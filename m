@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dI9ul-0003Oy-8t
+	(envelope-from <dgibson@ozlabs.org>) id 1dI9ul-0003Ow-8e
 	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 04:32:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dI9uf-00021Y-MC
+	(envelope-from <dgibson@ozlabs.org>) id 1dI9uf-00021O-LM
 	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 04:32:34 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue,  6 Jun 2017 18:32:15 +1000
-Message-Id: <20170606083221.9299-2-david@gibson.dropbear.id.au>
+Date: Tue,  6 Jun 2017 18:32:18 +1000
+Message-Id: <20170606083221.9299-5-david@gibson.dropbear.id.au>
 In-Reply-To: <20170606083221.9299-1-david@gibson.dropbear.id.au>
 References: <20170606083221.9299-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCH 1/7] spapr: Clean up DR entity sense handling
+Subject: [Qemu-devel] [PATCH 4/7] spapr: Don't misuse DR-indicator in
+ spapr_recover_pending_dimm_state()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,234 +23,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mdroth@linux.vnet.ibm.com
 Cc: lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, sursingh@redhat.com, groug@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-DRC classes have an entity_sense method to determine (in a specific PAPR
-sense) the presence or absence of a device plugged into a DRC.  However,
-we only have one implementation of the method, which explicitly tests for
-different DRC types.  This changes it to instead have different method
-implementations for the two cases: "logical" and "physical" DRCs.
+With some combinations of migration and hotplug we can lost temporary state
+indicating how many DRCs (guest side hotplug handles) are still connected
+to a DIMM object in the process of removal.  When we hit that situation
+spapr_recover_pending_dimm_state() is used to scan more extensively and
+work out the right number.
 
-While we're at it, the entity sense method always returns RTAS_OUT_SUCCESS,
-and the interesting value is returned via pass-by-reference.  Simplify this
-to directly return the value we care about
+It does this using drc->indicator state to determine what state of
+disconnection the DRC is in.  However, this is not safe, because the
+indicator state is guest settable - in fact it's more-or-less a purely
+guest->host notification mechanism which should have no bearing on the
+internals of hotplug state management.
+
+So, replace the test for this with a test on drc->dev, which is a purely
+qemu side managed variable, and updated the same BQL critical section as
+the indicator state.
+
+This does introduce an off-by-one change, because the indicator state was
+updated before the call to spapr_lmb_release() on the current DRC, whereas
+drc->dev is updated afterwards.  That's corrected by always decrementing
+the nr_lmbs value instead of only doing so in the case where we didn't
+have to recover information.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_drc.c         | 76 ++++++++++++++++++++++++----------------------
- hw/ppc/spapr_pci.c         |  6 ++--
- hw/ppc/trace-events        |  1 -
- include/hw/ppc/spapr_drc.h |  4 +--
- 4 files changed, 44 insertions(+), 43 deletions(-)
+ hw/ppc/spapr.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index 39e7f30..da3779e 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -185,39 +185,29 @@ static void set_signalled(sPAPRDRConnector *drc)
-  * based on the current allocation/indicator/power states
-  * for the DR connector.
-  */
--static uint32_t entity_sense(sPAPRDRConnector *drc, sPAPRDREntitySense *state)
-+static sPAPRDREntitySense physical_entity_sense(sPAPRDRConnector *drc)
- {
--    if (drc->dev) {
--        if (spapr_drc_type(drc) != SPAPR_DR_CONNECTOR_TYPE_PCI &&
--            drc->allocation_state == SPAPR_DR_ALLOCATION_STATE_UNUSABLE) {
--            /* for logical DR, we return a state of UNUSABLE
--             * iff the allocation state UNUSABLE.
--             * Otherwise, report the state as USABLE/PRESENT,
--             * as we would for PCI.
--             */
--            *state = SPAPR_DR_ENTITY_SENSE_UNUSABLE;
--        } else {
--            /* this assumes all PCI devices are assigned to
--             * a 'live insertion' power domain, where QEMU
--             * manages power state automatically as opposed
--             * to the guest. present, non-PCI resources are
--             * unaffected by power state.
--             */
--            *state = SPAPR_DR_ENTITY_SENSE_PRESENT;
--        }
-+    /* this assumes all PCI devices are assigned to a 'live insertion'
-+     * power domain, where QEMU manages power state automatically as
-+     * opposed to the guest. present, non-PCI resources are unaffected
-+     * by power state.
-+     */
-+    return drc->dev ? SPAPR_DR_ENTITY_SENSE_PRESENT
-+        : SPAPR_DR_ENTITY_SENSE_EMPTY;
-+}
-+
-+static sPAPRDREntitySense logical_entity_sense(sPAPRDRConnector *drc)
-+{
-+    /* for logical DR, we return a state of UNUSABLE iff the
-+     * allocation state UNUSABLE.  Otherwise, report the state as
-+     * USABLE/PRESENT, as we would for PCI.
-+     */
-+    if (drc->dev
-+        && (drc->allocation_state != SPAPR_DR_ALLOCATION_STATE_UNUSABLE)) {
-+        return SPAPR_DR_ENTITY_SENSE_PRESENT;
-     } else {
--        if (spapr_drc_type(drc) == SPAPR_DR_CONNECTOR_TYPE_PCI) {
--            /* PCI devices, and only PCI devices, use EMPTY
--             * in cases where we'd otherwise use UNUSABLE
--             */
--            *state = SPAPR_DR_ENTITY_SENSE_EMPTY;
--        } else {
--            *state = SPAPR_DR_ENTITY_SENSE_UNUSABLE;
--        }
-+        return SPAPR_DR_ENTITY_SENSE_UNUSABLE;
-     }
--
--    trace_spapr_drc_entity_sense(spapr_drc_index(drc), *state);
--    return RTAS_OUT_SUCCESS;
- }
- 
- static void prop_get_index(Object *obj, Visitor *v, const char *name,
-@@ -445,7 +435,6 @@ static void reset(DeviceState *d)
- {
-     sPAPRDRConnector *drc = SPAPR_DR_CONNECTOR(d);
-     sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
--    sPAPRDREntitySense state;
- 
-     trace_spapr_drc_reset(spapr_drc_index(drc));
- 
-@@ -477,8 +466,7 @@ static void reset(DeviceState *d)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 671cdbb..e8cecaf 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2683,7 +2683,7 @@ static sPAPRDIMMState *spapr_recover_pending_dimm_state(sPAPRMachineState *ms,
+         drc = spapr_drc_by_id(TYPE_SPAPR_DRC_LMB,
+                               addr / SPAPR_MEMORY_BLOCK_SIZE);
+         g_assert(drc);
+-        if (drc->indicator_state != SPAPR_DR_INDICATOR_STATE_INACTIVE) {
++        if (drc->dev) {
+             avail_lmbs++;
          }
+         addr += SPAPR_MEMORY_BLOCK_SIZE;
+@@ -2707,10 +2707,11 @@ void spapr_lmb_release(DeviceState *dev)
+      * during the unplug process. In this case recover it. */
+     if (ds == NULL) {
+         ds = spapr_recover_pending_dimm_state(spapr, PC_DIMM(dev));
+-        if (ds->nr_lmbs) {
+-            return;
+-        }
+-    } else if (--ds->nr_lmbs) {
++        /* The DRC being examined by the caller at least must be counted */
++        g_assert(ds->nr_lmbs);
++    }
++
++    if (--ds->nr_lmbs) {
+         return;
      }
  
--    drck->entity_sense(drc, &state);
--    if (state == SPAPR_DR_ENTITY_SENSE_PRESENT) {
-+    if (drck->dr_entity_sense(drc) == SPAPR_DR_ENTITY_SENSE_PRESENT) {
-         drck->set_signalled(drc);
-     }
- }
-@@ -488,8 +476,7 @@ static bool spapr_drc_needed(void *opaque)
-     sPAPRDRConnector *drc = (sPAPRDRConnector *)opaque;
-     sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
-     bool rc = false;
--    sPAPRDREntitySense value;
--    drck->entity_sense(drc, &value);
-+    sPAPRDREntitySense value = drck->dr_entity_sense(drc);
- 
-     /* If no dev is plugged in there is no need to migrate the DRC state */
-     if (value != SPAPR_DR_ENTITY_SENSE_PRESENT) {
-@@ -667,7 +654,6 @@ static void spapr_dr_connector_class_init(ObjectClass *k, void *data)
-     drck->set_indicator_state = set_indicator_state;
-     drck->set_allocation_state = set_allocation_state;
-     drck->get_name = get_name;
--    drck->entity_sense = entity_sense;
-     drck->attach = attach;
-     drck->detach = detach;
-     drck->release_pending = release_pending;
-@@ -678,6 +664,20 @@ static void spapr_dr_connector_class_init(ObjectClass *k, void *data)
-     dk->user_creatable = false;
- }
- 
-+static void spapr_drc_physical_class_init(ObjectClass *k, void *data)
-+{
-+    sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_CLASS(k);
-+
-+    drck->dr_entity_sense = physical_entity_sense;
-+}
-+
-+static void spapr_drc_logical_class_init(ObjectClass *k, void *data)
-+{
-+    sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_CLASS(k);
-+
-+    drck->dr_entity_sense = logical_entity_sense;
-+}
-+
- static void spapr_drc_cpu_class_init(ObjectClass *k, void *data)
- {
-     sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_CLASS(k);
-@@ -716,6 +716,7 @@ static const TypeInfo spapr_drc_physical_info = {
-     .name          = TYPE_SPAPR_DRC_PHYSICAL,
-     .parent        = TYPE_SPAPR_DR_CONNECTOR,
-     .instance_size = sizeof(sPAPRDRConnector),
-+    .class_init    = spapr_drc_physical_class_init,
-     .abstract      = true,
- };
- 
-@@ -723,6 +724,7 @@ static const TypeInfo spapr_drc_logical_info = {
-     .name          = TYPE_SPAPR_DRC_LOGICAL,
-     .parent        = TYPE_SPAPR_DR_CONNECTOR,
-     .instance_size = sizeof(sPAPRDRConnector),
-+    .class_init    = spapr_drc_logical_class_init,
-     .abstract      = true,
- };
- 
-@@ -1010,7 +1012,7 @@ static void rtas_get_sensor_state(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-         goto out;
-     }
-     drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
--    ret = drck->entity_sense(drc, &sensor_state);
-+    sensor_state = drck->dr_entity_sense(drc);
- 
- out:
-     rtas_st(rets, 0, ret);
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 0c181bb..5cba8f9 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1481,7 +1481,7 @@ static void spapr_phb_hot_plug_child(HotplugHandler *plug_handler,
-             func_drc = spapr_phb_get_pci_func_drc(phb, pci_bus_num(bus),
-                                                   PCI_DEVFN(slotnr, i));
-             func_drck = SPAPR_DR_CONNECTOR_GET_CLASS(func_drc);
--            func_drck->entity_sense(func_drc, &state);
-+            state = func_drck->dr_entity_sense(func_drc);
- 
-             if (state == SPAPR_DR_ENTITY_SENSE_PRESENT) {
-                 spapr_hotplug_req_add_by_index(func_drc);
-@@ -1522,7 +1522,7 @@ static void spapr_phb_hot_unplug_child(HotplugHandler *plug_handler,
-                 func_drc = spapr_phb_get_pci_func_drc(phb, pci_bus_num(bus),
-                                                       PCI_DEVFN(slotnr, i));
-                 func_drck = SPAPR_DR_CONNECTOR_GET_CLASS(func_drc);
--                func_drck->entity_sense(func_drc, &state);
-+                state = func_drck->dr_entity_sense(func_drc);
-                 if (state == SPAPR_DR_ENTITY_SENSE_PRESENT
-                     && !func_drck->release_pending(func_drc)) {
-                     error_setg(errp,
-@@ -1548,7 +1548,7 @@ static void spapr_phb_hot_unplug_child(HotplugHandler *plug_handler,
-                 func_drc = spapr_phb_get_pci_func_drc(phb, pci_bus_num(bus),
-                                                       PCI_DEVFN(slotnr, i));
-                 func_drck = SPAPR_DR_CONNECTOR_GET_CLASS(func_drc);
--                func_drck->entity_sense(func_drc, &state);
-+                state = func_drck->dr_entity_sense(func_drc);
-                 if (state == SPAPR_DR_ENTITY_SENSE_PRESENT) {
-                     spapr_hotplug_req_remove_by_index(func_drc);
-                 }
-diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
-index 43d265f..4979397 100644
---- a/hw/ppc/trace-events
-+++ b/hw/ppc/trace-events
-@@ -44,7 +44,6 @@ spapr_drc_set_allocation_state(uint32_t index, int state) "drc: 0x%"PRIx32", sta
- spapr_drc_set_allocation_state_finalizing(uint32_t index) "drc: 0x%"PRIx32
- spapr_drc_set_configured(uint32_t index) "drc: 0x%"PRIx32
- spapr_drc_set_configured_skipping(uint32_t index) "drc: 0x%"PRIx32", isolated device"
--spapr_drc_entity_sense(uint32_t index, int state) "drc: 0x%"PRIx32", state: 0x%x"
- spapr_drc_attach(uint32_t index) "drc: 0x%"PRIx32
- spapr_drc_detach(uint32_t index) "drc: 0x%"PRIx32
- spapr_drc_awaiting_isolated(uint32_t index) "drc: 0x%"PRIx32
-diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-index c88e1be..f892b94 100644
---- a/include/hw/ppc/spapr_drc.h
-+++ b/include/hw/ppc/spapr_drc.h
-@@ -214,6 +214,8 @@ typedef struct sPAPRDRConnectorClass {
-     sPAPRDRConnectorTypeShift typeshift;
-     const char *typename; /* used in device tree, PAPR 13.5.2.6 & C.6.1 */
- 
-+    sPAPRDREntitySense (*dr_entity_sense)(sPAPRDRConnector *drc);
-+
-     /* accessors for guest-visible (generally via RTAS) DR state */
-     uint32_t (*set_isolation_state)(sPAPRDRConnector *drc,
-                                     sPAPRDRIsolationState state);
-@@ -223,8 +225,6 @@ typedef struct sPAPRDRConnectorClass {
-                                      sPAPRDRAllocationState state);
-     const char *(*get_name)(sPAPRDRConnector *drc);
- 
--    uint32_t (*entity_sense)(sPAPRDRConnector *drc, sPAPRDREntitySense *state);
--
-     /* QEMU interfaces for managing hotplug operations */
-     void (*attach)(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
-                    int fdt_start_offset, bool coldplug, Error **errp);
 -- 
 2.9.4
