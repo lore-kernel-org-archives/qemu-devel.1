@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dIIV9-0006IB-ML
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:42:44 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dIIVD-0006Qu-3e
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:42:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dIIV8-00081z-Mg
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:42:43 -0400
-Date: Tue, 6 Jun 2017 18:42:18 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170606174218.GA2411@work-vm>
-References: <20170606052438.35405-1-haoqf@linux.vnet.ibm.com>
-	<20170606052438.35405-2-haoqf@linux.vnet.ibm.com>
-	<20170606124953.GD5448@noname.redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dIIVC-00084s-9O
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:42:47 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:33759)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dIIVC-00083d-26
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:42:46 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id v104so57389114wrb.0
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 10:42:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170606124953.GD5448@noname.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] qemu/migration: fix the double free
- problem on from_src_file
+In-Reply-To: <20170606140216.12270-1-pbonzini@redhat.com>
+References: <20170606140216.12270-1-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 6 Jun 2017 18:42:24 +0100
+Message-ID: <CAFEAcA_nSQ6dXsXS8zKZusqrPTYPq4HNzFyA3XhLOW7dCM=XLw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v3 00/33] Misc patches for 2017-06-01
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,74 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, quintela@redhat.com
-Cc: QingFeng Hao <haoqf@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, peterx@redhat.com, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, liujbjl@linux.vnet.ibm.com, famz@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-* Kevin Wolf (kwolf@redhat.com) wrote:
-> Am 06.06.2017 um 07:24 hat QingFeng Hao geschrieben:
-> > In load_snapshot, mis->from_src_file is freed twice, the first free is by
-> > qemu_fclose, the second is by migration_incoming_state_destroy and
-> > it causes Illegal instruction exception. The fix is just to remove the
-> > first free.
-> > 
-> > This problem is found by qemu-iotests case 068 since commit
-> > "660819b migration: shut src return path unconditionally". The error is:
-> > 068 1s ... - output mismatch (see 068.out.bad)
-> >     --- tests/qemu-iotests/068.out	2017-05-06 01:00:26.417270437 +0200
-> >     +++ 068.out.bad	2017-06-03 13:59:55.360274640 +0200
-> >     @@ -6,6 +6,8 @@
-> >      QEMU X.Y.Z monitor - type 'help' for more information
-> >      (qemu) savevm 0
-> >      (qemu) quit
-> >     +./common.config: line 107: 242472 Illegal instruction     (core dumped) ( if [ -n "${QEMU_NEED_PID}" ]; then
-> >     +    echo $BASHPID > "${QEMU_TEST_DIR}/qemu-${_QEMU_HANDLE}.pid";
-> >     +fi; exec "$QEMU_PROG" $QEMU_OPTIONS "$@" )
-> >      QEMU X.Y.Z monitor - type 'help' for more information
-> >     -(qemu) quit
-> >     -*** done
-> >     +(qemu) *** done
-> > 
-> > Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > Reviewed-by: Peter Xu <peterx@redhat.com>
-> 
-> Dave, as you only gave R-b rather than merging the patch, should this be
-> merged through the block tree?
+On 6 June 2017 at 15:02, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> The following changes since commit 70f31414e71250c6049a46851372ee6ea76f40=
+dd:
+>
+>   Merge remote-tracking branch 'remotes/ehabkost/tags/numa-pull-request' =
+into staging (2017-06-01 10:58:47 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/bonzini/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to 0c5029c963dbce627d75cd0267594224c89a6479:
+>
+>   Merge tag 'tags/for-upstream' into HEAD
 
-I'm happy for it to go via block but also happy for it to go via
-migration; Juan is mostly doing the migration set at the moment since
-they're dominated by his cleanups.
+This doesn't build when merged into current master:
 
-> > diff --git a/migration/savevm.c b/migration/savevm.c
-> > index 9c320f59d0..853e14e34e 100644
-> > --- a/migration/savevm.c
-> > +++ b/migration/savevm.c
-> > @@ -2290,7 +2290,6 @@ int load_snapshot(const char *name, Error **errp)
-> >  
-> >      aio_context_acquire(aio_context);
-> >      ret = qemu_loadvm_state(f);
-> > -    qemu_fclose(f);
-> >      aio_context_release(aio_context);
-> >  
-> >      migration_incoming_state_destroy();
-> 
-> Did we check other callers of migration_incoming_state_destroy()?
-> 
-> For example, qmp_xen_load_devices_state() looks suspicious, too.
+/home/pm215/qemu/hw/scsi/vhost-user-scsi.c: In function
+=E2=80=98vhost_user_scsi_realize=E2=80=99:
+/home/pm215/qemu/hw/scsi/vhost-user-scsi.c:121:5: error: implicit
+declaration of function =E2=80=98register_savevm=E2=80=99
+[-Werror=3Dimplicit-function-declaration]
+     register_savevm(dev, "vhost-user-scsi", vhost_user_scsi_id++, 1,
+     ^
+/home/pm215/qemu/hw/scsi/vhost-user-scsi.c:121:5: error: nested extern
+declaration of =E2=80=98register_savevm=E2=80=99 [-Werror=3Dnested-externs]
 
-Hmm, it looks suspicious in the opposite direction; it never sets
-mis->from_src_file as was added by b4b076da into the load_snapshot path.
+It has crossed in the post with the ppc pullreq, which includes
+a patch which removes register_savevm() as finally unnecessary.
+This new device should almost certainly be using a vmstate
+struct instead.
 
-> I can't tell for postcopy_ram_listen_thread() - commit 660819b didn't
-> seem to remove a qemu_fclose() call there, but I can't see one left
-> behind either. Was the file leaked before commit 660819b or am I
-> missing something?
-
-I don't think there's a problem in the postcopy path, although hmm was
-I missing a close before?
-
-Dave
-> 
-> Kevin
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks
+-- PMM
