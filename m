@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dIDE3-00056J-Cj
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 08:04:45 -0400
+	(envelope-from <eblake@redhat.com>) id 1dIDHx-0007SW-7u
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 08:08:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dIDDy-0008Uu-E6
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 08:04:43 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:32969)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dIDDy-0008T7-2B
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 08:04:38 -0400
-Received: by mail-lf0-x241.google.com with SMTP id u62so11487123lfg.0
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 05:04:37 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1dIDHw-0001ad-AK
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 08:08:45 -0400
+References: <20170530104857.70083-1-vsementsov@virtuozzo.com>
+	<20170530104857.70083-2-vsementsov@virtuozzo.com>
+	<21763282-556d-4389-29b5-664f6f4f4479@redhat.com>
+	<b1e2e189-c195-0f54-ffe8-45287d8d522f@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c523b295-0e15-c20a-12e6-5d920d7bbec3@redhat.com>
+Date: Tue, 6 Jun 2017 07:08:34 -0500
 MIME-Version: 1.0
-References: <1496666711-14630-1-git-send-email-amarnath.valluri@intel.com>
-	<1496666711-14630-8-git-send-email-amarnath.valluri@intel.com>
-In-Reply-To: <1496666711-14630-8-git-send-email-amarnath.valluri@intel.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 06 Jun 2017 12:04:25 +0000
-Message-ID: <CAJ+F1CJ8ML1_ZeB+rPdiK2ouQvxFHvu29DrWWWj6CNj=sH1mAg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 7/8] tpm-passthrough: move reusable code
- to utils
+In-Reply-To: <b1e2e189-c195-0f54-ffe8-45287d8d522f@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="lN7mgLEqq45PJnw2pWNGWAMANR9qkbwRS"
+Subject: Re: [Qemu-devel] [PATCH 1/4] block: add bdrv_get_format_alloc_stat
+ format interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,204 +27,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
-On Mon, Jun 5, 2017 at 4:44 PM Amarnath Valluri <amarnath.valluri@intel.com=
->
-wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--lN7mgLEqq45PJnw2pWNGWAMANR9qkbwRS
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+Message-ID: <c523b295-0e15-c20a-12e6-5d920d7bbec3@redhat.com>
+Subject: Re: [PATCH 1/4] block: add bdrv_get_format_alloc_stat format
+ interface
+References: <20170530104857.70083-1-vsementsov@virtuozzo.com>
+ <20170530104857.70083-2-vsementsov@virtuozzo.com>
+ <21763282-556d-4389-29b5-664f6f4f4479@redhat.com>
+ <b1e2e189-c195-0f54-ffe8-45287d8d522f@virtuozzo.com>
+In-Reply-To: <b1e2e189-c195-0f54-ffe8-45287d8d522f@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
-> Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
->
+On 06/02/2017 10:26 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 30.05.2017 17:53, Eric Blake wrote:
+>> On 05/30/2017 05:48 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> The function should collect statistics, about allocted/unallocated by=
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>> top-level format driver space (in its .file) and allocation status
+>>> (allocated/hole/after eof) of corresponding areas in this .file.
+>>>
+
+>>> +# @BlockFormatAllocInfo:
+>>> +#
+>>> +# Information about allocations, including metadata. All fields are
+>>> in bytes.
+>=20
+> s/All fields are in bytes./All fields are in bytes and aligned by secto=
+r
+> (512 bytes)./
+
+I wouldn't even promise sector alignment. We probably happen to have
+sector alignment (especially for qcow2, since the smallest cluster size
+permitted is sector aligned), but I see no inherent reason why we can't
+support sub-sector values if we are reporting in bytes.
+
+>=20
+> - ok? to emphasize that there is nothing about clusters... Or may be
+> better to write that they are aligned by byte.
+
+I think "All fields are in bytes" is sufficient.
 
 
+>>> +{ 'struct': 'BlockFormatAllocInfo',
+>>> +  'data': {'alloc_alloc':    'uint64',
+>>> +           'alloc_hole':     'uint64',
+>>> +           'alloc_overhead': 'uint64',
+>>> +           'hole_alloc':     'uint64',
+>>> +           'hole_hole':      'uint64' } }
+>> The idea seems okay, but the naming needs to be fixed.  Also, I'm not
+>> sure if we need all 5, or if 4 is enough; and I'm not sure if we have
+>> the right names ("how does alloc-hole differ from hole-alloc?"), or if=
 
-> ---
->  hw/tpm/tpm_passthrough.c | 64
-> ++++--------------------------------------------
->  hw/tpm/tpm_util.c        | 25 +++++++++++++++++++
->  hw/tpm/tpm_util.h        |  4 +++
->  3 files changed, 34 insertions(+), 59 deletions(-)
->
-> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
-> index 4ac47ed..592fd1f 100644
-> --- a/hw/tpm/tpm_passthrough.c
-> +++ b/hw/tpm/tpm_passthrough.c
-> @@ -68,27 +68,6 @@ typedef struct TPMPassthruState TPMPassthruState;
->
->  static void tpm_passthrough_cancel_cmd(TPMBackend *tb);
->
-> -static int tpm_passthrough_unix_write(int fd, const uint8_t *buf,
-> uint32_t len)
-> -{
-> -    int ret, remain;
-> -
-> -    remain =3D len;
-> -    while (remain > 0) {
-> -        ret =3D write(fd, buf, remain);
-> -        if (ret < 0) {
-> -            if (errno !=3D EINTR && errno !=3D EAGAIN) {
-> -                return -1;
-> -            }
-> -        } else if (ret =3D=3D 0) {
-> -            break;
-> -        } else {
-> -            buf +=3D ret;
-> -            remain -=3D ret;
-> -        }
-> -    }
-> -    return len - remain;
-> -}
-> -
->  static int tpm_passthrough_unix_read(int fd, uint8_t *buf, uint32_t len)
->  {
->      int ret;
-> @@ -102,45 +81,12 @@ static int tpm_passthrough_unix_read(int fd, uint8_t
-> *buf, uint32_t len)
->      }
->      return ret;
->  }
-> -
-> -static uint32_t tpm_passthrough_get_size_from_buffer(const uint8_t *buf)
-> -{
-> -    struct tpm_resp_hdr *resp =3D (struct tpm_resp_hdr *)buf;
-> -
-> -    return be32_to_cpu(resp->len);
-> -}
-> -
-> -/*
-> - * Write an error message in the given output buffer.
-> - */
-> -static void tpm_write_fatal_error_response(uint8_t *out, uint32_t out_le=
-n)
-> -{
-> -    if (out_len >=3D sizeof(struct tpm_resp_hdr)) {
-> -        struct tpm_resp_hdr *resp =3D (struct tpm_resp_hdr *)out;
-> -
-> -        resp->tag =3D cpu_to_be16(TPM_TAG_RSP_COMMAND);
-> -        resp->len =3D cpu_to_be32(sizeof(struct tpm_resp_hdr));
-> -        resp->errcode =3D cpu_to_be32(TPM_FAIL);
-> -    }
-> -}
-> -
-> -static bool tpm_passthrough_is_selftest(const uint8_t *in, uint32_t
-> in_len)
-> -{
-> -    struct tpm_req_hdr *hdr =3D (struct tpm_req_hdr *)in;
-> -
-> -    if (in_len >=3D sizeof(*hdr)) {
-> -        return (be32_to_cpu(hdr->ordinal) =3D=3D TPM_ORD_ContinueSelfTes=
-t);
-> -    }
-> -
-> -    return false;
-> -}
-> -
->  static int tpm_passthrough_unix_tx_bufs(TPMPassthruState *tpm_pt,
->                                          const uint8_t *in, uint32_t
-> in_len,
->                                          uint8_t *out, uint32_t out_len,
->                                          bool *selftest_done)
->  {
-> -    int ret;
-> +    ssize_t ret;
->      bool is_selftest;
->      const struct tpm_resp_hdr *hdr;
->
-> @@ -148,9 +94,9 @@ static int
-> tpm_passthrough_unix_tx_bufs(TPMPassthruState *tpm_pt,
->      tpm_pt->tpm_executing =3D true;
->      *selftest_done =3D false;
->
-> -    is_selftest =3D tpm_passthrough_is_selftest(in, in_len);
-> +    is_selftest =3D tpm_util_is_selftest(in, in_len);
->
-> -    ret =3D tpm_passthrough_unix_write(tpm_pt->tpm_fd, in, in_len);
-> +    ret =3D qemu_write_full(tpm_pt->tpm_fd, (const void *)in,
-> (size_t)in_len);
->      if (ret !=3D in_len) {
->          if (!tpm_pt->tpm_op_canceled || errno !=3D ECANCELED) {
->              error_report("tpm_passthrough: error while transmitting data=
- "
-> @@ -170,7 +116,7 @@ static int
-> tpm_passthrough_unix_tx_bufs(TPMPassthruState *tpm_pt,
->                           strerror(errno), errno);
->          }
->      } else if (ret < sizeof(struct tpm_resp_hdr) ||
-> -               tpm_passthrough_get_size_from_buffer(out) !=3D ret) {
-> +               be32_to_cpu(((struct tpm_resp_hdr *)out)->len) !=3D ret) =
-{
->          ret =3D -1;
->          error_report("tpm_passthrough: received invalid response "
->                       "packet from TPM");
-> @@ -183,7 +129,7 @@ static int
-> tpm_passthrough_unix_tx_bufs(TPMPassthruState *tpm_pt,
->
->  err_exit:
->      if (ret < 0) {
-> -        tpm_write_fatal_error_response(out, out_len);
-> +        tpm_util_write_fatal_error_response(out, out_len);
->      }
->
->      tpm_pt->tpm_executing =3D false;
-> diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
-> index 7b35429..fb929f6 100644
-> --- a/hw/tpm/tpm_util.c
-> +++ b/hw/tpm/tpm_util.c
-> @@ -24,6 +24,31 @@
->  #include "tpm_int.h"
->
->  /*
-> + * Write an error message in the given output buffer.
-> + */
-> +void tpm_util_write_fatal_error_response(uint8_t *out, uint32_t out_len)
-> +{
-> +    if (out_len >=3D sizeof(struct tpm_resp_hdr)) {
-> +        struct tpm_resp_hdr *resp =3D (struct tpm_resp_hdr *)out;
-> +
-> +        resp->tag =3D cpu_to_be16(TPM_TAG_RSP_COMMAND);
-> +        resp->len =3D cpu_to_be32(sizeof(struct tpm_resp_hdr));
-> +        resp->errcode =3D cpu_to_be32(TPM_FAIL);
-> +    }
-> +}
-> +
-> +bool tpm_util_is_selftest(const uint8_t *in, uint32_t in_len)
-> +{
-> +    struct tpm_req_hdr *hdr =3D (struct tpm_req_hdr *)in;
-> +
-> +    if (in_len >=3D sizeof(*hdr)) {
-> +        return (be32_to_cpu(hdr->ordinal) =3D=3D TPM_ORD_ContinueSelfTes=
-t);
-> +    }
-> +
-> +    return false;
-> +}
-> +
-> +/*
->   * A basic test of a TPM device. We expect a well formatted response
-> header
->   * (error response is fine) within one second.
->   */
-> diff --git a/hw/tpm/tpm_util.h b/hw/tpm/tpm_util.h
-> index df76245..2f7c961 100644
-> --- a/hw/tpm/tpm_util.h
-> +++ b/hw/tpm/tpm_util.h
-> @@ -24,6 +24,10 @@
->
->  #include "sysemu/tpm_backend.h"
->
-> +void tpm_util_write_fatal_error_response(uint8_t *out, uint32_t out_len)=
-;
-> +
-> +bool tpm_util_is_selftest(const uint8_t *in, uint32_t in_len);
-> +
->  int tpm_util_test_tpmdev(int tpm_fd, TPMVersion *tpm_version);
->
->  #endif /* TPM_TPM_UTIL_H */
-> --
-> 2.7.4
->
-> --
-Marc-Andr=C3=A9 Lureau
+>> we can come up with something more descriptive.  Particularly since
+>> "hole-" is not a hole in the filesystem sense, so much as unused
+>> clusters.  But I'm also not coming up with better names to suggest at
+>> the moment.
+>>
+> how about:
+>=20
+> used-allocated
+> used-discarded
+> used-overrun
+>=20
+> unused-allocated
+> unused-discarded
+
+Those work for me.
+
+>=20
+>=20
+> also, do you mention that your detailed wordings should be included int=
+o
+> block-core.json or you just clarify things?
+
+Good documentation is worth the effort. I don't know if you want all of
+my details in block-core.json, but giving a better overview of how each
+statistic is possible does make it easier to visualize what the
+statistic is actually counting.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--lN7mgLEqq45PJnw2pWNGWAMANR9qkbwRS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZNptCAAoJEKeha0olJ0NqmDwH/RY+lVpvV4e3AMfioxj7XcRg
+eAIrNTBRAiJ/EvPDFH2qGC1/6plEiMlFJFfOwq/s7yY9eD1hGlNcj6XOFvW7RFm+
+2om49QheLsy1Mg0MzCLotshpiz4LRL0JN4ygGgwJct6QVEoG90laqf5IJJV4yFYg
+ZPr6PCXrc4cM/MJqY01whXDDu+yMqA1NxFnb/1Yw4SkK9BRPQLQ23dXaLCFc872v
+++TJ1MktyTX3SXybEGu9Ml0pNvTHynqtKFh5Ez6Zp0UqlWzDdMJIxYDpJa3fHuON
+yhHel18yzpRjbndV3uzN9xhamYK96biUNKHSWt7NQykLEWnRcHVmQx4pwfXz9Ko=
+=zKxc
+-----END PGP SIGNATURE-----
+
+--lN7mgLEqq45PJnw2pWNGWAMANR9qkbwRS--
