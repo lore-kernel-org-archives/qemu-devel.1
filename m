@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54225)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dI4au-0003Uc-SR
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:51:46 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dI4aw-0003Us-UZ
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:51:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dI4at-0002x4-R7
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:51:44 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dI4at-0002wu-RJ
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:51:46 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue,  6 Jun 2017 12:51:19 +1000
-Message-Id: <20170606025135.2685-2-david@gibson.dropbear.id.au>
+Date: Tue,  6 Jun 2017 12:51:22 +1000
+Message-Id: <20170606025135.2685-5-david@gibson.dropbear.id.au>
 In-Reply-To: <20170606025135.2685-1-david@gibson.dropbear.id.au>
 References: <20170606025135.2685-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 01/17] migration: remove register_savevm()
+Subject: [Qemu-devel] [PULL 04/17] spapr: Abolish DRC get_fdt method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,184 +20,116 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, Laurent Vivier <lvivier@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 
-From: Laurent Vivier <lvivier@redhat.com>
+The DRConnectorClass includes a get_fdt method.  However
+  * There's only one implementation, and there's only likely to ever be one
+  * Both callers are local to spapr_drc
+  * Each caller only uses one half of the actual implementation
 
-We can replace the four remaining calls of register_savevm() by
-calls to register_savevm_live(). So we can remove the function and
-as we don't allocate anymore the ops pointer with g_new0()
-we don't have to free it then.
+So abolish get_fdt() entirely, and just open-code what we need.
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Tested-by: Daniel Barboza <danielhb@linux.vnet.ibm.com>
 ---
- hw/net/vmxnet3.c            |  8 ++++++--
- hw/s390x/s390-skeys.c       |  9 +++++++--
- hw/s390x/s390-virtio-ccw.c  |  8 ++++++--
- include/migration/vmstate.h |  8 --------
- migration/savevm.c          | 16 ----------------
- slirp/slirp.c               |  8 ++++++--
- 6 files changed, 25 insertions(+), 32 deletions(-)
+ hw/ppc/spapr_drc.c         | 23 ++++++-----------------
+ include/hw/ppc/spapr_drc.h |  1 -
+ 2 files changed, 6 insertions(+), 18 deletions(-)
 
-diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
-index 8b1fab2..4df3110 100644
---- a/hw/net/vmxnet3.c
-+++ b/hw/net/vmxnet3.c
-@@ -2262,6 +2262,11 @@ static const MemoryRegionOps b1_ops = {
-     },
- };
- 
-+static SaveVMHandlers savevm_vmxnet3_msix = {
-+    .save_state = vmxnet3_msix_save,
-+    .load_state = vmxnet3_msix_load,
-+};
-+
- static uint64_t vmxnet3_device_serial_num(VMXNET3State *s)
- {
-     uint64_t dsn_payload;
-@@ -2331,8 +2336,7 @@ static void vmxnet3_pci_realize(PCIDevice *pci_dev, Error **errp)
-                               vmxnet3_device_serial_num(s));
-     }
- 
--    register_savevm(dev, "vmxnet3-msix", -1, 1,
--                    vmxnet3_msix_save, vmxnet3_msix_load, s);
-+    register_savevm_live(dev, "vmxnet3-msix", -1, 1, &savevm_vmxnet3_msix, s);
+diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+index ae8800d..f5b7b68 100644
+--- a/hw/ppc/spapr_drc.c
++++ b/hw/ppc/spapr_drc.c
+@@ -199,14 +199,6 @@ static const char *get_name(sPAPRDRConnector *drc)
+     return drc->name;
  }
  
- static void vmxnet3_instance_init(Object *obj)
-diff --git a/hw/s390x/s390-skeys.c b/hw/s390x/s390-skeys.c
-index 619152c..35e7f63 100644
---- a/hw/s390x/s390-skeys.c
-+++ b/hw/s390x/s390-skeys.c
-@@ -362,6 +362,11 @@ static inline bool s390_skeys_get_migration_enabled(Object *obj, Error **errp)
-     return ss->migration_enabled;
- }
- 
-+static SaveVMHandlers savevm_s390_storage_keys = {
-+    .save_state = s390_storage_keys_save,
-+    .load_state = s390_storage_keys_load,
-+};
-+
- static inline void s390_skeys_set_migration_enabled(Object *obj, bool value,
-                                             Error **errp)
- {
-@@ -375,8 +380,8 @@ static inline void s390_skeys_set_migration_enabled(Object *obj, bool value,
-     ss->migration_enabled = value;
- 
-     if (ss->migration_enabled) {
--        register_savevm(NULL, TYPE_S390_SKEYS, 0, 1, s390_storage_keys_save,
--                        s390_storage_keys_load, ss);
-+        register_savevm_live(NULL, TYPE_S390_SKEYS, 0, 1,
-+                             &savevm_s390_storage_keys, ss);
-     } else {
-         unregister_savevm(DEVICE(ss), TYPE_S390_SKEYS, ss);
-     }
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index c9021f2..a806345 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -104,6 +104,11 @@ void s390_memory_init(ram_addr_t mem_size)
-     s390_skeys_init();
- }
- 
-+static SaveVMHandlers savevm_gtod = {
-+    .save_state = gtod_save,
-+    .load_state = gtod_load,
-+};
-+
- static void ccw_init(MachineState *machine)
- {
-     int ret;
-@@ -151,8 +156,7 @@ static void ccw_init(MachineState *machine)
-     s390_create_virtio_net(BUS(css_bus), "virtio-net-ccw");
- 
-     /* Register savevm handler for guest TOD clock */
--    register_savevm(NULL, "todclock", 0, 1,
--                    gtod_save, gtod_load, kvm_state);
-+    register_savevm_live(NULL, "todclock", 0, 1, &savevm_gtod, kvm_state);
- }
- 
- static void s390_cpu_plug(HotplugHandler *hotplug_dev,
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index 6689562..8a3e9e6 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -59,14 +59,6 @@ typedef struct SaveVMHandlers {
-     LoadStateHandler *load_state;
- } SaveVMHandlers;
- 
--int register_savevm(DeviceState *dev,
--                    const char *idstr,
--                    int instance_id,
--                    int version_id,
--                    SaveStateHandler *save_state,
--                    LoadStateHandler *load_state,
--                    void *opaque);
--
- int register_savevm_live(DeviceState *dev,
-                          const char *idstr,
-                          int instance_id,
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 9c320f5..035c127 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -645,21 +645,6 @@ int register_savevm_live(DeviceState *dev,
-     return 0;
- }
- 
--int register_savevm(DeviceState *dev,
--                    const char *idstr,
--                    int instance_id,
--                    int version_id,
--                    SaveStateHandler *save_state,
--                    LoadStateHandler *load_state,
--                    void *opaque)
+-static const void *get_fdt(sPAPRDRConnector *drc, int *fdt_start_offset)
 -{
--    SaveVMHandlers *ops = g_new0(SaveVMHandlers, 1);
--    ops->save_state = save_state;
--    ops->load_state = load_state;
--    return register_savevm_live(dev, idstr, instance_id, version_id,
--                                ops, opaque);
+-    if (fdt_start_offset) {
+-        *fdt_start_offset = drc->fdt_start_offset;
+-    }
+-    return drc->fdt;
 -}
 -
- void unregister_savevm(DeviceState *dev, const char *idstr, void *opaque)
+ static void set_configured(sPAPRDRConnector *drc)
  {
-     SaveStateEntry *se, *new_se;
-@@ -679,7 +664,6 @@ void unregister_savevm(DeviceState *dev, const char *idstr, void *opaque)
-         if (strcmp(se->idstr, id) == 0 && se->opaque == opaque) {
-             QTAILQ_REMOVE(&savevm_state.handlers, se, entry);
-             g_free(se->compat);
--            g_free(se->ops);
-             g_free(se);
-         }
+     trace_spapr_drc_set_configured(get_index(drc));
+@@ -753,7 +745,6 @@ static void spapr_dr_connector_class_init(ObjectClass *k, void *data)
+     drck->get_index = get_index;
+     drck->get_type = get_type;
+     drck->get_name = get_name;
+-    drck->get_fdt = get_fdt;
+     drck->set_configured = set_configured;
+     drck->entity_sense = entity_sense;
+     drck->attach = attach;
+@@ -1126,7 +1117,6 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
+     sPAPRConfigureConnectorState *ccs;
+     sPAPRDRCCResponse resp = SPAPR_DR_CC_RESPONSE_CONTINUE;
+     int rc;
+-    const void *fdt;
+ 
+     if (nargs != 2 || nret != 1) {
+         rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
+@@ -1144,8 +1134,7 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
      }
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index e79345b..2386493 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -272,6 +272,11 @@ static void slirp_init_once(void)
- static void slirp_state_save(QEMUFile *f, void *opaque);
- static int slirp_state_load(QEMUFile *f, void *opaque, int version_id);
  
-+static SaveVMHandlers savevm_slirp_state = {
-+    .save_state = slirp_state_save,
-+    .load_state = slirp_state_load,
-+};
-+
- Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
-                   struct in_addr vnetmask, struct in_addr vhost,
-                   bool in6_enabled,
-@@ -321,8 +326,7 @@ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
+     drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+-    fdt = drck->get_fdt(drc, NULL);
+-    if (!fdt) {
++    if (!drc->fdt) {
+         trace_spapr_rtas_ibm_configure_connector_missing_fdt(drc_index);
+         rc = SPAPR_DR_CC_RESPONSE_NOT_CONFIGURABLE;
+         goto out;
+@@ -1154,7 +1143,7 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
+     ccs = spapr_ccs_find(spapr, drc_index);
+     if (!ccs) {
+         ccs = g_new0(sPAPRConfigureConnectorState, 1);
+-        (void)drck->get_fdt(drc, &ccs->fdt_offset);
++        ccs->fdt_offset = drc->fdt_start_offset;
+         ccs->drc_index = drc_index;
+         spapr_ccs_add(spapr, ccs);
+     }
+@@ -1165,12 +1154,12 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
+         const struct fdt_property *prop;
+         int fdt_offset_next, prop_len;
  
-     slirp->opaque = opaque;
+-        tag = fdt_next_tag(fdt, ccs->fdt_offset, &fdt_offset_next);
++        tag = fdt_next_tag(drc->fdt, ccs->fdt_offset, &fdt_offset_next);
  
--    register_savevm(NULL, "slirp", 0, 4,
--                    slirp_state_save, slirp_state_load, slirp);
-+    register_savevm_live(NULL, "slirp", 0, 4, &savevm_slirp_state, slirp);
+         switch (tag) {
+         case FDT_BEGIN_NODE:
+             ccs->fdt_depth++;
+-            name = fdt_get_name(fdt, ccs->fdt_offset, NULL);
++            name = fdt_get_name(drc->fdt, ccs->fdt_offset, NULL);
  
-     QTAILQ_INSERT_TAIL(&slirp_instances, slirp, entry);
+             /* provide the name of the next OF node */
+             wa_offset = CC_VAL_DATA_OFFSET;
+@@ -1193,9 +1182,9 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
+             }
+             break;
+         case FDT_PROP:
+-            prop = fdt_get_property_by_offset(fdt, ccs->fdt_offset,
++            prop = fdt_get_property_by_offset(drc->fdt, ccs->fdt_offset,
+                                               &prop_len);
+-            name = fdt_string(fdt, fdt32_to_cpu(prop->nameoff));
++            name = fdt_string(drc->fdt, fdt32_to_cpu(prop->nameoff));
  
+             /* provide the name of the next OF property */
+             wa_offset = CC_VAL_DATA_OFFSET;
+diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+index 813b9ff..80db955 100644
+--- a/include/hw/ppc/spapr_drc.h
++++ b/include/hw/ppc/spapr_drc.h
+@@ -178,7 +178,6 @@ typedef struct sPAPRDRConnectorClass {
+     uint32_t (*entity_sense)(sPAPRDRConnector *drc, sPAPRDREntitySense *state);
+ 
+     /* QEMU interfaces for managing FDT/configure-connector */
+-    const void *(*get_fdt)(sPAPRDRConnector *drc, int *fdt_start_offset);
+     void (*set_configured)(sPAPRDRConnector *drc);
+ 
+     /* QEMU interfaces for managing hotplug operations */
 -- 
 2.9.4
