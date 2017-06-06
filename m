@@ -1,34 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dIJEP-0006M9-F4
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:29:30 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dIJEQ-0006Mv-At
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:29:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dIJEK-00032S-HL
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:29:29 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53741)
+	(envelope-from <borntraeger@de.ibm.com>) id 1dIJEL-000331-BM
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:29:30 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38047
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dIJEK-000323-7q
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:29:24 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v56IT73x068512
-	for <qemu-devel@nongnu.org>; Tue, 6 Jun 2017 14:29:22 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2awynhxd2c-1
+	id 1dIJEL-00032b-4d
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:29:25 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v56IT3sm025420
+	for <qemu-devel@nongnu.org>; Tue, 6 Jun 2017 14:29:24 -0400
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2ax1derres-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 14:29:22 -0400
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 14:29:24 -0400
 Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 6 Jun 2017 19:29:20 +0100
+	Tue, 6 Jun 2017 19:29:22 +0100
 From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue,  6 Jun 2017 20:29:11 +0200
+Date: Tue,  6 Jun 2017 20:29:13 +0200
 In-Reply-To: <1496773755-53343-1-git-send-email-borntraeger@de.ibm.com>
 References: <1496773755-53343-1-git-send-email-borntraeger@de.ibm.com>
-Message-Id: <1496773755-53343-2-git-send-email-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PATCH 1/5] s390x/css: catch section mismatch on load
+Message-Id: <1496773755-53343-4-git-send-email-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PATCH 3/5] pc-bios/s390-ccw: use STRIP variable in
+ Makefile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,110 +40,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cornelia.huck@de.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-stable@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cornelia.huck@de.ibm.com>, Greg Kurz <groug@kaod.org>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
+From: Greg Kurz <groug@kaod.org>
 
-Prior to the virtio-ccw-2.7 machine (and commit 2a79eb1a), our virtio
-devices residing under the virtual-css bus do not have qdev_path based
-migration stream identifiers (because their qdev_path is NULL). The ids
-are instead generated when the device is registered as a composition of
-the so called idstr, which takes the vmsd name as its value, and an
-instance_id, which is which is calculated as a maximal instance_id
-registered with the same idstr plus one, or zero (if none was registered
-previously).
+The docker-run-test-build@debian-s390x-cross target fails with:
 
-That means, under certain circumstances, one device might try, and even
-succeed, to load the state of a different device. This can lead to
-trouble.
+strip --strip-unneeded s390-ccw.elf -o s390-ccw.img
+strip: Unable to recognise the format of the input file `s390-ccw.elf'
 
-Let us fail the migration if the above problem is detected during load.
+The configure script defines a STRIP makefile variable whose default
+value is ${cross_prefix}strip. Let's use it.
 
-How to reproduce the problem:
-1) start qemu-system-s390x making sure you have the following devices
-   defined on your command line:
-     -device virtio-rng-ccw,id=rng1,devno=fe.0.0001
-     -device virtio-rng-ccw,id=rng2,devno=fe.0.0002
-2) detach the devices and reattach in reverse order using the monitor:
-     (qemu) device_del rng1
-     (qemu) device_del rng2
-     (qemu) device_add virtio-rng-ccw,id=rng2,devno=fe.0.0002
-     (qemu) device_add virtio-rng-ccw,id=rng1,devno=fe.0.0001
-3) save the state of the vm into a temporary file and quit QEMU:
-     (qemu) migrate "exec:gzip -c > /tmp/tmp_vmstate.gz"
-     (qemu) q
-4) use your command line from step 1 with
-     -incoming "exec:gzip -c -d /tmp/tmp_vmstate.gz"
-   appended to reproduce the problem (while trying to to load the saved vm)
+We default to using the non-prefixed strip command in case --enable-debug
+or --disable-strip was passed to configure during a regular build.
 
-CC: qemu-stable@nongnu.org
-Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
-Message-Id: <20170518111405.56947-1-pasic@linux.vnet.ibm.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Message-Id: <149623617700.4947.12490877660892961664.stgit@bahia.lan>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- hw/s390x/css.c        | 14 ++++++++++++++
- hw/s390x/virtio-ccw.c |  6 +++++-
- 2 files changed, 19 insertions(+), 1 deletion(-)
+ pc-bios/s390-ccw/Makefile | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index 1e2f26b..cc76c53 100644
---- a/hw/s390x/css.c
-+++ b/hw/s390x/css.c
-@@ -15,6 +15,7 @@
- #include "hw/qdev.h"
- #include "qemu/error-report.h"
- #include "qemu/bitops.h"
-+#include "qemu/error-report.h"
- #include "exec/address-spaces.h"
- #include "cpu.h"
- #include "hw/s390x/ioinst.h"
-@@ -1800,13 +1801,26 @@ void subch_device_save(SubchDev *s, QEMUFile *f)
- int subch_device_load(SubchDev *s, QEMUFile *f)
- {
-     SubchDev *old_s;
-+    Error *err = NULL;
-     uint16_t old_schid = s->schid;
-+    uint16_t old_devno = s->devno;
-     int i;
+diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
+index 79a46b6..fb88c13 100644
+--- a/pc-bios/s390-ccw/Makefile
++++ b/pc-bios/s390-ccw/Makefile
+@@ -21,8 +21,10 @@ build-all: s390-ccw.img
+ s390-ccw.elf: $(OBJECTS)
+ 	$(call quiet-command,$(CC) $(LDFLAGS) -o $@ $(OBJECTS),"BUILD","$(TARGET_DIR)$@")
  
-     s->cssid = qemu_get_byte(f);
-     s->ssid = qemu_get_byte(f);
-     s->schid = qemu_get_be16(f);
-     s->devno = qemu_get_be16(f);
-+    if (s->devno != old_devno) {
-+        /* Only possible if machine < 2.7 (no css_dev_path) */
++STRIP ?= strip
 +
-+        error_setg(&err, "%x != %x", old_devno,  s->devno);
-+        error_append_hint(&err, "Devno mismatch, tried to load wrong section!"
-+                          " Likely reason: some sequences of plug and unplug"
-+                          " can break migration for machine versions prior to"
-+                          " 2.7 (known design flaw).\n");
-+        error_report_err(err);
-+        return -EINVAL;
-+    }
-     /* Re-assign subch. */
-     if (old_schid != s->schid) {
-         old_s = channel_subsys.css[s->cssid]->sch_set[s->ssid]->sch[old_schid];
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index e6a6f74..90d37cb 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -1279,9 +1279,13 @@ static int virtio_ccw_load_config(DeviceState *d, QEMUFile *f)
-     SubchDev *s = ccw_dev->sch;
-     VirtIODevice *vdev = virtio_ccw_get_vdev(s);
-     int len;
-+    int ret;
+ s390-ccw.img: s390-ccw.elf
+-	$(call quiet-command,strip --strip-unneeded $< -o $@,"STRIP","$(TARGET_DIR)$@")
++	$(call quiet-command,$(STRIP) --strip-unneeded $< -o $@,"STRIP","$(TARGET_DIR)$@")
  
-     s->driver_data = dev;
--    subch_device_load(s, f);
-+    ret = subch_device_load(s, f);
-+    if (ret) {
-+        return ret;
-+    }
-     /* Re-fill subch_id after loading the subchannel states.*/
-     if (ck->refill_ids) {
-         ck->refill_ids(ccw_dev);
+ $(OBJECTS): Makefile
+ 
 -- 
 2.7.4
