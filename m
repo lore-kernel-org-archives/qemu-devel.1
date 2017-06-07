@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dIXkU-0005SP-LK
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:59:35 -0400
+	(envelope-from <quintela@redhat.com>) id 1dIXkV-0005TY-UI
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:59:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dIXkR-0005JT-Gc
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:59:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43900)
+	(envelope-from <quintela@redhat.com>) id 1dIXkV-0005KD-8D
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:59:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45886)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dIXkR-0005JL-AT
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:59:31 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dIXkV-0005K0-2a
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:59:35 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2EF4E4E4D0
-	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 09:59:30 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E5DE87F3F5
+	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 09:59:33 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed,  7 Jun 2017 11:59:19 +0200
-Message-Id: <20170607095926.1834-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 0/7] Migration PULL requset
+Date: Wed,  7 Jun 2017 11:59:21 +0200
+Message-Id: <20170607095926.1834-3-quintela@redhat.com>
+In-Reply-To: <20170607095926.1834-1-quintela@redhat.com>
+References: <20170607095926.1834-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PULL 2/7] ram: We only print throttling information
+ sometimes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +33,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Hi
+Change it to be consistent with everything else.
 
-This is the migration pull requset, it contains:
-- fix for segfault of io tests (QingFeng)
-- half of make consistent output
-- Make RAMState dynamic.
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ migration/migration.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-Please, apply.
-
-Thanks, Juan.
-
-The following changes since commit 65dfad62a176f5265f801683be64149c5ad55f7d:
-
-  Merge remote-tracking branch 'remotes/xtensa/tags/20170606-xtensa' into staging (2017-06-06 17:00:12 +0100)
-
-are available in the git repository at:
-
-  git://github.com/juanquintela/qemu.git tags/migration/20170607
-
-for you to fetch changes up to eefff991d059d299b917627d2a95bce34d2f97f3:
-
-  qemu/migration: fix the double free problem on from_src_file (2017-06-07 10:20:56 +0200)
-
-----------------------------------------------------------------
-migration/next for 20170607
-
-----------------------------------------------------------------
-Juan Quintela (6):
-      ram: Unfold get_xbzrle_cache_stats() into populate_ram_info()
-      ram: We only print throttling information sometimes
-      ram: Call migration_page_queue_free() at ram_migration_cleanup()
-      ram: Move ZERO_TARGET_PAGE inside XBZRLE
-      ram: Use MigrationStats for statistics
-      ram: Make RAMState dynamic
-
-QingFeng Hao (1):
-      qemu/migration: fix the double free problem on from_src_file
-
- migration/migration.c |  59 ++++++-------
- migration/ram.c       | 233 +++++++++++++++++++-------------------------------
- migration/ram.h       |  15 +---
- migration/savevm.c    |   1 -
- 4 files changed, 114 insertions(+), 194 deletions(-)
+diff --git a/migration/migration.c b/migration/migration.c
+index b1e68c0..9c5ff57 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -616,6 +616,11 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
+         info->xbzrle_cache->overflow = xbzrle_mig_pages_overflow();
+     }
+ 
++    if (cpu_throttle_active()) {
++        info->has_cpu_throttle_percentage = true;
++        info->cpu_throttle_percentage = cpu_throttle_get_percentage();
++    }
++
+     if (s->state != MIGRATION_STATUS_COMPLETED) {
+         info->ram->remaining = ram_bytes_remaining();
+         info->ram->dirty_pages_rate = ram_dirty_pages_rate();
+@@ -656,11 +661,6 @@ MigrationInfo *qmp_query_migrate(Error **errp)
+             info->disk->total = blk_mig_bytes_total();
+         }
+ 
+-        if (cpu_throttle_active()) {
+-            info->has_cpu_throttle_percentage = true;
+-            info->cpu_throttle_percentage = cpu_throttle_get_percentage();
+-        }
+-
+         break;
+     case MIGRATION_STATUS_POSTCOPY_ACTIVE:
+         /* Mostly the same as active; TODO add some postcopy stats */
+-- 
+2.9.4
