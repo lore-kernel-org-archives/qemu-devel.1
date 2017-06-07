@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dIi3f-0002H6-8V
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 17:00:11 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dIi6B-00034J-Tp
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 17:02:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dIi3b-0005x9-6P
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 17:00:03 -0400
-References: <1496862674-23626-1-git-send-email-thuth@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <df973d1f-cbb1-22c1-5763-f29001a16fd8@redhat.com>
-Date: Wed, 7 Jun 2017 15:59:54 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dIi6A-0006sT-6E
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 17:02:39 -0400
+Received: from mail-lf0-x22c.google.com ([2a00:1450:4010:c07::22c]:34498)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dIi69-0006sG-PX
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 17:02:38 -0400
+Received: by mail-lf0-x22c.google.com with SMTP id v20so10632966lfa.1
+	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 14:02:37 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1496862674-23626-1-git-send-email-thuth@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ptRgMbavdaJ8SU7Rq3x9n5BRAgVMHu4kJ"
-Subject: Re: [Qemu-devel] [PATCH] Makefile: Do not generate files if
- "configure" has not been run yet
+References: <20170606110459.9771-1-kraxel@redhat.com>
+	<20170606110459.9771-3-kraxel@redhat.com>
+In-Reply-To: <20170606110459.9771-3-kraxel@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 07 Jun 2017 21:02:24 +0000
+Message-ID: <CAJ+F1CLy2nt-PgqDPNAvQBMcjMt_oTAUrSLY8trPtD-fyufd5A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/4] egl-headless: use framebuffer helper
+ functions.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,96 +31,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ptRgMbavdaJ8SU7Rq3x9n5BRAgVMHu4kJ
-From: Eric Blake <eblake@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <df973d1f-cbb1-22c1-5763-f29001a16fd8@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] Makefile: Do not generate files if
- "configure" has not been run yet
-References: <1496862674-23626-1-git-send-email-thuth@redhat.com>
-In-Reply-To: <1496862674-23626-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi
 
-On 06/07/2017 02:11 PM, Thomas Huth wrote:
-> When doing a "make -j10" in the vanilla QEMU source tree (without
-> running "configure first), the Makefile currently generates two
+The patch looks good to me, but I tried to use egl-headless for the first
+time, and I get a weird crash on virgl init:
+(gdb) bt
+#0  0x00007fffd8cd935f in rawmemchr () at /lib64/libc.so.6
+#1  0x00007fffd8cc1832 in _IO_str_init_static_internal () at
+/lib64/libc.so.6
+#2  0x00007fffd8cb37e7 in vsscanf () at /lib64/libc.so.6
+#3  0x00007ffff6e818a6 in vsscanf () at /lib64/libasan.so.3
+#4  0x00007ffff6e819d3 in sscanf () at /lib64/libasan.so.3
+#5  0x00007ffff6bfe239 in vrender_get_glsl_version
+(glsl_version=3D0x60e00001f2b8) at vrend_renderer.c:6026
+#6  0x00007ffff6bfe239 in vrend_create_context (id=3Did@entry=3D0,
+nlen=3Dnlen@entry=3D0, debug_name=3Ddebug_name@entry=3D0x0) at vrend_render=
+er.c:4033
+#7  0x00007ffff6c04f2f in vrend_renderer_context_create_internal (handle=3D=
+0,
+nlen=3D0, debug_name=3D0x0) at vrend_decode.c:1066
+#8  0x00007ffff6bf72a3 in vrend_renderer_init (cbs=3D<optimized out>,
+flags=3D0) at vrend_renderer.c:3874
+#9  0x0000555556b52cc1 in virtio_gpu_virgl_init (g=3D0x633000008d10) at
+/home/elmarco/src/qemu/hw/display/virtio-gpu-3d.c:623
 
-s/"configure/"configure"/
+This doesn't happen when I use virgl/spice (gl=3Don obviously)
 
-> files already, qemu-version.h and qemu-options.def. This should not
-> happen, so let's make these targets depend on config-host.mak.
-> Also the python files can not be executed without $(PYTHON), so
-> these scripts should depend on config-host.mak, too.
->=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  Makefile | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->=20
-> diff --git a/Makefile b/Makefile
-> index c830d7a..6786dc2 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -286,7 +286,7 @@ endif
-> =20
->  all: $(DOCS) $(TOOLS) $(HELPERS-y) recurse-all modules
-> =20
-> -qemu-version.h: FORCE
-> +qemu-version.h: config-host.mak FORCE
+I guess you don't know what's going on, and I will look further later, I
+just thought it was worth to report in case you had an idea.
 
-This one makes sense.
+On Tue, Jun 6, 2017 at 3:05 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
 
-> @@ -393,6 +394,8 @@ gen-out-type =3D $(subst .,-,$(suffix $@))
-> =20
->  qapi-py =3D $(SRC_PATH)/scripts/qapi.py $(SRC_PATH)/scripts/ordereddic=
-t.py
-> =20
-> +$(qapi-py): config-host.mak
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 
-But this one is weird. How can a pre-existing file have a dependency?
-Remember, $(qapi-py) is not the list of built files, but the list of
-files used to build other files.  It seems like you either want
-config-host.mak includes in $(qapi-py), or...
-
+---
+>  ui/egl-headless.c | 67
+> ++++++++++++++-----------------------------------------
+>  1 file changed, 17 insertions(+), 50 deletions(-)
+>
+> diff --git a/ui/egl-headless.c b/ui/egl-headless.c
+> index d8d800f8a6..809bfde99c 100644
+> --- a/ui/egl-headless.c
+> +++ b/ui/egl-headless.c
+> @@ -8,14 +8,13 @@
+>  typedef struct egl_dpy {
+>      DisplayChangeListener dcl;
+>      DisplaySurface *ds;
+> -    int width, height;
+> -    GLuint texture;
+> -    GLuint framebuffer;
+> -    GLuint blit_texture;
+> -    GLuint blit_framebuffer;
+> +    egl_fb guest_fb;
+> +    egl_fb blit_fb;
+>      bool y_0_top;
+>  } egl_dpy;
+>
+> +/* ------------------------------------------------------------------ */
 > +
->  qga/qapi-generated/qga-qapi-types.c qga/qapi-generated/qga-qapi-types.=
-h :\
->  $(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-types.py $(q=
-api-py)
-
-=2E..that THIS should be the rule that depends on config-host.mak in
-addition do depending on $(qapi-py).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---ptRgMbavdaJ8SU7Rq3x9n5BRAgVMHu4kJ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZOGlKAAoJEKeha0olJ0NqP7AH/AxXtehObqua8jatCFwoN9r4
-f+m/5m8iYJJkIe8gnr9EThzGQnaq9GK4hawIRi5D78Tik/3YwpqWK1WC30ruPUEw
-WdonBY5LPuT/AihaiDqqTjhkdzumTI2pj9Tjc6h3Oye2shoh0B3M+LoO4+ZiUlSO
-pW4ZnFLgaVVQEvM+lD1kBx2kICRzlfJXJ6rrtDcmhrAeUK8FOx6owDFSNVMml1ou
-b2tHcfr7zFckcyyWkflaOMZTnUyQspvUJeRIMhPyLJIVTphGEV/pWxGlHZrZIW47
-yvA0xCZ4wFxehgO48Lpf/W6eLUoFkKd1jMx58aAVaSTpqGJZllGmc9Bak6gk1zI=
-=BH1V
------END PGP SIGNATURE-----
-
---ptRgMbavdaJ8SU7Rq3x9n5BRAgVMHu4kJ--
+>  static void egl_refresh(DisplayChangeListener *dcl)
+>  {
+>      graphic_hw_update(dcl->con);
+> @@ -38,8 +37,8 @@ static void egl_scanout_disable(DisplayChangeListener
+> *dcl)
+>  {
+>      egl_dpy *edpy =3D container_of(dcl, egl_dpy, dcl);
+>
+> -    edpy->texture =3D 0;
+> -    /* XXX: delete framebuffers here ??? */
+> +    egl_fb_destroy(&edpy->guest_fb);
+> +    egl_fb_destroy(&edpy->blit_fb);
+>  }
+>
+>  static void egl_scanout_texture(DisplayChangeListener *dcl,
+> @@ -52,34 +51,17 @@ static void egl_scanout_texture(DisplayChangeListener
+> *dcl,
+>  {
+>      egl_dpy *edpy =3D container_of(dcl, egl_dpy, dcl);
+>
+> -    edpy->texture =3D backing_id;
+>      edpy->y_0_top =3D backing_y_0_top;
+>
+>      /* source framebuffer */
+> -    if (!edpy->framebuffer) {
+> -        glGenFramebuffers(1, &edpy->framebuffer);
+> -    }
+> -    glBindFramebuffer(GL_FRAMEBUFFER_EXT, edpy->framebuffer);
+> -    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
+> GL_COLOR_ATTACHMENT0_EXT,
+> -                              GL_TEXTURE_2D, edpy->texture, 0);
+> +    egl_fb_create_for_tex(&edpy->guest_fb,
+> +                          backing_width, backing_height, backing_id);
+>
+>      /* dest framebuffer */
+> -    if (!edpy->blit_framebuffer) {
+> -        glGenFramebuffers(1, &edpy->blit_framebuffer);
+> -        glGenTextures(1, &edpy->blit_texture);
+> -        edpy->width =3D 0;
+> -        edpy->height =3D 0;
+> -    }
+> -    if (edpy->width !=3D backing_width || edpy->height !=3D backing_heig=
+ht) {
+> -        edpy->width   =3D backing_width;
+> -        edpy->height  =3D backing_height;
+> -        glBindTexture(GL_TEXTURE_2D, edpy->blit_texture);
+> -        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+> -                     edpy->width, edpy->height,
+> -                     0, GL_BGRA, GL_UNSIGNED_BYTE, 0);
+> -        glBindFramebuffer(GL_FRAMEBUFFER_EXT, edpy->blit_framebuffer);
+> -        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
+> GL_COLOR_ATTACHMENT0_EXT,
+> -                                  GL_TEXTURE_2D, edpy->blit_texture, 0);
+> +    if (edpy->blit_fb.width  !=3D backing_width ||
+> +        edpy->blit_fb.height !=3D backing_height) {
+> +        egl_fb_destroy(&edpy->blit_fb);
+> +        egl_fb_create_new_tex(&edpy->blit_fb, backing_width,
+> backing_height);
+>      }
+>  }
+>
+> @@ -88,32 +70,17 @@ static void egl_scanout_flush(DisplayChangeListener
+> *dcl,
+>                                uint32_t w, uint32_t h)
+>  {
+>      egl_dpy *edpy =3D container_of(dcl, egl_dpy, dcl);
+> -    GLuint y1, y2;
+>
+> -    if (!edpy->texture || !edpy->ds) {
+> +    if (!edpy->guest_fb.texture || !edpy->ds) {
+>          return;
+>      }
+> -    assert(surface_width(edpy->ds)  =3D=3D edpy->width);
+> -    assert(surface_height(edpy->ds) =3D=3D edpy->height);
+> +    assert(surface_width(edpy->ds)  =3D=3D edpy->guest_fb.width);
+> +    assert(surface_height(edpy->ds) =3D=3D edpy->guest_fb.height);
+>      assert(surface_format(edpy->ds) =3D=3D PIXMAN_x8r8g8b8);
+>
+> -    /* blit framebuffer, flip if needed */
+> -    glBindFramebuffer(GL_READ_FRAMEBUFFER, edpy->framebuffer);
+> -    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, edpy->blit_framebuffer);
+> -    glViewport(0, 0, edpy->width, edpy->height);
+> -    y1 =3D edpy->y_0_top ? edpy->height : 0;
+> -    y2 =3D edpy->y_0_top ? 0 : edpy->height;
+> -    glBlitFramebuffer(0, y1, edpy->width, y2,
+> -                      0, 0, edpy->width, edpy->height,
+> -                      GL_COLOR_BUFFER_BIT, GL_NEAREST);
+> +    egl_fb_blit(&edpy->blit_fb, &edpy->guest_fb, edpy->y_0_top);
+> +    egl_fb_read(surface_data(edpy->ds), &edpy->blit_fb);
+>
+> -    /* read pixels to surface */
+> -    glBindFramebuffer(GL_READ_FRAMEBUFFER, edpy->blit_framebuffer);
+> -    glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
+> -    glReadPixels(0, 0, edpy->width, edpy->height,
+> -                 GL_BGRA, GL_UNSIGNED_BYTE, surface_data(edpy->ds));
+> -
+> -    /* notify about updates */
+>      dpy_gfx_update(edpy->dcl.con, x, y, w, h);
+>  }
+>
+> --
+> 2.9.3
+>
+>
+> --
+Marc-Andr=C3=A9 Lureau
