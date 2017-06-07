@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1dIWxC-0002cP-FC
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:08:39 -0400
+	(envelope-from <bounces@canonical.com>) id 1dIWxD-0002cQ-DZ
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:08:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1dIWx7-0003mJ-8I
+	(envelope-from <bounces@canonical.com>) id 1dIWxA-0003ny-6d
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:08:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34109)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dIWxA-0003mH-1C
 	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:08:36 -0400
-Received: from outpost5.zedat.fu-berlin.de ([130.133.4.89]:49929)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <glaubitz@physik.fu-berlin.de>)
-	id 1dIWx7-0003lb-0K
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:08:33 -0400
-Date: Wed, 7 Jun 2017 11:08:24 +0200
-From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Message-ID: <20170607090824.GA6481@physik.fu-berlin.de>
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dIWx5-0001tK-7D
+	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 09:08:31 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id BD0262E81AE
+	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 09:08:30 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Sender: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Subject: Re: [Qemu-devel] [PATCH] target/m68k: implement rtd
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 07 Jun 2017 08:45:44 -0000
+From: Thomas Huth <965867@bugs.launchpad.net>
+Reply-To: Bug 965867 <965867@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20120327015624.22022.30085.malonedeb@soybean.canonical.com>
+Message-Id: <149682514398.7814.9803430217411365673.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 965867] Re: 9p virtual file system on qemu slow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,20 +36,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-> Add "Return and Deallocate" (rtd) instruction.
->
->   RTD #d
->
->     (SP) -> PC
->     SP + 4 + d -> SP
+Can you still reproduce this problem with the latest version of QEMU
+(currently version 2.9.0)?
 
-Tested-By: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
--- 
- .''`.  John Paul Adrian Glaubitz
-: :' :  Debian Developer - glaubitz@debian.org
-`. `'   Freie Universitaet Berlin - glaubitz@physik.fu-berlin.de
-  `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/965867
+
+Title:
+  9p virtual file system on qemu slow
+
+Status in QEMU:
+  Incomplete
+Status in qemu-kvm package in Ubuntu:
+  Confirmed
+
+Bug description:
+  Hi, =
+
+  The 9p virtual file system is slow. Several examples below: =
+
+  ---------------------------------------------------------
+  Host for the first time: =
+
+  $ time ls bam.unsorted/
+  ...........................
+  real    0m0.084s
+  user    0m0.000s
+  sys     0m0.028s
+  --------------------------------------------------
+  Host second and following: =
+
+
+  real    0m0.009s
+  user    0m0.000s
+  sys     0m0.008s
+  ------------------------------------------------------
+  VM for the first time: =
+
+  $ time ls bam.unsorted/
+  ................................
+  real    0m23.141s
+  user    0m0.064s
+  sys     0m2.156s
+  ------------------------------------------------------
+  VM for the second time
+  real    0m3.643s
+  user    0m0.024s
+  sys     0m0.424s
+  ----------------------------------------------------
+
+  Copy on host: =
+
+  $ time cp 5173T.root.bak test.tmp
+  real    0m30.346s
+  user    0m0.004s
+  sys     0m5.324s
+
+  $ ls -lahs test.tmp
+  2.7G -rw------- 1 oneadmin cloud 2.7G Mar 26 21:47 test.tmp
+
+  ---------------------------------------------------
+  $ copy on VM for the same file
+
+  time cp 5173T.root.bak test.tmp
+
+  real    5m46.978s
+  user    0m0.352s
+  sys     1m38.962s
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/965867/+subscriptions
