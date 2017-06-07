@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dIeew-00063t-IC
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:22:19 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dIegg-0007l1-Eu
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:24:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dIees-0002iu-B9
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:22:18 -0400
-Resent-Message-Id: <E1dIees-0002iu-B9@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21360)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dIees-0002iP-2E
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:22:14 -0400
-In-Reply-To: <20170607074632.13162-1-marcandre.lureau@redhat.com>
-Message-ID: <149685611719.189.17061945034400819431@84b42461e25a>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1dIegf-00042r-Mj
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:24:06 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:37878)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dIegf-000421-Dl
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:24:05 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id d73so15823392wma.0
+	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 10:24:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 7 Jun 2017 10:21:57 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/5] Code cleanups with Coccinelle
+In-Reply-To: <87a85jdbd1.fsf@linaro.org>
+References: <1496849369-30282-1-git-send-email-peter.maydell@linaro.org>
+	<87a85jdbd1.fsf@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 7 Jun 2017 18:23:43 +0100
+Message-ID: <CAFEAcA-YQBLJJvAcN82N1BTVsC-rQP2kZ1ccvCv9z48x+XPKUA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] arm_gicv3: Fix ICC_BPR1 reset value when
+ EL3 not implemented
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +31,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcandre.lureau@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, peter.maydell@linaro.org
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCAwLzVdIENvZGUgY2xlYW51cHMgd2l0aCBDb2NjaW5lbGxlClR5cGU6IHNl
-cmllcwpNZXNzYWdlLWlkOiAyMDE3MDYwNzA3NDYzMi4xMzE2Mi0xLW1hcmNhbmRyZS5sdXJlYXVA
-cmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1i
-YXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVk
-PTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1y
-ZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5n
-IFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAg
-aWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
-IC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkK
-ICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09
-CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20g
-aHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAtIFt0YWcgdXBkYXRlXSAg
-ICAgIHBhdGNoZXcvMTQ5Njc0NTA0Mi0yMzc5LTEtZ2l0LXNlbmQtZW1haWwtcGV0ZXJ4QHJlZGhh
-dC5jb20gLT4gcGF0Y2hldy8xNDk2NzQ1MDQyLTIzNzktMS1naXQtc2VuZC1lbWFpbC1wZXRlcnhA
-cmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmZmOTRhYWUgY29jY2lu
-ZWxsZTogcHJlZmVyIGdsaWIgZ19uZXcvZ19yZW5ldyBtYWNyb3MKNzM1ZTYzNCBSZXBsYWNlIGdf
-bWFsbG9jKCkrbWVtY3B5KCkgd2l0aCBnX21lbWR1cCgpCmQ3NWY3YzMgYXJjaDogaW50cm9kdWNl
-IEVMRl9OT1RFX1NJWkUgbWFjcm8KMmRiYTNkZSBjb2NjaW5lbGxlOiB1c2UgRElWX1JPVU5EX1VQ
-CmIzOGIwNDggY29jY2luZWxsZTogcmVwbGFjZSBjb2RlIHdpdGggUk9VTkRfVVAgbWFjcm8KCj09
-PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNTogY29jY2luZWxsZTogcmVwbGFj
-ZSBjb2RlIHdpdGggUk9VTkRfVVAgbWFjcm8uLi4KQ2hlY2tpbmcgUEFUQ0ggMi81OiBjb2NjaW5l
-bGxlOiB1c2UgRElWX1JPVU5EX1VQLi4uCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIg
-dXNlIHRhYnMKIzY1OiBGSUxFOiBkaXNhcy9pYTY0LmM6MTAxNTk6CiteSV5JICAgICAgbmV4dF9v
-cCA9IG9wX3BvaW50ZXIgKyAoRElWX1JPVU5EX1VQKG9wbGVuLCA4KSk7JAoKRVJST1I6IGNvZGUg
-aW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNzM6IEZJTEU6IGRpc2FzL2lhNjQuYzoxMDE2
-NjoKK15JXkkgIG5leHRfb3AgPSBvcF9wb2ludGVyICsgKERJVl9ST1VORF9VUChvcGxlbiwgOCkp
-OyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzIyNTogRklMRTog
-bGliZGVjbnVtYmVyL2RlY051bWJlci5jOjUwMjQ6CisgICAgICB6b2ZmPURJVl9ST1VORF9VUChp
-YWNjLCA4KTteSSAgICAgIC8qIGl0ZW1zIHRvIG9mZnNldCBieSAqLyQKCkVSUk9SOiBzcGFjZXMg
-cmVxdWlyZWQgYXJvdW5kIHRoYXQgJz0nIChjdHg6VnhWKQojMjI1OiBGSUxFOiBsaWJkZWNudW1i
-ZXIvZGVjTnVtYmVyLmM6NTAyNDoKKyAgICAgIHpvZmY9RElWX1JPVU5EX1VQKGlhY2MsIDgpOwkg
-ICAgICAvKiBpdGVtcyB0byBvZmZzZXQgYnkgKi8KICAgICAgICAgICBeCgp0b3RhbDogNCBlcnJv
-cnMsIDAgd2FybmluZ3MsIDI0MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
-IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAzLzU6IGFyY2g6IGludHJvZHVjZSBFTEZf
-Tk9URV9TSVpFIG1hY3JvLi4uCkNoZWNraW5nIFBBVENIIDQvNTogUmVwbGFjZSBnX21hbGxvYygp
-K21lbWNweSgpIHdpdGggZ19tZW1kdXAoKS4uLgpDaGVja2luZyBQQVRDSCA1LzU6IGNvY2NpbmVs
-bGU6IHByZWZlciBnbGliIGdfbmV3L2dfcmVuZXcgbWFjcm9zLi4uCkVSUk9SOiBjb2RlIGluZGVu
-dCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzgwMTogRklMRTogaHcvZG1hL2V0cmF4ZnNfZG1hLmM6
-Nzc2OgorXkljdHJsLT5jaGFubmVscyA9IGdfbmV3MCh0eXBlb2YoY3RybC0+Y2hhbm5lbHNbMF0p
-LCBucl9jaGFubmVscyk7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
-cwojMjkzNzogRklMRTogdXRpbC9lbnZsaXN0LmM6MjIxOgorXklwZW52ID0gZW52ID0gZ19uZXco
-Y2hhciAqLCBlbnZsaXN0LT5lbF9jb3VudCArIDEpOyQKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJu
-aW5ncywgMjAzNCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywg
-cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
-cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
-SU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2Rl
-OiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6
-Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
-ZWxAZnJlZWxpc3RzLm9yZw==
+On 7 June 2017 at 17:13, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+>
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>
+>> If EL3 is not implemented (ie only one security state) then the
+>> one and only ICC_BPR1 register behaves like the Non-secure
+>> ICC_BPR1 in an EL3-present configuration. In particular, its
+>> reset value is GIC_MIN_BPR_NS, not GIC_MIN_BPR.
+>>
+>> Correct the erroneous reset value; this fixes a problem where
+>> we might hit the assert added in commit a89ff39ee901.
+>>
+>> Reported-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>
+> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+Thanks; applied to master as a fix for an assertion failure
+(still not sure why I don't see it).
+
+-- PMM
