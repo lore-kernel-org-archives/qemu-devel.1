@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dIfOT-0008B1-7h
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:09:22 -0400
+	(envelope-from <clg@kaod.org>) id 1dIfQu-00026y-G6
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:11:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dIfOQ-0004pR-1P
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:09:21 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:35377)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dIfOP-0004p1-NG
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:09:17 -0400
-Received: by mail-wm0-x234.google.com with SMTP id x70so63151967wme.0
-	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 11:09:17 -0700 (PDT)
-References: <1487914949-1294-1-git-send-email-bobby.prani@gmail.com>
-	<CAJhHMCDG5vcrsRp3ANyWBZLSEV3deaeYq8EF2zu+Buo5rwPa2w@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAJhHMCDG5vcrsRp3ANyWBZLSEV3deaeYq8EF2zu+Buo5rwPa2w@mail.gmail.com>
-Date: Wed, 07 Jun 2017 19:09:41 +0100
-Message-ID: <878tl3d5zu.fsf@linaro.org>
+	(envelope-from <clg@kaod.org>) id 1dIfQr-0005Tt-8l
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:11:52 -0400
+Received: from 6.mo4.mail-out.ovh.net ([188.165.36.253]:51394)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dIfQq-0005TG-V5
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:11:49 -0400
+Received: from player772.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 81D206C5F1
+	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 20:11:47 +0200 (CEST)
+References: <149685579678.12025.9278446121024037161.stgit@bahia.lan>
+	<149685582923.12025.13700165807436904935.stgit@bahia.lan>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <c632e0a3-c6bb-2637-40c3-5098937476a5@kaod.org>
+Date: Wed, 7 Jun 2017 20:11:38 +0200
 MIME-Version: 1.0
+In-Reply-To: <149685582923.12025.13700165807436904935.stgit@bahia.lan>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] mttcg/i386: Patch instruction using
- async_safe_* framework
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] xics: setup cpu at realize time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,176 +30,267 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pranith Kumar <bobby.prani@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
+On 06/07/2017 07:17 PM, Greg Kurz wrote:
+> Until recently, spapr used to allocate ICPState objects for the lifetime
+> of the machine. They would only be associated to vCPUs in xics_cpu_setup()
+> when plugging a CPU core.
+> 
+> Now that ICPState objects have the same lifecycle as vCPUs, it is
+> possible to associate them during realization.
+> 
+> This patch hence open-codes xics_cpu_setup() in icp_realize(). The vCPU
+> is passed as a property. Note that vCPU now needs to be realized first
+> for the IRQs to be allocated. It also needs to resetted before ICPState
+> realization in order to synchronize with KVM.
+> 
+> Since ICPState objects are freed when unrealized, xics_cpu_destroy() isn't
+> needed anymore and can be safely dropped.
 
-Pranith Kumar <bobby.prani@gmail.com> writes:
+I like the idea but I think the assignment of ->cs attribute should be 
+moved under icp_kvm_cpu_setup(), as it is only used under xics_kvm by 
+the kvm_vcpu_ioctl() calls. 
 
-> Can someone please pick this up?
+Ideally, we should also introduce :
 
-It needs to be re-posted with the review tag and ping Paolo re: async
-work for KVM.
+	struct KvmState {
+	    ICPState parent_obj;
+	
+	    CPUState *cs;
+	};
 
->
-> Thanks,
->
-> On Fri, Feb 24, 2017 at 12:42 AM, Pranith Kumar <bobby.prani@gmail.com> wrote:
->> In mttcg, calling pause_all_vcpus() during execution from the
->> generated TBs causes a deadlock if some vCPU is waiting for exclusive
->> execution in start_exclusive(). Fix this by using the aync_safe_*
->> framework instead of pausing vcpus for patching instructions.
->>
->> CC: Richard Henderson <rth@twiddle.net>
->> CC: Peter Maydell <peter.maydell@linaro.org>
->> CC: Alex Bennée <alex.bennee@linaro.org>
->> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
->> ---
->>  hw/i386/kvmvapic.c | 82 ++++++++++++++++++++++++++++++++++--------------------
->>  1 file changed, 52 insertions(+), 30 deletions(-)
->>
->> diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
->> index 82a4955..11b0d49 100644
->> --- a/hw/i386/kvmvapic.c
->> +++ b/hw/i386/kvmvapic.c
->> @@ -383,8 +383,7 @@ static void patch_byte(X86CPU *cpu, target_ulong addr, uint8_t byte)
->>      cpu_memory_rw_debug(CPU(cpu), addr, &byte, 1, 1);
->>  }
->>
->> -static void patch_call(VAPICROMState *s, X86CPU *cpu, target_ulong ip,
->> -                       uint32_t target)
->> +static void patch_call(X86CPU *cpu, target_ulong ip, uint32_t target)
->>  {
->>      uint32_t offset;
->>
->> @@ -393,23 +392,24 @@ static void patch_call(VAPICROMState *s, X86CPU *cpu, target_ulong ip,
->>      cpu_memory_rw_debug(CPU(cpu), ip + 1, (void *)&offset, sizeof(offset), 1);
->>  }
->>
->> -static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulong ip)
->> +struct PatchInfo {
->> +    VAPICHandlers *handler;
->> +    target_ulong ip;
->> +};
->> +
->> +static void do_patch_instruction(CPUState *cs, run_on_cpu_data data)
->>  {
->> -    CPUState *cs = CPU(cpu);
->> -    CPUX86State *env = &cpu->env;
->> -    VAPICHandlers *handlers;
->> +    X86CPU *x86_cpu = X86_CPU(cs);
->> +    CPUX86State *env = &x86_cpu->env;
->> +    struct PatchInfo *info = (struct PatchInfo *) data.host_ptr;
->> +    VAPICHandlers *handlers = info->handler;
->> +    target_ulong ip = info->ip;
->>      uint8_t opcode[2];
->>      uint32_t imm32 = 0;
->>      target_ulong current_pc = 0;
->>      target_ulong current_cs_base = 0;
->>      uint32_t current_flags = 0;
->>
->> -    if (smp_cpus == 1) {
->> -        handlers = &s->rom_state.up;
->> -    } else {
->> -        handlers = &s->rom_state.mp;
->> -    }
->> -
->>      if (!kvm_enabled()) {
->>          cpu_get_tb_cpu_state(env, &current_pc, &current_cs_base,
->>                               &current_flags);
->> @@ -421,48 +421,70 @@ static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulong ip)
->>          }
->>      }
->>
->> -    pause_all_vcpus();
->> -
->>      cpu_memory_rw_debug(cs, ip, opcode, sizeof(opcode), 0);
->>
->>      switch (opcode[0]) {
->>      case 0x89: /* mov r32 to r/m32 */
->> -        patch_byte(cpu, ip, 0x50 + modrm_reg(opcode[1]));  /* push reg */
->> -        patch_call(s, cpu, ip + 1, handlers->set_tpr);
->> +        patch_byte(x86_cpu, ip, 0x50 + modrm_reg(opcode[1]));  /* push reg */
->> +        patch_call(x86_cpu, ip + 1, handlers->set_tpr);
->>          break;
->>      case 0x8b: /* mov r/m32 to r32 */
->> -        patch_byte(cpu, ip, 0x90);
->> -        patch_call(s, cpu, ip + 1, handlers->get_tpr[modrm_reg(opcode[1])]);
->> +        patch_byte(x86_cpu, ip, 0x90);
->> +        patch_call(x86_cpu, ip + 1, handlers->get_tpr[modrm_reg(opcode[1])]);
->>          break;
->>      case 0xa1: /* mov abs to eax */
->> -        patch_call(s, cpu, ip, handlers->get_tpr[0]);
->> +        patch_call(x86_cpu, ip, handlers->get_tpr[0]);
->>          break;
->>      case 0xa3: /* mov eax to abs */
->> -        patch_call(s, cpu, ip, handlers->set_tpr_eax);
->> +        patch_call(x86_cpu, ip, handlers->set_tpr_eax);
->>          break;
->>      case 0xc7: /* mov imm32, r/m32 (c7/0) */
->> -        patch_byte(cpu, ip, 0x68);  /* push imm32 */
->> +        patch_byte(x86_cpu, ip, 0x68);  /* push imm32 */
->>          cpu_memory_rw_debug(cs, ip + 6, (void *)&imm32, sizeof(imm32), 0);
->>          cpu_memory_rw_debug(cs, ip + 1, (void *)&imm32, sizeof(imm32), 1);
->> -        patch_call(s, cpu, ip + 5, handlers->set_tpr);
->> +        patch_call(x86_cpu, ip + 5, handlers->set_tpr);
->>          break;
->>      case 0xff: /* push r/m32 */
->> -        patch_byte(cpu, ip, 0x50); /* push eax */
->> -        patch_call(s, cpu, ip + 1, handlers->get_tpr_stack);
->> +        patch_byte(x86_cpu, ip, 0x50); /* push eax */
->> +        patch_call(x86_cpu, ip + 1, handlers->get_tpr_stack);
->>          break;
->>      default:
->>          abort();
->>      }
->>
->> -    resume_all_vcpus();
->> +    g_free(info);
->> +}
->> +
->> +static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulong ip)
->> +{
->> +    CPUState *cs = CPU(cpu);
->> +    VAPICHandlers *handlers;
->> +    struct PatchInfo *info;
->> +
->> +    if (smp_cpus == 1) {
->> +        handlers = &s->rom_state.up;
->> +    } else {
->> +        handlers = &s->rom_state.mp;
->> +    }
->> +
->> +    info  = g_new(struct PatchInfo, 1);
->> +    info->handler = handlers;
->> +    info->ip = ip;
->>
->>      if (!kvm_enabled()) {
->> -        /* Both tb_lock and iothread_mutex will be reset when
->> -         *  longjmps back into the cpu_exec loop. */
->> -        tb_lock();
->> -        tb_gen_code(cs, current_pc, current_cs_base, current_flags, 1);
->> -        cpu_loop_exit_noexc(cs);
->> +        const run_on_cpu_func fn = do_patch_instruction;
->> +
->> +        async_safe_run_on_cpu(cs, fn, RUN_ON_CPU_HOST_PTR(info));
->> +        cs->exception_index = EXCP_INTERRUPT;
->> +        cpu_loop_exit(cs);
->>      }
->> +
->> +    pause_all_vcpus();
->> +
->> +    do_patch_instruction(cs, RUN_ON_CPU_HOST_PTR(info));
->> +
->> +    resume_all_vcpus();
->> +    g_free(info);
->>  }
->>
->>  void vapic_report_tpr_access(DeviceState *dev, CPUState *cs, target_ulong ip,
->> --
->> 2.7.4
->>
+That would be cleaner, but that might introduce some migration compat 
+issues  again ...
 
+Some minor comments below,
 
---
-Alex Bennée
+Thanks,
+
+C. 
+
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  hw/intc/xics.c          |   76 ++++++++++++++++++++---------------------------
+>  hw/ppc/pnv_core.c       |   16 ++++------
+>  hw/ppc/spapr_cpu_core.c |   21 ++++++-------
+>  include/hw/ppc/xics.h   |    2 -
+>  4 files changed, 48 insertions(+), 67 deletions(-)
+> 
+> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+> index ec73f02144c9..330441ff7fe8 100644
+> --- a/hw/intc/xics.c
+> +++ b/hw/intc/xics.c
+> @@ -38,50 +38,6 @@
+>  #include "monitor/monitor.h"
+>  #include "hw/intc/intc.h"
+>  
+> -void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu)
+> -{
+> -    CPUState *cs = CPU(cpu);
+> -    ICPState *icp = ICP(cpu->intc);
+> -
+> -    assert(icp);
+> -    assert(cs == icp->cs);
+> -
+> -    icp->output = NULL;
+> -    icp->cs = NULL;
+> -}
+> -
+> -void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu, ICPState *icp)
+> -{
+> -    CPUState *cs = CPU(cpu);
+> -    CPUPPCState *env = &cpu->env;
+> -    ICPStateClass *icpc;
+> -
+> -    assert(icp);
+> -
+> -    cpu->intc = OBJECT(icp);
+> -    icp->cs = cs;
+> -
+> -    icpc = ICP_GET_CLASS(icp);
+> -    if (icpc->cpu_setup) {
+> -        icpc->cpu_setup(icp, cpu);
+> -    }
+> -
+> -    switch (PPC_INPUT(env)) {
+> -    case PPC_FLAGS_INPUT_POWER7:
+> -        icp->output = env->irq_inputs[POWER7_INPUT_INT];
+> -        break;
+> -
+> -    case PPC_FLAGS_INPUT_970:
+> -        icp->output = env->irq_inputs[PPC970_INPUT_INT];
+> -        break;
+> -
+> -    default:
+> -        error_report("XICS interrupt controller does not support this CPU "
+> -                     "bus model");
+> -        abort();
+> -    }
+> -}
+> -
+>  void icp_pic_print_info(ICPState *icp, Monitor *mon)
+>  {
+>      int cpu_index = icp->cs ? icp->cs->cpu_index : -1;
+> @@ -343,6 +299,8 @@ static void icp_realize(DeviceState *dev, Error **errp)
+>  {
+>      ICPState *icp = ICP(dev);
+>      ICPStateClass *icpc = ICP_GET_CLASS(dev);
+> +    PowerPCCPU *cpu;
+> +    CPUPPCState *env;
+>      Object *obj;
+>      Error *err = NULL;
+>  
+> @@ -355,6 +313,36 @@ static void icp_realize(DeviceState *dev, Error **errp)
+>  
+>      icp->xics = XICS_FABRIC(obj);
+>  
+> +    obj = object_property_get_link(OBJECT(dev), "cs", &err);
+> +    if (!obj) {
+> +        error_setg(errp, "%s: required link 'xics' not found: %s",
+> +                   __func__, error_get_pretty(err));
+> +        return;
+> +    }
+> +
+> +    cpu = POWERPC_CPU(obj);
+> +    cpu->intc = OBJECT(icp);
+> +    icp->cs = CPU(obj);
+
+only xics_kvm needs ->cs. 
+
+> +
+> +    if (icpc->cpu_setup) {
+> +        icpc->cpu_setup(icp, cpu);
+> +    }
+> +
+> +    env = &cpu->env;
+> +    switch (PPC_INPUT(env)) {
+> +    case PPC_FLAGS_INPUT_POWER7:
+> +        icp->output = env->irq_inputs[POWER7_INPUT_INT];
+> +        break;
+> +
+> +    case PPC_FLAGS_INPUT_970:
+> +        icp->output = env->irq_inputs[PPC970_INPUT_INT];
+> +        break;
+> +
+> +    default:
+> +        error_setg(errp, "XICS interrupt controller does not support this CPU bus model");
+> +        return;
+> +    }
+> +
+>      if (icpc->realize) {
+>          icpc->realize(dev, errp);
+>      }
+> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+> index e8a9a94d5a24..1393005e76f3 100644
+> --- a/hw/ppc/pnv_core.c
+> +++ b/hw/ppc/pnv_core.c
+> @@ -118,19 +118,19 @@ static void pnv_core_realize_child(Object *child, XICSFabric *xi, Error **errp)
+>      PowerPCCPU *cpu = POWERPC_CPU(cs);
+>      Object *obj;
+>  
+> -    obj = object_new(TYPE_PNV_ICP);
+> -    object_property_add_child(OBJECT(cpu), "icp", obj, &error_abort);
+> -    object_unref(obj);
+> -    object_property_add_const_link(obj, "xics", OBJECT(xi), &error_abort);
+> -    object_property_set_bool(obj, true, "realized", &local_err);
+> +    object_property_set_bool(child, true, "realized", &local_err);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+>          return;
+>      }
+>  
+> -    object_property_set_bool(child, true, "realized", &local_err);
+> +    obj = object_new(TYPE_PNV_ICP);
+> +    object_property_add_child(child, "icp", obj, NULL);
+> +    object_unref(obj);
+> +    object_property_add_const_link(obj, "xics", OBJECT(xi), &error_abort);
+> +    object_property_add_const_link(obj, "cs", child, &error_abort);
+
+may be link the cpu object instead ? 
+
+> +    object_property_set_bool(obj, true, "realized", &local_err);
+>      if (local_err) {
+> -        object_unparent(obj);
+>          error_propagate(errp, local_err);
+>          return;
+>      }
+> @@ -141,8 +141,6 @@ static void pnv_core_realize_child(Object *child, XICSFabric *xi, Error **errp)
+>          error_propagate(errp, local_err);
+>          return;
+>      }
+> -
+> -    xics_cpu_setup(xi, cpu, ICP(obj));
+>  }
+>  
+>  static void pnv_core_realize(DeviceState *dev, Error **errp)
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index 029a14120edd..9a6259525953 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -53,9 +53,6 @@ static void spapr_cpu_reset(void *opaque)
+>  
+>  static void spapr_cpu_destroy(PowerPCCPU *cpu)
+>  {
+> -    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+> -
+> -    xics_cpu_destroy(XICS_FABRIC(spapr), cpu);
+>      qemu_unregister_reset(spapr_cpu_reset, cpu);
+>  }
+>  
+> @@ -140,28 +137,28 @@ static void spapr_cpu_core_realize_child(Object *child, Error **errp)
+>      sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+>      CPUState *cs = CPU(child);
+>      PowerPCCPU *cpu = POWERPC_CPU(cs);
+> -    Object *obj;
+> +    Object *obj = NULL;
+>  
+> -    obj = object_new(spapr->icp_type);
+> -    object_property_add_child(OBJECT(cpu), "icp", obj, &error_abort);
+> -    object_unref(obj);
+> -    object_property_add_const_link(obj, "xics", OBJECT(spapr), &error_abort);
+> -    object_property_set_bool(obj, true, "realized", &local_err);
+> +    object_property_set_bool(child, true, "realized", &local_err);
+>      if (local_err) {
+>          goto error;
+>      }
+>  
+> -    object_property_set_bool(child, true, "realized", &local_err);
+> +    spapr_cpu_init(spapr, cpu, &local_err);
+>      if (local_err) {
+>          goto error;
+>      }
+>  
+> -    spapr_cpu_init(spapr, cpu, &local_err);
+> +    obj = object_new(spapr->icp_type);
+> +    object_property_add_child(child, "icp", obj, &error_abort);
+> +    object_unref(obj);
+> +    object_property_add_const_link(obj, "xics", OBJECT(spapr), &error_abort);
+> +    object_property_add_const_link(obj, "cs", child, &error_abort);
+
+same here.
+
+> +    object_property_set_bool(obj, true, "realized", &local_err);
+>      if (local_err) {
+>          goto error;
+>      }
+>  
+> -    xics_cpu_setup(XICS_FABRIC(spapr), cpu, ICP(obj));
+>      return;
+>  
+>  error:
+> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> index 40a506eacfb4..05767a15be9a 100644
+> --- a/include/hw/ppc/xics.h
+> +++ b/include/hw/ppc/xics.h
+> @@ -183,8 +183,6 @@ void spapr_dt_xics(int nr_servers, void *fdt, uint32_t phandle);
+>  
+>  qemu_irq xics_get_qirq(XICSFabric *xi, int irq);
+>  ICPState *xics_icp_get(XICSFabric *xi, int server);
+> -void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu, ICPState *icp);
+> -void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu);
+>  
+>  /* Internal XICS interfaces */
+>  void icp_set_cppr(ICPState *icp, uint8_t cppr);
+> 
