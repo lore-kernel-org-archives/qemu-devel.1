@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40810)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dIcwL-00012u-CT
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:32:10 -0400
+	(envelope-from <eblake@redhat.com>) id 1dId1O-0003gb-7H
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:37:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dIcwI-0003fH-9J
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:32:09 -0400
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:36838)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dIcwI-0003ez-2V
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:32:06 -0400
-Received: by mail-wm0-x236.google.com with SMTP id 7so120931914wmo.1
-	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 08:32:05 -0700 (PDT)
-Date: Wed, 7 Jun 2017 16:32:03 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170607153203.GI21990@stefanha-x1.localdomain>
-References: <20170607080639.22120-1-haozhong.zhang@intel.com>
+	(envelope-from <eblake@redhat.com>) id 1dId1N-0005ZH-AN
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:37:22 -0400
+References: <d5b487b58c2c6b3e68de0e858b84877434f05c76.1496843678.git.jcody@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f10688f7-0e86-38b5-fae7-31911a9d66e8@redhat.com>
+Date: Wed, 7 Jun 2017 10:37:13 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="l0l+eSofNeLXHSnY"
-Content-Disposition: inline
-In-Reply-To: <20170607080639.22120-1-haozhong.zhang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH] nvdimm acpi: fix region format interface
- code
+In-Reply-To: <d5b487b58c2c6b3e68de0e858b84877434f05c76.1496843678.git.jcody@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Xehldbbq6FGxfCJdLKR55A4NlVn8tEDuD"
+Subject: Re: [Qemu-devel] [PATCH] block: fix external snapshot abort
+ permission error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +24,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Haozhong Zhang <haozhong.zhang@intel.com>
-Cc: qemu-devel@nongnu.org, Xiao Guangrong <guangrong.xiao@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Dan Williams <dan.j.williams@intel.com>
+To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org
 
-
---l0l+eSofNeLXHSnY
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Xehldbbq6FGxfCJdLKR55A4NlVn8tEDuD
+From: Eric Blake <eblake@redhat.com>
+To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org
+Message-ID: <f10688f7-0e86-38b5-fae7-31911a9d66e8@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] block: fix external snapshot abort
+ permission error
+References: <d5b487b58c2c6b3e68de0e858b84877434f05c76.1496843678.git.jcody@redhat.com>
+In-Reply-To: <d5b487b58c2c6b3e68de0e858b84877434f05c76.1496843678.git.jcody@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 07, 2017 at 04:06:39PM +0800, Haozhong Zhang wrote:
-> Per ACPI 6.2, section 5.2.25.6 and JEDEC Annex L Release 3, the
-> current region format interface code 0x201 indicates the block
-> addressed function interface 1, rather than a byte addressable
-> interface. Fix it by using 0x301 which indicates the byte addressable
-> no energy backed function interface 1.
+On 06/07/2017 08:55 AM, Jeff Cody wrote:
+> In external_snapshot_abort(), we try to undo what was done in
+> external_snapshot_prepare() calling bdrv_replace_node() to swap the
+> nodes back.  However, we receive a permissions error as writers are
+> blocked on the old node, which is now the new node backing file.
 >=20
-> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> An easy fix (initially suggested by Kevin Wolf) is to call
+> bdrv_set_backing_hd() on the new node, to set the backing node to NULL.=
+
+>=20
+> Signed-off-by: Jeff Cody <jcody@redhat.com>
 > ---
->  hw/acpi/nvdimm.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+>  blockdev.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>=20
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
---l0l+eSofNeLXHSnY
+> diff --git a/blockdev.c b/blockdev.c
+> index 892d768..6472548 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -1803,7 +1803,11 @@ static void external_snapshot_abort(BlkActionSta=
+te *common)
+>                               DO_UPCAST(ExternalSnapshotState, common, =
+common);
+>      if (state->new_bs) {
+>          if (state->overlay_appended) {
+> +            bdrv_ref(state->old_bs);   /* we can't let bdrv_set_backin=
+d_hd()
+> +                                          close state->old_bs; we need=
+ it */
+> +            bdrv_set_backing_hd(state->new_bs, NULL, &error_abort);
+>              bdrv_replace_node(state->new_bs, state->old_bs, &error_abo=
+rt);
+> +            bdrv_unref(state->old_bs); /* bdrv_replace_node() ref'ed o=
+ld_bs */
+>          }
+>      }
+>  }
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--Xehldbbq6FGxfCJdLKR55A4NlVn8tEDuD
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBAgAGBQJZOBxzAAoJEJykq7OBq3PIYKcIAJAdZbahnuvlRIdSQ7tWveIc
-L85TiIS4G9adRJAnVq685Ho8vtycXRE+2QZabNoVahHCmdkNr1ErH/9NceSlku9g
-3h3hHCH1UiiORPbvb/EE6ilVbn6gQR109M4DVETHs3LWaqxr/spDGxPkqvoZlPuz
-pLdETyrx2l7xEttGed5wZPBnR3G1mDils3zKwQZEgAouk2jBtgPMxXrhlk7jN+l7
-zgwuibgoPM69VWpLxAk8o2SyD6eCnrAs+4JOtfH4sMp0VC37RuZ7KQkouQqw4GQu
-y6yhCaYD9MO72slYp17J4G6g2YW8us3YCkAJGB+X2pyKmwHJPwmsJ4UfQkgTSxM=
-=Oo/D
+iQEcBAEBCAAGBQJZOB2pAAoJEKeha0olJ0Nq+I4H/3fmgs4QPzDKSmL+sDMAWonR
+0GUdFPwtvyybYQ68/PyT847SowgXRzuBh1aKIxw5IkkQ/qnPdxkorQMvTLFRC3qx
+OH6d0mS9WE2CS8iUtDBW5CDuG5g4wiKykGU1dKB9fyqPy9D2ZLGQJ6TECr12TnGc
+i6vO6DE9zVZQuyNMU70ULL1I1TVExV+Z5AJ4wLsWc+7ofotAivFdsKR9d3zZbPQK
+Pm2yIqr1hPcc4iphhiQ/4vBNQGjE9/jeTlql9pm+uFJQxE+MA47WkJ/W9KRQppPe
+RULlxqa3JX3XyY/mah6pY1F3QwFJ8TPMOHV19hRDqOx3N39QEASIOgfVsWvkAAU=
+=BBIz
 -----END PGP SIGNATURE-----
 
---l0l+eSofNeLXHSnY--
+--Xehldbbq6FGxfCJdLKR55A4NlVn8tEDuD--
