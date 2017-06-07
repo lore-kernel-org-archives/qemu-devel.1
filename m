@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dIfjG-0002Qk-Uc
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:30:51 -0400
+	(envelope-from <bobby.prani@gmail.com>) id 1dIfyX-0006y3-Vg
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:46:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dIfjC-0004TD-1B
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:30:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57758)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dIfjB-0004Sy-RT
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:30:45 -0400
-Date: Wed, 7 Jun 2017 21:30:43 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170607212825-mutt-send-email-mst@kernel.org>
-References: <20170607152825.12081-1-pbonzini@redhat.com>
-	<20170607152825.12081-2-pbonzini@redhat.com>
-	<CAFEAcA8CppP6YEPkGxVEyLnO=Kk1qirpGk2sh0bXedscxct8Jg@mail.gmail.com>
-	<8229C6EB-56EA-475E-99D4-6D9B36B5D0A7@nutanix.com>
-	<7a06506e-20ba-66b8-8c69-c500efe86301@redhat.com>
-	<0281E149-DE28-4D6D-80E0-1132CAB8ABDB@nutanix.com>
-	<1265195474.6852496.1496859744613.JavaMail.zimbra@redhat.com>
+	(envelope-from <bobby.prani@gmail.com>) id 1dIfyX-00021N-AB
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:46:38 -0400
+Received: from mail-it0-x234.google.com ([2607:f8b0:4001:c0b::234]:35608)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1dIfyX-00021F-5R
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:46:37 -0400
+Received: by mail-it0-x234.google.com with SMTP id m62so115332278itc.0
+	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 11:46:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1265195474.6852496.1496859744613.JavaMail.zimbra@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 18/33] vhost-user-scsi: Introduce
- vhost-user-scsi host device
+In-Reply-To: <878tl3d5zu.fsf@linaro.org>
+References: <1487914949-1294-1-git-send-email-bobby.prani@gmail.com>
+	<CAJhHMCDG5vcrsRp3ANyWBZLSEV3deaeYq8EF2zu+Buo5rwPa2w@mail.gmail.com>
+	<878tl3d5zu.fsf@linaro.org>
+From: Pranith Kumar <bobby.prani@gmail.com>
+Date: Wed, 7 Jun 2017 14:46:05 -0400
+Message-ID: <CAJhHMCBKWTB4si9K6KBUMj17ye2f5nD0c-PzRnN5Fi8qayKktA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] mttcg/i386: Patch instruction using
+ async_safe_* framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,54 +32,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Felipe Franciosi <felipe@nutanix.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>
 
-On Wed, Jun 07, 2017 at 02:22:24PM -0400, Paolo Bonzini wrote:
-> > > How, since there is no synchronization point between the vhost-user
-> > > server on the source and the destination?
-> > 
-> > The idea is that the backend should both stop picking up new requests and
-> > also quiesce outstanding requests upon a GET_VRING_BASE vhost message.
-> 
-> This could be documented,
+On Wed, Jun 7, 2017 at 2:09 PM, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+>
+> Pranith Kumar <bobby.prani@gmail.com> writes:
+>
+>> Can someone please pick this up?
+>
+> It needs to be re-posted with the review tag and ping Paolo re: async
+> work for KVM.
+>
 
-It is documented AFAIK. Pls take a look at the spec documentation.
+Will do.
 
-> but perhaps it's best to add a START_STOP
-> feature and message to the vhost-user protocol?
-
-We just never need to GET_VRING_BASE if ring keeps going -
-makes no sense since base gets invalidated immediately.
-
-
-
-> The feature then can be optional for vhost-user-net and mandatory for
-> vhost-user-scsi.  When this is done we can remove .unmigratable.
-> 
-> Thanks,
-> 
-> Paolo
-
-If vhost-user-scsi does not stop the ring after responding to
-GET_VRING_BASE, it's just a bug that needs to be fixed.
-
-> > > 
-> > > Can you please send a version of your patch that uses .unmigratable?
-> > 
-> > Sure I can do that. We can work on the migration later on.
-> > 
-> > > 
-> > > I'll send a v6 that momentarily drops vhost-scsi, but I intend to
-> > > include it again in the next pull request.
-> > 
-> > Sounds good to me.
-> > 
-> > Felipe
-> > 
-> > > 
-> > > Thanks,
-> > > 
-> > > Paolo
-> > 
-> > 
+Thanks,
+--=20
+Pranith
