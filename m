@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dIck5-0004Ax-Ut
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:19:34 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dIcsG-0006fg-GT
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:27:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dIck2-00089i-Nz
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:19:29 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:35533)
+	(envelope-from <stefanha@gmail.com>) id 1dIcsD-0002fz-Cr
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:27:56 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:35135)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dIck2-00089a-Gw
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:19:26 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id q97so7654152wrb.2
-	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 08:19:26 -0700 (PDT)
-References: <20170605165233.4135-1-rth@twiddle.net>
-	<20170605165233.4135-23-rth@twiddle.net>
-	<87h8zrdh02.fsf@linaro.org> <87fufbdghz.fsf@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <87fufbdghz.fsf@linaro.org>
-Date: Wed, 07 Jun 2017 16:19:50 +0100
-Message-ID: <87efuvddux.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dIcsD-0002fV-3t
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:27:53 -0400
+Received: by mail-wm0-x234.google.com with SMTP id x70so60386972wme.0
+	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 08:27:53 -0700 (PDT)
+Date: Wed, 7 Jun 2017 16:27:49 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170607152749.GF21990@stefanha-x1.localdomain>
+References: <20170606072229.9302-1-haozhong.zhang@intel.com>
+	<20170606072229.9302-4-haozhong.zhang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 22/26] target/aarch64: optimize indirect
- branches
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="4VrXvz3cwkc87Wze"
+Content-Disposition: inline
+In-Reply-To: <20170606072229.9302-4-haozhong.zhang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] nvdimm: add a boolean option
+ "restrict"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,78 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
+To: Haozhong Zhang <haozhong.zhang@intel.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <guangrong.xiao@gmail.com>, Dan Williams <dan.j.williams@intel.com>
 
 
-Alex Bennée <alex.bennee@linaro.org> writes:
+--4VrXvz3cwkc87Wze
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Alex Bennée <alex.bennee@linaro.org> writes:
->
->> Richard Henderson <rth@twiddle.net> writes:
->>
->>> From: "Emilio G. Cota" <cota@braap.org>
->>>
->>> Measurements:
->>>
->>> [Baseline performance is that before applying this and the previous
->>> commit]
->>
->> Sadly this has regressed my qemu-system-aarch64 EL2 run. It was slightly
->> masked by an unrelated assertion breakage which I had to fix. However
->> with this patch my boot hangs spinning all 4 threads. Once reverted
->> things work again.
->>
->> My command line:
->>
->>   timeout -k 1s --foreground 120s ./aarch64-softmmu/qemu-system-aarch64 -machine type=virt -display none -m 4096 -cpu cortex-a57 -serial mon:stdio -netdev user,id=unet -device virtio-net-device,netdev=unet -drive file=/home/alex/lsrc/qemu/images/jessie-arm64.qcow2,id=myblock,index=0,if=none -device virtio-blk-device,drive=myblock -append "console=ttyAMA0 root=/dev/vda1 systemd.unit=benchmark.service" -kernel /home/alex/lsrc/qemu/images/aarch64-current-linux-kernel-only.img -smp 4 -machine gic-version=3 -machine virtualization=true -name debug-threads=on
->>
->> My tree with fix and revert:
->>
->>   https://github.com/stsquad/qemu/tree/debug/aarch64-hang
->>
->> I'm investigating now.
->
-> Well this seems to be a case of hangs with -smp > 1 (which I guess was
-> obvious seeing as the TCG threads seem to be spinning against each
-> other).
+On Tue, Jun 06, 2017 at 03:22:28PM +0800, Haozhong Zhang wrote:
+> If a vNVDIMM device is not backed by a DAX device and its "restrict"
+> option is enabled, bit 3 of state flags in its region mapping
+> structure will be set, in order to notify the guest of the lack of
+> write persistence guarantee. Once this bit is set, the guest OS may
+> mark the vNVDIMM device as read-only.
+>=20
+> This option is disabled by default for backwards compatibility. It's
+> recommended to enable for the formal usage.
 
-So the minimum fix I've found to get things working again is:
+Good idea.  I think the following is cleaner:
 
-void *HELPER(lookup_tb_ptr)(CPUArchState *env, target_ulong addr)
-{
-    CPUState *cpu = ENV_GET_CPU(env);
-    TranslationBlock *tb;
-    target_ulong cs_base, pc;
-    uint32_t flags;
+DEFINE_PROP_ON_OFF_AUTO("readonly") on the 'nvdimm' device.  The
+following states are available:
 
-    tb = atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)]);
-    if (likely(tb)) {
-        cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
-        if (likely(tb->pc == addr && tb->cs_base == cs_base &&
-                   tb->flags == flags)) {
-            goto found;
-        }
-        tb = tb_htable_lookup(cpu, addr, cs_base, flags);
-        if (likely(tb)) {
-            atomic_set(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)], tb);
-            /* goto found; */
-        }
-    }
-    return tcg_ctx.code_gen_epilogue;
- found:
-    qemu_log_mask_and_addr(CPU_LOG_EXEC, addr,
-                           "Chain %p [%d: " TARGET_FMT_lx "] %s\n",
-                           tb->tc_ptr, cpu->cpu_index, addr,
-                           lookup_symbol(addr));
-    return tb->tc_ptr;
-}
+ * 'on' - ACPI_NFIT_MEM_NOT_ARMED is set
+ * 'off' - ACPI_NFIT_MEM_NOT_ARMED is clear
+ * 'auto' - ACPI_NFIT_MEM_NOT_ARMED set if backend is not persistent
 
-Which I find very odd. It would imply that tb_htable_lookup is giving us
-a bad result, except I would find it very unlikely what ever funky value
-we stored in the jmp cache would never get hit again.
+This new property defaults to 'auto'.  Machine types older than
+pc-i440fx-2.10 and pc-q35-2.10 default to 'on'.
 
-/me is very confused.
+--4VrXvz3cwkc87Wze
+Content-Type: application/pgp-signature; name="signature.asc"
 
---
-Alex Bennée
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZOBt1AAoJEJykq7OBq3PI8TEH/i6+5lyu5WgdASiizf8E8GIU
+l23/AbH+bnRib3JwdRGTmNsd398lM32B4YVfS1xkhBqsHmm0+aIQ+AwhkxK4n7Vf
+P3si0lOu4IdC0xI0c6EvNc42RKQBUliaLpTC1JGBewH4KjMi7JgMOpetY1zsSQW7
+1WtbU8Kf3Upr5RQ2SVj/TrZ7p6odUGyBJy0j+6KO0DK7IfdV7MCYu33l0XytlFGI
+sfNL3urVOtBvoTU7MhFqslUl659xaiFTrQU9e82ZFhDCQLL4eGWjpRcXZTxSp2C3
+FnDz/av7skUfW34i2qVTUURA2SkhVNEoJ4UTXAvmOftaTh2zVyoJ/jBJEgbPkq8=
+=kHNO
+-----END PGP SIGNATURE-----
+
+--4VrXvz3cwkc87Wze--
