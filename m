@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dIbgP-0001oJ-E3
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:11:38 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1dIbhy-0003Qz-Qe
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:13:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dIbgL-0003vw-9P
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:11:37 -0400
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:33695)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dIbgL-0003vD-1I
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:11:33 -0400
-Received: by mail-wr0-x22d.google.com with SMTP id v104so6770601wrb.0
-	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 07:11:32 -0700 (PDT)
-References: <20170605165233.4135-1-rth@twiddle.net>
-	<20170605165233.4135-23-rth@twiddle.net>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170605165233.4135-23-rth@twiddle.net>
-Date: Wed, 07 Jun 2017 15:11:57 +0100
-Message-ID: <87h8zrdh02.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 22/26] target/aarch64: optimize indirect
- branches
+	(envelope-from <a.perevalov@samsung.com>) id 1dIbht-0004yT-Nb
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:13:14 -0400
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:32183)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1dIbht-0004wn-ES
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:13:09 -0400
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout2.w1.samsung.com
+	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
+	2014)) with ESMTP id <0OR600ADOKTSG9B0@mailout2.w1.samsung.com> for
+	qemu-devel@nongnu.org; Wed, 07 Jun 2017 15:13:04 +0100 (BST)
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Message-id: <2a74d0cf-6be8-ddc8-23df-aa0d2edae902@samsung.com>
+Date: Wed, 07 Jun 2017 17:13:00 +0300
+MIME-version: 1.0
+In-reply-to: <1496828798-27548-8-git-send-email-a.perevalov@samsung.com>
+Content-type: text/plain; charset=utf-8; format=flowed
+Content-transfer-encoding: 7bit
+Content-language: en-GB
+References: <1496828798-27548-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170607094729eucas1p15097f154039365d5e135f92b72aad1bf@eucas1p1.samsung.com>
+	<1496828798-27548-8-git-send-email-a.perevalov@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH v8 07/11] migration: add bitmap for copied
+ page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +36,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, i.maximets@samsung.com, peterx@redhat.com
 
-
-Richard Henderson <rth@twiddle.net> writes:
-
-> From: "Emilio G. Cota" <cota@braap.org>
+On 06/07/2017 12:46 PM, Alexey Perevalov wrote:
+> This patch adds ability to track down already copied
+> pages, it's necessary for calculation vCPU block time in
+> postcopy migration feature, maybe for restore after
+> postcopy migration failure.
+> Also it's necessary to solve shared memory issue in
+> postcopy livemigration. Information about copied pages
+> will be transferred to the software virtual bridge
+> (e.g. OVS-VSWITCHD), to avoid fallocate (unmap) for
+> already copied pages. fallocate syscall is required for
+> remmaped shared memory, due to remmaping itself blocks
+> ioctl(UFFDIO_COPY, ioctl in this case will end with EEXIT
+> error (struct page is exists after remmap).
 >
-> Measurements:
+> Bitmap is placed into RAMBlock as another postcopy/precopy
+> related bitmaps. Helpers are in migration/ram.c, due to
+> in this file is allowing to work with RAMBlock.
 >
-> [Baseline performance is that before applying this and the previous
-> commit]
+> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> ---
+>   include/exec/ram_addr.h |  2 ++
+>   migration/ram.c         | 36 ++++++++++++++++++++++++++++++++++++
+>   migration/ram.h         |  4 ++++
+>   3 files changed, 42 insertions(+)
+>
+> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+> index 140efa8..6a3780b 100644
+> --- a/include/exec/ram_addr.h
+> +++ b/include/exec/ram_addr.h
+> @@ -47,6 +47,8 @@ struct RAMBlock {
+>        * of the postcopy phase
+>        */
+>       unsigned long *unsentmap;
+> +    /* bitmap of already copied pages in postcopy */
+> +    unsigned long *copiedmap;
+>   };
+>   
+>   static inline bool offset_in_ramblock(RAMBlock *b, ram_addr_t offset)
+> diff --git a/migration/ram.c b/migration/ram.c
+> index f387e9c..a7c0db4 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -149,6 +149,25 @@ out:
+>       return ret;
+>   }
+>   
+> +static unsigned long int get_copied_bit_offset(uint64_t addr, RAMBlock *rb)
+> +{
+> +    uint64_t addr_offset = addr - (uint64_t)(uintptr_t)rb->host;
+> +    int page_shift = find_first_bit((unsigned long *)&rb->page_size,
+> +                                    sizeof(rb->page_size));
+> +
+> +    return addr_offset >> page_shift;
+> +}
+> +
+> +int test_copiedmap_by_addr(uint64_t addr, RAMBlock *rb)
+> +{
+> +    return test_bit(get_copied_bit_offset(addr, rb), rb->copiedmap);
+> +}
+> +
+> +void set_copiedmap_by_addr(uint64_t addr, RAMBlock *rb)
+> +{
+> +    set_bit_atomic(get_copied_bit_offset(addr, rb), rb->copiedmap);
+> +}
+> +
+>   /*
+>    * An outstanding page request, on the source, having been received
+>    * and queued
+> @@ -1449,6 +1468,8 @@ static void ram_migration_cleanup(void *opaque)
+>           block->bmap = NULL;
+>           g_free(block->unsentmap);
+>           block->unsentmap = NULL;
+looks like it's wrong place, because copiedmap is living
+on destination side, so maybe in qemu_ram_free
+> +        g_free(block->copiedmap);
+> +        block->copiedmap = NULL;
+>       }
+>   
+>       XBZRLE_cache_lock();
+> @@ -2517,6 +2538,14 @@ static int ram_load_postcopy(QEMUFile *f)
+>       return ret;
+>   }
+>   
+> +static unsigned long get_copiedmap_size(RAMBlock *rb)
+> +{
+> +    unsigned long pages;
+> +    pages = rb->max_length >> find_first_bit((unsigned long *)&rb->page_size,
+> +                                             sizeof(rb->page_size));
+> +    return pages;
+> +}
+> +
+>   static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>   {
+>       int flags = 0, ret = 0;
+> @@ -2544,6 +2573,13 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>       rcu_read_lock();
+>   
+>       if (postcopy_running) {
+> +        RAMBlock *rb;
+> +        RAMBLOCK_FOREACH(rb) {
+> +            /* need for destination, bitmap_new calls
+> +             * g_try_malloc0 and this function
+> +             * Attempts to allocate @n_bytes, initialized to 0'sh */
+> +            rb->copiedmap = bitmap_new(get_copiedmap_size(rb));
+> +        }
+>           ret = ram_load_postcopy(f);
+>       }
+>   
+> diff --git a/migration/ram.h b/migration/ram.h
+> index c9563d1..1f32824 100644
+> --- a/migration/ram.h
+> +++ b/migration/ram.h
+> @@ -67,4 +67,8 @@ int ram_discard_range(const char *block_name, uint64_t start, size_t length);
+>   int ram_postcopy_incoming_init(MigrationIncomingState *mis);
+>   
+>   void ram_handle_compressed(void *host, uint8_t ch, uint64_t size);
+> +
+> +int test_copiedmap_by_addr(uint64_t addr, RAMBlock *rb);
+> +void set_copiedmap_by_addr(uint64_t addr, RAMBlock *rb);
+> +
+>   #endif
 
-Sadly this has regressed my qemu-system-aarch64 EL2 run. It was slightly
-masked by an unrelated assertion breakage which I had to fix. However
-with this patch my boot hangs spinning all 4 threads. Once reverted
-things work again.
 
-My command line:
-
-  timeout -k 1s --foreground 120s ./aarch64-softmmu/qemu-system-aarch64 -machine type=virt -display none -m 4096 -cpu cortex-a57 -serial mon:stdio -netdev user,id=unet -device virtio-net-device,netdev=unet -drive file=/home/alex/lsrc/qemu/images/jessie-arm64.qcow2,id=myblock,index=0,if=none -device virtio-blk-device,drive=myblock -append "console=ttyAMA0 root=/dev/vda1 systemd.unit=benchmark.service" -kernel /home/alex/lsrc/qemu/images/aarch64-current-linux-kernel-only.img -smp 4 -machine gic-version=3 -machine virtualization=true -name debug-threads=on
-
-My tree with fix and revert:
-
-  https://github.com/stsquad/qemu/tree/debug/aarch64-hang
-
-I'm investigating now.
-
---
-Alex Bennée
+-- 
+Best regards,
+Alexey Perevalov
