@@ -1,16 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dIRWK-0003at-K4
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 23:20:34 -0400
+	(envelope-from <peterx@redhat.com>) id 1dIRet-00039r-Hl
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 23:29:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dIRWI-0002UB-Gd
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 23:20:32 -0400
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed,  7 Jun 2017 13:20:18 +1000
-Message-Id: <20170607032018.19588-8-david@gibson.dropbear.id.au>
-In-Reply-To: <20170607032018.19588-1-david@gibson.dropbear.id.au>
-References: <20170607032018.19588-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCHv2 7/7] spapr: Rework DRC name handling
+	(envelope-from <peterx@redhat.com>) id 1dIRes-0007Av-IY
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 23:29:23 -0400
+Date: Wed, 7 Jun 2017 11:29:08 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170607032908.GB6479@pxdev.xzpeter.org>
+References: <20170606052438.35405-1-haoqf@linux.vnet.ibm.com>
+	<20170606052438.35405-2-haoqf@linux.vnet.ibm.com>
+	<20170606124953.GD5448@noname.redhat.com>
+	<20170606174218.GA2411@work-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170606174218.GA2411@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] qemu/migration: fix the double free
+ problem on from_src_file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,205 +26,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mdroth@linux.vnet.ibm.com
-Cc: bharata@linux.vnet.ibm.com, sursingh@redhat.com, groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, quintela@redhat.com, QingFeng Hao <haoqf@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, liujbjl@linux.vnet.ibm.com, famz@redhat.com
 
-DRC objects have a get_name method which returns the DRC name generated
-when the DRC is created.  Replace that with a fixed spapr_drc_name()
-function which generates the name on the fly from other information.  This
-means:
-  * We get rid of a method with only one implementation, and only local
-    callers
-  * We don't have to carry the name string around for the lifetime of the
-    DRC
-  * We use information added to the class structure to generate the name
-    in standard format, so we don't need an explicit switch on drc type
-    any more
+On Tue, Jun 06, 2017 at 06:42:18PM +0100, Dr. David Alan Gilbert wrote:
+> * Kevin Wolf (kwolf@redhat.com) wrote:
+> > Am 06.06.2017 um 07:24 hat QingFeng Hao geschrieben:
+> > > In load_snapshot, mis->from_src_file is freed twice, the first free is by
+> > > qemu_fclose, the second is by migration_incoming_state_destroy and
+> > > it causes Illegal instruction exception. The fix is just to remove the
+> > > first free.
+> > > 
+> > > This problem is found by qemu-iotests case 068 since commit
+> > > "660819b migration: shut src return path unconditionally". The error is:
+> > > 068 1s ... - output mismatch (see 068.out.bad)
+> > >     --- tests/qemu-iotests/068.out	2017-05-06 01:00:26.417270437 +0200
+> > >     +++ 068.out.bad	2017-06-03 13:59:55.360274640 +0200
+> > >     @@ -6,6 +6,8 @@
+> > >      QEMU X.Y.Z monitor - type 'help' for more information
+> > >      (qemu) savevm 0
+> > >      (qemu) quit
+> > >     +./common.config: line 107: 242472 Illegal instruction     (core dumped) ( if [ -n "${QEMU_NEED_PID}" ]; then
+> > >     +    echo $BASHPID > "${QEMU_TEST_DIR}/qemu-${_QEMU_HANDLE}.pid";
+> > >     +fi; exec "$QEMU_PROG" $QEMU_OPTIONS "$@" )
+> > >      QEMU X.Y.Z monitor - type 'help' for more information
+> > >     -(qemu) quit
+> > >     -*** done
+> > >     +(qemu) *** done
+> > > 
+> > > Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+> > > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > Reviewed-by: Peter Xu <peterx@redhat.com>
+> > 
+> > Dave, as you only gave R-b rather than merging the patch, should this be
+> > merged through the block tree?
+> 
+> I'm happy for it to go via block but also happy for it to go via
+> migration; Juan is mostly doing the migration set at the moment since
+> they're dominated by his cleanups.
+> 
+> > > diff --git a/migration/savevm.c b/migration/savevm.c
+> > > index 9c320f59d0..853e14e34e 100644
+> > > --- a/migration/savevm.c
+> > > +++ b/migration/savevm.c
+> > > @@ -2290,7 +2290,6 @@ int load_snapshot(const char *name, Error **errp)
+> > >  
+> > >      aio_context_acquire(aio_context);
+> > >      ret = qemu_loadvm_state(f);
+> > > -    qemu_fclose(f);
+> > >      aio_context_release(aio_context);
+> > >  
+> > >      migration_incoming_state_destroy();
+> > 
+> > Did we check other callers of migration_incoming_state_destroy()?
+> > 
+> > For example, qmp_xen_load_devices_state() looks suspicious, too.
+> 
+> Hmm, it looks suspicious in the opposite direction; it never sets
+> mis->from_src_file as was added by b4b076da into the load_snapshot path.
 
-We also eliminate the 'name' property; it's basically useless since the
-only information in it can easily be deduced from other things.
+Agree.
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/spapr_drc.c         | 80 +++++++++++++++++-----------------------------
- include/hw/ppc/spapr_drc.h |  3 +-
- 2 files changed, 30 insertions(+), 53 deletions(-)
+Does qmp_xen_load_devices_state() needs to call
+migration_incoming_state_destroy() after all? Since the latter
+function only cleanups MigrationIncomingState and looks like the
+former xen code didn't really use it at all.
 
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index 82c0b94..15ef67d 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -155,9 +155,32 @@ static uint32_t set_allocation_state(sPAPRDRConnector *drc,
-     return RTAS_OUT_SUCCESS;
- }
- 
--static const char *get_name(sPAPRDRConnector *drc)
-+static const char *spapr_drc_name(sPAPRDRConnector *drc)
- {
--    return drc->name;
-+    sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
-+
-+    /* human-readable name for a DRC to encode into the DT
-+     * description. this is mainly only used within a guest in place
-+     * of the unique DRC index.
-+     *
-+     * in the case of VIO/PCI devices, it corresponds to a "location
-+     * code" that maps a logical device/function (DRC index) to a
-+     * physical (or virtual in the case of VIO) location in the system
-+     * by chaining together the "location label" for each
-+     * encapsulating component.
-+     *
-+     * since this is more to do with diagnosing physical hardware
-+     * issues than guest compatibility, we choose location codes/DRC
-+     * names that adhere to the documented format, but avoid encoding
-+     * the entire topology information into the label/code, instead
-+     * just using the location codes based on the labels for the
-+     * endpoints (VIO/PCI adaptor connectors), which is basically just
-+     * "C" followed by an integer ID.
-+     *
-+     * DRC names as documented by PAPR+ v2.7, 13.5.2.4
-+     * location codes as documented by PAPR+ v2.7, 12.3.1.5
-+     */
-+    return g_strdup_printf("%s%d", drck->drc_name_prefix, drc->id);
- }
- 
- /* has the guest been notified of device attachment? */
-@@ -202,13 +225,6 @@ static void prop_get_index(Object *obj, Visitor *v, const char *name,
-     visit_type_uint32(v, name, &value, errp);
- }
- 
--static char *prop_get_name(Object *obj, Error **errp)
--{
--    sPAPRDRConnector *drc = SPAPR_DR_CONNECTOR(obj);
--    sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
--    return g_strdup(drck->get_name(drc));
--}
--
- static void prop_get_fdt(Object *obj, Visitor *v, const char *name,
-                          void *opaque, Error **errp)
- {
-@@ -567,45 +583,6 @@ sPAPRDRConnector *spapr_dr_connector_new(Object *owner, const char *type,
-     object_property_set_bool(OBJECT(drc), true, "realized", NULL);
-     g_free(prop_name);
- 
--    /* human-readable name for a DRC to encode into the DT
--     * description. this is mainly only used within a guest in place
--     * of the unique DRC index.
--     *
--     * in the case of VIO/PCI devices, it corresponds to a
--     * "location code" that maps a logical device/function (DRC index)
--     * to a physical (or virtual in the case of VIO) location in the
--     * system by chaining together the "location label" for each
--     * encapsulating component.
--     *
--     * since this is more to do with diagnosing physical hardware
--     * issues than guest compatibility, we choose location codes/DRC
--     * names that adhere to the documented format, but avoid encoding
--     * the entire topology information into the label/code, instead
--     * just using the location codes based on the labels for the
--     * endpoints (VIO/PCI adaptor connectors), which is basically
--     * just "C" followed by an integer ID.
--     *
--     * DRC names as documented by PAPR+ v2.7, 13.5.2.4
--     * location codes as documented by PAPR+ v2.7, 12.3.1.5
--     */
--    switch (spapr_drc_type(drc)) {
--    case SPAPR_DR_CONNECTOR_TYPE_CPU:
--        drc->name = g_strdup_printf("CPU %d", id);
--        break;
--    case SPAPR_DR_CONNECTOR_TYPE_PHB:
--        drc->name = g_strdup_printf("PHB %d", id);
--        break;
--    case SPAPR_DR_CONNECTOR_TYPE_VIO:
--    case SPAPR_DR_CONNECTOR_TYPE_PCI:
--        drc->name = g_strdup_printf("C%d", id);
--        break;
--    case SPAPR_DR_CONNECTOR_TYPE_LMB:
--        drc->name = g_strdup_printf("LMB %d", id);
--        break;
--    default:
--        g_assert(false);
--    }
--
-     /* PCI slot always start in a USABLE state, and stay there */
-     if (spapr_drc_type(drc) == SPAPR_DR_CONNECTOR_TYPE_PCI) {
-         drc->allocation_state = SPAPR_DR_ALLOCATION_STATE_USABLE;
-@@ -621,7 +598,6 @@ static void spapr_dr_connector_instance_init(Object *obj)
-     object_property_add_uint32_ptr(obj, "id", &drc->id, NULL);
-     object_property_add(obj, "index", "uint32", prop_get_index,
-                         NULL, NULL, NULL, NULL);
--    object_property_add_str(obj, "name", prop_get_name, NULL, NULL);
-     object_property_add(obj, "fdt", "struct", prop_get_fdt,
-                         NULL, NULL, NULL, NULL);
- }
-@@ -636,7 +612,6 @@ static void spapr_dr_connector_class_init(ObjectClass *k, void *data)
-     dk->unrealize = unrealize;
-     drck->set_isolation_state = set_isolation_state;
-     drck->set_allocation_state = set_allocation_state;
--    drck->get_name = get_name;
-     drck->release_pending = release_pending;
-     drck->set_signalled = set_signalled;
-     /*
-@@ -665,6 +640,7 @@ static void spapr_drc_cpu_class_init(ObjectClass *k, void *data)
- 
-     drck->typeshift = SPAPR_DR_CONNECTOR_TYPE_SHIFT_CPU;
-     drck->typename = "CPU";
-+    drck->drc_name_prefix = "CPU ";
- }
- 
- static void spapr_drc_pci_class_init(ObjectClass *k, void *data)
-@@ -673,6 +649,7 @@ static void spapr_drc_pci_class_init(ObjectClass *k, void *data)
- 
-     drck->typeshift = SPAPR_DR_CONNECTOR_TYPE_SHIFT_PCI;
-     drck->typename = "28";
-+    drck->drc_name_prefix = "C";
- }
- 
- static void spapr_drc_lmb_class_init(ObjectClass *k, void *data)
-@@ -681,6 +658,7 @@ static void spapr_drc_lmb_class_init(ObjectClass *k, void *data)
- 
-     drck->typeshift = SPAPR_DR_CONNECTOR_TYPE_SHIFT_LMB;
-     drck->typename = "MEM";
-+    drck->drc_name_prefix = "LMB ";
- }
- 
- static const TypeInfo spapr_dr_connector_info = {
-@@ -829,7 +807,7 @@ int spapr_drc_populate_dt(void *fdt, int fdt_offset, Object *owner,
-         g_array_append_val(drc_power_domains, drc_power_domain);
- 
-         /* ibm,drc-names */
--        drc_names = g_string_append(drc_names, drck->get_name(drc));
-+        drc_names = g_string_append(drc_names, spapr_drc_name(drc));
-         drc_names = g_string_insert_len(drc_names, -1, "\0", 1);
- 
-         /* ibm,drc-types */
-diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-index 4f82001..c487123 100644
---- a/include/hw/ppc/spapr_drc.h
-+++ b/include/hw/ppc/spapr_drc.h
-@@ -184,7 +184,6 @@ typedef struct sPAPRDRConnector {
- 
-     uint32_t id;
-     Object *owner;
--    const char *name;
- 
-     /* DR-indicator */
-     uint32_t dr_indicator;
-@@ -215,6 +214,7 @@ typedef struct sPAPRDRConnectorClass {
-     /*< public >*/
-     sPAPRDRConnectorTypeShift typeshift;
-     const char *typename; /* used in device tree, PAPR 13.5.2.6 & C.6.1 */
-+    const char *drc_name_prefix; /* used other places in device tree */
- 
-     sPAPRDREntitySense (*dr_entity_sense)(sPAPRDRConnector *drc);
- 
-@@ -223,7 +223,6 @@ typedef struct sPAPRDRConnectorClass {
-                                     sPAPRDRIsolationState state);
-     uint32_t (*set_allocation_state)(sPAPRDRConnector *drc,
-                                      sPAPRDRAllocationState state);
--    const char *(*get_name)(sPAPRDRConnector *drc);
- 
-     /* QEMU interfaces for managing hotplug operations */
-     bool (*release_pending)(sPAPRDRConnector *drc);
+> 
+> > I can't tell for postcopy_ram_listen_thread() - commit 660819b didn't
+> > seem to remove a qemu_fclose() call there, but I can't see one left
+> > behind either. Was the file leaked before commit 660819b or am I
+> > missing something?
+> 
+> I don't think there's a problem in the postcopy path, although hmm was
+> I missing a close before?
+> 
+> Dave
+> > 
+> > Kevin
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 -- 
-2.9.4
+Peter Xu
