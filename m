@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34123)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dIe0w-0001mU-FH
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:40:59 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dIe0y-0001pI-Lb
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:41:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dIe0v-0000iV-51
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:40:58 -0400
-Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:33748)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1dIe0u-0000ht-Sr
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:40:57 -0400
-Received: by mail-io0-x242.google.com with SMTP id m4so1548502ioe.0
-	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 09:40:56 -0700 (PDT)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dIe0x-0000ll-88
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:41:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40384)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1dIe0x-0000kn-2I
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:40:59 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1788D1766B4
+	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 16:40:58 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed,  7 Jun 2017 20:36:25 +0400
+Message-Id: <20170607163635.17635-34-marcandre.lureau@redhat.com>
+In-Reply-To: <20170607163635.17635-1-marcandre.lureau@redhat.com>
+References: <20170607163635.17635-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1487914949-1294-1-git-send-email-bobby.prani@gmail.com>
-References: <1487914949-1294-1-git-send-email-bobby.prani@gmail.com>
-From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Wed, 7 Jun 2017 12:40:25 -0400
-Message-ID: <CAJhHMCDG5vcrsRp3ANyWBZLSEV3deaeYq8EF2zu+Buo5rwPa2w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] mttcg/i386: Patch instruction using
- async_safe_* framework
+Subject: [Qemu-devel] [PATCH v3 33/43] xen: use get_uint() for
+ "max-ram-below-4g" property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,185 +34,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pranith Kumar <bobby.prani@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Can someone please pick this up?
+TYPE_PC_MACHINE's property PC_MACHINE_MAX_RAM_BELOW_4G's getter and
+setter pc_machine_get_max_ram_below_4g() and
+pc_machine_set_max_ram_below_4g() use visit_type_size()
 
-Thanks,
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ hw/i386/xen/xen-hvm.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-On Fri, Feb 24, 2017 at 12:42 AM, Pranith Kumar <bobby.prani@gmail.com> wro=
-te:
-> In mttcg, calling pause_all_vcpus() during execution from the
-> generated TBs causes a deadlock if some vCPU is waiting for exclusive
-> execution in start_exclusive(). Fix this by using the aync_safe_*
-> framework instead of pausing vcpus for patching instructions.
->
-> CC: Richard Henderson <rth@twiddle.net>
-> CC: Peter Maydell <peter.maydell@linaro.org>
-> CC: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
-> ---
->  hw/i386/kvmvapic.c | 82 ++++++++++++++++++++++++++++++++++--------------=
-------
->  1 file changed, 52 insertions(+), 30 deletions(-)
->
-> diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
-> index 82a4955..11b0d49 100644
-> --- a/hw/i386/kvmvapic.c
-> +++ b/hw/i386/kvmvapic.c
-> @@ -383,8 +383,7 @@ static void patch_byte(X86CPU *cpu, target_ulong addr=
-, uint8_t byte)
->      cpu_memory_rw_debug(CPU(cpu), addr, &byte, 1, 1);
->  }
->
-> -static void patch_call(VAPICROMState *s, X86CPU *cpu, target_ulong ip,
-> -                       uint32_t target)
-> +static void patch_call(X86CPU *cpu, target_ulong ip, uint32_t target)
->  {
->      uint32_t offset;
->
-> @@ -393,23 +392,24 @@ static void patch_call(VAPICROMState *s, X86CPU *cp=
-u, target_ulong ip,
->      cpu_memory_rw_debug(CPU(cpu), ip + 1, (void *)&offset, sizeof(offset=
-), 1);
->  }
->
-> -static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulon=
-g ip)
-> +struct PatchInfo {
-> +    VAPICHandlers *handler;
-> +    target_ulong ip;
-> +};
-> +
-> +static void do_patch_instruction(CPUState *cs, run_on_cpu_data data)
->  {
-> -    CPUState *cs =3D CPU(cpu);
-> -    CPUX86State *env =3D &cpu->env;
-> -    VAPICHandlers *handlers;
-> +    X86CPU *x86_cpu =3D X86_CPU(cs);
-> +    CPUX86State *env =3D &x86_cpu->env;
-> +    struct PatchInfo *info =3D (struct PatchInfo *) data.host_ptr;
-> +    VAPICHandlers *handlers =3D info->handler;
-> +    target_ulong ip =3D info->ip;
->      uint8_t opcode[2];
->      uint32_t imm32 =3D 0;
->      target_ulong current_pc =3D 0;
->      target_ulong current_cs_base =3D 0;
->      uint32_t current_flags =3D 0;
->
-> -    if (smp_cpus =3D=3D 1) {
-> -        handlers =3D &s->rom_state.up;
-> -    } else {
-> -        handlers =3D &s->rom_state.mp;
-> -    }
-> -
->      if (!kvm_enabled()) {
->          cpu_get_tb_cpu_state(env, &current_pc, &current_cs_base,
->                               &current_flags);
-> @@ -421,48 +421,70 @@ static void patch_instruction(VAPICROMState *s, X86=
-CPU *cpu, target_ulong ip)
->          }
->      }
->
-> -    pause_all_vcpus();
-> -
->      cpu_memory_rw_debug(cs, ip, opcode, sizeof(opcode), 0);
->
->      switch (opcode[0]) {
->      case 0x89: /* mov r32 to r/m32 */
-> -        patch_byte(cpu, ip, 0x50 + modrm_reg(opcode[1]));  /* push reg *=
-/
-> -        patch_call(s, cpu, ip + 1, handlers->set_tpr);
-> +        patch_byte(x86_cpu, ip, 0x50 + modrm_reg(opcode[1]));  /* push r=
-eg */
-> +        patch_call(x86_cpu, ip + 1, handlers->set_tpr);
->          break;
->      case 0x8b: /* mov r/m32 to r32 */
-> -        patch_byte(cpu, ip, 0x90);
-> -        patch_call(s, cpu, ip + 1, handlers->get_tpr[modrm_reg(opcode[1]=
-)]);
-> +        patch_byte(x86_cpu, ip, 0x90);
-> +        patch_call(x86_cpu, ip + 1, handlers->get_tpr[modrm_reg(opcode[1=
-])]);
->          break;
->      case 0xa1: /* mov abs to eax */
-> -        patch_call(s, cpu, ip, handlers->get_tpr[0]);
-> +        patch_call(x86_cpu, ip, handlers->get_tpr[0]);
->          break;
->      case 0xa3: /* mov eax to abs */
-> -        patch_call(s, cpu, ip, handlers->set_tpr_eax);
-> +        patch_call(x86_cpu, ip, handlers->set_tpr_eax);
->          break;
->      case 0xc7: /* mov imm32, r/m32 (c7/0) */
-> -        patch_byte(cpu, ip, 0x68);  /* push imm32 */
-> +        patch_byte(x86_cpu, ip, 0x68);  /* push imm32 */
->          cpu_memory_rw_debug(cs, ip + 6, (void *)&imm32, sizeof(imm32), 0=
-);
->          cpu_memory_rw_debug(cs, ip + 1, (void *)&imm32, sizeof(imm32), 1=
-);
-> -        patch_call(s, cpu, ip + 5, handlers->set_tpr);
-> +        patch_call(x86_cpu, ip + 5, handlers->set_tpr);
->          break;
->      case 0xff: /* push r/m32 */
-> -        patch_byte(cpu, ip, 0x50); /* push eax */
-> -        patch_call(s, cpu, ip + 1, handlers->get_tpr_stack);
-> +        patch_byte(x86_cpu, ip, 0x50); /* push eax */
-> +        patch_call(x86_cpu, ip + 1, handlers->get_tpr_stack);
->          break;
->      default:
->          abort();
->      }
->
-> -    resume_all_vcpus();
-> +    g_free(info);
-> +}
-> +
-> +static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulon=
-g ip)
-> +{
-> +    CPUState *cs =3D CPU(cpu);
-> +    VAPICHandlers *handlers;
-> +    struct PatchInfo *info;
-> +
-> +    if (smp_cpus =3D=3D 1) {
-> +        handlers =3D &s->rom_state.up;
-> +    } else {
-> +        handlers =3D &s->rom_state.mp;
-> +    }
-> +
-> +    info  =3D g_new(struct PatchInfo, 1);
-> +    info->handler =3D handlers;
-> +    info->ip =3D ip;
->
->      if (!kvm_enabled()) {
-> -        /* Both tb_lock and iothread_mutex will be reset when
-> -         *  longjmps back into the cpu_exec loop. */
-> -        tb_lock();
-> -        tb_gen_code(cs, current_pc, current_cs_base, current_flags, 1);
-> -        cpu_loop_exit_noexc(cs);
-> +        const run_on_cpu_func fn =3D do_patch_instruction;
-> +
-> +        async_safe_run_on_cpu(cs, fn, RUN_ON_CPU_HOST_PTR(info));
-> +        cs->exception_index =3D EXCP_INTERRUPT;
-> +        cpu_loop_exit(cs);
->      }
-> +
-> +    pause_all_vcpus();
-> +
-> +    do_patch_instruction(cs, RUN_ON_CPU_HOST_PTR(info));
-> +
-> +    resume_all_vcpus();
-> +    g_free(info);
->  }
->
->  void vapic_report_tpr_access(DeviceState *dev, CPUState *cs, target_ulon=
-g ip,
-> --
-> 2.7.4
->
-
-
-
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index 1acd4de405..cffa7e2017 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -182,9 +182,9 @@ static void xen_ram_init(PCMachineState *pcms,
+ {
+     MemoryRegion *sysmem =3D get_system_memory();
+     ram_addr_t block_len;
+-    uint64_t user_lowmem =3D object_property_get_int(qdev_get_machine(),
+-                                                   PC_MACHINE_MAX_RAM_BE=
+LOW_4G,
+-                                                   &error_abort);
++    uint64_t user_lowmem =3D object_property_get_uint(qdev_get_machine()=
+,
++                                                    PC_MACHINE_MAX_RAM_B=
+ELOW_4G,
++                                                    &error_abort);
+=20
+     /* Handle the machine opt max-ram-below-4g.  It is basically doing
+      * min(xen limit, user limit).
 --=20
-Pranith
+2.13.0.91.g00982b8dd
