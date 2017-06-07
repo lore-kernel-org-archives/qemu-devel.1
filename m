@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48361)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dIV6h-0002eV-Dj
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:10:20 -0400
+	(envelope-from <armbru@redhat.com>) id 1dIVFU-0006j9-R8
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:19:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dIV6e-0000Qk-7i
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:10:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36496)
+	(envelope-from <armbru@redhat.com>) id 1dIVFR-0003K9-Mt
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:19:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35388)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dIV6e-0000Qc-1l
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:10:16 -0400
-Date: Wed, 7 Jun 2017 03:10:12 -0400 (EDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <878070384.6595572.1496819412787.JavaMail.zimbra@redhat.com>
-In-Reply-To: <8760g846pe.fsf@dusky.pond.sub.org>
-References: <20170605085254.16485-1-sf@sfritsch.de>
-	<e27e8fb4-64fa-9ba9-26a2-aa2af758462b@redhat.com>
-	<39506179-0abd-5bba-89a2-fe89e6f3a167@redhat.com>
-	<87a85ljdhn.fsf@dusky.pond.sub.org>
-	<1378843477.6503332.1496789071735.JavaMail.zimbra@redhat.com>
-	<8760g846pe.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dIVFR-0003Ji-H2
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:19:21 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <2b2311b1b070a0b03973e39deccf4682de4a6cd4.1496686997.git.alistair.francis@xilinx.com>
+	<CAJ+F1CLuPkWjG3Hn8hfaxTApn6+ouqh5nJZNWSQYX1C3_HRFqA@mail.gmail.com>
+	<e340cdb9-3c97-8624-81d9-f7888f819a68@amsat.org>
+	<CAKmqyKOOhu7iKuW4naNi0+7cwayLaftkPf=gS7uBakMvKavxVQ@mail.gmail.com>
+	<270686d0-1ca8-965f-a14a-397f45616deb@redhat.com>
+Date: Wed, 07 Jun 2017 09:19:16 +0200
+In-Reply-To: <270686d0-1ca8-965f-a14a-397f45616deb@redhat.com> (Paolo
+	Bonzini's message of "Wed, 7 Jun 2017 00:14:37 +0200")
+Message-ID: <87shjc2rkb.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] Add chardev-send-break monitor command
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] char-socket: Don't report TCP
+ socket waiting as an error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,49 +31,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Stefan Fritsch <sf@sfritsch.de>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Philippe =?utf-8?Q?Ma?= =?utf-8?Q?thieu-Daud=C3=A9?= <f4bug@amsat.org>, =?utf-8?Q?Marc-Andr?= =?utf-8?Q?=C3=A9?= Lureau <marcandre.lureau@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
+> On 06/06/2017 18:30, Alistair Francis wrote:
+>>>
+>>> This is somehow confusing. I don't think it is worth having another
+>>> qemu_log_stderr() function rather than using error_report() but this very
+>>> call might deserve a comment explaining this unusual use. What do you think?
+>> 
+>> The problem with stderr is that this isn't an error. Some uses of QEMU
+>> (inside Eclipse for example) flag everything printed on stderr as red
+>> which confuses users that they are seeing an error when they really
+>> aren't.
+>
+> But they are wrong.
 
------ Original Message -----
-> From: "Markus Armbruster" <armbru@redhat.com>
-> To: "Paolo Bonzini" <pbonzini@redhat.com>
-> Cc: "Stefan Fritsch" <sf@sfritsch.de>, qemu-devel@nongnu.org, "Dr. David =
-Alan Gilbert" <dgilbert@redhat.com>,
-> "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
-> Sent: Wednesday, June 7, 2017 9:06:53 AM
-> Subject: Re: [Qemu-devel] [PATCH] Add chardev-send-break monitor command
->=20
-> Paolo Bonzini <pbonzini@redhat.com> writes:
->=20
-> >> >> Is there an obvious test that we can enhance to add coverage of the=
- new
-> >> >> QMP command?
-> >> >
-> >> > You could have a new test covering hw/char/serial.c, but I wouldn't =
-let
-> >> > that hold the patch.
-> >>=20
-> >> Holding patches is pretty much the only leverage I have to get tests f=
-or
-> >> new stuff :)
-> >>=20
-> >> Asking for tests that cover all of serial.c wouldn't be fair.  But I a=
-m
-> >> asking for basic test coverage of new QMP commands.
-> >
-> > I agree, on the other hand it's not exactly a comparable area.  I am pl=
-anning
-> > to write a serial qtest for migration as well (which is more complex th=
-an this
-> > QMP command) so I might as well write the test for this new QMP command
-> > myself to get my feet wet...
->=20
-> I'm willing to take a committment from someone I trust in lieu of actual
-> tests.  Is this one?
+Concur.  We also print warnings and informational messages to stderr.
 
-Sure, though it looks like Stefan also wrote actual tests so we might get
-two birds with a stone.
+We should make errors easy to recognize.  Fortunately, error_report()
+prints errors to stderr in a rigid format.  Unfortunately, error
+messages bypassing error_report() still exist in places.  We suck.
 
-Paolo
+The format is
+
+    timestamp-if-enabled progname ':' location message
+
+timestamp-if-enabled is normally empty.  With -msg timestamp=on, it's
+the current time in ISO 8601 format, followed by a space.
+
+progname is the program name (main()'s argv[0]).
+
+location is either empty, or a reference to the command line or a
+configuration file.
+
+See error_vreport() for details.
+
+[...]
