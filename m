@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34032)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dIOtV-00038I-A3
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:32:18 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dIOtb-0003Ev-4B
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:32:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dIOtU-00026T-3l
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:32:17 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:33815)
+	(envelope-from <rth7680@gmail.com>) id 1dIOtZ-000297-BI
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:32:23 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:35647)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dIOtU-00026K-04
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:32:16 -0400
-Received: by mail-qk0-x242.google.com with SMTP id d14so12248395qkb.1
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 17:32:15 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dIOtZ-000292-7A
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:32:21 -0400
+Received: by mail-qk0-x244.google.com with SMTP id u129so439622qka.2
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 17:32:21 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue,  6 Jun 2017 17:30:48 -0700
-Message-Id: <20170607003119.14778-40-rth@twiddle.net>
+Date: Tue,  6 Jun 2017 17:30:52 -0700
+Message-Id: <20170607003119.14778-44-rth@twiddle.net>
 In-Reply-To: <20170607003119.14778-1-rth@twiddle.net>
 References: <20170607003119.14778-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL v2 39/70] target/s390x/cpu_models: Allow some
- additional feature bits for the "qemu" CPU
+Subject: [Qemu-devel] [PULL v2 43/70] target/s390x: implement TEST AND SET
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,96 +27,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, aurelien@aurel32.net, Thomas Huth <thuth@redhat.com>
+Cc: peter.maydell@linaro.org, aurelien@aurel32.net
 
-From: Thomas Huth <thuth@redhat.com>
+From: Aurelien Jarno <aurelien@aurel32.net>
 
-Currently we only present the plain z900 feature bits to the guest,
-but QEMU already emulates some additional features (but not all of
-the next CPU generation, so we can not use the next CPU level as
-default yet). Since newer Linux kernels are checking the feature bits
-and refuse to work if a required feature is missing, it would be nice
-to have a way to present more of the supported features when we are
-running with the "qemu" CPU.
-This patch now adds the supported features to the "full_feat" bitmap,
-so that additional features can be enabled on the command line now,
-for example with:
-
- qemu-system-s390x -cpu qemu,stfle=true,ldisp=true,eimm=true,stckf=true
-
-Acked-by: David Hildenbrand <david@redhat.com>
-Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1495704132-5675-1-git-send-email-thuth@redhat.com>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+Message-Id: <20170531220129.27724-5-aurelien@aurel32.net>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/s390x/cpu_models.c | 34 +++++++++++++++++++++++++++++++---
- 1 file changed, 31 insertions(+), 3 deletions(-)
+ target/s390x/insn-data.def |  3 +++
+ target/s390x/translate.c   | 10 ++++++++++
+ 2 files changed, 13 insertions(+)
 
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 8d27363..e5e005a 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -658,6 +658,30 @@ static void check_compatibility(const S390CPUModel *max_model,
-                   "available in the configuration: ");
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index f818437..0f70ace 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -810,6 +810,9 @@
+ /* SUPERVISOR CALL */
+     C(0x0a00, SVC,     I,     Z,   0, 0, 0, 0, svc, 0)
+ 
++/* TEST AND SET */
++    C(0x9300, TS,      S,     Z,   0, a2, 0, 0, ts, 0)
++
+ /* TEST DATA CLASS */
+     C(0xed10, TCEB,    RXE,   Z,   e1, a2, 0, 0, tceb, 0)
+     C(0xed11, TCDB,    RXE,   Z,   f1_o, a2, 0, 0, tcdb, 0)
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 0a1b3b3..2d45132 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -4134,6 +4134,16 @@ static ExitStatus op_trt(DisasContext *s, DisasOps *o)
+     return NO_EXIT;
  }
  
-+/**
-+ * The base TCG CPU model "qemu" is based on the z900. However, we already
-+ * can also emulate some additional features of later CPU generations, so
-+ * we add these additional feature bits here.
-+ */
-+static void add_qemu_cpu_model_features(S390FeatBitmap fbm)
++static ExitStatus op_ts(DisasContext *s, DisasOps *o)
 +{
-+    static const int feats[] = {
-+        S390_FEAT_STFLE,
-+        S390_FEAT_EXTENDED_IMMEDIATE,
-+        S390_FEAT_LONG_DISPLACEMENT,
-+        S390_FEAT_LONG_DISPLACEMENT_FAST,
-+        S390_FEAT_STORE_CLOCK_FAST,
-+        S390_FEAT_GENERAL_INSTRUCTIONS_EXT,
-+        S390_FEAT_EXECUTE_EXT,
-+        S390_FEAT_STFLE_45,
-+    };
-+    int i;
-+
-+    for (i = 0; i < ARRAY_SIZE(feats); i++) {
-+        set_bit(feats[i], fbm);
-+    }
++    TCGv_i32 t1 = tcg_const_i32(0xff);
++    tcg_gen_atomic_xchg_i32(t1, o->in2, t1, get_mem_index(s), MO_UB);
++    tcg_gen_extract_i32(cc_op, t1, 7, 1);
++    tcg_temp_free_i32(t1);
++    set_cc_static(s);
++    return NO_EXIT;
 +}
 +
- static S390CPUModel *get_max_cpu_model(Error **errp)
+ static ExitStatus op_unpk(DisasContext *s, DisasOps *o)
  {
-     static S390CPUModel max_model;
-@@ -670,10 +694,11 @@ static S390CPUModel *get_max_cpu_model(Error **errp)
-     if (kvm_enabled()) {
-         kvm_s390_get_host_cpu_model(&max_model, errp);
-     } else {
--        /* TCG emulates a z900 */
-+        /* TCG emulates a z900 (with some optional additional features) */
-         max_model.def = &s390_cpu_defs[0];
-         bitmap_copy(max_model.features, max_model.def->default_feat,
-                     S390_FEAT_MAX);
-+        add_qemu_cpu_model_features(max_model.features);
-     }
-     if (!*errp) {
-         cached = true;
-@@ -925,11 +950,14 @@ static void s390_host_cpu_model_initfn(Object *obj)
- 
- static void s390_qemu_cpu_model_initfn(Object *obj)
- {
-+    static S390CPUDef s390_qemu_cpu_defs;
-     S390CPU *cpu = S390_CPU(obj);
- 
-     cpu->model = g_malloc0(sizeof(*cpu->model));
--    /* TCG emulates a z900 */
--    cpu->model->def = &s390_cpu_defs[0];
-+    /* TCG emulates a z900 (with some optional additional features) */
-+    memcpy(&s390_qemu_cpu_defs, &s390_cpu_defs[0], sizeof(s390_qemu_cpu_defs));
-+    add_qemu_cpu_model_features(s390_qemu_cpu_defs.full_feat);
-+    cpu->model->def = &s390_qemu_cpu_defs;
-     bitmap_copy(cpu->model->features, cpu->model->def->default_feat,
-                 S390_FEAT_MAX);
- }
+     TCGv_i32 l = tcg_const_i32(get_field(s->fields, l1));
 -- 
 2.9.4
