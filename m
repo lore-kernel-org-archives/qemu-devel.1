@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dIOsj-0002IS-3Z
+	(envelope-from <rth7680@gmail.com>) id 1dIOsj-0002IT-J5
 	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:31:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dIOsh-0001nN-Cu
+	(envelope-from <rth7680@gmail.com>) id 1dIOsi-0001ni-K0
 	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:31:29 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:34034)
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:34807)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dIOsh-0001nI-7T
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:31:27 -0400
-Received: by mail-qt0-x242.google.com with SMTP id o21so22861118qtb.1
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 17:31:27 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dIOsi-0001nZ-G0
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:31:28 -0400
+Received: by mail-qk0-x244.google.com with SMTP id d14so12247222qkb.1
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 17:31:28 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue,  6 Jun 2017 17:30:10 -0700
-Message-Id: <20170607003119.14778-2-rth@twiddle.net>
+Date: Tue,  6 Jun 2017 17:30:11 -0700
+Message-Id: <20170607003119.14778-3-rth@twiddle.net>
 In-Reply-To: <20170607003119.14778-1-rth@twiddle.net>
 References: <20170607003119.14778-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL v2 01/70] target/s390x: Add support for the TEST
- BLOCK instruction
+Subject: [Qemu-devel] [PULL v2 02/70] target/s390x: Use
+ cpu_loop_exit_restore for tlb_fill
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,152 +28,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, aurelien@aurel32.net, Thomas Huth <thuth@redhat.com>
+Cc: peter.maydell@linaro.org, aurelien@aurel32.net
 
-From: Thomas Huth <thuth@redhat.com>
-
-TEST BLOCK was likely once used to execute basic memory
-tests, but nowadays it's just a (slow) way to clear a page.
-
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1495128400-23759-1-git-send-email-thuth@redhat.com>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/s390x/cpu.h         |  1 +
- target/s390x/helper.h      |  1 +
- target/s390x/insn-data.def |  2 ++
- target/s390x/mem_helper.c  | 28 ++++++++++++++++++++++++++++
- target/s390x/mmu_helper.c  |  2 +-
- target/s390x/translate.c   | 11 +++++++++++
- 6 files changed, 44 insertions(+), 1 deletion(-)
+ target/s390x/mem_helper.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index c74b419..f463113 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -1084,6 +1084,7 @@ struct sysib_322 {
- #define SIGP_ORDER_MASK 0x000000ff
- 
- void load_psw(CPUS390XState *env, uint64_t mask, uint64_t addr);
-+target_ulong mmu_real2abs(CPUS390XState *env, target_ulong raddr);
- int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
-                   target_ulong *raddr, int *flags, bool exc);
- int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code);
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 0b70770..1fae191 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -102,6 +102,7 @@ DEF_HELPER_FLAGS_4(lctl, TCG_CALL_NO_WG, void, env, i32, i64, i32)
- DEF_HELPER_FLAGS_4(lctlg, TCG_CALL_NO_WG, void, env, i32, i64, i32)
- DEF_HELPER_FLAGS_4(stctl, TCG_CALL_NO_WG, void, env, i32, i64, i32)
- DEF_HELPER_FLAGS_4(stctg, TCG_CALL_NO_WG, void, env, i32, i64, i32)
-+DEF_HELPER_FLAGS_2(testblock, TCG_CALL_NO_WG, i32, env, i64)
- DEF_HELPER_FLAGS_2(tprot, TCG_CALL_NO_RWG, i32, i64, i64)
- DEF_HELPER_FLAGS_2(iske, TCG_CALL_NO_RWG_SE, i64, env, i64)
- DEF_HELPER_FLAGS_3(sske, TCG_CALL_NO_RWG, void, env, i64, i64)
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 55a7c52..cac0f51 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -918,6 +918,8 @@
- /* STORE USING REAL ADDRESS */
-     C(0xb246, STURA,   RRE,   Z,   r1_o, r2_o, 0, 0, stura, 0)
-     C(0xb925, STURG,   RRE,   Z,   r1_o, r2_o, 0, 0, sturg, 0)
-+/* TEST BLOCK */
-+    C(0xb22c, TB,      RRE,   Z,   0, r2_o, 0, 0, testblock, 0)
- /* TEST PROTECTION */
-     C(0xe501, TPROT,   SSE,   Z,   la1, a2, 0, 0, tprot, 0)
- 
 diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index f6e5bce..0c6a0d9 100644
+index 0c6a0d9..e3325a4 100644
 --- a/target/s390x/mem_helper.c
 +++ b/target/s390x/mem_helper.c
-@@ -20,6 +20,7 @@
- 
- #include "qemu/osdep.h"
- #include "cpu.h"
-+#include "exec/address-spaces.h"
- #include "exec/helper-proto.h"
- #include "exec/exec-all.h"
- #include "exec/cpu_ldst.h"
-@@ -973,6 +974,33 @@ void HELPER(stctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+@@ -41,15 +41,9 @@
+ void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType access_type,
+               int mmu_idx, uintptr_t retaddr)
+ {
+-    int ret;
+-
+-    ret = s390_cpu_handle_mmu_fault(cs, addr, access_type, mmu_idx);
++    int ret = s390_cpu_handle_mmu_fault(cs, addr, access_type, mmu_idx);
+     if (unlikely(ret != 0)) {
+-        if (likely(retaddr)) {
+-            /* now we have a real cpu fault */
+-            cpu_restore_state(cs, retaddr);
+-        }
+-        cpu_loop_exit(cs);
++        cpu_loop_exit_restore(cs, retaddr);
      }
  }
  
-+uint32_t HELPER(testblock)(CPUS390XState *env, uint64_t real_addr)
-+{
-+    CPUState *cs = CPU(s390_env_get_cpu(env));
-+    uint64_t abs_addr;
-+    int i;
-+
-+    real_addr = fix_address(env, real_addr);
-+    abs_addr = mmu_real2abs(env, real_addr) & TARGET_PAGE_MASK;
-+    if (!address_space_access_valid(&address_space_memory, abs_addr,
-+                                    TARGET_PAGE_SIZE, true)) {
-+        program_interrupt(env, PGM_ADDRESSING, 4);
-+        return 1;
-+    }
-+
-+    /* Check low-address protection */
-+    if ((env->cregs[0] & CR0_LOWPROT) && real_addr < 0x2000) {
-+        program_interrupt(env, PGM_PROTECTION, 4);
-+        return 1;
-+    }
-+
-+    for (i = 0; i < TARGET_PAGE_SIZE; i += 8) {
-+        stq_phys(cs->as, abs_addr + i, 0);
-+    }
-+
-+    return 0;
-+}
-+
- uint32_t HELPER(tprot)(uint64_t a1, uint64_t a2)
- {
-     /* XXX implement */
-diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-index b11a027..31eb9ef 100644
---- a/target/s390x/mmu_helper.c
-+++ b/target/s390x/mmu_helper.c
-@@ -108,7 +108,7 @@ static void trigger_page_fault(CPUS390XState *env, target_ulong vaddr,
-  * Translate real address to absolute (= physical)
-  * address by taking care of the prefix mapping.
-  */
--static target_ulong mmu_real2abs(CPUS390XState *env, target_ulong raddr)
-+target_ulong mmu_real2abs(CPUS390XState *env, target_ulong raddr)
- {
-     if (raddr < 0x2000) {
-         return raddr + env->psa;    /* Map the lowcore. */
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 628fb86..837d90c 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -4062,6 +4062,16 @@ static ExitStatus op_tcxb(DisasContext *s, DisasOps *o)
- }
- 
- #ifndef CONFIG_USER_ONLY
-+
-+static ExitStatus op_testblock(DisasContext *s, DisasOps *o)
-+{
-+    check_privileged(s);
-+    potential_page_fault(s);
-+    gen_helper_testblock(cc_op, cpu_env, o->in2);
-+    set_cc_static(s);
-+    return NO_EXIT;
-+}
-+
- static ExitStatus op_tprot(DisasContext *s, DisasOps *o)
- {
-     potential_page_fault(s);
-@@ -4069,6 +4079,7 @@ static ExitStatus op_tprot(DisasContext *s, DisasOps *o)
-     set_cc_static(s);
-     return NO_EXIT;
- }
-+
- #endif
- 
- static ExitStatus op_tr(DisasContext *s, DisasOps *o)
 -- 
 2.9.4
