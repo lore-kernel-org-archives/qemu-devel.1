@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60724)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dIdwq-0005iM-Ub
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:36:46 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dIdx1-0005nN-5R
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:36:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dIdwp-0006oV-4E
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:36:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36362)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dIdwx-0006rG-70
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:36:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48964)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dIdwo-0006oC-Se
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:36:43 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	id 1dIdww-0006qt-UG
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:36:51 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C7320A723
-	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 16:36:41 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id ED0C28553C
+	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 16:36:49 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed,  7 Jun 2017 20:35:52 +0400
-Message-Id: <20170607163635.17635-1-marcandre.lureau@redhat.com>
+Date: Wed,  7 Jun 2017 20:35:53 +0400
+Message-Id: <20170607163635.17635-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20170607163635.17635-1-marcandre.lureau@redhat.com>
+References: <20170607163635.17635-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 00/43] qobject/qapi: add uint type
+Subject: [Qemu-devel] [PATCH v3 01/43] qdev: remove PropertyInfo.qtype field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,221 +36,304 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Hi,
+Remove dependency on qapi qtype, replace a field by a few PropertyInfo
+callbacks to set the default value type (introduced in commit 4f2d3d7).
 
-In previously sent series "[PATCH 00/21] WIP: dump: add kaslr support
-(for after 2.9)", I proposed changes to accept uint64 values from
-json, by adding a QUint type. During review, it was suggested to
-introduce a QNum type to hold various number representations.
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+---
+ include/hw/qdev-core.h       |  2 +-
+ include/hw/qdev-properties.h |  5 -----
+ hw/core/qdev-properties.c    | 35 ++++++++++++++++++++++++++++++++++-
+ hw/core/qdev.c               | 13 ++-----------
+ 4 files changed, 37 insertions(+), 18 deletions(-)
 
-This series introduces the QNum type, adds uint representation to it,
-and make uint64 values over json possible (while keeping json negative
-int for values >INT64_MAX to unsigned cast compatibility). It also
-improves some int vs uint usage for object properties and other
-QObject related clean-ups.
-
-v3:
-- rebased, drop the first keyval-related patches now upstream
-- update "tests: Remove test cases for alternates of 'number' and 'int'"
-  commit message, and drop now useless conflict checks
-- added "qapi: minor refactoring"
-- add missing Author/Copyright lines lost during merge
-- add qnum_get_try_(u)int() and simplify related code
-- fix some code comments
-- replace g_assert_not_reached() with assert(0) in qapi/
-- replace qapi/qmp/types.h include with the min required headers
-- add comment about changes in json serialization in "qapi: update the
-  qobject visitor to use QNUM_U64"
-- update comment in "object: use more specific property type names"
-  with the externally visible changes
-- split "qdev: make default property int" patch, rename macros
-  DEFINE_PROP_SIGNED/DEFINE_PROP_UNSIGNED
-- in tests, compare with expected float value
-- add r-b and suggested tags
-
-v2:
-- add set_default_value() callback in PropertyInfo
-- use Markus version of "remove alt num-int cases"
-- add more int/number ranges visitor checks
-- replace Error usage for success bool return value in get_int/uint()
-- various updated comments, patch and code reorganization
-- avoid temporary regression from patch "json: learn to parse uint64
-  numbers", drop related patch
-- split get_mmcfg_size() fix in a seperate patch
-- added "apic-common: make "id" property a uint32" patch
-- split the qdev uint proprety patch
-- split "Use uint property getter/setter where appropriate" in various
-  patches
-- add some qdict tests
-- dropped s3/s4 bool patch
-- add some r-b tags
-
-Marc-Andr=C3=A9 Lureau (43):
-  qdev: remove PropertyInfo.qtype field
-  object: fix potential leak in getters
-  tests: Remove test cases for alternates of 'number' and 'int'
-  tests: add more int/number ranges checks
-  qapi: minor refactoring
-  qapi: merge QInt and QFloat in QNum
-  qapi: Remove visit_start_alternate() parameter promote_int
-  tests: remove /{qnum,qlist,dict}/destroy test
-  qnum: add uint type
-  json: learn to parse uint64 numbers
-  qapi: update the qobject visitor to use QNUM_U64
-  object: add uint property setter/getter
-  q35: fix get_mmcfg_size to use uint64 visitor
-  object: use more specific property type names
-  qdev: rename DEFINE_PROP_DEFAULT() to DEFINE_PROP_SIGNED()
-  qdev: wrap default property value in an union
-  qdev: avoid type casts between signed and unsigned
-  apic-common: make "id" property a uint32
-  qdev: use appropriate getter/setters type
-  isa: use get_uint() for "io-base"
-  pc-dimm: use get_uint() for dimm properties
-  pc-dimm: make "size" property uint64
-  pcihp: use get_uint() for "bsel" property
-  aspeed: use {set,get}_uint() for "ram-size" property
-  bcm2835_fb: use {get,set}_uint() for "vcram-size" and "vcram-base"
-  platform-bus: use get_uint() for "addr" property
-  acpi: use get_uint() for "acpi-pcihp-io*" properties
-  acpi: use get_uint() for various acpi properties
-  acpi: use get_uint() for "pci-hole*" properties
-  pc: use get_uint() for "iobase" property
-  pc: use get_uint() for "apic-id" property
-  pc: use get_uint() for "hpet-intcap" property
-  xen: use get_uint() for "max-ram-below-4g" property
-  arm: use get_uint() for "mp-affinity" property
-  auxbus: use get_uint() for "addr" property
-  pvpanic: use get_uint() for "ioport" property
-  pnv-core: use get_uint() for "core-pir" property
-  numa: use get_uint() for "size" property
-  i386/cpu: use get_uint() for "min-level"/"min-xlevel" properties
-  console: use get_uint() for "head" property
-  tests/qdict: check more get_try_int() cases
-  RFC: qdict: add uint
-  qobject: move dump_qobject() from block/ to qobject/
-
- include/qapi/visitor.h                   |   4 +-
- include/qapi/visitor-impl.h              |   2 +-
- scripts/qapi.py                          |  36 +++--
- scripts/qapi-visit.py                    |  12 +-
- include/hw/isa/isa.h                     |   2 +-
- include/hw/qdev-core.h                   |   7 +-
- include/hw/qdev-properties.h             |  50 ++++---
- include/qapi/qmp/qdict.h                 |  10 +-
- include/qapi/qmp/qfloat.h                |  29 ----
- include/qapi/qmp/qint.h                  |  28 ----
- include/qapi/qmp/qlist.h                 |   5 +-
- include/qapi/qmp/qnum.h                  |  53 ++++++++
- include/qapi/qmp/qobject.h               |   7 +
- include/qapi/qmp/types.h                 |   3 +-
- include/qapi/qobject-input-visitor.h     |   6 +-
- include/qapi/qobject-output-visitor.h    |   8 +-
- include/qom/object.h                     |  23 ++++
- qapi/qapi-visit-core.c                   |   6 +-
- backends/cryptodev.c                     |   2 +-
- block/blkdebug.c                         |   1 -
- block/nbd.c                              |   1 -
- block/nfs.c                              |   1 -
- block/qapi.c                             |  93 +------------
- block/quorum.c                           |   1 -
- block/sheepdog.c                         |   1 -
- block/ssh.c                              |   1 -
- block/vvfat.c                            |   1 -
- blockdev.c                               |   8 +-
- hw/acpi/memory_hotplug.c                 |  12 +-
- hw/acpi/nvdimm.c                         |  18 +--
- hw/acpi/pcihp.c                          |   7 +-
- hw/arm/aspeed.c                          |   8 +-
- hw/arm/bcm2835_peripherals.c             |   9 +-
- hw/arm/raspi.c                           |   4 +-
- hw/block/fdc.c                           |  18 +--
- hw/core/platform-bus.c                   |   2 +-
- hw/core/qdev-properties.c                |  40 +++++-
- hw/core/qdev.c                           |  13 +-
- hw/i386/acpi-build.c                     |  71 +++++-----
- hw/i386/pc.c                             |   6 +-
- hw/i386/xen/xen-hvm.c                    |   6 +-
- hw/intc/apic_common.c                    |  10 +-
- hw/intc/arm_gicv3_common.c               |   2 +-
- hw/mem/pc-dimm.c                         |  23 ++--
- hw/misc/auxbus.c                         |   2 +-
- hw/misc/pvpanic.c                        |   2 +-
- hw/net/e1000e.c                          |   6 +-
- hw/pci-host/gpex.c                       |   2 +-
- hw/pci-host/piix.c                       |   8 +-
- hw/pci-host/q35.c                        |  15 +--
- hw/pci-host/xilinx-pcie.c                |   2 +-
- hw/ppc/pnv.c                             |   2 +-
- hw/ppc/pnv_core.c                        |   2 +-
- hw/ppc/spapr.c                           |   7 +-
- hw/usb/xen-usb.c                         |   1 -
- monitor.c                                |   2 +-
- net/dump.c                               |   2 +-
- net/filter-buffer.c                      |   2 +-
- numa.c                                   |   6 +-
- qapi/qapi-clone-visitor.c                |   2 +-
- qapi/qapi-dealloc-visitor.c              |   2 +-
- qapi/qobject-input-visitor.c             |  58 ++++----
- qapi/qobject-output-visitor.c            |   7 +-
- qga/commands.c                           |   2 +-
- qga/main.c                               |   1 -
- qobject/json-lexer.c                     |   4 +
- qobject/json-parser.c                    |  56 +++++---
- qobject/qdict.c                          | 100 +++++++++++---
- qobject/qfloat.c                         |  62 ---------
- qobject/qint.c                           |  61 ---------
- qobject/qjson.c                          |  37 +-----
- qobject/qlist.c                          |  23 ++++
- qobject/qnum.c                           | 221 +++++++++++++++++++++++++=
-++++++
- qobject/qobject.c                        |  22 ++-
- qom/object.c                             |  51 +++++--
- target/i386/cpu.c                        |  10 +-
- tests/check-qdict.c                      |  80 ++++++++---
- tests/check-qfloat.c                     |  53 --------
- tests/check-qint.c                       |  87 ------------
- tests/check-qjson.c                      | 154 +++++++++++++++------
- tests/check-qlist.c                      |  40 ++----
- tests/check-qnum.c                       | 170 ++++++++++++++++++++++++
- tests/check-qstring.c                    |   9 --
- tests/test-keyval.c                      |   4 +-
- tests/test-qmp-commands.c                |   8 +-
- tests/test-qmp-event.c                   |   9 +-
- tests/test-qobject-input-visitor.c       | 110 ++++++++-------
- tests/test-qobject-output-visitor.c      |  91 ++++++++-----
- tests/test-x86-cpuid-compat.c            |  18 ++-
- ui/console.c                             |   4 +-
- ui/spice-core.c                          |   1 -
- ui/vnc-enc-tight.c                       |   1 -
- util/qemu-option.c                       |  24 ++--
- MAINTAINERS                              |   3 +-
- qapi/trace-events                        |   2 +-
- qobject/Makefile.objs                    |   2 +-
- scripts/coccinelle/qobject.cocci         |   4 +-
- tests/.gitignore                         |   3 +-
- tests/Makefile.include                   |  13 +-
- tests/qapi-schema/comments.out           |   2 +-
- tests/qapi-schema/doc-good.out           |   2 +-
- tests/qapi-schema/empty.out              |   2 +-
- tests/qapi-schema/event-case.out         |   2 +-
- tests/qapi-schema/ident-with-escape.out  |   2 +-
- tests/qapi-schema/include-relpath.out    |   2 +-
- tests/qapi-schema/include-repetition.out |   2 +-
- tests/qapi-schema/include-simple.out     |   2 +-
- tests/qapi-schema/indented-expr.out      |   2 +-
- tests/qapi-schema/qapi-schema-test.json  |   2 -
- tests/qapi-schema/qapi-schema-test.out   |  10 +-
- 110 files changed, 1331 insertions(+), 1019 deletions(-)
- delete mode 100644 include/qapi/qmp/qfloat.h
- delete mode 100644 include/qapi/qmp/qint.h
- create mode 100644 include/qapi/qmp/qnum.h
- delete mode 100644 qobject/qfloat.c
- delete mode 100644 qobject/qint.c
- create mode 100644 qobject/qnum.c
- delete mode 100644 tests/check-qfloat.c
- delete mode 100644 tests/check-qint.c
- create mode 100644 tests/check-qnum.c
-
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index e69489ec6c..9523339762 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -226,7 +226,6 @@ struct Property {
+     PropertyInfo *info;
+     ptrdiff_t    offset;
+     uint8_t      bitnr;
+-    QType        qtype;
+     int64_t      defval;
+     int          arrayoffset;
+     PropertyInfo *arrayinfo;
+@@ -238,6 +237,7 @@ struct PropertyInfo {
+     const char *description;
+     const char * const *enum_table;
+     int (*print)(DeviceState *dev, Property *prop, char *dest, size_t le=
+n);
++    void (*set_default_value)(Object *obj, const Property *prop);
+     ObjectPropertyAccessor *get;
+     ObjectPropertyAccessor *set;
+     ObjectPropertyRelease *release;
+diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+index d206fc93dd..85e68998a9 100644
+--- a/include/hw/qdev-properties.h
++++ b/include/hw/qdev-properties.h
+@@ -42,7 +42,6 @@ extern PropertyInfo qdev_prop_arraylen;
+         .info      =3D &(_prop),                                        =
+  \
+         .offset    =3D offsetof(_state, _field)                         =
+  \
+             + type_check(_type,typeof_field(_state, _field)),           =
+\
+-        .qtype     =3D QTYPE_QINT,                                      =
+  \
+         .defval    =3D (_type)_defval,                                  =
+  \
+         }
+ #define DEFINE_PROP_BIT(_name, _state, _field, _bit, _defval) {  \
+@@ -51,7 +50,6 @@ extern PropertyInfo qdev_prop_arraylen;
+         .bitnr    =3D (_bit),                                      \
+         .offset    =3D offsetof(_state, _field)                    \
+             + type_check(uint32_t,typeof_field(_state, _field)), \
+-        .qtype     =3D QTYPE_QBOOL,                                \
+         .defval    =3D (bool)_defval,                              \
+         }
+ #define DEFINE_PROP_BIT64(_name, _state, _field, _bit, _defval) {       =
+\
+@@ -60,7 +58,6 @@ extern PropertyInfo qdev_prop_arraylen;
+         .bitnr    =3D (_bit),                                           =
+  \
+         .offset    =3D offsetof(_state, _field)                         =
+  \
+             + type_check(uint64_t, typeof_field(_state, _field)),       =
+\
+-        .qtype     =3D QTYPE_QBOOL,                                     =
+  \
+         .defval    =3D (bool)_defval,                                   =
+  \
+         }
+=20
+@@ -69,7 +66,6 @@ extern PropertyInfo qdev_prop_arraylen;
+         .info      =3D &(qdev_prop_bool),                          \
+         .offset    =3D offsetof(_state, _field)                    \
+             + type_check(bool, typeof_field(_state, _field)),    \
+-        .qtype     =3D QTYPE_QBOOL,                                \
+         .defval    =3D (bool)_defval,                              \
+         }
+=20
+@@ -105,7 +101,6 @@ extern PropertyInfo qdev_prop_arraylen;
+         .info =3D &(qdev_prop_arraylen),                                =
+  \
+         .offset =3D offsetof(_state, _field)                            =
+  \
+             + type_check(uint32_t, typeof_field(_state, _field)),       =
+\
+-        .qtype =3D QTYPE_QINT,                                          =
+  \
+         .arrayinfo =3D &(_arrayprop),                                   =
+  \
+         .arrayfieldsize =3D sizeof(_arraytype),                         =
+  \
+         .arrayoffset =3D offsetof(_state, _arrayfield),                 =
+  \
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index 9f1a497322..c5e028a45e 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -69,6 +69,12 @@ static void set_enum(Object *obj, Visitor *v, const ch=
+ar *name, void *opaque,
+     visit_type_enum(v, prop->name, ptr, prop->info->enum_table, errp);
+ }
+=20
++static void set_default_value_enum(Object *obj, const Property *prop)
++{
++    object_property_set_str(obj, prop->info->enum_table[prop->defval],
++                            prop->name, &error_abort);
++}
++
+ /* Bit */
+=20
+ static uint32_t qdev_get_prop_mask(Property *prop)
+@@ -120,11 +126,17 @@ static void prop_set_bit(Object *obj, Visitor *v, c=
+onst char *name,
+     bit_prop_set(dev, prop, value);
+ }
+=20
++static void set_default_value_bool(Object *obj, const Property *prop)
++{
++    object_property_set_bool(obj, prop->defval, prop->name, &error_abort=
+);
++}
++
+ PropertyInfo qdev_prop_bit =3D {
+     .name  =3D "bool",
+     .description =3D "on/off",
+     .get   =3D prop_get_bit,
+     .set   =3D prop_set_bit,
++    .set_default_value =3D set_default_value_bool,
+ };
+=20
+ /* Bit64 */
+@@ -183,6 +195,7 @@ PropertyInfo qdev_prop_bit64 =3D {
+     .description =3D "on/off",
+     .get   =3D prop_get_bit64,
+     .set   =3D prop_set_bit64,
++    .set_default_value =3D set_default_value_bool,
+ };
+=20
+ /* --- bool --- */
+@@ -216,6 +229,7 @@ PropertyInfo qdev_prop_bool =3D {
+     .name  =3D "bool",
+     .get   =3D get_bool,
+     .set   =3D set_bool,
++    .set_default_value =3D set_default_value_bool,
+ };
+=20
+ /* --- 8bit integer --- */
+@@ -245,10 +259,16 @@ static void set_uint8(Object *obj, Visitor *v, cons=
+t char *name, void *opaque,
+     visit_type_uint8(v, name, ptr, errp);
+ }
+=20
++static void set_default_value_int(Object *obj, const Property *prop)
++{
++    object_property_set_int(obj, prop->defval, prop->name, &error_abort)=
+;
++}
++
+ PropertyInfo qdev_prop_uint8 =3D {
+     .name  =3D "uint8",
+     .get   =3D get_uint8,
+     .set   =3D set_uint8,
++    .set_default_value =3D set_default_value_int,
+ };
+=20
+ /* --- 16bit integer --- */
+@@ -282,6 +302,7 @@ PropertyInfo qdev_prop_uint16 =3D {
+     .name  =3D "uint16",
+     .get   =3D get_uint16,
+     .set   =3D set_uint16,
++    .set_default_value =3D set_default_value_int,
+ };
+=20
+ /* --- 32bit integer --- */
+@@ -340,12 +361,14 @@ PropertyInfo qdev_prop_uint32 =3D {
+     .name  =3D "uint32",
+     .get   =3D get_uint32,
+     .set   =3D set_uint32,
++    .set_default_value =3D set_default_value_int,
+ };
+=20
+ PropertyInfo qdev_prop_int32 =3D {
+     .name  =3D "int32",
+     .get   =3D get_int32,
+     .set   =3D set_int32,
++    .set_default_value =3D set_default_value_int,
+ };
+=20
+ /* --- 64bit integer --- */
+@@ -379,6 +402,7 @@ PropertyInfo qdev_prop_uint64 =3D {
+     .name  =3D "uint64",
+     .get   =3D get_uint64,
+     .set   =3D set_uint64,
++    .set_default_value =3D set_default_value_int,
+ };
+=20
+ /* --- string --- */
+@@ -526,6 +550,7 @@ PropertyInfo qdev_prop_on_off_auto =3D {
+     .enum_table =3D OnOffAuto_lookup,
+     .get =3D get_enum,
+     .set =3D set_enum,
++    .set_default_value =3D set_default_value_enum,
+ };
+=20
+ /* --- lost tick policy --- */
+@@ -537,6 +562,7 @@ PropertyInfo qdev_prop_losttickpolicy =3D {
+     .enum_table  =3D LostTickPolicy_lookup,
+     .get   =3D get_enum,
+     .set   =3D set_enum,
++    .set_default_value =3D set_default_value_enum,
+ };
+=20
+ /* --- Block device error handling policy --- */
+@@ -550,6 +576,7 @@ PropertyInfo qdev_prop_blockdev_on_error =3D {
+     .enum_table =3D BlockdevOnError_lookup,
+     .get =3D get_enum,
+     .set =3D set_enum,
++    .set_default_value =3D set_default_value_enum,
+ };
+=20
+ /* --- BIOS CHS translation */
+@@ -563,6 +590,7 @@ PropertyInfo qdev_prop_bios_chs_trans =3D {
+     .enum_table =3D BiosAtaTranslation_lookup,
+     .get =3D get_enum,
+     .set =3D set_enum,
++    .set_default_value =3D set_default_value_enum,
+ };
+=20
+ /* --- FDC default drive types */
+@@ -573,7 +601,8 @@ PropertyInfo qdev_prop_fdc_drive_type =3D {
+                    "144/288/120/none/auto",
+     .enum_table =3D FloppyDriveType_lookup,
+     .get =3D get_enum,
+-    .set =3D set_enum
++    .set =3D set_enum,
++    .set_default_value =3D set_default_value_enum,
+ };
+=20
+ /* --- pci address --- */
+@@ -648,6 +677,7 @@ PropertyInfo qdev_prop_pci_devfn =3D {
+     .print =3D print_pci_devfn,
+     .get   =3D get_int32,
+     .set   =3D set_pci_devfn,
++    .set_default_value =3D set_default_value_int,
+ };
+=20
+ /* --- blocksize --- */
+@@ -695,6 +725,7 @@ PropertyInfo qdev_prop_blocksize =3D {
+     .description =3D "A power of two between 512 and 32768",
+     .get   =3D get_uint16,
+     .set   =3D set_blocksize,
++    .set_default_value =3D set_default_value_int,
+ };
+=20
+ /* --- pci host address --- */
+@@ -917,6 +948,7 @@ PropertyInfo qdev_prop_arraylen =3D {
+     .name =3D "uint32",
+     .get =3D get_uint32,
+     .set =3D set_prop_arraylen,
++    .set_default_value =3D set_default_value_int,
+ };
+=20
+ /* --- public helpers --- */
+@@ -1153,4 +1185,5 @@ PropertyInfo qdev_prop_size =3D {
+     .name  =3D "size",
+     .get =3D get_size,
+     .set =3D set_size,
++    .set_default_value =3D set_default_value_int,
+ };
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 0ce45a2019..849952a8d4 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -793,17 +793,8 @@ void qdev_property_add_static(DeviceState *dev, Prop=
+erty *prop,
+                                     prop->info->description,
+                                     &error_abort);
+=20
+-    if (prop->qtype =3D=3D QTYPE_NONE) {
+-        return;
+-    }
+-
+-    if (prop->qtype =3D=3D QTYPE_QBOOL) {
+-        object_property_set_bool(obj, prop->defval, prop->name, &error_a=
+bort);
+-    } else if (prop->info->enum_table) {
+-        object_property_set_str(obj, prop->info->enum_table[prop->defval=
+],
+-                                prop->name, &error_abort);
+-    } else if (prop->qtype =3D=3D QTYPE_QINT) {
+-        object_property_set_int(obj, prop->defval, prop->name, &error_ab=
+ort);
++    if (prop->info->set_default_value) {
++        prop->info->set_default_value(obj, prop);
+     }
+ }
+=20
 --=20
 2.13.0.91.g00982b8dd
