@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dIc8D-00075g-3G
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:40:21 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1dIcDy-0000jf-LP
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:46:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dIc8C-0001rm-79
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:40:21 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:35836)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dIc8C-0001rZ-0d
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:40:20 -0400
-Received: by mail-wm0-x232.google.com with SMTP id x70so59422605wme.0
-	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 07:40:19 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1496739230-32109-1-git-send-email-clg@kaod.org>
-References: <1496739230-32109-1-git-send-email-clg@kaod.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 7 Jun 2017 15:39:58 +0100
-Message-ID: <CAFEAcA9ipPsZm9Vvbie-V8tw=SQKGvPS4B60K1z8ZdtmReU+tg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] aspeed: add a TMP421 device to the
- palmetto machine
+	(envelope-from <a.perevalov@samsung.com>) id 1dIcDt-0003yK-Dy
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:46:18 -0400
+Received: from mailout4.w1.samsung.com ([210.118.77.14]:44281)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1dIcDt-0003xe-7j
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:46:13 -0400
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout4.w1.samsung.com
+	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
+	2014)) with ESMTP id <0OR6006Q6MCTG690@mailout4.w1.samsung.com> for
+	qemu-devel@nongnu.org; Wed, 07 Jun 2017 15:46:05 +0100 (BST)
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Message-id: <3e680032-8f14-9272-e7ff-a3624268770b@samsung.com>
+Date: Wed, 07 Jun 2017 17:46:01 +0300
+MIME-version: 1.0
+In-reply-to: <87lgp4ez1k.fsf@secure.mitica>
+Content-type: text/plain; charset=utf-8; format=flowed
+Content-transfer-encoding: 7bit
+Content-language: en-GB
+References: <1496828798-27548-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170607094729eucas1p15097f154039365d5e135f92b72aad1bf@eucas1p1.samsung.com>
+	<1496828798-27548-8-git-send-email-a.perevalov@samsung.com>
+	<87lgp4ez1k.fsf@secure.mitica>
+Subject: Re: [Qemu-devel] [PATCH v8 07/11] migration: add bitmap for copied
+ page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +37,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: quintela@redhat.com
+Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, peterx@redhat.com, dgilbert@redhat.com
 
-On 6 June 2017 at 09:53, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-> Hello,
+On 06/07/2017 03:56 PM, Juan Quintela wrote:
+> Alexey Perevalov <a.perevalov@samsung.com> wrote:
 >
-> This series fixes issues in the TMP421 model previously sent and adds
-> such a device to the palmetto machine.
+>> +static unsigned long get_copiedmap_size(RAMBlock *rb)
+>> +{
+>> +    unsigned long pages;
+>> +    pages = rb->max_length >> find_first_bit((unsigned long *)&rb->page_size,
+>> +                                             sizeof(rb->page_size));
+>> +    return pages;
+> Are you sure that you want this and not:
 >
-> Thanks,
+> pages = rb->max_length >> TARGET_PAGE_BITS?
+I just wish to optimize size of bitmap,
 >
-> C.
+> Otherwise, in some architectures/configurations you can end with a
+> bitmap size that is different of the migration bitmap size.
 >
-> C=C3=A9dric Le Goater (2):
->   hw/misc: add a TMP42{1,2,3} device model
->   aspeed: add a temp sensor device on I2C bus 3
->
->  default-configs/arm-softmmu.mak |   1 +
->  hw/arm/aspeed.c                 |   9 +
->  hw/misc/Makefile.objs           |   1 +
->  hw/misc/tmp421.c                | 402 ++++++++++++++++++++++++++++++++++=
-++++++
->  4 files changed, 413 insertions(+)
->  create mode 100644 hw/misc/tmp421.c
+looks like, yes, that solution is for le only, so I feel luck
+of converting to le, here.
 
+>
+>
 
-
-Applied to target-arm.next, thanks.
-
--- PMM
+-- 
+Best regards,
+Alexey Perevalov
