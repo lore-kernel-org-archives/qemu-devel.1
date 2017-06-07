@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dIee8-00058w-Ow
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:21:30 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dIeew-00063t-IC
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:22:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dIee4-0002Tl-Kr
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:21:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48254)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dIee4-0002TS-Bz
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:21:24 -0400
-Date: Wed, 7 Jun 2017 18:21:19 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170607172119.GM2099@work-vm>
-References: <20170606165510.33057-1-pasic@linux.vnet.ibm.com>
-	<20170606165510.33057-3-pasic@linux.vnet.ibm.com>
-	<20170607110758.GC2099@work-vm>
-	<c6466750-6d71-988c-6c81-9c54f5ca995a@linux.vnet.ibm.com>
-	<20170607120138.GD2384@work-vm>
-	<1fb16203-3857-d0aa-498e-4acca6a28a41@linux.vnet.ibm.com>
-	<20170607171021.GK2099@work-vm>
-	<a918bec2-971e-c51f-9909-f4b7149ad98e@linux.vnet.ibm.com>
+	(envelope-from <no-reply@patchew.org>) id 1dIees-0002iu-B9
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:22:18 -0400
+Resent-Message-Id: <E1dIees-0002iu-B9@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21360)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dIees-0002iP-2E
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:22:14 -0400
+In-Reply-To: <20170607074632.13162-1-marcandre.lureau@redhat.com>
+Message-ID: <149685611719.189.17061945034400819431@84b42461e25a>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a918bec2-971e-c51f-9909-f4b7149ad98e@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 2/3] vmstate: error hint for failed
- equal checks part 2
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 7 Jun 2017 10:21:57 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/5] Code cleanups with Coccinelle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,105 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+To: marcandre.lureau@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, peter.maydell@linaro.org
 
-* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
-> 
-> 
-> On 06/07/2017 07:10 PM, Dr. David Alan Gilbert wrote:
-> > * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
-> >>
-> >>
-> >> On 06/07/2017 02:01 PM, Dr. David Alan Gilbert wrote:
-> >>> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
-> >>>>
-> >>>>
-> >>>> On 06/07/2017 01:07 PM, Dr. David Alan Gilbert wrote:
-> >>>>> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
-> >>>>>> Verbose error reporting for the _EQUAL family. Modify the standard _EQUAL
-> >>>>>> so the hint states the assertion probably failed due to a bug. Introduce
-> >>>>>> _EQUAL_HINT for specifying a context specific hint.
-> >>>>>>
-> >>>>>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> >>>>>
-> >>>>> I'd prefer not to print 'Bug!?' by default - they already get the
-> >>>>> message telling them something didn't match and the migration fails.
-> >>>>> There are none-bug ways of this happening, e.g. a user starting a VM on
-> >>>>> the source and destination with different configs.
-> >>>>
-> >>>> I admit, my objective with 'Bug!?' was to provoke. My train of thought is
-> >>>> to encourage the programmer to think about and document the circumstances
-> >>>> under which such an assertion is supposed to fail (and against which it
-> >>>> is supposed to guard).
-> >>>>
-> >>>> I do not know how skillful are our users but a 4 != 5 then maybe a name
-> >>>> of a vmstate field is probably quite scary and not very revealing. I doubt
-> >>>> a non qemu developer can use it for something else that reporting a bug.
-> >>>>
-> >>>> Consequently if there are non-bug ways one can use the hint and state them.
-> >>>> Your example with the misconfigured target, by the way, is IMHO also be due
-> >>>> to a bug of the management software IMHO.
-> >>>>
-> >>>> To sum it up: IMHO the message provided by a failing _EQUAL is to ugly
-> >>>> and Qemuspeak to be presented to an user-user in non-bug cases. Agree?
-> >>>> Disagree?
-> >>>
-> >>> Disagree.
-> >>>
-> >>> I don't mind giving field names etc; they make it easy for us as
-> >>> developers to track down what's happening, but also sometimes they help
-> >>> endusers work around a prolem or see where the problem is; of course
-> >>> that varies depending on the field name, but some of our names are
-> >>> reasonable (e.g. there's a VMSTATE_INT32_EQUAL on 'queue_size' in
-> >>> vmmouse.c).  They're also pretty good if two end users hit the same
-> >>> problem they can see the same error message in a bug report.
-> >>>
-> >>> We often have customer-facing support people look at logs before they
-> >>> get as far as us developers; if we have bugs that are 
-> >>> 'if it's a failing BLAH device complaining about the BAR field'
-> >>> then this fixes it, then that helps them find workarounds/fixes quickly
-> >>> even if they don't understand what the BAR field is.
-> >>>
-> >>
-> >> You seem to forget, that I'm not proposing omitting this information,
-> >> but extending it with something civilized so one can distinguish between
-> >> an assert failed should have never happened situation an a as good as
-> >> reasonable error handling for an expected error scenario. IMHO the current
-> >> EQUAL looks more like the former (assert) and less like the later (error
-> >> reporting for an expected error scenario). Agree? Dissagree?
-> > 
-> > Yes, the current EQUAL is very terse; but we can't actually tell from
-> > the use which case it is; it'll all work nicely when people actually add
-> > the correct hint text in useful locations.
-> > 
-> 
-> You are right.
-> 
-> Since Juan also requested the adding an extra param to the original
-> macros variant I will go with that.
-> 
-> I shied away form it in the first place because I did not want to
-> bother the users of the macros without clarifying with the migration
-> gurus how the new interface should look like.
-
-If you just make the existing callers pass NULL then that's fine.
-
-Dave
-
-> Thanks a lot!
-> 
-> Regards,
-> Halil
-> 
-> >> Having a field name is great! That's beyond discussion.
-> >>
-> >> I see, my 'sum it up' above was a bit unfortunate: it sounds like I'm
-> >> against the inclusion of technical info and not against a lack of non
-> >> technical info. Sorry for that!
-> > 
-> > No, that's fine.
-> > 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCAwLzVdIENvZGUgY2xlYW51cHMgd2l0aCBDb2NjaW5lbGxlClR5cGU6IHNl
+cmllcwpNZXNzYWdlLWlkOiAyMDE3MDYwNzA3NDYzMi4xMzE2Mi0xLW1hcmNhbmRyZS5sdXJlYXVA
+cmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1i
+YXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVk
+PTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1y
+ZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5n
+IFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAg
+aWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
+IC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkK
+ICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09
+CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20g
+aHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAtIFt0YWcgdXBkYXRlXSAg
+ICAgIHBhdGNoZXcvMTQ5Njc0NTA0Mi0yMzc5LTEtZ2l0LXNlbmQtZW1haWwtcGV0ZXJ4QHJlZGhh
+dC5jb20gLT4gcGF0Y2hldy8xNDk2NzQ1MDQyLTIzNzktMS1naXQtc2VuZC1lbWFpbC1wZXRlcnhA
+cmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmZmOTRhYWUgY29jY2lu
+ZWxsZTogcHJlZmVyIGdsaWIgZ19uZXcvZ19yZW5ldyBtYWNyb3MKNzM1ZTYzNCBSZXBsYWNlIGdf
+bWFsbG9jKCkrbWVtY3B5KCkgd2l0aCBnX21lbWR1cCgpCmQ3NWY3YzMgYXJjaDogaW50cm9kdWNl
+IEVMRl9OT1RFX1NJWkUgbWFjcm8KMmRiYTNkZSBjb2NjaW5lbGxlOiB1c2UgRElWX1JPVU5EX1VQ
+CmIzOGIwNDggY29jY2luZWxsZTogcmVwbGFjZSBjb2RlIHdpdGggUk9VTkRfVVAgbWFjcm8KCj09
+PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNTogY29jY2luZWxsZTogcmVwbGFj
+ZSBjb2RlIHdpdGggUk9VTkRfVVAgbWFjcm8uLi4KQ2hlY2tpbmcgUEFUQ0ggMi81OiBjb2NjaW5l
+bGxlOiB1c2UgRElWX1JPVU5EX1VQLi4uCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIg
+dXNlIHRhYnMKIzY1OiBGSUxFOiBkaXNhcy9pYTY0LmM6MTAxNTk6CiteSV5JICAgICAgbmV4dF9v
+cCA9IG9wX3BvaW50ZXIgKyAoRElWX1JPVU5EX1VQKG9wbGVuLCA4KSk7JAoKRVJST1I6IGNvZGUg
+aW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNzM6IEZJTEU6IGRpc2FzL2lhNjQuYzoxMDE2
+NjoKK15JXkkgIG5leHRfb3AgPSBvcF9wb2ludGVyICsgKERJVl9ST1VORF9VUChvcGxlbiwgOCkp
+OyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzIyNTogRklMRTog
+bGliZGVjbnVtYmVyL2RlY051bWJlci5jOjUwMjQ6CisgICAgICB6b2ZmPURJVl9ST1VORF9VUChp
+YWNjLCA4KTteSSAgICAgIC8qIGl0ZW1zIHRvIG9mZnNldCBieSAqLyQKCkVSUk9SOiBzcGFjZXMg
+cmVxdWlyZWQgYXJvdW5kIHRoYXQgJz0nIChjdHg6VnhWKQojMjI1OiBGSUxFOiBsaWJkZWNudW1i
+ZXIvZGVjTnVtYmVyLmM6NTAyNDoKKyAgICAgIHpvZmY9RElWX1JPVU5EX1VQKGlhY2MsIDgpOwkg
+ICAgICAvKiBpdGVtcyB0byBvZmZzZXQgYnkgKi8KICAgICAgICAgICBeCgp0b3RhbDogNCBlcnJv
+cnMsIDAgd2FybmluZ3MsIDI0MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBw
+cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
+IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
+aW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAzLzU6IGFyY2g6IGludHJvZHVjZSBFTEZf
+Tk9URV9TSVpFIG1hY3JvLi4uCkNoZWNraW5nIFBBVENIIDQvNTogUmVwbGFjZSBnX21hbGxvYygp
+K21lbWNweSgpIHdpdGggZ19tZW1kdXAoKS4uLgpDaGVja2luZyBQQVRDSCA1LzU6IGNvY2NpbmVs
+bGU6IHByZWZlciBnbGliIGdfbmV3L2dfcmVuZXcgbWFjcm9zLi4uCkVSUk9SOiBjb2RlIGluZGVu
+dCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzgwMTogRklMRTogaHcvZG1hL2V0cmF4ZnNfZG1hLmM6
+Nzc2OgorXkljdHJsLT5jaGFubmVscyA9IGdfbmV3MCh0eXBlb2YoY3RybC0+Y2hhbm5lbHNbMF0p
+LCBucl9jaGFubmVscyk7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
+cwojMjkzNzogRklMRTogdXRpbC9lbnZsaXN0LmM6MjIxOgorXklwZW52ID0gZW52ID0gZ19uZXco
+Y2hhciAqLCBlbnZsaXN0LT5lbF9jb3VudCArIDEpOyQKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJu
+aW5ncywgMjAzNCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywg
+cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
+cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
+SU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2Rl
+OiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6
+Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
+ZWxAZnJlZWxpc3RzLm9yZw==
