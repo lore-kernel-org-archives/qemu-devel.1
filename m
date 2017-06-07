@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dIWSh-0003lY-O7
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 04:37:09 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dIWSy-00040i-5D
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 04:37:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dIWSg-0001AZ-1R
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 04:37:07 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dIWSw-0001Fs-Qr
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 04:37:24 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Wed,  7 Jun 2017 10:35:54 +0200
-Message-Id: <1496824556-1883-7-git-send-email-eric.auger@redhat.com>
+Date: Wed,  7 Jun 2017 10:35:56 +0200
+Message-Id: <1496824556-1883-9-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1496824556-1883-1-git-send-email-eric.auger@redhat.com>
 References: <1496824556-1883-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC 6/8] virtio-iommu: Implement the translation and
- commands
+Subject: [Qemu-devel] [RFC 8/8] hw/arm/virt: Add virtio-iommu the virt board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,330 +22,206 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, jean-philippe.brucker@arm.com
 Cc: will.deacon@arm.com, robin.murphy@arm.com, kevin.tian@intel.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, wei@redhat.com, tn@semihalf.com, bharat.bhushan@nxp.com
 
-This patch adds the actual implementation for the translation routine
-and the virtio-iommu commands.
+The specific virtio-mmio node is inconditionally added on
+machine init while the binding between this latter and the
+PCIe host bridge is done on machine init done notifier, only
+if -device virtio-iommu-device was added to the qemu command
+line.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- hw/virtio/trace-events   |   6 ++
- hw/virtio/virtio-iommu.c | 202 +++++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 202 insertions(+), 6 deletions(-)
 
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index 341dbdf..9196b63 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -33,3 +33,9 @@ virtio_iommu_detach(uint32_t dev, uint32_t flags) "dev=%d flags=%d"
- virtio_iommu_map(uint32_t as, uint64_t phys_addr, uint64_t virt_addr, uint64_t size, uint32_t flags) "as= %d phys_addr=0x%"PRIx64" virt_addr=0x%"PRIx64" size=0x%"PRIx64" flags=%d"
- virtio_iommu_unmap(uint32_t as, uint64_t virt_addr, uint64_t size, uint32_t reserved) "as= %d virt_addr=0x%"PRIx64" size=0x%"PRIx64" reserved=%d"
- virtio_iommu_translate(const char *name, uint32_t rid, uint64_t iova, int flag) "mr=%s rid=%d addr=0x%"PRIx64" flag=%d"
-+virtio_iommu_new_asid(uint32_t asid) "Allocate a new asid=%d"
-+virtio_iommu_new_devid(uint32_t devid) "Allocate a new devid=%d"
-+virtio_iommu_unmap_left_interval(uint64_t low, uint64_t high, uint64_t next_low, uint64_t next_high) "Unmap left [0x%"PRIx64",0x%"PRIx64"], new interval=[0x%"PRIx64",0x%"PRIx64"]"
-+virtio_iommu_unmap_right_interval(uint64_t low, uint64_t high, uint64_t next_low, uint64_t next_high) "Unmap right [0x%"PRIx64",0x%"PRIx64"], new interval=[0x%"PRIx64",0x%"PRIx64"]"
-+virtio_iommu_unmap_inc_interval(uint64_t low, uint64_t high) "Unmap inc [0x%"PRIx64",0x%"PRIx64"]"
-+virtio_iommu_translate_result(uint64_t virt_addr, uint64_t phys_addr, uint32_t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=%d"
-diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index 902c779..0bbdd76 100644
---- a/hw/virtio/virtio-iommu.c
-+++ b/hw/virtio/virtio-iommu.c
-@@ -32,10 +32,37 @@
- #include "hw/virtio/virtio-bus.h"
- #include "hw/virtio/virtio-access.h"
- #include "hw/virtio/virtio-iommu.h"
-+#include "hw/pci/pci_bus.h"
-+#include "hw/pci/pci.h"
+---
+---
+ hw/arm/virt.c         | 92 +++++++++++++++++++++++++++++++++++++++++++++++----
+ include/hw/arm/virt.h |  4 +++
+ 2 files changed, 89 insertions(+), 7 deletions(-)
+
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 6eb0d2a..6bcfbcd 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -52,6 +52,7 @@
+ #include "hw/arm/fdt.h"
+ #include "hw/intc/arm_gic.h"
+ #include "hw/intc/arm_gicv3_common.h"
++#include "hw/virtio/virtio-iommu.h"
+ #include "kvm_arm.h"
+ #include "hw/smbios/smbios.h"
+ #include "qapi/visitor.h"
+@@ -139,6 +140,7 @@ static const MemMapEntry a15memmap[] = {
+     [VIRT_FW_CFG] =             { 0x09020000, 0x00000018 },
+     [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
+     [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
++    [VIRT_SMMU] =               { 0x09050000, 0x00000200 },
+     [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
+     /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
+     [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
+@@ -159,6 +161,7 @@ static const int a15irqmap[] = {
+     [VIRT_SECURE_UART] = 8,
+     [VIRT_MMIO] = 16, /* ...to 16 + NUM_VIRTIO_TRANSPORTS - 1 */
+     [VIRT_GIC_V2M] = 48, /* ...to 48 + NUM_GICV2M_SPIS - 1 */
++    [VIRT_SMMU] = 74,
+     [VIRT_PLATFORM_BUS] = 112, /* ...to 112 + PLATFORM_BUS_NUM_IRQS -1 */
+ };
  
- /* Max size */
- #define VIOMMU_DEFAULT_QUEUE_SIZE 256
- 
-+typedef struct viommu_as viommu_as;
-+
-+typedef struct viommu_mapping {
-+    uint64_t virt_addr;
-+    uint64_t phys_addr;
-+    uint64_t size;
-+    uint32_t flags;
-+} viommu_mapping;
-+
-+typedef struct viommu_interval {
-+    uint64_t low;
-+    uint64_t high;
-+} viommu_interval;
-+
-+typedef struct viommu_dev {
-+    uint32_t id;
-+    viommu_as *as;
-+} viommu_dev;
-+
-+typedef struct viommu_as {
-+    uint32_t id;
-+    uint32_t nr_devices;
-+    GTree *mappings;
-+} viommu_as;
-+
- static inline uint16_t smmu_get_sid(IOMMUDevice *dev)
- {
-     return  ((pci_bus_num(dev->bus) & 0xff) << 8) | dev->devfn;
-@@ -88,6 +115,19 @@ static void virtio_iommu_init_as(VirtIOIOMMU *s)
-     }
+@@ -991,7 +994,81 @@ static void create_pcie_irq_map(const VirtMachineState *vms,
+                            0x7           /* PCI irq */);
  }
  
-+static gint interval_cmp(gconstpointer a, gconstpointer b, gpointer user_data)
+-static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
++static int bind_virtio_iommu_device(Object *obj, void *opaque)
 +{
-+    viommu_interval *inta = (viommu_interval *)a;
-+    viommu_interval *intb = (viommu_interval *)b;
++    VirtMachineState *vms = (VirtMachineState *)opaque;
++    struct arm_boot_info *info = &vms->bootinfo;
++    int dtb_size;
++    void *fdt = info->get_dtb(info, &dtb_size);
++    Object *dev;
 +
-+    if (inta->high <= intb->low) {
-+        return -1;
-+    } else if (intb->high <= inta->low) {
-+        return 1;
-+    } else {
-+        return 0;
-+    }
-+}
- 
- static int virtio_iommu_attach(VirtIOIOMMU *s,
-                                struct virtio_iommu_req_attach *req)
-@@ -95,10 +135,34 @@ static int virtio_iommu_attach(VirtIOIOMMU *s,
-     uint32_t asid = le32_to_cpu(req->address_space);
-     uint32_t devid = le32_to_cpu(req->device);
-     uint32_t reserved = le32_to_cpu(req->reserved);
-+    viommu_as *as;
-+    viommu_dev *dev;
- 
-     trace_virtio_iommu_attach(asid, devid, reserved);
- 
--    return VIRTIO_IOMMU_S_UNSUPP;
-+    dev = g_tree_lookup(s->devices, GUINT_TO_POINTER(devid));
-+    if (dev) {
-+        return -1;
-+    }
++    dev = object_dynamic_cast(obj, TYPE_VIRTIO_IOMMU);
 +
-+    as = g_tree_lookup(s->address_spaces, GUINT_TO_POINTER(asid));
-+    if (!as) {
-+        as = g_malloc0(sizeof(*as));
-+        as->id = asid;
-+        as->mappings = g_tree_new_full((GCompareDataFunc)interval_cmp,
-+                                         NULL, NULL, (GDestroyNotify)g_free);
-+        g_tree_insert(s->address_spaces, GUINT_TO_POINTER(asid), as);
-+        trace_virtio_iommu_new_asid(asid);
-+    }
-+
-+    dev = g_malloc0(sizeof(*dev));
-+    dev->as = as;
-+    dev->id = devid;
-+    as->nr_devices++;
-+    trace_virtio_iommu_new_devid(devid);
-+    g_tree_insert(s->devices, GUINT_TO_POINTER(devid), dev);
-+
-+    return VIRTIO_IOMMU_S_OK;
- }
- 
- static int virtio_iommu_detach(VirtIOIOMMU *s,
-@@ -106,10 +170,13 @@ static int virtio_iommu_detach(VirtIOIOMMU *s,
- {
-     uint32_t devid = le32_to_cpu(req->device);
-     uint32_t reserved = le32_to_cpu(req->reserved);
-+    int ret;
- 
-     trace_virtio_iommu_detach(devid, reserved);
- 
--    return VIRTIO_IOMMU_S_UNSUPP;
-+    ret = g_tree_remove(s->devices, GUINT_TO_POINTER(devid));
-+
-+    return ret ? VIRTIO_IOMMU_S_OK : VIRTIO_IOMMU_S_INVAL;
- }
- 
- static int virtio_iommu_map(VirtIOIOMMU *s,
-@@ -120,10 +187,37 @@ static int virtio_iommu_map(VirtIOIOMMU *s,
-     uint64_t virt_addr = le64_to_cpu(req->virt_addr);
-     uint64_t size = le64_to_cpu(req->size);
-     uint32_t flags = le32_to_cpu(req->flags);
-+    viommu_as *as;
-+    viommu_interval *interval;
-+    viommu_mapping *mapping;
-+
-+    interval = g_malloc0(sizeof(*interval));
-+
-+    interval->low = virt_addr;
-+    interval->high = virt_addr + size - 1;
-+
-+    as = g_tree_lookup(s->address_spaces, GUINT_TO_POINTER(asid));
-+    if (!as) {
-+        return VIRTIO_IOMMU_S_INVAL;
-+    }
-+
-+    mapping = g_tree_lookup(as->mappings, (gpointer)interval);
-+    if (mapping) {
-+        g_free(interval);
-+        return VIRTIO_IOMMU_S_INVAL;
-+    }
- 
-     trace_virtio_iommu_map(asid, phys_addr, virt_addr, size, flags);
- 
--    return VIRTIO_IOMMU_S_UNSUPP;
-+    mapping = g_malloc0(sizeof(*mapping));
-+    mapping->virt_addr = virt_addr;
-+    mapping->phys_addr = phys_addr;
-+    mapping->size = size;
-+    mapping->flags = flags;
-+
-+    g_tree_insert(as->mappings, interval, mapping);
-+
-+    return VIRTIO_IOMMU_S_OK;
- }
- 
- static int virtio_iommu_unmap(VirtIOIOMMU *s,
-@@ -133,10 +227,64 @@ static int virtio_iommu_unmap(VirtIOIOMMU *s,
-     uint64_t virt_addr = le64_to_cpu(req->virt_addr);
-     uint64_t size = le64_to_cpu(req->size);
-     uint32_t flags = le32_to_cpu(req->flags);
-+    viommu_mapping *mapping;
-+    viommu_interval interval;
-+    viommu_as *as;
- 
-     trace_virtio_iommu_unmap(asid, virt_addr, size, flags);
- 
--    return VIRTIO_IOMMU_S_UNSUPP;
-+    as = g_tree_lookup(s->address_spaces, GUINT_TO_POINTER(asid));
-+    if (!as) {
-+        error_report("%s: no as", __func__);
-+        return VIRTIO_IOMMU_S_INVAL;
-+    }
-+    interval.low = virt_addr;
-+    interval.high = virt_addr + size - 1;
-+
-+    mapping = g_tree_lookup(as->mappings, (gpointer)&interval);
-+
-+    while (mapping) {
-+        viommu_interval current;
-+        uint64_t low  = mapping->virt_addr;
-+        uint64_t high = mapping->virt_addr + mapping->size - 1;
-+
-+        current.low = low;
-+        current.high = high;
-+
-+        if (low == interval.low && size >= mapping->size) {
-+            g_tree_remove(as->mappings, (gpointer)&current);
-+            interval.low = high + 1;
-+            trace_virtio_iommu_unmap_left_interval(current.low, current.high,
-+                interval.low, interval.high);
-+        } else if (high == interval.high && size >= mapping->size) {
-+            trace_virtio_iommu_unmap_right_interval(current.low, current.high,
-+                interval.low, interval.high);
-+            g_tree_remove(as->mappings, (gpointer)&current);
-+            interval.high = low - 1;
-+        } else if (low > interval.low && high < interval.high) {
-+            trace_virtio_iommu_unmap_inc_interval(current.low, current.high);
-+            g_tree_remove(as->mappings, (gpointer)&current);
-+        } else {
-+            break;
-+        }
-+        if (interval.low >= interval.high) {
-+            return VIRTIO_IOMMU_S_OK;
-+        } else {
-+            mapping = g_tree_lookup(as->mappings, (gpointer)&interval);
-+        }
-+    }
-+
-+    if (mapping) {
-+        error_report("****** %s: Unmap 0x%"PRIx64" size=0x%"PRIx64
-+                     " from 0x%"PRIx64" size=0x%"PRIx64" is not supported",
-+                     __func__, interval.low, size,
-+                     mapping->virt_addr, mapping->size);
-+    } else {
-+        error_report("****** %s: no mapping for [0x%"PRIx64",0x%"PRIx64"]",
-+                     __func__, interval.low, interval.high);
-+    }
-+
-+    return VIRTIO_IOMMU_S_INVAL;
- }
- 
- #define get_payload_size(req) (\
-@@ -266,19 +414,46 @@ static IOMMUTLBEntry virtio_iommu_translate(MemoryRegion *mr, hwaddr addr,
-                                             IOMMUAccessFlags flag)
- {
-     IOMMUDevice *sdev = container_of(mr, IOMMUDevice, iommu_mr);
-+    VirtIOIOMMU *s = sdev->viommu;
-     uint32_t sid;
-+    viommu_dev *dev;
-+    viommu_mapping *mapping;
-+    viommu_interval interval;
-+
-+    interval.low = addr;
-+    interval.high = addr + 1;
- 
-     IOMMUTLBEntry entry = {
-         .target_as = &address_space_memory,
-         .iova = addr,
-         .translated_addr = addr,
--        .addr_mask = ~(hwaddr)0,
--        .perm = IOMMU_NONE,
-+        .addr_mask = (1 << 12) - 1, /* TODO */
-+        .perm = 3,
-     };
- 
-     sid = smmu_get_sid(sdev);
- 
-     trace_virtio_iommu_translate(mr->name, sid, addr, flag);
-+    qemu_mutex_lock(&s->mutex);
-+
-+    dev = g_tree_lookup(s->devices, GUINT_TO_POINTER(sid));
 +    if (!dev) {
-+        /* device cannot be attached to another as */
-+        printf("%s sid=%d is not known!!\n", __func__, sid);
-+        goto unlock;
++        /* Container, traverse it for children */
++        return object_child_foreach(obj, bind_virtio_iommu_device, opaque);
 +    }
 +
-+    mapping = g_tree_lookup(dev->as->mappings, (gpointer)&interval);
-+    if (!mapping) {
-+        printf("%s no mapping for 0x%"PRIx64" for sid=%d\n", __func__,
-+               addr, sid);
-+        goto unlock;
-+    }
-+    entry.translated_addr = addr - mapping->virt_addr + mapping->phys_addr,
-+    trace_virtio_iommu_translate_result(addr, entry.translated_addr, sid);
++    qemu_fdt_setprop_cells(fdt, vms->pcie_host_nodename, "iommu-map",
++                           0x0, vms->smmu_phandle, 0x0, 0x10000);
 +
-+unlock:
-+    qemu_mutex_unlock(&s->mutex);
-     return entry;
- }
- 
-@@ -341,6 +516,12 @@ static inline guint as_uint64_hash(gconstpointer v)
-     return (guint)*(const uint64_t *)v;
- }
- 
-+static gint int_cmp(gconstpointer a, gconstpointer b, gpointer user_data)
-+{
-+    uint ua = GPOINTER_TO_UINT(a);
-+    uint ub = GPOINTER_TO_UINT(b);
-+    return (ua > ub) - (ua < ub);
++    return true;
 +}
- 
- static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
- {
-@@ -362,12 +543,21 @@ static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
-                                             as_uint64_equal,
-                                             g_free, g_free);
- 
-+    s->address_spaces = g_tree_new_full((GCompareDataFunc)int_cmp,
-+                                         NULL, NULL, (GDestroyNotify)g_free);
-+    s->devices = g_tree_new_full((GCompareDataFunc)int_cmp,
-+                                         NULL, NULL, (GDestroyNotify)g_free);
 +
-     virtio_iommu_init_as(s);
++static
++void virtio_iommu_notifier(Notifier *notifier, void *data)
++{
++    VirtMachineState *vms = container_of(notifier, VirtMachineState,
++                                         virtio_iommu_done);
++    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
++    Object *container;
++
++
++    if (vmc->no_iommu) {
++        return;
++    }
++
++    container = container_get(qdev_get_machine(), "/peripheral");
++    bind_virtio_iommu_device(container, vms);
++    container = container_get(qdev_get_machine(), "/peripheral-anon");
++    bind_virtio_iommu_device(container, vms);
++}
++
++static void create_virtio_iommu(VirtMachineState *vms, qemu_irq *pic)
++{
++    char *smmu;
++    const char compat[] = "virtio,mmio";
++    int irq =  vms->irqmap[VIRT_SMMU];
++    hwaddr base = vms->memmap[VIRT_SMMU].base;
++    hwaddr size = vms->memmap[VIRT_SMMU].size;
++    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
++
++    if (vmc->no_iommu) {
++        return;
++    }
++
++    vms->smmu_phandle = qemu_fdt_alloc_phandle(vms->fdt);
++
++    sysbus_create_simple("virtio-mmio", base, pic[irq]);
++
++    smmu = g_strdup_printf("/virtio_mmio@%" PRIx64, base);
++    qemu_fdt_add_subnode(vms->fdt, smmu);
++    qemu_fdt_setprop(vms->fdt, smmu, "compatible", compat, sizeof(compat));
++    qemu_fdt_setprop_sized_cells(vms->fdt, smmu, "reg", 2, base, 2, size);
++
++    qemu_fdt_setprop_cells(vms->fdt, smmu, "interrupts",
++            GIC_FDT_IRQ_TYPE_SPI, irq, GIC_FDT_IRQ_FLAGS_EDGE_LO_HI);
++
++    qemu_fdt_setprop(vms->fdt, smmu, "dma-coherent", NULL, 0);
++    qemu_fdt_setprop_cell(vms->fdt, smmu, "#iommu-cells", 1);
++    qemu_fdt_setprop_cell(vms->fdt, smmu, "phandle", vms->smmu_phandle);
++    g_free(smmu);
++
++    vms->virtio_iommu_done.notify = virtio_iommu_notifier;
++    qemu_add_machine_init_done_notifier(&vms->virtio_iommu_done);
++}
++
++static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
+ {
+     hwaddr base_mmio = vms->memmap[VIRT_PCIE_MMIO].base;
+     hwaddr size_mmio = vms->memmap[VIRT_PCIE_MMIO].size;
+@@ -1064,7 +1141,8 @@ static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
+         }
+     }
+ 
+-    nodename = g_strdup_printf("/pcie@%" PRIx64, base);
++    vms->pcie_host_nodename = g_strdup_printf("/pcie@%" PRIx64, base);
++    nodename = vms->pcie_host_nodename;
+     qemu_fdt_add_subnode(vms->fdt, nodename);
+     qemu_fdt_setprop_string(vms->fdt, nodename,
+                             "compatible", "pci-host-ecam-generic");
+@@ -1103,7 +1181,6 @@ static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
+     qemu_fdt_setprop_cell(vms->fdt, nodename, "#interrupt-cells", 1);
+     create_pcie_irq_map(vms, vms->gic_phandle, irq, nodename);
+ 
+-    g_free(nodename);
  }
  
- static void virtio_iommu_device_unrealize(DeviceState *dev, Error **errp)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-+    VirtIOIOMMU *s = VIRTIO_IOMMU(dev);
-+
-+    g_tree_destroy(s->address_spaces);
-+    g_tree_destroy(s->devices);
+ static void create_platform_bus(VirtMachineState *vms, qemu_irq *pic)
+@@ -1448,16 +1525,16 @@ static void machvirt_init(MachineState *machine)
  
-     virtio_cleanup(vdev);
+     create_rtc(vms, pic);
+ 
+-    create_pcie(vms, pic);
+-
+-    create_gpio(vms, pic);
+-
+     /* Create mmio transports, so the user can create virtio backends
+      * (which will be automatically plugged in to the transports). If
+      * no backend is created the transport will just sit harmlessly idle.
+      */
+     create_virtio_devices(vms, pic);
+ 
++    create_pcie(vms, pic);
++
++    create_gpio(vms, pic);
++
+     vms->fw_cfg = create_fw_cfg(vms, &address_space_memory);
+     rom_set_fw(vms->fw_cfg);
+ 
+@@ -1482,6 +1559,7 @@ static void machvirt_init(MachineState *machine)
+      * Notifiers are executed in registration reverse order.
+      */
+     create_platform_bus(vms, pic);
++    create_virtio_iommu(vms, pic);
  }
+ 
+ static bool virt_get_secure(Object *obj, Error **errp)
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index ff27551..070cb39 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -59,6 +59,7 @@ enum {
+     VIRT_GIC_V2M,
+     VIRT_GIC_ITS,
+     VIRT_GIC_REDIST,
++    VIRT_SMMU,
+     VIRT_UART,
+     VIRT_MMIO,
+     VIRT_RTC,
+@@ -91,6 +92,7 @@ typedef struct {
+ typedef struct {
+     MachineState parent;
+     Notifier machine_done;
++    Notifier virtio_iommu_done;
+     FWCfgState *fw_cfg;
+     bool secure;
+     bool highmem;
+@@ -106,6 +108,8 @@ typedef struct {
+     uint32_t clock_phandle;
+     uint32_t gic_phandle;
+     uint32_t msi_phandle;
++    uint32_t smmu_phandle;
++    char *pcie_host_nodename;
+     int psci_conduit;
+ } VirtMachineState;
+ 
 -- 
 2.5.5
