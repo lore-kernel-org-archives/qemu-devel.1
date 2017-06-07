@@ -1,24 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dIdJV-0000jS-LI
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:56:06 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dIdP2-0005sq-6J
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:01:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dIdJU-0005fh-MY
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:56:05 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:35642)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dIdJU-0005f7-Hl
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:56:04 -0400
-Received: by mail-qt0-x241.google.com with SMTP id x58so1991084qtc.2
-	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 08:56:04 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Date: Wed,  7 Jun 2017 08:55:36 -0700
-Message-Id: <20170607155536.1193-8-rth@twiddle.net>
-In-Reply-To: <20170607155536.1193-1-rth@twiddle.net>
-References: <20170607155536.1193-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v4 7/7] target/arm: Use ldr (literal) for
- goto_tb
+	(envelope-from <eric.auger@redhat.com>) id 1dIdP1-0007yj-Ci
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:01:48 -0400
+From: Eric Auger <eric.auger@redhat.com>
+Date: Wed,  7 Jun 2017 18:01:20 +0200
+Message-Id: <1496851287-9428-2-git-send-email-eric.auger@redhat.com>
+In-Reply-To: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
+References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
+Subject: [Qemu-devel] [RFC v2 1/8] update-linux-headers: import
+ virtio_iommu.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,53 +20,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: cota@braap.org
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, jean-philippe.brucker@arm.com
+Cc: will.deacon@arm.com, robin.murphy@arm.com, kevin.tian@intel.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, wei@redhat.com, tn@semihalf.com, bharat.bhushan@nxp.com
 
-The new placement of the TB means that we can use one insn
-to load the goto_tb destination directly from the TB.
+Update the script to update the virtio_iommu.h header.
 
-Signed-off-by: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- tcg/arm/tcg-target.inc.c | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+ scripts/update-linux-headers.sh | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
-index 18708b1..b640fb9 100644
---- a/tcg/arm/tcg-target.inc.c
-+++ b/tcg/arm/tcg-target.inc.c
-@@ -1669,14 +1669,27 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-         }
-         break;
-     case INDEX_op_goto_tb:
--        tcg_debug_assert(s->tb_jmp_insn_offset == 0);
-         {
-             /* Indirect jump method */
--            intptr_t ptr = (intptr_t)(s->tb_jmp_target_addr + args[0]);
--            tcg_out_movi32(s, COND_AL, TCG_REG_R0, ptr & ~0xfff);
--            tcg_out_ld32_12(s, COND_AL, TCG_REG_PC, TCG_REG_R0, ptr & 0xfff);
-+            intptr_t ptr, dif, dil;
-+            TCGReg base = TCG_REG_PC;
-+
-+            tcg_debug_assert(s->tb_jmp_insn_offset == 0);
-+            ptr = (intptr_t)(s->tb_jmp_target_addr + args[0]);
-+            dif = ptr - ((intptr_t)s->code_ptr + 8);
-+            dil = sextract32(dif, 0, 12);
-+            if (dif != dil) {
-+                /* The TB is close, but outside the 12 bits addressable by
-+                   the load.  We can extend this to 20 bits with a sub of a
-+                   shifted immediate from pc.  In the vastly unlikely event
-+                   the code requires more than 1MB, we'll use 2 insns and
-+                   be no worse off.  */
-+                base = TCG_REG_R0;
-+                tcg_out_movi32(s, COND_AL, base, ptr - dil);
-+            }
-+            tcg_out_ld32_12(s, COND_AL, TCG_REG_PC, base, dil);
-+            s->tb_jmp_reset_offset[args[0]] = tcg_current_code_size(s);
-         }
--        s->tb_jmp_reset_offset[args[0]] = tcg_current_code_size(s);
-         break;
-     case INDEX_op_goto_ptr:
-         tcg_out_bx(s, COND_AL, args[0]);
+diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+index 2f906c4..03f6712 100755
+--- a/scripts/update-linux-headers.sh
++++ b/scripts/update-linux-headers.sh
+@@ -134,6 +134,9 @@ EOF
+ cat <<EOF >$output/linux-headers/linux/virtio_config.h
+ #include "standard-headers/linux/virtio_config.h"
+ EOF
++cat <<EOF >$output/linux-headers/linux/virtio_iommu.h
++#include "standard-headers/linux/virtio_iommu.h"
++EOF
+ cat <<EOF >$output/linux-headers/linux/virtio_ring.h
+ #include "standard-headers/linux/virtio_ring.h"
+ EOF
 -- 
-2.9.4
+2.5.5
