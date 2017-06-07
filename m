@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dIVdt-0002Qn-Mu
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:44:39 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dIVfw-0003wF-Qa
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:46:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dIVdo-0005M6-O7
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:44:37 -0400
-Received: from mailout3.w1.samsung.com ([210.118.77.13]:52945)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1dIVdo-0005Kk-D7
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:44:32 -0400
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout3.w1.samsung.com
-	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
-	2014)) with ESMTP id <0OR600I9E2DAR580@mailout3.w1.samsung.com> for
-	qemu-devel@nongnu.org; Wed, 07 Jun 2017 08:34:22 +0100 (BST)
-From: Alexey Perevalov <a.perevalov@samsung.com>
-Message-id: <e8383b52-0d67-e9a3-6a40-508400470478@samsung.com>
-Date: Wed, 07 Jun 2017 10:34:19 +0300
-MIME-version: 1.0
-In-reply-to: <20170601105752.GF2083@work-vm>
-Content-type: text/plain; charset=utf-8; format=flowed
-Content-transfer-encoding: 7bit
-Content-language: en-GB
-References: <1495539071-12995-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170523113131eucas1p24a041de6004237e437f97a24340507e2@eucas1p2.samsung.com>
-	<1495539071-12995-9-git-send-email-a.perevalov@samsung.com>
-	<20170601105752.GF2083@work-vm>
-Subject: Re: [Qemu-devel] [PATCH V6 08/10] migration: calculate vCPU
- blocktime on dst side
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dIVfr-0006Ge-T1
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:46:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42056)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1dIVfr-0006GR-Jx
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:46:39 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed,  7 Jun 2017 11:46:27 +0400
+Message-Id: <20170607074632.13162-1-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/5] Code cleanups with Coccinelle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,161 +25,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, peterx@redhat.com, eblake@redhat.com
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On 06/01/2017 01:57 PM, Dr. David Alan Gilbert wrote:
-> * Alexey Perevalov (a.perevalov@samsung.com) wrote:
->> This patch provides blocktime calculation per vCPU,
->> as a summary and as a overlapped value for all vCPUs.
->>
->> This approach was suggested by Peter Xu, as an improvements of
->> previous approch where QEMU kept tree with faulted page address and cpus bitmask
->> in it. Now QEMU is keeping array with faulted page address as value and vCPU
->> as index. It helps to find proper vCPU at UFFD_COPY time. Also it keeps
->> list for blocktime per vCPU (could be traced with page_fault_addr)
->>
->> Blocktime will not calculated if postcopy_blocktime field of
->> MigrationIncomingState wasn't initialized.
->>
->> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-> <snip>
->
->> +    if (dc->vcpu_addr[cpu] == 0) {
->> +        atomic_inc(&dc->smp_cpus_down);
->> +    }
->> +
->> +    atomic_xchg__nocheck(&dc->vcpu_addr[cpu], addr);
-> I was wondering if this could be done with atomic_cmpxchg with old=0,
-> but the behaviour would be different in the case where vcpu_addr[cpu]
-> wasn't zero  or the 'addr'; so I think allowing it to cope with that
-> case seems better.
+Hi,
 
-atomic_xchg__nocheck isn't atomic_cmpxchg, it is based on __atomic_exchange_n, ( from reference
-  It writesval  into|*ptr|, and returns the previous contents of|*ptr ) so I leave it as is. |
+Here is a few patches I came up with playing with some semantic
+patches. If necessary, I can split them further by unit/domains, but
+that will likely make a quite long series of patches.
 
->
-> Dave
->
->> +    atomic_xchg__nocheck(&dc->last_begin, now_ms);
->> +    atomic_xchg__nocheck(&dc->page_fault_vcpu_time[cpu], now_ms);
->> +
->> +    trace_mark_postcopy_blocktime_begin(addr, dc, dc->page_fault_vcpu_time[cpu],
->> +            cpu);
->> +}
->> +
->> +static void mark_postcopy_blocktime_end(uint64_t addr)
->> +{
->> +    MigrationIncomingState *mis = migration_incoming_get_current();
->> +    PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
->> +    int i, affected_cpu = 0;
->> +    int64_t now_ms;
->> +    bool vcpu_total_blocktime = false;
->> +    unsigned long int nr_bit;
->> +
->> +    if (!dc) {
->> +        return;
->> +    }
->> +    /* mark that page as copied */
->> +    nr_bit = get_copied_bit_offset(addr);
->> +    set_bit_atomic(nr_bit, mis->copied_pages);
->> +
->> +    now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
->> +
->> +    /* lookup cpu, to clear it,
->> +     * that algorithm looks straighforward, but it's not
->> +     * optimal, more optimal algorithm is keeping tree or hash
->> +     * where key is address value is a list of  */
->> +    for (i = 0; i < smp_cpus; i++) {
->> +        uint64_t vcpu_blocktime = 0;
->> +        if (atomic_fetch_add(&dc->vcpu_addr[i], 0) != addr) {
->> +            continue;
->> +        }
->> +        atomic_xchg__nocheck(&dc->vcpu_addr[i], 0);
->> +        vcpu_blocktime = now_ms -
->> +            atomic_fetch_add(&dc->page_fault_vcpu_time[i], 0);
->> +        affected_cpu += 1;
->> +        /* we need to know is that mark_postcopy_end was due to
->> +         * faulted page, another possible case it's prefetched
->> +         * page and in that case we shouldn't be here */
->> +        if (!vcpu_total_blocktime &&
->> +            atomic_fetch_add(&dc->smp_cpus_down, 0) == smp_cpus) {
->> +            vcpu_total_blocktime = true;
->> +        }
->> +        /* continue cycle, due to one page could affect several vCPUs */
->> +        dc->vcpu_blocktime[i] += vcpu_blocktime;
->> +    }
->> +
->> +    atomic_sub(&dc->smp_cpus_down, affected_cpu);
->> +    if (vcpu_total_blocktime) {
->> +        dc->total_blocktime += now_ms - atomic_fetch_add(&dc->last_begin, 0);
->> +    }
->> +    trace_mark_postcopy_blocktime_end(addr, dc, dc->total_blocktime);
->> +}
->> +
->>   /*
->>    * Handle faults detected by the USERFAULT markings
->>    */
->> @@ -654,8 +750,11 @@ static void *postcopy_ram_fault_thread(void *opaque)
->>           rb_offset &= ~(qemu_ram_pagesize(rb) - 1);
->>           trace_postcopy_ram_fault_thread_request(msg.arg.pagefault.address,
->>                                                   qemu_ram_get_idstr(rb),
->> -                                                rb_offset);
->> +                                                rb_offset,
->> +                                                msg.arg.pagefault.feat.ptid);
->>   
->> +        mark_postcopy_blocktime_begin((uintptr_t)(msg.arg.pagefault.address),
->> +                msg.arg.pagefault.feat.ptid, rb);
->>           /*
->>            * Send the request to the source - we want to request one
->>            * of our host page sizes (which is >= TPS)
->> @@ -750,6 +849,7 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
->>   
->>           return -e;
->>       }
->> +    mark_postcopy_blocktime_end((uint64_t)(uintptr_t)host);
->>   
->>       trace_postcopy_place_page(host);
->>       return 0;
->> diff --git a/migration/trace-events b/migration/trace-events
->> index 5b8ccf3..7bdadbb 100644
->> --- a/migration/trace-events
->> +++ b/migration/trace-events
->> @@ -112,6 +112,8 @@ process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
->>   process_incoming_migration_co_postcopy_end_main(void) ""
->>   migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
->>   migration_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname)  "ioc=%p ioctype=%s hostname=%s"
->> +mark_postcopy_blocktime_begin(uint64_t addr, void *dd, int64_t time, int cpu) "addr 0x%" PRIx64 " dd %p time %" PRId64 " cpu %d"
->> +mark_postcopy_blocktime_end(uint64_t addr, void *dd, int64_t time) "addr 0x%" PRIx64 " dd %p time %" PRId64
->>   
->>   # migration/rdma.c
->>   qemu_rdma_accept_incoming_migration(void) ""
->> @@ -188,7 +190,7 @@ postcopy_ram_enable_notify(void) ""
->>   postcopy_ram_fault_thread_entry(void) ""
->>   postcopy_ram_fault_thread_exit(void) ""
->>   postcopy_ram_fault_thread_quit(void) ""
->> -postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset) "Request for HVA=%" PRIx64 " rb=%s offset=%zx"
->> +postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset, uint32_t pid) "Request for HVA=%" PRIx64 " rb=%s offset=%zx %u"
->>   postcopy_ram_incoming_cleanup_closeuf(void) ""
->>   postcopy_ram_incoming_cleanup_entry(void) ""
->>   postcopy_ram_incoming_cleanup_exit(void) ""
->> @@ -197,6 +199,7 @@ save_xbzrle_page_skipping(void) ""
->>   save_xbzrle_page_overflow(void) ""
->>   ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wait: %" PRIu64 " milliseconds, %d iterations"
->>   ram_load_complete(int ret, uint64_t seq_iter) "exit_code %d seq iteration %" PRIu64
->> +get_mem_fault_cpu_index(uint32_t pid) "pid %u is not vCPU"
->>   
->>   # migration/exec.c
->>   migration_exec_outgoing(const char *cmd) "cmd=%s"
->> -- 
->> 1.8.3.1
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
->
->
+Marc-Andr=C3=A9 Lureau (5):
+  coccinelle: replace code with ROUND_UP macro
+  coccinelle: use DIV_ROUND_UP
+  arch: introduce ELF_NOTE_SIZE macro
+  Replace g_malloc()+memcpy() with g_memdup()
+  coccinelle: prefer glib g_new/g_renew macros
 
--- 
-Best regards,
-Alexey Perevalov
+ hw/lm32/lm32_hwsetup.h              |  2 +-
+ include/hw/elf_ops.h                |  2 +-
+ include/qemu/timer.h                |  2 +-
+ audio/alsaaudio.c                   |  2 +-
+ audio/coreaudio.c                   |  2 +-
+ audio/dsoundaudio.c                 |  2 +-
+ audio/ossaudio.c                    |  2 +-
+ audio/paaudio.c                     |  2 +-
+ audio/wavaudio.c                    |  2 +-
+ backends/cryptodev.c                |  2 +-
+ block/qed-check.c                   |  3 ++-
+ bootdevice.c                        |  2 +-
+ bsd-user/syscall.c                  |  2 +-
+ bt-host.c                           |  2 +-
+ bt-vhci.c                           |  2 +-
+ cpus-common.c                       |  4 ++--
+ cpus.c                              | 16 ++++++++--------
+ disas/ia64.c                        |  4 ++--
+ dma-helpers.c                       |  4 ++--
+ dump.c                              | 10 +++++-----
+ gdbstub.c                           |  4 ++--
+ hw/9pfs/9p-handle.c                 |  2 +-
+ hw/9pfs/9p-proxy.c                  |  2 +-
+ hw/9pfs/9p-synth.c                  |  5 ++---
+ hw/9pfs/9p.c                        |  6 +++---
+ hw/9pfs/xen-9p-backend.c            |  6 +++---
+ hw/acpi/memory_hotplug.c            |  2 +-
+ hw/audio/intel-hda.c                |  2 +-
+ hw/bt/core.c                        |  4 ++--
+ hw/bt/hci.c                         |  4 ++--
+ hw/bt/l2cap.c                       |  4 ++--
+ hw/bt/sdp.c                         |  6 +++---
+ hw/char/parallel.c                  |  2 +-
+ hw/char/serial.c                    |  4 ++--
+ hw/char/sh_serial.c                 |  2 +-
+ hw/char/virtio-serial-bus.c         | 19 +++++++++----------
+ hw/core/irq.c                       |  2 +-
+ hw/core/ptimer.c                    |  2 +-
+ hw/core/reset.c                     |  2 +-
+ hw/cris/axis_dev88.c                |  2 +-
+ hw/display/pxa2xx_lcd.c             |  2 +-
+ hw/display/tc6393xb.c               |  2 +-
+ hw/display/vga.c                    |  2 +-
+ hw/display/virtio-gpu.c             |  8 ++++----
+ hw/display/xenfb.c                  |  4 ++--
+ hw/dma/etraxfs_dma.c                |  2 +-
+ hw/dma/rc4030.c                     |  4 ++--
+ hw/dma/soc_dma.c                    |  6 ++----
+ hw/i2c/bitbang_i2c.c                |  2 +-
+ hw/i2c/core.c                       |  4 ++--
+ hw/i386/amd_iommu.c                 |  4 ++--
+ hw/i386/intel_iommu.c               |  2 +-
+ hw/i386/kvm/pci-assign.c            |  2 +-
+ hw/i386/multiboot.c                 |  3 +--
+ hw/i386/pc.c                        |  5 ++---
+ hw/i386/xen/xen-hvm.c               | 12 ++++++------
+ hw/i386/xen/xen-mapcache.c          | 14 +++++++-------
+ hw/input/pckbd.c                    |  2 +-
+ hw/input/ps2.c                      |  4 ++--
+ hw/input/pxa2xx_keypad.c            |  2 +-
+ hw/input/tsc2005.c                  |  3 +--
+ hw/input/virtio-input.c             |  4 ++--
+ hw/intc/exynos4210_gic.c            |  2 +-
+ hw/intc/heathrow_pic.c              |  2 +-
+ hw/intc/xics.c                      |  2 +-
+ hw/intc/xics_kvm.c                  |  2 +-
+ hw/lm32/lm32_boards.c               |  4 ++--
+ hw/lm32/milkymist.c                 |  2 +-
+ hw/m68k/mcf5206.c                   |  4 ++--
+ hw/m68k/mcf5208.c                   |  2 +-
+ hw/mips/mips_malta.c                |  2 +-
+ hw/mips/mips_mipssim.c              |  2 +-
+ hw/mips/mips_r4k.c                  |  2 +-
+ hw/misc/applesmc.c                  |  2 +-
+ hw/misc/imx6_src.c                  |  2 +-
+ hw/misc/ivshmem.c                   |  4 ++--
+ hw/misc/macio/mac_dbdma.c           |  2 +-
+ hw/misc/pci-testdev.c               |  2 +-
+ hw/net/eepro100.c                   |  3 +--
+ hw/net/net_rx_pkt.c                 |  2 +-
+ hw/net/virtio-net.c                 |  2 +-
+ hw/pci/msix.c                       |  6 +++---
+ hw/pci/pci.c                        |  2 +-
+ hw/pci/pcie_aer.c                   |  4 ++--
+ hw/ppc/e500.c                       |  4 ++--
+ hw/ppc/mac_newworld.c               |  2 +-
+ hw/ppc/mac_oldworld.c               |  2 +-
+ hw/ppc/ppc.c                        |  8 ++++----
+ hw/ppc/ppc405_boards.c              |  8 ++++----
+ hw/ppc/ppc405_uc.c                  | 28 ++++++++++++++--------------
+ hw/ppc/ppc440_bamboo.c              |  4 ++--
+ hw/ppc/ppc4xx_devs.c                |  4 ++--
+ hw/ppc/ppc_booke.c                  |  4 ++--
+ hw/ppc/prep.c                       |  2 +-
+ hw/ppc/spapr.c                      |  4 ++--
+ hw/ppc/spapr_events.c               |  2 +-
+ hw/ppc/spapr_iommu.c                |  2 +-
+ hw/ppc/spapr_pci.c                  |  2 +-
+ hw/ppc/spapr_vio.c                  |  2 +-
+ hw/ppc/virtex_ml507.c               |  2 +-
+ hw/s390x/css.c                      |  8 ++++----
+ hw/s390x/s390-pci-bus.c             |  4 ++--
+ hw/sh4/r2d.c                        |  4 ++--
+ hw/sh4/sh7750.c                     |  2 +-
+ hw/sparc/leon3.c                    |  2 +-
+ hw/sparc64/sparc64.c                |  4 ++--
+ hw/timer/arm_timer.c                |  2 +-
+ hw/timer/grlib_gptimer.c            |  2 +-
+ hw/timer/sh_timer.c                 |  4 ++--
+ hw/timer/slavio_timer.c             |  2 +-
+ hw/timer/xilinx_timer.c             |  2 +-
+ hw/usb/dev-hub.c                    |  8 ++++----
+ hw/vfio/common.c                    |  2 +-
+ hw/vfio/pci.c                       |  4 ++--
+ hw/vfio/platform.c                  |  4 ++--
+ hw/virtio/virtio-crypto.c           |  2 +-
+ hw/virtio/virtio-pci.c              |  4 ++--
+ hw/virtio/virtio.c                  |  4 ++--
+ hw/xtensa/xtfpga.c                  |  2 +-
+ kvm-all.c                           |  4 ++--
+ libdecnumber/decNumber.c            |  2 +-
+ linux-user/elfload.c                |  2 +-
+ memory.c                            | 12 ++++++------
+ memory_mapping.c                    |  2 +-
+ migration/block.c                   |  2 +-
+ migration/postcopy-ram.c            |  2 +-
+ migration/ram.c                     |  2 +-
+ monitor.c                           |  2 +-
+ nbd/server.c                        |  4 ++--
+ net/slirp.c                         |  2 +-
+ qga/commands-win32.c                |  2 +-
+ qga/commands.c                      |  2 +-
+ qmp.c                               |  2 +-
+ qobject/json-parser.c               |  2 +-
+ replay/replay-char.c                |  8 ++++----
+ replay/replay-events.c              | 10 +++++-----
+ replay/replay-net.c                 |  5 ++---
+ slirp/dnssearch.c                   |  4 ++--
+ slirp/slirp.c                       |  2 +-
+ target/i386/arch_dump.c             | 32 ++++++++++++++++---------------=
+-
+ target/i386/cpu.c                   |  2 +-
+ target/mips/translate_init.c        |  4 ++--
+ target/openrisc/mmu.c               |  2 +-
+ target/ppc/kvm.c                    |  4 ++--
+ target/ppc/mem_helper.c             |  2 +-
+ target/ppc/translate.c              |  2 +-
+ target/ppc/translate_init.c         |  6 +++---
+ target/s390x/misc_helper.c          |  2 +-
+ target/s390x/mmu_helper.c           |  2 +-
+ tcg/tcg.c                           |  4 ++--
+ tests/ahci-test.c                   |  2 +-
+ tests/fw_cfg-test.c                 |  4 ++--
+ tests/libqos/ahci.c                 |  2 +-
+ tests/libqos/libqos.c               |  2 +-
+ tests/libqos/malloc.c               |  6 +++---
+ tests/pc-cpu-test.c                 |  2 +-
+ tests/qht-bench.c                   |  4 ++--
+ tests/test-hbitmap.c                |  2 +-
+ tests/test-iov.c                    |  5 ++---
+ tests/test-qmp-commands.c           | 14 +++++++-------
+ tests/test-qobject-output-visitor.c |  2 +-
+ ui/console.c                        |  2 +-
+ ui/cursor.c                         |  2 +-
+ ui/input-legacy.c                   |  2 +-
+ ui/vnc-enc-tight.c                  |  4 ++--
+ ui/vnc.c                            |  5 +++--
+ util/acl.c                          |  2 +-
+ util/envlist.c                      |  2 +-
+ util/hbitmap.c                      |  2 +-
+ util/iohandler.c                    |  2 +-
+ util/main-loop.c                    |  2 +-
+ util/qemu-timer.c                   |  2 +-
+ vl.c                                |  2 +-
+ 173 files changed, 324 insertions(+), 332 deletions(-)
+
+--=20
+2.13.0.91.g00982b8dd
