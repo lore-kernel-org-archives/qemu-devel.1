@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44670)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dIeU5-0004qc-S7
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:11:06 -0400
+	(envelope-from <groug@kaod.org>) id 1dIeZj-0000H9-96
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:16:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dIeU1-0004Zu-Qd
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:11:05 -0400
-References: <20170607070732.23312-1-david@gibson.dropbear.id.au>
-	<3de884c3-c386-c024-e401-faa459dbf0b4@redhat.com>
-	<75cc682a-4203-30a5-fab3-22f4e1671532@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <9ef08f1d-33d3-4494-2e91-2456d5764ecf@redhat.com>
-Date: Wed, 7 Jun 2017 19:10:55 +0200
+	(envelope-from <groug@kaod.org>) id 1dIeZf-0000M1-7q
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:16:55 -0400
+Received: from 7.mo178.mail-out.ovh.net ([46.105.58.91]:38231)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dIeZf-0000Iq-1F
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:16:51 -0400
+Received: from player728.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 562B63DCE3
+	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 19:16:47 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Wed, 07 Jun 2017 19:16:36 +0200
+Message-ID: <149685579678.12025.9278446121024037161.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <75cc682a-4203-30a5-fab3-22f4e1671532@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] pseries: Correct panic
- behaviour for pseries machine type
+Subject: [Qemu-devel] [PATCH v3 0/5] spapr/xics: fix migration of older
+ machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,61 +28,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, mdroth@linux.vnet.ibm.com, lvivier@redhat.com
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-On 07.06.2017 16:34, Paolo Bonzini wrote:
-> 
-> 
-> On 07/06/2017 09:33, Thomas Huth wrote:
->> On 07.06.2017 09:07, David Gibson wrote:
->>> The pseries machine type doesn't usually use the 'pvpanic' device as such,
->>> because it has a firmware/hypervisor facility with roughly the same
->>> purpose.  The 'ibm,os-term' RTAS call notifies the hypervisor that the
->>> guest has crashed.
->>>
->>> Our implementation of this call was sending a GUEST_PANICKED qmp event;
->>> however, it was not doing the other usual panic actions, making its
->>> behaviour different from pvpanic for no good reason.
->>>
->>> To correct this, we should call qemu_system_guest_panicked() rather than
->>> directly sending the panic event.
->>>
->>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->>> ---
->>>  hw/ppc/spapr_rtas.c | 7 ++-----
->>>  1 file changed, 2 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
->>> index 707c4d4..94a2799 100644
->>> --- a/hw/ppc/spapr_rtas.c
->>> +++ b/hw/ppc/spapr_rtas.c
->>> @@ -293,12 +293,9 @@ static void rtas_ibm_os_term(PowerPCCPU *cpu,
->>>                              target_ulong args,
->>>                              uint32_t nret, target_ulong rets)
->>>  {
->>> -    target_ulong ret = 0;
->>> +    qemu_system_guest_panicked(NULL);
->>>  
->>> -    qapi_event_send_guest_panicked(GUEST_PANIC_ACTION_PAUSE, false, NULL,
->>> -                                   &error_abort);
->>> -
->>> -    rtas_st(rets, 0, ret);
->>> +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
->>>  }
->>>  
->>>  static void rtas_set_power_level(PowerPCCPU *cpu, sPAPRMachineState *spapr,
->>>
->>
->> If I get that qemu_system_guest_panicked() function right, it will stop
->> the VM, won't it? That contradicts the LoPAPR spec that says that the
->> RTAS call returns if the "ibm,extended-os-term" property is available in
->> the device tree.
-> 
-> It does return... but only after the user starts the guest again with
-> "cont".
+v3: - preparatory cleanup in pnv (patch 1)
+    - rework ICPState realization and vmstate registration (patches 2,3,4)
+    - fix migration using dummy icp/server entries (patch 5)
 
-OK, I guess that's enough to say that the "ibm,extended-os-term"
-property can stay ... so I think the patch is fine as it is right now.
+v2: - some patches from v1 are already merged in ppc-for-2.10
+    - added a new fix to a potential memory leak (patch 1)
+    - consolidate dt_id computation (patch 3)
+    - see individual changelogs for patch 2 and 4
 
- Thomas
+This series is based on:
+
+https://github.com/dgibson/qemu.git ppc-for-2.10
+
+This was lightly tested.
+
+--
+Greg
+
+---
+
+Greg Kurz (5):
+      pnv_core: drop reference on ICPState object during CPU realization
+      xics: add reset() handler to ICPStateClass
+      xics: setup cpu at realize time
+      xics: directly register ICPState objects to vmstate
+      spapr: fix migration of ICPState objects from/to older QEMU
+
+
+ hw/intc/xics.c          |   86 ++++++++++++++++++++++------------------------
+ hw/intc/xics_kvm.c      |   27 +-------------
+ hw/ppc/pnv_core.c       |   15 ++++----
+ hw/ppc/spapr.c          |   88 ++++++++++++++++++++++++++++++++++++++++++++++-
+ hw/ppc/spapr_cpu_core.c |   21 +++++------
+ include/hw/ppc/spapr.h  |    2 +
+ include/hw/ppc/xics.h   |    3 +-
+ 7 files changed, 148 insertions(+), 94 deletions(-)
