@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dIVT6-0003Nt-Vk
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:33:29 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1dIVVh-00047s-9l
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:36:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dIVT3-00008e-Ql
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:33:28 -0400
-References: <20170607070732.23312-1-david@gibson.dropbear.id.au>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <3de884c3-c386-c024-e401-faa459dbf0b4@redhat.com>
-Date: Wed, 7 Jun 2017 09:33:21 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170607070732.23312-1-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] pseries: Correct panic behaviour for
- pseries machine type
+	(envelope-from <a.perevalov@samsung.com>) id 1dIVVe-0000sZ-62
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:36:09 -0400
+Received: from mailout3.w1.samsung.com ([210.118.77.13]:52390)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1dIVVd-0000rq-Qk
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:36:06 -0400
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout3.w1.samsung.com
+	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
+	2014)) with ESMTP id <0OR600FH32G24780@mailout3.w1.samsung.com> for
+	qemu-devel@nongnu.org; Wed, 07 Jun 2017 08:36:02 +0100 (BST)
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Date: Wed, 07 Jun 2017 10:35:20 +0300
+Message-id: <1496820931-27416-1-git-send-email-a.perevalov@samsung.com>
+References: <CGME20170607073601eucas1p1b1897ed7d52d9edfed31971c592c2300@eucas1p1.samsung.com>
+Subject: [Qemu-devel] [[PATCH V7] 00/11] calculate blocktime for postcopy
+ live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,53 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, mdroth@linux.vnet.ibm.com, lvivier@redhat.com
-Cc: pbonzini@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Alexey Perevalov <a.perevalov@samsung.com>, dgilbert@redhat.com, i.maximets@samsung.com, peterx@redhat.com
 
-On 07.06.2017 09:07, David Gibson wrote:
-> The pseries machine type doesn't usually use the 'pvpanic' device as such,
-> because it has a firmware/hypervisor facility with roughly the same
-> purpose.  The 'ibm,os-term' RTAS call notifies the hypervisor that the
-> guest has crashed.
-> 
-> Our implementation of this call was sending a GUEST_PANICKED qmp event;
-> however, it was not doing the other usual panic actions, making its
-> behaviour different from pvpanic for no good reason.
-> 
-> To correct this, we should call qemu_system_guest_panicked() rather than
-> directly sending the panic event.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/ppc/spapr_rtas.c | 7 ++-----
->  1 file changed, 2 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> index 707c4d4..94a2799 100644
-> --- a/hw/ppc/spapr_rtas.c
-> +++ b/hw/ppc/spapr_rtas.c
-> @@ -293,12 +293,9 @@ static void rtas_ibm_os_term(PowerPCCPU *cpu,
->                              target_ulong args,
->                              uint32_t nret, target_ulong rets)
->  {
-> -    target_ulong ret = 0;
-> +    qemu_system_guest_panicked(NULL);
->  
-> -    qapi_event_send_guest_panicked(GUEST_PANIC_ACTION_PAUSE, false, NULL,
-> -                                   &error_abort);
-> -
-> -    rtas_st(rets, 0, ret);
-> +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
->  }
->  
->  static void rtas_set_power_level(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-> 
+This is 7th version
 
-If I get that qemu_system_guest_panicked() function right, it will stop
-the VM, won't it? That contradicts the LoPAPR spec that says that the
-RTAS call returns if the "ibm,extended-os-term" property is available in
-the device tree. And we currently present this property in the device
-tree. So either the guest should not be stopped here, or we've got to
-remove the property from the device tree again.
+(V6 -> V7)
+    1. copied bitmap was placed into RAMBlock as another migration
+related bitmaps.
+    2. Ordering of mark_postcopy_blocktime_end call and ordering
+of checking copied bitmap were changed.
+    3. linewrap style defects
+    4. new patch "postcopy_place_page factoring out"
+    5. postcopy_ram_supported_by_host accepts
+MigrationIncomingState in qmp_migrate_set_capabilities
+    5. minor fixes of documentation. 
+    and huge description of get_postcopy_total_blocktime was
+moved. Davids comment.
 
- Thomas
+This patch set is based on commit
+a0d4aac7467dd02e5657b79e867f067330266a24
+of git://git.qemu-project.org/qemu.git
+
+Alexey Perevalov (11):
+  userfault: add pid into uffd_msg & update UFFD_FEATURE_*
+  migration: pass MigrationIncomingState* into migration check functions
+  migration: fix hardcoded function name in error report
+  migration: split ufd_version_check onto receive/request features part
+  migration: introduce postcopy-blocktime capability
+  migration: add postcopy blocktime ctx into MigrationIncomingState
+  migration: add bitmap for copied page
+  migration: postcopy_place_page factoring out
+  migration: calculate vCPU blocktime on dst side
+  migration: add postcopy total blocktime into query-migrate
+  migration: postcopy_blocktime documentation
+
+ docs/migration.txt                |  10 +
+ hmp.c                             |  15 ++
+ include/exec/ram_addr.h           |   2 +
+ include/migration/migration.h     |  13 ++
+ linux-headers/linux/userfaultfd.h |   4 +
+ migration/migration.c             |  52 +++++-
+ migration/postcopy-ram.c          | 374 ++++++++++++++++++++++++++++++++++++--
+ migration/postcopy-ram.h          |   6 +-
+ migration/ram.c                   |  40 +++-
+ migration/ram.h                   |   4 +
+ migration/savevm.c                |   2 +-
+ migration/trace-events            |   6 +-
+ qapi-schema.json                  |  14 +-
+ 13 files changed, 514 insertions(+), 28 deletions(-)
+
+-- 
+1.9.1
