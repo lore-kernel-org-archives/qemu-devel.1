@@ -1,19 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dIbdw-000818-Dh
+	(envelope-from <berto@igalia.com>) id 1dIbdw-000814-CE
 	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:09:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dIbdr-0002Ya-AG
+	(envelope-from <berto@igalia.com>) id 1dIbdr-0002YM-9T
 	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:09:04 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Wed,  7 Jun 2017 17:08:25 +0300
-Message-Id: <643c9f0a83c8f5c913a55a556dcddd13754d1275.1496844254.git.berto@igalia.com>
-In-Reply-To: <cover.1496844254.git.berto@igalia.com>
-References: <cover.1496844254.git.berto@igalia.com>
-In-Reply-To: <cover.1496844254.git.berto@igalia.com>
-References: <cover.1496844254.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 4/7] qcow2: Split do_perform_cow() into
- _read(), _encrypt() and _write()
+Date: Wed,  7 Jun 2017 17:08:21 +0300
+Message-Id: <cover.1496844254.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH v2 0/7] qcow2: Reduce the number of I/O ops
+ when doing COW
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,211 +21,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-This patch splits do_perform_cow() into three separate functions to
-read, encrypt and write the COW regions.
+Hi all,
 
-perform_cow() can now read both regions first, then encrypt them and
-finally write them to disk. The memory allocation is also done in
-this function now, using one single buffer large enough to hold both
-regions.
+here's a patch series that rewrites the copy-on-write code in the
+qcow2 driver to reduce the number of I/O operations.
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- block/qcow2-cluster.c | 114 +++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 84 insertions(+), 30 deletions(-)
+This is version v2, please refer to the original e-mail for a complete
+description:
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 4c03639a72..af43e6a34f 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -403,34 +403,26 @@ int qcow2_encrypt_sectors(BDRVQcow2State *s, int64_t sector_num,
-     return 0;
- }
- 
--static int coroutine_fn do_perform_cow(BlockDriverState *bs,
--                                       uint64_t src_cluster_offset,
--                                       uint64_t cluster_offset,
--                                       unsigned offset_in_cluster,
--                                       unsigned bytes)
-+static int coroutine_fn do_perform_cow_read(BlockDriverState *bs,
-+                                            uint64_t src_cluster_offset,
-+                                            unsigned offset_in_cluster,
-+                                            uint8_t *buffer,
-+                                            unsigned bytes)
- {
--    BDRVQcow2State *s = bs->opaque;
-     QEMUIOVector qiov;
--    struct iovec iov;
-+    struct iovec iov = { .iov_base = buffer, .iov_len = bytes };
-     int ret;
- 
-     if (bytes == 0) {
-         return 0;
-     }
- 
--    iov.iov_len = bytes;
--    iov.iov_base = qemu_try_blockalign(bs, iov.iov_len);
--    if (iov.iov_base == NULL) {
--        return -ENOMEM;
--    }
--
-     qemu_iovec_init_external(&qiov, &iov, 1);
- 
-     BLKDBG_EVENT(bs->file, BLKDBG_COW_READ);
- 
-     if (!bs->drv) {
--        ret = -ENOMEDIUM;
--        goto out;
-+        return -ENOMEDIUM;
-     }
- 
-     /* Call .bdrv_co_readv() directly instead of using the public block-layer
-@@ -440,39 +432,63 @@ static int coroutine_fn do_perform_cow(BlockDriverState *bs,
-     ret = bs->drv->bdrv_co_preadv(bs, src_cluster_offset + offset_in_cluster,
-                                   bytes, &qiov, 0);
-     if (ret < 0) {
--        goto out;
-+        return ret;
-     }
- 
--    if (bs->encrypted) {
-+    return 0;
-+}
-+
-+static bool coroutine_fn do_perform_cow_encrypt(BlockDriverState *bs,
-+                                                uint64_t src_cluster_offset,
-+                                                unsigned offset_in_cluster,
-+                                                uint8_t *buffer,
-+                                                unsigned bytes)
-+{
-+    if (bytes && bs->encrypted) {
-+        BDRVQcow2State *s = bs->opaque;
-         int64_t sector = (src_cluster_offset + offset_in_cluster)
-                          >> BDRV_SECTOR_BITS;
-         assert(s->cipher);
-         assert((offset_in_cluster & ~BDRV_SECTOR_MASK) == 0);
-         assert((bytes & ~BDRV_SECTOR_MASK) == 0);
--        if (qcow2_encrypt_sectors(s, sector, iov.iov_base, iov.iov_base,
-+        if (qcow2_encrypt_sectors(s, sector, buffer, buffer,
-                                   bytes >> BDRV_SECTOR_BITS, true, NULL) < 0) {
--            ret = -EIO;
--            goto out;
-+            return false;
-         }
-     }
-+    return true;
-+}
-+
-+static int coroutine_fn do_perform_cow_write(BlockDriverState *bs,
-+                                             uint64_t cluster_offset,
-+                                             unsigned offset_in_cluster,
-+                                             uint8_t *buffer,
-+                                             unsigned bytes)
-+{
-+    QEMUIOVector qiov;
-+    struct iovec iov = { .iov_base = buffer, .iov_len = bytes };
-+    int ret;
-+
-+    if (bytes == 0) {
-+        return 0;
-+    }
-+
-+    qemu_iovec_init_external(&qiov, &iov, 1);
- 
-     ret = qcow2_pre_write_overlap_check(bs, 0,
-             cluster_offset + offset_in_cluster, bytes);
-     if (ret < 0) {
--        goto out;
-+        return ret;
-     }
- 
-     BLKDBG_EVENT(bs->file, BLKDBG_COW_WRITE);
-     ret = bdrv_co_pwritev(bs->file, cluster_offset + offset_in_cluster,
-                           bytes, &qiov, 0);
-     if (ret < 0) {
--        goto out;
-+        return ret;
-     }
- 
--    ret = 0;
--out:
--    qemu_vfree(iov.iov_base);
--    return ret;
-+    return 0;
- }
- 
- 
-@@ -760,22 +776,59 @@ static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
-     BDRVQcow2State *s = bs->opaque;
-     Qcow2COWRegion *start = &m->cow_start;
-     Qcow2COWRegion *end = &m->cow_end;
-+    unsigned buffer_size = start->nb_bytes + end->nb_bytes;
-+    uint8_t *start_buffer, *end_buffer;
-     int ret;
- 
-+    assert(start->nb_bytes <= UINT_MAX - end->nb_bytes);
-+
-     if (start->nb_bytes == 0 && end->nb_bytes == 0) {
-         return 0;
-     }
- 
-+    /* Reserve a buffer large enough to store the data from both the
-+     * start and end COW regions */
-+    start_buffer = qemu_try_blockalign(bs, buffer_size);
-+    if (start_buffer == NULL) {
-+        return -ENOMEM;
-+    }
-+    /* The part of the buffer where the end region is located */
-+    end_buffer = start_buffer + start->nb_bytes;
-+
-     qemu_co_mutex_unlock(&s->lock);
--    ret = do_perform_cow(bs, m->offset, m->alloc_offset,
--                         start->offset, start->nb_bytes);
-+    /* First we read the existing data from both COW regions */
-+    ret = do_perform_cow_read(bs, m->offset, start->offset,
-+                              start_buffer, start->nb_bytes);
-     if (ret < 0) {
-         goto fail;
-     }
- 
--    ret = do_perform_cow(bs, m->offset, m->alloc_offset,
--                         end->offset, end->nb_bytes);
-+    ret = do_perform_cow_read(bs, m->offset, end->offset,
-+                              end_buffer, end->nb_bytes);
-+    if (ret < 0) {
-+        goto fail;
-+    }
-+
-+    /* Encrypt the data if necessary before writing it */
-+    if (bs->encrypted) {
-+        if (!do_perform_cow_encrypt(bs, m->offset, start->offset,
-+                                    start_buffer, start->nb_bytes) ||
-+            !do_perform_cow_encrypt(bs, m->offset, end->offset,
-+                                    end_buffer, end->nb_bytes)) {
-+            ret = -EIO;
-+            goto fail;
-+        }
-+    }
-+
-+    /* And now we can write everything */
-+    ret = do_perform_cow_write(bs, m->alloc_offset, start->offset,
-+                               start_buffer, start->nb_bytes);
-+    if (ret < 0) {
-+        goto fail;
-+    }
- 
-+    ret = do_perform_cow_write(bs, m->alloc_offset, end->offset,
-+                               end_buffer, end->nb_bytes);
- fail:
-     qemu_co_mutex_lock(&s->lock);
- 
-@@ -788,6 +841,7 @@ fail:
-         qcow2_cache_depends_on_flush(s->l2_table_cache);
-     }
- 
-+    qemu_vfree(start_buffer);
-     return ret;
- }
- 
+https://lists.gnu.org/archive/html/qemu-block/2017-05/msg00882.html
+
+Regards,
+
+Berto
+
+Changes:
+
+v2:
+- Patch 1: Update commit message [Eric]
+- Patch 7: Make sure that the number of iovs does not exceed IOV_MAX [Anton]
+- Patch 7: Don't add zero-length buffers to the qiov in perform_cow()
+
+v1: https://lists.gnu.org/archive/html/qemu-block/2017-05/msg00882.html
+- Initial version
+
+Output of git-backport-diff against v1:
+
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+
+001/7:[down] 'qcow2: Remove unused Error variable in do_perform_cow()'
+002/7:[----] [--] 'qcow2: Use unsigned int for both members of Qcow2COWRegion'
+003/7:[----] [--] 'qcow2: Make perform_cow() call do_perform_cow() twice'
+004/7:[----] [--] 'qcow2: Split do_perform_cow() into _read(), _encrypt() and _write()'
+005/7:[----] [--] 'qcow2: Allow reading both COW regions with only one request'
+006/7:[----] [--] 'qcow2: Pass a QEMUIOVector to do_perform_cow_{read,write}()'
+007/7:[0014] [FC] 'qcow2: Merge the writing of the COW regions with the guest data'
+
+Alberto Garcia (7):
+  qcow2: Remove unused Error variable in do_perform_cow()
+  qcow2: Use unsigned int for both members of Qcow2COWRegion
+  qcow2: Make perform_cow() call do_perform_cow() twice
+  qcow2: Split do_perform_cow() into _read(), _encrypt() and _write()
+  qcow2: Allow reading both COW regions with only one request
+  qcow2: Pass a QEMUIOVector to do_perform_cow_{read,write}()
+  qcow2: Merge the writing of the COW regions with the guest data
+
+ block/qcow2-cluster.c | 192 +++++++++++++++++++++++++++++++++++++-------------
+ block/qcow2.c         |  64 ++++++++++++++---
+ block/qcow2.h         |  11 ++-
+ 3 files changed, 207 insertions(+), 60 deletions(-)
+
 -- 
 2.11.0
