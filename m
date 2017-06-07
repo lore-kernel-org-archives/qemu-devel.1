@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dIeaE-0000lU-US
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:17:30 -0400
+	(envelope-from <groug@kaod.org>) id 1dIeaO-0000ui-JN
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:17:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dIeaA-0000k5-Tp
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:17:26 -0400
-Received: from 6.mo178.mail-out.ovh.net ([46.105.53.132]:36627)
+	(envelope-from <groug@kaod.org>) id 1dIeaK-0000oh-Fw
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:17:36 -0400
+Received: from 4.mo178.mail-out.ovh.net ([46.105.49.171]:57484)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dIeaA-0000j2-Nl
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:17:22 -0400
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dIeaK-0000o2-5i
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:17:32 -0400
 Received: from player728.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 4241D3DCC5
-	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 19:17:21 +0200 (CEST)
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id C7E123E428
+	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 19:17:29 +0200 (CEST)
 From: Greg Kurz <groug@kaod.org>
-Date: Wed, 07 Jun 2017 19:17:17 +0200
-Message-ID: <149685583778.12025.272004316108066026.stgit@bahia.lan>
+Date: Wed, 07 Jun 2017 19:17:26 +0200
+Message-ID: <149685584629.12025.14875914798241845062.stgit@bahia.lan>
 In-Reply-To: <149685579678.12025.9278446121024037161.stgit@bahia.lan>
 References: <149685579678.12025.9278446121024037161.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v3 4/5] xics: directly register ICPState
- objects to vmstate
+Subject: [Qemu-devel] [PATCH v3 5/5] spapr: fix migration of ICPState
+ objects from/to older QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,46 +33,202 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-The ICPState objects are currently registered to vmstate as qdev objects.
-Their instance ids are hence computed automatically in the migration code,
-and thus depends on the order the CPU cores were plugged.
+Commit 5bc8d26de20c ("spapr: allocate the ICPState object from under
+sPAPRCPUCore") moved ICPState objects from the machine to CPU cores.
+This is an improvement since we no longer allocate ICPState objects
+that will never be used. But it has the side-effect of breaking
+migration of older machine types from older QEMU versions.
 
-If the destination had its CPU cores plugged in a different order than the
-source, then ICPState objects will have different instance_ids and load
-the wrong state.
+This patch allows spapr to register dummy "icp/server" entries to vmstate.
+These entries use a dedicated VMStateDescription that can swallow and
+discard state of an incoming migration stream, and that don't send anything
+on outgoing migration.
 
-Since CPU objects have a reliable cpu_index which is already used as
-instance_id in vmstate, let's use it for ICPState as well.
+As for real ICPState objects, the instance_id is the cpu_index of the
+corresponding vCPU, which happens to be equal to the generated instance_id
+of older machine types.
+
+The machine can unregister/register these entries when CPUs are dynamically
+plugged/unplugged.
+
+This is only available for pseries-2.9 and older machines, thanks to a
+compat property.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/intc/xics.c |    5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+v3: - new logic entirely implemented in hw/ppc/spapr.c
+---
+ hw/ppc/spapr.c         |   88 +++++++++++++++++++++++++++++++++++++++++++++++-
+ include/hw/ppc/spapr.h |    2 +
+ 2 files changed, 88 insertions(+), 2 deletions(-)
 
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index 330441ff7fe8..3d76b43876c5 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -348,10 +348,14 @@ static void icp_realize(DeviceState *dev, Error **errp)
-     }
- 
-     qemu_register_reset(icp_reset, dev);
-+    vmstate_register(NULL, icp->cs->cpu_index, &vmstate_icp_server, icp);
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 9b7ae28939a8..c15b604978f0 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -124,9 +124,52 @@ error:
+     return NULL;
  }
  
- static void icp_unrealize(DeviceState *dev, Error **errp)
- {
-+    ICPState *icp = ICP(dev);
++static bool pre_2_10_vmstate_dummy_icp_needed(void *opaque)
++{
++    return false;
++}
 +
-+    vmstate_unregister(NULL, &vmstate_icp_server, icp);
-     qemu_unregister_reset(icp_reset, dev);
- }
- 
-@@ -359,7 +363,6 @@ static void icp_class_init(ObjectClass *klass, void *data)
++static const VMStateDescription pre_2_10_vmstate_dummy_icp = {
++    .name = "icp/server",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = pre_2_10_vmstate_dummy_icp_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_UNUSED(4), /* uint32_t xirr */
++        VMSTATE_UNUSED(1), /* uint8_t pending_priority */
++        VMSTATE_UNUSED(1), /* uint8_t mfrr */
++        VMSTATE_END_OF_LIST()
++    },
++};
++
++static void pre_2_10_vmstate_register_dummy_icp(sPAPRMachineState *spapr, int i)
++{
++    bool *flag = &spapr->pre_2_10_ignore_icp[i];
++
++    g_assert(!*flag);
++    vmstate_register(NULL, i, &pre_2_10_vmstate_dummy_icp, flag);
++    *flag = true;
++}
++
++static void pre_2_10_vmstate_unregister_dummy_icp(sPAPRMachineState *spapr,
++                                                  int i)
++{
++    bool *flag = &spapr->pre_2_10_ignore_icp[i];
++
++    g_assert(*flag);
++    vmstate_unregister(NULL, &pre_2_10_vmstate_dummy_icp, flag);
++    *flag = false;
++}
++
++static inline int xics_nr_servers(void)
++{
++    return DIV_ROUND_UP(max_cpus * kvmppc_smt_threads(), smp_threads);
++}
++
+ static void xics_system_init(MachineState *machine, int nr_irqs, Error **errp)
  {
-     DeviceClass *dc = DEVICE_CLASS(klass);
+     sPAPRMachineState *spapr = SPAPR_MACHINE(machine);
++    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(machine);
  
--    dc->vmsd = &vmstate_icp_server;
-     dc->realize = icp_realize;
-     dc->unrealize = icp_unrealize;
+     if (kvm_enabled()) {
+         if (machine_kernel_irqchip_allowed(machine) &&
+@@ -148,6 +191,15 @@ static void xics_system_init(MachineState *machine, int nr_irqs, Error **errp)
+             return;
+         }
+     }
++
++    if (smc->pre_2_10_has_unused_icps) {
++        int i;
++
++        spapr->pre_2_10_ignore_icp = g_malloc(xics_nr_servers());
++        for (i = 0; i < xics_nr_servers(); i++) {
++            pre_2_10_vmstate_register_dummy_icp(spapr, i);
++        }
++    }
  }
+ 
+ static int spapr_fixup_cpu_smt_dt(void *fdt, int offset, PowerPCCPU *cpu,
+@@ -976,7 +1028,6 @@ static void *spapr_build_fdt(sPAPRMachineState *spapr,
+     void *fdt;
+     sPAPRPHBState *phb;
+     char *buf;
+-    int smt = kvmppc_smt_threads();
+ 
+     fdt = g_malloc0(FDT_MAX_SIZE);
+     _FDT((fdt_create_empty_tree(fdt, FDT_MAX_SIZE)));
+@@ -1016,7 +1067,7 @@ static void *spapr_build_fdt(sPAPRMachineState *spapr,
+     _FDT(fdt_setprop_cell(fdt, 0, "#size-cells", 2));
+ 
+     /* /interrupt controller */
+-    spapr_dt_xics(DIV_ROUND_UP(max_cpus * smt, smp_threads), fdt, PHANDLE_XICP);
++    spapr_dt_xics(xics_nr_servers(), fdt, PHANDLE_XICP);
+ 
+     ret = spapr_populate_memory(spapr, fdt);
+     if (ret < 0) {
+@@ -2800,9 +2851,24 @@ static void spapr_core_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
+                               Error **errp)
+ {
+     MachineState *ms = MACHINE(qdev_get_machine());
++    sPAPRMachineState *spapr = SPAPR_MACHINE(ms);
+     CPUCore *cc = CPU_CORE(dev);
+     CPUArchId *core_slot = spapr_find_cpu_slot(ms, cc->core_id, NULL);
+ 
++    if (spapr->pre_2_10_ignore_icp) {
++        sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
++        sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(cc));
++        const char *typename = object_class_get_name(scc->cpu_class);
++        size_t size = object_type_get_instance_size(typename);
++        int i;
++
++        for (i = 0; i < cc->nr_threads; i++) {
++            CPUState *cs = CPU(sc->threads + i * size);
++
++            pre_2_10_vmstate_register_dummy_icp(spapr, cs->cpu_index);
++        }
++    }
++
+     assert(core_slot);
+     core_slot->cpu = NULL;
+     object_unparent(OBJECT(dev));
+@@ -2912,6 +2978,21 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+         }
+     }
+     core_slot->cpu = OBJECT(dev);
++
++    if (spapr->pre_2_10_ignore_icp) {
++        sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(cc));
++        const char *typename = object_class_get_name(scc->cpu_class);
++        size_t size = object_type_get_instance_size(typename);
++        int i;
++
++        for (i = 0; i < cc->nr_threads; i++) {
++            sPAPRCPUCore *sc = SPAPR_CPU_CORE(dev);
++            void *obj = sc->threads + i * size;
++
++            cs = CPU(obj);
++            pre_2_10_vmstate_unregister_dummy_icp(spapr, cs->cpu_index);
++        }
++    }
+ }
+ 
+ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+@@ -3361,9 +3442,12 @@ static void spapr_machine_2_9_instance_options(MachineState *machine)
+ 
+ static void spapr_machine_2_9_class_options(MachineClass *mc)
+ {
++    sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
++
+     spapr_machine_2_10_class_options(mc);
+     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_9);
+     mc->numa_auto_assign_ram = numa_legacy_auto_assign_ram;
++    smc->pre_2_10_has_unused_icps = true;
+ }
+ 
+ DEFINE_SPAPR_MACHINE(2_9, "2.9", false);
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index f973b0284596..64382623199d 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -53,6 +53,7 @@ struct sPAPRMachineClass {
+     bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug of LMBs */
+     bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
+     const char *tcg_default_cpu; /* which (TCG) CPU to simulate by default */
++    bool pre_2_10_has_unused_icps;
+     void (*phb_placement)(sPAPRMachineState *spapr, uint32_t index,
+                           uint64_t *buid, hwaddr *pio, 
+                           hwaddr *mmio32, hwaddr *mmio64,
+@@ -90,6 +91,7 @@ struct sPAPRMachineState {
+     sPAPROptionVector *ov5_cas;     /* negotiated (via CAS) option vectors */
+     bool cas_reboot;
+     bool cas_legacy_guest_workaround;
++    bool *pre_2_10_ignore_icp;
+ 
+     Notifier epow_notifier;
+     QTAILQ_HEAD(, sPAPREventLogEntry) pending_events;
