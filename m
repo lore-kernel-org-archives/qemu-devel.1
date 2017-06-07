@@ -1,45 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dIebu-0002vB-KW
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:19:11 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dIecQ-0003GV-IQ
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:19:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dIebq-0001Xk-Gn
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:19:10 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47018)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dIebq-0001Wa-6o
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:19:06 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v57HDcPt098855
-	for <qemu-devel@nongnu.org>; Wed, 7 Jun 2017 13:19:04 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2axnhc8mnr-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 13:19:04 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Wed, 7 Jun 2017 18:19:02 +0100
-References: <20170606165510.33057-1-pasic@linux.vnet.ibm.com>
-	<20170606165510.33057-3-pasic@linux.vnet.ibm.com>
-	<20170607110758.GC2099@work-vm>
-	<c6466750-6d71-988c-6c81-9c54f5ca995a@linux.vnet.ibm.com>
-	<20170607120138.GD2384@work-vm>
-	<1fb16203-3857-d0aa-498e-4acca6a28a41@linux.vnet.ibm.com>
-	<20170607171021.GK2099@work-vm>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Wed, 7 Jun 2017 19:18:58 +0200
+	(envelope-from <mreitz@redhat.com>) id 1dIecP-0001op-Aa
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:19:42 -0400
+References: <20170601172734.9039-1-berrange@redhat.com>
+	<20170601172734.9039-14-berrange@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <a2a698c4-9169-100c-e2a7-eeb324d70818@redhat.com>
+Date: Wed, 7 Jun 2017 19:19:28 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170607171021.GK2099@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <a918bec2-971e-c51f-9909-f4b7149ad98e@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 2/3] vmstate: error hint for failed
- equal checks part 2
+In-Reply-To: <20170601172734.9039-14-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="jpcwfGajOp1qSd4ugBDP8velittVEwkNm"
+Subject: Re: [Qemu-devel] [PATCH v8 13/20] qcow2: add support for LUKS
+ encryption format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,97 +25,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--jpcwfGajOp1qSd4ugBDP8velittVEwkNm
+From: Max Reitz <mreitz@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
+Message-ID: <a2a698c4-9169-100c-e2a7-eeb324d70818@redhat.com>
+Subject: Re: [PATCH v8 13/20] qcow2: add support for LUKS encryption format
+References: <20170601172734.9039-1-berrange@redhat.com>
+ <20170601172734.9039-14-berrange@redhat.com>
+In-Reply-To: <20170601172734.9039-14-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2017-06-01 19:27, Daniel P. Berrange wrote:
+> This adds support for using LUKS as an encryption format
+> with the qcow2 file, using the new encrypt.format parameter
+> to request "luks" format. e.g.
+>=20
+>   # qemu-img create --object secret,data=3D123456,id=3Dsec0 \
+>        -f qcow2 -o encrypt.format=3Dluks,encrypt.key-secret=3Dsec0 \
+>        test.qcow2 10G
+>=20
+> The legacy "encryption=3Don" parameter still results in
+> creation of the old qcow2 AES format (and is equivalent
+> to the new 'encryption-format=3Daes'). e.g. the following are
+> equivalent:
+>=20
+>   # qemu-img create --object secret,data=3D123456,id=3Dsec0 \
+>        -f qcow2 -o encryption=3Don,encrypt.key-secret=3Dsec0 \
+>        test.qcow2 10G
+>=20
+>  # qemu-img create --object secret,data=3D123456,id=3Dsec0 \
+>        -f qcow2 -o encryption-format=3Daes,encrypt.key-secret=3Dsec0 \
+>        test.qcow2 10G
+>=20
+> With the LUKS format it is necessary to store the LUKS
+> partition header and key material in the QCow2 file. This
+> data can be many MB in size, so cannot go into the QCow2
+> header region directly. Thus the spec defines a FDE
+> (Full Disk Encryption) header extension that specifies
+> the offset of a set of clusters to hold the FDE headers,
+> as well as the length of that region. The LUKS header is
+> thus stored in these extra allocated clusters before the
+> main image payload.
+>=20
+> Aside from all the cryptographic differences implied by
+> use of the LUKS format, there is one further key difference
+> between the use of legacy AES and LUKS encryption in qcow2.
+> For LUKS, the initialiazation vectors are generated using
+> the host physical sector as the input, rather than the
+> guest virtual sector. This guarantees unique initialization
+> vectors for all sectors when qcow2 internal snapshots are
+> used, thus giving stronger protection against watermarking
+> attacks.
+>=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  block/qcow2-cluster.c      |   4 +-
+>  block/qcow2-refcount.c     |  10 ++
+>  block/qcow2.c              | 267 +++++++++++++++++++++++++++++++++++++=
++------
+>  block/qcow2.h              |   9 ++
+>  qapi/block-core.json       |   5 +-
+>  tests/qemu-iotests/082.out | 270 ++++++++++++++++++++++++++++++++++++-=
+--------
+>  6 files changed, 477 insertions(+), 88 deletions(-)
+
+[...]
+
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 38c0420..30d0343 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+
+[...]
+
+> @@ -2072,22 +2253,30 @@ static int qcow2_set_up_encryption(BlockDriverS=
+tate *bs, const char *encryptfmt,
+>      qdict_extract_subqdict(options, &encryptopts, "encrypt.");
+>      QDECREF(options);
+> =20
+> -    if (!g_str_equal(encryptfmt, "aes")) {
+> -        error_setg(errp, "Unknown encryption format '%s', expected 'ae=
+s'",
+> -                   encryptfmt);
+> -        ret =3D -EINVAL;
+> -        goto out;
+> +    int fmt =3D qcow2_crypt_method_from_format(encryptfmt);
+
+Because I love nit picking: Variable declarations should be at the start
+of the surrounding block.
+
+Max
+
+> +
+> +    switch (fmt) {
+> +    case QCOW_CRYPT_LUKS:
+> +        cryptoopts =3D block_crypto_create_opts_init(
+> +            Q_CRYPTO_BLOCK_FORMAT_LUKS, encryptopts, errp);
+> +        break;
+> +    case QCOW_CRYPT_AES:
+> +        cryptoopts =3D block_crypto_create_opts_init(
+> +            Q_CRYPTO_BLOCK_FORMAT_QCOW, encryptopts, errp);
+> +        break;
+> +    default:
+> +        error_setg(errp, "Unknown encryption format '%s'", encryptfmt)=
+;
+> +        break;
+>      }
+> -    cryptoopts =3D block_crypto_create_opts_init(
+> -        Q_CRYPTO_BLOCK_FORMAT_QCOW, encryptopts, errp);
+>      if (!cryptoopts) {
+>          ret =3D -EINVAL;
+>          goto out;
+>      }
+> -    s->crypt_method_header =3D QCOW_CRYPT_AES;
+> +    s->crypt_method_header =3D fmt;
+> =20
+>      crypto =3D qcrypto_block_create(cryptoopts,
+> -                                  NULL, NULL,
+> +                                  qcow2_crypto_hdr_init_func,
+> +                                  qcow2_crypto_hdr_write_func,
+>                                    bs, errp);
+>      if (!crypto) {
+>          ret =3D -EINVAL;
 
 
+--jpcwfGajOp1qSd4ugBDP8velittVEwkNm
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 06/07/2017 07:10 PM, Dr. David Alan Gilbert wrote:
-> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
->>
->>
->> On 06/07/2017 02:01 PM, Dr. David Alan Gilbert wrote:
->>> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
->>>>
->>>>
->>>> On 06/07/2017 01:07 PM, Dr. David Alan Gilbert wrote:
->>>>> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
->>>>>> Verbose error reporting for the _EQUAL family. Modify the standard _EQUAL
->>>>>> so the hint states the assertion probably failed due to a bug. Introduce
->>>>>> _EQUAL_HINT for specifying a context specific hint.
->>>>>>
->>>>>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->>>>>
->>>>> I'd prefer not to print 'Bug!?' by default - they already get the
->>>>> message telling them something didn't match and the migration fails.
->>>>> There are none-bug ways of this happening, e.g. a user starting a VM on
->>>>> the source and destination with different configs.
->>>>
->>>> I admit, my objective with 'Bug!?' was to provoke. My train of thought is
->>>> to encourage the programmer to think about and document the circumstances
->>>> under which such an assertion is supposed to fail (and against which it
->>>> is supposed to guard).
->>>>
->>>> I do not know how skillful are our users but a 4 != 5 then maybe a name
->>>> of a vmstate field is probably quite scary and not very revealing. I doubt
->>>> a non qemu developer can use it for something else that reporting a bug.
->>>>
->>>> Consequently if there are non-bug ways one can use the hint and state them.
->>>> Your example with the misconfigured target, by the way, is IMHO also be due
->>>> to a bug of the management software IMHO.
->>>>
->>>> To sum it up: IMHO the message provided by a failing _EQUAL is to ugly
->>>> and Qemuspeak to be presented to an user-user in non-bug cases. Agree?
->>>> Disagree?
->>>
->>> Disagree.
->>>
->>> I don't mind giving field names etc; they make it easy for us as
->>> developers to track down what's happening, but also sometimes they help
->>> endusers work around a prolem or see where the problem is; of course
->>> that varies depending on the field name, but some of our names are
->>> reasonable (e.g. there's a VMSTATE_INT32_EQUAL on 'queue_size' in
->>> vmmouse.c).  They're also pretty good if two end users hit the same
->>> problem they can see the same error message in a bug report.
->>>
->>> We often have customer-facing support people look at logs before they
->>> get as far as us developers; if we have bugs that are 
->>> 'if it's a failing BLAH device complaining about the BAR field'
->>> then this fixes it, then that helps them find workarounds/fixes quickly
->>> even if they don't understand what the BAR field is.
->>>
->>
->> You seem to forget, that I'm not proposing omitting this information,
->> but extending it with something civilized so one can distinguish between
->> an assert failed should have never happened situation an a as good as
->> reasonable error handling for an expected error scenario. IMHO the current
->> EQUAL looks more like the former (assert) and less like the later (error
->> reporting for an expected error scenario). Agree? Dissagree?
-> 
-> Yes, the current EQUAL is very terse; but we can't actually tell from
-> the use which case it is; it'll all work nicely when people actually add
-> the correct hint text in useful locations.
-> 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-You are right.
+iQEvBAEBCAAZBQJZODWgEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQJNn
+B/4m7593HOSmcY+hqT9FzD3sW5z5LBckEJa07jP51NWT3pLYJKXQW+rdkZ8XtORg
+Y/v4mutIgJYRDSUccJidGRb7XgFV3je5nKBbJrMPC2kJdj22awH/N5WZ+SuquXKp
+PFFXa8eeputDgRkBUYB+EvG51aqcPEo5QAvXO+C8Upv4lBZ8PE+MuzQcTKGE5ZVE
+6s+/GBkpgCkWIHhVYLxmpFBT+iIF2KD4zv7kExGMz4JpJulwScHblCT9eQI92YU9
+55UCFEyCqLm1dpp49M0o5N2AgFPgHREfPK5jlYO2FPbG0eoZbMgI8SyBJEBJDSqi
+2KPVUoeNZ3JO7LqdC9eJKp4U
+=shyV
+-----END PGP SIGNATURE-----
 
-Since Juan also requested the adding an extra param to the original
-macros variant I will go with that.
-
-I shied away form it in the first place because I did not want to
-bother the users of the macros without clarifying with the migration
-gurus how the new interface should look like.
-
-Thanks a lot!
-
-Regards,
-Halil
-
->> Having a field name is great! That's beyond discussion.
->>
->> I see, my 'sum it up' above was a bit unfortunate: it sounds like I'm
->> against the inclusion of technical info and not against a lack of non
->> technical info. Sorry for that!
-> 
-> No, that's fine.
-> 
+--jpcwfGajOp1qSd4ugBDP8velittVEwkNm--
