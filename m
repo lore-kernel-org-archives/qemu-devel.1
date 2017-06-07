@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50884)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dIVFU-0006j9-R8
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:19:25 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dIVKv-0000Un-W9
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:25:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dIVFR-0003K9-Mt
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:19:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35388)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dIVFR-0003Ji-H2
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:19:21 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <2b2311b1b070a0b03973e39deccf4682de4a6cd4.1496686997.git.alistair.francis@xilinx.com>
-	<CAJ+F1CLuPkWjG3Hn8hfaxTApn6+ouqh5nJZNWSQYX1C3_HRFqA@mail.gmail.com>
-	<e340cdb9-3c97-8624-81d9-f7888f819a68@amsat.org>
-	<CAKmqyKOOhu7iKuW4naNi0+7cwayLaftkPf=gS7uBakMvKavxVQ@mail.gmail.com>
-	<270686d0-1ca8-965f-a14a-397f45616deb@redhat.com>
-Date: Wed, 07 Jun 2017 09:19:16 +0200
-In-Reply-To: <270686d0-1ca8-965f-a14a-397f45616deb@redhat.com> (Paolo
-	Bonzini's message of "Wed, 7 Jun 2017 00:14:37 +0200")
-Message-ID: <87shjc2rkb.fsf@dusky.pond.sub.org>
+	(envelope-from <pbonzini@redhat.com>) id 1dIVKs-0005Zd-QE
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:25:01 -0400
+Date: Wed, 7 Jun 2017 03:24:56 -0400 (EDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1799129848.6598516.1496820296394.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20170607070732.23312-1-david@gibson.dropbear.id.au>
+References: <20170607070732.23312-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] char-socket: Don't report TCP
- socket waiting as an error
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] pseries: Correct panic behaviour for
+ pseries machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +23,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Philippe =?utf-8?Q?Ma?= =?utf-8?Q?thieu-Daud=C3=A9?= <f4bug@amsat.org>, =?utf-8?Q?Marc-Andr?= =?utf-8?Q?=C3=A9?= Lureau <marcandre.lureau@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: mdroth@linux.vnet.ibm.com, thuth@redhat.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
 
-> On 06/06/2017 18:30, Alistair Francis wrote:
->>>
->>> This is somehow confusing. I don't think it is worth having another
->>> qemu_log_stderr() function rather than using error_report() but this very
->>> call might deserve a comment explaining this unusual use. What do you think?
->> 
->> The problem with stderr is that this isn't an error. Some uses of QEMU
->> (inside Eclipse for example) flag everything printed on stderr as red
->> which confuses users that they are seeing an error when they really
->> aren't.
->
-> But they are wrong.
 
-Concur.  We also print warnings and informational messages to stderr.
+----- Original Message -----
+> From: "David Gibson" <david@gibson.dropbear.id.au>
+> To: mdroth@linux.vnet.ibm.com, thuth@redhat.com, lvivier@redhat.com
+> Cc: pbonzini@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, "David Gibson" <david@gibson.dropbear.id.au>
+> Sent: Wednesday, June 7, 2017 9:07:32 AM
+> Subject: [PATCH] pseries: Correct panic behaviour for pseries machine type
+> 
+> The pseries machine type doesn't usually use the 'pvpanic' device as such,
+> because it has a firmware/hypervisor facility with roughly the same
+> purpose.  The 'ibm,os-term' RTAS call notifies the hypervisor that the
+> guest has crashed.
+> 
+> Our implementation of this call was sending a GUEST_PANICKED qmp event;
+> however, it was not doing the other usual panic actions, making its
+> behaviour different from pvpanic for no good reason.
+> 
+> To correct this, we should call qemu_system_guest_panicked() rather than
+> directly sending the panic event.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/ppc/spapr_rtas.c | 7 ++-----
+>  1 file changed, 2 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+> index 707c4d4..94a2799 100644
+> --- a/hw/ppc/spapr_rtas.c
+> +++ b/hw/ppc/spapr_rtas.c
+> @@ -293,12 +293,9 @@ static void rtas_ibm_os_term(PowerPCCPU *cpu,
+>                              target_ulong args,
+>                              uint32_t nret, target_ulong rets)
+>  {
+> -    target_ulong ret = 0;
+> +    qemu_system_guest_panicked(NULL);
+>  
+> -    qapi_event_send_guest_panicked(GUEST_PANIC_ACTION_PAUSE, false, NULL,
+> -                                   &error_abort);
+> -
+> -    rtas_st(rets, 0, ret);
+> +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>  }
 
-We should make errors easy to recognize.  Fortunately, error_report()
-prints errors to stderr in a rigid format.  Unfortunately, error
-messages bypassing error_report() still exist in places.  We suck.
+It's possible to "cont" a panicked guest, so I think you should keep
+the rtas_st.
 
-The format is
-
-    timestamp-if-enabled progname ':' location message
-
-timestamp-if-enabled is normally empty.  With -msg timestamp=on, it's
-the current time in ISO 8601 format, followed by a space.
-
-progname is the program name (main()'s argv[0]).
-
-location is either empty, or a reference to the command line or a
-configuration file.
-
-See error_vreport() for details.
-
-[...]
+Paolo
