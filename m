@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dIWeB-0003dh-Eg
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 04:49:00 -0400
+	(envelope-from <bounces@canonical.com>) id 1dIWfH-0004Bd-SB
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 04:50:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dIWe7-0005ZK-G0
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 04:48:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53228)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dIWe7-0005Yz-A7
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 04:48:55 -0400
-References: <1496736776-19852-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <1d4d9454-2005-ff6c-d3b2-88b3b9cb593a@redhat.com>
-Date: Wed, 7 Jun 2017 16:48:42 +0800
+	(envelope-from <bounces@canonical.com>) id 1dIWfD-0005rM-UH
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 04:50:07 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57655)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dIWfD-0005qt-Nt
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 04:50:03 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dIWfC-0005sG-DH
+	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 08:50:02 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 637FB2E8194
+	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 08:50:02 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1496736776-19852-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V3 0/3] COLO-compare: Make COLO-compare
- support remote COLO-frame
+Date: Wed, 07 Jun 2017 08:40:07 -0000
+From: Thomas Huth <779151@bugs.launchpad.net>
+Reply-To: Bug 779151 <779151@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20110507181103.8677.35692.malonedeb@chaenomeles.canonical.com>
+Message-Id: <149682480849.8502.11749060289000457278.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 779151] Re: qemu-nbd crash during using with
+ chroot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +37,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>
+To: qemu-devel@nongnu.org
 
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
+-- =
 
-On 2017=E5=B9=B406=E6=9C=8806=E6=97=A5 16:12, Zhang Chen wrote:
-> This series focus on COLO-proxy remote colo-frame support.
-> Xen COLO-frame is the first user. We add a new chardev socket
-> in colo-compare as the way of communicate with remote COLO-frame.
-> And remote COLO-frame notify colo-proxy part depend on this serise:
-> https://lists.nongnu.org/archive/html/qemu-devel/2017-04/msg03904.html
->
-> I will send another part of this series after depend patchset have
-> been merged.
->
-> V3:
->   - Fix codestyle.
->
-> V2:
->   - Rename this series.
->   - Change communication way to remote colo-frame.
->   - Some bugfix.
->   - Split the main function, anther part wait depend patchset.
->
->
-> Zhang Chen (3):
->    COLO-compare: Add new parameter for communicate with remote colo-fra=
-me
->    COLO-compare: Add remote checkpoint notify chardev socket handler
->      frame
->    COLO-compare: Add remote initialization and checkpoint notification
->
->   net/colo-compare.c | 91 +++++++++++++++++++++++++++++++++++++++++++++=
-+++++++--
->   qemu-options.hx    | 41 ++++++++++++++++++++----
->   2 files changed, 124 insertions(+), 8 deletions(-)
->
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/779151
 
-Thanks for the series.
+Title:
+  qemu-nbd crash during using with chroot
 
-To speed up things, I would like to see IOThread conversion first. Then=20
-we can have this on top.
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  I use qemu-nbd to mount my image. And after some times, qemu-nbd
+  crashes and so the chroot freeze.
+
+  ps aux | grep qemu :
+  root      2223  0.0  0.0   9776   548 ?        Ss   18:03   0:00 qemu-nbd=
+ --connect=3D/dev/nbd0 /chroots/test/virtual.img
+  root      2224  0.0  0.0  10800   544 ?        D    18:03   0:00 qemu-nbd=
+ --connect=3D/dev/nbd0 /chroots/test/virtual.img
+  root      2227  0.0  0.0      0     0 ?        Z    18:03   0:00 [qemu-nb=
+d] <defunct>
+  root      2357  0.0  0.0   5212   768 pts/0    D+   18:07   0:00 grep qemu
+
+  mount :
+  /dev/nbd0p1 on /chroots/test/amd64 type ext3 (rw,errors=3Dremount-ro,comm=
+it=3D0)
+  /dev on /chroots/test/amd64/dev type devtmpfs (rw,mode=3D0755)
+  /dev/pts on /chroots/test/amd64/dev/pts type devpts (rw,noexec,nosuid,gid=
+=3D5,mode=3D0620)
+  /proc on /chroots/test/amd64/proc type proc (rw)
+  /sys on /chroots/test/amd64/sys type sysfs (rw,noexec,nosuid,nodev)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/779151/+subscriptions
