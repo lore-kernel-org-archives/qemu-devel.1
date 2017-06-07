@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dIeHZ-0001lc-NS
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:58:10 -0400
+	(envelope-from <bobby.prani@gmail.com>) id 1dIeJa-0004AF-HV
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:00:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dIeHU-0007XO-R3
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:58:09 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:36301)
+	(envelope-from <bobby.prani@gmail.com>) id 1dIeJV-00008W-Fp
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:00:14 -0400
+Received: from mail-yw0-x244.google.com ([2607:f8b0:4002:c05::244]:34038)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dIeHU-0007X2-KJ
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:58:04 -0400
-Received: by mail-wr0-x243.google.com with SMTP id e23so1703709wre.3
-	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 09:58:04 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <1495229390-18909-1-git-send-email-felipe@nutanix.com>
-	<871sqvepc0.fsf@secure.mitica>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c1d52506-50c3-6a67-5f74-b06ee0b016a2@redhat.com>
-Date: Wed, 7 Jun 2017 18:58:01 +0200
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1dIeJV-00007H-BM
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:00:09 -0400
+Received: by mail-yw0-x244.google.com with SMTP id w143so898671yww.1
+	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 10:00:09 -0700 (PDT)
+From: Pranith Kumar <bobby.prani@gmail.com>
+Date: Wed,  7 Jun 2017 13:00:06 -0400
+Message-Id: <20170607170006.9203-1-bobby.prani@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <871sqvepc0.fsf@secure.mitica>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] cpus: reset throttle_thread_scheduled
- after sleep
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] Revert "exec.c: Fix breakpoint invalidation
+ race"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,33 +28,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com, Felipe Franciosi <felipe@nutanix.com>
-Cc: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Malcolm Crossley <malcolm@nutanix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "open list:Overall" <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
+Now that we have proper locking after MTTCG patches have landed, we
+can revert the commit.  This reverts commit
 
+a9353fe897ca2687e5b3385ed39e3db3927a90e0.
 
-On 07/06/2017 18:26, Juan Quintela wrote:
-> Felipe Franciosi <felipe@nutanix.com> wrote:
->> Currently, the throttle_thread_scheduled flag is reset back to 0 before
->> sleeping (as part of the throttling logic). Given that throttle_timer
->> (well, any timer) may tick with a slight delay, it so happens that under
->> heavy throttling (ie. close or on CPU_THROTTLE_PCT_MAX) the tick may
->> schedule a further cpu_throttle_thread() work item after the flag reset,
->> but before the previous sleep completed. This results on the vCPU thread
->> sleeping continuously for potentially several seconds in a row.
->>
->> The chances of that happening can be drastically minimised by resetting
->> the flag after the sleep.
->>
->> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
->> Signed-off-by: Malcolm Crossley <malcolm@nutanix.com>
-> 
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
-> 
-> Paolo, I think that the analisys makes sense.
-> 
-> Should you pull this patch, or do you want me to pull it?
+CC: Peter Maydell <peter.maydell@linaro.org>
+CC: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+---
+ exec.c | 25 +++++++++++++++++++------
+ 1 file changed, 19 insertions(+), 6 deletions(-)
 
-I've already included in my jinxed (now at v6) pull request.
-
-Paolo
+diff --git a/exec.c b/exec.c
+index eac6085760..ce7a3412bf 100644
+--- a/exec.c
++++ b/exec.c
+@@ -731,15 +731,28 @@ void cpu_exec_realizefn(CPUState *cpu, Error **errp)
+ #endif
+ }
+ 
++#if defined(CONFIG_USER_ONLY)
+ static void breakpoint_invalidate(CPUState *cpu, target_ulong pc)
+ {
+-    /* Flush the whole TB as this will not have race conditions
+-     * even if we don't have proper locking yet.
+-     * Ideally we would just invalidate the TBs for the
+-     * specified PC.
+-     */
+-    tb_flush(cpu);
++    mmap_lock();
++    tb_lock();
++    tb_invalidate_phys_page_range(pc, pc + 1, 0);
++    tb_unlock();
++    mmap_unlock();
+ }
++#else
++static void breakpoint_invalidate(CPUState *cpu, target_ulong pc)
++{
++    MemTxAttrs attrs;
++    hwaddr phys = cpu_get_phys_page_attrs_debug(cpu, pc, &attrs);
++    int asidx = cpu_asidx_from_attrs(cpu, attrs);
++    if (phys != -1) {
++        /* Locks grabbed by tb_invalidate_phys_addr */
++        tb_invalidate_phys_addr(cpu->cpu_ases[asidx].as,
++                                phys | (pc & ~TARGET_PAGE_MASK));
++    }
++}
++#endif
+ 
+ #if defined(CONFIG_USER_ONLY)
+ void cpu_watchpoint_remove_all(CPUState *cpu, int mask)
+-- 
+2.11.0
