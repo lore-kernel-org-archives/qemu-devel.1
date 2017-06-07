@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48947)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dIail-0005YF-Nh
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 09:10:00 -0400
+	(envelope-from <quintela@redhat.com>) id 1dIakK-0006tV-Tt
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 09:11:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dIaii-0006El-Gd
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 09:09:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45394)
+	(envelope-from <quintela@redhat.com>) id 1dIakH-000124-Ld
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 09:11:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36904)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dIaii-0006DE-8L
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 09:09:56 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170531135709.345-1-marcandre.lureau@redhat.com>
-	<20170531135709.345-6-marcandre.lureau@redhat.com>
-	<878tlct0o3.fsf@dusky.pond.sub.org>
-	<CAFEAcA8C2yfwJHyf63pWc5Sxbb+sbTeTpDJG6H4VYARwX=Yxcw@mail.gmail.com>
-Date: Wed, 07 Jun 2017 15:09:51 +0200
-In-Reply-To: <CAFEAcA8C2yfwJHyf63pWc5Sxbb+sbTeTpDJG6H4VYARwX=Yxcw@mail.gmail.com>
-	(Peter Maydell's message of "Wed, 7 Jun 2017 13:31:06 +0100")
-Message-ID: <87fufct04g.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dIakH-00010m-Bs
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 09:11:33 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <1496828798-27548-10-git-send-email-a.perevalov@samsung.com>
+	(Alexey Perevalov's message of "Wed, 07 Jun 2017 12:46:36 +0300")
+References: <1496828798-27548-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170607094730eucas1p29b692c0f813d5368d70d999ca8a1f186@eucas1p2.samsung.com>
+	<1496828798-27548-10-git-send-email-a.perevalov@samsung.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 07 Jun 2017 15:11:26 +0200
+Message-ID: <87d1ageydd.fsf@secure.mitica>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 05/45] qdev: remove PropertyInfo.qtype
- field
+Subject: Re: [Qemu-devel] [PATCH v8 09/11] migration: calculate vCPU
+ blocktime on dst side
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,87 +30,236 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, peterx@redhat.com, dgilbert@redhat.com
 
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> On 1 June 2017 at 12:19, Markus Armbruster <armbru@redhat.com> wrote:
->> Lovely cleanup.
->>
->> The interesting part is the move of the bits controlling use of ->defval
->> from Property member .qtype (set only by DEFINE_PROP_foo() macros) to
->> its PropertyInfo method .info->set_default_value().  No functional
->> change if (1) we preserve existing use of ->defval and (2) we don't add
->> new uses of ->defval, or at least not uses that matter.
->>
->> Direction (1) is obvious for DEFINE_PROP_BIT(), DEFINE_PROP_BIT64(),
->> DEFINE_PROP_BOOL().  They set .info to &qdev_prop_bit, &qdev_prop_bit64,
->> &qdev_prop_bool, respectively.  These all get .set_default_value =
->> set_default_value_bool, which preserves the effect of .qtype =
->> QTYPE_BOOL.  Good.
->>
->> DEFINE_PROP_DEFAULT() sets .info to point to its argument _prop.  The
->> following arguments occur:
->>
->> * In include/hw/qdev-properties.h: qdev_prop_uint8, qdev_prop_uint16,
->>   qdev_prop_uint32, qdev_prop_int32, qdev_prop_uint64, qdev_prop_size,
->>   qdev_prop_pci_devfn, qdev_prop_on_off_auto, qdev_prop_losttickpolicy,
->>   qdev_prop_blockdev_on_error, qdev_prop_bios_chs_trans,
->>   qdev_prop_blocksize
->>
->> * In hw/block/fdc.c: qdev_prop_fdc_drive_type
->>
->> * In hw/net/e1000e.c: local copies of qdev_prop_uint8, qdev_prop_uint16.
->>
->> To preserve the effect of .qtype = QTYPE_QINT, these PropertyInfo need
->> .set_default_value = set_default_value_int or .set_default_value =
->> set_default_value_enum, depending on .enum_table.  They get it.  Good.
->>
->> DEFINE_PROP_ARRAY() sets .info to &qdev_prop_arraylen.  Needs and gets
->> .set_default_value = set_default_value_int.  Good.
->>
->> DEFINE_PROP_ARRAY() also takes a PropertyInfo argument, but it's not
->> relevant here, as the .qtype you remove doesn't apply to it.  I'm
->> mentioning this, because it confused me briefly.
->>
->> Direction (2) isn't as visible in the patch.  For each PropertyInfo you
->> change, we need to find and check stores into .info not wrapped in the
->> DEFINE_PROP_foo() macros you change.
->>
->> I can't find any.  Good.
+Alexey Perevalov <a.perevalov@samsung.com> wrote:
+> This patch provides blocktime calculation per vCPU,
+> as a summary and as a overlapped value for all vCPUs.
 >
-> I think this is going to break a patch I was halfway through
-> writing :-(
+> This approach was suggested by Peter Xu, as an improvements of
+> previous approch where QEMU kept tree with faulted page address and cpus bitmask
+> in it. Now QEMU is keeping array with faulted page address as value and vCPU
+> as index. It helps to find proper vCPU at UFFD_COPY time. Also it keeps
+> list for blocktime per vCPU (could be traced with page_fault_addr)
 >
-> What I want is "DEFINE_PROP_UINT32, but don't set the default value"
-> (because the default value in this case (a) isn't constant and
-> (b) is already in the struct field that the property modifies).
-> My plan for doing this was:
->  static Property arm_cpu_pmsav7_dregion_property =
->     DEFINE_PROP("pmsav7-dregion", ARMCPU, pmsav7_dregion,
->                 qdev_prop_uint32, uint32_t);
+> Blocktime will not calculated if postcopy_blocktime field of
+> MigrationIncomingState wasn't initialized.
 >
-> This won't work any more if qdev_property_add_static
-> assumes that "qdev_prop_uint32" implies "always set the default value".
+> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> ---
+>  migration/postcopy-ram.c | 139 ++++++++++++++++++++++++++++++++++++++++++++++-
+>  migration/trace-events   |   5 +-
+>  2 files changed, 142 insertions(+), 2 deletions(-)
+>
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index 62a272a..0ad9f9f 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -27,6 +27,7 @@
+>  #include "ram.h"
+>  #include "sysemu/sysemu.h"
+>  #include "sysemu/balloon.h"
+> +#include <sys/param.h>
+>  #include "qemu/error-report.h"
+>  #include "trace.h"
+>  
+> @@ -561,6 +562,133 @@ static int ram_block_enable_notify(const char *block_name, void *host_addr,
+>      return 0;
+>  }
+>  
+> +static int get_mem_fault_cpu_index(uint32_t pid)
+> +{
+> +    CPUState *cpu_iter;
+> +
+> +    CPU_FOREACH(cpu_iter) {
+> +        if (cpu_iter->thread_id == pid) {
 
-After this patch, qdev_property_add_static() delegates assigning a
-default value to prop->info->set_default_value(obj, prop).
+could we get a trace with the cpu for this pid, just for completeness?
 
-qdev_prop_uint32.set_default_value() assigns prop->defval.
+> +            return cpu_iter->cpu_index;
+> +        }
+> +    }
+> +    trace_get_mem_fault_cpu_index(pid);
+> +    return -1;
+> +}
+> +
+> +/*
+> + * This function is being called when pagefault occurs. It
+> + * tracks down vCPU blocking time.
+> + *
+> + * @addr: faulted host virtual address
+> + * @ptid: faulted process thread id
+> + * @rb: ramblock appropriate to addr
+> + */
+> +static void mark_postcopy_blocktime_begin(uint64_t addr, uint32_t ptid,
+> +                                          RAMBlock *rb)
+> +{
+> +    int cpu;
+> +    MigrationIncomingState *mis = migration_incoming_get_current();
+> +    PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
+> +    int64_t now_ms;
+> +
+> +    if (!dc || ptid == 0) {
+> +        return;
+> +    }
+> +    cpu = get_mem_fault_cpu_index(ptid);
+> +    if (cpu < 0) {
 
-> So how should I obtain those semantics with this cleanup in place ?
+Add one error message?
 
-Two ways come to mind:
+> +        return;
+> +    }
+> +
+> +    now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> +    if (dc->vcpu_addr[cpu] == 0) {
+> +        atomic_inc(&dc->smp_cpus_down);
+> +    }
+> +
+> +    atomic_xchg__nocheck(&dc->vcpu_addr[cpu], addr);
+> +    atomic_xchg__nocheck(&dc->last_begin, now_ms);
+> +    atomic_xchg__nocheck(&dc->page_fault_vcpu_time[cpu], now_ms);
+> +
+> +    if (test_copiedmap_by_addr(addr, rb)) {
+> +        atomic_xchg__nocheck(&dc->vcpu_addr[cpu], 0);
+> +        atomic_xchg__nocheck(&dc->page_fault_vcpu_time[cpu], 0);
+> +        atomic_sub(&dc->smp_cpus_down, 1);
+> +    }
+> +    trace_mark_postcopy_blocktime_begin(addr, dc, dc->page_fault_vcpu_time[cpu],
+> +                                        cpu);
+> +}
+> +
+> +/*
+> + *  This function just provide calculated blocktime per cpu and trace it.
+> + *  Total blocktime is calculated in mark_postcopy_blocktime_end.
+> + *
+> + *
+> + * Assume we have 3 CPU
+> + *
+> + *      S1        E1           S1               E1
+> + * -----***********------------xxx***************------------------------> CPU1
+> + *
+> + *             S2                E2
+> + * ------------****************xxx---------------------------------------> CPU2
+> + *
+> + *                         S3            E3
+> + * ------------------------****xxx********-------------------------------> CPU3
+> + *
+> + * We have sequence S1,S2,E1,S3,S1,E2,E3,E1
+> + * S2,E1 - doesn't match condition due to sequence S1,S2,E1 doesn't include CPU3
+> + * S3,S1,E2 - sequence includes all CPUs, in this case overlap will be S1,E2 -
+> + *            it's a part of total blocktime.
+> + * S1 - here is last_begin
+> + * Legend of the picture is following:
+> + *              * - means blocktime per vCPU
+> + *              x - means overlapped blocktime (total blocktime)
+> + *
+> + * @addr: host virtual address
+> + */
+> +static void mark_postcopy_blocktime_end(uint64_t addr)
+> +{
+> +    MigrationIncomingState *mis = migration_incoming_get_current();
+> +    PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
+> +    int i, affected_cpu = 0;
+> +    int64_t now_ms;
+> +    bool vcpu_total_blocktime = false;
+> +
+> +    if (!dc) {
+> +        return;
+> +    }
+> +
+> +    now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> +
+> +    /* lookup cpu, to clear it,
+> +     * that algorithm looks straighforward, but it's not
+> +     * optimal, more optimal algorithm is keeping tree or hash
+> +     * where key is address value is a list of  */
+> +    for (i = 0; i < smp_cpus; i++) {
+> +        uint64_t vcpu_blocktime = 0;
+> +        if (atomic_fetch_add(&dc->vcpu_addr[i], 0) != addr) {
+> +            continue;
+> +        }
+> +        atomic_xchg__nocheck(&dc->vcpu_addr[i], 0);
+> +        vcpu_blocktime = now_ms -
+> +            atomic_fetch_add(&dc->page_fault_vcpu_time[i], 0);
+> +        affected_cpu += 1;
+> +        /* we need to know is that mark_postcopy_end was due to
+> +         * faulted page, another possible case it's prefetched
+> +         * page and in that case we shouldn't be here */
+> +        if (!vcpu_total_blocktime &&
+> +            atomic_fetch_add(&dc->smp_cpus_down, 0) == smp_cpus) {
+> +            vcpu_total_blocktime = true;
+> +        }
+> +        /* continue cycle, due to one page could affect several vCPUs */
+> +        dc->vcpu_blocktime[i] += vcpu_blocktime;
+> +    }
+> +
+> +    atomic_sub(&dc->smp_cpus_down, affected_cpu);
+> +    if (vcpu_total_blocktime) {
+> +        dc->total_blocktime += now_ms - atomic_fetch_add(&dc->last_begin, 0);
+> +    }
+> +    trace_mark_postcopy_blocktime_end(addr, dc, dc->total_blocktime);
+> +}
+> +
+>  /*
+>   * Handle faults detected by the USERFAULT markings
+>   */
+> @@ -638,8 +766,11 @@ static void *postcopy_ram_fault_thread(void *opaque)
+>          rb_offset &= ~(qemu_ram_pagesize(rb) - 1);
+>          trace_postcopy_ram_fault_thread_request(msg.arg.pagefault.address,
+>                                                  qemu_ram_get_idstr(rb),
+> -                                                rb_offset);
+> +                                                rb_offset,
+> +                                                msg.arg.pagefault.feat.ptid);
+>  
+> +        mark_postcopy_blocktime_begin((uintptr_t)(msg.arg.pagefault.address),
+> +                                      msg.arg.pagefault.feat.ptid, rb);
+>          /*
+>           * Send the request to the source - we want to request one
+>           * of our host page sizes (which is >= TPS)
+> @@ -723,6 +854,12 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
+>      copy_struct.len = pagesize;
+>      copy_struct.mode = 0;
+>  
+> +    /* copied page isn't feature of blocktime calculation,
+> +     * it's more general entity, so keep it here,
+> +     * but gup betwean two following operation could be high,
+> +     * and in this case blocktime for such small interval will be lost */
+> +    set_copiedmap_by_addr((uint64_t)(uintptr_t)host, rb);
+> +    mark_postcopy_blocktime_end((uint64_t)(uintptr_t)host);
+>      /* copy also acks to the kernel waking the stalled thread up
+>       * TODO: We can inhibit that ack and only do it if it was requested
+>       * which would be slightly cheaper, but we'd have to be careful
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 5b8ccf3..7bdadbb 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -112,6 +112,8 @@ process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
+>  process_incoming_migration_co_postcopy_end_main(void) ""
+>  migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
+>  migration_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname)  "ioc=%p ioctype=%s hostname=%s"
+> +mark_postcopy_blocktime_begin(uint64_t addr, void *dd, int64_t time, int cpu) "addr 0x%" PRIx64 " dd %p time %" PRId64 " cpu %d"
+> +mark_postcopy_blocktime_end(uint64_t addr, void *dd, int64_t time) "addr 0x%" PRIx64 " dd %p time %" PRId64
+>  
+>  # migration/rdma.c
+>  qemu_rdma_accept_incoming_migration(void) ""
+> @@ -188,7 +190,7 @@ postcopy_ram_enable_notify(void) ""
+>  postcopy_ram_fault_thread_entry(void) ""
+>  postcopy_ram_fault_thread_exit(void) ""
+>  postcopy_ram_fault_thread_quit(void) ""
+> -postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset) "Request for HVA=%" PRIx64 " rb=%s offset=%zx"
+> +postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset, uint32_t pid) "Request for HVA=%" PRIx64 " rb=%s offset=%zx %u"
 
-* Define a PropertyInfo like qdev_prop_uint32 with a null
-  set_default_value(), and use that.
+Add "pid" in the string format?
 
-* Add a flag to Property that makes qdev_property_add_static() skip
-  prop->info->set_default_value(), set it for your property.
-
-  Actually, I'd probably do it the other way: call ->set_default_value()
-  only when the flag is set.  No need to check it's non-null then.
-  Setting the flag when it's null is a programming error.
-
-Could one of these two work for you?
+>  postcopy_ram_incoming_cleanup_closeuf(void) ""
+>  postcopy_ram_incoming_cleanup_entry(void) ""
+>  postcopy_ram_incoming_cleanup_exit(void) ""
+> @@ -197,6 +199,7 @@ save_xbzrle_page_skipping(void) ""
+>  save_xbzrle_page_overflow(void) ""
+>  ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wait: %" PRIu64 " milliseconds, %d iterations"
+>  ram_load_complete(int ret, uint64_t seq_iter) "exit_code %d seq iteration %" PRIu64
+> +get_mem_fault_cpu_index(uint32_t pid) "pid %u is not vCPU"
+>  
+>  # migration/exec.c
+>  migration_exec_outgoing(const char *cmd) "cmd=%s"
