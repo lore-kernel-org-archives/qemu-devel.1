@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dIf6J-0001xf-NJ
+	(envelope-from <kwolf@redhat.com>) id 1dIf6K-0001ya-Kg
 	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:50:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dIf6I-0005vr-2d
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:50:35 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dIf6J-0005wL-PW
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:50:36 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed,  7 Jun 2017 19:50:15 +0200
-Message-Id: <1496857819-12466-5-git-send-email-kwolf@redhat.com>
+Date: Wed,  7 Jun 2017 19:50:16 +0200
+Message-Id: <1496857819-12466-6-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1496857819-12466-1-git-send-email-kwolf@redhat.com>
 References: <1496857819-12466-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 4/8] qemu-iotests: Block migration test
+Subject: [Qemu-devel] [PULL 5/8] commit: Fix use after free in completion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,223 +22,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Jeff Cody <jcody@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- tests/qemu-iotests/183     | 140 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/183.out |  46 +++++++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 187 insertions(+)
- create mode 100755 tests/qemu-iotests/183
- create mode 100644 tests/qemu-iotests/183.out
+The final bdrv_set_backing_hd() could be working on already freed nodes
+because the commit job drops its references (through BlockBackends) to
+both overlay_bs and top already a bit earlier.
 
-diff --git a/tests/qemu-iotests/183 b/tests/qemu-iotests/183
-new file mode 100755
-index 0000000..20268ff
---- /dev/null
-+++ b/tests/qemu-iotests/183
-@@ -0,0 +1,140 @@
-+#!/bin/bash
-+#
-+# Test old-style block migration (migrate -b)
-+#
-+# Copyright (C) 2017 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
+One way to trigger the bug is hot unplugging a disk for which
+blockdev_mark_auto_del() cancels the block job.
+
+Fix this by taking BDS-level references while we're still using the
+nodes.
+
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+---
+ block/commit.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/block/commit.c b/block/commit.c
+index a3028b2..af6fa68 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -89,6 +89,10 @@ static void commit_complete(BlockJob *job, void *opaque)
+     int ret = data->ret;
+     bool remove_commit_top_bs = false;
+ 
++    /* Make sure overlay_bs and top stay around until bdrv_set_backing_hd() */
++    bdrv_ref(top);
++    bdrv_ref(overlay_bs);
 +
-+# creator
-+owner=kwolf@redhat.com
+     /* Remove base node parent that still uses BLK_PERM_WRITE/RESIZE before
+      * the normal backing chain can be restored. */
+     blk_unref(s->base);
+@@ -124,6 +128,9 @@ static void commit_complete(BlockJob *job, void *opaque)
+     if (remove_commit_top_bs) {
+         bdrv_set_backing_hd(overlay_bs, top, &error_abort);
+     }
 +
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+status=1 # failure is the default!
-+
-+MIG_SOCKET="${TEST_DIR}/migrate"
-+
-+_cleanup()
-+{
-+    rm -f "${MIG_SOCKET}"
-+    rm -f "${TEST_IMG}.dest"
-+    _cleanup_test_img
-+    _cleanup_qemu
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+. ./common.qemu
-+
-+_supported_fmt qcow2 raw qed dmg quorum
-+_supported_proto file
-+_supported_os Linux
-+
-+size=64M
-+_make_test_img $size
-+TEST_IMG="${TEST_IMG}.dest" _make_test_img $size
-+
-+echo
-+echo === Starting VMs ===
-+echo
-+
-+qemu_comm_method="qmp"
-+
-+_launch_qemu \
-+    -drive file="${TEST_IMG}",cache=$CACHEMODE,driver=$IMGFMT,id=disk
-+src=$QEMU_HANDLE
-+_send_qemu_cmd $src "{ 'execute': 'qmp_capabilities' }" 'return'
-+
-+_launch_qemu \
-+    -drive file="${TEST_IMG}.dest",cache=$CACHEMODE,driver=$IMGFMT,id=disk \
-+    -incoming "unix:${MIG_SOCKET}"
-+dest=$QEMU_HANDLE
-+_send_qemu_cmd $dest "{ 'execute': 'qmp_capabilities' }" 'return'
-+
-+echo
-+echo === Write something on the source ===
-+echo
-+
-+_send_qemu_cmd $src \
-+    "{ 'execute': 'human-monitor-command',
-+       'arguments': { 'command-line':
-+                      'qemu-io disk \"write -P 0x55 0 64k\"' } }" \
-+    'return'
-+_send_qemu_cmd $src \
-+    "{ 'execute': 'human-monitor-command',
-+       'arguments': { 'command-line':
-+                      'qemu-io disk \"read -P 0x55 0 64k\"' } }" \
-+    'return'
-+
-+echo
-+echo === Do block migration to destination ===
-+echo
-+
-+reply="$(_send_qemu_cmd $src \
-+    "{ 'execute': 'migrate',
-+       'arguments': { 'uri': 'unix:${MIG_SOCKET}', 'blk': true } }" \
-+    'return\|error')"
-+echo "$reply"
-+if echo "$reply" | grep "compiled without old-style" > /dev/null; then
-+    _notrun "migrate -b support not compiled in"
-+fi
-+
-+QEMU_COMM_TIMEOUT=0.1 qemu_cmd_repeat=50 silent=yes \
-+    _send_qemu_cmd $src "{ 'execute': 'query-migrate' }" '"status": "completed"'
-+_send_qemu_cmd $src "{ 'execute': 'query-status' }" "return"
-+
-+echo
-+echo === Do some I/O on the destination ===
-+echo
-+
-+# It is important that we use the BlockBackend of the guest device here instead
-+# of the node name, which would create a new BlockBackend and not test whether
-+# the guest has the necessary permissions to access the image now
-+silent=yes _send_qemu_cmd $dest "" "100 %"
-+_send_qemu_cmd $dest "{ 'execute': 'query-status' }" "return"
-+_send_qemu_cmd $dest \
-+    "{ 'execute': 'human-monitor-command',
-+       'arguments': { 'command-line':
-+                      'qemu-io disk \"read -P 0x55 0 64k\"' } }" \
-+    'return'
-+_send_qemu_cmd $dest \
-+    "{ 'execute': 'human-monitor-command',
-+       'arguments': { 'command-line':
-+                      'qemu-io disk \"write -P 0x66 1M 64k\"' } }" \
-+    'return'
-+
-+echo
-+echo === Shut down and check image ===
-+echo
-+
-+_send_qemu_cmd $src '{"execute":"quit"}' 'return'
-+_send_qemu_cmd $dest '{"execute":"quit"}' 'return'
-+wait=1 _cleanup_qemu
-+
-+_check_test_img
-+TEST_IMG="${TEST_IMG}.dest" _check_test_img
-+
-+$QEMU_IO -c 'write -P 0x66 1M 64k' "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG compare "$TEST_IMG.dest" "$TEST_IMG"
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/183.out b/tests/qemu-iotests/183.out
-new file mode 100644
-index 0000000..103fdc7
---- /dev/null
-+++ b/tests/qemu-iotests/183.out
-@@ -0,0 +1,46 @@
-+QA output created by 183
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+Formatting 'TEST_DIR/t.IMGFMT.dest', fmt=IMGFMT size=67108864
-+
-+=== Starting VMs ===
-+
-+{"return": {}}
-+{"return": {}}
-+
-+=== Write something on the source ===
-+
-+wrote 65536/65536 bytes at offset 0
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+{"return": ""}
-+read 65536/65536 bytes at offset 0
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+{"return": ""}
-+
-+=== Do block migration to destination ===
-+
-+{"return": {}}
-+{"return": {"status": "postmigrate", "singlestep": false, "running": false}}
-+
-+=== Do some I/O on the destination ===
-+
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "RESUME"}
-+{"return": {"status": "running", "singlestep": false, "running": true}}
-+read 65536/65536 bytes at offset 0
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+{"return": ""}
-+wrote 65536/65536 bytes at offset 1048576
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+{"return": ""}
-+
-+=== Shut down and check image ===
-+
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+No errors were found on the image.
-+No errors were found on the image.
-+wrote 65536/65536 bytes at offset 1048576
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Images are identical.
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 5c8ea0f..a6acaff 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -174,3 +174,4 @@
- 179 rw auto quick
- 181 rw auto migration
- 182 rw auto quick
-+183 rw auto migration
++    bdrv_unref(overlay_bs);
++    bdrv_unref(top);
+ }
+ 
+ static void coroutine_fn commit_run(void *opaque)
 -- 
 1.8.3.1
