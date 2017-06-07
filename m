@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1dIffD-00008i-Og
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:26:40 -0400
+	(envelope-from <mst@redhat.com>) id 1dIfjG-0002Qk-Uc
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:30:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1dIff7-0002sr-Ur
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:26:38 -0400
-Received: from us-smtp-delivery-101.mimecast.com ([216.205.24.101]:32160)
+	(envelope-from <mst@redhat.com>) id 1dIfjC-0004TD-1B
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:30:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57758)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <felipe@nutanix.com>) id 1dIff7-0002sl-Ju
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:26:33 -0400
-From: Felipe Franciosi <felipe@nutanix.com>
-Date: Wed, 7 Jun 2017 18:26:22 +0000
-Message-ID: <4FA9B5EC-B9B0-49A3-ADD8-AF1113B6144C@nutanix.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dIfjB-0004Sy-RT
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:30:45 -0400
+Date: Wed, 7 Jun 2017 21:30:43 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170607212825-mutt-send-email-mst@kernel.org>
 References: <20170607152825.12081-1-pbonzini@redhat.com>
 	<20170607152825.12081-2-pbonzini@redhat.com>
 	<CAFEAcA8CppP6YEPkGxVEyLnO=Kk1qirpGk2sh0bXedscxct8Jg@mail.gmail.com>
 	<8229C6EB-56EA-475E-99D4-6D9B36B5D0A7@nutanix.com>
-	<CAFEAcA-r6uC0zO6uYH38XztZfWqLVphRUXA5ffgGw-cFKL+QHg@mail.gmail.com>
-In-Reply-To: <CAFEAcA-r6uC0zO6uYH38XztZfWqLVphRUXA5ffgGw-cFKL+QHg@mail.gmail.com>
-Content-Language: en-US
-Content-ID: <D452117A6F66F744A070B3CFD81DA440@namprd02.prod.outlook.com>
+	<7a06506e-20ba-66b8-8c69-c500efe86301@redhat.com>
+	<0281E149-DE28-4D6D-80E0-1132CAB8ABDB@nutanix.com>
+	<1265195474.6852496.1496859744613.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1265195474.6852496.1496859744613.JavaMail.zimbra@redhat.com>
 Subject: Re: [Qemu-devel] [PULL 18/33] vhost-user-scsi: Introduce
  vhost-user-scsi host device
 List-Id: <qemu-devel.nongnu.org>
@@ -33,60 +33,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Felipe Franciosi <felipe@nutanix.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+
+On Wed, Jun 07, 2017 at 02:22:24PM -0400, Paolo Bonzini wrote:
+> > > How, since there is no synchronization point between the vhost-user
+> > > server on the source and the destination?
+> > 
+> > The idea is that the backend should both stop picking up new requests and
+> > also quiesce outstanding requests upon a GET_VRING_BASE vhost message.
+> 
+> This could be documented,
+
+It is documented AFAIK. Pls take a look at the spec documentation.
+
+> but perhaps it's best to add a START_STOP
+> feature and message to the vhost-user protocol?
+
+We just never need to GET_VRING_BASE if ring keeps going -
+makes no sense since base gets invalidated immediately.
 
 
-> On 7 Jun 2017, at 16:47, Peter Maydell <peter.maydell@linaro.org> wrote:
->=20
-> On 7 June 2017 at 16:39, Felipe Franciosi <felipe@nutanix.com> wrote:
->>=20
->>> On 7 Jun 2017, at 16:37, Peter Maydell <peter.maydell@linaro.org> wrote=
-:
->>>=20
->>> On 7 June 2017 at 16:28, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>>> From: Felipe Franciosi <felipe@nutanix.com>
->>>>=20
->>>> This commit introduces a vhost-user device for SCSI. This is based
->>>> on the existing vhost-scsi implementation, but done over vhost-user
->>>> instead. It also uses a chardev to connect to the backend. Unlike
->>>> vhost-scsi (today), VMs using vhost-user-scsi can be live migrated.
->>>>=20
->>>> To use it, start Qemu with a command line equivalent to:
->>>>=20
->>>> qemu-system-x86_64 \
->>>>      -chardev socket,id=3Dvus0,path=3D/tmp/vus.sock \
->>>>      -device vhost-user-scsi-pci,chardev=3Dvus0,bus=3Dpci.0,addr=3D...
->>>>=20
->>>> A separate commit presents a sample application linked with libiscsi t=
-o
->>>> provide a backend for vhost-user-scsi.
->>>>=20
->>>> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
->>>> Message-Id: <1488479153-21203-4-git-send-email-felipe@nutanix.com>
->>>> [Disable migration for now, since it does not support bdrv_drain. - Pa=
-olo]
->>>=20
->>> I was expecting this to mean a VMStateDescription with a
->>> ".unmigratable =3D 1" field, but it doesn't seem to have one.
->>> Does it disable migration some other way?
->>=20
->> Hi Peter,
->>=20
->> vhost-user-scsi supports migration.
->=20
-> Paolo's change comment in the commit message quoted above
-> says it does not, which is what I was remarking on.
->=20
-> (Your original patches use register_savevm(), which is a function
-> that has just gone away. They'd need to use VMStateDescription
-> structs instead to support migration.)
 
-Oh thanks for pointing that out, I missed it at the bottom of the commit me=
-ssage.
+> The feature then can be optional for vhost-user-net and mandatory for
+> vhost-user-scsi.  When this is done we can remove .unmigratable.
+> 
+> Thanks,
+> 
+> Paolo
 
-F.
+If vhost-user-scsi does not stop the ring after responding to
+GET_VRING_BASE, it's just a bug that needs to be fixed.
 
->=20
-> thanks
-> -- PMM
+> > > 
+> > > Can you please send a version of your patch that uses .unmigratable?
+> > 
+> > Sure I can do that. We can work on the migration later on.
+> > 
+> > > 
+> > > I'll send a v6 that momentarily drops vhost-scsi, but I intend to
+> > > include it again in the next pull request.
+> > 
+> > Sounds good to me.
+> > 
+> > Felipe
+> > 
+> > > 
+> > > Thanks,
+> > > 
+> > > Paolo
+> > 
+> > 
