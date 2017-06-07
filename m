@@ -1,27 +1,45 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dIeaO-0000ui-JN
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:17:40 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dIebu-0002vB-KW
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:19:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dIeaK-0000oh-Fw
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:17:36 -0400
-Received: from 4.mo178.mail-out.ovh.net ([46.105.49.171]:57484)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dIeaK-0000o2-5i
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:17:32 -0400
-Received: from player728.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id C7E123E428
-	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 19:17:29 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Wed, 07 Jun 2017 19:17:26 +0200
-Message-ID: <149685584629.12025.14875914798241845062.stgit@bahia.lan>
-In-Reply-To: <149685579678.12025.9278446121024037161.stgit@bahia.lan>
-References: <149685579678.12025.9278446121024037161.stgit@bahia.lan>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dIebq-0001Xk-Gn
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:19:10 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47018)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dIebq-0001Wa-6o
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:19:06 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v57HDcPt098855
+	for <qemu-devel@nongnu.org>; Wed, 7 Jun 2017 13:19:04 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2axnhc8mnr-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 13:19:04 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Wed, 7 Jun 2017 18:19:02 +0100
+References: <20170606165510.33057-1-pasic@linux.vnet.ibm.com>
+	<20170606165510.33057-3-pasic@linux.vnet.ibm.com>
+	<20170607110758.GC2099@work-vm>
+	<c6466750-6d71-988c-6c81-9c54f5ca995a@linux.vnet.ibm.com>
+	<20170607120138.GD2384@work-vm>
+	<1fb16203-3857-d0aa-498e-4acca6a28a41@linux.vnet.ibm.com>
+	<20170607171021.GK2099@work-vm>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Wed, 7 Jun 2017 19:18:58 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v3 5/5] spapr: fix migration of ICPState
- objects from/to older QEMU
+In-Reply-To: <20170607171021.GK2099@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <a918bec2-971e-c51f-9909-f4b7149ad98e@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 2/3] vmstate: error hint for failed
+ equal checks part 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,205 +48,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
 
-Commit 5bc8d26de20c ("spapr: allocate the ICPState object from under
-sPAPRCPUCore") moved ICPState objects from the machine to CPU cores.
-This is an improvement since we no longer allocate ICPState objects
-that will never be used. But it has the side-effect of breaking
-migration of older machine types from older QEMU versions.
 
-This patch allows spapr to register dummy "icp/server" entries to vmstate.
-These entries use a dedicated VMStateDescription that can swallow and
-discard state of an incoming migration stream, and that don't send anything
-on outgoing migration.
 
-As for real ICPState objects, the instance_id is the cpu_index of the
-corresponding vCPU, which happens to be equal to the generated instance_id
-of older machine types.
+On 06/07/2017 07:10 PM, Dr. David Alan Gilbert wrote:
+> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+>>
+>>
+>> On 06/07/2017 02:01 PM, Dr. David Alan Gilbert wrote:
+>>> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+>>>>
+>>>>
+>>>> On 06/07/2017 01:07 PM, Dr. David Alan Gilbert wrote:
+>>>>> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+>>>>>> Verbose error reporting for the _EQUAL family. Modify the standard _EQUAL
+>>>>>> so the hint states the assertion probably failed due to a bug. Introduce
+>>>>>> _EQUAL_HINT for specifying a context specific hint.
+>>>>>>
+>>>>>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>>>>>
+>>>>> I'd prefer not to print 'Bug!?' by default - they already get the
+>>>>> message telling them something didn't match and the migration fails.
+>>>>> There are none-bug ways of this happening, e.g. a user starting a VM on
+>>>>> the source and destination with different configs.
+>>>>
+>>>> I admit, my objective with 'Bug!?' was to provoke. My train of thought is
+>>>> to encourage the programmer to think about and document the circumstances
+>>>> under which such an assertion is supposed to fail (and against which it
+>>>> is supposed to guard).
+>>>>
+>>>> I do not know how skillful are our users but a 4 != 5 then maybe a name
+>>>> of a vmstate field is probably quite scary and not very revealing. I doubt
+>>>> a non qemu developer can use it for something else that reporting a bug.
+>>>>
+>>>> Consequently if there are non-bug ways one can use the hint and state them.
+>>>> Your example with the misconfigured target, by the way, is IMHO also be due
+>>>> to a bug of the management software IMHO.
+>>>>
+>>>> To sum it up: IMHO the message provided by a failing _EQUAL is to ugly
+>>>> and Qemuspeak to be presented to an user-user in non-bug cases. Agree?
+>>>> Disagree?
+>>>
+>>> Disagree.
+>>>
+>>> I don't mind giving field names etc; they make it easy for us as
+>>> developers to track down what's happening, but also sometimes they help
+>>> endusers work around a prolem or see where the problem is; of course
+>>> that varies depending on the field name, but some of our names are
+>>> reasonable (e.g. there's a VMSTATE_INT32_EQUAL on 'queue_size' in
+>>> vmmouse.c).  They're also pretty good if two end users hit the same
+>>> problem they can see the same error message in a bug report.
+>>>
+>>> We often have customer-facing support people look at logs before they
+>>> get as far as us developers; if we have bugs that are 
+>>> 'if it's a failing BLAH device complaining about the BAR field'
+>>> then this fixes it, then that helps them find workarounds/fixes quickly
+>>> even if they don't understand what the BAR field is.
+>>>
+>>
+>> You seem to forget, that I'm not proposing omitting this information,
+>> but extending it with something civilized so one can distinguish between
+>> an assert failed should have never happened situation an a as good as
+>> reasonable error handling for an expected error scenario. IMHO the current
+>> EQUAL looks more like the former (assert) and less like the later (error
+>> reporting for an expected error scenario). Agree? Dissagree?
+> 
+> Yes, the current EQUAL is very terse; but we can't actually tell from
+> the use which case it is; it'll all work nicely when people actually add
+> the correct hint text in useful locations.
+> 
 
-The machine can unregister/register these entries when CPUs are dynamically
-plugged/unplugged.
+You are right.
 
-This is only available for pseries-2.9 and older machines, thanks to a
-compat property.
+Since Juan also requested the adding an extra param to the original
+macros variant I will go with that.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
-v3: - new logic entirely implemented in hw/ppc/spapr.c
----
- hw/ppc/spapr.c         |   88 +++++++++++++++++++++++++++++++++++++++++++++++-
- include/hw/ppc/spapr.h |    2 +
- 2 files changed, 88 insertions(+), 2 deletions(-)
+I shied away form it in the first place because I did not want to
+bother the users of the macros without clarifying with the migration
+gurus how the new interface should look like.
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 9b7ae28939a8..c15b604978f0 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -124,9 +124,52 @@ error:
-     return NULL;
- }
- 
-+static bool pre_2_10_vmstate_dummy_icp_needed(void *opaque)
-+{
-+    return false;
-+}
-+
-+static const VMStateDescription pre_2_10_vmstate_dummy_icp = {
-+    .name = "icp/server",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = pre_2_10_vmstate_dummy_icp_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UNUSED(4), /* uint32_t xirr */
-+        VMSTATE_UNUSED(1), /* uint8_t pending_priority */
-+        VMSTATE_UNUSED(1), /* uint8_t mfrr */
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
-+static void pre_2_10_vmstate_register_dummy_icp(sPAPRMachineState *spapr, int i)
-+{
-+    bool *flag = &spapr->pre_2_10_ignore_icp[i];
-+
-+    g_assert(!*flag);
-+    vmstate_register(NULL, i, &pre_2_10_vmstate_dummy_icp, flag);
-+    *flag = true;
-+}
-+
-+static void pre_2_10_vmstate_unregister_dummy_icp(sPAPRMachineState *spapr,
-+                                                  int i)
-+{
-+    bool *flag = &spapr->pre_2_10_ignore_icp[i];
-+
-+    g_assert(*flag);
-+    vmstate_unregister(NULL, &pre_2_10_vmstate_dummy_icp, flag);
-+    *flag = false;
-+}
-+
-+static inline int xics_nr_servers(void)
-+{
-+    return DIV_ROUND_UP(max_cpus * kvmppc_smt_threads(), smp_threads);
-+}
-+
- static void xics_system_init(MachineState *machine, int nr_irqs, Error **errp)
- {
-     sPAPRMachineState *spapr = SPAPR_MACHINE(machine);
-+    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(machine);
- 
-     if (kvm_enabled()) {
-         if (machine_kernel_irqchip_allowed(machine) &&
-@@ -148,6 +191,15 @@ static void xics_system_init(MachineState *machine, int nr_irqs, Error **errp)
-             return;
-         }
-     }
-+
-+    if (smc->pre_2_10_has_unused_icps) {
-+        int i;
-+
-+        spapr->pre_2_10_ignore_icp = g_malloc(xics_nr_servers());
-+        for (i = 0; i < xics_nr_servers(); i++) {
-+            pre_2_10_vmstate_register_dummy_icp(spapr, i);
-+        }
-+    }
- }
- 
- static int spapr_fixup_cpu_smt_dt(void *fdt, int offset, PowerPCCPU *cpu,
-@@ -976,7 +1028,6 @@ static void *spapr_build_fdt(sPAPRMachineState *spapr,
-     void *fdt;
-     sPAPRPHBState *phb;
-     char *buf;
--    int smt = kvmppc_smt_threads();
- 
-     fdt = g_malloc0(FDT_MAX_SIZE);
-     _FDT((fdt_create_empty_tree(fdt, FDT_MAX_SIZE)));
-@@ -1016,7 +1067,7 @@ static void *spapr_build_fdt(sPAPRMachineState *spapr,
-     _FDT(fdt_setprop_cell(fdt, 0, "#size-cells", 2));
- 
-     /* /interrupt controller */
--    spapr_dt_xics(DIV_ROUND_UP(max_cpus * smt, smp_threads), fdt, PHANDLE_XICP);
-+    spapr_dt_xics(xics_nr_servers(), fdt, PHANDLE_XICP);
- 
-     ret = spapr_populate_memory(spapr, fdt);
-     if (ret < 0) {
-@@ -2800,9 +2851,24 @@ static void spapr_core_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
-                               Error **errp)
- {
-     MachineState *ms = MACHINE(qdev_get_machine());
-+    sPAPRMachineState *spapr = SPAPR_MACHINE(ms);
-     CPUCore *cc = CPU_CORE(dev);
-     CPUArchId *core_slot = spapr_find_cpu_slot(ms, cc->core_id, NULL);
- 
-+    if (spapr->pre_2_10_ignore_icp) {
-+        sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
-+        sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(cc));
-+        const char *typename = object_class_get_name(scc->cpu_class);
-+        size_t size = object_type_get_instance_size(typename);
-+        int i;
-+
-+        for (i = 0; i < cc->nr_threads; i++) {
-+            CPUState *cs = CPU(sc->threads + i * size);
-+
-+            pre_2_10_vmstate_register_dummy_icp(spapr, cs->cpu_index);
-+        }
-+    }
-+
-     assert(core_slot);
-     core_slot->cpu = NULL;
-     object_unparent(OBJECT(dev));
-@@ -2912,6 +2978,21 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-         }
-     }
-     core_slot->cpu = OBJECT(dev);
-+
-+    if (spapr->pre_2_10_ignore_icp) {
-+        sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(cc));
-+        const char *typename = object_class_get_name(scc->cpu_class);
-+        size_t size = object_type_get_instance_size(typename);
-+        int i;
-+
-+        for (i = 0; i < cc->nr_threads; i++) {
-+            sPAPRCPUCore *sc = SPAPR_CPU_CORE(dev);
-+            void *obj = sc->threads + i * size;
-+
-+            cs = CPU(obj);
-+            pre_2_10_vmstate_unregister_dummy_icp(spapr, cs->cpu_index);
-+        }
-+    }
- }
- 
- static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-@@ -3361,9 +3442,12 @@ static void spapr_machine_2_9_instance_options(MachineState *machine)
- 
- static void spapr_machine_2_9_class_options(MachineClass *mc)
- {
-+    sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
-+
-     spapr_machine_2_10_class_options(mc);
-     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_9);
-     mc->numa_auto_assign_ram = numa_legacy_auto_assign_ram;
-+    smc->pre_2_10_has_unused_icps = true;
- }
- 
- DEFINE_SPAPR_MACHINE(2_9, "2.9", false);
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index f973b0284596..64382623199d 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -53,6 +53,7 @@ struct sPAPRMachineClass {
-     bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug of LMBs */
-     bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
-     const char *tcg_default_cpu; /* which (TCG) CPU to simulate by default */
-+    bool pre_2_10_has_unused_icps;
-     void (*phb_placement)(sPAPRMachineState *spapr, uint32_t index,
-                           uint64_t *buid, hwaddr *pio, 
-                           hwaddr *mmio32, hwaddr *mmio64,
-@@ -90,6 +91,7 @@ struct sPAPRMachineState {
-     sPAPROptionVector *ov5_cas;     /* negotiated (via CAS) option vectors */
-     bool cas_reboot;
-     bool cas_legacy_guest_workaround;
-+    bool *pre_2_10_ignore_icp;
- 
-     Notifier epow_notifier;
-     QTAILQ_HEAD(, sPAPREventLogEntry) pending_events;
+Thanks a lot!
+
+Regards,
+Halil
+
+>> Having a field name is great! That's beyond discussion.
+>>
+>> I see, my 'sum it up' above was a bit unfortunate: it sounds like I'm
+>> against the inclusion of technical info and not against a lack of non
+>> technical info. Sorry for that!
+> 
+> No, that's fine.
+> 
