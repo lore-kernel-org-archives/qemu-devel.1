@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dIdPn-0006ip-KE
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:02:36 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dIdUF-0003Bc-Lc
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:07:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dIdPm-0008D5-D5
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:02:35 -0400
-From: Eric Auger <eric.auger@redhat.com>
-Date: Wed,  7 Jun 2017 18:01:27 +0200
-Message-Id: <1496851287-9428-9-git-send-email-eric.auger@redhat.com>
-In-Reply-To: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
-References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v2 8/8] hw/arm/virt: Add virtio-iommu the virt
- board
+	(envelope-from <el13635@mail.ntua.gr>) id 1dIdUC-0001i1-HO
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:07:11 -0400
+Received: from smtp1.ntua.gr ([2001:648:2000:de::183]:45267)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <el13635@mail.ntua.gr>) id 1dIdUC-0001hN-3Y
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:07:08 -0400
+Date: Wed, 7 Jun 2017 19:06:28 +0300
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20170607160628.mqhecliq7ka4t3gf@postretch>
+References: <20170607130619.1545-1-el13635@mail.ntua.gr>
+	<b1464fa9-84fe-780c-ea32-bbaa631b1d8f@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ppzi6rafsehxnk4q"
+Content-Disposition: inline
+In-Reply-To: <b1464fa9-84fe-780c-ea32-bbaa631b1d8f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC] block: add throttle block filter driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,209 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, jean-philippe.brucker@arm.com
-Cc: will.deacon@arm.com, robin.murphy@arm.com, kevin.tian@intel.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, wei@redhat.com, tn@semihalf.com, bharat.bhushan@nxp.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, stefanha@gmail.com, berto@igalia.com
 
-The specific virtio-mmio node is inconditionally added on
-machine init while the binding between this latter and the
-PCIe host bridge is done on machine init done notifier, only
-if -device virtio-iommu-device was added to the qemu command
-line.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+--ppzi6rafsehxnk4q
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
----
----
- hw/arm/virt.c         | 92 +++++++++++++++++++++++++++++++++++++++++++++++----
- include/hw/arm/virt.h |  4 +++
- 2 files changed, 89 insertions(+), 7 deletions(-)
+On Wed, Jun 07, 2017 at 10:40:08AM -0500, Eric Blake wrote:
+>On 06/07/2017 08:06 AM, Manos Pitsidianakis wrote:
+>> This is part of my work for my GSOC project this summer.
+>>
+>> I am not sure if the count parameter in  bdrv_co_pwrite_zeros and
+>> bdrv_co_pdiscard refers to sectors or bytes.
+>
+>Both refer to byte counts.  (We're trying to get rid of as many
+>sector-based interfaces as possible, but it's slow going to make sure
+>the conversions are still accurate).
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 6eb0d2a..6bcfbcd 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -52,6 +52,7 @@
- #include "hw/arm/fdt.h"
- #include "hw/intc/arm_gic.h"
- #include "hw/intc/arm_gicv3_common.h"
-+#include "hw/virtio/virtio-iommu.h"
- #include "kvm_arm.h"
- #include "hw/smbios/smbios.h"
- #include "qapi/visitor.h"
-@@ -139,6 +140,7 @@ static const MemMapEntry a15memmap[] = {
-     [VIRT_FW_CFG] =             { 0x09020000, 0x00000018 },
-     [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
-     [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
-+    [VIRT_SMMU] =               { 0x09050000, 0x00000200 },
-     [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
-     /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
-     [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
-@@ -159,6 +161,7 @@ static const int a15irqmap[] = {
-     [VIRT_SECURE_UART] = 8,
-     [VIRT_MMIO] = 16, /* ...to 16 + NUM_VIRTIO_TRANSPORTS - 1 */
-     [VIRT_GIC_V2M] = 48, /* ...to 48 + NUM_GICV2M_SPIS - 1 */
-+    [VIRT_SMMU] = 74,
-     [VIRT_PLATFORM_BUS] = 112, /* ...to 112 + PLATFORM_BUS_NUM_IRQS -1 */
- };
- 
-@@ -991,7 +994,81 @@ static void create_pcie_irq_map(const VirtMachineState *vms,
-                            0x7           /* PCI irq */);
- }
- 
--static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
-+static int bind_virtio_iommu_device(Object *obj, void *opaque)
-+{
-+    VirtMachineState *vms = (VirtMachineState *)opaque;
-+    struct arm_boot_info *info = &vms->bootinfo;
-+    int dtb_size;
-+    void *fdt = info->get_dtb(info, &dtb_size);
-+    Object *dev;
-+
-+    dev = object_dynamic_cast(obj, TYPE_VIRTIO_IOMMU);
-+
-+    if (!dev) {
-+        /* Container, traverse it for children */
-+        return object_child_foreach(obj, bind_virtio_iommu_device, opaque);
-+    }
-+
-+    qemu_fdt_setprop_cells(fdt, vms->pcie_host_nodename, "iommu-map",
-+                           0x0, vms->smmu_phandle, 0x0, 0x10000);
-+
-+    return true;
-+}
-+
-+static
-+void virtio_iommu_notifier(Notifier *notifier, void *data)
-+{
-+    VirtMachineState *vms = container_of(notifier, VirtMachineState,
-+                                         virtio_iommu_done);
-+    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
-+    Object *container;
-+
-+
-+    if (vmc->no_iommu) {
-+        return;
-+    }
-+
-+    container = container_get(qdev_get_machine(), "/peripheral");
-+    bind_virtio_iommu_device(container, vms);
-+    container = container_get(qdev_get_machine(), "/peripheral-anon");
-+    bind_virtio_iommu_device(container, vms);
-+}
-+
-+static void create_virtio_iommu(VirtMachineState *vms, qemu_irq *pic)
-+{
-+    char *smmu;
-+    const char compat[] = "virtio,mmio";
-+    int irq =  vms->irqmap[VIRT_SMMU];
-+    hwaddr base = vms->memmap[VIRT_SMMU].base;
-+    hwaddr size = vms->memmap[VIRT_SMMU].size;
-+    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
-+
-+    if (vmc->no_iommu) {
-+        return;
-+    }
-+
-+    vms->smmu_phandle = qemu_fdt_alloc_phandle(vms->fdt);
-+
-+    sysbus_create_simple("virtio-mmio", base, pic[irq]);
-+
-+    smmu = g_strdup_printf("/virtio_mmio@%" PRIx64, base);
-+    qemu_fdt_add_subnode(vms->fdt, smmu);
-+    qemu_fdt_setprop(vms->fdt, smmu, "compatible", compat, sizeof(compat));
-+    qemu_fdt_setprop_sized_cells(vms->fdt, smmu, "reg", 2, base, 2, size);
-+
-+    qemu_fdt_setprop_cells(vms->fdt, smmu, "interrupts",
-+            GIC_FDT_IRQ_TYPE_SPI, irq, GIC_FDT_IRQ_FLAGS_EDGE_LO_HI);
-+
-+    qemu_fdt_setprop(vms->fdt, smmu, "dma-coherent", NULL, 0);
-+    qemu_fdt_setprop_cell(vms->fdt, smmu, "#iommu-cells", 1);
-+    qemu_fdt_setprop_cell(vms->fdt, smmu, "phandle", vms->smmu_phandle);
-+    g_free(smmu);
-+
-+    vms->virtio_iommu_done.notify = virtio_iommu_notifier;
-+    qemu_add_machine_init_done_notifier(&vms->virtio_iommu_done);
-+}
-+
-+static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
- {
-     hwaddr base_mmio = vms->memmap[VIRT_PCIE_MMIO].base;
-     hwaddr size_mmio = vms->memmap[VIRT_PCIE_MMIO].size;
-@@ -1064,7 +1141,8 @@ static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
-         }
-     }
- 
--    nodename = g_strdup_printf("/pcie@%" PRIx64, base);
-+    vms->pcie_host_nodename = g_strdup_printf("/pcie@%" PRIx64, base);
-+    nodename = vms->pcie_host_nodename;
-     qemu_fdt_add_subnode(vms->fdt, nodename);
-     qemu_fdt_setprop_string(vms->fdt, nodename,
-                             "compatible", "pci-host-ecam-generic");
-@@ -1103,7 +1181,6 @@ static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
-     qemu_fdt_setprop_cell(vms->fdt, nodename, "#interrupt-cells", 1);
-     create_pcie_irq_map(vms, vms->gic_phandle, irq, nodename);
- 
--    g_free(nodename);
- }
- 
- static void create_platform_bus(VirtMachineState *vms, qemu_irq *pic)
-@@ -1448,16 +1525,16 @@ static void machvirt_init(MachineState *machine)
- 
-     create_rtc(vms, pic);
- 
--    create_pcie(vms, pic);
--
--    create_gpio(vms, pic);
--
-     /* Create mmio transports, so the user can create virtio backends
-      * (which will be automatically plugged in to the transports). If
-      * no backend is created the transport will just sit harmlessly idle.
-      */
-     create_virtio_devices(vms, pic);
- 
-+    create_pcie(vms, pic);
-+
-+    create_gpio(vms, pic);
-+
-     vms->fw_cfg = create_fw_cfg(vms, &address_space_memory);
-     rom_set_fw(vms->fw_cfg);
- 
-@@ -1482,6 +1559,7 @@ static void machvirt_init(MachineState *machine)
-      * Notifiers are executed in registration reverse order.
-      */
-     create_platform_bus(vms, pic);
-+    create_virtio_iommu(vms, pic);
- }
- 
- static bool virt_get_secure(Object *obj, Error **errp)
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index ff27551..070cb39 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -59,6 +59,7 @@ enum {
-     VIRT_GIC_V2M,
-     VIRT_GIC_ITS,
-     VIRT_GIC_REDIST,
-+    VIRT_SMMU,
-     VIRT_UART,
-     VIRT_MMIO,
-     VIRT_RTC,
-@@ -91,6 +92,7 @@ typedef struct {
- typedef struct {
-     MachineState parent;
-     Notifier machine_done;
-+    Notifier virtio_iommu_done;
-     FWCfgState *fw_cfg;
-     bool secure;
-     bool highmem;
-@@ -106,6 +108,8 @@ typedef struct {
-     uint32_t clock_phandle;
-     uint32_t gic_phandle;
-     uint32_t msi_phandle;
-+    uint32_t smmu_phandle;
-+    char *pcie_host_nodename;
-     int psci_conduit;
- } VirtMachineState;
- 
--- 
-2.5.5
+I see. Would changing the names in the BlockDriverState function=20
+signatures to reflect that be okay?
+
+--ppzi6rafsehxnk4q
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlk4JIQACgkQc2J8L2kN
+9xDKnQ//ephbePN4cLHSPQDZPq0DC1dy6JrM/YP9s8BRVlUJGQ/P9cpRQXqQlDHI
+thPTuzsMuXYHzrGpXZ6rlfdSAtAfoXN2HzDLBssbEyaZ2umXR2Kd7YfYv4MFBSuU
+qndb52DcYzFb/r4To5z1Rp4a+LYdfhcmkBYhP3M+7B7A8HVzLGcC+WMcdeBt9OzH
+vzHUV1CoqeVc/ygbGfz2aD8Jeuooz4nG9ltoBAPla8AcoT4Xuqo1Y89hAMesKYPY
+ilrbxHN4GGGIZ902uEsRz6VwFyhWCRC/gz4hCe3A7wqS+JciarXxCCFS+BHibL0/
+RQ+z7xA33k/KYgtJ3hHE8hEVNPI1tzCBzQhMiYXHr6zJ2g1kWtg9hCUk6IRiamJ3
+CfFoFArzw9UvbF/sv7RmFwgz+gA41s54ha+bQoFKUgCMHnqfxwfvUsnkjMFfZAmB
+QzOnhIr5Qn2xgIX5hfgaIWeDAg+Lg5tePoqa6eDXzDDmJ1bhdW/dFX0Lz5BYBwlJ
+vQ/tntQ9pu3FgEDbUYCXTJrp8ptWVOzH476Q2ODA5Ch9TVbb/oiPpAbcTKeat6rP
+8PVxPvTiqx8Cu617kD7ybZRpOeQqxH56DtdWPjcTLTEup6Al5JuhoCdkhBMu245f
+0Rc8ZJD54kNNa4idM5RLfDc8ImEdyq/uRU2NmitQMa4w4rUOaq8=
+=pRB8
+-----END PGP SIGNATURE-----
+
+--ppzi6rafsehxnk4q--
