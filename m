@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dIdsa-0002tN-Ng
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:32:24 -0400
+	(envelope-from <quintela@redhat.com>) id 1dIdw7-0005KO-Kg
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:36:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dIdsW-0004jO-QH
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:32:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41350)
+	(envelope-from <quintela@redhat.com>) id 1dIdw3-0006QD-JT
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:35:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59832)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dIdsW-0004j3-KQ
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:32:16 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A33AB80470
-	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 16:32:15 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed,  7 Jun 2017 20:30:59 +0400
-Message-Id: <20170607163140.17053-3-marcandre.lureau@redhat.com>
-In-Reply-To: <20170607163140.17053-1-marcandre.lureau@redhat.com>
-References: <20170607163140.17053-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dIdw3-0006Ow-6d
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:35:55 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170606165510.33057-3-pasic@linux.vnet.ibm.com> (Halil Pasic's
+	message of "Tue, 6 Jun 2017 18:55:09 +0200")
+References: <20170606165510.33057-1-pasic@linux.vnet.ibm.com>
+	<20170606165510.33057-3-pasic@linux.vnet.ibm.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 07 Jun 2017 18:35:51 +0200
+Message-ID: <87wp8ndac8.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 02/43] object: fix potential leak in getters
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC PATCH 2/3] vmstate: error hint for failed
+ equal checks part 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,52 +29,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-If the property is not of the requested type, the getters will leak a
-QObject.
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> Verbose error reporting for the _EQUAL family. Modify the standard _EQUAL
+> so the hint states the assertion probably failed due to a bug. Introduce
+> _EQUAL_HINT for specifying a context specific hint.
+>
+> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> ---
+> Keeping this separate for now because we may want something different
+> here. E.g. no new macros and adding an extra NULL parameter for all
+> pre-existing  _EQUAL usages.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
----
- qom/object.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/qom/object.c b/qom/object.c
-index eb4bc924ff..c7b8079df6 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -1122,7 +1122,7 @@ char *object_property_get_str(Object *obj, const ch=
-ar *name,
-         retval =3D g_strdup(qstring_get_str(qstring));
-     }
-=20
--    QDECREF(qstring);
-+    qobject_decref(ret);
-     return retval;
- }
-=20
-@@ -1183,7 +1183,7 @@ bool object_property_get_bool(Object *obj, const ch=
-ar *name,
-         retval =3D qbool_get_bool(qbool);
-     }
-=20
--    QDECREF(qbool);
-+    qobject_decref(ret);
-     return retval;
- }
-=20
-@@ -1214,7 +1214,7 @@ int64_t object_property_get_int(Object *obj, const =
-char *name,
-         retval =3D qint_get_int(qint);
-     }
-=20
--    QDECREF(qint);
-+    qobject_decref(ret);
-     return retval;
- }
-=20
---=20
-2.13.0.91.g00982b8dd
+I think that the best thing is to just add the HINT always.  I checked
+and there are only 25 uses of VMSTATE_*_EQUAL.  I agree with dave that
+adding a NULL there, and make they work is a better strategy.
+
+We are adding 8 new macros so we don't have to change 25 callers?
+
+Later, Juan.
