@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51438)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dIeuy-00022D-O0
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:38:55 -0400
+	(envelope-from <quintela@redhat.com>) id 1dIez3-00053p-91
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:43:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dIeux-0001Kn-Lb
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:38:52 -0400
-References: <20170601172734.9039-1-berrange@redhat.com>
-	<20170601172734.9039-20-berrange@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <8e56eb6a-6e2e-41fa-80fd-59060fca6e51@redhat.com>
-Date: Wed, 7 Jun 2017 19:38:44 +0200
+	(envelope-from <quintela@redhat.com>) id 1dIez0-0002fU-H4
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:43:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51738)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dIez0-0002f6-8B
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:43:02 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 630BE8553C
+	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 17:43:00 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <1496745042-2379-3-git-send-email-peterx@redhat.com> (Peter Xu's
+	message of "Tue, 6 Jun 2017 18:30:38 +0800")
+References: <1496745042-2379-1-git-send-email-peterx@redhat.com>
+	<1496745042-2379-3-git-send-email-peterx@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 07 Jun 2017 19:42:57 +0200
+Message-ID: <87k24nd78e.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <20170601172734.9039-20-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="sJHWT84aJjAmgVAL63rgpRCS1VWjfXeDm"
-Subject: Re: [Qemu-devel] [PATCH v8 19/20] qcow2: report encryption specific
- image information
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 2/6] migration: move global_state.optional
+ out
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,195 +35,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---sJHWT84aJjAmgVAL63rgpRCS1VWjfXeDm
-From: Max Reitz <mreitz@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
-Message-ID: <8e56eb6a-6e2e-41fa-80fd-59060fca6e51@redhat.com>
-Subject: Re: [PATCH v8 19/20] qcow2: report encryption specific image
- information
-References: <20170601172734.9039-1-berrange@redhat.com>
- <20170601172734.9039-20-berrange@redhat.com>
-In-Reply-To: <20170601172734.9039-20-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2017-06-01 19:27, Daniel P. Berrange wrote:
-> Currently 'qemu-img info' reports a simple "encrypted: yes"
-> field. This is not very useful now that qcow2 can support
-> multiple encryption formats. Users want to know which format
-> is in use and some data related to it.
->=20
-> Wire up usage of the qcrypto_block_get_info() method so that
-> 'qemu-img info' can report about the encryption format
-> and parameters in use
->=20
->   $ qemu-img create \
->       --object secret,id=3Dsec0,data=3D123456 \
->       -o encrypt.format=3Dluks,encrypt.key-secret=3Dsec0 \
->       -f qcow2 demo.qcow2 1G
->   Formatting 'demo.qcow2', fmt=3Dqcow2 size=3D1073741824 \
->   encryption=3Doff encrypt.format=3Dluks encrypt.key-secret=3Dsec0 \
->   cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
->=20
->   $ qemu-img info demo.qcow2
->   image: demo.qcow2
->   file format: qcow2
->   virtual size: 1.0G (1073741824 bytes)
->   disk size: 480K
->   encrypted: yes
->   cluster_size: 65536
->   Format specific information:
->       compat: 1.1
->       lazy refcounts: false
->       refcount bits: 16
->       encrypt:
->           ivgen alg: plain64
->           hash alg: sha256
->           cipher alg: aes-256
->           uuid: 3fa930c4-58c8-4ef7-b3c5-314bb5af21f3
->           format: luks
->           cipher mode: xts
->           slots:
->               [0]:
->                   active: true
->                   iters: 1839058
->                   key offset: 4096
->                   stripes: 4000
->               [1]:
->                   active: false
->                   key offset: 262144
->               [2]:
->                   active: false
->                   key offset: 520192
->               [3]:
->                   active: false
->                   key offset: 778240
->               [4]:
->                   active: false
->                   key offset: 1036288
->               [5]:
->                   active: false
->                   key offset: 1294336
->               [6]:
->                   active: false
->                   key offset: 1552384
->               [7]:
->                   active: false
->                   key offset: 1810432
->           payload offset: 2068480
->           master key iters: 438487
->       corrupt: false
->=20
-> With the legacy "AES" encryption we just report the format
-> name
->=20
->   $ qemu-img create \
->       --object secret,id=3Dsec0,data=3D123456 \
->       -o encrypt.format=3Daes,encrypt.key-secret=3Dsec0 \
->       -f qcow2 demo.qcow2 1G
->   Formatting 'demo.qcow2', fmt=3Dqcow2 size=3D1073741824 \
->   encryption=3Doff encrypt.format=3Daes encrypt.key-secret=3Dsec0 \
->   cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
->=20
->   $ ./qemu-img info demo.qcow2
->   image: demo.qcow2
->   file format: qcow2
->   virtual size: 1.0G (1073741824 bytes)
->   disk size: 196K
->   encrypted: yes
->   cluster_size: 65536
->   Format specific information:
->       compat: 1.1
->       lazy refcounts: false
->       refcount bits: 16
->       encrypt:
->           format: aes
->       corrupt: false
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Peter Xu <peterx@redhat.com> wrote:
+> Put it into MigrationState then we can use the properties to specify
+> whether to enable storing global state.
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 > ---
->  block/qcow2.c        | 32 +++++++++++++++++++++++++++++++-
->  qapi/block-core.json | 27 ++++++++++++++++++++++++++-
->  2 files changed, 57 insertions(+), 2 deletions(-)
->=20
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 58da658..a8a23af 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
+>  include/migration/migration.h |  6 ++++++
+>  migration/migration.c         | 21 +++++++++++++++++----
+>  2 files changed, 23 insertions(+), 4 deletions(-)
+>
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index bd0186c..8aa1ea6 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -162,6 +162,12 @@ struct MigrationState
+>      /* Do we have to clean up -b/-i from old migrate parameters */
+>      /* This feature is deprecated and will be removed */
+>      bool must_remove_block_options;
+> +
+> +    /*
+> +     * Global switch on whether we need to store the global state
+> +     * during migration.
+> +     */
+> +    bool store_global_state;
+>  };
+>  
+>  void migrate_set_state(int *state, int old_state, int new_state);
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 483b027..0653f49 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -140,13 +140,13 @@ void migration_incoming_state_destroy(void)
+>  
+>  
+>  typedef struct {
+> -    bool optional;
+>      uint32_t size;
+>      uint8_t runstate[100];
+>      RunState state;
+>      bool received;
+>  } GlobalState;
+>  
+> +/* This is only used if MigrationState.store_global_state is set. */
+>  static GlobalState global_state;
+>  
+>  int global_state_store(void)
+> @@ -179,7 +179,7 @@ static RunState global_state_get_runstate(void)
+>  
+>  void global_state_set_optional(void)
+>  {
+> -    global_state.optional = true;
+> +    migrate_get_current()->store_global_state = false;
 
-[...]
+Part of the advantage (for me) of using qapi was not to have to export
+a function to set this.  I.e.  isn't a way to call
 
-> @@ -3224,6 +3230,30 @@ static ImageInfoSpecific *qcow2_get_specific_inf=
-o(BlockDriverState *bs)
->          assert(false);
+qemu_opt_get_bool(migration_opts, "store_global_state", true)
+
+qapi_<magic>_set_bool(migration_opts, "store_global_state",false);
+?
+
+So, I don't have to eport global_state_set_optional()?
+
+
+My goal would be that when I need to add a new propertly, I add it to
+migration_properties and to MigrationState and call it a day?
+
+>  static bool global_state_needed(void *opaque)
+> @@ -188,8 +188,7 @@ static bool global_state_needed(void *opaque)
+>      char *runstate = (char *)s->runstate;
+>  
+>      /* If it is not optional, it is mandatory */
+> -
+> -    if (s->optional == false) {
+> +    if (migrate_get_current()->store_global_state) {
+
+Being able to query without having a function would also be nice.
+
+Later, Juan.
+
+>          return true;
 >      }
-> =20
-> +    if (encrypt_info) {
-> +        ImageInfoSpecificQCow2Encryption *qencrypt =3D
-> +            g_new(ImageInfoSpecificQCow2Encryption, 1);
-> +        switch (encrypt_info->format) {
-> +        case Q_CRYPTO_BLOCK_FORMAT_QCOW:
-> +            qencrypt->format =3D BLOCKDEV_QCOW2_ENCRYPTION_FORMAT_AES;=
-
-> +            qencrypt->u.aes =3D encrypt_info->u.qcow;
-> +            break;
-> +        case Q_CRYPTO_BLOCK_FORMAT_LUKS:
-> +            qencrypt->format =3D BLOCKDEV_QCOW2_ENCRYPTION_FORMAT_LUKS=
-;
-> +            qencrypt->u.luks =3D encrypt_info->u.luks;
-> +            break;
-> +        default:
-> +            assert(false);
-
-I'd rather like this to be either a plain abort() or a
-g_asert_not_reached(); the latter is more expressive, and the former
-will work even with NDEBUG.
-
-I know we already have an assert(false) in this function, but I'd assert
-this is just wrong.
-
-With this changed (or with me convinced that we should just use
-assert(false)):
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-> +        }
-> +        /* Since we did shallow copy above, erase any pointers
-> +         * in the original info */
-> +        memset(&encrypt_info->u, 0, sizeof(encrypt_info->u));
-> +        qapi_free_QCryptoBlockInfo(encrypt_info);
-> +
-> +        spec_info->u.qcow2.data->has_encrypt =3D true;
-> +        spec_info->u.qcow2.data->encrypt =3D qencrypt;
-> +    }
-> +
->      return spec_info;
+>  
+> @@ -2109,6 +2108,19 @@ void migrate_fd_connect(MigrationState *s)
+>      s->migration_thread_running = true;
 >  }
-
-
-
---sJHWT84aJjAmgVAL63rgpRCS1VWjfXeDm
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEvBAEBCAAZBQJZODokEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQKyF
-CACYInxHJOlXQDaofhEx2oDYnIWmmcNECnJMIYg9H/UB/KZcl5lye5bvzWMeRths
-lskoiCqQy4qFPkZHGnieUEjDVLuThAIG/10oaeHEuRYtglE97zJatmO5kv9WocLO
-edkdU/Soy8VOaouGJlpbxYazxy+rEpbBwwTCVlPxJZkj9/GvbMfe4mA/cZvLSA5j
-SPF8KHHvqzMkISAFTDD5paf3BQ8p0hQ31xfrVEcKbFeMw/HZCyp7M2PrnFwDhm+4
-8NPnEhe4a/AANv8jrRS8vV9Lx6n2Zgzy7DGNPyjVMWoPRTmVmXvEi0jYCc1BnFZH
-7GGdAvBTwUw8HTFZdgBVd471
-=rr3z
------END PGP SIGNATURE-----
-
---sJHWT84aJjAmgVAL63rgpRCS1VWjfXeDm--
+>  
+> +static Property migration_properties[] = {
+> +    DEFINE_PROP_BOOL("store-global-state", MigrationState,
+> +                     store_global_state, true),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static void migration_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->props = migration_properties;
+> +}
+> +
+>  static void migration_instance_init(Object *obj)
+>  {
+>      MigrationState *ms = MIGRATION_OBJ(obj);
+> @@ -2133,6 +2145,7 @@ static void migration_instance_init(Object *obj)
+>  static const TypeInfo migration_type = {
+>      .name = TYPE_MIGRATION,
+>      .parent = TYPE_DEVICE,
+> +    .class_init = migration_class_init,
+>      .class_size = sizeof(MigrationClass),
+>      .instance_size = sizeof(MigrationState),
+>      .instance_init = migration_instance_init,
