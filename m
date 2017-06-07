@@ -1,44 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dIZw8-0007zu-I3
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 08:19:45 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dIa7V-0002jT-GN
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 08:31:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dIZw5-000068-A8
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 08:19:44 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54462
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dIZw5-00005y-41
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 08:19:41 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v57CIvm2046238
-	for <qemu-devel@nongnu.org>; Wed, 7 Jun 2017 08:19:40 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2axcucdf6h-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 08:19:39 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Wed, 7 Jun 2017 13:19:38 +0100
-References: <20170606165510.33057-1-pasic@linux.vnet.ibm.com>
-	<20170606165510.33057-3-pasic@linux.vnet.ibm.com>
-	<20170607110758.GC2099@work-vm>
-	<c6466750-6d71-988c-6c81-9c54f5ca995a@linux.vnet.ibm.com>
-	<20170607120138.GD2384@work-vm>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Wed, 7 Jun 2017 14:19:33 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1dIa7U-0004DW-IM
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 08:31:29 -0400
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:35954)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dIa7U-0004DR-CV
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 08:31:28 -0400
+Received: by mail-wr0-x232.google.com with SMTP id v111so5479060wrc.3
+	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 05:31:28 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170607120138.GD2384@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <1fb16203-3857-d0aa-498e-4acca6a28a41@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 2/3] vmstate: error hint for failed
- equal checks part 2
+In-Reply-To: <878tlct0o3.fsf@dusky.pond.sub.org>
+References: <20170531135709.345-1-marcandre.lureau@redhat.com>
+	<20170531135709.345-6-marcandre.lureau@redhat.com>
+	<878tlct0o3.fsf@dusky.pond.sub.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 7 Jun 2017 13:31:06 +0100
+Message-ID: <CAFEAcA8C2yfwJHyf63pWc5Sxbb+sbTeTpDJG6H4VYARwX=Yxcw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 05/45] qdev: remove PropertyInfo.qtype
+ field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,94 +31,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
+On 1 June 2017 at 12:19, Markus Armbruster <armbru@redhat.com> wrote:
+> Lovely cleanup.
+>
+> The interesting part is the move of the bits controlling use of ->defval
+> from Property member .qtype (set only by DEFINE_PROP_foo() macros) to
+> its PropertyInfo method .info->set_default_value().  No functional
+> change if (1) we preserve existing use of ->defval and (2) we don't add
+> new uses of ->defval, or at least not uses that matter.
+>
+> Direction (1) is obvious for DEFINE_PROP_BIT(), DEFINE_PROP_BIT64(),
+> DEFINE_PROP_BOOL().  They set .info to &qdev_prop_bit, &qdev_prop_bit64,
+> &qdev_prop_bool, respectively.  These all get .set_default_value =
+> set_default_value_bool, which preserves the effect of .qtype =
+> QTYPE_BOOL.  Good.
+>
+> DEFINE_PROP_DEFAULT() sets .info to point to its argument _prop.  The
+> following arguments occur:
+>
+> * In include/hw/qdev-properties.h: qdev_prop_uint8, qdev_prop_uint16,
+>   qdev_prop_uint32, qdev_prop_int32, qdev_prop_uint64, qdev_prop_size,
+>   qdev_prop_pci_devfn, qdev_prop_on_off_auto, qdev_prop_losttickpolicy,
+>   qdev_prop_blockdev_on_error, qdev_prop_bios_chs_trans,
+>   qdev_prop_blocksize
+>
+> * In hw/block/fdc.c: qdev_prop_fdc_drive_type
+>
+> * In hw/net/e1000e.c: local copies of qdev_prop_uint8, qdev_prop_uint16.
+>
+> To preserve the effect of .qtype = QTYPE_QINT, these PropertyInfo need
+> .set_default_value = set_default_value_int or .set_default_value =
+> set_default_value_enum, depending on .enum_table.  They get it.  Good.
+>
+> DEFINE_PROP_ARRAY() sets .info to &qdev_prop_arraylen.  Needs and gets
+> .set_default_value = set_default_value_int.  Good.
+>
+> DEFINE_PROP_ARRAY() also takes a PropertyInfo argument, but it's not
+> relevant here, as the .qtype you remove doesn't apply to it.  I'm
+> mentioning this, because it confused me briefly.
+>
+> Direction (2) isn't as visible in the patch.  For each PropertyInfo you
+> change, we need to find and check stores into .info not wrapped in the
+> DEFINE_PROP_foo() macros you change.
+>
+> I can't find any.  Good.
 
+I think this is going to break a patch I was halfway through
+writing :-(
 
-On 06/07/2017 02:01 PM, Dr. David Alan Gilbert wrote:
-> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
->>
->>
->> On 06/07/2017 01:07 PM, Dr. David Alan Gilbert wrote:
->>> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
->>>> Verbose error reporting for the _EQUAL family. Modify the standard _EQUAL
->>>> so the hint states the assertion probably failed due to a bug. Introduce
->>>> _EQUAL_HINT for specifying a context specific hint.
->>>>
->>>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->>>
->>> I'd prefer not to print 'Bug!?' by default - they already get the
->>> message telling them something didn't match and the migration fails.
->>> There are none-bug ways of this happening, e.g. a user starting a VM on
->>> the source and destination with different configs.
->>
->> I admit, my objective with 'Bug!?' was to provoke. My train of thought is
->> to encourage the programmer to think about and document the circumstances
->> under which such an assertion is supposed to fail (and against which it
->> is supposed to guard).
->>
->> I do not know how skillful are our users but a 4 != 5 then maybe a name
->> of a vmstate field is probably quite scary and not very revealing. I doubt
->> a non qemu developer can use it for something else that reporting a bug.
->>
->> Consequently if there are non-bug ways one can use the hint and state them.
->> Your example with the misconfigured target, by the way, is IMHO also be due
->> to a bug of the management software IMHO.
->>
->> To sum it up: IMHO the message provided by a failing _EQUAL is to ugly
->> and Qemuspeak to be presented to an user-user in non-bug cases. Agree?
->> Disagree?
-> 
-> Disagree.
-> 
-> I don't mind giving field names etc; they make it easy for us as
-> developers to track down what's happening, but also sometimes they help
-> endusers work around a prolem or see where the problem is; of course
-> that varies depending on the field name, but some of our names are
-> reasonable (e.g. there's a VMSTATE_INT32_EQUAL on 'queue_size' in
-> vmmouse.c).  They're also pretty good if two end users hit the same
-> problem they can see the same error message in a bug report.
-> 
-> We often have customer-facing support people look at logs before they
-> get as far as us developers; if we have bugs that are 
-> 'if it's a failing BLAH device complaining about the BAR field'
-> then this fixes it, then that helps them find workarounds/fixes quickly
-> even if they don't understand what the BAR field is.
-> 
+What I want is "DEFINE_PROP_UINT32, but don't set the default value"
+(because the default value in this case (a) isn't constant and
+(b) is already in the struct field that the property modifies).
+My plan for doing this was:
+ static Property arm_cpu_pmsav7_dregion_property =
+    DEFINE_PROP("pmsav7-dregion", ARMCPU, pmsav7_dregion,
+                qdev_prop_uint32, uint32_t);
 
-You seem to forget, that I'm not proposing omitting this information,
-but extending it with something civilized so one can distinguish between
-an assert failed should have never happened situation an a as good as
-reasonable error handling for an expected error scenario. IMHO the current
-EQUAL looks more like the former (assert) and less like the later (error
-reporting for an expected error scenario). Agree? Dissagree?
+This won't work any more if qdev_property_add_static
+assumes that "qdev_prop_uint32" implies "always set the default value".
+So how should I obtain those semantics with this cleanup in place ?
 
-Having a field name is great! That's beyond discussion.
-
-I see, my 'sum it up' above was a bit unfortunate: it sounds like I'm
-against the inclusion of technical info and not against a lack of non
-technical info. Sorry for that!
-
->>
->>>
->>> (I also worry we have a lot f macros for each size;
->>> EQUAL, EQUAL_V, EQUAL_V_HINT but I don't know of a better answer for
->>> that)
->>>
->>
->> If we are going to drop the default hint ('Bug?!' or whatever) then
->> I think we could just add an extra NULL hint to each existing  _EQUAL
->> usage, re-purpose EQUAL, and forget about introducing new _HINT macros.
->>
->> What to you think?
-> 
-> Yes, that would be a lot simpler; and there aren't that many
-> VMSTATE*EQUAL* macros in use.
-> 
-
-I still have not given up on the discussion above. Will do depending
-on the outcome.
-
-Regards,
-Halil
+thanks
+-- PMM
