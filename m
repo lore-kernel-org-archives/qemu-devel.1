@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dId1O-0003gb-7H
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:37:23 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dId29-0004fO-MN
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:38:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dId1N-0005ZH-AN
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:37:22 -0400
-References: <d5b487b58c2c6b3e68de0e858b84877434f05c76.1496843678.git.jcody@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f10688f7-0e86-38b5-fae7-31911a9d66e8@redhat.com>
-Date: Wed, 7 Jun 2017 10:37:13 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1dId28-0005uF-84
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:38:09 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:36572)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dId28-0005tl-1E
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:38:08 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id v111so7851415wrc.3
+	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 08:38:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <d5b487b58c2c6b3e68de0e858b84877434f05c76.1496843678.git.jcody@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Xehldbbq6FGxfCJdLKR55A4NlVn8tEDuD"
-Subject: Re: [Qemu-devel] [PATCH] block: fix external snapshot abort
- permission error
+In-Reply-To: <20170607152825.12081-2-pbonzini@redhat.com>
+References: <20170607152825.12081-1-pbonzini@redhat.com>
+	<20170607152825.12081-2-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 7 Jun 2017 16:37:46 +0100
+Message-ID: <CAFEAcA8CppP6YEPkGxVEyLnO=Kk1qirpGk2sh0bXedscxct8Jg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 18/33] vhost-user-scsi: Introduce
+ vhost-user-scsi host device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,87 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Felipe Franciosi <felipe@nutanix.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Xehldbbq6FGxfCJdLKR55A4NlVn8tEDuD
-From: Eric Blake <eblake@redhat.com>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
-Message-ID: <f10688f7-0e86-38b5-fae7-31911a9d66e8@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] block: fix external snapshot abort
- permission error
-References: <d5b487b58c2c6b3e68de0e858b84877434f05c76.1496843678.git.jcody@redhat.com>
-In-Reply-To: <d5b487b58c2c6b3e68de0e858b84877434f05c76.1496843678.git.jcody@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 7 June 2017 at 16:28, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> From: Felipe Franciosi <felipe@nutanix.com>
+>
+> This commit introduces a vhost-user device for SCSI. This is based
+> on the existing vhost-scsi implementation, but done over vhost-user
+> instead. It also uses a chardev to connect to the backend. Unlike
+> vhost-scsi (today), VMs using vhost-user-scsi can be live migrated.
+>
+> To use it, start Qemu with a command line equivalent to:
+>
+> qemu-system-x86_64 \
+>        -chardev socket,id=vus0,path=/tmp/vus.sock \
+>        -device vhost-user-scsi-pci,chardev=vus0,bus=pci.0,addr=...
+>
+> A separate commit presents a sample application linked with libiscsi to
+> provide a backend for vhost-user-scsi.
+>
+> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
+> Message-Id: <1488479153-21203-4-git-send-email-felipe@nutanix.com>
+> [Disable migration for now, since it does not support bdrv_drain. - Paolo]
 
-On 06/07/2017 08:55 AM, Jeff Cody wrote:
-> In external_snapshot_abort(), we try to undo what was done in
-> external_snapshot_prepare() calling bdrv_replace_node() to swap the
-> nodes back.  However, we receive a permissions error as writers are
-> blocked on the old node, which is now the new node backing file.
->=20
-> An easy fix (initially suggested by Kevin Wolf) is to call
-> bdrv_set_backing_hd() on the new node, to set the backing node to NULL.=
+I was expecting this to mean a VMStateDescription with a
+".unmigratable = 1" field, but it doesn't seem to have one.
+Does it disable migration some other way?
 
->=20
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
-> ---
->  blockdev.c | 4 ++++
->  1 file changed, 4 insertions(+)
->=20
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-> diff --git a/blockdev.c b/blockdev.c
-> index 892d768..6472548 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -1803,7 +1803,11 @@ static void external_snapshot_abort(BlkActionSta=
-te *common)
->                               DO_UPCAST(ExternalSnapshotState, common, =
-common);
->      if (state->new_bs) {
->          if (state->overlay_appended) {
-> +            bdrv_ref(state->old_bs);   /* we can't let bdrv_set_backin=
-d_hd()
-> +                                          close state->old_bs; we need=
- it */
-> +            bdrv_set_backing_hd(state->new_bs, NULL, &error_abort);
->              bdrv_replace_node(state->new_bs, state->old_bs, &error_abo=
-rt);
-> +            bdrv_unref(state->old_bs); /* bdrv_replace_node() ref'ed o=
-ld_bs */
->          }
->      }
->  }
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---Xehldbbq6FGxfCJdLKR55A4NlVn8tEDuD
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZOB2pAAoJEKeha0olJ0Nq+I4H/3fmgs4QPzDKSmL+sDMAWonR
-0GUdFPwtvyybYQ68/PyT847SowgXRzuBh1aKIxw5IkkQ/qnPdxkorQMvTLFRC3qx
-OH6d0mS9WE2CS8iUtDBW5CDuG5g4wiKykGU1dKB9fyqPy9D2ZLGQJ6TECr12TnGc
-i6vO6DE9zVZQuyNMU70ULL1I1TVExV+Z5AJ4wLsWc+7ofotAivFdsKR9d3zZbPQK
-Pm2yIqr1hPcc4iphhiQ/4vBNQGjE9/jeTlql9pm+uFJQxE+MA47WkJ/W9KRQppPe
-RULlxqa3JX3XyY/mah6pY1F3QwFJ8TPMOHV19hRDqOx3N39QEASIOgfVsWvkAAU=
-=BBIz
------END PGP SIGNATURE-----
-
---Xehldbbq6FGxfCJdLKR55A4NlVn8tEDuD--
+thanks
+-- PMM
