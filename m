@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47496)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dIV1w-000094-Uy
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:05:25 -0400
+	(envelope-from <armbru@redhat.com>) id 1dIV3Z-0000iR-LN
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:07:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dIV1s-0006iO-Bj
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:05:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57718)
+	(envelope-from <armbru@redhat.com>) id 1dIV3T-0007Gg-Hn
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:07:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59668)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dIV1s-0006i3-5L
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:05:20 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dIV3T-0007G4-CA
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:06:59 -0400
 From: Markus Armbruster <armbru@redhat.com>
-References: <cover.1496746390.git.maozy.fnst@cn.fujitsu.com>
-	<3579e47c4bb41476406e26685292aaa9153fcc77.1496746391.git.maozy.fnst@cn.fujitsu.com>
-	<20170606145250.GG5016@thinpad.lan.raisama.net>
-	<a6e6a698-ab28-b956-b13d-d75c9c203838@cn.fujitsu.com>
-Date: Wed, 07 Jun 2017 09:05:08 +0200
-In-Reply-To: <a6e6a698-ab28-b956-b13d-d75c9c203838@cn.fujitsu.com> (Mao
-	Zhongyi's message of "Wed, 7 Jun 2017 13:33:51 +0800")
-Message-ID: <87a85k46sb.fsf@dusky.pond.sub.org>
+References: <20170605085254.16485-1-sf@sfritsch.de>
+	<e27e8fb4-64fa-9ba9-26a2-aa2af758462b@redhat.com>
+	<39506179-0abd-5bba-89a2-fe89e6f3a167@redhat.com>
+	<87a85ljdhn.fsf@dusky.pond.sub.org>
+	<1378843477.6503332.1496789071735.JavaMail.zimbra@redhat.com>
+Date: Wed, 07 Jun 2017 09:06:53 +0200
+In-Reply-To: <1378843477.6503332.1496789071735.JavaMail.zimbra@redhat.com>
+	(Paolo Bonzini's message of "Tue, 6 Jun 2017 18:44:31 -0400 (EDT)")
+Message-ID: <8760g846pe.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 5/7] pci: Make errp the last parameter
- of pci_add_capability()
+Subject: Re: [Qemu-devel] [PATCH] Add chardev-send-break monitor command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +30,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, mst@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org, marcel@redhat.com, alex.williamson@redhat.com, dmitry@daynix.com, pbonzini@redhat.com, rth@twiddle.net
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefan Fritsch <sf@sfritsch.de>, qemu-devel@nongnu.org, "Dr. David
+	Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-> Hi, Eduardo
+>> >> Is there an obvious test that we can enhance to add coverage of the new
+>> >> QMP command?
+>> >
+>> > You could have a new test covering hw/char/serial.c, but I wouldn't let
+>> > that hold the patch.
+>> 
+>> Holding patches is pretty much the only leverage I have to get tests for
+>> new stuff :)
+>> 
+>> Asking for tests that cover all of serial.c wouldn't be fair.  But I am
+>> asking for basic test coverage of new QMP commands.
 >
-> On 06/06/2017 10:52 PM, Eduardo Habkost wrote:
->> On Tue, Jun 06, 2017 at 07:26:30PM +0800, Mao Zhongyi wrote:
->>> Add Error argument for pci_add_capability() to leverage the errp
->>> to pass info on errors. This way is helpful for its callers to
->>> make a better error handling when moving to 'realize'.
-[...]
->>> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
->>> index b73bfea..2bba37a 100644
->>> --- a/hw/pci/pci.c
->>> +++ b/hw/pci/pci.c
->>> @@ -2264,15 +2264,13 @@ static void pci_del_option_rom(PCIDevice *pdev)
->>>   * in pci config space
->>>   */
->>>  int pci_add_capability(PCIDevice *pdev, uint8_t cap_id,
->>> -                       uint8_t offset, uint8_t size)
->>> +                       uint8_t offset, uint8_t size,
->>> +                       Error **errp)
->>>  {
->>>      int ret;
->>> -    Error *local_err = NULL;
->>>
->>> -    ret = pci_add_capability2(pdev, cap_id, offset, size, &local_err);
->>> -    if (ret < 0) {
->>> -        error_report_err(local_err);
->>> -    }
->>> +    ret = pci_add_capability2(pdev, cap_id, offset, size, errp);
->>> +
->>>      return ret;
->>>  }
->>
->> pci_add_capability() and pci_add_capability2() now do exactly the
->> same, why are both being kept?  I suggest replacing
->> pci_add_capability2() with pci_add_capability() everywhere (on a
->> separate patch).
->>
->
-> Completely remove pci_add_capability and direct use pci_add_capability2()
-> everywhere is it a more thorough way?
+> I agree, on the other hand it's not exactly a comparable area.  I am planning
+> to write a serial qtest for migration as well (which is more complex than this
+> QMP command) so I might as well write the test for this new QMP command myself
+> to get my feet wet...
 
-You're converting pci_add_capability() to Error because you need the
-Error for your conversions to realize().
-
-I recommend to change the calls where you need the Error (and only
-these) to call pci_add_capability2() instead.
-
-When no calls to pci_add_capability() remain, we remove it.  If that
-becomes the case in your series, you remove it.
-
-Okay?
+I'm willing to take a committment from someone I trust in lieu of actual
+tests.  Is this one?
