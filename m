@@ -1,27 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dIV3Z-0000iR-LN
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:07:10 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dIV4A-0001cE-Db
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:07:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dIV3T-0007Gg-Hn
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:07:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59668)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dIV3T-0007G4-CA
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:06:59 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170605085254.16485-1-sf@sfritsch.de>
-	<e27e8fb4-64fa-9ba9-26a2-aa2af758462b@redhat.com>
-	<39506179-0abd-5bba-89a2-fe89e6f3a167@redhat.com>
-	<87a85ljdhn.fsf@dusky.pond.sub.org>
-	<1378843477.6503332.1496789071735.JavaMail.zimbra@redhat.com>
-Date: Wed, 07 Jun 2017 09:06:53 +0200
-In-Reply-To: <1378843477.6503332.1496789071735.JavaMail.zimbra@redhat.com>
-	(Paolo Bonzini's message of "Tue, 6 Jun 2017 18:44:31 -0400 (EDT)")
-Message-ID: <8760g846pe.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] Add chardev-send-break monitor command
+	(envelope-from <dgibson@ozlabs.org>) id 1dIV47-0007Oe-8m
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 03:07:42 -0400
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Wed,  7 Jun 2017 17:07:32 +1000
+Message-Id: <20170607070732.23312-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PATCH] pseries: Correct panic behaviour for pseries
+ machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +18,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Fritsch <sf@sfritsch.de>, qemu-devel@nongnu.org, "Dr. David
-	Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: mdroth@linux.vnet.ibm.com, thuth@redhat.com, lvivier@redhat.com
+Cc: pbonzini@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+The pseries machine type doesn't usually use the 'pvpanic' device as such,
+because it has a firmware/hypervisor facility with roughly the same
+purpose.  The 'ibm,os-term' RTAS call notifies the hypervisor that the
+guest has crashed.
 
->> >> Is there an obvious test that we can enhance to add coverage of the new
->> >> QMP command?
->> >
->> > You could have a new test covering hw/char/serial.c, but I wouldn't let
->> > that hold the patch.
->> 
->> Holding patches is pretty much the only leverage I have to get tests for
->> new stuff :)
->> 
->> Asking for tests that cover all of serial.c wouldn't be fair.  But I am
->> asking for basic test coverage of new QMP commands.
->
-> I agree, on the other hand it's not exactly a comparable area.  I am planning
-> to write a serial qtest for migration as well (which is more complex than this
-> QMP command) so I might as well write the test for this new QMP command myself
-> to get my feet wet...
+Our implementation of this call was sending a GUEST_PANICKED qmp event;
+however, it was not doing the other usual panic actions, making its
+behaviour different from pvpanic for no good reason.
 
-I'm willing to take a committment from someone I trust in lieu of actual
-tests.  Is this one?
+To correct this, we should call qemu_system_guest_panicked() rather than
+directly sending the panic event.
+
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/spapr_rtas.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+index 707c4d4..94a2799 100644
+--- a/hw/ppc/spapr_rtas.c
++++ b/hw/ppc/spapr_rtas.c
+@@ -293,12 +293,9 @@ static void rtas_ibm_os_term(PowerPCCPU *cpu,
+                             target_ulong args,
+                             uint32_t nret, target_ulong rets)
+ {
+-    target_ulong ret = 0;
++    qemu_system_guest_panicked(NULL);
+ 
+-    qapi_event_send_guest_panicked(GUEST_PANIC_ACTION_PAUSE, false, NULL,
+-                                   &error_abort);
+-
+-    rtas_st(rets, 0, ret);
++    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+ }
+ 
+ static void rtas_set_power_level(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+-- 
+2.9.4
