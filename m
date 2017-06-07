@@ -1,29 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dIRWI-0003Zu-Nz
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 23:20:32 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dIRWK-0003at-K4
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 23:20:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dIRWF-0002Rz-0h
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 23:20:30 -0400
-Received: from ozlabs.org ([103.22.144.67]:59687)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1dIRWE-0002P3-DQ
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 23:20:26 -0400
-Date: Wed, 7 Jun 2017 09:47:05 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1dIRWI-0002UB-Gd
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 23:20:32 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170606234705.GG13397@umbus.fritz.box>
-References: <1496404254-17429-1-git-send-email-peterx@redhat.com>
-	<1496404254-17429-3-git-send-email-peterx@redhat.com>
-	<20170602194523-mutt-send-email-mst@kernel.org>
-	<20170605030725.GF4056@pxdev.xzpeter.org>
-	<f68502e6-875c-0e46-f7cf-127c23513d20@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="d5ZB48mKYG2jsBgL"
-Content-Disposition: inline
-In-Reply-To: <f68502e6-875c-0e46-f7cf-127c23513d20@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/3] exec: simplify
- address_space_get_iotlb_entry
+Date: Wed,  7 Jun 2017 13:20:18 +1000
+Message-Id: <20170607032018.19588-8-david@gibson.dropbear.id.au>
+In-Reply-To: <20170607032018.19588-1-david@gibson.dropbear.id.au>
+References: <20170607032018.19588-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PATCHv2 7/7] spapr: Rework DRC name handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,71 +19,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Maxime Coquelin <maxime.coquelin@redhat.com>, Jason Wang <jasowang@redhat.com>
+To: mdroth@linux.vnet.ibm.com
+Cc: bharata@linux.vnet.ibm.com, sursingh@redhat.com, groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
+DRC objects have a get_name method which returns the DRC name generated
+when the DRC is created.  Replace that with a fixed spapr_drc_name()
+function which generates the name on the fly from other information.  This
+means:
+  * We get rid of a method with only one implementation, and only local
+    callers
+  * We don't have to carry the name string around for the lifetime of the
+    DRC
+  * We use information added to the class structure to generate the name
+    in standard format, so we don't need an explicit switch on drc type
+    any more
 
---d5ZB48mKYG2jsBgL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+We also eliminate the 'name' property; it's basically useless since the
+only information in it can easily be deduced from other things.
 
-On Tue, Jun 06, 2017 at 04:34:30PM +0200, Paolo Bonzini wrote:
->=20
->=20
-> On 05/06/2017 05:07, Peter Xu wrote:
-> > I don't sure whether it'll be a good interface for IOTLB. AFAIU at
-> > least for VT-d, the IOMMU translation is page aligned which is defined
-> > by spec, so it makes sense that (again at least for VT-d) here we'd
-> > better just use page_mask/addr_mask.
-> >=20
-> > That's also how I know about IOMMU in general - I assume it do the
-> > translations always with page masks (never arbitary length), though
-> > page size can differ from platfrom to platform, that's why here the
-> > IOTLB interface used addr_mask, then it works for all platforms. I
-> > don't know whether I'm 100% correct here though.
-> >=20
-> > Maybe David/Paolo/... would comment as well?
->=20
-> I would ask David.  There are PowerPC MMUs that allow fast lookup of
-> arbitrarily-sized windows (not necessarily power of two),
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/spapr_drc.c         | 80 +++++++++++++++++-----------------------------
+ include/hw/ppc/spapr_drc.h |  3 +-
+ 2 files changed, 30 insertions(+), 53 deletions(-)
 
-Uh.. I'm not sure what you mean here.  You might be thinking of the
-BATs which really old (32-bit) PowerPC MMUs had - those allow
-arbitrary large block translations, but they do have to be a power of
-two.
-
-> so maybe the
-> IOMMUs can do the same.
-
-The only Power IOMMU I know about uses a fixed, power-of-two page size
-per DMA window.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---d5ZB48mKYG2jsBgL
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZNz75AAoJEGw4ysog2bOSJ00QAMA3Byrqx3L6+jrdbc4jhegx
-UPWaVFfN6wXDaxcmOOOK2xX3YdH7G3qqH+wU3mYEMyDfgl6jYLG4Ctb/DhAB6e7f
-gCX4DpEJrx4uvx6taIBR3PQGlgdyvgdnKXtFxkJXDDe4vxNmfutvrEp97Grl7L1d
-vZ7hrj2HngjKqrXBH9GH/o3wGaE336rCHt5QXpZjzTdGGmOxV/0vv2GDalIpZiHi
-Bqf58hJIaBuThuHaEBSF0GvtWpgmUgQ1FxJb59yiU9Re0KitWYXYGUHndCBkf/9E
-4SUtPUo/VzsZYGaG8IGsPqbVSFGC4H4OyZCMiOKiVDVUwQmKJrdKHctDM8lpNhTb
-9/+hyQV0EFDA+N5hlhOS+hG6LI5KSZo0TWX/+Ama7KxbC0uLmNbnxZYynnIZkrsA
-TbqIfG7DMCK+Rehw0wc8JsRSQJYfg3U6jYceG5gIbwoUFfC3jQ2Ir1k/ELZ9zpst
-76RJtSi8gG9Fmi9wHpXl+uaKS1pMhgniZ+c2LBODLZ7WKy0UTshxPnrF1/YVzZ6T
-OQ7v5qdB0xHZ34NXbzTXeZAxkfSytL1pSTMn5d1S0ITTxyfn7DkukzyX7ftoHwEQ
-hhzdb6AwWUTPvSAQdOLi3KEbfAW+zeY3W17WOvj55PeNrFl9Ofxls04F3xl0oONj
-r4IUZ8E9ki9XV68OVQU2
-=e5yI
------END PGP SIGNATURE-----
-
---d5ZB48mKYG2jsBgL--
+diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+index 82c0b94..15ef67d 100644
+--- a/hw/ppc/spapr_drc.c
++++ b/hw/ppc/spapr_drc.c
+@@ -155,9 +155,32 @@ static uint32_t set_allocation_state(sPAPRDRConnector *drc,
+     return RTAS_OUT_SUCCESS;
+ }
+ 
+-static const char *get_name(sPAPRDRConnector *drc)
++static const char *spapr_drc_name(sPAPRDRConnector *drc)
+ {
+-    return drc->name;
++    sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
++
++    /* human-readable name for a DRC to encode into the DT
++     * description. this is mainly only used within a guest in place
++     * of the unique DRC index.
++     *
++     * in the case of VIO/PCI devices, it corresponds to a "location
++     * code" that maps a logical device/function (DRC index) to a
++     * physical (or virtual in the case of VIO) location in the system
++     * by chaining together the "location label" for each
++     * encapsulating component.
++     *
++     * since this is more to do with diagnosing physical hardware
++     * issues than guest compatibility, we choose location codes/DRC
++     * names that adhere to the documented format, but avoid encoding
++     * the entire topology information into the label/code, instead
++     * just using the location codes based on the labels for the
++     * endpoints (VIO/PCI adaptor connectors), which is basically just
++     * "C" followed by an integer ID.
++     *
++     * DRC names as documented by PAPR+ v2.7, 13.5.2.4
++     * location codes as documented by PAPR+ v2.7, 12.3.1.5
++     */
++    return g_strdup_printf("%s%d", drck->drc_name_prefix, drc->id);
+ }
+ 
+ /* has the guest been notified of device attachment? */
+@@ -202,13 +225,6 @@ static void prop_get_index(Object *obj, Visitor *v, const char *name,
+     visit_type_uint32(v, name, &value, errp);
+ }
+ 
+-static char *prop_get_name(Object *obj, Error **errp)
+-{
+-    sPAPRDRConnector *drc = SPAPR_DR_CONNECTOR(obj);
+-    sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+-    return g_strdup(drck->get_name(drc));
+-}
+-
+ static void prop_get_fdt(Object *obj, Visitor *v, const char *name,
+                          void *opaque, Error **errp)
+ {
+@@ -567,45 +583,6 @@ sPAPRDRConnector *spapr_dr_connector_new(Object *owner, const char *type,
+     object_property_set_bool(OBJECT(drc), true, "realized", NULL);
+     g_free(prop_name);
+ 
+-    /* human-readable name for a DRC to encode into the DT
+-     * description. this is mainly only used within a guest in place
+-     * of the unique DRC index.
+-     *
+-     * in the case of VIO/PCI devices, it corresponds to a
+-     * "location code" that maps a logical device/function (DRC index)
+-     * to a physical (or virtual in the case of VIO) location in the
+-     * system by chaining together the "location label" for each
+-     * encapsulating component.
+-     *
+-     * since this is more to do with diagnosing physical hardware
+-     * issues than guest compatibility, we choose location codes/DRC
+-     * names that adhere to the documented format, but avoid encoding
+-     * the entire topology information into the label/code, instead
+-     * just using the location codes based on the labels for the
+-     * endpoints (VIO/PCI adaptor connectors), which is basically
+-     * just "C" followed by an integer ID.
+-     *
+-     * DRC names as documented by PAPR+ v2.7, 13.5.2.4
+-     * location codes as documented by PAPR+ v2.7, 12.3.1.5
+-     */
+-    switch (spapr_drc_type(drc)) {
+-    case SPAPR_DR_CONNECTOR_TYPE_CPU:
+-        drc->name = g_strdup_printf("CPU %d", id);
+-        break;
+-    case SPAPR_DR_CONNECTOR_TYPE_PHB:
+-        drc->name = g_strdup_printf("PHB %d", id);
+-        break;
+-    case SPAPR_DR_CONNECTOR_TYPE_VIO:
+-    case SPAPR_DR_CONNECTOR_TYPE_PCI:
+-        drc->name = g_strdup_printf("C%d", id);
+-        break;
+-    case SPAPR_DR_CONNECTOR_TYPE_LMB:
+-        drc->name = g_strdup_printf("LMB %d", id);
+-        break;
+-    default:
+-        g_assert(false);
+-    }
+-
+     /* PCI slot always start in a USABLE state, and stay there */
+     if (spapr_drc_type(drc) == SPAPR_DR_CONNECTOR_TYPE_PCI) {
+         drc->allocation_state = SPAPR_DR_ALLOCATION_STATE_USABLE;
+@@ -621,7 +598,6 @@ static void spapr_dr_connector_instance_init(Object *obj)
+     object_property_add_uint32_ptr(obj, "id", &drc->id, NULL);
+     object_property_add(obj, "index", "uint32", prop_get_index,
+                         NULL, NULL, NULL, NULL);
+-    object_property_add_str(obj, "name", prop_get_name, NULL, NULL);
+     object_property_add(obj, "fdt", "struct", prop_get_fdt,
+                         NULL, NULL, NULL, NULL);
+ }
+@@ -636,7 +612,6 @@ static void spapr_dr_connector_class_init(ObjectClass *k, void *data)
+     dk->unrealize = unrealize;
+     drck->set_isolation_state = set_isolation_state;
+     drck->set_allocation_state = set_allocation_state;
+-    drck->get_name = get_name;
+     drck->release_pending = release_pending;
+     drck->set_signalled = set_signalled;
+     /*
+@@ -665,6 +640,7 @@ static void spapr_drc_cpu_class_init(ObjectClass *k, void *data)
+ 
+     drck->typeshift = SPAPR_DR_CONNECTOR_TYPE_SHIFT_CPU;
+     drck->typename = "CPU";
++    drck->drc_name_prefix = "CPU ";
+ }
+ 
+ static void spapr_drc_pci_class_init(ObjectClass *k, void *data)
+@@ -673,6 +649,7 @@ static void spapr_drc_pci_class_init(ObjectClass *k, void *data)
+ 
+     drck->typeshift = SPAPR_DR_CONNECTOR_TYPE_SHIFT_PCI;
+     drck->typename = "28";
++    drck->drc_name_prefix = "C";
+ }
+ 
+ static void spapr_drc_lmb_class_init(ObjectClass *k, void *data)
+@@ -681,6 +658,7 @@ static void spapr_drc_lmb_class_init(ObjectClass *k, void *data)
+ 
+     drck->typeshift = SPAPR_DR_CONNECTOR_TYPE_SHIFT_LMB;
+     drck->typename = "MEM";
++    drck->drc_name_prefix = "LMB ";
+ }
+ 
+ static const TypeInfo spapr_dr_connector_info = {
+@@ -829,7 +807,7 @@ int spapr_drc_populate_dt(void *fdt, int fdt_offset, Object *owner,
+         g_array_append_val(drc_power_domains, drc_power_domain);
+ 
+         /* ibm,drc-names */
+-        drc_names = g_string_append(drc_names, drck->get_name(drc));
++        drc_names = g_string_append(drc_names, spapr_drc_name(drc));
+         drc_names = g_string_insert_len(drc_names, -1, "\0", 1);
+ 
+         /* ibm,drc-types */
+diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+index 4f82001..c487123 100644
+--- a/include/hw/ppc/spapr_drc.h
++++ b/include/hw/ppc/spapr_drc.h
+@@ -184,7 +184,6 @@ typedef struct sPAPRDRConnector {
+ 
+     uint32_t id;
+     Object *owner;
+-    const char *name;
+ 
+     /* DR-indicator */
+     uint32_t dr_indicator;
+@@ -215,6 +214,7 @@ typedef struct sPAPRDRConnectorClass {
+     /*< public >*/
+     sPAPRDRConnectorTypeShift typeshift;
+     const char *typename; /* used in device tree, PAPR 13.5.2.6 & C.6.1 */
++    const char *drc_name_prefix; /* used other places in device tree */
+ 
+     sPAPRDREntitySense (*dr_entity_sense)(sPAPRDRConnector *drc);
+ 
+@@ -223,7 +223,6 @@ typedef struct sPAPRDRConnectorClass {
+                                     sPAPRDRIsolationState state);
+     uint32_t (*set_allocation_state)(sPAPRDRConnector *drc,
+                                      sPAPRDRAllocationState state);
+-    const char *(*get_name)(sPAPRDRConnector *drc);
+ 
+     /* QEMU interfaces for managing hotplug operations */
+     bool (*release_pending)(sPAPRDRConnector *drc);
+-- 
+2.9.4
