@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60581)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dIhLL-0002N2-Po
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 16:14:16 -0400
+	(envelope-from <cota@braap.org>) id 1dIhSv-00041x-IL
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 16:22:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dIhLH-0004sr-P1
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 16:14:15 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:34799)
+	(envelope-from <cota@braap.org>) id 1dIhSr-0007qa-J0
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 16:22:05 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:57087)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dIhLH-0004rT-Bt
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 16:14:11 -0400
-Date: Wed, 7 Jun 2017 16:14:10 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dIhSr-0007qM-Ed
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 16:22:01 -0400
+Date: Wed, 7 Jun 2017 16:22:00 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170607201410.GA19037@flamenco>
-References: <1493875481-16388-1-git-send-email-thuth@redhat.com>
-	<87pofpnljd.fsf@dusky.pond.sub.org>
+Message-ID: <20170607202200.GA20593@flamenco>
+References: <20170605165233.4135-1-rth@twiddle.net>
+	<20170605165233.4135-23-rth@twiddle.net>
+	<87h8zrdh02.fsf@linaro.org> <87fufbdghz.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <87pofpnljd.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v2] Fix the -accel parameter and the
- documentation for 'hax'
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87fufbdghz.fsf@linaro.org>
+Subject: Re: [Qemu-devel] [PULL 22/26] target/aarch64: optimize indirect
+ branches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +30,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Vincent Palatin <vpalatin@chromium.org>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Alex =?utf-8?B?QmVubu+/vWU=?= <alex.bennee@linaro.org>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-On Thu, May 04, 2017 at 09:11:50 +0200, Markus Armbruster wrote:
-> Thomas Huth <thuth@redhat.com> writes:
-(snip)
-> >  STEXI
-> >  @item -accel @var{name}[,prop=@var{value}[,...]]
-> >  @findex -accel
-> >  This is used to enable an accelerator. Depending on the target architecture,
-> > -kvm, xen, or tcg can be available. By default, tcg is used. If there is more
-> > -than one accelerator specified, the next one is used if the previous one fails
-> > -to initialize.
-> > +kvm, xen, hax or tcg can be available. By default, tcg is used. If there is
-> > +more than one accelerator specified, the next one is used if the previous one
-> > +fails to initialize.
-> >  @table @option
-> >  @item thread=single|multi
-> >  Controls number of TCG threads. When the TCG is multi-threaded there will be one
-> > diff --git a/vl.c b/vl.c
-> > index f46e070..0a1b931 100644
-> > --- a/vl.c
-> > +++ b/vl.c
-> > @@ -3725,26 +3725,21 @@ int main(int argc, char **argv, char **envp)
-> >                  qdev_prop_register_global(&kvm_pit_lost_tick_policy);
-> >                  break;
-> >              }
-> > -            case QEMU_OPTION_accel:
-> > +            case QEMU_OPTION_accel: {
-> > +                QemuOpts *accel_opts;
+On Wed, Jun 07, 2017 at 15:22:48 +0100, Alex Bennée wrote:
 > 
-> Doesn't this shadow the @accel_opts declared in main()'s outermost
-> scope?
+> Alex Bennée <alex.bennee@linaro.org> writes:
+> 
+> > Richard Henderson <rth@twiddle.net> writes:
+> >
+> >> From: "Emilio G. Cota" <cota@braap.org>
+> >>
+> >> Measurements:
+> >>
+> >> [Baseline performance is that before applying this and the previous
+> >> commit]
+> >
+> > Sadly this has regressed my qemu-system-aarch64 EL2 run. It was slightly
+> > masked by an unrelated assertion breakage which I had to fix. However
+> > with this patch my boot hangs spinning all 4 threads. Once reverted
+> > things work again.
+> >
+> > My command line:
+> >
+> >   timeout -k 1s --foreground 120s ./aarch64-softmmu/qemu-system-aarch64 -machine type=virt -display none -m 4096 -cpu cortex-a57 -serial mon:stdio -netdev user,id=unet -device virtio-net-device,netdev=unet -drive file=/home/alex/lsrc/qemu/images/jessie-arm64.qcow2,id=myblock,index=0,if=none -device virtio-blk-device,drive=myblock -append "console=ttyAMA0 root=/dev/vda1 systemd.unit=benchmark.service" -kernel /home/alex/lsrc/qemu/images/aarch64-current-linux-kernel-only.img -smp 4 -machine gic-version=3 -machine virtualization=true -name debug-threads=on
+> >
+> > My tree with fix and revert:
+> >
+> >   https://github.com/stsquad/qemu/tree/debug/aarch64-hang
+> >
+> > I'm investigating now.
+> 
+> Well this seems to be a case of hangs with -smp > 1 (which I guess was
+> obvious seeing as the TCG threads seem to be spinning against each
+> other).
 
-Yes, it does :( Unfortunately Markus' review slipped through the
-cracks and this patch ended up upstream (bde4d9205). It causes
-a regression that breaks qemu_tcg_configure(accel_opts)
-since now accel_opts is always NULL. That is, in `-accel [..],thread=foo'
-foo is ignored.
+Not sure the problem is in MTTCG; I cannot reproduce with -smp > 1 and
+thread=single; can you? [ I get no output whatsoever when trying to boot ]
 
-		Emilio
+Note that you'll need to revert bde4d9205ee to get thread=foo to
+work again -- see [1].
+
+Thanks,
+
+		E.
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg01980.html
