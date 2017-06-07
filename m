@@ -1,17 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53731)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dIf6M-00021K-TQ
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:50:39 -0400
+	(envelope-from <quintela@redhat.com>) id 1dIf7y-0003M7-DU
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:52:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dIf6M-0005xR-3w
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:50:38 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed,  7 Jun 2017 19:50:19 +0200
-Message-Id: <1496857819-12466-9-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1496857819-12466-1-git-send-email-kwolf@redhat.com>
-References: <1496857819-12466-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 8/8] block: fix external snapshot abort
- permission error
+	(envelope-from <quintela@redhat.com>) id 1dIf7v-0006SV-SR
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:52:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46086)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dIf7v-0006S7-MH
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:52:15 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A54AD3DBE0
+	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 17:52:14 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <1496745042-2379-7-git-send-email-peterx@redhat.com> (Peter Xu's
+	message of "Tue, 6 Jun 2017 18:30:42 +0800")
+References: <1496745042-2379-1-git-send-email-peterx@redhat.com>
+	<1496745042-2379-7-git-send-email-peterx@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 07 Jun 2017 19:52:11 +0200
+Message-ID: <877f0nd6t0.fsf@secure.mitica>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 6/6] migration: move skip_section_footers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,41 +34,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-From: Jeff Cody <jcody@redhat.com>
+Peter Xu <peterx@redhat.com> wrote:
+> Move it into MigrationState, with a property binded to it.
+>
+> Same trick played with HW_COMPAT_2_3.
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-In external_snapshot_abort(), we try to undo what was done in
-external_snapshot_prepare() calling bdrv_replace_node() to swap the
-nodes back.  However, we receive a permissions error as writers are
-blocked on the old node, which is now the new node backing file.
-
-An easy fix (initially suggested by Kevin Wolf) is to call
-bdrv_set_backing_hd() on the new node, to set the backing node to NULL.
-
-Signed-off-by: Jeff Cody <jcody@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- blockdev.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/blockdev.c b/blockdev.c
-index 892d768..6472548 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1803,7 +1803,11 @@ static void external_snapshot_abort(BlkActionState *common)
-                              DO_UPCAST(ExternalSnapshotState, common, common);
-     if (state->new_bs) {
-         if (state->overlay_appended) {
-+            bdrv_ref(state->old_bs);   /* we can't let bdrv_set_backind_hd()
-+                                          close state->old_bs; we need it */
-+            bdrv_set_backing_hd(state->new_bs, NULL, &error_abort);
-             bdrv_replace_node(state->new_bs, state->old_bs, &error_abort);
-+            bdrv_unref(state->old_bs); /* bdrv_replace_node() ref'ed old_bs */
-         }
-     }
- }
--- 
-1.8.3.1
+Reviewed-by: Juan Quintela <quintela@redhat.com>
