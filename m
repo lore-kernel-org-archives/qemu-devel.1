@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33987)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dIe0h-0001XO-2E
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:40:44 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dIe0j-0001a1-QF
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:40:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dIe0g-0000Ur-1T
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:40:43 -0400
-References: <20170601172734.9039-1-berrange@redhat.com>
-	<20170601172734.9039-8-berrange@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <bcff6607-5095-4b98-54ca-b65ecbac0474@redhat.com>
-Date: Wed, 7 Jun 2017 18:40:32 +0200
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dIe0j-0000W8-0b
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:40:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48438)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1dIe0i-0000Vs-RM
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:40:44 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CEEBE85359
+	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 16:40:43 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed,  7 Jun 2017 20:36:23 +0400
+Message-Id: <20170607163635.17635-32-marcandre.lureau@redhat.com>
+In-Reply-To: <20170607163635.17635-1-marcandre.lureau@redhat.com>
+References: <20170607163635.17635-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170601172734.9039-8-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="IPVGQwoepVnLlfNv8wSv5wRmhDOFOOuOX"
-Subject: Re: [Qemu-devel] [PATCH v8 07/20] block: deprecate "encryption=on"
- in favor of "encrypt.format=aes"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 31/43] pc: use get_uint() for "apic-id"
+ property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,147 +34,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---IPVGQwoepVnLlfNv8wSv5wRmhDOFOOuOX
-From: Max Reitz <mreitz@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
-Message-ID: <bcff6607-5095-4b98-54ca-b65ecbac0474@redhat.com>
-Subject: Re: [PATCH v8 07/20] block: deprecate "encryption=on" in favor of
- "encrypt.format=aes"
-References: <20170601172734.9039-1-berrange@redhat.com>
- <20170601172734.9039-8-berrange@redhat.com>
-In-Reply-To: <20170601172734.9039-8-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+TYPE_X86_CPU's property "apic-id" is defined with DEFINE_PROP_UINT32().
 
-On 2017-06-01 19:27, Daniel P. Berrange wrote:
-> Historically the qcow & qcow2 image formats supported a property
-> "encryption=3Don" to enable their built-in AES encryption. We'll
-> soon be supporting LUKS for qcow2, so need a more general purpose
-> way to enable encryption, with a choice of formats.
->=20
-> This introduces an "encrypt.format" option, which will later be
-> joined by a number of other "encrypt.XXX" options. The use of
-> a "encrypt." prefix instead of "encrypt-" is done to facilitate
-> mapping to a nested QAPI schema at later date.
->=20
-> e.g. the preferred syntax is now
->=20
->   qemu-img create -f qcow2 -o encrypt.format=3Daes demo.qcow2
->=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Alberto Garcia <berto@igalia.com>
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  block/qcow.c               | 30 ++++++++++++++---
->  block/qcow2.c              | 33 +++++++++++++++----
->  include/block/block_int.h  |  2 +-
->  qemu-img.c                 |  4 ++-
->  tests/qemu-iotests/082.out | 81 ++++++++++++++++++++++++++++++--------=
---------
->  5 files changed, 110 insertions(+), 40 deletions(-)
->=20
-> diff --git a/block/qcow.c b/block/qcow.c
-> index 6738bc7..42f83b2 100644
-> --- a/block/qcow.c
-> +++ b/block/qcow.c
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ hw/i386/pc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-[...]
-
-> @@ -818,8 +818,16 @@ static int qcow_create(const char *filename, QemuO=
-pts *opts, Error **errp)
->      }
-> =20
->      backing_file =3D qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FILE);
-> -    if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
-> -        flags |=3D BLOCK_FLAG_ENCRYPT;
-> +    encryptfmt =3D qemu_opt_get_del(opts, BLOCK_OPT_ENCRYPT_FORMAT);
-> +    if (encryptfmt) {
-> +        if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
-
-You should probably just use qemu_opt_get_del(opts, BLOCK_OPT_ENCRYPT)
-here, because otherwise you can do this:
-
-$ ./qemu-img create -f qcow -o encryption=3Doff,encrypt.format=3Daes \
-    foo.qcow 64M
-Formatting 'foo.qcow', fmt=3Dqcow size=3D67108864 encryption=3Doff
-encrypt.format=3Daes
-
-> +            error_setg(errp, "Options " BLOCK_OPT_ENCRYPT " and "
-> +                       BLOCK_OPT_ENCRYPT_FORMAT " are mutually exclusi=
-ve");
-> +            ret =3D -EINVAL;
-> +            goto cleanup;
-> +        }
-> +    } else if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) =
-{
-> +        encryptfmt =3D "aes";
->      }
-> =20
->      ret =3D bdrv_create_file(filename, opts, &local_err);
-
-[...]
-
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index b3ba5da..19dfcd1 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-
-[...]
-
-> @@ -2366,8 +2373,16 @@ static int qcow2_create(const char *filename, Qe=
-muOpts *opts, Error **errp)
->                      BDRV_SECTOR_SIZE);
->      backing_file =3D qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FILE);
->      backing_fmt =3D qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FMT);
-> -    if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
-> -        flags |=3D BLOCK_FLAG_ENCRYPT;
-> +    encryptfmt =3D qemu_opt_get_del(opts, BLOCK_OPT_ENCRYPT_FORMAT);
-> +    if (encryptfmt) {
-> +        if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
-
-Same here.
-
-With these places fixed:
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-> +            error_setg(errp, "Options " BLOCK_OPT_ENCRYPT " and "
-> +                       BLOCK_OPT_ENCRYPT_FORMAT " are mutually exclusi=
-ve");
-> +            ret =3D -EINVAL;
-> +            goto finish;
-> +        }
-> +    } else if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) =
-{
-> +        encryptfmt =3D "aes";
->      }
->      cluster_size =3D qemu_opt_get_size_del(opts, BLOCK_OPT_CLUSTER_SIZ=
-E,
->                                           DEFAULT_CLUSTER_SIZE);
-
-
---IPVGQwoepVnLlfNv8wSv5wRmhDOFOOuOX
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEvBAEBCAAZBQJZOCyBEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQMqZ
-B/9C7HVMK7MWE7iMxmqrspzwnJBCrSk9bBjvJ2sUJ9f5bG5TrvnwIrgRhWjLmwDk
-IIqszBa6fRdK2lcYVNfIOwPkP5eaC8ULI0pwkAD3GMudvS4ZVQJFRgMsg5D2kW1N
-pmNFJ9m+aybTCU4DcZ7l0aXJye7Yw0xgd19xzKEGK4BE6SKuEuflaURKemIjwJFo
-GdmIV/IK1ApxO0+4jU+fXhk3Yy5M9+MF6TQdiQMElpVS5outnD5DptTphlu/+okP
-7YZXK+hvdzJ2cpv2HZAkiNBkQnZq3SNdKv1UdP/sQsUIP6jYdHHZYTRbGu60ZIJk
-0Qr0u9OC9cKkU/9nkCCqCiVN
-=0o9G
------END PGP SIGNATURE-----
-
---IPVGQwoepVnLlfNv8wSv5wRmhDOFOOuOX--
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index f670ecb7f2..f6d5717f8b 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1098,7 +1098,7 @@ static void pc_new_cpu(const char *typename, int64_=
+t apic_id, Error **errp)
+=20
+     cpu =3D object_new(typename);
+=20
+-    object_property_set_int(cpu, apic_id, "apic-id", &local_err);
++    object_property_set_uint(cpu, apic_id, "apic-id", &local_err);
+     object_property_set_bool(cpu, true, "realized", &local_err);
+=20
+     object_unref(cpu);
+--=20
+2.13.0.91.g00982b8dd
