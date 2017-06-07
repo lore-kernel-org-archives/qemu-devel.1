@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50899)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dIYyr-0003Uf-Pk
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 07:18:30 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dIZ3F-0004yh-5o
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 07:23:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dIYym-0007yZ-R5
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 07:18:29 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:38408)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dIYym-0007yC-Av
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 07:18:24 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <CAJhHMCBwu-pVAyxN+w8SSo19wi3DW3JCRRF-K1Sj9zYqGYkFvQ@mail.gmail.com>
-	<20170606171320.GA8115@flamenco>
-Date: Wed, 07 Jun 2017 14:12:44 +0300
-In-Reply-To: <20170606171320.GA8115@flamenco> (Emilio G. Cota's message of
-	"Tue, 6 Jun 2017 13:13:20 -0400")
-Message-ID: <877f0o3vbn.fsf@frigg.lan>
+	(envelope-from <dgilbert@redhat.com>) id 1dIZ3C-0000t9-1p
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 07:23:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40968)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dIZ3B-0000st-Rc
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 07:22:57 -0400
+Date: Wed, 7 Jun 2017 12:22:53 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170607112252.GD2099@work-vm>
+References: <20170606165510.33057-1-pasic@linux.vnet.ibm.com>
+	<20170606165510.33057-4-pasic@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] GSoC 2017 Proposal: TCG performance enhancements
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170606165510.33057-4-pasic@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 3/3] s390x/css: add hint for devno
+ missmatch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +28,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: Pranith Kumar <bobby.prani@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
 
-Emilio G Cota writes:
+* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+> This one has to be fixed up to 's390x: vmstatify config migration for
+> virtio-ccw' provided we want to achieve the same as 's390x/css: catch
+> section mismatch on load' does.
+> 
+> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> ---
+> 
+> This is on tom of 's390x: vmstatify config migration for virtio-ccw'
+               p
+> which ain't on top of 's390x/css: catch section mismatch on load' but on
+> top of master.  I kind of have a circular dependency here. This is why
+> the series is RFC. 
+> 
+> Wanted to provide an usage example. Faked 'Re: ' so patchew does not
+> try to apply this on top of current master.
+> ---
+>  hw/s390x/css.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> index 348129e1b2..de277d6a3d 100644
+> --- a/hw/s390x/css.c
+> +++ b/hw/s390x/css.c
+> @@ -134,6 +134,10 @@ static const VMStateDescription vmstate_sense_id = {
+>  static int subch_dev_post_load(void *opaque, int version_id);
+>  static void subch_dev_pre_save(void *opaque);
+>  
+> +const char err_hint_devno[] = "Devno mismatch, tried to load wrong section!"
+> +    " Likely reason: some sequences of plug and unplug  can break"
+> +    " migration for machine versions prior to  2.7 (known design flaw).";
+> +
 
-> - Instrumentation. I think QEMU should have a good interface to enable
->   dynamic binary instrumentation. This has many uses and in fact there
->   are quite a few forks of QEMU doing this.
->   I think Llu=C3=ADs Vilanova's work [1] is a good start to eventually get
->   something upstream.
+That's ok, but I suggest:
+   * 'bug' rather than 'design flaw' - it sounds a bit less scary to
+     endusers.
 
-> [1] https://projects.gso.ac.upc.edu/projects/qemu-dbi
-
-Hey, I'm really happy you think that's worth pursuing. Even if it doesn't l=
-ook
-like it, I keep working on this on small bits of free time. I have a few pa=
-tch
-series that were ready to send, but should now be rebased to upstream before
-that. In fact, I have an academic paper on the back-burner describing the w=
-ork I
-did (there's some cool tricks), but was waiting to get the core
-intrumentation-agnostic infrastructure upstreamed first.
-
-My understanding was that adding a public instrumentation interface would a=
-dd
-too much code maintenance overhead for a feature that is not in QEMU's core
-target.
-
-During time, I've kept simplifying large parts of the intrumentation code b=
-ase,
-and maybe things have changed in QEMU enough to rethink if that's worth
-integrating. Of course, I'm completely open to discuss it.
+Other than that,
 
 
-Cheers,
-  Lluis
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+Dave
+
+>  const VMStateDescription vmstate_subch_dev = {
+>      .name = "s390_subch_dev",
+>      .version_id = 1,
+> @@ -144,7 +148,7 @@ const VMStateDescription vmstate_subch_dev = {
+>          VMSTATE_UINT8_EQUAL(cssid, SubchDev),
+>          VMSTATE_UINT8_EQUAL(ssid, SubchDev),
+>          VMSTATE_UINT16(migrated_schid, SubchDev),
+> -        VMSTATE_UINT16(devno, SubchDev),
+> +        VMSTATE_UINT16_EQUAL_HINT(devno, SubchDev, err_hint_devno),
+>          VMSTATE_BOOL(thinint_active, SubchDev),
+>          VMSTATE_STRUCT(curr_status, SubchDev, 0, vmstate_schib, SCHIB),
+>          VMSTATE_UINT8_ARRAY(sense_data, SubchDev, 32),
+> -- 
+> 2.11.2
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
