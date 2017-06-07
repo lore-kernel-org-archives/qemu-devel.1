@@ -1,18 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rndfax@yandex.ru>) id 1dIdwW-0005Wn-OY
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:36:26 -0400
+	(envelope-from <rndfax@yandex.ru>) id 1dIe1A-00020Z-Cz
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:41:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rndfax@yandex.ru>) id 1dIdwS-0006af-Ri
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:36:24 -0400
-Received: from forward13o.cmail.yandex.net ([37.9.109.182]:41967)
+	(envelope-from <rndfax@yandex.ru>) id 1dIe17-0000rG-8f
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:41:12 -0400
+Received: from forward14p.cmail.yandex.net ([87.250.241.142]:47377)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rndfax@yandex.ru>) id 1dIdwS-0006Yk-G9
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:36:20 -0400
+	(Exim 4.71) (envelope-from <rndfax@yandex.ru>) id 1dIe17-0000q9-1C
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:41:09 -0400
+Received: from mxback18j.mail.yandex.net (mxback18j.mail.yandex.net
+	[IPv6:2a02:6b8:0:1619::94])
+	by forward14p.cmail.yandex.net (Yandex) with ESMTP id 01DBD2178F
+	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 19:41:05 +0300 (MSK)
 From: Aleksey Kuleshov <rndfax@yandex.ru>
 MIME-Version: 1.0
-Message-Id: <4392061496853374@web26g.yandex.ru>
-Date: Wed, 07 Jun 2017 19:36:14 +0300
+Message-Id: <4401421496853664@web26g.yandex.ru>
+Date: Wed, 07 Jun 2017 19:41:04 +0300
 Content-Transfer-Encoding: 7bit
 Content-Type: text/plain
 Subject: [Qemu-devel] [PATCH] m25p80: Fix WINBOND fast read command dummy
@@ -25,8 +29,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Marcin Krzeminski <marcin.krzeminski@nokia.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
 The original commit (3830c7a460b8252dc975f8115fdaed8c562d2d75)
 stated "Datasheet states that default dummy cycles is 8 so fix it."
