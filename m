@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60703)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dIXgM-0000sg-Do
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:55:20 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dIXgM-0000sh-Dx
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:55:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dIXgK-0003WL-BW
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dIXgJ-0003W1-8D
 	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:55:18 -0400
 Received: from [59.151.112.132] (port=2775 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dIXgJ-0003UP-Vt
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:55:16 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dIXgI-0003UP-SZ
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:55:15 -0400
 From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Wed, 7 Jun 2017 17:55:15 +0800
-Message-ID: <1496829322-17099-4-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-In-Reply-To: <1496829322-17099-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-References: <1496829322-17099-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Date: Wed, 7 Jun 2017 17:55:12 +0800
+Message-ID: <1496829322-17099-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH V6 03/10] net/filter-mirror.c: Add new option
- to enable vnet support for filter-redirector
+Subject: [Qemu-devel] [PATCH V6 00/10] Add COLO-proxy virtio-net support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,94 +27,78 @@ To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
 Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, weifuqiang <weifuqiang@huawei.com>, "eddie
 	. dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-We add the vnet_hdr_support option for filter-redirector, default is disable.
-If you use virtio-net-pci net driver, please enable it.
-Because colo-compare or other modules needs the vnet_hdr_len to parse
-packet, so we add this new option send the len to others.
-You can use it for example:
--object filter-redirector,id=r0,netdev=hn0,queue=tx,outdev=red0,vnet_hdr_support
+If user use -device virtio-net-pci, virtio-net driver will add a header
+to raw net packet that colo-proxy can't handle it. COLO-proxy just
+focus on the packet payload, so we skip the virtio-net header to compare
+the sent packet that primary guest's to secondary guest's.
 
-Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
----
- net/filter-mirror.c | 28 ++++++++++++++++++++++++++++
- qemu-options.hx     |  6 +++---
- 2 files changed, 31 insertions(+), 3 deletions(-)
+V6:
+ - p1: Remove the using_vnet_hdr, I will send a independent
+       patchset about it.
+ - p2: Change option input way from vnet_hdr=on/off to vnet_hdr_support.
+       Use nf->direction to decide check nf->netdev->vnet_hdr_len or nf->netdev->peer->vnet_hdr_len.
+ - p3: Change option input way from vnet_hdr=on/off to vnet_hdr_support.
+ - p4: No change.
+ - p5: No change.
+ - p6: Change option input way from vnet_hdr=on/off to vnet_hdr_support.
+       Fix commit log.
+ - p7: No change.
+ - p8: No change.
+ - p9: Change option input way from vnet_hdr=on/off to vnet_hdr_support.
+       Use nf->direction to decide check nf->netdev->vnet_hdr_len or nf->netdev->peer->vnet_hdr_len.
+ - p10: New patch to add new example for the case needs vnet hdr.
 
-diff --git a/net/filter-mirror.c b/net/filter-mirror.c
-index 50aa81b..3413e82 100644
---- a/net/filter-mirror.c
-+++ b/net/filter-mirror.c
-@@ -376,6 +376,13 @@ static char *filter_redirector_get_outdev(Object *obj, Error **errp)
-     return g_strdup(s->outdev);
- }
- 
-+static bool filter_redirector_get_vnet_hdr(Object *obj, Error **errp)
-+{
-+    MirrorState *s = FILTER_REDIRECTOR(obj);
-+
-+    return s->vnet_hdr;
-+}
-+
- static void
- filter_redirector_set_outdev(Object *obj, const char *value, Error **errp)
- {
-@@ -385,6 +392,15 @@ filter_redirector_set_outdev(Object *obj, const char *value, Error **errp)
-     s->outdev = g_strdup(value);
- }
- 
-+static void filter_redirector_set_vnet_hdr(Object *obj,
-+                                           bool value,
-+                                           Error **errp)
-+{
-+    MirrorState *s = FILTER_REDIRECTOR(obj);
-+
-+    s->vnet_hdr = value;
-+}
-+
- static void filter_mirror_init(Object *obj)
- {
-     MirrorState *s = FILTER_MIRROR(obj);
-@@ -405,10 +421,22 @@ static void filter_mirror_init(Object *obj)
- 
- static void filter_redirector_init(Object *obj)
- {
-+    MirrorState *s = FILTER_REDIRECTOR(obj);
-+
-     object_property_add_str(obj, "indev", filter_redirector_get_indev,
-                             filter_redirector_set_indev, NULL);
-     object_property_add_str(obj, "outdev", filter_redirector_get_outdev,
-                             filter_redirector_set_outdev, NULL);
-+
-+    /*
-+     * The vnet_hdr is disabled by default, if you want to enable
-+     * this option, you must enable all the option on related modules
-+     * (like other filter or colo-compare).
-+     */
-+    s->vnet_hdr = false;
-+    object_property_add_bool(obj, "vnet_hdr_support",
-+                             filter_redirector_get_vnet_hdr,
-+                             filter_redirector_set_vnet_hdr, NULL);
- }
- 
- static void filter_mirror_fini(Object *obj)
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 5c09fae..e78b942 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4028,11 +4028,11 @@ queue @var{all|rx|tx} is an option that can be applied to any netfilter.
- 
- filter-mirror on netdev @var{netdevid},mirror net packet to chardev@var{chardevid}, if have the vnet_hdr_support flag, filter-mirror will mirror packet with vnet_hdr_len.
- 
--@item -object filter-redirector,id=@var{id},netdev=@var{netdevid},indev=@var{chardevid},
--outdev=@var{chardevid}[,queue=@var{all|rx|tx}]
-+@item -object filter-redirector,id=@var{id},netdev=@var{netdevid},indev=@var{chardevid},outdev=@var{chardevid},queue=@var{all|rx|tx}[,vnet_hdr_support]
- 
- filter-redirector on netdev @var{netdevid},redirect filter's net packet to chardev
--@var{chardevid},and redirect indev's packet to filter.
-+@var{chardevid},and redirect indev's packet to filter.if have the vnet_hdr_support flag,
-+filter-redirector will redirect packet with vnet_hdr_len.
- Create a filter-redirector we need to differ outdev id from indev id, id can not
- be the same. we can just use indev or outdev, but at least one of indev or outdev
- need to be specified.
+V5:
+ - patch1: No change.
+ - patch2: Keep the long line in qemu-option.hx.
+           Squash patch2 into old patch3.
+           Add more comments.
+           Fix the return value.
+ - patch3: Add more comments in commit log.
+ - patch4: Add Suggested-by tag.
+           Fix commit log.
+           Move vnet_hdr to SocketReadState.
+ - patch5: No change.
+ - patch6: Squash old patch6 into this patch.
+ - patch7: No change.
+ - patch8: Remove the offset_all.
+ - patch9: Squash old patch11 and the patch12.
+
+
+V4:
+ - Add vnet_hdr option for filter-mirror, filter-redirector,
+   filter-rewriter,colo-compare.
+ - Use new design to impliment virtio-net support for colo-proxy.
+ - Fix codestyle.
+ - Remove unused option for filter-rewriter.
+ - Add filter-rewriter virtio-net support.
+ - Address other comments.
+
+
+Zhang Chen (10):
+  net: Add vnet_hdr_len arguments in NetClientState
+  net/filter-mirror.c: Make filter mirror support vnet support.
+  net/filter-mirror.c: Add new option to enable vnet support for
+    filter-redirector
+  net/net.c: Add vnet_hdr support in SocketReadState
+  net/colo.c: Make vnet_hdr_len as packet property
+  net/colo-compare.c: Make colo-compare support vnet_hdr_len
+  net/colo.c: Add vnet packet parse feature in colo-proxy
+  net/colo-compare.c: Add vnet packet's tcp/udp/icmp compare
+  net/filter-rewriter.c: Make filter-rewriter support vnet_hdr_len
+  docs/colo-proxy.txt: Update colo-proxy usage of net driver with
+    vnet_header
+
+ docs/colo-proxy.txt   | 26 ++++++++++++++
+ include/net/net.h     |  7 +++-
+ net/colo-compare.c    | 86 +++++++++++++++++++++++++++++++++++++-------
+ net/colo.c            |  9 ++---
+ net/colo.h            |  4 ++-
+ net/filter-mirror.c   | 98 ++++++++++++++++++++++++++++++++++++++++++++++++---
+ net/filter-rewriter.c | 51 ++++++++++++++++++++++++++-
+ net/net.c             | 34 ++++++++++++++++--
+ qemu-options.hx       | 19 +++++-----
+ 9 files changed, 296 insertions(+), 38 deletions(-)
+
 -- 
 2.7.4
