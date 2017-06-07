@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dIOsl-0002Ig-Bk
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:31:32 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dIOsm-0002Ix-2y
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:31:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dIOsj-0001oE-UM
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:31:31 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:35978)
+	(envelope-from <rth7680@gmail.com>) id 1dIOsl-0001oe-8O
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:31:32 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:33756)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dIOsj-0001nw-PK
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:31:29 -0400
-Received: by mail-qt0-x244.google.com with SMTP id s33so19303313qtg.3
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 17:31:29 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dIOsl-0001oZ-44
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:31:31 -0400
+Received: by mail-qk0-x241.google.com with SMTP id c206so15444243qkb.0
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 17:31:31 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue,  6 Jun 2017 17:30:12 -0700
-Message-Id: <20170607003119.14778-4-rth@twiddle.net>
+Date: Tue,  6 Jun 2017 17:30:13 -0700
+Message-Id: <20170607003119.14778-5-rth@twiddle.net>
 In-Reply-To: <20170607003119.14778-1-rth@twiddle.net>
 References: <20170607003119.14778-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL v2 03/70] target/s390x: Move helper_ex to end of
- file
+Subject: [Qemu-devel] [PULL v2 04/70] target/s390x: Use unwind data for
+ helper_nc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,189 +30,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, aurelien@aurel32.net
 
-This will avoid needing forward declarations in following patches.
-
 Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/s390x/mem_helper.c | 161 +++++++++++++++++++++++-----------------------
- 1 file changed, 81 insertions(+), 80 deletions(-)
+ target/s390x/mem_helper.c | 31 ++++++++++++++++++-------------
+ target/s390x/translate.c  |  1 -
+ 2 files changed, 18 insertions(+), 14 deletions(-)
 
 diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index e3325a4..90b62fa 100644
+index 90b62fa..7d6133b 100644
 --- a/target/s390x/mem_helper.c
 +++ b/target/s390x/mem_helper.c
-@@ -436,86 +436,6 @@ static uint32_t helper_icm(CPUS390XState *env, uint32_t r1, uint64_t address,
-     return cc;
+@@ -119,23 +119,28 @@ static void fast_memmove(CPUS390XState *env, uint64_t dest, uint64_t src,
  }
  
--/* execute instruction
--   this instruction executes an insn modified with the contents of r1
--   it does not change the executed instruction in memory
--   it does not change the program counter
--   in other words: tricky...
--   currently implemented by interpreting the cases it is most commonly used in
--*/
--uint32_t HELPER(ex)(CPUS390XState *env, uint32_t cc, uint64_t v1,
--                    uint64_t addr, uint64_t ret)
--{
--    S390CPU *cpu = s390_env_get_cpu(env);
--    uint16_t insn = cpu_lduw_code(env, addr);
--
--    HELPER_LOG("%s: v1 0x%lx addr 0x%lx insn 0x%x\n", __func__, v1, addr,
--               insn);
--    if ((insn & 0xf0ff) == 0xd000) {
--        uint32_t l, insn2, b1, b2, d1, d2;
--
--        l = v1 & 0xff;
--        insn2 = cpu_ldl_code(env, addr + 2);
--        b1 = (insn2 >> 28) & 0xf;
--        b2 = (insn2 >> 12) & 0xf;
--        d1 = (insn2 >> 16) & 0xfff;
--        d2 = insn2 & 0xfff;
--        switch (insn & 0xf00) {
--        case 0x200:
--            helper_mvc(env, l, get_address(env, 0, b1, d1),
--                       get_address(env, 0, b2, d2));
--            break;
--        case 0x400:
+ /* and on array */
+-uint32_t HELPER(nc)(CPUS390XState *env, uint32_t l, uint64_t dest,
+-                    uint64_t src)
++static uint32_t do_helper_nc(CPUS390XState *env, uint32_t l, uint64_t dest,
++                             uint64_t src, uintptr_t ra)
+ {
+-    int i;
+-    unsigned char x;
+-    uint32_t cc = 0;
++    uint32_t i;
++    uint8_t c = 0;
+ 
+     HELPER_LOG("%s l %d dest %" PRIx64 " src %" PRIx64 "\n",
+                __func__, l, dest, src);
++
+     for (i = 0; i <= l; i++) {
+-        x = cpu_ldub_data(env, dest + i) & cpu_ldub_data(env, src + i);
+-        if (x) {
+-            cc = 1;
+-        }
+-        cpu_stb_data(env, dest + i, x);
++        uint8_t x = cpu_ldub_data_ra(env, src + i, ra);
++        x &= cpu_ldub_data_ra(env, dest + i, ra);
++        c |= x;
++        cpu_stb_data_ra(env, dest + i, x, ra);
+     }
+-    return cc;
++    return c != 0;
++}
++
++uint32_t HELPER(nc)(CPUS390XState *env, uint32_t l, uint64_t dest,
++                    uint64_t src)
++{
++    return do_helper_nc(env, l, dest, src, GETPC());
+ }
+ 
+ /* xor on array */
+@@ -1213,8 +1218,8 @@ uint32_t HELPER(ex)(CPUS390XState *env, uint32_t cc, uint64_t v1,
+                        get_address(env, 0, b2, d2));
+             break;
+         case 0x400:
 -            cc = helper_nc(env, l, get_address(env, 0, b1, d1),
 -                            get_address(env, 0, b2, d2));
--            break;
--        case 0x500:
--            cc = helper_clc(env, l, get_address(env, 0, b1, d1),
--                            get_address(env, 0, b2, d2));
--            break;
--        case 0x600:
--            cc = helper_oc(env, l, get_address(env, 0, b1, d1),
--                            get_address(env, 0, b2, d2));
--            break;
--        case 0x700:
--            cc = helper_xc(env, l, get_address(env, 0, b1, d1),
--                           get_address(env, 0, b2, d2));
--            break;
--        case 0xc00:
--            helper_tr(env, l, get_address(env, 0, b1, d1),
--                      get_address(env, 0, b2, d2));
--            break;
--        case 0xd00:
--            cc = helper_trt(env, l, get_address(env, 0, b1, d1),
--                            get_address(env, 0, b2, d2));
--            break;
--        default:
--            goto abort;
--        }
--    } else if ((insn & 0xff00) == 0x0a00) {
--        /* supervisor call */
--        HELPER_LOG("%s: svc %ld via execute\n", __func__, (insn | v1) & 0xff);
--        env->psw.addr = ret - 4;
--        env->int_svc_code = (insn | v1) & 0xff;
--        env->int_svc_ilen = 4;
--        helper_exception(env, EXCP_SVC);
--    } else if ((insn & 0xff00) == 0xbf00) {
--        uint32_t insn2, r1, r3, b2, d2;
--
--        insn2 = cpu_ldl_code(env, addr + 2);
--        r1 = (insn2 >> 20) & 0xf;
--        r3 = (insn2 >> 16) & 0xf;
--        b2 = (insn2 >> 12) & 0xf;
--        d2 = insn2 & 0xfff;
--        cc = helper_icm(env, r1, get_address(env, 0, b2, d2), r3);
--    } else {
--    abort:
--        cpu_abort(CPU(cpu), "EXECUTE on instruction prefix 0x%x not implemented\n",
--                  insn);
--    }
--    return cc;
--}
--
- /* load access registers r1 to r3 from memory at a2 */
- void HELPER(lam)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
++            cc = do_helper_nc(env, l, get_address(env, 0, b1, d1),
++                              get_address(env, 0, b2, d2), 0);
+             break;
+         case 0x500:
+             cc = helper_clc(env, l, get_address(env, 0, b1, d1),
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 837d90c..afa2c6b 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -3048,7 +3048,6 @@ static ExitStatus op_nabsf128(DisasContext *s, DisasOps *o)
+ static ExitStatus op_nc(DisasContext *s, DisasOps *o)
  {
-@@ -1262,3 +1182,84 @@ uint64_t HELPER(lra)(CPUS390XState *env, uint64_t addr)
-     return ret;
- }
- #endif
-+
-+/* execute instruction
-+   this instruction executes an insn modified with the contents of r1
-+   it does not change the executed instruction in memory
-+   it does not change the program counter
-+   in other words: tricky...
-+   currently implemented by interpreting the cases it is most commonly used.
-+*/
-+uint32_t HELPER(ex)(CPUS390XState *env, uint32_t cc, uint64_t v1,
-+                    uint64_t addr, uint64_t ret)
-+{
-+    S390CPU *cpu = s390_env_get_cpu(env);
-+    uint16_t insn = cpu_lduw_code(env, addr);
-+
-+    HELPER_LOG("%s: v1 0x%lx addr 0x%lx insn 0x%x\n", __func__, v1, addr,
-+               insn);
-+    if ((insn & 0xf0ff) == 0xd000) {
-+        uint32_t l, insn2, b1, b2, d1, d2;
-+
-+        l = v1 & 0xff;
-+        insn2 = cpu_ldl_code(env, addr + 2);
-+        b1 = (insn2 >> 28) & 0xf;
-+        b2 = (insn2 >> 12) & 0xf;
-+        d1 = (insn2 >> 16) & 0xfff;
-+        d2 = insn2 & 0xfff;
-+        switch (insn & 0xf00) {
-+        case 0x200:
-+            helper_mvc(env, l, get_address(env, 0, b1, d1),
-+                       get_address(env, 0, b2, d2));
-+            break;
-+        case 0x400:
-+            cc = helper_nc(env, l, get_address(env, 0, b1, d1),
-+                            get_address(env, 0, b2, d2));
-+            break;
-+        case 0x500:
-+            cc = helper_clc(env, l, get_address(env, 0, b1, d1),
-+                            get_address(env, 0, b2, d2));
-+            break;
-+        case 0x600:
-+            cc = helper_oc(env, l, get_address(env, 0, b1, d1),
-+                            get_address(env, 0, b2, d2));
-+            break;
-+        case 0x700:
-+            cc = helper_xc(env, l, get_address(env, 0, b1, d1),
-+                           get_address(env, 0, b2, d2));
-+            break;
-+        case 0xc00:
-+            helper_tr(env, l, get_address(env, 0, b1, d1),
-+                      get_address(env, 0, b2, d2));
-+            break;
-+        case 0xd00:
-+            cc = helper_trt(env, l, get_address(env, 0, b1, d1),
-+                            get_address(env, 0, b2, d2));
-+            break;
-+        default:
-+            goto abort;
-+        }
-+    } else if ((insn & 0xff00) == 0x0a00) {
-+        /* supervisor call */
-+        HELPER_LOG("%s: svc %ld via execute\n", __func__, (insn | v1) & 0xff);
-+        env->psw.addr = ret - 4;
-+        env->int_svc_code = (insn | v1) & 0xff;
-+        env->int_svc_ilen = 4;
-+        helper_exception(env, EXCP_SVC);
-+    } else if ((insn & 0xff00) == 0xbf00) {
-+        uint32_t insn2, r1, r3, b2, d2;
-+
-+        insn2 = cpu_ldl_code(env, addr + 2);
-+        r1 = (insn2 >> 20) & 0xf;
-+        r3 = (insn2 >> 16) & 0xf;
-+        b2 = (insn2 >> 12) & 0xf;
-+        d2 = insn2 & 0xfff;
-+        cc = helper_icm(env, r1, get_address(env, 0, b2, d2), r3);
-+    } else {
-+    abort:
-+        cpu_abort(CPU(cpu),
-+                  "EXECUTE on instruction prefix 0x%x not implemented\n",
-+                  insn);
-+    }
-+    return cc;
-+}
+     TCGv_i32 l = tcg_const_i32(get_field(s->fields, l1));
+-    potential_page_fault(s);
+     gen_helper_nc(cc_op, cpu_env, l, o->addr1, o->in2);
+     tcg_temp_free_i32(l);
+     set_cc_static(s);
 -- 
 2.9.4
