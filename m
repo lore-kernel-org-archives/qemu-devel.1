@@ -1,24 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35053)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dIZvQ-0007eE-HK
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 08:19:01 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dIZw8-0007zu-I3
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 08:19:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dIZvP-0008LO-Kt
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 08:19:00 -0400
-Date: Wed, 7 Jun 2017 13:18:41 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170607121840.GE2099@work-vm>
-References: <20170606052438.35405-1-haoqf@linux.vnet.ibm.com>
-	<20170606052438.35405-2-haoqf@linux.vnet.ibm.com>
-	<20170606124953.GD5448@noname.redhat.com>
-	<a908cc58-3001-0d8a-0415-887b5cbae4e7@linux.vnet.ibm.com>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dIZw5-000068-A8
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 08:19:44 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54462
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dIZw5-00005y-41
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 08:19:41 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v57CIvm2046238
+	for <qemu-devel@nongnu.org>; Wed, 7 Jun 2017 08:19:40 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2axcucdf6h-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 08:19:39 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Wed, 7 Jun 2017 13:19:38 +0100
+References: <20170606165510.33057-1-pasic@linux.vnet.ibm.com>
+	<20170606165510.33057-3-pasic@linux.vnet.ibm.com>
+	<20170607110758.GC2099@work-vm>
+	<c6466750-6d71-988c-6c81-9c54f5ca995a@linux.vnet.ibm.com>
+	<20170607120138.GD2384@work-vm>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Wed, 7 Jun 2017 14:19:33 +0200
 MIME-Version: 1.0
+In-Reply-To: <20170607120138.GD2384@work-vm>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <a908cc58-3001-0d8a-0415-887b5cbae4e7@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] qemu/migration: fix the double free
- problem on from_src_file
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <1fb16203-3857-d0aa-498e-4acca6a28a41@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 2/3] vmstate: error hint for failed
+ equal checks part 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +47,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, peterx@redhat.com, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, liujbjl@linux.vnet.ibm.com, famz@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
 
-* QingFeng Hao (haoqf@linux.vnet.ibm.com) wrote:
->=20
->=20
-> =E5=9C=A8 2017/6/6 20:49, Kevin Wolf =E5=86=99=E9=81=93:
-> > Am 06.06.2017 um 07:24 hat QingFeng Hao geschrieben:
 
-<snip>
 
-> > I can't tell for postcopy_ram_listen_thread() - commit 660819b didn't
-> > seem to remove a qemu_fclose() call there, but I can't see one left
-> > behind either. Was the file leaked before commit 660819b or am I
-> > missing something?
-> I don't think so because loadvm_postcopy_handle_listen creates thread
-> postcopy_ram_listen_thread
-> and passes mis->from_src_file as its arg, which will be closed by
-> migration_incoming_state_destroy.
-> What confuses me is in the series function calls of qemu_loadvm_state_m=
-ain
-> etc, argument f looks
-> to be redundant as mis already contains from_src_file which equals to f=
-.
+On 06/07/2017 02:01 PM, Dr. David Alan Gilbert wrote:
+> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+>>
+>>
+>> On 06/07/2017 01:07 PM, Dr. David Alan Gilbert wrote:
+>>> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+>>>> Verbose error reporting for the _EQUAL family. Modify the standard _EQUAL
+>>>> so the hint states the assertion probably failed due to a bug. Introduce
+>>>> _EQUAL_HINT for specifying a context specific hint.
+>>>>
+>>>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>>>
+>>> I'd prefer not to print 'Bug!?' by default - they already get the
+>>> message telling them something didn't match and the migration fails.
+>>> There are none-bug ways of this happening, e.g. a user starting a VM on
+>>> the source and destination with different configs.
+>>
+>> I admit, my objective with 'Bug!?' was to provoke. My train of thought is
+>> to encourage the programmer to think about and document the circumstances
+>> under which such an assertion is supposed to fail (and against which it
+>> is supposed to guard).
+>>
+>> I do not know how skillful are our users but a 4 != 5 then maybe a name
+>> of a vmstate field is probably quite scary and not very revealing. I doubt
+>> a non qemu developer can use it for something else that reporting a bug.
+>>
+>> Consequently if there are non-bug ways one can use the hint and state them.
+>> Your example with the misconfigured target, by the way, is IMHO also be due
+>> to a bug of the management software IMHO.
+>>
+>> To sum it up: IMHO the message provided by a failing _EQUAL is to ugly
+>> and Qemuspeak to be presented to an user-user in non-bug cases. Agree?
+>> Disagree?
+> 
+> Disagree.
+> 
+> I don't mind giving field names etc; they make it easy for us as
+> developers to track down what's happening, but also sometimes they help
+> endusers work around a prolem or see where the problem is; of course
+> that varies depending on the field name, but some of our names are
+> reasonable (e.g. there's a VMSTATE_INT32_EQUAL on 'queue_size' in
+> vmmouse.c).  They're also pretty good if two end users hit the same
+> problem they can see the same error message in a bug report.
+> 
+> We often have customer-facing support people look at logs before they
+> get as far as us developers; if we have bugs that are 
+> 'if it's a failing BLAH device complaining about the BAR field'
+> then this fixes it, then that helps them find workarounds/fixes quickly
+> even if they don't understand what the BAR field is.
+> 
 
-In postcopy qemu_loadvm_state_main is called with two different file
-arguments but the same mis argument;  see loadvm_handle_cmd_packaged for
-the other case where it's called on a packaged-file blob.
+You seem to forget, that I'm not proposing omitting this information,
+but extending it with something civilized so one can distinguish between
+an assert failed should have never happened situation an a as good as
+reasonable error handling for an expected error scenario. IMHO the current
+EQUAL looks more like the former (assert) and less like the later (error
+reporting for an expected error scenario). Agree? Dissagree?
 
-> Furthermore, mis may be
-> also redundant as it can be got via migration_incoming_get_current. Tha=
-nks!
+Having a field name is great! That's beyond discussion.
 
-We keep changing our minds about the preferred style.  Sometimes we
-think it's best to pass the pointer, sometimes we think it's best
-to call get_current.
+I see, my 'sum it up' above was a bit unfortunate: it sounds like I'm
+against the inclusion of technical info and not against a lack of non
+technical info. Sorry for that!
 
-Dave
+>>
+>>>
+>>> (I also worry we have a lot f macros for each size;
+>>> EQUAL, EQUAL_V, EQUAL_V_HINT but I don't know of a better answer for
+>>> that)
+>>>
+>>
+>> If we are going to drop the default hint ('Bug?!' or whatever) then
+>> I think we could just add an extra NULL hint to each existing  _EQUAL
+>> usage, re-purpose EQUAL, and forget about introducing new _HINT macros.
+>>
+>> What to you think?
+> 
+> Yes, that would be a lot simpler; and there aren't that many
+> VMSTATE*EQUAL* macros in use.
+> 
 
-> >=20
-> > Kevin
-> >=20
->=20
-> --=20
-> Regards
-> QingFeng Hao
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+I still have not given up on the discussion above. Will do depending
+on the outcome.
+
+Regards,
+Halil
