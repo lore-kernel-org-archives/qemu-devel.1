@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dIOsw-0002Ub-UV
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:31:44 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dIOsx-0002VL-T5
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:31:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dIOsv-0001tz-Ln
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:31:42 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:35614)
+	(envelope-from <rth7680@gmail.com>) id 1dIOsx-0001uU-21
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:31:43 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:35615)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dIOsv-0001tp-Hj
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:31:41 -0400
-Received: by mail-qk0-x244.google.com with SMTP id u129so438509qka.2
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 17:31:41 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dIOsw-0001uI-UG
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:31:42 -0400
+Received: by mail-qk0-x244.google.com with SMTP id u129so438541qka.2
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 17:31:42 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue,  6 Jun 2017 17:30:21 -0700
-Message-Id: <20170607003119.14778-13-rth@twiddle.net>
+Date: Tue,  6 Jun 2017 17:30:22 -0700
+Message-Id: <20170607003119.14778-14-rth@twiddle.net>
 In-Reply-To: <20170607003119.14778-1-rth@twiddle.net>
 References: <20170607003119.14778-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL v2 12/70] target/s390x: Use unwind data for
- helper_mvpg
+Subject: [Qemu-devel] [PULL v2 13/70] target/s390x: Use unwind data for
+ helper_mvst
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,58 +34,44 @@ Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/s390x/helper.h     | 2 +-
- target/s390x/mem_helper.c | 9 +++++----
- target/s390x/translate.c  | 3 +--
- 3 files changed, 7 insertions(+), 7 deletions(-)
+ target/s390x/mem_helper.c | 5 +++--
+ target/s390x/translate.c  | 1 -
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 1fae191..ea35834 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -12,7 +12,7 @@ DEF_HELPER_FLAGS_3(divs64, TCG_CALL_NO_WG, s64, env, s64, s64)
- DEF_HELPER_FLAGS_4(divu64, TCG_CALL_NO_WG, i64, env, i64, i64, i64)
- DEF_HELPER_4(srst, i64, env, i64, i64, i64)
- DEF_HELPER_4(clst, i64, env, i64, i64, i64)
--DEF_HELPER_4(mvpg, void, env, i64, i64, i64)
-+DEF_HELPER_FLAGS_4(mvpg, TCG_CALL_NO_WG, i32, env, i64, i64, i64)
- DEF_HELPER_4(mvst, i64, env, i64, i64, i64)
- DEF_HELPER_5(ex, i32, env, i32, i64, i64, i64)
- DEF_HELPER_FLAGS_4(stam, TCG_CALL_NO_WG, void, env, i32, i64, i32)
 diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index af2801e..1c36a47 100644
+index 1c36a47..e4bfc6e 100644
 --- a/target/s390x/mem_helper.c
 +++ b/target/s390x/mem_helper.c
-@@ -398,11 +398,12 @@ uint64_t HELPER(clst)(CPUS390XState *env, uint64_t c, uint64_t s1, uint64_t s2)
- }
- 
- /* move page */
--void HELPER(mvpg)(CPUS390XState *env, uint64_t r0, uint64_t r1, uint64_t r2)
-+uint32_t HELPER(mvpg)(CPUS390XState *env, uint64_t r0, uint64_t r1, uint64_t r2)
- {
--    /* XXX missing r0 handling */
--    env->cc_op = 0;
--    fast_memmove(env, r1, r2, TARGET_PAGE_SIZE, 0);
-+    /* ??? missing r0 handling, which includes access keys, but more
-+       importantly optional suppression of the exception!  */
-+    fast_memmove(env, r1, r2, TARGET_PAGE_SIZE, GETPC());
-+    return 0; /* data moved */
- }
- 
+@@ -409,6 +409,7 @@ uint32_t HELPER(mvpg)(CPUS390XState *env, uint64_t r0, uint64_t r1, uint64_t r2)
  /* string copy (c is string terminator) */
+ uint64_t HELPER(mvst)(CPUS390XState *env, uint64_t c, uint64_t d, uint64_t s)
+ {
++    uintptr_t ra = GETPC();
+     uint32_t len;
+ 
+     c = c & 0xff;
+@@ -418,8 +419,8 @@ uint64_t HELPER(mvst)(CPUS390XState *env, uint64_t c, uint64_t d, uint64_t s)
+     /* Lest we fail to service interrupts in a timely manner, limit the
+        amount of work we're willing to do.  For now, let's cap at 8k.  */
+     for (len = 0; len < 0x2000; ++len) {
+-        uint8_t v = cpu_ldub_data(env, s + len);
+-        cpu_stb_data(env, d + len, v);
++        uint8_t v = cpu_ldub_data_ra(env, s + len, ra);
++        cpu_stb_data_ra(env, d + len, v, ra);
+         if (v == c) {
+             /* Complete.  Set CC=1 and advance R1.  */
+             env->cc_op = 1;
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index b87755e..ae29889 100644
+index ae29889..d41a0fd 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -2921,8 +2921,7 @@ static ExitStatus op_mvcs(DisasContext *s, DisasOps *o)
+@@ -2928,7 +2928,6 @@ static ExitStatus op_mvpg(DisasContext *s, DisasOps *o)
  
- static ExitStatus op_mvpg(DisasContext *s, DisasOps *o)
+ static ExitStatus op_mvst(DisasContext *s, DisasOps *o)
  {
 -    potential_page_fault(s);
--    gen_helper_mvpg(cpu_env, regs[0], o->in1, o->in2);
-+    gen_helper_mvpg(cc_op, cpu_env, regs[0], o->in1, o->in2);
+     gen_helper_mvst(o->in1, cpu_env, regs[0], o->in1, o->in2);
      set_cc_static(s);
-     return NO_EXIT;
- }
+     return_low128(o->in2);
 -- 
 2.9.4
