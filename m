@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54052)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dIXFC-0000qO-FT
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:27:15 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1dIXHI-0001hL-VM
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:29:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dIXF7-00028E-Hj
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:27:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37522)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dIXF7-00027s-C7
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:27:09 -0400
-Date: Wed, 7 Jun 2017 05:27:07 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <2020123289.30850450.1496827627184.JavaMail.zimbra@redhat.com>
-In-Reply-To: <CAFEAcA8FpdJEt2M5jHQjRE5OcHQ=XQoL=q3O=5ptBnc2UfN7Xw@mail.gmail.com>
-References: <20170607074632.13162-1-marcandre.lureau@redhat.com>
-	<20170607074632.13162-3-marcandre.lureau@redhat.com>
-	<CAFEAcA8FpdJEt2M5jHQjRE5OcHQ=XQoL=q3O=5ptBnc2UfN7Xw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/5] coccinelle: use DIV_ROUND_UP
+	(envelope-from <a.perevalov@samsung.com>) id 1dIXHE-0002pB-0M
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:29:24 -0400
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:54605)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1dIXHD-0002on-RF
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:29:19 -0400
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout1.w1.samsung.com
+	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
+	2014)) with ESMTP id <0OR6006A17OS1H30@mailout1.w1.samsung.com> for
+	qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:29:16 +0100 (BST)
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Message-id: <dc236aea-2015-3384-7a18-a67406df0586@samsung.com>
+Date: Wed, 07 Jun 2017 12:29:13 +0300
+MIME-version: 1.0
+In-reply-to: <20170607092426.GB4314@lemon.lan>
+Content-type: text/plain; charset=utf-8; format=flowed
+Content-transfer-encoding: 7bit
+Content-language: en-GB
+References: <1496820931-27416-10-git-send-email-a.perevalov@samsung.com>
+	<149682484945.96.2900136396151676257@7f80c91fe18c>
+	<CGME20170607092434epcas3p4d94054fb9aa0c4eb984e7cf4451119cd@epcas3p4.samsung.com>
+	<20170607092426.GB4314@lemon.lan>
+Subject: Re: [Qemu-devel] [[PATCH V7] 09/11] migration: calculate vCPU
+ blocktime on dst side
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,74 +37,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, peterx@redhat.com, i.maximets@samsung.com
 
-Hi
+On 06/07/2017 12:24 PM, Fam Zheng wrote:
+> On Wed, 06/07 01:40, no-reply@patchew.org wrote:
+>> Hi,
+>>
+>> This series failed build test on s390x host. Please find the details below.
+> So what happened is the double '[[' in the subject line confused Patchew, and
+> each patch in this series is treated as a standalone patch.
+it's not bad to check every patch in sequence separately,
+but including previous patches )
 
------ Original Message -----
-> On 7 June 2017 at 08:46, Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.=
-com>
-> wrote:
-> > The coccinelle/round.cocci script doesn't catch hard coded values.
-> >
-> > I used the following script over qemu code base:
-> >
-> > (
-> > - ((e1) + 3) / (4)
-> > + DIV_ROUND_UP(e1,4)
-> > |
-> > - ((e1) + (3)) / (4)
-> > + DIV_ROUND_UP(e1,4)
->=20
-> Why do we need both of these? Is it just "coccinelle is weird" ? :-)
+>
+> Fam
+>
+>
+>
 
-I am total newbie to coccinnelle-land, but I think this one is useless dupl=
-ication
-
->=20
-> > |
-> > - ((e1) + 7) / (8)
-> > + DIV_ROUND_UP(e1,8)
-> > |
-> > - ((e1) + (7)) / (8)
-> > + DIV_ROUND_UP(e1,8)
-> > |
-> > - ((e1) + 15) / (16)
-> > + DIV_ROUND_UP(e1,16)
-> > |
-> > - ((e1) + (15)) / (16)
-> > + DIV_ROUND_UP(e1,16)
-> > |
-> > - ((e1) + 31) / (32)
-> > + DIV_ROUND_UP(e1,32)
-> > |
-> > - ((e1) + (31)) / (32)
-> > + DIV_ROUND_UP(e1,32)
-> > )
->=20
-> > -                     next_op =3D op_pointer + ((oplen + 7) / 8);
-> > +                     next_op =3D op_pointer + (DIV_ROUND_UP(oplen, 8))=
-;
->=20
-> I think there's a coccinelle trick for making it drop
-> now-unnecessary brackets in substitutions like this, but I forget
-> what it is. Maybe it's as simple as having substitutions for
->=20
-
-> > - (((e1) + 7) / (8))
-> > + DIV_ROUND_UP(e1,8)
->=20
-> as well?
-
-
-I think you need a second rule:
-@@
-expression e1;
-expression e2;
-@@
--(DIV_ROUND_UP(e1,e2))
-+DIV_ROUND_UP(e1,e2)
-
-
-I will fix it in second version.
+-- 
+Best regards,
+Alexey Perevalov
