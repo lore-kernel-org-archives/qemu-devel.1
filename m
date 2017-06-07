@@ -1,40 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43486)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dIkQr-0007l9-32
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 19:32:10 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dIkgU-0003qG-7u
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 19:48:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dIkQn-0006hQ-Sx
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 19:32:09 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33709)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1dIkQn-0006h5-JV
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 19:32:05 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v57NTNuh085321
-	for <qemu-devel@nongnu.org>; Wed, 7 Jun 2017 19:32:03 -0400
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2axnnvw3u9-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 19:32:03 -0400
-Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 7 Jun 2017 19:32:02 -0400
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <alistair23@gmail.com>) id 1dIkgT-0003fi-Cu
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 19:48:18 -0400
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:34848)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1dIkgT-0003fO-6X
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 19:48:17 -0400
+Received: by mail-wm0-x22c.google.com with SMTP id x70so67237925wme.0
+	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 16:48:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <149687574611.20132.13119959702428537045@loki>
-References: <20170606130534.11019-1-david@gibson.dropbear.id.au>
-	<20170606130534.11019-3-david@gibson.dropbear.id.au>
-	<149687574611.20132.13119959702428537045@loki>
-Date: Wed, 07 Jun 2017 18:31:54 -0500
-Message-Id: <149687831426.5725.1889099825669243733@loki>
-Subject: Re: [Qemu-devel] [RFC 2/3] spapr: Start hotplugged PCI devices in
- ISOLATED state
+Sender: alistair23@gmail.com
+In-Reply-To: <87shjc2rkb.fsf@dusky.pond.sub.org>
+References: <2b2311b1b070a0b03973e39deccf4682de4a6cd4.1496686997.git.alistair.francis@xilinx.com>
+	<CAJ+F1CLuPkWjG3Hn8hfaxTApn6+ouqh5nJZNWSQYX1C3_HRFqA@mail.gmail.com>
+	<e340cdb9-3c97-8624-81d9-f7888f819a68@amsat.org>
+	<CAKmqyKOOhu7iKuW4naNi0+7cwayLaftkPf=gS7uBakMvKavxVQ@mail.gmail.com>
+	<270686d0-1ca8-965f-a14a-397f45616deb@redhat.com>
+	<87shjc2rkb.fsf@dusky.pond.sub.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Wed, 7 Jun 2017 16:47:43 -0700
+Message-ID: <CAKmqyKMJ8ZgTPtEj73pBDU+mf578tubKPUPsP4mTD8veX90K-w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] char-socket: Don't report TCP
+ socket waiting as an error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,119 +35,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: sursingh@redhat.com, qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org, bharata@linux.vnet.ibm.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Alistair Francis <alistair.francis@xilinx.com>
 
-Quoting Michael Roth (2017-06-07 17:49:06)
-> Quoting David Gibson (2017-06-06 08:05:33)
-> > PCI DRCs, and only PCI DRCs, are immediately moved to UNISOLATED isolat=
-ion
-> > state once the device is attached.  This has been there from the initial
-> > implementation, and it's not clear why.
-> > =
+On Wed, Jun 7, 2017 at 12:19 AM, Markus Armbruster <armbru@redhat.com> wrote:
+> Paolo Bonzini <pbonzini@redhat.com> writes:
+>
+>> On 06/06/2017 18:30, Alistair Francis wrote:
+>>>>
+>>>> This is somehow confusing. I don't think it is worth having another
+>>>> qemu_log_stderr() function rather than using error_report() but this very
+>>>> call might deserve a comment explaining this unusual use. What do you think?
+>>>
+>>> The problem with stderr is that this isn't an error. Some uses of QEMU
+>>> (inside Eclipse for example) flag everything printed on stderr as red
+>>> which confuses users that they are seeing an error when they really
+>>> aren't.
+>>
+>> But they are wrong.
+>
+> Concur.  We also print warnings and informational messages to stderr.
+>
+> We should make errors easy to recognize.  Fortunately, error_report()
+> prints errors to stderr in a rigid format.  Unfortunately, error
+> messages bypassing error_report() still exist in places.  We suck.
+>
+> The format is
+>
+>     timestamp-if-enabled progname ':' location message
+>
+> timestamp-if-enabled is normally empty.  With -msg timestamp=on, it's
+> the current time in ISO 8601 format, followed by a space.
+>
+> progname is the program name (main()'s argv[0]).
+>
+> location is either empty, or a reference to the command line or a
+> configuration file.
+>
+> See error_vreport() for details.
 
-> > The state diagram in PAPR 13.4 suggests PCI devices should start in
-> > ISOLATED state until the guest moves them into UNISOLATED, and the code=
- in
-> > the guest-side drmgr tool seems to work that way too.
-> =
+Ok, but this isn't an error, it's more information. So it sounds like
+we should still print to stderr but not print in the format described
+above?
 
-> I think this was a misguided attempt to disallow detach() to finalize a
-> device immediately after attach(), but up until v1.3.3 drmgr actually
-> explicitly put the device right back into ISOLATED before doing
-> entity-sense, then back to UNISOLATED right before calling
-> configure-connector and eventually bringing the device to a configured
-> state. So I doesn't seem like this would have had any effect up until
-> drmgr v1.3.3+.
-> =
+Thanks,
+Alistair
 
-> For drmgr v1.3.3+, this patch would have the effect of allowing detach()
-> during the initial entity-sense/set-power-level RTAS calls the guest
-> might be doing in response to attach(), but the guest code seems capable
-> of dealing with that particular case gracefully.
-> =
-
-> I'm a bit concerned if we have *multiple* attach()/detach() pairs being
-> executed while drmgr is processing a single hotplug add event though:
-> =
-
-> host               guest
-> =
-
-> attach()
-> notify
->                    rtas-set-indicator(DR_INDICATOR_ON)
->                    rtas-entity-sense =3D> device_present
->                    rtas-set-power-level(on)
-> detach()
-> attach()
->                    rtas-set-sensor-state(ISOLATION_STATE_UNISOLATED)
->                    rtas-configure-connector =3D> configured
->                    guest actually onlines device, but dr-indicator and
->                    power domain aren't necessarily in the expected
->                    state
-> =
-
-> In practice, this one isn't a big issue since we emulate an
-> 'automatic' power domain in QEMU that makes any rtas-set-power-level
-> calls a no-op, and we don't rely on the dr-indicator (anymore, at
-> least), but it does end up being the wrong value, and makes me think
-
-Actually, since we set it explicitly in attach(), dr-indicator does end
-up being correct, but correct for the wrong reasons still.
-
-> we should find some way to disallow immediate detach() after attach()
-> outside of the scenarios set_signalled() was added for. So I think
-> this patch seems reasonable, but maybe patch 3 should instead
-> repurpose set_signalled to handle this, or be replaced with some
-> other alternative that has the same effect.
-> =
-
-> > =
-
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> =
-
-> Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> =
-
-> > ---
-> >  hw/ppc/spapr_drc.c | 10 ----------
-> >  1 file changed, 10 deletions(-)
-> > =
-
-> > diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-> > index c73fae0..22f9224 100644
-> > --- a/hw/ppc/spapr_drc.c
-> > +++ b/hw/ppc/spapr_drc.c
-> > @@ -291,16 +291,6 @@ void spapr_drc_attach(sPAPRDRConnector *drc, Devic=
-eState *d, void *fdt,
-> >      }
-> >      g_assert(fdt || coldplug);
-> > =
-
-> > -    /* NOTE: setting initial isolation state to UNISOLATED means we ca=
-n't
-> > -     * detach unless guest has a userspace/kernel that moves this state
-> > -     * back to ISOLATED in response to an unplug event, or this is done
-> > -     * manually by the admin prior. if we force things while the guest
-> > -     * may be accessing the device, we can easily crash the guest, so =
-we
-> > -     * we defer completion of removal in such cases to the reset() hoo=
-k.
-> > -     */
-> > -    if (spapr_drc_type(drc) =3D=3D SPAPR_DR_CONNECTOR_TYPE_PCI) {
-> > -        drc->isolation_state =3D SPAPR_DR_ISOLATION_STATE_UNISOLATED;
-> > -    }
-> >      drc->dr_indicator =3D SPAPR_DR_INDICATOR_ACTIVE;
-> > =
-
-> >      drc->dev =3D d;
-> > -- =
-
-> > 2.9.4
-> > =
-
-> =
-
->=20
+>
+> [...]
+>
