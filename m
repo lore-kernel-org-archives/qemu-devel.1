@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dIfAA-0005LH-EG
+	(envelope-from <berrange@redhat.com>) id 1dIfAA-0005LJ-EQ
 	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:54:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dIfA6-0007sm-Di
+	(envelope-from <berrange@redhat.com>) id 1dIfA7-0007tG-O2
 	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:54:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49982)
+Received: from mx1.redhat.com ([209.132.183.28]:50944)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dIfA6-0007sJ-7e
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:54:30 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dIfA7-0007su-G1
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:54:31 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Wed,  7 Jun 2017 18:54:14 +0100
-Message-Id: <20170607175419.13558-1-berrange@redhat.com>
+Date: Wed,  7 Jun 2017 18:54:15 +0100
+Message-Id: <20170607175419.13558-2-berrange@redhat.com>
+In-Reply-To: <20170607175419.13558-1-berrange@redhat.com>
+References: <20170607175419.13558-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v1 0/5] Merge sockets 2017/06/07
+Subject: [Qemu-devel] [PULL v1 1/5] sockets: ensure we can bind to both ipv4
+ & ipv6 separately
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,41 +30,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
-The following changes since commit 0db1851becbefe3e50cfc03776fb1f75817376=
-af:
+When binding to an IPv6 socket we currently force the
+IPV6_V6ONLY flag to off. This means that the IPv6 socket
+will accept both IPv4 & IPv6 sockets when QEMU is launched
+with something like
 
-  Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-2.10-pull-re=
-quest' into staging (2017-06-07 11:56:00 +0100)
+  -vnc :::1
 
-are available in the git repository at:
+While this is good for that case, it is bad for other
+cases. For example if an empty hostname is given,
+getaddrinfo resolves it to 2 addresses 0.0.0.0 and ::,
+in that order. We will thus bind to 0.0.0.0 first, and
+then fail to bind to :: on the same port. The same
+problem can happen if any other hostname lookup causes
+the IPv4 address to be reported before the IPv6 address.
 
-  git://github.com/berrange/qemu tags/pull-sockets-2017-06-07-1
+When we get an IPv6 bind failure, we should re-try the
+same port, but with IPV6_V6ONLY turned on again, to
+avoid clash with any IPv4 listener.
 
-for you to fetch changes up to 8dd2c27927b93aa352c43e8f0b9437f85d2f5f55:
+This ensures that
 
-  tests: add functional test validating ipv4/ipv6 address flag handling (=
-2017-06-07 17:15:08 +0100)
+  -vnc :1
 
-----------------------------------------------------------------
-Merge sockets 2017/06/07 v1
+will bind successfully to both 0.0.0.0 and ::, and also
+avoid
 
-----------------------------------------------------------------
+  -vnc :1,to=3D2
 
-Daniel P. Berrange (5):
-  sockets: ensure we can bind to both ipv4 & ipv6 separately
-  sockets: don't block IPv4 clients when listening on "::"
-  sockets: ensure we don't accept IPv4 clients when IPv4 is disabled
-  io: preserve ipv4/ipv6 flags when resolving InetSocketAddress
-  tests: add functional test validating ipv4/ipv6 address flag handling
+from mistakenly using a 2nd port for the :: listener.
 
- io/dns-resolver.c          |   6 +-
- tests/.gitignore           |   1 +
- tests/Makefile.include     |   4 +
- tests/test-sockets-proto.c | 857 +++++++++++++++++++++++++++++++++++++++=
-++++++
- util/qemu-sockets.c        |  71 +++-
- 5 files changed, 918 insertions(+), 21 deletions(-)
- create mode 100644 tests/test-sockets-proto.c
+Acked-by: Gerd Hoffmann <kraxel@gmail.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ util/qemu-sockets.c | 31 +++++++++++++++++++++++--------
+ 1 file changed, 23 insertions(+), 8 deletions(-)
 
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index b39ae74..8720097 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -208,22 +208,37 @@ static int inet_listen_saddr(InetSocketAddress *sad=
+dr,
+         }
+=20
+         socket_set_fast_reuse(slisten);
+-#ifdef IPV6_V6ONLY
+-        if (e->ai_family =3D=3D PF_INET6) {
+-            /* listen on both ipv4 and ipv6 */
+-            const int off =3D 0;
+-            qemu_setsockopt(slisten, IPPROTO_IPV6, IPV6_V6ONLY, &off,
+-                            sizeof(off));
+-        }
+-#endif
+=20
+         port_min =3D inet_getport(e);
+         port_max =3D saddr->has_to ? saddr->to + port_offset : port_min;
+         for (p =3D port_min; p <=3D port_max; p++) {
++#ifdef IPV6_V6ONLY
++            /* listen on both ipv4 and ipv6 */
++            int v6only =3D 0;
++#endif
+             inet_setport(e, p);
++#ifdef IPV6_V6ONLY
++        rebind:
++            if (e->ai_family =3D=3D PF_INET6) {
++                qemu_setsockopt(slisten, IPPROTO_IPV6, IPV6_V6ONLY, &v6o=
+nly,
++                                sizeof(v6only));
++            }
++#endif
+             if (bind(slisten, e->ai_addr, e->ai_addrlen) =3D=3D 0) {
+                 goto listen;
+             }
++
++#ifdef IPV6_V6ONLY
++            /* If we got EADDRINUSE from an IPv6 bind & V6ONLY is unset,
++             * it could be that the IPv4 port is already claimed, so ret=
+ry
++             * with V6ONLY set
++             */
++            if (e->ai_family =3D=3D PF_INET6 && errno =3D=3D EADDRINUSE =
+&& !v6only) {
++                v6only =3D 1;
++                goto rebind;
++            }
++#endif
++
+             if (p =3D=3D port_max) {
+                 if (!e->ai_next) {
+                     error_setg_errno(errp, errno, "Failed to bind socket=
+");
 --=20
 2.9.3
