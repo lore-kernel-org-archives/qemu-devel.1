@@ -1,15 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dIbQo-0000fc-E6
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 09:55:31 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dIbV5-0003fK-Oi
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 09:59:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dIbQn-0004fC-Lm
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 09:55:30 -0400
-From: Jeff Cody <jcody@redhat.com>
-Date: Wed,  7 Jun 2017 09:55:22 -0400
-Message-Id: <d5b487b58c2c6b3e68de0e858b84877434f05c76.1496843678.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH] block: fix external snapshot abort permission
- error
+	(envelope-from <peter.maydell@linaro.org>) id 1dIbV4-00069L-Uw
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 09:59:55 -0400
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:38911)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dIbV4-000693-N2
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 09:59:54 -0400
+Received: by mail-wm0-x22c.google.com with SMTP id n195so11892839wmg.1
+	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 06:59:54 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20170607093027.14086-1-laurent@vivier.eu>
+References: <20170607093027.14086-1-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 7 Jun 2017 14:59:32 +0100
+Message-ID: <CAFEAcA8FgZLZrTnyPHUaCPiaQFQ+r33HLdyB7eC=OhzpDybRGA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/1] M68k for 2.10 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,37 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-In external_snapshot_abort(), we try to undo what was done in
-external_snapshot_prepare() calling bdrv_replace_node() to swap the
-nodes back.  However, we receive a permissions error as writers are
-blocked on the old node, which is now the new node backing file.
+On 7 June 2017 at 10:30, Laurent Vivier <laurent@vivier.eu> wrote:
+> The following changes since commit 65dfad62a176f5265f801683be64149c5ad55f7d:
+>
+>   Merge remote-tracking branch 'remotes/xtensa/tags/20170606-xtensa' into staging (2017-06-06 17:00:12 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/vivier/qemu-m68k.git tags/m68k-for-2.10-pull-request
+>
+> for you to fetch changes up to 18059c9e1648bf4fc5c7c1bae6f54690742b05ba:
+>
+>   target/m68k: implement rtd (2017-06-07 11:18:30 +0200)
+>
+> ----------------------------------------------------------------
+>
+> ----------------------------------------------------------------
+>
+> Laurent Vivier (1):
+>   target/m68k: implement rtd
+>
+>  target/m68k/cpu.c       |  2 ++
+>  target/m68k/cpu.h       |  1 +
+>  target/m68k/translate.c | 11 +++++++++++
+>  3 files changed, 14 insertions(+)
 
-An easy fix (initially suggested by Kevin Wolf) is to call
-bdrv_set_backing_hd() on the new node, to set the backing node to NULL.
+Applied, thanks.
 
-Signed-off-by: Jeff Cody <jcody@redhat.com>
----
- blockdev.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/blockdev.c b/blockdev.c
-index 892d768..6472548 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1803,7 +1803,11 @@ static void external_snapshot_abort(BlkActionState *common)
-                              DO_UPCAST(ExternalSnapshotState, common, common);
-     if (state->new_bs) {
-         if (state->overlay_appended) {
-+            bdrv_ref(state->old_bs);   /* we can't let bdrv_set_backind_hd()
-+                                          close state->old_bs; we need it */
-+            bdrv_set_backing_hd(state->new_bs, NULL, &error_abort);
-             bdrv_replace_node(state->new_bs, state->old_bs, &error_abort);
-+            bdrv_unref(state->old_bs); /* bdrv_replace_node() ref'ed old_bs */
-         }
-     }
- }
--- 
-2.9.3
+-- PMM
