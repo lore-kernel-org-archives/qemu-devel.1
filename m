@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39730)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dIcsG-0006fg-GT
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:27:57 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dIcsq-0006xc-7s
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:28:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dIcsD-0002fz-Cr
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:27:56 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:35135)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dIcsD-0002fV-3t
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:27:53 -0400
-Received: by mail-wm0-x234.google.com with SMTP id x70so60386972wme.0
-	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 08:27:53 -0700 (PDT)
-Date: Wed, 7 Jun 2017 16:27:49 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170607152749.GF21990@stefanha-x1.localdomain>
-References: <20170606072229.9302-1-haozhong.zhang@intel.com>
-	<20170606072229.9302-4-haozhong.zhang@intel.com>
+	(envelope-from <pbonzini@redhat.com>) id 1dIcsn-0002p7-1u
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:28:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55846)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dIcsm-0002ou-PL
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:28:28 -0400
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AE1C5C0587D3
+	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 15:28:27 +0000 (UTC)
+Received: from donizetti.redhat.com (ovpn-118-77.ams2.redhat.com
+	[10.36.118.77] (may be forged))
+	by int-mx09.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v57FSQpE002992
+	for <qemu-devel@nongnu.org>; Wed, 7 Jun 2017 11:28:26 -0400
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed,  7 Jun 2017 17:28:24 +0200
+Message-Id: <20170607152825.12081-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="4VrXvz3cwkc87Wze"
-Content-Disposition: inline
-In-Reply-To: <20170606072229.9302-4-haozhong.zhang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] nvdimm: add a boolean option
- "restrict"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v5 00/33] Misc patches for 2017-06-01
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,49 +35,220 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Haozhong Zhang <haozhong.zhang@intel.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <guangrong.xiao@gmail.com>, Dan Williams <dan.j.williams@intel.com>
+To: qemu-devel@nongnu.org
 
+The following changes since commit 65dfad62a176f5265f801683be64149c5ad55f=
+7d:
 
---4VrXvz3cwkc87Wze
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+  Merge remote-tracking branch 'remotes/xtensa/tags/20170606-xtensa' into=
+ staging (2017-06-06 17:00:12 +0100)
 
-On Tue, Jun 06, 2017 at 03:22:28PM +0800, Haozhong Zhang wrote:
-> If a vNVDIMM device is not backed by a DAX device and its "restrict"
-> option is enabled, bit 3 of state flags in its region mapping
-> structure will be set, in order to notify the guest of the lack of
-> write persistence guarantee. Once this bit is set, the guest OS may
-> mark the vNVDIMM device as read-only.
->=20
-> This option is disabled by default for backwards compatibility. It's
-> recommended to enable for the formal usage.
+are available in the git repository at:
 
-Good idea.  I think the following is cleaner:
+  git://github.com/bonzini/qemu.git tags/for-upstream
 
-DEFINE_PROP_ON_OFF_AUTO("readonly") on the 'nvdimm' device.  The
-following states are available:
+for you to fetch changes up to a316ae656514501478594ee6043b098c045046fc:
 
- * 'on' - ACPI_NFIT_MEM_NOT_ARMED is set
- * 'off' - ACPI_NFIT_MEM_NOT_ARMED is clear
- * 'auto' - ACPI_NFIT_MEM_NOT_ARMED set if backend is not persistent
+  docs: create config/, devel/ and spin/ subdirectories (2017-06-07 17:25=
+:31 +0200)
 
-This new property defaults to 'auto'.  Machine types older than
-pc-i440fx-2.10 and pc-q35-2.10 default to 'on'.
+----------------------------------------------------------------
+* virtio-scsi use-after-free fix (Fam)
+* vhost-user-scsi support (Felipe)
+* SMM fixes and improvements for TCG (myself, Mihail)
+* irqchip and AddressSpaceDispatch cleanups and fixes (Peter)
+* Coverity fix (Stefano)
+* NBD cleanups and fixes (Vladimir, Eric, myself)
+* RTC accuracy improvements and code cleanups (Guangrong+Yunfang)
+* socket error reporting improvement (Daniel)
+* GDB XML description for SSE registers (Abdallah)
+* kvmclock update fix (Denis)
+* SMM memory savings (Gonglei)
+* -cpu 486 fix (myself)
+* various bugfixes (Roman, Peter, myself, Thomas)
+* rtc-test improvement (Guangrong)
+* migration throttling fix (Felipe)
+* create docs/ subdirectories (myself)
 
---4VrXvz3cwkc87Wze
-Content-Type: application/pgp-signature; name="signature.asc"
+----------------------------------------------------------------
+Abdallah Bouassida (1):
+      target/i386: Add GDB XML description for SSE registers
 
------BEGIN PGP SIGNATURE-----
+Daniel P. Berrange (1):
+      sockets: improve error reporting if UNIX socket path is too long
 
-iQEcBAEBAgAGBQJZOBt1AAoJEJykq7OBq3PI8TEH/i6+5lyu5WgdASiizf8E8GIU
-l23/AbH+bnRib3JwdRGTmNsd398lM32B4YVfS1xkhBqsHmm0+aIQ+AwhkxK4n7Vf
-P3si0lOu4IdC0xI0c6EvNc42RKQBUliaLpTC1JGBewH4KjMi7JgMOpetY1zsSQW7
-1WtbU8Kf3Upr5RQ2SVj/TrZ7p6odUGyBJy0j+6KO0DK7IfdV7MCYu33l0XytlFGI
-sfNL3urVOtBvoTU7MhFqslUl659xaiFTrQU9e82ZFhDCQLL4eGWjpRcXZTxSp2C3
-FnDz/av7skUfW34i2qVTUURA2SkhVNEoJ4UTXAvmOftaTh2zVyoJ/jBJEgbPkq8=
-=kHNO
------END PGP SIGNATURE-----
+Denis Plotnikov (1):
+      kvmclock: update system_time_msr address forcibly
 
---4VrXvz3cwkc87Wze--
+Eric Blake (1):
+      nbd: Fully initialize client in case of failed negotiation
+
+Fam Zheng (1):
+      virtio-scsi: Unset hotplug handler when unrealize
+
+Felipe Franciosi (3):
+      vhost-user-scsi: Introduce vhost-user-scsi host device
+      vhost-user-scsi: Introduce a vhost-user-scsi sample application
+      cpus: reset throttle_thread_scheduled after sleep
+
+Gonglei (1):
+      kvm: don't register smram_listener when smm is off
+
+Mihail Abakumov (1):
+      i386: fix read/write cr with icount option
+
+Paolo Bonzini (6):
+      target/i386: enable A20 automatically in system management mode
+      target/i386: use multiple CPU AddressSpaces
+      linuxboot_dma: compile for i486
+      edu: fix memory leak on msi_broken platforms
+      nbd: make it thread-safe, fix qcow2 over nbd
+      docs: create config/, devel/ and spin/ subdirectories
+
+Peter Xu (4):
+      kvm: irqchip: trace changes on msi add/remove
+      msix: trace control bit write op
+      kvm: irqchip: skip update msi when disabled
+      exec: simplify phys_page_find() params
+
+Roman Pen (1):
+      i386/kvm: do not zero out segment flags if segment is unusable or n=
+ot present
+
+Stefano Stabellini (1):
+      Check the return value of fcntl in qemu_set_cloexec
+
+Tai Yunfang (1):
+      mc146818rtc: precisely count the clock for periodic timer
+
+Vladimir Sementsov-Ogievskiy (5):
+      nbd: strict nbd_wr_syncv
+      nbd: read_sync and friends: return 0 on success
+      nbd: add errp parameter to nbd_wr_syncv()
+      nbd: add errp to read_sync, write_sync and drop_sync
+      nbd/client.c: use errp instead of LOG
+
+Xiao Guangrong (5):
+      mc146818rtc: update periodic timer only if it is needed
+      mc146818rtc: ensure LOST_TICK_POLICY_SLEW is only enabled on TARGET=
+_I386
+      mc146818rtc: drop unnecessary '#ifdef TARGET_I386'
+      mc146818rtc: embrace all x86 specific code
+      qtest: add rtc periodic timer test
+
+ .gitignore                                 |   1 +
+ Makefile                                   |   3 +
+ Makefile.objs                              |   4 +
+ block/nbd-client.c                         |  41 +-
+ configure                                  |   4 +-
+ contrib/libvhost-user/libvhost-user.h      |  11 +-
+ contrib/vhost-user-scsi/Makefile.objs      |   1 +
+ contrib/vhost-user-scsi/vhost-user-scsi.c  | 886 +++++++++++++++++++++++=
+++++++
+ cpus.c                                     |   2 +-
+ default-configs/pci.mak                    |   1 +
+ default-configs/s390x-softmmu.mak          |   1 +
+ docs/{ =3D> config}/ich9-ehci-uhci.cfg       |   0
+ docs/{ =3D> config}/mach-virt-graphical.cfg  |   0
+ docs/{ =3D> config}/mach-virt-serial.cfg     |   0
+ docs/{ =3D> config}/q35-emulated.cfg         |   0
+ docs/{ =3D> config}/q35-virtio-graphical.cfg |   0
+ docs/{ =3D> config}/q35-virtio-serial.cfg    |   0
+ docs/{ =3D> devel}/atomics.txt               |   0
+ docs/{ =3D> devel}/bitmaps.md                |   0
+ docs/{ =3D> devel}/blkdebug.txt              |   0
+ docs/{ =3D> devel}/blkverify.txt             |   0
+ docs/{ =3D> devel}/build-system.txt          |   0
+ docs/{ =3D> devel}/lockcnt.txt               |   0
+ docs/{ =3D> devel}/memory.txt                |   0
+ docs/{ =3D> devel}/migration.txt             |   0
+ docs/{ =3D> devel}/multi-thread-tcg.txt      |   0
+ docs/{ =3D> devel}/multiple-iothreads.txt    |   0
+ docs/{ =3D> devel}/qapi-code-gen.txt         |   0
+ docs/{ =3D> devel}/rcu.txt                   |   0
+ docs/{ =3D> devel}/tracing.txt               |   0
+ docs/{ =3D> devel}/virtio-migration.txt      |   0
+ docs/{ =3D> devel}/writing-qmp-commands.txt  |   0
+ docs/{ =3D> spin}/aio_notify.promela         |   0
+ docs/{ =3D> spin}/aio_notify_accept.promela  |   0
+ docs/{ =3D> spin}/aio_notify_bug.promela     |   0
+ docs/{ =3D> spin}/tcg-exclusive.promela      |   0
+ docs/{ =3D> spin}/win32-qemu-event.promela   |   0
+ exec.c                                     |  13 +-
+ gdb-xml/i386-32bit-sse.xml                 |  52 ++
+ gdb-xml/i386-32bit.xml                     |  14 +
+ gdb-xml/i386-64bit-sse.xml                 |  60 ++
+ gdb-xml/i386-64bit.xml                     |  14 +
+ hw/i386/kvm/clock.c                        |   3 +
+ hw/misc/edu.c                              |  12 +-
+ hw/pci/msix.c                              |  11 +-
+ hw/pci/trace-events                        |   3 +
+ hw/scsi/Makefile.objs                      |   1 +
+ hw/scsi/vhost-scsi-common.c                |   1 -
+ hw/scsi/vhost-user-scsi.c                  | 194 +++++++
+ hw/scsi/virtio-scsi.c                      |   3 +
+ hw/timer/mc146818rtc.c                     | 203 ++++---
+ hw/virtio/virtio-pci.c                     |  58 ++
+ hw/virtio/virtio-pci.h                     |  11 +
+ include/block/nbd.h                        |   8 +-
+ include/hw/timer/mc146818rtc_regs.h        |  20 +
+ include/hw/virtio/vhost-user-scsi.h        |  35 ++
+ include/hw/virtio/virtio-scsi.h            |   2 +
+ kvm-all.c                                  |   8 +-
+ nbd/client.c                               | 125 ++--
+ nbd/common.c                               |  23 +-
+ nbd/nbd-internal.h                         |  40 +-
+ nbd/server.c                               | 100 ++--
+ pc-bios/linuxboot_dma.bin                  | Bin 1536 -> 1536 bytes
+ pc-bios/optionrom/Makefile                 |   1 +
+ qemu-nbd.c                                 |   5 +-
+ target/i386/arch_memory_mapping.c          |  18 +-
+ target/i386/cpu.c                          |  23 +-
+ target/i386/cpu.h                          |  20 +-
+ target/i386/helper.c                       |  96 ++--
+ target/i386/kvm.c                          |  36 +-
+ target/i386/machine.c                      |   4 -
+ target/i386/smm_helper.c                   |  18 -
+ target/i386/translate.c                    |  12 +
+ tests/qemu-iotests/083.out                 |   2 +
+ tests/rtc-test.c                           |  49 ++
+ trace-events                               |   3 +-
+ util/oslib-posix.c                         |   4 +-
+ util/qemu-sockets.c                        |  68 ++-
+ 78 files changed, 1936 insertions(+), 392 deletions(-)
+ create mode 100644 contrib/vhost-user-scsi/Makefile.objs
+ create mode 100644 contrib/vhost-user-scsi/vhost-user-scsi.c
+ rename docs/{ =3D> config}/ich9-ehci-uhci.cfg (100%)
+ rename docs/{ =3D> config}/mach-virt-graphical.cfg (100%)
+ rename docs/{ =3D> config}/mach-virt-serial.cfg (100%)
+ rename docs/{ =3D> config}/q35-emulated.cfg (100%)
+ rename docs/{ =3D> config}/q35-virtio-graphical.cfg (100%)
+ rename docs/{ =3D> config}/q35-virtio-serial.cfg (100%)
+ rename docs/{ =3D> devel}/atomics.txt (100%)
+ rename docs/{ =3D> devel}/bitmaps.md (100%)
+ rename docs/{ =3D> devel}/blkdebug.txt (100%)
+ rename docs/{ =3D> devel}/blkverify.txt (100%)
+ rename docs/{ =3D> devel}/build-system.txt (100%)
+ rename docs/{ =3D> devel}/lockcnt.txt (100%)
+ rename docs/{ =3D> devel}/memory.txt (100%)
+ rename docs/{ =3D> devel}/migration.txt (100%)
+ rename docs/{ =3D> devel}/multi-thread-tcg.txt (100%)
+ rename docs/{ =3D> devel}/multiple-iothreads.txt (100%)
+ rename docs/{ =3D> devel}/qapi-code-gen.txt (100%)
+ rename docs/{ =3D> devel}/rcu.txt (100%)
+ rename docs/{ =3D> devel}/tracing.txt (100%)
+ rename docs/{ =3D> devel}/virtio-migration.txt (100%)
+ rename docs/{ =3D> devel}/writing-qmp-commands.txt (100%)
+ rename docs/{ =3D> spin}/aio_notify.promela (100%)
+ rename docs/{ =3D> spin}/aio_notify_accept.promela (100%)
+ rename docs/{ =3D> spin}/aio_notify_bug.promela (100%)
+ rename docs/{ =3D> spin}/tcg-exclusive.promela (100%)
+ rename docs/{ =3D> spin}/win32-qemu-event.promela (100%)
+ create mode 100644 gdb-xml/i386-32bit-sse.xml
+ create mode 100644 gdb-xml/i386-32bit.xml
+ create mode 100644 gdb-xml/i386-64bit-sse.xml
+ create mode 100644 gdb-xml/i386-64bit.xml
+ create mode 100644 hw/scsi/vhost-user-scsi.c
+ create mode 100644 include/hw/virtio/vhost-user-scsi.h
+--=20
+2.13.0
