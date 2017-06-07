@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dIjm0-0001oD-JR
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 18:49:57 -0400
+	(envelope-from <bobby.prani@gmail.com>) id 1dIjoI-0002gZ-7h
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 18:52:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dIjlx-0000BQ-H2
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 18:49:56 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:56447)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dIjlx-0000Ao-41
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 18:49:53 -0400
-Date: Wed, 7 Jun 2017 18:49:49 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170607224949.GA25623@flamenco>
-References: <CAJhHMCBwu-pVAyxN+w8SSo19wi3DW3JCRRF-K1Sj9zYqGYkFvQ@mail.gmail.com>
-	<20170606171320.GA8115@flamenco> <877f0o3vbn.fsf@frigg.lan>
-	<CAFEAcA8RBMtfS+5GP=cGeAdV+zgGRg5OPEAu_PY+_hEPcWaJqw@mail.gmail.com>
-	<87zidjztrt.fsf@frigg.lan>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87zidjztrt.fsf@frigg.lan>
-Subject: Re: [Qemu-devel] GSoC 2017 Proposal: TCG performance enhancements
+	(envelope-from <bobby.prani@gmail.com>) id 1dIjoF-0000he-L2
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 18:52:18 -0400
+Received: from mail-yw0-x241.google.com ([2607:f8b0:4002:c05::241]:35105)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1dIjoF-0000hV-H6
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 18:52:15 -0400
+Received: by mail-yw0-x241.google.com with SMTP id p144so1302950ywp.2
+	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 15:52:15 -0700 (PDT)
+From: Pranith Kumar <bobby.prani@gmail.com>
+Date: Wed,  7 Jun 2017 18:52:10 -0400
+Message-Id: <20170607225212.23714-2-bobby.prani@gmail.com>
+In-Reply-To: <20170607225212.23714-1-bobby.prani@gmail.com>
+References: <20170607225212.23714-1-bobby.prani@gmail.com>
+Subject: [Qemu-devel] [RFC PATCH 1/3] tcg/aarch64: Introduce and use jump to
+ register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,23 +27,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Pranith Kumar <bobby.prani@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: alex.bennee@linaro.org
+Cc: qemu-devel@nongnu.org, rth@twiddle.net
 
-On Wed, Jun 07, 2017 at 18:45:10 +0300, Lluís Vilanova wrote:
-> If there is such renewed interest, I will carve a bit more time to bring the
-> patches up to date and send the instrumentation ones for further discussion.
+Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+---
+ tcg/aarch64/tcg-target.inc.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-I'm very interested and have time to spend on it -- I'm working on a
-simulator backend and would like to move ASAP from QSim[1] to qemu proper for
-the front-end. BTW I left some comments/questions a few days ago on the
-v7 patchset you sent in January (ouch!).
-
-I can also help with testing or bringing patches up to date -- let me
-know if you need any help.
-
-Thanks,
-
-		Emilio
-
-[1] http://manifold.gatech.edu/projects/qsim-a-multicore-emulator/
+diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+index 1fa3bccc89..ab0a8caa03 100644
+--- a/tcg/aarch64/tcg-target.inc.c
++++ b/tcg/aarch64/tcg-target.inc.c
+@@ -819,6 +819,12 @@ static inline void tcg_out_goto(TCGContext *s, tcg_insn_unit *target)
+     tcg_out_insn(s, 3206, B, offset);
+ }
+ 
++static inline void tcg_out_goto_register(TCGContext *s, intptr_t target)
++{
++    tcg_out_movi(s, TCG_TYPE_I64, TCG_REG_TMP, target);
++    tcg_out_insn(s, 3207, BR, TCG_REG_TMP);
++}
++
+ static inline void tcg_out_goto_noaddr(TCGContext *s)
+ {
+     /* We pay attention here to not modify the branch target by reading from
+@@ -1364,10 +1370,10 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,
+     case INDEX_op_exit_tb:
+         /* Reuse the zeroing that exists for goto_ptr.  */
+         if (a0 == 0) {
+-            tcg_out_goto(s, s->code_gen_epilogue);
++            tcg_out_goto_register(s, (intptr_t)(s->code_gen_epilogue));
+         } else {
+             tcg_out_movi(s, TCG_TYPE_I64, TCG_REG_X0, a0);
+-            tcg_out_goto(s, tb_ret_addr);
++            tcg_out_goto_register(s, (intptr_t)(tb_ret_addr));
+         }
+         break;
+ 
+-- 
+2.13.0
