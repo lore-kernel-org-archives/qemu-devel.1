@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dIXgM-0000sh-Dx
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:55:19 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dIXgP-0000wA-Ts
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:55:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dIXgJ-0003W1-8D
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:55:18 -0400
-Received: from [59.151.112.132] (port=2775 helo=heian.cn.fujitsu.com)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dIXgP-0003Y0-4h
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:55:21 -0400
+Received: from [59.151.112.132] (port=2726 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dIXgI-0003UP-SZ
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:55:15 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dIXgO-0003W8-P9
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:55:21 -0400
 From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Wed, 7 Jun 2017 17:55:12 +0800
-Message-ID: <1496829322-17099-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Date: Wed, 7 Jun 2017 17:55:19 +0800
+Message-ID: <1496829322-17099-8-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+In-Reply-To: <1496829322-17099-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+References: <1496829322-17099-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH V6 00/10] Add COLO-proxy virtio-net support
+Subject: [Qemu-devel] [PATCH V6 07/10] net/colo.c: Add vnet packet parse
+ feature in colo-proxy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,78 +30,39 @@ To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
 Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, weifuqiang <weifuqiang@huawei.com>, "eddie
 	. dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-If user use -device virtio-net-pci, virtio-net driver will add a header
-to raw net packet that colo-proxy can't handle it. COLO-proxy just
-focus on the packet payload, so we skip the virtio-net header to compare
-the sent packet that primary guest's to secondary guest's.
+Make colo-compare and filter-rewriter can parse vnet packet.
 
-V6:
- - p1: Remove the using_vnet_hdr, I will send a independent
-       patchset about it.
- - p2: Change option input way from vnet_hdr=on/off to vnet_hdr_support.
-       Use nf->direction to decide check nf->netdev->vnet_hdr_len or nf->netdev->peer->vnet_hdr_len.
- - p3: Change option input way from vnet_hdr=on/off to vnet_hdr_support.
- - p4: No change.
- - p5: No change.
- - p6: Change option input way from vnet_hdr=on/off to vnet_hdr_support.
-       Fix commit log.
- - p7: No change.
- - p8: No change.
- - p9: Change option input way from vnet_hdr=on/off to vnet_hdr_support.
-       Use nf->direction to decide check nf->netdev->vnet_hdr_len or nf->netdev->peer->vnet_hdr_len.
- - p10: New patch to add new example for the case needs vnet hdr.
+Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+---
+ net/colo.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-V5:
- - patch1: No change.
- - patch2: Keep the long line in qemu-option.hx.
-           Squash patch2 into old patch3.
-           Add more comments.
-           Fix the return value.
- - patch3: Add more comments in commit log.
- - patch4: Add Suggested-by tag.
-           Fix commit log.
-           Move vnet_hdr to SocketReadState.
- - patch5: No change.
- - patch6: Squash old patch6 into this patch.
- - patch7: No change.
- - patch8: Remove the offset_all.
- - patch9: Squash old patch11 and the patch12.
-
-
-V4:
- - Add vnet_hdr option for filter-mirror, filter-redirector,
-   filter-rewriter,colo-compare.
- - Use new design to impliment virtio-net support for colo-proxy.
- - Fix codestyle.
- - Remove unused option for filter-rewriter.
- - Add filter-rewriter virtio-net support.
- - Address other comments.
-
-
-Zhang Chen (10):
-  net: Add vnet_hdr_len arguments in NetClientState
-  net/filter-mirror.c: Make filter mirror support vnet support.
-  net/filter-mirror.c: Add new option to enable vnet support for
-    filter-redirector
-  net/net.c: Add vnet_hdr support in SocketReadState
-  net/colo.c: Make vnet_hdr_len as packet property
-  net/colo-compare.c: Make colo-compare support vnet_hdr_len
-  net/colo.c: Add vnet packet parse feature in colo-proxy
-  net/colo-compare.c: Add vnet packet's tcp/udp/icmp compare
-  net/filter-rewriter.c: Make filter-rewriter support vnet_hdr_len
-  docs/colo-proxy.txt: Update colo-proxy usage of net driver with
-    vnet_header
-
- docs/colo-proxy.txt   | 26 ++++++++++++++
- include/net/net.h     |  7 +++-
- net/colo-compare.c    | 86 +++++++++++++++++++++++++++++++++++++-------
- net/colo.c            |  9 ++---
- net/colo.h            |  4 ++-
- net/filter-mirror.c   | 98 ++++++++++++++++++++++++++++++++++++++++++++++++---
- net/filter-rewriter.c | 51 ++++++++++++++++++++++++++-
- net/net.c             | 34 ++++++++++++++++--
- qemu-options.hx       | 19 +++++-----
- 9 files changed, 296 insertions(+), 38 deletions(-)
-
+diff --git a/net/colo.c b/net/colo.c
+index 180eaed..28ce7c8 100644
+--- a/net/colo.c
++++ b/net/colo.c
+@@ -43,11 +43,11 @@ int parse_packet_early(Packet *pkt)
+ {
+     int network_length;
+     static const uint8_t vlan[] = {0x81, 0x00};
+-    uint8_t *data = pkt->data;
++    uint8_t *data = pkt->data + pkt->vnet_hdr_len;
+     uint16_t l3_proto;
+     ssize_t l2hdr_len = eth_get_l2_hdr_length(data);
+ 
+-    if (pkt->size < ETH_HLEN) {
++    if (pkt->size < ETH_HLEN + pkt->vnet_hdr_len) {
+         trace_colo_proxy_main("pkt->size < ETH_HLEN");
+         return 1;
+     }
+@@ -73,7 +73,7 @@ int parse_packet_early(Packet *pkt)
+     }
+ 
+     network_length = pkt->ip->ip_hl * 4;
+-    if (pkt->size < l2hdr_len + network_length) {
++    if (pkt->size < l2hdr_len + network_length + pkt->vnet_hdr_len) {
+         trace_colo_proxy_main("pkt->size < network_header + network_length");
+         return 1;
+     }
 -- 
 2.7.4
