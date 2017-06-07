@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dIOtt-0003b4-Jw
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:32:42 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dIOtw-0003eL-Mg
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:32:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dIOtr-0002Gq-NG
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:32:41 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:34086)
+	(envelope-from <rth7680@gmail.com>) id 1dIOtv-0002JP-Kt
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:32:44 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:32791)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dIOtr-0002Gl-Hp
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:32:39 -0400
-Received: by mail-qt0-x241.google.com with SMTP id o21so22863198qtb.1
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 17:32:39 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dIOtv-0002JF-Hg
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:32:43 -0400
+Received: by mail-qk0-x242.google.com with SMTP id c206so15446376qkb.0
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 17:32:43 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue,  6 Jun 2017 17:31:06 -0700
-Message-Id: <20170607003119.14778-58-rth@twiddle.net>
+Date: Tue,  6 Jun 2017 17:31:09 -0700
+Message-Id: <20170607003119.14778-61-rth@twiddle.net>
 In-Reply-To: <20170607003119.14778-1-rth@twiddle.net>
 References: <20170607003119.14778-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL v2 57/70] target/s390x: improve MOVE LONG and
- MOVE LONG EXTENDED
+Subject: [Qemu-devel] [PULL v2 60/70] target/s390x: implement PACK ASCII
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,205 +31,114 @@ Cc: peter.maydell@linaro.org, aurelien@aurel32.net
 
 From: Aurelien Jarno <aurelien@aurel32.net>
 
-As MVCL and MVCLE only differ by their operands, use a common
-do_mvcl helper. Optimize it calling fast_memmove and fast_memset.
-Correctly write back addresses. Check that r1 and r2/r3 registers
-are even.
-
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
-Message-Id: <20170531220129.27724-21-aurelien@aurel32.net>
+Message-Id: <20170531220129.27724-24-aurelien@aurel32.net>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/s390x/mem_helper.c | 90 +++++++++++++++++++++--------------------------
- target/s390x/translate.c  | 40 +++++++++++++++------
- 2 files changed, 70 insertions(+), 60 deletions(-)
+ target/s390x/helper.h      |  1 +
+ target/s390x/insn-data.def |  2 ++
+ target/s390x/mem_helper.c  | 35 +++++++++++++++++++++++++++++++++++
+ target/s390x/translate.c   | 16 ++++++++++++++++
+ 4 files changed, 54 insertions(+)
 
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index 8ce5e3f..61f3ead 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -86,6 +86,7 @@ DEF_HELPER_FLAGS_2(sqdb, TCG_CALL_NO_WG, i64, env, i64)
+ DEF_HELPER_FLAGS_3(sqxb, TCG_CALL_NO_WG, i64, env, i64, i64)
+ DEF_HELPER_FLAGS_1(cvd, TCG_CALL_NO_RWG_SE, i64, s32)
+ DEF_HELPER_FLAGS_4(pack, TCG_CALL_NO_WG, void, env, i32, i64, i64)
++DEF_HELPER_FLAGS_4(pka, TCG_CALL_NO_WG, void, env, i64, i64, i32)
+ DEF_HELPER_FLAGS_4(unpk, TCG_CALL_NO_WG, void, env, i32, i64, i64)
+ DEF_HELPER_FLAGS_4(tr, TCG_CALL_NO_WG, void, env, i32, i64, i64)
+ DEF_HELPER_4(tre, i64, env, i64, i64, i64)
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index d16857a..a5063a4 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -665,6 +665,8 @@
+     /* Really format SS_b, but we pack both lengths into one argument
+        for the helper call, so we might as well leave one 8-bit field.  */
+     C(0xf200, PACK,    SS_a,  Z,   la1, a2, 0, 0, pack, 0)
++/* PACK ASCII */
++    C(0xe900, PKA,     SS_f,  E2,  la1, a2, 0, 0, pka, 0)
+ 
+ /* PREFETCH */
+     /* Implemented as nops of course.  */
 diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 2326f0b..3b2ff09 100644
+index 581f107..4cf96c8 100644
 --- a/target/s390x/mem_helper.c
 +++ b/target/s390x/mem_helper.c
-@@ -576,49 +576,60 @@ void HELPER(stam)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+@@ -914,6 +914,41 @@ void HELPER(pack)(CPUS390XState *env, uint32_t len, uint64_t dest, uint64_t src)
      }
  }
  
--/* move long */
--uint32_t HELPER(mvcl)(CPUS390XState *env, uint32_t r1, uint32_t r2)
-+/* move long helper */
-+static inline uint32_t do_mvcl(CPUS390XState *env,
-+                               uint64_t *dest, uint64_t *destlen,
-+                               uint64_t *src, uint64_t *srclen,
-+                               uint8_t pad, uintptr_t ra)
- {
--    uintptr_t ra = GETPC();
--    uint64_t destlen = env->regs[r1 + 1] & 0xffffff;
--    uint64_t dest = get_address(env, r1);
--    uint64_t srclen = env->regs[r2 + 1] & 0xffffff;
--    uint64_t src = get_address(env, r2);
--    uint8_t pad = env->regs[r2 + 1] >> 24;
--    uint8_t v;
-+    uint64_t len = MIN(*srclen, *destlen);
-     uint32_t cc;
- 
--    if (destlen == srclen) {
-+    if (*destlen == *srclen) {
-         cc = 0;
--    } else if (destlen < srclen) {
-+    } else if (*destlen < *srclen) {
-         cc = 1;
-     } else {
-         cc = 2;
-     }
- 
--    if (srclen > destlen) {
--        srclen = destlen;
--    }
-+    /* Copy the src array */
-+    fast_memmove(env, *dest, *src, len, ra);
-+    *src += len;
-+    *srclen -= len;
-+    *dest += len;
-+    *destlen -= len;
- 
--    for (; destlen && srclen; src++, dest++, destlen--, srclen--) {
--        v = cpu_ldub_data_ra(env, src, ra);
--        cpu_stb_data_ra(env, dest, v, ra);
--    }
-+    /* Pad the remaining area */
-+    fast_memset(env, *dest, pad, *destlen, ra);
-+    *dest += *destlen;
-+    *destlen = 0;
- 
--    for (; destlen; dest++, destlen--) {
--        cpu_stb_data_ra(env, dest, pad, ra);
--    }
-+    return cc;
-+}
- 
--    env->regs[r1 + 1] = destlen;
--    /* can't use srclen here, we trunc'ed it */
--    env->regs[r2 + 1] -= src - env->regs[r2];
-+/* move long */
-+uint32_t HELPER(mvcl)(CPUS390XState *env, uint32_t r1, uint32_t r2)
++void HELPER(pka)(CPUS390XState *env, uint64_t dest, uint64_t src,
++                 uint32_t srclen)
 +{
 +    uintptr_t ra = GETPC();
-+    uint64_t destlen = env->regs[r1 + 1] & 0xffffff;
-+    uint64_t dest = get_address(env, r1);
-+    uint64_t srclen = env->regs[r2 + 1] & 0xffffff;
-+    uint64_t src = get_address(env, r2);
-+    uint8_t pad = env->regs[r2 + 1] >> 24;
-+    uint32_t cc;
++    int i;
++    /* The destination operand is always 16 bytes long.  */
++    const int destlen = 16;
 +
-+    cc = do_mvcl(env, &dest, &destlen, &src, &srclen, pad, ra);
++    /* The operands are processed from right to left.  */
++    src += srclen - 1;
++    dest += destlen - 1;
 +
-+    env->regs[r1 + 1] = deposit64(env->regs[r1 + 1], 0, 24, destlen);
-+    env->regs[r2 + 1] = deposit64(env->regs[r2 + 1], 0, 24, srclen);
-     set_address(env, r1, dest);
-     set_address(env, r2, src);
- 
-     return cc;
- }
- 
--/* move long extended another memcopy insn with more bells and whistles */
-+/* move long extended */
- uint32_t HELPER(mvcle)(CPUS390XState *env, uint32_t r1, uint64_t a2,
-                        uint32_t r3)
++    for (i = 0; i < destlen; i++) {
++        uint8_t b = 0;
++
++        /* Start with a positive sign */
++        if (i == 0) {
++            b = 0xc;
++        } else if (srclen > 1) {
++            b = cpu_ldub_data_ra(env, src, ra) & 0x0f;
++            src--;
++            srclen--;
++        }
++
++        if (srclen > 1) {
++            b |= cpu_ldub_data_ra(env, src, ra) << 4;
++            src--;
++            srclen--;
++        }
++
++        cpu_stb_data_ra(env, dest, b, ra);
++        dest--;
++    }
++}
++
+ void HELPER(unpk)(CPUS390XState *env, uint32_t len, uint64_t dest,
+                   uint64_t src)
  {
-@@ -627,34 +638,13 @@ uint32_t HELPER(mvcle)(CPUS390XState *env, uint32_t r1, uint64_t a2,
-     uint64_t dest = get_address(env, r1);
-     uint64_t srclen = get_length(env, r3 + 1);
-     uint64_t src = get_address(env, r3);
--    uint8_t pad = a2 & 0xff;
--    uint8_t v;
-+    uint8_t pad = a2;
-     uint32_t cc;
- 
--    if (destlen == srclen) {
--        cc = 0;
--    } else if (destlen < srclen) {
--        cc = 1;
--    } else {
--        cc = 2;
--    }
--
--    if (srclen > destlen) {
--        srclen = destlen;
--    }
--
--    for (; destlen && srclen; src++, dest++, destlen--, srclen--) {
--        v = cpu_ldub_data_ra(env, src, ra);
--        cpu_stb_data_ra(env, dest, v, ra);
--    }
--
--    for (; destlen; dest++, destlen--) {
--        cpu_stb_data_ra(env, dest, pad, ra);
--    }
-+    cc = do_mvcl(env, &dest, &destlen, &src, &srclen, pad, ra);
- 
--    set_length(env, r1 + 1 , destlen);
--    /* can't use srclen here, we trunc'ed it */
--    set_length(env, r3 + 1, env->regs[r3 + 1] - src - env->regs[r3]);
-+    set_length(env, r1 + 1, destlen);
-+    set_length(env, r3 + 1, srclen);
-     set_address(env, r1, dest);
-     set_address(env, r3, src);
- 
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 2d47f1d..c131f67 100644
+index 4f1a50e..4939311 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -2979,22 +2979,42 @@ static ExitStatus op_mvcin(DisasContext *s, DisasOps *o)
- 
- static ExitStatus op_mvcl(DisasContext *s, DisasOps *o)
- {
--    TCGv_i32 r1 = tcg_const_i32(get_field(s->fields, r1));
--    TCGv_i32 r2 = tcg_const_i32(get_field(s->fields, r2));
--    gen_helper_mvcl(cc_op, cpu_env, r1, r2);
--    tcg_temp_free_i32(r1);
--    tcg_temp_free_i32(r2);
-+    int r1 = get_field(s->fields, r1);
-+    int r2 = get_field(s->fields, r2);
-+    TCGv_i32 t1, t2;
-+
-+    /* r1 and r2 must be even.  */
-+    if (r1 & 1 || r2 & 1) {
-+        gen_program_exception(s, PGM_SPECIFICATION);
-+        return EXIT_NORETURN;
-+    }
-+
-+    t1 = tcg_const_i32(r1);
-+    t2 = tcg_const_i32(r2);
-+    gen_helper_mvcl(cc_op, cpu_env, t1, t2);
-+    tcg_temp_free_i32(t1);
-+    tcg_temp_free_i32(t2);
-     set_cc_static(s);
+@@ -3299,6 +3299,22 @@ static ExitStatus op_pack(DisasContext *s, DisasOps *o)
      return NO_EXIT;
  }
  
- static ExitStatus op_mvcle(DisasContext *s, DisasOps *o)
- {
--    TCGv_i32 r1 = tcg_const_i32(get_field(s->fields, r1));
--    TCGv_i32 r3 = tcg_const_i32(get_field(s->fields, r3));
--    gen_helper_mvcle(cc_op, cpu_env, r1, o->in2, r3);
--    tcg_temp_free_i32(r1);
--    tcg_temp_free_i32(r3);
-+    int r1 = get_field(s->fields, r1);
-+    int r3 = get_field(s->fields, r3);
-+    TCGv_i32 t1, t3;
++static ExitStatus op_pka(DisasContext *s, DisasOps *o)
++{
++    int l2 = get_field(s->fields, l2) + 1;
++    TCGv_i32 l;
 +
-+    /* r1 and r3 must be even.  */
-+    if (r1 & 1 || r3 & 1) {
++    /* The length must not exceed 32 bytes.  */
++    if (l2 > 32) {
 +        gen_program_exception(s, PGM_SPECIFICATION);
 +        return EXIT_NORETURN;
 +    }
++    l = tcg_const_i32(l2);
++    gen_helper_pka(cpu_env, o->addr1, o->in2, l);
++    tcg_temp_free_i32(l);
++    return NO_EXIT;
++}
 +
-+    t1 = tcg_const_i32(r1);
-+    t3 = tcg_const_i32(r3);
-+    gen_helper_mvcle(cc_op, cpu_env, t1, o->in2, t3);
-+    tcg_temp_free_i32(t1);
-+    tcg_temp_free_i32(t3);
-     set_cc_static(s);
-     return NO_EXIT;
- }
+ static ExitStatus op_popcnt(DisasContext *s, DisasOps *o)
+ {
+     gen_helper_popcnt(o->out, o->in2);
 -- 
 2.9.4
