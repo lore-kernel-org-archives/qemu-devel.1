@@ -1,16 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dIdPY-0006RJ-CX
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:02:22 -0400
+	(envelope-from <eblake@redhat.com>) id 1dIdPb-0006VU-TY
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:02:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dIdPS-000868-0x
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:02:20 -0400
-From: Eric Auger <eric.auger@redhat.com>
-Date: Wed,  7 Jun 2017 18:01:23 +0200
-Message-Id: <1496851287-9428-5-git-send-email-eric.auger@redhat.com>
-In-Reply-To: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
-References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v2 4/8] virtio-iommu: Decode the command payload
+	(envelope-from <eblake@redhat.com>) id 1dIdPa-00088f-Rf
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:02:24 -0400
+References: <cover.1496844254.git.berto@igalia.com>
+	<2ddc2703be89a250994478c92ca7695b4b88791b.1496844254.git.berto@igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5be69f00-7630-bdb1-70a8-02a078798f15@redhat.com>
+Date: Wed, 7 Jun 2017 11:02:06 -0500
+MIME-Version: 1.0
+In-Reply-To: <2ddc2703be89a250994478c92ca7695b4b88791b.1496844254.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="AbwWMJJv1qlCtrU2PhqgRMbqBmFmrMMCb"
+Subject: Re: [Qemu-devel] [PATCH v2 2/7] qcow2: Use unsigned int for both
+ members of Qcow2COWRegion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,160 +25,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, jean-philippe.brucker@arm.com
-Cc: will.deacon@arm.com, robin.murphy@arm.com, kevin.tian@intel.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, wei@redhat.com, tn@semihalf.com, bharat.bhushan@nxp.com
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-This patch adds the command payload decoding and
-introduces the functions that will do the actual
-command handling. Those functions are not yet implemented.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--AbwWMJJv1qlCtrU2PhqgRMbqBmFmrMMCb
+From: Eric Blake <eblake@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, "Denis V . Lunev" <den@openvz.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <5be69f00-7630-bdb1-70a8-02a078798f15@redhat.com>
+Subject: Re: [PATCH v2 2/7] qcow2: Use unsigned int for both members of
+ Qcow2COWRegion
+References: <cover.1496844254.git.berto@igalia.com>
+ <2ddc2703be89a250994478c92ca7695b4b88791b.1496844254.git.berto@igalia.com>
+In-Reply-To: <2ddc2703be89a250994478c92ca7695b4b88791b.1496844254.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- hw/virtio/trace-events   |  7 ++++
- hw/virtio/virtio-iommu.c | 97 ++++++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 100 insertions(+), 4 deletions(-)
+On 06/07/2017 09:08 AM, Alberto Garcia wrote:
+> Qcow2COWRegion has two attributes:
+>=20
+> - The offset of the COW region from the start of the first cluster
+>   touched by the I/O request. Since it's always going to be positive
+>   and the maximum request size is at most INT_MAX, we can use a
+>   regular unsigned int to store this offset.
 
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index e24d8fa..fba1da6 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -25,3 +25,10 @@ virtio_balloon_handle_output(const char *name, uint64_t gpa) "section name: %s g
- virtio_balloon_get_config(uint32_t num_pages, uint32_t actual) "num_pages: %d actual: %d"
- virtio_balloon_set_config(uint32_t actual, uint32_t oldactual) "actual: %d oldactual: %d"
- virtio_balloon_to_target(uint64_t target, uint32_t num_pages) "balloon target: %"PRIx64" num_pages: %d"
-+
-+# hw/virtio/virtio-iommu.c
-+#
-+virtio_iommu_attach(uint32_t as, uint32_t dev, uint32_t flags) "as=%d dev=%d flags=%d"
-+virtio_iommu_detach(uint32_t dev, uint32_t flags) "dev=%d flags=%d"
-+virtio_iommu_map(uint32_t as, uint64_t phys_addr, uint64_t virt_addr, uint64_t size, uint32_t flags) "as= %d phys_addr=0x%"PRIx64" virt_addr=0x%"PRIx64" size=0x%"PRIx64" flags=%d"
-+virtio_iommu_unmap(uint32_t as, uint64_t virt_addr, uint64_t size, uint32_t reserved) "as= %d virt_addr=0x%"PRIx64" size=0x%"PRIx64" reserved=%d"
-diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index 86129ef..ea1caa7 100644
---- a/hw/virtio/virtio-iommu.c
-+++ b/hw/virtio/virtio-iommu.c
-@@ -35,29 +35,118 @@
- /* Max size */
- #define VIOMMU_DEFAULT_QUEUE_SIZE 256
- 
-+static int virtio_iommu_attach(VirtIOIOMMU *s,
-+                               struct virtio_iommu_req_attach *req)
-+{
-+    uint32_t asid = le32_to_cpu(req->address_space);
-+    uint32_t devid = le32_to_cpu(req->device);
-+    uint32_t reserved = le32_to_cpu(req->reserved);
-+
-+    trace_virtio_iommu_attach(asid, devid, reserved);
-+
-+    return VIRTIO_IOMMU_S_UNSUPP;
-+}
-+
-+static int virtio_iommu_detach(VirtIOIOMMU *s,
-+                               struct virtio_iommu_req_detach *req)
-+{
-+    uint32_t devid = le32_to_cpu(req->device);
-+    uint32_t reserved = le32_to_cpu(req->reserved);
-+
-+    trace_virtio_iommu_detach(devid, reserved);
-+
-+    return VIRTIO_IOMMU_S_UNSUPP;
-+}
-+
-+static int virtio_iommu_map(VirtIOIOMMU *s,
-+                            struct virtio_iommu_req_map *req)
-+{
-+    uint32_t asid = le32_to_cpu(req->address_space);
-+    uint64_t phys_addr = le64_to_cpu(req->phys_addr);
-+    uint64_t virt_addr = le64_to_cpu(req->virt_addr);
-+    uint64_t size = le64_to_cpu(req->size);
-+    uint32_t flags = le32_to_cpu(req->flags);
-+
-+    trace_virtio_iommu_map(asid, phys_addr, virt_addr, size, flags);
-+
-+    return VIRTIO_IOMMU_S_UNSUPP;
-+}
-+
-+static int virtio_iommu_unmap(VirtIOIOMMU *s,
-+                              struct virtio_iommu_req_unmap *req)
-+{
-+    uint32_t asid = le32_to_cpu(req->address_space);
-+    uint64_t virt_addr = le64_to_cpu(req->virt_addr);
-+    uint64_t size = le64_to_cpu(req->size);
-+    uint32_t flags = le32_to_cpu(req->flags);
-+
-+    trace_virtio_iommu_unmap(asid, virt_addr, size, flags);
-+
-+    return VIRTIO_IOMMU_S_UNSUPP;
-+}
-+
-+#define get_payload_size(req) (\
-+sizeof((req)) - sizeof(struct virtio_iommu_req_tail))
-+
- static int virtio_iommu_handle_attach(VirtIOIOMMU *s,
-                                       struct iovec *iov,
-                                       unsigned int iov_cnt)
- {
--    return -ENOENT;
-+    struct virtio_iommu_req_attach req;
-+    size_t sz, payload_sz;
-+
-+    payload_sz = get_payload_size(req);
-+
-+    sz = iov_to_buf(iov, iov_cnt, 0, &req, payload_sz);
-+    if (sz != payload_sz) {
-+        return VIRTIO_IOMMU_S_INVAL;
-+    }
-+    return virtio_iommu_attach(s, &req);
- }
- static int virtio_iommu_handle_detach(VirtIOIOMMU *s,
-                                       struct iovec *iov,
-                                       unsigned int iov_cnt)
- {
--    return -ENOENT;
-+    struct virtio_iommu_req_detach req;
-+    size_t sz, payload_sz;
-+
-+    payload_sz = get_payload_size(req);
-+
-+    sz = iov_to_buf(iov, iov_cnt, 0, &req, payload_sz);
-+    if (sz != payload_sz) {
-+        return VIRTIO_IOMMU_S_INVAL;
-+    }
-+    return virtio_iommu_detach(s, &req);
- }
- static int virtio_iommu_handle_map(VirtIOIOMMU *s,
-                                    struct iovec *iov,
-                                    unsigned int iov_cnt)
- {
--    return -ENOENT;
-+    struct virtio_iommu_req_map req;
-+    size_t sz, payload_sz;
-+
-+    payload_sz = get_payload_size(req);
-+
-+    sz = iov_to_buf(iov, iov_cnt, 0, &req, payload_sz);
-+    if (sz != payload_sz) {
-+        return VIRTIO_IOMMU_S_INVAL;
-+    }
-+    return virtio_iommu_map(s, &req);
- }
- static int virtio_iommu_handle_unmap(VirtIOIOMMU *s,
-                                      struct iovec *iov,
-                                      unsigned int iov_cnt)
- {
--    return -ENOENT;
-+    struct virtio_iommu_req_unmap req;
-+    size_t sz, payload_sz;
-+
-+    payload_sz = get_payload_size(req);
-+
-+    sz = iov_to_buf(iov, iov_cnt, 0, &req, payload_sz);
-+    if (sz != payload_sz) {
-+        return VIRTIO_IOMMU_S_INVAL;
-+    }
-+    return virtio_iommu_unmap(s, &req);
- }
- 
- static void virtio_iommu_handle_command(VirtIODevice *vdev, VirtQueue *vq)
--- 
-2.5.5
+I don't know if we will ever get to the point that we allow a 64-bit
+request at the block layer (and then the block layer guarantees it is
+split down to the driver's limits, which works when a driver is still
+bound by 32-bit limits).  But we ALSO know that a cluster is at most 2M
+(in our current implementation of qcow2), so the offset of where the COW
+region starts in relation to the start of a cluster is < 2M.
+
+>=20
+> - The size of the COW region in bytes. This is guaranteed to be >=3D 0,=
+
+>   so we should use an unsigned type instead.
+
+And likewise, since a COW region is a sub-cluster, and clusters are
+bounded at 2M, we also have a sub-int upper bound on the size of the regi=
+on.
+
+>=20
+> In x86_64 this reduces the size of Qcow2COWRegion from 16 to 8 bytes.
+> It will also help keep some assertions simpler now that we know that
+> there are no negative numbers.
+>=20
+> The prototype of do_perform_cow() is also updated to reflect these
+> changes.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/qcow2-cluster.c | 4 ++--
+>  block/qcow2.h         | 4 ++--
+>  2 files changed, 4 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+> index d1c419f52b..a86c5a75a9 100644
+> --- a/block/qcow2-cluster.c
+> +++ b/block/qcow2-cluster.c
+> @@ -406,8 +406,8 @@ int qcow2_encrypt_sectors(BDRVQcow2State *s, int64_=
+t sector_num,
+>  static int coroutine_fn do_perform_cow(BlockDriverState *bs,
+>                                         uint64_t src_cluster_offset,
+>                                         uint64_t cluster_offset,
+> -                                       int offset_in_cluster,
+> -                                       int bytes)
+> +                                       unsigned offset_in_cluster,
+> +                                       unsigned bytes)
+
+I don't know if the code base has a strong preference for 'unsigned int'
+over 'unsigned', but it doesn't bother me.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--AbwWMJJv1qlCtrU2PhqgRMbqBmFmrMMCb
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZOCN+AAoJEKeha0olJ0NqWnkH/2awSt9RXZfnkyRbJLHD/Fee
+QrNiRxWIMWqF4YOnlUF2jw5dEZ0zmxSBgjHwMjLIUWcWxgeuTibe7M3D43LSWg5k
+AGmZHbboUn6zq9zplQ0RpHWto7Wum+aZQbOlkj8fezJKAL8izE7LRPTIuxgBvUYJ
+E3MWiu5JDTReBM3pmZhSfjFYc0gQJA2iynGXadZWl/FdI24mgxL/NjiqUx8bfbMB
+vWJ0kRFEdIK0JeAqeVmGXQoDg/TfcEkzP+D6InnhyMrFJkmGyv3w3lroQ3Ew5cqv
+bJJ7lun9HFsAeSq7vWXvoX4HD+pdmF0CH3B40eKWnMjstOqN462TqIp6yIVxFpE=
+=Vq1n
+-----END PGP SIGNATURE-----
+
+--AbwWMJJv1qlCtrU2PhqgRMbqBmFmrMMCb--
