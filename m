@@ -1,16 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dIWSy-00040i-5D
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 04:37:25 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dIWT8-00047F-Fj
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 04:37:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dIWSw-0001Fs-Qr
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 04:37:24 -0400
-From: Eric Auger <eric.auger@redhat.com>
-Date: Wed,  7 Jun 2017 10:35:56 +0200
-Message-Id: <1496824556-1883-9-git-send-email-eric.auger@redhat.com>
-In-Reply-To: <1496824556-1883-1-git-send-email-eric.auger@redhat.com>
-References: <1496824556-1883-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC 8/8] hw/arm/virt: Add virtio-iommu the virt board
+	(envelope-from <jasowang@redhat.com>) id 1dIWT0-0001Gc-Gl
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 04:37:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59184)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dIWT0-0001GS-9L
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 04:37:26 -0400
+References: <1496659493-1105-1-git-send-email-wang.yong155@zte.com.cn>
+	<1496659493-1105-5-git-send-email-wang.yong155@zte.com.cn>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <ba2f1089-add7-63ca-8406-fde640cc02bf@redhat.com>
+Date: Wed, 7 Jun 2017 16:37:18 +0800
+MIME-Version: 1.0
+In-Reply-To: <1496659493-1105-5-git-send-email-wang.yong155@zte.com.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCHv2 04/04] colo-compare: Update the COLO
+ document to fix the processing of secondary packets in the main thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,209 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, jean-philippe.brucker@arm.com
-Cc: will.deacon@arm.com, robin.murphy@arm.com, kevin.tian@intel.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, wei@redhat.com, tn@semihalf.com, bharat.bhushan@nxp.com
+To: Yong Wang <wang.yong155@zte.com.cn>, zhang.zhanghailiang@huawei.com, zhangchen.fnst@cn.fujitsu.com
+Cc: lizhijian@cn.fujitsu.com, qemu-devel@nongnu.org, wang.guang55@zte.com.cn
 
-The specific virtio-mmio node is inconditionally added on
-machine init while the binding between this latter and the
-PCIe host bridge is done on machine init done notifier, only
-if -device virtio-iommu-device was added to the qemu command
-line.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
----
----
- hw/arm/virt.c         | 92 +++++++++++++++++++++++++++++++++++++++++++++++----
- include/hw/arm/virt.h |  4 +++
- 2 files changed, 89 insertions(+), 7 deletions(-)
+On 2017=E5=B9=B406=E6=9C=8805=E6=97=A5 18:44, Yong Wang wrote:
+> From: Wang Yong <wang.yong155@zte.com.cn>
+>
+> In my test, secondary does not process the packets comparing in the IOT=
+hread
+> but in the qemu main thread processing.
+> secondary's configuration " -chardev socket,id=3Dcompare1,host=3D3.3.3.=
+3,port=3D9004,server,nowait"
+> here,we should use 'wait' instead of 'nowait' configuration .
+> after use  'wait' configuration ,packets can be process in the IOThread=
+ from the secondary,
+> not in the qemu main thread.
+>
+> Signed-off-by: Wang Yong<wang.yong155@zte.com.cn>
+> Signed-off-by: Wang Guang<wang.guang55@zte.com.cn>
+> ---
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 6eb0d2a..6bcfbcd 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -52,6 +52,7 @@
- #include "hw/arm/fdt.h"
- #include "hw/intc/arm_gic.h"
- #include "hw/intc/arm_gicv3_common.h"
-+#include "hw/virtio/virtio-iommu.h"
- #include "kvm_arm.h"
- #include "hw/smbios/smbios.h"
- #include "qapi/visitor.h"
-@@ -139,6 +140,7 @@ static const MemMapEntry a15memmap[] = {
-     [VIRT_FW_CFG] =             { 0x09020000, 0x00000018 },
-     [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
-     [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
-+    [VIRT_SMMU] =               { 0x09050000, 0x00000200 },
-     [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
-     /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
-     [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
-@@ -159,6 +161,7 @@ static const int a15irqmap[] = {
-     [VIRT_SECURE_UART] = 8,
-     [VIRT_MMIO] = 16, /* ...to 16 + NUM_VIRTIO_TRANSPORTS - 1 */
-     [VIRT_GIC_V2M] = 48, /* ...to 48 + NUM_GICV2M_SPIS - 1 */
-+    [VIRT_SMMU] = 74,
-     [VIRT_PLATFORM_BUS] = 112, /* ...to 112 + PLATFORM_BUS_NUM_IRQS -1 */
- };
- 
-@@ -991,7 +994,81 @@ static void create_pcie_irq_map(const VirtMachineState *vms,
-                            0x7           /* PCI irq */);
- }
- 
--static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
-+static int bind_virtio_iommu_device(Object *obj, void *opaque)
-+{
-+    VirtMachineState *vms = (VirtMachineState *)opaque;
-+    struct arm_boot_info *info = &vms->bootinfo;
-+    int dtb_size;
-+    void *fdt = info->get_dtb(info, &dtb_size);
-+    Object *dev;
-+
-+    dev = object_dynamic_cast(obj, TYPE_VIRTIO_IOMMU);
-+
-+    if (!dev) {
-+        /* Container, traverse it for children */
-+        return object_child_foreach(obj, bind_virtio_iommu_device, opaque);
-+    }
-+
-+    qemu_fdt_setprop_cells(fdt, vms->pcie_host_nodename, "iommu-map",
-+                           0x0, vms->smmu_phandle, 0x0, 0x10000);
-+
-+    return true;
-+}
-+
-+static
-+void virtio_iommu_notifier(Notifier *notifier, void *data)
-+{
-+    VirtMachineState *vms = container_of(notifier, VirtMachineState,
-+                                         virtio_iommu_done);
-+    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
-+    Object *container;
-+
-+
-+    if (vmc->no_iommu) {
-+        return;
-+    }
-+
-+    container = container_get(qdev_get_machine(), "/peripheral");
-+    bind_virtio_iommu_device(container, vms);
-+    container = container_get(qdev_get_machine(), "/peripheral-anon");
-+    bind_virtio_iommu_device(container, vms);
-+}
-+
-+static void create_virtio_iommu(VirtMachineState *vms, qemu_irq *pic)
-+{
-+    char *smmu;
-+    const char compat[] = "virtio,mmio";
-+    int irq =  vms->irqmap[VIRT_SMMU];
-+    hwaddr base = vms->memmap[VIRT_SMMU].base;
-+    hwaddr size = vms->memmap[VIRT_SMMU].size;
-+    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
-+
-+    if (vmc->no_iommu) {
-+        return;
-+    }
-+
-+    vms->smmu_phandle = qemu_fdt_alloc_phandle(vms->fdt);
-+
-+    sysbus_create_simple("virtio-mmio", base, pic[irq]);
-+
-+    smmu = g_strdup_printf("/virtio_mmio@%" PRIx64, base);
-+    qemu_fdt_add_subnode(vms->fdt, smmu);
-+    qemu_fdt_setprop(vms->fdt, smmu, "compatible", compat, sizeof(compat));
-+    qemu_fdt_setprop_sized_cells(vms->fdt, smmu, "reg", 2, base, 2, size);
-+
-+    qemu_fdt_setprop_cells(vms->fdt, smmu, "interrupts",
-+            GIC_FDT_IRQ_TYPE_SPI, irq, GIC_FDT_IRQ_FLAGS_EDGE_LO_HI);
-+
-+    qemu_fdt_setprop(vms->fdt, smmu, "dma-coherent", NULL, 0);
-+    qemu_fdt_setprop_cell(vms->fdt, smmu, "#iommu-cells", 1);
-+    qemu_fdt_setprop_cell(vms->fdt, smmu, "phandle", vms->smmu_phandle);
-+    g_free(smmu);
-+
-+    vms->virtio_iommu_done.notify = virtio_iommu_notifier;
-+    qemu_add_machine_init_done_notifier(&vms->virtio_iommu_done);
-+}
-+
-+static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
- {
-     hwaddr base_mmio = vms->memmap[VIRT_PCIE_MMIO].base;
-     hwaddr size_mmio = vms->memmap[VIRT_PCIE_MMIO].size;
-@@ -1064,7 +1141,8 @@ static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
-         }
-     }
- 
--    nodename = g_strdup_printf("/pcie@%" PRIx64, base);
-+    vms->pcie_host_nodename = g_strdup_printf("/pcie@%" PRIx64, base);
-+    nodename = vms->pcie_host_nodename;
-     qemu_fdt_add_subnode(vms->fdt, nodename);
-     qemu_fdt_setprop_string(vms->fdt, nodename,
-                             "compatible", "pci-host-ecam-generic");
-@@ -1103,7 +1181,6 @@ static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
-     qemu_fdt_setprop_cell(vms->fdt, nodename, "#interrupt-cells", 1);
-     create_pcie_irq_map(vms, vms->gic_phandle, irq, nodename);
- 
--    g_free(nodename);
- }
- 
- static void create_platform_bus(VirtMachineState *vms, qemu_irq *pic)
-@@ -1448,16 +1525,16 @@ static void machvirt_init(MachineState *machine)
- 
-     create_rtc(vms, pic);
- 
--    create_pcie(vms, pic);
--
--    create_gpio(vms, pic);
--
-     /* Create mmio transports, so the user can create virtio backends
-      * (which will be automatically plugged in to the transports). If
-      * no backend is created the transport will just sit harmlessly idle.
-      */
-     create_virtio_devices(vms, pic);
- 
-+    create_pcie(vms, pic);
-+
-+    create_gpio(vms, pic);
-+
-     vms->fw_cfg = create_fw_cfg(vms, &address_space_memory);
-     rom_set_fw(vms->fw_cfg);
- 
-@@ -1482,6 +1559,7 @@ static void machvirt_init(MachineState *machine)
-      * Notifiers are executed in registration reverse order.
-      */
-     create_platform_bus(vms, pic);
-+    create_virtio_iommu(vms, pic);
- }
- 
- static bool virt_get_secure(Object *obj, Error **errp)
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index ff27551..070cb39 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -59,6 +59,7 @@ enum {
-     VIRT_GIC_V2M,
-     VIRT_GIC_ITS,
-     VIRT_GIC_REDIST,
-+    VIRT_SMMU,
-     VIRT_UART,
-     VIRT_MMIO,
-     VIRT_RTC,
-@@ -91,6 +92,7 @@ typedef struct {
- typedef struct {
-     MachineState parent;
-     Notifier machine_done;
-+    Notifier virtio_iommu_done;
-     FWCfgState *fw_cfg;
-     bool secure;
-     bool highmem;
-@@ -106,6 +108,8 @@ typedef struct {
-     uint32_t clock_phandle;
-     uint32_t gic_phandle;
-     uint32_t msi_phandle;
-+    uint32_t smmu_phandle;
-+    char *pcie_host_nodename;
-     int psci_conduit;
- } VirtMachineState;
- 
--- 
-2.5.5
+This is a hint probably for something wrong in the code. Need to figure=20
+out the root cause.
+
+Thanks
+
+>   docs/colo-proxy.txt | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/docs/colo-proxy.txt b/docs/colo-proxy.txt
+> index ce3f783..567cc8b 100644
+> --- a/docs/colo-proxy.txt
+> +++ b/docs/colo-proxy.txt
+> @@ -165,7 +165,7 @@ Primary(ip:3.3.3.3):
+>   -netdev tap,id=3Dhn0,vhost=3Doff,script=3D/etc/qemu-ifup,downscript=3D=
+/etc/qemu-ifdown
+>   -device e1000,id=3De0,netdev=3Dhn0,mac=3D52:a4:00:12:78:66
+>   -chardev socket,id=3Dmirror0,host=3D3.3.3.3,port=3D9003,server,nowait
+> --chardev socket,id=3Dcompare1,host=3D3.3.3.3,port=3D9004,server,nowait
+> +-chardev socket,id=3Dcompare1,host=3D3.3.3.3,port=3D9004,server,wait
+>   -chardev socket,id=3Dcompare0,host=3D3.3.3.3,port=3D9001,server,nowai=
+t
+>   -chardev socket,id=3Dcompare0-0,host=3D3.3.3.3,port=3D9001
+>   -chardev socket,id=3Dcompare_out,host=3D3.3.3.3,port=3D9005,server,no=
+wait
