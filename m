@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anatol.pomozov@gmail.com>) id 1dIecN-0003EF-Rx
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:19:40 -0400
+	(envelope-from <armbru@redhat.com>) id 1dIetN-0000dM-FL
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:37:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anatol.pomozov@gmail.com>) id 1dIecN-0001oG-2b
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:19:39 -0400
-Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:36654)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <anatol.pomozov@gmail.com>)
-	id 1dIecM-0001oA-U7
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:19:38 -0400
-Received: by mail-it0-x244.google.com with SMTP id i206so1764002ita.3
-	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 10:19:38 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1dIetK-0000gj-7Z
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:37:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52744)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dIetK-0000gZ-2K
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:37:10 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170531135709.345-1-marcandre.lureau@redhat.com>
+	<20170531135709.345-6-marcandre.lureau@redhat.com>
+	<878tlct0o3.fsf@dusky.pond.sub.org>
+	<CAFEAcA8C2yfwJHyf63pWc5Sxbb+sbTeTpDJG6H4VYARwX=Yxcw@mail.gmail.com>
+	<87fufct04g.fsf@dusky.pond.sub.org>
+	<CAFEAcA_wVkwDUpJ4phLvz0TBbPG2UTjs6ua5i+YCnb0dWKUH+A@mail.gmail.com>
+Date: Wed, 07 Jun 2017 19:37:05 +0200
+In-Reply-To: <CAFEAcA_wVkwDUpJ4phLvz0TBbPG2UTjs6ua5i+YCnb0dWKUH+A@mail.gmail.com>
+	(Peter Maydell's message of "Wed, 7 Jun 2017 14:44:50 +0100")
+Message-ID: <87k24nog1q.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170607044148.10481-1-anatol.pomozov@gmail.com>
-References: <20170607044148.10481-1-anatol.pomozov@gmail.com>
-From: Anatol Pomozov <anatol.pomozov@gmail.com>
-Date: Wed, 7 Jun 2017 10:19:37 -0700
-Message-ID: <CAOMFOmXKgPiGwxieXfXXM=B9yodTaMU0zwB8k_-m_Jj37kv0LA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] Remove restriction that prevents bootimg
- elf64 images
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 05/45] qdev: remove PropertyInfo.qtype
+ field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +32,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, avi@redhat.com, adam@os.inf.tu-dresden.de, vlad.lungu@windriver.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-+ more folks who made changes to hw/i386/multiboot.c
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-On Tue, Jun 6, 2017 at 9:41 PM, Anatol Pomozov <anatol.pomozov@gmail.com> wrote:
-> It is possible to create a 64 bit elf image that has valid multiboot header.
-> qemu should be able to boot such images.
+> On 7 June 2017 at 14:09, Markus Armbruster <armbru@redhat.com> wrote:
+>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>> So how should I obtain those semantics with this cleanup in place ?
+>>
+>> Two ways come to mind:
+>>
+>> * Define a PropertyInfo like qdev_prop_uint32 with a null
+>>   set_default_value(), and use that.
+>>
+>> * Add a flag to Property that makes qdev_property_add_static() skip
+>>   prop->info->set_default_value(), set it for your property.
+>>
+>>   Actually, I'd probably do it the other way: call ->set_default_value()
+>>   only when the flag is set.  No need to check it's non-null then.
+>>   Setting the flag when it's null is a programming error.
+>>
+>> Could one of these two work for you?
 >
-> Tested with homemade 64bit OS - now it boots fine with 'qemu -kernel'
-> and as a grub image.
->
-> Signed-off-by: Anatol Pomozov <anatol.pomozov@gmail.com>
-> ---
->  hw/i386/multiboot.c | 5 -----
->  1 file changed, 5 deletions(-)
->
-> diff --git a/hw/i386/multiboot.c b/hw/i386/multiboot.c
-> index 663f35a658..cf1b4f5fb3 100644
-> --- a/hw/i386/multiboot.c
-> +++ b/hw/i386/multiboot.c
-> @@ -192,11 +192,6 @@ int load_multiboot(FWCfgState *fw_cfg,
->          int kernel_size;
->          fclose(f);
->
-> -        if (((struct elf64_hdr*)header)->e_machine == EM_X86_64) {
-> -            fprintf(stderr, "Cannot load x86-64 image, give a 32bit one.\n");
-> -            exit(1);
-> -        }
-> -
->          kernel_size = load_elf(kernel_filename, NULL, NULL, &elf_entry,
->                                 &elf_low, &elf_high, 0, I386_ELF_MACHINE,
->                                 0, 0);
-> --
-> 2.13.1
->
+> The former would work but duplicates a pile of code from the
+> qdev_prop_uint32 implementation. The latter would be cleaner
+> but introduces a dependency on this series -- how close is it
+> to hitting master?
+
+v2 was close, v3 just hit the list, but I'll be on vacation next week.
+Wrapping it up this week seems unrealistic.  Soon after I'm back is my
+best estimate.
