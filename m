@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51438)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dIez3-00053p-91
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:43:06 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dIf0V-0005cw-Gt
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:44:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dIez0-0002fU-H4
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:43:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51738)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dIez0-0002f6-8B
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:43:02 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 630BE8553C
-	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 17:43:00 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <1496745042-2379-3-git-send-email-peterx@redhat.com> (Peter Xu's
-	message of "Tue, 6 Jun 2017 18:30:38 +0800")
-References: <1496745042-2379-1-git-send-email-peterx@redhat.com>
-	<1496745042-2379-3-git-send-email-peterx@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 07 Jun 2017 19:42:57 +0200
-Message-ID: <87k24nd78e.fsf@secure.mitica>
+	(envelope-from <mreitz@redhat.com>) id 1dIf0U-0003QR-7E
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:44:35 -0400
+References: <20170601172734.9039-1-berrange@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <ded45a2f-c950-c338-373d-63e0c50b16f5@redhat.com>
+Date: Wed, 7 Jun 2017 19:44:24 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/6] migration: move global_state.optional
- out
+In-Reply-To: <20170601172734.9039-1-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="QcrrEjjVH4T2xmgEG5UWRhQrkF1SUERj3"
+Subject: Re: [Qemu-devel] [PATCH v8 00/20] Convert QCow[2] to QCryptoBlock &
+ add LUKS support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,117 +24,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-Peter Xu <peterx@redhat.com> wrote:
-> Put it into MigrationState then we can use the properties to specify
-> whether to enable storing global state.
->
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  include/migration/migration.h |  6 ++++++
->  migration/migration.c         | 21 +++++++++++++++++----
->  2 files changed, 23 insertions(+), 4 deletions(-)
->
-> diff --git a/include/migration/migration.h b/include/migration/migration.h
-> index bd0186c..8aa1ea6 100644
-> --- a/include/migration/migration.h
-> +++ b/include/migration/migration.h
-> @@ -162,6 +162,12 @@ struct MigrationState
->      /* Do we have to clean up -b/-i from old migrate parameters */
->      /* This feature is deprecated and will be removed */
->      bool must_remove_block_options;
-> +
-> +    /*
-> +     * Global switch on whether we need to store the global state
-> +     * during migration.
-> +     */
-> +    bool store_global_state;
->  };
->  
->  void migrate_set_state(int *state, int old_state, int new_state);
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 483b027..0653f49 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -140,13 +140,13 @@ void migration_incoming_state_destroy(void)
->  
->  
->  typedef struct {
-> -    bool optional;
->      uint32_t size;
->      uint8_t runstate[100];
->      RunState state;
->      bool received;
->  } GlobalState;
->  
-> +/* This is only used if MigrationState.store_global_state is set. */
->  static GlobalState global_state;
->  
->  int global_state_store(void)
-> @@ -179,7 +179,7 @@ static RunState global_state_get_runstate(void)
->  
->  void global_state_set_optional(void)
->  {
-> -    global_state.optional = true;
-> +    migrate_get_current()->store_global_state = false;
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--QcrrEjjVH4T2xmgEG5UWRhQrkF1SUERj3
+From: Max Reitz <mreitz@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
+Message-ID: <ded45a2f-c950-c338-373d-63e0c50b16f5@redhat.com>
+Subject: Re: [PATCH v8 00/20] Convert QCow[2] to QCryptoBlock & add LUKS
+ support
+References: <20170601172734.9039-1-berrange@redhat.com>
+In-Reply-To: <20170601172734.9039-1-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Part of the advantage (for me) of using qapi was not to have to export
-a function to set this.  I.e.  isn't a way to call
+On 2017-06-01 19:27, Daniel P. Berrange wrote:
+> Previously posted:
+>=20
+>  v1: https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg00201.htm=
+l
+>  v2: https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg05147.htm=
+l
+>  v3: https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg05671.htm=
+l
+>  v4: https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg02293.htm=
+l
+>  v5: https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg04653.htm=
+l
+>  v6: https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg04561.htm=
+l
+>  v7: https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg05818.htm=
+l
+>=20
+> This series is a continuation of previous work to support LUKS in
+> QEMU. The existing merged code supports LUKS as a standalone
+> driver which can be layered over/under any other QEMU block device
+> driver. This works well when using LUKS over protocol drivers (file,
+> rbd, iscsi, etc, etc), but has some downsides when combined with
+> format drivers like qcow2.
+>=20
+> If you layer LUKS under qcow2 (eg qcow2 -> luks -> file) then you
+> cannot get any information about the qcow2 file without first
+> decrypting it, as both the header and payload are encrypted.
+>=20
+> If you layer LUKS over qcow2 (eg luks -> qcow2 -> file) then you
+> cannot distinguish between a qcow2 file where the guest has done
+> LUKS encryption from a qcow2 file which qemu has done encryption.
+> More seriously, when encrypting sectors the guest virtual sector
+> is used as the input for deriving the initialization vectors.
+> When internal snapshots are used, this means that multiple sectors
+> in the qcow2 file may be encrypted with the same initialization
+> vector. This is a security weakness when combined with certain
+> cryptographic modes.
+>=20
+> Integrating LUKS natively into qcow2 allows us to combine the
+> best aspects of both layering strategies above. In particular
+> the header remains unecrypted, but initialization vectors are
+> generated using physical sector numbers preserving security
+> when snapshots are used. This is a change from previous postings
+> of this work, where the IVs were (incorrectly) generated based
+> on the virtual disk sector.
+>=20
+> In a previous posting of this work, Fam had suggested that we
+> do integration by layering luks over qcow2, but having QEMU
+> block layer automatically create the luks driver above qcow2
+> based on the qcow2 header crypt_method field. This is not
+> possible though, because such a scheme would suffer from the
+> problem of IVs being generated from the virtual disk sector
+> instead of physical disk sector. So having LUKS specific
+> code in the qcow2 block driver is unavoidable. In comparison
+> to the previous posting though, the amount of code in qcow2.c
+> has been reduced by allowing re-use of code from block/crypto.c
+> for handling QemuOpts -> QAPI conversion. So extra lines of
+> code in qcow2 to support LUKS is < 200.
+>=20
+> I have also split the changes to qcow2 up into 2 patches. The
+> first patch simply introduces use of the QCryptoBlock framework
+> to qcow2 for the existing (deprecated) AES-CBC encryption method.
+> The second patch wires up the LUKS support for qcow2. This makes
+> it clearer which parts of the changes are related to plain code
+> refactoring, vs enabling the new features. Specifically we can
+> now see that the LUKS enablement in qcow2 has this footprint:
 
-qemu_opt_get_bool(migration_opts, "store_global_state", true)
+I'm trusting Eric and Berto, so I haven't looked at all patches in
+depth. But I did have a look at all, and found only some minor stuff to
+complain about. I didn't send an R-b for patches I did not find
+anything, because (as I said) I didn't look at them sufficiently that
+I'd give an R-b (which I didn't because Eric's and Berto's were already
+present).
 
-qapi_<magic>_set_bool(migration_opts, "store_global_state",false);
-?
+I'm just writing this so you know I'm not planning to write any
+complaints for the patches I did not reply to. :-)
 
-So, I don't have to eport global_state_set_optional()?
+Max
 
 
-My goal would be that when I need to add a new propertly, I add it to
-migration_properties and to MigrationState and call it a day?
+--QcrrEjjVH4T2xmgEG5UWRhQrkF1SUERj3
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
->  static bool global_state_needed(void *opaque)
-> @@ -188,8 +188,7 @@ static bool global_state_needed(void *opaque)
->      char *runstate = (char *)s->runstate;
->  
->      /* If it is not optional, it is mandatory */
-> -
-> -    if (s->optional == false) {
-> +    if (migrate_get_current()->store_global_state) {
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-Being able to query without having a function would also be nice.
+iQEvBAEBCAAZBQJZODt4EhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQFhZ
+B/9/nZDbPG3QH8NbD157Q1Pteg+JekNQxIWz+0bEh9i4LnJ6qwzhRH95yLI18vc9
+IwEaCDXSlLGo4lnOOVGZsXHRMpDl2uttCxpNuSMhDiS1i/h1Nzk0uQZJlFDX4hsM
+uJxebAHqHuY9OOoOaxdJMrglVPeaU6kP9QfbDeD95BE9YaofDi1UlN9tZP56Wily
+2zf1AQ9kvknEFFdGIYJj/u+FszDCh8R8UWbPXHAQ7Uvy3YqaK7wAYi/w51wixTg1
+nVEMjg1rwKeiiVwjkdVcf8aYdstHar5S31ajx/jUNjNBxnzhkzMuNTHFLPChi2lD
+cQrzO0CfuT5E+kIo66xGUiuV
+=arZA
+-----END PGP SIGNATURE-----
 
-Later, Juan.
-
->          return true;
->      }
->  
-> @@ -2109,6 +2108,19 @@ void migrate_fd_connect(MigrationState *s)
->      s->migration_thread_running = true;
->  }
->  
-> +static Property migration_properties[] = {
-> +    DEFINE_PROP_BOOL("store-global-state", MigrationState,
-> +                     store_global_state, true),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static void migration_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +
-> +    dc->props = migration_properties;
-> +}
-> +
->  static void migration_instance_init(Object *obj)
->  {
->      MigrationState *ms = MIGRATION_OBJ(obj);
-> @@ -2133,6 +2145,7 @@ static void migration_instance_init(Object *obj)
->  static const TypeInfo migration_type = {
->      .name = TYPE_MIGRATION,
->      .parent = TYPE_DEVICE,
-> +    .class_init = migration_class_init,
->      .class_size = sizeof(MigrationClass),
->      .instance_size = sizeof(MigrationState),
->      .instance_init = migration_instance_init,
+--QcrrEjjVH4T2xmgEG5UWRhQrkF1SUERj3--
