@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dIWl2-0005kw-DW
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 04:56:05 -0400
+	(envelope-from <lersek@redhat.com>) id 1dIWqD-0008FZ-05
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:01:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dIWkz-0007bh-Lw
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 04:56:04 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59052)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dIWkz-0007bD-Fh
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 04:56:01 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dIWky-0006ks-Dd
-	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 08:56:00 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 668642E8194
-	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 08:56:00 +0000 (UTC)
+	(envelope-from <lersek@redhat.com>) id 1dIWq9-0000tV-6Z
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:01:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49000)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dIWq9-0000tO-09
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:01:21 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 83CF64DD7C
+	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 09:01:19 +0000 (UTC)
+References: <20170530212614.18343-1-lersek@redhat.com>
+	<1496814770.5126.1.camel@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <d8802612-0b11-776f-b209-53bbdaf67515@redhat.com>
+Date: Wed, 7 Jun 2017 11:01:12 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 07 Jun 2017 08:42:09 -0000
-From: Thomas Huth <816860@bugs.launchpad.net>
-Reply-To: Bug 816860 <816860@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20110727090924.6502.46971.malonedeb@wampee.canonical.com>
-Message-Id: <149682492898.32355.5381631999219578545.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 816860] Re: Guest machine freezes when NFS mount
- goes offline
+In-Reply-To: <1496814770.5126.1.camel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] q35/mch: implement extended TSEG sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,35 +34,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu devel list <qemu-devel@nongnu.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Can you still reproduce this problem with the latest version of QEMU
-(currently version 2.9.0)?
+On 06/07/17 07:52, Gerd Hoffmann wrote:
+>   Hi,
+> 
+> Patch looks sane overall.
+> 
+>> Invent a new, QEMU-specific register in the config space of the DRAM
+>> Controller, at offset 0x50, in order to allow guest firmware to query
+>> the
+>> TSEG (SMRAM) size.
+> 
+> Hmm, 0x50 appears to be the only unused config space register in the
+> specs.
 
-** Changed in: qemu
-       Status: Confirmed =3D> Incomplete
+I did find more holes, in "Table 5-1. DRAM Controller Register Address
+Map (D0:F0)", in "Document Number: 316966-002". The hole at 0x50 is just
+the one with the lowest config space offset (after the standard PCI
+device header). The others are:
 
--- =
+- 0x58-0x59 (word)
+- 0x9c (byte)
+- 0x9f (byte)
+- 0xb2-0xc7 (eight words)
+- 0xce-0xdb (seven words)
+- 0xeb-0xff (fifteen bytes, but this range appears to come after the
+             capability list, so I felt it would be unsafe to use)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/816860
+> I suspect in reality it isn't unused but undocumented.  I don't
+> have a better idea though, and in practice it probably isn't much of a
+> problem.
 
-Title:
-  Guest machine freezes when NFS mount goes offline
+Thanks for confirming. Then I'll set out to write the OVMF-side patches
+for this. Once I have it all working, I'm going to send out the QEMU
+change as a real patch.
 
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  I have a virtual KVM machine that has 2 CDROM units with ISOs mounted
-  from a NFS mount point. When NFS server goes offline the virtual
-  machine blocks completely instead of throwing read errors for the
-  CDROM device.
-
-  Host: Proxmox VE 1.8-11 (Debian GNU/Linux 5.0)
-  KVM commandline version: QEMU emulator version 0.14.1 (qemu-kvm-devel)
-  Guest: Windows 7 professional SP 1
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/816860/+subscriptions
+Thanks!
+Laszlo
