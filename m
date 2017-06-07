@@ -1,22 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dIdPb-0006VU-TY
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:02:25 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dIdPf-0006ae-7B
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:02:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dIdPa-00088f-Rf
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:02:24 -0400
-References: <cover.1496844254.git.berto@igalia.com>
-	<2ddc2703be89a250994478c92ca7695b4b88791b.1496844254.git.berto@igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5be69f00-7630-bdb1-70a8-02a078798f15@redhat.com>
-Date: Wed, 7 Jun 2017 11:02:06 -0500
-MIME-Version: 1.0
-In-Reply-To: <2ddc2703be89a250994478c92ca7695b4b88791b.1496844254.git.berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="AbwWMJJv1qlCtrU2PhqgRMbqBmFmrMMCb"
-Subject: Re: [Qemu-devel] [PATCH v2 2/7] qcow2: Use unsigned int for both
- members of Qcow2COWRegion
+	(envelope-from <eric.auger@redhat.com>) id 1dIdPd-00089Q-HC
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:02:27 -0400
+From: Eric Auger <eric.auger@redhat.com>
+Date: Wed,  7 Jun 2017 18:01:25 +0200
+Message-Id: <1496851287-9428-7-git-send-email-eric.auger@redhat.com>
+In-Reply-To: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
+References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
+Subject: [Qemu-devel] [RFC v2 6/8] virtio-iommu: Implement the translation
+ and commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,105 +20,338 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, jean-philippe.brucker@arm.com
+Cc: will.deacon@arm.com, robin.murphy@arm.com, kevin.tian@intel.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, wei@redhat.com, tn@semihalf.com, bharat.bhushan@nxp.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---AbwWMJJv1qlCtrU2PhqgRMbqBmFmrMMCb
-From: Eric Blake <eblake@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>, "Denis V . Lunev" <den@openvz.org>,
- Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <5be69f00-7630-bdb1-70a8-02a078798f15@redhat.com>
-Subject: Re: [PATCH v2 2/7] qcow2: Use unsigned int for both members of
- Qcow2COWRegion
-References: <cover.1496844254.git.berto@igalia.com>
- <2ddc2703be89a250994478c92ca7695b4b88791b.1496844254.git.berto@igalia.com>
-In-Reply-To: <2ddc2703be89a250994478c92ca7695b4b88791b.1496844254.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This patch adds the actual implementation for the translation routine
+and the virtio-iommu commands.
 
-On 06/07/2017 09:08 AM, Alberto Garcia wrote:
-> Qcow2COWRegion has two attributes:
->=20
-> - The offset of the COW region from the start of the first cluster
->   touched by the I/O request. Since it's always going to be positive
->   and the maximum request size is at most INT_MAX, we can use a
->   regular unsigned int to store this offset.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-I don't know if we will ever get to the point that we allow a 64-bit
-request at the block layer (and then the block layer guarantees it is
-split down to the driver's limits, which works when a driver is still
-bound by 32-bit limits).  But we ALSO know that a cluster is at most 2M
-(in our current implementation of qcow2), so the offset of where the COW
-region starts in relation to the start of a cluster is < 2M.
+---
 
->=20
-> - The size of the COW region in bytes. This is guaranteed to be >=3D 0,=
+v1 -> v2:
+- fix compilation issue reported by autobuild system
+---
+ hw/virtio/trace-events   |   6 ++
+ hw/virtio/virtio-iommu.c | 202 +++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 202 insertions(+), 6 deletions(-)
 
->   so we should use an unsigned type instead.
-
-And likewise, since a COW region is a sub-cluster, and clusters are
-bounded at 2M, we also have a sub-int upper bound on the size of the regi=
-on.
-
->=20
-> In x86_64 this reduces the size of Qcow2COWRegion from 16 to 8 bytes.
-> It will also help keep some assertions simpler now that we know that
-> there are no negative numbers.
->=20
-> The prototype of do_perform_cow() is also updated to reflect these
-> changes.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/qcow2-cluster.c | 4 ++--
->  block/qcow2.h         | 4 ++--
->  2 files changed, 4 insertions(+), 4 deletions(-)
->=20
-> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-> index d1c419f52b..a86c5a75a9 100644
-> --- a/block/qcow2-cluster.c
-> +++ b/block/qcow2-cluster.c
-> @@ -406,8 +406,8 @@ int qcow2_encrypt_sectors(BDRVQcow2State *s, int64_=
-t sector_num,
->  static int coroutine_fn do_perform_cow(BlockDriverState *bs,
->                                         uint64_t src_cluster_offset,
->                                         uint64_t cluster_offset,
-> -                                       int offset_in_cluster,
-> -                                       int bytes)
-> +                                       unsigned offset_in_cluster,
-> +                                       unsigned bytes)
-
-I don't know if the code base has a strong preference for 'unsigned int'
-over 'unsigned', but it doesn't bother me.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---AbwWMJJv1qlCtrU2PhqgRMbqBmFmrMMCb
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZOCN+AAoJEKeha0olJ0NqWnkH/2awSt9RXZfnkyRbJLHD/Fee
-QrNiRxWIMWqF4YOnlUF2jw5dEZ0zmxSBgjHwMjLIUWcWxgeuTibe7M3D43LSWg5k
-AGmZHbboUn6zq9zplQ0RpHWto7Wum+aZQbOlkj8fezJKAL8izE7LRPTIuxgBvUYJ
-E3MWiu5JDTReBM3pmZhSfjFYc0gQJA2iynGXadZWl/FdI24mgxL/NjiqUx8bfbMB
-vWJ0kRFEdIK0JeAqeVmGXQoDg/TfcEkzP+D6InnhyMrFJkmGyv3w3lroQ3Ew5cqv
-bJJ7lun9HFsAeSq7vWXvoX4HD+pdmF0CH3B40eKWnMjstOqN462TqIp6yIVxFpE=
-=Vq1n
------END PGP SIGNATURE-----
-
---AbwWMJJv1qlCtrU2PhqgRMbqBmFmrMMCb--
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index 341dbdf..9196b63 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -33,3 +33,9 @@ virtio_iommu_detach(uint32_t dev, uint32_t flags) "dev=%d flags=%d"
+ virtio_iommu_map(uint32_t as, uint64_t phys_addr, uint64_t virt_addr, uint64_t size, uint32_t flags) "as= %d phys_addr=0x%"PRIx64" virt_addr=0x%"PRIx64" size=0x%"PRIx64" flags=%d"
+ virtio_iommu_unmap(uint32_t as, uint64_t virt_addr, uint64_t size, uint32_t reserved) "as= %d virt_addr=0x%"PRIx64" size=0x%"PRIx64" reserved=%d"
+ virtio_iommu_translate(const char *name, uint32_t rid, uint64_t iova, int flag) "mr=%s rid=%d addr=0x%"PRIx64" flag=%d"
++virtio_iommu_new_asid(uint32_t asid) "Allocate a new asid=%d"
++virtio_iommu_new_devid(uint32_t devid) "Allocate a new devid=%d"
++virtio_iommu_unmap_left_interval(uint64_t low, uint64_t high, uint64_t next_low, uint64_t next_high) "Unmap left [0x%"PRIx64",0x%"PRIx64"], new interval=[0x%"PRIx64",0x%"PRIx64"]"
++virtio_iommu_unmap_right_interval(uint64_t low, uint64_t high, uint64_t next_low, uint64_t next_high) "Unmap right [0x%"PRIx64",0x%"PRIx64"], new interval=[0x%"PRIx64",0x%"PRIx64"]"
++virtio_iommu_unmap_inc_interval(uint64_t low, uint64_t high) "Unmap inc [0x%"PRIx64",0x%"PRIx64"]"
++virtio_iommu_translate_result(uint64_t virt_addr, uint64_t phys_addr, uint32_t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=%d"
+diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
+index 902c779..cd188fc 100644
+--- a/hw/virtio/virtio-iommu.c
++++ b/hw/virtio/virtio-iommu.c
+@@ -32,10 +32,37 @@
+ #include "hw/virtio/virtio-bus.h"
+ #include "hw/virtio/virtio-access.h"
+ #include "hw/virtio/virtio-iommu.h"
++#include "hw/pci/pci_bus.h"
++#include "hw/pci/pci.h"
+ 
+ /* Max size */
+ #define VIOMMU_DEFAULT_QUEUE_SIZE 256
+ 
++typedef struct viommu_as viommu_as;
++
++typedef struct viommu_mapping {
++    uint64_t virt_addr;
++    uint64_t phys_addr;
++    uint64_t size;
++    uint32_t flags;
++} viommu_mapping;
++
++typedef struct viommu_interval {
++    uint64_t low;
++    uint64_t high;
++} viommu_interval;
++
++typedef struct viommu_dev {
++    uint32_t id;
++    viommu_as *as;
++} viommu_dev;
++
++struct viommu_as {
++    uint32_t id;
++    uint32_t nr_devices;
++    GTree *mappings;
++};
++
+ static inline uint16_t smmu_get_sid(IOMMUDevice *dev)
+ {
+     return  ((pci_bus_num(dev->bus) & 0xff) << 8) | dev->devfn;
+@@ -88,6 +115,19 @@ static void virtio_iommu_init_as(VirtIOIOMMU *s)
+     }
+ }
+ 
++static gint interval_cmp(gconstpointer a, gconstpointer b, gpointer user_data)
++{
++    viommu_interval *inta = (viommu_interval *)a;
++    viommu_interval *intb = (viommu_interval *)b;
++
++    if (inta->high <= intb->low) {
++        return -1;
++    } else if (intb->high <= inta->low) {
++        return 1;
++    } else {
++        return 0;
++    }
++}
+ 
+ static int virtio_iommu_attach(VirtIOIOMMU *s,
+                                struct virtio_iommu_req_attach *req)
+@@ -95,10 +135,34 @@ static int virtio_iommu_attach(VirtIOIOMMU *s,
+     uint32_t asid = le32_to_cpu(req->address_space);
+     uint32_t devid = le32_to_cpu(req->device);
+     uint32_t reserved = le32_to_cpu(req->reserved);
++    viommu_as *as;
++    viommu_dev *dev;
+ 
+     trace_virtio_iommu_attach(asid, devid, reserved);
+ 
+-    return VIRTIO_IOMMU_S_UNSUPP;
++    dev = g_tree_lookup(s->devices, GUINT_TO_POINTER(devid));
++    if (dev) {
++        return -1;
++    }
++
++    as = g_tree_lookup(s->address_spaces, GUINT_TO_POINTER(asid));
++    if (!as) {
++        as = g_malloc0(sizeof(*as));
++        as->id = asid;
++        as->mappings = g_tree_new_full((GCompareDataFunc)interval_cmp,
++                                         NULL, NULL, (GDestroyNotify)g_free);
++        g_tree_insert(s->address_spaces, GUINT_TO_POINTER(asid), as);
++        trace_virtio_iommu_new_asid(asid);
++    }
++
++    dev = g_malloc0(sizeof(*dev));
++    dev->as = as;
++    dev->id = devid;
++    as->nr_devices++;
++    trace_virtio_iommu_new_devid(devid);
++    g_tree_insert(s->devices, GUINT_TO_POINTER(devid), dev);
++
++    return VIRTIO_IOMMU_S_OK;
+ }
+ 
+ static int virtio_iommu_detach(VirtIOIOMMU *s,
+@@ -106,10 +170,13 @@ static int virtio_iommu_detach(VirtIOIOMMU *s,
+ {
+     uint32_t devid = le32_to_cpu(req->device);
+     uint32_t reserved = le32_to_cpu(req->reserved);
++    int ret;
+ 
+     trace_virtio_iommu_detach(devid, reserved);
+ 
+-    return VIRTIO_IOMMU_S_UNSUPP;
++    ret = g_tree_remove(s->devices, GUINT_TO_POINTER(devid));
++
++    return ret ? VIRTIO_IOMMU_S_OK : VIRTIO_IOMMU_S_INVAL;
+ }
+ 
+ static int virtio_iommu_map(VirtIOIOMMU *s,
+@@ -120,10 +187,37 @@ static int virtio_iommu_map(VirtIOIOMMU *s,
+     uint64_t virt_addr = le64_to_cpu(req->virt_addr);
+     uint64_t size = le64_to_cpu(req->size);
+     uint32_t flags = le32_to_cpu(req->flags);
++    viommu_as *as;
++    viommu_interval *interval;
++    viommu_mapping *mapping;
++
++    interval = g_malloc0(sizeof(*interval));
++
++    interval->low = virt_addr;
++    interval->high = virt_addr + size - 1;
++
++    as = g_tree_lookup(s->address_spaces, GUINT_TO_POINTER(asid));
++    if (!as) {
++        return VIRTIO_IOMMU_S_INVAL;
++    }
++
++    mapping = g_tree_lookup(as->mappings, (gpointer)interval);
++    if (mapping) {
++        g_free(interval);
++        return VIRTIO_IOMMU_S_INVAL;
++    }
+ 
+     trace_virtio_iommu_map(asid, phys_addr, virt_addr, size, flags);
+ 
+-    return VIRTIO_IOMMU_S_UNSUPP;
++    mapping = g_malloc0(sizeof(*mapping));
++    mapping->virt_addr = virt_addr;
++    mapping->phys_addr = phys_addr;
++    mapping->size = size;
++    mapping->flags = flags;
++
++    g_tree_insert(as->mappings, interval, mapping);
++
++    return VIRTIO_IOMMU_S_OK;
+ }
+ 
+ static int virtio_iommu_unmap(VirtIOIOMMU *s,
+@@ -133,10 +227,64 @@ static int virtio_iommu_unmap(VirtIOIOMMU *s,
+     uint64_t virt_addr = le64_to_cpu(req->virt_addr);
+     uint64_t size = le64_to_cpu(req->size);
+     uint32_t flags = le32_to_cpu(req->flags);
++    viommu_mapping *mapping;
++    viommu_interval interval;
++    viommu_as *as;
+ 
+     trace_virtio_iommu_unmap(asid, virt_addr, size, flags);
+ 
+-    return VIRTIO_IOMMU_S_UNSUPP;
++    as = g_tree_lookup(s->address_spaces, GUINT_TO_POINTER(asid));
++    if (!as) {
++        error_report("%s: no as", __func__);
++        return VIRTIO_IOMMU_S_INVAL;
++    }
++    interval.low = virt_addr;
++    interval.high = virt_addr + size - 1;
++
++    mapping = g_tree_lookup(as->mappings, (gpointer)&interval);
++
++    while (mapping) {
++        viommu_interval current;
++        uint64_t low  = mapping->virt_addr;
++        uint64_t high = mapping->virt_addr + mapping->size - 1;
++
++        current.low = low;
++        current.high = high;
++
++        if (low == interval.low && size >= mapping->size) {
++            g_tree_remove(as->mappings, (gpointer)&current);
++            interval.low = high + 1;
++            trace_virtio_iommu_unmap_left_interval(current.low, current.high,
++                interval.low, interval.high);
++        } else if (high == interval.high && size >= mapping->size) {
++            trace_virtio_iommu_unmap_right_interval(current.low, current.high,
++                interval.low, interval.high);
++            g_tree_remove(as->mappings, (gpointer)&current);
++            interval.high = low - 1;
++        } else if (low > interval.low && high < interval.high) {
++            trace_virtio_iommu_unmap_inc_interval(current.low, current.high);
++            g_tree_remove(as->mappings, (gpointer)&current);
++        } else {
++            break;
++        }
++        if (interval.low >= interval.high) {
++            return VIRTIO_IOMMU_S_OK;
++        } else {
++            mapping = g_tree_lookup(as->mappings, (gpointer)&interval);
++        }
++    }
++
++    if (mapping) {
++        error_report("****** %s: Unmap 0x%"PRIx64" size=0x%"PRIx64
++                     " from 0x%"PRIx64" size=0x%"PRIx64" is not supported",
++                     __func__, interval.low, size,
++                     mapping->virt_addr, mapping->size);
++    } else {
++        error_report("****** %s: no mapping for [0x%"PRIx64",0x%"PRIx64"]",
++                     __func__, interval.low, interval.high);
++    }
++
++    return VIRTIO_IOMMU_S_INVAL;
+ }
+ 
+ #define get_payload_size(req) (\
+@@ -266,19 +414,46 @@ static IOMMUTLBEntry virtio_iommu_translate(MemoryRegion *mr, hwaddr addr,
+                                             IOMMUAccessFlags flag)
+ {
+     IOMMUDevice *sdev = container_of(mr, IOMMUDevice, iommu_mr);
++    VirtIOIOMMU *s = sdev->viommu;
+     uint32_t sid;
++    viommu_dev *dev;
++    viommu_mapping *mapping;
++    viommu_interval interval;
++
++    interval.low = addr;
++    interval.high = addr + 1;
+ 
+     IOMMUTLBEntry entry = {
+         .target_as = &address_space_memory,
+         .iova = addr,
+         .translated_addr = addr,
+-        .addr_mask = ~(hwaddr)0,
+-        .perm = IOMMU_NONE,
++        .addr_mask = (1 << 12) - 1, /* TODO */
++        .perm = 3,
+     };
+ 
+     sid = smmu_get_sid(sdev);
+ 
+     trace_virtio_iommu_translate(mr->name, sid, addr, flag);
++    qemu_mutex_lock(&s->mutex);
++
++    dev = g_tree_lookup(s->devices, GUINT_TO_POINTER(sid));
++    if (!dev) {
++        /* device cannot be attached to another as */
++        printf("%s sid=%d is not known!!\n", __func__, sid);
++        goto unlock;
++    }
++
++    mapping = g_tree_lookup(dev->as->mappings, (gpointer)&interval);
++    if (!mapping) {
++        printf("%s no mapping for 0x%"PRIx64" for sid=%d\n", __func__,
++               addr, sid);
++        goto unlock;
++    }
++    entry.translated_addr = addr - mapping->virt_addr + mapping->phys_addr,
++    trace_virtio_iommu_translate_result(addr, entry.translated_addr, sid);
++
++unlock:
++    qemu_mutex_unlock(&s->mutex);
+     return entry;
+ }
+ 
+@@ -341,6 +516,12 @@ static inline guint as_uint64_hash(gconstpointer v)
+     return (guint)*(const uint64_t *)v;
+ }
+ 
++static gint int_cmp(gconstpointer a, gconstpointer b, gpointer user_data)
++{
++    uint ua = GPOINTER_TO_UINT(a);
++    uint ub = GPOINTER_TO_UINT(b);
++    return (ua > ub) - (ua < ub);
++}
+ 
+ static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
+ {
+@@ -362,12 +543,21 @@ static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
+                                             as_uint64_equal,
+                                             g_free, g_free);
+ 
++    s->address_spaces = g_tree_new_full((GCompareDataFunc)int_cmp,
++                                         NULL, NULL, (GDestroyNotify)g_free);
++    s->devices = g_tree_new_full((GCompareDataFunc)int_cmp,
++                                         NULL, NULL, (GDestroyNotify)g_free);
++
+     virtio_iommu_init_as(s);
+ }
+ 
+ static void virtio_iommu_device_unrealize(DeviceState *dev, Error **errp)
+ {
+     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
++    VirtIOIOMMU *s = VIRTIO_IOMMU(dev);
++
++    g_tree_destroy(s->address_spaces);
++    g_tree_destroy(s->devices);
+ 
+     virtio_cleanup(vdev);
+ }
+-- 
+2.5.5
