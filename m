@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dIdhr-0004Nd-PX
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:21:16 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dIdiT-0004lh-KH
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:21:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dIdhr-0000dU-1Q
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:21:15 -0400
-Date: Wed, 7 Jun 2017 19:20:54 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170607162054.mbo2nxgi4zd4kqk6@postretch>
-References: <cover.1496844254.git.berto@igalia.com>
-	<ab53bc08e26b3e4cc5b1a14eee9e64fd0e03871d.1496844254.git.berto@igalia.com>
+	(envelope-from <pbonzini@redhat.com>) id 1dIdiP-0000kA-D3
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:21:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42450)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dIdiP-0000ju-6C
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:21:49 -0400
+References: <20170607152825.12081-1-pbonzini@redhat.com>
+	<20170607152825.12081-2-pbonzini@redhat.com>
+	<CAFEAcA8CppP6YEPkGxVEyLnO=Kk1qirpGk2sh0bXedscxct8Jg@mail.gmail.com>
+	<8229C6EB-56EA-475E-99D4-6D9B36B5D0A7@nutanix.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7a06506e-20ba-66b8-8c69-c500efe86301@redhat.com>
+Date: Wed, 7 Jun 2017 18:21:45 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="qybvqw6ywnk2pydd"
-Content-Disposition: inline
-In-Reply-To: <ab53bc08e26b3e4cc5b1a14eee9e64fd0e03871d.1496844254.git.berto@igalia.com>
-Subject: Re: [Qemu-devel] [PATCH v2 6/7] qcow2: Pass a QEMUIOVector to
- do_perform_cow_{read, write}()
+In-Reply-To: <8229C6EB-56EA-475E-99D4-6D9B36B5D0A7@nutanix.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 18/33] vhost-user-scsi: Introduce
+ vhost-user-scsi host device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,44 +31,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Denis V . Lunev" <den@openvz.org>
+To: Felipe Franciosi <felipe@nutanix.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
 
---qybvqw6ywnk2pydd
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
 
-On Wed, Jun 07, 2017 at 05:08:27PM +0300, Alberto Garcia wrote:
->Instead of passing a single buffer pointer to do_perform_cow_write(),
->pass a QEMUIOVector. This will allow us to merge the write requests
->for the COW regions and the actual data into a single one.
+On 07/06/2017 17:39, Felipe Franciosi wrote:
+> 
+>> On 7 Jun 2017, at 16:37, Peter Maydell <peter.maydell@linaro.org> wrote:
+>>
+>> On 7 June 2017 at 16:28, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>> From: Felipe Franciosi <felipe@nutanix.com>
+>>>
+>>> This commit introduces a vhost-user device for SCSI. This is based
+>>> on the existing vhost-scsi implementation, but done over vhost-user
+>>> instead. It also uses a chardev to connect to the backend. Unlike
+>>> vhost-scsi (today), VMs using vhost-user-scsi can be live migrated.
+>>>
+>>> To use it, start Qemu with a command line equivalent to:
+>>>
+>>> qemu-system-x86_64 \
+>>>       -chardev socket,id=vus0,path=/tmp/vus.sock \
+>>>       -device vhost-user-scsi-pci,chardev=vus0,bus=pci.0,addr=...
+>>>
+>>> A separate commit presents a sample application linked with libiscsi to
+>>> provide a backend for vhost-user-scsi.
+>>>
+>>> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
+>>> Message-Id: <1488479153-21203-4-git-send-email-felipe@nutanix.com>
+>>> [Disable migration for now, since it does not support bdrv_drain. - Paolo]
+>>
+>> I was expecting this to mean a VMStateDescription with a
+>> ".unmigratable = 1" field, but it doesn't seem to have one.
+>> Does it disable migration some other way?
 >
->Although do_perform_cow_read() does not strictly need to change its
->API, we're doing it here as well for consistency.
->
->Signed-off-by: Alberto Garcia <berto@igalia.com>
+> Hi Peter,
+> 
+> vhost-user-scsi supports migration.
 
-Reviewed-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+How, since there is no synchronization point between the vhost-user
+server on the source and the destination?
 
---qybvqw6ywnk2pydd
-Content-Type: application/pgp-signature; name="signature.asc"
+Can you please send a version of your patch that uses .unmigratable?
 
------BEGIN PGP SIGNATURE-----
+I'll send a v6 that momentarily drops vhost-scsi, but I intend to
+include it again in the next pull request.
 
-iQIzBAABCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlk4J+YACgkQc2J8L2kN
-9xAUcw//WBttzGF3kToGRvs21glqqrkz0ZyVbzPTwdPzL6Azz5nkpV5iYMh7HLFE
-CxDn6RhDYYPlbA4e0rUF0UB0sUod9EFmXq6cWhOFQIGNf71PnM0mUoq+A9mF/60o
-uq5puEzXEyeC4ybRdrqgJgt9X6fKzs1pIE4ErQWoRkrS8NENt1/l0vpxgP3EsRk9
-9bMqJvDrbt/Qf4YXP7lIP1i+dOK6TJ29u6PZpZoHYGGGNp5s62MNV1dmKSumszZD
-6ToVX9F9tr9wIJ1wFeWUxwwPOo2RLXxDoeuSQSE9n60EJMMdp4Ndf3jMjpDEw2sG
-x8OvGEq8QjSagMMcjBv1IYbpDf6I8Lstr0E7gGaqRpe05sSFPAQieodr34AtTiPH
-G/LzdK2oMvjICn0ysD/cjffMR9VzzbMq/shtiTWIdLCw40mpygwQPksa2YUQkom0
-xgVknP5ScybzfII3/P3VsQSaM2SINuotMX73jfrxcbxow8mPWL8AWNoZmLWJMnlJ
-n4SIignq4+Kz4DxTvxe8xOSapYCExGV4uC6p/FgZCMgyFq+PIqprcTX+S+7eq6Mn
-30AStnuv0mRUW66P/elQaAtciSBQsT2a+B9c4DyRkYPQ42h/sKtYiJ/4z965BUm8
-JwUdDhEQv/sBp7YVcvU3V+JYybWRKD065t6gQkdgrjrMVO6RtT4=
-=M6Ez
------END PGP SIGNATURE-----
+Thanks,
 
---qybvqw6ywnk2pydd--
+Paolo
