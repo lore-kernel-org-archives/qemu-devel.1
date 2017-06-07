@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48512)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dIdJU-0000i2-8r
+	(envelope-from <rth7680@gmail.com>) id 1dIdJU-0000i3-8s
 	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:56:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dIdJR-0005cV-3w
+	(envelope-from <rth7680@gmail.com>) id 1dIdJT-0005dh-2Z
 	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:56:04 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:33161)
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:33167)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dIdJQ-0005cM-Vg
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:56:01 -0400
-Received: by mail-qt0-x242.google.com with SMTP id w1so1993202qtg.0
-	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 08:56:00 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dIdJS-0005dc-Qm
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:56:02 -0400
+Received: by mail-qt0-x241.google.com with SMTP id w1so1993363qtg.0
+	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 08:56:02 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Wed,  7 Jun 2017 08:55:34 -0700
-Message-Id: <20170607155536.1193-6-rth@twiddle.net>
+Date: Wed,  7 Jun 2017 08:55:35 -0700
+Message-Id: <20170607155536.1193-7-rth@twiddle.net>
 In-Reply-To: <20170607155536.1193-1-rth@twiddle.net>
 References: <20170607155536.1193-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v4 5/7] target/arm: Remove limit on code buffer
- size
+Subject: [Qemu-devel] [PATCH v4 6/7] target/arm: Try pc-relative addresses
+ for movi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +30,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: cota@braap.org
 
-Since we're no longer using a direct branch, we have no
-limit on the branch distance.
-
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- translate-all.c | 2 --
- 1 file changed, 2 deletions(-)
+ tcg/arm/tcg-target.inc.c | 44 +++++++++++++++++++++++++++++---------------
+ 1 file changed, 29 insertions(+), 15 deletions(-)
 
-diff --git a/translate-all.c b/translate-all.c
-index bb094ad..966747a 100644
---- a/translate-all.c
-+++ b/translate-all.c
-@@ -523,8 +523,6 @@ static inline PageDesc *page_find(tb_page_addr_t index)
- # define MAX_CODE_GEN_BUFFER_SIZE  (32u * 1024 * 1024)
- #elif defined(__aarch64__)
- # define MAX_CODE_GEN_BUFFER_SIZE  (128ul * 1024 * 1024)
--#elif defined(__arm__)
--# define MAX_CODE_GEN_BUFFER_SIZE  (16u * 1024 * 1024)
- #elif defined(__s390x__)
-   /* We have a +- 4GB range on the branches; leave some slop.  */
- # define MAX_CODE_GEN_BUFFER_SIZE  (3ul * 1024 * 1024 * 1024)
+diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
+index fce382f..18708b1 100644
+--- a/tcg/arm/tcg-target.inc.c
++++ b/tcg/arm/tcg-target.inc.c
+@@ -418,25 +418,39 @@ static inline void tcg_out_dat_imm(TCGContext *s,
+ 
+ static void tcg_out_movi32(TCGContext *s, int cond, int rd, uint32_t arg)
+ {
+-    int rot, opc, rn;
+-
+-    /* For armv7, make sure not to use movw+movt when mov/mvn would do.
+-       Speed things up by only checking when movt would be required.
+-       Prior to armv7, have one go at fully rotated immediates before
+-       doing the decomposition thing below.  */
+-    if (!use_armv7_instructions || (arg & 0xffff0000)) {
+-        rot = encode_imm(arg);
++    int rot, opc, rn, diff;
++
++    /* Check a single MOV/MVN before anything else.  */
++    rot = encode_imm(arg);
++    if (rot >= 0) {
++        tcg_out_dat_imm(s, cond, ARITH_MOV, rd, 0,
++                        rotl(arg, rot) | (rot << 7));
++        return;
++    }
++    rot = encode_imm(~arg);
++    if (rot >= 0) {
++        tcg_out_dat_imm(s, cond, ARITH_MVN, rd, 0,
++                        rotl(~arg, rot) | (rot << 7));
++        return;
++    }
++
++    /* Check for a pc-relative address.  This will usually be the TB,
++       or within the TB, which is immediately before the code block.  */
++    diff = arg - ((intptr_t)s->code_ptr + 8);
++    if (diff >= 0) {
++        rot = encode_imm(diff);
+         if (rot >= 0) {
+-            tcg_out_dat_imm(s, cond, ARITH_MOV, rd, 0,
+-                            rotl(arg, rot) | (rot << 7));
++            tcg_out_dat_imm(s, cond, ARITH_ADD, rd, TCG_REG_PC,
++                            rotl(diff, rot) | (rot << 7));
+             return;
+-        }
+-        rot = encode_imm(~arg);
++	}
++    } else {
++        rot = encode_imm(-diff);
+         if (rot >= 0) {
+-            tcg_out_dat_imm(s, cond, ARITH_MVN, rd, 0,
+-                            rotl(~arg, rot) | (rot << 7));
++            tcg_out_dat_imm(s, cond, ARITH_SUB, rd, TCG_REG_PC,
++                            rotl(-diff, rot) | (rot << 7));
+             return;
+-        }
++	}
+     }
+ 
+     /* Use movw + movt.  */
 -- 
 2.9.4
