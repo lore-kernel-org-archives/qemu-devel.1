@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dIc2s-0005ZR-38
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:34:51 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dIc8D-00075g-3G
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:40:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dIc2o-0007y7-Ti
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:34:50 -0400
-References: <20170607070732.23312-1-david@gibson.dropbear.id.au>
-	<3de884c3-c386-c024-e401-faa459dbf0b4@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <75cc682a-4203-30a5-fab3-22f4e1671532@redhat.com>
-Date: Wed, 7 Jun 2017 16:34:40 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1dIc8C-0001rm-79
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:40:21 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:35836)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dIc8C-0001rZ-0d
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:40:20 -0400
+Received: by mail-wm0-x232.google.com with SMTP id x70so59422605wme.0
+	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 07:40:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <3de884c3-c386-c024-e401-faa459dbf0b4@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] pseries: Correct panic behaviour for
- pseries machine type
+In-Reply-To: <1496739230-32109-1-git-send-email-clg@kaod.org>
+References: <1496739230-32109-1-git-send-email-clg@kaod.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 7 Jun 2017 15:39:58 +0100
+Message-ID: <CAFEAcA9ipPsZm9Vvbie-V8tw=SQKGvPS4B60K1z8ZdtmReU+tg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] aspeed: add a TMP421 device to the
+ palmetto machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, mdroth@linux.vnet.ibm.com, lvivier@redhat.com
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+
+On 6 June 2017 at 09:53, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> Hello,
+>
+> This series fixes issues in the TMP421 model previously sent and adds
+> such a device to the palmetto machine.
+>
+> Thanks,
+>
+> C.
+>
+> C=C3=A9dric Le Goater (2):
+>   hw/misc: add a TMP42{1,2,3} device model
+>   aspeed: add a temp sensor device on I2C bus 3
+>
+>  default-configs/arm-softmmu.mak |   1 +
+>  hw/arm/aspeed.c                 |   9 +
+>  hw/misc/Makefile.objs           |   1 +
+>  hw/misc/tmp421.c                | 402 ++++++++++++++++++++++++++++++++++=
+++++++
+>  4 files changed, 413 insertions(+)
+>  create mode 100644 hw/misc/tmp421.c
 
 
 
-On 07/06/2017 09:33, Thomas Huth wrote:
-> On 07.06.2017 09:07, David Gibson wrote:
->> The pseries machine type doesn't usually use the 'pvpanic' device as such,
->> because it has a firmware/hypervisor facility with roughly the same
->> purpose.  The 'ibm,os-term' RTAS call notifies the hypervisor that the
->> guest has crashed.
->>
->> Our implementation of this call was sending a GUEST_PANICKED qmp event;
->> however, it was not doing the other usual panic actions, making its
->> behaviour different from pvpanic for no good reason.
->>
->> To correct this, we should call qemu_system_guest_panicked() rather than
->> directly sending the panic event.
->>
->> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->> ---
->>  hw/ppc/spapr_rtas.c | 7 ++-----
->>  1 file changed, 2 insertions(+), 5 deletions(-)
->>
->> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
->> index 707c4d4..94a2799 100644
->> --- a/hw/ppc/spapr_rtas.c
->> +++ b/hw/ppc/spapr_rtas.c
->> @@ -293,12 +293,9 @@ static void rtas_ibm_os_term(PowerPCCPU *cpu,
->>                              target_ulong args,
->>                              uint32_t nret, target_ulong rets)
->>  {
->> -    target_ulong ret = 0;
->> +    qemu_system_guest_panicked(NULL);
->>  
->> -    qapi_event_send_guest_panicked(GUEST_PANIC_ACTION_PAUSE, false, NULL,
->> -                                   &error_abort);
->> -
->> -    rtas_st(rets, 0, ret);
->> +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
->>  }
->>  
->>  static void rtas_set_power_level(PowerPCCPU *cpu, sPAPRMachineState *spapr,
->>
-> 
-> If I get that qemu_system_guest_panicked() function right, it will stop
-> the VM, won't it? That contradicts the LoPAPR spec that says that the
-> RTAS call returns if the "ibm,extended-os-term" property is available in
-> the device tree.
+Applied to target-arm.next, thanks.
 
-It does return... but only after the user starts the guest again with
-"cont".
-
-Paolo
+-- PMM
