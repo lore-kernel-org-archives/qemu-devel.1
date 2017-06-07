@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dIXYt-0001Ay-Va
+	(envelope-from <a.perevalov@samsung.com>) id 1dIXYt-0001At-Hq
 	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:47:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dIXYq-0000FF-1d
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:47:36 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1dIXYp-0000F1-Kk
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:47:35 -0400
 Received: from mailout2.w1.samsung.com ([210.118.77.12]:15626)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1dIXYp-0000EQ-RO
+	id 1dIXYp-0000EQ-Et
 	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:47:31 -0400
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
 	by mailout2.w1.samsung.com
 	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
-	2014)) with ESMTP id <0OR600A4Y8J7G930@mailout2.w1.samsung.com> for
-	qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:47:31 +0100 (BST)
+	2014)) with ESMTP id <0OR6006O78J52V30@mailout2.w1.samsung.com> for
+	qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:47:29 +0100 (BST)
 From: Alexey Perevalov <a.perevalov@samsung.com>
-Date: Wed, 07 Jun 2017 12:46:35 +0300
-Message-id: <1496828798-27548-9-git-send-email-a.perevalov@samsung.com>
+Date: Wed, 07 Jun 2017 12:46:32 +0300
+Message-id: <1496828798-27548-6-git-send-email-a.perevalov@samsung.com>
 In-reply-to: <1496828798-27548-1-git-send-email-a.perevalov@samsung.com>
 References: <1496828798-27548-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170607094730eucas1p2126d9850427e7b4af92898b64b7b805a@eucas1p2.samsung.com>
-Subject: [Qemu-devel] [PATCH v8 08/11] migration: postcopy_place_page
- factoring out
+	<CGME20170607094728eucas1p228f096ea7eebf7e791392c9193cefec0@eucas1p2.samsung.com>
+Subject: [Qemu-devel] [PATCH v8 05/11] migration: introduce
+ postcopy-blocktime capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,109 +34,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Perevalov <a.perevalov@samsung.com>, dgilbert@redhat.com, i.maximets@samsung.com, peterx@redhat.com
 
-Need to mark paged copied as closer as possible place where it
-tracks down. That will be necessary in futher patch.
+Right now it could be used on destination side to
+enable vCPU blocktime calculation for postcopy live migration.
+vCPU blocktime - it's time since vCPU thread was put into
+interruptible sleep, till memory page was copied and thread awake.
 
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
 ---
- migration/postcopy-ram.c | 13 ++++++++-----
- migration/postcopy-ram.h |  4 ++--
- migration/ram.c          |  4 ++--
- 3 files changed, 12 insertions(+), 9 deletions(-)
+ include/migration/migration.h | 1 +
+ migration/migration.c         | 9 +++++++++
+ qapi-schema.json              | 5 ++++-
+ 3 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index ade7f1c..62a272a 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -713,9 +713,10 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
-  * returns 0 on success
-  */
- int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
--                        size_t pagesize)
-+                        RAMBlock *rb)
- {
-     struct uffdio_copy copy_struct;
-+    size_t pagesize = qemu_ram_pagesize(rb);
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index 79b5484..2e61df5 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -189,6 +189,7 @@ int migrate_compress_level(void);
+ int migrate_compress_threads(void);
+ int migrate_decompress_threads(void);
+ bool migrate_use_events(void);
++bool migrate_postcopy_blocktime(void);
  
-     copy_struct.dst = (uint64_t)(uintptr_t)host;
-     copy_struct.src = (uint64_t)(uintptr_t)from;
-@@ -744,10 +745,12 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
-  * returns 0 on success
-  */
- int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
--                             size_t pagesize)
-+                             RAMBlock *rb)
- {
-+    size_t pagesize;
-     trace_postcopy_place_page_zero(host);
- 
-+    pagesize = qemu_ram_pagesize(rb);
-     if (pagesize == getpagesize()) {
-         struct uffdio_zeropage zero_struct;
-         zero_struct.range.start = (uint64_t)(uintptr_t)host;
-@@ -778,7 +781,7 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
-             memset(mis->postcopy_tmp_zero_page, '\0', mis->largest_page_size);
-         }
-         return postcopy_place_page(mis, host, mis->postcopy_tmp_zero_page,
--                                   pagesize);
-+                                   rb);
-     }
- 
-     return 0;
-@@ -841,14 +844,14 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+ /* Sending on the return path - generic and then for each message type */
+ void migrate_send_rp_message(MigrationIncomingState *mis,
+diff --git a/migration/migration.c b/migration/migration.c
+index 2a77636..d1cc34f 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1371,6 +1371,15 @@ bool migrate_zero_blocks(void)
+     return s->enabled_capabilities[MIGRATION_CAPABILITY_ZERO_BLOCKS];
  }
  
- int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
--                        size_t pagesize)
-+                        RAMBlock *rb)
++bool migrate_postcopy_blocktime(void)
++{
++    MigrationState *s;
++
++    s = migrate_get_current();
++
++    return s->enabled_capabilities[MIGRATION_CAPABILITY_POSTCOPY_BLOCKTIME];
++}
++
+ bool migrate_use_compression(void)
  {
-     assert(0);
-     return -1;
- }
+     MigrationState *s;
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 4b50b65..e906953 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -900,12 +900,15 @@
+ #          offers more flexibility.
+ #          (Since 2.10)
+ #
++# @postcopy-blocktime: Calculate downtime for postcopy live migration
++#                     (since 2.10)
++#
+ # Since: 1.2
+ ##
+ { 'enum': 'MigrationCapability',
+   'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
+            'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram',
+-           'block' ] }
++           'block', 'postcopy-blocktime'] }
  
- int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
--                        size_t pagesize)
-+                        RAMBlock *rb)
- {
-     assert(0);
-     return -1;
-diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
-index 587a8b8..77ea0fd 100644
---- a/migration/postcopy-ram.h
-+++ b/migration/postcopy-ram.h
-@@ -72,14 +72,14 @@ void postcopy_discard_send_finish(MigrationState *ms,
-  * returns 0 on success
-  */
- int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
--                        size_t pagesize);
-+                        RAMBlock *rb);
- 
- /*
-  * Place a zero page at (host) atomically
-  * returns 0 on success
-  */
- int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
--                             size_t pagesize);
-+                             RAMBlock *rb);
- 
- /* The current postcopy state is read/set by postcopy_state_get/set
-  * which update it atomically.
-diff --git a/migration/ram.c b/migration/ram.c
-index a7c0db4..a791d40 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2524,10 +2524,10 @@ static int ram_load_postcopy(QEMUFile *f)
- 
-             if (all_zero) {
-                 ret = postcopy_place_page_zero(mis, place_dest,
--                                               block->page_size);
-+                                               block);
-             } else {
-                 ret = postcopy_place_page(mis, place_dest,
--                                          place_source, block->page_size);
-+                                          place_source, block);
-             }
-         }
-         if (!ret) {
+ ##
+ # @MigrationCapabilityStatus:
 -- 
 1.9.1
