@@ -1,41 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dIeFk-0008MN-U3
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:56:18 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dIeHZ-0001lc-NS
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:58:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dIeFf-000758-WD
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:56:17 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44379)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dIeFf-00074f-Lo
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:56:11 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v57Gsobu084701
-	for <qemu-devel@nongnu.org>; Wed, 7 Jun 2017 12:56:09 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2axndq81db-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 12:56:08 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Wed, 7 Jun 2017 17:56:06 +0100
-References: <20170606165510.33057-1-pasic@linux.vnet.ibm.com>
-	<20170606165510.33057-3-pasic@linux.vnet.ibm.com>
-	<87wp8ndac8.fsf@secure.mitica>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Wed, 7 Jun 2017 18:56:03 +0200
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dIeHU-0007XO-R3
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:58:09 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:36301)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1dIeHU-0007X2-KJ
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:58:04 -0400
+Received: by mail-wr0-x243.google.com with SMTP id e23so1703709wre.3
+	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 09:58:04 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <1495229390-18909-1-git-send-email-felipe@nutanix.com>
+	<871sqvepc0.fsf@secure.mitica>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c1d52506-50c3-6a67-5f74-b06ee0b016a2@redhat.com>
+Date: Wed, 7 Jun 2017 18:58:01 +0200
 MIME-Version: 1.0
-In-Reply-To: <87wp8ndac8.fsf@secure.mitica>
+In-Reply-To: <871sqvepc0.fsf@secure.mitica>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <84f8eb54-da74-e55f-324d-91bcb05cc7ca@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 2/3] vmstate: error hint for failed
- equal checks part 2
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] cpus: reset throttle_thread_scheduled
+ after sleep
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,43 +33,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: quintela@redhat.com, Felipe Franciosi <felipe@nutanix.com>
+Cc: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Malcolm Crossley <malcolm@nutanix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
 
 
-On 06/07/2017 06:35 PM, Juan Quintela wrote:
-> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
->> Verbose error reporting for the _EQUAL family. Modify the standard _EQUAL
->> so the hint states the assertion probably failed due to a bug. Introduce
->> _EQUAL_HINT for specifying a context specific hint.
+On 07/06/2017 18:26, Juan Quintela wrote:
+> Felipe Franciosi <felipe@nutanix.com> wrote:
+>> Currently, the throttle_thread_scheduled flag is reset back to 0 before
+>> sleeping (as part of the throttling logic). Given that throttle_timer
+>> (well, any timer) may tick with a slight delay, it so happens that under
+>> heavy throttling (ie. close or on CPU_THROTTLE_PCT_MAX) the tick may
+>> schedule a further cpu_throttle_thread() work item after the flag reset,
+>> but before the previous sleep completed. This results on the vCPU thread
+>> sleeping continuously for potentially several seconds in a row.
 >>
->> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->> ---
->> Keeping this separate for now because we may want something different
->> here. E.g. no new macros and adding an extra NULL parameter for all
->> pre-existing  _EQUAL usages.
+>> The chances of that happening can be drastically minimised by resetting
+>> the flag after the sleep.
+>>
+>> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
+>> Signed-off-by: Malcolm Crossley <malcolm@nutanix.com>
 > 
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
 > 
-> I think that the best thing is to just add the HINT always.  I checked
-> and there are only 25 uses of VMSTATE_*_EQUAL.  I agree with dave that
-> adding a NULL there, and make they work is a better strategy.
+> Paolo, I think that the analisys makes sense.
 > 
+> Should you pull this patch, or do you want me to pull it?
 
-Will do that!
+I've already included in my jinxed (now at v6) pull request.
 
-> We are adding 8 new macros so we don't have to change 25 callers?
-> 
-
-It was more the fear of needlessly complicating the interface that
-made me do this version first (I assumed typical usage is without
-hint with the purpose of catching bugs).
-
-I also wanted to avoid bothering a lot's of people in the first round
-(I assume the usages are spread over files owned by various
-maintainers).
-
-Thanks for your review!
-
-Regards,
-Halil
+Paolo
