@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dIfNB-0006xa-7d
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:08:02 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dIfNC-0006yl-Kj
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:08:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dIfN7-0004DI-1s
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:08:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35142)
+	(envelope-from <stefanha@redhat.com>) id 1dIfNB-0004G3-5x
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:08:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60202)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dIfN6-0004D0-Ph
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:07:56 -0400
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dIfNA-0004Fa-TG
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:08:01 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed,  7 Jun 2017 19:07:35 +0100
-Message-Id: <20170607180736.11011-5-stefanha@redhat.com>
+Date: Wed,  7 Jun 2017 19:07:36 +0100
+Message-Id: <20170607180736.11011-6-stefanha@redhat.com>
 In-Reply-To: <20170607180736.11011-1-stefanha@redhat.com>
 References: <20170607180736.11011-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL for-2.9 4/5] coroutine-lock: do not touch
- coroutine after another one has been entered
+Subject: [Qemu-devel] [PULL for-2.9 5/5] configure: split c and cxx extra
+ flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,157 +25,195 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Roman Pen <roman.penyaev@profitbricks.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Bruno Dominguez <bru.dominguez@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-From: Roman Pen <roman.penyaev@profitbricks.com>
+From: Bruno Dominguez <bru.dominguez@gmail.com>
 
-Submission of requests on linux aio is a bit tricky and can lead to
-requests completions on submission path:
+There was no possibility to add specific cxx flags using the configure
+file. So A new entrance has been created to support it.
 
-44713c9e8547 ("linux-aio: Handle io_submit() failure gracefully")
-0ed93d84edab ("linux-aio: process completions from ioq_submit()")
+Duplication of information in configure and rules.mak. Taking
+QEMU_CFLAGS and add them to QEMU_CXXFLAGS, now the value of
+QEMU_CXXFLAGS is stored in config-host.mak, so there is no need for
+it.
 
-That means that any coroutine which has been yielded in order to wait
-for completion can be resumed from submission path and be eventually
-terminated (freed).
+The makefile for libvixl was adding flags for QEMU_CXXFLAGS in
+QEMU_CFLAGS because of the addition in rules.mak. That was removed, so
+adding them where it should be.
 
-The following use-after-free crash was observed when IO throttling
-was enabled:
-
- Program received signal SIGSEGV, Segmentation fault.
- [Switching to Thread 0x7f5813dff700 (LWP 56417)]
- virtqueue_unmap_sg (elem=0x7f5804009a30, len=1, vq=<optimized out>) at virtio.c:252
- (gdb) bt
- #0  virtqueue_unmap_sg (elem=0x7f5804009a30, len=1, vq=<optimized out>) at virtio.c:252
-                              ^^^^^^^^^^^^^^
-                              remember the address
-
- #1  virtqueue_fill (vq=0x5598b20d21b0, elem=0x7f5804009a30, len=1, idx=0) at virtio.c:282
- #2  virtqueue_push (vq=0x5598b20d21b0, elem=elem@entry=0x7f5804009a30, len=<optimized out>) at virtio.c:308
- #3  virtio_blk_req_complete (req=req@entry=0x7f5804009a30, status=status@entry=0 '\000') at virtio-blk.c:61
- #4  virtio_blk_rw_complete (opaque=<optimized out>, ret=0) at virtio-blk.c:126
- #5  blk_aio_complete (acb=0x7f58040068d0) at block-backend.c:923
- #6  coroutine_trampoline (i0=<optimized out>, i1=<optimized out>) at coroutine-ucontext.c:78
-
- (gdb) p * elem
- $8 = {index = 77, out_num = 2, in_num = 1,
-       in_addr = 0x7f5804009ad8, out_addr = 0x7f5804009ae0,
-       in_sg = 0x0, out_sg = 0x7f5804009a50}
-       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-       'in_sg' and 'out_sg' are invalid.
-       e.g. it is impossible that 'in_sg' is zero,
-       instead its value must be equal to:
-
-       (gdb) p/x 0x7f5804009ad8 + sizeof(elem->in_addr[0]) + 2 * sizeof(elem->out_addr[0])
-       $26 = 0x7f5804009af0
-
-Seems 'elem' was corrupted.  Meanwhile another thread raised an abort:
-
- Thread 12 (Thread 0x7f57f2ffd700 (LWP 56426)):
- #0  raise () from /lib/x86_64-linux-gnu/libc.so.6
- #1  abort () from /lib/x86_64-linux-gnu/libc.so.6
- #2  qemu_coroutine_enter (co=0x7f5804009af0) at qemu-coroutine.c:113
- #3  qemu_co_queue_run_restart (co=0x7f5804009a30) at qemu-coroutine-lock.c:60
- #4  qemu_coroutine_enter (co=0x7f5804009a30) at qemu-coroutine.c:119
-                           ^^^^^^^^^^^^^^^^^^
-                           WTF?? this is equal to elem from crashed thread
-
- #5  qemu_co_queue_run_restart (co=0x7f57e7f16ae0) at qemu-coroutine-lock.c:60
- #6  qemu_coroutine_enter (co=0x7f57e7f16ae0) at qemu-coroutine.c:119
- #7  qemu_co_queue_run_restart (co=0x7f5807e112a0) at qemu-coroutine-lock.c:60
- #8  qemu_coroutine_enter (co=0x7f5807e112a0) at qemu-coroutine.c:119
- #9  qemu_co_queue_run_restart (co=0x7f5807f17820) at qemu-coroutine-lock.c:60
- #10 qemu_coroutine_enter (co=0x7f5807f17820) at qemu-coroutine.c:119
- #11 qemu_co_queue_run_restart (co=0x7f57e7f18e10) at qemu-coroutine-lock.c:60
- #12 qemu_coroutine_enter (co=0x7f57e7f18e10) at qemu-coroutine.c:119
- #13 qemu_co_enter_next (queue=queue@entry=0x5598b1e742d0) at qemu-coroutine-lock.c:106
- #14 timer_cb (blk=0x5598b1e74280, is_write=<optimized out>) at throttle-groups.c:419
-
-Crash can be explained by access of 'co' object from the loop inside
-qemu_co_queue_run_restart():
-
-  while ((next = QSIMPLEQ_FIRST(&co->co_queue_wakeup))) {
-      QSIMPLEQ_REMOVE_HEAD(&co->co_queue_wakeup, co_queue_next);
-                           ^^^^^^^^^^^^^^^^^^^^
-                           on each iteration 'co' is accessed,
-                           but 'co' can be already freed
-
-      qemu_coroutine_enter(next);
-  }
-
-When 'next' coroutine is resumed (entered) it can in its turn resume
-'co', and eventually free it.  That's why we see 'co' (which was freed)
-has the same address as 'elem' from the first backtrace.
-
-The fix is obvious: use temporary queue and do not touch coroutine after
-first qemu_coroutine_enter() is invoked.
-
-The issue is quite rare and happens every ~12 hours on very high IO
-and CPU load (building linux kernel with -j512 inside guest) when IO
-throttling is enabled.  With the fix applied guest is running ~35 hours
-and is still alive so far.
-
-Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Signed-off-by: Bruno Dominguez <bru.dominguez@gmail.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-id: 20170601160847.23720-1-roman.penyaev@profitbricks.com
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org
+Message-id: 1496754467-20893-1-git-send-email-bru.dominguez@gmail.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- util/qemu-coroutine-lock.c | 19 +++++++++++++++++--
- util/qemu-coroutine.c      |  5 +++++
- 2 files changed, 22 insertions(+), 2 deletions(-)
+ configure                   | 74 +++++++++++++++++++++++++--------------------
+ disas/libvixl/Makefile.objs |  4 +--
+ rules.mak                   |  3 --
+ 3 files changed, 44 insertions(+), 37 deletions(-)
 
-diff --git a/util/qemu-coroutine-lock.c b/util/qemu-coroutine-lock.c
-index 6328eed..b44b5d5 100644
---- a/util/qemu-coroutine-lock.c
-+++ b/util/qemu-coroutine-lock.c
-@@ -77,10 +77,25 @@ void coroutine_fn qemu_co_queue_wait(CoQueue *queue, CoMutex *mutex)
- void qemu_co_queue_run_restart(Coroutine *co)
- {
-     Coroutine *next;
-+    QSIMPLEQ_HEAD(, Coroutine) tmp_queue_wakeup =
-+        QSIMPLEQ_HEAD_INITIALIZER(tmp_queue_wakeup);
- 
-     trace_qemu_co_queue_run_restart(co);
--    while ((next = QSIMPLEQ_FIRST(&co->co_queue_wakeup))) {
--        QSIMPLEQ_REMOVE_HEAD(&co->co_queue_wakeup, co_queue_next);
+diff --git a/configure b/configure
+index 2203b98..98012ab 100755
+--- a/configure
++++ b/configure
+@@ -91,7 +91,8 @@ update_cxxflags() {
+     # Set QEMU_CXXFLAGS from QEMU_CFLAGS by filtering out those
+     # options which some versions of GCC's C++ compiler complain about
+     # because they only make sense for C programs.
+-    QEMU_CXXFLAGS=
++    QEMU_CXXFLAGS="$QEMU_CXXFLAGS -D__STDC_LIMIT_MACROS"
 +
-+    /* Because "co" has yielded, any coroutine that we wakeup can resume it.
-+     * If this happens and "co" terminates, co->co_queue_wakeup becomes
-+     * invalid memory.  Therefore, use a temporary queue and do not touch
-+     * the "co" coroutine as soon as you enter another one.
-+     *
-+     * In its turn resumed "co" can pupulate "co_queue_wakeup" queue with
-+     * new coroutines to be woken up.  The caller, who has resumed "co",
-+     * will be responsible for traversing the same queue, which may cause
-+     * a different wakeup order but not any missing wakeups.
-+     */
-+    QSIMPLEQ_CONCAT(&tmp_queue_wakeup, &co->co_queue_wakeup);
-+
-+    while ((next = QSIMPLEQ_FIRST(&tmp_queue_wakeup))) {
-+        QSIMPLEQ_REMOVE_HEAD(&tmp_queue_wakeup, co_queue_next);
-         qemu_coroutine_enter(next);
-     }
- }
-diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
-index 486af9a..d6095c1 100644
---- a/util/qemu-coroutine.c
-+++ b/util/qemu-coroutine.c
-@@ -126,6 +126,11 @@ void qemu_aio_coroutine_enter(AioContext *ctx, Coroutine *co)
+     for arg in $QEMU_CFLAGS; do
+         case $arg in
+             -Wstrict-prototypes|-Wmissing-prototypes|-Wnested-externs|\
+@@ -345,6 +346,9 @@ for opt do
+   --extra-cflags=*) QEMU_CFLAGS="$QEMU_CFLAGS $optarg"
+                     EXTRA_CFLAGS="$optarg"
+   ;;
++  --extra-cxxflags=*) QEMU_CXXFLAGS="$QEMU_CXXFLAGS $optarg"
++                      EXTRA_CXXFLAGS="$optarg"
++  ;;
+   --extra-ldflags=*) LDFLAGS="$LDFLAGS $optarg"
+                      EXTRA_LDFLAGS="$optarg"
+   ;;
+@@ -788,6 +792,8 @@ for opt do
+   ;;
+   --extra-cflags=*)
+   ;;
++  --extra-cxxflags=*)
++  ;;
+   --extra-ldflags=*)
+   ;;
+   --enable-debug-info)
+@@ -1305,6 +1311,7 @@ Advanced options (experts only):
+   --cxx=CXX                use C++ compiler CXX [$cxx]
+   --objcc=OBJCC            use Objective-C compiler OBJCC [$objcc]
+   --extra-cflags=CFLAGS    append extra C compiler flags QEMU_CFLAGS
++  --extra-cxxflags=CXXFLAGS append extra C++ compiler flags QEMU_CXXFLAGS
+   --extra-ldflags=LDFLAGS  append extra linker flags LDFLAGS
+   --make=MAKE              use specified make [$make]
+   --install=INSTALL        use specified install [$install]
+@@ -1490,37 +1497,6 @@ if test "$bogus_os" = "yes"; then
+     error_exit "Unrecognized host OS $targetos"
+ fi
  
-     qemu_co_queue_run_restart(co);
+-# Check that the C++ compiler exists and works with the C compiler
+-if has $cxx; then
+-    cat > $TMPC <<EOF
+-int c_function(void);
+-int main(void) { return c_function(); }
+-EOF
+-
+-    compile_object
+-
+-    cat > $TMPCXX <<EOF
+-extern "C" {
+-   int c_function(void);
+-}
+-int c_function(void) { return 42; }
+-EOF
+-
+-    update_cxxflags
+-
+-    if do_cxx $QEMU_CXXFLAGS -o $TMPE $TMPCXX $TMPO $LDFLAGS; then
+-        # C++ compiler $cxx works ok with C compiler $cc
+-        :
+-    else
+-        echo "C++ compiler $cxx does not work with C compiler $cc"
+-        echo "Disabling C++ specific optional code"
+-        cxx=
+-    fi
+-else
+-    echo "No C++ compiler available; disabling C++ specific optional code"
+-    cxx=
+-fi
+-
+ gcc_flags="-Wold-style-declaration -Wold-style-definition -Wtype-limits"
+ gcc_flags="-Wformat-security -Wformat-y2k -Winit-self -Wignored-qualifiers $gcc_flags"
+ gcc_flags="-Wno-missing-include-dirs -Wempty-body -Wnested-externs $gcc_flags"
+@@ -5064,6 +5040,38 @@ EOF
+   fi
+ fi
  
-+    /* Beware, if ret == COROUTINE_YIELD and qemu_co_queue_run_restart()
-+     * has started any other coroutine, "co" might have been reentered
-+     * and even freed by now!  So be careful and do not touch it.
-+     */
++# Check that the C++ compiler exists and works with the C compiler.
++# All the QEMU_CXXFLAGS are based on QEMU_CFLAGS. Keep this at the end to don't miss any other that could be added.
++if has $cxx; then
++    cat > $TMPC <<EOF
++int c_function(void);
++int main(void) { return c_function(); }
++EOF
 +
-     switch (ret) {
-     case COROUTINE_YIELD:
-         return;
++    compile_object
++
++    cat > $TMPCXX <<EOF
++extern "C" {
++   int c_function(void);
++}
++int c_function(void) { return 42; }
++EOF
++
++    update_cxxflags
++
++    if do_cxx $QEMU_CXXFLAGS -o $TMPE $TMPCXX $TMPO $LDFLAGS; then
++        # C++ compiler $cxx works ok with C compiler $cc
++        :
++    else
++        echo "C++ compiler $cxx does not work with C compiler $cc"
++        echo "Disabling C++ specific optional code"
++        cxx=
++    fi
++else
++    echo "No C++ compiler available; disabling C++ specific optional code"
++    cxx=
++fi
++
+ echo_version() {
+     if test "$1" = "yes" ; then
+         echo "($2)"
+@@ -5269,6 +5277,7 @@ if test "$mingw32" = "no" ; then
+ fi
+ echo "qemu_helperdir=$libexecdir" >> $config_host_mak
+ echo "extra_cflags=$EXTRA_CFLAGS" >> $config_host_mak
++echo "extra_cxxflags=$EXTRA_CXXFLAGS" >> $config_host_mak
+ echo "extra_ldflags=$EXTRA_LDFLAGS" >> $config_host_mak
+ echo "qemu_localedir=$qemu_localedir" >> $config_host_mak
+ echo "libs_softmmu=$libs_softmmu" >> $config_host_mak
+@@ -5911,6 +5920,7 @@ echo "WINDRES=$windres" >> $config_host_mak
+ echo "CFLAGS=$CFLAGS" >> $config_host_mak
+ echo "CFLAGS_NOPIE=$CFLAGS_NOPIE" >> $config_host_mak
+ echo "QEMU_CFLAGS=$QEMU_CFLAGS" >> $config_host_mak
++echo "QEMU_CXXFLAGS=$QEMU_CXXFLAGS" >> $config_host_mak
+ echo "QEMU_INCLUDES=$QEMU_INCLUDES" >> $config_host_mak
+ if test "$sparse" = "yes" ; then
+   echo "CC           := REAL_CC=\"\$(CC)\" cgcc"       >> $config_host_mak
+diff --git a/disas/libvixl/Makefile.objs b/disas/libvixl/Makefile.objs
+index 860fb7f..27183b7 100644
+--- a/disas/libvixl/Makefile.objs
++++ b/disas/libvixl/Makefile.objs
+@@ -6,9 +6,9 @@ libvixl_OBJS = vixl/utils.o \
+ 
+ # The -Wno-sign-compare is needed only for gcc 4.6, which complains about
+ # some signed-unsigned equality comparisons which later gcc versions do not.
+-$(addprefix $(obj)/,$(libvixl_OBJS)): QEMU_CFLAGS := -I$(SRC_PATH)/disas/libvixl $(QEMU_CFLAGS) -Wno-sign-compare
++$(addprefix $(obj)/,$(libvixl_OBJS)): QEMU_CXXFLAGS := -I$(SRC_PATH)/disas/libvixl $(QEMU_CXXFLAGS) -Wno-sign-compare
+ # Ensure that C99 macros are defined regardless of the inclusion order of
+ # headers in vixl. This is required at least on NetBSD.
+-$(addprefix $(obj)/,$(libvixl_OBJS)): QEMU_CFLAGS += -D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS -D__STDC_FORMAT_MACROS
++$(addprefix $(obj)/,$(libvixl_OBJS)): QEMU_CXXFLAGS += -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS
+ 
+ common-obj-$(CONFIG_ARM_A64_DIS) += $(libvixl_OBJS)
+diff --git a/rules.mak b/rules.mak
+index 1c0eabb..2a2fb72 100644
+--- a/rules.mak
++++ b/rules.mak
+@@ -20,9 +20,6 @@ MAKEFLAGS += -rR
+ %.mak:
+ clean-target:
+ 
+-# Flags for C++ compilation
+-QEMU_CXXFLAGS = -D__STDC_LIMIT_MACROS $(filter-out -Wstrict-prototypes -Wmissing-prototypes -Wnested-externs -Wold-style-declaration -Wold-style-definition -Wredundant-decls, $(QEMU_CFLAGS))
+-
+ # Flags for dependency generation
+ QEMU_DGFLAGS += -MMD -MP -MT $@ -MF $(@D)/$(*F).d
+ 
 -- 
 2.9.4
