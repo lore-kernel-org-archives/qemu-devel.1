@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dIbQ0-00005Q-BY
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 09:54:41 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dIbQc-0000Ut-CJ
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 09:55:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dIbPx-0004PF-0B
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 09:54:40 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:35116)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dIbPw-0004Oj-MD
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 09:54:36 -0400
-Received: by mail-wm0-x242.google.com with SMTP id g15so2701666wmc.2
-	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 06:54:34 -0700 (PDT)
-Date: Wed, 7 Jun 2017 14:54:30 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170607135430.GB21990@stefanha-x1.localdomain>
-References: <20170601160847.23720-1-roman.penyaev@profitbricks.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="uQr8t48UFsdbeI+V"
-Content-Disposition: inline
-In-Reply-To: <20170601160847.23720-1-roman.penyaev@profitbricks.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/1] coroutine-lock: do not touch
- coroutine after another one has been entered
+	(envelope-from <pbonzini@redhat.com>) id 1dIbQa-0004cR-N8
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 09:55:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55264)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dIbQa-0004cA-E8
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 09:55:16 -0400
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5614780478
+	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 13:55:15 +0000 (UTC)
+Received: from donizetti.redhat.com (ovpn-118-77.ams2.redhat.com
+	[10.36.118.77] (may be forged))
+	by int-mx11.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v57DtBnB024686
+	for <qemu-devel@nongnu.org>; Wed, 7 Jun 2017 09:55:14 -0400
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed,  7 Jun 2017 15:55:11 +0200
+Message-Id: <20170607135511.1312-3-pbonzini@redhat.com>
+In-Reply-To: <20170607135511.1312-1-pbonzini@redhat.com>
+References: <20170607135511.1312-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 33/33] docs: create config/,
+ devel/ and spin/ subdirectories
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,150 +35,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Pen <roman.penyaev@profitbricks.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
 
+Developer documentation should be its own manual.  As a start, move all
+developer-oriented files to a separate directory.
 
---uQr8t48UFsdbeI+V
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Also move non-text files to their own directories: docs/config/ for
+QEMU -readconfig input, and docs/spin/ for formal models to be used
+with the SPIN model checker.
 
-On Thu, Jun 01, 2017 at 06:08:47PM +0200, Roman Pen wrote:
-> Submission of requests on linux aio is a bit tricky and can lead to
-> requests completions on submission path:
->=20
-> 44713c9e8547 ("linux-aio: Handle io_submit() failure gracefully")
-> 0ed93d84edab ("linux-aio: process completions from ioq_submit()")
->=20
-> That means that any coroutine which has been yielded in order to wait
-> for completion can be resumed from submission path and be eventually
-> terminated (freed).
->=20
-> The following use-after-free crash was observed when IO throttling
-> was enabled:
->=20
->  Program received signal SIGSEGV, Segmentation fault.
->  [Switching to Thread 0x7f5813dff700 (LWP 56417)]
->  virtqueue_unmap_sg (elem=3D0x7f5804009a30, len=3D1, vq=3D<optimized out>=
-) at virtio.c:252
->  (gdb) bt
->  #0  virtqueue_unmap_sg (elem=3D0x7f5804009a30, len=3D1, vq=3D<optimized =
-out>) at virtio.c:252
->                               ^^^^^^^^^^^^^^
->                               remember the address
->=20
->  #1  virtqueue_fill (vq=3D0x5598b20d21b0, elem=3D0x7f5804009a30, len=3D1,=
- idx=3D0) at virtio.c:282
->  #2  virtqueue_push (vq=3D0x5598b20d21b0, elem=3Delem@entry=3D0x7f5804009=
-a30, len=3D<optimized out>) at virtio.c:308
->  #3  virtio_blk_req_complete (req=3Dreq@entry=3D0x7f5804009a30, status=3D=
-status@entry=3D0 '\000') at virtio-blk.c:61
->  #4  virtio_blk_rw_complete (opaque=3D<optimized out>, ret=3D0) at virtio=
--blk.c:126
->  #5  blk_aio_complete (acb=3D0x7f58040068d0) at block-backend.c:923
->  #6  coroutine_trampoline (i0=3D<optimized out>, i1=3D<optimized out>) at=
- coroutine-ucontext.c:78
->=20
->  (gdb) p * elem
->  $8 =3D {index =3D 77, out_num =3D 2, in_num =3D 1,
->        in_addr =3D 0x7f5804009ad8, out_addr =3D 0x7f5804009ae0,
->        in_sg =3D 0x0, out_sg =3D 0x7f5804009a50}
->        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
->        'in_sg' and 'out_sg' are invalid.
->        e.g. it is impossible that 'in_sg' is zero,
->        instead its value must be equal to:
->=20
->        (gdb) p/x 0x7f5804009ad8 + sizeof(elem->in_addr[0]) + 2 * sizeof(e=
-lem->out_addr[0])
->        $26 =3D 0x7f5804009af0
->=20
-> Seems 'elem' was corrupted.  Meanwhile another thread raised an abort:
->=20
->  Thread 12 (Thread 0x7f57f2ffd700 (LWP 56426)):
->  #0  raise () from /lib/x86_64-linux-gnu/libc.so.6
->  #1  abort () from /lib/x86_64-linux-gnu/libc.so.6
->  #2  qemu_coroutine_enter (co=3D0x7f5804009af0) at qemu-coroutine.c:113
->  #3  qemu_co_queue_run_restart (co=3D0x7f5804009a30) at qemu-coroutine-lo=
-ck.c:60
->  #4  qemu_coroutine_enter (co=3D0x7f5804009a30) at qemu-coroutine.c:119
->                            ^^^^^^^^^^^^^^^^^^
->                            WTF?? this is equal to elem from crashed thread
->=20
->  #5  qemu_co_queue_run_restart (co=3D0x7f57e7f16ae0) at qemu-coroutine-lo=
-ck.c:60
->  #6  qemu_coroutine_enter (co=3D0x7f57e7f16ae0) at qemu-coroutine.c:119
->  #7  qemu_co_queue_run_restart (co=3D0x7f5807e112a0) at qemu-coroutine-lo=
-ck.c:60
->  #8  qemu_coroutine_enter (co=3D0x7f5807e112a0) at qemu-coroutine.c:119
->  #9  qemu_co_queue_run_restart (co=3D0x7f5807f17820) at qemu-coroutine-lo=
-ck.c:60
->  #10 qemu_coroutine_enter (co=3D0x7f5807f17820) at qemu-coroutine.c:119
->  #11 qemu_co_queue_run_restart (co=3D0x7f57e7f18e10) at qemu-coroutine-lo=
-ck.c:60
->  #12 qemu_coroutine_enter (co=3D0x7f57e7f18e10) at qemu-coroutine.c:119
->  #13 qemu_co_enter_next (queue=3Dqueue@entry=3D0x5598b1e742d0) at qemu-co=
-routine-lock.c:106
->  #14 timer_cb (blk=3D0x5598b1e74280, is_write=3D<optimized out>) at throt=
-tle-groups.c:419
->=20
-> Crash can be explained by access of 'co' object from the loop inside
-> qemu_co_queue_run_restart():
->=20
->   while ((next =3D QSIMPLEQ_FIRST(&co->co_queue_wakeup))) {
->       QSIMPLEQ_REMOVE_HEAD(&co->co_queue_wakeup, co_queue_next);
->                            ^^^^^^^^^^^^^^^^^^^^
->                            on each iteration 'co' is accessed,
->                            but 'co' can be already freed
->=20
->       qemu_coroutine_enter(next);
->   }
->=20
-> When 'next' coroutine is resumed (entered) it can in its turn resume
-> 'co', and eventually free it.  That's why we see 'co' (which was freed)
-> has the same address as 'elem' from the first backtrace.
->=20
-> The fix is obvious: use temporary queue and do not touch coroutine after
-> first qemu_coroutine_enter() is invoked.
->=20
-> The issue is quite rare and happens every ~12 hours on very high IO
-> and CPU load (building linux kernel with -j512 inside guest) when IO
-> throttling is enabled.  With the fix applied guest is running ~35 hours
-> and is still alive so far.
->=20
-> Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Fam Zheng <famz@redhat.com>
-> Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: qemu-devel@nongnu.org
-> ---
->  v3:
->      Comments tweaks suggested by Stefan.
->  v2:
->      Comments tweaks suggested by Paolo.
->=20
->  util/qemu-coroutine-lock.c | 19 +++++++++++++++++--
->  util/qemu-coroutine.c      |  5 +++++
->  2 files changed, 22 insertions(+), 2 deletions(-)
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ docs/{ => config}/ich9-ehci-uhci.cfg       | 0
+ docs/{ => config}/mach-virt-graphical.cfg  | 0
+ docs/{ => config}/mach-virt-serial.cfg     | 0
+ docs/{ => config}/q35-emulated.cfg         | 0
+ docs/{ => config}/q35-virtio-graphical.cfg | 0
+ docs/{ => config}/q35-virtio-serial.cfg    | 0
+ docs/{ => devel}/atomics.txt               | 0
+ docs/{ => devel}/bitmaps.md                | 0
+ docs/{ => devel}/blkdebug.txt              | 0
+ docs/{ => devel}/blkverify.txt             | 0
+ docs/{ => devel}/build-system.txt          | 0
+ docs/{ => devel}/lockcnt.txt               | 0
+ docs/{ => devel}/memory.txt                | 0
+ docs/{ => devel}/migration.txt             | 0
+ docs/{ => devel}/multi-thread-tcg.txt      | 0
+ docs/{ => devel}/multiple-iothreads.txt    | 0
+ docs/{ => devel}/qapi-code-gen.txt         | 0
+ docs/{ => devel}/rcu.txt                   | 0
+ docs/{ => devel}/tracing.txt               | 0
+ docs/{ => devel}/virtio-migration.txt      | 0
+ docs/{ => devel}/writing-qmp-commands.txt  | 0
+ docs/{ => spin}/aio_notify.promela         | 0
+ docs/{ => spin}/aio_notify_accept.promela  | 0
+ docs/{ => spin}/aio_notify_bug.promela     | 0
+ docs/{ => spin}/tcg-exclusive.promela      | 0
+ docs/{ => spin}/win32-qemu-event.promela   | 0
+ 26 files changed, 0 insertions(+), 0 deletions(-)
+ rename docs/{ => config}/ich9-ehci-uhci.cfg (100%)
+ rename docs/{ => config}/mach-virt-graphical.cfg (100%)
+ rename docs/{ => config}/mach-virt-serial.cfg (100%)
+ rename docs/{ => config}/q35-emulated.cfg (100%)
+ rename docs/{ => config}/q35-virtio-graphical.cfg (100%)
+ rename docs/{ => config}/q35-virtio-serial.cfg (100%)
+ rename docs/{ => devel}/atomics.txt (100%)
+ rename docs/{ => devel}/bitmaps.md (100%)
+ rename docs/{ => devel}/blkdebug.txt (100%)
+ rename docs/{ => devel}/blkverify.txt (100%)
+ rename docs/{ => devel}/build-system.txt (100%)
+ rename docs/{ => devel}/lockcnt.txt (100%)
+ rename docs/{ => devel}/memory.txt (100%)
+ rename docs/{ => devel}/migration.txt (100%)
+ rename docs/{ => devel}/multi-thread-tcg.txt (100%)
+ rename docs/{ => devel}/multiple-iothreads.txt (100%)
+ rename docs/{ => devel}/qapi-code-gen.txt (100%)
+ rename docs/{ => devel}/rcu.txt (100%)
+ rename docs/{ => devel}/tracing.txt (100%)
+ rename docs/{ => devel}/virtio-migration.txt (100%)
+ rename docs/{ => devel}/writing-qmp-commands.txt (100%)
+ rename docs/{ => spin}/aio_notify.promela (100%)
+ rename docs/{ => spin}/aio_notify_accept.promela (100%)
+ rename docs/{ => spin}/aio_notify_bug.promela (100%)
+ rename docs/{ => spin}/tcg-exclusive.promela (100%)
+ rename docs/{ => spin}/win32-qemu-event.promela (100%)
 
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
-
-Stefan
-
---uQr8t48UFsdbeI+V
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZOAWWAAoJEJykq7OBq3PIjfsH/A2Mx10Lfo68ObGZkoiWF+Ao
-BdF+NPVXdCa2sUR3/DhPXSBLp4cfuRqs5DiUq8VYL+faDFV71k8I2qIh79eTIeAH
-rBXrSb4kXSuR4onLsusRZ4p+bye9Ce0IlS9wbSsgyuVEvGd1wrJrnQ/AkGMVDqMQ
-bs/W5UVZ/09zAn9QcLt7npFstJWHG8Kn/VfEc8klihyd4kUDQcyTLgntTsnmHMII
-+cxOtJiHixuaB2ePJAK+roguSK9UD4IpEtZtYGrmDFHlHhJ/HQMmotNNNA3HPVLm
-bZq3GAN1ReQq9aUyNPP0mff8iT21olahr0+MdUUf83N4CeQ3RG6H7P0jNc94yaM=
-=EnwV
------END PGP SIGNATURE-----
-
---uQr8t48UFsdbeI+V--
+diff --git a/docs/ich9-ehci-uhci.cfg b/docs/config/ich9-ehci-uhci.cfg
+similarity index 100%
+rename from docs/ich9-ehci-uhci.cfg
+rename to docs/config/ich9-ehci-uhci.cfg
+diff --git a/docs/mach-virt-graphical.cfg b/docs/config/mach-virt-graphical.cfg
+similarity index 100%
+rename from docs/mach-virt-graphical.cfg
+rename to docs/config/mach-virt-graphical.cfg
+diff --git a/docs/mach-virt-serial.cfg b/docs/config/mach-virt-serial.cfg
+similarity index 100%
+rename from docs/mach-virt-serial.cfg
+rename to docs/config/mach-virt-serial.cfg
+diff --git a/docs/q35-emulated.cfg b/docs/config/q35-emulated.cfg
+similarity index 100%
+rename from docs/q35-emulated.cfg
+rename to docs/config/q35-emulated.cfg
+diff --git a/docs/q35-virtio-graphical.cfg b/docs/config/q35-virtio-graphical.cfg
+similarity index 100%
+rename from docs/q35-virtio-graphical.cfg
+rename to docs/config/q35-virtio-graphical.cfg
+diff --git a/docs/q35-virtio-serial.cfg b/docs/config/q35-virtio-serial.cfg
+similarity index 100%
+rename from docs/q35-virtio-serial.cfg
+rename to docs/config/q35-virtio-serial.cfg
+diff --git a/docs/atomics.txt b/docs/devel/atomics.txt
+similarity index 100%
+rename from docs/atomics.txt
+rename to docs/devel/atomics.txt
+diff --git a/docs/bitmaps.md b/docs/devel/bitmaps.md
+similarity index 100%
+rename from docs/bitmaps.md
+rename to docs/devel/bitmaps.md
+diff --git a/docs/blkdebug.txt b/docs/devel/blkdebug.txt
+similarity index 100%
+rename from docs/blkdebug.txt
+rename to docs/devel/blkdebug.txt
+diff --git a/docs/blkverify.txt b/docs/devel/blkverify.txt
+similarity index 100%
+rename from docs/blkverify.txt
+rename to docs/devel/blkverify.txt
+diff --git a/docs/build-system.txt b/docs/devel/build-system.txt
+similarity index 100%
+rename from docs/build-system.txt
+rename to docs/devel/build-system.txt
+diff --git a/docs/lockcnt.txt b/docs/devel/lockcnt.txt
+similarity index 100%
+rename from docs/lockcnt.txt
+rename to docs/devel/lockcnt.txt
+diff --git a/docs/memory.txt b/docs/devel/memory.txt
+similarity index 100%
+rename from docs/memory.txt
+rename to docs/devel/memory.txt
+diff --git a/docs/migration.txt b/docs/devel/migration.txt
+similarity index 100%
+rename from docs/migration.txt
+rename to docs/devel/migration.txt
+diff --git a/docs/multi-thread-tcg.txt b/docs/devel/multi-thread-tcg.txt
+similarity index 100%
+rename from docs/multi-thread-tcg.txt
+rename to docs/devel/multi-thread-tcg.txt
+diff --git a/docs/multiple-iothreads.txt b/docs/devel/multiple-iothreads.txt
+similarity index 100%
+rename from docs/multiple-iothreads.txt
+rename to docs/devel/multiple-iothreads.txt
+diff --git a/docs/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+similarity index 100%
+rename from docs/qapi-code-gen.txt
+rename to docs/devel/qapi-code-gen.txt
+diff --git a/docs/rcu.txt b/docs/devel/rcu.txt
+similarity index 100%
+rename from docs/rcu.txt
+rename to docs/devel/rcu.txt
+diff --git a/docs/tracing.txt b/docs/devel/tracing.txt
+similarity index 100%
+rename from docs/tracing.txt
+rename to docs/devel/tracing.txt
+diff --git a/docs/virtio-migration.txt b/docs/devel/virtio-migration.txt
+similarity index 100%
+rename from docs/virtio-migration.txt
+rename to docs/devel/virtio-migration.txt
+diff --git a/docs/writing-qmp-commands.txt b/docs/devel/writing-qmp-commands.txt
+similarity index 100%
+rename from docs/writing-qmp-commands.txt
+rename to docs/devel/writing-qmp-commands.txt
+diff --git a/docs/aio_notify.promela b/docs/spin/aio_notify.promela
+similarity index 100%
+rename from docs/aio_notify.promela
+rename to docs/spin/aio_notify.promela
+diff --git a/docs/aio_notify_accept.promela b/docs/spin/aio_notify_accept.promela
+similarity index 100%
+rename from docs/aio_notify_accept.promela
+rename to docs/spin/aio_notify_accept.promela
+diff --git a/docs/aio_notify_bug.promela b/docs/spin/aio_notify_bug.promela
+similarity index 100%
+rename from docs/aio_notify_bug.promela
+rename to docs/spin/aio_notify_bug.promela
+diff --git a/docs/tcg-exclusive.promela b/docs/spin/tcg-exclusive.promela
+similarity index 100%
+rename from docs/tcg-exclusive.promela
+rename to docs/spin/tcg-exclusive.promela
+diff --git a/docs/win32-qemu-event.promela b/docs/spin/win32-qemu-event.promela
+similarity index 100%
+rename from docs/win32-qemu-event.promela
+rename to docs/spin/win32-qemu-event.promela
+-- 
+2.13.0
