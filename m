@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42069)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dIg7U-0003gN-9d
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:55:53 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dIg8d-0004fb-Os
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:57:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dIg7T-00075a-GI
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:55:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58020)
+	(envelope-from <pbonzini@redhat.com>) id 1dIg8a-0007MW-KP
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:57:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60060)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dIg7T-000750-B2
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:55:51 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed,  7 Jun 2017 19:55:40 +0100
-Message-Id: <20170607185540.12767-2-stefanha@redhat.com>
-In-Reply-To: <20170607185540.12767-1-stefanha@redhat.com>
-References: <20170607185540.12767-1-stefanha@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dIg8a-0007MB-Ee
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:57:00 -0400
+Date: Wed, 7 Jun 2017 14:56:57 -0400 (EDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1191656469.6862786.1496861817272.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20170607212825-mutt-send-email-mst@kernel.org>
+References: <20170607152825.12081-1-pbonzini@redhat.com>
+	<20170607152825.12081-2-pbonzini@redhat.com>
+	<CAFEAcA8CppP6YEPkGxVEyLnO=Kk1qirpGk2sh0bXedscxct8Jg@mail.gmail.com>
+	<8229C6EB-56EA-475E-99D4-6D9B36B5D0A7@nutanix.com>
+	<7a06506e-20ba-66b8-8c69-c500efe86301@redhat.com>
+	<0281E149-DE28-4D6D-80E0-1132CAB8ABDB@nutanix.com>
+	<1265195474.6852496.1496859744613.JavaMail.zimbra@redhat.com>
+	<20170607212825-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/1] simpletrace: Improve the error message if
- event is not declared
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 18/33] vhost-user-scsi: Introduce
+ vhost-user-scsi host device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,65 +34,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Felipe Franciosi <felipe@nutanix.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
 
-Today, if we use a trace-event file which does not declare an event
-existing in the log file we'll get the following error:
+> > This could be documented,
+> 
+> It is documented AFAIK. Pls take a look at the spec documentation.
 
-$ scripts/simpletrace.py trace-events trace-68508
-Traceback (most recent call last):
-  File "scripts/simpletrace.py", line 242, in <module>
-    run(Formatter())
-  File "scripts/simpletrace.py", line 217, in run
-    process(events, sys.argv[2], analyzer, read_header=3Dread_header)
-  File "scripts/simpletrace.py", line 192, in process
-    for rec in read_trace_records(edict, log):
-  File "scripts/simpletrace.py", line 107, in read_trace_records
-    rec =3D read_record(edict, idtoname, fobj)
-  File "scripts/simpletrace.py", line 71, in read_record
-    return get_record(edict, idtoname, rechdr, fobj)
-  File "scripts/simpletrace.py", line 45, in get_record
-    event =3D edict[name]
-KeyError: 'qemu_mutex_locked'
+Found it now.  It's not under GET_VRING_BASE, it's under "starting
+and stopping rings"---fair enough.
 
-This patch improves this error by adding a hint instead of just that
-KeyError log:
+In the case of vhost-user-scsi, however, QEMU also must not proceed
+until vhost-user-scsi has drained the pending I/O---and this pending
+I/O would be completed _after_ QEMU has sent GET_VRING_BASE.
 
-$ scripts/simpletrace.py trace-events trace-68508
-'qemu_mutex_locked' event is logged but is not declared in the trace
-events file, try using trace-events-all instead.
+Is this handled by VHOST_USER_PROTOCOL_F_REPLY_ACK already?  If so,
+migration would be denied if the server lacks that protocol feature.
 
-Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-id: 1496075404-8845-1-git-send-email-joserz@linux.vnet.ibm.com
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- scripts/simpletrace.py | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+Paolo
 
-diff --git a/scripts/simpletrace.py b/scripts/simpletrace.py
-index d60b3a0..f1be6e4 100755
---- a/scripts/simpletrace.py
-+++ b/scripts/simpletrace.py
-@@ -42,7 +42,15 @@ def get_record(edict, idtoname, rechdr, fobj):
-         event_id =3D rechdr[0]
-         name =3D idtoname[event_id]
-         rec =3D (name, rechdr[1], rechdr[3])
--        event =3D edict[name]
-+        try:
-+            event =3D edict[name]
-+        except KeyError, e:
-+            import sys
-+            sys.stderr.write('%s event is logged but is not declared ' \
-+                             'in the trace events file, try using ' \
-+                             'trace-events-all instead.\n' % str(e))
-+            sys.exit(1)
-+
-         for type, name in event.args:
-             if is_string(type):
-                 l =3D fobj.read(4)
---=20
-2.9.4
+> > but perhaps it's best to add a START_STOP
+> > feature and message to the vhost-user protocol?
+> 
+> We just never need to GET_VRING_BASE if ring keeps going -
+> makes no sense since base gets invalidated immediately.
+> 
+> 
+> 
+> > The feature then can be optional for vhost-user-net and mandatory for
+> > vhost-user-scsi.  When this is done we can remove .unmigratable.
+> > 
+> > Thanks,
+> > 
+> > Paolo
+> 
+> If vhost-user-scsi does not stop the ring after responding to
+> GET_VRING_BASE, it's just a bug that needs to be fixed.
+> 
+> > > > 
+> > > > Can you please send a version of your patch that uses .unmigratable?
+> > > 
+> > > Sure I can do that. We can work on the migration later on.
+> > > 
+> > > > 
+> > > > I'll send a v6 that momentarily drops vhost-scsi, but I intend to
+> > > > include it again in the next pull request.
+> > > 
+> > > Sounds good to me.
+> > > 
+> > > Felipe
+> > > 
+> > > > 
+> > > > Thanks,
+> > > > 
+> > > > Paolo
+> > > 
+> > > 
+> 
