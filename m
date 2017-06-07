@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dIdGP-0006KZ-SD
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:52:57 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dIdJL-0000ZB-I2
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:55:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dIdGL-0004B2-0a
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:52:53 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:48600)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dIdGK-00049C-KW
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:52:48 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <CAJhHMCBwu-pVAyxN+w8SSo19wi3DW3JCRRF-K1Sj9zYqGYkFvQ@mail.gmail.com>
-	<20170606171320.GA8115@flamenco> <877f0o3vbn.fsf@frigg.lan>
-	<CAFEAcA8RBMtfS+5GP=cGeAdV+zgGRg5OPEAu_PY+_hEPcWaJqw@mail.gmail.com>
-	<000023f1-57a6-b211-d9d1-87b8f39326d5@redhat.com>
-Date: Wed, 07 Jun 2017 18:52:29 +0300
-In-Reply-To: <000023f1-57a6-b211-d9d1-87b8f39326d5@redhat.com> (Paolo
-	Bonzini's message of "Wed, 7 Jun 2017 15:35:33 +0200")
-Message-ID: <87fufbztfm.fsf@frigg.lan>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] GSoC 2017 Proposal: TCG performance enhancements
+	(envelope-from <rth7680@gmail.com>) id 1dIdJI-0005Yd-Cw
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:55:55 -0400
+Received: from mail-qt0-x229.google.com ([2607:f8b0:400d:c0d::229]:35821)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dIdJI-0005YQ-8P
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 11:55:52 -0400
+Received: by mail-qt0-x229.google.com with SMTP id w1so10748603qtg.2
+	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 08:55:50 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Date: Wed,  7 Jun 2017 08:55:29 -0700
+Message-Id: <20170607155536.1193-1-rth@twiddle.net>
+Subject: [Qemu-devel] [PATCH v4 0/7] tcg: allocate TB structs preceding
+ translate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +25,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Emilio G. Cota" <cota@braap.org>, Pranith Kumar <bobby.prani@gmail.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Alessandro Di Federico <ale+qemu@clearmind.me>
+To: qemu-devel@nongnu.org
+Cc: cota@braap.org
 
-Paolo Bonzini writes:
+This is a follow-up to Emilio's patch set.
 
-> On 07/06/2017 14:07, Peter Maydell wrote:
->>> My understanding was that adding a public instrumentation interface would add
->>> too much code maintenance overhead for a feature that is not in QEMU's core
->>> target.
->> Well, it depends what you define as our core target :-)
->> I think we get quite a lot of users that want some useful ability
->> to see what their guest code is doing, and these days (when
->> dev board hardware is often very cheap and easily available)
+My primary changes to Emilio's patches are to the first patch, in
+merging the existing implementations from tcg/ppc/tcg-target.inc.c
+into util/cacheinfo.c.
 
-> and virtualization is too...
-
-Actually, in this case I was thinking of some way to transition between KVM and
-TCG back and forth to be able to instrument a VM at any point in time.
+Then I've a few follow-up patches to take advantage of the new TB
+placement for arm platforms.  I've had a look at the asm output for
+ppc64 and s390x, and don't see anything obvious that can be improved.
 
 
->> I think that's a lot of the value that emulation can bring to
->> the table. Obviously we would want to try to do it in a way
->> that is low-runtime-overhead and is easy to get right for
->> people adding/maintaining cpu target frontend code...
-
-> Indeed.  I even sometimes use TCG -d in_asm,exec,int for KVM unit tests,
-> because it's easier to debug them that way :) so introspection ability
-> is welcome.
-
-AFAIR, Blue Swirl once proposed to use the instrumentation features to implement
-unit tests.
+r~
 
 
-> Related to this is also Alessandro's work to librarify TCG (he has a
-> TCG-> LLVM backend for example).
+Emilio G. Cota (2):
+  util: add cacheinfo
+  tcg: allocate TB structs before the corresponding translated code
 
-Maybe I misunderstood, but that would be completely orthogonal, even though
-instrumentation performance might benefit from LLVM's advanced IR
-optimizers. But this goes a long way to hot code identification and asynchronous
-optimization (since code that is not really hot will just run faster with
-simpler optimizations, like in the TCG compiler). This actually sounds pretty
-much like Java's HotSpot, certainly a non-trivial effort.
+Richard Henderson (5):
+  tcg/aarch64: Use ADR in tcg_out_movi
+  target/arm: Use indirect branch for goto_tb
+  target/arm: Remove limit on code buffer size
+  target/arm: Try pc-relative addresses for movi
+  target/arm: Use ldr (literal) for goto_tb
 
+ include/exec/exec-all.h      |   5 +-
+ include/exec/tb-context.h    |   3 +-
+ include/qemu/osdep.h         |   3 +
+ tcg/aarch64/tcg-target.inc.c |   7 +-
+ tcg/arm/tcg-target.inc.c     |  82 +++++++++++---------
+ tcg/ppc/tcg-target.inc.c     |  71 +-----------------
+ tcg/tcg.c                    |  20 +++++
+ tcg/tcg.h                    |   2 +-
+ translate-all.c              |  41 +++++-----
+ util/Makefile.objs           |   1 +
+ util/cacheinfo.c             | 174 +++++++++++++++++++++++++++++++++++++++++++
+ 11 files changed, 282 insertions(+), 127 deletions(-)
+ create mode 100644 util/cacheinfo.c
 
-Cheers,
-  Lluis
+-- 
+2.9.4
