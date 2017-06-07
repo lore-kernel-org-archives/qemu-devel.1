@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dIOKZ-0000Tl-4f
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 19:56:12 -0400
+	(envelope-from <famz@redhat.com>) id 1dIOSc-0003Fd-8P
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:04:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dIOKY-0004G6-7V
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 19:56:11 -0400
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:35783)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1dIOKX-0004Fm-WF
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 19:56:10 -0400
-Received: by mail-wm0-x22e.google.com with SMTP id x70so47248576wme.0
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 16:56:09 -0700 (PDT)
+	(envelope-from <famz@redhat.com>) id 1dIOSZ-0006QT-3Q
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:04:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47080)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dIOSY-0006PK-UO
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 20:04:27 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 103D1C049D5C
+	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 00:04:25 +0000 (UTC)
+Date: Wed, 7 Jun 2017 08:04:21 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170607000421.GA30726@lemon.lan>
+References: <20170605123908.18777-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <270686d0-1ca8-965f-a14a-397f45616deb@redhat.com>
-References: <2b2311b1b070a0b03973e39deccf4682de4a6cd4.1496686997.git.alistair.francis@xilinx.com>
-	<CAJ+F1CLuPkWjG3Hn8hfaxTApn6+ouqh5nJZNWSQYX1C3_HRFqA@mail.gmail.com>
-	<e340cdb9-3c97-8624-81d9-f7888f819a68@amsat.org>
-	<CAKmqyKOOhu7iKuW4naNi0+7cwayLaftkPf=gS7uBakMvKavxVQ@mail.gmail.com>
-	<270686d0-1ca8-965f-a14a-397f45616deb@redhat.com>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 6 Jun 2017 16:55:38 -0700
-Message-ID: <CAKmqyKM=e4zDG-jv-MdHQH3pqtLzBSnq7F-YWeB7S+bw91udVg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] char-socket: Don't report TCP
- socket waiting as an error
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170605123908.18777-1-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 00/19] Block layer thread safety, part 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,47 +33,10 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Tue, Jun 6, 2017 at 3:14 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
->
-> On 06/06/2017 18:30, Alistair Francis wrote:
->>>
->>> This is somehow confusing. I don't think it is worth having another
->>> qemu_log_stderr() function rather than using error_report() but this very
->>> call might deserve a comment explaining this unusual use. What do you think?
->>
->> The problem with stderr is that this isn't an error. Some uses of QEMU
->> (inside Eclipse for example) flag everything printed on stderr as red
->> which confuses users that they are seeing an error when they really
->> aren't.
->
-> But they are wrong.  Would it work for you to work around it, by making
-> QEMU use a client (connect) rather than a server (listen) socket?
+On Mon, 06/05 14:38, Paolo Bonzini wrote:
+> v3->v4: rebased and included fixes in Fam's v2 pull request
+>         new patch 18, fixing testsuite failures on OS X
 
-No, we use QEMU as both so we will always have this issue.
-
->
->> Also all the uses of this message that I have seen (there are probably
->> others though) stops QEMU until the connection is made, which means it
->> doesn't matter if it is mixed up in console output.
->
-> It may not mix up, but it would break programs expecting only console
-> output to be on stdout.
-
-Is that something we guarantee that stdout will only ever be program output?
-
-Thanks,
-Alistair
-
->
->> I just think that this message to most users isn't helpful and they
->> probably don't even read it, so printing to stderr seems like a bit
->> much.
->
-> I would compare it with dd's output.  It goes to stderr even though it's
-> not an error.
->
-> Paolo
->
+Queued, thanks.
