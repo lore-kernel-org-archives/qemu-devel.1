@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46843)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dIegg-0007l1-Eu
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:24:07 -0400
+	(envelope-from <bounces@canonical.com>) id 1dIeiZ-0001Hm-JB
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:26:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dIegf-00042r-Mj
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:24:06 -0400
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:37878)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dIegf-000421-Dl
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:24:05 -0400
-Received: by mail-wm0-x22e.google.com with SMTP id d73so15823392wma.0
-	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 10:24:05 -0700 (PDT)
+	(envelope-from <bounces@canonical.com>) id 1dIeiW-00053h-B4
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:26:03 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60446)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dIeiW-00052G-3I
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:26:00 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dIeiT-0003fT-R2
+	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 17:25:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C917F2E8194
+	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 17:25:57 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <87a85jdbd1.fsf@linaro.org>
-References: <1496849369-30282-1-git-send-email-peter.maydell@linaro.org>
-	<87a85jdbd1.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 7 Jun 2017 18:23:43 +0100
-Message-ID: <CAFEAcA-YQBLJJvAcN82N1BTVsC-rQP2kZ1ccvCv9z48x+XPKUA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] arm_gicv3: Fix ICC_BPR1 reset value when
- EL3 not implemented
+Date: Wed, 07 Jun 2017 17:06:25 -0000
+From: Thomas Huth <893956@bugs.launchpad.net>
+Reply-To: Bug 893956 <893956@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20111123113338.301.42834.malonedeb@gac.canonical.com>
+Message-Id: <149685518563.8133.15451733371987001092.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 893956] Re: qemu-img bug with dynamic vhd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,28 +36,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: qemu-devel@nongnu.org
 
-On 7 June 2017 at 17:13, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
->
-> Peter Maydell <peter.maydell@linaro.org> writes:
->
->> If EL3 is not implemented (ie only one security state) then the
->> one and only ICC_BPR1 register behaves like the Non-secure
->> ICC_BPR1 in an EL3-present configuration. In particular, its
->> reset value is GIC_MIN_BPR_NS, not GIC_MIN_BPR.
->>
->> Correct the erroneous reset value; this fixes a problem where
->> we might hit the assert added in commit a89ff39ee901.
->>
->> Reported-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->
-> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+** Changed in: qemu
+       Status: Incomplete =3D> Won't Fix
 
-Thanks; applied to master as a fix for an assertion failure
-(still not sure why I don't see it).
+-- =
 
--- PMM
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/893956
+
+Title:
+  qemu-img bug with dynamic vhd
+
+Status in QEMU:
+  Won't Fix
+
+Bug description:
+  Hye, i found a problem with qemu-img when trying to get info of a
+  dynamic vhd. I made imgae of my 60GB computer hard drive with
+  disk2vhd. The dynamic vhd is 21gb size.
+
+  With 1.0-rc3 version :
+  running command: qemu-img info 60_GB.VHD
+  qemu-img:  Could not open '60_GB.VHD' : File too large
+
+  0.14.1 version give me wrong information :
+  image: 60_GB.VHD
+  file format: vpc
+  virtual size: 127G (136899993600 bytes)
+  disk size: 21G
+
+  Thanks for reply.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/893956/+subscriptions
