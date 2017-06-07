@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dIdy6-0007GI-RB
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:38:04 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dIdy9-0007I9-4F
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:38:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dIdy0-0007Kn-O6
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:38:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:10644)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dIdy7-0007Q9-Q1
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:38:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39426)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dIdy0-0007KX-GJ
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:37:56 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	id 1dIdy7-0007PP-HT
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:38:03 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 89D4FC0587C4
-	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 16:37:55 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8744C83F3D
+	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 16:38:02 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed,  7 Jun 2017 20:36:00 +0400
-Message-Id: <20170607163635.17635-9-marcandre.lureau@redhat.com>
+Date: Wed,  7 Jun 2017 20:36:01 +0400
+Message-Id: <20170607163635.17635-10-marcandre.lureau@redhat.com>
 In-Reply-To: <20170607163635.17635-1-marcandre.lureau@redhat.com>
 References: <20170607163635.17635-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 08/43] tests: remove /{qnum, qlist,
- dict}/destroy test
+Subject: [Qemu-devel] [PATCH v3 09/43] qnum: add uint type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,173 +36,230 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-The tests aren't really useful, or already covered by other simple tests.
+In order to store integer values between INT64_MAX and UINT64_MAX, add
+a uint64_t internal representation.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/check-qdict.c   |  9 ++-------
- tests/check-qlist.c   | 23 ++---------------------
- tests/check-qnum.c    | 18 ++----------------
- tests/check-qstring.c |  9 ---------
- 4 files changed, 6 insertions(+), 53 deletions(-)
+ include/qapi/qmp/qnum.h |  7 ++++++
+ qobject/qnum.c          | 64 +++++++++++++++++++++++++++++++++++++++++++=
+++++++
+ tests/check-qnum.c      | 48 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 119 insertions(+)
 
-diff --git a/tests/check-qdict.c b/tests/check-qdict.c
-index f067c63275..5eca1b5449 100644
---- a/tests/check-qdict.c
-+++ b/tests/check-qdict.c
-@@ -32,8 +32,7 @@ static void qdict_new_test(void)
-     g_assert(qdict->base.refcnt =3D=3D 1);
-     g_assert(qobject_type(QOBJECT(qdict)) =3D=3D QTYPE_QDICT);
+diff --git a/include/qapi/qmp/qnum.h b/include/qapi/qmp/qnum.h
+index e42b136141..09d745c490 100644
+--- a/include/qapi/qmp/qnum.h
++++ b/include/qapi/qmp/qnum.h
+@@ -19,6 +19,7 @@
 =20
--    // destroy doesn't exit yet
--    g_free(qdict);
-+    QDECREF(qdict);
+ typedef enum {
+     QNUM_I64,
++    QNUM_U64,
+     QNUM_DOUBLE
+ } QNumKind;
+=20
+@@ -27,15 +28,21 @@ typedef struct QNum {
+     QNumKind kind;
+     union {
+         int64_t i64;
++        uint64_t u64;
+         double dbl;
+     } u;
+ } QNum;
+=20
+ QNum *qnum_from_int(int64_t value);
++QNum *qnum_from_uint(uint64_t value);
+ QNum *qnum_from_double(double value);
+=20
+ bool qnum_get_try_int(const QNum *qn, int64_t *val);
+ int64_t qnum_get_int(const QNum *qn);
++
++bool qnum_get_try_uint(const QNum *qn, uint64_t *val);
++uint64_t qnum_get_uint(const QNum *qn);
++
+ double qnum_get_double(QNum *qn);
+=20
+ char *qnum_to_string(QNum *qn);
+diff --git a/qobject/qnum.c b/qobject/qnum.c
+index d88e4f7a59..52918ac20e 100644
+--- a/qobject/qnum.c
++++ b/qobject/qnum.c
+@@ -35,6 +35,22 @@ QNum *qnum_from_int(int64_t value)
  }
 =20
- static void qdict_put_obj_test(void)
-@@ -53,11 +52,7 @@ static void qdict_put_obj_test(void)
-     qn =3D qobject_to_qnum(ent->value);
-     g_assert_cmpint(qnum_get_int(qn), =3D=3D, num);
-=20
--    // destroy doesn't exit yet
--    QDECREF(qn);
--    g_free(ent->key);
--    g_free(ent);
--    g_free(qdict);
-+    QDECREF(qdict);
+ /**
++ * qnum_from_uint(): Create a new QNum from an uint64_t
++ *
++ * Return strong reference.
++ */
++QNum *qnum_from_uint(uint64_t value)
++{
++    QNum *qn =3D g_new(QNum, 1);
++
++    qobject_init(QOBJECT(qn), QTYPE_QNUM);
++    qn->kind =3D QNUM_U64;
++    qn->u.u64 =3D value;
++
++    return qn;
++}
++
++/**
+  * qnum_from_double(): Create a new QNum from a double
+  *
+  * Return strong reference.
+@@ -61,6 +77,12 @@ bool qnum_get_try_int(const QNum *qn, int64_t *val)
+     case QNUM_I64:
+         *val =3D qn->u.i64;
+         return true;
++    case QNUM_U64:
++        if (qn->u.u64 > INT64_MAX) {
++            return false;
++        }
++        *val =3D qn->u.u64;
++        return true;
+     case QNUM_DOUBLE:
+         return false;
+     }
+@@ -83,6 +105,44 @@ int64_t qnum_get_int(const QNum *qn)
  }
 =20
- static void qdict_destroy_simple_test(void)
-diff --git a/tests/check-qlist.c b/tests/check-qlist.c
-index a9b65c6239..894e9915e5 100644
---- a/tests/check-qlist.c
-+++ b/tests/check-qlist.c
-@@ -30,8 +30,7 @@ static void qlist_new_test(void)
-     g_assert(qlist->base.refcnt =3D=3D 1);
-     g_assert(qobject_type(QOBJECT(qlist)) =3D=3D QTYPE_QLIST);
-=20
--    // destroy doesn't exist yet
--    g_free(qlist);
-+    QDECREF(qlist);
- }
-=20
- static void qlist_append_test(void)
-@@ -49,10 +48,7 @@ static void qlist_append_test(void)
-     g_assert(entry !=3D NULL);
-     g_assert(entry->value =3D=3D QOBJECT(qi));
-=20
--    // destroy doesn't exist yet
--    QDECREF(qi);
--    g_free(entry);
--    g_free(qlist);
-+    QDECREF(qlist);
- }
-=20
- static void qobject_to_qlist_test(void)
-@@ -63,20 +59,6 @@ static void qobject_to_qlist_test(void)
-=20
-     g_assert(qobject_to_qlist(QOBJECT(qlist)) =3D=3D qlist);
-=20
--    // destroy doesn't exist yet
--    g_free(qlist);
--}
--
--static void qlist_destroy_test(void)
--{
--    int i;
--    QList *qlist;
--
--    qlist =3D qlist_new();
--
--    for (i =3D 0; i < 42; i++)
--        qlist_append_int(qlist, i);
--
-     QDECREF(qlist);
- }
-=20
-@@ -125,7 +107,6 @@ int main(int argc, char **argv)
-     g_test_add_func("/public/new", qlist_new_test);
-     g_test_add_func("/public/append", qlist_append_test);
-     g_test_add_func("/public/to_qlist", qobject_to_qlist_test);
--    g_test_add_func("/public/destroy", qlist_destroy_test);
-     g_test_add_func("/public/iter", qlist_iter_test);
-=20
-     return g_test_run();
+ /**
++ * qnum_get_uint(): Get an unsigned integer from the number
++ *
++ * Return true on success.
++ */
++bool qnum_get_try_uint(const QNum *qn, uint64_t *val)
++{
++    switch (qn->kind) {
++    case QNUM_I64:
++        if (qn->u.i64 < 0) {
++            return false;
++        }
++        *val =3D qn->u.i64;
++        return true;
++    case QNUM_U64:
++        *val =3D qn->u.u64;
++        return true;
++    case QNUM_DOUBLE:
++        return false;
++    }
++
++    assert(0);
++    return false;
++}
++
++/**
++ * qnum_get_uint(): Get an unsigned integer from the number
++ *
++ * assert() on failure.
++ */
++uint64_t qnum_get_uint(const QNum *qn)
++{
++    uint64_t val;
++    bool success =3D qnum_get_try_uint(qn, &val);
++    assert(success);
++    return val;
++}
++
++/**
+  * qnum_get_double(): Get a float representation of the number
+  *
+  * qnum_get_double() loses precision for integers beyond 53 bits.
+@@ -92,6 +152,8 @@ double qnum_get_double(QNum *qn)
+     switch (qn->kind) {
+     case QNUM_I64:
+         return qn->u.i64;
++    case QNUM_U64:
++        return qn->u.u64;
+     case QNUM_DOUBLE:
+         return qn->u.dbl;
+     }
+@@ -107,6 +169,8 @@ char *qnum_to_string(QNum *qn)
+     switch (qn->kind) {
+     case QNUM_I64:
+         return g_strdup_printf("%" PRId64, qn->u.i64);
++    case QNUM_U64:
++        return g_strdup_printf("%" PRIu64, qn->u.u64);
+     case QNUM_DOUBLE:
+         /* FIXME: snprintf() is locale dependent; but JSON requires
+          * numbers to be formatted as if in the C locale. Dependence
 diff --git a/tests/check-qnum.c b/tests/check-qnum.c
-index d94cea024b..da7e0b0a9a 100644
+index da7e0b0a9a..d702d5da9c 100644
 --- a/tests/check-qnum.c
 +++ b/tests/check-qnum.c
-@@ -36,8 +36,7 @@ static void qnum_from_int_test(void)
-     g_assert_cmpint(qn->base.refcnt, =3D=3D, 1);
-     g_assert_cmpint(qobject_type(QOBJECT(qn)), =3D=3D, QTYPE_QNUM);
-=20
--    // destroy doesn't exit yet
--    g_free(qn);
-+    QDECREF(qn);
- }
-=20
- static void qnum_from_double_test(void)
-@@ -52,8 +51,7 @@ static void qnum_from_double_test(void)
-     g_assert_cmpint(qn->base.refcnt, =3D=3D, 1);
-     g_assert_cmpint(qobject_type(QOBJECT(qn)), =3D=3D, QTYPE_QNUM);
-=20
--    // destroy doesn't exit yet
--    g_free(qn);
-+    QDECREF(qn);
- }
-=20
- static void qnum_from_int64_test(void)
-@@ -109,24 +107,12 @@ static void qnum_to_string_test(void)
+@@ -39,6 +39,21 @@ static void qnum_from_int_test(void)
      QDECREF(qn);
  }
 =20
--static void qnum_destroy_test(void)
--{
--    QNum *qn;
--
--    qn =3D qnum_from_int(0);
--    QDECREF(qn);
--
--    qn =3D qnum_from_double(0.42);
--    QDECREF(qn);
--}
--
- int main(int argc, char **argv)
++static void qnum_from_uint_test(void)
++{
++    QNum *qn;
++    const uint64_t value =3D UINT64_MAX;
++
++    qn =3D qnum_from_uint(value);
++    g_assert(qn !=3D NULL);
++    g_assert_cmpint(qn->kind, =3D=3D, QNUM_U64);
++    g_assert(qn->u.u64 =3D=3D value);
++    g_assert(qn->base.refcnt =3D=3D 1);
++    g_assert(qobject_type(QOBJECT(qn)) =3D=3D QTYPE_QNUM);
++
++    QDECREF(qn);
++}
++
+ static void qnum_from_double_test(void)
  {
+     QNum *qn;
+@@ -76,6 +91,37 @@ static void qnum_get_int_test(void)
+     QDECREF(qn);
+ }
+=20
++static void qnum_get_uint_test(void)
++{
++    QNum *qn;
++    const int value =3D 123456;
++    uint64_t val;
++    int64_t ival;
++
++    qn =3D qnum_from_uint(value);
++    g_assert(qnum_get_try_uint(qn, &val));
++    g_assert_cmpuint(val, =3D=3D, value);
++    QDECREF(qn);
++
++    qn =3D qnum_from_int(value);
++    g_assert(qnum_get_try_uint(qn, &val));
++    g_assert_cmpuint(val, =3D=3D, value);
++    QDECREF(qn);
++
++    /* invalid cases */
++    qn =3D qnum_from_int(-1);
++    g_assert(!qnum_get_try_uint(qn, &val));
++    QDECREF(qn);
++
++    qn =3D qnum_from_uint(-1ULL);
++    g_assert(!qnum_get_try_int(qn, &ival));
++    QDECREF(qn);
++
++    qn =3D qnum_from_double(0.42);
++    g_assert(!qnum_get_try_uint(qn, &val));
++    QDECREF(qn);
++}
++
+ static void qobject_to_qnum_test(void)
+ {
+     QNum *qn;
+@@ -112,9 +158,11 @@ int main(int argc, char **argv)
      g_test_init(&argc, &argv, NULL);
 =20
      g_test_add_func("/qnum/from_int", qnum_from_int_test);
++    g_test_add_func("/qnum/from_uint", qnum_from_uint_test);
      g_test_add_func("/qnum/from_double", qnum_from_double_test);
--    g_test_add_func("/qnum/destroy", qnum_destroy_test);
      g_test_add_func("/qnum/from_int64", qnum_from_int64_test);
      g_test_add_func("/qnum/get_int", qnum_get_int_test);
++    g_test_add_func("/qnum/get_uint", qnum_get_uint_test);
      g_test_add_func("/qnum/to_qnum", qobject_to_qnum_test);
-diff --git a/tests/check-qstring.c b/tests/check-qstring.c
-index 239e9d9da3..112ec08967 100644
---- a/tests/check-qstring.c
-+++ b/tests/check-qstring.c
-@@ -31,14 +31,6 @@ static void qstring_from_str_test(void)
-     g_assert(strcmp(str, qstring->string) =3D=3D 0);
-     g_assert(qobject_type(QOBJECT(qstring)) =3D=3D QTYPE_QSTRING);
+     g_test_add_func("/qnum/to_string", qnum_to_string_test);
 =20
--    // destroy doesn't exit yet
--    g_free(qstring->string);
--    g_free(qstring);
--}
--
--static void qstring_destroy_test(void)
--{
--    QString *qstring =3D qstring_from_str("destroy test");
-     QDECREF(qstring);
- }
-=20
-@@ -97,7 +89,6 @@ int main(int argc, char **argv)
-     g_test_init(&argc, &argv, NULL);
-=20
-     g_test_add_func("/public/from_str", qstring_from_str_test);
--    g_test_add_func("/public/destroy", qstring_destroy_test);
-     g_test_add_func("/public/get_str", qstring_get_str_test);
-     g_test_add_func("/public/append_chr", qstring_append_chr_test);
-     g_test_add_func("/public/from_substr", qstring_from_substr_test);
 --=20
 2.13.0.91.g00982b8dd
