@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dIgCT-0007CV-Rt
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 15:01:02 -0400
+	(envelope-from <bobby.prani@gmail.com>) id 1dIgD4-0007VB-BP
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 15:01:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dIgCS-0008Nc-QJ
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 15:01:01 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:36506)
+	(envelope-from <bobby.prani@gmail.com>) id 1dIgD1-00005C-3U
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 15:01:38 -0400
+Received: from mail-yb0-x243.google.com ([2607:f8b0:4002:c09::243]:33518)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dIgCS-0008ME-7l
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 15:01:00 -0400
-Received: by mail-lf0-x243.google.com with SMTP id x81so1583885lfb.3
-	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 12:01:00 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1dIgD0-000054-Uj
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 15:01:35 -0400
+Received: by mail-yb0-x243.google.com with SMTP id 202so773155ybd.0
+	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 12:01:34 -0700 (PDT)
+From: Pranith Kumar <bobby.prani@gmail.com>
+Date: Wed,  7 Jun 2017 15:01:31 -0400
+Message-Id: <20170607190132.5460-1-bobby.prani@gmail.com>
 MIME-Version: 1.0
-References: <20170602081519.15648-1-marcandre.lureau@redhat.com>
-In-Reply-To: <20170602081519.15648-1-marcandre.lureau@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 07 Jun 2017 19:00:46 +0000
-Message-ID: <CAJ+F1C+fqVd2PDkaPCPS9ZsikZ841hT1wc7tNOj8=JnZOHFchg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] vhost-user-bridge: fix iov_restore_front()
- warning
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH RESEND] mttcg/i386: Patch instruction using
+ async_safe_* framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,72 +28,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: dgilbert@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-Hi, Michael, could you pick this patch?
+In mttcg, calling pause_all_vcpus() during execution from the
+generated TBs causes a deadlock if some vCPU is waiting for exclusive
+execution in start_exclusive(). Fix this by using the aync_safe_*
+framework instead of pausing vcpus for patching instructions.
 
-thanks
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+---
+ hw/i386/kvmvapic.c | 82 ++++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 52 insertions(+), 30 deletions(-)
 
-On Fri, Jun 2, 2017 at 12:26 PM Marc-Andr=C3=A9 Lureau <
-marcandre.lureau@redhat.com> wrote:
-
->   CC      tests/vhost-user-bridge.o
-> /home/dgilbert/git/qemu-world3/tests/vhost-user-bridge.c:228:23: warning:
-> variables 'front' and 'iov' used in loop condition not modified in loop
-> body [-Wfor-loop-analysis]
->     for (cur =3D front; front !=3D iov; cur++) {
->                       ^~~~~    ~~~
-> 1 warning generated.
->
-> Fix the loop, document the function, and fix some related assert().
->
-> In practice, the loop bug was harmless because the front sg buffer is
-> enough to discard/restore the header size.
->
-> Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  tests/vhost-user-bridge.c | 11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
->
-> diff --git a/tests/vhost-user-bridge.c b/tests/vhost-user-bridge.c
-> index 8618c20d53..1e5b5ca3da 100644
-> --- a/tests/vhost-user-bridge.c
-> +++ b/tests/vhost-user-bridge.c
-> @@ -220,12 +220,18 @@ vubr_handle_tx(VuDev *dev, int qidx)
->      free(elem);
->  }
->
-> +
-> +/* this function reverse the effect of iov_discard_front() it must be
-> + * called with 'front' being the original struct iovec and 'bytes'
-> + * being the number of bytes you shaved off
-> + */
->  static void
->  iov_restore_front(struct iovec *front, struct iovec *iov, size_t bytes)
->  {
->      struct iovec *cur;
->
-> -    for (cur =3D front; front !=3D iov; cur++) {
-> +    for (cur =3D front; cur !=3D iov; cur++) {
-> +        assert(bytes >=3D cur->iov_len);
->          bytes -=3D cur->iov_len;
->      }
->
-> @@ -302,7 +308,8 @@ vubr_backend_recv_cb(int sock, void *ctx)
->              }
->              iov_from_buf(sg, elem->in_num, 0, &hdr, sizeof hdr);
->              total +=3D hdrlen;
-> -            assert(iov_discard_front(&sg, &num, hdrlen) =3D=3D hdrlen);
-> +            ret =3D iov_discard_front(&sg, &num, hdrlen);
-> +            assert(ret =3D=3D hdrlen);
->          }
->
->          struct msghdr msg =3D {
-> --
-> 2.13.0.91.g00982b8dd
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
+index 82a49556af..11b0d494eb 100644
+--- a/hw/i386/kvmvapic.c
++++ b/hw/i386/kvmvapic.c
+@@ -383,8 +383,7 @@ static void patch_byte(X86CPU *cpu, target_ulong addr, uint8_t byte)
+     cpu_memory_rw_debug(CPU(cpu), addr, &byte, 1, 1);
+ }
+ 
+-static void patch_call(VAPICROMState *s, X86CPU *cpu, target_ulong ip,
+-                       uint32_t target)
++static void patch_call(X86CPU *cpu, target_ulong ip, uint32_t target)
+ {
+     uint32_t offset;
+ 
+@@ -393,23 +392,24 @@ static void patch_call(VAPICROMState *s, X86CPU *cpu, target_ulong ip,
+     cpu_memory_rw_debug(CPU(cpu), ip + 1, (void *)&offset, sizeof(offset), 1);
+ }
+ 
+-static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulong ip)
++struct PatchInfo {
++    VAPICHandlers *handler;
++    target_ulong ip;
++};
++
++static void do_patch_instruction(CPUState *cs, run_on_cpu_data data)
+ {
+-    CPUState *cs = CPU(cpu);
+-    CPUX86State *env = &cpu->env;
+-    VAPICHandlers *handlers;
++    X86CPU *x86_cpu = X86_CPU(cs);
++    CPUX86State *env = &x86_cpu->env;
++    struct PatchInfo *info = (struct PatchInfo *) data.host_ptr;
++    VAPICHandlers *handlers = info->handler;
++    target_ulong ip = info->ip;
+     uint8_t opcode[2];
+     uint32_t imm32 = 0;
+     target_ulong current_pc = 0;
+     target_ulong current_cs_base = 0;
+     uint32_t current_flags = 0;
+ 
+-    if (smp_cpus == 1) {
+-        handlers = &s->rom_state.up;
+-    } else {
+-        handlers = &s->rom_state.mp;
+-    }
+-
+     if (!kvm_enabled()) {
+         cpu_get_tb_cpu_state(env, &current_pc, &current_cs_base,
+                              &current_flags);
+@@ -421,48 +421,70 @@ static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulong ip)
+         }
+     }
+ 
+-    pause_all_vcpus();
+-
+     cpu_memory_rw_debug(cs, ip, opcode, sizeof(opcode), 0);
+ 
+     switch (opcode[0]) {
+     case 0x89: /* mov r32 to r/m32 */
+-        patch_byte(cpu, ip, 0x50 + modrm_reg(opcode[1]));  /* push reg */
+-        patch_call(s, cpu, ip + 1, handlers->set_tpr);
++        patch_byte(x86_cpu, ip, 0x50 + modrm_reg(opcode[1]));  /* push reg */
++        patch_call(x86_cpu, ip + 1, handlers->set_tpr);
+         break;
+     case 0x8b: /* mov r/m32 to r32 */
+-        patch_byte(cpu, ip, 0x90);
+-        patch_call(s, cpu, ip + 1, handlers->get_tpr[modrm_reg(opcode[1])]);
++        patch_byte(x86_cpu, ip, 0x90);
++        patch_call(x86_cpu, ip + 1, handlers->get_tpr[modrm_reg(opcode[1])]);
+         break;
+     case 0xa1: /* mov abs to eax */
+-        patch_call(s, cpu, ip, handlers->get_tpr[0]);
++        patch_call(x86_cpu, ip, handlers->get_tpr[0]);
+         break;
+     case 0xa3: /* mov eax to abs */
+-        patch_call(s, cpu, ip, handlers->set_tpr_eax);
++        patch_call(x86_cpu, ip, handlers->set_tpr_eax);
+         break;
+     case 0xc7: /* mov imm32, r/m32 (c7/0) */
+-        patch_byte(cpu, ip, 0x68);  /* push imm32 */
++        patch_byte(x86_cpu, ip, 0x68);  /* push imm32 */
+         cpu_memory_rw_debug(cs, ip + 6, (void *)&imm32, sizeof(imm32), 0);
+         cpu_memory_rw_debug(cs, ip + 1, (void *)&imm32, sizeof(imm32), 1);
+-        patch_call(s, cpu, ip + 5, handlers->set_tpr);
++        patch_call(x86_cpu, ip + 5, handlers->set_tpr);
+         break;
+     case 0xff: /* push r/m32 */
+-        patch_byte(cpu, ip, 0x50); /* push eax */
+-        patch_call(s, cpu, ip + 1, handlers->get_tpr_stack);
++        patch_byte(x86_cpu, ip, 0x50); /* push eax */
++        patch_call(x86_cpu, ip + 1, handlers->get_tpr_stack);
+         break;
+     default:
+         abort();
+     }
+ 
+-    resume_all_vcpus();
++    g_free(info);
++}
++
++static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulong ip)
++{
++    CPUState *cs = CPU(cpu);
++    VAPICHandlers *handlers;
++    struct PatchInfo *info;
++
++    if (smp_cpus == 1) {
++        handlers = &s->rom_state.up;
++    } else {
++        handlers = &s->rom_state.mp;
++    }
++
++    info  = g_new(struct PatchInfo, 1);
++    info->handler = handlers;
++    info->ip = ip;
+ 
+     if (!kvm_enabled()) {
+-        /* Both tb_lock and iothread_mutex will be reset when
+-         *  longjmps back into the cpu_exec loop. */
+-        tb_lock();
+-        tb_gen_code(cs, current_pc, current_cs_base, current_flags, 1);
+-        cpu_loop_exit_noexc(cs);
++        const run_on_cpu_func fn = do_patch_instruction;
++
++        async_safe_run_on_cpu(cs, fn, RUN_ON_CPU_HOST_PTR(info));
++        cs->exception_index = EXCP_INTERRUPT;
++        cpu_loop_exit(cs);
+     }
++
++    pause_all_vcpus();
++
++    do_patch_instruction(cs, RUN_ON_CPU_HOST_PTR(info));
++
++    resume_all_vcpus();
++    g_free(info);
+ }
+ 
+ void vapic_report_tpr_access(DeviceState *dev, CPUState *cs, target_ulong ip,
+-- 
+2.11.0
