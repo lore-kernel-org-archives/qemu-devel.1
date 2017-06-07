@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43089)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dIeTX-0004Pu-3O
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:10:32 -0400
+	(envelope-from <thuth@redhat.com>) id 1dIeU5-0004qc-S7
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:11:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dIeTT-0004OG-00
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:10:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49272)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dIeTS-0004NH-Mp
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:10:26 -0400
-Date: Wed, 7 Jun 2017 18:10:21 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170607171021.GK2099@work-vm>
-References: <20170606165510.33057-1-pasic@linux.vnet.ibm.com>
-	<20170606165510.33057-3-pasic@linux.vnet.ibm.com>
-	<20170607110758.GC2099@work-vm>
-	<c6466750-6d71-988c-6c81-9c54f5ca995a@linux.vnet.ibm.com>
-	<20170607120138.GD2384@work-vm>
-	<1fb16203-3857-d0aa-498e-4acca6a28a41@linux.vnet.ibm.com>
+	(envelope-from <thuth@redhat.com>) id 1dIeU1-0004Zu-Qd
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 13:11:05 -0400
+References: <20170607070732.23312-1-david@gibson.dropbear.id.au>
+	<3de884c3-c386-c024-e401-faa459dbf0b4@redhat.com>
+	<75cc682a-4203-30a5-fab3-22f4e1671532@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <9ef08f1d-33d3-4494-2e91-2456d5764ecf@redhat.com>
+Date: Wed, 7 Jun 2017 19:10:55 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1fb16203-3857-d0aa-498e-4acca6a28a41@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 2/3] vmstate: error hint for failed
- equal checks part 2
+In-Reply-To: <75cc682a-4203-30a5-fab3-22f4e1671532@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] pseries: Correct panic
+ behaviour for pseries machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,106 +26,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, mdroth@linux.vnet.ibm.com, lvivier@redhat.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+On 07.06.2017 16:34, Paolo Bonzini wrote:
 > 
 > 
-> On 06/07/2017 02:01 PM, Dr. David Alan Gilbert wrote:
-> > * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
-> >>
-> >>
-> >> On 06/07/2017 01:07 PM, Dr. David Alan Gilbert wrote:
-> >>> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
-> >>>> Verbose error reporting for the _EQUAL family. Modify the standard _EQUAL
-> >>>> so the hint states the assertion probably failed due to a bug. Introduce
-> >>>> _EQUAL_HINT for specifying a context specific hint.
-> >>>>
-> >>>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> >>>
-> >>> I'd prefer not to print 'Bug!?' by default - they already get the
-> >>> message telling them something didn't match and the migration fails.
-> >>> There are none-bug ways of this happening, e.g. a user starting a VM on
-> >>> the source and destination with different configs.
-> >>
-> >> I admit, my objective with 'Bug!?' was to provoke. My train of thought is
-> >> to encourage the programmer to think about and document the circumstances
-> >> under which such an assertion is supposed to fail (and against which it
-> >> is supposed to guard).
-> >>
-> >> I do not know how skillful are our users but a 4 != 5 then maybe a name
-> >> of a vmstate field is probably quite scary and not very revealing. I doubt
-> >> a non qemu developer can use it for something else that reporting a bug.
-> >>
-> >> Consequently if there are non-bug ways one can use the hint and state them.
-> >> Your example with the misconfigured target, by the way, is IMHO also be due
-> >> to a bug of the management software IMHO.
-> >>
-> >> To sum it up: IMHO the message provided by a failing _EQUAL is to ugly
-> >> and Qemuspeak to be presented to an user-user in non-bug cases. Agree?
-> >> Disagree?
-> > 
-> > Disagree.
-> > 
-> > I don't mind giving field names etc; they make it easy for us as
-> > developers to track down what's happening, but also sometimes they help
-> > endusers work around a prolem or see where the problem is; of course
-> > that varies depending on the field name, but some of our names are
-> > reasonable (e.g. there's a VMSTATE_INT32_EQUAL on 'queue_size' in
-> > vmmouse.c).  They're also pretty good if two end users hit the same
-> > problem they can see the same error message in a bug report.
-> > 
-> > We often have customer-facing support people look at logs before they
-> > get as far as us developers; if we have bugs that are 
-> > 'if it's a failing BLAH device complaining about the BAR field'
-> > then this fixes it, then that helps them find workarounds/fixes quickly
-> > even if they don't understand what the BAR field is.
-> > 
+> On 07/06/2017 09:33, Thomas Huth wrote:
+>> On 07.06.2017 09:07, David Gibson wrote:
+>>> The pseries machine type doesn't usually use the 'pvpanic' device as such,
+>>> because it has a firmware/hypervisor facility with roughly the same
+>>> purpose.  The 'ibm,os-term' RTAS call notifies the hypervisor that the
+>>> guest has crashed.
+>>>
+>>> Our implementation of this call was sending a GUEST_PANICKED qmp event;
+>>> however, it was not doing the other usual panic actions, making its
+>>> behaviour different from pvpanic for no good reason.
+>>>
+>>> To correct this, we should call qemu_system_guest_panicked() rather than
+>>> directly sending the panic event.
+>>>
+>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>>> ---
+>>>  hw/ppc/spapr_rtas.c | 7 ++-----
+>>>  1 file changed, 2 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+>>> index 707c4d4..94a2799 100644
+>>> --- a/hw/ppc/spapr_rtas.c
+>>> +++ b/hw/ppc/spapr_rtas.c
+>>> @@ -293,12 +293,9 @@ static void rtas_ibm_os_term(PowerPCCPU *cpu,
+>>>                              target_ulong args,
+>>>                              uint32_t nret, target_ulong rets)
+>>>  {
+>>> -    target_ulong ret = 0;
+>>> +    qemu_system_guest_panicked(NULL);
+>>>  
+>>> -    qapi_event_send_guest_panicked(GUEST_PANIC_ACTION_PAUSE, false, NULL,
+>>> -                                   &error_abort);
+>>> -
+>>> -    rtas_st(rets, 0, ret);
+>>> +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>>>  }
+>>>  
+>>>  static void rtas_set_power_level(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+>>>
+>>
+>> If I get that qemu_system_guest_panicked() function right, it will stop
+>> the VM, won't it? That contradicts the LoPAPR spec that says that the
+>> RTAS call returns if the "ibm,extended-os-term" property is available in
+>> the device tree.
 > 
-> You seem to forget, that I'm not proposing omitting this information,
-> but extending it with something civilized so one can distinguish between
-> an assert failed should have never happened situation an a as good as
-> reasonable error handling for an expected error scenario. IMHO the current
-> EQUAL looks more like the former (assert) and less like the later (error
-> reporting for an expected error scenario). Agree? Dissagree?
+> It does return... but only after the user starts the guest again with
+> "cont".
 
-Yes, the current EQUAL is very terse; but we can't actually tell from
-the use which case it is; it'll all work nicely when people actually add
-the correct hint text in useful locations.
+OK, I guess that's enough to say that the "ibm,extended-os-term"
+property can stay ... so I think the patch is fine as it is right now.
 
-> Having a field name is great! That's beyond discussion.
-> 
-> I see, my 'sum it up' above was a bit unfortunate: it sounds like I'm
-> against the inclusion of technical info and not against a lack of non
-> technical info. Sorry for that!
-
-No, that's fine.
-
-Dave
-
-> >>
-> >>>
-> >>> (I also worry we have a lot f macros for each size;
-> >>> EQUAL, EQUAL_V, EQUAL_V_HINT but I don't know of a better answer for
-> >>> that)
-> >>>
-> >>
-> >> If we are going to drop the default hint ('Bug?!' or whatever) then
-> >> I think we could just add an extra NULL hint to each existing  _EQUAL
-> >> usage, re-purpose EQUAL, and forget about introducing new _HINT macros.
-> >>
-> >> What to you think?
-> > 
-> > Yes, that would be a lot simpler; and there aren't that many
-> > VMSTATE*EQUAL* macros in use.
-> > 
-> 
-> I still have not given up on the discussion above. Will do depending
-> on the outcome.
-> 
-> Regards,
-> Halil
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+ Thomas
