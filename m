@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dIdUF-0003Bc-Lc
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:07:12 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dIdWK-0005fO-15
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:09:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dIdUC-0001i1-HO
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:07:11 -0400
-Received: from smtp1.ntua.gr ([2001:648:2000:de::183]:45267)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dIdUC-0001hN-3Y
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:07:08 -0400
-Date: Wed, 7 Jun 2017 19:06:28 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170607160628.mqhecliq7ka4t3gf@postretch>
-References: <20170607130619.1545-1-el13635@mail.ntua.gr>
-	<b1464fa9-84fe-780c-ea32-bbaa631b1d8f@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1dIdWF-0002xf-EN
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:09:19 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:38828)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dIdWF-0002wZ-53
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 12:09:15 -0400
+Received: by mail-wm0-x229.google.com with SMTP id n195so14544616wmg.1
+	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 09:09:15 -0700 (PDT)
+References: <CAJhHMCBwu-pVAyxN+w8SSo19wi3DW3JCRRF-K1Sj9zYqGYkFvQ@mail.gmail.com>
+	<20170606171320.GA8115@flamenco> <877f0o3vbn.fsf@frigg.lan>
+	<CAFEAcA8RBMtfS+5GP=cGeAdV+zgGRg5OPEAu_PY+_hEPcWaJqw@mail.gmail.com>
+	<000023f1-57a6-b211-d9d1-87b8f39326d5@redhat.com>
+	<87fufbztfm.fsf@frigg.lan>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <87fufbztfm.fsf@frigg.lan>
+Date: Wed, 07 Jun 2017 17:09:39 +0100
+Message-ID: <87bmpzdbjw.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ppzi6rafsehxnk4q"
-Content-Disposition: inline
-In-Reply-To: <b1464fa9-84fe-780c-ea32-bbaa631b1d8f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC] block: add throttle block filter driver
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] GSoC 2017 Proposal: TCG performance enhancements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +33,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, stefanha@gmail.com, berto@igalia.com
+To: =?utf-8?Q?Llu=C3=ADs?= Vilanova <vilanova@ac.upc.edu>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Emilio G. Cota" <cota@braap.org>, Pranith Kumar <bobby.prani@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Alessandro Di Federico <ale+qemu@clearmind.me>
 
 
---ppzi6rafsehxnk4q
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Lluís Vilanova <vilanova@ac.upc.edu> writes:
 
-On Wed, Jun 07, 2017 at 10:40:08AM -0500, Eric Blake wrote:
->On 06/07/2017 08:06 AM, Manos Pitsidianakis wrote:
->> This is part of my work for my GSOC project this summer.
->>
->> I am not sure if the count parameter in  bdrv_co_pwrite_zeros and
->> bdrv_co_pdiscard refers to sectors or bytes.
+> Paolo Bonzini writes:
 >
->Both refer to byte counts.  (We're trying to get rid of as many
->sector-based interfaces as possible, but it's slow going to make sure
->the conversions are still accurate).
+>> On 07/06/2017 14:07, Peter Maydell wrote:
+>>>> My understanding was that adding a public instrumentation interface would add
+>>>> too much code maintenance overhead for a feature that is not in QEMU's core
+>>>> target.
+>>> Well, it depends what you define as our core target :-)
+>>> I think we get quite a lot of users that want some useful ability
+>>> to see what their guest code is doing, and these days (when
+>>> dev board hardware is often very cheap and easily available)
+>
+>> and virtualization is too...
+>
+> Actually, in this case I was thinking of some way to transition between KVM and
+> TCG back and forth to be able to instrument a VM at any point in time.
 
-I see. Would changing the names in the BlockDriverState function=20
-signatures to reflect that be okay?
+While we are blue sky thinking another fun thing might be doing system
+emulation without SoftMMU but instead using the hosts virtualized page
+tables (i.e. running TCG code inside KVM). Obviously there are mapping
+issues given differing page sizes and the like but it would save the
+SoftMMU overhead.
+>
+>
+>>> I think that's a lot of the value that emulation can bring to
+>>> the table. Obviously we would want to try to do it in a way
+>>> that is low-runtime-overhead and is easy to get right for
+>>> people adding/maintaining cpu target frontend code...
+>
+>> Indeed.  I even sometimes use TCG -d in_asm,exec,int for KVM unit tests,
+>> because it's easier to debug them that way :) so introspection ability
+>> is welcome.
+>
+> AFAIR, Blue Swirl once proposed to use the instrumentation features to implement
+> unit tests.
+>
+>
+>> Related to this is also Alessandro's work to librarify TCG (he has a
+>> TCG-> LLVM backend for example).
+>
+> Maybe I misunderstood, but that would be completely orthogonal, even though
+> instrumentation performance might benefit from LLVM's advanced IR
+> optimizers. But this goes a long way to hot code identification and asynchronous
+> optimization (since code that is not really hot will just run faster with
+> simpler optimizations, like in the TCG compiler). This actually sounds pretty
+> much like Java's HotSpot, certainly a non-trivial effort.
 
---ppzi6rafsehxnk4q
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlk4JIQACgkQc2J8L2kN
-9xDKnQ//ephbePN4cLHSPQDZPq0DC1dy6JrM/YP9s8BRVlUJGQ/P9cpRQXqQlDHI
-thPTuzsMuXYHzrGpXZ6rlfdSAtAfoXN2HzDLBssbEyaZ2umXR2Kd7YfYv4MFBSuU
-qndb52DcYzFb/r4To5z1Rp4a+LYdfhcmkBYhP3M+7B7A8HVzLGcC+WMcdeBt9OzH
-vzHUV1CoqeVc/ygbGfz2aD8Jeuooz4nG9ltoBAPla8AcoT4Xuqo1Y89hAMesKYPY
-ilrbxHN4GGGIZ902uEsRz6VwFyhWCRC/gz4hCe3A7wqS+JciarXxCCFS+BHibL0/
-RQ+z7xA33k/KYgtJ3hHE8hEVNPI1tzCBzQhMiYXHr6zJ2g1kWtg9hCUk6IRiamJ3
-CfFoFArzw9UvbF/sv7RmFwgz+gA41s54ha+bQoFKUgCMHnqfxwfvUsnkjMFfZAmB
-QzOnhIr5Qn2xgIX5hfgaIWeDAg+Lg5tePoqa6eDXzDDmJ1bhdW/dFX0Lz5BYBwlJ
-vQ/tntQ9pu3FgEDbUYCXTJrp8ptWVOzH476Q2ODA5Ch9TVbb/oiPpAbcTKeat6rP
-8PVxPvTiqx8Cu617kD7ybZRpOeQqxH56DtdWPjcTLTEup6Al5JuhoCdkhBMu245f
-0Rc8ZJD54kNNa4idM5RLfDc8ImEdyq/uRU2NmitQMa4w4rUOaq8=
-=pRB8
------END PGP SIGNATURE-----
-
---ppzi6rafsehxnk4q--
+--
+Alex Bennée
