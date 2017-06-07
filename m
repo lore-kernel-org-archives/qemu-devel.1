@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57607)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dIh8m-0005R1-7X
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 16:01:17 -0400
+	(envelope-from <cota@braap.org>) id 1dIhLL-0002N2-Po
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 16:14:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dIh8h-0006zZ-Dp
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 16:01:16 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59017)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dIh8h-0006xk-89
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 16:01:11 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dIh8f-0006pJ-Ay
-	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 20:01:09 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AF3B82E819C
-	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 20:01:08 +0000 (UTC)
+	(envelope-from <cota@braap.org>) id 1dIhLH-0004sr-P1
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 16:14:15 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:34799)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dIhLH-0004rT-Bt
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 16:14:11 -0400
+Date: Wed, 7 Jun 2017 16:14:10 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170607201410.GA19037@flamenco>
+References: <1493875481-16388-1-git-send-email-thuth@redhat.com>
+	<87pofpnljd.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 07 Jun 2017 19:53:19 -0000
-From: Thomas Huth <1696180@bugs.launchpad.net>
-Reply-To: Bug 1696180 <1696180@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149676875833.612.2775062648799367879.malonedeb@chaenomeles.canonical.com>
-Message-Id: <149686520002.8383.16336695852674599146.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1696180] Re: Issues with qemu-img, libgfapi,
- and encryption at rest
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87pofpnljd.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v2] Fix the -accel parameter and the
+ documentation for 'hax'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,65 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Vincent Palatin <vpalatin@chromium.org>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Alex =?utf-8?B?QmVubu+/vWU=?= <alex.bennee@linaro.org>
 
-** Changed in: qemu
-       Status: Incomplete =3D> Triaged
+On Thu, May 04, 2017 at 09:11:50 +0200, Markus Armbruster wrote:
+> Thomas Huth <thuth@redhat.com> writes:
+(snip)
+> >  STEXI
+> >  @item -accel @var{name}[,prop=@var{value}[,...]]
+> >  @findex -accel
+> >  This is used to enable an accelerator. Depending on the target architecture,
+> > -kvm, xen, or tcg can be available. By default, tcg is used. If there is more
+> > -than one accelerator specified, the next one is used if the previous one fails
+> > -to initialize.
+> > +kvm, xen, hax or tcg can be available. By default, tcg is used. If there is
+> > +more than one accelerator specified, the next one is used if the previous one
+> > +fails to initialize.
+> >  @table @option
+> >  @item thread=single|multi
+> >  Controls number of TCG threads. When the TCG is multi-threaded there will be one
+> > diff --git a/vl.c b/vl.c
+> > index f46e070..0a1b931 100644
+> > --- a/vl.c
+> > +++ b/vl.c
+> > @@ -3725,26 +3725,21 @@ int main(int argc, char **argv, char **envp)
+> >                  qdev_prop_register_global(&kvm_pit_lost_tick_policy);
+> >                  break;
+> >              }
+> > -            case QEMU_OPTION_accel:
+> > +            case QEMU_OPTION_accel: {
+> > +                QemuOpts *accel_opts;
+> 
+> Doesn't this shadow the @accel_opts declared in main()'s outermost
+> scope?
 
--- =
+Yes, it does :( Unfortunately Markus' review slipped through the
+cracks and this patch ended up upstream (bde4d9205). It causes
+a regression that breaks qemu_tcg_configure(accel_opts)
+since now accel_opts is always NULL. That is, in `-accel [..],thread=foo'
+foo is ignored.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1696180
-
-Title:
-  Issues with qemu-img, libgfapi, and encryption at rest
-
-Status in QEMU:
-  Triaged
-
-Bug description:
-  Hi,
-
-  Encryption-at-rest has been supported for some time now.  The client
-  is responsible for encrypting the files with a help of a master key
-  file.  I have a properly setup environment and everything appears to
-  be working fine but when I use qemu-img to move a file to gluster I
-  get the following:
-
-  =
-
-  # qemu-img convert -f raw -O raw linux.iso gluster://gluster01/virt0/linu=
-x.raw
-  [2017-06-06 16:52:25.489720] E [mem-pool.c:579:mem_put] (-->/lib64/libglu=
-sterfs.so.0(syncop_lookup+0x4e5) [0x7f30f7a36d35] -->/lib64/libglusterfs.so=
-.0(+0x59f02) [0x7f30f7a32f02] -->/lib64/libglusterfs.so.0(mem_put+0x190) [0=
-x7f30f7a24a60] ) 0-mem-pool: mem-pool ptr is NULL
-  [2017-06-06 16:52:25.490778] E [mem-pool.c:579:mem_put] (-->/lib64/libglu=
-sterfs.so.0(syncop_lookup+0x4e5) [0x7f30f7a36d35] -->/lib64/libglusterfs.so=
-.0(+0x59f02) [0x7f30f7a32f02] -->/lib64/libglusterfs.so.0(mem_put+0x190) [0=
-x7f30f7a24a60] ) 0-mem-pool: mem-pool ptr is NULL
-  [2017-06-06 16:52:25.492263] E [mem-pool.c:579:mem_put] (-->/lib64/libglu=
-sterfs.so.0(syncop_lookup+0x4e5) [0x7f30f7a36d35] -->/lib64/libglusterfs.so=
-.0(+0x59f02) [0x7f30f7a32f02] -->/lib64/libglusterfs.so.0(mem_put+0x190) [0=
-x7f30f7a24a60] ) 0-mem-pool: mem-pool ptr is NULL
-  [2017-06-06 16:52:25.497226] E [mem-pool.c:579:mem_put] (-->/lib64/libglu=
-sterfs.so.0(syncop_create+0x44d) [0x7f30f7a3cf5d] -->/lib64/libglusterfs.so=
-.0(+0x59f02) [0x7f30f7a32f02] -->/lib64/libglusterfs.so.0(mem_put+0x190) [0=
-x7f30f7a24a60] ) 0-mem-pool: mem-pool ptr is NULL
-
-  On and on until I get this message:
-
-  [2017-06-06 17:00:03.467361] E [MSGID: 108006] [afr-common.c:4409:afr_not=
-ify] 0-virt0-replicate-0: All subvolumes are down. Going offline until atle=
-ast one of them comes back up.
-  [2017-06-06 17:00:03.467442] E [MSGID: 108006] [afr-common.c:4409:afr_not=
-ify] 0-virt0-replicate-1: All subvolumes are down. Going offline until atle=
-ast one of them comes back up.
-
-  I asked for help assuming it's a problem with glusterfs and was told
-  it appears qemu-img's implementation of libgfapi doesn't call the
-  xlator function correctly.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1696180/+subscriptions
+		Emilio
