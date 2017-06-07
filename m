@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51646)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52551)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dIZ3F-0004yh-5o
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 07:23:02 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dIZ5c-0005d2-6O
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 07:25:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dIZ3C-0000t9-1p
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 07:23:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40968)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dIZ3B-0000st-Rc
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 07:22:57 -0400
-Date: Wed, 7 Jun 2017 12:22:53 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170607112252.GD2099@work-vm>
-References: <20170606165510.33057-1-pasic@linux.vnet.ibm.com>
-	<20170606165510.33057-4-pasic@linux.vnet.ibm.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1dIZ5Z-0002B9-1s
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 07:25:28 -0400
+Date: Wed, 7 Jun 2017 21:16:11 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170607111611.GK13397@umbus.fritz.box>
+References: <20170607070732.23312-1-david@gibson.dropbear.id.au>
+	<1799129848.6598516.1496820296394.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="zYX8XqlwBJQgDxCD"
 Content-Disposition: inline
-In-Reply-To: <20170606165510.33057-4-pasic@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 3/3] s390x/css: add hint for devno
- missmatch
+In-Reply-To: <1799129848.6598516.1496820296394.JavaMail.zimbra@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] pseries: Correct panic behaviour for
+ pseries machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,67 +25,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-
-* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
-> This one has to be fixed up to 's390x: vmstatify config migration for
-> virtio-ccw' provided we want to achieve the same as 's390x/css: catch
-> section mismatch on load' does.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> ---
-> 
-> This is on tom of 's390x: vmstatify config migration for virtio-ccw'
-               p
-> which ain't on top of 's390x/css: catch section mismatch on load' but on
-> top of master.  I kind of have a circular dependency here. This is why
-> the series is RFC. 
-> 
-> Wanted to provide an usage example. Faked 'Re: ' so patchew does not
-> try to apply this on top of current master.
-> ---
->  hw/s390x/css.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index 348129e1b2..de277d6a3d 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -134,6 +134,10 @@ static const VMStateDescription vmstate_sense_id = {
->  static int subch_dev_post_load(void *opaque, int version_id);
->  static void subch_dev_pre_save(void *opaque);
->  
-> +const char err_hint_devno[] = "Devno mismatch, tried to load wrong section!"
-> +    " Likely reason: some sequences of plug and unplug  can break"
-> +    " migration for machine versions prior to  2.7 (known design flaw).";
-> +
-
-That's ok, but I suggest:
-   * 'bug' rather than 'design flaw' - it sounds a bit less scary to
-     endusers.
-
-Other than that,
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: mdroth@linux.vnet.ibm.com, thuth@redhat.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+--zYX8XqlwBJQgDxCD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Dave
+On Wed, Jun 07, 2017 at 03:24:56AM -0400, Paolo Bonzini wrote:
+>=20
+>=20
+> ----- Original Message -----
+> > From: "David Gibson" <david@gibson.dropbear.id.au>
+> > To: mdroth@linux.vnet.ibm.com, thuth@redhat.com, lvivier@redhat.com
+> > Cc: pbonzini@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, "D=
+avid Gibson" <david@gibson.dropbear.id.au>
+> > Sent: Wednesday, June 7, 2017 9:07:32 AM
+> > Subject: [PATCH] pseries: Correct panic behaviour for pseries machine t=
+ype
+> >=20
+> > The pseries machine type doesn't usually use the 'pvpanic' device as su=
+ch,
+> > because it has a firmware/hypervisor facility with roughly the same
+> > purpose.  The 'ibm,os-term' RTAS call notifies the hypervisor that the
+> > guest has crashed.
+> >=20
+> > Our implementation of this call was sending a GUEST_PANICKED qmp event;
+> > however, it was not doing the other usual panic actions, making its
+> > behaviour different from pvpanic for no good reason.
+> >=20
+> > To correct this, we should call qemu_system_guest_panicked() rather than
+> > directly sending the panic event.
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> >  hw/ppc/spapr_rtas.c | 7 ++-----
+> >  1 file changed, 2 insertions(+), 5 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+> > index 707c4d4..94a2799 100644
+> > --- a/hw/ppc/spapr_rtas.c
+> > +++ b/hw/ppc/spapr_rtas.c
+> > @@ -293,12 +293,9 @@ static void rtas_ibm_os_term(PowerPCCPU *cpu,
+> >                              target_ulong args,
+> >                              uint32_t nret, target_ulong rets)
+> >  {
+> > -    target_ulong ret =3D 0;
+> > +    qemu_system_guest_panicked(NULL);
+> > =20
+> > -    qapi_event_send_guest_panicked(GUEST_PANIC_ACTION_PAUSE, false, NU=
+LL,
+> > -                                   &error_abort);
+> > -
+> > -    rtas_st(rets, 0, ret);
+> > +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+> >  }
+>=20
+> It's possible to "cont" a panicked guest, so I think you should keep
+> the rtas_st.
 
->  const VMStateDescription vmstate_subch_dev = {
->      .name = "s390_subch_dev",
->      .version_id = 1,
-> @@ -144,7 +148,7 @@ const VMStateDescription vmstate_subch_dev = {
->          VMSTATE_UINT8_EQUAL(cssid, SubchDev),
->          VMSTATE_UINT8_EQUAL(ssid, SubchDev),
->          VMSTATE_UINT16(migrated_schid, SubchDev),
-> -        VMSTATE_UINT16(devno, SubchDev),
-> +        VMSTATE_UINT16_EQUAL_HINT(devno, SubchDev, err_hint_devno),
->          VMSTATE_BOOL(thinint_active, SubchDev),
->          VMSTATE_STRUCT(curr_status, SubchDev, 0, vmstate_schib, SCHIB),
->          VMSTATE_UINT8_ARRAY(sense_data, SubchDev, 32),
-> -- 
-> 2.11.2
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+I did keep the rtas_st(), I just changed it to using a constant
+instead of an always-0 variable.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--zYX8XqlwBJQgDxCD
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZN+B0AAoJEGw4ysog2bOSm04P/jWtmDxajzdJy7MfajiLQBPC
+11Yx3s2Sloc8RlH7KZVMKweCZZ9uCpWs9ivN+mAK5OneZAWLblLOHQMPGMWbjbns
+Jd8rMtqtSsLpmVD+q9TdkecSZ793ngSoSdMTXAK5wN3Qngh5tsNalQWvJdldaoKq
+Ij047cfz4NBpVtJwyY8KU9xejrdXvhHLXveQNtZ2L2tj/4grE+yF8uDlzpWSTzrk
+ovzKk5jKb8b4oGlYZIF1vt17Z97rK9efIRI/F//6CZwAkGD36wodhUBXTJDD6DzT
+feQ0mJb7CRupNmDQxbJYxSW38GdO8Or4GYK9zH9g9K7Dk9+BymJ9wW7P1oyMdn32
+Po6pdgwhVolQwgaPY0bgOTZDKqT9oRhjdwoMDRgxmGCrAyxHn9gJxRsKAsEdWlv5
+RXxjCkLdF7cGDzIaybXBWpF2+ozDt+JBh9Rs51CQW4pD7/1qdVmkXYTtMLiHh4Kg
+a7F928Ogu4/HCc/i+fp1cvvxDv34GG9Ftv0MQVZJANkbrHOh4NGzRyd4qMcQpKYP
+6spW7B4GumwoAYUChWdXHTBfpTXz6ryB3TifKO1h7edhSpEECmjPa85lGth57nqX
+WmHgj5in3sXFfKtRQQy+qEB6u0/9nV+0qOWjZMgRUMdawscI//0bdDCpnEY83Nw4
+Vzk7ZyH0Ngiun/iDeW5i
+=I/Wp
+-----END PGP SIGNATURE-----
+
+--zYX8XqlwBJQgDxCD--
