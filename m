@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dIi0L-0008JG-Vj
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 16:56:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1dIi3f-0002H6-8V
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 17:00:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dIi0H-0004XA-4K
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 16:56:38 -0400
-Received: from 3.mo178.mail-out.ovh.net ([46.105.44.197]:41280)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dIi0G-0004Wr-TM
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 16:56:33 -0400
-Received: from player728.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 698A73E0BF
-	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 22:56:31 +0200 (CEST)
-Date: Wed, 7 Jun 2017 22:56:27 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170607225627.0929223c@bahia.ttt.fr.ibm.com>
-In-Reply-To: <2f1659c4-0bad-a3d1-91fc-a0a802f21fa5@kaod.org>
-References: <149685579678.12025.9278446121024037161.stgit@bahia.lan>
-	<149685583778.12025.272004316108066026.stgit@bahia.lan>
-	<2f1659c4-0bad-a3d1-91fc-a0a802f21fa5@kaod.org>
+	(envelope-from <eblake@redhat.com>) id 1dIi3b-0005x9-6P
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 17:00:03 -0400
+References: <1496862674-23626-1-git-send-email-thuth@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <df973d1f-cbb1-22c1-5763-f29001a16fd8@redhat.com>
+Date: Wed, 7 Jun 2017 15:59:54 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/lyNn1MlCEYJhvtTISeOvxsh";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v3 4/5] xics: directly register ICPState
- objects to vmstate
+In-Reply-To: <1496862674-23626-1-git-send-email-thuth@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ptRgMbavdaJ8SU7Rq3x9n5BRAgVMHu4kJ"
+Subject: Re: [Qemu-devel] [PATCH] Makefile: Do not generate files if
+ "configure" has not been run yet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,95 +24,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
---Sig_/lyNn1MlCEYJhvtTISeOvxsh
-Content-Type: text/plain; charset=UTF-8
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ptRgMbavdaJ8SU7Rq3x9n5BRAgVMHu4kJ
+From: Eric Blake <eblake@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <df973d1f-cbb1-22c1-5763-f29001a16fd8@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] Makefile: Do not generate files if
+ "configure" has not been run yet
+References: <1496862674-23626-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <1496862674-23626-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 7 Jun 2017 20:14:01 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+On 06/07/2017 02:11 PM, Thomas Huth wrote:
+> When doing a "make -j10" in the vanilla QEMU source tree (without
+> running "configure first), the Makefile currently generates two
 
-> On 06/07/2017 07:17 PM, Greg Kurz wrote:
-> > The ICPState objects are currently registered to vmstate as qdev object=
-s.
-> > Their instance ids are hence computed automatically in the migration co=
-de,
-> > and thus depends on the order the CPU cores were plugged.
-> >=20
-> > If the destination had its CPU cores plugged in a different order than =
-the
-> > source, then ICPState objects will have different instance_ids and load
-> > the wrong state.
-> >=20
-> > Since CPU objects have a reliable cpu_index which is already used as
-> > instance_id in vmstate, let's use it for ICPState as well.
-> >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >  hw/intc/xics.c |    5 ++++-
-> >  1 file changed, 4 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> > index 330441ff7fe8..3d76b43876c5 100644
-> > --- a/hw/intc/xics.c
-> > +++ b/hw/intc/xics.c
-> > @@ -348,10 +348,14 @@ static void icp_realize(DeviceState *dev, Error *=
-*errp)
-> >      }
-> > =20
-> >      qemu_register_reset(icp_reset, dev);
-> > +    vmstate_register(NULL, icp->cs->cpu_index, &vmstate_icp_server, ic=
-p); =20
->=20
-> so, what I just said in the previous email regarding ->cs would break thi=
-s=20
-> patch. Forget about it.=20
->=20
+s/"configure/"configure"/
 
-Unless we have an icp->cpu_index like I mentioned in the other mail.
+> files already, qemu-version.h and qemu-options.def. This should not
+> happen, so let's make these targets depend on config-host.mak.
+> Also the python files can not be executed without $(PYTHON), so
+> these scripts should depend on config-host.mak, too.
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  Makefile | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/Makefile b/Makefile
+> index c830d7a..6786dc2 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -286,7 +286,7 @@ endif
+> =20
+>  all: $(DOCS) $(TOOLS) $(HELPERS-y) recurse-all modules
+> =20
+> -qemu-version.h: FORCE
+> +qemu-version.h: config-host.mak FORCE
 
->=20
-> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
->=20
-> Thanks,
->=20
-> C.
->=20
-> >  }
-> > =20
-> >  static void icp_unrealize(DeviceState *dev, Error **errp)
-> >  {
-> > +    ICPState *icp =3D ICP(dev);
-> > +
-> > +    vmstate_unregister(NULL, &vmstate_icp_server, icp);
-> >      qemu_unregister_reset(icp_reset, dev);
-> >  }
-> > =20
-> > @@ -359,7 +363,6 @@ static void icp_class_init(ObjectClass *klass, void=
- *data)
-> >  {
-> >      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> > =20
-> > -    dc->vmsd =3D &vmstate_icp_server;
-> >      dc->realize =3D icp_realize;
-> >      dc->unrealize =3D icp_unrealize;
-> >  }
-> >  =20
->=20
+This one makes sense.
+
+> @@ -393,6 +394,8 @@ gen-out-type =3D $(subst .,-,$(suffix $@))
+> =20
+>  qapi-py =3D $(SRC_PATH)/scripts/qapi.py $(SRC_PATH)/scripts/ordereddic=
+t.py
+> =20
+> +$(qapi-py): config-host.mak
+
+But this one is weird. How can a pre-existing file have a dependency?
+Remember, $(qapi-py) is not the list of built files, but the list of
+files used to build other files.  It seems like you either want
+config-host.mak includes in $(qapi-py), or...
+
+> +
+>  qga/qapi-generated/qga-qapi-types.c qga/qapi-generated/qga-qapi-types.=
+h :\
+>  $(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-types.py $(q=
+api-py)
+
+=2E..that THIS should be the rule that depends on config-host.mak in
+addition do depending on $(qapi-py).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
---Sig_/lyNn1MlCEYJhvtTISeOvxsh
-Content-Type: application/pgp-signature
+--ptRgMbavdaJ8SU7Rq3x9n5BRAgVMHu4kJ
+Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iEYEARECAAYFAlk4aHsACgkQAvw66wEB28LBpgCfRlp0ULIUTmZFsFdPugJ4mmAz
-lp0AnRNVjYGHvL4Dca5JUI2tG1pTi2Ub
-=jCDy
+iQEcBAEBCAAGBQJZOGlKAAoJEKeha0olJ0NqP7AH/AxXtehObqua8jatCFwoN9r4
+f+m/5m8iYJJkIe8gnr9EThzGQnaq9GK4hawIRi5D78Tik/3YwpqWK1WC30ruPUEw
+WdonBY5LPuT/AihaiDqqTjhkdzumTI2pj9Tjc6h3Oye2shoh0B3M+LoO4+ZiUlSO
+pW4ZnFLgaVVQEvM+lD1kBx2kICRzlfJXJ6rrtDcmhrAeUK8FOx6owDFSNVMml1ou
+b2tHcfr7zFckcyyWkflaOMZTnUyQspvUJeRIMhPyLJIVTphGEV/pWxGlHZrZIW47
+yvA0xCZ4wFxehgO48Lpf/W6eLUoFkKd1jMx58aAVaSTpqGJZllGmc9Bak6gk1zI=
+=BH1V
 -----END PGP SIGNATURE-----
 
---Sig_/lyNn1MlCEYJhvtTISeOvxsh--
+--ptRgMbavdaJ8SU7Rq3x9n5BRAgVMHu4kJ--
