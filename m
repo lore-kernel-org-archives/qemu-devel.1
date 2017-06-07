@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dIbdw-00081A-Dj
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:09:05 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dIbgP-0001oJ-E3
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:11:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dIbdr-0002Yp-Ba
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:09:04 -0400
-From: Alberto Garcia <berto@igalia.com>
-Date: Wed,  7 Jun 2017 17:08:24 +0300
-Message-Id: <c49daf8afe80eade79ac53d305b83eb24b264338.1496844254.git.berto@igalia.com>
-In-Reply-To: <cover.1496844254.git.berto@igalia.com>
-References: <cover.1496844254.git.berto@igalia.com>
-In-Reply-To: <cover.1496844254.git.berto@igalia.com>
-References: <cover.1496844254.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 3/7] qcow2: Make perform_cow() call
- do_perform_cow() twice
+	(envelope-from <alex.bennee@linaro.org>) id 1dIbgL-0003vw-9P
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:11:37 -0400
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:33695)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dIbgL-0003vD-1I
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:11:33 -0400
+Received: by mail-wr0-x22d.google.com with SMTP id v104so6770601wrb.0
+	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 07:11:32 -0700 (PDT)
+References: <20170605165233.4135-1-rth@twiddle.net>
+	<20170605165233.4135-23-rth@twiddle.net>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170605165233.4135-23-rth@twiddle.net>
+Date: Wed, 07 Jun 2017 15:11:57 +0100
+Message-ID: <87h8zrdh02.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 22/26] target/aarch64: optimize indirect
+ branches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,99 +31,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
 
-Instead of calling perform_cow() twice with a different COW region
-each time, call it just once and make perform_cow() handle both
-regions.
 
-This patch simply moves code around. The next one will do the actual
-reordering of the COW operations.
+Richard Henderson <rth@twiddle.net> writes:
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- block/qcow2-cluster.c | 38 +++++++++++++++++++++++---------------
- 1 file changed, 23 insertions(+), 15 deletions(-)
+> From: "Emilio G. Cota" <cota@braap.org>
+>
+> Measurements:
+>
+> [Baseline performance is that before applying this and the previous
+> commit]
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index a86c5a75a9..4c03639a72 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -414,6 +414,10 @@ static int coroutine_fn do_perform_cow(BlockDriverState *bs,
-     struct iovec iov;
-     int ret;
- 
-+    if (bytes == 0) {
-+        return 0;
-+    }
-+
-     iov.iov_len = bytes;
-     iov.iov_base = qemu_try_blockalign(bs, iov.iov_len);
-     if (iov.iov_base == NULL) {
-@@ -751,31 +755,40 @@ uint64_t qcow2_alloc_compressed_cluster_offset(BlockDriverState *bs,
-     return cluster_offset;
- }
- 
--static int perform_cow(BlockDriverState *bs, QCowL2Meta *m, Qcow2COWRegion *r)
-+static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
- {
-     BDRVQcow2State *s = bs->opaque;
-+    Qcow2COWRegion *start = &m->cow_start;
-+    Qcow2COWRegion *end = &m->cow_end;
-     int ret;
- 
--    if (r->nb_bytes == 0) {
-+    if (start->nb_bytes == 0 && end->nb_bytes == 0) {
-         return 0;
-     }
- 
-     qemu_co_mutex_unlock(&s->lock);
--    ret = do_perform_cow(bs, m->offset, m->alloc_offset, r->offset, r->nb_bytes);
-+    ret = do_perform_cow(bs, m->offset, m->alloc_offset,
-+                         start->offset, start->nb_bytes);
-+    if (ret < 0) {
-+        goto fail;
-+    }
-+
-+    ret = do_perform_cow(bs, m->offset, m->alloc_offset,
-+                         end->offset, end->nb_bytes);
-+
-+fail:
-     qemu_co_mutex_lock(&s->lock);
- 
--    if (ret < 0) {
--        return ret;
--    }
--
-     /*
-      * Before we update the L2 table to actually point to the new cluster, we
-      * need to be sure that the refcounts have been increased and COW was
-      * handled.
-      */
--    qcow2_cache_depends_on_flush(s->l2_table_cache);
-+    if (ret == 0) {
-+        qcow2_cache_depends_on_flush(s->l2_table_cache);
-+    }
- 
--    return 0;
-+    return ret;
- }
- 
- int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
-@@ -795,12 +808,7 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
-     }
- 
-     /* copy content of unmodified sectors */
--    ret = perform_cow(bs, m, &m->cow_start);
--    if (ret < 0) {
--        goto err;
--    }
--
--    ret = perform_cow(bs, m, &m->cow_end);
-+    ret = perform_cow(bs, m);
-     if (ret < 0) {
-         goto err;
-     }
--- 
-2.11.0
+Sadly this has regressed my qemu-system-aarch64 EL2 run. It was slightly
+masked by an unrelated assertion breakage which I had to fix. However
+with this patch my boot hangs spinning all 4 threads. Once reverted
+things work again.
+
+My command line:
+
+  timeout -k 1s --foreground 120s ./aarch64-softmmu/qemu-system-aarch64 -machine type=virt -display none -m 4096 -cpu cortex-a57 -serial mon:stdio -netdev user,id=unet -device virtio-net-device,netdev=unet -drive file=/home/alex/lsrc/qemu/images/jessie-arm64.qcow2,id=myblock,index=0,if=none -device virtio-blk-device,drive=myblock -append "console=ttyAMA0 root=/dev/vda1 systemd.unit=benchmark.service" -kernel /home/alex/lsrc/qemu/images/aarch64-current-linux-kernel-only.img -smp 4 -machine gic-version=3 -machine virtualization=true -name debug-threads=on
+
+My tree with fix and revert:
+
+  https://github.com/stsquad/qemu/tree/debug/aarch64-hang
+
+I'm investigating now.
+
+--
+Alex Bennée
