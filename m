@@ -1,15 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dIbdw-000814-CE
+	(envelope-from <berto@igalia.com>) id 1dIbdw-00081A-Dj
 	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:09:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dIbdr-0002YM-9T
+	(envelope-from <berto@igalia.com>) id 1dIbdr-0002Yp-Ba
 	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 10:09:04 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Wed,  7 Jun 2017 17:08:21 +0300
-Message-Id: <cover.1496844254.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 0/7] qcow2: Reduce the number of I/O ops
- when doing COW
+Date: Wed,  7 Jun 2017 17:08:24 +0300
+Message-Id: <c49daf8afe80eade79ac53d305b83eb24b264338.1496844254.git.berto@igalia.com>
+In-Reply-To: <cover.1496844254.git.berto@igalia.com>
+References: <cover.1496844254.git.berto@igalia.com>
+In-Reply-To: <cover.1496844254.git.berto@igalia.com>
+References: <cover.1496844254.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH v2 3/7] qcow2: Make perform_cow() call
+ do_perform_cow() twice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,59 +25,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-Hi all,
+Instead of calling perform_cow() twice with a different COW region
+each time, call it just once and make perform_cow() handle both
+regions.
 
-here's a patch series that rewrites the copy-on-write code in the
-qcow2 driver to reduce the number of I/O operations.
+This patch simply moves code around. The next one will do the actual
+reordering of the COW operations.
 
-This is version v2, please refer to the original e-mail for a complete
-description:
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ block/qcow2-cluster.c | 38 +++++++++++++++++++++++---------------
+ 1 file changed, 23 insertions(+), 15 deletions(-)
 
-https://lists.gnu.org/archive/html/qemu-block/2017-05/msg00882.html
-
-Regards,
-
-Berto
-
-Changes:
-
-v2:
-- Patch 1: Update commit message [Eric]
-- Patch 7: Make sure that the number of iovs does not exceed IOV_MAX [Anton]
-- Patch 7: Don't add zero-length buffers to the qiov in perform_cow()
-
-v1: https://lists.gnu.org/archive/html/qemu-block/2017-05/msg00882.html
-- Initial version
-
-Output of git-backport-diff against v1:
-
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream patch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-
-001/7:[down] 'qcow2: Remove unused Error variable in do_perform_cow()'
-002/7:[----] [--] 'qcow2: Use unsigned int for both members of Qcow2COWRegion'
-003/7:[----] [--] 'qcow2: Make perform_cow() call do_perform_cow() twice'
-004/7:[----] [--] 'qcow2: Split do_perform_cow() into _read(), _encrypt() and _write()'
-005/7:[----] [--] 'qcow2: Allow reading both COW regions with only one request'
-006/7:[----] [--] 'qcow2: Pass a QEMUIOVector to do_perform_cow_{read,write}()'
-007/7:[0014] [FC] 'qcow2: Merge the writing of the COW regions with the guest data'
-
-Alberto Garcia (7):
-  qcow2: Remove unused Error variable in do_perform_cow()
-  qcow2: Use unsigned int for both members of Qcow2COWRegion
-  qcow2: Make perform_cow() call do_perform_cow() twice
-  qcow2: Split do_perform_cow() into _read(), _encrypt() and _write()
-  qcow2: Allow reading both COW regions with only one request
-  qcow2: Pass a QEMUIOVector to do_perform_cow_{read,write}()
-  qcow2: Merge the writing of the COW regions with the guest data
-
- block/qcow2-cluster.c | 192 +++++++++++++++++++++++++++++++++++++-------------
- block/qcow2.c         |  64 ++++++++++++++---
- block/qcow2.h         |  11 ++-
- 3 files changed, 207 insertions(+), 60 deletions(-)
-
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index a86c5a75a9..4c03639a72 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -414,6 +414,10 @@ static int coroutine_fn do_perform_cow(BlockDriverState *bs,
+     struct iovec iov;
+     int ret;
+ 
++    if (bytes == 0) {
++        return 0;
++    }
++
+     iov.iov_len = bytes;
+     iov.iov_base = qemu_try_blockalign(bs, iov.iov_len);
+     if (iov.iov_base == NULL) {
+@@ -751,31 +755,40 @@ uint64_t qcow2_alloc_compressed_cluster_offset(BlockDriverState *bs,
+     return cluster_offset;
+ }
+ 
+-static int perform_cow(BlockDriverState *bs, QCowL2Meta *m, Qcow2COWRegion *r)
++static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
+ {
+     BDRVQcow2State *s = bs->opaque;
++    Qcow2COWRegion *start = &m->cow_start;
++    Qcow2COWRegion *end = &m->cow_end;
+     int ret;
+ 
+-    if (r->nb_bytes == 0) {
++    if (start->nb_bytes == 0 && end->nb_bytes == 0) {
+         return 0;
+     }
+ 
+     qemu_co_mutex_unlock(&s->lock);
+-    ret = do_perform_cow(bs, m->offset, m->alloc_offset, r->offset, r->nb_bytes);
++    ret = do_perform_cow(bs, m->offset, m->alloc_offset,
++                         start->offset, start->nb_bytes);
++    if (ret < 0) {
++        goto fail;
++    }
++
++    ret = do_perform_cow(bs, m->offset, m->alloc_offset,
++                         end->offset, end->nb_bytes);
++
++fail:
+     qemu_co_mutex_lock(&s->lock);
+ 
+-    if (ret < 0) {
+-        return ret;
+-    }
+-
+     /*
+      * Before we update the L2 table to actually point to the new cluster, we
+      * need to be sure that the refcounts have been increased and COW was
+      * handled.
+      */
+-    qcow2_cache_depends_on_flush(s->l2_table_cache);
++    if (ret == 0) {
++        qcow2_cache_depends_on_flush(s->l2_table_cache);
++    }
+ 
+-    return 0;
++    return ret;
+ }
+ 
+ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
+@@ -795,12 +808,7 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
+     }
+ 
+     /* copy content of unmodified sectors */
+-    ret = perform_cow(bs, m, &m->cow_start);
+-    if (ret < 0) {
+-        goto err;
+-    }
+-
+-    ret = perform_cow(bs, m, &m->cow_end);
++    ret = perform_cow(bs, m);
+     if (ret < 0) {
+         goto err;
+     }
 -- 
 2.11.0
