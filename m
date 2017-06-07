@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dIXgM-0000si-E2
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:55:19 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dIXgM-0000sg-Do
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:55:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dIXgJ-0003W9-Na
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dIXgK-0003WL-BW
 	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:55:18 -0400
-Received: from [59.151.112.132] (port=5646 helo=heian.cn.fujitsu.com)
+Received: from [59.151.112.132] (port=2775 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dIXgJ-0003Vu-Ca
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:55:15 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dIXgJ-0003UP-Vt
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 05:55:16 -0400
 From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Wed, 7 Jun 2017 17:55:13 +0800
-Message-ID: <1496829322-17099-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Date: Wed, 7 Jun 2017 17:55:15 +0800
+Message-ID: <1496829322-17099-4-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 In-Reply-To: <1496829322-17099-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 References: <1496829322-17099-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH V6 01/10] net: Add vnet_hdr_len arguments in
- NetClientState
+Subject: [Qemu-devel] [PATCH V6 03/10] net/filter-mirror.c: Add new option
+ to enable vnet support for filter-redirector
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +30,94 @@ To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
 Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, weifuqiang <weifuqiang@huawei.com>, "eddie
 	. dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-Add vnet_hdr_len arguments in NetClientState
-that make other module get real vnet_hdr_len easily.
+We add the vnet_hdr_support option for filter-redirector, default is disable.
+If you use virtio-net-pci net driver, please enable it.
+Because colo-compare or other modules needs the vnet_hdr_len to parse
+packet, so we add this new option send the len to others.
+You can use it for example:
+-object filter-redirector,id=r0,netdev=hn0,queue=tx,outdev=red0,vnet_hdr_support
 
 Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 ---
- include/net/net.h | 1 +
- net/net.c         | 1 +
- 2 files changed, 2 insertions(+)
+ net/filter-mirror.c | 28 ++++++++++++++++++++++++++++
+ qemu-options.hx     |  6 +++---
+ 2 files changed, 31 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/net.h b/include/net/net.h
-index 99b28d5..9a92c70 100644
---- a/include/net/net.h
-+++ b/include/net/net.h
-@@ -100,6 +100,7 @@ struct NetClientState {
-     unsigned int queue_index;
-     unsigned rxfilter_notify_enabled:1;
-     int vring_enable;
-+    int vnet_hdr_len;
-     QTAILQ_HEAD(NetFilterHead, NetFilterState) filters;
- };
- 
-diff --git a/net/net.c b/net/net.c
-index 0ac3b9e..4e7a305 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -491,6 +491,7 @@ void qemu_set_vnet_hdr_len(NetClientState *nc, int len)
-         return;
-     }
- 
-+    nc->vnet_hdr_len = len;
-     nc->info->set_vnet_hdr_len(nc, len);
+diff --git a/net/filter-mirror.c b/net/filter-mirror.c
+index 50aa81b..3413e82 100644
+--- a/net/filter-mirror.c
++++ b/net/filter-mirror.c
+@@ -376,6 +376,13 @@ static char *filter_redirector_get_outdev(Object *obj, Error **errp)
+     return g_strdup(s->outdev);
  }
  
++static bool filter_redirector_get_vnet_hdr(Object *obj, Error **errp)
++{
++    MirrorState *s = FILTER_REDIRECTOR(obj);
++
++    return s->vnet_hdr;
++}
++
+ static void
+ filter_redirector_set_outdev(Object *obj, const char *value, Error **errp)
+ {
+@@ -385,6 +392,15 @@ filter_redirector_set_outdev(Object *obj, const char *value, Error **errp)
+     s->outdev = g_strdup(value);
+ }
+ 
++static void filter_redirector_set_vnet_hdr(Object *obj,
++                                           bool value,
++                                           Error **errp)
++{
++    MirrorState *s = FILTER_REDIRECTOR(obj);
++
++    s->vnet_hdr = value;
++}
++
+ static void filter_mirror_init(Object *obj)
+ {
+     MirrorState *s = FILTER_MIRROR(obj);
+@@ -405,10 +421,22 @@ static void filter_mirror_init(Object *obj)
+ 
+ static void filter_redirector_init(Object *obj)
+ {
++    MirrorState *s = FILTER_REDIRECTOR(obj);
++
+     object_property_add_str(obj, "indev", filter_redirector_get_indev,
+                             filter_redirector_set_indev, NULL);
+     object_property_add_str(obj, "outdev", filter_redirector_get_outdev,
+                             filter_redirector_set_outdev, NULL);
++
++    /*
++     * The vnet_hdr is disabled by default, if you want to enable
++     * this option, you must enable all the option on related modules
++     * (like other filter or colo-compare).
++     */
++    s->vnet_hdr = false;
++    object_property_add_bool(obj, "vnet_hdr_support",
++                             filter_redirector_get_vnet_hdr,
++                             filter_redirector_set_vnet_hdr, NULL);
+ }
+ 
+ static void filter_mirror_fini(Object *obj)
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 5c09fae..e78b942 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4028,11 +4028,11 @@ queue @var{all|rx|tx} is an option that can be applied to any netfilter.
+ 
+ filter-mirror on netdev @var{netdevid},mirror net packet to chardev@var{chardevid}, if have the vnet_hdr_support flag, filter-mirror will mirror packet with vnet_hdr_len.
+ 
+-@item -object filter-redirector,id=@var{id},netdev=@var{netdevid},indev=@var{chardevid},
+-outdev=@var{chardevid}[,queue=@var{all|rx|tx}]
++@item -object filter-redirector,id=@var{id},netdev=@var{netdevid},indev=@var{chardevid},outdev=@var{chardevid},queue=@var{all|rx|tx}[,vnet_hdr_support]
+ 
+ filter-redirector on netdev @var{netdevid},redirect filter's net packet to chardev
+-@var{chardevid},and redirect indev's packet to filter.
++@var{chardevid},and redirect indev's packet to filter.if have the vnet_hdr_support flag,
++filter-redirector will redirect packet with vnet_hdr_len.
+ Create a filter-redirector we need to differ outdev id from indev id, id can not
+ be the same. we can just use indev or outdev, but at least one of indev or outdev
+ need to be specified.
 -- 
 2.7.4
