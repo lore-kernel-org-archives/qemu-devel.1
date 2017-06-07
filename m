@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49607)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dIakK-0006tV-Tt
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 09:11:38 -0400
+	(envelope-from <bounces@canonical.com>) id 1dIatp-0001TL-Sy
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 09:21:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dIakH-000124-Ld
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 09:11:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36904)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dIakH-00010m-Bs
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 09:11:33 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <1496828798-27548-10-git-send-email-a.perevalov@samsung.com>
-	(Alexey Perevalov's message of "Wed, 07 Jun 2017 12:46:36 +0300")
-References: <1496828798-27548-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170607094730eucas1p29b692c0f813d5368d70d999ca8a1f186@eucas1p2.samsung.com>
-	<1496828798-27548-10-git-send-email-a.perevalov@samsung.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 07 Jun 2017 15:11:26 +0200
-Message-ID: <87d1ageydd.fsf@secure.mitica>
+	(envelope-from <bounces@canonical.com>) id 1dIatm-0006KE-Nr
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 09:21:25 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46710)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dIatm-0006K6-Hz
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 09:21:22 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dIatj-0000Lw-W8
+	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 13:21:20 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 06D762E81D0
+	for <qemu-devel@nongnu.org>; Wed,  7 Jun 2017 13:21:15 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v8 09/11] migration: calculate vCPU
- blocktime on dst side
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 07 Jun 2017 13:11:16 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1696353 <1696353@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <149682692221.8383.2186201709283317126.malonedeb@gac.canonical.com>
+Message-Id: <149684107654.2052.9656543243649783734.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1696353] Re: golang binaries fail to start under
+ linux-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,236 +37,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>
-Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, peterx@redhat.com, dgilbert@redhat.com
+To: qemu-devel@nongnu.org
 
-Alexey Perevalov <a.perevalov@samsung.com> wrote:
-> This patch provides blocktime calculation per vCPU,
-> as a summary and as a overlapped value for all vCPUs.
->
-> This approach was suggested by Peter Xu, as an improvements of
-> previous approch where QEMU kept tree with faulted page address and cpus bitmask
-> in it. Now QEMU is keeping array with faulted page address as value and vCPU
-> as index. It helps to find proper vCPU at UFFD_COPY time. Also it keeps
-> list for blocktime per vCPU (could be traced with page_fault_addr)
->
-> Blocktime will not calculated if postcopy_blocktime field of
-> MigrationIncomingState wasn't initialized.
->
-> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-> ---
->  migration/postcopy-ram.c | 139 ++++++++++++++++++++++++++++++++++++++++++++++-
->  migration/trace-events   |   5 +-
->  2 files changed, 142 insertions(+), 2 deletions(-)
->
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index 62a272a..0ad9f9f 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -27,6 +27,7 @@
->  #include "ram.h"
->  #include "sysemu/sysemu.h"
->  #include "sysemu/balloon.h"
-> +#include <sys/param.h>
->  #include "qemu/error-report.h"
->  #include "trace.h"
->  
-> @@ -561,6 +562,133 @@ static int ram_block_enable_notify(const char *block_name, void *host_addr,
->      return 0;
->  }
->  
-> +static int get_mem_fault_cpu_index(uint32_t pid)
-> +{
-> +    CPUState *cpu_iter;
-> +
-> +    CPU_FOREACH(cpu_iter) {
-> +        if (cpu_iter->thread_id == pid) {
+The problem with doing that is that it doesn't actually change the
+behaviour. We use pthread_create to create the new thread, which glibc
+does with a clone with CLONE_SYSVSEM set. We can't tell the difference
+between "guest program needs the new threads to not share SysV semaphore
+behaviour" and "guest program doesn't care but didn't provide the flag"
+so we err on the side of caution and refuse to create a thread that
+doesn't behave the way the guest asked us for it to behave.
 
-could we get a trace with the cpu for this pid, just for completeness?
+-- =
 
-> +            return cpu_iter->cpu_index;
-> +        }
-> +    }
-> +    trace_get_mem_fault_cpu_index(pid);
-> +    return -1;
-> +}
-> +
-> +/*
-> + * This function is being called when pagefault occurs. It
-> + * tracks down vCPU blocking time.
-> + *
-> + * @addr: faulted host virtual address
-> + * @ptid: faulted process thread id
-> + * @rb: ramblock appropriate to addr
-> + */
-> +static void mark_postcopy_blocktime_begin(uint64_t addr, uint32_t ptid,
-> +                                          RAMBlock *rb)
-> +{
-> +    int cpu;
-> +    MigrationIncomingState *mis = migration_incoming_get_current();
-> +    PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
-> +    int64_t now_ms;
-> +
-> +    if (!dc || ptid == 0) {
-> +        return;
-> +    }
-> +    cpu = get_mem_fault_cpu_index(ptid);
-> +    if (cpu < 0) {
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1696353
 
-Add one error message?
+Title:
+  golang binaries fail to start under linux-user
 
-> +        return;
-> +    }
-> +
-> +    now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-> +    if (dc->vcpu_addr[cpu] == 0) {
-> +        atomic_inc(&dc->smp_cpus_down);
-> +    }
-> +
-> +    atomic_xchg__nocheck(&dc->vcpu_addr[cpu], addr);
-> +    atomic_xchg__nocheck(&dc->last_begin, now_ms);
-> +    atomic_xchg__nocheck(&dc->page_fault_vcpu_time[cpu], now_ms);
-> +
-> +    if (test_copiedmap_by_addr(addr, rb)) {
-> +        atomic_xchg__nocheck(&dc->vcpu_addr[cpu], 0);
-> +        atomic_xchg__nocheck(&dc->page_fault_vcpu_time[cpu], 0);
-> +        atomic_sub(&dc->smp_cpus_down, 1);
-> +    }
-> +    trace_mark_postcopy_blocktime_begin(addr, dc, dc->page_fault_vcpu_time[cpu],
-> +                                        cpu);
-> +}
-> +
-> +/*
-> + *  This function just provide calculated blocktime per cpu and trace it.
-> + *  Total blocktime is calculated in mark_postcopy_blocktime_end.
-> + *
-> + *
-> + * Assume we have 3 CPU
-> + *
-> + *      S1        E1           S1               E1
-> + * -----***********------------xxx***************------------------------> CPU1
-> + *
-> + *             S2                E2
-> + * ------------****************xxx---------------------------------------> CPU2
-> + *
-> + *                         S3            E3
-> + * ------------------------****xxx********-------------------------------> CPU3
-> + *
-> + * We have sequence S1,S2,E1,S3,S1,E2,E3,E1
-> + * S2,E1 - doesn't match condition due to sequence S1,S2,E1 doesn't include CPU3
-> + * S3,S1,E2 - sequence includes all CPUs, in this case overlap will be S1,E2 -
-> + *            it's a part of total blocktime.
-> + * S1 - here is last_begin
-> + * Legend of the picture is following:
-> + *              * - means blocktime per vCPU
-> + *              x - means overlapped blocktime (total blocktime)
-> + *
-> + * @addr: host virtual address
-> + */
-> +static void mark_postcopy_blocktime_end(uint64_t addr)
-> +{
-> +    MigrationIncomingState *mis = migration_incoming_get_current();
-> +    PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
-> +    int i, affected_cpu = 0;
-> +    int64_t now_ms;
-> +    bool vcpu_total_blocktime = false;
-> +
-> +    if (!dc) {
-> +        return;
-> +    }
-> +
-> +    now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-> +
-> +    /* lookup cpu, to clear it,
-> +     * that algorithm looks straighforward, but it's not
-> +     * optimal, more optimal algorithm is keeping tree or hash
-> +     * where key is address value is a list of  */
-> +    for (i = 0; i < smp_cpus; i++) {
-> +        uint64_t vcpu_blocktime = 0;
-> +        if (atomic_fetch_add(&dc->vcpu_addr[i], 0) != addr) {
-> +            continue;
-> +        }
-> +        atomic_xchg__nocheck(&dc->vcpu_addr[i], 0);
-> +        vcpu_blocktime = now_ms -
-> +            atomic_fetch_add(&dc->page_fault_vcpu_time[i], 0);
-> +        affected_cpu += 1;
-> +        /* we need to know is that mark_postcopy_end was due to
-> +         * faulted page, another possible case it's prefetched
-> +         * page and in that case we shouldn't be here */
-> +        if (!vcpu_total_blocktime &&
-> +            atomic_fetch_add(&dc->smp_cpus_down, 0) == smp_cpus) {
-> +            vcpu_total_blocktime = true;
-> +        }
-> +        /* continue cycle, due to one page could affect several vCPUs */
-> +        dc->vcpu_blocktime[i] += vcpu_blocktime;
-> +    }
-> +
-> +    atomic_sub(&dc->smp_cpus_down, affected_cpu);
-> +    if (vcpu_total_blocktime) {
-> +        dc->total_blocktime += now_ms - atomic_fetch_add(&dc->last_begin, 0);
-> +    }
-> +    trace_mark_postcopy_blocktime_end(addr, dc, dc->total_blocktime);
-> +}
-> +
->  /*
->   * Handle faults detected by the USERFAULT markings
->   */
-> @@ -638,8 +766,11 @@ static void *postcopy_ram_fault_thread(void *opaque)
->          rb_offset &= ~(qemu_ram_pagesize(rb) - 1);
->          trace_postcopy_ram_fault_thread_request(msg.arg.pagefault.address,
->                                                  qemu_ram_get_idstr(rb),
-> -                                                rb_offset);
-> +                                                rb_offset,
-> +                                                msg.arg.pagefault.feat.ptid);
->  
-> +        mark_postcopy_blocktime_begin((uintptr_t)(msg.arg.pagefault.address),
-> +                                      msg.arg.pagefault.feat.ptid, rb);
->          /*
->           * Send the request to the source - we want to request one
->           * of our host page sizes (which is >= TPS)
-> @@ -723,6 +854,12 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
->      copy_struct.len = pagesize;
->      copy_struct.mode = 0;
->  
-> +    /* copied page isn't feature of blocktime calculation,
-> +     * it's more general entity, so keep it here,
-> +     * but gup betwean two following operation could be high,
-> +     * and in this case blocktime for such small interval will be lost */
-> +    set_copiedmap_by_addr((uint64_t)(uintptr_t)host, rb);
-> +    mark_postcopy_blocktime_end((uint64_t)(uintptr_t)host);
->      /* copy also acks to the kernel waking the stalled thread up
->       * TODO: We can inhibit that ack and only do it if it was requested
->       * which would be slightly cheaper, but we'd have to be careful
-> diff --git a/migration/trace-events b/migration/trace-events
-> index 5b8ccf3..7bdadbb 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -112,6 +112,8 @@ process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
->  process_incoming_migration_co_postcopy_end_main(void) ""
->  migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
->  migration_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname)  "ioc=%p ioctype=%s hostname=%s"
-> +mark_postcopy_blocktime_begin(uint64_t addr, void *dd, int64_t time, int cpu) "addr 0x%" PRIx64 " dd %p time %" PRId64 " cpu %d"
-> +mark_postcopy_blocktime_end(uint64_t addr, void *dd, int64_t time) "addr 0x%" PRIx64 " dd %p time %" PRId64
->  
->  # migration/rdma.c
->  qemu_rdma_accept_incoming_migration(void) ""
-> @@ -188,7 +190,7 @@ postcopy_ram_enable_notify(void) ""
->  postcopy_ram_fault_thread_entry(void) ""
->  postcopy_ram_fault_thread_exit(void) ""
->  postcopy_ram_fault_thread_quit(void) ""
-> -postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset) "Request for HVA=%" PRIx64 " rb=%s offset=%zx"
-> +postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset, uint32_t pid) "Request for HVA=%" PRIx64 " rb=%s offset=%zx %u"
+Status in QEMU:
+  New
 
-Add "pid" in the string format?
+Bug description:
+  With current master golang binaries fail when run under linux-user,
+  for example:
 
->  postcopy_ram_incoming_cleanup_closeuf(void) ""
->  postcopy_ram_incoming_cleanup_entry(void) ""
->  postcopy_ram_incoming_cleanup_exit(void) ""
-> @@ -197,6 +199,7 @@ save_xbzrle_page_skipping(void) ""
->  save_xbzrle_page_overflow(void) ""
->  ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wait: %" PRIu64 " milliseconds, %d iterations"
->  ram_load_complete(int ret, uint64_t seq_iter) "exit_code %d seq iteration %" PRIu64
-> +get_mem_fault_cpu_index(uint32_t pid) "pid %u is not vCPU"
->  
->  # migration/exec.c
->  migration_exec_outgoing(const char *cmd) "cmd=%s"
+  [will@localhost qemu]$ ./arm-linux-user/qemu-arm glide =
+
+  runtime: failed to create new OS thread (have 2 already; errno=3D22)
+  fatal error: newosproc
+
+  runtime stack:
+  runtime.throw(0x45f879, 0x9)
+  	/usr/lib/golang/src/runtime/panic.go:566 +0x78
+  runtime.newosproc(0x1092c000, 0x1093bfe0)
+  	/usr/lib/golang/src/runtime/os_linux.go:160 +0x1b0
+  runtime.newm(0x4ae1e8, 0x0)
+  	/usr/lib/golang/src/runtime/proc.go:1572 +0x12c
+  runtime.main.func1()
+  	/usr/lib/golang/src/runtime/proc.go:126 +0x24
+  runtime.systemstack(0x5ef900)
+  	/usr/lib/golang/src/runtime/asm_arm.s:247 +0x80
+  runtime.mstart()
+  	/usr/lib/golang/src/runtime/proc.go:1079
+
+  goroutine 1 [running]:
+  runtime.systemstack_switch()
+  	/usr/lib/golang/src/runtime/asm_arm.s:192 +0x4 fp=3D0x109287ac sp=3D0x10=
+9287a8
+  runtime.main()
+  	/usr/lib/golang/src/runtime/proc.go:127 +0x5c fp=3D0x109287d4 sp=3D0x109=
+287ac
+  runtime.goexit()
+  	/usr/lib/golang/src/runtime/asm_arm.s:998 +0x4 fp=3D0x109287d4 sp=3D0x10=
+9287d4
+
+  The reason for this is that the golang runtime does not pass the
+  CLONE_SYSVMEM flag to clone so the clone flags checks fail:
+
+  https://github.com/golang/go/blob/master/src/runtime/os_linux.go#L155
+
+  The attached patch allows golang binaries to start under linux-user.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1696353/+subscriptions
