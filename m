@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dIfJF-0005ps-4W
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:03:58 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dIfMw-0006hd-UX
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:07:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dIfJB-0002Zs-05
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:03:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57906)
+	(envelope-from <stefanha@redhat.com>) id 1dIfMs-00045p-PX
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:07:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59764)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dIfJA-0002ZZ-Oj
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:03:52 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <8f9e006d-50f1-ac03-568e-5467f86e53e5@linux.vnet.ibm.com> (Halil
-	Pasic's message of "Thu, 1 Jun 2017 13:46:36 +0200")
-References: <20170529135520.101429-1-pasic@linux.vnet.ibm.com>
-	<20170529135520.101429-5-pasic@linux.vnet.ibm.com>
-	<87a85sc102.fsf@secure.mitica>
-	<4f30017b-22a9-496a-82d2-637a3317c692@linux.vnet.ibm.com>
-	<20170601133251.4869b001.cornelia.huck@de.ibm.com>
-	<8f9e006d-50f1-ac03-568e-5467f86e53e5@linux.vnet.ibm.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 07 Jun 2017 20:03:50 +0200
-Message-ID: <87y3t3brp5.fsf@secure.mitica>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dIfMs-00045Q-JN
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 14:07:42 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Wed,  7 Jun 2017 19:07:31 +0100
+Message-Id: <20170607180736.11011-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 4/7] s390x/css: add missing css state
- conditionally
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL for-2.9 0/5] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,86 +24,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> On 06/01/2017 01:32 PM, Cornelia Huck wrote:
->> On Thu, 1 Jun 2017 11:35:27 +0200
->> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
->> 
+The following changes since commit 0db1851becbefe3e50cfc03776fb1f75817376=
+af:
 
->>>>
->>>> I was about to suggest to move css from pointer to an embedded struct,
->>>> and then noticed that MAX_CSSID is .... 65535.  I guess that this is
->
-> #define MAX_CSSID 255 
-> ("include/hw/s390x/css.h" line 23) 
+  Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-2.10-pull-re=
+quest' into staging (2017-06-07 11:56:00 +0100)
 
-I have to grep better O:-)
+are available in the git repository at:
 
->>>> going to be sparse, very sparse.  Perhaps there is an easier way to
->>>> transmit it?
->>>>
->>>> You are transmiting:
->>>>
->>>> 65000 structs each of size MAX_CHPID (255) and each element is byte +
->>>> byte +byte = 65000 * 255 * 3 = 47 MB.
->>>>
->>>> If it is really sparse, I think that sending something like a list
->>>> of <index in array> <contents> could make sense, no?
->>>>
->>>> Or I am missunderstanding something?
->>>>
->>>
->>> I think you are misunderstanding. Sparse arrays of pointers were not
->>> supported in the first place. Support was added by me recentily (patch
->>> 07d4e69 "migration/vmstate: fix array of ptr with nullptrs"). For a null
->>> pointer just a single byte is transmitted. So we should be more like
->>> around 64KB, given that it is really sparse. Bottom line, the in stream
->
-> Given that my calculation is also wrong. The overhead is below 255 bytes
-> (overhead compared to not transferring anything for null pointers, which
-> is clearly an unrealistic lower bound case).
+  git://github.com/stefanha/qemu.git tags/block-pull-request
 
-Yeap, I greeped wrong.  255 x 255 makes no sense to optimize at all.
-Sorry for the noise.
+for you to fetch changes up to 11cde1c81093a33c46c7a4039bf750bb61551087:
 
->>> representation is at least as efficient as the in memory representation.
->>>
->>> Of course we could do something special for sparse arrays of pointers in
->>> general, and indeed, one of the possibilities is a list/vector of non
->>> null indexes. 
->> 
->> Just as discussion fodder: For a run-of-the-mill qemu guest, I'd expect
->> a low double-digit number of subchannels in css 0xfe, in subchannel set
->> 0, which are clustered right at the beginning, and one chpid (0) in css
->> 0xfe.
->> 
->> As the subchannel id is autogenerated based upon the devno (if
->> provided), it is easy to have subchannels in an arbitrary subchannel
->> set (of which there are only four), but to get high subchannel ids with
->> a lot of empty slots before, you'd have to create a lot (really a lot)
->> of devices and then detach most of them again - not a very likely
->> pattern.
->> 
->> The 3270 support does not really change much: one additional subchannel
->> (with the same characteristics) and one further chpid. But I don't
->> expect many people to use 3270, and it is not (yet) migratable anyway.
->> 
->> vfio-ccw devices will be in another css (possibly mapped), but they are
->> not migrateable either.
->> 
->> So if we want to optimize, some "nothing of interest beyond that point"
->> marker might be useful - but not very.
->
-> Thus I do not think we need extra sparse array handling for this. 
->
-> (Nevertheless an extra sparse array handling might make sense for
-> vmstate core, provided there is an use case).
+  configure: split c and cxx extra flags (2017-06-07 15:29:46 +0100)
 
-So, I retire all my objections.
+----------------------------------------------------------------
 
-Again, sorry for the noise.
+----------------------------------------------------------------
 
-Thanks, Juan.
+Bruno Dominguez (1):
+  configure: split c and cxx extra flags
+
+Philippe Mathieu-Daud=C3=A9 (2):
+  oslib: strip trailing '\n' from error_setg() string argument
+  coccinelle: fix typo in comment
+
+Roman Pen (1):
+  coroutine-lock: do not touch coroutine after another one has been
+    entered
+
+Stefan Hajnoczi (1):
+  .gdbinit: load QEMU sub-commands when gdb starts
+
+ configure                                | 75 ++++++++++++++++++--------=
+------
+ disas/libvixl/Makefile.objs              |  4 +-
+ util/oslib-posix.c                       |  2 +-
+ util/qemu-coroutine-lock.c               | 19 +++++++-
+ util/qemu-coroutine.c                    |  5 +++
+ .gdbinit                                 |  8 ++++
+ rules.mak                                |  3 --
+ scripts/coccinelle/return_directly.cocci |  2 +-
+ 8 files changed, 77 insertions(+), 41 deletions(-)
+ create mode 100644 .gdbinit
+
+--=20
+2.9.4
