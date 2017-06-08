@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46148)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dIw3y-0001sv-8t
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 07:57:19 -0400
+	(envelope-from <famz@redhat.com>) id 1dIw45-00020X-He
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 07:57:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dIw3x-0001wY-BO
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 07:57:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40438)
+	(envelope-from <famz@redhat.com>) id 1dIw43-0001yo-3Y
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 07:57:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47476)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dIw3x-0001wK-2m
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 07:57:17 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dIw42-0001yW-U7
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 07:57:23 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Thu,  8 Jun 2017 19:56:36 +0800
-Message-Id: <20170608115643.18859-17-famz@redhat.com>
+Date: Thu,  8 Jun 2017 19:56:39 +0800
+Message-Id: <20170608115643.18859-20-famz@redhat.com>
 In-Reply-To: <20170608115643.18859-1-famz@redhat.com>
 References: <20170608115643.18859-1-famz@redhat.com>
-Subject: [Qemu-devel] [PULL v3 16/23] block: access write_gen with atomics
+Subject: [Qemu-devel] [PULL v3 19/23] migration/block: reset dirty bitmap
+ before reading
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,79 +29,37 @@ Cc: peter.maydell@linaro.org
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
+Any data that is returned by read may be stale already, the bitmap
+has to be cleared before issuing the read.
+
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20170605123908.18777-13-pbonzini@redhat.com>
+Message-Id: <20170605123908.18777-16-pbonzini@redhat.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block.c                   | 2 +-
- block/io.c                | 6 +++---
- include/block/block_int.h | 2 +-
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ migration/block.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/block.c b/block.c
-index af6366b..361005c 100644
---- a/block.c
-+++ b/block.c
-@@ -3424,7 +3424,7 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, Error **errp)
-         ret = refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
-         bdrv_dirty_bitmap_truncate(bs);
-         bdrv_parent_cb_resize(bs);
--        ++bs->write_gen;
-+        atomic_inc(&bs->write_gen);
-     }
-     return ret;
- }
-diff --git a/block/io.c b/block/io.c
-index bc69b4c..036f5a4 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -1402,7 +1402,7 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
-     }
-     bdrv_debug_event(bs, BLKDBG_PWRITEV_DONE);
+diff --git a/migration/block.c b/migration/block.c
+index 0b3926e..7ed42c6 100644
+--- a/migration/block.c
++++ b/migration/block.c
+@@ -537,6 +537,8 @@ static int mig_save_device_dirty(QEMUFile *f, BlkMigDevState *bmds,
+             } else {
+                 nr_sectors = BDRV_SECTORS_PER_DIRTY_CHUNK;
+             }
++            bdrv_reset_dirty_bitmap(bmds->dirty_bitmap, sector, nr_sectors);
++
+             blk = g_new(BlkMigBlock, 1);
+             blk->buf = g_malloc(BLOCK_SIZE);
+             blk->bmds = bmds;
+@@ -569,7 +571,6 @@ static int mig_save_device_dirty(QEMUFile *f, BlkMigDevState *bmds,
+                 g_free(blk);
+             }
  
--    ++bs->write_gen;
-+    atomic_inc(&bs->write_gen);
-     bdrv_set_dirty(bs, start_sector, end_sector - start_sector);
+-            bdrv_reset_dirty_bitmap(bmds->dirty_bitmap, sector, nr_sectors);
+             sector += nr_sectors;
+             bmds->cur_dirty = sector;
  
-     stat64_max(&bs->wr_highest_offset, offset + bytes);
-@@ -2291,7 +2291,7 @@ int coroutine_fn bdrv_co_flush(BlockDriverState *bs)
-         goto early_exit;
-     }
- 
--    current_gen = bs->write_gen;
-+    current_gen = atomic_read(&bs->write_gen);
- 
-     /* Wait until any previous flushes are completed */
-     while (bs->active_flush_req) {
-@@ -2516,7 +2516,7 @@ int coroutine_fn bdrv_co_pdiscard(BlockDriverState *bs, int64_t offset,
-     }
-     ret = 0;
- out:
--    ++bs->write_gen;
-+    atomic_inc(&bs->write_gen);
-     bdrv_set_dirty(bs, req.offset >> BDRV_SECTOR_BITS,
-                    req.bytes >> BDRV_SECTOR_BITS);
-     tracked_request_end(&req);
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 28f8b1e..b7d0dfb 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -612,7 +612,6 @@ struct BlockDriverState {
-     QLIST_HEAD(, BdrvTrackedRequest) tracked_requests;
-     CoQueue flush_queue;                  /* Serializing flush queue */
-     bool active_flush_req;                /* Flush request in flight? */
--    unsigned int write_gen;               /* Current data generation */
-     unsigned int flushed_gen;             /* Flushed write generation */
- 
-     QLIST_HEAD(, BdrvDirtyBitmap) dirty_bitmaps;
-@@ -647,6 +646,7 @@ struct BlockDriverState {
- 
-     /* Accessed with atomic ops.  */
-     int quiesce_counter;
-+    unsigned int write_gen;               /* Current data generation */
- };
- 
- struct BlockBackendRootState {
 -- 
 2.9.4
