@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54805)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dItCm-0004r3-54
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 04:54:13 -0400
+	(envelope-from <groug@kaod.org>) id 1dItFo-0006A0-B2
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 04:57:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dItCi-0007Jz-UJ
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 04:54:12 -0400
-Received: from 3.mo178.mail-out.ovh.net ([46.105.44.197]:41251)
+	(envelope-from <groug@kaod.org>) id 1dItFl-0008F6-7U
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 04:57:20 -0400
+Received: from 7.mo178.mail-out.ovh.net ([46.105.58.91]:53494)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dItCi-0007Jh-Oc
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 04:54:08 -0400
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dItFl-0008Ei-0k
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 04:57:17 -0400
 Received: from player728.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 08F0532C2D
-	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 10:54:07 +0200 (CEST)
-Date: Thu, 8 Jun 2017 10:54:02 +0200
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 6CADA3E907
+	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 10:57:15 +0200 (CEST)
+Date: Thu, 8 Jun 2017 10:57:04 +0200
 From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170608105402.5b19af21@bahia.ttt.fr.ibm.com>
-In-Reply-To: <3a0cab6c-a913-e7e8-4a07-fbd7509731db@kaod.org>
-References: <149685579678.12025.9278446121024037161.stgit@bahia.lan>
-	<149685582923.12025.13700165807436904935.stgit@bahia.lan>
-	<c632e0a3-c6bb-2637-40c3-5098937476a5@kaod.org>
-	<20170607225507.5d2c6c33@bahia.ttt.fr.ibm.com>
-	<3a0cab6c-a913-e7e8-4a07-fbd7509731db@kaod.org>
+Message-ID: <20170608105704.20097fca@bahia.ttt.fr.ibm.com>
+In-Reply-To: <20170608041739.GY13397@umbus.fritz.box>
+References: <20170602031507.29881-1-david@gibson.dropbear.id.au>
+	<20170608041739.GY13397@umbus.fritz.box>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/R9eH9Qbl1Wl7g6VW=+hFlFQ";
+	boundary="Sig_/YGSCRyi.qqORE9_BY53/va.";
 	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v3 3/5] xics: setup cpu at realize time
+Subject: Re: [Qemu-devel] [PATCHv5 0/4] Clean up compatibility mode handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,51 +31,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: clg@kaod.org, mdroth@linux.vnet.ibm.com, sursingh@redhat.com, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com, abologna@redhat.com, sbobroff@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
---Sig_/R9eH9Qbl1Wl7g6VW=+hFlFQ
-Content-Type: text/plain; charset=UTF-8
+--Sig_/YGSCRyi.qqORE9_BY53/va.
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 8 Jun 2017 07:50:08 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+On Thu, 8 Jun 2017 14:17:39 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> On 06/07/2017 10:55 PM, Greg Kurz wrote:
-> [...]
-> >>> +    obj =3D object_new(TYPE_PNV_ICP);
-> >>> +    object_property_add_child(child, "icp", obj, NULL);
-> >>> +    object_unref(obj);
-> >>> +    object_property_add_const_link(obj, "xics", OBJECT(xi), &error_a=
-bort);
-> >>> +    object_property_add_const_link(obj, "cs", child, &error_abort); =
-  =20
-> >>
-> >> may be link the cpu object instead ?=20
-> >> =20
+> On Fri, Jun 02, 2017 at 01:15:03PM +1000, David Gibson wrote:
+> > This is a rebased and revised version of my patches revising CPU
+> > compatiblity mode handling on ppc, last posted in November.  Since
+> > then, many of the patches have already been merged (some for 2.9, some
+> > since).  This is what's left.
 > >=20
-> > I'm not sure to understand... isn't child supposed to be a CPU index he=
-re ? =20
+> >  * There was conceptual confusion about what a compatibility mode
+> >    means, and how it interacts with the machine type.  This cleans
+> >    that up, clarifying that a compatibility mode (as an externally set
+> >    option) only makes sense on machine types that don't permit the
+> >    guest hypervisor privilege (i.e. 'pseries')
+> >=20
+> >  * It was previously the user's (or management layer's) responsibility
+> >    to determine compatibility of CPUs on either end for migration.
+> >    This uses the compatibility modes to check that properly during an
+> >    incoming migration. =20
 >=20
-> I meant linking the 'PowerPCCPU *cpu' object and not the CPUState.
-> That's minor.
+> Anyone willing to give some review and/or testing, particularly for
+> patch 2/4.
 >=20
 
-Well, cpu =3D=3D cs =3D=3D child and object_property_add_const_link() expec=
-ts
-an Object *. Passing child avoids a not-really-useful OBJECT() dynamic
-cast.
+I'm planning to re-run all the tests when migration of pre-2.10 machine
+types is fixed.
 
---Sig_/R9eH9Qbl1Wl7g6VW=+hFlFQ
+--Sig_/YGSCRyi.qqORE9_BY53/va.
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iEYEARECAAYFAlk5EKoACgkQAvw66wEB28Ja2ACfViFWAYwd51NM+KD62DsCyJOI
-PCEAn1/lfUd/gdOsKZTyDqXKIYnbwFAE
-=DfS1
+iEYEARECAAYFAlk5EWAACgkQAvw66wEB28KkzgCeNTsuLCX3nAfgMmvbGGwYDH0O
+9UoAn3o1a+putKVPmNTpZOlpQeobMGOc
+=yzgq
 -----END PGP SIGNATURE-----
 
---Sig_/R9eH9Qbl1Wl7g6VW=+hFlFQ--
+--Sig_/YGSCRyi.qqORE9_BY53/va.--
