@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dIw4B-00026K-IW
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 07:57:37 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dIw6Q-0004l6-Jr
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 07:59:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dIw4A-00022E-Ii
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 07:57:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45594)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dIw6L-0003E1-Q7
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 07:59:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43946)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dIw4A-00021m-AH
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 07:57:30 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Thu,  8 Jun 2017 19:56:43 +0800
-Message-Id: <20170608115643.18859-24-famz@redhat.com>
-In-Reply-To: <20170608115643.18859-1-famz@redhat.com>
-References: <20170608115643.18859-1-famz@redhat.com>
-Subject: [Qemu-devel] [PULL v3 23/23] block: make accounting thread-safe
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1dIw6L-0003DH-Jx
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 07:59:45 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Thu,  8 Jun 2017 15:59:36 +0400
+Message-Id: <20170608115939.30985-1-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 0/3] char: fix chardev aliases regression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,151 +26,29 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+Cc: anthony.perard@citrix.com, pbonzini@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+Hi,
 
-I'm not trying too hard yet.  Later, with multiqueue support,
-this may cause mutex contention or cacheline bouncing.
+The patch "char: move CharBackend handling in char-fe unit" broke
+chardev aliases. Here is a small series to fix it, and add a simple
+unit test to check the alias keep working.
 
-Cc: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20170605123908.18777-20-pbonzini@redhat.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- block/accounting.c         | 16 ++++++++++++++++
- include/block/accounting.h |  8 ++++++--
- 2 files changed, 22 insertions(+), 2 deletions(-)
+v2:
+- move HAVE_CHARDEV_* in osdep.h (Markus Armbruster)
+- add r-b tags from Eric for the patches that didn't change
 
-diff --git a/block/accounting.c b/block/accounting.c
-index ce6dbf7..87ef5bb 100644
---- a/block/accounting.c
-+++ b/block/accounting.c
-@@ -34,6 +34,7 @@ static const int qtest_latency_ns = NANOSECONDS_PER_SECOND / 1000;
- 
- void block_acct_init(BlockAcctStats *stats)
- {
-+    qemu_mutex_init(&stats->lock);
-     if (qtest_enabled()) {
-         clock_type = QEMU_CLOCK_VIRTUAL;
-     }
-@@ -52,6 +53,7 @@ void block_acct_cleanup(BlockAcctStats *stats)
-     QSLIST_FOREACH_SAFE(s, &stats->intervals, entries, next) {
-         g_free(s);
-     }
-+    qemu_mutex_destroy(&stats->lock);
- }
- 
- void block_acct_add_interval(BlockAcctStats *stats, unsigned interval_length)
-@@ -61,12 +63,15 @@ void block_acct_add_interval(BlockAcctStats *stats, unsigned interval_length)
- 
-     s = g_new0(BlockAcctTimedStats, 1);
-     s->interval_length = interval_length;
-+    s->stats = stats;
-+    qemu_mutex_lock(&stats->lock);
-     QSLIST_INSERT_HEAD(&stats->intervals, s, entries);
- 
-     for (i = 0; i < BLOCK_MAX_IOTYPE; i++) {
-         timed_average_init(&s->latency[i], clock_type,
-                            (uint64_t) interval_length * NANOSECONDS_PER_SECOND);
-     }
-+    qemu_mutex_unlock(&stats->lock);
- }
- 
- BlockAcctTimedStats *block_acct_interval_next(BlockAcctStats *stats,
-@@ -102,6 +107,8 @@ static void block_account_one_io(BlockAcctStats *stats, BlockAcctCookie *cookie,
- 
-     assert(cookie->type < BLOCK_MAX_IOTYPE);
- 
-+    qemu_mutex_lock(&stats->lock);
-+
-     if (failed) {
-         stats->failed_ops[cookie->type]++;
-     } else {
-@@ -117,6 +124,8 @@ static void block_account_one_io(BlockAcctStats *stats, BlockAcctCookie *cookie,
-             timed_average_account(&s->latency[cookie->type], latency_ns);
-         }
-     }
-+
-+    qemu_mutex_unlock(&stats->lock);
- }
- 
- void block_acct_done(BlockAcctStats *stats, BlockAcctCookie *cookie)
-@@ -137,18 +146,23 @@ void block_acct_invalid(BlockAcctStats *stats, enum BlockAcctType type)
-      * not.  The reason is that invalid requests are accounted during their
-      * submission, therefore there's no actual I/O involved.
-      */
-+    qemu_mutex_lock(&stats->lock);
-     stats->invalid_ops[type]++;
- 
-     if (stats->account_invalid) {
-         stats->last_access_time_ns = qemu_clock_get_ns(clock_type);
-     }
-+    qemu_mutex_unlock(&stats->lock);
- }
- 
- void block_acct_merge_done(BlockAcctStats *stats, enum BlockAcctType type,
-                       int num_requests)
- {
-     assert(type < BLOCK_MAX_IOTYPE);
-+
-+    qemu_mutex_lock(&stats->lock);
-     stats->merged[type] += num_requests;
-+    qemu_mutex_unlock(&stats->lock);
- }
- 
- int64_t block_acct_idle_time_ns(BlockAcctStats *stats)
-@@ -163,7 +177,9 @@ double block_acct_queue_depth(BlockAcctTimedStats *stats,
- 
-     assert(type < BLOCK_MAX_IOTYPE);
- 
-+    qemu_mutex_lock(&stats->stats->lock);
-     sum = timed_average_sum(&stats->latency[type], &elapsed);
-+    qemu_mutex_unlock(&stats->stats->lock);
- 
-     return (double) sum / elapsed;
- }
-diff --git a/include/block/accounting.h b/include/block/accounting.h
-index 55cb06f..b833d26 100644
---- a/include/block/accounting.h
-+++ b/include/block/accounting.h
-@@ -26,8 +26,10 @@
- #define BLOCK_ACCOUNTING_H
- 
- #include "qemu/timed-average.h"
-+#include "qemu/thread.h"
- 
- typedef struct BlockAcctTimedStats BlockAcctTimedStats;
-+typedef struct BlockAcctStats BlockAcctStats;
- 
- enum BlockAcctType {
-     BLOCK_ACCT_READ,
-@@ -37,12 +39,14 @@ enum BlockAcctType {
- };
- 
- struct BlockAcctTimedStats {
-+    BlockAcctStats *stats;
-     TimedAverage latency[BLOCK_MAX_IOTYPE];
-     unsigned interval_length; /* in seconds */
-     QSLIST_ENTRY(BlockAcctTimedStats) entries;
- };
- 
--typedef struct BlockAcctStats {
-+struct BlockAcctStats {
-+    QemuMutex lock;
-     uint64_t nr_bytes[BLOCK_MAX_IOTYPE];
-     uint64_t nr_ops[BLOCK_MAX_IOTYPE];
-     uint64_t invalid_ops[BLOCK_MAX_IOTYPE];
-@@ -53,7 +57,7 @@ typedef struct BlockAcctStats {
-     QSLIST_HEAD(, BlockAcctTimedStats) intervals;
-     bool account_invalid;
-     bool account_failed;
--} BlockAcctStats;
-+};
- 
- typedef struct BlockAcctCookie {
-     int64_t bytes;
--- 
-2.9.4
+Marc-Andr=C3=A9 Lureau (3):
+  char: fix alias devices regression
+  chardev: don't use alias names in parse_compat()
+  test-char: start a /char/serial test
+
+ include/chardev/char-parallel.h |  5 -----
+ include/chardev/char-serial.h   |  8 --------
+ include/qemu/osdep.h            | 13 +++++++++++++
+ chardev/char.c                  |  4 ++--
+ tests/test-char.c               | 30 ++++++++++++++++++++++++++++++
+ 5 files changed, 45 insertions(+), 15 deletions(-)
+
+--=20
+2.13.0.91.g00982b8dd
