@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <postmaster@upsilon.org.uk>) id 1dIuSR-00007G-9p
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 06:14:28 -0400
+	(envelope-from <clg@kaod.org>) id 1dIy38-0002Bj-Hg
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 10:04:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <postmaster@upsilon.org.uk>) id 1dIuSM-00066r-7r
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 06:14:27 -0400
-Received: from outmx-028.london.gridhost.co.uk ([95.142.156.253]:46287)
+	(envelope-from <clg@kaod.org>) id 1dIy33-0003gZ-JQ
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 10:04:34 -0400
+Received: from 16.mo4.mail-out.ovh.net ([188.165.55.104]:48641)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <postmaster@upsilon.org.uk>)
-	id 1dIuSM-00065z-16
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 06:14:22 -0400
-References: <7f44106b-c67e-2581-f59b-36a9796a9a36@upsilon.org.uk>
-	<20170608100208.GA4145@stefanha-x1.localdomain>
-From: postmaster <postmaster@upsilon.org.uk>
-Message-ID: <3cee931a-8ae1-56cd-4202-acbe91e09ca9@upsilon.org.uk>
-Date: Thu, 8 Jun 2017 11:14:19 +0100
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dIy33-0003g0-9x
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 10:04:29 -0400
+Received: from player772.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 8721370DD5
+	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 16:04:26 +0200 (CEST)
+References: <149692935202.12119.3614006195497745877.stgit@bahia>
+	<149692936183.12119.5013623492394505174.stgit@bahia>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <5022e1af-9b70-518a-ce61-cadc905e637f@kaod.org>
+Date: Thu, 8 Jun 2017 16:04:21 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170608100208.GA4145@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <149692936183.12119.5013623492394505174.stgit@bahia>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] KVM guests fail to start
+Subject: Re: [Qemu-devel] [PATCH v4 1/6] xics: introduce macros for ICP/ICS
+ link properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,25 +31,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On 08/06/17 11:02, Stefan Hajnoczi wrote:
->
-> Please make sure your qemu-block-extra and qemu-system-x86 packages are
-> up-to-date.  They should both have the same version number.
->
-> Are you using a backports package for QEMU?
->
-Thanks, something along the lines of this does seem to have been the
-problem.
+On 06/08/2017 03:42 PM, Greg Kurz wrote:
+> These properties are part of the XICS API. They deserve to appear
+> explicitely in the XICS header file.
 
-I am using the backports package but it seems that the update uprevved
-qemu.* modulo qemu-system-x86.
+I don't see the benefits.
 
-After a bit of fiddling I've got it working again by updating
-qemu-system-x86 and then forcing the user/group in
-/etc/libvirt/qemu.conf (presumably the conf file was over-written by the
-update).
+C. 
 
-David
+
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  hw/intc/xics.c          |    8 ++++----
+>  hw/ppc/pnv_core.c       |    3 ++-
+>  hw/ppc/pnv_psi.c        |    3 ++-
+>  hw/ppc/spapr.c          |    3 ++-
+>  hw/ppc/spapr_cpu_core.c |    3 ++-
+>  include/hw/ppc/xics.h   |    4 ++++
+>  6 files changed, 16 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+> index ec73f02144c9..aa2c4e744f65 100644
+> --- a/hw/intc/xics.c
+> +++ b/hw/intc/xics.c
+> @@ -346,9 +346,9 @@ static void icp_realize(DeviceState *dev, Error **errp)
+>      Object *obj;
+>      Error *err = NULL;
+>  
+> -    obj = object_property_get_link(OBJECT(dev), "xics", &err);
+> +    obj = object_property_get_link(OBJECT(dev), ICP_PROP_XICS, &err);
+>      if (!obj) {
+> -        error_setg(errp, "%s: required link 'xics' not found: %s",
+> +        error_setg(errp, "%s: required link '" ICP_PROP_XICS "' not found: %s",
+>                     __func__, error_get_pretty(err));
+>          return;
+>      }
+> @@ -654,9 +654,9 @@ static void ics_base_realize(DeviceState *dev, Error **errp)
+>      Object *obj;
+>      Error *err = NULL;
+>  
+> -    obj = object_property_get_link(OBJECT(dev), "xics", &err);
+> +    obj = object_property_get_link(OBJECT(dev), ICS_PROP_XICS, &err);
+>      if (!obj) {
+> -        error_setg(errp, "%s: required link 'xics' not found: %s",
+> +        error_setg(errp, "%s: required link '" ICS_PROP_XICS "' not found: %s",
+>                     __func__, error_get_pretty(err));
+>          return;
+>      }
+> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+> index e8a9a94d5a24..0b6e72950ca3 100644
+> --- a/hw/ppc/pnv_core.c
+> +++ b/hw/ppc/pnv_core.c
+> @@ -121,7 +121,8 @@ static void pnv_core_realize_child(Object *child, XICSFabric *xi, Error **errp)
+>      obj = object_new(TYPE_PNV_ICP);
+>      object_property_add_child(OBJECT(cpu), "icp", obj, &error_abort);
+>      object_unref(obj);
+> -    object_property_add_const_link(obj, "xics", OBJECT(xi), &error_abort);
+> +    object_property_add_const_link(obj, ICP_PROP_XICS, OBJECT(xi),
+> +                                   &error_abort);
+>      object_property_set_bool(obj, true, "realized", &local_err);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+> diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
+> index 2bf5bfe3fdd6..9876c266223d 100644
+> --- a/hw/ppc/pnv_psi.c
+> +++ b/hw/ppc/pnv_psi.c
+> @@ -474,7 +474,8 @@ static void pnv_psi_realize(DeviceState *dev, Error **errp)
+>      }
+>  
+>      /* Create PSI interrupt control source */
+> -    object_property_add_const_link(OBJECT(ics), "xics", obj,  &error_abort);
+> +    object_property_add_const_link(OBJECT(ics), ICS_PROP_XICS, obj,
+> +                                   &error_abort);
+>      object_property_set_int(OBJECT(ics), PSI_NUM_INTERRUPTS, "nr-irqs", &err);
+>      if (err) {
+>          error_propagate(errp, err);
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 01dda9ea9fb7..b2951d7618d6 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -107,7 +107,8 @@ static ICSState *spapr_ics_create(sPAPRMachineState *spapr,
+>  
+>      obj = object_new(type_ics);
+>      object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort);
+> -    object_property_add_const_link(obj, "xics", OBJECT(spapr), &error_abort);
+> +    object_property_add_const_link(obj, ICS_PROP_XICS, OBJECT(spapr),
+> +                                   &error_abort);
+>      object_property_set_int(obj, nr_irqs, "nr-irqs", &local_err);
+>      if (local_err) {
+>          goto error;
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index 029a14120edd..e81879c7cad7 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -145,7 +145,8 @@ static void spapr_cpu_core_realize_child(Object *child, Error **errp)
+>      obj = object_new(spapr->icp_type);
+>      object_property_add_child(OBJECT(cpu), "icp", obj, &error_abort);
+>      object_unref(obj);
+> -    object_property_add_const_link(obj, "xics", OBJECT(spapr), &error_abort);
+> +    object_property_add_const_link(obj, ICP_PROP_XICS, OBJECT(spapr),
+> +                                   &error_abort);
+>      object_property_set_bool(obj, true, "realized", &local_err);
+>      if (local_err) {
+>          goto error;
+> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> index 40a506eacfb4..31145326ebf9 100644
+> --- a/include/hw/ppc/xics.h
+> +++ b/include/hw/ppc/xics.h
+> @@ -86,6 +86,8 @@ struct ICPState {
+>      XICSFabric *xics;
+>  };
+>  
+> +#define ICP_PROP_XICS "xics"
+> +
+>  struct PnvICPState {
+>      ICPState parent_obj;
+>  
+> @@ -130,6 +132,8 @@ struct ICSState {
+>      XICSFabric *xics;
+>  };
+>  
+> +#define ICS_PROP_XICS "xics"
+> +
+>  static inline bool ics_valid_irq(ICSState *ics, uint32_t nr)
+>  {
+>      return (ics->offset != 0) && (nr >= ics->offset)
+> 
