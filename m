@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dImlR-0007Xi-Dj
+	(envelope-from <dgibson@ozlabs.org>) id 1dImlR-0007Xj-GS
 	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 22:01:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dImlQ-0004Wn-Ga
+	(envelope-from <dgibson@ozlabs.org>) id 1dImlQ-0004Wi-GN
 	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 22:01:33 -0400
-Date: Thu, 8 Jun 2017 11:41:50 +1000
+Date: Thu, 8 Jun 2017 11:53:29 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170608014150.GQ13397@umbus.fritz.box>
+Message-ID: <20170608015329.GS13397@umbus.fritz.box>
 References: <149685579678.12025.9278446121024037161.stgit@bahia.lan>
-	<149685581222.12025.5541302490723329093.stgit@bahia.lan>
-	<bdabdcdb-c373-f248-95da-676bf30a22ea@kaod.org>
+	<149685582923.12025.13700165807436904935.stgit@bahia.lan>
+	<c632e0a3-c6bb-2637-40c3-5098937476a5@kaod.org>
+	<20170607225507.5d2c6c33@bahia.ttt.fr.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="tKkaNMvYmhQvRCRK"
+	protocol="application/pgp-signature"; boundary="n1q7a47AT2c4WQJe"
 Content-Disposition: inline
-In-Reply-To: <bdabdcdb-c373-f248-95da-676bf30a22ea@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v3 1/5] pnv_core: drop reference on
- ICPState object during CPU realization
+In-Reply-To: <20170607225507.5d2c6c33@bahia.ttt.fr.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] xics: setup cpu at realize time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,59 +26,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Greg Kurz <groug@kaod.org>
+Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---tKkaNMvYmhQvRCRK
+--n1q7a47AT2c4WQJe
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 07, 2017 at 07:49:14PM +0200, C=E9dric Le Goater wrote:
-> On 06/07/2017 07:16 PM, Greg Kurz wrote:
-> > Similarly to what was done to spapr with commit 249127d0dfeb, this patch
-> > ensures that we don't keep an extra reference on the ICPState object. A=
-lso
-> > since the object was just created and not reparented yet, the call to
-> > object_property_add_child() should never fail: let's pass &error_abort =
-to
-> > make this clear.
+On Wed, Jun 07, 2017 at 10:55:07PM +0200, Greg Kurz wrote:
+> On Wed, 7 Jun 2017 20:11:38 +0200
+> C=E9dric Le Goater <clg@kaod.org> wrote:
+>=20
+> > On 06/07/2017 07:17 PM, Greg Kurz wrote:
+> > > Until recently, spapr used to allocate ICPState objects for the lifet=
+ime
+> > > of the machine. They would only be associated to vCPUs in xics_cpu_se=
+tup()
+> > > when plugging a CPU core.
+> > >=20
+> > > Now that ICPState objects have the same lifecycle as vCPUs, it is
+> > > possible to associate them during realization.
+> > >=20
+> > > This patch hence open-codes xics_cpu_setup() in icp_realize(). The vC=
+PU
+> > > is passed as a property. Note that vCPU now needs to be realized first
+> > > for the IRQs to be allocated. It also needs to resetted before ICPSta=
+te
+> > > realization in order to synchronize with KVM.
+> > >=20
+> > > Since ICPState objects are freed when unrealized, xics_cpu_destroy() =
+isn't
+> > > needed anymore and can be safely dropped. =20
 > >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
->=20
-> Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
-
-Applied to ppc-for-2.10, thanks.
-
-
->=20
-> Thanks,
->=20
-> C.=20
->=20
-> > ---
-> >  hw/ppc/pnv_core.c |    3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-> > index 1b7ec70f033d..e8a9a94d5a24 100644
-> > --- a/hw/ppc/pnv_core.c
-> > +++ b/hw/ppc/pnv_core.c
-> > @@ -119,7 +119,8 @@ static void pnv_core_realize_child(Object *child, X=
-ICSFabric *xi, Error **errp)
-> >      Object *obj;
-> > =20
-> >      obj =3D object_new(TYPE_PNV_ICP);
-> > -    object_property_add_child(OBJECT(cpu), "icp", obj, NULL);
-> > +    object_property_add_child(OBJECT(cpu), "icp", obj, &error_abort);
-> > +    object_unref(obj);
-> >      object_property_add_const_link(obj, "xics", OBJECT(xi), &error_abo=
-rt);
-> >      object_property_set_bool(obj, true, "realized", &local_err);
-> >      if (local_err) {
+> > I like the idea but I think the assignment of ->cs attribute should be=
+=20
+> > moved under icp_kvm_cpu_setup(), as it is only used under xics_kvm by=
+=20
+> > the kvm_vcpu_ioctl() calls.=20
 > >=20
 >=20
+> Well, cs->cpu_index is also used for traces and to implement the 'info pi=
+c'
+> monitor command.
+
+Right.  I think it makes sense for the ICP to have a handle on it's
+associated CPU, even if we don't actually use it in all cases right
+now.  So I have no problem with the property being in all ICPs; I
+think that will be cleaner than special casing xics_kvm.  Especially
+if we have to un-special-case it sometime in future because we need
+to access the CPU object for some reason we haven't thought of yet.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -86,25 +84,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---tKkaNMvYmhQvRCRK
+--n1q7a47AT2c4WQJe
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZOKteAAoJEGw4ysog2bOSQgUQAIzDOsIH26f2QsDw7AW4ZyHL
-WUjlW1Sz6+d4Ht2gCM+JdCX3KH8jhptmuEzkbKeblDGfXH/knGF2EfC7tkDEGeYp
-/CJmW/kzGNoAV+WlFoIJWNavQRFS27O5o3VD80vQAaqUCY3Zk5yOhnBFd5BoIhBL
-RKlpARWnr8IKwuDwc9esCYTppON0hIdccY9JBZ7jEi436D/8mICKxQzetXH2eSWK
-Wk1/99WWA4fK/X0+UXA0kjbHfD/zfPkQTtkKd0VdTz4YB2CZpDFK+bS70Z2er0YN
-DD5CKUZWwqTlktWhm7lEl6ytEu1yu/GlZSLgkOCNeauOcp70LgwduFMyLTUYJC1g
-sor1AS5A5fVE0UB+boD19RbSaPiQfTTX8bA0HkrAOPXXE9VyyPgyklVMeSm5ANrX
-uWdTfmyQ4iQ16xUSHvFhiIcCGa4S+TtPFkY3Sz2M9LHqdpv7eQmeLfZA0oKU6dGr
-WQ1AcZnaHalxiSm84L0mZ11PPfMtgdDQcA1X8IGPfLKUkOuRbX6ctVOsAsDhhlL2
-0AjcRpVPBz/HIrjAQo7YlclVQXRJ+d8H4vhT1jYdWUtypaxU7BfWlxb1BKDHPN2X
-2lZhqXzCderwd0T7lTDHzg6XuOvQeGcEUdhP0QgIa9PwbqIQhv58yN3VXDofPcda
-zSekLex4DWoP0q8jXtOa
-=PldN
+iQIcBAEBCAAGBQJZOK4ZAAoJEGw4ysog2bOSjDUQALacjSCmb40qMZPOZ590vyGI
+fZZXYbmef7KU+aexcFHW//yGG5GhQjti6RH/spOAkV6AiXjoAr4gabQTYWIEq83o
+oPa7lZraSjvjYzdrLs/0lsDM3OG6pCCiap0ozPb/Wnjlo1RjVPX4PSA3k6bARuvp
+qSxEqr7cldcZ++kqw06TVXZD/pwVMnubhLFScWQg/zKNYBVAPzFcYbYXOx1z5J2L
+D9wpUljeb1goUGorx36u/jEp8KFNdh/Swv4feoiV7OAc2pD+tXN5cObNQCDMQ+i3
+o8k/Eghafc0d//Be16pvz7zi0/99WGnEu3heKIjgzPiBsh1kh/hhPX2wcviTz4B/
+CrT5tW4h2QQx1j67buf+dOCCaalkhvZAiHL2TDjQaIiH96Mte85q1HMy/ix+jaEl
+qMfMPfaViZTD4D1vv84ZRfPun1/FBRAzfgohjW1bRbPY6W34MbhSye8Zc0MgOOQF
+DFh7iy2pLdzkx6hxSG0dBLybZorkTlW1//Npg/rLRyVQoXO4+VzFDmaAF7poWL7L
+9ADV5T7Uoj3bJe60nauNspbsFWLGDJKoaxndw+0PvdetyY5k6Xd+/RCx+giGD0nL
+rdEFlFqB1NW4R42lPiM598i4/4T8oEDcNP5M4724OBp25dCtm8NOen3iPQfUKkYN
+sC/vcSXGFaPdzTLqp38N
+=H+ld
 -----END PGP SIGNATURE-----
 
---tKkaNMvYmhQvRCRK--
+--n1q7a47AT2c4WQJe--
