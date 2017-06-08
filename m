@@ -1,25 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dIxee-0001bj-3b
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:39:16 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dIxef-0001cd-Ex
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:39:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dIxed-0005PD-CA
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:39:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36284)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dIxed-0005Og-7J
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:39:15 -0400
-Message-ID: <1496929152.29761.3.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 08 Jun 2017 15:39:12 +0200
-In-Reply-To: <1496927734-29174-4-git-send-email-owen.smith@citrix.com>
-References: <1496927734-29174-1-git-send-email-owen.smith@citrix.com>
-	<1496927734-29174-4-git-send-email-owen.smith@citrix.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 3/4] ui/input: Add activate/remove for
- keyboard handlers
+	(envelope-from <ehabkost@redhat.com>) id 1dIxee-0005QJ-L1
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:39:17 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Thu,  8 Jun 2017 10:39:02 -0300
+Message-Id: <20170608133906.12737-2-ehabkost@redhat.com>
+In-Reply-To: <20170608133906.12737-1-ehabkost@redhat.com>
+References: <20170608133906.12737-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/5] xilinx: Fix error handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,24 +19,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Owen Smith <owen.smith@citrix.com>, qemu-devel@nongnu.org
-Cc: sstabellini@kernel.org, anthony.perard@citrix.com, xen-devel@lists.xenproject.org
+To: qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>, Jason Wang <jasowang@redhat.com>, qemu-arm@nongnu.org
 
-diff --git a/ui/input-legacy.c b/ui/input-legacy.c
-> index 7159747..fbe1ce7 100644
-> --- a/ui/input-legacy.c
-> +++ b/ui/input-legacy.c
-> @@ -142,6 +142,18 @@ QEMUPutKbdEntry
-> *qemu_add_kbd_event_handler(QEMUPutKBDEvent *func, void *opaque)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return entry;
-> =C2=A0}
-> =C2=A0
-> +void qemu_activate_kbd_event_handler(QEMUPutKbdEntry *entry)
+Assigning directly to *errp is not valid, as errp may be NULL,
+&error_fatal, or &error_abort.  Use error_propagate() instead.
 
-Please don't add new code to input-legacy.c please.
+error_propagate() handles non-NULL *errp correctly, so the
+"if (!*errp)" check can be removed.
 
-Switch your code to use the new qemu_input_handler_*() functions
-directly instead.
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: qemu-arm@nongnu.org
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ hw/dma/xilinx_axidma.c  | 4 +---
+ hw/net/xilinx_axienet.c | 4 +---
+ 2 files changed, 2 insertions(+), 6 deletions(-)
 
-cheers,
-  Gerd
+diff --git a/hw/dma/xilinx_axidma.c b/hw/dma/xilinx_axidma.c
+index 6065689ad1..3987b5ff96 100644
+--- a/hw/dma/xilinx_axidma.c
++++ b/hw/dma/xilinx_axidma.c
+@@ -554,9 +554,7 @@ static void xilinx_axidma_realize(DeviceState *dev, Error **errp)
+     return;
+ 
+ xilinx_axidma_realize_fail:
+-    if (!*errp) {
+-        *errp = local_err;
+-    }
++    error_propagate(errp, local_err);
+ }
+ 
+ static void xilinx_axidma_init(Object *obj)
+diff --git a/hw/net/xilinx_axienet.c b/hw/net/xilinx_axienet.c
+index b6701844d3..5ffa739f68 100644
+--- a/hw/net/xilinx_axienet.c
++++ b/hw/net/xilinx_axienet.c
+@@ -981,9 +981,7 @@ static void xilinx_enet_realize(DeviceState *dev, Error **errp)
+     return;
+ 
+ xilinx_enet_realize_fail:
+-    if (!*errp) {
+-        *errp = local_err;
+-    }
++    error_propagate(errp, local_err);
+ }
+ 
+ static void xilinx_enet_init(Object *obj)
+-- 
+2.11.0.259.g40922b1
