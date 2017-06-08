@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dJ1Ra-0002qK-BY
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 13:42:04 -0400
+	(envelope-from <armbru@redhat.com>) id 1dJ1St-00040e-GM
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 13:43:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dJ1RU-0004e1-RS
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 13:42:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35452)
+	(envelope-from <armbru@redhat.com>) id 1dJ1Sp-0005FI-3R
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 13:43:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44020)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dJ1RU-0004dm-Hi
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 13:41:56 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dJ1So-0005F2-Qb
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 13:43:19 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 266BABCD47
-	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 17:41:55 +0000 (UTC)
-Date: Thu, 8 Jun 2017 20:41:50 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170608204026-mutt-send-email-mst@kernel.org>
-References: <20170608161013.17920-1-lersek@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id CF3548F27A
+	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 17:43:17 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170607163635.17635-1-marcandre.lureau@redhat.com>
+	<20170607163635.17635-44-marcandre.lureau@redhat.com>
+Date: Thu, 08 Jun 2017 19:43:14 +0200
+In-Reply-To: <20170607163635.17635-44-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Wed, 7 Jun 2017
+	20:36:35 +0400")
+Message-ID: <87h8zq1ikt.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170608161013.17920-1-lersek@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] q35/mch: implement extended TSEG sizes
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 43/43] qobject: move dump_qobject() from
+ block/ to qobject/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,252 +36,345 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu devel list <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Thu, Jun 08, 2017 at 06:10:13PM +0200, Laszlo Ersek wrote:
-> The q35 machine type currently lets the guest firmware select a 1MB, 2MB
-> or 8MB TSEG (basically, SMRAM) size. In edk2/OVMF, we use 8MB, but even
-> that is not enough when a lot of VCPUs (more than approx. 224) are
-> configured -- SMRAM footprint scales largely proportionally with VCPU
-> count.
-> 
-> Introduce a new property for "mch" called "extended-tseg-mbytes", which
-> expresses (in megabytes) the user's choice of TSEG (SMRAM) size.
-> 
-> Invent a new, QEMU-specific register in the config space of the DRAM
-> Controller, at offset 0x50, in order to allow guest firmware to query the
-> TSEG (SMRAM) size.
-> 
-> According to Intel Document Number 316966-002, Table 5-1 "DRAM Controller
-> Register Address Map (D0:F0)":
-> 
->     Warning: Address locations that are not listed are considered Intel
->              Reserved registers locations. Reads to Reserved registers may
->              return non-zero values. Writes to reserved locations may
->              cause system failures.
-> 
->              All registers that are defined in the PCI 2.3 specification,
->              but are not necessary or implemented in this component are
->              simply not included in this document. The
->              reserved/unimplemented space in the PCI configuration header
->              space is not documented as such in this summary.
-> 
-> Offsets 0x50 and 0x51 are not listed in Table 5-1. They are also not part
-> of the standard PCI config space header. And they precede the capability
-> list as well, which starts at 0xe0 for this device.
-> 
-> When the guest writes value 0xffff to this register, the value that can be
-> read back is that of "mch.extended-tseg-mbytes" -- unless it remains
-> 0xffff. The guest is required to write 0xffff first (as opposed to a
-> read-only register) because PCI config space is generally not cleared on
-> QEMU reset, and after S3 resume or reboot, new guest firmware running on
-> old QEMU could read a guest OS-injected value from this register.
-> 
-> After reading the available "extended" TSEG size, the guest firmware may
-> actually request that TSEG size by writing pattern 11b to the ESMRAMC
-> register's TSEG_SZ bit-field. (The Intel spec referenced above defines
-> only patterns 00b (1MB), 01b (2MB) and 10b (8MB); 11b is reserved.)
-> 
-> On the QEMU command line, the value can be set with
-> 
->   -global mch.extended-tseg-mbytes=N
-> 
-> The default value for 2.10+ q35 machine types is 16. The value is limited
-> to 0xfff (4095) at the moment, purely so that the product (4095 MB) can be
-> stored to the uint32_t variable "tseg_size" in mch_update_smram(). Users
-> are responsible for choosing sensible TSEG sizes.
-> 
-> On 2.9 and earlier q35 machine types, the default value is 0. This lets
-> the 11b bit pattern in ESMRAMC.TSEG_SZ, and the register at offset 0x50,
-> keep their original behavior.
-> 
-> When "extended-tseg-mbytes" is nonzero, the new register at offset 0x50 is
-> set to that value on reset, for completeness.
-> 
-> PCI config space is migrated automatically, so no VMSD changes are
-> necessary.
-> 
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Ref: https://bugzilla.redhat.com/show_bug.cgi?id=1447027
-> Ref: https://lists.01.org/pipermail/edk2-devel/2017-May/010456.html
-> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-I really dislike negotiation being re-invented for each device.  Do we
-need these tricks?  Can we just do fw cfg with standard discovery?
-This ties in with my proposal to generalize smi features to
-generic ones.
-
-
+> The dump functions could be generally useful for any qobject user or for
+> debugging etc.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
-> 
-> Notes:
->     RFC->PATCH changes:
->     - This is an identical PATCH repost of the original RFC at
->       <http://lists.nongnu.org/archive/html/qemu-devel/2017-05/msg06912.html>;
->       I got the OVMF patches now.
-> 
->  include/hw/i386/pc.h      |  5 +++++
->  include/hw/pci-host/q35.h |  6 ++++++
->  hw/pci-host/q35.c         | 41 ++++++++++++++++++++++++++++++++++++++---
->  3 files changed, 49 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index d071c9c0e9cd..233216abdc1a 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -384,6 +384,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
->  
->  #define PC_COMPAT_2_9 \
->      HW_COMPAT_2_9 \
-> +    {\
-> +        .driver   = "mch",\
-> +        .property = "extended-tseg-mbytes",\
-> +        .value    = stringify(0),\
-> +    },\
->  
->  #define PC_COMPAT_2_8 \
->      HW_COMPAT_2_8 \
-> diff --git a/include/hw/pci-host/q35.h b/include/hw/pci-host/q35.h
-> index 53b6760c16c5..58983c00b32d 100644
-> --- a/include/hw/pci-host/q35.h
-> +++ b/include/hw/pci-host/q35.h
-> @@ -60,6 +60,7 @@ typedef struct MCHPCIState {
->      uint64_t above_4g_mem_size;
->      uint64_t pci_hole64_size;
->      uint32_t short_root_bus;
-> +    uint16_t ext_tseg_mbytes;
->  } MCHPCIState;
->  
->  typedef struct Q35PCIHost {
-> @@ -91,6 +92,11 @@ typedef struct Q35PCIHost {
->  /* D0:F0 configuration space */
->  #define MCH_HOST_BRIDGE_REVISION_DEFAULT       0x0
->  
-> +#define MCH_HOST_BRIDGE_EXT_TSEG_MBYTES        0x50
-> +#define MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_SIZE   2
-> +#define MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_QUERY  0xffff
-> +#define MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_MAX    0xfff
+>  include/qapi/qmp/qdict.h   |  2 ++
+>  include/qapi/qmp/qlist.h   |  2 ++
+>  include/qapi/qmp/qobject.h |  7 ++++
+>  block/qapi.c               | 90 +++-------------------------------------=
+------
+>  qobject/qdict.c            | 30 ++++++++++++++++
+>  qobject/qlist.c            | 23 ++++++++++++
+>  qobject/qobject.c          | 19 ++++++++++
+>  tests/check-qjson.c        | 19 ++++++++++
+>  8 files changed, 106 insertions(+), 86 deletions(-)
+>
+> diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
+> index 8c7c2b762b..1ef3bc8cda 100644
+> --- a/include/qapi/qmp/qdict.h
+> +++ b/include/qapi/qmp/qdict.h
+> @@ -91,4 +91,6 @@ QObject *qdict_crumple(const QDict *src, Error **errp);
+>=20=20
+>  void qdict_join(QDict *dest, QDict *src, bool overwrite);
+>=20=20
+> +char *qdict_to_string(QDict *dict, int indent);
 > +
->  #define MCH_HOST_BRIDGE_PCIEXBAR               0x60    /* 64bit register */
->  #define MCH_HOST_BRIDGE_PCIEXBAR_SIZE          8       /* 64bit register */
->  #define MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT       0xb0000000
-> diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
-> index cd5c49616ef9..28cb97b60fa3 100644
-> --- a/hw/pci-host/q35.c
-> +++ b/hw/pci-host/q35.c
-> @@ -134,7 +134,7 @@ static void q35_host_get_mmcfg_size(Object *obj, Visitor *v, const char *name,
->      visit_type_uint32(v, name, &value, errp);
+>  #endif /* QDICT_H */
+> diff --git a/include/qapi/qmp/qlist.h b/include/qapi/qmp/qlist.h
+> index c4b5fdad9b..c93ac3e15b 100644
+> --- a/include/qapi/qmp/qlist.h
+> +++ b/include/qapi/qmp/qlist.h
+> @@ -60,6 +60,8 @@ size_t qlist_size(const QList *qlist);
+>  QList *qobject_to_qlist(const QObject *obj);
+>  void qlist_destroy_obj(QObject *obj);
+>=20=20
+> +char *qlist_to_string(QList *list, int indent);
+> +
+>  static inline const QListEntry *qlist_first(const QList *qlist)
+>  {
+>      return QTAILQ_FIRST(&qlist->head);
+> diff --git a/include/qapi/qmp/qobject.h b/include/qapi/qmp/qobject.h
+> index b8ddbca405..0d6ae5048a 100644
+> --- a/include/qapi/qmp/qobject.h
+> +++ b/include/qapi/qmp/qobject.h
+> @@ -101,4 +101,11 @@ static inline QObject *qnull(void)
+>      return &qnull_;
 >  }
->  
-> -static Property mch_props[] = {
-> +static Property q35_host_props[] = {
->      DEFINE_PROP_UINT64(PCIE_HOST_MCFG_BASE, Q35PCIHost, parent_obj.base_addr,
->                          MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT),
->      DEFINE_PROP_SIZE(PCI_HOST_PROP_PCI_HOLE64_SIZE, Q35PCIHost,
-> @@ -154,7 +154,7 @@ static void q35_host_class_init(ObjectClass *klass, void *data)
->  
->      hc->root_bus_path = q35_host_root_bus_path;
->      dc->realize = q35_host_realize;
-> -    dc->props = mch_props;
-> +    dc->props = q35_host_props;
->      /* Reason: needs to be wired up by pc_q35_init */
->      dc->user_creatable = false;
->      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-> @@ -369,7 +369,7 @@ static void mch_update_smram(MCHPCIState *mch)
->              tseg_size = 1024 * 1024 * 8;
->              break;
->          default:
-> -            tseg_size = 0;
-> +            tseg_size = 1024 * 1024 * (uint32_t)mch->ext_tseg_mbytes;
->              break;
->          }
->      } else {
-> @@ -392,6 +392,17 @@ static void mch_update_smram(MCHPCIState *mch)
->      memory_region_transaction_commit();
->  }
->  
-> +static void mch_update_ext_tseg_mbytes(MCHPCIState *mch)
+>=20=20
+> +char *qobject_to_string_indent(QObject *obj, int indent);
+> +
+> +static inline char *qobject_to_string(QObject *obj)
 > +{
-> +    PCIDevice *pd = PCI_DEVICE(mch);
-> +    uint8_t *reg = pd->config + MCH_HOST_BRIDGE_EXT_TSEG_MBYTES;
-> +
-> +    if (mch->ext_tseg_mbytes > 0 &&
-> +        pci_get_word(reg) == MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_QUERY) {
-> +        pci_set_word(reg, mch->ext_tseg_mbytes);
-> +    }
+> +    return qobject_to_string_indent(obj, 0);
 > +}
 > +
->  static void mch_write_config(PCIDevice *d,
->                                uint32_t address, uint32_t val, int len)
->  {
-> @@ -413,6 +424,11 @@ static void mch_write_config(PCIDevice *d,
->                         MCH_HOST_BRIDGE_SMRAM_SIZE)) {
->          mch_update_smram(mch);
+>  #endif /* QOBJECT_H */
+> diff --git a/block/qapi.c b/block/qapi.c
+> index 2050df29e4..9b7d42e50a 100644
+> --- a/block/qapi.c
+> +++ b/block/qapi.c
+> @@ -586,101 +586,19 @@ void bdrv_snapshot_dump(fprintf_function func_fpri=
+ntf, void *f,
 >      }
-> +
-> +    if (ranges_overlap(address, len, MCH_HOST_BRIDGE_EXT_TSEG_MBYTES,
-> +                       MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_SIZE)) {
-> +        mch_update_ext_tseg_mbytes(mch);
-> +    }
 >  }
->  
->  static void mch_update(MCHPCIState *mch)
-> @@ -420,6 +436,7 @@ static void mch_update(MCHPCIState *mch)
->      mch_update_pciexbar(mch);
->      mch_update_pam(mch);
->      mch_update_smram(mch);
-> +    mch_update_ext_tseg_mbytes(mch);
->  }
->  
->  static int mch_post_load(void *opaque, int version_id)
-> @@ -457,6 +474,11 @@ static void mch_reset(DeviceState *qdev)
->      d->wmask[MCH_HOST_BRIDGE_SMRAM] = MCH_HOST_BRIDGE_SMRAM_WMASK;
->      d->wmask[MCH_HOST_BRIDGE_ESMRAMC] = MCH_HOST_BRIDGE_ESMRAMC_WMASK;
->  
-> +    if (mch->ext_tseg_mbytes > 0) {
-> +        pci_set_word(d->config + MCH_HOST_BRIDGE_EXT_TSEG_MBYTES,
-> +                     MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_QUERY);
-> +    }
-> +
->      mch_update(mch);
->  }
->  
-> @@ -465,6 +487,12 @@ static void mch_realize(PCIDevice *d, Error **errp)
->      int i;
->      MCHPCIState *mch = MCH_PCI_DEVICE(d);
->  
-> +    if (mch->ext_tseg_mbytes > MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_MAX) {
-> +        error_setg(errp, "invalid extended-tseg-mbytes value: %" PRIu16,
-> +                   mch->ext_tseg_mbytes);
-> +        return;
-> +    }
-> +
->      /* setup pci memory mapping */
->      pc_pci_as_mapping_init(OBJECT(mch), mch->system_memory,
->                             mch->pci_address_space);
-> @@ -530,6 +558,12 @@ uint64_t mch_mcfg_base(void)
->      return MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT;
->  }
->  
-> +static Property mch_props[] = {
-> +    DEFINE_PROP_UINT16("extended-tseg-mbytes", MCHPCIState, ext_tseg_mbytes,
-> +                       16),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
->  static void mch_class_init(ObjectClass *klass, void *data)
+>=20=20
+> -static void dump_qdict(fprintf_function func_fprintf, void *f, int inden=
+tation,
+> -                       QDict *dict);
+> -static void dump_qlist(fprintf_function func_fprintf, void *f, int inden=
+tation,
+> -                       QList *list);
+> -
+> -static void dump_qobject(fprintf_function func_fprintf, void *f,
+> -                         int comp_indent, QObject *obj)
+> -{
+> -    switch (qobject_type(obj)) {
+> -        case QTYPE_QNUM: {
+> -            QNum *value =3D qobject_to_qnum(obj);
+> -            char *tmp =3D qnum_to_string(value);
+> -            func_fprintf(f, "%s", tmp);
+> -            g_free(tmp);
+> -            break;
+> -        }
+> -        case QTYPE_QSTRING: {
+> -            QString *value =3D qobject_to_qstring(obj);
+> -            func_fprintf(f, "%s", qstring_get_str(value));
+> -            break;
+> -        }
+> -        case QTYPE_QDICT: {
+> -            QDict *value =3D qobject_to_qdict(obj);
+> -            dump_qdict(func_fprintf, f, comp_indent, value);
+> -            break;
+> -        }
+> -        case QTYPE_QLIST: {
+> -            QList *value =3D qobject_to_qlist(obj);
+> -            dump_qlist(func_fprintf, f, comp_indent, value);
+> -            break;
+> -        }
+> -        case QTYPE_QBOOL: {
+> -            QBool *value =3D qobject_to_qbool(obj);
+> -            func_fprintf(f, "%s", qbool_get_bool(value) ? "true" : "fals=
+e");
+> -            break;
+> -        }
+> -        default:
+> -            abort();
+> -    }
+> -}
+> -
+> -static void dump_qlist(fprintf_function func_fprintf, void *f, int inden=
+tation,
+> -                       QList *list)
+> -{
+> -    const QListEntry *entry;
+> -    int i =3D 0;
+> -
+> -    for (entry =3D qlist_first(list); entry; entry =3D qlist_next(entry)=
+, i++) {
+> -        QType type =3D qobject_type(entry->value);
+> -        bool composite =3D (type =3D=3D QTYPE_QDICT || type =3D=3D QTYPE=
+_QLIST);
+> -        func_fprintf(f, "%*s[%i]:%c", indentation * 4, "", i,
+> -                     composite ? '\n' : ' ');
+> -        dump_qobject(func_fprintf, f, indentation + 1, entry->value);
+> -        if (!composite) {
+> -            func_fprintf(f, "\n");
+> -        }
+> -    }
+> -}
+> -
+> -static void dump_qdict(fprintf_function func_fprintf, void *f, int inden=
+tation,
+> -                       QDict *dict)
+> -{
+> -    const QDictEntry *entry;
+> -
+> -    for (entry =3D qdict_first(dict); entry; entry =3D qdict_next(dict, =
+entry)) {
+> -        QType type =3D qobject_type(entry->value);
+> -        bool composite =3D (type =3D=3D QTYPE_QDICT || type =3D=3D QTYPE=
+_QLIST);
+> -        char *key =3D g_malloc(strlen(entry->key) + 1);
+> -        int i;
+> -
+> -        /* replace dashes with spaces in key (variable) names */
+> -        for (i =3D 0; entry->key[i]; i++) {
+> -            key[i] =3D entry->key[i] =3D=3D '-' ? ' ' : entry->key[i];
+> -        }
+> -        key[i] =3D 0;
+> -        func_fprintf(f, "%*s%s:%c", indentation * 4, "", key,
+> -                     composite ? '\n' : ' ');
+> -        dump_qobject(func_fprintf, f, indentation + 1, entry->value);
+> -        if (!composite) {
+> -            func_fprintf(f, "\n");
+> -        }
+> -        g_free(key);
+> -    }
+> -}
+> -
+>  void bdrv_image_info_specific_dump(fprintf_function func_fprintf, void *=
+f,
+>                                     ImageInfoSpecific *info_spec)
 >  {
->      PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-> @@ -538,6 +572,7 @@ static void mch_class_init(ObjectClass *klass, void *data)
->      k->realize = mch_realize;
->      k->config_write = mch_write_config;
->      dc->reset = mch_reset;
-> +    dc->props = mch_props;
->      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
->      dc->desc = "Host bridge";
->      dc->vmsd = &vmstate_mch;
-> -- 
-> 2.9.3
+>      QObject *obj, *data;
+>      Visitor *v =3D qobject_output_visitor_new(&obj);
+> +    char *tmp;
+>=20=20
+>      visit_type_ImageInfoSpecific(v, NULL, &info_spec, &error_abort);
+>      visit_complete(v, &obj);
+>      data =3D qdict_get(qobject_to_qdict(obj), "data");
+> -    dump_qobject(func_fprintf, f, 1, data);
+> +    tmp =3D qobject_to_string_indent(data, 1);
+> +    func_fprintf(f, "%s", tmp);
+> +    g_free(tmp);
+>      qobject_decref(obj);
+>      visit_free(v);
+>  }
+
+The title claims "move dump_qobject() from block/ to qobject/", but
+that's not what the patch does.  It *replaces* dump_qobject() by
+qobject_to_string().  The former dumps to a callback, the latter to a
+dynamic string buffer.
+
+Providing dump functionality in one way doesn't preclude the other way:
+given callback, one could define a callback that builds up a string
+buffer, and given buffer, one could (and you actually do) pass the
+buffer to a callback.  That's less efficient, though.
+
+Trading efficiency for ease-of-use should be okay here, but I'm cc'ing
+Max and Kevin to double-check.
+
+Two ways forward:
+
+1. Get Max / Kevin's blessing, change the commit message to match the
+code.
+
+2. Change the code to match the commit message.
+
+> diff --git a/qobject/qdict.c b/qobject/qdict.c
+> index 65069baa1b..7e5a945c5e 100644
+> --- a/qobject/qdict.c
+> +++ b/qobject/qdict.c
+> @@ -1055,3 +1055,33 @@ void qdict_join(QDict *dest, QDict *src, bool over=
+write)
+>          entry =3D next;
+>      }
+>  }
+> +
+> +char *qdict_to_string(QDict *dict, int indent)
+> +{
+> +    const QDictEntry *entry;
+> +    GString *str =3D g_string_new(NULL);
+> +
+> +    for (entry =3D qdict_first(dict); entry; entry =3D qdict_next(dict, =
+entry)) {
+> +        QType type =3D qobject_type(entry->value);
+> +        bool composite =3D (type =3D=3D QTYPE_QDICT || type =3D=3D QTYPE=
+_QLIST);
+> +        char *key =3D g_malloc(strlen(entry->key) + 1);
+> +        char *val =3D qobject_to_string_indent(entry->value, indent + 1);
+> +        int i;
+> +
+> +        /* replace dashes with spaces in key (variable) names */
+> +        for (i =3D 0; entry->key[i]; i++) {
+> +            key[i] =3D entry->key[i] =3D=3D '-' ? ' ' : entry->key[i];
+> +        }
+> +        key[i] =3D 0;
+> +        g_string_append_printf(str, "%*s%s:", indent * 4, "", key);
+> +        g_string_append_c(str, composite ? '\n' : ' ');
+> +        g_string_append(str, val);
+> +        if (!composite) {
+> +            g_string_append_c(str, '\n');
+> +        }
+> +        g_free(val);
+> +        g_free(key);
+> +    }
+> +
+> +    return g_string_free(str, false);
+> +}
+> diff --git a/qobject/qlist.c b/qobject/qlist.c
+> index 86b60cb88c..b769248290 100644
+> --- a/qobject/qlist.c
+> +++ b/qobject/qlist.c
+> @@ -158,3 +158,26 @@ void qlist_destroy_obj(QObject *obj)
+>=20=20
+>      g_free(qlist);
+>  }
+> +
+> +char *qlist_to_string(QList *list, int indent)
+> +{
+> +    GString *str =3D g_string_new(NULL);
+> +    const QListEntry *entry;
+> +    int i =3D 0;
+> +
+> +    for (entry =3D qlist_first(list); entry; entry =3D qlist_next(entry)=
+, i++) {
+> +        QType type =3D qobject_type(entry->value);
+> +        bool composite =3D (type =3D=3D QTYPE_QDICT || type =3D=3D QTYPE=
+_QLIST);
+> +        char *val =3D qobject_to_string_indent(entry->value, indent + 1);
+> +
+> +        g_string_append_printf(str, "%*s[%i]:", indent * 4, "", i);
+> +        g_string_append_c(str, composite ? '\n' : ' ');
+> +        g_string_append(str, val);
+> +        if (!composite) {
+> +            g_string_append_c(str, '\n');
+> +        }
+> +        g_free(val);
+> +    }
+> +
+> +    return g_string_free(str, false);
+> +}
+> diff --git a/qobject/qobject.c b/qobject/qobject.c
+> index b0cafb66f1..64e959c54f 100644
+> --- a/qobject/qobject.c
+> +++ b/qobject/qobject.c
+> @@ -27,3 +27,22 @@ void qobject_destroy(QObject *obj)
+>      assert(QTYPE_QNULL < obj->type && obj->type < QTYPE__MAX);
+>      qdestroy[obj->type](obj);
+>  }
+> +
+> +char *qobject_to_string_indent(QObject *obj, int indent)
+> +{
+> +    switch (qobject_type(obj)) {
+> +    case QTYPE_QNUM:
+> +        return qnum_to_string(qobject_to_qnum(obj));
+> +    case QTYPE_QSTRING:
+> +        return g_strdup(qstring_get_str(qobject_to_qstring(obj)));
+> +    case QTYPE_QDICT:
+> +        return qdict_to_string(qobject_to_qdict(obj), indent);
+> +    case QTYPE_QLIST:
+> +        return qlist_to_string(qobject_to_qlist(obj), indent);
+> +    case QTYPE_QBOOL:
+> +        return g_strdup(qbool_get_bool(qobject_to_qbool(obj)) ?
+> +                        "true" : "false");
+> +    default:
+> +        abort();
+> +    }
+> +}
+> diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+> index 53f2275b9b..dd3c102bc0 100644
+> --- a/tests/check-qjson.c
+> +++ b/tests/check-qjson.c
+> @@ -1372,6 +1372,23 @@ static void simple_whitespace(void)
+>      }
+>  }
+>=20=20
+> +static void qobject_to_string_test(void)
+> +{
+> +    QObject *obj;
+> +    char *tmp;
+> +
+> +    obj =3D qobject_from_json("[ 43, { 'c': { 'd' : 12 } }, [ 1, 2 ], 42=
+ ]",
+> +                            &error_abort);
+> +    tmp =3D qobject_to_string(obj);
+> +    g_assert_cmpstr(tmp, =3D=3D,
+> +                    "[0]: 43\n"
+> +                    "[1]:\n    c:\n        d: 12\n"
+> +                    "[2]:\n    [0]: 1\n    [1]: 2\n"
+> +                    "[3]: 42\n");
+> +    g_free(tmp);
+> +    qobject_decref(obj);
+> +}
+> +
+>  static void simple_varargs(void)
+>  {
+>      QObject *embedded_obj;
+> @@ -1545,5 +1562,7 @@ int main(int argc, char **argv)
+>      g_test_add_func("/errors/unterminated/literal", unterminated_literal=
+);
+>      g_test_add_func("/errors/limits/nesting", limits_nesting);
+>=20=20
+> +    g_test_add_func("/qobject/to_string", qobject_to_string_test);
+> +
+>      return g_test_run();
+>  }
