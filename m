@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dIuS6-0008NV-DK
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 06:14:07 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dIuSu-0000UY-Rj
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 06:14:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dIuS1-0005zZ-CO
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 06:14:06 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:33119)
+	(envelope-from <stefanha@gmail.com>) id 1dIuSt-0006Qp-Dc
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 06:14:56 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:35550)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dIuS1-0005y0-4l
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 06:14:01 -0400
-Received: by mail-wm0-x231.google.com with SMTP id m7so36991942wmg.0
-	for <qemu-devel@nongnu.org>; Thu, 08 Jun 2017 03:14:01 -0700 (PDT)
-Date: Thu, 8 Jun 2017 11:13:57 +0100
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dIuSt-0006P8-6h
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 06:14:55 -0400
+Received: by mail-wm0-x232.google.com with SMTP id x70so74195137wme.0
+	for <qemu-devel@nongnu.org>; Thu, 08 Jun 2017 03:14:55 -0700 (PDT)
+Date: Thu, 8 Jun 2017 11:14:52 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170608101357.GB4145@stefanha-x1.localdomain>
+Message-ID: <20170608101452.GC4145@stefanha-x1.localdomain>
 References: <CAJSP0QVzoN=2rv_HUNf0oR_FQg=5xJ9UQbLqq0rj8OuYb8ZByw@mail.gmail.com>
-	<eb4f47f8-ed16-f59b-4adc-1e4e94cadf7d@de.ibm.com>
-	<20170531130638.GF16733@stefanha-x1.localdomain>
-	<CAJ+F1CJOMMOiPqkSaSNzD6F7=DJBQVojKkz6UNkqgLbVSa5vfg@mail.gmail.com>
+	<CAFEAcA-AjqsFnk8O3vVO-zhWwowfgZuJi0PWgezPO6K-Ye2cqw@mail.gmail.com>
+	<87zidtrr5a.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Yylu36WmvOXNoKYn"
+	protocol="application/pgp-signature"; boundary="QRj9sO5tAVLaXnSD"
 Content-Disposition: inline
-In-Reply-To: <CAJ+F1CJOMMOiPqkSaSNzD6F7=DJBQVojKkz6UNkqgLbVSa5vfg@mail.gmail.com>
+In-Reply-To: <87zidtrr5a.fsf@linaro.org>
 Subject: Re: [Qemu-devel] [RFC] QEMU 2.10 release schedule
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -32,62 +31,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel <qemu-devel@nongnu.org>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel <qemu-devel@nongnu.org>
 
 
---Yylu36WmvOXNoKYn
+--QRj9sO5tAVLaXnSD
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 07, 2017 at 06:24:24PM +0000, Marc-Andr=E9 Lureau wrote:
-> Hi
+On Wed, May 31, 2017 at 04:18:41PM +0100, Alex Benn=E9e wrote:
 >=20
-> On Wed, May 31, 2017 at 5:07 PM Stefan Hajnoczi <stefanha@gmail.com> wrot=
-e:
+> Peter Maydell <peter.maydell@linaro.org> writes:
 >=20
-> > On Tue, May 30, 2017 at 01:21:01PM +0200, Christian Borntraeger wrote:
-> > > On 05/30/2017 12:11 PM, Stefan Hajnoczi wrote:
-> > > > Here is a first stab at the next release schedule:
-> > > >
-> > > > Beginning of development phase: 2017-04-20
-> > > > Soft feature freeze: 2017-07-18
-> > > > -rc0: 2017-07-25
-> > > > -rc1: 2017-08-01
-> > > > -rc2: 2017-08-08
-> > > > -rc3: 2017-08-15
-> > > > -rc4: 2017-08-22
-> > > >
-> > >
-> > > - rc4/release or really only rc4?
+> > On 30 May 2017 at 11:11, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> >> Here is a first stab at the next release schedule:
+> >>
+> >> Beginning of development phase: 2017-04-20
+> >> Soft feature freeze: 2017-07-18
+> >> -rc0: 2017-07-25
+> >> -rc1: 2017-08-01
+> >> -rc2: 2017-08-08
+> >> -rc3: 2017-08-15
+> >> -rc4: 2017-08-22
 > >
-> > I had rc4/release in mind.
+> > Are we going with the same definitions of soft/hard freeze
+> > as last time around?
 > >
+> > (I thought last release was a complete mess in terms of
+> > getting code in in an orderly manner for the freeze,
+> > personally...)
 >=20
-> Can we put that preliminary schedule on the wiki?
-> http://wiki.qemu.org/Planning/2.10
+> Do we want to have a broad plan for the order things need to go in
+> before the feature freeze or stick to a first to the gate approach?
+>=20
+> Obviously we don't want to stall the process waiting for delayed series
+> that might end up getting dropped but having the broad sketches might
+> make it easier for developers to prioritise what patches queues to drain
+> first?
 
-Yes, I have posted the schedule on the wiki:
-http://wiki.qemu.org/Planning/2.10
-
-No one had concerns about the dates so I think we can consider them
-final.
+Any further thoughts on this?  Otherwise we can default to the way
+things were done in previous releases.
 
 Stefan
 
---Yylu36WmvOXNoKYn
+--QRj9sO5tAVLaXnSD
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJZOSNlAAoJEJykq7OBq3PI0LoIALj/teHSrsBkHa6F/IDTUU4i
-he+z0W1wGKC7ltjuUO/dz1TTOKEJImIQgRmP/MiZSIq3Bx/bByf77P+qUZpjB9UL
-QpPTPJJRzmShBlDTRK44pDJ11aVOmv85Kka8NTBf5qnvDV+x1ay1A3VxLI7tgyVl
-AqQiVzgu/PntanAey+z8unylNmh376iWHyd7hjY6+uJDBlD16vqbC6VPyfk69k32
-HpKp+29VCtfkWNx7skTkKLOEGB3oFV35s0kR1s2WMIcp6PQ/l3P0+5E15drcSbPt
-IT2AkMm98tQYJE1J08qHxMgQpDPVSMOT8FxuHRxTFK1Ag3+sEL4oZWOTePDQYAI=
-=X5jq
+iQEcBAEBAgAGBQJZOSOcAAoJEJykq7OBq3PIT6QH/RDtw5dgFA7xzkOdkk0+ssb5
+KbnYNyHZnSiP6tz3wmeF/uDLU6dL+fWbFCFUSOzG8bavLkzhGZanedm4i4mj6cqa
+CoiyIoVQEYdy91SKDD6xr8YxXoXV4MmVrMHMkuHMcieOlGRTsFTyAd9o6b9ywEQZ
+r2oX7pknox/h0236U4y4nPK1PQj2cokAchCbMLW8ozDbEonOMjpx1QUV/vBxab7V
+UjhfhhyD/JXAvx0BOqnHDYq1Awh+fPYREFA9cynAo0bUuEgQEUSAfm4yh+gELgtb
+9b6JQN+fj1MBwsbyffDNrZkWAlGEGzJA7A8+3viCliECI+r8929F9kw2rZMDCfU=
+=rLbu
 -----END PGP SIGNATURE-----
 
---Yylu36WmvOXNoKYn--
+--QRj9sO5tAVLaXnSD--
