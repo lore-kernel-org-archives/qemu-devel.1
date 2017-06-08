@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dItcR-000709-Jx
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:20:44 -0400
+	(envelope-from <wang.yong155@zte.com.cn>) id 1dIte6-00084M-GV
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:22:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dItcO-0000dH-H6
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:20:43 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:33463)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dItcO-0000cu-8g
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:20:40 -0400
-Received: by mail-wm0-x231.google.com with SMTP id m7so36766048wmg.0
-	for <qemu-devel@nongnu.org>; Thu, 08 Jun 2017 02:20:40 -0700 (PDT)
-References: <1496899257-25800-1-git-send-email-thuth@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1496899257-25800-1-git-send-email-thuth@redhat.com>
-Date: Thu, 08 Jun 2017 10:21:05 +0100
-Message-ID: <8760g6deda.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] vl: Fix broken thread=xxx option of the
- --accel parameter
+	(envelope-from <wang.yong155@zte.com.cn>) id 1dIte3-0000vO-BW
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:22:26 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:49920)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <wang.yong155@zte.com.cn>) id 1dIte2-0000ur-5k
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:22:23 -0400
+Date: Thu, 8 Jun 2017 17:21:09 +0800 (CST)
+Message-ID: <201706081721097319444@zte.com.cn>
+References: 1496659493-1105-1-git-send-email-wang.yong155@zte.com.cn,
+	ba2f1089-add7-63ca-8406-fde640cc02bf@redhat.com
+Mime-Version: 1.0
+From: <wang.yong155@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64 
+Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBSZTogW1BBVENIdjIgMDQvMDRdIGNv?=
+ =?utf-8?q?lo-compare=3A_Update_the_COLO_document_to_fix_theprocessing_of_?=
+ =?utf-8?q?secondary_packets_in_the_main_thread?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,70 +29,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Emilio G Cota <cota@braap.org>
+To: jasowang@redhat.com, zhang.zhanghailiang@huawei.com
+Cc: zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com, qemu-devel@nongnu.org, wang.guang55@zte.com.cn
 
-
-Thomas Huth <thuth@redhat.com> writes:
-
-> Commit bde4d9205 ("Fix the -accel parameter and the documentation for
-> 'hax'") introduced a regression by adding a new local accel_opts
-> variable which shadows the variable with the same name that is
-> declared at the beginning of the main() scope. This causes the
-> qemu_tcg_configure() call later to be always called with NULL, so
-> that the thread=xxx option gets ignored. Fix it by removing the
-> local accel_opts variable and use "opts" instead, which is meant
-> for storing temporary QemuOpts values.
-> And while we're at it, also change the exit(1) here to exit(0)
-> since asking for help is not an error.
->
-> Fixes: bde4d9205ee9def98852ff6054cdef4efd74e1f8
-> Reported-by: Markus Armbruster <armbru@redhat.com>
-> Reported-by: Emilio G. Cota <cota@braap.org>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Tested-by: Alex Bennée <alex.bennee@linaro.org>
-
-I'll leave the wider question of a better layout to the QemuOpts experts
-(I was/am very much an amateur when I first added the thread option).
-
-> ---
->  vl.c | 13 +++++--------
->  1 file changed, 5 insertions(+), 8 deletions(-)
->
-> diff --git a/vl.c b/vl.c
-> index be4dcf2..5aba544 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -3757,21 +3757,18 @@ int main(int argc, char **argv, char **envp)
->                  qdev_prop_register_global(&kvm_pit_lost_tick_policy);
->                  break;
->              }
-> -            case QEMU_OPTION_accel: {
-> -                QemuOpts *accel_opts;
-> -
-> +            case QEMU_OPTION_accel:
->                  accel_opts = qemu_opts_parse_noisily(qemu_find_opts("accel"),
->                                                       optarg, true);
->                  optarg = qemu_opt_get(accel_opts, "accel");
->                  if (!optarg || is_help_option(optarg)) {
->                      error_printf("Possible accelerators: kvm, xen, hax, tcg\n");
-> -                    exit(1);
-> +                    exit(0);
->                  }
-> -                accel_opts = qemu_opts_create(qemu_find_opts("machine"), NULL,
-> -                                              false, &error_abort);
-> -                qemu_opt_set(accel_opts, "accel", optarg, &error_abort);
-> +                opts = qemu_opts_create(qemu_find_opts("machine"), NULL,
-> +                                        false, &error_abort);
-> +                qemu_opt_set(opts, "accel", optarg, &error_abort);
->                  break;
-> -            }
->              case QEMU_OPTION_usb:
->                  olist = qemu_find_opts("machine");
->                  qemu_opts_parse_noisily(olist, "usb=on", false);
-
-
---
-Alex Bennée
+77ye77yeIEZyb206IFdhbmcgWW9uZyDvvJx3YW5nLnlvbmcxNTVAenRlLmNvbS5jbu+8ng0KDQrv
+vJ7vvJ4NCg0K77ye77yeIEluIG15IHRlc3QsIHNlY29uZGFyeSBkb2VzIG5vdCBwcm9jZXNzIHRo
+ZSBwYWNrZXRzIGNvbXBhcmluZyBpbiB0aGUgSU9UaHJlYWQNCg0K77ye77yeIGJ1dCBpbiB0aGUg
+cWVtdSBtYWluIHRocmVhZCBwcm9jZXNzaW5nLg0KDQrvvJ7vvJ4gc2Vjb25kYXJ5J3MgY29uZmln
+dXJhdGlvbiAiIC1jaGFyZGV2IHNvY2tldCxpZD1jb21wYXJlMSxob3N0PTMuMy4zLjMscG9ydD05
+MDA0LHNlcnZlcixub3dhaXQiDQoNCu+8nu+8niBoZXJlLHdlIHNob3VsZCB1c2UgJ3dhaXQnIGlu
+c3RlYWQgb2YgJ25vd2FpdCcgY29uZmlndXJhdGlvbiAuDQoNCu+8nu+8niBhZnRlciB1c2UgICd3
+YWl0JyBjb25maWd1cmF0aW9uICxwYWNrZXRzIGNhbiBiZSBwcm9jZXNzIGluIHRoZSBJT1RocmVh
+ZCBmcm9tIHRoZSBzZWNvbmRhcnksDQoNCu+8nu+8niBub3QgaW4gdGhlIHFlbXUgbWFpbiB0aHJl
+YWQuDQoNCu+8nu+8ng0KDQrvvJ7vvJ4gU2lnbmVkLW9mZi1ieTogV2FuZyBZb25n77ycd2FuZy55
+b25nMTU1QHp0ZS5jb20uY27vvJ4NCg0K77ye77yeIFNpZ25lZC1vZmYtYnk6IFdhbmcgR3Vhbmfv
+vJx3YW5nLmd1YW5nNTVAenRlLmNvbS5jbu+8ng0KDQrvvJ7vvJ4gLS0tDQoNCg0KDQoNCu+8nlRo
+aXMgaXMgYSBoaW50IHByb2JhYmx5IGZvciBzb21ldGhpbmcgd3JvbmcgaW4gdGhlIGNvZGUuIE5l
+ZWQgdG8gZmlndXJlIA0KDQrvvJ5vdXQgdGhlIHJvb3QgY2F1c2UuDQoNCg0KDQoNCkkgdGhpbmsg
+dGhpcyBpcyBub3QgYSBCVUcgYnV0IGNvbmZpZ3VyYXRpb24gcHJvYmxlbS4NCg0KdGhlbiB0aGlz
+IHNlcmllcyBjYW4gbm90IHN1Ym1pdCB0aGlzIHBhdGNoLg0KDQoNCg0KDQpUaGFua3MNCg0KDQoN
+Cg0K77yeVGhhbmtzDQoNCg0KDQoNCu+8nu+8niAgIGRvY3MvY29sby1wcm94eS50eHQgfCAyICst
+DQoNCu+8nu+8niAgIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlvbigt
+KQ0KDQrvvJ7vvJ4NCg0K77ye77yeIGRpZmYgLS1naXQgYS9kb2NzL2NvbG8tcHJveHkudHh0IGIv
+ZG9jcy9jb2xvLXByb3h5LnR4dA0KDQrvvJ7vvJ4gaW5kZXggY2UzZjc4My4uNTY3Y2M4YiAxMDA2
+NDQNCg0K77ye77yeIC0tLSBhL2RvY3MvY29sby1wcm94eS50eHQNCg0K77ye77yeICsrKyBiL2Rv
+Y3MvY29sby1wcm94eS50eHQNCg0K77ye77yeIEBAIC0xNjUsNyArMTY1LDcgQEAgUHJpbWFyeShp
+cDozLjMuMy4zKToNCg0K77ye77yeICAgLW5ldGRldiB0YXAsaWQ9aG4wLHZob3N0PW9mZixzY3Jp
+cHQ9L2V0Yy9xZW11LWlmdXAsZG93bnNjcmlwdD0vZXRjL3FlbXUtaWZkb3duDQoNCu+8nu+8niAg
+IC1kZXZpY2UgZTEwMDAsaWQ9ZTAsbmV0ZGV2PWhuMCxtYWM9NTI6YTQ6MDA6MTI6Nzg6NjYNCg0K
+77ye77yeICAgLWNoYXJkZXYgc29ja2V0LGlkPW1pcnJvcjAsaG9zdD0zLjMuMy4zLHBvcnQ9OTAw
+MyxzZXJ2ZXIsbm93YWl0DQoNCu+8nu+8niAtLWNoYXJkZXYgc29ja2V0LGlkPWNvbXBhcmUxLGhv
+c3Q9My4zLjMuMyxwb3J0PTkwMDQsc2VydmVyLG5vd2FpdA0KDQrvvJ7vvJ4gKy1jaGFyZGV2IHNv
+Y2tldCxpZD1jb21wYXJlMSxob3N0PTMuMy4zLjMscG9ydD05MDA0LHNlcnZlcix3YWl0DQoNCu+8
+nu+8niAgIC1jaGFyZGV2IHNvY2tldCxpZD1jb21wYXJlMCxob3N0PTMuMy4zLjMscG9ydD05MDAx
+LHNlcnZlcixub3dhaXQNCg0K77ye77yeICAgLWNoYXJkZXYgc29ja2V0LGlkPWNvbXBhcmUwLTAs
+aG9zdD0zLjMuMy4zLHBvcnQ9OTAwMQ0KDQrvvJ7vvJ4gICAtY2hhcmRldiBzb2NrZXQsaWQ9Y29t
+cGFyZV9vdXQsaG9zdD0zLjMuMy4zLHBvcnQ9OTAwNSxzZXJ2ZXIsbm93YWkNCg0KDQoNCg0KDQoN
+Cg0KDQoNCg0KDQoNCg0KDQoNCuWOn+Wni+mCruS7tg0KDQoNCg0K5Y+R5Lu25Lq677yaIO+8nGph
+c293YW5nQHJlZGhhdC5jb23vvJ4NCuaUtuS7tuS6uu+8mueOi+WLhzEwMTcwNTMwIO+8nHpoYW5n
+LnpoYW5naGFpbGlhbmdAaHVhd2VpLmNvbe+8niDvvJx6aGFuZ2NoZW4uZm5zdEBjbi5mdWppdHN1
+LmNvbe+8ng0K5oqE6YCB5Lq677yaIO+8nGxpemhpamlhbkBjbi5mdWppdHN1LmNvbe+8niDvvJxx
+ZW11LWRldmVsQG5vbmdudS5vcmfvvJ7njovlub8xMDE2NTk5Mg0K5pelIOacnyDvvJoyMDE35bm0
+MDbmnIgwN+aXpSAxNjozNw0K5Li7IOmimCDvvJpSZTogW1BBVENIdjIgMDQvMDRdIGNvbG8tY29t
+cGFyZTogVXBkYXRlIHRoZSBDT0xPIGRvY3VtZW50IHRvIGZpeCB0aGVwcm9jZXNzaW5nIG9mIHNl
+Y29uZGFyeSBwYWNrZXRzIGluIHRoZSBtYWluIHRocmVhZA0KDQoNCg0KDQoNCg0KDQpPbiAyMDE3
+5bm0MDbmnIgwNeaXpSAxODo0NCwgWW9uZyBXYW5nIHdyb3RlOg0K77yeIEZyb206IFdhbmcgWW9u
+ZyDvvJx3YW5nLnlvbmcxNTVAenRlLmNvbS5jbu+8ng0K77yeDQrvvJ4gSW4gbXkgdGVzdCwgc2Vj
+b25kYXJ5IGRvZXMgbm90IHByb2Nlc3MgdGhlIHBhY2tldHMgY29tcGFyaW5nIGluIHRoZSBJT1Ro
+cmVhZA0K77yeIGJ1dCBpbiB0aGUgcWVtdSBtYWluIHRocmVhZCBwcm9jZXNzaW5nLg0K77yeIHNl
+Y29uZGFyeSdzIGNvbmZpZ3VyYXRpb24gIiAtY2hhcmRldiBzb2NrZXQsaWQ9Y29tcGFyZTEsaG9z
+dD0zLjMuMy4zLHBvcnQ9OTAwNCxzZXJ2ZXIsbm93YWl0Ig0K77yeIGhlcmUsd2Ugc2hvdWxkIHVz
+ZSAnd2FpdCcgaW5zdGVhZCBvZiAnbm93YWl0JyBjb25maWd1cmF0aW9uIC4NCu+8niBhZnRlciB1
+c2UgICd3YWl0JyBjb25maWd1cmF0aW9uICxwYWNrZXRzIGNhbiBiZSBwcm9jZXNzIGluIHRoZSBJ
+T1RocmVhZCBmcm9tIHRoZSBzZWNvbmRhcnksDQrvvJ4gbm90IGluIHRoZSBxZW11IG1haW4gdGhy
+ZWFkLg0K77yeDQrvvJ4gU2lnbmVkLW9mZi1ieTogV2FuZyBZb25n77ycd2FuZy55b25nMTU1QHp0
+ZS5jb20uY27vvJ4NCu+8niBTaWduZWQtb2ZmLWJ5OiBXYW5nIEd1YW5n77ycd2FuZy5ndWFuZzU1
+QHp0ZS5jb20uY27vvJ4NCu+8niAtLS0NCg0KVGhpcyBpcyBhIGhpbnQgcHJvYmFibHkgZm9yIHNv
+bWV0aGluZyB3cm9uZyBpbiB0aGUgY29kZS4gTmVlZCB0byBmaWd1cmUgDQpvdXQgdGhlIHJvb3Qg
+Y2F1c2UuDQoNClRoYW5rcw0KDQrvvJ4gICBkb2NzL2NvbG8tcHJveHkudHh0IHwgMiArLQ0K77ye
+ICAgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0pDQrvvJ4NCu+8
+niBkaWZmIC0tZ2l0IGEvZG9jcy9jb2xvLXByb3h5LnR4dCBiL2RvY3MvY29sby1wcm94eS50eHQN
+Cu+8niBpbmRleCBjZTNmNzgzLi41NjdjYzhiIDEwMDY0NA0K77yeIC0tLSBhL2RvY3MvY29sby1w
+cm94eS50eHQNCu+8niArKysgYi9kb2NzL2NvbG8tcHJveHkudHh0DQrvvJ4gQEAgLTE2NSw3ICsx
+NjUsNyBAQCBQcmltYXJ5KGlwOjMuMy4zLjMpOg0K77yeICAgLW5ldGRldiB0YXAsaWQ9aG4wLHZo
+b3N0PW9mZixzY3JpcHQ9L2V0Yy9xZW11LWlmdXAsZG93bnNjcmlwdD0vZXRjL3FlbXUtaWZkb3du
+DQrvvJ4gICAtZGV2aWNlIGUxMDAwLGlkPWUwLG5ldGRldj1objAsbWFjPTUyOmE0OjAwOjEyOjc4
+OjY2DQrvvJ4gICAtY2hhcmRldiBzb2NrZXQsaWQ9bWlycm9yMCxob3N0PTMuMy4zLjMscG9ydD05
+MDAzLHNlcnZlcixub3dhaXQNCu+8niAtLWNoYXJkZXYgc29ja2V0LGlkPWNvbXBhcmUxLGhvc3Q9
+My4zLjMuMyxwb3J0PTkwMDQsc2VydmVyLG5vd2FpdA0K77yeICstY2hhcmRldiBzb2NrZXQsaWQ9
+Y29tcGFyZTEsaG9zdD0zLjMuMy4zLHBvcnQ9OTAwNCxzZXJ2ZXIsd2FpdA0K77yeICAgLWNoYXJk
+ZXYgc29ja2V0LGlkPWNvbXBhcmUwLGhvc3Q9My4zLjMuMyxwb3J0PTkwMDEsc2VydmVyLG5vd2Fp
+dA0K77yeICAgLWNoYXJkZXYgc29ja2V0LGlkPWNvbXBhcmUwLTAsaG9zdD0zLjMuMy4zLHBvcnQ9
+OTAwMQ0K77yeICAgLWNoYXJkZXYgc29ja2V0LGlkPWNvbXBhcmVfb3V0LGhvc3Q9My4zLjMuMyxw
+b3J0PTkwMDUsc2VydmVyLG5vd2FpdA==
