@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dItJv-0007dC-KF
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:01:36 -0400
+	(envelope-from <groug@kaod.org>) id 1dItRA-0001ef-1y
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:09:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dItJs-0001US-Hx
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:01:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42510)
+	(envelope-from <groug@kaod.org>) id 1dItR6-0004yY-U7
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:09:04 -0400
+Received: from 8.mo178.mail-out.ovh.net ([46.105.74.227]:53259)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dItJs-0001UA-9f
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:01:32 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 142CCC04B92D
-	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 09:01:31 +0000 (UTC)
-Date: Thu, 8 Jun 2017 10:01:23 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170608090123.GA2082@work-vm>
-References: <20170607124359.79478-1-marcel@redhat.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dItR6-0004wv-Np
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:09:00 -0400
+Received: from player728.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 157153CD51
+	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 11:08:59 +0200 (CEST)
+Date: Thu, 8 Jun 2017 11:08:53 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170608110853.115fa1f8@bahia.ttt.fr.ibm.com>
+In-Reply-To: <20170608035921.GU13397@umbus.fritz.box>
+References: <149685579678.12025.9278446121024037161.stgit@bahia.lan>
+	<149685583778.12025.272004316108066026.stgit@bahia.lan>
+	<20170608035921.GU13397@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170607124359.79478-1-marcel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V2] hw/pcie: fix the generic pcie root port
- to support migration
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/HBkBL8G2=_svYkit1F=rMFM";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v3 4/5] xics: directly register ICPState
+ objects to vmstate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,122 +33,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>
 
-* Marcel Apfelbaum (marcel@redhat.com) wrote:
-> Add msix state to pcie-root-ports's vmstate
-> in order to support migration.
-> 
-> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
-> ---
-> v1 -> v2:
->  - Added x-migrate-msix compat property to avoid
->    breaking migration (Dave)
-> 
->  hw/pci-bridge/gen_pcie_root_port.c | 25 +++++++++++++++++++++++++
->  include/hw/compat.h                |  4 ++++
->  2 files changed, 29 insertions(+)
-> 
-> diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
-> index 8ebffa8..cb694d6 100644
-> --- a/hw/pci-bridge/gen_pcie_root_port.c
-> +++ b/hw/pci-bridge/gen_pcie_root_port.c
-> @@ -20,6 +20,14 @@
->  #define GEN_PCIE_ROOT_PORT_AER_OFFSET           0x100
->  #define GEN_PCIE_ROOT_PORT_MSIX_NR_VECTOR       1
->  
-> +typedef struct GenPCIERootPort {
-> +    /*< private >*/
-> +    PCIESlot parent_obj;
-> +    /*< public >*/
-> +
-> +    bool migrate_msix;
-> +} GenPCIERootPort;
-> +
->  static uint8_t gen_rp_aer_vector(const PCIDevice *d)
->  {
->      return 0;
-> @@ -45,6 +53,13 @@ static void gen_rp_interrupts_uninit(PCIDevice *d)
->      msix_uninit_exclusive_bar(d);
->  }
->  
-> +static bool gen_rp_test_migrate_msix(void *opaque, int version_id)
-> +{
-> +    GenPCIERootPort *rp = opaque;
-> +
-> +    return rp->migrate_msix;
-> +}
-> +
->  static const VMStateDescription vmstate_rp_dev = {
->      .name = "pcie-root-port",
->      .version_id = 1,
-> @@ -54,10 +69,18 @@ static const VMStateDescription vmstate_rp_dev = {
->          VMSTATE_PCI_DEVICE(parent_obj.parent_obj.parent_obj, PCIESlot),
->          VMSTATE_STRUCT(parent_obj.parent_obj.parent_obj.exp.aer_log,
->                         PCIESlot, 0, vmstate_pcie_aer_log, PCIEAERLog),
-> +        VMSTATE_MSIX_TEST(parent_obj.parent_obj.parent_obj.parent_obj,
-> +                          GenPCIERootPort,
-> +                          gen_rp_test_migrate_msix),
+--Sig_/HBkBL8G2=_svYkit1F=rMFM
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-So that's  GenPCIERootPort,
-    parent_obj is PCIESlot
-    parent_obj is PCIEPort
-    parent_obj is PCIEBridge
-    parent_obj is PCIDevice
+On Thu, 8 Jun 2017 13:59:21 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-and msix_save is expecting a PCIDevice, so yep.
+> On Wed, Jun 07, 2017 at 07:17:17PM +0200, Greg Kurz wrote:
+> > The ICPState objects are currently registered to vmstate as qdev object=
+s.
+> > Their instance ids are hence computed automatically in the migration co=
+de,
+> > and thus depends on the order the CPU cores were plugged.
+> >=20
+> > If the destination had its CPU cores plugged in a different order than =
+the
+> > source, then ICPState objects will have different instance_ids and load
+> > the wrong state.
+> >=20
+> > Since CPU objects have a reliable cpu_index which is already used as
+> > instance_id in vmstate, let's use it for ICPState as well.
+> >=20
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  hw/intc/xics.c |    5 ++++-
+> >  1 file changed, 4 insertions(+), 1 deletion(-) =20
+>=20
+> So, this is definitely a good idea w.r.t. future compatibility.  But,
+> won't it break migration compat as a once off, since the devices will
+> be found under their new id instead of the qdev id?
+>=20
 
->          VMSTATE_END_OF_LIST()
->      }
->  };
->  
-> +static Property gen_rp_props[] = {
-> +    DEFINE_PROP_BOOL("x-migrate-msix", GenPCIERootPort, migrate_msix, true),
-> +    DEFINE_PROP_END_OF_LIST()
-> +};
-> +
->  static void gen_rp_dev_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(klass);
-> @@ -68,6 +91,7 @@ static void gen_rp_dev_class_init(ObjectClass *klass, void *data)
->      k->device_id = PCI_DEVICE_ID_REDHAT_PCIE_RP;
->      dc->desc = "PCI Express Root Port";
->      dc->vmsd = &vmstate_rp_dev;
-> +    dc->props = gen_rp_props;
->      rpc->aer_vector = gen_rp_aer_vector;
->      rpc->interrupts_init = gen_rp_interrupts_init;
->      rpc->interrupts_uninit = gen_rp_interrupts_uninit;
-> @@ -77,6 +101,7 @@ static void gen_rp_dev_class_init(ObjectClass *klass, void *data)
->  static const TypeInfo gen_rp_dev_info = {
->      .name          = TYPE_GEN_PCIE_ROOT_PORT,
->      .parent        = TYPE_PCIE_ROOT_PORT,
-> +    .instance_size = sizeof(GenPCIERootPort),
->      .class_init    = gen_rp_dev_class_init,
->  };
->  
-> diff --git a/include/hw/compat.h b/include/hw/compat.h
-> index 55b1765..4fb6a19 100644
-> --- a/include/hw/compat.h
-> +++ b/include/hw/compat.h
-> @@ -6,6 +6,10 @@
->          .driver   = "pci-bridge",\
->          .property = "shpc",\
->          .value    = "off",\
-> +    },{\
-> +        .driver   = "pcie-root-port",\
-> +        .property = "x-migrate-msix",\
-> +        .value    = "false",\
+Older machine types used to allocate/realize all ICPState objects
+at machine init time and never release them. The qdev ids are thus
+0,1,2... nr_servers and happen to map to cpu_index.
 
-You could lose the x-  but that's OK.
+> >=20
+> > diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+> > index 330441ff7fe8..3d76b43876c5 100644
+> > --- a/hw/intc/xics.c
+> > +++ b/hw/intc/xics.c
+> > @@ -348,10 +348,14 @@ static void icp_realize(DeviceState *dev, Error *=
+*errp)
+> >      }
+> > =20
+> >      qemu_register_reset(icp_reset, dev);
+> > +    vmstate_register(NULL, icp->cs->cpu_index, &vmstate_icp_server, ic=
+p);
+> >  }
+> > =20
+> >  static void icp_unrealize(DeviceState *dev, Error **errp)
+> >  {
+> > +    ICPState *icp =3D ICP(dev);
+> > +
+> > +    vmstate_unregister(NULL, &vmstate_icp_server, icp);
+> >      qemu_unregister_reset(icp_reset, dev);
+> >  }
+> > =20
+> > @@ -359,7 +363,6 @@ static void icp_class_init(ObjectClass *klass, void=
+ *data)
+> >  {
+> >      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> > =20
+> > -    dc->vmsd =3D &vmstate_icp_server;
+> >      dc->realize =3D icp_realize;
+> >      dc->unrealize =3D icp_unrealize;
+> >  }
+> >  =20
+>=20
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
->      },
->  
->  #define HW_COMPAT_2_8 \
-> -- 
-> 2.9.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--Sig_/HBkBL8G2=_svYkit1F=rMFM
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlk5FCUACgkQAvw66wEB28LUnQCgp7VueUgyQMZ39QzSlbQ88tl0
+MVYAn2Dk6WctNHBHTcNXWwPBrMUzT+5b
+=PRHc
+-----END PGP SIGNATURE-----
+
+--Sig_/HBkBL8G2=_svYkit1F=rMFM--
