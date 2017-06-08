@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dIrXS-0002uv-HW
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 03:07:27 -0400
+	(envelope-from <berto@igalia.com>) id 1dIrZe-0005Qz-Pt
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 03:09:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dIrXP-0008R7-PK
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 03:07:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51788)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dIrXP-0008Qi-II
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 03:07:23 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AB55D23E6C6
-	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 07:07:22 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu,  8 Jun 2017 09:07:16 +0200
-Message-Id: <20170608070716.2954-8-kraxel@redhat.com>
-In-Reply-To: <20170608070716.2954-1-kraxel@redhat.com>
-References: <20170608070716.2954-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 7/7] spice: don't enter opengl mode in case
- another UI provides opengl support
+	(envelope-from <berto@igalia.com>) id 1dIrZb-0000rY-8U
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 03:09:42 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <1ab8d614-be8d-b206-e52b-bd4539173bd7@redhat.com>
+References: <cover.1496844254.git.berto@igalia.com>
+	<c49daf8afe80eade79ac53d305b83eb24b264338.1496844254.git.berto@igalia.com>
+	<1ab8d614-be8d-b206-e52b-bd4539173bd7@redhat.com>
+Date: Thu, 08 Jun 2017 09:09:00 +0200
+Message-ID: <w51poefhs6r.fsf@maestria.local.igalia.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 3/7] qcow2: Make perform_cow() call
+ do_perform_cow() twice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +24,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20170606110618.10393-1-kraxel@redhat.com
----
- include/ui/spice-display.h | 2 ++
- ui/spice-core.c            | 1 +
- ui/spice-display.c         | 3 ++-
- 3 files changed, 5 insertions(+), 1 deletion(-)
+On Wed 07 Jun 2017 11:43:34 PM CEST, Eric Blake wrote:
+>>  block/qcow2-cluster.c | 38 +++++++++++++++++++++++---------------
+>>  1 file changed, 23 insertions(+), 15 deletions(-)
+>
+>>      qemu_co_mutex_unlock(&s->lock);
+>> -    ret = do_perform_cow(bs, m->offset, m->alloc_offset, r->offset, r->nb_bytes);
+>> +    ret = do_perform_cow(bs, m->offset, m->alloc_offset,
+>> +                         start->offset, start->nb_bytes);
+>> +    if (ret < 0) {
+>> +        goto fail;
+>> +    }
+>> +
+>> +    ret = do_perform_cow(bs, m->offset, m->alloc_offset,
+>> +                         end->offset, end->nb_bytes);
+>> +
+>> +fail:
+>
+> Since you reach this label even on success, it feels a bit awkward. I
+> probably would have avoided the goto and used fewer lines by
+> refactoring the logic as:
+>
+> ret = do_perform_cow(..., start->...);
+> if (ret >= 0) {
+>     ret = do_perform_cow(..., end->...);
+> }
 
-diff --git a/include/ui/spice-display.h b/include/ui/spice-display.h
-index 184d4c373a..4ba9444dba 100644
---- a/include/ui/spice-display.h
-+++ b/include/ui/spice-display.h
-@@ -140,6 +140,8 @@ struct SimpleSpiceCursor {
-     QXLCursor cursor;
- };
- 
-+extern bool spice_opengl;
-+
- int qemu_spice_rect_is_empty(const QXLRect* r);
- void qemu_spice_rect_union(QXLRect *dest, const QXLRect *r);
- 
-diff --git a/ui/spice-core.c b/ui/spice-core.c
-index 804abc5c0f..7c9ec0f0dd 100644
---- a/ui/spice-core.c
-+++ b/ui/spice-core.c
-@@ -847,6 +847,7 @@ void qemu_spice_init(void)
-             exit(1);
-         }
-         display_opengl = 1;
-+        spice_opengl = 1;
-     }
- #endif
- }
-diff --git a/ui/spice-display.c b/ui/spice-display.c
-index b353445f58..042292cc90 100644
---- a/ui/spice-display.c
-+++ b/ui/spice-display.c
-@@ -27,6 +27,7 @@
- #include "ui/spice-display.h"
- 
- static int debug = 0;
-+bool spice_opengl;
- 
- static void GCC_FMT_ATTR(2, 3) dprint(int level, const char *fmt, ...)
- {
-@@ -1013,7 +1014,7 @@ static void qemu_spice_display_init_one(QemuConsole *con)
- 
-     ssd->dcl.ops = &display_listener_ops;
- #ifdef HAVE_SPICE_GL
--    if (display_opengl) {
-+    if (spice_opengl) {
-         ssd->dcl.ops = &display_listener_gl_ops;
-         ssd->gl_unblock_bh = qemu_bh_new(qemu_spice_gl_unblock_bh, ssd);
-         ssd->gl_unblock_timer = timer_new_ms(QEMU_CLOCK_REALTIME,
--- 
-2.9.3
+I actually wrote this code without any gotos the way you mention, and it
+works fine in this patch, but as I was making more changes I ended up
+with a quite large piece of code that needed to add "if (!ret)" to
+almost every if statement, so I didn't quite like the final result.
+
+I'm open to reconsider it, but take a look first at the code after the
+last patch and you'll see that it would not be as neat as it appears
+now.
+
+Berto
