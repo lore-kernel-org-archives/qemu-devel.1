@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44396)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dIqKq-0004QL-4u
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 01:50:21 -0400
+	(envelope-from <sjitindarsingh@gmail.com>) id 1dIqWL-0006v8-MM
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 02:02:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dIqKl-0005ra-Pu
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 01:50:20 -0400
-Received: from 15.mo4.mail-out.ovh.net ([91.121.62.11]:41883)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dIqKl-0005qy-Fy
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 01:50:15 -0400
-Received: from player772.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id AF4B470839
-	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 07:50:12 +0200 (CEST)
-References: <149685579678.12025.9278446121024037161.stgit@bahia.lan>
-	<149685582923.12025.13700165807436904935.stgit@bahia.lan>
-	<c632e0a3-c6bb-2637-40c3-5098937476a5@kaod.org>
-	<20170607225507.5d2c6c33@bahia.ttt.fr.ibm.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <3a0cab6c-a913-e7e8-4a07-fbd7509731db@kaod.org>
-Date: Thu, 8 Jun 2017 07:50:08 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170607225507.5d2c6c33@bahia.ttt.fr.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 3/5] xics: setup cpu at realize time
+	(envelope-from <sjitindarsingh@gmail.com>) id 1dIqWI-0001v4-FM
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 02:02:13 -0400
+Message-ID: <1496901722.2261.3.camel@gmail.com>
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Date: Thu, 08 Jun 2017 16:02:02 +1000
+In-Reply-To: <20170602031507.29881-3-david@gibson.dropbear.id.au>
+References: <20170602031507.29881-1-david@gibson.dropbear.id.au>
+	<20170602031507.29881-3-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCHv5 2/4] pseries: Move CPU
+ compatibility property to machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,330 +24,547 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: David Gibson <david@gibson.dropbear.id.au>, groug@kaod.org, clg@kaod.org, mdroth@linux.vnet.ibm.com, sursingh@redhat.com, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, abologna@redhat.com, sbobroff@redhat.com
 
-On 06/07/2017 10:55 PM, Greg Kurz wrote:
-> On Wed, 7 Jun 2017 20:11:38 +0200
-> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->=20
->> On 06/07/2017 07:17 PM, Greg Kurz wrote:
->>> Until recently, spapr used to allocate ICPState objects for the lifet=
-ime
->>> of the machine. They would only be associated to vCPUs in xics_cpu_se=
-tup()
->>> when plugging a CPU core.
->>>
->>> Now that ICPState objects have the same lifecycle as vCPUs, it is
->>> possible to associate them during realization.
->>>
->>> This patch hence open-codes xics_cpu_setup() in icp_realize(). The vC=
-PU
->>> is passed as a property. Note that vCPU now needs to be realized firs=
-t
->>> for the IRQs to be allocated. It also needs to resetted before ICPSta=
-te
->>> realization in order to synchronize with KVM.
->>>
->>> Since ICPState objects are freed when unrealized, xics_cpu_destroy() =
-isn't
->>> needed anymore and can be safely dropped. =20
->>
->> I like the idea but I think the assignment of ->cs attribute should be=
-=20
->> moved under icp_kvm_cpu_setup(), as it is only used under xics_kvm by=20
->> the kvm_vcpu_ioctl() calls.=20
->>
->=20
-> Well, cs->cpu_index is also used for traces and to implement the 'info =
-pic'
-> monitor command.
+On Fri, 2017-06-02 at 13:15 +1000, David Gibson wrote:
+> Server class POWER CPUs have a "compat" property, which is used to
+> set the
+> backwards compatibility mode for the processor.  However, this only
+> makes
+> sense for machine types which don't give the guest access to
+> hypervisor
+> privilege - otherwise the compatibility level is under the guest's
+> control.
+> 
+> To reflect this, this removes the CPU 'compat' property and instead
+> creates a 'max-cpu-compat' property on the pseries machine.  Strictly
+> speaking this breaks compatibility, but AFAIK the 'compat' option was
+> never (directly) used with -device or device_add.
+> 
+> The option was used with -cpu.  So, to maintain compatibility, this
+> patch adds a hack to the cpu option parsing to strip out any compat
+> options supplied with -cpu and set them on the machine property
+> instead of the now deprecated cpu property.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 
-yes. But, these are just printfs.
+Looks good to me and no longer segfaults :)
 
->> Ideally, we should also introduce :
->>
->> 	struct KvmState {
->> 	    ICPState parent_obj;
->> =09
->> 	    CPUState *cs;
->> 	};
->>
->> That would be cleaner, but that might introduce some migration compat=20
->> issues  again ...
->>
->=20
-> No, as long as it doesn't change state, we're good. My concern is more
-> about how to pass cs to xics_kvm=20
+Tried a few configurations and behaves as expected:
 
-That can be done in the cpu_setup handler.
+Tested-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-> and the cs->cpu_index to xics.
-
-The printfs are interesting to have but not vital.=20
-
-David has a good point for keeping ->cs. So let's abandon the idea. =20
-
->> Some minor comments below,
->>
->> Thanks,
->>
->> C.=20
->>
->>> Signed-off-by: Greg Kurz <groug@kaod.org>
->>> ---
->>>  hw/intc/xics.c          |   76 ++++++++++++++++++++-----------------=
-----------
->>>  hw/ppc/pnv_core.c       |   16 ++++------
->>>  hw/ppc/spapr_cpu_core.c |   21 ++++++-------
->>>  include/hw/ppc/xics.h   |    2 -
->>>  4 files changed, 48 insertions(+), 67 deletions(-)
->>>
->>> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
->>> index ec73f02144c9..330441ff7fe8 100644
->>> --- a/hw/intc/xics.c
->>> +++ b/hw/intc/xics.c
->>> @@ -38,50 +38,6 @@
->>>  #include "monitor/monitor.h"
->>>  #include "hw/intc/intc.h"
->>> =20
->>> -void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu)
->>> -{
->>> -    CPUState *cs =3D CPU(cpu);
->>> -    ICPState *icp =3D ICP(cpu->intc);
->>> -
->>> -    assert(icp);
->>> -    assert(cs =3D=3D icp->cs);
->>> -
->>> -    icp->output =3D NULL;
->>> -    icp->cs =3D NULL;
->>> -}
->>> -
->>> -void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu, ICPState *icp)
->>> -{
->>> -    CPUState *cs =3D CPU(cpu);
->>> -    CPUPPCState *env =3D &cpu->env;
->>> -    ICPStateClass *icpc;
->>> -
->>> -    assert(icp);
->>> -
->>> -    cpu->intc =3D OBJECT(icp);
->>> -    icp->cs =3D cs;
->>> -
->>> -    icpc =3D ICP_GET_CLASS(icp);
->>> -    if (icpc->cpu_setup) {
->>> -        icpc->cpu_setup(icp, cpu);
->>> -    }
->>> -
->>> -    switch (PPC_INPUT(env)) {
->>> -    case PPC_FLAGS_INPUT_POWER7:
->>> -        icp->output =3D env->irq_inputs[POWER7_INPUT_INT];
->>> -        break;
->>> -
->>> -    case PPC_FLAGS_INPUT_970:
->>> -        icp->output =3D env->irq_inputs[PPC970_INPUT_INT];
->>> -        break;
->>> -
->>> -    default:
->>> -        error_report("XICS interrupt controller does not support thi=
-s CPU "
->>> -                     "bus model");
->>> -        abort();
->>> -    }
->>> -}
->>> -
->>>  void icp_pic_print_info(ICPState *icp, Monitor *mon)
->>>  {
->>>      int cpu_index =3D icp->cs ? icp->cs->cpu_index : -1;
->>> @@ -343,6 +299,8 @@ static void icp_realize(DeviceState *dev, Error *=
-*errp)
->>>  {
->>>      ICPState *icp =3D ICP(dev);
->>>      ICPStateClass *icpc =3D ICP_GET_CLASS(dev);
->>> +    PowerPCCPU *cpu;
->>> +    CPUPPCState *env;
->>>      Object *obj;
->>>      Error *err =3D NULL;
->>> =20
->>> @@ -355,6 +313,36 @@ static void icp_realize(DeviceState *dev, Error =
-**errp)
->>> =20
->>>      icp->xics =3D XICS_FABRIC(obj);
->>> =20
->>> +    obj =3D object_property_get_link(OBJECT(dev), "cs", &err);
->>> +    if (!obj) {
->>> +        error_setg(errp, "%s: required link 'xics' not found: %s",
->>> +                   __func__, error_get_pretty(err));
->>> +        return;
->>> +    }
->>> +
->>> +    cpu =3D POWERPC_CPU(obj);
->>> +    cpu->intc =3D OBJECT(icp);
->>> +    icp->cs =3D CPU(obj); =20
->>
->> only xics_kvm needs ->cs.=20
->>
->=20
-> yeah, maybe the base class should only have a cpu_index field:
->=20
->     icp->cpu_index =3D CPU(obj)->cpu_index;
-
-arg, no. please, let's not add another cpu index :)
-
->>> +
->>> +    if (icpc->cpu_setup) {
->>> +        icpc->cpu_setup(icp, cpu);
->>> +    }
->>> +
->>> +    env =3D &cpu->env;
->>> +    switch (PPC_INPUT(env)) {
->>> +    case PPC_FLAGS_INPUT_POWER7:
->>> +        icp->output =3D env->irq_inputs[POWER7_INPUT_INT];
->>> +        break;
->>> +
->>> +    case PPC_FLAGS_INPUT_970:
->>> +        icp->output =3D env->irq_inputs[PPC970_INPUT_INT];
->>> +        break;
->>> +
->>> +    default:
->>> +        error_setg(errp, "XICS interrupt controller does not support=
- this CPU bus model");
->>> +        return;
->>> +    }
->>> +
->>>      if (icpc->realize) {
->>>          icpc->realize(dev, errp);
->>>      }
->>> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
->>> index e8a9a94d5a24..1393005e76f3 100644
->>> --- a/hw/ppc/pnv_core.c
->>> +++ b/hw/ppc/pnv_core.c
->>> @@ -118,19 +118,19 @@ static void pnv_core_realize_child(Object *chil=
-d, XICSFabric *xi, Error **errp)
->>>      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
->>>      Object *obj;
->>> =20
->>> -    obj =3D object_new(TYPE_PNV_ICP);
->>> -    object_property_add_child(OBJECT(cpu), "icp", obj, &error_abort)=
-;
->>> -    object_unref(obj);
->>> -    object_property_add_const_link(obj, "xics", OBJECT(xi), &error_a=
-bort);
->>> -    object_property_set_bool(obj, true, "realized", &local_err);
->>> +    object_property_set_bool(child, true, "realized", &local_err);
->>>      if (local_err) {
->>>          error_propagate(errp, local_err);
->>>          return;
->>>      }
->>> =20
->>> -    object_property_set_bool(child, true, "realized", &local_err);
->>> +    obj =3D object_new(TYPE_PNV_ICP);
->>> +    object_property_add_child(child, "icp", obj, NULL);
->>> +    object_unref(obj);
->>> +    object_property_add_const_link(obj, "xics", OBJECT(xi), &error_a=
-bort);
->>> +    object_property_add_const_link(obj, "cs", child, &error_abort); =
-=20
->>
->> may be link the cpu object instead ?=20
->>
->=20
-> I'm not sure to understand... isn't child supposed to be a CPU index he=
-re ?
-
-I meant linking the 'PowerPCCPU *cpu' object and not the CPUState.
-That's minor.
-
->>> +    object_property_set_bool(obj, true, "realized", &local_err);
->>>      if (local_err) {
->>> -        object_unparent(obj);
->>>          error_propagate(errp, local_err);
->>>          return;
->>>      }
->>> @@ -141,8 +141,6 @@ static void pnv_core_realize_child(Object *child,=
- XICSFabric *xi, Error **errp)
->>>          error_propagate(errp, local_err);
->>>          return;
->>>      }
->>> -
->>> -    xics_cpu_setup(xi, cpu, ICP(obj));
->>>  }
->>> =20
->>>  static void pnv_core_realize(DeviceState *dev, Error **errp)
->>> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
->>> index 029a14120edd..9a6259525953 100644
->>> --- a/hw/ppc/spapr_cpu_core.c
->>> +++ b/hw/ppc/spapr_cpu_core.c
->>> @@ -53,9 +53,6 @@ static void spapr_cpu_reset(void *opaque)
->>> =20
->>>  static void spapr_cpu_destroy(PowerPCCPU *cpu)
->>>  {
->>> -    sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
->>> -
->>> -    xics_cpu_destroy(XICS_FABRIC(spapr), cpu);
->>>      qemu_unregister_reset(spapr_cpu_reset, cpu);
->>>  }
->>> =20
->>> @@ -140,28 +137,28 @@ static void spapr_cpu_core_realize_child(Object=
- *child, Error **errp)
->>>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
->>>      CPUState *cs =3D CPU(child);
->>>      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
->>> -    Object *obj;
->>> +    Object *obj =3D NULL;
->>> =20
->>> -    obj =3D object_new(spapr->icp_type);
->>> -    object_property_add_child(OBJECT(cpu), "icp", obj, &error_abort)=
-;
->>> -    object_unref(obj);
->>> -    object_property_add_const_link(obj, "xics", OBJECT(spapr), &erro=
-r_abort);
->>> -    object_property_set_bool(obj, true, "realized", &local_err);
->>> +    object_property_set_bool(child, true, "realized", &local_err);
->>>      if (local_err) {
->>>          goto error;
->>>      }
->>> =20
->>> -    object_property_set_bool(child, true, "realized", &local_err);
->>> +    spapr_cpu_init(spapr, cpu, &local_err);
->>>      if (local_err) {
->>>          goto error;
->>>      }
->>> =20
->>> -    spapr_cpu_init(spapr, cpu, &local_err);
->>> +    obj =3D object_new(spapr->icp_type);
->>> +    object_property_add_child(child, "icp", obj, &error_abort);
->>> +    object_unref(obj);
->>> +    object_property_add_const_link(obj, "xics", OBJECT(spapr), &erro=
-r_abort);
->>> +    object_property_add_const_link(obj, "cs", child, &error_abort); =
-=20
->>
->> same here.
->>
->>> +    object_property_set_bool(obj, true, "realized", &local_err);
->>>      if (local_err) {
->>>          goto error;
->>>      }
->>> =20
->>> -    xics_cpu_setup(XICS_FABRIC(spapr), cpu, ICP(obj));
->>>      return;
->>> =20
->>>  error:
->>> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
->>> index 40a506eacfb4..05767a15be9a 100644
->>> --- a/include/hw/ppc/xics.h
->>> +++ b/include/hw/ppc/xics.h
->>> @@ -183,8 +183,6 @@ void spapr_dt_xics(int nr_servers, void *fdt, uin=
-t32_t phandle);
->>> =20
->>>  qemu_irq xics_get_qirq(XICSFabric *xi, int irq);
->>>  ICPState *xics_icp_get(XICSFabric *xi, int server);
->>> -void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu, ICPState *icp);
->>> -void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu);
->>> =20
->>>  /* Internal XICS interfaces */
->>>  void icp_set_cppr(ICPState *icp, uint8_t cppr);
->>>  =20
->>
->=20
+> ---
+>  hw/ppc/spapr.c              |   6 ++-
+>  hw/ppc/spapr_cpu_core.c     |  55 +++++++++++++++++++++++-
+>  hw/ppc/spapr_hcall.c        |   8 ++--
+>  include/hw/ppc/spapr.h      |  12 ++++--
+>  target/ppc/compat.c         | 102
+> ++++++++++++++++++++++++++++++++++++++++++++
+>  target/ppc/cpu.h            |   5 ++-
+>  target/ppc/translate_init.c |  86 +++++++++++-----------------------
+> ---
+>  7 files changed, 201 insertions(+), 73 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index ab3aab1..3c4e88f 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2134,7 +2134,7 @@ static void ppc_spapr_init(MachineState
+> *machine)
+>          machine->cpu_model = kvm_enabled() ? "host" : smc-
+> >tcg_default_cpu;
+>      }
+>  
+> -    ppc_cpu_parse_features(machine->cpu_model);
+> +    spapr_cpu_parse_features(spapr);
+>  
+>      spapr_init_cpus(spapr);
+>  
+> @@ -2497,6 +2497,10 @@ static void spapr_machine_initfn(Object *obj)
+>                                      " place of standard EPOW events
+> when possible"
+>                                      " (required for memory hot-
+> unplug support)",
+>                                      NULL);
+> +
+> +    ppc_compat_add_property(obj, "max-cpu-compat", &spapr-
+> >max_compat_pvr,
+> +                            "Maximum permitted CPU compatibility
+> mode",
+> +                            &error_fatal);
+>  }
+>  
+>  static void spapr_machine_finalizefn(Object *obj)
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index ff7058e..846d9e7 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -20,6 +20,57 @@
+>  #include "sysemu/numa.h"
+>  #include "qemu/error-report.h"
+>  
+> +void spapr_cpu_parse_features(sPAPRMachineState *spapr)
+> +{
+> +    /*
+> +     * Backwards compatibility hack:
+> +     *
+> +     *   CPUs had a "compat=" property which didn't make sense for
+> +     *   anything except pseries.  It was replaced by "max-cpu-
+> compat"
+> +     *   machine option.  This supports old command lines like
+> +     *       -cpu POWER8,compat=power7
+> +     *   By stripping the compat option and applying it to the
+> machine
+> +     *   before passing it on to the cpu level parser.
+> +     */
+> +    gchar **inpieces;
+> +    int i, j;
+> +    gchar *compat_str = NULL;
+> +
+> +    inpieces = g_strsplit(MACHINE(spapr)->cpu_model, ",", 0);
+> +
+> +    /* inpieces[0] is the actual model string */
+> +    i = 1;
+> +    j = 1;
+> +    while (inpieces[i]) {
+> +        if (g_str_has_prefix(inpieces[i], "compat=")) {
+> +            /* in case of multiple compat= options */
+> +            g_free(compat_str);
+> +            compat_str = inpieces[i];
+> +        } else {
+> +            j++;
+> +        }
+> +
+> +        i++;
+> +        /* Excise compat options from list */
+> +        inpieces[j] = inpieces[i];
+> +    }
+> +
+> +    if (compat_str) {
+> +        char *val = compat_str + strlen("compat=");
+> +        gchar *newprops = g_strjoinv(",", inpieces);
+> +
+> +        object_property_set_str(OBJECT(spapr), val, "max-cpu-
+> compat",
+> +                                &error_fatal);
+> +
+> +        ppc_cpu_parse_features(newprops);
+> +        g_free(newprops);
+> +    } else {
+> +        ppc_cpu_parse_features(MACHINE(spapr)->cpu_model);
+> +    }
+> +
+> +    g_strfreev(inpieces);
+> +}
+> +
+>  static void spapr_cpu_reset(void *opaque)
+>  {
+>      sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+> @@ -70,10 +121,10 @@ static void spapr_cpu_init(sPAPRMachineState
+> *spapr, PowerPCCPU *cpu,
+>      /* Enable PAPR mode in TCG or KVM */
+>      cpu_ppc_set_papr(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
+>  
+> -    if (cpu->max_compat) {
+> +    if (spapr->max_compat_pvr) {
+>          Error *local_err = NULL;
+>  
+> -        ppc_set_compat(cpu, cpu->max_compat, &local_err);
+> +        ppc_set_compat(cpu, spapr->max_compat_pvr, &local_err);
+>          if (local_err) {
+>              error_propagate(errp, local_err);
+>              return;
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index aae5a62..a9bb3ed 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1044,11 +1044,11 @@ static target_ulong
+> h_signal_sys_reset(PowerPCCPU *cpu,
+>      }
+>  }
+>  
+> -static uint32_t cas_check_pvr(PowerPCCPU *cpu, target_ulong *addr,
+> -                              Error **errp)
+> +static uint32_t cas_check_pvr(sPAPRMachineState *spapr, PowerPCCPU
+> *cpu,
+> +                              target_ulong *addr, Error **errp)
+>  {
+>      bool explicit_match = false; /* Matched the CPU's real PVR */
+> -    uint32_t max_compat = cpu->max_compat;
+> +    uint32_t max_compat = spapr->max_compat_pvr;
+>      uint32_t best_compat = 0;
+>      int i;
+>  
+> @@ -1104,7 +1104,7 @@ static target_ulong
+> h_client_architecture_support(PowerPCCPU *cpu,
+>      bool guest_radix;
+>      Error *local_err = NULL;
+>  
+> -    cas_pvr = cas_check_pvr(cpu, &addr, &local_err);
+> +    cas_pvr = cas_check_pvr(spapr, cpu, &addr, &local_err);
+>      if (local_err) {
+>          error_report_err(local_err);
+>          return H_HARDWARE;
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 98fb78b..4da92e2 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -87,16 +87,19 @@ struct sPAPRMachineState {
+>      uint64_t rtc_offset; /* Now used only during incoming migration
+> */
+>      struct PPCTimebase tb;
+>      bool has_graphics;
+> -    sPAPROptionVector *ov5;         /* QEMU-supported option vectors
+> */
+> -    sPAPROptionVector *ov5_cas;     /* negotiated (via CAS) option
+> vectors */
+> -    bool cas_reboot;
+> -    bool cas_legacy_guest_workaround;
+>  
+>      Notifier epow_notifier;
+>      QTAILQ_HEAD(, sPAPREventLogEntry) pending_events;
+>      bool use_hotplug_event_source;
+>      sPAPREventSource *event_sources;
+>  
+> +    /* ibm,client-architecture-support option negotiation */
+> +    bool cas_reboot;
+> +    bool cas_legacy_guest_workaround;
+> +    sPAPROptionVector *ov5;         /* QEMU-supported option vectors
+> */
+> +    sPAPROptionVector *ov5_cas;     /* negotiated (via CAS) option
+> vectors */
+> +    uint32_t max_compat_pvr;
+> +
+>      /* Migration state */
+>      int htab_save_index;
+>      bool htab_first_pass;
+> @@ -639,6 +642,7 @@ void
+> spapr_hotplug_req_add_by_count_indexed(sPAPRDRConnectorType drc_type,
+>                                              uint32_t count, uint32_t
+> index);
+>  void spapr_hotplug_req_remove_by_count_indexed(sPAPRDRConnectorType
+> drc_type,
+>                                                 uint32_t count,
+> uint32_t index);
+> +void spapr_cpu_parse_features(sPAPRMachineState *spapr);
+>  void *spapr_populate_hotplug_cpu_dt(CPUState *cs, int *fdt_offset,
+>                                      sPAPRMachineState *spapr);
+>  
+> diff --git a/target/ppc/compat.c b/target/ppc/compat.c
+> index e8ec1e1..e72839f 100644
+> --- a/target/ppc/compat.c
+> +++ b/target/ppc/compat.c
+> @@ -24,9 +24,11 @@
+>  #include "sysemu/cpus.h"
+>  #include "qemu/error-report.h"
+>  #include "qapi/error.h"
+> +#include "qapi/visitor.h"
+>  #include "cpu-models.h"
+>  
+>  typedef struct {
+> +    const char *name;
+>      uint32_t pvr;
+>      uint64_t pcr;
+>      uint64_t pcr_level;
+> @@ -38,6 +40,7 @@ static const CompatInfo compat_table[] = {
+>       * Ordered from oldest to newest - the code relies on this
+>       */
+>      { /* POWER6, ISA2.05 */
+> +        .name = "power6",
+>          .pvr = CPU_POWERPC_LOGICAL_2_05,
+>          .pcr = PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COMPAT_2_06 |
+>                 PCR_COMPAT_2_05 | PCR_TM_DIS | PCR_VSX_DIS,
+> @@ -45,24 +48,28 @@ static const CompatInfo compat_table[] = {
+>          .max_threads = 2,
+>      },
+>      { /* POWER7, ISA2.06 */
+> +        .name = "power7",
+>          .pvr = CPU_POWERPC_LOGICAL_2_06,
+>          .pcr = PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COMPAT_2_06 |
+> PCR_TM_DIS,
+>          .pcr_level = PCR_COMPAT_2_06,
+>          .max_threads = 4,
+>      },
+>      {
+> +        .name = "power7+",
+>          .pvr = CPU_POWERPC_LOGICAL_2_06_PLUS,
+>          .pcr = PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COMPAT_2_06 |
+> PCR_TM_DIS,
+>          .pcr_level = PCR_COMPAT_2_06,
+>          .max_threads = 4,
+>      },
+>      { /* POWER8, ISA2.07 */
+> +        .name = "power8",
+>          .pvr = CPU_POWERPC_LOGICAL_2_07,
+>          .pcr = PCR_COMPAT_3_00 | PCR_COMPAT_2_07,
+>          .pcr_level = PCR_COMPAT_2_07,
+>          .max_threads = 8,
+>      },
+>      { /* POWER9, ISA3.00 */
+> +        .name = "power9",
+>          .pvr = CPU_POWERPC_LOGICAL_3_00,
+>          .pcr = PCR_COMPAT_3_00,
+>          .pcr_level = PCR_COMPAT_3_00,
+> @@ -189,3 +196,98 @@ int ppc_compat_max_threads(PowerPCCPU *cpu)
+>  
+>      return n_threads;
+>  }
+> +
+> +static void ppc_compat_prop_get(Object *obj, Visitor *v, const char
+> *name,
+> +                                void *opaque, Error **errp)
+> +{
+> +    uint32_t compat_pvr = *((uint32_t *)opaque);
+> +    const char *value;
+> +
+> +    if (!compat_pvr) {
+> +        value = "";
+> +    } else {
+> +        const CompatInfo *compat = compat_by_pvr(compat_pvr);
+> +
+> +        g_assert(compat);
+> +
+> +        value = compat->name;
+> +    }
+> +
+> +    visit_type_str(v, name, (char **)&value, errp);
+> +}
+> +
+> +static void ppc_compat_prop_set(Object *obj, Visitor *v, const char
+> *name,
+> +                                void *opaque, Error **errp)
+> +{
+> +    Error *error = NULL;
+> +    char *value;
+> +    uint32_t compat_pvr;
+> +
+> +    visit_type_str(v, name, &value, &error);
+> +    if (error) {
+> +        error_propagate(errp, error);
+> +        return;
+> +    }
+> +
+> +    if (strcmp(value, "") == 0) {
+> +        compat_pvr = 0;
+> +    } else {
+> +        int i;
+> +        const CompatInfo *compat = NULL;
+> +
+> +        for (i = 0; i < ARRAY_SIZE(compat_table); i++) {
+> +            if (strcmp(value, compat_table[i].name) == 0) {
+> +                compat = &compat_table[i];
+> +                break;
+> +
+> +            }
+> +        }
+> +
+> +        if (!compat) {
+> +            error_setg(errp, "Invalid compatibility mode \"%s\"",
+> value);
+> +            goto out;
+> +        }
+> +        compat_pvr = compat->pvr;
+> +    }
+> +
+> +    *((uint32_t *)opaque) = compat_pvr;
+> +
+> +out:
+> +    g_free(value);
+> +}
+> +
+> +void ppc_compat_add_property(Object *obj, const char *name,
+> +                             uint32_t *compat_pvr, const char
+> *basedesc,
+> +                             Error **errp)
+> +{
+> +    Error *local_err = NULL;
+> +    gchar *namesv[ARRAY_SIZE(compat_table) + 1];
+> +    gchar *names, *desc;
+> +    int i;
+> +
+> +    object_property_add(obj, name, "string",
+> +                        ppc_compat_prop_get, ppc_compat_prop_set,
+> NULL,
+> +                        compat_pvr, &local_err);
+> +    if (local_err) {
+> +        goto out;
+> +    }
+> +
+> +    for (i = 0; i < ARRAY_SIZE(compat_table); i++) {
+> +        /*
+> +         * Have to discard const here, because g_strjoinv() takes
+> +         * (gchar **), not (const gchar **) :(
+> +         */
+> +        namesv[i] = (gchar *)compat_table[i].name;
+> +    }
+> +    namesv[ARRAY_SIZE(compat_table)] = NULL;
+> +
+> +    names = g_strjoinv(", ", namesv);
+> +    desc = g_strdup_printf("%s. Valid values are %s.", basedesc,
+> names);
+> +    object_property_set_description(obj, name, desc, &local_err);
+> +
+> +    g_free(names);
+> +    g_free(desc);
+> +
+> +out:
+> +    error_propagate(errp, local_err);
+> +}
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 401e10e..4517b4b 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1189,7 +1189,6 @@ typedef struct PPCVirtualHypervisorClass
+> PPCVirtualHypervisorClass;
+>   * PowerPCCPU:
+>   * @env: #CPUPPCState
+>   * @cpu_dt_id: CPU index used in the device tree. KVM uses this
+> index too
+> - * @max_compat: Maximal supported logical PVR from the command line
+>   * @compat_pvr: Current logical PVR, zero if in "raw" mode
+>   *
+>   * A PowerPC CPU.
+> @@ -1201,7 +1200,6 @@ struct PowerPCCPU {
+>  
+>      CPUPPCState env;
+>      int cpu_dt_id;
+> -    uint32_t max_compat;
+>      uint32_t compat_pvr;
+>      PPCVirtualHypervisor *vhyp;
+>      Object *intc;
+> @@ -1374,6 +1372,9 @@ void ppc_set_compat(PowerPCCPU *cpu, uint32_t
+> compat_pvr, Error **errp);
+>  void ppc_set_compat_all(uint32_t compat_pvr, Error **errp);
+>  #endif
+>  int ppc_compat_max_threads(PowerPCCPU *cpu);
+> +void ppc_compat_add_property(Object *obj, const char *name,
+> +                             uint32_t *compat_pvr, const char
+> *basedesc,
+> +                             Error **errp);
+>  #endif /* defined(TARGET_PPC64) */
+>  
+>  #include "exec/cpu-all.h"
+> diff --git a/target/ppc/translate_init.c
+> b/target/ppc/translate_init.c
+> index 56a0ab2..e837cd2 100644
+> --- a/target/ppc/translate_init.c
+> +++ b/target/ppc/translate_init.c
+> @@ -33,6 +33,7 @@
+>  #include "hw/qdev-properties.h"
+>  #include "hw/ppc/ppc.h"
+>  #include "mmu-book3s-v3.h"
+> +#include "sysemu/qtest.h"
+>  
+>  //#define PPC_DUMP_CPU
+>  //#define PPC_DEBUG_SPR
+> @@ -8413,73 +8414,38 @@ POWERPC_FAMILY(POWER5P)(ObjectClass *oc, void
+> *data)
+>      pcc->l1_icache_size = 0x10000;
+>  }
+>  
+> -static void powerpc_get_compat(Object *obj, Visitor *v, const char
+> *name,
+> -                               void *opaque, Error **errp)
+> -{
+> -    char *value = (char *)"";
+> -    Property *prop = opaque;
+> -    uint32_t *max_compat = qdev_get_prop_ptr(DEVICE(obj), prop);
+> -
+> -    switch (*max_compat) {
+> -    case CPU_POWERPC_LOGICAL_2_05:
+> -        value = (char *)"power6";
+> -        break;
+> -    case CPU_POWERPC_LOGICAL_2_06:
+> -        value = (char *)"power7";
+> -        break;
+> -    case CPU_POWERPC_LOGICAL_2_07:
+> -        value = (char *)"power8";
+> -        break;
+> -    case 0:
+> -        break;
+> -    default:
+> -        error_report("Internal error: compat is set to %x",
+> *max_compat);
+> -        abort();
+> -        break;
+> -    }
+> -
+> -    visit_type_str(v, name, &value, errp);
+> -}
+> -
+> -static void powerpc_set_compat(Object *obj, Visitor *v, const char
+> *name,
+> -                               void *opaque, Error **errp)
+> +/*
+> + * The CPU used to have a "compat" property which set the
+> + * compatibility mode PVR.  However, this was conceptually broken -
+> it
+> + * only makes sense on the pseries machine type (otherwise the guest
+> + * owns the PCR and can control the compatibility mode
+> itself).  It's
+> + * been replaced with the 'max-cpu-compat' property on the pseries
+> + * machine type.  For backwards compatibility, pseries specially
+> + * parses the -cpu parameter and converts old compat= parameters
+> into
+> + * the appropriate machine parameters.  This stub implementation of
+> + * the parameter catches any uses on explicitly created CPUs.
+> + */
+> +static void getset_compat_deprecated(Object *obj, Visitor *v, const
+> char *name,
+> +                                     void *opaque, Error **errp)
+>  {
+> -    Error *error = NULL;
+> -    char *value = NULL;
+> -    Property *prop = opaque;
+> -    uint32_t *max_compat = qdev_get_prop_ptr(DEVICE(obj), prop);
+> -
+> -    visit_type_str(v, name, &value, &error);
+> -    if (error) {
+> -        error_propagate(errp, error);
+> -        return;
+> -    }
+> -
+> -    if (strcmp(value, "power6") == 0) {
+> -        *max_compat = CPU_POWERPC_LOGICAL_2_05;
+> -    } else if (strcmp(value, "power7") == 0) {
+> -        *max_compat = CPU_POWERPC_LOGICAL_2_06;
+> -    } else if (strcmp(value, "power8") == 0) {
+> -        *max_compat = CPU_POWERPC_LOGICAL_2_07;
+> -    } else {
+> -        error_setg(errp, "Invalid compatibility mode \"%s\"",
+> value);
+> +    if (!qtest_enabled()) {
+> +        error_report("CPU 'compat' property is deprecated and has no
+> effect; "
+> +                     "use max-cpu-compat machine property instead");
+>      }
+> -
+> -    g_free(value);
+> +    visit_type_null(v, name, NULL);
+>  }
+>  
+> -static PropertyInfo powerpc_compat_propinfo = {
+> +static PropertyInfo ppc_compat_deprecated_propinfo = {
+>      .name = "str",
+> -    .description = "compatibility mode, power6/power7/power8",
+> -    .get = powerpc_get_compat,
+> -    .set = powerpc_set_compat,
+> +    .description = "compatibility mode (deprecated)",
+> +    .get = getset_compat_deprecated,
+> +    .set = getset_compat_deprecated,
+>  };
+> -
+> -#define DEFINE_PROP_POWERPC_COMPAT(_n, _s, _f) \
+> -    DEFINE_PROP(_n, _s, _f, powerpc_compat_propinfo, uint32_t)
+> -
+>  static Property powerpc_servercpu_properties[] = {
+> -    DEFINE_PROP_POWERPC_COMPAT("compat", PowerPCCPU, max_compat),
+> +    {
+> +        .name = "compat",
+> +        .info = &ppc_compat_deprecated_propinfo,
+> +    },
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
