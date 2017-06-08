@@ -1,46 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dItBK-00044o-1C
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 04:52:43 -0400
+	(envelope-from <groug@kaod.org>) id 1dItCm-0004r3-54
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 04:54:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dItBG-0006Vm-QA
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 04:52:42 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55661
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dItBG-0006Vb-JN
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 04:52:38 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v588oCIU111065
-	for <qemu-devel@nongnu.org>; Thu, 8 Jun 2017 04:52:37 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2axv361vd4-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 08 Jun 2017 04:52:37 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Thu, 8 Jun 2017 09:52:35 +0100
-References: <20170529135520.101429-1-pasic@linux.vnet.ibm.com>
-	<20170529135520.101429-5-pasic@linux.vnet.ibm.com>
-	<87a85sc102.fsf@secure.mitica>
-	<4f30017b-22a9-496a-82d2-637a3317c692@linux.vnet.ibm.com>
-	<20170601133251.4869b001.cornelia.huck@de.ibm.com>
-	<8f9e006d-50f1-ac03-568e-5467f86e53e5@linux.vnet.ibm.com>
-	<87y3t3brp5.fsf@secure.mitica>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Thu, 8 Jun 2017 10:52:33 +0200
+	(envelope-from <groug@kaod.org>) id 1dItCi-0007Jz-UJ
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 04:54:12 -0400
+Received: from 3.mo178.mail-out.ovh.net ([46.105.44.197]:41251)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dItCi-0007Jh-Oc
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 04:54:08 -0400
+Received: from player728.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 08F0532C2D
+	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 10:54:07 +0200 (CEST)
+Date: Thu, 8 Jun 2017 10:54:02 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170608105402.5b19af21@bahia.ttt.fr.ibm.com>
+In-Reply-To: <3a0cab6c-a913-e7e8-4a07-fbd7509731db@kaod.org>
+References: <149685579678.12025.9278446121024037161.stgit@bahia.lan>
+	<149685582923.12025.13700165807436904935.stgit@bahia.lan>
+	<c632e0a3-c6bb-2637-40c3-5098937476a5@kaod.org>
+	<20170607225507.5d2c6c33@bahia.ttt.fr.ibm.com>
+	<3a0cab6c-a913-e7e8-4a07-fbd7509731db@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <87y3t3brp5.fsf@secure.mitica>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <57adc010-13db-fa6e-a50a-0e54f184c84f@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 4/7] s390x/css: add missing css state
- conditionally
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/R9eH9Qbl1Wl7g6VW=+hFlFQ";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] xics: setup cpu at realize time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,97 +34,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
+--Sig_/R9eH9Qbl1Wl7g6VW=+hFlFQ
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, 8 Jun 2017 07:50:08 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-On 06/07/2017 08:03 PM, Juan Quintela wrote:
-> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
->> On 06/01/2017 01:32 PM, Cornelia Huck wrote:
->>> On Thu, 1 Jun 2017 11:35:27 +0200
->>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
->>>
-> 
->>>>>
->>>>> I was about to suggest to move css from pointer to an embedded struct,
->>>>> and then noticed that MAX_CSSID is .... 65535.  I guess that this is
->>
->> #define MAX_CSSID 255 
->> ("include/hw/s390x/css.h" line 23) 
-> 
-> I have to grep better O:-)
-> 
->>>>> going to be sparse, very sparse.  Perhaps there is an easier way to
->>>>> transmit it?
->>>>>
->>>>> You are transmiting:
->>>>>
->>>>> 65000 structs each of size MAX_CHPID (255) and each element is byte +
->>>>> byte +byte = 65000 * 255 * 3 = 47 MB.
->>>>>
->>>>> If it is really sparse, I think that sending something like a list
->>>>> of <index in array> <contents> could make sense, no?
->>>>>
->>>>> Or I am missunderstanding something?
->>>>>
->>>>
->>>> I think you are misunderstanding. Sparse arrays of pointers were not
->>>> supported in the first place. Support was added by me recentily (patch
->>>> 07d4e69 "migration/vmstate: fix array of ptr with nullptrs"). For a null
->>>> pointer just a single byte is transmitted. So we should be more like
->>>> around 64KB, given that it is really sparse. Bottom line, the in stream
->>
->> Given that my calculation is also wrong. The overhead is below 255 bytes
->> (overhead compared to not transferring anything for null pointers, which
->> is clearly an unrealistic lower bound case).
-> 
-> Yeap, I greeped wrong.  255 x 255 makes no sense to optimize at all.
-> Sorry for the noise.
-> 
->>>> representation is at least as efficient as the in memory representation.
->>>>
->>>> Of course we could do something special for sparse arrays of pointers in
->>>> general, and indeed, one of the possibilities is a list/vector of non
->>>> null indexes. 
->>>
->>> Just as discussion fodder: For a run-of-the-mill qemu guest, I'd expect
->>> a low double-digit number of subchannels in css 0xfe, in subchannel set
->>> 0, which are clustered right at the beginning, and one chpid (0) in css
->>> 0xfe.
->>>
->>> As the subchannel id is autogenerated based upon the devno (if
->>> provided), it is easy to have subchannels in an arbitrary subchannel
->>> set (of which there are only four), but to get high subchannel ids with
->>> a lot of empty slots before, you'd have to create a lot (really a lot)
->>> of devices and then detach most of them again - not a very likely
->>> pattern.
->>>
->>> The 3270 support does not really change much: one additional subchannel
->>> (with the same characteristics) and one further chpid. But I don't
->>> expect many people to use 3270, and it is not (yet) migratable anyway.
->>>
->>> vfio-ccw devices will be in another css (possibly mapped), but they are
->>> not migrateable either.
->>>
->>> So if we want to optimize, some "nothing of interest beyond that point"
->>> marker might be useful - but not very.
->>
->> Thus I do not think we need extra sparse array handling for this. 
->>
->> (Nevertheless an extra sparse array handling might make sense for
->> vmstate core, provided there is an use case).
-> 
-> So, I retire all my objections.
-> 
-> Again, sorry for the noise.
+> On 06/07/2017 10:55 PM, Greg Kurz wrote:
+> [...]
+> >>> +    obj =3D object_new(TYPE_PNV_ICP);
+> >>> +    object_property_add_child(child, "icp", obj, NULL);
+> >>> +    object_unref(obj);
+> >>> +    object_property_add_const_link(obj, "xics", OBJECT(xi), &error_a=
+bort);
+> >>> +    object_property_add_const_link(obj, "cs", child, &error_abort); =
+  =20
+> >>
+> >> may be link the cpu object instead ?=20
+> >> =20
+> >=20
+> > I'm not sure to understand... isn't child supposed to be a CPU index he=
+re ? =20
+>=20
+> I meant linking the 'PowerPCCPU *cpu' object and not the CPUState.
+> That's minor.
+>=20
 
-No problem. Actually, it's appreciated! Better have some false
-positives than having something stupid slipping in and having
-to live with it.
+Well, cpu =3D=3D cs =3D=3D child and object_property_add_const_link() expec=
+ts
+an Object *. Passing child avoids a not-really-useful OBJECT() dynamic
+cast.
 
-Thanks for your review!
+--Sig_/R9eH9Qbl1Wl7g6VW=+hFlFQ
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-Regards,
-Halil
+iEYEARECAAYFAlk5EKoACgkQAvw66wEB28Ja2ACfViFWAYwd51NM+KD62DsCyJOI
+PCEAn1/lfUd/gdOsKZTyDqXKIYnbwFAE
+=DfS1
+-----END PGP SIGNATURE-----
+
+--Sig_/R9eH9Qbl1Wl7g6VW=+hFlFQ--
