@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dIzdT-0003IP-V4
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 11:46:12 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dIzdw-0003fo-BI
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 11:46:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dIzdQ-0004JY-Nr
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 11:46:11 -0400
-Received: from 1.mo178.mail-out.ovh.net ([178.33.251.53]:44437)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dIzdQ-0004J3-Gz
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 11:46:08 -0400
-Received: from player728.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 8380E3EB2F
-	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 17:46:05 +0200 (CEST)
-Date: Thu, 8 Jun 2017 17:45:59 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170608174559.053df142@bahia.ttt.fr.ibm.com>
-In-Reply-To: <018ad85d-6b7f-53d9-e3dc-4a79fcc81767@kaod.org>
-References: <149692935202.12119.3614006195497745877.stgit@bahia>
-	<149692936183.12119.5013623492394505174.stgit@bahia>
-	<5022e1af-9b70-518a-ce61-cadc905e637f@kaod.org>
-	<20170608163207.45ba5618@bahia.ttt.fr.ibm.com>
-	<018ad85d-6b7f-53d9-e3dc-4a79fcc81767@kaod.org>
+	(envelope-from <el13635@mail.ntua.gr>) id 1dIzdt-0004S4-3r
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 11:46:40 -0400
+Received: from smtp1.ntua.gr ([2001:648:2000:de::183]:65154)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <el13635@mail.ntua.gr>) id 1dIzds-0004QV-PE
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 11:46:37 -0400
+Date: Thu, 8 Jun 2017 18:46:27 +0300
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20170608154627.6nl5m4mzyrjdkfqn@postretch>
+References: <20170608133906.12737-1-ehabkost@redhat.com>
+	<20170608133906.12737-4-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/_0iVP1d5ekJNC1WnIYMSIWa";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v4 1/6] xics: introduce macros for ICP/ICS
- link properties
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="irmoea5ptce6kmrw"
+Content-Disposition: inline
+In-Reply-To: <20170608133906.12737-4-ehabkost@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/5] websock: Don't try to set *errp
+ directly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,62 +29,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
---Sig_/_0iVP1d5ekJNC1WnIYMSIWa
-Content-Type: text/plain; charset=UTF-8
+
+--irmoea5ptce6kmrw
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 8 Jun 2017 16:51:35 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+On Thu, Jun 08, 2017 at 10:39:04AM -0300, Eduardo Habkost wrote:
+>Assigning directly to *errp is not valid, as errp may be NULL,
+>&error_fatal, or &error_abort.  Use error_propagate() instead.
+>
+>Cc: "Daniel P. Berrange" <berrange@redhat.com>
+>Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>---
+> io/channel-websock.c | 4 ++--
+> 1 file changed, 2 insertions(+), 2 deletions(-)
+>
+>diff --git a/io/channel-websock.c b/io/channel-websock.c
+>index 8fabadea2f..5a3badbec2 100644
+>--- a/io/channel-websock.c
+>+++ b/io/channel-websock.c
+>@@ -856,7 +856,7 @@ static ssize_t qio_channel_websock_readv(QIOChannel *i=
+oc,
+>     ssize_t ret;
+>
+>     if (wioc->io_err) {
+>-        *errp =3D error_copy(wioc->io_err);
+>+        error_propagate(errp, error_copy(wioc->io_err));
+>         return -1;
+>     }
+>
+>@@ -902,7 +902,7 @@ static ssize_t qio_channel_websock_writev(QIOChannel *=
+ioc,
+>     ssize_t ret;
+>
+>     if (wioc->io_err) {
+>-        *errp =3D error_copy(wioc->io_err);
+>+        error_propagate(errp, error_copy(wioc->io_err));
+>         return -1;
+>     }
+>
+>--=20
+>2.11.0.259.g40922b1
+>
+>
+>
 
-> On 06/08/2017 04:32 PM, Greg Kurz wrote:
-> > On Thu, 8 Jun 2017 16:04:21 +0200
-> > C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-> >  =20
-> >> On 06/08/2017 03:42 PM, Greg Kurz wrote: =20
-> >>> These properties are part of the XICS API. They deserve to appear
-> >>> explicitely in the XICS header file.   =20
-> >>
-> >> I don't see the benefits.
-> >> =20
-> >=20
-> > The links need to be set with the appropriate name otherwise XICS bails=
- out.
-> > When David asked to rename the "cs" prop to "cpu",  =20
->=20
-> yes. that is better.
->=20
-> > I forgot to patch pnv accordingly in the first place. :)
-> >=20
-> > FWIW, other people do that as well (see hw/i386/pc_q35.c for example). =
-=20
->=20
-> well, I don't see the benefits of changing a string constant by a=20
-> define.=20
->=20
+Reviewed-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
 
-Improved semantics, especially since the "xics" string appears in many
-places with different meanings. But I don't want to bikeshed more, I'll
-do as David says :)
-
-> Cheers,=20
->=20
-> C.
->=20
-
-
---Sig_/_0iVP1d5ekJNC1WnIYMSIWa
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+--irmoea5ptce6kmrw
+Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
 
-iEYEARECAAYFAlk5cTcACgkQAvw66wEB28KtbACdGo1yJMhMkBHFJnTImV/lRPYT
-oEkAnR5YNEzmvAq4Tp/DJWRNgwR8VhsS
-=GoBI
+iQIzBAABCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlk5cVMACgkQc2J8L2kN
+9xBOGw//fNC7syg13FGKWsZYC//LFyEavGdukDS+qUMxYR00XC0CLg2Frubv0Mhw
+dQy9Jt0r1yoibnzXeaw9f4SzwNRST5zO20nlHlqN/RHt5v8i4G7fYeI8ZYW69L9b
+QhQ9/uUNql984l9qODFO4aqm2KC5KKJcbnNKA4IGFSiKMHZ+kPi6XPpIZfZOzwas
+YUplO/CzpSiuL+ExDZmgQM9yHFxvzuxB0XyueVtIVC3Jmj1NbBQWVSuhtRxbZW04
+VMHYoFVeogmRVhqrUPz7CQIhOREfXvdXBZ17Hbba0S3gE7eILNRLn1Paa/flCQwH
+6dubdqvasZA0FEDtPCF2erd19OdRjVJXZ4VQIIX/Z7qnKk345+gOhuDl4kFH7y7Z
+ZvVtCa6bgOYwnA/rQa+TCMp4bhft8XseUo21GB2noV0odaYqGoPFdn9Sr0lHHHJ/
++CcYBrvx095H8q4FW5dl8Ba/n0oiNp+cQ98DULs+A/pL0kdAwzlaMTka7vSHhWta
+ija/vMmXPoWzyun7tc3ZnXFTu3FjN+J/tUryUGhBOKX6a3l2Q41KkLp7sHG8LUwJ
+yyTrArGdT0SkJr6SsyMkuS5tG4ChucUyrWh2PyRNwZ/8I9S3TwXyrjuq+baFrQXh
+G36CXXxf7wdQwsbc0aNciI23wNT7ru+HQN0fuV9nt612mLf/p3s=
+=lDuk
 -----END PGP SIGNATURE-----
 
---Sig_/_0iVP1d5ekJNC1WnIYMSIWa--
+--irmoea5ptce6kmrw--
