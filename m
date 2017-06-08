@@ -1,35 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45206)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dIxYm-00086B-Bn
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:33:13 -0400
+	(envelope-from <eblake@redhat.com>) id 1dIxeO-0001TV-AR
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:39:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dIxYi-000202-GA
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:33:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33296)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dIxYi-0001ym-A1
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:33:08 -0400
-References: <20170607152825.12081-1-pbonzini@redhat.com>
-	<20170607152825.12081-2-pbonzini@redhat.com>
-	<CAFEAcA8CppP6YEPkGxVEyLnO=Kk1qirpGk2sh0bXedscxct8Jg@mail.gmail.com>
-	<8229C6EB-56EA-475E-99D4-6D9B36B5D0A7@nutanix.com>
-	<7a06506e-20ba-66b8-8c69-c500efe86301@redhat.com>
-	<0281E149-DE28-4D6D-80E0-1132CAB8ABDB@nutanix.com>
-	<1265195474.6852496.1496859744613.JavaMail.zimbra@redhat.com>
-	<20170607212825-mutt-send-email-mst@kernel.org>
-	<1191656469.6862786.1496861817272.JavaMail.zimbra@redhat.com>
-	<20170608032440-mutt-send-email-mst@kernel.org>
-	<7A6952CE-E364-4265-A3B9-9BAB7CA620D2@nutanix.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a819c39f-66e2-8879-0f5f-dce822c8b7d0@redhat.com>
-Date: Thu, 8 Jun 2017 15:33:03 +0200
+	(envelope-from <eblake@redhat.com>) id 1dIxeN-0005DQ-B6
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:39:00 -0400
+References: <cover.1496844254.git.berto@igalia.com>
+	<2ddc2703be89a250994478c92ca7695b4b88791b.1496844254.git.berto@igalia.com>
+	<5be69f00-7630-bdb1-70a8-02a078798f15@redhat.com>
+	<w51efuuochp.fsf@maestria.local.igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f8f971f7-aecf-a5d4-9550-742bc5e5d055@redhat.com>
+Date: Thu, 8 Jun 2017 08:38:48 -0500
 MIME-Version: 1.0
-In-Reply-To: <7A6952CE-E364-4265-A3B9-9BAB7CA620D2@nutanix.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 18/33] vhost-user-scsi: Introduce
- vhost-user-scsi host device
+In-Reply-To: <w51efuuochp.fsf@maestria.local.igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="QP1G2M9M1kgqFS4iXqKw6n9IBaIs7l3o8"
+Subject: Re: [Qemu-devel] [PATCH v2 2/7] qcow2: Use unsigned int for both
+ members of Qcow2COWRegion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,30 +27,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Felipe Franciosi <felipe@nutanix.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--QP1G2M9M1kgqFS4iXqKw6n9IBaIs7l3o8
+From: Eric Blake <eblake@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, "Denis V . Lunev" <den@openvz.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <f8f971f7-aecf-a5d4-9550-742bc5e5d055@redhat.com>
+Subject: Re: [PATCH v2 2/7] qcow2: Use unsigned int for both members of
+ Qcow2COWRegion
+References: <cover.1496844254.git.berto@igalia.com>
+ <2ddc2703be89a250994478c92ca7695b4b88791b.1496844254.git.berto@igalia.com>
+ <5be69f00-7630-bdb1-70a8-02a078798f15@redhat.com>
+ <w51efuuochp.fsf@maestria.local.igalia.com>
+In-Reply-To: <w51efuuochp.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 06/08/2017 08:06 AM, Alberto Garcia wrote:
+> On Wed 07 Jun 2017 06:02:06 PM CEST, Eric Blake wrote:
+>=20
+>>> - The offset of the COW region from the start of the first cluster
+>>>   touched by the I/O request. Since it's always going to be positive
+>>>   and the maximum request size is at most INT_MAX, we can use a
+>>>   regular unsigned int to store this offset.
+>>
+>> I don't know if we will ever get to the point that we allow a 64-bit
+>> request at the block layer (and then the block layer guarantees it is
+>> split down to the driver's limits, which works when a driver is still
+>> bound by 32-bit limits).  But we ALSO know that a cluster is at most
+>> 2M (in our current implementation of qcow2), so the offset of where
+>> the COW region starts in relation to the start of a cluster is < 2M.
+>=20
+> That's correct for the offset of the first region (m->cow_start),
+> however m->cow_end is also relative to the offset of the first allocate=
+d
+> cluster, so it can be > 2M if the requests spans several clusters.
+>=20
+> So I guess the maximum theoretical offset would be something like
+> INT_MAX + 2*cluster_size (a bit below that actually).
+
+At which point, your earlier claim that we bound requests at INT_MAX
+takes over.  But thanks for correcting me that the end cow region can
+indeed be more than a cluster away from the beginning region.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
+--QP1G2M9M1kgqFS4iXqKw6n9IBaIs7l3o8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 08/06/2017 13:05, Felipe Franciosi wrote:
->> Weird.  Doesn't QEMU wait for response to GET_VRING_BASE? I think
->> it does since we migrate the returned value.
->
-> It does and that's what I said on my first message. On
-> GET_VRING_BASE, a vhost-user-scsi backend application will stop
-> picking up new requests and, _additionally_, quiesce the VQ (by
-> waiting for any outstanding I/O to complete or cancelling them)
-> before returning the last_avail_idx.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Yes, I understand now.
+iQEcBAEBCAAGBQJZOVNpAAoJEKeha0olJ0Nq0IEH/0e3dj0cNAZugII3tfe4ZoIe
+xyXGf4RgcQEq83CQX9sGsgahR9BHF80fRaXU9p/eOH4L5xlbDe7lOS1kx3qf2Unt
+zagoTx+r5+6bIiqVZ+80qp6ztg3pVddpQ+aWutsk8Dllf2lWWUVHtxlUcZBKcs3r
+zJizqMGi4h6q6QWGoW4/Kt+JNx/4ak3ehEKci5U1SicKZV48AJ7AAFCiHDunQMFt
+r5px7d2gpbqL8JHseBNUr0QBQdScQLYCKF/xucN4homLEBidUvSm2MPsNyCr7TB4
+zRyAirlLEMSjLMK9BSWbUruC9QTqkIVlDM6Eug5ujEWulx1fV4ykxwKW2a6CPOo=
+=ak2X
+-----END PGP SIGNATURE-----
 
-> Such an application therefore doesn't _necessarily_ need a drain
-> call. However, we could extend vhost-user to include a message for
-> draining (which can be implemented as "wait for pending I/O to
-> complete" or "cancel all outstanding" depending on the
-> implementation).
-
-Ok, and I see that vhost_dev_stop also calls get_vring_base so my
-worries are appeased. :)
-
-Paolo
+--QP1G2M9M1kgqFS4iXqKw6n9IBaIs7l3o8--
