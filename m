@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dIuWe-0002oD-P8
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 06:18:50 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dIuWz-0002y3-Ig
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 06:19:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dIuWZ-0008I9-NN
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 06:18:48 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:32941)
+	(envelope-from <stefanha@gmail.com>) id 1dIuWu-0008OS-IE
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 06:19:09 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:38858)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dIuWZ-0008I5-GI
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 06:18:43 -0400
-Received: by mail-wm0-x244.google.com with SMTP id x3so6547377wme.0
-	for <qemu-devel@nongnu.org>; Thu, 08 Jun 2017 03:18:43 -0700 (PDT)
-Date: Thu, 8 Jun 2017 11:18:40 +0100
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dIuWu-0008O8-A2
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 06:19:04 -0400
+Received: by mail-wm0-x232.google.com with SMTP id n195so27808132wmg.1
+	for <qemu-devel@nongnu.org>; Thu, 08 Jun 2017 03:19:04 -0700 (PDT)
+Date: Thu, 8 Jun 2017 11:19:00 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170608101840.GD4145@stefanha-x1.localdomain>
+Message-ID: <20170608101900.GE4145@stefanha-x1.localdomain>
 References: <20170606072229.9302-1-haozhong.zhang@intel.com>
 	<20170606072229.9302-4-haozhong.zhang@intel.com>
 	<20170607152749.GF21990@stefanha-x1.localdomain>
-	<20170608063948.vpv5ndka76dyyxp4@hz-desktop>
+	<20170608014529.5eczic72rw4cxkxl@hz-desktop>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="wULyF7TL5taEdwHz"
+	protocol="application/pgp-signature"; boundary="ffoCPvUAPMgSXi6H"
 Content-Disposition: inline
-In-Reply-To: <20170608063948.vpv5ndka76dyyxp4@hz-desktop>
+In-Reply-To: <20170608014529.5eczic72rw4cxkxl@hz-desktop>
 Subject: Re: [Qemu-devel] [PATCH v2 3/4] nvdimm: add a boolean option
  "restrict"
 List-Id: <qemu-devel.nongnu.org>
@@ -36,12 +36,12 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <guangrong.xiao@gmail.com>, Dan Williams <dan.j.williams@intel.com>
 
 
---wULyF7TL5taEdwHz
+--ffoCPvUAPMgSXi6H
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 08, 2017 at 02:39:48PM +0800, Haozhong Zhang wrote:
+On Thu, Jun 08, 2017 at 09:45:29AM +0800, Haozhong Zhang wrote:
 > On 06/07/17 16:27 +0100, Stefan Hajnoczi wrote:
 > > On Tue, Jun 06, 2017 at 03:22:28PM +0800, Haozhong Zhang wrote:
 > > > If a vNVDIMM device is not backed by a DAX device and its "restrict"
@@ -65,27 +65,24 @@ On Thu, Jun 08, 2017 at 02:39:48PM +0800, Haozhong Zhang wrote:
 > > This new property defaults to 'auto'.  Machine types older than
 > > pc-i440fx-2.10 and pc-q35-2.10 default to 'on'.
 >=20
-> I think the the name "readonly" is not precise, because QEMU only sets
-> one bit and does not prevent guest writes. It's guest decision to
-> treat the vNVDIMM devices as read-only (e.g. Linux kernel).
->=20
-> We may use "unsafe-write" instead.
+> Shouldn't it be 'off' on older machine types? The older machine types
+> and older QEMU never check the backend and never set ACPI_NFIT_MEM_NOT_AR=
+MED.
 
-I agree, "readonly" isn't accurate.  I would use the NFIT terminology
-and call it "armed".
+You are right.  'readonly' should be 'off' for older machine types.
 
---wULyF7TL5taEdwHz
+--ffoCPvUAPMgSXi6H
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJZOSSAAAoJEJykq7OBq3PIKIsH+wYZPnWPl1bhFCi8nRO8Xd/B
-XPApqS67irumIHZdiCw7D/Al6S0H3Rx2MM5jlskVTBZ8daLbFEFy5EsvufJTBJu6
-clmzovB1oKu5o4mNwnVXwiWkxef9lvr1oR8/p2yX1IaPLgHJ48XGMlAwn/4hVNuE
-aJwxX+OOR+6XE2un1ACXzJIP+AAYUJwoM5QEJzKKpeCAAMsCyHul8slP3qddnsKB
-0t/OoiPVtpPuzMq1xt6xb2n4IAIj2oYjrgF3kGvDzGFqeynXfpMjdG4OKUAvD4or
-crCpBrRNq//vsaW7ZjntzHur6ZxZt3ds1NdZG79FWQJKu3MoDktdfZEtcUCkAkM=
-=2uBi
+iQEcBAEBAgAGBQJZOSSUAAoJEJykq7OBq3PIYiYH/RGNw48hHAjYhltcLn1eIA9O
+lLnuejnaFYxbxgzOKRNlqiK124byCwTjwcdrKRSGcEYwlrvZ02uN2jTWSurtQIFB
+ljsUhXhTMdaSyhhNjmg0BwimjV4y1gGmPLQPD81VgVaa/ZewtOdxt5y40MtEBYdT
+OizFzRm77Jb+hrwyKr9t9etx4Wi5D9J8FO7Ilj0Md1oCNQOexydqWrTNBBTo0Fo5
+t/cPKasLQGn5MiMJpoDbyBwh/1dYHsHkw2k2Ofu58e04r3OCqHgXXwhP2pZg8L5y
+7DaqD/hCrbaNaBKCwhOadXo+5A2sfAQWv4ezszf5yele99pCGAKd4SY7oF11IEo=
+=HsBm
 -----END PGP SIGNATURE-----
 
---wULyF7TL5taEdwHz--
+--ffoCPvUAPMgSXi6H--
