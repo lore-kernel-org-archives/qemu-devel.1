@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dJ1UT-0006xx-So
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 13:45:02 -0400
+	(envelope-from <armbru@redhat.com>) id 1dJ1fn-0002jp-TU
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 13:56:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dJ1UP-0005wN-Kt
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 13:45:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47568)
+	(envelope-from <armbru@redhat.com>) id 1dJ1fk-0001gi-H5
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 13:56:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35532)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dJ1UP-0005v6-Be
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 13:44:57 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 530748F226
-	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 17:44:56 +0000 (UTC)
-Date: Thu, 8 Jun 2017 14:44:51 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170608174451.GJ22043@thinpad.lan.raisama.net>
-References: <20170608133906.12737-1-ehabkost@redhat.com>
-	<20170608133906.12737-6-ehabkost@redhat.com>
-	<b27cc65d-1a07-c320-0bbc-8bb11dc22e63@redhat.com>
-	<20170608160516.GL5016@thinpad.lan.raisama.net>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dJ1fk-0001gD-93
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 13:56:40 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <2b2311b1b070a0b03973e39deccf4682de4a6cd4.1496686997.git.alistair.francis@xilinx.com>
+	<CAJ+F1CLuPkWjG3Hn8hfaxTApn6+ouqh5nJZNWSQYX1C3_HRFqA@mail.gmail.com>
+	<e340cdb9-3c97-8624-81d9-f7888f819a68@amsat.org>
+	<CAKmqyKOOhu7iKuW4naNi0+7cwayLaftkPf=gS7uBakMvKavxVQ@mail.gmail.com>
+	<270686d0-1ca8-965f-a14a-397f45616deb@redhat.com>
+	<87shjc2rkb.fsf@dusky.pond.sub.org>
+	<CAKmqyKMJ8ZgTPtEj73pBDU+mf578tubKPUPsP4mTD8veX90K-w@mail.gmail.com>
+	<878tl3kodm.fsf@dusky.pond.sub.org>
+	<CAKmqyKP3S7mBwQzC0yV4MpQddcKvGXtXrPyY68X7t62YwLqy3g@mail.gmail.com>
+Date: Thu, 08 Jun 2017 19:56:35 +0200
+In-Reply-To: <CAKmqyKP3S7mBwQzC0yV4MpQddcKvGXtXrPyY68X7t62YwLqy3g@mail.gmail.com>
+	(Alistair Francis's message of "Thu, 8 Jun 2017 09:53:57 -0700")
+Message-ID: <871squz7l8.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170608160516.GL5016@thinpad.lan.raisama.net>
-Subject: Re: [Qemu-devel] [PATCH 5/5] vnc: No need for Error** parameter at
- vnc_client_io_error()
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] char-socket: Don't report TCP
+ socket waiting as an error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,98 +35,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?utf-8?Q?Marc-Andr?= =?utf-8?Q?=C3=A9?= Lureau <marcandre.lureau@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, Jun 08, 2017 at 01:05:16PM -0300, Eduardo Habkost wrote:
-> On Thu, Jun 08, 2017 at 10:17:45AM -0500, Eric Blake wrote:
-> > On 06/08/2017 08:39 AM, Eduardo Habkost wrote:
-> > > The only callers of vnc_client_io_error() with non-NULL errp don't use
-> > > *errp after the function gets called, so there's no need to use an
-> > > Error** argument.  Change parameter to Error* and simplify the code.
-> > > 
-> > > Cc: Gerd Hoffmann <kraxel@redhat.com>
-> > > Cc: Daniel P. Berrange <berrange@redhat.com>
-> > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > > ---
-> > >  ui/vnc.h |  2 +-
-> > >  ui/vnc.c | 13 +++++--------
-> > >  2 files changed, 6 insertions(+), 9 deletions(-)
-> > 
-> > >  
-> > > -ssize_t vnc_client_io_error(VncState *vs, ssize_t ret, Error **errp)
-> > > +ssize_t vnc_client_io_error(VncState *vs, ssize_t ret, Error *err)
-> > >  {
-> > 
-> > This is unusual.
-> 
-> Why?  I would say that using Error** for input (and not output)
-> is the unusual pattern.
-> 
-> This is the only remaining place in the whole tree where code
-> assigns something to *errp outside util/error.c (and no callers
-> of this function rely on this feature).
-> 
-> 
-> 
-> > 
-> > >      if (ret <= 0) {
-> > >          if (ret == 0) {
-> > > @@ -1188,14 +1188,11 @@ ssize_t vnc_client_io_error(VncState *vs, ssize_t ret, Error **errp)
-> > >              vnc_disconnect_start(vs);
-> > >          } else if (ret != QIO_CHANNEL_ERR_BLOCK) {
-> > >              VNC_DEBUG("Closing down client sock: ret %zd (%s)\n",
-> > > -                      ret, errp ? error_get_pretty(*errp) : "Unknown");
-> > > +                      ret, err ? error_get_pretty(err) : "Unknown");
-> > >              vnc_disconnect_start(vs);
-> > >          }
-> > >  
-> > > -        if (errp) {
-> > > -            error_free(*errp);
-> > > -            *errp = NULL;
-> > > -        }
-> > > +        error_free(err);
-> > 
-> > Worse, it's action at a distance. You are freeing memory here that was
-> > allocated in the callers.
-> 
-> Isn't this one of the purposes of this function?
-> 
-> The difference here is that now the function function is just
-> taking ownership of err, making the interface and the
-> implementation simpler.  If I document this more clearly at
-> vnc_client_io_error()'s declaration, would it make this change
-> acceptable?
+Alistair Francis <alistair.francis@xilinx.com> writes:
 
-What about the following?
+> On Wed, Jun 7, 2017 at 11:03 PM, Markus Armbruster <armbru@redhat.com> wrote:
+>> Alistair Francis <alistair.francis@xilinx.com> writes:
+>>
+>>> On Wed, Jun 7, 2017 at 12:19 AM, Markus Armbruster <armbru@redhat.com> wrote:
+>>>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>>>>
+>>>>> On 06/06/2017 18:30, Alistair Francis wrote:
+>>>>>>>
+>>>>>>> This is somehow confusing. I don't think it is worth having another
+>>>>>>> qemu_log_stderr() function rather than using error_report() but this very
+>>>>>>> call might deserve a comment explaining this unusual use. What do you think?
+>>>>>>
+>>>>>> The problem with stderr is that this isn't an error. Some uses of QEMU
+>>>>>> (inside Eclipse for example) flag everything printed on stderr as red
+>>>>>> which confuses users that they are seeing an error when they really
+>>>>>> aren't.
+>>>>>
+>>>>> But they are wrong.
+>>>>
+>>>> Concur.  We also print warnings and informational messages to stderr.
+>>>>
+>>>> We should make errors easy to recognize.  Fortunately, error_report()
+>>>> prints errors to stderr in a rigid format.  Unfortunately, error
+>>>> messages bypassing error_report() still exist in places.  We suck.
+>>>>
+>>>> The format is
+>>>>
+>>>>     timestamp-if-enabled progname ':' location message
+>>>>
+>>>> timestamp-if-enabled is normally empty.  With -msg timestamp=on, it's
+>>>> the current time in ISO 8601 format, followed by a space.
+>>>>
+>>>> progname is the program name (main()'s argv[0]).
+>>>>
+>>>> location is either empty, or a reference to the command line or a
+>>>> configuration file.
+>>>>
+>>>> See error_vreport() for details.
+>>>
+>>> Ok, but this isn't an error, it's more information. So it sounds like
+>>> we should still print to stderr but not print in the format described
+>>> above?
+>>
+>> Yes.
+>>
+>> I explained the error message format to show how to distinguish actual
+>> errors from other stuff.
+>
+> Sorry, I should have been more clear. I meant we should not use the
+> error_report() function here. I don't think we have any
+> warning_report() function though, is that something worth having?
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- ui/vnc.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+So far we simply use error_printf() for such things.
 
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 51f13f0c29..cb55554210 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -1180,6 +1180,15 @@ void vnc_disconnect_finish(VncState *vs)
-     g_free(vs);
- }
- 
-+
-+/*
-+ * Handle I/O error (@ret < 0) or EOF (@ret == 0) from I/O
-+ * channel.  In case of errors or EOF, @err is freed using
-+ * error_free().
-+ *
-+ * Returns 0 in case @ret <= 0 and the error was properly
-+ * handled, otherwise returns @ret.
-+ */
- ssize_t vnc_client_io_error(VncState *vs, ssize_t ret, Error *err)
- {
-     if (ret <= 0) {
--- 
-2.11.0.259.g40922b1
-
--- 
-Eduardo
+A function to report a warning would let us report them more uniformly,
+but only if we actually use it uniformly.  In other words, adding one
+without also converting the existing warnings to use it would create yet
+another open-ended incremental conversion job.  Are we up to it?
