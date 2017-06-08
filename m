@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dIte6-00084M-GV
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:22:28 -0400
+	(envelope-from <clg@kaod.org>) id 1dIthg-0000cL-MV
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:26:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dIte3-0000vO-BW
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:22:26 -0400
-Received: from mxhk.zte.com.cn ([63.217.80.70]:49920)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dIte2-0000ur-5k
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:22:23 -0400
-Date: Thu, 8 Jun 2017 17:21:09 +0800 (CST)
-Message-ID: <201706081721097319444@zte.com.cn>
-References: 1496659493-1105-1-git-send-email-wang.yong155@zte.com.cn,
-	ba2f1089-add7-63ca-8406-fde640cc02bf@redhat.com
-Mime-Version: 1.0
-From: <wang.yong155@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBSZTogW1BBVENIdjIgMDQvMDRdIGNv?=
- =?utf-8?q?lo-compare=3A_Update_the_COLO_document_to_fix_theprocessing_of_?=
- =?utf-8?q?secondary_packets_in_the_main_thread?=
+	(envelope-from <clg@kaod.org>) id 1dIthb-0002dQ-Qo
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:26:08 -0400
+Received: from 10.mo4.mail-out.ovh.net ([188.165.33.109]:57148)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dIthb-0002d5-I7
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:26:03 -0400
+Received: from player772.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id EF8D770E1B
+	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 11:26:01 +0200 (CEST)
+References: <149685579678.12025.9278446121024037161.stgit@bahia.lan>
+	<149685582923.12025.13700165807436904935.stgit@bahia.lan>
+	<c632e0a3-c6bb-2637-40c3-5098937476a5@kaod.org>
+	<20170607225507.5d2c6c33@bahia.ttt.fr.ibm.com>
+	<20170608015329.GS13397@umbus.fritz.box>
+	<20170608111450.05c37c89@bahia.ttt.fr.ibm.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <40dea77b-93e1-a6e6-e95a-60fe5ff5e335@kaod.org>
+Date: Thu, 8 Jun 2017 11:25:52 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170608111450.05c37c89@bahia.ttt.fr.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] xics: setup cpu at realize time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,76 +34,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jasowang@redhat.com, zhang.zhanghailiang@huawei.com
-Cc: zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com, qemu-devel@nongnu.org, wang.guang55@zte.com.cn
+To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-77ye77yeIEZyb206IFdhbmcgWW9uZyDvvJx3YW5nLnlvbmcxNTVAenRlLmNvbS5jbu+8ng0KDQrv
-vJ7vvJ4NCg0K77ye77yeIEluIG15IHRlc3QsIHNlY29uZGFyeSBkb2VzIG5vdCBwcm9jZXNzIHRo
-ZSBwYWNrZXRzIGNvbXBhcmluZyBpbiB0aGUgSU9UaHJlYWQNCg0K77ye77yeIGJ1dCBpbiB0aGUg
-cWVtdSBtYWluIHRocmVhZCBwcm9jZXNzaW5nLg0KDQrvvJ7vvJ4gc2Vjb25kYXJ5J3MgY29uZmln
-dXJhdGlvbiAiIC1jaGFyZGV2IHNvY2tldCxpZD1jb21wYXJlMSxob3N0PTMuMy4zLjMscG9ydD05
-MDA0LHNlcnZlcixub3dhaXQiDQoNCu+8nu+8niBoZXJlLHdlIHNob3VsZCB1c2UgJ3dhaXQnIGlu
-c3RlYWQgb2YgJ25vd2FpdCcgY29uZmlndXJhdGlvbiAuDQoNCu+8nu+8niBhZnRlciB1c2UgICd3
-YWl0JyBjb25maWd1cmF0aW9uICxwYWNrZXRzIGNhbiBiZSBwcm9jZXNzIGluIHRoZSBJT1RocmVh
-ZCBmcm9tIHRoZSBzZWNvbmRhcnksDQoNCu+8nu+8niBub3QgaW4gdGhlIHFlbXUgbWFpbiB0aHJl
-YWQuDQoNCu+8nu+8ng0KDQrvvJ7vvJ4gU2lnbmVkLW9mZi1ieTogV2FuZyBZb25n77ycd2FuZy55
-b25nMTU1QHp0ZS5jb20uY27vvJ4NCg0K77ye77yeIFNpZ25lZC1vZmYtYnk6IFdhbmcgR3Vhbmfv
-vJx3YW5nLmd1YW5nNTVAenRlLmNvbS5jbu+8ng0KDQrvvJ7vvJ4gLS0tDQoNCg0KDQoNCu+8nlRo
-aXMgaXMgYSBoaW50IHByb2JhYmx5IGZvciBzb21ldGhpbmcgd3JvbmcgaW4gdGhlIGNvZGUuIE5l
-ZWQgdG8gZmlndXJlIA0KDQrvvJ5vdXQgdGhlIHJvb3QgY2F1c2UuDQoNCg0KDQoNCkkgdGhpbmsg
-dGhpcyBpcyBub3QgYSBCVUcgYnV0IGNvbmZpZ3VyYXRpb24gcHJvYmxlbS4NCg0KdGhlbiB0aGlz
-IHNlcmllcyBjYW4gbm90IHN1Ym1pdCB0aGlzIHBhdGNoLg0KDQoNCg0KDQpUaGFua3MNCg0KDQoN
-Cg0K77yeVGhhbmtzDQoNCg0KDQoNCu+8nu+8niAgIGRvY3MvY29sby1wcm94eS50eHQgfCAyICst
-DQoNCu+8nu+8niAgIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlvbigt
-KQ0KDQrvvJ7vvJ4NCg0K77ye77yeIGRpZmYgLS1naXQgYS9kb2NzL2NvbG8tcHJveHkudHh0IGIv
-ZG9jcy9jb2xvLXByb3h5LnR4dA0KDQrvvJ7vvJ4gaW5kZXggY2UzZjc4My4uNTY3Y2M4YiAxMDA2
-NDQNCg0K77ye77yeIC0tLSBhL2RvY3MvY29sby1wcm94eS50eHQNCg0K77ye77yeICsrKyBiL2Rv
-Y3MvY29sby1wcm94eS50eHQNCg0K77ye77yeIEBAIC0xNjUsNyArMTY1LDcgQEAgUHJpbWFyeShp
-cDozLjMuMy4zKToNCg0K77ye77yeICAgLW5ldGRldiB0YXAsaWQ9aG4wLHZob3N0PW9mZixzY3Jp
-cHQ9L2V0Yy9xZW11LWlmdXAsZG93bnNjcmlwdD0vZXRjL3FlbXUtaWZkb3duDQoNCu+8nu+8niAg
-IC1kZXZpY2UgZTEwMDAsaWQ9ZTAsbmV0ZGV2PWhuMCxtYWM9NTI6YTQ6MDA6MTI6Nzg6NjYNCg0K
-77ye77yeICAgLWNoYXJkZXYgc29ja2V0LGlkPW1pcnJvcjAsaG9zdD0zLjMuMy4zLHBvcnQ9OTAw
-MyxzZXJ2ZXIsbm93YWl0DQoNCu+8nu+8niAtLWNoYXJkZXYgc29ja2V0LGlkPWNvbXBhcmUxLGhv
-c3Q9My4zLjMuMyxwb3J0PTkwMDQsc2VydmVyLG5vd2FpdA0KDQrvvJ7vvJ4gKy1jaGFyZGV2IHNv
-Y2tldCxpZD1jb21wYXJlMSxob3N0PTMuMy4zLjMscG9ydD05MDA0LHNlcnZlcix3YWl0DQoNCu+8
-nu+8niAgIC1jaGFyZGV2IHNvY2tldCxpZD1jb21wYXJlMCxob3N0PTMuMy4zLjMscG9ydD05MDAx
-LHNlcnZlcixub3dhaXQNCg0K77ye77yeICAgLWNoYXJkZXYgc29ja2V0LGlkPWNvbXBhcmUwLTAs
-aG9zdD0zLjMuMy4zLHBvcnQ9OTAwMQ0KDQrvvJ7vvJ4gICAtY2hhcmRldiBzb2NrZXQsaWQ9Y29t
-cGFyZV9vdXQsaG9zdD0zLjMuMy4zLHBvcnQ9OTAwNSxzZXJ2ZXIsbm93YWkNCg0KDQoNCg0KDQoN
-Cg0KDQoNCg0KDQoNCg0KDQoNCuWOn+Wni+mCruS7tg0KDQoNCg0K5Y+R5Lu25Lq677yaIO+8nGph
-c293YW5nQHJlZGhhdC5jb23vvJ4NCuaUtuS7tuS6uu+8mueOi+WLhzEwMTcwNTMwIO+8nHpoYW5n
-LnpoYW5naGFpbGlhbmdAaHVhd2VpLmNvbe+8niDvvJx6aGFuZ2NoZW4uZm5zdEBjbi5mdWppdHN1
-LmNvbe+8ng0K5oqE6YCB5Lq677yaIO+8nGxpemhpamlhbkBjbi5mdWppdHN1LmNvbe+8niDvvJxx
-ZW11LWRldmVsQG5vbmdudS5vcmfvvJ7njovlub8xMDE2NTk5Mg0K5pelIOacnyDvvJoyMDE35bm0
-MDbmnIgwN+aXpSAxNjozNw0K5Li7IOmimCDvvJpSZTogW1BBVENIdjIgMDQvMDRdIGNvbG8tY29t
-cGFyZTogVXBkYXRlIHRoZSBDT0xPIGRvY3VtZW50IHRvIGZpeCB0aGVwcm9jZXNzaW5nIG9mIHNl
-Y29uZGFyeSBwYWNrZXRzIGluIHRoZSBtYWluIHRocmVhZA0KDQoNCg0KDQoNCg0KDQpPbiAyMDE3
-5bm0MDbmnIgwNeaXpSAxODo0NCwgWW9uZyBXYW5nIHdyb3RlOg0K77yeIEZyb206IFdhbmcgWW9u
-ZyDvvJx3YW5nLnlvbmcxNTVAenRlLmNvbS5jbu+8ng0K77yeDQrvvJ4gSW4gbXkgdGVzdCwgc2Vj
-b25kYXJ5IGRvZXMgbm90IHByb2Nlc3MgdGhlIHBhY2tldHMgY29tcGFyaW5nIGluIHRoZSBJT1Ro
-cmVhZA0K77yeIGJ1dCBpbiB0aGUgcWVtdSBtYWluIHRocmVhZCBwcm9jZXNzaW5nLg0K77yeIHNl
-Y29uZGFyeSdzIGNvbmZpZ3VyYXRpb24gIiAtY2hhcmRldiBzb2NrZXQsaWQ9Y29tcGFyZTEsaG9z
-dD0zLjMuMy4zLHBvcnQ9OTAwNCxzZXJ2ZXIsbm93YWl0Ig0K77yeIGhlcmUsd2Ugc2hvdWxkIHVz
-ZSAnd2FpdCcgaW5zdGVhZCBvZiAnbm93YWl0JyBjb25maWd1cmF0aW9uIC4NCu+8niBhZnRlciB1
-c2UgICd3YWl0JyBjb25maWd1cmF0aW9uICxwYWNrZXRzIGNhbiBiZSBwcm9jZXNzIGluIHRoZSBJ
-T1RocmVhZCBmcm9tIHRoZSBzZWNvbmRhcnksDQrvvJ4gbm90IGluIHRoZSBxZW11IG1haW4gdGhy
-ZWFkLg0K77yeDQrvvJ4gU2lnbmVkLW9mZi1ieTogV2FuZyBZb25n77ycd2FuZy55b25nMTU1QHp0
-ZS5jb20uY27vvJ4NCu+8niBTaWduZWQtb2ZmLWJ5OiBXYW5nIEd1YW5n77ycd2FuZy5ndWFuZzU1
-QHp0ZS5jb20uY27vvJ4NCu+8niAtLS0NCg0KVGhpcyBpcyBhIGhpbnQgcHJvYmFibHkgZm9yIHNv
-bWV0aGluZyB3cm9uZyBpbiB0aGUgY29kZS4gTmVlZCB0byBmaWd1cmUgDQpvdXQgdGhlIHJvb3Qg
-Y2F1c2UuDQoNClRoYW5rcw0KDQrvvJ4gICBkb2NzL2NvbG8tcHJveHkudHh0IHwgMiArLQ0K77ye
-ICAgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0pDQrvvJ4NCu+8
-niBkaWZmIC0tZ2l0IGEvZG9jcy9jb2xvLXByb3h5LnR4dCBiL2RvY3MvY29sby1wcm94eS50eHQN
-Cu+8niBpbmRleCBjZTNmNzgzLi41NjdjYzhiIDEwMDY0NA0K77yeIC0tLSBhL2RvY3MvY29sby1w
-cm94eS50eHQNCu+8niArKysgYi9kb2NzL2NvbG8tcHJveHkudHh0DQrvvJ4gQEAgLTE2NSw3ICsx
-NjUsNyBAQCBQcmltYXJ5KGlwOjMuMy4zLjMpOg0K77yeICAgLW5ldGRldiB0YXAsaWQ9aG4wLHZo
-b3N0PW9mZixzY3JpcHQ9L2V0Yy9xZW11LWlmdXAsZG93bnNjcmlwdD0vZXRjL3FlbXUtaWZkb3du
-DQrvvJ4gICAtZGV2aWNlIGUxMDAwLGlkPWUwLG5ldGRldj1objAsbWFjPTUyOmE0OjAwOjEyOjc4
-OjY2DQrvvJ4gICAtY2hhcmRldiBzb2NrZXQsaWQ9bWlycm9yMCxob3N0PTMuMy4zLjMscG9ydD05
-MDAzLHNlcnZlcixub3dhaXQNCu+8niAtLWNoYXJkZXYgc29ja2V0LGlkPWNvbXBhcmUxLGhvc3Q9
-My4zLjMuMyxwb3J0PTkwMDQsc2VydmVyLG5vd2FpdA0K77yeICstY2hhcmRldiBzb2NrZXQsaWQ9
-Y29tcGFyZTEsaG9zdD0zLjMuMy4zLHBvcnQ9OTAwNCxzZXJ2ZXIsd2FpdA0K77yeICAgLWNoYXJk
-ZXYgc29ja2V0LGlkPWNvbXBhcmUwLGhvc3Q9My4zLjMuMyxwb3J0PTkwMDEsc2VydmVyLG5vd2Fp
-dA0K77yeICAgLWNoYXJkZXYgc29ja2V0LGlkPWNvbXBhcmUwLTAsaG9zdD0zLjMuMy4zLHBvcnQ9
-OTAwMQ0K77yeICAgLWNoYXJkZXYgc29ja2V0LGlkPWNvbXBhcmVfb3V0LGhvc3Q9My4zLjMuMyxw
-b3J0PTkwMDUsc2VydmVyLG5vd2FpdA==
+On 06/08/2017 11:14 AM, Greg Kurz wrote:
+> On Thu, 8 Jun 2017 11:53:29 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+>> On Wed, Jun 07, 2017 at 10:55:07PM +0200, Greg Kurz wrote:
+>>> On Wed, 7 Jun 2017 20:11:38 +0200
+>>> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>>>  =20
+>>>> On 06/07/2017 07:17 PM, Greg Kurz wrote: =20
+>>>>> Until recently, spapr used to allocate ICPState objects for the lif=
+etime
+>>>>> of the machine. They would only be associated to vCPUs in xics_cpu_=
+setup()
+>>>>> when plugging a CPU core.
+>>>>>
+>>>>> Now that ICPState objects have the same lifecycle as vCPUs, it is
+>>>>> possible to associate them during realization.
+>>>>>
+>>>>> This patch hence open-codes xics_cpu_setup() in icp_realize(). The =
+vCPU
+>>>>> is passed as a property. Note that vCPU now needs to be realized fi=
+rst
+>>>>> for the IRQs to be allocated. It also needs to resetted before ICPS=
+tate
+>>>>> realization in order to synchronize with KVM.
+>>>>>
+>>>>> Since ICPState objects are freed when unrealized, xics_cpu_destroy(=
+) isn't
+>>>>> needed anymore and can be safely dropped.   =20
+>>>>
+>>>> I like the idea but I think the assignment of ->cs attribute should =
+be=20
+>>>> moved under icp_kvm_cpu_setup(), as it is only used under xics_kvm b=
+y=20
+>>>> the kvm_vcpu_ioctl() calls.=20
+>>>>  =20
+>>>
+>>> Well, cs->cpu_index is also used for traces and to implement the 'inf=
+o pic'
+>>> monitor command. =20
+>>
+>> Right.  I think it makes sense for the ICP to have a handle on it's
+>> associated CPU, even if we don't actually use it in all cases right
+>> now.  So I have no problem with the property being in all ICPs; I
+>> think that will be cleaner than special casing xics_kvm.  Especially
+>> if we have to un-special-case it sometime in future because we need
+>> to access the CPU object for some reason we haven't thought of yet.
+>>
+>=20
+> We had discussed with Cedric about that actually but when I started
+> to write code, I had the impression that I would have to do convoluted
+> things to get rid of the CPU handle in ICP.
+
+There is nothing complex and it would surely simplify cpu_setup().=20
+
+But, the main argument is that it might be useful to other platforms.  =20
+So there is not much value in removing it. I am OK with that. I am less
+OK with using the index, even if it is useful for the migration state=20
+of ICP objects today.=20
+
+We could be tempted to use more of cpu_index, like we have done in=20
+the past, and that was really complex to untangle. Let's be cautious.
+
+C.
