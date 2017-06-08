@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47333)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mrolnik@gmail.com>) id 1dJ2Vb-0005oP-1r
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 14:50:16 -0400
+	(envelope-from <mrolnik@gmail.com>) id 1dJ2Vn-0005yM-Gg
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 14:50:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mrolnik@gmail.com>) id 1dJ2VZ-0001Po-EK
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 14:50:15 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36355)
+	(envelope-from <mrolnik@gmail.com>) id 1dJ2Vl-0001Ry-Op
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 14:50:27 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34134)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1dJ2VZ-0001Oi-4m
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 14:50:13 -0400
-Received: by mail-wm0-x242.google.com with SMTP id d17so3821402wme.3
-	for <qemu-devel@nongnu.org>; Thu, 08 Jun 2017 11:50:12 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1dJ2Vl-0001Rh-BO
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 14:50:25 -0400
+Received: by mail-wm0-x243.google.com with SMTP id 70so8662173wme.1
+	for <qemu-devel@nongnu.org>; Thu, 08 Jun 2017 11:50:25 -0700 (PDT)
 From: Michael Rolnik <mrolnik@gmail.com>
-Date: Thu,  8 Jun 2017 21:49:41 +0300
-Message-Id: <20170608184944.19406-7-mrolnik@gmail.com>
+Date: Thu,  8 Jun 2017 21:49:44 +0300
+Message-Id: <20170608184944.19406-10-mrolnik@gmail.com>
 In-Reply-To: <20170608184944.19406-1-mrolnik@gmail.com>
 References: <20170608184944.19406-1-mrolnik@gmail.com>
-Subject: [Qemu-devel] [PATCH RFC v19 06/13] target-avr: adding helpers for
- IN, OUT, SLEEP, WBR & unsupported instructions
+Subject: [Qemu-devel] [PATCH RFC v19 09/13] target-avr: adding instruction
+ decoder
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,340 +30,734 @@ To: qemu-devel@nongnu.org
 Cc: anichang@protonmail.ch, Michael Rolnik <mrolnik@gmail.com>, Richard Henderson <rth@twiddle.net>
 
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Message-Id: <1471522070-77598-7-git-send-email-mrolnik@gmail.com>
+Message-Id: <1471522070-77598-10-git-send-email-mrolnik@gmail.com>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/avr/cpu.h       |  10 +++
- target/avr/helper.c    | 216 ++++++++++++++++++++++++++++++++++++++++++++++++-
- target/avr/helper.h    |   7 ++
- target/avr/translate.c |   8 ++
- 4 files changed, 239 insertions(+), 2 deletions(-)
+ target/avr/Makefile.objs |   1 +
+ target/avr/decode.c      | 691 +++++++++++++++++++++++++++++++++++++++++++++++
+ target/avr/translate.c   |   2 +
+ 3 files changed, 694 insertions(+)
+ create mode 100644 target/avr/decode.c
 
-diff --git a/target/avr/cpu.h b/target/avr/cpu.h
-index 54dc58c0df..92143244f7 100644
---- a/target/avr/cpu.h
-+++ b/target/avr/cpu.h
-@@ -139,6 +139,7 @@ struct CPUAVRState {
-     uint32_t sp; /* 16 bits */
- 
-     uint64_t intsrc; /* interrupt sources */
-+    bool fullacc;/* CPU/MEM if true MEM only otherwise */
- 
-     uint32_t features;
- 
-@@ -181,6 +182,10 @@ int avr_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int rw,
- int avr_cpu_memory_rw_debug(CPUState *cs, vaddr address, uint8_t *buf,
-                                 int len, bool is_write);
- 
-+enum {
-+    TB_FLAGS_FULL_ACCESS = 1,
-+};
-+
- static inline void cpu_get_tb_cpu_state(CPUAVRState *env, target_ulong *pc,
-                                 target_ulong *cs_base, uint32_t *pflags)
- {
-@@ -188,6 +193,11 @@ static inline void cpu_get_tb_cpu_state(CPUAVRState *env, target_ulong *pc,
- 
-     *pc = env->pc_w * 2;
-     *cs_base = 0;
-+
-+    if (env->fullacc) {
-+        flags |= TB_FLAGS_FULL_ACCESS;
-+    }
-+
-     *pflags = flags;
- }
- 
-diff --git a/target/avr/helper.c b/target/avr/helper.c
-index 61255fdff3..bc53053a57 100644
---- a/target/avr/helper.c
-+++ b/target/avr/helper.c
-@@ -28,6 +28,7 @@
- #include "exec/cpu_ldst.h"
- #include "qemu/host-utils.h"
- #include "exec/helper-proto.h"
-+#include "exec/ioport.h"
- 
- bool avr_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
- {
-@@ -79,11 +80,11 @@ void avr_cpu_do_interrupt(CPUState *cs)
- 
-     if (avr_feature(env, AVR_FEATURE_3_BYTE_PC)) {
-         cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
--        cpu_stb_data(env, env->sp--, (ret & 0x00ff00) >>  8);
-+        cpu_stb_data(env, env->sp--, (ret & 0x00ff00) >> 8);
-         cpu_stb_data(env, env->sp--, (ret & 0xff0000) >> 16);
-     } else if (avr_feature(env, AVR_FEATURE_2_BYTE_PC)) {
-         cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
--        cpu_stb_data(env, env->sp--, (ret & 0x00ff00) >>  8);
-+        cpu_stb_data(env, env->sp--, (ret & 0x00ff00) >> 8);
-     } else {
-         cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
-     }
-@@ -126,7 +127,19 @@ void tlb_fill(CPUState *cs, target_ulong vaddr, MMUAccessType access_type,
-     if (mmu_idx == MMU_CODE_IDX) {
-         paddr = PHYS_BASE_CODE + vaddr - VIRT_BASE_CODE;
-         prot = PAGE_READ | PAGE_EXEC;
-+    } else if (vaddr - VIRT_BASE_REGS < AVR_REGS) {
-+        /*
-+         * this is a write into CPU registers, exit and rebuilt this TB
-+         * to use full write
-+         */
-+        AVRCPU *cpu = AVR_CPU(cs);
-+        CPUAVRState *env = &cpu->env;
-+        env->fullacc = 1;
-+        cpu_loop_exit_restore(cs, retaddr);
-     } else {
-+        /*
-+         * this is a write into memory. nothing special
-+         */
-         paddr = PHYS_BASE_DATA + vaddr - VIRT_BASE_DATA;
-         prot = PAGE_READ | PAGE_WRITE;
-     }
-@@ -134,6 +147,30 @@ void tlb_fill(CPUState *cs, target_ulong vaddr, MMUAccessType access_type,
-     tlb_set_page_with_attrs(cs, vaddr, paddr, attrs, prot, mmu_idx, page_size);
- }
- 
-+void helper_sleep(CPUAVRState *env)
-+{
-+    CPUState *cs = CPU(avr_env_get_cpu(env));
-+
-+    cs->exception_index = EXCP_HLT;
-+    cpu_loop_exit(cs);
-+}
-+
-+void helper_unsupported(CPUAVRState *env)
-+{
-+    CPUState *cs = CPU(avr_env_get_cpu(env));
-+
-+    /*
-+     *  I count not find what happens on the real platform, so
-+     *  it's EXCP_DEBUG for meanwhile
-+     */
-+    cs->exception_index = EXCP_DEBUG;
-+    if (qemu_loglevel_mask(LOG_UNIMP)) {
-+        qemu_log("UNSUPPORTED\n");
-+        cpu_dump_state(cs, qemu_logfile, fprintf, 0);
-+    }
-+    cpu_loop_exit(cs);
-+}
-+
- void helper_debug(CPUAVRState *env)
- {
-     CPUState *cs = CPU(avr_env_get_cpu(env));
-@@ -141,3 +178,178 @@ void helper_debug(CPUAVRState *env)
-     cs->exception_index = EXCP_DEBUG;
-     cpu_loop_exit(cs);
- }
-+
-+void helper_wdr(CPUAVRState *env)
-+{
-+    CPUState *cs = CPU(avr_env_get_cpu(env));
-+
-+    /* WD is not implemented yet, placeholder */
-+    cs->exception_index = EXCP_DEBUG;
-+    cpu_loop_exit(cs);
-+}
-+
+diff --git a/target/avr/Makefile.objs b/target/avr/Makefile.objs
+index a448792ff3..9848b1cb4c 100644
+--- a/target/avr/Makefile.objs
++++ b/target/avr/Makefile.objs
+@@ -21,4 +21,5 @@
+ obj-y += translate.o cpu.o helper.o
+ obj-y += gdbstub.o
+ obj-y += translate-inst.o
++obj-y += decode.o
+ obj-$(CONFIG_SOFTMMU) += machine.o
+diff --git a/target/avr/decode.c b/target/avr/decode.c
+new file mode 100644
+index 0000000000..2d2e54e448
+--- /dev/null
++++ b/target/avr/decode.c
+@@ -0,0 +1,691 @@
 +/*
-+ * This function implements IN instruction
++ * QEMU AVR CPU
 + *
-+ * It does the following
-+ * a.  if an IO register belongs to CPU, its value is read and returned
-+ * b.  otherwise io address is translated to mem address and physical memory
-+ *     is read.
-+ * c.  it caches the value for sake of SBI, SBIC, SBIS & CBI implementation
++ * Copyright (c) 2016 Michael Rolnik
 + *
-+ */
-+target_ulong helper_inb(CPUAVRState *env, uint32_t port)
-+{
-+    target_ulong data = 0;
-+
-+    switch (port) {
-+    case 0x38: /* RAMPD */
-+        data = 0xff & (env->rampD >> 16);
-+        break;
-+    case 0x39: /* RAMPX */
-+        data = 0xff & (env->rampX >> 16);
-+        break;
-+    case 0x3a: /* RAMPY */
-+        data = 0xff & (env->rampY >> 16);
-+        break;
-+    case 0x3b: /* RAMPZ */
-+        data = 0xff & (env->rampZ >> 16);
-+        break;
-+    case 0x3c: /* EIND */
-+        data = 0xff & (env->eind >> 16);
-+        break;
-+    case 0x3d: /* SPL */
-+        data = env->sp & 0x00ff;
-+        break;
-+    case 0x3e: /* SPH */
-+        data = env->sp >> 8;
-+        break;
-+    case 0x3f: /* SREG */
-+        data = cpu_get_sreg(env);
-+        break;
-+    default:
-+        /*
-+         * CPU does not know how to read this register, pass it to the
-+         * device/board
-+         */
-+        cpu_physical_memory_read(PHYS_BASE_REGS + port + AVR_CPU_IO_REGS_BASE,
-+                                 &data, 1);
-+    }
-+
-+    return data;
-+}
-+
-+/*
-+ *  This function implements OUT instruction
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
 + *
-+ *  It does the following
-+ *  a.  if an IO register belongs to CPU, its value is written into the register
-+ *  b.  otherwise io address is translated to mem address and physical memory
-+ *      is written.
-+ *  c.  it caches the value for sake of SBI, SBIC, SBIS & CBI implementation
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
 + *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
 + */
-+void helper_outb(CPUAVRState *env, uint32_t port, uint32_t data)
-+{
-+    data &= 0x000000ff;
 +
-+    switch (port) {
-+    case 0x04:
-+        {
-+            CPUState *cpu = CPU(avr_env_get_cpu(env));
-+            qemu_irq irq = qdev_get_gpio_in(DEVICE(cpu), 3);
-+            qemu_set_irq(irq, 1);
++#include <stdint.h>
++#include "translate.h"
++
++void avr_decode(uint32_t pc, uint32_t *l, uint32_t c, translate_function_t *t)
++{
++    uint32_t opc = extract32(c, 0, 16);
++    switch (opc & 0x0000d000) {
++        case 0x00000000: {
++            switch (opc & 0x00002c00) {
++                case 0x00000000: {
++                    switch (opc & 0x00000300) {
++                        case 0x00000000: {
++                            *l = 16;
++                            *t = &avr_translate_NOP;
++                            break;
++                        }
++                        case 0x00000100: {
++                            *l = 16;
++                            *t = &avr_translate_MOVW;
++                            break;
++                        }
++                        case 0x00000200: {
++                            *l = 16;
++                            *t = &avr_translate_MULS;
++                            break;
++                        }
++                        case 0x00000300: {
++                            switch (opc & 0x00000088) {
++                                case 0x00000000: {
++                                    *l = 16;
++                                    *t = &avr_translate_MULSU;
++                                    break;
++                                }
++                                case 0x00000008: {
++                                    *l = 16;
++                                    *t = &avr_translate_FMUL;
++                                    break;
++                                }
++                                case 0x00000080: {
++                                    *l = 16;
++                                    *t = &avr_translate_FMULS;
++                                    break;
++                                }
++                                case 0x00000088: {
++                                    *l = 16;
++                                    *t = &avr_translate_FMULSU;
++                                    break;
++                                }
++                            }
++                            break;
++                        }
++                    }
++                    break;
++                }
++                case 0x00000400: {
++                    *l = 16;
++                    *t = &avr_translate_CPC;
++                    break;
++                }
++                case 0x00000800: {
++                    *l = 16;
++                    *t = &avr_translate_SBC;
++                    break;
++                }
++                case 0x00000c00: {
++                    *l = 16;
++                    *t = &avr_translate_ADD;
++                    break;
++                }
++                case 0x00002000: {
++                    *l = 16;
++                    *t = &avr_translate_AND;
++                    break;
++                }
++                case 0x00002400: {
++                    *l = 16;
++                    *t = &avr_translate_EOR;
++                    break;
++                }
++                case 0x00002800: {
++                    *l = 16;
++                    *t = &avr_translate_OR;
++                    break;
++                }
++                case 0x00002c00: {
++                    *l = 16;
++                    *t = &avr_translate_MOV;
++                    break;
++                }
++            }
++            break;
 +        }
-+        break;
-+    case 0x38: /* RAMPD */
-+        if (avr_feature(env, AVR_FEATURE_RAMPD)) {
-+            env->rampD = (data & 0xff) << 16;
++        case 0x00001000: {
++            switch (opc & 0x00002000) {
++                case 0x00000000: {
++                    switch (opc & 0x00000c00) {
++                        case 0x00000000: {
++                            *l = 16;
++                            *t = &avr_translate_CPSE;
++                            break;
++                        }
++                        case 0x00000400: {
++                            *l = 16;
++                            *t = &avr_translate_CP;
++                            break;
++                        }
++                        case 0x00000800: {
++                            *l = 16;
++                            *t = &avr_translate_SUB;
++                            break;
++                        }
++                        case 0x00000c00: {
++                            *l = 16;
++                            *t = &avr_translate_ADC;
++                            break;
++                        }
++                    }
++                    break;
++                }
++                case 0x00002000: {
++                    *l = 16;
++                    *t = &avr_translate_CPI;
++                    break;
++                }
++            }
++            break;
 +        }
-+        break;
-+    case 0x39: /* RAMPX */
-+        if (avr_feature(env, AVR_FEATURE_RAMPX)) {
-+            env->rampX = (data & 0xff) << 16;
++        case 0x00004000: {
++            switch (opc & 0x00002000) {
++                case 0x00000000: {
++                    *l = 16;
++                    *t = &avr_translate_SBCI;
++                    break;
++                }
++                case 0x00002000: {
++                    *l = 16;
++                    *t = &avr_translate_ORI;
++                    break;
++                }
++            }
++            break;
 +        }
-+        break;
-+    case 0x3a: /* RAMPY */
-+        if (avr_feature(env, AVR_FEATURE_RAMPY)) {
-+            env->rampY = (data & 0xff) << 16;
++        case 0x00005000: {
++            switch (opc & 0x00002000) {
++                case 0x00000000: {
++                    *l = 16;
++                    *t = &avr_translate_SUBI;
++                    break;
++                }
++                case 0x00002000: {
++                    *l = 16;
++                    *t = &avr_translate_ANDI;
++                    break;
++                }
++            }
++            break;
 +        }
-+        break;
-+    case 0x3b: /* RAMPZ */
-+        if (avr_feature(env, AVR_FEATURE_RAMPZ)) {
-+            env->rampZ = (data & 0xff) << 16;
++        case 0x00008000: {
++            switch (opc & 0x00000208) {
++                case 0x00000000: {
++                    *l = 16;
++                    *t = &avr_translate_LDDZ;
++                    break;
++                }
++                case 0x00000008: {
++                    *l = 16;
++                    *t = &avr_translate_LDDY;
++                    break;
++                }
++                case 0x00000200: {
++                    *l = 16;
++                    *t = &avr_translate_STDZ;
++                    break;
++                }
++                case 0x00000208: {
++                    *l = 16;
++                    *t = &avr_translate_STDY;
++                    break;
++                }
++            }
++            break;
 +        }
-+        break;
-+    case 0x3c: /* EIDN */
-+        env->eind = (data & 0xff) << 16;
-+        break;
-+    case 0x3d: /* SPL */
-+        env->sp = (env->sp & 0xff00) | (data);
-+        break;
-+    case 0x3e: /* SPH */
-+        if (avr_feature(env, AVR_FEATURE_2_BYTE_SP)) {
-+            env->sp = (env->sp & 0x00ff) | (data << 8);
++        case 0x00009000: {
++            switch (opc & 0x00002800) {
++                case 0x00000000: {
++                    switch (opc & 0x00000600) {
++                        case 0x00000000: {
++                            switch (opc & 0x0000000f) {
++                                case 0x00000000: {
++                                    *l = 32;
++                                    *t = &avr_translate_LDS;
++                                    break;
++                                }
++                                case 0x00000001: {
++                                    *l = 16;
++                                    *t = &avr_translate_LDZ2;
++                                    break;
++                                }
++                                case 0x00000002: {
++                                    *l = 16;
++                                    *t = &avr_translate_LDZ3;
++                                    break;
++                                }
++                                case 0x00000003: {
++                                    break;
++                                }
++                                case 0x00000004: {
++                                    *l = 16;
++                                    *t = &avr_translate_LPM2;
++                                    break;
++                                }
++                                case 0x00000005: {
++                                    *l = 16;
++                                    *t = &avr_translate_LPMX;
++                                    break;
++                                }
++                                case 0x00000006: {
++                                    *l = 16;
++                                    *t = &avr_translate_ELPM2;
++                                    break;
++                                }
++                                case 0x00000007: {
++                                    *l = 16;
++                                    *t = &avr_translate_ELPMX;
++                                    break;
++                                }
++                                case 0x00000008: {
++                                    break;
++                                }
++                                case 0x00000009: {
++                                    *l = 16;
++                                    *t = &avr_translate_LDY2;
++                                    break;
++                                }
++                                case 0x0000000a: {
++                                    *l = 16;
++                                    *t = &avr_translate_LDY3;
++                                    break;
++                                }
++                                case 0x0000000b: {
++                                    break;
++                                }
++                                case 0x0000000c: {
++                                    *l = 16;
++                                    *t = &avr_translate_LDX1;
++                                    break;
++                                }
++                                case 0x0000000d: {
++                                    *l = 16;
++                                    *t = &avr_translate_LDX2;
++                                    break;
++                                }
++                                case 0x0000000e: {
++                                    *l = 16;
++                                    *t = &avr_translate_LDX3;
++                                    break;
++                                }
++                                case 0x0000000f: {
++                                    *l = 16;
++                                    *t = &avr_translate_POP;
++                                    break;
++                                }
++                            }
++                            break;
++                        }
++                        case 0x00000200: {
++                            switch (opc & 0x0000000f) {
++                                case 0x00000000: {
++                                    *l = 32;
++                                    *t = &avr_translate_STS;
++                                    break;
++                                }
++                                case 0x00000001: {
++                                    *l = 16;
++                                    *t = &avr_translate_STZ2;
++                                    break;
++                                }
++                                case 0x00000002: {
++                                    *l = 16;
++                                    *t = &avr_translate_STZ3;
++                                    break;
++                                }
++                                case 0x00000003: {
++                                    break;
++                                }
++                                case 0x00000004: {
++                                    *l = 16;
++                                    *t = &avr_translate_XCH;
++                                    break;
++                                }
++                                case 0x00000005: {
++                                    *l = 16;
++                                    *t = &avr_translate_LAS;
++                                    break;
++                                }
++                                case 0x00000006: {
++                                    *l = 16;
++                                    *t = &avr_translate_LAC;
++                                    break;
++                                }
++                                case 0x00000007: {
++                                    *l = 16;
++                                    *t = &avr_translate_LAT;
++                                    break;
++                                }
++                                case 0x00000008: {
++                                    break;
++                                }
++                                case 0x00000009: {
++                                    *l = 16;
++                                    *t = &avr_translate_STY2;
++                                    break;
++                                }
++                                case 0x0000000a: {
++                                    *l = 16;
++                                    *t = &avr_translate_STY3;
++                                    break;
++                                }
++                                case 0x0000000b: {
++                                    break;
++                                }
++                                case 0x0000000c: {
++                                    *l = 16;
++                                    *t = &avr_translate_STX1;
++                                    break;
++                                }
++                                case 0x0000000d: {
++                                    *l = 16;
++                                    *t = &avr_translate_STX2;
++                                    break;
++                                }
++                                case 0x0000000e: {
++                                    *l = 16;
++                                    *t = &avr_translate_STX3;
++                                    break;
++                                }
++                                case 0x0000000f: {
++                                    *l = 16;
++                                    *t = &avr_translate_PUSH;
++                                    break;
++                                }
++                            }
++                            break;
++                        }
++                        case 0x00000400: {
++                            switch (opc & 0x0000000e) {
++                                case 0x00000000: {
++                                    switch (opc & 0x00000001) {
++                                        case 0x00000000: {
++                                            *l = 16;
++                                            *t = &avr_translate_COM;
++                                            break;
++                                        }
++                                        case 0x00000001: {
++                                            *l = 16;
++                                            *t = &avr_translate_NEG;
++                                            break;
++                                        }
++                                    }
++                                    break;
++                                }
++                                case 0x00000002: {
++                                    switch (opc & 0x00000001) {
++                                        case 0x00000000: {
++                                            *l = 16;
++                                            *t = &avr_translate_SWAP;
++                                            break;
++                                        }
++                                        case 0x00000001: {
++                                            *l = 16;
++                                            *t = &avr_translate_INC;
++                                            break;
++                                        }
++                                    }
++                                    break;
++                                }
++                                case 0x00000004: {
++                                    *l = 16;
++                                    *t = &avr_translate_ASR;
++                                    break;
++                                }
++                                case 0x00000006: {
++                                    switch (opc & 0x00000001) {
++                                        case 0x00000000: {
++                                            *l = 16;
++                                            *t = &avr_translate_LSR;
++                                            break;
++                                        }
++                                        case 0x00000001: {
++                                            *l = 16;
++                                            *t = &avr_translate_ROR;
++                                            break;
++                                        }
++                                    }
++                                    break;
++                                }
++                                case 0x00000008: {
++                                    switch (opc & 0x00000181) {
++                                        case 0x00000000: {
++                                            *l = 16;
++                                            *t = &avr_translate_BSET;
++                                            break;
++                                        }
++                                        case 0x00000001: {
++                                            switch (opc & 0x00000010) {
++                                                case 0x00000000: {
++                                                    *l = 16;
++                                                    *t = &avr_translate_IJMP;
++                                                    break;
++                                                }
++                                                case 0x00000010: {
++                                                    *l = 16;
++                                                    *t = &avr_translate_EIJMP;
++                                                    break;
++                                                }
++                                            }
++                                            break;
++                                        }
++                                        case 0x00000080: {
++                                            *l = 16;
++                                            *t = &avr_translate_BCLR;
++                                            break;
++                                        }
++                                        case 0x00000081: {
++                                            break;
++                                        }
++                                        case 0x00000100: {
++                                            switch (opc & 0x00000010) {
++                                                case 0x00000000: {
++                                                    *l = 16;
++                                                    *t = &avr_translate_RET;
++                                                    break;
++                                                }
++                                                case 0x00000010: {
++                                                    *l = 16;
++                                                    *t = &avr_translate_RETI;
++                                                    break;
++                                                }
++                                            }
++                                            break;
++                                        }
++                                        case 0x00000101: {
++                                            switch (opc & 0x00000010) {
++                                                case 0x00000000: {
++                                                    *l = 16;
++                                                    *t = &avr_translate_ICALL;
++                                                    break;
++                                                }
++                                                case 0x00000010: {
++                                                    *l = 16;
++                                                    *t = &avr_translate_EICALL;
++                                                    break;
++                                                }
++                                            }
++                                            break;
++                                        }
++                                        case 0x00000180: {
++                                            switch (opc & 0x00000070) {
++                                                case 0x00000000: {
++                                                    *l = 16;
++                                                    *t = &avr_translate_SLEEP;
++                                                    break;
++                                                }
++                                                case 0x00000010: {
++                                                    *l = 16;
++                                                    *t = &avr_translate_BREAK;
++                                                    break;
++                                                }
++                                                case 0x00000020: {
++                                                    *l = 16;
++                                                    *t = &avr_translate_WDR;
++                                                    break;
++                                                }
++                                                case 0x00000030: {
++                                                    break;
++                                                }
++                                                case 0x00000040: {
++                                                    *l = 16;
++                                                    *t = &avr_translate_LPM1;
++                                                    break;
++                                                }
++                                                case 0x00000050: {
++                                                    *l = 16;
++                                                    *t = &avr_translate_ELPM1;
++                                                    break;
++                                                }
++                                                case 0x00000060: {
++                                                    *l = 16;
++                                                    *t = &avr_translate_SPM;
++                                                    break;
++                                                }
++                                                case 0x00000070: {
++                                                    *l = 16;
++                                                    *t = &avr_translate_SPMX;
++                                                    break;
++                                                }
++                                            }
++                                            break;
++                                        }
++                                        case 0x00000181: {
++                                            break;
++                                        }
++                                    }
++                                    break;
++                                }
++                                case 0x0000000a: {
++                                    switch (opc & 0x00000001) {
++                                        case 0x00000000: {
++                                            *l = 16;
++                                            *t = &avr_translate_DEC;
++                                            break;
++                                        }
++                                        case 0x00000001: {
++                                            *l = 16;
++                                            *t = &avr_translate_DES;
++                                            break;
++                                        }
++                                    }
++                                    break;
++                                }
++                                case 0x0000000c: {
++                                    *l = 32;
++                                    *t = &avr_translate_JMP;
++                                    break;
++                                }
++                                case 0x0000000e: {
++                                    *l = 32;
++                                    *t = &avr_translate_CALL;
++                                    break;
++                                }
++                            }
++                            break;
++                        }
++                        case 0x00000600: {
++                            switch (opc & 0x00000100) {
++                                case 0x00000000: {
++                                    *l = 16;
++                                    *t = &avr_translate_ADIW;
++                                    break;
++                                }
++                                case 0x00000100: {
++                                    *l = 16;
++                                    *t = &avr_translate_SBIW;
++                                    break;
++                                }
++                            }
++                            break;
++                        }
++                    }
++                    break;
++                }
++                case 0x00000800: {
++                    switch (opc & 0x00000400) {
++                        case 0x00000000: {
++                            switch (opc & 0x00000300) {
++                                case 0x00000000: {
++                                    *l = 16;
++                                    *t = &avr_translate_CBI;
++                                    break;
++                                }
++                                case 0x00000100: {
++                                    *l = 16;
++                                    *t = &avr_translate_SBIC;
++                                    break;
++                                }
++                                case 0x00000200: {
++                                    *l = 16;
++                                    *t = &avr_translate_SBI;
++                                    break;
++                                }
++                                case 0x00000300: {
++                                    *l = 16;
++                                    *t = &avr_translate_SBIS;
++                                    break;
++                                }
++                            }
++                            break;
++                        }
++                        case 0x00000400: {
++                            *l = 16;
++                            *t = &avr_translate_MUL;
++                            break;
++                        }
++                    }
++                    break;
++                }
++                case 0x00002000: {
++                    *l = 16;
++                    *t = &avr_translate_IN;
++                    break;
++                }
++                case 0x00002800: {
++                    *l = 16;
++                    *t = &avr_translate_OUT;
++                    break;
++                }
++            }
++            break;
 +        }
-+        break;
-+    case 0x3f: /* SREG */
-+        cpu_set_sreg(env, data);
-+        break;
-+    default:
-+        /*
-+         * CPU does not know how to write this register, pass it to the
-+         * device/board
-+         */
-+        cpu_physical_memory_write(PHYS_BASE_REGS + port + AVR_CPU_IO_REGS_BASE,
-+                                  &data, 1);
++        case 0x0000c000: {
++            switch (opc & 0x00002000) {
++                case 0x00000000: {
++                    *l = 16;
++                    *t = &avr_translate_RJMP;
++                    break;
++                }
++                case 0x00002000: {
++                    *l = 16;
++                    *t = &avr_translate_LDI;
++                    break;
++                }
++            }
++            break;
++        }
++        case 0x0000d000: {
++            switch (opc & 0x00002000) {
++                case 0x00000000: {
++                    *l = 16;
++                    *t = &avr_translate_RCALL;
++                    break;
++                }
++                case 0x00002000: {
++                    switch (opc & 0x00000c00) {
++                        case 0x00000000: {
++                            *l = 16;
++                            *t = &avr_translate_BRBS;
++                            break;
++                        }
++                        case 0x00000400: {
++                            *l = 16;
++                            *t = &avr_translate_BRBC;
++                            break;
++                        }
++                        case 0x00000800: {
++                            switch (opc & 0x00000200) {
++                                case 0x00000000: {
++                                    *l = 16;
++                                    *t = &avr_translate_BLD;
++                                    break;
++                                }
++                                case 0x00000200: {
++                                    *l = 16;
++                                    *t = &avr_translate_BST;
++                                    break;
++                                }
++                            }
++                            break;
++                        }
++                        case 0x00000c00: {
++                            switch (opc & 0x00000200) {
++                                case 0x00000000: {
++                                    *l = 16;
++                                    *t = &avr_translate_SBRC;
++                                    break;
++                                }
++                                case 0x00000200: {
++                                    *l = 16;
++                                    *t = &avr_translate_SBRS;
++                                    break;
++                                }
++                            }
++                            break;
++                        }
++                    }
++                    break;
++                }
++            }
++            break;
++        }
 +    }
 +}
-+
-+/*
-+ *  this function implements LD instruction when there is a posibility to read
-+ *  from a CPU register
-+ */
-+target_ulong helper_fullrd(CPUAVRState *env, uint32_t addr)
-+{
-+    uint8_t data;
-+
-+    env->fullacc = false;
-+    switch (addr) {
-+    case AVR_CPU_REGS_BASE ... AVR_CPU_REGS_LAST:
-+        /* CPU registers */
-+        data = env->r[addr - AVR_CPU_REGS_BASE];
-+        break;
-+    case AVR_CPU_IO_REGS_BASE ... AVR_CPU_IO_REGS_LAST:
-+        /* CPU IO registers */
-+        data = helper_inb(env, addr);
-+        break;
-+    default:
-+        /* memory */
-+        cpu_physical_memory_read(PHYS_BASE_DATA + addr - VIRT_BASE_DATA,
-+                                 &data, 1);
-+    }
-+    return data;
-+}
-+
-+/*
-+ *  this function implements LD instruction when there is a posibility to write
-+ *  into a CPU register
-+ */
-+void helper_fullwr(CPUAVRState *env, uint32_t data, uint32_t addr)
-+{
-+    env->fullacc = false;
-+    switch (addr) {
-+    case AVR_CPU_REGS_BASE ... AVR_CPU_REGS_LAST:
-+        /* CPU registers */
-+        env->r[addr - AVR_CPU_REGS_BASE] = data;
-+        break;
-+    case AVR_CPU_IO_REGS_BASE ... AVR_CPU_IO_REGS_LAST:
-+        /* CPU IO registers */
-+        helper_outb(env, data, addr);
-+        break;
-+    default:
-+        /* memory */
-+        cpu_physical_memory_write(PHYS_BASE_DATA + addr - VIRT_BASE_DATA,
-+                                  &data, 1);
-+    }
-+}
-diff --git a/target/avr/helper.h b/target/avr/helper.h
-index b5ef3bfb93..603631520a 100644
---- a/target/avr/helper.h
-+++ b/target/avr/helper.h
-@@ -18,4 +18,11 @@
-  * <http://www.gnu.org/licenses/lgpl-2.1.html>
-  */
- 
-+DEF_HELPER_1(wdr, void, env)
- DEF_HELPER_1(debug, void, env)
-+DEF_HELPER_1(sleep, void, env)
-+DEF_HELPER_1(unsupported, void, env)
-+DEF_HELPER_3(outb, void, env, i32, i32)
-+DEF_HELPER_2(inb, tl, env, i32)
-+DEF_HELPER_3(fullwr, void, env, i32, i32)
-+DEF_HELPER_2(fullrd, tl, env, i32)
 diff --git a/target/avr/translate.c b/target/avr/translate.c
-index 7926b7162f..daf4a6afc7 100644
+index daf4a6afc7..d6f1f71ebc 100644
 --- a/target/avr/translate.c
 +++ b/target/avr/translate.c
-@@ -128,6 +128,14 @@ void gen_intermediate_code(CPUAVRState *env, struct TranslationBlock *tb)
-     if (max_insns > TCG_MAX_INSNS) {
-         max_insns = TCG_MAX_INSNS;
-     }
-+    if (tb->flags & TB_FLAGS_FULL_ACCESS) {
-+        /*
-+            this flag is set by ST/LD instruction
-+            we will regenerate it ONLY with mem/cpu memory access
-+            instead of mem access
-+        */
-+        max_insns = 1;
-+    }
+@@ -90,6 +90,8 @@ static void decode_opc(AVRCPU *cpu, DisasContext *ctx, InstInfo *inst)
+     inst->length = 16;
+     inst->translate = NULL;
  
-     gen_tb_start(tb);
- 
++    avr_decode(inst->cpc, &inst->length, inst->opcode, &inst->translate);
++
+     if (inst->length == 16) {
+         inst->npc = inst->cpc + 1;
+         /* get opcode as 16bit value */
 -- 
 2.11.0 (Apple Git-81)
