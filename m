@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1dIqCO-0002AM-R4
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 01:41:37 -0400
+	(envelope-from <clg@kaod.org>) id 1dIqKq-0004QL-4u
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 01:50:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1dIqCK-0002mm-Sb
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 01:41:36 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:34040)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sjitindarsingh@gmail.com>)
-	id 1dIqCK-0002mi-Ma
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 01:41:32 -0400
-Received: by mail-pg0-x241.google.com with SMTP id v14so3472814pgn.1
-	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 22:41:32 -0700 (PDT)
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Thu,  8 Jun 2017 15:41:16 +1000
-Message-Id: <20170608054116.17203-1-sjitindarsingh@gmail.com>
-Subject: [Qemu-devel] [PATCH V2] monitor: Add -a (all) option to info
- registers
+	(envelope-from <clg@kaod.org>) id 1dIqKl-0005ra-Pu
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 01:50:20 -0400
+Received: from 15.mo4.mail-out.ovh.net ([91.121.62.11]:41883)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dIqKl-0005qy-Fy
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 01:50:15 -0400
+Received: from player772.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id AF4B470839
+	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 07:50:12 +0200 (CEST)
+References: <149685579678.12025.9278446121024037161.stgit@bahia.lan>
+	<149685582923.12025.13700165807436904935.stgit@bahia.lan>
+	<c632e0a3-c6bb-2637-40c3-5098937476a5@kaod.org>
+	<20170607225507.5d2c6c33@bahia.ttt.fr.ibm.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <3a0cab6c-a913-e7e8-4a07-fbd7509731db@kaod.org>
+Date: Thu, 8 Jun 2017 07:50:08 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170607225507.5d2c6c33@bahia.ttt.fr.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] xics: setup cpu at realize time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,84 +32,330 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, armbru@redhat.com, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-The info registers command in the qemu monitor is used to dump register
-values.
+On 06/07/2017 10:55 PM, Greg Kurz wrote:
+> On Wed, 7 Jun 2017 20:11:38 +0200
+> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>=20
+>> On 06/07/2017 07:17 PM, Greg Kurz wrote:
+>>> Until recently, spapr used to allocate ICPState objects for the lifet=
+ime
+>>> of the machine. They would only be associated to vCPUs in xics_cpu_se=
+tup()
+>>> when plugging a CPU core.
+>>>
+>>> Now that ICPState objects have the same lifecycle as vCPUs, it is
+>>> possible to associate them during realization.
+>>>
+>>> This patch hence open-codes xics_cpu_setup() in icp_realize(). The vC=
+PU
+>>> is passed as a property. Note that vCPU now needs to be realized firs=
+t
+>>> for the IRQs to be allocated. It also needs to resetted before ICPSta=
+te
+>>> realization in order to synchronize with KVM.
+>>>
+>>> Since ICPState objects are freed when unrealized, xics_cpu_destroy() =
+isn't
+>>> needed anymore and can be safely dropped. =20
+>>
+>> I like the idea but I think the assignment of ->cs attribute should be=
+=20
+>> moved under icp_kvm_cpu_setup(), as it is only used under xics_kvm by=20
+>> the kvm_vcpu_ioctl() calls.=20
+>>
+>=20
+> Well, cs->cpu_index is also used for traces and to implement the 'info =
+pic'
+> monitor command.
 
-Currently this command uses the monitor cpu (which can be set by the
-user) as the cpu for whose registers will be dumped. Sometimes it is
-useful to see the registers for all cpus and currently this requires
-setting the monitor cpu and the re-running the command for each cpu
-in the system. I would be nice if there was an easier way to do this.
+yes. But, these are just printfs.
 
-Add the "-a" option to the info registers command to dump the register
-values for all cpus.
+>> Ideally, we should also introduce :
+>>
+>> 	struct KvmState {
+>> 	    ICPState parent_obj;
+>> =09
+>> 	    CPUState *cs;
+>> 	};
+>>
+>> That would be cleaner, but that might introduce some migration compat=20
+>> issues  again ...
+>>
+>=20
+> No, as long as it doesn't change state, we're good. My concern is more
+> about how to pass cs to xics_kvm=20
 
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+That can be done in the cpu_setup handler.
 
----
+> and the cs->cpu_index to xics.
 
-Change Log:
+The printfs are interesting to have but not vital.=20
 
-V1 -> V2:
- - Add CPU number to beginning of register dump
----
- hmp-commands-info.hx |  6 +++---
- monitor.c            | 21 ++++++++++++++++-----
- 2 files changed, 19 insertions(+), 8 deletions(-)
+David has a good point for keeping ->cs. So let's abandon the idea. =20
 
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index ae16901..ba98e58 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -100,9 +100,9 @@ ETEXI
- 
-     {
-         .name       = "registers",
--        .args_type  = "",
--        .params     = "",
--        .help       = "show the cpu registers",
-+        .args_type  = "cpustate_all:-a",
-+        .params     = "[-a]",
-+        .help       = "show the cpu registers (-a: all - show register info for all cpus)",
-         .cmd        = hmp_info_registers,
-     },
- 
-diff --git a/monitor.c b/monitor.c
-index baa73c9..1629ad1 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -1078,13 +1078,24 @@ int monitor_get_cpu_index(void)
- 
- static void hmp_info_registers(Monitor *mon, const QDict *qdict)
- {
--    CPUState *cs = mon_get_cpu();
-+    bool all_cpus = qdict_get_try_bool(qdict, "cpustate_all", false);
-+    CPUState *cs;
- 
--    if (!cs) {
--        monitor_printf(mon, "No CPU available\n");
--        return;
-+    if (all_cpus) {
-+        CPU_FOREACH(cs) {
-+            monitor_printf(mon, "\nCPU#%d\n", cs->cpu_index);
-+            cpu_dump_state(cs, (FILE *)mon, monitor_fprintf, CPU_DUMP_FPU);
-+        }
-+    } else {
-+        cs = mon_get_cpu();
-+
-+        if (!cs) {
-+            monitor_printf(mon, "No CPU available\n");
-+            return;
-+        }
-+
-+        cpu_dump_state(cs, (FILE *)mon, monitor_fprintf, CPU_DUMP_FPU);
-     }
--    cpu_dump_state(cs, (FILE *)mon, monitor_fprintf, CPU_DUMP_FPU);
- }
- 
- static void hmp_info_jit(Monitor *mon, const QDict *qdict)
--- 
-2.9.4
+>> Some minor comments below,
+>>
+>> Thanks,
+>>
+>> C.=20
+>>
+>>> Signed-off-by: Greg Kurz <groug@kaod.org>
+>>> ---
+>>>  hw/intc/xics.c          |   76 ++++++++++++++++++++-----------------=
+----------
+>>>  hw/ppc/pnv_core.c       |   16 ++++------
+>>>  hw/ppc/spapr_cpu_core.c |   21 ++++++-------
+>>>  include/hw/ppc/xics.h   |    2 -
+>>>  4 files changed, 48 insertions(+), 67 deletions(-)
+>>>
+>>> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+>>> index ec73f02144c9..330441ff7fe8 100644
+>>> --- a/hw/intc/xics.c
+>>> +++ b/hw/intc/xics.c
+>>> @@ -38,50 +38,6 @@
+>>>  #include "monitor/monitor.h"
+>>>  #include "hw/intc/intc.h"
+>>> =20
+>>> -void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu)
+>>> -{
+>>> -    CPUState *cs =3D CPU(cpu);
+>>> -    ICPState *icp =3D ICP(cpu->intc);
+>>> -
+>>> -    assert(icp);
+>>> -    assert(cs =3D=3D icp->cs);
+>>> -
+>>> -    icp->output =3D NULL;
+>>> -    icp->cs =3D NULL;
+>>> -}
+>>> -
+>>> -void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu, ICPState *icp)
+>>> -{
+>>> -    CPUState *cs =3D CPU(cpu);
+>>> -    CPUPPCState *env =3D &cpu->env;
+>>> -    ICPStateClass *icpc;
+>>> -
+>>> -    assert(icp);
+>>> -
+>>> -    cpu->intc =3D OBJECT(icp);
+>>> -    icp->cs =3D cs;
+>>> -
+>>> -    icpc =3D ICP_GET_CLASS(icp);
+>>> -    if (icpc->cpu_setup) {
+>>> -        icpc->cpu_setup(icp, cpu);
+>>> -    }
+>>> -
+>>> -    switch (PPC_INPUT(env)) {
+>>> -    case PPC_FLAGS_INPUT_POWER7:
+>>> -        icp->output =3D env->irq_inputs[POWER7_INPUT_INT];
+>>> -        break;
+>>> -
+>>> -    case PPC_FLAGS_INPUT_970:
+>>> -        icp->output =3D env->irq_inputs[PPC970_INPUT_INT];
+>>> -        break;
+>>> -
+>>> -    default:
+>>> -        error_report("XICS interrupt controller does not support thi=
+s CPU "
+>>> -                     "bus model");
+>>> -        abort();
+>>> -    }
+>>> -}
+>>> -
+>>>  void icp_pic_print_info(ICPState *icp, Monitor *mon)
+>>>  {
+>>>      int cpu_index =3D icp->cs ? icp->cs->cpu_index : -1;
+>>> @@ -343,6 +299,8 @@ static void icp_realize(DeviceState *dev, Error *=
+*errp)
+>>>  {
+>>>      ICPState *icp =3D ICP(dev);
+>>>      ICPStateClass *icpc =3D ICP_GET_CLASS(dev);
+>>> +    PowerPCCPU *cpu;
+>>> +    CPUPPCState *env;
+>>>      Object *obj;
+>>>      Error *err =3D NULL;
+>>> =20
+>>> @@ -355,6 +313,36 @@ static void icp_realize(DeviceState *dev, Error =
+**errp)
+>>> =20
+>>>      icp->xics =3D XICS_FABRIC(obj);
+>>> =20
+>>> +    obj =3D object_property_get_link(OBJECT(dev), "cs", &err);
+>>> +    if (!obj) {
+>>> +        error_setg(errp, "%s: required link 'xics' not found: %s",
+>>> +                   __func__, error_get_pretty(err));
+>>> +        return;
+>>> +    }
+>>> +
+>>> +    cpu =3D POWERPC_CPU(obj);
+>>> +    cpu->intc =3D OBJECT(icp);
+>>> +    icp->cs =3D CPU(obj); =20
+>>
+>> only xics_kvm needs ->cs.=20
+>>
+>=20
+> yeah, maybe the base class should only have a cpu_index field:
+>=20
+>     icp->cpu_index =3D CPU(obj)->cpu_index;
+
+arg, no. please, let's not add another cpu index :)
+
+>>> +
+>>> +    if (icpc->cpu_setup) {
+>>> +        icpc->cpu_setup(icp, cpu);
+>>> +    }
+>>> +
+>>> +    env =3D &cpu->env;
+>>> +    switch (PPC_INPUT(env)) {
+>>> +    case PPC_FLAGS_INPUT_POWER7:
+>>> +        icp->output =3D env->irq_inputs[POWER7_INPUT_INT];
+>>> +        break;
+>>> +
+>>> +    case PPC_FLAGS_INPUT_970:
+>>> +        icp->output =3D env->irq_inputs[PPC970_INPUT_INT];
+>>> +        break;
+>>> +
+>>> +    default:
+>>> +        error_setg(errp, "XICS interrupt controller does not support=
+ this CPU bus model");
+>>> +        return;
+>>> +    }
+>>> +
+>>>      if (icpc->realize) {
+>>>          icpc->realize(dev, errp);
+>>>      }
+>>> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+>>> index e8a9a94d5a24..1393005e76f3 100644
+>>> --- a/hw/ppc/pnv_core.c
+>>> +++ b/hw/ppc/pnv_core.c
+>>> @@ -118,19 +118,19 @@ static void pnv_core_realize_child(Object *chil=
+d, XICSFabric *xi, Error **errp)
+>>>      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+>>>      Object *obj;
+>>> =20
+>>> -    obj =3D object_new(TYPE_PNV_ICP);
+>>> -    object_property_add_child(OBJECT(cpu), "icp", obj, &error_abort)=
+;
+>>> -    object_unref(obj);
+>>> -    object_property_add_const_link(obj, "xics", OBJECT(xi), &error_a=
+bort);
+>>> -    object_property_set_bool(obj, true, "realized", &local_err);
+>>> +    object_property_set_bool(child, true, "realized", &local_err);
+>>>      if (local_err) {
+>>>          error_propagate(errp, local_err);
+>>>          return;
+>>>      }
+>>> =20
+>>> -    object_property_set_bool(child, true, "realized", &local_err);
+>>> +    obj =3D object_new(TYPE_PNV_ICP);
+>>> +    object_property_add_child(child, "icp", obj, NULL);
+>>> +    object_unref(obj);
+>>> +    object_property_add_const_link(obj, "xics", OBJECT(xi), &error_a=
+bort);
+>>> +    object_property_add_const_link(obj, "cs", child, &error_abort); =
+=20
+>>
+>> may be link the cpu object instead ?=20
+>>
+>=20
+> I'm not sure to understand... isn't child supposed to be a CPU index he=
+re ?
+
+I meant linking the 'PowerPCCPU *cpu' object and not the CPUState.
+That's minor.
+
+>>> +    object_property_set_bool(obj, true, "realized", &local_err);
+>>>      if (local_err) {
+>>> -        object_unparent(obj);
+>>>          error_propagate(errp, local_err);
+>>>          return;
+>>>      }
+>>> @@ -141,8 +141,6 @@ static void pnv_core_realize_child(Object *child,=
+ XICSFabric *xi, Error **errp)
+>>>          error_propagate(errp, local_err);
+>>>          return;
+>>>      }
+>>> -
+>>> -    xics_cpu_setup(xi, cpu, ICP(obj));
+>>>  }
+>>> =20
+>>>  static void pnv_core_realize(DeviceState *dev, Error **errp)
+>>> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+>>> index 029a14120edd..9a6259525953 100644
+>>> --- a/hw/ppc/spapr_cpu_core.c
+>>> +++ b/hw/ppc/spapr_cpu_core.c
+>>> @@ -53,9 +53,6 @@ static void spapr_cpu_reset(void *opaque)
+>>> =20
+>>>  static void spapr_cpu_destroy(PowerPCCPU *cpu)
+>>>  {
+>>> -    sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+>>> -
+>>> -    xics_cpu_destroy(XICS_FABRIC(spapr), cpu);
+>>>      qemu_unregister_reset(spapr_cpu_reset, cpu);
+>>>  }
+>>> =20
+>>> @@ -140,28 +137,28 @@ static void spapr_cpu_core_realize_child(Object=
+ *child, Error **errp)
+>>>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+>>>      CPUState *cs =3D CPU(child);
+>>>      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+>>> -    Object *obj;
+>>> +    Object *obj =3D NULL;
+>>> =20
+>>> -    obj =3D object_new(spapr->icp_type);
+>>> -    object_property_add_child(OBJECT(cpu), "icp", obj, &error_abort)=
+;
+>>> -    object_unref(obj);
+>>> -    object_property_add_const_link(obj, "xics", OBJECT(spapr), &erro=
+r_abort);
+>>> -    object_property_set_bool(obj, true, "realized", &local_err);
+>>> +    object_property_set_bool(child, true, "realized", &local_err);
+>>>      if (local_err) {
+>>>          goto error;
+>>>      }
+>>> =20
+>>> -    object_property_set_bool(child, true, "realized", &local_err);
+>>> +    spapr_cpu_init(spapr, cpu, &local_err);
+>>>      if (local_err) {
+>>>          goto error;
+>>>      }
+>>> =20
+>>> -    spapr_cpu_init(spapr, cpu, &local_err);
+>>> +    obj =3D object_new(spapr->icp_type);
+>>> +    object_property_add_child(child, "icp", obj, &error_abort);
+>>> +    object_unref(obj);
+>>> +    object_property_add_const_link(obj, "xics", OBJECT(spapr), &erro=
+r_abort);
+>>> +    object_property_add_const_link(obj, "cs", child, &error_abort); =
+=20
+>>
+>> same here.
+>>
+>>> +    object_property_set_bool(obj, true, "realized", &local_err);
+>>>      if (local_err) {
+>>>          goto error;
+>>>      }
+>>> =20
+>>> -    xics_cpu_setup(XICS_FABRIC(spapr), cpu, ICP(obj));
+>>>      return;
+>>> =20
+>>>  error:
+>>> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+>>> index 40a506eacfb4..05767a15be9a 100644
+>>> --- a/include/hw/ppc/xics.h
+>>> +++ b/include/hw/ppc/xics.h
+>>> @@ -183,8 +183,6 @@ void spapr_dt_xics(int nr_servers, void *fdt, uin=
+t32_t phandle);
+>>> =20
+>>>  qemu_irq xics_get_qirq(XICSFabric *xi, int irq);
+>>>  ICPState *xics_icp_get(XICSFabric *xi, int server);
+>>> -void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu, ICPState *icp);
+>>> -void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu);
+>>> =20
+>>>  /* Internal XICS interfaces */
+>>>  void icp_set_cppr(ICPState *icp, uint8_t cppr);
+>>>  =20
+>>
+>=20
