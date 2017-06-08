@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dIx8G-00083V-Pl
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:05:50 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dIx8G-00083W-QL
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:05:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dIx8C-0006Bz-N2
+	(envelope-from <kwolf@redhat.com>) id 1dIx8D-0006CY-4Z
 	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:05:48 -0400
-References: <20170608031124.8031-1-maozy.fnst@cn.fujitsu.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <faabf6b3-f7e3-fa2c-8adb-b1914dbe8f8a@redhat.com>
-Date: Thu, 8 Jun 2017 15:05:38 +0200
+Received: from mx1.redhat.com ([209.132.183.28]:37438)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1dIx8C-0006Bb-V0
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:05:45 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 071558124F
+	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 13:05:44 +0000 (UTC)
+Date: Thu, 8 Jun 2017 15:05:36 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170608130536.GD4427@noname.redhat.com>
+References: <20170601221552.30628-1-quintela@redhat.com>
+	<8737bbd6qb.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <20170608031124.8031-1-maozy.fnst@cn.fujitsu.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] util/qemu-sockets: Drop unused helper
- socket_address_to_string()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8737bbd6qb.fsf@secure.mitica>
+Subject: Re: [Qemu-devel] [PATCH 0/5] Create setup/cleanup methods for
+ migration incoming side
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,87 +34,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, kraxel@redhat.com, armbru@redhat.com, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, dgilbert@redhat.com, peterx@redhat.com
 
-Cc: qemu-trivial@nongnu.org
+Am 07.06.2017 um 19:53 hat Juan Quintela geschrieben:
+> Juan Quintela <quintela@redhat.com> wrote:
+> > Hi
+> 
+> Hi Kevin and Stefan, I intended to cc you on this series.
+> 
+> Is this what you were asking for block layer migration?
+> 
+> Do you need anything else?
 
-On 08/06/2017 05:11, Mao Zhongyi wrote:
-> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-> ---
->  include/qemu/sockets.h | 15 ---------------
->  util/qemu-sockets.c    | 34 ----------------------------------
->  2 files changed, 49 deletions(-)
-> 
-> diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
-> index 7abffc4..8eb0172 100644
-> --- a/include/qemu/sockets.h
-> +++ b/include/qemu/sockets.h
-> @@ -106,21 +106,6 @@ SocketAddress *socket_local_address(int fd, Error **errp);
->  SocketAddress *socket_remote_address(int fd, Error **errp);
->  
->  /**
-> - * socket_address_to_string:
-> - * @addr: the socket address struct
-> - * @errp: pointer to uninitialized error object
-> - *
-> - * Get the string representation of the socket
-> - * address. A pointer to the char array containing
-> - * string format will be returned, the caller is
-> - * required to release the returned value when no
-> - * longer required with g_free.
-> - *
-> - * Returns: the socket address in string format, or NULL on error
-> - */
-> -char *socket_address_to_string(struct SocketAddress *addr, Error **errp);
-> -
-> -/**
->   * socket_address_flatten:
->   * @addr: the socket address to flatten
->   *
-> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-> index b39ae74..08b1a26 100644
-> --- a/util/qemu-sockets.c
-> +++ b/util/qemu-sockets.c
-> @@ -1301,40 +1301,6 @@ SocketAddress *socket_remote_address(int fd, Error **errp)
->      return socket_sockaddr_to_address(&ss, sslen, errp);
->  }
->  
-> -char *socket_address_to_string(struct SocketAddress *addr, Error **errp)
-> -{
-> -    char *buf;
-> -    InetSocketAddress *inet;
-> -
-> -    switch (addr->type) {
-> -    case SOCKET_ADDRESS_TYPE_INET:
-> -        inet = &addr->u.inet;
-> -        if (strchr(inet->host, ':') == NULL) {
-> -            buf = g_strdup_printf("%s:%s", inet->host, inet->port);
-> -        } else {
-> -            buf = g_strdup_printf("[%s]:%s", inet->host, inet->port);
-> -        }
-> -        break;
-> -
-> -    case SOCKET_ADDRESS_TYPE_UNIX:
-> -        buf = g_strdup(addr->u.q_unix.path);
-> -        break;
-> -
-> -    case SOCKET_ADDRESS_TYPE_FD:
-> -        buf = g_strdup(addr->u.fd.str);
-> -        break;
-> -
-> -    case SOCKET_ADDRESS_TYPE_VSOCK:
-> -        buf = g_strdup_printf("%s:%s",
-> -                              addr->u.vsock.cid,
-> -                              addr->u.vsock.port);
-> -        break;
-> -
-> -    default:
-> -        abort();
-> -    }
-> -    return buf;
-> -}
->  
->  SocketAddress *socket_address_flatten(SocketAddressLegacy *addr_legacy)
->  {
-> 
+I didn't manage to apply this to my local git tree, so my review is
+based on scanning the emails.
+
+The important part for us is probably where you call the .cleanup_load
+callback. As I commented on the patch, I don't see any place in this
+series that calls it. We need it before bdrv_invalidate_cache_all() is
+called, I think.
+
+Kevin
