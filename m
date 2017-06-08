@@ -1,15 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dIs3E-000353-NH
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 03:40:17 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dIs4Z-0003yN-J6
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 03:41:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dIs3A-0003Wa-Nb
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 03:40:16 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu,  8 Jun 2017 09:40:04 +0200
-Message-Id: <1496907604-2393-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] Makefile: Do not generate files if
- "configure" has not been run yet
+	(envelope-from <kraxel@redhat.com>) id 1dIs4V-0003j6-N8
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 03:41:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58600)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dIs4V-0003ig-H1
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 03:41:35 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 84F408124D
+	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 07:41:34 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu,  8 Jun 2017 09:41:22 +0200
+Message-Id: <20170608074122.32099-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] xhci: only update dequeue ptr on completed
+ transfers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,113 +29,51 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>
+Cc: lvivier@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
 
-When doing a "make -j10" in the vanilla QEMU source tree (without
-running "configure first), the Makefile currently generates two
-files already, qemu-version.h and qemu-options.def. This should not
-happen, so let's make these targets depend on config-host.mak.
-Also the targets that use python  can not be executed without the
-$(PYTHON) from config-host.mak, so these should depend on the config-
-host.mak file, too (these targets generate some ugly error messages
-otherwise during "make -j10").
+The dequeue pointer should only be updated in case the transfer
+is actually completed.  If we update it for inflight transfers
+we will not pick them up again after migration, which easily
+triggers with HID devices as they typically have a pending
+transfer, waiting for user input to happen.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Fixes: 243afe858b95765b98d16a1f0dd50dca262858ad
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1451631
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- v2:
- - Add the dependency to the targets that use $(PYTHON) instead of
-   adding it to $(qapi-py)
+ hw/usb/hcd-xhci.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
- Makefile | 23 ++++++++++++-----------
- 1 file changed, 12 insertions(+), 11 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index c830d7a..b5e0731 100644
---- a/Makefile
-+++ b/Makefile
-@@ -286,7 +286,7 @@ endif
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index a0c7960a7b..760135c0d2 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -1912,6 +1912,8 @@ static void xhci_kick_epctx(XHCIEPContext *epctx, unsigned int streamid)
+         }
+         assert(!xfer->running_retry);
+         if (xfer->complete) {
++            /* update ring dequeue ptr */
++            xhci_set_ep_state(xhci, epctx, stctx, epctx->state);
+             xhci_ep_free_xfer(epctx->retry);
+         }
+         epctx->retry = NULL;
+@@ -1962,6 +1964,8 @@ static void xhci_kick_epctx(XHCIEPContext *epctx, unsigned int streamid)
+             xhci_fire_transfer(xhci, xfer, epctx);
+         }
+         if (xfer->complete) {
++            /* update ring dequeue ptr */
++            xhci_set_ep_state(xhci, epctx, stctx, epctx->state);
+             xhci_ep_free_xfer(xfer);
+             xfer = NULL;
+         }
+@@ -1979,8 +1983,6 @@ static void xhci_kick_epctx(XHCIEPContext *epctx, unsigned int streamid)
+             break;
+         }
+     }
+-    /* update ring dequeue ptr */
+-    xhci_set_ep_state(xhci, epctx, stctx, epctx->state);
+     epctx->kick_active--;
  
- all: $(DOCS) $(TOOLS) $(HELPERS-y) recurse-all modules
- 
--qemu-version.h: FORCE
-+qemu-version.h: config-host.mak FORCE
- 	$(call quiet-command, \
- 		(cd $(SRC_PATH); \
- 		printf '#define QEMU_PKGVERSION '; \
-@@ -312,6 +312,7 @@ qemu-version.h: FORCE
- 
- config-host.h: config-host.h-timestamp
- config-host.h-timestamp: config-host.mak
-+qemu-options.def: config-host.mak
- qemu-options.def: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
- 	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$@")
- 
-@@ -394,17 +395,17 @@ gen-out-type = $(subst .,-,$(suffix $@))
- qapi-py = $(SRC_PATH)/scripts/qapi.py $(SRC_PATH)/scripts/ordereddict.py
- 
- qga/qapi-generated/qga-qapi-types.c qga/qapi-generated/qga-qapi-types.h :\
--$(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-types.py $(qapi-py)
-+$(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-types.py $(qapi-py) config-host.mak
- 	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-types.py \
- 		$(gen-out-type) -o qga/qapi-generated -p "qga-" $<, \
- 		"GEN","$@")
- qga/qapi-generated/qga-qapi-visit.c qga/qapi-generated/qga-qapi-visit.h :\
--$(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-visit.py $(qapi-py)
-+$(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-visit.py $(qapi-py) config-host.mak
- 	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-visit.py \
- 		$(gen-out-type) -o qga/qapi-generated -p "qga-" $<, \
- 		"GEN","$@")
- qga/qapi-generated/qga-qmp-commands.h qga/qapi-generated/qga-qmp-marshal.c :\
--$(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-commands.py $(qapi-py)
-+$(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-commands.py $(qapi-py) config-host.mak
- 	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-commands.py \
- 		$(gen-out-type) -o qga/qapi-generated -p "qga-" $<, \
- 		"GEN","$@")
-@@ -416,27 +417,27 @@ qapi-modules = $(SRC_PATH)/qapi-schema.json $(SRC_PATH)/qapi/common.json \
-                $(SRC_PATH)/qapi/trace.json
- 
- qapi-types.c qapi-types.h :\
--$(qapi-modules) $(SRC_PATH)/scripts/qapi-types.py $(qapi-py)
-+$(qapi-modules) $(SRC_PATH)/scripts/qapi-types.py $(qapi-py) config-host.mak
- 	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-types.py \
- 		$(gen-out-type) -o "." -b $<, \
- 		"GEN","$@")
- qapi-visit.c qapi-visit.h :\
--$(qapi-modules) $(SRC_PATH)/scripts/qapi-visit.py $(qapi-py)
-+$(qapi-modules) $(SRC_PATH)/scripts/qapi-visit.py $(qapi-py) config-host.mak
- 	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-visit.py \
- 		$(gen-out-type) -o "." -b $<, \
- 		"GEN","$@")
- qapi-event.c qapi-event.h :\
--$(qapi-modules) $(SRC_PATH)/scripts/qapi-event.py $(qapi-py)
-+$(qapi-modules) $(SRC_PATH)/scripts/qapi-event.py $(qapi-py) config-host.mak
- 	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-event.py \
- 		$(gen-out-type) -o "." $<, \
- 		"GEN","$@")
- qmp-commands.h qmp-marshal.c :\
--$(qapi-modules) $(SRC_PATH)/scripts/qapi-commands.py $(qapi-py)
-+$(qapi-modules) $(SRC_PATH)/scripts/qapi-commands.py $(qapi-py) config-host.mak
- 	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-commands.py \
- 		$(gen-out-type) -o "." $<, \
- 		"GEN","$@")
- qmp-introspect.h qmp-introspect.c :\
--$(qapi-modules) $(SRC_PATH)/scripts/qapi-introspect.py $(qapi-py)
-+$(qapi-modules) $(SRC_PATH)/scripts/qapi-introspect.py $(qapi-py) config-host.mak
- 	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-introspect.py \
- 		$(gen-out-type) -o "." $<, \
- 		"GEN","$@")
-@@ -703,10 +704,10 @@ qemu-img-cmds.texi: $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/scripts/hxtool
- 
- docs/qemu-qmp-qapi.texi docs/qemu-ga-qapi.texi: $(SRC_PATH)/scripts/qapi2texi.py $(qapi-py)
- 
--docs/qemu-qmp-qapi.texi: $(qapi-modules)
-+docs/qemu-qmp-qapi.texi: $(qapi-modules) config-host.mak
- 	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi2texi.py $< > $@,"GEN","$@")
- 
--docs/qemu-ga-qapi.texi: $(SRC_PATH)/qga/qapi-schema.json
-+docs/qemu-ga-qapi.texi: $(SRC_PATH)/qga/qapi-schema.json config-host.mak
- 	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi2texi.py $< > $@,"GEN","$@")
- 
- qemu.1: qemu-doc.texi qemu-options.texi qemu-monitor.texi qemu-monitor-info.texi
+     ep = xhci_epid_to_usbep(epctx);
 -- 
-1.8.3.1
+2.9.3
