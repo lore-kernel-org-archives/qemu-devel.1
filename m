@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dIkgU-0003qG-7u
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 19:48:19 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dIkvC-000847-Mt
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 20:03:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dIkgT-0003fi-Cu
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 19:48:18 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:34848)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1dIkgT-0003fO-6X
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 19:48:17 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id x70so67237925wme.0
-	for <qemu-devel@nongnu.org>; Wed, 07 Jun 2017 16:48:15 -0700 (PDT)
+	(envelope-from <no-reply@patchew.org>) id 1dIkv8-0008Ub-N3
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 20:03:30 -0400
+Resent-Message-Id: <E1dIkv8-0008Ub-N3@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21416)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dIkv8-0008Qd-FJ
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 20:03:26 -0400
+In-Reply-To: <20170607155536.1193-1-rth@twiddle.net>
+Message-ID: <149688017690.420.10600095705554796648@84b42461e25a>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <87shjc2rkb.fsf@dusky.pond.sub.org>
-References: <2b2311b1b070a0b03973e39deccf4682de4a6cd4.1496686997.git.alistair.francis@xilinx.com>
-	<CAJ+F1CLuPkWjG3Hn8hfaxTApn6+ouqh5nJZNWSQYX1C3_HRFqA@mail.gmail.com>
-	<e340cdb9-3c97-8624-81d9-f7888f819a68@amsat.org>
-	<CAKmqyKOOhu7iKuW4naNi0+7cwayLaftkPf=gS7uBakMvKavxVQ@mail.gmail.com>
-	<270686d0-1ca8-965f-a14a-397f45616deb@redhat.com>
-	<87shjc2rkb.fsf@dusky.pond.sub.org>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Wed, 7 Jun 2017 16:47:43 -0700
-Message-ID: <CAKmqyKMJ8ZgTPtEj73pBDU+mf578tubKPUPsP4mTD8veX90K-w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] char-socket: Don't report TCP
- socket waiting as an error
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 7 Jun 2017 17:02:57 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v4 0/7] tcg: allocate TB structs preceding
+ translate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,52 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Alistair Francis <alistair.francis@xilinx.com>
+To: rth@twiddle.net
+Cc: famz@redhat.com, qemu-devel@nongnu.org, cota@braap.org
 
-On Wed, Jun 7, 2017 at 12:19 AM, Markus Armbruster <armbru@redhat.com> wrote:
-> Paolo Bonzini <pbonzini@redhat.com> writes:
->
->> On 06/06/2017 18:30, Alistair Francis wrote:
->>>>
->>>> This is somehow confusing. I don't think it is worth having another
->>>> qemu_log_stderr() function rather than using error_report() but this very
->>>> call might deserve a comment explaining this unusual use. What do you think?
->>>
->>> The problem with stderr is that this isn't an error. Some uses of QEMU
->>> (inside Eclipse for example) flag everything printed on stderr as red
->>> which confuses users that they are seeing an error when they really
->>> aren't.
->>
->> But they are wrong.
->
-> Concur.  We also print warnings and informational messages to stderr.
->
-> We should make errors easy to recognize.  Fortunately, error_report()
-> prints errors to stderr in a rigid format.  Unfortunately, error
-> messages bypassing error_report() still exist in places.  We suck.
->
-> The format is
->
->     timestamp-if-enabled progname ':' location message
->
-> timestamp-if-enabled is normally empty.  With -msg timestamp=on, it's
-> the current time in ISO 8601 format, followed by a space.
->
-> progname is the program name (main()'s argv[0]).
->
-> location is either empty, or a reference to the command line or a
-> configuration file.
->
-> See error_vreport() for details.
-
-Ok, but this isn't an error, it's more information. So it sounds like
-we should still print to stderr but not print in the format described
-above?
-
-Thanks,
-Alistair
-
->
-> [...]
->
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcwNjA3MTU1NTM2LjExOTMtMS1ydGhAdHdpZGRsZS5uZXQKU3ViamVjdDog
+W1FlbXUtZGV2ZWxdIFtQQVRDSCB2NCAwLzddIHRjZzogYWxsb2NhdGUgVEIgc3RydWN0cyBwcmVj
+ZWRpbmcgdHJhbnNsYXRlCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpC
+QVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpm
+YWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0l
+SCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hl
+Y2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4i
+CiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0
+Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAg
+ICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVO
+RCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQK
+U3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwphNWY1NTQ0IHRhcmdldC9hcm06IFVzZSBs
+ZHIgKGxpdGVyYWwpIGZvciBnb3RvX3RiCjE1YTkyZDggdGFyZ2V0L2FybTogVHJ5IHBjLXJlbGF0
+aXZlIGFkZHJlc3NlcyBmb3IgbW92aQpjMjcwYzQyIHRhcmdldC9hcm06IFJlbW92ZSBsaW1pdCBv
+biBjb2RlIGJ1ZmZlciBzaXplCjkyZGY5MmQgdGFyZ2V0L2FybTogVXNlIGluZGlyZWN0IGJyYW5j
+aCBmb3IgZ290b190YgpjYTVkM2ZkIHRjZy9hYXJjaDY0OiBVc2UgQURSIGluIHRjZ19vdXRfbW92
+aQpjNjJhNjQwIHRjZzogYWxsb2NhdGUgVEIgc3RydWN0cyBiZWZvcmUgdGhlIGNvcnJlc3BvbmRp
+bmcgdHJhbnNsYXRlZCBjb2RlCmIzZTJhMWYgdXRpbDogYWRkIGNhY2hlaW5mbwoKPT09IE9VVFBV
+VCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS83OiB1dGlsOiBhZGQgY2FjaGVpbmZvLi4uCkVS
+Uk9SOiBkbyBub3QgaW5pdGlhbGlzZSBnbG9iYWxzIHRvIDAgb3IgTlVMTAojMTQ5OiBGSUxFOiB1
+dGlsL2NhY2hlaW5mby5jOjExOgoraW50IHFlbXVfaWNhY2hlX2xpbmVzaXplID0gMDsKCkVSUk9S
+OiBkbyBub3QgaW5pdGlhbGlzZSBnbG9iYWxzIHRvIDAgb3IgTlVMTAojMTUwOiBGSUxFOiB1dGls
+L2NhY2hlaW5mby5jOjEyOgoraW50IHFlbXVfZGNhY2hlX2xpbmVzaXplID0gMDsKCkVSUk9SOiBz
+cGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQgJyYmJyAoY3R4OkV4VykKIzE4NzogRklMRTogdXRp
+bC9jYWNoZWluZm8uYzo0OToKKyAgICAgICAgICAgICYmIGJ1ZltpXS5DYWNoZS5MZXZlbCA9PSAx
+KSB7CiAgICAgICAgICAgICBeCgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5l
+cyBzaG91bGQgYmUgYXZvaWRlZAojMjA5OiBGSUxFOiB1dGlsL2NhY2hlaW5mby5jOjcxOgorIyBp
+ZiBkZWZpbmVkKF9fQVBQTEVfXykKCnRvdGFsOiAzIGVycm9ycywgMSB3YXJuaW5ncywgMjA3IGxp
+bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
+LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNr
+aW5nIFBBVENIIDIvNzogdGNnOiBhbGxvY2F0ZSBUQiBzdHJ1Y3RzIGJlZm9yZSB0aGUgY29ycmVz
+cG9uZGluZyB0cmFuc2xhdGVkIGNvZGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMy83OiB0Y2cvYWFyY2g2
+NDogVXNlIEFEUiBpbiB0Y2dfb3V0X21vdmkuLi4KQ2hlY2tpbmcgUEFUQ0ggNC83OiB0YXJnZXQv
+YXJtOiBVc2UgaW5kaXJlY3QgYnJhbmNoIGZvciBnb3RvX3RiLi4uCkNoZWNraW5nIFBBVENIIDUv
+NzogdGFyZ2V0L2FybTogUmVtb3ZlIGxpbWl0IG9uIGNvZGUgYnVmZmVyIHNpemUuLi4KQ2hlY2tp
+bmcgUEFUQ0ggNi83OiB0YXJnZXQvYXJtOiBUcnkgcGMtcmVsYXRpdmUgYWRkcmVzc2VzIGZvciBt
+b3ZpLi4uCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzU0OiBGSUxF
+OiB0Y2cvYXJtL3RjZy10YXJnZXQuaW5jLmM6NDQ2OgorXkl9JAoKRVJST1I6IGNvZGUgaW5kZW50
+IHNob3VsZCBuZXZlciB1c2UgdGFicwojNjQ6IEZJTEU6IHRjZy9hcm0vdGNnLXRhcmdldC5pbmMu
+Yzo0NTM6CiteSX0kCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDU0IGxpbmVzIGNoZWNr
+ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENI
+IDcvNzogdGFyZ2V0L2FybTogVXNlIGxkciAobGl0ZXJhbCkgZm9yIGdvdG9fdGIuLi4KPT09IE9V
+VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
+XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5v
+cmc=
