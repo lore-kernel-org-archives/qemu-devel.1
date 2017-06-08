@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48164)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dIxi4-0005eJ-4i
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:42:51 -0400
+	(envelope-from <groug@kaod.org>) id 1dIxiF-0005oh-Le
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:43:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dIxi3-0006yt-3y
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:42:48 -0400
-Received: from 6.mo178.mail-out.ovh.net ([46.105.53.132]:53927)
+	(envelope-from <groug@kaod.org>) id 1dIxiC-000794-HZ
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:42:59 -0400
+Received: from 9.mo178.mail-out.ovh.net ([46.105.75.45]:35833)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dIxi2-0006yT-TU
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:42:47 -0400
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dIxiC-00077U-BB
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:42:56 -0400
 Received: from player728.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id ADE723EAC7
-	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 15:42:45 +0200 (CEST)
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id CC5903EAC7
+	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 15:42:54 +0200 (CEST)
 From: Greg Kurz <groug@kaod.org>
-Date: Thu, 08 Jun 2017 15:42:41 +0200
-Message-ID: <149692936183.12119.5013623492394505174.stgit@bahia>
+Date: Thu, 08 Jun 2017 15:42:50 +0200
+Message-ID: <149692937073.12119.15678075319946323731.stgit@bahia>
 In-Reply-To: <149692935202.12119.3614006195497745877.stgit@bahia>
 References: <149692935202.12119.3614006195497745877.stgit@bahia>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v4 1/6] xics: introduce macros for ICP/ICS link
- properties
+Subject: [Qemu-devel] [PATCH v4 2/6] xics: pass appropriate types to
+ realize() handlers.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,122 +33,131 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-These properties are part of the XICS API. They deserve to appear
-explicitely in the XICS header file.
+It makes more sense to pass an IPCState * to handlers of ICPStateClass
+instead of a DeviceState *, if only to benefit from compile time type
+checking. The same goes with ICSStateClass.
+
+While here, we also change the declaration of ICPStateClass in xics.h
+for consistency.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/intc/xics.c          |    8 ++++----
- hw/ppc/pnv_core.c       |    3 ++-
- hw/ppc/pnv_psi.c        |    3 ++-
- hw/ppc/spapr.c          |    3 ++-
- hw/ppc/spapr_cpu_core.c |    3 ++-
- include/hw/ppc/xics.h   |    4 ++++
- 6 files changed, 16 insertions(+), 8 deletions(-)
+ hw/intc/xics.c        |   10 ++++------
+ hw/intc/xics_kvm.c    |    6 ++----
+ hw/intc/xics_pnv.c    |    6 +++---
+ include/hw/ppc/xics.h |    8 ++++----
+ 4 files changed, 13 insertions(+), 17 deletions(-)
 
 diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index ec73f02144c9..aa2c4e744f65 100644
+index aa2c4e744f65..f74a96e932d7 100644
 --- a/hw/intc/xics.c
 +++ b/hw/intc/xics.c
-@@ -346,9 +346,9 @@ static void icp_realize(DeviceState *dev, Error **errp)
-     Object *obj;
-     Error *err = NULL;
+@@ -356,7 +356,7 @@ static void icp_realize(DeviceState *dev, Error **errp)
+     icp->xics = XICS_FABRIC(obj);
  
--    obj = object_property_get_link(OBJECT(dev), "xics", &err);
-+    obj = object_property_get_link(OBJECT(dev), ICP_PROP_XICS, &err);
-     if (!obj) {
--        error_setg(errp, "%s: required link 'xics' not found: %s",
-+        error_setg(errp, "%s: required link '" ICP_PROP_XICS "' not found: %s",
-                    __func__, error_get_pretty(err));
+     if (icpc->realize) {
+-        icpc->realize(dev, errp);
++        icpc->realize(icp, errp);
+     }
+ 
+     qemu_register_reset(icp_reset, dev);
+@@ -606,10 +606,8 @@ static void ics_simple_initfn(Object *obj)
+     ics->offset = XICS_IRQ_BASE;
+ }
+ 
+-static void ics_simple_realize(DeviceState *dev, Error **errp)
++static void ics_simple_realize(ICSState *ics, Error **errp)
+ {
+-    ICSState *ics = ICS_SIMPLE(dev);
+-
+     if (!ics->nr_irqs) {
+         error_setg(errp, "Number of interrupts needs to be greater 0");
          return;
-     }
-@@ -654,9 +654,9 @@ static void ics_base_realize(DeviceState *dev, Error **errp)
-     Object *obj;
-     Error *err = NULL;
+@@ -617,7 +615,7 @@ static void ics_simple_realize(DeviceState *dev, Error **errp)
+     ics->irqs = g_malloc0(ics->nr_irqs * sizeof(ICSIRQState));
+     ics->qirqs = qemu_allocate_irqs(ics_simple_set_irq, ics, ics->nr_irqs);
  
--    obj = object_property_get_link(OBJECT(dev), "xics", &err);
-+    obj = object_property_get_link(OBJECT(dev), ICS_PROP_XICS, &err);
-     if (!obj) {
--        error_setg(errp, "%s: required link 'xics' not found: %s",
-+        error_setg(errp, "%s: required link '" ICS_PROP_XICS "' not found: %s",
-                    __func__, error_get_pretty(err));
+-    qemu_register_reset(ics_simple_reset, dev);
++    qemu_register_reset(ics_simple_reset, ics);
+ }
+ 
+ static Property ics_simple_properties[] = {
+@@ -664,7 +662,7 @@ static void ics_base_realize(DeviceState *dev, Error **errp)
+ 
+ 
+     if (icsc->realize) {
+-        icsc->realize(dev, errp);
++        icsc->realize(ics, errp);
+     }
+ }
+ 
+diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+index 45bf110b51e6..41c5b9439562 100644
+--- a/hw/intc/xics_kvm.c
++++ b/hw/intc/xics_kvm.c
+@@ -328,10 +328,8 @@ static void ics_kvm_reset(void *dev)
+     ics_set_kvm_state(ics, 1);
+ }
+ 
+-static void ics_kvm_realize(DeviceState *dev, Error **errp)
++static void ics_kvm_realize(ICSState *ics, Error **errp)
+ {
+-    ICSState *ics = ICS_SIMPLE(dev);
+-
+     if (!ics->nr_irqs) {
+         error_setg(errp, "Number of interrupts needs to be greater 0");
          return;
-     }
-diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index e8a9a94d5a24..0b6e72950ca3 100644
---- a/hw/ppc/pnv_core.c
-+++ b/hw/ppc/pnv_core.c
-@@ -121,7 +121,8 @@ static void pnv_core_realize_child(Object *child, XICSFabric *xi, Error **errp)
-     obj = object_new(TYPE_PNV_ICP);
-     object_property_add_child(OBJECT(cpu), "icp", obj, &error_abort);
-     object_unref(obj);
--    object_property_add_const_link(obj, "xics", OBJECT(xi), &error_abort);
-+    object_property_add_const_link(obj, ICP_PROP_XICS, OBJECT(xi),
-+                                   &error_abort);
-     object_property_set_bool(obj, true, "realized", &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
-index 2bf5bfe3fdd6..9876c266223d 100644
---- a/hw/ppc/pnv_psi.c
-+++ b/hw/ppc/pnv_psi.c
-@@ -474,7 +474,8 @@ static void pnv_psi_realize(DeviceState *dev, Error **errp)
-     }
+@@ -339,7 +337,7 @@ static void ics_kvm_realize(DeviceState *dev, Error **errp)
+     ics->irqs = g_malloc0(ics->nr_irqs * sizeof(ICSIRQState));
+     ics->qirqs = qemu_allocate_irqs(ics_kvm_set_irq, ics, ics->nr_irqs);
  
-     /* Create PSI interrupt control source */
--    object_property_add_const_link(OBJECT(ics), "xics", obj,  &error_abort);
-+    object_property_add_const_link(OBJECT(ics), ICS_PROP_XICS, obj,
-+                                   &error_abort);
-     object_property_set_int(OBJECT(ics), PSI_NUM_INTERRUPTS, "nr-irqs", &err);
-     if (err) {
-         error_propagate(errp, err);
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 01dda9ea9fb7..b2951d7618d6 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -107,7 +107,8 @@ static ICSState *spapr_ics_create(sPAPRMachineState *spapr,
+-    qemu_register_reset(ics_kvm_reset, dev);
++    qemu_register_reset(ics_kvm_reset, ics);
+ }
  
-     obj = object_new(type_ics);
-     object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort);
--    object_property_add_const_link(obj, "xics", OBJECT(spapr), &error_abort);
-+    object_property_add_const_link(obj, ICS_PROP_XICS, OBJECT(spapr),
-+                                   &error_abort);
-     object_property_set_int(obj, nr_irqs, "nr-irqs", &local_err);
-     if (local_err) {
-         goto error;
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 029a14120edd..e81879c7cad7 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -145,7 +145,8 @@ static void spapr_cpu_core_realize_child(Object *child, Error **errp)
-     obj = object_new(spapr->icp_type);
-     object_property_add_child(OBJECT(cpu), "icp", obj, &error_abort);
-     object_unref(obj);
--    object_property_add_const_link(obj, "xics", OBJECT(spapr), &error_abort);
-+    object_property_add_const_link(obj, ICP_PROP_XICS, OBJECT(spapr),
-+                                   &error_abort);
-     object_property_set_bool(obj, true, "realized", &local_err);
-     if (local_err) {
-         goto error;
+ static void ics_kvm_class_init(ObjectClass *klass, void *data)
+diff --git a/hw/intc/xics_pnv.c b/hw/intc/xics_pnv.c
+index 12ae605f10e8..2a955a894678 100644
+--- a/hw/intc/xics_pnv.c
++++ b/hw/intc/xics_pnv.c
+@@ -159,11 +159,11 @@ static const MemoryRegionOps pnv_icp_ops = {
+     },
+ };
+ 
+-static void pnv_icp_realize(DeviceState *dev, Error **errp)
++static void pnv_icp_realize(ICPState *icp, Error **errp)
+ {
+-    PnvICPState *icp = PNV_ICP(dev);
++    PnvICPState *pnv_icp = PNV_ICP(icp);
+ 
+-    memory_region_init_io(&icp->mmio, OBJECT(dev), &pnv_icp_ops,
++    memory_region_init_io(&pnv_icp->mmio, OBJECT(icp), &pnv_icp_ops,
+                           icp, "icp-thread", 0x1000);
+ }
+ 
 diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 40a506eacfb4..31145326ebf9 100644
+index 31145326ebf9..797df82fefc0 100644
 --- a/include/hw/ppc/xics.h
 +++ b/include/hw/ppc/xics.h
-@@ -86,6 +86,8 @@ struct ICPState {
-     XICSFabric *xics;
+@@ -65,9 +65,9 @@ typedef struct XICSFabric XICSFabric;
+ struct ICPStateClass {
+     DeviceClass parent_class;
+ 
+-    void (*realize)(DeviceState *dev, Error **errp);
+-    void (*pre_save)(ICPState *s);
+-    int (*post_load)(ICPState *s, int version_id);
++    void (*realize)(ICPState *icp, Error **errp);
++    void (*pre_save)(ICPState *icp);
++    int (*post_load)(ICPState *icp, int version_id);
+     void (*cpu_setup)(ICPState *icp, PowerPCCPU *cpu);
+     void (*reset)(ICPState *icp);
  };
+@@ -113,7 +113,7 @@ struct PnvICPState {
+ struct ICSStateClass {
+     DeviceClass parent_class;
  
-+#define ICP_PROP_XICS "xics"
-+
- struct PnvICPState {
-     ICPState parent_obj;
- 
-@@ -130,6 +132,8 @@ struct ICSState {
-     XICSFabric *xics;
- };
- 
-+#define ICS_PROP_XICS "xics"
-+
- static inline bool ics_valid_irq(ICSState *ics, uint32_t nr)
- {
-     return (ics->offset != 0) && (nr >= ics->offset)
+-    void (*realize)(DeviceState *dev, Error **errp);
++    void (*realize)(ICSState *s, Error **errp);
+     void (*pre_save)(ICSState *s);
+     int (*post_load)(ICSState *s, int version_id);
+     void (*reject)(ICSState *s, uint32_t irq);
