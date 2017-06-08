@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mrolnik@gmail.com>) id 1dJ2VU-0005h3-Cw
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 14:50:10 -0400
+	(envelope-from <mrolnik@gmail.com>) id 1dJ2VW-0005hH-1u
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 14:50:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mrolnik@gmail.com>) id 1dJ2VP-0001JP-W2
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 14:50:08 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34109)
+	(envelope-from <mrolnik@gmail.com>) id 1dJ2VS-0001KF-G8
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 14:50:10 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:33618)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1dJ2VP-0001JD-MP
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 14:50:03 -0400
-Received: by mail-wm0-x242.google.com with SMTP id 70so8660955wme.1
-	for <qemu-devel@nongnu.org>; Thu, 08 Jun 2017 11:50:03 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1dJ2VS-0001Jp-5q
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 14:50:06 -0400
+Received: by mail-wm0-x244.google.com with SMTP id x3so8674692wme.0
+	for <qemu-devel@nongnu.org>; Thu, 08 Jun 2017 11:50:05 -0700 (PDT)
 From: Michael Rolnik <mrolnik@gmail.com>
-Date: Thu,  8 Jun 2017 21:49:38 +0300
-Message-Id: <20170608184944.19406-4-mrolnik@gmail.com>
+Date: Thu,  8 Jun 2017 21:49:39 +0300
+Message-Id: <20170608184944.19406-5-mrolnik@gmail.com>
 In-Reply-To: <20170608184944.19406-1-mrolnik@gmail.com>
 References: <20170608184944.19406-1-mrolnik@gmail.com>
-Subject: [Qemu-devel] [PATCH RFC v19 03/13] target-avr: adding a sample AVR
- board
+Subject: [Qemu-devel] [PATCH RFC v19 04/13] target-avr: adding instructions
+ encodings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,168 +30,822 @@ To: qemu-devel@nongnu.org
 Cc: anichang@protonmail.ch, Michael Rolnik <mrolnik@gmail.com>, Richard Henderson <rth@twiddle.net>
 
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Message-Id: <1471522070-77598-4-git-send-email-mrolnik@gmail.com>
+Message-Id: <1471522070-77598-5-git-send-email-mrolnik@gmail.com>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- MAINTAINERS          |   1 +
- hw/avr/Makefile.objs |  21 ++++++++++
- hw/avr/sample.c      | 108 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 130 insertions(+)
- create mode 100644 hw/avr/Makefile.objs
- create mode 100644 hw/avr/sample.c
+ target/avr/translate-inst.h | 804 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 804 insertions(+)
+ create mode 100644 target/avr/translate-inst.h
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index dc37be323e..313b42642a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -129,6 +129,7 @@ AVR
- M: Michael Rolnik <mrolnik@gmail.com>
- S: Maintained
- F: target-avr/
-+F: hw/avr/
- 
- CRIS
- M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
-diff --git a/hw/avr/Makefile.objs b/hw/avr/Makefile.objs
+diff --git a/target/avr/translate-inst.h b/target/avr/translate-inst.h
 new file mode 100644
-index 0000000000..8f537c9870
+index 0000000000..af2e076807
 --- /dev/null
-+++ b/hw/avr/Makefile.objs
-@@ -0,0 +1,21 @@
-+#
-+#  QEMU AVR CPU
-+#
-+#  Copyright (c) 2016 Michael Rolnik
-+#
-+#  This library is free software; you can redistribute it and/or
-+#  modify it under the terms of the GNU Lesser General Public
-+#  License as published by the Free Software Foundation; either
-+#  version 2.1 of the License, or (at your option) any later version.
-+#
-+#  This library is distributed in the hope that it will be useful,
-+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+#  Lesser General Public License for more details.
-+#
-+#  You should have received a copy of the GNU Lesser General Public
-+#  License along with this library; if not, see
-+#  <http://www.gnu.org/licenses/lgpl-2.1.html>
-+#
-+
-+obj-y += sample.o
-diff --git a/hw/avr/sample.c b/hw/avr/sample.c
-new file mode 100644
-index 0000000000..7b03130680
---- /dev/null
-+++ b/hw/avr/sample.c
-@@ -0,0 +1,108 @@
++++ b/target/avr/translate-inst.h
+@@ -0,0 +1,804 @@
 +/*
-+ * QEMU AVR CPU
++ *  QEMU AVR CPU
 + *
-+ * Copyright (c) 2016 Michael Rolnik
++ *  Copyright (c) 2016 Michael Rolnik
 + *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
 + *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
 + *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, see
++ *  <http://www.gnu.org/licenses/lgpl-2.1.html>
 + */
 +
-+/*
-+ *  NOTE:
-+ *      This is not a real AVR board !!! This is an example !!!
-+ *
-+ *        This example can be used to build a real AVR board.
-+ *
-+ *      This example board loads provided binary file into flash memory and
-+ *      executes it from 0x00000000 address in the code memory space.
-+ *
-+ *      Currently used for AVR CPU validation
-+ *
-+ */
++#ifndef AVR_TRANSLATE_INST_H_
++#define AVR_TRANSLATE_INST_H_
 +
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qemu-common.h"
-+#include "cpu.h"
-+#include "hw/hw.h"
-+#include "sysemu/sysemu.h"
-+#include "sysemu/qtest.h"
-+#include "ui/console.h"
-+#include "hw/boards.h"
-+#include "hw/devices.h"
-+#include "hw/loader.h"
-+#include "qemu/error-report.h"
-+#include "exec/address-spaces.h"
-+#include "include/hw/sysbus.h"
++typedef struct DisasContext DisasContext;
 +
-+#define VIRT_BASE_FLASH 0x00000000
-+#define VIRT_BASE_ISRAM 0x00000100
-+#define VIRT_BASE_EXMEM 0x00001100
-+#define VIRT_BASE_EEPROM 0x00000000
++int avr_translate_NOP(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
 +
-+#define SIZE_FLASH 0x00020000
-+#define SIZE_ISRAM 0x00001000
-+#define SIZE_EXMEM 0x00010000
-+#define SIZE_EEPROM 0x00001000
-+#define SIZE_IOREG SIZE_REGS
-+
-+#define PHYS_BASE_FLASH (PHYS_BASE_CODE)
-+
-+#define PHYS_BASE_ISRAM (PHYS_BASE_DATA)
-+#define PHYS_BASE_EXMEM (PHYS_BASE_ISRAM + SIZE_ISRAM)
-+#define PHYS_BASE_EEPROM (PHYS_BASE_EXMEM + SIZE_EXMEM)
-+
-+#define PHYS_BASE_IOREG (PHYS_BASE_REGS + 0x20)
-+
-+static void sample_init(MachineState *machine)
++int avr_translate_MOVW(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t MOVW_Rr(uint32_t opcode)
 +{
-+    MemoryRegion *address_space_mem;
-+    MemoryRegion *ram;
-+    MemoryRegion *flash;
-+    unsigned ram_size = SIZE_ISRAM + SIZE_EXMEM;
-+    AVRCPU *cpu_avr ATTRIBUTE_UNUSED;
-+    const char *firmware = NULL;
-+    const char *filename;
-+
-+    address_space_mem = get_system_memory();
-+    ram = g_new(MemoryRegion, 1);
-+    flash = g_new(MemoryRegion, 1);
-+
-+    cpu_avr = cpu_avr_init("avr5");
-+
-+    memory_region_allocate_system_memory(ram, NULL, "avr.ram", ram_size);
-+    memory_region_add_subregion(address_space_mem, PHYS_BASE_ISRAM, ram);
-+
-+    memory_region_init_rom(flash, NULL, "avr.flash", SIZE_FLASH, &error_fatal);
-+    memory_region_add_subregion(address_space_mem, PHYS_BASE_FLASH, flash);
-+    vmstate_register_ram_global(flash);
-+
-+    if (machine->firmware) {
-+        firmware = machine->firmware;
-+    }
-+
-+    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, firmware);
-+    if (filename) {
-+        load_image_targphys(filename, PHYS_BASE_FLASH, SIZE_FLASH);
-+    }
++    return extract32(opcode, 0, 4);
 +}
 +
-+static void sample_machine_init(MachineClass *mc)
++static inline uint32_t MOVW_Rd(uint32_t opcode)
 +{
-+    mc->desc = "AVR sample/example board";
-+    mc->init = sample_init;
-+    mc->is_default = 1;
++    return extract32(opcode, 4, 4);
 +}
 +
-+DEFINE_MACHINE("sample", sample_machine_init)
++int avr_translate_MULS(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t MULS_Rr(uint32_t opcode)
++{
++    return extract32(opcode, 0, 4);
++}
++
++static inline uint32_t MULS_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 4);
++}
++
++int avr_translate_MULSU(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t MULSU_Rr(uint32_t opcode)
++{
++    return extract32(opcode, 0, 3);
++}
++
++static inline uint32_t MULSU_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 3);
++}
++
++int avr_translate_FMUL(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t FMUL_Rr(uint32_t opcode)
++{
++    return extract32(opcode, 0, 3);
++}
++
++static inline uint32_t FMUL_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 3);
++}
++
++int avr_translate_FMULS(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t FMULS_Rr(uint32_t opcode)
++{
++    return extract32(opcode, 0, 3);
++}
++
++static inline uint32_t FMULS_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 3);
++}
++
++int avr_translate_FMULSU(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t FMULSU_Rr(uint32_t opcode)
++{
++    return extract32(opcode, 0, 3);
++}
++
++static inline uint32_t FMULSU_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 3);
++}
++
++int avr_translate_CPC(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t CPC_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++static inline uint32_t CPC_Rr(uint32_t opcode)
++{
++    return (extract32(opcode, 9, 1) << 4) |
++            (extract32(opcode, 0, 4));
++}
++
++int avr_translate_SBC(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t SBC_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++static inline uint32_t SBC_Rr(uint32_t opcode)
++{
++    return (extract32(opcode, 9, 1) << 4) |
++            (extract32(opcode, 0, 4));
++}
++
++int avr_translate_ADD(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t ADD_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++static inline uint32_t ADD_Rr(uint32_t opcode)
++{
++    return (extract32(opcode, 9, 1) << 4) |
++            (extract32(opcode, 0, 4));
++}
++
++int avr_translate_AND(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t AND_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++static inline uint32_t AND_Rr(uint32_t opcode)
++{
++    return (extract32(opcode, 9, 1) << 4) |
++            (extract32(opcode, 0, 4));
++}
++
++int avr_translate_EOR(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t EOR_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++static inline uint32_t EOR_Rr(uint32_t opcode)
++{
++    return (extract32(opcode, 9, 1) << 4) |
++            (extract32(opcode, 0, 4));
++}
++
++int avr_translate_OR(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t OR_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++static inline uint32_t OR_Rr(uint32_t opcode)
++{
++    return (extract32(opcode, 9, 1) << 4) |
++            (extract32(opcode, 0, 4));
++}
++
++int avr_translate_MOV(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t MOV_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++static inline uint32_t MOV_Rr(uint32_t opcode)
++{
++    return (extract32(opcode, 9, 1) << 4) |
++            (extract32(opcode, 0, 4));
++}
++
++int avr_translate_CPSE(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t CPSE_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++static inline uint32_t CPSE_Rr(uint32_t opcode)
++{
++    return (extract32(opcode, 9, 1) << 4) |
++            (extract32(opcode, 0, 4));
++}
++
++int avr_translate_CP(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t CP_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++static inline uint32_t CP_Rr(uint32_t opcode)
++{
++    return (extract32(opcode, 9, 1) << 4) |
++            (extract32(opcode, 0, 4));
++}
++
++int avr_translate_SUB(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t SUB_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++static inline uint32_t SUB_Rr(uint32_t opcode)
++{
++    return (extract32(opcode, 9, 1) << 4) |
++            (extract32(opcode, 0, 4));
++}
++
++int avr_translate_ADC(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t ADC_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++static inline uint32_t ADC_Rr(uint32_t opcode)
++{
++    return (extract32(opcode, 9, 1) << 4) |
++            (extract32(opcode, 0, 4));
++}
++
++int avr_translate_CPI(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t CPI_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 4);
++}
++
++static inline uint32_t CPI_Imm(uint32_t opcode)
++{
++    return (extract32(opcode, 8, 4) << 4) |
++            (extract32(opcode, 0, 4));
++}
++
++int avr_translate_SBCI(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t SBCI_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 4);
++}
++
++static inline uint32_t SBCI_Imm(uint32_t opcode)
++{
++    return (extract32(opcode, 8, 4) << 4) |
++            (extract32(opcode, 0, 4));
++}
++
++int avr_translate_ORI(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t ORI_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 4);
++}
++
++static inline uint32_t ORI_Imm(uint32_t opcode)
++{
++    return (extract32(opcode, 8, 4) << 4) |
++            (extract32(opcode, 0, 4));
++}
++
++int avr_translate_SUBI(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t SUBI_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 4);
++}
++
++static inline uint32_t SUBI_Imm(uint32_t opcode)
++{
++    return (extract32(opcode, 8, 4) << 4) |
++            (extract32(opcode, 0, 4));
++}
++
++int avr_translate_ANDI(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t ANDI_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 4);
++}
++
++static inline uint32_t ANDI_Imm(uint32_t opcode)
++{
++    return (extract32(opcode, 8, 4) << 4) |
++            (extract32(opcode, 0, 4));
++}
++
++int avr_translate_LDDZ(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t LDDZ_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++static inline uint32_t LDDZ_Imm(uint32_t opcode)
++{
++    return (extract32(opcode, 13, 1) << 5) |
++            (extract32(opcode, 10, 2) << 3) |
++            (extract32(opcode, 0, 3));
++}
++
++int avr_translate_LDDY(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t LDDY_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++static inline uint32_t LDDY_Imm(uint32_t opcode)
++{
++    return (extract32(opcode, 13, 1) << 5) |
++            (extract32(opcode, 10, 2) << 3) |
++            (extract32(opcode, 0, 3));
++}
++
++int avr_translate_STDZ(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t STDZ_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++static inline uint32_t STDZ_Imm(uint32_t opcode)
++{
++    return (extract32(opcode, 13, 1) << 5) |
++            (extract32(opcode, 10, 2) << 3) |
++            (extract32(opcode, 0, 3));
++}
++
++int avr_translate_STDY(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t STDY_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++static inline uint32_t STDY_Imm(uint32_t opcode)
++{
++    return (extract32(opcode, 13, 1) << 5) |
++            (extract32(opcode, 10, 2) << 3) |
++            (extract32(opcode, 0, 3));
++}
++
++int avr_translate_LDS(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t LDS_Imm(uint32_t opcode)
++{
++    return extract32(opcode, 0, 16);
++}
++
++static inline uint32_t LDS_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 20, 5);
++}
++
++int avr_translate_LDZ2(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t LDZ2_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_LDZ3(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t LDZ3_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_LPM2(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t LPM2_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_LPMX(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t LPMX_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_ELPM2(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t ELPM2_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_ELPMX(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t ELPMX_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_LDY2(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t LDY2_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_LDY3(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t LDY3_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_LDX1(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t LDX1_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_LDX2(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t LDX2_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_LDX3(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t LDX3_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_POP(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t POP_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_STS(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t STS_Imm(uint32_t opcode)
++{
++    return extract32(opcode, 0, 16);
++}
++
++static inline uint32_t STS_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 20, 5);
++}
++
++int avr_translate_STZ2(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t STZ2_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_STZ3(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t STZ3_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_XCH(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t XCH_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_LAS(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t LAS_Rr(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_LAC(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t LAC_Rr(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_LAT(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t LAT_Rr(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_STY2(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t STY2_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_STY3(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t STY3_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_STX1(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t STX1_Rr(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_STX2(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t STX2_Rr(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_STX3(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t STX3_Rr(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_PUSH(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t PUSH_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_COM(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t COM_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_NEG(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t NEG_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_SWAP(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t SWAP_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_INC(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t INC_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_ASR(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t ASR_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_LSR(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t LSR_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_ROR(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t ROR_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_BSET(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t BSET_Bit(uint32_t opcode)
++{
++    return extract32(opcode, 4, 3);
++}
++
++int avr_translate_IJMP(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++
++int avr_translate_EIJMP(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++
++int avr_translate_BCLR(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t BCLR_Bit(uint32_t opcode)
++{
++    return extract32(opcode, 4, 3);
++}
++
++int avr_translate_RET(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++
++int avr_translate_RETI(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++
++int avr_translate_ICALL(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++
++int avr_translate_EICALL(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++
++int avr_translate_SLEEP(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++
++int avr_translate_BREAK(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++
++int avr_translate_WDR(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++
++int avr_translate_LPM1(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++
++int avr_translate_ELPM1(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++
++int avr_translate_SPM(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++
++int avr_translate_SPMX(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++
++int avr_translate_DEC(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t DEC_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_DES(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t DES_Imm(uint32_t opcode)
++{
++    return extract32(opcode, 4, 4);
++}
++
++int avr_translate_JMP(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t JMP_Imm(uint32_t opcode)
++{
++    return (extract32(opcode, 20, 5) << 17) |
++            (extract32(opcode, 0, 17));
++}
++
++int avr_translate_CALL(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t CALL_Imm(uint32_t opcode)
++{
++    return (extract32(opcode, 20, 5) << 17) |
++            (extract32(opcode, 0, 17));
++}
++
++int avr_translate_ADIW(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t ADIW_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 2);
++}
++
++static inline uint32_t ADIW_Imm(uint32_t opcode)
++{
++    return (extract32(opcode, 6, 2) << 4) |
++            (extract32(opcode, 0, 4));
++}
++
++int avr_translate_SBIW(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t SBIW_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 2);
++}
++
++static inline uint32_t SBIW_Imm(uint32_t opcode)
++{
++    return (extract32(opcode, 6, 2) << 4) |
++            (extract32(opcode, 0, 4));
++}
++
++int avr_translate_CBI(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t CBI_Bit(uint32_t opcode)
++{
++    return extract32(opcode, 0, 3);
++}
++
++static inline uint32_t CBI_Imm(uint32_t opcode)
++{
++    return extract32(opcode, 3, 5);
++}
++
++int avr_translate_SBIC(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t SBIC_Bit(uint32_t opcode)
++{
++    return extract32(opcode, 0, 3);
++}
++
++static inline uint32_t SBIC_Imm(uint32_t opcode)
++{
++    return extract32(opcode, 3, 5);
++}
++
++int avr_translate_SBI(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t SBI_Bit(uint32_t opcode)
++{
++    return extract32(opcode, 0, 3);
++}
++
++static inline uint32_t SBI_Imm(uint32_t opcode)
++{
++    return extract32(opcode, 3, 5);
++}
++
++int avr_translate_SBIS(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t SBIS_Bit(uint32_t opcode)
++{
++    return extract32(opcode, 0, 3);
++}
++
++static inline uint32_t SBIS_Imm(uint32_t opcode)
++{
++    return extract32(opcode, 3, 5);
++}
++
++int avr_translate_MUL(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t MUL_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++static inline uint32_t MUL_Rr(uint32_t opcode)
++{
++    return (extract32(opcode, 9, 1) << 4) |
++            (extract32(opcode, 0, 4));
++}
++
++int avr_translate_IN(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t IN_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++static inline uint32_t IN_Imm(uint32_t opcode)
++{
++    return (extract32(opcode, 9, 2) << 4) |
++            (extract32(opcode, 0, 4));
++}
++
++int avr_translate_OUT(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t OUT_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++static inline uint32_t OUT_Imm(uint32_t opcode)
++{
++    return (extract32(opcode, 9, 2) << 4) |
++            (extract32(opcode, 0, 4));
++}
++
++int avr_translate_RJMP(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t RJMP_Imm(uint32_t opcode)
++{
++    return extract32(opcode, 0, 12);
++}
++
++int avr_translate_LDI(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t LDI_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 4);
++}
++
++static inline uint32_t LDI_Imm(uint32_t opcode)
++{
++    return (extract32(opcode, 8, 4) << 4) |
++            (extract32(opcode, 0, 4));
++}
++
++int avr_translate_RCALL(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t RCALL_Imm(uint32_t opcode)
++{
++    return extract32(opcode, 0, 12);
++}
++
++int avr_translate_BRBS(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t BRBS_Bit(uint32_t opcode)
++{
++    return extract32(opcode, 0, 3);
++}
++
++static inline uint32_t BRBS_Imm(uint32_t opcode)
++{
++    return extract32(opcode, 3, 7);
++}
++
++int avr_translate_BRBC(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t BRBC_Bit(uint32_t opcode)
++{
++    return extract32(opcode, 0, 3);
++}
++
++static inline uint32_t BRBC_Imm(uint32_t opcode)
++{
++    return extract32(opcode, 3, 7);
++}
++
++int avr_translate_BLD(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t BLD_Bit(uint32_t opcode)
++{
++    return extract32(opcode, 0, 3);
++}
++
++static inline uint32_t BLD_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_BST(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t BST_Bit(uint32_t opcode)
++{
++    return extract32(opcode, 0, 3);
++}
++
++static inline uint32_t BST_Rd(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_SBRC(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t SBRC_Bit(uint32_t opcode)
++{
++    return extract32(opcode, 0, 3);
++}
++
++static inline uint32_t SBRC_Rr(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++int avr_translate_SBRS(CPUAVRState *env, DisasContext* ctx, uint32_t opcode);
++static inline uint32_t SBRS_Bit(uint32_t opcode)
++{
++    return extract32(opcode, 0, 3);
++}
++
++static inline uint32_t SBRS_Rr(uint32_t opcode)
++{
++    return extract32(opcode, 4, 5);
++}
++
++#endif
 -- 
 2.11.0 (Apple Git-81)
