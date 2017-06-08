@@ -1,31 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dJ2DA-0005mh-RO
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 14:31:14 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dJ2IH-0007JV-VL
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 14:36:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dJ2D6-00084O-8U
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 14:31:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59694)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dJ2D6-00083z-1t
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 14:31:08 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D01157F09D
-	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 18:31:06 +0000 (UTC)
-References: <20170608161013.17920-1-lersek@redhat.com>
-	<961e1ac9-56a5-df24-9ed7-e1981e61942a@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <51ff0ee5-3875-1a51-415c-170a8b3b8eaf@redhat.com>
-Date: Thu, 8 Jun 2017 20:31:02 +0200
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dJ2ID-0001In-Jh
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 14:36:29 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45297
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1dJ2ID-0001Ie-DU
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 14:36:25 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v58IXiQm046444
+	for <qemu-devel@nongnu.org>; Thu, 8 Jun 2017 14:36:24 -0400
+Received: from e24smtp03.br.ibm.com (e24smtp03.br.ibm.com [32.104.18.24])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2aybe7hhb9-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 08 Jun 2017 14:36:23 -0400
+Received: from localhost
+	by e24smtp03.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Thu, 8 Jun 2017 15:36:22 -0300
+References: <20170608172743.10132-1-lvivier@redhat.com>
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Thu, 8 Jun 2017 15:35:58 -0300
 MIME-Version: 1.0
-In-Reply-To: <961e1ac9-56a5-df24-9ed7-e1981e61942a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20170608172743.10132-1-lvivier@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] q35/mch: implement extended TSEG sizes
+Content-Language: en-US
+Message-Id: <b297a96d-171c-334d-9232-5172fac386d4@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 0/2] spapr: disable
+ hotplugging without OS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,43 +43,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu devel list <qemu-devel@nongnu.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org
 
-On 06/08/17 18:34, Paolo Bonzini wrote:
-> 
-> 
-> On 08/06/2017 18:10, Laszlo Ersek wrote:
->> When the guest writes value 0xffff to this register, the value that can be
->> read back is that of "mch.extended-tseg-mbytes" -- unless it remains
->> 0xffff. The guest is required to write 0xffff first (as opposed to a
->> read-only register) because PCI config space is generally not cleared on
->> QEMU reset, and after S3 resume or reboot, new guest firmware running on
->> old QEMU could read a guest OS-injected value from this register.
-> 
-> I guess that's also a reason not to make it readonly (that is, it would
-> require some firmware code anyway to test for "readonlyness" and
-> distinguish old machine types from new)?
 
-That's right; in
-<https://lists.01.org/pipermail/edk2-devel/2017-May/010432.html> I wrote,
 
-> If we invent such a new register, it should be in a location that is
-> either read-only, or zeroed-on-reset, in current QEMU. Otherwise, new
-> firmware running on old QEMU could be misled by a guest OS that writes
-> to this register, and then either reboots or enters S3.
+On 06/08/2017 02:27 PM, Laurent Vivier wrote:
+> If the OS is not started, QEMU sends an event to the OS
+> that is lost and cannot be recovered. An unplug is not
+> able to restore QEMU in a coherent state.
+> So, while the OS is not started, disable CPU and memory hotplug.
+> We guess the OS is started if the CAS has been negotiated.
 >
-> ... With this in mind, I don't oppose "having to write somewhere to
-> read back the result", but then let's please make that write access as
-> well to the same new qemu-specific register, and not to MCH_ESMRAMC.
+> This series also revert previous fix which was not really fixing
+> the hotplug problem when the OS is not running.
+>
+> v2:
+> - fix indent
+> - remove useless local_err
+> - allow hotplug if the VM is not started (pre-launch or incoming state)
+> - remove vector 6, instead just mark the end of CAS negotiation
+>
+> Laurent Vivier (2):
+>    spapr: disable hotplugging without OS
+>    Revert "spapr: fix memory hot-unplugging"
+>
+>   hw/ppc/spapr.c             | 51 +++++++++++++++++++++++++++++++++++++++++++---
+>   hw/ppc/spapr_drc.c         | 20 +++---------------
+>   hw/ppc/spapr_hcall.c       |  1 +
+>   include/hw/ppc/spapr.h     |  2 ++
+>   include/hw/ppc/spapr_drc.h |  1 -
+>   5 files changed, 54 insertions(+), 21 deletions(-)
+>
+Tested-by: Daniel Barboza <danielhb@linux.vnet.ibm.com>
 
-The problem is that config space is by default r/w and not cleared on
-reboot -- see Gerd's
-<https://lists.01.org/pipermail/edk2-devel/2017-May/010456.html> --, and
-once we designate another offset as "special" (either "reactive" or
-"read only"), the firmware will have to write to it and read it back
-unconditionally, to tell it apart from the default / original /
-non-special config space.
+This is curious. I was having a little look into hotplug/unplug and DRC 
+states yesterday
+while taking a look at the latest David's cleanup. I was trying to find 
+out a way to tune
+spapr_drc_needed() in a way that we don't accidentally migrate more DRCs 
+than necessary
+and at the same time handle that scenario of libvirt migration after 
+hotplug (libvirt hotplugs
+the device on target instead of adding it in the command line).
 
-Thanks!
-Laszlo
+I would like to migrate the DRCs if and only if:
+
+1 - a device was hotplugged
+2 - a device is undergoing hotplug/unplug
+
+(2) is easy and is already taken care of. But (1) is tricky because, 
+before this patch, if a migration
+occurs *before* CAS we don't need to migrate the DRC - the object will 
+go through the state
+changes after the migration. With this series this scenario is not going 
+to happen, then
+we can happily add a
+
+if (dev->hotplugged) return true;
+
+in spapr_drc_needed and fix the libvirt migration scenario again.
+
+
+
+Daniel
