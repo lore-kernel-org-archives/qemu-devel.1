@@ -1,14 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dJ5st-0006XI-7Z
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 18:26:32 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1dJ5xp-0008Hj-N1
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 18:31:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dJ5sr-0007tc-MH
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 18:26:31 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Thu,  8 Jun 2017 17:26:17 -0500
-Message-Id: <20170608222617.20376-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH] nbd: Fix regression on resiliency to port scan
+	(envelope-from <sstabellini@kernel.org>) id 1dJ5xl-0001Jg-LH
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 18:31:37 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49656)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1dJ5xl-0001JS-BJ
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 18:31:33 -0400
+Date: Thu, 8 Jun 2017 15:31:30 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <1496927734-29174-2-git-send-email-owen.smith@citrix.com>
+Message-ID: <alpine.DEB.2.10.1706081524340.26108@sstabellini-ThinkPad-X260>
+References: <1496927734-29174-1-git-send-email-owen.smith@citrix.com>
+	<1496927734-29174-2-git-send-email-owen.smith@citrix.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH 1/4] xenfb: Add feature-vkbd-standalone
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,195 +27,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
+To: Owen Smith <owen.smith@citrix.com>
+Cc: qemu-devel@nongnu.org, sstabellini@kernel.org, anthony.perard@citrix.com, kraxel@redhat.com, xen-devel@lists.xenproject.org
 
-Back in qemu 2.5, qemu-nbd was immune to port probes (a transient
-server would not quit, regardless of how many probe connections
-came and went, until a connection actually negotiated).  But we
-broke that in commit ee7d7aa when removing the return value to
-nbd_client_new(), although that patch also introduced a bug causing
-an assertion failure on a client that fails negotiation.  We then
-made it worse during refactoring in commit 1a6245a (a segfault
-before we could even assert); the (masked) assertion was cleaned
-up in d3780c2 (still in 2.6), and just recently we finally fixed
-the segfault ("nbd: Fully intialize client in case of failed
-negotiation").  But that still means that ever since we added
-TLS support to qemu-nbd, we have been vulnerable to an ill-timed
-port-scan being able to cause a denial of service by taking down
-qemu-nbd before a real client has a chance to connect.
+On Thu, 8 Jun 2017, Owen Smith wrote:
+> Advertise "feature-vkbd-standalone" to indicate the backend
+> can connect without a vfb device connection.
+> When "request-vkbd-standalone" is set to 1, the backend does
+> not wait for a QemuConsole to be setup before connecting the 
+> vkbd device. This also means that absolute coordinates cannot
+> be scaled to the non-existent QemuConsole's sizes, and remain
+> unscaled, in the range [0, 0x7FFF].
+> 
+> Signed-off-by: Owen Smith <owen.smith@citrix.com>
+> ---
+>  hw/display/xenfb.c | 32 ++++++++++++++++++++++----------
+>  1 file changed, 22 insertions(+), 10 deletions(-)
+> 
+> diff --git a/hw/display/xenfb.c b/hw/display/xenfb.c
+> index e76c0d8..2ebc81b 100644
+> --- a/hw/display/xenfb.c
+> +++ b/hw/display/xenfb.c
+> @@ -52,6 +52,7 @@ struct common {
+>  struct XenInput {
+>      struct common c;
+>      int abs_pointer_wanted; /* Whether guest supports absolute pointer */
+> +    int vkbd_standalone;    /* Guest supports vkbd without vfb device */
+>      int button_state;       /* Last seen pointer button state */
+>      int extended;
+>      QEMUPutMouseEntry *qmouse;
+> @@ -306,18 +307,22 @@ static void xenfb_mouse_event(void *opaque,
+>  			      int dx, int dy, int dz, int button_state)
+>  {
+>      struct XenInput *xenfb = opaque;
+> -    DisplaySurface *surface = qemu_console_surface(xenfb->c.con);
+> -    int dw = surface_width(surface);
+> -    int dh = surface_height(surface);
+> -    int i;
+> +    int i, x, y;
+> +    if (xenfb->c.con != NULL) {
+> +        DisplaySurface *surface = qemu_console_surface(xenfb->c.con);
+> +        int dw = surface_width(surface);
+> +        int dh = surface_height(surface);
+> +        x = dx * (dh - 1) / 0x7fff;
+> +        y = dy * (dw - 1) / 0x7fff;
+> +    } else {
+> +        x = dx;
+> +        y = dy;
+> +    }
+>  
+>      trace_xenfb_mouse_event(opaque, dx, dy, dz, button_state,
+>                              xenfb->abs_pointer_wanted);
+>      if (xenfb->abs_pointer_wanted)
+> -	xenfb_send_position(xenfb,
+> -			    dx * (dw - 1) / 0x7fff,
+> -			    dy * (dh - 1) / 0x7fff,
+> -			    dz);
+> +        xenfb_send_position(xenfb, x, y, dz);
+>      else
+>  	xenfb_send_motion(xenfb, dx, dy, dz);
+>  
+> @@ -336,6 +341,7 @@ static void xenfb_mouse_event(void *opaque,
+>  static int input_init(struct XenDevice *xendev)
+>  {
+>      xenstore_write_be_int(xendev, "feature-abs-pointer", 1);
+> +    xenstore_write_be_int(xendev, "feature-vkbd-standalone", 1);
+>      return 0;
+>  }
+>  
+> @@ -345,8 +351,14 @@ static int input_initialise(struct XenDevice *xendev)
+>      int rc;
+>  
+>      if (!in->c.con) {
+> -        xen_pv_printf(xendev, 1, "ds not set (yet)\n");
+> -        return -1;
+> +        if (xenstore_read_fe_int(xendev, "request-vkbd-standalone",
+> +                                 &in->vkbd_standalone) == -1) {
+> +            in->vkbd_standalone = 0;
+> +        }
+> +        if (in->vkbd_standalone == 0) {
+> +            xen_pv_printf(xendev, 1, "ds not set (yet)\n");
+> +            return -1;
+> +        }
 
-Since negotiation is now handled asynchronously via coroutines,
-we no longer have a synchronous point of return by re-adding a
-return value to nbd_client_new().  So this patch instead wires
-things up to pass the negotiation status through the close_fn
-callback function.
+In your changes to include/public/io/kbdif.h, make sure to write when
+(at what xenstore status stage) the frontend needs to write
+request-vkbd-standalone. 
 
-Simple test across two terminals:
-$ qemu-nbd -f raw -p 30001 file
-$ nmap 127.0.0.1 -p 30001 && \
-  qemu-io -c 'r 0 512' -f raw nbd://localhost:30001
+This patch looks good:
 
-Note that this patch does not change what constitutes successful
-negotiation (thus, a client must enter transmission phase before
-that client can be considered as a reason to terminate the server
-when the connection ends).  Perhaps we may want to tweak things
-in a later patch to also treat a client that uses NBD_OPT_ABORT
-as being a 'successful' negotiation (the client correctly talked
-the NBD protocol, and informed us it was not going to use our
-export after all), but that's a discussion for another day.
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
 
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1451614
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- include/block/nbd.h |  2 +-
- blockdev-nbd.c      |  6 +++++-
- nbd/server.c        | 24 +++++++++++++++---------
- qemu-nbd.c          |  4 ++--
- 4 files changed, 23 insertions(+), 13 deletions(-)
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 416257a..8fa5ce5 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -162,7 +162,7 @@ void nbd_client_new(NBDExport *exp,
-                     QIOChannelSocket *sioc,
-                     QCryptoTLSCreds *tlscreds,
-                     const char *tlsaclname,
--                    void (*close)(NBDClient *));
-+                    void (*close_fn)(NBDClient *, bool));
- void nbd_client_get(NBDClient *client);
- void nbd_client_put(NBDClient *client);
-
-diff --git a/blockdev-nbd.c b/blockdev-nbd.c
-index dd0860f..28f551a 100644
---- a/blockdev-nbd.c
-+++ b/blockdev-nbd.c
-@@ -27,6 +27,10 @@ typedef struct NBDServerData {
-
- static NBDServerData *nbd_server;
-
-+static void nbd_blockdev_client_closed(NBDClient *client, bool ignored)
-+{
-+    nbd_client_put(client);
-+}
-
- static gboolean nbd_accept(QIOChannel *ioc, GIOCondition condition,
-                            gpointer opaque)
-@@ -46,7 +50,7 @@ static gboolean nbd_accept(QIOChannel *ioc, GIOCondition condition,
-     qio_channel_set_name(QIO_CHANNEL(cioc), "nbd-server");
-     nbd_client_new(NULL, cioc,
-                    nbd_server->tlscreds, NULL,
--                   nbd_client_put);
-+                   nbd_blockdev_client_closed);
-     object_unref(OBJECT(cioc));
-     return TRUE;
- }
-diff --git a/nbd/server.c b/nbd/server.c
-index 49b55f6..f2b1aa4 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -81,7 +81,7 @@ static QTAILQ_HEAD(, NBDExport) exports = QTAILQ_HEAD_INITIALIZER(exports);
-
- struct NBDClient {
-     int refcount;
--    void (*close)(NBDClient *client);
-+    void (*close_fn)(NBDClient *client, bool negotiated);
-
-     bool no_zeroes;
-     NBDExport *exp;
-@@ -778,7 +778,7 @@ void nbd_client_put(NBDClient *client)
-     }
- }
-
--static void client_close(NBDClient *client)
-+static void client_close(NBDClient *client, bool negotiated)
- {
-     if (client->closing) {
-         return;
-@@ -793,8 +793,8 @@ static void client_close(NBDClient *client)
-                          NULL);
-
-     /* Also tell the client, so that they release their reference.  */
--    if (client->close) {
--        client->close(client);
-+    if (client->close_fn) {
-+        client->close_fn(client, negotiated);
-     }
- }
-
-@@ -975,7 +975,7 @@ void nbd_export_close(NBDExport *exp)
-
-     nbd_export_get(exp);
-     QTAILQ_FOREACH_SAFE(client, &exp->clients, next, next) {
--        client_close(client);
-+        client_close(client, true);
-     }
-     nbd_export_set_name(exp, NULL);
-     nbd_export_set_description(exp, NULL);
-@@ -1337,7 +1337,7 @@ done:
-
- out:
-     nbd_request_put(req);
--    client_close(client);
-+    client_close(client, true);
-     nbd_client_put(client);
- }
-
-@@ -1363,7 +1363,7 @@ static coroutine_fn void nbd_co_client_start(void *opaque)
-     qemu_co_mutex_init(&client->send_lock);
-
-     if (nbd_negotiate(data)) {
--        client_close(client);
-+        client_close(client, false);
-         goto out;
-     }
-
-@@ -1373,11 +1373,17 @@ out:
-     g_free(data);
- }
-
-+/*
-+ * Create a new client listener on the given export @exp, using the
-+ * given channel @sioc.  Begin servicing it in a coroutine.  When the
-+ * connection closes, call @close_fn with an indication of whether the
-+ * client completed negotiation.
-+ */
- void nbd_client_new(NBDExport *exp,
-                     QIOChannelSocket *sioc,
-                     QCryptoTLSCreds *tlscreds,
-                     const char *tlsaclname,
--                    void (*close_fn)(NBDClient *))
-+                    void (*close_fn)(NBDClient *, bool))
- {
-     NBDClient *client;
-     NBDClientNewData *data = g_new(NBDClientNewData, 1);
-@@ -1394,7 +1400,7 @@ void nbd_client_new(NBDExport *exp,
-     object_ref(OBJECT(client->sioc));
-     client->ioc = QIO_CHANNEL(sioc);
-     object_ref(OBJECT(client->ioc));
--    client->close = close_fn;
-+    client->close_fn = close_fn;
-
-     data->client = client;
-     data->co = qemu_coroutine_create(nbd_co_client_start, data);
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index 651f85e..9464a04 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -336,10 +336,10 @@ static void nbd_export_closed(NBDExport *exp)
-
- static void nbd_update_server_watch(void);
-
--static void nbd_client_closed(NBDClient *client)
-+static void nbd_client_closed(NBDClient *client, bool negotiated)
- {
-     nb_fds--;
--    if (nb_fds == 0 && !persistent && state == RUNNING) {
-+    if (negotiated && nb_fds == 0 && !persistent && state == RUNNING) {
-         state = TERMINATE;
-     }
-     nbd_update_server_watch();
--- 
-2.9.4
+>      }
+>  
+>      rc = common_bind(&in->c);
