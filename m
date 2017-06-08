@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34166)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dIwtU-0007TV-8G
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 08:50:33 -0400
+	(envelope-from <mst@redhat.com>) id 1dIwuR-0008Cu-UE
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 08:51:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dIwtT-00085W-FW
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 08:50:32 -0400
-References: <20170531094330.1808-1-pbonzini@redhat.com>
-	<20170531094330.1808-9-pbonzini@redhat.com>
-	<20170608124629.GI4145@stefanha-x1.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <56d77c66-0330-bf6e-c229-e79d6c970a99@redhat.com>
-Date: Thu, 8 Jun 2017 14:50:19 +0200
+	(envelope-from <mst@redhat.com>) id 1dIwuP-0008NS-Ct
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 08:51:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59720)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dIwuP-0008NE-4B
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 08:51:29 -0400
+Date: Thu, 8 Jun 2017 15:51:27 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170608154618-mutt-send-email-mst@kernel.org>
+References: <20170606072229.9302-1-haozhong.zhang@intel.com>
+	<20170606072229.9302-3-haozhong.zhang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20170608124629.GI4145@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 08/11] block: invoke .bdrv_drain callback
- in coroutine context and from AioContext
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170606072229.9302-3-haozhong.zhang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] nvdimm: warn if the backend is not
+ a DAX device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,50 +28,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: Haozhong Zhang <haozhong.zhang@intel.com>
+Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <guangrong.xiao@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Dan Williams <dan.j.williams@intel.com>
+
+On Tue, Jun 06, 2017 at 03:22:27PM +0800, Haozhong Zhang wrote:
+> Applications in Linux guest that use device-dax never trigger flush
+> that can be trapped by KVM/QEMU. Meanwhile, if the host backend is not
+> device-dax, QEMU cannot guarantee the persistence of guest writes.
+> Before solving this flushing problem, QEMU should warn users if the
+> host backend is not device-dax.
+
+No one reads warnings unless things fail but they can be a debugging aid
+if they do. But they have to be simple and robust to be helpful for
+that. This one seems to me too complex and fragile.
 
 
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> Message-id: CAPcyv4hV2-ZW8SMCRtD0P_86KgR3DHOvNe+6T5SY2u7wXg3gEg@mail.gmail.com
 
-On 08/06/2017 14:46, Stefan Hajnoczi wrote:
-> On Wed, May 31, 2017 at 11:43:27AM +0200, Paolo Bonzini wrote:
->> diff --git a/block/qed.c b/block/qed.c
->> index 83a0973cfb..990210cd9c 100644
->> --- a/block/qed.c
->> +++ b/block/qed.c
->=20
-> Does this belong in the next patch?
+Don't include this line in commit log please. Put it after --- if you
+must.
 
-I don't think so, there is no .bdrv_drain callback anymore so I have to
-switch the only implementation to .bdrv_co_drain.
+> ---
+>  hw/mem/nvdimm.c      |  6 ++++++
+>  include/qemu/osdep.h |  9 ++++++++
+>  util/osdep.c         | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 76 insertions(+)
+> 
+> diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+> index a9b0863f20..b23542fbdf 100644
+> --- a/hw/mem/nvdimm.c
+> +++ b/hw/mem/nvdimm.c
+> @@ -26,6 +26,7 @@
+>  #include "qapi/error.h"
+>  #include "qapi/visitor.h"
+>  #include "hw/mem/nvdimm.h"
+> +#include "qemu/error-report.h"
+>  
+>  static void nvdimm_get_label_size(Object *obj, Visitor *v, const char *name,
+>                                    void *opaque, Error **errp)
+> @@ -84,6 +85,11 @@ static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
+>      NVDIMMDevice *nvdimm = NVDIMM(dimm);
+>      uint64_t align, pmem_size, size = memory_region_size(mr);
+>  
+> +    if (!qemu_fd_is_dev_dax(memory_region_get_fd(mr))) {
+> +        error_report("warning: nvdimm backend does not look like a DAX device, "
+> +                     "unable to guarantee persistence of guest writes");
+> +    }
+> +
+>      align = memory_region_get_alignment(mr);
+>  
+>      pmem_size = size - nvdimm->label_size;
+> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+> index 1c9f5e260c..7f26af371e 100644
+> --- a/include/qemu/osdep.h
+> +++ b/include/qemu/osdep.h
+> @@ -470,4 +470,13 @@ char *qemu_get_pid_name(pid_t pid);
+>   */
+>  pid_t qemu_fork(Error **errp);
+>  
+> +/**
+> + * qemu_fd_is_dev_dax:
+> + *
+> + * Check whether @fd describes a DAX device.
+> + *
+> + * Returns true if it is; otherwise, return false.
+> + */
+> +bool qemu_fd_is_dev_dax(int fd);
+> +
+>  #endif
+> diff --git a/util/osdep.c b/util/osdep.c
+> index a2863c8e53..02881f96bc 100644
+> --- a/util/osdep.c
+> +++ b/util/osdep.c
+> @@ -471,3 +471,64 @@ writev(int fd, const struct iovec *iov, int iov_cnt)
+>      return readv_writev(fd, iov, iov_cnt, true);
+>  }
+>  #endif
+> +
+> +#ifdef __linux__
+> +static ssize_t qemu_dev_dax_sysfs_read(int fd, const char *entry,
+> +                                       char *buf, size_t len)
+> +{
+> +    ssize_t read_bytes;
+> +    struct stat st;
+> +    unsigned int major, minor;
+> +    char *path, *pos;
+> +    int sysfs_fd;
+> +
+> +    if (fstat(fd, &st)) {
+> +        return 0;
+> +    }
+> +
+> +    major = major(st.st_rdev);
+> +    minor = minor(st.st_rdev);
+> +    path = g_strdup_printf("/sys/dev/char/%u:%u/%s", major, minor, entry);
+> +
+> +    sysfs_fd = open(path, O_RDONLY);
+> +    g_free(path);
+> +    if (sysfs_fd == -1) {
+> +        return 0;
+> +    }
+> +
+> +    read_bytes = read(sysfs_fd, buf, len - 1);
+> +    close(sysfs_fd);
+> +    if (read_bytes > 0) {
+> +        buf[read_bytes] = '\0';
+> +        pos = g_strstr_len(buf, read_bytes, "\n");
+> +        if (pos) {
+> +            *pos = '\0';
+> +        }
+> +    }
+> +
+> +    return read_bytes;
+> +}
+> +#endif /* __linux__ */
+> +
+> +bool qemu_fd_is_dev_dax(int fd)
+> +{
+> +    bool is_dax = false;
+> +
+> +#ifdef __linux__
+> +    char devtype[7];
+> +    ssize_t len;
+> +
+> +    if (fd == -1) {
+> +        return false;
+> +    }
+> +
+> +    len = qemu_dev_dax_sysfs_read(fd, "device/devtype",
+> +                                  devtype, sizeof(devtype));
+> +    if (len <= 0) {
+> +        return false;
+> +    }
 
-Paolo
+This can easily trigger false positives e.g. if sysfs access
+is blocked by selinux.
 
->> @@ -351,7 +351,7 @@ static void bdrv_qed_attach_aio_context(BlockDrive=
-rState *bs,
->>      }
->>  }
->> =20
->> -static void bdrv_qed_drain(BlockDriverState *bs)
->> +static void coroutine_fn bdrv_qed_co_drain(BlockDriverState *bs)
->>  {
->>      BDRVQEDState *s =3D bs->opaque;
->> =20
->> @@ -360,7 +360,7 @@ static void bdrv_qed_drain(BlockDriverState *bs)
->>       */
->>      if (s->need_check_timer && timer_pending(s->need_check_timer)) {
->>          qed_cancel_need_check_timer(s);
->> -        qed_need_check_timer_cb(s);
->> +        qed_need_check_timer_entry(s);
->>      }
->>  }
->> =20
->> @@ -1544,7 +1544,7 @@ static BlockDriver bdrv_qed =3D {
->>      .bdrv_check               =3D bdrv_qed_check,
->>      .bdrv_detach_aio_context  =3D bdrv_qed_detach_aio_context,
->>      .bdrv_attach_aio_context  =3D bdrv_qed_attach_aio_context,
->> -    .bdrv_drain               =3D bdrv_qed_drain,
->> +    .bdrv_co_drain            =3D bdrv_qed_co_drain,
->>  };
->> =20
->>  static void bdrv_qed_init(void)
+
+> +    is_dax = !strncmp(devtype, "nd_dax", len);
+
+E.g. will return true on any string starting with nd_dax.
+And it's not clear non-dax devices can't guarantee safety.
+
+> +#endif /* __linux__ */
+> +
+> +    return is_dax;
+> +}
+> -- 
+> 2.11.0
