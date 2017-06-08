@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dIxV4-0005Xv-Eu
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:29:23 -0400
+	(envelope-from <eblake@redhat.com>) id 1dIxVp-0005w6-5F
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:30:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dIxV1-0000JT-AH
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:29:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34630)
+	(envelope-from <eblake@redhat.com>) id 1dIxVj-0000ai-DQ
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:30:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49974)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dIxV1-0000Iy-1O
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:29:19 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dIxVj-0000aF-4E
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:30:03 -0400
 References: <20170608115939.30985-1-marcandre.lureau@redhat.com>
-	<20170608115939.30985-2-marcandre.lureau@redhat.com>
+	<20170608115939.30985-4-marcandre.lureau@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <b3e0f4e1-0594-0563-aa9c-4b26d0eecd0f@redhat.com>
-Date: Thu, 8 Jun 2017 08:29:14 -0500
+Message-ID: <765f4687-52ac-ff9d-ef82-037c319e23ec@redhat.com>
+Date: Thu, 8 Jun 2017 08:29:58 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170608115939.30985-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20170608115939.30985-4-marcandre.lureau@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="KNXg4gk3Ton0ulN7fHT6qq1TnoF3aFHMl"
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] char: fix alias devices regression
+	boundary="EIGSDVLh79bOFtUI4QWpr3juKCJT98mj0"
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] test-char: start a /char/serial test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,38 +32,41 @@ To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel
 Cc: anthony.perard@citrix.com, pbonzini@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KNXg4gk3Ton0ulN7fHT6qq1TnoF3aFHMl
+--EIGSDVLh79bOFtUI4QWpr3juKCJT98mj0
 From: Eric Blake <eblake@redhat.com>
 To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
  qemu-devel@nongnu.org
 Cc: anthony.perard@citrix.com, pbonzini@redhat.com
-Message-ID: <b3e0f4e1-0594-0563-aa9c-4b26d0eecd0f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] char: fix alias devices regression
+Message-ID: <765f4687-52ac-ff9d-ef82-037c319e23ec@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] test-char: start a /char/serial test
 References: <20170608115939.30985-1-marcandre.lureau@redhat.com>
- <20170608115939.30985-2-marcandre.lureau@redhat.com>
-In-Reply-To: <20170608115939.30985-2-marcandre.lureau@redhat.com>
+ <20170608115939.30985-4-marcandre.lureau@redhat.com>
+In-Reply-To: <20170608115939.30985-4-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 06/08/2017 06:59 AM, Marc-Andr=C3=A9 Lureau wrote:
-> Fix regression from commit 4d43a603c71, where the serial and parallel
-> headers got removed from char.c, which broke the alias table.
->=20
-> Move the HAVE_CHARDEV_SERIAL/HAVE_CHARDEV_PARPORT to osdep.h instead
-> of being in seperate headers.
-
-s/seperate/separate/
-
+> Quite limited test, to check that the chardev can be created with a
+> path and with the tty alias.
 >=20
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 > ---
->  include/chardev/char-parallel.h |  5 -----
->  include/chardev/char-serial.h   |  8 --------
->  include/qemu/osdep.h            | 13 +++++++++++++
->  3 files changed, 13 insertions(+), 13 deletions(-)
+>  tests/test-char.c | 30 ++++++++++++++++++++++++++++++
+>  1 file changed, 30 insertions(+)
 >=20
+> diff --git a/tests/test-char.c b/tests/test-char.c
+> index dfe856cb85..ecc3fec194 100644
+> --- a/tests/test-char.c
+> +++ b/tests/test-char.c
+> @@ -5,6 +5,7 @@
+>  #include "qemu/config-file.h"
+>  #include "qemu/sockets.h"
+>  #include "chardev/char-fe.h"
+> +#include "chardev/char-serial.h" /* for HAVE_CHARDEV_SERIAL */
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Either the comment or the entire #include is now spurious, given the new
+1/3.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -71,7 +74,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---KNXg4gk3Ton0ulN7fHT6qq1TnoF3aFHMl
+--EIGSDVLh79bOFtUI4QWpr3juKCJT98mj0
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -81,13 +84,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZOVEqAAoJEKeha0olJ0Nqi7kIAKClCJfwC411KsB5S3J/2Ppt
-imUkicNib+L4FlmBKAWlk1OGVzpBJli6bF5KxpFoq65GnWbuzWHOzYbmr8nooyNr
-Y9drQKptjM1Dxn4L/7fEFEO1HKD4R6GweO2S+3U835XIPJM3GdaFQgPC5GJ6MSF6
-cegs7nlFMMwFWU0Jl/HZy++JBCuyliuyUGksyeOB5/qE3GEEfAM9V5LgJ5bHGJpN
-TJ3lmUOFzoi2lScJ4z7j0+UQPwiwMavpUh4r1Gzamu/0KVdVIG1oHJkEEFVvdBE1
-AcLkxdhVCZ8DgUx7uZ4ns53d3sVmfbmieATNmRsELK0iwF/bMMlGyAF8IDznM88=
-=xxGl
+iQEcBAEBCAAGBQJZOVFWAAoJEKeha0olJ0Nqh6IH/AiYSKhLysqEm2QuC2iO866B
+bNuDwQ08LK/KgtTQx4NRW6gnR8hCVRgvGTesiL/xB24ZbDPkoTG5o7sOrFrLA0mv
+S0yuCyEEqVUITKpMCeWqBnn3aTOTjpK6nsTjXJD7/dLxBNvNBG4u5UqBRDYOEdto
+oy8xPm0H4h7rBRVFFdrjCi2mLVXmaAiBqTkT3/ZzIea2l1EGJczXqj1yMsg5g5ef
+VS8cfDHbiA9wmlG5/G7WkhUQ4u/aXd5EqcZcKfQNoJNg1AqSlPVIYFSRFSbwyzDK
+QkruCGoYMXaGWfj09hWfxJ/gEVOFUj/6G0m/r6toLpoeGKMsUSLu59cgzcqfpCM=
+=zi4p
 -----END PGP SIGNATURE-----
 
---KNXg4gk3Ton0ulN7fHT6qq1TnoF3aFHMl--
+--EIGSDVLh79bOFtUI4QWpr3juKCJT98mj0--
