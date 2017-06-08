@@ -1,31 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dIx2N-00058M-A4
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 08:59:44 -0400
+	(envelope-from <thuth@redhat.com>) id 1dIx2t-0005Tt-46
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:00:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dIx2M-0003q3-JQ
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 08:59:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47610)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1dIx2M-0003o0-Cs
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 08:59:42 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DDD66C04B332
-	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 12:59:40 +0000 (UTC)
-Date: Thu, 8 Jun 2017 14:59:37 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170608125937.GC4427@noname.redhat.com>
-References: <20170601221552.30628-1-quintela@redhat.com>
-	<20170601221552.30628-4-quintela@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170601221552.30628-4-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/5] migration: Create
- load_setup()/cleanup() methods
+	(envelope-from <thuth@redhat.com>) id 1dIx2o-00047L-Nm
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:00:15 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Thu,  8 Jun 2017 14:59:59 +0200
+Message-Id: <1496926799-13040-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v3] Makefile: Do not generate files if
+ "configure" has not been run yet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,31 +18,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>
 
-Am 02.06.2017 um 00:15 hat Juan Quintela geschrieben:
-> We need to do things at load time.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  include/migration/register.h |  2 ++
->  migration/savevm.c           | 31 +++++++++++++++++++++++++++++++
->  2 files changed, 33 insertions(+)
-> 
-> diff --git a/include/migration/register.h b/include/migration/register.h
-> index 8e37185..0862bb8 100644
-> --- a/include/migration/register.h
-> +++ b/include/migration/register.h
-> @@ -42,6 +42,8 @@ typedef struct SaveVMHandlers {
->                                uint64_t *non_postcopiable_pending,
->                                uint64_t *postcopiable_pending);
->      LoadStateHandler *load_state;
-> +    int (*load_setup)(QEMUFile *f, void *opaque);
-> +    int (*load_cleanup)(void *opaque);
->  } SaveVMHandlers;
+When doing a "make -j10" in the vanilla QEMU source tree (without
+running "configure" first), the Makefile currently generates two
+files already, qemu-version.h and qemu-options.def. This should not
+happen, so let's only build the generated files if config-host.mak
+is available (i.e. "configure" has been run already).
 
-I see that you add code to call load_setup(), but don't you want to call
-load_cleanup() somewhere, too?
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ v3:
+ - Check for config-host.mak at the place where we add the dependencies
+   for $(GENERATED_FILES) instead of adding single dependencies all over
+   the place
 
-Kevin
+ Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index c830d7a..32d4441 100644
+--- a/Makefile
++++ b/Makefile
+@@ -791,9 +791,11 @@ endif # CONFIG_WIN
+ 
+ # Add a dependency on the generated files, so that they are always
+ # rebuilt before other object files
++ifneq ($(wildcard config-host.mak),)
+ ifneq ($(filter-out $(UNCHECKED_GOALS),$(MAKECMDGOALS)),$(if $(MAKECMDGOALS),,fail))
+ Makefile: $(GENERATED_FILES)
+ endif
++endif
+ 
+ .SECONDARY: $(TRACE_HEADERS) $(TRACE_HEADERS:%=%-timestamp) \
+ 	$(TRACE_SOURCES) $(TRACE_SOURCES:%=%-timestamp) \
+-- 
+1.8.3.1
