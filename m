@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58712)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dIyBe-0004m9-Iq
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 10:13:23 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dIyBj-0004nQ-0p
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 10:13:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dIyBb-0008NT-DM
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 10:13:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40942)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dIyBi-0008SB-AZ
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 10:13:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51502)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dIyBb-0008Ml-7E
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 10:13:19 -0400
+	id 1dIyBi-0008Rm-47
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 10:13:26 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu,  8 Jun 2017 18:13:10 +0400
-Message-Id: <20170608141313.27588-1-marcandre.lureau@redhat.com>
+Date: Thu,  8 Jun 2017 18:13:12 +0400
+Message-Id: <20170608141313.27588-3-marcandre.lureau@redhat.com>
+In-Reply-To: <20170608141313.27588-1-marcandre.lureau@redhat.com>
+References: <20170608141313.27588-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/3] Char patches
+Subject: [Qemu-devel] [PULL 2/3] chardev: don't use alias names in
+ parse_compat()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +31,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-The following changes since commit 64175afc695c0672876fbbfc31b299c86d562c=
-b4:
+"parport" is considered "old" since commit 88a946d32d, when "parallel"
+was added. Similarly for "tty" in commit d59044ef74d.
 
-  arm_gicv3: Fix ICC_BPR1 reset value when EL3 not implemented (2017-06-0=
-7 17:21:44 +0100)
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ chardev/char.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-are available in the git repository at:
-
-  https://github.com/elmarco/qemu.git tags/char-pull-request
-
-for you to fetch changes up to 27d4c3789ddde40e1c7280150b46eb20a6a892e6:
-
-  test-char: start a /char/serial test (2017-06-08 17:58:13 +0400)
-
-----------------------------------------------------------------
-
-----------------------------------------------------------------
-
-Marc-Andr=C3=A9 Lureau (3):
-  char: fix alias devices regression
-  chardev: don't use alias names in parse_compat()
-  test-char: start a /char/serial test
-
- include/chardev/char-parallel.h |  5 -----
- include/chardev/char-serial.h   |  8 --------
- include/qemu/osdep.h            | 13 +++++++++++++
- chardev/char.c                  |  4 ++--
- tests/test-char.c               | 29 +++++++++++++++++++++++++++++
- 5 files changed, 44 insertions(+), 15 deletions(-)
-
+diff --git a/chardev/char.c b/chardev/char.c
+index 7aa0210765..bcfc065d16 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -450,12 +450,12 @@ QemuOpts *qemu_chr_parse_compat(const char *label, =
+const char *filename)
+     }
+     if (strstart(filename, "/dev/parport", NULL) ||
+         strstart(filename, "/dev/ppi", NULL)) {
+-        qemu_opt_set(opts, "backend", "parport", &error_abort);
++        qemu_opt_set(opts, "backend", "parallel", &error_abort);
+         qemu_opt_set(opts, "path", filename, &error_abort);
+         return opts;
+     }
+     if (strstart(filename, "/dev/", NULL)) {
+-        qemu_opt_set(opts, "backend", "tty", &error_abort);
++        qemu_opt_set(opts, "backend", "serial", &error_abort);
+         qemu_opt_set(opts, "path", filename, &error_abort);
+         return opts;
+     }
 --=20
 2.13.0.91.g00982b8dd
