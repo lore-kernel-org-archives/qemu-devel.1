@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dIwTM-0006aA-Ss
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 08:23:34 -0400
+	(envelope-from <thuth@redhat.com>) id 1dIwnE-0004GK-4D
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 08:44:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dIwTI-0004XC-Mx
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 08:23:32 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:33653)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dIwTI-0004X4-AA
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 08:23:28 -0400
-Received: by mail-lf0-x241.google.com with SMTP id u62so2962028lfg.0
-	for <qemu-devel@nongnu.org>; Thu, 08 Jun 2017 05:23:28 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1dIwn9-0004cw-5o
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 08:44:04 -0400
+References: <1496907604-2393-1-git-send-email-thuth@redhat.com>
+	<20170608111616.GA14424@lemon.lan>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <9b595fb3-e73e-92a8-559d-c55382545879@redhat.com>
+Date: Thu, 8 Jun 2017 14:43:48 +0200
 MIME-Version: 1.0
-References: <20170606110618.10393-1-kraxel@redhat.com>
-In-Reply-To: <20170606110618.10393-1-kraxel@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 08 Jun 2017 12:23:16 +0000
-Message-ID: <CAJ+F1CKCn1k=vGsbgKTXmHrfCZ=Ftgzg8=FON0-XRjDYR59+6g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] spice: don't enter opengl mode in case
- another UI provides opengl support
+In-Reply-To: <20170608111616.GA14424@lemon.lan>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="E5nov9BOTvPeL5kG9iiC7ucXNSIXl8ucx"
+Subject: Re: [Qemu-devel] [PATCH v2] Makefile: Do not generate files if
+ "configure" has not been run yet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,74 +25,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>
 
-Hi
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--E5nov9BOTvPeL5kG9iiC7ucXNSIXl8ucx
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 6, 2017 at 3:11 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
+On 08.06.2017 13:16, Fam Zheng wrote:
+> On Thu, 06/08 09:40, Thomas Huth wrote:
+>> When doing a "make -j10" in the vanilla QEMU source tree (without
+>> running "configure first), the Makefile currently generates two
+>> files already, qemu-version.h and qemu-options.def. This should not
+>> happen, so let's make these targets depend on config-host.mak.
+>> Also the targets that use python  can not be executed without the
+>> $(PYTHON) from config-host.mak, so these should depend on the config-
+>> host.mak file, too (these targets generate some ugly error messages
+>> otherwise during "make -j10").
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  v2:
+>>  - Add the dependency to the targets that use $(PYTHON) instead of
+>>    adding it to $(qapi-py)
+>>
+>>  Makefile | 23 ++++++++++++-----------
+>>  1 file changed, 12 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/Makefile b/Makefile
+>> index c830d7a..b5e0731 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -286,7 +286,7 @@ endif
+>> =20
+>>  all: $(DOCS) $(TOOLS) $(HELPERS-y) recurse-all modules
+>=20
+> Is it enough to add a
+>=20
+>     $(filter-out $(GENERATED_FILES),config-host.mak): config-host.mak
+>=20
+> after the variable is fully built?  (Seems config-host.mak is not inclu=
+ded, but
+> filtering out is safer.)
 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
->
+That works for the files that I've mentioned in the patch description,
+but I then suddenly see lots of *.pyc files in scripts/tracetool instead.=
+=2E.
 
- Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Anyway, I think I've now found a way that works even more reliable:
+Simply disable the "Makefile: $(GENERATED_FILES)" rule if
+config-host.mak is missing. I'll send a v3 patch in a minute...
 
----
->  include/ui/spice-display.h | 2 ++
->  ui/spice-core.c            | 1 +
->  ui/spice-display.c         | 3 ++-
->  3 files changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/include/ui/spice-display.h b/include/ui/spice-display.h
-> index 184d4c373a..4ba9444dba 100644
-> --- a/include/ui/spice-display.h
-> +++ b/include/ui/spice-display.h
-> @@ -140,6 +140,8 @@ struct SimpleSpiceCursor {
->      QXLCursor cursor;
->  };
->
-> +extern bool spice_opengl;
-> +
->  int qemu_spice_rect_is_empty(const QXLRect* r);
->  void qemu_spice_rect_union(QXLRect *dest, const QXLRect *r);
->
-> diff --git a/ui/spice-core.c b/ui/spice-core.c
-> index 804abc5c0f..7c9ec0f0dd 100644
-> --- a/ui/spice-core.c
-> +++ b/ui/spice-core.c
-> @@ -847,6 +847,7 @@ void qemu_spice_init(void)
->              exit(1);
->          }
->          display_opengl =3D 1;
-> +        spice_opengl =3D 1;
->      }
->  #endif
->  }
-> diff --git a/ui/spice-display.c b/ui/spice-display.c
-> index b353445f58..042292cc90 100644
-> --- a/ui/spice-display.c
-> +++ b/ui/spice-display.c
-> @@ -27,6 +27,7 @@
->  #include "ui/spice-display.h"
->
->  static int debug =3D 0;
-> +bool spice_opengl;
->
->  static void GCC_FMT_ATTR(2, 3) dprint(int level, const char *fmt, ...)
->  {
-> @@ -1013,7 +1014,7 @@ static void qemu_spice_display_init_one(QemuConsole
-> *con)
->
->      ssd->dcl.ops =3D &display_listener_ops;
->  #ifdef HAVE_SPICE_GL
-> -    if (display_opengl) {
-> +    if (spice_opengl) {
->          ssd->dcl.ops =3D &display_listener_gl_ops;
->          ssd->gl_unblock_bh =3D qemu_bh_new(qemu_spice_gl_unblock_bh, ssd=
-);
->          ssd->gl_unblock_timer =3D timer_new_ms(QEMU_CLOCK_REALTIME,
-> --
-> 2.9.3
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+ Thomas
+
+
+--E5nov9BOTvPeL5kG9iiC7ucXNSIXl8ucx
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJZOUaIAAoJEC7Z13T+cC210vcQAIq6edH7rfQRpdV2VNhDig5F
+VgGgSvxZGLlbZU485LHExpglKhzchaNKVkJbdGeuuqUo+ixTAJMsaozV6pSTDN2u
+M/B2VdqHwQQRIiYgcqNv7AqCzeBJnJxAjKORxcr4V7pgvPlMdgqmhSkoersz8WAp
+6RjSBp95SC0oZh5o4s9BC3GA75I7XsPPjlsGxCxQFqvGpKi16FtjiP0EJ48dr2lE
+BypfBlLj1MkEjYnQVH2p6R+/klpTz2HvuQ8IeAB5bEOH09dQ34uI/Xn7le8PosJ4
+Y/8/oBcS11QZkf7vCwE7BFNHARbv2ruwgLxd4waG8HNzQ6OUihaC3bZK+v/QrnAb
+2OQxKVxjzAAr3zGB0AGf7aHScskGDYnx9bZU2dhdf4VqWeLU2QN6HdVUm+r2E55h
+tt3tVQNeRqYxBCd5dl6NK3gDe6C6JJ9CYLV5J3CK3Gkr5ybDpZS26qSaql7hJRUX
+UECv1MdHsJogcri3d4zJJ+HKJ9QbzRNHXgenDFJxDEalXGqJNbEbHBMxm466P65b
+p6ck2cGId4TE6C0y/sGaekBSsbQDy25acEiCv75BD6/xtzf/TTO5rJZRf2S4CYdP
+HrYWZ4tblV+KFpl05g2bXPEn4PIfvUD0fP12HNiDlIq4nv1j9yDlUXXw7mLBYUmJ
+DegJBa/pXd6s9Qfa4OhW
+=SaAE
+-----END PGP SIGNATURE-----
+
+--E5nov9BOTvPeL5kG9iiC7ucXNSIXl8ucx--
