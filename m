@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dIkvC-000847-Mt
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 20:03:31 -0400
+	(envelope-from <mst@redhat.com>) id 1dIlM0-0006JT-Fv
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 20:31:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dIkv8-0008Ub-N3
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 20:03:30 -0400
-Resent-Message-Id: <E1dIkv8-0008Ub-N3@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21416)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dIkv8-0008Qd-FJ
-	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 20:03:26 -0400
-In-Reply-To: <20170607155536.1193-1-rth@twiddle.net>
-Message-ID: <149688017690.420.10600095705554796648@84b42461e25a>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <mst@redhat.com>) id 1dIlLx-0002XK-DZ
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 20:31:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59216)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dIlLx-0002X9-4A
+	for qemu-devel@nongnu.org; Wed, 07 Jun 2017 20:31:09 -0400
+Date: Thu, 8 Jun 2017 03:31:06 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170608032440-mutt-send-email-mst@kernel.org>
+References: <20170607152825.12081-1-pbonzini@redhat.com>
+	<20170607152825.12081-2-pbonzini@redhat.com>
+	<CAFEAcA8CppP6YEPkGxVEyLnO=Kk1qirpGk2sh0bXedscxct8Jg@mail.gmail.com>
+	<8229C6EB-56EA-475E-99D4-6D9B36B5D0A7@nutanix.com>
+	<7a06506e-20ba-66b8-8c69-c500efe86301@redhat.com>
+	<0281E149-DE28-4D6D-80E0-1132CAB8ABDB@nutanix.com>
+	<1265195474.6852496.1496859744613.JavaMail.zimbra@redhat.com>
+	<20170607212825-mutt-send-email-mst@kernel.org>
+	<1191656469.6862786.1496861817272.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 7 Jun 2017 17:02:57 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v4 0/7] tcg: allocate TB structs preceding
- translate
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1191656469.6862786.1496861817272.JavaMail.zimbra@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 18/33] vhost-user-scsi: Introduce
+ vhost-user-scsi host device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +35,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: rth@twiddle.net
-Cc: famz@redhat.com, qemu-devel@nongnu.org, cota@braap.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Felipe Franciosi <felipe@nutanix.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcwNjA3MTU1NTM2LjExOTMtMS1ydGhAdHdpZGRsZS5uZXQKU3ViamVjdDog
-W1FlbXUtZGV2ZWxdIFtQQVRDSCB2NCAwLzddIHRjZzogYWxsb2NhdGUgVEIgc3RydWN0cyBwcmVj
-ZWRpbmcgdHJhbnNsYXRlCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpC
-QVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpm
-YWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0l
-SCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hl
-Y2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4i
-CiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0
-Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAg
-ICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVO
-RCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQK
-U3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwphNWY1NTQ0IHRhcmdldC9hcm06IFVzZSBs
-ZHIgKGxpdGVyYWwpIGZvciBnb3RvX3RiCjE1YTkyZDggdGFyZ2V0L2FybTogVHJ5IHBjLXJlbGF0
-aXZlIGFkZHJlc3NlcyBmb3IgbW92aQpjMjcwYzQyIHRhcmdldC9hcm06IFJlbW92ZSBsaW1pdCBv
-biBjb2RlIGJ1ZmZlciBzaXplCjkyZGY5MmQgdGFyZ2V0L2FybTogVXNlIGluZGlyZWN0IGJyYW5j
-aCBmb3IgZ290b190YgpjYTVkM2ZkIHRjZy9hYXJjaDY0OiBVc2UgQURSIGluIHRjZ19vdXRfbW92
-aQpjNjJhNjQwIHRjZzogYWxsb2NhdGUgVEIgc3RydWN0cyBiZWZvcmUgdGhlIGNvcnJlc3BvbmRp
-bmcgdHJhbnNsYXRlZCBjb2RlCmIzZTJhMWYgdXRpbDogYWRkIGNhY2hlaW5mbwoKPT09IE9VVFBV
-VCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS83OiB1dGlsOiBhZGQgY2FjaGVpbmZvLi4uCkVS
-Uk9SOiBkbyBub3QgaW5pdGlhbGlzZSBnbG9iYWxzIHRvIDAgb3IgTlVMTAojMTQ5OiBGSUxFOiB1
-dGlsL2NhY2hlaW5mby5jOjExOgoraW50IHFlbXVfaWNhY2hlX2xpbmVzaXplID0gMDsKCkVSUk9S
-OiBkbyBub3QgaW5pdGlhbGlzZSBnbG9iYWxzIHRvIDAgb3IgTlVMTAojMTUwOiBGSUxFOiB1dGls
-L2NhY2hlaW5mby5jOjEyOgoraW50IHFlbXVfZGNhY2hlX2xpbmVzaXplID0gMDsKCkVSUk9SOiBz
-cGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQgJyYmJyAoY3R4OkV4VykKIzE4NzogRklMRTogdXRp
-bC9jYWNoZWluZm8uYzo0OToKKyAgICAgICAgICAgICYmIGJ1ZltpXS5DYWNoZS5MZXZlbCA9PSAx
-KSB7CiAgICAgICAgICAgICBeCgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5l
-cyBzaG91bGQgYmUgYXZvaWRlZAojMjA5OiBGSUxFOiB1dGlsL2NhY2hlaW5mby5jOjcxOgorIyBp
-ZiBkZWZpbmVkKF9fQVBQTEVfXykKCnRvdGFsOiAzIGVycm9ycywgMSB3YXJuaW5ncywgMjA3IGxp
-bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNr
-aW5nIFBBVENIIDIvNzogdGNnOiBhbGxvY2F0ZSBUQiBzdHJ1Y3RzIGJlZm9yZSB0aGUgY29ycmVz
-cG9uZGluZyB0cmFuc2xhdGVkIGNvZGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMy83OiB0Y2cvYWFyY2g2
-NDogVXNlIEFEUiBpbiB0Y2dfb3V0X21vdmkuLi4KQ2hlY2tpbmcgUEFUQ0ggNC83OiB0YXJnZXQv
-YXJtOiBVc2UgaW5kaXJlY3QgYnJhbmNoIGZvciBnb3RvX3RiLi4uCkNoZWNraW5nIFBBVENIIDUv
-NzogdGFyZ2V0L2FybTogUmVtb3ZlIGxpbWl0IG9uIGNvZGUgYnVmZmVyIHNpemUuLi4KQ2hlY2tp
-bmcgUEFUQ0ggNi83OiB0YXJnZXQvYXJtOiBUcnkgcGMtcmVsYXRpdmUgYWRkcmVzc2VzIGZvciBt
-b3ZpLi4uCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzU0OiBGSUxF
-OiB0Y2cvYXJtL3RjZy10YXJnZXQuaW5jLmM6NDQ2OgorXkl9JAoKRVJST1I6IGNvZGUgaW5kZW50
-IHNob3VsZCBuZXZlciB1c2UgdGFicwojNjQ6IEZJTEU6IHRjZy9hcm0vdGNnLXRhcmdldC5pbmMu
-Yzo0NTM6CiteSX0kCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDU0IGxpbmVzIGNoZWNr
-ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENI
-IDcvNzogdGFyZ2V0L2FybTogVXNlIGxkciAobGl0ZXJhbCkgZm9yIGdvdG9fdGIuLi4KPT09IE9V
-VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFp
-bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
-XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5v
-cmc=
+On Wed, Jun 07, 2017 at 02:56:57PM -0400, Paolo Bonzini wrote:
+> 
+> > > This could be documented,
+> > 
+> > It is documented AFAIK. Pls take a look at the spec documentation.
+> 
+> Found it now.  It's not under GET_VRING_BASE, it's under "starting
+> and stopping rings"---fair enough.
+> 
+> In the case of vhost-user-scsi, however, QEMU also must not proceed
+> until vhost-user-scsi has drained the pending I/O---and this pending
+> I/O would be completed _after_ QEMU has sent GET_VRING_BASE.
+
+Weird.  Doesn't QEMU wait for response to GET_VRING_BASE?
+I think it does since we migrate the returned value.
+
+Spec says:
+	Client must only process each ring when it is started.
+so this isn't expected. I guess whoever wrote vhost-user-scsi
+understood "process" as "start processing".
+What was intended is reading or writing any part of ring.
+The used ring must not be updated after ring is stopped.
+A spec clarification might in order.
+
+> Is this handled by VHOST_USER_PROTOCOL_F_REPLY_ACK already?  If so,
+> migration would be denied if the server lacks that protocol feature.
+> 
+> Paolo
+
+GET_VRING_BASE does not need an ack, after respoding ring should
+be stopped.
+
+> > > but perhaps it's best to add a START_STOP
+> > > feature and message to the vhost-user protocol?
+> > 
+> > We just never need to GET_VRING_BASE if ring keeps going -
+> > makes no sense since base gets invalidated immediately.
+> > 
+> > 
+> > 
+> > > The feature then can be optional for vhost-user-net and mandatory for
+> > > vhost-user-scsi.  When this is done we can remove .unmigratable.
+> > > 
+> > > Thanks,
+> > > 
+> > > Paolo
+> > 
+> > If vhost-user-scsi does not stop the ring after responding to
+> > GET_VRING_BASE, it's just a bug that needs to be fixed.
+> > 
+> > > > > 
+> > > > > Can you please send a version of your patch that uses .unmigratable?
+> > > > 
+> > > > Sure I can do that. We can work on the migration later on.
+> > > > 
+> > > > > 
+> > > > > I'll send a v6 that momentarily drops vhost-scsi, but I intend to
+> > > > > include it again in the next pull request.
+> > > > 
+> > > > Sounds good to me.
+> > > > 
+> > > > Felipe
+> > > > 
+> > > > > 
+> > > > > Thanks,
+> > > > > 
+> > > > > Paolo
+> > > > 
+> > > > 
+> > 
