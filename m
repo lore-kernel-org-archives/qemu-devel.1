@@ -1,36 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dIxQe-0002mv-5y
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:24:49 -0400
+	(envelope-from <eblake@redhat.com>) id 1dIxV4-0005Xv-Eu
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:29:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dIxQd-0006Mj-BJ
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:24:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59050)
+	(envelope-from <eblake@redhat.com>) id 1dIxV1-0000JT-AH
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:29:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34630)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dIxQd-0006LT-4d
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:24:47 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 30BEE80F9E
-	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 13:24:46 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170608124458.GF3628@pxdev.xzpeter.org> (Peter Xu's message of
-	"Thu, 8 Jun 2017 20:44:58 +0800")
-References: <1496745042-2379-1-git-send-email-peterx@redhat.com>
-	<1496745042-2379-3-git-send-email-peterx@redhat.com>
-	<87k24nd78e.fsf@secure.mitica>
-	<20170608104127.GE3628@pxdev.xzpeter.org>
-	<87efuubun6.fsf@secure.mitica>
-	<20170608124458.GF3628@pxdev.xzpeter.org>
-Reply-To: quintela@redhat.com
-Date: Thu, 08 Jun 2017 15:24:44 +0200
-Message-ID: <87a85iboir.fsf@secure.mitica>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dIxV1-0000Iy-1O
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:29:19 -0400
+References: <20170608115939.30985-1-marcandre.lureau@redhat.com>
+	<20170608115939.30985-2-marcandre.lureau@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b3e0f4e1-0594-0563-aa9c-4b26d0eecd0f@redhat.com>
+Date: Thu, 8 Jun 2017 08:29:14 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/6] migration: move global_state.optional
- out
+In-Reply-To: <20170608115939.30985-2-marcandre.lureau@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="KNXg4gk3Ton0ulN7fHT6qq1TnoF3aFHMl"
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] char: fix alias devices regression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,35 +28,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: anthony.perard@citrix.com, pbonzini@redhat.com
 
-Peter Xu <peterx@redhat.com> wrote:
-> On Thu, Jun 08, 2017 at 01:12:29PM +0200, Juan Quintela wrote:
->> Peter Xu <peterx@redhat.com> wrote:
->> > On Wed, Jun 07, 2017 at 07:42:57PM +0200, Juan Quintela wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--KNXg4gk3Ton0ulN7fHT6qq1TnoF3aFHMl
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: anthony.perard@citrix.com, pbonzini@redhat.com
+Message-ID: <b3e0f4e1-0594-0563-aa9c-4b26d0eecd0f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] char: fix alias devices regression
+References: <20170608115939.30985-1-marcandre.lureau@redhat.com>
+ <20170608115939.30985-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20170608115939.30985-2-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-...
->> 
->> Yeap.  I *thought* that there was a way to test/set thing
->> programatically also so I didn't have to create/export that functions.
->> My ideal world would be that there were something like that
->> 
->> qemu_opt_get_bool(migration_opts, "store_global_state", true);
->> 
->> so I only have to export migration_opts (or whatever), and just set/read
->> values from places like xen_init.  Im my ideal world, if I have to
->> create a new "property", I don't want to have to export a function to
->> set/read it.  For instance, the case of xen_init().  We haven't been
->> able to remove global_state_set_optional() because they don't know about
->> properties.
->> 
->> I still love the patches are they are.  Boing able to set things from
->> the command line makes things so much better/easier O:-)
->
-> Oh, looks like what we need to do is just export
-> register_compat_prop(), then xen_init() can use it.
->
-> I'll try that tomorrow. :)
+On 06/08/2017 06:59 AM, Marc-Andr=C3=A9 Lureau wrote:
+> Fix regression from commit 4d43a603c71, where the serial and parallel
+> headers got removed from char.c, which broke the alias table.
+>=20
+> Move the HAVE_CHARDEV_SERIAL/HAVE_CHARDEV_PARPORT to osdep.h instead
+> of being in seperate headers.
 
-Thanks, Juan.
+s/seperate/separate/
+
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  include/chardev/char-parallel.h |  5 -----
+>  include/chardev/char-serial.h   |  8 --------
+>  include/qemu/osdep.h            | 13 +++++++++++++
+>  3 files changed, 13 insertions(+), 13 deletions(-)
+>=20
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--KNXg4gk3Ton0ulN7fHT6qq1TnoF3aFHMl
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZOVEqAAoJEKeha0olJ0Nqi7kIAKClCJfwC411KsB5S3J/2Ppt
+imUkicNib+L4FlmBKAWlk1OGVzpBJli6bF5KxpFoq65GnWbuzWHOzYbmr8nooyNr
+Y9drQKptjM1Dxn4L/7fEFEO1HKD4R6GweO2S+3U835XIPJM3GdaFQgPC5GJ6MSF6
+cegs7nlFMMwFWU0Jl/HZy++JBCuyliuyUGksyeOB5/qE3GEEfAM9V5LgJ5bHGJpN
+TJ3lmUOFzoi2lScJ4z7j0+UQPwiwMavpUh4r1Gzamu/0KVdVIG1oHJkEEFVvdBE1
+AcLkxdhVCZ8DgUx7uZ4ns53d3sVmfbmieATNmRsELK0iwF/bMMlGyAF8IDznM88=
+=xxGl
+-----END PGP SIGNATURE-----
+
+--KNXg4gk3Ton0ulN7fHT6qq1TnoF3aFHMl--
