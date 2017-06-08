@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34436)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1dItbP-0006T1-Ha
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:19:45 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dItcR-000709-Jx
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:20:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1dItbM-0000Cw-Ci
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:19:39 -0400
-Received: from mga03.intel.com ([134.134.136.65]:60296)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1dItbL-0000Cd-VI
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:19:36 -0400
-Date: Thu, 8 Jun 2017 17:19:27 +0800
-From: Zhong Yang <yang.zhong@intel.com>
-Message-ID: <20170608091927.GB21945@yangzhon-Virtual>
-References: <1496383606-18060-1-git-send-email-yang.zhong@intel.com>
-	<bba5be37-e002-b65e-41b9-358e7f6a3ec9@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1dItcO-0000dH-H6
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:20:43 -0400
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:33463)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dItcO-0000cu-8g
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:20:40 -0400
+Received: by mail-wm0-x231.google.com with SMTP id m7so36766048wmg.0
+	for <qemu-devel@nongnu.org>; Thu, 08 Jun 2017 02:20:40 -0700 (PDT)
+References: <1496899257-25800-1-git-send-email-thuth@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1496899257-25800-1-git-send-email-thuth@redhat.com>
+Date: Thu, 08 Jun 2017 10:21:05 +0100
+Message-ID: <8760g6deda.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <bba5be37-e002-b65e-41b9-358e7f6a3ec9@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] tcg: split the tcg code and
- separate tcg files
+Subject: Re: [Qemu-devel] [PATCH] vl: Fix broken thread=xxx option of the
+ --accel parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,129 +30,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, laurent.desnogues@gmail.com, anthony.xu@intel.com, yang.zhong@intel.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Emilio G Cota <cota@braap.org>
 
-O Wed, Jun 07, 2017 at 03:28:55PM +0200, Paolo Bonzini wrote:
-> 
-> 
-> On 02/06/2017 08:06, Yang Zhong wrote:
-> > In order to disable tcg, the first phase is to split some
-> > tcg code and separate those tcg related files into one
-> > directory. The next phase will disable tcg more easily and
-> > cleanly.
-> >   
-> > In the first phase, there are four patches to deal with split 
-> > code and separate files.
-> > 1)split the tcg exec code.
-> >   a)split the tcg accelerators from accel.c file and re-name
-> >     tcg accelerator to tcg-all.c, like kvm-all.c did.
-> >   b)create one accel directory, which will include kvm,
-> >     tcg and general exec files.
-> > 2)move cputlb.c, cpu-exec-common.c and cpu-exec.c related tcg
-> >   exec file into accel/tcg/ subdirectory.
-> > 3)move tcg related backend files into accel/tcg/ directory
-> >   those files include translate-all.(ch), translate-common.c,
-> >   tci.c and tcg-runtime.c.
-> > 4)move kvm and exec.c file.
-> >   a)move kvm related accelerator files into accel/kvm/ directory.
-> >   b)move exec.c in accel/ directory.
-> >   c)stubs/ directory was created for kvm and tcg stub files.
-> > 
-> > after those changes are done, the file tree like below
-> > accel
-> > ├── accel.c
-> > ├── exec.c
-> > ├── kvm
-> > │   ├── kvm-all.c
-> > │   ├── Makefile.objs
-> > │   └── trace-events
-> > ├── Makefile.objs
-> > ├── stubs
-> > │   ├── kvm-stub.c
-> > │   └── Makefile.objs
-> > └── tcg
-> >     ├── cpu-exec.c
-> >     ├── cpu-exec-common.c
-> >     ├── cputlb.c
-> >     ├── Makefile.objs
-> >     ├── tcg-all.c
-> >     ├── tcg-runtime.c
-> >     ├── tci.c
-> >     ├── trace-events
-> >     ├── translate-all.c
-> >     ├── translate-all.h
-> >     └── translate-common.c
-> > 3 directories, 19 files
-> > 
-> > v3: squash patches and move tcg related backend files to accel/tcg/ 
-> >     according to Paolo's comments.
-> >     add kvm and tcg exec related patches into one patchset.
-> > 
-> > 
-> > Yang Zhong (4):
-> >   accel: split the tcg accelerator from accel.c file
-> >   tcg: move tcg related files into accel/tcg/ subdirectory
-> >   tcg: move tcg backend files into accel/tcg/
-> >   accel: move kvm related accelerator files into accel/
-> > 
-> >  Makefile.objs                                      |  3 +-
-> >  Makefile.target                                    | 10 +---
-> >  accel/Makefile.objs                                |  5 ++
-> >  accel.c => accel/accel.c                           | 27 ----------
-> >  exec.c => accel/exec.c                             |  0
-> >  accel/kvm/Makefile.objs                            |  1 +
-> >  kvm-all.c => accel/kvm/kvm-all.c                   |  2 +-
-> >  accel/kvm/trace-events                             | 13 +++++
-> >  accel/stubs/Makefile.objs                          |  1 +
-> >  kvm-stub.c => accel/stubs/kvm-stub.c               |  0
-> >  accel/tcg/Makefile.objs                            |  4 ++
-> >  cpu-exec-common.c => accel/tcg/cpu-exec-common.c   |  0
-> >  cpu-exec.c => accel/tcg/cpu-exec.c                 |  2 +-
-> >  cputlb.c => accel/tcg/cputlb.c                     |  0
-> >  accel/tcg/tcg-all.c                                | 61 ++++++++++++++++++++++
-> >  tcg-runtime.c => accel/tcg/tcg-runtime.c           |  0
-> >  tci.c => accel/tcg/tci.c                           |  0
-> >  accel/tcg/trace-events                             | 10 ++++
-> >  translate-all.c => accel/tcg/translate-all.c       |  2 +-
-> >  translate-all.h => accel/tcg/translate-all.h       |  0
-> >  translate-common.c => accel/tcg/translate-common.c |  0
-> >  configure                                          |  2 +-
-> >  trace-events                                       | 21 --------
-> >  23 files changed, 103 insertions(+), 61 deletions(-)
-> >  create mode 100644 accel/Makefile.objs
-> >  rename accel.c => accel/accel.c (87%)
-> >  rename exec.c => accel/exec.c (100%)
-> >  create mode 100644 accel/kvm/Makefile.objs
-> >  rename kvm-all.c => accel/kvm/kvm-all.c (99%)
-> >  create mode 100644 accel/kvm/trace-events
-> >  create mode 100644 accel/stubs/Makefile.objs
-> >  rename kvm-stub.c => accel/stubs/kvm-stub.c (100%)
-> >  create mode 100644 accel/tcg/Makefile.objs
-> >  rename cpu-exec-common.c => accel/tcg/cpu-exec-common.c (100%)
-> >  rename cpu-exec.c => accel/tcg/cpu-exec.c (99%)
-> >  rename cputlb.c => accel/tcg/cputlb.c (100%)
-> >  create mode 100644 accel/tcg/tcg-all.c
-> >  rename tcg-runtime.c => accel/tcg/tcg-runtime.c (100%)
-> >  rename tci.c => accel/tcg/tci.c (100%)
-> >  create mode 100644 accel/tcg/trace-events
-> >  rename translate-all.c => accel/tcg/translate-all.c (99%)
-> >  rename translate-all.h => accel/tcg/translate-all.h (100%)
-> >  rename translate-common.c => accel/tcg/translate-common.c (100%)
-> > 
-> 
-> Queued, thanks (except I'm not sure why you're moving exec.c, so I've
-> undone that, and tcg-runtime.c probably fits better in tcg/).
-> 
-  Thanks Paolo for your great help!
 
-  as for exec.c, i ever thought this file is related with system and moved it to here.
+Thomas Huth <thuth@redhat.com> writes:
 
-  You are right, tcg-runtime.c is BSD Licenced file, which should be moved to tcg/.
-  Whether can i release V4 for those moving?  thanks!
+> Commit bde4d9205 ("Fix the -accel parameter and the documentation for
+> 'hax'") introduced a regression by adding a new local accel_opts
+> variable which shadows the variable with the same name that is
+> declared at the beginning of the main() scope. This causes the
+> qemu_tcg_configure() call later to be always called with NULL, so
+> that the thread=xxx option gets ignored. Fix it by removing the
+> local accel_opts variable and use "opts" instead, which is meant
+> for storing temporary QemuOpts values.
+> And while we're at it, also change the exit(1) here to exit(0)
+> since asking for help is not an error.
+>
+> Fixes: bde4d9205ee9def98852ff6054cdef4efd74e1f8
+> Reported-by: Markus Armbruster <armbru@redhat.com>
+> Reported-by: Emilio G. Cota <cota@braap.org>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-  Regards,
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Tested-by: Alex Bennée <alex.bennee@linaro.org>
 
-  Yang. 
- 
-> Paolo
+I'll leave the wider question of a better layout to the QemuOpts experts
+(I was/am very much an amateur when I first added the thread option).
+
+> ---
+>  vl.c | 13 +++++--------
+>  1 file changed, 5 insertions(+), 8 deletions(-)
+>
+> diff --git a/vl.c b/vl.c
+> index be4dcf2..5aba544 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -3757,21 +3757,18 @@ int main(int argc, char **argv, char **envp)
+>                  qdev_prop_register_global(&kvm_pit_lost_tick_policy);
+>                  break;
+>              }
+> -            case QEMU_OPTION_accel: {
+> -                QemuOpts *accel_opts;
+> -
+> +            case QEMU_OPTION_accel:
+>                  accel_opts = qemu_opts_parse_noisily(qemu_find_opts("accel"),
+>                                                       optarg, true);
+>                  optarg = qemu_opt_get(accel_opts, "accel");
+>                  if (!optarg || is_help_option(optarg)) {
+>                      error_printf("Possible accelerators: kvm, xen, hax, tcg\n");
+> -                    exit(1);
+> +                    exit(0);
+>                  }
+> -                accel_opts = qemu_opts_create(qemu_find_opts("machine"), NULL,
+> -                                              false, &error_abort);
+> -                qemu_opt_set(accel_opts, "accel", optarg, &error_abort);
+> +                opts = qemu_opts_create(qemu_find_opts("machine"), NULL,
+> +                                        false, &error_abort);
+> +                qemu_opt_set(opts, "accel", optarg, &error_abort);
+>                  break;
+> -            }
+>              case QEMU_OPTION_usb:
+>                  olist = qemu_find_opts("machine");
+>                  qemu_opts_parse_noisily(olist, "usb=on", false);
+
+
+--
+Alex Bennée
