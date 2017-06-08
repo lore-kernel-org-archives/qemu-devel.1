@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54201)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dIxvv-0007wP-Gh
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:57:08 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dIxyN-0000G5-Tt
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:59:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dIxvq-00076d-Us
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:57:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50438)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dIxvq-000767-OR
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:57:02 -0400
-Date: Thu, 8 Jun 2017 09:56:59 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <751038014.31767180.1496930219401.JavaMail.zimbra@redhat.com>
-In-Reply-To: <765f4687-52ac-ff9d-ef82-037c319e23ec@redhat.com>
-References: <20170608115939.30985-1-marcandre.lureau@redhat.com>
-	<20170608115939.30985-4-marcandre.lureau@redhat.com>
-	<765f4687-52ac-ff9d-ef82-037c319e23ec@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1dIxyI-0000QC-VN
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:59:39 -0400
+References: <20170607083243.8983-1-aik@ozlabs.ru>
+	<20170608074250.GE25805@umbus.fritz.box>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b9c81b9d-56ce-b8e6-bedc-5140caf14798@redhat.com>
+Date: Thu, 8 Jun 2017 15:59:27 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170608074250.GE25805@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] test-char: start a /char/serial test
+Subject: Re: [Qemu-devel] [PATCH qemu v7] memory/iommu: QOM'fy IOMMU
+ MemoryRegion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +25,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, anthony perard <anthony.perard@citrix.com>, pbonzini@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-Hi
 
------ Original Message -----
-> On 06/08/2017 06:59 AM, Marc-Andr=C3=A9 Lureau wrote:
-> > Quite limited test, to check that the chardev can be created with a
-> > path and with the tty alias.
-> >=20
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > Reviewed-by: Eric Blake <eblake@redhat.com>
-> > ---
-> >  tests/test-char.c | 30 ++++++++++++++++++++++++++++++
-> >  1 file changed, 30 insertions(+)
-> >=20
-> > diff --git a/tests/test-char.c b/tests/test-char.c
-> > index dfe856cb85..ecc3fec194 100644
-> > --- a/tests/test-char.c
-> > +++ b/tests/test-char.c
-> > @@ -5,6 +5,7 @@
-> >  #include "qemu/config-file.h"
-> >  #include "qemu/sockets.h"
-> >  #include "chardev/char-fe.h"
-> > +#include "chardev/char-serial.h" /* for HAVE_CHARDEV_SERIAL */
->=20
-> Either the comment or the entire #include is now spurious, given the new
-> 1/3.
 
-indeed, removed
+On 08/06/2017 09:42, David Gibson wrote:
+> So.. this seems like an only halfway QOMification.  The main init
+> function still takes an ops structure, whereas the QOMish way to do
+> this would be to have the base IOMMUMemoryRegion be an abstract class,
+> and have the IOMMUOps pointers as part of the IOMMUMemoryRegionClass.
+>=20
+> Maybe you can persuade me this is a useful interim step?
+
+Well, it's definitely better than nothing, and MR already relies heavily
+on the ops pattern.
+
+The only changes I'd make are:
+
+1) remove this unnecessary hunk
+
+>      snprintf(tmp, sizeof(tmp), "tce-iommu-%x", tcet->liobn);
+> -    memory_region_init_iommu(&tcet->iommu, tcetobj, &spapr_iommu_ops, =
+tmp, 0);
+> +    memory_region_init_iommu_type(TYPE_IOMMU_MEMORY_REGION,
+> +                                  &tcet->iommu, tcetobj, &spapr_iommu_=
+ops,
+> +                                  tmp, 0);
+
+thus delaying the introduction of memory_region_init_iommu_type to the
+next step.
+
+2) Leave is_iommu early in the "should fit in a cache line" part, for
+example after dirty_log_mask, and since we have room move "bool
+ram_device;" there too.
 
 >=20
-> --
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
->=20
->=20
+> -    const MemoryRegionIOMMUOps *iommu_ops;
+> =20
+>      const MemoryRegionOps *ops;
+>      void *opaque;
+> @@ -243,6 +246,13 @@ struct MemoryRegion {
+>      const char *name;
+>      unsigned ioeventfd_nb;
+>      MemoryRegionIoeventfd *ioeventfds;
+> +    bool is_iommu;
+
+Thanks,
+
+Paolo
