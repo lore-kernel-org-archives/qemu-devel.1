@@ -1,21 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dIxPZ-0001lG-24
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:23:42 -0400
+	(envelope-from <quintela@redhat.com>) id 1dIxQe-0002mv-5y
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:24:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dIxPV-0005NN-OV
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:23:41 -0400
-References: <1496926799-13040-1-git-send-email-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <151f982c-8e35-5dba-e40c-5b1c5d76b6d1@redhat.com>
-Date: Thu, 8 Jun 2017 15:23:32 +0200
+	(envelope-from <quintela@redhat.com>) id 1dIxQd-0006Mj-BJ
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:24:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59050)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dIxQd-0006LT-4d
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 09:24:47 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 30BEE80F9E
+	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 13:24:46 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170608124458.GF3628@pxdev.xzpeter.org> (Peter Xu's message of
+	"Thu, 8 Jun 2017 20:44:58 +0800")
+References: <1496745042-2379-1-git-send-email-peterx@redhat.com>
+	<1496745042-2379-3-git-send-email-peterx@redhat.com>
+	<87k24nd78e.fsf@secure.mitica>
+	<20170608104127.GE3628@pxdev.xzpeter.org>
+	<87efuubun6.fsf@secure.mitica>
+	<20170608124458.GF3628@pxdev.xzpeter.org>
+Reply-To: quintela@redhat.com
+Date: Thu, 08 Jun 2017 15:24:44 +0200
+Message-ID: <87a85iboir.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <1496926799-13040-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] Makefile: Do not generate files if
- "configure" has not been run yet
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 2/6] migration: move global_state.optional
+ out
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,46 +39,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>, qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
+Peter Xu <peterx@redhat.com> wrote:
+> On Thu, Jun 08, 2017 at 01:12:29PM +0200, Juan Quintela wrote:
+>> Peter Xu <peterx@redhat.com> wrote:
+>> > On Wed, Jun 07, 2017 at 07:42:57PM +0200, Juan Quintela wrote:
 
+...
+>> 
+>> Yeap.  I *thought* that there was a way to test/set thing
+>> programatically also so I didn't have to create/export that functions.
+>> My ideal world would be that there were something like that
+>> 
+>> qemu_opt_get_bool(migration_opts, "store_global_state", true);
+>> 
+>> so I only have to export migration_opts (or whatever), and just set/read
+>> values from places like xen_init.  Im my ideal world, if I have to
+>> create a new "property", I don't want to have to export a function to
+>> set/read it.  For instance, the case of xen_init().  We haven't been
+>> able to remove global_state_set_optional() because they don't know about
+>> properties.
+>> 
+>> I still love the patches are they are.  Boing able to set things from
+>> the command line makes things so much better/easier O:-)
+>
+> Oh, looks like what we need to do is just export
+> register_compat_prop(), then xen_init() can use it.
+>
+> I'll try that tomorrow. :)
 
-On 08/06/2017 14:59, Thomas Huth wrote:
-> When doing a "make -j10" in the vanilla QEMU source tree (without
-> running "configure" first), the Makefile currently generates two
-> files already, qemu-version.h and qemu-options.def. This should not
-> happen, so let's only build the generated files if config-host.mak
-> is available (i.e. "configure" has been run already).
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  v3:
->  - Check for config-host.mak at the place where we add the dependencies
->    for $(GENERATED_FILES) instead of adding single dependencies all over
->    the place
-> 
->  Makefile | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/Makefile b/Makefile
-> index c830d7a..32d4441 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -791,9 +791,11 @@ endif # CONFIG_WIN
->  
->  # Add a dependency on the generated files, so that they are always
->  # rebuilt before other object files
-> +ifneq ($(wildcard config-host.mak),)
->  ifneq ($(filter-out $(UNCHECKED_GOALS),$(MAKECMDGOALS)),$(if $(MAKECMDGOALS),,fail))
->  Makefile: $(GENERATED_FILES)
->  endif
-> +endif
->  
->  .SECONDARY: $(TRACE_HEADERS) $(TRACE_HEADERS:%=%-timestamp) \
->  	$(TRACE_SOURCES) $(TRACE_SOURCES:%=%-timestamp) \
-> 
-
-Thanks, queued.
-
-Paolo
+Thanks, Juan.
