@@ -1,30 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59798)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35518)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dIuz7-0003mf-3p
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 06:48:14 -0400
+	(envelope-from <felipe@nutanix.com>) id 1dIvFn-0001VQ-Aq
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 07:05:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dIuz3-0002cw-Vr
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 06:48:13 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:33939)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dIuz3-0002cc-No
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 06:48:09 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id d64so13477813wmf.1
-	for <qemu-devel@nongnu.org>; Thu, 08 Jun 2017 03:48:07 -0700 (PDT)
-References: <20170605165233.4135-1-rth@twiddle.net>
-	<20170605165233.4135-23-rth@twiddle.net>
-	<87h8zrdh02.fsf@linaro.org> <87fufbdghz.fsf@linaro.org>
-	<20170607202200.GA20593@flamenco>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170607202200.GA20593@flamenco>
-Date: Thu, 08 Jun 2017 11:48:33 +0100
-Message-ID: <871squdabi.fsf@linaro.org>
+	(envelope-from <felipe@nutanix.com>) id 1dIvFi-0000Zc-CB
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 07:05:27 -0400
+Received: from us-smtp-delivery-101.mimecast.com ([63.128.21.101]:44988)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <felipe@nutanix.com>) id 1dIvFi-0000ZP-31
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 07:05:22 -0400
+From: Felipe Franciosi <felipe@nutanix.com>
+Date: Thu, 8 Jun 2017 11:05:16 +0000
+Message-ID: <7A6952CE-E364-4265-A3B9-9BAB7CA620D2@nutanix.com>
+References: <20170607152825.12081-1-pbonzini@redhat.com>
+	<20170607152825.12081-2-pbonzini@redhat.com>
+	<CAFEAcA8CppP6YEPkGxVEyLnO=Kk1qirpGk2sh0bXedscxct8Jg@mail.gmail.com>
+	<8229C6EB-56EA-475E-99D4-6D9B36B5D0A7@nutanix.com>
+	<7a06506e-20ba-66b8-8c69-c500efe86301@redhat.com>
+	<0281E149-DE28-4D6D-80E0-1132CAB8ABDB@nutanix.com>
+	<1265195474.6852496.1496859744613.JavaMail.zimbra@redhat.com>
+	<20170607212825-mutt-send-email-mst@kernel.org>
+	<1191656469.6862786.1496861817272.JavaMail.zimbra@redhat.com>
+	<20170608032440-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20170608032440-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+Content-ID: <1DA68980DBBDAD4495C96EB79F6B235E@namprd02.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 22/26] target/aarch64: optimize indirect
- branches
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 18/33] vhost-user-scsi: Introduce
+ vhost-user-scsi host device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,78 +38,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
 
-Emilio G. Cota <cota@braap.org> writes:
+> On 8 Jun 2017, at 01:31, Michael S. Tsirkin <mst@redhat.com> wrote:
+>=20
+> On Wed, Jun 07, 2017 at 02:56:57PM -0400, Paolo Bonzini wrote:
+>>=20
+>>>> This could be documented,
+>>>=20
+>>> It is documented AFAIK. Pls take a look at the spec documentation.
+>>=20
+>> Found it now.  It's not under GET_VRING_BASE, it's under "starting
+>> and stopping rings"---fair enough.
+>>=20
+>> In the case of vhost-user-scsi, however, QEMU also must not proceed
+>> until vhost-user-scsi has drained the pending I/O---and this pending
+>> I/O would be completed _after_ QEMU has sent GET_VRING_BASE.
+>=20
+> Weird.  Doesn't QEMU wait for response to GET_VRING_BASE?
+> I think it does since we migrate the returned value.
 
-> On Wed, Jun 07, 2017 at 15:22:48 +0100, Alex Bennée wrote:
->>
->> Alex Bennée <alex.bennee@linaro.org> writes:
->>
->> > Richard Henderson <rth@twiddle.net> writes:
->> >
->> >> From: "Emilio G. Cota" <cota@braap.org>
->> >>
->> >> Measurements:
->> >>
->> >> [Baseline performance is that before applying this and the previous
->> >> commit]
->> >
->> > Sadly this has regressed my qemu-system-aarch64 EL2 run. It was slightly
->> > masked by an unrelated assertion breakage which I had to fix. However
->> > with this patch my boot hangs spinning all 4 threads. Once reverted
->> > things work again.
->> >
->> > My command line:
->> >
->> >   timeout -k 1s --foreground 120s ./aarch64-softmmu/qemu-system-aarch64 -machine type=virt -display none -m 4096 -cpu cortex-a57 -serial mon:stdio -netdev user,id=unet -device virtio-net-device,netdev=unet -drive file=/home/alex/lsrc/qemu/images/jessie-arm64.qcow2,id=myblock,index=0,if=none -device virtio-blk-device,drive=myblock -append "console=ttyAMA0 root=/dev/vda1 systemd.unit=benchmark.service" -kernel /home/alex/lsrc/qemu/images/aarch64-current-linux-kernel-only.img -smp 4 -machine gic-version=3 -machine virtualization=true -name debug-threads=on
->> >
->> > My tree with fix and revert:
->> >
->> >   https://github.com/stsquad/qemu/tree/debug/aarch64-hang
->> >
->> > I'm investigating now.
->>
->> Well this seems to be a case of hangs with -smp > 1 (which I guess was
->> obvious seeing as the TCG threads seem to be spinning against each
->> other).
+It does and that's what I said on my first message. On GET_VRING_BASE, a vh=
+ost-user-scsi backend application will stop picking up new requests and, _a=
+dditionally_, quiesce the VQ (by waiting for any outstanding I/O to complet=
+e or cancelling them) before returning the last_avail_idx.
 
-*sigh* OK I can replicate with thread=single so I guess that rules out
-race conditions. So that leaves us with some TCG state that is
-different when we chain compared to returning to the epilogue. It's odd
-that it doesn't trigger for cache lookups though.
+Such an application therefore doesn't _necessarily_ need a drain call. Howe=
+ver, we could extend vhost-user to include a message for draining (which ca=
+n be implemented as "wait for pending I/O to complete" or "cancel all outst=
+anding" depending on the implementation).
 
-I tried this:
+>=20
+> Spec says:
+> =09Client must only process each ring when it is started.
+> so this isn't expected. I guess whoever wrote vhost-user-scsi
+> understood "process" as "start processing".
+> What was intended is reading or writing any part of ring.
+> The used ring must not be updated after ring is stopped.
+> A spec clarification might in order.
+>=20
+>> Is this handled by VHOST_USER_PROTOCOL_F_REPLY_ACK already?  If so,
+>> migration would be denied if the server lacks that protocol feature.
+>>=20
+>> Paolo
+>=20
+> GET_VRING_BASE does not need an ack, after respoding ring should
+> be stopped.
 
-        tb = tb_htable_lookup(cpu, addr, cs_base, flags);
-        if (likely(tb)) {
-            atomic_set(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)], tb);
-            if (cpu->icount_decr.u32) {
-                goto found;
-            }
-        }
+Precisely. To clarify further: the REPLY_ACK feature was added as an extens=
+ion only for messages that do not demand a reply. This is to cope with a vh=
+ost-user protocol deficiency where commands like SET_MEM_TABLE are asynchro=
+nous. Qemu sends them and carry on executing before the backend can ACK new=
+ regions were configured. The original vhost(-kernel) doesn't suffer that p=
+roblem as messages are sent via an ioctl() which blocks until the backend i=
+s done.
 
-So we only chain htable looksups when an IRQ is happening and it gets
-further but still hangs. It doesn't rule out IRQ handling but I can't
-image a mechanism that breaks it.
+>>>> but perhaps it's best to add a START_STOP
+>>>> feature and message to the vhost-user protocol?
+>>>=20
+>>> We just never need to GET_VRING_BASE if ring keeps going -
+>>> makes no sense since base gets invalidated immediately.
+>>>=20
+>>>=20
+>>>=20
+>>>> The feature then can be optional for vhost-user-net and mandatory for
+>>>> vhost-user-scsi.  When this is done we can remove .unmigratable.
+>>>>=20
+>>>> Thanks,
+>>>>=20
+>>>> Paolo
+>>>=20
+>>> If vhost-user-scsi does not stop the ring after responding to
+>>> GET_VRING_BASE, it's just a bug that needs to be fixed.
 
-Time to re-review the code I guess!
+Any backend application written for vhost-user-scsi needs to adhere to the =
+spec and stop picking up new requests upon a GET_VRING_BASE. Depending on t=
+he storage backend, it can decide whether to also quiesce the VQ or potenti=
+ally cancel any outstanding request.
 
->
-> Not sure the problem is in MTTCG; I cannot reproduce with -smp > 1 and
-> thread=single; can you? [ I get no output whatsoever when trying to boot ]
->
-> Note that you'll need to revert bde4d9205ee to get thread=foo to
-> work again -- see [1].
->
-> Thanks,
->
-> 		E.
->
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg01980.html
+Worth noting, this is very different in networking as packets can just be d=
+ropped.
 
-
---
-Alex Bennée
+Thanks,
+Felipe
