@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dJ1Te-0005JF-Jr
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 13:44:11 -0400
+	(envelope-from <mst@redhat.com>) id 1dJ1UC-0006IY-PJ
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 13:44:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dJ1Ta-0005f2-BV
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 13:44:10 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:54573)
+	(envelope-from <mst@redhat.com>) id 1dJ1U8-0005oQ-H9
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 13:44:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38822)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dJ1TZ-0005df-Rv
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 13:44:06 -0400
-Date: Thu, 8 Jun 2017 13:44:04 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170608174404.GA1767@flamenco>
-References: <20170607155536.1193-1-rth@twiddle.net>
-	<20170607233019.GA29137@flamenco>
-	<d1c6bad4-12b4-b697-fca5-dae84864bba0@twiddle.net>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dJ1U8-0005o3-8j
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 13:44:40 -0400
+Date: Thu, 8 Jun 2017 20:44:19 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170608204207-mutt-send-email-mst@kernel.org>
+References: <c76b36de-ebf9-c662-d454-0a95b43901e8@redhat.com>
+	<2ff62b03-d71b-93c4-79bf-10682b229758@redhat.com>
+	<20170605185815-mutt-send-email-mst@kernel.org>
+	<e3c4defa-69ff-45db-dc7a-427dbb521c18@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d1c6bad4-12b4-b697-fca5-dae84864bba0@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH v4 0/7] tcg: allocate TB structs preceding
- translate
+In-Reply-To: <e3c4defa-69ff-45db-dc7a-427dbb521c18@redhat.com>
+Subject: Re: [Qemu-devel] allocation zone extensions for the firmware
+ linker/loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,25 +30,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: SeaBIOS devel list <SeaBIOS@seabios.org>, qemu devel list <qemu-devel@nongnu.org>, edk2-devel-ml01 <edk2-devel@ml01.01.org>, Kevin O'Connor <kevin@koconnor.net>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ben Warren <ben@skyportsystems.com>, Dongjiu Geng <gengdongjiu@huawei.com>, Igor Mammedov <imammedo@redhat.com>, "Jordan Justen (Intel address)" <jordan.l.justen@intel.com>, "Leif Lindholm (Linaro address)" <leif.lindholm@linaro.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Xiao Guangrong <guangrong.xiao@linux.intel.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, Jun 08, 2017 at 09:44:11 -0700, Richard Henderson wrote:
-> On 06/07/2017 04:30 PM, Emilio G. Cota wrote:
-> >On Wed, Jun 07, 2017 at 08:55:29 -0700, Richard Henderson wrote:
-> >>Then I've a few follow-up patches to take advantage of the new TB
-> >>placement for arm platforms.  I've had a look at the asm output for
-> >>ppc64 and s390x, and don't see anything obvious that can be improved.
-> >
-> >Nice! Just tested patches 3-7 with an arm guest image on
-> >x86 and aarch64 hosts:
-> >
-> >   Tested-by: Emilio G. Cota <cota@braap.org>
+On Tue, Jun 06, 2017 at 08:10:17PM +0200, Laszlo Ersek wrote:
+> On 06/05/17 18:02, Michael S. Tsirkin wrote:
+> > On Sat, Jun 03, 2017 at 09:36:23AM +0200, Laszlo Ersek wrote:
+> >> On 06/02/17 17:45, Laszlo Ersek wrote:
+> >>
+> >>> The patches can cause linker/loader breakage when old firmware is booted
+> >>> on new QEMU. However, that's no problem (it's nothing new), the next
+> >>> release of QEMU should bundle the new firmware binaries as always.
+> >>
+> >> Dave made a good point (which I should have realized myself, really!),
+> >> namely if you launch old fw on old qemu, then migrate the guest to a new
+> >> qemu and then reboot the guest on the target host, within the migrated
+> >> VM, things will break.
+> >>
+> >> So that makes this approach dead in the water.
+> >>
+> >> Possible mitigations I could think of:
+> >> - Make it machine type dependent. Complicated (we don't usually bind
+> >> ACPI generation to machine types) and wouldn't help existing devices.
+> >> - Let the firmware negotiate these extensions. Very complicated (new
+> >> fw-cfg files are needed for negotiation) and wouldn't help existing devices.
+> > 
+> > This last option *shouldn't* be complicated. If it is something's wrong.
+> > 
+> > Maybe we made a mistake when we added etc/smi/*features*.
+> > 
+> > It's not too late to move these to etc/*features* for new
+> > machine types if we want to and if you can do the firmware
+> > work. Then you'd just take out a bit and be done with it.
+> > 
+> > I don't insist on doing the ACPI thing now but I do think
+> > infrastructure for negotiating extensions should be there.
 > 
-> So... you've tested patch 3 then?
-> Patches 4-7 are for an arm host.
+> Different drivers in the firmware would need to negotiate different
+> questions / features with QEMU independently of each other. The "thing"
+> in OVMF that negotiates (and uses) the SMI broadcast is very-very
+> different and separate from the "thing" in OVMF that handles the ACPI
+> linker/loader script.
 
-Ha! Yes, sorry for the confusion -- I blindly went by the patch titles'
-"target/arm" prefix; shouldn't they be "tcg/arm"?
 
-		E.
+They both could call a common library.
+
+Also, we don't need separate fw cfg files - we could
+reserve ranges of bits in a single file.
+E.g. bits 0-31 - smi, 32-63 - tseg, etc.
+
+-- 
+MST
