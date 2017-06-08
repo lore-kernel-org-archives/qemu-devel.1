@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dIyBq-0004uM-OR
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 10:13:35 -0400
+	(envelope-from <thuth@redhat.com>) id 1dIyGH-0008JD-JP
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 10:18:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dIyBn-0008Tb-Ki
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 10:13:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49134)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dIyBn-0008TB-FR
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 10:13:31 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu,  8 Jun 2017 18:13:13 +0400
-Message-Id: <20170608141313.27588-4-marcandre.lureau@redhat.com>
-In-Reply-To: <20170608141313.27588-1-marcandre.lureau@redhat.com>
-References: <20170608141313.27588-1-marcandre.lureau@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 3/3] test-char: start a /char/serial test
+	(envelope-from <thuth@redhat.com>) id 1dIyGE-0002Lj-Fx
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 10:18:09 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Thu,  8 Jun 2017 16:18:02 +0200
+Message-Id: <1496931482-29914-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] Makefile: Move balloon.o,
+ numa.o and bootdevice.o to common-obj-y
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +19,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrew Jones <drjones@redhat.com>
 
-Quite limited test, to check that the chardev can be created with a
-path and with the tty alias.
+There does not seem to be any target specific code in these files, so
+we can put them into "common-obj" instead of "obj" to compile them only
+once for all targets.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/test-char.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ Makefile.objs   | 1 +
+ Makefile.target | 3 +--
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/test-char.c b/tests/test-char.c
-index dfe856cb85..9e361c8d09 100644
---- a/tests/test-char.c
-+++ b/tests/test-char.c
-@@ -450,6 +450,32 @@ static void char_udp_test(void)
-     g_free(tmp);
- }
-=20
-+#ifdef HAVE_CHARDEV_SERIAL
-+static void char_serial_test(void)
-+{
-+    QemuOpts *opts;
-+    Chardev *chr;
-+
-+    opts =3D qemu_opts_create(qemu_find_opts("chardev"), "serial-id",
-+                            1, &error_abort);
-+    qemu_opt_set(opts, "backend", "serial", &error_abort);
-+    qemu_opt_set(opts, "path", "/dev/null", &error_abort);
-+
-+    chr =3D qemu_chr_new_from_opts(opts, NULL);
-+    g_assert_nonnull(chr);
-+    /* TODO: add more tests with a pty */
-+    object_unparent(OBJECT(chr));
-+
-+    /* test tty alias */
-+    qemu_opt_set(opts, "backend", "tty", &error_abort);
-+    chr =3D qemu_chr_new_from_opts(opts, NULL);
-+    g_assert_nonnull(chr);
-+    object_unparent(OBJECT(chr));
-+
-+    qemu_opts_del(opts);
-+}
-+#endif
-+
- static void char_file_test(void)
- {
-     char *tmp_path =3D g_dir_make_tmp("qemu-test-char.XXXXXX", NULL);
-@@ -597,6 +623,9 @@ int main(int argc, char **argv)
-     g_test_add_func("/char/file", char_file_test);
-     g_test_add_func("/char/socket", char_socket_test);
-     g_test_add_func("/char/udp", char_udp_test);
-+#ifdef HAVE_CHARDEV_SERIAL
-+    g_test_add_func("/char/serial", char_serial_test);
-+#endif
-=20
-     return g_test_run();
- }
---=20
-2.13.0.91.g00982b8dd
+diff --git a/Makefile.objs b/Makefile.objs
+index 0575802..a949502 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -40,6 +40,7 @@ io-obj-y = io/
+ 
+ ifeq ($(CONFIG_SOFTMMU),y)
+ common-obj-y = blockdev.o blockdev-nbd.o block/
++common-obj-y += balloon.o numa.o bootdevice.o
+ common-obj-y += iothread.o
+ common-obj-y += net/
+ common-obj-y += qdev-monitor.o device-hotplug.o
+diff --git a/Makefile.target b/Makefile.target
+index ce8dfe4..da37258 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -139,8 +139,7 @@ endif #CONFIG_BSD_USER
+ #########################################################
+ # System emulator target
+ ifdef CONFIG_SOFTMMU
+-obj-y += arch_init.o cpus.o monitor.o gdbstub.o balloon.o ioport.o numa.o
+-obj-y += qtest.o bootdevice.o
++obj-y += arch_init.o cpus.o monitor.o gdbstub.o ioport.o qtest.o
+ obj-y += hw/
+ obj-$(CONFIG_KVM) += kvm-all.o
+ obj-y += memory.o cputlb.o
+-- 
+1.8.3.1
