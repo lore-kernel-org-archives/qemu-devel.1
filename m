@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dIw6b-0004uV-7l
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 08:00:11 -0400
+	(envelope-from <eblake@redhat.com>) id 1dIwS1-0005fG-05
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 08:22:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dIw6W-0003Hj-Eo
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 08:00:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45218)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dIw6W-0003HY-92
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 07:59:56 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu,  8 Jun 2017 15:59:39 +0400
-Message-Id: <20170608115939.30985-4-marcandre.lureau@redhat.com>
-In-Reply-To: <20170608115939.30985-1-marcandre.lureau@redhat.com>
-References: <20170608115939.30985-1-marcandre.lureau@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dIwRx-00044s-1q
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 08:22:09 -0400
+References: <1496907604-2393-1-git-send-email-thuth@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1e50d054-a342-39c1-db69-3b7adf162b79@redhat.com>
+Date: Thu, 8 Jun 2017 07:21:59 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 3/3] test-char: start a /char/serial test
+In-Reply-To: <1496907604-2393-1-git-send-email-thuth@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="fG2QXQgqrgO2mthQlgF8BxB8wooSnlUWg"
+Subject: Re: [Qemu-devel] [PATCH v2] Makefile: Do not generate files if
+ "configure" has not been run yet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,72 +24,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: anthony.perard@citrix.com, pbonzini@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-Quite limited test, to check that the chardev can be created with a
-path and with the tty alias.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--fG2QXQgqrgO2mthQlgF8BxB8wooSnlUWg
+From: Eric Blake <eblake@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <1e50d054-a342-39c1-db69-3b7adf162b79@redhat.com>
+Subject: Re: [PATCH v2] Makefile: Do not generate files if "configure" has not
+ been run yet
+References: <1496907604-2393-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <1496907604-2393-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- tests/test-char.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+On 06/08/2017 02:40 AM, Thomas Huth wrote:
+> When doing a "make -j10" in the vanilla QEMU source tree (without
+> running "configure first), the Makefile currently generates two
+> files already, qemu-version.h and qemu-options.def. This should not
+> happen, so let's make these targets depend on config-host.mak.
+> Also the targets that use python  can not be executed without the
+> $(PYTHON) from config-host.mak, so these should depend on the config-
+> host.mak file, too (these targets generate some ugly error messages
+> otherwise during "make -j10").
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  v2:
+>  - Add the dependency to the targets that use $(PYTHON) instead of
+>    adding it to $(qapi-py)
+>=20
+> @@ -312,6 +312,7 @@ qemu-version.h: FORCE
+> =20
+>  config-host.h: config-host.h-timestamp
+>  config-host.h-timestamp: config-host.mak
+> +qemu-options.def: config-host.mak
+>  qemu-options.def: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxto=
+ol
+>  	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN"=
+,"$@")
 
-diff --git a/tests/test-char.c b/tests/test-char.c
-index dfe856cb85..ecc3fec194 100644
---- a/tests/test-char.c
-+++ b/tests/test-char.c
-@@ -5,6 +5,7 @@
- #include "qemu/config-file.h"
- #include "qemu/sockets.h"
- #include "chardev/char-fe.h"
-+#include "chardev/char-serial.h" /* for HAVE_CHARDEV_SERIAL */
- #include "sysemu/sysemu.h"
- #include "qapi/error.h"
- #include "qom/qom-qobject.h"
-@@ -450,6 +451,32 @@ static void char_udp_test(void)
-     g_free(tmp);
- }
-=20
-+#ifdef HAVE_CHARDEV_SERIAL
-+static void char_serial_test(void)
-+{
-+    QemuOpts *opts;
-+    Chardev *chr;
-+
-+    opts =3D qemu_opts_create(qemu_find_opts("chardev"), "serial-id",
-+                            1, &error_abort);
-+    qemu_opt_set(opts, "backend", "serial", &error_abort);
-+    qemu_opt_set(opts, "path", "/dev/null", &error_abort);
-+
-+    chr =3D qemu_chr_new_from_opts(opts, NULL);
-+    g_assert_nonnull(chr);
-+    /* TODO: add more tests with a pty */
-+    object_unparent(OBJECT(chr));
-+
-+    /* test tty alias */
-+    qemu_opt_set(opts, "backend", "tty", &error_abort);
-+    chr =3D qemu_chr_new_from_opts(opts, NULL);
-+    g_assert_nonnull(chr);
-+    object_unparent(OBJECT(chr));
-+
-+    qemu_opts_del(opts);
-+}
-+#endif
-+
- static void char_file_test(void)
- {
-     char *tmp_path =3D g_dir_make_tmp("qemu-test-char.XXXXXX", NULL);
-@@ -597,6 +624,9 @@ int main(int argc, char **argv)
-     g_test_add_func("/char/file", char_file_test);
-     g_test_add_func("/char/socket", char_socket_test);
-     g_test_add_func("/char/udp", char_udp_test);
-+#ifdef HAVE_CHARDEV_SERIAL
-+    g_test_add_func("/char/serial", char_serial_test);
-+#endif
-=20
-     return g_test_run();
- }
+This works (namely, splitting the dependencies between a no-op rule and
+the real rule:
+
+a:b
+a:c
+	recipe
+
+), but looks unusual compared to having a single rule with all the
+dependencies:
+
+a: b c
+	recipe
+
+> @@ -394,17 +395,17 @@ gen-out-type =3D $(subst .,-,$(suffix $@))
+>  qapi-py =3D $(SRC_PATH)/scripts/qapi.py $(SRC_PATH)/scripts/ordereddic=
+t.py
+> =20
+>  qga/qapi-generated/qga-qapi-types.c qga/qapi-generated/qga-qapi-types.=
+h :\
+> -$(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-types.py $(q=
+api-py)
+> +$(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-types.py $(q=
+api-py) config-host.mak
+>  	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-types.py \
+
+Long line. Let's use \ line-splitting to keep things under 80 columns
+(if Fam's suggestion of adding the dependency just once doesn't pan out).=
+
+
+>  		$(gen-out-type) -o qga/qapi-generated -p "qga-" $<, \
+>  		"GEN","$@")
+>  qga/qapi-generated/qga-qapi-visit.c qga/qapi-generated/qga-qapi-visit.=
+h :\
+> -$(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-visit.py $(q=
+api-py)
+> +$(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-visit.py $(q=
+api-py) config-host.mak
+
+More long lines ahead.
+
 --=20
-2.13.0.91.g00982b8dd
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--fG2QXQgqrgO2mthQlgF8BxB8wooSnlUWg
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZOUFnAAoJEKeha0olJ0NqrEoH/i1RCOnD6xiZhSJl5v3j44N/
+oJWhnrpcwofGiDDED9DFi9Vwec2IKXW41+QTXP+VCXQjafGy3mVpM83q2sXyRtK1
+1TCTqUY8zrnZxxrs75Unv6I4sf6Pmd4JidCH+P6elMYAGqvypkfbBP5Jtumw+xbf
+mQsBjaicGDQZNlXkMp+9Vcbz0zVahp4KBfnDelkvVqCfZvQJbVo/ORQK0BnPLqJi
+pF4x7PxIlNsX+ZhfOhntRpHplIdC8ggYU4G97CPq5ULU4HHn40DBrt4nFjDbZPrM
+kwPVQfyc2c+snq+MkMfrXWZM+5Uucvg880FPcNBskWExLCCmi5zXbfAiQneQ3jg=
+=wMVC
+-----END PGP SIGNATURE-----
+
+--fG2QXQgqrgO2mthQlgF8BxB8wooSnlUWg--
