@@ -1,17 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dJ1Dt-00075s-97
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 13:27:54 -0400
+	(envelope-from <mst@redhat.com>) id 1dJ1Ra-0002qK-BY
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 13:42:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dJ1Ds-00064i-1j
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 13:27:53 -0400
-From: Laurent Vivier <lvivier@redhat.com>
-Date: Thu,  8 Jun 2017 19:27:43 +0200
-Message-Id: <20170608172743.10132-3-lvivier@redhat.com>
-In-Reply-To: <20170608172743.10132-1-lvivier@redhat.com>
-References: <20170608172743.10132-1-lvivier@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/2] Revert "spapr: fix memory
- hot-unplugging"
+	(envelope-from <mst@redhat.com>) id 1dJ1RU-0004e1-RS
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 13:42:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35452)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dJ1RU-0004dm-Hi
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 13:41:56 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 266BABCD47
+	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 17:41:55 +0000 (UTC)
+Date: Thu, 8 Jun 2017 20:41:50 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170608204026-mutt-send-email-mst@kernel.org>
+References: <20170608161013.17920-1-lersek@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170608161013.17920-1-lersek@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] q35/mch: implement extended TSEG sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,81 +32,252 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, Laurent Vivier <lvivier@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu devel list <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-This reverts commit fe6824d12642b005c69123ecf8631f9b13553f8b.
+On Thu, Jun 08, 2017 at 06:10:13PM +0200, Laszlo Ersek wrote:
+> The q35 machine type currently lets the guest firmware select a 1MB, 2MB
+> or 8MB TSEG (basically, SMRAM) size. In edk2/OVMF, we use 8MB, but even
+> that is not enough when a lot of VCPUs (more than approx. 224) are
+> configured -- SMRAM footprint scales largely proportionally with VCPU
+> count.
+> 
+> Introduce a new property for "mch" called "extended-tseg-mbytes", which
+> expresses (in megabytes) the user's choice of TSEG (SMRAM) size.
+> 
+> Invent a new, QEMU-specific register in the config space of the DRAM
+> Controller, at offset 0x50, in order to allow guest firmware to query the
+> TSEG (SMRAM) size.
+> 
+> According to Intel Document Number 316966-002, Table 5-1 "DRAM Controller
+> Register Address Map (D0:F0)":
+> 
+>     Warning: Address locations that are not listed are considered Intel
+>              Reserved registers locations. Reads to Reserved registers may
+>              return non-zero values. Writes to reserved locations may
+>              cause system failures.
+> 
+>              All registers that are defined in the PCI 2.3 specification,
+>              but are not necessary or implemented in this component are
+>              simply not included in this document. The
+>              reserved/unimplemented space in the PCI configuration header
+>              space is not documented as such in this summary.
+> 
+> Offsets 0x50 and 0x51 are not listed in Table 5-1. They are also not part
+> of the standard PCI config space header. And they precede the capability
+> list as well, which starts at 0xe0 for this device.
+> 
+> When the guest writes value 0xffff to this register, the value that can be
+> read back is that of "mch.extended-tseg-mbytes" -- unless it remains
+> 0xffff. The guest is required to write 0xffff first (as opposed to a
+> read-only register) because PCI config space is generally not cleared on
+> QEMU reset, and after S3 resume or reboot, new guest firmware running on
+> old QEMU could read a guest OS-injected value from this register.
+> 
+> After reading the available "extended" TSEG size, the guest firmware may
+> actually request that TSEG size by writing pattern 11b to the ESMRAMC
+> register's TSEG_SZ bit-field. (The Intel spec referenced above defines
+> only patterns 00b (1MB), 01b (2MB) and 10b (8MB); 11b is reserved.)
+> 
+> On the QEMU command line, the value can be set with
+> 
+>   -global mch.extended-tseg-mbytes=N
+> 
+> The default value for 2.10+ q35 machine types is 16. The value is limited
+> to 0xfff (4095) at the moment, purely so that the product (4095 MB) can be
+> stored to the uint32_t variable "tseg_size" in mch_update_smram(). Users
+> are responsible for choosing sensible TSEG sizes.
+> 
+> On 2.9 and earlier q35 machine types, the default value is 0. This lets
+> the 11b bit pattern in ESMRAMC.TSEG_SZ, and the register at offset 0x50,
+> keep their original behavior.
+> 
+> When "extended-tseg-mbytes" is nonzero, the new register at offset 0x50 is
+> set to that value on reset, for completeness.
+> 
+> PCI config space is migrated automatically, so no VMSD changes are
+> necessary.
+> 
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Ref: https://bugzilla.redhat.com/show_bug.cgi?id=1447027
+> Ref: https://lists.01.org/pipermail/edk2-devel/2017-May/010456.html
+> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
 
-Conflicts hw/ppc/spapr_drc.c, because get_index() has been renamed
-spapr_get_index().
+I really dislike negotiation being re-invented for each device.  Do we
+need these tricks?  Can we just do fw cfg with standard discovery?
+This ties in with my proposal to generalize smi features to
+generic ones.
 
-This didn't fix the problem. Once the hotplug has been started
-some memory is allocated and some structures are allocated.
-We don't free it when we ignore the unplug, and we can't because
-they can be in use by the kernel.
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
----
- hw/ppc/spapr_drc.c         | 20 +++-----------------
- include/hw/ppc/spapr_drc.h |  1 -
- 2 files changed, 3 insertions(+), 18 deletions(-)
-
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index 39e7f30..7605977 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -140,17 +140,6 @@ static uint32_t set_allocation_state(sPAPRDRConnector *drc,
-         if (!drc->dev) {
-             return RTAS_OUT_NO_SUCH_INDICATOR;
-         }
--        if (drc->awaiting_release && drc->awaiting_allocation) {
--            /* kernel is acknowledging a previous hotplug event
--             * while we are already removing it.
--             * it's safe to ignore awaiting_allocation here since we know the
--             * situation is predicated on the guest either already having done
--             * so (boot-time hotplug), or never being able to acquire in the
--             * first place (hotplug followed by immediate unplug).
--             */
--            drc->awaiting_allocation_skippable = true;
--            return RTAS_OUT_NO_SUCH_INDICATOR;
--        }
-     }
- 
-     if (spapr_drc_type(drc) != SPAPR_DR_CONNECTOR_TYPE_PCI) {
-@@ -401,11 +390,9 @@ static void detach(sPAPRDRConnector *drc, DeviceState *d, Error **errp)
-     }
- 
-     if (drc->awaiting_allocation) {
--        if (!drc->awaiting_allocation_skippable) {
--            drc->awaiting_release = true;
--            trace_spapr_drc_awaiting_allocation(spapr_drc_index(drc));
--            return;
--        }
-+        drc->awaiting_release = true;
-+        trace_spapr_drc_awaiting_allocation(spapr_drc_index(drc));
-+        return;
-     }
- 
-     drc->indicator_state = SPAPR_DR_INDICATOR_STATE_INACTIVE;
-@@ -428,7 +415,6 @@ static void detach(sPAPRDRConnector *drc, DeviceState *d, Error **errp)
-     }
- 
-     drc->awaiting_release = false;
--    drc->awaiting_allocation_skippable = false;
-     g_free(drc->fdt);
-     drc->fdt = NULL;
-     drc->fdt_start_offset = 0;
-diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-index c88e1be..84b58f0 100644
---- a/include/hw/ppc/spapr_drc.h
-+++ b/include/hw/ppc/spapr_drc.h
-@@ -200,7 +200,6 @@ typedef struct sPAPRDRConnector {
-     bool awaiting_release;
-     bool signalled;
-     bool awaiting_allocation;
--    bool awaiting_allocation_skippable;
- 
-     /* device pointer, via link property */
-     DeviceState *dev;
--- 
-2.9.4
+> ---
+> 
+> Notes:
+>     RFC->PATCH changes:
+>     - This is an identical PATCH repost of the original RFC at
+>       <http://lists.nongnu.org/archive/html/qemu-devel/2017-05/msg06912.html>;
+>       I got the OVMF patches now.
+> 
+>  include/hw/i386/pc.h      |  5 +++++
+>  include/hw/pci-host/q35.h |  6 ++++++
+>  hw/pci-host/q35.c         | 41 ++++++++++++++++++++++++++++++++++++++---
+>  3 files changed, 49 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index d071c9c0e9cd..233216abdc1a 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -384,6 +384,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+>  
+>  #define PC_COMPAT_2_9 \
+>      HW_COMPAT_2_9 \
+> +    {\
+> +        .driver   = "mch",\
+> +        .property = "extended-tseg-mbytes",\
+> +        .value    = stringify(0),\
+> +    },\
+>  
+>  #define PC_COMPAT_2_8 \
+>      HW_COMPAT_2_8 \
+> diff --git a/include/hw/pci-host/q35.h b/include/hw/pci-host/q35.h
+> index 53b6760c16c5..58983c00b32d 100644
+> --- a/include/hw/pci-host/q35.h
+> +++ b/include/hw/pci-host/q35.h
+> @@ -60,6 +60,7 @@ typedef struct MCHPCIState {
+>      uint64_t above_4g_mem_size;
+>      uint64_t pci_hole64_size;
+>      uint32_t short_root_bus;
+> +    uint16_t ext_tseg_mbytes;
+>  } MCHPCIState;
+>  
+>  typedef struct Q35PCIHost {
+> @@ -91,6 +92,11 @@ typedef struct Q35PCIHost {
+>  /* D0:F0 configuration space */
+>  #define MCH_HOST_BRIDGE_REVISION_DEFAULT       0x0
+>  
+> +#define MCH_HOST_BRIDGE_EXT_TSEG_MBYTES        0x50
+> +#define MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_SIZE   2
+> +#define MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_QUERY  0xffff
+> +#define MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_MAX    0xfff
+> +
+>  #define MCH_HOST_BRIDGE_PCIEXBAR               0x60    /* 64bit register */
+>  #define MCH_HOST_BRIDGE_PCIEXBAR_SIZE          8       /* 64bit register */
+>  #define MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT       0xb0000000
+> diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+> index cd5c49616ef9..28cb97b60fa3 100644
+> --- a/hw/pci-host/q35.c
+> +++ b/hw/pci-host/q35.c
+> @@ -134,7 +134,7 @@ static void q35_host_get_mmcfg_size(Object *obj, Visitor *v, const char *name,
+>      visit_type_uint32(v, name, &value, errp);
+>  }
+>  
+> -static Property mch_props[] = {
+> +static Property q35_host_props[] = {
+>      DEFINE_PROP_UINT64(PCIE_HOST_MCFG_BASE, Q35PCIHost, parent_obj.base_addr,
+>                          MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT),
+>      DEFINE_PROP_SIZE(PCI_HOST_PROP_PCI_HOLE64_SIZE, Q35PCIHost,
+> @@ -154,7 +154,7 @@ static void q35_host_class_init(ObjectClass *klass, void *data)
+>  
+>      hc->root_bus_path = q35_host_root_bus_path;
+>      dc->realize = q35_host_realize;
+> -    dc->props = mch_props;
+> +    dc->props = q35_host_props;
+>      /* Reason: needs to be wired up by pc_q35_init */
+>      dc->user_creatable = false;
+>      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+> @@ -369,7 +369,7 @@ static void mch_update_smram(MCHPCIState *mch)
+>              tseg_size = 1024 * 1024 * 8;
+>              break;
+>          default:
+> -            tseg_size = 0;
+> +            tseg_size = 1024 * 1024 * (uint32_t)mch->ext_tseg_mbytes;
+>              break;
+>          }
+>      } else {
+> @@ -392,6 +392,17 @@ static void mch_update_smram(MCHPCIState *mch)
+>      memory_region_transaction_commit();
+>  }
+>  
+> +static void mch_update_ext_tseg_mbytes(MCHPCIState *mch)
+> +{
+> +    PCIDevice *pd = PCI_DEVICE(mch);
+> +    uint8_t *reg = pd->config + MCH_HOST_BRIDGE_EXT_TSEG_MBYTES;
+> +
+> +    if (mch->ext_tseg_mbytes > 0 &&
+> +        pci_get_word(reg) == MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_QUERY) {
+> +        pci_set_word(reg, mch->ext_tseg_mbytes);
+> +    }
+> +}
+> +
+>  static void mch_write_config(PCIDevice *d,
+>                                uint32_t address, uint32_t val, int len)
+>  {
+> @@ -413,6 +424,11 @@ static void mch_write_config(PCIDevice *d,
+>                         MCH_HOST_BRIDGE_SMRAM_SIZE)) {
+>          mch_update_smram(mch);
+>      }
+> +
+> +    if (ranges_overlap(address, len, MCH_HOST_BRIDGE_EXT_TSEG_MBYTES,
+> +                       MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_SIZE)) {
+> +        mch_update_ext_tseg_mbytes(mch);
+> +    }
+>  }
+>  
+>  static void mch_update(MCHPCIState *mch)
+> @@ -420,6 +436,7 @@ static void mch_update(MCHPCIState *mch)
+>      mch_update_pciexbar(mch);
+>      mch_update_pam(mch);
+>      mch_update_smram(mch);
+> +    mch_update_ext_tseg_mbytes(mch);
+>  }
+>  
+>  static int mch_post_load(void *opaque, int version_id)
+> @@ -457,6 +474,11 @@ static void mch_reset(DeviceState *qdev)
+>      d->wmask[MCH_HOST_BRIDGE_SMRAM] = MCH_HOST_BRIDGE_SMRAM_WMASK;
+>      d->wmask[MCH_HOST_BRIDGE_ESMRAMC] = MCH_HOST_BRIDGE_ESMRAMC_WMASK;
+>  
+> +    if (mch->ext_tseg_mbytes > 0) {
+> +        pci_set_word(d->config + MCH_HOST_BRIDGE_EXT_TSEG_MBYTES,
+> +                     MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_QUERY);
+> +    }
+> +
+>      mch_update(mch);
+>  }
+>  
+> @@ -465,6 +487,12 @@ static void mch_realize(PCIDevice *d, Error **errp)
+>      int i;
+>      MCHPCIState *mch = MCH_PCI_DEVICE(d);
+>  
+> +    if (mch->ext_tseg_mbytes > MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_MAX) {
+> +        error_setg(errp, "invalid extended-tseg-mbytes value: %" PRIu16,
+> +                   mch->ext_tseg_mbytes);
+> +        return;
+> +    }
+> +
+>      /* setup pci memory mapping */
+>      pc_pci_as_mapping_init(OBJECT(mch), mch->system_memory,
+>                             mch->pci_address_space);
+> @@ -530,6 +558,12 @@ uint64_t mch_mcfg_base(void)
+>      return MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT;
+>  }
+>  
+> +static Property mch_props[] = {
+> +    DEFINE_PROP_UINT16("extended-tseg-mbytes", MCHPCIState, ext_tseg_mbytes,
+> +                       16),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+>  static void mch_class_init(ObjectClass *klass, void *data)
+>  {
+>      PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+> @@ -538,6 +572,7 @@ static void mch_class_init(ObjectClass *klass, void *data)
+>      k->realize = mch_realize;
+>      k->config_write = mch_write_config;
+>      dc->reset = mch_reset;
+> +    dc->props = mch_props;
+>      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+>      dc->desc = "Host bridge";
+>      dc->vmsd = &vmstate_mch;
+> -- 
+> 2.9.3
