@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dItmo-00033S-Q5
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:31:27 -0400
+	(envelope-from <clg@kaod.org>) id 1dItne-0003d5-V9
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:32:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dItmj-0004iR-U8
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:31:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60552)
+	(envelope-from <clg@kaod.org>) id 1dItna-0004vQ-1t
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:32:19 -0400
+Received: from 5.mo4.mail-out.ovh.net ([188.165.44.50]:57714)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dItmj-0004i5-LC
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:31:21 -0400
-Date: Thu, 8 Jun 2017 10:31:13 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170608093113.GB2082@work-vm>
-References: <20170605085254.16485-1-sf@sfritsch.de>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dItnZ-0004v3-Nd
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 05:32:13 -0400
+Received: from player772.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 7A5A2702C5
+	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 11:32:11 +0200 (CEST)
+References: <149685579678.12025.9278446121024037161.stgit@bahia.lan>
+	<149685582923.12025.13700165807436904935.stgit@bahia.lan>
+	<20170608020112.GT13397@umbus.fritz.box>
+	<20170608104530.65b7d53e@bahia.ttt.fr.ibm.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <b713d9db-2805-15ee-28cb-68a13ba981e5@kaod.org>
+Date: Thu, 8 Jun 2017 11:32:08 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20170605085254.16485-1-sf@sfritsch.de>
-Subject: Re: [Qemu-devel] [PATCH] Add chardev-send-break monitor command
+In-Reply-To: <20170608104530.65b7d53e@bahia.ttt.fr.ibm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] xics: setup cpu at realize time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,151 +32,322 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Fritsch <sf@sfritsch.de>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-* Stefan Fritsch (sf@sfritsch.de) wrote:
-> Sending a break on a serial console can be useful for debugging the
-> guest. But not all chardev backends support sending breaks (only telnet
-> and mux do). The chardev-send-break command allows to send a break even
-> if using other backends.
->=20
-> Signed-off-by: Stefan Fritsch <sf@sfritsch.de>
+On 06/08/2017 10:45 AM, Greg Kurz wrote:
+> On Thu, 8 Jun 2017 12:01:12 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+> 
+>> On Wed, Jun 07, 2017 at 07:17:09PM +0200, Greg Kurz wrote:
+>>> Until recently, spapr used to allocate ICPState objects for the lifetime
+>>> of the machine. They would only be associated to vCPUs in xics_cpu_setup()
+>>> when plugging a CPU core.
+>>>
+>>> Now that ICPState objects have the same lifecycle as vCPUs, it is
+>>> possible to associate them during realization.
+>>>
+>>> This patch hence open-codes xics_cpu_setup() in icp_realize(). The vCPU
+>>> is passed as a property. Note that vCPU now needs to be realized first
+>>> for the IRQs to be allocated. It also needs to resetted before ICPState
+>>> realization in order to synchronize with KVM.  
+>>
+>> Ok, what enforces those ordering constraints?
+>>
+> 
+> I'm not sure about what you're asking... I had to re-order because
+> xics_cpu_setup() used to be called after the vCPU is realized and
+> put in PAPR mode.
+> 
+> Especially, we have these lines:
+> 
+>     switch (PPC_INPUT(env)) {
+>     case PPC_FLAGS_INPUT_POWER7:
+>         icp->output = env->irq_inputs[POWER7_INPUT_INT];
+>         break;
+> 
+>     case PPC_FLAGS_INPUT_970:
+>         icp->output = env->irq_inputs[PPC970_INPUT_INT];
+>         break;
+> 
+> They depend on env->irq_inputs being allocated. This happens on the
+> 
+> spapr_cpu_core_realize_child()
+> {
+>     ...
+>     object_property_set_bool(child, true, "realized", &local_err);
+>      object_property_set_bool()
+>       object_property_set_qobject()
+>        object_property_set()
+>         property_set_bool()
+>          device_set_realized()
+>           ppc_cpu_realizefn()
+>            init_ppc_proc()
+>             init_proc_POWER8()
+>              ppcPOWER7_irq_init()
+> 
+> and, when using xics_kvm:
+> 
+> icp_kvm_cpu_setup()
+> {
+>     ...
+>     ret = kvm_vcpu_enable_cap(cs, KVM_CAP_IRQ_XICS, 0, kernel_xics_fd, vcpu_id);
+> 
+> This ioctl returns EINVAL because it fails the kvmppc_sanity_check() in KVM.
+> 
+> It depends on QEMU enabling KVM_CAP_PPC_PAPR for the vCPU, which happens in:
+> 
+> spapr_cpu_core_realize_child()
+> {
+>     ...
+>     spapr_cpu_init(spapr, cpu, &local_err);
+>      cpu_ppc_set_papr()
+>       kvmppc_set_papr()
+> 
+>>> Since ICPState objects are freed when unrealized, xics_cpu_destroy() isn't
+>>> needed anymore and can be safely dropped.
+>>>
+>>> Signed-off-by: Greg Kurz <groug@kaod.org>  
+>>
+>>
+>> Looks pretty good, though a couple nits below.
+>>
+> 
+> Thanks. I'm also thinking about going one step further and converting
+> xics_kvm to use the icpc->realize() handler instead of icpc->cpu_setup().
+> Makes sense ?
 
-=46rom the HMP side, it looks OK, you could easily add a line to
-tests/test-hmp.c's command list.
+It should be fine I think, now that a reset handler is defined.
 
-But,
+C.
 
-Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Dave
-
-> ---
->  chardev/char.c   | 12 ++++++++++++
->  hmp-commands.hx  | 16 ++++++++++++++++
->  hmp.c            |  8 ++++++++
->  hmp.h            |  1 +
->  qapi-schema.json | 20 ++++++++++++++++++++
->  5 files changed, 57 insertions(+)
->=20
-> diff --git a/chardev/char.c b/chardev/char.c
-> index 4e24dc39af..fa54f7c915 100644
-> --- a/chardev/char.c
-> +++ b/chardev/char.c
-> @@ -1307,6 +1307,18 @@ void qmp_chardev_remove(const char *id, Error **er=
-rp)
->      object_unparent(OBJECT(chr));
->  }
-> =20
-> +void qmp_chardev_send_break(const char *id, Error **errp)
-> +{
-> +    Chardev *chr;
-> +
-> +    chr =3D qemu_chr_find(id);
-> +    if (chr =3D=3D NULL) {
-> +        error_setg(errp, "Chardev '%s' not found", id);
-> +        return;
-> +    }
-> +    qemu_chr_be_event(chr, CHR_EVENT_BREAK);
-> +}
-> +
->  void qemu_chr_cleanup(void)
->  {
->      object_unparent(get_chardevs_root());
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index e763606fe5..fc8d54b52a 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -1745,6 +1745,22 @@ Removes the chardev @var{id}.
->  ETEXI
-> =20
->      {
-> +        .name       =3D "chardev-send-break",
-> +        .args_type  =3D "id:s",
-> +        .params     =3D "id",
-> +        .help       =3D "send break on chardev",
-> +        .cmd        =3D hmp_chardev_send_break,
-> +        .command_completion =3D chardev_remove_completion,
-> +    },
-> +
-> +STEXI
-> +@item chardev-send-break id
-> +@findex chardev-send-break
-> +Sends break on the chardev @var{id}.
-> +
-> +ETEXI
-> +
-> +    {
->          .name       =3D "qemu-io",
->          .args_type  =3D "device:B,command:s",
->          .params     =3D "[device] \"[command]\"",
-> diff --git a/hmp.c b/hmp.c
-> index ad723903a6..fb2a38b7d6 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -2233,6 +2233,14 @@ void hmp_chardev_remove(Monitor *mon, const QDict =
-*qdict)
->      hmp_handle_error(mon, &local_err);
->  }
-> =20
-> +void hmp_chardev_send_break(Monitor *mon, const QDict *qdict)
-> +{
-> +    Error *local_err =3D NULL;
-> +
-> +    qmp_chardev_send_break(qdict_get_str(qdict, "id"), &local_err);
-> +    hmp_handle_error(mon, &local_err);
-> +}
-> +
->  void hmp_qemu_io(Monitor *mon, const QDict *qdict)
->  {
->      BlockBackend *blk;
-> diff --git a/hmp.h b/hmp.h
-> index d8b94ce9dc..214b2617e7 100644
-> --- a/hmp.h
-> +++ b/hmp.h
-> @@ -103,6 +103,7 @@ void hmp_nbd_server_add(Monitor *mon, const QDict *qd=
-ict);
->  void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict);
->  void hmp_chardev_add(Monitor *mon, const QDict *qdict);
->  void hmp_chardev_remove(Monitor *mon, const QDict *qdict);
-> +void hmp_chardev_send_break(Monitor *mon, const QDict *qdict);
->  void hmp_qemu_io(Monitor *mon, const QDict *qdict);
->  void hmp_cpu_add(Monitor *mon, const QDict *qdict);
->  void hmp_object_add(Monitor *mon, const QDict *qdict);
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 4b50b652d3..e01dd83dd9 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -5114,6 +5114,26 @@
->  { 'command': 'chardev-remove', 'data': {'id': 'str'} }
-> =20
->  ##
-> +# @chardev-send-break:
-> +#
-> +# Send a break to a character device
-> +#
-> +# @id: the chardev's ID, must exist
-> +#
-> +# Returns: Nothing on success
-> +#
-> +# Since: 2.10
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "chardev-send-break", "arguments": { "id" : "foo" } }
-> +# <- { "return": {} }
-> +#
-> +##
-> +{ 'command': 'chardev-send-break', 'data': {'id': 'str'} }
-> +
-> +
-> +##
->  # @TpmModel:
->  #
->  # An enumeration of TPM models
-> --=20
-> 2.11.0
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>> ---
+>>>  hw/intc/xics.c          |   76 ++++++++++++++++++++---------------------------
+>>>  hw/ppc/pnv_core.c       |   16 ++++------
+>>>  hw/ppc/spapr_cpu_core.c |   21 ++++++-------
+>>>  include/hw/ppc/xics.h   |    2 -
+>>>  4 files changed, 48 insertions(+), 67 deletions(-)
+>>>
+>>> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+>>> index ec73f02144c9..330441ff7fe8 100644
+>>> --- a/hw/intc/xics.c
+>>> +++ b/hw/intc/xics.c
+>>> @@ -38,50 +38,6 @@
+>>>  #include "monitor/monitor.h"
+>>>  #include "hw/intc/intc.h"
+>>>  
+>>> -void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu)
+>>> -{
+>>> -    CPUState *cs = CPU(cpu);
+>>> -    ICPState *icp = ICP(cpu->intc);
+>>> -
+>>> -    assert(icp);
+>>> -    assert(cs == icp->cs);
+>>> -
+>>> -    icp->output = NULL;
+>>> -    icp->cs = NULL;
+>>> -}
+>>> -
+>>> -void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu, ICPState *icp)
+>>> -{
+>>> -    CPUState *cs = CPU(cpu);
+>>> -    CPUPPCState *env = &cpu->env;
+>>> -    ICPStateClass *icpc;
+>>> -
+>>> -    assert(icp);
+>>> -
+>>> -    cpu->intc = OBJECT(icp);
+>>> -    icp->cs = cs;
+>>> -
+>>> -    icpc = ICP_GET_CLASS(icp);
+>>> -    if (icpc->cpu_setup) {
+>>> -        icpc->cpu_setup(icp, cpu);
+>>> -    }
+>>> -
+>>> -    switch (PPC_INPUT(env)) {
+>>> -    case PPC_FLAGS_INPUT_POWER7:
+>>> -        icp->output = env->irq_inputs[POWER7_INPUT_INT];
+>>> -        break;
+>>> -
+>>> -    case PPC_FLAGS_INPUT_970:
+>>> -        icp->output = env->irq_inputs[PPC970_INPUT_INT];
+>>> -        break;
+>>> -
+>>> -    default:
+>>> -        error_report("XICS interrupt controller does not support this CPU "
+>>> -                     "bus model");
+>>> -        abort();
+>>> -    }
+>>> -}
+>>> -
+>>>  void icp_pic_print_info(ICPState *icp, Monitor *mon)
+>>>  {
+>>>      int cpu_index = icp->cs ? icp->cs->cpu_index : -1;
+>>> @@ -343,6 +299,8 @@ static void icp_realize(DeviceState *dev, Error **errp)
+>>>  {
+>>>      ICPState *icp = ICP(dev);
+>>>      ICPStateClass *icpc = ICP_GET_CLASS(dev);
+>>> +    PowerPCCPU *cpu;
+>>> +    CPUPPCState *env;
+>>>      Object *obj;
+>>>      Error *err = NULL;
+>>>  
+>>> @@ -355,6 +313,36 @@ static void icp_realize(DeviceState *dev, Error **errp)
+>>>  
+>>>      icp->xics = XICS_FABRIC(obj);
+>>>  
+>>> +    obj = object_property_get_link(OBJECT(dev), "cs", &err);  
+>>
+>> I don't like the name "cs" for an externally visible property.  "cpu"
+>> would be better.
+>>
+> 
+> Right. I'll fix this.
+> 
+>>> +    if (!obj) {
+>>> +        error_setg(errp, "%s: required link 'xics' not found: %s",  
+>>
+>> Copy/paste mistake in this message.
+>>
+> 
+> Oops :)
+> 
+>>> +                   __func__, error_get_pretty(err));
+>>> +        return;
+>>> +    }
+>>> +
+>>> +    cpu = POWERPC_CPU(obj);
+>>> +    cpu->intc = OBJECT(icp);
+>>> +    icp->cs = CPU(obj);
+>>> +
+>>> +    if (icpc->cpu_setup) {
+>>> +        icpc->cpu_setup(icp, cpu);
+>>> +    }
+>>> +
+>>> +    env = &cpu->env;
+>>> +    switch (PPC_INPUT(env)) {
+>>> +    case PPC_FLAGS_INPUT_POWER7:
+>>> +        icp->output = env->irq_inputs[POWER7_INPUT_INT];
+>>> +        break;
+>>> +
+>>> +    case PPC_FLAGS_INPUT_970:
+>>> +        icp->output = env->irq_inputs[PPC970_INPUT_INT];
+>>> +        break;
+>>> +
+>>> +    default:
+>>> +        error_setg(errp, "XICS interrupt controller does not support this CPU bus model");
+>>> +        return;
+>>> +    }
+>>> +
+>>>      if (icpc->realize) {
+>>>          icpc->realize(dev, errp);
+>>>      }
+>>> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+>>> index e8a9a94d5a24..1393005e76f3 100644
+>>> --- a/hw/ppc/pnv_core.c
+>>> +++ b/hw/ppc/pnv_core.c
+>>> @@ -118,19 +118,19 @@ static void pnv_core_realize_child(Object *child, XICSFabric *xi, Error **errp)
+>>>      PowerPCCPU *cpu = POWERPC_CPU(cs);
+>>>      Object *obj;
+>>>  
+>>> -    obj = object_new(TYPE_PNV_ICP);
+>>> -    object_property_add_child(OBJECT(cpu), "icp", obj, &error_abort);
+>>> -    object_unref(obj);
+>>> -    object_property_add_const_link(obj, "xics", OBJECT(xi), &error_abort);
+>>> -    object_property_set_bool(obj, true, "realized", &local_err);
+>>> +    object_property_set_bool(child, true, "realized", &local_err);
+>>>      if (local_err) {
+>>>          error_propagate(errp, local_err);
+>>>          return;
+>>>      }
+>>>  
+>>> -    object_property_set_bool(child, true, "realized", &local_err);
+>>> +    obj = object_new(TYPE_PNV_ICP);
+>>> +    object_property_add_child(child, "icp", obj, NULL);
+>>> +    object_unref(obj);
+>>> +    object_property_add_const_link(obj, "xics", OBJECT(xi), &error_abort);
+>>> +    object_property_add_const_link(obj, "cs", child, &error_abort);
+>>> +    object_property_set_bool(obj, true, "realized", &local_err);
+>>>      if (local_err) {
+>>> -        object_unparent(obj);
+>>>          error_propagate(errp, local_err);
+>>>          return;
+>>>      }
+>>> @@ -141,8 +141,6 @@ static void pnv_core_realize_child(Object *child, XICSFabric *xi, Error **errp)
+>>>          error_propagate(errp, local_err);
+>>>          return;
+>>>      }
+>>> -
+>>> -    xics_cpu_setup(xi, cpu, ICP(obj));
+>>>  }
+>>>  
+>>>  static void pnv_core_realize(DeviceState *dev, Error **errp)
+>>> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+>>> index 029a14120edd..9a6259525953 100644
+>>> --- a/hw/ppc/spapr_cpu_core.c
+>>> +++ b/hw/ppc/spapr_cpu_core.c
+>>> @@ -53,9 +53,6 @@ static void spapr_cpu_reset(void *opaque)
+>>>  
+>>>  static void spapr_cpu_destroy(PowerPCCPU *cpu)
+>>>  {
+>>> -    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+>>> -
+>>> -    xics_cpu_destroy(XICS_FABRIC(spapr), cpu);
+>>>      qemu_unregister_reset(spapr_cpu_reset, cpu);
+>>>  }
+>>>  
+>>> @@ -140,28 +137,28 @@ static void spapr_cpu_core_realize_child(Object *child, Error **errp)
+>>>      sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+>>>      CPUState *cs = CPU(child);
+>>>      PowerPCCPU *cpu = POWERPC_CPU(cs);
+>>> -    Object *obj;
+>>> +    Object *obj = NULL;
+>>>  
+>>> -    obj = object_new(spapr->icp_type);
+>>> -    object_property_add_child(OBJECT(cpu), "icp", obj, &error_abort);
+>>> -    object_unref(obj);
+>>> -    object_property_add_const_link(obj, "xics", OBJECT(spapr), &error_abort);
+>>> -    object_property_set_bool(obj, true, "realized", &local_err);
+>>> +    object_property_set_bool(child, true, "realized", &local_err);
+>>>      if (local_err) {
+>>>          goto error;
+>>>      }
+>>>  
+>>> -    object_property_set_bool(child, true, "realized", &local_err);
+>>> +    spapr_cpu_init(spapr, cpu, &local_err);
+>>>      if (local_err) {
+>>>          goto error;
+>>>      }
+>>>  
+>>> -    spapr_cpu_init(spapr, cpu, &local_err);
+>>> +    obj = object_new(spapr->icp_type);
+>>> +    object_property_add_child(child, "icp", obj, &error_abort);
+>>> +    object_unref(obj);
+>>> +    object_property_add_const_link(obj, "xics", OBJECT(spapr), &error_abort);
+>>> +    object_property_add_const_link(obj, "cs", child, &error_abort);
+>>> +    object_property_set_bool(obj, true, "realized", &local_err);
+>>>      if (local_err) {
+>>>          goto error;
+>>>      }
+>>>  
+>>> -    xics_cpu_setup(XICS_FABRIC(spapr), cpu, ICP(obj));
+>>>      return;
+>>>  
+>>>  error:
+>>> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+>>> index 40a506eacfb4..05767a15be9a 100644
+>>> --- a/include/hw/ppc/xics.h
+>>> +++ b/include/hw/ppc/xics.h
+>>> @@ -183,8 +183,6 @@ void spapr_dt_xics(int nr_servers, void *fdt, uint32_t phandle);
+>>>  
+>>>  qemu_irq xics_get_qirq(XICSFabric *xi, int irq);
+>>>  ICPState *xics_icp_get(XICSFabric *xi, int server);
+>>> -void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu, ICPState *icp);
+>>> -void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu);
+>>>  
+>>>  /* Internal XICS interfaces */
+>>>  void icp_set_cppr(ICPState *icp, uint8_t cppr);
+>>>   
+>>
+> 
