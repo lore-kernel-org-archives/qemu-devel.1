@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dJ24E-0003GX-JN
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 14:21:59 -0400
+	(envelope-from <lersek@redhat.com>) id 1dJ2DA-0005mh-RO
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 14:31:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dJ24B-0003F7-PW
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 14:21:58 -0400
-Received: from smtp1.ntua.gr ([2001:648:2000:de::183]:17614)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dJ24B-0003D2-DD
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 14:21:55 -0400
-Date: Thu, 8 Jun 2017 21:21:13 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170608182113.nmxnvus26vplg5du@postretch>
+	(envelope-from <lersek@redhat.com>) id 1dJ2D6-00084O-8U
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 14:31:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59694)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dJ2D6-00083z-1t
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 14:31:08 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D01157F09D
+	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 18:31:06 +0000 (UTC)
+References: <20170608161013.17920-1-lersek@redhat.com>
+	<961e1ac9-56a5-df24-9ed7-e1981e61942a@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <51ff0ee5-3875-1a51-415c-170a8b3b8eaf@redhat.com>
+Date: Thu, 8 Jun 2017 20:31:02 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Subject: [Qemu-devel] [Proposal] I/O throttling through new -object interface
+In-Reply-To: <961e1ac9-56a5-df24-9ed7-e1981e61942a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] q35/mch: implement extended TSEG sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +34,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu devel list <qemu-devel@nongnu.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-In continuation of the discussion at [0], here follows a proposal for a 
-new ThrottleGroup object defined through QOM. 
+On 06/08/17 18:34, Paolo Bonzini wrote:
+> 
+> 
+> On 08/06/2017 18:10, Laszlo Ersek wrote:
+>> When the guest writes value 0xffff to this register, the value that can be
+>> read back is that of "mch.extended-tseg-mbytes" -- unless it remains
+>> 0xffff. The guest is required to write 0xffff first (as opposed to a
+>> read-only register) because PCI config space is generally not cleared on
+>> QEMU reset, and after S3 resume or reboot, new guest firmware running on
+>> old QEMU could read a guest OS-injected value from this register.
+> 
+> I guess that's also a reason not to make it readonly (that is, it would
+> require some firmware code anyway to test for "readonlyness" and
+> distinguish old machine types from new)?
 
-Throttle groups are currently defined when instantiating a drive in the 
-command line,, eg.  
--drive file=foo.qcow2,throttling.iops-total=100,throttling.group=bar
-and also on QMP with the 'block_set_io_throttle' command, eg:
+That's right; in
+<https://lists.01.org/pipermail/edk2-devel/2017-May/010432.html> I wrote,
 
-   { "execute": "block_set_io_throttle",
-     "arguments": {
-        "device": "virtio0",
-        "iops": 100,
-        "iops_rd": 0,
-        "iops_wr": 0,
-        "bps": 0,
-        "bps_rd": 0,
-        "bps_wr": 0
-     }
-   }
+> If we invent such a new register, it should be in a location that is
+> either read-only, or zeroed-on-reset, in current QEMU. Otherwise, new
+> firmware running on old QEMU could be misled by a guest OS that writes
+> to this register, and then either reboots or enters S3.
+>
+> ... With this in mind, I don't oppose "having to write somewhere to
+> read back the result", but then let's please make that write access as
+> well to the same new qemu-specific register, and not to MCH_ESMRAMC.
 
-As part of my GSoC project, IO throttling is moved to a block filter 
-driver, which means multiple filter nodes sharing ThrottleGroup 
-instances, and also, chaining filter nodes. The old interface will be 
-retained as much as possible. By defining ThrottleGroups with QOM the 
-following interface can be used:
-    -drive file=foo.qcow2,throttling.group=bar \
-    -object throttle-group,iops-total=100,id=bar
-which will be equivalent to the current command above. The 
-'block_set_io_throttle' command can be extended with a "group" argument, 
-that when defined instead of "device", will find and edit the object in 
-question. Users can hotplug ThrottleGroups with object-add in QMP/HMP, 
-then attach drives to a throttle group (ie adding a filter node in the 
-drive path that points to that throttle group) with an 'attach-throttle' 
-and detach with 'detach-throttle', each taking the drive and throttle 
-group name as arguments. An alternative (but uglier) approach would be 
-to use 'block_set_io_throttle' for this as well. Something that's also 
-sound is a 'block_set_throttle_groups' that takes a list of groups and a 
-drive as arguments. I think the last could be best if the relevant 
-function does not become complex.
-All this means that existing configuration will not be redefined 
-everytime the object is referenced unless each limit is specified 
-explicitly, like it was mentioned in the previous discussion.
+The problem is that config space is by default r/w and not cleared on
+reboot -- see Gerd's
+<https://lists.01.org/pipermail/edk2-devel/2017-May/010456.html> --, and
+once we designate another offset as "special" (either "reactive" or
+"read only"), the firmware will have to write to it and read it back
+unconditionally, to tell it apart from the default / original /
+non-special config space.
 
-Regarding 'query-block'. This case is complicated by the fact that it 
-would be possible for a drive to have many nodes, thus the values 
-printed by 'query-block' might be inaccurate if they only report one of 
-the node configurations.  The current approach is to report only the 
-first filter node in the BDS tree. A user with advanced throttling 
-configurations might have no need for this command.
-
-I'm not certain about this, since this could be handled internally by an 
-application, but it might be useful to have queries to list all the 
-throttle groups that affect a drive, and to list all the drives in a 
-throttle group. Maybe defining the drives as a ThrottleGroup QOM 
-property will take care of the latter and also attaching/detaching 
-drives to a group through the property getter/setter. Thoughts?
-
-[0] https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg06245.html
+Thanks!
+Laszlo
