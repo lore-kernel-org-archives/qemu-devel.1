@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dIqfs-0001xo-PL
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 02:12:05 -0400
+	(envelope-from <armbru@redhat.com>) id 1dIqlH-0003af-00
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 02:17:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dIqfp-0005ys-Hv
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 02:12:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33398)
+	(envelope-from <armbru@redhat.com>) id 1dIqlD-0007TF-Qs
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 02:17:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37144)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dIqfp-0005xN-9B
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 02:12:01 -0400
-Date: Thu, 8 Jun 2017 14:11:50 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170608061150.GA3628@pxdev.xzpeter.org>
-References: <1496404254-17429-1-git-send-email-peterx@redhat.com>
-	<1496404254-17429-3-git-send-email-peterx@redhat.com>
-	<20170602194523-mutt-send-email-mst@kernel.org>
-	<20170605030725.GF4056@pxdev.xzpeter.org>
-	<f68502e6-875c-0e46-f7cf-127c23513d20@redhat.com>
-	<20170606234705.GG13397@umbus.fritz.box>
-	<20170607034443.GA7983@pxdev.xzpeter.org>
-	<20170607160445-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dIqlD-0007TA-Kr
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 02:17:35 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170608031124.8031-1-maozy.fnst@cn.fujitsu.com>
+Date: Thu, 08 Jun 2017 08:17:30 +0200
+In-Reply-To: <20170608031124.8031-1-maozy.fnst@cn.fujitsu.com> (Mao Zhongyi's
+	message of "Thu, 8 Jun 2017 11:11:24 +0800")
+Message-ID: <874lvrknph.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170607160445-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH 2/3] exec: simplify
- address_space_get_iotlb_entry
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] util/qemu-sockets: Drop unused helper
+ socket_address_to_string()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,78 +27,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Maxime Coquelin <maxime.coquelin@redhat.com>, Jason Wang <jasowang@redhat.com>
+To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, kraxel@redhat.com
 
-On Wed, Jun 07, 2017 at 04:07:20PM +0300, Michael S. Tsirkin wrote:
-> On Wed, Jun 07, 2017 at 11:44:43AM +0800, Peter Xu wrote:
-> > On Wed, Jun 07, 2017 at 09:47:05AM +1000, David Gibson wrote:
-> > > On Tue, Jun 06, 2017 at 04:34:30PM +0200, Paolo Bonzini wrote:
-> > > > 
-> > > > 
-> > > > On 05/06/2017 05:07, Peter Xu wrote:
-> > > > > I don't sure whether it'll be a good interface for IOTLB. AFAIU at
-> > > > > least for VT-d, the IOMMU translation is page aligned which is defined
-> > > > > by spec, so it makes sense that (again at least for VT-d) here we'd
-> > > > > better just use page_mask/addr_mask.
-> > > > > 
-> > > > > That's also how I know about IOMMU in general - I assume it do the
-> > > > > translations always with page masks (never arbitary length), though
-> > > > > page size can differ from platfrom to platform, that's why here the
-> > > > > IOTLB interface used addr_mask, then it works for all platforms. I
-> > > > > don't know whether I'm 100% correct here though.
-> > > > > 
-> > > > > Maybe David/Paolo/... would comment as well?
-> > > > 
-> > > > I would ask David.  There are PowerPC MMUs that allow fast lookup of
-> > > > arbitrarily-sized windows (not necessarily power of two),
-> > > 
-> > > Uh.. I'm not sure what you mean here.  You might be thinking of the
-> > > BATs which really old (32-bit) PowerPC MMUs had - those allow
-> > > arbitrary large block translations, but they do have to be a power of
-> > > two.
-> > > 
-> > > > so maybe the
-> > > > IOMMUs can do the same.
-> > > 
-> > > The only Power IOMMU I know about uses a fixed, power-of-two page size
-> > > per DMA window.
-> > 
-> > If so, I would still be inclined to keep using masks for QEMU IOTLB.
-> > Then, my first two patches should still stand.
-> > 
-> > I am just afraid that not using masks will diverge the emulation from
-> > real hardware and brings trouble one day.
-> > 
-> > For vhost IOTLB interface, it does not need to be strictly aligned to
-> > QEMU IOMMU IOTLB definition, and that's how it's working now (current
-> > vhost iotlb allows arbitary length, and I think it's good). So imho we
-> > don't really need to worry about the performance - after all, we can
-> > do everything customized for vhost, just like what patch 3 did (yeah,
-> > it can be better...).
-> > 
-> > Thanks,
-> 
-> Pre-faults is also something that does not happen on real hardware.
-> And it's about security so a bigger issue.
-> 
-> If I had to choose between that and using non-power-of-2 in
-> the API, I'd go for non-power-of-2. Let backends that can only
-> support power of 2 split it up to multiple transactions.
+Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
 
-The problem is that when I was fixing the problem that vhost had with
-PT (a764040, "exec: abstract address_space_do_translate()"), I did
-broke the IOTLB translation a bit (it was using page masks). IMHO we
-need to fix it first for correctness (patch 1/2).
+> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
 
-For patch 3, if we can have Jason's patch to allow dynamic
-iommu_platform switching, that'll be the best, then I can rewrite
-patch 3 with the switching logic rather than caching anything. But
-IMHO that can be separated from patch 1/2 if you like.
+socket_address_to_string() was added in commit 7e84495 "Change
+net/socket.c to use socket_*() functions".  The commit was reverted
+(commit 6160183), but the revert left in the helper.  It was then redone
+(commit 883e4f7), and reverted again (commit 6701e55).  No other users
+have emerged.  If they ever do, the helper is one git-revert away.
 
-Or do you have better suggestion on how should we fix it?
-
-Thanks,
-
--- 
-Peter Xu
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
