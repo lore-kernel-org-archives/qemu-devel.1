@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dIrZe-0005Qz-Pt
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 03:09:43 -0400
+	(envelope-from <armbru@redhat.com>) id 1dIraN-0006Ag-LS
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 03:10:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dIrZb-0000rY-8U
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 03:09:42 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <1ab8d614-be8d-b206-e52b-bd4539173bd7@redhat.com>
-References: <cover.1496844254.git.berto@igalia.com>
-	<c49daf8afe80eade79ac53d305b83eb24b264338.1496844254.git.berto@igalia.com>
-	<1ab8d614-be8d-b206-e52b-bd4539173bd7@redhat.com>
-Date: Thu, 08 Jun 2017 09:09:00 +0200
-Message-ID: <w51poefhs6r.fsf@maestria.local.igalia.com>
+	(envelope-from <armbru@redhat.com>) id 1dIraI-0001Kk-3b
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 03:10:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39258)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dIraH-0001JD-UB
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 03:10:22 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170607184921.28407-1-marcandre.lureau@redhat.com>
+	<20170607184921.28407-2-marcandre.lureau@redhat.com>
+Date: Thu, 08 Jun 2017 09:10:18 +0200
+In-Reply-To: <20170607184921.28407-2-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Wed, 7 Jun 2017 22:49:19 +0400")
+Message-ID: <87o9tzj6p1.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 3/7] qcow2: Make perform_cow() call
- do_perform_cow() twice
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/3] char: fix alias devices regression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,42 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, anthony.perard@citrix.com, pbonzini@redhat.com
 
-On Wed 07 Jun 2017 11:43:34 PM CEST, Eric Blake wrote:
->>  block/qcow2-cluster.c | 38 +++++++++++++++++++++++---------------
->>  1 file changed, 23 insertions(+), 15 deletions(-)
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+
+> Fix regression from commit 4d43a603c71, where the serial and parallel
+> headers got removed from char.c, which broke the alias table.
 >
->>      qemu_co_mutex_unlock(&s->lock);
->> -    ret = do_perform_cow(bs, m->offset, m->alloc_offset, r->offset, r->nb_bytes);
->> +    ret = do_perform_cow(bs, m->offset, m->alloc_offset,
->> +                         start->offset, start->nb_bytes);
->> +    if (ret < 0) {
->> +        goto fail;
->> +    }
->> +
->> +    ret = do_perform_cow(bs, m->offset, m->alloc_offset,
->> +                         end->offset, end->nb_bytes);
->> +
->> +fail:
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  chardev/char.c | 2 ++
+>  1 file changed, 2 insertions(+)
 >
-> Since you reach this label even on success, it feels a bit awkward. I
-> probably would have avoided the goto and used fewer lines by
-> refactoring the logic as:
->
-> ret = do_perform_cow(..., start->...);
-> if (ret >= 0) {
->     ret = do_perform_cow(..., end->...);
-> }
+> diff --git a/chardev/char.c b/chardev/char.c
+> index 7aa0210765..f38fac5c6b 100644
+> --- a/chardev/char.c
+> +++ b/chardev/char.c
+> @@ -34,6 +34,8 @@
+>  #include "qemu/help_option.h"
+>=20=20
+>  #include "chardev/char-mux.h"
+> +#include "chardev/char-parallel.h" /* for HAVE_CHARDEV_PARPORT */
+> +#include "chardev/char-serial.h" /* for HAVE_CHARDEV_SERIAL */
+>=20=20
+>  /***********************************************************/
+>  /* character device */
 
-I actually wrote this code without any gotos the way you mention, and it
-works fine in this patch, but as I was making more changes I ended up
-with a quite large piece of code that needed to add "if (!ret)" to
-almost every if statement, so I didn't quite like the final result.
+Two drive-by observations:
 
-I'm open to reconsider it, but take a look first at the code after the
-last patch and you'll see that it would not be as neat as it appears
-now.
+* Putting HAVE_FOOs in random headers, then testing them with #ifdef is
+  asking for trouble.  Anything you test with #ifdef should be there
+  after #include "qemu/osdep.h" at the latest, or be defined in the same
+  .c.
 
-Berto
+* Such comments after #include rot quickly.  Strong dislike.
+
+Doesn't mean this isn't an acceptable minimally invasive regression fix.
