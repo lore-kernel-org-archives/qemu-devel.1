@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1dIrH5-00044z-Ar
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 02:50:32 -0400
+	(envelope-from <sjitindarsingh@gmail.com>) id 1dIrUO-0000Mg-9D
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 03:04:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1dIrH1-000206-Ov
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 02:50:31 -0400
-Received: from mga11.intel.com ([192.55.52.93]:44558)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1dIrH1-0001zo-GJ
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 02:50:27 -0400
-Date: Thu, 8 Jun 2017 14:50:23 +0800
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-ID: <20170608065023.tym7fthnymmif7c7@hz-desktop>
-References: <20170607080639.22120-1-haozhong.zhang@intel.com>
-	<011f1bfe-f882-d940-52eb-7b5d511f9ffc@gmail.com>
-	<20170608050640.ov5wtygx737ory6z@hz-desktop>
-	<11a7114a-95e5-d758-8479-86571037da3d@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <11a7114a-95e5-d758-8479-86571037da3d@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] nvdimm acpi: fix region format interface
- code
+	(envelope-from <sjitindarsingh@gmail.com>) id 1dIrUN-0007bw-1y
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 03:04:16 -0400
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Date: Thu,  8 Jun 2017 17:03:46 +1000
+Message-Id: <20170608070351.1434-1-sjitindarsingh@gmail.com>
+Subject: [Qemu-devel] [PATCH 0/5] target/ppc: Implement support for the
+ Large Decrementer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +18,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@gmail.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Dan Williams <dan.j.williams@intel.com>
+To: qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, agraf@suse.de, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-On 06/08/17 14:40 +0800, Xiao Guangrong wrote:
-> 
-> 
-> On 06/08/2017 01:06 PM, Haozhong Zhang wrote:
-> > On 06/08/17 11:07 +0800, Xiao Guangrong wrote:
-> > > 
-> > > 
-> > > On 06/07/2017 04:06 PM, Haozhong Zhang wrote:
-> > > > Per ACPI 6.2, section 5.2.25.6 and JEDEC Annex L Release 3, the
-> > > > current region format interface code 0x201 indicates the block
-> > > > addressed function interface 1, rather than a byte addressable
-> > > > interface. Fix it by using 0x301 which indicates the byte addressable
-> > > > no energy backed function interface 1.
-> > > > 
-> > > > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> > > > ---
-> > > >    hw/acpi/nvdimm.c | 7 ++++---
-> > > >    1 file changed, 4 insertions(+), 3 deletions(-)
-> > > > 
-> > > > diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
-> > > > index 8e7d6ec034..b5734f5897 100644
-> > > > --- a/hw/acpi/nvdimm.c
-> > > > +++ b/hw/acpi/nvdimm.c
-> > > > @@ -338,9 +338,10 @@ static void nvdimm_build_structure_dcr(GArray *structures, DeviceState *dev)
-> > > >        nfit_dcr->revision_id = cpu_to_le16(1 /* Current Revision supported
-> > > >                                                 in ACPI 6.0 is 1. */);
-> > > >        nfit_dcr->serial_number = cpu_to_le32(sn);
-> > > > -    nfit_dcr->fic = cpu_to_le16(0x201 /* Format Interface Code. See Chapter
-> > > > -                                         2: NVDIMM Device Specific Method
-> > > > -                                         (DSM) in DSM Spec Rev1.*/);
-> > > > +    nfit_dcr->fic = cpu_to_le16(0x301 /* Format Interface Code:
-> > > > +                                         Byte addressable, no energy backed.
-> > > > +                                         See ACPI 6.2, sect 5.2.25.6 and
-> > > > +                                         JEDEC Annex L Release 3. */);
-> > > 
-> > > Shouldn't the 'no energy backend' indicator be set only for !dax disk?
-> > 
-> > Above specs define RFIC for two classes of byte-addressable NVDIMM:
-> > 1. 0x10[0|1]: A function containing byte addressable persistent memory
-> >                whose persistence is achieved through the use of DRAM,
-> >                nonvolatile memory (e.g., Flash) and an energy source.
-> > 	      Only the DRAM portion is addressable by the system.
-> > 2. 0x30[0|1]: A function containing byte addressable persistent
-> >                memory. All of the persistent memory is addressable by
-> >                the system. No external energy source is required.
-> > If the last bit is 0, then it's a proprietary interface.
-> 
-> As both of them indicate persistent memory, it is okay to me.
-> 
-> The FIC, 0x201, comes from the document of Intel DSM example, i have no idea why
-> it uses 0x201. Maybe it is worth being fixed too.
-> 
+The POWER9 processor introduces a new operating mode of the decrementer
+called large decrementer mode.
 
-I guess the reason is it's an example, e.g. "... describes an
-*example* _DSM interface for NVDIMM Device with Region Format
-Interface Code (RFIC) of 0x0201" at the beginning of Chapter 2.
+If large decrementer mode is disabled then the decrementer behaves before
+as a 32-bit decrementing register. If large decrementer mode is enabled
+then the decrementer behaves as a d-bit decrementing register, the value
+of which is sign extended to 64-bits (where d is implementation dependent).
 
-Haozhong
+The hypervisor decrementer is now a h-bit decrementing register which is
+always sign extended to 64-bits (where h is implementation dependent).
+
+To use the large decrementer both the guest and the host must have support
+for it. If the host has support then qemu will advertise this to the guest
+and tell the host that the guest is using the large decrementer. In TCG we
+always advertise support and enable the large decrementer if we detect that
+the guest will use it. 
+
+The large decrementer can be disabled on the command line to ensure
+migration between hosts with differing levels of support or decrementer
+size.
+
+This patch series is based on the branch dwg/ppc-for-2.10
+
+Suraj Jitindar Singh (5):
+  target/ppc: Implement large decrementer support for TCG
+  target/ppc: Implement large decrementer support for KVM
+  target/ppc: Implement migration support for large decrementer
+  target/ppc: Enable the large decrementer for TCG and KVM guests
+  target/ppc: Add cmd line option to disable the large decrementer
+
+ hw/ppc/ppc.c                |  81 +++++++++++++++++++---------
+ hw/ppc/spapr.c              | 128 ++++++++++++++++++++++++++++++++++++++++++++
+ hw/ppc/spapr_hcall.c        |  36 +++++++++++++
+ include/hw/ppc/spapr.h      |   2 +
+ target/ppc/cpu-qom.h        |   1 +
+ target/ppc/cpu.h            |   8 +--
+ target/ppc/kvm.c            |  59 ++++++++++++++++++++
+ target/ppc/kvm_ppc.h        |  25 +++++++++
+ target/ppc/mmu-hash64.c     |   2 +-
+ target/ppc/translate.c      |   2 +-
+ target/ppc/translate_init.c |   3 ++
+ 11 files changed, 317 insertions(+), 30 deletions(-)
+
+-- 
+2.9.4
