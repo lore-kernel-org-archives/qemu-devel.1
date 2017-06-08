@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47136)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1dIskG-0003Lg-4k
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 04:24:45 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dIsvW-0005y1-M0
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 04:36:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1dIskB-0001e4-D2
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 04:24:44 -0400
-Received: from mga02.intel.com ([134.134.136.20]:61518)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1dIskA-0001ds-Va
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 04:24:39 -0400
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-Date: Thu, 8 Jun 2017 08:24:33 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743908C040@shsmsx102.ccr.corp.intel.com>
-References: <1493285660-4470-1-git-send-email-peterx@redhat.com>
-	<1493285660-4470-7-git-send-email-peterx@redhat.com>
-	<20170501045822.GM13773@umbus.fritz.box>
-	<20170508054814.GA2820@pxdev.xzpeter.org>
-	<20170508060744.GG25748@umbus.fritz.box>
-	<20170508073217.GD2820@pxdev.xzpeter.org>
-	<20170510070406.GU25748@umbus.fritz.box>
-	<20170511050426.GF28293@pxdev.xzpeter.org>
-	<20170515053211.GB11105@umbus.fritz.box>
-	<20170525072430.GA22816@pxdev.xzpeter.org>
-	<20170526053014.GL12929@umbus.fritz.box>
-In-Reply-To: <20170526053014.GL12929@umbus.fritz.box>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <jasowang@redhat.com>) id 1dIsvV-0007RH-Ig
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 04:36:22 -0400
+References: <1496824556-1883-1-git-send-email-eric.auger@redhat.com>
+	<03f4d3b6-a678-56b8-4320-ac002dfeeb8d@redhat.com>
+	<8bd10202-75a2-2dee-1d75-9070217f65e0@arm.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <60346d98-362d-a7ca-10ca-c150e842d51b@redhat.com>
+Date: Thu, 8 Jun 2017 16:35:55 +0800
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH 6/8] memory: introduce AddressSpaceOps
+In-Reply-To: <8bd10202-75a2-2dee-1d75-9070217f65e0@arm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC 0/8] VIRTIO-IOMMU device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,151 +25,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, Peter Xu <peterx@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Lan, Tianyu" <tianyu.lan@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, "Tian, Kevin" <kevin.tian@intel.com>, Jason Wang <jasowang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
+To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: wei@redhat.com, kevin.tian@intel.com, marc.zyngier@arm.com, tn@semihalf.com, will.deacon@arm.com, drjones@redhat.com, bharat.bhushan@nxp.com, christoffer.dall@linaro.org, robin.murphy@arm.com
 
-Hi David,
 
-I added some update on your question. See if it make any sense.
 
-> -----Original Message-----
-> From: David Gibson [mailto:david@gibson.dropbear.id.au]
-> Sent: Friday, May 26, 2017 1:30 PM
-> To: Peter Xu <peterx@redhat.com>
-> On Thu, May 25, 2017 at 03:24:30PM +0800, Peter Xu wrote:
+On 2017=E5=B9=B406=E6=9C=8807=E6=97=A5 18:19, Jean-Philippe Brucker wrote=
+:
+> Hi Jason,
+>
+> On 07/06/17 10:17, Jason Wang wrote:
+>> On 2017=E5=B9=B406=E6=9C=8807=E6=97=A5 16:35, Eric Auger wrote:
+>>> This series implements the virtio-iommu device. This is a proof
+>>> of concept based on the virtio-iommu specification written by
+>>> Jean-Philippe Brucker [1]. This was tested with a guest using
+>>> the virtio-iommu driver [2] and exposed with a virtio-net-pci
+>>> using dma ops.
+>>>
+>>> The device gets instantiated using the "-device virtio-iommu-device"
+>>> option. It currently works with ARM virt machine only as the machine
+>>> must handle the dt binding between the virtio-mmio "iommu" node and
+>>> the PCI host bridge node. ACPI booting is not yet supported.
+>>>
+>>> This should allow to start some benchmarking activities against
+>>> pure emulated IOMMU (especially ARM SMMU).
+>> Yes, it would be also interesting to compare it with intel IOMMU. Actu=
+ally
+>> the core function is similar to the subset of intel one with CM enable=
+d.
+>> Since each map and unmap requires a command, it would be very slow for
+>> dynamic mappings. I wonder whether or not we can do any optimization o=
+n this.
+> In general we will have to send the same number of map/unmap requests t=
+han
+> the number of invalidations needed for an emulated IOMMU such as the In=
+tel
+> one (if I understand correctly with CM there are invalidations both on =
+map
+> and unmap, to avoid trapping the page tables). Using virtio allows to
+> reduce the number of round-trips to the host, by batching map/unmap
+> requests where possible.
 
-[...]
+When QI is enabled, intel IOMMU can also support batching. And it can=20
+even allow asynchronous completion of the operation by noting using wait=20
+descriptor.
 
-> > > > > > >
-> > > > > > > I don't believe we have any existing platforms with both an
-> > > > > > > IOMMU and a direct mapped window in a device's address
-> > > > > > > space.  But it seems to be just too plausible a setup to not
-> > > > > > > plan for it. [1]
-> > > > > > >
-> > > > > > > > This patch derived from a requirement in virt-svm project (=
-on x86).
-> > > > > > > > Virt-svm needs some notification mechanism for each IOMMU
-> > > > > > > > (or say, the IOMMU that managers the SVM-enabled device).
-> > > > > > > > For now, all IOMMU notifiers are per-memory-region not
-> > > > > > > > per-iommu, and that's imho not what virt-svm wants. Any sug=
-gestions?
-> > > > > > >
-> > > > > > > I don't know SVM, so I can't really make sense of that.
-> > > > > > > What format does this identifier need?  What does "for one
-> > > > > > > IOMMU" mean in this context - i.e. what guest observable
-> > > > > > > properties require the IDs to be the same or to be different.
-> > > > > >
-> > > > > > Virt-svm should need to trap the content of a register
-> > > > > > (actually the data is in the memory, but, let's assume it's a
-> > > > > > mmio operation for simplicity, considering it is finally
-> > > > > > delivered via invalidation requests), then pass that info down
-> > > > > > to kernel. So the listened element is per-iommu not per-mr
-> > > > > > this time. When the content changed, vfio will need to be notif=
-ied, then
-> pass this info down.
-> > > > >
-> > > > > I don't entirely follow what you're saying.  When the virtual
-> > > > > hardware gets an invalidate request, it looks up the unit to
-> > > > > invalidate in memory?  Which component gets to decide that ID?
-> > > > > How is it advertised to the guest OS?
-> > > > >
-> > > > > If your ID is tied to the AS now, you could just iterate through
-> > > > > the AS and invalidate any IOMMU MRs that are present within it.
-> > > > >
-> > > > > Alternatively, if the ID is tied to something more concrete,
-> > > > > like a specific PCI host bridge (which incorporates the IOMMU
-> > > > > logic), then that device probably already has a handle on the
-> > > > > right IOMMU MR to invalidate it.
-> > > >
-> > > > Sorry to be unclear on the requirement. I don't know what's the ID
-> > > > you mentioned above... Anyway, let me try to further simplify the
-> > > > use case.
-> > >
-> > > Right, the ID was me guessing badly at what's going on here, so I
-> > > think it confused rather than clarifying.
-> > >
-> > > > Just assume we have such a requirement: when one register of
-> > > > vIOMMU changes, we need to pass this register data to the hardware
-> > > > IOMMU by some way. And, let's assume this is a notification
-> > > > mechanism, so that every device in the system can listen to this
-> > > > register change, then capture what has changed to what. Here the
-> > > > point is, in all cases this event is not related to memory region
-> > > > at all. So imho we need some other way to do it besides memory regi=
-on
-> IOMMU notifiers.
-> > >
-> > > Ok.  So is this right?
-> > > 	* You have a single bank of vIOMMU registers
-> > > 	* Which control two (or more) IOMMU regions in in the guest's
-> > >           address space
-> > > 	* Assuming the host also has an AMD IOMMU, those will be
-> > >           backed by a single IOMMU on the host ("single" meaning
-> > >           controlled by a single bank of host registers)
-> > >
-> > > I'm assuming the guest IOMMU code must know which IOMMU regions it
-> > > is managing, so getting from the guest registers to the set of IOMMU
-> > > MRs should be easy.
-> > >
-> > > What's the operation that needs to happen on the host IOMMU, in
-> > > terms of the VFIO IOMMU interface?
-> >
-> > (Sorry to respond so late...)
-> >
-> > It'll pass the captured data downward to host IOMMU in some way.
-> >
-> > IMHO if we are discussing the notifier thing only, we don't really
-> > need to know what would it do after it gets the data. The point is how
-> > we should define this kind if notifies, which differs from current
-> > memory region based notifiers.
->=20
-> I'm trying to understand how it differs - I still don't have a clear pict=
-ure.  That's why
-> I'm asking what needs to be passed to the host MMU, so I can see why you =
-need this
-> different notifier.
+> Adding vhost-iommu in the host could further
+> reduce the latency of map/unmap requests.
 
-It differs in the registration. For the MemoryRegion based notifier(MAP/UNM=
-AP), it
-is registered when IOMMU MemoryRegion is used. On VT-d, it is the time swit=
-ch
-system memory address space to vtd address space. This is introduced by the=
- patch
-below:
+Probably but then we need a way to co-operate with userspace device=20
+emulation codes.
 
-[Qemu-devel] [PATCH v9 8/9] intel_iommu: allow dynamic switch of IOMMU regi=
-on
+>
+> To actually reduce the number of requests, I see two possible
+> optimizations (loosely described in [1]), both requiring invasive chang=
+es.
+>
+> * Relaxed (insecure) mode, where the guest batches unmap request or
+> doesn't send them at all. Map will override existing mappings if
+> necessary. You end up sending far less unmap requests, but there is a
+> vulnerability window where devices can access stale mappings, so you ha=
+ve
+> to trust your peripherals. I believe the x86 IOMMU drivers in Linux
+> already allow this.
 
-For virt-SVM, it wants to add two more notfiers. If we add the notifiers at=
- the same
-time with the MAP/UNMAP notifier, then virt-SVM cannot work if there is no =
-IOMMU
-region switch. This scenario happens when passthru-mode is used in the vIOM=
-MU.
+Yes and actually it's the default behavior.  What's more, it will try to=20
+do a domain invalidation if there's too many pending invalidation.
 
-So in order to solve the scenario above, I discussed with Peter. My initial=
- plan is to move
-the registration of new notifiers to be in vfio_realize(). The logic is if =
-vIOMMU is exposed
-to guest, then the new notifiers would be registered. This approach is prop=
-osed in my
-RFC patch for virt-SVM.
+>
+> * Page table handover, which is a new mode orthogonal to map/unmap. Thi=
+s
+> uses nested translation - the guest has one set of page tables for
+> gva->gpa and the host has one set for gpa->hpa. After setup, the guest
+> populates the page tables and only sends invalidation requests, no map.=
+ I
+> think that with the Intel IOMMU this would only be possible with PASID
+> traffic. But nested translation will inherently be slower than "classic=
+"
+> mode, so it might end up being overall slower than map/unmap, if there =
+is
+> a lot of TLB invalidation and trashing. This mode is mostly useful for =
+SVM
+> virtualization.
 
-https://www.spinics.net/lists/kvm/msg148803.html
+An advantage for page table is that its searching is faster than current=20
+tree based algorithm, this can help in the case of dynamic mappings more=20
+or less.
 
-However, Peter mentioned the approach in the RFC patch may not be compatibl=
-e with
-sPAPR since there may be multiple MemoryRegion for sPARR. It would result i=
-n multiple
-notifier registration on sPARR.
+Thanks
 
-Due to it, Peter tries to introduce the IOMMUObject. It would help the dete=
-ction in
-vfio_realize() to check if vIOMMU is exposed to guest. Also it moves the io=
-mmu specific
-notifiers to be tied on the exposure of vIOMMU instead of IOMMU Region swit=
-ching.
-
-Any further comments, pls let me know.
-
-Thanks,
-Yi L
+>
+> Thanks,
+> Jean
+>
+>
