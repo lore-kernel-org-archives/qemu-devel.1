@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dIvMl-00067e-R6
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 07:12:40 -0400
+	(envelope-from <famz@redhat.com>) id 1dIvQX-0006rf-Si
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 07:16:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dIvMh-0003Id-S8
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 07:12:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42450)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dIvMh-0003IQ-Js
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 07:12:35 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B67504DD7C
-	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 11:12:34 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170608104127.GE3628@pxdev.xzpeter.org> (Peter Xu's message of
-	"Thu, 8 Jun 2017 18:41:27 +0800")
-References: <1496745042-2379-1-git-send-email-peterx@redhat.com>
-	<1496745042-2379-3-git-send-email-peterx@redhat.com>
-	<87k24nd78e.fsf@secure.mitica>
-	<20170608104127.GE3628@pxdev.xzpeter.org>
-Reply-To: quintela@redhat.com
-Date: Thu, 08 Jun 2017 13:12:29 +0200
-Message-ID: <87efuubun6.fsf@secure.mitica>
+	(envelope-from <famz@redhat.com>) id 1dIvQT-0004pQ-RJ
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 07:16:33 -0400
+Date: Thu, 8 Jun 2017 19:16:16 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170608111616.GA14424@lemon.lan>
+References: <1496907604-2393-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/6] migration: move global_state.optional
- out
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1496907604-2393-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] Makefile: Do not generate files if
+ "configure" has not been run yet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,67 +23,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-Peter Xu <peterx@redhat.com> wrote:
-> On Wed, Jun 07, 2017 at 07:42:57PM +0200, Juan Quintela wrote:
+On Thu, 06/08 09:40, Thomas Huth wrote:
+> When doing a "make -j10" in the vanilla QEMU source tree (without
+> running "configure first), the Makefile currently generates two
+> files already, qemu-version.h and qemu-options.def. This should not
+> happen, so let's make these targets depend on config-host.mak.
+> Also the targets that use python  can not be executed without the
+> $(PYTHON) from config-host.mak, so these should depend on the config-
+> host.mak file, too (these targets generate some ugly error messages
+> otherwise during "make -j10").
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  v2:
+>  - Add the dependency to the targets that use $(PYTHON) instead of
+>    adding it to $(qapi-py)
+> 
+>  Makefile | 23 ++++++++++++-----------
+>  1 file changed, 12 insertions(+), 11 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index c830d7a..b5e0731 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -286,7 +286,7 @@ endif
+>  
+>  all: $(DOCS) $(TOOLS) $(HELPERS-y) recurse-all modules
 
->> > +/* This is only used if MigrationState.store_global_state is set. */
->> >  static GlobalState global_state;
->> >  
->> >  int global_state_store(void)
->> > @@ -179,7 +179,7 @@ static RunState global_state_get_runstate(void)
->> >  
->> >  void global_state_set_optional(void)
->> >  {
->> > -    global_state.optional = true;
->> > +    migrate_get_current()->store_global_state = false;
->> 
->> Part of the advantage (for me) of using qapi was not to have to export
->> a function to set this.  I.e.  isn't a way to call
->> 
->> qemu_opt_get_bool(migration_opts, "store_global_state", true)
->> 
->> qapi_<magic>_set_bool(migration_opts, "store_global_state",false);
->> ?
->
-> I didn't catch the comment here... Do you mean e.g.
-> qemu_opt_set_bool()? Here can we use it in some way?
->
-> (I thought we were using the "-global migration.store_global_state"
->  parameter, then it'll setup MigrationState.store_global_state, isn't
->  that the trick?)
+Is it enough to add a
 
-Yeap.  Althought for me would be the same if that is stored anywhare
-else.  I don't really care where it is stored.
+    $(filter-out $(GENERATED_FILES),config-host.mak): config-host.mak
 
->> 
->> So, I don't have to eport global_state_set_optional()?
->> 
->
-> As mentioned in latter patch, xen_init() still uses it, so looks like
-> we still need it?
+after the variable is fully built?  (Seems config-host.mak is not included, but
+filtering out is safer.)
 
-Yeap.  I *thought* that there was a way to test/set thing
-programatically also so I didn't have to create/export that functions.
-My ideal world would be that there were something like that
+Fam
 
-qemu_opt_get_bool(migration_opts, "store_global_state", true);
-
-so I only have to export migration_opts (or whatever), and just set/read
-values from places like xen_init.  Im my ideal world, if I have to
-create a new "property", I don't want to have to export a function to
-set/read it.  For instance, the case of xen_init().  We haven't been
-able to remove global_state_set_optional() because they don't know about
-properties.
-
-I still love the patches are they are.  Boing able to set things from
-the command line makes things so much better/easier O:-)
-
-
-> I can squash this patch with the next if you like it.
-
-That is up to you.
-
-Thanks, Juan.
+>  
+> -qemu-version.h: FORCE
+> +qemu-version.h: config-host.mak FORCE
+>  	$(call quiet-command, \
+>  		(cd $(SRC_PATH); \
+>  		printf '#define QEMU_PKGVERSION '; \
+> @@ -312,6 +312,7 @@ qemu-version.h: FORCE
+>  
+>  config-host.h: config-host.h-timestamp
+>  config-host.h-timestamp: config-host.mak
+> +qemu-options.def: config-host.mak
+>  qemu-options.def: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
+>  	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$@")
+>  
+> @@ -394,17 +395,17 @@ gen-out-type = $(subst .,-,$(suffix $@))
+>  qapi-py = $(SRC_PATH)/scripts/qapi.py $(SRC_PATH)/scripts/ordereddict.py
+>  
+>  qga/qapi-generated/qga-qapi-types.c qga/qapi-generated/qga-qapi-types.h :\
+> -$(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-types.py $(qapi-py)
+> +$(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-types.py $(qapi-py) config-host.mak
+>  	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-types.py \
+>  		$(gen-out-type) -o qga/qapi-generated -p "qga-" $<, \
+>  		"GEN","$@")
+>  qga/qapi-generated/qga-qapi-visit.c qga/qapi-generated/qga-qapi-visit.h :\
+> -$(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-visit.py $(qapi-py)
+> +$(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-visit.py $(qapi-py) config-host.mak
+>  	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-visit.py \
+>  		$(gen-out-type) -o qga/qapi-generated -p "qga-" $<, \
+>  		"GEN","$@")
+>  qga/qapi-generated/qga-qmp-commands.h qga/qapi-generated/qga-qmp-marshal.c :\
+> -$(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-commands.py $(qapi-py)
+> +$(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-commands.py $(qapi-py) config-host.mak
+>  	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-commands.py \
+>  		$(gen-out-type) -o qga/qapi-generated -p "qga-" $<, \
+>  		"GEN","$@")
+> @@ -416,27 +417,27 @@ qapi-modules = $(SRC_PATH)/qapi-schema.json $(SRC_PATH)/qapi/common.json \
+>                 $(SRC_PATH)/qapi/trace.json
+>  
+>  qapi-types.c qapi-types.h :\
+> -$(qapi-modules) $(SRC_PATH)/scripts/qapi-types.py $(qapi-py)
+> +$(qapi-modules) $(SRC_PATH)/scripts/qapi-types.py $(qapi-py) config-host.mak
+>  	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-types.py \
+>  		$(gen-out-type) -o "." -b $<, \
+>  		"GEN","$@")
+>  qapi-visit.c qapi-visit.h :\
+> -$(qapi-modules) $(SRC_PATH)/scripts/qapi-visit.py $(qapi-py)
+> +$(qapi-modules) $(SRC_PATH)/scripts/qapi-visit.py $(qapi-py) config-host.mak
+>  	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-visit.py \
+>  		$(gen-out-type) -o "." -b $<, \
+>  		"GEN","$@")
+>  qapi-event.c qapi-event.h :\
+> -$(qapi-modules) $(SRC_PATH)/scripts/qapi-event.py $(qapi-py)
+> +$(qapi-modules) $(SRC_PATH)/scripts/qapi-event.py $(qapi-py) config-host.mak
+>  	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-event.py \
+>  		$(gen-out-type) -o "." $<, \
+>  		"GEN","$@")
+>  qmp-commands.h qmp-marshal.c :\
+> -$(qapi-modules) $(SRC_PATH)/scripts/qapi-commands.py $(qapi-py)
+> +$(qapi-modules) $(SRC_PATH)/scripts/qapi-commands.py $(qapi-py) config-host.mak
+>  	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-commands.py \
+>  		$(gen-out-type) -o "." $<, \
+>  		"GEN","$@")
+>  qmp-introspect.h qmp-introspect.c :\
+> -$(qapi-modules) $(SRC_PATH)/scripts/qapi-introspect.py $(qapi-py)
+> +$(qapi-modules) $(SRC_PATH)/scripts/qapi-introspect.py $(qapi-py) config-host.mak
+>  	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-introspect.py \
+>  		$(gen-out-type) -o "." $<, \
+>  		"GEN","$@")
+> @@ -703,10 +704,10 @@ qemu-img-cmds.texi: $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/scripts/hxtool
+>  
+>  docs/qemu-qmp-qapi.texi docs/qemu-ga-qapi.texi: $(SRC_PATH)/scripts/qapi2texi.py $(qapi-py)
+>  
+> -docs/qemu-qmp-qapi.texi: $(qapi-modules)
+> +docs/qemu-qmp-qapi.texi: $(qapi-modules) config-host.mak
+>  	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi2texi.py $< > $@,"GEN","$@")
+>  
+> -docs/qemu-ga-qapi.texi: $(SRC_PATH)/qga/qapi-schema.json
+> +docs/qemu-ga-qapi.texi: $(SRC_PATH)/qga/qapi-schema.json config-host.mak
+>  	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi2texi.py $< > $@,"GEN","$@")
+>  
+>  qemu.1: qemu-doc.texi qemu-options.texi qemu-monitor.texi qemu-monitor-info.texi
+> -- 
+> 1.8.3.1
+> 
+> 
