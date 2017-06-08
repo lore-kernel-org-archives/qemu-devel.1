@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dIsvW-0005y1-M0
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 04:36:26 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dIsxH-0006wA-Oa
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 04:38:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dIsvV-0007RH-Ig
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 04:36:22 -0400
-References: <1496824556-1883-1-git-send-email-eric.auger@redhat.com>
-	<03f4d3b6-a678-56b8-4320-ac002dfeeb8d@redhat.com>
-	<8bd10202-75a2-2dee-1d75-9070217f65e0@arm.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <60346d98-362d-a7ca-10ca-c150e842d51b@redhat.com>
-Date: Thu, 8 Jun 2017 16:35:55 +0800
+	(envelope-from <alex.bennee@linaro.org>) id 1dIsxD-0000LP-Mj
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 04:38:11 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:34414)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dIsxD-0000KZ-GE
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 04:38:07 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id g76so15315328wrd.1
+	for <qemu-devel@nongnu.org>; Thu, 08 Jun 2017 01:38:07 -0700 (PDT)
+References: <20170605165233.4135-1-rth@twiddle.net>
+	<20170605165233.4135-23-rth@twiddle.net>
+	<87h8zrdh02.fsf@linaro.org>
+	<02d52209-3f94-7c06-3637-2ee84573d700@twiddle.net>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <02d52209-3f94-7c06-3637-2ee84573d700@twiddle.net>
+Date: Thu, 08 Jun 2017 09:38:32 +0100
+Message-ID: <877f0mdgc7.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <8bd10202-75a2-2dee-1d75-9070217f65e0@arm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 0/8] VIRTIO-IOMMU device
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 22/26] target/aarch64: optimize indirect
+ branches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,97 +33,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: wei@redhat.com, kevin.tian@intel.com, marc.zyngier@arm.com, tn@semihalf.com, will.deacon@arm.com, drjones@redhat.com, bharat.bhushan@nxp.com, christoffer.dall@linaro.org, robin.murphy@arm.com
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
 
 
+Richard Henderson <rth@twiddle.net> writes:
 
-On 2017=E5=B9=B406=E6=9C=8807=E6=97=A5 18:19, Jean-Philippe Brucker wrote=
-:
-> Hi Jason,
->
-> On 07/06/17 10:17, Jason Wang wrote:
->> On 2017=E5=B9=B406=E6=9C=8807=E6=97=A5 16:35, Eric Auger wrote:
->>> This series implements the virtio-iommu device. This is a proof
->>> of concept based on the virtio-iommu specification written by
->>> Jean-Philippe Brucker [1]. This was tested with a guest using
->>> the virtio-iommu driver [2] and exposed with a virtio-net-pci
->>> using dma ops.
+> On 06/07/2017 07:11 AM, Alex Bennée wrote:
+>>
+>> Richard Henderson <rth@twiddle.net> writes:
+>>
+>>> From: "Emilio G. Cota" <cota@braap.org>
 >>>
->>> The device gets instantiated using the "-device virtio-iommu-device"
->>> option. It currently works with ARM virt machine only as the machine
->>> must handle the dt binding between the virtio-mmio "iommu" node and
->>> the PCI host bridge node. ACPI booting is not yet supported.
+>>> Measurements:
 >>>
->>> This should allow to start some benchmarking activities against
->>> pure emulated IOMMU (especially ARM SMMU).
->> Yes, it would be also interesting to compare it with intel IOMMU. Actu=
-ally
->> the core function is similar to the subset of intel one with CM enable=
-d.
->> Since each map and unmap requires a command, it would be very slow for
->> dynamic mappings. I wonder whether or not we can do any optimization o=
-n this.
-> In general we will have to send the same number of map/unmap requests t=
-han
-> the number of invalidations needed for an emulated IOMMU such as the In=
-tel
-> one (if I understand correctly with CM there are invalidations both on =
-map
-> and unmap, to avoid trapping the page tables). Using virtio allows to
-> reduce the number of round-trips to the host, by batching map/unmap
-> requests where possible.
+>>> [Baseline performance is that before applying this and the previous
+>>> commit]
+>>
+>> Sadly this has regressed my qemu-system-aarch64 EL2 run. It was slightly
+>> masked by an unrelated assertion breakage which I had to fix. However
+>> with this patch my boot hangs spinning all 4 threads. Once reverted
+>> things work again.
+>>
+>> My command line:
+>>
+>>    timeout -k 1s --foreground 120s ./aarch64-softmmu/qemu-system-aarch64 -machine type=virt -display none -m 4096 -cpu cortex-a57 -serial mon:stdio -netdev user,id=unet -device virtio-net-device,netdev=unet -drive file=/home/alex/lsrc/qemu/images/jessie-arm64.qcow2,id=myblock,index=0,if=none -device virtio-blk-device,drive=myblock -append "console=ttyAMA0 root=/dev/vda1 systemd.unit=benchmark.service" -kernel /home/alex/lsrc/qemu/images/aarch64-current-linux-kernel-only.img -smp 4 -machine gic-version=3 -machine virtualization=true -name debug-threads=on
+>
+> If you ignore the timeout, does it complete eventually?
 
-When QI is enabled, intel IOMMU can also support batching. And it can=20
-even allow asynchronous completion of the operation by noting using wait=20
-descriptor.
+It seems to hang indefinitely. The difference is between no output and
+the usual kernel output.
 
-> Adding vhost-iommu in the host could further
-> reduce the latency of map/unmap requests.
+> It may not be the same thing, but that pull left out the final patch
+> for target/alpha that enabled goto_ptr.  But as I hadn't seen a
+> similar problem with other guests, I was assuming that the problem was
+> in hw/alpha/, or some other bit of the interrupt chain.
 
-Probably but then we need a way to co-operate with userspace device=20
-emulation codes.
+Given output is being suppressed I wonder if there is some funkyness
+with IRQs going on here?
 
 >
-> To actually reduce the number of requests, I see two possible
-> optimizations (loosely described in [1]), both requiring invasive chang=
-es.
 >
-> * Relaxed (insecure) mode, where the guest batches unmap request or
-> doesn't send them at all. Map will override existing mappings if
-> necessary. You end up sending far less unmap requests, but there is a
-> vulnerability window where devices can access stale mappings, so you ha=
-ve
-> to trust your peripherals. I believe the x86 IOMMU drivers in Linux
-> already allow this.
+> r~
 
-Yes and actually it's the default behavior.  What's more, it will try to=20
-do a domain invalidation if there's too many pending invalidation.
 
->
-> * Page table handover, which is a new mode orthogonal to map/unmap. Thi=
-s
-> uses nested translation - the guest has one set of page tables for
-> gva->gpa and the host has one set for gpa->hpa. After setup, the guest
-> populates the page tables and only sends invalidation requests, no map.=
- I
-> think that with the Intel IOMMU this would only be possible with PASID
-> traffic. But nested translation will inherently be slower than "classic=
-"
-> mode, so it might end up being overall slower than map/unmap, if there =
-is
-> a lot of TLB invalidation and trashing. This mode is mostly useful for =
-SVM
-> virtualization.
-
-An advantage for page table is that its searching is faster than current=20
-tree based algorithm, this can help in the case of dynamic mappings more=20
-or less.
-
-Thanks
-
->
-> Thanks,
-> Jean
->
->
+--
+Alex Bennée
