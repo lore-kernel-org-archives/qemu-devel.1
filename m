@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dIylt-000145-FR
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 10:50:50 -0400
+	(envelope-from <clg@kaod.org>) id 1dIymo-0001fG-Lv
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 10:51:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dIylp-0008WP-JU
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 10:50:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35927)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dIylp-0008Vs-E6
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 10:50:45 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dIyln-0002fX-1p
-	for <qemu-devel@nongnu.org>; Thu, 08 Jun 2017 14:50:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D1BD52E819B
-	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 14:50:42 +0000 (UTC)
+	(envelope-from <clg@kaod.org>) id 1dIymk-0000T2-QT
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 10:51:46 -0400
+Received: from 1.mo4.mail-out.ovh.net ([178.33.248.196]:51808)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dIymk-0000Sa-Jr
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 10:51:42 -0400
+Received: from player772.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 56BEA71064
+	for <qemu-devel@nongnu.org>; Thu,  8 Jun 2017 16:51:40 +0200 (CEST)
+References: <149692935202.12119.3614006195497745877.stgit@bahia>
+	<149692936183.12119.5013623492394505174.stgit@bahia>
+	<5022e1af-9b70-518a-ce61-cadc905e637f@kaod.org>
+	<20170608163207.45ba5618@bahia.ttt.fr.ibm.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <018ad85d-6b7f-53d9-e3dc-4a79fcc81767@kaod.org>
+Date: Thu, 8 Jun 2017 16:51:35 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20170608163207.45ba5618@bahia.ttt.fr.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 08 Jun 2017 14:38:01 -0000
-From: Will Newton <will.newton@gmail.com>
-Reply-To: Bug 1696773 <1696773@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <149693268144.10005.16353270944603688746.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1696773] [NEW] golang calls to exec crash user
- emulation
+Subject: Re: [Qemu-devel] [PATCH v4 1/6] xics: introduce macros for ICP/ICS
+ link properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,42 +33,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-Public bug reported:
+On 06/08/2017 04:32 PM, Greg Kurz wrote:
+> On Thu, 8 Jun 2017 16:04:21 +0200
+> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>=20
+>> On 06/08/2017 03:42 PM, Greg Kurz wrote:
+>>> These properties are part of the XICS API. They deserve to appear
+>>> explicitely in the XICS header file. =20
+>>
+>> I don't see the benefits.
+>>
+>=20
+> The links need to be set with the appropriate name otherwise XICS bails=
+ out.
+> When David asked to rename the "cs" prop to "cpu",=20
 
-An example program can be found here:
+yes. that is better.
 
-https://github.com/willnewton/qemucrash
+> I forgot to patch pnv accordingly in the first place. :)
+>=20
+> FWIW, other people do that as well (see hw/i386/pc_q35.c for example).
 
-This code starts a goroutine (thread) and calls exec repeatedly. This
-works ok natively but when run under ARM user emulation it segfaults
-(usually, there are occasionally other failures).
+well, I don't see the benefits of changing a string constant by a=20
+define.=20
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+Cheers,=20
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1696773
-
-Title:
-  golang calls to exec crash user emulation
-
-Status in QEMU:
-  New
-
-Bug description:
-  An example program can be found here:
-
-  https://github.com/willnewton/qemucrash
-
-  This code starts a goroutine (thread) and calls exec repeatedly. This
-  works ok natively but when run under ARM user emulation it segfaults
-  (usually, there are occasionally other failures).
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1696773/+subscriptions
+C.
