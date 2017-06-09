@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dJLHt-0004yk-4W
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 10:53:22 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dJLIN-0005cE-6o
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 10:53:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dJLHs-0003ff-4n
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 10:53:21 -0400
-References: <cover.1496844254.git.berto@igalia.com>
-	<643c9f0a83c8f5c913a55a556dcddd13754d1275.1496844254.git.berto@igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <36215351-07f7-43ab-bad5-96ed1f6ecd61@redhat.com>
-Date: Fri, 9 Jun 2017 09:53:05 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dJLIL-0003w0-QO
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 10:53:51 -0400
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:34763)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dJLIL-0003uU-Dk
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 10:53:49 -0400
+Received: by mail-lf0-x244.google.com with SMTP id o28so5306119lfk.1
+	for <qemu-devel@nongnu.org>; Fri, 09 Jun 2017 07:53:47 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <643c9f0a83c8f5c913a55a556dcddd13754d1275.1496844254.git.berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="2Ni4x5kEW3U8XwcOggGBrax9LUQDqDCAm"
-Subject: Re: [Qemu-devel] [PATCH v2 4/7] qcow2: Split do_perform_cow() into
- _read(), _encrypt() and _write()
+References: <1496152683-102751-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1496152683-102751-4-git-send-email-anton.nefedov@virtuozzo.com>
+	<CAJ+F1CLJBBJRRGzxRFGxihuD7Gsbxm-0Gg4uvyLfFsC_77NiQA@mail.gmail.com>
+	<e7bb9020-99b1-bb6f-0bf4-1c5d20c692fa@virtuozzo.com>
+In-Reply-To: <e7bb9020-99b1-bb6f-0bf4-1c5d20c692fa@virtuozzo.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 09 Jun 2017 14:53:35 +0000
+Message-ID: <CAJ+F1CLZmEPN-Jw3dZc64UnFFye29gyPaz+O=DHES6Vjh-hDHw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 03/13] char: chardevice hotswap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,125 +32,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, den@virtuozzo.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2Ni4x5kEW3U8XwcOggGBrax9LUQDqDCAm
-From: Eric Blake <eblake@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>, "Denis V . Lunev" <den@openvz.org>,
- Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <36215351-07f7-43ab-bad5-96ed1f6ecd61@redhat.com>
-Subject: Re: [PATCH v2 4/7] qcow2: Split do_perform_cow() into _read(),
- _encrypt() and _write()
-References: <cover.1496844254.git.berto@igalia.com>
- <643c9f0a83c8f5c913a55a556dcddd13754d1275.1496844254.git.berto@igalia.com>
-In-Reply-To: <643c9f0a83c8f5c913a55a556dcddd13754d1275.1496844254.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, Jun 1, 2017 at 3:23 PM Anton Nefedov <anton.nefedov@virtuozzo.com>
+wrote:
 
-On 06/07/2017 09:08 AM, Alberto Garcia wrote:
-> This patch splits do_perform_cow() into three separate functions to
-> read, encrypt and write the COW regions.
->=20
-> perform_cow() can now read both regions first, then encrypt them and
-> finally write them to disk. The memory allocation is also done in
-> this function now, using one single buffer large enough to hold both
-> regions.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/qcow2-cluster.c | 114 +++++++++++++++++++++++++++++++++++++-----=
---------
->  1 file changed, 84 insertions(+), 30 deletions(-)
->=20
+>
+>
+> On 05/31/2017 10:20 PM, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi
+> >
+> > On Tue, May 30, 2017 at 6:12 PM Anton Nefedov
+> > <anton.nefedov@virtuozzo.com <mailto:anton.nefedov@virtuozzo.com>>
+> wrote:
+> >
+> >     This patch adds a possibility to change a char device without a
+> frontend
+> >     removal.
+> >
+> >     1. Ideally, it would have to happen transparently to a frontend, i.=
+e.
+> >     frontend would continue its regular operation.
+> >     However, backends are not stateless and are set up by the frontends
+> >     via qemu_chr_fe_<> functions, and it's not (generally) possible to
+> >     replay
+> >     that setup entirely in a backend code, as different chardevs respon=
+d
+> >     to the setup calls differently, so do frontends work differently
+> basing
+> >     on those setup responses.
+> >     Moreover, some frontend can generally get and save the backend
+> pointer
+> >     (qemu_chr_fe_get_driver()), and it will become invalid after backen=
+d
+> >     change.
+> >
+> >     So, a frontend which would like to support chardev hotswap has to
+> >     register
+> >     a "backend change" handler, and redo its backend setup there.
+> >
+> >     2. Write path can be used by multiple threads and thus protected wi=
+th
+> >     chr_write_lock.
+> >     So hotswap also has to be protected so write functions won't access
+> >     a backend being replaced.
+> >
+> >
+> > Tbh, I don't understand the need for a different lock. Could you
+> > explain? Even better would be to write a test that shows in which way
+> > the lock helps.
+> >
+>
+> hi Marc-Andr=C3=A9,
+>
+> The existing chr_write_lock belongs to Chardev.
+> For the hotswap case, we need to ensure that be->chr won't change and
+> the old Chardev (together with its mutex) won't be destroyed while it's
+> used in the write functions.
+>
+> Maybe we could move the lock to CharBackend, instead of creating a new
+> one. But I guess this
+>   1. won't work for mux, where multiple CharBackends share the same
+> Chardev
+>   2. won't work for some chardevs, like pty which uses the lock for the
+> timer handler
+>
+> Sorry if I'm not explaining clearly enough or maybe I'm missing some
+> easier solution?
+>
+>
+It looks to me like you would get the same guarantees by using the
+chr_write_lock directly:
 
-Let's suppose we have a guest issuing 512-byte aligned requests and a
-host that requires 4k alignment; and the guest does an operation that
-needs a COW with one sector at both the front and end of the cluster.
+@@ -1381,7 +1374,7 @@ ChardevReturn *qmp_chardev_change(const char *id,
+ChardevBackend *backend,
+         closed_sent =3D true;
+     }
 
-> @@ -760,22 +776,59 @@ static int perform_cow(BlockDriverState *bs, QCow=
-L2Meta *m)
->      BDRVQcow2State *s =3D bs->opaque;
->      Qcow2COWRegion *start =3D &m->cow_start;
->      Qcow2COWRegion *end =3D &m->cow_end;
-> +    unsigned buffer_size =3D start->nb_bytes + end->nb_bytes;
+-    qemu_mutex_lock(&be->chr_lock);
++    qemu_mutex_lock(&chr->chr_write_lock);
+     chr->be =3D NULL;
+     qemu_chr_fe_connect(be, chr_new, &error_abort);
 
-This sets buffer_size to 1024 initially.
+@@ -1389,14 +1382,14 @@ ChardevReturn *qmp_chardev_change(const char *id,
+ChardevBackend *backend,
+         error_setg(errp, "Chardev '%s' change failed", chr_new->label);
+         chr_new->be =3D NULL;
+         qemu_chr_fe_connect(be, chr, &error_abort);
+-        qemu_mutex_unlock(&be->chr_lock);
++        qemu_mutex_unlock(&chr->chr_write_lock);
+         if (closed_sent) {
+             qemu_chr_be_event(chr, CHR_EVENT_OPENED);
+         }
+         object_unref(OBJECT(chr_new));
+         return NULL;
+     }
+-    qemu_mutex_unlock(&be->chr_lock);
++    qemu_mutex_unlock(&chr->chr_write_lock);
 
-> +    uint8_t *start_buffer, *end_buffer;
->      int ret;
-> =20
-> +    assert(start->nb_bytes <=3D UINT_MAX - end->nb_bytes);
-> +
->      if (start->nb_bytes =3D=3D 0 && end->nb_bytes =3D=3D 0) {
->          return 0;
->      }
-> =20
-> +    /* Reserve a buffer large enough to store the data from both the
-> +     * start and end COW regions */
-> +    start_buffer =3D qemu_try_blockalign(bs, buffer_size);
+I wonder if we should rename 'chr_write_lock' to just 'lock' :)
 
-This is going to allocate a bigger buffer, namely one that is at least
-4k in size (at least, that's my understanding - the block device is able
-to track its preferred IO size/alignment).
 
-> +    if (start_buffer =3D=3D NULL) {
-> +        return -ENOMEM;
-> +    }
-> +    /* The part of the buffer where the end region is located */
-> +    end_buffer =3D start_buffer + start->nb_bytes;
-
-But now end_buffer does not have optimal alignment.  In the old code, we
-called qemu_try_blockalign() twice, so that both read()s were called on
-a 4k boundary; but now, the end read() is called unaligned to a 4k
-boundary.  Of course, since we're only reading 512 bytes, instead of 4k,
-it MIGHT not matter, but I don't know if we are going to cause a bounce
-buffer to come into play that we could otherwise avoid if we were
-smarter with our alignments.  Is that something we need to analyze
-further, or even possibly intentionally over-allocate our buffer to
-ensure optimal read alignments?
-
-> +    /* And now we can write everything */
-> +    ret =3D do_perform_cow_write(bs, m->alloc_offset, start->offset,
-> +                               start_buffer, start->nb_bytes);
-> +    if (ret < 0) {
-> +        goto fail;
-> +    }
-> =20
-> +    ret =3D do_perform_cow_write(bs, m->alloc_offset, end->offset,
-> +                               end_buffer, end->nb_bytes);
-
-At any rate, other than the potential of a pessimization due to poor
-alignments, your split looks sane, and it makes it more obvious that if
-we set up the write iov, a later patch could then call a single
-do_perform_cow_write using pwritev() over both chunks in one syscall.
-
+> I can try to add a test but can't quite see yet how to freeze the old
+> chardev somewhere in cc->chr_write() and hotswap it while it's there.
+>
+>
+> >
+> >
+> >     Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com
+> >     <mailto:anton.nefedov@virtuozzo.com>>
+> >     Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com
+> >     <mailto:vsementsov@virtuozzo.com>>
+> >
+> >
+> > patch looks good otherwise
+> >
+> >     ---
+> >       chardev/char.c        | 126
+> >     ++++++++++++++++++++++++++++++++++++++++++++++----
+> >       include/sysemu/char.h |   9 ++++
+> >       qapi-schema.json      |  40 ++++++++++++++++
+> >       3 files changed, 165 insertions(+), 10 deletions(-)
+> >
+> > --
+> > Marc-Andr=C3=A9 Lureau
+>
+> /Anton
+>
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---2Ni4x5kEW3U8XwcOggGBrax9LUQDqDCAm
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZOrZRAAoJEKeha0olJ0Nqco4H/22NOQzqTHBJ0gyPMxrMxc5v
-xcx1kbLy/dpSWHdDlCcgRBfCPNG4k8iqwGBjs7f3UcpTht10ESKdS/aZHf++h3hD
-OpX2z4ZDJMtbnmrMZxI9ff+iPAkMpjCVt2YyZQhfn7DwkgYOFYfJM/u07aOc/jUX
-6UuOjuRrNlOXMd/w5wmuPEoYhW4Z18a2S0NZDSLGPMOoy8zaFfn1oRPhmohP9UYP
-pZTyTigQqtS3Z/A4dU/7XNqso8SoF/WcR4J/G4VNTziH+RUdna9t6QH8ei7ChkOZ
-N6rtPOWtqDeD/3pwTkDpwchpsCt2wf6dekbt1MPnIfnB/QKcEgIfSdJ293nFB+A=
-=Undj
------END PGP SIGNATURE-----
-
---2Ni4x5kEW3U8XwcOggGBrax9LUQDqDCAm--
+Marc-Andr=C3=A9 Lureau
