@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dJHY5-0005ah-1k
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 06:53:50 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dJHbK-0007hr-KQ
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 06:57:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dJHY1-0004rc-UY
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 06:53:49 -0400
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:35018)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dJHY1-0004n3-Kl
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 06:53:45 -0400
-Received: by mail-wr0-x22d.google.com with SMTP id q97so28856757wrb.2
-	for <qemu-devel@nongnu.org>; Fri, 09 Jun 2017 03:53:43 -0700 (PDT)
-References: <20170609094812.GA2201@toto>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170609094812.GA2201@toto>
-Date: Fri, 09 Jun 2017 11:54:09 +0100
-Message-ID: <87zidhbfe6.fsf@linaro.org>
+	(envelope-from <dgibson@ozlabs.org>) id 1dJHbJ-00061U-KW
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 06:57:10 -0400
+Date: Fri, 9 Jun 2017 20:03:36 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170609100336.GJ26521@umbus.fritz.box>
+References: <20170608144106.GG25805@umbus.fritz.box>
+	<20170609110748.00c8e419@nial.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] AArch64 regression
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="ed/6oDxOLijJh8b0"
+Content-Disposition: inline
+In-Reply-To: <20170609110748.00c8e419@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] unplug_request and migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,176 +24,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, qemu-devel@nongnu.org, peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>, Richard Henderson <rth@twiddle.net>, fred.konrad@greensocs.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, quintela@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, jdenemar@redhat.com
 
 
-Edgar E. Iglesias <edgar.iglesias@gmail.com> writes:
+--ed/6oDxOLijJh8b0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Hi,
->
-> I was running a bunch of tests in preparation for the MMIO/exec
-> series but am running into regressions on master.
-> I'm at commit 64175afc695c0672876fbbfc31b299c86d562cb4
->
-> On the xlnx-zcu102 I see lockups, the console goes unresponsive.
-> On one of my vexpress-a15 setups (with an a57), I see weird
-> segfaults in user-space.
->
-> I bisected this multiple times with each of the test cases
-> and all of the bisects bring me to this commit:
-> commit e75449a346bf558296966a44277bfd93412c6da6
-> Author: Emilio G. Cota <cota@braap.org>
-> Date:   Fri Apr 28 14:59:23 2017 -0400
->
->     target/aarch64: optimize indirect branches
->
->
-> Does this ring any bells? Are there any known issues at the moment?
-> I've copied a GDB backtrace form the ZynqMP lockup at the end
-> of this email.
+On Fri, Jun 09, 2017 at 11:09:10AM +0200, Igor Mammedov wrote:
+> On Fri, 9 Jun 2017 00:41:06 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > Hi Dave & Juan,
+> >=20
+> > I'm hoping one of you can answer this.
+> >=20
+> > I'm currently grappling with (amongst other things) a pseries machine
+> > racing a hot unplug operation with a migrate.  There's various issues
+> > with what interim state we need, and which bits of it need to be
+> > migrated that I'm still investigating.  But, there's a more general
+> > question that I'm guessing must have already been addressed for x86.
+> >=20
+> > For any "soft" unplug device - i.e. using ->unplug_request, rather
+> > than ->unplug, giving a device_del command will just ask the guest
+> > nicely to release the device, with the completion of the unplug
+> > happening only if and when the guest indicates it's ready for the
+> > device to go away.  AFAICT, the device_del command will return as soon
+> > as the request is made, but if the guest is busy, the completion of
+> > the hot unplug could take arbitrarily long.
+> >=20
+> > So, what happens if there's a migration in between the unplug_request
+> > and the guest completing the unplug?  How does libvirt (or whatever)
+> > know whether to include the device on the destination machine command
+> > line?
+> >=20
+>=20
+> looking at qdev_unplug():
+>     if (!migration_is_idle()) {=20
+>         error_setg(errp, "device_del not allowed while migrating");
+>         return;
+>     }
+>=20
+> so unplug request should fail if migration is in progress , it won't reac=
+h guest
+> and mgmt side will have to repeat request on migration completion.
+>=20
+> But it's still possible to issue unplug request first and then start
+> migration,
 
-Yes - see the PULL req thread when this got merged:
+Right, that's the case I'm interested in, not the other way around.
 
-  Message-ID: <87h8zrdh02.fsf@linaro.org>
+> that's where race between DEVICE_DELETED and migration start (starting DS=
+T with
+> being unplugged device) occurs.
+>=20
+> it could be possible:
+>  1: on unplug_request() set global flag that there is pending unplug and =
+forbid
+>     migration until completion. But there is no guarantee that unplug will
+>     be completed nor a way to notice that it's failed/rejected by guest.
+>     I'm not sure how that could be solved.
+>  2: set per device pending_unplug flag and delay unplug event from guest
+>     until migration is completed if migration is in progress when unplug
+>     callback is called.
+>     mgmt will treat the case as usual migration, i.e. start dst with being
+>     unplugged device, and device will be removed on dst side on migration
+>     completion.
+>     (it should be generic solution as x86 is also affected), as place whe=
+re
+>     to put this common logic I'd suggest hotplug_handler_unplug()
 
-I'm currently trying to narrow it down. It's tricky as the problem goes
-away when I add fprintfs but it affects both single and multi-thread
-modes so I don't think its a race.
+So.. it seems like the short version is that racing migration and
+unplug is broken already.
 
-It seems to only affect TB's looked up in lookup_tb_ptr via the htable
-which is odd.
+Which is unfortunate, but at least means I don't need to worry about
+it particularly for Power.
 
->
-> Thanks,
-> Edgar
->
-> GDB backtrace:
-> (gdb) thread apply all bt
->
-> Thread 6 (Thread 0x7fff431fc700 (LWP 28586)):
-> #0  0x00007ffff5e2826d in __lll_lock_wait ()
->    from /lib/x86_64-linux-gnu/libpthread.so.0
-> #1  0x00007ffff5e21dbd in pthread_mutex_lock ()
->    from /lib/x86_64-linux-gnu/libpthread.so.0
-> #2  0x0000555555b5cc40 in qemu_mutex_lock (
->     mutex=mutex@entry=0x55555620be80 <qemu_global_mutex>)
->     at /home/edgar/src/c/qemu/qemu/util/qemu-thread-posix.c:61
-> #3  0x00005555557bc9cc in qemu_mutex_lock_iothread ()
->     at /home/edgar/src/c/qemu/qemu/cpus.c:1581
-> #4  0x000055555578e865 in cpu_handle_interrupt (last_tb=<synthetic pointer>,
->     cpu=0x5555566c40b0) at /home/edgar/src/c/qemu/qemu/cpu-exec.c:491
-> #5  cpu_exec (cpu=cpu@entry=0x7fffc543f4f8)
->     at /home/edgar/src/c/qemu/qemu/cpu-exec.c:670
-> #6  0x00005555557bcb9f in tcg_cpu_exec (cpu=0x7fffc543f4f8)
->     at /home/edgar/src/c/qemu/qemu/cpus.c:1270
-> #7  qemu_tcg_cpu_thread_fn (arg=0x7fffc543f4f8)
->     at /home/edgar/src/c/qemu/qemu/cpus.c:1473
-> #8  0x00007ffff5e1f6ba in start_thread ()
->    from /lib/x86_64-linux-gnu/libpthread.so.0
-> #9  0x00007ffff5b5582d in clone () from /lib/x86_64-linux-gnu/libc.so.6
->
-> Thread 5 (Thread 0x7fff439fd700 (LWP 28585)):
-> #0  0x00007ffff5e2826d in __lll_lock_wait ()
->    from /lib/x86_64-linux-gnu/libpthread.so.0
-> #1  0x00007ffff5e21dbd in pthread_mutex_lock ()
->    from /lib/x86_64-linux-gnu/libpthread.so.0
-> #2  0x0000555555b5cc40 in qemu_mutex_lock (
->     mutex=mutex@entry=0x55555620be80 <qemu_global_mutex>)
->     at /home/edgar/src/c/qemu/qemu/util/qemu-thread-posix.c:61
-> #3  0x00005555557bc9cc in qemu_mutex_lock_iothread ()
->     at /home/edgar/src/c/qemu/qemu/cpus.c:1581
-> #4  0x000055555578e865 in cpu_handle_interrupt (last_tb=<synthetic pointer>,
->     cpu=0x5555566c40b0) at /home/edgar/src/c/qemu/qemu/cpu-exec.c:491
-> #5  cpu_exec (cpu=cpu@entry=0x7fffc54208d0)
->     at /home/edgar/src/c/qemu/qemu/cpu-exec.c:670
-> #6  0x00005555557bcb9f in tcg_cpu_exec (cpu=0x7fffc54208d0)
->     at /home/edgar/src/c/qemu/qemu/cpus.c:1270
-> #7  qemu_tcg_cpu_thread_fn (arg=0x7fffc54208d0)
->     at /home/edgar/src/c/qemu/qemu/cpus.c:1473
-> #8  0x00007ffff5e1f6ba in start_thread ()
->    from /lib/x86_64-linux-gnu/libpthread.so.0
-> #9  0x00007ffff5b5582d in clone () from /lib/x86_64-linux-gnu/libc.so.6
->
-> Thread 4 (Thread 0x7fff441fe700 (LWP 28584)):
-> #0  0x00007ffff5e21dac in pthread_mutex_lock ()
->    from /lib/x86_64-linux-gnu/libpthread.so.0
-> #1  0x0000555555b5cc40 in qemu_mutex_lock (
->     mutex=mutex@entry=0x55555620be80 <qemu_global_mutex>)
->     at /home/edgar/src/c/qemu/qemu/util/qemu-thread-posix.c:61
-> #2  0x00005555557bc9cc in qemu_mutex_lock_iothread ()
->     at /home/edgar/src/c/qemu/qemu/cpus.c:1581
-> #3  0x000055555578e865 in cpu_handle_interrupt (last_tb=<synthetic pointer>,
->     cpu=0x5555566c40b0) at /home/edgar/src/c/qemu/qemu/cpu-exec.c:491
-> #4  cpu_exec (cpu=cpu@entry=0x7fffc5401ca8)
->     at /home/edgar/src/c/qemu/qemu/cpu-exec.c:670
-> #5  0x00005555557bcb9f in tcg_cpu_exec (cpu=0x7fffc5401ca8)
->     at /home/edgar/src/c/qemu/qemu/cpus.c:1270
-> #6  qemu_tcg_cpu_thread_fn (arg=0x7fffc5401ca8)
->     at /home/edgar/src/c/qemu/qemu/cpus.c:1473
-> #7  0x00007ffff5e1f6ba in start_thread ()
->    from /lib/x86_64-linux-gnu/libpthread.so.0
-> #8  0x00007ffff5b5582d in clone () from /lib/x86_64-linux-gnu/libc.so.6
->
-> Thread 3 (Thread 0x7fff449ff700 (LWP 28583)):
-> #0  0x00005555558c4c89 in regime_el (mmu_idx=ARMMMUIdx_S1NSE1,
->     env=0x7fffc53eb310) at /home/edgar/src/c/qemu/qemu/target/arm/helper.c:7028
-> #1  regime_tcr (mmu_idx=<optimized out>, env=0x7fffc53eb310)
->     at /home/edgar/src/c/qemu/qemu/target/arm/helper.c:7117
-> #2  arm_regime_tbi0 (env=env@entry=0x7fffc53eb310, mmu_idx=<optimized out>,
->     mmu_idx@entry=ARMMMUIdx_S12NSE1)
->     at /home/edgar/src/c/qemu/qemu/target/arm/helper.c:7142
-> #3  0x00005555557ba346 in cpu_get_tb_cpu_state (flags=<synthetic pointer>,
->     cs_base=<synthetic pointer>, pc=<synthetic pointer>, env=0x7fffc53eb310)
->     at /home/edgar/src/c/qemu/qemu/target/arm/cpu.h:2571
-> #4  helper_lookup_tb_ptr (env=0x7fffc53eb310, addr=18446743524088820436)
->     at /home/edgar/src/c/qemu/qemu/tcg-runtime.c:156
-> #5  0x00007fffcf2f7e53 in code_gen_buffer ()
-> #6  0x000055555578de7c in cpu_tb_exec (itb=<optimized out>,
->     itb=<optimized out>, cpu=0x7fffc5727478)
->     at /home/edgar/src/c/qemu/qemu/cpu-exec.c:166
-> #7  cpu_loop_exec_tb (tb_exit=<synthetic pointer>,
->     last_tb=<synthetic pointer>, tb=<optimized out>, cpu=0x7fffc5727478)
->     at /home/edgar/src/c/qemu/qemu/cpu-exec.c:574
-> #8  cpu_exec (cpu=cpu@entry=0x7fffc53e3080)
->     at /home/edgar/src/c/qemu/qemu/cpu-exec.c:672
-> #9  0x00005555557bcb9f in tcg_cpu_exec (cpu=0x7fffc53e3080)
->     at /home/edgar/src/c/qemu/qemu/cpus.c:1270
-> #10 qemu_tcg_cpu_thread_fn (arg=0x7fffc53e3080)
->     at /home/edgar/src/c/qemu/qemu/cpus.c:1473
-> #11 0x00007ffff5e1f6ba in start_thread ()
->    from /lib/x86_64-linux-gnu/libpthread.so.0
-> #12 0x00007ffff5b5582d in clone () from /lib/x86_64-linux-gnu/libc.so.6
->
-> Thread 2 (Thread 0x7fffef7b7700 (LWP 28582)):
-> #0  0x00007ffff5b4f8e9 in syscall () from /lib/x86_64-linux-gnu/libc.so.6
-> #1  0x0000555555b5d385 in qemu_futex_wait (val=<optimized out>,
->     f=<optimized out>) at /home/edgar/src/c/qemu/qemu/include/qemu/futex.h:26
-> #2  qemu_event_wait (ev=ev@entry=0x55555661bae4 <rcu_call_ready_event>)
->     at /home/edgar/src/c/qemu/qemu/util/qemu-thread-posix.c:415
-> #3  0x0000555555b6cc6e in call_rcu_thread (opaque=<optimized out>)
->     at /home/edgar/src/c/qemu/qemu/util/rcu.c:249
-> #4  0x00007ffff5e1f6ba in start_thread ()
->    from /lib/x86_64-linux-gnu/libpthread.so.0
-> #5  0x00007ffff5b5582d in clone () from /lib/x86_64-linux-gnu/libc.so.6
->
-> Thread 1 (Thread 0x7ffff7f31c00 (LWP 28578)):
-> #0  0x00007ffff5b49c21 in ppoll () from /lib/x86_64-linux-gnu/libc.so.6
-> #1  0x0000555555b58f39 in ppoll (__ss=0x0, __timeout=0x7fffffffd5f0,
->     __nfds=<optimized out>, __fds=<optimized out>)
->     at /usr/include/x86_64-linux-gnu/bits/poll2.h:77
-> #2  qemu_poll_ns (fds=<optimized out>, nfds=<optimized out>,
->     timeout=timeout@entry=9223371867734611302)
->     at /home/edgar/src/c/qemu/qemu/util/qemu-timer.c:334
-> #3  0x0000555555b59d6a in os_host_main_loop_wait (timeout=9223371867734611302)
->     at /home/edgar/src/c/qemu/qemu/util/main-loop.c:255
-> #4  main_loop_wait (nonblocking=<optimized out>)
->     at /home/edgar/src/c/qemu/qemu/util/main-loop.c:517
-> #5  0x0000555555779057 in main_loop () at /home/edgar/src/c/qemu/qemu/vl.c:1918
-> #6  main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>)
->     at /home/edgar/src/c/qemu/qemu/vl.c:4752
-> (gdb)
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
+--ed/6oDxOLijJh8b0
+Content-Type: application/pgp-signature; name="signature.asc"
 
---
-Alex Bennée
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZOnJ1AAoJEGw4ysog2bOS2fkQAJYtcZD/+OwB0d9YeXZB75iF
+/svyc3Q7DpW1yezlQPN7yRg99x4THpm/zY7F8KxYn0sWP3gLimfWM2FS/YmWvTCu
+JHpFr0S6/J4HO7yzZbuT4NbPUT95MuyGrDNn8eF3SuYlXlvdh5+YuF2UfiXBrbR+
+x/caBKjNpluTykuo+Qbc9E1IS+4vM5OXLqIs7HFu+/h6tMBSTDVxM+f/JxJMTkWJ
+TQ2+j6T+u0dC+0NPrWlqBW99eg52DmjI6oz+uvpmM/a0qgXOolvLhzpLr6hhCvYV
+thSYxAyC4dJs2Nhh3aUqmZwg8kTGq/0Ib+ySO4ytF0yzJVO2OrtSH+Yc74rWWJzj
+8FhxxLf5C1aGqYW6qpIHa0qIDI1OTLQPy0qHc7qqdyr8EzdxSNn9EQ8AonsAKXMU
+G5EEVEZCVs1qDt3hvZ/tzebTiuFd6OLRIK+VeWXNa8Cy0VcIV/jcGCT1d3RYqyat
+xX2Lwiv2uyI50662oe5/wu1cPceHphfdi93KhIFmDBcgl2VzW8xRaIAO8VcvNSHu
+aVOYlA+GWCynl1ND2jD1nWNMEvAtCSqSr/OGja4CoOxjkcn7roVtFD9QvLpy2312
+ZAFsOQwcnEQyC6OWMkjdbh262Oty8dcem7Cl4df2k1xuWnW1F4dGMwpCYDIBB03v
+yKu+JdR/bMZGoupeqgcv
+=GHEm
+-----END PGP SIGNATURE-----
+
+--ed/6oDxOLijJh8b0--
