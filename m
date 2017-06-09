@@ -1,23 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dJHbN-0007kd-EX
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 06:57:14 -0400
+	(envelope-from <lvivier@redhat.com>) id 1dJHm7-0006HK-3c
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 07:08:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dJHbM-00062U-9f
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 06:57:13 -0400
-Date: Fri, 9 Jun 2017 20:53:05 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170609105305.GN26521@umbus.fritz.box>
-References: <20170530160445.12810-1-lvivier@redhat.com>
-	<20170531043557.GI12163@umbus.fritz.box>
-	<149695205346.23353.3484869110998357783@loki>
-	<20170609102733.0eb7293d@nial.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="BjavXC7V3ilNTWHC"
-Content-Disposition: inline
-In-Reply-To: <20170609102733.0eb7293d@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] spapr: manage hotplugged devices while the
+	(envelope-from <lvivier@redhat.com>) id 1dJHm3-0001kh-UG
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 07:08:19 -0400
+From: Laurent Vivier <lvivier@redhat.com>
+Date: Fri,  9 Jun 2017 13:08:10 +0200
+Message-Id: <20170609110810.3951-1-lvivier@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] spapr: manage hotplugged devices while the
  VM is not started
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -27,125 +18,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, Laurent Vivier <lvivier@redhat.com>
 
+For QEMU, a hotlugged device is a device added using the HMP/QMP
+interface.
+For SPAPR, a hotplugged device is a device added while the
+machine is running. In this case QEMU doesn't update internal
+state but relies on the OS for this part
 
---BjavXC7V3ilNTWHC
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In the case of migration, when we (libvirt) hotplug a device
+on the source guest, we (libvirt) generally hotplug the same
+device on the destination guest. But in this case, the machine
+is stopped (RUN_STATE_INMIGRATE) and QEMU must not expect
+the OS will manage it as an hotplugged device as it will
+be "imported" by the migration.
 
-On Fri, Jun 09, 2017 at 10:27:33AM +0200, Igor Mammedov wrote:
-> On Thu, 08 Jun 2017 15:00:53 -0500
-> Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
->=20
-> > Quoting David Gibson (2017-05-30 23:35:57)
-> > > On Tue, May 30, 2017 at 06:04:45PM +0200, Laurent Vivier wrote: =20
-> > > > For QEMU, a hotlugged device is a device added using the HMP/QMP
-> > > > interface.
-> > > > For SPAPR, a hotplugged device is a device added while the
-> > > > machine is running. In this case QEMU doesn't update internal
-> > > > state but relies on the OS for this part
-> > > >=20
-> > > > In the case of migration, when we (libvirt) hotplug a device
-> > > > on the source guest, we (libvirt) generally hotplug the same
-> > > > device on the destination guest. But in this case, the machine
-> > > > is stopped (RUN_STATE_INMIGRATE) and QEMU must not expect
-> > > > the OS will manage it as an hotplugged device as it will
-> > > > be "imported" by the migration.
-> > > >=20
-> > > > This patch changes the meaning of "hotplugged" in spapr.c
-> > > > to manage a QEMU hotplugged device like a "coldplugged" one
-> > > > when the machine is awaiting an incoming migration.
-> > > >=20
-> > > > Signed-off-by: Laurent Vivier <lvivier@redhat.com> =20
-> > >=20
-> > > So, I think this is a reasonable concept, at least in terms of
-> > > cleanliness and not doing unnecessary work.  However, if it's fixing
-> > > bugs, I suspect that means we still have problems elsewhere. =20
-> >=20
-> > I was hoping a lot of these issues would go away once we default
-> > the initial/reset DRC states to "coldplugged". I think your pending
-> > patch:
-> >=20
-> >   "spapr: Make DRC reset force DRC into known state"
-> >=20
-> > But I didn't consider the fact that libvirt will be issuing these
-> > hotplugs *after* reset, so those states would indeed need to
-> > be fixed up again to reflect boot-time,attached as opposed to
-> > boot-time,unattached before starting the target.
-> >=20
-> > So I do think this patch addresses a specific bug that isn't
-> > obviously fixable elsewhere.
-> >=20
-> > To me it seems like the only way to avoid doing something like
-> > what this patch does is to migrate all attached DRCs from the
-> > source in all cases.
-> >=20
-> > This would break backward-migration though, unless we switch from
-> > using subregions for DRCs to explicitly disabling DRC migration
-> > based on machine type.
-> we could leave old machines broken and fix only new machine types,
-> then it would be easy ot migrate 'additional' DRC state as subsection
-> only on new for new machines.
->=20
-> >=20
-> > That approach seems to similar to what x86 does, e.g.
-> > hw/acpi/ich9.c and hw/acpi/piix.c migrate vmstate_memhp_state
-> > (corresponding to all DIMMs' slot status) in all cases where
-> > memory hotplug is enabled. If they were to do this using
-> > subregions for DIMMs in a transitional state I think similar
-> > issues would pop up in that code as well.
-> >=20
-> > Even if we take this route, we still need to explicitly suppress
-> > hotplug events during INMIGRATE to avoid extra events going on
-> > the queue. *Unless* we similarly rely purely on the ones sent by
-> > the source.
-> pc/q35 might also lose events if device is hotplugged during migration,
-> in addition migration would fail anyway since dst qemu
-> should be launched with all devices that are present on src.
->=20
-> ex: consider if one hotplugs DIMM during migration, it creates
-> RAM region mapped into guest and that region might be transferred
-> as part of VMState (not sure if it even works)
-> and considering dst qemu has no idea about hotplugged memory mapping,
-> the migration would fail on receiving unknown VMState.
->=20
-> Hotplug generally doesn't work during migration, so it should be disabled
-> in a generic way on migration start and re-enabled on target
-> on migration completion. How about blocking device_add when
-> INMIGRATE state and unblocking it when switching to runnig on dst?
+This patch changes the meaning of "hotplugged" in spapr.c
+to manage a QEMU hotplugged device like a "coldplugged" one
+when the machine is awaiting an incoming migration.
 
-Yeah, that sounds like a good idea.  We need to cover the case of
-migration during an incomplete hot (un)plug as well as hotplug during
-a migration.
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+---
+v2: fix the minor nit reported by dgibson
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+    I repost the patch as I think it is good to have
+    devices in a good state before migration (it is
+    generally a pre-requisite for migration), 
+    so a hotplugged CPU before incoming migration
+    appears like a coldplugged one, and moreover
+    it fixes the use case in which CPU are hotplugged
+    on both side (src and dest), and we try to unplug
+    the CPU after the migration.
 
---BjavXC7V3ilNTWHC
-Content-Type: application/pgp-signature; name="signature.asc"
+ hw/ppc/spapr.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZOn4RAAoJEGw4ysog2bOSEfsP/1I/VbTVBdRLM7CvtJwNqujh
-zihdx6zDT43hanw5haFP+IkY/iQz6RjUfqhcTmkdCEOM41VYOrhmBOa0USaQwTB/
-kyBdsjA4pot8U46gZFdxpwVXOVGmB5GiZkEi0sroLAiytXjU8mUt/vc+Xxr056j4
-dUF+vctPfLNpQALonxz5FMMFtpeyVajh7WDZglU6MyWabC0Q4y1VMQrk93IlSldQ
-ajggUqAcZrUaOYXMU8GG67x1Gp5cBMCbe7gZd+RTrowgMP11Nr3plPWPYy3KUzof
-/wxwkBKGbgQg+X91Rz1crTB7LcjUMERMtl8gH5/4MCKgM3eXnQzb0XjScr1jjTfJ
-D4tw80VFhEN7PNTW5vk2boWUrqDz2Igirkl+jZoYFDRpTYuCDTNNStL1ZuEqpeWe
-pBUtrnmLwgNrxn+gFlGwp6+RYr519j6eLXt+v04loN38vdNw90LMuaEt2dNBj0hT
-1g3IN9jGW2Fykz/aX6YY0n6jmcTtPksQNDwEPFpDuX+IJEsegfMEIKIQYO9/mBm2
-5rd+gkPGA+nOp0j4BxSdTlAqn+WvOtCdkW1761Yd8ArtCghSEJLawpQFK/hYoXo5
-kbWDsSCcQoKqgA+akyPKrcL2uehksYN0OZrxTynZkhir/w9PvEj9WRVutx2PSosE
-8IbH9ECoC7I4n3vqppwy
-=HgjN
------END PGP SIGNATURE-----
-
---BjavXC7V3ilNTWHC--
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 91b4057..d5a3587 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2518,6 +2518,12 @@ static void spapr_nmi(NMIState *n, int cpu_index, Error **errp)
+     }
+ }
+ 
++static bool spapr_coldplugged(DeviceState *dev)
++{
++    return runstate_check(RUN_STATE_INMIGRATE) ||
++           !dev->hotplugged;
++}
++
+ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
+                            uint32_t node, bool dedicated_hp_event_source,
+                            Error **errp)
+@@ -2528,6 +2534,7 @@ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
+     int i, fdt_offset, fdt_size;
+     void *fdt;
+     uint64_t addr = addr_start;
++    bool coldplugged = spapr_coldplugged(dev);
+ 
+     for (i = 0; i < nr_lmbs; i++) {
+         drc = spapr_drc_by_id(TYPE_SPAPR_DRC_LMB,
+@@ -2539,9 +2546,9 @@ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
+                                                 SPAPR_MEMORY_BLOCK_SIZE);
+ 
+         drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+-        drck->attach(drc, dev, fdt, fdt_offset, !dev->hotplugged, errp);
++        drck->attach(drc, dev, fdt, fdt_offset, coldplugged, errp);
+         addr += SPAPR_MEMORY_BLOCK_SIZE;
+-        if (!dev->hotplugged) {
++        if (coldplugged) {
+             /* guests expect coldplugged LMBs to be pre-allocated */
+             drck->set_allocation_state(drc, SPAPR_DR_ALLOCATION_STATE_USABLE);
+             drck->set_isolation_state(drc, SPAPR_DR_ISOLATION_STATE_UNISOLATED);
+@@ -2550,7 +2557,7 @@ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
+     /* send hotplug notification to the
+      * guest only in case of hotplugged memory
+      */
+-    if (dev->hotplugged) {
++    if (!coldplugged) {
+         if (dedicated_hp_event_source) {
+             drc = spapr_drc_by_id(TYPE_SPAPR_DRC_LMB,
+                                   addr_start / SPAPR_MEMORY_BLOCK_SIZE);
+@@ -2863,6 +2870,7 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     int smt = kvmppc_smt_threads();
+     CPUArchId *core_slot;
+     int index;
++    bool coldplugged = spapr_coldplugged(dev);
+ 
+     core_slot = spapr_find_cpu_slot(MACHINE(hotplug_dev), cc->core_id, &index);
+     if (!core_slot) {
+@@ -2884,7 +2892,7 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+ 
+     if (drc) {
+         sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+-        drck->attach(drc, dev, fdt, fdt_offset, !dev->hotplugged, &local_err);
++        drck->attach(drc, dev, fdt, fdt_offset, coldplugged, &local_err);
+         if (local_err) {
+             g_free(fdt);
+             error_propagate(errp, local_err);
+@@ -2892,7 +2900,7 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+         }
+     }
+ 
+-    if (dev->hotplugged) {
++    if (!coldplugged) {
+         /*
+          * Send hotplug notification interrupt to the guest only in case
+          * of hotplugged CPUs.
+-- 
+2.9.4
