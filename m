@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46981)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dJCRw-0003vW-I9
+	(envelope-from <dgibson@ozlabs.org>) id 1dJCRw-0003va-Jm
 	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:27:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dJCRs-0006bu-L8
+	(envelope-from <dgibson@ozlabs.org>) id 1dJCRs-0006bg-I9
 	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:27:08 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  9 Jun 2017 15:26:32 +1000
-Message-Id: <20170609052652.23200-1-david@gibson.dropbear.id.au>
+Date: Fri,  9 Jun 2017 15:26:33 +1000
+Message-Id: <20170609052652.23200-2-david@gibson.dropbear.id.au>
+In-Reply-To: <20170609052652.23200-1-david@gibson.dropbear.id.au>
+References: <20170609052652.23200-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/20] ppc-for-2.10 queue 20170609
+Subject: [Qemu-devel] [PULL 01/20] target/ppc: pass const string to
+ kvmppc_is_mem_backend_page_size_ok()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,79 +24,71 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, sursingh@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, sursingh@redhat.com, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-The following changes since commit 64175afc695c0672876fbbfc31b299c86d562c=
-b4:
+From: Greg Kurz <groug@kaod.org>
 
-  arm_gicv3: Fix ICC_BPR1 reset value when EL3 not implemented (2017-06-0=
-7 17:21:44 +0100)
+This function has three implementations. Two are stubs that do nothing
+and the third one only passes the obj_path argument to:
 
-are available in the git repository at:
+Object *object_resolve_path(const char *path, bool *ambiguous);
 
-  git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170609
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ target/ppc/kvm.c     | 4 ++--
+ target/ppc/kvm_ppc.h | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-for you to fetch changes up to 593080936a06a04eacc589350e3a7ebc02f2ed8e:
-
-  Revert "spapr: fix memory hot-unplugging" (2017-06-09 12:35:46 +1000)
-
-----------------------------------------------------------------
-ppc patch queue 2017-06-09
-
-This batch contains more patches to rework the pseries machine hotplug
-infrastructure, plus an assorted batch of bugfixes.
-
-It contains a start on fixes to restore migration from older machine
-types on older versions which was broken by some xics changes.  There
-are still a few missing pieces here, though.
-
-----------------------------------------------------------------
-David Gibson (8):
-      pseries: Correct panic behaviour for pseries machine type
-      spapr: Clean up DR entity sense handling
-      spapr: Don't misuse DR-indicator in spapr_recover_pending_dimm_stat=
-e()
-      spapr: Clean up RTAS set-indicator
-      spapr: Clean up handling of DR-indicator
-      spapr: Change DRC attach & detach methods to functions
-      spapr: Fold spapr_phb_{add,remove}_pci_device() into their only cal=
-lers
-      spapr: Rework DRC name handling
-
-Greg Kurz (9):
-      target/ppc: pass const string to kvmppc_is_mem_backend_page_size_ok=
-()
-      target/ppc: fix memory leak in kvmppc_is_mem_backend_page_size_ok()
-      spapr: fix memory leak in spapr_memory_pre_plug()
-      pnv_core: drop reference on ICPState object during CPU realization
-      xics: add reset() handler to ICPStateClass
-      xics: introduce macros for ICP/ICS link properties
-      xics: pass appropriate types to realize() handlers.
-      xics: setup cpu at realize time
-      xics: drop ICPStateClass::cpu_setup() handler
-
-Laurent Vivier (1):
-      Revert "spapr: fix memory hot-unplugging"
-
-Thomas Huth (2):
-      hw/ppc/spapr: Adjust firmware name for PCI bridges
-      hw/cpu: core.c can be compiled as common object
-
- hw/cpu/Makefile.objs       |   3 +-
- hw/intc/xics.c             |  95 +++++++--------
- hw/intc/xics_kvm.c         |  45 ++-----
- hw/intc/xics_pnv.c         |   6 +-
- hw/ppc/pnv_core.c          |  16 +--
- hw/ppc/pnv_psi.c           |   3 +-
- hw/ppc/spapr.c             |  44 +++----
- hw/ppc/spapr_cpu_core.c    |  22 ++--
- hw/ppc/spapr_drc.c         | 289 +++++++++++++++++++--------------------=
-------
- hw/ppc/spapr_pci.c         |  72 ++++-------
- hw/ppc/spapr_rtas.c        |   7 +-
- hw/ppc/trace-events        |   5 +-
- include/hw/ppc/spapr_drc.h |  31 +++--
- include/hw/ppc/xics.h      |  17 +--
- target/ppc/kvm.c           |   5 +-
- target/ppc/kvm_ppc.h       |   4 +-
- 16 files changed, 278 insertions(+), 386 deletions(-)
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 51249ce..8881762 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -478,7 +478,7 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+     }
+ }
+=20
+-bool kvmppc_is_mem_backend_page_size_ok(char *obj_path)
++bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
+ {
+     Object *mem_obj =3D object_resolve_path(obj_path, NULL);
+     char *mempath =3D object_property_get_str(mem_obj, "mem-path", NULL)=
+;
+@@ -499,7 +499,7 @@ static inline void kvm_fixup_page_sizes(PowerPCCPU *c=
+pu)
+ {
+ }
+=20
+-bool kvmppc_is_mem_backend_page_size_ok(char *obj_path)
++bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
+ {
+     return true;
+ }
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index f48243d..eab7c8f 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -64,7 +64,7 @@ int kvmppc_enable_hwrng(void);
+ int kvmppc_put_books_sregs(PowerPCCPU *cpu);
+ PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
+=20
+-bool kvmppc_is_mem_backend_page_size_ok(char *obj_path);
++bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path);
+=20
+ #else
+=20
+@@ -211,7 +211,7 @@ static inline uint64_t kvmppc_rma_size(uint64_t curre=
+nt_size,
+     return ram_size;
+ }
+=20
+-static inline bool kvmppc_is_mem_backend_page_size_ok(char *obj_path)
++static inline bool kvmppc_is_mem_backend_page_size_ok(const char *obj_pa=
+th)
+ {
+     return true;
+ }
+--=20
+2.9.4
