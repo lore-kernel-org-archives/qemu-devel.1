@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53033)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dJHbK-0007hi-DR
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 06:57:11 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dJHbM-0007j2-Ax
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 06:57:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dJHbJ-00061L-FU
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 06:57:10 -0400
-Date: Fri, 9 Jun 2017 19:43:41 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1dJHbJ-00061A-8u
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 06:57:12 -0400
+Date: Fri, 9 Jun 2017 20:49:10 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170609094341.GI26521@umbus.fritz.box>
-References: <149685579678.12025.9278446121024037161.stgit@bahia.lan>
-	<149685582923.12025.13700165807436904935.stgit@bahia.lan>
-	<20170608020112.GT13397@umbus.fritz.box>
-	<20170608104530.65b7d53e@bahia.ttt.fr.ibm.com>
-	<20170609022452.GE26521@umbus.fritz.box>
-	<20170609084550.53aece8d@bahia.ttt.fr.ibm.com>
+Message-ID: <20170609104910.GM26521@umbus.fritz.box>
+References: <20170530160445.12810-1-lvivier@redhat.com>
+	<20170531043557.GI12163@umbus.fritz.box>
+	<149695205346.23353.3484869110998357783@loki>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Encpt1P6Mxii2VuT"
+	protocol="application/pgp-signature"; boundary="pFpMklMRdxwSC3Yi"
 Content-Disposition: inline
-In-Reply-To: <20170609084550.53aece8d@bahia.ttt.fr.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 3/5] xics: setup cpu at realize time
+In-Reply-To: <149695205346.23353.3484869110998357783@loki>
+Subject: Re: [Qemu-devel] [PATCH] spapr: manage hotplugged devices while the
+ VM is not started
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +26,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---Encpt1P6Mxii2VuT
+--pFpMklMRdxwSC3Yi
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 09, 2017 at 08:45:50AM +0200, Greg Kurz wrote:
-> On Fri, 9 Jun 2017 12:24:52 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Thu, Jun 08, 2017 at 10:45:30AM +0200, Greg Kurz wrote:
-> > > On Thu, 8 Jun 2017 12:01:12 +1000
-> > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > >  =20
-> > > > On Wed, Jun 07, 2017 at 07:17:09PM +0200, Greg Kurz wrote: =20
-> > > > > Until recently, spapr used to allocate ICPState objects for the l=
-ifetime
-> > > > > of the machine. They would only be associated to vCPUs in xics_cp=
-u_setup()
-> > > > > when plugging a CPU core.
-> > > > >=20
-> > > > > Now that ICPState objects have the same lifecycle as vCPUs, it is
-> > > > > possible to associate them during realization.
-> > > > >=20
-> > > > > This patch hence open-codes xics_cpu_setup() in icp_realize(). Th=
-e vCPU
-> > > > > is passed as a property. Note that vCPU now needs to be realized =
-first
-> > > > > for the IRQs to be allocated. It also needs to resetted before IC=
-PState
-> > > > > realization in order to synchronize with KVM.   =20
-> > > >=20
-> > > > Ok, what enforces those ordering constraints?
-> > > >  =20
+On Thu, Jun 08, 2017 at 03:00:53PM -0500, Michael Roth wrote:
+> Quoting David Gibson (2017-05-30 23:35:57)
+> > On Tue, May 30, 2017 at 06:04:45PM +0200, Laurent Vivier wrote:
+> > > For QEMU, a hotlugged device is a device added using the HMP/QMP
+> > > interface.
+> > > For SPAPR, a hotplugged device is a device added while the
+> > > machine is running. In this case QEMU doesn't update internal
+> > > state but relies on the OS for this part
 > > >=20
-> > > I'm not sure about what you're asking... I had to re-order because
-> > > xics_cpu_setup() used to be called after the vCPU is realized and
-> > > put in PAPR mode. =20
+> > > In the case of migration, when we (libvirt) hotplug a device
+> > > on the source guest, we (libvirt) generally hotplug the same
+> > > device on the destination guest. But in this case, the machine
+> > > is stopped (RUN_STATE_INMIGRATE) and QEMU must not expect
+> > > the OS will manage it as an hotplugged device as it will
+> > > be "imported" by the migration.
+> > >=20
+> > > This patch changes the meaning of "hotplugged" in spapr.c
+> > > to manage a QEMU hotplugged device like a "coldplugged" one
+> > > when the machine is awaiting an incoming migration.
+> > >=20
+> > > Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 > >=20
-> > Duh, sorry, I wasn't thinking to ask about realize order, since that's
-> > manual and you've re-ordered it to be correct.
-> >=20
-> > You also mention that reset order matters, and I'm less clear on what
-> > guarantees that the reset handlers for the components get called in
-> > the right order.
-> >=20
+> > So, I think this is a reasonable concept, at least in terms of
+> > cleanliness and not doing unnecessary work.  However, if it's fixing
+> > bugs, I suspect that means we still have problems elsewhere.
 >=20
-> Oops... my bad, this is a mistake in the changelog. The KVM error I was
-> seing isn't related to CPU reset as I was thinking first but to
-> cpu_ppc_set_papr()... :-\
+> I was hoping a lot of these issues would go away once we default
+> the initial/reset DRC states to "coldplugged". I think your pending
+> patch:
 >=20
-> The last sentence should rather be something like:
+>   "spapr: Make DRC reset force DRC into known state"
 >=20
-> "We also need to call spapr_cpu_init() before ICPState realization in
->  order to enable PAPR mode in KVM."
->=20
-> Can you fix this in your tree or should I send an updated version ?
+> But I didn't consider the fact that libvirt will be issuing these
+> hotplugs *after* reset, so those states would indeed need to
+> be fixed up again to reflect boot-time,attached as opposed to
+> boot-time,unattached before starting the target.
 
-Uh.. too late, I already sent a pull request.
+So, something I haven't written yet, but I'm considering for my DRC
+cleanup series is to force a reset of the DRC objects (and just the
+DRC objects) at CAS time.  Since that's when the guest gets the final
+version of the device tree, that should ensure that the DRC state is
+in sync with whether the guest sees the device as hotplugged or
+coldplugged.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -97,25 +85,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---Encpt1P6Mxii2VuT
+--pFpMklMRdxwSC3Yi
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZOm3KAAoJEGw4ysog2bOSUR8P+wRvg9kO1ByS12/fVULTjFDE
-prtPpCWzGL8Onvbw3tz9138O3bPqqY8u/9LNfQKugglQwqHzLyS5RV+CS5FPQkZr
-Wc0+tcA0dREMgnLu2ibNlGYpyQIFqi0SSski0nAxN3IWBT1Mpd2wO7KOcqxjzSFX
-5jK1z7mrCLSbUXu8fD5MeHYF/XAY9hQh0AHbUvUNz/K2GlCAMqrLsl0b3qf/tDmo
-y8gGOkQ5+nAgpkq2hnQ9WbRxTixfdw0dAtWbei6l/SUL5Ey9GmG2ssXAyuECUOav
-T+A/0ABVig8phRUPivplHm/qSx6H92PQBHVh4J6b7NsLKrF3LHm+I+5GVl3mHJqh
-wPMaWl6701WuSynCOtJBZFTO91cU5JdD23zZSvJu4gpCNchKhIWdiB5YAeGHCNDf
-ByjaHM9V43v0SSqtftBAitF/aXj4swC7vDn83DlBxw1MrS643C4hBBXxYLxbicY/
-IX59/60cUOduxEVS6x8UmZ5CAnIJbILw/hE8pxhjVkzPsWR6enVTIEGA4wJqgIg0
-nrOgYS+GarXO23963bxrUUKXC41b0zAVMz3jTJ/h0UzSIoROAwoQEbEQZW9L//R1
-X05hzYCSjkMESzPTUMUS+2fIpsLfWwUI7Z/nnCSf5Wr12h+DE3gzon8b+RhSt4Jx
-xCx6dwV6rApZLXSVn2c7
-=hi0Z
+iQIcBAEBCAAGBQJZOn0jAAoJEGw4ysog2bOS6pcP/05xkHXIvbmm116r3+EQHLi9
+ZDJa0BGGMLAe78eZ50av9Lvl9DICKEMljaGc248XYz8++Ynhy/Yo8RtXSrX3tfKJ
+Ctn8AmY2QZcjyqkMDE1CUzclLCeKdojkLz+jI4LwrkcHRYF/SH5cMkg3hHEcyBo6
+DXcJVw0ZLvPUIy6P/dh2AAJRlco1XkXk6tUaj5fuZ8jORS/bp5zC7LaKFo305c5e
+JEMQmVkFtNuOATMf8JGVUQsYeJ0EfIpUtJvxNiWh5ra0b0Ok5IuCui5NBwqMLE5+
+UPpz8KIvs4TkezgSVPK5GxUi0enijoHzizkdFxSc/tzee1+OcjQCA0ueDh0+OPx5
+sn+60XYx7WINH5x46HCEnwQs34JpGCoyzWq7nYL8ype2deWZDkjkcAXjcc/c5DcP
+i6IyVUpZyIbTrgxGecIUzkQ/Bm+9+rMX2pBIcN/CdskyRXNozhmSpIh69ceBHs4L
+GpTCl8WwL+rSVOymJNtR3kT3pliYQ/NRixeUbzxWhplOcFgISmdYy95XLClPN35/
+/JYb1GTI+UDpfg5LQ9LoKUoVbi3kukoVSQ+EqRKLVlTtKz0LrLvqQqcAqV4mV/xh
+NCDvtkRikqTsz2vcs1aR4YooU2kuWljTYsWy1b2O1wLswnKBlo7MCxvesRCrRPAa
+dNqToW3DtEw/MXmcaaUS
+=c0xp
 -----END PGP SIGNATURE-----
 
---Encpt1P6Mxii2VuT--
+--pFpMklMRdxwSC3Yi--
