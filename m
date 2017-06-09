@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43646)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dJKUD-0006TE-Fy
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 10:02:04 -0400
+	(envelope-from <armbru@redhat.com>) id 1dJKUu-0007EV-TV
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 10:02:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dJKU6-0000zi-0G
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 10:02:01 -0400
-References: <20170602112158.232757-1-vsementsov@virtuozzo.com>
-	<20170602112158.232757-31-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <a805c668-0996-44ce-7cb5-3d3195510e48@redhat.com>
-Date: Fri, 9 Jun 2017 16:01:38 +0200
+	(envelope-from <armbru@redhat.com>) id 1dJKUr-0001AH-QE
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 10:02:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59912)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dJKUr-0001A5-Kb
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 10:02:41 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 98FF58553E
+	for <qemu-devel@nongnu.org>; Fri,  9 Jun 2017 14:02:40 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <1496980142-8986-1-git-send-email-peterx@redhat.com>
+Date: Fri, 09 Jun 2017 16:02:37 +0200
+In-Reply-To: <1496980142-8986-1-git-send-email-peterx@redhat.com> (Peter Xu's
+	message of "Fri, 9 Jun 2017 11:48:56 +0800")
+Message-ID: <877f0lgsxu.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170602112158.232757-31-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="b3PbqmxcU5QGilUHRDEh98V6poKRx1GfW"
-Subject: Re: [Qemu-devel] [PATCH v20 30/30] block: release persistent
- bitmaps on inactivate
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/6] migration: objectify MigrationState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +33,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---b3PbqmxcU5QGilUHRDEh98V6poKRx1GfW
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
- famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
-Message-ID: <a805c668-0996-44ce-7cb5-3d3195510e48@redhat.com>
-Subject: Re: [PATCH v20 30/30] block: release persistent bitmaps on inactivate
-References: <20170602112158.232757-1-vsementsov@virtuozzo.com>
- <20170602112158.232757-31-vsementsov@virtuozzo.com>
-In-Reply-To: <20170602112158.232757-31-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Test compile gripes:
 
-On 2017-06-02 13:21, Vladimir Sementsov-Ogievskiy wrote:
-> We should release them here to reload on invalidate cache.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block.c                      |  4 ++++
->  block/dirty-bitmap.c         | 29 +++++++++++++++++++++++------
->  include/block/dirty-bitmap.h |  1 +
->  3 files changed, 28 insertions(+), 6 deletions(-)
+    hw/xen/xen-common.c: In function =E2=80=98xen_init=E2=80=99:
+    hw/xen/xen-common.c:147:5: warning: implicit declaration of function =
+=E2=80=98register_compat_prop=E2=80=99 [-Wimplicit-function-declaration]
+         register_compat_prop("migration", "store-global-state", "off");
+         ^~~~~~~~~~~~~~~~~~~~
+    hw/xen/xen-common.c:147:5: warning: nested extern declaration of =E2=80=
+=98register_compat_prop=E2=80=99 [-Wnested-externs]
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+You might want to install Xen development packages to catch such issues
+earlier.
 
+Test run:
 
---b3PbqmxcU5QGilUHRDEh98V6poKRx1GfW
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+    $ qemu-system-x86_64 -device migration,help
+    migration.skip-section-footer=3Dbool
+    migration.store-global-state=3Dbool
+    migration.only-migratable=3Dbool
+    migration.skip-configuration=3Dbool
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEvBAEBCAAZBQJZOqpCEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQGVb
-B/0Y7ORZuwU5RVNySoJP4O8hCugumEdVVQhHtAoCe+N9Co744QaxVliZ2CA3U12c
-TSmdHHHI7aXpCQsWEorB4YtMykbpm8B7j/EA0PujzyfLKQRglp6G7UMwv6wYsb3V
-1okytcw4bwPSayIRMl0IFksIKP72+3XnO7Va15m3J+THvYf+iC84lCwQnDwzkmxd
-mwihW1gzvBa8m31eSZ63tVU5nDq0XAT49td0lUfy5dI4Nls3JnrnU79qLiVgEL3U
-7mQdg0STvGBRrrzNHR7dpwYKUV9IqcS5AAz81GtbVqR/V2Pmc95LtlJpPwqQxywb
-xPIDAPrfp3mRu+M58IDfKAqr
-=v9rA
------END PGP SIGNATURE-----
-
---b3PbqmxcU5QGilUHRDEh98V6poKRx1GfW--
+What would adding this device do?
