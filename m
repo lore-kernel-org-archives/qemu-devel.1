@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49436)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dJCbw-00063B-Ax
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:37:29 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dJCbv-0001dB-JE
+	(envelope-from <rth7680@gmail.com>) id 1dJCbu-0005yy-VQ
 	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:37:28 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:34723)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dJCbv-0001d3-FX
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <rth7680@gmail.com>) id 1dJCbt-0001ca-8G
 	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:37:27 -0400
-Received: by mail-qt0-x242.google.com with SMTP id o21so13030628qtb.1
-	for <qemu-devel@nongnu.org>; Thu, 08 Jun 2017 22:37:27 -0700 (PDT)
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:35357)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dJCbt-0001cW-1s
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:37:25 -0400
+Received: by mail-qt0-x243.google.com with SMTP id x58so13035289qtc.2
+	for <qemu-devel@nongnu.org>; Thu, 08 Jun 2017 22:37:24 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Thu,  8 Jun 2017 22:37:15 -0700
-Message-Id: <20170609053719.26251-4-rth@twiddle.net>
+Date: Thu,  8 Jun 2017 22:37:13 -0700
+Message-Id: <20170609053719.26251-2-rth@twiddle.net>
 In-Reply-To: <20170609053719.26251-1-rth@twiddle.net>
 References: <20170609053719.26251-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v5 3/7] tcg/aarch64: Use ADR in tcg_out_movi
+Subject: [Qemu-devel] [PATCH v5 1/7] util: add cacheinfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +29,331 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: cota@braap.org
 
-The new placement of the TB means that we can use one insn
-to load the return value for exit_tb returning the TB pointer.
+From: "Emilio G. Cota" <cota@braap.org>
 
-Tested-by: Emilio G. Cota <cota@braap.org>
+Add helpers to gather cache info from the host at init-time.
+
+For now, only export the host's I/D cache line sizes, which we
+will use to improve cache locality to avoid false sharing.
+
+Suggested-by: Richard Henderson <rth@twiddle.net>
+Suggested-by: Geert Martin Ijewski <gm.ijewski@web.de>
+Tested-by:    Geert Martin Ijewski <gm.ijewski@web.de>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+Message-Id: <1496794624-4083-1-git-send-email-cota@braap.org>
+[rth: Move all implementations from tcg/ppc/]
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/aarch64/tcg-target.inc.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ include/qemu/osdep.h     |   3 +
+ tcg/ppc/tcg-target.inc.c |  71 +-----------------
+ util/Makefile.objs       |   1 +
+ util/cacheinfo.c         | 185 +++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 191 insertions(+), 69 deletions(-)
+ create mode 100644 util/cacheinfo.c
 
-diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
-index 5f18545..1fa3bcc 100644
---- a/tcg/aarch64/tcg-target.inc.c
-+++ b/tcg/aarch64/tcg-target.inc.c
-@@ -616,7 +616,12 @@ static void tcg_out_movi(TCGContext *s, TCGType type, TCGReg rd,
-     /* Look for host pointer values within 4G of the PC.  This happens
-        often when loading pointers to QEMU's own data structures.  */
-     if (type == TCG_TYPE_I64) {
--        tcg_target_long disp = (value >> 12) - ((intptr_t)s->code_ptr >> 12);
-+        tcg_target_long disp = value - (intptr_t)s->code_ptr;
-+        if (disp == sextract64(disp, 0, 21)) {
-+            tcg_out_insn(s, 3406, ADR, rd, disp);
-+            return;
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 1c9f5e2..ee43521 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -470,4 +470,7 @@ char *qemu_get_pid_name(pid_t pid);
+  */
+ pid_t qemu_fork(Error **errp);
+ 
++extern int qemu_icache_linesize;
++extern int qemu_dcache_linesize;
++
+ #endif
+diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
+index 8d50f18..1f690df 100644
+--- a/tcg/ppc/tcg-target.inc.c
++++ b/tcg/ppc/tcg-target.inc.c
+@@ -2820,14 +2820,11 @@ void tcg_register_jit(void *buf, size_t buf_size)
+ }
+ #endif /* __ELF__ */
+ 
+-static size_t dcache_bsize = 16;
+-static size_t icache_bsize = 16;
+-
+ void flush_icache_range(uintptr_t start, uintptr_t stop)
+ {
+     uintptr_t p, start1, stop1;
+-    size_t dsize = dcache_bsize;
+-    size_t isize = icache_bsize;
++    size_t dsize = qemu_dcache_linesize;
++    size_t isize = qemu_icache_linesize;
+ 
+     start1 = start & ~(dsize - 1);
+     stop1 = (stop + dsize - 1) & ~(dsize - 1);
+@@ -2844,67 +2841,3 @@ void flush_icache_range(uintptr_t start, uintptr_t stop)
+     asm volatile ("sync" : : : "memory");
+     asm volatile ("isync" : : : "memory");
+ }
+-
+-#if defined _AIX
+-#include <sys/systemcfg.h>
+-
+-static void __attribute__((constructor)) tcg_cache_init(void)
+-{
+-    icache_bsize = _system_configuration.icache_line;
+-    dcache_bsize = _system_configuration.dcache_line;
+-}
+-
+-#elif defined __linux__
+-static void __attribute__((constructor)) tcg_cache_init(void)
+-{
+-    unsigned long dsize = qemu_getauxval(AT_DCACHEBSIZE);
+-    unsigned long isize = qemu_getauxval(AT_ICACHEBSIZE);
+-
+-    if (dsize == 0 || isize == 0) {
+-        if (dsize == 0) {
+-            fprintf(stderr, "getauxval AT_DCACHEBSIZE failed\n");
+-        }
+-        if (isize == 0) {
+-            fprintf(stderr, "getauxval AT_ICACHEBSIZE failed\n");
+-        }
+-        exit(1);
+-    }
+-    dcache_bsize = dsize;
+-    icache_bsize = isize;
+-}
+-
+-#elif defined __APPLE__
+-#include <sys/sysctl.h>
+-
+-static void __attribute__((constructor)) tcg_cache_init(void)
+-{
+-    size_t len;
+-    unsigned cacheline;
+-    int name[2] = { CTL_HW, HW_CACHELINE };
+-
+-    len = sizeof(cacheline);
+-    if (sysctl(name, 2, &cacheline, &len, NULL, 0)) {
+-        perror("sysctl CTL_HW HW_CACHELINE failed");
+-        exit(1);
+-    }
+-    dcache_bsize = cacheline;
+-    icache_bsize = cacheline;
+-}
+-
+-#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+-#include <sys/sysctl.h>
+-
+-static void __attribute__((constructor)) tcg_cache_init(void)
+-{
+-    size_t len = 4;
+-    unsigned cacheline;
+-
+-    if (sysctlbyname ("machdep.cacheline_size", &cacheline, &len, NULL, 0)) {
+-        fprintf(stderr, "sysctlbyname machdep.cacheline_size failed: %s\n",
+-                strerror(errno));
+-        exit(1);
+-    }
+-    dcache_bsize = cacheline;
+-    icache_bsize = cacheline;
+-}
+-#endif
+diff --git a/util/Makefile.objs b/util/Makefile.objs
+index c6205eb..94d9477 100644
+--- a/util/Makefile.objs
++++ b/util/Makefile.objs
+@@ -20,6 +20,7 @@ util-obj-y += host-utils.o
+ util-obj-y += bitmap.o bitops.o hbitmap.o
+ util-obj-y += fifo8.o
+ util-obj-y += acl.o
++util-obj-y += cacheinfo.o
+ util-obj-y += error.o qemu-error.o
+ util-obj-y += id.o
+ util-obj-y += iov.o qemu-config.o qemu-sockets.o uri.o notify.o
+diff --git a/util/cacheinfo.c b/util/cacheinfo.c
+new file mode 100644
+index 0000000..f987522
+--- /dev/null
++++ b/util/cacheinfo.c
+@@ -0,0 +1,185 @@
++/*
++ * cacheinfo.c - helpers to query the host about its caches
++ *
++ * Copyright (C) 2017, Emilio G. Cota <cota@braap.org>
++ * License: GNU GPL, version 2 or later.
++ *   See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++
++int qemu_icache_linesize = 0;
++int qemu_dcache_linesize = 0;
++
++/*
++ * Operating system specific detection mechanisms.
++ */
++
++#if defined(_AIX)
++# include <sys/systemcfg.h>
++
++static void sys_cache_info(int *isize, int *dsize)
++{
++    *isize = _system_configuration.icache_line;
++    *dsize = _system_configuration.dcache_line;
++}
++
++#elif defined(_WIN32)
++
++static void sys_cache_info(int *isize, int *dsize)
++{
++    SYSTEM_LOGICAL_PROCESSOR_INFORMATION *buf;
++    DWORD size = 0;
++    BOOL success;
++    size_t i, n;
++
++    /* Check for the required buffer size first.  Note that if the zero
++       size we use for the probe results in success, then there is no
++       data available; fail in that case.  */
++    success = GetLogicalProcessorInformation(0, &size);
++    if (success || GetLastError() != ERROR_INSUFFICIENT_BUFFER) {
++        return;
++    }
++
++    n = size / sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION);
++    size = n * sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION);
++    buf = g_new0(SYSTEM_LOGICAL_PROCESSOR_INFORMATION, n);
++    if (!GetLogicalProcessorInformation(buf, &size)) {
++        goto fail;
++    }
++
++    for (i = 0; i < n; i++) {
++        if (buf[i].Relationship == RelationCache
++            && buf[i].Cache.Level == 1) {
++            switch (buf[i].Cache.Type) {
++            case CacheUnified:
++                *isize = *dsize = buf[i].Cache.LineSize;
++                break;
++            case CacheInstruction:
++                *isize = buf[i].Cache.LineSize;
++                break;
++            case CacheData:
++                *dsize = buf[i].Cache.LineSize;
++                break;
++            default:
++                break;
++            }
 +        }
-+        disp = (value >> 12) - ((intptr_t)s->code_ptr >> 12);
-         if (disp == sextract64(disp, 0, 21)) {
-             tcg_out_insn(s, 3406, ADRP, rd, disp);
-             if (value & 0xfff) {
++    }
++ fail:
++    g_free(buf);
++}
++
++#elif defined(__APPLE__) \
++      || defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++# include <sys/sysctl.h>
++# if defined(__APPLE__)
++#  define SYSCTL_CACHELINE_NAME "hw.cachelinesize"
++# else
++#  define SYSCTL_CACHELINE_NAME "machdep.cacheline_size"
++# endif
++
++static void sys_cache_info(int *isize, int *dsize)
++{
++    /* There's only a single sysctl for both I/D cache line sizes.  */
++    long size;
++    size_t len = sizeof(size);
++    if (!sysctlbyname(SYSCTL_CACHELINE_NAME, &size, &len, NULL, 0)) {
++        *isize = *dsize = size;
++    }
++}
++
++#else
++/* POSIX */
++
++static void sys_cache_info(int *isize, int *dsize)
++{
++# ifdef _SC_LEVEL1_ICACHE_LINESIZE
++    *isize = sysconf(_SC_LEVEL1_ICACHE_LINESIZE);
++# endif
++# ifdef _SC_LEVEL1_DCACHE_LINESIZE
++    *dsize = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
++# endif
++}
++#endif /* sys_cache_info */
++
++/*
++ * Architecture (+ OS) specific detection mechanisms.
++ */
++
++#if defined(__aarch64__)
++
++static void arch_cache_info(int *isize, int *dsize)
++{
++    if (*isize == 0 || *dsize == 0) {
++        unsigned ctr;
++
++        /* The real cache geometry is in CCSIDR_EL1/CLIDR_EL1/CSSELR_EL1,
++           but (at least under Linux) these are marked protected by the
++           kernel.  However, CTR_EL0 contains the minimum linesize in the
++           entire hierarchy, and is used by userspace cache flushing.  */
++        asm volatile("mrs\t%0, ctr_el0" : "=r"(ctr));
++        if (*isize == 0) {
++            *isize = 4 << (ctr & 0xf);
++        }
++        if (*dsize == 0) {
++            *dsize = 4 << ((ctr >> 16) & 0xf);
++        }
++    }
++}
++
++#elif defined(_ARCH_PPC) && defined(__linux__)
++
++static void arch_cache_info(int *isize, int *dsize)
++{
++    if (*isize == 0) {
++        *isize = qemu_getauxval(AT_ICACHEBSIZE);
++    }
++    if (*dsize == 0) {
++        *dsize = qemu_getauxval(AT_DCACHEBSIZE);
++    }
++}
++
++#else
++static void arch_cache_info(int *isize, int *dsize) { }
++#endif /* arch_cache_info */
++
++/*
++ * ... and if all else fails ...
++ */
++
++static void fallback_cache_info(int *isize, int *dsize)
++{
++    /* If we can only find one of the two, assume they're the same.  */
++    if (*isize) {
++        if (*dsize) {
++            /* Success! */
++        } else {
++            *dsize = *isize;
++        }
++    } else if (*dsize) {
++        *isize = *dsize;
++    } else {
++#if defined(_ARCH_PPC)
++        /* For PPC, we're going to use the icache size computed for
++           flush_icache_range.  Which means that we must use the
++           architecture minimum.  */
++        *isize = *dsize = 16;
++#else
++        /* Otherwise, 64 bytes is not uncommon.  */
++        *isize = *dsize = 64;
++#endif
++    }
++}
++
++static void __attribute__((constructor)) init_cache_info(void)
++{
++    int isize = 0, dsize = 0;
++
++    sys_cache_info(&isize, &dsize);
++    arch_cache_info(&isize, &dsize);
++    fallback_cache_info(&isize, &dsize);
++
++    qemu_icache_linesize = isize;
++    qemu_dcache_linesize = dsize;
++}
 -- 
 2.9.4
