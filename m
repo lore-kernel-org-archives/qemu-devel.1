@@ -1,31 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34040)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dJLXT-0004PJ-Fz
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 11:09:28 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dJLes-0001TZ-9s
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 11:17:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dJLXN-0002PO-EC
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 11:09:27 -0400
-Received: from 2.mo178.mail-out.ovh.net ([46.105.39.61]:58455)
+	(envelope-from <stefanha@redhat.com>) id 1dJLem-00055V-Vx
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 11:17:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46934)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dJLXN-0002Or-4f
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 11:09:21 -0400
-Received: from player728.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 9516F3895F
-	for <qemu-devel@nongnu.org>; Fri,  9 Jun 2017 17:09:19 +0200 (CEST)
-Date: Fri, 9 Jun 2017 17:09:13 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170609170913.2e6526c3@bahia.ttt.fr.ibm.com>
-In-Reply-To: <20170609102832.GL26521@umbus.fritz.box>
-References: <149692935202.12119.3614006195497745877.stgit@bahia>
-	<20170609022813.GF26521@umbus.fritz.box>
-	<20170609113631.229dd346@bahia.ttt.fr.ibm.com>
-	<20170609102832.GL26521@umbus.fritz.box>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/c.PIZY9=8FDXSCjI2zyK7zo";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v4 0/6] spapr/xics: fix migration of older
- machine types
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dJLem-00054r-N5
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 11:17:00 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Fri,  9 Jun 2017 16:16:15 +0100
+Message-Id: <20170609151615.2589-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/i386: fix nvdimm check error path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,151 +21,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>
 
---Sig_/c.PIZY9=8FDXSCjI2zyK7zo
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Commit e987c37aee1752177906847630d32477da57e705 ("hw/i386: check if
+nvdimm is enabled before plugging") introduced a check to reject nvdimm
+hotplug if -machine pc,nvdimm=on was not given.
 
-On Fri, 9 Jun 2017 20:28:32 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+This check executes after pc_dimm_memory_plug() has already completed
+and does not reverse the effect of this function in the case of failure.
 
-> On Fri, Jun 09, 2017 at 11:36:31AM +0200, Greg Kurz wrote:
-> > On Fri, 9 Jun 2017 12:28:13 +1000
-> > David Gibson <david@gibson.dropbear.id.au> wrote:
-> >  =20
-> > > On Thu, Jun 08, 2017 at 03:42:32PM +0200, Greg Kurz wrote: =20
-> > > > I've provided answers for all comments from the v3 review that I de=
-liberately
-> > > > don't address in v4.   =20
-> > >=20
-> > > I've merged patches 1-4.  5 & 6 I'm still reviewing.
-> > >  =20
-> >=20
-> > Cool. FYI, I forgot to mention that I only tested with KVM.
-> >=20
-> > I'm now trying with TCG and I hit various guest crash on
-> > the destination (using your ppc-for-2.10 branch WITHOUT
-> > my patches): =20
->=20
-> Drat.  What's your reproducer for this crash?
->=20
+Perform the check before calling pc_dimm_memory_plug().  This fixes the
+following abort:
 
-1) start guest
+  $ qemu -M accel=kvm -m 1G,slots=4,maxmem=8G \
+         -object memory-backend-file,id=mem1,share=on,mem-path=nvdimm.dat,size=1G
+  (qemu) device_add nvdimm,memdev=mem1
+  nvdimm is not enabled: missing 'nvdimm' in '-M'
+  (qemu) device_add nvdimm,memdev=mem1
+  Core dumped
 
-qemu-system-ppc64 \
- -nodefaults -nographic -snapshot -no-shutdown -serial mon:stdio \
- -device virtio-net,netdev=3Dnetdev0,id=3Dnet0 \
- -netdev bridge,id=3Dnetdev0,br=3Dvirbr0,helper=3D/usr/libexec/qemu-bridge-=
-helper \
- -device virtio-blk,drive=3Ddrive0,id=3Dblk0 \
- -drive file=3D/home/greg/images/sle12-sp1-ppc64le.qcow2,id=3Ddrive0,if=3Dn=
-one \
- -machine type=3Dpseries,accel=3Dtcg -cpu POWER8
+The backtrace is:
 
-2) migrate
+  #0  0x00007fffdb5b191f in raise () at /lib64/libc.so.6
+  #1  0x00007fffdb5b351a in abort () at /lib64/libc.so.6
+  #2  0x00007fffdb5a9da7 in __assert_fail_base () at /lib64/libc.so.6
+  #3  0x00007fffdb5a9e52 in  () at /lib64/libc.so.6
+  #4  0x000055555577a5fa in qemu_ram_set_idstr (new_block=0x555556747a00, name=<optimized out>, dev=dev@entry=0x555556705590) at qemu/exec.c:1709
+  #5  0x0000555555a0fe86 in vmstate_register_ram (mr=mr@entry=0x55555673a0e0, dev=dev@entry=0x555556705590) at migration/savevm.c:2293
+  #6  0x0000555555965088 in pc_dimm_memory_plug (dev=dev@entry=0x555556705590, hpms=hpms@entry=0x5555566bb0e0, mr=mr@entry=0x555556705630, align=<optimized out>, errp=errp@entry=0x7fffffffc660)
+      at hw/mem/pc-dimm.c:110
+  #7  0x000055555581d89b in pc_dimm_plug (errp=0x7fffffffc6c0, dev=0x555556705590, hotplug_dev=<optimized out>) at qemu/hw/i386/pc.c:1713
+  #8  0x000055555581d89b in pc_machine_device_plug_cb (hotplug_dev=<optimized out>, dev=0x555556705590, errp=0x7fffffffc6c0) at qemu/hw/i386/pc.c:2004
+  #9  0x0000555555914da6 in device_set_realized (obj=<optimized out>, value=<optimized out>, errp=0x7fffffffc7e8) at hw/core/qdev.c:926
 
-3) destination crashes (immediately or after very short delay) or hangs
+Cc: Haozhong Zhang <haozhong.zhang@intel.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ hw/i386/pc.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-> >=20
-> > cpu 0x0: Vector: 700 (Program Check) at [c0000000787ebae0]
-> >     pc: c0000000002803c4: __fput+0x284/0x310
-> >     lr: c000000000280258: __fput+0x118/0x310
-> >     sp: c0000000787ebd60
-> >    msr: 8000000000029033
-> >   current =3D 0xc00000007cbab640
-> >   paca    =3D 0xc000000007b80000   softe: 0        irq_happened: 0x01
-> >     pid   =3D 1812, comm =3D gawk
-> > kernel BUG at ../include/linux/fs.h:2399!
-> > enter ? for help
-> > [c0000000787ebdb0] c0000000000d7d84 task_work_run+0xe4/0x160
-> > [c0000000787ebe00] c000000000018054 do_notify_resume+0xb4/0xc0
-> > [c0000000787ebe30] c00000000000a730 ret_from_except_lite+0x5c/0x60
-> > --- Exception: c00 (System Call) at 00003fff9026dd90
-> > SP (3fffcb37b790) is in userspace =20
-> > 0:mon>  =20
-> >=20
-> > or
-> >=20
-> > cpu 0x0: Vector: 300 (Data Access) at [c00000007fff7490]
-> >     pc: c0000000001ef768: free_pcppages_bulk+0x2b8/0x500
-> >     lr: c0000000001ef524: free_pcppages_bulk+0x74/0x500
-> >     sp: c00000007fff7710
-> >    msr: 8000000000009033
-> >    dar: c0000000807afc70
-> >  dsisr: 40000000
-> >   current =3D 0xc00000007c609190
-> >   paca    =3D 0xc000000007b80000   softe: 0        irq_happened: 0x01
-> >     pid   =3D 1631, comm =3D systemctl
-> > enter ? for help
-> > [c00000007fff77c0] c0000000001eff24 free_hot_cold_page+0x204/0x270
-> > [c00000007fff7810] c0000000001f5848 __put_single_page+0x48/0x60
-> > [c00000007fff7840] c00000000059ac50 skb_release_data+0xb0/0x180
-> > [c00000007fff7880] c00000000059ae38 kfree_skb+0x58/0x130
-> > [c00000007fff78c0] c00000000063f604 __udp4_lib_mcast_deliver+0x3d4/0x460
-> > [c00000007fff7a50] c00000000063fb0c __udp4_lib_rcv+0x47c/0x770
-> > [c00000007fff7b00] c0000000006023a8 ip_local_deliver_finish+0x148/0x310
-> > [c00000007fff7b50] c0000000006026c4 ip_rcv_finish+0x154/0x420
-> > [c00000007fff7bd0] c0000000005b1154 __netif_receive_skb_core+0x874/0xac0
-> > [c00000007fff7cc0] c0000000005b30d4 netif_receive_skb+0x34/0xd0
-> > [c00000007fff7d00] d000000000ef3c74 virtnet_poll+0x514/0x8a0 [virtio_ne=
-t]
-> > [c00000007fff7e10] c0000000005b3668 net_rx_action+0x1d8/0x310
-> > [c00000007fff7ea0] c0000000000b0cc4 __do_softirq+0x154/0x330
-> > [c00000007fff7f90] c0000000000251ac call_do_softirq+0x14/0x24
-> > [c00000007fff3ef0] c000000000011be0 do_softirq+0xe0/0x110
-> > [c00000007fff3f30] c0000000000b10e8 irq_exit+0xc8/0x110
-> > [c00000007fff3f60] c0000000000117e8 __do_irq+0xb8/0x1c0
-> > [c00000007fff3f90] c0000000000251d0 call_do_irq+0x14/0x24
-> > [c00000007a94bac0] c000000000011990 do_IRQ+0xa0/0x120
-> > [c00000007a94bb20] c00000000000a8b0 restore_check_irq_replay+0x2c/0x5c
-> > --- Exception: 501 (Hardware Interrupt) at c000000000010f84 arch_local_=
-irq_restore+0x74/0x90
-> > [c00000007a94be10] 000000000000000c (unreliable)
-> > [c00000007a94be30] c00000000000a704 ret_from_except_lite+0x30/0x60
-> > --- Exception: 501 (Hardware Interrupt) at 00003fffa04a2c28
-> > SP (3ffff7f1bf60) is in userspace =20
-> > 0:mon>  =20
-> >=20
-> > These doesn't seem to occur with QEMU master. I'll try to
-> > investigate. =20
->=20
-
-Bisect leads to:
-
-f0b0685d6694a28c66018f438e822596243b1250 is the first bad commit
-commit f0b0685d6694a28c66018f438e822596243b1250
-Author: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Date:   Thu Apr 27 10:48:23 2017 +0530
-
-    tcg: enable MTTCG by default for PPC64 on x86
-
-I guess we're still not completely ready to support MTTCG...
-
-Cc'ing Nikunj for insights.
-
-> Thanks.  I'm going to be in China for the next couple of weeks.  I'll
-> still be working, but my time will be divided.
->=20
-
-Hey, have a good trip! :)
-
-Cheers,
-
---
-Greg
-
---Sig_/c.PIZY9=8FDXSCjI2zyK7zo
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlk6uhkACgkQAvw66wEB28KyMgCcCigot/Capkz7M8vlwZmuRNRo
-XMIAoJfEL6o9gFJf0GQ3/sl5uqODN/rw
-=0vlk
------END PGP SIGNATURE-----
-
---Sig_/c.PIZY9=8FDXSCjI2zyK7zo--
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 5b8c6fb..db41cca 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1692,6 +1692,7 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
+     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+     MemoryRegion *mr = ddc->get_memory_region(dimm);
+     uint64_t align = TARGET_PAGE_SIZE;
++    bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+ 
+     if (memory_region_get_alignment(mr) && pcmc->enforce_aligned_dimm) {
+         align = memory_region_get_alignment(mr);
+@@ -1703,17 +1704,18 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
+         goto out;
+     }
+ 
++    if (is_nvdimm && !pcms->acpi_nvdimm_state.is_enabled) {
++        error_setg(&local_err,
++                   "nvdimm is not enabled: missing 'nvdimm' in '-M'");
++        goto out;
++    }
++
+     pc_dimm_memory_plug(dev, &pcms->hotplug_memory, mr, align, &local_err);
+     if (local_err) {
+         goto out;
+     }
+ 
+-    if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
+-        if (!pcms->acpi_nvdimm_state.is_enabled) {
+-            error_setg(&local_err,
+-                       "nvdimm is not enabled: missing 'nvdimm' in '-M'");
+-            goto out;
+-        }
++    if (is_nvdimm) {
+         nvdimm_plug(&pcms->acpi_nvdimm_state);
+     }
+ 
+-- 
+2.9.4
