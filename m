@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dJIfG-0006Vm-UT
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 08:05:19 -0400
+	(envelope-from <eblake@redhat.com>) id 1dJIg4-0006wM-WF
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 08:06:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dJIfF-0008N3-TY
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 08:05:18 -0400
+	(envelope-from <eblake@redhat.com>) id 1dJIg3-00007N-Qj
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 08:06:08 -0400
 References: <1497009003-25794-1-git-send-email-kwolf@redhat.com>
-	<1497009003-25794-2-git-send-email-kwolf@redhat.com>
+	<1497009003-25794-3-git-send-email-kwolf@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <dae737d8-a62c-3699-807a-39edc98b7c54@redhat.com>
-Date: Fri, 9 Jun 2017 07:05:06 -0500
+Message-ID: <024dd4f2-ecf8-088e-4207-822878a13433@redhat.com>
+Date: Fri, 9 Jun 2017 07:05:54 -0500
 MIME-Version: 1.0
-In-Reply-To: <1497009003-25794-2-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1497009003-25794-3-git-send-email-kwolf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="HkurwXmPPkEAIjHrUCQOTTEPtf4wp9CML"
-Subject: Re: [Qemu-devel] [PATCH 1/3] commit: Fix completion with extra
- reference
+	boundary="99EgMopWsxKVKNfLqSs6hXNJIpOqP21q6"
+Subject: Re: [Qemu-devel] [PATCH 2/3] qemu-iotests: Allow starting new qemu
+ after cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +29,54 @@ To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HkurwXmPPkEAIjHrUCQOTTEPtf4wp9CML
+--99EgMopWsxKVKNfLqSs6hXNJIpOqP21q6
 From: Eric Blake <eblake@redhat.com>
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org
-Message-ID: <dae737d8-a62c-3699-807a-39edc98b7c54@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/3] commit: Fix completion with extra
- reference
+Message-ID: <024dd4f2-ecf8-088e-4207-822878a13433@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] qemu-iotests: Allow starting new qemu
+ after cleanup
 References: <1497009003-25794-1-git-send-email-kwolf@redhat.com>
- <1497009003-25794-2-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1497009003-25794-2-git-send-email-kwolf@redhat.com>
+ <1497009003-25794-3-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1497009003-25794-3-git-send-email-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 06/09/2017 06:50 AM, Kevin Wolf wrote:
-> commit_complete() can't assume that after its block_job_completed() the=
+> After _cleanup_qemu(), test cases should be able to start the next qemu=
 
-> job is actually immediately freed; someone else may still be holding
-> references. In this case, the op blockers on the intermediate nodes mak=
-e
-> the graph reconfiguration in the completion code fail.
->=20
-> Call block_job_remove_all_bdrv() manually so that we know for sure that=
+> process and call _cleanup_qemu() for that one as well. For this to work=
 
-> any blockers on intermediate nodes are given up.
+> cleanly, we need to improve the cleanup so that the second invocation
+> doesn't try to kill the qemu instances from the first invocation a
+> second time (which would result in error messages).
+
+Yeah, idempotency is a nice thing.
+
 >=20
-> Cc: qemu-stable@nongnu.org
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  block/commit.c | 7 +++++++
->  1 file changed, 7 insertions(+)
+>  tests/qemu-iotests/common.qemu | 3 +++
+>  1 file changed, 3 insertions(+)
 >=20
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
+
+> diff --git a/tests/qemu-iotests/common.qemu b/tests/qemu-iotests/common=
+=2Eqemu
+> index 7a78a00..76ef298 100644
+> --- a/tests/qemu-iotests/common.qemu
+> +++ b/tests/qemu-iotests/common.qemu
+> @@ -222,5 +222,8 @@ function _cleanup_qemu()
+>          rm -f "${QEMU_FIFO_IN}_${i}" "${QEMU_FIFO_OUT}_${i}"
+>          eval "exec ${QEMU_IN[$i]}<&-"   # close file descriptors
+>          eval "exec ${QEMU_OUT[$i]}<&-"
+> +
+> +        unset QEMU_IN[$i]
+> +        unset QEMU_OUT[$i]
+>      done
+>  }
+>=20
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -69,7 +84,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---HkurwXmPPkEAIjHrUCQOTTEPtf4wp9CML
+--99EgMopWsxKVKNfLqSs6hXNJIpOqP21q6
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -79,13 +94,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZOo7yAAoJEKeha0olJ0Nqzh0H/2AqIjT6g2bMlIu4nmIfOkXu
-rguywhgVkMQd4T0ULZKYuu31cNWiuPIpNfRwYN7jd2zlKNcT9tfYbiQVxsNLk/yO
-t437d8RD4rAqvJD1AZEw/pdLttrnWX7IiLTSUm60Bm9DRxEPc1gMDyFRWINYGFmx
-D8Z/KWfb8CsR18nZxmMH0Pkb/n12erhtCbyiK6d34bdmdQof7zaRRg0zcW2tM6rH
-jK/VwLyKm6SOTJp88oD/fJxCUKxUy2Ukl8cM8EepB2/P78FgL8Y+SCKn2E4H2uwl
-zIf7s5zVb8cl3G9YPRsohI6f607U2pTfm+mFOwJcbVwtLPQwS11/cltTZu33+Wk=
-=tK6a
+iQEcBAEBCAAGBQJZOo8jAAoJEKeha0olJ0NqqC4H/10BD0UaJzB0LwsYI3BbRFrP
+92jojodEQTPDkX4H811kf8nQkjsDs5s5D4ZWEbVITlw+R6FR8Rjc7sgfi8CuMrrT
+ibwR1G4bOJzUt/m4AoiENX7RXLyf0iszXLO7Oqvcs+lC0ItCO0Bp9CSUqffEn4Ku
+WiHmDpTcXqRCO/8xZoyt/IvF/vwTtUi81YvZKpQDfgiuXYyjQrJmywbM8x3g5B1b
+hSDOZEINRIHhDuji7U5fbd4HkpTGbFVkK4zlFXEAeJxOsROZnrFsJt9JdLBIHmHQ
+ESErObuKjItKhCf++OAQCeAFeJpWncqP0y4Iyht0532sccnXg5nCqNZ96XvrC2U=
+=Fy+9
 -----END PGP SIGNATURE-----
 
---HkurwXmPPkEAIjHrUCQOTTEPtf4wp9CML--
+--99EgMopWsxKVKNfLqSs6hXNJIpOqP21q6--
