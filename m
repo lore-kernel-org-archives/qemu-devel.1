@@ -1,33 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dJNn6-0001T9-N7
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 13:33:45 -0400
+	(envelope-from <lersek@redhat.com>) id 1dJNuT-0003m0-E8
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 13:41:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dJNn2-0007Sj-Oe
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 13:33:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56242)
+	(envelope-from <lersek@redhat.com>) id 1dJNuP-0001Zq-Gr
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 13:41:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51514)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dJNn2-0007Sc-GK
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 13:33:40 -0400
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dJNuP-0001ZS-7w
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 13:41:17 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 823EE33458C
-	for <qemu-devel@nongnu.org>; Fri,  9 Jun 2017 17:33:39 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170609134010.GK22043@thinpad.lan.raisama.net> (Eduardo
-	Habkost's message of "Fri, 9 Jun 2017 10:40:10 -0300")
-References: <1496980142-8986-1-git-send-email-peterx@redhat.com>
-	<1496980142-8986-4-git-send-email-peterx@redhat.com>
-	<20170609134010.GK22043@thinpad.lan.raisama.net>
-Reply-To: quintela@redhat.com
-Date: Fri, 09 Jun 2017 19:33:35 +0200
-Message-ID: <87h8zp83rk.fsf@secure.mitica>
+	by mx1.redhat.com (Postfix) with ESMTPS id 6FC1BC057FA6
+	for <qemu-devel@nongnu.org>; Fri,  9 Jun 2017 17:41:14 +0000 (UTC)
+References: <20170608161013.17920-1-lersek@redhat.com>
+	<20170608204026-mutt-send-email-mst@kernel.org>
+	<1496951333.29761.5.camel@redhat.com>
+	<20170608224942-mutt-send-email-mst@kernel.org>
+	<d7cb6756-6d1f-60ee-c7b6-ef6a8b08bb08@redhat.com>
+	<20170609031436-mutt-send-email-mst@kernel.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <232488ab-cbb5-d296-2087-5af3c869214c@redhat.com>
+Date: Fri, 9 Jun 2017 19:41:08 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] migration: move
- global_state.optional out
+In-Reply-To: <20170609031436-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] q35/mch: implement extended TSEG sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,99 +38,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-Eduardo Habkost <ehabkost@redhat.com> wrote:
-D> On Fri, Jun 09, 2017 at 11:48:59AM +0800, Peter Xu wrote:
->> Put it into MigrationState then we can use the properties to specify
->> whether to enable storing global state.
->> 
->> Removing global_state_set_optional() since now we can use HW_COMPAT_2_3
->> for x86/power in general, and the register_compat_prop() for xen_init().
->> 
->> Signed-off-by: Peter Xu <peterx@redhat.com>
->> ---
->>  hw/i386/pc_piix.c             |  1 -
->>  hw/ppc/spapr.c                |  1 -
->>  hw/xen/xen-common.c           |  8 +++++++-
->>  include/hw/compat.h           |  4 ++++
->>  include/migration/migration.h |  7 ++++++-
->>  migration/migration.c         | 24 ++++++++++++++++--------
->>  6 files changed, 33 insertions(+), 12 deletions(-)
->> 
->> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
->> index 2234bd0..c83cec5 100644
->> --- a/hw/i386/pc_piix.c
->> +++ b/hw/i386/pc_piix.c
->> @@ -317,7 +317,6 @@ static void pc_compat_2_3(MachineState *machine)
->>      if (kvm_enabled()) {
->>          pcms->smm = ON_OFF_AUTO_OFF;
->>      }
->> -    global_state_set_optional();
->>      savevm_skip_configuration();
->>  }
->>  
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index ab3aab1..3e78bb9 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -3593,7 +3593,6 @@ static void spapr_machine_2_3_instance_options(MachineState *machine)
->>  {
->>      spapr_machine_2_4_instance_options(machine);
->>      savevm_skip_section_footers();
->> -    global_state_set_optional();
->>      savevm_skip_configuration();
->>  }
->
-> This is a good thing: makes the migration behavior of the
-> machine-types introspectable in compat_props.
->
-> I suggest moving this part (and all the rest except the new
-> register_compat_prop() call below) to a separate patch, because
-> it is an improvement on its own.
->
->>  
->> diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
->> index 0bed577..8240d50 100644
->> --- a/hw/xen/xen-common.c
->> +++ b/hw/xen/xen-common.c
->> @@ -138,7 +138,13 @@ static int xen_init(MachineState *ms)
->>      }
->>      qemu_add_vm_change_state_handler(xen_change_state_handler, NULL);
->>  
->> -    global_state_set_optional();
->> +    /*
->> +     * TODO: make sure global MigrationState has not yet been created
->> +     * (otherwise the compat trick won't work). For now we are in
->> +     * configure_accelerator() so we are mostly good. Better to
->> +     * confirm that in the future.
->> +     */
->
-> So, this makes accelerator initialization very sensitive to
-> ordering.
->
->> +    register_compat_prop("migration", "store-global-state", "off");
->
-> It's already hard to track down machine-type stuff that is
-> initialized at machine->init() time but it's not introspectable,
-> let's not do the same mistake with accelerators.
->
-> Can't this be solved by a AcceleratorClass::global_props field,
-> so we are sure there's a single place in the code where globals
-> are registered?  (Currently, they are all registered by the few
-> lines around the machine_register_compat_props() call in main()).
->
-> I think I see other use cases for a new
-> AcceleratorClass::global_props field.  e.g.: replacing
-> kvm_default_props and tcg_default_props in target/i386/cpu.c.
+On 06/09/17 02:19, Michael S. Tsirkin wrote:
+> On Fri, Jun 09, 2017 at 01:01:54AM +0200, Laszlo Ersek wrote:
+>> On 06/08/17 21:55, Michael S. Tsirkin wrote:
+>>> On Thu, Jun 08, 2017 at 09:48:53PM +0200, Gerd Hoffmann wrote:
+>>>>   Hi,
+>>>>
+>>>>> I really dislike negotiation being re-invented for each device.  Do
+>>>>> we
+>>>>> need these tricks?  Can we just do fw cfg with standard discovery?
+>>>>> This ties in with my proposal to generalize smi features to
+>>>>> generic ones.
+>>>>
+>>>> Device properties should be part of the device.
+>>>> We should have done this with the smi too.
+>>>
+>>> What is part of the device and what isn't? It's all part
+>>> of QEMU in the end.  Adding probing for multiple devices
+>>> will just add to number of exits and slow down guest boot.
+>>>
+>>> We do want to stick to emulating real devices if we can, no argument
+>>> here - but this stuff is PV anyway - what do we gain by spreading it
+>>> out?
+>>>
+>>>> A more standard way to handle this would be to add a vendor-specific
+>>>> pci capability and place the register there.  Not sure we have room for
+>>>> that in the pci config space though.
+>>>>
+>>>> cheers,
+>>>>   Gerd
+>>>
+>>> We don't have room anywhere in PCI config space. Laszlo makes argument
+>>> why it's safe for this device based on spec but it's anyone's guess
+>>> whether current and future software will follow spec.  In short, going
+>>> anywhere near the emulated device has a potential to break some drivers.
+>>
+>> I'm fine using any QEMU facility that lets independent firmware modules
+>> perform their feature detections / negotiations / lockdowns in arbitrary
+>> order between each other. (Hopefully without extreme parsing requirements.)
+> 
+> How about adding etc/mch/features etc copying the smi stuff? Is this
+> simple enough? We can worry about removing code duplication later.
 
-That is the kind of discussion that I wanted to start.  Thanks.
-For the migration point of view, we don't care *how* or *where* it is
-implemented, just that it is easy to add new properties (call it
-whatever name that you want).
+I'm having a hard time mapping the negotiation used for SMI to this
+TSEG-size case. (Just to be sure I've now re-read the commit message on
+50de920b372b ("hw/isa/lpc_ich9: add SMI feature negotiation via fw_cfg",
+2017-01-26).)
 
-And yes, making xen/kvm/tcg use QOM like everything else looks like a
-good idea to me.
+For SMI, there is only one way to trigger it. And the broadcast feature,
+if negotiated, modifies the behavior of SMI. It does not change how the
+SMI is triggered by the guest.
 
-Later, Juan.
+The TSEG size selection differs. There are already three options for the
+guest (bit patterns 00 -> 1MB, 01 -> 2MB, 10 -> 8MB) to write to
+ESMRAMC.TSEG_SZ. Let's say the guest wants more:
+
+- First, beyond learning whether "more is possible", it has to know
+exactly "how much". So a single bit in some "host-features" bitmask is
+not good enough for that.
+
+- Second, assuming an increased TSEG size is available (with a queriable
+size), the bit patterns 00, 01, 10 should still not change their
+behavior / meaning. For example, I don't see how
+
+  ESMRAMC.TSEG_SZ == 00
+
+(implying 1MB TSEG) could coexist with the guest actually negotiating
+16MB via another communication channel. Whatever code looked at
+ESMRAMC.TSEG_SZ would rightfully think there was a 1MB TSEG.
+
+So I think such a side-channel negotiation would actually violate
+specified behavior from the Q35 spec, rather than just fill in
+reserved/unspecified bits.
+
+- The third doubt I have is security / lockdown. In the SMI case, we
+defined our own lockdown scheme, and it did not overlap or conflict with
+anything. For SMRAM however, the SMRAM.D_LCK bit already locks down a
+whole bunch of things, including the ESMRAMC.TSEG_SZ field. Should
+SMRAM.D_LCK also lock down the "other" negotiation channel? If that's
+our choice, then we diverge at once from the negotiation pattern seen
+with SMI. Or else, what if we lock down the "other" channel (selecting
+16MB for example), but don't lock down D_LCK? Then ESMRAMC.TSEG_SZ can
+still be modified, and that should actually affect the TSEG size
+(because D_LCK is not set).
+
+... I think the negotiation pattern we used for etc/smi/* doesn't apply
+here; the Q35 spec already defines too much of a selection / lockdown
+dance for that. We could perhaps figure out the interactions, but (a)
+it's a security thing so there isn't much room for mistakes, and (b) we
+wouldn't be reusing the pattern seen with the SMI feature negotiation
+anyway.
+
+ESMRAMC.TSEG_SZ == 11 is the simplest (non-conflicting) extension to the
+Q35 spec, IMO. That's the core thing.
+
+How we pass the information to the guest that
+(a) ESMRAMC.TSEG_SZ == 11 is available, and
+(b) what size it actually means
+
+is a secondary question. For this, my original suggestion was a new
+fw_cfg file indeed:
+
+https://lists.01.org/pipermail/edk2-devel/2017-May/010404.html
+
+but Gerd seemed to prefer PCI config space. I was fine either way.
+
+(Please note that a malicious guest OS cannot fake an fw_cfg file on old
+QEMU, but it can fill in unimplemented registers in PCI config space.
+This is why using fw_cfg for querying the extended TSEG availability and
+size would be a "read only" operation in the guest, and why using PCI
+config space instead requires a *write* operation first. The latter has
+nothing to do with feature negotiation; the write occurs only to
+suppress earlier tampering from a malicious guest OS, pre-reboot.)
+
+Summary:
+
+(1) I don't think the pattern that we used for broadcast SMI applies
+here; we already have a spec-mandated selection and lockdown protocol
+involving ESMRAMC.TSEG_SZ and SMRAM.D_LCK.
+
+I don't think we can, or should try to, diverge from this protocol. In
+fact we're lucky to have a reserved bitmask value (11) in ESMRAMC.TSEG_SZ.
+
+(2) How exactly we inform the guest about the TSEG size that
+(ESMRAMC.TSEG_SZ == 11) corresponds to is a secondary question. We can
+make it a constant (and pray, like Paolo mentions), or we can make it
+cmdline-configurable and expose it via PCI config space, or we can make
+it cmdline-configurable and expose it via a new fw_cfg file. In OVMF I
+can easily accommodate either of these three options.
+
+Thanks
+Laszlo
