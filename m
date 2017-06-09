@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47219)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dJCS1-000449-Uv
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:27:16 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dJCRz-0006gf-1x
+	(envelope-from <dgibson@ozlabs.org>) id 1dJCRy-0003x7-2Z
 	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:27:13 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1dJCRw-0006dz-1V
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:27:10 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  9 Jun 2017 15:26:43 +1000
-Message-Id: <20170609052652.23200-12-david@gibson.dropbear.id.au>
+Date: Fri,  9 Jun 2017 15:26:40 +1000
+Message-Id: <20170609052652.23200-9-david@gibson.dropbear.id.au>
 In-Reply-To: <20170609052652.23200-1-david@gibson.dropbear.id.au>
 References: <20170609052652.23200-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 11/20] spapr: Rework DRC name handling
+Subject: [Qemu-devel] [PULL 08/20] spapr: Clean up handling of DR-indicator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,204 +22,185 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, sursingh@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-DRC objects have a get_name method which returns the DRC name generated
-when the DRC is created.  Replace that with a fixed spapr_drc_name()
-function which generates the name on the fly from other information.  This
-means:
-  * We get rid of a method with only one implementation, and only local
-    callers
-  * We don't have to carry the name string around for the lifetime of the
-    DRC
-  * We use information added to the class structure to generate the name
-    in standard format, so we don't need an explicit switch on drc type
-    any more
+There are 3 types of "indicator" associated with hotplug in the PAPR spec
+the "allocation state", "isolation state" and "DR-indicator".  The first
+two are intimately tied to the various state transitions associated with
+hotplug.  The DR-indicator, however, is different and simpler.
 
-We also eliminate the 'name' property; it's basically useless since the
-only information in it can easily be deduced from other things.
+It's basically just a guest controlled variable which can be used by the
+guest to flag state or problems associated with a device.  The idea is that
+the hypervisor can use it to present information back on management
+consoles (on some machines with PowerVM it may even control physical LEDs
+on the machine case associated with the relevant device).
+
+For that reason, there's only ever likely to be a single update
+implementation so the set_indicator_state method isn't useful.  Replace it
+with a direct function call.
+
+While we're there, make some small associated cleanups:
+  * PAPR doesn't use the term "indicator state", just "DR-indicator" and
+the allocation state and isolation state are also considered "indicators".
+Rename things to be less confusing
+  * Fold set_indicator_state() and rtas_set_indicator_state() into a single
+rtas_set_dr_indicator() function.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 Acked-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/ppc/spapr_drc.c         | 80 +++++++++++++++++-----------------------------
- include/hw/ppc/spapr_drc.h |  3 +-
- 2 files changed, 30 insertions(+), 53 deletions(-)
+ hw/ppc/spapr_drc.c         | 25 ++++++++-----------------
+ hw/ppc/trace-events        |  2 +-
+ include/hw/ppc/spapr_drc.h | 16 ++++++++--------
+ 3 files changed, 17 insertions(+), 26 deletions(-)
 
 diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index 82c0b94..15ef67d 100644
+index f0cff0b..19e2c0d 100644
 --- a/hw/ppc/spapr_drc.c
 +++ b/hw/ppc/spapr_drc.c
-@@ -155,9 +155,32 @@ static uint32_t set_allocation_state(sPAPRDRConnector *drc,
+@@ -116,14 +116,6 @@ static uint32_t set_isolation_state(sPAPRDRConnector *drc,
      return RTAS_OUT_SUCCESS;
  }
  
--static const char *get_name(sPAPRDRConnector *drc)
-+static const char *spapr_drc_name(sPAPRDRConnector *drc)
- {
--    return drc->name;
-+    sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
-+
-+    /* human-readable name for a DRC to encode into the DT
-+     * description. this is mainly only used within a guest in place
-+     * of the unique DRC index.
-+     *
-+     * in the case of VIO/PCI devices, it corresponds to a "location
-+     * code" that maps a logical device/function (DRC index) to a
-+     * physical (or virtual in the case of VIO) location in the system
-+     * by chaining together the "location label" for each
-+     * encapsulating component.
-+     *
-+     * since this is more to do with diagnosing physical hardware
-+     * issues than guest compatibility, we choose location codes/DRC
-+     * names that adhere to the documented format, but avoid encoding
-+     * the entire topology information into the label/code, instead
-+     * just using the location codes based on the labels for the
-+     * endpoints (VIO/PCI adaptor connectors), which is basically just
-+     * "C" followed by an integer ID.
-+     *
-+     * DRC names as documented by PAPR+ v2.7, 13.5.2.4
-+     * location codes as documented by PAPR+ v2.7, 12.3.1.5
-+     */
-+    return g_strdup_printf("%s%d", drck->drc_name_prefix, drc->id);
- }
- 
- /* has the guest been notified of device attachment? */
-@@ -202,13 +225,6 @@ static void prop_get_index(Object *obj, Visitor *v, const char *name,
-     visit_type_uint32(v, name, &value, errp);
- }
- 
--static char *prop_get_name(Object *obj, Error **errp)
+-static uint32_t set_indicator_state(sPAPRDRConnector *drc,
+-                                    sPAPRDRIndicatorState state)
 -{
--    sPAPRDRConnector *drc = SPAPR_DR_CONNECTOR(obj);
--    sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
--    return g_strdup(drck->get_name(drc));
+-    trace_spapr_drc_set_indicator_state(spapr_drc_index(drc), state);
+-    drc->indicator_state = state;
+-    return RTAS_OUT_SUCCESS;
 -}
 -
- static void prop_get_fdt(Object *obj, Visitor *v, const char *name,
-                          void *opaque, Error **errp)
+ static uint32_t set_allocation_state(sPAPRDRConnector *drc,
+                                      sPAPRDRAllocationState state)
  {
-@@ -567,45 +583,6 @@ sPAPRDRConnector *spapr_dr_connector_new(Object *owner, const char *type,
-     object_property_set_bool(OBJECT(drc), true, "realized", NULL);
-     g_free(prop_name);
- 
--    /* human-readable name for a DRC to encode into the DT
--     * description. this is mainly only used within a guest in place
--     * of the unique DRC index.
--     *
--     * in the case of VIO/PCI devices, it corresponds to a
--     * "location code" that maps a logical device/function (DRC index)
--     * to a physical (or virtual in the case of VIO) location in the
--     * system by chaining together the "location label" for each
--     * encapsulating component.
--     *
--     * since this is more to do with diagnosing physical hardware
--     * issues than guest compatibility, we choose location codes/DRC
--     * names that adhere to the documented format, but avoid encoding
--     * the entire topology information into the label/code, instead
--     * just using the location codes based on the labels for the
--     * endpoints (VIO/PCI adaptor connectors), which is basically
--     * just "C" followed by an integer ID.
--     *
--     * DRC names as documented by PAPR+ v2.7, 13.5.2.4
--     * location codes as documented by PAPR+ v2.7, 12.3.1.5
--     */
--    switch (spapr_drc_type(drc)) {
--    case SPAPR_DR_CONNECTOR_TYPE_CPU:
--        drc->name = g_strdup_printf("CPU %d", id);
--        break;
--    case SPAPR_DR_CONNECTOR_TYPE_PHB:
--        drc->name = g_strdup_printf("PHB %d", id);
--        break;
--    case SPAPR_DR_CONNECTOR_TYPE_VIO:
--    case SPAPR_DR_CONNECTOR_TYPE_PCI:
--        drc->name = g_strdup_printf("C%d", id);
--        break;
--    case SPAPR_DR_CONNECTOR_TYPE_LMB:
--        drc->name = g_strdup_printf("LMB %d", id);
--        break;
--    default:
--        g_assert(false);
--    }
--
-     /* PCI slot always start in a USABLE state, and stay there */
+@@ -321,7 +313,7 @@ static void attach(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
      if (spapr_drc_type(drc) == SPAPR_DR_CONNECTOR_TYPE_PCI) {
-         drc->allocation_state = SPAPR_DR_ALLOCATION_STATE_USABLE;
-@@ -621,7 +598,6 @@ static void spapr_dr_connector_instance_init(Object *obj)
-     object_property_add_uint32_ptr(obj, "id", &drc->id, NULL);
-     object_property_add(obj, "index", "uint32", prop_get_index,
-                         NULL, NULL, NULL, NULL);
--    object_property_add_str(obj, "name", prop_get_name, NULL, NULL);
-     object_property_add(obj, "fdt", "struct", prop_get_fdt,
-                         NULL, NULL, NULL, NULL);
- }
-@@ -636,7 +612,6 @@ static void spapr_dr_connector_class_init(ObjectClass *k, void *data)
+         drc->isolation_state = SPAPR_DR_ISOLATION_STATE_UNISOLATED;
+     }
+-    drc->indicator_state = SPAPR_DR_INDICATOR_STATE_ACTIVE;
++    drc->dr_indicator = SPAPR_DR_INDICATOR_ACTIVE;
+ 
+     drc->dev = d;
+     drc->fdt = fdt;
+@@ -394,7 +386,7 @@ static void detach(sPAPRDRConnector *drc, DeviceState *d, Error **errp)
+         }
+     }
+ 
+-    drc->indicator_state = SPAPR_DR_INDICATOR_STATE_INACTIVE;
++    drc->dr_indicator = SPAPR_DR_INDICATOR_INACTIVE;
+ 
+     /* Calling release callbacks based on spapr_drc_type(drc). */
+     switch (spapr_drc_type(drc)) {
+@@ -507,7 +499,7 @@ static const VMStateDescription vmstate_spapr_drc = {
+     .fields  = (VMStateField []) {
+         VMSTATE_UINT32(isolation_state, sPAPRDRConnector),
+         VMSTATE_UINT32(allocation_state, sPAPRDRConnector),
+-        VMSTATE_UINT32(indicator_state, sPAPRDRConnector),
++        VMSTATE_UINT32(dr_indicator, sPAPRDRConnector),
+         VMSTATE_BOOL(configured, sPAPRDRConnector),
+         VMSTATE_BOOL(awaiting_release, sPAPRDRConnector),
+         VMSTATE_BOOL(awaiting_allocation, sPAPRDRConnector),
+@@ -647,7 +639,6 @@ static void spapr_dr_connector_class_init(ObjectClass *k, void *data)
+     dk->realize = realize;
      dk->unrealize = unrealize;
      drck->set_isolation_state = set_isolation_state;
+-    drck->set_indicator_state = set_indicator_state;
      drck->set_allocation_state = set_allocation_state;
--    drck->get_name = get_name;
-     drck->release_pending = release_pending;
-     drck->set_signalled = set_signalled;
-     /*
-@@ -665,6 +640,7 @@ static void spapr_drc_cpu_class_init(ObjectClass *k, void *data)
- 
-     drck->typeshift = SPAPR_DR_CONNECTOR_TYPE_SHIFT_CPU;
-     drck->typename = "CPU";
-+    drck->drc_name_prefix = "CPU ";
+     drck->get_name = get_name;
+     drck->attach = attach;
+@@ -929,17 +920,17 @@ static uint32_t rtas_set_allocation_state(uint32_t idx, uint32_t state)
+     return drck->set_allocation_state(drc, state);
  }
  
- static void spapr_drc_pci_class_init(ObjectClass *k, void *data)
-@@ -673,6 +649,7 @@ static void spapr_drc_pci_class_init(ObjectClass *k, void *data)
+-static uint32_t rtas_set_indicator_state(uint32_t idx, uint32_t state)
++static uint32_t rtas_set_dr_indicator(uint32_t idx, uint32_t state)
+ {
+     sPAPRDRConnector *drc = spapr_drc_by_index(idx);
+-    sPAPRDRConnectorClass *drck;
  
-     drck->typeshift = SPAPR_DR_CONNECTOR_TYPE_SHIFT_PCI;
-     drck->typename = "28";
-+    drck->drc_name_prefix = "C";
+     if (!drc) {
+         return RTAS_OUT_PARAM_ERROR;
+     }
+ 
+-    drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+-    return drck->set_indicator_state(drc, state);
++    trace_spapr_drc_set_dr_indicator(idx, state);
++    drc->dr_indicator = state;
++    return RTAS_OUT_SUCCESS;
  }
  
- static void spapr_drc_lmb_class_init(ObjectClass *k, void *data)
-@@ -681,6 +658,7 @@ static void spapr_drc_lmb_class_init(ObjectClass *k, void *data)
- 
-     drck->typeshift = SPAPR_DR_CONNECTOR_TYPE_SHIFT_LMB;
-     drck->typename = "MEM";
-+    drck->drc_name_prefix = "LMB ";
- }
- 
- static const TypeInfo spapr_dr_connector_info = {
-@@ -829,7 +807,7 @@ int spapr_drc_populate_dt(void *fdt, int fdt_offset, Object *owner,
-         g_array_append_val(drc_power_domains, drc_power_domain);
- 
-         /* ibm,drc-names */
--        drc_names = g_string_append(drc_names, drck->get_name(drc));
-+        drc_names = g_string_append(drc_names, spapr_drc_name(drc));
-         drc_names = g_string_insert_len(drc_names, -1, "\0", 1);
- 
-         /* ibm,drc-types */
+ static void rtas_set_indicator(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+@@ -964,7 +955,7 @@ static void rtas_set_indicator(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+         ret = rtas_set_isolation_state(idx, state);
+         break;
+     case RTAS_SENSOR_TYPE_DR:
+-        ret = rtas_set_indicator_state(idx, state);
++        ret = rtas_set_dr_indicator(idx, state);
+         break;
+     case RTAS_SENSOR_TYPE_ALLOCATION_STATE:
+         ret = rtas_set_allocation_state(idx, state);
+diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
+index 581fa85..3e8e3cf 100644
+--- a/hw/ppc/trace-events
++++ b/hw/ppc/trace-events
+@@ -39,7 +39,7 @@ spapr_iommu_ddw_reset(uint64_t buid, uint32_t cfgaddr) "buid=%"PRIx64" addr=%"PR
+ spapr_drc_set_isolation_state(uint32_t index, int state) "drc: 0x%"PRIx32", state: %"PRIx32
+ spapr_drc_set_isolation_state_finalizing(uint32_t index) "drc: 0x%"PRIx32
+ spapr_drc_set_isolation_state_deferring(uint32_t index) "drc: 0x%"PRIx32
+-spapr_drc_set_indicator_state(uint32_t index, int state) "drc: 0x%"PRIx32", state: 0x%x"
++spapr_drc_set_dr_indicator(uint32_t index, int state) "drc: 0x%"PRIx32", state: 0x%x"
+ spapr_drc_set_allocation_state(uint32_t index, int state) "drc: 0x%"PRIx32", state: 0x%x"
+ spapr_drc_set_allocation_state_finalizing(uint32_t index) "drc: 0x%"PRIx32
+ spapr_drc_set_configured(uint32_t index) "drc: 0x%"PRIx32
 diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-index 4f82001..c487123 100644
+index f892b94..70db573 100644
 --- a/include/hw/ppc/spapr_drc.h
 +++ b/include/hw/ppc/spapr_drc.h
-@@ -184,7 +184,6 @@ typedef struct sPAPRDRConnector {
+@@ -125,7 +125,7 @@ typedef enum {
+ } sPAPRDRAllocationState;
  
-     uint32_t id;
+ /*
+- * LED/visual indicator state
++ * DR-indicator (LED/visual indicator)
+  *
+  * set via set-indicator RTAS calls
+  * as documented by PAPR+ 2.7 13.5.3.4, Table 177,
+@@ -137,10 +137,10 @@ typedef enum {
+  * action: (currently unused)
+  */
+ typedef enum {
+-    SPAPR_DR_INDICATOR_STATE_INACTIVE   = 0,
+-    SPAPR_DR_INDICATOR_STATE_ACTIVE     = 1,
+-    SPAPR_DR_INDICATOR_STATE_IDENTIFY   = 2,
+-    SPAPR_DR_INDICATOR_STATE_ACTION     = 3,
++    SPAPR_DR_INDICATOR_INACTIVE   = 0,
++    SPAPR_DR_INDICATOR_ACTIVE     = 1,
++    SPAPR_DR_INDICATOR_IDENTIFY   = 2,
++    SPAPR_DR_INDICATOR_ACTION     = 3,
+ } sPAPRDRIndicatorState;
+ 
+ /*
+@@ -186,10 +186,12 @@ typedef struct sPAPRDRConnector {
      Object *owner;
--    const char *name;
+     const char *name;
  
-     /* DR-indicator */
-     uint32_t dr_indicator;
-@@ -215,6 +214,7 @@ typedef struct sPAPRDRConnectorClass {
-     /*< public >*/
-     sPAPRDRConnectorTypeShift typeshift;
-     const char *typename; /* used in device tree, PAPR 13.5.2.6 & C.6.1 */
-+    const char *drc_name_prefix; /* used other places in device tree */
++    /* DR-indicator */
++    uint32_t dr_indicator;
++
+     /* sensor/indicator states */
+     uint32_t isolation_state;
+     uint32_t allocation_state;
+-    uint32_t indicator_state;
  
-     sPAPRDREntitySense (*dr_entity_sense)(sPAPRDRConnector *drc);
- 
-@@ -223,7 +223,6 @@ typedef struct sPAPRDRConnectorClass {
+     /* configure-connector state */
+     void *fdt;
+@@ -219,8 +221,6 @@ typedef struct sPAPRDRConnectorClass {
+     /* accessors for guest-visible (generally via RTAS) DR state */
+     uint32_t (*set_isolation_state)(sPAPRDRConnector *drc,
                                      sPAPRDRIsolationState state);
+-    uint32_t (*set_indicator_state)(sPAPRDRConnector *drc,
+-                                    sPAPRDRIndicatorState state);
      uint32_t (*set_allocation_state)(sPAPRDRConnector *drc,
                                       sPAPRDRAllocationState state);
--    const char *(*get_name)(sPAPRDRConnector *drc);
- 
-     /* QEMU interfaces for managing hotplug operations */
-     bool (*release_pending)(sPAPRDRConnector *drc);
+     const char *(*get_name)(sPAPRDRConnector *drc);
 -- 
 2.9.4
