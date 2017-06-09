@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46987)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dJCRw-0003va-Jm
+	(envelope-from <dgibson@ozlabs.org>) id 1dJCRx-0003vp-0I
 	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:27:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dJCRs-0006bg-I9
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:27:08 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dJCRv-0006dS-KB
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:27:09 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  9 Jun 2017 15:26:33 +1000
-Message-Id: <20170609052652.23200-2-david@gibson.dropbear.id.au>
+Date: Fri,  9 Jun 2017 15:26:38 +1000
+Message-Id: <20170609052652.23200-7-david@gibson.dropbear.id.au>
 In-Reply-To: <20170609052652.23200-1-david@gibson.dropbear.id.au>
 References: <20170609052652.23200-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 01/20] target/ppc: pass const string to
- kvmppc_is_mem_backend_page_size_ok()
+Subject: [Qemu-devel] [PULL 06/20] spapr: Don't misuse DR-indicator in
+ spapr_recover_pending_dimm_state()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,71 +21,65 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, sursingh@redhat.com, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, sursingh@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-From: Greg Kurz <groug@kaod.org>
+With some combinations of migration and hotplug we can lost temporary state
+indicating how many DRCs (guest side hotplug handles) are still connected
+to a DIMM object in the process of removal.  When we hit that situation
+spapr_recover_pending_dimm_state() is used to scan more extensively and
+work out the right number.
 
-This function has three implementations. Two are stubs that do nothing
-and the third one only passes the obj_path argument to:
+It does this using drc->indicator state to determine what state of
+disconnection the DRC is in.  However, this is not safe, because the
+indicator state is guest settable - in fact it's more-or-less a purely
+guest->host notification mechanism which should have no bearing on the
+internals of hotplug state management.
 
-Object *object_resolve_path(const char *path, bool *ambiguous);
+So, replace the test for this with a test on drc->dev, which is a purely
+qemu side managed variable, and updated the same BQL critical section as
+the indicator state.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+This does introduce an off-by-one change, because the indicator state was
+updated before the call to spapr_lmb_release() on the current DRC, whereas
+drc->dev is updated afterwards.  That's corrected by always decrementing
+the nr_lmbs value instead of only doing so in the case where we didn't
+have to recover information.
+
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Acked-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- target/ppc/kvm.c     | 4 ++--
- target/ppc/kvm_ppc.h | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ hw/ppc/spapr.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 51249ce..8881762 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -478,7 +478,7 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 9b7ae28..b2311dc 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2676,7 +2676,7 @@ static sPAPRDIMMState *spapr_recover_pending_dimm_state(sPAPRMachineState *ms,
+         drc = spapr_drc_by_id(TYPE_SPAPR_DRC_LMB,
+                               addr / SPAPR_MEMORY_BLOCK_SIZE);
+         g_assert(drc);
+-        if (drc->indicator_state != SPAPR_DR_INDICATOR_STATE_INACTIVE) {
++        if (drc->dev) {
+             avail_lmbs++;
+         }
+         addr += SPAPR_MEMORY_BLOCK_SIZE;
+@@ -2700,10 +2700,11 @@ void spapr_lmb_release(DeviceState *dev)
+      * during the unplug process. In this case recover it. */
+     if (ds == NULL) {
+         ds = spapr_recover_pending_dimm_state(spapr, PC_DIMM(dev));
+-        if (ds->nr_lmbs) {
+-            return;
+-        }
+-    } else if (--ds->nr_lmbs) {
++        /* The DRC being examined by the caller at least must be counted */
++        g_assert(ds->nr_lmbs);
++    }
++
++    if (--ds->nr_lmbs) {
+         return;
      }
- }
-=20
--bool kvmppc_is_mem_backend_page_size_ok(char *obj_path)
-+bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
- {
-     Object *mem_obj =3D object_resolve_path(obj_path, NULL);
-     char *mempath =3D object_property_get_str(mem_obj, "mem-path", NULL)=
-;
-@@ -499,7 +499,7 @@ static inline void kvm_fixup_page_sizes(PowerPCCPU *c=
-pu)
- {
- }
-=20
--bool kvmppc_is_mem_backend_page_size_ok(char *obj_path)
-+bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
- {
-     return true;
- }
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index f48243d..eab7c8f 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -64,7 +64,7 @@ int kvmppc_enable_hwrng(void);
- int kvmppc_put_books_sregs(PowerPCCPU *cpu);
- PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
-=20
--bool kvmppc_is_mem_backend_page_size_ok(char *obj_path);
-+bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path);
-=20
- #else
-=20
-@@ -211,7 +211,7 @@ static inline uint64_t kvmppc_rma_size(uint64_t curre=
-nt_size,
-     return ram_size;
- }
-=20
--static inline bool kvmppc_is_mem_backend_page_size_ok(char *obj_path)
-+static inline bool kvmppc_is_mem_backend_page_size_ok(const char *obj_pa=
-th)
- {
-     return true;
- }
---=20
+ 
+-- 
 2.9.4
