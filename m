@@ -1,34 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dJCHi-0008T6-QQ
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:16:35 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dJCRt-0003uU-PV
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:27:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dJCHe-0002qI-Ry
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:16:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37807)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dJCHe-0002q1-J0
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:16:30 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <2b2311b1b070a0b03973e39deccf4682de4a6cd4.1496686997.git.alistair.francis@xilinx.com>
-	<CAJ+F1CLuPkWjG3Hn8hfaxTApn6+ouqh5nJZNWSQYX1C3_HRFqA@mail.gmail.com>
-	<e340cdb9-3c97-8624-81d9-f7888f819a68@amsat.org>
-	<CAKmqyKOOhu7iKuW4naNi0+7cwayLaftkPf=gS7uBakMvKavxVQ@mail.gmail.com>
-	<270686d0-1ca8-965f-a14a-397f45616deb@redhat.com>
-	<87shjc2rkb.fsf@dusky.pond.sub.org>
-	<CAKmqyKMJ8ZgTPtEj73pBDU+mf578tubKPUPsP4mTD8veX90K-w@mail.gmail.com>
-	<878tl3kodm.fsf@dusky.pond.sub.org>
-	<CAKmqyKP3S7mBwQzC0yV4MpQddcKvGXtXrPyY68X7t62YwLqy3g@mail.gmail.com>
-	<871squz7l8.fsf@dusky.pond.sub.org>
-	<CAKmqyKMQyYObpsFd6hGe3zjPSJRKyWZqMGfuFSMJULzmvoD_eA@mail.gmail.com>
-Date: Fri, 09 Jun 2017 07:16:24 +0200
-In-Reply-To: <CAKmqyKMQyYObpsFd6hGe3zjPSJRKyWZqMGfuFSMJULzmvoD_eA@mail.gmail.com>
-	(Alistair Francis's message of "Thu, 8 Jun 2017 12:57:38 -0700")
-Message-ID: <87efutd9lj.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] char-socket: Don't report TCP
- socket waiting as an error
+	(envelope-from <dgibson@ozlabs.org>) id 1dJCRs-0006bh-I1
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:27:05 -0400
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Fri,  9 Jun 2017 15:26:34 +1000
+Message-Id: <20170609052652.23200-3-david@gibson.dropbear.id.au>
+In-Reply-To: <20170609052652.23200-1-david@gibson.dropbear.id.au>
+References: <20170609052652.23200-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PULL 02/20] target/ppc: fix memory leak in
+ kvmppc_is_mem_backend_page_size_ok()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,82 +20,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?utf-8?Q?Marc-Andr?= =?utf-8?Q?=C3=A9?= Lureau <marcandre.lureau@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: peter.maydell@linaro.org
+Cc: agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, sursingh@redhat.com, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-Alistair Francis <alistair.francis@xilinx.com> writes:
+From: Greg Kurz <groug@kaod.org>
 
-> On Thu, Jun 8, 2017 at 10:56 AM, Markus Armbruster <armbru@redhat.com> wrote:
->> Alistair Francis <alistair.francis@xilinx.com> writes:
->>
->>> On Wed, Jun 7, 2017 at 11:03 PM, Markus Armbruster <armbru@redhat.com> wrote:
->>>> Alistair Francis <alistair.francis@xilinx.com> writes:
->>>>
->>>>> On Wed, Jun 7, 2017 at 12:19 AM, Markus Armbruster <armbru@redhat.com> wrote:
->>>>>> Paolo Bonzini <pbonzini@redhat.com> writes:
->>>>>>
->>>>>>> On 06/06/2017 18:30, Alistair Francis wrote:
->>>>>>>>>
->>>>>>>>> This is somehow confusing. I don't think it is worth having another
->>>>>>>>> qemu_log_stderr() function rather than using error_report() but this very
->>>>>>>>> call might deserve a comment explaining this unusual use. What do you think?
->>>>>>>>
->>>>>>>> The problem with stderr is that this isn't an error. Some uses of QEMU
->>>>>>>> (inside Eclipse for example) flag everything printed on stderr as red
->>>>>>>> which confuses users that they are seeing an error when they really
->>>>>>>> aren't.
->>>>>>>
->>>>>>> But they are wrong.
->>>>>>
->>>>>> Concur.  We also print warnings and informational messages to stderr.
->>>>>>
->>>>>> We should make errors easy to recognize.  Fortunately, error_report()
->>>>>> prints errors to stderr in a rigid format.  Unfortunately, error
->>>>>> messages bypassing error_report() still exist in places.  We suck.
->>>>>>
->>>>>> The format is
->>>>>>
->>>>>>     timestamp-if-enabled progname ':' location message
->>>>>>
->>>>>> timestamp-if-enabled is normally empty.  With -msg timestamp=on, it's
->>>>>> the current time in ISO 8601 format, followed by a space.
->>>>>>
->>>>>> progname is the program name (main()'s argv[0]).
->>>>>>
->>>>>> location is either empty, or a reference to the command line or a
->>>>>> configuration file.
->>>>>>
->>>>>> See error_vreport() for details.
->>>>>
->>>>> Ok, but this isn't an error, it's more information. So it sounds like
->>>>> we should still print to stderr but not print in the format described
->>>>> above?
->>>>
->>>> Yes.
->>>>
->>>> I explained the error message format to show how to distinguish actual
->>>> errors from other stuff.
->>>
->>> Sorry, I should have been more clear. I meant we should not use the
->>> error_report() function here. I don't think we have any
->>> warning_report() function though, is that something worth having?
->>
->> So far we simply use error_printf() for such things.
->>
->> A function to report a warning would let us report them more uniformly,
->> but only if we actually use it uniformly.  In other words, adding one
->> without also converting the existing warnings to use it would create yet
->> another open-ended incremental conversion job.  Are we up to it?
->
-> Yeah! Why not. I am happy to give it a shot changing some errors to warnings.
->
-> First thing though, what is the format for printing warnings?
+The string returned by object_property_get_str() is dynamically allocated.
 
-We make one up.
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ target/ppc/kvm.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-For what it's worth, gcc uses the same format as for errors with the
-message prefixed either by "warning: " or by "error: ".  Also common is
-prefixing warnings, but not errors.
-
-We already have several error_report() calls with messages that start
-with (a variation of) "warning: ".
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 8881762..f2f7c53 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -486,6 +486,7 @@ bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
+ 
+     if (mempath) {
+         pagesize = qemu_mempath_getpagesize(mempath);
++        g_free(mempath);
+     } else {
+         pagesize = getpagesize();
+     }
+-- 
+2.9.4
