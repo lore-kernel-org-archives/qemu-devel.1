@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dJKGO-0000lk-2C
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:47:46 -0400
+	(envelope-from <armbru@redhat.com>) id 1dJKGO-0000m3-80
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:47:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dJKGI-0003cp-QJ
+	(envelope-from <armbru@redhat.com>) id 1dJKGJ-0003dH-5E
 	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:47:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54236)
+Received: from mx1.redhat.com ([209.132.183.28]:23930)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dJKGI-0003b0-Ia
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dJKGI-0003cC-Rp
 	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:47:38 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 68ECF81236
+	by mx1.redhat.com (Postfix) with ESMTPS id BD5C08047C
 	for <qemu-devel@nongnu.org>; Fri,  9 Jun 2017 13:47:37 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  9 Jun 2017 15:47:22 +0200
-Message-Id: <1497016045-6009-39-git-send-email-armbru@redhat.com>
+Date: Fri,  9 Jun 2017 15:47:25 +0200
+Message-Id: <1497016045-6009-42-git-send-email-armbru@redhat.com>
 In-Reply-To: <1497016045-6009-1-git-send-email-armbru@redhat.com>
 References: <1497016045-6009-1-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 38/41] numa: use get_uint() for "size" property
+Subject: [Qemu-devel] [PULL 41/41] tests/qdict: check more get_try_int()
+ cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,43 +38,36 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-"size" is a property of TYPE_MEMORY_BACKEND.
-host_memory_backend_get_size() and host_memory_backend_set_size() use
-visit_type_size().
-
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20170607163635.17635-39-marcandre.lureau@redhat.com>
+Suggested-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20170607163635.17635-42-marcandre.lureau@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- numa.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ tests/check-qdict.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/numa.c b/numa.c
-index 65701cb..b0e75f6 100644
---- a/numa.c
-+++ b/numa.c
-@@ -216,7 +216,7 @@ static void parse_numa_node(MachineState *ms, NumaNod=
-eOptions *node,
-         }
+diff --git a/tests/check-qdict.c b/tests/check-qdict.c
+index 5eca1b5..3540577 100644
+--- a/tests/check-qdict.c
++++ b/tests/check-qdict.c
+@@ -108,10 +108,17 @@ static void qdict_get_try_int_test(void)
+     QDict *tests_dict =3D qdict_new();
 =20
-         object_ref(o);
--        numa_info[nodenr].node_mem =3D object_property_get_int(o, "size"=
-, NULL);
-+        numa_info[nodenr].node_mem =3D object_property_get_uint(o, "size=
-", NULL);
-         numa_info[nodenr].node_memdev =3D MEMORY_BACKEND(o);
-     }
-     numa_info[nodenr].present =3D true;
-@@ -641,8 +641,8 @@ static int query_memdev(Object *obj, void *opaque)
-         m->value->id =3D object_property_get_str(obj, "id", NULL);
-         m->value->has_id =3D !!m->value->id;
+     qdict_put_int(tests_dict, key, value);
++    qdict_put_str(tests_dict, "string", "test");
 =20
--        m->value->size =3D object_property_get_int(obj, "size",
--                                                 &error_abort);
-+        m->value->size =3D object_property_get_uint(obj, "size",
-+                                                  &error_abort);
-         m->value->merge =3D object_property_get_bool(obj, "merge",
-                                                    &error_abort);
-         m->value->dump =3D object_property_get_bool(obj, "dump",
+     ret =3D qdict_get_try_int(tests_dict, key, 0);
+     g_assert(ret =3D=3D value);
+=20
++    ret =3D qdict_get_try_int(tests_dict, "missing", -42);
++    g_assert_cmpuint(ret, =3D=3D, -42);
++
++    ret =3D qdict_get_try_int(tests_dict, "string", -42);
++    g_assert_cmpuint(ret, =3D=3D, -42);
++
+     QDECREF(tests_dict);
+ }
+=20
 --=20
 2.7.5
