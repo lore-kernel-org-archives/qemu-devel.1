@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dJDnR-0006ul-Nc
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 02:53:26 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dJDuu-0001He-Lc
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 03:01:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dJDnO-0005zp-Ka
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 02:53:25 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Fri,  9 Jun 2017 08:53:17 +0200
-Message-Id: <1496991197-1815-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/ppc/prep: Remove superfluous call to
- soundhw_init()
+	(envelope-from <no-reply@patchew.org>) id 1dJDur-0000uR-Ho
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 03:01:08 -0400
+Resent-Message-Id: <E1dJDur-0000uR-Ho@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21309)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dJDur-0000uF-7h
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 03:01:05 -0400
+In-Reply-To: <20170609053719.26251-1-rth@twiddle.net>
+Message-ID: <149699165216.2550.12975691549964796606@84b42461e25a>
+Reply-To: <qemu-devel@nongnu.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 9 Jun 2017 00:00:52 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v5 0/7] tcg: allocate TB structs preceding
+ translate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,45 +29,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org
-Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+To: rth@twiddle.net
+Cc: famz@redhat.com, qemu-devel@nongnu.org, cota@braap.org
 
-When using the 40p machine, soundhw_init() is currently called twice,
-one time from vl.c and one time from ibm_40p_init(). The call in
-ibm_40p_init() was likely just a copy-and-paste from a old version
-of the prep machine - but there the call to audio_init() (which was
-the previous name of this function) has been removed many years ago
-already, with commit b3e6d591b05538056d665572f3e3bbfb3cbb70e7
-("audio: enable PCI audio cards for all PCI-enabled targets"), so
-we certainly also do not need the soundhw_init() in the 40p function
-anymore nowadays.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/ppc/prep.c | 4 ----
- 1 file changed, 4 deletions(-)
-
-diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-index d16646c..36d3dcd 100644
---- a/hw/ppc/prep.c
-+++ b/hw/ppc/prep.c
-@@ -36,7 +36,6 @@
- #include "hw/pci/pci_host.h"
- #include "hw/ppc/ppc.h"
- #include "hw/boards.h"
--#include "hw/audio/soundhw.h"
- #include "qemu/error-report.h"
- #include "qemu/log.h"
- #include "hw/ide.h"
-@@ -782,9 +781,6 @@ static void ibm_40p_init(MachineState *machine)
-     qbus_walk_children(BUS(isa_bus), prep_set_cmos_checksum, NULL, NULL, NULL,
-                        &cmos_checksum);
- 
--    /* initialize audio subsystem */
--    soundhw_init();
--
-     /* add some more devices */
-     if (defaults_enabled()) {
-         isa_create_simple(isa_bus, "i8042");
--- 
-1.8.3.1
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjUgMC83XSB0Y2c6IGFsbG9jYXRlIFRCIHN0cnVj
+dHMgcHJlY2VkaW5nIHRyYW5zbGF0ZQpNZXNzYWdlLWlkOiAyMDE3MDYwOTA1MzcxOS4yNjI1MS0x
+LXJ0aEB0d2lkZGxlLm5ldAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoK
+QkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkK
+ZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9
+JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNo
+ZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4u
+IgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3Bh
+dGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwog
+ICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBF
+TkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0
+CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFn
+XSAgICAgICAgIHBhdGNoZXcvMTQ5Njk5MTE5Ny0xODE1LTEtZ2l0LXNlbmQtZW1haWwtdGh1dGhA
+cmVkaGF0LmNvbSAtPiBwYXRjaGV3LzE0OTY5OTExOTctMTgxNS0xLWdpdC1zZW5kLWVtYWlsLXRo
+dXRoQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwowZDFlMmU4IHRj
+Zy9hcm06IFVzZSBsZHIgKGxpdGVyYWwpIGZvciBnb3RvX3RiCjc4ODdlNTIgdGNnL2FybTogVHJ5
+IHBjLXJlbGF0aXZlIGFkZHJlc3NlcyBmb3IgbW92aQplMDE0NDk3IHRjZy9hcm06IFJlbW92ZSBs
+aW1pdCBvbiBjb2RlIGJ1ZmZlciBzaXplCjFjMGU1NjMgdGNnL2FybTogVXNlIGluZGlyZWN0IGJy
+YW5jaCBmb3IgZ290b190YgozODg0NjhlIHRjZy9hYXJjaDY0OiBVc2UgQURSIGluIHRjZ19vdXRf
+bW92aQpjZjFjMzBiIHRjZzogYWxsb2NhdGUgVEIgc3RydWN0cyBiZWZvcmUgdGhlIGNvcnJlc3Bv
+bmRpbmcgdHJhbnNsYXRlZCBjb2RlCjg1N2QzNGUgdXRpbDogYWRkIGNhY2hlaW5mbwoKPT09IE9V
+VFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS83OiB1dGlsOiBhZGQgY2FjaGVpbmZvLi4u
+CkVSUk9SOiBkbyBub3QgaW5pdGlhbGlzZSBnbG9iYWxzIHRvIDAgb3IgTlVMTAojMTQ5OiBGSUxF
+OiB1dGlsL2NhY2hlaW5mby5jOjExOgoraW50IHFlbXVfaWNhY2hlX2xpbmVzaXplID0gMDsKCkVS
+Uk9SOiBkbyBub3QgaW5pdGlhbGlzZSBnbG9iYWxzIHRvIDAgb3IgTlVMTAojMTUwOiBGSUxFOiB1
+dGlsL2NhY2hlaW5mby5jOjEyOgoraW50IHFlbXVfZGNhY2hlX2xpbmVzaXplID0gMDsKCkVSUk9S
+OiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQgJyYmJyAoY3R4OkV4VykKIzE5MTogRklMRTog
+dXRpbC9jYWNoZWluZm8uYzo1MzoKKyAgICAgICAgICAgICYmIGJ1ZltpXS5DYWNoZS5MZXZlbCA9
+PSAxKSB7CiAgICAgICAgICAgICBeCgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVm
+aW5lcyBzaG91bGQgYmUgYXZvaWRlZAojMjE0OiBGSUxFOiB1dGlsL2NhY2hlaW5mby5jOjc2Ogor
+IyBpZiBkZWZpbmVkKF9fQVBQTEVfXykKCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBk
+ZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiMyNDg6IEZJTEU6IHV0aWwvY2FjaGVpbmZvLmM6MTEw
+OgorI2lmIGRlZmluZWQoX19hYXJjaDY0X18pCgp0b3RhbDogMyBlcnJvcnMsIDIgd2FybmluZ3Ms
+IDIxOCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
+IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
+cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
+CgpDaGVja2luZyBQQVRDSCAyLzc6IHRjZzogYWxsb2NhdGUgVEIgc3RydWN0cyBiZWZvcmUgdGhl
+IGNvcnJlc3BvbmRpbmcgdHJhbnNsYXRlZCBjb2RlLi4uCkNoZWNraW5nIFBBVENIIDMvNzogdGNn
+L2FhcmNoNjQ6IFVzZSBBRFIgaW4gdGNnX291dF9tb3ZpLi4uCkNoZWNraW5nIFBBVENIIDQvNzog
+dGNnL2FybTogVXNlIGluZGlyZWN0IGJyYW5jaCBmb3IgZ290b190Yi4uLgpDaGVja2luZyBQQVRD
+SCA1Lzc6IHRjZy9hcm06IFJlbW92ZSBsaW1pdCBvbiBjb2RlIGJ1ZmZlciBzaXplLi4uCkNoZWNr
+aW5nIFBBVENIIDYvNzogdGNnL2FybTogVHJ5IHBjLXJlbGF0aXZlIGFkZHJlc3NlcyBmb3IgbW92
+aS4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM1NDogRklMRTog
+dGNnL2FybS90Y2ctdGFyZ2V0LmluYy5jOjQ0NjoKK15JfSQKCkVSUk9SOiBjb2RlIGluZGVudCBz
+aG91bGQgbmV2ZXIgdXNlIHRhYnMKIzY0OiBGSUxFOiB0Y2cvYXJtL3RjZy10YXJnZXQuaW5jLmM6
+NDUzOgorXkl9JAoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA1NCBsaW5lcyBjaGVja2Vk
+CgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA3
+Lzc6IHRjZy9hcm06IFVzZSBsZHIgKGxpdGVyYWwpIGZvciBnb3RvX3RiLi4uCj09PSBPVVRQVVQg
+RU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2Vu
+ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBs
+ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
