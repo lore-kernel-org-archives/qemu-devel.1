@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dJGWm-0003lk-Fa
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 05:48:26 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dJGlS-0007Kc-I6
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 06:03:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dJGWl-0006HJ-4k
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 05:48:24 -0400
-Date: Fri, 9 Jun 2017 11:48:12 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20170609094812.GA2201@toto>
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dJGlQ-0002YW-Fn
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 06:03:34 -0400
+Received: from [59.151.112.132] (port=57873 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dJGlQ-0002K7-4g
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 06:03:32 -0400
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Date: Fri, 9 Jun 2017 18:01:44 +0800
+Message-ID: <cover.1496924675.git.maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] AArch64 regression
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3 0/4] Improve error reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,157 +23,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm <qemu-arm@nongnu.org>, qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: "Emilio G. Cota" <cota@braap.org>, Richard Henderson <rth@twiddle.net>, fred.konrad@greensocs.com, alex.bennee@linaro.org
+To: qemu-devel@nongnu.org
+Cc: jasowang@redhat.com, armbru@redhat.com, berrange@redhat.com, kraxel@redhat.com, pbonzini@redhat.com
 
-Hi,
+Daniel's patch(commit 6701e551, Revert "Change net/socket.c to use socket_*() 
+functions" again) has been in upstream. Continue this patchset.
 
-I was running a bunch of tests in preparation for the MMIO/exec
-series but am running into regressions on master.
-I'm at commit 64175afc695c0672876fbbfc31b299c86d562cb4
+In v2, this series convert the non-blocking connect mechanism to QIOchannel 
+by replace the socket_connect(), and some errors also are converted to Error. 
 
-On the xlnx-zcu102 I see lockups, the console goes unresponsive.
-On one of my vexpress-a15 setups (with an a57), I see weird
-segfaults in user-space.
-
-I bisected this multiple times with each of the test cases
-and all of the bisects bring me to this commit:
-commit e75449a346bf558296966a44277bfd93412c6da6
-Author: Emilio G. Cota <cota@braap.org>
-Date:   Fri Apr 28 14:59:23 2017 -0400
-
-    target/aarch64: optimize indirect branches
+The v2 related discussion was listed on:
+https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg04886.html
 
 
-Does this ring any bells? Are there any known issues at the moment?
-I've copied a GDB backtrace form the ZynqMP lockup at the end
-of this email.
+v3:
+* PATCH 01 is suggested by Markus and Daniel that removes the dubious 'default' case
+           in the net_socket_fd_init(). Jason agreed.
+* PATCH 02 is redoing previous patch 4.
+* PATCH 04 is redoing previous patch 2, improves sort of error messages. 
 
-Thanks,
-Edgar
+v2:
+* PATCH 02 reworking of patch 2 following Markus's suggestion that convert error_report()
+           in the function called by net_socket_*_init() to Error. Also add many error 
+           handling information.
+* PATCH 03 net_socket_mcast_create(), net_socket_fd_init_dgram() and net_socket_fd_init() 
+           use the function such as fprintf, perror to report an error message. Convert it 
+           to Error.
+* PATCH 04 parse_host_port() may fail without reporting an error. Now, fix it to set an
+           error when it fails.
 
-GDB backtrace:
-(gdb) thread apply all bt
 
-Thread 6 (Thread 0x7fff431fc700 (LWP 28586)):
-#0  0x00007ffff5e2826d in __lll_lock_wait ()
-   from /lib/x86_64-linux-gnu/libpthread.so.0
-#1  0x00007ffff5e21dbd in pthread_mutex_lock ()
-   from /lib/x86_64-linux-gnu/libpthread.so.0
-#2  0x0000555555b5cc40 in qemu_mutex_lock (
-    mutex=mutex@entry=0x55555620be80 <qemu_global_mutex>)
-    at /home/edgar/src/c/qemu/qemu/util/qemu-thread-posix.c:61
-#3  0x00005555557bc9cc in qemu_mutex_lock_iothread ()
-    at /home/edgar/src/c/qemu/qemu/cpus.c:1581
-#4  0x000055555578e865 in cpu_handle_interrupt (last_tb=<synthetic pointer>, 
-    cpu=0x5555566c40b0) at /home/edgar/src/c/qemu/qemu/cpu-exec.c:491
-#5  cpu_exec (cpu=cpu@entry=0x7fffc543f4f8)
-    at /home/edgar/src/c/qemu/qemu/cpu-exec.c:670
-#6  0x00005555557bcb9f in tcg_cpu_exec (cpu=0x7fffc543f4f8)
-    at /home/edgar/src/c/qemu/qemu/cpus.c:1270
-#7  qemu_tcg_cpu_thread_fn (arg=0x7fffc543f4f8)
-    at /home/edgar/src/c/qemu/qemu/cpus.c:1473
-#8  0x00007ffff5e1f6ba in start_thread ()
-   from /lib/x86_64-linux-gnu/libpthread.so.0
-#9  0x00007ffff5b5582d in clone () from /lib/x86_64-linux-gnu/libc.so.6
+Cc: jasowang@redhat.com
+Cc: armbru@redhat.com
+Cc: berrange@redhat.com
+Cc: kraxel@redhat.com
+Cc: pbonzini@redhat.com
+Mao Zhongyi (4):
+  net/socket: Drop the odd 'default' case and comment
+  net/net: Convert parse_host_port() to Error
+  net/socket: Convert error report message to Error
+  net/socket: Improve -net socket error reporting
 
-Thread 5 (Thread 0x7fff439fd700 (LWP 28585)):
-#0  0x00007ffff5e2826d in __lll_lock_wait ()
-   from /lib/x86_64-linux-gnu/libpthread.so.0
-#1  0x00007ffff5e21dbd in pthread_mutex_lock ()
-   from /lib/x86_64-linux-gnu/libpthread.so.0
-#2  0x0000555555b5cc40 in qemu_mutex_lock (
-    mutex=mutex@entry=0x55555620be80 <qemu_global_mutex>)
-    at /home/edgar/src/c/qemu/qemu/util/qemu-thread-posix.c:61
-#3  0x00005555557bc9cc in qemu_mutex_lock_iothread ()
-    at /home/edgar/src/c/qemu/qemu/cpus.c:1581
-#4  0x000055555578e865 in cpu_handle_interrupt (last_tb=<synthetic pointer>, 
-    cpu=0x5555566c40b0) at /home/edgar/src/c/qemu/qemu/cpu-exec.c:491
-#5  cpu_exec (cpu=cpu@entry=0x7fffc54208d0)
-    at /home/edgar/src/c/qemu/qemu/cpu-exec.c:670
-#6  0x00005555557bcb9f in tcg_cpu_exec (cpu=0x7fffc54208d0)
-    at /home/edgar/src/c/qemu/qemu/cpus.c:1270
-#7  qemu_tcg_cpu_thread_fn (arg=0x7fffc54208d0)
-    at /home/edgar/src/c/qemu/qemu/cpus.c:1473
-#8  0x00007ffff5e1f6ba in start_thread ()
-   from /lib/x86_64-linux-gnu/libpthread.so.0
-#9  0x00007ffff5b5582d in clone () from /lib/x86_64-linux-gnu/libc.so.6
+ include/qemu/sockets.h |   2 +-
+ net/net.c              |  21 ++++++--
+ net/socket.c           | 138 +++++++++++++++++++++++++++++--------------------
+ 3 files changed, 98 insertions(+), 63 deletions(-)
 
-Thread 4 (Thread 0x7fff441fe700 (LWP 28584)):
-#0  0x00007ffff5e21dac in pthread_mutex_lock ()
-   from /lib/x86_64-linux-gnu/libpthread.so.0
-#1  0x0000555555b5cc40 in qemu_mutex_lock (
-    mutex=mutex@entry=0x55555620be80 <qemu_global_mutex>)
-    at /home/edgar/src/c/qemu/qemu/util/qemu-thread-posix.c:61
-#2  0x00005555557bc9cc in qemu_mutex_lock_iothread ()
-    at /home/edgar/src/c/qemu/qemu/cpus.c:1581
-#3  0x000055555578e865 in cpu_handle_interrupt (last_tb=<synthetic pointer>, 
-    cpu=0x5555566c40b0) at /home/edgar/src/c/qemu/qemu/cpu-exec.c:491
-#4  cpu_exec (cpu=cpu@entry=0x7fffc5401ca8)
-    at /home/edgar/src/c/qemu/qemu/cpu-exec.c:670
-#5  0x00005555557bcb9f in tcg_cpu_exec (cpu=0x7fffc5401ca8)
-    at /home/edgar/src/c/qemu/qemu/cpus.c:1270
-#6  qemu_tcg_cpu_thread_fn (arg=0x7fffc5401ca8)
-    at /home/edgar/src/c/qemu/qemu/cpus.c:1473
-#7  0x00007ffff5e1f6ba in start_thread ()
-   from /lib/x86_64-linux-gnu/libpthread.so.0
-#8  0x00007ffff5b5582d in clone () from /lib/x86_64-linux-gnu/libc.so.6
-
-Thread 3 (Thread 0x7fff449ff700 (LWP 28583)):
-#0  0x00005555558c4c89 in regime_el (mmu_idx=ARMMMUIdx_S1NSE1, 
-    env=0x7fffc53eb310) at /home/edgar/src/c/qemu/qemu/target/arm/helper.c:7028
-#1  regime_tcr (mmu_idx=<optimized out>, env=0x7fffc53eb310)
-    at /home/edgar/src/c/qemu/qemu/target/arm/helper.c:7117
-#2  arm_regime_tbi0 (env=env@entry=0x7fffc53eb310, mmu_idx=<optimized out>, 
-    mmu_idx@entry=ARMMMUIdx_S12NSE1)
-    at /home/edgar/src/c/qemu/qemu/target/arm/helper.c:7142
-#3  0x00005555557ba346 in cpu_get_tb_cpu_state (flags=<synthetic pointer>, 
-    cs_base=<synthetic pointer>, pc=<synthetic pointer>, env=0x7fffc53eb310)
-    at /home/edgar/src/c/qemu/qemu/target/arm/cpu.h:2571
-#4  helper_lookup_tb_ptr (env=0x7fffc53eb310, addr=18446743524088820436)
-    at /home/edgar/src/c/qemu/qemu/tcg-runtime.c:156
-#5  0x00007fffcf2f7e53 in code_gen_buffer ()
-#6  0x000055555578de7c in cpu_tb_exec (itb=<optimized out>, 
-    itb=<optimized out>, cpu=0x7fffc5727478)
-    at /home/edgar/src/c/qemu/qemu/cpu-exec.c:166
-#7  cpu_loop_exec_tb (tb_exit=<synthetic pointer>, 
-    last_tb=<synthetic pointer>, tb=<optimized out>, cpu=0x7fffc5727478)
-    at /home/edgar/src/c/qemu/qemu/cpu-exec.c:574
-#8  cpu_exec (cpu=cpu@entry=0x7fffc53e3080)
-    at /home/edgar/src/c/qemu/qemu/cpu-exec.c:672
-#9  0x00005555557bcb9f in tcg_cpu_exec (cpu=0x7fffc53e3080)
-    at /home/edgar/src/c/qemu/qemu/cpus.c:1270
-#10 qemu_tcg_cpu_thread_fn (arg=0x7fffc53e3080)
-    at /home/edgar/src/c/qemu/qemu/cpus.c:1473
-#11 0x00007ffff5e1f6ba in start_thread ()
-   from /lib/x86_64-linux-gnu/libpthread.so.0
-#12 0x00007ffff5b5582d in clone () from /lib/x86_64-linux-gnu/libc.so.6
-
-Thread 2 (Thread 0x7fffef7b7700 (LWP 28582)):
-#0  0x00007ffff5b4f8e9 in syscall () from /lib/x86_64-linux-gnu/libc.so.6
-#1  0x0000555555b5d385 in qemu_futex_wait (val=<optimized out>, 
-    f=<optimized out>) at /home/edgar/src/c/qemu/qemu/include/qemu/futex.h:26
-#2  qemu_event_wait (ev=ev@entry=0x55555661bae4 <rcu_call_ready_event>)
-    at /home/edgar/src/c/qemu/qemu/util/qemu-thread-posix.c:415
-#3  0x0000555555b6cc6e in call_rcu_thread (opaque=<optimized out>)
-    at /home/edgar/src/c/qemu/qemu/util/rcu.c:249
-#4  0x00007ffff5e1f6ba in start_thread ()
-   from /lib/x86_64-linux-gnu/libpthread.so.0
-#5  0x00007ffff5b5582d in clone () from /lib/x86_64-linux-gnu/libc.so.6
-
-Thread 1 (Thread 0x7ffff7f31c00 (LWP 28578)):
-#0  0x00007ffff5b49c21 in ppoll () from /lib/x86_64-linux-gnu/libc.so.6
-#1  0x0000555555b58f39 in ppoll (__ss=0x0, __timeout=0x7fffffffd5f0, 
-    __nfds=<optimized out>, __fds=<optimized out>)
-    at /usr/include/x86_64-linux-gnu/bits/poll2.h:77
-#2  qemu_poll_ns (fds=<optimized out>, nfds=<optimized out>, 
-    timeout=timeout@entry=9223371867734611302)
-    at /home/edgar/src/c/qemu/qemu/util/qemu-timer.c:334
-#3  0x0000555555b59d6a in os_host_main_loop_wait (timeout=9223371867734611302)
-    at /home/edgar/src/c/qemu/qemu/util/main-loop.c:255
-#4  main_loop_wait (nonblocking=<optimized out>)
-    at /home/edgar/src/c/qemu/qemu/util/main-loop.c:517
-#5  0x0000555555779057 in main_loop () at /home/edgar/src/c/qemu/qemu/vl.c:1918
-#6  main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>)
-    at /home/edgar/src/c/qemu/qemu/vl.c:4752
-(gdb) 
+-- 
+2.9.3
