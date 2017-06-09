@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dJMOA-0003MY-L3
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 12:03:56 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dJMRA-000643-B6
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 12:07:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dJMO7-0001TF-Cm
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 12:03:54 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:34188)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dJMO7-0001SW-1w
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 12:03:51 -0400
-Received: by mail-wr0-x231.google.com with SMTP id g76so37805178wrd.1
-	for <qemu-devel@nongnu.org>; Fri, 09 Jun 2017 09:03:50 -0700 (PDT)
-References: <20170609150622.4720-1-f4bug@amsat.org>
-	<20170609150622.4720-3-f4bug@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170609150622.4720-3-f4bug@amsat.org>
-Date: Fri, 09 Jun 2017 17:04:17 +0100
-Message-ID: <87y3t1b11a.fsf@linaro.org>
+	(envelope-from <el13635@mail.ntua.gr>) id 1dJMR4-0002VK-8c
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 12:07:00 -0400
+Received: from smtp1.ntua.gr ([2001:648:2000:de::183]:33040)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <el13635@mail.ntua.gr>) id 1dJMR3-0002Sm-Ph
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 12:06:54 -0400
+Date: Fri, 9 Jun 2017 19:06:09 +0300
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20170609160609.r2ivmny4pqvycwp5@postretch>
+References: <20170608182113.nmxnvus26vplg5du@postretch>
+	<w51k24ll1ke.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] net/pcnet: modernise PCNET_DEBUG
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="nmdy3ebfreoa3ajh"
+Content-Disposition: inline
+In-Reply-To: <w51k24ll1ke.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [Proposal] I/O throttling through new -object
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,484 +29,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Jason Wang <jasowang@redhat.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
 
-Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+--nmdy3ebfreoa3ajh
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Ensure the format strings are always preprocessed, so any problem get reported.
+On Fri, Jun 09, 2017 at 03:42:41PM +0200, Alberto Garcia wrote:
+>Hey Manos, thanks for your proposal and for the good work :)
 >
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
+>On Thu 08 Jun 2017 08:21:13 PM CEST, Manos Pitsidianakis wrote:
 >
-> v2: Addressed review feedback from Alex Bennée
->     No changes in *printf() calls but using qemu_log_mask() is an option.
+>> As part of my GSoC project, IO throttling is moved to a block filter
+>> driver, which means multiple filter nodes sharing ThrottleGroup
+>> instances, and also, chaining filter nodes. The old interface will be
+>> retained as much as possible. By defining ThrottleGroups with QOM the
+>> following interface can be used:
+>>     -drive file=3Dfoo.qcow2,throttling.group=3Dbar \
+>>     -object throttle-group,iops-total=3D100,id=3Dbar
 >
->  hw/net/pcnet-pci.c |  13 ----
->  hw/net/pcnet.c     | 190 +++++++++++++++++++++++++++--------------------------
->  2 files changed, 96 insertions(+), 107 deletions(-)
->
-> diff --git a/hw/net/pcnet-pci.c b/hw/net/pcnet-pci.c
-> index 0acf8a4879..331370a1f2 100644
-> --- a/hw/net/pcnet-pci.c
-> +++ b/hw/net/pcnet-pci.c
-> @@ -38,14 +38,6 @@
->
->  #include "pcnet.h"
->
-> -//#define PCNET_DEBUG
-> -//#define PCNET_DEBUG_IO
-> -//#define PCNET_DEBUG_BCR
-> -//#define PCNET_DEBUG_CSR
-> -//#define PCNET_DEBUG_RMD
-> -//#define PCNET_DEBUG_TMD
-> -//#define PCNET_DEBUG_MATCH
-> -
->  #define TYPE_PCI_PCNET "pcnet"
->
->  #define PCI_PCNET(obj) \
-> @@ -284,11 +276,6 @@ static void pci_pcnet_realize(PCIDevice *pci_dev, Error **errp)
->      PCNetState *s = &d->state;
->      uint8_t *pci_conf;
->
-> -#if 0
-> -    printf("sizeof(RMD)=%d, sizeof(TMD)=%d\n",
-> -        sizeof(struct pcnet_RMD), sizeof(struct pcnet_TMD));
-> -#endif
-> -
->      pci_conf = pci_dev->config;
->
->      pci_set_word(pci_conf + PCI_STATUS,
-> diff --git a/hw/net/pcnet.c b/hw/net/pcnet.c
-> index 654455355f..6e97c0b176 100644
-> --- a/hw/net/pcnet.c
-> +++ b/hw/net/pcnet.c
-> @@ -45,13 +45,13 @@
->
->  #include "pcnet.h"
->
-> -//#define PCNET_DEBUG
-> -//#define PCNET_DEBUG_IO
-> -//#define PCNET_DEBUG_BCR
-> -//#define PCNET_DEBUG_CSR
-> -//#define PCNET_DEBUG_RMD
-> -//#define PCNET_DEBUG_TMD
-> -//#define PCNET_DEBUG_MATCH
-> +#define PCNET_DEBUG         0
-> +#define PCNET_DEBUG_IO      0
-> +#define PCNET_DEBUG_BCR     0
-> +#define PCNET_DEBUG_CSR     0
-> +#define PCNET_DEBUG_RMD     0
-> +#define PCNET_DEBUG_TMD     0
-> +#define PCNET_DEBUG_MATCH   0
+>It should be --object
 
-This is an aweful lot of debug knobs. Is there really such a variation
-in debug output to bother having this granularity?
+Both seem to have the result in my qemu build.
+
+>, and I guess the name would be throttling-group?
+
+Hm, I thought throttle-group would be nicer because it's shorter, but I=20
+can change it, of course. I am not certain if there's a semantic=20
+difference (because I am not a native speaker).
 
 >
+>> 'block_set_io_throttle' command can be extended with a "group"
+>> argument, that when defined instead of "device", will find and edit
+>> the object in question.
 >
->  struct qemu_ether_header {
-> @@ -268,7 +268,9 @@ struct pcnet_RMD {
->          GET_FIELD((T)->misc, TMDM, TDR),                \
->          GET_FIELD((T)->misc, TMDM, TRC))
+>Note that block_set_io_throttle() already has a 'group' argument. Its
+>current semantics are:
 >
-> -#define PRINT_RMD(R) printf(                            \
-> +
-> +#define PRINT_RMD(R) do { if (PCNET_DEBUG_RMD) {        \
-> +        printf(                                         \
->          "RMD0 : RBADR=0x%08x\n"                         \
->          "RMD1 : OWN=%d, ERR=%d, FRAM=%d, OFLO=%d, "     \
->          "CRC=%d, BUFF=%d, STP=%d, ENP=%d,\n       "     \
-> @@ -292,7 +294,9 @@ struct pcnet_RMD {
->          GET_FIELD((R)->msg_length, RMDM, RCC),          \
->          GET_FIELD((R)->msg_length, RMDM, RPC),          \
->          GET_FIELD((R)->msg_length, RMDM, MCNT),         \
-> -        GET_FIELD((R)->msg_length, RMDM, ZEROS))
-> +        GET_FIELD((R)->msg_length, RMDM, ZEROS)); }     \
-> +        } while (0)
-> +
+>   - bps or iops !=3D 0   -> set the I/O limits of a throttling group. The
+>                           selected device is moved to that group if it
+>                           wasn't there yet.
 >
->  static inline void pcnet_tmd_load(PCNetState *s, struct pcnet_TMD *tmd,
->                                    hwaddr addr)
-> @@ -510,7 +514,7 @@ static inline void pcnet_rmd_store(PCNetState *s, struct pcnet_RMD *rmd,
+>   - bps and iops =3D=3D 0  -> remove a device from a throttling group
+>                           without touching that group's I/O limits.
 >
->  #endif
+>where 'device' is mandatory and 'group' defaults to the value of
+>'device' if unset.
 >
-> -#define PRINT_PKTHDR(BUF) do {                  \
-> +#define PRINT_PKTHDR(BUF) do { if (PCNET_DEBUG_MATCH) { \
->      struct qemu_ether_header *hdr = (void *)(BUF); \
->      printf("packet dhost=%02x:%02x:%02x:%02x:%02x:%02x, " \
->             "shost=%02x:%02x:%02x:%02x:%02x:%02x, " \
-> @@ -520,7 +524,7 @@ static inline void pcnet_rmd_store(PCNetState *s, struct pcnet_RMD *rmd,
->             hdr->ether_shost[0],hdr->ether_shost[1],hdr->ether_shost[2], \
->             hdr->ether_shost[3],hdr->ether_shost[4],hdr->ether_shost[5], \
->             be16_to_cpu(hdr->ether_type));       \
-> -} while (0)
-> +    } } while (0)
+>If I get it right, what you propose is that 'device' is optional and in
+>that case 'group' is mandatory and the command updates the throttling
+>group parameters.
 >
->  #define MULTICAST_FILTER_LEN 8
->
-> @@ -623,14 +627,14 @@ static inline int padr_match(PCNetState *s, const uint8_t *buf, int size)
->          s->csr[14] & 0xff, s->csr[14] >> 8
->      };
->      int result = (!CSR_DRCVPA(s)) && !memcmp(hdr->ether_dhost, padr, 6);
-> -#ifdef PCNET_DEBUG_MATCH
-> -    printf("packet dhost=%02x:%02x:%02x:%02x:%02x:%02x, "
-> -           "padr=%02x:%02x:%02x:%02x:%02x:%02x\n",
-> -           hdr->ether_dhost[0],hdr->ether_dhost[1],hdr->ether_dhost[2],
-> -           hdr->ether_dhost[3],hdr->ether_dhost[4],hdr->ether_dhost[5],
-> -           padr[0],padr[1],padr[2],padr[3],padr[4],padr[5]);
-> -    printf("padr_match result=%d\n", result);
-> -#endif
-> +    if (PCNET_DEBUG_MATCH) {
-> +        printf("packet dhost=%02x:%02x:%02x:%02x:%02x:%02x, "
-> +               "padr=%02x:%02x:%02x:%02x:%02x:%02x\n",
-> +               hdr->ether_dhost[0], hdr->ether_dhost[1], hdr->ether_dhost[2],
-> +               hdr->ether_dhost[3], hdr->ether_dhost[4], hdr->ether_dhost[5],
-> +               padr[0], padr[1], padr[2], padr[3], padr[4], padr[5]);
-> +        printf("padr_match result=%d\n", result);
-> +    }
+>Note that you can do that already if you select a device that is already
+>in the group. These new semantics would allow modifying a group that is
+>not being used by any block device.
 
-While this improves things it might be cleaner to debug helper/defines
-so we can have simpler:
+That was my thinking as well.
+>
+>I'm not a big fan of overloading block_set_io_throttle() even more, but
+>this proposal does actually sound fine.
+>
+>> Users can hotplug ThrottleGroups with object-add in QMP/HMP, then
+>> attach drives to a throttle group (ie adding a filter node in the
+>> drive path that points to that throttle group) with an
+>> 'attach-throttle' and detach with 'detach-throttle', each taking the
+>> drive and throttle group name as arguments. An alternative (but
+>> uglier) approach would be to use 'block_set_io_throttle' for this as
+>> well.
+>
+>Yeah I agree that the block_set_io_throttle() approach would be uglier.
+>
+>> Something that's also sound is a 'block_set_throttle_groups' that
+>> takes a list of groups and a drive as arguments.
+>
+>Would that simply be a foreach(g, groups) { attach(device, g); } ?
 
-   debug_pcnet("foo=%x bar=%d", foo, bar)
+Something like=20
 
-Or maybe:
+foreach(g, groups) { attach(device, g); }
+foreach(g, device.groups - groups) { detach(device, g); } #where '-' is=20
+the set minus operation)
 
-   debug_pci(PCNET_DEBUG_MATCH, "foo=%x, bar=%x", foo, bar)
+This would mean you would have to redefine previous groups as well=20
+everytime you use 'block_set_throttle_groups' otherwise they would get=20
+removed from the device. At least that's a way to avoid using more=20
+commands for attaching/detaching.
+>
+>> Regarding 'query-block'. This case is complicated by the fact that it
+>> would be possible for a drive to have many nodes, thus the values
+>> printed by 'query-block' might be inaccurate if they only report one
+>> of the node configurations.  The current approach is to report only
+>> the first filter node in the BDS tree. A user with advanced throttling
+>> configurations might have no need for this command.
+>
+>I guess the user can use 'query-block' and walk the backing chain
+>looking for throttling filter nodes?
 
-Depending on if we can rationlise the debug control knobs
+I think it would be trivial to do this. Isn't the BDS tree always=20
+"short"? Otherwise the filter nodes should be cached in BlockBackend for=20
+performance, if it can be argued that it's needed.
+>
+>Berto
+>
 
->      return result;
->  }
->
-> @@ -639,9 +643,9 @@ static inline int padr_bcast(PCNetState *s, const uint8_t *buf, int size)
->      static const uint8_t BCAST[6] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
->      struct qemu_ether_header *hdr = (void *)buf;
->      int result = !CSR_DRCVBC(s) && !memcmp(hdr->ether_dhost, BCAST, 6);
-> -#ifdef PCNET_DEBUG_MATCH
-> -    printf("padr_bcast result=%d\n", result);
-> -#endif
-> +    if (PCNET_DEBUG_MATCH) {
-> +        printf("padr_bcast result=%d\n", result);
-> +    }
->      return result;
->  }
->
-> @@ -790,6 +794,10 @@ static void pcnet_init(PCNetState *s)
->      uint16_t padr[3], ladrf[4], mode;
->      uint32_t rdra, tdra;
->
-> +    if (PCNET_DEBUG) {
-> +        printf("sizeof(RMD)=%zu, sizeof(TMD)=%zu\n",
-> +            sizeof(struct pcnet_RMD), sizeof(struct pcnet_TMD));
-> +    }
->      trace_pcnet_init(s, PHYSADDR(s, CSR_IADR(s)));
->
->      if (BCR_SSIZE32(s)) {
-> @@ -858,9 +866,9 @@ static void pcnet_init(PCNetState *s)
->
->  static void pcnet_start(PCNetState *s)
->  {
-> -#ifdef PCNET_DEBUG
-> -    printf("pcnet_start\n");
-> -#endif
-> +    if (PCNET_DEBUG) {
-> +        printf("pcnet_start\n");
-> +    }
->
->      if (!CSR_DTX(s)) {
->          s->csr[0] |= 0x0010;    /* set TXON */
-> @@ -877,9 +885,9 @@ static void pcnet_start(PCNetState *s)
->
->  static void pcnet_stop(PCNetState *s)
->  {
-> -#ifdef PCNET_DEBUG
-> -    printf("pcnet_stop\n");
-> -#endif
-> +    if (PCNET_DEBUG) {
-> +        printf("pcnet_stop\n");
-> +    }
->      s->csr[0] &= ~0xffeb;
->      s->csr[0] |= 0x0014;
->      s->csr[4] &= ~0x02c2;
-> @@ -939,12 +947,13 @@ static void pcnet_rdte_poll(PCNetState *s)
->          RMDLOAD(&rmd, PHYSADDR(s,CSR_CRDA(s)));
->          CSR_CRBC(s) = GET_FIELD(rmd.buf_length, RMDL, BCNT);
->          CSR_CRST(s) = rmd.status;
-> -#ifdef PCNET_DEBUG_RMD_X
-> -        printf("CRDA=0x%08x CRST=0x%04x RCVRC=%d RMDL=0x%04x RMDS=0x%04x RMDM=0x%08x\n",
-> -                PHYSADDR(s,CSR_CRDA(s)), CSR_CRST(s), CSR_RCVRC(s),
-> -                rmd.buf_length, rmd.status, rmd.msg_length);
-> +        if (PCNET_DEBUG_RMD) {
-> +            printf("CRDA=0x%08x CRST=0x%04x RCVRC=%d RMDL=0x%04x "
-> +                    "RMDS=0x%04x RMDM=0x%08x\n",
-> +                    PHYSADDR(s, CSR_CRDA(s)), CSR_CRST(s), CSR_RCVRC(s),
-> +                    rmd.buf_length, rmd.status, rmd.msg_length);
-> +        }
->          PRINT_RMD(&rmd);
-> -#endif
->      } else {
->          CSR_CRBC(s) = CSR_CRST(s) = 0;
->      }
-> @@ -1013,9 +1022,9 @@ ssize_t pcnet_receive(NetClientState *nc, const uint8_t *buf, size_t size_)
->          (CSR_LOOP(s) && !s->looptest)) {
->          return -1;
->      }
-> -#ifdef PCNET_DEBUG
-> -    printf("pcnet_receive size=%d\n", size);
-> -#endif
-> +    if (PCNET_DEBUG) {
-> +        printf("pcnet_receive size=%d\n", size);
-> +    }
->
->      /* if too small buffer, then expand it */
->      if (size < MIN_BUF_SIZE) {
-> @@ -1044,10 +1053,10 @@ ssize_t pcnet_receive(NetClientState *nc, const uint8_t *buf, size_t size_)
->                      (BCR_SWSTYLE(s) ? 16 : 8 );
->                  RMDLOAD(&rmd, nrda);
->                  if (GET_FIELD(rmd.status, RMDS, OWN)) {
-> -#ifdef PCNET_DEBUG_RMD
-> -                    printf("pcnet - scan buffer: RCVRC=%d PREV_RCVRC=%d\n",
-> +                    if (PCNET_DEBUG_RMD) {
-> +                        printf("pcnet - scan buffer: RCVRC=%d PREV_RCVRC=%d\n",
->                                  rcvrc, CSR_RCVRC(s));
-> -#endif
-> +                    }
->                      CSR_RCVRC(s) = rcvrc;
->                      pcnet_rdte_poll(s);
->                      break;
-> @@ -1056,9 +1065,9 @@ ssize_t pcnet_receive(NetClientState *nc, const uint8_t *buf, size_t size_)
->          }
->
->          if (!(CSR_CRST(s) & 0x8000)) {
-> -#ifdef PCNET_DEBUG_RMD
-> -            printf("pcnet - no buffer: RCVRC=%d\n", CSR_RCVRC(s));
-> -#endif
-> +            if (PCNET_DEBUG_RMD) {
-> +                printf("pcnet - no buffer: RCVRC=%d\n", CSR_RCVRC(s));
-> +            }
->              s->csr[0] |= 0x1000; /* Set MISS flag */
->              CSR_MISSC(s)++;
->          } else {
-> @@ -1069,9 +1078,9 @@ ssize_t pcnet_receive(NetClientState *nc, const uint8_t *buf, size_t size_)
->
->              if (!s->looptest) {
->                  if (size > 4092) {
-> -#ifdef PCNET_DEBUG_RMD
-> -                    fprintf(stderr, "pcnet: truncates rx packet.\n");
-> -#endif
-> +                    if (PCNET_DEBUG_RMD) {
-> +                        fprintf(stderr, "pcnet: truncates rx packet.\n");
-> +                    }
->                      size = 4092;
->                  }
->                  memcpy(src, buf, size);
-> @@ -1099,9 +1108,7 @@ ssize_t pcnet_receive(NetClientState *nc, const uint8_t *buf, size_t size_)
->                  crc_err = (*(uint32_t *)p != htonl(fcs));
->              }
->
-> -#ifdef PCNET_DEBUG_MATCH
->              PRINT_PKTHDR(buf);
-> -#endif
->
->              RMDLOAD(&rmd, PHYSADDR(s,crda));
->              /*if (!CSR_LAPPEN(s))*/
-> @@ -1121,16 +1128,12 @@ ssize_t pcnet_receive(NetClientState *nc, const uint8_t *buf, size_t size_)
->              PCNET_RECV_STORE();
->              if ((remaining > 0) && CSR_NRDA(s)) {
->                  hwaddr nrda = CSR_NRDA(s);
-> -#ifdef PCNET_DEBUG_RMD
->                  PRINT_RMD(&rmd);
-> -#endif
->                  RMDLOAD(&rmd, PHYSADDR(s,nrda));
->                  if (GET_FIELD(rmd.status, RMDS, OWN)) {
->                      crda = nrda;
->                      PCNET_RECV_STORE();
-> -#ifdef PCNET_DEBUG_RMD
->                      PRINT_RMD(&rmd);
-> -#endif
->                      if ((remaining > 0) && (nrda=CSR_NNRD(s))) {
->                          RMDLOAD(&rmd, PHYSADDR(s,nrda));
->                          if (GET_FIELD(rmd.status, RMDS, OWN)) {
-> @@ -1162,13 +1165,11 @@ ssize_t pcnet_receive(NetClientState *nc, const uint8_t *buf, size_t size_)
->              RMDSTORE(&rmd, PHYSADDR(s,crda));
->              s->csr[0] |= 0x0400;
->
-> -#ifdef PCNET_DEBUG
-> -            printf("RCVRC=%d CRDA=0x%08x BLKS=%d\n",
-> -                CSR_RCVRC(s), PHYSADDR(s,CSR_CRDA(s)), pktcount);
-> -#endif
-> -#ifdef PCNET_DEBUG_RMD
-> +            if (PCNET_DEBUG) {
-> +                printf("RCVRC=%d CRDA=0x%08x BLKS=%d\n",
-> +                    CSR_RCVRC(s), PHYSADDR(s, CSR_CRDA(s)), pktcount);
-> +            }
->              PRINT_RMD(&rmd);
-> -#endif
->
->              while (pktcount--) {
->                  if (CSR_RCVRC(s) <= 1) {
-> @@ -1217,10 +1218,10 @@ txagain:
->
->          TMDLOAD(&tmd, PHYSADDR(s,CSR_CXDA(s)));
->
-> -#ifdef PCNET_DEBUG_TMD
-> -        printf("  TMDLOAD 0x%08x\n", PHYSADDR(s,CSR_CXDA(s)));
-> -        PRINT_TMD(&tmd);
-> -#endif
-> +        if (PCNET_DEBUG_TMD) {
-> +            printf("  TMDLOAD 0x%08x\n", PHYSADDR(s, CSR_CXDA(s)));
-> +            PRINT_TMD(&tmd);
-> +        }
->          if (GET_FIELD(tmd.status, TMDS, STP)) {
->              s->xmit_pos = 0;
->              xmit_cxda = PHYSADDR(s,CSR_CXDA(s));
-> @@ -1260,9 +1261,9 @@ txagain:
->              goto txdone;
->          }
->
-> -#ifdef PCNET_DEBUG
-> -        printf("pcnet_transmit size=%d\n", s->xmit_pos);
-> -#endif
-> +        if (PCNET_DEBUG) {
-> +            printf("pcnet_transmit size=%d\n", s->xmit_pos);
-> +        }
->          if (CSR_LOOP(s)) {
->              if (BCR_SWSTYLE(s) == 1)
->                  add_crc = !GET_FIELD(tmd.status, TMDS, NOFCS);
-> @@ -1363,9 +1364,9 @@ static void pcnet_poll_timer(void *opaque)
->  static void pcnet_csr_writew(PCNetState *s, uint32_t rap, uint32_t new_value)
->  {
->      uint16_t val = new_value;
-> -#ifdef PCNET_DEBUG_CSR
-> -    printf("pcnet_csr_writew rap=%d val=0x%04x\n", rap, val);
-> -#endif
-> +    if (PCNET_DEBUG_CSR) {
-> +        printf("pcnet_csr_writew rap=%d val=0x%04x\n", rap, val);
-> +    }
->      switch (rap) {
->      case 0:
->          s->csr[0] &= ~(val & 0x7f00); /* Clear any interrupt flags */
-> @@ -1491,18 +1492,18 @@ static uint32_t pcnet_csr_readw(PCNetState *s, uint32_t rap)
->      default:
->          val = s->csr[rap];
->      }
-> -#ifdef PCNET_DEBUG_CSR
-> -    printf("pcnet_csr_readw rap=%d val=0x%04x\n", rap, val);
-> -#endif
-> +    if (PCNET_DEBUG_CSR) {
-> +        printf("pcnet_csr_readw rap=%d val=0x%04x\n", rap, val);
-> +    }
->      return val;
->  }
->
->  static void pcnet_bcr_writew(PCNetState *s, uint32_t rap, uint32_t val)
->  {
->      rap &= 127;
-> -#ifdef PCNET_DEBUG_BCR
-> -    printf("pcnet_bcr_writew rap=%d val=0x%04x\n", rap, val);
-> -#endif
-> +    if (PCNET_DEBUG_BCR) {
-> +        printf("pcnet_bcr_writew rap=%d val=0x%04x\n", rap, val);
-> +    }
->      switch (rap) {
->      case BCR_SWS:
->          if (!(CSR_STOP(s) || CSR_SPND(s)))
-> @@ -1524,9 +1525,9 @@ static void pcnet_bcr_writew(PCNetState *s, uint32_t rap, uint32_t val)
->              val = 0x0200;
->              break;
->          }
-> -#ifdef PCNET_DEBUG
-> -       printf("BCR_SWS=0x%04x\n", val);
-> -#endif
-> +        if (PCNET_DEBUG) {
-> +            printf("BCR_SWS=0x%04x\n", val);
-> +        }
->          /* fall through */
->      case BCR_LNKST:
->      case BCR_LED1:
-> @@ -1560,9 +1561,9 @@ uint32_t pcnet_bcr_readw(PCNetState *s, uint32_t rap)
->          val = rap < 32 ? s->bcr[rap] : 0;
->          break;
->      }
-> -#ifdef PCNET_DEBUG_BCR
-> -    printf("pcnet_bcr_readw rap=%d val=0x%04x\n", rap, val);
-> -#endif
-> +    if (PCNET_DEBUG_BCR) {
-> +        printf("pcnet_bcr_readw rap=%d val=0x%04x\n", rap, val);
-> +    }
->      return val;
->  }
->
-> @@ -1592,9 +1593,9 @@ void pcnet_ioport_writew(void *opaque, uint32_t addr, uint32_t val)
->  {
->      PCNetState *s = opaque;
->      pcnet_poll_timer(s);
-> -#ifdef PCNET_DEBUG_IO
-> -    printf("pcnet_ioport_writew addr=0x%08x val=0x%04x\n", addr, val);
-> -#endif
-> +    if (PCNET_DEBUG_IO) {
-> +        printf("pcnet_ioport_writew addr=0x%08x val=0x%04x\n", addr, val);
-> +    }
->      if (!BCR_DWIO(s)) {
->          switch (addr & 0x0f) {
->          case 0x00: /* RDP */
-> @@ -1634,9 +1635,10 @@ uint32_t pcnet_ioport_readw(void *opaque, uint32_t addr)
->          }
->      }
->      pcnet_update_irq(s);
-> -#ifdef PCNET_DEBUG_IO
-> -    printf("pcnet_ioport_readw addr=0x%08x val=0x%04x\n", addr, val & 0xffff);
-> -#endif
-> +    if (PCNET_DEBUG_IO) {
-> +        printf("pcnet_ioport_readw addr=0x%08x val=0x%04x\n", addr,
-> +                val & 0xffff);
-> +    }
->      return val;
->  }
->
-> @@ -1644,9 +1646,9 @@ void pcnet_ioport_writel(void *opaque, uint32_t addr, uint32_t val)
->  {
->      PCNetState *s = opaque;
->      pcnet_poll_timer(s);
-> -#ifdef PCNET_DEBUG_IO
-> -    printf("pcnet_ioport_writel addr=0x%08x val=0x%08x\n", addr, val);
-> -#endif
-> +    if (PCNET_DEBUG_IO) {
-> +        printf("pcnet_ioport_writel addr=0x%08x val=0x%08x\n", addr, val);
-> +    }
->      if (BCR_DWIO(s)) {
->          switch (addr & 0x0f) {
->          case 0x00: /* RDP */
-> @@ -1662,9 +1664,9 @@ void pcnet_ioport_writel(void *opaque, uint32_t addr, uint32_t val)
->      } else if ((addr & 0x0f) == 0) {
->          /* switch device to dword i/o mode */
->          pcnet_bcr_writew(s, BCR_BSBC, pcnet_bcr_readw(s, BCR_BSBC) | 0x0080);
-> -#ifdef PCNET_DEBUG_IO
-> -        printf("device switched into dword i/o mode\n");
-> -#endif
-> +        if (PCNET_DEBUG_IO) {
-> +            printf("device switched into dword i/o mode\n");
-> +        }
->      }
->      pcnet_update_irq(s);
->  }
-> @@ -1692,9 +1694,9 @@ uint32_t pcnet_ioport_readl(void *opaque, uint32_t addr)
->          }
->      }
->      pcnet_update_irq(s);
-> -#ifdef PCNET_DEBUG_IO
-> -    printf("pcnet_ioport_readl addr=0x%08x val=0x%08x\n", addr, val);
-> -#endif
-> +    if (PCNET_DEBUG_IO) {
-> +        printf("pcnet_ioport_readl addr=0x%08x val=0x%08x\n", addr, val);
-> +    }
->      return val;
->  }
+--nmdy3ebfreoa3ajh
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
---
-Alex Bennée
+iQIzBAABCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlk6x3EACgkQc2J8L2kN
+9xDdPxAAmte+fBD4PWbVzWVMbK6xrD0TM5Q6ddWSfr02I38EY/TXUtSESX1LPCYm
+eIHIZpwexIzsrJWNIVWOLb56vn+qqSz9Kbr+rUCVgk3Iya5wGJggxjp97jsAwCPe
+PsJpOHKo6+J/258aQCTJV5akEmy1hetUVSTf9R+Wh8zO8/obb4ssler3TXBzvEEw
+1qXzUcyh13ctw9V28A9xub2jw3hq8NXc1rrRXDWXah/MwX31zpYcKEafaoZ+11dC
+GfnihC0g2CLX3i4HJTDfE2vcBC8B+QNldyMGLfqRJEx3/T4oT6OpodXBtiQQ8l/A
+3FPd1CQnOXMyovmHNXQsAULbypfbhPYY4DDEVmd9EHrsLxrKpDkYBzN8RbS6a78o
+NVVH5u+Zwof7pUNyz7l+Hwe79LaTVI8OI6wQ0lhQePXKkj/6pSJuk6CJZxuURg9B
+VgdA9xVUQWPforXv1ElI3VSa/L7G96Q7rOGLVbKwwYCfIfnSk1+O/SZQuJLpxH4a
+ArF3e/dW0FnqDllKXMCs/FiuiU5k54eGcyPvqN6xD/W+p5VcYamb4C4ets9/5H+3
+TD6j41L6mPI1GzLthuR2LvbbOYso9etudIVLWdzDjmEHzZsEneymcQDiDCsQdMog
++/joyllInbawztNJVq4Wz8xRRGsqTTZPehID0g989g0iKXrH6qY=
+=BI7x
+-----END PGP SIGNATURE-----
+
+--nmdy3ebfreoa3ajh--
