@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dJ9cC-0000Y2-4B
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 22:25:33 -0400
+	(envelope-from <andrew@aj.id.au>) id 1dJ9db-0001Xk-LO
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 22:27:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dJ9c8-000695-T9
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 22:25:32 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:59673)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dJ9c8-00068K-DL
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 22:25:28 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu,  8 Jun 2017 22:25:16 -0400
-Message-Id: <1496975122-16999-2-git-send-email-cota@braap.org>
-In-Reply-To: <1496975122-16999-1-git-send-email-cota@braap.org>
-References: <1496975122-16999-1-git-send-email-cota@braap.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v8 1/7] exec: [tcg] Refactor flush of per-CPU
- virtual TB cache
+	(envelope-from <andrew@aj.id.au>) id 1dJ9da-0006Ou-Iq
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 22:26:59 -0400
+Message-ID: <1496975205.23335.9.camel@aj.id.au>
+From: Andrew Jeffery <andrew@aj.id.au>
+Date: Fri, 09 Jun 2017 11:56:45 +0930
+In-Reply-To: <1496739312-32304-1-git-send-email-clg@kaod.org>
+References: <1496739312-32304-1-git-send-email-clg@kaod.org>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-82dWZunQWbGaf3i9I6cf"
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] timer/aspeed: fix timer enablement when a
+ reload is not set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,84 +23,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Stefan Hajnoczi <stefanha@redhat.com>
+To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-From: Lluís Vilanova <vilanova@ac.upc.edu>
 
-The function is reused in later patches.
+--=-82dWZunQWbGaf3i9I6cf
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
 
-Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- cputlb.c                |  2 +-
- include/exec/exec-all.h |  6 ++++++
- translate-all.c         | 15 ++++++++++-----
- 3 files changed, 17 insertions(+), 6 deletions(-)
+T24gVHVlLCAyMDE3LTA2LTA2IGF0IDEwOjU1ICswMjAwLCBDw6lkcmljIExlIEdvYXRlciB3cm90
+ZToKPiBXaGVuIGEgdGltZXIgaXMgZW5hYmxlZCBiZWZvcmUgYSByZWxvYWQgdmFsdWUgaXMgc2V0
+LCB0aGUgY29udHJvbGxlcgo+IHdhaXRzIGZvciBhIHJlbG9hZCB2YWx1ZSB0byBiZSBzZXQgYmVm
+b3JlIHN0YXJ0aW5nIGRlY3JlbWVudGluZy4gVGhpcwo+IGZpeCB0cmllcyB0byBjb3ZlciB0aGF0
+IGNhc2UgYnkgY2hhbmdpbmcgdGhlIHRpbWVyIGV4cGlyeSBvbmx5IHdoZW4KPiBhIHJlbG9hZCB2
+YWx1ZSBpcyB2YWxpZC4KPiAKPiA+IFNpZ25lZC1vZmYtYnk6IEPDqWRyaWMgTGUgR29hdGVyIDxj
+bGdAa2FvZC5vcmc+Cj4gLS0tCj4gwqBody90aW1lci9hc3BlZWRfdGltZXIuYyB8IDM3ICsrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0KPiDCoDEgZmlsZSBjaGFuZ2VkLCAyOSBp
+bnNlcnRpb25zKCspLCA4IGRlbGV0aW9ucygtKQo+IAo+IGRpZmYgLS1naXQgYS9ody90aW1lci9h
+c3BlZWRfdGltZXIuYyBiL2h3L3RpbWVyL2FzcGVlZF90aW1lci5jCj4gaW5kZXggOWI3MGVlMDli
+MDdmLi41MGFjYmY1MzBhM2EgMTAwNjQ0Cj4gLS0tIGEvaHcvdGltZXIvYXNwZWVkX3RpbWVyLmMK
+PiArKysgYi9ody90aW1lci9hc3BlZWRfdGltZXIuYwo+IEBAIC0xMzAsMTUgKzEzMCwyNiBAQCBz
+dGF0aWMgdWludDY0X3QgY2FsY3VsYXRlX25leHQoc3RydWN0IEFzcGVlZFRpbWVyICp0KQo+IMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgbmV4dCA9IHNlcVsxXTsKPiDCoMKgwqDCoMKgwqDCoMKg
+wqB9IGVsc2UgaWYgKG5vdyA8IHNlcVsyXSkgewo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+bmV4dCA9IHNlcVsyXTsKPiAtwqDCoMKgwqDCoMKgwqDCoH0gZWxzZSB7Cj4gK8KgwqDCoMKgwqDC
+oMKgwqB9IGVsc2UgaWYgKHQtPnJlbG9hZCkgewo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+cmVsb2FkX25zID0gbXVsZGl2NjQodC0+cmVsb2FkLCBOQU5PU0VDT05EU19QRVJfU0VDT05ELCBy
+YXRlKTsKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHQtPnN0YXJ0ID0gbm93IC0gKChub3cg
+LSB0LT5zdGFydCkgJSByZWxvYWRfbnMpOwo+ICvCoMKgwqDCoMKgwqDCoMKgfSBlbHNlIHsKPiAr
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgLyogbm8gcmVsb2FkIHZhbHVlLCByZXR1cm4gMCAqLwo+
+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBicmVhazsKPiDCoMKgwqDCoMKgwqDCoMKgwqB9Cj4g
+wqDCoMKgwqDCoH0KPiDCoAo+IMKgwqDCoMKgwqByZXR1cm4gbmV4dDsKPiDCoH0KPiDCoAo+ICtz
+dGF0aWMgdm9pZCBhc3BlZWRfdGltZXJfbW9kKEFzcGVlZFRpbWVyICp0KQo+ICt7Cj4gK8KgwqDC
+oMKgdWludDY0X3QgbmV4dCA9IGNhbGN1bGF0ZV9uZXh0KHQpOwo+ICvCoMKgwqDCoGlmIChuZXh0
+KSB7Cj4gK8KgwqDCoMKgwqDCoMKgwqB0aW1lcl9tb2QoJnQtPnRpbWVyLCBuZXh0KTsKPiArwqDC
+oMKgwqB9Cj4gK30KPiArCj4gwqBzdGF0aWMgdm9pZCBhc3BlZWRfdGltZXJfZXhwaXJlKHZvaWQg
+Km9wYXF1ZSkKPiDCoHsKPiDCoMKgwqDCoMKgQXNwZWVkVGltZXIgKnQgPSBvcGFxdWU7Cj4gQEAg
+LTE2NCw3ICsxNzUsNyBAQCBzdGF0aWMgdm9pZCBhc3BlZWRfdGltZXJfZXhwaXJlKHZvaWQgKm9w
+YXF1ZSkKPiDCoMKgwqDCoMKgwqDCoMKgwqBxZW11X3NldF9pcnEodC0+aXJxLCB0LT5sZXZlbCk7
+Cj4gwqDCoMKgwqDCoH0KPiDCoAo+IC3CoMKgwqDCoHRpbWVyX21vZCgmdC0+dGltZXIsIGNhbGN1
+bGF0ZV9uZXh0KHQpKTsKPiArwqDCoMKgwqBhc3BlZWRfdGltZXJfbW9kKHQpOwo+IMKgfQo+IMKg
+Cj4gwqBzdGF0aWMgdWludDY0X3QgYXNwZWVkX3RpbWVyX2dldF92YWx1ZShBc3BlZWRUaW1lciAq
+dCwgaW50IHJlZykKPiBAQCAtMjI3LDEwICsyMzgsMjMgQEAgc3RhdGljIHZvaWQgYXNwZWVkX3Rp
+bWVyX3NldF92YWx1ZShBc3BlZWRUaW1lckN0cmxTdGF0ZSAqcywgaW50IHRpbWVyLCBpbnQgcmVn
+LAo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoHVpbnQzMl90IHZhbHVlKQo+IMKgewo+IMKgwqDCoMKgwqBBc3Bl
+ZWRUaW1lciAqdDsKPiArwqDCoMKgwqB1aW50MzJfdCBvbGRfcmVsb2FkOwo+IMKgCj4gwqDCoMKg
+wqDCoHRyYWNlX2FzcGVlZF90aW1lcl9zZXRfdmFsdWUodGltZXIsIHJlZywgdmFsdWUpOwo+IMKg
+wqDCoMKgwqB0ID0gJnMtPnRpbWVyc1t0aW1lcl07Cj4gwqDCoMKgwqDCoHN3aXRjaCAocmVnKSB7
+Cj4gK8KgwqDCoMKgY2FzZSBUSU1FUl9SRUdfUkVMT0FEOgo+ICvCoMKgwqDCoMKgwqDCoMKgb2xk
+X3JlbG9hZCA9IHQtPnJlbG9hZDsKPiArwqDCoMKgwqDCoMKgwqDCoHQtPnJlbG9hZCA9IHZhbHVl
+Owo+ICsKPiArwqDCoMKgwqDCoMKgwqDCoC8qIElmIHRoZSByZWxvYWQgdmFsdWUgd2FzIG5vdCBw
+cmV2aW91c2x5IHNldCwgb3IgemVybywgYW5kCj4gK8KgwqDCoMKgwqDCoMKgwqDCoCogdGhlIGN1
+cnJlbnQgdmFsdWUgaXMgdmFsaWQsIHRyeSB0byBzdGFydCB0aGUgdGltZXIgaWYgaXQgaXMKPiAr
+wqDCoMKgwqDCoMKgwqDCoMKgKiBlbmFibGVkLgo+ICvCoMKgwqDCoMKgwqDCoMKgwqAqLwo+ICvC
+oMKgwqDCoMKgwqDCoMKgaWYgKG9sZF9yZWxvYWQgfHwgIXQtPnJlbG9hZCkgewo+ICvCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqBicmVhazsKPiArwqDCoMKgwqDCoMKgwqDCoH0KCk1heWJlIEkgbmVl
+ZCBtb3JlIGNhZmZlaW5lLCBidXQgSSBpbml0aWFsbHkgc3RydWdnbGVkIHRvIHJlY29uY2lsZSB0
+aGUKY29uZGl0aW9uIHdpdGggdGhlIGNvbW1lbnQsIGFzIHRoZSBjb25kaXRpb24gY2hlY2tzIHRo
+ZSBpbnZlcnNlIGluCm9yZGVyIHRvIGJyZWFrIHdoaWxlIHRoZSBjb21tZW50IGRpc2N1c3NlcyB0
+aGUgbm9uLWJyZWFraW5nIGNhc2UuIAoKSG93ZXZlciwgYWZ0ZXIgdHJ5aW5nIGZvciBzZXZlcmFs
+IG1pbnV0ZXMsIEknbSBub3Qgc3VyZSB0aGVyZSdzIGFuIGVhc3kKd2F5IHRvIGltcHJvdmUgaXQu
+Cgo+ICsKPiDCoMKgwqDCoMKgY2FzZSBUSU1FUl9SRUdfU1RBVFVTOgo+IMKgwqDCoMKgwqDCoMKg
+wqDCoGlmICh0aW1lcl9lbmFibGVkKHQpKSB7Cj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqB1
+aW50NjRfdCBub3cgPSBxZW11X2Nsb2NrX2dldF9ucyhRRU1VX0NMT0NLX1ZJUlRVQUwpOwo+IEBA
+IC0yMzgsMTcgKzI2MiwxNCBAQCBzdGF0aWMgdm9pZCBhc3BlZWRfdGltZXJfc2V0X3ZhbHVlKEFz
+cGVlZFRpbWVyQ3RybFN0YXRlICpzLCBpbnQgdGltZXIsIGludCByZWcsCj4gwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqB1aW50MzJfdCByYXRlID0gY2FsY3VsYXRlX3JhdGUodCk7Cj4gwqAKPiDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHQtPnN0YXJ0ICs9IG11bGRpdjY0KGRlbHRhLCBOQU5P
+U0VDT05EU19QRVJfU0VDT05ELCByYXRlKTsKPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgdGlt
+ZXJfbW9kKCZ0LT50aW1lciwgY2FsY3VsYXRlX25leHQodCkpOwo+ICvCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqBhc3BlZWRfdGltZXJfbW9kKHQpOwo+IMKgwqDCoMKgwqDCoMKgwqDCoH0KPiDCoMKg
+wqDCoMKgwqDCoMKgwqBicmVhazsKPiAtwqDCoMKgwqBjYXNlIFRJTUVSX1JFR19SRUxPQUQ6Cj4g
+LcKgwqDCoMKgwqDCoMKgwqB0LT5yZWxvYWQgPSB2YWx1ZTsKPiAtwqDCoMKgwqDCoMKgwqDCoGJy
+ZWFrOwo+IMKgwqDCoMKgwqBjYXNlIFRJTUVSX1JFR19NQVRDSF9GSVJTVDoKPiDCoMKgwqDCoMKg
+Y2FzZSBUSU1FUl9SRUdfTUFUQ0hfU0VDT05EOgo+IMKgwqDCoMKgwqDCoMKgwqDCoHQtPm1hdGNo
+W3JlZyAtIDJdID0gdmFsdWU7Cj4gwqDCoMKgwqDCoMKgwqDCoMKgaWYgKHRpbWVyX2VuYWJsZWQo
+dCkpIHsKPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgdGltZXJfbW9kKCZ0LT50aW1lciwgY2Fs
+Y3VsYXRlX25leHQodCkpOwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBhc3BlZWRfdGltZXJf
+bW9kKHQpOwo+IMKgwqDCoMKgwqDCoMKgwqDCoH0KPiDCoMKgwqDCoMKgwqDCoMKgwqBicmVhazsK
+PiDCoMKgwqDCoMKgZGVmYXVsdDoKPiBAQCAtMjY4LDcgKzI4OSw3IEBAIHN0YXRpYyB2b2lkIGFz
+cGVlZF90aW1lcl9jdHJsX2VuYWJsZShBc3BlZWRUaW1lciAqdCwgYm9vbCBlbmFibGUpCj4gwqDC
+oMKgwqDCoHRyYWNlX2FzcGVlZF90aW1lcl9jdHJsX2VuYWJsZSh0LT5pZCwgZW5hYmxlKTsKPiDC
+oMKgwqDCoMKgaWYgKGVuYWJsZSkgewo+IMKgwqDCoMKgwqDCoMKgwqDCoHQtPnN0YXJ0ID0gcWVt
+dV9jbG9ja19nZXRfbnMoUUVNVV9DTE9DS19WSVJUVUFMKTsKPiAtwqDCoMKgwqDCoMKgwqDCoHRp
+bWVyX21vZCgmdC0+dGltZXIsIGNhbGN1bGF0ZV9uZXh0KHQpKTsKPiArwqDCoMKgwqDCoMKgwqDC
+oGFzcGVlZF90aW1lcl9tb2QodCk7Cj4gwqDCoMKgwqDCoH0gZWxzZSB7Cj4gwqDCoMKgwqDCoMKg
+wqDCoMKgdGltZXJfZGVsKCZ0LT50aW1lcik7Cj4gwqDCoMKgwqDCoH0KClJldmlld2VkLWJ5OiBB
+bmRyZXcgSmVmZmVyeSA8YW5kcmV3QGFqLmlkLmF1Pg==
 
-diff --git a/cputlb.c b/cputlb.c
-index 743776a..6a2b762 100644
---- a/cputlb.c
-+++ b/cputlb.c
-@@ -118,7 +118,7 @@ static void tlb_flush_nocheck(CPUState *cpu)
- 
-     memset(env->tlb_table, -1, sizeof(env->tlb_table));
-     memset(env->tlb_v_table, -1, sizeof(env->tlb_v_table));
--    memset(cpu->tb_jmp_cache, 0, sizeof(cpu->tb_jmp_cache));
-+    tb_flush_jmp_cache_all(cpu);
- 
-     env->vtlb_index = 0;
-     env->tlb_flush_addr = -1;
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 724ec73..b0281b0 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -366,6 +366,12 @@ struct TranslationBlock {
- };
- 
- void tb_free(TranslationBlock *tb);
-+/**
-+ * tb_flush_jmp_cache_all:
-+ *
-+ * Flush the virtual translation block cache.
-+ */
-+void tb_flush_jmp_cache_all(CPUState *env);
- void tb_flush(CPUState *cpu);
- void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr);
- TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
-diff --git a/translate-all.c b/translate-all.c
-index 966747a..8a5dc19 100644
---- a/translate-all.c
-+++ b/translate-all.c
-@@ -931,11 +931,7 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
-     }
- 
-     CPU_FOREACH(cpu) {
--        int i;
--
--        for (i = 0; i < TB_JMP_CACHE_SIZE; ++i) {
--            atomic_set(&cpu->tb_jmp_cache[i], NULL);
--        }
-+        tb_flush_jmp_cache_all(cpu);
-     }
- 
-     tcg_ctx.tb_ctx.nb_tbs = 0;
-@@ -1733,6 +1729,15 @@ void tb_check_watchpoint(CPUState *cpu)
-     }
- }
- 
-+void tb_flush_jmp_cache_all(CPUState *cpu)
-+{
-+    int i;
-+
-+    for (i = 0; i < TB_JMP_CACHE_SIZE; ++i) {
-+        atomic_set(&cpu->tb_jmp_cache[i], NULL);
-+    }
-+}
-+
- #ifndef CONFIG_USER_ONLY
- /* in deterministic execution mode, instructions doing device I/Os
-  * must be at the end of the TB.
--- 
-2.7.4
+
+--=-82dWZunQWbGaf3i9I6cf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAABCgAGBQJZOgdlAAoJEJ0dnzgO5LT5qvwP/RkBNLcwYbOIjiEGOfeWLaxC
+9NTZ+oX06bX4FCG+YD1FqGoEQS5EVoMXgn1rS1GWbrm3EB3r+9vKQjgGVKWZwgOI
+kb2cIqKEabGdL26XnqrSc6mgdEYVVL2WAZef3ZWReQ8ewkhIwnMnQMd1E19PqI71
+j7VzkvQ5y06F4GRSWJTzw5GgbO/iNfl51iqZkgJJ1qYOln8idHc13fW3pKVaLfI4
+Jd9xXH/Ag5bTqyshUsVBIWM9TFxECvG4JDPM7GPVMf2hzo8A7uC7KrNjdlKQvNZ6
+dyalWHeSlSN8Pxe6yMiK12O2t63pNrb1I6BDO7ZgPIaeWFVHv47R1ujSJZFGn40x
+YqPut3eDqF2k3uEbbhDrCgX5y9lxqW3C54YzCEBWPnwWDuUjsPszd2kDp9VWLEjd
+9J3Ac8VLKCZPq4WEqnrt2d8KU2Rb8tyV/pIpnKjZL8SWPJ6fSz4ozOcDKot4i4aj
+5SS7LbeqDOfnDJS5CP4zBNdO1o8g908zAqDgmCJxqbbY5FUKu+RrIV5jo8LZBwTj
+mQg/u6yXKdvJ6hCVceq0PizTflqLUrFn8BLPu0uE0YeSeqamdKJ89StaMNyCSJbb
+kbHjl59nuGzrV5TbcySlT6pH/imZnTACqODHloR3S55IYcjyxc8b5pLedfq66ZXG
+fTV2xEnUoI8QeP55XLLj
+=FdrJ
+-----END PGP SIGNATURE-----
+
+--=-82dWZunQWbGaf3i9I6cf--
