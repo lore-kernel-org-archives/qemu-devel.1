@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44106)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dJIpC-0003KO-2P
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 08:15:35 -0400
+	(envelope-from <quintela@redhat.com>) id 1dJIsB-0004hD-2X
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 08:18:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dJIpA-0003I7-Lc
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 08:15:34 -0400
-References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
-	<AM5PR0401MB2545AFD256A96420ACC44CD89ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<14c83c14-1e7e-f142-77b0-fa8c873e2d41@redhat.com>
-	<AM5PR0401MB2545C0E76C4BE6F82FE376D09ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <445b60fe-a0da-ee93-fab3-be88fe269846@redhat.com>
-Date: Fri, 9 Jun 2017 14:15:10 +0200
+	(envelope-from <quintela@redhat.com>) id 1dJIs6-00040a-Vy
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 08:18:39 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170609100336.GJ26521@umbus.fritz.box> (David Gibson's message
+	of "Fri, 9 Jun 2017 20:03:36 +1000")
+References: <20170608144106.GG25805@umbus.fritz.box>
+	<20170609110748.00c8e419@nial.brq.redhat.com>
+	<20170609100336.GJ26521@umbus.fritz.box>
+Reply-To: quintela@redhat.com
+Date: Fri, 09 Jun 2017 14:18:32 +0200
+Message-ID: <87poed8icn.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <AM5PR0401MB2545C0E76C4BE6F82FE376D09ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 0/8] VIRTIO-IOMMU device
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] unplug_request and migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,181 +25,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bharat Bhushan <bharat.bhushan@nxp.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>
-Cc: "will.deacon@arm.com" <will.deacon@arm.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "drjones@redhat.com" <drjones@redhat.com>, "wei@redhat.com" <wei@redhat.com>, "tn@semihalf.com" <tn@semihalf.com>, Peter Xu <peterx@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, jdenemar@redhat.com
 
-Hi,
+David Gibson <david@gibson.dropbear.id.au> wrote:
+> On Fri, Jun 09, 2017 at 11:09:10AM +0200, Igor Mammedov wrote:
+>> On Fri, 9 Jun 2017 00:41:06 +1000
+>> David Gibson <david@gibson.dropbear.id.au> wrote:
+>> 
+>> > Hi Dave & Juan,
+>> > 
+>> > I'm hoping one of you can answer this.
+>> > 
+>> > I'm currently grappling with (amongst other things) a pseries machine
+>> > racing a hot unplug operation with a migrate.  There's various issues
+>> > with what interim state we need, and which bits of it need to be
+>> > migrated that I'm still investigating.  But, there's a more general
+>> > question that I'm guessing must have already been addressed for x86.
+>> > 
+>> > For any "soft" unplug device - i.e. using ->unplug_request, rather
+>> > than ->unplug, giving a device_del command will just ask the guest
+>> > nicely to release the device, with the completion of the unplug
+>> > happening only if and when the guest indicates it's ready for the
+>> > device to go away.  AFAICT, the device_del command will return as soon
+>> > as the request is made, but if the guest is busy, the completion of
+>> > the hot unplug could take arbitrarily long.
+>> > 
+>> > So, what happens if there's a migration in between the unplug_request
+>> > and the guest completing the unplug?  How does libvirt (or whatever)
+>> > know whether to include the device on the destination machine command
+>> > line?
+>> > 
+>> 
+>> looking at qdev_unplug():
+>>     if (!migration_is_idle()) { 
+>>         error_setg(errp, "device_del not allowed while migrating");
+>>         return;
+>>     }
+>> 
+>> so unplug request should fail if migration is in progress , it won't reach guest
+>> and mgmt side will have to repeat request on migration completion.
+>> 
+>> But it's still possible to issue unplug request first and then start
+>> migration,
+>
+> Right, that's the case I'm interested in, not the other way around.
+>
+>> that's where race between DEVICE_DELETED and migration start (starting DST with
+>> being unplugged device) occurs.
+>> 
+>> it could be possible:
+>>  1: on unplug_request() set global flag that there is pending unplug and forbid
+>>     migration until completion. But there is no guarantee that unplug will
+>>     be completed nor a way to notice that it's failed/rejected by guest.
+>>     I'm not sure how that could be solved.
+>>  2: set per device pending_unplug flag and delay unplug event from guest
+>>     until migration is completed if migration is in progress when unplug
+>>     callback is called.
+>>     mgmt will treat the case as usual migration, i.e. start dst with being
+>>     unplugged device, and device will be removed on dst side on migration
+>>     completion.
+>>     (it should be generic solution as x86 is also affected), as place where
+>>     to put this common logic I'd suggest hotplug_handler_unplug()
+>
+> So.. it seems like the short version is that racing migration and
+> unplug is broken already.
 
-On 09/06/2017 13:30, Bharat Bhushan wrote:
-> Hi Eric,
-> 
->> -----Original Message-----
->> From: Auger Eric [mailto:eric.auger@redhat.com]
->> Sent: Friday, June 09, 2017 12:14 PM
->> To: Bharat Bhushan <bharat.bhushan@nxp.com>;
->> eric.auger.pro@gmail.com; peter.maydell@linaro.org;
->> alex.williamson@redhat.com; mst@redhat.com; qemu-arm@nongnu.org;
->> qemu-devel@nongnu.org; jean-philippe.brucker@arm.com
->> Cc: will.deacon@arm.com; robin.murphy@arm.com; kevin.tian@intel.com;
->> marc.zyngier@arm.com; christoffer.dall@linaro.org; drjones@redhat.com;
->> wei@redhat.com; tn@semihalf.com
->> Subject: Re: [RFC v2 0/8] VIRTIO-IOMMU device
->>
->> Hi Bharat,
->>
->> On 09/06/2017 08:16, Bharat Bhushan wrote:
->>> Hi Eric,
->>>
->>>> -----Original Message-----
->>>> From: Eric Auger [mailto:eric.auger@redhat.com]
->>>> Sent: Wednesday, June 07, 2017 9:31 PM
->>>> To: eric.auger.pro@gmail.com; eric.auger@redhat.com;
->>>> peter.maydell@linaro.org; alex.williamson@redhat.com;
->> mst@redhat.com;
->>>> qemu-arm@nongnu.org; qemu-devel@nongnu.org; jean-
->>>> philippe.brucker@arm.com
->>>> Cc: will.deacon@arm.com; robin.murphy@arm.com;
->> kevin.tian@intel.com;
->>>> marc.zyngier@arm.com; christoffer.dall@linaro.org;
->>>> drjones@redhat.com; wei@redhat.com; tn@semihalf.com; Bharat
->> Bhushan
->>>> <bharat.bhushan@nxp.com>
->>>> Subject: [RFC v2 0/8] VIRTIO-IOMMU device
->>>>
->>>> This series implements the virtio-iommu device. This is a proof of
->>>> concept based on the virtio-iommu specification written by Jean-Philippe
->> Brucker [1].
->>>> This was tested with a guest using the virtio-iommu driver [2] and
->>>> exposed with a virtio-net-pci using dma ops.
->>>>
->>>> The device gets instantiated using the "-device virtio-iommu-device"
->>>> option. It currently works with ARM virt machine only as the machine
->>>> must handle the dt binding between the virtio-mmio "iommu" node and
->>>> the PCI host bridge node. ACPI booting is not yet supported.
+> Which is unfortunate, but at least means I don't need to worry about
+> it particularly for Power.
 
-For those who may play with the device, this was tested with a
-virtio-net-pci device using the following command:
+Yeap.  I think that when I put the patches (for 2.10) to disable
+hot[un]plug during migration, it was the 1st try to do something about
+it.
 
--device
-virtio-net-pci,netdev=tap0,mac=<MAC>,iommu_platform,disable-modern=off,disable-legacy=on
-\
-
-I tried to run the guest using a virtio-blk-pci device using
--device
-virtio-blk-pci,scsi=off,drive=<>,iommu_platform=off,disable-modern=off,disable-legacy=on,werror=stop,rerror=stop
-\
-
-and the guest does *not* boot whereas it does without any iommu.
-
-However I am not sure the issue is related to the actual virtual iommu
-device as I have the exact same issue with vsmmuv3 emulated device (This
-was originally reported by Tomasz). So the issue may come from the
-infrastructure around. To be further investigated ...
-
-Thanks
-
-Eric
-
->>>>
->>>> This should allow to start some benchmarking activities against pure
->>>> emulated IOMMU (especially ARM SMMU).
->>>
->>> I am testing this on ARM64 and see below continuous error prints:
->>>
->>> 	virtio_iommu_translate sid=8 is not known!!
->>> 	virtio_iommu_translate sid=8 is not known!!
->>> 	virtio_iommu_translate sid=8 is not known!!
->>> 	virtio_iommu_translate sid=8 is not known!!
->>> 	virtio_iommu_translate sid=8 is not known!!
->>> 	virtio_iommu_translate sid=8 is not known!!
->>> 	virtio_iommu_translate sid=8 is not known!!
->>> 	virtio_iommu_translate sid=8 is not known!!
->>> 	virtio_iommu_translate sid=8 is not known!!
->>> 	virtio_iommu_translate sid=8 is not known!!
->>>
->>>
->>> Also in guest I do not see device-tree node with virtio-iommu.
->> do you mean the virtio-mmio with #iommu-cells property?
->>
->> This one is created statically by virt machine. I would be surprised if it were
->> not there. Are you using the virt = virt2.10 machine. Machines before do not
->> support its instantiation.
->>
->> Please can you add a printf in hw/arm/virt.c create_virtio_mmio() at the
->> moment when this node is created. Also you can add a printf in
->> bind_virtio_iommu_device() to make sure the binding with the PCI host
->> bridge is added on machine init done.
->>
->> Also worth to check, CONFIG_VIRTIO_IOMMU=y on guest side.
-> 
-> It works on my side. The driver config was disabled and also I was using guest kernel which was not have deferred-probing. Now after fixing it works on my side
-> I placed some prints to see dma-map are mapping regions in virtio-iommu, it uses emulated iommu.
-> 
-> I will continue to add VFIO support now on this and more testing !!
-> 
-> Thanks
-> -Bharat
-> 
->>
->> Thanks
->>
->> Eric
->>
->>> I am using qemu-tree you mentioned below and iommu-driver patches
->> published by Jean-P.
->>> Qemu command line have additional ""-device virtio-iommu-device". What
->> I am missing ?
->>
->>
->>>
->>> Thanks
->>> -Bharat
->>>
->>>>
->>>> Best Regards
->>>>
->>>> Eric
->>>>
->>>> This series can be found at:
->>>> https://github.com/eauger/qemu/tree/virtio-iommu-rfcv2
->>>>
->>>> References:
->>>> [1] [RFC 0/3] virtio-iommu: a paravirtualized IOMMU, [2] [RFC PATCH
->>>> linux]
->>>> iommu: Add virtio-iommu driver [3] [RFC PATCH kvmtool 00/15] Add
->>>> virtio- iommu
->>>>
->>>> History:
->>>> v1 -> v2:
->>>> - fix redifinition of viommu_as typedef
->>>>
->>>> Eric Auger (8):
->>>>   update-linux-headers: import virtio_iommu.h
->>>>   linux-headers: Update for virtio-iommu
->>>>   virtio_iommu: add skeleton
->>>>   virtio-iommu: Decode the command payload
->>>>   virtio_iommu: Add the iommu regions
->>>>   virtio-iommu: Implement the translation and commands
->>>>   hw/arm/virt: Add 2.10 machine type
->>>>   hw/arm/virt: Add virtio-iommu the virt board
->>>>
->>>>  hw/arm/virt.c                                 | 116 ++++-
->>>>  hw/virtio/Makefile.objs                       |   1 +
->>>>  hw/virtio/trace-events                        |  14 +
->>>>  hw/virtio/virtio-iommu.c                      | 623
->> ++++++++++++++++++++++++++
->>>>  include/hw/arm/virt.h                         |   5 +
->>>>  include/hw/virtio/virtio-iommu.h              |  60 +++
->>>>  include/standard-headers/linux/virtio_ids.h   |   1 +
->>>>  include/standard-headers/linux/virtio_iommu.h | 142 ++++++
->>>>  linux-headers/linux/virtio_iommu.h            |   1 +
->>>>  scripts/update-linux-headers.sh               |   3 +
->>>>  10 files changed, 957 insertions(+), 9 deletions(-)  create mode
->>>> 100644 hw/virtio/virtio-iommu.c  create mode 100644
->>>> include/hw/virtio/virtio- iommu.h  create mode 100644
->>>> include/standard- headers/linux/virtio_iommu.h  create mode 100644
->>>> linux-headers/linux/virtio_iommu.h
->>>>
->>>> --
->>>> 2.5.5
->>>
+Later, Juan.
