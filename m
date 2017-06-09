@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dJK7V-0003u9-4j
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:38:33 -0400
+	(envelope-from <armbru@redhat.com>) id 1dJK8T-0004P0-V7
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:39:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dJK7U-00083Z-99
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:38:33 -0400
-References: <20170602112158.232757-1-vsementsov@virtuozzo.com>
-	<20170602112158.232757-15-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <69aeeb36-553c-9c6f-8515-f0f1bd229bb5@redhat.com>
-Date: Fri, 9 Jun 2017 15:38:12 +0200
+	(envelope-from <armbru@redhat.com>) id 1dJK8P-0000EM-1w
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:39:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37384)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dJK8O-0000Dm-Pm
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:39:28 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C71258124D
+	for <qemu-devel@nongnu.org>; Fri,  9 Jun 2017 13:39:27 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <1496980142-8986-1-git-send-email-peterx@redhat.com>
+	<1496980142-8986-3-git-send-email-peterx@redhat.com>
+Date: Fri, 09 Jun 2017 15:39:24 +0200
+In-Reply-To: <1496980142-8986-3-git-send-email-peterx@redhat.com> (Peter Xu's
+	message of "Fri, 9 Jun 2017 11:48:58 +0800")
+Message-ID: <87lgp1i8kz.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170602112158.232757-15-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="c3ioXr7SRGDmt88X8el4uJlV6T1RbRScu"
-Subject: Re: [Qemu-devel] [PATCH v20 14/30] qcow2: support
- .bdrv_reopen_bitmaps_rw
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] migration: let MigrationState be a
+ qdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,54 +34,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---c3ioXr7SRGDmt88X8el4uJlV6T1RbRScu
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
- famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
-Message-ID: <69aeeb36-553c-9c6f-8515-f0f1bd229bb5@redhat.com>
-Subject: Re: [PATCH v20 14/30] qcow2: support .bdrv_reopen_bitmaps_rw
-References: <20170602112158.232757-1-vsementsov@virtuozzo.com>
- <20170602112158.232757-15-vsementsov@virtuozzo.com>
-In-Reply-To: <20170602112158.232757-15-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Peter Xu <peterx@redhat.com> writes:
 
-On 2017-06-02 13:21, Vladimir Sementsov-Ogievskiy wrote:
-> Realize bdrv_reopen_bitmaps_rw interface.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Let the old man "MigrationState" join the object family. Direct benefit
+> is that we can start to use all the property features derived from
+> current QDev, like: HW_COMPAT_* bits, command line setup for migration
+> parameters (so will never need to set them up each time using HMP/QMP,
+> this is really, really attractive for test writters), etc.
+>
+> I see no reason to disallow this happen yet. So let's start from this
+> one, to see whether it would be anything good.
+>
+> No functional change at all.
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 > ---
->  block/qcow2-bitmap.c | 61 ++++++++++++++++++++++++++++++++++++++++++++=
-++++++++
->  block/qcow2.c        |  2 ++
->  block/qcow2.h        |  1 +
->  3 files changed, 64 insertions(+)
+>  include/migration/migration.h | 19 ++++++++++++++
+>  migration/migration.c         | 61 ++++++++++++++++++++++++++++---------------
+>  2 files changed, 59 insertions(+), 21 deletions(-)
+>
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index 79b5484..bd0186c 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -21,6 +21,7 @@
+>  #include "qapi-types.h"
+>  #include "exec/cpu-common.h"
+>  #include "qemu/coroutine_int.h"
+> +#include "hw/qdev.h"
+>  
+>  #define QEMU_VM_FILE_MAGIC           0x5145564d
+>  #define QEMU_VM_FILE_VERSION_COMPAT  0x00000002
+> @@ -49,6 +50,8 @@ enum mig_rp_message_type {
+>      MIG_RP_MSG_MAX
+>  };
+>  
+> +#define TYPE_MIGRATION "migration"
+> +
+>  /* State for the incoming migration */
+>  struct MigrationIncomingState {
+>      QEMUFile *from_src_file;
+> @@ -91,8 +94,24 @@ struct MigrationIncomingState {
+>  MigrationIncomingState *migration_incoming_get_current(void);
+>  void migration_incoming_state_destroy(void);
+>  
+> +#define MIGRATION_CLASS(klass) \
+> +    OBJECT_CLASS_CHECK(MigrationClass, (klass), TYPE_MIGRATION)
+> +#define MIGRATION_OBJ(obj) \
+> +    OBJECT_CHECK(MigrationState, (obj), TYPE_MIGRATION)
+> +#define MIGRATION_GET_CLASS(obj) \
+> +    OBJECT_GET_CLASS(MigrationClass, (obj), TYPE_MIGRATION)
+> +
+> +typedef struct MigrationClass {
+> +    /*< private >*/
+> +    DeviceClass parent_class;
+> +} MigrationClass;
+> +
+>  struct MigrationState
+>  {
+> +    /*< private >*/
+> +    DeviceState parent_obj;
+> +
+> +    /*< public >*/
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Turning MigrationState into a QOM object so you can use QOM
+infrastructure makes sense.  But why turn it into a device?  It doesn't
+feel device-like to me.  Would ObjectClass and Object instead of
+DeviceClass and DeviceState do?
 
+>      size_t bytes_xfer;
+>      size_t xfer_limit;
+>      QemuThread thread;
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 48c94c9..98b77e2 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -93,29 +93,13 @@ static bool deferred_incoming;
+>  /* For outgoing */
+>  MigrationState *migrate_get_current(void)
+>  {
+> -    static bool once;
+> -    static MigrationState current_migration = {
+> -        .state = MIGRATION_STATUS_NONE,
+> -        .xbzrle_cache_size = DEFAULT_MIGRATE_CACHE_SIZE,
+> -        .mbps = -1,
+> -        .parameters = {
+> -            .compress_level = DEFAULT_MIGRATE_COMPRESS_LEVEL,
+> -            .compress_threads = DEFAULT_MIGRATE_COMPRESS_THREAD_COUNT,
+> -            .decompress_threads = DEFAULT_MIGRATE_DECOMPRESS_THREAD_COUNT,
+> -            .cpu_throttle_initial = DEFAULT_MIGRATE_CPU_THROTTLE_INITIAL,
+> -            .cpu_throttle_increment = DEFAULT_MIGRATE_CPU_THROTTLE_INCREMENT,
+> -            .max_bandwidth = MAX_THROTTLE,
+> -            .downtime_limit = DEFAULT_MIGRATE_SET_DOWNTIME,
+> -            .x_checkpoint_delay = DEFAULT_MIGRATE_X_CHECKPOINT_DELAY,
+> -        },
+> -    };
+> +    static MigrationState *current_migration;
 
---c3ioXr7SRGDmt88X8el4uJlV6T1RbRScu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+You add an indirection...
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+>  
+> -    if (!once) {
+> -        current_migration.parameters.tls_creds = g_strdup("");
+> -        current_migration.parameters.tls_hostname = g_strdup("");
+> -        once = true;
+> +    if (!current_migration) {
+> +        current_migration = MIGRATION_OBJ(object_new(TYPE_MIGRATION));
 
-iQEvBAEBCAAZBQJZOqTEEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQH02
-B/9iT7caYOOw24kgq4UT8as7H0oYzQdo9LSgcjEBHZ6/X/kx5HKkArCQrCg8L8l2
-MTwKwPerXhHb/d+LYXFt9YLxiC3II1zcwLSoZHJPQULMRiDKdX0BeR58OVLj1rGa
-e5wA32t73xSRVaQwKoNbrXe4sUAnGulBc4q7vQbJaTSaQ7oqQpIv0xqhZVvZVztO
-wManSq5iXElJUN/NA1yEkF5BIsQ9zJFUXtggup++9/D4r1DLaq04BjaS2VCqLPtQ
-GRioH6TKYIRTWwjEXBKDM3HfnklUNn7CAxp99fsCrk7GcPLqbzlwbuK9Q+g2SFLc
-v6ZmfjFjCZp/VpqLQmyl/I3+
-=uSW4
------END PGP SIGNATURE-----
+... possibly just so you can use object_new().  Have you considered
+object_initialize()?
 
---c3ioXr7SRGDmt88X8el4uJlV6T1RbRScu--
+>      }
+> -    return &current_migration;
+> +
+> +    return current_migration;
+>  }
+>  
+>  MigrationIncomingState *migration_incoming_get_current(void)
+> @@ -2123,3 +2107,38 @@ void migrate_fd_connect(MigrationState *s)
+>      s->migration_thread_running = true;
+>  }
+>  
+> +static void migration_instance_init(Object *obj)
+> +{
+> +    MigrationState *ms = MIGRATION_OBJ(obj);
+> +
+> +    ms->state = MIGRATION_STATUS_NONE;
+> +    ms->xbzrle_cache_size = DEFAULT_MIGRATE_CACHE_SIZE;
+> +    ms->mbps = -1;
+> +    ms->parameters = (MigrationParameters) {
+> +        .compress_level = DEFAULT_MIGRATE_COMPRESS_LEVEL,
+> +        .compress_threads = DEFAULT_MIGRATE_COMPRESS_THREAD_COUNT,
+> +        .decompress_threads = DEFAULT_MIGRATE_DECOMPRESS_THREAD_COUNT,
+> +        .cpu_throttle_initial = DEFAULT_MIGRATE_CPU_THROTTLE_INITIAL,
+> +        .cpu_throttle_increment = DEFAULT_MIGRATE_CPU_THROTTLE_INCREMENT,
+> +        .max_bandwidth = MAX_THROTTLE,
+> +        .downtime_limit = DEFAULT_MIGRATE_SET_DOWNTIME,
+> +        .x_checkpoint_delay = DEFAULT_MIGRATE_X_CHECKPOINT_DELAY,
+> +    };
+> +    ms->parameters.tls_creds = g_strdup("");
+> +    ms->parameters.tls_hostname = g_strdup("");
+> +}
+> +
+> +static const TypeInfo migration_type = {
+> +    .name = TYPE_MIGRATION,
+> +    .parent = TYPE_DEVICE,
+> +    .class_size = sizeof(MigrationClass),
+> +    .instance_size = sizeof(MigrationState),
+> +    .instance_init = migration_instance_init,
+> +};
+> +
+> +static void register_migration_types(void)
+> +{
+> +    type_register_static(&migration_type);
+> +}
+> +
+> +type_init(register_migration_types);
