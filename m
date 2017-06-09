@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dJKGF-0000cL-La
+	(envelope-from <armbru@redhat.com>) id 1dJKGF-0000cS-Ob
 	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:47:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dJKGE-0003XE-DZ
+	(envelope-from <armbru@redhat.com>) id 1dJKGE-0003X7-D6
 	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:47:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33572)
+Received: from mx1.redhat.com ([209.132.183.28]:40077)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dJKGE-0003WU-4u
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dJKGE-0003WV-3q
 	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:47:34 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1826D85541
+	by mx1.redhat.com (Postfix) with ESMTPS id 1B0CD80462
 	for <qemu-devel@nongnu.org>; Fri,  9 Jun 2017 13:47:33 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  9 Jun 2017 15:46:53 +0200
-Message-Id: <1497016045-6009-10-git-send-email-armbru@redhat.com>
+Date: Fri,  9 Jun 2017 15:46:54 +0200
+Message-Id: <1497016045-6009-11-git-send-email-armbru@redhat.com>
 In-Reply-To: <1497016045-6009-1-git-send-email-armbru@redhat.com>
 References: <1497016045-6009-1-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 09/41] qnum: add uint type
+Subject: [Qemu-devel] [PULL 10/41] json: learn to parse uint64 numbers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,232 +37,186 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-In order to store integer values between INT64_MAX and UINT64_MAX, add
-a uint64_t internal representation.
+Switch strtoll() usage to qemu_strtoi64() helper while at it.
+
+Add a few tests for large numbers.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20170607163635.17635-11-marcandre.lureau@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20170607163635.17635-10-marcandre.lureau@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/qapi/qmp/qnum.h |  7 ++++++
- qobject/qnum.c          | 64 +++++++++++++++++++++++++++++++++++++++++++=
-++++++
- tests/check-qnum.c      | 48 +++++++++++++++++++++++++++++++++++++
- 3 files changed, 119 insertions(+)
+ qobject/json-lexer.c  |  4 ++++
+ qobject/json-parser.c | 36 ++++++++++++++++++++++++++++--------
+ tests/check-qjson.c   | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 76 insertions(+), 8 deletions(-)
 
-diff --git a/include/qapi/qmp/qnum.h b/include/qapi/qmp/qnum.h
-index e42b136..09d745c 100644
---- a/include/qapi/qmp/qnum.h
-+++ b/include/qapi/qmp/qnum.h
-@@ -19,6 +19,7 @@
+diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
+index af4a75e..980ba15 100644
+--- a/qobject/json-lexer.c
++++ b/qobject/json-lexer.c
+@@ -227,15 +227,18 @@ static const uint8_t json_lexer[][256] =3D  {
+     /* escape */
+     [IN_ESCAPE_LL] =3D {
+         ['d'] =3D JSON_ESCAPE,
++        ['u'] =3D JSON_ESCAPE,
+     },
 =20
- typedef enum {
-     QNUM_I64,
-+    QNUM_U64,
-     QNUM_DOUBLE
- } QNumKind;
+     [IN_ESCAPE_L] =3D {
+         ['d'] =3D JSON_ESCAPE,
+         ['l'] =3D IN_ESCAPE_LL,
++        ['u'] =3D JSON_ESCAPE,
+     },
 =20
-@@ -27,15 +28,21 @@ typedef struct QNum {
-     QNumKind kind;
-     union {
-         int64_t i64;
-+        uint64_t u64;
-         double dbl;
-     } u;
- } QNum;
+     [IN_ESCAPE_I64] =3D {
+         ['d'] =3D JSON_ESCAPE,
++        ['u'] =3D JSON_ESCAPE,
+     },
 =20
- QNum *qnum_from_int(int64_t value);
-+QNum *qnum_from_uint(uint64_t value);
- QNum *qnum_from_double(double value);
+     [IN_ESCAPE_I6] =3D {
+@@ -251,6 +254,7 @@ static const uint8_t json_lexer[][256] =3D  {
+         ['i'] =3D JSON_ESCAPE,
+         ['p'] =3D JSON_ESCAPE,
+         ['s'] =3D JSON_ESCAPE,
++        ['u'] =3D JSON_ESCAPE,
+         ['f'] =3D JSON_ESCAPE,
+         ['l'] =3D IN_ESCAPE_L,
+         ['I'] =3D IN_ESCAPE_I,
+diff --git a/qobject/json-parser.c b/qobject/json-parser.c
+index 5e80828..7a417f2 100644
+--- a/qobject/json-parser.c
++++ b/qobject/json-parser.c
+@@ -12,6 +12,7 @@
+  */
 =20
- bool qnum_get_try_int(const QNum *qn, int64_t *val);
- int64_t qnum_get_int(const QNum *qn);
+ #include "qemu/osdep.h"
++#include "qemu/cutils.h"
+ #include "qapi/error.h"
+ #include "qemu-common.h"
+ #include "qapi/qmp/types.h"
+@@ -472,6 +473,13 @@ static QObject *parse_escape(JSONParserContext *ctxt=
+, va_list *ap)
+     } else if (!strcmp(token->str, "%lld") ||
+                !strcmp(token->str, "%I64d")) {
+         return QOBJECT(qnum_from_int(va_arg(*ap, long long)));
++    } else if (!strcmp(token->str, "%u")) {
++        return QOBJECT(qnum_from_uint(va_arg(*ap, unsigned int)));
++    } else if (!strcmp(token->str, "%lu")) {
++        return QOBJECT(qnum_from_uint(va_arg(*ap, unsigned long)));
++    } else if (!strcmp(token->str, "%llu") ||
++               !strcmp(token->str, "%I64u")) {
++        return QOBJECT(qnum_from_uint(va_arg(*ap, unsigned long long)));
+     } else if (!strcmp(token->str, "%s")) {
+         return QOBJECT(qstring_from_str(va_arg(*ap, const char *)));
+     } else if (!strcmp(token->str, "%f")) {
+@@ -493,21 +501,33 @@ static QObject *parse_literal(JSONParserContext *ct=
+xt)
+     case JSON_INTEGER: {
+         /*
+          * Represent JSON_INTEGER as QNUM_I64 if possible, else as
+-         * QNUM_DOUBLE.  Note that strtoll() fails with ERANGE when
+-         * it's not possible.
++         * QNUM_U64, else as QNUM_DOUBLE.  Note that qemu_strtoi64()
++         * and qemu_strtou64() fail with ERANGE when it's not
++         * possible.
+          *
+          * qnum_get_int() will then work for any signed 64-bit
+-         * JSON_INTEGER, and qnum_get_double() both for any
+-         * JSON_INTEGER and any JSON_FLOAT (with precision loss for
+-         * integers beyond 53 bits)
++         * JSON_INTEGER, qnum_get_uint() for any unsigned 64-bit
++         * integer, and qnum_get_double() both for any JSON_INTEGER
++         * and any JSON_FLOAT (with precision loss for integers beyond
++         * 53 bits)
+          */
++        int ret;
+         int64_t value;
++        uint64_t uvalue;
+=20
+-        errno =3D 0; /* strtoll doesn't set errno on success */
+-        value =3D strtoll(token->str, NULL, 10);
+-        if (errno !=3D ERANGE) {
++        ret =3D qemu_strtoi64(token->str, NULL, 10, &value);
++        if (!ret) {
+             return QOBJECT(qnum_from_int(value));
+         }
++        assert(ret =3D=3D -ERANGE);
 +
-+bool qnum_get_try_uint(const QNum *qn, uint64_t *val);
-+uint64_t qnum_get_uint(const QNum *qn);
-+
- double qnum_get_double(QNum *qn);
-=20
- char *qnum_to_string(QNum *qn);
-diff --git a/qobject/qnum.c b/qobject/qnum.c
-index d88e4f7..52918ac 100644
---- a/qobject/qnum.c
-+++ b/qobject/qnum.c
-@@ -35,6 +35,22 @@ QNum *qnum_from_int(int64_t value)
- }
-=20
- /**
-+ * qnum_from_uint(): Create a new QNum from an uint64_t
-+ *
-+ * Return strong reference.
-+ */
-+QNum *qnum_from_uint(uint64_t value)
-+{
-+    QNum *qn =3D g_new(QNum, 1);
-+
-+    qobject_init(QOBJECT(qn), QTYPE_QNUM);
-+    qn->kind =3D QNUM_U64;
-+    qn->u.u64 =3D value;
-+
-+    return qn;
-+}
-+
-+/**
-  * qnum_from_double(): Create a new QNum from a double
-  *
-  * Return strong reference.
-@@ -61,6 +77,12 @@ bool qnum_get_try_int(const QNum *qn, int64_t *val)
-     case QNUM_I64:
-         *val =3D qn->u.i64;
-         return true;
-+    case QNUM_U64:
-+        if (qn->u.u64 > INT64_MAX) {
-+            return false;
++        if (token->str[0] !=3D '-') {
++            ret =3D qemu_strtou64(token->str, NULL, 10, &uvalue);
++            if (!ret) {
++                return QOBJECT(qnum_from_uint(uvalue));
++            }
++            assert(ret =3D=3D -ERANGE);
 +        }
-+        *val =3D qn->u.u64;
-+        return true;
-     case QNUM_DOUBLE:
-         return false;
+         /* fall through to JSON_FLOAT */
      }
-@@ -83,6 +105,44 @@ int64_t qnum_get_int(const QNum *qn)
- }
-=20
- /**
-+ * qnum_get_uint(): Get an unsigned integer from the number
-+ *
-+ * Return true on success.
-+ */
-+bool qnum_get_try_uint(const QNum *qn, uint64_t *val)
-+{
-+    switch (qn->kind) {
-+    case QNUM_I64:
-+        if (qn->u.i64 < 0) {
-+            return false;
-+        }
-+        *val =3D qn->u.i64;
-+        return true;
-+    case QNUM_U64:
-+        *val =3D qn->u.u64;
-+        return true;
-+    case QNUM_DOUBLE:
-+        return false;
-+    }
-+
-+    assert(0);
-+    return false;
-+}
-+
-+/**
-+ * qnum_get_uint(): Get an unsigned integer from the number
-+ *
-+ * assert() on failure.
-+ */
-+uint64_t qnum_get_uint(const QNum *qn)
-+{
-+    uint64_t val;
-+    bool success =3D qnum_get_try_uint(qn, &val);
-+    assert(success);
-+    return val;
-+}
-+
-+/**
-  * qnum_get_double(): Get a float representation of the number
-  *
-  * qnum_get_double() loses precision for integers beyond 53 bits.
-@@ -92,6 +152,8 @@ double qnum_get_double(QNum *qn)
-     switch (qn->kind) {
-     case QNUM_I64:
-         return qn->u.i64;
-+    case QNUM_U64:
-+        return qn->u.u64;
-     case QNUM_DOUBLE:
-         return qn->u.dbl;
+     case JSON_FLOAT:
+diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+index f0a89f7..53f2275 100644
+--- a/tests/check-qjson.c
++++ b/tests/check-qjson.c
+@@ -906,6 +906,49 @@ static void simple_number(void)
      }
-@@ -107,6 +169,8 @@ char *qnum_to_string(QNum *qn)
-     switch (qn->kind) {
-     case QNUM_I64:
-         return g_strdup_printf("%" PRId64, qn->u.i64);
-+    case QNUM_U64:
-+        return g_strdup_printf("%" PRIu64, qn->u.u64);
-     case QNUM_DOUBLE:
-         /* FIXME: snprintf() is locale dependent; but JSON requires
-          * numbers to be formatted as if in the C locale. Dependence
-diff --git a/tests/check-qnum.c b/tests/check-qnum.c
-index da7e0b0..d702d5d 100644
---- a/tests/check-qnum.c
-+++ b/tests/check-qnum.c
-@@ -39,6 +39,21 @@ static void qnum_from_int_test(void)
-     QDECREF(qn);
  }
 =20
-+static void qnum_from_uint_test(void)
++static void large_number(void)
 +{
-+    QNum *qn;
-+    const uint64_t value =3D UINT64_MAX;
-+
-+    qn =3D qnum_from_uint(value);
-+    g_assert(qn !=3D NULL);
-+    g_assert_cmpint(qn->kind, =3D=3D, QNUM_U64);
-+    g_assert(qn->u.u64 =3D=3D value);
-+    g_assert(qn->base.refcnt =3D=3D 1);
-+    g_assert(qobject_type(QOBJECT(qn)) =3D=3D QTYPE_QNUM);
-+
-+    QDECREF(qn);
-+}
-+
- static void qnum_from_double_test(void)
- {
-     QNum *qn;
-@@ -76,6 +91,37 @@ static void qnum_get_int_test(void)
-     QDECREF(qn);
- }
-=20
-+static void qnum_get_uint_test(void)
-+{
-+    QNum *qn;
-+    const int value =3D 123456;
++    const char *maxu64 =3D "18446744073709551615"; /* 2^64-1 */
++    const char *gtu64 =3D "18446744073709551616"; /* 2^64 */
++    const char *lti64 =3D "-9223372036854775809"; /* -2^63 - 1 */
++    QNum *qnum;
++    QString *str;
 +    uint64_t val;
 +    int64_t ival;
 +
-+    qn =3D qnum_from_uint(value);
-+    g_assert(qnum_get_try_uint(qn, &val));
-+    g_assert_cmpuint(val, =3D=3D, value);
-+    QDECREF(qn);
++    qnum =3D qobject_to_qnum(qobject_from_json(maxu64, &error_abort));
++    g_assert(qnum);
++    g_assert_cmpuint(qnum_get_uint(qnum), =3D=3D, 18446744073709551615U)=
+;
++    g_assert(!qnum_get_try_int(qnum, &ival));
 +
-+    qn =3D qnum_from_int(value);
-+    g_assert(qnum_get_try_uint(qn, &val));
-+    g_assert_cmpuint(val, =3D=3D, value);
-+    QDECREF(qn);
++    str =3D qobject_to_json(QOBJECT(qnum));
++    g_assert_cmpstr(qstring_get_str(str), =3D=3D, maxu64);
++    QDECREF(str);
++    QDECREF(qnum);
 +
-+    /* invalid cases */
-+    qn =3D qnum_from_int(-1);
-+    g_assert(!qnum_get_try_uint(qn, &val));
-+    QDECREF(qn);
++    qnum =3D qobject_to_qnum(qobject_from_json(gtu64, &error_abort));
++    g_assert(qnum);
++    g_assert_cmpfloat(qnum_get_double(qnum), =3D=3D, 18446744073709552e3=
+);
++    g_assert(!qnum_get_try_uint(qnum, &val));
++    g_assert(!qnum_get_try_int(qnum, &ival));
 +
-+    qn =3D qnum_from_uint(-1ULL);
-+    g_assert(!qnum_get_try_int(qn, &ival));
-+    QDECREF(qn);
++    str =3D qobject_to_json(QOBJECT(qnum));
++    g_assert_cmpstr(qstring_get_str(str), =3D=3D, gtu64);
++    QDECREF(str);
++    QDECREF(qnum);
 +
-+    qn =3D qnum_from_double(0.42);
-+    g_assert(!qnum_get_try_uint(qn, &val));
-+    QDECREF(qn);
++    qnum =3D qobject_to_qnum(qobject_from_json(lti64, &error_abort));
++    g_assert(qnum);
++    g_assert_cmpfloat(qnum_get_double(qnum), =3D=3D, -92233720368547758e=
+2);
++    g_assert(!qnum_get_try_uint(qnum, &val));
++    g_assert(!qnum_get_try_int(qnum, &ival));
++
++    str =3D qobject_to_json(QOBJECT(qnum));
++    g_assert_cmpstr(qstring_get_str(str), =3D=3D, "-9223372036854775808"=
+);
++    QDECREF(str);
++    QDECREF(qnum);
 +}
 +
- static void qobject_to_qnum_test(void)
+ static void float_number(void)
  {
-     QNum *qn;
-@@ -112,9 +158,11 @@ int main(int argc, char **argv)
-     g_test_init(&argc, &argv, NULL);
+     int i;
+@@ -1475,6 +1518,7 @@ int main(int argc, char **argv)
+     g_test_add_func("/literals/string/vararg", vararg_string);
 =20
-     g_test_add_func("/qnum/from_int", qnum_from_int_test);
-+    g_test_add_func("/qnum/from_uint", qnum_from_uint_test);
-     g_test_add_func("/qnum/from_double", qnum_from_double_test);
-     g_test_add_func("/qnum/from_int64", qnum_from_int64_test);
-     g_test_add_func("/qnum/get_int", qnum_get_int_test);
-+    g_test_add_func("/qnum/get_uint", qnum_get_uint_test);
-     g_test_add_func("/qnum/to_qnum", qobject_to_qnum_test);
-     g_test_add_func("/qnum/to_string", qnum_to_string_test);
+     g_test_add_func("/literals/number/simple", simple_number);
++    g_test_add_func("/literals/number/large", large_number);
+     g_test_add_func("/literals/number/float", float_number);
+     g_test_add_func("/literals/number/vararg", vararg_number);
 =20
 --=20
 2.7.5
