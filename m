@@ -1,38 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45254)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dJC4L-00057z-O1
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:02:47 -0400
+	(envelope-from <armbru@redhat.com>) id 1dJCHi-0008T6-QQ
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:16:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dJC4G-0006aq-RK
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:02:45 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49329)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1dJC4G-0006aX-HO
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:02:40 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v594x8Gt004056
-	for <qemu-devel@nongnu.org>; Fri, 9 Jun 2017 01:02:38 -0400
-Received: from e23smtp05.au.ibm.com (e23smtp05.au.ibm.com [202.81.31.147])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2aygma9edj-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 09 Jun 2017 01:02:38 -0400
-Received: from localhost
-	by e23smtp05.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Fri, 9 Jun 2017 15:02:35 +1000
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <20170609020141.GB26521@umbus.fritz.box>
-References: <20170608063608.17855-1-nikunj@linux.vnet.ibm.com>
-	<20170609020141.GB26521@umbus.fritz.box>
-Date: Fri, 09 Jun 2017 10:32:25 +0530
+	(envelope-from <armbru@redhat.com>) id 1dJCHe-0002qI-Ry
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:16:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37807)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dJCHe-0002q1-J0
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:16:30 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <2b2311b1b070a0b03973e39deccf4682de4a6cd4.1496686997.git.alistair.francis@xilinx.com>
+	<CAJ+F1CLuPkWjG3Hn8hfaxTApn6+ouqh5nJZNWSQYX1C3_HRFqA@mail.gmail.com>
+	<e340cdb9-3c97-8624-81d9-f7888f819a68@amsat.org>
+	<CAKmqyKOOhu7iKuW4naNi0+7cwayLaftkPf=gS7uBakMvKavxVQ@mail.gmail.com>
+	<270686d0-1ca8-965f-a14a-397f45616deb@redhat.com>
+	<87shjc2rkb.fsf@dusky.pond.sub.org>
+	<CAKmqyKMJ8ZgTPtEj73pBDU+mf578tubKPUPsP4mTD8veX90K-w@mail.gmail.com>
+	<878tl3kodm.fsf@dusky.pond.sub.org>
+	<CAKmqyKP3S7mBwQzC0yV4MpQddcKvGXtXrPyY68X7t62YwLqy3g@mail.gmail.com>
+	<871squz7l8.fsf@dusky.pond.sub.org>
+	<CAKmqyKMQyYObpsFd6hGe3zjPSJRKyWZqMGfuFSMJULzmvoD_eA@mail.gmail.com>
+Date: Fri, 09 Jun 2017 07:16:24 +0200
+In-Reply-To: <CAKmqyKMQyYObpsFd6hGe3zjPSJRKyWZqMGfuFSMJULzmvoD_eA@mail.gmail.com>
+	(Alistair Francis's message of "Thu, 8 Jun 2017 12:57:38 -0700")
+Message-ID: <87efutd9lj.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Message-Id: <87mv9heota.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH RFC] spapr: ignore interrupts during reset
- state
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] char-socket: Don't report TCP
+ socket waiting as an error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,131 +37,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, rth@twiddle.net, alex.bennee@linaro.org, bharata@linux.vnet.ibm.com
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?utf-8?Q?Marc-Andr?= =?utf-8?Q?=C3=A9?= Lureau <marcandre.lureau@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-David Gibson <david@gibson.dropbear.id.au> writes:
+Alistair Francis <alistair.francis@xilinx.com> writes:
 
-> On Thu, Jun 08, 2017 at 12:06:08PM +0530, Nikunj A Dadhania wrote:
->> Rebooting a SMP TCG guest is broken for both single/multi threaded TCG.
+> On Thu, Jun 8, 2017 at 10:56 AM, Markus Armbruster <armbru@redhat.com> wrote:
+>> Alistair Francis <alistair.francis@xilinx.com> writes:
+>>
+>>> On Wed, Jun 7, 2017 at 11:03 PM, Markus Armbruster <armbru@redhat.com> wrote:
+>>>> Alistair Francis <alistair.francis@xilinx.com> writes:
+>>>>
+>>>>> On Wed, Jun 7, 2017 at 12:19 AM, Markus Armbruster <armbru@redhat.com> wrote:
+>>>>>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>>>>>>
+>>>>>>> On 06/06/2017 18:30, Alistair Francis wrote:
+>>>>>>>>>
+>>>>>>>>> This is somehow confusing. I don't think it is worth having another
+>>>>>>>>> qemu_log_stderr() function rather than using error_report() but this very
+>>>>>>>>> call might deserve a comment explaining this unusual use. What do you think?
+>>>>>>>>
+>>>>>>>> The problem with stderr is that this isn't an error. Some uses of QEMU
+>>>>>>>> (inside Eclipse for example) flag everything printed on stderr as red
+>>>>>>>> which confuses users that they are seeing an error when they really
+>>>>>>>> aren't.
+>>>>>>>
+>>>>>>> But they are wrong.
+>>>>>>
+>>>>>> Concur.  We also print warnings and informational messages to stderr.
+>>>>>>
+>>>>>> We should make errors easy to recognize.  Fortunately, error_report()
+>>>>>> prints errors to stderr in a rigid format.  Unfortunately, error
+>>>>>> messages bypassing error_report() still exist in places.  We suck.
+>>>>>>
+>>>>>> The format is
+>>>>>>
+>>>>>>     timestamp-if-enabled progname ':' location message
+>>>>>>
+>>>>>> timestamp-if-enabled is normally empty.  With -msg timestamp=on, it's
+>>>>>> the current time in ISO 8601 format, followed by a space.
+>>>>>>
+>>>>>> progname is the program name (main()'s argv[0]).
+>>>>>>
+>>>>>> location is either empty, or a reference to the command line or a
+>>>>>> configuration file.
+>>>>>>
+>>>>>> See error_vreport() for details.
+>>>>>
+>>>>> Ok, but this isn't an error, it's more information. So it sounds like
+>>>>> we should still print to stderr but not print in the format described
+>>>>> above?
+>>>>
+>>>> Yes.
+>>>>
+>>>> I explained the error message format to show how to distinguish actual
+>>>> errors from other stuff.
+>>>
+>>> Sorry, I should have been more clear. I meant we should not use the
+>>> error_report() function here. I don't think we have any
+>>> warning_report() function though, is that something worth having?
+>>
+>> So far we simply use error_printf() for such things.
+>>
+>> A function to report a warning would let us report them more uniformly,
+>> but only if we actually use it uniformly.  In other words, adding one
+>> without also converting the existing warnings to use it would create yet
+>> another open-ended incremental conversion job.  Are we up to it?
 >
-> Ouch.  When exactly did this happen?
-
-Broken since long
-
-> I know that smp boot used to work under TCG, albeit very slowly.
-
-SMP boot works, its the reboot issued from the guest doesn't boot and
-crashes in SLOF.
-
->> When reset happens, all the CPUs are in halted state. First CPU is brought out
->> of reset and secondary CPUs would be initialized by the guest kernel using a
->> rtas call start-cpu.
->> 
->> However, in case of TCG, decrementer interrupts keep on coming and waking the
->> secondary CPUs up.
+> Yeah! Why not. I am happy to give it a shot changing some errors to warnings.
 >
-> Ok.. how is that happening given that the secondary CPUs should have
-> MSR[EE] == 0?
+> First thing though, what is the format for printing warnings?
 
-Basically, the CPU is in halted condition and has_work() does not check
-for MSR_EE in that case. But I am not sure if checking MSR_EE is
-sufficient, as the CPU does go to halted state (idle) while running as
-well.
+We make one up.
 
-static bool cpu_has_work_POWER8(CPUState *cs)
-{
-    PowerPCCPU *cpu = POWERPC_CPU(cs);
-    CPUPPCState *env = &cpu->env;
+For what it's worth, gcc uses the same format as for errors with the
+message prefixed either by "warning: " or by "error: ".  Also common is
+prefixing warnings, but not errors.
 
-    if (cs->halted) {
-       [ SNIP ]
-       /* Does not check for msr_ee */
-    } else {
-        return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
-    }
-}
-
->
->> These secondary CPUs would see the decrementer interrupt pending, which makes
->> cpu::has_work() to bring them out of wait loop and start executing
->> tcg_exec_cpu().
->> 
->> The problem with this is all the CPUs wake up and start booting SLOF image,
->> causing the following exception(4 CPUs TCG VM):
->
-> [snip]
->> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
->> index d10808d..eb88bcb 100644
->> --- a/target/ppc/cpu.h
->> +++ b/target/ppc/cpu.h
->> @@ -1013,6 +1013,13 @@ struct CPUPPCState {
->>      int access_type; /* when a memory exception occurs, the access
->>                          type is stored here */
->>  
->> +    /* CPU in reset, shouldn't process any interrupts.
->> +     *
->> +     * Decrementer interrupts in TCG can still wake the CPU up. Make sure that
->> +     * when this variable is set, cpu_has_work_* should return false.
->> +     */
->> +    int in_reset;
->
-> So I'd really rather not add another flag to the cpu structure,
-> especially since we'd then need to migrate it as well.
-
-I agree, Bharata and I did discuss about the migrate case. This patch
-was to highlight the exact issue.
-
-> I'm pretty sure there should be a way to inhibit the unwanted
-> interrupts using existing mechanisms.
-
-One of the thing that I had observed was msr had just MSR_SF bit set
-during the reset case, we can test for that maybe.
-
-The below works as well:
-
-+        if ((env->msr & ~(1ull << MSR_SF)) == 0) {
-+            return false;
-+        }
-
->> +
->>      CPU_COMMON
->>  
->>      /* MMU context - only relevant for full system emulation */
->> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
->> index 56a0ab2..64f4348 100644
->> --- a/target/ppc/translate_init.c
->> +++ b/target/ppc/translate_init.c
->> @@ -8561,6 +8561,9 @@ static bool cpu_has_work_POWER7(CPUState *cs)
->>      CPUPPCState *env = &cpu->env;
->>  
->>      if (cs->halted) {
->> +        if (env->in_reset) {
->> +            return false;
->> +        }
->>          if (!(cs->interrupt_request & CPU_INTERRUPT_HARD)) {
->>              return false;
->>          }
->> @@ -8718,6 +8721,9 @@ static bool cpu_has_work_POWER8(CPUState *cs)
->>      CPUPPCState *env = &cpu->env;
->>  
->>      if (cs->halted) {
->> +        if (env->in_reset) {
->> +            return false;
->> +        }
->>          if (!(cs->interrupt_request & CPU_INTERRUPT_HARD)) {
->>              return false;
->>          }
->> @@ -8899,6 +8905,9 @@ static bool cpu_has_work_POWER9(CPUState *cs)
->>      CPUPPCState *env = &cpu->env;
->>  
->>      if (cs->halted) {
->> +        if (env->in_reset) {
->> +            return false;
->> +        }
->>          if (!(cs->interrupt_request & CPU_INTERRUPT_HARD)) {
->>              return false;
->>          }
-
-Regards
-Nikunj
+We already have several error_report() calls with messages that start
+with (a variation of) "warning: ".
