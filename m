@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34040)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Chris.Friesen@windriver.com>) id 1dJQ5U-0005Pw-T6
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 16:00:53 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dJQ62-0005kB-CN
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 16:01:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Chris.Friesen@windriver.com>) id 1dJQ5R-0000cb-SF
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 16:00:53 -0400
-Received: from mail1.windriver.com ([147.11.146.13]:43631)
+	(envelope-from <kraxel@redhat.com>) id 1dJQ5z-0000tu-Bt
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 16:01:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34758)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Chris.Friesen@windriver.com>)
-	id 1dJQ5R-0000c2-Ji
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 16:00:49 -0400
-Received: from ALA-HCA.corp.ad.wrs.com (ala-hca.corp.ad.wrs.com
-	[147.11.189.40])
-	by mail1.windriver.com (8.15.2/8.15.1) with ESMTPS id v59K0im8017781
-	(version=TLSv1 cipher=AES128-SHA bits=128 verify=FAIL)
-	for <qemu-devel@nongnu.org>; Fri, 9 Jun 2017 13:00:44 -0700 (PDT)
-Message-ID: <593AFE69.7090206@windriver.com>
-Date: Fri, 9 Jun 2017 14:00:41 -0600
-From: Chris Friesen <chris.friesen@windriver.com>
-MIME-Version: 1.0
-References: <593AC202.5000404@windriver.com>
-In-Reply-To: <593AC202.5000404@windriver.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] call flow to hit get_pci_config_device() during
- live migration
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dJQ5z-0000sw-7D
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 16:01:23 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A16BC80F93
+	for <qemu-devel@nongnu.org>; Fri,  9 Jun 2017 20:01:21 +0000 (UTC)
+Message-ID: <1497038478.10080.1.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri, 09 Jun 2017 22:01:18 +0200
+In-Reply-To: <7a7647cd-3d7a-0b6f-0691-d656c9026f44@redhat.com>
+References: <20170608161013.17920-1-lersek@redhat.com>
+	<20170608204026-mutt-send-email-mst@kernel.org>
+	<1496951333.29761.5.camel@redhat.com>
+	<20170608224942-mutt-send-email-mst@kernel.org>
+	<7a7647cd-3d7a-0b6f-0691-d656c9026f44@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] q35/mch: implement extended TSEG sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,28 +36,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, qemu devel list <qemu-devel@nongnu.org>
 
-On 06/09/2017 09:42 AM, Chris Friesen wrote:
-> Hi,
->
-> I'm investigating an issue seen over a live migration from a modified
-> qemu-kvm-ev-2.3.0-31.el7_2.7.1 to a modified qemu-kvm-ev-2.6.0-28.el7_3.9.1.  We
-> hit an issue down in get_pci_config_device() that caused the migration to fail.
->
-> The qemu logs on the destination are included below.
->
-> I'm looking for some guidance on the call flow that leads to this function, and
-> the likely causes of the bad config data.  And if anyone can help me decode the
-> config data information in the log (cmask/wmask/wlcmask) and the logic of the
-> "bad config data" check I'd appreciate it.
+On Fri, 2017-06-09 at 13:40 +0200, Paolo Bonzini wrote:
+>=20
+> On 08/06/2017 21:55, Michael S. Tsirkin wrote:
+> > We don't have room anywhere in PCI config space. Laszlo makes
+> > argument
+> > why it's safe for this device based on spec but it's anyone's guess
+> > whether current and future software will follow spec.=C2=A0=C2=A0In sho=
+rt,
+> > going
+> > anywhere near the emulated device has a potential to break some
+> > drivers.
+>=20
+> There are no such drivers.=C2=A0=C2=A0The MCH and PCH are only touched by=
+ the
+> firmware, not by the OS.
 
-I think what I end up with is that byte 0x20 (ie 32) of the PCI config for the 
-virtio-blk device is 0 in the data coming over the wire, and 0xC in the local 
-copy.  Since cmask is 0xff we need to check all the bits in the byte, and both 
-wmask and w1cmask are 0 so the version on the wire and the local version should 
-be the same.
+Yea.  That is *exactly* the reason why I think simply using the 0x50
+offset probably works fine in practice even though I suspect on
+physical hardware it might be some undocumented register.  Much of the
+stuff in the host bridge pci config space is firmware territory, and we
+run qemu specific firmware *anyway*.
 
-Does that seem right?
-
-Chris
+cheers,
+  Gerd
