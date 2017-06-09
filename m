@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dJIsB-0004hD-2X
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 08:18:40 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dJJ3X-000833-Bn
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 08:30:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dJIs6-00040a-Vy
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 08:18:39 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170609100336.GJ26521@umbus.fritz.box> (David Gibson's message
-	of "Fri, 9 Jun 2017 20:03:36 +1000")
-References: <20170608144106.GG25805@umbus.fritz.box>
-	<20170609110748.00c8e419@nial.brq.redhat.com>
-	<20170609100336.GJ26521@umbus.fritz.box>
-Reply-To: quintela@redhat.com
-Date: Fri, 09 Jun 2017 14:18:32 +0200
-Message-ID: <87poed8icn.fsf@secure.mitica>
+	(envelope-from <mreitz@redhat.com>) id 1dJJ3U-00083x-8G
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 08:30:23 -0400
+References: <20170602112158.232757-1-vsementsov@virtuozzo.com>
+	<20170602112158.232757-10-vsementsov@virtuozzo.com>
+	<e45c747d-240d-4a31-8935-ae8c42af16ea@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <29231d6f-d033-593b-c47a-ca651b4efb8a@redhat.com>
+Date: Fri, 9 Jun 2017 14:29:53 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] unplug_request and migration
+In-Reply-To: <e45c747d-240d-4a31-8935-ae8c42af16ea@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ptkebCQXb9aTPDnjPu64PsrCqV8s0idTW"
+Subject: Re: [Qemu-devel] [PATCH v20 09/30] block/dirty-bitmap: fix comment
+ for BlockDirtyBitmap.disabled field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,77 +26,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, jdenemar@redhat.com
+To: John Snow <jsnow@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-David Gibson <david@gibson.dropbear.id.au> wrote:
-> On Fri, Jun 09, 2017 at 11:09:10AM +0200, Igor Mammedov wrote:
->> On Fri, 9 Jun 2017 00:41:06 +1000
->> David Gibson <david@gibson.dropbear.id.au> wrote:
->> 
->> > Hi Dave & Juan,
->> > 
->> > I'm hoping one of you can answer this.
->> > 
->> > I'm currently grappling with (amongst other things) a pseries machine
->> > racing a hot unplug operation with a migrate.  There's various issues
->> > with what interim state we need, and which bits of it need to be
->> > migrated that I'm still investigating.  But, there's a more general
->> > question that I'm guessing must have already been addressed for x86.
->> > 
->> > For any "soft" unplug device - i.e. using ->unplug_request, rather
->> > than ->unplug, giving a device_del command will just ask the guest
->> > nicely to release the device, with the completion of the unplug
->> > happening only if and when the guest indicates it's ready for the
->> > device to go away.  AFAICT, the device_del command will return as soon
->> > as the request is made, but if the guest is busy, the completion of
->> > the hot unplug could take arbitrarily long.
->> > 
->> > So, what happens if there's a migration in between the unplug_request
->> > and the guest completing the unplug?  How does libvirt (or whatever)
->> > know whether to include the device on the destination machine command
->> > line?
->> > 
->> 
->> looking at qdev_unplug():
->>     if (!migration_is_idle()) { 
->>         error_setg(errp, "device_del not allowed while migrating");
->>         return;
->>     }
->> 
->> so unplug request should fail if migration is in progress , it won't reach guest
->> and mgmt side will have to repeat request on migration completion.
->> 
->> But it's still possible to issue unplug request first and then start
->> migration,
->
-> Right, that's the case I'm interested in, not the other way around.
->
->> that's where race between DEVICE_DELETED and migration start (starting DST with
->> being unplugged device) occurs.
->> 
->> it could be possible:
->>  1: on unplug_request() set global flag that there is pending unplug and forbid
->>     migration until completion. But there is no guarantee that unplug will
->>     be completed nor a way to notice that it's failed/rejected by guest.
->>     I'm not sure how that could be solved.
->>  2: set per device pending_unplug flag and delay unplug event from guest
->>     until migration is completed if migration is in progress when unplug
->>     callback is called.
->>     mgmt will treat the case as usual migration, i.e. start dst with being
->>     unplugged device, and device will be removed on dst side on migration
->>     completion.
->>     (it should be generic solution as x86 is also affected), as place where
->>     to put this common logic I'd suggest hotplug_handler_unplug()
->
-> So.. it seems like the short version is that racing migration and
-> unplug is broken already.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ptkebCQXb9aTPDnjPu64PsrCqV8s0idTW
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com,
+ stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
+Message-ID: <29231d6f-d033-593b-c47a-ca651b4efb8a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v20 09/30] block/dirty-bitmap: fix comment
+ for BlockDirtyBitmap.disabled field
+References: <20170602112158.232757-1-vsementsov@virtuozzo.com>
+ <20170602112158.232757-10-vsementsov@virtuozzo.com>
+ <e45c747d-240d-4a31-8935-ae8c42af16ea@redhat.com>
+In-Reply-To: <e45c747d-240d-4a31-8935-ae8c42af16ea@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Which is unfortunate, but at least means I don't need to worry about
-> it particularly for Power.
+On 2017-06-02 23:02, John Snow wrote:
+>=20
+>=20
+> On 06/02/2017 07:21 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>=
 
-Yeap.  I think that when I put the patches (for 2.10) to disable
-hot[un]plug during migration, it was the 1st try to do something about
-it.
+>> ---
+>>  block/dirty-bitmap.c | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+>> index 90af37287f..f25428868c 100644
+>> --- a/block/dirty-bitmap.c
+>> +++ b/block/dirty-bitmap.c
+>> @@ -42,7 +42,8 @@ struct BdrvDirtyBitmap {
+>>      BdrvDirtyBitmap *successor; /* Anonymous child; implies frozen st=
+atus */
+>>      char *name;                 /* Optional non-empty unique ID */
+>>      int64_t size;               /* Size of the bitmap (Number of sect=
+ors) */
+>> -    bool disabled;              /* Bitmap is read-only */
+>> +    bool disabled;              /* Bitmap is disabled. It skips all w=
+rites to
+>> +                                   the device */
+>=20
+>=20
+> Or, "Bitmap is disabled. Writes to the device are ignored." or similar.=
 
-Later, Juan.
+
+I'd like "It ignores all writes to the device" the most. :-)
+
+("Writes are ignored" sounds a bit like they are ignored in general, not
+just by this bitmap; and "it skips" just sounds a bit weird.)
+
+> It's not very important.
+
+Discussing the non-important stuff is the most fun!
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+> Reviewed-by: John Snow <jsnow@redhat.com>
+>=20
+>>      int active_iterators;       /* How many iterators are active */
+>>      QLIST_ENTRY(BdrvDirtyBitmap) list;
+>>  };
+>>
+
+
+
+--ptkebCQXb9aTPDnjPu64PsrCqV8s0idTW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEvBAEBCAAZBQJZOpTBEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQHOH
+B/9/L9/279Dmek/mOItH/BzT/e4PQ1PxrmoSXTAVDKRW0zwykO9Gl8ym4QKe0k/8
+M4zlet15Uuds/9f6rPm59OnCuGJOajcvCZZcgKsd7EYpWCqaNdepvJ7mAKDwlOnn
+lgXBuBaYckrZYraYHqoKNUn/BBuqfaZSD7UOdjzIxiHW3daWz+QYiQKIg6elvnnr
+tkHtWkQfz1KQGApoL+9uQ4NBpqUfZAGgB1eRtgnBuMEBjn2/Z9XgyNIvAfHp0wG8
+vNMJJdL5k47tdqdzdlybN5HvbWQIYhzizW0Q24/QustKb0krZB8cPxcTkWV/dFWF
+EBnjfenuG9hClTTLvX5px89o
+=qHs/
+-----END PGP SIGNATURE-----
+
+--ptkebCQXb9aTPDnjPu64PsrCqV8s0idTW--
