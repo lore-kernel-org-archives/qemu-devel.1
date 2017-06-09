@@ -1,36 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dJCkn-0006TP-UP
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:46:38 -0400
+	(envelope-from <peterx@redhat.com>) id 1dJD44-0008MY-O0
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 02:06:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dJCki-0004s7-W8
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:46:38 -0400
-Received: from 8.mo6.mail-out.ovh.net ([178.33.42.204]:34926)
+	(envelope-from <peterx@redhat.com>) id 1dJD3y-0004L2-Dx
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 02:06:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55614)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dJCki-0004rY-Qn
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:46:32 -0400
-Received: from player787.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 50496DF065
-	for <qemu-devel@nongnu.org>; Fri,  9 Jun 2017 07:46:31 +0200 (CEST)
-References: <149692935202.12119.3614006195497745877.stgit@bahia>
-	<149692936183.12119.5013623492394505174.stgit@bahia>
-	<5022e1af-9b70-518a-ce61-cadc905e637f@kaod.org>
-	<20170608163207.45ba5618@bahia.ttt.fr.ibm.com>
-	<018ad85d-6b7f-53d9-e3dc-4a79fcc81767@kaod.org>
-	<20170608174559.053df142@bahia.ttt.fr.ibm.com>
-	<a5d61649-5e45-7e36-b5ac-06dbf14a71a3@kaod.org>
-	<20170608190041.79e55b43@bahia.ttt.fr.ibm.com>
-	<9fdf8493-625a-561f-ca07-e56a3bd797cf@kaod.org>
-	<20170609021059.GD26521@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <7986edb4-0fbb-2bac-d2d1-0de420149056@kaod.org>
-Date: Fri, 9 Jun 2017 07:46:26 +0200
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dJD3y-0004KG-4d
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 02:06:26 -0400
+Date: Fri, 9 Jun 2017 14:06:17 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170609060617.GJ3628@pxdev.xzpeter.org>
+References: <1496828798-27548-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170607094729eucas1p15097f154039365d5e135f92b72aad1bf@eucas1p1.samsung.com>
+	<1496828798-27548-8-git-send-email-a.perevalov@samsung.com>
+	<2a74d0cf-6be8-ddc8-23df-aa0d2edae902@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <20170609021059.GD26521@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 1/6] xics: introduce macros for ICP/ICS
- link properties
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <2a74d0cf-6be8-ddc8-23df-aa0d2edae902@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH v8 07/11] migration: add bitmap for copied
+ page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,84 +30,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, i.maximets@samsung.com
 
-On 06/09/2017 04:10 AM, David Gibson wrote:
-> On Thu, Jun 08, 2017 at 07:26:35PM +0200, C=E9dric Le Goater wrote:
->> On 06/08/2017 07:00 PM, Greg Kurz wrote:
->>> On Thu, 8 Jun 2017 18:08:44 +0200
->>> C=E9dric Le Goater <clg@kaod.org> wrote:
->>>
->>>>>>> FWIW, other people do that as well (see hw/i386/pc_q35.c for exam=
-ple).   =20
->>>>>>
->>>>>> well, I don't see the benefits of changing a string constant by a=20
->>>>>> define.=20
->>>>>> =20
->>>>>
->>>>> Improved semantics,  especially since the "xics" string appears in=20
->>>>> many places with different meanings.  =20
->>>>
->>>> ah ? If so, we should do a cleanup up. The code seems consistent fro=
-m=20
->>>> what I can see. xics is a general name for :
->>>>
->>>> 	'PowerPC interrupt controller (type 2)'=20
->>>>
->>>> and it is mostly used as a prefix. There are no "xics" object, only =
-a=20
->>>
->>> I'm only talking about "xics" as a property name actually:
->>>
->>> $ git grep '"xics"'
->>> hw/intc/xics.c:    obj =3D object_property_get_link(OBJECT(dev), "xic=
-s", &err);
->>> hw/intc/xics.c:    obj =3D object_property_get_link(OBJECT(dev), "xic=
-s", &err);
->>> hw/ppc/pnv.c:    object_property_add_const_link(OBJECT(&chip->psi), "=
-xics",
->>> hw/ppc/pnv.c:        object_property_add_const_link(OBJECT(pnv_core),=
- "xics",
->>> hw/ppc/pnv_core.c:    object_property_add_const_link(obj, "xics", OBJ=
-ECT(xi), &error_abort);
->>> hw/ppc/pnv_core.c:    xi =3D object_property_get_link(OBJECT(dev), "x=
-ics", &local_err);
->>> hw/ppc/pnv_psi.c:    obj =3D object_property_get_link(OBJECT(dev), "x=
-ics", &err);
->>> hw/ppc/pnv_psi.c:    object_property_add_const_link(OBJECT(ics), "xic=
-s", obj,  &error_abort);
->>> hw/ppc/spapr.c:    object_property_add_const_link(obj, "xics", OBJECT=
-(spapr), &error_abort);
->>> hw/ppc/spapr_cpu_core.c:    object_property_add_const_link(obj, "xics=
-", OBJECT(spapr), &error_abort);
->>>
->>> You have to read the code to know which ones are related.
->>
->> The "xics" property link always point to the same object :=20
->> the XICSFabric object which is the machine, spapr or pnv.=20
->>
->>> With this patch applied, it is mostly obvious, even for the newbie:
->>
->> ah. the goal is to know where in the code the link was set.=20
->> It can be even more complex with aliases.
->=20
-> There doesn't seem to be a strong convention about whether to use raw
-> property names or defines across qemu.  I'm not all that fussed either
-> way.
->=20
-> I do see one small advantage to use defines: if you make a typo, it
-> will probably result in a compile time error, whereas with a bare
-> string it won't show up until a runtime error.
+On Wed, Jun 07, 2017 at 05:13:00PM +0300, Alexey Perevalov wrote:
+> On 06/07/2017 12:46 PM, Alexey Perevalov wrote:
+> >This patch adds ability to track down already copied
+> >pages, it's necessary for calculation vCPU block time in
+> >postcopy migration feature, maybe for restore after
+> >postcopy migration failure.
+> >Also it's necessary to solve shared memory issue in
+> >postcopy livemigration. Information about copied pages
+> >will be transferred to the software virtual bridge
+> >(e.g. OVS-VSWITCHD), to avoid fallocate (unmap) for
+> >already copied pages. fallocate syscall is required for
+> >remmaped shared memory, due to remmaping itself blocks
+> >ioctl(UFFDIO_COPY, ioctl in this case will end with EEXIT
+> >error (struct page is exists after remmap).
+> >
+> >Bitmap is placed into RAMBlock as another postcopy/precopy
+> >related bitmaps. Helpers are in migration/ram.c, due to
+> >in this file is allowing to work with RAMBlock.
+> >
+> >Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> >---
+> >  include/exec/ram_addr.h |  2 ++
+> >  migration/ram.c         | 36 ++++++++++++++++++++++++++++++++++++
+> >  migration/ram.h         |  4 ++++
+> >  3 files changed, 42 insertions(+)
+> >
+> >diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+> >index 140efa8..6a3780b 100644
+> >--- a/include/exec/ram_addr.h
+> >+++ b/include/exec/ram_addr.h
+> >@@ -47,6 +47,8 @@ struct RAMBlock {
+> >       * of the postcopy phase
+> >       */
+> >      unsigned long *unsentmap;
+> >+    /* bitmap of already copied pages in postcopy */
+> >+    unsigned long *copiedmap;
+> >  };
+> >  static inline bool offset_in_ramblock(RAMBlock *b, ram_addr_t offset)
+> >diff --git a/migration/ram.c b/migration/ram.c
+> >index f387e9c..a7c0db4 100644
+> >--- a/migration/ram.c
+> >+++ b/migration/ram.c
+> >@@ -149,6 +149,25 @@ out:
+> >      return ret;
+> >  }
+> >+static unsigned long int get_copied_bit_offset(uint64_t addr, RAMBlock *rb)
+> >+{
+> >+    uint64_t addr_offset = addr - (uint64_t)(uintptr_t)rb->host;
+> >+    int page_shift = find_first_bit((unsigned long *)&rb->page_size,
+> >+                                    sizeof(rb->page_size));
+> >+
+> >+    return addr_offset >> page_shift;
+> >+}
+> >+
+> >+int test_copiedmap_by_addr(uint64_t addr, RAMBlock *rb)
+> >+{
+> >+    return test_bit(get_copied_bit_offset(addr, rb), rb->copiedmap);
+> >+}
+> >+
+> >+void set_copiedmap_by_addr(uint64_t addr, RAMBlock *rb)
+> >+{
+> >+    set_bit_atomic(get_copied_bit_offset(addr, rb), rb->copiedmap);
+> >+}
+> >+
+> >  /*
+> >   * An outstanding page request, on the source, having been received
+> >   * and queued
+> >@@ -1449,6 +1468,8 @@ static void ram_migration_cleanup(void *opaque)
+> >          block->bmap = NULL;
+> >          g_free(block->unsentmap);
+> >          block->unsentmap = NULL;
+> looks like it's wrong place, because copiedmap is living
+> on destination side, so maybe in qemu_ram_free
 
-ok. I can agree with that.
+Yes, and...
 
-> In this case, I intend to take the macro patch, mostly just on the
-> basis of avoiding further delays to rework the remaining patches.
+> >+        g_free(block->copiedmap);
+> >+        block->copiedmap = NULL;
+> >      }
+> >      XBZRLE_cache_lock();
+> >@@ -2517,6 +2538,14 @@ static int ram_load_postcopy(QEMUFile *f)
+> >      return ret;
+> >  }
+> >+static unsigned long get_copiedmap_size(RAMBlock *rb)
+> >+{
+> >+    unsigned long pages;
+> >+    pages = rb->max_length >> find_first_bit((unsigned long *)&rb->page_size,
+> >+                                             sizeof(rb->page_size));
+> >+    return pages;
+> >+}
+> >+
+> >  static int ram_load(QEMUFile *f, void *opaque, int version_id)
+> >  {
+> >      int flags = 0, ret = 0;
+> >@@ -2544,6 +2573,13 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+> >      rcu_read_lock();
+> >      if (postcopy_running) {
+> >+        RAMBlock *rb;
+> >+        RAMBLOCK_FOREACH(rb) {
+> >+            /* need for destination, bitmap_new calls
+> >+             * g_try_malloc0 and this function
+> >+             * Attempts to allocate @n_bytes, initialized to 0'sh */
+> >+            rb->copiedmap = bitmap_new(get_copiedmap_size(rb));
 
-But I don't think having two different defines is a good idea :=20
+... I'm not sure whether this is the right place to init the bitmap,
+since iiuc ram_load() can be entered multiple times?
 
-+#define ICP_PROP_XICS "xics"
-+#define ICS_PROP_XICS "xics"
+Also, I think we need the bitmap even before the first page we send
+during precopy, right?
 
-C.
+I would think loadvm_postcopy_handle_advise() somewhere proper: that
+is before the first page is sent, and also when we are there it means
+source wants to do postcopy finally.
+
+Thanks,
+
+> >+        }
+> >          ret = ram_load_postcopy(f);
+> >      }
+> >diff --git a/migration/ram.h b/migration/ram.h
+> >index c9563d1..1f32824 100644
+> >--- a/migration/ram.h
+> >+++ b/migration/ram.h
+> >@@ -67,4 +67,8 @@ int ram_discard_range(const char *block_name, uint64_t start, size_t length);
+> >  int ram_postcopy_incoming_init(MigrationIncomingState *mis);
+> >  void ram_handle_compressed(void *host, uint8_t ch, uint64_t size);
+> >+
+> >+int test_copiedmap_by_addr(uint64_t addr, RAMBlock *rb);
+> >+void set_copiedmap_by_addr(uint64_t addr, RAMBlock *rb);
+> >+
+> >  #endif
+> 
+> 
+> -- 
+> Best regards,
+> Alexey Perevalov
+
+-- 
+Peter Xu
