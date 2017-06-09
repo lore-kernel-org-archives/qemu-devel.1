@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dJJG7-0004YX-Jf
+	(envelope-from <jcody@redhat.com>) id 1dJJG7-0004YS-H1
 	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 08:43:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dJJG6-0003d0-OG
+	(envelope-from <jcody@redhat.com>) id 1dJJG6-0003cr-N9
 	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 08:43:23 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Fri,  9 Jun 2017 08:43:12 -0400
-Message-Id: <20170609124313.8026-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL 0/1] Block patches
+Date: Fri,  9 Jun 2017 08:43:13 -0400
+Message-Id: <20170609124313.8026-2-jcody@redhat.com>
+In-Reply-To: <20170609124313.8026-1-jcody@redhat.com>
+References: <20170609124313.8026-1-jcody@redhat.com>
+Subject: [Qemu-devel] [PULL 1/1] block/gluster.c: Handle
+ qdict_array_entries() failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,27 +23,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com
 
-The following changes since commit 64175afc695c0672876fbbfc31b299c86d562cb4:
+From: Peter Maydell <peter.maydell@linaro.org>
 
-  arm_gicv3: Fix ICC_BPR1 reset value when EL3 not implemented (2017-06-07 17:21:44 +0100)
+In qemu_gluster_parse_json(), the call to qdict_array_entries()
+could return a negative error code, which we were ignoring
+because we assigned the result to an unsigned variable.
+Fix this by using the 'int' type instead, which matches the
+return type of qdict_array_entries() and also the type
+we use for the loop enumeration variable 'i'.
 
-are available in the git repository at:
+(Spotted by Coverity, CID 1360960.)
 
-  git://github.com/codyprime/qemu-kvm-jtc.git tags/block-pull-request
-
-for you to fetch changes up to 56faeb9bb6872b3f926b3b3e0452a70beea10af2:
-
-  block/gluster.c: Handle qdict_array_entries() failure (2017-06-09 08:41:29 -0400)
-
-----------------------------------------------------------------
-Gluster patch
-----------------------------------------------------------------
-
-Peter Maydell (1):
-  block/gluster.c: Handle qdict_array_entries() failure
-
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Jeff Cody <jcody@redhat.com>
+Message-id: 1496682098-1540-1-git-send-email-peter.maydell@linaro.org
+Signed-off-by: Jeff Cody <jcody@redhat.com>
+---
  block/gluster.c | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)
 
+diff --git a/block/gluster.c b/block/gluster.c
+index 031596a..addceed 100644
+--- a/block/gluster.c
++++ b/block/gluster.c
+@@ -493,8 +493,7 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+     Error *local_err = NULL;
+     char *str = NULL;
+     const char *ptr;
+-    size_t num_servers;
+-    int i, type;
++    int i, type, num_servers;
+ 
+     /* create opts info from runtime_json_opts list */
+     opts = qemu_opts_create(&runtime_json_opts, NULL, 0, &error_abort);
 -- 
 2.9.3
