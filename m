@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dJLvS-0001U0-Oi
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 11:34:15 -0400
+	(envelope-from <armbru@redhat.com>) id 1dJLw4-0001pk-G2
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 11:34:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dJLvO-0004HK-19
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 11:34:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52926)
+	(envelope-from <armbru@redhat.com>) id 1dJLvz-0004h8-Jy
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 11:34:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51220)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dJLvN-0004Gp-R3
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 11:34:09 -0400
-Date: Fri, 9 Jun 2017 12:34:02 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170609153402.GR5016@thinpad.lan.raisama.net>
-References: <20170609151615.2589-1-stefanha@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dJLvz-0004gt-Dy
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 11:34:47 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170609133337.31183-1-marcandre.lureau@redhat.com>
+	<650896fb-d42b-3ce7-8660-4c1275a5e360@redhat.com>
+Date: Fri, 09 Jun 2017 17:34:42 +0200
+In-Reply-To: <650896fb-d42b-3ce7-8660-4c1275a5e360@redhat.com> (Eric Blake's
+	message of "Fri, 9 Jun 2017 09:58:37 -0500")
+Message-ID: <87wp8lb2el.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170609151615.2589-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/i386: fix nvdimm check error path
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] tests: check-qom-proplist: fix leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,45 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, Haozhong Zhang <haozhong.zhang@intel.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
-On Fri, Jun 09, 2017 at 04:16:15PM +0100, Stefan Hajnoczi wrote:
-> Commit e987c37aee1752177906847630d32477da57e705 ("hw/i386: check if
-> nvdimm is enabled before plugging") introduced a check to reject nvdimm
-> hotplug if -machine pc,nvdimm=on was not given.
-> 
-> This check executes after pc_dimm_memory_plug() has already completed
-> and does not reverse the effect of this function in the case of failure.
-> 
-> Perform the check before calling pc_dimm_memory_plug().  This fixes the
-> following abort:
-> 
->   $ qemu -M accel=kvm -m 1G,slots=4,maxmem=8G \
->          -object memory-backend-file,id=mem1,share=on,mem-path=nvdimm.dat,size=1G
->   (qemu) device_add nvdimm,memdev=mem1
->   nvdimm is not enabled: missing 'nvdimm' in '-M'
->   (qemu) device_add nvdimm,memdev=mem1
->   Core dumped
-> 
-> The backtrace is:
-> 
->   #0  0x00007fffdb5b191f in raise () at /lib64/libc.so.6
->   #1  0x00007fffdb5b351a in abort () at /lib64/libc.so.6
->   #2  0x00007fffdb5a9da7 in __assert_fail_base () at /lib64/libc.so.6
->   #3  0x00007fffdb5a9e52 in  () at /lib64/libc.so.6
->   #4  0x000055555577a5fa in qemu_ram_set_idstr (new_block=0x555556747a00, name=<optimized out>, dev=dev@entry=0x555556705590) at qemu/exec.c:1709
->   #5  0x0000555555a0fe86 in vmstate_register_ram (mr=mr@entry=0x55555673a0e0, dev=dev@entry=0x555556705590) at migration/savevm.c:2293
->   #6  0x0000555555965088 in pc_dimm_memory_plug (dev=dev@entry=0x555556705590, hpms=hpms@entry=0x5555566bb0e0, mr=mr@entry=0x555556705630, align=<optimized out>, errp=errp@entry=0x7fffffffc660)
->       at hw/mem/pc-dimm.c:110
->   #7  0x000055555581d89b in pc_dimm_plug (errp=0x7fffffffc6c0, dev=0x555556705590, hotplug_dev=<optimized out>) at qemu/hw/i386/pc.c:1713
->   #8  0x000055555581d89b in pc_machine_device_plug_cb (hotplug_dev=<optimized out>, dev=0x555556705590, errp=0x7fffffffc6c0) at qemu/hw/i386/pc.c:2004
->   #9  0x0000555555914da6 in device_set_realized (obj=<optimized out>, value=<optimized out>, errp=0x7fffffffc7e8) at hw/core/qdev.c:926
-> 
-> Cc: Haozhong Zhang <haozhong.zhang@intel.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Eric Blake <eblake@redhat.com> writes:
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> On 06/09/2017 08:33 AM, Marc-Andr=C3=A9 Lureau wrote:
+>> user_creatable_add_opts() returns a reference (the other reference is
+>> for the root parent/child link).
+>>=20
+>> Leak introduced in commit a1af255f065cc.
+>>=20
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> ---
+>>  tests/check-qom-proplist.c | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>=20
+>> diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
+>> index 8e432e9ab6..a3cd7ab29f 100644
+>> --- a/tests/check-qom-proplist.c
+>> +++ b/tests/check-qom-proplist.c
+>> @@ -428,6 +428,8 @@ static void test_dummy_createcmdl(void)
+>>      g_assert(err =3D=3D NULL);
+>>      error_free(err);
+>>=20=20
+>> +    object_unref(OBJECT(dobj));
+>
+> This should be spelled QDECREF(dobj);
 
--- 
-Eduardo
+Caution, this is object_unref(), not qobject_decref().
+
+We suck at naming.
+
+> (Hmm - maybe scripts/coccinelle/qobject.cocci should be taught this
+> cleanup pattern...)
