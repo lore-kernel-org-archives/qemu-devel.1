@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dJFLs-0005Pb-Fc
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 04:33:05 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dJFMn-0006AA-OS
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 04:34:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dJFLp-0008V8-4b
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 04:33:04 -0400
-Received: from lhrrgout.huawei.com ([194.213.3.17]:13592)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dJFLo-0008TO-Mn
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 04:33:01 -0400
-References: <1494405683-20877-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1494405683-20877-4-git-send-email-pradeep.jagadeesh@huawei.com>
-	<20170511095022.2478c784@bahia.lan>
-	<d2ad9283-a7d5-50d4-4deb-4f604d2d16e5@huawei.com>
-	<20170608162000.30f889d6@bahia.ttt.fr.ibm.com>
-From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-Message-ID: <623914a0-7c5a-1bdb-aeb6-f8a7fadcb9a7@huawei.com>
-Date: Fri, 9 Jun 2017 10:32:46 +0200
+	(envelope-from <stefanha@gmail.com>) id 1dJFMk-0000kr-GR
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 04:34:01 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:36609)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dJFMk-0000jJ-9C
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 04:33:58 -0400
+Received: by mail-wm0-x229.google.com with SMTP id 7so151891264wmo.1
+	for <qemu-devel@nongnu.org>; Fri, 09 Jun 2017 01:33:56 -0700 (PDT)
+Date: Fri, 9 Jun 2017 09:33:53 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170609083352.GA25859@stefanha-x1.localdomain>
+References: <1496957498-17127-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+	<149697539488.2157.11696332117845784842@84b42461e25a>
 MIME-Version: 1.0
-In-Reply-To: <20170608162000.30f889d6@bahia.ttt.fr.ibm.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 3/4] qmp: refactor duplicate code
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="bp/iNruPH9dso1Pn"
+Content-Disposition: inline
+In-Reply-To: <149697539488.2157.11696332117845784842@84b42461e25a>
+Subject: Re: [Qemu-devel] [PATCH] Add manpage for QEMU Backup Tool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,244 +30,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+To: chugh.ishani@research.iiit.ac.in
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, famz@redhat.com, stefanha@redhat.com
 
-On 6/8/2017 4:20 PM, Greg Kurz wrote:
-> On Fri, 12 May 2017 10:03:02 +0200
-> Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com> wrote:
->
->> On 5/11/2017 9:50 AM, Greg Kurz wrote:
->>> On Wed, 10 May 2017 04:41:22 -0400
->>> Pradeep Jagadeesh <pradeepkiruvale@gmail.com> wrote:
->>>
->>>> This patch factor out the duplicate qmp throttle interface code
->>>> that was present in both block and fsdev device files.
->>>>
->>>
->>> There isn't any duplicated code at this stage since you have changed the
->>> patch ordering.
->>>
->>> Also, this patch is factoring out several things:
->>> - factoring code out of qmp_block_set_io_throttle()
->>> - factoring code out of hmp_block_set_io_throttle()
->>> So I'm not sure the patch title is quite right either.
->>>
->>> This seems to be the same in patch 4: it only mentions QMP even though
->>> it adds QMP and HMP interfaces. Maybe you should change this part of
->>> the series.
->>>
->>> A patch to introduce the full QMP interface, including the associated
->>> code refactoring (whose need would then be obvious). And a similar patch
->>> for the HMP interface.
->> But without hmp functionalities the qmp does not work. So, I just kept
->> both together.
->
-> This sounds weird... I would rather expect HMP to depend on QMP, not the
-> contrary.
->
-> Anyway, looking at this patch I still see two different things which
-> deserve their own patch and appropriate description.
 
-OK, I can create different patches.
+--bp/iNruPH9dso1Pn
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Regards,
-Pradeep
+On Thu, Jun 08, 2017 at 07:29:55PM -0700, no-reply@patchew.org wrote:
+> === OUTPUT BEGIN ===
+> Checking PATCH 1/1: Add manpage for QEMU Backup Tool...
+> ERROR: trailing whitespace
+> #28: FILE: contrib/backup/qemu-backup.texi:1:
+> +                   $
 
->
->>>
->>>> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
->>>> ---
->>>>  blockdev.c                      | 53 +++-------------------------------------
->>>>  hmp.c                           | 21 +++++++++++-----
->>>>  include/qemu/throttle-options.h |  2 ++
->>>>  util/throttle-options.c         | 54 +++++++++++++++++++++++++++++++++++++++++
->>>>  4 files changed, 74 insertions(+), 56 deletions(-)
->>>>
->>>> diff --git a/blockdev.c b/blockdev.c
->>>> index a0eb2ed..a55f6be 100644
->>>> --- a/blockdev.c
->>>> +++ b/blockdev.c
->>>> @@ -2593,6 +2593,7 @@ void qmp_block_set_io_throttle(BlockIOThrottle *arg, Error **errp)
->>>>      BlockDriverState *bs;
->>>>      BlockBackend *blk;
->>>>      AioContext *aio_context;
->>>> +    IOThrottle *iothrottle;
->>>>
->>>>      blk = qmp_get_blk(arg->has_device ? arg->device : NULL,
->>>>                        arg->has_id ? arg->id : NULL,
->>>> @@ -2610,56 +2611,8 @@ void qmp_block_set_io_throttle(BlockIOThrottle *arg, Error **errp)
->>>>          goto out;
->>>>      }
->>>>
->>>> -    throttle_config_init(&cfg);
->>>> -    cfg.buckets[THROTTLE_BPS_TOTAL].avg = arg->bps;
->>>> -    cfg.buckets[THROTTLE_BPS_READ].avg  = arg->bps_rd;
->>>> -    cfg.buckets[THROTTLE_BPS_WRITE].avg = arg->bps_wr;
->>>> -
->>>> -    cfg.buckets[THROTTLE_OPS_TOTAL].avg = arg->iops;
->>>> -    cfg.buckets[THROTTLE_OPS_READ].avg  = arg->iops_rd;
->>>> -    cfg.buckets[THROTTLE_OPS_WRITE].avg = arg->iops_wr;
->>>> -
->>>> -    if (arg->has_bps_max) {
->>>> -        cfg.buckets[THROTTLE_BPS_TOTAL].max = arg->bps_max;
->>>> -    }
->>>> -    if (arg->has_bps_rd_max) {
->>>> -        cfg.buckets[THROTTLE_BPS_READ].max = arg->bps_rd_max;
->>>> -    }
->>>> -    if (arg->has_bps_wr_max) {
->>>> -        cfg.buckets[THROTTLE_BPS_WRITE].max = arg->bps_wr_max;
->>>> -    }
->>>> -    if (arg->has_iops_max) {
->>>> -        cfg.buckets[THROTTLE_OPS_TOTAL].max = arg->iops_max;
->>>> -    }
->>>> -    if (arg->has_iops_rd_max) {
->>>> -        cfg.buckets[THROTTLE_OPS_READ].max = arg->iops_rd_max;
->>>> -    }
->>>> -    if (arg->has_iops_wr_max) {
->>>> -        cfg.buckets[THROTTLE_OPS_WRITE].max = arg->iops_wr_max;
->>>> -    }
->>>> -
->>>> -    if (arg->has_bps_max_length) {
->>>> -        cfg.buckets[THROTTLE_BPS_TOTAL].burst_length = arg->bps_max_length;
->>>> -    }
->>>> -    if (arg->has_bps_rd_max_length) {
->>>> -        cfg.buckets[THROTTLE_BPS_READ].burst_length = arg->bps_rd_max_length;
->>>> -    }
->>>> -    if (arg->has_bps_wr_max_length) {
->>>> -        cfg.buckets[THROTTLE_BPS_WRITE].burst_length = arg->bps_wr_max_length;
->>>> -    }
->>>> -    if (arg->has_iops_max_length) {
->>>> -        cfg.buckets[THROTTLE_OPS_TOTAL].burst_length = arg->iops_max_length;
->>>> -    }
->>>> -    if (arg->has_iops_rd_max_length) {
->>>> -        cfg.buckets[THROTTLE_OPS_READ].burst_length = arg->iops_rd_max_length;
->>>> -    }
->>>> -    if (arg->has_iops_wr_max_length) {
->>>> -        cfg.buckets[THROTTLE_OPS_WRITE].burst_length = arg->iops_wr_max_length;
->>>> -    }
->>>> -
->>>> -    if (arg->has_iops_size) {
->>>> -        cfg.op_size = arg->iops_size;
->>>> -    }
->>>> +    iothrottle = qapi_BlockIOThrottle_base(arg);
->>>> +    qmp_set_io_throttle(&cfg, iothrottle);
->>>>
->>>>      if (!throttle_is_valid(&cfg, errp)) {
->>>>          goto out;
->>>> diff --git a/hmp.c b/hmp.c
->>>> index ab407d6..9660373 100644
->>>> --- a/hmp.c
->>>> +++ b/hmp.c
->>>> @@ -1552,20 +1552,29 @@ void hmp_change(Monitor *mon, const QDict *qdict)
->>>>      hmp_handle_error(mon, &err);
->>>>  }
->>>>
->>>> +static void hmp_initialize_io_throttle(IOThrottle *iot, const QDict *qdict)
->>>> +{
->>>> +    iot->has_id = true;
->>>> +    iot->id = (char *) qdict_get_str(qdict, "id");
->>>> +    iot->bps = qdict_get_int(qdict, "bps");
->>>> +    iot->bps_rd = qdict_get_int(qdict, "bps_rd");
->>>> +    iot->bps_wr = qdict_get_int(qdict, "bps_wr");
->>>> +    iot->iops = qdict_get_int(qdict, "iops");
->>>> +    iot->iops_rd = qdict_get_int(qdict, "iops_rd");
->>>> +    iot->iops_wr = qdict_get_int(qdict, "iops_wr");
->>>> +}
->>>> +
->>>>  void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict)
->>>>  {
->>>>      Error *err = NULL;
->>>> +    IOThrottle *iothrottle;
->>>>      BlockIOThrottle throttle = {
->>>>          .has_device = true,
->>>>          .device = (char *) qdict_get_str(qdict, "device"),
->>>> -        .bps = qdict_get_int(qdict, "bps"),
->>>> -        .bps_rd = qdict_get_int(qdict, "bps_rd"),
->>>> -        .bps_wr = qdict_get_int(qdict, "bps_wr"),
->>>> -        .iops = qdict_get_int(qdict, "iops"),
->>>> -        .iops_rd = qdict_get_int(qdict, "iops_rd"),
->>>> -        .iops_wr = qdict_get_int(qdict, "iops_wr"),
->>>>      };
->>>>
->>>> +    iothrottle = qapi_BlockIOThrottle_base(&throttle);
->>>> +    hmp_initialize_io_throttle(iothrottle, qdict);
->>>>      qmp_block_set_io_throttle(&throttle, &err);
->>>>      hmp_handle_error(mon, &err);
->>>>  }
->>>> diff --git a/include/qemu/throttle-options.h b/include/qemu/throttle-options.h
->>>> index 9b68eb8..ccf10cc 100644
->>>> --- a/include/qemu/throttle-options.h
->>>> +++ b/include/qemu/throttle-options.h
->>>> @@ -94,4 +94,6 @@
->>>>
->>>>  void parse_io_throttle_options(ThrottleConfig *, QemuOpts *);
->>>>
->>>> +void qmp_set_io_throttle(ThrottleConfig *, IOThrottle *);
->>>> +
->>>>  #endif
->>>> diff --git a/util/throttle-options.c b/util/throttle-options.c
->>>> index 02b26b8..ded57bc 100644
->>>> --- a/util/throttle-options.c
->>>> +++ b/util/throttle-options.c
->>>> @@ -49,3 +49,57 @@ void parse_io_throttle_options(ThrottleConfig *throttle_cfg, QemuOpts *opts)
->>>>          qemu_opt_get_number(opts, "throttling.iops-size", 0);
->>>>
->>>>  }
->>>> +
->>>> +void qmp_set_io_throttle(ThrottleConfig *cfg, IOThrottle *arg)
->>>> +{
->>>> +    throttle_config_init(cfg);
->>>> +    cfg->buckets[THROTTLE_BPS_TOTAL].avg = arg->bps;
->>>> +    cfg->buckets[THROTTLE_BPS_READ].avg  = arg->bps_rd;
->>>> +    cfg->buckets[THROTTLE_BPS_WRITE].avg = arg->bps_wr;
->>>> +
->>>> +    cfg->buckets[THROTTLE_OPS_TOTAL].avg = arg->iops;
->>>> +    cfg->buckets[THROTTLE_OPS_READ].avg  = arg->iops_rd;
->>>> +    cfg->buckets[THROTTLE_OPS_WRITE].avg = arg->iops_wr;
->>>> +
->>>> +    if (arg->has_bps_max) {
->>>> +        cfg->buckets[THROTTLE_BPS_TOTAL].max = arg->bps_max;
->>>> +    }
->>>> +    if (arg->has_bps_rd_max) {
->>>> +        cfg->buckets[THROTTLE_BPS_READ].max = arg->bps_rd_max;
->>>> +    }
->>>> +    if (arg->has_bps_wr_max) {
->>>> +        cfg->buckets[THROTTLE_BPS_WRITE].max = arg->bps_wr_max;
->>>> +    }
->>>> +    if (arg->has_iops_max) {
->>>> +        cfg->buckets[THROTTLE_OPS_TOTAL].max = arg->iops_max;
->>>> +    }
->>>> +    if (arg->has_iops_rd_max) {
->>>> +        cfg->buckets[THROTTLE_OPS_READ].max = arg->iops_rd_max;
->>>> +    }
->>>> +    if (arg->has_iops_wr_max) {
->>>> +        cfg->buckets[THROTTLE_OPS_WRITE].max = arg->iops_wr_max;
->>>> +    }
->>>> +
->>>> +    if (arg->has_bps_max_length) {
->>>> +        cfg->buckets[THROTTLE_BPS_TOTAL].burst_length = arg->bps_max_length;
->>>> +    }
->>>> +    if (arg->has_bps_rd_max_length) {
->>>> +        cfg->buckets[THROTTLE_BPS_READ].burst_length = arg->bps_rd_max_length;
->>>> +    }
->>>> +    if (arg->has_bps_wr_max_length) {
->>>> +        cfg->buckets[THROTTLE_BPS_WRITE].burst_length = arg->bps_wr_max_length;
->>>> +    }
->>>> +    if (arg->has_iops_max_length) {
->>>> +        cfg->buckets[THROTTLE_OPS_TOTAL].burst_length = arg->iops_max_length;
->>>> +    }
->>>> +    if (arg->has_iops_rd_max_length) {
->>>> +        cfg->buckets[THROTTLE_OPS_READ].burst_length = arg->iops_rd_max_length;
->>>> +    }
->>>> +    if (arg->has_iops_wr_max_length) {
->>>> +        cfg->buckets[THROTTLE_OPS_WRITE].burst_length = arg->iops_wr_max_length;
->>>> +    }
->>>> +
->>>> +    if (arg->has_iops_size) {
->>>> +        cfg->op_size = arg->iops_size;
->>>> +    }
->>>> +}
->>
->>
->
+Hi Ishani,
+In case you are wondering about these errors - please send a new
+revision (v2) of this patch with the whitespace issues fixed.
+
+Here are a few Vim tips but I'm sure you can do the same in Emacs or
+other editors:
+
+1. Add the following to your .vimrc to highlight trailing whitespace:
+
+   hi WhiteSpaceEOL ctermbg=red guibg=red
+   au InsertEnter * match WhiteSpaceEOL /\s\+\%#\@<!$/
+   au InsertLeave * match WhiteSpaceEOL /\s\+$/
+
+2. Use this search-and-replace command to get rid of trailing
+   whitespace:
+
+   :%s/\s\+$//g
+
+I recommend running scripts/checkpatch.pl yourself before submitting
+patches.  You can do it automatically from a git hook (see githooks(5))
+by following the instructions here:
+
+http://blog.vmsplice.net/2011/03/how-to-automatically-run-checkpatchpl.html
+
+Stefan
+
+--bp/iNruPH9dso1Pn
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZOl1wAAoJEJykq7OBq3PI0I0H/3rg3AhMqlnmhov2GzHS3YMV
+Mfz9M46P3VzgZfX2c2UrXag3LJPXFM0Ct0tpK/Ta2DnjvHZqY7ko2ZnFPJtJQ2rp
+hUtYVc3PIUqcQRh78sjzTeZ21cJsY095KQ8fxeEBl9N68fGzsVwRHnIiRvMkF91P
+l2fi3gLfBGGvigbBgPIhG/EB1wI6EgQ09+cQePtUYNDNte0LMyZFDwzmYBrICIqw
+SvQJ3MfFtNwJom7KjNvckZ9FilZtuyJz2BWX88KvYbdpyllQQ83oOL/hUyMWILnx
+iJn3GAjyBd0KkSquZOr4abB7xya0C1lOFwCFa/Qg6CTqmPQc3awxAmW1ciH149g=
+=NMpx
+-----END PGP SIGNATURE-----
+
+--bp/iNruPH9dso1Pn--
