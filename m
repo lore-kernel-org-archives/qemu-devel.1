@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dJI3j-0003dM-Hi
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 07:26:33 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dJI3m-0003eO-CE
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 07:26:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dJI3g-0000ZX-6p
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 07:26:31 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dJI3i-0000aK-5Q
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 07:26:34 -0400
 Received: from [59.151.112.132] (port=39012 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dJI3f-0000Ym-AT
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 07:26:28 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dJI3g-0000Ym-UT
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 07:26:30 -0400
 From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Date: Fri, 9 Jun 2017 19:24:39 +0800
-Message-ID: <c2f88d614b4832e915688422746ec0060b0a35f0.1496994386.git.maozy.fnst@cn.fujitsu.com>
+Date: Fri, 9 Jun 2017 19:24:41 +0800
+Message-ID: <72678ddb0e7f8258586891d90f56537db02df272.1496994386.git.maozy.fnst@cn.fujitsu.com>
 In-Reply-To: <cover.1496994386.git.maozy.fnst@cn.fujitsu.com>
 References: <cover.1496994386.git.maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 4/7] pci: Make errp the last parameter of
- pci_add_capability()
+Subject: [Qemu-devel] [PATCH v4 6/7] pci: Convert to realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,391 +26,368 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, jasowang@redhat.com, marcel@redhat.com, alex.williamson@redhat.com, armbru@redhat.com
+Cc: mst@redhat.com, marcel@redhat.com, armbru@redhat.com
 
-Add Error argument for pci_add_capability() to leverage the errp
-to pass info on errors. This way is helpful for its callers to
-make a better error handling when moving to 'realize'.
+The pci-birdge device i82801b11 and io3130_upstream/downstream
+still implements the old PCIDeviceClass .init() through *_init()
+instead of the new .realize(). All devices need to be converted
+to .realize(). So convert it and rename it to *_realize().
 
-Cc: pbonzini@redhat.com
-Cc: rth@twiddle.net
-Cc: ehabkost@redhat.com
 Cc: mst@redhat.com
-Cc: jasowang@redhat.com
 Cc: marcel@redhat.com
-Cc: alex.williamson@redhat.com
 Cc: armbru@redhat.com
 Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
 ---
- hw/i386/amd_iommu.c       | 24 +++++++++++++++++-------
- hw/net/e1000e.c           | 30 ++++++++++++++++++------------
- hw/net/eepro100.c         | 18 ++++++++++++++----
- hw/pci-bridge/i82801b11.c |  1 +
- hw/pci/pci.c              | 10 ++++------
- hw/pci/pci_bridge.c       |  7 ++++++-
- hw/pci/pcie.c             | 10 ++++++++--
- hw/pci/shpc.c             |  5 ++++-
- hw/pci/slotid_cap.c       |  7 ++++++-
- hw/vfio/pci.c             |  9 ++++++---
- hw/virtio/virtio-pci.c    | 12 ++++++++----
- include/hw/pci/pci.h      |  3 ++-
- 12 files changed, 94 insertions(+), 42 deletions(-)
+ hw/pci-bridge/i82801b11.c          | 11 +++++------
+ hw/pci-bridge/pcie_root_port.c     | 15 ++++++---------
+ hw/pci-bridge/xio3130_downstream.c | 20 +++++++++-----------
+ hw/pci-bridge/xio3130_upstream.c   | 20 +++++++++-----------
+ hw/pci/pci_bridge.c                |  7 +++----
+ hw/pci/pcie.c                      | 11 ++++++-----
+ include/hw/pci/pci_bridge.h        |  3 ++-
+ include/hw/pci/pcie.h              |  3 ++-
+ 8 files changed, 42 insertions(+), 48 deletions(-)
 
-diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
-index 7b6d4ea..d93ffc2 100644
---- a/hw/i386/amd_iommu.c
-+++ b/hw/i386/amd_iommu.c
-@@ -1158,13 +1158,23 @@ static void amdvi_realize(DeviceState *dev, Error **err)
-     x86_iommu->type = TYPE_AMD;
-     qdev_set_parent_bus(DEVICE(&s->pci), &bus->qbus);
-     object_property_set_bool(OBJECT(&s->pci), true, "realized", err);
--    s->capab_offset = pci_add_capability(&s->pci.dev, AMDVI_CAPAB_ID_SEC, 0,
--                                         AMDVI_CAPAB_SIZE);
--    assert(s->capab_offset > 0);
--    ret = pci_add_capability(&s->pci.dev, PCI_CAP_ID_MSI, 0, AMDVI_CAPAB_REG_SIZE);
--    assert(ret > 0);
--    ret = pci_add_capability(&s->pci.dev, PCI_CAP_ID_HT, 0, AMDVI_CAPAB_REG_SIZE);
--    assert(ret > 0);
-+    ret = pci_add_capability(&s->pci.dev, AMDVI_CAPAB_ID_SEC, 0,
-+                                         AMDVI_CAPAB_SIZE, err);
-+    if (ret < 0) {
-+        return;
-+    }
-+    s->capab_offset = ret;
-+
-+    ret = pci_add_capability(&s->pci.dev, PCI_CAP_ID_MSI, 0,
-+                             AMDVI_CAPAB_REG_SIZE, err);
-+    if (ret < 0) {
-+        return;
-+    }
-+    ret = pci_add_capability(&s->pci.dev, PCI_CAP_ID_HT, 0,
-+                             AMDVI_CAPAB_REG_SIZE, err);
-+    if (ret < 0) {
-+        return;
-+    }
- 
-     /* set up MMIO */
-     memory_region_init_io(&s->mmio, OBJECT(s), &mmio_mem_ops, s, "amdvi-mmio",
-diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
-index 8259d67..d1b1a97 100644
---- a/hw/net/e1000e.c
-+++ b/hw/net/e1000e.c
-@@ -47,6 +47,7 @@
- #include "e1000e_core.h"
- 
- #include "trace.h"
-+#include "qapi/error.h"
- 
- #define TYPE_E1000E "e1000e"
- #define E1000E(obj) OBJECT_CHECK(E1000EState, (obj), TYPE_E1000E)
-@@ -372,21 +373,26 @@ e1000e_gen_dsn(uint8_t *mac)
- static int
- e1000e_add_pm_capability(PCIDevice *pdev, uint8_t offset, uint16_t pmc)
- {
--    int ret = pci_add_capability(pdev, PCI_CAP_ID_PM, offset, PCI_PM_SIZEOF);
-+    Error *local_err = NULL;
-+    int ret = pci_add_capability(pdev, PCI_CAP_ID_PM, offset,
-+                                 PCI_PM_SIZEOF, &local_err);
- 
--    if (ret > 0) {
--        pci_set_word(pdev->config + offset + PCI_PM_PMC,
--                     PCI_PM_CAP_VER_1_1 |
--                     pmc);
-+    if (local_err) {
-+        error_report_err(local_err);
-+        return ret;
-+    }
- 
--        pci_set_word(pdev->wmask + offset + PCI_PM_CTRL,
--                     PCI_PM_CTRL_STATE_MASK |
--                     PCI_PM_CTRL_PME_ENABLE |
--                     PCI_PM_CTRL_DATA_SEL_MASK);
-+    pci_set_word(pdev->config + offset + PCI_PM_PMC,
-+                 PCI_PM_CAP_VER_1_1 |
-+                 pmc);
- 
--        pci_set_word(pdev->w1cmask + offset + PCI_PM_CTRL,
--                     PCI_PM_CTRL_PME_STATUS);
--    }
-+    pci_set_word(pdev->wmask + offset + PCI_PM_CTRL,
-+                 PCI_PM_CTRL_STATE_MASK |
-+                 PCI_PM_CTRL_PME_ENABLE |
-+                 PCI_PM_CTRL_DATA_SEL_MASK);
-+
-+    pci_set_word(pdev->w1cmask + offset + PCI_PM_CTRL,
-+                 PCI_PM_CTRL_PME_STATUS);
- 
-     return ret;
- }
-diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
-index da36816..5a4774a 100644
---- a/hw/net/eepro100.c
-+++ b/hw/net/eepro100.c
-@@ -48,6 +48,7 @@
- #include "sysemu/sysemu.h"
- #include "sysemu/dma.h"
- #include "qemu/bitops.h"
-+#include "qapi/error.h"
- 
- /* QEMU sends frames smaller than 60 bytes to ethernet nics.
-  * Such frames are rejected by real nics and their emulations.
-@@ -494,7 +495,7 @@ static void eepro100_fcp_interrupt(EEPRO100State * s)
- }
- #endif
- 
--static void e100_pci_reset(EEPRO100State * s)
-+static void e100_pci_reset(EEPRO100State *s, Error **errp)
- {
-     E100PCIDeviceInfo *info = eepro100_get_class(s);
-     uint32_t device = s->device;
-@@ -570,8 +571,12 @@ static void e100_pci_reset(EEPRO100State * s)
-         /* Power Management Capabilities */
-         int cfg_offset = 0xdc;
-         int r = pci_add_capability(&s->dev, PCI_CAP_ID_PM,
--                                   cfg_offset, PCI_PM_SIZEOF);
--        assert(r > 0);
-+                                   cfg_offset, PCI_PM_SIZEOF,
-+                                   errp);
-+        if (r < 0) {
-+            return;
-+        }
-+
-         pci_set_word(pci_conf + cfg_offset + PCI_PM_PMC, 0x7e21);
- #if 0 /* TODO: replace dummy code for power management emulation. */
-         /* TODO: Power Management Control / Status. */
-@@ -1858,12 +1863,17 @@ static void e100_nic_realize(PCIDevice *pci_dev, Error **errp)
- {
-     EEPRO100State *s = DO_UPCAST(EEPRO100State, dev, pci_dev);
-     E100PCIDeviceInfo *info = eepro100_get_class(s);
-+    Error *local_err = NULL;
- 
-     TRACE(OTHER, logout("\n"));
- 
-     s->device = info->device;
- 
--    e100_pci_reset(s);
-+    e100_pci_reset(s, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
- 
-     /* Add 64 * 2 EEPROM. i82557 and i82558 support a 64 word EEPROM,
-      * i82559 and later support 64 or 256 word EEPROM. */
 diff --git a/hw/pci-bridge/i82801b11.c b/hw/pci-bridge/i82801b11.c
-index 2404e7e..2c065c3 100644
+index 2c065c3..2c1b747 100644
 --- a/hw/pci-bridge/i82801b11.c
 +++ b/hw/pci-bridge/i82801b11.c
-@@ -44,6 +44,7 @@
- #include "qemu/osdep.h"
- #include "hw/pci/pci.h"
- #include "hw/i386/ich9.h"
-+#include "qapi/error.h"
+@@ -59,24 +59,23 @@ typedef struct I82801b11Bridge {
+     /*< public >*/
+ } I82801b11Bridge;
  
- 
- /*****************************************************************************/
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index b73bfea..2bba37a 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -2264,15 +2264,13 @@ static void pci_del_option_rom(PCIDevice *pdev)
-  * in pci config space
-  */
- int pci_add_capability(PCIDevice *pdev, uint8_t cap_id,
--                       uint8_t offset, uint8_t size)
-+                       uint8_t offset, uint8_t size,
-+                       Error **errp)
+-static int i82801b11_bridge_initfn(PCIDevice *d)
++static void i82801b11_bridge_realize(PCIDevice *d, Error **errp)
  {
-     int ret;
--    Error *local_err = NULL;
+     int rc;
  
--    ret = pci_add_capability2(pdev, cap_id, offset, size, &local_err);
--    if (ret < 0) {
--        error_report_err(local_err);
--    }
-+    ret = pci_add_capability2(pdev, cap_id, offset, size, errp);
-+
-     return ret;
+     pci_bridge_initfn(d, TYPE_PCI_BUS);
+ 
+     rc = pci_bridge_ssvid_init(d, I82801ba_SSVID_OFFSET,
+-                               I82801ba_SSVID_SVID, I82801ba_SSVID_SSID);
++                               I82801ba_SSVID_SVID, I82801ba_SSVID_SSID,
++                               errp);
+     if (rc < 0) {
+         goto err_bridge;
+     }
+     pci_config_set_prog_interface(d->config, PCI_CLASS_BRIDGE_PCI_INF_SUB);
+-    return 0;
++    return;
+ 
+ err_bridge:
+     pci_bridge_exitfn(d);
+-
+-    return rc;
  }
  
+ static const VMStateDescription i82801b11_bridge_dev_vmstate = {
+@@ -96,7 +95,7 @@ static void i82801b11_bridge_class_init(ObjectClass *klass, void *data)
+     k->vendor_id = PCI_VENDOR_ID_INTEL;
+     k->device_id = PCI_DEVICE_ID_INTEL_82801BA_11;
+     k->revision = ICH9_D2P_A2_REVISION;
+-    k->init = i82801b11_bridge_initfn;
++    k->realize = i82801b11_bridge_realize;
+     k->config_write = pci_bridge_write_config;
+     dc->vmsd = &i82801b11_bridge_dev_vmstate;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+index cf36318..00f0b1f 100644
+--- a/hw/pci-bridge/pcie_root_port.c
++++ b/hw/pci-bridge/pcie_root_port.c
+@@ -59,29 +59,27 @@ static void rp_realize(PCIDevice *d, Error **errp)
+     PCIDeviceClass *dc = PCI_DEVICE_GET_CLASS(d);
+     PCIERootPortClass *rpc = PCIE_ROOT_PORT_GET_CLASS(d);
+     int rc;
+-    Error *local_err = NULL;
+ 
+     pci_config_set_interrupt_pin(d->config, 1);
+     pci_bridge_initfn(d, TYPE_PCIE_BUS);
+     pcie_port_init_reg(d);
+ 
+-    rc = pci_bridge_ssvid_init(d, rpc->ssvid_offset, dc->vendor_id, rpc->ssid);
++    rc = pci_bridge_ssvid_init(d, rpc->ssvid_offset, dc->vendor_id,
++                               rpc->ssid, errp);
+     if (rc < 0) {
+-        error_setg(errp, "Can't init SSV ID, error %d", rc);
+         goto err_bridge;
+     }
+ 
+     if (rpc->interrupts_init) {
+-        rc = rpc->interrupts_init(d, &local_err);
++        rc = rpc->interrupts_init(d, errp);
+         if (rc < 0) {
+-            error_propagate(errp, local_err);
+             goto err_bridge;
+         }
+     }
+ 
+-    rc = pcie_cap_init(d, rpc->exp_offset, PCI_EXP_TYPE_ROOT_PORT, p->port);
++    rc = pcie_cap_init(d, rpc->exp_offset, PCI_EXP_TYPE_ROOT_PORT,
++                       p->port, errp);
+     if (rc < 0) {
+-        error_setg(errp, "Can't add Root Port capability, error %d", rc);
+         goto err_int;
+     }
+ 
+@@ -98,9 +96,8 @@ static void rp_realize(PCIDevice *d, Error **errp)
+     }
+ 
+     rc = pcie_aer_init(d, PCI_ERR_VER, rpc->aer_offset,
+-                       PCI_ERR_SIZEOF, &local_err);
++                       PCI_ERR_SIZEOF, errp);
+     if (rc < 0) {
+-        error_propagate(errp, local_err);
+         goto err;
+     }
+     pcie_aer_root_init(d);
+diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_downstream.c
+index cfe8a36..e706f36 100644
+--- a/hw/pci-bridge/xio3130_downstream.c
++++ b/hw/pci-bridge/xio3130_downstream.c
+@@ -56,33 +56,33 @@ static void xio3130_downstream_reset(DeviceState *qdev)
+     pci_bridge_reset(qdev);
+ }
+ 
+-static int xio3130_downstream_initfn(PCIDevice *d)
++static void xio3130_downstream_realize(PCIDevice *d, Error **errp)
+ {
+     PCIEPort *p = PCIE_PORT(d);
+     PCIESlot *s = PCIE_SLOT(d);
+     int rc;
+-    Error *err = NULL;
+ 
+     pci_bridge_initfn(d, TYPE_PCIE_BUS);
+     pcie_port_init_reg(d);
+ 
+     rc = msi_init(d, XIO3130_MSI_OFFSET, XIO3130_MSI_NR_VECTOR,
+                   XIO3130_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_64BIT,
+-                  XIO3130_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_MASKBIT, &err);
++                  XIO3130_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_MASKBIT,
++                  errp);
+     if (rc < 0) {
+         assert(rc == -ENOTSUP);
+-        error_report_err(err);
+         goto err_bridge;
+     }
+ 
+     rc = pci_bridge_ssvid_init(d, XIO3130_SSVID_OFFSET,
+-                               XIO3130_SSVID_SVID, XIO3130_SSVID_SSID);
++                               XIO3130_SSVID_SVID, XIO3130_SSVID_SSID,
++                               errp);
+     if (rc < 0) {
+         goto err_bridge;
+     }
+ 
+     rc = pcie_cap_init(d, XIO3130_EXP_OFFSET, PCI_EXP_TYPE_DOWNSTREAM,
+-                       p->port);
++                       p->port, errp);
+     if (rc < 0) {
+         goto err_msi;
+     }
+@@ -98,13 +98,12 @@ static int xio3130_downstream_initfn(PCIDevice *d)
+     }
+ 
+     rc = pcie_aer_init(d, PCI_ERR_VER, XIO3130_AER_OFFSET,
+-                       PCI_ERR_SIZEOF, &err);
++                       PCI_ERR_SIZEOF, errp);
+     if (rc < 0) {
+-        error_report_err(err);
+         goto err;
+     }
+ 
+-    return 0;
++    return;
+ 
+ err:
+     pcie_chassis_del_slot(s);
+@@ -114,7 +113,6 @@ err_msi:
+     msi_uninit(d);
+ err_bridge:
+     pci_bridge_exitfn(d);
+-    return rc;
+ }
+ 
+ static void xio3130_downstream_exitfn(PCIDevice *d)
+@@ -181,7 +179,7 @@ static void xio3130_downstream_class_init(ObjectClass *klass, void *data)
+     k->is_express = 1;
+     k->is_bridge = 1;
+     k->config_write = xio3130_downstream_write_config;
+-    k->init = xio3130_downstream_initfn;
++    k->realize = xio3130_downstream_realize;
+     k->exit = xio3130_downstream_exitfn;
+     k->vendor_id = PCI_VENDOR_ID_TI;
+     k->device_id = PCI_DEVICE_ID_TI_XIO3130D;
+diff --git a/hw/pci-bridge/xio3130_upstream.c b/hw/pci-bridge/xio3130_upstream.c
+index 401c784..a052224 100644
+--- a/hw/pci-bridge/xio3130_upstream.c
++++ b/hw/pci-bridge/xio3130_upstream.c
+@@ -53,32 +53,32 @@ static void xio3130_upstream_reset(DeviceState *qdev)
+     pcie_cap_deverr_reset(d);
+ }
+ 
+-static int xio3130_upstream_initfn(PCIDevice *d)
++static void xio3130_upstream_realize(PCIDevice *d, Error **errp)
+ {
+     PCIEPort *p = PCIE_PORT(d);
+     int rc;
+-    Error *err = NULL;
+ 
+     pci_bridge_initfn(d, TYPE_PCIE_BUS);
+     pcie_port_init_reg(d);
+ 
+     rc = msi_init(d, XIO3130_MSI_OFFSET, XIO3130_MSI_NR_VECTOR,
+                   XIO3130_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_64BIT,
+-                  XIO3130_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_MASKBIT, &err);
++                  XIO3130_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_MASKBIT,
++                  errp);
+     if (rc < 0) {
+         assert(rc == -ENOTSUP);
+-        error_report_err(err);
+         goto err_bridge;
+     }
+ 
+     rc = pci_bridge_ssvid_init(d, XIO3130_SSVID_OFFSET,
+-                               XIO3130_SSVID_SVID, XIO3130_SSVID_SSID);
++                               XIO3130_SSVID_SVID, XIO3130_SSVID_SSID,
++                               errp);
+     if (rc < 0) {
+         goto err_bridge;
+     }
+ 
+     rc = pcie_cap_init(d, XIO3130_EXP_OFFSET, PCI_EXP_TYPE_UPSTREAM,
+-                       p->port);
++                       p->port, errp);
+     if (rc < 0) {
+         goto err_msi;
+     }
+@@ -86,13 +86,12 @@ static int xio3130_upstream_initfn(PCIDevice *d)
+     pcie_cap_deverr_init(d);
+ 
+     rc = pcie_aer_init(d, PCI_ERR_VER, XIO3130_AER_OFFSET,
+-                       PCI_ERR_SIZEOF, &err);
++                       PCI_ERR_SIZEOF, errp);
+     if (rc < 0) {
+-        error_report_err(err);
+         goto err;
+     }
+ 
+-    return 0;
++    return;
+ 
+ err:
+     pcie_cap_exit(d);
+@@ -100,7 +99,6 @@ err_msi:
+     msi_uninit(d);
+ err_bridge:
+     pci_bridge_exitfn(d);
+-    return rc;
+ }
+ 
+ static void xio3130_upstream_exitfn(PCIDevice *d)
+@@ -153,7 +151,7 @@ static void xio3130_upstream_class_init(ObjectClass *klass, void *data)
+     k->is_express = 1;
+     k->is_bridge = 1;
+     k->config_write = xio3130_upstream_write_config;
+-    k->init = xio3130_upstream_initfn;
++    k->realize = xio3130_upstream_realize;
+     k->exit = xio3130_upstream_exitfn;
+     k->vendor_id = PCI_VENDOR_ID_TI;
+     k->device_id = PCI_DEVICE_ID_TI_XIO3130U;
 diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
-index 5118ef4..bb0f3a3 100644
+index c3f6215..9b1d542 100644
 --- a/hw/pci/pci_bridge.c
 +++ b/hw/pci/pci_bridge.c
-@@ -33,6 +33,7 @@
- #include "hw/pci/pci_bridge.h"
- #include "hw/pci/pci_bus.h"
- #include "qemu/range.h"
-+#include "qapi/error.h"
+@@ -41,15 +41,14 @@
+ #define PCI_SSVID_SSID          6
  
- /* PCI bridge subsystem vendor ID helper functions */
- #define PCI_SSVID_SIZEOF        8
-@@ -43,8 +44,12 @@ int pci_bridge_ssvid_init(PCIDevice *dev, uint8_t offset,
-                           uint16_t svid, uint16_t ssid)
+ int pci_bridge_ssvid_init(PCIDevice *dev, uint8_t offset,
+-                          uint16_t svid, uint16_t ssid)
++                          uint16_t svid, uint16_t ssid,
++                          Error **errp)
  {
      int pos;
--    pos = pci_add_capability(dev, PCI_CAP_ID_SSVID, offset, PCI_SSVID_SIZEOF);
-+    Error *local_err = NULL;
-+
-+    pos = pci_add_capability(dev, PCI_CAP_ID_SSVID, offset,
-+                             PCI_SSVID_SIZEOF, &local_err);
+-    Error *local_err = NULL;
+ 
+     pos = pci_add_capability2(dev, PCI_CAP_ID_SSVID, offset,
+-                             PCI_SSVID_SIZEOF, &local_err);
++                             PCI_SSVID_SIZEOF, errp);
      if (pos < 0) {
-+        error_report_err(local_err);
+-        error_report_err(local_err);
          return pos;
      }
  
 diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-index 18e634f..f187512 100644
+index 9232baa..d20887c 100644
 --- a/hw/pci/pcie.c
 +++ b/hw/pci/pcie.c
-@@ -91,11 +91,14 @@ int pcie_cap_init(PCIDevice *dev, uint8_t offset, uint8_t type, uint8_t port)
+@@ -86,19 +86,19 @@ pcie_cap_v1_fill(PCIDevice *dev, uint8_t port, uint8_t type, uint8_t version)
+     pci_set_word(cmask + PCI_EXP_LNKSTA, 0);
+ }
+ 
+-int pcie_cap_init(PCIDevice *dev, uint8_t offset, uint8_t type, uint8_t port)
++int pcie_cap_init(PCIDevice *dev, uint8_t offset,
++                  uint8_t type, uint8_t port,
++                  Error **errp)
+ {
      /* PCIe cap v2 init */
      int pos;
      uint8_t *exp_cap;
-+    Error *local_err = NULL;
+-    Error *local_err = NULL;
  
      assert(pci_is_express(dev));
  
--    pos = pci_add_capability(dev, PCI_CAP_ID_EXP, offset, PCI_EXP_VER2_SIZEOF);
-+    pos = pci_add_capability(dev, PCI_CAP_ID_EXP, offset,
-+                             PCI_EXP_VER2_SIZEOF, &local_err);
+     pos = pci_add_capability2(dev, PCI_CAP_ID_EXP, offset,
+-                             PCI_EXP_VER2_SIZEOF, &local_err);
++                             PCI_EXP_VER2_SIZEOF, errp);
      if (pos < 0) {
-+        error_report_err(local_err);
+-        error_report_err(local_err);
          return pos;
      }
      dev->exp.exp_cap = pos;
-@@ -123,11 +126,14 @@ int pcie_cap_v1_init(PCIDevice *dev, uint8_t offset, uint8_t type,
+@@ -147,6 +147,7 @@ static int
+ pcie_endpoint_cap_common_init(PCIDevice *dev, uint8_t offset, uint8_t cap_size)
  {
-     /* PCIe cap v1 init */
-     int pos;
+     uint8_t type = PCI_EXP_TYPE_ENDPOINT;
 +    Error *local_err = NULL;
  
-     assert(pci_is_express(dev));
+     /*
+      * Windows guests will report Code 10, device cannot start, if
+@@ -159,7 +160,7 @@ pcie_endpoint_cap_common_init(PCIDevice *dev, uint8_t offset, uint8_t cap_size)
  
--    pos = pci_add_capability(dev, PCI_CAP_ID_EXP, offset, PCI_EXP_VER1_SIZEOF);
-+    pos = pci_add_capability(dev, PCI_CAP_ID_EXP, offset,
-+                             PCI_EXP_VER1_SIZEOF, &local_err);
-     if (pos < 0) {
-+        error_report_err(local_err);
-         return pos;
-     }
-     dev->exp.exp_cap = pos;
-diff --git a/hw/pci/shpc.c b/hw/pci/shpc.c
-index 42fafac..d72d5e4 100644
---- a/hw/pci/shpc.c
-+++ b/hw/pci/shpc.c
-@@ -450,9 +450,12 @@ static int shpc_cap_add_config(PCIDevice *d)
- {
-     uint8_t *config;
-     int config_offset;
-+    Error *local_err = NULL;
-     config_offset = pci_add_capability(d, PCI_CAP_ID_SHPC,
--                                       0, SHPC_CAP_LENGTH);
-+                                       0, SHPC_CAP_LENGTH,
-+                                       &local_err);
-     if (config_offset < 0) {
-+        error_report_err(local_err);
-         return config_offset;
-     }
-     config = d->config + config_offset;
-diff --git a/hw/pci/slotid_cap.c b/hw/pci/slotid_cap.c
-index aec1e91..bdca205 100644
---- a/hw/pci/slotid_cap.c
-+++ b/hw/pci/slotid_cap.c
-@@ -2,6 +2,7 @@
- #include "hw/pci/slotid_cap.h"
- #include "hw/pci/pci.h"
- #include "qemu/error-report.h"
-+#include "qapi/error.h"
- 
- #define SLOTID_CAP_LENGTH 4
- #define SLOTID_NSLOTS_SHIFT ctz32(PCI_SID_ESR_NSLOTS)
-@@ -11,6 +12,8 @@ int slotid_cap_init(PCIDevice *d, int nslots,
-                     unsigned offset)
- {
-     int cap;
-+    Error *local_err = NULL;
-+
-     if (!chassis) {
-         error_report("Bridge chassis not specified. Each bridge is required "
-                      "to be assigned a unique chassis id > 0.");
-@@ -21,8 +24,10 @@ int slotid_cap_init(PCIDevice *d, int nslots,
-         return -EINVAL;
-     }
- 
--    cap = pci_add_capability(d, PCI_CAP_ID_SLOTID, offset, SLOTID_CAP_LENGTH);
-+    cap = pci_add_capability(d, PCI_CAP_ID_SLOTID, offset,
-+                             SLOTID_CAP_LENGTH, &local_err);
-     if (cap < 0) {
-+        error_report_err(local_err);
-         return cap;
-     }
-     /* We make each chassis unique, this way each bridge is First in Chassis */
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 5881968..70bfb59 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -1743,11 +1743,14 @@ static int vfio_setup_pcie_cap(VFIOPCIDevice *vdev, int pos, uint8_t size,
-                                PCI_EXP_LNKCAP_MLW | PCI_EXP_LNKCAP_SLS);
-     }
- 
--    pos = pci_add_capability(&vdev->pdev, PCI_CAP_ID_EXP, pos, size);
--    if (pos > 0) {
--        vdev->pdev.exp.exp_cap = pos;
-+    pos = pci_add_capability(&vdev->pdev, PCI_CAP_ID_EXP, pos, size,
-+                             errp);
-+    if (pos < 0) {
-+        return pos;
-     }
- 
-+    vdev->pdev.exp.exp_cap = pos;
-+
-     return pos;
+     return (cap_size == PCI_EXP_VER1_SIZEOF)
+         ? pcie_cap_v1_init(dev, offset, type, 0)
+-        : pcie_cap_init(dev, offset, type, 0);
++        : pcie_cap_init(dev, offset, type, 0, &local_err);
  }
  
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index f9b7244..1fc5059 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -1162,8 +1162,8 @@ static int virtio_pci_add_mem_cap(VirtIOPCIProxy *proxy,
-     PCIDevice *dev = &proxy->pci_dev;
-     int offset;
+ int pcie_endpoint_cap_init(PCIDevice *dev, uint8_t offset)
+diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
+index d5891cd..ff7cbaa 100644
+--- a/include/hw/pci/pci_bridge.h
++++ b/include/hw/pci/pci_bridge.h
+@@ -33,7 +33,8 @@
+ #define PCI_BRIDGE_DEV_PROP_SHPC       "shpc"
  
--    offset = pci_add_capability(dev, PCI_CAP_ID_VNDR, 0, cap->cap_len);
--    assert(offset > 0);
-+    offset = pci_add_capability(dev, PCI_CAP_ID_VNDR, 0,
-+                                cap->cap_len, &error_abort);
+ int pci_bridge_ssvid_init(PCIDevice *dev, uint8_t offset,
+-                          uint16_t svid, uint16_t ssid);
++                          uint16_t svid, uint16_t ssid,
++                          Error **errp);
  
-     assert(cap->cap_len >= sizeof *cap);
-     memcpy(dev->config + offset + PCI_CAP_FLAGS, &cap->cap_len,
-@@ -1810,8 +1810,12 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
-         pos = pcie_endpoint_cap_init(pci_dev, 0);
-         assert(pos > 0);
+ PCIDevice *pci_bridge_get_device(PCIBus *bus);
+ PCIBus *pci_bridge_get_sec_bus(PCIBridge *br);
+diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
+index 3d8f24b..b71e369 100644
+--- a/include/hw/pci/pcie.h
++++ b/include/hw/pci/pcie.h
+@@ -84,7 +84,8 @@ struct PCIExpressDevice {
+ #define COMPAT_PROP_PCP "power_controller_present"
  
--        pos = pci_add_capability(pci_dev, PCI_CAP_ID_PM, 0, PCI_PM_SIZEOF);
--        assert(pos > 0);
-+        pos = pci_add_capability(pci_dev, PCI_CAP_ID_PM, 0,
-+                                 PCI_PM_SIZEOF, errp);
-+        if (pos < 0) {
-+            return;
-+        }
-+
-         pci_dev->exp.pm_cap = pos;
- 
-         /*
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index a37a2d5..fe52aa8 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -356,7 +356,8 @@ void pci_unregister_vga(PCIDevice *pci_dev);
- pcibus_t pci_get_bar_addr(PCIDevice *pci_dev, int region_num);
- 
- int pci_add_capability(PCIDevice *pdev, uint8_t cap_id,
--                       uint8_t offset, uint8_t size);
-+                       uint8_t offset, uint8_t size,
-+                       Error **errp);
- int pci_add_capability2(PCIDevice *pdev, uint8_t cap_id,
-                        uint8_t offset, uint8_t size,
-                        Error **errp);
+ /* PCI express capability helper functions */
+-int pcie_cap_init(PCIDevice *dev, uint8_t offset, uint8_t type, uint8_t port);
++int pcie_cap_init(PCIDevice *dev, uint8_t offset, uint8_t type,
++                  uint8_t port, Error **errp);
+ int pcie_cap_v1_init(PCIDevice *dev, uint8_t offset,
+                      uint8_t type, uint8_t port);
+ int pcie_endpoint_cap_init(PCIDevice *dev, uint8_t offset);
 -- 
 2.9.3
