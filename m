@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47067)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dJCRy-0003xz-O8
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:27:14 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dJCRz-0003zC-Ta
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:27:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dJCRw-0006e7-4c
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:27:10 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dJCRy-0006fX-AH
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:27:11 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  9 Jun 2017 15:26:50 +1000
-Message-Id: <20170609052652.23200-19-david@gibson.dropbear.id.au>
+Date: Fri,  9 Jun 2017 15:26:45 +1000
+Message-Id: <20170609052652.23200-14-david@gibson.dropbear.id.au>
 In-Reply-To: <20170609052652.23200-1-david@gibson.dropbear.id.au>
 References: <20170609052652.23200-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 18/20] xics: setup cpu at realize time
+Subject: [Qemu-devel] [PULL 13/20] xics: add reset() handler to ICPStateClass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,262 +27,117 @@ Cc: agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet
 
 From: Greg Kurz <groug@kaod.org>
 
-Until recently, spapr used to allocate ICPState objects for the lifetime
-of the machine. They would only be associated to vCPUs in xics_cpu_setup(=
-)
-when plugging a CPU core.
+Taking into account that qemu_set_irq() returns immediatly if its first
+argument is NULL, icp_kvm_reset() largely duplicates icp_reset().
 
-Now that ICPState objects have the same lifecycle as vCPUs, it is
-possible to associate them during realization.
+This patch introduces a reset() handler, so that the common logic can
+be implemented in icp_reset() only.
 
-This patch hence open-codes xics_cpu_setup() in icp_realize(). The vCPU
-is passed as a property. Note that vCPU now needs to be realized first
-for the IRQs to be allocated. It also needs to resetted before ICPState
-realization in order to synchronize with KVM.
-
-Since ICPState objects are freed when unrealized, xics_cpu_destroy() isn'=
-t
-needed anymore and can be safely dropped.
+While there we can also drop icp_kvm_realize() and icp_kvm_unrealize(). T=
+his
+causes icp-kvm to be realized in icp_realize(), which sets icp->xics, but
+it has no impact.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xics.c          | 76 +++++++++++++++++++++----------------------=
-------
- hw/ppc/pnv_core.c       | 18 ++++++------
- hw/ppc/spapr_cpu_core.c | 23 +++++++--------
- include/hw/ppc/xics.h   |  3 +-
- 4 files changed, 51 insertions(+), 69 deletions(-)
+ hw/intc/xics.c        |  5 +++++
+ hw/intc/xics_kvm.c    | 27 ++-------------------------
+ include/hw/ppc/xics.h |  1 +
+ 3 files changed, 8 insertions(+), 25 deletions(-)
 
 diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index f74a96e..fdbfddf 100644
+index ea35167..ec73f02 100644
 --- a/hw/intc/xics.c
 +++ b/hw/intc/xics.c
-@@ -38,50 +38,6 @@
- #include "monitor/monitor.h"
- #include "hw/intc/intc.h"
-=20
--void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu)
--{
--    CPUState *cs =3D CPU(cpu);
--    ICPState *icp =3D ICP(cpu->intc);
--
--    assert(icp);
--    assert(cs =3D=3D icp->cs);
--
--    icp->output =3D NULL;
--    icp->cs =3D NULL;
--}
--
--void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu, ICPState *icp)
--{
--    CPUState *cs =3D CPU(cpu);
--    CPUPPCState *env =3D &cpu->env;
--    ICPStateClass *icpc;
--
--    assert(icp);
--
--    cpu->intc =3D OBJECT(icp);
--    icp->cs =3D cs;
--
--    icpc =3D ICP_GET_CLASS(icp);
--    if (icpc->cpu_setup) {
--        icpc->cpu_setup(icp, cpu);
--    }
--
--    switch (PPC_INPUT(env)) {
--    case PPC_FLAGS_INPUT_POWER7:
--        icp->output =3D env->irq_inputs[POWER7_INPUT_INT];
--        break;
--
--    case PPC_FLAGS_INPUT_970:
--        icp->output =3D env->irq_inputs[PPC970_INPUT_INT];
--        break;
--
--    default:
--        error_report("XICS interrupt controller does not support this CP=
-U "
--                     "bus model");
--        abort();
--    }
--}
--
- void icp_pic_print_info(ICPState *icp, Monitor *mon)
+@@ -325,6 +325,7 @@ static const VMStateDescription vmstate_icp_server =3D=
  {
-     int cpu_index =3D icp->cs ? icp->cs->cpu_index : -1;
-@@ -343,6 +299,8 @@ static void icp_realize(DeviceState *dev, Error **err=
-p)
+ static void icp_reset(void *dev)
  {
      ICPState *icp =3D ICP(dev);
-     ICPStateClass *icpc =3D ICP_GET_CLASS(dev);
-+    PowerPCCPU *cpu;
-+    CPUPPCState *env;
-     Object *obj;
-     Error *err =3D NULL;
++    ICPStateClass *icpc =3D ICP_GET_CLASS(icp);
 =20
-@@ -355,6 +313,36 @@ static void icp_realize(DeviceState *dev, Error **er=
-rp)
+     icp->xirr =3D 0;
+     icp->pending_priority =3D 0xff;
+@@ -332,6 +333,10 @@ static void icp_reset(void *dev)
 =20
-     icp->xics =3D XICS_FABRIC(obj);
-=20
-+    obj =3D object_property_get_link(OBJECT(dev), ICP_PROP_CPU, &err);
-+    if (!obj) {
-+        error_setg(errp, "%s: required link '" ICP_PROP_CPU "' not found=
-: %s",
-+                   __func__, error_get_pretty(err));
-+        return;
+     /* Make all outputs are deasserted */
+     qemu_set_irq(icp->output, 0);
++
++    if (icpc->reset) {
++        icpc->reset(icp);
 +    }
-+
-+    cpu =3D POWERPC_CPU(obj);
-+    cpu->intc =3D OBJECT(icp);
-+    icp->cs =3D CPU(obj);
-+
-+    if (icpc->cpu_setup) {
-+        icpc->cpu_setup(icp, cpu);
-+    }
-+
-+    env =3D &cpu->env;
-+    switch (PPC_INPUT(env)) {
-+    case PPC_FLAGS_INPUT_POWER7:
-+        icp->output =3D env->irq_inputs[POWER7_INPUT_INT];
-+        break;
-+
-+    case PPC_FLAGS_INPUT_970:
-+        icp->output =3D env->irq_inputs[PPC970_INPUT_INT];
-+        break;
-+
-+    default:
-+        error_setg(errp, "XICS interrupt controller does not support thi=
-s CPU bus model");
-+        return;
-+    }
-+
-     if (icpc->realize) {
-         icpc->realize(icp, errp);
-     }
-diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index 0b6e729..c7b00b6 100644
---- a/hw/ppc/pnv_core.c
-+++ b/hw/ppc/pnv_core.c
-@@ -118,20 +118,20 @@ static void pnv_core_realize_child(Object *child, X=
-ICSFabric *xi, Error **errp)
-     PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-     Object *obj;
-=20
--    obj =3D object_new(TYPE_PNV_ICP);
--    object_property_add_child(OBJECT(cpu), "icp", obj, &error_abort);
--    object_unref(obj);
--    object_property_add_const_link(obj, ICP_PROP_XICS, OBJECT(xi),
--                                   &error_abort);
--    object_property_set_bool(obj, true, "realized", &local_err);
-+    object_property_set_bool(child, true, "realized", &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-     }
-=20
--    object_property_set_bool(child, true, "realized", &local_err);
-+    obj =3D object_new(TYPE_PNV_ICP);
-+    object_property_add_child(child, "icp", obj, NULL);
-+    object_unref(obj);
-+    object_property_add_const_link(obj, ICP_PROP_XICS, OBJECT(xi),
-+                                   &error_abort);
-+    object_property_add_const_link(obj, ICP_PROP_CPU, child, &error_abor=
-t);
-+    object_property_set_bool(obj, true, "realized", &local_err);
-     if (local_err) {
--        object_unparent(obj);
-         error_propagate(errp, local_err);
-         return;
-     }
-@@ -142,8 +142,6 @@ static void pnv_core_realize_child(Object *child, XIC=
-SFabric *xi, Error **errp)
-         error_propagate(errp, local_err);
-         return;
-     }
--
--    xics_cpu_setup(xi, cpu, ICP(obj));
  }
 =20
- static void pnv_core_realize(DeviceState *dev, Error **errp)
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index e81879c..9fb896b 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -53,9 +53,6 @@ static void spapr_cpu_reset(void *opaque)
+ static void icp_realize(DeviceState *dev, Error **errp)
+diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+index 14b8f6f..45bf110 100644
+--- a/hw/intc/xics_kvm.c
++++ b/hw/intc/xics_kvm.c
+@@ -110,19 +110,8 @@ static int icp_set_kvm_state(ICPState *icp, int vers=
+ion_id)
+     return 0;
+ }
 =20
- static void spapr_cpu_destroy(PowerPCCPU *cpu)
+-static void icp_kvm_reset(void *dev)
++static void icp_kvm_reset(ICPState *icp)
  {
--    sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+-    ICPState *icp =3D ICP(dev);
 -
--    xics_cpu_destroy(XICS_FABRIC(spapr), cpu);
-     qemu_unregister_reset(spapr_cpu_reset, cpu);
+-    icp->xirr =3D 0;
+-    icp->pending_priority =3D 0xff;
+-    icp->mfrr =3D 0xff;
+-
+-    /* Make all outputs as deasserted only if the CPU thread is in use *=
+/
+-    if (icp->output) {
+-        qemu_set_irq(icp->output, 0);
+-    }
+-
+     icp_set_kvm_state(icp, 1);
  }
 =20
-@@ -140,29 +137,29 @@ static void spapr_cpu_core_realize_child(Object *ch=
-ild, Error **errp)
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
-     CPUState *cs =3D CPU(child);
-     PowerPCCPU *cpu =3D POWERPC_CPU(cs);
--    Object *obj;
-+    Object *obj =3D NULL;
+@@ -159,26 +148,14 @@ static void icp_kvm_cpu_setup(ICPState *icp, PowerP=
+CCPU *cpu)
+     QLIST_INSERT_HEAD(&kvm_enabled_icps, enabled_icp, node);
+ }
 =20
--    obj =3D object_new(spapr->icp_type);
--    object_property_add_child(OBJECT(cpu), "icp", obj, &error_abort);
--    object_unref(obj);
--    object_property_add_const_link(obj, ICP_PROP_XICS, OBJECT(spapr),
--                                   &error_abort);
--    object_property_set_bool(obj, true, "realized", &local_err);
-+    object_property_set_bool(child, true, "realized", &local_err);
-     if (local_err) {
-         goto error;
-     }
+-static void icp_kvm_realize(DeviceState *dev, Error **errp)
+-{
+-    qemu_register_reset(icp_kvm_reset, dev);
+-}
+-
+-static void icp_kvm_unrealize(DeviceState *dev, Error **errp)
+-{
+-    qemu_unregister_reset(icp_kvm_reset, dev);
+-}
+-
+ static void icp_kvm_class_init(ObjectClass *klass, void *data)
+ {
+-    DeviceClass *dc =3D DEVICE_CLASS(klass);
+     ICPStateClass *icpc =3D ICP_CLASS(klass);
 =20
--    object_property_set_bool(child, true, "realized", &local_err);
-+    spapr_cpu_init(spapr, cpu, &local_err);
-     if (local_err) {
-         goto error;
-     }
+-    dc->realize =3D icp_kvm_realize;
+-    dc->unrealize =3D icp_kvm_unrealize;
+     icpc->pre_save =3D icp_get_kvm_state;
+     icpc->post_load =3D icp_set_kvm_state;
+     icpc->cpu_setup =3D icp_kvm_cpu_setup;
++    icpc->reset =3D icp_kvm_reset;
+ }
 =20
--    spapr_cpu_init(spapr, cpu, &local_err);
-+    obj =3D object_new(spapr->icp_type);
-+    object_property_add_child(child, "icp", obj, &error_abort);
-+    object_unref(obj);
-+    object_property_add_const_link(obj, ICP_PROP_XICS, OBJECT(spapr),
-+                                   &error_abort);
-+    object_property_add_const_link(obj, ICP_PROP_CPU, child, &error_abor=
-t);
-+    object_property_set_bool(obj, true, "realized", &local_err);
-     if (local_err) {
-         goto error;
-     }
-=20
--    xics_cpu_setup(XICS_FABRIC(spapr), cpu, ICP(obj));
-     return;
-=20
- error:
+ static const TypeInfo icp_kvm_info =3D {
 diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 797df82..37b8fb1 100644
+index a3073f9..40a506e 100644
 --- a/include/hw/ppc/xics.h
 +++ b/include/hw/ppc/xics.h
-@@ -87,6 +87,7 @@ struct ICPState {
+@@ -69,6 +69,7 @@ struct ICPStateClass {
+     void (*pre_save)(ICPState *s);
+     int (*post_load)(ICPState *s, int version_id);
+     void (*cpu_setup)(ICPState *icp, PowerPCCPU *cpu);
++    void (*reset)(ICPState *icp);
  };
 =20
- #define ICP_PROP_XICS "xics"
-+#define ICP_PROP_CPU "cpu"
-=20
- struct PnvICPState {
-     ICPState parent_obj;
-@@ -187,8 +188,6 @@ void spapr_dt_xics(int nr_servers, void *fdt, uint32_=
-t phandle);
-=20
- qemu_irq xics_get_qirq(XICSFabric *xi, int irq);
- ICPState *xics_icp_get(XICSFabric *xi, int server);
--void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu, ICPState *icp);
--void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu);
-=20
- /* Internal XICS interfaces */
- void icp_set_cppr(ICPState *icp, uint8_t cppr);
+ struct ICPState {
 --=20
 2.9.4
