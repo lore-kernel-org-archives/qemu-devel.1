@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53673)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dJ9mU-0007bF-4b
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 22:36:11 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dJ9mW-0007bT-2s
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 22:36:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dJ9mT-000136-9F
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 22:36:10 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:39433)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1dJ9mS-000120-TG
-	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 22:36:09 -0400
-Date: Fri, 9 Jun 2017 12:03:38 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1dJ9mS-00012m-V2
+	for qemu-devel@nongnu.org; Thu, 08 Jun 2017 22:36:12 -0400
+Date: Fri, 9 Jun 2017 12:24:52 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170609020338.GC26521@umbus.fritz.box>
-References: <1496927934-21815-1-git-send-email-thuth@redhat.com>
-	<871squblsp.fsf@secure.mitica>
+Message-ID: <20170609022452.GE26521@umbus.fritz.box>
+References: <149685579678.12025.9278446121024037161.stgit@bahia.lan>
+	<149685582923.12025.13700165807436904935.stgit@bahia.lan>
+	<20170608020112.GT13397@umbus.fritz.box>
+	<20170608104530.65b7d53e@bahia.ttt.fr.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Fig2xvG2VGoz8o/s"
+	protocol="application/pgp-signature"; boundary="Uwl7UQhJk99r8jnw"
 Content-Disposition: inline
-In-Reply-To: <871squblsp.fsf@secure.mitica>
-Subject: Re: [Qemu-devel] [PATCH] hw/cpu: core.c can be compiled as common
- object
+In-Reply-To: <20170608104530.65b7d53e@bahia.ttt.fr.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] xics: setup cpu at realize time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +26,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Andrew Jones <drjones@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>
 
 
---Fig2xvG2VGoz8o/s
+--Uwl7UQhJk99r8jnw
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 08, 2017 at 04:23:34PM +0200, Juan Quintela wrote:
-> Thomas Huth <thuth@redhat.com> wrote:
-> > There does not seem to be any target specific code in core.c, so we can
-> > put it into "common-obj" instead of "obj" to compile it only once for
-> > all targets.
-> >
-> > Signed-off-by: Thomas Huth <thuth@redhat.com>
+On Thu, Jun 08, 2017 at 10:45:30AM +0200, Greg Kurz wrote:
+> On Thu, 8 Jun 2017 12:01:12 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
 >=20
-> It compiles.
-> I can't see anything that is target dependent on core.c.
+> > On Wed, Jun 07, 2017 at 07:17:09PM +0200, Greg Kurz wrote:
+> > > Until recently, spapr used to allocate ICPState objects for the lifet=
+ime
+> > > of the machine. They would only be associated to vCPUs in xics_cpu_se=
+tup()
+> > > when plugging a CPU core.
+> > >=20
+> > > Now that ICPState objects have the same lifecycle as vCPUs, it is
+> > > possible to associate them during realization.
+> > >=20
+> > > This patch hence open-codes xics_cpu_setup() in icp_realize(). The vC=
+PU
+> > > is passed as a property. Note that vCPU now needs to be realized first
+> > > for the IRQs to be allocated. It also needs to resetted before ICPSta=
+te
+> > > realization in order to synchronize with KVM. =20
+> >=20
+> > Ok, what enforces those ordering constraints?
+> >=20
 >=20
-> So
->=20
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
+> I'm not sure about what you're asking... I had to re-order because
+> xics_cpu_setup() used to be called after the vCPU is realized and
+> put in PAPR mode.
 
-I've merged this into my ppc-for-2.10 tree, on the basis that ppc is
-the only user of core.c so far.  Any objections?
+Duh, sorry, I wasn't thinking to ask about realize order, since that's
+manual and you've re-ordered it to be correct.
+
+You also mention that reset order matters, and I'm less clear on what
+guarantees that the reset handlers for the components get called in
+the right order.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -62,25 +76,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---Fig2xvG2VGoz8o/s
+--Uwl7UQhJk99r8jnw
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZOgH6AAoJEGw4ysog2bOSDhUQAJGsjICJ0/3TSOlN4/GAyODr
-g/w3Hnfs8R7RB24il/WOA+gtKP4g5JfRFROS1eaCtj81mP94GpVRlTYRyVC+4ssI
-tCNbqCOve37S74GeeElL2AeC2dEKyatcjHHW47aJvS9Ne3DSKAFRY3Dt8H18xz+U
-DSKvwnBCDmAJWqI3yQ7xcBT20ge9Bg5Pi4LY5+IeoJeto1gbt/czj2wx0s7R5VZw
-45lTey+RX8WbAIScLfdioB5YhZoL2SbBuGe5ZnlPLLZf+AFI3Q3rk6UxwfAvVEsW
-GvpJAk83WkQTCovi6+RzUK4K8eRhdCUrfKJbaYmEICn25Kc2UbdFYF7tHdYFOz6h
-JCJ0d25HOb9FtiayTqEQBmoeIJWiwDowZv2TecHRmiySScoluWI2gidn0cDpEJvZ
-OxS+hDjK1nklvA0FRS7W3ewJA6JgmPT7uJw5QaA1XxFW1l6XUDFEQn3R64aGMlBA
-rfMzbFo1a6xp9Z97JZ9bhGvn+xmOmLIgjVNbF2MrznDeW3ES7fp1MrHYjO5GNvOw
-Eut9iqT9bWN7bZvXI2T01QmQIb2H8QsLNrSSFKeuEqG6WrzoXy7Z1c+UhScJ8UYZ
-54w5g4j4f1UwPG+/mrMTaUS40xdjUDf2+9s/+at3kRd+NFuF6VjjClnsiJPoI/ol
-qlUfoeeGatirDxf8jBn4
-=Wye/
+iQIcBAEBCAAGBQJZOgbyAAoJEGw4ysog2bOS8PYP/10WSVLPWe0CABYj1V2AcC+B
+bMm7Hzu/MciCKF0hFlSUURYN75ZyldkON48YzFJis/EpgQ3uv+YYBzEUa9/qQhi/
+HS0F0IJvDS5wZ8Tim/3qFOqSGSOV/ywfQGytYut0qqDRT8MRZTKLduZHcuB8jnWU
+rAjq9otMu2GEtSe4BTdWeBP3c78bPyE8+GusiSEU08w46mbLjDLgEGyDmEyVPm13
+vCU1kTCzN98n6XI63ddwDT1R1ReNsGVk5kBIbHaHWsxn/uRtJ/OG+s8tpiIZ2yOm
+bLv8U13q8n8vqOmi3d+bJh59AVjmmSY0sKMPBoqGf4QJS+fl3Pmfjj2RD/aZPmJZ
+/3KQKufOvMTTQV+v9XrcO/R9BXi2f+3LuD4WCyBcHMc6jRTgC1R5DkD3HNSj+9kv
+y9v4yUHLRUIi45GSjV6tWxAds2UKpsXHKR2BN0uq8kVaE3N3PWlsGrn2kpGEylhi
+EzLV0lACuno7IpgUU2rIG7GYtT+TtZJdrICBK2x1+2EeFT3ZLNyTuOijbzFcAliW
++5Z1pXLFTZS3YDNGcY727zoo7meW8G60mT+VnTnDZXgiNdSsRdFXms7vMjqelk93
+vl5eJplKxH5MoIQMlSGvWv69IK5cKKKPS0q5KgAqR3NuKJXbCbkHe5kGMiv760Yl
+ZRTaeboz4PNaY/PF2HNe
+=M/YN
 -----END PGP SIGNATURE-----
 
---Fig2xvG2VGoz8o/s--
+--Uwl7UQhJk99r8jnw--
