@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dJDIF-0005Yl-FG
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 02:21:12 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1dJDIt-0005xv-3j
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 02:21:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dJDIC-0002AX-5B
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 02:21:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47532)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dJDIB-0002AB-SW
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 02:21:08 -0400
-References: <1496829322-17099-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1496829322-17099-10-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <c734e384-a0fe-0b08-2221-3d7a5842cb50@redhat.com>
-Date: Fri, 9 Jun 2017 14:20:58 +0800
-MIME-Version: 1.0
-In-Reply-To: <1496829322-17099-10-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V6 09/10] net/filter-rewriter.c: Make
- filter-rewriter support vnet_hdr_len
+	(envelope-from <a.perevalov@samsung.com>) id 1dJDIp-0002SM-Nw
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 02:21:51 -0400
+Received: from mailout4.w1.samsung.com ([210.118.77.14]:43467)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1dJDIp-0002Qs-Fs
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 02:21:47 -0400
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout4.w1.samsung.com
+	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
+	2014)) with ESMTP id <0OR900G6ROC6UY30@mailout4.w1.samsung.com> for
+	qemu-devel@nongnu.org; Fri, 09 Jun 2017 07:21:42 +0100 (BST)
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Message-id: <b1260f4a-513e-b5c0-2cef-b9b6e0b65d17@samsung.com>
+Date: Fri, 09 Jun 2017 09:21:38 +0300
+MIME-version: 1.0
+In-reply-to: <20170609041059.GI3628@pxdev.xzpeter.org>
+Content-type: text/plain; charset=utf-8; format=flowed
+Content-transfer-encoding: 7bit
+Content-language: en-GB
+References: <1496828798-27548-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170607094727eucas1p13b2228fead9fc5a49d953985c777b719@eucas1p1.samsung.com>
+	<1496828798-27548-3-git-send-email-a.perevalov@samsung.com>
+	<20170609041059.GI3628@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH v8 02/11] migration: pass
+ MigrationIncomingState* into migration check functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,154 +37,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, weifuqiang <weifuqiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, i.maximets@samsung.com
 
+On 06/09/2017 07:10 AM, Peter Xu wrote:
+> On Wed, Jun 07, 2017 at 12:46:29PM +0300, Alexey Perevalov wrote:
+>> That tiny refactoring is necessary to be able to set
+>> UFFD_FEATURE_THREAD_ID while requesting features, and then
+>> to create downtime context in case when kernel supports it.
+>>
+>> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+>> ---
+>>   migration/migration.c    |  3 ++-
+>>   migration/postcopy-ram.c | 10 +++++-----
+>>   migration/postcopy-ram.h |  2 +-
+>>   migration/savevm.c       |  2 +-
+>>   4 files changed, 9 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/migration/migration.c b/migration/migration.c
+>> index 48c94c9..2a77636 100644
+>> --- a/migration/migration.c
+>> +++ b/migration/migration.c
+>> @@ -726,6 +726,7 @@ void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
+>>                                     Error **errp)
+>>   {
+>>       MigrationState *s = migrate_get_current();
+>> +    MigrationIncomingState *mis = migration_incoming_get_current();
+> If this patch is only servicing patch 6, I'd prefer in patch 6 we call
+> migration_incoming_get_current() (rather than here), then this patch
+> may be dropped?...
+I planed this patch as preparation, I used to separate refactoring from 
+main change, for
+easy merging while rebasing.
+mis - is necessary here to have the same behaviour as before.
 
-
-On 2017=E5=B9=B406=E6=9C=8807=E6=97=A5 17:55, Zhang Chen wrote:
-> We add the vnet_hdr_support option for filter-rewriter, default is disa=
-ble.
-> If you use virtio-net-pci net driver, please enable it.
-> You can use it for example:
-> -object filter-rewriter,id=3Drew0,netdev=3Dhn0,queue=3Dall,vnet_hdr_sup=
-port
 >
-> We get the vnet_hdr_len from NetClientState that make us
-> parse net packet correctly.
+> Thanks,
 >
-> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-> ---
->   net/filter-rewriter.c | 51 ++++++++++++++++++++++++++++++++++++++++++=
-++++++++-
->   qemu-options.hx       |  4 ++--
->   2 files changed, 52 insertions(+), 3 deletions(-)
->
-> diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
-> index 63256c7..8eaf0e8 100644
-> --- a/net/filter-rewriter.c
-> +++ b/net/filter-rewriter.c
-> @@ -17,6 +17,7 @@
->   #include "qemu-common.h"
->   #include "qapi/error.h"
->   #include "qapi/qmp/qerror.h"
-> +#include "qemu/error-report.h"
->   #include "qapi-visit.h"
->   #include "qom/object.h"
->   #include "qemu/main-loop.h"
-> @@ -33,6 +34,7 @@ typedef struct RewriterState {
->       NetQueue *incoming_queue;
->       /* hashtable to save connection */
->       GHashTable *connection_track_table;
-> +    bool vnet_hdr;
->   } RewriterState;
->  =20
->   static void filter_rewriter_flush(NetFilterState *nf)
-> @@ -155,10 +157,25 @@ static ssize_t colo_rewriter_receive_iov(NetFilte=
-rState *nf,
->       ConnectionKey key;
->       Packet *pkt;
->       ssize_t size =3D iov_size(iov, iovcnt);
-> +    ssize_t vnet_hdr_len =3D 0;
->       char *buf =3D g_malloc0(size);
->  =20
->       iov_to_buf(iov, iovcnt, 0, buf, size);
-> -    pkt =3D packet_new(buf, size, 0);
-> +
-> +    if (s->vnet_hdr) {
-> +        if (nf->direction =3D=3D NET_FILTER_DIRECTION_RX ||
-> +            nf->direction =3D=3D NET_FILTER_DIRECTION_ALL) {
-> +            vnet_hdr_len =3D nf->netdev->vnet_hdr_len;
-> +        } else if (nf->direction =3D=3D NET_FILTER_DIRECTION_TX) {
-> +            vnet_hdr_len =3D nf->netdev->peer->vnet_hdr_len;
-> +        } else {
-> +            error_report("filter-rewriter get vnet_hdr_len failed");
-> +            /* When error occurred we drop the packet  */
-> +            return 1;
-> +        }
-> +    }
+>>       MigrationCapabilityStatusList *cap;
+>>       bool old_postcopy_cap = migrate_postcopy_ram();
+>>   
+>> @@ -772,7 +773,7 @@ void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
+>>            * special support.
+>>            */
+>>           if (!old_postcopy_cap && runstate_check(RUN_STATE_INMIGRATE) &&
+>> -            !postcopy_ram_supported_by_host()) {
+>> +            !postcopy_ram_supported_by_host(mis)) {
+>>               /* postcopy_ram_supported_by_host will have emitted a more
+>>                * detailed message
+>>                */
+>> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+>> index 9c41887..10d39a0 100644
+>> --- a/migration/postcopy-ram.c
+>> +++ b/migration/postcopy-ram.c
+>> @@ -63,7 +63,7 @@ struct PostcopyDiscardState {
+>>   #include <sys/eventfd.h>
+>>   #include <linux/userfaultfd.h>
+>>   
+>> -static bool ufd_version_check(int ufd)
+>> +static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
+>>   {
+>>       struct uffdio_api api_struct;
+>>       uint64_t ioctl_mask;
+>> @@ -126,7 +126,7 @@ static int test_ramblock_postcopiable(const char *block_name, void *host_addr,
+>>    * normally fine since if the postcopy succeeds it gets turned back on at the
+>>    * end.
+>>    */
+>> -bool postcopy_ram_supported_by_host(void)
+>> +bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
+>>   {
+>>       long pagesize = getpagesize();
+>>       int ufd = -1;
+>> @@ -149,7 +149,7 @@ bool postcopy_ram_supported_by_host(void)
+>>       }
+>>   
+>>       /* Version and features check */
+>> -    if (!ufd_version_check(ufd)) {
+>> +    if (!ufd_version_check(ufd, mis)) {
+>>           goto out;
+>>       }
+>>   
+>> @@ -525,7 +525,7 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+>>        * Although the host check already tested the API, we need to
+>>        * do the check again as an ABI handshake on the new fd.
+>>        */
+>> -    if (!ufd_version_check(mis->userfault_fd)) {
+>> +    if (!ufd_version_check(mis->userfault_fd, mis)) {
+>>           return -1;
+>>       }
+>>   
+>> @@ -663,7 +663,7 @@ void *postcopy_get_tmp_page(MigrationIncomingState *mis)
+>>   
+>>   #else
+>>   /* No target OS support, stubs just fail */
+>> -bool postcopy_ram_supported_by_host(void)
+>> +bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
+>>   {
+>>       error_report("%s: No OS support", __func__);
+>>       return false;
+>> diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
+>> index 52d51e8..587a8b8 100644
+>> --- a/migration/postcopy-ram.h
+>> +++ b/migration/postcopy-ram.h
+>> @@ -14,7 +14,7 @@
+>>   #define QEMU_POSTCOPY_RAM_H
+>>   
+>>   /* Return true if the host supports everything we need to do postcopy-ram */
+>> -bool postcopy_ram_supported_by_host(void);
+>> +bool postcopy_ram_supported_by_host(MigrationIncomingState *mis);
+>>   
+>>   /*
+>>    * Make all of RAM sensitive to accesses to areas that haven't yet been written
+>> diff --git a/migration/savevm.c b/migration/savevm.c
+>> index 9c320f5..8b7bab8 100644
+>> --- a/migration/savevm.c
+>> +++ b/migration/savevm.c
+>> @@ -1380,7 +1380,7 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
+>>           return -1;
+>>       }
+>>   
+>> -    if (!postcopy_ram_supported_by_host()) {
+>> +    if (!postcopy_ram_supported_by_host(mis)) {
+>>           postcopy_state_set(POSTCOPY_INCOMING_NONE);
+>>           return -1;
+>>       }
+>> -- 
+>> 1.9.1
+>>
 
-Similar issue as patch 02, and we can probably use a helper to avoid=20
-duplicating codes.
-
-Thanks
-
-> +
-> +    pkt =3D packet_new(buf, size, vnet_hdr_len);
->       g_free(buf);
->  =20
->       /*
-> @@ -237,6 +254,37 @@ static void colo_rewriter_setup(NetFilterState *nf=
-, Error **errp)
->       s->incoming_queue =3D qemu_new_net_queue(qemu_netfilter_pass_to_n=
-ext, nf);
->   }
->  =20
-> +static bool filter_rewriter_get_vnet_hdr(Object *obj, Error **errp)
-> +{
-> +    RewriterState *s =3D FILTER_COLO_REWRITER(obj);
-> +
-> +    return s->vnet_hdr;
-> +}
-> +
-> +static void filter_rewriter_set_vnet_hdr(Object *obj,
-> +                                         bool value,
-> +                                         Error **errp)
-> +{
-> +    RewriterState *s =3D FILTER_COLO_REWRITER(obj);
-> +
-> +    s->vnet_hdr =3D value;
-> +}
-> +
-> +static void filter_rewriter_init(Object *obj)
-> +{
-> +    RewriterState *s =3D FILTER_COLO_REWRITER(obj);
-> +
-> +    /*
-> +     * The vnet_hdr is disabled by default, if you want to enable
-> +     * this option, you must enable all the option on related modules
-> +     * (like other filter or colo-compare).
-> +     */
-> +    s->vnet_hdr =3D false;
-> +    object_property_add_bool(obj, "vnet_hdr_support",
-> +                             filter_rewriter_get_vnet_hdr,
-> +                             filter_rewriter_set_vnet_hdr, NULL);
-> +}
-> +
->   static void colo_rewriter_class_init(ObjectClass *oc, void *data)
->   {
->       NetFilterClass *nfc =3D NETFILTER_CLASS(oc);
-> @@ -250,6 +298,7 @@ static const TypeInfo colo_rewriter_info =3D {
->       .name =3D TYPE_FILTER_REWRITER,
->       .parent =3D TYPE_NETFILTER,
->       .class_init =3D colo_rewriter_class_init,
-> +    .instance_init =3D filter_rewriter_init,
->       .instance_size =3D sizeof(RewriterState),
->   };
->  =20
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index fbfd604..8655842 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -4037,12 +4037,12 @@ Create a filter-redirector we need to differ ou=
-tdev id from indev id, id can not
->   be the same. we can just use indev or outdev, but at least one of ind=
-ev or outdev
->   need to be specified.
->  =20
-> -@item -object filter-rewriter,id=3D@var{id},netdev=3D@var{netdevid},re=
-writer-mode=3D@var{mode}[,queue=3D@var{all|rx|tx}]
-> +@item -object filter-rewriter,id=3D@var{id},netdev=3D@var{netdevid},re=
-writer-mode=3D@var{mode},queue=3D@var{all|rx|tx},[vnet_hdr_support]
->  =20
->   Filter-rewriter is a part of COLO project.It will rewrite tcp packet =
-to
->   secondary from primary to keep secondary tcp connection,and rewrite
->   tcp packet to primary from secondary make tcp packet can be handled b=
-y
-> -client.
-> +client.if have the vnet_hdr_support flag, we can parse packet with vne=
-t header.
->  =20
->   usage:
->   colo secondary:
+-- 
+Best regards,
+Alexey Perevalov
