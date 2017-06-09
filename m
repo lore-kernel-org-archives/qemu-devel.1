@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dJDuu-0001He-Lc
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 03:01:10 -0400
+	(envelope-from <peterx@redhat.com>) id 1dJE8R-0005TS-4l
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 03:15:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dJDur-0000uR-Ho
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 03:01:08 -0400
-Resent-Message-Id: <E1dJDur-0000uR-Ho@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21309)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dJDur-0000uF-7h
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 03:01:05 -0400
-In-Reply-To: <20170609053719.26251-1-rth@twiddle.net>
-Message-ID: <149699165216.2550.12975691549964796606@84b42461e25a>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <peterx@redhat.com>) id 1dJE8M-0005rx-AJ
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 03:15:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46356)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dJE8M-0005rb-4K
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 03:15:02 -0400
+Date: Fri, 9 Jun 2017 15:14:55 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170609071455.GK3628@pxdev.xzpeter.org>
+References: <1496828798-27548-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170607094727eucas1p13b2228fead9fc5a49d953985c777b719@eucas1p1.samsung.com>
+	<1496828798-27548-3-git-send-email-a.perevalov@samsung.com>
+	<20170609041059.GI3628@pxdev.xzpeter.org>
+	<b1260f4a-513e-b5c0-2cef-b9b6e0b65d17@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 9 Jun 2017 00:00:52 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v5 0/7] tcg: allocate TB structs preceding
- translate
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <b1260f4a-513e-b5c0-2cef-b9b6e0b65d17@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH v8 02/11] migration: pass
+ MigrationIncomingState* into migration check functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +31,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: rth@twiddle.net
-Cc: famz@redhat.com, qemu-devel@nongnu.org, cota@braap.org
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, i.maximets@samsung.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjUgMC83XSB0Y2c6IGFsbG9jYXRlIFRCIHN0cnVj
-dHMgcHJlY2VkaW5nIHRyYW5zbGF0ZQpNZXNzYWdlLWlkOiAyMDE3MDYwOTA1MzcxOS4yNjI1MS0x
-LXJ0aEB0d2lkZGxlLm5ldAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoK
-QkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkK
-ZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9
-JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNo
-ZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4u
-IgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3Bh
-dGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwog
-ICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBF
-TkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0
-CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFn
-XSAgICAgICAgIHBhdGNoZXcvMTQ5Njk5MTE5Ny0xODE1LTEtZ2l0LXNlbmQtZW1haWwtdGh1dGhA
-cmVkaGF0LmNvbSAtPiBwYXRjaGV3LzE0OTY5OTExOTctMTgxNS0xLWdpdC1zZW5kLWVtYWlsLXRo
-dXRoQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwowZDFlMmU4IHRj
-Zy9hcm06IFVzZSBsZHIgKGxpdGVyYWwpIGZvciBnb3RvX3RiCjc4ODdlNTIgdGNnL2FybTogVHJ5
-IHBjLXJlbGF0aXZlIGFkZHJlc3NlcyBmb3IgbW92aQplMDE0NDk3IHRjZy9hcm06IFJlbW92ZSBs
-aW1pdCBvbiBjb2RlIGJ1ZmZlciBzaXplCjFjMGU1NjMgdGNnL2FybTogVXNlIGluZGlyZWN0IGJy
-YW5jaCBmb3IgZ290b190YgozODg0NjhlIHRjZy9hYXJjaDY0OiBVc2UgQURSIGluIHRjZ19vdXRf
-bW92aQpjZjFjMzBiIHRjZzogYWxsb2NhdGUgVEIgc3RydWN0cyBiZWZvcmUgdGhlIGNvcnJlc3Bv
-bmRpbmcgdHJhbnNsYXRlZCBjb2RlCjg1N2QzNGUgdXRpbDogYWRkIGNhY2hlaW5mbwoKPT09IE9V
-VFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS83OiB1dGlsOiBhZGQgY2FjaGVpbmZvLi4u
-CkVSUk9SOiBkbyBub3QgaW5pdGlhbGlzZSBnbG9iYWxzIHRvIDAgb3IgTlVMTAojMTQ5OiBGSUxF
-OiB1dGlsL2NhY2hlaW5mby5jOjExOgoraW50IHFlbXVfaWNhY2hlX2xpbmVzaXplID0gMDsKCkVS
-Uk9SOiBkbyBub3QgaW5pdGlhbGlzZSBnbG9iYWxzIHRvIDAgb3IgTlVMTAojMTUwOiBGSUxFOiB1
-dGlsL2NhY2hlaW5mby5jOjEyOgoraW50IHFlbXVfZGNhY2hlX2xpbmVzaXplID0gMDsKCkVSUk9S
-OiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQgJyYmJyAoY3R4OkV4VykKIzE5MTogRklMRTog
-dXRpbC9jYWNoZWluZm8uYzo1MzoKKyAgICAgICAgICAgICYmIGJ1ZltpXS5DYWNoZS5MZXZlbCA9
-PSAxKSB7CiAgICAgICAgICAgICBeCgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVm
-aW5lcyBzaG91bGQgYmUgYXZvaWRlZAojMjE0OiBGSUxFOiB1dGlsL2NhY2hlaW5mby5jOjc2Ogor
-IyBpZiBkZWZpbmVkKF9fQVBQTEVfXykKCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBk
-ZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiMyNDg6IEZJTEU6IHV0aWwvY2FjaGVpbmZvLmM6MTEw
-OgorI2lmIGRlZmluZWQoX19hYXJjaDY0X18pCgp0b3RhbDogMyBlcnJvcnMsIDIgd2FybmluZ3Ms
-IDIxOCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
-IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
-cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
-CgpDaGVja2luZyBQQVRDSCAyLzc6IHRjZzogYWxsb2NhdGUgVEIgc3RydWN0cyBiZWZvcmUgdGhl
-IGNvcnJlc3BvbmRpbmcgdHJhbnNsYXRlZCBjb2RlLi4uCkNoZWNraW5nIFBBVENIIDMvNzogdGNn
-L2FhcmNoNjQ6IFVzZSBBRFIgaW4gdGNnX291dF9tb3ZpLi4uCkNoZWNraW5nIFBBVENIIDQvNzog
-dGNnL2FybTogVXNlIGluZGlyZWN0IGJyYW5jaCBmb3IgZ290b190Yi4uLgpDaGVja2luZyBQQVRD
-SCA1Lzc6IHRjZy9hcm06IFJlbW92ZSBsaW1pdCBvbiBjb2RlIGJ1ZmZlciBzaXplLi4uCkNoZWNr
-aW5nIFBBVENIIDYvNzogdGNnL2FybTogVHJ5IHBjLXJlbGF0aXZlIGFkZHJlc3NlcyBmb3IgbW92
-aS4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM1NDogRklMRTog
-dGNnL2FybS90Y2ctdGFyZ2V0LmluYy5jOjQ0NjoKK15JfSQKCkVSUk9SOiBjb2RlIGluZGVudCBz
-aG91bGQgbmV2ZXIgdXNlIHRhYnMKIzY0OiBGSUxFOiB0Y2cvYXJtL3RjZy10YXJnZXQuaW5jLmM6
-NDUzOgorXkl9JAoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA1NCBsaW5lcyBjaGVja2Vk
-CgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA3
-Lzc6IHRjZy9hcm06IFVzZSBsZHIgKGxpdGVyYWwpIGZvciBnb3RvX3RiLi4uCj09PSBPVVRQVVQg
-RU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2Vu
-ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBs
-ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On Fri, Jun 09, 2017 at 09:21:38AM +0300, Alexey Perevalov wrote:
+> On 06/09/2017 07:10 AM, Peter Xu wrote:
+> >On Wed, Jun 07, 2017 at 12:46:29PM +0300, Alexey Perevalov wrote:
+> >>That tiny refactoring is necessary to be able to set
+> >>UFFD_FEATURE_THREAD_ID while requesting features, and then
+> >>to create downtime context in case when kernel supports it.
+> >>
+> >>Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> >>---
+> >>  migration/migration.c    |  3 ++-
+> >>  migration/postcopy-ram.c | 10 +++++-----
+> >>  migration/postcopy-ram.h |  2 +-
+> >>  migration/savevm.c       |  2 +-
+> >>  4 files changed, 9 insertions(+), 8 deletions(-)
+> >>
+> >>diff --git a/migration/migration.c b/migration/migration.c
+> >>index 48c94c9..2a77636 100644
+> >>--- a/migration/migration.c
+> >>+++ b/migration/migration.c
+> >>@@ -726,6 +726,7 @@ void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
+> >>                                    Error **errp)
+> >>  {
+> >>      MigrationState *s = migrate_get_current();
+> >>+    MigrationIncomingState *mis = migration_incoming_get_current();
+> >If this patch is only servicing patch 6, I'd prefer in patch 6 we call
+> >migration_incoming_get_current() (rather than here), then this patch
+> >may be dropped?...
+> I planed this patch as preparation, I used to separate refactoring from main
+> change, for
+> easy merging while rebasing.
+> mis - is necessary here to have the same behaviour as before.
+
+Could I ask what's the "same behavior" you mentioned?
+
+I thought this patch is only used by patch 6 when creating the
+blocktime struct (but not really a clean-up), no?
+
+-- 
+Peter Xu
