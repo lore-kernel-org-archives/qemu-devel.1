@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dJKcy-000736-Uw
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 10:11:05 -0400
+	(envelope-from <eblake@redhat.com>) id 1dJKiD-00040V-Ca
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 10:16:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dJKcv-0004WN-NA
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 10:11:04 -0400
+	(envelope-from <eblake@redhat.com>) id 1dJKiC-0006vY-C9
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 10:16:29 -0400
 References: <1497009003-25794-1-git-send-email-kwolf@redhat.com>
 	<1497009003-25794-4-git-send-email-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <cca5d6f7-0747-5759-f940-1d8755b1a523@redhat.com>
-Date: Fri, 9 Jun 2017 16:10:54 +0200
+	<8514d36e-1bc6-567f-4f10-9e8584b9eed0@redhat.com>
+	<20170609125831.GD4462@noname.redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ea981c62-61c5-8870-3ba2-8469f8c4fa5f@redhat.com>
+Date: Fri, 9 Jun 2017 09:16:11 -0500
 MIME-Version: 1.0
-In-Reply-To: <1497009003-25794-4-git-send-email-kwolf@redhat.com>
+In-Reply-To: <20170609125831.GD4462@noname.redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="B19LTSKX4o7tpkvwfD84RmlxRrHqbPKU2"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 3/3] qemu-iotests: Test
- exiting qemu with running job
+	boundary="TIlmDj6IM7f0AKlXM98hPmcUJAhOTMTjG"
+Subject: Re: [Qemu-devel] [PATCH 3/3] qemu-iotests: Test exiting qemu with
+ running job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,102 +27,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---B19LTSKX4o7tpkvwfD84RmlxRrHqbPKU2
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
-Message-ID: <cca5d6f7-0747-5759-f940-1d8755b1a523@redhat.com>
-Subject: Re: [Qemu-block] [PATCH 3/3] qemu-iotests: Test exiting qemu with
+--TIlmDj6IM7f0AKlXM98hPmcUJAhOTMTjG
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Message-ID: <ea981c62-61c5-8870-3ba2-8469f8c4fa5f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] qemu-iotests: Test exiting qemu with
  running job
 References: <1497009003-25794-1-git-send-email-kwolf@redhat.com>
  <1497009003-25794-4-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1497009003-25794-4-git-send-email-kwolf@redhat.com>
+ <8514d36e-1bc6-567f-4f10-9e8584b9eed0@redhat.com>
+ <20170609125831.GD4462@noname.redhat.com>
+In-Reply-To: <20170609125831.GD4462@noname.redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-06-09 13:50, Kevin Wolf wrote:
-> When qemu is exited, all running jobs should be cancelled successfully.=
+On 06/09/2017 07:58 AM, Kevin Wolf wrote:
+> Am 09.06.2017 um 14:14 hat Eric Blake geschrieben:
+>> On 06/09/2017 06:50 AM, Kevin Wolf wrote:
+>>> When qemu is exited, all running jobs should be cancelled successfull=
+y.
+>>> This adds a test for this for all types of block jobs that currently
+>>> exist in qemu.
+>>>
+>>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 
-> This adds a test for this for all types of block jobs that currently
-> exist in qemu.
+>>> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "=
+event": "SHUTDOWN", "data": {"guest": false}}
+>>> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "=
+event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 67108864=
+, "offset": 524288, "speed": 65536, "type": "commit"}}
+>>
+>> I'm worried that if you don't sanitize at least offset, you will still=
+
+>> be prone to some race conditions changing the output.  You may want to=
+
+>> add in some additional filtering on the output to be safer.
 >=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  tests/qemu-iotests/185     | 189 +++++++++++++++++++++++++++++++++++++=
-++++++++
->  tests/qemu-iotests/185.out |  59 ++++++++++++++
->  tests/qemu-iotests/group   |   1 +
->  3 files changed, 249 insertions(+)
->  create mode 100755 tests/qemu-iotests/185
->  create mode 100644 tests/qemu-iotests/185.out
+> I considered that at first, but then I realised that these offsets are
+> indeed predictable and we want to know if they change (it would likely
+> mean that the throttling is broken).
 >=20
-> diff --git a/tests/qemu-iotests/185 b/tests/qemu-iotests/185
-> new file mode 100755
-> index 0000000..645ec9a
-> --- /dev/null
-> +++ b/tests/qemu-iotests/185
+> If you look at the individual cases, we have:
+>=20
+> * offset=3D512k for (intermediate) commit and streaming. This is exactl=
+y
+>   the buffer size for a single request and will be followed by a delay
+>   of eight seconds before the next chunk is copied, so we will never ge=
+t
+>   a different value here.
+>=20
+> * offset=3D4M for active commit and mirror, because the mirror job has =
+a
+>   larger buffer size by default, so one request completes it all. This
+>   number is already the maximum, so nothing is going to change here
+>   either.
+>=20
+> * offset=3D64k for backup, which works cluster by cluster. We know that=
 
-[...]
+>   the cluster size is exactly 64k, and while we have only one second
+>   of delay here, that's still plenty of time for the 'quit' command to
+>   arrive.
 
-> +_supported_fmt qcow2 raw
-> +_supported_proto file
-> +_supported_os Linux
+These belong in comments in the test proper, because it is not obvious
+otherwise.  But with comments added (so someone debugging a theoretical
+test failure down the road knows what they are up against),
 
-[...]
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-> +echo
-> +echo =3D=3D=3D Creating backing chain =3D=3D=3D
-> +echo
-> +
-> +_send_qemu_cmd $h \
-> +    "{ 'execute': 'blockdev-snapshot-sync',
-> +       'arguments': { 'device': 'disk',
-> +                      'snapshot-file': '$TEST_IMG.mid',
-> +                      'format': '$IMGFMT',
-
-Not having looked at this series further yet (sorry...), I just noticed
-that this does not work very well with raw.
-
-Max
-
-> +                      'mode': 'absolute-paths' } }" \
-> +    "return"
-> +
-> +_send_qemu_cmd $h \
-> +    "{ 'execute': 'human-monitor-command',
-> +       'arguments': { 'command-line':
-> +                      'qemu-io disk \"write 0 4M\"' } }" \
-> +    "return"
-> +
-> +_send_qemu_cmd $h \
-> +    "{ 'execute': 'blockdev-snapshot-sync',
-> +       'arguments': { 'device': 'disk',
-> +                      'snapshot-file': '$TEST_IMG',
-> +                      'format': '$IMGFMT',
-> +                      'mode': 'absolute-paths' } }" \
-> +    "return"
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
---B19LTSKX4o7tpkvwfD84RmlxRrHqbPKU2
+--TIlmDj6IM7f0AKlXM98hPmcUJAhOTMTjG
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEvBAEBCAAZBQJZOqxuEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQHf+
-CACmfbd36VuNn2gGEK04wtHSnGzv10Enm0eFLf5g88VEummaDLYJQEb0Qj32aNj6
-gvYthve/7I4rzff3DbL0AdkPCPZL5j2BAfQ/KoR5svrQCk2JNauP2lEFAvdUEKgM
-i7VnPH6Mh3CGF4CxcoXEYVi91TS6qaD/4k3+/MRtOpTwpPZKIAAaQEMiatGZPifn
-crsj9zX4jqiBUY63/1+VvILpXy1KJnRWTK0C/PWzhA/t96YvAP4NmOwMCwID7dT8
-AJANIH1cZm/uu1+zeRIoaUaUVsWQbzhffvqGzu919lMwStzyXrhQAnvV9V/7YLUE
-Luim7rj76U/ffrGPXbcLCU6T
-=XQqv
+iQEcBAEBCAAGBQJZOq2rAAoJEKeha0olJ0NqSdAH/01C18Louwnd4H1ffZLt80hI
+O5WQpzHdooBtOcZDgtOFXOuszSiTvezu8P60hndOpqCAURoJyY5K2+ykoACqCQa7
+uJJYbjA61kDy2+ZPqlcdYWOXxrygx8zV6gBk0cgZRMrEZL3iIRaL22oGLNcVUOcf
++2qtx33eWOM8uNhfh9bRq+mdwDuveevbiRzp0lYhlOPIhJJc11psjb9TRfppKgx3
+yupIOaY52x0fqRO55kvM2gu55Ph3dW0F94Px5vAYmOC5APeMfMf6r9nZFj4Bt7Y+
+fOTSm8E6XGxivCYuhsiBGXvFQR6eVB1YlcHoLvKlHi4BrlPvTZQEA0driGJb6l4=
+=G+02
 -----END PGP SIGNATURE-----
 
---B19LTSKX4o7tpkvwfD84RmlxRrHqbPKU2--
+--TIlmDj6IM7f0AKlXM98hPmcUJAhOTMTjG--
