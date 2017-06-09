@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dJJap-0004Nj-3H
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:04:50 -0400
+	(envelope-from <mlureau@redhat.com>) id 1dJJcS-0005gR-QF
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:06:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dJJal-00040P-3n
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:04:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60622)
+	(envelope-from <mlureau@redhat.com>) id 1dJJcO-0004Tr-Qs
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:06:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55440)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dJJak-000402-U6
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:04:43 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dJJcO-0004Ta-IQ
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:06:24 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F11A01E2F0
-	for <qemu-devel@nongnu.org>; Fri,  9 Jun 2017 13:04:41 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Fri,  9 Jun 2017 21:04:13 +0800
-Message-Id: <1497013453-13688-4-git-send-email-peterx@redhat.com>
-In-Reply-To: <1497013453-13688-1-git-send-email-peterx@redhat.com>
-References: <1497013453-13688-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/3] intel_iommu: cleanup
- vtd_interrupt_remap_msi()
+	by mx1.redhat.com (Postfix) with ESMTPS id 9FE9D37E66
+	for <qemu-devel@nongnu.org>; Fri,  9 Jun 2017 13:06:23 +0000 (UTC)
+Date: Fri, 9 Jun 2017 09:06:22 -0400 (EDT)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <2025405656.32234574.1497013582739.JavaMail.zimbra@redhat.com>
+In-Reply-To: <87fuf9l4sw.fsf@dusky.pond.sub.org>
+References: <20170607163635.17635-1-marcandre.lureau@redhat.com>
+	<87fuf9l4sw.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 00/43] qobject/qapi: add uint type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +33,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Move the memcpy upper into where needed, then share the trace so that we
-trace every correct remapping.
+Hi
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- hw/i386/intel_iommu.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+----- Original Message -----
+> PATCH 01-41 look ready with minor tweaks.  I chatted with Marc-Andr=C3=A9=
+,
+> and he asked me to apply them myself.  You can find the result at
+> https://repo.or.cz/qemu/armbru.git in branch qapi-next.  Marc-Andr=C3=A9,
+> please give it a quick look-over.  If it's good, I'll post a pull
+> request later today.
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index f94fc4e..dc65270 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -2499,7 +2499,8 @@ static int vtd_interrupt_remap_msi(IntelIOMMUState *iommu,
-     trace_vtd_ir_remap_msi_req(origin->address, origin->data);
- 
-     if (!iommu || !iommu->intr_enabled) {
--        goto do_not_translate;
-+        memcpy(translated, origin, sizeof(*origin));
-+        goto out;
-     }
- 
-     if (origin->address & VTD_MSI_ADDR_HI_MASK) {
-@@ -2516,7 +2517,8 @@ static int vtd_interrupt_remap_msi(IntelIOMMUState *iommu,
- 
-     /* This is compatible mode. */
-     if (addr.addr.int_mode != VTD_IR_INT_FORMAT_REMAP) {
--        goto do_not_translate;
-+        memcpy(translated, origin, sizeof(*origin));
-+        goto out;
-     }
- 
-     index = addr.addr.index_h << 15 | le16_to_cpu(addr.addr.index_l);
-@@ -2568,15 +2570,12 @@ static int vtd_interrupt_remap_msi(IntelIOMMUState *iommu,
-     /* Translate VTDIrq to MSI message */
-     vtd_generate_msi_message(&irq, translated);
- 
-+out:
-     trace_vtd_ir_remap_msi(ioapic_irq ? "IOAPIC" : "MSI",
-                            origin->address, origin->data,
-                            translated->address, translated->data);
- 
-     return 0;
--
--do_not_translate:
--    memcpy(translated, origin, sizeof(*origin));
--    return 0;
- }
- 
- static int vtd_int_remap(X86IOMMUState *iommu, MSIMessage *src,
--- 
-2.7.4
+Looks good to me, thanks a lot!
+
+>=20
+> PATCH 42 is RFC.  I'd like to give PATCH 43 a bit more time on the list.
+>=20
+> Incremental diff for your convenience:
+>=20
+> diff --git a/blockdev.c b/blockdev.c
+> index 154c95d..4009dd9 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -335,10 +335,9 @@ static bool parse_stats_intervals(BlockAcctStats *st=
+ats,
+> QList *intervals,
+>          }
+> =20
+>          case QTYPE_QNUM: {
+> -            int64_t length;
+> +            int64_t length =3D qnum_get_int(qobject_to_qnum(entry->value=
+));
+> =20
+> -            if (qnum_get_try_int(qobject_to_qnum(entry->value), &length)=
+ &&
+> -                length > 0 && length <=3D UINT_MAX) {
+> +            if (length > 0 && length <=3D UINT_MAX) {
+>                  block_acct_add_interval(stats, (unsigned) length);
+>              } else {
+>                  error_setg(errp, "Invalid interval length: %" PRId64,
+>                  length);
+> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> index a8f09c1..68cd653 100644
+> --- a/hw/core/qdev-properties.c
+> +++ b/hw/core/qdev-properties.c
+> @@ -71,7 +71,7 @@ static void set_enum(Object *obj, Visitor *v, const cha=
+r
+> *name, void *opaque,
+> =20
+>  static void set_default_value_enum(Object *obj, const Property *prop)
+>  {
+> -    object_property_set_str(obj, prop->info->enum_table[prop->defval.u],
+> +    object_property_set_str(obj, prop->info->enum_table[prop->defval.i],
+>                              prop->name, &error_abort);
+>  }
+> =20
+> diff --git a/tests/test-qobject-input-visitor.c
+> b/tests/test-qobject-input-visitor.c
+> index 3bcdb9a..34bab8a 100644
+> --- a/tests/test-qobject-input-visitor.c
+> +++ b/tests/test-qobject-input-visitor.c
+> @@ -152,6 +152,7 @@ static void test_visitor_in_uint(TestInputVisitorData
+> *data,
+>      g_assert_cmpuint(res, =3D=3D, 18446744073709551574U);
+> =20
+>      visit_type_number(v, NULL, &dbl, &error_abort);
+> +    g_assert_cmpfloat(dbl, =3D=3D, 18446744073709552000.0);
+>  }
+> =20
+>  static void test_visitor_in_int_overflow(TestInputVisitorData *data,
+> @@ -161,9 +162,10 @@ static void
+> test_visitor_in_int_overflow(TestInputVisitorData *data,
+>      Error *err =3D NULL;
+>      Visitor *v;
+> =20
+> -    /* this will overflow a QNUM_I64, so should be deserialized into a
+> +    /*
+> +     * This will overflow a QNUM_I64, so should be deserialized into a
+>       * QNUM_DOUBLE field instead, leading to an error if we pass it to
+> -     * visit_type_int. confirm this.
+> +     * visit_type_int().  Confirm this.
+>       */
+>      v =3D visitor_input_test_init(data, "%f", DBL_MAX);
+> =20
+> diff --git a/tests/test-qobject-output-visitor.c
+> b/tests/test-qobject-output-visitor.c
+> index d23c8eb..749c540 100644
+> --- a/tests/test-qobject-output-visitor.c
+> +++ b/tests/test-qobject-output-visitor.c
+> @@ -609,11 +609,13 @@ static void check_native_list(QObject *qobj,
+>          for (i =3D 0; i < 32; i++) {
+>              QObject *tmp;
+>              QNum *qvalue;
+> +            uint64_t val;
+> =20
+>              tmp =3D qlist_peek(qlist);
+>              g_assert(tmp);
+>              qvalue =3D qobject_to_qnum(tmp);
+> -            g_assert_cmpuint(qnum_get_uint(qvalue), =3D=3D, i);
+> +            g_assert(qnum_get_try_uint(qvalue, &val));
+> +            g_assert_cmpint(val, =3D=3D, i);
+>              qobject_decref(qlist_pop(qlist));
+>          }
+>          break;
+>=20
