@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37692)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dJIQd-0006lN-0D
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 07:50:11 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dJIQe-0006n4-D8
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 07:50:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dJIQc-0001te-9s
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 07:50:11 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dJIQd-0001vM-KH
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 07:50:12 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  9 Jun 2017 13:50:00 +0200
-Message-Id: <1497009003-25794-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/3] commit: Fix completion with extra reference
+Date: Fri,  9 Jun 2017 13:50:01 +0200
+Message-Id: <1497009003-25794-2-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1497009003-25794-1-git-send-email-kwolf@redhat.com>
+References: <1497009003-25794-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/3] commit: Fix completion with extra reference
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,19 +22,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-Kevin Wolf (3):
-  commit: Fix completion with extra reference
-  qemu-iotests: Allow starting new qemu after cleanup
-  qemu-iotests: Test exiting qemu with running job
+commit_complete() can't assume that after its block_job_completed() the
+job is actually immediately freed; someone else may still be holding
+references. In this case, the op blockers on the intermediate nodes make
+the graph reconfiguration in the completion code fail.
 
- block/commit.c                 |   7 ++
- tests/qemu-iotests/185         | 189 +++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/185.out     |  59 +++++++++++++
- tests/qemu-iotests/common.qemu |   3 +
- tests/qemu-iotests/group       |   1 +
- 5 files changed, 259 insertions(+)
- create mode 100755 tests/qemu-iotests/185
- create mode 100644 tests/qemu-iotests/185.out
+Call block_job_remove_all_bdrv() manually so that we know for sure that
+any blockers on intermediate nodes are given up.
 
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block/commit.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/block/commit.c b/block/commit.c
+index af6fa68..8c09c3d 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -119,6 +119,13 @@ static void commit_complete(BlockJob *job, void *opaque)
+     }
+     g_free(s->backing_file_str);
+     blk_unref(s->top);
++
++    /* If there is more than one reference to the job (e.g. if called from
++     * block_job_finish_sync()), block_job_completed() won't free it and
++     * therefore the blockers on the intermediate nodes remain. This would
++     * cause bdrv_set_backing_hd() to fail. */
++    block_job_remove_all_bdrv(job);
++
+     block_job_completed(&s->common, ret);
+     g_free(data);
+ 
 -- 
 1.8.3.1
