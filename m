@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dJKGE-0000b9-6k
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:47:35 -0400
+	(envelope-from <armbru@redhat.com>) id 1dJKGF-0000cL-La
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:47:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dJKGC-0003Vh-Js
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:47:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45751)
+	(envelope-from <armbru@redhat.com>) id 1dJKGE-0003XE-DZ
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:47:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33572)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dJKGC-0003VM-Ai
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:47:32 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dJKGE-0003WU-4u
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:47:34 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 50A2281222
-	for <qemu-devel@nongnu.org>; Fri,  9 Jun 2017 13:47:31 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1826D85541
+	for <qemu-devel@nongnu.org>; Fri,  9 Jun 2017 13:47:33 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  9 Jun 2017 15:46:45 +0200
-Message-Id: <1497016045-6009-2-git-send-email-armbru@redhat.com>
+Date: Fri,  9 Jun 2017 15:46:53 +0200
+Message-Id: <1497016045-6009-10-git-send-email-armbru@redhat.com>
 In-Reply-To: <1497016045-6009-1-git-send-email-armbru@redhat.com>
 References: <1497016045-6009-1-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 01/41] qdev: remove PropertyInfo.qtype field
+Subject: [Qemu-devel] [PULL 09/41] qnum: add uint type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,306 +37,232 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Remove dependency on qapi qtype, replace a field by a few PropertyInfo
-callbacks to set the default value type (introduced in commit 4f2d3d7).
+In order to store integer values between INT64_MAX and UINT64_MAX, add
+a uint64_t internal representation.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20170607163635.17635-2-marcandre.lureau@redhat.com>
+Message-Id: <20170607163635.17635-10-marcandre.lureau@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/core/qdev-properties.c    | 35 ++++++++++++++++++++++++++++++++++-
- hw/core/qdev.c               | 13 ++-----------
- include/hw/qdev-core.h       |  2 +-
- include/hw/qdev-properties.h |  5 -----
- 4 files changed, 37 insertions(+), 18 deletions(-)
+ include/qapi/qmp/qnum.h |  7 ++++++
+ qobject/qnum.c          | 64 +++++++++++++++++++++++++++++++++++++++++++=
+++++++
+ tests/check-qnum.c      | 48 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 119 insertions(+)
 
-diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index 9f1a497..c5e028a 100644
---- a/hw/core/qdev-properties.c
-+++ b/hw/core/qdev-properties.c
-@@ -69,6 +69,12 @@ static void set_enum(Object *obj, Visitor *v, const ch=
-ar *name, void *opaque,
-     visit_type_enum(v, prop->name, ptr, prop->info->enum_table, errp);
+diff --git a/include/qapi/qmp/qnum.h b/include/qapi/qmp/qnum.h
+index e42b136..09d745c 100644
+--- a/include/qapi/qmp/qnum.h
++++ b/include/qapi/qmp/qnum.h
+@@ -19,6 +19,7 @@
+=20
+ typedef enum {
+     QNUM_I64,
++    QNUM_U64,
+     QNUM_DOUBLE
+ } QNumKind;
+=20
+@@ -27,15 +28,21 @@ typedef struct QNum {
+     QNumKind kind;
+     union {
+         int64_t i64;
++        uint64_t u64;
+         double dbl;
+     } u;
+ } QNum;
+=20
+ QNum *qnum_from_int(int64_t value);
++QNum *qnum_from_uint(uint64_t value);
+ QNum *qnum_from_double(double value);
+=20
+ bool qnum_get_try_int(const QNum *qn, int64_t *val);
+ int64_t qnum_get_int(const QNum *qn);
++
++bool qnum_get_try_uint(const QNum *qn, uint64_t *val);
++uint64_t qnum_get_uint(const QNum *qn);
++
+ double qnum_get_double(QNum *qn);
+=20
+ char *qnum_to_string(QNum *qn);
+diff --git a/qobject/qnum.c b/qobject/qnum.c
+index d88e4f7..52918ac 100644
+--- a/qobject/qnum.c
++++ b/qobject/qnum.c
+@@ -35,6 +35,22 @@ QNum *qnum_from_int(int64_t value)
  }
 =20
-+static void set_default_value_enum(Object *obj, const Property *prop)
+ /**
++ * qnum_from_uint(): Create a new QNum from an uint64_t
++ *
++ * Return strong reference.
++ */
++QNum *qnum_from_uint(uint64_t value)
 +{
-+    object_property_set_str(obj, prop->info->enum_table[prop->defval],
-+                            prop->name, &error_abort);
++    QNum *qn =3D g_new(QNum, 1);
++
++    qobject_init(QOBJECT(qn), QTYPE_QNUM);
++    qn->kind =3D QNUM_U64;
++    qn->u.u64 =3D value;
++
++    return qn;
 +}
 +
- /* Bit */
-=20
- static uint32_t qdev_get_prop_mask(Property *prop)
-@@ -120,11 +126,17 @@ static void prop_set_bit(Object *obj, Visitor *v, c=
-onst char *name,
-     bit_prop_set(dev, prop, value);
- }
-=20
-+static void set_default_value_bool(Object *obj, const Property *prop)
-+{
-+    object_property_set_bool(obj, prop->defval, prop->name, &error_abort=
-);
-+}
-+
- PropertyInfo qdev_prop_bit =3D {
-     .name  =3D "bool",
-     .description =3D "on/off",
-     .get   =3D prop_get_bit,
-     .set   =3D prop_set_bit,
-+    .set_default_value =3D set_default_value_bool,
- };
-=20
- /* Bit64 */
-@@ -183,6 +195,7 @@ PropertyInfo qdev_prop_bit64 =3D {
-     .description =3D "on/off",
-     .get   =3D prop_get_bit64,
-     .set   =3D prop_set_bit64,
-+    .set_default_value =3D set_default_value_bool,
- };
-=20
- /* --- bool --- */
-@@ -216,6 +229,7 @@ PropertyInfo qdev_prop_bool =3D {
-     .name  =3D "bool",
-     .get   =3D get_bool,
-     .set   =3D set_bool,
-+    .set_default_value =3D set_default_value_bool,
- };
-=20
- /* --- 8bit integer --- */
-@@ -245,10 +259,16 @@ static void set_uint8(Object *obj, Visitor *v, cons=
-t char *name, void *opaque,
-     visit_type_uint8(v, name, ptr, errp);
- }
-=20
-+static void set_default_value_int(Object *obj, const Property *prop)
-+{
-+    object_property_set_int(obj, prop->defval, prop->name, &error_abort)=
-;
-+}
-+
- PropertyInfo qdev_prop_uint8 =3D {
-     .name  =3D "uint8",
-     .get   =3D get_uint8,
-     .set   =3D set_uint8,
-+    .set_default_value =3D set_default_value_int,
- };
-=20
- /* --- 16bit integer --- */
-@@ -282,6 +302,7 @@ PropertyInfo qdev_prop_uint16 =3D {
-     .name  =3D "uint16",
-     .get   =3D get_uint16,
-     .set   =3D set_uint16,
-+    .set_default_value =3D set_default_value_int,
- };
-=20
- /* --- 32bit integer --- */
-@@ -340,12 +361,14 @@ PropertyInfo qdev_prop_uint32 =3D {
-     .name  =3D "uint32",
-     .get   =3D get_uint32,
-     .set   =3D set_uint32,
-+    .set_default_value =3D set_default_value_int,
- };
-=20
- PropertyInfo qdev_prop_int32 =3D {
-     .name  =3D "int32",
-     .get   =3D get_int32,
-     .set   =3D set_int32,
-+    .set_default_value =3D set_default_value_int,
- };
-=20
- /* --- 64bit integer --- */
-@@ -379,6 +402,7 @@ PropertyInfo qdev_prop_uint64 =3D {
-     .name  =3D "uint64",
-     .get   =3D get_uint64,
-     .set   =3D set_uint64,
-+    .set_default_value =3D set_default_value_int,
- };
-=20
- /* --- string --- */
-@@ -526,6 +550,7 @@ PropertyInfo qdev_prop_on_off_auto =3D {
-     .enum_table =3D OnOffAuto_lookup,
-     .get =3D get_enum,
-     .set =3D set_enum,
-+    .set_default_value =3D set_default_value_enum,
- };
-=20
- /* --- lost tick policy --- */
-@@ -537,6 +562,7 @@ PropertyInfo qdev_prop_losttickpolicy =3D {
-     .enum_table  =3D LostTickPolicy_lookup,
-     .get   =3D get_enum,
-     .set   =3D set_enum,
-+    .set_default_value =3D set_default_value_enum,
- };
-=20
- /* --- Block device error handling policy --- */
-@@ -550,6 +576,7 @@ PropertyInfo qdev_prop_blockdev_on_error =3D {
-     .enum_table =3D BlockdevOnError_lookup,
-     .get =3D get_enum,
-     .set =3D set_enum,
-+    .set_default_value =3D set_default_value_enum,
- };
-=20
- /* --- BIOS CHS translation */
-@@ -563,6 +590,7 @@ PropertyInfo qdev_prop_bios_chs_trans =3D {
-     .enum_table =3D BiosAtaTranslation_lookup,
-     .get =3D get_enum,
-     .set =3D set_enum,
-+    .set_default_value =3D set_default_value_enum,
- };
-=20
- /* --- FDC default drive types */
-@@ -573,7 +601,8 @@ PropertyInfo qdev_prop_fdc_drive_type =3D {
-                    "144/288/120/none/auto",
-     .enum_table =3D FloppyDriveType_lookup,
-     .get =3D get_enum,
--    .set =3D set_enum
-+    .set =3D set_enum,
-+    .set_default_value =3D set_default_value_enum,
- };
-=20
- /* --- pci address --- */
-@@ -648,6 +677,7 @@ PropertyInfo qdev_prop_pci_devfn =3D {
-     .print =3D print_pci_devfn,
-     .get   =3D get_int32,
-     .set   =3D set_pci_devfn,
-+    .set_default_value =3D set_default_value_int,
- };
-=20
- /* --- blocksize --- */
-@@ -695,6 +725,7 @@ PropertyInfo qdev_prop_blocksize =3D {
-     .description =3D "A power of two between 512 and 32768",
-     .get   =3D get_uint16,
-     .set   =3D set_blocksize,
-+    .set_default_value =3D set_default_value_int,
- };
-=20
- /* --- pci host address --- */
-@@ -917,6 +948,7 @@ PropertyInfo qdev_prop_arraylen =3D {
-     .name =3D "uint32",
-     .get =3D get_uint32,
-     .set =3D set_prop_arraylen,
-+    .set_default_value =3D set_default_value_int,
- };
-=20
- /* --- public helpers --- */
-@@ -1153,4 +1185,5 @@ PropertyInfo qdev_prop_size =3D {
-     .name  =3D "size",
-     .get =3D get_size,
-     .set =3D set_size,
-+    .set_default_value =3D set_default_value_int,
- };
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 0ce45a2..849952a 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -793,17 +793,8 @@ void qdev_property_add_static(DeviceState *dev, Prop=
-erty *prop,
-                                     prop->info->description,
-                                     &error_abort);
-=20
--    if (prop->qtype =3D=3D QTYPE_NONE) {
--        return;
--    }
--
--    if (prop->qtype =3D=3D QTYPE_QBOOL) {
--        object_property_set_bool(obj, prop->defval, prop->name, &error_a=
-bort);
--    } else if (prop->info->enum_table) {
--        object_property_set_str(obj, prop->info->enum_table[prop->defval=
-],
--                                prop->name, &error_abort);
--    } else if (prop->qtype =3D=3D QTYPE_QINT) {
--        object_property_set_int(obj, prop->defval, prop->name, &error_ab=
-ort);
-+    if (prop->info->set_default_value) {
-+        prop->info->set_default_value(obj, prop);
++/**
+  * qnum_from_double(): Create a new QNum from a double
+  *
+  * Return strong reference.
+@@ -61,6 +77,12 @@ bool qnum_get_try_int(const QNum *qn, int64_t *val)
+     case QNUM_I64:
+         *val =3D qn->u.i64;
+         return true;
++    case QNUM_U64:
++        if (qn->u.u64 > INT64_MAX) {
++            return false;
++        }
++        *val =3D qn->u.u64;
++        return true;
+     case QNUM_DOUBLE:
+         return false;
      }
+@@ -83,6 +105,44 @@ int64_t qnum_get_int(const QNum *qn)
  }
 =20
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index e69489e..9523339 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -226,7 +226,6 @@ struct Property {
-     PropertyInfo *info;
-     ptrdiff_t    offset;
-     uint8_t      bitnr;
--    QType        qtype;
-     int64_t      defval;
-     int          arrayoffset;
-     PropertyInfo *arrayinfo;
-@@ -238,6 +237,7 @@ struct PropertyInfo {
-     const char *description;
-     const char * const *enum_table;
-     int (*print)(DeviceState *dev, Property *prop, char *dest, size_t le=
-n);
-+    void (*set_default_value)(Object *obj, const Property *prop);
-     ObjectPropertyAccessor *get;
-     ObjectPropertyAccessor *set;
-     ObjectPropertyRelease *release;
-diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-index d206fc9..85e6899 100644
---- a/include/hw/qdev-properties.h
-+++ b/include/hw/qdev-properties.h
-@@ -42,7 +42,6 @@ extern PropertyInfo qdev_prop_arraylen;
-         .info      =3D &(_prop),                                        =
-  \
-         .offset    =3D offsetof(_state, _field)                         =
-  \
-             + type_check(_type,typeof_field(_state, _field)),           =
-\
--        .qtype     =3D QTYPE_QINT,                                      =
-  \
-         .defval    =3D (_type)_defval,                                  =
-  \
-         }
- #define DEFINE_PROP_BIT(_name, _state, _field, _bit, _defval) {  \
-@@ -51,7 +50,6 @@ extern PropertyInfo qdev_prop_arraylen;
-         .bitnr    =3D (_bit),                                      \
-         .offset    =3D offsetof(_state, _field)                    \
-             + type_check(uint32_t,typeof_field(_state, _field)), \
--        .qtype     =3D QTYPE_QBOOL,                                \
-         .defval    =3D (bool)_defval,                              \
-         }
- #define DEFINE_PROP_BIT64(_name, _state, _field, _bit, _defval) {       =
-\
-@@ -60,7 +58,6 @@ extern PropertyInfo qdev_prop_arraylen;
-         .bitnr    =3D (_bit),                                           =
-  \
-         .offset    =3D offsetof(_state, _field)                         =
-  \
-             + type_check(uint64_t, typeof_field(_state, _field)),       =
-\
--        .qtype     =3D QTYPE_QBOOL,                                     =
-  \
-         .defval    =3D (bool)_defval,                                   =
-  \
-         }
+ /**
++ * qnum_get_uint(): Get an unsigned integer from the number
++ *
++ * Return true on success.
++ */
++bool qnum_get_try_uint(const QNum *qn, uint64_t *val)
++{
++    switch (qn->kind) {
++    case QNUM_I64:
++        if (qn->u.i64 < 0) {
++            return false;
++        }
++        *val =3D qn->u.i64;
++        return true;
++    case QNUM_U64:
++        *val =3D qn->u.u64;
++        return true;
++    case QNUM_DOUBLE:
++        return false;
++    }
++
++    assert(0);
++    return false;
++}
++
++/**
++ * qnum_get_uint(): Get an unsigned integer from the number
++ *
++ * assert() on failure.
++ */
++uint64_t qnum_get_uint(const QNum *qn)
++{
++    uint64_t val;
++    bool success =3D qnum_get_try_uint(qn, &val);
++    assert(success);
++    return val;
++}
++
++/**
+  * qnum_get_double(): Get a float representation of the number
+  *
+  * qnum_get_double() loses precision for integers beyond 53 bits.
+@@ -92,6 +152,8 @@ double qnum_get_double(QNum *qn)
+     switch (qn->kind) {
+     case QNUM_I64:
+         return qn->u.i64;
++    case QNUM_U64:
++        return qn->u.u64;
+     case QNUM_DOUBLE:
+         return qn->u.dbl;
+     }
+@@ -107,6 +169,8 @@ char *qnum_to_string(QNum *qn)
+     switch (qn->kind) {
+     case QNUM_I64:
+         return g_strdup_printf("%" PRId64, qn->u.i64);
++    case QNUM_U64:
++        return g_strdup_printf("%" PRIu64, qn->u.u64);
+     case QNUM_DOUBLE:
+         /* FIXME: snprintf() is locale dependent; but JSON requires
+          * numbers to be formatted as if in the C locale. Dependence
+diff --git a/tests/check-qnum.c b/tests/check-qnum.c
+index da7e0b0..d702d5d 100644
+--- a/tests/check-qnum.c
++++ b/tests/check-qnum.c
+@@ -39,6 +39,21 @@ static void qnum_from_int_test(void)
+     QDECREF(qn);
+ }
 =20
-@@ -69,7 +66,6 @@ extern PropertyInfo qdev_prop_arraylen;
-         .info      =3D &(qdev_prop_bool),                          \
-         .offset    =3D offsetof(_state, _field)                    \
-             + type_check(bool, typeof_field(_state, _field)),    \
--        .qtype     =3D QTYPE_QBOOL,                                \
-         .defval    =3D (bool)_defval,                              \
-         }
++static void qnum_from_uint_test(void)
++{
++    QNum *qn;
++    const uint64_t value =3D UINT64_MAX;
++
++    qn =3D qnum_from_uint(value);
++    g_assert(qn !=3D NULL);
++    g_assert_cmpint(qn->kind, =3D=3D, QNUM_U64);
++    g_assert(qn->u.u64 =3D=3D value);
++    g_assert(qn->base.refcnt =3D=3D 1);
++    g_assert(qobject_type(QOBJECT(qn)) =3D=3D QTYPE_QNUM);
++
++    QDECREF(qn);
++}
++
+ static void qnum_from_double_test(void)
+ {
+     QNum *qn;
+@@ -76,6 +91,37 @@ static void qnum_get_int_test(void)
+     QDECREF(qn);
+ }
 =20
-@@ -105,7 +101,6 @@ extern PropertyInfo qdev_prop_arraylen;
-         .info =3D &(qdev_prop_arraylen),                                =
-  \
-         .offset =3D offsetof(_state, _field)                            =
-  \
-             + type_check(uint32_t, typeof_field(_state, _field)),       =
-\
--        .qtype =3D QTYPE_QINT,                                          =
-  \
-         .arrayinfo =3D &(_arrayprop),                                   =
-  \
-         .arrayfieldsize =3D sizeof(_arraytype),                         =
-  \
-         .arrayoffset =3D offsetof(_state, _arrayfield),                 =
-  \
++static void qnum_get_uint_test(void)
++{
++    QNum *qn;
++    const int value =3D 123456;
++    uint64_t val;
++    int64_t ival;
++
++    qn =3D qnum_from_uint(value);
++    g_assert(qnum_get_try_uint(qn, &val));
++    g_assert_cmpuint(val, =3D=3D, value);
++    QDECREF(qn);
++
++    qn =3D qnum_from_int(value);
++    g_assert(qnum_get_try_uint(qn, &val));
++    g_assert_cmpuint(val, =3D=3D, value);
++    QDECREF(qn);
++
++    /* invalid cases */
++    qn =3D qnum_from_int(-1);
++    g_assert(!qnum_get_try_uint(qn, &val));
++    QDECREF(qn);
++
++    qn =3D qnum_from_uint(-1ULL);
++    g_assert(!qnum_get_try_int(qn, &ival));
++    QDECREF(qn);
++
++    qn =3D qnum_from_double(0.42);
++    g_assert(!qnum_get_try_uint(qn, &val));
++    QDECREF(qn);
++}
++
+ static void qobject_to_qnum_test(void)
+ {
+     QNum *qn;
+@@ -112,9 +158,11 @@ int main(int argc, char **argv)
+     g_test_init(&argc, &argv, NULL);
+=20
+     g_test_add_func("/qnum/from_int", qnum_from_int_test);
++    g_test_add_func("/qnum/from_uint", qnum_from_uint_test);
+     g_test_add_func("/qnum/from_double", qnum_from_double_test);
+     g_test_add_func("/qnum/from_int64", qnum_from_int64_test);
+     g_test_add_func("/qnum/get_int", qnum_get_int_test);
++    g_test_add_func("/qnum/get_uint", qnum_get_uint_test);
+     g_test_add_func("/qnum/to_qnum", qobject_to_qnum_test);
+     g_test_add_func("/qnum/to_string", qnum_to_string_test);
+=20
 --=20
 2.7.5
