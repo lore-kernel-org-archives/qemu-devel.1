@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37134)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dJGQD-0001Xl-Ec
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 05:41:38 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1dJGWm-0003lk-Fa
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 05:48:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dJGQ8-0003ry-KP
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 05:41:37 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:34497)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dJGQ8-0003rS-Dz
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 05:41:32 -0400
-Received: by mail-wm0-x244.google.com with SMTP id 70so10889255wme.1
-	for <qemu-devel@nongnu.org>; Fri, 09 Jun 2017 02:41:29 -0700 (PDT)
-Date: Fri, 9 Jun 2017 10:41:13 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170609094113.GD26144@stefanha-x1.localdomain>
-References: <20170608232255.1621-1-el13635@mail.ntua.gr>
+	(envelope-from <edgar.iglesias@gmail.com>) id 1dJGWl-0006HJ-4k
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 05:48:24 -0400
+Date: Fri, 9 Jun 2017 11:48:12 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Message-ID: <20170609094812.GA2201@toto>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="vni90+aGYgRvsTuO"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170608232255.1621-1-el13635@mail.ntua.gr>
-Subject: Re: [Qemu-devel] [PATCH v2] block: change variable names in
- BlockDriverState
+Subject: [Qemu-devel] AArch64 regression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +20,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-arm <qemu-arm@nongnu.org>, qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: "Emilio G. Cota" <cota@braap.org>, Richard Henderson <rth@twiddle.net>, fred.konrad@greensocs.com, alex.bennee@linaro.org
+
+Hi,
+
+I was running a bunch of tests in preparation for the MMIO/exec
+series but am running into regressions on master.
+I'm at commit 64175afc695c0672876fbbfc31b299c86d562cb4
+
+On the xlnx-zcu102 I see lockups, the console goes unresponsive.
+On one of my vexpress-a15 setups (with an a57), I see weird
+segfaults in user-space.
+
+I bisected this multiple times with each of the test cases
+and all of the bisects bring me to this commit:
+commit e75449a346bf558296966a44277bfd93412c6da6
+Author: Emilio G. Cota <cota@braap.org>
+Date:   Fri Apr 28 14:59:23 2017 -0400
+
+    target/aarch64: optimize indirect branches
 
 
---vni90+aGYgRvsTuO
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Does this ring any bells? Are there any known issues at the moment?
+I've copied a GDB backtrace form the ZynqMP lockup at the end
+of this email.
 
-On Fri, Jun 09, 2017 at 02:22:55AM +0300, Manos Pitsidianakis wrote:
-> diff --git a/hw/ide/core.c b/hw/ide/core.c
-> index 0b48b64..1a74339 100644
-> --- a/hw/ide/core.c
-> +++ b/hw/ide/core.c
-> @@ -416,16 +416,16 @@ static void ide_issue_trim_cb(void *opaque, int ret)
->                  /* 6-byte LBA + 2-byte range per entry */
->                  uint64_t entry =3D le64_to_cpu(buffer[i]);
->                  uint64_t sector =3D entry & 0x0000ffffffffffffULL;
-> -                uint16_t count =3D entry >> 48;
-> +                uint16_t bytes =3D entry >> 48;
-> =20
-> -                if (count =3D=3D 0) {
-> +                if (bytes =3D=3D 0) {
->                      continue;
->                  }
-> =20
->                  /* Got an entry! Submit and exit.  */
->                  iocb->aiocb =3D blk_aio_pdiscard(iocb->blk,
->                                                 sector << BDRV_SECTOR_BIT=
-S,
-> -                                               count << BDRV_SECTOR_BITS,
-> +                                               bytes << BDRV_SECTOR_BITS,
->                                                 ide_issue_trim_cb, opaque=
-);
->                  return;
->              }
+Thanks,
+Edgar
 
-This change looks suspicious:
+GDB backtrace:
+(gdb) thread apply all bt
 
-  bytes << BDRV_SECTOR_BITS
+Thread 6 (Thread 0x7fff431fc700 (LWP 28586)):
+#0  0x00007ffff5e2826d in __lll_lock_wait ()
+   from /lib/x86_64-linux-gnu/libpthread.so.0
+#1  0x00007ffff5e21dbd in pthread_mutex_lock ()
+   from /lib/x86_64-linux-gnu/libpthread.so.0
+#2  0x0000555555b5cc40 in qemu_mutex_lock (
+    mutex=mutex@entry=0x55555620be80 <qemu_global_mutex>)
+    at /home/edgar/src/c/qemu/qemu/util/qemu-thread-posix.c:61
+#3  0x00005555557bc9cc in qemu_mutex_lock_iothread ()
+    at /home/edgar/src/c/qemu/qemu/cpus.c:1581
+#4  0x000055555578e865 in cpu_handle_interrupt (last_tb=<synthetic pointer>, 
+    cpu=0x5555566c40b0) at /home/edgar/src/c/qemu/qemu/cpu-exec.c:491
+#5  cpu_exec (cpu=cpu@entry=0x7fffc543f4f8)
+    at /home/edgar/src/c/qemu/qemu/cpu-exec.c:670
+#6  0x00005555557bcb9f in tcg_cpu_exec (cpu=0x7fffc543f4f8)
+    at /home/edgar/src/c/qemu/qemu/cpus.c:1270
+#7  qemu_tcg_cpu_thread_fn (arg=0x7fffc543f4f8)
+    at /home/edgar/src/c/qemu/qemu/cpus.c:1473
+#8  0x00007ffff5e1f6ba in start_thread ()
+   from /lib/x86_64-linux-gnu/libpthread.so.0
+#9  0x00007ffff5b5582d in clone () from /lib/x86_64-linux-gnu/libc.so.6
 
-Therefore 'bytes' is actually in units of sectors!
+Thread 5 (Thread 0x7fff439fd700 (LWP 28585)):
+#0  0x00007ffff5e2826d in __lll_lock_wait ()
+   from /lib/x86_64-linux-gnu/libpthread.so.0
+#1  0x00007ffff5e21dbd in pthread_mutex_lock ()
+   from /lib/x86_64-linux-gnu/libpthread.so.0
+#2  0x0000555555b5cc40 in qemu_mutex_lock (
+    mutex=mutex@entry=0x55555620be80 <qemu_global_mutex>)
+    at /home/edgar/src/c/qemu/qemu/util/qemu-thread-posix.c:61
+#3  0x00005555557bc9cc in qemu_mutex_lock_iothread ()
+    at /home/edgar/src/c/qemu/qemu/cpus.c:1581
+#4  0x000055555578e865 in cpu_handle_interrupt (last_tb=<synthetic pointer>, 
+    cpu=0x5555566c40b0) at /home/edgar/src/c/qemu/qemu/cpu-exec.c:491
+#5  cpu_exec (cpu=cpu@entry=0x7fffc54208d0)
+    at /home/edgar/src/c/qemu/qemu/cpu-exec.c:670
+#6  0x00005555557bcb9f in tcg_cpu_exec (cpu=0x7fffc54208d0)
+    at /home/edgar/src/c/qemu/qemu/cpus.c:1270
+#7  qemu_tcg_cpu_thread_fn (arg=0x7fffc54208d0)
+    at /home/edgar/src/c/qemu/qemu/cpus.c:1473
+#8  0x00007ffff5e1f6ba in start_thread ()
+   from /lib/x86_64-linux-gnu/libpthread.so.0
+#9  0x00007ffff5b5582d in clone () from /lib/x86_64-linux-gnu/libc.so.6
 
-Please drop this hunk.
+Thread 4 (Thread 0x7fff441fe700 (LWP 28584)):
+#0  0x00007ffff5e21dac in pthread_mutex_lock ()
+   from /lib/x86_64-linux-gnu/libpthread.so.0
+#1  0x0000555555b5cc40 in qemu_mutex_lock (
+    mutex=mutex@entry=0x55555620be80 <qemu_global_mutex>)
+    at /home/edgar/src/c/qemu/qemu/util/qemu-thread-posix.c:61
+#2  0x00005555557bc9cc in qemu_mutex_lock_iothread ()
+    at /home/edgar/src/c/qemu/qemu/cpus.c:1581
+#3  0x000055555578e865 in cpu_handle_interrupt (last_tb=<synthetic pointer>, 
+    cpu=0x5555566c40b0) at /home/edgar/src/c/qemu/qemu/cpu-exec.c:491
+#4  cpu_exec (cpu=cpu@entry=0x7fffc5401ca8)
+    at /home/edgar/src/c/qemu/qemu/cpu-exec.c:670
+#5  0x00005555557bcb9f in tcg_cpu_exec (cpu=0x7fffc5401ca8)
+    at /home/edgar/src/c/qemu/qemu/cpus.c:1270
+#6  qemu_tcg_cpu_thread_fn (arg=0x7fffc5401ca8)
+    at /home/edgar/src/c/qemu/qemu/cpus.c:1473
+#7  0x00007ffff5e1f6ba in start_thread ()
+   from /lib/x86_64-linux-gnu/libpthread.so.0
+#8  0x00007ffff5b5582d in clone () from /lib/x86_64-linux-gnu/libc.so.6
 
---vni90+aGYgRvsTuO
-Content-Type: application/pgp-signature; name="signature.asc"
+Thread 3 (Thread 0x7fff449ff700 (LWP 28583)):
+#0  0x00005555558c4c89 in regime_el (mmu_idx=ARMMMUIdx_S1NSE1, 
+    env=0x7fffc53eb310) at /home/edgar/src/c/qemu/qemu/target/arm/helper.c:7028
+#1  regime_tcr (mmu_idx=<optimized out>, env=0x7fffc53eb310)
+    at /home/edgar/src/c/qemu/qemu/target/arm/helper.c:7117
+#2  arm_regime_tbi0 (env=env@entry=0x7fffc53eb310, mmu_idx=<optimized out>, 
+    mmu_idx@entry=ARMMMUIdx_S12NSE1)
+    at /home/edgar/src/c/qemu/qemu/target/arm/helper.c:7142
+#3  0x00005555557ba346 in cpu_get_tb_cpu_state (flags=<synthetic pointer>, 
+    cs_base=<synthetic pointer>, pc=<synthetic pointer>, env=0x7fffc53eb310)
+    at /home/edgar/src/c/qemu/qemu/target/arm/cpu.h:2571
+#4  helper_lookup_tb_ptr (env=0x7fffc53eb310, addr=18446743524088820436)
+    at /home/edgar/src/c/qemu/qemu/tcg-runtime.c:156
+#5  0x00007fffcf2f7e53 in code_gen_buffer ()
+#6  0x000055555578de7c in cpu_tb_exec (itb=<optimized out>, 
+    itb=<optimized out>, cpu=0x7fffc5727478)
+    at /home/edgar/src/c/qemu/qemu/cpu-exec.c:166
+#7  cpu_loop_exec_tb (tb_exit=<synthetic pointer>, 
+    last_tb=<synthetic pointer>, tb=<optimized out>, cpu=0x7fffc5727478)
+    at /home/edgar/src/c/qemu/qemu/cpu-exec.c:574
+#8  cpu_exec (cpu=cpu@entry=0x7fffc53e3080)
+    at /home/edgar/src/c/qemu/qemu/cpu-exec.c:672
+#9  0x00005555557bcb9f in tcg_cpu_exec (cpu=0x7fffc53e3080)
+    at /home/edgar/src/c/qemu/qemu/cpus.c:1270
+#10 qemu_tcg_cpu_thread_fn (arg=0x7fffc53e3080)
+    at /home/edgar/src/c/qemu/qemu/cpus.c:1473
+#11 0x00007ffff5e1f6ba in start_thread ()
+   from /lib/x86_64-linux-gnu/libpthread.so.0
+#12 0x00007ffff5b5582d in clone () from /lib/x86_64-linux-gnu/libc.so.6
 
------BEGIN PGP SIGNATURE-----
+Thread 2 (Thread 0x7fffef7b7700 (LWP 28582)):
+#0  0x00007ffff5b4f8e9 in syscall () from /lib/x86_64-linux-gnu/libc.so.6
+#1  0x0000555555b5d385 in qemu_futex_wait (val=<optimized out>, 
+    f=<optimized out>) at /home/edgar/src/c/qemu/qemu/include/qemu/futex.h:26
+#2  qemu_event_wait (ev=ev@entry=0x55555661bae4 <rcu_call_ready_event>)
+    at /home/edgar/src/c/qemu/qemu/util/qemu-thread-posix.c:415
+#3  0x0000555555b6cc6e in call_rcu_thread (opaque=<optimized out>)
+    at /home/edgar/src/c/qemu/qemu/util/rcu.c:249
+#4  0x00007ffff5e1f6ba in start_thread ()
+   from /lib/x86_64-linux-gnu/libpthread.so.0
+#5  0x00007ffff5b5582d in clone () from /lib/x86_64-linux-gnu/libc.so.6
 
-iQEcBAEBAgAGBQJZOm05AAoJEJykq7OBq3PIyXoH/RGgCKIc8aUofNEU42I4Yb+7
-h1s0gJDXBjW3SqJKcbS+jDIIr49KuFWBLjMuuYQjl6ApXNBV/No2abA0Oj2LFkr0
-cZIDPsLK+8RBiFFdWf6vPs6X7a4IrxjYe7gTJdDPzCiXLC9m86NwMgxcrVPuRYGb
-FnfC/saSM1AltFYvQbzkGJ70mnUavQyWRpkmlM3TRWQ52iMftvsUOYqmoLUhe+/o
-GdbJXcHbNkvDoCtUXQR9zcilpLHeXYgKBv+5iOlBJxA63ocmcfr7LhhAizG6TOTv
-WKxf1JV7OiwrS1sYoodm9LNXNpqsDOmgylcZI8zMuR+Qos/+L0l4ivMrUijbE8g=
-=HvzG
------END PGP SIGNATURE-----
-
---vni90+aGYgRvsTuO--
+Thread 1 (Thread 0x7ffff7f31c00 (LWP 28578)):
+#0  0x00007ffff5b49c21 in ppoll () from /lib/x86_64-linux-gnu/libc.so.6
+#1  0x0000555555b58f39 in ppoll (__ss=0x0, __timeout=0x7fffffffd5f0, 
+    __nfds=<optimized out>, __fds=<optimized out>)
+    at /usr/include/x86_64-linux-gnu/bits/poll2.h:77
+#2  qemu_poll_ns (fds=<optimized out>, nfds=<optimized out>, 
+    timeout=timeout@entry=9223371867734611302)
+    at /home/edgar/src/c/qemu/qemu/util/qemu-timer.c:334
+#3  0x0000555555b59d6a in os_host_main_loop_wait (timeout=9223371867734611302)
+    at /home/edgar/src/c/qemu/qemu/util/main-loop.c:255
+#4  main_loop_wait (nonblocking=<optimized out>)
+    at /home/edgar/src/c/qemu/qemu/util/main-loop.c:517
+#5  0x0000555555779057 in main_loop () at /home/edgar/src/c/qemu/qemu/vl.c:1918
+#6  main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>)
+    at /home/edgar/src/c/qemu/qemu/vl.c:4752
+(gdb) 
