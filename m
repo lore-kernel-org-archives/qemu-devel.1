@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dJNNq-0000m9-2W
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 13:07:39 -0400
+	(envelope-from <quintela@redhat.com>) id 1dJNk9-0007xo-G0
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 13:30:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dJNNp-0006FK-2P
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 13:07:38 -0400
-References: <1497009003-25794-1-git-send-email-kwolf@redhat.com>
-	<1497009003-25794-4-git-send-email-kwolf@redhat.com>
-	<8514d36e-1bc6-567f-4f10-9e8584b9eed0@redhat.com>
-	<20170609125831.GD4462@noname.redhat.com>
-	<ea981c62-61c5-8870-3ba2-8469f8c4fa5f@redhat.com>
-	<20170609155543.GF4462@noname.redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <dbbdb7cb-979e-581d-2e54-12ba02780d06@redhat.com>
-Date: Fri, 9 Jun 2017 12:07:29 -0500
+	(envelope-from <quintela@redhat.com>) id 1dJNk5-00069Z-HK
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 13:30:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46630)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dJNk5-00069A-8c
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 13:30:37 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0928581222
+	for <qemu-devel@nongnu.org>; Fri,  9 Jun 2017 17:30:36 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <877f0lgsxu.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Fri, 09 Jun 2017 16:02:37 +0200")
+References: <1496980142-8986-1-git-send-email-peterx@redhat.com>
+	<877f0lgsxu.fsf@dusky.pond.sub.org>
+Reply-To: quintela@redhat.com
+Date: Fri, 09 Jun 2017 19:30:32 +0200
+Message-ID: <87lgp183wn.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <20170609155543.GF4462@noname.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="4dN3krOavu4BIfGD0Gsj7EwhXdKMUHKWN"
-Subject: Re: [Qemu-devel] [PATCH 3/3] qemu-iotests: Test exiting qemu with
- running job
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/6] migration: objectify MigrationState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,90 +35,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4dN3krOavu4BIfGD0Gsj7EwhXdKMUHKWN
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Message-ID: <dbbdb7cb-979e-581d-2e54-12ba02780d06@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] qemu-iotests: Test exiting qemu with
- running job
-References: <1497009003-25794-1-git-send-email-kwolf@redhat.com>
- <1497009003-25794-4-git-send-email-kwolf@redhat.com>
- <8514d36e-1bc6-567f-4f10-9e8584b9eed0@redhat.com>
- <20170609125831.GD4462@noname.redhat.com>
- <ea981c62-61c5-8870-3ba2-8469f8c4fa5f@redhat.com>
- <20170609155543.GF4462@noname.redhat.com>
-In-Reply-To: <20170609155543.GF4462@noname.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Markus Armbruster <armbru@redhat.com> wrote:
+> Test compile gripes:
+>
+>     hw/xen/xen-common.c: In function =E2=80=98xen_init=E2=80=99:
+>     hw/xen/xen-common.c:147:5: warning: implicit declaration of function =
+=E2=80=98register_compat_prop=E2=80=99 [-Wimplicit-function-declaration]
+>          register_compat_prop("migration", "store-global-state", "off");
+>          ^~~~~~~~~~~~~~~~~~~~
+>     hw/xen/xen-common.c:147:5: warning: nested extern declaration of =E2=
+=80=98register_compat_prop=E2=80=99 [-Wnested-externs]
+>
+> You might want to install Xen development packages to catch such issues
+> earlier.
+>
+> Test run:
+>
+>     $ qemu-system-x86_64 -device migration,help
+>     migration.skip-section-footer=3Dbool
+>     migration.store-global-state=3Dbool
+>     migration.only-migratable=3Dbool
+>     migration.skip-configuration=3Dbool
+>
+> What would adding this device do?
 
-On 06/09/2017 10:55 AM, Kevin Wolf wrote:
+Parameters, capabilities, options for migration.
 
->>
->> These belong in comments in the test proper, because it is not obvious=
+This was what we discussed on irc.  We want to have a way to control
+migration features that depend on versions.
 
->> otherwise.  But with comments added (so someone debugging a theoretica=
-l
->> test failure down the road knows what they are up against),
->=20
-> # Note that the reference output intentionally includes the 'offset' fi=
-eld in
-> # BLOCK_JOB_CANCELLED events for all of the following block jobs. They =
-are
-> # predictable and any change in the offsets would hint at a bug in the =
-job
-> # throttling code.
-> #
-> # In order to achieve these predictable offsets, all of the following t=
-ests
-> # use speed=3D65536. Each job will perform exactly one iteration before=
- it has
-> # to sleep at least for a second, which is plenty of time for the 'quit=
-' QMP
-> # command to be received (after receiving the command, the rest runs
-> # synchronously, so jobs can arbitrarily continue or complete).
-> #
-> # The buffer size for commit and streaming is 512k (waiting for 8 secon=
-ds after
-> # the first request), for active commit and mirror it's large enough to=
- cover
-> # the full 4M, and for backup it's the qcow2 cluster size, which we kno=
-w is
-> # 64k. As all of these are at least as large as the speed, we are sure =
-that the
-> # offset doesn't advance after the first iteration before qemu exits.
->=20
-> Does this look okay?
+So we disable new features for old machine types (normal thing that we
+do).  But right now, creating such a new feature requires creating a
+couple of functions to set/clear the feature, adding includes on the
+destination side, etc.
 
-Yes, that looks fine.
+This was supposed to be a global property (or a qemu_opt, or whatever).
+Just something that could be enabled/disabled easily on machine types,
+and if possible independently of machine types.  This (for instance)
+would allow that store-global-state is disabled by defaulte for
+machine-2.9 (I forgot the exact name for the machine type), but I can
+enable it by hand.  That is very handy for testing.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+So, I think that the question is, how/where can we set that kind of
+properties?
 
+At least for me, being able to *also* set migration
+capabilities/parameters with this mechanism on the command line would be
+very nice, for instance
 
---4dN3krOavu4BIfGD0Gsj7EwhXdKMUHKWN
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+   -global migration.xbzrle on
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+or
 
-iQEcBAEBCAAGBQJZOtXRAAoJEKeha0olJ0NqnY0H/jW95ivDuQJyNyDklqFPKg3L
-VaaYxf+y4F/cqK9/GATUc3rmBZxLUCA9R4+TKVba33k26RiViWI0UDT8RI70VG4y
-U5urVRnM9XAv9TJsMa29tk1ofK3ioqDxDVRwd/HshRrl8jG0p22MzFIYMeM3EjBw
-9eXbJ13zjhbVTlXUMwTmjXbagQDfYthPnwjwcQFT/l5yLAPcqM3FuSgMQqKOtLlx
-dd98g8uvy30PFipDqzZWFxuXLxdlwvLQusGLknRr7Q3wKt4si7S5GsS45SD9KjAN
-GXrCIqU9XmsyZyko0bIAT+IfHSvn2JW9ytmn6pc/uGkdvDk9V/18Clz9kP5mA9k=
-=4ZV5
------END PGP SIGNATURE-----
+   -global migration.max-speed 2G
 
---4dN3krOavu4BIfGD0Gsj7EwhXdKMUHKWN--
+I don't care about what is the exact syntax, or where we hang them,
+i.e. a new device, a new list, somewhere that already exist.  That is
+what we ask for advice.
+
+Thanks for the review and the suggestions.
+
+Later, Juan.
