@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dJCc3-0006GU-Gw
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:37:36 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dJCdw-00084v-GK
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:39:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dJCc0-0001eW-Ln
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:37:35 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:34729)
+	(envelope-from <rth7680@gmail.com>) id 1dJCdt-0002j1-D9
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:39:32 -0400
+Received: from mail-qt0-x22c.google.com ([2607:f8b0:400d:c0d::22c]:34660)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dJCc0-0001eP-HL
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:37:32 -0400
-Received: by mail-qt0-x243.google.com with SMTP id o21so13030893qtb.1
-	for <qemu-devel@nongnu.org>; Thu, 08 Jun 2017 22:37:32 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dJCdt-0002ip-8r
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:39:29 -0400
+Received: by mail-qt0-x22c.google.com with SMTP id c10so65057539qtd.1
+	for <qemu-devel@nongnu.org>; Thu, 08 Jun 2017 22:39:29 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170607212058.6124-1-aurelien@aurel32.net>
 From: Richard Henderson <rth@twiddle.net>
-Date: Thu,  8 Jun 2017 22:37:19 -0700
-Message-Id: <20170609053719.26251-8-rth@twiddle.net>
-In-Reply-To: <20170609053719.26251-1-rth@twiddle.net>
-References: <20170609053719.26251-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v5 7/7] tcg/arm: Use ldr (literal) for goto_tb
+Message-ID: <559b8c2d-2ff3-81cf-2c99-e8862cb80a40@twiddle.net>
+Date: Thu, 8 Jun 2017 22:39:25 -0700
+MIME-Version: 1.0
+In-Reply-To: <20170607212058.6124-1-aurelien@aurel32.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target/sh4: optimize cross-page and
+ indirect jumps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,53 +31,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: cota@braap.org
+To: Aurelien Jarno <aurelien@aurel32.net>, qemu-devel@nongnu.org
 
-The new placement of the TB means that we can use one insn
-to load the goto_tb destination directly from the TB.
+On 06/07/2017 02:20 PM, Aurelien Jarno wrote:
+>           if (ctx->singlestep_enabled)
+>               gen_helper_debug(cpu_env);
+> -        tcg_gen_exit_tb(0);
+> +        tcg_gen_lookup_and_goto_ptr(cpu_pc);
 
-Signed-off-by: Richard Henderson <rth@twiddle.net>
----
- tcg/arm/tcg-target.inc.c | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+That really should be an else for that if, since helper_debug doesn't return.
 
-diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
-index 18708b1..b640fb9 100644
---- a/tcg/arm/tcg-target.inc.c
-+++ b/tcg/arm/tcg-target.inc.c
-@@ -1669,14 +1669,27 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-         }
-         break;
-     case INDEX_op_goto_tb:
--        tcg_debug_assert(s->tb_jmp_insn_offset == 0);
-         {
-             /* Indirect jump method */
--            intptr_t ptr = (intptr_t)(s->tb_jmp_target_addr + args[0]);
--            tcg_out_movi32(s, COND_AL, TCG_REG_R0, ptr & ~0xfff);
--            tcg_out_ld32_12(s, COND_AL, TCG_REG_PC, TCG_REG_R0, ptr & 0xfff);
-+            intptr_t ptr, dif, dil;
-+            TCGReg base = TCG_REG_PC;
-+
-+            tcg_debug_assert(s->tb_jmp_insn_offset == 0);
-+            ptr = (intptr_t)(s->tb_jmp_target_addr + args[0]);
-+            dif = ptr - ((intptr_t)s->code_ptr + 8);
-+            dil = sextract32(dif, 0, 12);
-+            if (dif != dil) {
-+                /* The TB is close, but outside the 12 bits addressable by
-+                   the load.  We can extend this to 20 bits with a sub of a
-+                   shifted immediate from pc.  In the vastly unlikely event
-+                   the code requires more than 1MB, we'll use 2 insns and
-+                   be no worse off.  */
-+                base = TCG_REG_R0;
-+                tcg_out_movi32(s, COND_AL, base, ptr - dil);
-+            }
-+            tcg_out_ld32_12(s, COND_AL, TCG_REG_PC, base, dil);
-+            s->tb_jmp_reset_offset[args[0]] = tcg_current_code_size(s);
-         }
--        s->tb_jmp_reset_offset[args[0]] = tcg_current_code_size(s);
-         break;
-     case INDEX_op_goto_ptr:
-         tcg_out_bx(s, COND_AL, args[0]);
--- 
-2.9.4
+
+r~
