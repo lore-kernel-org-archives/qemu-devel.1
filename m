@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56944)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dJDCW-0003Wj-6b
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 02:15:17 -0400
+	(envelope-from <bharat.bhushan@nxp.com>) id 1dJDDQ-0003yi-Sq
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 02:16:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dJDCS-0008Mz-QM
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 02:15:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57928)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dJDCS-0008Mr-HT
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 02:15:12 -0400
-References: <1496829322-17099-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1496829322-17099-5-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <5de38b64-e84a-930a-0c39-f084d00fc9c4@redhat.com>
-Date: Fri, 9 Jun 2017 14:15:07 +0800
-MIME-Version: 1.0
-In-Reply-To: <1496829322-17099-5-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(envelope-from <bharat.bhushan@nxp.com>) id 1dJDDP-0000Lm-LM
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 02:16:12 -0400
+From: Bharat Bhushan <bharat.bhushan@nxp.com>
+Date: Fri, 9 Jun 2017 06:16:02 +0000
+Message-ID: <AM5PR0401MB2545AFD256A96420ACC44CD89ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
+In-Reply-To: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
 Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V6 04/10] net/net.c: Add vnet_hdr support
- in SocketReadState
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [RFC v2 0/8] VIRTIO-IOMMU device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,130 +23,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, weifuqiang <weifuqiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>
+To: Eric Auger <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>
+Cc: "will.deacon@arm.com" <will.deacon@arm.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "drjones@redhat.com" <drjones@redhat.com>, "wei@redhat.com" <wei@redhat.com>, "tn@semihalf.com" <tn@semihalf.com>
+
+Hi Eric,
+
+> -----Original Message-----
+> From: Eric Auger [mailto:eric.auger@redhat.com]
+> Sent: Wednesday, June 07, 2017 9:31 PM
+> To: eric.auger.pro@gmail.com; eric.auger@redhat.com;
+> peter.maydell@linaro.org; alex.williamson@redhat.com; mst@redhat.com;
+> qemu-arm@nongnu.org; qemu-devel@nongnu.org; jean-
+> philippe.brucker@arm.com
+> Cc: will.deacon@arm.com; robin.murphy@arm.com; kevin.tian@intel.com;
+> marc.zyngier@arm.com; christoffer.dall@linaro.org; drjones@redhat.com;
+> wei@redhat.com; tn@semihalf.com; Bharat Bhushan
+> <bharat.bhushan@nxp.com>
+> Subject: [RFC v2 0/8] VIRTIO-IOMMU device
+>=20
+> This series implements the virtio-iommu device. This is a proof of concep=
+t
+> based on the virtio-iommu specification written by Jean-Philippe Brucker =
+[1].
+> This was tested with a guest using the virtio-iommu driver [2] and expose=
+d
+> with a virtio-net-pci using dma ops.
+>=20
+> The device gets instantiated using the "-device virtio-iommu-device"
+> option. It currently works with ARM virt machine only as the machine must
+> handle the dt binding between the virtio-mmio "iommu" node and the PCI
+> host bridge node. ACPI booting is not yet supported.
+>=20
+> This should allow to start some benchmarking activities against pure
+> emulated IOMMU (especially ARM SMMU).
+
+I am testing this on ARM64 and see below continuous error prints:
+
+	virtio_iommu_translate sid=3D8 is not known!!
+	virtio_iommu_translate sid=3D8 is not known!!
+	virtio_iommu_translate sid=3D8 is not known!!
+	virtio_iommu_translate sid=3D8 is not known!!
+	virtio_iommu_translate sid=3D8 is not known!!
+	virtio_iommu_translate sid=3D8 is not known!!
+	virtio_iommu_translate sid=3D8 is not known!!
+	virtio_iommu_translate sid=3D8 is not known!!
+	virtio_iommu_translate sid=3D8 is not known!!
+	virtio_iommu_translate sid=3D8 is not known!!=20
 
 
+Also in guest I do not see device-tree node with virtio-iommu.
+I am using qemu-tree you mentioned below and iommu-driver patches published=
+ by Jean-P.
+Qemu command line have additional ""-device virtio-iommu-device". What I am=
+ missing ?
 
-On 2017=E5=B9=B406=E6=9C=8807=E6=97=A5 17:55, Zhang Chen wrote:
-> We add a flag to dicide whether net_fill_rstate() to read
+Thanks
+-Bharat
 
-s/dicide/decide/ and s/to/needs/
-
-> the vnet_hdr_len or not.
->
-> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-> Suggested-by: Jason Wang <jasowang@redhat.com>
-> ---
->   include/net/net.h   |  6 +++++-
->   net/filter-mirror.c |  1 +
->   net/net.c           | 33 ++++++++++++++++++++++++++++++---
->   3 files changed, 36 insertions(+), 4 deletions(-)
->
-> diff --git a/include/net/net.h b/include/net/net.h
-> index 9a92c70..b2167ae 100644
-> --- a/include/net/net.h
-> +++ b/include/net/net.h
-> @@ -112,9 +112,13 @@ typedef struct NICState {
->   } NICState;
->  =20
->   struct SocketReadState {
-> -    int state; /* 0 =3D getting length, 1 =3D getting data */
-> +    /* 0 =3D getting length, 1 =3D getting vnet header length, 2 =3D g=
-etting data */
-> +    int state;
-> +    /* This flag decide whether to read the vnet_hdr_len field */
-> +    bool vnet_hdr;
->       uint32_t index;
->       uint32_t packet_len;
-> +    uint32_t vnet_hdr_len;
->       uint8_t buf[NET_BUFSIZE];
->       SocketReadStateFinalize *finalize;
->   };
-> diff --git a/net/filter-mirror.c b/net/filter-mirror.c
-> index 3413e82..4b03dda 100644
-> --- a/net/filter-mirror.c
-> +++ b/net/filter-mirror.c
-> @@ -267,6 +267,7 @@ static void filter_redirector_setup(NetFilterState =
-*nf, Error **errp)
->       }
->  =20
->       net_socket_rs_init(&s->rs, redirector_rs_finalize);
-> +    s->rs.vnet_hdr =3D s->vnet_hdr;
-
-This looks like a follow up patch on top for this. And I would like to=20
-reoder the series and make this patch as 02/10.
-
->  =20
->       if (s->indev) {
->           chr =3D qemu_chr_find(s->indev);
-> diff --git a/net/net.c b/net/net.c
-> index 4e7a305..b9b90c9 100644
-> --- a/net/net.c
-> +++ b/net/net.c
-> @@ -1606,8 +1606,10 @@ void net_socket_rs_init(SocketReadState *rs,
->                           SocketReadStateFinalize *finalize)
->   {
->       rs->state =3D 0;
-> +    rs->vnet_hdr =3D false;
-
-Let's introduce a parameter for this function and let's caller set it=20
-instead of manually toggling it like above.
-
->       rs->index =3D 0;
->       rs->packet_len =3D 0;
-> +    rs->vnet_hdr_len =3D 0;
->       memset(rs->buf, 0, sizeof(rs->buf));
->       rs->finalize =3D finalize;
->   }
-> @@ -1622,8 +1624,12 @@ int net_fill_rstate(SocketReadState *rs, const u=
-int8_t *buf, int size)
->       unsigned int l;
->  =20
->       while (size > 0) {
-> -        /* reassemble a packet from the network */
-> -        switch (rs->state) { /* 0 =3D getting length, 1 =3D getting da=
-ta */
-> +        /* Reassemble a packet from the network.
-> +         * 0 =3D getting length.
-> +         * 1 =3D getting vnet header length.
-> +         * 2 =3D getting data.
-> +         */
-> +        switch (rs->state) {
->           case 0:
->               l =3D 4 - rs->index;
->               if (l > size) {
-> @@ -1637,10 +1643,31 @@ int net_fill_rstate(SocketReadState *rs, const =
-uint8_t *buf, int size)
->                   /* got length */
->                   rs->packet_len =3D ntohl(*(uint32_t *)rs->buf);
->                   rs->index =3D 0;
-> -                rs->state =3D 1;
-> +                if (rs->vnet_hdr) {
-> +                    rs->state =3D 1;
-> +                } else {
-> +                    rs->state =3D 2;
-> +                    rs->vnet_hdr_len =3D 0;
-> +                }
->               }
->               break;
->           case 1:
-> +            l =3D 4 - rs->index;
-> +            if (l > size) {
-> +                l =3D size;
-> +            }
-> +            memcpy(rs->buf + rs->index, buf, l);
-> +            buf +=3D l;
-> +            size -=3D l;
-> +            rs->index +=3D l;
-> +            if (rs->index =3D=3D 4) {
-> +                /* got vnet header length */
-> +                rs->vnet_hdr_len =3D ntohl(*(uint32_t *)rs->buf);
-> +                rs->index =3D 0;
-> +                rs->state =3D 2;
-> +            }
-> +            break;
-> +        case 2:
->               l =3D rs->packet_len - rs->index;
->               if (l > size) {
->                   l =3D size;
+>=20
+> Best Regards
+>=20
+> Eric
+>=20
+> This series can be found at:
+> https://github.com/eauger/qemu/tree/virtio-iommu-rfcv2
+>=20
+> References:
+> [1] [RFC 0/3] virtio-iommu: a paravirtualized IOMMU, [2] [RFC PATCH linux=
+]
+> iommu: Add virtio-iommu driver [3] [RFC PATCH kvmtool 00/15] Add virtio-
+> iommu
+>=20
+> History:
+> v1 -> v2:
+> - fix redifinition of viommu_as typedef
+>=20
+> Eric Auger (8):
+>   update-linux-headers: import virtio_iommu.h
+>   linux-headers: Update for virtio-iommu
+>   virtio_iommu: add skeleton
+>   virtio-iommu: Decode the command payload
+>   virtio_iommu: Add the iommu regions
+>   virtio-iommu: Implement the translation and commands
+>   hw/arm/virt: Add 2.10 machine type
+>   hw/arm/virt: Add virtio-iommu the virt board
+>=20
+>  hw/arm/virt.c                                 | 116 ++++-
+>  hw/virtio/Makefile.objs                       |   1 +
+>  hw/virtio/trace-events                        |  14 +
+>  hw/virtio/virtio-iommu.c                      | 623 ++++++++++++++++++++=
+++++++
+>  include/hw/arm/virt.h                         |   5 +
+>  include/hw/virtio/virtio-iommu.h              |  60 +++
+>  include/standard-headers/linux/virtio_ids.h   |   1 +
+>  include/standard-headers/linux/virtio_iommu.h | 142 ++++++
+>  linux-headers/linux/virtio_iommu.h            |   1 +
+>  scripts/update-linux-headers.sh               |   3 +
+>  10 files changed, 957 insertions(+), 9 deletions(-)  create mode 100644
+> hw/virtio/virtio-iommu.c  create mode 100644 include/hw/virtio/virtio-
+> iommu.h  create mode 100644 include/standard-
+> headers/linux/virtio_iommu.h
+>  create mode 100644 linux-headers/linux/virtio_iommu.h
+>=20
+> --
+> 2.5.5
