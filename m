@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dJNkD-0007yD-Mn
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 13:30:46 -0400
+	(envelope-from <quintela@redhat.com>) id 1dJNn6-0001T9-N7
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 13:33:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dJNkC-0006Ce-HN
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 13:30:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43818)
+	(envelope-from <quintela@redhat.com>) id 1dJNn2-0007Sj-Oe
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 13:33:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56242)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1dJNkC-0006BP-8P
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 13:30:44 -0400
-From: Alex Williamson <alex.williamson@redhat.com>
-Date: Fri, 09 Jun 2017 11:30:38 -0600
-Message-ID: <20170609173021.24851.96804.stgit@gimli.home>
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dJNn2-0007Sc-GK
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 13:33:40 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 823EE33458C
+	for <qemu-devel@nongnu.org>; Fri,  9 Jun 2017 17:33:39 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170609134010.GK22043@thinpad.lan.raisama.net> (Eduardo
+	Habkost's message of "Fri, 9 Jun 2017 10:40:10 -0300")
+References: <1496980142-8986-1-git-send-email-peterx@redhat.com>
+	<1496980142-8986-4-git-send-email-peterx@redhat.com>
+	<20170609134010.GK22043@thinpad.lan.raisama.net>
+Reply-To: quintela@redhat.com
+Date: Fri, 09 Jun 2017 19:33:35 +0200
+Message-ID: <87h8zp83rk.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] vfio: Test realized when using
- VFIOGroup.device_list iterator
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 3/6] migration: move
+ global_state.optional out
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,105 +36,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: eric.auger@redhat.com, alex.williamson@redhat.com, kvm@vger.kernel.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-VFIOGroup.device_list is effectively our reference tracking mechanism
-such that we can teardown a group when all of the device references
-are removed.  However, we also use this list from our machine reset
-handler for processing resets that affect multiple devices.  Generally
-device removals are fully processed (exitfn + finalize) when this
-reset handler is invoked, however if the removal is triggered via
-another reset handler (piix4_reset->acpi_pcihp_reset) then the device
-exitfn may run, but not finalize.  In this case we hit asserts when
-we start trying to access PCI helpers since much of the PCI state of
-the device is released.  To resolve this, add a pointer to the Object
-DeviceState in our common base-device and skip non-realized devices
-as we iterate.
+Eduardo Habkost <ehabkost@redhat.com> wrote:
+D> On Fri, Jun 09, 2017 at 11:48:59AM +0800, Peter Xu wrote:
+>> Put it into MigrationState then we can use the properties to specify
+>> whether to enable storing global state.
+>> 
+>> Removing global_state_set_optional() since now we can use HW_COMPAT_2_3
+>> for x86/power in general, and the register_compat_prop() for xen_init().
+>> 
+>> Signed-off-by: Peter Xu <peterx@redhat.com>
+>> ---
+>>  hw/i386/pc_piix.c             |  1 -
+>>  hw/ppc/spapr.c                |  1 -
+>>  hw/xen/xen-common.c           |  8 +++++++-
+>>  include/hw/compat.h           |  4 ++++
+>>  include/migration/migration.h |  7 ++++++-
+>>  migration/migration.c         | 24 ++++++++++++++++--------
+>>  6 files changed, 33 insertions(+), 12 deletions(-)
+>> 
+>> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+>> index 2234bd0..c83cec5 100644
+>> --- a/hw/i386/pc_piix.c
+>> +++ b/hw/i386/pc_piix.c
+>> @@ -317,7 +317,6 @@ static void pc_compat_2_3(MachineState *machine)
+>>      if (kvm_enabled()) {
+>>          pcms->smm = ON_OFF_AUTO_OFF;
+>>      }
+>> -    global_state_set_optional();
+>>      savevm_skip_configuration();
+>>  }
+>>  
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index ab3aab1..3e78bb9 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -3593,7 +3593,6 @@ static void spapr_machine_2_3_instance_options(MachineState *machine)
+>>  {
+>>      spapr_machine_2_4_instance_options(machine);
+>>      savevm_skip_section_footers();
+>> -    global_state_set_optional();
+>>      savevm_skip_configuration();
+>>  }
+>
+> This is a good thing: makes the migration behavior of the
+> machine-types introspectable in compat_props.
+>
+> I suggest moving this part (and all the rest except the new
+> register_compat_prop() call below) to a separate patch, because
+> it is an improvement on its own.
+>
+>>  
+>> diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
+>> index 0bed577..8240d50 100644
+>> --- a/hw/xen/xen-common.c
+>> +++ b/hw/xen/xen-common.c
+>> @@ -138,7 +138,13 @@ static int xen_init(MachineState *ms)
+>>      }
+>>      qemu_add_vm_change_state_handler(xen_change_state_handler, NULL);
+>>  
+>> -    global_state_set_optional();
+>> +    /*
+>> +     * TODO: make sure global MigrationState has not yet been created
+>> +     * (otherwise the compat trick won't work). For now we are in
+>> +     * configure_accelerator() so we are mostly good. Better to
+>> +     * confirm that in the future.
+>> +     */
+>
+> So, this makes accelerator initialization very sensitive to
+> ordering.
+>
+>> +    register_compat_prop("migration", "store-global-state", "off");
+>
+> It's already hard to track down machine-type stuff that is
+> initialized at machine->init() time but it's not introspectable,
+> let's not do the same mistake with accelerators.
+>
+> Can't this be solved by a AcceleratorClass::global_props field,
+> so we are sure there's a single place in the code where globals
+> are registered?  (Currently, they are all registered by the few
+> lines around the machine_register_compat_props() call in main()).
+>
+> I think I see other use cases for a new
+> AcceleratorClass::global_props field.  e.g.: replacing
+> kvm_default_props and tcg_default_props in target/i386/cpu.c.
 
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- hw/vfio/common.c              |    6 ++++--
- hw/vfio/pci.c                 |    7 +++++--
- hw/vfio/platform.c            |    1 +
- include/hw/vfio/vfio-common.h |    1 +
- 4 files changed, 11 insertions(+), 4 deletions(-)
+That is the kind of discussion that I wanted to start.  Thanks.
+For the migration point of view, we don't care *how* or *where* it is
+implemented, just that it is easy to add new properties (call it
+whatever name that you want).
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index b9abe77f5a7b..29923e499012 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -858,13 +858,15 @@ void vfio_reset_handler(void *opaque)
- 
-     QLIST_FOREACH(group, &vfio_group_list, next) {
-         QLIST_FOREACH(vbasedev, &group->device_list, next) {
--            vbasedev->ops->vfio_compute_needs_reset(vbasedev);
-+            if (vbasedev->dev->realized) {
-+                vbasedev->ops->vfio_compute_needs_reset(vbasedev);
-+            }
-         }
-     }
- 
-     QLIST_FOREACH(group, &vfio_group_list, next) {
-         QLIST_FOREACH(vbasedev, &group->device_list, next) {
--            if (vbasedev->needs_reset) {
-+            if (vbasedev->dev->realized && vbasedev->needs_reset) {
-                 vbasedev->ops->vfio_hot_reset_multi(vbasedev);
-             }
-         }
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 32aca7770177..8a1d70295fad 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -2113,7 +2113,8 @@ static int vfio_pci_hot_reset(VFIOPCIDevice *vdev, bool single)
- 
-         /* Prep dependent devices for reset and clear our marker. */
-         QLIST_FOREACH(vbasedev_iter, &group->device_list, next) {
--            if (vbasedev_iter->type != VFIO_DEVICE_TYPE_PCI) {
-+            if (!vbasedev_iter->dev->realized ||
-+                vbasedev_iter->type != VFIO_DEVICE_TYPE_PCI) {
-                 continue;
-             }
-             tmp = container_of(vbasedev_iter, VFIOPCIDevice, vbasedev);
-@@ -2194,7 +2195,8 @@ out:
-         }
- 
-         QLIST_FOREACH(vbasedev_iter, &group->device_list, next) {
--            if (vbasedev_iter->type != VFIO_DEVICE_TYPE_PCI) {
-+            if (!vbasedev_iter->dev->realized ||
-+                vbasedev_iter->type != VFIO_DEVICE_TYPE_PCI) {
-                 continue;
-             }
-             tmp = container_of(vbasedev_iter, VFIOPCIDevice, vbasedev);
-@@ -2644,6 +2646,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
-     vdev->vbasedev.name = g_strdup(basename(vdev->vbasedev.sysfsdev));
-     vdev->vbasedev.ops = &vfio_pci_ops;
-     vdev->vbasedev.type = VFIO_DEVICE_TYPE_PCI;
-+    vdev->vbasedev.dev = &vdev->pdev.qdev;
- 
-     tmp = g_strdup_printf("%s/iommu_group", vdev->vbasedev.sysfsdev);
-     len = readlink(tmp, group_path, sizeof(group_path));
-diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
-index a4663c918ea2..7c09deda6143 100644
---- a/hw/vfio/platform.c
-+++ b/hw/vfio/platform.c
-@@ -640,6 +640,7 @@ static void vfio_platform_realize(DeviceState *dev, Error **errp)
-     int i, ret;
- 
-     vbasedev->type = VFIO_DEVICE_TYPE_PLATFORM;
-+    vbasedev->dev = dev;
-     vbasedev->ops = &vfio_platform_ops;
- 
-     trace_vfio_platform_realize(vbasedev->sysfsdev ?
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index 9521013d52b3..0b475a3596fc 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -115,6 +115,7 @@ typedef struct VFIODevice {
-     struct VFIOGroup *group;
-     char *sysfsdev;
-     char *name;
-+    DeviceState *dev;
-     int fd;
-     int type;
-     bool reset_works;
+And yes, making xen/kvm/tcg use QOM like everything else looks like a
+good idea to me.
+
+Later, Juan.
