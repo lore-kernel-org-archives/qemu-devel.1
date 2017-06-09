@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dJKGK-0000hZ-2v
+	(envelope-from <armbru@redhat.com>) id 1dJKGJ-0000gu-GT
 	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:47:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dJKGG-0003ZT-IZ
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:47:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46168)
+	(envelope-from <armbru@redhat.com>) id 1dJKGG-0003ZN-HN
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:47:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35774)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dJKGG-0003YF-7d
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dJKGG-0003Y4-6h
 	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:47:36 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 28E485A60
+	by mx1.redhat.com (Postfix) with ESMTPS id 1BA1CC04B92E
 	for <qemu-devel@nongnu.org>; Fri,  9 Jun 2017 13:47:35 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  9 Jun 2017 15:47:01 +0200
-Message-Id: <1497016045-6009-18-git-send-email-armbru@redhat.com>
+Date: Fri,  9 Jun 2017 15:46:51 +0200
+Message-Id: <1497016045-6009-8-git-send-email-armbru@redhat.com>
 In-Reply-To: <1497016045-6009-1-git-send-email-armbru@redhat.com>
 References: <1497016045-6009-1-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 17/41] qdev: avoid type casts between signed and
- unsigned
+Subject: [Qemu-devel] [PULL 07/41] qapi: Remove visit_start_alternate()
+ parameter promote_int
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,229 +38,206 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Modify the unsigned type for various properties to use QNUM_U64, to
-avoid type casts.
+Before the previous commit, parameter promote_int =3D true made
+visit_start_alternate() with an input visitor avoid QTYPE_QINT
+variants and create QTYPE_QFLOAT variants instead.  This was used
+where QTYPE_QINT variants were invalid.
 
-There are a few empty lines added to improve code reading/style.
+The previous commit fused QTYPE_QINT with QTYPE_QFLOAT, rendering
+promote_int useless and unused.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20170607163635.17635-18-marcandre.lureau@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
-[Change to set_default_value_enum() dropped]
+Message-Id: <20170607163635.17635-8-marcandre.lureau@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/core/qdev-properties.c    | 21 +++++++++++++--------
- include/hw/qdev-core.h       |  1 +
- include/hw/qdev-properties.h | 29 ++++++++++++++++++++---------
- 3 files changed, 34 insertions(+), 17 deletions(-)
+ include/qapi/visitor-impl.h        |  2 +-
+ include/qapi/visitor.h             |  4 +---
+ qapi/qapi-clone-visitor.c          |  2 +-
+ qapi/qapi-dealloc-visitor.c        |  2 +-
+ qapi/qapi-visit-core.c             |  6 +++---
+ qapi/qobject-input-visitor.c       |  2 +-
+ qapi/trace-events                  |  2 +-
+ scripts/qapi-visit.py              | 12 +++---------
+ tests/test-qobject-input-visitor.c |  2 +-
+ 9 files changed, 13 insertions(+), 21 deletions(-)
 
-diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index f3f682c..68cd653 100644
---- a/hw/core/qdev-properties.c
-+++ b/hw/core/qdev-properties.c
-@@ -128,7 +128,7 @@ static void prop_set_bit(Object *obj, Visitor *v, con=
-st char *name,
+diff --git a/include/qapi/visitor-impl.h b/include/qapi/visitor-impl.h
+index e87709d..dcd656a 100644
+--- a/include/qapi/visitor-impl.h
++++ b/include/qapi/visitor-impl.h
+@@ -71,7 +71,7 @@ struct Visitor
+      * optional for output visitors. */
+     void (*start_alternate)(Visitor *v, const char *name,
+                             GenericAlternate **obj, size_t size,
+-                            bool promote_int, Error **errp);
++                            Error **errp);
 =20
- static void set_default_value_bool(Object *obj, const Property *prop)
+     /* Optional, needed for dealloc visitor */
+     void (*end_alternate)(Visitor *v, void **obj);
+diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
+index 4721c39..74768aa 100644
+--- a/include/qapi/visitor.h
++++ b/include/qapi/visitor.h
+@@ -410,15 +410,13 @@ void visit_end_list(Visitor *v, void **list);
+  * the qtype of the next thing to be visited, stored in (*@obj)->type.
+  * Other visitors will leave @obj unchanged.
+  *
+- * If @promote_int, treat integers as QTYPE_FLOAT.
+- *
+  * If successful, this must be paired with visit_end_alternate() with
+  * the same @obj to clean up, even if visiting the contents of the
+  * alternate fails.
+  */
+ void visit_start_alternate(Visitor *v, const char *name,
+                            GenericAlternate **obj, size_t size,
+-                           bool promote_int, Error **errp);
++                           Error **errp);
+=20
+ /*
+  * Finish visiting an alternate type.
+diff --git a/qapi/qapi-clone-visitor.c b/qapi/qapi-clone-visitor.c
+index de756bf..ed16d3a 100644
+--- a/qapi/qapi-clone-visitor.c
++++ b/qapi/qapi-clone-visitor.c
+@@ -70,7 +70,7 @@ static GenericList *qapi_clone_next_list(Visitor *v, Ge=
+nericList *tail,
+=20
+ static void qapi_clone_start_alternate(Visitor *v, const char *name,
+                                        GenericAlternate **obj, size_t si=
+ze,
+-                                       bool promote_int, Error **errp)
++                                       Error **errp)
  {
--    object_property_set_bool(obj, prop->defval.i, prop->name, &error_abo=
-rt);
-+    object_property_set_bool(obj, prop->defval.u, prop->name, &error_abo=
-rt);
+     qapi_clone_start_struct(v, name, (void **)obj, size, errp);
+ }
+diff --git a/qapi/qapi-dealloc-visitor.c b/qapi/qapi-dealloc-visitor.c
+index e39457b..fd6f9fb 100644
+--- a/qapi/qapi-dealloc-visitor.c
++++ b/qapi/qapi-dealloc-visitor.c
+@@ -38,7 +38,7 @@ static void qapi_dealloc_end_struct(Visitor *v, void **=
+obj)
+=20
+ static void qapi_dealloc_start_alternate(Visitor *v, const char *name,
+                                          GenericAlternate **obj, size_t =
+size,
+-                                         bool promote_int, Error **errp)
++                                         Error **errp)
+ {
  }
 =20
- PropertyInfo qdev_prop_bit =3D {
-@@ -264,11 +264,16 @@ static void set_default_value_int(Object *obj, cons=
-t Property *prop)
-     object_property_set_int(obj, prop->defval.i, prop->name, &error_abor=
-t);
- }
+diff --git a/qapi/qapi-visit-core.c b/qapi/qapi-visit-core.c
+index 43a09d1..935a2c5 100644
+--- a/qapi/qapi-visit-core.c
++++ b/qapi/qapi-visit-core.c
+@@ -106,15 +106,15 @@ void visit_end_list(Visitor *v, void **obj)
 =20
-+static void set_default_value_uint(Object *obj, const Property *prop)
-+{
-+    object_property_set_uint(obj, prop->defval.u, prop->name, &error_abo=
-rt);
-+}
-+
- PropertyInfo qdev_prop_uint8 =3D {
-     .name  =3D "uint8",
-     .get   =3D get_uint8,
-     .set   =3D set_uint8,
--    .set_default_value =3D set_default_value_int,
-+    .set_default_value =3D set_default_value_uint,
- };
+ void visit_start_alternate(Visitor *v, const char *name,
+                            GenericAlternate **obj, size_t size,
+-                           bool promote_int, Error **errp)
++                           Error **errp)
+ {
+     Error *err =3D NULL;
 =20
- /* --- 16bit integer --- */
-@@ -302,7 +307,7 @@ PropertyInfo qdev_prop_uint16 =3D {
-     .name  =3D "uint16",
-     .get   =3D get_uint16,
-     .set   =3D set_uint16,
--    .set_default_value =3D set_default_value_int,
-+    .set_default_value =3D set_default_value_uint,
- };
+     assert(obj && size >=3D sizeof(GenericAlternate));
+     assert(!(v->type & VISITOR_OUTPUT) || *obj);
+-    trace_visit_start_alternate(v, name, obj, size, promote_int);
++    trace_visit_start_alternate(v, name, obj, size);
+     if (v->start_alternate) {
+-        v->start_alternate(v, name, obj, size, promote_int, &err);
++        v->start_alternate(v, name, obj, size, &err);
+     }
+     if (v->type & VISITOR_INPUT) {
+         assert(v->start_alternate && !err !=3D !*obj);
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index b24f99d..539b3b8 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -367,7 +367,7 @@ static void qobject_input_end_list(Visitor *v, void *=
+*obj)
 =20
- /* --- 32bit integer --- */
-@@ -361,7 +366,7 @@ PropertyInfo qdev_prop_uint32 =3D {
-     .name  =3D "uint32",
-     .get   =3D get_uint32,
-     .set   =3D set_uint32,
--    .set_default_value =3D set_default_value_int,
-+    .set_default_value =3D set_default_value_uint,
- };
+ static void qobject_input_start_alternate(Visitor *v, const char *name,
+                                           GenericAlternate **obj, size_t=
+ size,
+-                                          bool promote_int, Error **errp=
+)
++                                          Error **errp)
+ {
+     QObjectInputVisitor *qiv =3D to_qiv(v);
+     QObject *qobj =3D qobject_input_get_object(qiv, name, false, errp);
+diff --git a/qapi/trace-events b/qapi/trace-events
+index 339cacf..3b57aba 100644
+--- a/qapi/trace-events
++++ b/qapi/trace-events
+@@ -11,7 +11,7 @@ visit_next_list(void *v, void *tail, size_t size) "v=3D=
+%p tail=3D%p size=3D%zu"
+ visit_check_list(void *v) "v=3D%p"
+ visit_end_list(void *v, void *obj) "v=3D%p obj=3D%p"
 =20
- PropertyInfo qdev_prop_int32 =3D {
-@@ -402,7 +407,7 @@ PropertyInfo qdev_prop_uint64 =3D {
-     .name  =3D "uint64",
-     .get   =3D get_uint64,
-     .set   =3D set_uint64,
--    .set_default_value =3D set_default_value_int,
-+    .set_default_value =3D set_default_value_uint,
- };
+-visit_start_alternate(void *v, const char *name, void *obj, size_t size,=
+ bool promote_int) "v=3D%p name=3D%s obj=3D%p size=3D%zu promote_int=3D%d=
+"
++visit_start_alternate(void *v, const char *name, void *obj, size_t size)=
+ "v=3D%p name=3D%s obj=3D%p size=3D%zu"
+ visit_end_alternate(void *v, void *obj) "v=3D%p obj=3D%p"
 =20
- /* --- string --- */
-@@ -725,7 +730,7 @@ PropertyInfo qdev_prop_blocksize =3D {
-     .description =3D "A power of two between 512 and 32768",
-     .get   =3D get_uint16,
-     .set   =3D set_blocksize,
--    .set_default_value =3D set_default_value_int,
-+    .set_default_value =3D set_default_value_uint,
- };
+ visit_optional(void *v, const char *name, bool *present) "v=3D%p name=3D=
+%s present=3D%p"
+diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
+index cc447ec..bd0b742 100644
+--- a/scripts/qapi-visit.py
++++ b/scripts/qapi-visit.py
+@@ -161,20 +161,14 @@ void visit_type_%(c_name)s(Visitor *v, const char *=
+name, %(c_name)s *obj, Error
 =20
- /* --- pci host address --- */
-@@ -948,7 +953,7 @@ PropertyInfo qdev_prop_arraylen =3D {
-     .name =3D "uint32",
-     .get =3D get_uint32,
-     .set =3D set_prop_arraylen,
--    .set_default_value =3D set_default_value_int,
-+    .set_default_value =3D set_default_value_uint,
- };
 =20
- /* --- public helpers --- */
-@@ -1185,5 +1190,5 @@ PropertyInfo qdev_prop_size =3D {
-     .name  =3D "size",
-     .get =3D get_size,
-     .set =3D set_size,
--    .set_default_value =3D set_default_value_int,
-+    .set_default_value =3D set_default_value_uint,
- };
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 784971b..9d7c1c0 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -228,6 +228,7 @@ struct Property {
-     uint8_t      bitnr;
-     union {
-         int64_t i;
-+        uint64_t u;
-     } defval;
-     int          arrayoffset;
-     PropertyInfo *arrayinfo;
-diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-index 34524d0..1e5c928 100644
---- a/include/hw/qdev-properties.h
-+++ b/include/hw/qdev-properties.h
-@@ -37,6 +37,7 @@ extern PropertyInfo qdev_prop_arraylen;
-         .offset    =3D offsetof(_state, _field)                    \
-             + type_check(_type, typeof_field(_state, _field)),   \
-         }
-+
- #define DEFINE_PROP_SIGNED(_name, _state, _field, _defval, _prop, _type)=
- { \
-         .name      =3D (_name),                                         =
-  \
-         .info      =3D &(_prop),                                        =
-  \
-@@ -44,21 +45,31 @@ extern PropertyInfo qdev_prop_arraylen;
-             + type_check(_type,typeof_field(_state, _field)),           =
-\
-         .defval.i  =3D (_type)_defval,                                  =
-  \
-         }
-+
- #define DEFINE_PROP_BIT(_name, _state, _field, _bit, _defval) {  \
-         .name      =3D (_name),                                    \
-         .info      =3D &(qdev_prop_bit),                           \
-         .bitnr    =3D (_bit),                                      \
-         .offset    =3D offsetof(_state, _field)                    \
-             + type_check(uint32_t,typeof_field(_state, _field)), \
--        .defval.i  =3D (bool)_defval,                              \
-+        .defval.u  =3D (bool)_defval,                              \
-         }
-+
-+#define DEFINE_PROP_UNSIGNED(_name, _state, _field, _defval, _prop, _typ=
-e) { \
-+        .name      =3D (_name),                                         =
-  \
-+        .info      =3D &(_prop),                                        =
-  \
-+        .offset    =3D offsetof(_state, _field)                         =
-  \
-+            + type_check(_type, typeof_field(_state, _field)),          =
-\
-+        .defval.u  =3D (_type)_defval,                                  =
-  \
-+        }
-+
- #define DEFINE_PROP_BIT64(_name, _state, _field, _bit, _defval) {       =
-\
-         .name      =3D (_name),                                         =
-  \
-         .info      =3D &(qdev_prop_bit64),                              =
-  \
-         .bitnr    =3D (_bit),                                           =
-  \
-         .offset    =3D offsetof(_state, _field)                         =
-  \
-             + type_check(uint64_t, typeof_field(_state, _field)),       =
-\
--        .defval.i  =3D (bool)_defval,                                   =
-  \
-+        .defval.u  =3D (bool)_defval,                                   =
-  \
-         }
+ def gen_visit_alternate(name, variants):
+-    promote_int =3D 'true'
+-    ret =3D ''
+-    for var in variants.variants:
+-        if var.type.alternate_qtype() =3D=3D 'QTYPE_QNUM':
+-            promote_int =3D 'false'
+-
+-    ret +=3D mcgen('''
++    ret =3D mcgen('''
 =20
- #define DEFINE_PROP_BOOL(_name, _state, _field, _defval) {       \
-@@ -66,7 +77,7 @@ extern PropertyInfo qdev_prop_arraylen;
-         .info      =3D &(qdev_prop_bool),                          \
-         .offset    =3D offsetof(_state, _field)                    \
-             + type_check(bool, typeof_field(_state, _field)),    \
--        .defval.i  =3D (bool)_defval,                              \
-+        .defval.u    =3D (bool)_defval,                            \
-         }
+ void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **ob=
+j, Error **errp)
+ {
+     Error *err =3D NULL;
 =20
- #define PROP_ARRAY_LEN_PREFIX "len-"
-@@ -107,17 +118,17 @@ extern PropertyInfo qdev_prop_arraylen;
-         }
+     visit_start_alternate(v, name, (GenericAlternate **)obj, sizeof(**ob=
+j),
+-                          %(promote_int)s, &err);
++                          &err);
+     if (err) {
+         goto out;
+     }
+@@ -183,7 +177,7 @@ void visit_type_%(c_name)s(Visitor *v, const char *na=
+me, %(c_name)s **obj, Error
+     }
+     switch ((*obj)->type) {
+ ''',
+-                 c_name=3Dc_name(name), promote_int=3Dpromote_int)
++                 c_name=3Dc_name(name))
 =20
- #define DEFINE_PROP_UINT8(_n, _s, _f, _d)                       \
--    DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_uint8, uint8_t)
-+    DEFINE_PROP_UNSIGNED(_n, _s, _f, _d, qdev_prop_uint8, uint8_t)
- #define DEFINE_PROP_UINT16(_n, _s, _f, _d)                      \
--    DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_uint16, uint16_t)
-+    DEFINE_PROP_UNSIGNED(_n, _s, _f, _d, qdev_prop_uint16, uint16_t)
- #define DEFINE_PROP_UINT32(_n, _s, _f, _d)                      \
--    DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_uint32, uint32_t)
-+    DEFINE_PROP_UNSIGNED(_n, _s, _f, _d, qdev_prop_uint32, uint32_t)
- #define DEFINE_PROP_INT32(_n, _s, _f, _d)                      \
-     DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_int32, int32_t)
- #define DEFINE_PROP_UINT64(_n, _s, _f, _d)                      \
--    DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_uint64, uint64_t)
-+    DEFINE_PROP_UNSIGNED(_n, _s, _f, _d, qdev_prop_uint64, uint64_t)
- #define DEFINE_PROP_SIZE(_n, _s, _f, _d)                       \
--    DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_size, uint64_t)
-+    DEFINE_PROP_UNSIGNED(_n, _s, _f, _d, qdev_prop_size, uint64_t)
- #define DEFINE_PROP_PCI_DEVFN(_n, _s, _f, _d)                   \
-     DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_pci_devfn, int32_t)
-=20
-@@ -163,7 +174,7 @@ extern PropertyInfo qdev_prop_arraylen;
- #define DEFINE_PROP_BIOS_CHS_TRANS(_n, _s, _f, _d) \
-     DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_bios_chs_trans, int)
- #define DEFINE_PROP_BLOCKSIZE(_n, _s, _f) \
--    DEFINE_PROP_SIGNED(_n, _s, _f, 0, qdev_prop_blocksize, uint16_t)
-+    DEFINE_PROP_UNSIGNED(_n, _s, _f, 0, qdev_prop_blocksize, uint16_t)
- #define DEFINE_PROP_PCI_HOST_DEVADDR(_n, _s, _f) \
-     DEFINE_PROP(_n, _s, _f, qdev_prop_pci_host_devaddr, PCIHostDeviceAdd=
-ress)
-=20
+     for var in variants.variants:
+         ret +=3D mcgen('''
+diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-inpu=
+t-visitor.c
+index 6890ce5..928cc26 100644
+--- a/tests/test-qobject-input-visitor.c
++++ b/tests/test-qobject-input-visitor.c
+@@ -1105,7 +1105,7 @@ static void test_visitor_in_fail_struct_missing(Tes=
+tInputVisitorData *data,
+     error_free_or_abort(&err);
+     visit_start_list(v, "list", NULL, 0, &err);
+     error_free_or_abort(&err);
+-    visit_start_alternate(v, "alternate", &alt, sizeof(*alt), false, &er=
+r);
++    visit_start_alternate(v, "alternate", &alt, sizeof(*alt), &err);
+     error_free_or_abort(&err);
+     visit_optional(v, "optional", &present);
+     g_assert(!present);
 --=20
 2.7.5
