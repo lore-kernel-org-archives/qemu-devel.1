@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33900)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dJDeA-0004I4-KM
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 02:43:54 -0400
+	(envelope-from <groug@kaod.org>) id 1dJDgO-00050o-5J
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 02:46:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dJDe9-0001ww-7s
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 02:43:50 -0400
-References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
-	<AM5PR0401MB2545AFD256A96420ACC44CD89ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <14c83c14-1e7e-f142-77b0-fa8c873e2d41@redhat.com>
-Date: Fri, 9 Jun 2017 08:43:32 +0200
+	(envelope-from <groug@kaod.org>) id 1dJDgL-0002hy-1d
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 02:46:08 -0400
+Received: from 5.mo178.mail-out.ovh.net ([46.105.51.53]:53056)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dJDgK-0002fs-Qz
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 02:46:04 -0400
+Received: from player728.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 453C53E9AA
+	for <qemu-devel@nongnu.org>; Fri,  9 Jun 2017 08:45:55 +0200 (CEST)
+Date: Fri, 9 Jun 2017 08:45:50 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170609084550.53aece8d@bahia.ttt.fr.ibm.com>
+In-Reply-To: <20170609022452.GE26521@umbus.fritz.box>
+References: <149685579678.12025.9278446121024037161.stgit@bahia.lan>
+	<149685582923.12025.13700165807436904935.stgit@bahia.lan>
+	<20170608020112.GT13397@umbus.fritz.box>
+	<20170608104530.65b7d53e@bahia.ttt.fr.ibm.com>
+	<20170609022452.GE26521@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <AM5PR0401MB2545AFD256A96420ACC44CD89ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 0/8] VIRTIO-IOMMU device
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/GvRssp/9JWSitk/c4G7.N=l";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] xics: setup cpu at realize time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,123 +34,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bharat Bhushan <bharat.bhushan@nxp.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>
-Cc: "will.deacon@arm.com" <will.deacon@arm.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "drjones@redhat.com" <drjones@redhat.com>, "wei@redhat.com" <wei@redhat.com>, "tn@semihalf.com" <tn@semihalf.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>
 
-Hi Bharat,
+--Sig_/GvRssp/9JWSitk/c4G7.N=l
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On 09/06/2017 08:16, Bharat Bhushan wrote:
-> Hi Eric,
-> 
->> -----Original Message-----
->> From: Eric Auger [mailto:eric.auger@redhat.com]
->> Sent: Wednesday, June 07, 2017 9:31 PM
->> To: eric.auger.pro@gmail.com; eric.auger@redhat.com;
->> peter.maydell@linaro.org; alex.williamson@redhat.com; mst@redhat.com;
->> qemu-arm@nongnu.org; qemu-devel@nongnu.org; jean-
->> philippe.brucker@arm.com
->> Cc: will.deacon@arm.com; robin.murphy@arm.com; kevin.tian@intel.com;
->> marc.zyngier@arm.com; christoffer.dall@linaro.org; drjones@redhat.com;
->> wei@redhat.com; tn@semihalf.com; Bharat Bhushan
->> <bharat.bhushan@nxp.com>
->> Subject: [RFC v2 0/8] VIRTIO-IOMMU device
->>
->> This series implements the virtio-iommu device. This is a proof of concept
->> based on the virtio-iommu specification written by Jean-Philippe Brucker [1].
->> This was tested with a guest using the virtio-iommu driver [2] and exposed
->> with a virtio-net-pci using dma ops.
->>
->> The device gets instantiated using the "-device virtio-iommu-device"
->> option. It currently works with ARM virt machine only as the machine must
->> handle the dt binding between the virtio-mmio "iommu" node and the PCI
->> host bridge node. ACPI booting is not yet supported.
->>
->> This should allow to start some benchmarking activities against pure
->> emulated IOMMU (especially ARM SMMU).
-> 
-> I am testing this on ARM64 and see below continuous error prints:
-> 
-> 	virtio_iommu_translate sid=8 is not known!!
-> 	virtio_iommu_translate sid=8 is not known!!
-> 	virtio_iommu_translate sid=8 is not known!!
-> 	virtio_iommu_translate sid=8 is not known!!
-> 	virtio_iommu_translate sid=8 is not known!!
-> 	virtio_iommu_translate sid=8 is not known!!
-> 	virtio_iommu_translate sid=8 is not known!!
-> 	virtio_iommu_translate sid=8 is not known!!
-> 	virtio_iommu_translate sid=8 is not known!!
-> 	virtio_iommu_translate sid=8 is not known!! 
-> 
-> 
-> Also in guest I do not see device-tree node with virtio-iommu.
-do you mean the virtio-mmio with #iommu-cells property?
+On Fri, 9 Jun 2017 12:24:52 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-This one is created statically by virt machine. I would be surprised if
-it were not there. Are you using the virt = virt2.10 machine. Machines
-before do not support its instantiation.
+> On Thu, Jun 08, 2017 at 10:45:30AM +0200, Greg Kurz wrote:
+> > On Thu, 8 Jun 2017 12:01:12 +1000
+> > David Gibson <david@gibson.dropbear.id.au> wrote:
+> >  =20
+> > > On Wed, Jun 07, 2017 at 07:17:09PM +0200, Greg Kurz wrote: =20
+> > > > Until recently, spapr used to allocate ICPState objects for the lif=
+etime
+> > > > of the machine. They would only be associated to vCPUs in xics_cpu_=
+setup()
+> > > > when plugging a CPU core.
+> > > >=20
+> > > > Now that ICPState objects have the same lifecycle as vCPUs, it is
+> > > > possible to associate them during realization.
+> > > >=20
+> > > > This patch hence open-codes xics_cpu_setup() in icp_realize(). The =
+vCPU
+> > > > is passed as a property. Note that vCPU now needs to be realized fi=
+rst
+> > > > for the IRQs to be allocated. It also needs to resetted before ICPS=
+tate
+> > > > realization in order to synchronize with KVM.   =20
+> > >=20
+> > > Ok, what enforces those ordering constraints?
+> > >  =20
+> >=20
+> > I'm not sure about what you're asking... I had to re-order because
+> > xics_cpu_setup() used to be called after the vCPU is realized and
+> > put in PAPR mode. =20
+>=20
+> Duh, sorry, I wasn't thinking to ask about realize order, since that's
+> manual and you've re-ordered it to be correct.
+>=20
+> You also mention that reset order matters, and I'm less clear on what
+> guarantees that the reset handlers for the components get called in
+> the right order.
+>=20
 
-Please can you add a printf in hw/arm/virt.c create_virtio_mmio() at the
-moment when this node is created. Also you can add a printf in
-bind_virtio_iommu_device() to make sure the binding with the PCI host
-bridge is added on machine init done.
+Oops... my bad, this is a mistake in the changelog. The KVM error I was
+seing isn't related to CPU reset as I was thinking first but to
+cpu_ppc_set_papr()... :-\
 
-Also worth to check, CONFIG_VIRTIO_IOMMU=y on guest side.
+The last sentence should rather be something like:
 
-Thanks
+"We also need to call spapr_cpu_init() before ICPState realization in
+ order to enable PAPR mode in KVM."
 
-Eric
+Can you fix this in your tree or should I send an updated version ?
 
-> I am using qemu-tree you mentioned below and iommu-driver patches published by Jean-P.
-> Qemu command line have additional ""-device virtio-iommu-device". What I am missing ?
+Cheers,
 
+--
+Greg
 
-> 
-> Thanks
-> -Bharat
-> 
->>
->> Best Regards
->>
->> Eric
->>
->> This series can be found at:
->> https://github.com/eauger/qemu/tree/virtio-iommu-rfcv2
->>
->> References:
->> [1] [RFC 0/3] virtio-iommu: a paravirtualized IOMMU, [2] [RFC PATCH linux]
->> iommu: Add virtio-iommu driver [3] [RFC PATCH kvmtool 00/15] Add virtio-
->> iommu
->>
->> History:
->> v1 -> v2:
->> - fix redifinition of viommu_as typedef
->>
->> Eric Auger (8):
->>   update-linux-headers: import virtio_iommu.h
->>   linux-headers: Update for virtio-iommu
->>   virtio_iommu: add skeleton
->>   virtio-iommu: Decode the command payload
->>   virtio_iommu: Add the iommu regions
->>   virtio-iommu: Implement the translation and commands
->>   hw/arm/virt: Add 2.10 machine type
->>   hw/arm/virt: Add virtio-iommu the virt board
->>
->>  hw/arm/virt.c                                 | 116 ++++-
->>  hw/virtio/Makefile.objs                       |   1 +
->>  hw/virtio/trace-events                        |  14 +
->>  hw/virtio/virtio-iommu.c                      | 623 ++++++++++++++++++++++++++
->>  include/hw/arm/virt.h                         |   5 +
->>  include/hw/virtio/virtio-iommu.h              |  60 +++
->>  include/standard-headers/linux/virtio_ids.h   |   1 +
->>  include/standard-headers/linux/virtio_iommu.h | 142 ++++++
->>  linux-headers/linux/virtio_iommu.h            |   1 +
->>  scripts/update-linux-headers.sh               |   3 +
->>  10 files changed, 957 insertions(+), 9 deletions(-)  create mode 100644
->> hw/virtio/virtio-iommu.c  create mode 100644 include/hw/virtio/virtio-
->> iommu.h  create mode 100644 include/standard-
->> headers/linux/virtio_iommu.h
->>  create mode 100644 linux-headers/linux/virtio_iommu.h
->>
->> --
->> 2.5.5
-> 
+--Sig_/GvRssp/9JWSitk/c4G7.N=l
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlk6RB4ACgkQAvw66wEB28IN0wCgi0jOC6kNAu618acUD8Xm52/7
+lSMAoJuqIjcza3wiodvKf47i/zfzNITL
+=2fMR
+-----END PGP SIGNATURE-----
+
+--Sig_/GvRssp/9JWSitk/c4G7.N=l--
