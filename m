@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dJIQe-0006n4-D8
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 07:50:15 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dJIQi-0006rM-1q
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 07:50:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dJIQd-0001vM-KH
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 07:50:12 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dJIQh-0001zZ-Bv
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 07:50:16 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  9 Jun 2017 13:50:01 +0200
-Message-Id: <1497009003-25794-2-git-send-email-kwolf@redhat.com>
+Date: Fri,  9 Jun 2017 13:50:02 +0200
+Message-Id: <1497009003-25794-3-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1497009003-25794-1-git-send-email-kwolf@redhat.com>
 References: <1497009003-25794-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/3] commit: Fix completion with extra reference
+Subject: [Qemu-devel] [PATCH 2/3] qemu-iotests: Allow starting new qemu
+ after cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,37 +23,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-commit_complete() can't assume that after its block_job_completed() the
-job is actually immediately freed; someone else may still be holding
-references. In this case, the op blockers on the intermediate nodes make
-the graph reconfiguration in the completion code fail.
+After _cleanup_qemu(), test cases should be able to start the next qemu
+process and call _cleanup_qemu() for that one as well. For this to work
+cleanly, we need to improve the cleanup so that the second invocation
+doesn't try to kill the qemu instances from the first invocation a
+second time (which would result in error messages).
 
-Call block_job_remove_all_bdrv() manually so that we know for sure that
-any blockers on intermediate nodes are given up.
-
-Cc: qemu-stable@nongnu.org
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/commit.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ tests/qemu-iotests/common.qemu | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/block/commit.c b/block/commit.c
-index af6fa68..8c09c3d 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -119,6 +119,13 @@ static void commit_complete(BlockJob *job, void *opaque)
-     }
-     g_free(s->backing_file_str);
-     blk_unref(s->top);
+diff --git a/tests/qemu-iotests/common.qemu b/tests/qemu-iotests/common.qemu
+index 7a78a00..76ef298 100644
+--- a/tests/qemu-iotests/common.qemu
++++ b/tests/qemu-iotests/common.qemu
+@@ -222,5 +222,8 @@ function _cleanup_qemu()
+         rm -f "${QEMU_FIFO_IN}_${i}" "${QEMU_FIFO_OUT}_${i}"
+         eval "exec ${QEMU_IN[$i]}<&-"   # close file descriptors
+         eval "exec ${QEMU_OUT[$i]}<&-"
 +
-+    /* If there is more than one reference to the job (e.g. if called from
-+     * block_job_finish_sync()), block_job_completed() won't free it and
-+     * therefore the blockers on the intermediate nodes remain. This would
-+     * cause bdrv_set_backing_hd() to fail. */
-+    block_job_remove_all_bdrv(job);
-+
-     block_job_completed(&s->common, ret);
-     g_free(data);
- 
++        unset QEMU_IN[$i]
++        unset QEMU_OUT[$i]
+     done
+ }
 -- 
 1.8.3.1
