@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dJJcS-0005gR-QF
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:06:30 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dJJqX-0002fS-4j
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:21:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dJJcO-0004Tr-Qs
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:06:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55440)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dJJcO-0004Ta-IQ
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:06:24 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9FE9D37E66
-	for <qemu-devel@nongnu.org>; Fri,  9 Jun 2017 13:06:23 +0000 (UTC)
-Date: Fri, 9 Jun 2017 09:06:22 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <2025405656.32234574.1497013582739.JavaMail.zimbra@redhat.com>
-In-Reply-To: <87fuf9l4sw.fsf@dusky.pond.sub.org>
-References: <20170607163635.17635-1-marcandre.lureau@redhat.com>
-	<87fuf9l4sw.fsf@dusky.pond.sub.org>
+	(envelope-from <ehabkost@redhat.com>) id 1dJJqU-0001Zk-09
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:21:01 -0400
+Date: Fri, 9 Jun 2017 10:20:53 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170609132053.GM5016@thinpad.lan.raisama.net>
+References: <1496927934-21815-1-git-send-email-thuth@redhat.com>
+	<871squblsp.fsf@secure.mitica>
+	<20170609020338.GC26521@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 00/43] qobject/qapi: add uint type
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170609020338.GC26521@umbus.fritz.box>
+Subject: Re: [Qemu-devel] [PATCH] hw/cpu: core.c can be compiled as common
+ object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,109 +25,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Juan Quintela <quintela@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Igor Mammedov <imammedo@redhat.com>, Andrew Jones <drjones@redhat.com>
 
-Hi
+On Fri, Jun 09, 2017 at 12:03:38PM +1000, David Gibson wrote:
+> On Thu, Jun 08, 2017 at 04:23:34PM +0200, Juan Quintela wrote:
+> > Thomas Huth <thuth@redhat.com> wrote:
+> > > There does not seem to be any target specific code in core.c, so we can
+> > > put it into "common-obj" instead of "obj" to compile it only once for
+> > > all targets.
+> > >
+> > > Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > 
+> > It compiles.
+> > I can't see anything that is target dependent on core.c.
+> > 
+> > So
+> > 
+> > Reviewed-by: Juan Quintela <quintela@redhat.com>
+> 
+> I've merged this into my ppc-for-2.10 tree, on the basis that ppc is
+> the only user of core.c so far.  Any objections?
 
------ Original Message -----
-> PATCH 01-41 look ready with minor tweaks.  I chatted with Marc-Andr=C3=A9=
-,
-> and he asked me to apply them myself.  You can find the result at
-> https://repo.or.cz/qemu/armbru.git in branch qapi-next.  Marc-Andr=C3=A9,
-> please give it a quick look-over.  If it's good, I'll post a pull
-> request later today.
+No problem to me.  If you want, you can add my:
 
-Looks good to me, thanks a lot!
+Acked-by: Eduardo Habkost <ehabkost@redhat.com>
 
->=20
-> PATCH 42 is RFC.  I'd like to give PATCH 43 a bit more time on the list.
->=20
-> Incremental diff for your convenience:
->=20
-> diff --git a/blockdev.c b/blockdev.c
-> index 154c95d..4009dd9 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -335,10 +335,9 @@ static bool parse_stats_intervals(BlockAcctStats *st=
-ats,
-> QList *intervals,
->          }
-> =20
->          case QTYPE_QNUM: {
-> -            int64_t length;
-> +            int64_t length =3D qnum_get_int(qobject_to_qnum(entry->value=
-));
-> =20
-> -            if (qnum_get_try_int(qobject_to_qnum(entry->value), &length)=
- &&
-> -                length > 0 && length <=3D UINT_MAX) {
-> +            if (length > 0 && length <=3D UINT_MAX) {
->                  block_acct_add_interval(stats, (unsigned) length);
->              } else {
->                  error_setg(errp, "Invalid interval length: %" PRId64,
->                  length);
-> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-> index a8f09c1..68cd653 100644
-> --- a/hw/core/qdev-properties.c
-> +++ b/hw/core/qdev-properties.c
-> @@ -71,7 +71,7 @@ static void set_enum(Object *obj, Visitor *v, const cha=
-r
-> *name, void *opaque,
-> =20
->  static void set_default_value_enum(Object *obj, const Property *prop)
->  {
-> -    object_property_set_str(obj, prop->info->enum_table[prop->defval.u],
-> +    object_property_set_str(obj, prop->info->enum_table[prop->defval.i],
->                              prop->name, &error_abort);
->  }
-> =20
-> diff --git a/tests/test-qobject-input-visitor.c
-> b/tests/test-qobject-input-visitor.c
-> index 3bcdb9a..34bab8a 100644
-> --- a/tests/test-qobject-input-visitor.c
-> +++ b/tests/test-qobject-input-visitor.c
-> @@ -152,6 +152,7 @@ static void test_visitor_in_uint(TestInputVisitorData
-> *data,
->      g_assert_cmpuint(res, =3D=3D, 18446744073709551574U);
-> =20
->      visit_type_number(v, NULL, &dbl, &error_abort);
-> +    g_assert_cmpfloat(dbl, =3D=3D, 18446744073709552000.0);
->  }
-> =20
->  static void test_visitor_in_int_overflow(TestInputVisitorData *data,
-> @@ -161,9 +162,10 @@ static void
-> test_visitor_in_int_overflow(TestInputVisitorData *data,
->      Error *err =3D NULL;
->      Visitor *v;
-> =20
-> -    /* this will overflow a QNUM_I64, so should be deserialized into a
-> +    /*
-> +     * This will overflow a QNUM_I64, so should be deserialized into a
->       * QNUM_DOUBLE field instead, leading to an error if we pass it to
-> -     * visit_type_int. confirm this.
-> +     * visit_type_int().  Confirm this.
->       */
->      v =3D visitor_input_test_init(data, "%f", DBL_MAX);
-> =20
-> diff --git a/tests/test-qobject-output-visitor.c
-> b/tests/test-qobject-output-visitor.c
-> index d23c8eb..749c540 100644
-> --- a/tests/test-qobject-output-visitor.c
-> +++ b/tests/test-qobject-output-visitor.c
-> @@ -609,11 +609,13 @@ static void check_native_list(QObject *qobj,
->          for (i =3D 0; i < 32; i++) {
->              QObject *tmp;
->              QNum *qvalue;
-> +            uint64_t val;
-> =20
->              tmp =3D qlist_peek(qlist);
->              g_assert(tmp);
->              qvalue =3D qobject_to_qnum(tmp);
-> -            g_assert_cmpuint(qnum_get_uint(qvalue), =3D=3D, i);
-> +            g_assert(qnum_get_try_uint(qvalue, &val));
-> +            g_assert_cmpint(val, =3D=3D, i);
->              qobject_decref(qlist_pop(qlist));
->          }
->          break;
->=20
+-- 
+Eduardo
