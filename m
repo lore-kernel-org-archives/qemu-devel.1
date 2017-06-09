@@ -1,38 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dJG6Q-0003hQ-Im
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 05:21:11 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dJGJw-0007Nb-4u
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 05:35:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dJG6N-00055F-FC
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 05:21:10 -0400
-Received: from 10.mo178.mail-out.ovh.net ([46.105.76.150]:52030)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dJG6N-00054z-7x
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 05:21:07 -0400
-Received: from player728.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 6B3DA3EC96
-	for <qemu-devel@nongnu.org>; Fri,  9 Jun 2017 11:21:05 +0200 (CEST)
-Date: Fri, 9 Jun 2017 11:20:52 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170609112052.64d86e83@bahia.ttt.fr.ibm.com>
-In-Reply-To: <09cf094d-55ce-ee3c-6dcc-dd0eee894d8a@huawei.com>
-References: <1494405683-20877-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1494405683-20877-5-git-send-email-pradeep.jagadeesh@huawei.com>
-	<6a035cd9-34f9-c1f5-e986-404daf941641@redhat.com>
-	<57a24e21-0864-16d3-1bce-ad801875ea9f@huawei.com>
-	<2c0e99ce-f3cb-90e8-baed-8fad9d39455b@redhat.com>
-	<20170517182938.0c7f366e@bahia.lan>
-	<6df407d5-4145-2e90-a7eb-b047819ceb75@redhat.com>
-	<e1d5b2d3-bfe7-4fac-03f7-bbfbd5de10fe@huawei.com>
-	<20170608184915.20056e6c@bahia.ttt.fr.ibm.com>
-	<d08e5a11-0b75-a111-40c4-2f09f37404b1@huawei.com>
-	<20170609110741.5ef3e49d@bahia.ttt.fr.ibm.com>
-	<09cf094d-55ce-ee3c-6dcc-dd0eee894d8a@huawei.com>
+	(envelope-from <stefanha@gmail.com>) id 1dJGJr-0001hd-A7
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 05:35:08 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:33961)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dJGJr-0001gN-3T
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 05:35:03 -0400
+Received: by mail-wm0-x244.google.com with SMTP id 70so10865315wme.1
+	for <qemu-devel@nongnu.org>; Fri, 09 Jun 2017 02:35:02 -0700 (PDT)
+Date: Fri, 9 Jun 2017 10:34:51 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170609093451.GC26144@stefanha-x1.localdomain>
+References: <20170606072229.9302-1-haozhong.zhang@intel.com>
+	<20170606072229.9302-4-haozhong.zhang@intel.com>
+	<20170608155249-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/tyLN0CYXQtyvJ/F0K2Av7jQ";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v4 4/4] fsdev: QMP interface for throttling
+	protocol="application/pgp-signature"; boundary="Pk6IbRAofICFmK5e"
+Content-Disposition: inline
+In-Reply-To: <20170608155249-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] nvdimm: add a boolean option
+ "restrict"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,50 +32,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-Cc: Eric Blake <eblake@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, alberto garcia <berto@igalia.com>, qemu-devel@nongnu.org, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Haozhong Zhang <haozhong.zhang@intel.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <guangrong.xiao@gmail.com>, Dan Williams <dan.j.williams@intel.com>
 
---Sig_/tyLN0CYXQtyvJ/F0K2Av7jQ
-Content-Type: text/plain; charset=US-ASCII
+
+--Pk6IbRAofICFmK5e
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 9 Jun 2017 11:13:50 +0200
-Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com> wrote:
-
-> On 6/9/2017 11:07 AM, Greg Kurz wrote:
-> >   GEN     qmp-commands.h
-> > /tmp/qemu-test/src/qapi-schema.json:85: No such file or directory: qapi=
-/fsdev.json
-> > Makefile:438: recipe for target 'qmp-commands.h' failed
-> >
-> > Please fix that. =20
-> Ho ok, I will have a look.
-> How are you trying to compile, using "make docker" options?
-
-=46rom the QEMU source tree I do:
-
-mkdir build
-cd build
-../configure
-make docker-test-mingw@fedora
-
+On Thu, Jun 08, 2017 at 03:56:42PM +0300, Michael S. Tsirkin wrote:
+> On Tue, Jun 06, 2017 at 03:22:28PM +0800, Haozhong Zhang wrote:
+> > If a vNVDIMM device is not backed by a DAX device and its "restrict"
+> > option is enabled, bit 3 of state flags in its region mapping
+> > structure will be set, in order to notify the guest of the lack of
+> > write persistence guarantee. Once this bit is set, the guest OS may
+> > mark the vNVDIMM device as read-only.
+> >=20
+> > This option is disabled by default for backwards compatibility. It's
+> > recommended to enable for the formal usage.
+> >=20
+> > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
 >=20
->=20
-> Thanks
-> Pradeep
->=20
+> Seems wrong to me. E.g. it won't work in a nested
+> virt setup. What if backend is dax but is not armed?
+> Can't the armed bit of the backing device be tested?
+> Name "restrict" is also confusing. Can we reuse cache=3D
+> options? E.g. cache=3Dunsafe etc.
 
+The -drive cache=3D options (writeback, writethrough, none, directsync,
+unsafe) are confusing and considered legacy options.  The new options
+are -drive
+cache.writeback=3Don|off,cache.direct=3Don|off,cache.no-flush=3Don|off.
 
---Sig_/tyLN0CYXQtyvJ/F0K2Av7jQ
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+I suggested to call the option -device nvdimm,armed=3Dauto|on|off in
+another email.  "Armed" is the term used by the NVDIMM/NFIT
+specification and it has an NVDIMM-specific meaning.
+
+Stefan
+
+--Pk6IbRAofICFmK5e
+Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
 
-iEYEARECAAYFAlk6aHQACgkQAvw66wEB28JfbQCeLZld2kuW64l1X3cqALUhhA42
-nhIAnijTMVFkl0D5L2RBk/DuvwV/YMj5
-=+bn8
+iQEcBAEBAgAGBQJZOmu6AAoJEJykq7OBq3PIUYEIAJ47uyg7nM52FToaj7CL9of6
+rjVXeXvqeyavvlhmlrwjCPoLDVrKa13n32Jb+MIvrqIEklj8Pk+gfx9aorYvxoSo
+ZjjEbvoC8cG1WdEuR0dn51UConBihiB5gvRMSjsP3iZCYpz+ZmVFC8ixqj3MMCFf
+R3k5Ts8hBG8wsDns+udrKwuBrV8N1RaLwSUPCwNKSIeI6Y6y75kkxjIuoUKv5zwM
+IGKOS0eyugF2XTFiFB2F+Tu5WkzHT0KoR7bnOAoGKfKDl+I0gFFRuqZtFdQ1Fc3W
+FHiYCDchhNOV6lGGwDZPLYuhAFdRXdWdJ921sm5QPXZCbvOWYOfvq3YdbUFekVI=
+=no2q
 -----END PGP SIGNATURE-----
 
---Sig_/tyLN0CYXQtyvJ/F0K2Av7jQ--
+--Pk6IbRAofICFmK5e--
