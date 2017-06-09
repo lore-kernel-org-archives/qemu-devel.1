@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dJLw4-0001pk-G2
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 11:34:53 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dJLy0-0003Ku-1t
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 11:36:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dJLvz-0004h8-Jy
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 11:34:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51220)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dJLvz-0004gt-Dy
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 11:34:47 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170609133337.31183-1-marcandre.lureau@redhat.com>
-	<650896fb-d42b-3ce7-8660-4c1275a5e360@redhat.com>
-Date: Fri, 09 Jun 2017 17:34:42 +0200
-In-Reply-To: <650896fb-d42b-3ce7-8660-4c1275a5e360@redhat.com> (Eric Blake's
-	message of "Fri, 9 Jun 2017 09:58:37 -0500")
-Message-ID: <87wp8lb2el.fsf@dusky.pond.sub.org>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dJLxz-0005kc-30
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 11:36:52 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20170609152017.7286-1-eblake@redhat.com>
+	<20170609152017.7286-2-eblake@redhat.com>
+	<CAJ+F1CJL04MkrYmnhM3rLaSAuEXYo7JsZwyDLeXA35bV6dvqqA@mail.gmail.com>
+	<b3e66ce9-d503-bf6f-cd93-511097418480@redhat.com>
+In-Reply-To: <b3e66ce9-d503-bf6f-cd93-511097418480@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 09 Jun 2017 15:36:38 +0000
+Message-ID: <CAJ+F1CJTTjU_yLXabC5MaVktbmz6drZ6AwusdvEy15XAu_f7yg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tests: check-qom-proplist: fix leak
+Subject: Re: [Qemu-devel] [PATCH 1/2] qobject: Update coccinelle script to
+ catch Q{INC, DEC}REF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +26,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, armbru@redhat.com
 
-Eric Blake <eblake@redhat.com> writes:
+On Fri, Jun 9, 2017 at 7:33 PM Eric Blake <eblake@redhat.com> wrote:
 
-> On 06/09/2017 08:33 AM, Marc-Andr=C3=A9 Lureau wrote:
->> user_creatable_add_opts() returns a reference (the other reference is
->> for the root parent/child link).
->>=20
->> Leak introduced in commit a1af255f065cc.
->>=20
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> ---
->>  tests/check-qom-proplist.c | 2 ++
->>  1 file changed, 2 insertions(+)
->>=20
->> diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
->> index 8e432e9ab6..a3cd7ab29f 100644
->> --- a/tests/check-qom-proplist.c
->> +++ b/tests/check-qom-proplist.c
->> @@ -428,6 +428,8 @@ static void test_dummy_createcmdl(void)
->>      g_assert(err =3D=3D NULL);
->>      error_free(err);
->>=20=20
->> +    object_unref(OBJECT(dobj));
+> On 06/09/2017 10:28 AM, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi
+> >
+> > On Fri, Jun 9, 2017 at 7:20 PM Eric Blake <eblake@redhat.com> wrote:
+> >
+> >> A recent patch submission was about to use qobject_decref(QOBJECT(E)),
+> >> even though we already have QDECREF(E) for that purpose.  While our
+> >> tree is currently free from the longhand form, we might as well update
+> >>
+> >
+> > Oh?
+> >
+> >  $ git grep 'object_unref(OBJECT('  | wc -l
+> > 152
 >
-> This should be spelled QDECREF(dobj);
+> Quit mixing QOM and QObject ;)
+>
+> $ git grep qobject_'..cref(QOBJECT'
+> include/qapi/qmp/qobject.h:    qobject_incref(QOBJECT(obj))
+> scripts/coccinelle/qobject.cocci:- qobject_incref(QOBJECT(E));
+> scripts/coccinelle/qobject.cocci:- qobject_decref(QOBJECT(E));
+>
+>
+>
+Yeah, I got mixed by your comments, my patch doesn't do
+qobject_decref(QOBJECT(E)) but object_unref(OBJECT(E)), which doesn't have
+macro helper afaik.
 
-Caution, this is object_unref(), not qobject_decref().
 
-We suck at naming.
-
-> (Hmm - maybe scripts/coccinelle/qobject.cocci should be taught this
-> cleanup pattern...)
+> Yes, we may want to add a script to clean QOM abuses, but that's a
+> different project for a different day.
+>
+> --
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266 <+1%20919-301-3266>
+> Virtualization:  qemu.org | libvirt.org
+>
+> --
+Marc-Andr=C3=A9 Lureau
