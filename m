@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dJNHD-00056z-Po
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 13:00:48 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dJNHD-00056y-Pe
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 13:00:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dJNHC-0004id-Th
+	(envelope-from <alex.bennee@linaro.org>) id 1dJNHA-0004i7-PA
 	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 13:00:47 -0400
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:33489)
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:33799)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dJNHC-0004iN-NR
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 13:00:46 -0400
-Received: by mail-wr0-x22d.google.com with SMTP id v104so39319983wrb.0
-	for <qemu-devel@nongnu.org>; Fri, 09 Jun 2017 10:00:46 -0700 (PDT)
+	id 1dJNHA-0004hy-Ih
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 13:00:44 -0400
+Received: by mail-wr0-x231.google.com with SMTP id g76so39239932wrd.1
+	for <qemu-devel@nongnu.org>; Fri, 09 Jun 2017 10:00:44 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri,  9 Jun 2017 18:00:59 +0100
-Message-Id: <20170609170100.3599-3-alex.bennee@linaro.org>
-In-Reply-To: <20170609170100.3599-1-alex.bennee@linaro.org>
-References: <20170609170100.3599-1-alex.bennee@linaro.org>
+Date: Fri,  9 Jun 2017 18:00:57 +0100
+Message-Id: <20170609170100.3599-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC DEBUG PATCH 2/3] tcg-runtime: light re-factor of
- lookup_tb_ptr
+Subject: [Qemu-devel] [RFC DEBUG PATCH 0/3] debug patch for lookup-ptr hang
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,71 +30,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, pbonzini@redhat.com, edgar.iglesias@xilinx.com, cota@braap.org
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Just a little precursor re-factoring before I was going to add a trace
-point:
+Hi,
 
-  - single return point, defaulting to tcg_ctx.code_gen_epilogue
-  - move cs_base, pc and flags inside the jump cache hit scope
-  - calculate the tb_jmp_cache hash once
+These are debug patches only but represent how much I have narrowed
+down the problem so far. I've included Thomas' patch to fix the
+thread=single|multi option as that is currently broken upstream. So
+far it seems though the problem is unrelated to multi-threading.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tcg-runtime.c | 35 +++++++++++++++++++----------------
- 1 file changed, 19 insertions(+), 16 deletions(-)
+As discussed in the other thread I found not returning to a
+tb_htable_lookup but adding it to the tb_jmp_cache made the problem go
+away. I also tried various printfs but they also seemed to un-wedge
+the hang I was seeing. It is not really a hang rather than a busy-spin
+that will eventually given enough time unwind.
 
-diff --git a/tcg-runtime.c b/tcg-runtime.c
-index 7fa90ce508..e987c1f6bb 100644
---- a/tcg-runtime.c
-+++ b/tcg-runtime.c
-@@ -147,30 +147,33 @@ uint64_t HELPER(ctpop_i64)(uint64_t arg)
- void *HELPER(lookup_tb_ptr)(CPUArchState *env, target_ulong addr)
- {
-     CPUState *cpu = ENV_GET_CPU(env);
-+    unsigned int addr_hash = tb_jmp_cache_hash_func(addr);
-+    void * code_ptr = NULL;
-     TranslationBlock *tb;
--    target_ulong cs_base, pc;
--    uint32_t flags;
- 
--    tb = atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)]);
-+    tb = atomic_rcu_read(&cpu->tb_jmp_cache[addr_hash]);
-     if (likely(tb)) {
-+        target_ulong cs_base, pc;
-+        uint32_t flags;
-+
-         cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
-+
-         if (likely(tb->pc == addr && tb->cs_base == cs_base &&
-                    tb->flags == flags)) {
--            goto found;
--        }
--        tb = tb_htable_lookup(cpu, addr, cs_base, flags);
--        if (likely(tb)) {
--            atomic_set(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)], tb);
--            goto found;
-+            code_ptr = tb->tc_ptr;
-+        } else {
-+            /* If we didn't find it in the jmp_cache we still might
-+             * find it in the global tb_htable
-+             */
-+            tb = tb_htable_lookup(cpu, addr, cs_base, flags);
-+            if (likely(tb)) {
-+                atomic_set(&cpu->tb_jmp_cache[addr_hash], tb);
-+                code_ptr = tb->tc_ptr;
-+            }
-         }
-     }
--    return tcg_ctx.code_gen_epilogue;
-- found:
--    qemu_log_mask_and_addr(CPU_LOG_EXEC, addr,
--                           "Chain %p [%d: " TARGET_FMT_lx "] %s\n",
--                           tb->tc_ptr, cpu->cpu_index, addr,
--                           lookup_symbol(addr));
--    return tb->tc_ptr;
-+
-+    return code_ptr ? code_ptr : tcg_ctx.code_gen_epilogue;
- }
- 
- void HELPER(exit_atomic)(CPUArchState *env)
+So added a new TB flag (is_magic) which if set would skip returning
+the code ptr and default to exiting the loop via the epilogue and set
+it for all DISAS_JUMP/DISAS_UPDATE paths that trigger
+lookup_and_goto_ptr. After selectively commenting them out I found the
+RET instruction is responsible for my particular fail case.
+
+I find this confusing because BL and BLR basically do the same thing
+and they seem to work fine.
+
+I have an uneasy feeling there is some subtle black magic in the
+interaction between cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags),
+addr and the TCGv cpu_pc but I haven't nailed it down. I'm posting
+this for those that still have some Friday left in case it prompts any
+thoughts.
+
+Over to you, hopefully inspiration will strike before I return to the
+fray on Monday ;-)
+
+Cheers,
+
+Alex Bennée (2):
+  tcg-runtime: light re-factor of lookup_tb_ptr
+  translate-a64: fix lookup_tb_ptr hang (DEBUG!)
+
+Thomas Huth (1):
+  vl: Fix broken thread=xxx option of the --accel parameter
+
+ include/exec/exec-all.h    |  2 ++
+ target/arm/translate-a64.c | 21 +++++++++++++++++----
+ target/arm/translate.h     |  2 ++
+ tcg-runtime.c              | 37 +++++++++++++++++++++----------------
+ vl.c                       | 13 +++++--------
+ 5 files changed, 47 insertions(+), 28 deletions(-)
+
 -- 
 2.13.0
