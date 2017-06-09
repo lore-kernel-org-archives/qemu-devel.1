@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dJHTc-0001sG-78
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 06:49:15 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dJHY5-0005ah-1k
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 06:53:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dJHTZ-0001rh-Ul
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 06:49:12 -0400
-Received: from mga04.intel.com ([192.55.52.120]:35795)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dJHTZ-0001he-H7
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 06:49:09 -0400
-From: Wei Wang <wei.w.wang@intel.com>
-Date: Fri,  9 Jun 2017 18:41:41 +0800
-Message-Id: <1497004901-30593-7-git-send-email-wei.w.wang@intel.com>
-In-Reply-To: <1497004901-30593-1-git-send-email-wei.w.wang@intel.com>
-References: <1497004901-30593-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v11 6/6] virtio-balloon: VIRTIO_BALLOON_F_CMD_VQ
+	(envelope-from <alex.bennee@linaro.org>) id 1dJHY1-0004rc-UY
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 06:53:49 -0400
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:35018)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dJHY1-0004n3-Kl
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 06:53:45 -0400
+Received: by mail-wr0-x22d.google.com with SMTP id q97so28856757wrb.2
+	for <qemu-devel@nongnu.org>; Fri, 09 Jun 2017 03:53:43 -0700 (PDT)
+References: <20170609094812.GA2201@toto>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170609094812.GA2201@toto>
+Date: Fri, 09 Jun 2017 11:54:09 +0100
+Message-ID: <87zidhbfe6.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] AArch64 regression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,562 +29,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, david@redhat.com, dave.hansen@intel.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, wei.w.wang@intel.com, liliang.opensource@gmail.com
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, qemu-devel@nongnu.org, peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>, Richard Henderson <rth@twiddle.net>, fred.konrad@greensocs.com
 
-Add a new vq, cmdq, to handle requests between the device and driver.
 
-This patch implements two commands send from the device and handled in
-the driver.
-1) cmd VIRTIO_BALLOON_CMDQ_REPORT_STATS: this command is used to report
-the guest memory statistics to the host. The stats_vq mechanism is not
-used when the cmdq mechanism is enabled.
-2) cmd VIRTIO_BALLOON_CMDQ_REPORT_UNUSED_PAGES: this command is used to
-report the guest unused pages to the host.
+Edgar E. Iglesias <edgar.iglesias@gmail.com> writes:
 
-Signed-off-by: Wei Wang <wei.w.wang@intel.com>
----
- drivers/virtio/virtio_balloon.c     | 363 ++++++++++++++++++++++++++++++++----
- include/uapi/linux/virtio_balloon.h |  13 ++
- 2 files changed, 337 insertions(+), 39 deletions(-)
+> Hi,
+>
+> I was running a bunch of tests in preparation for the MMIO/exec
+> series but am running into regressions on master.
+> I'm at commit 64175afc695c0672876fbbfc31b299c86d562cb4
+>
+> On the xlnx-zcu102 I see lockups, the console goes unresponsive.
+> On one of my vexpress-a15 setups (with an a57), I see weird
+> segfaults in user-space.
+>
+> I bisected this multiple times with each of the test cases
+> and all of the bisects bring me to this commit:
+> commit e75449a346bf558296966a44277bfd93412c6da6
+> Author: Emilio G. Cota <cota@braap.org>
+> Date:   Fri Apr 28 14:59:23 2017 -0400
+>
+>     target/aarch64: optimize indirect branches
+>
+>
+> Does this ring any bells? Are there any known issues at the moment?
+> I've copied a GDB backtrace form the ZynqMP lockup at the end
+> of this email.
 
-diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
-index 0cf945c..4ac90a5 100644
---- a/drivers/virtio/virtio_balloon.c
-+++ b/drivers/virtio/virtio_balloon.c
-@@ -51,6 +51,10 @@ MODULE_PARM_DESC(oom_pages, "pages to free on OOM");
- static struct vfsmount *balloon_mnt;
- #endif
- 
-+/* Types of pages to chunk */
-+#define PAGE_CHUNK_TYPE_BALLOON 0	/* Chunk of inflate/deflate pages */
-+#define PAGE_CHNUK_UNUSED_PAGE  1	/* Chunk of unused pages */
-+
- /* The size of one page_bmap used to record inflated/deflated pages. */
- #define VIRTIO_BALLOON_PAGE_BMAP_SIZE	(8 * PAGE_SIZE)
- /*
-@@ -81,12 +85,25 @@ struct virtio_balloon_page_chunk {
- 	unsigned long *page_bmap[VIRTIO_BALLOON_PAGE_BMAP_MAX_NUM];
- };
- 
-+struct virtio_balloon_cmdq_unused_page {
-+	struct virtio_balloon_cmdq_hdr hdr;
-+	struct vring_desc *desc_table;
-+	/* Number of added descriptors */
-+	unsigned int num;
-+};
-+
-+struct virtio_balloon_cmdq_stats {
-+	struct virtio_balloon_cmdq_hdr hdr;
-+	struct virtio_balloon_stat stats[VIRTIO_BALLOON_S_NR];
-+};
-+
- struct virtio_balloon {
- 	struct virtio_device *vdev;
--	struct virtqueue *inflate_vq, *deflate_vq, *stats_vq;
-+	struct virtqueue *inflate_vq, *deflate_vq, *stats_vq, *cmd_vq;
- 
- 	/* The balloon servicing is delegated to a freezable workqueue. */
- 	struct work_struct update_balloon_stats_work;
-+	struct work_struct cmdq_handle_work;
- 	struct work_struct update_balloon_size_work;
- 
- 	/* Prevent updating balloon when it is being canceled. */
-@@ -115,8 +132,10 @@ struct virtio_balloon {
- 	unsigned int num_pfns;
- 	__virtio32 pfns[VIRTIO_BALLOON_ARRAY_PFNS_MAX];
- 
--	/* Memory statistics */
--	struct virtio_balloon_stat stats[VIRTIO_BALLOON_S_NR];
-+	/* Cmdq msg buffer for memory statistics */
-+	struct virtio_balloon_cmdq_stats cmdq_stats;
-+	/* Cmdq msg buffer for reporting ununsed pages */
-+	struct virtio_balloon_cmdq_unused_page cmdq_unused_page;
- 
- 	/* To register callback in oom notifier call chain */
- 	struct notifier_block nb;
-@@ -208,31 +227,77 @@ static void clear_page_bmap(struct virtio_balloon *vb,
- 		       VIRTIO_BALLOON_PAGE_BMAP_SIZE);
- }
- 
--static void send_page_chunks(struct virtio_balloon *vb, struct virtqueue *vq)
-+static void send_page_chunks(struct virtio_balloon *vb, struct virtqueue *vq,
-+			     int type, bool busy_wait)
- {
--	unsigned int len, num;
--	struct vring_desc *desc = vb->balloon_page_chunk.desc_table;
-+	unsigned int len, *num, reset_num;
-+	struct vring_desc *desc;
-+
-+	switch (type) {
-+	case PAGE_CHUNK_TYPE_BALLOON:
-+		desc = vb->balloon_page_chunk.desc_table;
-+		num = &vb->balloon_page_chunk.chunk_num;
-+		reset_num = 0;
-+		break;
-+	case PAGE_CHNUK_UNUSED_PAGE:
-+		desc = vb->cmdq_unused_page.desc_table;
-+		num = &vb->cmdq_unused_page.num;
-+		/*
-+		 * The first desc is used for the cmdq_hdr, so chunks will be
-+		 * added from the second desc.
-+		 */
-+		reset_num = 1;
-+		break;
-+	default:
-+		dev_warn(&vb->vdev->dev, "%s: unknown page chunk type %d\n",
-+			 __func__, type);
-+		return;
-+	}
- 
--	num = vb->balloon_page_chunk.chunk_num;
--	if (!virtqueue_indirect_desc_table_add(vq, desc, num)) {
-+	if (!virtqueue_indirect_desc_table_add(vq, desc, *num)) {
- 		virtqueue_kick(vq);
--		wait_event(vb->acked, virtqueue_get_buf(vq, &len));
--		vb->balloon_page_chunk.chunk_num = 0;
-+		if (busy_wait)
-+			while (!virtqueue_get_buf(vq, &len) &&
-+			       !virtqueue_is_broken(vq))
-+				cpu_relax();
-+		else
-+			wait_event(vb->acked, virtqueue_get_buf(vq, &len));
-+		/*
-+		 * Now, the descriptor have been delivered to the host. Reset
-+		 * the field in the structure that records the number of added
-+		 * descriptors, so that new added descriptor can be re-counted.
-+		 */
-+		*num = reset_num;
- 	}
- }
- 
- /* Add a chunk to the buffer. */
- static void add_one_chunk(struct virtio_balloon *vb, struct virtqueue *vq,
--			  u64 base_addr, u32 size)
-+			  int type, u64 base_addr, u32 size)
- {
--	unsigned int *num = &vb->balloon_page_chunk.chunk_num;
--	struct vring_desc *desc = &vb->balloon_page_chunk.desc_table[*num];
-+	unsigned int *num;
-+	struct vring_desc *desc;
-+
-+	switch (type) {
-+	case PAGE_CHUNK_TYPE_BALLOON:
-+		num = &vb->balloon_page_chunk.chunk_num;
-+		desc = &vb->balloon_page_chunk.desc_table[*num];
-+		break;
-+	case PAGE_CHNUK_UNUSED_PAGE:
-+		num = &vb->cmdq_unused_page.num;
-+		desc = &vb->cmdq_unused_page.desc_table[*num];
-+		break;
-+	default:
-+		dev_warn(&vb->vdev->dev, "%s: chunk %d of unknown pages\n",
-+			 __func__, type);
-+		return;
-+	}
- 
- 	desc->addr = cpu_to_virtio64(vb->vdev, base_addr);
- 	desc->len = cpu_to_virtio32(vb->vdev, size);
- 	*num += 1;
- 	if (*num == VIRTIO_BALLOON_MAX_PAGE_CHUNKS)
--		send_page_chunks(vb, vq);
-+		send_page_chunks(vb, vq, type, false);
- }
- 
- static void convert_bmap_to_chunks(struct virtio_balloon *vb,
-@@ -264,7 +329,8 @@ static void convert_bmap_to_chunks(struct virtio_balloon *vb,
- 		chunk_base_addr = (pfn_start + next_one) <<
- 				  VIRTIO_BALLOON_PFN_SHIFT;
- 		if (chunk_size) {
--			add_one_chunk(vb, vq, chunk_base_addr, chunk_size);
-+			add_one_chunk(vb, vq, PAGE_CHUNK_TYPE_BALLOON,
-+				      chunk_base_addr, chunk_size);
- 			pos += next_zero + 1;
- 		}
- 	}
-@@ -311,7 +377,7 @@ static void tell_host_from_page_bmap(struct virtio_balloon *vb,
- 				       pfn_num);
- 	}
- 	if (vb->balloon_page_chunk.chunk_num > 0)
--		send_page_chunks(vb, vq);
-+		send_page_chunks(vb, vq, PAGE_CHUNK_TYPE_BALLOON, false);
- }
- 
- static void set_page_pfns(struct virtio_balloon *vb,
-@@ -516,8 +582,8 @@ static inline void update_stat(struct virtio_balloon *vb, int idx,
- 			       u16 tag, u64 val)
- {
- 	BUG_ON(idx >= VIRTIO_BALLOON_S_NR);
--	vb->stats[idx].tag = cpu_to_virtio16(vb->vdev, tag);
--	vb->stats[idx].val = cpu_to_virtio64(vb->vdev, val);
-+	vb->cmdq_stats.stats[idx].tag = cpu_to_virtio16(vb->vdev, tag);
-+	vb->cmdq_stats.stats[idx].val = cpu_to_virtio64(vb->vdev, val);
- }
- 
- #define pages_to_bytes(x) ((u64)(x) << PAGE_SHIFT)
-@@ -582,7 +648,8 @@ static void stats_handle_request(struct virtio_balloon *vb)
- 	vq = vb->stats_vq;
- 	if (!virtqueue_get_buf(vq, &len))
- 		return;
--	sg_init_one(&sg, vb->stats, sizeof(vb->stats[0]) * num_stats);
-+	sg_init_one(&sg, vb->cmdq_stats.stats,
-+		    sizeof(vb->cmdq_stats.stats[0]) * num_stats);
- 	virtqueue_add_outbuf(vq, &sg, 1, vb, GFP_KERNEL);
- 	virtqueue_kick(vq);
- }
-@@ -686,43 +753,216 @@ static void update_balloon_size_func(struct work_struct *work)
- 		queue_work(system_freezable_wq, work);
- }
- 
-+static void cmdq_handle_stats(struct virtio_balloon *vb)
-+{
-+	struct scatterlist sg;
-+	unsigned int num_stats;
-+
-+	spin_lock(&vb->stop_update_lock);
-+	if (!vb->stop_update) {
-+		num_stats = update_balloon_stats(vb);
-+		sg_init_one(&sg, &vb->cmdq_stats,
-+			    sizeof(struct virtio_balloon_cmdq_hdr) +
-+			    sizeof(struct virtio_balloon_stat) * num_stats);
-+		virtqueue_add_outbuf(vb->cmd_vq, &sg, 1, vb, GFP_KERNEL);
-+		virtqueue_kick(vb->cmd_vq);
-+	}
-+	spin_unlock(&vb->stop_update_lock);
-+}
-+
-+/*
-+ * The header part of the message buffer is given to the device to send a
-+ * command to the driver.
-+ */
-+static void host_cmd_buf_add(struct virtio_balloon *vb,
-+			   struct virtio_balloon_cmdq_hdr *hdr)
-+{
-+	struct scatterlist sg;
-+
-+	hdr->flags = 0;
-+	sg_init_one(&sg, hdr, VIRTIO_BALLOON_CMDQ_HDR_SIZE);
-+
-+	if (virtqueue_add_inbuf(vb->cmd_vq, &sg, 1, hdr, GFP_KERNEL) < 0) {
-+		__virtio_clear_bit(vb->vdev,
-+				   VIRTIO_BALLOON_F_CMD_VQ);
-+		dev_warn(&vb->vdev->dev, "%s: add miscq msg buf err\n",
-+			 __func__);
-+		return;
-+	}
-+
-+	virtqueue_kick(vb->cmd_vq);
-+}
-+
-+static void cmdq_handle_unused_pages(struct virtio_balloon *vb)
-+{
-+	struct virtqueue *vq = vb->cmd_vq;
-+	struct vring_desc *hdr_desc = &vb->cmdq_unused_page.desc_table[0];
-+	unsigned long hdr_pa;
-+	unsigned int order = 0, migratetype = 0;
-+	struct zone *zone = NULL;
-+	struct page *page = NULL;
-+	u64 pfn;
-+	int ret = 0;
-+
-+	/* Put the hdr to the first desc */
-+	hdr_pa = virt_to_phys((void *)&vb->cmdq_unused_page.hdr);
-+	hdr_desc->addr = cpu_to_virtio64(vb->vdev, hdr_pa);
-+	hdr_desc->len = cpu_to_virtio32(vb->vdev,
-+				sizeof(struct virtio_balloon_cmdq_hdr));
-+	vb->cmdq_unused_page.num = 1;
-+
-+	for_each_populated_zone(zone) {
-+		for (order = MAX_ORDER - 1; order > 0; order--) {
-+			for (migratetype = 0; migratetype < MIGRATE_TYPES;
-+			     migratetype++) {
-+				do {
-+					ret = report_unused_page_block(zone,
-+						order, migratetype, &page);
-+					if (!ret) {
-+						pfn = (u64)page_to_pfn(page);
-+						add_one_chunk(vb, vq,
-+						PAGE_CHNUK_UNUSED_PAGE,
-+						pfn << VIRTIO_BALLOON_PFN_SHIFT,
-+						(u64)(1 << order) *
-+						VIRTIO_BALLOON_PAGES_PER_PAGE);
-+					}
-+				} while (!ret);
-+			}
-+		}
-+	}
-+
-+	/* Set the cmd completion flag. */
-+	vb->cmdq_unused_page.hdr.flags |=
-+				cpu_to_le32(VIRTIO_BALLOON_CMDQ_F_COMPLETION);
-+	send_page_chunks(vb, vq, PAGE_CHNUK_UNUSED_PAGE, true);
-+}
-+
-+static void cmdq_handle(struct virtio_balloon *vb)
-+{
-+	struct virtqueue *vq;
-+	struct virtio_balloon_cmdq_hdr *hdr;
-+	unsigned int len;
-+
-+	vq = vb->cmd_vq;
-+	while ((hdr = (struct virtio_balloon_cmdq_hdr *)
-+			virtqueue_get_buf(vq, &len)) != NULL) {
-+		switch (hdr->cmd) {
-+		case VIRTIO_BALLOON_CMDQ_REPORT_STATS:
-+			cmdq_handle_stats(vb);
-+			break;
-+		case VIRTIO_BALLOON_CMDQ_REPORT_UNUSED_PAGES:
-+			cmdq_handle_unused_pages(vb);
-+			break;
-+		default:
-+			dev_warn(&vb->vdev->dev, "%s: wrong cmd\n", __func__);
-+			return;
-+		}
-+		/*
-+		 * Replenish all the command buffer to the device after a
-+		 * command is handled. This is for the convenience of the
-+		 * device to rewind the cmdq to get back all the command
-+		 * buffer after live migration.
-+		 */
-+		host_cmd_buf_add(vb, &vb->cmdq_stats.hdr);
-+		host_cmd_buf_add(vb, &vb->cmdq_unused_page.hdr);
-+	}
-+}
-+
-+static void cmdq_handle_work_func(struct work_struct *work)
-+{
-+	struct virtio_balloon *vb;
-+
-+	vb = container_of(work, struct virtio_balloon,
-+			  cmdq_handle_work);
-+	cmdq_handle(vb);
-+}
-+
-+static void cmdq_callback(struct virtqueue *vq)
-+{
-+	struct virtio_balloon *vb = vq->vdev->priv;
-+
-+	queue_work(system_freezable_wq, &vb->cmdq_handle_work);
-+}
-+
- static int init_vqs(struct virtio_balloon *vb)
- {
--	struct virtqueue *vqs[3];
--	vq_callback_t *callbacks[] = { balloon_ack, balloon_ack, stats_request };
--	static const char * const names[] = { "inflate", "deflate", "stats" };
--	int err, nvqs;
-+	struct virtqueue **vqs;
-+	vq_callback_t **callbacks;
-+	const char **names;
-+	int err = -ENOMEM;
-+	int nvqs;
-+
-+	/* Inflateq and deflateq are used unconditionally */
-+	nvqs = 2;
-+
-+	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_CMD_VQ) ||
-+	    virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ))
-+		nvqs++;
-+
-+	/* Allocate space for find_vqs parameters */
-+	vqs = kcalloc(nvqs, sizeof(*vqs), GFP_KERNEL);
-+	if (!vqs)
-+		goto err_vq;
-+	callbacks = kmalloc_array(nvqs, sizeof(*callbacks), GFP_KERNEL);
-+	if (!callbacks)
-+		goto err_callback;
-+	names = kmalloc_array(nvqs, sizeof(*names), GFP_KERNEL);
-+	if (!names)
-+		goto err_names;
-+
-+	callbacks[0] = balloon_ack;
-+	names[0] = "inflate";
-+	callbacks[1] = balloon_ack;
-+	names[1] = "deflate";
- 
- 	/*
--	 * We expect two virtqueues: inflate and deflate, and
--	 * optionally stat.
-+	 * The stats_vq is used only when cmdq is not supported (or disabled)
-+	 * by the device.
- 	 */
--	nvqs = virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ) ? 3 : 2;
--	err = vb->vdev->config->find_vqs(vb->vdev, nvqs, vqs, callbacks, names,
--			NULL);
--	if (err)
--		return err;
-+	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_CMD_VQ)) {
-+		callbacks[2] = cmdq_callback;
-+		names[2] = "cmdq";
-+	} else if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ)) {
-+		callbacks[2] = stats_request;
-+		names[2] = "stats";
-+	}
- 
-+	err = vb->vdev->config->find_vqs(vb->vdev, nvqs, vqs, callbacks,
-+					 names, NULL);
-+	if (err)
-+		goto err_find;
- 	vb->inflate_vq = vqs[0];
- 	vb->deflate_vq = vqs[1];
--	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ)) {
-+
-+	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_CMD_VQ)) {
-+		vb->cmd_vq = vqs[2];
-+		/* Prime the cmdq with the header buffer. */
-+		host_cmd_buf_add(vb, &vb->cmdq_stats.hdr);
-+		host_cmd_buf_add(vb, &vb->cmdq_unused_page.hdr);
-+	} else if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ)) {
- 		struct scatterlist sg;
--		unsigned int num_stats;
--		vb->stats_vq = vqs[2];
- 
-+		vb->stats_vq = vqs[2];
- 		/*
- 		 * Prime this virtqueue with one buffer so the hypervisor can
- 		 * use it to signal us later (it can't be broken yet!).
- 		 */
--		num_stats = update_balloon_stats(vb);
--
--		sg_init_one(&sg, vb->stats, sizeof(vb->stats[0]) * num_stats);
-+		sg_init_one(&sg, vb->cmdq_stats.stats,
-+			    sizeof(vb->cmdq_stats.stats));
- 		if (virtqueue_add_outbuf(vb->stats_vq, &sg, 1, vb, GFP_KERNEL)
- 		    < 0)
- 			BUG();
- 		virtqueue_kick(vb->stats_vq);
- 	}
--	return 0;
-+
-+err_find:
-+	kfree(names);
-+err_names:
-+	kfree(callbacks);
-+err_callback:
-+	kfree(vqs);
-+err_vq:
-+	return err;
- }
- 
- #ifdef CONFIG_BALLOON_COMPACTION
-@@ -730,7 +970,8 @@ static int init_vqs(struct virtio_balloon *vb)
- static void tell_host_one_page(struct virtio_balloon *vb,
- 			       struct virtqueue *vq, struct page *page)
- {
--	add_one_chunk(vb, vq, page_to_pfn(page) << VIRTIO_BALLOON_PFN_SHIFT,
-+	add_one_chunk(vb, vq, PAGE_CHUNK_TYPE_BALLOON,
-+		      page_to_pfn(page) << VIRTIO_BALLOON_PFN_SHIFT,
- 		      VIRTIO_BALLOON_PAGES_PER_PAGE);
- }
- 
-@@ -865,6 +1106,40 @@ static int balloon_page_chunk_init(struct virtio_balloon *vb)
- 	return -ENOMEM;
- }
- 
-+/*
-+ * Each type of command is handled one in-flight each time. So, we allocate
-+ * one message buffer for each type of command. The header part of the message
-+ * buffer will be offered to the device, so that the device can send a command
-+ * using the corresponding command buffer to the driver later.
-+ */
-+static int cmdq_init(struct virtio_balloon *vb)
-+{
-+	vb->cmdq_unused_page.desc_table = alloc_indirect(vb->vdev,
-+						VIRTIO_BALLOON_MAX_PAGE_CHUNKS,
-+						GFP_KERNEL);
-+	if (!vb->cmdq_unused_page.desc_table) {
-+		dev_warn(&vb->vdev->dev, "%s: failed\n", __func__);
-+		__virtio_clear_bit(vb->vdev,
-+				   VIRTIO_BALLOON_F_CMD_VQ);
-+		return -ENOMEM;
-+	}
-+	vb->cmdq_unused_page.num = 0;
-+
-+	/*
-+	 * The header is initialized to let the device know which type of
-+	 * command buffer it receives. The device will later use a buffer
-+	 * according to the type of command that it needs to send.
-+	 */
-+	vb->cmdq_stats.hdr.cmd = VIRTIO_BALLOON_CMDQ_REPORT_STATS;
-+	vb->cmdq_stats.hdr.flags = 0;
-+	vb->cmdq_unused_page.hdr.cmd = VIRTIO_BALLOON_CMDQ_REPORT_UNUSED_PAGES;
-+	vb->cmdq_unused_page.hdr.flags = 0;
-+
-+	INIT_WORK(&vb->cmdq_handle_work, cmdq_handle_work_func);
-+
-+	return 0;
-+}
-+
- static int virtballoon_validate(struct virtio_device *vdev)
- {
- 	struct virtio_balloon *vb = NULL;
-@@ -883,6 +1158,11 @@ static int virtballoon_validate(struct virtio_device *vdev)
- 			goto err_page_chunk;
- 	}
- 
-+	if (virtio_has_feature(vdev, VIRTIO_BALLOON_F_CMD_VQ)) {
-+		err = cmdq_init(vb);
-+		if (err < 0)
-+			goto err_vb;
-+	}
- 	return 0;
- 
- err_page_chunk:
-@@ -902,7 +1182,10 @@ static int virtballoon_probe(struct virtio_device *vdev)
- 		return -EINVAL;
- 	}
- 
--	INIT_WORK(&vb->update_balloon_stats_work, update_balloon_stats_func);
-+	if (!virtio_has_feature(vdev, VIRTIO_BALLOON_F_CMD_VQ) &&
-+	    virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ))
-+		INIT_WORK(&vb->update_balloon_stats_work,
-+			  update_balloon_stats_func);
- 	INIT_WORK(&vb->update_balloon_size_work, update_balloon_size_func);
- 	spin_lock_init(&vb->stop_update_lock);
- 	vb->stop_update = false;
-@@ -980,6 +1263,7 @@ static void virtballoon_remove(struct virtio_device *vdev)
- 	spin_unlock_irq(&vb->stop_update_lock);
- 	cancel_work_sync(&vb->update_balloon_size_work);
- 	cancel_work_sync(&vb->update_balloon_stats_work);
-+	cancel_work_sync(&vb->cmdq_handle_work);
- 
- 	remove_common(vb);
- 	free_page_bmap(vb);
-@@ -1029,6 +1313,7 @@ static unsigned int features[] = {
- 	VIRTIO_BALLOON_F_STATS_VQ,
- 	VIRTIO_BALLOON_F_DEFLATE_ON_OOM,
- 	VIRTIO_BALLOON_F_PAGE_CHUNKS,
-+	VIRTIO_BALLOON_F_CMD_VQ,
- };
- 
- static struct virtio_driver virtio_balloon_driver = {
-diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/virtio_balloon.h
-index 5ed3c7b..cb66c1a 100644
---- a/include/uapi/linux/virtio_balloon.h
-+++ b/include/uapi/linux/virtio_balloon.h
-@@ -35,6 +35,7 @@
- #define VIRTIO_BALLOON_F_STATS_VQ	1 /* Memory Stats virtqueue */
- #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon on OOM */
- #define VIRTIO_BALLOON_F_PAGE_CHUNKS	3 /* Inflate/Deflate pages in chunks */
-+#define VIRTIO_BALLOON_F_CMD_VQ		4 /* Command virtqueue */
- 
- /* Size of a PFN in the balloon interface. */
- #define VIRTIO_BALLOON_PFN_SHIFT 12
-@@ -83,4 +84,16 @@ struct virtio_balloon_stat {
- 	__virtio64 val;
- } __attribute__((packed));
- 
-+/* Use the memory of a vring_desc to place the cmdq header */
-+#define VIRTIO_BALLOON_CMDQ_HDR_SIZE sizeof(struct vring_desc)
-+
-+struct virtio_balloon_cmdq_hdr {
-+#define VIRTIO_BALLOON_CMDQ_REPORT_STATS	0
-+#define VIRTIO_BALLOON_CMDQ_REPORT_UNUSED_PAGES	1
-+	__le32 cmd;
-+/* Flag to indicate the completion of handling a command */
-+#define VIRTIO_BALLOON_CMDQ_F_COMPLETION	1
-+	__le32 flags;
-+};
-+
- #endif /* _LINUX_VIRTIO_BALLOON_H */
--- 
-2.7.4
+Yes - see the PULL req thread when this got merged:
+
+  Message-ID: <87h8zrdh02.fsf@linaro.org>
+
+I'm currently trying to narrow it down. It's tricky as the problem goes
+away when I add fprintfs but it affects both single and multi-thread
+modes so I don't think its a race.
+
+It seems to only affect TB's looked up in lookup_tb_ptr via the htable
+which is odd.
+
+>
+> Thanks,
+> Edgar
+>
+> GDB backtrace:
+> (gdb) thread apply all bt
+>
+> Thread 6 (Thread 0x7fff431fc700 (LWP 28586)):
+> #0  0x00007ffff5e2826d in __lll_lock_wait ()
+>    from /lib/x86_64-linux-gnu/libpthread.so.0
+> #1  0x00007ffff5e21dbd in pthread_mutex_lock ()
+>    from /lib/x86_64-linux-gnu/libpthread.so.0
+> #2  0x0000555555b5cc40 in qemu_mutex_lock (
+>     mutex=mutex@entry=0x55555620be80 <qemu_global_mutex>)
+>     at /home/edgar/src/c/qemu/qemu/util/qemu-thread-posix.c:61
+> #3  0x00005555557bc9cc in qemu_mutex_lock_iothread ()
+>     at /home/edgar/src/c/qemu/qemu/cpus.c:1581
+> #4  0x000055555578e865 in cpu_handle_interrupt (last_tb=<synthetic pointer>,
+>     cpu=0x5555566c40b0) at /home/edgar/src/c/qemu/qemu/cpu-exec.c:491
+> #5  cpu_exec (cpu=cpu@entry=0x7fffc543f4f8)
+>     at /home/edgar/src/c/qemu/qemu/cpu-exec.c:670
+> #6  0x00005555557bcb9f in tcg_cpu_exec (cpu=0x7fffc543f4f8)
+>     at /home/edgar/src/c/qemu/qemu/cpus.c:1270
+> #7  qemu_tcg_cpu_thread_fn (arg=0x7fffc543f4f8)
+>     at /home/edgar/src/c/qemu/qemu/cpus.c:1473
+> #8  0x00007ffff5e1f6ba in start_thread ()
+>    from /lib/x86_64-linux-gnu/libpthread.so.0
+> #9  0x00007ffff5b5582d in clone () from /lib/x86_64-linux-gnu/libc.so.6
+>
+> Thread 5 (Thread 0x7fff439fd700 (LWP 28585)):
+> #0  0x00007ffff5e2826d in __lll_lock_wait ()
+>    from /lib/x86_64-linux-gnu/libpthread.so.0
+> #1  0x00007ffff5e21dbd in pthread_mutex_lock ()
+>    from /lib/x86_64-linux-gnu/libpthread.so.0
+> #2  0x0000555555b5cc40 in qemu_mutex_lock (
+>     mutex=mutex@entry=0x55555620be80 <qemu_global_mutex>)
+>     at /home/edgar/src/c/qemu/qemu/util/qemu-thread-posix.c:61
+> #3  0x00005555557bc9cc in qemu_mutex_lock_iothread ()
+>     at /home/edgar/src/c/qemu/qemu/cpus.c:1581
+> #4  0x000055555578e865 in cpu_handle_interrupt (last_tb=<synthetic pointer>,
+>     cpu=0x5555566c40b0) at /home/edgar/src/c/qemu/qemu/cpu-exec.c:491
+> #5  cpu_exec (cpu=cpu@entry=0x7fffc54208d0)
+>     at /home/edgar/src/c/qemu/qemu/cpu-exec.c:670
+> #6  0x00005555557bcb9f in tcg_cpu_exec (cpu=0x7fffc54208d0)
+>     at /home/edgar/src/c/qemu/qemu/cpus.c:1270
+> #7  qemu_tcg_cpu_thread_fn (arg=0x7fffc54208d0)
+>     at /home/edgar/src/c/qemu/qemu/cpus.c:1473
+> #8  0x00007ffff5e1f6ba in start_thread ()
+>    from /lib/x86_64-linux-gnu/libpthread.so.0
+> #9  0x00007ffff5b5582d in clone () from /lib/x86_64-linux-gnu/libc.so.6
+>
+> Thread 4 (Thread 0x7fff441fe700 (LWP 28584)):
+> #0  0x00007ffff5e21dac in pthread_mutex_lock ()
+>    from /lib/x86_64-linux-gnu/libpthread.so.0
+> #1  0x0000555555b5cc40 in qemu_mutex_lock (
+>     mutex=mutex@entry=0x55555620be80 <qemu_global_mutex>)
+>     at /home/edgar/src/c/qemu/qemu/util/qemu-thread-posix.c:61
+> #2  0x00005555557bc9cc in qemu_mutex_lock_iothread ()
+>     at /home/edgar/src/c/qemu/qemu/cpus.c:1581
+> #3  0x000055555578e865 in cpu_handle_interrupt (last_tb=<synthetic pointer>,
+>     cpu=0x5555566c40b0) at /home/edgar/src/c/qemu/qemu/cpu-exec.c:491
+> #4  cpu_exec (cpu=cpu@entry=0x7fffc5401ca8)
+>     at /home/edgar/src/c/qemu/qemu/cpu-exec.c:670
+> #5  0x00005555557bcb9f in tcg_cpu_exec (cpu=0x7fffc5401ca8)
+>     at /home/edgar/src/c/qemu/qemu/cpus.c:1270
+> #6  qemu_tcg_cpu_thread_fn (arg=0x7fffc5401ca8)
+>     at /home/edgar/src/c/qemu/qemu/cpus.c:1473
+> #7  0x00007ffff5e1f6ba in start_thread ()
+>    from /lib/x86_64-linux-gnu/libpthread.so.0
+> #8  0x00007ffff5b5582d in clone () from /lib/x86_64-linux-gnu/libc.so.6
+>
+> Thread 3 (Thread 0x7fff449ff700 (LWP 28583)):
+> #0  0x00005555558c4c89 in regime_el (mmu_idx=ARMMMUIdx_S1NSE1,
+>     env=0x7fffc53eb310) at /home/edgar/src/c/qemu/qemu/target/arm/helper.c:7028
+> #1  regime_tcr (mmu_idx=<optimized out>, env=0x7fffc53eb310)
+>     at /home/edgar/src/c/qemu/qemu/target/arm/helper.c:7117
+> #2  arm_regime_tbi0 (env=env@entry=0x7fffc53eb310, mmu_idx=<optimized out>,
+>     mmu_idx@entry=ARMMMUIdx_S12NSE1)
+>     at /home/edgar/src/c/qemu/qemu/target/arm/helper.c:7142
+> #3  0x00005555557ba346 in cpu_get_tb_cpu_state (flags=<synthetic pointer>,
+>     cs_base=<synthetic pointer>, pc=<synthetic pointer>, env=0x7fffc53eb310)
+>     at /home/edgar/src/c/qemu/qemu/target/arm/cpu.h:2571
+> #4  helper_lookup_tb_ptr (env=0x7fffc53eb310, addr=18446743524088820436)
+>     at /home/edgar/src/c/qemu/qemu/tcg-runtime.c:156
+> #5  0x00007fffcf2f7e53 in code_gen_buffer ()
+> #6  0x000055555578de7c in cpu_tb_exec (itb=<optimized out>,
+>     itb=<optimized out>, cpu=0x7fffc5727478)
+>     at /home/edgar/src/c/qemu/qemu/cpu-exec.c:166
+> #7  cpu_loop_exec_tb (tb_exit=<synthetic pointer>,
+>     last_tb=<synthetic pointer>, tb=<optimized out>, cpu=0x7fffc5727478)
+>     at /home/edgar/src/c/qemu/qemu/cpu-exec.c:574
+> #8  cpu_exec (cpu=cpu@entry=0x7fffc53e3080)
+>     at /home/edgar/src/c/qemu/qemu/cpu-exec.c:672
+> #9  0x00005555557bcb9f in tcg_cpu_exec (cpu=0x7fffc53e3080)
+>     at /home/edgar/src/c/qemu/qemu/cpus.c:1270
+> #10 qemu_tcg_cpu_thread_fn (arg=0x7fffc53e3080)
+>     at /home/edgar/src/c/qemu/qemu/cpus.c:1473
+> #11 0x00007ffff5e1f6ba in start_thread ()
+>    from /lib/x86_64-linux-gnu/libpthread.so.0
+> #12 0x00007ffff5b5582d in clone () from /lib/x86_64-linux-gnu/libc.so.6
+>
+> Thread 2 (Thread 0x7fffef7b7700 (LWP 28582)):
+> #0  0x00007ffff5b4f8e9 in syscall () from /lib/x86_64-linux-gnu/libc.so.6
+> #1  0x0000555555b5d385 in qemu_futex_wait (val=<optimized out>,
+>     f=<optimized out>) at /home/edgar/src/c/qemu/qemu/include/qemu/futex.h:26
+> #2  qemu_event_wait (ev=ev@entry=0x55555661bae4 <rcu_call_ready_event>)
+>     at /home/edgar/src/c/qemu/qemu/util/qemu-thread-posix.c:415
+> #3  0x0000555555b6cc6e in call_rcu_thread (opaque=<optimized out>)
+>     at /home/edgar/src/c/qemu/qemu/util/rcu.c:249
+> #4  0x00007ffff5e1f6ba in start_thread ()
+>    from /lib/x86_64-linux-gnu/libpthread.so.0
+> #5  0x00007ffff5b5582d in clone () from /lib/x86_64-linux-gnu/libc.so.6
+>
+> Thread 1 (Thread 0x7ffff7f31c00 (LWP 28578)):
+> #0  0x00007ffff5b49c21 in ppoll () from /lib/x86_64-linux-gnu/libc.so.6
+> #1  0x0000555555b58f39 in ppoll (__ss=0x0, __timeout=0x7fffffffd5f0,
+>     __nfds=<optimized out>, __fds=<optimized out>)
+>     at /usr/include/x86_64-linux-gnu/bits/poll2.h:77
+> #2  qemu_poll_ns (fds=<optimized out>, nfds=<optimized out>,
+>     timeout=timeout@entry=9223371867734611302)
+>     at /home/edgar/src/c/qemu/qemu/util/qemu-timer.c:334
+> #3  0x0000555555b59d6a in os_host_main_loop_wait (timeout=9223371867734611302)
+>     at /home/edgar/src/c/qemu/qemu/util/main-loop.c:255
+> #4  main_loop_wait (nonblocking=<optimized out>)
+>     at /home/edgar/src/c/qemu/qemu/util/main-loop.c:517
+> #5  0x0000555555779057 in main_loop () at /home/edgar/src/c/qemu/qemu/vl.c:1918
+> #6  main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>)
+>     at /home/edgar/src/c/qemu/qemu/vl.c:4752
+> (gdb)
+
+
+--
+Alex Bennée
