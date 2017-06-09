@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dJLuu-0001AW-4u
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 11:33:41 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dJLvS-0001U0-Oi
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 11:34:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dJLup-0003qk-Ib
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 11:33:40 -0400
-References: <20170609152017.7286-1-eblake@redhat.com>
-	<20170609152017.7286-2-eblake@redhat.com>
-	<CAJ+F1CJL04MkrYmnhM3rLaSAuEXYo7JsZwyDLeXA35bV6dvqqA@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b3e66ce9-d503-bf6f-cd93-511097418480@redhat.com>
-Date: Fri, 9 Jun 2017 10:33:32 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1dJLvO-0004HK-19
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 11:34:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52926)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dJLvN-0004Gp-R3
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 11:34:09 -0400
+Date: Fri, 9 Jun 2017 12:34:02 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170609153402.GR5016@thinpad.lan.raisama.net>
+References: <20170609151615.2589-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CJL04MkrYmnhM3rLaSAuEXYo7JsZwyDLeXA35bV6dvqqA@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="E5fcT9pB7twRrGqRBeoDBsH7n3w76Thnl"
-Subject: Re: [Qemu-devel] [PATCH 1/2] qobject: Update coccinelle script to
- catch Q{INC, DEC}REF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170609151615.2589-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/i386: fix nvdimm check error path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,75 +26,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, armbru@redhat.com
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, Haozhong Zhang <haozhong.zhang@intel.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---E5fcT9pB7twRrGqRBeoDBsH7n3w76Thnl
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>,
- qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, armbru@redhat.com
-Message-ID: <b3e66ce9-d503-bf6f-cd93-511097418480@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] qobject: Update coccinelle script to
- catch Q{INC, DEC}REF
-References: <20170609152017.7286-1-eblake@redhat.com>
- <20170609152017.7286-2-eblake@redhat.com>
- <CAJ+F1CJL04MkrYmnhM3rLaSAuEXYo7JsZwyDLeXA35bV6dvqqA@mail.gmail.com>
-In-Reply-To: <CAJ+F1CJL04MkrYmnhM3rLaSAuEXYo7JsZwyDLeXA35bV6dvqqA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Jun 09, 2017 at 04:16:15PM +0100, Stefan Hajnoczi wrote:
+> Commit e987c37aee1752177906847630d32477da57e705 ("hw/i386: check if
+> nvdimm is enabled before plugging") introduced a check to reject nvdimm
+> hotplug if -machine pc,nvdimm=on was not given.
+> 
+> This check executes after pc_dimm_memory_plug() has already completed
+> and does not reverse the effect of this function in the case of failure.
+> 
+> Perform the check before calling pc_dimm_memory_plug().  This fixes the
+> following abort:
+> 
+>   $ qemu -M accel=kvm -m 1G,slots=4,maxmem=8G \
+>          -object memory-backend-file,id=mem1,share=on,mem-path=nvdimm.dat,size=1G
+>   (qemu) device_add nvdimm,memdev=mem1
+>   nvdimm is not enabled: missing 'nvdimm' in '-M'
+>   (qemu) device_add nvdimm,memdev=mem1
+>   Core dumped
+> 
+> The backtrace is:
+> 
+>   #0  0x00007fffdb5b191f in raise () at /lib64/libc.so.6
+>   #1  0x00007fffdb5b351a in abort () at /lib64/libc.so.6
+>   #2  0x00007fffdb5a9da7 in __assert_fail_base () at /lib64/libc.so.6
+>   #3  0x00007fffdb5a9e52 in  () at /lib64/libc.so.6
+>   #4  0x000055555577a5fa in qemu_ram_set_idstr (new_block=0x555556747a00, name=<optimized out>, dev=dev@entry=0x555556705590) at qemu/exec.c:1709
+>   #5  0x0000555555a0fe86 in vmstate_register_ram (mr=mr@entry=0x55555673a0e0, dev=dev@entry=0x555556705590) at migration/savevm.c:2293
+>   #6  0x0000555555965088 in pc_dimm_memory_plug (dev=dev@entry=0x555556705590, hpms=hpms@entry=0x5555566bb0e0, mr=mr@entry=0x555556705630, align=<optimized out>, errp=errp@entry=0x7fffffffc660)
+>       at hw/mem/pc-dimm.c:110
+>   #7  0x000055555581d89b in pc_dimm_plug (errp=0x7fffffffc6c0, dev=0x555556705590, hotplug_dev=<optimized out>) at qemu/hw/i386/pc.c:1713
+>   #8  0x000055555581d89b in pc_machine_device_plug_cb (hotplug_dev=<optimized out>, dev=0x555556705590, errp=0x7fffffffc6c0) at qemu/hw/i386/pc.c:2004
+>   #9  0x0000555555914da6 in device_set_realized (obj=<optimized out>, value=<optimized out>, errp=0x7fffffffc7e8) at hw/core/qdev.c:926
+> 
+> Cc: Haozhong Zhang <haozhong.zhang@intel.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-On 06/09/2017 10:28 AM, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Fri, Jun 9, 2017 at 7:20 PM Eric Blake <eblake@redhat.com> wrote:
->=20
->> A recent patch submission was about to use qobject_decref(QOBJECT(E)),=
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
->> even though we already have QDECREF(E) for that purpose.  While our
->> tree is currently free from the longhand form, we might as well update=
-
->>
->=20
-> Oh?
->=20
->  $ git grep 'object_unref(OBJECT('  | wc -l
-> 152
-
-Quit mixing QOM and QObject ;)
-
-$ git grep qobject_'..cref(QOBJECT'
-include/qapi/qmp/qobject.h:    qobject_incref(QOBJECT(obj))
-scripts/coccinelle/qobject.cocci:- qobject_incref(QOBJECT(E));
-scripts/coccinelle/qobject.cocci:- qobject_decref(QOBJECT(E));
-
-Yes, we may want to add a script to clean QOM abuses, but that's a
-different project for a different day.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---E5fcT9pB7twRrGqRBeoDBsH7n3w76Thnl
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZOr/MAAoJEKeha0olJ0NqCqUIAJ2dDzernby+VaTxULJ7//q0
-gxZ5Nxkh3nye2PvbfthPNIU8drJOu9AaBjrzhNJ7HxQ7zBgcR3xeckbvJXFxwnoj
-DTmO6V4aiStv9dMRySVRf9dhwOOJ8NyAqgZgaHm3a7BYolOVzglz4IZKTUWSWn1T
-4UaCZhnY9mLSvJRsTU27hpmdJdc3ZwP9o6VwBI5KedBgG+WYBpyRsGsU3UwAzshs
-F7T8GzOilfn6WGo5C7IR0vW5dOioNwsQHZgV1pHqGv5osbO3wK0uB8vbk7OswpHf
-2zFIelXqaJs4dJeX9hTQIsd4iDb4lgD9qhK/JeLgIsjlR7qoyFIsL4k65ns24rI=
-=awMj
------END PGP SIGNATURE-----
-
---E5fcT9pB7twRrGqRBeoDBsH7n3w76Thnl--
+-- 
+Eduardo
