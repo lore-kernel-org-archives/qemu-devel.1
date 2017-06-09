@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dJKGG-0000dB-9e
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:47:39 -0400
+	(envelope-from <armbru@redhat.com>) id 1dJKGH-0000e8-2q
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:47:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dJKGF-0003XZ-41
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:47:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51294)
+	(envelope-from <armbru@redhat.com>) id 1dJKGF-0003Xy-Ed
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:47:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51298)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dJKGE-0003Wu-RM
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dJKGE-0003Wz-VQ
 	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 09:47:35 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D232C4E326
+	by mx1.redhat.com (Postfix) with ESMTPS id E53F64DD62
 	for <qemu-devel@nongnu.org>; Fri,  9 Jun 2017 13:47:33 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  9 Jun 2017 15:46:56 +0200
-Message-Id: <1497016045-6009-13-git-send-email-armbru@redhat.com>
+Date: Fri,  9 Jun 2017 15:46:55 +0200
+Message-Id: <1497016045-6009-12-git-send-email-armbru@redhat.com>
 In-Reply-To: <1497016045-6009-1-git-send-email-armbru@redhat.com>
 References: <1497016045-6009-1-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 12/41] object: add uint property setter/getter
+Subject: [Qemu-devel] [PULL 11/41] qapi: update the qobject visitor to use
+ QNUM_U64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,92 +38,174 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
+Switch to use QNum/uint where appropriate to remove i64 limitation.
+
+The input visitor will cast i64 input to u64 for compatibility
+reasons (existing json QMP client already use negative i64 for large
+u64, and expect an implicit cast in qemu).
+
+Note: before the patch, uint64_t values above INT64_MAX are sent over
+json QMP as negative values, e.g. UINT64_MAX is sent as -1. After the
+patch, they are sent unmodified.  Clearly a bug fix, but we have to
+consider compatibility issues anyway.  libvirt should cope fine,
+because its parsing of unsigned integers accepts negative values
+modulo 2^64.  There's hope that other clients will, too.
+
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20170607163635.17635-13-marcandre.lureau@redhat.com>
+Message-Id: <20170607163635.17635-12-marcandre.lureau@redhat.com>
+[check_native_list() tweaked for consistency with signed case]
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/qom/object.h | 23 +++++++++++++++++++++++
- qom/object.c         | 29 +++++++++++++++++++++++++++++
- 2 files changed, 52 insertions(+)
+ hw/i386/acpi-build.c                |  2 +-
+ qapi/qobject-input-visitor.c        | 21 ++++++++++++++++-----
+ qapi/qobject-output-visitor.c       |  3 +--
+ tests/test-qobject-input-visitor.c  |  7 ++-----
+ tests/test-qobject-output-visitor.c | 22 ++++++++++++++++++----
+ 5 files changed, 38 insertions(+), 17 deletions(-)
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index cd0f412..abaeb8c 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -1094,6 +1094,29 @@ int64_t object_property_get_int(Object *obj, const=
- char *name,
-                                 Error **errp);
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index d7d2b65..3eb4367 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2614,7 +2614,7 @@ static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg)
+     if (!o) {
+         return false;
+     }
+-    mcfg->mcfg_base =3D qnum_get_int(qobject_to_qnum(o));
++    mcfg->mcfg_base =3D qnum_get_uint(qobject_to_qnum(o));
+     qobject_decref(o);
 =20
- /**
-+ * object_property_set_uint:
-+ * @value: the value to be written to the property
-+ * @name: the name of the property
-+ * @errp: returns an error if this function fails
-+ *
-+ * Writes an unsigned integer value to a property.
-+ */
-+void object_property_set_uint(Object *obj, uint64_t value,
-+                              const char *name, Error **errp);
+     o =3D object_property_get_qobject(pci_host, PCIE_HOST_MCFG_SIZE, NUL=
+L);
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index 539b3b8..35aff78 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -417,7 +417,6 @@ static void qobject_input_type_int64_keyval(Visitor *=
+v, const char *name,
+ static void qobject_input_type_uint64(Visitor *v, const char *name,
+                                       uint64_t *obj, Error **errp)
+ {
+-    /* FIXME: qobject_to_qnum mishandles values over INT64_MAX */
+     QObjectInputVisitor *qiv =3D to_qiv(v);
+     QObject *qobj =3D qobject_input_get_object(qiv, name, true, errp);
+     QNum *qnum;
+@@ -427,11 +426,23 @@ static void qobject_input_type_uint64(Visitor *v, c=
+onst char *name,
+         return;
+     }
+     qnum =3D qobject_to_qnum(qobj);
+-    if (!qnum || !qnum_get_try_int(qnum, &val)) {
+-        error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
+-                   full_name(qiv, name), "integer");
++    if (!qnum) {
++        goto err;
+     }
+-    *obj =3D val;
 +
-+/**
-+ * object_property_get_uint:
-+ * @obj: the object
-+ * @name: the name of the property
-+ * @errp: returns an error if this function fails
-+ *
-+ * Returns: the value of the property, converted to an unsigned integer,=
- or 0
-+ * an error occurs (including when the property value is not an integer)=
-.
-+ */
-+uint64_t object_property_get_uint(Object *obj, const char *name,
-+                                  Error **errp);
++    if (qnum_get_try_uint(qnum, obj)) {
++        return;
++    }
 +
-+/**
-  * object_property_get_enum:
-  * @obj: the object
-  * @name: the name of the property
-diff --git a/qom/object.c b/qom/object.c
-index dee7f7c..5f6fdfa 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -1216,6 +1216,35 @@ int64_t object_property_get_int(Object *obj, const=
- char *name,
-     return retval;
++    /* Need to accept negative values for backward compatibility */
++    if (qnum_get_try_int(qnum, &val)) {
++        *obj =3D val;
++        return;
++    }
++
++err:
++    error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
++               full_name(qiv, name), "uint64");
  }
 =20
-+void object_property_set_uint(Object *obj, uint64_t value,
-+                              const char *name, Error **errp)
-+{
-+    QNum *qnum =3D qnum_from_uint(value);
+ static void qobject_input_type_uint64_keyval(Visitor *v, const char *nam=
+e,
+diff --git a/qapi/qobject-output-visitor.c b/qapi/qobject-output-visitor.=
+c
+index 2ca5093..70be84c 100644
+--- a/qapi/qobject-output-visitor.c
++++ b/qapi/qobject-output-visitor.c
+@@ -150,9 +150,8 @@ static void qobject_output_type_int64(Visitor *v, con=
+st char *name,
+ static void qobject_output_type_uint64(Visitor *v, const char *name,
+                                        uint64_t *obj, Error **errp)
+ {
+-    /* FIXME values larger than INT64_MAX become negative */
+     QObjectOutputVisitor *qov =3D to_qov(v);
+-    qobject_output_add(qov, name, qnum_from_int(*obj));
++    qobject_output_add(qov, name, qnum_from_uint(*obj));
+ }
+=20
+ static void qobject_output_type_bool(Visitor *v, const char *name, bool =
+*obj,
+diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-inpu=
+t-visitor.c
+index 928cc26..34bab8a 100644
+--- a/tests/test-qobject-input-visitor.c
++++ b/tests/test-qobject-input-visitor.c
+@@ -123,7 +123,6 @@ static void test_visitor_in_int(TestInputVisitorData =
+*data,
+ static void test_visitor_in_uint(TestInputVisitorData *data,
+                                 const void *unused)
+ {
+-    Error *err =3D NULL;
+     uint64_t res =3D 0;
+     int64_t i64;
+     double dbl;
+@@ -147,12 +146,10 @@ static void test_visitor_in_uint(TestInputVisitorDa=
+ta *data,
+     visit_type_uint64(v, NULL, &res, &error_abort);
+     g_assert_cmpuint(res, =3D=3D, (uint64_t)-value);
+=20
+-    /* BUG: value between INT64_MAX+1 and UINT64_MAX rejected */
+-
+     v =3D visitor_input_test_init(data, "18446744073709551574");
+=20
+-    visit_type_uint64(v, NULL, &res, &err);
+-    error_free_or_abort(&err);
++    visit_type_uint64(v, NULL, &res, &error_abort);
++    g_assert_cmpuint(res, =3D=3D, 18446744073709551574U);
+=20
+     visit_type_number(v, NULL, &dbl, &error_abort);
+     g_assert_cmpfloat(dbl, =3D=3D, 18446744073709552000.0);
+diff --git a/tests/test-qobject-output-visitor.c b/tests/test-qobject-out=
+put-visitor.c
+index a16c8f6..749c540 100644
+--- a/tests/test-qobject-output-visitor.c
++++ b/tests/test-qobject-output-visitor.c
+@@ -602,14 +602,28 @@ static void check_native_list(QObject *qobj,
+     qlist =3D qlist_copy(qobject_to_qlist(qdict_get(qdict, "data")));
+=20
+     switch (kind) {
+-    case USER_DEF_NATIVE_LIST_UNION_KIND_S8:
+-    case USER_DEF_NATIVE_LIST_UNION_KIND_S16:
+-    case USER_DEF_NATIVE_LIST_UNION_KIND_S32:
+-    case USER_DEF_NATIVE_LIST_UNION_KIND_S64:
+     case USER_DEF_NATIVE_LIST_UNION_KIND_U8:
+     case USER_DEF_NATIVE_LIST_UNION_KIND_U16:
+     case USER_DEF_NATIVE_LIST_UNION_KIND_U32:
+     case USER_DEF_NATIVE_LIST_UNION_KIND_U64:
++        for (i =3D 0; i < 32; i++) {
++            QObject *tmp;
++            QNum *qvalue;
++            uint64_t val;
 +
-+    object_property_set_qobject(obj, QOBJECT(qnum), name, errp);
-+    QDECREF(qnum);
-+}
++            tmp =3D qlist_peek(qlist);
++            g_assert(tmp);
++            qvalue =3D qobject_to_qnum(tmp);
++            g_assert(qnum_get_try_uint(qvalue, &val));
++            g_assert_cmpint(val, =3D=3D, i);
++            qobject_decref(qlist_pop(qlist));
++        }
++        break;
 +
-+uint64_t object_property_get_uint(Object *obj, const char *name,
-+                                  Error **errp)
-+{
-+    QObject *ret =3D object_property_get_qobject(obj, name, errp);
-+    QNum *qnum;
-+    uint64_t retval;
-+
-+    if (!ret) {
-+        return 0;
-+    }
-+    qnum =3D qobject_to_qnum(ret);
-+    if (!qnum || !qnum_get_try_uint(qnum, &retval)) {
-+        error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name, "uint");
-+        retval =3D 0;
-+    }
-+
-+    qobject_decref(ret);
-+    return retval;
-+}
-+
- typedef struct EnumProperty {
-     const char * const *strings;
-     int (*get)(Object *, Error **);
++    case USER_DEF_NATIVE_LIST_UNION_KIND_S8:
++    case USER_DEF_NATIVE_LIST_UNION_KIND_S16:
++    case USER_DEF_NATIVE_LIST_UNION_KIND_S32:
++    case USER_DEF_NATIVE_LIST_UNION_KIND_S64:
+         /*
+          * All integer elements in JSON arrays get stored into QNums
+          * when we convert to QObjects, so we can check them all in
 --=20
 2.7.5
