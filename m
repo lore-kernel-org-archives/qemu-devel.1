@@ -1,24 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1dJEEe-0008Cw-7m
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 03:21:34 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1dJEIg-0001Sy-K6
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 03:25:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1dJEEb-00086w-V4
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 03:21:32 -0400
-MIME-Version: 1.0
-In-Reply-To: <648515bf-ba1e-3d7f-d5bd-51b243f8c29f@amsat.org>
-References: <1494949133-2202-1-git-send-email-sundeep.lkml@gmail.com>
-	<d403f33f-647e-a142-4265-7d856d8be6aa@amsat.org>
-	<CALHRZur8Uh0JCnOoY-_mUU_fyzbUgxbmWKtfOoB-GTYR5UcEnQ@mail.gmail.com>
-	<CALHRZuoVHFOYV345JmvSkfJHsVjS7Wv_ySzAUtwo1D7eyoS_XQ@mail.gmail.com>
-	<648515bf-ba1e-3d7f-d5bd-51b243f8c29f@amsat.org>
-From: sundeep subbaraya <sundeep.lkml@gmail.com>
-Date: Fri, 9 Jun 2017 12:51:26 +0530
-Message-ID: <CALHRZuoihb2Oiu9adm=2gPUf-LFdkBR9qw1iV+ohL6kp0t5d=A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu devel v5 PATCH 0/5] Add support for
- Smartfusion2 SoC
+	(envelope-from <a.perevalov@samsung.com>) id 1dJEIb-0001EL-JY
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 03:25:42 -0400
+Received: from mailout4.w1.samsung.com ([210.118.77.14]:46476)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1dJEIb-0001E4-Cp
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 03:25:37 -0400
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout4.w1.samsung.com
+	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
+	2014)) with ESMTP id <0OR900GWARAKUY40@mailout4.w1.samsung.com> for
+	qemu-devel@nongnu.org; Fri, 09 Jun 2017 08:25:32 +0100 (BST)
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Message-id: <f38e7d6b-f04b-ac9f-79d3-03b5b6422890@samsung.com>
+Date: Fri, 09 Jun 2017 10:25:29 +0300
+MIME-version: 1.0
+In-reply-to: <20170609071455.GK3628@pxdev.xzpeter.org>
+Content-type: text/plain; charset=utf-8; format=flowed
+Content-transfer-encoding: 7bit
+Content-language: en-GB
+References: <1496828798-27548-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170607094727eucas1p13b2228fead9fc5a49d953985c777b719@eucas1p1.samsung.com>
+	<1496828798-27548-3-git-send-email-a.perevalov@samsung.com>
+	<20170609041059.GI3628@pxdev.xzpeter.org>
+	<b1260f4a-513e-b5c0-2cef-b9b6e0b65d17@samsung.com>
+	<20170609071455.GK3628@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH v8 02/11] migration: pass
+ MigrationIncomingState* into migration check functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,222 +39,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair23@gmail.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, i.maximets@samsung.com
 
-Hi Philippe,
-
-On Wed, May 31, 2017 at 11:06 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.=
-org>
-wrote:
-
-> Hi Sundeep,
+On 06/09/2017 10:14 AM, Peter Xu wrote:
+> On Fri, Jun 09, 2017 at 09:21:38AM +0300, Alexey Perevalov wrote:
+>> On 06/09/2017 07:10 AM, Peter Xu wrote:
+>>> On Wed, Jun 07, 2017 at 12:46:29PM +0300, Alexey Perevalov wrote:
+>>>> That tiny refactoring is necessary to be able to set
+>>>> UFFD_FEATURE_THREAD_ID while requesting features, and then
+>>>> to create downtime context in case when kernel supports it.
+>>>>
+>>>> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+>>>> ---
+>>>>   migration/migration.c    |  3 ++-
+>>>>   migration/postcopy-ram.c | 10 +++++-----
+>>>>   migration/postcopy-ram.h |  2 +-
+>>>>   migration/savevm.c       |  2 +-
+>>>>   4 files changed, 9 insertions(+), 8 deletions(-)
+>>>>
+>>>> diff --git a/migration/migration.c b/migration/migration.c
+>>>> index 48c94c9..2a77636 100644
+>>>> --- a/migration/migration.c
+>>>> +++ b/migration/migration.c
+>>>> @@ -726,6 +726,7 @@ void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
+>>>>                                     Error **errp)
+>>>>   {
+>>>>       MigrationState *s = migrate_get_current();
+>>>> +    MigrationIncomingState *mis = migration_incoming_get_current();
+>>> If this patch is only servicing patch 6, I'd prefer in patch 6 we call
+>>> migration_incoming_get_current() (rather than here), then this patch
+>>> may be dropped?...
+>> I planed this patch as preparation, I used to separate refactoring from main
+>> change, for
+>> easy merging while rebasing.
+>> mis - is necessary here to have the same behaviour as before.
+> Could I ask what's the "same behavior" you mentioned?
+I meant no changes in functionality.
 >
-> On 05/29/2017 02:28 AM, sundeep subbaraya wrote:
->
->> Hi Philippe,
->>
->> Any update on this? I will wait for your comments too
->> and send next iteration fixing Alistair comments.
->>
->
-> Sorry I'm supposed to be in holidays ;)
->
-
-Ohh sorry currently am in vacation :)
-
->
->
->> Thanks,
->> Sundeep
->>
->> On Wed, May 17, 2017 at 3:09 PM, sundeep subbaraya
->> <sundeep.lkml@gmail.com <mailto:sundeep.lkml@gmail.com>> wrote:
->>
->>     Hi Philippe,
->>
->>     On Wed, May 17, 2017 at 9:57 AM, Philippe Mathieu-Daud=C3=A9
->>     <f4bug@amsat.org <mailto:f4bug@amsat.org>> wrote:
->>
->>         Hi Sundeep,
->>
->>         This patchset is way cleaner!
->>         I had a fast look and I like it, I'll try to make some time soon
->>         to review details and test it.
->>
->>
->>     Thank you
->>
->>
->>
->>
->>         Is your work interested on U-Boot or more focused in Linux kerne=
-l?
->>
->>
->>     I am interested more in kernel. I had to look into u-boot for first
->>     time for Qemu only.
->>     I worked only on FPGAs(load kernel with debugger) till now so never
->>     got a chance to look into u-boot.
->>
->>
->>         If you compile QEMU with libfdt support you can use the -dtb
->>         option to pass the blob to the kernel directly, bypassing the
->>         bootloader.
->>
->>     Yeah for armv7m I could not find any thing like that in tree.
->>
->>
->>         If you need a bootloader you may give a look at coreboot which
->>         supports dts well, see how Vladimir Serbinenko used Linux's dt
->>         to boot a QEMU Versatile Express board:
->>         https://mail.coreboot.org/pipermail/coreboot-gerrit/2016-
->> February/040899.html
->>         <https://mail.coreboot.org/pipermail/coreboot-gerrit/2016-
->> February/040899.html>
->>
->>     Cool. I will look into it.
->>
->>     Thanks,
->>     Sundeep
->>
->>
->>         Regards,
->>
->>         Phil.
->>
->>
->>         On 05/16/2017 12:38 PM, Subbaraya Sundeep wrote:
->>
->>             Hi Qemu-devel,
->>
->>             I am trying to add Smartfusion2 SoC.
->>             SoC is from Microsemi and System on Module(SOM)
->>             board is from Emcraft systems. Smartfusion2 has hardened
->>             Microcontroller(Cortex-M3)based Sub System and FPGA fabric.
->>             At the moment only system timer, sysreg and SPI
->>             controller are modelled.
->>
->>             Testing:
->>             ./arm-softmmu/qemu-system-arm -M smartfusion2-som -serial
->>             mon:stdio \
->>             -kernel u-boot.bin -display none -drive
->>             file=3Dspi.bin,if=3Dmtd,format=3Draw
->>
->
-> I'm not sure the timer is working correctly, U-Boot loops with this
-> pattern:
->
-> msf2_sysreg_read: addr: 0x00000048 data: 0x00000220
-> msf2_sysreg_write: addr: 0x00000048 data: 0x00000220
-> msf2_sysreg_read: addr: 0x00000048 data: 0x00000220
-> msf2_sysreg_write: addr: 0x00000048 data: 0x00000020
-> msf2_sysreg_read: addr: 0x00000048 data: 0x00000020
-> msf2_sysreg_write: addr: 0x00000048 data: 0x00000000
-> msf2_sysreg_read: addr: 0x00000048 data: 0x00000000
-> msf2_sysreg_write: addr: 0x00000048 data: 0x00000020
-> msf2_sysreg_read: addr: 0x00000048 data: 0x00000020
-> msf2_sysreg_write: addr: 0x00000048 data: 0x00000220
->
->
->>             Binaries u-boot.bin and spi.bin are at:
->>
->
-> you can compress spi.bin!
->
-> can you share u-boot.elf with debug symbols too?
+> I thought this patch is only used by patch 6 when creating the
+> blocktime struct (but not really a clean-up), no?
 >
 
-Sure. I have tested binaries before pushing. Did you compile the u-boot
-again?
-Please wait for a few days I will check and provide once am back.
-
-Thanks,
-Sundeep
-
->
-> Regards,
->
-> Phil.
->
->             https://github.com/Subbaraya-Sundeep/qemu-test-binaries.git
->>
->>             <https://github.com/Subbaraya-Sundeep/qemu-test-binaries.git=
->
->>
->>             U-boot is from Emcraft with modified
->>                 - SPI driver not to use PDMA.
->>                 - ugly hack to pass dtb to kernel in r1.
->>             @
->>             https://github.com/Subbaraya-Sundeep/emcraft-uboot-sf2.git
->>             <https://github.com/Subbaraya-Sundeep/emcraft-uboot-sf2.git>
->>
->>             Linux is 4.5 linux with Smartfusion2 SoC dts and clocksource
->>             driver added by myself @
->>             https://github.com/Subbaraya-Sundeep/linux.git
->>             <https://github.com/Subbaraya-Sundeep/linux.git>
->>
->>             v5
->>                 As per Philippe comments:
->>                     Added abort in Sysreg if guest tries to remap memory
->>                     other than default mapping.
->>                     Use of CONFIG_MSF2 in Makefile for soc.c
->>                     Fixed incorrect logic in timer model.
->>                     Renamed msf2-timer.c -> mss-timer.c
->>                             msf2-spi.c -> mss-spi.c also type names
->>                     Renamed function msf2_init->emcraft_sf2_init in
->>             msf2-som.c
->>                     Added part-name,eNVM-size,eSRAM-size,pclk0 and pclk1
->>                         properties to soc.
->>                     Pass soc part-name,memory size and clock rate
->>             properties from som.
->>             v4:
->>                 Fixed build failure by using PRIx macros.
->>             v3:
->>                 Added SoC file and board file as per Alistair comments.
->>             v2:
->>                 Added SPI controller so that u-boot loads kernel from
->>             spi flash.
->>             v1:
->>                 Initial patch set with timer and sysreg
->>
->>             Thanks,
->>             Sundeep
->>
->>             Subbaraya Sundeep (5):
->>               msf2: Add Smartfusion2 System timer
->>               msf2: Microsemi Smartfusion2 System Register block.
->>               msf2: Add Smartfusion2 SPI controller
->>               msf2: Add Smartfusion2 SoC.
->>               msf2: Add Emcraft's Smartfusion2 SOM kit.
->>
->>              default-configs/arm-softmmu.mak |   1 +
->>              hw/arm/Makefile.objs            |   2 +
->>              hw/arm/msf2-soc.c               | 201 +++++++++++++++++++++
->>              hw/arm/msf2-som.c               |  89 ++++++++++
->>              hw/misc/Makefile.objs           |   1 +
->>              hw/misc/msf2-sysreg.c           | 161 +++++++++++++++++
->>              hw/ssi/Makefile.objs            |   1 +
->>              hw/ssi/mss-spi.c                | 378
->>             ++++++++++++++++++++++++++++++++++++++++
->>              hw/timer/Makefile.objs          |   1 +
->>              hw/timer/mss-timer.c            | 249
->>             ++++++++++++++++++++++++++
->>              include/hw/arm/msf2-soc.h       |  69 ++++++++
->>              include/hw/misc/msf2-sysreg.h   |  80 +++++++++
->>              include/hw/ssi/mss-spi.h        | 104 +++++++++++
->>              include/hw/timer/mss-timer.h    |  80 +++++++++
->>              14 files changed, 1417 insertions(+)
->>              create mode 100644 hw/arm/msf2-soc.c
->>              create mode 100644 hw/arm/msf2-som.c
->>              create mode 100644 hw/misc/msf2-sysreg.c
->>              create mode 100644 hw/ssi/mss-spi.c
->>              create mode 100644 hw/timer/mss-timer.c
->>              create mode 100644 include/hw/arm/msf2-soc.h
->>              create mode 100644 include/hw/misc/msf2-sysreg.h
->>              create mode 100644 include/hw/ssi/mss-spi.h
->>              create mode 100644 include/hw/timer/mss-timer.h
->>
->>
->>
->>
+-- 
+Best regards,
+Alexey Perevalov
