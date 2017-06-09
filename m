@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dJIQk-0006uE-Qd
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 07:50:21 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dJIUR-0001rL-VB
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 07:54:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dJIQj-00022H-5R
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 07:50:18 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  9 Jun 2017 13:50:03 +0200
-Message-Id: <1497009003-25794-4-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1497009003-25794-1-git-send-email-kwolf@redhat.com>
-References: <1497009003-25794-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/3] qemu-iotests: Test exiting qemu with
- running job
+	(envelope-from <eric.auger@redhat.com>) id 1dJIUQ-000413-HC
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 07:54:08 -0400
+References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
+	<AM5PR0401MB2545AFD256A96420ACC44CD89ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<14c83c14-1e7e-f142-77b0-fa8c873e2d41@redhat.com>
+	<AM5PR0401MB2545C0E76C4BE6F82FE376D09ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <6f22079e-4b4b-6476-77be-51ec83104c0d@redhat.com>
+Date: Fri, 9 Jun 2017 13:53:49 +0200
+MIME-Version: 1.0
+In-Reply-To: <AM5PR0401MB2545C0E76C4BE6F82FE376D09ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v2 0/8] VIRTIO-IOMMU device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,290 +25,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+To: Bharat Bhushan <bharat.bhushan@nxp.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>
+Cc: "wei@redhat.com" <wei@redhat.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
 
-When qemu is exited, all running jobs should be cancelled successfully.
-This adds a test for this for all types of block jobs that currently
-exist in qemu.
+Hi Bharat,
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- tests/qemu-iotests/185     | 189 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/185.out |  59 ++++++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 249 insertions(+)
- create mode 100755 tests/qemu-iotests/185
- create mode 100644 tests/qemu-iotests/185.out
+On 09/06/2017 13:30, Bharat Bhushan wrote:
+> Hi Eric,
+> 
+>> -----Original Message-----
+>> From: Auger Eric [mailto:eric.auger@redhat.com]
+>> Sent: Friday, June 09, 2017 12:14 PM
+>> To: Bharat Bhushan <bharat.bhushan@nxp.com>;
+>> eric.auger.pro@gmail.com; peter.maydell@linaro.org;
+>> alex.williamson@redhat.com; mst@redhat.com; qemu-arm@nongnu.org;
+>> qemu-devel@nongnu.org; jean-philippe.brucker@arm.com
+>> Cc: will.deacon@arm.com; robin.murphy@arm.com; kevin.tian@intel.com;
+>> marc.zyngier@arm.com; christoffer.dall@linaro.org; drjones@redhat.com;
+>> wei@redhat.com; tn@semihalf.com
+>> Subject: Re: [RFC v2 0/8] VIRTIO-IOMMU device
+>>
+>> Hi Bharat,
+>>
+>> On 09/06/2017 08:16, Bharat Bhushan wrote:
+>>> Hi Eric,
+>>>
+>>>> -----Original Message-----
+>>>> From: Eric Auger [mailto:eric.auger@redhat.com]
+>>>> Sent: Wednesday, June 07, 2017 9:31 PM
+>>>> To: eric.auger.pro@gmail.com; eric.auger@redhat.com;
+>>>> peter.maydell@linaro.org; alex.williamson@redhat.com;
+>> mst@redhat.com;
+>>>> qemu-arm@nongnu.org; qemu-devel@nongnu.org; jean-
+>>>> philippe.brucker@arm.com
+>>>> Cc: will.deacon@arm.com; robin.murphy@arm.com;
+>> kevin.tian@intel.com;
+>>>> marc.zyngier@arm.com; christoffer.dall@linaro.org;
+>>>> drjones@redhat.com; wei@redhat.com; tn@semihalf.com; Bharat
+>> Bhushan
+>>>> <bharat.bhushan@nxp.com>
+>>>> Subject: [RFC v2 0/8] VIRTIO-IOMMU device
+>>>>
+>>>> This series implements the virtio-iommu device. This is a proof of
+>>>> concept based on the virtio-iommu specification written by Jean-Philippe
+>> Brucker [1].
+>>>> This was tested with a guest using the virtio-iommu driver [2] and
+>>>> exposed with a virtio-net-pci using dma ops.
+>>>>
+>>>> The device gets instantiated using the "-device virtio-iommu-device"
+>>>> option. It currently works with ARM virt machine only as the machine
+>>>> must handle the dt binding between the virtio-mmio "iommu" node and
+>>>> the PCI host bridge node. ACPI booting is not yet supported.
+>>>>
+>>>> This should allow to start some benchmarking activities against pure
+>>>> emulated IOMMU (especially ARM SMMU).
+>>>
+>>> I am testing this on ARM64 and see below continuous error prints:
+>>>
+>>> 	virtio_iommu_translate sid=8 is not known!!
+>>> 	virtio_iommu_translate sid=8 is not known!!
+>>> 	virtio_iommu_translate sid=8 is not known!!
+>>> 	virtio_iommu_translate sid=8 is not known!!
+>>> 	virtio_iommu_translate sid=8 is not known!!
+>>> 	virtio_iommu_translate sid=8 is not known!!
+>>> 	virtio_iommu_translate sid=8 is not known!!
+>>> 	virtio_iommu_translate sid=8 is not known!!
+>>> 	virtio_iommu_translate sid=8 is not known!!
+>>> 	virtio_iommu_translate sid=8 is not known!!
+>>>
+>>>
+>>> Also in guest I do not see device-tree node with virtio-iommu.
+>> do you mean the virtio-mmio with #iommu-cells property?
+>>
+>> This one is created statically by virt machine. I would be surprised if it were
+>> not there. Are you using the virt = virt2.10 machine. Machines before do not
+>> support its instantiation.
+>>
+>> Please can you add a printf in hw/arm/virt.c create_virtio_mmio() at the
+>> moment when this node is created. Also you can add a printf in
+>> bind_virtio_iommu_device() to make sure the binding with the PCI host
+>> bridge is added on machine init done.
+>>
+>> Also worth to check, CONFIG_VIRTIO_IOMMU=y on guest side.
+> 
+> It works on my side.
+Great.
 
-diff --git a/tests/qemu-iotests/185 b/tests/qemu-iotests/185
-new file mode 100755
-index 0000000..645ec9a
---- /dev/null
-+++ b/tests/qemu-iotests/185
-@@ -0,0 +1,189 @@
-+#!/bin/bash
-+#
-+# Test exiting qemu while jobs are still running
-+#
-+# Copyright (C) 2017 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=kwolf@redhat.com
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+status=1 # failure is the default!
-+
-+MIG_SOCKET="${TEST_DIR}/migrate"
-+
-+_cleanup()
-+{
-+    rm -f "${TEST_IMG}.mid"
-+    rm -f "${TEST_IMG}.copy"
-+    _cleanup_test_img
-+    _cleanup_qemu
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+. ./common.qemu
-+
-+_supported_fmt qcow2 raw
-+_supported_proto file
-+_supported_os Linux
-+
-+size=64M
-+TEST_IMG="${TEST_IMG}.base" _make_test_img $size
-+
-+echo
-+echo === Starting VM ===
-+echo
-+
-+qemu_comm_method="qmp"
-+
-+_launch_qemu \
-+    -drive file="${TEST_IMG}.base",cache=$CACHEMODE,driver=$IMGFMT,id=disk
-+h=$QEMU_HANDLE
-+_send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" 'return'
-+
-+echo
-+echo === Creating backing chain ===
-+echo
-+
-+_send_qemu_cmd $h \
-+    "{ 'execute': 'blockdev-snapshot-sync',
-+       'arguments': { 'device': 'disk',
-+                      'snapshot-file': '$TEST_IMG.mid',
-+                      'format': '$IMGFMT',
-+                      'mode': 'absolute-paths' } }" \
-+    "return"
-+
-+_send_qemu_cmd $h \
-+    "{ 'execute': 'human-monitor-command',
-+       'arguments': { 'command-line':
-+                      'qemu-io disk \"write 0 4M\"' } }" \
-+    "return"
-+
-+_send_qemu_cmd $h \
-+    "{ 'execute': 'blockdev-snapshot-sync',
-+       'arguments': { 'device': 'disk',
-+                      'snapshot-file': '$TEST_IMG',
-+                      'format': '$IMGFMT',
-+                      'mode': 'absolute-paths' } }" \
-+    "return"
-+
-+echo
-+echo === Start commit job and exit qemu ===
-+echo
-+
-+_send_qemu_cmd $h \
-+    "{ 'execute': 'block-commit',
-+       'arguments': { 'device': 'disk',
-+                      'base':'$TEST_IMG.base',
-+                      'top': '$TEST_IMG.mid',
-+                      'speed': 65536 } }" \
-+    "return"
-+
-+_send_qemu_cmd $h "{ 'execute': 'quit' }" "return"
-+wait=1 _cleanup_qemu
-+
-+echo
-+echo === Start active commit job and exit qemu ===
-+echo
-+
-+_launch_qemu \
-+    -drive file="${TEST_IMG}",cache=$CACHEMODE,driver=$IMGFMT,id=disk
-+h=$QEMU_HANDLE
-+_send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" 'return'
-+
-+_send_qemu_cmd $h \
-+    "{ 'execute': 'block-commit',
-+       'arguments': { 'device': 'disk',
-+                      'base':'$TEST_IMG.base',
-+                      'speed': 65536 } }" \
-+    "return"
-+
-+_send_qemu_cmd $h "{ 'execute': 'quit' }" "return"
-+wait=1 _cleanup_qemu
-+
-+echo
-+echo === Start mirror job and exit qemu ===
-+echo
-+
-+_launch_qemu \
-+    -drive file="${TEST_IMG}",cache=$CACHEMODE,driver=$IMGFMT,id=disk
-+h=$QEMU_HANDLE
-+_send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" 'return'
-+
-+_send_qemu_cmd $h \
-+    "{ 'execute': 'drive-mirror',
-+       'arguments': { 'device': 'disk',
-+                      'target': '$TEST_IMG.copy',
-+                      'format': '$IMGFMT',
-+                      'sync': 'full',
-+                      'speed': 65536 } }" \
-+    "return"
-+
-+_send_qemu_cmd $h "{ 'execute': 'quit' }" "return"
-+wait=1 _cleanup_qemu
-+
-+echo
-+echo === Start backup job and exit qemu ===
-+echo
-+
-+_launch_qemu \
-+    -drive file="${TEST_IMG}",cache=$CACHEMODE,driver=$IMGFMT,id=disk
-+h=$QEMU_HANDLE
-+_send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" 'return'
-+
-+_send_qemu_cmd $h \
-+    "{ 'execute': 'drive-backup',
-+       'arguments': { 'device': 'disk',
-+                      'target': '$TEST_IMG.copy',
-+                      'format': '$IMGFMT',
-+                      'sync': 'full',
-+                      'speed': 65536 } }" \
-+    "return"
-+
-+_send_qemu_cmd $h "{ 'execute': 'quit' }" "return"
-+wait=1 _cleanup_qemu
-+
-+echo
-+echo === Start streaming job and exit qemu ===
-+echo
-+
-+_launch_qemu \
-+    -drive file="${TEST_IMG}",cache=$CACHEMODE,driver=$IMGFMT,id=disk
-+h=$QEMU_HANDLE
-+_send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" 'return'
-+
-+_send_qemu_cmd $h \
-+    "{ 'execute': 'block-stream',
-+       'arguments': { 'device': 'disk',
-+                      'speed': 65536 } }" \
-+    "return"
-+
-+_send_qemu_cmd $h "{ 'execute': 'quit' }" "return"
-+wait=1 _cleanup_qemu
-+
-+_check_test_img
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/185.out b/tests/qemu-iotests/185.out
-new file mode 100644
-index 0000000..45bc7cb
---- /dev/null
-+++ b/tests/qemu-iotests/185.out
-@@ -0,0 +1,59 @@
-+QA output created by 185
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=67108864
-+
-+=== Starting VM ===
-+
-+{"return": {}}
-+
-+=== Creating backing chain ===
-+
-+Formatting 'TEST_DIR/t.qcow2.mid', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.qcow2.base backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+{"return": {}}
-+wrote 4194304/4194304 bytes at offset 0
-+4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+{"return": ""}
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.qcow2.mid backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+{"return": {}}
-+
-+=== Start commit job and exit qemu ===
-+
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 67108864, "offset": 524288, "speed": 65536, "type": "commit"}}
-+
-+=== Start active commit job and exit qemu ===
-+
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "commit"}}
-+
-+=== Start mirror job and exit qemu ===
-+
-+{"return": {}}
-+Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "mirror"}}
-+
-+=== Start backup job and exit qemu ===
-+
-+{"return": {}}
-+Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 67108864, "offset": 65536, "speed": 65536, "type": "backup"}}
-+
-+=== Start streaming job and exit qemu ===
-+
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 67108864, "offset": 524288, "speed": 65536, "type": "stream"}}
-+No errors were found on the image.
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index a6acaff..318ae74 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -175,3 +175,4 @@
- 181 rw auto migration
- 182 rw auto quick
- 183 rw auto migration
-+185 rw auto
--- 
-1.8.3.1
+ The driver config was disabled and also I was using guest kernel which
+was not have deferred-probing.
+Yes I did not mention in my cover letter the guest I have been using is
+based on Jean-Philippe's branch, featuring deferred IOMMU probing. I I
+have not tried yet with an upstream guest.
+ Now after fixing it works on my side
+> I placed some prints to see dma-map are mapping regions in virtio-iommu, it uses emulated iommu.
+> 
+> I will continue to add VFIO support now on this and more testing !!
+
+OK. I will do the VFIO integration first on the vsmmuv3 device as I
+already prepared the VFIO replay and hopefully we will sync ;-)
+
+Thanks
+
+Eric
+> 
+> Thanks
+> -Bharat
+> 
+>>
+>> Thanks
+>>
+>> Eric
+>>
+>>> I am using qemu-tree you mentioned below and iommu-driver patches
+>> published by Jean-P.
+>>> Qemu command line have additional ""-device virtio-iommu-device". What
+>> I am missing ?
+>>
+>>
+>>>
+>>> Thanks
+>>> -Bharat
+>>>
+>>>>
+>>>> Best Regards
+>>>>
+>>>> Eric
+>>>>
+>>>> This series can be found at:
+>>>> https://github.com/eauger/qemu/tree/virtio-iommu-rfcv2
+>>>>
+>>>> References:
+>>>> [1] [RFC 0/3] virtio-iommu: a paravirtualized IOMMU, [2] [RFC PATCH
+>>>> linux]
+>>>> iommu: Add virtio-iommu driver [3] [RFC PATCH kvmtool 00/15] Add
+>>>> virtio- iommu
+>>>>
+>>>> History:
+>>>> v1 -> v2:
+>>>> - fix redifinition of viommu_as typedef
+>>>>
+>>>> Eric Auger (8):
+>>>>   update-linux-headers: import virtio_iommu.h
+>>>>   linux-headers: Update for virtio-iommu
+>>>>   virtio_iommu: add skeleton
+>>>>   virtio-iommu: Decode the command payload
+>>>>   virtio_iommu: Add the iommu regions
+>>>>   virtio-iommu: Implement the translation and commands
+>>>>   hw/arm/virt: Add 2.10 machine type
+>>>>   hw/arm/virt: Add virtio-iommu the virt board
+>>>>
+>>>>  hw/arm/virt.c                                 | 116 ++++-
+>>>>  hw/virtio/Makefile.objs                       |   1 +
+>>>>  hw/virtio/trace-events                        |  14 +
+>>>>  hw/virtio/virtio-iommu.c                      | 623
+>> ++++++++++++++++++++++++++
+>>>>  include/hw/arm/virt.h                         |   5 +
+>>>>  include/hw/virtio/virtio-iommu.h              |  60 +++
+>>>>  include/standard-headers/linux/virtio_ids.h   |   1 +
+>>>>  include/standard-headers/linux/virtio_iommu.h | 142 ++++++
+>>>>  linux-headers/linux/virtio_iommu.h            |   1 +
+>>>>  scripts/update-linux-headers.sh               |   3 +
+>>>>  10 files changed, 957 insertions(+), 9 deletions(-)  create mode
+>>>> 100644 hw/virtio/virtio-iommu.c  create mode 100644
+>>>> include/hw/virtio/virtio- iommu.h  create mode 100644
+>>>> include/standard- headers/linux/virtio_iommu.h  create mode 100644
+>>>> linux-headers/linux/virtio_iommu.h
+>>>>
+>>>> --
+>>>> 2.5.5
+>>>
+> 
