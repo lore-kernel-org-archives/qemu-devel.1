@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dJCRx-0003w0-5Q
+	(envelope-from <dgibson@ozlabs.org>) id 1dJCRw-0003vW-I9
 	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:27:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dJCRv-0006da-Lk
-	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:27:09 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dJCRs-0006bu-L8
+	for qemu-devel@nongnu.org; Fri, 09 Jun 2017 01:27:08 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  9 Jun 2017 15:26:36 +1000
-Message-Id: <20170609052652.23200-5-david@gibson.dropbear.id.au>
-In-Reply-To: <20170609052652.23200-1-david@gibson.dropbear.id.au>
-References: <20170609052652.23200-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 04/20] pseries: Correct panic behaviour for
- pseries machine type
+Date: Fri,  9 Jun 2017 15:26:32 +1000
+Message-Id: <20170609052652.23200-1-david@gibson.dropbear.id.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/20] ppc-for-2.10 queue 20170609
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +23,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, sursingh@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-The pseries machine type doesn't usually use the 'pvpanic' device as such,
-because it has a firmware/hypervisor facility with roughly the same
-purpose.  The 'ibm,os-term' RTAS call notifies the hypervisor that the
-guest has crashed.
+The following changes since commit 64175afc695c0672876fbbfc31b299c86d562c=
+b4:
 
-Our implementation of this call was sending a GUEST_PANICKED qmp event;
-however, it was not doing the other usual panic actions, making its
-behaviour different from pvpanic for no good reason.
+  arm_gicv3: Fix ICC_BPR1 reset value when EL3 not implemented (2017-06-0=
+7 17:21:44 +0100)
 
-To correct this, we should call qemu_system_guest_panicked() rather than
-directly sending the panic event.
+are available in the git repository at:
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
- hw/ppc/spapr_rtas.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+  git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170609
 
-diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-index 707c4d4..94a2799 100644
---- a/hw/ppc/spapr_rtas.c
-+++ b/hw/ppc/spapr_rtas.c
-@@ -293,12 +293,9 @@ static void rtas_ibm_os_term(PowerPCCPU *cpu,
-                             target_ulong args,
-                             uint32_t nret, target_ulong rets)
- {
--    target_ulong ret = 0;
-+    qemu_system_guest_panicked(NULL);
- 
--    qapi_event_send_guest_panicked(GUEST_PANIC_ACTION_PAUSE, false, NULL,
--                                   &error_abort);
--
--    rtas_st(rets, 0, ret);
-+    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
- }
- 
- static void rtas_set_power_level(PowerPCCPU *cpu, sPAPRMachineState *spapr,
--- 
-2.9.4
+for you to fetch changes up to 593080936a06a04eacc589350e3a7ebc02f2ed8e:
+
+  Revert "spapr: fix memory hot-unplugging" (2017-06-09 12:35:46 +1000)
+
+----------------------------------------------------------------
+ppc patch queue 2017-06-09
+
+This batch contains more patches to rework the pseries machine hotplug
+infrastructure, plus an assorted batch of bugfixes.
+
+It contains a start on fixes to restore migration from older machine
+types on older versions which was broken by some xics changes.  There
+are still a few missing pieces here, though.
+
+----------------------------------------------------------------
+David Gibson (8):
+      pseries: Correct panic behaviour for pseries machine type
+      spapr: Clean up DR entity sense handling
+      spapr: Don't misuse DR-indicator in spapr_recover_pending_dimm_stat=
+e()
+      spapr: Clean up RTAS set-indicator
+      spapr: Clean up handling of DR-indicator
+      spapr: Change DRC attach & detach methods to functions
+      spapr: Fold spapr_phb_{add,remove}_pci_device() into their only cal=
+lers
+      spapr: Rework DRC name handling
+
+Greg Kurz (9):
+      target/ppc: pass const string to kvmppc_is_mem_backend_page_size_ok=
+()
+      target/ppc: fix memory leak in kvmppc_is_mem_backend_page_size_ok()
+      spapr: fix memory leak in spapr_memory_pre_plug()
+      pnv_core: drop reference on ICPState object during CPU realization
+      xics: add reset() handler to ICPStateClass
+      xics: introduce macros for ICP/ICS link properties
+      xics: pass appropriate types to realize() handlers.
+      xics: setup cpu at realize time
+      xics: drop ICPStateClass::cpu_setup() handler
+
+Laurent Vivier (1):
+      Revert "spapr: fix memory hot-unplugging"
+
+Thomas Huth (2):
+      hw/ppc/spapr: Adjust firmware name for PCI bridges
+      hw/cpu: core.c can be compiled as common object
+
+ hw/cpu/Makefile.objs       |   3 +-
+ hw/intc/xics.c             |  95 +++++++--------
+ hw/intc/xics_kvm.c         |  45 ++-----
+ hw/intc/xics_pnv.c         |   6 +-
+ hw/ppc/pnv_core.c          |  16 +--
+ hw/ppc/pnv_psi.c           |   3 +-
+ hw/ppc/spapr.c             |  44 +++----
+ hw/ppc/spapr_cpu_core.c    |  22 ++--
+ hw/ppc/spapr_drc.c         | 289 +++++++++++++++++++--------------------=
+------
+ hw/ppc/spapr_pci.c         |  72 ++++-------
+ hw/ppc/spapr_rtas.c        |   7 +-
+ hw/ppc/trace-events        |   5 +-
+ include/hw/ppc/spapr_drc.h |  31 +++--
+ include/hw/ppc/xics.h      |  17 +--
+ target/ppc/kvm.c           |   5 +-
+ target/ppc/kvm_ppc.h       |   4 +-
+ 16 files changed, 278 insertions(+), 386 deletions(-)
