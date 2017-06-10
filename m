@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50483)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1dJgcW-0002K8-Ax
-	for qemu-devel@nongnu.org; Sat, 10 Jun 2017 09:40:05 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53763)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <5019096@qq.com>) id 1dJgr9-0005tt-2k
+	for qemu-devel@nongnu.org; Sat, 10 Jun 2017 09:55:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1dJgcV-00060D-JR
-	for qemu-devel@nongnu.org; Sat, 10 Jun 2017 09:40:04 -0400
-References: <20170531120049.14111-1-n54@gmx.com>
-	<26b48c35-b6cc-708d-c4d2-b26a9382e10a@msgid.tls.msk.ru>
-	<df623a80-4017-2e79-6bf3-7c402f24b275@gmx.com>
-	<877f0p38tr.fsf@dusky.pond.sub.org>
-	<b60c5d7b-6ae7-4aa0-6263-b96c964b9195@msgid.tls.msk.ru>
-	<55dd32a9-7f01-93e3-e22e-3826dcef1d9d@gmx.com>
-	<CAFEAcA_2X6QRBS_mbL15Rkq51HxTAX-vb9TJQxKMnwuRsixkiw@mail.gmail.com>
-	<6620e2b9-6cc7-48fc-6ecf-4065718d765d@gmx.com>
-From: Kamil Rytarowski <n54@gmx.com>
-Message-ID: <cdc49669-c996-b84d-8110-b7b62ada8ad0@gmx.com>
-Date: Sat, 10 Jun 2017 15:41:34 +0200
-MIME-Version: 1.0
-In-Reply-To: <6620e2b9-6cc7-48fc-6ecf-4065718d765d@gmx.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="oLiUDL6v0AEC3OiunHAH0pa2GEu9oxJtE"
-Subject: Re: [Qemu-devel] [PATCH v3] ivshmem-server: ivshmem-client: Build
- when eventfd() is available
+	(envelope-from <5019096@qq.com>) id 1dJgr5-0003c4-Vg
+	for qemu-devel@nongnu.org; Sat, 10 Jun 2017 09:55:11 -0400
+Received: from smtpbg64.qq.com ([103.7.28.238]:23412)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <5019096@qq.com>) id 1dJgr4-0003aC-VU
+	for qemu-devel@nongnu.org; Sat, 10 Jun 2017 09:55:07 -0400
+From: "=?gb18030?B?xNA2wfrLq0E=?=" <5019096@qq.com>
+Mime-Version: 1.0
+Date: Sat, 10 Jun 2017 21:54:57 +0800
+Message-ID: <tencent_7AD3D98771C01E340454EDB8@qq.com>
+Content-Type: text/plain;
+	charset="gb18030"
+Content-Transfer-Encoding: base64
+Subject: [Qemu-devel] why guest memory size not equal to my setting?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,91 +25,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Michael Tokarev <mjt@tls.msk.ru>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
+To: =?gb18030?B?cWVtdS1kZXZlbA==?= <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---oLiUDL6v0AEC3OiunHAH0pa2GEu9oxJtE
-From: Kamil Rytarowski <n54@gmx.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- QEMU Trivial <qemu-trivial@nongnu.org>, Michael Tokarev <mjt@tls.msk.ru>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Message-ID: <cdc49669-c996-b84d-8110-b7b62ada8ad0@gmx.com>
-Subject: Re: [Qemu-devel] [PATCH v3] ivshmem-server: ivshmem-client: Build
- when eventfd() is available
-References: <20170531120049.14111-1-n54@gmx.com>
- <26b48c35-b6cc-708d-c4d2-b26a9382e10a@msgid.tls.msk.ru>
- <df623a80-4017-2e79-6bf3-7c402f24b275@gmx.com>
- <877f0p38tr.fsf@dusky.pond.sub.org>
- <b60c5d7b-6ae7-4aa0-6263-b96c964b9195@msgid.tls.msk.ru>
- <55dd32a9-7f01-93e3-e22e-3826dcef1d9d@gmx.com>
- <CAFEAcA_2X6QRBS_mbL15Rkq51HxTAX-vb9TJQxKMnwuRsixkiw@mail.gmail.com>
- <6620e2b9-6cc7-48fc-6ecf-4065718d765d@gmx.com>
-In-Reply-To: <6620e2b9-6cc7-48fc-6ecf-4065718d765d@gmx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 06.06.2017 16:56, Kamil Rytarowski wrote:
-> On 06.06.2017 16:34, Peter Maydell wrote:
->> On 6 June 2017 at 14:38, Kamil Rytarowski <n54@gmx.com> wrote:
->>> I've linked qemu with the original patch and:
->>> ./configure --disable-linux-user --disable-system --static
->>>
->>> I got some warnings, I think they are originated from our libc and ar=
-e
->>> not related to qemu:
->>>   LINK    sparc64-bsd-user/qemu-sparc64
->>> /usr/lib/libc.a(initfini.o): warning: common of `__ps_strings'
->>> overridden by definition
->>> /usr/lib/crt0.o: warning: defined here
->>> /usr/lib/libc.a(_env.o): warning: multiple common of `environ'
->>> /usr/lib/crt0.o: warning: previous common is here
->>> /usr/lib/libc.a(getprogname.o): warning: common of `__progname'
->>> overridden by definition
->>> /usr/lib/crt0.o: warning: defined here
->>
->> Yes, I think I've seen those before on NetBSD -- they look
->> like a bug in your libc to me, it shouldn't be confusing itself
->> with itself like that :-)
->>
->> thanks
->> -- PMM
->>
->=20
-> I have filed this bug upstream: http://gnats.netbsd.org/52278
->=20
->=20
-
-
-What's the status with this patch?
-
-NetBSD build still breaks due to ivshmem-*.
-
-
---oLiUDL6v0AEC3OiunHAH0pa2GEu9oxJtE
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZO/ckAAoJEEuzCOmwLnZsGk0P/06By3LePjQknNLbZDunQTo2
-/e1vAR7N03NQOWSRfhs+jZCHMGFKemByDh7S7MXXqbUPWE/+X5OMco2DFw4TJvLF
-/4fQNYNrE6tOp2V75txYL3cawONoAVXTZnKw1nGGtcbncTBQuAngJtU3x8Sowdr7
-iy0fqa21/7o4XT85Tntro6XKWc0udaOFHGnEDWvtK52aZbCP6F0sczislv8fSVLV
-0FXpOZ7hnCywU2ubnMZad9kqqjYHjBjbkDprCtINx+0Ibi/Qm3TzG5+Gh2rNF7rI
-bXuAXE6Y24DRO7iM8INx3RlLwx58QMnE2FBzdoW3xWwogRaw+ay9iWTtT8OjPjpn
-rkzftHKYZVBMlTk2gy3rUUw5smlRwaVF2d/NtJ3jCzLUA+sW8TW82q/vbxMJnQIv
-G4mjW/raZJoUkudksipyBhPDIizudXFXsQxUK1Taj9ap9Tx+LB15IpzUTaYVFEVi
-MLwbFTD0EPRL6pYwiJKnYb5t6hNBiaIZVGeZqhtfjbF2+UDR4rxGcOiDu159WclO
-7RkC0jFh06/SicCd4EIXe2p/4cHouEag37Q3ynBOhq2l/m2isFgzzqGeowU8tNbc
-qID9mH2pIdBxRx5j8duIoJk7dTGPyQkGXFvMAQtVK/1skoccaHVr6cyquTokac6C
-Uv+23nysTiLGuRzA+SoT
-=QFEs
------END PGP SIGNATURE-----
-
---oLiUDL6v0AEC3OiunHAH0pa2GEu9oxJtE--
+SGVsbG8gUWVtdS1kZXZlbCwNCg0KUmVjZW50bHkgSSdtIHRyeWluZyB0byBzdHVkeSB2bSBt
+ZW1vcnkgYWxsb2NhdGlvbiBvbiBxZW11LWt2bSBlbnZpcm9ubWVudC4NCkkgZm91bmQgc29t
+ZSBpbnRlcmVzdGluZyBoZXJlOg0KDQpJIGhhdmUgY3JlYXRlIGEgOEdCKDgzODg2MDggaykg
+bWVtb3J5IGd1ZXN0IHVzaW5nIENlbnRvcyA3LiBidXQgd2hlbiBJIHVzaW5nIGRtZXNnIHRv
+IHNob3cgdGhlIGluaXQgbWVtb3J5LA0KaXQgd2FzIDk0MzcxODQgayxhcm91bmQgOTIxNk1C
+LiBJIHdvdWxkIGxpa2UgdG8ga25vdyB0aGUgZ2FwPw0KDQpJIGtub3cgcWVtdSB3aWxsIGlu
+aXQgdHdvIG1lbW9yeSByZWdpb246DQpzeXN0ZW1fbWVtb3J5ID0gZ19tYWxsb2Moc2l6ZW9m
+KCpzeXN0ZW1fbWVtb3J5KSk7DQphbmQgc3lzdGVtX2lvID0gZ19tYWxsb2Moc2l6ZW9mKCpz
+eXN0ZW1faW8pKTsNCg0KRG9lcyB0aG9zZSBnYXAgcG9pbnQgdG8gdGhlIHJlZ2lvbiBvZiBz
+eXN0ZW1faW8gPw0KDQoNCkJlbG93IGlzIG15IGVudmlyb25tZW50LiAgDQoNCg0KW3Jvb3RA
+cWktamlvbmctbWluZy10ZXN0IH5dIyBkbWVzZyB8Z3JlcCBNZW1vcnkNClsgICAgMC4wMDAw
+MDBdIE1lbW9yeTogNzM3MjE0MGsvOTQzNzE4NGsgYXZhaWxhYmxlICg2MjQ0ayBrZXJuZWwg
+Y29kZSwgMTA0OTEwMGsgYWJzZW50LCAxMDE1OTQ0ayByZXNlcnZlZCwgNDE3OGsgZGF0YSwg
+MTYwNGsgaW5pdCkNCg0KDQp2aXJzaCAjIHFlbXUtbW9uaXRvci1jb21tYW5kIDQgLS1obXAg
+aW5mbyB2ZXJzaW9uDQoyLjEuMiAocWVtdS1rdm0tZXYtMi4xLjItMjMuZWw3LjEpDQoNCnFl
+bXUgICAgICAyMDE0OTIgICAgICAgMSAgMCBKdW4wMiA/ICAgICAgICAwMTowNjo0MiAvdXNy
+L2xpYmV4ZWMvcWVtdS1rdm0gLW5hbWUgaW5zdGFuY2UtMDAwMDYzMmYgLVMgLW1hY2hpbmUg
+cGMtaTQ0MGZ4LXJoZWw3LjEuMCxhY2NlbD1rdm0sdXNiPW9mZiAtY3B1IEhhc3dlbGwsK2Fi
+bSwrcGRwZTFnYiwrcmRyYW5kLCtmMTZjLCtvc3hzYXZlLCtkY2EsK3BkY20sK3h0cHIsK3Rt
+MiwrZXN0LCtzbXgsK3ZteCwrZHNfY3BsLCtkdGVzNjQsK3BiZSwrdG0sK2h0LCtzcywrYWNw
+aSwrZHMsK3ZtZSwtcnRtLC1obGUgLW0gODE5MiAtcmVhbHRpbWUgbWxvY2s9b2ZmIC1zbXAg
+NCxzb2NrZXRzPTQsY29yZXM9MSx0aHJlYWRzPTEgLXV1aWQgNzVlMTIzNGMtNmM1Ni00MmUx
+LWFlNDUtMTkwYTA5MGJmYzA0IC1zbWJpb3MgdHlwZT0xLG1hbnVmYWN0dXJlcj1GZWRvcmEg
+UHJvamVjdCxwcm9kdWN0PU9wZW5TdGFjayBOb3ZhLHZlcnNpb249MTIuMC41LTIuZWw3LmNl
+bnRvcy51c3RhY2ssc2VyaWFsPWQ4M2QzMjRlLTBhNmMtNDMzNi05ZDQwLWRkOGY5Nzc4M2Vk
+ZSx1dWlkPTc1ZTEyMzRjLTZjNTYtNDJlMS1hZTQ1LTE5MGEwOTBiZmMwNCxmYW1pbHk9Vmly
+dHVhbCBNYWNoaW5lIC1uby11c2VyLWNvbmZpZyAtbm9kZWZhdWx0cyAtY2hhcmRldiBzb2Nr
+ZXQsaWQ9Y2hhcm1vbml0b3IscGF0aD0vdmFyL2xpYi9saWJ2aXJ0L3FlbXUvZG9tYWluLWlu
+c3RhbmNlLTAwMDA2MzJmL21vbml0b3Iuc29jayxzZXJ2ZXIsbm93YWl0IC1tb24gY2hhcmRl
+dj1jaGFybW9uaXRvcixpZD1tb25pdG9yLG1vZGU9Y29udHJvbCAtcnRjIGJhc2U9dXRjLGRy
+aWZ0Zml4PXNsZXcgLWdsb2JhbCBrdm0tcGl0Lmxvc3RfdGlja19wb2xpY3k9ZGlzY2FyZCAt
+bm8taHBldCAtbm8tc2h1dGRvd24gLWJvb3Qgc3RyaWN0PW9uIC1kZXZpY2UgcGlpeDMtdXNi
+LXVoY2ksaWQ9dXNiLGJ1cz1wY2kuMCxhZGRyPTB4MS4weDIgLWRldmljZSB2aXJ0aW8tc2Vy
+aWFsLXBjaSxpZD12aXJ0aW8tc2VyaWFsMCxidXM9cGNpLjAsYWRkcj0weDQgLWRyaXZlIGZp
+bGU9cmJkOnBvb2wtYzI2MWRjMTcwOTQ4NGUwMWI1MzMxNTY1MDZhYWIwOTEvNzVlMTIzNGMt
+NmM1Ni00MmUxLWFlNDUtMTkwYTA5MGJmYzA0X2Rpc2suY29uZmlnOmF1dGhfc3VwcG9ydGVk
+PW5vbmU6bW9uX2hvc3Q9NTUuMy41My4xOVw6Njc4OVw7NTUuMy41My41OVw6Njc4OVw7NTUu
+My41My45OVw6Njc4OSxpZj1ub25lLGlkPWRyaXZlLWlkZTAtMS0xLHJlYWRvbmx5PW9uLGZv
+cm1hdD1yYXcsY2FjaGU9d3JpdGViYWNrIC1kZXZpY2UgaWRlLWNkLGJ1cz1pZGUuMSx1bml0
+PTEsZHJpdmU9ZHJpdmUtaWRlMC0xLTEsaWQ9aWRlMC0xLTEgLWRyaXZlIGZpbGU9cmJkOnBv
+b2wtYzI2MWRjMTcwOTQ4NGUwMWI1MzMxNTY1MDZhYWIwOTEvdm9sdW1lLWUyOTI0YzY2LTk4
+MTUtNDZkNS05YTAxLWFmMzU1YTMzMzk3NTphdXRoX3N1cHBvcnRlZD1ub25lOm1vbl9ob3N0
+PTU1LjMuNTMuMTlcOjY3ODlcOzU1LjMuNTMuNTlcOjY3ODlcOzU1LjMuNTMuOTlcOjY3ODks
+aWY9bm9uZSxpZD1kcml2ZS12aXJ0aW8tZGlzazAsZm9ybWF0PXJhdyxzZXJpYWw9ZTI5MjRj
+NjYtOTgxNS00NmQ1LTlhMDEtYWYzNTVhMzMzOTc1LGNhY2hlPXdyaXRlYmFjayAtZGV2aWNl
+IHZpcnRpby1ibGstcGNpLHNjc2k9b2ZmLGJ1cz1wY2kuMCxhZGRyPTB4NSxkcml2ZT1kcml2
+ZS12aXJ0aW8tZGlzazAsaWQ9dmlydGlvLWRpc2swLGJvb3RpbmRleD0xIC1kcml2ZSBmaWxl
+PXJiZDpwb29sLWMyNjFkYzE3MDk0ODRlMDFiNTMzMTU2NTA2YWFiMDkxL3ZvbHVtZS1lN2U5
+NjEzNi1hZDU3LTQ0YTAtOTI1ZS0wYzU5ZjZiZDg3OGE6YXV0aF9zdXBwb3J0ZWQ9bm9uZTpt
+b25faG9zdD01NS4zLjUzLjE5XDo2Nzg5XDs1NS4zLjUzLjU5XDo2Nzg5XDs1NS4zLjUzLjk5
+XDo2Nzg5LGlmPW5vbmUsaWQ9ZHJpdmUtdmlydGlvLWRpc2sxLGZvcm1hdD1yYXcsc2VyaWFs
+PWU3ZTk2MTM2LWFkNTctNDRhMC05MjVlLTBjNTlmNmJkODc4YSxjYWNoZT13cml0ZWJhY2sg
+LWRldmljZSB2aXJ0aW8tYmxrLXBjaSxzY3NpPW9mZixidXM9cGNpLjAsYWRkcj0weDYsZHJp
+dmU9ZHJpdmUtdmlydGlvLWRpc2sxLGlkPXZpcnRpby1kaXNrMSAtZHJpdmUgZmlsZT1yYmQ6
+cG9vbC1jMjYxZGMxNzA5NDg0ZTAxYjUzMzE1NjUwNmFhYjA5MS92b2x1bWUtOGNkZjI4ZDQt
+YzRmNy00YjljLTlkZmMtOGZjNTVkMWI4NjkyOmF1dGhfc3VwcG9ydGVkPW5vbmU6bW9uX2hv
+c3Q9NTUuMy41My4xOVw6Njc4OVw7NTUuMy41My41OVw6Njc4OVw7NTUuMy41My45OVw6Njc4
+OSxpZj1ub25lLGlkPWRyaXZlLXZpcnRpby1kaXNrMixmb3JtYXQ9cmF3LHNlcmlhbD04Y2Rm
+MjhkNC1jNGY3LTRiOWMtOWRmYy04ZmM1NWQxYjg2OTIsY2FjaGU9d3JpdGViYWNrIC1kZXZp
+Y2UgdmlydGlvLWJsay1wY2ksc2NzaT1vZmYsYnVzPXBjaS4wLGFkZHI9MHg3LGRyaXZlPWRy
+aXZlLXZpcnRpby1kaXNrMixpZD12aXJ0aW8tZGlzazIgLW5ldGRldiB0YXAsZmQ9MjUsaWQ9
+aG9zdG5ldDAsdmhvc3Q9b24sdmhvc3RmZD0yNiAtZGV2aWNlIHZpcnRpby1uZXQtcGNpLG5l
+dGRldj1ob3N0bmV0MCxpZD1uZXQwLG1hYz1mYToxNjozZTphNzozZDpkZSxidXM9cGNpLjAs
+YWRkcj0weDMgLWNoYXJkZXYgZmlsZSxpZD1jaGFyc2VyaWFsMCxwYXRoPS92YXIvbGliL25v
+dmEvaW5zdGFuY2VzLzc1ZTEyMzRjLTZjNTYtNDJlMS1hZTQ1LTE5MGEwOTBiZmMwNC9jb25z
+b2xlLmxvZyAtZGV2aWNlIGlzYS1zZXJpYWwsY2hhcmRldj1jaGFyc2VyaWFsMCxpZD1zZXJp
+YWwwIC1jaGFyZGV2IHB0eSxpZD1jaGFyc2VyaWFsMSAtZGV2aWNlIGlzYS1zZXJpYWwsY2hh
+cmRldj1jaGFyc2VyaWFsMSxpZD1zZXJpYWwxIC1jaGFyZGV2IHNvY2tldCxpZD1jaGFyY2hh
+bm5lbDAscGF0aD0vdmFyL2xpYi9saWJ2aXJ0L3FlbXUvb3JnLnFlbXUuZ3Vlc3RfYWdlbnQu
+MC5pbnN0YW5jZS0wMDAwNjMyZi5zb2NrLHNlcnZlcixub3dhaXQgLWRldmljZSB2aXJ0c2Vy
+aWFscG9ydCxidXM9dmlydGlvLXNlcmlhbDAuMCxucj0xLGNoYXJkZXY9Y2hhcmNoYW5uZWww
+LGlkPWNoYW5uZWwwLG5hbWU9b3JnLnFlbXUuZ3Vlc3RfYWdlbnQuMCAtZGV2aWNlIHVzYi10
+YWJsZXQsaWQ9aW5wdXQwIC12bmMgMC4wLjAuMDowIC1rIGVuLXVzIC1kZXZpY2UgY2lycnVz
+LXZnYSxpZD12aWRlbzAsYnVzPXBjaS4wLGFkZHI9MHgyIC1kZXZpY2UgdmlydGlvLWJhbGxv
+b24tcGNpLGlkPWJhbGxvb24wLGJ1cz1wY2kuMCxhZGRyPTB4OCAtbXNnIHRpbWVzdGFtcD1v
+bg0KDQoNCnZpcnNoICMgZG9taW5mbyBpbnN0YW5jZS0wMDAwNjMyZg0KSWQ6ICAgICAgICAg
+ICAgIDQNCk5hbWU6ICAgICAgICAgICBpbnN0YW5jZS0wMDAwNjMyZg0KVVVJRDogICAgICAg
+ICAgIDc1ZTEyMzRjLTZjNTYtNDJlMS1hZTQ1LTE5MGEwOTBiZmMwNA0KT1MgVHlwZTogICAg
+ICAgIGh2bQ0KU3RhdGU6ICAgICAgICAgIHJ1bm5pbmcNCkNQVShzKTogICAgICAgICA0DQpD
+UFUgdGltZTogICAgICAgNDAwMy4wcw0KTWF4IG1lbW9yeTogICAgIDgzODg2MDggS2lCDQpV
+c2VkIG1lbW9yeTogICAgODM4ODYwOCBLaUINClBlcnNpc3RlbnQ6ICAgICB5ZXMNCkF1dG9z
+dGFydDogICAgICBkaXNhYmxlDQpNYW5hZ2VkIHNhdmU6ICAgbm8NClNlY3VyaXR5IG1vZGVs
+OiBub25lDQpTZWN1cml0eSBET0k6ICAgMA0KDQoNClRoYW5rcyBpbiBhZHZhbmNlLg==
