@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dJfXY-0006in-37
-	for qemu-devel@nongnu.org; Sat, 10 Jun 2017 08:30:52 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dJg0K-0008JK-Lp
+	for qemu-devel@nongnu.org; Sat, 10 Jun 2017 09:00:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dJfXX-0001eS-5Y
-	for qemu-devel@nongnu.org; Sat, 10 Jun 2017 08:30:52 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:33312
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dJg0H-0002cs-UP
+	for qemu-devel@nongnu.org; Sat, 10 Jun 2017 09:00:36 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:33405
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1dJfXW-0001cu-UT
-	for qemu-devel@nongnu.org; Sat, 10 Jun 2017 08:30:51 -0400
+	id 1dJg0H-0002cc-Mo
+	for qemu-devel@nongnu.org; Sat, 10 Jun 2017 09:00:33 -0400
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sat, 10 Jun 2017 13:30:19 +0100
-Message-Id: <1497097821-32754-5-git-send-email-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <1497097821-32754-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-References: <1497097821-32754-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 4/6] fw_cfg: move fw_cfg_init1() into the
- fw_cfg_*_realize() functions
+Date: Sat, 10 Jun 2017 14:00:15 +0100
+Message-Id: <1497099616-2615-3-git-send-email-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <1497099616-2615-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+References: <1497099616-2615-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH 2/3] sun4u: expose fw_cfg on ebus PCI IO
+ address space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,61 +26,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, rjones@redhat.com, pbonzini@redhat.com, somlo@cmu.edu, lersek@redhat.com, mst@redhat.com, ehabkost@redhat.com
+To: qemu-devel@nongnu.org, atar4qemu@gmail.com
 
-And rename to fw_cfg_common_realize() which better describes its role.
+To allow future changes to the sun4u PCI topology.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/nvram/fw_cfg.c |    8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ hw/sparc64/sun4u.c |   10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index f7b78a9..87b4392 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -910,7 +910,7 @@ static void fw_cfg_machine_ready(struct Notifier *n, void *data)
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index 98ee6f5..19e64be 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -224,13 +224,11 @@ static void isa_irq_handler(void *opaque, int n, int level)
  
- 
- 
--static void fw_cfg_init1(DeviceState *dev)
-+static void fw_cfg_common_realize(DeviceState *dev)
+ /* EBUS (Eight bit bus) bridge */
+ static ISABus *
+-pci_ebus_init(PCIBus *bus, int devfn, qemu_irq *irqs)
++pci_ebus_init(PCIDevice *pci_dev, qemu_irq *irqs)
  {
-     FWCfgState *s = FW_CFG(dev);
-     MachineState *machine = MACHINE(qdev_get_machine());
-@@ -951,7 +951,6 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
-         qdev_prop_set_bit(dev, "dma_enabled", false);
-     }
+     qemu_irq *isa_irq;
+-    PCIDevice *pci_dev;
+     ISABus *isa_bus;
  
--    fw_cfg_init1(dev);
+-    pci_dev = pci_create_simple(bus, devfn, "ebus");
+     isa_bus = ISA_BUS(qdev_get_child_bus(DEVICE(pci_dev), "isa.0"));
+     isa_irq = qemu_allocate_irqs(isa_irq_handler, irqs, 16);
+     isa_bus_irqs(isa_bus, isa_irq);
+@@ -429,6 +427,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+     unsigned int i;
+     uint64_t initrd_addr, initrd_size, kernel_addr, kernel_size, kernel_entry;
+     PCIBus *pci_bus, *pci_bus2, *pci_bus3;
++    PCIDevice *ebus;
+     ISABus *isa_bus;
+     SysBusDevice *s;
+     qemu_irq *ivec_irqs, *pbm_irqs;
+@@ -452,7 +451,8 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+     pci_vga_init(pci_bus);
+ 
+     // XXX Should be pci_bus3
+-    isa_bus = pci_ebus_init(pci_bus, -1, pbm_irqs);
++    ebus = pci_create_simple(pci_bus, -1, "ebus");
++    isa_bus = pci_ebus_init(ebus, pbm_irqs);
+ 
+     i = 0;
+     if (hwdef->console_serial_base) {
+@@ -517,7 +517,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+     qdev_prop_set_bit(dev, "dma_enabled", false);
      qdev_init_nofail(dev);
+     s = SYS_BUS_DEVICE(dev);
+-    memory_region_add_subregion(get_system_io(), BIOS_CFG_IOPORT,
++    memory_region_add_subregion(pci_address_space_io(ebus), BIOS_CFG_IOPORT,
+                                 sysbus_mmio_get_region(s, 0));
  
-     s = FW_CFG(dev);
-@@ -985,7 +984,6 @@ FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
-         qdev_prop_set_bit(dev, "dma_enabled", false);
-     }
- 
--    fw_cfg_init1(dev);
-     qdev_init_nofail(dev);
- 
-     sbd = SYS_BUS_DEVICE(dev);
-@@ -1085,6 +1083,8 @@ static void fw_cfg_io_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
-+    fw_cfg_common_realize(dev);
-+
-     /* when using port i/o, the 8-bit data register ALWAYS overlaps
-      * with half of the 16-bit control register. Hence, the total size
-      * of the i/o region used is FW_CFG_CTL_SIZE */
-@@ -1138,6 +1138,8 @@ static void fw_cfg_mem_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
-+    fw_cfg_common_realize(dev);
-+
-     memory_region_init_io(&s->ctl_iomem, OBJECT(s), &fw_cfg_ctl_mem_ops,
-                           FW_CFG(s), "fwcfg.ctl", FW_CFG_CTL_SIZE);
-     sysbus_init_mmio(sbd, &s->ctl_iomem);
+     fw_cfg = FW_CFG(dev);
 -- 
 1.7.10.4
