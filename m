@@ -1,29 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dK4Ts-0003lT-CV
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 11:08:45 -0400
+	(envelope-from <tsn@cs.nctu.edu.tw>) id 1dK8Eb-00057e-BM
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 15:09:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dK4To-0006rM-EF
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 11:08:44 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:36389
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1dK4To-0006qh-6s
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 11:08:40 -0400
-Received: from host109-146-132-203.range109-146.btcentralplus.com
-	([109.146.132.203] helo=[192.168.1.65])
-	by s16892447.onlinehome-server.info with esmtpsa
-	(TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16) (Exim 4.76)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dK4Tj-0005T5-6j
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 16:08:36 +0100
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <ccd731e5-f128-0493-d12f-72193a39d0f9@ilande.co.uk>
-Date: Sun, 11 Jun 2017 16:08:27 +0100
+	(envelope-from <tsn@cs.nctu.edu.tw>) id 1dK8EW-0003Kz-Be
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 15:09:13 -0400
+Received: from csmailer.cs.nctu.edu.tw ([140.113.235.130]:42258)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <tsn@cs.nctu.edu.tw>) id 1dK8EV-00038h-Pz
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 15:09:08 -0400
+Received: from csmailer.cs.nctu.edu.tw (localhost [127.0.0.1])
+	by csmailer.cs.nctu.edu.tw (Postfix) with ESMTP id DAC7B17646
+	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 03:08:44 +0800 (CST)
+Received: from csmailer.cs.nctu.edu.tw ([127.0.0.1])
+	by csmailer.cs.nctu.edu.tw (csmailer.cs.nctu.edu.tw [127.0.0.1])
+	(amavisd-new, port 10027)
+	with ESMTP id hVKNme0rXzc1 for <qemu-devel@nongnu.org>;
+	Mon, 12 Jun 2017 03:08:44 +0800 (CST)
+Received: from csmail1.cs.nctu.edu.tw (csmail1.cs.nctu.edu.tw [140.113.235.71])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by csmailer.cs.nctu.edu.tw (Postfix) with ESMTPS id B5C0217643
+	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 03:08:44 +0800 (CST)
+Received: from mail-qt0-f182.google.com (mail-qt0-f182.google.com
+	[209.85.216.182]) (Authenticated sender: tsn)
+	by csmail1.cs.nctu.edu.tw (Postfix) with ESMTPA id 7F335174485
+	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 03:08:44 +0800 (CST)
+Received: by mail-qt0-f182.google.com with SMTP id c10so106803016qtd.1
+	for <qemu-devel@nongnu.org>; Sun, 11 Jun 2017 12:08:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] pci_nic_init_nofail() only works on root PCI buses?
+In-Reply-To: <CAPhXLnv2g_80gi1o6p-QUbKJQ5m+6gkLDN8TWtE-B=70uacDEw@mail.gmail.com>
+References: <CAPhXLnv2g_80gi1o6p-QUbKJQ5m+6gkLDN8TWtE-B=70uacDEw@mail.gmail.com>
+From: Tsung-en Hsiao <tsn@cs.nctu.edu.tw>
+Date: Mon, 12 Jun 2017 03:08:22 +0800
+Message-ID: <CAPhXLnuNAqwQHdns2Sxv4UuFz9WhGH1ZM4E4TN87e31cDpZ7gQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] Fwd:  [BUG] Failed to compile using gcc7.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,38 +44,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
 Hi all,
+I encountered the same problem on gcc 7.1.1 and found Qu's mail in
+this list from google search.
 
-Playing around with trying to set up PCI bridges for sun4u, I noticed
-that I get an assert with the following diff which simply moves the
-default NIC behind a PCI bridge rather than being directly on the root
-PCI bus:
+Temporarily fix it by specifying the string length in snprintf
+directive. Hope this is helpful to other people encountered the same
+problem.
 
-diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index 69f565d..0b17f2e 100644
---- a/hw/sparc64/sun4u.c
-+++ b/hw/sparc64/sun4u.c
-@@ -465,7 +465,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
-     parallel_hds_isa_init(isa_bus, MAX_PARALLEL_PORTS);
+@@ -1,9 +1,7 @@
+---
+--- a/block/blkdebug.c
+-                 "blkdebug:%s:%s", s->config_file ?: "",
+--- a/block/blkverify.c
+-                 "blkverify:%s:%s",
+--- a/hw/usb/bus.c
+-        snprintf(downstream->path, sizeof(downstream->path), "%s.%d",
+-        snprintf(downstream->path, sizeof(downstream->path), "%d", portnr);
+--
++++ b/block/blkdebug.c
++                 "blkdebug:%.2037s:%.2037s", s->config_file ?: "",
++++ b/block/blkverify.c
++                 "blkverify:%.2038s:%.2038s",
++++ b/hw/usb/bus.c
++        snprintf(downstream->path, sizeof(downstream->path), "%.12s.%d",
++        snprintf(downstream->path, sizeof(downstream->path), "%.12d", portnr);
 
-     for(i = 0; i < nb_nics; i++)
--        pci_nic_init_nofail(&nd_table[i], pci_bus, "ne2k_pci", NULL);
-+        pci_nic_init_nofail(&nd_table[i], pci_bus3, "ne2k_pci", NULL);
+Tsung-en Hsiao
 
-     ide_drive_get(hd, ARRAY_SIZE(hd));
-
-
-$ ./qemu-system-sparc64 -nographic
-qemu-system-sparc64: hw/pci/pci.c:682: pci_get_bus_devfn: Assertion
-`!root->parent_dev' failed.
-Aborted
-
-Is there any particular reason why the assert() is set to fail if the
-NIC isn't being instantiated on the root PCI bus?
-
-
-ATB,
-
-Mark.
+> Qu Wenruo Wrote:
+>
+> Hi all,
+>
+> After upgrading gcc from 6.3.1 to 7.1.1, qemu can't be compiled with gcc.
+>
+> The error is:
+>
+> ------
+>  CC      block/blkdebug.o
+> block/blkdebug.c: In function 'blkdebug_refresh_filename':
+>
+> block/blkdebug.c:693:31: error: '%s' directive output may be truncated writing up to 4095 bytes into a region of size 4086 [-Werror=format-truncation=]
+>
+>                  "blkdebug:%s:%s", s->config_file ?: "",
+>                               ^~
+> In file included from /usr/include/stdio.h:939:0,
+>                 from /home/adam/qemu/include/qemu/osdep.h:68,
+>                 from block/blkdebug.c:25:
+>
+> /usr/include/bits/stdio2.h:64:10: note: '__builtin___snprintf_chk' output 11 or more bytes (assuming 4106) into a destination of size 4096
+>
+>   return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVEL - 1,
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>        __bos (__s), __fmt, __va_arg_pack ());
+>        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> cc1: all warnings being treated as errors
+> make: *** [/home/adam/qemu/rules.mak:69: block/blkdebug.o] Error 1
+> ------
+>
+> It seems that gcc 7 is introducing more restrict check for printf.
+>
+> If using clang, although there are some extra warning, it can at least pass the compile.
+>
+> Thanks,
+> Qu
