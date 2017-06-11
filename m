@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dJrix-00051z-Mi
-	for qemu-devel@nongnu.org; Sat, 10 Jun 2017 21:31:28 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dJrq0-0007H5-4F
+	for qemu-devel@nongnu.org; Sat, 10 Jun 2017 21:38:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dJriw-0006dO-V0
-	for qemu-devel@nongnu.org; Sat, 10 Jun 2017 21:31:27 -0400
-Date: Sun, 11 Jun 2017 04:31:14 +0300
+	(envelope-from <el13635@mail.ntua.gr>) id 1dJrpz-0000Ff-AJ
+	for qemu-devel@nongnu.org; Sat, 10 Jun 2017 21:38:44 -0400
+Date: Sun, 11 Jun 2017 04:37:59 +0300
 From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170611013114.okggmteznc3ittnx@postretch>
-References: <1497078250-19505-1-git-send-email-lizhengui@huawei.com>
+Message-ID: <20170611013759.xaqkr5avny6b5jf6@postretch>
+References: <20170611011427.6713-1-el13635@mail.ntua.gr>
+	<149714452188.6210.6227845436168589119@84b42461e25a>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="lcpcceomutpvtenk"
+	protocol="application/pgp-signature"; boundary="ipqo5mnvzfzzuriq"
 Content-Disposition: inline
-In-Reply-To: <1497078250-19505-1-git-send-email-lizhengui@huawei.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] bdrv_inc_in_flight and
- bdrv_dec_in_flight:
+In-Reply-To: <149714452188.6210.6227845436168589119@84b42461e25a>
+Subject: Re: [Qemu-devel] [PATCH RFC v2 0/2] IO throttling block filter
+ driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,81 +25,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhengui Li <lizhengui@huawei.com>
-Cc: armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, berto@igalia.com, qemu-block@nongnu.org, stefanha@redhat.com
 
 
---lcpcceomutpvtenk
+--ipqo5mnvzfzzuriq
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jun 10, 2017 at 03:04:10PM +0800, Zhengui Li wrote:
->Avoid empty pointer access if the bs is NULL.
+On Sat, Jun 10, 2017 at 06:28:42PM -0700, no-reply@patchew.org wrote:
+>Hi,
 
-Looks like most (if not all) of the places these are called dereference=20
-bs anyway. Can it ever be NULL? Perhaps a check for each of those case=20
-(if any) would be a better idea.
+>/tmp/qemu-test/src/tests/test-throttle.c:144: error: static declaration of=
+ =E2=80=98read_timer_cb=E2=80=99 follows non-static declaration
+>/tmp/qemu-test/src/include/block/throttle-groups.h:50: note: previous decl=
+aration of =E2=80=98read_timer_cb=E2=80=99 was here
+>/tmp/qemu-test/src/tests/test-throttle.c:148: error: static declaration of=
+ =E2=80=98write_timer_cb=E2=80=99 follows non-static declaration
+>/tmp/qemu-test/src/include/block/throttle-groups.h:51: note: previous decl=
+aration of =E2=80=98write_timer_cb=E2=80=99 was here
+>make: *** [tests/test-throttle.o] Error 1
+>make: *** Waiting for unfinished jobs....
 
->Signed-off-by: Zhengui Li <lizhengui@huawei.com>
->---
-> block/io.c | 10 +++++++---
-> 1 file changed, 7 insertions(+), 3 deletions(-)
->
->diff --git a/block/io.c b/block/io.c
->index ed31810..b12d7cf 100644
->--- a/block/io.c
->+++ b/block/io.c
->@@ -492,7 +492,9 @@ static bool tracked_request_overlaps(BdrvTrackedReques=
-t *req,
->
-> void bdrv_inc_in_flight(BlockDriverState *bs)
-> {
->-    atomic_inc(&bs->in_flight);
->+    if (bs) {
->+        atomic_inc(&bs->in_flight);
->+    }
-> }
->
-> static void dummy_bh_cb(void *opaque)
->@@ -508,8 +510,10 @@ void bdrv_wakeup(BlockDriverState *bs)
->
-> void bdrv_dec_in_flight(BlockDriverState *bs)
-> {
->-    atomic_dec(&bs->in_flight);
->-    bdrv_wakeup(bs);
->+    if (bs) {
->+        atomic_dec(&bs->in_flight);
->+        bdrv_wakeup(bs);
->+    }
-> }
->
-> static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *se=
-lf)
->--=20
->1.8.3.1
->
->
->
+Looks like I forgot to port a last minute change to test-throttle.c,=20
+will clean it up.
 
---lcpcceomutpvtenk
+--ipqo5mnvzfzzuriq
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlk8nWEACgkQc2J8L2kN
-9xDrgBAAuPvWTguHDkFN3fp/5tKGvHFq2IRtPeILeMTSz3Wew7GlDu0LiFWkzEfk
-avBGsAoE+vYTUtQbH0LFI7jnhtpSR1l0jlC6lH89TRA+dM15U+WBoM5g3TaGtT3Y
-OKEZ3PpIIH+3UaaVUpAPzbbP5i82ibdBBBlWQHogDDoBtFTlDwX5lqwpAWQs9aJS
-DB2/mrZRc6mXk4zseJXNTYmn0Cp32u6g/KjVty02r35bHywP8B6t2gPLuOe204hc
-2qi3bNahef7/qLZ6+FYcSJw/d74sZ9SdpW24QmtFvqntfQtgEyVtTck+BRtaQkY5
-dp3EP7bDRIkRQ8nCgrfUsStfMINOIAUVZXB5TFA28zB8c4zhn8iWpg9CXetR0cnu
-MLwATJrDJit2GyI0xO83eCJyKNiffln/xWj+LTm3RGElLNtdvlqQdbARrlZbdW2M
-q+Ewikd9VUmDO69gWjApu4SLdBc/waaK4ZsY16HtJ7PJhejvoeARPybqM5lS1Ikl
-E1qD/NrwpdjYkcz0wKBjOFM967b/KPynFO/5vh/woVE55zngnobH1ltwXRvQIcIV
-v2jZTTNTPRLs4DAxdZRNTra1QkcOYEElChdUf7XMBngXO/FjK0jKZDZAQj2n9kKF
-m1lZfblVn0rDDni3wd7dU9gqBgQ3eFc+YDw6UZcWc2TLCrGNRjE=
-=90Eh
+iQIzBAABCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlk8nvcACgkQc2J8L2kN
+9xDJcg/+P3eOVbyiMETjmW+c9Ege6yRDzL7LynLKaPZtIaGS+DP1kI3PA08ZGmEi
+N+bwoVPGaAKULUTdJShpxATN5OXDzD38Fnd19VE0MclyVPFX/BxEpSsIj4TLZmds
+AkmHrtESgy4KWTWSF6wL3ZeUpvOK+/GfW86FGUGbBImmeiXJFQOPOa6H3QcDtNwk
+N3ixA22++9wqYhhJqziABGR1R0wR+GMXmxgGhdSsFQ8TyspImyOsjObdqCtkvv1G
+Zme+c56UyahbumU/WFIFz0NH5ngKUKJqvfMUG9oTkffYCeMImjxcfppVhjC9S7rz
+SQlUf+VxBsLzhQogMAdDLUsnHZ1hsEDBMUmZm+qwmTY1mkbkFfWD0czAYkP5kyIQ
+sLPh/gIMUbmR4xsBifJlfpnQG5ANzHAaFuyxFEz8CTUEmIk/K/xvElE1rLWyKbDV
+N/PhFkWSVacLQfo/eQwOk5Fek8ndvXR0WCvECf5EKcZloXpptlQXworWv+hHBdE0
+3+mTPMTCcJ8ZgnG+NEGL2JJm2yw8o+bW58clWrCa/mmaf7YWsFYNneNVjZLP8/Kp
+/xfG8389dRB1wAgT4ZG3NK3WTmizgZcf5juZyBNMIMxasJuWbU0UPWQAHbFUqilz
+mEdmSaTQPSCB+Poxq7jcLk35NrKwYv8jcQ1xSzq6ZLKiOxcDbIg=
+=Bb97
 -----END PGP SIGNATURE-----
 
---lcpcceomutpvtenk--
+--ipqo5mnvzfzzuriq--
