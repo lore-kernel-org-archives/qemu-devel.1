@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55128)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dJtF5-00009j-Kn
-	for qemu-devel@nongnu.org; Sat, 10 Jun 2017 23:08:44 -0400
+	(envelope-from <cota@braap.org>) id 1dJv6G-0004Ig-DB
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 01:07:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dJtF4-0001Qv-MO
-	for qemu-devel@nongnu.org; Sat, 10 Jun 2017 23:08:43 -0400
-References: <1497078250-19505-1-git-send-email-lizhengui@huawei.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b69bd8b0-c892-6456-713b-333d0e173cb4@redhat.com>
-Date: Sat, 10 Jun 2017 22:08:31 -0500
+	(envelope-from <cota@braap.org>) id 1dJv6F-0001Ss-El
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 01:07:44 -0400
+Date: Sun, 11 Jun 2017 01:07:30 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170611050730.GA12317@flamenco>
+References: <20170609170100.3599-1-alex.bennee@linaro.org>
+	<20170609170100.3599-4-alex.bennee@linaro.org>
+	<fc351edb-7c08-c341-d8ee-85f6768e4931@twiddle.net>
+	<87vao4b4z5.fsf@linaro.org>
+	<9776b437-90b4-f2c2-4a0c-c1c6585379bf@twiddle.net>
 MIME-Version: 1.0
-In-Reply-To: <1497078250-19505-1-git-send-email-lizhengui@huawei.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="AdRom6xv2cG8WGJ8WfBWJeBb7GsNDfoFI"
-Subject: Re: [Qemu-devel] [PATCH] bdrv_inc_in_flight and bdrv_dec_in_flight:
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <9776b437-90b4-f2c2-4a0c-c1c6585379bf@twiddle.net>
+Subject: Re: [Qemu-devel] [RFC DEBUG PATCH 3/3] translate-a64: fix
+ lookup_tb_ptr hang (DEBUG!)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,57 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhengui Li <lizhengui@huawei.com>, armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Richard Henderson <rth@twiddle.net>
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, pbonzini@redhat.com, edgar.iglesias@xilinx.com, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "open list:ARM" <qemu-arm@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---AdRom6xv2cG8WGJ8WfBWJeBb7GsNDfoFI
-From: Eric Blake <eblake@redhat.com>
-To: Zhengui Li <lizhengui@huawei.com>, armbru@redhat.com, kwolf@redhat.com,
- mreitz@redhat.com
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Message-ID: <b69bd8b0-c892-6456-713b-333d0e173cb4@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] bdrv_inc_in_flight and bdrv_dec_in_flight:
-References: <1497078250-19505-1-git-send-email-lizhengui@huawei.com>
-In-Reply-To: <1497078250-19505-1-git-send-email-lizhengui@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Sat, Jun 10, 2017 at 09:59:19 -0700, Richard Henderson wrote:
+> On 06/10/2017 01:51 AM, Alex Bennée wrote:
+> >I would agree with Emilio that we revert but I can't quite shake the
+> >feeling we are missing an underlying problem. Would just skipping the
+> >htable lookup (but keeping the tb_jmp_cache) be an OK fix for now?
+> 
+> I agree.  It seems like there's some real problem that this is uncovering.
+> 
+> Dropping the htable lookup is certainly ok by me.  If that's enough to
+> un-stick your regression testing for aarch64 guest.
 
-On 06/10/2017 02:04 AM, Zhengui Li wrote:
-> Avoid empty pointer access if the bs is NULL.
->=20
-> Signed-off-by: Zhengui Li <lizhengui@huawei.com>
-> ---
->  block/io.c | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
+Unfortunately not checking the htable isn't enough to fix it for me.
 
-NACK; this is fixing a symptom, not the problem. If you have a coredump
-due to a bad caller passing in NULL, then post the backtrace and let's
-fix the broken caller instead.
+I spent a few hours on Friday trying (and failing) to understand
+what's going on. Regarding interrupts, I see *more* TB_EXIT_INTERRUPT
+exits than without the patch, so my current best guess is that this is
+a livelock kind of thing.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+I'll keep digging, but regardless I think we should revert
+e75449a346 ("target/aarch64: optimize indirect branches") ASAP, and
+then reenable the feature ("revert the revert") once we get to the
+bottom of this.
 
-
---AdRom6xv2cG8WGJ8WfBWJeBb7GsNDfoFI
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZPLQwAAoJEKeha0olJ0NqgY4H/0AmbnRdGCkEnzhY/LlSAI+X
-wK2zqDaqmYytW5AruI7Rx3TRqDIP30XFEFrN+lzBh2TKKsnOs07XYarligw7CdTr
-lt6gRdL5yNxNeyYnjRCttS8Hd3NFPwhRQ4RGQNDUNhGEzQX7oCK9JuX+p48zTpzp
-nQbaJclyRDRpYd55wycjBpKIAkGbvBJoDvt7DUP2A5Bucdpl2w0TeQFnEl/BuTQJ
-IzXZ2+Na8zEMhdcWAlsEmS3uEAmm4hPajSe3UBQ54+o7CpbNC+AhK629k3Ocd43q
-M9rLv8hSiBrmZyvshNIl84WiP00Nw+it781NuBxZAlovRwOQN5mHGF6HXYrjLF0=
-=f8LP
------END PGP SIGNATURE-----
-
---AdRom6xv2cG8WGJ8WfBWJeBb7GsNDfoFI--
+		E.
