@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38123)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dK2Qj-0005rv-EY
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 08:57:22 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dK2Ql-0005xv-Ij
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 08:57:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dK2Qi-0005Yl-Jb
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 08:57:21 -0400
-Date: Sun, 11 Jun 2017 20:57:04 +0800
+	(envelope-from <dgibson@ozlabs.org>) id 1dK2Qi-0005Yf-Hi
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 08:57:23 -0400
+Date: Sun, 11 Jun 2017 20:30:25 +0800
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170611125704.GC18542@umbus>
+Message-ID: <20170611123025.GB18542@umbus>
 References: <20170602031507.29881-1-david@gibson.dropbear.id.au>
-	<1497109365.4161.1.camel@redhat.com>
+	<20170602031507.29881-3-david@gibson.dropbear.id.au>
+	<20170609155556.1447e151@bahia.ttt.fr.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="mvpLiMfbWzRoNl4x"
+	protocol="application/pgp-signature"; boundary="uQr8t48UFsdbeI+V"
 Content-Disposition: inline
-In-Reply-To: <1497109365.4161.1.camel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCHv5 0/4] Clean up compatibility mode handling
+In-Reply-To: <20170609155556.1447e151@bahia.ttt.fr.ibm.com>
+Subject: Re: [Qemu-devel] [PATCHv5 2/4] pseries: Move CPU compatibility
+ property to machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,32 +26,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>
-Cc: groug@kaod.org, clg@kaod.org, mdroth@linux.vnet.ibm.com, sursingh@redhat.com, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com, sbobroff@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Greg Kurz <groug@kaod.org>
+Cc: clg@kaod.org, mdroth@linux.vnet.ibm.com, sursingh@redhat.com, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com, abologna@redhat.com, sbobroff@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---mvpLiMfbWzRoNl4x
-Content-Type: text/plain; charset=iso-8859-1
+--uQr8t48UFsdbeI+V
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jun 10, 2017 at 05:42:45PM +0200, Andrea Bolognani wrote:
-> On Fri, 2017-06-02 at 13:15 +1000, David Gibson wrote:
-> > This is a rebased and revised version of my patches revising CPU
-> > compatiblity mode handling on ppc, last posted in November.=A0=A0Since
-> > then, many of the patches have already been merged (some for 2.9, some
-> > since).=A0=A0This is what's left.
+On Fri, Jun 09, 2017 at 03:55:56PM +0200, Greg Kurz wrote:
+> On Fri,  2 Jun 2017 13:15:05 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
 >=20
-> I've tested this the same way I had tested one of the
-> previous respins, eg. for basic usage and general sanity
-> of the interface. All the issues I pointed out last time
-> seems to have been addressed.
+> > Server class POWER CPUs have a "compat" property, which is used to set =
+the
+> > backwards compatibility mode for the processor.  However, this only mak=
+es
+> > sense for machine types which don't give the guest access to hypervisor
+> > privilege - otherwise the compatibility level is under the guest's cont=
+rol.
+> >=20
+> > To reflect this, this removes the CPU 'compat' property and instead
+> > creates a 'max-cpu-compat' property on the pseries machine.  Strictly
+> > speaking this breaks compatibility, but AFAIK the 'compat' option was
+> > never (directly) used with -device or device_add.
+> >=20
+> > The option was used with -cpu.  So, to maintain compatibility, this
+> > patch adds a hack to the cpu option parsing to strip out any compat
+> > options supplied with -cpu and set them on the machine property
+> > instead of the now deprecated cpu property.
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
 >=20
+> Just one trivial style nit in ppc_compat_prop_set().
 >=20
-> Tested-by: Andrea Bolognani <abologna@redhat.com>
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+>=20
+> and
+>=20
+> Tested-by: Greg Kurz <groug@kaod.org>
 
-Ok, I think have enough acks of various sorts now.  I've merged this
-into ppc-for-2.10.
+Thanks.
+
+[snip]
+
+> > +static void ppc_compat_prop_set(Object *obj, Visitor *v, const char *n=
+ame,
+> > +                                void *opaque, Error **errp)
+> > +{
+> > +    Error *error =3D NULL;
+>=20
+> s/error/local_error maybe ? For consistency with ppc_compat_add_property(=
+) below.
+
+Yeah, makes sense.  local_err does seem to be by far the more common
+name for this idiom.
+
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -57,25 +91,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---mvpLiMfbWzRoNl4x
+--uQr8t48UFsdbeI+V
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZPT4bAAoJEGw4ysog2bOSNtAQANa4GAHj9Z1GFnX5pO9RCfrX
-16tfWJydbpTxZlwqv7iZ+9jTYU124Ivo3410eBw+7IZ2XhPjjUGz4lX6qZjql1Uy
-tX48RpNz5n3dqAL6NDGennjKhNmWZBuY+i2K86/qMHbzgiNJN4c2D4907k5qm0wT
-Jn7H7E7b8pF6wFIbJdnDqrBEWbtrZ7cBXvY+x7z9gy2RgPZtzvFixBgdcqUqEhUh
-z+A0xry6QWjh8xelfzrnc+AtKDIz3W33gTU7utN4viwlf/GRI0P80GVlsFbD4mH9
-JEsZM0BR1Cn3PG+DzMgll1Od/bppv/jZPxP5U6ysOVPBetjaurDKYNsECr1xGOXM
-6RQKmnaXko/Z4eWjbbz2n8Db6KgxowfDfShHIAQEBJYPqcmUWBmWj6LbYj87DMM/
-fz5QizWiOhbYUEEp37lMp/M3MFv+FfAUqy3HytJr0c+yCj9xaEJtY6d4u3QOQTNG
-icRnM6QhcLn1MOJT/4nhME/s2HPA3Hte3BJi3j3LYlTBPjNAQXsjmao7KaJseioF
-/1qqRVc2naxLjxLzpnbEA58m1WcPguRo5kp9le8Q+NI0kcOzO8Mgg+1WW4qR0UmL
-gPb6HYEsM3lD2PHO3eW0hrxXpVgo6Qa6lXQCjPKtzVO51qqAPuBkYD5f2tMCEWKQ
-nHwPjM4OJcky2e+yu3nX
-=l77V
+iQIcBAEBCAAGBQJZPTfeAAoJEGw4ysog2bOSTnkP/i2c5YBjSd+v+Jpkz2DQXSfz
+BhvcmxIGU3D7iS91YaMWhK0LiH9rC2KXlHj9NuM9+xqceNY04Tu75cgGPJ9UGd2b
+nbfuDntOeGEUnK3SdiAaqIkfixHvcZV4YH1BfdHN1R3UYDu8J07eIDYxEUNU/efd
+jW4QAVhytu/wwTaiaTW/VVASVV393PBKDsF3vkGoRTLf95bgD5oTGRe25HYLkUju
+Z1BFJ5tZ7CBLO0+lZR34fwWWfVAJFtBwRsl3GFLgiSyGRJcyowanUv1VSeHprxjc
+il2TMDAUKmLJfVZp3Wwiy5rGI/cKx6aNDLAyx+3F4qgVKQ31OpM1ueC/Xhg0RzBV
+VgnRQZ9DOcxkZDZ13GdM7dF1iawAqVqMJrQEP6RIXHMANpSeKmwVHu/9im1nmEfw
+OJbDagezbjTSguzxvkUsRYtLAtV2eTLBq+kMydXC9AbLcFkAAVZBpMOtGjawltaA
+V3plPDG72luSIJn2JAazfDQDiLGF4rHdwx8sPSBUz0NDfU5XXdKBw8S5YbKoOEuC
+viF1nsMO13p59s4NJfODsCfpK8A9JS9kWcNJOKqgrYI/3pZmCtEWN7DZLcB36br0
+/DjawXiLGYrzYhQ2ca9IoZ3wsqUOQ+dDi3VL/vG4jqHS8j0+XHaoTj1ODol5/k22
+TddalrCM/8EwhVLJvl0b
+=IqJE
 -----END PGP SIGNATURE-----
 
---mvpLiMfbWzRoNl4x--
+--uQr8t48UFsdbeI+V--
