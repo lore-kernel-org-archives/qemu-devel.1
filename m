@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52981)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55048)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dK26X-0000Lc-6G
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 08:36:30 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dK27O-0001Ag-9P
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 08:37:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dK26U-0005hJ-2q
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 08:36:29 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:35780)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dK26T-0005ge-MT
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 08:36:26 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <1496975122-16999-1-git-send-email-cota@braap.org>
-	<1496975122-16999-3-git-send-email-cota@braap.org>
-Date: Sun, 11 Jun 2017 15:36:16 +0300
-In-Reply-To: <1496975122-16999-3-git-send-email-cota@braap.org> (Emilio
-	G. Cota's message of "Thu, 8 Jun 2017 22:25:17 -0400")
-Message-ID: <87poeaog5b.fsf@frigg.lan>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 2/7] cpu: allocate cpu->trace_dstate in
- place
+	(envelope-from <mreitz@redhat.com>) id 1dK27L-0006W3-65
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 08:37:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34694)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1dK27K-0006VH-Vo
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 08:37:19 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C722E81233
+	for <qemu-devel@nongnu.org>; Sun, 11 Jun 2017 12:37:17 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+Date: Sun, 11 Jun 2017 14:37:14 +0200
+Message-Id: <20170611123714.31292-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH] qemu-nbd: Ignore SIGPIPE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,116 +27,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>
 
-Emilio G Cota writes:
+qemu proper has done so for 13 years
+(8a7ddc38a60648257dc0645ab4a05b33d6040063), qemu-img and qemu-io have
+done so for four years (526eda14a68d5b3596be715505289b541288ef2a).
+Ignoring this signal is especially important in qemu-nbd because
+otherwise a client can easily take down the qemu-nbd server by dropping
+the connection when the server wants to send something, for example:
 
-> There's little point in dynamically allocating the bitmap if we
-> know at compile-time the max number of events we want to support.
-> Thus, make room in the struct for the bitmap, which will make things
-> easier later: this paves the way for upcoming changes, in which
-> we'll use a u32 to fully capture cpu->trace_dstate.
+$ qemu-nbd -x foo -f raw -t null-co:// &
+[1] 12726
+$ qemu-io -c quit nbd://localhost/bar
+can't open device nbd://localhost/bar: No export with name 'bar' available
+[1]  + 12726 broken pipe  qemu-nbd -x foo -f raw -t null-co://
 
-> This change also increases performance by saving a dereference and
-> improving locality--note that this is important since upcoming work
-> makes reading this bitmap fairly common.
+In this case, the client sends an NBD_OPT_ABORT and closes the
+connection (because it is not required to wait for a reply), but the
+server replies with an NBD_REP_ACK (because it is required to reply).
 
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+I tried to find some other reproducer instead of using a qemu client
+(e.g. nping -c 1 --tcp-connect localhost -p 10809, which gives the same
+pattern of <FIN-ACK, >PSH-ACK, <RST as qemu-io) but to no avail. This
+only results in the write being successful and the next read failing;
+interestingly, sendmsg()'s man page states that EPIPE is only returned
+when the local end is closed. However, I have not found the NBD server
+to close that local end anywhere.
 
-Reviewed-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+In any case, ignoring SIGPIPE is the right thing to do. We get an EPIPE
+anyway, and this is fully sufficient to let us know that the connection
+is dead.
+---
+ qemu-nbd.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-
-> ---
->  include/qom/cpu.h | 9 +++------
->  qom/cpu.c         | 8 --------
->  trace/control.c   | 9 ++++++++-
->  3 files changed, 11 insertions(+), 15 deletions(-)
-
-> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-> index 89ddb68..bc6e20f 100644
-> --- a/include/qom/cpu.h
-> +++ b/include/qom/cpu.h
-> @@ -259,6 +259,7 @@ typedef void (*run_on_cpu_func)(CPUState *cpu, run_on=
-_cpu_data data);
->  struct qemu_work_item;
-=20
->  #define CPU_UNSET_NUMA_NODE_ID -1
-> +#define CPU_TRACE_DSTATE_MAX_EVENTS 32
-=20
->  /**
->   * CPUState:
-> @@ -373,12 +374,8 @@ struct CPUState {
->      struct KVMState *kvm_state;
->      struct kvm_run *kvm_run;
-=20
-> -    /*
-> -     * Used for events with 'vcpu' and *without* the 'disabled' properti=
-es.
-> -     * Dynamically allocated based on bitmap requried to hold up to
-> -     * trace_get_vcpu_event_count() entries.
-> -     */
-> -    unsigned long *trace_dstate;
-> +    /* Used for events with 'vcpu' and *without* the 'disabled' properti=
-es */
-> +    DECLARE_BITMAP(trace_dstate, CPU_TRACE_DSTATE_MAX_EVENTS);
-=20
->      /* TODO Move common fields from CPUArchState here. */
->      int cpu_index; /* used by alpha TCG */
-> diff --git a/qom/cpu.c b/qom/cpu.c
-> index 5069876..69fbb9c 100644
-> --- a/qom/cpu.c
-> +++ b/qom/cpu.c
-> @@ -382,7 +382,6 @@ static void cpu_common_unrealizefn(DeviceState *dev, =
-Error **errp)
-=20
->  static void cpu_common_initfn(Object *obj)
->  {
-> -    uint32_t count;
->      CPUState *cpu =3D CPU(obj);
->      CPUClass *cc =3D CPU_GET_CLASS(obj);
-=20
-> @@ -397,18 +396,11 @@ static void cpu_common_initfn(Object *obj)
->      QTAILQ_INIT(&cpu->breakpoints);
->      QTAILQ_INIT(&cpu->watchpoints);
-=20
-> -    count =3D trace_get_vcpu_event_count();
-> -    if (count) {
-> -        cpu->trace_dstate =3D bitmap_new(count);
-> -    }
-> -
->      cpu_exec_initfn(cpu);
->  }
-=20
->  static void cpu_common_finalize(Object *obj)
->  {
-> -    CPUState *cpu =3D CPU(obj);
-> -    g_free(cpu->trace_dstate);
->  }
-=20
->  static int64_t cpu_common_get_arch_id(CPUState *cpu)
-> diff --git a/trace/control.c b/trace/control.c
-> index 9b157b0..83740aa 100644
-> --- a/trace/control.c
-> +++ b/trace/control.c
-> @@ -65,8 +65,15 @@ void trace_event_register_group(TraceEvent **events)
->      size_t i;
->      for (i =3D 0; events[i] !=3D NULL; i++) {
->          events[i]->id =3D next_id++;
-> -        if (events[i]->vcpu_id !=3D TRACE_VCPU_EVENT_NONE) {
-> +        if (events[i]->vcpu_id =3D=3D TRACE_VCPU_EVENT_NONE) {
-> +            continue;
-> +        }
-> +
-> +        if (likely(next_vcpu_id < CPU_TRACE_DSTATE_MAX_EVENTS)) {
->              events[i]->vcpu_id =3D next_vcpu_id++;
-> +        } else {
-> +            error_report("WARNING: too many vcpu trace events; dropping =
-'%s'",
-> +                         events[i]->name);
->          }
->      }
->      event_groups =3D g_renew(TraceEventGroup, event_groups, nevent_group=
-s + 1);
-> --=20
-> 2.7.4
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index b7ab86b..b2eeedb 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -580,6 +580,10 @@ int main(int argc, char **argv)
+     sa_sigterm.sa_handler = termsig_handler;
+     sigaction(SIGTERM, &sa_sigterm, NULL);
+ 
++#ifdef CONFIG_POSIX
++    signal(SIGPIPE, SIG_IGN);
++#endif
++
+     module_call_init(MODULE_INIT_TRACE);
+     qcrypto_init(&error_fatal);
+ 
+-- 
+2.9.4
