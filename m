@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dK31w-0006d1-4M
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 09:35:49 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dK4Fu-00073J-7d
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 10:54:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dK31t-0000b3-2E
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 09:35:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44613)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dK4Fp-0002jI-9k
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 10:54:18 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:36350
+	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dK31s-0000an-Sv
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 09:35:44 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dK31q-0006y3-Ib
-	for <qemu-devel@nongnu.org>; Sun, 11 Jun 2017 13:35:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7B18B2E8025
-	for <qemu-devel@nongnu.org>; Sun, 11 Jun 2017 13:35:42 +0000 (UTC)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1dK4Fp-0002gW-1w
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 10:54:13 -0400
+References: <1497099616-2615-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1497099616-2615-2-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20feb578-3a53-5bbf-53a9-f057ed510fd4@amsat.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <7e2e6bdb-fde3-f4ff-b6b7-977536b51658@ilande.co.uk>
+Date: Sun, 11 Jun 2017 15:53:43 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 11 Jun 2017 13:28:29 -0000
-From: Colin Finck <mail@colinfinck.de>
-Reply-To: Bug 1694808 <1694808@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149625981140.25356.9191241290348673100.malonedeb@soybean.canonical.com>
-Message-Id: <149718770891.19846.12872582601746288443.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1694808] Re: Passthrough USB Host Keyboard
- doesn't work on Q35 platform on boot-up
+In-Reply-To: <20feb578-3a53-5bbf-53a9-f057ed510fd4@amsat.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/3] sun4u: switch to using qdev to
+ instantiate fw_cfg interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,45 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, atar4qemu@gmail.com
 
-Same problem with qemu 2.8 from Ubuntu Cloud Archive.
-Is that enough to consider the bug highly likely in latest upstream version=
- too? I don't have a QEMU build system at hand right now..
+On 10/06/17 18:55, Philippe Mathieu-Daudé wrote:
 
-** Changed in: qemu
-       Status: Incomplete =3D> New
+> Hi Mark,
+> 
+> On 06/10/2017 10:00 AM, Mark Cave-Ayland wrote:
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> ---
+>>  hw/sparc64/sun4u.c |   10 +++++++++-
+>>  1 file changed, 9 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+>> index 69f565d..98ee6f5 100644
+>> --- a/hw/sparc64/sun4u.c
+>> +++ b/hw/sparc64/sun4u.c
+>> @@ -512,7 +512,15 @@ static void sun4uv_init(MemoryRegion
+>> *address_space_mem,
+>>                             graphic_width, graphic_height, graphic_depth,
+>>                             (uint8_t *)&nd_table[0].macaddr);
+>>
+>> -    fw_cfg = fw_cfg_init_io(BIOS_CFG_IOPORT);
+>> +    dev = qdev_create(NULL, TYPE_FW_CFG_IO);
+>> +    qdev_prop_set_uint32(dev, "iobase", BIOS_CFG_IOPORT);
+>> +    qdev_prop_set_bit(dev, "dma_enabled", false);
+>> +    qdev_init_nofail(dev);
+>> +    s = SYS_BUS_DEVICE(dev);
+>> +    memory_region_add_subregion(get_system_io(), BIOS_CFG_IOPORT,
+>> +                                sysbus_mmio_get_region(s, 0));
+> 
+> Now that you exported TYPE_FW_CFG_IO I think this might be
+> useful/cleaner to have that code in an static inlined function in fw_cfg.h:
+> 
+> DeviceState *fw_cfg_create(uint32_t iobase[, bool dma_enabled]);
+> 
+> What do you think?
+> 
+> Anyway:
+> 
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
--- =
+I'd be inclined to leave the patch in its current form unless anyone
+strongly needs more wrapper functions. The important part of the
+patchset from my perspective is that it brings the fw_cfg MMIO and
+ioport implementations a lot closer together.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1694808
 
-Title:
-  Passthrough USB Host Keyboard doesn't work on Q35 platform on boot-up
+ATB,
 
-Status in QEMU:
-  New
-Status in qemu-kvm package in Ubuntu:
-  New
-
-Bug description:
-  Using qemu-kvm as shipped with Ubuntu 16.04, I cannot get a passed-
-  through USB Host Keyboard to work at boot-up using the Q35 platform.
-
-  My minimal example to verify this bug is the following:
-
-    qemu-system-x86_64 -M q35 -m 128 -cdrom mini.iso -usb -usbdevice
-  host:04ca:005a -vnc :1 -display none
-
-  Using a noname USB Keyboard with ID 04ca:005a and the Ubuntu 16.04
-  NetBoot mini.iso, I can see the boot screen of the Ubuntu ISO through
-  VNC, but pressing the arrow keys doesn't do anything.
-
-  By taking out the "-M q35" parameter, QEMU switches to the traditional
-  i440FX system. The passed-through USB Host Keyboard works there, but
-  the old platform is no option for me.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1694808/+subscriptions
+Mark.
