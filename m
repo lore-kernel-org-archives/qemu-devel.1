@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1dK8LP-0007Bb-MA
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 15:16:16 -0400
+	(envelope-from <berto@igalia.com>) id 1dKAPr-0007dv-39
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 17:28:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1dK8LK-00050C-OZ
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 15:16:15 -0400
-References: <1496991197-1815-1-git-send-email-thuth@redhat.com>
-From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-Message-ID: <2b0f04b5-3c4b-4f07-f852-bc73ae8af915@reactos.org>
-Date: Sun, 11 Jun 2017 21:15:51 +0200
+	(envelope-from <berto@igalia.com>) id 1dKAPn-00010U-U1
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 17:28:59 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170609152017.7286-3-eblake@redhat.com>
+References: <20170609152017.7286-1-eblake@redhat.com>
+	<20170609152017.7286-3-eblake@redhat.com>
+Date: Sun, 11 Jun 2017 23:28:15 +0200
+Message-ID: <w517f0i1afk.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <1496991197-1815-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/ppc/prep: Remove superfluous call to
- soundhw_init()
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] qobject: Catch another
+ straggler for use of qdict_put_str()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,49 +23,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org
-Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, qemu-trivial@nongnu.org, armbru@redhat.com, Max Reitz <mreitz@redhat.com>, marcandre.lureau@redhat.com
 
-Le 09/06/2017 =E0 08:53, Thomas Huth a =E9crit :
-> When using the 40p machine, soundhw_init() is currently called twice,
-> one time from vl.c and one time from ibm_40p_init(). The call in
-> ibm_40p_init() was likely just a copy-and-paste from a old version
-> of the prep machine - but there the call to audio_init() (which was
-> the previous name of this function) has been removed many years ago
-> already, with commit b3e6d591b05538056d665572f3e3bbfb3cbb70e7
-> ("audio: enable PCI audio cards for all PCI-enabled targets"), so
-> we certainly also do not need the soundhw_init() in the 40p function
-> anymore nowadays.
+On Fri 09 Jun 2017 05:20:17 PM CEST, Eric Blake <eblake@redhat.com> wrote:
+> Dan's addition of key-secret improvements in commit 29cf9336 was
+> developed prior to the addition of QDict scalar insertion macros,
+> but merged after the general cleanup in commit 46f5ac20.
+> Patch created mechanically by rerunning:
+>   spatch --sp-file scripts/coccinelle/qobject.cocci \
+>          --macro-file scripts/cocci-macro-file.h --dir . --in-place
 >
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-Reviewed-by: Herv=E9 Poussineau <hpoussin@reactos.org>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
-> ---
->  hw/ppc/prep.c | 4 ----
->  1 file changed, 4 deletions(-)
->
-> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-> index d16646c..36d3dcd 100644
-> --- a/hw/ppc/prep.c
-> +++ b/hw/ppc/prep.c
-> @@ -36,7 +36,6 @@
->  #include "hw/pci/pci_host.h"
->  #include "hw/ppc/ppc.h"
->  #include "hw/boards.h"
-> -#include "hw/audio/soundhw.h"
->  #include "qemu/error-report.h"
->  #include "qemu/log.h"
->  #include "hw/ide.h"
-> @@ -782,9 +781,6 @@ static void ibm_40p_init(MachineState *machine)
->      qbus_walk_children(BUS(isa_bus), prep_set_cmos_checksum, NULL, NUL=
-L, NULL,
->                         &cmos_checksum);
->
-> -    /* initialize audio subsystem */
-> -    soundhw_init();
-> -
->      /* add some more devices */
->      if (defaults_enabled()) {
->          isa_create_simple(isa_bus, "i8042");
->
+Berto
