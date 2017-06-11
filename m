@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dKC6Q-0001yc-5t
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 19:17:03 -0400
+	(envelope-from <laurent@vivier.eu>) id 1dKC6U-000216-De
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 19:17:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dKC6M-0007zv-Vh
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 19:17:02 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:60680)
+	(envelope-from <laurent@vivier.eu>) id 1dKC6T-00081O-F1
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 19:17:06 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:61017)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dKC6M-0007zX-K5
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 19:16:58 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dKC6T-000813-2i
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 19:17:05 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 12 Jun 2017 01:16:26 +0200
-Message-Id: <20170611231633.32582-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v4 0/7] target-m68k: implement 680x0 FPU
+Date: Mon, 12 Jun 2017 01:16:27 +0200
+Message-Id: <20170611231633.32582-2-laurent@vivier.eu>
+In-Reply-To: <20170611231633.32582-1-laurent@vivier.eu>
+References: <20170611231633.32582-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH v4 1/7] softfloat: define 680x0 specific values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,68 +26,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
 
-This series modifies the original ColdFire FPU implementation
-to use floatx80 instead of float64 internally as this
-is the native datatype for 680x0. I didn't keep the float64
-type for ColdFire, but if someone thinks it's required I
-can update this series in this way.
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+---
+ fpu/softfloat-specialize.h | 34 +++++++++++++++++++++++++++++++---
+ 1 file changed, 31 insertions(+), 3 deletions(-)
 
-The series also adds the FPU status and control registers.
-
-The floatx80 datatype used here is not exactly the same as the
-one used by 680x0 for its extended precision data type, because
-normally the signaling bit of 680x0 NAN is the MSB of the mantissa
-minus one and in floatx80 it is the MSB.
-
-We also add the gdb server parts to read the new FPU registers.
-A strange thing happens here: while the gdb client running remotely
-from a debian etch-m68k has no issue working with 96bit FPU registers
-(the 680x0 extended precision data type), new gdbs (from a debian unstable
-and gdb for cross-compiled environment) don't expect this FPU registers
-size. But it seems like a bug in gdb, not in this implementation.
-
-v4:
-    this is only a subset of v3
-    add a patch to move fmove CR to a function
-    use "FPReg *" instead of FP0/FP1 temporaries
-    fcmp/ftst take old FPSR register from parameters
-    and return the new one
-    add R-b from Richard
-
-v3:
-    fix fsave opcode
-    Add comment to define "unnormalized" number
-    Correctly define pickNaN()
-
-v2:
-    complete rework of the series
-    force single precision in ColdFire mode
-    add "forced" precision instructions (fsmove, fdmove, fsadd, ...)
-    fixed Fcc.
-
-Laurent Vivier (7):
-  softfloat: define 680x0 specific values
-  target-m68k: move FPU helpers to fpu_helper.c
-  target-m68k: define ext_opsize
-  target-m68k: move fmove CR to a function
-  target-m68k: use floatx80 internally
-  target-m68k: define 96bit FP registers for gdb on 680x0
-  target-m68k: add FPCR and FPSR
-
- configure                  |   2 +-
- fpu/softfloat-specialize.h |  34 +-
- gdb-xml/m68k-fp.xml        |  21 ++
- target/m68k/Makefile.objs  |   2 +-
- target/m68k/cpu.c          |   9 +-
- target/m68k/cpu.h          |  42 ++-
- target/m68k/fpu_helper.c   | 207 ++++++++++
- target/m68k/helper.c       | 165 ++++----
- target/m68k/helper.h       |  38 +-
- target/m68k/qregs.def      |   2 +-
- target/m68k/translate.c    | 918 +++++++++++++++++++++++++++++++--------------
- 11 files changed, 1031 insertions(+), 409 deletions(-)
- create mode 100644 gdb-xml/m68k-fp.xml
- create mode 100644 target/m68k/fpu_helper.c
-
+diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.h
+index 100c8a9..de2c5d5 100644
+--- a/fpu/softfloat-specialize.h
++++ b/fpu/softfloat-specialize.h
+@@ -111,7 +111,7 @@ float16 float16_default_nan(float_status *status)
+ *----------------------------------------------------------------------------*/
+ float32 float32_default_nan(float_status *status)
+ {
+-#if defined(TARGET_SPARC)
++#if defined(TARGET_SPARC) || defined(TARGET_M68K)
+     return const_float32(0x7FFFFFFF);
+ #elif defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_ALPHA) || \
+       defined(TARGET_XTENSA) || defined(TARGET_S390X) || defined(TARGET_TRICORE)
+@@ -136,7 +136,7 @@ float32 float32_default_nan(float_status *status)
+ *----------------------------------------------------------------------------*/
+ float64 float64_default_nan(float_status *status)
+ {
+-#if defined(TARGET_SPARC)
++#if defined(TARGET_SPARC) || defined(TARGET_M68K)
+     return const_float64(LIT64(0x7FFFFFFFFFFFFFFF));
+ #elif defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_ALPHA) || \
+       defined(TARGET_S390X)
+@@ -162,7 +162,10 @@ float64 float64_default_nan(float_status *status)
+ floatx80 floatx80_default_nan(float_status *status)
+ {
+     floatx80 r;
+-
++#if defined(TARGET_M68K)
++    r.low = LIT64(0xFFFFFFFFFFFFFFFF);
++    r.high = 0x7FFF;
++#else
+     if (status->snan_bit_is_one) {
+         r.low = LIT64(0xBFFFFFFFFFFFFFFF);
+         r.high = 0x7FFF;
+@@ -170,6 +173,7 @@ floatx80 floatx80_default_nan(float_status *status)
+         r.low = LIT64(0xC000000000000000);
+         r.high = 0xFFFF;
+     }
++#endif
+     return r;
+ }
+ 
+@@ -502,6 +506,30 @@ static int pickNaN(flag aIsQNaN, flag aIsSNaN, flag bIsQNaN, flag bIsSNaN,
+         return 1;
+     }
+ }
++#elif defined(TARGET_M68K)
++static int pickNaN(flag aIsQNaN, flag aIsSNaN, flag bIsQNaN, flag bIsSNaN,
++                   flag aIsLargerSignificand)
++{
++    /* M68000 FAMILY PROGRAMMER'S REFERENCE MANUAL
++     * 3.4 FLOATING-POINT INSTRUCTION DETAILS
++     * If either operand, but not both operands, of an operation is a
++     * nonsignaling NaN, then that NaN is returned as the result. If both
++     * operands are nonsignaling NaNs, then the destination operand
++     * nonsignaling NaN is returned as the result.
++     * If either operand to an operation is a signaling NaN (SNaN), then the
++     * SNaN bit is set in the FPSR EXC byte. If the SNaN exception enable bit
++     * is set in the FPCR ENABLE byte, then the exception is taken and the
++     * destination is not modified. If the SNaN exception enable bit is not
++     * set, setting the SNaN bit in the operand to a one converts the SNaN to
++     * a nonsignaling NaN. The operation then continues as described in the
++     * preceding paragraph for nonsignaling NaNs.
++     */
++    if (aIsQNaN || aIsSNaN) { /* a is the destination operand */
++        return 0; /* return the destination operand */
++    } else {
++        return 1; /* return b */
++    }
++}
+ #else
+ static int pickNaN(flag aIsQNaN, flag aIsSNaN, flag bIsQNaN, flag bIsSNaN,
+                     flag aIsLargerSignificand)
 -- 
 2.9.4
