@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39445)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dKPjn-0000ou-VS
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 09:50:40 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dKPkq-0001bx-4n
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 09:51:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dKPjm-0008Q0-0e
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 09:50:36 -0400
-Received: from [59.151.112.132] (port=23824 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dKPjl-0008P1-LA
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 09:50:33 -0400
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Date: Mon, 12 Jun 2017 21:48:29 +0800
-Message-ID: <eee360d6b199c0946919b68f86ce9ec8c42dc605.1497272778.git.maozy.fnst@cn.fujitsu.com>
-In-Reply-To: <cover.1497272778.git.maozy.fnst@cn.fujitsu.com>
-References: <cover.1497272778.git.maozy.fnst@cn.fujitsu.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dKPkp-0000EV-D4
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 09:51:40 -0400
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:33177)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dKPkp-0000E9-6b
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 09:51:39 -0400
+Received: by mail-wr0-x22d.google.com with SMTP id v104so97094318wrb.0
+	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 06:51:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v5 3/9] pci: Fix the return value checking
+In-Reply-To: <20170607180736.11011-1-stefanha@redhat.com>
+References: <20170607180736.11011-1-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 12 Jun 2017 14:51:16 +0100
+Message-ID: <CAFEAcA_q-71+Ap4JPF6AMTPnjVWHRAnZ=U1rFBj4Ji9yKeLFpA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL for-2.9 0/5] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,76 +29,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dmitry@daynix.com, jasowang@redhat.com, kraxel@redhat.com, alex.williamson@redhat.com, armbru@redhat.com
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-pci_add_capability returns a strictly positive value on success,
-correct asserts.
+On 7 June 2017 at 19:07, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> The following changes since commit 0db1851becbefe3e50cfc03776fb1f75817376=
+af:
+>
+>   Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-2.10-pull-re=
+quest' into staging (2017-06-07 11:56:00 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/stefanha/qemu.git tags/block-pull-request
+>
+> for you to fetch changes up to 11cde1c81093a33c46c7a4039bf750bb61551087:
+>
+>   configure: split c and cxx extra flags (2017-06-07 15:29:46 +0100)
+>
+> ----------------------------------------------------------------
+>
+> ----------------------------------------------------------------
+>
+> Bruno Dominguez (1):
+>   configure: split c and cxx extra flags
+>
+> Philippe Mathieu-Daud=C3=A9 (2):
+>   oslib: strip trailing '\n' from error_setg() string argument
+>   coccinelle: fix typo in comment
+>
+> Roman Pen (1):
+>   coroutine-lock: do not touch coroutine after another one has been
+>     entered
+>
+> Stefan Hajnoczi (1):
+>   .gdbinit: load QEMU sub-commands when gdb starts
+>
+>  configure                                | 75 ++++++++++++++++++--------=
+------
+>  disas/libvixl/Makefile.objs              |  4 +-
+>  util/oslib-posix.c                       |  2 +-
+>  util/qemu-coroutine-lock.c               | 19 +++++++-
+>  util/qemu-coroutine.c                    |  5 +++
+>  .gdbinit                                 |  8 ++++
+>  rules.mak                                |  3 --
+>  scripts/coccinelle/return_directly.cocci |  2 +-
+>  8 files changed, 77 insertions(+), 41 deletions(-)
+>  create mode 100644 .gdbinit
 
-Cc: dmitry@daynix.com
-Cc: jasowang@redhat.com
-Cc: kraxel@redhat.com
-Cc: alex.williamson@redhat.com
-Cc: armbru@redhat.com
-Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
----
- hw/net/e1000e.c   | 2 +-
- hw/net/eepro100.c | 2 +-
- hw/usb/hcd-xhci.c | 2 +-
- hw/vfio/pci.c     | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+Applied, thanks.
 
-diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
-index 6e23493..8259d67 100644
---- a/hw/net/e1000e.c
-+++ b/hw/net/e1000e.c
-@@ -374,7 +374,7 @@ e1000e_add_pm_capability(PCIDevice *pdev, uint8_t offset, uint16_t pmc)
- {
-     int ret = pci_add_capability(pdev, PCI_CAP_ID_PM, offset, PCI_PM_SIZEOF);
- 
--    if (ret >= 0) {
-+    if (ret > 0) {
-         pci_set_word(pdev->config + offset + PCI_PM_PMC,
-                      PCI_PM_CAP_VER_1_1 |
-                      pmc);
-diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
-index 4bf71f2..da36816 100644
---- a/hw/net/eepro100.c
-+++ b/hw/net/eepro100.c
-@@ -571,7 +571,7 @@ static void e100_pci_reset(EEPRO100State * s)
-         int cfg_offset = 0xdc;
-         int r = pci_add_capability(&s->dev, PCI_CAP_ID_PM,
-                                    cfg_offset, PCI_PM_SIZEOF);
--        assert(r >= 0);
-+        assert(r > 0);
-         pci_set_word(pci_conf + cfg_offset + PCI_PM_PMC, 0x7e21);
- #if 0 /* TODO: replace dummy code for power management emulation. */
-         /* TODO: Power Management Control / Status. */
-diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-index a0c7960..ab42f86 100644
---- a/hw/usb/hcd-xhci.c
-+++ b/hw/usb/hcd-xhci.c
-@@ -3417,7 +3417,7 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
-     if (pci_bus_is_express(dev->bus) ||
-         xhci_get_flag(xhci, XHCI_FLAG_FORCE_PCIE_ENDCAP)) {
-         ret = pcie_endpoint_cap_init(dev, 0xa0);
--        assert(ret >= 0);
-+        assert(ret > 0);
-     }
- 
-     if (xhci->msix != ON_OFF_AUTO_OFF) {
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 32aca77..5881968 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -1744,7 +1744,7 @@ static int vfio_setup_pcie_cap(VFIOPCIDevice *vdev, int pos, uint8_t size,
-     }
- 
-     pos = pci_add_capability(&vdev->pdev, PCI_CAP_ID_EXP, pos, size);
--    if (pos >= 0) {
-+    if (pos > 0) {
-         vdev->pdev.exp.exp_cap = pos;
-     }
- 
--- 
-2.9.3
+-- PMM
