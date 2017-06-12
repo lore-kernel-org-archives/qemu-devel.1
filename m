@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dKO2b-0002MB-Bh
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 08:01:54 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dKO4Q-0003Tq-3I
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 08:03:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dKO2X-0004vH-L9
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 08:01:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43154)
+	(envelope-from <imammedo@redhat.com>) id 1dKO4N-0005hu-0g
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 08:03:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39404)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1dKO2X-0004ui-Fh
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 08:01:49 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7068280F95
-	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 12:01:48 +0000 (UTC)
-References: <20170607105810.3003-1-quintela@redhat.com>
-	<20170607105810.3003-3-quintela@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <c2d4cb5b-6223-f6e7-66c2-069826394519@redhat.com>
-Date: Mon, 12 Jun 2017 14:01:33 +0200
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dKO4M-0005hX-RS
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 08:03:42 -0400
+Date: Mon, 12 Jun 2017 14:03:35 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170612140335.6f1a9310@nial.brq.redhat.com>
+In-Reply-To: <1497097821-32754-5-git-send-email-mark.cave-ayland@ilande.co.uk>
+References: <1497097821-32754-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1497097821-32754-5-git-send-email-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-In-Reply-To: <20170607105810.3003-3-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] ram: Now POSTCOPY_ACTIVE is the
- same that STATUS_ACTIVE
+Subject: Re: [Qemu-devel] [PATCH 4/6] fw_cfg: move fw_cfg_init1() into the
+ fw_cfg_*_realize() functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,45 +28,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, peterx@redhat.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel@nongnu.org, rjones@redhat.com, pbonzini@redhat.com, somlo@cmu.edu, lersek@redhat.com, mst@redhat.com, ehabkost@redhat.com
 
-On 07/06/2017 12:58, Juan Quintela wrote:
-> Merge them.
+On Sat, 10 Jun 2017 13:30:19 +0100
+Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> wrote:
+
+> And rename to fw_cfg_common_realize() which better describes its role.
 > 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 > ---
->  migration/migration.c | 14 +-------------
->  1 file changed, 1 insertion(+), 13 deletions(-)
+>  hw/nvram/fw_cfg.c |    8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
 > 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index cfa266b..b31a195 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -541,20 +541,8 @@ MigrationInfo *qmp_query_migrate(Error **errp)
->          break;
->      case MIGRATION_STATUS_ACTIVE:
->      case MIGRATION_STATUS_CANCELLING:
-> -        info->has_status = true;
-> -        info->has_total_time = true;
-> -        info->total_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME)
-> -            - s->total_time;
-> -        info->has_expected_downtime = true;
-> -        info->expected_downtime = s->expected_downtime;
-> -        info->has_setup_time = true;
-> -        info->setup_time = s->setup_time;
-> -
-> -        populate_ram_info(info, s);
-> -        populate_disk_info(info);
-> -        break;
->      case MIGRATION_STATUS_POSTCOPY_ACTIVE:
-> -        /* Mostly the same as active; TODO add some postcopy stats */
-> +         /* TODO add some postcopy stats */
->          info->has_status = true;
->          info->has_total_time = true;
->          info->total_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME)
-> 
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index f7b78a9..87b4392 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -910,7 +910,7 @@ static void fw_cfg_machine_ready(struct Notifier *n, void *data)
+>  
+>  
+>  
+> -static void fw_cfg_init1(DeviceState *dev)
+> +static void fw_cfg_common_realize(DeviceState *dev)
+>  {
+>      FWCfgState *s = FW_CFG(dev);
+>      MachineState *machine = MACHINE(qdev_get_machine());
+> @@ -951,7 +951,6 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
+>          qdev_prop_set_bit(dev, "dma_enabled", false);
+>      }
+>  
+> -    fw_cfg_init1(dev);
+>      qdev_init_nofail(dev);
+>  
+>      s = FW_CFG(dev);
+> @@ -985,7 +984,6 @@ FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
+>          qdev_prop_set_bit(dev, "dma_enabled", false);
+>      }
+>  
+> -    fw_cfg_init1(dev);
+>      qdev_init_nofail(dev);
+>  
+>      sbd = SYS_BUS_DEVICE(dev);
+> @@ -1085,6 +1083,8 @@ static void fw_cfg_io_realize(DeviceState *dev, Error **errp)
+>          return;
+>      }
+>  
+> +    fw_cfg_common_realize(dev);
+For QOM objects it's done with inheritance, see 9f318f8f7e6 for example.
+
+i.e. define in parent TYPE_FW_CFG.realize and call it from children.
+You also can dedup fw_cfg_mem_realize/fw_cfg_mem_realize and
+move common code into new fw_cfg_realize()
