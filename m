@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dKMC6-0006Hv-7t
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 06:03:35 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dKMVD-0002mJ-81
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 06:23:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dKMC3-0004zQ-2w
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 06:03:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57198)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1dKMC2-0004xG-QU
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 06:03:31 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D4A793B71F
-	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 10:03:28 +0000 (UTC)
-References: <20170601212921.30241-1-quintela@redhat.com>
-	<20170601212921.30241-2-quintela@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <d7fb3a8f-9aa2-6c09-5ee0-ebf41c8ce65d@redhat.com>
-Date: Mon, 12 Jun 2017 12:03:25 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1dKMVC-00022b-FA
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 06:23:19 -0400
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:36649)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dKMVC-000228-7k
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 06:23:18 -0400
+Received: by mail-wr0-x233.google.com with SMTP id v111so91252293wrc.3
+	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 03:23:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170601212921.30241-2-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 01/11] migration: Remove MigrationState
- from migration_channel_incomming()
+In-Reply-To: <1496857819-12466-1-git-send-email-kwolf@redhat.com>
+References: <1496857819-12466-1-git-send-email-kwolf@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 12 Jun 2017 11:22:56 +0100
+Message-ID: <CAFEAcA_zNQDuSU633434Po=hng1rfk7oQfpDq0fYt9idO1scZQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/8] Block layer patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,107 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, peterx@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 01/06/2017 23:29, Juan Quintela wrote:
-> All callers were calling migrate_get_current(), so do it inside the function.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+On 7 June 2017 at 18:50, Kevin Wolf <kwolf@redhat.com> wrote:
+> The following changes since commit b55a69fe5f0a504dac6359bb7e99a72b130c3661:
+>
+>   Merge remote-tracking branch 'remotes/juanquintela/tags/migration/20170607' into staging (2017-06-07 15:06:42 +0100)
+>
+> are available in the git repository at:
+>
+>
+>   git://repo.or.cz/qemu/kevin.git tags/for-upstream
+>
+> for you to fetch changes up to 2cb8f869e43406ce829ebe3b16fecc78d367dc7f:
+>
+>   block: fix external snapshot abort permission error (2017-06-07 18:51:51 +0200)
+>
+> ----------------------------------------------------------------
+> Block layer patches
+>
+> ----------------------------------------------------------------
+> Jeff Cody (1):
+>       block: fix external snapshot abort permission error
+>
+> Kevin Wolf (6):
+>       block: Fix anonymous BBs in blk_root_inactivate()
+>       migration: Inactivate images after .save_live_complete_precopy()
+>       migration/block: Clean up BBs in block_save_complete()
+>       qemu-iotests: Block migration test
+>       commit: Fix use after free in completion
+>       qemu-iotests: Test automatic commit job cancel on hot unplug
+>
+> Peter Maydell (1):
+>       block/qcow.c: Fix memory leak in qcow_create()
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Applied, thanks.
 
-> ---
->  migration/channel.c | 5 +++--
->  migration/channel.h | 3 +--
->  migration/exec.c    | 2 +-
->  migration/fd.c      | 2 +-
->  migration/socket.c  | 3 +--
->  migration/tls.c     | 2 +-
->  6 files changed, 8 insertions(+), 9 deletions(-)
-> 
-> diff --git a/migration/channel.c b/migration/channel.c
-> index eae1d9e..92f6f99 100644
-> --- a/migration/channel.c
-> +++ b/migration/channel.c
-> @@ -19,9 +19,10 @@
->  #include "qapi/error.h"
->  #include "io/channel-tls.h"
->  
-> -void migration_channel_process_incoming(MigrationState *s,
-> -                                        QIOChannel *ioc)
-> +void migration_channel_process_incoming(QIOChannel *ioc)
->  {
-> +    MigrationState *s = migrate_get_current();
-> +
->      trace_migration_set_incoming_channel(
->          ioc, object_get_typename(OBJECT(ioc)));
->  
-> diff --git a/migration/channel.h b/migration/channel.h
-> index 2e0a7e3..e4b4057 100644
-> --- a/migration/channel.h
-> +++ b/migration/channel.h
-> @@ -18,8 +18,7 @@
->  
->  #include "io/channel.h"
->  
-> -void migration_channel_process_incoming(MigrationState *s,
-> -                                        QIOChannel *ioc);
-> +void migration_channel_process_incoming(QIOChannel *ioc);
->  
->  void migration_channel_connect(MigrationState *s,
->                                 QIOChannel *ioc,
-> diff --git a/migration/exec.c b/migration/exec.c
-> index 9077024..fc78eeb 100644
-> --- a/migration/exec.c
-> +++ b/migration/exec.c
-> @@ -49,7 +49,7 @@ static gboolean exec_accept_incoming_migration(QIOChannel *ioc,
->                                                 GIOCondition condition,
->                                                 gpointer opaque)
->  {
-> -    migration_channel_process_incoming(migrate_get_current(), ioc);
-> +    migration_channel_process_incoming(ioc);
->      object_unref(OBJECT(ioc));
->      return FALSE; /* unregister */
->  }
-> diff --git a/migration/fd.c b/migration/fd.c
-> index 0077a50..8a04dcd 100644
-> --- a/migration/fd.c
-> +++ b/migration/fd.c
-> @@ -49,7 +49,7 @@ static gboolean fd_accept_incoming_migration(QIOChannel *ioc,
->                                               GIOCondition condition,
->                                               gpointer opaque)
->  {
-> -    migration_channel_process_incoming(migrate_get_current(), ioc);
-> +    migration_channel_process_incoming(ioc);
->      object_unref(OBJECT(ioc));
->      return FALSE; /* unregister */
->  }
-> diff --git a/migration/socket.c b/migration/socket.c
-> index 85bfdcc..50dc8d8 100644
-> --- a/migration/socket.c
-> +++ b/migration/socket.c
-> @@ -148,8 +148,7 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
->      trace_migration_socket_incoming_accepted();
->  
->      qio_channel_set_name(QIO_CHANNEL(sioc), "migration-socket-incoming");
-> -    migration_channel_process_incoming(migrate_get_current(),
-> -                                       QIO_CHANNEL(sioc));
-> +    migration_channel_process_incoming(QIO_CHANNEL(sioc));
->      object_unref(OBJECT(sioc));
->  
->  out:
-> diff --git a/migration/tls.c b/migration/tls.c
-> index bae9aca..d3abd6e 100644
-> --- a/migration/tls.c
-> +++ b/migration/tls.c
-> @@ -74,7 +74,7 @@ static void migration_tls_incoming_handshake(QIOTask *task,
->          error_report_err(err);
->      } else {
->          trace_migration_tls_incoming_handshake_complete();
-> -        migration_channel_process_incoming(migrate_get_current(), ioc);
-> +        migration_channel_process_incoming(ioc);
->      }
->      object_unref(OBJECT(ioc));
->  }
-> 
+-- PMM
