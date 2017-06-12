@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dKRyD-0008Fh-Da
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 12:13:38 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dKRyb-0008PU-Gj
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 12:14:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dKRyA-0005IS-Nj
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 12:13:37 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:34235)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dKRyA-0005I9-IZ
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 12:13:34 -0400
-Received: by mail-qt0-x243.google.com with SMTP id o21so27456007qtb.1
-	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 09:13:31 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170611231633.32582-1-laurent@vivier.eu>
-	<20170611231633.32582-5-laurent@vivier.eu>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <48fecf30-cc95-de46-e4a7-50f94dd1d49b@twiddle.net>
-Date: Mon, 12 Jun 2017 09:13:27 -0700
+	(envelope-from <ehabkost@redhat.com>) id 1dKRyY-0005NQ-PG
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 12:14:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34044)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dKRyY-0005N8-G8
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 12:13:58 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D2F9A285A8
+	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 16:13:55 +0000 (UTC)
+Date: Mon, 12 Jun 2017 13:13:49 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170612161349.GL22043@thinpad.lan.raisama.net>
+References: <1496980142-8986-1-git-send-email-peterx@redhat.com>
+	<1496980142-8986-3-git-send-email-peterx@redhat.com>
+	<87lgp1i8kz.fsf@dusky.pond.sub.org>
+	<20170612044609.GE25059@pxdev.xzpeter.org>
 MIME-Version: 1.0
-In-Reply-To: <20170611231633.32582-5-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 4/7] target-m68k: move fmove CR to a
- function
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170612044609.GE25059@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] migration: let MigrationState be a
+ qdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,27 +36,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>
+To: Peter Xu <peterx@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 06/11/2017 04:16 PM, Laurent Vivier wrote:
-> Move code of fmove to/from control register to a function
+On Mon, Jun 12, 2017 at 12:46:09PM +0800, Peter Xu wrote:
+> On Fri, Jun 09, 2017 at 03:39:24PM +0200, Markus Armbruster wrote:
+> > Peter Xu <peterx@redhat.com> writes:
+> > 
+> > > Let the old man "MigrationState" join the object family. Direct benefit
+> > > is that we can start to use all the property features derived from
+> > > current QDev, like: HW_COMPAT_* bits, command line setup for migration
+> > > parameters (so will never need to set them up each time using HMP/QMP,
+> > > this is really, really attractive for test writters), etc.
+> > >
+> > > I see no reason to disallow this happen yet. So let's start from this
+> > > one, to see whether it would be anything good.
+> > >
+> > > No functional change at all.
+> > >
+> > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > ---
+> > >  include/migration/migration.h | 19 ++++++++++++++
+> > >  migration/migration.c         | 61 ++++++++++++++++++++++++++++---------------
+> > >  2 files changed, 59 insertions(+), 21 deletions(-)
+> > >
+> > > diff --git a/include/migration/migration.h b/include/migration/migration.h
+> > > index 79b5484..bd0186c 100644
+> > > --- a/include/migration/migration.h
+> > > +++ b/include/migration/migration.h
+> > > @@ -21,6 +21,7 @@
+> > >  #include "qapi-types.h"
+> > >  #include "exec/cpu-common.h"
+> > >  #include "qemu/coroutine_int.h"
+> > > +#include "hw/qdev.h"
+> > >  
+> > >  #define QEMU_VM_FILE_MAGIC           0x5145564d
+> > >  #define QEMU_VM_FILE_VERSION_COMPAT  0x00000002
+> > > @@ -49,6 +50,8 @@ enum mig_rp_message_type {
+> > >      MIG_RP_MSG_MAX
+> > >  };
+> > >  
+> > > +#define TYPE_MIGRATION "migration"
+> > > +
+> > >  /* State for the incoming migration */
+> > >  struct MigrationIncomingState {
+> > >      QEMUFile *from_src_file;
+> > > @@ -91,8 +94,24 @@ struct MigrationIncomingState {
+> > >  MigrationIncomingState *migration_incoming_get_current(void);
+> > >  void migration_incoming_state_destroy(void);
+> > >  
+> > > +#define MIGRATION_CLASS(klass) \
+> > > +    OBJECT_CLASS_CHECK(MigrationClass, (klass), TYPE_MIGRATION)
+> > > +#define MIGRATION_OBJ(obj) \
+> > > +    OBJECT_CHECK(MigrationState, (obj), TYPE_MIGRATION)
+> > > +#define MIGRATION_GET_CLASS(obj) \
+> > > +    OBJECT_GET_CLASS(MigrationClass, (obj), TYPE_MIGRATION)
+> > > +
+> > > +typedef struct MigrationClass {
+> > > +    /*< private >*/
+> > > +    DeviceClass parent_class;
+> > > +} MigrationClass;
+> > > +
+> > >  struct MigrationState
+> > >  {
+> > > +    /*< private >*/
+> > > +    DeviceState parent_obj;
+> > > +
+> > > +    /*< public >*/
+> > 
+> > Turning MigrationState into a QOM object so you can use QOM
+> > infrastructure makes sense.  But why turn it into a device?  It doesn't
+> > feel device-like to me.  Would ObjectClass and Object instead of
+> > DeviceClass and DeviceState do?
 > 
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->   target/m68k/translate.c | 66 ++++++++++++++++++++++++++++++-------------------
->   1 file changed, 41 insertions(+), 25 deletions(-)
+> Yeah. That's the main reason for the series to be (was) RFC.
+> 
+> I was trying to use the HW_COMPAT_* bits and -global, and that's QDev
+> thing (IIUC you got that already :). I am just curious about why that
+> is not for QObject from the very beginning, then it'll be easier.
+> 
+> For now, IMHO QDev is okay as well for migration, as long as it's kept
+> internally inside QEMU. But sure at least I should turn user_creatable
+> to off. I'll investigate more to see how to make this a safer approach
+> in next post.
 
-In that this is 100% code movement,
+We could allow non-device QOM objects use the global property
+system optionally.
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+We could make qdev_prop_set_globals() work on any Object*, and
+let QOM classes call it on post_init if they want to be
+configurable by global properties too.
 
+Note that this would break qdev_prop_check_globals(), because it
+expects globals to work only on TYPE_DEVICE.  We could address
+that by introducing a new interface type to indicate the type
+works with -global (something like
+INTERFACE_CONFIGURABLE_BY_GLOBAL_PROPERTIES, but shorter?).
 
-> +            cpu_abort(NULL, "Unimplemented: fmove from control %d", mask);
-> +            goto undef;
+Such a system would probably allow us to replace
+default_machine_opts, default_boot_order, default_display,
+default_ram_size (and probably many other compat fields) on
+MachineClass.  It could also be used to implement -machine and
+-accel options by simply translating them to global properties
+(like we already do for -cpu).
 
-But cpu_abort doesn't return, and will exit qemu.
-This should be qemu_log_mask(LOG_UNIMP, ...).
+(This sounds like reinventing a QemuOpts-like system on top of
+global properties.  Maybe that's a bad thing, maybe that's a good
+thing.  I'm not sure.)
 
+> [...]
 
-r~
+-- 
+Eduardo
