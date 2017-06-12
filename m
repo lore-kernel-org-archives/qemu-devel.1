@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dKUav-0004bE-3z
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 15:01:46 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dKUmK-0007XV-Jk
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 15:13:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dKUau-0002RA-4B
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 15:01:45 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:34651)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dKUmG-0007A9-2d
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 15:13:32 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:35622)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dKUat-0002QL-SZ
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 15:01:44 -0400
-Received: by mail-lf0-x243.google.com with SMTP id o28so10224358lfk.1
-	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 12:01:41 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dKUmF-00079x-TS
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 15:13:27 -0400
+Received: by mail-qt0-x241.google.com with SMTP id x58so28735644qtc.2
+	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 12:13:27 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170611231633.32582-1-laurent@vivier.eu>
+	<20170611231633.32582-5-laurent@vivier.eu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <7836c89d-884e-1c54-a2fd-81b6112558aa@amsat.org>
+Date: Mon, 12 Jun 2017 16:12:35 -0300
 MIME-Version: 1.0
-References: <20170608115939.30985-1-marcandre.lureau@redhat.com>
-	<9e20350b-aac2-b099-ebac-03e61ad1d79e@redhat.com>
-In-Reply-To: <9e20350b-aac2-b099-ebac-03e61ad1d79e@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 12 Jun 2017 19:01:28 +0000
-Message-ID: <CAJ+F1CLAM+wNS3oL=VJYs+d6FziXY4wH1=6pmqHuLHrkz4zigg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] char: fix chardev aliases regression
+In-Reply-To: <20170611231633.32582-5-laurent@vivier.eu>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 4/7] target-m68k: move fmove CR to a
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +35,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: anthony.perard@citrix.com, Peter Maydell <peter.maydell@linaro.org>
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 
-Hi Paolo
+Hi Laurent,
 
-On Mon, Jun 12, 2017 at 8:06 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
-
+On 06/11/2017 08:16 PM, Laurent Vivier wrote:
+> Move code of fmove to/from control register to a function
 >
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>  target/m68k/translate.c | 66 ++++++++++++++++++++++++++++++-------------------
+>  1 file changed, 41 insertions(+), 25 deletions(-)
 >
-> On 08/06/2017 13:59, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi,
-> >
-> > The patch "char: move CharBackend handling in char-fe unit" broke
-> > chardev aliases. Here is a small series to fix it, and add a simple
-> > unit test to check the alias keep working.
-> >
-> > v2:
-> > - move HAVE_CHARDEV_* in osdep.h (Markus Armbruster)
-> > - add r-b tags from Eric for the patches that didn't change
-> >
-> > Marc-Andr=C3=A9 Lureau (3):
-> >   char: fix alias devices regression
-> >   chardev: don't use alias names in parse_compat()
-> >   test-char: start a /char/serial test
-> >
-> >  include/chardev/char-parallel.h |  5 -----
-> >  include/chardev/char-serial.h   |  8 --------
-> >  include/qemu/osdep.h            | 13 +++++++++++++
-> >  chardev/char.c                  |  4 ++--
-> >  tests/test-char.c               | 30 ++++++++++++++++++++++++++++++
-> >  5 files changed, 45 insertions(+), 15 deletions(-)
-> >
+> diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+> index 049d837..45733ce 100644
+> --- a/target/m68k/translate.c
+> +++ b/target/m68k/translate.c
+> @@ -4099,6 +4099,45 @@ DISAS_INSN(trap)
+>      gen_exception(s, s->pc - 2, EXCP_TRAP0 + (insn & 0xf));
+>  }
 >
-> Queued, thanks.
->
+> +static void gen_op_fmove_fcr(CPUM68KState *env, DisasContext *s,
+> +                             uint32_t insn, uint32_t ext)
+> +{
+> +    int mask = (ext >> 10) & 7;
+> +    int is_write = (ext >> 13) & 1;
+> +    TCGv val;
+> +
+> +    if (is_write) {
+> +        switch (mask) {
+> +        case 1: /* FPIAR */
+> +        case 2: /* FPSR */
+> +        default:
+> +            cpu_abort(NULL, "Unimplemented: fmove from control %d", mask);
+> +            goto undef;
+> +        case 4: /* FPCR */
 
-I also sent a pull request with those patches "[PULL 0/3] Char patches" a
-few days ago. I should take the habit to notice it on the PATCH series.
+It seems easier to move the 'if (is_write) {' check here
 
-Thanks
---=20
-Marc-Andr=C3=A9 Lureau
+> +            val = tcg_const_i32(0);
+> +            DEST_EA(env, insn, OS_LONG, val, NULL);
+> +            tcg_temp_free(val);
+
+then '}'
+
+> +            break;
+> +        }
+> +        return;
+> +    }
+> +    switch (mask) {
+> +    case 1: /* FPIAR */
+> +    case 2: /* FPSR */
+> +    default:
+> +        cpu_abort(NULL, "Unimplemented: fmove to control %d",
+> +                  mask);
+> +        break;
+> +    case 4: /* FPCR */
+> +        /* Not implemented.  Ignore writes.  */
+> +        break;
+> +    }
+> +    return;
+> +undef:
+> +    s->pc -= 2;
+> +    disas_undef_fpu(env, s, insn);
+> +}
+> +
+>  /* ??? FP exceptions are not implemented.  Most exceptions are deferred until
+>     immediately before the next FP instruction is executed.  */
+>  DISAS_INSN(fpu)
+> @@ -4177,32 +4216,9 @@ DISAS_INSN(fpu)
+>          tcg_temp_free_i32(tmp32);
+>          return;
+>      case 4: /* fmove to control register.  */
+> -        switch ((ext >> 10) & 7) {
+> -        case 4: /* FPCR */
+> -            /* Not implemented.  Ignore writes.  */
+> -            break;
+> -        case 1: /* FPIAR */
+> -        case 2: /* FPSR */
+> -        default:
+> -            cpu_abort(NULL, "Unimplemented: fmove to control %d",
+> -                      (ext >> 10) & 7);
+> -        }
+> -        break;
+>      case 5: /* fmove from control register.  */
+> -        switch ((ext >> 10) & 7) {
+> -        case 4: /* FPCR */
+> -            /* Not implemented.  Always return zero.  */
+> -            tmp32 = tcg_const_i32(0);
+> -            break;
+> -        case 1: /* FPIAR */
+> -        case 2: /* FPSR */
+> -        default:
+> -            cpu_abort(NULL, "Unimplemented: fmove from control %d",
+> -                      (ext >> 10) & 7);
+> -            goto undef;
+> -        }
+> -        DEST_EA(env, insn, OS_LONG, tmp32, NULL);
+> -        break;
+> +        gen_op_fmove_fcr(env, s, insn, ext);
+> +        return;
+>      case 6: /* fmovem */
+>      case 7:
+>          {
+>
