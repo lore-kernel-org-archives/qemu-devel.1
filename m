@@ -1,32 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dKHF5-00043m-99
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 00:46:20 -0400
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dKHyE-00040y-9P
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 01:32:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dKHF2-00038m-6l
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 00:46:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55626)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dKHF1-00038R-UK
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 00:46:16 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B57C1C04B316
-	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 04:46:14 +0000 (UTC)
-Date: Mon, 12 Jun 2017 12:46:09 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170612044609.GE25059@pxdev.xzpeter.org>
-References: <1496980142-8986-1-git-send-email-peterx@redhat.com>
-	<1496980142-8986-3-git-send-email-peterx@redhat.com>
-	<87lgp1i8kz.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87lgp1i8kz.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] migration: let MigrationState be a
- qdev
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dKHy9-0008Ct-DV
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 01:32:58 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47569
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
+	id 1dKHy9-0008CY-7u
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 01:32:53 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v5C5TU1X137464
+	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 01:32:52 -0400
+Received: from e23smtp06.au.ibm.com (e23smtp06.au.ibm.com [202.81.31.148])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2b19fkdame-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 01:32:51 -0400
+Received: from localhost
+	by e23smtp06.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
+	Mon, 12 Jun 2017 15:32:49 +1000
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Date: Mon, 12 Jun 2017 11:02:34 +0530
+In-Reply-To: <1497245555-32472-1-git-send-email-bharata@linux.vnet.ibm.com>
+References: <1497245555-32472-1-git-send-email-bharata@linux.vnet.ibm.com>
+Message-Id: <1497245555-32472-2-git-send-email-bharata@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v6 1/2] spapr: Add a "no HPT" encoding to HTAB
+ migration stream
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,138 +39,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, sam.bobroff@au1.ibm.com, rnsastry@linux.vnet.ibm.com, sjitindarsingh@gmail.com, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-On Fri, Jun 09, 2017 at 03:39:24PM +0200, Markus Armbruster wrote:
-> Peter Xu <peterx@redhat.com> writes:
-> 
-> > Let the old man "MigrationState" join the object family. Direct benefit
-> > is that we can start to use all the property features derived from
-> > current QDev, like: HW_COMPAT_* bits, command line setup for migration
-> > parameters (so will never need to set them up each time using HMP/QMP,
-> > this is really, really attractive for test writters), etc.
-> >
-> > I see no reason to disallow this happen yet. So let's start from this
-> > one, to see whether it would be anything good.
-> >
-> > No functional change at all.
-> >
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  include/migration/migration.h | 19 ++++++++++++++
-> >  migration/migration.c         | 61 ++++++++++++++++++++++++++++---------------
-> >  2 files changed, 59 insertions(+), 21 deletions(-)
-> >
-> > diff --git a/include/migration/migration.h b/include/migration/migration.h
-> > index 79b5484..bd0186c 100644
-> > --- a/include/migration/migration.h
-> > +++ b/include/migration/migration.h
-> > @@ -21,6 +21,7 @@
-> >  #include "qapi-types.h"
-> >  #include "exec/cpu-common.h"
-> >  #include "qemu/coroutine_int.h"
-> > +#include "hw/qdev.h"
-> >  
-> >  #define QEMU_VM_FILE_MAGIC           0x5145564d
-> >  #define QEMU_VM_FILE_VERSION_COMPAT  0x00000002
-> > @@ -49,6 +50,8 @@ enum mig_rp_message_type {
-> >      MIG_RP_MSG_MAX
-> >  };
-> >  
-> > +#define TYPE_MIGRATION "migration"
-> > +
-> >  /* State for the incoming migration */
-> >  struct MigrationIncomingState {
-> >      QEMUFile *from_src_file;
-> > @@ -91,8 +94,24 @@ struct MigrationIncomingState {
-> >  MigrationIncomingState *migration_incoming_get_current(void);
-> >  void migration_incoming_state_destroy(void);
-> >  
-> > +#define MIGRATION_CLASS(klass) \
-> > +    OBJECT_CLASS_CHECK(MigrationClass, (klass), TYPE_MIGRATION)
-> > +#define MIGRATION_OBJ(obj) \
-> > +    OBJECT_CHECK(MigrationState, (obj), TYPE_MIGRATION)
-> > +#define MIGRATION_GET_CLASS(obj) \
-> > +    OBJECT_GET_CLASS(MigrationClass, (obj), TYPE_MIGRATION)
-> > +
-> > +typedef struct MigrationClass {
-> > +    /*< private >*/
-> > +    DeviceClass parent_class;
-> > +} MigrationClass;
-> > +
-> >  struct MigrationState
-> >  {
-> > +    /*< private >*/
-> > +    DeviceState parent_obj;
-> > +
-> > +    /*< public >*/
-> 
-> Turning MigrationState into a QOM object so you can use QOM
-> infrastructure makes sense.  But why turn it into a device?  It doesn't
-> feel device-like to me.  Would ObjectClass and Object instead of
-> DeviceClass and DeviceState do?
+Add a "no HPT" encoding (using value -1) to the HTAB migration
+stream (in the place of HPT size) when the guest doesn't allocate HPT.
+This will help the target side to match target HPT with the source HPT
+and thus enable successful migration.
 
-Yeah. That's the main reason for the series to be (was) RFC.
+Suggested-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+---
+ hw/ppc/spapr.c | 29 +++++++++++++++++++++++++----
+ 1 file changed, 25 insertions(+), 4 deletions(-)
 
-I was trying to use the HW_COMPAT_* bits and -global, and that's QDev
-thing (IIUC you got that already :). I am just curious about why that
-is not for QObject from the very beginning, then it'll be easier.
-
-For now, IMHO QDev is okay as well for migration, as long as it's kept
-internally inside QEMU. But sure at least I should turn user_creatable
-to off. I'll investigate more to see how to make this a safer approach
-in next post.
-
-> 
-> >      size_t bytes_xfer;
-> >      size_t xfer_limit;
-> >      QemuThread thread;
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index 48c94c9..98b77e2 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -93,29 +93,13 @@ static bool deferred_incoming;
-> >  /* For outgoing */
-> >  MigrationState *migrate_get_current(void)
-> >  {
-> > -    static bool once;
-> > -    static MigrationState current_migration = {
-> > -        .state = MIGRATION_STATUS_NONE,
-> > -        .xbzrle_cache_size = DEFAULT_MIGRATE_CACHE_SIZE,
-> > -        .mbps = -1,
-> > -        .parameters = {
-> > -            .compress_level = DEFAULT_MIGRATE_COMPRESS_LEVEL,
-> > -            .compress_threads = DEFAULT_MIGRATE_COMPRESS_THREAD_COUNT,
-> > -            .decompress_threads = DEFAULT_MIGRATE_DECOMPRESS_THREAD_COUNT,
-> > -            .cpu_throttle_initial = DEFAULT_MIGRATE_CPU_THROTTLE_INITIAL,
-> > -            .cpu_throttle_increment = DEFAULT_MIGRATE_CPU_THROTTLE_INCREMENT,
-> > -            .max_bandwidth = MAX_THROTTLE,
-> > -            .downtime_limit = DEFAULT_MIGRATE_SET_DOWNTIME,
-> > -            .x_checkpoint_delay = DEFAULT_MIGRATE_X_CHECKPOINT_DELAY,
-> > -        },
-> > -    };
-> > +    static MigrationState *current_migration;
-> 
-> You add an indirection...
-> 
-> >  
-> > -    if (!once) {
-> > -        current_migration.parameters.tls_creds = g_strdup("");
-> > -        current_migration.parameters.tls_hostname = g_strdup("");
-> > -        once = true;
-> > +    if (!current_migration) {
-> > +        current_migration = MIGRATION_OBJ(object_new(TYPE_MIGRATION));
-> 
-> ... possibly just so you can use object_new().  Have you considered
-> object_initialize()?
-
-Yes, but even with object_initialize() I still need that indirection?
-
-Or, I can put the init into main() in some way to avoid the
-indirection.
-
-Thanks!
-
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 8b541d9..c425499 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1558,13 +1558,19 @@ static int htab_save_setup(QEMUFile *f, void *opaque)
+     sPAPRMachineState *spapr = opaque;
+ 
+     /* "Iteration" header */
+-    qemu_put_be32(f, spapr->htab_shift);
++    if (!spapr->htab_shift) {
++        qemu_put_be32(f, -1);
++    } else {
++        qemu_put_be32(f, spapr->htab_shift);
++    }
+ 
+     if (spapr->htab) {
+         spapr->htab_save_index = 0;
+         spapr->htab_first_pass = true;
+     } else {
+-        assert(kvm_enabled());
++        if (spapr->htab_shift) {
++            assert(kvm_enabled());
++        }
+     }
+ 
+ 
+@@ -1710,7 +1716,12 @@ static int htab_save_iterate(QEMUFile *f, void *opaque)
+     int rc = 0;
+ 
+     /* Iteration header */
+-    qemu_put_be32(f, 0);
++    if (!spapr->htab_shift) {
++        qemu_put_be32(f, -1);
++        return 0;
++    } else {
++        qemu_put_be32(f, 0);
++    }
+ 
+     if (!spapr->htab) {
+         assert(kvm_enabled());
+@@ -1744,7 +1755,12 @@ static int htab_save_complete(QEMUFile *f, void *opaque)
+     int fd;
+ 
+     /* Iteration header */
+-    qemu_put_be32(f, 0);
++    if (!spapr->htab_shift) {
++        qemu_put_be32(f, -1);
++        return 0;
++    } else {
++        qemu_put_be32(f, 0);
++    }
+ 
+     if (!spapr->htab) {
+         int rc;
+@@ -1788,6 +1804,11 @@ static int htab_load(QEMUFile *f, void *opaque, int version_id)
+ 
+     section_hdr = qemu_get_be32(f);
+ 
++    if (section_hdr == -1) {
++        spapr_free_hpt(spapr);
++        return 0;
++    }
++
+     if (section_hdr) {
+         Error *local_err = NULL;
+ 
 -- 
-Peter Xu
+2.7.4
