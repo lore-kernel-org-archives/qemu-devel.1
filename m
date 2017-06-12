@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dKQpP-00054j-4y
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 11:00:28 -0400
+	(envelope-from <jcody@redhat.com>) id 1dKQpP-00054p-9H
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 11:00:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dKQpO-00038C-7s
+	(envelope-from <jcody@redhat.com>) id 1dKQpO-00038N-Au
 	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 11:00:27 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Mon, 12 Jun 2017 11:00:17 -0400
-Message-Id: <06e5d41f597b506e2550c86745db3690daf35928.1497279406.git.jcody@redhat.com>
+Date: Mon, 12 Jun 2017 11:00:16 -0400
+Message-Id: <33051361d0e5c63369bfb9180052ea30bbbf0661.1497279406.git.jcody@redhat.com>
 In-Reply-To: <cover.1497279406.git.jcody@redhat.com>
 References: <cover.1497279406.git.jcody@redhat.com>
 In-Reply-To: <cover.1497279406.git.jcody@redhat.com>
 References: <cover.1497279406.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] block/iscsi: enable filename option and
+Subject: [Qemu-devel] [PATCH 1/2] block/rbd: enable filename option and
  parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,7 +25,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, armbru@redhat.com, rjones@redhat.com
 
-When enabling option parsing and blockdev-add for iscsi, we removed the
+When enabling option parsing and blockdev-add for rbd, we removed the
 'filename' option.  Unfortunately, this was a bit optimistic, as
 previous versions of QEMU allowed the use of the option in backing
 filenames via json.  This means that without parsing this option, we
@@ -36,16 +36,16 @@ See bug: https://bugzilla.redhat.com/show_bug.cgi?id=1457088
 Tested-by: Richard W.M. Jones <rjones@redhat.com>
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- block/iscsi.c | 19 ++++++++++++++++++-
+ block/rbd.c | 19 ++++++++++++++++++-
  1 file changed, 18 insertions(+), 1 deletion(-)
 
-diff --git a/block/iscsi.c b/block/iscsi.c
-index 5daa201..ba50e76 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -1732,6 +1732,10 @@ static QemuOptsList runtime_opts = {
-             .name = "timeout",
-             .type = QEMU_OPT_NUMBER,
+diff --git a/block/rbd.c b/block/rbd.c
+index e551639..cbc0b85 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -340,6 +340,10 @@ static QemuOptsList runtime_opts = {
+             .type = QEMU_OPT_STRING,
+             .help = "Legacy rados key/value option parameters",
          },
 +        {
 +            .name = "filename",
@@ -54,24 +54,24 @@ index 5daa201..ba50e76 100644
          { /* end of list */ }
      },
  };
-@@ -1747,12 +1751,24 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
-     char *initiator_name = NULL;
+@@ -541,12 +545,24 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+ {
+     BDRVRBDState *s = bs->opaque;
+     const char *pool, *snap, *conf, *user, *image_name, *keypairs;
+-    const char *secretid;
++    const char *secretid, *filename;
      QemuOpts *opts;
      Error *local_err = NULL;
--    const char *transport_name, *portal, *target;
-+    const char *transport_name, *portal, *target, *filename;
- #if LIBISCSI_API_VERSION >= (20160603)
-     enum iscsi_transport_type transport;
- #endif
-     int i, ret = 0, timeout = 0, lun;
+     char *mon_host = NULL;
+     int r;
  
 +    /* If we are given a filename, parse the filename, with precedence given to
 +     * filename encoded options */
 +    filename = qdict_get_try_str(options, "filename");
 +    if (filename) {
-+        iscsi_parse_filename(filename, options, &local_err);
++        qemu_rbd_parse_filename(filename, options, &local_err);
 +        if (local_err) {
-+            ret = -EINVAL;
++            r = -EINVAL;
 +            error_propagate(errp, local_err);
 +            goto exit;
 +        }
@@ -80,12 +80,12 @@ index 5daa201..ba50e76 100644
      opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
      qemu_opts_absorb_qdict(opts, options, &local_err);
      if (local_err) {
-@@ -1967,6 +1983,7 @@ out:
-         }
-         memset(iscsilun, 0, sizeof(IscsiLun));
-     }
+@@ -665,6 +681,7 @@ failed_shutdown:
+ failed_opts:
+     qemu_opts_del(opts);
+     g_free(mon_host);
 +exit:
-     return ret;
+     return r;
  }
  
 -- 
