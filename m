@@ -1,17 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48082)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39443)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batmanustc@gmail.com>) id 1dKOLH-0000qz-41
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 08:21:11 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dKPjn-0000os-Uz
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 09:50:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <batmanustc@gmail.com>) id 1dKOLG-0002EP-5Z
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 08:21:10 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dKPjk-0008Ph-UE
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 09:50:36 -0400
+Received: from [59.151.112.132] (port=23824 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dKPjk-0008P1-IH
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 09:50:32 -0400
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Date: Mon, 12 Jun 2017 21:48:27 +0800
+Message-ID: <ed9724f87e996e2bf95f2e722280713a461068fc.1497272778.git.maozy.fnst@cn.fujitsu.com>
+In-Reply-To: <cover.1497272778.git.maozy.fnst@cn.fujitsu.com>
+References: <cover.1497272778.git.maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-From: Sam <batmanustc@gmail.com>
-Date: Mon, 12 Jun 2017 20:21:07 +0800
-Message-ID: <CAOE=1Z1H-7DQtcUsKt7P2fhYQ2fBVp7R9KJwPki5wH9KvhbxBg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] Is there more trace-events in vhost module?
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v5 1/9] pci: Clean up error checking in
+ pci_add_capability()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,18 +26,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-discuss@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, marcel@redhat.com
 
-hi all=EF=BC=8C
+On success, pci_add_capability2() returns a positive value. On
+failure, it sets an error and return a negative value.
 
-I'm debuging ovs-2.6.0, dpdk-2.2.0 and qemu-2.6.0. And I run such command:
+pci_add_capability() laboriously checks this behavior. No other
+caller does. Drop the checks from pci_add_capability().
 
-QEMU_CMD -D qemu-log.log -trace events=3Dqemu-events ...
+Cc: mst@redhat.com
+Cc: marcel@redhat.com
+Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+---
+ hw/pci/pci.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-I want to trace vhost-user protocol process between QEMU and ovs-dpdk.
-Ovs-dpdk's log shows lots of infomations of vhost-user protocol, but QEMU's
-log shows only a little.
-
-As in qemu-events, there is only 'vhost_user_event' event I could use. Is
-there more events or some other method to debug vhost related module in
-QEMU?
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index 98ccc27..53566b8 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -2270,12 +2270,8 @@ int pci_add_capability(PCIDevice *pdev, uint8_t cap_id,
+     Error *local_err = NULL;
+ 
+     ret = pci_add_capability2(pdev, cap_id, offset, size, &local_err);
+-    if (local_err) {
+-        assert(ret < 0);
++    if (ret < 0) {
+         error_report_err(local_err);
+-    } else {
+-        /* success implies a positive offset in config space */
+-        assert(ret > 0);
+     }
+     return ret;
+ }
+-- 
+2.9.3
