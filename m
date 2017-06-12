@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dKNcA-0007RA-Cr
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 07:34:38 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dKNfM-0000ce-0l
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 07:37:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dKNc9-0005mQ-3e
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 07:34:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50014)
+	(envelope-from <imammedo@redhat.com>) id 1dKNfI-0006O4-SO
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 07:37:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36082)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1dKNc8-0005mL-Qz
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 07:34:33 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DC12D80F8D
-	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 11:34:31 +0000 (UTC)
-References: <20170601212921.30241-1-quintela@redhat.com>
-	<20170601212921.30241-7-quintela@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <753c22da-35b2-a81c-e6b2-f20d8f0c5e34@redhat.com>
-Date: Mon, 12 Jun 2017 13:34:27 +0200
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dKNfI-0006Np-JP
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 07:37:48 -0400
+Date: Mon, 12 Jun 2017 13:37:40 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170612133740.2f3eef83@nial.brq.redhat.com>
+In-Reply-To: <1497097821-32754-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+References: <1497097821-32754-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1497097821-32754-4-git-send-email-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-In-Reply-To: <20170601212921.30241-7-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 06/11] migration: Commands are only used
- inside migration.c
+Subject: Re: [Qemu-devel] [PATCH 3/6] fw_cfg: move setting of FW_CFG_ID into
+ fw_cfg_init1()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,124 +28,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, peterx@redhat.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel@nongnu.org, rjones@redhat.com, pbonzini@redhat.com, somlo@cmu.edu, lersek@redhat.com, mst@redhat.com, ehabkost@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
 
-On 01/06/2017 23:29, Juan Quintela wrote:
-> So, move them there.  Notice that we export functions that send
-> commands, not the command themselves.
+On Sat, 10 Jun 2017 13:30:18 +0100
+Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> wrote:
+
+> The dma_enabled property enables us to set the FW_CFG_ID version
+> accordingly.
+it might be not safe as patch reorders FW_CFG_ID entry.
+
+(I recall there were patches that sorted fwcfg entries,
+but it's worth checking that it won't break migration)
+
+CCing Gerd, maybe he would recall how it works.
+
 > 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 > ---
->  include/migration/migration.h | 15 --------------
->  migration/migration.c         | 46 +++++++++++++++++++++++++++----------------
->  2 files changed, 29 insertions(+), 32 deletions(-)
+>  hw/nvram/fw_cfg.c |   16 +++++++---------
+>  1 file changed, 7 insertions(+), 9 deletions(-)
 > 
-> diff --git a/include/migration/migration.h b/include/migration/migration.h
-> index dd52d3c..108212c 100644
-> --- a/include/migration/migration.h
-> +++ b/include/migration/migration.h
-> @@ -22,18 +22,6 @@
->  #include "exec/cpu-common.h"
->  #include "qemu/coroutine_int.h"
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index 1313bfd..f7b78a9 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -914,12 +914,19 @@ static void fw_cfg_init1(DeviceState *dev)
+>  {
+>      FWCfgState *s = FW_CFG(dev);
+>      MachineState *machine = MACHINE(qdev_get_machine());
+> +    uint32_t version = FW_CFG_VERSION;
 >  
-> -/* Messages sent on the return path from destination to source */
-> -enum mig_rp_message_type {
-> -    MIG_RP_MSG_INVALID = 0,  /* Must be 0 */
-> -    MIG_RP_MSG_SHUT,         /* sibling will not send any more RP messages */
-> -    MIG_RP_MSG_PONG,         /* Response to a PING; data (seq: be32 ) */
-> -
-> -    MIG_RP_MSG_REQ_PAGES_ID, /* data (start: be64, len: be32, id: string) */
-> -    MIG_RP_MSG_REQ_PAGES,    /* data (start: be64, len: be32) */
-> -
-> -    MIG_RP_MSG_MAX
-> -};
-> -
->  /* State for the incoming migration */
->  struct MigrationIncomingState {
->      QEMUFile *from_src_file;
-> @@ -176,9 +164,6 @@ int migrate_decompress_threads(void);
->  bool migrate_use_events(void);
+>      assert(!object_resolve_path(FW_CFG_PATH, NULL));
 >  
->  /* Sending on the return path - generic and then for each message type */
-> -void migrate_send_rp_message(MigrationIncomingState *mis,
-> -                             enum mig_rp_message_type message_type,
-> -                             uint16_t len, void *data);
->  void migrate_send_rp_shut(MigrationIncomingState *mis,
->                            uint32_t value);
->  void migrate_send_rp_pong(MigrationIncomingState *mis,
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 48c94c9..603d39d 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -86,6 +86,18 @@ static NotifierList migration_state_notifiers =
+>      object_property_add_child(OBJECT(machine), FW_CFG_NAME, OBJECT(s), NULL);
 >  
->  static bool deferred_incoming;
->  
-> +/* Messages sent on the return path from destination to source */
-> +enum mig_rp_message_type {
-> +    MIG_RP_MSG_INVALID = 0,  /* Must be 0 */
-> +    MIG_RP_MSG_SHUT,         /* sibling will not send any more RP messages */
-> +    MIG_RP_MSG_PONG,         /* Response to a PING; data (seq: be32 ) */
+>      fw_cfg_add_bytes(s, FW_CFG_SIGNATURE, (char *)"QEMU", 4);
 > +
-> +    MIG_RP_MSG_REQ_PAGES_ID, /* data (start: be64, len: be32, id: string) */
-> +    MIG_RP_MSG_REQ_PAGES,    /* data (start: be64, len: be32) */
+> +    if (s->dma_enabled) {
+> +        version |= FW_CFG_VERSION_DMA;
+> +    }
 > +
-> +    MIG_RP_MSG_MAX
-> +};
-> +
->  /* When we add fault tolerance, we could have several
->     migrations at once.  For now we don't need to add
->     dynamic creation of migration */
-> @@ -292,6 +304,23 @@ static void deferred_incoming_migration(Error **errp)
->      deferred_incoming = true;
+> +    fw_cfg_add_i32(s, FW_CFG_ID, version);
+>      fw_cfg_add_bytes(s, FW_CFG_UUID, &qemu_uuid, 16);
+>      fw_cfg_add_i16(s, FW_CFG_NOGRAPHIC, (uint16_t)!machine->enable_graphics);
+>      fw_cfg_add_i16(s, FW_CFG_BOOT_MENU, (uint16_t)boot_menu);
+> @@ -935,7 +942,6 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
+>  {
+>      DeviceState *dev;
+>      FWCfgState *s;
+> -    uint32_t version = FW_CFG_VERSION;
+>      bool dma_requested = dma_iobase && dma_as;
+>  
+>      dev = qdev_create(NULL, TYPE_FW_CFG_IO);
+> @@ -954,12 +960,8 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
+>          /* 64 bits for the address field */
+>          s->dma_as = dma_as;
+>          s->dma_addr = 0;
+> -
+> -        version |= FW_CFG_VERSION_DMA;
+>      }
+>  
+> -    fw_cfg_add_i32(s, FW_CFG_ID, version);
+> -
+>      return s;
 >  }
 >  
-> +/*
-> + * Send a message on the return channel back to the source
-> + * of the migration.
-> + */
-> +static void migrate_send_rp_message(MigrationIncomingState *mis,
-> +                                    enum mig_rp_message_type message_type,
-> +                                    uint16_t len, void *data)
-> +{
-> +    trace_migrate_send_rp_message((int)message_type, len);
-> +    qemu_mutex_lock(&mis->rp_mutex);
-> +    qemu_put_be16(mis->to_src_file, (unsigned int)message_type);
-> +    qemu_put_be16(mis->to_src_file, len);
-> +    qemu_put_buffer(mis->to_src_file, data, len);
-> +    qemu_fflush(mis->to_src_file);
-> +    qemu_mutex_unlock(&mis->rp_mutex);
-> +}
-> +
->  /* Request a range of pages from the source VM at the given
->   * start address.
->   *   rbname: Name of the RAMBlock to request the page in, if NULL it's the same
-> @@ -462,23 +491,6 @@ void migration_fd_process_incoming(QEMUFile *f)
+> @@ -975,7 +977,6 @@ FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
+>      DeviceState *dev;
+>      SysBusDevice *sbd;
+>      FWCfgState *s;
+> -    uint32_t version = FW_CFG_VERSION;
+>      bool dma_requested = dma_addr && dma_as;
+>  
+>      dev = qdev_create(NULL, TYPE_FW_CFG_MEM);
+> @@ -997,11 +998,8 @@ FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
+>          s->dma_as = dma_as;
+>          s->dma_addr = 0;
+>          sysbus_mmio_map(sbd, 2, dma_addr);
+> -        version |= FW_CFG_VERSION_DMA;
+>      }
+>  
+> -    fw_cfg_add_i32(s, FW_CFG_ID, version);
+> -
+>      return s;
 >  }
 >  
->  /*
-> - * Send a message on the return channel back to the source
-> - * of the migration.
-> - */
-> -void migrate_send_rp_message(MigrationIncomingState *mis,
-> -                             enum mig_rp_message_type message_type,
-> -                             uint16_t len, void *data)
-> -{
-> -    trace_migrate_send_rp_message((int)message_type, len);
-> -    qemu_mutex_lock(&mis->rp_mutex);
-> -    qemu_put_be16(mis->to_src_file, (unsigned int)message_type);
-> -    qemu_put_be16(mis->to_src_file, len);
-> -    qemu_put_buffer(mis->to_src_file, data, len);
-> -    qemu_fflush(mis->to_src_file);
-> -    qemu_mutex_unlock(&mis->rp_mutex);
-> -}
-> -
-> -/*
->   * Send a 'SHUT' message on the return channel with the given value
->   * to indicate that we've finished with the RP.  Non-0 value indicates
->   * error.
-> 
