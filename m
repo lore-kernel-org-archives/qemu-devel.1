@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dKEAO-0004fD-Hg
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 21:29:17 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dKEGl-00062s-Ny
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 21:35:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dKEAK-0004rp-9K
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 21:29:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43818)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dKEAK-0004rF-2v
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 21:29:12 -0400
-Date: Mon, 12 Jun 2017 09:29:07 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170612012907.GA14733@lemon.lan>
-References: <149710124565.5184.589786790726488850@84b42461e25a>
-	<ec44cfad-92a4-664a-4c05-39941bc31480@ilande.co.uk>
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dKEGi-0006Zu-Jm
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 21:35:51 -0400
+Received: from [59.151.112.132] (port=1289 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dKEGh-0006Z4-CT
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 21:35:48 -0400
+References: <cover.1496994386.git.maozy.fnst@cn.fujitsu.com>
+	<23d76336ccef24473bf20f83628818eb3d97dac4.1496994386.git.maozy.fnst@cn.fujitsu.com>
+	<20170609135353.GQ5016@thinpad.lan.raisama.net>
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Message-ID: <e19cc067-95d8-fa52-1c99-bb9839aa2e23@cn.fujitsu.com>
+Date: Mon, 12 Jun 2017 09:34:14 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ec44cfad-92a4-664a-4c05-39941bc31480@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH 0/3] sun4u: move fw_cfg/NVRAM devices to
- ebus PCI IO address space
+In-Reply-To: <20170609135353.GQ5016@thinpad.lan.raisama.net>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 5/7] pci: Replace pci_add_capability()
+ with pci_add_capability2()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,23 +29,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, atar4qemu@gmail.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, mst@redhat.com, dmitry@daynix.com, jasowang@redhat.com, marcel@redhat.com, alex.williamson@redhat.com, armbru@redhat.com
 
-On Sat, 06/10 14:31, Mark Cave-Ayland wrote:
-> On 10/06/17 14:27, no-reply@patchew.org wrote:
-> 
-> > Hi,
-> > 
-> > This series failed build test on s390x host. Please find the details below.
-> 
-> Well given that it's dependent upon the fw_cfg patchset I posted
-> earlier, it's probably going to fail on all hosts :)
-> 
-> Is there a way to express patch dependencies for the patchew builds that
-> I'm not aware of?
+Hi, Eduardo
 
-There currently isn't one but it's being worked on. I will announce it on
-qemu-devel@nongnu.org once it's ready. Thanks!
+On 06/09/2017 09:53 PM, Eduardo Habkost wrote:
+> On Fri, Jun 09, 2017 at 07:24:40PM +0800, Mao Zhongyi wrote:
+>> After the patch 'Make errp the last parameter of pci_add_capability()',
+>> pci_add_capability() and pci_add_capability2() now do exactly the same.
+>> So drop the wrapper pci_add_capability() of pci_add_capability2(), then
+>> replace the pci_add_capability() with pci_add_capability2() everywhere.
+>
+> I would do the opposite, and keep pci_add_capability() only.
+> It's confusing to have a function named pci_add_capability2() if
+> pci_add_capability() doesn't exist anymore.
+>
 
-Fam
+Yes, I see, will fix it right away.
+
+Thanks
+Mao
