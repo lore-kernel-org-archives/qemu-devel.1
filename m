@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dKNte-0006sY-Ju
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 07:52:39 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dKNvU-0007ma-9G
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 07:54:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dKNtb-0001ga-IU
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 07:52:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38900)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dKNtb-0001gM-A4
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 07:52:35 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4658C19D24B
-	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 11:52:34 +0000 (UTC)
-Date: Mon, 12 Jun 2017 12:52:27 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170612115227.GD3146@work-vm>
-References: <20170607105810.3003-1-quintela@redhat.com>
-	<20170607105810.3003-2-quintela@redhat.com>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dKNvR-0002IQ-7R
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 07:54:32 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:38824
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1dKNvR-0002I8-04
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 07:54:29 -0400
+References: <1497097821-32754-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1497097821-32754-3-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20170612134328.76c5a352@nial.brq.redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <84a176fb-0d57-09f5-15c3-8e2bd4c66f48@ilande.co.uk>
+Date: Mon, 12 Jun 2017 12:54:19 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170607105810.3003-2-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] ram: Print block stats also in the
- complete case
+In-Reply-To: <20170612134328.76c5a352@nial.brq.redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/6] fw_cfg: move qdev_init_nofail() out
+ from fw_cfg_init1() into callers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,82 +31,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: ehabkost@redhat.com, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, pbonzini@redhat.com, lersek@redhat.com
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Once there, create populate_disk_info.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+On 12/06/17 12:43, Igor Mammedov wrote:
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> On Sat, 10 Jun 2017 13:30:17 +0100
+> Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> wrote:
+> 
+> patch needs a commit message saying why it's needed.
+> maybe add something similar to:
+> 
+> qdev_init_nofail() essentially 'realizes' object,
+> taking in account that fw_cfg_init1() will be moved to
+> realize in follow up patches, move qdev_init_nofail() outside of
+> fw_cfg_init1().
 
-> 
-> --
-> 
-> - create populate_disk_info instead of "abusing" populate_ram_info
-> ---
->  migration/migration.c | 31 +++++++++++++------------------
->  1 file changed, 13 insertions(+), 18 deletions(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 4dbc4f2..cfa266b 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -515,6 +515,17 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
->      }
->  }
->  
-> +static void populate_disk_info(MigrationInfo *info)
-> +{
-> +    if (blk_mig_active()) {
-> +        info->has_disk = true;
-> +        info->disk = g_malloc0(sizeof(*info->disk));
-> +        info->disk->transferred = blk_mig_bytes_transferred();
-> +        info->disk->remaining = blk_mig_bytes_remaining();
-> +        info->disk->total = blk_mig_bytes_total();
-> +    }
-> +}
-> +
->  MigrationInfo *qmp_query_migrate(Error **errp)
->  {
->      MigrationInfo *info = g_malloc0(sizeof(*info));
-> @@ -540,15 +551,7 @@ MigrationInfo *qmp_query_migrate(Error **errp)
->          info->setup_time = s->setup_time;
->  
->          populate_ram_info(info, s);
-> -
-> -        if (blk_mig_active()) {
-> -            info->has_disk = true;
-> -            info->disk = g_malloc0(sizeof(*info->disk));
-> -            info->disk->transferred = blk_mig_bytes_transferred();
-> -            info->disk->remaining = blk_mig_bytes_remaining();
-> -            info->disk->total = blk_mig_bytes_total();
-> -        }
-> -
-> +        populate_disk_info(info);
->          break;
->      case MIGRATION_STATUS_POSTCOPY_ACTIVE:
->          /* Mostly the same as active; TODO add some postcopy stats */
-> @@ -562,15 +565,7 @@ MigrationInfo *qmp_query_migrate(Error **errp)
->          info->setup_time = s->setup_time;
->  
->          populate_ram_info(info, s);
-> -
-> -        if (blk_mig_active()) {
-> -            info->has_disk = true;
-> -            info->disk = g_malloc0(sizeof(*info->disk));
-> -            info->disk->transferred = blk_mig_bytes_transferred();
-> -            info->disk->remaining = blk_mig_bytes_remaining();
-> -            info->disk->total = blk_mig_bytes_total();
-> -        }
-> -
-> +        populate_disk_info(info);
->          break;
->      case MIGRATION_STATUS_COLO:
->          info->has_status = true;
-> -- 
-> 2.9.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Yes, I can alter the commit message to provide more explanation. For
+some background the use case can be found in my follow-up sun4u patches
+here (i.e. preparation for moving the ebus device behind a PCI bridge):
+
+https://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg02658.html
+https://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg02656.html
+
+
+ATB,
+
+Mark.
