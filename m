@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dave.hansen@intel.com>) id 1dKQ2t-0005qV-9j
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 10:10:20 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dKQ8z-0007sa-5w
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 10:16:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dave.hansen@intel.com>) id 1dKQ2p-0007FF-96
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 10:10:19 -0400
-Received: from mga07.intel.com ([134.134.136.100]:39192)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dave.hansen@intel.com>)
-	id 1dKQ2o-0007Ek-W1
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 10:10:15 -0400
-References: <1497004901-30593-1-git-send-email-wei.w.wang@intel.com>
-	<1497004901-30593-5-git-send-email-wei.w.wang@intel.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Message-ID: <b92af473-f00e-b956-ea97-eb4626601789@intel.com>
-Date: Mon, 12 Jun 2017 07:10:12 -0700
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dKQ8u-0001gV-Th
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 10:16:37 -0400
+Received: from [59.151.112.132] (port=40923 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dKQ8u-0001ek-HO
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 10:16:32 -0400
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Date: Mon, 12 Jun 2017 22:15:01 +0800
+Message-ID: <cover.1497276062.git.maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <1497004901-30593-5-git-send-email-wei.w.wang@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v11 4/6] mm: function to offer a page block
- on the free list
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v4 0/4] Improve error reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +23,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, david@redhat.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com
+To: qemu-devel@nongnu.org
+Cc: jasowang@redhat.com, armbru@redhat.com, berrange@redhat.com, kraxel@redhat.com, pbonzini@redhat.com
 
-Please stop cc'ing me on things also sent to closed mailing lists
-(virtio-dev@lists.oasis-open.org).  I'm happy to review things on open
-lists, but I'm not fond of the closed lists bouncing things at me.
+Daniel's patch(commit 6701e551, Revert "Change net/socket.c to use socket_*() 
+functions" again) has been in upstream. Continue this patchset.
 
-On 06/09/2017 03:41 AM, Wei Wang wrote:
-> Add a function to find a page block on the free list specified by the
-> caller. Pages from the page block may be used immediately after the
-> function returns. The caller is responsible for detecting or preventing
-> the use of such pages.
+In v2, this series convert the non-blocking connect mechanism to QIOchannel 
+by replace the socket_connect(), and some errors also are converted to Error. 
 
-This description doesn't tell me very much about what's going on here.
-Neither does the comment.
+The v2 related discussion was listed on:
+https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg04886.html
 
-"Pages from the page block may be used immediately after the
- function returns".
+v4: 
+* PATCH 01 is redoing previous patch 1, replace the fprintf() with error_report()
+		     in the 'default' case of net_socket_fd_init() [Markus Armbruster]
 
-Used by who?  Does the "may" here mean that it is OK, or is it a warning
-that the contents will be thrown away immediately?
+v3:
+* PATCH 01 is suggested by Markus and Daniel that removes the dubious 'default' case
+           in the net_socket_fd_init(). Jason agreed.
+* PATCH 02 is redoing previous patch 4.
+* PATCH 04 is redoing previous patch 2, improves sort of error messages. 
 
-The hypervisor is going to throw away the contents of these pages,
-right?  As soon as the spinlock is released, someone can allocate a
-page, and put good data in it.  What keeps the hypervisor from throwing
-away good data?
+v2:
+* PATCH 02 reworking of patch 2 following Markus's suggestion that convert error_report()
+           in the function called by net_socket_*_init() to Error. Also add many error 
+           handling information.
+* PATCH 03 net_socket_mcast_create(), net_socket_fd_init_dgram() and net_socket_fd_init() 
+           use the function such as fprintf, perror to report an error message. Convert it 
+           to Error.
+* PATCH 04 parse_host_port() may fail without reporting an error. Now, fix it to set an
+           error when it fails.
+
+
+Cc: jasowang@redhat.com
+Cc: armbru@redhat.com
+Cc: berrange@redhat.com
+Cc: kraxel@redhat.com
+Cc: pbonzini@redhat.com
+
+Mao Zhongyi (4):
+  net/socket: Drop the odd 'default' case and comment
+  net/net: Convert parse_host_port() to Error
+  net/socket: Convert error report message to Error
+  net/socket: Improve -net socket error reporting
+
+ include/qemu/sockets.h |   2 +-
+ net/net.c              |  21 ++++++--
+ net/socket.c           | 133 +++++++++++++++++++++++++++++--------------------
+ 3 files changed, 96 insertions(+), 60 deletions(-)
+
+-- 
+2.9.3
