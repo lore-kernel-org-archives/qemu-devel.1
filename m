@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40264)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dKLfS-0002WR-P8
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 05:29:52 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dKLfg-0002dL-Jw
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 05:30:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dKLfN-0002oP-RM
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 05:29:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42546)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dKLfN-0002o1-IT
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 05:29:45 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 567377F6A8
-	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 09:29:44 +0000 (UTC)
-Date: Mon, 12 Jun 2017 17:29:34 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170612092934.GG12928@pxdev.xzpeter.org>
-References: <20170601212921.30241-1-quintela@redhat.com>
-	<20170601212921.30241-4-quintela@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1dKLfb-0002rJ-ND
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 05:30:04 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:32963)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dKLfb-0002r4-D9
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 05:29:59 -0400
+Received: by mail-wr0-x242.google.com with SMTP id v104so20564089wrb.0
+	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 02:29:59 -0700 (PDT)
+Date: Mon, 12 Jun 2017 10:29:46 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170612092946.GA3628@stefanha-x1.localdomain>
+References: <20170508141536.20690-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="/04w6evG8XlLl3ft"
 Content-Disposition: inline
-In-Reply-To: <20170601212921.30241-4-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 03/11] migration: Split registration
- functions from vmstate.h
+In-Reply-To: <20170508141536.20690-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 0/9] qemu-img: add measure sub-command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,196 +29,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>, Nir Soffer <nsoffer@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, Alberto Garcia <berto@igalia.com>, stefanha@redhat.com
 
-On Thu, Jun 01, 2017 at 11:29:13PM +0200, Juan Quintela wrote:
-> They are indpendent, and nowadays almost every device register things
-> with qdev->vmsd.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  hw/net/vmxnet3.c             |  1 +
->  hw/ppc/spapr.c               |  1 +
->  hw/s390x/s390-skeys.c        |  1 +
->  hw/s390x/s390-virtio-ccw.c   |  1 +
->  include/migration/register.h | 64 ++++++++++++++++++++++++++++++++++++++++++++
->  include/migration/vmstate.h  | 45 -------------------------------
->  migration/block.c            |  1 +
->  migration/ram.c              |  1 +
->  migration/savevm.c           |  1 +
->  slirp/slirp.c                |  1 +
->  10 files changed, 72 insertions(+), 45 deletions(-)
->  create mode 100644 include/migration/register.h
-> 
-> diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
-> index 8b1fab2..21ac646 100644
-> --- a/hw/net/vmxnet3.c
-> +++ b/hw/net/vmxnet3.c
-> @@ -26,6 +26,7 @@
->  #include "qemu/bswap.h"
->  #include "hw/pci/msix.h"
->  #include "hw/pci/msi.h"
-> +#include "migration/register.h"
->  
->  #include "vmxnet3.h"
->  #include "vmxnet_debug.h"
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index ab3aab1..a44efbf 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -39,6 +39,7 @@
->  #include "sysemu/hw_accel.h"
->  #include "kvm_ppc.h"
->  #include "migration/migration.h"
-> +#include "migration/register.h"
->  #include "mmu-hash64.h"
->  #include "mmu-book3s-v3.h"
->  #include "qom/cpu.h"
-> diff --git a/hw/s390x/s390-skeys.c b/hw/s390x/s390-skeys.c
-> index 619152c..58f084a 100644
-> --- a/hw/s390x/s390-skeys.c
-> +++ b/hw/s390x/s390-skeys.c
-> @@ -15,6 +15,7 @@
->  #include "hw/s390x/storage-keys.h"
->  #include "qemu/error-report.h"
->  #include "sysemu/kvm.h"
-> +#include "migration/register.h"
->  
->  #define S390_SKEYS_BUFFER_SIZE 131072  /* Room for 128k storage keys */
->  #define S390_SKEYS_SAVE_FLAG_EOS 0x01
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index c9021f2..51d14d3 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -28,6 +28,7 @@
->  #include "ipl.h"
->  #include "hw/s390x/s390-virtio-ccw.h"
->  #include "hw/s390x/css-bridge.h"
-> +#include "migration/register.h"
->  
->  static const char *const reset_dev_types[] = {
->      TYPE_VIRTUAL_CSS_BRIDGE,
-> diff --git a/include/migration/register.h b/include/migration/register.h
-> new file mode 100644
-> index 0000000..844afaf
-> --- /dev/null
-> +++ b/include/migration/register.h
-> @@ -0,0 +1,64 @@
-> +/*
-> + * QEMU migration vmstate registration
-> + *
-> + * Copyright IBM, Corp. 2008
-> + *
-> + * Authors:
-> + *  Anthony Liguori   <aliguori@us.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2.  See
-> + * the COPYING file in the top-level directory.
-> + *
-> + */
-> +
-> +#ifndef MIGRATION_REGISTER_H
-> +#define MIGRATION_REGISTER_H
-> +
-> +typedef void SaveStateHandler(QEMUFile *f, void *opaque);
-> +typedef int LoadStateHandler(QEMUFile *f, void *opaque, int version_id);
-> +
-> +typedef struct SaveVMHandlers {
-> +    /* This runs inside the iothread lock.  */
-> +    SaveStateHandler *save_state;
-> +
-> +    void (*cleanup)(void *opaque);
-> +    int (*save_live_complete_postcopy)(QEMUFile *f, void *opaque);
-> +    int (*save_live_complete_precopy)(QEMUFile *f, void *opaque);
-> +
-> +    /* This runs both outside and inside the iothread lock.  */
-> +    bool (*is_active)(void *opaque);
-> +
-> +    /* This runs outside the iothread lock in the migration case, and
-> +     * within the lock in the savevm case.  The callback had better only
-> +     * use data that is local to the migration thread or protected
-> +     * by other locks.
-> +     */
-> +    int (*save_live_iterate)(QEMUFile *f, void *opaque);
-> +
-> +    /* This runs outside the iothread lock!  */
-> +    int (*save_live_setup)(QEMUFile *f, void *opaque);
-> +    void (*save_live_pending)(QEMUFile *f, void *opaque,
-> +                              uint64_t threshold_size,
-> +                              uint64_t *non_postcopiable_pending,
-> +                              uint64_t *postcopiable_pending);
-> +    LoadStateHandler *load_state;
-> +} SaveVMHandlers;
-> +
-> +int register_savevm(DeviceState *dev,
-> +                    const char *idstr,
-> +                    int instance_id,
-> +                    int version_id,
-> +                    SaveStateHandler *save_state,
-> +                    LoadStateHandler *load_state,
-> +                    void *opaque);
 
-Looks like this patch needs a rebasing since this function is already
-remove...
+--/04w6evG8XlLl3ft
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> +
-> +int register_savevm_live(DeviceState *dev,
-> +                         const char *idstr,
-> +                         int instance_id,
-> +                         int version_id,
-> +                         SaveVMHandlers *ops,
-> +                         void *opaque);
-> +
-> +void unregister_savevm(DeviceState *dev, const char *idstr, void *opaque);
-> +
-> +#endif
-> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-> index b95c9bb..6de554d 100644
-> --- a/include/migration/vmstate.h
-> +++ b/include/migration/vmstate.h
-> @@ -29,53 +29,8 @@
->  
->  #include "migration/qjson.h"
->  
-> -typedef void SaveStateHandler(QEMUFile *f, void *opaque);
->  typedef int LoadStateHandler(QEMUFile *f, void *opaque, int version_id);
+On Mon, May 08, 2017 at 10:15:27AM -0400, Stefan Hajnoczi wrote:
+> v6:
+>  * Change bdrv_measure() return type to BlockMeasureInfo * [Eric]
+>  * Clarify that holes in sparse POSIX files are still counted [Eric]
+>=20
+> v5:
+>  * Use UINT64_MAX instead of ~0ULL [Berto]
+>  * Document qemu-img measure ofmt, fmt, output_fmt, and snapshot_param
+>    [Berto]
+>=20
+> v4:
+>  * Make qcow2 refcount calculation conservative [Maor]
+>  * Include actual qemu-img convert image size in test cases
+>=20
+> v3:
+>  * Drop RFC, this is ready to go for QEMU 2.10
+>  * Use "required size" instead of "required bytes" in qemu-img output for
+>    consistency [Nir]
+>  * Clarify BlockMeasureInfo semantics [Max]
+>  * Clarify bdrv_measure() opts argument and error handling [Nir]
+>  * Handle -o backing_file=3D for qcow2 [Max]
+>  * Handle snapshot options in qemu-img measure
+>  * Probe input image for allocated data clusters for qcow2.  Didn't centr=
+alize
+>    this because there are format-specific aspects such as the cluster_siz=
+e.  It
+>    may make sense to centralize it later (with a bit more complexity) if
+>    support is added to more formats.
+>  * Add qemu-img(1) man page section for 'measure' sub-command [Max]
+>  * Extend test case to cover additional scenarios [Nir]
+>=20
+> RFCv2:
+>  * Publishing RFC again to discuss the new user-visible interfaces.  Code=
+ has
+>    changed quite a bit, I have not kept any Reviewed-by tags.
+>  * Rename qemu-img sub-command "measure" and API bdrv_measure() [Nir]
+>  * Report both "required bytes" and "fully allocated bytes" to handle the=
+ empty
+>    image file and prealloc use cases [Nir and Dan]
+>  * Use bdrv_getlength() instead of bdrv_nb_sectors() [Berto]
+>  * Rename "err" label "out" in qemu-img-cmds.c [Nir]
+>  * Add basic qcow2 support, doesn't support qemu-img convert from existin=
+g files yet
+>=20
+> RFCv1:
+>  * Publishing patch series with just raw support, no qcow2 yet.  Please r=
+eview
+>    the command-line interface and let me know if you are happy with this
+>    approach.
+>=20
+> Users and management tools sometimes need to know the size required for a=
+ new
+> disk image so that an LVM volume, SAN LUN, etc can be allocated ahead of =
+time.
+> Image formats like qcow2 have non-trivial metadata that makes it hard to
+> estimate the exact size without knowledge of file format internals.
+>=20
+> This patch series introduces a new qemu-img sub-command that calculates t=
+he
+> required size for both image creation and conversion scenarios.
+>=20
+> The conversion scenario is:
+>=20
+>   $ qemu-img measure -f raw -O qcow2 input.img
+>   required size: 1327680
+>   fully allocated size: 1074069504
+>=20
+> Here an existing image file is taken and the output includes the space re=
+quired
+> for data from the input image file.
+>=20
+> The creation scenario is:
+>=20
+>   $ qemu-img measure -O qcow2 --size 5G
+>   required size: 327680
+>   fully allocated size: 1074069504
+>=20
+> Stefan Hajnoczi (9):
+>   block: add bdrv_measure() API
+>   raw-format: add bdrv_measure() support
+>   qcow2: extract preallocation calculation function
+>   qcow2: make refcount size calculation conservative
+>   qcow2: extract image creation option parsing
+>   qcow2: add bdrv_measure() support
+>   qemu-img: add measure subcommand
+>   qemu-iotests: support per-format golden output files
+>   iotests: add test 178 for qemu-img measure
+>=20
+>  qapi/block-core.json             |  25 +++
+>  include/block/block.h            |   2 +
+>  include/block/block_int.h        |   2 +
+>  block.c                          |  35 ++++
+>  block/qcow2.c                    | 372 +++++++++++++++++++++++++++++----=
+------
+>  block/raw-format.c               |  26 +++
+>  qemu-img.c                       | 228 ++++++++++++++++++++++++
+>  qemu-img-cmds.hx                 |   6 +
+>  qemu-img.texi                    |  30 ++++
+>  tests/qemu-iotests/178           | 168 ++++++++++++++++++
+>  tests/qemu-iotests/178.out.qcow2 | 278 +++++++++++++++++++++++++++++
+>  tests/qemu-iotests/178.out.raw   | 146 +++++++++++++++
+>  tests/qemu-iotests/check         |   5 +
+>  tests/qemu-iotests/group         |   1 +
+>  14 files changed, 1230 insertions(+), 94 deletions(-)
+>  create mode 100755 tests/qemu-iotests/178
+>  create mode 100644 tests/qemu-iotests/178.out.qcow2
+>  create mode 100644 tests/qemu-iotests/178.out.raw
 
-Should be removed too?
+Ping ^ 2
 
-Other than mentioned above:
+Stefan
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+--/04w6evG8XlLl3ft
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Thanks,
+-----BEGIN PGP SIGNATURE-----
 
->  
-> -typedef struct SaveVMHandlers {
-> -    /* This runs inside the iothread lock.  */
-> -    SaveStateHandler *save_state;
-> -
-> -    void (*cleanup)(void *opaque);
-> -    int (*save_live_complete_postcopy)(QEMUFile *f, void *opaque);
-> -    int (*save_live_complete_precopy)(QEMUFile *f, void *opaque);
-> -
-> -    /* This runs both outside and inside the iothread lock.  */
-> -    bool (*is_active)(void *opaque);
-> -
-> -    /* This runs outside the iothread lock in the migration case, and
-> -     * within the lock in the savevm case.  The callback had better only
-> -     * use data that is local to the migration thread or protected
-> -     * by other locks.
-> -     */
-> -    int (*save_live_iterate)(QEMUFile *f, void *opaque);
-> -
-> -    /* This runs outside the iothread lock!  */
-> -    int (*save_live_setup)(QEMUFile *f, void *opaque);
-> -    void (*save_live_pending)(QEMUFile *f, void *opaque,
-> -                              uint64_t threshold_size,
-> -                              uint64_t *non_postcopiable_pending,
-> -                              uint64_t *postcopiable_pending);
-> -    LoadStateHandler *load_state;
-> -} SaveVMHandlers;
+iQEcBAEBAgAGBQJZPl8KAAoJEJykq7OBq3PIfxwIAKOS2FLJf6YUPhw+ywFBIsYA
+80xCWxDoWoblh0ZLByoZ2Eb1QizhL0NkKpVuO/w+ha0kkoBR2+k6XrAqp9t8zHd5
++15CO1M3oNNv93AxQFazIAvtWTMsTc5YfGwxMzc6aU7774vH7pk5JPl3GzkkWiTY
+L36zJSl63ApBwnjtRxkIeXIVru9mWgbs5De0cNWe+REJ+Aqzditf9/FFZQQrv8Mp
++aY78l4ygMiAbkyFupE3FU4GlGZ9h3dhF86+el6pZKY1RNBhp/2Yw5981hYvnTYZ
+hXZKKzgNYK+ClHVF6p2b/l99dIye6AxxhgjpWV2jA88dXukX1mMiP687XT/APzQ=
+=DGqv
+-----END PGP SIGNATURE-----
 
--- 
-Peter Xu
+--/04w6evG8XlLl3ft--
