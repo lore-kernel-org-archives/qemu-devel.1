@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dKNhH-0001Iu-4Z
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 07:39:52 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dKNkw-0002Xb-Fq
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 07:43:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dKNhE-0007AM-1p
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 07:39:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58634)
+	(envelope-from <imammedo@redhat.com>) id 1dKNkt-0007om-C4
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 07:43:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43934)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1dKNhD-0007AI-Oy
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 07:39:47 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 88E3F80F8F
-	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 11:39:46 +0000 (UTC)
-References: <20170601212921.30241-1-quintela@redhat.com>
-	<20170601212921.30241-8-quintela@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <36fd7d5a-8f20-b366-1704-9dc8951c154b@redhat.com>
-Date: Mon, 12 Jun 2017 13:39:42 +0200
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dKNkt-0007oS-6J
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 07:43:35 -0400
+Date: Mon, 12 Jun 2017 13:43:28 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170612134328.76c5a352@nial.brq.redhat.com>
+In-Reply-To: <1497097821-32754-3-git-send-email-mark.cave-ayland@ilande.co.uk>
+References: <1497097821-32754-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1497097821-32754-3-git-send-email-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-In-Reply-To: <20170601212921.30241-8-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 07/11] migration: ram_control_* are
- implemented in qemu_file
+Subject: Re: [Qemu-devel] [PATCH 2/6] fw_cfg: move qdev_init_nofail() out
+ from fw_cfg_init1() into callers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,73 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, peterx@redhat.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel@nongnu.org, rjones@redhat.com, pbonzini@redhat.com, somlo@cmu.edu, lersek@redhat.com, mst@redhat.com, ehabkost@redhat.com
 
-On 01/06/2017 23:29, Juan Quintela wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+On Sat, 10 Jun 2017 13:30:17 +0100
+Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> wrote:
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+patch needs a commit message saying why it's needed.
+maybe add something similar to:
 
+qdev_init_nofail() essentially 'realizes' object,
+taking in account that fw_cfg_init1() will be moved to
+realize in follow up patches, move qdev_init_nofail() outside of
+fw_cfg_init1().
+
+
+
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 > ---
->  include/migration/migration.h | 18 ------------------
->  migration/qemu-file.h         | 17 +++++++++++++++++
->  2 files changed, 17 insertions(+), 18 deletions(-)
+>  hw/nvram/fw_cfg.c |    5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 > 
-> diff --git a/include/migration/migration.h b/include/migration/migration.h
-> index 108212c..cb894b8 100644
-> --- a/include/migration/migration.h
-> +++ b/include/migration/migration.h
-> @@ -171,24 +171,6 @@ void migrate_send_rp_pong(MigrationIncomingState *mis,
->  void migrate_send_rp_req_pages(MigrationIncomingState *mis, const char* rbname,
->                                ram_addr_t start, size_t len);
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index 144e0c6..1313bfd 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -919,8 +919,6 @@ static void fw_cfg_init1(DeviceState *dev)
 >  
-> -void ram_control_before_iterate(QEMUFile *f, uint64_t flags);
-> -void ram_control_after_iterate(QEMUFile *f, uint64_t flags);
-> -void ram_control_load_hook(QEMUFile *f, uint64_t flags, void *data);
-> -
-> -/* Whenever this is found in the data stream, the flags
-> - * will be passed to ram_control_load_hook in the incoming-migration
-> - * side. This lets before_ram_iterate/after_ram_iterate add
-> - * transport-specific sections to the RAM migration data.
-> - */
-> -#define RAM_SAVE_FLAG_HOOK     0x80
-> -
-> -#define RAM_SAVE_CONTROL_NOT_SUPP -1000
-> -#define RAM_SAVE_CONTROL_DELAYED  -2000
-> -
-> -size_t ram_control_save_page(QEMUFile *f, ram_addr_t block_offset,
-> -                             ram_addr_t offset, size_t size,
-> -                             uint64_t *bytes_sent);
-> -
->  void savevm_skip_section_footers(void);
->  void register_global_state(void);
->  void global_state_set_optional(void);
-> diff --git a/migration/qemu-file.h b/migration/qemu-file.h
-> index 49fd697..aae4e5e 100644
-> --- a/migration/qemu-file.h
-> +++ b/migration/qemu-file.h
-> @@ -156,5 +156,22 @@ void qemu_file_set_blocking(QEMUFile *f, bool block);
+>      object_property_add_child(OBJECT(machine), FW_CFG_NAME, OBJECT(s), NULL);
 >  
->  size_t qemu_get_counted_string(QEMUFile *f, char buf[256]);
+> -    qdev_init_nofail(dev);
+> -
+>      fw_cfg_add_bytes(s, FW_CFG_SIGNATURE, (char *)"QEMU", 4);
+>      fw_cfg_add_bytes(s, FW_CFG_UUID, &qemu_uuid, 16);
+>      fw_cfg_add_i16(s, FW_CFG_NOGRAPHIC, (uint16_t)!machine->enable_graphics);
+> @@ -948,6 +946,8 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
+>      }
 >  
-> +void ram_control_before_iterate(QEMUFile *f, uint64_t flags);
-> +void ram_control_after_iterate(QEMUFile *f, uint64_t flags);
-> +void ram_control_load_hook(QEMUFile *f, uint64_t flags, void *data);
+>      fw_cfg_init1(dev);
+> +    qdev_init_nofail(dev);
 > +
-> +/* Whenever this is found in the data stream, the flags
-> + * will be passed to ram_control_load_hook in the incoming-migration
-> + * side. This lets before_ram_iterate/after_ram_iterate add
-> + * transport-specific sections to the RAM migration data.
-> + */
-> +#define RAM_SAVE_FLAG_HOOK     0x80
-> +
-> +#define RAM_SAVE_CONTROL_NOT_SUPP -1000
-> +#define RAM_SAVE_CONTROL_DELAYED  -2000
-> +
-> +size_t ram_control_save_page(QEMUFile *f, ram_addr_t block_offset,
-> +                             ram_addr_t offset, size_t size,
-> +                             uint64_t *bytes_sent);
+>      s = FW_CFG(dev);
 >  
->  #endif
-> 
+>      if (s->dma_enabled) {
+> @@ -985,6 +985,7 @@ FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
+>      }
+>  
+>      fw_cfg_init1(dev);
+> +    qdev_init_nofail(dev);
+>  
+>      sbd = SYS_BUS_DEVICE(dev);
+>      sysbus_mmio_map(sbd, 0, ctl_addr);
