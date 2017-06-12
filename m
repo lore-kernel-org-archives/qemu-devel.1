@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39077)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dKXrs-0003QH-EB
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 18:31:29 -0400
+	(envelope-from <lersek@redhat.com>) id 1dKYAl-00071W-OB
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 18:51:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dKXrn-0004vM-Dc
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 18:31:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47328)
+	(envelope-from <lersek@redhat.com>) id 1dKYAh-0001mW-OY
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 18:50:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33016)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dKXrn-0004vF-5F
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 18:31:23 -0400
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dKYAh-0001mD-Fk
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 18:50:55 -0400
 References: <1497302470-10776-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1497302470-10776-3-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1497302470-10776-4-git-send-email-mark.cave-ayland@ilande.co.uk>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <5bb9a39e-64b9-556e-e5ac-140d160c4c17@redhat.com>
-Date: Tue, 13 Jun 2017 00:31:17 +0200
+Message-ID: <1e8933c2-c64e-9b2f-3eae-8c5664c4a5a6@redhat.com>
+Date: Tue, 13 Jun 2017 00:50:48 +0200
 MIME-Version: 1.0
-In-Reply-To: <1497302470-10776-3-git-send-email-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <1497302470-10776-4-git-send-email-mark.cave-ayland@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCHv2 2/4] fw_cfg: move setting of
- FW_CFG_VERSION_DMA bit to fw_cfg_init1()
+Subject: Re: [Qemu-devel] [PATCHv2 3/4] fw_cfg: move qdev_init_nofail() from
+ fw_cfg_init1() to callers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,81 +32,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, imammedo@redhat.com, somlo@cmu.edu, ehabkost@redhat.com, mst@redhat.com, pbonzini@redhat.com, rjones@redhat.com, peter.maydell@linaro.org
 
 On 06/12/17 23:21, Mark Cave-Ayland wrote:
-> The setting of the FW_CFG_VERSION_DMA bit is the same across both the
-> TYPE_FW_CFG_MEM and TYPE_FW_CFG_IO devices, so unify the logic in
-> fw_cfg_init1().
+> When looking to instantiate a TYPE_FW_CFG_MEM or TYPE_FW_CFG_IO device to be
+> able to wire it up differently, it is much more convenient for the caller to
+> instantiate the device and have the fw_cfg default files already preloaded
+> during realize.
+> 
+> Move fw_cfg_init1() to the end of both the fw_cfg_mem_realize() and
+> fw_cfg_io_realize() functions so it no longer needs to be called manually
+> when instantiating the device.
 > 
 > Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 > ---
->  hw/nvram/fw_cfg.c |   16 +++++++---------
->  1 file changed, 7 insertions(+), 9 deletions(-)
+>  hw/nvram/fw_cfg.c |   10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
 > 
 > diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> index be5b04e..e1aa4fc 100644
+> index e1aa4fc..6c21e43 100644
 > --- a/hw/nvram/fw_cfg.c
 > +++ b/hw/nvram/fw_cfg.c
-> @@ -914,6 +914,7 @@ static void fw_cfg_init1(DeviceState *dev)
->  {
->      FWCfgState *s = FW_CFG(dev);
->      MachineState *machine = MACHINE(qdev_get_machine());
-> +    uint32_t version = FW_CFG_VERSION;
+> @@ -920,8 +920,6 @@ static void fw_cfg_init1(DeviceState *dev)
 >  
->      assert(!object_resolve_path(FW_CFG_PATH, NULL));
+>      object_property_add_child(OBJECT(machine), FW_CFG_NAME, OBJECT(s), NULL);
 >  
-> @@ -928,6 +929,12 @@ static void fw_cfg_init1(DeviceState *dev)
->      fw_cfg_bootsplash(s);
->      fw_cfg_reboot(s);
->  
-> +    if (s->dma_enabled) {
-> +        version |= FW_CFG_VERSION_DMA;
-> +    }
-> +
-> +    fw_cfg_add_i32(s, FW_CFG_ID, version);
-> +
->      s->machine_ready.notify = fw_cfg_machine_ready;
->      qemu_add_machine_init_done_notifier(&s->machine_ready);
->  }
-> @@ -938,7 +945,6 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
->      DeviceState *dev;
->      SysBusDevice *sbd;
->      FWCfgState *s;
-> -    uint32_t version = FW_CFG_VERSION;
->      bool dma_requested = dma_iobase && dma_as;
->  
->      dev = qdev_create(NULL, TYPE_FW_CFG_IO);
-> @@ -960,12 +966,8 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
->          s->dma_as = dma_as;
->          s->dma_addr = 0;
->          sysbus_add_io(sbd, dma_iobase, sysbus_mmio_get_region(sbd, 1));
+> -    qdev_init_nofail(dev);
 > -
-> -        version |= FW_CFG_VERSION_DMA;
+>      fw_cfg_add_bytes(s, FW_CFG_SIGNATURE, (char *)"QEMU", 4);
+>      fw_cfg_add_bytes(s, FW_CFG_UUID, &qemu_uuid, 16);
+>      fw_cfg_add_i16(s, FW_CFG_NOGRAPHIC, (uint16_t)!machine->enable_graphics);
+> @@ -954,7 +952,7 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
+>          qdev_prop_set_bit(dev, "dma_enabled", false);
 >      }
 >  
-> -    fw_cfg_add_i32(s, FW_CFG_ID, version);
-> -
->      return s;
->  }
+> -    fw_cfg_init1(dev);
+> +    qdev_init_nofail(dev);
 >  
-> @@ -981,7 +983,6 @@ FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
->      DeviceState *dev;
->      SysBusDevice *sbd;
->      FWCfgState *s;
-> -    uint32_t version = FW_CFG_VERSION;
->      bool dma_requested = dma_addr && dma_as;
->  
->      dev = qdev_create(NULL, TYPE_FW_CFG_MEM);
-> @@ -1002,11 +1003,8 @@ FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
->          s->dma_as = dma_as;
->          s->dma_addr = 0;
->          sysbus_mmio_map(sbd, 2, dma_addr);
-> -        version |= FW_CFG_VERSION_DMA;
+>      sbd = SYS_BUS_DEVICE(dev);
+>      sysbus_add_io(sbd, iobase, sysbus_mmio_get_region(sbd, 0));
+> @@ -991,7 +989,7 @@ FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
+>          qdev_prop_set_bit(dev, "dma_enabled", false);
 >      }
 >  
-> -    fw_cfg_add_i32(s, FW_CFG_ID, version);
-> -
->      return s;
+> -    fw_cfg_init1(dev);
+> +    qdev_init_nofail(dev);
+>  
+>      sbd = SYS_BUS_DEVICE(dev);
+>      sysbus_mmio_map(sbd, 0, ctl_addr);
+> @@ -1097,6 +1095,8 @@ static void fw_cfg_io_realize(DeviceState *dev, Error **errp)
+>                                sizeof(dma_addr_t));
+>          sysbus_init_mmio(sbd, &FW_CFG(s)->dma_iomem);
+>      }
+> +
+> +    fw_cfg_init1(dev);
 >  }
 >  
+>  static void fw_cfg_io_class_init(ObjectClass *klass, void *data)
+> @@ -1163,6 +1163,8 @@ static void fw_cfg_mem_realize(DeviceState *dev, Error **errp)
+>                                sizeof(dma_addr_t));
+>          sysbus_init_mmio(sbd, &FW_CFG(s)->dma_iomem);
+>      }
+> +
+> +    fw_cfg_init1(dev);
+>  }
+>  
+>  static void fw_cfg_mem_class_init(ObjectClass *klass, void *data)
 > 
 
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+This looks good to me generally, but I'm concerned about the part of
+fw_cfg_init1() that precedes the original qdev_init_nofail() call, namely
+
+    assert(!object_resolve_path(FW_CFG_PATH, NULL));
+
+    object_property_add_child(OBJECT(machine), FW_CFG_NAME, OBJECT(s),
+NULL);
+
+The object_property_add_child() call creates a machine-global link to
+the sole fw-cfg device, so that *other* code can find the fw-cfg device
+by calling object_resolve_path(). (The same way that we assert fails
+right before the creation, i.e. we don't try to create several fw_cfg
+devices.)
+
+I feel that this link creation does not belong in device realize
+methods, but to board code. I feel that these two steps should be
+factored out to a separate helper function, and then called from:
+
+- fw_cfg_init_io_dma(), just before the new qdev_init_nofail() call site,
+- fw_cfg_init_mem_wide(), just before the new qdev_init_nofail() call site,
+- before any similar qdev_init_nofail() call sites, such as in
+<https://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg02658.html>.
+
+Again this is just a gut feeling, comments / opinions welcome.
+
+Thanks,
+Laszlo
