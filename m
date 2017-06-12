@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dKTZm-00034A-JG
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 13:56:31 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dKTdr-0004RD-Io
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 14:00:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dKTZh-0005Ns-PF
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 13:56:30 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:62197)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dKTZh-0005MJ-Ec
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 13:56:25 -0400
-References: <20170611231633.32582-1-laurent@vivier.eu>
-	<20170611231633.32582-5-laurent@vivier.eu>
-	<48fecf30-cc95-de46-e4a7-50f94dd1d49b@twiddle.net>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <aded5012-9d86-825f-be0a-2b1c54a1fa3b@vivier.eu>
-Date: Mon, 12 Jun 2017 19:56:01 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1dKTdq-0006nN-Ny
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 14:00:43 -0400
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:34793)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dKTdq-0006n2-EQ
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 14:00:42 -0400
+Received: by mail-wr0-x236.google.com with SMTP id g76so104762084wrd.1
+	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 11:00:42 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <48fecf30-cc95-de46-e4a7-50f94dd1d49b@twiddle.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 4/7] target-m68k: move fmove CR to a
- function
+In-Reply-To: <20170608070716.2954-1-kraxel@redhat.com>
+References: <20170608070716.2954-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 12 Jun 2017 19:00:19 +0100
+Message-ID: <CAFEAcA9+194DyFJ=grKX6o9LAUeXHAJgX92gc419+Aa64_PHig@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/7] ui patch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,32 +28,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Le 12/06/2017 à 18:13, Richard Henderson a écrit :
-> On 06/11/2017 04:16 PM, Laurent Vivier wrote:
->> Move code of fmove to/from control register to a function
->>
->> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
->> ---
->>   target/m68k/translate.c | 66
->> ++++++++++++++++++++++++++++++-------------------
->>   1 file changed, 41 insertions(+), 25 deletions(-)
-> 
-> In that this is 100% code movement,
-> 
-> Reviewed-by: Richard Henderson <rth@twiddle.net>
-> 
-> 
->> +            cpu_abort(NULL, "Unimplemented: fmove from control %d",
->> mask);
->> +            goto undef;
-> 
-> But cpu_abort doesn't return, and will exit qemu.
-> This should be qemu_log_mask(LOG_UNIMP, ...).
+On 8 June 2017 at 08:07, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>   Hi,
+>
+> Here is the ui patch queue.  Switches the default
+> to gtk3 and sdl2 and fixes some bugs.
+>
+> please pull,
+>   Gerd
+>
+> The following changes since commit a0d4aac7467dd02e5657b79e867f067330266a24:
+>
+>   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20170605' into staging (2017-06-05 18:03:43 +0100)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/pull-ui-20170608-1
+>
+> for you to fetch changes up to 468949958fdfa4347a66e3cf5c8240a428532602:
+>
+>   spice: don't enter opengl mode in case another UI provides opengl support (2017-06-08 08:13:46 +0200)
+>
+> ----------------------------------------------------------------
+> ui: prefer gtk3 and sdl2, various fixes.
+>
+> ----------------------------------------------------------------
 
-Do you want I update the patch to fix that?
+This causes configure to barf warnings in my build logs on half
+my build machines:
 
-Thanks,
-Laurent
+WARNING: Support for gtk2 will be dropped in future releases.
+WARNING: Please consider using gtk3 instead.
+
+I don't think it is yet possible to drop gtk2.
+
+thanks
+-- PMM
