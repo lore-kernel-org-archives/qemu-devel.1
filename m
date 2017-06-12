@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dKRQ9-0002Bd-U2
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 11:38:26 -0400
+	(envelope-from <thuth@redhat.com>) id 1dKRp0-0003xX-UE
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 12:04:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dKRQ5-0007Jt-SJ
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 11:38:25 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:36183)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dKRQ5-0007H6-L5
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 11:38:21 -0400
-Received: by mail-wr0-x242.google.com with SMTP id e23so22871622wre.3
-	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 08:38:21 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 12 Jun 2017 17:38:14 +0200
-Message-Id: <20170612153816.15266-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/2] docs: create docs/interop/,
- include version number in qemu-doc
+	(envelope-from <thuth@redhat.com>) id 1dKRox-0008Ug-Kh
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 12:04:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39072)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dKRox-0008SY-FW
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 12:04:03 -0400
+References: <20170612121820.31106-1-otubo@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <ca7bce93-6a7e-3560-a6d9-ad95c2dc1eae@redhat.com>
+Date: Mon, 12 Jun 2017 18:03:53 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170612121820.31106-1-otubo@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: seccomp: change email contact
+ for Eduardo Otubo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,39 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, thuth@redhat.com
+To: Eduardo Otubo <otubo@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-Submitted together because of Makefile conflicts.
+On 12.06.2017 14:18, Eduardo Otubo wrote:
+> Signed-off-by: Eduardo Otubo <otubo@redhat.com>
+> ---
+>  MAINTAINERS | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 120788d..0d065a0 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1490,7 +1490,7 @@ F: tests/vmstate-static-checker-data/
+>  F: docs/migration.txt
+> =20
+>  Seccomp
+> -M: Eduardo Otubo <eduardo.otubo@profitbricks.com>
+> +M: Eduardo Otubo <otubo@redhat.com>
+>  S: Supported
+>  F: qemu-seccomp.c
+>  F: include/sysemu/seccomp.h
 
-Paolo Bonzini (2):
-  docs: create interop/ subdirectory
-  qemu-doc: include version number
-
- .gitignore                                         | 16 ++---
- Makefile                                           | 72 ++++++++++++----------
- configure                                          |  2 +-
- docs/{specs => interop}/parallels.txt              |  0
- docs/{specs => interop}/qcow2.txt                  |  0
- docs/{specs => interop}/qed_spec.txt               |  0
- docs/{ => interop}/qemu-ga-ref.texi                |  0
- docs/{ => interop}/qemu-qmp-ref.texi               |  0
- docs/{ => interop}/qmp-intro.txt                   |  0
- docs/{ => interop}/qmp-spec.txt                    |  0
- docs/{specs => interop}/vhost-user.txt             |  0
- .../{ => interop}/vnc-ledstate-Pseudo-encoding.txt |  0
- qemu-doc.texi                                      |  5 +-
- rules.mak                                          |  2 +-
- 14 files changed, 51 insertions(+), 46 deletions(-)
- rename docs/{specs => interop}/parallels.txt (100%)
- rename docs/{specs => interop}/qcow2.txt (100%)
- rename docs/{specs => interop}/qed_spec.txt (100%)
- rename docs/{ => interop}/qemu-ga-ref.texi (100%)
- rename docs/{ => interop}/qemu-qmp-ref.texi (100%)
- rename docs/{ => interop}/qmp-intro.txt (100%)
- rename docs/{ => interop}/qmp-spec.txt (100%)
- rename docs/{specs => interop}/vhost-user.txt (100%)
- rename docs/{ => interop}/vnc-ledstate-Pseudo-encoding.txt (100%)
-
--- 
-2.13.0
+Reviewed-by: Thomas Huth <thuth@redhat.com>
