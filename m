@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dKEGl-00062s-Ny
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 21:35:52 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dKEJ0-0007AY-W1
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 21:38:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dKEGi-0006Zu-Jm
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 21:35:51 -0400
-Received: from [59.151.112.132] (port=1289 helo=heian.cn.fujitsu.com)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dKEIx-00073n-Rs
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 21:38:10 -0400
+Received: from [59.151.112.132] (port=16656 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dKEGh-0006Z4-CT
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 21:35:48 -0400
-References: <cover.1496994386.git.maozy.fnst@cn.fujitsu.com>
-	<23d76336ccef24473bf20f83628818eb3d97dac4.1496994386.git.maozy.fnst@cn.fujitsu.com>
-	<20170609135353.GQ5016@thinpad.lan.raisama.net>
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dKEIx-00073T-GC
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 21:38:07 -0400
+References: <cover.1496924675.git.maozy.fnst@cn.fujitsu.com>
+	<92b1a896753cc1b2a1200f5a525bad314152cdd9.1496924675.git.maozy.fnst@cn.fujitsu.com>
+	<87shj9i9du.fsf@dusky.pond.sub.org>
 From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Message-ID: <e19cc067-95d8-fa52-1c99-bb9839aa2e23@cn.fujitsu.com>
-Date: Mon, 12 Jun 2017 09:34:14 +0800
+Message-ID: <d805d523-603c-d096-0dc1-b250c94d318f@cn.fujitsu.com>
+Date: Mon, 12 Jun 2017 09:36:46 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170609135353.GQ5016@thinpad.lan.raisama.net>
+In-Reply-To: <87shj9i9du.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 5/7] pci: Replace pci_add_capability()
- with pci_add_capability2()
+Subject: Re: [Qemu-devel] [PATCH v3 1/4] net/socket: Drop the odd 'default'
+ case and comment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,24 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, mst@redhat.com, dmitry@daynix.com, jasowang@redhat.com, marcel@redhat.com, alex.williamson@redhat.com, armbru@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, jasowang@redhat.com
 
-Hi, Eduardo
+Hi, Markus
 
-On 06/09/2017 09:53 PM, Eduardo Habkost wrote:
-> On Fri, Jun 09, 2017 at 07:24:40PM +0800, Mao Zhongyi wrote:
->> After the patch 'Make errp the last parameter of pci_add_capability()',
->> pci_add_capability() and pci_add_capability2() now do exactly the same.
->> So drop the wrapper pci_add_capability() of pci_add_capability2(), then
->> replace the pci_add_capability() with pci_add_capability2() everywhere.
+On 06/09/2017 09:22 PM, Markus Armbruster wrote:
+> Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
 >
-> I would do the opposite, and keep pci_add_capability() only.
-> It's confusing to have a function named pci_add_capability2() if
-> pci_add_capability() doesn't exist anymore.
+>> In the net_socket_fd_init(), the 'default' case and comment is odd.
+>> If @fd really was a pty, getsockopt() would fail with ENOTSOCK. If
+>> @fd was a socket, but neither SOCK_DGRAM nor SOCK_STREAM. It should
+>> not be treated as if it was SOCK_STREAM.
+>>
+>> If there is a genuine reason to support something like SOCK_RAW, it
+>> should be explicitly handled.
+>>
+>> So, drop the 'default' case since it is broken already.
+>>
+>> Cc: jasowang@redhat.com
+>> Cc: armbru@redhat.com
+>> Cc: berrange@redhat.com
+>> Cc: armbru@redhat.com
+>> Suggested-by: Markus Armbruster <armbru@redhat.com>
+>> Suggested-by: Daniel P. Berrange <berrange@redhat.com>
+>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+>> ---
+>>  net/socket.c | 6 +++---
+>>  1 file changed, 3 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/net/socket.c b/net/socket.c
+>> index dcae1ae..a503cfe 100644
+>> --- a/net/socket.c
+>> +++ b/net/socket.c
+>> @@ -449,9 +449,9 @@ static NetSocketState *net_socket_fd_init(NetClientState *peer,
+>>      case SOCK_STREAM:
+>>          return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
+>>      default:
+>> -        /* who knows ... this could be a eg. a pty, do warn and continue as stream */
+>> -        fprintf(stderr, "qemu: warning: socket type=%d for fd=%d is not SOCK_DGRAM or SOCK_STREAM\n", so_type, fd);
+>> -        return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
+>> +        fprintf(stderr, "qemu: error: socket type=%d for fd=%d is not"
+>> +                " SOCK_DGRAM or SOCK_STREAM\n", so_type, fd);
+>> +        closesocket(fd);
+>>      }
+>>      return NULL;
+>>  }
 >
+> Please use error_report() here.
 
-Yes, I see, will fix it right away.
+OK, I see, will fix it in v4.
 
 Thanks
 Mao
