@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dKU31-0003dt-Rf
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 14:26:44 -0400
+	(envelope-from <lersek@redhat.com>) id 1dKU3t-0004gw-J0
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 14:27:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dKU30-00068K-TW
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 14:26:43 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:34678)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dKU30-000687-LF
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 14:26:42 -0400
-Received: by mail-wr0-x230.google.com with SMTP id g76so105602858wrd.1
-	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 11:26:42 -0700 (PDT)
+	(envelope-from <lersek@redhat.com>) id 1dKU3n-0006I8-FS
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 14:27:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54170)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dKU3n-0006HT-6P
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 14:27:31 -0400
+References: <1497097821-32754-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1497097821-32754-2-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20170612132034.1d15ab04@nial.brq.redhat.com>
+	<bb84bdf5-6d09-60be-5954-dd6cde59264f@ilande.co.uk>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <0d1ddd4f-d008-29df-cb6d-38a8da84afb5@redhat.com>
+Date: Mon, 12 Jun 2017 20:27:24 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170608115643.18859-1-famz@redhat.com>
-References: <20170608115643.18859-1-famz@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 12 Jun 2017 19:26:19 +0100
-Message-ID: <CAFEAcA-myF7ZP19hcfJpJ2j8BBkvFyJofecp7v39FJJ10DO10w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v3 00/23] Docker and block patches
+In-Reply-To: <bb84bdf5-6d09-60be-5954-dd6cde59264f@ilande.co.uk>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/6] fw_cfg: move initialisation of
+ FWCfgState into instance_init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +31,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Igor Mammedov <imammedo@redhat.com>
+Cc: ehabkost@redhat.com, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, pbonzini@redhat.com
 
-On 8 June 2017 at 12:56, Fam Zheng <famz@redhat.com> wrote:
-> The following changes since commit 64175afc695c0672876fbbfc31b299c86d562cb4:
->
->   arm_gicv3: Fix ICC_BPR1 reset value when EL3 not implemented (2017-06-07 17:21:44 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/famz/qemu.git tags/docker-and-block-pull-request
->
-> for you to fetch changes up to 383226d7f90e83fd2b4ea5fbedf67bd9d3173221:
->
->   block: make accounting thread-safe (2017-06-08 19:09:23 +0800)
->
-> ----------------------------------------------------------------
->
-> v3: Update Paolo's series to fix make check on OSX.
->
-> ----------------------------------------------------------------
+Hi Mark,
 
-This still fails on OSX:
+On 06/12/17 13:45, Mark Cave-Ayland wrote:
+> On 12/06/17 12:20, Igor Mammedov wrote:
+> 
+>> On Sat, 10 Jun 2017 13:30:16 +0100
+>> Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> wrote:
+>>
+>>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>>> ---
+>>>  hw/nvram/fw_cfg.c |   14 ++++++++++----
+>>>  1 file changed, 10 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+>>> index 316fca9..144e0c6 100644
+>>> --- a/hw/nvram/fw_cfg.c
+>>> +++ b/hw/nvram/fw_cfg.c
+>>> @@ -1017,6 +1017,15 @@ FWCfgState *fw_cfg_find(void)
+>>>      return FW_CFG(object_resolve_path(FW_CFG_PATH, NULL));
+>>>  }
+>>>  
+>>> +static void fw_cfg_init(Object *obj)
+>>> +{
+>>> +    FWCfgState *s = FW_CFG(obj);
+>>> +
+>>> +    s->entries[0] = g_new0(FWCfgEntry, fw_cfg_max_entry(s));
+>>> +    s->entries[1] = g_new0(FWCfgEntry, fw_cfg_max_entry(s));
+>>> +    s->entry_order = g_new0(int, fw_cfg_max_entry(s));
+>> it doesn't seem right,
+>>
+>> consider,
+>>  object_new(fwcfg)
+>>    1: fw_cfg_init -> g_new0(FWCfgEntry, fw_cfg_max_entry(s) -> FW_CFG_FILE_SLOTS_DFLT);
+>>    2: set property x-file-slots
+>>    3: realize -> fw_cfg_file_slots_allocate()
+>>
+>>> @@ -1052,10 +1062,6 @@ static void fw_cfg_file_slots_allocate(FWCfgState *s, Error **errp)
+>>>                     file_slots_max);
+>>>          return;
+>>>      }
+>>> -
+>>> -    s->entries[0] = g_new0(FWCfgEntry, fw_cfg_max_entry(s));
+>>> -    s->entries[1] = g_new0(FWCfgEntry, fw_cfg_max_entry(s));
+>>> -    s->entry_order = g_new0(int, fw_cfg_max_entry(s));
+>> opps, s->entries doesn't account for new values of x-file-slots
+>>
+>> So question is why this patch is needed at all (it needs some reasoning in commit message)?
+>>
+>> So for now NACK and I'd suggest to drop this patch.
+> 
+> Right I missed the x-file-slots property when I was looking at this,
+> mainly because all of the existing callers went through
+> fw_cfg_init_mem() and fw_cfg_init_io(). I do see now though that the
+> property is referenced in compat.h.
+> 
+> The reason for moving the initialisation is that if you apply patch 2 on
+> its own then you get hit by the following assert on qemu-system-sparc64
+> due to uninitialised data:
+> 
+> Program received signal SIGSEGV, Segmentation fault.
+> 0x000000000062f81d in fw_cfg_add_bytes_read_callback (s=0x1e85410,
+> key=0, callback=0, callback_opaque=0x0, data=0x9f6c28, len=4,
+> read_only=true) at hw/nvram/fw_cfg.c:633
+> 633         assert(s->entries[arch][key].data == NULL); /* avoid key
+> conflict */
+> (gdb) bt
+> #0  0x000000000062f81d in fw_cfg_add_bytes_read_callback (s=0x1e85410,
+> key=0, callback=0, callback_opaque=0x0, data=0x9f6c28, len=4,
+> read_only=true) at hw/nvram/fw_cfg.c:633
+> #1  0x000000000062fac8 in fw_cfg_add_bytes (s=0x1e85410, key=0,
+> data=0x9f6c28, len=4) at hw/nvram/fw_cfg.c:664
+> #2  0x00000000006307a8 in fw_cfg_init1 (dev=0x1e85410) at
+> hw/nvram/fw_cfg.c:922
+> #3  0x00000000006308fe in fw_cfg_init_io_dma (iobase=1296, dma_iobase=0,
+> dma_as=0x0) at hw/nvram/fw_cfg.c:948
+> #4  0x00000000006309bc in fw_cfg_init_io (iobase=1296) at
+> hw/nvram/fw_cfg.c:968
+> #5  0x00000000004f31e9 in sun4uv_init (address_space_mem=0x132df20,
+> machine=0x132c8c0, hwdef=0x8bf400) at
+> /home/build/src/qemu/git/qemu/hw/sparc64/sun4u.c:515
+> #6  0x00000000004f3403 in sun4u_init (machine=0x132c8c0) at
+> /home/build/src/qemu/git/qemu/hw/sparc64/sun4u.c:565
+> #7  0x00000000005c0d26 in machine_run_board_init (machine=0x132c8c0) at
+> hw/core/machine.c:760
+> 
+> 
+> #8  0x0000000000532e56 in main (argc=2, argv=0x7fffffffeaa8,
+> envp=0x7fffffffeac0) at vl.c:4594
+> 
+> Based upon this what do you think the best solution would be?
 
-  GTESTER tests/test-blockjob
-qemu: qemu_mutex_lock: Invalid argument
 
-The backtrace is different from last time:
+if you apply patch #2 without patch #1, then the above SIGSEGV will hit
+on all fw_cfg using targets / machine types, not just
+qemu-system-sparc64. The reason is that, after patch #2 (without patch
+#1 applied) you have
 
-* thread #1: tid = 0x7f066a, 0x00007fffc611ad42
-libsystem_kernel.dylib`__pthread_kill + 10, queue =
-'com.apple.main-thread', stop reason = signal SIGABRT
-  * frame #0: 0x00007fffc611ad42 libsystem_kernel.dylib`__pthread_kill + 10
-    frame #1: 0x00007fffc6208457 libsystem_pthread.dylib`pthread_kill + 90
-    frame #2: 0x00007fffc6080420 libsystem_c.dylib`abort + 129
-    frame #3: 0x00000001000c1265
-test-blockjob`error_exit(err=<unavailable>, msg=<unavailable>) + 53 at
-qemu-thread-posix.c:36
-    frame #4: 0x00000001000c1327
-test-blockjob`qemu_mutex_lock(mutex=<unavailable>) + 151 at
-qemu-thread-posix.c:63
-    frame #5: 0x000000010005eef7
-test-blockjob`bdrv_do_release_matching_dirty_bitmap [inlined]
-bdrv_dirty_bitmaps_lock(bs=0x0000000101806000) + 39 at
-dirty-bitmap.c:58
-    frame #6: 0x000000010005eee7
-test-blockjob`bdrv_do_release_matching_dirty_bitmap(bs=0x0000000101806000,
-bitmap=0x0000000000000000, only_named=true) + 23 at dirty-bitmap.c:349
-    frame #7: 0x000000010000962d test-blockjob`bdrv_delete [inlined]
-bdrv_close(bs=0x0000000101806000) + 32 at block.c:3042
-    frame #8: 0x000000010000960d
-test-blockjob`bdrv_delete(bs=0x0000000101806000) + 61 at block.c:3229
-    frame #9: 0x0000000100043da2
-test-blockjob`blk_remove_bs(blk=0x0000000100d0a7d0) + 98 at
-block-backend.c:607
-    frame #10: 0x0000000100001318 test-blockjob`test_job_ids [inlined]
-destroy_blk(blk=0x0000000100d0a7d0) + 29 at test-blockjob.c:83
-    frame #11: 0x00000001000012fb test-blockjob`test_job_ids + 411 at
-test-blockjob.c:140
-    frame #12: 0x000000010070d91d
-libglib-2.0.0.dylib`g_test_run_suite_internal + 626
-    frame #13: 0x000000010070dae1
-libglib-2.0.0.dylib`g_test_run_suite_internal + 1078
-    frame #14: 0x000000010070d198 libglib-2.0.0.dylib`g_test_run_suite + 266
-    frame #15: 0x0000000100001148
-test-blockjob`main(argc=<unavailable>, argv=<unavailable>) + 88 at
-test-blockjob.c:152
-    frame #16: 0x00007fffc5fec235 libdyld.dylib`start + 1
-    frame #17: 0x00007fffc5fec235 libdyld.dylib`start + 1
+  fw_cfg_init1()
+    ...
+      fw_cfg_add_bytes_read_callback()
+        s->entries[arch][key].data
+  qdev_init_nofail()
+    fw_cfg_file_slots_allocate()
 
-thanks
--- PMM
+IOW, the s->entries array is now dynamically allocated (after the
+introduction of the x-file-slots property):
+
+    FWCfgEntry *entries[2];
+
+and it is allocated in fw_cfg_file_slots_allocate(), called from
+realize. But with patch #2 applied in isolation, you perform the first
+dereference (from fw_cfg_init1(), indirectly) before allocation, that's
+why it crashes.
+
+Ultimately we need the following order:
+
+(1) set properties (from device defaults, from device compat settings,
+and from the command line; and also directly from code, such as in
+fw_cfg_init_io_dma())
+
+(2) call qdev_init_nofail() -- this will consume the properties from
+(1), including the x-file-slots property, for allocating "s->entries" in
+fw_cfg_file_slots_allocate()
+
+(3) call fw_cfg_add_*() -- now that the device has been realized and is
+usable.
+
+This means that
+
+- patch #1 should be dropped,
+
+- and in patch #2, you have to push the rest of fw_cfg_init1() --
+everything that is after the original qdev_init_nofail() call -- to the
+end of the realize functions.
+
+
+Alternatively, in patch #2, you have to split fw_cfg_init1() into two
+parts, fw_cfg_init1() and fw_cfg_init2(). fw_cfg_init1() would keep
+everything that's *before* the original qdev_init_nofail() call, and
+fw_cfg_init2() would get everything *after*. Then, in
+fw_cfg_init_io_dma() and fw_cfg_init_mem_wide(), you'd do
+
+    fw_cfg_init1(dev);
+    qdev_init_nofail(dev);
+    fw_cfg_init2(dev);
+
+In short, you cannot reorder steps (2) and (3) against each other -- you
+cannot add fw_cfg entries before you realize the device -- and the crash
+happens because that's exactly what patch #2 does at the moment.
+
+And, patch #1 is not the right fix (you can allocate s->entries only in
+realize, because the size depends on a property, which you can only
+access in realize). The right fix is to drop patch #1 and to split
+fw_cfg_init1() like described above.
+
+... Hmmm, wait a second, while the above approach would fix patch #2, in
+fact I think patch #2 doesn't have the right *goal*.
+
+I'll comment under patch #2.
+
+Thanks
+Laszlo
