@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <keith.busch@intel.com>) id 1dKPqk-0007Vy-W0
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 09:57:47 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dKPsf-0000N3-FA
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 09:59:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <keith.busch@intel.com>) id 1dKPqg-00024b-5u
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 09:57:47 -0400
-Date: Mon, 12 Jun 2017 10:05:31 -0400
-From: Keith Busch <keith.busch@intel.com>
-Message-ID: <20170612140530.GA23969@localhost.localdomain>
-References: <b3375e1d-a304-237c-124c-21b7f482b6ab@cn.fujitsu.com>
-	<20170602135151.GB4948@noname.redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1dKPsa-0002r9-LD
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 09:59:45 -0400
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:33266)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dKPsa-0002qu-E1
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 09:59:40 -0400
+Received: by mail-wr0-x232.google.com with SMTP id v104so97335617wrb.0
+	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 06:59:40 -0700 (PDT)
+Date: Mon, 12 Jun 2017 14:59:24 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170612135924.GC17075@stefanha-x1.localdomain>
+References: <20170608182113.nmxnvus26vplg5du@postretch>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="ncSAzJYg3Aa9+CRW"
 Content-Disposition: inline
-In-Reply-To: <20170602135151.GB4948@noname.redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] NVME: is there any plan to support
- SGL data transfer?
+In-Reply-To: <20170608182113.nmxnvus26vplg5du@postretch>
+Subject: Re: [Qemu-devel] [Proposal] I/O throttling through new -object
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,28 +30,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Qu Wenruo <quwenruo@cn.fujitsu.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-On Fri, Jun 02, 2017 at 03:51:51PM +0200, Kevin Wolf wrote:
-> Am 02.06.2017 um 03:47 hat Qu Wenruo geschrieben:
-> > When going through NVMe specification and hw/block/nvme.c,
-> > I found that it seems that NVMe qemu implementation only support PRP
-> > for sq entry.
-> > And NvmeRwCmd doesn't even use union to define DPTR, but just prp1 and prp2.
-> > 
-> > Although I am just a newbie, but I'm quite interested in NVMe and
-> > want to try to implement SGL support for qemu NVMe.
-> > 
-> > Is there anyone already doing such work? Or is there any plan on
-> > implement such feature?
-> 
-> Keith, you can probably answer this?
 
-Hi,
+--ncSAzJYg3Aa9+CRW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-I personally have no plans to implement it, but would be happy to see it
-added if someone wants to send the patch for review.
+On Thu, Jun 08, 2017 at 09:21:13PM +0300, Manos Pitsidianakis wrote:
+> The old interface will be retained as much as possible.
 
-Thanks,
-Keith
+I think "retained" means "reused" here but in case it doesn't:
+
+The old interface must remain 100% functional.  Existing software like
+libvirt must continue to work without any changes.  QEMU releases are
+backwards compatible except for a long-term deprecation schedule.
+
+--ncSAzJYg3Aa9+CRW
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZPp48AAoJEJykq7OBq3PIozMH/RHtOpFU3mUCjGLeNfqT/MNz
+ZNFlFKe1bdPu5deY3zMHZzpxFAUZBnNFCswdUVyh/OR5GcDmB2yMLgRGtDFpmnYW
+47rDvnZkP6rLMk99i3BKV3g6hTBaDhXxPMDK4iDKGWtxJNPmgaSlGefCqSUefqsB
+Ii1uQyG78xUKv4ItQ8s8iBDpxAbirlj+7yehfSJ5lbx5jDKMgij5bpVKHrAJc6/b
+67S95JmtCGQmcspnKsRXs7sbxcxLOWMiJiBpzRUOjWU7ig86cfae6F5B/RkYwJj6
+6yNfi4R6iUs8N4MWiRSNDhInw57ZUhG83/qnL4xrc3hfb7xDELa87lmg3Vblnnw=
+=lBtD
+-----END PGP SIGNATURE-----
+
+--ncSAzJYg3Aa9+CRW--
