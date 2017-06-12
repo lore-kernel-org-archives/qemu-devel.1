@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46134)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dKM0d-00026U-7Y
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 05:51:43 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dKM1i-0003KM-Sp
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 05:52:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dKM0a-0000s2-3R
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 05:51:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37158)
+	(envelope-from <dgilbert@redhat.com>) id 1dKM1f-00014F-Nf
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 05:52:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55514)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dKM0Z-0000rh-U2
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 05:51:40 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CECEE723AF
-	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 09:51:38 +0000 (UTC)
-Date: Mon, 12 Jun 2017 17:51:33 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170612095133.GJ12928@pxdev.xzpeter.org>
-References: <20170601212921.30241-1-quintela@redhat.com>
-	<20170601212921.30241-11-quintela@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dKM1f-000143-EO
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 05:52:47 -0400
+Date: Mon, 12 Jun 2017 10:52:40 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170612095239.GA3146@work-vm>
+References: <1496828798-27548-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170607094728eucas1p1984b365dd09f3222b758075e651a5b5d@eucas1p1.samsung.com>
+	<1496828798-27548-5-git-send-email-a.perevalov@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170601212921.30241-11-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 10/11] migration: Move migration.h to
- migration/
+In-Reply-To: <1496828798-27548-5-git-send-email-a.perevalov@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH v8 04/11] migration: split
+ ufd_version_check onto receive/request features part
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,15 +29,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, peterx@redhat.com
 
-On Thu, Jun 01, 2017 at 11:29:20PM +0200, Juan Quintela wrote:
-> Nothing uses it outside of migration.h
+* Alexey Perevalov (a.perevalov@samsung.com) wrote:
+> This modification is necessary for userfault fd features which are
+> required to be requested from userspace.
+> UFFD_FEATURE_THREAD_ID is a one of such "on demand" feature, which will
+> be introduced in the next patch.
 > 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> QEMU have to use separate userfault file descriptor, due to
+> userfault context has internal state, and after first call of
+> ioctl UFFD_API it changes its state to UFFD_STATE_RUNNING (in case of
+> success), but kernel while handling ioctl UFFD_API expects UFFD_STATE_WAIT_API.
+> So only one ioctl with UFFD_API is possible per ufd.
+> 
+> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
--- 
-Peter Xu
+> ---
+>  migration/postcopy-ram.c | 94 ++++++++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 88 insertions(+), 6 deletions(-)
+> 
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index 8838901..cbe8f9f 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -63,16 +63,67 @@ struct PostcopyDiscardState {
+>  #include <sys/eventfd.h>
+>  #include <linux/userfaultfd.h>
+>  
+> -static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
+> +
+> +/**
+> + * receive_ufd_features: check userfault fd features, to request only supported
+> + * features in the future.
+> + *
+> + * Returns: true on success
+> + *
+> + * __NR_userfaultfd - should be checked before
+> + *  @features: out parameter will contain uffdio_api.features provided by kernel
+> + *              in case of success
+> + */
+> +static bool receive_ufd_features(uint64_t *features)
+>  {
+> -    struct uffdio_api api_struct;
+> -    uint64_t ioctl_mask;
+> +    struct uffdio_api api_struct = {0};
+> +    int ufd;
+> +    bool ret = true;
+> +
+> +    /* if we are here __NR_userfaultfd should exists */
+> +    ufd = syscall(__NR_userfaultfd, O_CLOEXEC);
+> +    if (ufd == -1) {
+> +        error_report("%s: syscall __NR_userfaultfd failed: %s", __func__,
+> +                     strerror(errno));
+> +        return false;
+> +    }
+>  
+> +    /* ask features */
+>      api_struct.api = UFFD_API;
+>      api_struct.features = 0;
+>      if (ioctl(ufd, UFFDIO_API, &api_struct)) {
+>          error_report("%s: UFFDIO_API failed: %s", __func__,
+>                       strerror(errno));
+> +        ret = false;
+> +        goto release_ufd;
+> +    }
+> +
+> +    *features = api_struct.features;
+> +
+> +release_ufd:
+> +    close(ufd);
+> +    return ret;
+> +}
+> +
+> +/**
+> + * request_ufd_features: this function should be called only once on a newly
+> + * opened ufd, subsequent calls will lead to error.
+> + *
+> + * Returns: true on succes
+> + *
+> + * @ufd: fd obtained from userfaultfd syscall
+> + * @features: bit mask see UFFD_API_FEATURES
+> + */
+> +static bool request_ufd_features(int ufd, uint64_t features)
+> +{
+> +    struct uffdio_api api_struct = {0};
+> +    uint64_t ioctl_mask;
+> +
+> +    api_struct.api = UFFD_API;
+> +    api_struct.features = features;
+> +    if (ioctl(ufd, UFFDIO_API, &api_struct)) {
+> +        error_report("%s failed: UFFDIO_API failed: %s", __func__,
+> +                     strerror(errno));
+>          return false;
+>      }
+>  
+> @@ -84,11 +135,42 @@ static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
+>          return false;
+>      }
+>  
+> +    return true;
+> +}
+> +
+> +static bool ufd_check_and_apply(int ufd, MigrationIncomingState *mis)
+> +{
+> +    uint64_t asked_features = 0;
+> +    static uint64_t supported_features;
+> +
+> +    /*
+> +     * it's not possible to
+> +     * request UFFD_API twice per one fd
+> +     * userfault fd features is persistent
+> +     */
+> +    if (!supported_features) {
+> +        if (!receive_ufd_features(&supported_features)) {
+> +            error_report("%s failed", __func__);
+> +            return false;
+> +        }
+> +    }
+> +
+> +    /*
+> +     * request features, even if asked_features is 0, due to
+> +     * kernel expects UFFD_API before UFFDIO_REGISTER, per
+> +     * userfault file descriptor
+> +     */
+> +    if (!request_ufd_features(ufd, asked_features)) {
+> +        error_report("%s failed: features %" PRIu64, __func__,
+> +                     asked_features);
+> +        return false;
+> +    }
+> +
+>      if (getpagesize() != ram_pagesize_summary()) {
+>          bool have_hp = false;
+>          /* We've got a huge page */
+>  #ifdef UFFD_FEATURE_MISSING_HUGETLBFS
+> -        have_hp = api_struct.features & UFFD_FEATURE_MISSING_HUGETLBFS;
+> +        have_hp = supported_features & UFFD_FEATURE_MISSING_HUGETLBFS;
+>  #endif
+>          if (!have_hp) {
+>              error_report("Userfault on this host does not support huge pages");
+> @@ -149,7 +231,7 @@ bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
+>      }
+>  
+>      /* Version and features check */
+> -    if (!ufd_version_check(ufd, mis)) {
+> +    if (!ufd_check_and_apply(ufd, mis)) {
+>          goto out;
+>      }
+>  
+> @@ -525,7 +607,7 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+>       * Although the host check already tested the API, we need to
+>       * do the check again as an ABI handshake on the new fd.
+>       */
+> -    if (!ufd_version_check(mis->userfault_fd, mis)) {
+> +    if (!ufd_check_and_apply(mis->userfault_fd, mis)) {
+>          return -1;
+>      }
+>  
+> -- 
+> 1.9.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
