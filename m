@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1dKFs7-0001JT-Ga
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 23:18:32 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dKFt6-0001iu-Pw
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 23:19:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1dKFs4-0004xJ-9w
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 23:18:31 -0400
-Received: from mga04.intel.com ([192.55.52.120]:12484)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1dKFs3-0004wt-Uk
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 23:18:28 -0400
-Date: Mon, 12 Jun 2017 11:18:21 +0800
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-ID: <20170612031821.ycsasc2p6svil55a@hz-desktop>
-References: <20170606072229.9302-1-haozhong.zhang@intel.com>
-	<20170606072229.9302-3-haozhong.zhang@intel.com>
-	<20170608154618-mutt-send-email-mst@kernel.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dKFt5-00059C-RX
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 23:19:32 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <CAPhXLnv2g_80gi1o6p-QUbKJQ5m+6gkLDN8TWtE-B=70uacDEw@mail.gmail.com>
+	<CAPhXLnuNAqwQHdns2Sxv4UuFz9WhGH1ZM4E4TN87e31cDpZ7gQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <fec4ddf7-f316-675b-bccb-236f281a174a@amsat.org>
+Date: Mon, 12 Jun 2017 00:19:21 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170608154618-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] nvdimm: warn if the backend is not
- a DAX device
+In-Reply-To: <CAPhXLnuNAqwQHdns2Sxv4UuFz9WhGH1ZM4E4TN87e31cDpZ7gQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Fwd: [BUG] Failed to compile using gcc7.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,176 +27,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <guangrong.xiao@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Dan Williams <dan.j.williams@intel.com>
+To: Tsung-en Hsiao <tsn@cs.nctu.edu.tw>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, Qu Wenruo <quwenruo@cn.fujitsu.com>
 
-On 06/08/17 15:51 +0300, Michael S. Tsirkin wrote:
-> On Tue, Jun 06, 2017 at 03:22:27PM +0800, Haozhong Zhang wrote:
-> > Applications in Linux guest that use device-dax never trigger flush
-> > that can be trapped by KVM/QEMU. Meanwhile, if the host backend is not
-> > device-dax, QEMU cannot guarantee the persistence of guest writes.
-> > Before solving this flushing problem, QEMU should warn users if the
-> > host backend is not device-dax.
-> 
-> No one reads warnings unless things fail but they can be a debugging aid
-> if they do. But they have to be simple and robust to be helpful for
-> that. This one seems to me too complex and fragile.
+Hi Tsung-en,
+
+On 06/11/2017 04:08 PM, Tsung-en Hsiao wrote:
+> Hi all,
+> I encountered the same problem on gcc 7.1.1 and found Qu's mail in
+> this list from google search.
 >
-> 
-> > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> > Message-id: CAPcyv4hV2-ZW8SMCRtD0P_86KgR3DHOvNe+6T5SY2u7wXg3gEg@mail.gmail.com
-> 
-> Don't include this line in commit log please. Put it after --- if you
-> must.
-> 
-> > ---
-> >  hw/mem/nvdimm.c      |  6 ++++++
-> >  include/qemu/osdep.h |  9 ++++++++
-> >  util/osdep.c         | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  3 files changed, 76 insertions(+)
-> > 
-> > diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
-> > index a9b0863f20..b23542fbdf 100644
-> > --- a/hw/mem/nvdimm.c
-> > +++ b/hw/mem/nvdimm.c
-> > @@ -26,6 +26,7 @@
-> >  #include "qapi/error.h"
-> >  #include "qapi/visitor.h"
-> >  #include "hw/mem/nvdimm.h"
-> > +#include "qemu/error-report.h"
-> >  
-> >  static void nvdimm_get_label_size(Object *obj, Visitor *v, const char *name,
-> >                                    void *opaque, Error **errp)
-> > @@ -84,6 +85,11 @@ static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
-> >      NVDIMMDevice *nvdimm = NVDIMM(dimm);
-> >      uint64_t align, pmem_size, size = memory_region_size(mr);
-> >  
-> > +    if (!qemu_fd_is_dev_dax(memory_region_get_fd(mr))) {
-> > +        error_report("warning: nvdimm backend does not look like a DAX device, "
-> > +                     "unable to guarantee persistence of guest writes");
-> > +    }
-> > +
-> >      align = memory_region_get_alignment(mr);
-> >  
-> >      pmem_size = size - nvdimm->label_size;
-> > diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> > index 1c9f5e260c..7f26af371e 100644
-> > --- a/include/qemu/osdep.h
-> > +++ b/include/qemu/osdep.h
-> > @@ -470,4 +470,13 @@ char *qemu_get_pid_name(pid_t pid);
-> >   */
-> >  pid_t qemu_fork(Error **errp);
-> >  
-> > +/**
-> > + * qemu_fd_is_dev_dax:
-> > + *
-> > + * Check whether @fd describes a DAX device.
-> > + *
-> > + * Returns true if it is; otherwise, return false.
-> > + */
-> > +bool qemu_fd_is_dev_dax(int fd);
-> > +
-> >  #endif
-> > diff --git a/util/osdep.c b/util/osdep.c
-> > index a2863c8e53..02881f96bc 100644
-> > --- a/util/osdep.c
-> > +++ b/util/osdep.c
-> > @@ -471,3 +471,64 @@ writev(int fd, const struct iovec *iov, int iov_cnt)
-> >      return readv_writev(fd, iov, iov_cnt, true);
-> >  }
-> >  #endif
-> > +
-> > +#ifdef __linux__
-> > +static ssize_t qemu_dev_dax_sysfs_read(int fd, const char *entry,
-> > +                                       char *buf, size_t len)
-> > +{
-> > +    ssize_t read_bytes;
-> > +    struct stat st;
-> > +    unsigned int major, minor;
-> > +    char *path, *pos;
-> > +    int sysfs_fd;
-> > +
-> > +    if (fstat(fd, &st)) {
-> > +        return 0;
-> > +    }
-> > +
-> > +    major = major(st.st_rdev);
-> > +    minor = minor(st.st_rdev);
-> > +    path = g_strdup_printf("/sys/dev/char/%u:%u/%s", major, minor, entry);
-> > +
-> > +    sysfs_fd = open(path, O_RDONLY);
-> > +    g_free(path);
-> > +    if (sysfs_fd == -1) {
-> > +        return 0;
-> > +    }
-> > +
-> > +    read_bytes = read(sysfs_fd, buf, len - 1);
-> > +    close(sysfs_fd);
-> > +    if (read_bytes > 0) {
-> > +        buf[read_bytes] = '\0';
-> > +        pos = g_strstr_len(buf, read_bytes, "\n");
-> > +        if (pos) {
-> > +            *pos = '\0';
-> > +        }
-> > +    }
-> > +
-> > +    return read_bytes;
-> > +}
-> > +#endif /* __linux__ */
-> > +
-> > +bool qemu_fd_is_dev_dax(int fd)
-> > +{
-> > +    bool is_dax = false;
-> > +
-> > +#ifdef __linux__
-> > +    char devtype[7];
-> > +    ssize_t len;
-> > +
-> > +    if (fd == -1) {
-> > +        return false;
-> > +    }
-> > +
-> > +    len = qemu_dev_dax_sysfs_read(fd, "device/devtype",
-> > +                                  devtype, sizeof(devtype));
-> > +    if (len <= 0) {
-> > +        return false;
-> > +    }
-> 
-> This can easily trigger false positives e.g. if sysfs access
-> is blocked by selinux.
+> Temporarily fix it by specifying the string length in snprintf
+> directive. Hope this is helpful to other people encountered the same
+> problem.
+
+Thank your for sharing this.
+
 >
+> @@ -1,9 +1,7 @@
+> ---
+> --- a/block/blkdebug.c
+> -                 "blkdebug:%s:%s", s->config_file ?: "",
+> --- a/block/blkverify.c
+> -                 "blkverify:%s:%s",
+> --- a/hw/usb/bus.c
+> -        snprintf(downstream->path, sizeof(downstream->path), "%s.%d",
+> -        snprintf(downstream->path, sizeof(downstream->path), "%d", portnr);
+> --
+> +++ b/block/blkdebug.c
+> +                 "blkdebug:%.2037s:%.2037s", s->config_file ?: "",
 
-A part of userland interface of nvdimm is exposed via sysfs, so QEMU
-has to access to certain sysfs entries in order to, e.g. perform the
-DAX check in this patch and get alignment requirement in patch 4.
+It is a rather funny way to silent this warning :) Truncating the 
+filename until it fits.
 
-I agree it's not robust if the permission is not properly granted. We
-may either
-1) require users to grant the permissions to QEMU and document the
-   requirements
- or
-2) get the information from sysfs from the outside of QEMU
-   (e.g. libvirt) which has the permission and then pass to QEMU.
+However I don't think it is the correct way since there is indeed an 
+overflow of bs->exact_filename.
 
-Which one do you think is better?
+Apparently exact_filename from "block/block_int.h" is defined to hold a 
+pathname:
+     char exact_filename[PATH_MAX];
 
-> 
-> > +    is_dax = !strncmp(devtype, "nd_dax", len);
-> 
-> E.g. will return true on any string starting with nd_dax.
-> And it's not clear non-dax devices can't guarantee safety.
+but is used for more than that (for example in blkdebug.c it might use 
+until 10+2*PATH_MAX chars).
 
-This check can be done by checking whether /sys/dev/char/MAJ:MIN/subsystem
-points to /sys/class/dax, as Dan suggested, if we decide to access
-sysfs in QEMU.
+I suppose it started as a buffer to hold a pathname then more block 
+drivers were added and this buffer ended used differently.
 
-Thanks,
-Haozhong
+If it is a multi-purpose buffer one safer option might be to declare it 
+as a GString* and use g_string_printf().
 
-> 
-> > +#endif /* __linux__ */
-> > +
-> > +    return is_dax;
-> > +}
-> > -- 
-> > 2.11.0
+I CC'ed the block folks to have their feedback.
+
+Regards,
+
+Phil.
+
+> +++ b/block/blkverify.c
+> +                 "blkverify:%.2038s:%.2038s",
+> +++ b/hw/usb/bus.c
+> +        snprintf(downstream->path, sizeof(downstream->path), "%.12s.%d",
+> +        snprintf(downstream->path, sizeof(downstream->path), "%.12d", portnr);
+>
+> Tsung-en Hsiao
+>
+>> Qu Wenruo Wrote:
+>>
+>> Hi all,
+>>
+>> After upgrading gcc from 6.3.1 to 7.1.1, qemu can't be compiled with gcc.
+>>
+>> The error is:
+>>
+>> ------
+>>  CC      block/blkdebug.o
+>> block/blkdebug.c: In function 'blkdebug_refresh_filename':
+>>
+>> block/blkdebug.c:693:31: error: '%s' directive output may be truncated writing up to 4095 bytes into a region of size 4086 [-Werror=format-truncation=]
+>>
+>>                  "blkdebug:%s:%s", s->config_file ?: "",
+>>                               ^~
+>> In file included from /usr/include/stdio.h:939:0,
+>>                 from /home/adam/qemu/include/qemu/osdep.h:68,
+>>                 from block/blkdebug.c:25:
+>>
+>> /usr/include/bits/stdio2.h:64:10: note: '__builtin___snprintf_chk' output 11 or more bytes (assuming 4106) into a destination of size 4096
+>>
+>>   return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVEL - 1,
+>>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>        __bos (__s), __fmt, __va_arg_pack ());
+>>        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> cc1: all warnings being treated as errors
+>> make: *** [/home/adam/qemu/rules.mak:69: block/blkdebug.o] Error 1
+>> ------
+>>
+>> It seems that gcc 7 is introducing more restrict check for printf.
+>>
+>> If using clang, although there are some extra warning, it can at least pass the compile.
+>>
+>> Thanks,
+>> Qu
+>
