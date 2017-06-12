@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38263)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dKFhE-0007JQ-R9
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 23:07:17 -0400
+	(envelope-from <haozhong.zhang@intel.com>) id 1dKFs7-0001JT-Ga
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 23:18:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dKFhB-0000SF-Jw
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 23:07:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52840)
+	(envelope-from <haozhong.zhang@intel.com>) id 1dKFs4-0004xJ-9w
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 23:18:31 -0400
+Received: from mga04.intel.com ([192.55.52.120]:12484)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dKFhB-0000Ri-Ap
-	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 23:07:13 -0400
-Date: Mon, 12 Jun 2017 06:07:04 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170612060450-mutt-send-email-mst@kernel.org>
-References: <f68502e6-875c-0e46-f7cf-127c23513d20@redhat.com>
-	<20170606234705.GG13397@umbus.fritz.box>
-	<20170607034443.GA7983@pxdev.xzpeter.org>
-	<20170607160445-mutt-send-email-mst@kernel.org>
-	<20170608061150.GA3628@pxdev.xzpeter.org>
-	<20170608215918-mutt-send-email-mst@kernel.org>
-	<20170609015847.GG3628@pxdev.xzpeter.org>
-	<20170611130710-mutt-send-email-mst@kernel.org>
-	<20170611121015.GA18542@umbus>
-	<20170612023443.GA25059@pxdev.xzpeter.org>
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1dKFs3-0004wt-Uk
+	for qemu-devel@nongnu.org; Sun, 11 Jun 2017 23:18:28 -0400
+Date: Mon, 12 Jun 2017 11:18:21 +0800
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Message-ID: <20170612031821.ycsasc2p6svil55a@hz-desktop>
+References: <20170606072229.9302-1-haozhong.zhang@intel.com>
+	<20170606072229.9302-3-haozhong.zhang@intel.com>
+	<20170608154618-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170612023443.GA25059@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH 2/3] exec: simplify
- address_space_get_iotlb_entry
+In-Reply-To: <20170608154618-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] nvdimm: warn if the backend is not
+ a DAX device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,88 +30,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Maxime Coquelin <maxime.coquelin@redhat.com>, Jason Wang <jasowang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <guangrong.xiao@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Dan Williams <dan.j.williams@intel.com>
 
-On Mon, Jun 12, 2017 at 10:34:43AM +0800, Peter Xu wrote:
-> On Sun, Jun 11, 2017 at 08:10:15PM +0800, David Gibson wrote:
-> > On Sun, Jun 11, 2017 at 01:09:26PM +0300, Michael S. Tsirkin wrote:
-> > > On Fri, Jun 09, 2017 at 09:58:47AM +0800, Peter Xu wrote:
-> > > > > > The problem is that when I was fixing the problem that vhost had with
-> > > > > > PT (a764040, "exec: abstract address_space_do_translate()"), I did
-> > > > > > broke the IOTLB translation a bit (it was using page masks). IMHO we
-> > > > > > need to fix it first for correctness (patch 1/2).
-> > > > > > 
-> > > > > > For patch 3, if we can have Jason's patch to allow dynamic
-> > > > > > iommu_platform switching, that'll be the best, then I can rewrite
-> > > > > > patch 3 with the switching logic rather than caching anything. But
-> > > > > > IMHO that can be separated from patch 1/2 if you like.
-> > > > > > 
-> > > > > > Or do you have better suggestion on how should we fix it?
-> > > > > > 
-> > > > > > Thanks,
-> > > > > 
-> > > > > Can we drop masks completely and replace with length? I think we
-> > > > > should do that instead of trying to fix masks.
-> > > > 
-> > > > Do you mean to modify IOMMUTLBEntry.addr_mask into length?
-> > > 
-> > > I think it's better than alternatives.
-> > > 
-> > > > Again, I am not sure this is good... At least we need to get ack from
-> > > > David since spapr should be the initial user of it, and possibly also
-> > > > Alex since vfio should be assuming that (IIUC both in QEMU and kernel)
-> > > > addr_mask is page masks rather than arbirary length.
-> > > > 
-> > > > (CC Alex)
-> > > > 
-> > > > Thanks,
-> > > 
-> > > Callbacks that need powers of two can easily split up the range.
+On 06/08/17 15:51 +0300, Michael S. Tsirkin wrote:
+> On Tue, Jun 06, 2017 at 03:22:27PM +0800, Haozhong Zhang wrote:
+> > Applications in Linux guest that use device-dax never trigger flush
+> > that can be trapped by KVM/QEMU. Meanwhile, if the host backend is not
+> > device-dax, QEMU cannot guarantee the persistence of guest writes.
+> > Before solving this flushing problem, QEMU should warn users if the
+> > host backend is not device-dax.
+> 
+> No one reads warnings unless things fail but they can be a debugging aid
+> if they do. But they have to be simple and robust to be helpful for
+> that. This one seems to me too complex and fragile.
+>
+> 
+> > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> > Message-id: CAPcyv4hV2-ZW8SMCRtD0P_86KgR3DHOvNe+6T5SY2u7wXg3gEg@mail.gmail.com
+> 
+> Don't include this line in commit log please. Put it after --- if you
+> must.
+> 
+> > ---
+> >  hw/mem/nvdimm.c      |  6 ++++++
+> >  include/qemu/osdep.h |  9 ++++++++
+> >  util/osdep.c         | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  3 files changed, 76 insertions(+)
 > > 
-> > I think I missed part of the thread.  What's the original use case for
-> > non-power-of-two IOTLB entries?  It certainly won't happen on Power.
+> > diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+> > index a9b0863f20..b23542fbdf 100644
+> > --- a/hw/mem/nvdimm.c
+> > +++ b/hw/mem/nvdimm.c
+> > @@ -26,6 +26,7 @@
+> >  #include "qapi/error.h"
+> >  #include "qapi/visitor.h"
+> >  #include "hw/mem/nvdimm.h"
+> > +#include "qemu/error-report.h"
+> >  
+> >  static void nvdimm_get_label_size(Object *obj, Visitor *v, const char *name,
+> >                                    void *opaque, Error **errp)
+> > @@ -84,6 +85,11 @@ static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
+> >      NVDIMMDevice *nvdimm = NVDIMM(dimm);
+> >      uint64_t align, pmem_size, size = memory_region_size(mr);
+> >  
+> > +    if (!qemu_fd_is_dev_dax(memory_region_get_fd(mr))) {
+> > +        error_report("warning: nvdimm backend does not look like a DAX device, "
+> > +                     "unable to guarantee persistence of guest writes");
+> > +    }
+> > +
+> >      align = memory_region_get_alignment(mr);
+> >  
+> >      pmem_size = size - nvdimm->label_size;
+> > diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+> > index 1c9f5e260c..7f26af371e 100644
+> > --- a/include/qemu/osdep.h
+> > +++ b/include/qemu/osdep.h
+> > @@ -470,4 +470,13 @@ char *qemu_get_pid_name(pid_t pid);
+> >   */
+> >  pid_t qemu_fork(Error **errp);
+> >  
+> > +/**
+> > + * qemu_fd_is_dev_dax:
+> > + *
+> > + * Check whether @fd describes a DAX device.
+> > + *
+> > + * Returns true if it is; otherwise, return false.
+> > + */
+> > +bool qemu_fd_is_dev_dax(int fd);
+> > +
+> >  #endif
+> > diff --git a/util/osdep.c b/util/osdep.c
+> > index a2863c8e53..02881f96bc 100644
+> > --- a/util/osdep.c
+> > +++ b/util/osdep.c
+> > @@ -471,3 +471,64 @@ writev(int fd, const struct iovec *iov, int iov_cnt)
+> >      return readv_writev(fd, iov, iov_cnt, true);
+> >  }
+> >  #endif
+> > +
+> > +#ifdef __linux__
+> > +static ssize_t qemu_dev_dax_sysfs_read(int fd, const char *entry,
+> > +                                       char *buf, size_t len)
+> > +{
+> > +    ssize_t read_bytes;
+> > +    struct stat st;
+> > +    unsigned int major, minor;
+> > +    char *path, *pos;
+> > +    int sysfs_fd;
+> > +
+> > +    if (fstat(fd, &st)) {
+> > +        return 0;
+> > +    }
+> > +
+> > +    major = major(st.st_rdev);
+> > +    minor = minor(st.st_rdev);
+> > +    path = g_strdup_printf("/sys/dev/char/%u:%u/%s", major, minor, entry);
+> > +
+> > +    sysfs_fd = open(path, O_RDONLY);
+> > +    g_free(path);
+> > +    if (sysfs_fd == -1) {
+> > +        return 0;
+> > +    }
+> > +
+> > +    read_bytes = read(sysfs_fd, buf, len - 1);
+> > +    close(sysfs_fd);
+> > +    if (read_bytes > 0) {
+> > +        buf[read_bytes] = '\0';
+> > +        pos = g_strstr_len(buf, read_bytes, "\n");
+> > +        if (pos) {
+> > +            *pos = '\0';
+> > +        }
+> > +    }
+> > +
+> > +    return read_bytes;
+> > +}
+> > +#endif /* __linux__ */
+> > +
+> > +bool qemu_fd_is_dev_dax(int fd)
+> > +{
+> > +    bool is_dax = false;
+> > +
+> > +#ifdef __linux__
+> > +    char devtype[7];
+> > +    ssize_t len;
+> > +
+> > +    if (fd == -1) {
+> > +        return false;
+> > +    }
+> > +
+> > +    len = qemu_dev_dax_sysfs_read(fd, "device/devtype",
+> > +                                  devtype, sizeof(devtype));
+> > +    if (len <= 0) {
+> > +        return false;
+> > +    }
 > 
-> Currently address_space_get_iotlb_entry() didn't really follow the
-> rule, addr_mask can be arbitary length. This series tried to fix it,
-> while Michael was questioning about whether we should really fix that
-> at all.
-> 
-> Michael,
-> 
-> Even if for performance's sake, I should still think we should fix it.
-> Let's consider a most simple worst case: we have a single page mapped
-> with IOVA range (2M page):
-> 
->  [0x0, 0x200000)
-> 
-> And if guest access IOVA using the following patern:
-> 
->  0x1fffff, 0x1ffffe, 0x1ffffd, ...
-> 
-> Then now we'll get this:
-> 
-> - request 0x1fffff, cache miss, will get iotlb [0x1fffff, 0x200000)
-> - request 0x1ffffe, cache miss, will get iotlb [0x1ffffe, 0x200000)
-> - request 0x1ffffd, cache miss, will get iotlb [0x1ffffd, 0x200000)
-> - ...
+> This can easily trigger false positives e.g. if sysfs access
+> is blocked by selinux.
+>
 
-We pass an offset too, do we not? So callee can figure out
-the region starts at 0x0 and avoid 2nd and 3rd misses.
+A part of userland interface of nvdimm is exposed via sysfs, so QEMU
+has to access to certain sysfs entries in order to, e.g. perform the
+DAX check in this patch and get alignment requirement in patch 4.
 
+I agree it's not robust if the permission is not properly granted. We
+may either
+1) require users to grant the permissions to QEMU and document the
+   requirements
+ or
+2) get the information from sysfs from the outside of QEMU
+   (e.g. libvirt) which has the permission and then pass to QEMU.
 
-> We'll all cache miss along the way until we access 0x0. While if we
-> are with page mask, we'll get:
+Which one do you think is better?
+
 > 
-> - request 0x1fffff, cache miss, will get iotlb [0x0, 0x200000)
-> - request 0x1ffffe, cache hit
-> - request 0x1ffffd, cache hit
-> - ...
+> > +    is_dax = !strncmp(devtype, "nd_dax", len);
 > 
-> We'll only miss at the first IO.
+> E.g. will return true on any string starting with nd_dax.
+> And it's not clear non-dax devices can't guarantee safety.
 
-I think we should send as much info as we can.
-There should be a way to find full region start and length.
+This check can be done by checking whether /sys/dev/char/MAJ:MIN/subsystem
+points to /sys/class/dax, as Dan suggested, if we decide to access
+sysfs in QEMU.
 
-> -- 
-> Peter Xu
+Thanks,
+Haozhong
+
+> 
+> > +#endif /* __linux__ */
+> > +
+> > +    return is_dax;
+> > +}
+> > -- 
+> > 2.11.0
