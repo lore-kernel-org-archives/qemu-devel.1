@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38691)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dKNfM-0000ce-0l
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 07:37:52 -0400
+	(envelope-from <lvivier@redhat.com>) id 1dKNhH-0001Iu-4Z
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 07:39:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dKNfI-0006O4-SO
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 07:37:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36082)
+	(envelope-from <lvivier@redhat.com>) id 1dKNhE-0007AM-1p
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 07:39:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58634)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dKNfI-0006Np-JP
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 07:37:48 -0400
-Date: Mon, 12 Jun 2017 13:37:40 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170612133740.2f3eef83@nial.brq.redhat.com>
-In-Reply-To: <1497097821-32754-4-git-send-email-mark.cave-ayland@ilande.co.uk>
-References: <1497097821-32754-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1497097821-32754-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1dKNhD-0007AI-Oy
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 07:39:47 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 88E3F80F8F
+	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 11:39:46 +0000 (UTC)
+References: <20170601212921.30241-1-quintela@redhat.com>
+	<20170601212921.30241-8-quintela@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <36fd7d5a-8f20-b366-1704-9dc8951c154b@redhat.com>
+Date: Mon, 12 Jun 2017 13:39:42 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20170601212921.30241-8-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/6] fw_cfg: move setting of FW_CFG_ID into
- fw_cfg_init1()
+Subject: Re: [Qemu-devel] [PATCH 07/11] migration: ram_control_* are
+ implemented in qemu_file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,89 +35,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, rjones@redhat.com, pbonzini@redhat.com, somlo@cmu.edu, lersek@redhat.com, mst@redhat.com, ehabkost@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, peterx@redhat.com
 
-On Sat, 10 Jun 2017 13:30:18 +0100
-Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> wrote:
+On 01/06/2017 23:29, Juan Quintela wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-> The dma_enabled property enables us to set the FW_CFG_ID version
-> accordingly.
-it might be not safe as patch reorders FW_CFG_ID entry.
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 
-(I recall there were patches that sorted fwcfg entries,
-but it's worth checking that it won't break migration)
-
-CCing Gerd, maybe he would recall how it works.
-
-> 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 > ---
->  hw/nvram/fw_cfg.c |   16 +++++++---------
->  1 file changed, 7 insertions(+), 9 deletions(-)
+>  include/migration/migration.h | 18 ------------------
+>  migration/qemu-file.h         | 17 +++++++++++++++++
+>  2 files changed, 17 insertions(+), 18 deletions(-)
 > 
-> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> index 1313bfd..f7b78a9 100644
-> --- a/hw/nvram/fw_cfg.c
-> +++ b/hw/nvram/fw_cfg.c
-> @@ -914,12 +914,19 @@ static void fw_cfg_init1(DeviceState *dev)
->  {
->      FWCfgState *s = FW_CFG(dev);
->      MachineState *machine = MACHINE(qdev_get_machine());
-> +    uint32_t version = FW_CFG_VERSION;
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index 108212c..cb894b8 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -171,24 +171,6 @@ void migrate_send_rp_pong(MigrationIncomingState *mis,
+>  void migrate_send_rp_req_pages(MigrationIncomingState *mis, const char* rbname,
+>                                ram_addr_t start, size_t len);
 >  
->      assert(!object_resolve_path(FW_CFG_PATH, NULL));
+> -void ram_control_before_iterate(QEMUFile *f, uint64_t flags);
+> -void ram_control_after_iterate(QEMUFile *f, uint64_t flags);
+> -void ram_control_load_hook(QEMUFile *f, uint64_t flags, void *data);
+> -
+> -/* Whenever this is found in the data stream, the flags
+> - * will be passed to ram_control_load_hook in the incoming-migration
+> - * side. This lets before_ram_iterate/after_ram_iterate add
+> - * transport-specific sections to the RAM migration data.
+> - */
+> -#define RAM_SAVE_FLAG_HOOK     0x80
+> -
+> -#define RAM_SAVE_CONTROL_NOT_SUPP -1000
+> -#define RAM_SAVE_CONTROL_DELAYED  -2000
+> -
+> -size_t ram_control_save_page(QEMUFile *f, ram_addr_t block_offset,
+> -                             ram_addr_t offset, size_t size,
+> -                             uint64_t *bytes_sent);
+> -
+>  void savevm_skip_section_footers(void);
+>  void register_global_state(void);
+>  void global_state_set_optional(void);
+> diff --git a/migration/qemu-file.h b/migration/qemu-file.h
+> index 49fd697..aae4e5e 100644
+> --- a/migration/qemu-file.h
+> +++ b/migration/qemu-file.h
+> @@ -156,5 +156,22 @@ void qemu_file_set_blocking(QEMUFile *f, bool block);
 >  
->      object_property_add_child(OBJECT(machine), FW_CFG_NAME, OBJECT(s), NULL);
+>  size_t qemu_get_counted_string(QEMUFile *f, char buf[256]);
 >  
->      fw_cfg_add_bytes(s, FW_CFG_SIGNATURE, (char *)"QEMU", 4);
+> +void ram_control_before_iterate(QEMUFile *f, uint64_t flags);
+> +void ram_control_after_iterate(QEMUFile *f, uint64_t flags);
+> +void ram_control_load_hook(QEMUFile *f, uint64_t flags, void *data);
 > +
-> +    if (s->dma_enabled) {
-> +        version |= FW_CFG_VERSION_DMA;
-> +    }
+> +/* Whenever this is found in the data stream, the flags
+> + * will be passed to ram_control_load_hook in the incoming-migration
+> + * side. This lets before_ram_iterate/after_ram_iterate add
+> + * transport-specific sections to the RAM migration data.
+> + */
+> +#define RAM_SAVE_FLAG_HOOK     0x80
 > +
-> +    fw_cfg_add_i32(s, FW_CFG_ID, version);
->      fw_cfg_add_bytes(s, FW_CFG_UUID, &qemu_uuid, 16);
->      fw_cfg_add_i16(s, FW_CFG_NOGRAPHIC, (uint16_t)!machine->enable_graphics);
->      fw_cfg_add_i16(s, FW_CFG_BOOT_MENU, (uint16_t)boot_menu);
-> @@ -935,7 +942,6 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
->  {
->      DeviceState *dev;
->      FWCfgState *s;
-> -    uint32_t version = FW_CFG_VERSION;
->      bool dma_requested = dma_iobase && dma_as;
+> +#define RAM_SAVE_CONTROL_NOT_SUPP -1000
+> +#define RAM_SAVE_CONTROL_DELAYED  -2000
+> +
+> +size_t ram_control_save_page(QEMUFile *f, ram_addr_t block_offset,
+> +                             ram_addr_t offset, size_t size,
+> +                             uint64_t *bytes_sent);
 >  
->      dev = qdev_create(NULL, TYPE_FW_CFG_IO);
-> @@ -954,12 +960,8 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
->          /* 64 bits for the address field */
->          s->dma_as = dma_as;
->          s->dma_addr = 0;
-> -
-> -        version |= FW_CFG_VERSION_DMA;
->      }
->  
-> -    fw_cfg_add_i32(s, FW_CFG_ID, version);
-> -
->      return s;
->  }
->  
-> @@ -975,7 +977,6 @@ FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
->      DeviceState *dev;
->      SysBusDevice *sbd;
->      FWCfgState *s;
-> -    uint32_t version = FW_CFG_VERSION;
->      bool dma_requested = dma_addr && dma_as;
->  
->      dev = qdev_create(NULL, TYPE_FW_CFG_MEM);
-> @@ -997,11 +998,8 @@ FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
->          s->dma_as = dma_as;
->          s->dma_addr = 0;
->          sysbus_mmio_map(sbd, 2, dma_addr);
-> -        version |= FW_CFG_VERSION_DMA;
->      }
->  
-> -    fw_cfg_add_i32(s, FW_CFG_ID, version);
-> -
->      return s;
->  }
->  
+>  #endif
+> 
