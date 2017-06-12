@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dKLEm-00018G-E6
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 05:02:17 -0400
+	(envelope-from <atar4qemu@gmail.com>) id 1dKLLI-00043I-Hk
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 05:09:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dKLEj-00020h-6A
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 05:02:16 -0400
-Date: Mon, 12 Jun 2017 16:45:00 +0800
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170612084500.GD18542@umbus>
-References: <1497245555-32472-1-git-send-email-bharata@linux.vnet.ibm.com>
+	(envelope-from <atar4qemu@gmail.com>) id 1dKLLH-0004FP-7f
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 05:09:00 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:35804)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1dKLLH-0004F5-0Z
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 05:08:59 -0400
+Received: by mail-oi0-x241.google.com with SMTP id v74so8199294oie.2
+	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 02:08:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="GyRA7555PLgSTuth"
-Content-Disposition: inline
-In-Reply-To: <1497245555-32472-1-git-send-email-bharata@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v6 0/2] ppc/spapr: Fix migration of radix
- guests
+In-Reply-To: <3c220ed8-ded2-bb6e-06c9-9978b4177cbc@ilande.co.uk>
+References: <1497099616-2615-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1497099616-2615-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1ba105d2-be1d-c05b-bc99-6426f6d9c487@amsat.org>
+	<3c220ed8-ded2-bb6e-06c9-9978b4177cbc@ilande.co.uk>
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Mon, 12 Jun 2017 11:08:36 +0200
+Message-ID: <CACXAS8AB=tqQriuyyte2Cn_Mp2fFx1GtQLryaUE-ymdb8_6MMA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/3] sun4u: expose NVRAM on ebus PCI IO
+ address space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +32,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, sam.bobroff@au1.ibm.com, rnsastry@linux.vnet.ibm.com, sjitindarsingh@gmail.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, qemu-devel <qemu-devel@nongnu.org>
+
+On Sun, Jun 11, 2017 at 4:58 PM, Mark Cave-Ayland
+<mark.cave-ayland@ilande.co.uk> wrote:
+> On 10/06/17 19:05, Philippe Mathieu-Daud=C3=A9 wrote:
+>
+>> Hi Mark,
+>>
+>> I'm not sure having this patch split from the previous (2/3) really
+>> helps bisecting, I'd rather squash them altogether.
+>>
+>> Either way:
+>>
+>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>
+>> On 06/10/2017 10:00 AM, Mark Cave-Ayland wrote:
+>>> To allow future changes to the sun4u PCI topology.
+>>>
+>>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>>> ---
+>>>  hw/sparc64/sun4u.c |    2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+>>> index 19e64be..bf738f8 100644
+>>> --- a/hw/sparc64/sun4u.c
+>>> +++ b/hw/sparc64/sun4u.c
+>>> @@ -492,7 +492,7 @@ static void sun4uv_init(MemoryRegion
+>>> *address_space_mem,
+>>>      /* Map NVRAM into I/O (ebus) space */
+>>>      nvram =3D m48t59_init(NULL, 0, 0, NVRAM_SIZE, 1968, 59);
+>>>      s =3D SYS_BUS_DEVICE(nvram);
+>>> -    memory_region_add_subregion(get_system_io(), 0x2000,
+>>> +    memory_region_add_subregion(pci_address_space_io(ebus), 0x2000,
+>>>                                  sysbus_mmio_get_region(s, 0));
+>>>
+>>>      initrd_size =3D 0;
+>>>
+>
+> Yes I could probably do that (unless Artyom objects).
+
+I won't object einther way.
+
+Acked-By: Artyom Tarasenko <atar4qemu@gmail.com>
 
 
---GyRA7555PLgSTuth
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Artyom
 
-On Mon, Jun 12, 2017 at 11:02:33AM +0530, Bharata B Rao wrote:
-> This patchset fixes the migration of sPAPR radix guests.
->=20
-> Migration of hash and radix guests individually has been tested on
-> TCG and KVM (P8 and P9 hosts). Changeover from HPT to RPT and vice versa
-> via reboot during migration isn't tested yet since it is possible
-> to test that currently only with TCG and TCG reboot is being fixed.
->=20
-> Changes in v6:
-> --------------
-> - Ensure any allocated HPT is free by the target when the source
->   doesn't send HPT.
+> I agree there
+> isn't that much in to the patch, and until the PCI topology changes it's
+> effectively a no-op.
+>
+>
+> ATB,
+>
+> Mark.
+>
 
-I've applied these to ppc-for-2.10, because I'm pretty sure they make
-things better than they were.  There are some things I'd really like
-to see addressed in followup patches, however.
 
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Regards,
+Artyom Tarasenko
 
---GyRA7555PLgSTuth
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZPlSLAAoJEGw4ysog2bOS44cQANFuCEONTAza0KAVlCrYyXlA
-mRx4j4iiw6oCUP57QmrU2s1aWL74kJvF+8lBAhhYmLe2CpemjnCGbK+O99YrMeHg
-+AnqXG0KzcTUdjRpzWSmbxkM5J/4r9bHLhsNJ0hdoX5kD7adr5WO81TPTnK8Cw+k
-bkrEFbCH2SVRoT7sU9JAtfYjLtEzwbtx2vTZ4Y09N9MGC7yqE7fpNfaGPnMXxCX6
-kHm9zwE6uiNcz8I1gg2Bjc/AmtzR7z/tIx4pECluX2LP9MANWkXPunR1KFjQ161A
-CEHa3TJNMg3ms612Z03pdaI7MMYBzR2/ad1F/KGwczMDzh81lVuCvfe2uiQ+YjMg
-81I1qm2vSBuT9FOJCw/1L+xh654vkqA/wK1a5gCHaqK06O1ZyflzUCikqE3s++8l
-s5xdSDcAAwNBd8A/Qvl/EMr5G6mBv3VGZDo1BM5fsLice5Aqnt64Rvq9sRGJTrD2
-CvhMbuacSKG3x1p3RnK3QJdWgClXzXRcmzaKYJijqaQb9TBn/GIRUO0IfjZvCzNQ
-yaFCwGL95CijUZedujNeuvUDmQTwvwpPEMJ5cT7asGjjOB0MfsJkSkKIISU/qLWE
-Bf1bBlyr++cMjwEhpejoKM2r2pQANx6N9UACHuP3gGb1WOS6Y+t5Nzs1wP8zAPqL
-tGyoWLX8oi8Zd1GAQnld
-=GWHn
------END PGP SIGNATURE-----
-
---GyRA7555PLgSTuth--
+SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/q=
+emu
