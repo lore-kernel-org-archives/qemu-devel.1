@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dKLoN-0004rD-8B
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 05:39:09 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dKLry-0006ju-ET
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 05:42:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dKLoJ-0005R6-90
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 05:39:03 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:34447)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dKLoJ-0005Qv-1H
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 05:38:59 -0400
-Received: by mail-wr0-x243.google.com with SMTP id u101so20661115wrc.1
-	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 02:38:58 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20170611123714.31292-1-mreitz@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cbd02834-2619-a643-5999-50726f2b6f14@redhat.com>
-Date: Mon, 12 Jun 2017 11:38:56 +0200
+	(envelope-from <dgibson@ozlabs.org>) id 1dKLrx-0006Ei-K8
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 05:42:46 -0400
+Date: Mon, 12 Jun 2017 17:18:36 +0800
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170612091836.GF18542@umbus>
+References: <1497245555-32472-1-git-send-email-bharata@linux.vnet.ibm.com>
+	<1497245555-32472-3-git-send-email-bharata@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170611123714.31292-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qemu-nbd: Ignore SIGPIPE
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="4VrXvz3cwkc87Wze"
+Content-Disposition: inline
+In-Reply-To: <1497245555-32472-3-git-send-email-bharata@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v6 2/2] spapr: Fix migration of Radix guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,60 +24,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+To: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, sam.bobroff@au1.ibm.com, rnsastry@linux.vnet.ibm.com, sjitindarsingh@gmail.com
 
 
+--4VrXvz3cwkc87Wze
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 11/06/2017 14:37, Max Reitz wrote:
-> qemu proper has done so for 13 years
-> (8a7ddc38a60648257dc0645ab4a05b33d6040063), qemu-img and qemu-io have
-> done so for four years (526eda14a68d5b3596be715505289b541288ef2a).
-> Ignoring this signal is especially important in qemu-nbd because
-> otherwise a client can easily take down the qemu-nbd server by dropping
-> the connection when the server wants to send something, for example:
-> 
-> $ qemu-nbd -x foo -f raw -t null-co:// &
-> [1] 12726
-> $ qemu-io -c quit nbd://localhost/bar
-> can't open device nbd://localhost/bar: No export with name 'bar' available
-> [1]  + 12726 broken pipe  qemu-nbd -x foo -f raw -t null-co://
-> 
-> In this case, the client sends an NBD_OPT_ABORT and closes the
-> connection (because it is not required to wait for a reply), but the
-> server replies with an NBD_REP_ACK (because it is required to reply).
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+On Mon, Jun 12, 2017 at 11:02:35AM +0530, Bharata B Rao wrote:
+> Fix migration of radix guests by ensuring that we issue
+> KVM_PPC_CONFIGURE_V3_MMU for radix case post migration.
+>=20
+> Reported-by: Nageswara R Sastry <rnsastry@linux.vnet.ibm.com>
+> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+> Reviewed-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+
+I believe we shouldn't assume a particular existing state on the
+destination when processing an incoming stream (it's normally done
+immediatley after startup, but I'm not sure it has to be).
+
+So, we shouldn't only call configure_v3_mmu when patb_entry !=3D 0.  For
+the case of an incoming hash guest, I believe we should explicitly
+configure KVM to HPT mode, rather than assume it's there already.
+
 > ---
-> I tried to find some other reproducer instead of using a qemu client
-> (e.g. nping -c 1 --tcp-connect localhost -p 10809, which gives the same
-> pattern of <FIN-ACK, >PSH-ACK, <RST as qemu-io) but to no avail. This
-> only results in the write being successful and the next read failing;
-> interestingly, sendmsg()'s man page states that EPIPE is only returned
-> when the local end is closed. However, I have not found the NBD server
-> to close that local end anywhere.
-> 
-> In any case, ignoring SIGPIPE is the right thing to do. We get an EPIPE
-> anyway, and this is fully sufficient to let us know that the connection
-> is dead.
-> ---
->  qemu-nbd.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/qemu-nbd.c b/qemu-nbd.c
-> index b7ab86b..b2eeedb 100644
-> --- a/qemu-nbd.c
-> +++ b/qemu-nbd.c
-> @@ -580,6 +580,10 @@ int main(int argc, char **argv)
->      sa_sigterm.sa_handler = termsig_handler;
->      sigaction(SIGTERM, &sa_sigterm, NULL);
->  
-> +#ifdef CONFIG_POSIX
-> +    signal(SIGPIPE, SIG_IGN);
-> +#endif
+>  hw/ppc/spapr.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index c425499..b2217f3 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1443,6 +1443,18 @@ static int spapr_post_load(void *opaque, int versi=
+on_id)
+>          err =3D spapr_rtc_import_offset(&spapr->rtc, spapr->rtc_offset);
+>      }
+> =20
+> +    if (spapr->patb_entry) {
+> +        PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
+> +        bool radix =3D !!(spapr->patb_entry & PATBE1_GR);
+> +        bool gtse =3D !!(cpu->env.spr[SPR_LPCR] & LPCR_GTSE);
 > +
->      module_call_init(MODULE_INIT_TRACE);
->      qcrypto_init(&error_fatal);
->  
-> 
+> +        err =3D kvmppc_configure_v3_mmu(cpu, radix, gtse, spapr->patb_en=
+try);
+> +        if (err) {
+> +            error_report("Process table config unsupported by the host");
+> +            return -EINVAL;
+> +        }
+> +    }
+> +
+>      return err;
+>  }
+> =20
 
-Queued, thanks.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--4VrXvz3cwkc87Wze
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZPlxsAAoJEGw4ysog2bOS7IAQALdYlRj7Q1NkwpsyyO1y/fJV
+fMUjQyU6pDmL0JjlLb3vdOCqUVv7jZyvC1/orPwV+KQ6Idzy0tN1v0cjUburVhHO
+Xzblx2N92OCb+1ecL4sIsTPyaQ93BuOoBco3FZX3Futx7K7hYn7i/Sgjk0APilzE
+pUtCBe4WyfPeQnaxmp86Q6JjQPp4OloW3v/Bh66pQplI4e2dkmu/72ZQd58PIXaZ
+jjc5OdGTn2eDztr+wdu5z0ujk6VT+CoJ5gnTYbrGWSgS87pn9qCN9m7sNVG+f4Iy
+Uxfjj/0iwtDykSsu1kptfdMFpVeGMslaNYQsIBDGtCWE5hMGhaib6xZfzv+hSwKW
+AYauZDDgAJIk87Ewkq9A0UoGlP7w7lG8Tn40Gsk6ifFZhsklayn3zXWaWlbQN2Rm
++pdSV6bpRkwNWM6q0AUQAhbbnf4dsX8tg8ASHU0qBrKPdr3heoLLRRx0k0bF6B7G
+Kp10U0uFgfizGp2JyGn4yJnUiH3usgIUpq0grjo9Pl8mWVXrR9czdTrRivh4dU7w
+PHoUIyXxLsFBVZD4RY944J09eVz8Zm3HGXGDC9osiyzMaHZNdBDjK9k83sCvTcf2
+ZsTEhvVw20BNJoDgzx6nYatCCZ0yEKrYT8BadoxHCaQb/SxQc78XI40hXMikoAUP
+dMs9aWEMFFcD/iz39cTd
+=lhbm
+-----END PGP SIGNATURE-----
+
+--4VrXvz3cwkc87Wze--
