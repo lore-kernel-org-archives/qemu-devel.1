@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dave.hansen@intel.com>) id 1dKWMG-0002xQ-LZ
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 16:54:45 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dKWcZ-00082O-Ig
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 17:11:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dave.hansen@intel.com>) id 1dKWMB-0007dy-Q5
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 16:54:44 -0400
-Received: from mga03.intel.com ([134.134.136.65]:37986)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dave.hansen@intel.com>)
-	id 1dKWMB-0007di-GY
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 16:54:39 -0400
-References: <1497004901-30593-1-git-send-email-wei.w.wang@intel.com>
-	<1497004901-30593-5-git-send-email-wei.w.wang@intel.com>
-	<b92af473-f00e-b956-ea97-eb4626601789@intel.com>
-	<20170612181354-mutt-send-email-mst@kernel.org>
-	<9d0900f3-9df5-ac63-4069-2d796f2a5bc7@intel.com>
-	<20170612194438-mutt-send-email-mst@kernel.org>
-From: Dave Hansen <dave.hansen@intel.com>
-Message-ID: <d0811862-6633-a43c-90a5-629fe9b6d150@intel.com>
-Date: Mon, 12 Jun 2017 13:54:36 -0700
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dKWcW-0004oP-EE
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 17:11:35 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:40041
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1dKWcW-0004mr-6d
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 17:11:32 -0400
+References: <1497097821-32754-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1497097821-32754-3-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20170612134328.76c5a352@nial.brq.redhat.com>
+	<84a176fb-0d57-09f5-15c3-8e2bd4c66f48@ilande.co.uk>
+	<0799bedf-d1af-49e3-4d18-81957b9240c3@redhat.com>
+	<b7ee6bf2-6437-ca8a-e2a9-80a800bca2bd@ilande.co.uk>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <73e92706-416c-df0c-592d-4c87a8156f91@ilande.co.uk>
+Date: Mon, 12 Jun 2017 22:11:13 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170612194438-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <b7ee6bf2-6437-ca8a-e2a9-80a800bca2bd@ilande.co.uk>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v11 4/6] mm: function to offer a page block
- on the free list
+Subject: Re: [Qemu-devel] [PATCH 2/6] fw_cfg: move qdev_init_nofail() out
+ from fw_cfg_init1() into callers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,42 +34,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Wei Wang <wei.w.wang@intel.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com
+To: Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, ehabkost@redhat.com, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, pbonzini@redhat.com
 
-On 06/12/2017 01:34 PM, Michael S. Tsirkin wrote:
-> On Mon, Jun 12, 2017 at 09:42:36AM -0700, Dave Hansen wrote:
->> On 06/12/2017 09:28 AM, Michael S. Tsirkin wrote:
->>>
->>>> The hypervisor is going to throw away the contents of these pages,
->>>> right?
->>> It should be careful and only throw away contents that was there before
->>> report_unused_page_block was invoked.  Hypervisor is responsible for not
->>> corrupting guest memory.  But that's not something an mm patch should
->>> worry about.
->>
->> That makes sense.  I'm struggling to imagine how the hypervisor makes
->> use of this information, though.  Does it make the pages read-only
->> before this, and then it knows if there has not been a write *and* it
->> gets notified via this new mechanism that it can throw the page away?
-> 
-> Yes, and specifically, this is how it works for migration.  Normally you
-> start by migrating all of memory, then send updates incrementally if
-> pages have been modified.  This mechanism allows skipping some pages in
-> the 1st stage, if they get changed they will be migrated in the 2nd
-> stage.
+On 12/06/17 20:50, Mark Cave-Ayland wrote:
 
-OK, so the migration starts and marks everything read-only.  All the
-pages now have read-only valuable data, or read-only worthless data in
-the case that the page is in the free lists.  In order for a page to
-become non-worthless, it has to have a write done to it, which the
-hypervisor obviously knows about.
+> Now I understand this much better, let me try a v2 of this which fixes
+> (1) and moves fw_cfg_init1() to a QOM method in the parent as suggested
+> by Igor and see what you think.
 
-With this mechanism, the hypervisor knows it can discard pages which
-have not had a write since they were known to have worthless contents.
+Experimenting with this some more, if the aim is to try and minimise
+code movement/reorganisation then I don't think the QOM method will give
+that much benefit for the work involved.
 
-Correct?
+I've just created a v2 with the aim of minimising code churn which I'll
+send along shortly.
 
-That also seems like pretty good information to include in the
-changelog.  Otherwise, folks are going to be left wondering what good
-the mechanism is.  It's pretty non-trivial to figure out. :)
+
+ATB,
+
+Mark.
