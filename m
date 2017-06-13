@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59869)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dKmQZ-0001np-2F
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dKmQV-0001jm-Rh
 	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 10:04:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dKmQS-0005LE-89
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 10:04:15 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:26504 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dKmQS-0005La-CI
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 10:04:11 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:31918 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dKmQR-0005Hu-UD
+	id 1dKmQS-0005IR-0E
 	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 10:04:08 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 13 Jun 2017 17:03:37 +0300
-Message-Id: <20170613140358.81651-10-vsementsov@virtuozzo.com>
+Date: Tue, 13 Jun 2017 17:03:57 +0300
+Message-Id: <20170613140358.81651-30-vsementsov@virtuozzo.com>
 In-Reply-To: <20170613140358.81651-1-vsementsov@virtuozzo.com>
 References: <20170613140358.81651-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v21 09/30] block/dirty-bitmap: fix comment for
- BlockDirtyBitmap.disabled field
+Subject: [Qemu-devel] [PATCH v21 29/30] qmp: block-dirty-bitmap-remove:
+ remove persistent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +28,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- block/dirty-bitmap.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Remove persistent bitmap from the storage on block-dirty-bitmap-remove.
 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 90af37287f..573510229a 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -42,7 +42,8 @@ struct BdrvDirtyBitmap {
-     BdrvDirtyBitmap *successor; /* Anonymous child; implies frozen status */
-     char *name;                 /* Optional non-empty unique ID */
-     int64_t size;               /* Size of the bitmap (Number of sectors) */
--    bool disabled;              /* Bitmap is read-only */
-+    bool disabled;              /* Bitmap is disabled. It ignores all writes to
-+                                   the device */
-     int active_iterators;       /* How many iterators are active */
-     QLIST_ENTRY(BdrvDirtyBitmap) list;
- };
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+---
+ blockdev.c           | 10 ++++++++++
+ qapi/block-core.json |  3 ++-
+ 2 files changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/blockdev.c b/blockdev.c
+index e3dbef7427..7ec75524a8 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -2801,6 +2801,7 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
+     AioContext *aio_context;
+     BlockDriverState *bs;
+     BdrvDirtyBitmap *bitmap;
++    Error *local_err = NULL;
+ 
+     bitmap = block_dirty_bitmap_lookup(node, name, &bs, &aio_context, errp);
+     if (!bitmap || !bs) {
+@@ -2813,6 +2814,15 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
+                    name);
+         goto out;
+     }
++
++    if (bdrv_dirty_bitmap_get_persistance(bitmap)) {
++        bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
++        if (local_err != NULL) {
++            error_propagate(errp, local_err);
++            goto out;
++        }
++    }
++
+     bdrv_dirty_bitmap_make_anon(bitmap);
+     bdrv_release_dirty_bitmap(bs, bitmap);
+ 
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 3dd9f92e5a..37f35a1811 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -1600,7 +1600,8 @@
+ # @block-dirty-bitmap-remove:
+ #
+ # Stop write tracking and remove the dirty bitmap that was created
+-# with block-dirty-bitmap-add.
++# with block-dirty-bitmap-add. If the bitmap is persistent, remove it from its
++# storage too.
+ #
+ # Returns: nothing on success
+ #          If @node is not a valid block device or node, DeviceNotFound
 -- 
 2.11.1
