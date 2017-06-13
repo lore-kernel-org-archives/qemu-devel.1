@@ -1,38 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33379)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dKii8-00066V-Ou
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:06:10 -0400
+	(envelope-from <sbates130272@gmail.com>) id 1dKilb-0001FD-Gg
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:09:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dKii3-00080U-Pa
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:06:08 -0400
-Received: from 12.mo5.mail-out.ovh.net ([46.105.39.65]:52699)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dKii3-00080E-FW
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:06:03 -0400
-Received: from player799.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 00100106270
-	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 12:06:01 +0200 (CEST)
-Date: Tue, 13 Jun 2017 12:05:52 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170613120552.44c1c58e@bahia.ttt.fr.ibm.com>
-In-Reply-To: <20170613095549.GC2096@work-vm>
-References: <149685579678.12025.9278446121024037161.stgit@bahia.lan>
-	<149685584629.12025.14875914798241845062.stgit@bahia.lan>
-	<20170608040857.GV13397@umbus.fritz.box>
-	<20170608115410.2e7a2511@bahia.ttt.fr.ibm.com>
-	<20170612142456.GJ18542@umbus>
-	<20170613093359.4567ba94@bahia.ttt.fr.ibm.com>
-	<20170613080631.GB30171@umbus>
-	<20170613104003.233e21d5@bahia.ttt.fr.ibm.com>
-	<20170613090002.GA2096@work-vm>
-	<20170613112150.7f64171c@bahia.ttt.fr.ibm.com>
-	<20170613095549.GC2096@work-vm>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/URMkHxCtLo1JPgkVbz5wuUl";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v3 5/5] spapr: fix migration of ICPState
- objects from/to older QEMU
+	(envelope-from <sbates130272@gmail.com>) id 1dKilY-0001MS-01
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:09:43 -0400
+From: sbates@raithlin.com
+Date: Tue, 13 Jun 2017 04:08:35 -0600
+Message-Id: <1497348515-6391-1-git-send-email-sbates@raithlin.com>
+Subject: [Qemu-devel] [PATCH] nvme: Add support for Read Data and Write Data
+ in CMBs.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,150 +18,213 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>, Juan Quintela <quintela@redhat.com>
+To: keith.busch@intel.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, logang@deltatee.com
+Cc: kwolf@redhat.com, mreitz@redhat.com, Stephen Bates <sbates@raithlin.com>
 
---Sig_/URMkHxCtLo1JPgkVbz5wuUl
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+From: Stephen Bates <sbates@raithlin.com>
 
-On Tue, 13 Jun 2017 10:55:50 +0100
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+Add the ability for the NVMe model to support both the RDS and WDS
+modes in the Controller Memory Buffer.
 
-> * Greg Kurz (groug@kaod.org) wrote:
-> > On Tue, 13 Jun 2017 10:00:03 +0100
-> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> >  =20
-> > > * Greg Kurz (groug@kaod.org) wrote: =20
-> > > > On Tue, 13 Jun 2017 16:06:31 +0800
-> > > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > > >    =20
-> > > > > On Tue, Jun 13, 2017 at 09:33:59AM +0200, Greg Kurz wrote:   =20
-> > > > [...]   =20
-> > > > > > > > > > +static void pre_2_10_vmstate_register_dummy_icp(sPAPRM=
-achineState *spapr, int i)
-> > > > > > > > > > +{
-> > > > > > > > > > +    bool *flag =3D &spapr->pre_2_10_ignore_icp[i];
-> > > > > > > > > > +
-> > > > > > > > > > +    g_assert(!*flag);         =20
-> > > > > > > > >=20
-> > > > > > > > > Apart from this assert(), you never seem to test the valu=
-es in the
-> > > > > > > > > pre_2_10_ignore_icp() array, so it seems a bit pointless.
-> > > > > > > > >        =20
-> > > > > > > >=20
-> > > > > > > > There's the opposite check in pre_2_10_vmstate_unregister_d=
-ummy_icp().
-> > > > > > > > But I agree it isn't really useful... but more because of p=
-aranoia :)       =20
-> > > > > > >=20
-> > > > > > > I'm all for paranoid assert()s if they can be made using data=
- readily
-> > > > > > > to hand.  Adding a data structure just for the purpose of mak=
-ing an
-> > > > > > > assert() later, not so much.
-> > > > > > >      =20
-> > > > > >=20
-> > > > > > It is also passed as opaque argument to vmstate_register(), whe=
-re it is
-> > > > > > used as a key when calling vmstate_unregister(). I could possib=
-ly pass
-> > > > > > (void *) i instead, but I'm not a big fan of hijacking pointer =
-arguments
-> > > > > > to pass numbers.     =20
-> > > > >=20
-> > > > > Ah, I see your point.  Creating an array, purely to generate arbi=
-trary
-> > > > > pointers is also kind of ugly, though.  Really the cpu_index / XI=
-CS
-> > > > > server number makes sense to identify the vmstate, but it looks l=
-ike
-> > > > > vmstate_unregister() doesn't take that.
-> > > > >    =20
-> > > >=20
-> > > > Indeed... what about adding a vmstate_unregister_by_instance_id() t=
-hen ?
-> > > >=20
-> > > > Cc'ing Juan and David.   =20
-> > >=20
-> > > So what's the problem with a (void *)i ? =20
-> >=20
-> > https://stackoverflow.com/questions/8618637/what-does-it-mean-to-conver=
-t-int-to-void-or-vice-versa
-> > =20
-> > > It's simple, as long as you're
-> > > not actually using the opaque anywhere it's easy.
-> > >  =20
-> >=20
-> > but as you say, since the opaque isn't used anywhere, it is probably
-> > okay to pass (void *) i. =20
->=20
-> Yes, I don't think we're ever casting back from the (void *) to an int
-> so it feels pretty safe to me.
->=20
+Although not currently supported in the upstreamed Linux kernel a fork
+with support exists [1] and user-space test programs that build on
+this also exist [2].
 
-Just one nit, gcc doesn't like it on 64-bit hosts:
+Useful for testing CMB functionality in preperation for real CMB
+enabled NVMe devices (coming soon).
 
-hw/ppc/spapr.c: In function =E2=80=98pre_2_10_vmstate_register_dummy_icp=E2=
-=80=99:
-hw/ppc/spapr.c:148:60: error: cast to pointer from integer of different
- size [-Werror=3Dint-to-pointer-cast]
-     vmstate_register(NULL, i, &pre_2_10_vmstate_dummy_icp, (void *) i);
+[1] https://github.com/sbates130272/linux-p2pmem
+[2] https://github.com/sbates130272/p2pmem-test
 
-I need to cast to (long) first.
+Signed-off-by: Stephen Bates <sbates@raithlin.com>
+Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
+---
+ hw/block/nvme.c | 83 +++++++++++++++++++++++++++++++++++++++------------------
+ hw/block/nvme.h |  1 +
+ 2 files changed, 58 insertions(+), 26 deletions(-)
 
-> >  =20
-> > > Note from a quick glance at your patch;  will this work migrating
-> > > from this 2.10 -> 2.9 ?  Are your dummy vmstate's really good enough =
-for
-> > > the 2.9 ?
-> > >  =20
-> >=20
-> > Yeah but I need to add some comments as David suggested.
-> >=20
-> > The idea is that 2.9 used to create a bunch of objects at machine init,
-> > that only get used when CPUs are plugged. With 2.10, these objects are
-> > now created under the CPUs. When migrating from 2.10 to 2.9, we only ne=
-ed
-> > to send the real objects. The dummy vmstate entries don't send anything
-> > (.needed always returns false) since the corresponding objects in 2.9 a=
-ren't
-> > being used and still have their default state.
-> >  =20
->=20
-> OK, that'll probably work.
->=20
-
-Thanks for this confirmation.
-
-> Dave
->=20
-> > > Dave
-> > >=20
-> > >  =20
-> > > > --
-> > > > Greg   =20
-> > >=20
-> > >=20
-> > > --
-> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK =20
-> >  =20
->=20
->=20
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
-
---Sig_/URMkHxCtLo1JPgkVbz5wuUl
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEUEARECAAYFAlk/uQAACgkQAvw66wEB28LudwCfYBu9TLC7goHIQYb/7+LzyOUm
-ifwAlAwPQQSlwy9k54firvadq8xPi4o=
-=u2ZP
------END PGP SIGNATURE-----
-
---Sig_/URMkHxCtLo1JPgkVbz5wuUl--
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 381dc7c..6071dc1 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -21,7 +21,7 @@
+  *              cmb_size_mb=<cmb_size_mb[optional]>
+  *
+  * Note cmb_size_mb denotes size of CMB in MB. CMB is assumed to be at
+- * offset 0 in BAR2 and supports SQS only for now.
++ * offset 0 in BAR2 and supports only WDS, RDS and SQS for now.
+  */
+ 
+ #include "qemu/osdep.h"
+@@ -93,8 +93,8 @@ static void nvme_isr_notify(NvmeCtrl *n, NvmeCQueue *cq)
+     }
+ }
+ 
+-static uint16_t nvme_map_prp(QEMUSGList *qsg, uint64_t prp1, uint64_t prp2,
+-    uint32_t len, NvmeCtrl *n)
++static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOVector *iov, uint64_t prp1,
++                             uint64_t prp2, uint32_t len, NvmeCtrl *n)
+ {
+     hwaddr trans_len = n->page_size - (prp1 % n->page_size);
+     trans_len = MIN(len, trans_len);
+@@ -102,10 +102,15 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, uint64_t prp1, uint64_t prp2,
+ 
+     if (!prp1) {
+         return NVME_INVALID_FIELD | NVME_DNR;
++    } else if (n->cmbsz && prp1 >= n->ctrl_mem.addr &&
++               prp1 < n->ctrl_mem.addr + int128_get64(n->ctrl_mem.size)) {
++        qsg->nsg = 0;
++        qemu_iovec_init(iov, num_prps);
++        qemu_iovec_add(iov, (void *)&n->cmbuf[prp1 - n->ctrl_mem.addr], trans_len);
++    } else {
++        pci_dma_sglist_init(qsg, &n->parent_obj, num_prps);
++        qemu_sglist_add(qsg, prp1, trans_len);
+     }
+-
+-    pci_dma_sglist_init(qsg, &n->parent_obj, num_prps);
+-    qemu_sglist_add(qsg, prp1, trans_len);
+     len -= trans_len;
+     if (len) {
+         if (!prp2) {
+@@ -118,7 +123,7 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, uint64_t prp1, uint64_t prp2,
+ 
+             nents = (len + n->page_size - 1) >> n->page_bits;
+             prp_trans = MIN(n->max_prp_ents, nents) * sizeof(uint64_t);
+-            pci_dma_read(&n->parent_obj, prp2, (void *)prp_list, prp_trans);
++            nvme_addr_read(n, prp2, (void *)prp_list, prp_trans);
+             while (len != 0) {
+                 uint64_t prp_ent = le64_to_cpu(prp_list[i]);
+ 
+@@ -130,7 +135,7 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, uint64_t prp1, uint64_t prp2,
+                     i = 0;
+                     nents = (len + n->page_size - 1) >> n->page_bits;
+                     prp_trans = MIN(n->max_prp_ents, nents) * sizeof(uint64_t);
+-                    pci_dma_read(&n->parent_obj, prp_ent, (void *)prp_list,
++                    nvme_addr_read(n, prp_ent, (void *)prp_list,
+                         prp_trans);
+                     prp_ent = le64_to_cpu(prp_list[i]);
+                 }
+@@ -140,7 +145,11 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, uint64_t prp1, uint64_t prp2,
+                 }
+ 
+                 trans_len = MIN(len, n->page_size);
+-                qemu_sglist_add(qsg, prp_ent, trans_len);
++                if (qsg->nsg){
++                    qemu_sglist_add(qsg, prp_ent, trans_len);
++                } else {
++                    qemu_iovec_add(iov, (void *)&n->cmbuf[prp_ent - n->ctrl_mem.addr], trans_len);
++                }
+                 len -= trans_len;
+                 i++;
+             }
+@@ -148,7 +157,11 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, uint64_t prp1, uint64_t prp2,
+             if (prp2 & (n->page_size - 1)) {
+                 goto unmap;
+             }
+-            qemu_sglist_add(qsg, prp2, len);
++            if (qsg->nsg) {
++                qemu_sglist_add(qsg, prp2, len);
++            } else {
++                qemu_iovec_add(iov, (void *)&n->cmbuf[prp2 - n->ctrl_mem.addr], trans_len);
++            }
+         }
+     }
+     return NVME_SUCCESS;
+@@ -162,16 +175,24 @@ static uint16_t nvme_dma_read_prp(NvmeCtrl *n, uint8_t *ptr, uint32_t len,
+     uint64_t prp1, uint64_t prp2)
+ {
+     QEMUSGList qsg;
++    QEMUIOVector iov;
++    uint16_t status = NVME_SUCCESS;
+ 
+-    if (nvme_map_prp(&qsg, prp1, prp2, len, n)) {
++    if (nvme_map_prp(&qsg, &iov, prp1, prp2, len, n)) {
+         return NVME_INVALID_FIELD | NVME_DNR;
+     }
+-    if (dma_buf_read(ptr, len, &qsg)) {
++    if (qsg.nsg > 0) {
++        if (dma_buf_read(ptr, len, &qsg)) {
++            status = NVME_INVALID_FIELD | NVME_DNR;
++        }
+         qemu_sglist_destroy(&qsg);
+-        return NVME_INVALID_FIELD | NVME_DNR;
++    } else {
++        if (qemu_iovec_to_buf(&iov, 0, ptr, len) != len) {
++            status = NVME_INVALID_FIELD | NVME_DNR;
++        }
++        qemu_iovec_destroy(&iov);
+     }
+-    qemu_sglist_destroy(&qsg);
+-    return NVME_SUCCESS;
++    return status;
+ }
+ 
+ static void nvme_post_cqes(void *opaque)
+@@ -285,20 +306,27 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+         return NVME_LBA_RANGE | NVME_DNR;
+     }
+ 
+-    if (nvme_map_prp(&req->qsg, prp1, prp2, data_size, n)) {
++    if (nvme_map_prp(&req->qsg, &req->iov, prp1, prp2, data_size, n)) {
+         block_acct_invalid(blk_get_stats(n->conf.blk), acct);
+         return NVME_INVALID_FIELD | NVME_DNR;
+     }
+ 
+-    assert((nlb << data_shift) == req->qsg.size);
+-
+-    req->has_sg = true;
+     dma_acct_start(n->conf.blk, &req->acct, &req->qsg, acct);
+-    req->aiocb = is_write ?
+-        dma_blk_write(n->conf.blk, &req->qsg, data_offset, BDRV_SECTOR_SIZE,
+-                      nvme_rw_cb, req) :
+-        dma_blk_read(n->conf.blk, &req->qsg, data_offset, BDRV_SECTOR_SIZE,
+-                     nvme_rw_cb, req);
++    if (req->qsg.nsg > 0) {
++        req->has_sg = true;
++        req->aiocb = is_write ?
++            dma_blk_write(n->conf.blk, &req->qsg, data_offset, BDRV_SECTOR_SIZE,
++                          nvme_rw_cb, req) :
++            dma_blk_read(n->conf.blk, &req->qsg, data_offset, BDRV_SECTOR_SIZE,
++                         nvme_rw_cb, req);
++    } else {
++        req->has_sg = false;
++        req->aiocb = is_write ?
++            blk_aio_pwritev(n->conf.blk, data_offset, &req->iov, 0, nvme_rw_cb,
++                            req) :
++            blk_aio_preadv(n->conf.blk, data_offset, &req->iov, 0, nvme_rw_cb,
++                           req);
++    }
+ 
+     return NVME_NO_COMPLETE;
+ }
+@@ -987,11 +1015,14 @@ static int nvme_init(PCIDevice *pci_dev)
+         NVME_CMBSZ_SET_SQS(n->bar.cmbsz, 1);
+         NVME_CMBSZ_SET_CQS(n->bar.cmbsz, 0);
+         NVME_CMBSZ_SET_LISTS(n->bar.cmbsz, 0);
+-        NVME_CMBSZ_SET_RDS(n->bar.cmbsz, 0);
+-        NVME_CMBSZ_SET_WDS(n->bar.cmbsz, 0);
++        NVME_CMBSZ_SET_RDS(n->bar.cmbsz, 1);
++        NVME_CMBSZ_SET_WDS(n->bar.cmbsz, 1);
+         NVME_CMBSZ_SET_SZU(n->bar.cmbsz, 2); /* MBs */
+         NVME_CMBSZ_SET_SZ(n->bar.cmbsz, n->cmb_size_mb);
+ 
++        n->cmbloc = n->bar.cmbloc;
++        n->cmbsz = n->bar.cmbsz;
++
+         n->cmbuf = g_malloc0(NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
+         memory_region_init_io(&n->ctrl_mem, OBJECT(n), &nvme_cmb_ops, n,
+                               "nvme-cmb", NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
+diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+index b4961d2..6aab338 100644
+--- a/hw/block/nvme.h
++++ b/hw/block/nvme.h
+@@ -712,6 +712,7 @@ typedef struct NvmeRequest {
+     NvmeCqe                 cqe;
+     BlockAcctCookie         acct;
+     QEMUSGList              qsg;
++    QEMUIOVector            iov;
+     QTAILQ_ENTRY(NvmeRequest)entry;
+ } NvmeRequest;
+ 
+-- 
+2.7.4
