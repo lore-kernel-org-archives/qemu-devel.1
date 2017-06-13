@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1dKkVe-0004Ee-Kn
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 08:01:27 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dKkj4-0007rX-Mx
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 08:15:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1dKkVa-00018a-2g
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 08:01:22 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:3893)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1dKkVZ-00017b-Fv
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 08:01:18 -0400
-From: Jay Zhou <jianjay.zhou@huawei.com>
-References: <1497273796-44720-1-git-send-email-jianjay.zhou@huawei.com>
-	<20170612195209.GA16151@potion>
-Message-ID: <593FD3E0.5070807@huawei.com>
-Date: Tue, 13 Jun 2017 20:00:32 +0800
+	(envelope-from <kwolf@redhat.com>) id 1dKkiy-0005el-RC
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 08:15:14 -0400
+Date: Tue, 13 Jun 2017 14:14:55 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170613121455.GF4383@noname.redhat.com>
+References: <20170522135704.842-1-stefanha@redhat.com>
+	<20170612134733.GA17075@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20170612195209.GA16151@potion>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH RFC] KVM: X86: save and load
- PVCLOCK_TSC_UNSTABLE_BIT when migration
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="LyciRD1jyfeSSjG0"
+Content-Disposition: inline
+In-Reply-To: <20170612134733.GA17075@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 0/4] block: fix 'savevm'
+ hang with -object iothread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +25,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, wangxinxin.wang@huawei.com, weidong.huang@huawei.com, arei.gonglei@huawei.com
-
-Hi Radim,
-
-On 2017/6/13 3:52, Radim Krčmář wrote:
-> 2017-06-12 21:23+0800, Jay Zhou:
->> Guest using kvmclock will be hanged when migrating from unstable
->> tsc host to stable tsc host occasionally.
->> Sometimes, the tsc timestamp saved at the source side will be
->> backward when the guest stopped, and this value is transferred
->> to the destination side. The guest at the destination side thought
->> kvmclock is stable, so the protection mechanism against time
->> going backwards is not used.
->> When the first time vcpu0 enters the guest at the destination
->> side to update the wall clock, the result of
->> pvclock_clocksource_read will be backward occasionally,
->> which results in the wall clock drift.
->>
->> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
->> ---
->
-> Hm, are you using KVM that has e3fd9a93a12a (4.9+)?
-
-I'm using KVM (4.4.11) and QEMU (2.6.0). I thought the newest KVM
-and QEMU have the same problem, maybe I'm wrong.
-
->
-> If you get a timestamp from KVM_GET_CLOCK() and pass that to
-> KVM_SET_CLOCK(), then kvmclock should not jump backwards anymore
-> (it could before 4.9, but only if the host had stable tsc).
-
-If migrating from old KVMs to newer KVMs (v4.9+), the clock member
-of struct KVMClockState is migrated to the destination side, but the
-clock_is_reliable isn't migrated. The value of clock_is_reliable is false
-at the source side, and it is true at the destination side. Is it possible
-the clock member of struct KVMClockState migrated is smaller than the
-last_value saved in the guest theoretically? Could you explain more
-why it should not jump backwards in the scenario of migrating from unstable tsc 
-host to stable tsc host?
-
->
-> A possible source of this bug in when QEMU recomputes the timestamp to
-> pass to KVM_SET_CLOCK() using TSC and kvmclock page.
-
-Yes, this bug happened in this scenario in my tests.
-
->
-> Can you provide the values used for KVM_GET_CLOCK and KVM_SET_CLOCK when
-> the bug occurs?
-
-I didn't print these values out when the bug occured, and I do not have the 
-physical machine with unstable tsc clocksource now. But I will try to reproduce 
-with the newest KVM and QEMU once I have.
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, stefanha@redhat.com
 
 
-Regards,
-Jay Zhou
+--LyciRD1jyfeSSjG0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Am 12.06.2017 um 15:47 hat Stefan Hajnoczi geschrieben:
+> On Mon, May 22, 2017 at 02:57:00PM +0100, Stefan Hajnoczi wrote:
+> > v3:
+> >  * Add missing bdrv_drain_all_end() in error code paths [Kevin]
+> > v2:
+> >  * New patch to use bdrv_drain_all_begin/end() in savevm/loadvm [Kevin]
+> >    (All other patches unchanged)
+> >=20
+> > The 'savevm' command hangs when -object iothread is used.  See patches =
+for
+> > details, but basically the vmstate read/write code didn't conform to th=
+e latest
+> > block layer locking rules.
+> >=20
+> > Stefan Hajnoczi (4):
+> >   block: count bdrv_co_rw_vmstate() requests
+> >   block: use BDRV_POLL_WHILE() in bdrv_rw_vmstate()
+> >   migration: avoid recursive AioContext locking in save_vmstate()
+> >   migration: use bdrv_drain_all_begin/end() instead bdrv_drain_all()
+> >=20
+> >  block/io.c         | 21 +++++++++++++--------
+> >  migration/savevm.c | 30 ++++++++++++++++++++++++++----
+> >  2 files changed, 39 insertions(+), 12 deletions(-)
+>=20
+> Ping ^ 2
+
+Thanks, applied to the block branch.
+
+Kevin
+
+--LyciRD1jyfeSSjG0
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJZP9c/AAoJEH8JsnLIjy/W3vwP/RhlorsZvMMWMEwp910+Thhw
+EU2JJ5EnDENcSLHILY/Lxok22qfi6SiVdlLqbINUiD4H+X+IZ0/EsU1J5n//nukm
+QdxDa7KOXKGCScmdU+ll/JLi7VT4GkzHK/BUYRY72PBcYiqwxzeeK4ewekKRUgrP
+R8NLEOWaQ7m5W/h0BgqiGivfuq/GTG+E+xuFytYhsi7mbzIqNeYBsO3njUCw4HcN
+3OtTbhheJwnDOrm6AtBRy8IR8DtGAdntox7EoBIp0AQwezj8NxhOGhQrpHwqaKm/
+I3gBIrm/adZSWdzoSga1dgQ0ebA2RiVvX6Ia2X/fma3SGr10uoB+If7+gxKP7KfB
+Cz4jUHtt1Sd6mgM4vzPc91NZaJydNE9+aTyvCmAm2e9y7efoyv+3ywZOVk1RTBmg
+JE6RqvF4U4FbtIH/69ddTJxb+ix0FHj1WPl/pKwoIYi0VQox6mj8JrsIoHqGM1uY
+NrNvzzv08l6fkA1Hi51B5R6BVdi/4AxdH6WC1tpps/PYi34tqtfxslU4F+Grbgi4
+Kj647sNH7RGWcl85ruXixmS2uSUVNHRrzvP1sZP5iapHEAI0s+bXTBkbGYWxpruc
+/yNUxQoRIaMXx0Zj0mdxEwOAH0W3P88+4JZWvyD+8a/y+aavTg0iVC++6e4hsm2E
+9R/waQyAqRhuZM9NQOt1
+=pW57
+-----END PGP SIGNATURE-----
+
+--LyciRD1jyfeSSjG0--
