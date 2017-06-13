@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dKh9Z-00036J-AN
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 04:26:22 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dKhA3-0003ba-K5
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 04:26:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dKh9V-0001HU-Bz
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 04:26:21 -0400
-Received: from 14.mo5.mail-out.ovh.net ([188.165.51.82]:34286)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dKh9V-0001HI-5g
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 04:26:17 -0400
-Received: from player799.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 51750105B15
-	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 10:26:15 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Tue, 13 Jun 2017 10:26:02 +0200
-Message-ID: <149734236294.28467.16891018961029258858.stgit@bahia.lan>
+	(envelope-from <peter.maydell@linaro.org>) id 1dKhA2-0001TS-S6
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 04:26:51 -0400
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:35309)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dKhA2-0001TA-JK
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 04:26:50 -0400
+Received: by mail-wr0-x233.google.com with SMTP id q97so131366805wrb.2
+	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 01:26:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] spapr: exit gentfully when CPU doesn't support
- requested compat mode
+In-Reply-To: <4a61a587-6dff-e5fd-58aa-fd168e27f876@redhat.com>
+References: <20170608070716.2954-1-kraxel@redhat.com>
+	<CAFEAcA9+194DyFJ=grKX6o9LAUeXHAJgX92gc419+Aa64_PHig@mail.gmail.com>
+	<CAFEAcA9YuwACfrciwQnHV-S60AMYZoaNzTKecEE7KzuCt2Wtyg@mail.gmail.com>
+	<4a61a587-6dff-e5fd-58aa-fd168e27f876@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 13 Jun 2017 09:26:28 +0100
+Message-ID: <CAFEAcA-yoQuDtKx-hePwCh47S6Um7_nxcdXLiQKUQN5=eHm7Sg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/7] ui patch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +31,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, Andrea Bolognani <abologna@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-QEMU currently aborts if the user asks something unrealistic like power9
-compat mode with a POWER8 CPU for example. Since this isn't a bug in QEMU,
-there's no point in aborting. The same goes with the other possible error
-paths in ppc_set_compat_all(). Let's just terminate QEMU instead.
+On 13 June 2017 at 06:14, Thomas Huth <thuth@redhat.com> wrote:
+> On 12.06.2017 20:08, Peter Maydell wrote:
+>> On 12 June 2017 at 19:00, Peter Maydell <peter.maydell@linaro.org> wrote:
+>>> This causes configure to barf warnings in my build logs on half
+>>> my build machines:
+>>>
+>>> WARNING: Support for gtk2 will be dropped in future releases.
+>>> WARNING: Please consider using gtk3 instead.
+>>>
+>>> I don't think it is yet possible to drop gtk2.
+>>
+>> Oh, one of them was the warning about SDL1.2.
+>
+> Adding the warning does not necessarily mean that we've really got to
+> drop support for these in the very near future, but it's a good start to
+> remind people that support for the old versions won't be around forever
+> ;-) And AFAIK the old versions of these libraries are not maintained by
+> the upstream projects anymore, too, so at one point in time, we've
+> really got to deprecate support for these in QEMU, too.
+>
+> So would it at least be feasible to install SDL 2 on that build
+> machines? (IMHO installing SDL 2 from sources is not too much of a pain,
+> e.g. it does not require lots of other additional libraries around)
 
-Reported-by: Andrea Bolognani <abologna@redhat.com>
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Yes, I'll circle back and have a look at whether it's just a matter
+of installing an extra -dev package. If it's necessary to build from
+source then it's definitely too early to deprecate though.
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index b2217f39eeea..d0cc124935c0 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1345,7 +1345,7 @@ static void ppc_spapr_reset(void)
-         spapr_ovec_cleanup(spapr->ov5_cas);
-         spapr->ov5_cas = spapr_ovec_new();
- 
--        ppc_set_compat_all(spapr->max_compat_pvr, &error_abort);
-+        ppc_set_compat_all(spapr->max_compat_pvr, &error_fatal);
-     }
- 
-     fdt = spapr_build_fdt(spapr, rtas_addr, spapr->rtas_size);
+(Mostly if I have a long pullreq queue than printing warning messages
+in my build logs is a good way to get your pull request pushed to
+the end of the todo list :-))
+
+thanks
+-- PMM
