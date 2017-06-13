@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dKoZq-0003F0-7x
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 12:21:59 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dKoxh-0001KL-Gg
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 12:46:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dKoZl-0006MS-Nx
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 12:21:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47710)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dKoZl-0006LU-Fw
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 12:21:53 -0400
-References: <20170228131710.10593-1-mbenes@suse.cz>
-	<e30b5e57-82a0-d030-6be0-1b78492ada0e@redhat.com>
-	<alpine.LSU.2.20.1703011310200.5005@pobox.suse.cz>
-	<faddb81d-8fe2-bb67-ce85-5b6ca321fc14@redhat.com>
-	<a2a007b2-3472-ad4a-bf10-a043a1d6b7cf@redhat.com>
-	<alpine.LSU.2.20.1706131015030.29266@pobox.suse.cz>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <ee2f457b-6ca2-6640-4eb6-0f36f25d6708@redhat.com>
-Date: Tue, 13 Jun 2017 18:21:48 +0200
+	(envelope-from <kwolf@redhat.com>) id 1dKoxg-0006aX-NV
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 12:46:37 -0400
+Date: Tue, 13 Jun 2017 18:46:28 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170613164628.GG4383@noname.redhat.com>
+References: <1496857819-12466-1-git-send-email-kwolf@redhat.com>
+	<1496857819-12466-6-git-send-email-kwolf@redhat.com>
+	<CAFEAcA-zObhNAR7iuQZ0MH7-ng86m2XEik8bie3o4THEbLwcVA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <alpine.LSU.2.20.1706131015030.29266@pobox.suse.cz>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH] target-s390x: Implement mvcos
- instruction
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-zObhNAR7iuQZ0MH7-ng86m2XEik8bie3o4THEbLwcVA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 5/8] commit: Fix use after free in completion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,135 +24,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Miroslav Benes <mbenes@suse.cz>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, ebischoff@suse.com, mmarek@suse.com, agraf@suse.de, rth@twiddle.net, Aurelien Jarno <aurelien@aurel32.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 13.06.2017 10:18, Miroslav Benes wrote:
-> On Mon, 12 Jun 2017, David Hildenbrand wrote:
+Am 13.06.2017 um 18:12 hat Peter Maydell geschrieben:
+> On 7 June 2017 at 18:50, Kevin Wolf <kwolf@redhat.com> wrote:
+> > diff --git a/block/commit.c b/block/commit.c
+> > index a3028b2..af6fa68 100644
+> > --- a/block/commit.c
+> > +++ b/block/commit.c
+> > @@ -89,6 +89,10 @@ static void commit_complete(BlockJob *job, void *opaque)
+> >      int ret = data->ret;
+> >      bool remove_commit_top_bs = false;
+> >
+> > +    /* Make sure overlay_bs and top stay around until bdrv_set_backing_hd() */
+> > +    bdrv_ref(top);
+> > +    bdrv_ref(overlay_bs);
+> > +
+> >      /* Remove base node parent that still uses BLK_PERM_WRITE/RESIZE before
+> >       * the normal backing chain can be restored. */
+> >      blk_unref(s->base);
 > 
->> On 12.06.2017 18:44, Thomas Huth wrote:
->>> On 01.03.2017 13:19, Miroslav Benes wrote:
->>>> On Wed, 1 Mar 2017, Thomas Huth wrote:
->>>>
->>>>> On 28.02.2017 14:17, Miroslav Benes wrote:
->>>>>> Implement MVCOS instruction, which the Linux kernel uses in user access
->>>>>> functions.
->>>>>>
->>>>>> Signed-off-by: Miroslav Benes <mbenes@suse.cz>
->>>>>> ---
->>>>>> I tried to do my best to follow the specification but it is quite
->>>>>> possible that I got something wrong because of my lack of
->>>>>> understanding. Especially I am not sure about all those bit ops :/.
->>>>>>
->>>>>> Anyway, there is one piece missing. The actual use of keys and
->>>>>> address-space-control during the move. I used fast_memmove, but
->>>>>> it is not correct. Is there a helper which I could use? I looked at
->>>>>> other instructions which should implement access control, but there were
->>>>>> silently ignore it :).
->>>>>
->>>>> I'm not aware of a function that could deal with two address spaces
->>>>> already (but that does not mean that there is no such function already)
->>>>> ... still, I guess, you likely need to write your own memmove helper
->>>>> function that can deal with two different address spaces.
->>>>
->>>> Ok, I thought that was the case. I'll try to come up with something.
->>>>  
->>>>>>  target/s390x/helper.h      |  1 +
->>>>>>  target/s390x/insn-data.def |  2 ++
->>>>>>  target/s390x/mem_helper.c  | 80 ++++++++++++++++++++++++++++++++++++++++++++++
->>>>>>  target/s390x/translate.c   | 12 +++++++
->>>>>>  4 files changed, 95 insertions(+)
->>>>>>
->>>>>> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
->>>>>> index 9102071d0aa4..bc5dfccc3d7e 100644
->>>>>> --- a/target/s390x/helper.h
->>>>>> +++ b/target/s390x/helper.h
->>>>>> @@ -104,6 +104,7 @@ DEF_HELPER_FLAGS_2(iske, TCG_CALL_NO_RWG_SE, i64, env, i64)
->>>>>>  DEF_HELPER_FLAGS_3(sske, TCG_CALL_NO_RWG, void, env, i64, i64)
->>>>>>  DEF_HELPER_FLAGS_2(rrbe, TCG_CALL_NO_RWG, i32, env, i64)
->>>>>>  DEF_HELPER_3(csp, i32, env, i32, i64)
->>>>>> +DEF_HELPER_5(mvcos, i32, env, i64, i64, i64, i64)
->>>>>>  DEF_HELPER_4(mvcs, i32, env, i64, i64, i64)
->>>>>>  DEF_HELPER_4(mvcp, i32, env, i64, i64, i64)
->>>>>>  DEF_HELPER_4(sigp, i32, env, i64, i32, i64)
->>>>>> diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
->>>>>> index 075ff597c3de..a1e6d735d090 100644
->>>>>> --- a/target/s390x/insn-data.def
->>>>>> +++ b/target/s390x/insn-data.def
->>>>>> @@ -854,6 +854,8 @@
->>>>>>  /* LOAD USING REAL ADDRESS */
->>>>>>      C(0xb24b, LURA,    RRE,   Z,   0, r2, new, r1_32, lura, 0)
->>>>>>      C(0xb905, LURAG,   RRE,   Z,   0, r2, r1, 0, lurag, 0)
->>>>>> +/* MOVE WITH OPTIONAL SPECIFICATION */
->>>>>> +    C(0xc800, MVCOS,   SSF,   MVCOS, la1, a2, 0, 0, mvcos, 0)
->>>>>>  /* MOVE TO PRIMARY */
->>>>>>      C(0xda00, MVCP,    SS_d,  Z,   la1, a2, 0, 0, mvcp, 0)
->>>>>>  /* MOVE TO SECONDARY */
->>>>>> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
->>>>>> index 675aba2e44d4..ca8f7c49250c 100644
->>>>>> --- a/target/s390x/mem_helper.c
->>>>>> +++ b/target/s390x/mem_helper.c
->>>>>> @@ -1089,6 +1089,86 @@ uint32_t HELPER(mvcp)(CPUS390XState *env, uint64_t l, uint64_t a1, uint64_t a2)
->>>>>>      return cc;
->>>>>>  }
->>>>>>  
->>>>>> +uint32_t HELPER(mvcos)(CPUS390XState *env, uint64_t r0, uint64_t dest,
->>>>>> +                       uint64_t src, uint64_t len)
->>>>>> +{
->>>>>> +    int cc;
->>>>>> +    int key1, as1, abit1, kbit1;
->>>>>> +    int key2, as2, abit2, kbit2;
->>>>>> +
->>>>>> +    HELPER_LOG("%s dest %" PRIx64 ", src %" PRIx64 ", len %" PRIx64 "\n",
->>>>>> +               __func__, dest, src, len);
->>>>>> +
->>>>>> +    /* check DAT */
->>>>>> +    if (!(env->psw.mask & PSW_MASK_DAT)) {
->>>>>> +        program_interrupt(env, PGM_SPECIAL_OP, 2);
->>>>>
->>>>> Length of the opcode is 6 bytes, not 2.
->>>>
->>>> True. Sorry, I don't know where 2 came from. It does not make sense.
->>>
->>> As I recently had to learn it the hard way (while implementing the TEST
->>> BLOCK instruction), you should use ILEN_LATER_INC here instead of 2 (or
->>> 6), since the Special operation exception is suppressing, too, i.e. the
->>> program counter should be increased afterwards to the next instruction.
->>>
->>
->> This is no longer needed with
->> https://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg02631.html
->>
->> You can either use 6 or ILEN_AUTO here, suppression will be handled
->> internally.
+> Hi -- coverity complains about this change, because bdrv_ref()
+> assumes that its argument is not NULL, but later on in commit_complete()
+> we have a check
+>     "if (overlay_bs && ...)"
+> which assumes its argument might be NULL. (CID 1376205)
 > 
-> ok, good to know.
->  
->>> BTW, are you still working on a new version of this patch?
-> 
-> Unfortunately, I haven't touched it since the submission. It is only a 
-> side project at work and I only started reading about s390x address spaces 
-> to implement a proper memmove helper. No implementation yet so far :/
-> 
-> So if anyone wants to work on this, they can of course take my patch as a 
-> basis.
+> Which is correct?
 
-I will look into it. I already have something running that almost works.
+I saw the Coverity report and am looking into it. It's not completely
+clear to me yet which is correct, but I suspect it can be NULL.
 
-For some reason, when I trick my upstream linux kernel in using mvcos
-for uaccess, I get my /init killed at some point, like it would be
-receiving some unexpected page fault. hmmm....
-
-Thanks!
-
-> 
-> Thanks,
-> Miroslav
-> 
-
-
--- 
-
-Thanks,
-
-David
+Kevin
