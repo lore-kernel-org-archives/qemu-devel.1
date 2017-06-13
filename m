@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dKlv7-0007mu-OO
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 09:31:46 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dKlv1-0007gc-9l
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 09:31:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dKlv6-0008HR-PZ
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 09:31:45 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dKlv0-0008En-Jp
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 09:31:39 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Tue, 13 Jun 2017 15:31:16 +0200
-Message-Id: <1497360677-4780-3-git-send-email-eric.auger@redhat.com>
+Date: Tue, 13 Jun 2017 15:31:15 +0200
+Message-Id: <1497360677-4780-2-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1497360677-4780-1-git-send-email-eric.auger@redhat.com>
 References: <1497360677-4780-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 2/3] hw/arm/virt: Set INTx/gsi mapping
+Subject: [Qemu-devel] [PATCH v3 1/3] hw/pci-host/gpex: Set INTx index/gsi
+ mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +25,52 @@ Cc: christoffer.dall@linaro.org, agraf@suse.de, pranavkumar@linaro.org, drjones@
 
 From: Pranavkumar Sawargaonkar <pranavkumar@linaro.org>
 
-Let's provide the GPEX host bridge with the INTx/gsi mapping. This is
-needed for INTx/gsi routing.
+To implement INTx to gsi routing we need to pass the gpex host
+bridge the gsi associated to each INTx index. Let's introduce
+irq_num array and gpex_set_irq_num setter function.
 
 Signed-off-by: Pranavkumar Sawargaonkar <pranavkumar@linaro.org>
 Signed-off-by: Tushar Jagad <tushar.jagad@linaro.org>
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- hw/arm/virt.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ hw/pci-host/gpex.c         | 10 ++++++++++
+ include/hw/pci-host/gpex.h |  3 +++
+ 2 files changed, 13 insertions(+)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 010f724..f86c229 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1012,6 +1012,7 @@ static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
-     char *nodename;
-     int i;
-     PCIHostState *pci;
-+    GPEXHost *s;
+diff --git a/hw/pci-host/gpex.c b/hw/pci-host/gpex.c
+index e2629ce..22367aa4 100644
+--- a/hw/pci-host/gpex.c
++++ b/hw/pci-host/gpex.c
+@@ -43,6 +43,16 @@ static void gpex_set_irq(void *opaque, int irq_num, int level)
+     qemu_set_irq(s->irq[irq_num], level);
+ }
  
-     dev = qdev_create(NULL, TYPE_GPEX_HOST);
-     qdev_init_nofail(dev);
-@@ -1047,8 +1048,11 @@ static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
-     /* Map IO port space */
-     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 2, base_pio);
- 
-+    s = GPEX_HOST(dev);
++int gpex_set_irq_num(GPEXHost *s, int index, uint32_t gsi)
++{
++    if (index >=  GPEX_NUM_IRQS) {
++        return -EINVAL;
++    }
 +
-     for (i = 0; i < GPEX_NUM_IRQS; i++) {
-         sysbus_connect_irq(SYS_BUS_DEVICE(dev), i, pic[irq + i]);
-+        gpex_set_irq_num(s, i, irq + i);
-     }
++    s->irq_num[index] = gsi;
++    return 0;
++}
++
+ static void gpex_host_realize(DeviceState *dev, Error **errp)
+ {
+     PCIHostState *pci = PCI_HOST_BRIDGE(dev);
+diff --git a/include/hw/pci-host/gpex.h b/include/hw/pci-host/gpex.h
+index 68c9348..db26b3e 100644
+--- a/include/hw/pci-host/gpex.h
++++ b/include/hw/pci-host/gpex.h
+@@ -51,6 +51,9 @@ typedef struct GPEXHost {
+     MemoryRegion io_ioport;
+     MemoryRegion io_mmio;
+     qemu_irq irq[GPEX_NUM_IRQS];
++    uint32_t irq_num[GPEX_NUM_IRQS];
+ } GPEXHost;
  
-     pci = PCI_HOST_BRIDGE(dev);
++int gpex_set_irq_num(GPEXHost *s, int index, uint32_t gsi);
++
+ #endif /* HW_GPEX_H */
 -- 
 2.5.5
