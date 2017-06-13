@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <li.ping288@zte.com.cn>) id 1dKiyI-0002M5-Ao
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:22:51 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dKiyR-0002Pb-0w
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:22:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <li.ping288@zte.com.cn>) id 1dKiyE-0005z3-EG
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:22:50 -0400
-Received: from mxhk.zte.com.cn ([63.217.80.70]:36294)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <li.ping288@zte.com.cn>) id 1dKiyE-0005y0-33
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:22:46 -0400
-From: Li Ping <li.ping288@zte.com.cn>
-Date: Tue, 13 Jun 2017 18:21:43 +0800
-Message-Id: <1497349303-3076-1-git-send-email-li.ping288@zte.com.cn>
-Subject: [Qemu-devel] [PATCH] QEMU Guest Agent: Fix memory leak of device
- information set
+	(envelope-from <kraxel@redhat.com>) id 1dKiyN-00063T-3l
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:22:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54408)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dKiyM-00063A-TX
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:22:55 -0400
+Message-ID: <1497349375.8068.3.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 13 Jun 2017 12:22:55 +0200
+In-Reply-To: <dc2d2f2f-0c82-fa8f-9da1-b183fc203110@accelerated.com>
+References: <dc2d2f2f-0c82-fa8f-9da1-b183fc203110@accelerated.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] usb-host: support devices with
+ sparse/non-sequential USB interfaces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,39 +27,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mdroth@linux.vnet.ibm.com
-Cc: qemu-devel@nongnu.org, Li Ping <li.ping288@zte.com.cn>
+To: Samuel Brian <sam.brian@accelerated.com>, qemu-devel@nongnu.org
 
-The caller of SetupDiGetClassDevs must delete the returned device information
- set when it is no longer needed by calling SetupDiDestroyDeviceInfoList.
+On Tue, 2017-06-13 at 14:17 +1000, Samuel Brian wrote:
+> This change allows sparse USB interface numbering.
+> Instead of only claiming the interfaces in the range reported by the
+> USB
+> device through bNumInterfaces, QEMU attempts to claim all possible
+> interfaces.
 
-Signed-off-by: Li Ping<li.ping288@zte.com.cn>
----
- qga/commands-win32.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Patch looks good but fails to apply.  Thunderbird wrapped lines and
+corrupted the patch.
 
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 439d229..6f16457 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -512,7 +512,7 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
-             } else {
-                 error_setg_win32(errp, GetLastError(),
-                         "failed to get device name");
--                goto out;
-+                goto free_dev_info;
-             }
-         }
- 
-@@ -560,6 +560,9 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
-         pci->bus = bus;
-         break;
-     }
-+
-+free_dev_info:
-+    SetupDiDestroyDeviceInfoList(dev_info);
- out:
-     g_free(buffer);
-     g_free(name);
--- 
-1.8.3.1
+Please resend using "git send-email" to avoid that.
+
+thanks,
+  Gerd
