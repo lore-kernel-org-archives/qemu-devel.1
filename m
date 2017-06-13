@@ -1,38 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dKiQZ-0008TR-6N
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 05:48:05 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dKiTC-0000ie-4p
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 05:50:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dKiQW-0002Ib-3k
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 05:47:59 -0400
-Received: from mga06.intel.com ([134.134.136.31]:42446)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dKiQV-0002F3-Py
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 05:47:56 -0400
-Message-ID: <593FB550.6090903@intel.com>
-Date: Tue, 13 Jun 2017 17:50:08 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <stefanha@gmail.com>) id 1dKiT9-00035z-35
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 05:50:42 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:34502)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dKiT8-00035q-Rk
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 05:50:39 -0400
+Received: by mail-lf0-x243.google.com with SMTP id o28so11775376lfk.1
+	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 02:50:38 -0700 (PDT)
+Date: Tue, 13 Jun 2017 10:50:30 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170613095030.GB29273@stefanha-x1.localdomain>
+References: <20170524150753.GB23327@stefanha-x1.localdomain>
+	<1497334024.13717.8.camel@linux.intel.com>
 MIME-Version: 1.0
-References: <1496653049-44530-1-git-send-email-wei.w.wang@intel.com>
-	<20170605182514-mutt-send-email-mst@kernel.org>
-	<5937511D.5070205@intel.com>
-	<20170608220006-mutt-send-email-mst@kernel.org>
-	<593A0F47.5080806@intel.com> <593E5F46.5080704@intel.com>
-	<20170612234035-mutt-send-email-mst@kernel.org>
-	<593F57C0.9080701@intel.com>
-	<4639c51b-32a6-3528-2ed6-c5f6296b6300@redhat.com>
-	<593F6133.9050804@intel.com>
-	<65faf3f9-a839-0b04-c740-6b2a60a51cf6@redhat.com>
-	<593F8153.7080209@intel.com>
-	<f8a64b2c-e769-4e9c-1cc6-ad31ea266010@redhat.com>
-	<593F9187.6040800@intel.com>
-	<9f196d71-f06b-7520-ca03-e94bf3b5a986@redhat.com>
-In-Reply-To: <9f196d71-f06b-7520-ca03-e94bf3b5a986@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [PATCH v1]
- virtio-net: enable configurable tx queue size
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="TRYliJ5NKNqkz5bu"
+Content-Disposition: inline
+In-Reply-To: <1497334024.13717.8.camel@linux.intel.com>
+Subject: Re: [Qemu-devel] Status of q35-lite?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,91 +30,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "stefanha@gmail.com" <stefanha@gmail.com>, "armbru@redhat.com" <armbru@redhat.com>, "jan.scheurich@ericsson.com" <jan.scheurich@ericsson.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+To: Chao Peng <chao.p.peng@linux.intel.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, rjones@redhat.com, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 06/13/2017 05:04 PM, Jason Wang wrote:
->
->
-> On 2017年06月13日 15:17, Wei Wang wrote:
->> On 06/13/2017 02:29 PM, Jason Wang wrote:
->>> The issue is what if there's a mismatch of max #sgs between qemu and
->>>>>> When the vhost backend is used, QEMU is not involved in the data 
->>>>>> path.
->>>>>> The vhost backend
->>>>>> directly gets what is offered by the guest from the vq. Why would
->>>>>> there be a mismatch of
->>>>>> max #sgs between QEMU and vhost, and what is the QEMU side max #sgs
->>>>>> used for? Thanks.
->>>>> You need query the backend max #sgs in this case at least. no? If not
->>>>> how do you know the value is supported by the backend?
->>>>>
->>>>> Thanks
->>>>>
->>>> Here is my thought: vhost backend has already been supporting 1024 
->>>> sgs,
->>>> so I think it might not be necessary to query the max sgs that the 
->>>> vhost
->>>> backend supports. In the setup phase, when QEMU detects the backend is
->>>> vhost, it assumes 1024 max sgs is supported, instead of giving an 
->>>> extra
->>>> call to query.
->>>
->>> We can probably assume vhost kernel supports up to 1024 sgs. But how 
->>> about for other vhost-user backends?
->>>
->> So far, I haven't seen any vhost backend implementation supporting 
->> less than 1024 sgs.
->
-> Since vhost-user is an open protocol we can not check each 
-> implementation (some may be even close sourced). For safety, we need 
-> an explicit clarification on this.
->
->>
->>
->>> And what you said here makes me ask one of my questions in the past:
->>>
->>> Do we have plan to extend 1024 to a larger value or 1024 looks good 
->>> for the future years? If we only care about 1024, there's even no 
->>> need for a new config filed, a feature flag is more than enough. If 
->>> we want to extend it to e.g 2048, we definitely need to query vhost 
->>> backend's limit (even for vhost-kernel).
->>>
->>
->> According to virtio spec (e.g. 2.4.4), unreasonably large descriptors 
->> are
->> not encouraged to be used by the guest. If possible, I would suggest 
->> to use
->> 1024 as the largest number of descriptors that the guest can chain, 
->> even when
->> we have larger queue size in the future. That is,
->> if (backend == QEMU backend)
->>     config.max_chain_size = 1023 (defined by the qemu backend 
->> implementation);
->> else if (backend == vhost)
->>     config.max_chain_size = 1024;
->>
->> It is transparent to the guest. From the guest's point of view, all 
->> it knows is a value
->> given to him via reading config.max_chain_size.
->
-> So not transparent actually, guest at least guest need to see and 
-> check for this. So the question still, since you only care about two 
-> cases in fact:
->
-> - backend supports 1024
-> - backend supports <1024 (qemu or whatever other backends)
->
-> So it looks like a new feature flag is more than enough. If 
-> device(backends) support this feature, it can make sure 1024 sgs is 
-> supported?
->
 
-That wouldn't be enough. For example, QEMU3.0 backend supports 
-max_chain_size=1023,
-while QEMU4.0 backend supports max_chain_size=1021. How would the guest know
-the max size with the same feature flag? Would it still chain 1023 
-descriptors with QEMU4.0?
+--TRYliJ5NKNqkz5bu
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Best,
-Wei
+On Tue, Jun 13, 2017 at 02:07:04PM +0800, Chao Peng wrote:
+> On Wed, 2017-05-24 at 16:07 +0100, Stefan Hajnoczi wrote:
+> > Hi Chao,
+> > Last year there was an effort to make "built-in" hardware optional so
+> > that VMs can be launched with a minimal set of devices.=A0=A0You made
+> > SATA,
+> > PIT, and SMBus optional.
+> >=20
+> > What is the current status of this work?
+> >=20
+> > Are there more devices that could benefit from an optional switch?
+>=20
+> Hi Stefan, in terms of making device optional, we don't have more
+> follow-ups basically because other build-in devices do not have
+> significant performance impact. For other optimizations (like
+> optimizing/skipping BIOS), we are still working on them.
+
+Excellent to hear!  If you want early feedback on BIOS optimizations
+then this mailing list or SeaBios/ed2k might be good places to discuss.
+
+KVM Forum proposals can be submitted until Thursday, June 15th.  That
+would be a good forum to present your work:
+http://events.linuxfoundation.org/events/kvm-forum/program/cfp
+
+Stefan
+
+--TRYliJ5NKNqkz5bu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZP7VlAAoJEJykq7OBq3PIIrwH/AsW44E8/T/HRQLWarWXtWEV
+pcniSGMiWfOfG7ZvnB4jvanuMsPl/Yc3kwxV00QezS5CRG0FqSCxfCa+oonmE8U5
+But80vnteqNAELtM0KWpUdH7zOIw1tekdE9EwjQatxgbqfk7s3DGNbyeTpor4dSS
+VbVH2U26xZtnW4FvQyek0Pu3FhoptVOzTzuds7cye9grQPyzbfRkThm3Q5v9ivRS
+rLHvK2EPCdnBdu+cMfpD7i3cBWCNBuF964ryDG3uxVtBjFXaNL43/oaO7h4A8iDE
+bwX6va8WPSHGDJ5pyNx6ECoPxre8HcFiPDp1ulrbUZwGNCg1yYdvW82LZBEABiQ=
+=E0qw
+-----END PGP SIGNATURE-----
+
+--TRYliJ5NKNqkz5bu--
