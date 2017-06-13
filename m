@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dKoOd-0007nz-Vt
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 12:10:25 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dKoRJ-0000VL-EC
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 12:13:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dKoOc-0001iC-Hp
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 12:10:23 -0400
-Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:35061)
+	(envelope-from <peter.maydell@linaro.org>) id 1dKoRI-0002gl-Lj
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 12:13:09 -0400
+Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:36419)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dKoOc-0001hp-Ae
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 12:10:22 -0400
-Received: by mail-wr0-x236.google.com with SMTP id q97so150423600wrb.2
-	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 09:10:22 -0700 (PDT)
+	id 1dKoRI-0002gT-FL
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 12:13:08 -0400
+Received: by mail-wr0-x235.google.com with SMTP id 36so28583244wry.3
+	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 09:13:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1496320911-51305-23-git-send-email-pbonzini@redhat.com>
-References: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
-	<1496320911-51305-23-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1496857819-12466-6-git-send-email-kwolf@redhat.com>
+References: <1496857819-12466-1-git-send-email-kwolf@redhat.com>
+	<1496857819-12466-6-git-send-email-kwolf@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Jun 2017 17:10:00 +0100
-Message-ID: <CAFEAcA8-wN6_LmMCf=73jGmJbpMmQACiUKiUi-b4J0y-P6-YUw@mail.gmail.com>
+Date: Tue, 13 Jun 2017 17:12:46 +0100
+Message-ID: <CAFEAcA-zObhNAR7iuQZ0MH7-ng86m2XEik8bie3o4THEbLwcVA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 22/33] sockets: improve error reporting if
- UNIX socket path is too long
+Subject: Re: [Qemu-devel] [PULL 5/8] commit: Fix use after free in completion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,83 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 1 June 2017 at 13:41, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> From: "Daniel P. Berrange" <berrange@redhat.com>
+On 7 June 2017 at 18:50, Kevin Wolf <kwolf@redhat.com> wrote:
+> The final bdrv_set_backing_hd() could be working on already freed nodes
+> because the commit job drops its references (through BlockBackends) to
+> both overlay_bs and top already a bit earlier.
 >
-> The 'struct sockaddr_un' only allows 108 bytes for the socket
-> path.
+> One way to trigger the bug is hot unplugging a disk for which
+> blockdev_mark_auto_del() cancels the block job.
 >
-> If the user supplies a path, QEMU uses snprintf() to silently
-> truncate it when too long. This is undesirable because the user
-> will then be unable to connect to the path they asked for.
+> Fix this by taking BDS-level references while we're still using the
+> nodes.
 >
-> If the user doesn't supply a path, QEMU builds one based on
-> TMPDIR, but if that leads to an overlong path, it mistakenly
-> uses error_setg_errno() with a stale errno value, because
-> snprintf() does not set errno on truncation.
->
-> In solving this the code needed some refactoring to ensure we
-> don't pass 'un.sun_path' directly to any APIs which expect
-> NUL-terminated strings, because the path is not required to
-> be terminated.
->
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> Message-Id: <20170525155300.22743-1-berrange@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Reviewed-by: John Snow <jsnow@redhat.com>
 > ---
->  util/qemu-sockets.c | 68 ++++++++++++++++++++++++++++++++++++-----------------
->  1 file changed, 46 insertions(+), 22 deletions(-)
-
-It looks like we missed a case where we should have changed
-an un.sun_path usage to something else:
-
-> @@ -873,24 +877,25 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
->           * to unlink first and thus re-open the race window.  The
->           * worst case possible is bind() failing, i.e. a DoS attack.
->           */
-> -        fd = mkstemp(un.sun_path);
-> +        fd = mkstemp(pathbuf);
->          if (fd < 0) {
->              error_setg_errno(errp, errno,
-> -                             "Failed to make a temporary socket name in %s", tmpdir);
-> +                             "Failed to make a temporary socket %s", pathbuf);
->              goto err;
->          }
->          close(fd);
-> -        if (update_addr) {
-> -            g_free(saddr->path);
-> -            saddr->path = g_strdup(un.sun_path);
-> -        }
->      }
+>  block/commit.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 >
-> -    if (unlink(un.sun_path) < 0 && errno != ENOENT) {
-> +    if (unlink(path) < 0 && errno != ENOENT) {
->          error_setg_errno(errp, errno,
-> -                         "Failed to unlink socket %s", un.sun_path);
-> +                         "Failed to unlink socket %s", path);
->          goto err;
->      }
+> diff --git a/block/commit.c b/block/commit.c
+> index a3028b2..af6fa68 100644
+> --- a/block/commit.c
+> +++ b/block/commit.c
+> @@ -89,6 +89,10 @@ static void commit_complete(BlockJob *job, void *opaque)
+>      int ret = data->ret;
+>      bool remove_commit_top_bs = false;
+>
+> +    /* Make sure overlay_bs and top stay around until bdrv_set_backing_hd() */
+> +    bdrv_ref(top);
+> +    bdrv_ref(overlay_bs);
 > +
-> +    memset(&un, 0, sizeof(un));
-> +    un.sun_family = AF_UNIX;
-> +    strncpy(un.sun_path, path, sizeof(un.sun_path));
-> +
->      if (bind(sock, (struct sockaddr*) &un, sizeof(un)) < 0) {
->          error_setg_errno(errp, errno, "Failed to bind socket to %s", un.sun_path);
+>      /* Remove base node parent that still uses BLK_PERM_WRITE/RESIZE before
+>       * the normal backing chain can be restored. */
+>      blk_unref(s->base);
 
-...you can see it in this bit of the context: this should be passing
-"path" to the %s format string, shouldn't it?
+Hi -- coverity complains about this change, because bdrv_ref()
+assumes that its argument is not NULL, but later on in commit_complete()
+we have a check
+    "if (overlay_bs && ...)"
+which assumes its argument might be NULL. (CID 1376205)
 
-Spotted looking at coverity issues, though unfortunately coverity
-just always reports the "buffer not nul terminated" error rather
-than only the cases where we don't nul terminate and then hand
-the buffer to a function which consumes a nul-terminated string,
-so we just have to mark the issue 'ignore' and don't get the
-benefit of static checking :-(
+Which is correct?
 
 thanks
 -- PMM
