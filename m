@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dKqO6-00049E-42
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 14:18:00 -0400
+	(envelope-from <bounces@canonical.com>) id 1dKqO6-00049I-Jq
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 14:17:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dKqO1-0002r2-KQ
+	(envelope-from <bounces@canonical.com>) id 1dKqO1-0002rJ-M6
 	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 14:17:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57867)
+Received: from indium.canonical.com ([91.189.90.7]:57886)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dKqO1-0002pg-BX
+	id 1dKqO1-0002pu-Dc
 	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 14:17:53 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dKqO0-0003wN-0a
+	id 1dKqO0-0003xu-8H
 	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 18:17:52 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CB8EF2E81AB
-	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 18:17:49 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 37BED2E81C1
+	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 18:17:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 13 Jun 2017 18:04:57 -0000
-From: Thomas Huth <1067517@bugs.launchpad.net>
-Reply-To: Bug 1067517 <1067517@bugs.launchpad.net>
+Date: Tue, 13 Jun 2017 18:03:25 -0000
+From: Thomas Huth <1047576@bugs.launchpad.net>
+Reply-To: Bug 1047576 <1047576@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20121016210525.14788.5580.malonedeb@gac.canonical.com>
-Message-Id: <149737709692.28243.12533788438050030835.malone@gac.canonical.com>
+References: <20120907191638.8105.79748.malonedeb@chaenomeles.canonical.com>
+Message-Id: <149737700518.9828.18421024507958894342.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1067517] Re: qemu dosn't save snapshots with the
- 'commit' command
+Subject: [Qemu-devel] [Bug 1047576] Re: qemu unittest emulator failure on
+ latest git master
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,7 +40,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 
 Triaging old bug tickets ... Can you still reproduce this problem with
-the latest version of QEMU (currently version 2.9.0)?
+the latest version of QEMU?
 
 ** Changed in: qemu
        Status: New =3D> Incomplete
@@ -49,160 +49,113 @@ the latest version of QEMU (currently version 2.9.0)?
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1067517
+https://bugs.launchpad.net/bugs/1047576
 
 Title:
-  qemu dosn't save snapshots with the 'commit' command
+  qemu unittest emulator failure on latest git master
 
 Status in QEMU:
   Incomplete
 
 Bug description:
-  Usually there is the 'commit' command in qemu which is described as follo=
-wed: "commit changes to the disk images (if -snapshot is used) or backing f=
-iles"
-  From the context i though if i start a guest with the "-snapshot" option,=
- the commit command would save all the changes back to the file. I've tried=
- it out but i didn't get it to work. I tried a few things like first use sa=
-vevm or stop and than commit all, but actually nothing works.
-  Interestingly, when using qcow2 files qemu doesn't show's any error at al=
-l. The changes in the guest just won't get saved. But if i'm using lvm2 par=
-titions i would get I/O errors after execute 'commit all'. That's probably =
-because lvm2 doesn't support this feature.?!? However i made a attachment w=
-hich shows the error's in the guest (dmesg).
+  Running the emulator unittest, using the cmdline:
 
-  Right now i started the guest with following command:
-  /usr/bin/qemu-system-x86_64 -name g64 -runas kvm -m 4096 -smp 2 \
-  -monitor unix:/var/run/kvm/g64.sock,server,nowait -pidfile /var/run/kvm/g=
-64.pid -daemonize -snapshot \
-  -device virtio-serial -chardev spicevmc,id=3Dvdagent,name=3Dvdagent \
-  -device virtserialport,chardev=3Dvdagent,name=3Dcom.redhat.spice.0 \
-  -drive file=3D/media/btrfs/g64.qcow2,if=3Dvirtio,cache=3Dnone,aio=3Dthrea=
-ds \
-  -netdev type=3Dtap,id=3Dg64_3,vhost=3Don,ifname=3Dqtap3,script=3Dno,downs=
-cript=3Dno \
-  -device virtio-net-pci,netdev=3Dg64_3,mac=3DDE:AD:BE:EF:CB:22 \
-  -spice port=3D5803,addr=3D192.168.2.60,password=3Dsecret -k de -cpu host \
-  -usb -usbdevice tablet -vga qxl
+  16:01:30 INFO | Running emulator
+  16:01:30 INFO | Running qemu command (reformatted):
+  16:01:30 INFO | /home/lmr/Code/autotest.git/autotest/client/tests/virt/kv=
+m/qemu =
 
-  The system is stable gentoo:
-  Portage 2.1.11.9 (default/linux/amd64/10.0/no-multilib, gcc-4.5.4, glibc-=
-2.15-r2, 3.4.9-gentoo x86_64)
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-                          System Settings
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  System uname: Linux-3.4.9-gentoo-x86_64-Intel-R-_Xeon-R-_CPU_E5405_@_2.00=
-GHz-with-gentoo-2.1
-  Timestamp of tree: Tue, 16 Oct 2012 03:45:01 +0000
-  app-shells/bash:          4.2_p37
-  dev-lang/python:          2.7.3-r2, 3.2.3
-  dev-util/cmake:           2.8.8-r3
-  dev-util/pkgconfig:       0.27.1
-  sys-apps/baselayout:      2.1-r1
-  sys-apps/openrc:          0.9.8.4
-  sys-apps/sandbox:         2.5
-  sys-devel/autoconf:       2.68
-  sys-devel/automake:       1.11.6
-  sys-devel/binutils:       2.22-r1
-  sys-devel/gcc:            4.5.4
-  sys-devel/gcc-config:     1.7.3
-  sys-devel/libtool:        2.4-r1
-  sys-devel/make:           3.82-r3
-  sys-kernel/linux-headers: 3.4-r2 (virtual/os-headers)
-  sys-libs/glibc:           2.15-r2
-  Repositories: gentoo x-local x11 sunrise virtualization
-  ACCEPT_KEYWORDS=3D"amd64"
-  ACCEPT_LICENSE=3D"* -@EULA"
-  CBUILD=3D"x86_64-pc-linux-gnu"
-  CFLAGS=3D"-O2 -pipe -march=3Dnative -fopenmp"
-  CHOST=3D"x86_64-pc-linux-gnu"
-  CONFIG_PROTECT=3D"/etc /usr/share/openvpn/easy-rsa"
-  CONFIG_PROTECT_MASK=3D"/etc/ca-certificates.conf /etc/env.d /etc/fonts/fo=
-nts.conf /etc/gconf /etc/gentoo-release /etc/revdep-rebuild /etc/sandbox.d =
-/etc/terminfo"
-  CXXFLAGS=3D"-O2 -pipe -march=3Dnative -fopenmp"
-  DISTDIR=3D"/usr/portage/distfiles"
-  FCFLAGS=3D"-O2 -pipe"
-  FEATURES=3D"assume-digests binpkg-logs config-protect-if-modified distloc=
-ks ebuild-locks fixlafiles news parallel-fetch parse-eapi-ebuild-head prote=
-ct-owned sandbox sfperms strict unknown-features-warn unmerge-logs unmerge-=
-orphans userfetch"
-  FFLAGS=3D"-O2 -pipe"
-  GENTOO_MIRRORS=3D"        http://gentoo.supp.name/                       =
-         http://ftp.fi.muni.cz/pub/linux/gentoo/                         ht=
-tp://gentoo.mirror.web4u.cz/                          http://gentoo.mirror.=
-dkm.cz/pub/gentoo/                         http://gentoo.ynet.sk/pub"
-  LANG=3D"de_DE.utf8"
-  LDFLAGS=3D"-Wl,-O1 -Wl,--as-needed -fopenmp"
-  LINGUAS=3D"en"
-  MAKEOPTS=3D"-j12"
-  PKGDIR=3D"/usr/portage/packages"
-  PORTAGE_CONFIGROOT=3D"/"
-  PORTAGE_RSYNC_OPTS=3D"--recursive --links --safe-links --perms --times --=
-compress --force --whole-file --delete --stats --human-readable --timeout=
-=3D180 --exclude=3D/distfiles --exclude=3D/local --exclude=3D/packages"
-  PORTAGE_TMPDIR=3D"/var/tmp"
-  PORTDIR=3D"/usr/portage"
-  PORTDIR_OVERLAY=3D"/home/clown/public/overlays/local /home/clown/public/o=
-verlays/layman/x11 /home/clown/public/overlays/layman/sunrise /home/clown/p=
-ublic/overlays/layman/virtualization"
-  SYNC=3D"rsync://rsync.europe.gentoo.org/gentoo-portage/"
-  USE=3D"acl acpi amd64 berkdb bzip2 cli cracklib crypt cups cxx dbus dri f=
-ortran gdbm gif gpm iconv ipv6 mmx modules mudflap ncurses nls nptl openmp =
-pam pbm pcre png pppd readline session sqlite sse sse2 ssl ssse3 tcpd threa=
-ds unicode zlib" ALSA_CARDS=3D"ali5451 als4000 atiixp atiixp-modem bt87x ca=
-0106 cmipci emu10k1x ens1370 ens1371 es1938 es1968 fm801 hda-intel intel8x0=
- intel8x0m maestro3 trident usb-audio via82xx via82xx-modem ymfpci" ALSA_PC=
-M_PLUGINS=3D"adpcm alaw asym copy dmix dshare dsnoop empty extplug file hoo=
-ks iec958 ioplug ladspa lfloat linear meter mmap_emul mulaw multi null plug=
- rate route share shm softvol" APACHE2_MODULES=3D"authn_core authz_core soc=
-ache_shmcb unixd actions alias auth_basic authn_alias authn_anon authn_dbm =
-authn_default authn_file authz_dbm authz_default authz_groupfile authz_host=
- authz_owner authz_user autoindex cache cgi cgid dav dav_fs dav_lock deflat=
-e dir disk_cache env expires ext_filter file_cache filter headers include i=
-nfo log_config logio mem_cache mime mime_magic negotiation rewrite setenvif=
- speling status unique_id userdir usertrack vhost_alias" CALLIGRA_FEATURES=
-=3D"kexi words flow plan sheets stage tables krita karbon braindump" CAMERA=
-S=3D"ptp2" COLLECTD_PLUGINS=3D"df interface irq load memory rrdtool swap sy=
-slog" ELIBC=3D"glibc" GPSD_PROTOCOLS=3D"ashtech aivdm earthmate evermore fv=
-18 garmin garmintxt gpsclock itrax mtk3301 nmea ntrip navcom oceanserver ol=
-dstyle oncore rtcm104v2 rtcm104v3 sirf superstar2 timing tsip tripmate tnt =
-ubx" INPUT_DEVICES=3D"keyboard mouse evdev" KERNEL=3D"linux" LCD_DEVICES=3D=
-"bayrad cfontz cfontz633 glk hd44780 lb216 lcdm001 mtxorb ncurses text" LIB=
-REOFFICE_EXTENSIONS=3D"presenter-console presenter-minimizer" LINGUAS=3D"en=
-" PHP_TARGETS=3D"php5-3" PYTHON_TARGETS=3D"python3_2 python2_7" QEMU_SOFTMM=
-U_TARGETS=3D"i386 x86_64" QEMU_USER_TARGETS=3D"i386 x86_64" RUBY_TARGETS=3D=
-"ruby18 ruby19" SANE_BACKENDS=3D"niash" USERLAND=3D"GNU" VIDEO_CARDS=3D"fbd=
-ev glint intel mach64 mga nouveau nv r128 radeon savage sis tdfx trident ve=
-sa via vmware dummy v4l" XTABLES_ADDONS=3D"quota2 psd pknock lscan length2 =
-ipv4options ipset ipp2p iface geoip fuzzy condition tee tarpit sysrq steal =
-rawnat logmark ipmark dhcpmac delude chaos account"
-  Unset:  CPPFLAGS, CTARGET, EMERGE_DEFAULT_OPTS, INSTALL_MASK, LC_ALL, POR=
-TAGE_BUNZIP2_COMMAND, PORTAGE_COMPRESS, PORTAGE_COMPRESS_FLAGS, PORTAGE_RSY=
-NC_EXTRA_OPTS, USE_PYTHON
+  16:01:30 INFO |     -S =
 
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-                          Package Settings
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  16:01:30 INFO |     -name 'unittest_vm' =
 
-  app-emulation/qemu-1.1.1-r1 was built with the following:
-  USE=3D"aio caps curl ncurses sasl spice vde vhost-net -alsa -bluetooth -b=
-rltty -debug -doc -fdt -opengl -pulseaudio -python -rbd -sdl -smartcard -st=
-atic -tci -tls -usbredir -virtfs -xattr -xen -xfs" QEMU_SOFTMMU_TARGETS=3D"=
-i386 x86_64 (-alpha) (-arm) -cris (-m68k) -microblaze -microblazeel (-mips)=
- -mips64 -mips64el -mipsel (-ppc) (-ppc64) -ppcemb -s390x -sh4 -sh4eb (-spa=
-rc) -sparc64 -xtensa -xtensaeb" QEMU_USER_TARGETS=3D"i386 x86_64 (-alpha) (=
--arm) -armeb -cris (-m68k) -microblaze -microblazeel (-mips) -mipsel (-ppc)=
- (-ppc64) -ppc64abi32 -s390x -sh4 -sh4eb (-sparc) -sparc32plus -sparc64 -un=
-icore32"
+  16:01:30 INFO |     -nodefaults =
+
+  16:01:30 INFO |     -chardev socket,id=3Dhmp_id_humanmonitor1,path=3D/tmp=
+/monitor-humanmonitor1-20120907-155940-WomlFZY3,server,nowait =
+
+  16:01:30 INFO |     -mon chardev=3Dhmp_id_humanmonitor1,mode=3Dreadline =
+
+  16:01:30 INFO |     -chardev socket,id=3Dserial_id_20120907-155940-WomlFZ=
+Y3,path=3D/tmp/serial-20120907-155940-WomlFZY3,server,nowait =
+
+  16:01:30 INFO |     -device isa-serial,chardev=3Dserial_id_20120907-15594=
+0-WomlFZY3 =
+
+  16:01:30 INFO |     -chardev socket,id=3Dseabioslog_id_20120907-155940-Wo=
+mlFZY3,path=3D/tmp/seabios-20120907-155940-WomlFZY3,server,nowait =
+
+  16:01:30 INFO |     -device isa-debugcon,chardev=3Dseabioslog_id_20120907=
+-155940-WomlFZY3,iobase=3D0x402 =
+
+  16:01:30 INFO |     -m 512 =
+
+  16:01:30 INFO |     -smp 2,cores=3D1,threads=3D1,sockets=3D2 =
+
+  16:01:30 INFO |     -kernel '/home/lmr/Code/autotest.git/autotest/client/=
+tests/virt/kvm/unittests/emulator.flat' =
+
+  16:01:30 INFO |     -vnc :0 =
+
+  16:01:30 INFO |     -chardev file,id=3Dtestlog,path=3D/tmp/testlog-201209=
+07-155940-WomlFZY3 =
+
+  16:01:30 INFO |     -device testdev,chardev=3Dtestlog =
+
+  16:01:30 INFO |     -rtc base=3Dutc,clock=3Dhost,driftfix=3Dnone  =
+
+  16:01:30 INFO |     -boot order=3Dcdn,once=3Dc,menu=3Doff   =
+
+  16:01:30 INFO |     -S =
+
+  16:01:30 INFO |     -enable-kvm
+
+  We get
+
+  16:01:32 INFO | Waiting for unittest emulator to complete, timeout 600, o=
+utput in /tmp/testlog-20120907-155940-WomlFZY3
+  16:01:32 INFO | [qemu output] KVM internal error. Suberror: 1
+  16:01:32 INFO | [qemu output] emulation failure
+  16:01:32 INFO | [qemu output] RAX=3Dffffffffffffeff8 RBX=3Dffffffffffffe0=
+00 RCX=3Dfffffffffffff000 RDX=3D000000000044d2b0
+  16:01:32 INFO | [qemu output] RSI=3D000000000044c9fa RDI=3D000000000044e3=
+70 RBP=3Dffffffffffffeff8 RSP=3D000000000044d2b0
+  16:01:32 INFO | [qemu output] R8 =3D000000000000000a R9 =3D00000000000003=
+f8 R10=3D0000000000000000 R11=3D0000000000000000
+  16:01:32 INFO | [qemu output] R12=3Dffffffffffffe000 R13=3D000000001fff60=
+00 R14=3D000000001fff5000 R15=3D0000000000000000
+  16:01:32 INFO | [qemu output] RIP=3D0000000000400a89 RFL=3D00010002 [----=
+---] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HLT=3D0
+  16:01:32 INFO | [qemu output] ES =3D0010 0000000000000000 ffffffff 00c093=
+00 DPL=3D0 DS   [-WA]
+  16:01:32 INFO | [qemu output] CS =3D0008 0000000000000000 ffffffff 00a09b=
+00 DPL=3D0 CS64 [-RA]
+  16:01:32 INFO | [qemu output] SS =3D0000 0000000000000000 ffffffff 000000=
+00
+  16:01:32 INFO | [qemu output] DS =3D0010 0000000000000000 ffffffff 00c093=
+00 DPL=3D0 DS   [-WA]
+  16:01:32 INFO | [qemu output] FS =3D0010 0000000000000000 ffffffff 00c093=
+00 DPL=3D0 DS   [-WA]
+  16:01:32 INFO | [qemu output] GS =3D0010 000000000044c370 ffffffff 00c093=
+00 DPL=3D0 DS   [-WA]
+  16:01:32 INFO | [qemu output] LDT=3D0000 0000000000000000 0000ffff 000082=
+00 DPL=3D0 LDT
+  16:01:32 INFO | [qemu output] TR =3D0048 000000000040a452 0000ffff 00008b=
+00 DPL=3D0 TSS64-busy
+  16:01:32 INFO | [qemu output] GDT=3D     000000000040a00a 00000447
+  16:01:32 INFO | [qemu output] IDT=3D     0000000000000000 00000fff
+  16:01:32 INFO | [qemu output] CR0=3D80010011 CR2=3D0000000000000000 CR3=
+=3D000000001ffff000 CR4=3D00000020
+  16:01:32 INFO | [qemu output] DR0=3D0000000000000000 DR1=3D00000000000000=
+00 DR2=3D0000000000000000 DR3=3D0000000000000000
+  16:01:32 INFO | [qemu output] DR6=3D00000000ffff0ff0 DR7=3D00000000000004=
+00
+  16:01:32 INFO | [qemu output] EFER=3D0000000000000500
+  16:01:32 INFO | [qemu output] Code=3D88 77 00 49 8d 84 24 f8 0f 00 00 48 =
+89 e2 48 89 e9 48 89 c5 <c9> 48 87 e2 48 87 e9 48 81 f9 99 88 77 00 0f 94 c=
+0 48 39 d5 40 0f 94 c6 40 0f b6 f6 21 c6
+
+  More logs will be attached to this bug report.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1067517/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1047576/+subscriptions
