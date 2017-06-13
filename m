@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dKqBO-00056v-2e
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 14:04:51 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dKqDE-0006Zj-CL
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 14:06:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dKqBM-0007Em-92
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 14:04:50 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:34030)
+	(envelope-from <peter.maydell@linaro.org>) id 1dKqDC-0007sI-Gt
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 14:06:44 -0400
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:35997)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dKqBL-0007Ef-Uv
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 14:04:48 -0400
-Received: by mail-wr0-x242.google.com with SMTP id u101so32755089wrc.1
-	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 11:04:47 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <1497346256-10073-1-git-send-email-gi-oh.kim@profitbricks.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0a016e14-d3c7-1bd3-a6db-753b87005609@redhat.com>
-Date: Tue, 13 Jun 2017 20:04:43 +0200
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dKqDC-0007rv-5A
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 14:06:42 -0400
+Received: by mail-wr0-x231.google.com with SMTP id 36so33123480wry.3
+	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 11:06:42 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1497346256-10073-1-git-send-email-gi-oh.kim@profitbricks.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] virtio-blk: drain block before cleanup
+In-Reply-To: <20170425180609.11004-1-krzk@kernel.org>
+References: <20170425180609.11004-1-krzk@kernel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 13 Jun 2017 19:06:20 +0100
+Message-ID: <CAFEAcA8C2QQynn_a7SsJOYo4oOuqV4UGmV2kKOHxLCafx=yTWA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3] hw/misc: Add Exynos4210 Pseudo Random
+ Number Generator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,182 +29,377 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gioh Kim <gi-oh.kim@profitbricks.com>, mst@redhat.com
-Cc: qemu-devel@nongnu.org
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+
+On 25 April 2017 at 19:06, Krzysztof Kozlowski <krzk@kernel.org> wrote:
+> Add emulation for Exynos4210 Pseudo Random Number Generator which could
+> work on fixed seeds or with seeds provided by True Random Number
+> Generator block inside the SoC.
+>
+> Implement only the fixed seeds part of it in polling mode (no
+> interrupts).
+
+Hi -- this patch is a bit old and I forget what the status of it
+is. Does it still need review?
+
+thanks
+-- PMM
 
 
-
-On 13/06/2017 11:30, Gioh Kim wrote:
-> Hi,
-> 
-> I'd like to report one use-after-free problem which is found by AddressSanitizer.
-> My company provides virtualization server with Qemu-2.7.
-> If customer commands Disk hot-unplug on Web-based application,
-> the application sends "device_del" and "drive_del" commands to qemu process via QMP.
-> It usually works fine.
-> But I found a corner case like following.
-> 1. Customer commands Disk hot-unplug via Web-based application.
-> 2. The application sends "device_del" that sometimes takes unpredictable time.
-> 3. There are some inflight IOs
-> 4. Customer does reboot or shutdown the guest OS
-> 4. Qemu process generates segfault.
-> 
-> If a disk is unplugged with "device_del" and "drive_del" commands,
-> qemu does not generate problem. But if only "device_del" command are finished and
-> guest os reboots, qemu generates segfault.
-> I can reproduce that case easily with following commands
-> 1. generate heavy IO on disk in Guest OS
-> 2. run "device_del" on the qemu monitor
-> 3. run "system_reboot" on the qemu monitor
-> 
-> According to AdressSanitizer, VirtQueue is freed by virtio_cleanup but dereferenced
-> by asynchronous request. I think asynchronous requests should be finished
-> before virtio_cleanup, so I added blk_drain() before virtio_cleanup.
-
-Hi Gioh,
-
-this was fixed in QEMU 2.8 by commit c611c76417 ("virtio: add
-MemoryListener to cache ring translations", 2017-02-17).
-
-Even though the MemoryRegionCache mechanism is currently not caching
-anything (commit 90c4fe5fc5, "exec: revert MemoryRegionCache",
-2017-04-03), the virtio bugfix remains.
-
-Your patch looks good as a workaround for QEMU 2.7.
-
-Paolo
-
-> Following is configure options I used to build qemu with AddressSanitizer.
-> ./configure --target-list=x86_64-softmmu --extra-cflags="-fsanitize=address -fno-omit-frame-pointer" --enable-debug
-> 
-> Following is the report of AddressSanitizer.
-> 
-> ------------------------------------- 8< ----------------------------------------
-> ==8801==WARNING: ASan doesn't fully support makecontext/swapcontext functions and may produce false positives in some cases!
-> ==8801==WARNING: ASan is ignoring requested __asan_handle_no_return: stack top: 0x7ffc984da000; bottom 0x7fa524363000; size: 0x005774177000 (375609847808)
-> False positive error reports may follow
-> For details see http://code.google.com/p/address-sanitizer/issues/detail?id=189
-> =================================================================
-> ==8801==ERROR: AddressSanitizer: heap-use-after-free on address 0x7fa5240ab82c at pc 0x55ccd7bffb76 bp 0x7fa524364590 sp 0x7fa524364580
-> READ of size 2 at 0x7fa5240ab82c thread T0
->     #0 0x55ccd7bffb75 in virtqueue_fill /home/gohkim/work/tools/qemu/hw/virtio/virtio.c:284
->     #1 0x55ccd7bffe46 in virtqueue_push /home/gohkim/work/tools/qemu/hw/virtio/virtio.c:308
->     #2 0x55ccd7b66c74 in virtio_blk_req_complete /home/gohkim/work/tools/qemu/hw/block/virtio-blk.c:58
->     #3 0x55ccd7b67154 in virtio_blk_rw_complete /home/gohkim/work/tools/qemu/hw/block/virtio-blk.c:121
->     #4 0x55ccd83852b9 in blk_aio_complete block/block-backend.c:923
->     #5 0x55ccd8385a73 in blk_aio_write_entry block/block-backend.c:984
->     #6 0x55ccd84c7d68 in coroutine_trampoline util/coroutine-ucontext.c:78
->     #7 0x7fa5702d45cf  (/lib/x86_64-linux-gnu/libc.so.6+0x495cf)
-> 
-> 0x7fa5240ab82c is located 44 bytes inside of 131072-byte region [0x7fa5240ab800,0x7fa5240cb800)
-> freed by thread T0 here:
->     #0 0x7fa573f876aa in __interceptor_free (/usr/lib/x86_64-linux-gnu/libasan.so.2+0x986aa)
->     #1 0x55ccd7c07fa4 in virtio_cleanup /home/gohkim/work/tools/qemu/hw/virtio/virtio.c:1678
->     #2 0x55ccd7b6c585 in virtio_blk_device_unrealize /home/gohkim/work/tools/qemu/hw/block/virtio-blk.c:948
->     #3 0x55ccd7c09734 in virtio_device_unrealize /home/gohkim/work/tools/qemu/hw/virtio/virtio.c:1950
->     #4 0x55ccd7eb9bb7 in device_set_realized hw/core/qdev.c:964
->     #5 0x55ccd82c1bef in property_set_bool qom/object.c:1853
->     #6 0x55ccd82be535 in object_property_set qom/object.c:1087
->     #7 0x55ccd82c454f in object_property_set_qobject qom/qom-qobject.c:27
->     #8 0x55ccd82be810 in object_property_set_bool qom/object.c:1156
->     #9 0x55ccd7ec1395 in bus_set_realized hw/core/bus.c:181
->     #10 0x55ccd82c1bef in property_set_bool qom/object.c:1853
->     #11 0x55ccd82be535 in object_property_set qom/object.c:1087
->     #12 0x55ccd82c454f in object_property_set_qobject qom/qom-qobject.c:27
->     #13 0x55ccd82be810 in object_property_set_bool qom/object.c:1156
->     #14 0x55ccd7eb9a8a in device_set_realized hw/core/qdev.c:956
->     #15 0x55ccd82c1bef in property_set_bool qom/object.c:1853
->     #16 0x55ccd82be535 in object_property_set qom/object.c:1087
->     #17 0x55ccd82c454f in object_property_set_qobject qom/qom-qobject.c:27
->     #18 0x55ccd82be810 in object_property_set_bool qom/object.c:1156
->     #19 0x55ccd7eba820 in device_unparent hw/core/qdev.c:1099
->     #20 0x55ccd82bf50b in object_finalize_child_property qom/object.c:1362
->     #21 0x55ccd82bb3c6 in object_property_del_child qom/object.c:422
->     #22 0x55ccd82bb601 in object_unparent qom/object.c:441
->     #23 0x55ccd7e221f1 in acpi_pcihp_eject_slot hw/acpi/pcihp.c:139
->     #24 0x55ccd7e22301 in acpi_pcihp_update_hotplug_bus hw/acpi/pcihp.c:152
->     #25 0x55ccd7e22600 in acpi_pcihp_update hw/acpi/pcihp.c:176
->     #26 0x55ccd7e22628 in acpi_pcihp_reset hw/acpi/pcihp.c:182
->     #27 0x55ccd7e1fc10 in piix4_reset hw/acpi/piix4.c:363
->     #28 0x55ccd7da4ebd in qemu_devices_reset /home/gohkim/work/tools/qemu/vl.c:1713
->     #29 0x55ccd7c28354 in pc_machine_reset /home/gohkim/work/tools/qemu/hw/i386/pc.c:2178
-> 
-> previously allocated by thread T0 here:
->     #0 0x7fa573f87b49 in __interceptor_calloc (/usr/lib/x86_64-linux-gnu/libasan.so.2+0x98b49)
->     #1 0x7fa5718575d0 in g_malloc0 (/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x4f5d0)
->     #2 0x55ccd7b6bfa5 in virtio_blk_device_realize /home/gohkim/work/tools/qemu/hw/block/virtio-blk.c:910
->     #3 0x55ccd7c09500 in virtio_device_realize /home/gohkim/work/tools/qemu/hw/virtio/virtio.c:1927
->     #4 0x55ccd7eb9690 in device_set_realized hw/core/qdev.c:918
->     #5 0x55ccd82c1bef in property_set_bool qom/object.c:1853
->     #6 0x55ccd82be535 in object_property_set qom/object.c:1087
->     #7 0x55ccd82c454f in object_property_set_qobject qom/qom-qobject.c:27
->     #8 0x55ccd82be810 in object_property_set_bool qom/object.c:1156
->     #9 0x55ccd81b1b5c in virtio_blk_pci_realize hw/virtio/virtio-pci.c:1897
->     #10 0x55ccd81b14df in virtio_pci_realize hw/virtio/virtio-pci.c:1799
->     #11 0x55ccd805e2c5 in pci_qdev_realize hw/pci/pci.c:1966
->     #12 0x55ccd81b17db in virtio_pci_dc_realize hw/virtio/virtio-pci.c:1852
->     #13 0x55ccd7eb9690 in device_set_realized hw/core/qdev.c:918
->     #14 0x55ccd82c1bef in property_set_bool qom/object.c:1853
->     #15 0x55ccd82be535 in object_property_set qom/object.c:1087
->     #16 0x55ccd82c454f in object_property_set_qobject qom/qom-qobject.c:27
->     #17 0x55ccd82be810 in object_property_set_bool qom/object.c:1156
->     #18 0x55ccd7d8141e in qdev_device_add /home/gohkim/work/tools/qemu/qdev-monitor.c:618
->     #19 0x55ccd7dab462 in device_init_func /home/gohkim/work/tools/qemu/vl.c:2316
->     #20 0x55ccd84bd18c in qemu_opts_foreach util/qemu-option.c:1116
->     #21 0x55ccd7db2bdb in main /home/gohkim/work/tools/qemu/vl.c:4507
->     #22 0x7fa5702ababf in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x20abf)
-> 
-> SUMMARY: AddressSanitizer: heap-use-after-free /home/gohkim/work/tools/qemu/hw/virtio/virtio.c:284 virtqueue_fill
-> Shadow bytes around the buggy address:
->   0x0ff52480d6b0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
->   0x0ff52480d6c0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
->   0x0ff52480d6d0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
->   0x0ff52480d6e0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
->   0x0ff52480d6f0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-> =>0x0ff52480d700: fd fd fd fd fd[fd]fd fd fd fd fd fd fd fd fd fd
->   0x0ff52480d710: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
->   0x0ff52480d720: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
->   0x0ff52480d730: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
->   0x0ff52480d740: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
->   0x0ff52480d750: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
-> Shadow byte legend (one shadow byte represents 8 application bytes):
->   Addressable:           00
->   Partially addressable: 01 02 03 04 05 06 07 
->   Heap left redzone:       fa
->   Heap right redzone:      fb
->   Freed heap region:       fd
->   Stack left redzone:      f1
->   Stack mid redzone:       f2
->   Stack right redzone:     f3
->   Stack partial redzone:   f4
->   Stack after return:      f5
->   Stack use after scope:   f8
->   Global redzone:          f9
->   Global init order:       f6
->   Poisoned by user:        f7
->   Container overflow:      fc
->   Array cookie:            ac
->   Intra object redzone:    bb
->   ASan internal:           fe
-> ==8801==ABORTING
-> 
-> 
-> Signed-off-by: Gioh Kim <gi-oh.kim@profitbricks.com>
+> Emulation tested with two independent Linux kernel exynos-rng drivers:
+> 1. New kcapi-rng interface (targeting Linux v4.12),
+> 2. Old hwrng inteface
+>    # echo "exynos" > /sys/class/misc/hw_random/rng_current
+>    # dd if=/dev/hwrng of=/dev/null bs=1 count=16
+>
+> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+>
 > ---
->  hw/block/virtio-blk.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-> index 331d766..cc39934 100644
-> --- a/hw/block/virtio-blk.c
-> +++ b/hw/block/virtio-blk.c
-> @@ -939,6 +939,8 @@ static void virtio_blk_device_unrealize(DeviceState *dev, Error **errp)
->      virtio_blk_data_plane_destroy(s->dataplane);
->      s->dataplane = NULL;
->      qemu_del_vm_change_state_handler(s->change);
-> +    if (blk_bs(s->blk) && bdrv_requests_pending((blk_bs(s->blk))))
-> +        blk_drain(s->blk);
->      blockdev_mark_auto_del(s->blk);
->      virtio_cleanup(vdev);
->  }
-> 
+>
+> Changes since v2:
+> 1. Drop GRand in favor of qcrypto_random_bytes() after discussion with
+>    Peter Maydell.
+> 2. Because of above, ignore the seed value but mark if each one of five
+>    seed registers were seeded.
+> 3. Fix memset of s->randr_value (copy paste error, also shorter sizeof
+>    can be used).
+>
+> Changes since v1:
+> 1. Use GRand-like functions to fix build on MingW32 (this adds also
+>    finalize).
+> 2. Add DPRINTF macro.
+> 3. Use HWADDR_PRIx and family for printing values.
+> ---
+>  hw/arm/exynos4210.c      |   4 +
+>  hw/misc/Makefile.objs    |   2 +-
+>  hw/misc/exynos4210_rng.c | 282 +++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 287 insertions(+), 1 deletion(-)
+>  create mode 100644 hw/misc/exynos4210_rng.c
+>
+> diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
+> index 960f27e45a36..5a622cfedfc8 100644
+> --- a/hw/arm/exynos4210.c
+> +++ b/hw/arm/exynos4210.c
+> @@ -86,6 +86,9 @@
+>  /* Clock controller SFR base address */
+>  #define EXYNOS4210_CLK_BASE_ADDR            0x10030000
+>
+> +/* PRNG/HASH SFR base address */
+> +#define EXYNOS4210_RNG_BASE_ADDR            0x10830400
+> +
+>  /* Display controllers (FIMD) */
+>  #define EXYNOS4210_FIMD0_BASE_ADDR          0x11C00000
+>
+> @@ -322,6 +325,7 @@ Exynos4210State *exynos4210_init(MemoryRegion *system_mem,
+>      sysbus_create_simple("exynos4210.pmu", EXYNOS4210_PMU_BASE_ADDR, NULL);
+>
+>      sysbus_create_simple("exynos4210.clk", EXYNOS4210_CLK_BASE_ADDR, NULL);
+> +    sysbus_create_simple("exynos4210.rng", EXYNOS4210_RNG_BASE_ADDR, NULL);
+>
+>      /* PWM */
+>      sysbus_create_varargs("exynos4210.pwm", EXYNOS4210_PWM_BASE_ADDR,
+> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+> index c8b489390f7e..e0699ea11155 100644
+> --- a/hw/misc/Makefile.objs
+> +++ b/hw/misc/Makefile.objs
+> @@ -26,7 +26,7 @@ obj-$(CONFIG_IVSHMEM) += ivshmem.o
+>  obj-$(CONFIG_REALVIEW) += arm_sysctl.o
+>  obj-$(CONFIG_NSERIES) += cbus.o
+>  obj-$(CONFIG_ECCMEMCTL) += eccmemctl.o
+> -obj-$(CONFIG_EXYNOS4) += exynos4210_pmu.o exynos4210_clk.o
+> +obj-$(CONFIG_EXYNOS4) += exynos4210_pmu.o exynos4210_clk.o exynos4210_rng.o
+>  obj-$(CONFIG_IMX) += imx_ccm.o
+>  obj-$(CONFIG_IMX) += imx31_ccm.o
+>  obj-$(CONFIG_IMX) += imx25_ccm.o
+> diff --git a/hw/misc/exynos4210_rng.c b/hw/misc/exynos4210_rng.c
+> new file mode 100644
+> index 000000000000..3f1459edb5df
+> --- /dev/null
+> +++ b/hw/misc/exynos4210_rng.c
+> @@ -0,0 +1,282 @@
+> +/*
+> + *  Exynos4210 Pseudo Random Nubmer Generator Emulation
+> + *
+> + *  Copyright (c) 2017 Krzysztof Kozlowski <krzk@kernel.org>
+> + *
+> + *  This program is free software; you can redistribute it and/or modify it
+> + *  under the terms of the GNU General Public License as published by the
+> + *  Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful, but WITHOUT
+> + *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + *  FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+> + *  for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License along
+> + *  with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "crypto/random.h"
+> +#include "hw/sysbus.h"
+> +#include "qemu/log.h"
+> +
+> +#define DEBUG_EXYNOS_RNG 0
+> +
+> +#define DPRINTF(fmt, ...) \
+> +    do { \
+> +        if (DEBUG_EXYNOS_RNG) { \
+> +            printf("exynos4210_rng: " fmt, ## __VA_ARGS__); \
+> +        } \
+> +    } while (0)
+> +
+> +#define TYPE_EXYNOS4210_RNG             "exynos4210.rng"
+> +#define EXYNOS4210_RNG(obj) \
+> +    OBJECT_CHECK(Exynos4210RngState, (obj), TYPE_EXYNOS4210_RNG)
+> +
+> +/*
+> + * Exynos4220, PRNG, only polling mode is supported.
+> + */
+> +
+> +/* RNG_CONTROL_1 register bitfields, reset value: 0x0 */
+> +#define EXYNOS4210_RNG_CONTROL_1_PRNG           0x8
+> +#define EXYNOS4210_RNG_CONTROL_1_START_INIT     BIT(4)
+> +/* RNG_STATUS register bitfields, reset value: 0x1 */
+> +#define EXYNOS4210_RNG_STATUS_PRNG_ERROR        BIT(7)
+> +#define EXYNOS4210_RNG_STATUS_PRNG_DONE         BIT(5)
+> +#define EXYNOS4210_RNG_STATUS_MSG_DONE          BIT(4)
+> +#define EXYNOS4210_RNG_STATUS_PARTIAL_DONE      BIT(3)
+> +#define EXYNOS4210_RNG_STATUS_PRNG_BUSY         BIT(2)
+> +#define EXYNOS4210_RNG_STATUS_SEED_SETTING_DONE BIT(1)
+> +#define EXYNOS4210_RNG_STATUS_BUFFER_READY      BIT(0)
+> +#define EXYNOS4210_RNG_STATUS_WRITE_MASK        (EXYNOS4210_RNG_STATUS_PRNG_DONE \
+> +                                                    | EXYNOS4210_RNG_STATUS_MSG_DONE \
+> +                                                    | EXYNOS4210_RNG_STATUS_PARTIAL_DONE)
+> +
+> +#define EXYNOS4210_RNG_CONTROL_1                  0x0
+> +#define EXYNOS4210_RNG_STATUS                    0x10
+> +#define EXYNOS4210_RNG_SEED_IN                  0x140
+> +#define EXYNOS4210_RNG_SEED_IN_OFFSET(n)        (EXYNOS4210_RNG_SEED_IN + (n * 0x4))
+> +#define EXYNOS4210_RNG_PRNG                     0x160
+> +#define EXYNOS4210_RNG_PRNG_OFFSET(n)           (EXYNOS4210_RNG_PRNG + (n * 0x4))
+> +
+> +#define EXYNOS4210_RNG_PRNG_NUM                 5
+> +
+> +#define EXYNOS4210_RNG_REGS_MEM_SIZE            0x200
+> +
+> +typedef struct Exynos4210RngState {
+> +    SysBusDevice parent_obj;
+> +    MemoryRegion iomem;
+> +
+> +    int32_t randr_value[EXYNOS4210_RNG_PRNG_NUM];
+> +    /* bits from 0 to EXYNOS4210_RNG_PRNG_NUM if given seed register was set */
+> +    uint32_t seed_set;
+> +
+> +    /* Register values */
+> +    uint32_t reg_control;
+> +    uint32_t reg_status;
+> +} Exynos4210RngState;
+> +
+> +static bool exynos4210_rng_seed_ready(const Exynos4210RngState *s)
+> +{
+> +    unsigned int i;
+> +
+> +    for (i = 0; i < EXYNOS4210_RNG_PRNG_NUM; i++) {
+> +        if ((s->seed_set & BIT(i)) == 0) {
+> +            return false;
+> +        }
+> +    }
+> +
+> +    return true;
+> +}
+> +
+> +static void exynos4210_rng_set_seed(Exynos4210RngState *s, unsigned int i,
+> +                                    uint64_t val)
+> +{
+> +    /*
+> +     * We actually ignore the seed and always generate true random numbers.
+> +     * Theoretically this should not match the device as Exynos has
+> +     * a Pseudo Random Number Generator but testing shown that it always
+> +     * generates random numbers regardless of the seed value.
+> +     */
+> +    s->seed_set |= BIT(i);
+> +
+> +    /* If all seeds were written, update the status to reflect it */
+> +    if (exynos4210_rng_seed_ready(s)) {
+> +        s->reg_status |= EXYNOS4210_RNG_STATUS_SEED_SETTING_DONE;
+> +    } else {
+> +        s->reg_status &= ~EXYNOS4210_RNG_STATUS_SEED_SETTING_DONE;
+> +    }
+> +}
+> +
+> +static void exynos4210_rng_run_engine(Exynos4210RngState *s)
+> +{
+> +    Error *err = NULL;
+> +    int ret;
+> +
+> +    /* Seed set? */
+> +    if ((s->reg_status & EXYNOS4210_RNG_STATUS_SEED_SETTING_DONE) == 0) {
+> +        goto out;
+> +    }
+> +
+> +    /* PRNG engine chosen? */
+> +    if ((s->reg_control & EXYNOS4210_RNG_CONTROL_1_PRNG) == 0) {
+> +        goto out;
+> +    }
+> +
+> +    /* PRNG engine started? */
+> +    if ((s->reg_control & EXYNOS4210_RNG_CONTROL_1_START_INIT) == 0) {
+> +        goto out;
+> +    }
+> +
+> +    /* Get randoms */
+> +    ret = qcrypto_random_bytes((uint8_t *)s->randr_value,
+> +                               sizeof(s->randr_value), &err);
+> +    if (!ret) {
+> +        /* Notify that PRNG is ready */
+> +        s->reg_status |= EXYNOS4210_RNG_STATUS_PRNG_DONE;
+> +    } else {
+> +        error_report_err(err);
+> +    }
+> +
+> +out:
+> +    /* Always clear start engine bit */
+> +    s->reg_control &= ~EXYNOS4210_RNG_CONTROL_1_START_INIT;
+> +}
+> +
+> +static uint64_t exynos4210_rng_read(void *opaque, hwaddr offset,
+> +                                    unsigned size)
+> +{
+> +    Exynos4210RngState *s = (Exynos4210RngState *)opaque;
+> +    uint32_t val = 0;
+> +
+> +    assert(size == 4);
+> +
+> +    switch (offset) {
+> +    case EXYNOS4210_RNG_CONTROL_1:
+> +        val = s->reg_control;
+> +        break;
+> +
+> +    case EXYNOS4210_RNG_STATUS:
+> +        val = s->reg_status;
+> +        break;
+> +
+> +    case EXYNOS4210_RNG_PRNG_OFFSET(0):
+> +    case EXYNOS4210_RNG_PRNG_OFFSET(1):
+> +    case EXYNOS4210_RNG_PRNG_OFFSET(2):
+> +    case EXYNOS4210_RNG_PRNG_OFFSET(3):
+> +    case EXYNOS4210_RNG_PRNG_OFFSET(4):
+> +        val = s->randr_value[(offset - EXYNOS4210_RNG_PRNG_OFFSET(0)) / 4];
+> +        DPRINTF("returning random @0x%" HWADDR_PRIx ": 0x%" PRIx32 "\n",
+> +                offset, val);
+> +        break;
+> +
+> +    default:
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "%s: bad read offset 0x%" HWADDR_PRIx "\n",
+> +                      __func__, offset);
+> +    }
+> +
+> +    return val;
+> +}
+> +
+> +static void exynos4210_rng_write(void *opaque, hwaddr offset,
+> +                                 uint64_t val, unsigned size)
+> +{
+> +    Exynos4210RngState *s = (Exynos4210RngState *)opaque;
+> +
+> +    assert(size == 4);
+> +
+> +    switch (offset) {
+> +    case EXYNOS4210_RNG_CONTROL_1:
+> +        DPRINTF("RNG_CONTROL_1 = 0x%" PRIx64 "\n", val);
+> +        s->reg_control = val;
+> +        exynos4210_rng_run_engine(s);
+> +        break;
+> +
+> +    case EXYNOS4210_RNG_STATUS:
+> +        /* For clearing status fields */
+> +        s->reg_status &= ~EXYNOS4210_RNG_STATUS_WRITE_MASK;
+> +        s->reg_status |= val & EXYNOS4210_RNG_STATUS_WRITE_MASK;
+> +        break;
+> +
+> +    case EXYNOS4210_RNG_SEED_IN_OFFSET(0):
+> +    case EXYNOS4210_RNG_SEED_IN_OFFSET(1):
+> +    case EXYNOS4210_RNG_SEED_IN_OFFSET(2):
+> +    case EXYNOS4210_RNG_SEED_IN_OFFSET(3):
+> +    case EXYNOS4210_RNG_SEED_IN_OFFSET(4):
+> +        exynos4210_rng_set_seed(s,
+> +                                (offset - EXYNOS4210_RNG_SEED_IN_OFFSET(0)) / 4,
+> +                                val);
+> +        break;
+> +
+> +    default:
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "%s: bad write offset 0x%" HWADDR_PRIx "\n",
+> +                      __func__, offset);
+> +    }
+> +}
+> +
+> +static const MemoryRegionOps exynos4210_rng_ops = {
+> +    .read = exynos4210_rng_read,
+> +    .write = exynos4210_rng_write,
+> +    .endianness = DEVICE_NATIVE_ENDIAN,
+> +};
+> +
+> +static void exynos4210_rng_reset(DeviceState *dev)
+> +{
+> +    Exynos4210RngState *s = EXYNOS4210_RNG(dev);
+> +
+> +    s->reg_control = 0;
+> +    s->reg_status = EXYNOS4210_RNG_STATUS_BUFFER_READY;
+> +    memset(s->randr_value, 0, sizeof(s->randr_value));
+> +    s->seed_set = 0;
+> +}
+> +
+> +static void exynos4210_rng_init(Object *obj)
+> +{
+> +    Exynos4210RngState *s = EXYNOS4210_RNG(obj);
+> +    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
+> +
+> +    memory_region_init_io(&s->iomem, obj, &exynos4210_rng_ops, s,
+> +                          TYPE_EXYNOS4210_RNG, EXYNOS4210_RNG_REGS_MEM_SIZE);
+> +    sysbus_init_mmio(dev, &s->iomem);
+> +}
+> +
+> +static const VMStateDescription exynos4210_rng_vmstate = {
+> +    .name = TYPE_EXYNOS4210_RNG,
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_INT32_ARRAY(randr_value, Exynos4210RngState,
+> +                            EXYNOS4210_RNG_PRNG_NUM),
+> +        VMSTATE_UINT32(seed_set, Exynos4210RngState),
+> +        VMSTATE_UINT32(reg_status, Exynos4210RngState),
+> +        VMSTATE_UINT32(reg_control, Exynos4210RngState),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static void exynos4210_rng_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->reset = exynos4210_rng_reset;
+> +    dc->vmsd = &exynos4210_rng_vmstate;
+> +}
+> +
+> +static const TypeInfo exynos4210_rng_info = {
+> +    .name          = TYPE_EXYNOS4210_RNG,
+> +    .parent        = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(Exynos4210RngState),
+> +    .instance_init = exynos4210_rng_init,
+> +    .class_init    = exynos4210_rng_class_init,
+> +};
+> +
+> +static void exynos4210_rng_register(void)
+> +{
+> +    type_register_static(&exynos4210_rng_info);
+> +}
+> +
+> +type_init(exynos4210_rng_register)
+> --
+> 2.9.3
+>
