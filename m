@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dKnLR-0002uK-02
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 11:03:02 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dKnM2-0003GG-I3
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 11:03:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dKnLP-0002eJ-Ft
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 11:03:01 -0400
-Date: Tue, 13 Jun 2017 22:55:00 +0800
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170613145500.GB13420@umbus>
-References: <20170608040857.GV13397@umbus.fritz.box>
-	<20170608115410.2e7a2511@bahia.ttt.fr.ibm.com>
-	<20170612142456.GJ18542@umbus>
-	<20170613093359.4567ba94@bahia.ttt.fr.ibm.com>
-	<20170613080631.GB30171@umbus>
-	<20170613104003.233e21d5@bahia.ttt.fr.ibm.com>
-	<20170613090002.GA2096@work-vm>
-	<20170613112150.7f64171c@bahia.ttt.fr.ibm.com>
-	<20170613095549.GC2096@work-vm>
-	<20170613120552.44c1c58e@bahia.ttt.fr.ibm.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dKnLy-00036b-88
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 11:03:38 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:44898 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dKnLx-00034e-Su
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 11:03:34 -0400
+References: <149736509828.129.3630891448953030106@4a9a010726c0>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <79440064-d904-8e7c-2348-e59d5f4eee4b@virtuozzo.com>
+Date: Tue, 13 Jun 2017 18:03:22 +0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="KFztAG8eRSV9hGtP"
-Content-Disposition: inline
-In-Reply-To: <20170613120552.44c1c58e@bahia.ttt.fr.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 5/5] spapr: fix migration of ICPState
- objects from/to older QEMU
+In-Reply-To: <149736509828.129.3630891448953030106@4a9a010726c0>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v21 00/30] qcow2: persistent dirty bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,130 +28,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org, jsnow@redhat.com
+
+Looks weird.
+
+13.06.2017 17:44, no-reply@patchew.org wrote:
+> Hi,
+>
+> This series failed automatic build test. Please find the testing comman=
+ds and
+> their output below. If you have docker installed, you can probably repr=
+oduce it
+> locally.
+>
+> Message-id: 20170613140358.81651-1-vsementsov@virtuozzo.com
+> Subject: [Qemu-devel] [PATCH v21 00/30] qcow2: persistent dirty bitmaps
+> Type: series
+>
+> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
+> #!/bin/bash
+> set -e
+> git submodule update --init dtc
+> # Let docker tests dump environment info
+> export SHOW_ENV=3D1
+> export J=3D8
+> time make docker-test-quick@centos6
+> time make docker-test-mingw@fedora
+> time make docker-test-build@min-glib
+> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
+>
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+>  From https://github.com/patchew-project/qemu
+>   - [tag update]      patchew/20170613133329.23653-1-stefanha@redhat.co=
+m -> patchew/20170613133329.23653-1-stefanha@redhat.com
+>   * [new tag]         patchew/20170613140358.81651-1-vsementsov@virtuoz=
+zo.com -> patchew/20170613140358.81651-1-vsementsov@virtuozzo.com
+> Switched to a new branch 'test'
+> 09d75c7 block: release persistent bitmaps on inactivate
+> 837d8c4 qmp: block-dirty-bitmap-remove: remove persistent
+> c44d3dc qcow2: add .bdrv_remove_persistent_dirty_bitmap
+> 3a2e6d8 block/dirty-bitmap: add bdrv_remove_persistent_dirty_bitmap
+> 66e087f iotests: test qcow2 persistent dirty bitmap
+> a6c4b98 qmp: add x-debug-block-dirty-bitmap-sha256
+
+[...]
+
+>    CC      hw/net/e1000e_core.o
+>    CC      hw/net/rtl8139.o
+>    CC      hw/net/vmxnet3.o
+>    CC      hw/net/smc91c111.o
+> In file included from /tmp/qemu-test/src/hw/net/vmxnet3.c:30:
+> /tmp/qemu-test/src/include/migration/register.h:18: error: redefinition=
+ of typedef =E2=80=98LoadStateHandler=E2=80=99
+> /tmp/qemu-test/src/include/migration/vmstate.h:32: note: previous decla=
+ration of =E2=80=98LoadStateHandler=E2=80=99 was here
+> make: *** [hw/net/vmxnet3.o] Error 1
+> make: *** Waiting for unfinished jobs....
+> tests/docker/Makefile.include:118: recipe for target 'docker-run' faile=
+d
+> make[1]: *** [docker-run] Error 2
+> make[1]: Leaving directory '/var/tmp/patchew-tester-tmp-zqsdsd64/src'
+> tests/docker/Makefile.include:149: recipe for target 'docker-run-test-q=
+uick@centos6' failed
+> make: *** [docker-run-test-quick@centos6] Error 2
+
+Hmm.. What? my patches are not related to migration or network.. Also,=20
+v21 is very similar with v20, the only change in code is error_report ->=20
+error_reportf_err with additional message...
 
 
---KFztAG8eRSV9hGtP
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> =3D=3D=3D OUTPUT END =3D=3D=3D
+>
+> Test command exited with code: 2
+>
+>
+> ---
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@freelists.org
 
-On Tue, Jun 13, 2017 at 12:05:52PM +0200, Greg Kurz wrote:
-> On Tue, 13 Jun 2017 10:55:50 +0100
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
->=20
-> > * Greg Kurz (groug@kaod.org) wrote:
-> > > On Tue, 13 Jun 2017 10:00:03 +0100
-> > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > >  =20
-> > > > * Greg Kurz (groug@kaod.org) wrote: =20
-> > > > > On Tue, 13 Jun 2017 16:06:31 +0800
-> > > > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > > > >    =20
-> > > > > > On Tue, Jun 13, 2017 at 09:33:59AM +0200, Greg Kurz wrote:   =
-=20
-> > > > > [...]   =20
-> > > > > > > > > > > +static void pre_2_10_vmstate_register_dummy_icp(sPAP=
-RMachineState *spapr, int i)
-> > > > > > > > > > > +{
-> > > > > > > > > > > +    bool *flag =3D &spapr->pre_2_10_ignore_icp[i];
-> > > > > > > > > > > +
-> > > > > > > > > > > +    g_assert(!*flag);         =20
-> > > > > > > > > >=20
-> > > > > > > > > > Apart from this assert(), you never seem to test the va=
-lues in the
-> > > > > > > > > > pre_2_10_ignore_icp() array, so it seems a bit pointles=
-s.
-> > > > > > > > > >        =20
-> > > > > > > > >=20
-> > > > > > > > > There's the opposite check in pre_2_10_vmstate_unregister=
-_dummy_icp().
-> > > > > > > > > But I agree it isn't really useful... but more because of=
- paranoia :)       =20
-> > > > > > > >=20
-> > > > > > > > I'm all for paranoid assert()s if they can be made using da=
-ta readily
-> > > > > > > > to hand.  Adding a data structure just for the purpose of m=
-aking an
-> > > > > > > > assert() later, not so much.
-> > > > > > > >      =20
-> > > > > > >=20
-> > > > > > > It is also passed as opaque argument to vmstate_register(), w=
-here it is
-> > > > > > > used as a key when calling vmstate_unregister(). I could poss=
-ibly pass
-> > > > > > > (void *) i instead, but I'm not a big fan of hijacking pointe=
-r arguments
-> > > > > > > to pass numbers.     =20
-> > > > > >=20
-> > > > > > Ah, I see your point.  Creating an array, purely to generate ar=
-bitrary
-> > > > > > pointers is also kind of ugly, though.  Really the cpu_index / =
-XICS
-> > > > > > server number makes sense to identify the vmstate, but it looks=
- like
-> > > > > > vmstate_unregister() doesn't take that.
-> > > > > >    =20
-> > > > >=20
-> > > > > Indeed... what about adding a vmstate_unregister_by_instance_id()=
- then ?
-> > > > >=20
-> > > > > Cc'ing Juan and David.   =20
-> > > >=20
-> > > > So what's the problem with a (void *)i ? =20
-> > >=20
-> > > https://stackoverflow.com/questions/8618637/what-does-it-mean-to-conv=
-ert-int-to-void-or-vice-versa
-> > > =20
-> > > > It's simple, as long as you're
-> > > > not actually using the opaque anywhere it's easy.
-> > > >  =20
-> > >=20
-> > > but as you say, since the opaque isn't used anywhere, it is probably
-> > > okay to pass (void *) i. =20
-> >=20
-> > Yes, I don't think we're ever casting back from the (void *) to an int
-> > so it feels pretty safe to me.
-> >=20
->=20
-> Just one nit, gcc doesn't like it on 64-bit hosts:
->=20
-> hw/ppc/spapr.c: In function =E2=80=98pre_2_10_vmstate_register_dummy_icp=
-=E2=80=99:
-> hw/ppc/spapr.c:148:60: error: cast to pointer from integer of different
->  size [-Werror=3Dint-to-pointer-cast]
->      vmstate_register(NULL, i, &pre_2_10_vmstate_dummy_icp, (void *) i);
->=20
-> I need to cast to (long) first.
-
-No, you need to cast to uintptr_t first.
 
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---KFztAG8eRSV9hGtP
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZP/zBAAoJEGw4ysog2bOSPDkQAM/QEVJgd7mt2qh1NuH5Ap2/
-p2oD3t1OwikVoDHM58T2d54cN/DEOXPUWS2xd9ALnl+lOq3qNfmRiLgG5vWvOH06
-E3Dc4Avuac0MzwZk1UdwRNLfMCrsnG2L8gss2UavATyPYUHkskOq8hg2vcAZWSm1
-FHZlWAAUpDAsVUWsusKWEeQuuxRZSerECVpUuFHurY41s7tISOJDzVlwdPxHMBud
-TAnuKesEel+VSYoZOy7TReJk2akjwHFjLiY1AfhANLXK5JjcXst/TJ0d1Z034Ymy
-2ZIxkR9HPO8XjucEzY2F5Gdma/ikEv29Jo8niI03sDR9LpWoYTmTlqaFNuy6qfAh
-mpo8sieFaig5crieoYEV3rU1YZUkY8dHporDJh4+D0Y3lx/Rc4Q1RueCWmnVQ9V6
-BGnPZhpFC+/HtMaAeREpPFYWgWbJuQo+UehCP6PVKMcSLBbEPbbTHJrBVQqapVMe
-jAERGjiIvAuwcXbNvGE5ZvPSJRCDh6FyiiaMmtnTEza2mxAZaIzh3BUpUFQQ0BVi
-mQo4w6ZIHIqcOKTZOjWfhiL6lEFsIpgX0/GDmxPqTs4ADfjKYSSYYqO4QEZ1tkQ5
-psMN5gd6pDMMOb4kpGBGRIrSbjiiFnw9Wrg4dwtf+FNB2fbpL6ruxnU7IL6/WPoC
-GwwJkHq57IeT4RdmSVeE
-=THhf
------END PGP SIGNATURE-----
-
---KFztAG8eRSV9hGtP--
+Best regards,
+Vladimir
