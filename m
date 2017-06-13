@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dKj11-0004LC-Kc
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:25:40 -0400
+	(envelope-from <gi-oh.kim@profitbricks.com>) id 1dKj5w-0005mw-76
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:30:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dKj0y-00073e-F6
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:25:39 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:2361 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dKj0y-00072o-3X
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:25:36 -0400
-References: <20170602112158.232757-1-vsementsov@virtuozzo.com>
-	<20170602112158.232757-14-vsementsov@virtuozzo.com>
-	<3c884dff-5736-5e27-c68a-f1df374e26b0@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <80a6c118-bdef-7519-6405-e80970ddda96@virtuozzo.com>
-Date: Tue, 13 Jun 2017 13:25:13 +0300
+	(envelope-from <gi-oh.kim@profitbricks.com>) id 1dKj5v-0000ha-1n
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:30:44 -0400
+Received: from mail-yb0-x22e.google.com ([2607:f8b0:4002:c09::22e]:35193)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <gi-oh.kim@profitbricks.com>)
+	id 1dKj5u-0000hR-R6
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:30:42 -0400
+Received: by mail-yb0-x22e.google.com with SMTP id f192so34311600yba.2
+	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 03:30:42 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <3c884dff-5736-5e27-c68a-f1df374e26b0@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v20 13/30] block: new
- bdrv_reopen_bitmaps_rw interface
+In-Reply-To: <149734914886.12819.8513153919786826492@84b42461e25a>
+References: <1497346256-10073-1-git-send-email-gi-oh.kim@profitbricks.com>
+	<149734914886.12819.8513153919786826492@84b42461e25a>
+From: Gi-Oh Kim <gi-oh.kim@profitbricks.com>
+Date: Tue, 13 Jun 2017 12:30:00 +0200
+Message-ID: <CAJX1Ytb_rucnrN7=H2AQh_vNNJtb-j04ZY=fvJNgOnnLVZVk5g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] virtio-blk: drain block before cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,101 +29,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com
 
-09.06.2017 16:27, Max Reitz wrote:
-> On 2017-06-02 13:21, Vladimir Sementsov-Ogievskiy wrote:
->> Add format driver handler, which should mark loaded read-only
->> bitmaps as 'IN_USE' in the image and unset read_only field in
->> corresponding BdrvDirtyBitmap's.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   block.c                   | 17 +++++++++++++++++
->>   include/block/block_int.h |  7 +++++++
->>   2 files changed, 24 insertions(+)
->>
->> diff --git a/block.c b/block.c
->> index 04af7697dc..161db9e32a 100644
->> --- a/block.c
->> +++ b/block.c
->> @@ -2946,12 +2946,16 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
->>   {
->>       BlockDriver *drv;
->>       BlockDriverState *bs;
->> +    bool old_can_write, new_can_write;
->>   
->>       assert(reopen_state != NULL);
->>       bs = reopen_state->bs;
->>       drv = bs->drv;
->>       assert(drv != NULL);
->>   
->> +    old_can_write =
->> +        !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTIVE);
->> +
->>       /* If there are any driver level actions to take */
->>       if (drv->bdrv_reopen_commit) {
->>           drv->bdrv_reopen_commit(reopen_state);
->> @@ -2965,6 +2969,19 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
->>       bs->read_only = !(reopen_state->flags & BDRV_O_RDWR);
->>   
->>       bdrv_refresh_limits(bs, NULL);
->> +
->> +    new_can_write =
->> +        !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTIVE);
->> +    if (!old_can_write && new_can_write && drv->bdrv_reopen_bitmaps_rw) {
->> +        Error *local_err = NULL;
->> +        if (drv->bdrv_reopen_bitmaps_rw(bs, &local_err) < 0) {
->> +            /* This is not fatal, bitmaps just left read-only, so all following
->> +             * writes will fail. User can remove read-only bitmaps to unblock
->> +             * writes.
->> +             */
-> In a sense, it pretty much is fatal. We were asked to make the image
-> non-read-only but we failed because it effectively still is read-only.
+On Tue, Jun 13, 2017 at 12:19 PM,  <no-reply@patchew.org> wrote:
+> Hi,
 >
-> But I can't think of anything better, and you're right, removing the
-> bitmaps would resolve the situation. This would require the user to know
-> that updating the bitmaps was the issue, and local_err may not actually
-> reflect that.
+> This series seems to have some coding style problems. See output below for
+> more information:
 >
->> +            error_report_err(local_err);
-> So I'd prepend this with something like "$node_name: Failed to make
-> dirty bitmaps writable", and maybe append a hint like "Removing all
-> persistent dirty bitmaps from this node will allow writing to it".
+> Type: series
+> Subject: [Qemu-devel] [PATCH] virtio-blk: drain block before cleanup
+> Message-id: 1497346256-10073-1-git-send-email-gi-oh.kim@profitbricks.com
+>
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+>
+> BASE=base
+> n=1
+> total=$(git log --oneline $BASE.. | wc -l)
+> failed=0
+>
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+>
+> commits="$(git log --format=%H --reverse $BASE..)"
+> for c in $commits; do
+>     echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
+>     if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
+>         failed=1
+>         echo
+>     fi
+>     n=$((n+1))
+> done
+>
+> exit $failed
+> === TEST SCRIPT END ===
+>
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> From https://github.com/patchew-project/qemu
+>  * [new tag]         patchew/1497346593-8791-1-git-send-email-a.perevalov@samsung.com -> patchew/1497346593-8791-1-git-send-email-a.perevalov@samsung.com
+>  * [new tag]         patchew/1497348515-6391-1-git-send-email-sbates@raithlin.com -> patchew/1497348515-6391-1-git-send-email-sbates@raithlin.com
+> Switched to a new branch 'test'
+> 4b981d6 virtio-blk: drain block before cleanup
+>
+> === OUTPUT BEGIN ===
+> Checking PATCH 1/1: virtio-blk: drain block before cleanup...
+> ERROR: braces {} are necessary for all arms of this statement
+> #157: FILE: hw/block/virtio-blk.c:976:
+> +    if (blk_bs(s->blk) && bdrv_requests_pending((blk_bs(s->blk))))
+> [...]
+>
+> total: 1 errors, 0 warnings, 8 lines checked
+>
+> Your patch has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+>
+> === OUTPUT END ===
+>
 
-Ok for prepending, but I don't want to add last note, as for the user it 
-may better to retry an operation, leading reopening image rw..
-
->
-> Max
->
->> +        }
->> +    }
->>   }
->>   
->>   /*
->> diff --git a/include/block/block_int.h b/include/block/block_int.h
->> index 8d3724cce6..1dc6f2e90d 100644
->> --- a/include/block/block_int.h
->> +++ b/include/block/block_int.h
->> @@ -380,6 +380,13 @@ struct BlockDriver {
->>                                uint64_t parent_perm, uint64_t parent_shared,
->>                                uint64_t *nperm, uint64_t *nshared);
->>   
->> +    /**
->> +     * Bitmaps should be marked as 'IN_USE' in the image on reopening image
->> +     * as rw. This handler should realize it. It also should unset readonly
->> +     * field of BlockDirtyBitmap's in case of success.
->> +     */
->> +    int (*bdrv_reopen_bitmaps_rw)(BlockDriverState *bs, Error **errp);
->> +
->>       QLIST_ENTRY(BlockDriver) list;
->>   };
->>   
->>
->
+Yes, it has a problem.
+I'll send 2nd patch after fixing it.
 
 -- 
 Best regards,
-Vladimir
+Gi-Oh Kim
+TEL: 0176 2697 8962
