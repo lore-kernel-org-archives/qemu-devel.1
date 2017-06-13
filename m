@@ -1,37 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dKhkz-0001M9-9h
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 05:05:06 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dKhp7-0003FE-VV
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 05:09:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dKhku-0004tQ-KV
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 05:05:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33858)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dKhku-0004t0-C3
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 05:04:56 -0400
-References: <1496653049-44530-1-git-send-email-wei.w.wang@intel.com>
-	<20170605182514-mutt-send-email-mst@kernel.org>
-	<5937511D.5070205@intel.com>
-	<20170608220006-mutt-send-email-mst@kernel.org>
-	<593A0F47.5080806@intel.com> <593E5F46.5080704@intel.com>
-	<20170612234035-mutt-send-email-mst@kernel.org>
-	<593F57C0.9080701@intel.com>
-	<4639c51b-32a6-3528-2ed6-c5f6296b6300@redhat.com>
-	<593F6133.9050804@intel.com>
-	<65faf3f9-a839-0b04-c740-6b2a60a51cf6@redhat.com>
-	<593F8153.7080209@intel.com>
-	<f8a64b2c-e769-4e9c-1cc6-ad31ea266010@redhat.com>
-	<593F9187.6040800@intel.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <9f196d71-f06b-7520-ca03-e94bf3b5a986@redhat.com>
-Date: Tue, 13 Jun 2017 17:04:41 +0800
+	(envelope-from <stefanha@gmail.com>) id 1dKhp2-0005gQ-4y
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 05:09:17 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:33215)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dKhp1-0005g9-Ud
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 05:09:12 -0400
+Received: by mail-wr0-x241.google.com with SMTP id v104so27820648wrb.0
+	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 02:09:11 -0700 (PDT)
+Date: Tue, 13 Jun 2017 10:09:08 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170613090908.GA29273@stefanha-x1.localdomain>
+References: <20170508141536.20690-1-stefanha@redhat.com>
+	<20170508141536.20690-8-stefanha@redhat.com>
+	<w51ziddplu9.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <593F9187.6040800@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [PATCH v1]
- virtio-net: enable configurable tx queue size
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="+QahgC5+KEYLbs62"
+Content-Disposition: inline
+In-Reply-To: <w51ziddplu9.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [PATCH v6 7/9] qemu-img: add measure subcommand
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,107 +31,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "stefanha@gmail.com" <stefanha@gmail.com>, "armbru@redhat.com" <armbru@redhat.com>, "jan.scheurich@ericsson.com" <jan.scheurich@ericsson.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Nir Soffer <nsoffer@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, John Snow <jsnow@redhat.com>
 
 
+--+QahgC5+KEYLbs62
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 2017=E5=B9=B406=E6=9C=8813=E6=97=A5 15:17, Wei Wang wrote:
-> On 06/13/2017 02:29 PM, Jason Wang wrote:
->> The issue is what if there's a mismatch of max #sgs between qemu and
->>>>> When the vhost backend is used, QEMU is not involved in the data=20
->>>>> path.
->>>>> The vhost backend
->>>>> directly gets what is offered by the guest from the vq. Why would
->>>>> there be a mismatch of
->>>>> max #sgs between QEMU and vhost, and what is the QEMU side max #sgs
->>>>> used for? Thanks.
->>>> You need query the backend max #sgs in this case at least. no? If no=
-t
->>>> how do you know the value is supported by the backend?
->>>>
->>>> Thanks
->>>>
->>> Here is my thought: vhost backend has already been supporting 1024 sg=
-s,
->>> so I think it might not be necessary to query the max sgs that the=20
->>> vhost
->>> backend supports. In the setup phase, when QEMU detects the backend i=
-s
->>> vhost, it assumes 1024 max sgs is supported, instead of giving an ext=
-ra
->>> call to query.
->>
->> We can probably assume vhost kernel supports up to 1024 sgs. But how=20
->> about for other vhost-user backends?
->>
-> So far, I haven't seen any vhost backend implementation supporting=20
-> less than 1024 sgs.
+On Mon, Jun 12, 2017 at 12:00:14PM +0200, Alberto Garcia wrote:
+> On Mon 08 May 2017 04:15:34 PM CEST, Stefan Hajnoczi wrote:
+> > The measure subcommand calculates the size required by a new image file.
+> > This can be used by users or management tools that need to allocate
+> > space on an LVM volume, SAN LUN, etc before creating or converting an
+> > image file.
+> >
+> > Suggested-by: Maor Lipchuk <mlipchuk@redhat.com>
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > ---
+> > v5:
+> >  * Use UINT64_MAX instead of ~0ULL [Berto]
+> >  * Document qemu-img measure ofmt, fmt, output_fmt, and snapshot_param
+> >    [Berto]
+> > ---
+>=20
+> I had left some comments to v5 of this patch, I'm not sure if you saw
+> that e-mail:
+>=20
+> https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg01717.html
 
-Since vhost-user is an open protocol we can not check each=20
-implementation (some may be even close sourced). For safety, we need an=20
-explicit clarification on this.
+Thanks, I hadn't seen it.  Will send another revision.
 
->
->
->> And what you said here makes me ask one of my questions in the past:
->>
->> Do we have plan to extend 1024 to a larger value or 1024 looks good=20
->> for the future years? If we only care about 1024, there's even no=20
->> need for a new config filed, a feature flag is more than enough. If=20
->> we want to extend it to e.g 2048, we definitely need to query vhost=20
->> backend's limit (even for vhost-kernel).
->>
->
-> According to virtio spec (e.g. 2.4.4), unreasonably large descriptors a=
-re
-> not encouraged to be used by the guest. If possible, I would suggest=20
-> to use
-> 1024 as the largest number of descriptors that the guest can chain,=20
-> even when
-> we have larger queue size in the future. That is,
-> if (backend =3D=3D QEMU backend)
->     config.max_chain_size =3D 1023 (defined by the qemu backend=20
-> implementation);
-> else if (backend =3D=3D vhost)
->     config.max_chain_size =3D 1024;
->
-> It is transparent to the guest. From the guest's point of view, all it=20
-> knows is a value
-> given to him via reading config.max_chain_size.
+Stefan
 
-So not transparent actually, guest at least guest need to see and check=20
-for this. So the question still, since you only care about two cases in=20
-fact:
+--+QahgC5+KEYLbs62
+Content-Type: application/pgp-signature; name="signature.asc"
 
-- backend supports 1024
-- backend supports <1024 (qemu or whatever other backends)
+-----BEGIN PGP SIGNATURE-----
 
-So it looks like a new feature flag is more than enough. If=20
-device(backends) support this feature, it can make sure 1024 sgs is=20
-supported?
+iQEcBAEBAgAGBQJZP6u0AAoJEJykq7OBq3PIdL8H+gMvTbRC2q1BRiYeJnYxWuhr
+SsQZp8XzFSGPV39q75AeM3Fe7rIGuhhFbK0wk/B12pluK6DwNHWvcfIintIiVlwg
+bT3CLUl5WV2uYkzxUHrXj5XdiVqw1f8Kjac+dY7t9wSHNltRcCnypYRx9F2CI8Bn
+2FznsgEDTNib9uiAqhhGSjfoXVgNmk0c9JzowG/9K5vOpKQhQ9mouRRRz99rVNH6
+ECoZzLDqsYx7oQKEznXf8R1ukYJ55hfdYxMnrKi2YjDOD0zpWkDQHh9Ot6k2uArN
+HpqJGTzk0MsJN9fNh6ZQBzaM4xZeRfOr7N5LBp58LMS9YX4yQMm7DAvHpccBgyU=
+=Pgwa
+-----END PGP SIGNATURE-----
 
-Thanks
-
->
->
-> Best,
-> Wei
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
+--+QahgC5+KEYLbs62--
