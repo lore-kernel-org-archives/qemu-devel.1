@@ -1,43 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dKhCs-0006Ch-HT
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 04:29:47 -0400
+	(envelope-from <groug@kaod.org>) id 1dKhN8-0000YP-46
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 04:40:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dKhCo-0002Yi-In
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 04:29:46 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34821)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1dKhCo-0002YI-91
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 04:29:42 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v5D8Shfv116973
-	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 04:29:40 -0400
-Received: from e23smtp06.au.ibm.com (e23smtp06.au.ibm.com [202.81.31.148])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2b29nuh43v-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 04:29:39 -0400
-Received: from localhost
-	by e23smtp06.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Tue, 13 Jun 2017 18:29:37 +1000
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <20170613094302.1cb4012c@bahia.ttt.fr.ibm.com>
-References: <149692935202.12119.3614006195497745877.stgit@bahia>
-	<20170609022813.GF26521@umbus.fritz.box>
-	<20170609113631.229dd346@bahia.ttt.fr.ibm.com>
-	<20170609102832.GL26521@umbus.fritz.box>
-	<20170609170913.2e6526c3@bahia.ttt.fr.ibm.com>
-	<20170611093842.GA13479@umbus>
-	<20170613094302.1cb4012c@bahia.ttt.fr.ibm.com>
-Date: Tue, 13 Jun 2017 13:59:29 +0530
+	(envelope-from <groug@kaod.org>) id 1dKhN4-0005IZ-Vz
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 04:40:22 -0400
+Received: from 7.mo5.mail-out.ovh.net ([178.32.124.100]:41759)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dKhN4-0005IF-QJ
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 04:40:18 -0400
+Received: from player799.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 6AE5C106044
+	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 10:40:11 +0200 (CEST)
+Date: Tue, 13 Jun 2017 10:40:03 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170613104003.233e21d5@bahia.ttt.fr.ibm.com>
+In-Reply-To: <20170613080631.GB30171@umbus>
+References: <149685579678.12025.9278446121024037161.stgit@bahia.lan>
+	<149685584629.12025.14875914798241845062.stgit@bahia.lan>
+	<20170608040857.GV13397@umbus.fritz.box>
+	<20170608115410.2e7a2511@bahia.ttt.fr.ibm.com>
+	<20170612142456.GJ18542@umbus>
+	<20170613093359.4567ba94@bahia.ttt.fr.ibm.com>
+	<20170613080631.GB30171@umbus>
 MIME-Version: 1.0
-Content-Type: text/plain
-Message-Id: <8760g01eae.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH v4 0/6] spapr/xics: fix migration of older
- machine types
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/hre0zq9+U0yVtsqoZx/YLzV";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v3 5/5] spapr: fix migration of ICPState
+ objects from/to older QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,71 +37,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan
+	Gilbert" <dgilbert@redhat.com>
 
-Greg Kurz <groug@kaod.org> writes:
+--Sig_/hre0zq9+U0yVtsqoZx/YLzV
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> On Sun, 11 Jun 2017 17:38:42 +0800
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->
->> On Fri, Jun 09, 2017 at 05:09:13PM +0200, Greg Kurz wrote:
->> > On Fri, 9 Jun 2017 20:28:32 +1000
->> > David Gibson <david@gibson.dropbear.id.au> wrote:
->> >   
->> > > On Fri, Jun 09, 2017 at 11:36:31AM +0200, Greg Kurz wrote:  
->> > > > On Fri, 9 Jun 2017 12:28:13 +1000
->> > > > David Gibson <david@gibson.dropbear.id.au> wrote:
->> > > >     
->> > > > > On Thu, Jun 08, 2017 at 03:42:32PM +0200, Greg Kurz wrote:    
->> > > > > > I've provided answers for all comments from the v3 review that I deliberately
->> > > > > > don't address in v4.      
->> > > > > 
->> > > > > I've merged patches 1-4.  5 & 6 I'm still reviewing.
->> > > > >     
->> > > > 
->> > > > Cool. FYI, I forgot to mention that I only tested with KVM.
->> > > > 
->> > > > I'm now trying with TCG and I hit various guest crash on
->> > > > the destination (using your ppc-for-2.10 branch WITHOUT
->> > > > my patches):    
->> > > 
->> > > Drat.  What's your reproducer for this crash?
->> > >   
->> > 
->> > 1) start guest
->> > 
->> > qemu-system-ppc64 \
->> >  -nodefaults -nographic -snapshot -no-shutdown -serial mon:stdio \
->> >  -device virtio-net,netdev=netdev0,id=net0 \
->> >  -netdev bridge,id=netdev0,br=virbr0,helper=/usr/libexec/qemu-bridge-helper \
->> >  -device virtio-blk,drive=drive0,id=blk0 \
->> >  -drive file=/home/greg/images/sle12-sp1-ppc64le.qcow2,id=drive0,if=none \
->> >  -machine type=pseries,accel=tcg -cpu POWER8
+On Tue, 13 Jun 2017 16:06:31 +0800
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-Strangely, your command line does not have multiple threads. Need to see
-what is the side effect of enabling MTTCG by default here.
+> On Tue, Jun 13, 2017 at 09:33:59AM +0200, Greg Kurz wrote:
+[...]
+> > > > > > +static void pre_2_10_vmstate_register_dummy_icp(sPAPRMachineSt=
+ate *spapr, int i)
+> > > > > > +{
+> > > > > > +    bool *flag =3D &spapr->pre_2_10_ignore_icp[i];
+> > > > > > +
+> > > > > > +    g_assert(!*flag);     =20
+> > > > >=20
+> > > > > Apart from this assert(), you never seem to test the values in the
+> > > > > pre_2_10_ignore_icp() array, so it seems a bit pointless.
+> > > > >    =20
+> > > >=20
+> > > > There's the opposite check in pre_2_10_vmstate_unregister_dummy_icp=
+().
+> > > > But I agree it isn't really useful... but more because of paranoia =
+:)   =20
+> > >=20
+> > > I'm all for paranoid assert()s if they can be made using data readily
+> > > to hand.  Adding a data structure just for the purpose of making an
+> > > assert() later, not so much.
+> > >  =20
+> >=20
+> > It is also passed as opaque argument to vmstate_register(), where it is
+> > used as a key when calling vmstate_unregister(). I could possibly pass
+> > (void *) i instead, but I'm not a big fan of hijacking pointer arguments
+> > to pass numbers. =20
+>=20
+> Ah, I see your point.  Creating an array, purely to generate arbitrary
+> pointers is also kind of ugly, though.  Really the cpu_index / XICS
+> server number makes sense to identify the vmstate, but it looks like
+> vmstate_unregister() doesn't take that.
+>=20
 
->> > 
->> > 2) migrate
->> > 
->> > 3) destination crashes (immediately or after very short delay) or
->> > hangs  
->> 
->> Ok.  I'll bisect it when I can, but you might well get to it first.
->> 
->> 
->
-> Heh, maybe you didn't see in my mail but I did bisect:
->
-> f0b0685d6694a28c66018f438e822596243b1250 is the first bad commit
-> commit f0b0685d6694a28c66018f438e822596243b1250
-> Author: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-> Date:   Thu Apr 27 10:48:23 2017 +0530
->
->     tcg: enable MTTCG by default for PPC64 on x86
+Indeed... what about adding a vmstate_unregister_by_instance_id() then ?
 
-Let me have a look at it.
+Cc'ing Juan and David.
 
-Regards,
-Nikunj
+--
+Greg
+
+--Sig_/hre0zq9+U0yVtsqoZx/YLzV
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlk/pOQACgkQAvw66wEB28LP6wCdGjXeezSrgPRbtFUFPYK/f2sk
+kCkAoKjEh1FHz0ucCfQZB83B85PDk7oP
+=rtS/
+-----END PGP SIGNATURE-----
+
+--Sig_/hre0zq9+U0yVtsqoZx/YLzV--
