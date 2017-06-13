@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dKuhG-0001Uu-Dq
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 18:54:03 -0400
+	(envelope-from <sam.brian@accelerated.com>) id 1dKuoS-00031L-Uy
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 19:01:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dKuhF-0006VP-KC
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 18:54:02 -0400
-Date: Tue, 13 Jun 2017 18:53:52 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170613225352.GA26288@flamenco>
-References: <20170609170100.3599-1-alex.bennee@linaro.org>
-	<20170609170100.3599-4-alex.bennee@linaro.org>
-	<fc351edb-7c08-c341-d8ee-85f6768e4931@twiddle.net>
-	<87vao4b4z5.fsf@linaro.org>
-	<9776b437-90b4-f2c2-4a0c-c1c6585379bf@twiddle.net>
-	<20170611050730.GA12317@flamenco>
+	(envelope-from <sam.brian@accelerated.com>) id 1dKuoP-0008SY-37
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 19:01:29 -0400
+Received: from mail-bl2nam02on0060.outbound.protection.outlook.com
+	([104.47.38.60]:33968
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sam.brian@accelerated.com>)
+	id 1dKuoO-0008RO-In
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 19:01:25 -0400
+From: Samuel Brian <sam.brian@accelerated.com>
+Date: Wed, 14 Jun 2017 08:59:00 +1000
+Message-Id: <20170613225900.1641-1-sam.brian@accelerated.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170611050730.GA12317@flamenco>
-Subject: [Qemu-devel] [PATCH] target/aarch64: exit to main loop after
- handling MSR
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2] usb-host: support devices with
+ sparse/non-sequential USB interfaces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +27,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: Richard Henderson <rth@twiddle.net>, peter.maydell@linaro.org, pbonzini@redhat.com, edgar.iglesias@xilinx.com, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "open list:ARM" <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Samuel Brian <sam.brian@accelerated.com>
 
-The appended fixes it for me. Can you please test?
-[ apply with `git am --scissors' ]
+Some USB devices have sparse interface numbering which is not able to be
+passthroughed.
+For example, the Sierra Wireless MC7455/MC7430:
 
-Thanks,
+  # lsusb  -D /dev/bus/usb/003/003 | egrep '1199|9071|bNumInterfaces|bInterfaceNumber'
+  Device: ID 1199:9071 Sierra Wireless, Inc.
+    idVendor           0x1199 Sierra Wireless, Inc.
+    idProduct          0x9071
+      bNumInterfaces          5
+        bInterfaceNumber        0
+        bInterfaceNumber        2
+        bInterfaceNumber        3
+        bInterfaceNumber        8
+        bInterfaceNumber       10
 
-		Emilio
+In this case, the interface numbers are 0, 2, 3, 8, 10 and not the
+0, 1, 2, 3, 4 that QEMU tries to claim.
 
----- 8< ----
+This change allows sparse USB interface numbering.
+Instead of only claiming the interfaces in the range reported by the USB
+device through bNumInterfaces, QEMU attempts to claim all possible
+interfaces.
 
-Commit e75449a3 ("target/aarch64: optimize indirect branches") causes
-a regression by which aarch64 guests freeze under TCG with -smp > 1,
-even with `-accel accel=tcg,thread=single' (i.e. MTTCG disabled).
+v2 to fix broken v1 patch formatting.
 
-I isolated the problem to the MSR handler. This patch forces an exit
-after the handler is executed, which fixes the regression.
-
-Signed-off-by: Emilio G. Cota <cota@braap.org>
+Signed-off-by: Samuel Brian <sam.brian@accelerated.com>
 ---
- target/arm/translate-a64.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ hw/usb/host-libusb.c | 24 ++++++++++++++----------
+ 1 file changed, 14 insertions(+), 10 deletions(-)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 860e279..5a609a0 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -1422,7 +1422,7 @@ static void handle_msr_i(DisasContext *s, uint32_t insn,
-         gen_helper_msr_i_pstate(cpu_env, tcg_op, tcg_imm);
-         tcg_temp_free_i32(tcg_imm);
-         tcg_temp_free_i32(tcg_op);
--        s->is_jmp = DISAS_UPDATE;
-+        s->is_jmp = DISAS_EXIT;
-         break;
+diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
+index f9c8eafe06..2e3a752ef6 100644
+--- a/hw/usb/host-libusb.c
++++ b/hw/usb/host-libusb.c
+@@ -1107,7 +1107,7 @@ static void usb_host_detach_kernel(USBHostDevice *s)
+     if (rc != 0) {
+         return;
      }
-     default:
-@@ -11362,6 +11362,10 @@ void gen_intermediate_code_a64(ARMCPU *cpu, TranslationBlock *tb)
-         case DISAS_NEXT:
-             gen_goto_tb(dc, 1, dc->pc);
-             break;
-+        case DISAS_EXIT:
-+            gen_a64_set_pc_im(dc->pc);
-+            tcg_gen_exit_tb(0);
-+            break;
-         default:
-         case DISAS_UPDATE:
-             gen_a64_set_pc_im(dc->pc);
+-    for (i = 0; i < conf->bNumInterfaces; i++) {
++    for (i = 0; i < USB_MAX_INTERFACES; i++) {
+         rc = libusb_kernel_driver_active(s->dh, i);
+         usb_host_libusb_error("libusb_kernel_driver_active", rc);
+         if (rc != 1) {
+@@ -1130,7 +1130,7 @@ static void usb_host_attach_kernel(USBHostDevice *s)
+     if (rc != 0) {
+         return;
+     }
+-    for (i = 0; i < conf->bNumInterfaces; i++) {
++    for (i = 0; i < USB_MAX_INTERFACES; i++) {
+         if (!s->ifs[i].detached) {
+             continue;
+         }
+@@ -1145,7 +1145,7 @@ static int usb_host_claim_interfaces(USBHostDevice *s, int configuration)
+ {
+     USBDevice *udev = USB_DEVICE(s);
+     struct libusb_config_descriptor *conf;
+-    int rc, i;
++    int rc, i, claimed;
+ 
+     for (i = 0; i < USB_MAX_INTERFACES; i++) {
+         udev->altsetting[i] = 0;
+@@ -1164,14 +1164,19 @@ static int usb_host_claim_interfaces(USBHostDevice *s, int configuration)
+         return USB_RET_STALL;
+     }
+ 
+-    for (i = 0; i < conf->bNumInterfaces; i++) {
++    claimed = 0;
++    for (i = 0; i < USB_MAX_INTERFACES; i++) {
+         trace_usb_host_claim_interface(s->bus_num, s->addr, configuration, i);
+         rc = libusb_claim_interface(s->dh, i);
+-        usb_host_libusb_error("libusb_claim_interface", rc);
+-        if (rc != 0) {
+-            return USB_RET_STALL;
++        if (rc == 0) {
++             s->ifs[i].claimed = true;
++             if (++claimed == conf->bNumInterfaces) {
++                break;
++             }
+         }
+-        s->ifs[i].claimed = true;
++    }
++    if (claimed != conf->bNumInterfaces) {
++        return USB_RET_STALL;
+     }
+ 
+     udev->ninterfaces   = conf->bNumInterfaces;
+@@ -1183,10 +1188,9 @@ static int usb_host_claim_interfaces(USBHostDevice *s, int configuration)
+ 
+ static void usb_host_release_interfaces(USBHostDevice *s)
+ {
+-    USBDevice *udev = USB_DEVICE(s);
+     int i, rc;
+ 
+-    for (i = 0; i < udev->ninterfaces; i++) {
++    for (i = 0; i < USB_MAX_INTERFACES; i++) {
+         if (!s->ifs[i].claimed) {
+             continue;
+         }
 -- 
-2.7.4
+2.11.0
