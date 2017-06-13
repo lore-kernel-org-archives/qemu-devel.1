@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dKiyR-0002Pb-0w
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:22:59 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dKj11-0004LC-Kc
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:25:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dKiyN-00063T-3l
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:22:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54408)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dKj0y-00073e-F6
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:25:39 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:2361 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dKiyM-00063A-TX
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:22:55 -0400
-Message-ID: <1497349375.8068.3.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 13 Jun 2017 12:22:55 +0200
-In-Reply-To: <dc2d2f2f-0c82-fa8f-9da1-b183fc203110@accelerated.com>
-References: <dc2d2f2f-0c82-fa8f-9da1-b183fc203110@accelerated.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dKj0y-00072o-3X
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:25:36 -0400
+References: <20170602112158.232757-1-vsementsov@virtuozzo.com>
+	<20170602112158.232757-14-vsementsov@virtuozzo.com>
+	<3c884dff-5736-5e27-c68a-f1df374e26b0@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <80a6c118-bdef-7519-6405-e80970ddda96@virtuozzo.com>
+Date: Tue, 13 Jun 2017 13:25:13 +0300
+MIME-Version: 1.0
+In-Reply-To: <3c884dff-5736-5e27-c68a-f1df374e26b0@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] usb-host: support devices with
- sparse/non-sequential USB interfaces
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v20 13/30] block: new
+ bdrv_reopen_bitmaps_rw interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,19 +31,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Brian <sam.brian@accelerated.com>, qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
-On Tue, 2017-06-13 at 14:17 +1000, Samuel Brian wrote:
-> This change allows sparse USB interface numbering.
-> Instead of only claiming the interfaces in the range reported by the
-> USB
-> device through bNumInterfaces, QEMU attempts to claim all possible
-> interfaces.
+09.06.2017 16:27, Max Reitz wrote:
+> On 2017-06-02 13:21, Vladimir Sementsov-Ogievskiy wrote:
+>> Add format driver handler, which should mark loaded read-only
+>> bitmaps as 'IN_USE' in the image and unset read_only field in
+>> corresponding BdrvDirtyBitmap's.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   block.c                   | 17 +++++++++++++++++
+>>   include/block/block_int.h |  7 +++++++
+>>   2 files changed, 24 insertions(+)
+>>
+>> diff --git a/block.c b/block.c
+>> index 04af7697dc..161db9e32a 100644
+>> --- a/block.c
+>> +++ b/block.c
+>> @@ -2946,12 +2946,16 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
+>>   {
+>>       BlockDriver *drv;
+>>       BlockDriverState *bs;
+>> +    bool old_can_write, new_can_write;
+>>   
+>>       assert(reopen_state != NULL);
+>>       bs = reopen_state->bs;
+>>       drv = bs->drv;
+>>       assert(drv != NULL);
+>>   
+>> +    old_can_write =
+>> +        !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTIVE);
+>> +
+>>       /* If there are any driver level actions to take */
+>>       if (drv->bdrv_reopen_commit) {
+>>           drv->bdrv_reopen_commit(reopen_state);
+>> @@ -2965,6 +2969,19 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
+>>       bs->read_only = !(reopen_state->flags & BDRV_O_RDWR);
+>>   
+>>       bdrv_refresh_limits(bs, NULL);
+>> +
+>> +    new_can_write =
+>> +        !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTIVE);
+>> +    if (!old_can_write && new_can_write && drv->bdrv_reopen_bitmaps_rw) {
+>> +        Error *local_err = NULL;
+>> +        if (drv->bdrv_reopen_bitmaps_rw(bs, &local_err) < 0) {
+>> +            /* This is not fatal, bitmaps just left read-only, so all following
+>> +             * writes will fail. User can remove read-only bitmaps to unblock
+>> +             * writes.
+>> +             */
+> In a sense, it pretty much is fatal. We were asked to make the image
+> non-read-only but we failed because it effectively still is read-only.
+>
+> But I can't think of anything better, and you're right, removing the
+> bitmaps would resolve the situation. This would require the user to know
+> that updating the bitmaps was the issue, and local_err may not actually
+> reflect that.
+>
+>> +            error_report_err(local_err);
+> So I'd prepend this with something like "$node_name: Failed to make
+> dirty bitmaps writable", and maybe append a hint like "Removing all
+> persistent dirty bitmaps from this node will allow writing to it".
 
-Patch looks good but fails to apply.  Thunderbird wrapped lines and
-corrupted the patch.
+Ok for prepending, but I don't want to add last note, as for the user it 
+may better to retry an operation, leading reopening image rw..
 
-Please resend using "git send-email" to avoid that.
+>
+> Max
+>
+>> +        }
+>> +    }
+>>   }
+>>   
+>>   /*
+>> diff --git a/include/block/block_int.h b/include/block/block_int.h
+>> index 8d3724cce6..1dc6f2e90d 100644
+>> --- a/include/block/block_int.h
+>> +++ b/include/block/block_int.h
+>> @@ -380,6 +380,13 @@ struct BlockDriver {
+>>                                uint64_t parent_perm, uint64_t parent_shared,
+>>                                uint64_t *nperm, uint64_t *nshared);
+>>   
+>> +    /**
+>> +     * Bitmaps should be marked as 'IN_USE' in the image on reopening image
+>> +     * as rw. This handler should realize it. It also should unset readonly
+>> +     * field of BlockDirtyBitmap's in case of success.
+>> +     */
+>> +    int (*bdrv_reopen_bitmaps_rw)(BlockDriverState *bs, Error **errp);
+>> +
+>>       QLIST_ENTRY(BlockDriver) list;
+>>   };
+>>   
+>>
+>
 
-thanks,
-  Gerd
+-- 
+Best regards,
+Vladimir
