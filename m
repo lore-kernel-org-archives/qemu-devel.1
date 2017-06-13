@@ -1,24 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1dKncX-0003jv-St
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 11:20:46 -0400
+	(envelope-from <groug@kaod.org>) id 1dKngQ-0004zm-0e
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 11:24:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1dKncT-000090-OU
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 11:20:41 -0400
-Received: from research.iiit.ac.in ([196.12.53.8]:32950)
+	(envelope-from <groug@kaod.org>) id 1dKngM-0001gw-I7
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 11:24:42 -0400
+Received: from 18.mo5.mail-out.ovh.net ([178.33.45.10]:34827)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1dKncR-00007o-GW
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 11:20:37 -0400
-From: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
-Date: Tue, 13 Jun 2017 20:50:06 +0530
-Message-Id: <1497367206-4295-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dKngM-0001fT-BT
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 11:24:38 -0400
+Received: from player799.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 17FEC105F2D
+	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 17:24:35 +0200 (CEST)
+Date: Tue, 13 Jun 2017 17:24:28 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170613172428.08dee7ea@bahia.ttt.fr.ibm.com>
+In-Reply-To: <20170613100146.GA13420@umbus>
+References: <149685579678.12025.9278446121024037161.stgit@bahia.lan>
+	<149685584629.12025.14875914798241845062.stgit@bahia.lan>
+	<20170608040857.GV13397@umbus.fritz.box>
+	<20170608115410.2e7a2511@bahia.ttt.fr.ibm.com>
+	<20170612142456.GJ18542@umbus>
+	<20170613093359.4567ba94@bahia.ttt.fr.ibm.com>
+	<20170613080631.GB30171@umbus>
+	<20170613104003.233e21d5@bahia.ttt.fr.ibm.com>
+	<20170613090002.GA2096@work-vm>
+	<20170613112150.7f64171c@bahia.ttt.fr.ibm.com>
+	<20170613100146.GA13420@umbus>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] Add manpage for QEMU Backup Tool
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/xvJjRSj0PTFCnTn8wZDL4p=";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v3 5/5] spapr: fix migration of ICPState
+ objects from/to older QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,195 +41,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, jsnow@redhat.com, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>, Juan Quintela <quintela@redhat.com>
 
-Signed-off-by: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
----
- Makefile                        |   2 +-
- contrib/backup/qemu-backup.texi | 139 ++++++++++++++++++++++++++++++++++=
-++++++
- 2 files changed, 140 insertions(+), 1 deletion(-)
- create mode 100644 contrib/backup/qemu-backup.texi
+--Sig_/xvJjRSj0PTFCnTn8wZDL4p=
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/Makefile b/Makefile
-index c830d7a..f42cb1d 100644
---- a/Makefile
-+++ b/Makefile
-@@ -504,7 +504,7 @@ clean:
- VERSION ?=3D $(shell cat VERSION)
-=20
- dist: qemu-$(VERSION).tar.bz2
--
-+qemu-backup.8: contrib/qemu-backup/qemu-backup.texi
- qemu-%.tar.bz2:
- 	$(SRC_PATH)/scripts/make-release "$(SRC_PATH)" "$(patsubst qemu-%.tar.b=
-z2,%,$@)"
-=20
-diff --git a/contrib/backup/qemu-backup.texi b/contrib/backup/qemu-backup=
-.texi
-new file mode 100644
-index 0000000..1db63c0
---- /dev/null
-+++ b/contrib/backup/qemu-backup.texi
-@@ -0,0 +1,139 @@
-+@setfilename qemu-backup-tool-manpage
-+
-+@documentlanguage en
-+@documentencoding UTF-8
-+
-+\input texinfo
-+@settitle Manpage_backup_tool 1.0
-+@copying
-+This is a manpage for qemu_backup_tool, version 1.0.
-+
-+Copyright @copyright{} 2016 Free Software Foundation, Inc.
-+@end copying
-+@ifinfo
-+@direntry
-+* QEMU: (qemu-backup-tool-manpage).    Man page for QEMU backup tool.
-+@end direntry
-+@end ifinfo
-+@iftex
-+@titlepage
-+@sp 7
-+@center @titlefont{QEMU_backup_tool}
-+@sp 1
-+@center @titlefont{Man Page}
-+@sp 3
-+@end titlepage
-+@end iftex
-+@ifnottex
-+@node Top
-+@top Short Sample
-+
-+@menu
-+* Name::
-+* Synopsis::
-+* list of Commands::
-+* Command Parameters::
-+* Command Descriptions::
-+* License::
-+@end menu
-+
-+@end ifnottex
-+
-+@node Name
-+@chapter Name
-+
-+QEMU disk backup tool.
-+
-+@node Synopsis
-+@chapter Synopsis
-+
-+qemu-backup command [ command options].
-+
-+@node  list of Commands
-+@chapter  list of Commands
-+@cindex chapter, first dummy
-+@itemize
-+@item qemu-backup guest add [--id id] [--qmp socketpath]
-+@item qemu-backup guest list
-+@item qemu-backup drive add [--guest guestname] [--id driveid] [--target=
- target]
-+@item qemu-backup drive list [--guest guestname]
-+@item qemu-backup backup [--guest guestname]
-+@item qemu-backup restore [--guest guestname]
-+@item qemu-backup drive-remove [--guest guestname] [--id driveid]
-+@item qemu-backup remove [--guest guestname]
-+@item qemu-backup drive add [--all] [--guest guestname] [--target target=
-]
-+@item qemu-backup backup [--inc] [--guest guestname]
-+@end itemize
-+@node  Command Parameters
-+@chapter  Command Parameters
-+@cindex chapter, first dummy
-+@itemize
-+@item --guest: Name of the guest.
-+@item --id: id of guest or drive.
-+@item --target: Destination on which you want your backup to be made.
-+@item --all: Add all the drives present in a guest for backup except cd-=
-rom.
-+@item --inc: For incremental backup.
-+@item --qmp: Path of qmp socket.
-+@end itemize
-+
-+@node  Command Descriptions
-+@chapter  Command Descriptions
-+@cindex chapter, first dummy
-+@itemize
-+@item qemu-backup guest add [--id id] [--qmp socketpath]
-+This command adds a guest to the configuration file given its path to qm=
-p socket.
-+example:
-+qemu-backup guest add --id=3Dfedora =E2=80=93qmp=3D/var/run/qemu/fedora.=
-sock
-+
-+@item qemu-backup guest list
-+This commands lists the names of guests which are added to configuration=
- file.
-+
-+@item qemu-backup drive add [--guest guestname] [--id driveid] [--target=
- target]
-+This command adds different drives for backup in a particular guest by g=
-iving the name of drive to be backed up and target imagefile in which we =
-want to store the drive backup.
-+example:
-+qemu-backup drive add --guest=3Dfedora --id=3Droot
-+--target=3D/backup/fedora/root.img
-+qemu-backup drive add --guest=3Dfedora --id=3Ddata
-+--target=3D/backup/fedora/data.img
-+
-+@item qemu-backup drive list [--guest guestname]
-+This commands gives the names of the drive present in a guest which are =
-added for backup.
-+example: qemu-backup drive list --guest=3Dfedora
-+
-+@item qemu-backup backup [--guest guestname]
-+
-+This command makes the backup of the drives, in their respective given d=
-estinations. The ids of drive and their destinations are taken from the c=
-onfiguration file.
-+example: qemu-backup backup --guest=3Dfedora
-+
-+@item qemu-backup restore [--guest guestname]
-+This command is needed if we want to restore the backup. It will list th=
-e commands to be run for performing the same but will not perform any act=
-ion.
-+example: qemu-backup restore --guest=3Dfedora
-+cp /backup/fedora/root.img /var/run/qemu/fedora/root.img
-+cp /backup/fedora/data.img /var/run/qemu/fedora/data.img
-+
-+@item qemu-backup drive-remove [--guest guestname] [--id driveid]
-+This command helps remove a drive which is set for backup in configurati=
-on of given host.
-+example: qemu-backup remove --guest=3Dfedora --id=3Droot
-+
-+@item qemu-backup remove [--guest guestname]
-+This command removes the guest from the configuration file.
-+example: qemu-backup remove =E2=80=93guest=3Dfedora
-+
-+@item qemu-backup drive add --all [-guest guestname] [-destination desti=
-nation]
-+This command adds all the drives of the guest for backup other than CDRO=
-M drive. Here all the backup drives will have the same names as original =
-drives and target will be the destination folder.
-+example: qemu-backup drive add --all --guest fedora --destination =3D/ba=
-ckup/fedora/
-+
-+@end itemize
-+
-+
-+@node License
-+@appendix License
-+
-+QEMU is a trademark of Fabrice Bellard.
-+
-+QEMU is released under the GNU General Public License (TODO: add link).
-+Parts of QEMU have specific licenses, see file LICENSE.
-+
-+TODO (refer to file LICENSE, include it, include the GPL?)
-+
-+@bye
---=20
-2.7.4
+On Tue, 13 Jun 2017 18:01:46 +0800
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> On Tue, Jun 13, 2017 at 11:21:50AM +0200, Greg Kurz wrote:
+> > On Tue, 13 Jun 2017 10:00:03 +0100
+> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> >  =20
+> > > * Greg Kurz (groug@kaod.org) wrote: =20
+> > > > On Tue, 13 Jun 2017 16:06:31 +0800
+> > > > David Gibson <david@gibson.dropbear.id.au> wrote:
+> > > >    =20
+> > > > > On Tue, Jun 13, 2017 at 09:33:59AM +0200, Greg Kurz wrote:   =20
+> > > > [...]   =20
+> > > > > > > > > > +static void pre_2_10_vmstate_register_dummy_icp(sPAPRM=
+achineState *spapr, int i)
+> > > > > > > > > > +{
+> > > > > > > > > > +    bool *flag =3D &spapr->pre_2_10_ignore_icp[i];
+> > > > > > > > > > +
+> > > > > > > > > > +    g_assert(!*flag);         =20
+> > > > > > > > >=20
+> > > > > > > > > Apart from this assert(), you never seem to test the valu=
+es in the
+> > > > > > > > > pre_2_10_ignore_icp() array, so it seems a bit pointless.
+> > > > > > > > >        =20
+> > > > > > > >=20
+> > > > > > > > There's the opposite check in pre_2_10_vmstate_unregister_d=
+ummy_icp().
+> > > > > > > > But I agree it isn't really useful... but more because of p=
+aranoia :)       =20
+> > > > > > >=20
+> > > > > > > I'm all for paranoid assert()s if they can be made using data=
+ readily
+> > > > > > > to hand.  Adding a data structure just for the purpose of mak=
+ing an
+> > > > > > > assert() later, not so much.
+> > > > > > >      =20
+> > > > > >=20
+> > > > > > It is also passed as opaque argument to vmstate_register(), whe=
+re it is
+> > > > > > used as a key when calling vmstate_unregister(). I could possib=
+ly pass
+> > > > > > (void *) i instead, but I'm not a big fan of hijacking pointer =
+arguments
+> > > > > > to pass numbers.     =20
+> > > > >=20
+> > > > > Ah, I see your point.  Creating an array, purely to generate arbi=
+trary
+> > > > > pointers is also kind of ugly, though.  Really the cpu_index / XI=
+CS
+> > > > > server number makes sense to identify the vmstate, but it looks l=
+ike
+> > > > > vmstate_unregister() doesn't take that.
+> > > > >    =20
+> > > >=20
+> > > > Indeed... what about adding a vmstate_unregister_by_instance_id() t=
+hen ?
+> > > >=20
+> > > > Cc'ing Juan and David.   =20
+> > >=20
+> > > So what's the problem with a (void *)i ? =20
+> >=20
+> > https://stackoverflow.com/questions/8618637/what-does-it-mean-to-conver=
+t-int-to-void-or-vice-versa
+> >  =20
+> > > It's simple, as long as you're
+> > > not actually using the opaque anywhere it's easy.
+> > >  =20
+> >=20
+> > but as you say, since the opaque isn't used anywhere, it is probably
+> > okay to pass (void *) i. =20
+>=20
+> Right, that's probably the right short term approach.
+>=20
+
+I'm currently heading towards (void *)(intptr_t) i
+
+>=20
+> Incidentally, for a somewhat safer-than-standard approach to this
+> common problem, see https://ccodearchive.net/info/ptrint.html
+>=20
+
+Heh, your code :)
+
+IIUC it is licensed under the terms of CC0, which I believe to be GPL
+compatible. Why not using it in QEMU ?
+
+--Sig_/xvJjRSj0PTFCnTn8wZDL4p=
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAllAA6wACgkQAvw66wEB28I16gCeNcEETJWCbRkaItjbLO5r0+Rq
+groAn36w15seiAs1MO8DKNJZ0ffFgYNr
+=AUQf
+-----END PGP SIGNATURE-----
+
+--Sig_/xvJjRSj0PTFCnTn8wZDL4p=--
