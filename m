@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32903)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dKh47-0007b0-3L
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 04:20:44 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dKh47-0007bA-6k
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 04:20:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dKh42-0007ta-RD
+	(envelope-from <dgibson@ozlabs.org>) id 1dKh45-0007v4-RP
 	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 04:20:43 -0400
-Date: Tue, 13 Jun 2017 16:15:35 +0800
+Date: Tue, 13 Jun 2017 16:20:26 +0800
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170613081535.GE30171@umbus>
+Message-ID: <20170613082026.GF30171@umbus>
 References: <20170608070351.1434-1-sjitindarsingh@gmail.com>
-	<20170608070351.1434-3-sjitindarsingh@gmail.com>
+	<20170608070351.1434-4-sjitindarsingh@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="3XA6nns4nE4KvaS/"
+	protocol="application/pgp-signature"; boundary="6v9BRtpmy+umdQlo"
 Content-Disposition: inline
-In-Reply-To: <20170608070351.1434-3-sjitindarsingh@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 2/5] target/ppc: Implement large
- decrementer support for KVM
+In-Reply-To: <20170608070351.1434-4-sjitindarsingh@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 3/5] target/ppc: Implement migration
+ support for large decrementer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,221 +29,166 @@ To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, agraf@suse.de
 
 
---3XA6nns4nE4KvaS/
+--6v9BRtpmy+umdQlo
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 08, 2017 at 05:03:48PM +1000, Suraj Jitindar Singh wrote:
-> The large decrementer is an operating mode of the decrementer.
-> The decrementer is normally a 32-bit register.
-> When operating in large decrementer mode the decrementer is a d-bit
-> register which is sign extended to 64-bits (where d is implementation
-> dependant).
+On Thu, Jun 08, 2017 at 05:03:49PM +1000, Suraj Jitindar Singh wrote:
+> Implement support to migrate a guest which is using the large
+> decrementer.
 >=20
-> Implement support for a KVM guest to use the decrementer in large
-> decrementer mode. This means adding functions to query the large
-> decrementer support of the hypervisor and to enable the large
-> decrementer with the hypervisor.
+> We need to save the decrementer width to the migration stream.
+> On incoming migration we then need to check that the hypervisor is
+> capable of letting the guest use the large decrementer and that the
+> decrementer width is the same on the receiving side. Since there is no
+> way to tell the guest when the width of the decrementer changes we have
+> to terminate if the decrementer width is not what the guest expects.
+> If we can use the large decrementer then we have to tell the hypervisor
+> to enable it.
 >=20
 > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 > ---
->  target/ppc/kvm.c     | 59 ++++++++++++++++++++++++++++++++++++++++++++++=
+>  hw/ppc/spapr.c         | 63 ++++++++++++++++++++++++++++++++++++++++++++=
 ++++++
->  target/ppc/kvm_ppc.h | 25 ++++++++++++++++++++++
->  2 files changed, 84 insertions(+)
+>  include/hw/ppc/spapr.h |  1 +
+>  2 files changed, 64 insertions(+)
 >=20
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 51249ce..b2c94a0 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -88,6 +88,7 @@ static int cap_fixup_hcalls;
->  static int cap_htm;             /* Hardware transactional memory support=
- */
->  static int cap_mmu_radix;
->  static int cap_mmu_hash_v3;
-> +static int cap_large_decr;
-> =20
->  static uint32_t debug_inst_opcode;
-> =20
-> @@ -393,6 +394,19 @@ target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu,
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 5d10366..6ba869a 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1420,6 +1420,45 @@ static bool spapr_vga_init(PCIBus *pci_bus, Error =
+**errp)
 >      }
 >  }
 > =20
-> +void kvmppc_configure_large_decrementer(CPUState *cs, bool enable_ld)
+> +static int spapr_import_large_decr_bits(sPAPRMachineState *spapr)
 > +{
-> +    uint64_t lpcr;
+> +    /*
+> +     * If the guest uses the large decrementer then this hypervisor must=
+ also
+> +     * support it and have the exact same width. We must also enable the=
+ large
+> +     * decrementer because we have no way to tell the guest to stop usin=
+g it.
+> +     */
+> +    if (spapr->large_decr_bits) {
+> +        uint32_t dec_bits =3D 32;
+> +        PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
+> +        CPUState *cs =3D CPU(cpu);
+> +        PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cs);
 > +
-> +    kvm_get_one_reg(cs, KVM_REG_PPC_LPCR_64, &lpcr);
-> +    if (enable_ld) {
-> +        lpcr |=3D LPCR_LD;
-> +    } else {
-> +        lpcr &=3D LPCR_LD;
+> +        if (kvm_enabled()) {
+> +            if (!kvmppc_has_cap_large_decr()) {
+> +                error_report("Host doesn't support large decrementer and=
+ guest requires it");
+> +                return -EINVAL;
+> +            }
+> +            dec_bits =3D kvmppc_get_dec_bits();
+> +        } else {
+> +            dec_bits =3D pcc->large_decr_bits;
+> +        }
+> +
+> +        if (spapr->large_decr_bits !=3D dec_bits) {
+> +            error_report("Host large decrementer size [%u] doesn't match=
+ what guest expects [%u]",
+> +                         dec_bits, spapr->large_decr_bits);
+> +            return -EINVAL;
+> +        }
+
+Could you just use a VMSTATE_EQUAL() rather than explicit post_load logic?
+
+> +
+> +        if (kvm_enabled()) {
+> +            CPU_FOREACH(cs) {
+> +                kvmppc_configure_large_decrementer(cs, true);
+> +            }
+> +        }
 > +    }
-> +    kvm_set_one_reg(cs, KVM_REG_PPC_LPCR_64, &lpcr);
-> +}
-
-This is never called, which seems bogus.  The LPCR should already be
-synchronized with KVM, so I'm not sure why this needs a special call.
-
->  static bool kvm_valid_page_size(uint32_t flags, long rampgsize, uint32_t=
- shift)
->  {
->      if (!(flags & KVM_PPC_PAGE_SIZES_REAL)) {
-> @@ -2004,6 +2018,11 @@ uint32_t kvmppc_get_dfp(void)
->      return kvmppc_read_int_cpu_dt("ibm,dfp");
->  }
-> =20
-> +uint32_t kvmppc_get_dec_bits(void)
-> +{
-> +    return kvmppc_read_int_cpu_dt("ibm,dec-bits");
-> +}
 > +
->  static int kvmppc_get_pvinfo(CPUPPCState *env, struct kvm_ppc_pvinfo *pv=
-info)
->   {
->       PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
-> @@ -2380,6 +2399,7 @@ static void kvmppc_host_cpu_class_init(ObjectClass =
-*oc, void *data)
-> =20
->  #if defined(TARGET_PPC64)
->      pcc->radix_page_info =3D kvm_get_radix_page_info();
-> +    pcc->large_decr_bits =3D kvmppc_get_dec_bits();
-
-As you may have heard from SamB, autodetecting properties from KVM to
-set on the guest CPU is.. problematic.  We already use it in a bunch
-of places, but I'd like to discourage more examples of it.
-
->      if ((pcc->pvr & 0xffffff00) =3D=3D CPU_POWERPC_POWER9_DD1) {
->          /*
-> @@ -2424,6 +2444,45 @@ bool kvmppc_has_cap_mmu_hash_v3(void)
->      return cap_mmu_hash_v3;
->  }
-> =20
-> +void kvmppc_check_cap_large_decr(void)
-> +{
-> +    PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
-> +    CPUState *cs =3D CPU(cpu);
-> +    bool large_dec_support;
-> +    uint32_t dec_bits;
-> +    uint64_t lpcr;
-> +
-> +    /*
-> +     * Try and set the LPCR_LD (large decrementer) bit to enable the lar=
-ge
-> +     * decrementer. A hypervisor with large decrementer capabilities wil=
-l allow
-> +     * this so the value read back after this will have the LPCR_LD bit =
-set.
-> +     * Otherwise the bit will be cleared meaning we can't use the large
-> +     * decrementer.
-> +     */
-> +    kvm_get_one_reg(cs, KVM_REG_PPC_LPCR_64, &lpcr);
-> +    lpcr |=3D LPCR_LD;
-> +    kvm_set_one_reg(cs, KVM_REG_PPC_LPCR_64, &lpcr);
-> +    kvm_get_one_reg(cs, KVM_REG_PPC_LPCR_64, &lpcr);
-> +    large_dec_support =3D !!(lpcr & LPCR_LD);
-> +    /* Probably a good idea to clear it again */
-> +    lpcr &=3D ~LPCR_LD;
-> +    kvm_set_one_reg(cs, KVM_REG_PPC_LPCR_64, &lpcr);
-> +
-> +    /*
-> +     * Check for the ibm,dec-bits property on the host, if it isn't ther=
-e then
-> +     * something has gone wrong and we're better off not letting the gue=
-st use
-> +     * the large decrementer.
-> +     */
-> +    dec_bits =3D kvmppc_get_dec_bits();
-> +
-> +    cap_large_decr =3D large_dec_support && dec_bits;
-> +}
-> +
-> +bool kvmppc_has_cap_large_decr(void)
-> +{
-> +    return cap_large_decr;
-> +}
-> +
->  PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void)
->  {
->      uint32_t host_pvr =3D mfpvr();
-> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-> index f48243d..c49c7f0 100644
-> --- a/target/ppc/kvm_ppc.h
-> +++ b/target/ppc/kvm_ppc.h
-> @@ -17,6 +17,7 @@ uint32_t kvmppc_get_tbfreq(void);
->  uint64_t kvmppc_get_clockfreq(void);
->  uint32_t kvmppc_get_vmx(void);
->  uint32_t kvmppc_get_dfp(void);
-> +uint32_t kvmppc_get_dec_bits(void);
->  bool kvmppc_get_host_model(char **buf);
->  bool kvmppc_get_host_serial(char **buf);
->  int kvmppc_get_hasidle(CPUPPCState *env);
-> @@ -36,6 +37,8 @@ int kvmppc_booke_watchdog_enable(PowerPCCPU *cpu);
->  target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu,
->                                       bool radix, bool gtse,
->                                       uint64_t proc_tbl);
-> +void kvmppc_check_cap_large_decr(void);
-> +void kvmppc_configure_large_decrementer(CPUState *cs, bool enable_ld);
->  #ifndef CONFIG_USER_ONLY
->  off_t kvmppc_alloc_rma(void **rma);
->  bool kvmppc_spapr_use_multitce(void);
-> @@ -60,6 +63,7 @@ bool kvmppc_has_cap_fixup_hcalls(void);
->  bool kvmppc_has_cap_htm(void);
->  bool kvmppc_has_cap_mmu_radix(void);
->  bool kvmppc_has_cap_mmu_hash_v3(void);
-> +bool kvmppc_has_cap_large_decr(void);
->  int kvmppc_enable_hwrng(void);
->  int kvmppc_put_books_sregs(PowerPCCPU *cpu);
->  PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
-> @@ -98,6 +102,11 @@ static inline uint32_t kvmppc_get_dfp(void)
->      return 0;
->  }
-> =20
-> +static inline uint32_t kvmppc_get_dec_bits(void)
-> +{
 > +    return 0;
-
-IIUC, this should never be called on non-KVM, so this should have an
-abort() (or g_assert_not_reached()) rather than returning a
-clearly-wrong value.
-
 > +}
 > +
->  static inline int kvmppc_get_hasidle(CPUPPCState *env)
+>  static int spapr_post_load(void *opaque, int version_id)
 >  {
->      return 0;
-> @@ -170,6 +179,17 @@ static inline target_ulong kvmppc_configure_v3_mmu(P=
-owerPCCPU *cpu,
->      return 0;
+>      sPAPRMachineState *spapr =3D (sPAPRMachineState *)opaque;
+> @@ -1439,8 +1478,13 @@ static int spapr_post_load(void *opaque, int versi=
+on_id)
+>       * value into the RTC device */
+>      if (version_id < 3) {
+>          err =3D spapr_rtc_import_offset(&spapr->rtc, spapr->rtc_offset);
+> +        if (err) {
+> +            return err;
+> +        }
+>      }
+> =20
+> +    err =3D spapr_import_large_decr_bits(spapr);
+> +
+>      return err;
 >  }
 > =20
-> +static inline void kvmppc_check_cap_large_decr(void)
-> +{
-> +    return;
-> +}
-> +
-> +static inline void kvmppc_configure_large_decrementer(CPUState *cs,
-> +                                                      bool enable_ld)
-> +{
-> +    return;
-> +}
-> +
->  #ifndef CONFIG_USER_ONLY
->  static inline off_t kvmppc_alloc_rma(void **rma)
->  {
-> @@ -282,6 +302,11 @@ static inline bool kvmppc_has_cap_mmu_hash_v3(void)
->      return false;
->  }
+> @@ -1529,6 +1573,24 @@ static const VMStateDescription vmstate_spapr_patb=
+_entry =3D {
+>      },
+>  };
 > =20
-> +static inline bool kvmppc_has_cap_large_decr(void)
+> +static bool spapr_large_decr_entry_needed(void *opaque)
 > +{
-> +    return false;
+> +    sPAPRMachineState *spapr =3D opaque;
+> +
+> +    return !!spapr->large_decr_bits;
+
+Hrm.  We have no existing releases - upstream or down - that support
+POWER9, which is the first thing with large decr.  Rather than fancy
+conditional logic, could we just always transfer the decr size for
+POWER9?
+
+Do we need to support qemu on POWER9 with a pre-large-decr host
+kernel?  Or is POWER9 support new enough that we can just say that you
+require a host kernel with large decr support to run POWER9 guests.
+That could simplify several things.
+
 > +}
 > +
->  static inline int kvmppc_enable_hwrng(void)
->  {
->      return -1;
+> +static const VMStateDescription vmstate_spapr_large_decr_entry =3D {
+> +    .name =3D "spapr_large_decr_entry",
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 1,
+> +    .needed =3D spapr_large_decr_entry_needed,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_UINT32(large_decr_bits, sPAPRMachineState),
+> +        VMSTATE_END_OF_LIST()
+> +    },
+> +};
+> +
+>  static const VMStateDescription vmstate_spapr =3D {
+>      .name =3D "spapr",
+>      .version_id =3D 3,
+> @@ -1547,6 +1609,7 @@ static const VMStateDescription vmstate_spapr =3D {
+>      .subsections =3D (const VMStateDescription*[]) {
+>          &vmstate_spapr_ov5_cas,
+>          &vmstate_spapr_patb_entry,
+> +        &vmstate_spapr_large_decr_entry,
+>          NULL
+>      }
+>  };
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 98fb78b..4ba9b89 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -91,6 +91,7 @@ struct sPAPRMachineState {
+>      sPAPROptionVector *ov5_cas;     /* negotiated (via CAS) option vecto=
+rs */
+>      bool cas_reboot;
+>      bool cas_legacy_guest_workaround;
+> +    uint32_t large_decr_bits; /* Large decrementer width (0 -> not in us=
+e) */
+
+Having this here as well as in the CPU class seems a bit icky.
+
+>      Notifier epow_notifier;
+>      QTAILQ_HEAD(, sPAPREventLogEntry) pending_events;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -251,25 +196,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---3XA6nns4nE4KvaS/
+--6v9BRtpmy+umdQlo
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZP58nAAoJEGw4ysog2bOSHsgQALrYMmOUZFjof7rZfXkC6LBX
-A7mmS1IjwgCIzB1Rv+xbiXwJtAZDjb03nTgOVsMW44EC4oCsWUbWytAqDlPJ/fZO
-g7JPlrOqsPuKuZEUQ1zP1Sk6gSzfzEiMcMNFOcdR/hmUqQWd8a+u9LTc2dF11G3S
-oT2NVXhkDZW9SSjvyHr20rVJ3FOSLMsuMflHX3qtBGHHqa3YEI9IiLVTEhboaU10
-4d2MzUzN84jGpcaz7s41XF2jzPQLV0j+Liul+Hasg8MdkL/WTE4uI3819GHQlBYf
-eelW6HDN3S10pR9elzzSSxB3UW8eNEPZYaSDrW6pcyL8XAR+t1i4mr+KdFOlIdhC
-/IFAGZR/fvaOtseie0A1ZUp/H4Isgzo6K5hiY6XLw0upgkdhYJkKFPbHETTZnKcx
-TDp9Ud1v8Zfqjrw8YKfl0gqwOgrcvz3hiEQNpY5T9P+4SSm/tFtjOUdqJpL+vt0V
-EheZrLKBqsnqq6aJW7zlr6ndx5E0Up5TXbkzEWDA+mDweQmYlghnYbQyEaTIMRAe
-04F43gA1ziDa/7biMKQDEnqiH9j74CejfjIapn8wm+LjHU4fvj9uk6HPDKwfSrDP
-C4fFoyd1g+PDjJFdfWU4cmQ1yf1zZ36DaVg2smPBEw487Sx2bPDJ2Jnwlsgniapm
-qPWEbcTxFosDO2nPoKca
-=ozdw
+iQIcBAEBCAAGBQJZP6BJAAoJEGw4ysog2bOSNmYQAKGW1jhpIfVeKhPloGF+Iai2
+4NGZCmex/2wsW9TEH45XrhuQ04c7ZYt5jf0Q+hEzZP3QiLK4qjPTAgzJ+nVfyHh7
+3Oy14MiMUZB8mAuYlAKm27C7OpQa7bpHXAfLZ6kR86f6wzDC4Ak0zVwf5eR9A28D
+e15HgIom5nlcB6IEbnxANpE2SE/j2KJGuf9GSBjM/tGX+N5eAwm0Uqg2ATdPoyoO
+fDAcTgPbjZwqTnQWpGNiR6fzqhrkjAJVqnTFlhaxtULGiKjotdUMbxnruVNluSAx
+oGBSxmiC9wHtnMHSId7SA9pZqfWZvRi6fzH/eOfgNxK/2osKeLwbf5SJ2XroqJE4
+updvLv/MLR0AMzYW3y9bt7YWgJVIk6aHMTHGxqaMM1FKaghW+CdAoMKV9p0zd+fO
+RUPiLC0S5vkPFkfdXXFpJPhOg4GFxgTlTcp3XfvHQSzWb64me3quf12FxZlwv2ti
+lH1KDISqgUFcofSHmDw2hYVBz8GTysbWYIPsbl1q7S4J5C9H2V8UCLWSeH+Vs57w
+jNKH/aQLUv+KBsKKAdMSb2OZp6tTdAgQSDdkIk2sA40XeocLoPT8Wgv8eE2J7+BE
+J4GhzgQo0m+ynfPkBLPs6W3tL6gizsaLGF6xStdwYETd/DTaXcb39jgOW0nv3XXH
+QSjwbvVnZsDc77JZFWe6
+=rH1w
 -----END PGP SIGNATURE-----
 
---3XA6nns4nE4KvaS/--
+--6v9BRtpmy+umdQlo--
