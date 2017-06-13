@@ -1,23 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37283)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dKsHB-0005Ey-RT
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 16:18:58 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dKsJT-0005zp-GC
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 16:21:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dKsH7-0000xE-Sz
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 16:18:57 -0400
-References: <20170608172743.10132-1-lvivier@redhat.com>
-	<20170608172743.10132-2-lvivier@redhat.com>
-	<20170612143711.GK18542@umbus>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <655ad598-f23d-6f58-7f35-88d254551b10@redhat.com>
-Date: Tue, 13 Jun 2017 22:18:47 +0200
+	(envelope-from <mreitz@redhat.com>) id 1dKsJS-0001Rg-8j
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 16:21:19 -0400
+From: Max Reitz <mreitz@redhat.com>
+Date: Tue, 13 Jun 2017 22:20:51 +0200
+Message-Id: <20170613202107.10125-1-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170612143711.GK18542@umbus>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] spapr: disable hotplugging without
- OS
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 00/16] block: Preallocated truncate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,46 +20,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-On 12/06/2017 16:37, David Gibson wrote:
-> On Thu, Jun 08, 2017 at 07:27:42PM +0200, Laurent Vivier wrote:
->> If the OS is not started, QEMU sends an event to the OS
->> that is lost and cannot be recovered. An unplug is not
->> able to restore QEMU in a coherent state.
->> So, while the OS is not started, disable CPU and memory hotplug.
->> We guess the OS is started if the CAS has been negotiated.
->>
->> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> 
-> It seems a pain to introduce a whole new (migrated) variable just to
-> check this.  Could we instead tweak the allocation of spapr->ov5_cas,
-> so it is NULL until CAS is completed?
+=3D=3D=3D Series dependencies =3D=3D=3D
 
-I think it's a good idea to use ov5_cas, but we need to modify some
-functions to manage the NULL pointer (spapr_ovec_test(),
-spapr_ovec_populate_dt()), and I have some issues to manage the NULL
-pointer in migration:
+This series depends on v7 of Stefan's series
+"qemu-img: add measure sub-command"
+(http://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg03035.html).
 
-- with the previous releases, if it is NULL, we don't want to migrate it
-because previous releases are not able to manage a NULL pointer, so we
-don't migrate it (spapr_ov5_cas_needed() should be false if ov5_cas is
-NULL) letting it to its default value (initialized but empty) in this
-case on the destination,
 
-- with the current version, if it is not NULL, we to want migrate it,
-but the destination guest crashes because the pointer on the destination
-is NULL and there is no memory the receive the data.
+=3D=3D=3D Actual cover letter =3D=3D=3D
 
-I think the problem is we can't migrate ov5_cas if it is not initialized
-on the destination side[0]. Perhaps I've missed something but it seems a
-NULL pointer can't be migrated and thus cannot be used as a state marker.
+This series adds preallocation to bdrv_truncate() and subsequently
+qemu-img resize. This is implemented for qcow2 and raw only, just like
+preallocation for newly created images is. There is no runtime interface
+for this new parameter (yet).
 
-Any idea?
 
-Thanks,
-Laurent
+v4:
+- Patch 4:
+  - Note bug fix in commit message [Eric]
+  - "...may result in *slightly* more data being allocated..." [Eric]
+- Patch 11:
+  - Drop the "image may now occupy more space than necessary" note --
+    that's always the case when preallocation failed, and I don't really
+    want to mention it everywhere
+  - Flush metadata after preallocation [Stefan]
 
-[0] Perhaps we could use a VMSTATE_XXX() with a VMS_ALLOC flag instead
-of VMSTATE_STRUCT_POINTER_V() to allocate the memory on the destination?
+
+git-backport-diff against v3:
+
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream pat=
+ch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respec=
+tively
+
+001/16:[----] [--] 'block: Add PreallocMode to BD.bdrv_truncate()'
+002/16:[----] [--] 'block: Add PreallocMode to bdrv_truncate()'
+003/16:[----] [--] 'block: Add PreallocMode to blk_truncate()'
+004/16:[0002] [FC] 'qemu-img: Expose PreallocMode for resizing'
+005/16:[----] [--] 'block/file-posix: Small fixes in raw_create()'
+006/16:[----] [--] 'block/file-posix: Extract raw_regular_truncate()'
+007/16:[----] [--] 'block/file-posix: Generalize raw_regular_truncate'
+008/16:[----] [--] 'block/file-posix: Preallocation for truncate'
+009/16:[----] [--] 'block/qcow2: Generalize preallocate()'
+010/16:[----] [--] 'block/qcow2: Lock s->lock in preallocate()'
+011/16:[0013] [FC] 'block/qcow2: Metadata preallocation for truncate'
+012/16:[----] [--] 'block/qcow2: Add qcow2_refcount_area()'
+013/16:[----] [--] 'block/qcow2: Rename "fail_block" to just "fail"'
+014/16:[----] [--] 'block/qcow2: falloc/full preallocating growth'
+015/16:[----] [--] 'iotests: Add preallocated resize test for raw'
+016/16:[----] [--] 'iotests: Add preallocated growth test for qcow2'
+
+
+Max Reitz (16):
+  block: Add PreallocMode to BD.bdrv_truncate()
+  block: Add PreallocMode to bdrv_truncate()
+  block: Add PreallocMode to blk_truncate()
+  qemu-img: Expose PreallocMode for resizing
+  block/file-posix: Small fixes in raw_create()
+  block/file-posix: Extract raw_regular_truncate()
+  block/file-posix: Generalize raw_regular_truncate
+  block/file-posix: Preallocation for truncate
+  block/qcow2: Generalize preallocate()
+  block/qcow2: Lock s->lock in preallocate()
+  block/qcow2: Metadata preallocation for truncate
+  block/qcow2: Add qcow2_refcount_area()
+  block/qcow2: Rename "fail_block" to just "fail"
+  block/qcow2: falloc/full preallocating growth
+  iotests: Add preallocated resize test for raw
+  iotests: Add preallocated growth test for qcow2
+
+ block/qcow2.h                  |   9 +
+ include/block/block.h          |   3 +-
+ include/block/block_int.h      |   3 +-
+ include/sysemu/block-backend.h |   3 +-
+ block.c                        |   5 +-
+ block/blkdebug.c               |   5 +-
+ block/block-backend.c          |   5 +-
+ block/commit.c                 |   4 +-
+ block/crypto.c                 |   4 +-
+ block/file-posix.c             | 201 +++++++++++++--------
+ block/file-win32.c             |   9 +-
+ block/gluster.c                |   8 +-
+ block/iscsi.c                  |   9 +-
+ block/mirror.c                 |   3 +-
+ block/nfs.c                    |   9 +-
+ block/parallels.c              |  13 +-
+ block/qcow.c                   |   8 +-
+ block/qcow2-refcount.c         | 277 +++++++++++++++++++----------
+ block/qcow2.c                  | 205 +++++++++++++++++++---
+ block/qed.c                    |  11 +-
+ block/raw-format.c             |   5 +-
+ block/rbd.c                    |   9 +-
+ block/sheepdog.c               |  11 +-
+ block/vdi.c                    |   3 +-
+ block/vhdx-log.c               |   2 +-
+ block/vhdx.c                   |   8 +-
+ block/vmdk.c                   |   7 +-
+ block/vpc.c                    |   2 +-
+ blockdev.c                     |   2 +-
+ qemu-img.c                     |  33 +++-
+ qemu-io-cmds.c                 |   2 +-
+ qemu-img.texi                  |   7 +-
+ tests/qemu-iotests/044.out     |   2 +-
+ tests/qemu-iotests/106         |  92 ++++++++++
+ tests/qemu-iotests/106.out     |  50 ++++++
+ tests/qemu-iotests/125         | 130 ++++++++++++++
+ tests/qemu-iotests/125.out     | 386 +++++++++++++++++++++++++++++++++++=
+++++++
+ tests/qemu-iotests/group       |   2 +
+ 38 files changed, 1313 insertions(+), 234 deletions(-)
+ create mode 100755 tests/qemu-iotests/106
+ create mode 100644 tests/qemu-iotests/106.out
+ create mode 100755 tests/qemu-iotests/125
+ create mode 100644 tests/qemu-iotests/125.out
+
+--=20
+2.9.4
