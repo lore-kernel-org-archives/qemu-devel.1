@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40355)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gi-oh.kim@profitbricks.com>) id 1dKj5w-0005mw-76
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:30:45 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dKj8u-0006Rv-7a
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:33:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gi-oh.kim@profitbricks.com>) id 1dKj5v-0000ha-1n
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:30:44 -0400
-Received: from mail-yb0-x22e.google.com ([2607:f8b0:4002:c09::22e]:35193)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <gi-oh.kim@profitbricks.com>)
-	id 1dKj5u-0000hR-R6
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:30:42 -0400
-Received: by mail-yb0-x22e.google.com with SMTP id f192so34311600yba.2
-	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 03:30:42 -0700 (PDT)
+	(envelope-from <stefanha@gmail.com>) id 1dKj8r-0001EY-3S
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 06:33:48 -0400
+Date: Tue, 13 Jun 2017 11:33:40 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170613103340.GD29273@stefanha-x1.localdomain>
+References: <CAOE=1Z1H-7DQtcUsKt7P2fhYQ2fBVp7R9KJwPki5wH9KvhbxBg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <149734914886.12819.8513153919786826492@84b42461e25a>
-References: <1497346256-10073-1-git-send-email-gi-oh.kim@profitbricks.com>
-	<149734914886.12819.8513153919786826492@84b42461e25a>
-From: Gi-Oh Kim <gi-oh.kim@profitbricks.com>
-Date: Tue, 13 Jun 2017 12:30:00 +0200
-Message-ID: <CAJX1Ytb_rucnrN7=H2AQh_vNNJtb-j04ZY=fvJNgOnnLVZVk5g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] virtio-blk: drain block before cleanup
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="rz+pwK2yUstbofK6"
+Content-Disposition: inline
+In-Reply-To: <CAOE=1Z1H-7DQtcUsKt7P2fhYQ2fBVp7R9KJwPki5wH9KvhbxBg@mail.gmail.com>
+Subject: Re: [Qemu-devel] Is there more trace-events in vhost module?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +23,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com
+To: Sam <batmanustc@gmail.com>
+Cc: qemu-devel@nongnu.org, qemu-discuss@nongnu.org
 
-On Tue, Jun 13, 2017 at 12:19 PM,  <no-reply@patchew.org> wrote:
-> Hi,
->
-> This series seems to have some coding style problems. See output below for
-> more information:
->
-> Type: series
-> Subject: [Qemu-devel] [PATCH] virtio-blk: drain block before cleanup
-> Message-id: 1497346256-10073-1-git-send-email-gi-oh.kim@profitbricks.com
->
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
->
-> BASE=base
-> n=1
-> total=$(git log --oneline $BASE.. | wc -l)
-> failed=0
->
-> git config --local diff.renamelimit 0
-> git config --local diff.renames True
->
-> commits="$(git log --format=%H --reverse $BASE..)"
-> for c in $commits; do
->     echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
->     if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
->         failed=1
->         echo
->     fi
->     n=$((n+1))
-> done
->
-> exit $failed
-> === TEST SCRIPT END ===
->
-> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> From https://github.com/patchew-project/qemu
->  * [new tag]         patchew/1497346593-8791-1-git-send-email-a.perevalov@samsung.com -> patchew/1497346593-8791-1-git-send-email-a.perevalov@samsung.com
->  * [new tag]         patchew/1497348515-6391-1-git-send-email-sbates@raithlin.com -> patchew/1497348515-6391-1-git-send-email-sbates@raithlin.com
-> Switched to a new branch 'test'
-> 4b981d6 virtio-blk: drain block before cleanup
->
-> === OUTPUT BEGIN ===
-> Checking PATCH 1/1: virtio-blk: drain block before cleanup...
-> ERROR: braces {} are necessary for all arms of this statement
-> #157: FILE: hw/block/virtio-blk.c:976:
-> +    if (blk_bs(s->blk) && bdrv_requests_pending((blk_bs(s->blk))))
-> [...]
->
-> total: 1 errors, 0 warnings, 8 lines checked
->
-> Your patch has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
->
-> === OUTPUT END ===
->
 
-Yes, it has a problem.
-I'll send 2nd patch after fixing it.
+--rz+pwK2yUstbofK6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Best regards,
-Gi-Oh Kim
-TEL: 0176 2697 8962
+On Mon, Jun 12, 2017 at 08:21:07PM +0800, Sam wrote:
+> I'm debuging ovs-2.6.0, dpdk-2.2.0 and qemu-2.6.0. And I run such command:
+>=20
+> QEMU_CMD -D qemu-log.log -trace events=3Dqemu-events ...
+>=20
+> I want to trace vhost-user protocol process between QEMU and ovs-dpdk.
+> Ovs-dpdk's log shows lots of infomations of vhost-user protocol, but QEMU=
+'s
+> log shows only a little.
+>=20
+> As in qemu-events, there is only 'vhost_user_event' event I could use. Is
+> there more events or some other method to debug vhost related module in
+> QEMU?
+
+vhost_user_event is the only QEMU trace event that currently exists for
+vhost-user.
+
+Guidelines for submitting patches are here if you decide to add more:
+http://wiki.qemu.org/Contribute/SubmitAPatch
+
+Stefan
+
+--rz+pwK2yUstbofK6
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZP7+EAAoJEJykq7OBq3PIURcH/3D2vjuzW5xe0L9eQE4v5Z9Y
+rK+2vJ9aKLZ+jQWYWZPDgiufkbwqwfgyyAl8FeXzdlFgviv37bOEwn3oxUi/z1K6
+2G8C0OG4hWKiBL8XzltPj7LK6oVXORuWDbWx5zzFGmQTKq5+SSZQaUnY5nPg6lJq
+nx+oZqoI8K1sEJQq9gtoAq6Jb6Bt3TuqWl4C+17DJvYT1oUIV+Q3zD9LHtGNNzHH
+e3fXA4R3FrlWUlTjaYhQvsT6/u82SdUoNgG2N04XTa7porawqxFh0KxjYCLUCiKl
+bdHZ1xUAavX7L2X7HeS7CgCmnnTqLjxRp/wpDeO1a8nffJpnOSblNQ/WCpaBiUI=
+=mFx5
+-----END PGP SIGNATURE-----
+
+--rz+pwK2yUstbofK6--
