@@ -1,33 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dKgTp-00039H-Bd
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 03:43:14 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1dKgYA-0004yt-IM
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 03:47:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dKgTl-0004VZ-FM
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 03:43:13 -0400
-Received: from 4.mo5.mail-out.ovh.net ([178.33.111.247]:59033)
+	(envelope-from <wei.w.wang@intel.com>) id 1dKgY6-0005sJ-Mw
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 03:47:42 -0400
+Received: from mga06.intel.com ([134.134.136.31]:25790)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dKgTl-0004VM-8e
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 03:43:09 -0400
-Received: from player799.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id E14E91021F3
-	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 09:43:07 +0200 (CEST)
-Date: Tue, 13 Jun 2017 09:43:02 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170613094302.1cb4012c@bahia.ttt.fr.ibm.com>
-In-Reply-To: <20170611093842.GA13479@umbus>
-References: <149692935202.12119.3614006195497745877.stgit@bahia>
-	<20170609022813.GF26521@umbus.fritz.box>
-	<20170609113631.229dd346@bahia.ttt.fr.ibm.com>
-	<20170609102832.GL26521@umbus.fritz.box>
-	<20170609170913.2e6526c3@bahia.ttt.fr.ibm.com>
-	<20170611093842.GA13479@umbus>
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1dKgY6-0005sB-Cm
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 03:47:38 -0400
+Message-ID: <593F9921.7040708@intel.com>
+Date: Tue, 13 Jun 2017 15:49:53 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/F.Lp5fmv+Xc6Fwy1b0rxHjR";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v4 0/6] spapr/xics: fix migration of older
- machine types
+References: <1496653049-44530-1-git-send-email-wei.w.wang@intel.com>
+	<20170605182514-mutt-send-email-mst@kernel.org>
+	<5937511D.5070205@intel.com>
+	<20170608220006-mutt-send-email-mst@kernel.org>
+	<593A0F47.5080806@intel.com> <593E5F46.5080704@intel.com>
+	<20170612234035-mutt-send-email-mst@kernel.org>
+	<593F57C0.9080701@intel.com>
+	<4639c51b-32a6-3528-2ed6-c5f6296b6300@redhat.com>
+	<593F6133.9050804@intel.com>
+	<65faf3f9-a839-0b04-c740-6b2a60a51cf6@redhat.com>
+	<fce1c1be-4105-3fd9-c734-987b85376cf9@redhat.com>
+	<593F827A.9000106@intel.com>
+	<74c22cd1-391d-d6b2-03f1-b247c2f78ccf@redhat.com>
+In-Reply-To: <74c22cd1-391d-d6b2-03f1-b247c2f78ccf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [PATCH v1]
+ virtio-net: enable configurable tx queue size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,82 +40,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+To: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "stefanha@gmail.com" <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "jan.scheurich@ericsson.com" <jan.scheurich@ericsson.com>, "armbru@redhat.com" <armbru@redhat.com>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
 
---Sig_/F.Lp5fmv+Xc6Fwy1b0rxHjR
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 06/13/2017 02:31 PM, Jason Wang wrote:
+>
+>
+> On 2017年06月13日 14:13, Wei Wang wrote:
+>> On 06/13/2017 11:59 AM, Jason Wang wrote:
+>>>
+>>> On 2017年06月13日 11:55, Jason Wang wrote:
+>>>> The issue is what if there's a mismatch of max #sgs between qemu and
+>>>> vhost?
+>>>>
+>>>>> When the vhost backend is used, QEMU is not involved in the data
+>>>>> path. The vhost backend
+>>>>> directly gets what is offered by the guest from the vq.
+>>> FYI, qemu will try to fallback to userspace if there's something wrong
+>>> with vhost-kernel (e.g the IOMMU support). This doesn't work for
+>>> vhost-user actually, but it works for vhost-kernel.
+>>>
+>>> Thanks
+>>>
+>>
+>> That wouldn't be a problem. When it falls back to the QEMU backend,
+>> the "max_chain_size" will be set according to the QEMU backend
+>> (e.g. 1023). Guest will read the max_chain_size register.
+>
+> What if there's backend that supports less than 1023? Or in the 
+> future, we increase the limit to e.g 2048?
+>
 
-On Sun, 11 Jun 2017 17:38:42 +0800
-David Gibson <david@gibson.dropbear.id.au> wrote:
+I agree the potential issue is that it's assumed (hardcoded) that the vhost
+backend supports 1024 chain size. This only comes to be an issue if the 
+vhost
+backend implementation supports less than 1024 in the future, but that
+can be solved by introducing another feature to support that.
 
-> On Fri, Jun 09, 2017 at 05:09:13PM +0200, Greg Kurz wrote:
-> > On Fri, 9 Jun 2017 20:28:32 +1000
-> > David Gibson <david@gibson.dropbear.id.au> wrote:
-> >  =20
-> > > On Fri, Jun 09, 2017 at 11:36:31AM +0200, Greg Kurz wrote: =20
-> > > > On Fri, 9 Jun 2017 12:28:13 +1000
-> > > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > > >    =20
-> > > > > On Thu, Jun 08, 2017 at 03:42:32PM +0200, Greg Kurz wrote:   =20
-> > > > > > I've provided answers for all comments from the v3 review that =
-I deliberately
-> > > > > > don't address in v4.     =20
-> > > > >=20
-> > > > > I've merged patches 1-4.  5 & 6 I'm still reviewing.
-> > > > >    =20
-> > > >=20
-> > > > Cool. FYI, I forgot to mention that I only tested with KVM.
-> > > >=20
-> > > > I'm now trying with TCG and I hit various guest crash on
-> > > > the destination (using your ppc-for-2.10 branch WITHOUT
-> > > > my patches):   =20
-> > >=20
-> > > Drat.  What's your reproducer for this crash?
-> > >  =20
-> >=20
-> > 1) start guest
-> >=20
-> > qemu-system-ppc64 \
-> >  -nodefaults -nographic -snapshot -no-shutdown -serial mon:stdio \
-> >  -device virtio-net,netdev=3Dnetdev0,id=3Dnet0 \
-> >  -netdev bridge,id=3Dnetdev0,br=3Dvirbr0,helper=3D/usr/libexec/qemu-bri=
-dge-helper \
-> >  -device virtio-blk,drive=3Ddrive0,id=3Dblk0 \
-> >  -drive file=3D/home/greg/images/sle12-sp1-ppc64le.qcow2,id=3Ddrive0,if=
-=3Dnone \
-> >  -machine type=3Dpseries,accel=3Dtcg -cpu POWER8
-> >=20
-> > 2) migrate
-> >=20
-> > 3) destination crashes (immediately or after very short delay) or
-> > hangs =20
->=20
-> Ok.  I'll bisect it when I can, but you might well get to it first.
->=20
->=20
+If that's acceptable, some customers will be easy to upgrade their
+already deployed products to use 1024 tx queue size.
 
-Heh, maybe you didn't see in my mail but I did bisect:
-
-f0b0685d6694a28c66018f438e822596243b1250 is the first bad commit
-commit f0b0685d6694a28c66018f438e822596243b1250
-Author: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Date:   Thu Apr 27 10:48:23 2017 +0530
-
-    tcg: enable MTTCG by default for PPC64 on x86
-
-
---Sig_/F.Lp5fmv+Xc6Fwy1b0rxHjR
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlk/l4YACgkQAvw66wEB28IjWQCePlLGqwAVsGl1cukIvmd3rpNm
-cV8An1Ce7OBfKZx8IBKwg+INyPUmW1u6
-=sVfm
------END PGP SIGNATURE-----
-
---Sig_/F.Lp5fmv+Xc6Fwy1b0rxHjR--
+Best,
+Wei
