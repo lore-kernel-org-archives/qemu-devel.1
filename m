@@ -1,18 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dKkmP-00011u-QU
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 08:18:45 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dKkzh-0006cG-CX
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 08:32:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dKkmL-0007Fg-Pp
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 08:18:41 -0400
-From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Date: Tue, 13 Jun 2017 15:16:39 +0300
-Message-Id: <20170613121639.17853-5-pbutsykin@virtuozzo.com>
-In-Reply-To: <20170613121639.17853-1-pbutsykin@virtuozzo.com>
-References: <20170613121639.17853-1-pbutsykin@virtuozzo.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dKkzd-0002hn-1b
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 08:32:25 -0400
+Received: from mail-lf0-x229.google.com ([2a00:1450:4010:c07::229]:35408)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dKkzc-0002hV-Lz
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 08:32:20 -0400
+Received: by mail-lf0-x229.google.com with SMTP id p189so69773804lfe.2
+	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 05:32:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 4/4] qemu-iotests: add shrinking image test
+References: <1496152683-102751-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1496152683-102751-4-git-send-email-anton.nefedov@virtuozzo.com>
+	<CAJ+F1CLJBBJRRGzxRFGxihuD7Gsbxm-0Gg4uvyLfFsC_77NiQA@mail.gmail.com>
+	<e7bb9020-99b1-bb6f-0bf4-1c5d20c692fa@virtuozzo.com>
+	<CAJ+F1CLZmEPN-Jw3dZc64UnFFye29gyPaz+O=DHES6Vjh-hDHw@mail.gmail.com>
+	<180cb703-0d20-c167-c368-094c314f7126@virtuozzo.com>
+In-Reply-To: <180cb703-0d20-c167-c368-094c314f7126@virtuozzo.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 13 Jun 2017 12:32:08 +0000
+Message-ID: <CAJ+F1C+RERi==AHy4n9JMyV+=joMBZzWr23mvAkrrb3wqynXwA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 03/13] char: chardevice hotswap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,159 +34,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, armbru@redhat.com, pbutsykin@virtuozzo.com, den@openvz.org
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, den@virtuozzo.com
 
-Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
----
- tests/qemu-iotests/163     | 113 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/163.out |   5 ++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 119 insertions(+)
- create mode 100644 tests/qemu-iotests/163
- create mode 100644 tests/qemu-iotests/163.out
+Hi
 
-diff --git a/tests/qemu-iotests/163 b/tests/qemu-iotests/163
-new file mode 100644
-index 0000000000..2cb0116173
---- /dev/null
-+++ b/tests/qemu-iotests/163
-@@ -0,0 +1,113 @@
-+#!/usr/bin/env python
-+#
-+# Tests for shrinking images
-+#
-+# Copyright (c) 2016-2017 Parallels International GmbH
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+import os, random, iotests
-+from iotests import qemu_img, qemu_io, image_size
-+
-+test_img = os.path.join(iotests.test_dir, 'test.img')
-+check_img = os.path.join(iotests.test_dir, 'check.img')
-+
-+def size_to_int(str):
-+    suff = ['B', 'K', 'M', 'G', 'T']
-+    return int(str[:-1]) * 1024**suff.index(str[-1:])
-+
-+class TestShrink(iotests.QMPTestCase):
-+    image_len = '1G'
-+    shrink_size = '128M'
-+    chank_size = '256M'
-+
-+    def setUp(self):
-+        qemu_img('create', '-f', iotests.imgfmt, test_img, TestShrink.image_len)
-+        qemu_img('create', '-f', iotests.imgfmt, check_img,
-+                 TestShrink.shrink_size)
-+
-+    def tearDown(self):
-+        os.remove(test_img)
-+        os.remove(check_img)
-+
-+    def image_verify(self):
-+        self.assertEqual(image_size(test_img), image_size(check_img),
-+                         "Verifying image size")
-+
-+        if iotests.imgfmt == 'raw':
-+            return
-+
-+        self.assertEqual(qemu_img('check', test_img),
-+                         qemu_img('check', check_img),
-+                         "Verifying image corruption")
-+
-+    def test_empty_image(self):
-+        qemu_img('resize',  '-f', iotests.imgfmt, '--shrink', test_img,
-+                 TestShrink.shrink_size)
-+
-+        self.assertEqual(
-+            qemu_io('-c', 'read -P 0x00 %s'%TestShrink.shrink_size, test_img),
-+            qemu_io('-c', 'read -P 0x00 %s'%TestShrink.shrink_size, check_img),
-+            "Verifying image content")
-+
-+        TestShrink.image_verify(self)
-+
-+    def test_sequential_write(self):
-+        for offs in range(0, size_to_int(TestShrink.image_len),
-+                          size_to_int(TestShrink.chank_size)):
-+            qemu_io('-c', 'write -P 0xff %d %s' % (offs, TestShrink.chank_size),
-+                    test_img)
-+
-+        qemu_img('resize',  '-f', iotests.imgfmt, '--shrink', test_img,
-+                 TestShrink.shrink_size)
-+
-+        self.assertEqual(
-+            qemu_io('-c', 'read -P 0xff %s'%TestShrink.image_len, test_img),
-+            qemu_io('-c', 'read -P 0xff %s'%TestShrink.image_len, check_img),
-+            "Verifying image content")
-+
-+        self.assertEqual(
-+            qemu_io('-c', 'read -P 0xff %s'%TestShrink.shrink_size, test_img),
-+            qemu_io('-c', 'read -P 0xff %s'%TestShrink.shrink_size, check_img),
-+            "Verifying image content")
-+
-+        TestShrink.image_verify(self)
-+
-+    def test_random_write(self):
-+        offs_list = range(0, size_to_int(TestShrink.image_len),
-+                          size_to_int(TestShrink.chank_size))
-+        random.shuffle(offs_list)
-+        for offs in offs_list:
-+            qemu_io('-c', 'write -P 0xff %d %s' % (offs, TestShrink.chank_size),
-+                    test_img)
-+
-+        qemu_img('resize',  '-f', iotests.imgfmt, '--shrink', test_img,
-+                 TestShrink.shrink_size)
-+
-+        self.assertEqual(
-+            qemu_io('-c', 'read -P 0xff %s'%TestShrink.image_len, test_img),
-+            qemu_io('-c', 'read -P 0xff %s'%TestShrink.image_len, check_img),
-+            "Verifying image content")
-+
-+        self.assertEqual(
-+            qemu_io('-c', 'read -P 0xff %s'%TestShrink.shrink_size, test_img),
-+            qemu_io('-c', 'read -P 0xff %s'%TestShrink.shrink_size, check_img),
-+            "Verifying image content")
-+
-+        TestShrink.image_verify(self)
-+
-+
-+if __name__ == '__main__':
-+    iotests.main(supported_fmts=['raw', 'qcow2'])
-diff --git a/tests/qemu-iotests/163.out b/tests/qemu-iotests/163.out
-new file mode 100644
-index 0000000000..8d7e996700
---- /dev/null
-+++ b/tests/qemu-iotests/163.out
-@@ -0,0 +1,5 @@
-+...
-+----------------------------------------------------------------------
-+Ran 3 tests
-+
-+OK
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 5c8ea0f95c..a2f42e7165 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -163,6 +163,7 @@
- 159 rw auto quick
- 160 rw auto quick
- 162 auto quick
-+163 rw auto quick
- 170 rw auto quick
- 171 rw auto quick
- 172 auto
--- 
-2.13.0
+On Tue, Jun 13, 2017 at 3:53 PM Anton Nefedov <anton.nefedov@virtuozzo.com>
+wrote:
+
+> >     The existing chr_write_lock belongs to Chardev.
+> >     For the hotswap case, we need to ensure that be->chr won't change a=
+nd
+> >     the old Chardev (together with its mutex) won't be destroyed while
+> it's
+> >     used in the write functions.
+> >
+> >     Maybe we could move the lock to CharBackend, instead of creating a
+> new
+> >     one. But I guess this
+> >        1. won't work for mux, where multiple CharBackends share the sam=
+e
+> >     Chardev
+> >        2. won't work for some chardevs, like pty which uses the lock fo=
+r
+> the
+> >     timer handler
+> >
+> >     Sorry if I'm not explaining clearly enough or maybe I'm missing som=
+e
+> >     easier solution?
+> >
+> >
+> > It looks to me like you would get the same guarantees by using the
+> > chr_write_lock directly:
+> >
+> > @@ -1381,7 +1374,7 @@ ChardevReturn *qmp_chardev_change(const char *id,
+> > ChardevBackend *backend,
+> >           closed_sent =3D true;
+> >       }
+> >
+> > -    qemu_mutex_lock(&be->chr_lock);
+> > +    qemu_mutex_lock(&chr->chr_write_lock);
+> >       chr->be =3D NULL;
+> >       qemu_chr_fe_connect(be, chr_new, &error_abort);
+> >
+> > @@ -1389,14 +1382,14 @@ ChardevReturn *qmp_chardev_change(const char
+> > *id, ChardevBackend *backend,
+> >           error_setg(errp, "Chardev '%s' change failed", chr_new->label=
+);
+> >           chr_new->be =3D NULL;
+> >           qemu_chr_fe_connect(be, chr, &error_abort);
+> > -        qemu_mutex_unlock(&be->chr_lock);
+> > +        qemu_mutex_unlock(&chr->chr_write_lock);
+> >           if (closed_sent) {
+> >               qemu_chr_be_event(chr, CHR_EVENT_OPENED);
+> >           }
+> >           object_unref(OBJECT(chr_new));
+> >           return NULL;
+> >       }
+> > -    qemu_mutex_unlock(&be->chr_lock);
+> > +    qemu_mutex_unlock(&chr->chr_write_lock);
+> >
+> > I wonder if we should rename 'chr_write_lock' to just 'lock' :)
+> >
+>
+> hi,
+>
+> but isn't there a potential race?
+>
+> Assume thread-1 is somewhere in qemu_chr_write() and thread-2 is in
+> qmp_chardev_change().
+>
+> T2 can change the chardev, and destroy the old one while T1 still has
+> the pointer ( =3D use after free).
+> Or T1 unlocks chr_write_lock, T2 acquires that in
+> qemu_chr_write_buffer(), then T1 destroys it together
+> with the chardev ( =3D undefined behaviour).
+>
+
+> What I'm trying to say is that the critical section for the hotswap is
+> bigger than what chr_write_lock currently covers - we also need to cover
+> the be->chr pointer.
+> Or am I missing something?
+>
+
+Thanks for the detail, I think you are correct, and probably your solution
+is good. Another way would be to object_ref/unref the Chardev when using it
+in seperate thread, this way we wouldn't need an extra lock, I think. Paolo
+might be of good advice to get this right.
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
