@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dKlBU-00025E-C0
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 08:44:37 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dKlIE-0003gX-Fy
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 08:51:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dKlBT-0007EF-Jn
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 08:44:36 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:33175)
+	(envelope-from <peter.maydell@linaro.org>) id 1dKlID-0000vb-JB
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 08:51:34 -0400
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:35752)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dKlBT-0007E4-Cb
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 08:44:35 -0400
-Received: by mail-wr0-x230.google.com with SMTP id v104so135321863wrb.0
-	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 05:44:34 -0700 (PDT)
+	id 1dKlID-0000vA-Ai
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 08:51:33 -0400
+Received: by mail-wr0-x234.google.com with SMTP id q97so142020558wrb.2
+	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 05:51:33 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CABUdOL7gP=h8deWfuxz01eER2DkUFkFLZSdQcGhDJFzcmzGyZw@mail.gmail.com>
-References: <CABUdOL7gP=h8deWfuxz01eER2DkUFkFLZSdQcGhDJFzcmzGyZw@mail.gmail.com>
+In-Reply-To: <20170609124313.8026-1-jcody@redhat.com>
+References: <20170609124313.8026-1-jcody@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Jun 2017 13:44:11 +0100
-Message-ID: <CAFEAcA-7MMVi-ubFGi9882WMgYUWMcbLiF9MVOT+cg-1A20cgA@mail.gmail.com>
+Date: Tue, 13 Jun 2017 13:51:11 +0100
+Message-ID: <CAFEAcA9UR7ACbAdoPtWjnWf81cK5bXocDrOoOzEroyY=MvqHZw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Emulation without RWX
+Subject: Re: [Qemu-devel] [PULL 0/1] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,23 +28,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Antonio Groza <antoniogroza@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Jeff Cody <jcody@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 13 June 2017 at 12:54, Antonio Groza <antoniogroza@gmail.com> wrote:
-> Hello, i am trying to emulate x86 on a platform that won't allow me to map
-> memory pages as RWX(Apple's iOS) and i was wondering if there was any way
-> of running qemu without doing that. I've had a brief look at your
-> documentation and it looks like you are transpiling between 2 different
-> instruction sets and i don't know how that would be possible without a rwx
-> page.
+On 9 June 2017 at 13:43, Jeff Cody <jcody@redhat.com> wrote:
+> The following changes since commit 64175afc695c0672876fbbfc31b299c86d562cb4:
+>
+>   arm_gicv3: Fix ICC_BPR1 reset value when EL3 not implemented (2017-06-07 17:21:44 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/codyprime/qemu-kvm-jtc.git tags/block-pull-request
+>
+> for you to fetch changes up to 56faeb9bb6872b3f926b3b3e0452a70beea10af2:
+>
+>   block/gluster.c: Handle qdict_array_entries() failure (2017-06-09 08:41:29 -0400)
+>
+> ----------------------------------------------------------------
+> Gluster patch
+> ----------------------------------------------------------------
 
-It's certainly possible in theory -- you'd just need to be more
-careful than we are currently about mapping the memory RW when
-writing or patching code and then R-X when executing. (Now we're
-multithreaded this is probably trickier than when we only had
-a single thread, though.) But we don't do it currently and it
-would require (possibly complicated) code changes to do it.
+Applied, thanks.
 
-thanks
 -- PMM
