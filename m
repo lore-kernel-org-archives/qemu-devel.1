@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dKr5l-0005Do-4L
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 15:03:06 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dKrDc-0007Pc-FJ
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 15:11:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dKr5g-0001TI-90
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 15:03:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40134)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dKr5g-0001T6-3O
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 15:03:00 -0400
-Date: Tue, 13 Jun 2017 16:02:56 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170613190256.GA5016@thinpad.lan.raisama.net>
-References: <20170606181948.16238-1-rkagan@virtuozzo.com>
-	<20170606181948.16238-12-rkagan@virtuozzo.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1dKrDX-0003go-KO
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 15:11:12 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:33484)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dKrDX-0003gd-Ds
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 15:11:07 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id v104so147968435wrb.0
+	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 12:11:07 -0700 (PDT)
+References: <20170610223135.1731-1-f4bug@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170610223135.1731-1-f4bug@amsat.org>
+Date: Tue, 13 Jun 2017 20:11:38 +0100
+Message-ID: <87vanzitxx.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170606181948.16238-12-rkagan@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH 11/23] hyperv: address HvSintRoute by
- X86CPU pointer
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] tcg/tci: enable bswap16_i64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +29,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, "Emilio G . Cota" <cota@braap.org>, Richard Henderson <rth@twiddle.net>
 
-On Tue, Jun 06, 2017 at 09:19:36PM +0300, Roman Kagan wrote:
-> Use X86CPU pointer to refer to the respective HvSintRoute instead of
-> vp_index.  This is more convenient and also paves the way for future
-> enhancements.
-> 
-> Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
-[...]
-> @@ -101,16 +101,18 @@ static void hv_test_dev_control(void *opaque, hwaddr addr, uint64_t data,
->      uint8_t sint = data & 0xFF;
->      uint8_t vcpu_id = (data >> 8ULL) & 0xFF;
 
-vcpu_id risks being confused KVM's vcpu_id (which is the CPU APIC
-ID in x86).  If you are already touching this code, this could be
-renamed to vp_index to avoid confusion.
+Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
 
->      uint8_t ctl = (data >> 16ULL) & 0xFF;
-> +    X86CPU *cpu = hyperv_find_vcpu(vcpu_id);
-> +    assert(cpu);
->  
->      switch (ctl) {
->      case HV_TEST_DEV_SINT_ROUTE_CREATE:
-> -        sint_route_create(dev, vcpu_id, sint);
-> +        sint_route_create(dev, cpu, sint);
->          break;
->      case HV_TEST_DEV_SINT_ROUTE_DESTROY:
-> -        sint_route_destroy(dev, vcpu_id, sint);
-> +        sint_route_destroy(dev, cpu, sint);
->          break;
->      case HV_TEST_DEV_SINT_ROUTE_SET_SINT:
-> -        sint_route_set_sint(dev, vcpu_id, sint);
-> +        sint_route_set_sint(dev, cpu, sint);
->          break;
->      default:
->          break;
+> remove some copy/paste leftover, code seems sane.
+>
+> while running Alex Bennée's image aarch64-linux-3.15rc2-buildroot.img:
+>
+> Trace 0x7fa1904b0890 [0: ffffffc00036cd04]
+> ----------------
+> IN:
+> 0xffffffc00036cd24:  5ac00694      rev16 w20, w20
+>
+> OP:
+>  ---- ffffffc00036cd24 0000000000000000 0000000000000000
+>  ext32u_i64 tmp3,x20
+>  ext16u_i64 tmp2,tmp3
+>  bswap16_i64 x20,tmp2
+>  movi_i64 tmp4,$0x10
+>  shr_i64 tmp2,tmp3,tmp4
+>  ext16u_i64 tmp2,tmp2
+>  bswap16_i64 tmp2,tmp2
+>  deposit_i64 x20,x20,tmp2,$0x10,$0x10
+>
+> Linking TBs 0x7fa1904b0890 [ffffffc00036cd04] index 0 -> 0x7fa1904b0aa0 [ffffffc00036cd24]
+> Trace 0x7fa1904b0aa0 [0: ffffffc00036cd24]
+> TODO qemu/tci.c:1049: tcg_qemu_tb_exec()
+> qemu/tci.c:1049: tcg fatal error
+> Aborted
+>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
--- 
-Eduardo
+Possibly the only person who has run tci recently ;-)
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+
+> ---
+>
+> there is no entry in MAINTAINERS for this file, I think it should it go under:
+> "Tiny Code Generator (TCG) / Common code"
+>
+>  tci.c | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/tci.c b/tci.c
+> index 4bdc645f2a..f39bfb95c0 100644
+> --- a/tci.c
+> +++ b/tci.c
+> @@ -1046,7 +1046,6 @@ uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr)
+>              break;
+>  #if TCG_TARGET_HAS_bswap16_i64
+>          case INDEX_op_bswap16_i64:
+> -            TODO();
+>              t0 = *tb_ptr++;
+>              t1 = tci_read_r16(&tb_ptr);
+>              tci_write_reg64(t0, bswap16(t1));
+
+
+--
+Alex Bennée
