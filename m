@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew@aj.id.au>) id 1dKdap-0005kF-Ts
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 00:38:17 -0400
+	(envelope-from <th.huth@gmail.com>) id 1dKdkj-0000l0-S0
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 00:48:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew@aj.id.au>) id 1dKdao-0001ce-Ma
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 00:38:15 -0400
-Message-ID: <1497328676.11158.1.camel@aj.id.au>
-From: Andrew Jeffery <andrew@aj.id.au>
-Date: Tue, 13 Jun 2017 14:07:56 +0930
-In-Reply-To: <bc98777b-e99d-3b55-3904-8f752a350b6c@kaod.org>
-References: <1496739312-32304-1-git-send-email-clg@kaod.org>
-	<1496975205.23335.9.camel@aj.id.au>
-	<bc98777b-e99d-3b55-3904-8f752a350b6c@kaod.org>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="=-QV+O+a46wFWmkOwNTRAe"
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] timer/aspeed: fix timer enablement when a
- reload is not set
+	(envelope-from <th.huth@gmail.com>) id 1dKdkf-0004b5-UU
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 00:48:29 -0400
+Received: from mail-wr0-f193.google.com ([209.85.128.193]:35163)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1dKdkf-0004ar-Ny
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 00:48:25 -0400
+Received: by mail-wr0-f193.google.com with SMTP id g76so26392269wrd.2
+	for <qemu-devel@nongnu.org>; Mon, 12 Jun 2017 21:48:23 -0700 (PDT)
+References: <20170611231633.32582-1-laurent@vivier.eu>
+	<20170611231633.32582-6-laurent@vivier.eu>
+From: Thomas Huth <huth@tuxfamily.org>
+Message-ID: <221c6711-d46f-2fcf-6091-f1f3340664f7@tuxfamily.org>
+Date: Tue, 13 Jun 2017 06:48:21 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170611231633.32582-6-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 5/7] target-m68k: use floatx80 internally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,133 +30,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 
+On 12.06.2017 01:16, Laurent Vivier wrote:
+> Coldfire uses float64, but 680x0 use floatx80.
+> This patch introduces the use of floatx80 internally
+> and enables 680x0 80bits FPU.
+> 
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>  target/m68k/cpu.c        |   9 +-
+>  target/m68k/cpu.h        |   6 +-
+>  target/m68k/fpu_helper.c |  85 +++----
+>  target/m68k/helper.c     |  12 +-
+>  target/m68k/helper.h     |  37 +--
+>  target/m68k/qregs.def    |   1 -
+>  target/m68k/translate.c  | 568 +++++++++++++++++++++++++++++++----------------
+>  7 files changed, 464 insertions(+), 254 deletions(-)
+> 
+> diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
+> index f068922..435456f 100644
+> --- a/target/m68k/cpu.c
+> +++ b/target/m68k/cpu.c
+> @@ -49,6 +49,8 @@ static void m68k_cpu_reset(CPUState *s)
+>      M68kCPU *cpu = M68K_CPU(s);
+>      M68kCPUClass *mcc = M68K_CPU_GET_CLASS(cpu);
+>      CPUM68KState *env = &cpu->env;
+> +    floatx80 nan = floatx80_default_nan(NULL);
+> +    int i;
+>  
+>      mcc->parent_reset(s);
+>  
+> @@ -57,7 +59,12 @@ static void m68k_cpu_reset(CPUState *s)
+>      env->sr = 0x2700;
+>  #endif
+>      m68k_switch_sp(env);
+> -    /* ??? FP regs should be initialized to NaN.  */
+> +    for (i = 0; i < 8; i++) {
+> +        env->fregs[i].d = nan;
+> +    }
+> +    env->fpcr = 0;
+> +    env->fpsr = 0;
+> +
 
---=-QV+O+a46wFWmkOwNTRAe
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+Maybe move such non-related hunks to a separate patch? This patch here
+is already big enough...
 
-T24gRnJpLCAyMDE3LTA2LTA5IGF0IDA3OjQwICswMjAwLCBDw6lkcmljIExlIEdvYXRlciB3cm90
-ZToKPiBPbiAwNi8wOS8yMDE3IDA0OjI2IEFNLCBBbmRyZXcgSmVmZmVyeSB3cm90ZToKPiA+IE9u
-IFR1ZSwgMjAxNy0wNi0wNiBhdCAxMDo1NSArMDIwMCwgQ8OpZHJpYyBMZSBHb2F0ZXIgd3JvdGU6
-Cj4gPiA+IFdoZW4gYSB0aW1lciBpcyBlbmFibGVkIGJlZm9yZSBhIHJlbG9hZCB2YWx1ZSBpcyBz
-ZXQsIHRoZSBjb250cm9sbGVyCj4gPiA+IHdhaXRzIGZvciBhIHJlbG9hZCB2YWx1ZSB0byBiZSBz
-ZXQgYmVmb3JlIHN0YXJ0aW5nIGRlY3JlbWVudGluZy4gVGhpcwo+ID4gPiBmaXggdHJpZXMgdG8g
-Y292ZXIgdGhhdCBjYXNlIGJ5IGNoYW5naW5nIHRoZSB0aW1lciBleHBpcnkgb25seSB3aGVuCj4g
-PiA+IGEgcmVsb2FkIHZhbHVlIGlzIHZhbGlkLgo+ID4gPiAKPiA+ID4gPiBTaWduZWQtb2ZmLWJ5
-OiBDw6lkcmljIExlIEdvYXRlciA8Y2xnQGthb2Qub3JnPgo+ID4gPiAKPiA+ID4gLS0tCj4gPiA+
-IMKgaHcvdGltZXIvYXNwZWVkX3RpbWVyLmMgfCAzNyArKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKy0tLS0tLS0tCj4gPiA+IMKgMSBmaWxlIGNoYW5nZWQsIDI5IGluc2VydGlvbnMoKyksIDgg
-ZGVsZXRpb25zKC0pCj4gPiA+IAo+ID4gPiBkaWZmIC0tZ2l0IGEvaHcvdGltZXIvYXNwZWVkX3Rp
-bWVyLmMgYi9ody90aW1lci9hc3BlZWRfdGltZXIuYwo+ID4gPiBpbmRleCA5YjcwZWUwOWIwN2Yu
-LjUwYWNiZjUzMGEzYSAxMDA2NDQKPiA+ID4gLS0tIGEvaHcvdGltZXIvYXNwZWVkX3RpbWVyLmMK
-PiA+ID4gKysrIGIvaHcvdGltZXIvYXNwZWVkX3RpbWVyLmMKPiA+ID4gQEAgLTEzMCwxNSArMTMw
-LDI2IEBAIHN0YXRpYyB1aW50NjRfdCBjYWxjdWxhdGVfbmV4dChzdHJ1Y3QgQXNwZWVkVGltZXIg
-KnQpCj4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgbmV4dCA9IHNlcVsxXTsKPiA+ID4g
-wqDCoMKgwqDCoMKgwqDCoMKgfSBlbHNlIGlmIChub3cgPCBzZXFbMl0pIHsKPiA+ID4gwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqBuZXh0ID0gc2VxWzJdOwo+ID4gPiAtwqDCoMKgwqDCoMKgwqDC
-oH0gZWxzZSB7Cj4gPiA+ICvCoMKgwqDCoMKgwqDCoMKgfSBlbHNlIGlmICh0LT5yZWxvYWQpIHsK
-PiA+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByZWxvYWRfbnMgPSBtdWxkaXY2NCh0LT5y
-ZWxvYWQsIE5BTk9TRUNPTkRTX1BFUl9TRUNPTkQsIHJhdGUpOwo+ID4gPiDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoHQtPnN0YXJ0ID0gbm93IC0gKChub3cgLSB0LT5zdGFydCkgJSByZWxvYWRf
-bnMpOwo+ID4gPiArwqDCoMKgwqDCoMKgwqDCoH0gZWxzZSB7Cj4gPiA+ICvCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqAvKiBubyByZWxvYWQgdmFsdWUsIHJldHVybiAwICovCj4gPiA+ICvCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqBicmVhazsKPiA+ID4gwqDCoMKgwqDCoMKgwqDCoMKgfQo+ID4gPiDC
-oMKgwqDCoMKgfQo+ID4gPiDCoAo+ID4gPiDCoMKgwqDCoMKgcmV0dXJuIG5leHQ7Cj4gPiA+IMKg
-fQo+ID4gPiDCoAo+ID4gPiArc3RhdGljIHZvaWQgYXNwZWVkX3RpbWVyX21vZChBc3BlZWRUaW1l
-ciAqdCkKPiA+ID4gK3sKPiA+ID4gK8KgwqDCoMKgdWludDY0X3QgbmV4dCA9IGNhbGN1bGF0ZV9u
-ZXh0KHQpOwo+ID4gPiArwqDCoMKgwqBpZiAobmV4dCkgewo+ID4gPiArwqDCoMKgwqDCoMKgwqDC
-oHRpbWVyX21vZCgmdC0+dGltZXIsIG5leHQpOwo+ID4gPiArwqDCoMKgwqB9Cj4gPiA+ICt9Cj4g
-PiA+ICsKPiA+ID4gwqBzdGF0aWMgdm9pZCBhc3BlZWRfdGltZXJfZXhwaXJlKHZvaWQgKm9wYXF1
-ZSkKPiA+ID4gwqB7Cj4gPiA+IMKgwqDCoMKgwqBBc3BlZWRUaW1lciAqdCA9IG9wYXF1ZTsKPiA+
-ID4gQEAgLTE2NCw3ICsxNzUsNyBAQCBzdGF0aWMgdm9pZCBhc3BlZWRfdGltZXJfZXhwaXJlKHZv
-aWQgKm9wYXF1ZSkKPiA+ID4gwqDCoMKgwqDCoMKgwqDCoMKgcWVtdV9zZXRfaXJxKHQtPmlycSwg
-dC0+bGV2ZWwpOwo+ID4gPiDCoMKgwqDCoMKgfQo+ID4gPiDCoAo+ID4gPiAtwqDCoMKgwqB0aW1l
-cl9tb2QoJnQtPnRpbWVyLCBjYWxjdWxhdGVfbmV4dCh0KSk7Cj4gPiA+ICvCoMKgwqDCoGFzcGVl
-ZF90aW1lcl9tb2QodCk7Cj4gPiA+IMKgfQo+ID4gPiDCoAo+ID4gPiDCoHN0YXRpYyB1aW50NjRf
-dCBhc3BlZWRfdGltZXJfZ2V0X3ZhbHVlKEFzcGVlZFRpbWVyICp0LCBpbnQgcmVnKQo+ID4gPiBA
-QCAtMjI3LDEwICsyMzgsMjMgQEAgc3RhdGljIHZvaWQgYXNwZWVkX3RpbWVyX3NldF92YWx1ZShB
-c3BlZWRUaW1lckN0cmxTdGF0ZSAqcywgaW50IHRpbWVyLCBpbnQgcmVnLAo+ID4gPiDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqB1aW50MzJfdCB2YWx1ZSkKPiA+ID4gwqB7Cj4gPiA+IMKgwqDCoMKgwqBBc3BlZWRU
-aW1lciAqdDsKPiA+ID4gK8KgwqDCoMKgdWludDMyX3Qgb2xkX3JlbG9hZDsKPiA+ID4gwqAKPiA+
-ID4gwqDCoMKgwqDCoHRyYWNlX2FzcGVlZF90aW1lcl9zZXRfdmFsdWUodGltZXIsIHJlZywgdmFs
-dWUpOwo+ID4gPiDCoMKgwqDCoMKgdCA9ICZzLT50aW1lcnNbdGltZXJdOwo+ID4gPiDCoMKgwqDC
-oMKgc3dpdGNoIChyZWcpIHsKPiA+ID4gK8KgwqDCoMKgY2FzZSBUSU1FUl9SRUdfUkVMT0FEOgo+
-ID4gPiArwqDCoMKgwqDCoMKgwqDCoG9sZF9yZWxvYWQgPSB0LT5yZWxvYWQ7Cj4gPiA+ICvCoMKg
-wqDCoMKgwqDCoMKgdC0+cmVsb2FkID0gdmFsdWU7Cj4gPiA+ICsKPiA+ID4gK8KgwqDCoMKgwqDC
-oMKgwqAvKiBJZiB0aGUgcmVsb2FkIHZhbHVlIHdhcyBub3QgcHJldmlvdXNseSBzZXQsIG9yIHpl
-cm8sIGFuZAo+ID4gPiArwqDCoMKgwqDCoMKgwqDCoMKgKiB0aGUgY3VycmVudCB2YWx1ZSBpcyB2
-YWxpZCwgdHJ5IHRvIHN0YXJ0IHRoZSB0aW1lciBpZiBpdCBpcwo+ID4gPiArwqDCoMKgwqDCoMKg
-wqDCoMKgKiBlbmFibGVkLgo+ID4gPiArwqDCoMKgwqDCoMKgwqDCoMKgKi8KPiA+ID4gK8KgwqDC
-oMKgwqDCoMKgwqBpZiAob2xkX3JlbG9hZCB8fCAhdC0+cmVsb2FkKSB7Cj4gPiA+ICvCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqBicmVhazsKPiA+ID4gK8KgwqDCoMKgwqDCoMKgwqB9Cj4gPiAKPiA+
-IE1heWJlIEkgbmVlZCBtb3JlIGNhZmZlaW5lLCBidXQgSSBpbml0aWFsbHkgc3RydWdnbGVkIHRv
-IHJlY29uY2lsZSB0aGUKPiA+IGNvbmRpdGlvbiB3aXRoIHRoZSBjb21tZW50LCBhcyB0aGUgY29u
-ZGl0aW9uIGNoZWNrcyB0aGUgaW52ZXJzZSBpbgo+ID4gb3JkZXIgdG8gYnJlYWsgd2hpbGUgdGhl
-IGNvbW1lbnQgZGlzY3Vzc2VzIHRoZSBub24tYnJlYWtpbmcgY2FzZS7CoAo+IAo+IEkgYWdyZWUu
-IFRoZSByZWxvYWQgInZhbHVlIiBpcyB1c2VkIGluIGEgaGlkZGVuIHdheSB0byB0aGUgYWN0aXZh
-dGUgdGhlwqAKPiB0aW1lci4KPiAKPiA+IEhvd2V2ZXIsIGFmdGVyIHRyeWluZyBmb3Igc2V2ZXJh
-bCBtaW51dGVzLCBJJ20gbm90IHN1cmUgdGhlcmUncyBhbiBlYXN5Cj4gPiB3YXkgdG8gaW1wcm92
-ZSBpdC4KPiAKPiBJIHRyaWVkIGEgZmV3IHRoaW5ncy4gTWF5IGJlLCB3ZSBjb3VsZCBtb3ZlIHRo
-ZSBmb2xsb3dpbmcgY29kZSBpbsKgCj4gaXRzIG93biByb3V0aW5lIGFuZCBjYWxsIGl0IHR3aWNl
-ID/CoAoKSSBkb24ndCB0aGluayBpdCdzIG5lY2Vzc2FyeS4gVGhlIGNvbW1lbnQgc2VydmVzIGFz
-IGVub3VnaCB3YXJuaW5nIC0gaXQKc2hvdWxkIGF0IGxlYXN0IG1ha2UgcGVvcGxlIHRoaW5rIGJl
-Zm9yZSBtb2RpZnlpbmcgdGhlIGNvZGUuCgpDaGVlcnMsCgpBbmRyZXcKCj4gwqAKPiA+ID4gKwo+
-ID4gPiDCoMKgwqDCoMKgY2FzZSBUSU1FUl9SRUdfU1RBVFVTOgo+ID4gPiDCoMKgwqDCoMKgwqDC
-oMKgwqBpZiAodGltZXJfZW5hYmxlZCh0KSkgewo+ID4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoHVpbnQ2NF90IG5vdyA9IHFlbXVfY2xvY2tfZ2V0X25zKFFFTVVfQ0xPQ0tfVklSVFVBTCk7
-Cj4gPiA+IEBAIC0yMzgsMTcgKzI2MiwxNCBAQCBzdGF0aWMgdm9pZCBhc3BlZWRfdGltZXJfc2V0
-X3ZhbHVlKEFzcGVlZFRpbWVyQ3RybFN0YXRlICpzLCBpbnQgdGltZXIsIGludCByZWcsCj4gPiA+
-IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgdWludDMyX3QgcmF0ZSA9IGNhbGN1bGF0ZV9yYXRl
-KHQpOwo+ID4gPiDCoAo+ID4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHQtPnN0YXJ0ICs9
-IG11bGRpdjY0KGRlbHRhLCBOQU5PU0VDT05EU19QRVJfU0VDT05ELCByYXRlKTsKPiA+ID4gLcKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoHRpbWVyX21vZCgmdC0+dGltZXIsIGNhbGN1bGF0ZV9uZXh0
-KHQpKTsKPiA+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGFzcGVlZF90aW1lcl9tb2QodCk7
-Cj4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoH0KPiA+ID4gwqDCoMKgwqDCoMKgwqDCoMKgYnJlYWs7
-Cj4gPiA+IC3CoMKgwqDCoGNhc2UgVElNRVJfUkVHX1JFTE9BRDoKPiA+ID4gLcKgwqDCoMKgwqDC
-oMKgwqB0LT5yZWxvYWQgPSB2YWx1ZTsKPiA+ID4gLcKgwqDCoMKgwqDCoMKgwqBicmVhazsKPiA+
-ID4gwqDCoMKgwqDCoGNhc2UgVElNRVJfUkVHX01BVENIX0ZJUlNUOgo+ID4gPiDCoMKgwqDCoMKg
-Y2FzZSBUSU1FUl9SRUdfTUFUQ0hfU0VDT05EOgo+ID4gPiDCoMKgwqDCoMKgwqDCoMKgwqB0LT5t
-YXRjaFtyZWcgLSAyXSA9IHZhbHVlOwo+ID4gPiDCoMKgwqDCoMKgwqDCoMKgwqBpZiAodGltZXJf
-ZW5hYmxlZCh0KSkgewo+ID4gPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgdGltZXJfbW9kKCZ0
-LT50aW1lciwgY2FsY3VsYXRlX25leHQodCkpOwo+ID4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgYXNwZWVkX3RpbWVyX21vZCh0KTsKPiA+ID4gwqDCoMKgwqDCoMKgwqDCoMKgfQo+ID4gPiDC
-oMKgwqDCoMKgwqDCoMKgwqBicmVhazsKPiA+ID4gwqDCoMKgwqDCoGRlZmF1bHQ6Cj4gPiA+IEBA
-IC0yNjgsNyArMjg5LDcgQEAgc3RhdGljIHZvaWQgYXNwZWVkX3RpbWVyX2N0cmxfZW5hYmxlKEFz
-cGVlZFRpbWVyICp0LCBib29sIGVuYWJsZSkKPiA+ID4gwqDCoMKgwqDCoHRyYWNlX2FzcGVlZF90
-aW1lcl9jdHJsX2VuYWJsZSh0LT5pZCwgZW5hYmxlKTsKPiA+ID4gwqDCoMKgwqDCoGlmIChlbmFi
-bGUpIHsKPiA+ID4gwqDCoMKgwqDCoMKgwqDCoMKgdC0+c3RhcnQgPSBxZW11X2Nsb2NrX2dldF9u
-cyhRRU1VX0NMT0NLX1ZJUlRVQUwpOwo+ID4gPiAtwqDCoMKgwqDCoMKgwqDCoHRpbWVyX21vZCgm
-dC0+dGltZXIsIGNhbGN1bGF0ZV9uZXh0KHQpKTsKPiA+ID4gK8KgwqDCoMKgwqDCoMKgwqBhc3Bl
-ZWRfdGltZXJfbW9kKHQpOwo+ID4gPiDCoMKgwqDCoMKgfSBlbHNlIHsKPiA+ID4gwqDCoMKgwqDC
-oMKgwqDCoMKgdGltZXJfZGVsKCZ0LT50aW1lcik7Cj4gPiA+IMKgwqDCoMKgwqB9Cj4gPiAKPiA+
-IFJldmlld2VkLWJ5OiBBbmRyZXcgSmVmZmVyeSA8YW5kcmV3QGFqLmlkLmF1Pgo+IAo+IFRoYW5r
-cywKPiAKPiBDLg==
-
-
---=-QV+O+a46wFWmkOwNTRAe
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAABCgAGBQJZP2wlAAoJEJ0dnzgO5LT5QY8P/2cuwzNPLb9RbzZ+i+BIjk0n
-eoiHTIUdlQs6QJDJ8WeiK2YOtxeyn7eZcGolKi2MzRY7avgjJmq8FMJ68pc9mNdH
-rEXqgWoMaTNbzKTDPXWZ27jbGG2GrHw8YupefbH9TO5xOQFgqSsIS0Jt24TB9pgl
-NkVg5mbawWxd9/nBtsjGTlBQNvZzPMYiA7PLu3fDRVp8L2dE+pxSSvpE02/zPV/d
-ByPP/cg0ZYoUhboVl5Yk3n7Bnb0EpsppdEJzi/jU1lv1vXTcuJgDAdtDMK2VgK2n
-vlzkQmBUyGoIutULMvs/n6WQU6IWJUw5LQFKG5xa600VwJD3kctfL5qwZoKFKckf
-cZZ+Fz8MV4BtXyvuNnBsLzzN3Iz6BW4k5s9H0WBfAM6MLSdO+w0XwXcJtJIo87Nj
-/Nq7n5RFBMTazoJ9a9h1zShv2zzO19mOpCKf7XTAQ+hwCTA0dtv+IrnDumsqmb45
-4nnifO5PPfQaT18RtSKPN1cbKUQu5HmWvXIEINdcva0CpoLHB1Iq68RBVoktbmq0
-PyWFyZlcWeGB4Pp/rwbGibgzsneMwIm7MQNbdVZcum288V2NFwcadeOlXXrCRsp2
-q7od0JmOcXxRUq1nDkFZ5O+V5LkE0qvgH0lKOVyw2LcDiOuLBacWWQgx0fQV5twT
-7+4uHW9Ds+o7jQKS4qT1
-=dgXJ
------END PGP SIGNATURE-----
-
---=-QV+O+a46wFWmkOwNTRAe--
+ Thomas
