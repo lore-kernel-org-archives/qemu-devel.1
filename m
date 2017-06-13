@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dL15Y-0003cG-RG
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 01:43:36 -0400
+	(envelope-from <bounces@canonical.com>) id 1dKsvE-0006QN-2W
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 17:00:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dL15U-0003tL-Ay
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 01:43:32 -0400
-Resent-Message-Id: <E1dL15U-0003tL-Ay@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21346)
+	(envelope-from <bounces@canonical.com>) id 1dKsv8-0006Oj-77
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 17:00:20 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37488)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dL15U-0003t4-3R
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 01:43:28 -0400
-In-Reply-To: <20170614052311.13785-1-rth@twiddle.net>
-Message-ID: <149741899705.828.15672279399101787393@4a9a010726c0>
-Reply-To: <qemu-devel@nongnu.org>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dKsv7-0006Nf-Te
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 17:00:14 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dKsv5-0005eD-MQ
+	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 21:00:11 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7339C2E81AC
+	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 21:00:02 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 13 Jun 2017 22:43:17 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 00/10] TCG queued patches
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 13 Jun 2017 20:45:03 -0000
+From: Lucas Meneghel Rodrigues <lookkas@gmail.com>
+Reply-To: Bug 1047576 <1047576@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20120907191638.8105.79748.malonedeb@chaenomeles.canonical.com>
+Message-Id: <149738670372.405.13253162826247608773.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1047576] Re: qemu unittest emulator failure on
+ latest git master
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +37,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: rth@twiddle.net
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQVUxMIDAwLzEwXSBUQ0cgcXVldWVkIHBhdGNoZXMKVHlwZTogc2VyaWVzCk1lc3Nh
-Z2UtaWQ6IDIwMTcwNjE0MDUyMzExLjEzNzg1LTEtcnRoQHR3aWRkbGUubmV0Cgo9PT0gVEVTVCBT
-Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxv
-ZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUK
-CmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBj
-IGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdp
-dCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9y
-bWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAg
-ICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpl
-eGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIx
-ZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
-ZXN0JwpkYzg1YTA0IHRjZzogUmVtb3ZlIHRiX2h0YWJsZV9sb29rdXAgZnJvbSBoZWxwZXJfbG9v
-a3VwX3RiX3B0cgphNGFlYzM4IFJldmVydCAidGFyZ2V0L2FhcmNoNjQ6IG9wdGltaXplIGluZGly
-ZWN0IGJyYW5jaGVzIgozZWVkZmU5IHRjZy9hcm06IFVzZSBsZHIgKGxpdGVyYWwpIGZvciBnb3Rv
-X3RiCjZiNTEzZDkgdGNnL2FybTogVHJ5IHBjLXJlbGF0aXZlIGFkZHJlc3NlcyBmb3IgbW92aQox
-MTEzNDk4IHRjZy9hcm06IFJlbW92ZSBsaW1pdCBvbiBjb2RlIGJ1ZmZlciBzaXplCjRlMmYyNzIg
-dGNnL2FybTogVXNlIGluZGlyZWN0IGJyYW5jaCBmb3IgZ290b190YgoxZWI3ZDJmIHRjZy9hYXJj
-aDY0OiBVc2UgQURSIGluIHRjZ19vdXRfbW92aQozN2Q1NGIyIHRyYW5zbGF0ZS1hbGw6IGNvbnNv
-bGlkYXRlIHRiIGluaXQgaW4gdGJfZ2VuX2NvZGUKZWUyNGM2OCB0Y2c6IGFsbG9jYXRlIFRCIHN0
-cnVjdHMgYmVmb3JlIHRoZSBjb3JyZXNwb25kaW5nIHRyYW5zbGF0ZWQgY29kZQphYWRmZjlmIHV0
-aWw6IGFkZCBjYWNoZWluZm8KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEv
-MTA6IHV0aWw6IGFkZCBjYWNoZWluZm8uLi4KRVJST1I6IGRvIG5vdCBpbml0aWFsaXNlIGdsb2Jh
-bHMgdG8gMCBvciBOVUxMCiMxNDk6IEZJTEU6IHV0aWwvY2FjaGVpbmZvLmM6MTE6CitpbnQgcWVt
-dV9pY2FjaGVfbGluZXNpemUgPSAwOwoKRVJST1I6IGRvIG5vdCBpbml0aWFsaXNlIGdsb2JhbHMg
-dG8gMCBvciBOVUxMCiMxNTA6IEZJTEU6IHV0aWwvY2FjaGVpbmZvLmM6MTI6CitpbnQgcWVtdV9k
-Y2FjaGVfbGluZXNpemUgPSAwOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCAn
-JiYnIChjdHg6RXhXKQojMTkxOiBGSUxFOiB1dGlsL2NhY2hlaW5mby5jOjUzOgorICAgICAgICAg
-ICAgJiYgYnVmW2ldLkNhY2hlLkxldmVsID09IDEpIHsKICAgICAgICAgICAgIF4KCldBUk5JTkc6
-IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiMyMTQ6IEZJ
-TEU6IHV0aWwvY2FjaGVpbmZvLmM6NzY6CisjIGlmIGRlZmluZWQoX19BUFBMRV9fKQoKV0FSTklO
-RzogYXJjaGl0ZWN0dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzI0ODog
-RklMRTogdXRpbC9jYWNoZWluZm8uYzoxMTA6CisjaWYgZGVmaW5lZChfX2FhcmNoNjRfXykKCnRv
-dGFsOiAzIGVycm9ycywgMiB3YXJuaW5ncywgMjE4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvMTA6IHRjZzogYWxs
-b2NhdGUgVEIgc3RydWN0cyBiZWZvcmUgdGhlIGNvcnJlc3BvbmRpbmcgdHJhbnNsYXRlZCBjb2Rl
-Li4uCkNoZWNraW5nIFBBVENIIDMvMTA6IHRyYW5zbGF0ZS1hbGw6IGNvbnNvbGlkYXRlIHRiIGlu
-aXQgaW4gdGJfZ2VuX2NvZGUuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8xMDogdGNnL2FhcmNoNjQ6IFVz
-ZSBBRFIgaW4gdGNnX291dF9tb3ZpLi4uCkNoZWNraW5nIFBBVENIIDUvMTA6IHRjZy9hcm06IFVz
-ZSBpbmRpcmVjdCBicmFuY2ggZm9yIGdvdG9fdGIuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8xMDogdGNn
-L2FybTogUmVtb3ZlIGxpbWl0IG9uIGNvZGUgYnVmZmVyIHNpemUuLi4KQ2hlY2tpbmcgUEFUQ0gg
-Ny8xMDogdGNnL2FybTogVHJ5IHBjLXJlbGF0aXZlIGFkZHJlc3NlcyBmb3IgbW92aS4uLgpDaGVj
-a2luZyBQQVRDSCA4LzEwOiB0Y2cvYXJtOiBVc2UgbGRyIChsaXRlcmFsKSBmb3IgZ290b190Yi4u
-LgpDaGVja2luZyBQQVRDSCA5LzEwOiBSZXZlcnQgInRhcmdldC9hYXJjaDY0OiBvcHRpbWl6ZSBp
-bmRpcmVjdCBicmFuY2hlcyIuLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMTA6IHRjZzogUmVtb3ZlIHRi
-X2h0YWJsZV9sb29rdXAgZnJvbSBoZWxwZXJfbG9va3VwX3RiX3B0ci4uLgo9PT0gT1VUUFVUIEVO
-RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVy
-YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
-c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+This doesn't reproduce with the latest version of QEMU, you may close
+it.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1047576
+
+Title:
+  qemu unittest emulator failure on latest git master
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Running the emulator unittest, using the cmdline:
+
+  16:01:30 INFO | Running emulator
+  16:01:30 INFO | Running qemu command (reformatted):
+  16:01:30 INFO | /home/lmr/Code/autotest.git/autotest/client/tests/virt/kv=
+m/qemu =
+
+  16:01:30 INFO |     -S =
+
+  16:01:30 INFO |     -name 'unittest_vm' =
+
+  16:01:30 INFO |     -nodefaults =
+
+  16:01:30 INFO |     -chardev socket,id=3Dhmp_id_humanmonitor1,path=3D/tmp=
+/monitor-humanmonitor1-20120907-155940-WomlFZY3,server,nowait =
+
+  16:01:30 INFO |     -mon chardev=3Dhmp_id_humanmonitor1,mode=3Dreadline =
+
+  16:01:30 INFO |     -chardev socket,id=3Dserial_id_20120907-155940-WomlFZ=
+Y3,path=3D/tmp/serial-20120907-155940-WomlFZY3,server,nowait =
+
+  16:01:30 INFO |     -device isa-serial,chardev=3Dserial_id_20120907-15594=
+0-WomlFZY3 =
+
+  16:01:30 INFO |     -chardev socket,id=3Dseabioslog_id_20120907-155940-Wo=
+mlFZY3,path=3D/tmp/seabios-20120907-155940-WomlFZY3,server,nowait =
+
+  16:01:30 INFO |     -device isa-debugcon,chardev=3Dseabioslog_id_20120907=
+-155940-WomlFZY3,iobase=3D0x402 =
+
+  16:01:30 INFO |     -m 512 =
+
+  16:01:30 INFO |     -smp 2,cores=3D1,threads=3D1,sockets=3D2 =
+
+  16:01:30 INFO |     -kernel '/home/lmr/Code/autotest.git/autotest/client/=
+tests/virt/kvm/unittests/emulator.flat' =
+
+  16:01:30 INFO |     -vnc :0 =
+
+  16:01:30 INFO |     -chardev file,id=3Dtestlog,path=3D/tmp/testlog-201209=
+07-155940-WomlFZY3 =
+
+  16:01:30 INFO |     -device testdev,chardev=3Dtestlog =
+
+  16:01:30 INFO |     -rtc base=3Dutc,clock=3Dhost,driftfix=3Dnone  =
+
+  16:01:30 INFO |     -boot order=3Dcdn,once=3Dc,menu=3Doff   =
+
+  16:01:30 INFO |     -S =
+
+  16:01:30 INFO |     -enable-kvm
+
+  We get
+
+  16:01:32 INFO | Waiting for unittest emulator to complete, timeout 600, o=
+utput in /tmp/testlog-20120907-155940-WomlFZY3
+  16:01:32 INFO | [qemu output] KVM internal error. Suberror: 1
+  16:01:32 INFO | [qemu output] emulation failure
+  16:01:32 INFO | [qemu output] RAX=3Dffffffffffffeff8 RBX=3Dffffffffffffe0=
+00 RCX=3Dfffffffffffff000 RDX=3D000000000044d2b0
+  16:01:32 INFO | [qemu output] RSI=3D000000000044c9fa RDI=3D000000000044e3=
+70 RBP=3Dffffffffffffeff8 RSP=3D000000000044d2b0
+  16:01:32 INFO | [qemu output] R8 =3D000000000000000a R9 =3D00000000000003=
+f8 R10=3D0000000000000000 R11=3D0000000000000000
+  16:01:32 INFO | [qemu output] R12=3Dffffffffffffe000 R13=3D000000001fff60=
+00 R14=3D000000001fff5000 R15=3D0000000000000000
+  16:01:32 INFO | [qemu output] RIP=3D0000000000400a89 RFL=3D00010002 [----=
+---] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HLT=3D0
+  16:01:32 INFO | [qemu output] ES =3D0010 0000000000000000 ffffffff 00c093=
+00 DPL=3D0 DS   [-WA]
+  16:01:32 INFO | [qemu output] CS =3D0008 0000000000000000 ffffffff 00a09b=
+00 DPL=3D0 CS64 [-RA]
+  16:01:32 INFO | [qemu output] SS =3D0000 0000000000000000 ffffffff 000000=
+00
+  16:01:32 INFO | [qemu output] DS =3D0010 0000000000000000 ffffffff 00c093=
+00 DPL=3D0 DS   [-WA]
+  16:01:32 INFO | [qemu output] FS =3D0010 0000000000000000 ffffffff 00c093=
+00 DPL=3D0 DS   [-WA]
+  16:01:32 INFO | [qemu output] GS =3D0010 000000000044c370 ffffffff 00c093=
+00 DPL=3D0 DS   [-WA]
+  16:01:32 INFO | [qemu output] LDT=3D0000 0000000000000000 0000ffff 000082=
+00 DPL=3D0 LDT
+  16:01:32 INFO | [qemu output] TR =3D0048 000000000040a452 0000ffff 00008b=
+00 DPL=3D0 TSS64-busy
+  16:01:32 INFO | [qemu output] GDT=3D     000000000040a00a 00000447
+  16:01:32 INFO | [qemu output] IDT=3D     0000000000000000 00000fff
+  16:01:32 INFO | [qemu output] CR0=3D80010011 CR2=3D0000000000000000 CR3=
+=3D000000001ffff000 CR4=3D00000020
+  16:01:32 INFO | [qemu output] DR0=3D0000000000000000 DR1=3D00000000000000=
+00 DR2=3D0000000000000000 DR3=3D0000000000000000
+  16:01:32 INFO | [qemu output] DR6=3D00000000ffff0ff0 DR7=3D00000000000004=
+00
+  16:01:32 INFO | [qemu output] EFER=3D0000000000000500
+  16:01:32 INFO | [qemu output] Code=3D88 77 00 49 8d 84 24 f8 0f 00 00 48 =
+89 e2 48 89 e9 48 89 c5 <c9> 48 87 e2 48 87 e9 48 81 f9 99 88 77 00 0f 94 c=
+0 48 39 d5 40 0f 94 c6 40 0f b6 f6 21 c6
+
+  More logs will be attached to this bug report.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1047576/+subscriptions
