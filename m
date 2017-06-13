@@ -1,35 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59490)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dKf2d-0002Nz-Me
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 02:11:04 -0400
+	(envelope-from <peterx@redhat.com>) id 1dKfF4-00065Z-VY
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 02:23:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dKf2a-0003if-CZ
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 02:11:03 -0400
-Received: from mga03.intel.com ([134.134.136.65]:45953)
+	(envelope-from <peterx@redhat.com>) id 1dKfF1-0006pb-Ob
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 02:23:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46270)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dKf2a-0003iV-3Y
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 02:11:00 -0400
-Message-ID: <593F827A.9000106@intel.com>
-Date: Tue, 13 Jun 2017 14:13:14 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dKfF1-0006pK-IA
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 02:23:51 -0400
+Date: Tue, 13 Jun 2017 14:23:44 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170613062344.GE11751@pxdev.xzpeter.org>
+References: <1496828798-27548-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170607094729eucas1p15097f154039365d5e135f92b72aad1bf@eucas1p1.samsung.com>
+	<1496828798-27548-8-git-send-email-a.perevalov@samsung.com>
+	<20170613055949.GD11751@pxdev.xzpeter.org>
+	<70f69591-8f94-8171-8a6b-684120723e0c@samsung.com>
 MIME-Version: 1.0
-References: <1496653049-44530-1-git-send-email-wei.w.wang@intel.com>
-	<20170605182514-mutt-send-email-mst@kernel.org>
-	<5937511D.5070205@intel.com>
-	<20170608220006-mutt-send-email-mst@kernel.org>
-	<593A0F47.5080806@intel.com> <593E5F46.5080704@intel.com>
-	<20170612234035-mutt-send-email-mst@kernel.org>
-	<593F57C0.9080701@intel.com>
-	<4639c51b-32a6-3528-2ed6-c5f6296b6300@redhat.com>
-	<593F6133.9050804@intel.com>
-	<65faf3f9-a839-0b04-c740-6b2a60a51cf6@redhat.com>
-	<fce1c1be-4105-3fd9-c734-987b85376cf9@redhat.com>
-In-Reply-To: <fce1c1be-4105-3fd9-c734-987b85376cf9@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v1] virtio-net: enable
- configurable tx queue size
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <70f69591-8f94-8171-8a6b-684120723e0c@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH v8 07/11] migration: add bitmap for copied
+ page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,28 +31,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "stefanha@gmail.com" <stefanha@gmail.com>, "armbru@redhat.com" <armbru@redhat.com>, "jan.scheurich@ericsson.com" <jan.scheurich@ericsson.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, i.maximets@samsung.com
 
-On 06/13/2017 11:59 AM, Jason Wang wrote:
->
-> On 2017年06月13日 11:55, Jason Wang wrote:
->> The issue is what if there's a mismatch of max #sgs between qemu and
->> vhost?
->>
->>> When the vhost backend is used, QEMU is not involved in the data
->>> path. The vhost backend
->>> directly gets what is offered by the guest from the vq.
-> FYI, qemu will try to fallback to userspace if there's something wrong
-> with vhost-kernel (e.g the IOMMU support). This doesn't work for
-> vhost-user actually, but it works for vhost-kernel.
->
-> Thanks
->
+On Tue, Jun 13, 2017 at 09:10:46AM +0300, Alexey Perevalov wrote:
+> On 06/13/2017 08:59 AM, Peter Xu wrote:
+> >On Wed, Jun 07, 2017 at 12:46:34PM +0300, Alexey Perevalov wrote:
+> >>This patch adds ability to track down already copied
+> >>pages, it's necessary for calculation vCPU block time in
+> >>postcopy migration feature, maybe for restore after
+> >>postcopy migration failure.
+> >>Also it's necessary to solve shared memory issue in
+> >>postcopy livemigration. Information about copied pages
+> >>will be transferred to the software virtual bridge
+> >>(e.g. OVS-VSWITCHD), to avoid fallocate (unmap) for
+> >>already copied pages. fallocate syscall is required for
+> >>remmaped shared memory, due to remmaping itself blocks
+> >>ioctl(UFFDIO_COPY, ioctl in this case will end with EEXIT
+> >>error (struct page is exists after remmap).
+> >>
+> >>Bitmap is placed into RAMBlock as another postcopy/precopy
+> >>related bitmaps. Helpers are in migration/ram.c, due to
+> >>in this file is allowing to work with RAMBlock.
+> >>
+> >>Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> >Hi, Alexey,
+> >
+> >Besides all the existing comments, I would suggest you do all the
+> >copied_map things in this single patch, so that it'll be easier for
+> >others to work upon your work. E.g., move the bit_set() operations
+> >here as well (currently it was in followup patches, and looks like
+> >that's not enough since we need to capture copied_map even for precopy
+> >phase), then this single patch can ideally be separated from the whole
+> >series (and then I can work upon it :-).
+> >
+> >Or, please just let me know if you want me to do this for you. I can
+> >post this as a standalone patch, with your s-o-b if you allow.
+> 
+> Hello Peter,
+> I'm working with this patch in another patch series too.
+> (it's about QEMU's shared memory and OVS-VSWITCHD,
+> vhost-user use case).
+> So if you need that I could resend this patch as separate patch.
+> And it will be convenient to base both my patch set and you patches
+> on top of it.
 
-That wouldn't be a problem. When it falls back to the QEMU backend,
-the "max_chain_size" will be set according to the QEMU backend
-(e.g. 1023). Guest will read the max_chain_size register.
+That'll be great!  Then please post this as standalone patch.
 
-Best,
-Wei
+Thanks,
+
+-- 
+Peter Xu
