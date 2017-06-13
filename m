@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58990)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dKiX4-00041K-Rg
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 05:54:50 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dKiYK-0005DV-Qv
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 05:56:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dKiX4-0004dg-54
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 05:54:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59748)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dKiX3-0004dY-Uo
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 05:54:42 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E6051C05B1E6
-	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 09:54:40 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Tue, 13 Jun 2017 11:54:32 +0200
-Message-Id: <20170613095432.11623-3-quintela@redhat.com>
-In-Reply-To: <20170613095432.11623-1-quintela@redhat.com>
-References: <20170613095432.11623-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] migration: Don't create decompression
- threads if not enabled
+	(envelope-from <dgilbert@redhat.com>) id 1dKiYG-00055q-TW
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 05:56:00 -0400
+Date: Tue, 13 Jun 2017 10:55:50 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170613095549.GC2096@work-vm>
+References: <149685579678.12025.9278446121024037161.stgit@bahia.lan>
+	<149685584629.12025.14875914798241845062.stgit@bahia.lan>
+	<20170608040857.GV13397@umbus.fritz.box>
+	<20170608115410.2e7a2511@bahia.ttt.fr.ibm.com>
+	<20170612142456.GJ18542@umbus>
+	<20170613093359.4567ba94@bahia.ttt.fr.ibm.com>
+	<20170613080631.GB30171@umbus>
+	<20170613104003.233e21d5@bahia.ttt.fr.ibm.com>
+	<20170613090002.GA2096@work-vm>
+	<20170613112150.7f64171c@bahia.ttt.fr.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170613112150.7f64171c@bahia.ttt.fr.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 5/5] spapr: fix migration of ICPState
+ objects from/to older QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +32,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: Greg Kurz <groug@kaod.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>, Juan Quintela <quintela@redhat.com>
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+* Greg Kurz (groug@kaod.org) wrote:
+> On Tue, 13 Jun 2017 10:00:03 +0100
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> 
+> > * Greg Kurz (groug@kaod.org) wrote:
+> > > On Tue, 13 Jun 2017 16:06:31 +0800
+> > > David Gibson <david@gibson.dropbear.id.au> wrote:
+> > >   
+> > > > On Tue, Jun 13, 2017 at 09:33:59AM +0200, Greg Kurz wrote:  
+> > > [...]  
+> > > > > > > > > +static void pre_2_10_vmstate_register_dummy_icp(sPAPRMachineState *spapr, int i)
+> > > > > > > > > +{
+> > > > > > > > > +    bool *flag = &spapr->pre_2_10_ignore_icp[i];
+> > > > > > > > > +
+> > > > > > > > > +    g_assert(!*flag);        
+> > > > > > > > 
+> > > > > > > > Apart from this assert(), you never seem to test the values in the
+> > > > > > > > pre_2_10_ignore_icp() array, so it seems a bit pointless.
+> > > > > > > >       
+> > > > > > > 
+> > > > > > > There's the opposite check in pre_2_10_vmstate_unregister_dummy_icp().
+> > > > > > > But I agree it isn't really useful... but more because of paranoia :)      
+> > > > > > 
+> > > > > > I'm all for paranoid assert()s if they can be made using data readily
+> > > > > > to hand.  Adding a data structure just for the purpose of making an
+> > > > > > assert() later, not so much.
+> > > > > >     
+> > > > > 
+> > > > > It is also passed as opaque argument to vmstate_register(), where it is
+> > > > > used as a key when calling vmstate_unregister(). I could possibly pass
+> > > > > (void *) i instead, but I'm not a big fan of hijacking pointer arguments
+> > > > > to pass numbers.    
+> > > > 
+> > > > Ah, I see your point.  Creating an array, purely to generate arbitrary
+> > > > pointers is also kind of ugly, though.  Really the cpu_index / XICS
+> > > > server number makes sense to identify the vmstate, but it looks like
+> > > > vmstate_unregister() doesn't take that.
+> > > >   
+> > > 
+> > > Indeed... what about adding a vmstate_unregister_by_instance_id() then ?
+> > > 
+> > > Cc'ing Juan and David.  
+> > 
+> > So what's the problem with a (void *)i ?
+> 
+> https://stackoverflow.com/questions/8618637/what-does-it-mean-to-convert-int-to-void-or-vice-versa
+>
+> > It's simple, as long as you're
+> > not actually using the opaque anywhere it's easy.
+> > 
+> 
+> but as you say, since the opaque isn't used anywhere, it is probably
+> okay to pass (void *) i.
+
+Yes, I don't think we're ever casting back from the (void *) to an int
+so it feels pretty safe to me.
+
+> 
+> > Note from a quick glance at your patch;  will this work migrating
+> > from this 2.10 -> 2.9 ?  Are your dummy vmstate's really good enough for
+> > the 2.9 ?
+> > 
+> 
+> Yeah but I need to add some comments as David suggested.
+> 
+> The idea is that 2.9 used to create a bunch of objects at machine init,
+> that only get used when CPUs are plugged. With 2.10, these objects are
+> now created under the CPUs. When migrating from 2.10 to 2.9, we only need
+> to send the real objects. The dummy vmstate entries don't send anything
+> (.needed always returns false) since the corresponding objects in 2.9 aren't
+> being used and still have their default state.
+> 
+
+OK, that'll probably work.
+
+Dave
+
+> > Dave
+> > 
+> > 
+> > > --
+> > > Greg  
+> > 
+> > 
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+
 
 --
-
-I removed the [HACK] part because previous patch just check that
-compression pages are not received.
----
- migration/ram.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/migration/ram.c b/migration/ram.c
-index f2d1bce..d475cf5 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2234,6 +2234,9 @@ static void compress_threads_load_setup(void)
- {
-     int i, thread_count;
- 
-+    if (!migrate_use_compression()) {
-+        return;
-+    }
-     thread_count = migrate_decompress_threads();
-     decompress_threads = g_new0(QemuThread, thread_count);
-     decomp_param = g_new0(DecompressParam, thread_count);
-@@ -2255,6 +2258,9 @@ static void compress_threads_load_cleanup(void)
- {
-     int i, thread_count;
- 
-+    if (!migrate_use_compression()) {
-+        return;
-+    }
-     thread_count = migrate_decompress_threads();
-     for (i = 0; i < thread_count; i++) {
-         qemu_mutex_lock(&decomp_param[i].mutex);
--- 
-2.9.4
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
