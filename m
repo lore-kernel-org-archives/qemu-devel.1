@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56935)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dKexs-0000b3-UO
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 02:06:09 -0400
+	(envelope-from <chao.p.peng@linux.intel.com>) id 1dKeyx-000192-Qg
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 02:07:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dKexo-0002SM-Vu
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 02:06:08 -0400
-Received: from mga04.intel.com ([192.55.52.120]:43924)
+	(envelope-from <chao.p.peng@linux.intel.com>) id 1dKeyu-0002hw-Gs
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 02:07:15 -0400
+Received: from mga11.intel.com ([192.55.52.93]:21343)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dKexo-0002Rz-NE
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 02:06:04 -0400
-Message-ID: <593F8153.7080209@intel.com>
-Date: Tue, 13 Jun 2017 14:08:19 +0800
-From: Wei Wang <wei.w.wang@intel.com>
-MIME-Version: 1.0
-References: <1496653049-44530-1-git-send-email-wei.w.wang@intel.com>
-	<20170605182514-mutt-send-email-mst@kernel.org>
-	<5937511D.5070205@intel.com>
-	<20170608220006-mutt-send-email-mst@kernel.org>
-	<593A0F47.5080806@intel.com> <593E5F46.5080704@intel.com>
-	<20170612234035-mutt-send-email-mst@kernel.org>
-	<593F57C0.9080701@intel.com>
-	<4639c51b-32a6-3528-2ed6-c5f6296b6300@redhat.com>
-	<593F6133.9050804@intel.com>
-	<65faf3f9-a839-0b04-c740-6b2a60a51cf6@redhat.com>
-In-Reply-To: <65faf3f9-a839-0b04-c740-6b2a60a51cf6@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(Exim 4.71) (envelope-from <chao.p.peng@linux.intel.com>)
+	id 1dKeyu-0002hN-8R
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 02:07:12 -0400
+Message-ID: <1497334024.13717.8.camel@linux.intel.com>
+From: Chao Peng <chao.p.peng@linux.intel.com>
+Date: Tue, 13 Jun 2017 14:07:04 +0800
+In-Reply-To: <20170524150753.GB23327@stefanha-x1.localdomain>
+References: <20170524150753.GB23327@stefanha-x1.localdomain>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v1] virtio-net: enable
- configurable tx queue size
+Subject: Re: [Qemu-devel] Status of q35-lite?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,55 +27,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "stefanha@gmail.com" <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "jan.scheurich@ericsson.com" <jan.scheurich@ericsson.com>, "armbru@redhat.com" <armbru@redhat.com>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, rjones@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
 
-On 06/13/2017 11:55 AM, Jason Wang wrote:
->
-> On 2017年06月13日 11:51, Wei Wang wrote:
->> On 06/13/2017 11:19 AM, Jason Wang wrote:
->>>
->>> On 2017年06月13日 11:10, Wei Wang wrote:
->>>> On 06/13/2017 04:43 AM, Michael S. Tsirkin wrote:
->>>>> On Mon, Jun 12, 2017 at 05:30:46PM +0800, Wei Wang wrote:
->>>>>> Ping for comments, thanks.
->>>>> This was only posted a week ago, might be a bit too short for some
->>>>> people.
->>>> OK, sorry for the push.
->>>>> A couple of weeks is more reasonable before you ping.  Also, I
->>>>> sent a bunch of comments on Thu, 8 Jun 2017.  You should probably
->>>>> address these.
->>>>>
->>>> I responded to the comments. The main question is that I'm not sure
->>>> why we need the vhost backend to support VIRTIO_F_MAX_CHAIN_SIZE.
->>>> IMHO, that should be a feature proposed to solve the possible issue
->>>> caused by the QEMU implemented backend.
->>> The issue is what if there's a mismatch of max #sgs between qemu and
->>> vhost?
->>>
->> When the vhost backend is used, QEMU is not involved in the data path.
->> The vhost backend
->> directly gets what is offered by the guest from the vq. Why would
->> there be a mismatch of
->> max #sgs between QEMU and vhost, and what is the QEMU side max #sgs
->> used for? Thanks.
-> You need query the backend max #sgs in this case at least. no? If not
-> how do you know the value is supported by the backend?
->
-> Thanks
->
-Here is my thought: vhost backend has already been supporting 1024 sgs,
-so I think it might not be necessary to query the max sgs that the vhost
-backend supports. In the setup phase, when QEMU detects the backend is
-vhost, it assumes 1024 max sgs is supported, instead of giving an extra
-call to query.
+On Wed, 2017-05-24 at 16:07 +0100, Stefan Hajnoczi wrote:
+> Hi Chao,
+> Last year there was an effort to make "built-in" hardware optional so
+> that VMs can be launched with a minimal set of devices.  You made
+> SATA,
+> PIT, and SMBus optional.
+> 
+> What is the current status of this work?
+> 
+> Are there more devices that could benefit from an optional switch?
 
-The advantage is that people who is using the vhost backend can upgrade
-to use 1024 tx queue size by only applying the QEMU patches. Adding an extra
-call to query the size would need to patch their vhost backend (like 
-vhost-user),
-which is difficult for them.
+Hi Stefan, in terms of making device optional, we don't have more
+follow-ups basically because other build-in devices do not have
+significant performance impact. For other optimizations (like
+optimizing/skipping BIOS), we are still working on them.
 
-
-Best,
-Wei
+Chao
+> 
+> For reference, here is the discussion that kicked of the effort to
+> make
+> some core devices optional:
+> "[RFC 0/9] Introduce light weight PC platform pc-lite"
+> https://lists.nongnu.org/archive/html/qemu-devel/2016-06/msg04842.html
+> 
+> Stefan
