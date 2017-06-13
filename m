@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1dKm4i-0008O7-Oy
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 09:41:41 -0400
+	(envelope-from <rkrcmar@redhat.com>) id 1dKmFg-0006uc-L5
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 09:53:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1dKm4f-00046g-LU
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 09:41:40 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:3945)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1dKm4f-00044e-1G
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 09:41:37 -0400
-References: <1497274251-26448-1-git-send-email-jianjay.zhou@huawei.com>
-	<20170612200315.GB16151@potion>
-From: Jay Zhou <jianjay.zhou@huawei.com>
-Message-ID: <593FEB6C.9060405@huawei.com>
-Date: Tue, 13 Jun 2017 21:41:00 +0800
+	(envelope-from <rkrcmar@redhat.com>) id 1dKmFd-0000QT-JS
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 09:53:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43135)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkrcmar@redhat.com>) id 1dKmFd-0000Q5-Aj
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 09:52:57 -0400
+Date: Tue, 13 Jun 2017 15:52:52 +0200
+From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Message-ID: <20170613135252.GA29382@potion>
+References: <1497273796-44720-1-git-send-email-jianjay.zhou@huawei.com>
+	<20170612195209.GA16151@potion> <593FD3E0.5070807@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20170612200315.GB16151@potion>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH RFC] migration: kvmclock: save and load the
- PVCLOCK_TSC_UNSTABLE_BIT flag when migration
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <593FD3E0.5070807@huawei.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH RFC] KVM: X86: save and load
+ PVCLOCK_TSC_UNSTABLE_BIT when migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +29,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, wangxinxin.wang@huawei.com, weidong.huang@huawei.com, arei.gonglei@huawei.com
+To: Jay Zhou <jianjay.zhou@huawei.com>
+Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, wangxinxin.wang@huawei.com, weidong.huang@huawei.com, arei.gonglei@huawei.com
 
-Hi Radim,
+2017-06-13 20:00+0800, Jay Zhou:
+> On 2017/6/13 3:52, Radim Kr=C4=8Dm=C3=A1=C5=99 wrote:
+> > If you get a timestamp from KVM_GET_CLOCK() and pass that to
+> > KVM_SET_CLOCK(), then kvmclock should not jump backwards anymore
+> > (it could before 4.9, but only if the host had stable tsc).
+>=20
+> If migrating from old KVMs to newer KVMs (v4.9+), the clock member
+> of struct KVMClockState is migrated to the destination side, but the
+> clock_is_reliable isn't migrated.
 
-On 2017/6/13 4:03, Radim Krčmář wrote:
-> 2017-06-12 21:30+0800, Jay Zhou:
->> Guest using kvmclock will be hanged when migrating from unstable
->> tsc host to stable tsc host occasionally.
->> Sometimes, the tsc timestamp saved at the source side will be
->> backward when the guest stopped, and this value is transferred
->> to the destination side. The guest at the destination side thought
->> kvmclock is stable, so the protection mechanism against time
->> going backwards is not used.
->> When the first time vcpu0 enters the guest at the destination
->> side to update the wall clock, the result of
->> pvclock_clocksource_read will be backward occasionally,
->> which results in the wall clock drift.
->>
->> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
->> ---
->> diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
->>
->>       if (running) {
->>           struct kvm_clock_data data = {};
->> +        uint8_t flags_at_migration;
->>
->>           /*
->>            * If the host where s->clock was read did not support reliable
->>            * KVM_GET_CLOCK, read kvmclock value from memory.
->>            */
->>           if (!s->clock_is_reliable) {
->
-> 'clock_is_reliable = true' on all newer KVMs (v4.9+), so I don't see a
-> reason to add a feature that can't be used.
+clock_is_reliable is migrated as a subsection on newer QEMUs.
 
-After rereading the codes, yes, I agree. Sorry to disturb.
+>                                   The value of clock_is_reliable is fal=
+se
+> at the source side, and it is true at the destination side.
 
->
->> -            uint64_t pvclock_via_mem = kvmclock_current_nsec(s);
->> +            uint64_t pvclock_via_mem = kvmclock_current_nsec(s,
->> +                                                    &flags_at_migration);
->
-> kvmclock_current_nsec() was introduced to work around the problem with
-> backward time, so we should understand why it returns a time that is
-> backwards if we want to do something for old KVMs ...
->
-> Is pvclock_via_mem < s->clock?
+clock_is_reliable is only set right after KVM_GET_CLOCK() and doesn't
+change on the destination side.
 
-Please see the other thread I replied to you when the bug occured.
+>                                                             Is it possi=
+ble
+> the clock member of struct KVMClockState migrated is smaller than the
+> last_value saved in the guest theoretically?
 
+KVM_GET_CLOCK() should return the kvmclock timestamp that would be seen
+by the guest at that time.  And KVM_SET_CLOCK() would set the timestamp
+so that a guest reading at that time would see it.
 
-Regards,
-Jay Zhou
+And because the guest is not running after KVM_GET_CLOCK() and before
+KVM_SET_CLOCK(), then it should never see a timestamp that goes
+backwards -- the kvmclock is going to readable until "X - epsilon" and
+from "X + epsilon", where X is the value QEMU got from KVM_GET_CLOCK().
+
+>                                              Could you explain more
+> why it should not jump backwards in the scenario of migrating from unst=
+able
+> tsc host to stable tsc host?
+
+KVM_GET_CLOCK() returns clock based on ktime_get_boot_ns() and unstable
+tsc host uses that to synchronize kvmclock on every VM entry, so the
+last time we can read inside the guest is exteremely unlikely to be
+larger that the value we get get from KVM_GET_CLOCK() after all VCPUs
+have been paused -- the guest would have to run without a VM exit for a
+really long time to make a delta of several microseconds.
+
+KVM does have a KVM_SET_CLOCK() bug on a stable TSC destination that
+could also shift the time, but that one could only be hit if the
+destination was waiting for a long time and I hope it doesn't happen in
+the wild, because we'd also be hitting it with stable source tsc.
+
+> > Can you provide the values used for KVM_GET_CLOCK and KVM_SET_CLOCK w=
+hen
+> > the bug occurs?
+>=20
+> I didn't print these values out when the bug occured, and I do not have=
+ the
+> physical machine with unstable tsc clocksource now. But I will try to
+> reproduce with the newest KVM and QEMU once I have.
+
+Great, thanks!
