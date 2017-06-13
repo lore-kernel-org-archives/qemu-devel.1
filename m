@@ -1,30 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dKg2l-0002Ki-N1
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 03:15:16 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1dKg3X-0002nK-3U
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 03:16:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dKg2i-0005CP-Hs
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 03:15:15 -0400
-Received: from 17.mo5.mail-out.ovh.net ([46.105.56.132]:44188)
+	(envelope-from <wei.w.wang@intel.com>) id 1dKg3T-0005ON-VP
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 03:16:03 -0400
+Received: from mga02.intel.com ([134.134.136.20]:32890)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dKg2i-00056I-BS
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 03:15:12 -0400
-Received: from player799.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id B6693105CFD
-	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 09:15:02 +0200 (CEST)
-Date: Tue, 13 Jun 2017 09:14:55 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170613091455.3f307990@bahia.ttt.fr.ibm.com>
-In-Reply-To: <20170612141546.GH18542@umbus>
-References: <149692935202.12119.3614006195497745877.stgit@bahia>
-	<149692939833.12119.5229563110691809599.stgit@bahia>
-	<20170612141546.GH18542@umbus>
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1dKg3T-0005OB-ML
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 03:15:59 -0400
+Message-ID: <593F9187.6040800@intel.com>
+Date: Tue, 13 Jun 2017 15:17:27 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/3OYybo+rKmN6zslidFMjOUT";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v4 5/6] xics: directly register ICPState
- objects to vmstate
+References: <1496653049-44530-1-git-send-email-wei.w.wang@intel.com>
+	<20170605182514-mutt-send-email-mst@kernel.org>
+	<5937511D.5070205@intel.com>
+	<20170608220006-mutt-send-email-mst@kernel.org>
+	<593A0F47.5080806@intel.com> <593E5F46.5080704@intel.com>
+	<20170612234035-mutt-send-email-mst@kernel.org>
+	<593F57C0.9080701@intel.com>
+	<4639c51b-32a6-3528-2ed6-c5f6296b6300@redhat.com>
+	<593F6133.9050804@intel.com>
+	<65faf3f9-a839-0b04-c740-6b2a60a51cf6@redhat.com>
+	<593F8153.7080209@intel.com>
+	<f8a64b2c-e769-4e9c-1cc6-ad31ea266010@redhat.com>
+In-Reply-To: <f8a64b2c-e769-4e9c-1cc6-ad31ea266010@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [PATCH v1]
+ virtio-net: enable configurable tx queue size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,103 +39,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>
+To: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "stefanha@gmail.com" <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "jan.scheurich@ericsson.com" <jan.scheurich@ericsson.com>, "armbru@redhat.com" <armbru@redhat.com>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
 
---Sig_/3OYybo+rKmN6zslidFMjOUT
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, 12 Jun 2017 22:15:46 +0800
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> On Thu, Jun 08, 2017 at 03:43:18PM +0200, Greg Kurz wrote:
-> > The ICPState objects are currently registered to vmstate as qdev object=
-s.
-> > Their instance ids are hence computed automatically in the migration co=
-de,
-> > and thus depends on the order the CPU cores were plugged.
-> >=20
-> > If the destination had its CPU cores plugged in a different order than =
-the
-> > source, then ICPState objects will have different instance_ids and load
-> > the wrong state.
-> >=20
-> > Since CPU objects have a reliable cpu_index which is already used as
-> > instance_id in vmstate, let's use it for ICPState as well.
-> >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org> =20
->=20
-> This is certainly an improvement.  You answered my query on the
-> previous version as to why this doesn't break migration, but that
-> information should go into the commit message.
->=20
-
-I'll add this explanation to the changelog.
-
-> So, ideally, we would use the XICS "server number" as the migration
-> key.  That's an architected part of the XICs state, since those values
-> are entered explicitly into the ICS.  We have a way to go from server
-> number to ICP at the moment, but not the reverse, but we can fix that.
->=20
-> Unfortunately I think those won't always match existing automatically
-> generated IDs, which makes things harder.
->=20
-
-Maybe things will get better when cpu_dt_id can be contiguous:
-
-http://www.spinics.net/lists/kvm/msg150390.html
-
-But I guess it won't help with existing machine types.
-
-> > ---
-> >  hw/intc/xics.c |    5 ++++-
-> >  1 file changed, 4 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> > index 7ccfb53c55a0..faa5c631f655 100644
-> > --- a/hw/intc/xics.c
-> > +++ b/hw/intc/xics.c
-> > @@ -344,10 +344,14 @@ static void icp_realize(DeviceState *dev, Error *=
-*errp)
-> >      }
-> > =20
-> >      qemu_register_reset(icp_reset, dev);
-> > +    vmstate_register(NULL, icp->cs->cpu_index, &vmstate_icp_server, ic=
-p);
-> >  }
-> > =20
-> >  static void icp_unrealize(DeviceState *dev, Error **errp)
-> >  {
-> > +    ICPState *icp =3D ICP(dev);
-> > +
-> > +    vmstate_unregister(NULL, &vmstate_icp_server, icp);
-> >      qemu_unregister_reset(icp_reset, dev);
-> >  }
-> > =20
-> > @@ -355,7 +359,6 @@ static void icp_class_init(ObjectClass *klass, void=
- *data)
-> >  {
-> >      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> > =20
-> > -    dc->vmsd =3D &vmstate_icp_server;
-> >      dc->realize =3D icp_realize;
-> >      dc->unrealize =3D icp_unrealize;
-> >  }
-> >  =20
->=20
+On 06/13/2017 02:29 PM, Jason Wang wrote:
+> The issue is what if there's a mismatch of max #sgs between qemu and
+>>>> When the vhost backend is used, QEMU is not involved in the data path.
+>>>> The vhost backend
+>>>> directly gets what is offered by the guest from the vq. Why would
+>>>> there be a mismatch of
+>>>> max #sgs between QEMU and vhost, and what is the QEMU side max #sgs
+>>>> used for? Thanks.
+>>> You need query the backend max #sgs in this case at least. no? If not
+>>> how do you know the value is supported by the backend?
+>>>
+>>> Thanks
+>>>
+>> Here is my thought: vhost backend has already been supporting 1024 sgs,
+>> so I think it might not be necessary to query the max sgs that the vhost
+>> backend supports. In the setup phase, when QEMU detects the backend is
+>> vhost, it assumes 1024 max sgs is supported, instead of giving an extra
+>> call to query.
+>
+> We can probably assume vhost kernel supports up to 1024 sgs. But how 
+> about for other vhost-user backends?
+>
+So far, I haven't seen any vhost backend implementation supporting less 
+than 1024 sgs.
 
 
---Sig_/3OYybo+rKmN6zslidFMjOUT
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+> And what you said here makes me ask one of my questions in the past:
+>
+> Do we have plan to extend 1024 to a larger value or 1024 looks good 
+> for the future years? If we only care about 1024, there's even no need 
+> for a new config filed, a feature flag is more than enough. If we want 
+> to extend it to e.g 2048, we definitely need to query vhost backend's 
+> limit (even for vhost-kernel).
+>
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+According to virtio spec (e.g. 2.4.4), unreasonably large descriptors are
+not encouraged to be used by the guest. If possible, I would suggest to use
+1024 as the largest number of descriptors that the guest can chain, even 
+when
+we have larger queue size in the future. That is,
+if (backend == QEMU backend)
+     config.max_chain_size = 1023 (defined by the qemu backend 
+implementation);
+else if (backend == vhost)
+     config.max_chain_size = 1024;
 
-iEYEARECAAYFAlk/kO8ACgkQAvw66wEB28KblACggR5z7P0w1pqItQp8H76jx3+K
-1xUAn3Dv7mi6SB5yEIZFoycHwJc7DNbM
-=O2ap
------END PGP SIGNATURE-----
+It is transparent to the guest. From the guest's point of view, all it 
+knows is a value
+given to him via reading config.max_chain_size.
 
---Sig_/3OYybo+rKmN6zslidFMjOUT--
+
+Best,
+Wei
