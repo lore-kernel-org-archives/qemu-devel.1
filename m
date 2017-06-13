@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dKhSp-0002Fc-FP
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 04:46:19 -0400
+	(envelope-from <berto@igalia.com>) id 1dKhVz-0003ky-G6
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 04:49:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dKhSm-0007Q4-C3
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 04:46:15 -0400
-Date: Tue, 13 Jun 2017 16:45:55 +0800
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170613084555.GG30171@umbus>
-References: <149734236294.28467.16891018961029258858.stgit@bahia.lan>
+	(envelope-from <berto@igalia.com>) id 1dKhVw-0000BW-Bz
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 04:49:31 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170611011427.6713-2-el13635@mail.ntua.gr>
+References: <20170611011427.6713-1-el13635@mail.ntua.gr>
+	<20170611011427.6713-2-el13635@mail.ntua.gr>
+Date: Tue, 13 Jun 2017 10:48:50 +0200
+Message-ID: <w5160g01de5.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="64j1qyTOoGvYcHb1"
-Content-Disposition: inline
-In-Reply-To: <149734236294.28467.16891018961029258858.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH] spapr: exit gentfully when CPU doesn't
- support requested compat mode
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH RFC v2 1/2] block: move ThrottleGroup
+ membership to ThrottleGroupMember
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,71 +23,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Andrea Bolognani <abologna@redhat.com>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org
 
+On Sun 11 Jun 2017 03:14:26 AM CEST, Manos Pitsidianakis wrote:
+> This commit gathers ThrottleGroup membership details from BlockBackendPublic
+> into ThrottleGroupMember and refactors existing code to use the structure.
+> --- a/block/throttle-groups.c
+> +++ b/block/throttle-groups.c
+> @@ -29,43 +29,6 @@
+>  #include "qemu/thread.h"
+>  #include "sysemu/qtest.h"
+>  
+> -/* The ThrottleGroup structure (with its ThrottleState) is shared
+> - * among different BlockBackends and it's independent from
+> - * AioContext, so in order to use it from different threads it needs
+> - * its own locking.
+> - *
+> - * This locking is however handled internally in this file, so it's
+> - * transparent to outside users.
+> - *
+> - * The whole ThrottleGroup structure is private and invisible to
+> - * outside users, that only use it through its ThrottleState.
+> - *
+> - * In addition to the ThrottleGroup structure, BlockBackendPublic has
+> - * fields that need to be accessed by other members of the group and
+> - * therefore also need to be protected by this lock. Once a
+> - * BlockBackend is registered in a group those fields can be accessed
+> - * by other threads any time.
+> - *
+> - * Again, all this is handled internally and is mostly transparent to
+> - * the outside. The 'throttle_timers' field however has an additional
+> - * constraint because it may be temporarily invalid (see for example
+> - * bdrv_set_aio_context()). Therefore in this file a thread will
+> - * access some other BlockBackend's timers only after verifying that
+> - * that BlockBackend has throttled requests in the queue.
+> - */
+> -typedef struct ThrottleGroup {
+> -    char *name; /* This is constant during the lifetime of the group */
+> -
+> -    QemuMutex lock; /* This lock protects the following four fields */
+> -    ThrottleState ts;
+> -    QLIST_HEAD(, BlockBackendPublic) head;
+> -    BlockBackend *tokens[2];
+> -    bool any_timer_armed[2];
+> -
+> -    /* These two are protected by the global throttle_groups_lock */
+> -    unsigned refcount;
+> -    QTAILQ_ENTRY(ThrottleGroup) list;
+> -} ThrottleGroup;
 
---64j1qyTOoGvYcHb1
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Wait a minute, why do you need to move this structure to a header file?
 
-On Tue, Jun 13, 2017 at 10:26:02AM +0200, Greg Kurz wrote:
-> QEMU currently aborts if the user asks something unrealistic like power9
-> compat mode with a POWER8 CPU for example. Since this isn't a bug in QEMU,
-> there's no point in aborting. The same goes with the other possible error
-> paths in ppc_set_compat_all(). Let's just terminate QEMU instead.
->=20
-> Reported-by: Andrea Bolognani <abologna@redhat.com>
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+The idea is that ThrottleGroup, its members and locking rules are
+handled internally in throttle-groups.c. In particular we don't want to
+have to expose this QemuMutex and its locking rules to the outside.
 
-Heh, I already folded an identical fix into ppc-for-2.10.
-
-
-> ---
->  hw/ppc/spapr.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index b2217f39eeea..d0cc124935c0 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1345,7 +1345,7 @@ static void ppc_spapr_reset(void)
->          spapr_ovec_cleanup(spapr->ov5_cas);
->          spapr->ov5_cas =3D spapr_ovec_new();
-> =20
-> -        ppc_set_compat_all(spapr->max_compat_pvr, &error_abort);
-> +        ppc_set_compat_all(spapr->max_compat_pvr, &error_fatal);
->      }
-> =20
->      fdt =3D spapr_build_fdt(spapr, rtas_addr, spapr->rtas_size);
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---64j1qyTOoGvYcHb1
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZP6ZAAAoJEGw4ysog2bOS96gQAK/9OZoP5gmsRE6f/pNGGNSj
-M4X3UmjY4FyTUtNX3qDassEAL9xrlF7Ljgme8F69W02MQ9QuR7UB3E+bk2DKNqjS
-fNAVYPmklvrxZSRI/fg4CcMOw3F+AXsH6plkWZRWdh4HhVULy73rSikkDFs5pxT7
-g+dBWdivV+VEevgiSyvd5LZ7QZ4tUwb9HsUlU075pG6x9NV0s6Kec3UQhJ5afH9w
-rQsCs2Dy1pygvqU4tZYHHqaeGqAvaMkfoSDuhywbkBsZhLcSLrLeY9m5iIzWucYM
-c0tLuE6tDQUOGtfBXs7rOExNmYYZ7vpgBS1iar/2dVCPLN1wZZv9XOHuc1TwclW4
-Rt2K5mgMGSjHkUy/l7q5CZ+VoAwNimoXiScqZxXSfwziQKZtgs/o6nhALUGehAPc
-VXUbZDS9WGY3rNl3ACPdrv3LNng8WpH3Id1saATCplG49awF1FcqF0rr/AJl9N/C
-P61f/a5vtj151qu8cTTuKr+hsxSrXozOdxnwYmPXaX85aC6VJ57BHLqJbDxLr60X
-+nNpQplT7D4ytvljbtOZAPWWRQF0DFUiSGSRd2jBceeKAkYqrSsXfGilMFaAu8Ar
-uZLNkL4n0xwNilcucOmF3sE+TRhDndsGYpfIiSEMSsHIavnjJqRplToIq+donJ4p
-kk71we7PFFECY8F6ZH6j
-=IRqv
------END PGP SIGNATURE-----
-
---64j1qyTOoGvYcHb1--
+Berto
