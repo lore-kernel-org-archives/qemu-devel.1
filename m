@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37804)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dKsJT-0005zp-GC
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 16:21:21 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dKsJX-00062x-FK
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 16:21:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dKsJS-0001Rg-8j
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 16:21:19 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dKsJV-0001Sl-Pp
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 16:21:23 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Tue, 13 Jun 2017 22:20:51 +0200
-Message-Id: <20170613202107.10125-1-mreitz@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 00/16] block: Preallocated truncate
+Date: Tue, 13 Jun 2017 22:20:52 +0200
+Message-Id: <20170613202107.10125-2-mreitz@redhat.com>
+In-Reply-To: <20170613202107.10125-1-mreitz@redhat.com>
+References: <20170613202107.10125-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 01/16] block: Add PreallocMode to
+ BD.bdrv_truncate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,122 +23,353 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-=3D=3D=3D Series dependencies =3D=3D=3D
+Add a PreallocMode parameter to the bdrv_truncate() function implemented
+by each block driver. Currently, we always pass PREALLOC_MODE_OFF and no
+driver accepts anything else.
 
-This series depends on v7 of Stefan's series
-"qemu-img: add measure sub-command"
-(http://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg03035.html).
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ include/block/block_int.h |  3 ++-
+ block.c                   |  2 +-
+ block/blkdebug.c          |  9 ++++++++-
+ block/crypto.c            |  8 +++++++-
+ block/file-posix.c        |  9 ++++++++-
+ block/file-win32.c        |  9 ++++++++-
+ block/gluster.c           |  8 +++++++-
+ block/iscsi.c             |  9 ++++++++-
+ block/nfs.c               |  9 ++++++++-
+ block/qcow2.c             |  9 ++++++++-
+ block/qed.c               |  9 ++++++++-
+ block/raw-format.c        |  9 ++++++++-
+ block/rbd.c               |  9 ++++++++-
+ block/sheepdog.c          | 11 +++++++++--
+ 14 files changed, 98 insertions(+), 15 deletions(-)
 
-
-=3D=3D=3D Actual cover letter =3D=3D=3D
-
-This series adds preallocation to bdrv_truncate() and subsequently
-qemu-img resize. This is implemented for qcow2 and raw only, just like
-preallocation for newly created images is. There is no runtime interface
-for this new parameter (yet).
-
-
-v4:
-- Patch 4:
-  - Note bug fix in commit message [Eric]
-  - "...may result in *slightly* more data being allocated..." [Eric]
-- Patch 11:
-  - Drop the "image may now occupy more space than necessary" note --
-    that's always the case when preallocation failed, and I don't really
-    want to mention it everywhere
-  - Flush metadata after preallocation [Stefan]
-
-
-git-backport-diff against v3:
-
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream pat=
-ch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respec=
-tively
-
-001/16:[----] [--] 'block: Add PreallocMode to BD.bdrv_truncate()'
-002/16:[----] [--] 'block: Add PreallocMode to bdrv_truncate()'
-003/16:[----] [--] 'block: Add PreallocMode to blk_truncate()'
-004/16:[0002] [FC] 'qemu-img: Expose PreallocMode for resizing'
-005/16:[----] [--] 'block/file-posix: Small fixes in raw_create()'
-006/16:[----] [--] 'block/file-posix: Extract raw_regular_truncate()'
-007/16:[----] [--] 'block/file-posix: Generalize raw_regular_truncate'
-008/16:[----] [--] 'block/file-posix: Preallocation for truncate'
-009/16:[----] [--] 'block/qcow2: Generalize preallocate()'
-010/16:[----] [--] 'block/qcow2: Lock s->lock in preallocate()'
-011/16:[0013] [FC] 'block/qcow2: Metadata preallocation for truncate'
-012/16:[----] [--] 'block/qcow2: Add qcow2_refcount_area()'
-013/16:[----] [--] 'block/qcow2: Rename "fail_block" to just "fail"'
-014/16:[----] [--] 'block/qcow2: falloc/full preallocating growth'
-015/16:[----] [--] 'iotests: Add preallocated resize test for raw'
-016/16:[----] [--] 'iotests: Add preallocated growth test for qcow2'
-
-
-Max Reitz (16):
-  block: Add PreallocMode to BD.bdrv_truncate()
-  block: Add PreallocMode to bdrv_truncate()
-  block: Add PreallocMode to blk_truncate()
-  qemu-img: Expose PreallocMode for resizing
-  block/file-posix: Small fixes in raw_create()
-  block/file-posix: Extract raw_regular_truncate()
-  block/file-posix: Generalize raw_regular_truncate
-  block/file-posix: Preallocation for truncate
-  block/qcow2: Generalize preallocate()
-  block/qcow2: Lock s->lock in preallocate()
-  block/qcow2: Metadata preallocation for truncate
-  block/qcow2: Add qcow2_refcount_area()
-  block/qcow2: Rename "fail_block" to just "fail"
-  block/qcow2: falloc/full preallocating growth
-  iotests: Add preallocated resize test for raw
-  iotests: Add preallocated growth test for qcow2
-
- block/qcow2.h                  |   9 +
- include/block/block.h          |   3 +-
- include/block/block_int.h      |   3 +-
- include/sysemu/block-backend.h |   3 +-
- block.c                        |   5 +-
- block/blkdebug.c               |   5 +-
- block/block-backend.c          |   5 +-
- block/commit.c                 |   4 +-
- block/crypto.c                 |   4 +-
- block/file-posix.c             | 201 +++++++++++++--------
- block/file-win32.c             |   9 +-
- block/gluster.c                |   8 +-
- block/iscsi.c                  |   9 +-
- block/mirror.c                 |   3 +-
- block/nfs.c                    |   9 +-
- block/parallels.c              |  13 +-
- block/qcow.c                   |   8 +-
- block/qcow2-refcount.c         | 277 +++++++++++++++++++----------
- block/qcow2.c                  | 205 +++++++++++++++++++---
- block/qed.c                    |  11 +-
- block/raw-format.c             |   5 +-
- block/rbd.c                    |   9 +-
- block/sheepdog.c               |  11 +-
- block/vdi.c                    |   3 +-
- block/vhdx-log.c               |   2 +-
- block/vhdx.c                   |   8 +-
- block/vmdk.c                   |   7 +-
- block/vpc.c                    |   2 +-
- blockdev.c                     |   2 +-
- qemu-img.c                     |  33 +++-
- qemu-io-cmds.c                 |   2 +-
- qemu-img.texi                  |   7 +-
- tests/qemu-iotests/044.out     |   2 +-
- tests/qemu-iotests/106         |  92 ++++++++++
- tests/qemu-iotests/106.out     |  50 ++++++
- tests/qemu-iotests/125         | 130 ++++++++++++++
- tests/qemu-iotests/125.out     | 386 +++++++++++++++++++++++++++++++++++=
-++++++
- tests/qemu-iotests/group       |   2 +
- 38 files changed, 1313 insertions(+), 234 deletions(-)
- create mode 100755 tests/qemu-iotests/106
- create mode 100644 tests/qemu-iotests/106.out
- create mode 100755 tests/qemu-iotests/125
- create mode 100644 tests/qemu-iotests/125.out
-
---=20
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 614cec9..31ae4c1 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -203,7 +203,8 @@ struct BlockDriver {
+     int coroutine_fn (*bdrv_co_flush_to_os)(BlockDriverState *bs);
+ 
+     const char *protocol_name;
+-    int (*bdrv_truncate)(BlockDriverState *bs, int64_t offset, Error **errp);
++    int (*bdrv_truncate)(BlockDriverState *bs, int64_t offset,
++                         PreallocMode prealloc, Error **errp);
+ 
+     int64_t (*bdrv_getlength)(BlockDriverState *bs);
+     bool has_variable_length;
+diff --git a/block.c b/block.c
+index 056400a..2fdb8a5 100644
+--- a/block.c
++++ b/block.c
+@@ -3417,7 +3417,7 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, Error **errp)
+ 
+     assert(!(bs->open_flags & BDRV_O_INACTIVE));
+ 
+-    ret = drv->bdrv_truncate(bs, offset, errp);
++    ret = drv->bdrv_truncate(bs, offset, PREALLOC_MODE_OFF, errp);
+     if (ret == 0) {
+         ret = refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
+         bdrv_dirty_bitmap_truncate(bs);
+diff --git a/block/blkdebug.c b/block/blkdebug.c
+index a5196e8..00090aa 100644
+--- a/block/blkdebug.c
++++ b/block/blkdebug.c
+@@ -812,8 +812,15 @@ static int64_t blkdebug_getlength(BlockDriverState *bs)
+     return bdrv_getlength(bs->file->bs);
+ }
+ 
+-static int blkdebug_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
++static int blkdebug_truncate(BlockDriverState *bs, int64_t offset,
++                             PreallocMode prealloc, Error **errp)
+ {
++    if (prealloc != PREALLOC_MODE_OFF) {
++        error_setg(errp, "Unsupported preallocation mode '%s'",
++                   PreallocMode_lookup[prealloc]);
++        return -ENOTSUP;
++    }
++
+     return bdrv_truncate(bs->file, offset, errp);
+ }
+ 
+diff --git a/block/crypto.c b/block/crypto.c
+index 10e5ddc..7047cb2 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -382,12 +382,18 @@ static int block_crypto_create_generic(QCryptoBlockFormat format,
+ }
+ 
+ static int block_crypto_truncate(BlockDriverState *bs, int64_t offset,
+-                                 Error **errp)
++                                 PreallocMode prealloc, Error **errp)
+ {
+     BlockCrypto *crypto = bs->opaque;
+     size_t payload_offset =
+         qcrypto_block_get_payload_offset(crypto->block);
+ 
++    if (prealloc != PREALLOC_MODE_OFF) {
++        error_setg(errp, "Unsupported preallocation mode '%s'",
++                   PreallocMode_lookup[prealloc]);
++        return -ENOTSUP;
++    }
++
+     offset += payload_offset;
+ 
+     return bdrv_truncate(bs->file, offset, errp);
+diff --git a/block/file-posix.c b/block/file-posix.c
+index de2d3a2..30d2245 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -1624,12 +1624,19 @@ static void raw_close(BlockDriverState *bs)
+     }
+ }
+ 
+-static int raw_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
++static int raw_truncate(BlockDriverState *bs, int64_t offset,
++                        PreallocMode prealloc, Error **errp)
+ {
+     BDRVRawState *s = bs->opaque;
+     struct stat st;
+     int ret;
+ 
++    if (prealloc != PREALLOC_MODE_OFF) {
++        error_setg(errp, "Unsupported preallocation mode '%s'",
++                   PreallocMode_lookup[prealloc]);
++        return -ENOTSUP;
++    }
++
+     if (fstat(s->fd, &st)) {
+         ret = -errno;
+         error_setg_errno(errp, -ret, "Failed to fstat() the file");
+diff --git a/block/file-win32.c b/block/file-win32.c
+index ef2910b..4706335 100644
+--- a/block/file-win32.c
++++ b/block/file-win32.c
+@@ -461,12 +461,19 @@ static void raw_close(BlockDriverState *bs)
+     }
+ }
+ 
+-static int raw_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
++static int raw_truncate(BlockDriverState *bs, int64_t offset,
++                        PreallocMode prealloc, Error **errp)
+ {
+     BDRVRawState *s = bs->opaque;
+     LONG low, high;
+     DWORD dwPtrLow;
+ 
++    if (prealloc != PREALLOC_MODE_OFF) {
++        error_setg(errp, "Unsupported preallocation mode '%s'",
++                   PreallocMode_lookup[prealloc]);
++        return -ENOTSUP;
++    }
++
+     low = offset;
+     high = offset >> 32;
+ 
+diff --git a/block/gluster.c b/block/gluster.c
+index 031596a..4cb5e63 100644
+--- a/block/gluster.c
++++ b/block/gluster.c
+@@ -1097,11 +1097,17 @@ static coroutine_fn int qemu_gluster_co_rw(BlockDriverState *bs,
+ }
+ 
+ static int qemu_gluster_truncate(BlockDriverState *bs, int64_t offset,
+-                                 Error **errp)
++                                 PreallocMode prealloc, Error **errp)
+ {
+     int ret;
+     BDRVGlusterState *s = bs->opaque;
+ 
++    if (prealloc != PREALLOC_MODE_OFF) {
++        error_setg(errp, "Unsupported preallocation mode '%s'",
++                   PreallocMode_lookup[prealloc]);
++        return -ENOTSUP;
++    }
++
+     ret = glfs_ftruncate(s->fd, offset);
+     if (ret < 0) {
+         ret = -errno;
+diff --git a/block/iscsi.c b/block/iscsi.c
+index 5daa201..61d5792 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -2059,11 +2059,18 @@ static void iscsi_reopen_commit(BDRVReopenState *reopen_state)
+     }
+ }
+ 
+-static int iscsi_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
++static int iscsi_truncate(BlockDriverState *bs, int64_t offset,
++                          PreallocMode prealloc, Error **errp)
+ {
+     IscsiLun *iscsilun = bs->opaque;
+     Error *local_err = NULL;
+ 
++    if (prealloc != PREALLOC_MODE_OFF) {
++        error_setg(errp, "Unsupported preallocation mode '%s'",
++                   PreallocMode_lookup[prealloc]);
++        return -ENOTSUP;
++    }
++
+     if (iscsilun->type != TYPE_DISK) {
+         error_setg(errp, "Cannot resize non-disk iSCSI devices");
+         return -ENOTSUP;
+diff --git a/block/nfs.c b/block/nfs.c
+index 848b2c0..be6073a 100644
+--- a/block/nfs.c
++++ b/block/nfs.c
+@@ -758,11 +758,18 @@ static int64_t nfs_get_allocated_file_size(BlockDriverState *bs)
+     return (task.ret < 0 ? task.ret : st.st_blocks * 512);
+ }
+ 
+-static int nfs_file_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
++static int nfs_file_truncate(BlockDriverState *bs, int64_t offset,
++                             PreallocMode prealloc, Error **errp)
+ {
+     NFSClient *client = bs->opaque;
+     int ret;
+ 
++    if (prealloc != PREALLOC_MODE_OFF) {
++        error_setg(errp, "Unsupported preallocation mode '%s'",
++                   PreallocMode_lookup[prealloc]);
++        return -ENOTSUP;
++    }
++
+     ret = nfs_ftruncate(client->context, client->fh, offset);
+     if (ret < 0) {
+         error_setg_errno(errp, -ret, "Failed to truncate file");
+diff --git a/block/qcow2.c b/block/qcow2.c
+index ff7f568..942befe 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2597,12 +2597,19 @@ static coroutine_fn int qcow2_co_pdiscard(BlockDriverState *bs,
+     return ret;
+ }
+ 
+-static int qcow2_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
++static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
++                          PreallocMode prealloc, Error **errp)
+ {
+     BDRVQcow2State *s = bs->opaque;
+     int64_t new_l1_size;
+     int ret;
+ 
++    if (prealloc != PREALLOC_MODE_OFF) {
++        error_setg(errp, "Unsupported preallocation mode '%s'",
++                   PreallocMode_lookup[prealloc]);
++        return -ENOTSUP;
++    }
++
+     if (offset & 511) {
+         error_setg(errp, "The new size must be a multiple of 512");
+         return -EINVAL;
+diff --git a/block/qed.c b/block/qed.c
+index 8d899fd..794b9af 100644
+--- a/block/qed.c
++++ b/block/qed.c
+@@ -1517,12 +1517,19 @@ static int coroutine_fn bdrv_qed_co_pwrite_zeroes(BlockDriverState *bs,
+     return cb.ret;
+ }
+ 
+-static int bdrv_qed_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
++static int bdrv_qed_truncate(BlockDriverState *bs, int64_t offset,
++                             PreallocMode prealloc, Error **errp)
+ {
+     BDRVQEDState *s = bs->opaque;
+     uint64_t old_image_size;
+     int ret;
+ 
++    if (prealloc != PREALLOC_MODE_OFF) {
++        error_setg(errp, "Unsupported preallocation mode '%s'",
++                   PreallocMode_lookup[prealloc]);
++        return -ENOTSUP;
++    }
++
+     if (!qed_is_image_size_valid(offset, s->header.cluster_size,
+                                  s->header.table_size)) {
+         error_setg(errp, "Invalid image size specified");
+diff --git a/block/raw-format.c b/block/raw-format.c
+index ac7453e..20134cb 100644
+--- a/block/raw-format.c
++++ b/block/raw-format.c
+@@ -352,10 +352,17 @@ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
+     }
+ }
+ 
+-static int raw_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
++static int raw_truncate(BlockDriverState *bs, int64_t offset,
++                        PreallocMode prealloc, Error **errp)
+ {
+     BDRVRawState *s = bs->opaque;
+ 
++    if (prealloc != PREALLOC_MODE_OFF) {
++        error_setg(errp, "Unsupported preallocation mode '%s'",
++                   PreallocMode_lookup[prealloc]);
++        return -ENOTSUP;
++    }
++
+     if (s->has_size) {
+         error_setg(errp, "Cannot resize fixed-size raw disks");
+         return -ENOTSUP;
+diff --git a/block/rbd.c b/block/rbd.c
+index e551639..4b3fadb 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -916,11 +916,18 @@ static int64_t qemu_rbd_getlength(BlockDriverState *bs)
+     return info.size;
+ }
+ 
+-static int qemu_rbd_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
++static int qemu_rbd_truncate(BlockDriverState *bs, int64_t offset,
++                             PreallocMode prealloc, Error **errp)
+ {
+     BDRVRBDState *s = bs->opaque;
+     int r;
+ 
++    if (prealloc != PREALLOC_MODE_OFF) {
++        error_setg(errp, "Unsupported preallocation mode '%s'",
++                   PreallocMode_lookup[prealloc]);
++        return -ENOTSUP;
++    }
++
+     r = rbd_resize(s->image, offset);
+     if (r < 0) {
+         error_setg_errno(errp, -r, "Failed to resize file");
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index a18315a..e3e4ad5 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -2153,13 +2153,20 @@ static int64_t sd_getlength(BlockDriverState *bs)
+     return s->inode.vdi_size;
+ }
+ 
+-static int sd_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
++static int sd_truncate(BlockDriverState *bs, int64_t offset,
++                       PreallocMode prealloc, Error **errp)
+ {
+     BDRVSheepdogState *s = bs->opaque;
+     int ret, fd;
+     unsigned int datalen;
+     uint64_t max_vdi_size;
+ 
++    if (prealloc != PREALLOC_MODE_OFF) {
++        error_setg(errp, "Unsupported preallocation mode '%s'",
++                   PreallocMode_lookup[prealloc]);
++        return -ENOTSUP;
++    }
++
+     max_vdi_size = (UINT64_C(1) << s->inode.block_size_shift) * MAX_DATA_OBJS;
+     if (offset < s->inode.vdi_size) {
+         error_setg(errp, "shrinking is not supported");
+@@ -2448,7 +2455,7 @@ static coroutine_fn int sd_co_writev(BlockDriverState *bs, int64_t sector_num,
+     BDRVSheepdogState *s = bs->opaque;
+ 
+     if (offset > s->inode.vdi_size) {
+-        ret = sd_truncate(bs, offset, NULL);
++        ret = sd_truncate(bs, offset, PREALLOC_MODE_OFF, NULL);
+         if (ret < 0) {
+             return ret;
+         }
+-- 
 2.9.4
