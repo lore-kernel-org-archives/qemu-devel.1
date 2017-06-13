@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dKmTe-0005KM-Ju
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 10:07:27 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dKmTf-0005LO-IA
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 10:07:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dKmTd-0006kE-8M
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 10:07:26 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dKmTZ-0006gg-Ar
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 10:07:27 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37257)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dKmTc-0006cz-W9
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 10:07:25 -0400
+	id 1dKmTZ-0006cz-2G
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 10:07:21 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1dKmTP-00012e-GU
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 15:07:11 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1dKmTU-00014t-MH
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 15:07:16 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Jun 2017 15:06:54 +0100
-Message-Id: <1497362826-21125-6-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 13 Jun 2017 15:07:02 +0100
+Message-Id: <1497362826-21125-14-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1497362826-21125-1-git-send-email-peter.maydell@linaro.org>
 References: <1497362826-21125-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 05/17] hw/arm/exynos: Move DRAM initialization
- next boards
+Subject: [Qemu-devel] [PULL 13/17] timer/aspeed: fix timer enablement when a
+ reload is not set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,177 +33,114 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Krzysztof Kozlowski <krzk@kernel.org>
+From: Cédric Le Goater <clg@kaod.org>
 
-Before QOM-ifying the Exynos4 SoC model, move the DRAM initialization
-from exynos4210.c to exynos4_boards.c because DRAM is board specific,
-not SoC.
+When a timer is enabled before a reload value is set, the controller
+waits for a reload value to be set before starting decrementing. This
+fix tries to cover that case by changing the timer expiry only when
+a reload value is valid.
 
-Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
+Message-id: 1496739312-32304-1-git-send-email-clg@kaod.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/exynos4210.h |  5 +----
- hw/arm/exynos4210.c         | 20 +-----------------
- hw/arm/exynos4_boards.c     | 50 ++++++++++++++++++++++++++++++++++++++-------
- 3 files changed, 45 insertions(+), 30 deletions(-)
+ hw/timer/aspeed_timer.c | 37 +++++++++++++++++++++++++++++--------
+ 1 file changed, 29 insertions(+), 8 deletions(-)
 
-diff --git a/include/hw/arm/exynos4210.h b/include/hw/arm/exynos4210.h
-index d9e0801..098a69e 100644
---- a/include/hw/arm/exynos4210.h
-+++ b/include/hw/arm/exynos4210.h
-@@ -93,8 +93,6 @@ typedef struct Exynos4210State {
-     MemoryRegion iram_mem;
-     MemoryRegion irom_mem;
-     MemoryRegion irom_alias_mem;
--    MemoryRegion dram0_mem;
--    MemoryRegion dram1_mem;
-     MemoryRegion boot_secondary;
-     MemoryRegion bootreg_mem;
-     I2CBus *i2c_if[EXYNOS4210_I2C_NUMBER];
-@@ -103,8 +101,7 @@ typedef struct Exynos4210State {
- void exynos4210_write_secondary(ARMCPU *cpu,
-         const struct arm_boot_info *info);
- 
--Exynos4210State *exynos4210_init(MemoryRegion *system_mem,
--        unsigned long ram_size);
-+Exynos4210State *exynos4210_init(MemoryRegion *system_mem);
- 
- /* Initialize exynos4210 IRQ subsystem stub */
- qemu_irq *exynos4210_init_irq(Exynos4210Irq *env);
-diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
-index 960f27e..0da877f 100644
---- a/hw/arm/exynos4210.c
-+++ b/hw/arm/exynos4210.c
-@@ -160,13 +160,11 @@ static uint64_t exynos4210_calc_affinity(int cpu)
-     return mp_affinity;
- }
- 
--Exynos4210State *exynos4210_init(MemoryRegion *system_mem,
--        unsigned long ram_size)
-+Exynos4210State *exynos4210_init(MemoryRegion *system_mem)
- {
-     int i, n;
-     Exynos4210State *s = g_new(Exynos4210State, 1);
-     qemu_irq gate_irq[EXYNOS4210_NCPUS][EXYNOS4210_IRQ_GATE_NINPUTS];
--    unsigned long mem_size;
-     DeviceState *dev;
-     SysBusDevice *busdev;
-     ObjectClass *cpu_oc;
-@@ -299,22 +297,6 @@ Exynos4210State *exynos4210_init(MemoryRegion *system_mem,
-     memory_region_add_subregion(system_mem, EXYNOS4210_IRAM_BASE_ADDR,
-                                 &s->iram_mem);
- 
--    /* DRAM */
--    mem_size = ram_size;
--    if (mem_size > EXYNOS4210_DRAM_MAX_SIZE) {
--        memory_region_init_ram(&s->dram1_mem, NULL, "exynos4210.dram1",
--                mem_size - EXYNOS4210_DRAM_MAX_SIZE, &error_fatal);
--        vmstate_register_ram_global(&s->dram1_mem);
--        memory_region_add_subregion(system_mem, EXYNOS4210_DRAM1_BASE_ADDR,
--                &s->dram1_mem);
--        mem_size = EXYNOS4210_DRAM_MAX_SIZE;
--    }
--    memory_region_init_ram(&s->dram0_mem, NULL, "exynos4210.dram0", mem_size,
--                           &error_fatal);
--    vmstate_register_ram_global(&s->dram0_mem);
--    memory_region_add_subregion(system_mem, EXYNOS4210_DRAM0_BASE_ADDR,
--            &s->dram0_mem);
--
-    /* PMU.
-     * The only reason of existence at the moment is that secondary CPU boot
-     * loader uses PMU INFORM5 register as a holding pen.
-diff --git a/hw/arm/exynos4_boards.c b/hw/arm/exynos4_boards.c
-index 4853c31..6240b26 100644
---- a/hw/arm/exynos4_boards.c
-+++ b/hw/arm/exynos4_boards.c
-@@ -22,6 +22,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "qemu-common.h"
- #include "cpu.h"
-@@ -56,6 +57,12 @@ typedef enum Exynos4BoardType {
-     EXYNOS4_NUM_OF_BOARDS
- } Exynos4BoardType;
- 
-+typedef struct Exynos4BoardState {
-+    Exynos4210State *soc;
-+    MemoryRegion dram0_mem;
-+    MemoryRegion dram1_mem;
-+} Exynos4BoardState;
-+
- static int exynos4_board_id[EXYNOS4_NUM_OF_BOARDS] = {
-     [EXYNOS4_BOARD_NURI]     = 0xD33,
-     [EXYNOS4_BOARD_SMDKC210] = 0xB16,
-@@ -96,9 +103,34 @@ static void lan9215_init(uint32_t base, qemu_irq irq)
+diff --git a/hw/timer/aspeed_timer.c b/hw/timer/aspeed_timer.c
+index 9b70ee0..50acbf5 100644
+--- a/hw/timer/aspeed_timer.c
++++ b/hw/timer/aspeed_timer.c
+@@ -130,15 +130,26 @@ static uint64_t calculate_next(struct AspeedTimer *t)
+             next = seq[1];
+         } else if (now < seq[2]) {
+             next = seq[2];
+-        } else {
++        } else if (t->reload) {
+             reload_ns = muldiv64(t->reload, NANOSECONDS_PER_SECOND, rate);
+             t->start = now - ((now - t->start) % reload_ns);
++        } else {
++            /* no reload value, return 0 */
++            break;
+         }
      }
+ 
+     return next;
  }
  
--static Exynos4210State *exynos4_boards_init_common(MachineState *machine,
--                                                   Exynos4BoardType board_type)
-+static void exynos4_boards_init_ram(Exynos4BoardState *s,
-+                                    MemoryRegion *system_mem,
-+                                    unsigned long ram_size)
++static void aspeed_timer_mod(AspeedTimer *t)
 +{
-+    unsigned long mem_size = ram_size;
-+
-+    if (mem_size > EXYNOS4210_DRAM_MAX_SIZE) {
-+        memory_region_init_ram(&s->dram1_mem, NULL, "exynos4210.dram1",
-+                               mem_size - EXYNOS4210_DRAM_MAX_SIZE,
-+                               &error_fatal);
-+        vmstate_register_ram_global(&s->dram1_mem);
-+        memory_region_add_subregion(system_mem, EXYNOS4210_DRAM1_BASE_ADDR,
-+                                    &s->dram1_mem);
-+        mem_size = EXYNOS4210_DRAM_MAX_SIZE;
++    uint64_t next = calculate_next(t);
++    if (next) {
++        timer_mod(&t->timer, next);
 +    }
-+
-+    memory_region_init_ram(&s->dram0_mem, NULL, "exynos4210.dram0", mem_size,
-+                           &error_fatal);
-+    vmstate_register_ram_global(&s->dram0_mem);
-+    memory_region_add_subregion(system_mem, EXYNOS4210_DRAM0_BASE_ADDR,
-+                                &s->dram0_mem);
 +}
 +
-+static Exynos4BoardState *
-+exynos4_boards_init_common(MachineState *machine,
-+                           Exynos4BoardType board_type)
+ static void aspeed_timer_expire(void *opaque)
  {
-+    Exynos4BoardState *s = g_new(Exynos4BoardState, 1);
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
+     AspeedTimer *t = opaque;
+@@ -164,7 +175,7 @@ static void aspeed_timer_expire(void *opaque)
+         qemu_set_irq(t->irq, t->level);
+     }
  
-     if (smp_cpus != EXYNOS4210_NCPUS && !qtest_enabled()) {
-@@ -127,8 +159,12 @@ static Exynos4210State *exynos4_boards_init_common(MachineState *machine,
-             machine->kernel_cmdline,
-             machine->initrd_filename);
- 
--    return exynos4210_init(get_system_memory(),
--            exynos4_board_ram_size[board_type]);
-+    exynos4_boards_init_ram(s, get_system_memory(),
-+                            exynos4_board_ram_size[board_type]);
-+
-+    s->soc = exynos4210_init(get_system_memory());
-+
-+    return s;
+-    timer_mod(&t->timer, calculate_next(t));
++    aspeed_timer_mod(t);
  }
  
- static void nuri_init(MachineState *machine)
-@@ -140,11 +176,11 @@ static void nuri_init(MachineState *machine)
- 
- static void smdkc210_init(MachineState *machine)
+ static uint64_t aspeed_timer_get_value(AspeedTimer *t, int reg)
+@@ -227,10 +238,23 @@ static void aspeed_timer_set_value(AspeedTimerCtrlState *s, int timer, int reg,
+                                    uint32_t value)
  {
--    Exynos4210State *s = exynos4_boards_init_common(machine,
--                                                    EXYNOS4_BOARD_SMDKC210);
-+    Exynos4BoardState *s = exynos4_boards_init_common(machine,
-+                                                      EXYNOS4_BOARD_SMDKC210);
+     AspeedTimer *t;
++    uint32_t old_reload;
  
-     lan9215_init(SMDK_LAN9118_BASE_ADDR,
--            qemu_irq_invert(s->irq_table[exynos4210_get_irq(37, 1)]));
-+            qemu_irq_invert(s->soc->irq_table[exynos4210_get_irq(37, 1)]));
-     arm_load_kernel(ARM_CPU(first_cpu), &exynos4_board_binfo);
- }
+     trace_aspeed_timer_set_value(timer, reg, value);
+     t = &s->timers[timer];
+     switch (reg) {
++    case TIMER_REG_RELOAD:
++        old_reload = t->reload;
++        t->reload = value;
++
++        /* If the reload value was not previously set, or zero, and
++         * the current value is valid, try to start the timer if it is
++         * enabled.
++         */
++        if (old_reload || !t->reload) {
++            break;
++        }
++
+     case TIMER_REG_STATUS:
+         if (timer_enabled(t)) {
+             uint64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+@@ -238,17 +262,14 @@ static void aspeed_timer_set_value(AspeedTimerCtrlState *s, int timer, int reg,
+             uint32_t rate = calculate_rate(t);
  
+             t->start += muldiv64(delta, NANOSECONDS_PER_SECOND, rate);
+-            timer_mod(&t->timer, calculate_next(t));
++            aspeed_timer_mod(t);
+         }
+         break;
+-    case TIMER_REG_RELOAD:
+-        t->reload = value;
+-        break;
+     case TIMER_REG_MATCH_FIRST:
+     case TIMER_REG_MATCH_SECOND:
+         t->match[reg - 2] = value;
+         if (timer_enabled(t)) {
+-            timer_mod(&t->timer, calculate_next(t));
++            aspeed_timer_mod(t);
+         }
+         break;
+     default:
+@@ -268,7 +289,7 @@ static void aspeed_timer_ctrl_enable(AspeedTimer *t, bool enable)
+     trace_aspeed_timer_ctrl_enable(t->id, enable);
+     if (enable) {
+         t->start = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+-        timer_mod(&t->timer, calculate_next(t));
++        aspeed_timer_mod(t);
+     } else {
+         timer_del(&t->timer);
+     }
 -- 
 2.7.4
