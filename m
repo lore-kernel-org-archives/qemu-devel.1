@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dKqhX-0005HZ-PE
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 14:38:04 -0400
+	(envelope-from <mst@redhat.com>) id 1dKqyF-0008UI-UD
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 14:55:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dKqhQ-00005f-GN
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 14:38:00 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:36608)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dKqhQ-00005R-C7
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 14:37:56 -0400
-Received: by mail-qt0-x242.google.com with SMTP id s33so36829403qtg.3
-	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 11:37:56 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 13 Jun 2017 15:37:37 -0300
-Message-Id: <20170613183025.5145-1-f4bug@amsat.org>
+	(envelope-from <mst@redhat.com>) id 1dKqyD-0006Xj-V3
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 14:55:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55480)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dKqyD-0006XB-PJ
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 14:55:17 -0400
+Date: Tue, 13 Jun 2017 21:55:05 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170613215454-mutt-send-email-mst@kernel.org>
+References: <1497004901-30593-1-git-send-email-wei.w.wang@intel.com>
+	<1497004901-30593-4-git-send-email-wei.w.wang@intel.com>
+	<20170613200049-mutt-send-email-mst@kernel.org>
+	<fb67359c-3d19-f67f-ec47-3cf868b8d9e8@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 0/2] Fix upstream error: redefinition of
- typedef 'LoadStateHandler'
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fb67359c-3d19-f67f-ec47-3cf868b8d9e8@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v11 3/6] virtio-balloon:
+ VIRTIO_BALLOON_F_PAGE_CHUNKS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,35 +30,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Fam Zheng <famz@redhat.com>
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: Wei Wang <wei.w.wang@intel.com>, virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, Matthew Wilcox <willy@infradead.org>
 
-Also included Fam's patch for bison/flex, not required but still silent few warnings.
+On Tue, Jun 13, 2017 at 10:59:07AM -0700, Dave Hansen wrote:
+> On 06/13/2017 10:56 AM, Michael S. Tsirkin wrote:
+> >> +/* The size of one page_bmap used to record inflated/deflated pages. */
+> >> +#define VIRTIO_BALLOON_PAGE_BMAP_SIZE	(8 * PAGE_SIZE)
+> > At this size, you probably want alloc_pages to avoid kmalloc
+> > overhead.
+> 
+> For slub, at least, kmalloc() just calls alloc_pages() basically
+> directly.  There's virtually no overhead.
+> 
+> 
 
-patchew output:
-
-    === OUTPUT BEGIN ===
-    In file included from /tmp/qemu-test/src/hw/net/vmxnet3.c:30:
-    /tmp/qemu-test/src/include/migration/register.h:18: error: redefinition of typedef ‘LoadStateHandler’
-    /tmp/qemu-test/src/include/migration/vmstate.h:32: note: previous declaration of ‘LoadStateHandler’ was here
-    make: *** [hw/net/vmxnet3.o] Error 1
-    make: *** Waiting for unfinished jobs....
-    tests/docker/Makefile.include:118: recipe for target 'docker-run' failed
-    make[1]: *** [docker-run] Error 2
-    make[1]: Leaving directory '/var/tmp/patchew-tester-tmp-x6sxqrj2/src'
-    tests/docker/Makefile.include:149: recipe for target 'docker-run-test-quick@centos6' failed
-    make: *** [docker-run-test-quick@centos6] Error 2
-    === OUTPUT END ===
-
-Fam Zheng (1):
-  docker: Add flex and bison to centos6 image
-
-Philippe Mathieu-Daudé (1):
-  migration: remove duplicate typedef
-
- include/migration/vmstate.h             | 2 +-
- tests/docker/dockerfiles/centos6.docker | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+OK then.
 
 -- 
-2.11.0
+MST
