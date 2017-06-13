@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dKsJr-0006KH-Uy
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 16:21:47 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dKsJy-0006RI-6M
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 16:21:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dKsJq-0001Zb-A2
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 16:21:43 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dKsJx-0001cK-CY
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 16:21:50 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Tue, 13 Jun 2017 22:20:57 +0200
-Message-Id: <20170613202107.10125-7-mreitz@redhat.com>
+Date: Tue, 13 Jun 2017 22:21:00 +0200
+Message-Id: <20170613202107.10125-10-mreitz@redhat.com>
 In-Reply-To: <20170613202107.10125-1-mreitz@redhat.com>
 References: <20170613202107.10125-1-mreitz@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 06/16] block/file-posix: Extract
- raw_regular_truncate()
+Subject: [Qemu-devel] [PATCH v4 09/16] block/qcow2: Generalize preallocate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,190 +22,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-This functionality is part of raw_create() which we will be able to
-reuse nicely in raw_truncate().
+This patch adds two new parameters to the preallocate() function so we
+will be able to use it not just for preallocating a new image but also
+for preallocated image growth.
+
+The offset parameter allows the caller to specify a virtual offset from
+which to start preallocating. For newly created images this is always 0,
+but for preallocating growth this will be the old image length.
+
+The new_length parameter specifies the supposed new length of the image
+(basically the "end offset" for preallocation). During image truncation,
+bdrv_getlength() will return the old image length so we cannot rely on
+its return value then.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- block/file-posix.c | 144 +++++++++++++++++++++++++++++------------------=
-------
- 1 file changed, 78 insertions(+), 66 deletions(-)
+ block/qcow2.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index a020198..bd02bfb 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1624,6 +1624,81 @@ static void raw_close(BlockDriverState *bs)
-     }
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 6371c32..7d201bb 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2035,17 +2035,24 @@ static int qcow2_change_backing_file(BlockDriverState *bs,
+     return qcow2_update_header(bs);
  }
-=20
-+static int raw_regular_truncate(int fd, int64_t offset, PreallocMode pre=
-alloc,
-+                                Error **errp)
-+{
-+    int result =3D 0;
-+    char *buf;
-+
-+    switch (prealloc) {
-+#ifdef CONFIG_POSIX_FALLOCATE
-+    case PREALLOC_MODE_FALLOC:
-+        /*
-+         * Truncating before posix_fallocate() makes it about twice slow=
-er on
-+         * file systems that do not support fallocate(), trying to check=
- if a
-+         * block is allocated before allocating it, so don't do that her=
-e.
-+         */
-+        result =3D -posix_fallocate(fd, 0, offset);
-+        if (result !=3D 0) {
-+            /* posix_fallocate() doesn't set errno. */
-+            error_setg_errno(errp, -result,
-+                             "Could not preallocate data for the new fil=
-e");
-+        }
-+        return result;
-+#endif
-+    case PREALLOC_MODE_FULL:
-+    {
-+        int64_t num =3D 0, left =3D offset;
-+
-+        /*
-+         * Knowing the final size from the beginning could allow the fil=
-e
-+         * system driver to do less allocations and possibly avoid
-+         * fragmentation of the file.
-+         */
-+        if (ftruncate(fd, offset) !=3D 0) {
-+            result =3D -errno;
-+            error_setg_errno(errp, -result, "Could not resize file");
-+            return result;
-+        }
-+
-+        buf =3D g_malloc0(65536);
-+
-+        while (left > 0) {
-+            num =3D MIN(left, 65536);
-+            result =3D write(fd, buf, num);
-+            if (result < 0) {
-+                result =3D -errno;
-+                error_setg_errno(errp, -result,
-+                                 "Could not write to the new file");
-+                break;
-+            }
-+            left -=3D result;
-+        }
-+        if (result >=3D 0) {
-+            result =3D fsync(fd);
-+            if (result < 0) {
-+                result =3D -errno;
-+                error_setg_errno(errp, -result,
-+                                 "Could not flush new file to disk");
-+            }
-+        }
-+        g_free(buf);
-+        return result;
-+    }
-+    case PREALLOC_MODE_OFF:
-+        if (ftruncate(fd, offset) !=3D 0) {
-+            result =3D -errno;
-+            error_setg_errno(errp, -result, "Could not resize file");
-+        }
-+        return result;
-+    default:
-+        result =3D -ENOTSUP;
-+        error_setg(errp, "Unsupported preallocation mode: %s",
-+                   PreallocMode_lookup[prealloc]);
-+        return result;
-+    }
-+}
-+
- static int raw_truncate(BlockDriverState *bs, int64_t offset,
-                         PreallocMode prealloc, Error **errp)
+ 
+-static int preallocate(BlockDriverState *bs)
++/**
++ * Preallocates metadata structures for data clusters between @offset (in the
++ * guest disk) and @new_length (which is thus generally the new guest disk
++ * size).
++ *
++ * Returns: 0 on success, -errno on failure.
++ */
++static int preallocate(BlockDriverState *bs,
++                       uint64_t offset, uint64_t new_length)
  {
-@@ -1892,72 +1967,9 @@ static int raw_create(const char *filename, QemuOp=
-ts *opts, Error **errp)
- #endif
-     }
-=20
--    switch (prealloc) {
--#ifdef CONFIG_POSIX_FALLOCATE
--    case PREALLOC_MODE_FALLOC:
--        /*
--         * Truncating before posix_fallocate() makes it about twice slow=
-er on
--         * file systems that do not support fallocate(), trying to check=
- if a
--         * block is allocated before allocating it, so don't do that her=
-e.
--         */
--        result =3D -posix_fallocate(fd, 0, total_size);
--        if (result !=3D 0) {
--            /* posix_fallocate() doesn't set errno. */
--            error_setg_errno(errp, -result,
--                             "Could not preallocate data for the new fil=
-e");
--        }
--        break;
--#endif
--    case PREALLOC_MODE_FULL:
--    {
--        int64_t num =3D 0, left =3D total_size;
--
--        /*
--         * Knowing the final size from the beginning could allow the fil=
-e
--         * system driver to do less allocations and possibly avoid
--         * fragmentation of the file.
--         */
--        if (ftruncate(fd, total_size) !=3D 0) {
--            result =3D -errno;
--            error_setg_errno(errp, -result, "Could not resize file");
--            goto out_close;
--        }
--
--        buf =3D g_malloc0(65536);
--
--        while (left > 0) {
--            num =3D MIN(left, 65536);
--            result =3D write(fd, buf, num);
--            if (result < 0) {
--                result =3D -errno;
--                error_setg_errno(errp, -result,
--                                 "Could not write to the new file");
--                break;
--            }
--            left -=3D result;
--        }
--        if (result >=3D 0) {
--            result =3D fsync(fd);
--            if (result < 0) {
--                result =3D -errno;
--                error_setg_errno(errp, -result,
--                                 "Could not flush new file to disk");
--            }
--        }
--        g_free(buf);
--        break;
--    }
--    case PREALLOC_MODE_OFF:
--        if (ftruncate(fd, total_size) !=3D 0) {
--            result =3D -errno;
--            error_setg_errno(errp, -result, "Could not resize file");
--        }
--        break;
--    default:
--        result =3D -ENOTSUP;
--        error_setg(errp, "Unsupported preallocation mode: %s",
--                   PreallocMode_lookup[prealloc]);
--        break;
-+    result =3D raw_regular_truncate(fd, total_size, prealloc, errp);
-+    if (result < 0) {
-+        goto out_close;
-     }
-=20
- out_close:
---=20
+     uint64_t bytes;
+-    uint64_t offset;
+     uint64_t host_offset = 0;
+     unsigned int cur_bytes;
+     int ret;
+     QCowL2Meta *meta;
+ 
+-    bytes = bdrv_getlength(bs);
+-    offset = 0;
++    assert(offset <= new_length);
++    bytes = new_length - offset;
+ 
+     while (bytes) {
+         cur_bytes = MIN(bytes, INT_MAX);
+@@ -2384,7 +2391,7 @@ static int qcow2_create2(const char *filename, int64_t total_size,
+     if (prealloc != PREALLOC_MODE_OFF) {
+         BDRVQcow2State *s = blk_bs(blk)->opaque;
+         qemu_co_mutex_lock(&s->lock);
+-        ret = preallocate(blk_bs(blk));
++        ret = preallocate(blk_bs(blk), 0, total_size);
+         qemu_co_mutex_unlock(&s->lock);
+         if (ret < 0) {
+             error_setg_errno(errp, -ret, "Could not preallocate metadata");
+-- 
 2.9.4
