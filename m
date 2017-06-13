@@ -1,25 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57086)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dKpS9-0001HS-5E
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 13:18:06 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dKpUG-0002bX-Dd
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 13:20:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dKpS7-00005w-OH
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 13:18:05 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:35369)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dKpS7-00005Z-Fd
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 13:18:03 -0400
-Received: by mail-wr0-x231.google.com with SMTP id q97so153156383wrb.2
-	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 10:18:03 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1497362826-21125-1-git-send-email-peter.maydell@linaro.org>
-References: <1497362826-21125-1-git-send-email-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Jun 2017 18:17:40 +0100
-Message-ID: <CAFEAcA9=fufO4b0v468PH61mj9wXg2sdO+a6LN96U8HxPTHz9Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/17] target-arm queue
+	(envelope-from <mreitz@redhat.com>) id 1dKpUF-000100-LH
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 13:20:16 -0400
+From: Max Reitz <mreitz@redhat.com>
+Date: Tue, 13 Jun 2017 19:20:04 +0200
+Message-Id: <20170613172006.19685-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/2] block: Fix gcc 7 warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +17,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-On 13 June 2017 at 15:06, Peter Maydell <peter.maydell@linaro.org> wrote:
-> Target-arm queue...
->
-> thanks
-> -- PMM
->
-> The following changes since commit 735286a4f88255e1463d42ce28d8d14181fd32d4:
->
->   Merge remote-tracking branch 'remotes/juanquintela/tags/migration/20170613' into staging (2017-06-13 13:51:29 +0100)
->
-> are available in the git repository at:
->
->   git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20170613
->
-> for you to fetch changes up to 252a7a6a968c279a4636a86b0559ba3a930a90b5:
->
->   hw/intc/arm_gicv3_its: Allow save/restore (2017-06-13 14:57:01 +0100)
->
-> ----------------------------------------------------------------
-> target-arm queue:
->  * vITS: Support save/restore
->  * timer/aspeed: Fix timer enablement when reload is not set
->  * aspped: add temperature sensor device
->  * timer.h: Provide better monotonic time on ARM hosts
->  * exynos4210: various cleanups
->  * exynos4210: support system poweroff
->
+blkdebug and blkverify use snprintf() to generate a filename; however,
+that may not fit into the target buffer (BDS.exact_filename). If so,
+they generate a truncated and thus pretty much unusable filename. In
+this case it's better to just not generate a filename at all (until we
+have better infrastructure which is not bound by a static buffer size).
 
-Applied, thanks.
+Also, gcc 7 warns about these snprintf() instances and these patches fix
+these warnings. There is another one in hw/usb/bus.c which is not
+addressed by this series.
 
--- PMM
+Max Reitz (2):
+  blkdebug: Catch bs->exact_filename overflow
+  blkverify: Catch bs->exact_filename overflow
+
+ block/blkdebug.c  | 10 +++++++---
+ block/blkverify.c | 12 ++++++++----
+ 2 files changed, 15 insertions(+), 7 deletions(-)
+
+-- 
+2.9.4
