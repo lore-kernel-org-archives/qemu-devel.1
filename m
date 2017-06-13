@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58155)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dKiWG-0003IF-Sc
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 05:53:53 -0400
+	(envelope-from <quintela@redhat.com>) id 1dKiWJ-0003KQ-7J
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 05:53:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dKiWG-0004Mq-1Q
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 05:53:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56118)
+	(envelope-from <quintela@redhat.com>) id 1dKiWI-0004Oh-BQ
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 05:53:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56542)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dKiWF-0004LP-OW
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 05:53:51 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dKiWI-0004OU-34
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 05:53:54 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BA37619CF96
-	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 09:53:50 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0C3437EBA6
+	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 09:53:53 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Tue, 13 Jun 2017 11:53:35 +0200
-Message-Id: <20170613095338.11560-3-quintela@redhat.com>
+Date: Tue, 13 Jun 2017 11:53:36 +0200
+Message-Id: <20170613095338.11560-4-quintela@redhat.com>
 In-Reply-To: <20170613095338.11560-1-quintela@redhat.com>
 References: <20170613095338.11560-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/5] migration: Rename cleanup() to
- save_cleanup()
+Subject: [Qemu-devel] [PATCH v2 3/5] migration: Create
+ load_setup()/cleanup() methods
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,83 +33,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, kwolf@redhat.com, stefanha@redhat.com
 
-We need a cleanup for loads, so we rename here to be consistent.
+We need to do things at load time and at cleanup time.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- hw/ppc/spapr.c               | 2 +-
- include/migration/register.h | 2 +-
- migration/block.c            | 2 +-
- migration/ram.c              | 2 +-
- migration/savevm.c           | 4 ++--
- 5 files changed, 6 insertions(+), 6 deletions(-)
+ include/migration/register.h |  2 ++
+ migration/savevm.c           | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ migration/trace-events       |  2 ++
+ 3 files changed, 48 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 7db5396..dabf822 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1871,7 +1871,7 @@ static SaveVMHandlers savevm_htab_handlers = {
-     .save_setup = htab_save_setup,
-     .save_live_iterate = htab_save_iterate,
-     .save_live_complete_precopy = htab_save_complete,
--    .cleanup = htab_cleanup,
-+    .save_cleanup = htab_cleanup,
-     .load_state = htab_load,
- };
- 
 diff --git a/include/migration/register.h b/include/migration/register.h
-index 333e3df..9ad1e4c 100644
+index 9ad1e4c..4b5c0e0 100644
 --- a/include/migration/register.h
 +++ b/include/migration/register.h
-@@ -21,7 +21,7 @@ typedef struct SaveVMHandlers {
-     /* This runs inside the iothread lock.  */
-     SaveStateHandler *save_state;
+@@ -42,6 +42,8 @@ typedef struct SaveVMHandlers {
+                               uint64_t *non_postcopiable_pending,
+                               uint64_t *postcopiable_pending);
+     LoadStateHandler *load_state;
++    int (*load_setup)(QEMUFile *f, void *opaque);
++    int (*load_cleanup)(void *opaque);
+ } SaveVMHandlers;
  
--    void (*cleanup)(void *opaque);
-+    void (*save_cleanup)(void *opaque);
-     int (*save_live_complete_postcopy)(QEMUFile *f, void *opaque);
-     int (*save_live_complete_precopy)(QEMUFile *f, void *opaque);
- 
-diff --git a/migration/block.c b/migration/block.c
-index c160d41..ad36afb 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -1012,7 +1012,7 @@ static SaveVMHandlers savevm_block_handlers = {
-     .save_live_complete_precopy = block_save_complete,
-     .save_live_pending = block_save_pending,
-     .load_state = block_load,
--    .cleanup = block_migration_cleanup,
-+    .save_cleanup = block_migration_cleanup,
-     .is_active = block_is_active,
- };
- 
-diff --git a/migration/ram.c b/migration/ram.c
-index 3454bf7..be78e42 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2611,7 +2611,7 @@ static SaveVMHandlers savevm_ram_handlers = {
-     .save_live_complete_precopy = ram_save_complete,
-     .save_live_pending = ram_save_pending,
-     .load_state = ram_load,
--    .cleanup = ram_migration_cleanup,
-+    .save_cleanup = ram_migration_cleanup,
- };
- 
- void ram_mig_init(void)
+ int register_savevm_live(DeviceState *dev,
 diff --git a/migration/savevm.c b/migration/savevm.c
-index 7f2a5bd..fb93931 100644
+index fb93931..ed36f35 100644
 --- a/migration/savevm.c
 +++ b/migration/savevm.c
-@@ -1226,8 +1226,8 @@ void qemu_savevm_state_cleanup(void)
+@@ -1912,6 +1912,43 @@ qemu_loadvm_section_part_end(QEMUFile *f, MigrationIncomingState *mis)
+     return 0;
+ }
  
-     trace_savevm_state_cleanup();
-     QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
--        if (se->ops && se->ops->cleanup) {
--            se->ops->cleanup(se->opaque);
-+        if (se->ops && se->ops->save_cleanup) {
-+            se->ops->save_cleanup(se->opaque);
++static int qemu_loadvm_state_setup(QEMUFile *f)
++{
++    SaveStateEntry *se;
++    int ret;
++
++    trace_loadvm_state_setup();
++    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
++        if (!se->ops || !se->ops->load_setup) {
++            continue;
++        }
++        if (se->ops && se->ops->is_active) {
++            if (!se->ops->is_active(se->opaque)) {
++                continue;
++            }
++        }
++
++        ret = se->ops->load_setup(f, se->opaque);
++        if (ret < 0) {
++            qemu_file_set_error(f, ret);
++            return ret;
++        }
++    }
++    return 0;
++}
++
++static void qemu_loadvm_state_cleanup(void)
++{
++    SaveStateEntry *se;
++
++    trace_loadvm_state_cleanup();
++    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
++        if (se->ops && se->ops->load_cleanup) {
++            se->ops->load_cleanup(se->opaque);
++        }
++    }
++}
++
+ static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
+ {
+     uint8_t section_type;
+@@ -1984,6 +2021,12 @@ int qemu_loadvm_state(QEMUFile *f)
+         return -ENOTSUP;
+     }
+ 
++
++    if (qemu_loadvm_state_setup(f) != 0) {
++        error_report("Load state of one device failed");
++        return -EINVAL;
++    }
++
+     if (!savevm_state.skip_configuration || enforce_config_section()) {
+         if (qemu_get_byte(f) != QEMU_VM_CONFIGURATION) {
+             error_report("Configuration section missing");
+@@ -2047,6 +2090,7 @@ int qemu_loadvm_state(QEMUFile *f)
          }
      }
- }
+ 
++    qemu_loadvm_state_cleanup();
+     cpu_synchronize_all_post_init();
+ 
+     return ret;
+diff --git a/migration/trace-events b/migration/trace-events
+index 9669e94..cb2c4b5 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -7,6 +7,8 @@ qemu_loadvm_state_section_partend(uint32_t section_id) "%u"
+ qemu_loadvm_state_post_main(int ret) "%d"
+ qemu_loadvm_state_section_startfull(uint32_t section_id, const char *idstr, uint32_t instance_id, uint32_t version_id) "%u(%s) %u %u"
+ qemu_savevm_send_packaged(void) ""
++loadvm_state_setup(void) ""
++loadvm_state_cleanup(void) ""
+ loadvm_handle_cmd_packaged(unsigned int length) "%u"
+ loadvm_handle_cmd_packaged_main(int ret) "%d"
+ loadvm_handle_cmd_packaged_received(int ret) "%d"
 -- 
 2.9.4
