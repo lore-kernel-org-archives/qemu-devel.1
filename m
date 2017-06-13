@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dKcsS-0003sr-SA
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 23:52:26 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dKcwB-00057P-Jd
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 23:56:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dKcsP-00014I-QU
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 23:52:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37026)
+	(envelope-from <jasowang@redhat.com>) id 1dKcw8-0002Up-CE
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 23:56:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39274)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dKcsP-00014C-Hb
-	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 23:52:21 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 553AF5D68D
-	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 03:52:20 +0000 (UTC)
-Date: Tue, 13 Jun 2017 11:52:15 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170613035215.GB11751@pxdev.xzpeter.org>
-References: <1496980142-8986-1-git-send-email-peterx@redhat.com>
-	<1496980142-8986-3-git-send-email-peterx@redhat.com>
-	<87lgp1i8kz.fsf@dusky.pond.sub.org>
-	<20170612044609.GE25059@pxdev.xzpeter.org>
-	<20170612161349.GL22043@thinpad.lan.raisama.net>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dKcw8-0002UZ-6E
+	for qemu-devel@nongnu.org; Mon, 12 Jun 2017 23:56:12 -0400
+References: <1496653049-44530-1-git-send-email-wei.w.wang@intel.com>
+	<20170605182514-mutt-send-email-mst@kernel.org>
+	<5937511D.5070205@intel.com>
+	<20170608220006-mutt-send-email-mst@kernel.org>
+	<593A0F47.5080806@intel.com> <593E5F46.5080704@intel.com>
+	<20170612234035-mutt-send-email-mst@kernel.org>
+	<593F57C0.9080701@intel.com>
+	<4639c51b-32a6-3528-2ed6-c5f6296b6300@redhat.com>
+	<593F6133.9050804@intel.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <65faf3f9-a839-0b04-c740-6b2a60a51cf6@redhat.com>
+Date: Tue, 13 Jun 2017 11:55:59 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170612161349.GL22043@thinpad.lan.raisama.net>
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] migration: let MigrationState be a
- qdev
+In-Reply-To: <593F6133.9050804@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v1] virtio-net: enable
+ configurable tx queue size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,124 +36,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Wei Wang <wei.w.wang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: virtio-dev@lists.oasis-open.org, stefanha@gmail.com, qemu-devel@nongnu.org, jan.scheurich@ericsson.com, armbru@redhat.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 
-On Mon, Jun 12, 2017 at 01:13:49PM -0300, Eduardo Habkost wrote:
-> On Mon, Jun 12, 2017 at 12:46:09PM +0800, Peter Xu wrote:
-> > On Fri, Jun 09, 2017 at 03:39:24PM +0200, Markus Armbruster wrote:
-> > > Peter Xu <peterx@redhat.com> writes:
-> > > 
-> > > > Let the old man "MigrationState" join the object family. Direct benefit
-> > > > is that we can start to use all the property features derived from
-> > > > current QDev, like: HW_COMPAT_* bits, command line setup for migration
-> > > > parameters (so will never need to set them up each time using HMP/QMP,
-> > > > this is really, really attractive for test writters), etc.
-> > > >
-> > > > I see no reason to disallow this happen yet. So let's start from this
-> > > > one, to see whether it would be anything good.
-> > > >
-> > > > No functional change at all.
-> > > >
-> > > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > > ---
-> > > >  include/migration/migration.h | 19 ++++++++++++++
-> > > >  migration/migration.c         | 61 ++++++++++++++++++++++++++++---------------
-> > > >  2 files changed, 59 insertions(+), 21 deletions(-)
-> > > >
-> > > > diff --git a/include/migration/migration.h b/include/migration/migration.h
-> > > > index 79b5484..bd0186c 100644
-> > > > --- a/include/migration/migration.h
-> > > > +++ b/include/migration/migration.h
-> > > > @@ -21,6 +21,7 @@
-> > > >  #include "qapi-types.h"
-> > > >  #include "exec/cpu-common.h"
-> > > >  #include "qemu/coroutine_int.h"
-> > > > +#include "hw/qdev.h"
-> > > >  
-> > > >  #define QEMU_VM_FILE_MAGIC           0x5145564d
-> > > >  #define QEMU_VM_FILE_VERSION_COMPAT  0x00000002
-> > > > @@ -49,6 +50,8 @@ enum mig_rp_message_type {
-> > > >      MIG_RP_MSG_MAX
-> > > >  };
-> > > >  
-> > > > +#define TYPE_MIGRATION "migration"
-> > > > +
-> > > >  /* State for the incoming migration */
-> > > >  struct MigrationIncomingState {
-> > > >      QEMUFile *from_src_file;
-> > > > @@ -91,8 +94,24 @@ struct MigrationIncomingState {
-> > > >  MigrationIncomingState *migration_incoming_get_current(void);
-> > > >  void migration_incoming_state_destroy(void);
-> > > >  
-> > > > +#define MIGRATION_CLASS(klass) \
-> > > > +    OBJECT_CLASS_CHECK(MigrationClass, (klass), TYPE_MIGRATION)
-> > > > +#define MIGRATION_OBJ(obj) \
-> > > > +    OBJECT_CHECK(MigrationState, (obj), TYPE_MIGRATION)
-> > > > +#define MIGRATION_GET_CLASS(obj) \
-> > > > +    OBJECT_GET_CLASS(MigrationClass, (obj), TYPE_MIGRATION)
-> > > > +
-> > > > +typedef struct MigrationClass {
-> > > > +    /*< private >*/
-> > > > +    DeviceClass parent_class;
-> > > > +} MigrationClass;
-> > > > +
-> > > >  struct MigrationState
-> > > >  {
-> > > > +    /*< private >*/
-> > > > +    DeviceState parent_obj;
-> > > > +
-> > > > +    /*< public >*/
-> > > 
-> > > Turning MigrationState into a QOM object so you can use QOM
-> > > infrastructure makes sense.  But why turn it into a device?  It doesn't
-> > > feel device-like to me.  Would ObjectClass and Object instead of
-> > > DeviceClass and DeviceState do?
-> > 
-> > Yeah. That's the main reason for the series to be (was) RFC.
-> > 
-> > I was trying to use the HW_COMPAT_* bits and -global, and that's QDev
-> > thing (IIUC you got that already :). I am just curious about why that
-> > is not for QObject from the very beginning, then it'll be easier.
-> > 
-> > For now, IMHO QDev is okay as well for migration, as long as it's kept
-> > internally inside QEMU. But sure at least I should turn user_creatable
-> > to off. I'll investigate more to see how to make this a safer approach
-> > in next post.
-> 
-> We could allow non-device QOM objects use the global property
-> system optionally.
-> 
-> We could make qdev_prop_set_globals() work on any Object*, and
-> let QOM classes call it on post_init if they want to be
-> configurable by global properties too.
-> 
-> Note that this would break qdev_prop_check_globals(), because it
-> expects globals to work only on TYPE_DEVICE.  We could address
-> that by introducing a new interface type to indicate the type
-> works with -global (something like
-> INTERFACE_CONFIGURABLE_BY_GLOBAL_PROPERTIES, but shorter?).
-> 
-> Such a system would probably allow us to replace
-> default_machine_opts, default_boot_order, default_display,
-> default_ram_size (and probably many other compat fields) on
-> MachineClass.  It could also be used to implement -machine and
-> -accel options by simply translating them to global properties
-> (like we already do for -cpu).
-> 
-> (This sounds like reinventing a QemuOpts-like system on top of
-> global properties.  Maybe that's a bad thing, maybe that's a good
-> thing.  I'm not sure.)
 
-Thanks Eduardo for the reviews and suggestions. 
 
-It'll obviously benefit us a lot if all the objects can use the global
-properties and the *_COMPAT_* legacy magic, while the tricky point is
-that, QObject will then depend on QDev?
+On 2017=E5=B9=B406=E6=9C=8813=E6=97=A5 11:51, Wei Wang wrote:
+> On 06/13/2017 11:19 AM, Jason Wang wrote:
+>>
+>>
+>> On 2017=E5=B9=B406=E6=9C=8813=E6=97=A5 11:10, Wei Wang wrote:
+>>> On 06/13/2017 04:43 AM, Michael S. Tsirkin wrote:
+>>>> On Mon, Jun 12, 2017 at 05:30:46PM +0800, Wei Wang wrote:
+>>>>> Ping for comments, thanks.
+>>>> This was only posted a week ago, might be a bit too short for some
+>>>> people.
+>>> OK, sorry for the push.
+>>>> A couple of weeks is more reasonable before you ping.  Also, I
+>>>> sent a bunch of comments on Thu, 8 Jun 2017.  You should probably
+>>>> address these.
+>>>>
+>>> I responded to the comments. The main question is that I'm not sure
+>>> why we need the vhost backend to support VIRTIO_F_MAX_CHAIN_SIZE.
+>>> IMHO, that should be a feature proposed to solve the possible issue
+>>> caused by the QEMU implemented backend.
+>>
+>> The issue is what if there's a mismatch of max #sgs between qemu and=20
+>> vhost?
+>>
+>
+> When the vhost backend is used, QEMU is not involved in the data path.=20
+> The vhost backend
+> directly gets what is offered by the guest from the vq. Why would=20
+> there be a mismatch of
+> max #sgs between QEMU and vhost, and what is the QEMU side max #sgs=20
+> used for? Thanks.
 
-Generally speaking this sounds good to me.  Before I do anything else,
-I believe I should wait to see how other QOM developers think about
-it.  Thanks,
+You need query the backend max #sgs in this case at least. no? If not=20
+how do you know the value is supported by the backend?
 
--- 
-Peter Xu
+Thanks
+
+>
+> Best,
+> Wei
+>
+>
