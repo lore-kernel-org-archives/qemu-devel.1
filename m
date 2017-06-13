@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dKmQW-0001l2-Ex
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 10:04:20 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dKmQV-0001iU-I9
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 10:04:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dKmQS-0005Lr-Gz
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 10:04:12 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:49009 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dKmQS-0005L1-6t
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 10:04:11 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:35812 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dKmQS-0005IP-0c
+	id 1dKmQR-0005Hl-QP
 	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 10:04:08 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 13 Jun 2017 17:03:53 +0300
-Message-Id: <20170613140358.81651-26-vsementsov@virtuozzo.com>
+Date: Tue, 13 Jun 2017 17:03:54 +0300
+Message-Id: <20170613140358.81651-27-vsementsov@virtuozzo.com>
 In-Reply-To: <20170613140358.81651-1-vsementsov@virtuozzo.com>
 References: <20170613140358.81651-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v21 25/30] qmp: add
- x-debug-block-dirty-bitmap-sha256
+Subject: [Qemu-devel] [PATCH v21 26/30] iotests: test qcow2 persistent dirty
+ bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,176 +30,147 @@ Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, j
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- block/dirty-bitmap.c         |  5 +++++
- blockdev.c                   | 29 +++++++++++++++++++++++++++++
- include/block/dirty-bitmap.h |  2 ++
- include/qemu/hbitmap.h       |  8 ++++++++
- qapi/block-core.json         | 27 +++++++++++++++++++++++++++
- tests/Makefile.include       |  2 +-
- util/hbitmap.c               | 11 +++++++++++
- 7 files changed, 83 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/165     | 105 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/165.out |   5 +++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 111 insertions(+)
+ create mode 100755 tests/qemu-iotests/165
+ create mode 100644 tests/qemu-iotests/165.out
 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 4e53cf1694..315e44666d 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -621,3 +621,8 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
-     return bitmap == NULL ? QLIST_FIRST(&bs->dirty_bitmaps) :
-                             QLIST_NEXT(bitmap, list);
- }
-+
-+char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp)
-+{
-+    return hbitmap_sha256(bitmap->bitmap, errp);
-+}
-diff --git a/blockdev.c b/blockdev.c
-index d04432172a..e3dbef7427 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2857,6 +2857,35 @@ void qmp_block_dirty_bitmap_clear(const char *node, const char *name,
-     aio_context_release(aio_context);
- }
- 
-+BlockDirtyBitmapSha256 *qmp_x_debug_block_dirty_bitmap_sha256(const char *node,
-+                                                              const char *name,
-+                                                              Error **errp)
-+{
-+    AioContext *aio_context;
-+    BdrvDirtyBitmap *bitmap;
-+    BlockDriverState *bs;
-+    BlockDirtyBitmapSha256 *ret = NULL;
-+    char *sha256;
-+
-+    bitmap = block_dirty_bitmap_lookup(node, name, &bs, &aio_context, errp);
-+    if (!bitmap || !bs) {
-+        return NULL;
-+    }
-+
-+    sha256 = bdrv_dirty_bitmap_sha256(bitmap, errp);
-+    if (sha256 == NULL) {
-+        goto out;
-+    }
-+
-+    ret = g_new(BlockDirtyBitmapSha256, 1);
-+    ret->sha256 = sha256;
-+
-+out:
-+    aio_context_release(aio_context);
-+
-+    return ret;
-+}
-+
- void hmp_drive_del(Monitor *mon, const QDict *qdict)
- {
-     const char *id = qdict_get_str(qdict, "id");
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index a3ac9c3640..00b298330c 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -90,4 +90,6 @@ bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs);
- BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
-                                         BdrvDirtyBitmap *bitmap);
- 
-+char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp);
-+
- #endif
-diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
-index b52304ac29..d3a74a21fc 100644
---- a/include/qemu/hbitmap.h
-+++ b/include/qemu/hbitmap.h
-@@ -253,6 +253,14 @@ void hbitmap_deserialize_ones(HBitmap *hb, uint64_t start, uint64_t count,
- void hbitmap_deserialize_finish(HBitmap *hb);
- 
- /**
-+ * hbitmap_sha256:
-+ * @bitmap: HBitmap to operate on.
-+ *
-+ * Returns SHA256 hash of the last level.
-+ */
-+char *hbitmap_sha256(const HBitmap *bitmap, Error **errp);
-+
-+/**
-  * hbitmap_free:
-  * @hb: HBitmap to operate on.
-  *
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 9134a317e5..3dd9f92e5a 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1643,6 +1643,33 @@
-   'data': 'BlockDirtyBitmap' }
- 
- ##
-+# @BlockDirtyBitmapSha256:
+diff --git a/tests/qemu-iotests/165 b/tests/qemu-iotests/165
+new file mode 100755
+index 0000000000..74d7b79a0b
+--- /dev/null
++++ b/tests/qemu-iotests/165
+@@ -0,0 +1,105 @@
++#!/usr/bin/env python
 +#
-+# SHA256 hash of dirty bitmap data
++# Tests for persistent dirty bitmaps.
 +#
-+# @sha256: ASCII representation of SHA256 bitmap hash
++# Copyright: Vladimir Sementsov-Ogievskiy 2015-2017
 +#
-+# Since: 2.10
-+##
-+  { 'struct': 'BlockDirtyBitmapSha256',
-+    'data': {'sha256': 'str'} }
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-+##
-+# @x-debug-block-dirty-bitmap-sha256:
-+#
-+# Get bitmap SHA256
-+#
-+# Returns: BlockDirtyBitmapSha256 on success
-+#          If @node is not a valid block device, DeviceNotFound
-+#          If @name is not found or if hashing has failed, GenericError with an
-+#          explanation
-+#
-+# Since: 2.10
-+##
-+  { 'command': 'x-debug-block-dirty-bitmap-sha256',
-+    'data': 'BlockDirtyBitmap', 'returns': 'BlockDirtyBitmapSha256' }
++import os
++import re
++import iotests
++from iotests import qemu_img
 +
-+##
- # @blockdev-mirror:
- #
- # Start mirroring a block device's writes to a new destination.
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 75893838e5..38dbd2d9c8 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -552,7 +552,7 @@ tests/test-blockjob$(EXESUF): tests/test-blockjob.o $(test-block-obj-y) $(test-u
- tests/test-blockjob-txn$(EXESUF): tests/test-blockjob-txn.o $(test-block-obj-y) $(test-util-obj-y)
- tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
- tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
--tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y)
-+tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y) $(test-crypto-obj-y)
- tests/test-x86-cpuid$(EXESUF): tests/test-x86-cpuid.o
- tests/test-xbzrle$(EXESUF): tests/test-xbzrle.o migration/xbzrle.o migration/page_cache.o $(test-util-obj-y)
- tests/test-cutils$(EXESUF): tests/test-cutils.o util/cutils.o
-diff --git a/util/hbitmap.c b/util/hbitmap.c
-index 0c1591a594..21535cc90b 100644
---- a/util/hbitmap.c
-+++ b/util/hbitmap.c
-@@ -13,6 +13,7 @@
- #include "qemu/hbitmap.h"
- #include "qemu/host-utils.h"
- #include "trace.h"
-+#include "crypto/hash.h"
- 
- /* HBitmaps provides an array of bits.  The bits are stored as usual in an
-  * array of unsigned longs, but HBitmap is also optimized to provide fast
-@@ -727,3 +728,13 @@ void hbitmap_free_meta(HBitmap *hb)
-     hbitmap_free(hb->meta);
-     hb->meta = NULL;
- }
++disk = os.path.join(iotests.test_dir, 'disk')
++disk_size = 0x40000000 # 1G
 +
-+char *hbitmap_sha256(const HBitmap *bitmap, Error **errp)
-+{
-+    size_t size = bitmap->sizes[HBITMAP_LEVELS - 1] * sizeof(unsigned long);
-+    char *data = (char *)bitmap->levels[HBITMAP_LEVELS - 1];
-+    char *hash = NULL;
-+    qcrypto_hash_digest(QCRYPTO_HASH_ALG_SHA256, data, size, &hash, errp);
++# regions for qemu_io: (start, count) in bytes
++regions1 = ((0,        0x100000),
++            (0x200000, 0x100000))
 +
-+    return hash;
-+}
++regions2 = ((0x10000000, 0x20000),
++            (0x3fff0000, 0x10000))
++
++class TestPersistentDirtyBitmap(iotests.QMPTestCase):
++
++    def setUp(self):
++        qemu_img('create', '-f', iotests.imgfmt, disk, str(disk_size))
++
++    def tearDown(self):
++        os.remove(disk)
++
++    def mkVm(self):
++        return iotests.VM().add_drive(disk)
++
++    def mkVmRo(self):
++        return iotests.VM().add_drive(disk, opts='readonly=on')
++
++    def getSha256(self):
++        result = self.vm.qmp('x-debug-block-dirty-bitmap-sha256',
++                             node='drive0', name='bitmap0')
++        return result['return']['sha256']
++
++    def checkBitmap(self, sha256):
++        result = self.vm.qmp('x-debug-block-dirty-bitmap-sha256',
++                             node='drive0', name='bitmap0')
++        self.assert_qmp(result, 'return/sha256', sha256);
++
++    def writeRegions(self, regions):
++        for r in regions:
++            self.vm.hmp_qemu_io('drive0',
++                                'write %d %d' % r)
++
++    def qmpAddBitmap(self):
++        self.vm.qmp('block-dirty-bitmap-add', node='drive0',
++                    name='bitmap0', persistent=True, autoload=True)
++
++    def test_persistent(self):
++        self.vm = self.mkVm()
++        self.vm.launch()
++        self.qmpAddBitmap()
++
++        self.writeRegions(regions1)
++        sha256 = self.getSha256()
++
++        self.vm.shutdown()
++
++        self.vm = self.mkVmRo()
++        self.vm.launch()
++        self.vm.shutdown()
++
++        #catch 'Persistent bitmaps are lost' possible error
++        log = self.vm.get_log()
++        log = re.sub(r'^\[I \d+\.\d+\] OPENED\n', '', log)
++        log = re.sub(r'\[I \+\d+\.\d+\] CLOSED\n?$', '', log)
++        if log:
++            print log
++
++        self.vm = self.mkVm()
++        self.vm.launch()
++
++        self.checkBitmap(sha256)
++        self.writeRegions(regions2)
++        sha256 = self.getSha256()
++
++        self.vm.shutdown()
++        self.vm.launch()
++
++        self.checkBitmap(sha256)
++
++        self.vm.shutdown()
++
++if __name__ == '__main__':
++    iotests.main(supported_fmts=['qcow2'])
+diff --git a/tests/qemu-iotests/165.out b/tests/qemu-iotests/165.out
+new file mode 100644
+index 0000000000..ae1213e6f8
+--- /dev/null
++++ b/tests/qemu-iotests/165.out
+@@ -0,0 +1,5 @@
++.
++----------------------------------------------------------------------
++Ran 1 tests
++
++OK
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 5c8ea0f95c..1a446489c2 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -163,6 +163,7 @@
+ 159 rw auto quick
+ 160 rw auto quick
+ 162 auto quick
++165 rw auto quick
+ 170 rw auto quick
+ 171 rw auto quick
+ 172 auto
 -- 
 2.11.1
