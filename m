@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53476)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anatol.pomozov@gmail.com>) id 1dKvog-0007GC-Aq
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 20:05:47 -0400
+	(envelope-from <quwenruo@cn.fujitsu.com>) id 1dKvzK-0000tU-W2
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 20:16:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anatol.pomozov@gmail.com>) id 1dKvof-0000cO-2N
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 20:05:46 -0400
-Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:35736)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <anatol.pomozov@gmail.com>)
-	id 1dKvoe-0000bs-Ek
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 20:05:44 -0400
-Received: by mail-it0-x242.google.com with SMTP id f20so5614267itb.2
-	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 17:05:42 -0700 (PDT)
+	(envelope-from <quwenruo@cn.fujitsu.com>) id 1dKvzK-0002n9-7B
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 20:16:46 -0400
+References: <b3375e1d-a304-237c-124c-21b7f482b6ab@cn.fujitsu.com>
+	<20170602135151.GB4948@noname.redhat.com>
+	<20170612140530.GA23969@localhost.localdomain>
+From: Qu Wenruo <quwenruo@cn.fujitsu.com>
+Message-ID: <2686e824-9d6e-3cfc-6184-1647f274e53b@cn.fujitsu.com>
+Date: Tue, 13 Jun 2017 09:25:52 +0800
 MIME-Version: 1.0
-In-Reply-To: <CAOMFOmX3YXKJ-JkOpiedZZaG4RpgFg+LJhhLTFN+LaS9i17TMg@mail.gmail.com>
-References: <20170607044148.10481-1-anatol.pomozov@gmail.com>
-	<20170608204116.svjgt323qrbghyku@os.inf.tu-dresden.de>
-	<CAOMFOmX3YXKJ-JkOpiedZZaG4RpgFg+LJhhLTFN+LaS9i17TMg@mail.gmail.com>
-From: Anatol Pomozov <anatol.pomozov@gmail.com>
-Date: Tue, 13 Jun 2017 17:05:41 -0700
-Message-ID: <CAOMFOmWsODJzsqhF7mexh=NT_sF7HYs4UuVK41YOBGSYB6o4Sg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] Remove restriction that prevents bootimg
- elf64 images
+In-Reply-To: <20170612140530.GA23969@localhost.localdomain>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] NVME: is there any plan to support
+ SGL data transfer?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,53 +26,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Adam Lackorzynski <adam@os.inf.tu-dresden.de>
-Cc: qemu-devel@nongnu.org
+To: Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-Hi Adam
 
-Do these arguments sound reasonable to apply the patch?
 
-On Thu, Jun 8, 2017 at 2:07 PM, Anatol Pomozov <anatol.pomozov@gmail.com> wrote:
-> +reply-all
->
-> On Thu, Jun 8, 2017 at 1:41 PM, Adam Lackorzynski
-> <adam@os.inf.tu-dresden.de> wrote:
+At 06/12/2017 10:05 PM, Keith Busch wrote:
+> On Fri, Jun 02, 2017 at 03:51:51PM +0200, Kevin Wolf wrote:
+>> Am 02.06.2017 um 03:47 hat Qu Wenruo geschrieben:
+>>> When going through NVMe specification and hw/block/nvme.c,
+>>> I found that it seems that NVMe qemu implementation only support PRP
+>>> for sq entry.
+>>> And NvmeRwCmd doesn't even use union to define DPTR, but just prp1 and prp2.
+>>>
+>>> Although I am just a newbie, but I'm quite interested in NVMe and
+>>> want to try to implement SGL support for qemu NVMe.
+>>>
+>>> Is there anyone already doing such work? Or is there any plan on
+>>> implement such feature?
 >>
->> On Tue Jun 06, 2017 at 21:41:48 -0700, Anatol Pomozov wrote:
->>> It is possible to create a 64 bit elf image that has valid multiboot header.
->>> qemu should be able to boot such images.
->>
->> But this 64bit image actually starts with 32bit code, right?
->
-> Correct. The very first part of the startup code has to be 32bit.
-> After it sets "long mode" it can use 64bit instructions. To make sure
-> that the preamble has only 32bit instructions one have to use asm
-> directive such as ".code32".
->
-> Here is an example from LitleKernel sturtup code:
->
-> https://github.com/littlekernel/lk/blob/master/arch/x86/64/start.S#L50
->
-> .code32 tells assembler to treat following text as 32 bit code. And
-> later when it jumps into "long mode"
->
-> https://github.com/littlekernel/lk/blob/master/arch/x86/64/start.S#L214
-> one can use 64bit code.
->
->> So it's a 32bit program and the check verifies that this is the case.
->
-> While preamble have to contain 32 only instructions the rest of the
-> image can perfectly contain 64bit code. Right now 64bit binary cannot
-> be run with "qemu-system-x86_64 -kernel". But the same binary runs
-> fine if packed with GRUB as iso.
->
-> I tried to hack around this restriction by adding
-> "OUTPUT_FORMAT(elf32-i386)" to the linker file and compiling project
-> with 64bit support. But GNU ld program crashed at Ubuntu 14.04. It
-> means not that many people use this code path. GNU ld compiled from
-> HEAD does not have this problem but now GDB is confused by the fact
-> that ELF contains 64bit code while header reports i386.
->
-> Practically there is no reason for this check as it prevents running
-> 64bit binaries with "qemu-system-x86_64 -kernel".
+>> Keith, you can probably answer this?
+> 
+> Hi,
+> 
+> I personally have no plans to implement it, but would be happy to see it
+> added if someone wants to send the patch for review.
+
+Glad to hear that.
+
+I have submitted some preparation patch to update nvme.h for SGL and 
+added needed error code for it.
+
+It would be very nice if anyone could review it.
+
+Thanks,
+Qu
+
+> 
+> Thanks,
+> Keith
+> 
+> 
