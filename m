@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41328)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dL4Vf-00087h-4Z
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 05:22:44 -0400
+	(envelope-from <quintela@redhat.com>) id 1dL4Z6-0001K1-16
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 05:26:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dL4Vb-0003ve-2A
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 05:22:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54546)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dL4Va-0003vV-Pu
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 05:22:39 -0400
-Date: Wed, 14 Jun 2017 10:22:30 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170614092040.GB2687@work-vm>
-References: <20170613140546.28227-1-vadim.galitsyn@profitbricks.com>
+	(envelope-from <quintela@redhat.com>) id 1dL4Z2-0005NB-0P
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 05:26:16 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170614110001.7816209b@nial.brq.redhat.com> (Igor Mammedov's
+	message of "Wed, 14 Jun 2017 11:00:01 +0200")
+References: <20170530160445.12810-1-lvivier@redhat.com>
+	<20170531043557.GI12163@umbus.fritz.box>
+	<149695205346.23353.3484869110998357783@loki>
+	<20170609102733.0eb7293d@nial.brq.redhat.com>
+	<149739016562.5725.6958577924052221756@loki>
+	<20170614110001.7816209b@nial.brq.redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 14 Jun 2017 11:26:08 +0200
+Message-ID: <87y3suex8v.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170613140546.28227-1-vadim.galitsyn@profitbricks.com>
-Subject: Re: [Qemu-devel] [PATCH v2] hmp,
- qmp: introduce "info memory" and "query-memory" commands
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] spapr: manage hotplugged devices while the
+ VM is not started
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,200 +29,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Vasilis Liaskovitis <vasilis.liaskovitis@profitbricks.com>, Mohammed Gamal <mgamal@redhat.com>, Eduardo Otubo <otubo@redhat.com>, imammedo@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-* Vadim Galitsyn (vadim.galitsyn@profitbricks.com) wrote:
-> Commands above provide the following memory information in bytes:
-> 
->   * base-memory - amount of static memory specified
->     with '-m' option at the start of the QEMU process.
-> 
->   * hot-plug-memory - amount of memory that was hot-plugged.
-> 
->   * ballooned-actual-memory - size of the memory that remains
->     available to the guest after ballooning, as reported by the
->     guest. If the guest has not reported its memory, this value
->     equals to @base-memory + @hot-plug-memory. If ballooning
->     is not enabled, zero value is reported.
-> 
-> NOTE:
-> 
->     Parameter @ballooned-actual-memory reports the same as
->     "info balloon" command when ballooning is enabled. The idea
->     to have it in scope of this command(s) comes from
->     https://lists.gnu.org/archive/html/qemu-devel/2012-07/msg01472.html.
-> 
-> Signed-off-by: Vasilis Liaskovitis <vasilis.liaskovitis@profitbricks.com>
-> Signed-off-by: Mohammed Gamal <mohammed.gamal@profitbricks.com>
-> Signed-off-by: Eduardo Otubo <eduardo.otubo@profitbricks.com>
-> Signed-off-by: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
-> Reviewed-by: Eugene Crosser <evgenii.cherkashin@profitbricks.com>
-> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Cc: Markus Armbruster <armbru@redhat.com>
-> Cc: qemu-devel@nongnu.org
-> ---
-> 
-> v2:
->  * Fixed build for targets which do not have CONFIG_MEM_HOTPLUG enabled.
-> 
->  hmp-commands-info.hx | 15 +++++++++++++++
->  hmp.c                | 14 ++++++++++++++
->  hmp.h                |  1 +
->  qapi-schema.json     | 27 +++++++++++++++++++++++++++
->  qmp.c                | 34 ++++++++++++++++++++++++++++++++++
->  5 files changed, 91 insertions(+)
-> 
-> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-> index ae169011b1..bc37525550 100644
-> --- a/hmp-commands-info.hx
-> +++ b/hmp-commands-info.hx
-> @@ -833,6 +833,21 @@ STEXI
->  @end table
->  ETEXI
->  
-> +STEXI
-> +@item info memory
-> +@findex memory
-> +Display total memory size in bytes (static, hotplugged, ballooned)
-> +ETEXI
-> +
-> +    {
-> +        .name       = "memory",
-> +        .args_type  = "",
-> +        .params     = "",
-> +        .help       = "show memory size information in bytes (static, "
-> +                      "hotplugged, ballooned)",
-> +        .cmd        = hmp_info_memory,
-> +    },
-> +
->  STEXI
->  @end table
->  ETEXI
-> diff --git a/hmp.c b/hmp.c
-> index 8c72c58b20..81e383f169 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -2817,3 +2817,17 @@ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict)
->      hmp_handle_error(mon, &err);
->      qapi_free_GuidInfo(info);
->  }
-> +
-> +void hmp_info_memory(Monitor *mon, const QDict *qdict)
-> +{
-> +    Error *err = NULL;
-> +    MemoryInfo *info = qmp_query_memory(&err);
-> +    if (info) {
-> +        monitor_printf(mon, "base-memory: %lu\n", info->base_memory);
-> +        monitor_printf(mon, "hot-plug-memory: %lu\n", info->hot_plug_memory);
-> +        monitor_printf(mon, "ballooned-actual-memory: %lu\n",
-> +                       info->ballooned_actual_memory);
+Igor Mammedov <imammedo@redhat.com> wrote:
+> On Tue, 13 Jun 2017 16:42:45 -0500
+> Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+>
+>> Quoting Igor Mammedov (2017-06-09 03:27:33)
+>> > On Thu, 08 Jun 2017 15:00:53 -0500
+>> > Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+>> >   
+>> > > Quoting David Gibson (2017-05-30 23:35:57)  
+>> > > > On Tue, May 30, 2017 at 06:04:45PM +0200, Laurent Vivier wrote:    
+>> > > > > For QEMU, a hotlugged device is a device added using the HMP/QMP
+>> > > > > interface.
+>> > > > > For SPAPR, a hotplugged device is a device added while the
+>> > > > > machine is running. In this case QEMU doesn't update internal
+>> > > > > state but relies on the OS for this part
+>> > > > > 
+>> > > > > In the case of migration, when we (libvirt) hotplug a device
+>> > > > > on the source guest, we (libvirt) generally hotplug the same
+>> > > > > device on the destination guest. But in this case, the machine
+>> > > > > is stopped (RUN_STATE_INMIGRATE) and QEMU must not expect
+>> > > > > the OS will manage it as an hotplugged device as it will
+>> > > > > be "imported" by the migration.
+>> > > > > 
+>> > > > > This patch changes the meaning of "hotplugged" in spapr.c
+>> > > > > to manage a QEMU hotplugged device like a "coldplugged" one
+>> > > > > when the machine is awaiting an incoming migration.
+>> > > > > 
+>> > > > > Signed-off-by: Laurent Vivier <lvivier@redhat.com>    
+>> > > > 
+>> > > > So, I think this is a reasonable concept, at least in terms of
+>> > > > cleanliness and not doing unnecessary work.  However, if it's fixing
+>> > > > bugs, I suspect that means we still have problems elsewhere.    
+>> > > 
+>> > > I was hoping a lot of these issues would go away once we default
+>> > > the initial/reset DRC states to "coldplugged". I think your pending
+>> > > patch:
+>> > > 
+>> > >   "spapr: Make DRC reset force DRC into known state"
+>> > > 
+>> > > But I didn't consider the fact that libvirt will be issuing these
+>> > > hotplugs *after* reset, so those states would indeed need to
+>> > > be fixed up again to reflect boot-time,attached as opposed to
+>> > > boot-time,unattached before starting the target.
+>> > > 
+>> > > So I do think this patch addresses a specific bug that isn't
+>> > > obviously fixable elsewhere.
+>> > > 
+>> > > To me it seems like the only way to avoid doing something like
+>> > > what this patch does is to migrate all attached DRCs from the
+>> > > source in all cases.
+>> > > 
+>> > > This would break backward-migration though, unless we switch from
+>> > > using subregions for DRCs to explicitly disabling DRC migration
+>> > > based on machine type.  
+>> > we could leave old machines broken and fix only new machine types,
+>> > then it would be easy ot migrate 'additional' DRC state as subsection
+>> > only on new for new machines.  
+>> 
+>> That's an option, but subsections were only really used for backward
+>> compatibility. Not sure how much we have to gain from using both.
+> If I remember correctly subsections could be/are used for forward compat stuff
+> i.e. subsection is generated on source side when .needed callback returns
+> true and destinations will just consume whatever data were sent
+> without looking at .need callback. So source could generate extra
+> DRC subsection when cpu hotplug is enabled for new machine types,
+> ex: f816a62daa
+>
+> adding David/Juan to CC list to correct me if I'm wrong.
 
-I think you need to use the PRIu64 macros rather than 'lu' for the types
-of the ints there to keep it portable.
+Yeap.  subsections are used when we know that we have missed some data
+(or we need some more data for some other reason).
 
-Other than that; please add a test entry to tests/test-hmp.c
-and I'm guessing you'll also need a qmp test for it.
+If the data would have been required always, we would have detected
+before.  So subsections allows us to remain compatible, if needed()
+returns false, we are compatible with old version, and if it returns
+true, we send the additional data because we know that it is needed.
 
-Dave
+So  we have the following cases:
 
-> +        g_free(info);
-> +    }
-> +    hmp_handle_error(mon, &err);
-> +}
-> diff --git a/hmp.h b/hmp.h
-> index d8b94ce9dc..c422aa2fac 100644
-> --- a/hmp.h
-> +++ b/hmp.h
-> @@ -143,5 +143,6 @@ void hmp_info_dump(Monitor *mon, const QDict *qdict);
->  void hmp_info_ramblock(Monitor *mon, const QDict *qdict);
->  void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
->  void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
-> +void hmp_info_memory(Monitor *mon, const QDict *qdict);
->  
->  #endif
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 4b50b652d3..33cd7cb3b8 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -4324,6 +4324,33 @@
->    'data': { 'name': 'str', '*migration-safe': 'bool', 'static': 'bool',
->              '*unavailable-features': [ 'str' ], 'typename': 'str' } }
->  
-> +##
-> +# @MemoryInfo:
-> +#
-> +# Memory information in bytes.
-> +#
-> +# @base-memory: size of static memory which was specified on Qemu start.
-> +#
-> +# @hot-plug-memory: size of hot-plugged memory.
-> +#
-> +# @ballooned-actual-memory: amount of guest memory available after ballooning.
-> +#
-> +# Since: 2.10.0
-> +##
-> +{ 'struct': 'MemoryInfo',
-> +  'data'  : { 'base-memory': 'int', 'hot-plug-memory': 'int',
-> +              'ballooned-actual-memory': 'int' } }
-> +
-> +##
-> +# @query-memory:
-> +#
-> +# Return memory size information which includes
-> +# static, hotplugged and ballooned memory.
-> +#
-> +# Since: 2.10.0
-> +##
-> +{ 'command': 'query-memory', 'returns': 'MemoryInfo' }
-> +
->  ##
->  # @query-cpu-definitions:
->  #
-> diff --git a/qmp.c b/qmp.c
-> index 7ee9bcfdcf..7e57a9bbf9 100644
-> --- a/qmp.c
-> +++ b/qmp.c
-> @@ -712,3 +712,37 @@ ACPIOSTInfoList *qmp_query_acpi_ospm_status(Error **errp)
->  
->      return head;
->  }
-> +
-> +MemoryInfo *qmp_query_memory(Error **errp)
-> +{
-> +#ifdef CONFIG_MEM_HOTPLUG
-> +    MemoryInfo *mem_info = g_malloc0(sizeof(MemoryInfo));
-> +    BalloonInfo *balloon_info;
-> +    Error *local_err = NULL;
-> +
-> +    mem_info->base_memory = ram_size;
-> +    mem_info->hot_plug_memory = pc_existing_dimms_capacity(&local_err);
-> +    if (local_err) {
-> +        error_setg(errp, "could not get hot-plug memory info: %s",
-> +                   error_get_pretty(local_err));
-> +        g_free(mem_info);
-> +        return NULL;
-> +    }
-> +
-> +    /* In case if it is not possible to get balloon info, just ignore it. */
-> +    balloon_info = qmp_query_balloon(&local_err);
-> +    if (local_err) {
-> +        mem_info->ballooned_actual_memory = 0;
-> +        error_free(local_err);
-> +    } else {
-> +        mem_info->ballooned_actual_memory = balloon_info->actual;
-> +    }
-> +
-> +    qapi_free_BalloonInfo(balloon_info);
-> +
-> +    return mem_info;
-> +#else
-> +    error_setg(errp, "command not supported for this configuration");
-> +    return NULL;
-> +#endif
-> +}
-> -- 
-> 2.13.1.394.g41dd433
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+old-qemu  -> old-qemu
+   will work as before
+   if "needed" data is required, migration fails
+old-qemu -> new-qemu
+   identical to previous
+new-qemu -> new-qemu
+   subsection is sent when nededed
+new-qemu -> old-qemu
+   subsection is sent if it is neded, and then it breaks migration
+   but we know that it would have failed anyways.
+new-qemu -M old-machine-type -> new-qemu -M old-machine-type
+   we sent and recognize the new subsection if it is required
+   so, even with old machine types, if the qemus are new, we do the
+   right thing.
+
+This is how subsections are supposed to work.  I haven't investigated
+your particular problem or set of patches, if you need help here, please
+ask.
+
+Later, Juan.
