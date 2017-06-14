@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dL7gp-00086f-Fg
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 08:46:28 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dL7hQ-0008NO-OU
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 08:47:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dL7gm-0004Rr-D5
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 08:46:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55508)
+	(envelope-from <pbonzini@redhat.com>) id 1dL7hN-0004Z6-Nv
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 08:47:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56782)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dL7gm-0004Rc-3L
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 08:46:24 -0400
-Date: Wed, 14 Jun 2017 09:46:20 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170614124620.GB5016@thinpad.lan.raisama.net>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dL7hN-0004Yo-HM
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 08:47:01 -0400
 References: <20170606181948.16238-1-rkagan@virtuozzo.com>
-	<20170606181948.16238-14-rkagan@virtuozzo.com>
-	<20170613183434.GY5016@thinpad.lan.raisama.net>
-	<20170614095759.GH2004@rkaganb.sw.ru>
+	<20170606181948.16238-17-rkagan@virtuozzo.com>
+	<999e60c5-7ee7-5346-6940-1fcd5d7b4264@redhat.com>
+	<20170614115421.GJ2004@rkaganb.sw.ru>
+	<c6f8c40b-6038-3b3a-e78e-a3ea6bc6fc2b@redhat.com>
+	<20170614124109.GB2044@rkaganb.sw.ru>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7262a2b7-5c3c-39c6-8f2e-f2818ce59c35@redhat.com>
+Date: Wed, 14 Jun 2017 14:46:57 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170614095759.GH2004@rkaganb.sw.ru>
-Subject: Re: [Qemu-devel] [PATCH 13/23] hyperv: qdev-ify SynIC
+In-Reply-To: <20170614124109.GB2044@rkaganb.sw.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 16/23] hyperv: map overlay pages after
+ updating msrs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +33,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
+To: Roman Kagan <rkagan@virtuozzo.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-On Wed, Jun 14, 2017 at 12:58:04PM +0300, Roman Kagan wrote:
-> On Tue, Jun 13, 2017 at 03:34:34PM -0300, Eduardo Habkost wrote:
-> > On Tue, Jun 06, 2017 at 09:19:38PM +0300, Roman Kagan wrote:
-> > > Make Hyper-V SynIC a device which is attached as a child to X86CPU.  For
-> > > now it only makes SynIC visibile in the qom hierarchy and exposes a few
-> > > properties which are maintained in sync with the respecitve msrs of the
-> > > parent cpu.
-> [...]
-> > > +static SynICState *get_synic(X86CPU *cpu)
-> > > +{
-> > > +    SynICState *synic =
-> > > +        SYNIC(object_resolve_path_component(OBJECT(cpu), "synic"));
-> > > +    assert(synic);
-> > > +    return synic;
-> > 
-> > How often this will run?  I think a new X86CPU struct field would
-> > be acceptable to avoid resolving a QOM path on every hyperv exit.
-> 
-> It's only used at the points where synic state is updated: at
-> realize/save/load/unrealize and when the guest configures synics via
-> msrs (i.e. a few times per cpu at guest startup).  None of those is
-> performance-critical.
-> 
-> > Do you even need QOM for this?
-> 
-> I need to reach the synic from the cpu on slow paths, and IMHO the
-> pointer on X86CPU is not justified here.  Besides there are two memory
-> regions associated with every synic (in a followup patch) and I thought
-> it made sense to have a dedicated parent QOM node for them.
 
-Makes sense.
 
+On 14/06/2017 14:41, Roman Kagan wrote:
+> On Wed, Jun 14, 2017 at 02:11:56PM +0200, Paolo Bonzini wrote:
+>> On 14/06/2017 13:54, Roman Kagan wrote:
+>>>> Why not disable the zeroing for host-initiated MSR writes?  This is
+>>>> pretty clearly a KVM bug, we can push it to stable kernels too.
+>>>
+>>> The only problem with this is that QEMU will have no reliable way to
+>>> know if the KVM it runs with has this bug fixed or not.  Machines
+>>> without vmbus work and even migrate fine with the current KVM despite
+>>> this bug (the only user of those pages currently is synic timers which
+>>> re-arm themselves and post messages regardless of zeroing).  Now
+>>> updating QEMU to a vmbus-enabled version without updating the kernel
+>>> will make the migrations cause guest hangs.
+>>
+>> Return 2 from KVM_CHECK_EXTENSION(KVM_CAP_HYPERV_SYNIC)?  Then you can
+>> make new QEMU refuse to enable synic if a new kernel is not available.
 > 
-> > > +static Property synic_props[] = {
-> > > +    DEFINE_PROP_BOOL("enabled", SynICState, enabled, false),
-> > > +    DEFINE_PROP_UINT64("msg-page-addr", SynICState, msg_page_addr, 0),
-> > > +    DEFINE_PROP_UINT64("evt-page-addr", SynICState, evt_page_addr, 0),
-> > 
-> > What do you need the QOM properties for?  Are they supposed to be
-> > configurable by the user?
+> Indeed, that's a possibility.
 > 
-> No.  Actually I wanted to define them as read-only, but I failed to find
-> a way to do so.
-> 
-> > Are they supposed to be queried from outside QEMU?  On which cases?
-> 
-> ATM I only see them as informational fields that may prove useful during
-> debugging.
-> 
+> I'll probably make it in both directions then: on
+> KVM_ENABLE_CAP(KVM_CAP_HYPERV_SYNIC, 2) disable zeroing completely,
+> including on guest writes, to better match Hyper-V.  Or does it deserve
+> a separate cap number?
 
-You can use object_property_add_uint64_ptr() on instance_init to
-add read-only properties.
+Unfortunately kvm_vcpu_ioctl_enable_cap is not checking arguments and
+refusing nonzero values, so I'm a bit wary of doing that
+unconditionally---and I'm not sure it deserves a separate capability number.
 
-If the enabled/msg_page_addr/evt_page_addr struct fields exist
-only because of the properties, you can also use
-object_property_add() and write your own getter that will query
-the MSRs only when reading the property.  I normally don't like
-custom getters/setters, but it sounds acceptable for a read-only
-property that's only for debugging.
+Maybe a flag KVM_ENABLE_CAP_STRICT_ARG_CHECK in cap->flags, but I don't
+want you to do too much unrelated work.  Keeping the zeroing on guest
+writes doesn't seem too bad.
 
-Either way you choose to implement it, I would add a comment
-noting that the properties are there just for debugging.
+Or the nuclear option, introduce KVM_CAP_HYPERV_SYNIC2 and drop the
+broken KVM_CAP_HYPERV_SYNIC altogether.  Has its charm...
 
-BTW, would you still want to add this amount of boilerplate code
-just for debugging if we had a generic msr_get HMP command?
-There's a series in the list (submitted on April) adding msr_get
-and msr_set HMP commands, but it was never merged.
-
--- 
-Eduardo
+Paolo
