@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dLEHG-00013a-OB
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 15:48:31 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dLEHF-0008UF-ND
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 15:48:30 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:35153)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dLEHF-0008U5-Iz
+	(envelope-from <rth7680@gmail.com>) id 1dLEHF-00012a-1V
 	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 15:48:29 -0400
-Received: by mail-qt0-x242.google.com with SMTP id x58so2210363qtc.2
-	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 12:48:29 -0700 (PDT)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <rth7680@gmail.com>) id 1dLEHC-0008SX-T4
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 15:48:28 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:35998)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dLEHC-0008Rp-Os
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 15:48:26 -0400
+Received: by mail-qt0-x244.google.com with SMTP id s33so2212542qtg.3
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 12:48:26 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Wed, 14 Jun 2017 12:48:19 -0700
-Message-Id: <20170614194821.8754-4-rth@twiddle.net>
+Date: Wed, 14 Jun 2017 12:48:17 -0700
+Message-Id: <20170614194821.8754-2-rth@twiddle.net>
 In-Reply-To: <20170614194821.8754-1-rth@twiddle.net>
 References: <20170614194821.8754-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v2 3/5] target/mips: Exit after enabling
- interrupts
+Subject: [Qemu-devel] [PATCH v2 1/5] tcg: Refactor helper_lookup_tb_ptr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +27,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, cota@braap.org, pbonzini@redhat.com, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
+Cc: alex.bennee@linaro.org, cota@braap.org, pbonzini@redhat.com
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+We can call tb_htable_lookup even when the tb_jmp_cache
+is completely empty.  Therefore, un-nest most of the code
+dependent on tb != NULL from the read from the cache.
 
-Exit to cpu loop so we reevaluate cpu_mips_hw_interrupts.
-
-Cc: Aurelien Jarno <aurelien@aurel32.net>
-Cc: Yongbok Kim <yongbok.kim@imgtec.com>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/mips/translate.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ tcg-runtime.c | 34 ++++++++++++++++++----------------
+ 1 file changed, 18 insertions(+), 16 deletions(-)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 559f8fe..891f14b 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -13403,9 +13403,11 @@ static void gen_pool32axf (CPUMIPSState *env, DisasContext *ctx, int rt, int rs)
-                 save_cpu_state(ctx, 1);
-                 gen_helper_ei(t0, cpu_env);
-                 gen_store_gpr(t0, rs);
--                /* Stop translation as we may have switched the execution mode */
--                ctx->bstate = BS_STOP;
-                 tcg_temp_free(t0);
-+                /* BS_STOP isn't good enough here;
-+                   reevaluate cpu_mips_hw_interrupts_enabled.  */
-+                gen_save_pc(ctx->pc + 4);
-+                ctx->bstate = BS_EXCP;
-             }
-             break;
-         default:
+diff --git a/tcg-runtime.c b/tcg-runtime.c
+index 7fa90ce..a35c725 100644
+--- a/tcg-runtime.c
++++ b/tcg-runtime.c
+@@ -147,30 +147,32 @@ uint64_t HELPER(ctpop_i64)(uint64_t arg)
+ void *HELPER(lookup_tb_ptr)(CPUArchState *env, target_ulong addr)
+ {
+     CPUState *cpu = ENV_GET_CPU(env);
++    void *ret = tcg_ctx.code_gen_epilogue;
+     TranslationBlock *tb;
+     target_ulong cs_base, pc;
+-    uint32_t flags;
+-
+-    tb = atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)]);
+-    if (likely(tb)) {
+-        cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
+-        if (likely(tb->pc == addr && tb->cs_base == cs_base &&
+-                   tb->flags == flags)) {
+-            goto found;
+-        }
++    uint32_t flags, addr_hash;
++
++    addr_hash = tb_jmp_cache_hash_func(addr);
++    tb = atomic_rcu_read(&cpu->tb_jmp_cache[addr_hash]);
++    cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
++
++    if (unlikely(!(tb
++                   && tb->pc == addr
++                   && tb->cs_base == cs_base
++                   && tb->flags == flags))) {
+         tb = tb_htable_lookup(cpu, addr, cs_base, flags);
+-        if (likely(tb)) {
+-            atomic_set(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)], tb);
+-            goto found;
++        if (!tb) {
++            return ret;
+         }
++        atomic_set(&cpu->tb_jmp_cache[addr_hash], tb);
+     }
+-    return tcg_ctx.code_gen_epilogue;
+- found:
++
++    ret = tb->tc_ptr;
+     qemu_log_mask_and_addr(CPU_LOG_EXEC, addr,
+                            "Chain %p [%d: " TARGET_FMT_lx "] %s\n",
+-                           tb->tc_ptr, cpu->cpu_index, addr,
++                           ret, cpu->cpu_index, addr,
+                            lookup_symbol(addr));
+-    return tb->tc_ptr;
++    return ret;
+ }
+ 
+ void HELPER(exit_atomic)(CPUArchState *env)
 -- 
 2.9.4
