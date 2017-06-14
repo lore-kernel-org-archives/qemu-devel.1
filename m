@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52328)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dL6q4-0007tf-0c
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:52:02 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dL6sR-0001va-Jf
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:54:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dL6q3-0000TP-2W
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:51:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37044)
+	(envelope-from <pbonzini@redhat.com>) id 1dL6sP-0001c2-Hy
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:54:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54502)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dL6q2-0000TK-Sb
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:51:54 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BF14F3B470
-	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 11:51:53 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 14 Jun 2017 13:51:37 +0200
-Message-Id: <20170614115138.19571-5-quintela@redhat.com>
-In-Reply-To: <20170614115138.19571-1-quintela@redhat.com>
-References: <20170614115138.19571-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 4/5] migration: Test for disabled features on
- reception
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dL6sP-0001bv-92
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:54:21 -0400
+References: <1488276185-31168-1-git-send-email-fred.konrad@greensocs.com>
+	<b690a50d-4ab3-830c-93a3-5f2b4b027448@greensocs.com>
+	<CAFEAcA94RykH0U33F0aGEYRs_FXF_NNuwQAX_mOf4wVde0s9BQ@mail.gmail.com>
+	<1db78209-e426-03b5-9a19-592da96adaee@greensocs.com>
+	<CAFEAcA-pmVW-fnu6ZT=PeRcSf-U5UVsyYsJkzh2c_BFKDTU5kg@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d0a7ebb7-9f3d-5b3c-692e-344f4a980c05@redhat.com>
+Date: Wed, 14 Jun 2017 13:54:16 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-pmVW-fnu6ZT=PeRcSf-U5UVsyYsJkzh2c_BFKDTU5kg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 00/10] Clock framework API.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,66 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>, KONRAD Frederic <fred.konrad@greensocs.com>
+Cc: Edgar Iglesias <edgar.iglesias@xilinx.com>, Mark Burton <mark.burton@greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
 
-Right now, if we receive a compressed page while this features are
-disabled, Bad Things (TM) can happen.  Just add a test for them.
+On 13/06/2017 12:33, Peter Maydell wrote:
+>> For the migration maybe we can refresh the whole clock tree at the end
+>> of the migration. Is that a good idea?
+> That seems kind of awkward -- where would this code that did a
+> clock tree refresh be? Also you're then reliant on all the
+> callback functions registered to not actually do anything that
+> affects device state when the refresh happens. It would be
+> cleaner if the qemu-clk objects managed their own internal
+> state migration (but can we do this without having to make
+> them be Device objects rather than just objects ?).
+> 
+> Cc'd Paolo who might have an opinion on these -- my opinion currently
+> is mostly "this doesn't really look right" rather than knowing what
+> the right approach is.
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Same here. :)
 
---
+I think the various bindings and rates could be refreshed as devices are
+migrated.  This assumes that the device migration order is okay
+according to the clock tree, that is if you have three devices X/Y/Z and
+five clocks a/b/c/d/e/f:
 
-I had XBZRLE here also, but it don't need extra resources on
-destination, only on source.  Additionally libvirt don't enable it on
-destination, so don't put it here.
+  fixed-clock
+    |     |
+   X:a   X:b
+    |     |    \
+   Y:c   Y:d      Z:e
+          |
+         Z:f
 
-- initialize invalid_flags at declaration time.
-- remove extra space (peter)
----
- migration/ram.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+you could do this:
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 7f687f5..09b483c 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2455,7 +2455,7 @@ static int ram_load_postcopy(QEMUFile *f)
- 
- static int ram_load(QEMUFile *f, void *opaque, int version_id)
- {
--    int flags = 0, ret = 0;
-+    int flags = 0, ret = 0, invalid_flags = 0;
-     static uint64_t seq_iter;
-     int len = 0;
-     /*
-@@ -2472,6 +2472,9 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-         ret = -EINVAL;
-     }
- 
-+    if (!migrate_use_compression()) {
-+        invalid_flags |= RAM_SAVE_FLAG_COMPRESS_PAGE;
-+    }
-     /* This RCU critical section can be very long running.
-      * When RCU reclaims in the code start to become numerous,
-      * it will be necessary to reduce the granularity of this
-@@ -2492,6 +2495,15 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-         flags = addr & ~TARGET_PAGE_MASK;
-         addr &= TARGET_PAGE_MASK;
- 
-+        if (flags & invalid_flags) {
-+            if (flags & invalid_flags & RAM_SAVE_FLAG_COMPRESS_PAGE) {
-+                error_report("Received an unexpected compressed page");
-+            }
-+
-+            ret = -EINVAL;
-+            break;
-+        }
-+
-         if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
-                      RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE)) {
-             RAMBlock *block = ram_block_from_stream(f, flags);
--- 
-2.9.4
+- migrate X
+  - retrieve the PLL ratios for a and b's bound clocks (if the ratio
+    is variable, otherwise no need for this)
+  - in the post_load callback, bind a and b to the fixed-clock
+    (if the binding is variable, otherwise no need for this)
+- migrate Y
+  - retrieve the PLL ratio for d's bound clocks (if the ratio
+    is variable, otherwise no need for this)
+  - in the post_load callback, bind c and d to a and b respectively
+    (if the binding is variable, otherwise no need for this)
+- migrate Z
+  - in the post_load callback, bind e and f to b and d respectively
+    (if the binding is variable, otherwise no need for this)
+
+Paolo
