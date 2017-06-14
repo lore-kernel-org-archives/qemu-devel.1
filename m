@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40458)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dL0EF-0000D6-VE
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 00:48:28 -0400
+	(envelope-from <famz@redhat.com>) id 1dL0Jd-0001bo-Um
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 00:54:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dL0EF-0004yA-Av
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 00:48:27 -0400
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170609170100.3599-1-alex.bennee@linaro.org>
-	<20170609170100.3599-4-alex.bennee@linaro.org>
-	<fc351edb-7c08-c341-d8ee-85f6768e4931@twiddle.net>
-	<87vao4b4z5.fsf@linaro.org>
-	<9776b437-90b4-f2c2-4a0c-c1c6585379bf@twiddle.net>
-	<20170611050730.GA12317@flamenco> <20170613225352.GA26288@flamenco>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <db800d74-7cfa-d9e3-60d7-3e7b19565b9b@twiddle.net>
-Date: Tue, 13 Jun 2017 21:48:17 -0700
+	(envelope-from <famz@redhat.com>) id 1dL0JZ-00068f-QR
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 00:54:01 -0400
+Date: Wed, 14 Jun 2017 12:53:49 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170614045349.GA25748@lemon>
+References: <1497383329-10393-1-git-send-email-thuth@redhat.com>
+	<149738389265.243.11409224507286961666@4a9a010726c0>
+	<20170614051851-mutt-send-email-mst@kernel.org>
+	<20170614023017.GG13420@umbus>
 MIME-Version: 1.0
-In-Reply-To: <20170613225352.GA26288@flamenco>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/aarch64: exit to main loop after
- handling MSR
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170614023017.GG13420@umbus>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/pci-bridge/dec: Classify the DEC PCI
+ bridge as bridge device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +27,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: peter.maydell@linaro.org, pbonzini@redhat.com, edgar.iglesias@xilinx.com, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "open list:ARM" <qemu-arm@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: thuth@redhat.com, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, agraf@suse.de, qemu-ppc@nongnu.org, marcel@redhat.com
 
-On 06/13/2017 03:53 PM, Emilio G. Cota wrote:
-> The appended fixes it for me. Can you please test?
-> [ apply with `git am --scissors' ]
-> 
-> Thanks,
-> 
-> 		Emilio
-> 
-> ---- 8< ----
-> 
-> Commit e75449a3 ("target/aarch64: optimize indirect branches") causes
-> a regression by which aarch64 guests freeze under TCG with -smp > 1,
-> even with `-accel accel=tcg,thread=single' (i.e. MTTCG disabled).
-> 
-> I isolated the problem to the MSR handler. This patch forces an exit
-> after the handler is executed, which fixes the regression.
+On Wed, 06/14 10:30, David Gibson wrote:
+> On Wed, Jun 14, 2017 at 05:19:18AM +0300, Michael S. Tsirkin wrote:
+> > On Tue, Jun 13, 2017 at 12:58:13PM -0700, no-reply@patchew.org wrote:
+> > > In file included from /tmp/qemu-test/src/hw/net/vmxnet3.c:30:
+> > > /tmp/qemu-test/src/include/migration/register.h:18: error: redefini=
+tion of typedef =E2=80=98LoadStateHandler=E2=80=99
+> > > /tmp/qemu-test/src/include/migration/vmstate.h:32: note: previous d=
+eclaration of =E2=80=98LoadStateHandler=E2=80=99 was here
+> > > make: *** [hw/net/vmxnet3.o] Error 1
+> > > make: *** Waiting for unfinished jobs....
+> > > tests/docker/Makefile.include:118: recipe for target 'docker-run' f=
+ailed
+> > > make[1]: *** [docker-run] Error 2
+> > > make[1]: Leaving directory '/var/tmp/patchew-tester-tmp-dv2lv743/sr=
+c'
+> > > tests/docker/Makefile.include:149: recipe for target 'docker-run-te=
+st-quick@centos6' failed
+> > > make: *** [docker-run-test-quick@centos6] Error 2
+> > > =3D=3D=3D OUTPUT END =3D=3D=3D
+> > >=20
+> > > Test command exited with code: 2
+> >=20
+> > Any idea what's going on here?
 
-Why would that be?  The cpu_get_tb_cpu_state within helper_lookup_tb_ptr is 
-supposed to read the new state that the msr handler would have installed.
+Unrelated to this patch. Every patch from today has it.
 
+>=20
+> I _think_ that's unrelated to the patch here.  Looks like the
+> autobuilder is using a compiler version that doesn't like typedef
+> redefinitions, even if they're identical.
 
-r~
+RHEL 6 build was broken by commit f2a8f0a6314 (migration: Split registrat=
+ion
+functions from vmstate.h). The fix is
+
+https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg03173.html
+
+Fam
