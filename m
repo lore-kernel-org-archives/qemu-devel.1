@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dL9zL-000477-TV
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:13:44 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dL9zr-0004ML-MP
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:14:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dL9zH-0004kp-Rp
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:13:43 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:34270)
+	(envelope-from <alex.bennee@linaro.org>) id 1dL9zn-0004vu-Mr
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:14:15 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:33963)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dL9zH-0004kZ-NW
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:13:39 -0400
-Received: by mail-qt0-x241.google.com with SMTP id o21so437129qtb.1
-	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 08:13:39 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170607175419.13558-1-berrange@redhat.com>
-	<CAFEAcA8eXe2+65KTYPHDpXgK2X3k=bdvVFdWfAAzP-OeWgL1gw@mail.gmail.com>
-	<20170614105023.GG4370@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <15e25d8e-4a2d-6d2a-95b3-9b045abf7af6@amsat.org>
-Date: Wed, 14 Jun 2017 12:13:33 -0300
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dL9zn-0004vV-Fa
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:14:11 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id 77so4864288wrb.1
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 08:14:11 -0700 (PDT)
+References: <1497369290-20401-1-git-send-email-peter.maydell@linaro.org>
+	<1497369290-20401-4-git-send-email-peter.maydell@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1497369290-20401-4-git-send-email-peter.maydell@linaro.org>
+Date: Wed, 14 Jun 2017 16:14:44 +0100
+Message-ID: <874lviob2z.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170614105023.GG4370@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL v1 0/5] Merge sockets 2017/06/07
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 3/3] travis: Add config to do a Coverity
+ Scan upload
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,76 +31,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Hi Daniel,
 
-On 06/14/2017 07:50 AM, Daniel P. Berrange wrote:
-> On Mon, Jun 12, 2017 at 02:14:19PM +0100, Peter Maydell wrote:
->> On 7 June 2017 at 18:54, Daniel P. Berrange <berrange@redhat.com> wrote:
->>> The following changes since commit 0db1851becbefe3e50cfc03776fb1f75817376af:
->>>
->>>   Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-2.10-pull-request' into staging (2017-06-07 11:56:00 +0100)
->>>
->>> are available in the git repository at:
->>>
->>>   git://github.com/berrange/qemu tags/pull-sockets-2017-06-07-1
->>>
->>> for you to fetch changes up to 8dd2c27927b93aa352c43e8f0b9437f85d2f5f55:
->>>
->>>   tests: add functional test validating ipv4/ipv6 address flag handling (2017-06-07 17:15:08 +0100)
->>>
->>> ----------------------------------------------------------------
->>> Merge sockets 2017/06/07 v1
->>>
->>> ----------------------------------------------------------------
->>
->> Hi; I'm afraid this ran into 'make check' problems:
->>
->> On OSX and FreeBSD:
->>   GTESTER check-qtest-i386
->> ERROR:/Users/pm215/src/qemu-for-merges/tests/test-sockets-proto.c:825:void
->> test_listen(const void *): assertion failed: (data->ipv6 != 0)
->> GTester: last random seed: R02Sc21fa7784ab13d0fd3274d86c5a52367
->> **
->> ERROR:/Users/pm215/src/qemu-for-merges/tests/test-sockets-proto.c:825:void
->> test_listen(const void *): assertion failed: (data->ipv6 != 0)
->> GTester: last random seed: R02Sdf653a63e8d9a5d03bfadb49122f3e9a
->
-> Ok, it appears that getaddrinfo() returns different results for "localhost"
-> on FreeBSD/OSX, compared to Linux. Linux returns IPv4 first, then IPv6,
-> while FreeBSD/OSX return IPv6 first then IPv4. The sockets code is working
-> correctly, but the unit test is not seeing the expected results, since its
-> data tables are expecting the Linux behaviour. Not sure how I'll fix this
-> yet, perhaps I'll just #ifdef __linux__ as a temporary hack.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-On Linux it depends of your /etc/gai.conf(5), on FreeBSD it depends on 
-ip6addrctl(8) policy.
+> Add config to travis to do a Coverity Scan build and upload, using
+> the new run-coverity-scan script.
+>
+> There is an official integration between Travis and Coverity Scan:
+>  https://github.com/travis-ci/travis-build/blob/master/lib/travis/build/addons/coverity_scan.rb
+> which slurps values out of the .travis.yml and downloads a build
+> script from Coverity which does the bulk of the work:
+>  https://scan.coverity.com/scripts/travisci_build_coverity_scan.sh
+>
+> However we choose to roll our own since this seems less
+> confusing and also allows us to include debug features
+> (notably the ability to do a "dry run" test which doesn't
+> actually upload anything).
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  .travis.yml | 24 ++++++++++++++++++++++++
+>  1 file changed, 24 insertions(+)
+>
+> diff --git a/.travis.yml b/.travis.yml
+> index 26dabb6..d772a4a 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -210,3 +210,27 @@ matrix:
+>          - TEST_CMD=""
+>        before_script:
+>          - ./configure ${CONFIG} --extra-cflags="-g3 -O0 -fsanitize=thread -fuse-ld=gold" || cat config.log
+> +    # Build and upload to Coverity Scan.
+> +    # We do not impose any rate limiting here, but instead rely on the
+> +    # limiting done by the coverity servers, which for a project of QEMU's
+> +    # size means one build a day. The run-coverity-scan script will exit
+> +    # early if the limiter does not permit a new upload, so the effect will
+> +    # be that the first build (only) in each 24 hour period will be scanned.
+> +    # If we needed to apply a limit at the Travis end, the simplest approach
+> +    # would be to run the scan only if the branch was 'coverity-scan', and
+> +    # use a cron job to push master to the 'coverity-scan' branch periodically.
+> +    # We run on the trusty Travis hosts so that there's a wider set of
+> +    # dependencies satisfied to improve coverage.
+> +    - dist: trusty
 
-I'm not sure about this hack, temporary tends to last...
+I think we ought to add a sudo: stanza here to make it explicit if we
+want the containerised or VM based trusty image here. I'm wildly
+assuming we need lots of memory for this build so I would suggest:
 
->
->
->> On the clang runtime undefined-behavior sanitizer:
->>   GTESTER check-qtest-i386
->> /home/petmay01/linaro/qemu-for-merges/qapi/qapi-visit-core.c:139:12:
->> runtime error: load of value 254, which is not a valid value for type
->> 'bool'
->>
->> (ditto for check-qtest-ppc64, x86_64
->>   GTESTER check-qtest-ppc64
->> /home/petmay01/linaro/qemu-for-merges/qapi/qapi-visit-core.c:139:12:
->> runtime error: load of value 254, which is not a valid value for type
->> 'bool'
->
-> [snip]
->
->> This usually means "forgot to initialize a bool". May or may not
->> be the same bug in both cases...
->
-> Yes, this was a unit test bug using  g_new instead of g_new0
->
-> Regards,
-> Daniel
->
+ sudo: required
+
+> +      env:
+> +        - COVERITY=1
+> +        - COVERITY_BUILD_CMD="make -j3"
+> +        - COVERITY_EMAIL=peter.maydell@linaro.org
+> +        # This 'secure' setting sets COVERITY_TOKEN=<secret token>
+> +        # and was created with travis encrypt -r qemu/qemu COVERITY_TOKEN=...
+> +        - secure: "D3E6E5bacui53fYBQrx0wQr8ZTvo6VIBPKfg0QHj2uwa6OPFkUlcMr/EHWvdbZNAa4Q1bv1vhlED5OPRfPmQYzxQNT4SAxDZeuZnikgIymfqQXNOjKw4kRUDO9P42QanyFd+EAu2JDVClAeJPgBpa/ns4CNrGDK+Q3coGndCP8o="
+> +      before_script:
+> +        - if [ "$TRAVIS_PULL_REQUEST" = "true" ]; then echo "Skipping Coverity (pullreq)"; exit 0; fi
+> +        - if [ "$TRAVIS_BRANCH" != "master" ]; then echo "Skipping
+> Coverity (wrong branch)"; exit 0; fi
+
+This doesn't actually skip anything - but you can't exit non-zero
+without breaking the build. You would need to touch a file or something
+to make run-coverity-scan skip its work.
+
+> +      script:
+> +        - ./scripts/run-coverity-scan
+
+
+--
+Alex Bennée
