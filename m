@@ -1,46 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42048)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dL0NA-0002rQ-7X
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 00:57:41 -0400
+	(envelope-from <peterx@redhat.com>) id 1dL0Nv-0003JX-BF
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 00:58:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dL0N5-0007B8-BW
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 00:57:40 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55101
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1dL0N5-0007Ay-6k
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 00:57:35 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v5E4rdD2077739
-	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 00:57:34 -0400
-Received: from e23smtp07.au.ibm.com (e23smtp07.au.ibm.com [202.81.31.140])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2b2scrtfmq-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 00:57:34 -0400
-Received: from localhost
-	by e23smtp07.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Wed, 14 Jun 2017 14:57:30 +1000
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <20170614014142.GF13420@umbus>
-References: <149692935202.12119.3614006195497745877.stgit@bahia>
-	<20170609022813.GF26521@umbus.fritz.box>
-	<20170609113631.229dd346@bahia.ttt.fr.ibm.com>
-	<20170609102832.GL26521@umbus.fritz.box>
-	<20170609170913.2e6526c3@bahia.ttt.fr.ibm.com>
-	<20170611093842.GA13479@umbus>
-	<20170613094302.1cb4012c@bahia.ttt.fr.ibm.com>
-	<8760g01eae.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<20170614014142.GF13420@umbus>
-Date: Wed, 14 Jun 2017 10:27:23 +0530
+	(envelope-from <peterx@redhat.com>) id 1dL0Np-0007lL-GW
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 00:58:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55322)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dL0Np-0007h7-As
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 00:58:21 -0400
+Date: Wed, 14 Jun 2017 12:58:15 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170614045815.GG11751@pxdev.xzpeter.org>
+References: <1497346593-8791-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170613093801eucas1p1e2b34c1a72b7150a28007d5b187da82e@eucas1p1.samsung.com>
+	<1497346593-8791-3-git-send-email-a.perevalov@samsung.com>
+	<87tw3kjer9.fsf@secure.mitica>
+	<154a8295-381a-b7dd-41b9-d9f720b790f6@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Message-Id: <874lvjkvyk.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH v4 0/6] spapr/xics: fix migration of older
- machine types
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <154a8295-381a-b7dd-41b9-d9f720b790f6@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] migration: add bitmap for copied
+ page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,78 +31,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: quintela@redhat.com, qemu-devel@nongnu.org, i.maximets@samsung.com, dgilbert@redhat.com
 
-David Gibson <david@gibson.dropbear.id.au> writes:
+On Tue, Jun 13, 2017 at 03:00:28PM +0300, Alexey Perevalov wrote:
+> On 06/13/2017 02:42 PM, Juan Quintela wrote:
 
-> On Tue, Jun 13, 2017 at 01:59:29PM +0530, Nikunj A Dadhania wrote:
->> Greg Kurz <groug@kaod.org> writes:
->> 
->> > On Sun, 11 Jun 2017 17:38:42 +0800
->> > David Gibson <david@gibson.dropbear.id.au> wrote:
->> >
->> >> On Fri, Jun 09, 2017 at 05:09:13PM +0200, Greg Kurz wrote:
->> >> > On Fri, 9 Jun 2017 20:28:32 +1000
->> >> > David Gibson <david@gibson.dropbear.id.au> wrote:
->> >> >   
->> >> > > On Fri, Jun 09, 2017 at 11:36:31AM +0200, Greg Kurz wrote:  
->> >> > > > On Fri, 9 Jun 2017 12:28:13 +1000
->> >> > > > David Gibson <david@gibson.dropbear.id.au> wrote:
->> >> > > >     
->> >> > > > > On Thu, Jun 08, 2017 at 03:42:32PM +0200, Greg Kurz wrote:    
->> >> > > > > > I've provided answers for all comments from the v3 review that I deliberately
->> >> > > > > > don't address in v4.      
->> >> > > > > 
->> >> > > > > I've merged patches 1-4.  5 & 6 I'm still reviewing.
->> >> > > > >     
->> >> > > > 
->> >> > > > Cool. FYI, I forgot to mention that I only tested with KVM.
->> >> > > > 
->> >> > > > I'm now trying with TCG and I hit various guest crash on
->> >> > > > the destination (using your ppc-for-2.10 branch WITHOUT
->> >> > > > my patches):    
->> >> > > 
->> >> > > Drat.  What's your reproducer for this crash?
->> >> > >   
->> >> > 
->> >> > 1) start guest
->> >> > 
->> >> > qemu-system-ppc64 \
->> >> >  -nodefaults -nographic -snapshot -no-shutdown -serial mon:stdio \
->> >> >  -device virtio-net,netdev=netdev0,id=net0 \
->> >> >  -netdev bridge,id=netdev0,br=virbr0,helper=/usr/libexec/qemu-bridge-helper \
->> >> >  -device virtio-blk,drive=drive0,id=blk0 \
->> >> >  -drive file=/home/greg/images/sle12-sp1-ppc64le.qcow2,id=drive0,if=none \
->> >> >  -machine type=pseries,accel=tcg -cpu POWER8
->> 
->> Strangely, your command line does not have multiple threads. Need to see
->> what is the side effect of enabling MTTCG by default here.
->> 
->> >> > 
->> >> > 2) migrate
->> >> > 
->> >> > 3) destination crashes (immediately or after very short delay) or
->> >> > hangs  
->> >> 
->> >> Ok.  I'll bisect it when I can, but you might well get to it first.
->> >> 
->> >> 
->> >
->> > Heh, maybe you didn't see in my mail but I did bisect:
->> >
->> > f0b0685d6694a28c66018f438e822596243b1250 is the first bad commit
->> > commit f0b0685d6694a28c66018f438e822596243b1250
->> > Author: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
->> > Date:   Thu Apr 27 10:48:23 2017 +0530
->> >
->> >     tcg: enable MTTCG by default for PPC64 on x86
->> 
->> Let me have a look at it.
->
-> Is this crash fixed by the patch from Thomas I merged yesterday?
+[...]
 
-No, it doesn't. Moreover, in Greg's scenario there is only one cpu.
+> >>Bitmap is placed into RAMBlock as another postcopy/precopy
+> >>related bitmaps.
+> >Why are we not using the TARGET_PAGE_SIZE as units of the bitmap?
+> Page size per ram block can be different, just to
+> reduce whole size of bitmap.
 
-Regards,
-Nikunj
+I think one reason that we should use TARGET_PAGE_SIZE not
+per-ramblock page size bitmap is that we need to let this
+copied_bitmap/recved_bitmap work even during precopy phase, and in
+precopy phase we are migrating pages in target page size, not host
+page size.
+
+Thanks,
+
+-- 
+Peter Xu
