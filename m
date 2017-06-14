@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dLBpE-0001M2-GG
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:11:25 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dLBqA-0001s1-5M
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:12:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dLBpD-000608-Kx
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:11:24 -0400
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:33008)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1dLBpD-0005zR-Fo
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:11:23 -0400
-Received: by mail-io0-x244.google.com with SMTP id j200so622500ioe.0
-	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 10:11:22 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1dLBq6-0006GA-0b
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:12:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:5184)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dLBq5-0006Fx-Q3
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:12:17 -0400
+References: <149745954462.1611.12282014261512444009@4a9a010726c0>
+	<F0D8D81A-19F6-4311-95C6-B30B38FCB2BC@nutanix.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <cd443e75-eec3-b5fc-1acc-3d4a152db655@redhat.com>
+Date: Wed, 14 Jun 2017 19:12:13 +0200
 MIME-Version: 1.0
-Sender: bobby.prani@gmail.com
-In-Reply-To: <20170614140209.29847-3-alex.bennee@linaro.org>
-References: <20170614140209.29847-1-alex.bennee@linaro.org>
-	<20170614140209.29847-3-alex.bennee@linaro.org>
-From: Pranith Kumar <bobby.prani+qemu@gmail.com>
-Date: Wed, 14 Jun 2017 13:10:50 -0400
-Message-ID: <CAJhHMCDxE+q34xvMLaK12Spq8RosLZP_i30Dsc=EDqtv0w8+yg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <F0D8D81A-19F6-4311-95C6-B30B38FCB2BC@nutanix.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 2/3] tcg-runtime: light re-factor of
- lookup_tb_ptr
+Subject: Re: [Qemu-devel] [PATCH] vhost-user: support cross-endianess
+ negatiation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,89 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Emilio G. Cota" <cota@braap.org>, qemu-devel <qemu-devel@nongnu.org>
-
-Hi Alex,
-
-On Wed, Jun 14, 2017 at 10:02 AM, Alex Benn=C3=A9e <alex.bennee@linaro.org>=
- wrote:
-> Just a little precursor re-factoring before I was going to add a trace
-> point:
->
->   - single return point, defaulting to tcg_ctx.code_gen_epilogue
->   - move cs_base, pc and flags inside the jump cache hit scope
->   - calculate the tb_jmp_cache hash once
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  tcg-runtime.c | 35 +++++++++++++++++++----------------
->  1 file changed, 19 insertions(+), 16 deletions(-)
-
-Phew, glad you got this figured out! I tested it on the images I have
-and it works. Please add:
-
-Tested-by: Pranith Kumar <bobby.prani@gmail.com>
+To: Felipe Franciosi <felipe@nutanix.com>, QEMU Developers <qemu-devel@nongnu.org>, "famz@redhat.com" <famz@redhat.com>
+Cc: Mike Cui <cui@nutanix.com>, "Michael S. Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>
 
 
->
-> diff --git a/tcg-runtime.c b/tcg-runtime.c
-> index 7fa90ce508..f4bfa9cea6 100644
-> --- a/tcg-runtime.c
-> +++ b/tcg-runtime.c
-> @@ -147,30 +147,33 @@ uint64_t HELPER(ctpop_i64)(uint64_t arg)
->  void *HELPER(lookup_tb_ptr)(CPUArchState *env, target_ulong addr)
->  {
->      CPUState *cpu =3D ENV_GET_CPU(env);
-> +    unsigned int addr_hash =3D tb_jmp_cache_hash_func(addr);
-> +    void *code_ptr =3D NULL;
->      TranslationBlock *tb;
-> -    target_ulong cs_base, pc;
-> -    uint32_t flags;
->
-> -    tb =3D atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(add=
-r)]);
-> +    tb =3D atomic_rcu_read(&cpu->tb_jmp_cache[addr_hash]);
->      if (likely(tb)) {
-> +        target_ulong cs_base, pc;
-> +        uint32_t flags;
-> +
->          cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
-> +
->          if (likely(tb->pc =3D=3D addr && tb->cs_base =3D=3D cs_base &&
->                     tb->flags =3D=3D flags)) {
-> -            goto found;
-> -        }
-> -        tb =3D tb_htable_lookup(cpu, addr, cs_base, flags);
-> -        if (likely(tb)) {
-> -            atomic_set(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)],=
- tb);
-> -            goto found;
-> +            code_ptr =3D tb->tc_ptr;
-> +        } else {
-> +            /* If we didn't find it in the jmp_cache we still might
-> +             * find it in the global tb_htable
-> +             */
-> +            tb =3D tb_htable_lookup(cpu, addr, cs_base, flags);
-> +            if (likely(tb)) {
-> +                atomic_set(&cpu->tb_jmp_cache[addr_hash], tb);
-> +                code_ptr =3D tb->tc_ptr;
-> +            }
->          }
->      }
-> -    return tcg_ctx.code_gen_epilogue;
-> - found:
-> -    qemu_log_mask_and_addr(CPU_LOG_EXEC, addr,
-> -                           "Chain %p [%d: " TARGET_FMT_lx "] %s\n",
-> -                           tb->tc_ptr, cpu->cpu_index, addr,
-> -                           lookup_symbol(addr));
-> -    return tb->tc_ptr;
-> +
-> +    return code_ptr ? code_ptr : tcg_ctx.code_gen_epilogue;
->  }
->
->  void HELPER(exit_atomic)(CPUArchState *env)
-> --
-> 2.13.0
->
->
+
+On 14/06/2017 19:02, Felipe Franciosi wrote:
+>=20
+>> On 14 Jun 2017, at 17:59, no-reply@patchew.org wrote:
+>>
+>> Hi,
+>>
+>> This series failed automatic build test. Please find the testing comma=
+nds and
+>> their output below. If you have docker installed, you can probably rep=
+roduce it
+>> locally.
+>>
+>> Message-id: 1497458486-15673-1-git-send-email-felipe@nutanix.com
+>> Type: series
+>> Subject: [Qemu-devel] [PATCH] vhost-user: support cross-endianess nega=
+tiation
+>>
+> ...
+>>
+>>  CC      hw/pci-bridge/pci_expander_bridge.o
+>> In file included from /tmp/qemu-test/src/hw/net/vmxnet3.c:30:
+>> /tmp/qemu-test/src/include/migration/register.h:18: error: redefinitio=
+n of typedef =E2=80=98LoadStateHandler=E2=80=99
+>> /tmp/qemu-test/src/include/migration/vmstate.h:32: note: previous decl=
+aration of =E2=80=98LoadStateHandler=E2=80=99 was here
+>> make: *** [hw/net/vmxnet3.o] Error 1
+>> make: *** Waiting for unfinished jobs....
+>> tests/docker/Makefile.include:118: recipe for target 'docker-run' fail=
+ed
+>> make[1]: *** [docker-run] Error 2
+>> make[1]: Leaving directory '/var/tmp/patchew-tester-tmp-enl3ixyr/src'
+>> tests/docker/Makefile.include:149: recipe for target 'docker-run-test-=
+build@min-glib' failed
+>> make: *** [docker-run-test-build@min-glib] Error 2
+>> =3D=3D=3D OUTPUT END =3D=3D=3D
+>>
+>> Test command exited with code: 2
+>=20
+> That seems completely unrelated to what our patch touched... I'm gonna =
+guess this is a known issue and I can safely ignore it?
+
+Yes.
+
+Juan, can you take a look?  Just removing the typedef from
+VMStateDescription, and instead just using int(*load_state_old)(etc...)
+should do it.
+
+Paolo
