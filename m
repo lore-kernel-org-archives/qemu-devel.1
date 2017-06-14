@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dL70N-0007sD-Lb
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 08:02:39 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dL72w-0000Za-8a
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 08:05:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dL70H-00057Q-Pp
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 08:02:35 -0400
-References: <20170609170100.3599-1-alex.bennee@linaro.org>
-	<20170609170100.3599-4-alex.bennee@linaro.org>
-	<fc351edb-7c08-c341-d8ee-85f6768e4931@twiddle.net>
-	<87vao4b4z5.fsf@linaro.org>
-	<9776b437-90b4-f2c2-4a0c-c1c6585379bf@twiddle.net>
-	<20170611050730.GA12317@flamenco> <20170613225352.GA26288@flamenco>
-	<db800d74-7cfa-d9e3-60d7-3e7b19565b9b@twiddle.net>
-	<5036e9ad-257a-b098-5093-050fca825627@redhat.com>
-	<87r2ymiyht.fsf@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9c7ea148-2ca7-ec56-48ed-eabac0fe7896@redhat.com>
-Date: Wed, 14 Jun 2017 14:02:19 +0200
+	(envelope-from <mreitz@redhat.com>) id 1dL72r-0006V5-CF
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 08:05:14 -0400
+References: <20170602112158.232757-1-vsementsov@virtuozzo.com>
+	<20170602112158.232757-14-vsementsov@virtuozzo.com>
+	<3c884dff-5736-5e27-c68a-f1df374e26b0@redhat.com>
+	<80a6c118-bdef-7519-6405-e80970ddda96@virtuozzo.com>
+	<e4af8c75-b217-3017-708a-8760a2689c00@redhat.com>
+	<566c473c-3669-ebde-e50a-0f85afac5f51@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <a67643ae-85fe-6464-bbd5-bd1b4927000a@redhat.com>
+Date: Wed, 14 Jun 2017 14:04:37 +0200
 MIME-Version: 1.0
-In-Reply-To: <87r2ymiyht.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] target/aarch64: exit to main loop after
- handling MSR
+In-Reply-To: <566c473c-3669-ebde-e50a-0f85afac5f51@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="VmbMLHuQFctXTeaj9C5aaoBg2HE6RCrlH"
+Subject: Re: [Qemu-devel] [PATCH v20 13/30] block: new
+ bdrv_reopen_bitmaps_rw interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,62 +29,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: Richard Henderson <rth@twiddle.net>, "Emilio G. Cota" <cota@braap.org>, peter.maydell@linaro.org, edgar.iglesias@xilinx.com, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "open list:ARM" <qemu-arm@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--VmbMLHuQFctXTeaj9C5aaoBg2HE6RCrlH
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
+ famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+Message-ID: <a67643ae-85fe-6464-bbd5-bd1b4927000a@redhat.com>
+Subject: Re: [PATCH v20 13/30] block: new bdrv_reopen_bitmaps_rw interface
+References: <20170602112158.232757-1-vsementsov@virtuozzo.com>
+ <20170602112158.232757-14-vsementsov@virtuozzo.com>
+ <3c884dff-5736-5e27-c68a-f1df374e26b0@redhat.com>
+ <80a6c118-bdef-7519-6405-e80970ddda96@virtuozzo.com>
+ <e4af8c75-b217-3017-708a-8760a2689c00@redhat.com>
+ <566c473c-3669-ebde-e50a-0f85afac5f51@virtuozzo.com>
+In-Reply-To: <566c473c-3669-ebde-e50a-0f85afac5f51@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+On 2017-06-14 11:03, Vladimir Sementsov-Ogievskiy wrote:
+> 13.06.2017 18:28, Max Reitz wrote:
+>> On 2017-06-13 12:25, Vladimir Sementsov-Ogievskiy wrote:
+>>> 09.06.2017 16:27, Max Reitz wrote:
+>>>> On 2017-06-02 13:21, Vladimir Sementsov-Ogievskiy wrote:
+>>>>> Add format driver handler, which should mark loaded read-only
+>>>>> bitmaps as 'IN_USE' in the image and unset read_only field in
+>>>>> corresponding BdrvDirtyBitmap's.
+>>>>>
+>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.c=
+om>
+>>>>> ---
+>>>>>    block.c                   | 17 +++++++++++++++++
+>>>>>    include/block/block_int.h |  7 +++++++
+>>>>>    2 files changed, 24 insertions(+)
+>>>>>
+>>>>> diff --git a/block.c b/block.c
+>>>>> index 04af7697dc..161db9e32a 100644
+>>>>> --- a/block.c
+>>>>> +++ b/block.c
+>>>>> @@ -2946,12 +2946,16 @@ void bdrv_reopen_commit(BDRVReopenState
+>>>>> *reopen_state)
+>>>>>    {
+>>>>>        BlockDriver *drv;
+>>>>>        BlockDriverState *bs;
+>>>>> +    bool old_can_write, new_can_write;
+>>>>>          assert(reopen_state !=3D NULL);
+>>>>>        bs =3D reopen_state->bs;
+>>>>>        drv =3D bs->drv;
+>>>>>        assert(drv !=3D NULL);
+>>>>>    +    old_can_write =3D
+>>>>> +        !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) &
+>>>>> BDRV_O_INACTIVE);
+>>>>> +
+>>>>>        /* If there are any driver level actions to take */
+>>>>>        if (drv->bdrv_reopen_commit) {
+>>>>>            drv->bdrv_reopen_commit(reopen_state);
+>>>>> @@ -2965,6 +2969,19 @@ void bdrv_reopen_commit(BDRVReopenState
+>>>>> *reopen_state)
+>>>>>        bs->read_only =3D !(reopen_state->flags & BDRV_O_RDWR);
+>>>>>          bdrv_refresh_limits(bs, NULL);
+>>>>> +
+>>>>> +    new_can_write =3D
+>>>>> +        !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) &
+>>>>> BDRV_O_INACTIVE);
+>>>>> +    if (!old_can_write && new_can_write &&
+>>>>> drv->bdrv_reopen_bitmaps_rw) {
+>>>>> +        Error *local_err =3D NULL;
+>>>>> +        if (drv->bdrv_reopen_bitmaps_rw(bs, &local_err) < 0) {
+>>>>> +            /* This is not fatal, bitmaps just left read-only, so
+>>>>> all following
+>>>>> +             * writes will fail. User can remove read-only bitmaps=
 
-On 14/06/2017 13:45, Alex Benn=C3=A9e wrote:
->=20
-> Paolo Bonzini <pbonzini@redhat.com> writes:
->=20
->> On 14/06/2017 06:48, Richard Henderson wrote:
+>>>>> to unblock
+>>>>> +             * writes.
+>>>>> +             */
+>>>> In a sense, it pretty much is fatal. We were asked to make the image=
+
+>>>> non-read-only but we failed because it effectively still is read-onl=
+y.
 >>>>
->>>> Commit e75449a3 ("target/aarch64: optimize indirect branches") cause=
-s
->>>> a regression by which aarch64 guests freeze under TCG with -smp > 1,
->>>> even with `-accel accel=3Dtcg,thread=3Dsingle' (i.e. MTTCG disabled)=
-.
+>>>> But I can't think of anything better, and you're right, removing the=
+
+>>>> bitmaps would resolve the situation. This would require the user to
+>>>> know
+>>>> that updating the bitmaps was the issue, and local_err may not actua=
+lly
+>>>> reflect that.
 >>>>
->>>> I isolated the problem to the MSR handler. This patch forces an exit
->>>> after the handler is executed, which fixes the regression.
->>>
->>> Why would that be?  The cpu_get_tb_cpu_state within helper_lookup_tb_=
-ptr
->>> is supposed to read the new state that the msr handler would have
->>> installed.
->>
->> Could some of these cause an interrupt, or some other change in the
->> cpu_exec flow?
+>>>>> +            error_report_err(local_err);
+>>>> So I'd prepend this with something like "$node_name: Failed to make
+>>>> dirty bitmaps writable", and maybe append a hint like "Removing all
+>>>> persistent dirty bitmaps from this node will allow writing to it".
+>>> Ok for prepending, but I don't want to add last note, as for the user=
+ it
+>>> may better to retry an operation, leading reopening image rw..
+>> Which operation do you mean? The reopening? Because that operation
+>> already "succeeded" at this point, so you can't retry it...
 >=20
-> Well what I was observing was the secondary_start_kernel stalling and
-> leaving the main cpu spinning. The msr is actually:
->=20
-> 	local_irq_enable();
-> 	local_fiq_enable();
->=20
-> Which I assume would re-enable IRQs if they are ready to go. However I
-> guess if we sink into our cpu_idle without exiting the main loop we
-> never set any pending IRQs?
+> So, firstly, reopen r-o again and then reopen r-w? Is it possible?
 
-Then Emilio's patch, if a bit of a heavy hammer, is correct. After
-aa64_daif_write needs you need an exit_tb so that arm_cpu_exec_interrupt
-is executed again.
+That should work, yes -- if it works then. :-)
 
-Compare with this from the x86 front-end:
+Max
 
-        /* if irq were inhibited with HF_INHIBIT_IRQ_MASK, we clear
-           the flag and abort the translation to give the irqs a
-           change to be happen */
-        if (dc->tf || dc->singlestep_enabled ||
-            (flags & HF_INHIBIT_IRQ_MASK)) {
-            gen_jmp_im(pc_ptr - dc->cs_base);
-            gen_eob(dc);
-            break;
-        }
 
-(This triggers one instruction after a STI instruction, due to how x86's
-"interrupt shadow" work, so it doesn't happen immediately after
-helper_sti; but the idea is the same).
+--VmbMLHuQFctXTeaj9C5aaoBg2HE6RCrlH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Paolo
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEvBAEBCAAZBQJZQSZWEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQDhL
+B/0afuCROVxM3RK7KSMDk+swLAkWQ4fxD7M2IoQcQjv104160HVcJ0x6xphKuKr0
+TotjTG6Rgy7F3Xqux1YCoV7rzyLCtzcubTxc8Ow7nANo7CApZ7YDtVw6j8KWapi4
+5WPetxuxupVJJco1OcXHssWC/O5jKHymr2hLByPItwn2ShMnC9JQdsSTXAp8mUIo
+8ZSuRKIX56zZjKLLObTvZ4SduOtvnl6tJjzykPNrvaO4AiHbUFQDM8N5Iq0WDpS/
+CJU4CwQpmVZFud5yk+mK2X4COJcCPSZb3P9/vtso9rn6RxKyFKXZEji4sNKRsncG
+N+XjFTC10Q53bK7az8uPdPt6
+=vHpM
+-----END PGP SIGNATURE-----
+
+--VmbMLHuQFctXTeaj9C5aaoBg2HE6RCrlH--
