@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dLCMl-0005kF-S4
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:46:04 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1dLCMp-0005lz-Rq
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:46:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dLCMj-00013U-4Q
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:46:03 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:34593)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1dLCMo-00015Y-P3
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:46:07 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:35459)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1dLCMi-00013E-Sz
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:46:01 -0400
-Received: by mail-lf0-x243.google.com with SMTP id o28so970535lfk.1
-	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 10:46:00 -0700 (PDT)
+	id 1dLCMo-00015K-Dh
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:46:06 -0400
+Received: by mail-lf0-x243.google.com with SMTP id v20so963979lfa.2
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 10:46:06 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Wed, 14 Jun 2017 19:45:49 +0200
-Message-Id: <1497462353-3432-4-git-send-email-edgar.iglesias@gmail.com>
+Date: Wed, 14 Jun 2017 19:45:53 +0200
+Message-Id: <1497462353-3432-8-git-send-email-edgar.iglesias@gmail.com>
 In-Reply-To: <1497462353-3432-1-git-send-email-edgar.iglesias@gmail.com>
 References: <1497462353-3432-1-git-send-email-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PULL v1 3/7] cputlb: fix the way get_page_addr_code
- fills the tlb
+Subject: [Qemu-devel] [PULL v1 7/7] xilinx_spips: allow mmio execution
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,34 +31,132 @@ Cc: fred.konrad@greensocs.com, pbonzini@redhat.com, rth@twiddle.net, edgar.igles
 
 From: KONRAD Frederic <fred.konrad@greensocs.com>
 
-get_page_addr_code(..) does a cpu_ldub_code to fill the tlb:
-This can lead to some side effects if a device is mapped at this address.
+This allows to execute from the lqspi area.
 
-So this patch replaces the cpu_memory_ld by a tlb_fill.
+When the request_ptr is called the device loads 1024bytes from the SPI device.
+Then this code can be executed by the guest.
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
 ---
- cputlb.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ hw/ssi/xilinx_spips.c | 74 ++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 55 insertions(+), 19 deletions(-)
 
-diff --git a/cputlb.c b/cputlb.c
-index 5d6c755..95265a0 100644
---- a/cputlb.c
-+++ b/cputlb.c
-@@ -849,8 +849,10 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
-     index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
-     mmu_idx = cpu_mmu_index(env, true);
-     if (unlikely(env->tlb_table[mmu_idx][index].addr_code !=
--                 (addr & TARGET_PAGE_MASK))) {
--        cpu_ldub_code(env, addr);
-+                 (addr & (TARGET_PAGE_MASK | TLB_INVALID_MASK)))) {
-+        if (!VICTIM_TLB_HIT(addr_read, addr)) {
-+            tlb_fill(ENV_GET_CPU(env), addr, MMU_INST_FETCH, mmu_idx, 0);
-+        }
+diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+index da8adfa..e833028 100644
+--- a/hw/ssi/xilinx_spips.c
++++ b/hw/ssi/xilinx_spips.c
+@@ -496,6 +496,18 @@ static const MemoryRegionOps spips_ops = {
+     .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
++static void xilinx_qspips_invalidate_mmio_ptr(XilinxQSPIPS *q)
++{
++    XilinxSPIPS *s = &q->parent_obj;
++
++    if (q->lqspi_cached_addr != ~0ULL) {
++        /* Invalidate the current mapped mmio */
++        memory_region_invalidate_mmio_ptr(&s->mmlqspi, q->lqspi_cached_addr,
++                                          LQSPI_CACHE_SIZE);
++        q->lqspi_cached_addr = ~0ULL;
++    }
++}
++
+ static void xilinx_qspips_write(void *opaque, hwaddr addr,
+                                 uint64_t value, unsigned size)
+ {
+@@ -505,7 +517,7 @@ static void xilinx_qspips_write(void *opaque, hwaddr addr,
+     addr >>= 2;
+ 
+     if (addr == R_LQSPI_CFG) {
+-        q->lqspi_cached_addr = ~0ULL;
++        xilinx_qspips_invalidate_mmio_ptr(q);
      }
-     iotlbentry = &env->iotlb[mmu_idx][index];
-     pd = iotlbentry->addr & ~TARGET_PAGE_MASK;
+ }
+ 
+@@ -517,27 +529,20 @@ static const MemoryRegionOps qspips_ops = {
+ 
+ #define LQSPI_CACHE_SIZE 1024
+ 
+-static uint64_t
+-lqspi_read(void *opaque, hwaddr addr, unsigned int size)
++static void lqspi_load_cache(void *opaque, hwaddr addr)
+ {
+-    int i;
+     XilinxQSPIPS *q = opaque;
+     XilinxSPIPS *s = opaque;
+-    uint32_t ret;
+-
+-    if (addr >= q->lqspi_cached_addr &&
+-            addr <= q->lqspi_cached_addr + LQSPI_CACHE_SIZE - 4) {
+-        uint8_t *retp = &q->lqspi_buf[addr - q->lqspi_cached_addr];
+-        ret = cpu_to_le32(*(uint32_t *)retp);
+-        DB_PRINT_L(1, "addr: %08x, data: %08x\n", (unsigned)addr,
+-                   (unsigned)ret);
+-        return ret;
+-    } else {
+-        int flash_addr = (addr / num_effective_busses(s));
+-        int slave = flash_addr >> LQSPI_ADDRESS_BITS;
+-        int cache_entry = 0;
+-        uint32_t u_page_save = s->regs[R_LQSPI_STS] & ~LQSPI_CFG_U_PAGE;
+-
++    int i;
++    int flash_addr = ((addr & ~(LQSPI_CACHE_SIZE - 1))
++                   / num_effective_busses(s));
++    int slave = flash_addr >> LQSPI_ADDRESS_BITS;
++    int cache_entry = 0;
++    uint32_t u_page_save = s->regs[R_LQSPI_STS] & ~LQSPI_CFG_U_PAGE;
++
++    if (addr < q->lqspi_cached_addr ||
++            addr > q->lqspi_cached_addr + LQSPI_CACHE_SIZE - 4) {
++        xilinx_qspips_invalidate_mmio_ptr(q);
+         s->regs[R_LQSPI_STS] &= ~LQSPI_CFG_U_PAGE;
+         s->regs[R_LQSPI_STS] |= slave ? LQSPI_CFG_U_PAGE : 0;
+ 
+@@ -589,12 +594,43 @@ lqspi_read(void *opaque, hwaddr addr, unsigned int size)
+         xilinx_spips_update_cs_lines(s);
+ 
+         q->lqspi_cached_addr = flash_addr * num_effective_busses(s);
++    }
++}
++
++static void *lqspi_request_mmio_ptr(void *opaque, hwaddr addr, unsigned *size,
++                                    unsigned *offset)
++{
++    XilinxQSPIPS *q = opaque;
++    hwaddr offset_within_the_region = addr & ~(LQSPI_CACHE_SIZE - 1);
++
++    lqspi_load_cache(opaque, offset_within_the_region);
++    *size = LQSPI_CACHE_SIZE;
++    *offset = offset_within_the_region;
++    return q->lqspi_buf;
++}
++
++static uint64_t
++lqspi_read(void *opaque, hwaddr addr, unsigned int size)
++{
++    XilinxQSPIPS *q = opaque;
++    uint32_t ret;
++
++    if (addr >= q->lqspi_cached_addr &&
++            addr <= q->lqspi_cached_addr + LQSPI_CACHE_SIZE - 4) {
++        uint8_t *retp = &q->lqspi_buf[addr - q->lqspi_cached_addr];
++        ret = cpu_to_le32(*(uint32_t *)retp);
++        DB_PRINT_L(1, "addr: %08x, data: %08x\n", (unsigned)addr,
++                   (unsigned)ret);
++        return ret;
++    } else {
++        lqspi_load_cache(opaque, addr);
+         return lqspi_read(opaque, addr, size);
+     }
+ }
+ 
+ static const MemoryRegionOps lqspi_ops = {
+     .read = lqspi_read,
++    .request_ptr = lqspi_request_mmio_ptr,
+     .endianness = DEVICE_NATIVE_ENDIAN,
+     .valid = {
+         .min_access_size = 1,
 -- 
 2.7.4
