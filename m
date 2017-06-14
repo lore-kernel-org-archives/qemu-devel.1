@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1dL84T-0004RR-Cx
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 09:10:54 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dL853-0004jN-La
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 09:11:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1dL84O-0004UA-Dd
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 09:10:53 -0400
-Received: from greensocs.com ([193.104.36.180]:43921)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1dL84O-0004TD-0K
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 09:10:48 -0400
-References: <1488276185-31168-1-git-send-email-fred.konrad@greensocs.com>
-	<b690a50d-4ab3-830c-93a3-5f2b4b027448@greensocs.com>
-	<CAFEAcA94RykH0U33F0aGEYRs_FXF_NNuwQAX_mOf4wVde0s9BQ@mail.gmail.com>
-	<1db78209-e426-03b5-9a19-592da96adaee@greensocs.com>
-	<CAFEAcA-pmVW-fnu6ZT=PeRcSf-U5UVsyYsJkzh2c_BFKDTU5kg@mail.gmail.com>
-	<d0a7ebb7-9f3d-5b3c-692e-344f4a980c05@redhat.com>
-From: KONRAD Frederic <fred.konrad@greensocs.com>
-Message-ID: <79847843-5891-307a-2d9d-d896a05011da@greensocs.com>
-Date: Wed, 14 Jun 2017 15:10:40 +0200
+	(envelope-from <imammedo@redhat.com>) id 1dL84y-0004pR-Iu
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 09:11:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40576)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dL84y-0004oo-C7
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 09:11:24 -0400
+Date: Wed, 14 Jun 2017 15:11:17 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170614151117.42235246@nial.brq.redhat.com>
+In-Reply-To: <20170614130149.GD5016@thinpad.lan.raisama.net>
+References: <20170606181948.16238-1-rkagan@virtuozzo.com>
+	<20170606181948.16238-6-rkagan@virtuozzo.com>
+	<20170613185752.GZ5016@thinpad.lan.raisama.net>
+	<20170614112506.GI2004@rkaganb.sw.ru>
+	<6bb8f5e3-b6bf-c62a-93f3-9fe338d43881@redhat.com>
+	<20170614130149.GD5016@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-In-Reply-To: <d0a7ebb7-9f3d-5b3c-692e-344f4a980c05@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 00/10] Clock framework API.
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 05/23] hyperv: ensure VP index equal to
+ QEMU cpu_index
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,70 +32,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Edgar Iglesias <edgar.iglesias@xilinx.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Mark Burton <mark.burton@greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>, qemu-devel@nongnu.org, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, "Denis V
+	. Lunev" <den@openvz.org>
+
+On Wed, 14 Jun 2017 10:01:49 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
+
+> On Wed, Jun 14, 2017 at 01:26:44PM +0200, Paolo Bonzini wrote:
+> > 
+> > 
+> > On 14/06/2017 13:25, Roman Kagan wrote:  
+> > >> The problem with that is that it will break as soon as we create
+> > >> VCPUs in a different order.  Unsolvable on hosts that don't allow
+> > >> HV_X64_MSR_VP_INDEX to be set, however.  
+> > > Right, thanks for putting together a detailed explanation.
+> > > 
+> > > This was a thinko back then, not to have HV_X64_MSR_VP_INDEX maintained
+> > > by QEMU.  I'm going to post a patch to KVM fixing that.
+> > > 
+> > > Meanwhile QEMU needs a way to maintain its notion of vp_index that is
+> > >   1) in sync with kernel's notion
+> > >   2) also with kernels that don't support setting the msr
+> > >   3) persistent across migrations
+> > > 
+> > > cpu_index looked like a perfect candidate.
+> > >   
+> > 
+> > What you want is the APIC id, which _is_ cpu_index but may not be in the
+> > future.  But the APIC id is also the KVM vcpu_id, so there's no need to
+> > have VP_INDEX maintained by QEMU.  
+> 
+> No, KVM really uses the VCPU _index_ for HV_X64_MSR_VP_INDEX:
+and as you pointed out that works just by luck,
+as soon as we there would be out of order created CPUs
+returned value won't match cpu_index.
+
+So instead of spreading this nonsense out to QEMU, is it possible
+to fix kernel(kvm+guest) to use apic_id instead?
 
 
-
-Le 14/06/2017 =C3=A0 13:54, Paolo Bonzini a =C3=A9crit :
-> On 13/06/2017 12:33, Peter Maydell wrote:
->>> For the migration maybe we can refresh the whole clock tree at the en=
-d
->>> of the migration. Is that a good idea?
->> That seems kind of awkward -- where would this code that did a
->> clock tree refresh be? Also you're then reliant on all the
->> callback functions registered to not actually do anything that
->> affects device state when the refresh happens. It would be
->> cleaner if the qemu-clk objects managed their own internal
->> state migration (but can we do this without having to make
->> them be Device objects rather than just objects ?).
->>
->> Cc'd Paolo who might have an opinion on these -- my opinion currently
->> is mostly "this doesn't really look right" rather than knowing what
->> the right approach is.
->
-> Same here. :)
->
-> I think the various bindings and rates could be refreshed as devices ar=
-e
-> migrated.
- > "This assumes that the device migration order is okay"
-
-I think it's the real problem here?
-
-> according to the clock tree, that is if you have three devices X/Y/Z an=
-d
-> five clocks a/b/c/d/e/f:
->
->   fixed-clock
->     |     |
->    X:a   X:b
->     |     |    \
->    Y:c   Y:d      Z:e
->           |
->          Z:f
->
-> you could do this:
->
-> - migrate X
->   - retrieve the PLL ratios for a and b's bound clocks (if the ratio
->     is variable, otherwise no need for this)
->   - in the post_load callback, bind a and b to the fixed-clock
->     (if the binding is variable, otherwise no need for this)
-> - migrate Y
->   - retrieve the PLL ratio for d's bound clocks (if the ratio
->     is variable, otherwise no need for this)
->   - in the post_load callback, bind c and d to a and b respectively
->     (if the binding is variable, otherwise no need for this)
-> - migrate Z
->   - in the post_load callback, bind e and f to b and d respectively
->     (if the binding is variable, otherwise no need for this)
->
-
-So for you the migration of the clock tree will be done by the device?
-I think this is OK :).
-
-Fred
-
-> Paolo
->
+> kvm_hv_get_msr():
+> 
+>         case HV_X64_MSR_VP_INDEX: {
+>                 int r;
+>                 struct kvm_vcpu *v;
+> 
+>                 kvm_for_each_vcpu(r, v, vcpu->kvm) {
+>                         if (v == vcpu) {
+>                                 data = r;
+>                                 break;
+>                         }
+>                 }
+>                 break;
+>         }
+> 
+> 
