@@ -1,35 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dLCyf-0005a6-Og
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 14:25:14 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dLD0L-0006Qh-2Z
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 14:26:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dLCyc-0007cO-FM
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 14:25:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36350)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dLCyc-0007al-8j
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 14:25:10 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 32DAC4E4C6
-	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 18:25:08 +0000 (UTC)
-Date: Wed, 14 Jun 2017 21:25:04 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170614211927-mutt-send-email-mst@kernel.org>
-References: <20170608161013.17920-1-lersek@redhat.com>
-	<20170608204026-mutt-send-email-mst@kernel.org>
-	<1496951333.29761.5.camel@redhat.com>
-	<20170608224942-mutt-send-email-mst@kernel.org>
-	<7a7647cd-3d7a-0b6f-0691-d656c9026f44@redhat.com>
-	<1497038478.10080.1.camel@redhat.com>
+	(envelope-from <rth7680@gmail.com>) id 1dLD0H-000817-Of
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 14:26:56 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:34178)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dLD0H-00080x-Kl
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 14:26:53 -0400
+Received: by mail-qt0-x242.google.com with SMTP id o21so1689525qtb.1
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 11:26:53 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170614140209.29847-1-alex.bennee@linaro.org>
+	<20170614140209.29847-4-alex.bennee@linaro.org>
+	<09a35585-d876-6c9e-7045-8cda418455e0@twiddle.net>
+	<a1a0b43c-b074-a1a4-dc26-717964121b1a@redhat.com>
+	<f32b9b12-73b4-e803-6425-271b48858a8b@twiddle.net>
+	<be99bef9-eeb2-6816-e0ca-979780a48a06@redhat.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <9daac065-1738-f872-0267-94cffa96ab6d@twiddle.net>
+Date: Wed, 14 Jun 2017 11:26:48 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <1497038478.10080.1.camel@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] q35/mch: implement extended TSEG sizes
+In-Reply-To: <be99bef9-eeb2-6816-e0ca-979780a48a06@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 3/3] tcg-runtime: short-circuit
+ lookup_tb_ptr on IRQs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,45 +36,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, qemu devel list <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, cota@braap.org
+Cc: qemu-devel@nongnu.org
 
-On Fri, Jun 09, 2017 at 10:01:18PM +0200, Gerd Hoffmann wrote:
-> On Fri, 2017-06-09 at 13:40 +0200, Paolo Bonzini wrote:
-> >=20
-> > On 08/06/2017 21:55, Michael S. Tsirkin wrote:
-> > > We don't have room anywhere in PCI config space. Laszlo makes
-> > > argument
-> > > why it's safe for this device based on spec but it's anyone's guess
-> > > whether current and future software will follow spec.=A0=A0In short=
-,
-> > > going
-> > > anywhere near the emulated device has a potential to break some
-> > > drivers.
-> >=20
-> > There are no such drivers.=A0=A0The MCH and PCH are only touched by t=
-he
-> > firmware, not by the OS.
->=20
-> Yea.  That is *exactly* the reason why I think simply using the 0x50
-> offset probably works fine in practice even though I suspect on
-> physical hardware it might be some undocumented register.  Much of the
-> stuff in the host bridge pci config space is firmware territory, and we
-> run qemu specific firmware *anyway*.
->=20
-> cheers,
->   Gerd
+On 06/14/2017 10:08 AM, Paolo Bonzini wrote:
+> And MIPS:
+> 
+> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> index 559f8fed89..244f3cb9ab 100644
+> --- a/target/mips/translate.c
+> +++ b/target/mips/translate.c
+> @@ -13403,8 +13403,9 @@ static void gen_pool32axf (CPUMIPSState *env, DisasContext *ctx, int rt, int rs)
+>                   save_cpu_state(ctx, 1);
+>                   gen_helper_ei(t0, cpu_env);
+>                   gen_store_gpr(t0, rs);
+> -                /* Stop translation as we may have switched the execution mode */
+> -                ctx->bstate = BS_STOP;
+> +                /* BS_STOP isn't good enough here, reevaluate cpu_mips_hw_interrupts_enabled. */
+> +                gen_save_pc(ctx->pc + 4);
+> +                ctx->bstate = BS_EXCP;
+>                   tcg_temp_free(t0);
+>               }
+>               break;
+> 
+> The others seem okay.
 
-To be specific, what I meant is a bit that tells guest that a
-config space register is available, and lets host find out
-that guest is going to use it.
+Thanks for this bit.  We also need to fix SSM for s390x.
 
-This to ensure full forward and backward compatibility.
 
-I agree a fw cfg file for a single bit seems like an overkill, that's
-why I thought sharing feature files with SMI would be a good idea.
-
-Do you see an issue with that?
-
---=20
-MST
+r~
