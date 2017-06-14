@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42236)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dLAGU-0007Kw-LD
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:31:28 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dLAGX-0007Oo-KG
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:31:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dLAGP-0003u5-OC
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:31:26 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dLAGW-00041g-Sa
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:31:29 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 14 Jun 2017 17:31:01 +0200
-Message-Id: <20170614153102.9077-4-mreitz@redhat.com>
+Date: Wed, 14 Jun 2017 17:31:02 +0200
+Message-Id: <20170614153102.9077-5-mreitz@redhat.com>
 In-Reply-To: <20170614153102.9077-1-mreitz@redhat.com>
 References: <20170614153102.9077-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/4] block: qobject_is_equal() in
- bdrv_reopen_prepare()
+Subject: [Qemu-devel] [PATCH 4/4] iotests: Add test for non-string option
+ reopening
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,49 +23,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Currently, bdrv_reopen_prepare() assumes that all BDS options are
-strings. However, this is not the case if the BDS has been created
-through the json: pseudo-protocol or blockdev-add.
-
-Note that the user-invokable reopen command is an HMP command, so you
-can only specify strings there. Therefore, specifying a non-string
-option with the "same" value as it was when originally created will now
-return an error because the values are supposedly similar (and there is
-no way for the user to circumvent this but to just not specify the
-option again -- however, this is still strictly better than just
-crashing).
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c | 15 +++------------
- 1 file changed, 3 insertions(+), 12 deletions(-)
+ tests/qemu-iotests/133     | 9 +++++++++
+ tests/qemu-iotests/133.out | 5 +++++
+ 2 files changed, 14 insertions(+)
 
-diff --git a/block.c b/block.c
-index fa1d06d..23424d5 100644
---- a/block.c
-+++ b/block.c
-@@ -2950,19 +2950,10 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
-         const QDictEntry *entry = qdict_first(reopen_state->options);
+diff --git a/tests/qemu-iotests/133 b/tests/qemu-iotests/133
+index 9d35a6a..af6b3e1 100755
+--- a/tests/qemu-iotests/133
++++ b/tests/qemu-iotests/133
+@@ -83,6 +83,15 @@ $QEMU_IO -c 'reopen -o driver=qcow2' $TEST_IMG
+ $QEMU_IO -c 'reopen -o file.driver=file' $TEST_IMG
+ $QEMU_IO -c 'reopen -o backing.driver=qcow2' $TEST_IMG
  
-         do {
--            QString *new_obj = qobject_to_qstring(entry->value);
--            const char *new = qstring_get_str(new_obj);
--            /*
--             * Caution: while qdict_get_try_str() is fine, getting
--             * non-string types would require more care.  When
--             * bs->options come from -blockdev or blockdev_add, its
--             * members are typed according to the QAPI schema, but
--             * when they come from -drive, they're all QString.
--             */
--            const char *old = qdict_get_try_str(reopen_state->bs->options,
--                                                entry->key);
-+            QObject *new = entry->value;
-+            QObject *old = qdict_get(reopen_state->bs->options, entry->key);
++echo
++echo "=== Check that reopening works with non-string options ==="
++echo
++
++# Using the json: pseudo-protocol we can create non-string options
++# (Invoke 'info' just so we get some output afterwards)
++IMGOPTSSYNTAX=false $QEMU_IO -f null-co -c 'reopen' -c 'info' \
++    "json:{'driver': 'null-co', 'size': 65536}"
++
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/133.out b/tests/qemu-iotests/133.out
+index cc86b94..f4a85ae 100644
+--- a/tests/qemu-iotests/133.out
++++ b/tests/qemu-iotests/133.out
+@@ -19,4 +19,9 @@ Cannot change the option 'driver'
  
--            if (!old || strcmp(new, old)) {
-+            if (!qobject_is_equal(new, old)) {
-                 error_setg(errp, "Cannot change the option '%s'", entry->key);
-                 ret = -EINVAL;
-                 goto error;
+ === Check that unchanged driver is okay ===
+ 
++
++=== Check that reopening works with non-string options ===
++
++format name: null-co
++format name: null-co
+ *** done
 -- 
 2.9.4
