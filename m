@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45036)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45053)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dL0m9-0001u0-VA
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 01:23:30 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dL0mA-0001ud-Ky
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 01:23:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dL0m7-0007MO-5G
+	(envelope-from <rth7680@gmail.com>) id 1dL0m9-0007P3-PP
 	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 01:23:30 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:34135)
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:35973)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dL0m7-0007ME-0k
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 01:23:27 -0400
-Received: by mail-qt0-x242.google.com with SMTP id o21so39043295qtb.1
-	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 22:23:26 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dL0m9-0007Om-L4
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 01:23:29 -0400
+Received: by mail-qt0-x242.google.com with SMTP id s33so39071596qtg.3
+	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 22:23:29 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue, 13 Jun 2017 22:23:09 -0700
-Message-Id: <20170614052311.13785-9-rth@twiddle.net>
+Date: Tue, 13 Jun 2017 22:23:11 -0700
+Message-Id: <20170614052311.13785-11-rth@twiddle.net>
 In-Reply-To: <20170614052311.13785-1-rth@twiddle.net>
 References: <20170614052311.13785-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 08/10] tcg/arm: Use ldr (literal) for goto_tb
+Subject: [Qemu-devel] [PULL 10/10] tcg: Remove tb_htable_lookup from
+ helper_lookup_tb_ptr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +30,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-The new placement of the TB means that we can use one insn
-to load the goto_tb destination directly from the TB.
+This appears to induce lockups, or maybe livelocks, while booting an
+Alpha Linux kernel.  The assumption is that there is a bug elsewhere
+within QEMU, but reverting the patch allows normal work to continue
+in the meantime.
 
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/arm/tcg-target.inc.c | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+ tcg-runtime.c | 32 +++++++++++++-------------------
+ 1 file changed, 13 insertions(+), 19 deletions(-)
 
-diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
-index 42370e5..d1793ec 100644
---- a/tcg/arm/tcg-target.inc.c
-+++ b/tcg/arm/tcg-target.inc.c
-@@ -1669,14 +1669,27 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-         }
-         break;
-     case INDEX_op_goto_tb:
--        tcg_debug_assert(s->tb_jmp_insn_offset == 0);
-         {
-             /* Indirect jump method */
--            intptr_t ptr = (intptr_t)(s->tb_jmp_target_addr + args[0]);
--            tcg_out_movi32(s, COND_AL, TCG_REG_R0, ptr & ~0xfff);
--            tcg_out_ld32_12(s, COND_AL, TCG_REG_PC, TCG_REG_R0, ptr & 0xfff);
-+            intptr_t ptr, dif, dil;
-+            TCGReg base = TCG_REG_PC;
+diff --git a/tcg-runtime.c b/tcg-runtime.c
+index 7fa90ce..cc3bbaf 100644
+--- a/tcg-runtime.c
++++ b/tcg-runtime.c
+@@ -147,30 +147,24 @@ uint64_t HELPER(ctpop_i64)(uint64_t arg)
+ void *HELPER(lookup_tb_ptr)(CPUArchState *env, target_ulong addr)
+ {
+     CPUState *cpu = ENV_GET_CPU(env);
+-    TranslationBlock *tb;
+-    target_ulong cs_base, pc;
+-    uint32_t flags;
++    unsigned int hash = tb_jmp_cache_hash_func(addr);
++    TranslationBlock *tb = atomic_rcu_read(&cpu->tb_jmp_cache[hash]);
++    void *ret = tcg_ctx.code_gen_epilogue;
+ 
+-    tb = atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)]);
+     if (likely(tb)) {
++        target_ulong cs_base, pc;
++        uint32_t flags;
 +
-+            tcg_debug_assert(s->tb_jmp_insn_offset == 0);
-+            ptr = (intptr_t)(s->tb_jmp_target_addr + args[0]);
-+            dif = ptr - ((intptr_t)s->code_ptr + 8);
-+            dil = sextract32(dif, 0, 12);
-+            if (dif != dil) {
-+                /* The TB is close, but outside the 12 bits addressable by
-+                   the load.  We can extend this to 20 bits with a sub of a
-+                   shifted immediate from pc.  In the vastly unlikely event
-+                   the code requires more than 1MB, we'll use 2 insns and
-+                   be no worse off.  */
-+                base = TCG_REG_R0;
-+                tcg_out_movi32(s, COND_AL, base, ptr - dil);
-+            }
-+            tcg_out_ld32_12(s, COND_AL, TCG_REG_PC, base, dil);
-+            s->tb_jmp_reset_offset[args[0]] = tcg_current_code_size(s);
+         cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
+-        if (likely(tb->pc == addr && tb->cs_base == cs_base &&
+-                   tb->flags == flags)) {
+-            goto found;
+-        }
+-        tb = tb_htable_lookup(cpu, addr, cs_base, flags);
+-        if (likely(tb)) {
+-            atomic_set(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)], tb);
+-            goto found;
++        if (tb->pc == addr && tb->cs_base == cs_base && tb->flags == flags) {
++            ret = tb->tc_ptr;
++            qemu_log_mask_and_addr(CPU_LOG_EXEC, addr,
++                                   "Chain %p [%d: " TARGET_FMT_lx "] %s\n",
++                                   ret, cpu->cpu_index, addr,
++                                   lookup_symbol(addr));
          }
--        s->tb_jmp_reset_offset[args[0]] = tcg_current_code_size(s);
-         break;
-     case INDEX_op_goto_ptr:
-         tcg_out_bx(s, COND_AL, args[0]);
+     }
+-    return tcg_ctx.code_gen_epilogue;
+- found:
+-    qemu_log_mask_and_addr(CPU_LOG_EXEC, addr,
+-                           "Chain %p [%d: " TARGET_FMT_lx "] %s\n",
+-                           tb->tc_ptr, cpu->cpu_index, addr,
+-                           lookup_symbol(addr));
+-    return tb->tc_ptr;
++    return ret;
+ }
+ 
+ void HELPER(exit_atomic)(CPUArchState *env)
 -- 
 2.9.4
