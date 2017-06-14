@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dL1hv-0005VS-Lp
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 02:23:12 -0400
+	(envelope-from <mrolnik@gmail.com>) id 1dL1hx-0005Vc-3c
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 02:23:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dL1hs-0006wm-HL
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 02:23:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51336)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dL1hs-0006w7-BR
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 02:23:08 -0400
-Message-ID: <1497421386.11748.1.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 14 Jun 2017 08:23:06 +0200
-In-Reply-To: <CAKXe6SLoc3XPMaSme-qWjQJOyrJLKZyMyX-zCiuHtiL4c2ZmVA@mail.gmail.com>
-References: <1497411544-80213-1-git-send-email-liqiang6-s@360.cn>
-	<149741206273.576.11299001383096762722@4a9a010726c0>
-	<CAKXe6SLoc3XPMaSme-qWjQJOyrJLKZyMyX-zCiuHtiL4c2ZmVA@mail.gmail.com>
+	(envelope-from <mrolnik@gmail.com>) id 1dL1hw-0006xR-9d
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 02:23:13 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:36788)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1dL1hw-0006x8-2w
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 02:23:12 -0400
+Received: by mail-wr0-x243.google.com with SMTP id 77so5979897wrb.3
+	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 23:23:12 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <9ac47825-aeb0-3dc8-3e47-7bbcad19f730@tuxfamily.org>
+References: <20170608184944.19406-1-mrolnik@gmail.com>
+	<20170608184944.19406-10-mrolnik@gmail.com>
+	<2dba69fb-2894-5f8b-bc61-abfa97873dcf@tuxfamily.org>
+	<CAK4993hf9TSqzNAs6-c-TvD2zX7rQDh4X39AyRofehfN_nsRYQ@mail.gmail.com>
+	<9ac47825-aeb0-3dc8-3e47-7bbcad19f730@tuxfamily.org>
+From: Michael Rolnik <mrolnik@gmail.com>
+Date: Wed, 14 Jun 2017 09:22:30 +0300
+Message-ID: <CAK4993hwPzmSdXp8BXV+OH9UU8UdZWq5L3kS5QxUAmcPAPJKFw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] usb: xhci: fix info leak when writing
- event to the guest
+Subject: Re: [Qemu-devel] [PATCH RFC v19 09/13] target-avr: adding
+ instruction decoder
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,23 +32,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>, Qemu Developers <qemu-devel@nongnu.org>
-Cc: famz@redhat.com, Li Qiang <liqiang6-s@360.cn>, P J P <ppandit@redhat.com>
+To: Thomas Huth <huth@tuxfamily.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Anichang <anichang@protonmail.ch>
 
-  Hi,
+we had this discussion previously.
+1. I am not sure my generator will run on every machine as it requires some
+tools e.g. xsltproc
+2. once AVR finds its way into master, I will try to generate files during
+the build.
 
->=C2=A0> CC=C2=A0 =C2=A0 =C2=A0 hw/timer/a9gtimer.o
-> > In file included from /tmp/qemu-test/src/hw/net/vmxnet3.c:30:
-> > /tmp/qemu-test/src/include/migration/register.h:18: error:
-> > redefinition of typedef =E2=80=98LoadStateHandler=E2=80=99
-> > /tmp/qemu-test/src/include/migration/vmstate.h:32: note: previous
-> > declaration of =E2=80=98LoadStateHandler=E2=80=99 was here
->=20
->=20
-> Seems not related with my patch.
+On Wed, Jun 14, 2017 at 8:14 AM, Thomas Huth <huth@tuxfamily.org> wrote:
 
-Indeed, master branch seems to be broken, I got a few more of these
-already ...
+> On 13.06.2017 22:29, Michael Rolnik wrote:
+> > this is generated code.
+>
+> Hmm, then it should likely not be included in a patch, but generated
+> during built-time instead, I guess?
+>
+>  Thomas
+>
 
-cheers,
-  Gerd
+
+
+-- 
+Best Regards,
+Michael Rolnik
