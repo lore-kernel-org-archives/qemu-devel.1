@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1dL6Z4-0002T4-Aa
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:34:23 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dL6jU-0005ha-9n
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:45:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1dL6Z1-0002Hg-MN
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:34:22 -0400
-Received: from aserp1040.oracle.com ([141.146.126.69]:37532)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
-	id 1dL6Z1-0002GK-Bf
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:34:19 -0400
-Message-ID: <1497440051.15929.10.camel@oracle.com>
-From: Knut Omang <knut.omang@oracle.com>
-Date: Wed, 14 Jun 2017 13:34:11 +0200
-In-Reply-To: <20170614081717.GA4370@redhat.com>
-References: <cover.e0862272629975a2a7296103cf5d5f8de70abc01.1497035841.git-series.knut.omang@oracle.com>
-	<c1871854a5510bdb24198d266c28788aa81d3f10.1497035841.git-series.knut.omang@oracle.com>
-	<20170614081717.GA4370@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/2] socket: Handle race condition between
- binds to the same port
+	(envelope-from <alex.bennee@linaro.org>) id 1dL6jQ-0005tQ-8Q
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:45:08 -0400
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:33431)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dL6jP-0005rz-Vj
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:45:04 -0400
+Received: by mail-wr0-x231.google.com with SMTP id v104so174059112wrb.0
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 04:45:03 -0700 (PDT)
+References: <20170609170100.3599-1-alex.bennee@linaro.org>
+	<20170609170100.3599-4-alex.bennee@linaro.org>
+	<fc351edb-7c08-c341-d8ee-85f6768e4931@twiddle.net>
+	<87vao4b4z5.fsf@linaro.org>
+	<9776b437-90b4-f2c2-4a0c-c1c6585379bf@twiddle.net>
+	<20170611050730.GA12317@flamenco> <20170613225352.GA26288@flamenco>
+	<db800d74-7cfa-d9e3-60d7-3e7b19565b9b@twiddle.net>
+	<5036e9ad-257a-b098-5093-050fca825627@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <5036e9ad-257a-b098-5093-050fca825627@redhat.com>
+Date: Wed, 14 Jun 2017 12:45:34 +0100
+Message-ID: <87r2ymiyht.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] target/aarch64: exit to main loop after
+ handling MSR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +37,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>, "Emilio G. Cota" <cota@braap.org>, peter.maydell@linaro.org, edgar.iglesias@xilinx.com, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "open list:ARM" <qemu-arm@nongnu.org>
 
-On Wed, 2017-06-14 at 09:17 +0100, Daniel P. Berrange wrote:
-> On Fri, Jun 09, 2017 at 09:19:49PM +0200, Knut Omang wrote:
-> > If an offset of ports is specified to the inet_listen_saddr function(),
-> > and two or more processes tries to bind from these ports at the same ti=
-me,
-> > occasionally more than one process may be able to bind to the same
-> > port. The condition is detected by listen() but too late to avoid a fai=
-lure.
-> >=20
-> > This function is called by socket_listen() and used
-> > by all socket listening code in QEMU, so all cases where any form of dy=
-namic
-> > port selection is used should be subject to this issue.
-> >=20
-> > Add code to close and re-establish the socket when this
-> > condition is observed, hiding the race condition from the user.
-> >=20
-> > This has been developed and tested by means of the
-> > test-listen unit test in the previous commit.
-> > Enable the test for make check now that it passes.
-> >=20
-> > Signed-off-by: Knut Omang <knut.omang@oracle.com>
-> > Reviewed-by: Bhavesh Davda <bhavesh.davda@oracle.com>
-> > Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
-> > Reviewed-by: Girish Moodalbail <girish.moodalbail@oracle.com>
-> > ---
-> > =C2=A0tests/Makefile.include |=C2=A0=C2=A0=C2=A02 +-
-> > =C2=A0util/qemu-sockets.c=C2=A0=C2=A0=C2=A0=C2=A0| 106 ++++++++++++++++=
-+++++++++++++-------------
-> > =C2=A02 files changed, 76 insertions(+), 32 deletions(-)
->=20
-> FYI, the changes here will conflict with a pull request that I have
-> pending, so please rebase against this PR
->=20
-> https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg01940.html
 
-Ok, v3 will be from this base,
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Knut
+> On 14/06/2017 06:48, Richard Henderson wrote:
+>>>
+>>> Commit e75449a3 ("target/aarch64: optimize indirect branches") causes
+>>> a regression by which aarch64 guests freeze under TCG with -smp > 1,
+>>> even with `-accel accel=tcg,thread=single' (i.e. MTTCG disabled).
+>>>
+>>> I isolated the problem to the MSR handler. This patch forces an exit
+>>> after the handler is executed, which fixes the regression.
+>>
+>> Why would that be?  The cpu_get_tb_cpu_state within helper_lookup_tb_ptr
+>> is supposed to read the new state that the msr handler would have
+>> installed.
+>
+> Could some of these cause an interrupt, or some other change in the
+> cpu_exec flow?
 
->=20
-> Regards,
-> Daniel
+Well what I was observing was the secondary_start_kernel stalling and
+leaving the main cpu spinning. The msr is actually:
+
+	local_irq_enable();
+	local_fiq_enable();
+
+Which I assume would re-enable IRQs if they are ready to go. However I
+guess if we sink into our cpu_idle without exiting the main loop we
+never set any pending IRQs?
+
+>
+> Thanks,
+>
+> Paolo
+
+
+--
+Alex Bennée
