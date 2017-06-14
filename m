@@ -1,20 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dLALu-0004gf-VA
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:37:04 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dLAM1-0004kt-26
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:37:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dLALp-00009d-UT
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:37:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55836)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dLALp-00009H-Kj
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:36:57 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed, 14 Jun 2017 16:35:54 +0100
-Message-Id: <20170614153557.3319-7-stefanha@redhat.com>
-In-Reply-To: <20170614153557.3319-1-stefanha@redhat.com>
-References: <20170614153557.3319-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 6/9] qcow2: add bdrv_measure() support
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dLALx-0000Dj-7h
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:37:09 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:33938)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dLALx-0000DN-1Q
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:37:05 -0400
+Received: by mail-qt0-x244.google.com with SMTP id o21so593255qtb.1
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 08:37:04 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1497369290-20401-1-git-send-email-peter.maydell@linaro.org>
+	<1497369290-20401-2-git-send-email-peter.maydell@linaro.org>
+	<f279fd6d-d32f-79e8-66e3-62edc0e425a8@amsat.org>
+	<937b2871-7380-4bfc-9a3b-997e496633ff@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <7b7e4b38-923d-b928-ab09-716b2140273b@amsat.org>
+Date: Wed, 14 Jun 2017 12:37:00 -0300
+MIME-Version: 1.0
+In-Reply-To: <937b2871-7380-4bfc-9a3b-997e496633ff@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/3] travis: install more library
+ dependencies
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,179 +37,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Nir Soffer <nsoffer@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Markus Armbruster <armbru@redhat.com>, patches@linaro.org, Fam Zheng <famz@redhat.com>
 
-Use qcow2_calc_prealloc_size() to get the required file size.
+On 06/14/2017 12:07 PM, Paolo Bonzini wrote:
+>
+>
+> On 14/06/2017 05:52, Philippe Mathieu-Daudé wrote:
+>> As you said, due to Travis using Ubuntu still not all libs get detected
+>> but at least the following:
+>>
+>>  $ ./configure ${CONFIG}
+>> -VirtFS support    no
+>> +VirtFS support    yes
+>> -bluez  support    no
+>> +bluez  support    yes
+>> -xfsctl support    no
+>> +xfsctl support    yes
+>> -lzo support       no
+>> +lzo support       yes
+>> -snappy support    no
+>> +snappy support    yes
+>>
+>> Using debian based docker images on Shippable we also get:
+>>
+>> -nettle            no
+>> -nettle kdf        no
+>> +nettle            yes (3.3)
+>> +nettle kdf        yes
+>> -rbd support       no
+>> +rbd support       yes
+>> -vde support       no
+>> +vde support       yes
+>> -GlusterFS support no
+>> +GlusterFS support yes
+>> -libnfs support    no
+>> +libnfs support    yes
+>
+> So this leaves out only rdma and iscsi?
+>
+> I don't know travis vs. shippable very well, can you provide a similar
+> patch to shippable?
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
-v8:
- * Use QCOW_MAX_L1_SIZE to check maximum virtual disk size [Berto]
+Travis base images are Ubuntu based, as said Peter "some of our 
+dependencies need versions that are closer to the bleeding edge than 
+those distros provide".
+With Shippable we can use our own docker images, i.e. for 
+cross-compiling we use debian/stable.
 
-   Look at virtual disk size because metadata does not need to fit into
-   the L1 table.
+I already provided a branch doing that on Shippable reviewed by Alex/Fam:
+https://github.com/philmd/qemu/tree/docker_shippable_v5
+I believe it is in Fam's queue.
 
-v7:
- * Check that qcow2 supports the image file size [Berto]
----
- block/qcow2.c | 137 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 137 insertions(+)
+You can check output here:
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index fd0fba5..4b19b75 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2958,6 +2958,142 @@ static coroutine_fn int qcow2_co_flush_to_os(BlockDriverState *bs)
-     return 0;
- }
- 
-+static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
-+                                       Error **errp)
-+{
-+    Error *local_err = NULL;
-+    BlockMeasureInfo *info;
-+    uint64_t required = 0; /* bytes that contribute to required size */
-+    uint64_t virtual_size; /* disk size as seen by guest */
-+    uint64_t refcount_bits;
-+    uint64_t l2_tables;
-+    size_t cluster_size;
-+    int version;
-+    char *optstr;
-+    PreallocMode prealloc;
-+    bool has_backing_file;
-+
-+    /* Parse image creation options */
-+    cluster_size = qcow2_opt_get_cluster_size_del(opts, &local_err);
-+    if (local_err) {
-+        goto err;
-+    }
-+
-+    version = qcow2_opt_get_version_del(opts, &local_err);
-+    if (local_err) {
-+        goto err;
-+    }
-+
-+    refcount_bits = qcow2_opt_get_refcount_bits_del(opts, version, &local_err);
-+    if (local_err) {
-+        goto err;
-+    }
-+
-+    optstr = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
-+    prealloc = qapi_enum_parse(PreallocMode_lookup, optstr,
-+                               PREALLOC_MODE__MAX, PREALLOC_MODE_OFF,
-+                               &local_err);
-+    g_free(optstr);
-+    if (local_err) {
-+        goto err;
-+    }
-+
-+    optstr = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FILE);
-+    has_backing_file = !!optstr;
-+    g_free(optstr);
-+
-+    virtual_size = align_offset(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
-+                                cluster_size);
-+
-+    /* Check that virtual disk size is valid */
-+    l2_tables = DIV_ROUND_UP(virtual_size / cluster_size,
-+                             cluster_size / sizeof(uint64_t));
-+    if (l2_tables * sizeof(uint64_t) > QCOW_MAX_L1_SIZE) {
-+        error_setg(&local_err, "The image size is too large "
-+                               "(try using a larger cluster size)");
-+        goto err;
-+    }
-+
-+    /* Account for input image */
-+    if (in_bs) {
-+        int64_t ssize = bdrv_getlength(in_bs);
-+        if (ssize < 0) {
-+            error_setg_errno(&local_err, -ssize,
-+                             "Unable to get image virtual_size");
-+            goto err;
-+        }
-+
-+        virtual_size = align_offset(ssize, cluster_size);
-+
-+        if (has_backing_file) {
-+            /* We don't how much of the backing chain is shared by the input
-+             * image and the new image file.  In the worst case the new image's
-+             * backing file has nothing in common with the input image.  Be
-+             * conservative and assume all clusters need to be written.
-+             */
-+            required = virtual_size;
-+        } else {
-+            int cluster_sectors = cluster_size / BDRV_SECTOR_SIZE;
-+            int64_t sector_num;
-+            int pnum = 0;
-+
-+            for (sector_num = 0;
-+                 sector_num < ssize / BDRV_SECTOR_SIZE;
-+                 sector_num += pnum) {
-+                int nb_sectors = MAX(ssize / BDRV_SECTOR_SIZE - sector_num,
-+                                     INT_MAX);
-+                BlockDriverState *file;
-+                int64_t ret;
-+
-+                ret = bdrv_get_block_status_above(in_bs, NULL,
-+                                                  sector_num, nb_sectors,
-+                                                  &pnum, &file);
-+                if (ret < 0) {
-+                    error_setg_errno(&local_err, -ret,
-+                                     "Unable to get block status");
-+                    goto err;
-+                }
-+
-+                if (ret & BDRV_BLOCK_ZERO) {
-+                    /* Skip zero regions (safe with no backing file) */
-+                } else if ((ret & (BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED)) ==
-+                           (BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED)) {
-+                    /* Extend pnum to end of cluster for next iteration */
-+                    pnum = ROUND_UP(sector_num + pnum, cluster_sectors) -
-+                           sector_num;
-+
-+                    /* Count clusters we've seen */
-+                    required += (sector_num % cluster_sectors + pnum) *
-+                                BDRV_SECTOR_SIZE;
-+                }
-+            }
-+        }
-+    }
-+
-+    /* Take into account preallocation.  Nothing special is needed for
-+     * PREALLOC_MODE_METADATA since metadata is always counted.
-+     */
-+    if (prealloc == PREALLOC_MODE_FULL || prealloc == PREALLOC_MODE_FALLOC) {
-+        required = virtual_size;
-+    }
-+
-+    info = g_new(BlockMeasureInfo, 1);
-+    info->fully_allocated =
-+        qcow2_calc_prealloc_size(virtual_size, cluster_size,
-+                                 ctz32(refcount_bits));
-+
-+    /* Remove data clusters that are not required.  This overestimates the
-+     * required size because metadata needed for the fully allocated file is
-+     * still counted.
-+     */
-+    info->required = info->fully_allocated - virtual_size + required;
-+    return info;
-+
-+err:
-+    error_propagate(errp, local_err);
-+    return NULL;
-+}
-+
- static int qcow2_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
- {
-     BDRVQcow2State *s = bs->opaque;
-@@ -3505,6 +3641,7 @@ BlockDriver bdrv_qcow2 = {
-     .bdrv_snapshot_delete   = qcow2_snapshot_delete,
-     .bdrv_snapshot_list     = qcow2_snapshot_list,
-     .bdrv_snapshot_load_tmp = qcow2_snapshot_load_tmp,
-+    .bdrv_measure           = qcow2_measure,
-     .bdrv_get_info          = qcow2_get_info,
-     .bdrv_get_specific_info = qcow2_get_specific_info,
- 
--- 
-2.9.4
+https://app.shippable.com/github/philmd/qemu/runs/78/1/console
+
+   ./configure ${QEMU_CONFIGURE_OPTS} --target-list=${TARGET_LIST}
+   target list       arm-softmmu arm-linux-user armeb-linux-user
+   ...
+   RDMA support      yes
+   ...
+   libiscsi support  yes
+
+>
+> Paolo
+>
+>> On 06/13/2017 12:54 PM, Peter Maydell wrote:
+>>> Update the travis list of library packages to install so that
+>>> our build tests cover more of our code base.
+>>>
+>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>>
+>> Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>
+>>> ---
+>>>  .travis.yml | 18 ++++++++++++++++++
+>>>  1 file changed, 18 insertions(+)
+>>>
+>>> diff --git a/.travis.yml b/.travis.yml
+>>> index 27a2d9c..26dabb6 100644
+>>> --- a/.travis.yml
+>>> +++ b/.travis.yml
+>>> @@ -11,28 +11,37 @@ addons:
+>>>        # Build dependencies
+>>>        - libaio-dev
+>>>        - libattr1-dev
+>>> +      - libbluetooth-dev
+>>>        - libbrlapi-dev
+>>> +      - libcap-dev
+>>>        - libcap-ng-dev
+>>>        - libgnutls-dev
+>>>        - libgtk-3-dev
+>>>        - libiscsi-dev
+>>>        - liblttng-ust-dev
+>>> +      - liblzo2-dev
+>>>        - libnfs-dev
+>>>        - libncurses5-dev
+>>>        - libnss3-dev
+>>>        - libpixman-1-dev
+>>>        - libpng12-dev
+>>>        - librados-dev
+>>> +      - librdmacm-dev
+>>>        - libsdl1.2-dev
+>>>        - libseccomp-dev
+>>> +      - libsnappy-dev
+>>>        - libspice-protocol-dev
+>>>        - libspice-server-dev
+>>>        - libssh2-1-dev
+>>>        - liburcu-dev
+>>>        - libusb-1.0-0-dev
+>>> +      - libvde-dev
+>>>        - libvte-2.90-dev
+>>> +      - libxen-dev
+>>> +      - nettle-dev
+>>>        - sparse
+>>>        - uuid-dev
+>>> +      - xfslibs-dev
+>>>
+>>>  # The channel name "irc.oftc.net#qemu" is encrypted against qemu/qemu
+>>>  # to prevent IRC notifications from forks. This was created using:
+>>> @@ -162,28 +171,37 @@ matrix:
+>>>              # Build dependencies
+>>>              - libaio-dev
+>>>              - libattr1-dev
+>>> +            - libbluetooth-dev
+>>>              - libbrlapi-dev
+>>> +            - libcap-dev
+>>>              - libcap-ng-dev
+>>>              - libgnutls-dev
+>>>              - libgtk-3-dev
+>>>              - libiscsi-dev
+>>>              - liblttng-ust-dev
+>>> +            - liblzo2-dev
+>>>              - libnfs-dev
+>>>              - libncurses5-dev
+>>>              - libnss3-dev
+>>>              - libpixman-1-dev
+>>>              - libpng12-dev
+>>>              - librados-dev
+>>> +            - librdmacm-dev
+>>>              - libsdl1.2-dev
+>>>              - libseccomp-dev
+>>> +            - libsnappy-dev
+>>>              - libspice-protocol-dev
+>>>              - libspice-server-dev
+>>>              - libssh2-1-dev
+>>>              - liburcu-dev
+>>>              - libusb-1.0-0-dev
+>>> +            - libvde-dev
+>>>              - libvte-2.90-dev
+>>> +            - libxen-dev
+>>> +            - nettle-dev
+>>>              - sparse
+>>>              - uuid-dev
+>>> +            - xfslibs-dev
+>>>        language: generic
+>>>        compiler: none
+>>>        env:
+>>>
+>
