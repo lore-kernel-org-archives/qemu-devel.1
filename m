@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dL6px-0007q4-WD
+	(envelope-from <quintela@redhat.com>) id 1dL6py-0007q6-0T
 	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:51:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dL6pt-0000Ra-Vd
+	(envelope-from <quintela@redhat.com>) id 1dL6px-0000SG-7d
 	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:51:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44644)
+Received: from mx1.redhat.com ([209.132.183.28]:36954)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dL6pt-0000RO-Pi
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:51:45 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dL6px-0000S8-1J
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:51:49 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 99C7181F01
-	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 11:51:44 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id F0E7D368E4
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 11:51:47 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 14 Jun 2017 13:51:33 +0200
-Message-Id: <20170614115138.19571-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 0/5] Migration PULL request
+Date: Wed, 14 Jun 2017 13:51:35 +0200
+Message-Id: <20170614115138.19571-3-quintela@redhat.com>
+In-Reply-To: <20170614115138.19571-1-quintela@redhat.com>
+References: <20170614115138.19571-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PULL 2/5] migration: fix incorrect enable return path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +32,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Hi
+From: Peter Xu <peterx@redhat.com>
 
-In this pull requset:
-- I included the v1 of peter return path, fix it
-- fix the compliation with older compilers (new compliers don't
-   complain about a repeated typedef, so I didn't noticed)
-- Add test for disabled features
-- Last bit of misc cleanup, remove of not needed includes
+0425dc9 is actually v1 of that patch, but it was accidentally
+merged (while there was a v2). That will cause problem when we try to
+migrate to some old QEMUs when return path is not really there. Let's
+fix it, then squashing this patch with 0425dc9 will be exactly patch
+content of v2.
 
-Please, apply.
+Fixes: 0425dc9 ("migration: isolate return path on src")
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+---
+ migration/migration.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Thanks, Juan.
-
-The following changes since commit 3f0602927b120a480b35dcf58cf6f95435b3ae91:
-
-  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20170613' into staging (2017-06-13 15:49:07 +0100)
-
-are available in the git repository at:
-
-  git://github.com/juanquintela/qemu.git tags/migration/20170614
-
-for you to fetch changes up to 3416ab5bb452f1b6cea58aed8983ffb9a455b7c4:
-
-  migration: Don't create decompression threads if not enabled (2017-06-14 11:11:06 +0200)
-
-----------------------------------------------------------------
-migration/next for 20170614
-
-----------------------------------------------------------------
-Juan Quintela (4):
-      migration: Fix compilation with older compilers
-      migration: Remove unneeded includes
-      migration: Test for disabled features on reception
-      migration: Don't create decompression threads if not enabled
-
-Peter Xu (1):
-      migration: fix incorrect enable return path
-
- include/migration/colo.h     |  3 ---
- include/migration/misc.h     |  2 ++
- include/migration/register.h |  3 ---
- include/migration/vmstate.h  |  1 -
- include/qemu/typedefs.h      |  2 ++
- migration/block.c            |  6 ------
- migration/colo-failover.c    |  2 ++
- migration/colo.c             |  2 --
- migration/exec.c             |  2 --
- migration/fd.c               |  2 --
- migration/global_state.c     |  1 -
- migration/migration.c        | 12 +++++-------
- migration/migration.h        |  2 --
- migration/postcopy-ram.c     |  2 --
- migration/qemu-file.c        |  2 --
- migration/ram.c              | 24 +++++++++++++++++++-----
- migration/savevm.c           |  6 ------
- 17 files changed, 30 insertions(+), 44 deletions(-)
+diff --git a/migration/migration.c b/migration/migration.c
+index 8ef6d6c..f9053b0 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1814,7 +1814,11 @@ static void *migration_thread(void *opaque)
+ 
+     qemu_savevm_state_header(s->to_dst_file);
+ 
+-    if (s->to_dst_file) {
++    /*
++     * If we opened the return path, we need to make sure dst has it
++     * opened as well.
++     */
++    if (s->rp_state.from_dst_file) {
+         /* Now tell the dest that it should open its end so it can reply */
+         qemu_savevm_send_open_return_path(s->to_dst_file);
+ 
+-- 
+2.9.4
