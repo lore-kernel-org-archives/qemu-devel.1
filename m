@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dLDp5-0005AZ-UC
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 15:19:24 -0400
+	(envelope-from <thuth@redhat.com>) id 1dLDrb-0005u7-Qa
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 15:22:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dLDp2-0008Co-Pb
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 15:19:23 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:34426)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dLDp2-0008Ca-M5
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 15:19:20 -0400
-Received: by mail-qt0-x242.google.com with SMTP id o21so2027732qtb.1
-	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 12:19:20 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170614140209.29847-1-alex.bennee@linaro.org>
-	<20170614140209.29847-4-alex.bennee@linaro.org>
-	<09a35585-d876-6c9e-7045-8cda418455e0@twiddle.net>
-	<a1a0b43c-b074-a1a4-dc26-717964121b1a@redhat.com>
-	<871sqmo3xb.fsf@linaro.org>
-	<CAFEAcA-02MVgmdMaDMfhU55J9B7ER1gT6TmyNsZE+bc3wTW45w@mail.gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <48da7ce0-2bb5-cdb4-ad5a-a0f0de4cb3f2@twiddle.net>
-Date: Wed, 14 Jun 2017 12:19:16 -0700
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-02MVgmdMaDMfhU55J9B7ER1gT6TmyNsZE+bc3wTW45w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 3/3] tcg-runtime: short-circuit
- lookup_tb_ptr on IRQs
+	(envelope-from <thuth@redhat.com>) id 1dLDra-0000Pe-Tj
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 15:21:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42662)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dLDra-0000PR-NL
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 15:21:58 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9F1C1883A4
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 19:21:57 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+Date: Wed, 14 Jun 2017 21:21:51 +0200
+Message-Id: <1497468113-2874-3-git-send-email-thuth@redhat.com>
+In-Reply-To: <1497468113-2874-1-git-send-email-thuth@redhat.com>
+References: <1497468113-2874-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/4] include/exec/poison: Mark some CONFIG
+ defines as poisoned, too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,35 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Emilio G. Cota" <cota@braap.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-On 06/14/2017 12:11 PM, Peter Maydell wrote:
-> On 14 June 2017 at 18:49, Alex Bennée <alex.bennee@linaro.org> wrote:
->> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
->> index 2a85666579..7e67bb3db2 100644
->> --- a/target/arm/op_helper.c
->> +++ b/target/arm/op_helper.c
->> @@ -835,6 +835,9 @@ void HELPER(msr_i_pstate)(CPUARMState *env, uint32_t op, uint32_t imm)
->>           break;
->>       case 0x1f: /* DAIFClear */
->>           env->daif &= ~((imm << 6) & PSTATE_DAIF);
->> +        /* This may result in pending IRQs being unmasked so ensure we
->> +           exit the loop */
->> +        cpu_exit(ENV_GET_CPU(env));
->>           break;
->>       default:
->>           g_assert_not_reached();
-> 
-> The 'op' field we're switching on here is just a constant
-> from the instruction encoding, so I'd rather see us
-> identify that in translate-a64.c and end the TB or
-> whatever when we need to, rather than doing the
-> longjump-out-of-here that cpu_exit() does at runtime.
+These are defined in config-target.h and thus should never be
+used in common code.
 
-cpu_exit isn't the longjmp; this is just a set of exit_request and icount_decr.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ include/exec/poison.h | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-That said, you're right that we can do this more directly from the translator.
-
-
-r~
+diff --git a/include/exec/poison.h b/include/exec/poison.h
+index 9356d5f..5ffed4d 100644
+--- a/include/exec/poison.h
++++ b/include/exec/poison.h
+@@ -61,5 +61,25 @@
+ #pragma GCC poison CPU_INTERRUPT_TGT_INT_1
+ #pragma GCC poison CPU_INTERRUPT_TGT_INT_2
+ 
++#pragma GCC poison CONFIG_ALPHA_DIS
++#pragma GCC poison CONFIG_ARM_A64_DIS
++#pragma GCC poison CONFIG_ARM_DIS
++#pragma GCC poison CONFIG_CRIS_DIS
++#pragma GCC poison CONFIG_I386_DIS
++#pragma GCC poison CONFIG_LM32_DIS
++#pragma GCC poison CONFIG_M68K_DIS
++#pragma GCC poison CONFIG_MICROBLAZE_DIS
++#pragma GCC poison CONFIG_MIPS_DIS
++#pragma GCC poison CONFIG_MOXIE_DIS
++#pragma GCC poison CONFIG_NIOS2_DIS
++#pragma GCC poison CONFIG_PPC_DIS
++#pragma GCC poison CONFIG_S390_DIS
++#pragma GCC poison CONFIG_SH4_DIS
++#pragma GCC poison CONFIG_SPARC_DIS
++#pragma GCC poison CONFIG_XTENSA_DIS
++
++#pragma GCC poison CONFIG_LINUX_USER
++#pragma GCC poison CONFIG_VHOST_NET
++
+ #endif
+ #endif
+-- 
+1.8.3.1
