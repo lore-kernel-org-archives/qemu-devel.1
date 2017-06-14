@@ -1,27 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dLAHO-00088B-OM
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:32:23 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dLAL7-0003mk-4b
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:36:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dLAHJ-000541-O0
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:32:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51494)
+	(envelope-from <stefanha@redhat.com>) id 1dLAL2-0008FA-3A
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:36:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41116)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dLAHJ-00053K-Hn
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:32:17 -0400
-References: <20170606181948.16238-1-rkagan@virtuozzo.com>
-	<20170606181948.16238-18-rkagan@virtuozzo.com>
-	<ebb4867f-a072-cfa0-6ca8-b493ef157458@redhat.com>
-	<20170614152848.GA19027@rkaganb.sw.ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <62f00098-87c5-b0d9-6a07-71990b537c8d@redhat.com>
-Date: Wed, 14 Jun 2017 17:32:12 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170614152848.GA19027@rkaganb.sw.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 17/23] hyperv: add synic message delivery
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dLAL1-0008El-QG
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:36:08 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Wed, 14 Jun 2017 16:35:48 +0100
+Message-Id: <20170614153557.3319-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH v8 0/9] qemu-img: add measure sub-command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +21,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
+To: qemu-devel@nongnu.org
+Cc: Nir Soffer <nsoffer@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
+v8:
+ * Check 2P file size in qemu-iotests 178 [Berto]
+ * Use QCOW_MAX_L1_SIZE to check maximum virtual disk size [Berto]
 
+v7:
+ * Check max file size with 7 exabytes [Berto]
+ * Really use UINT64_MAX everywhere instead of ~0ULL [Berto]
 
-On 14/06/2017 17:28, Roman Kagan wrote:
-> On Wed, Jun 14, 2017 at 05:08:02PM +0200, Paolo Bonzini wrote:
->>
->>
->> On 06/06/2017 20:19, Roman Kagan wrote:
->>> +    sint_route->msg_status = ret;
->>> +    /* notify the msg originator of the progress made; if the slot was busy we
->>> +     * set msg_pending flag in it so it will be the guest who will do EOM and
->>> +     * trigger the notification from KVM via sint_ack_notifier */
->>> +    if (ret != -EAGAIN) {
->>> +        qemu_bh_schedule(sint_route->msg_bh);
->>> +    }
->>
->> It may be faster to use aio_bh_schedule_oneshot, depending on the number
->> of devices.
-> 
-> Messages aren't used on fast paths, they are only exchanged at device
-> setup/teardown.  So I cared more about readability than speed here.
+v6:
+ * Change bdrv_measure() return type to BlockMeasureInfo * [Eric]
+ * Clarify that holes in sparse POSIX files are still counted [Eric]
 
-Then you really want to use aio_bh_schedule_oneshot, because bottom
-halves incur a (small) cost even when you don't use them: each iteration
-of the event loop visits the list of bottom halves.
+v5:
+ * Use UINT64_MAX instead of ~0ULL [Berto]
+ * Document qemu-img measure ofmt, fmt, output_fmt, and snapshot_param
+   [Berto]
 
-Persistent bottom halves, thus, are only a good idea if they are
-expected to trigger very often on a busy VM.  If this bottom half is
-only triggered at setup/teardown, it shouldn't use them.
+v4:
+ * Make qcow2 refcount calculation conservative [Maor]
+ * Include actual qemu-img convert image size in test cases
 
-Paolo
+v3:
+ * Drop RFC, this is ready to go for QEMU 2.10
+ * Use "required size" instead of "required bytes" in qemu-img output for
+   consistency [Nir]
+ * Clarify BlockMeasureInfo semantics [Max]
+ * Clarify bdrv_measure() opts argument and error handling [Nir]
+ * Handle -o backing_file= for qcow2 [Max]
+ * Handle snapshot options in qemu-img measure
+ * Probe input image for allocated data clusters for qcow2.  Didn't centralize
+   this because there are format-specific aspects such as the cluster_size.  It
+   may make sense to centralize it later (with a bit more complexity) if
+   support is added to more formats.
+ * Add qemu-img(1) man page section for 'measure' sub-command [Max]
+ * Extend test case to cover additional scenarios [Nir]
+
+RFCv2:
+ * Publishing RFC again to discuss the new user-visible interfaces.  Code has
+   changed quite a bit, I have not kept any Reviewed-by tags.
+ * Rename qemu-img sub-command "measure" and API bdrv_measure() [Nir]
+ * Report both "required bytes" and "fully allocated bytes" to handle the empty
+   image file and prealloc use cases [Nir and Dan]
+ * Use bdrv_getlength() instead of bdrv_nb_sectors() [Berto]
+ * Rename "err" label "out" in qemu-img-cmds.c [Nir]
+ * Add basic qcow2 support, doesn't support qemu-img convert from existing files yet
+
+RFCv1:
+ * Publishing patch series with just raw support, no qcow2 yet.  Please review
+   the command-line interface and let me know if you are happy with this
+   approach.
+
+Users and management tools sometimes need to know the size required for a new
+disk image so that an LVM volume, SAN LUN, etc can be allocated ahead of time.
+Image formats like qcow2 have non-trivial metadata that makes it hard to
+estimate the exact size without knowledge of file format internals.
+
+This patch series introduces a new qemu-img sub-command that calculates the
+required size for both image creation and conversion scenarios.
+
+The conversion scenario is:
+
+  $ qemu-img measure -f raw -O qcow2 input.img
+  required size: 1327680
+  fully allocated size: 1074069504
+
+Here an existing image file is taken and the output includes the space required
+for data from the input image file.
+
+The creation scenario is:
+
+  $ qemu-img measure -O qcow2 --size 5G
+  required size: 327680
+  fully allocated size: 1074069504
+
+Stefan Hajnoczi (9):
+  block: add bdrv_measure() API
+  raw-format: add bdrv_measure() support
+  qcow2: extract preallocation calculation function
+  qcow2: make refcount size calculation conservative
+  qcow2: extract image creation option parsing
+  qcow2: add bdrv_measure() support
+  qemu-img: add measure subcommand
+  qemu-iotests: support per-format golden output files
+  iotests: add test 178 for qemu-img measure
+
+ qapi/block-core.json             |  25 +++
+ include/block/block.h            |   2 +
+ include/block/block_int.h        |   2 +
+ block.c                          |  35 ++++
+ block/qcow2.c                    | 383 +++++++++++++++++++++++++++++----------
+ block/raw-format.c               |  26 +++
+ qemu-img.c                       | 234 ++++++++++++++++++++++++
+ qemu-img-cmds.hx                 |   6 +
+ qemu-img.texi                    |  30 +++
+ tests/qemu-iotests/178           | 170 +++++++++++++++++
+ tests/qemu-iotests/178.out.qcow2 | 286 +++++++++++++++++++++++++++++
+ tests/qemu-iotests/178.out.raw   | 158 ++++++++++++++++
+ tests/qemu-iotests/check         |   5 +
+ tests/qemu-iotests/group         |   1 +
+ 14 files changed, 1268 insertions(+), 95 deletions(-)
+ create mode 100755 tests/qemu-iotests/178
+ create mode 100644 tests/qemu-iotests/178.out.qcow2
+ create mode 100644 tests/qemu-iotests/178.out.raw
+
+-- 
+2.9.4
