@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dL6Dk-0007r5-Un
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:12:21 -0400
+	(envelope-from <quintela@redhat.com>) id 1dL6Hf-0001Fw-Rn
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:16:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dL6Dg-0002PG-TZ
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:12:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44000)
+	(envelope-from <quintela@redhat.com>) id 1dL6Hc-0004Bd-Id
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:16:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33500)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dL6Dg-0002Ox-Mj
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:12:16 -0400
-References: <20170606181948.16238-1-rkagan@virtuozzo.com>
-	<20170606181948.16238-17-rkagan@virtuozzo.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <999e60c5-7ee7-5346-6940-1fcd5d7b4264@redhat.com>
-Date: Wed, 14 Jun 2017 13:12:12 +0200
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dL6Hc-0004B8-Cc
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:16:20 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <1497421386.11748.1.camel@redhat.com> (Gerd Hoffmann's message of
+	"Wed, 14 Jun 2017 08:23:06 +0200")
+References: <1497411544-80213-1-git-send-email-liqiang6-s@360.cn>
+	<149741206273.576.11299001383096762722@4a9a010726c0>
+	<CAKXe6SLoc3XPMaSme-qWjQJOyrJLKZyMyX-zCiuHtiL4c2ZmVA@mail.gmail.com>
+	<1497421386.11748.1.camel@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 14 Jun 2017 13:16:12 +0200
+Message-ID: <87o9tqes5f.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <20170606181948.16238-17-rkagan@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 16/23] hyperv: map overlay pages after
- updating msrs
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] usb: xhci: fix info leak when writing
+ event to the guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Li Qiang <liq3ea@gmail.com>, Qemu Developers <qemu-devel@nongnu.org>, Li Qiang <liqiang6-s@360.cn>, famz@redhat.com, P J P <ppandit@redhat.com>
 
+Gerd Hoffmann <kraxel@redhat.com> wrote:
+>   Hi,
+>
+>>=C2=A0> CC=C2=A0 =C2=A0 =C2=A0 hw/timer/a9gtimer.o
+>> > In file included from /tmp/qemu-test/src/hw/net/vmxnet3.c:30:
+>> > /tmp/qemu-test/src/include/migration/register.h:18: error:
+>> > redefinition of typedef =E2=80=98LoadStateHandler=E2=80=99
+>> > /tmp/qemu-test/src/include/migration/vmstate.h:32: note: previous
+>> > declaration of =E2=80=98LoadStateHandler=E2=80=99 was here
+>>=20
+>>=20
+>> Seems not related with my patch.
+>
+> Indeed, master branch seems to be broken, I got a few more of these
+> already ...
 
+It was me.  New compliers work with a repeated typedef, so I didn't
+noticed.  For a fast fix, look at the list for my last patch.  Going to
+send the PULL request when everything finish compiling.
 
-On 06/06/2017 20:19, Roman Kagan wrote:
-> There is a design flaw in the Hyper-V SynIC implementation in KVM: when
-> message page or event flags page is enabled by setting the corresponding
-> msr, KVM zeroes it out.  This violates the spec in general (per spec,
-> the pages have to be overlay ones and only zeroed at cpu reset), but
-> it's non-fatal in normal operation because the user exit happens after
-> the page is zeroed, so it's the underlying guest page which is zeroed
-> out, and sane guests don't depend on its contents to be preserved while
-> it's overlaid.
-> 
-> However, in the case of vmstate load the overlay pages are set up before
-> msrs are set so the contents of those pages get lost.
-> 
-> To work it around, avoid setting up overlay pages in .post_load.
-> Instead, postpone it until after the msrs are pushed to KVM.  As a
-> result, KVM just zeroes out the underlying guest pages similar to how it
-> happens during guest-initiated msr writes, which is tolerable.
-
-Why not disable the zeroing for host-initiated MSR writes?  This is
-pretty clearly a KVM bug, we can push it to stable kernels too.
-
-Paolo
+Sorry, Juan.
