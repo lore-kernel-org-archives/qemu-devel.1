@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54106)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dL9XK-000594-EK
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:44:47 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dL9cB-0008Ev-FZ
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:49:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dL9XF-0008E3-K3
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:44:46 -0400
-Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:33341)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dL9XF-0008Dd-CK
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:44:41 -0400
-Received: by mail-wr0-x232.google.com with SMTP id r103so1475230wrb.0
-	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 07:44:39 -0700 (PDT)
-References: <1497369290-20401-1-git-send-email-peter.maydell@linaro.org>
-	<1497369290-20401-2-git-send-email-peter.maydell@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1497369290-20401-2-git-send-email-peter.maydell@linaro.org>
-Date: Wed, 14 Jun 2017 15:45:12 +0100
-Message-ID: <877f0eocg7.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] travis: install more library
- dependencies
+	(envelope-from <ehabkost@redhat.com>) id 1dL9c6-00019f-L2
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:49:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51096)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dL9c6-00019Q-Ej
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:49:42 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 49275D5988
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 14:49:41 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Wed, 14 Jun 2017 11:49:39 -0300
+Message-Id: <20170614144939.1115-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH] device-crash-test: Fix regexp on whitelist
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,104 +27,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
 
+The "||" in the whitelist entry was not escaped, making the regexp match
+all strings, on every single cases where QEMU aborted.
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ scripts/device-crash-test | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> Update the travis list of library packages to install so that
-> our build tests cover more of our code base.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
-> ---
->  .travis.yml | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
->
-> diff --git a/.travis.yml b/.travis.yml
-> index 27a2d9c..26dabb6 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -11,28 +11,37 @@ addons:
->        # Build dependencies
->        - libaio-dev
->        - libattr1-dev
-> +      - libbluetooth-dev
->        - libbrlapi-dev
-> +      - libcap-dev
->        - libcap-ng-dev
->        - libgnutls-dev
->        - libgtk-3-dev
->        - libiscsi-dev
->        - liblttng-ust-dev
-> +      - liblzo2-dev
->        - libnfs-dev
->        - libncurses5-dev
->        - libnss3-dev
->        - libpixman-1-dev
->        - libpng12-dev
->        - librados-dev
-> +      - librdmacm-dev
->        - libsdl1.2-dev
->        - libseccomp-dev
-> +      - libsnappy-dev
->        - libspice-protocol-dev
->        - libspice-server-dev
->        - libssh2-1-dev
->        - liburcu-dev
->        - libusb-1.0-0-dev
-> +      - libvde-dev
->        - libvte-2.90-dev
-> +      - libxen-dev
-> +      - nettle-dev
->        - sparse
->        - uuid-dev
-> +      - xfslibs-dev
->
->  # The channel name "irc.oftc.net#qemu" is encrypted against qemu/qemu
->  # to prevent IRC notifications from forks. This was created using:
-> @@ -162,28 +171,37 @@ matrix:
->              # Build dependencies
->              - libaio-dev
->              - libattr1-dev
-> +            - libbluetooth-dev
->              - libbrlapi-dev
-> +            - libcap-dev
->              - libcap-ng-dev
->              - libgnutls-dev
->              - libgtk-3-dev
->              - libiscsi-dev
->              - liblttng-ust-dev
-> +            - liblzo2-dev
->              - libnfs-dev
->              - libncurses5-dev
->              - libnss3-dev
->              - libpixman-1-dev
->              - libpng12-dev
->              - librados-dev
-> +            - librdmacm-dev
->              - libsdl1.2-dev
->              - libseccomp-dev
-> +            - libsnappy-dev
->              - libspice-protocol-dev
->              - libspice-server-dev
->              - libssh2-1-dev
->              - liburcu-dev
->              - libusb-1.0-0-dev
-> +            - libvde-dev
->              - libvte-2.90-dev
-> +            - libxen-dev
-> +            - nettle-dev
->              - sparse
->              - uuid-dev
-> +            - xfslibs-dev
->        language: generic
->        compiler: none
->        env:
-
-
---
-Alex Bennée
+diff --git a/scripts/device-crash-test b/scripts/device-crash-test
+index 5f90e9bb54..e77b693eb2 100755
+--- a/scripts/device-crash-test
++++ b/scripts/device-crash-test
+@@ -219,7 +219,7 @@ ERROR_WHITELIST = [
+     {'exitcode':-6, 'log':r"Object .* is not an instance of type spapr-machine", 'loglevel':logging.ERROR},
+     {'exitcode':-6, 'log':r"Object .* is not an instance of type generic-pc-machine", 'loglevel':logging.ERROR},
+     {'exitcode':-6, 'log':r"Object .* is not an instance of type e500-ccsr", 'loglevel':logging.ERROR},
+-    {'exitcode':-6, 'log':r"vmstate_register_with_alias_id: Assertion `!se->compat || se->instance_id == 0' failed", 'loglevel':logging.ERROR},
++    {'exitcode':-6, 'log':r"vmstate_register_with_alias_id: Assertion `!se->compat \|\| se->instance_id == 0' failed", 'loglevel':logging.ERROR},
+     {'exitcode':-11, 'device':'stm32f205-soc', 'loglevel':logging.ERROR, 'expected':True},
+     {'exitcode':-11, 'device':'xlnx,zynqmp', 'loglevel':logging.ERROR, 'expected':True},
+     {'exitcode':-11, 'device':'mips-cps', 'loglevel':logging.ERROR, 'expected':True},
+-- 
+2.11.0.259.g40922b1
