@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dL45l-0000gn-Dw
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 04:55:58 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dL4A1-0001zY-7T
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 05:00:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dL45i-0003tb-9X
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 04:55:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56266)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dL45h-0003tK-U1
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 04:55:54 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <149742933433.960.4827367239827382038@4a9a010726c0>
-	(no-reply@patchew.org's message of "Wed, 14 Jun 2017 01:35:35 -0700
-	(PDT)")
-References: <149742933433.960.4827367239827382038@4a9a010726c0>
-Reply-To: quintela@redhat.com
-Date: Wed, 14 Jun 2017 10:55:47 +0200
-Message-ID: <87bmpreyng.fsf@secure.mitica>
+	(envelope-from <imammedo@redhat.com>) id 1dL49w-0005Jn-5r
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 05:00:21 -0400
+Date: Wed, 14 Jun 2017 11:00:01 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170614110001.7816209b@nial.brq.redhat.com>
+In-Reply-To: <149739016562.5725.6958577924052221756@loki>
+References: <20170530160445.12810-1-lvivier@redhat.com>
+	<20170531043557.GI12163@umbus.fritz.box>
+	<149695205346.23353.3484869110998357783@loki>
+	<20170609102733.0eb7293d@nial.brq.redhat.com>
+	<149739016562.5725.6958577924052221756@loki>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] migration: fix incorrect enable return path
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] spapr: manage hotplugged devices while the
+ VM is not started
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,90 +27,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: no-reply@patchew.org
-Cc: peterx@redhat.com, qemu-devel@nongnu.org, famz@redhat.com, lvivier@redhat.com, dgilbert@redhat.com
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-no-reply@patchew.org wrote:
-> Hi,
+On Tue, 13 Jun 2017 16:42:45 -0500
+Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
 
-> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
-> Submodule 'dtc' (git://git.qemu-project.org/dtc.git) registered for path =
-'dtc'
-> Cloning into '/var/tmp/patchew-tester-tmp-ynbw5yjp/src/dtc'...
-> Submodule path 'dtc': checked out '558cd81bdd432769b59bff01240c44f82cfb1a=
-9d'
->   BUILD   fedora
-> make[1]: Entering directory '/var/tmp/patchew-tester-tmp-ynbw5yjp/src'
->   ARCHIVE qemu.tgz
->   ARCHIVE dtc.tgz
->   COPY    RUNNER
->     RUN test-mingw in qemu:fedora=20
-> Packages installed:
-> PyYAML-3.11-13.fc25.x86_64
-> SDL-devel-1.2.15-21.fc24.x86_64
-> bc-1.06.95-16.fc24.x86_64
-> bison-3.0.4-4.fc24.x86_64
-> ccache-3.3.4-1.fc25.x86_64
-> clang-3.9.1-2.fc25.x86_64
-> findutils-4.6.0-8.fc25.x86_64
-> flex-2.6.0-3.fc25.x86_64
-> gcc-6.3.1-1.fc25.x86_64
+> Quoting Igor Mammedov (2017-06-09 03:27:33)
+> > On Thu, 08 Jun 2017 15:00:53 -0500
+> > Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+> >   
+> > > Quoting David Gibson (2017-05-30 23:35:57)  
+> > > > On Tue, May 30, 2017 at 06:04:45PM +0200, Laurent Vivier wrote:    
+> > > > > For QEMU, a hotlugged device is a device added using the HMP/QMP
+> > > > > interface.
+> > > > > For SPAPR, a hotplugged device is a device added while the
+> > > > > machine is running. In this case QEMU doesn't update internal
+> > > > > state but relies on the OS for this part
+> > > > > 
+> > > > > In the case of migration, when we (libvirt) hotplug a device
+> > > > > on the source guest, we (libvirt) generally hotplug the same
+> > > > > device on the destination guest. But in this case, the machine
+> > > > > is stopped (RUN_STATE_INMIGRATE) and QEMU must not expect
+> > > > > the OS will manage it as an hotplugged device as it will
+> > > > > be "imported" by the migration.
+> > > > > 
+> > > > > This patch changes the meaning of "hotplugged" in spapr.c
+> > > > > to manage a QEMU hotplugged device like a "coldplugged" one
+> > > > > when the machine is awaiting an incoming migration.
+> > > > > 
+> > > > > Signed-off-by: Laurent Vivier <lvivier@redhat.com>    
+> > > > 
+> > > > So, I think this is a reasonable concept, at least in terms of
+> > > > cleanliness and not doing unnecessary work.  However, if it's fixing
+> > > > bugs, I suspect that means we still have problems elsewhere.    
+> > > 
+> > > I was hoping a lot of these issues would go away once we default
+> > > the initial/reset DRC states to "coldplugged". I think your pending
+> > > patch:
+> > > 
+> > >   "spapr: Make DRC reset force DRC into known state"
+> > > 
+> > > But I didn't consider the fact that libvirt will be issuing these
+> > > hotplugs *after* reset, so those states would indeed need to
+> > > be fixed up again to reflect boot-time,attached as opposed to
+> > > boot-time,unattached before starting the target.
+> > > 
+> > > So I do think this patch addresses a specific bug that isn't
+> > > obviously fixable elsewhere.
+> > > 
+> > > To me it seems like the only way to avoid doing something like
+> > > what this patch does is to migrate all attached DRCs from the
+> > > source in all cases.
+> > > 
+> > > This would break backward-migration though, unless we switch from
+> > > using subregions for DRCs to explicitly disabling DRC migration
+> > > based on machine type.  
+> > we could leave old machines broken and fix only new machine types,
+> > then it would be easy ot migrate 'additional' DRC state as subsection
+> > only on new for new machines.  
+> 
+> That's an option, but subsections were only really used for backward
+> compatibility. Not sure how much we have to gain from using both.
+If I remember correctly subsections could be/are used for forward compat stuff
+i.e. subsection is generated on source side when .needed callback returns
+true and destinations will just consume whatever data were sent
+without looking at .need callback. So source could generate extra
+DRC subsection when cpu hotplug is enabled for new machine types,
+ex: f816a62daa
 
-(master)$ rpm -qa gcc
-gcc-6.3.1-1.fc25.x86_64
+adding David/Juan to CC list to correct me if I'm wrong.
 
-I *am* using that compiler.
-
-> gcc-c++-6.3.1-1.fc25.x86_64
-> git-2.9.3-2.fc25.x86_64
-> glib2-devel-2.50.3-1.fc25.x86_64
-> libfdt-devel-1.4.2-1.fc25.x86_64
-> make-4.1-5.fc24.x86_64
-> mingw32-SDL-1.2.15-7.fc24.noarch
-> mingw32-bzip2-1.0.6-7.fc24.noarch
-> mingw32-curl-7.47.0-1.fc24.noarch
-> mingw32-glib2-2.50.1-1.fc25.noarch
-> mingw32-gmp-6.1.1-1.fc25.noarch
-> mingw32-gnutls-3.5.5-2.fc25.noarch
-> mingw32-gtk2-2.24.31-2.fc25.noarch
-> mingw32-gtk3-3.22.2-1.fc25.noarch
-> mingw32-libjpeg-turbo-1.5.1-1.fc25.noarch
-> mingw32-libpng-1.6.27-1.fc25.noarch
-> mingw32-libssh2-1.4.3-5.fc24.noarch
-> mingw32-libtasn1-4.9-1.fc25.noarch
-> mingw32-nettle-3.3-1.fc25.noarch
-> mingw32-pixman-0.34.0-1.fc25.noarch
-> mingw32-pkg-config-0.28-6.fc24.x86_64
-> mingw64-SDL-1.2.15-7.fc24.noarch
-> mingw64-bzip2-1.0.6-7.fc24.noarch
-> mingw64-curl-7.47.0-1.fc24.noarch
-> mingw64-glib2-2.50.1-1.fc25.noarch
-> mingw64-gmp-6.1.1-1.fc25.noarch
-> mingw64-gnutls-3.5.5-2.fc25.noarch
-> mingw64-gtk2-2.24.31-2.fc25.noarch
-> mingw64-gtk3-3.22.2-1.fc25.noarch
-> mingw64-libjpeg-turbo-1.5.1-1.fc25.noarch
-> mingw64-libpng-1.6.27-1.fc25.noarch
-> mingw64-libssh2-1.4.3-5.fc24.noarch
-> mingw64-libtasn1-4.9-1.fc25.noarch
-> mingw64-nettle-3.3-1.fc25.noarch
-> mingw64-pixman-0.34.0-1.fc25.noarch
-> mingw64-pkg-config-0.28-6.fc24.x86_64
-
-Oh, it is crosscompiling for windows32/64
-
-But it don't put what complier they are using.  For me, it also
-cross-compile without warning/errors (I have lastest F25 packages).
+> > > That approach seems to similar to what x86 does, e.g.
+> > > hw/acpi/ich9.c and hw/acpi/piix.c migrate vmstate_memhp_state
+> > > (corresponding to all DIMMs' slot status) in all cases where
+> > > memory hotplug is enabled. If they were to do this using
+> > > subregions for DIMMs in a transitional state I think similar
+> > > issues would pop up in that code as well.
+> > > 
+> > > Even if we take this route, we still need to explicitly suppress
+> > > hotplug events during INMIGRATE to avoid extra events going on
+> > > the queue. *Unless* we similarly rely purely on the ones sent by
+> > > the source.  
+> > pc/q35 might also lose events if device is hotplugged during migration,
+> > in addition migration would fail anyway since dst qemu
+> > should be launched with all devices that are present on src.
+> > 
+> > ex: consider if one hotplugs DIMM during migration, it creates
+> > RAM region mapped into guest and that region might be transferred
+> > as part of VMState (not sure if it even works)
+> > and considering dst qemu has no idea about hotplugged memory mapping,
+> > the migration would fail on receiving unknown VMState.
+> > 
+> > Hotplug generally doesn't work during migration, so it should be disabled
+> > in a generic way on migration start and re-enabled on target
+> > on migration completion. How about blocking device_add when
+> > INMIGRATE state and unblocking it when switching to runnig on dst?  
+> 
+> Maybe I'm misunderstanding the intent of this patch, but in our own
+> testing we've seen that even for CPUs hotplugged *before* migration
+> starts, libvirt will add them to the dest via device_add instead of
+> via the command-line.
+the way migration currently works, this behavior seems fine to me,
+whether hotplugged CPUs on target side are specified with -device or
+device_add, it shouldn't affect machine behavior. It doesn't in
+case of cpu for x86, where hotplug process state is
+migrated as VMSTATE_CPU_HOTPLUG subsection of piix4_pm/ich9
+device.
 
 
-> In file included from /tmp/qemu-test/src/hw/net/vmxnet3.c:30:
-> /tmp/qemu-test/src/include/migration/register.h:18: error: redefinition o=
-f typedef =E2=80=98LoadStateHandler=E2=80=99
-> /tmp/qemu-test/src/include/migration/vmstate.h:32: note: previous declara=
-tion of =E2=80=98LoadStateHandler=E2=80=99 was here
-> make: *** [hw/net/vmxnet3.o] Error 1
-> make: *** Waiting for unfinished jobs....
+> If the CPUs were all specified via command-line, I don't think these
+> patches would be needed, since the coldplug hooks would be executed
+> without the need to make any special considerations for INMIGRATE.
+I don't think that it's libvirt's problem, user if free to use either
+-device or device_add to add devices on target side.
 
-Patch is on list to fix this.  The problem is not on this patch.
+We might re-enable writing to hotplugged property (36cccb8c5)
+and ask mgmt to set its value on target but that would not work
+fine for old mgmt tools.
+Perhaps we should migrate DeviceState::hotplugged property state
+as part of every device so that target could fixup device state
+according to its value, but I'm not sure if it is useful.
 
-Later, Juan.
+
+> This libvirt commit seems to confirm that the CPUs are added via
+> device_add, and we've seen similar behavior in our testing:
+> 
+> 
+> commit 9eb9106ea51b43102ee51132f69780b2c86ccbca
+> Author: Peter Krempa <pkrempa@redhat.com>
+> Date:   Thu Aug 4 14:36:24 2016 +0200
+> 
+>     qemu: command: Add support for sparse vcpu topologies
+>     
+>     Add support for using the new approach to hotplug vcpus using device_add
+>     during startup of qemu to allow sparse vcpu topologies.
+>     
+>     There are a few limitations imposed by qemu on the supported
+>     configuration:
+>     - vcpu0 needs to be always present and not hotpluggable
+>     - non-hotpluggable cpus need to be ordered at the beginning
+>     - order of the vcpus needs to be unique for every single hotpluggable
+>       entity
+>     
+>     Qemu also doesn't really allow to query the information necessary to
+>     start a VM with the vcpus directly on the commandline. Fortunately they
+>     can be hotplugged during startup.
+>     
+>     The new hotplug code uses the following approach:
+>     - non-hotpluggable vcpus are counted and put to the -smp option
+>     - qemu is started
+>     - qemu is queried for the necessary information
+>     - the configuration is checked
+>     - the hotpluggable vcpus are hotplugged
+>     - vcpus are started
+>     
+>     This patch adds a lot of checking code and enables the support to
+>     specify the individual vcpu element with qemu.
+> 
+> 
+> So I don't think disabling migration during inmigrate is a possible
+> alternative unless we rework how libvirt handles this. The only
+> alternative to this patch that I'm aware of would be to always
+> migrate DRCs when dev->hotplugged == true.
+Currently I'd suggest to look into always migrate DRCs if cpu hotplug
+is enabled even if dev->hotplugged is false (not nice but it might work).
+Consider:
+  SRC1: hotplug CPU1 => CPU1.hotplugged = true
+  DST1: -device CPU1 => CPU1.hotplugged = false
+so in current code relying on CPU1.hotplugged would not work as expected,
+it works by accident because libvirt uses device_add on target
+  DST1: device_add CPU1 => CPU1.hotplugged = true
+
+If we try to fix it by migrating 'DeviceState::hotplugged' flag,
+we would need CPU/memory/machine specific migration hooks which will
+fix device/machine state as by the time migration stream is processed
+on target side, all devices are already wired up using -device or
+device_add paths (cold/hotplugged paths).
+Approach doesn't seem robust to me.
+
+May be we should
+ 1. make DeviceState:hotpluggable property write-able again
+ 2. transmit DeviceState:hotpluggable as part of migration stream
+ 3. add generic migration hook which will check if target and
+    source value match, if value differs => fail/abort migration.
+ 4. in case values mismatch mgmt will be forced to explicitly
+    provide hotplugged property value on -device/device_add
+That would enforce consistent DeviceState:hotpluggable value
+on target and source.
+We can enforce it only for new machine types so it won't break
+old mgmt tools with old machine types but would force mgmt
+for new machines to use hotplugged property on target
+so QEMU could rely on its value for migration purposes.
