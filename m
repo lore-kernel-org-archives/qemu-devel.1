@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dL6py-0007q6-0T
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:51:50 -0400
+	(envelope-from <quintela@redhat.com>) id 1dL6q0-0007qK-DD
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:51:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dL6px-0000SG-7d
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:51:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36954)
+	(envelope-from <quintela@redhat.com>) id 1dL6pz-0000Sz-3N
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:51:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50768)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dL6px-0000S8-1J
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:51:49 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dL6py-0000Sg-R7
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:51:51 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F0E7D368E4
-	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 11:51:47 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B2CB3C0467C5
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 11:51:49 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 14 Jun 2017 13:51:35 +0200
-Message-Id: <20170614115138.19571-3-quintela@redhat.com>
+Date: Wed, 14 Jun 2017 13:51:36 +0200
+Message-Id: <20170614115138.19571-4-quintela@redhat.com>
 In-Reply-To: <20170614115138.19571-1-quintela@redhat.com>
 References: <20170614115138.19571-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 2/5] migration: fix incorrect enable return path
+Subject: [Qemu-devel] [PULL 3/5] migration: Remove unneeded includes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,39 +32,285 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-From: Peter Xu <peterx@redhat.com>
-
-0425dc9 is actually v1 of that patch, but it was accidentally
-merged (while there was a v2). That will cause problem when we try to
-migrate to some old QEMUs when return path is not really there. Let's
-fix it, then squashing this patch with 0425dc9 will be exactly patch
-content of v2.
-
-Fixes: 0425dc9 ("migration: isolate return path on src")
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- migration/migration.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ include/migration/colo.h  | 3 ---
+ include/migration/misc.h  | 2 ++
+ migration/block.c         | 6 ------
+ migration/colo-failover.c | 2 ++
+ migration/colo.c          | 2 --
+ migration/exec.c          | 2 --
+ migration/fd.c            | 2 --
+ migration/global_state.c  | 1 -
+ migration/migration.c     | 6 ------
+ migration/migration.h     | 2 --
+ migration/postcopy-ram.c  | 2 --
+ migration/qemu-file.c     | 2 --
+ migration/ram.c           | 4 ----
+ migration/savevm.c        | 6 ------
+ 14 files changed, 4 insertions(+), 38 deletions(-)
 
+diff --git a/include/migration/colo.h b/include/migration/colo.h
+index ba0bb6e..be6beba 100644
+--- a/include/migration/colo.h
++++ b/include/migration/colo.h
+@@ -14,9 +14,6 @@
+ #define QEMU_COLO_H
+ 
+ #include "qemu-common.h"
+-#include "qemu/coroutine_int.h"
+-#include "qemu/thread.h"
+-#include "qemu/main-loop.h"
+ 
+ bool colo_supported(void);
+ void colo_info_init(void);
+diff --git a/include/migration/misc.h b/include/migration/misc.h
+index d5a433a..65c7070 100644
+--- a/include/migration/misc.h
++++ b/include/migration/misc.h
+@@ -14,6 +14,8 @@
+ #ifndef MIGRATION_MISC_H
+ #define MIGRATION_MISC_H
+ 
++#include "qemu/notify.h"
++
+ /* migration/ram.c */
+ 
+ void ram_mig_init(void);
+diff --git a/migration/block.c b/migration/block.c
+index ae06975..3aae5a3 100644
+--- a/migration/block.c
++++ b/migration/block.c
+@@ -15,19 +15,13 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "qemu-common.h"
+-#include "block/block.h"
+ #include "qemu/error-report.h"
+-#include "qemu/main-loop.h"
+-#include "hw/hw.h"
+ #include "qemu/cutils.h"
+ #include "qemu/queue.h"
+-#include "qemu/timer.h"
+ #include "block.h"
+ #include "migration/misc.h"
+ #include "migration.h"
+ #include "migration/register.h"
+-#include "sysemu/blockdev.h"
+ #include "qemu-file.h"
+ #include "migration/vmstate.h"
+ #include "sysemu/block-backend.h"
+diff --git a/migration/colo-failover.c b/migration/colo-failover.c
+index cc229f5..f991486 100644
+--- a/migration/colo-failover.c
++++ b/migration/colo-failover.c
+@@ -13,6 +13,8 @@
+ #include "qemu/osdep.h"
+ #include "migration/colo.h"
+ #include "migration/failover.h"
++#include "qemu/main-loop.h"
++#include "migration.h"
+ #include "qmp-commands.h"
+ #include "qapi/qmp/qerror.h"
+ #include "qemu/error-report.h"
+diff --git a/migration/colo.c b/migration/colo.c
+index 45e9b46..c436d63 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -11,7 +11,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu/timer.h"
+ #include "sysemu/sysemu.h"
+ #include "qemu-file-channel.h"
+ #include "migration.h"
+@@ -22,7 +21,6 @@
+ #include "io/channel-buffer.h"
+ #include "trace.h"
+ #include "qemu/error-report.h"
+-#include "qapi/error.h"
+ #include "migration/failover.h"
+ #include "replication.h"
+ #include "qmp-commands.h"
+diff --git a/migration/exec.c b/migration/exec.c
+index b1de445..08b599e 100644
+--- a/migration/exec.c
++++ b/migration/exec.c
+@@ -19,10 +19,8 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "qemu-common.h"
+ #include "channel.h"
+ #include "exec.h"
+-#include "migration.h"
+ #include "io/channel-command.h"
+ #include "trace.h"
+ 
+diff --git a/migration/fd.c b/migration/fd.c
+index b2384bf..30f5258 100644
+--- a/migration/fd.c
++++ b/migration/fd.c
+@@ -16,10 +16,8 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "qemu-common.h"
+ #include "channel.h"
+ #include "fd.h"
+-#include "migration.h"
+ #include "monitor/monitor.h"
+ #include "io/channel-util.h"
+ #include "trace.h"
+diff --git a/migration/global_state.c b/migration/global_state.c
+index 16ac63f..f792cf5 100644
+--- a/migration/global_state.c
++++ b/migration/global_state.c
+@@ -17,7 +17,6 @@
+ #include "qapi/util.h"
+ #include "migration/global_state.h"
+ #include "migration/vmstate.h"
+-#include "sysemu/sysemu.h"
+ #include "trace.h"
+ 
+ typedef struct {
 diff --git a/migration/migration.c b/migration/migration.c
-index 8ef6d6c..f9053b0 100644
+index f9053b0..b9d8798 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -1814,7 +1814,11 @@ static void *migration_thread(void *opaque)
+@@ -16,7 +16,6 @@
+ #include "qemu/osdep.h"
+ #include "qemu/cutils.h"
+ #include "qemu/error-report.h"
+-#include "qemu/main-loop.h"
+ #include "migration/blocker.h"
+ #include "exec.h"
+ #include "fd.h"
+@@ -30,11 +29,9 @@
+ #include "qemu-file-channel.h"
+ #include "qemu-file.h"
+ #include "migration/vmstate.h"
+-#include "sysemu/sysemu.h"
+ #include "block/block.h"
+ #include "qapi/qmp/qerror.h"
+ #include "qapi/util.h"
+-#include "qemu/sockets.h"
+ #include "qemu/rcu.h"
+ #include "block.h"
+ #include "postcopy-ram.h"
+@@ -42,9 +39,6 @@
+ #include "qmp-commands.h"
+ #include "trace.h"
+ #include "qapi-event.h"
+-#include "qom/cpu.h"
+-#include "exec/memory.h"
+-#include "exec/address-spaces.h"
+ #include "exec/target_page.h"
+ #include "io/channel-buffer.h"
+ #include "migration/colo.h"
+diff --git a/migration/migration.h b/migration/migration.h
+index 601e4ab..d9a268a 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -14,10 +14,8 @@
+ #ifndef QEMU_MIGRATION_H
+ #define QEMU_MIGRATION_H
  
-     qemu_savevm_state_header(s->to_dst_file);
+-#include "qapi/qmp/qdict.h"
+ #include "qemu-common.h"
+ #include "qemu/thread.h"
+-#include "qemu/notify.h"
+ #include "qapi-types.h"
+ #include "exec/cpu-common.h"
+ #include "qemu/coroutine_int.h"
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index c8c4500..7e21e6f 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -17,8 +17,6 @@
+  */
  
--    if (s->to_dst_file) {
-+    /*
-+     * If we opened the return path, we need to make sure dst has it
-+     * opened as well.
-+     */
-+    if (s->rp_state.from_dst_file) {
-         /* Now tell the dest that it should open its end so it can reply */
-         qemu_savevm_send_open_return_path(s->to_dst_file);
+ #include "qemu/osdep.h"
+-
+-#include "qemu-common.h"
+ #include "exec/target_page.h"
+ #include "migration.h"
+ #include "qemu-file.h"
+diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+index e65c373..2ab2bf3 100644
+--- a/migration/qemu-file.c
++++ b/migration/qemu-file.c
+@@ -26,8 +26,6 @@
+ #include "qemu-common.h"
+ #include "qemu/error-report.h"
+ #include "qemu/iov.h"
+-#include "qemu/sockets.h"
+-#include "qemu/coroutine.h"
+ #include "migration.h"
+ #include "qemu-file.h"
+ #include "trace.h"
+diff --git a/migration/ram.c b/migration/ram.c
+index c1b4f4a..7f687f5 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -26,14 +26,12 @@
+  * THE SOFTWARE.
+  */
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "cpu.h"
+ #include <zlib.h>
+ #include "qapi-event.h"
+ #include "qemu/cutils.h"
+ #include "qemu/bitops.h"
+ #include "qemu/bitmap.h"
+-#include "qemu/timer.h"
+ #include "qemu/main-loop.h"
+ #include "xbzrle.h"
+ #include "ram.h"
+@@ -41,9 +39,7 @@
+ #include "migration/register.h"
+ #include "migration/misc.h"
+ #include "qemu-file.h"
+-#include "migration/vmstate.h"
+ #include "postcopy-ram.h"
+-#include "exec/address-spaces.h"
+ #include "migration/page_cache.h"
+ #include "qemu/error-report.h"
+ #include "trace.h"
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 30cda2c..f32a82d 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -28,12 +28,8 @@
  
+ #include "qemu/osdep.h"
+ #include "hw/boards.h"
+-#include "hw/hw.h"
+-#include "hw/qdev.h"
+ #include "hw/xen/xen.h"
+ #include "net/net.h"
+-#include "sysemu/sysemu.h"
+-#include "qemu/timer.h"
+ #include "migration.h"
+ #include "migration/snapshot.h"
+ #include "migration/misc.h"
+@@ -46,13 +42,11 @@
+ #include "postcopy-ram.h"
+ #include "qapi/qmp/qerror.h"
+ #include "qemu/error-report.h"
+-#include "qemu/queue.h"
+ #include "sysemu/cpus.h"
+ #include "exec/memory.h"
+ #include "exec/target_page.h"
+ #include "qmp-commands.h"
+ #include "trace.h"
+-#include "qemu/bitops.h"
+ #include "qemu/iov.h"
+ #include "block/snapshot.h"
+ #include "qemu/cutils.h"
 -- 
 2.9.4
