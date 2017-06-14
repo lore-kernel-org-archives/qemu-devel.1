@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dL2dW-0000Ww-FC
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 03:22:43 -0400
+	(envelope-from <peterx@redhat.com>) id 1dL2i4-0001ee-Fi
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 03:27:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dL2dT-0002Vu-BG
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 03:22:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44476)
+	(envelope-from <peterx@redhat.com>) id 1dL2i1-0003pM-AW
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 03:27:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49518)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dL2dT-0002Vj-2e
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 03:22:39 -0400
-References: <20170613214736.19963-1-david@redhat.com>
-	<20170613214736.19963-3-david@redhat.com>
-	<3c564230-7879-45ff-ffa1-c4e7bea17902@twiddle.net>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <52401112-57c8-201f-d091-afb3a196412f@redhat.com>
-Date: Wed, 14 Jun 2017 09:22:35 +0200
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dL2i1-0003p7-2M
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 03:27:21 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EC19DC04B320
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 07:27:19 +0000 (UTC)
+Date: Wed, 14 Jun 2017 15:27:06 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170614072706.GK11751@pxdev.xzpeter.org>
+References: <20170613095432.11623-1-quintela@redhat.com>
+	<20170613095432.11623-2-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <3c564230-7879-45ff-ffa1-c4e7bea17902@twiddle.net>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 2/3] target/s390x: implement mvcos
- instruction
+Content-Disposition: inline
+In-Reply-To: <20170613095432.11623-2-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] migration: Test for disabled features
+ on reception
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,102 +34,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
-Cc: agraf@suse.de, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, Miroslav Benes <mbenes@suse.cz>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
 
-On 14.06.2017 06:41, Richard Henderson wrote:
-> On 06/13/2017 02:47 PM, David Hildenbrand wrote:
->> +static inline bool psw_key_valid(CPUS390XState *env, uint8_t psw_key)
->> +{
->> +    uint16_t pkm = ((env->cregs[3] & CR3_PKM) >> 16);
->> +
->> +    if (env->psw.mask & PSW_MASK_PSTATE) {
->> +        /* PSW key has range 0..15, it is valid if the bit is 1 in the PKM */
->> +        return pkm & (1 << (psw_key & 0xff));
+On Tue, Jun 13, 2017 at 11:54:31AM +0200, Juan Quintela wrote:
+> Right now, if we receive a compressed page while this features are
+> disabled, Bad Things (TM) can happen.  Just add a test for them.
 > 
-> Did you intend to write & 0xf?  Otherwise this mask is pointless...
-
-Yes, we will always get only 4 bits set ... but I don't want any
-compiler to complain about the shift. So 0xf it is. Thanks!
-
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > 
+> --
 > 
->> +        switch (src_as) {
->> +        case 0x0:
->> +            x = cpu_ldub_primary_ra(env, src, ra);
->> +            break;
->> +        case 0x2:
->> +            x = cpu_ldub_secondary_ra(env, src, ra);
->> +            break;
->> +        case 0x3:
->> +            x = cpu_ldub_home_ra(env, src, ra);
->> +            break;
->> +        }
->> +        switch (dest_as) {
->> +        case 0x0:
->> +            cpu_stb_primary_ra(env, dest, x, ra);
->> +            break;
->> +        case 0x2:
->> +            cpu_stb_secondary_ra(env, dest, x, ra);
->> +            break;
->> +        case 0x3:
->> +            cpu_stb_home_ra(env, dest, x, ra);
->> +            break;
->> +        }
+> I had XBZRLE here also, but it don't need extra resources on
+> destination, only on source.  Additionally libvirt don't enable it on
+> destination, so don't put it here.
+> ---
+>  migration/ram.c | 16 +++++++++++++++-
+>  1 file changed, 15 insertions(+), 1 deletion(-)
 > 
-> Rather than these switches, you can use helper_ret_ldub_mmu.  Of course, that 
-> will only work for SOFTMMU.  But for CONFIG_USER_ONLY, there's surely only one 
-> address space that's legal, so you could simply forward to fast_memmove.
+> diff --git a/migration/ram.c b/migration/ram.c
+> index f35d65a..f2d1bce 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -2477,7 +2477,7 @@ static int ram_load_postcopy(QEMUFile *f)
+>  
+>  static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>  {
+> -    int flags = 0, ret = 0;
+> +    int flags = 0, ret = 0, invalid_flags;
+>      static uint64_t seq_iter;
+>      int len = 0;
+>      /*
+> @@ -2494,6 +2494,11 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>          ret = -EINVAL;
+>      }
+>  
+> +    invalid_flags = 0;
 
-That sounds like a good idea. I will look into it. This would then allow
-to expose the facility also for CONFIG_USER_ONLY.
+Nit: set zero when declare (just like flags, ret)?
 
-> 
->> +    if (!(env->psw.mask & PSW_MASK_DAT)) {
->> +        program_interrupt(env, PGM_SPECIAL_OP, 6);
->> +    }
-> 
-> You should use restore_program_state before program_interrupt (or add a new 
-> entry-point to do both).  Then you can drop ...
+> +
+> +    if (!migrate_use_compression()) {
+> +        invalid_flags |= RAM_SAVE_FLAG_COMPRESS_PAGE;
+> +    }
+>      /* This RCU critical section can be very long running.
+>       * When RCU reclaims in the code start to become numerous,
+>       * it will be necessary to reduce the granularity of this
+> @@ -2514,6 +2519,15 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>          flags = addr & ~TARGET_PAGE_MASK;
+>          addr &= TARGET_PAGE_MASK;
+>  
+> +        if (flags & invalid_flags) {
+> +            if (flags & invalid_flags  & RAM_SAVE_FLAG_COMPRESS_PAGE) {
+                                        ^
+Nit: one extra space -------------------+
 
-restore_program_state -  you mean cpu_restore_state() I assume.
-
-Would it makes sense to
-
-a) move cpu_restore_state() into program_interrupt()
-b) make all callers forward ra from GETPC() (problem with kvm code that
-share handlers?)
-c) fixup callers that already do the cpu_restore_state()
-c) drop potential_page_fault() completely
-
-Two questions:
-a) Could we avoid having to forward the ra by doing GETPC directly in
-program_interrupt()? In mem_helper, I can see that we do GETPC on
-several places and pass it around, so I assume GETPC() has to be called
-in the first handler?
-b) With cpu_restore_state(), there is no need for update_psw_addr() +
-update_cc_op(), correct?
-
-Any other nice solution for cleaning potential_page_fault() up?
-
-> 
->> +    potential_page_fault(s);
->> +    gen_helper_mvcos(cc_op, cpu_env, o->addr1, o->in2, regs[r3]);
-> 
-> ... the potential_page_fault.
-
-I would suggest to leave it in this patch as it and then clean it up all
-together in one shot (adding 5 cpu_restore_state() vs. one
-potential_page_fault() temporarily looks better to me).
-
-> 
-> 
-> r~
+> +                error_report("Received an unexpected compressed page");
+> +            }
+> +
+> +            ret = -EINVAL;
+> +            break;
+> +        }
+> +
+>          if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
+>                       RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE)) {
+>              RAMBlock *block = ram_block_from_stream(f, flags);
+> -- 
+> 2.9.4
 > 
 
+Besides the nits:
+
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
 -- 
-
-Thanks,
-
-David
+Peter Xu
