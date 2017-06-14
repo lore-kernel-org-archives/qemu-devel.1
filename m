@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dL8rg-0005rz-LU
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:01:54 -0400
+	(envelope-from <lvivier@redhat.com>) id 1dL8uE-0000bx-J9
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:04:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dL8ra-0008Fi-KY
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:01:44 -0400
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:35522)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dL8ra-0008FK-El
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:01:38 -0400
-Received: by mail-wr0-x22d.google.com with SMTP id q97so1982885wrb.2
-	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 07:01:38 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed, 14 Jun 2017 15:02:07 +0100
-Message-Id: <20170614140209.29847-2-alex.bennee@linaro.org>
-In-Reply-To: <20170614140209.29847-1-alex.bennee@linaro.org>
-References: <20170614140209.29847-1-alex.bennee@linaro.org>
-Subject: [Qemu-devel] [PATCH v1 1/3] vl: Fix broken thread=xxx option of the
- --accel parameter
+	(envelope-from <lvivier@redhat.com>) id 1dL8u9-00013Z-IT
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:04:22 -0400
+References: <149744692318.5507.14451686460325895979.stgit@bahia.lan>
+	<149744695027.5507.7049830187351447969.stgit@bahia.lan>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <73052dd1-21df-9f2b-7c7f-ff90860473b8@redhat.com>
+Date: Wed, 14 Jun 2017 16:04:12 +0200
+MIME-Version: 1.0
+In-Reply-To: <149744695027.5507.7049830187351447969.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 2/3] xics: directly register ICPState
+ objects to vmstate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,60 +25,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, pbonzini@redhat.com, rth@twiddle.net, cota@braap.org
-Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-From: Thomas Huth <thuth@redhat.com>
+On 14/06/2017 15:29, Greg Kurz wrote:
+> The ICPState objects are currently registered to vmstate as qdev objects.
+> Their instance ids are hence computed automatically in the migration code,
+> and thus depends on the order the CPU cores were plugged.
+> 
+> If the destination had its CPU cores plugged in a different order than the
+> source, then ICPState objects will have different instance_ids and load
+> the wrong state.
+> 
+> Since CPU objects have a reliable cpu_index which is already used as
+> instance_id in vmstate, let's use it for ICPState as well.
+> 
+> Please note that this doesn't break migration. Older machine types used to
+> allocate and realize all ICPState objects at machine init time, for the whole
+> lifetime of the machine. The qdev instance ids are thus 0,1,2... nr_servers
+> and happen to map to the vCPU indexes.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Commit bde4d9205 ("Fix the -accel parameter and the documentation for
-'hax'") introduced a regression by adding a new local accel_opts
-variable which shadows the variable with the same name that is
-declared at the beginning of the main() scope. This causes the
-qemu_tcg_configure() call later to be always called with NULL, so
-that the thread=xxx option gets ignored. Fix it by removing the
-local accel_opts variable and use "opts" instead, which is meant
-for storing temporary QemuOpts values.
-And while we're at it, also change the exit(1) here to exit(0)
-since asking for help is not an error.
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 
-Fixes: bde4d9205ee9def98852ff6054cdef4efd74e1f8
-Reported-by: Markus Armbruster <armbru@redhat.com>
-Reported-by: Emilio G. Cota <cota@braap.org>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- vl.c | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+CC: dgilbert
 
-diff --git a/vl.c b/vl.c
-index 32db19e3b9..59fea15488 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3757,21 +3757,18 @@ int main(int argc, char **argv, char **envp)
-                 qdev_prop_register_global(&kvm_pit_lost_tick_policy);
-                 break;
-             }
--            case QEMU_OPTION_accel: {
--                QemuOpts *accel_opts;
--
-+            case QEMU_OPTION_accel:
-                 accel_opts = qemu_opts_parse_noisily(qemu_find_opts("accel"),
-                                                      optarg, true);
-                 optarg = qemu_opt_get(accel_opts, "accel");
-                 if (!optarg || is_help_option(optarg)) {
-                     error_printf("Possible accelerators: kvm, xen, hax, tcg\n");
--                    exit(1);
-+                    exit(0);
-                 }
--                accel_opts = qemu_opts_create(qemu_find_opts("machine"), NULL,
--                                              false, &error_abort);
--                qemu_opt_set(accel_opts, "accel", optarg, &error_abort);
-+                opts = qemu_opts_create(qemu_find_opts("machine"), NULL,
-+                                        false, &error_abort);
-+                qemu_opt_set(opts, "accel", optarg, &error_abort);
-                 break;
--            }
-             case QEMU_OPTION_usb:
-                 olist = qemu_find_opts("machine");
-                 qemu_opts_parse_noisily(olist, "usb=on", false);
--- 
-2.13.0
+> ---
+> v5: - explain why it doesn't break migration in the changelog
+> ---
+>  hw/intc/xics.c |    5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+> index 7ccfb53c55a0..faa5c631f655 100644
+> --- a/hw/intc/xics.c
+> +++ b/hw/intc/xics.c
+> @@ -344,10 +344,14 @@ static void icp_realize(DeviceState *dev, Error **errp)
+>      }
+>  
+>      qemu_register_reset(icp_reset, dev);
+> +    vmstate_register(NULL, icp->cs->cpu_index, &vmstate_icp_server, icp);
+>  }
+>  
+>  static void icp_unrealize(DeviceState *dev, Error **errp)
+>  {
+> +    ICPState *icp = ICP(dev);
+> +
+> +    vmstate_unregister(NULL, &vmstate_icp_server, icp);
+>      qemu_unregister_reset(icp_reset, dev);
+>  }
+>  
+> @@ -355,7 +359,6 @@ static void icp_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+>  
+> -    dc->vmsd = &vmstate_icp_server;
+>      dc->realize = icp_realize;
+>      dc->unrealize = icp_unrealize;
+>  }
+> 
