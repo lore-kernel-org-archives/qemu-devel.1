@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46821)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dLBqA-0001s1-5M
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:12:23 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dLBvS-0004il-S7
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:17:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dLBq6-0006GA-0b
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:12:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:5184)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dLBq5-0006Fx-Q3
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:12:17 -0400
-References: <149745954462.1611.12282014261512444009@4a9a010726c0>
-	<F0D8D81A-19F6-4311-95C6-B30B38FCB2BC@nutanix.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cd443e75-eec3-b5fc-1acc-3d4a152db655@redhat.com>
-Date: Wed, 14 Jun 2017 19:12:13 +0200
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dLBvR-00086t-Ei
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:17:50 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:34834)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dLBvR-00086l-2X
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:17:49 -0400
+Received: by mail-lf0-x243.google.com with SMTP id v20so899236lfa.2
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 10:17:49 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <F0D8D81A-19F6-4311-95C6-B30B38FCB2BC@nutanix.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+References: <1497458486-15673-1-git-send-email-felipe@nutanix.com>
+In-Reply-To: <1497458486-15673-1-git-send-email-felipe@nutanix.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 14 Jun 2017 17:17:37 +0000
+Message-ID: <CAJ+F1CLKvSywR1EN8LXaCd7S1Ya0gebE25QYBWfK4LW2Nmm2=g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH] vhost-user: support cross-endianess
  negatiation
@@ -29,56 +30,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Felipe Franciosi <felipe@nutanix.com>, QEMU Developers <qemu-devel@nongnu.org>, "famz@redhat.com" <famz@redhat.com>
-Cc: Mike Cui <cui@nutanix.com>, "Michael S. Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Felipe Franciosi <felipe@nutanix.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Mike Cui <cui@nutanix.com>, qemu-devel@nongnu.org
+
+H
+
+On Wed, Jun 14, 2017 at 8:42 PM Felipe Franciosi <felipe@nutanix.com> wrote=
+:
+
+> Currently, vhost-user does not implement any means for notifying the
+> backend about guest endianess. This commit introduces a new message
+> called VHOST_USER_SET_VRING_ENDIAN which is analogous to the ioctl()
+> called VHOST_SET_VRING_ENDIAN used for kernel vhost backends. Such
+> message is necessary for backends supporting legacy (pre-1.0) virtio
+> devices running in big-endian guests.
+>
+> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
+> Signed-off-by: Mike Cui <cui@nutanix.com>
+> ---
+>  docs/specs/vhost-user.txt | 14 ++++++++++++++
+>  hw/virtio/vhost-user.c    | 23 +++++++++++++++++++++--
+>  2 files changed, 35 insertions(+), 2 deletions(-)
+>
+> diff --git a/docs/specs/vhost-user.txt b/docs/specs/vhost-user.txt
+> index 481ab56..eafbed9 100644
+> --- a/docs/specs/vhost-user.txt
+> +++ b/docs/specs/vhost-user.txt
+> @@ -326,6 +326,7 @@ Protocol features
+>  #define VHOST_USER_PROTOCOL_F_REPLY_ACK      3
+>  #define VHOST_USER_PROTOCOL_F_MTU            4
+>  #define VHOST_USER_PROTOCOL_F_SLAVE_REQ      5
+> +#define VHOST_USER_PROTOCOL_F_CROSS_ENDIAN   6
+>
+>  Master message types
+>  --------------------
+> @@ -580,6 +581,19 @@ Master message types
+>        This request should be send only when VIRTIO_F_IOMMU_PLATFORM
+> feature
+>        has been successfully negotiated.
+>
+> + * VHOST_USER_SET_VRING_ENDIAN
+> +
+> +      Id: 22
+> +      Equivalent ioctl: VHOST_SET_VRING_ENDIAN
+> +      Master payload: vring state description
+> +
+> +      Set the endianess of a VQ for legacy devices. Big-endian is
+> indicated
+> +      with state.num set to true, and little-endian is indicated with
+> state.num
+> +      set to false.
+> +      This request should be sent only when
+> VHOST_USER_PROTOCOL_F_CROSS_ENDIAN
+> +      has been negotiated.
+>
+
+And it can be sent at any time? multiple times? Do we expect the backend to
+handle any endianess?
 
 
-
-On 14/06/2017 19:02, Felipe Franciosi wrote:
->=20
->> On 14 Jun 2017, at 17:59, no-reply@patchew.org wrote:
->>
->> Hi,
->>
->> This series failed automatic build test. Please find the testing comma=
-nds and
->> their output below. If you have docker installed, you can probably rep=
-roduce it
->> locally.
->>
->> Message-id: 1497458486-15673-1-git-send-email-felipe@nutanix.com
->> Type: series
->> Subject: [Qemu-devel] [PATCH] vhost-user: support cross-endianess nega=
-tiation
->>
-> ...
->>
->>  CC      hw/pci-bridge/pci_expander_bridge.o
->> In file included from /tmp/qemu-test/src/hw/net/vmxnet3.c:30:
->> /tmp/qemu-test/src/include/migration/register.h:18: error: redefinitio=
-n of typedef =E2=80=98LoadStateHandler=E2=80=99
->> /tmp/qemu-test/src/include/migration/vmstate.h:32: note: previous decl=
-aration of =E2=80=98LoadStateHandler=E2=80=99 was here
->> make: *** [hw/net/vmxnet3.o] Error 1
->> make: *** Waiting for unfinished jobs....
->> tests/docker/Makefile.include:118: recipe for target 'docker-run' fail=
-ed
->> make[1]: *** [docker-run] Error 2
->> make[1]: Leaving directory '/var/tmp/patchew-tester-tmp-enl3ixyr/src'
->> tests/docker/Makefile.include:149: recipe for target 'docker-run-test-=
-build@min-glib' failed
->> make: *** [docker-run-test-build@min-glib] Error 2
->> =3D=3D=3D OUTPUT END =3D=3D=3D
->>
->> Test command exited with code: 2
->=20
-> That seems completely unrelated to what our patch touched... I'm gonna =
-guess this is a known issue and I can safely ignore it?
-
-Yes.
-
-Juan, can you take a look?  Just removing the typedef from
-VMStateDescription, and instead just using int(*load_state_old)(etc...)
-should do it.
-
-Paolo
+> +
+> +
+>  Slave message types
+>  -------------------
+>
+> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> index 958ee09..006af1c 100644
+> --- a/hw/virtio/vhost-user.c
+> +++ b/hw/virtio/vhost-user.c
+> @@ -33,6 +33,7 @@ enum VhostUserProtocolFeature {
+>      VHOST_USER_PROTOCOL_F_REPLY_ACK =3D 3,
+>      VHOST_USER_PROTOCOL_F_NET_MTU =3D 4,
+>      VHOST_USER_PROTOCOL_F_SLAVE_REQ =3D 5,
+> +    VHOST_USER_PROTOCOL_F_CROSS_ENDIAN =3D 6,
+>
+>      VHOST_USER_PROTOCOL_F_MAX
+>  };
+> @@ -63,6 +64,7 @@ typedef enum VhostUserRequest {
+>      VHOST_USER_NET_SET_MTU =3D 20,
+>      VHOST_USER_SET_SLAVE_REQ_FD =3D 21,
+>      VHOST_USER_IOTLB_MSG =3D 22,
+> +    VHOST_USER_SET_VRING_ENDIAN =3D 23,
+>      VHOST_USER_MAX
+>  } VhostUserRequest;
+>
+> @@ -367,8 +369,25 @@ static int vhost_user_set_vring_addr(struct vhost_de=
+v
+> *dev,
+>  static int vhost_user_set_vring_endian(struct vhost_dev *dev,
+>                                         struct vhost_vring_state *ring)
+>  {
+> -    error_report("vhost-user trying to send unhandled ioctl");
+> -    return -1;
+> +    bool cross_endian =3D virtio_has_feature(dev->protocol_features,
+> +
+>  VHOST_USER_PROTOCOL_F_CROSS_ENDIAN);
+> +    VhostUserMsg msg =3D {
+> +        .request =3D VHOST_USER_SET_VRING_ENDIAN,
+> +        .flags =3D VHOST_USER_VERSION,
+> +        .payload.state =3D *ring,
+> +        .size =3D sizeof(msg.payload.state),
+> +    };
+> +
+> +    if (!cross_endian) {
+> +        error_report("vhost-user trying to send unhandled ioctl");
+> +        return -1;
+> +    }
+> +
+> +    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
+> +        return -1;
+> +    }
+> +
+> +    return 0;
+>  }
+>
+>  static int vhost_set_vring(struct vhost_dev *dev,
+> --
+> 1.9.5
+>
+>
+> --
+Marc-Andr=C3=A9 Lureau
