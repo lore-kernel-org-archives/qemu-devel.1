@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dL2B3-0002x4-5D
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 02:53:18 -0400
+	(envelope-from <peterx@redhat.com>) id 1dL2BA-000389-T5
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 02:53:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dL2B2-0007Yu-1f
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 02:53:17 -0400
-Resent-Message-Id: <E1dL2B2-0007Yu-1f@eggs.gnu.org>
-In-Reply-To: <20170614063607.47863-1-aik@ozlabs.ru>
-Message-ID: <149742316109.876.1308050750965482811@4a9a010726c0>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <peterx@redhat.com>) id 1dL2B6-0007an-52
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 02:53:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38098)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dL2B5-0007aG-Su
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 02:53:20 -0400
+Date: Wed, 14 Jun 2017 14:53:13 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170614065313.GJ11751@pxdev.xzpeter.org>
+References: <1497346593-8791-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170613093801eucas1p1e2b34c1a72b7150a28007d5b187da82e@eucas1p1.samsung.com>
+	<1497346593-8791-3-git-send-email-a.perevalov@samsung.com>
+	<20170614051223.GH11751@pxdev.xzpeter.org>
+	<516e826e-5469-81b6-b23b-12f9b759bd64@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 13 Jun 2017 23:52:41 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH qemu v8 0/2] memory/iommu: QOM'fy IOMMU
- MemoryRegion
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <516e826e-5469-81b6-b23b-12f9b759bd64@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] migration: add bitmap for copied
+ page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +31,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: aik@ozlabs.ru
-Cc: famz@redhat.com, qemu-devel@nongnu.org, f4bug@amsat.org, peterx@redhat.com, borntraeger@de.ibm.com, alex.williamson@redhat.com, qemu-ppc@nongnu.org, cornelia.huck@de.ibm.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, quintela@redhat.com, dgilbert@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCBxZW11IHY4IDAvMl0gbWVtb3J5L2lvbW11OiBRT00nZnkgSU9NTVUgTWVt
-b3J5UmVnaW9uCk1lc3NhZ2UtaWQ6IDIwMTcwNjE0MDYzNjA3LjQ3ODYzLTEtYWlrQG96bGFicy5y
-dQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJB
-U0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZh
-aWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVI
-IC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVj
-a2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIK
-ICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRj
-aC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAg
-IGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5E
-ID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApG
-cm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0
-ZV0gICAgICBwYXRjaGV3LzIwMTcwNjEzMTQwMzU4LjgxNjUxLTEtdnNlbWVudHNvdkB2aXJ0dW96
-em8uY29tIC0+IHBhdGNoZXcvMjAxNzA2MTMxNDAzNTguODE2NTEtMS12c2VtZW50c292QHZpcnR1
-b3p6by5jb20KICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDE3MDYxNDA2NDQ1Mi4yMzE2
-Ny0xLXNqaXRpbmRhcnNpbmdoQGdtYWlsLmNvbSAtPiBwYXRjaGV3LzIwMTcwNjE0MDY0NDUyLjIz
-MTY3LTEtc2ppdGluZGFyc2luZ2hAZ21haWwuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
-dGVzdCcKM2QwOGFjYSBtZW1vcnkvaW9tbXU6IGludHJvZHVjZSBJT01NVU1lbW9yeVJlZ2lvbkNs
-YXNzCmQxNDQzYjAgbWVtb3J5L2lvbW11OiBRT00nZnkgSU9NTVUgTWVtb3J5UmVnaW9uCgo9PT0g
-T1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzI6IG1lbW9yeS9pb21tdTogUU9NJ2Z5
-IElPTU1VIE1lbW9yeVJlZ2lvbi4uLgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0
-ICcqJyAoY3R4Old4TykKIzEyOTogRklMRTogaHcvZG1hL3JjNDAzMC5jOjcyMDoKK0RldmljZVN0
-YXRlICpyYzQwMzBfaW5pdChyYzQwMzBfZG1hICoqZG1hcywgSU9NTVVNZW1vcnlSZWdpb24gKipk
-bWFfbXIpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMSBl
-cnJvcnMsIDAgd2FybmluZ3MsIDc3MiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyLzI6IG1lbW9yeS9pb21tdTogaW50
-cm9kdWNlIElPTU1VTWVtb3J5UmVnaW9uQ2xhc3MuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
-IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On Wed, Jun 14, 2017 at 09:39:53AM +0300, Alexey Perevalov wrote:
+> On 06/14/2017 08:12 AM, Peter Xu wrote:
+> >On Tue, Jun 13, 2017 at 12:36:33PM +0300, Alexey Perevalov wrote:
+> >>This patch adds ability to track down already copied
+> >>pages, it's necessary for calculation vCPU block time in
+> >>postcopy migration feature, maybe for restore after
+> >>postcopy migration failure.
+> >>Also it's necessary to solve shared memory issue in
+> >>postcopy livemigration. Information about copied pages
+> >>will be transferred to the software virtual bridge
+> >>(e.g. OVS-VSWITCHD), to avoid fallocate (unmap) for
+> >>already copied pages. fallocate syscall is required for
+> >>remmaped shared memory, due to remmaping itself blocks
+> >>ioctl(UFFDIO_COPY, ioctl in this case will end with EEXIT
+> >>error (struct page is exists after remmap).
+> >>
+> >>Bitmap is placed into RAMBlock as another postcopy/precopy
+> >>related bitmaps.
+> >>
+> >>copied bitmap is not releasing due to ramblocks is not releasing
+> >>too.
+> >>
+> >>Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> >>---
+> >>  include/exec/ram_addr.h       |  3 +++
+> >>  include/migration/migration.h |  3 +++
+> >>  migration/postcopy-ram.c      |  7 ++++++
+> >>  migration/ram.c               | 54 ++++++++++++++++++++++++++++++++++++++++++-
+> >>  migration/ram.h               |  5 ++++
+> >>  migration/savevm.c            |  1 +
+> >>  6 files changed, 72 insertions(+), 1 deletion(-)
+> >>
+> >>diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+> >>index 140efa8..56cdf16 100644
+> >>--- a/include/exec/ram_addr.h
+> >>+++ b/include/exec/ram_addr.h
+> >>@@ -47,6 +47,9 @@ struct RAMBlock {
+> >>       * of the postcopy phase
+> >>       */
+> >>      unsigned long *unsentmap;
+> >>+    /* bitmap of already copied pages in postcopy */
+> >>+    unsigned long *copiedmap;
+> >>+    size_t nr_copiedmap;
+> >Do we really need this?
+> This and question about
+> 
+> ram_discard_range Juan already asked.
+> I just repeat nr_copiedmap - premature optimization )
+> ram_discard_range - I forgot to clean up patch.
+> 
+> >
+> >>  };
+> >>  static inline bool offset_in_ramblock(RAMBlock *b, ram_addr_t offset)
+> >>diff --git a/include/migration/migration.h b/include/migration/migration.h
+> >>index 79b5484..8005c11 100644
+> >>--- a/include/migration/migration.h
+> >>+++ b/include/migration/migration.h
+> >>@@ -226,4 +226,7 @@ void savevm_skip_configuration(void);
+> >>  int global_state_store(void);
+> >>  void global_state_store_running(void);
+> >>+size_t get_copiedmap_size(RAMBlock *rb);
+> >>+void movecopiedmap(void *dst, RAMBlock *rb, size_t len);
+> >>+
+> >>  #endif
+> >>diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> >>index f6244ee..e13b22e 100644
+> >>--- a/migration/postcopy-ram.c
+> >>+++ b/migration/postcopy-ram.c
+> >>@@ -576,6 +576,13 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
+> >>      copy_struct.len = pagesize;
+> >>      copy_struct.mode = 0;
+> >>+
+> >>+    /* copied page isn't feature of blocktime calculation,
+> >>+     * it's more general entity, so keep it here,
+> >>+     * but gup betwean two following operation could be high,
+> >>+     * and in this case blocktime for such small interval will be lost */
+> >>+    set_copiedmap_by_addr(host, rb);
+> >>+
+> >I guess this is not enough?
+> yes, zero pages were missed
+> >
+> >For postcopy, you may have missed to trap in
+> >postcopy_place_page_zero() when pagesize == getpagesize() (we used
+> >UFFDIO_ZEROPAGE there)?
+> >
+> >(Btw, why not we trap all these in ram_load_postcopy()?)
+> I tried to place
+> 
+> set_copiedmap_by_addr as closer as possible to ioctl. It could be important to reduce probability of
+> race, also when I inform OVS-VSWITCH (patches not yet published), it's important to reduce time between
+> mark page as copied and really coping.
+
+If so, I would suggest we comment this in the codes.
+
+Btw, could you elaborate a bit in detail on why you need to "reduce
+the time" here? IMHO the ordering should matter and I can understand
+(and actually we can also achieve the ordering requirement if we put
+this handling in ram_load_postcopy()), but I cannot really understand
+when you say "it's important to reduce time between A and B"...
+
+Thanks,
+
+-- 
+Peter Xu
