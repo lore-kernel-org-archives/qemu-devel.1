@@ -1,35 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dKyQK-0004NK-T8
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 22:52:49 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1dKyoU-0002fR-CJ
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 23:17:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dKyQH-0005w4-Ql
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 22:52:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42854)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dKyQH-0005vS-Iw
-	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 22:52:45 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 19F0080483
-	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 02:52:43 +0000 (UTC)
-Date: Wed, 14 Jun 2017 10:52:37 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170614025237.GF11751@pxdev.xzpeter.org>
-References: <1496980142-8986-1-git-send-email-peterx@redhat.com>
-	<1496980142-8986-4-git-send-email-peterx@redhat.com>
-	<20170609134010.GK22043@thinpad.lan.raisama.net>
-	<20170612081356.GD12928@pxdev.xzpeter.org>
-	<20170613034102.GA11751@pxdev.xzpeter.org>
-	<20170613111635.GU5016@thinpad.lan.raisama.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170613111635.GU5016@thinpad.lan.raisama.net>
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] migration: move
- global_state.optional out
+	(envelope-from <programmingkidx@gmail.com>) id 1dKyoR-0006n6-81
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 23:17:46 -0400
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:33870)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1dKyoR-0006mb-1n
+	for qemu-devel@nongnu.org; Tue, 13 Jun 2017 23:17:43 -0400
+Received: by mail-it0-x244.google.com with SMTP id 201so14557248itu.1
+	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 20:17:41 -0700 (PDT)
+From: Programmingkid <programmingkidx@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 13 Jun 2017 23:17:38 -0400
+Message-Id: <D6FAAABF-064D-49C0-B572-C73679F34052@gmail.com>
+Mime-Version: 1.0 (Apple Message framework v1084)
+Subject: [Qemu-devel] [PATCH v3] ui/cocoa.m: add Speed menu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,79 +27,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
-On Tue, Jun 13, 2017 at 08:16:35AM -0300, Eduardo Habkost wrote:
-> On Tue, Jun 13, 2017 at 11:41:02AM +0800, Peter Xu wrote:
-> > On Mon, Jun 12, 2017 at 04:18:06PM +0800, Peter Xu wrote:
-> > > On Fri, Jun 09, 2017 at 10:40:10AM -0300, Eduardo Habkost wrote:
-> > > > On Fri, Jun 09, 2017 at 11:48:59AM +0800, Peter Xu wrote:
-> > > > > Put it into MigrationState then we can use the properties to specify
-> > > > > whether to enable storing global state.
-> > > > > 
-> > > > > Removing global_state_set_optional() since now we can use HW_COMPAT_2_3
-> > > > > for x86/power in general, and the register_compat_prop() for xen_init().
-> > > > > 
-> > > > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> [...]
-> > > > > diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
-> > > > > index 0bed577..8240d50 100644
-> > > > > --- a/hw/xen/xen-common.c
-> > > > > +++ b/hw/xen/xen-common.c
-> > > > > @@ -138,7 +138,13 @@ static int xen_init(MachineState *ms)
-> > > > >      }
-> > > > >      qemu_add_vm_change_state_handler(xen_change_state_handler, NULL);
-> > > > >  
-> > > > > -    global_state_set_optional();
-> > > > > +    /*
-> > > > > +     * TODO: make sure global MigrationState has not yet been created
-> > > > > +     * (otherwise the compat trick won't work). For now we are in
-> > > > > +     * configure_accelerator() so we are mostly good. Better to
-> > > > > +     * confirm that in the future.
-> > > > > +     */
-> > > > 
-> > > > So, this makes accelerator initialization very sensitive to
-> > > > ordering.
-> > > > 
-> > > > > +    register_compat_prop("migration", "store-global-state", "off");
-> > > > 
-> > > > It's already hard to track down machine-type stuff that is
-> > > > initialized at machine->init() time but it's not introspectable,
-> > > > let's not do the same mistake with accelerators.
-> > > > 
-> > > > Can't this be solved by a AcceleratorClass::global_props field,
-> > > > so we are sure there's a single place in the code where globals
-> > > > are registered?  (Currently, they are all registered by the few
-> > > > lines around the machine_register_compat_props() call in main()).
-> > > > 
-> > > > I think I see other use cases for a new
-> > > > AcceleratorClass::global_props field.  e.g.: replacing
-> > > > kvm_default_props and tcg_default_props in target/i386/cpu.c.
-> > > 
-> > > Hmm, this sounds nice.  Then we can also get rid of the TODO above.
-> > > 
-> > > Thanks for your suggestion and review! I'll see whether I can writeup
-> > > something as RFC for this.
-> > 
-> > After a second thought, I see these requirements are slightly
-> > different.
-> > 
-> > For xen_init(), AccelClass::global_props may help since that's mainly
-> > properties to be setup for TYPE_MIGRATION (let's assume it's okay that
-> > MigrationState can be a QDev).
-> > 
-> > For kvm_default_props and tcg_default_props, AccelClass::global_props
-> > may not help since they are setting up properties for TYPE_CPU, and
-> > TYPE_CPU cannot really use global property features yet. :(
-> 
-> TYPE_CPU can use global properties, for sure.  TYPE_CPU is a
-> TYPE_DEVICE subclass, and -cpu is implemented internally using
-> global properties.
+Programs running inside of QEMU can sometimes use more CPU time than is =
+really
+needed. To solve this problem, we just need to throttle the virtual CPU. =
+This
+feature will stop laptops from burning up.=20
 
-Indeed. :)
+This patch adds a menu called Speed that has menu items from 100% to 1% =
+that
+represent the speed options. 100% is full speed and 1% is slowest.
 
-Thanks, 
+Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+---
+v3 changes:
+Changed the item deselection loop.
+Moved speed calculation equation to main function.
+Replaced "%c" with "%%".
+Changed how 100% menu item is made.
 
--- 
-Peter Xu
+v2 changes:
+Fixed missing space with 'if' and 'for' structures.
+Fixed tab damage.
+Use loop to create menu items.
+Changed name of menu items to use percentages.
+Use tags to determine selected menu item.
+
+ ui/cocoa.m | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 55 insertions(+)
+
+diff --git a/ui/cocoa.m b/ui/cocoa.m
+index 004ec27..a866a66 100644
+--- a/ui/cocoa.m
++++ b/ui/cocoa.m
+@@ -35,6 +35,7 @@
+ #include "sysemu/blockdev.h"
+ #include "qemu-version.h"
+ #include <Carbon/Carbon.h>
++#include "qom/cpu.h"
+=20
+ #ifndef MAC_OS_X_VERSION_10_5
+ #define MAC_OS_X_VERSION_10_5 1050
+@@ -857,6 +858,7 @@ QemuCocoaView *cocoaView;
+ - (void)openDocumentation:(NSString *)filename;
+ - (IBAction) do_about_menu_item: (id) sender;
+ - (void)make_about_window;
++- (void)adjustSpeed:(id)sender;
+ @end
+=20
+ @implementation QemuCocoaAppController
+@@ -1263,6 +1265,34 @@ QemuCocoaView *cocoaView;
+     [superView addSubview: copyright_label];
+ }
+=20
++/* Used by the Speed menu items */
++- (void)adjustSpeed:(id)sender
++{
++    int throttle_pct; /* throttle percentage */
++    NSMenu *menu;
++
++    menu =3D [sender menu];
++    if (menu !=3D nil)
++    {
++        /* Unselect the currently selected item */
++        for (NSMenuItem *item in [menu itemArray]) {
++            if (item.state =3D=3D NSOnState) {
++                [item setState: NSOffState];
++                break;
++            }
++        }
++    }
++
++    // check the menu item
++    [sender setState: NSOnState];
++
++    // get the throttle percentage
++    throttle_pct =3D [sender tag];
++
++    cpu_throttle_set(throttle_pct);
++    COCOA_DEBUG("cpu throttling at %d%c\n", =
+cpu_throttle_get_percentage(), '%');
++}
++
+ @end
+=20
+=20
+@@ -1345,6 +1375,31 @@ int main (int argc, const char * argv[]) {
+     [menuItem setSubmenu:menu];
+     [[NSApp mainMenu] addItem:menuItem];
+=20
++    // Speed menu
++    menu =3D [[NSMenu alloc] initWithTitle:@"Speed"];
++
++    // Add the rest of the Speed menu items
++    int p, percentage, throttle_pct;
++    for (p =3D 10; p >=3D 0; p--)
++    {
++        percentage =3D p * 10 > 1 ? p * 10 : 1; // prevent a 0% menu =
+item
++
++        if (percentage =3D=3D 100) {
++            [menuItem setState: NSOnState];
++        }
++        menuItem =3D [[[NSMenuItem alloc]
++                   initWithTitle: [NSString stringWithFormat: @"%d%%", =
+percentage] action:@selector(adjustSpeed:) keyEquivalent:@""] =
+autorelease];
++
++        /* Calculate the throttle percentage */
++        throttle_pct =3D -1 * percentage + 100;
++
++        [menuItem setTag: throttle_pct];
++        [menu addItem: menuItem];
++    }
++    menuItem =3D [[[NSMenuItem alloc] initWithTitle:@"Speed" action:nil =
+keyEquivalent:@""] autorelease];
++    [menuItem setSubmenu:menu];
++    [[NSApp mainMenu] addItem:menuItem];
++
+     // Window menu
+     menu =3D [[NSMenu alloc] initWithTitle:@"Window"];
+     [menu addItem: [[[NSMenuItem alloc] initWithTitle:@"Minimize" =
+action:@selector(performMiniaturize:) keyEquivalent:@"m"] autorelease]]; =
+// Miniaturize
+--=20
+2.7.2
