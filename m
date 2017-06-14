@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dLFwf-0000Ra-Fy
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 17:35:22 -0400
+	(envelope-from <jcody@redhat.com>) id 1dLG0X-0002a7-12
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 17:39:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dLFwe-0007nl-MR
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 17:35:21 -0400
-Date: Wed, 14 Jun 2017 18:35:05 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170614213505.GM5016@thinpad.lan.raisama.net>
-References: <149727922719.28532.11985025310576184920.stgit@frigg.lan>
-	<149727923488.28532.12388479748363447374.stgit@frigg.lan>
+	(envelope-from <jcody@redhat.com>) id 1dLG0W-0000Ov-8K
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 17:39:21 -0400
+Date: Wed, 14 Jun 2017 17:39:12 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170614213912.GE2767@localhost.localdomain>
+References: <cover.1497444637.git.jcody@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <149727923488.28532.12388479748363447374.stgit@frigg.lan>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 1/6] Pass generic CPUState to
- gen_intermediate_code()
+In-Reply-To: <cover.1497444637.git.jcody@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] Parse 'filename' option for
+ RBD/iSCSI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,22 +23,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
-Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Michael Walle <michael@walle.cc>, Laurent Vivier <laurent@vivier.eu>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Anthony Green <green@moxielogic.com>, Stafford Horne <shorne@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Max Filippov <jcmvbkbc@gmail.com>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:PowerPC" <qemu-ppc@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, rjones@redhat.com
 
-On Mon, Jun 12, 2017 at 05:53:55PM +0300, Llu=EDs Vilanova wrote:
-> Needed to implement a target-agnostic gen_intermediate_code() in the
-> future.
->=20
-> Signed-off-by: Llu=EDs Vilanova <vilanova@ac.upc.edu>
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> Reviewed-by: Richard Henderson <rth@twiddle.net>
+On Wed, Jun 14, 2017 at 08:53:18AM -0400, Jeff Cody wrote:
+> Change from v2:
+> Add warning message that this is an unsupported option that may
+> be deprecated in the future.
+> 
+> We need to be able to parse the 'filename' option for rbd and iscsi, because
+> there may exist images in the wild that have json backing files, that specify
+> the filename argument.
+> 
+> Jeff Cody (2):
+>   block/rbd: enable filename option and parsing
+>   block/iscsi: enable filename option and parsing
+> 
+>  block/iscsi.c | 22 +++++++++++++++++++++-
+>  block/rbd.c   | 22 +++++++++++++++++++++-
+>  2 files changed, 42 insertions(+), 2 deletions(-)
+> 
+> -- 
+> 2.9.3
+> 
 
-Acked-by: Eduardo Habkost <ehabkost@redhat.com>
+Thanks,
 
-For i386 parts:
+Applied to my block branch:
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+git://github.com/codyprime/qemu-kvm-jtc block
 
---=20
-Eduardo
+-Jeff
