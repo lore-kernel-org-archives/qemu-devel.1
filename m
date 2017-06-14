@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dL9H6-0005uc-Br
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:28:01 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dL9Jw-0007Aw-1f
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:30:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dL9H2-00021V-EA
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:28:00 -0400
-Received: from mail-ua0-x244.google.com ([2607:f8b0:400c:c08::244]:34986)
+	(envelope-from <rth7680@gmail.com>) id 1dL9Js-00031E-F4
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:30:55 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:33284)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dL9H2-000216-9u
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:27:56 -0400
-Received: by mail-ua0-x244.google.com with SMTP id b10so215248uaa.2
-	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 07:27:56 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170614052311.13785-1-rth@twiddle.net>
-	<20170614052311.13785-10-rth@twiddle.net>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7bcb68c3-e1d3-40bf-6db8-85b7e8a4aa14@amsat.org>
-Date: Wed, 14 Jun 2017 11:27:52 -0300
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dL9Js-000319-9L
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:30:52 -0400
+Received: by mail-qk0-x242.google.com with SMTP id u8so297554qka.0
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 07:30:52 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170613214736.19963-1-david@redhat.com>
+	<20170613214736.19963-3-david@redhat.com>
+	<3c564230-7879-45ff-ffa1-c4e7bea17902@twiddle.net>
+	<52401112-57c8-201f-d091-afb3a196412f@redhat.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <e379cef7-90e9-46d5-6872-3d069f39fd6a@twiddle.net>
+Date: Wed, 14 Jun 2017 07:30:47 -0700
 MIME-Version: 1.0
-In-Reply-To: <20170614052311.13785-10-rth@twiddle.net>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 09/10] Revert "target/aarch64: optimize
- indirect branches"
+In-Reply-To: <52401112-57c8-201f-d091-afb3a196412f@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 2/3] target/s390x: implement mvcos
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,41 +34,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: agraf@suse.de, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, Miroslav Benes <mbenes@suse.cz>
 
-Can this pull wait you test last series sent by Alex Bennée with the 
-following patch?
+On 06/14/2017 12:22 AM, David Hildenbrand wrote:
+>>> +    if (!(env->psw.mask & PSW_MASK_DAT)) {
+>>> +        program_interrupt(env, PGM_SPECIAL_OP, 6);
+>>> +    }
+>>
+>> You should use restore_program_state before program_interrupt (or add a new
+>> entry-point to do both).  Then you can drop ...
+> 
+> restore_program_state -  you mean cpu_restore_state() I assume.
 
-I dont have Alpha images to test on.
+Yes, sorry.
 
-"tcg-runtime: short-circuit lookup_tb_ptr on IRQs"
+> Would it makes sense to
+> 
+> a) move cpu_restore_state() into program_interrupt()
+> b) make all callers forward ra from GETPC() (problem with kvm code that
+> share handlers?)
+> c) fixup callers that already do the cpu_restore_state()
+> d) drop potential_page_fault() completely
 
-On 06/14/2017 02:23 AM, Richard Henderson wrote:
-> This reverts commit e75449a346bf558296966a44277bfd93412c6da6.
->
-> This patch appears to induce lockups, or maybe livelocks, while
-> booting a Linux kernel.  The assumption is that there is a bug
-> elsewhere within QEMU, but reverting the patch allows normal work
-> to continue in the meantime.
->
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
-> ---
->  target/arm/translate-a64.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 860e279..ab61d96 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -11367,7 +11367,8 @@ void gen_intermediate_code_a64(ARMCPU *cpu, TranslationBlock *tb)
->              gen_a64_set_pc_im(dc->pc);
->              /* fall through */
->          case DISAS_JUMP:
-> -            tcg_gen_lookup_and_goto_ptr(cpu_pc);
-> +            /* indicate that the hash table must be used to find the next TB */
-> +            tcg_gen_exit_tb(0);
->              break;
->          case DISAS_TB_JUMP:
->          case DISAS_EXC:
->
+Yes, that makes sense.  For B, kvm can pass 0 for RA and nothing will happen. 
+For C, that project is on-going but not complete; D is indeed the ultimate goal.
+
+> Two questions:
+> a) Could we avoid having to forward the ra by doing GETPC directly in
+> program_interrupt()? In mem_helper, I can see that we do GETPC on
+> several places and pass it around, so I assume GETPC() has to be called
+> in the first handler?
+
+You must use GETPC in the first handler.  We're looking for the address of the 
+TCG generated code from where we were called.  So, no, you can't use GETPC from 
+program_interrupt.
+
+> b) With cpu_restore_state(), there is no need for update_psw_addr() +
+> update_cc_op(), correct?
+
+Correct.
+
+>>> +    potential_page_fault(s);
+>>> +    gen_helper_mvcos(cc_op, cpu_env, o->addr1, o->in2, regs[r3]);
+>>
+>> ... the potential_page_fault.
+> 
+> I would suggest to leave it in this patch as it and then clean it up all
+> together in one shot (adding 5 cpu_restore_state() vs. one
+> potential_page_fault() temporarily looks better to me).
+
+I would say the opposite, since the code generated by potential_page_fault is 
+always executed, whereas the cpu_restore_state is on an error path which for a 
+well-behaved guest will never be executed.
+
+
+r~
