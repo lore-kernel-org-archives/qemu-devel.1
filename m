@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dL8I7-00048y-89
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 09:25:00 -0400
+	(envelope-from <groug@kaod.org>) id 1dL8M1-0005n4-Ns
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 09:29:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dL8I3-0002s3-8Q
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 09:24:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42530)
+	(envelope-from <groug@kaod.org>) id 1dL8Lx-00042Q-OB
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 09:29:01 -0400
+Received: from 13.mo5.mail-out.ovh.net ([87.98.182.191]:57560)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dL8I2-0002rv-VW
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 09:24:55 -0400
-Date: Wed, 14 Jun 2017 15:24:50 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170614152450.199121ee@nial.brq.redhat.com>
-In-Reply-To: <20170614130015.GC5016@thinpad.lan.raisama.net>
-References: <20170606181948.16238-1-rkagan@virtuozzo.com>
-	<20170606181948.16238-6-rkagan@virtuozzo.com>
-	<20170613185752.GZ5016@thinpad.lan.raisama.net>
-	<20170614112506.GI2004@rkaganb.sw.ru>
-	<20170614130015.GC5016@thinpad.lan.raisama.net>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dL8Lx-000420-H8
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 09:28:57 -0400
+Received: from player799.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id B46D01052D7
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 15:28:55 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Wed, 14 Jun 2017 15:28:43 +0200
+Message-ID: <149744692318.5507.14451686460325895979.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 05/23] hyperv: ensure VP index equal to
- QEMU cpu_index
+Subject: [Qemu-devel] [PATCH v5 0/3] spapr/xics: fix migration of older
+ machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,116 +28,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Roman Kagan <rkagan@virtuozzo.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, "Denis V
-	. Lunev" <den@openvz.org>
+To: qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-On Wed, 14 Jun 2017 10:00:15 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+Cc'ing Laurent because I needed to incorporate the "spapr: manage hotplugged
+devices while the VM is not started" patch in this series to be able to
+verify that the "CPU core unplug" part of patch 3 behaves as expected.
 
-> On Wed, Jun 14, 2017 at 02:25:07PM +0300, Roman Kagan wrote:
-> > On Tue, Jun 13, 2017 at 03:57:52PM -0300, Eduardo Habkost wrote:  
-> > > On Tue, Jun 06, 2017 at 09:19:30PM +0300, Roman Kagan wrote:  
-> > > > Hyper-V identifies vcpus by the virtual processor (VP) index which is
-> > > > normally queried by the guest via HV_X64_MSR_VP_INDEX msr.
-> > > > 
-> > > > It has to be owned by QEMU in order to preserve it across migration.
-> > > > 
-> > > > However, the current implementation in KVM doesn't allow to set this
-> > > > msr, and KVM uses its own notion of VP index.  Fortunately, the way
-> > > > vcpus are created in QEMU/KVM basically guarantees that the KVM value is
-> > > > equal to QEMU cpu_index.  
-> > > 
-> > > This might not be true in the future.  cpu_index is not a good
-> > > identifier for CPUs, and we would like to remove it in the
-> > > future.
-> > > 
-> > > But it looks like we have no choice, see extra comments below:  
-> >   
-> > > > +static void hyperv_set_vp_index(CPUState *cs)
-> > > > +{
-> > > > +    struct {
-> > > > +        struct kvm_msrs info;
-> > > > +        struct kvm_msr_entry entries[1];
-> > > > +    } msr_data;
-> > > > +    int ret;
-> > > > +
-> > > > +    msr_data.info.nmsrs = 1;
-> > > > +    msr_data.entries[0].index = HV_X64_MSR_VP_INDEX;
-> > > > +
-> > > > +    /*
-> > > > +     * Some kernels don't support setting HV_X64_MSR_VP_INDEX.  However,
-> > > > +     * they use VP_INDEX equal to cpu_index due to the way vcpus are created.
-> > > > +     * So ignore the errors from SET_MSRS, but verify that GET_MSRS returns the
-> > > > +     * expected value.
-> > > > +     */  
-> > > 
-> > > Oh.  This sounds like a problem.  As reference for others, this
-> > > is the KVM code in kvm_hv_get_msr():
-> > > 
-> > > 	case HV_X64_MSR_VP_INDEX: {
-> > > 		int r;
-> > > 		struct kvm_vcpu *v;
-> > > 
-> > > 		kvm_for_each_vcpu(r, v, vcpu->kvm) {
-> > > 			if (v == vcpu) {
-> > > 				data = r;
-> > > 				break;
-> > > 			}
-> > > 		}
-> > > 		break;
-> > > 	}
-> > > 
-> > > The problem with that is that it will break as soon as we create
-> > > VCPUs in a different order.  Unsolvable on hosts that don't allow
-> > > HV_X64_MSR_VP_INDEX to be set, however.  
-> > 
-> > Right, thanks for putting together a detailed explanation.
-> > 
-> > This was a thinko back then, not to have HV_X64_MSR_VP_INDEX maintained
-> > by QEMU.  I'm going to post a patch to KVM fixing that.
-> > 
-> > Meanwhile QEMU needs a way to maintain its notion of vp_index that is
-> >   1) in sync with kernel's notion
-> >   2) also with kernels that don't support setting the msr
-> >   3) persistent across migrations
-> > 
-> > cpu_index looked like a perfect candidate.  
-> 
-> I would like to be able to stop using cpu_index as a persistent
-> VCPU identifier in the future.  I would also like to be able to
-> create VCPUs in any order without breaking guest ABI.  But it
-> seems to be impossible to do that without breaking vp_index on
-> older kernels.
-> 
-> So cpu_index looks like the only candidate we have.
-> 
-> >   
-> > > > +    msr_data.entries[0].data = cs->cpu_index;
-> > > > +    kvm_vcpu_ioctl(cs, KVM_SET_MSRS, &msr_data);
-> > > > +    ret = kvm_vcpu_ioctl(cs, KVM_GET_MSRS, &msr_data);
-> > > > +    assert(ret == 1);
-> > > > +    assert(msr_data.entries[0].data == cs->cpu_index);  
-> > > 
-> > > If KVM already initializes the MSR to cpu_index and we will abort
-> > > if it was not set to anything except cpu_index here, why exactly
-> > > do we need the KVM_SET_MSRS call?  
-> > 
-> > The kernel made no obligations to keep initializing its vp_index
-> > identically to QEMU's cpu_index.  So we'd better check and abort if that
-> > got out of sync.  Once KVM gains the ability to learn vp_index from QEMU
-> > we'll no longer depend on that as we'll do explicit synchronization.  
-> 
-> I think the kernel now has an obligation to keep initializing
-> HV_X64_MSR_VP_INDEX in a compatible way, or it will break older
-> QEMU versions that don't set the MSR.
-> 
-> But if you don't think we can rely on that, then the KVM_SET_MSRS
-> call won't hurt.
+With this series, I could successfully do the following on POWER8 host with
+full cores:
 
-if we can tell apart old index based vp_index kernel and new that supports
-MSR setting (add cap check perhaps) then we should be able to
- - leave out old vp_index broken as it is now (for old kernels/old QEMU and/ new QEMU old machine types)
-     i.e. do not set vp_index MSR in QEMU
- - in case of (new QEMU new machine type/new kernel) use APIC ID which would work
-   with out of order CPU creation
+1) start a pseries-2.9 machine with QEMU 2.9:
+        -smp cores=1,threads=2,maxcpus=8
+
+2) hotplug a core:
+    device_add host-spapr-cpu-core,core-id=4,id=core4
+
+3) migrate to QEMU 2.10 with core4 added (ie, started with same -smp as in
+   step 1 and same device_add as step 2):
+
+4) hotplug another core:
+    device_add host-spapr-cpu-core,core-id=2,id=core2
+
+5) migrate back to QEMU 2.9 with core4 and core2 added
+
+6) hotplug the core in the last available slot:
+    device_add host-spapr-cpu-core,core-id=6,id=core6
+
+7) migrate to QEMU 2.10 with core4, core2 and core6 added
+
+The following step requires Laurent's patch, otherwise the guest complains
+about the non-existing DRC and fails to unplug the cores.
+
+8) unplug some cores:
+    device_del core4
+    device_del core2
+
+9) migrate back to QEMU 2.9 with core6 added
+
+v5: - some patches from v4 got merged
+    - rebased and added Laurent's change to manage hotplugging of CPU
+      on the destination host (patch 1)
+    - see individual changelog for patches 2 and 3
+
+v4: - some patches from v3 got merged
+    - added some more preparatory cleanup in xics (patches 1,2)
+    - merge cpu_setup() handler into realize() (patch 4)
+    - see individual changelog for patches 3 and 6
+
+v3: - preparatory cleanup in pnv (patch 1)
+    - rework ICPState realization and vmstate registration (patches 2,3,4)
+    - fix migration using dummy icp/server entries (patch 5)
+
+v2: - some patches from v1 are already merged in ppc-for-2.10
+    - added a new fix to a potential memory leak (patch 1)
+    - consolidate dt_id computation (patch 3)
+    - see individual changelogs for patch 2 and 4
+
+Cheers.
+
+--
+Greg
+
+---
+
+Greg Kurz (2):
+      xics: directly register ICPState objects to vmstate
+      spapr: fix migration of ICPState objects from/to older QEMU
+
+Laurent Vivier (1):
+      spapr: manage hotplugged devices while the VM is not started
+
+
+ hw/intc/xics.c         |    5 ++
+ hw/ppc/spapr.c         |  107 ++++++++++++++++++++++++++++++++++++++++++++----
+ include/hw/ppc/spapr.h |    1 
+ 3 files changed, 104 insertions(+), 9 deletions(-)
