@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dL9WF-0004R0-7K
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:43:40 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dL9Wp-0004kH-Fp
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:44:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dL9WE-0007mM-Dh
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:43:39 -0400
-Date: Wed, 14 Jun 2017 16:43:24 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170614144324.GA4785@noname.redhat.com>
-References: <20170522135704.842-1-stefanha@redhat.com>
-	<20170522135704.842-4-stefanha@redhat.com>
-	<add32dd6-f842-9d66-0f7f-6e0e2b7c8100@virtuozzo.com>
-	<99f414f1-7a0f-b659-be81-d6f38fd04ff4@virtuozzo.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1dL9Wo-00084O-GH
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:44:15 -0400
+Date: Wed, 14 Jun 2017 22:39:14 +0800
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170614143914.GB2614@umbus>
+References: <149744692318.5507.14451686460325895979.stgit@bahia.lan>
+	<149744695984.5507.11604157257247801492.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="z6Eq5LdranGa6ru8"
 Content-Disposition: inline
-In-Reply-To: <99f414f1-7a0f-b659-be81-d6f38fd04ff4@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v3 3/4] migration: avoid recursive
- AioContext locking in save_vmstate()
+In-Reply-To: <149744695984.5507.11604157257247801492.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH v5 3/3] spapr: fix migration of ICPState
+ objects from/to older QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,44 +25,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>
 
-Am 14.06.2017 um 15:15 hat Pavel Butsykin geschrieben:
-> On 14.06.2017 13:10, Pavel Butsykin wrote:
-> >
-> >On 22.05.2017 16:57, Stefan Hajnoczi wrote:
-> >>AioContext was designed to allow nested acquire/release calls.  It uses
-> >>a recursive mutex so callers don't need to worry about nesting...or so
-> >>we thought.
-> >>
-> >>BDRV_POLL_WHILE() is used to wait for block I/O requests.  It releases
-> >>the AioContext temporarily around aio_poll().  This gives IOThreads a
-> >>chance to acquire the AioContext to process I/O completions.
-> >>
-> >>It turns out that recursive locking and BDRV_POLL_WHILE() don't mix.
-> >>BDRV_POLL_WHILE() only releases the AioContext once, so the IOThread
-> >>will not be able to acquire the AioContext if it was acquired
-> >>multiple times.
-> >>
-> >>Instead of trying to release AioContext n times in BDRV_POLL_WHILE(),
-> >>this patch simply avoids nested locking in save_vmstate().  It's the
-> >>simplest fix and we should step back to consider the big picture with
-> >>all the recent changes to block layer threading.
-> >>
-> >>This patch is the final fix to solve 'savevm' hanging with -object
-> >>iothread.
-> >
-> >The same I see in external_snapshot_prepare():
-> >[...]
-> >and at the moment BDRV_POLL_WHILE(bs, flush_co.ret == NOT_DONE),
-> >we have at least two locks.. So here is another deadlock.
-> 
-> Sorry, here different kind of deadlock. In external_snapshot case, the
-> deadlock can happen only if state->old_bs->aio_context == my_iothread->ctx,
-> because in this case the aio_co_enter() always calls aio_co_schedule():
 
-Can you please write qemu-iotests case for any deadlock case that we're
-seeing? Stefan, we could also use one for the bug fixed in this series.
+--z6Eq5LdranGa6ru8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Kevin
+On Wed, Jun 14, 2017 at 03:29:19PM +0200, Greg Kurz wrote:
+> Commit 5bc8d26de20c ("spapr: allocate the ICPState object from under
+> sPAPRCPUCore") moved ICPState objects from the machine to CPU cores.
+> This is an improvement since we no longer allocate ICPState objects
+> that will never be used. But it has the side-effect of breaking
+> migration of older machine types from older QEMU versions.
+>=20
+> This patch allows spapr to register dummy "icp/server" entries to vmstate.
+> These entries use a dedicated VMStateDescription that can swallow and
+> discard state of an incoming migration stream, and that don't send anythi=
+ng
+> on outgoing migration.
+>=20
+> As for real ICPState objects, the instance_id is the cpu_index of the
+> corresponding vCPU, which happens to be equal to the generated instance_id
+> of older machine types.
+>=20
+> The machine can unregister/register these entries when CPUs are dynamical=
+ly
+> plugged/unplugged.
+>=20
+> This is only available for pseries-2.9 and older machines, thanks to a
+> compat property.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+
+Applied to ppc-for-2.10.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--z6Eq5LdranGa6ru8
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZQUqRAAoJEGw4ysog2bOS+dQP/jmGKX/EhsLCf7IY1ohQUJ7Q
+RrYswERtQYwEg0JnLOxaTSLLX21UmVxsBtsHMR+gAoxS/ba4bky7CY47JSxJbOiQ
+p2r/0bV8gKPD/lIZTiORAHsa6pSkdeFS1kNJJCdN/T7j2fHwtepxZK9Jk1mQqTrg
++gzRslcUm2Z20MfumsUoOe9nrxNDoqm0EfBk4VcWvxev0ahnExKUUhuO0YpOALtR
+0qtg3OXqL+jzcRP8RowjUAGZwR3iqYTuBTyhmf8Xdx4wOTXbOWs9xw7HN/90+KZk
++FqJpD41NB+ZbwNhNrqjQ9rhLT8GUtkrGM9YVF/ewE7+IV+x3bamgXzq1zKqUuwi
+IZKWhyD99mHl4QiVULv/PKDm9M19zlSDoNO9toPyul9smqwFbcvC46MIY0t7MpDa
+eAxtQpuKyC9GVV5MRmx9uKwyoBD75V7B6ZmswhdAwvTJ3R/uFra+v2sq7Z2A2wKA
+TAxMDUERMS+UkTwh3EmR4wp3oMiEGvE4gagfYF5uzY68g4LIpdiWGsUfV9ng0yCS
+yChCclvRgI4tNOKyKbyksCeq8+jALcjyNIj7tgScwodByj2sDhwU2Aem/N/giqJW
+Mb5k1Pji0vzAU/iSnAi64vC5zftz+/es+w9eoDqK5Ncd87V3WtUFufW7bpYY+Hxw
+HZt0b4xfGM2YJeoNSRu7
+=TFYc
+-----END PGP SIGNATURE-----
+
+--z6Eq5LdranGa6ru8--
