@@ -1,18 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dLEHJ-00016i-GL
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 15:48:34 -0400
+	(envelope-from <thuth@redhat.com>) id 1dLETY-0006Yp-Nj
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 16:01:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dLEHI-0008WD-Da
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 15:48:33 -0400
-Sender: Richard Henderson <rth7680@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Date: Wed, 14 Jun 2017 12:48:21 -0700
-Message-Id: <20170614194821.8754-6-rth@twiddle.net>
-In-Reply-To: <20170614194821.8754-1-rth@twiddle.net>
-References: <20170614194821.8754-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v2 5/5] target/arm: Exit after clearing
- interrupt mask
+	(envelope-from <thuth@redhat.com>) id 1dLETT-0004Lv-UJ
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 16:01:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36258)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dLETT-0004LQ-Nb
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 16:01:07 -0400
+References: <20170613214736.19963-1-david@redhat.com>
+	<20170613214736.19963-3-david@redhat.com>
+	<cf5f341a-2446-31e5-1990-201a8015a38f@redhat.com>
+	<a7963e43-26f0-3910-fdb5-b9e56ae3dd23@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <7edf6834-f76a-1360-745c-416077dbcf44@redhat.com>
+Date: Wed, 14 Jun 2017 22:00:59 +0200
+MIME-Version: 1.0
+In-Reply-To: <a7963e43-26f0-3910-fdb5-b9e56ae3dd23@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 2/3] target/s390x: implement mvcos
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,42 +31,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, cota@braap.org, pbonzini@redhat.com, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: Miroslav Benes <mbenes@suse.cz>, agraf@suse.de, Aurelien Jarno <aurelien@aurel32.net>, rth@twiddle.net
 
-Exit to cpu loop so we reevaluate cpu_arm_hw_interrupts.
+On 14.06.2017 09:56, David Hildenbrand wrote:
+[...]
+>> I think you should also mask the length with 0xffffffff if the PSW was
+>> not in 64-bit mode? Or is this done automagically by the generated TCG
+>> code already?
+> 
+> I was asking myself the same question, but it shouldn't really matter as
+> was we will be using a maximum of 4096, no?
 
-Cc: qemu-arm@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <rth@twiddle.net>
----
- target/arm/translate-a64.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+Question is whether we can end up here somehow in 32-bit mode and the
+upper part of the register is still != 0 ... something like 0x100000010
+for example. Can we be sure that the upper half is always cleared if we
+switch from 64-bit mode to the 32-bit mode before?
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 860e279..e55547d 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -1422,7 +1422,9 @@ static void handle_msr_i(DisasContext *s, uint32_t insn,
-         gen_helper_msr_i_pstate(cpu_env, tcg_op, tcg_imm);
-         tcg_temp_free_i32(tcg_imm);
-         tcg_temp_free_i32(tcg_op);
--        s->is_jmp = DISAS_UPDATE;
-+        /* For DAIFClear, exit the cpu loop to re-evaluate pending IRQs.  */
-+        gen_a64_set_pc_im(s->pc);
-+        s->is_jmp = (op == 0x1f ? DISAS_EXIT : DISAS_JUMP);
-         break;
-     }
-     default:
-@@ -11369,6 +11371,9 @@ void gen_intermediate_code_a64(ARMCPU *cpu, TranslationBlock *tb)
-         case DISAS_JUMP:
-             tcg_gen_lookup_and_goto_ptr(cpu_pc);
-             break;
-+        case DISAS_EXIT:
-+            tcg_gen_exit_tb(0);
-+            break;
-         case DISAS_TB_JUMP:
-         case DISAS_EXC:
-         case DISAS_SWI:
--- 
-2.9.4
+ Thomas
