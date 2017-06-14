@@ -1,19 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dLIlp-0004GE-AA
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 20:36:22 -0400
+	(envelope-from <bounces@canonical.com>) id 1dLJ7a-0002iY-PL
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 20:58:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dLIlk-0005dE-9R
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 20:36:21 -0400
-Received: from out4-smtp.messagingengine.com ([66.111.4.28]:33037)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dLIlk-0005bf-2h
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 20:36:16 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Date: Wed, 14 Jun 2017 20:36:13 -0400
-Message-Id: <1497486973-25845-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH] tcg: consistently access cpu->tb_jmp_cache
- atomically
+	(envelope-from <bounces@canonical.com>) id 1dLJ7W-00031E-QZ
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 20:58:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38146)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dLJ7W-000319-K8
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 20:58:46 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dLFb0-0007g3-Vp
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 21:12:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id BF5522E85AC
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 21:11:51 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 14 Jun 2017 20:28:58 -0000
+From: Thomas Huth <823733@bugs.launchpad.net>
+Reply-To: Bug 823733 <823733@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20110810053253.11269.76752.malonedeb@gac.canonical.com>
+Message-Id: <149747213838.1324.2684709954965181982.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 823733] Re: Soloaris can't be poweroff
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,167 +37,151 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-Some code paths can lead to atomic accesses racing with memset()
-on cpu->tb_jmp_cache, which can result in torn reads/writes
-and is undefined behaviour in C11.
+Triaging old bug tickets ... can you still reproduce this problem with
+the latest version of QEMU (currently version 2.9.0)?
 
-These torn accesses are unlikely to show up as bugs, but from code
-inspection they seem possible. For example, tb_phys_invalidate does:
-    /* remove the TB from the hash list */
-    h = tb_jmp_cache_hash_func(tb->pc);
-    CPU_FOREACH(cpu) {
-        if (atomic_read(&cpu->tb_jmp_cache[h]) == tb) {
-            atomic_set(&cpu->tb_jmp_cache[h], NULL);
-        }
-    }
-Here atomic_set might race with a concurrent memset (such as the
-ones scheduled via "unsafe" async work, e.g. tlb_flush_page) and
-therefore we might end up with a torn pointer (or who knows what,
-because we are under undefined behaviour).
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-This patch converts parallel accesses to cpu->tb_jmp_cache to use
-atomic primitives, thereby bringing these accesses back to defined
-behaviour. The price to pay is to potentially execute more instructions
-when clearing cpu->tb_jmp_cache, but given how infrequently they happen
-and the small size of the cache, the performance impact I have measured
-is within noise range when booting debian-arm.
+-- =
 
-Note that under "safe async" work (e.g. do_tb_flush) we could use memset
-because no other vcpus are running. However I'm keeping these accesses
-atomic as well to keep things simple and to avoid confusing analysis
-tools such as ThreadSanitizer.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/823733
 
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- cputlb.c          |  4 ++--
- include/qom/cpu.h | 11 ++++++++++-
- qom/cpu.c         |  5 +----
- translate-all.c   | 25 ++++++++++++-------------
- 4 files changed, 25 insertions(+), 20 deletions(-)
+Title:
+  Soloaris can't be poweroff
 
-diff --git a/cputlb.c b/cputlb.c
-index 743776a..e85b6d3 100644
---- a/cputlb.c
-+++ b/cputlb.c
-@@ -118,7 +118,7 @@ static void tlb_flush_nocheck(CPUState *cpu)
- 
-     memset(env->tlb_table, -1, sizeof(env->tlb_table));
-     memset(env->tlb_v_table, -1, sizeof(env->tlb_v_table));
--    memset(cpu->tb_jmp_cache, 0, sizeof(cpu->tb_jmp_cache));
-+    cpu_tb_jmp_cache_clear(cpu);
- 
-     env->vtlb_index = 0;
-     env->tlb_flush_addr = -1;
-@@ -183,7 +183,7 @@ static void tlb_flush_by_mmuidx_async_work(CPUState *cpu, run_on_cpu_data data)
-         }
-     }
- 
--    memset(cpu->tb_jmp_cache, 0, sizeof(cpu->tb_jmp_cache));
-+    cpu_tb_jmp_cache_clear(cpu);
- 
-     tlb_debug("done\n");
- 
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 89ddb68..2fe7cff 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -346,7 +346,7 @@ struct CPUState {
- 
-     void *env_ptr; /* CPUArchState */
- 
--    /* Writes protected by tb_lock, reads not thread-safe  */
-+    /* Accessed in parallel; all accesses must be atomic */
-     struct TranslationBlock *tb_jmp_cache[TB_JMP_CACHE_SIZE];
- 
-     struct GDBRegisterState *gdb_regs;
-@@ -422,6 +422,15 @@ extern struct CPUTailQ cpus;
- 
- extern __thread CPUState *current_cpu;
- 
-+static inline void cpu_tb_jmp_cache_clear(CPUState *cpu)
-+{
-+    unsigned int i;
-+
-+    for (i = 0; i < TB_JMP_CACHE_SIZE; i++) {
-+        atomic_set(&cpu->tb_jmp_cache[i], NULL);
-+    }
-+}
-+
- /**
-  * qemu_tcg_mttcg_enabled:
-  * Check whether we are running MultiThread TCG or not.
-diff --git a/qom/cpu.c b/qom/cpu.c
-index 5069876..585419b 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -274,7 +274,6 @@ void cpu_reset(CPUState *cpu)
- static void cpu_common_reset(CPUState *cpu)
- {
-     CPUClass *cc = CPU_GET_CLASS(cpu);
--    int i;
- 
-     if (qemu_loglevel_mask(CPU_LOG_RESET)) {
-         qemu_log("CPU Reset (CPU %d)\n", cpu->cpu_index);
-@@ -292,9 +291,7 @@ static void cpu_common_reset(CPUState *cpu)
-     cpu->crash_occurred = false;
- 
-     if (tcg_enabled()) {
--        for (i = 0; i < TB_JMP_CACHE_SIZE; ++i) {
--            atomic_set(&cpu->tb_jmp_cache[i], NULL);
--        }
-+        cpu_tb_jmp_cache_clear(cpu);
- 
- #ifdef CONFIG_SOFTMMU
-         tlb_flush(cpu, 0);
-diff --git a/translate-all.c b/translate-all.c
-index b3ee876..af3c4df 100644
---- a/translate-all.c
-+++ b/translate-all.c
-@@ -923,11 +923,7 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
-     }
- 
-     CPU_FOREACH(cpu) {
--        int i;
--
--        for (i = 0; i < TB_JMP_CACHE_SIZE; ++i) {
--            atomic_set(&cpu->tb_jmp_cache[i], NULL);
--        }
-+        cpu_tb_jmp_cache_clear(cpu);
-     }
- 
-     tcg_ctx.tb_ctx.nb_tbs = 0;
-@@ -1806,19 +1802,22 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
-     cpu_loop_exit_noexc(cpu);
- }
- 
--void tb_flush_jmp_cache(CPUState *cpu, target_ulong addr)
-+static void tb_jmp_cache_clear_page(CPUState *cpu, target_ulong page_addr)
- {
-+    unsigned int i0 = tb_jmp_cache_hash_page(page_addr);
-     unsigned int i;
- 
-+    for (i = 0; i < TB_JMP_PAGE_SIZE; i++) {
-+        atomic_set(&cpu->tb_jmp_cache[i0 + i], NULL);
-+    }
-+}
-+
-+void tb_flush_jmp_cache(CPUState *cpu, target_ulong addr)
-+{
-     /* Discard jump cache entries for any tb which might potentially
-        overlap the flushed page.  */
--    i = tb_jmp_cache_hash_page(addr - TARGET_PAGE_SIZE);
--    memset(&cpu->tb_jmp_cache[i], 0,
--           TB_JMP_PAGE_SIZE * sizeof(TranslationBlock *));
--
--    i = tb_jmp_cache_hash_page(addr);
--    memset(&cpu->tb_jmp_cache[i], 0,
--           TB_JMP_PAGE_SIZE * sizeof(TranslationBlock *));
-+    tb_jmp_cache_clear_page(cpu, addr - TARGET_PAGE_SIZE);
-+    tb_jmp_cache_clear_page(cpu, addr);
- }
- 
- static void print_qht_statistics(FILE *f, fprintf_function cpu_fprintf,
--- 
-2.7.4
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Thank you forgive my poor English.
+
+  It seems KVM can=E2=80=99t poweroff solairs 10 or sloalrs 11 VM.
+  I have created solaris 10 and 11 as usual. Everything in VM is running OK=
+, but finally I use shell command =E2=80=98poweroff=E2=80=99 or =E2=80=98in=
+it 5=E2=80=99, the solaris VM (both 10 & 11) system could=E2=80=99t be powe=
+roff but with promoting me the message: perss any key to reboot =E2=80=A6..=
+  ,I pressed any key in vnc client, solaris VM reboot immediately. Endless =
+reboot loop above.
+
+  the solaris 10 & 11 from oracle iso file name :
+  sol-10-u9-ga-x86-dvd.iso
+  sol-11-exp-201011-text-x86.iso
+
+  the solaris 10 & 11 from oracle iso file name :
+  sol-10-u9-ga-x86-dvd.iso
+  sol-11-exp-201011-text-x86.iso
+
+  1. On my real physical machine,the solaris can be poweroff
+  2. On vmware ,the solaris can be poweroff
+  3. On my real physical machine,I have try to disbale the ACPI opiton in B=
+OIS, then the solaris can't be poweroff,Like the problem I have described a=
+bove
+  so ,I doubt the KVM has a little problem in ACPI =
+
+
+  I have try the suggestion as follows, but I can=E2=80=99t solve the probl=
+em.
+  7.2 Solaris reboot all the time on grub menu
+  =E2=80=A2	Run through the installer as usual =
+
+  =E2=80=A2	On completion and reboot, the VM will perpetually reboot. "Stop=
+" the VM. =
+
+  =E2=80=A2	Start it up again, and immediately open a vnc console and selec=
+t the Safe Boot from the options screen =
+
+  =E2=80=A2	When prompted if you want to try and recover the boot block, sa=
+y yes =
+
+  =E2=80=A2	You should now have a Bourne terminal with your existing filesy=
+stem mounted on /a =
+
+  =E2=80=A2	Run /a/usr/bin/bash (my preferred shell) =
+
+  =E2=80=A2	export TERM=3Dxterm =
+
+  =E2=80=A2	vi /a/boot/grub/menu.1st (editing the bootloader on your mounte=
+d filesystem), to add "kernel/unix" to the kernel options for the non-safe-=
+mode boot. Ex : =
+
+  Config File : /a/boot/grub/menu.lst =
+
+  kernel$ /platform/i86pc/multiboot -B $ZFS-BOOTFS kernel/unix
+
+  According to KVM requirements, I collected the following information:
+  CPU model name
+  model name      : Intel(R) Xeon(R) CPU           X3450  @ 2.67GHz
+
+  kvm -version
+  QEMU PC emulator version 0.12.3 (qemu-kvm-0.12.3), Copyright (c) 2003-200=
+8 Fabrice Bellard
+
+  Host kernel version
+  Ubuntu 10.04.1 LTS   2.6.32-25-server =
+
+
+  What host kernel arch you are using (i386 or x86_64)
+  X86_64
+
+  Guest OS
+  Solaris 10 and Solaris 11=EF=BC=8Cboth can not shutdown
+
+  The qemu command line you are using to start the guest
+
+  First, I used the command line as follows:
+  kvm -m 1024 -drive file=3Dsolaris10.img,cache=3Dwriteback -net nic -net u=
+ser -nographic -vnc :1
+  then I try to use -no-kvm-irqchip or -no-kvm ,but the problem also appear=
+s!
+
+  Secondly, have created and run solaris 10&11 by using Virsh, still solari=
+s can't be poweroff, the XML file content is :
+  <domain type=3D'kvm'>
+      <name>solairs</name>
+      <uuid>85badf15-244d-4719-a2da-8c3de064137d</uuid>
+      <memory>1677721</memory>
+      <currentMemory>1677721</currentMemory>
+      <vcpu>1</vcpu>
+      <os>
+      <type arch=3D'i686' machine=3D'pc-0.12'>hvm</type>
+        <boot dev=3D'hd'/>
+     </os>
+     <features>
+      <acpi/>
+      <apic/>
+     </features>
+    <clock offset=3D'utc'/>
+     <on_poweroff>destroy</on_poweroff>
+    <on_reboot>restart</on_reboot>
+     <on_crash>destroy</on_crash>
+     <devices>
+       <emulator>/usr/bin/kvm</emulator>
+       <disk type=3D'file' device=3D'disk'>
+        <driver name=3D'qemu' type=3D'qcow2' cache=3D'writeback'/>
+         <source file=3D'/opt/GuestOS/solaris10.img'/>
+         <target dev=3D'hda' bus=3D'ide'/>
+       </disk>
+      <interface type=3D'bridge'>
+        <mac address=3D'00:0c:29:d0:36:c3'/>
+        <source bridge=3D'br1'/>
+        <target dev=3D'vnet0'/>
+       </interface>
+       <input type=3D'mouse' bus=3D'ps2'/>
+       <graphics type=3D'vnc' port=3D'5901' autoport=3D'no' keymap=3D'en-us=
+'/>
+      <video>
+        <model type=3D'vga' vram=3D'65536' heads=3D'1'/>
+      </video>
+    </devices>
+    <seclabel type=3D'dynamic' model=3D'apparmor'>
+      <label>libvirt-f36f5289-692e-6f1c-fe71-c6ed19453e2f</label>
+      <imagelabel>libvirt-f36f5289-692e-6f1c-fe71-c6ed19453e2f</imagelabel>
+    </seclabel>
+   </domain>
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/823733/+subscriptions
