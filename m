@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38678)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dL02H-00047j-Ni
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 00:36:06 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dL07e-0005Tb-Re
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 00:41:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dL02E-0001j9-Jg
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 00:36:05 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53916)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dL02E-0001iH-E0
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 00:36:02 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dL02B-0007GL-Gk
-	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 04:35:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7771D2E8193
-	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 04:35:59 +0000 (UTC)
+	(envelope-from <rth7680@gmail.com>) id 1dL07b-0002vb-Cl
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 00:41:38 -0400
+Received: from mail-qk0-x22e.google.com ([2607:f8b0:400d:c09::22e]:32844)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dL07b-0002vL-6Y
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 00:41:35 -0400
+Received: by mail-qk0-x22e.google.com with SMTP id r62so27783049qkf.0
+	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 21:41:35 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170613214736.19963-1-david@redhat.com>
+	<20170613214736.19963-3-david@redhat.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <3c564230-7879-45ff-ffa1-c4e7bea17902@twiddle.net>
+Date: Tue, 13 Jun 2017 21:41:30 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 14 Jun 2017 04:17:26 -0000
-From: Launchpad Bug Tracker <1030666@bugs.launchpad.net>
-Reply-To: Bug 1030666 <1030666@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20120730014155.9541.71695.malonedeb@soybean.canonical.com>
-Message-Id: <149741384671.17358.16879117718720483018.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1030666] Re: gdb can't proceed after a breakpoint
+In-Reply-To: <20170613214736.19963-3-david@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 2/3] target/s390x: implement mvcos
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,67 +32,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: agraf@suse.de, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, Miroslav Benes <mbenes@suse.cz>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+On 06/13/2017 02:47 PM, David Hildenbrand wrote:
+> +static inline bool psw_key_valid(CPUS390XState *env, uint8_t psw_key)
+> +{
+> +    uint16_t pkm = ((env->cregs[3] & CR3_PKM) >> 16);
+> +
+> +    if (env->psw.mask & PSW_MASK_PSTATE) {
+> +        /* PSW key has range 0..15, it is valid if the bit is 1 in the PKM */
+> +        return pkm & (1 << (psw_key & 0xff));
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+Did you intend to write & 0xf?  Otherwise this mask is pointless...
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1030666
+> +        switch (src_as) {
+> +        case 0x0:
+> +            x = cpu_ldub_primary_ra(env, src, ra);
+> +            break;
+> +        case 0x2:
+> +            x = cpu_ldub_secondary_ra(env, src, ra);
+> +            break;
+> +        case 0x3:
+> +            x = cpu_ldub_home_ra(env, src, ra);
+> +            break;
+> +        }
+> +        switch (dest_as) {
+> +        case 0x0:
+> +            cpu_stb_primary_ra(env, dest, x, ra);
+> +            break;
+> +        case 0x2:
+> +            cpu_stb_secondary_ra(env, dest, x, ra);
+> +            break;
+> +        case 0x3:
+> +            cpu_stb_home_ra(env, dest, x, ra);
+> +            break;
+> +        }
 
-Title:
-  gdb can't proceed after a breakpoint
+Rather than these switches, you can use helper_ret_ldub_mmu.  Of course, that 
+will only work for SOFTMMU.  But for CONFIG_USER_ONLY, there's surely only one 
+address space that's legal, so you could simply forward to fast_memmove.
 
-Status in QEMU:
-  Expired
+> +    if (!(env->psw.mask & PSW_MASK_DAT)) {
+> +        program_interrupt(env, PGM_SPECIAL_OP, 6);
+> +    }
 
-Bug description:
-  Using qemu-1.1.0-windows.zip package from http://lassauge.free.fr/qemu/
-  Host: Windows 7 Ultimate 64-bit
-  Guest: i386 system running MS-DOS 6.22
-  Launch command line:
-  =C2=A0=C2=A0qemu-system-i386.exe -L Bios -fda "DOS.vfd" -fdb "Data.vfd" -=
-gdb tcp:127.0.0.1:1234
-  Debbugers tried:
-  =C2=A0=C2=A0gdb 7.3.50.20111026-cvs running on Cygwin 1.7.16
-  =C2=A0=C2=A0gdb 7.4 on MinGW
+You should use restore_program_state before program_interrupt (or add a new 
+entry-point to do both).  Then you can drop ...
 
-  Short description:
-  I use gdb to attach to a running Qemu session, set a breakpoint and resum=
-e execution. When the breakpoint is hit, gdb gains control as expected. How=
-ever, trying to single-step or continue at this point just causes the same =
-breakpoint to be hit immediately again. Deleting the breakpoint allows sing=
-le-stepping or continue to work.
+> +    potential_page_fault(s);
+> +    gen_helper_mvcos(cc_op, cpu_env, o->addr1, o->in2, regs[r3]);
 
-  Steps to reproduce:
-  DOS.vfd is a floppy image containing an MS-DOS 6.22 startup disk.
-  Data.vfd is a floppy image containing a single program (hello.com).
-  The aim is to debug the execution of hello.com with gdb.
-  Launch Qemu.
-  Launch gdb, an attach to qemu:
-  =C2=A0=C2=A0"target remote localhost:1234"
-  I know the address at which hello.com will be loaded, so set a breakpoint=
- there and resume execution:
-  =C2=A0=C2=A0"break *0xf730"
-  =C2=A0=C2=A0"continue"
-  In Qemu, start hello.com. The breakpoint is immediately hit, execution st=
-ops and gdb gains control.
-  Examining the program gives expected results (such as "info reg" or "disa=
-ssemble").
-  At this point, try to proceed either with single-stepping ("si" or "ni") =
-or with "continue", and the same breakpoint is immediately hit again. Subse=
-quent attempts to single-step or continue just keep hitting the same breakp=
-oint.
-  The only way to proceed at this point is to delete the breakpoint, after =
-which both single-stepping and continue work.
+... the potential_page_fault.
 
-  Note that single-stepping and continue works as expected if it is done
-  after interrupting execution with Ctrl-C.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1030666/+subscriptions
+r~
