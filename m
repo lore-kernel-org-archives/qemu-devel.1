@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44605)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dLBgz-0004JB-Gv
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:02:54 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dLBj1-00065S-Vi
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:05:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dLBgy-00030P-K6
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:02:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57800)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dLBgy-00030A-EK
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:02:52 -0400
-References: <20170613214736.19963-1-david@redhat.com>
-	<20170613214736.19963-3-david@redhat.com>
-	<3c564230-7879-45ff-ffa1-c4e7bea17902@twiddle.net>
-	<52401112-57c8-201f-d091-afb3a196412f@redhat.com>
-	<e379cef7-90e9-46d5-6872-3d069f39fd6a@twiddle.net>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <0959e60a-7894-d7d7-0bfe-dbb19b162875@redhat.com>
-Date: Wed, 14 Jun 2017 19:02:48 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1dLBj0-0003wM-TA
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:04:59 -0400
+Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:36066)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dLBj0-0003vH-Lg
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:04:58 -0400
+Received: by mail-wr0-x230.google.com with SMTP id 36so8975118wry.3
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 10:04:58 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <e379cef7-90e9-46d5-6872-3d069f39fd6a@twiddle.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 2/3] target/s390x: implement mvcos
- instruction
+In-Reply-To: <7de47a0f-baad-d849-eebd-87c86dae16c1@redhat.com>
+References: <1497369290-20401-1-git-send-email-peter.maydell@linaro.org>
+	<1497369290-20401-2-git-send-email-peter.maydell@linaro.org>
+	<f279fd6d-d32f-79e8-66e3-62edc0e425a8@amsat.org>
+	<937b2871-7380-4bfc-9a3b-997e496633ff@redhat.com>
+	<7b7e4b38-923d-b928-ab09-716b2140273b@amsat.org>
+	<7de47a0f-baad-d849-eebd-87c86dae16c1@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 14 Jun 2017 18:04:36 +0100
+Message-ID: <CAFEAcA8y1GaZ7f-zf5BZQaJkCXNz+t5mD4hkJAB2eCVx7eYr4g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 1/3] travis: install more library
+ dependencies
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,67 +34,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
-Cc: agraf@suse.de, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, Miroslav Benes <mbenes@suse.cz>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Markus Armbruster <armbru@redhat.com>, "patches@linaro.org" <patches@linaro.org>, Fam Zheng <famz@redhat.com>
 
+On 14 June 2017 at 17:49, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> Well, trusty is 3 years old by now... I wouldn't call that bleeding
+> edge, and it seems like Travis is suggesting using Docker images for
+> those who want to use a newer distro.  This patch and patch 2 are
+> useful, but I think I'd rather get full coverage, either with Shippable
+> or by keeping on doing manual builds, than to rush things and switch to
+> CI when it's not ready.
 
->> Would it makes sense to
->>
->> a) move cpu_restore_state() into program_interrupt()
->> b) make all callers forward ra from GETPC() (problem with kvm code that
->> share handlers?)
->> c) fixup callers that already do the cpu_restore_state()
->> d) drop potential_page_fault() completely
-> 
-> Yes, that makes sense.  For B, kvm can pass 0 for RA and nothing will happen. 
-> For C, that project is on-going but not complete; D is indeed the ultimate goal.
-> 
->> Two questions:
->> a) Could we avoid having to forward the ra by doing GETPC directly in
->> program_interrupt()? In mem_helper, I can see that we do GETPC on
->> several places and pass it around, so I assume GETPC() has to be called
->> in the first handler?
-> 
-> You must use GETPC in the first handler.  We're looking for the address of the 
-> TCG generated code from where we were called.  So, no, you can't use GETPC from 
-> program_interrupt.
-> 
->> b) With cpu_restore_state(), there is no need for update_psw_addr() +
->> update_cc_op(), correct?
-> 
-> Correct.
+Yes, I overall agree that we maybe don't want to use Travis
+for this, but I would like us to automate it somehow.
+(I was about 50/50 on whether to tag the patchset as RFC.)
 
-Thanks for the clarification!
+> First, I don't think it's accurate to say that scans have been often
+> weeks or months apart:
+>
+>                         #days   #commits
+>         2017-06-05      4       123
+>         2017-06-01      14      214
+>         2017-05-18      3       108
+>         2017-05-15      8       262
+>         2017-05-07      12      149
+>         2017-04-25      24      317
 
-> 
->>>> +    potential_page_fault(s);
->>>> +    gen_helper_mvcos(cc_op, cpu_env, o->addr1, o->in2, regs[r3]);
->>>
->>> ... the potential_page_fault.
->>
->> I would suggest to leave it in this patch as it and then clean it up all
->> together in one shot (adding 5 cpu_restore_state() vs. one
->> potential_page_fault() temporarily looks better to me).
-> 
-> I would say the opposite, since the code generated by potential_page_fault is 
-> always executed, whereas the cpu_restore_state is on an error path which for a 
-> well-behaved guest will never be executed.
+Yes, but this one (I think) only happened because I got fed
+up enough of the build being out of date to go and find out
+how to rebuild it and do an upload. I think I also did the
+1st June one by hand, maybe?
 
-By temporary I meant:
-I will be looking into cleaning this all up and getting rid of
-potential_page_fault() soon :)
+The reason I put this patch set together is because I didn't
+want to have to do a manual build a third time :-)
 
-However, in v2 I avoided potential_page_fault().
+> In the last eight months, there was exactly one case where the builds
+> were more than one month apart and one more case where the builds were
+> more than two weeks apart.  Both of them coincided with the two most
+> recent hard freeze periods (2.8 and 2.9).
 
-> 
-> 
-> r~
-> 
+I'm more likely to look at coverity during freeze periods
+than less, because bugs coverity notices are more likely
+than not to be candidates for being worth fixing before
+releases, and I don't have my plate full with feature work.
+So I'd rather have the build be as up to date as possible
+during a release so we can catch any bugs that snuck in
+before we hit the last release candidate.
 
-Thanks!
+> Second, I don't even think that CI is particularly useful when someone
+> must actively consume those scans: triage newly-reporte defects, inform
+> the authors of the patch, and so on.  Too many Coverity reports can be a
+> burden because you cannot use e.g. the "All newly detected" view.
 
--- 
+You can do triage at any frequency you want, because bugs stay
+in the "new" state until you move them, whether they were
+detected in the most recent scan or not.
 
-Thanks,
+Conversely, if we don't do scans very frequently then the
+"outstanding defects" view gets hard to use because it's
+still showing things we've already fixed and isn't showing
+new things we've introduced but not scanned yet.
 
-David
+thanks
+-- PMM
