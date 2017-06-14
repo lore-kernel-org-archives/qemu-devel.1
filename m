@@ -1,37 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1dL9mg-0004m6-Fy
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:00:39 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dL9nX-0005Dj-8C
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:01:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1dL9mc-0005rz-Kj
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:00:38 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42203)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1dL9mc-0005rH-BT
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:00:34 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v5EExMEO129407
-	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 11:00:32 -0400
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2b32ujqppm-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 11:00:31 -0400
-Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Wed, 14 Jun 2017 09:00:28 -0600
-References: <7f0b8d00-236d-37e8-5c1f-e7ea8e4b9146@redhat.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Wed, 14 Jun 2017 11:00:23 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dL9nS-00069T-Rk
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:01:31 -0400
+Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:33687)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dL9nS-00068z-G4
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 11:01:26 -0400
+Received: by mail-wr0-x235.google.com with SMTP id r103so2126968wrb.0
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 08:01:26 -0700 (PDT)
+References: <1497369290-20401-1-git-send-email-peter.maydell@linaro.org>
+	<1497369290-20401-3-git-send-email-peter.maydell@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1497369290-20401-3-git-send-email-peter.maydell@linaro.org>
+Date: Wed, 14 Jun 2017 16:01:58 +0100
+Message-ID: <8760fyobo9.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <7f0b8d00-236d-37e8-5c1f-e7ea8e4b9146@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-Id: <23b82458-1c39-b728-986a-685f64c63a47@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] TPM status
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 2/3] scripts/run-coverity-scan: Script to
+ run Coverity Scan build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,52 +31,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Amarnath Valluri <amarnath.valluri@intel.com>, qemu devel list <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Jones <pjones@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Javier Martinez Canillas <javierm@redhat.com>
-
-On 06/14/2017 09:51 AM, Laszlo Ersek wrote:
-> Hi Stefan,
->
-> the MAINTAINERS file doesn't seem to cover any of the TPM-related files
-> in the tree:
->
->    backends/tpm.c
->    hw/tpm/
->    include/hw/acpi/tpm.h
->    include/sysemu/tpm*
->    tpm.c
->
-> but I have a gut feeling that you are semi-officially maintaining TPM
-> anyway, so I'm going to ask you. :)
->
-> Can you please write a document, to be placed under docs/specs/, that
-> describes the TPM device from a guest perspective, also explaining how
-> the guest-visible bits are connected to (current) TPM backend(s)?
->
-> The document wouldn't have to be very long; I think all standardized
-> interfaces could be mentioned by reference only (by spec names and
-> locations). The document should however describe any QEMU specifics, and
-> how the relevant specs are brought together in the implementation.
->
-> Some text files I'm familiar with and can recommend as examples:
-> - docs/specs/fw_cfg.txt
-> - docs/specs/pvpanic.txt
-> - docs/specs/vmgenid.txt
->
-> (There may be more and/or better examples of course.)
->
-> This document should be the starting point for developers that want to
-> support QEMU's TPM(s) in guest firmware that is different from SeaBIOS.
-> (You've been maintaining the related SeaBIOS feature.)
->
-> Would you be willing to author such a design document?
-
-I'll look into that. Give me some time...
-
-    Stefan
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
 
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> Add a new script to automate the process of running the Coverity
+> Scan build tools and uploading the resulting tarball to the
+> website. This is primarily intended to be driven from Travis,
+> but it can be run locally (if you are a maintainer of the
+> QEMU project on the Coverity Scan website and have the secret
+> upload token).
 >
-> Thank you,
-> Laszlo
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+
+> ---
+>  scripts/run-coverity-scan | 170 ++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 170 insertions(+)
+>  create mode 100755 scripts/run-coverity-scan
 >
+> diff --git a/scripts/run-coverity-scan b/scripts/run-coverity-scan
+> new file mode 100755
+> index 0000000..e6d5fc5
+> --- /dev/null
+> +++ b/scripts/run-coverity-scan
+> @@ -0,0 +1,170 @@
+> +#!/bin/sh -e
+> +
+> +# Upload a created tarball to Coverity Scan, as per
+> +# https://scan.coverity.com/projects/qemu/builds/new
+> +
+> +# This work is licensed under the terms of the GNU GPL version 2,
+> +# or (at your option) any later version.
+> +# See the COPYING file in the top-level directory.
+> +#
+> +# Copyright (c) 2017 Linaro Limited
+> +# Written by Peter Maydell
+> +
+> +# Note that this script will automatically download and
+> +# run the (closed-source) coverity build tools, so don't
+> +# use it if you don't trust them!
+> +
+> +# This script assumes that you're running it from a QEMU source
+> +# tree, and that tree is a fresh clean one, because we do an in-tree
+> +# build. (This is necessary so that the filenames that the Coverity
+> +# Scan server sees are relative paths that match up with the component
+> +# regular expressions it uses; an out-of-tree build won't work for this.)
+> +# The host machine should have as many of QEMU's dependencies
+> +# installed as possible, for maximum coverity coverage.
+> +
+> +# You need to pass the following environment variables to the script:
+> +#  COVERITY_TOKEN -- this is the secret 8 digit hex string which lets
+> +#                    you upload to Coverity Scan. If you're a maintainer
+> +#                    in Coverity then the web UI will tell you this.
+> +#  COVERITY_EMAIL -- the email address to use for uploads
+> +
+> +# and optionally
+> +#  COVERITY_DRYRUN -- set to not actually do the upload
+> +#  COVERITY_BUILD_CMD -- make command (defaults to 'make -j8')
+> +#  COVERITY_TOOL_BASE -- set to directory to put coverity tools
+> +#                        (defaults to /tmp/coverity-tools)
+> +
+> +# The primary purpose of this script is to be run as part of
+> +# a Travis build, but it is possible to run it manually locally.
+> +
+> +if [ -z "$COVERITY_TOKEN" ]; then
+> +    echo "COVERITY_TOKEN environment variable not set"
+> +    exit 1
+> +fi
+> +
+> +if [ -z "$COVERITY_EMAIL" ]; then
+> +    echo "COVERITY_EMAIL environment variable not set"
+> +    exit 1
+> +fi
+> +
+> +if [ -z "$COVERITY_BUILD_CMD" ]; then
+> +    echo "COVERITY_BUILD_CMD: using default 'make -j8'"
+> +    COVERITY_BUILD_CMD="make -j8"
+> +fi
+> +
+> +if [ -z "$COVERITY_TOOL_BASE" ]; then
+> +    echo "COVERITY_TOOL_BASE: using default /tmp/coverity-tools"
+> +    COVERITY_TOOL_BASE=/tmp/coverity-tools
+> +fi
+> +
+> +PROJTOKEN="$COVERITY_TOKEN"
+> +PROJNAME=QEMU
+> +TARBALL=cov-int.tar.xz
+> +SRCDIR="$(pwd)"
+> +
+> +echo "Checking this is a QEMU source tree..."
+> +if ! [ -e VERSION ]; then
+> +    echo "Not in a QEMU source tree?"
+> +    exit 1
+> +fi
+> +
+> +echo "Checking upload permissions..."
+> +
+> +if ! up_perm="$(wget https://scan.coverity.com/api/upload_permitted --post-data "token=$PROJTOKEN&project=$PROJNAME" -q -O -)"; then
+> +    echo "Coverity Scan API access denied: bad token?"
+> +    exit 1
+> +fi
+> +
+> +# Really up_perm is a JSON response with either
+> +# {upload_permitted:true} or {next_upload_permitted_at:<date>}
+> +# We do some hacky string parsing instead of properly parsing it.
+> +case "$up_perm" in
+> +    *upload_permitted*true*)
+> +        echo "Coverity Scan: upload permitted"
+> +        ;;
+> +    *next_upload_permitted_at*)
+> +        if [ -z "$COVERITY_DRYRUN" ]; then
+> +            echo "Coverity Scan: upload quota reached; stopping here"
+> +            # Exit success as this isn't a build error.
+> +            exit 0
+> +        else
+> +            echo "Coverity Scan: upload quota reached, continuing dry run"
+> +        fi
+> +        ;;
+> +    *)
+> +        echo "Coverity Scan upload check: unexpected result $up_perm"
+> +        exit 1
+> +        ;;
+> +esac
+> +
+> +mkdir -p "$COVERITY_TOOL_BASE"
+> +cd "$COVERITY_TOOL_BASE"
+> +
+> +echo "Checking for new version of coverity build tools..."
+> +wget https://scan.coverity.com/download/linux64 --post-data "token=$PROJTOKEN&project=$PROJNAME&md5=1" -O coverity_tool.md5.new
+> +
+> +if ! cmp -s coverity_tool.md5 coverity_tool.md5.new; then
+> +    # out of date md5 or no md5: download new build tool
+> +    # blow away the old build tool
+> +    echo "Downloading coverity build tools..."
+> +    rm -rf coverity_tool coverity_tool.tgz
+> +    wget https://scan.coverity.com/download/linux64 --post-data "token=$PROJTOKEN&project=$PROJNAME" -O coverity_tool.tgz
+> +    if ! (cat coverity_tool.md5.new; echo "  coverity_tool.tgz") | md5sum -c --status; then
+> +        echo "Downloaded tarball didn't match md5sum!"
+> +        exit 1
+> +    fi
+> +    # extract the new one, keeping it corralled in a 'coverity_tool' directory
+> +    echo "Unpacking coverity build tools..."
+> +    mkdir -p coverity_tool
+> +    cd coverity_tool
+> +    tar xf ../coverity_tool.tgz
+> +    cd ..
+> +    mv coverity_tool.md5.new coverity_tool.md5
+> +fi
+> +
+> +rm -f coverity_tool.md5.new
+> +
+> +TOOLBIN="$(echo $(pwd)/coverity_tool/cov-analysis-*/bin)"
+> +
+> +if ! test -x "$TOOLBIN/cov-build"; then
+> +    echo "Couldn't find cov-build in the coverity build-tool directory??"
+> +    exit 1
+> +fi
+> +
+> +export PATH="$TOOLBIN:$PATH"
+> +
+> +cd "$SRCDIR"
+> +
+> +echo "Doing make distclean..."
+> +make distclean
+> +
+> +echo "Configuring..."
+> +./configure --audio-drv-list=oss,alsa,sdl,pa --disable-werror
+> +
+> +echo "Making libqemustub.a..."
+> +make libqemustub.a
+> +
+> +echo "Running cov-build..."
+> +rm -rf cov-int
+> +mkdir cov-int
+> +cov-build --dir cov-int $COVERITY_BUILD_CMD
+> +
+> +echo "Creating results tarball..."
+> +tar cvf - cov-int | xz > "$TARBALL"
+> +
+> +echo "Uploading results tarball..."
+> +
+> +VERSION="$(git describe --always HEAD)"
+> +DESCRIPTION="$(git rev-parse HEAD)"
+> +
+> +if ! [ -z "$COVERITY_DRYRUN" ]; then
+> +    echo "Dry run only, not uploading $TARBALL"
+> +    exit 0
+> +fi
+> +
+> +curl --form token="$PROJTOKEN" --form email="$COVERITY_EMAIL" \
+> +     --form file=@"$TARBALL" --form version="$VERSION" \
+> +     --form description="$DESCRIPTION" \
+> +     https://scan.coverity.com/builds?project="$PROJNAME"
+> +
+> +echo "Done."
+
+
+--
+Alex Bennée
