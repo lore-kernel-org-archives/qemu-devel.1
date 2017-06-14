@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dL6Kc-0003al-Jz
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:19:27 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dL6Mp-0004iX-3M
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:21:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dL6Kb-0005f9-R8
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:19:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33299)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dL6Kb-0005ek-KV
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:19:25 -0400
-References: <20170606181948.16238-1-rkagan@virtuozzo.com>
-	<20170606181948.16238-21-rkagan@virtuozzo.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <43a7c4b5-1445-a48f-b45b-f15030bb81b6@redhat.com>
-Date: Wed, 14 Jun 2017 13:19:21 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1dL6Mo-0006b0-DB
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:21:43 -0400
+Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:35380)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dL6Mo-0006ag-4K
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:21:42 -0400
+Received: by mail-wr0-x235.google.com with SMTP id q97so185034657wrb.2
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 04:21:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170606181948.16238-21-rkagan@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 20/23] hyperv: process POST_MESSAGE
- hypercall
+In-Reply-To: <20170614082610.GB4370@redhat.com>
+References: <20170607175419.13558-1-berrange@redhat.com>
+	<CAFEAcA8eXe2+65KTYPHDpXgK2X3k=bdvVFdWfAAzP-OeWgL1gw@mail.gmail.com>
+	<20170614082610.GB4370@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 14 Jun 2017 12:21:17 +0100
+Message-ID: <CAFEAcA_K8zv-L1ZFHc_F01aXx1XHde09GbZwv+X8Yd7oy24miw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v1 0/5] Merge sockets 2017/06/07
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,23 +30,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+On 14 June 2017 at 09:26, Daniel P. Berrange <berrange@redhat.com> wrote:
+> Was this clang on OSX/FreeBSD too, or is that on Linux ? If the latter,
+> what are the args to use with configure to exercise this scenario ?
 
+Linux. For details of how to run the sanitizer, see
+http://wiki.qemu.org/Testing#clang_UBSan
 
-On 06/06/2017 20:19, Roman Kagan wrote:
-> +typedef struct MsgHandler {
-> +    struct rcu_head rcu;
-> +    QLIST_ENTRY(MsgHandler) le;
-> +    uint32_t conn_id;
-> +    HvMsgHandler handler;
-> +    void *data;
-> +} MsgHandler;
-> +
-> +static QLIST_HEAD(, MsgHandler) msg_handlers;
-> +static QemuMutex msg_handlers_mutex;
-
-Maybe use the same mutex for event and message handlers?
-
-Paolo
+thanks
+-- PMM
