@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35340)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dLEvr-00014v-4a
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 16:30:28 -0400
+	(envelope-from <cota@braap.org>) id 1dLEz8-0004G1-0c
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 16:33:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dLEvn-0005nS-Ul
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 16:30:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41661)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dLEvn-0005n5-PA
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 16:30:23 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BB44E3DEEB
-	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 20:30:22 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Wed, 14 Jun 2017 17:29:58 -0300
-Message-Id: <20170614203000.19984-4-ehabkost@redhat.com>
-In-Reply-To: <20170614203000.19984-1-ehabkost@redhat.com>
-References: <20170614203000.19984-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/5] memory: Add RAM_NONPERSISTENT flag
+	(envelope-from <cota@braap.org>) id 1dLEz6-0006yR-Vg
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 16:33:50 -0400
+Date: Wed, 14 Jun 2017 16:33:43 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170614203343.GB8420@flamenco>
+References: <20170614194821.8754-1-rth@twiddle.net>
+	<20170614194821.8754-6-rth@twiddle.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20170614194821.8754-6-rth@twiddle.net>
+Subject: [Qemu-devel] [PATCH] target/aarch64: exit to main loop after 'msr
+ daifclr'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,66 +25,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org, pbonzini@redhat.com, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-The new flag will make qemu_ram_free() discard the contents of the
-block.  It will be used to let QEMU be configured to avoid flushing file
-contents to disk when exiting.  As MADV_REMOVE is not always supported,
-the new code will try MADV_NOTNEEDED in case MADV_REMOVE fails.
+On Wed, Jun 14, 2017 at 12:48:21 -0700, Richard Henderson wrote:
+> Exit to cpu loop so we reevaluate cpu_arm_hw_interrupts.
+> 
+> Cc: qemu-arm@nongnu.org
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
+> ---
+>  target/arm/translate-a64.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index 860e279..e55547d 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -1422,7 +1422,9 @@ static void handle_msr_i(DisasContext *s, uint32_t insn,
+>          gen_helper_msr_i_pstate(cpu_env, tcg_op, tcg_imm);
+>          tcg_temp_free_i32(tcg_imm);
+>          tcg_temp_free_i32(tcg_op);
+> -        s->is_jmp = DISAS_UPDATE;
+> +        /* For DAIFClear, exit the cpu loop to re-evaluate pending IRQs.  */
+> +        gen_a64_set_pc_im(s->pc);
 
-The new flag will also indicate that ram_block_discard_range() can use
-MADV_REMOVE when discarding memory pages.  I have considered calling
-MADV_REMOVE unconditionally (as destroying the RAM contents seems to be
-OK every time ram_block_discard_range() is called), but for safety I
-decided to restrict the new code to blocks having RAM_NONPERSISTENT set.
+For op != 0x1f we end up setting the pc twice (first here, then in
+the switch statement). It's still correct though.
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> +        s->is_jmp = (op == 0x1f ? DISAS_EXIT : DISAS_JUMP);
+
+Could do without the parens.
+
+>          break;
+>      }
+>      default:
+> @@ -11369,6 +11371,9 @@ void gen_intermediate_code_a64(ARMCPU *cpu, TranslationBlock *tb)
+>          case DISAS_JUMP:
+>              tcg_gen_lookup_and_goto_ptr(cpu_pc);
+>              break;
+> +        case DISAS_EXIT:
+> +            tcg_gen_exit_tb(0);
+> +            break;
+
+We could also mention the regression in the commit log. In fact
+I just did that :-) feel free to reuse parts of the below.
+
+Thanks,
+
+		E.
+
+--- 8< ---
+
+Commit e75449a3 ("target/aarch64: optimize indirect branches") causes
+a regression by which -smp > 1 freezes under TCG, even with
+`-accel accel=tcg,thread=single' (i.e. MTTCG disabled).
+
+The cause of the regression is well described here by Alex:
+On Wed, Jun 14, 2017 at 15:02:06 +0100, Alex Bennée wrote:
+> Fundamentally the problem was that an interrupt was pending
+> (interrupt_request was set) but the "msr daifclr" operations when the
+> kernel did local_irq/fiq_enable() never got handled because the
+> cpu_idle loop was being very efficiently chained. As a result we never
+> got around to exiting the TCG code and calling arm_cpu_do_interrupt
+> which would then raise the IRQ to move things on
+> [ Message-Id: <20170614140209.29847-1-alex.bennee@linaro.org> ]
+
+Fix it by enforcing an exit to the main loop right after 'msr daifclr'
+is executed.
+
+Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- exec.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+ target/arm/translate-a64.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/exec.c b/exec.c
-index 585d6ed6d7..a6e9ed4ece 100644
---- a/exec.c
-+++ b/exec.c
-@@ -102,6 +102,11 @@ static MemoryRegion io_mem_unassigned;
-  */
- #define RAM_RESIZEABLE (1 << 2)
- 
-+/* RAMBlock contents are not persistent, and we can discard memory contents
-+ * when freeing the memory block.
-+ */
-+#define RAM_NONPERSISTENT (1 << 3)
-+
- #endif
- 
- #ifdef TARGET_PAGE_BITS_VARY
-@@ -2061,6 +2066,10 @@ void qemu_ram_free(RAMBlock *block)
-         ram_block_notify_remove(block->host, block->max_length);
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 860e279..323e419 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -1422,7 +1422,8 @@ static void handle_msr_i(DisasContext *s, uint32_t insn,
+         gen_helper_msr_i_pstate(cpu_env, tcg_op, tcg_imm);
+         tcg_temp_free_i32(tcg_imm);
+         tcg_temp_free_i32(tcg_op);
+-        s->is_jmp = DISAS_UPDATE;
++        /* force exit to the main loop for DAIFClear */
++        s->is_jmp = op == 0x1f ? DISAS_EXIT : DISAS_UPDATE;
+         break;
      }
- 
-+    if (block->flags & RAM_NONPERSISTENT) {
-+        ram_block_discard_range(block, 0, block->max_length);
-+    }
-+
-     qemu_mutex_lock_ramlist();
-     QLIST_REMOVE_RCU(block, next);
-     ram_list.mru_block = NULL;
-@@ -3537,7 +3546,13 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
-             /* Note: We need the madvise MADV_DONTNEED behaviour of definitely
-              * freeing the page.
-              */
--            ret = madvise(host_startaddr, length, MADV_DONTNEED);
-+            if (rb->flags & RAM_NONPERSISTENT) {
-+                ret = madvise(host_startaddr, length, MADV_REMOVE);
-+            }
-+            /* Fallback to MADV_DONTNEED if MADV_REMOVE fails */
-+            if (ret || !(rb->flags & RAM_NONPERSISTENT)) {
-+                ret = madvise(host_startaddr, length, MADV_DONTNEED);
-+            }
- #endif
-         } else {
-             /* Huge page case  - unfortunately it can't do DONTNEED, but
+     default:
+@@ -11362,6 +11363,10 @@ void gen_intermediate_code_a64(ARMCPU *cpu, TranslationBlock *tb)
+         case DISAS_NEXT:
+             gen_goto_tb(dc, 1, dc->pc);
+             break;
++        case DISAS_EXIT:
++            gen_a64_set_pc_im(dc->pc);
++            tcg_gen_exit_tb(0);
++            break;
+         default:
+         case DISAS_UPDATE:
+             gen_a64_set_pc_im(dc->pc);
 -- 
-2.11.0.259.g40922b1
+2.7.4
