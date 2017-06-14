@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dLEs4-0005zO-ED
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 16:26:33 -0400
+	(envelope-from <cota@braap.org>) id 1dLEt8-0007Ea-60
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 16:27:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dLEs0-0004Pe-G1
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 16:26:32 -0400
-Resent-Message-Id: <E1dLEs0-0004Pe-G1@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21340)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dLEs0-0004PS-7I
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 16:26:28 -0400
-In-Reply-To: <20170614194821.8754-1-rth@twiddle.net>
-Message-ID: <149747198022.1965.17818028554584922608@4a9a010726c0>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <cota@braap.org>) id 1dLEt4-0004e9-7L
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 16:27:38 -0400
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:40741)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dLEt4-0004dq-0j
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 16:27:34 -0400
+Date: Wed, 14 Jun 2017 16:27:33 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170614202733.GA8420@flamenco>
+References: <20170614194821.8754-1-rth@twiddle.net>
+	<20170614194821.8754-2-rth@twiddle.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 14 Jun 2017 13:26:20 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] Fixes for TCG hangs
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20170614194821.8754-2-rth@twiddle.net>
+Subject: [Qemu-devel] [PATCH] tcg-runtime: increase hit rate of lookup_tb_ptr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +28,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: rth@twiddle.net
-Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, cota@braap.org, alex.bennee@linaro.org
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org, pbonzini@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA2MTQxOTQ4MjEuODc1NC0xLXJ0aEB0d2lkZGxlLm5ldApTdWJqZWN0OiBbUWVtdS1kZXZlbF0g
-W1BBVENIIHYyIDAvNV0gRml4ZXMgZm9yIFRDRyBoYW5ncwpUeXBlOiBzZXJpZXMKCj09PSBURVNU
-IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQg
-bG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1
-ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9y
-IGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQo
-Z2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1m
-b3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4K
-ICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUK
-CmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
-MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
-J3Rlc3QnCjQzZmI5YjggdGFyZ2V0L2FybTogRXhpdCBhZnRlciBjbGVhcmluZyBpbnRlcnJ1cHQg
-bWFzawoxMTY5M2NhIHRhcmdldC9zMzkweDogRXhpdCBhZnRlciBjaGFuZ2luZyBQU1cgbWFzawow
-YTJlNGU0IHRhcmdldC9taXBzOiBFeGl0IGFmdGVyIGVuYWJsaW5nIGludGVycnVwdHMKYzE0Nzc5
-NCB0YXJnZXQvYWxwaGE6IFVzZSB0Y2dfZ2VuX2xvb2t1cF9hbmRfZ290b19wdHIKNTM0OTliZSB0
-Y2c6IFJlZmFjdG9yIGhlbHBlcl9sb29rdXBfdGJfcHRyCgo9PT0gT1VUUFVUIEJFR0lOID09PQpD
-aGVja2luZyBQQVRDSCAxLzU6IHRjZzogUmVmYWN0b3IgaGVscGVyX2xvb2t1cF90Yl9wdHIuLi4K
-Q2hlY2tpbmcgUEFUQ0ggMi81OiB0YXJnZXQvYWxwaGE6IFVzZSB0Y2dfZ2VuX2xvb2t1cF9hbmRf
-Z290b19wdHIuLi4KRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMg
-YXJlIG5vdCByZXF1aXJlZAojMjc6IEZJTEU6IHRhcmdldC9hbHBoYS90cmFuc2xhdGUuYzo0NjQ6
-CisgICAgcmV0dXJuICgoY3R4LT50Yi0+Y2ZsYWdzICYgQ0ZfTEFTVF9JTykKCnRvdGFsOiAxIGVy
-cm9ycywgMCB3YXJuaW5ncywgNjYgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMy81OiB0YXJnZXQvbWlwczogRXhpdCBh
-ZnRlciBlbmFibGluZyBpbnRlcnJ1cHRzLi4uCkNoZWNraW5nIFBBVENIIDQvNTogdGFyZ2V0L3Mz
-OTB4OiBFeGl0IGFmdGVyIGNoYW5naW5nIFBTVyBtYXNrLi4uCkNoZWNraW5nIFBBVENIIDUvNTog
-dGFyZ2V0L2FybTogRXhpdCBhZnRlciBjbGVhcmluZyBpbnRlcnJ1cHQgbWFzay4uLgo9PT0gT1VU
-UFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWls
-IGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9d
-LgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9y
-Zw==
+On Wed, Jun 14, 2017 at 12:48:17 -0700, Richard Henderson wrote:
+> We can call tb_htable_lookup even when the tb_jmp_cache
+> is completely empty.  Therefore, un-nest most of the code
+> dependent on tb != NULL from the read from the cache.
+> 
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
+
+I just wrote this alternative patch, which does the same thing
+as yours. I also measured what the effect of this change
+has on the hit rate of lookup_tb_ptr. Feel free to reuse parts
+of the patch and/or the commit message!
+
+Thanks,
+
+		E.
+
+--- 8< ---
+
+Strangely, we do not look up the tb in the global hash table
+when we get NULL from tb_jmp_cache.
+
+Fix it, which improves the hit rate of lookup_tb_ptr; for instance,
+when booting and immediately shutting down debian-arm, the hit
+rate improves from
+	93.150742% (before this patch)
+to
+	99.451323 % (after).
+
+While at it, use a variable for the tb_jmp_cache hash and get rid
+of the goto's.
+
+Suggested-by: Richard Henderson <rth@twiddle.net>
+Suggested-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+---
+ tcg-runtime.c | 20 ++++++++------------
+ 1 file changed, 8 insertions(+), 12 deletions(-)
+
+diff --git a/tcg-runtime.c b/tcg-runtime.c
+index 7fa90ce..09324b9 100644
+--- a/tcg-runtime.c
++++ b/tcg-runtime.c
+@@ -149,23 +149,19 @@ void *HELPER(lookup_tb_ptr)(CPUArchState *env, target_ulong addr)
+     CPUState *cpu = ENV_GET_CPU(env);
+     TranslationBlock *tb;
+     target_ulong cs_base, pc;
++    unsigned int hash = tb_jmp_cache_hash_func(addr);
+     uint32_t flags;
+ 
+-    tb = atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)]);
+-    if (likely(tb)) {
+-        cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
+-        if (likely(tb->pc == addr && tb->cs_base == cs_base &&
+-                   tb->flags == flags)) {
+-            goto found;
+-        }
++    tb = atomic_rcu_read(&cpu->tb_jmp_cache[hash]);
++    cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
++    if (unlikely(tb == NULL || tb->pc != addr || tb->cs_base != cs_base ||
++               tb->flags != flags)) {
+         tb = tb_htable_lookup(cpu, addr, cs_base, flags);
+-        if (likely(tb)) {
+-            atomic_set(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)], tb);
+-            goto found;
++        if (unlikely(tb == NULL)) {
++            return tcg_ctx.code_gen_epilogue;
+         }
++        atomic_set(&cpu->tb_jmp_cache[hash], tb);
+     }
+-    return tcg_ctx.code_gen_epilogue;
+- found:
+     qemu_log_mask_and_addr(CPU_LOG_EXEC, addr,
+                            "Chain %p [%d: " TARGET_FMT_lx "] %s\n",
+                            tb->tc_ptr, cpu->cpu_index, addr,
+-- 
+2.7.4
