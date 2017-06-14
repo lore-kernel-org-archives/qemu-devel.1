@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1dLBgb-0003q4-JA
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:02:32 -0400
+	(envelope-from <david@redhat.com>) id 1dLBgz-0004JB-Gv
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:02:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1dLBgW-0002sD-OO
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:02:29 -0400
-Received: from us-smtp-delivery-101.mimecast.com ([63.128.21.101]:44468)
+	(envelope-from <david@redhat.com>) id 1dLBgy-00030P-K6
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:02:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57800)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <felipe@nutanix.com>) id 1dLBgW-0002rr-F7
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:02:24 -0400
-From: Felipe Franciosi <felipe@nutanix.com>
-Date: Wed, 14 Jun 2017 17:02:17 +0000
-Message-ID: <F0D8D81A-19F6-4311-95C6-B30B38FCB2BC@nutanix.com>
-References: <149745954462.1611.12282014261512444009@4a9a010726c0>
-In-Reply-To: <149745954462.1611.12282014261512444009@4a9a010726c0>
-Content-Language: en-US
-Content-ID: <DF8297DF6995124381EFE4D8DEBAFD20@namprd02.prod.outlook.com>
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dLBgy-00030A-EK
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:02:52 -0400
+References: <20170613214736.19963-1-david@redhat.com>
+	<20170613214736.19963-3-david@redhat.com>
+	<3c564230-7879-45ff-ffa1-c4e7bea17902@twiddle.net>
+	<52401112-57c8-201f-d091-afb3a196412f@redhat.com>
+	<e379cef7-90e9-46d5-6872-3d069f39fd6a@twiddle.net>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <0959e60a-7894-d7d7-0bfe-dbb19b162875@redhat.com>
+Date: Wed, 14 Jun 2017 19:02:48 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH] vhost-user: support cross-endianess
- negatiation
+In-Reply-To: <e379cef7-90e9-46d5-6872-3d069f39fd6a@twiddle.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 2/3] target/s390x: implement mvcos
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +32,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>, "famz@redhat.com" <famz@redhat.com>
-Cc: Mike Cui <cui@nutanix.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo
-	Bonzini <pbonzini@redhat.com>
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+Cc: agraf@suse.de, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, Miroslav Benes <mbenes@suse.cz>
 
-DQo+IE9uIDE0IEp1biAyMDE3LCBhdCAxNzo1OSwgbm8tcmVwbHlAcGF0Y2hldy5vcmcgd3JvdGU6
-DQo+IA0KPiBIaSwNCj4gDQo+IFRoaXMgc2VyaWVzIGZhaWxlZCBhdXRvbWF0aWMgYnVpbGQgdGVz
-dC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMgYW5kDQo+IHRoZWlyIG91dHB1dCBi
-ZWxvdy4gSWYgeW91IGhhdmUgZG9ja2VyIGluc3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXBy
-b2R1Y2UgaXQNCj4gbG9jYWxseS4NCj4gDQo+IE1lc3NhZ2UtaWQ6IDE0OTc0NTg0ODYtMTU2NzMt
-MS1naXQtc2VuZC1lbWFpbC1mZWxpcGVAbnV0YW5peC5jb20NCj4gVHlwZTogc2VyaWVzDQo+IFN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIHZob3N0LXVzZXI6IHN1cHBvcnQgY3Jvc3MtZW5k
-aWFuZXNzIG5lZ2F0aWF0aW9uDQo+IA0KLi4uDQo+IA0KPiAgQ0MgICAgICBody9wY2ktYnJpZGdl
-L3BjaV9leHBhbmRlcl9icmlkZ2Uubw0KPiBJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3RtcC9xZW11
-LXRlc3Qvc3JjL2h3L25ldC92bXhuZXQzLmM6MzA6DQo+IC90bXAvcWVtdS10ZXN0L3NyYy9pbmNs
-dWRlL21pZ3JhdGlvbi9yZWdpc3Rlci5oOjE4OiBlcnJvcjogcmVkZWZpbml0aW9uIG9mIHR5cGVk
-ZWYg4oCYTG9hZFN0YXRlSGFuZGxlcuKAmQ0KPiAvdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9t
-aWdyYXRpb24vdm1zdGF0ZS5oOjMyOiBub3RlOiBwcmV2aW91cyBkZWNsYXJhdGlvbiBvZiDigJhM
-b2FkU3RhdGVIYW5kbGVy4oCZIHdhcyBoZXJlDQo+IG1ha2U6ICoqKiBbaHcvbmV0L3ZteG5ldDMu
-b10gRXJyb3IgMQ0KPiBtYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLg0K
-PiB0ZXN0cy9kb2NrZXIvTWFrZWZpbGUuaW5jbHVkZToxMTg6IHJlY2lwZSBmb3IgdGFyZ2V0ICdk
-b2NrZXItcnVuJyBmYWlsZWQNCj4gbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAyDQo+
-IG1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5ICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAt
-ZW5sM2l4eXIvc3JjJw0KPiB0ZXN0cy9kb2NrZXIvTWFrZWZpbGUuaW5jbHVkZToxNDk6IHJlY2lw
-ZSBmb3IgdGFyZ2V0ICdkb2NrZXItcnVuLXRlc3QtYnVpbGRAbWluLWdsaWInIGZhaWxlZA0KPiBt
-YWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1idWlsZEBtaW4tZ2xpYl0gRXJyb3IgMg0KPiA9PT0g
-T1VUUFVUIEVORCA9PT0NCj4gDQo+IFRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAyDQoN
-ClRoYXQgc2VlbXMgY29tcGxldGVseSB1bnJlbGF0ZWQgdG8gd2hhdCBvdXIgcGF0Y2ggdG91Y2hl
-ZC4uLiBJJ20gZ29ubmEgZ3Vlc3MgdGhpcyBpcyBhIGtub3duIGlzc3VlIGFuZCBJIGNhbiBzYWZl
-bHkgaWdub3JlIGl0Pw0KDQpUaGFua3MsDQpGLg==
+
+>> Would it makes sense to
+>>
+>> a) move cpu_restore_state() into program_interrupt()
+>> b) make all callers forward ra from GETPC() (problem with kvm code that
+>> share handlers?)
+>> c) fixup callers that already do the cpu_restore_state()
+>> d) drop potential_page_fault() completely
+> 
+> Yes, that makes sense.  For B, kvm can pass 0 for RA and nothing will happen. 
+> For C, that project is on-going but not complete; D is indeed the ultimate goal.
+> 
+>> Two questions:
+>> a) Could we avoid having to forward the ra by doing GETPC directly in
+>> program_interrupt()? In mem_helper, I can see that we do GETPC on
+>> several places and pass it around, so I assume GETPC() has to be called
+>> in the first handler?
+> 
+> You must use GETPC in the first handler.  We're looking for the address of the 
+> TCG generated code from where we were called.  So, no, you can't use GETPC from 
+> program_interrupt.
+> 
+>> b) With cpu_restore_state(), there is no need for update_psw_addr() +
+>> update_cc_op(), correct?
+> 
+> Correct.
+
+Thanks for the clarification!
+
+> 
+>>>> +    potential_page_fault(s);
+>>>> +    gen_helper_mvcos(cc_op, cpu_env, o->addr1, o->in2, regs[r3]);
+>>>
+>>> ... the potential_page_fault.
+>>
+>> I would suggest to leave it in this patch as it and then clean it up all
+>> together in one shot (adding 5 cpu_restore_state() vs. one
+>> potential_page_fault() temporarily looks better to me).
+> 
+> I would say the opposite, since the code generated by potential_page_fault is 
+> always executed, whereas the cpu_restore_state is on an error path which for a 
+> well-behaved guest will never be executed.
+
+By temporary I meant:
+I will be looking into cleaning this all up and getting rid of
+potential_page_fault() soon :)
+
+However, in v2 I avoided potential_page_fault().
+
+> 
+> 
+> r~
+> 
+
+Thanks!
+
+-- 
+
+Thanks,
+
+David
