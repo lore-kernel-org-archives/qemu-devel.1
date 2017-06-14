@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60347)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dL2BA-000389-T5
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 02:53:25 -0400
+	(envelope-from <bounces@canonical.com>) id 1dL2Da-0005Ly-A5
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 02:55:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dL2B6-0007an-52
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 02:53:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38098)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dL2B5-0007aG-Su
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 02:53:20 -0400
-Date: Wed, 14 Jun 2017 14:53:13 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170614065313.GJ11751@pxdev.xzpeter.org>
-References: <1497346593-8791-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170613093801eucas1p1e2b34c1a72b7150a28007d5b187da82e@eucas1p1.samsung.com>
-	<1497346593-8791-3-git-send-email-a.perevalov@samsung.com>
-	<20170614051223.GH11751@pxdev.xzpeter.org>
-	<516e826e-5469-81b6-b23b-12f9b759bd64@samsung.com>
+	(envelope-from <bounces@canonical.com>) id 1dL2DV-0008L0-DI
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 02:55:54 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51050)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dL2DU-0008Ks-Uc
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 02:55:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dL2DS-0003mA-Gk
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 06:55:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 39B5B2E819C
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 06:55:46 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <516e826e-5469-81b6-b23b-12f9b759bd64@samsung.com>
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] migration: add bitmap for copied
- page
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 14 Jun 2017 06:39:38 -0000
+From: Thomas Huth <1047576@bugs.launchpad.net>
+Reply-To: Bug 1047576 <1047576@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20120907191638.8105.79748.malonedeb@chaenomeles.canonical.com>
+Message-Id: <149742237855.1837.13861377009798390306.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1047576] Re: qemu unittest emulator failure on
+ latest git master
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,110 +37,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>
-Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, quintela@redhat.com, dgilbert@redhat.com
+To: qemu-devel@nongnu.org
 
-On Wed, Jun 14, 2017 at 09:39:53AM +0300, Alexey Perevalov wrote:
-> On 06/14/2017 08:12 AM, Peter Xu wrote:
-> >On Tue, Jun 13, 2017 at 12:36:33PM +0300, Alexey Perevalov wrote:
-> >>This patch adds ability to track down already copied
-> >>pages, it's necessary for calculation vCPU block time in
-> >>postcopy migration feature, maybe for restore after
-> >>postcopy migration failure.
-> >>Also it's necessary to solve shared memory issue in
-> >>postcopy livemigration. Information about copied pages
-> >>will be transferred to the software virtual bridge
-> >>(e.g. OVS-VSWITCHD), to avoid fallocate (unmap) for
-> >>already copied pages. fallocate syscall is required for
-> >>remmaped shared memory, due to remmaping itself blocks
-> >>ioctl(UFFDIO_COPY, ioctl in this case will end with EEXIT
-> >>error (struct page is exists after remmap).
-> >>
-> >>Bitmap is placed into RAMBlock as another postcopy/precopy
-> >>related bitmaps.
-> >>
-> >>copied bitmap is not releasing due to ramblocks is not releasing
-> >>too.
-> >>
-> >>Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-> >>---
-> >>  include/exec/ram_addr.h       |  3 +++
-> >>  include/migration/migration.h |  3 +++
-> >>  migration/postcopy-ram.c      |  7 ++++++
-> >>  migration/ram.c               | 54 ++++++++++++++++++++++++++++++++++++++++++-
-> >>  migration/ram.h               |  5 ++++
-> >>  migration/savevm.c            |  1 +
-> >>  6 files changed, 72 insertions(+), 1 deletion(-)
-> >>
-> >>diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-> >>index 140efa8..56cdf16 100644
-> >>--- a/include/exec/ram_addr.h
-> >>+++ b/include/exec/ram_addr.h
-> >>@@ -47,6 +47,9 @@ struct RAMBlock {
-> >>       * of the postcopy phase
-> >>       */
-> >>      unsigned long *unsentmap;
-> >>+    /* bitmap of already copied pages in postcopy */
-> >>+    unsigned long *copiedmap;
-> >>+    size_t nr_copiedmap;
-> >Do we really need this?
-> This and question about
-> 
-> ram_discard_range Juan already asked.
-> I just repeat nr_copiedmap - premature optimization )
-> ram_discard_range - I forgot to clean up patch.
-> 
-> >
-> >>  };
-> >>  static inline bool offset_in_ramblock(RAMBlock *b, ram_addr_t offset)
-> >>diff --git a/include/migration/migration.h b/include/migration/migration.h
-> >>index 79b5484..8005c11 100644
-> >>--- a/include/migration/migration.h
-> >>+++ b/include/migration/migration.h
-> >>@@ -226,4 +226,7 @@ void savevm_skip_configuration(void);
-> >>  int global_state_store(void);
-> >>  void global_state_store_running(void);
-> >>+size_t get_copiedmap_size(RAMBlock *rb);
-> >>+void movecopiedmap(void *dst, RAMBlock *rb, size_t len);
-> >>+
-> >>  #endif
-> >>diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> >>index f6244ee..e13b22e 100644
-> >>--- a/migration/postcopy-ram.c
-> >>+++ b/migration/postcopy-ram.c
-> >>@@ -576,6 +576,13 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
-> >>      copy_struct.len = pagesize;
-> >>      copy_struct.mode = 0;
-> >>+
-> >>+    /* copied page isn't feature of blocktime calculation,
-> >>+     * it's more general entity, so keep it here,
-> >>+     * but gup betwean two following operation could be high,
-> >>+     * and in this case blocktime for such small interval will be lost */
-> >>+    set_copiedmap_by_addr(host, rb);
-> >>+
-> >I guess this is not enough?
-> yes, zero pages were missed
-> >
-> >For postcopy, you may have missed to trap in
-> >postcopy_place_page_zero() when pagesize == getpagesize() (we used
-> >UFFDIO_ZEROPAGE there)?
-> >
-> >(Btw, why not we trap all these in ram_load_postcopy()?)
-> I tried to place
-> 
-> set_copiedmap_by_addr as closer as possible to ioctl. It could be important to reduce probability of
-> race, also when I inform OVS-VSWITCH (patches not yet published), it's important to reduce time between
-> mark page as copied and really coping.
+Thanks for checking again!
 
-If so, I would suggest we comment this in the codes.
+** Changed in: qemu
+       Status: Incomplete =3D> Fix Released
 
-Btw, could you elaborate a bit in detail on why you need to "reduce
-the time" here? IMHO the ordering should matter and I can understand
-(and actually we can also achieve the ordering requirement if we put
-this handling in ram_load_postcopy()), but I cannot really understand
-when you say "it's important to reduce time between A and B"...
+-- =
 
-Thanks,
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1047576
 
--- 
-Peter Xu
+Title:
+  qemu unittest emulator failure on latest git master
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  Running the emulator unittest, using the cmdline:
+
+  16:01:30 INFO | Running emulator
+  16:01:30 INFO | Running qemu command (reformatted):
+  16:01:30 INFO | /home/lmr/Code/autotest.git/autotest/client/tests/virt/kv=
+m/qemu =
+
+  16:01:30 INFO |     -S =
+
+  16:01:30 INFO |     -name 'unittest_vm' =
+
+  16:01:30 INFO |     -nodefaults =
+
+  16:01:30 INFO |     -chardev socket,id=3Dhmp_id_humanmonitor1,path=3D/tmp=
+/monitor-humanmonitor1-20120907-155940-WomlFZY3,server,nowait =
+
+  16:01:30 INFO |     -mon chardev=3Dhmp_id_humanmonitor1,mode=3Dreadline =
+
+  16:01:30 INFO |     -chardev socket,id=3Dserial_id_20120907-155940-WomlFZ=
+Y3,path=3D/tmp/serial-20120907-155940-WomlFZY3,server,nowait =
+
+  16:01:30 INFO |     -device isa-serial,chardev=3Dserial_id_20120907-15594=
+0-WomlFZY3 =
+
+  16:01:30 INFO |     -chardev socket,id=3Dseabioslog_id_20120907-155940-Wo=
+mlFZY3,path=3D/tmp/seabios-20120907-155940-WomlFZY3,server,nowait =
+
+  16:01:30 INFO |     -device isa-debugcon,chardev=3Dseabioslog_id_20120907=
+-155940-WomlFZY3,iobase=3D0x402 =
+
+  16:01:30 INFO |     -m 512 =
+
+  16:01:30 INFO |     -smp 2,cores=3D1,threads=3D1,sockets=3D2 =
+
+  16:01:30 INFO |     -kernel '/home/lmr/Code/autotest.git/autotest/client/=
+tests/virt/kvm/unittests/emulator.flat' =
+
+  16:01:30 INFO |     -vnc :0 =
+
+  16:01:30 INFO |     -chardev file,id=3Dtestlog,path=3D/tmp/testlog-201209=
+07-155940-WomlFZY3 =
+
+  16:01:30 INFO |     -device testdev,chardev=3Dtestlog =
+
+  16:01:30 INFO |     -rtc base=3Dutc,clock=3Dhost,driftfix=3Dnone  =
+
+  16:01:30 INFO |     -boot order=3Dcdn,once=3Dc,menu=3Doff   =
+
+  16:01:30 INFO |     -S =
+
+  16:01:30 INFO |     -enable-kvm
+
+  We get
+
+  16:01:32 INFO | Waiting for unittest emulator to complete, timeout 600, o=
+utput in /tmp/testlog-20120907-155940-WomlFZY3
+  16:01:32 INFO | [qemu output] KVM internal error. Suberror: 1
+  16:01:32 INFO | [qemu output] emulation failure
+  16:01:32 INFO | [qemu output] RAX=3Dffffffffffffeff8 RBX=3Dffffffffffffe0=
+00 RCX=3Dfffffffffffff000 RDX=3D000000000044d2b0
+  16:01:32 INFO | [qemu output] RSI=3D000000000044c9fa RDI=3D000000000044e3=
+70 RBP=3Dffffffffffffeff8 RSP=3D000000000044d2b0
+  16:01:32 INFO | [qemu output] R8 =3D000000000000000a R9 =3D00000000000003=
+f8 R10=3D0000000000000000 R11=3D0000000000000000
+  16:01:32 INFO | [qemu output] R12=3Dffffffffffffe000 R13=3D000000001fff60=
+00 R14=3D000000001fff5000 R15=3D0000000000000000
+  16:01:32 INFO | [qemu output] RIP=3D0000000000400a89 RFL=3D00010002 [----=
+---] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HLT=3D0
+  16:01:32 INFO | [qemu output] ES =3D0010 0000000000000000 ffffffff 00c093=
+00 DPL=3D0 DS   [-WA]
+  16:01:32 INFO | [qemu output] CS =3D0008 0000000000000000 ffffffff 00a09b=
+00 DPL=3D0 CS64 [-RA]
+  16:01:32 INFO | [qemu output] SS =3D0000 0000000000000000 ffffffff 000000=
+00
+  16:01:32 INFO | [qemu output] DS =3D0010 0000000000000000 ffffffff 00c093=
+00 DPL=3D0 DS   [-WA]
+  16:01:32 INFO | [qemu output] FS =3D0010 0000000000000000 ffffffff 00c093=
+00 DPL=3D0 DS   [-WA]
+  16:01:32 INFO | [qemu output] GS =3D0010 000000000044c370 ffffffff 00c093=
+00 DPL=3D0 DS   [-WA]
+  16:01:32 INFO | [qemu output] LDT=3D0000 0000000000000000 0000ffff 000082=
+00 DPL=3D0 LDT
+  16:01:32 INFO | [qemu output] TR =3D0048 000000000040a452 0000ffff 00008b=
+00 DPL=3D0 TSS64-busy
+  16:01:32 INFO | [qemu output] GDT=3D     000000000040a00a 00000447
+  16:01:32 INFO | [qemu output] IDT=3D     0000000000000000 00000fff
+  16:01:32 INFO | [qemu output] CR0=3D80010011 CR2=3D0000000000000000 CR3=
+=3D000000001ffff000 CR4=3D00000020
+  16:01:32 INFO | [qemu output] DR0=3D0000000000000000 DR1=3D00000000000000=
+00 DR2=3D0000000000000000 DR3=3D0000000000000000
+  16:01:32 INFO | [qemu output] DR6=3D00000000ffff0ff0 DR7=3D00000000000004=
+00
+  16:01:32 INFO | [qemu output] EFER=3D0000000000000500
+  16:01:32 INFO | [qemu output] Code=3D88 77 00 49 8d 84 24 f8 0f 00 00 48 =
+89 e2 48 89 e9 48 89 c5 <c9> 48 87 e2 48 87 e9 48 81 f9 99 88 77 00 0f 94 c=
+0 48 39 d5 40 0f 94 c6 40 0f b6 f6 21 c6
+
+  More logs will be attached to this bug report.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1047576/+subscriptions
