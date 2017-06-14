@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44929)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dL0m0-0001mI-4m
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 01:23:22 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dL0m1-0001n6-H6
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 01:23:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dL0ly-0007K1-LD
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 01:23:20 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:36499)
+	(envelope-from <rth7680@gmail.com>) id 1dL0lz-0007KL-TY
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 01:23:21 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:35398)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dL0ly-0007Js-FK
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 01:23:18 -0400
-Received: by mail-qk0-x244.google.com with SMTP id r62so6489389qkf.3
-	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 22:23:18 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dL0lz-0007KF-ON
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 01:23:19 -0400
+Received: by mail-qt0-x242.google.com with SMTP id x58so39039332qtc.2
+	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 22:23:19 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue, 13 Jun 2017 22:23:02 -0700
-Message-Id: <20170614052311.13785-2-rth@twiddle.net>
+Date: Tue, 13 Jun 2017 22:23:03 -0700
+Message-Id: <20170614052311.13785-3-rth@twiddle.net>
 In-Reply-To: <20170614052311.13785-1-rth@twiddle.net>
 References: <20170614052311.13785-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 01/10] util: add cacheinfo
+Subject: [Qemu-devel] [PULL 02/10] tcg: allocate TB structs before the
+ corresponding translated code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,329 +32,203 @@ Cc: peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-Add helpers to gather cache info from the host at init-time.
+Allocating an arbitrarily-sized array of tbs results in either
+(a) a lot of memory wasted or (b) unnecessary flushes of the code
+cache when we run out of TB structs in the array.
 
-For now, only export the host's I/D cache line sizes, which we
-will use to improve cache locality to avoid false sharing.
+An obvious solution would be to just malloc a TB struct when needed,
+and keep the TB array as an array of pointers (recall that tb_find_pc()
+needs the TB array to run in O(log n)).
+
+Perhaps a better solution, which is implemented in this patch, is to
+allocate TB's right before the translated code they describe. This
+results in some memory waste due to padding to have code and TBs in
+separate cache lines--for instance, I measured 4.7% of padding in the
+used portion of code_gen_buffer when booting aarch64 Linux on a
+host with 64-byte cache lines. However, it can allow for optimizations
+in some host architectures, since TCG backends could safely assume that
+the TB and the corresponding translated code are very close to each
+other in memory. See this message by rth for a detailed explanation:
+
+  https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg05172.html
+  Subject: Re: GSoC 2017 Proposal: TCG performance enhancements
+  Message-ID: <1e67644b-4b30-887e-d329-1848e94c9484@twiddle.net>
 
 Suggested-by: Richard Henderson <rth@twiddle.net>
-Suggested-by: Geert Martin Ijewski <gm.ijewski@web.de>
-Tested-by:    Geert Martin Ijewski <gm.ijewski@web.de>
+Reviewed-by: Pranith Kumar <bobby.prani@gmail.com>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
-Message-Id: <1496794624-4083-1-git-send-email-cota@braap.org>
-[rth: Move all implementations from tcg/ppc/]
+Message-Id: <1496790745-314-3-git-send-email-cota@braap.org>
+[rth: Simplify the arithmetic in tcg_tb_alloc]
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- include/qemu/osdep.h     |   3 +
- tcg/ppc/tcg-target.inc.c |  71 +-----------------
- util/Makefile.objs       |   1 +
- util/cacheinfo.c         | 185 +++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 191 insertions(+), 69 deletions(-)
- create mode 100644 util/cacheinfo.c
+ include/exec/tb-context.h |  3 ++-
+ tcg/tcg.c                 | 20 ++++++++++++++++++++
+ tcg/tcg.h                 |  2 +-
+ translate-all.c           | 39 ++++++++++++++++++++++++---------------
+ 4 files changed, 47 insertions(+), 17 deletions(-)
 
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index fb008a2..8559634 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -483,4 +483,7 @@ char *qemu_get_pid_name(pid_t pid);
-  */
- pid_t qemu_fork(Error **errp);
+diff --git a/include/exec/tb-context.h b/include/exec/tb-context.h
+index c7f17f2..25c2afe 100644
+--- a/include/exec/tb-context.h
++++ b/include/exec/tb-context.h
+@@ -31,8 +31,9 @@ typedef struct TBContext TBContext;
  
-+extern int qemu_icache_linesize;
-+extern int qemu_dcache_linesize;
-+
- #endif
-diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-index 8d50f18..1f690df 100644
---- a/tcg/ppc/tcg-target.inc.c
-+++ b/tcg/ppc/tcg-target.inc.c
-@@ -2820,14 +2820,11 @@ void tcg_register_jit(void *buf, size_t buf_size)
+ struct TBContext {
+ 
+-    TranslationBlock *tbs;
++    TranslationBlock **tbs;
+     struct qht htable;
++    size_t tbs_size;
+     int nb_tbs;
+     /* any access to the tbs or the page table must use this lock */
+     QemuMutex tb_lock;
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index 564292f..3559829 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -383,6 +383,26 @@ void tcg_context_init(TCGContext *s)
+     }
  }
- #endif /* __ELF__ */
  
--static size_t dcache_bsize = 16;
--static size_t icache_bsize = 16;
--
- void flush_icache_range(uintptr_t start, uintptr_t stop)
++/*
++ * Allocate TBs right before their corresponding translated code, making
++ * sure that TBs and code are on different cache lines.
++ */
++TranslationBlock *tcg_tb_alloc(TCGContext *s)
++{
++    uintptr_t align = qemu_icache_linesize;
++    TranslationBlock *tb;
++    void *next;
++
++    tb = (void *)ROUND_UP((uintptr_t)s->code_gen_ptr, align);
++    next = (void *)ROUND_UP((uintptr_t)(tb + 1), align);
++
++    if (unlikely(next > s->code_gen_highwater)) {
++        return NULL;
++    }
++    s->code_gen_ptr = next;
++    return tb;
++}
++
+ void tcg_prologue_init(TCGContext *s)
  {
-     uintptr_t p, start1, stop1;
--    size_t dsize = dcache_bsize;
--    size_t isize = icache_bsize;
-+    size_t dsize = qemu_dcache_linesize;
-+    size_t isize = qemu_icache_linesize;
+     size_t prologue_size, total_size;
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 5ec48d1..9e37722 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -697,7 +697,6 @@ struct TCGContext {
+        here, because there's too much arithmetic throughout that relies
+        on addition and subtraction working on bytes.  Rely on the GCC
+        extension that allows arithmetic on void*.  */
+-    int code_gen_max_blocks;
+     void *code_gen_prologue;
+     void *code_gen_epilogue;
+     void *code_gen_buffer;
+@@ -756,6 +755,7 @@ static inline bool tcg_op_buf_full(void)
+ /* tb_lock must be held for tcg_malloc_internal. */
+ void *tcg_malloc_internal(TCGContext *s, int size);
+ void tcg_pool_reset(TCGContext *s);
++TranslationBlock *tcg_tb_alloc(TCGContext *s);
  
-     start1 = start & ~(dsize - 1);
-     stop1 = (stop + dsize - 1) & ~(dsize - 1);
-@@ -2844,67 +2841,3 @@ void flush_icache_range(uintptr_t start, uintptr_t stop)
-     asm volatile ("sync" : : : "memory");
-     asm volatile ("isync" : : : "memory");
+ void tb_lock(void);
+ void tb_unlock(void);
+diff --git a/translate-all.c b/translate-all.c
+index b3ee876..bb094ad 100644
+--- a/translate-all.c
++++ b/translate-all.c
+@@ -781,12 +781,13 @@ static inline void code_gen_alloc(size_t tb_size)
+         exit(1);
+     }
+ 
+-    /* Estimate a good size for the number of TBs we can support.  We
+-       still haven't deducted the prologue from the buffer size here,
+-       but that's minimal and won't affect the estimate much.  */
+-    tcg_ctx.code_gen_max_blocks
+-        = tcg_ctx.code_gen_buffer_size / CODE_GEN_AVG_BLOCK_SIZE;
+-    tcg_ctx.tb_ctx.tbs = g_new(TranslationBlock, tcg_ctx.code_gen_max_blocks);
++    /* size this conservatively -- realloc later if needed */
++    tcg_ctx.tb_ctx.tbs_size =
++        tcg_ctx.code_gen_buffer_size / CODE_GEN_AVG_BLOCK_SIZE / 8;
++    if (unlikely(!tcg_ctx.tb_ctx.tbs_size)) {
++        tcg_ctx.tb_ctx.tbs_size = 64 * 1024;
++    }
++    tcg_ctx.tb_ctx.tbs = g_new(TranslationBlock *, tcg_ctx.tb_ctx.tbs_size);
+ 
+     qemu_mutex_init(&tcg_ctx.tb_ctx.tb_lock);
  }
--
--#if defined _AIX
--#include <sys/systemcfg.h>
--
--static void __attribute__((constructor)) tcg_cache_init(void)
--{
--    icache_bsize = _system_configuration.icache_line;
--    dcache_bsize = _system_configuration.dcache_line;
--}
--
--#elif defined __linux__
--static void __attribute__((constructor)) tcg_cache_init(void)
--{
--    unsigned long dsize = qemu_getauxval(AT_DCACHEBSIZE);
--    unsigned long isize = qemu_getauxval(AT_ICACHEBSIZE);
--
--    if (dsize == 0 || isize == 0) {
--        if (dsize == 0) {
--            fprintf(stderr, "getauxval AT_DCACHEBSIZE failed\n");
--        }
--        if (isize == 0) {
--            fprintf(stderr, "getauxval AT_ICACHEBSIZE failed\n");
--        }
--        exit(1);
--    }
--    dcache_bsize = dsize;
--    icache_bsize = isize;
--}
--
--#elif defined __APPLE__
--#include <sys/sysctl.h>
--
--static void __attribute__((constructor)) tcg_cache_init(void)
--{
--    size_t len;
--    unsigned cacheline;
--    int name[2] = { CTL_HW, HW_CACHELINE };
--
--    len = sizeof(cacheline);
--    if (sysctl(name, 2, &cacheline, &len, NULL, 0)) {
--        perror("sysctl CTL_HW HW_CACHELINE failed");
--        exit(1);
--    }
--    dcache_bsize = cacheline;
--    icache_bsize = cacheline;
--}
--
--#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
--#include <sys/sysctl.h>
--
--static void __attribute__((constructor)) tcg_cache_init(void)
--{
--    size_t len = 4;
--    unsigned cacheline;
--
--    if (sysctlbyname ("machdep.cacheline_size", &cacheline, &len, NULL, 0)) {
--        fprintf(stderr, "sysctlbyname machdep.cacheline_size failed: %s\n",
--                strerror(errno));
--        exit(1);
--    }
--    dcache_bsize = cacheline;
--    icache_bsize = cacheline;
--}
--#endif
-diff --git a/util/Makefile.objs b/util/Makefile.objs
-index c6205eb..94d9477 100644
---- a/util/Makefile.objs
-+++ b/util/Makefile.objs
-@@ -20,6 +20,7 @@ util-obj-y += host-utils.o
- util-obj-y += bitmap.o bitops.o hbitmap.o
- util-obj-y += fifo8.o
- util-obj-y += acl.o
-+util-obj-y += cacheinfo.o
- util-obj-y += error.o qemu-error.o
- util-obj-y += id.o
- util-obj-y += iov.o qemu-config.o qemu-sockets.o uri.o notify.o
-diff --git a/util/cacheinfo.c b/util/cacheinfo.c
-new file mode 100644
-index 0000000..f987522
---- /dev/null
-+++ b/util/cacheinfo.c
-@@ -0,0 +1,185 @@
-+/*
-+ * cacheinfo.c - helpers to query the host about its caches
-+ *
-+ * Copyright (C) 2017, Emilio G. Cota <cota@braap.org>
-+ * License: GNU GPL, version 2 or later.
-+ *   See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+
-+int qemu_icache_linesize = 0;
-+int qemu_dcache_linesize = 0;
-+
-+/*
-+ * Operating system specific detection mechanisms.
-+ */
-+
-+#if defined(_AIX)
-+# include <sys/systemcfg.h>
-+
-+static void sys_cache_info(int *isize, int *dsize)
-+{
-+    *isize = _system_configuration.icache_line;
-+    *dsize = _system_configuration.dcache_line;
-+}
-+
-+#elif defined(_WIN32)
-+
-+static void sys_cache_info(int *isize, int *dsize)
-+{
-+    SYSTEM_LOGICAL_PROCESSOR_INFORMATION *buf;
-+    DWORD size = 0;
-+    BOOL success;
-+    size_t i, n;
-+
-+    /* Check for the required buffer size first.  Note that if the zero
-+       size we use for the probe results in success, then there is no
-+       data available; fail in that case.  */
-+    success = GetLogicalProcessorInformation(0, &size);
-+    if (success || GetLastError() != ERROR_INSUFFICIENT_BUFFER) {
-+        return;
+@@ -828,13 +829,20 @@ bool tcg_enabled(void)
+ static TranslationBlock *tb_alloc(target_ulong pc)
+ {
+     TranslationBlock *tb;
++    TBContext *ctx;
+ 
+     assert_tb_locked();
+ 
+-    if (tcg_ctx.tb_ctx.nb_tbs >= tcg_ctx.code_gen_max_blocks) {
++    tb = tcg_tb_alloc(&tcg_ctx);
++    if (unlikely(tb == NULL)) {
+         return NULL;
+     }
+-    tb = &tcg_ctx.tb_ctx.tbs[tcg_ctx.tb_ctx.nb_tbs++];
++    ctx = &tcg_ctx.tb_ctx;
++    if (unlikely(ctx->nb_tbs == ctx->tbs_size)) {
++        ctx->tbs_size *= 2;
++        ctx->tbs = g_renew(TranslationBlock *, ctx->tbs, ctx->tbs_size);
 +    }
++    ctx->tbs[ctx->nb_tbs++] = tb;
+     tb->pc = pc;
+     tb->cflags = 0;
+     tb->invalid = false;
+@@ -850,8 +858,10 @@ void tb_free(TranslationBlock *tb)
+        Ignore the hard cases and just back up if this TB happens to
+        be the last one generated.  */
+     if (tcg_ctx.tb_ctx.nb_tbs > 0 &&
+-            tb == &tcg_ctx.tb_ctx.tbs[tcg_ctx.tb_ctx.nb_tbs - 1]) {
+-        tcg_ctx.code_gen_ptr = tb->tc_ptr;
++            tb == tcg_ctx.tb_ctx.tbs[tcg_ctx.tb_ctx.nb_tbs - 1]) {
++        size_t struct_size = ROUND_UP(sizeof(*tb), qemu_icache_linesize);
 +
-+    n = size / sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION);
-+    size = n * sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION);
-+    buf = g_new0(SYSTEM_LOGICAL_PROCESSOR_INFORMATION, n);
-+    if (!GetLogicalProcessorInformation(buf, &size)) {
-+        goto fail;
-+    }
-+
-+    for (i = 0; i < n; i++) {
-+        if (buf[i].Relationship == RelationCache
-+            && buf[i].Cache.Level == 1) {
-+            switch (buf[i].Cache.Type) {
-+            case CacheUnified:
-+                *isize = *dsize = buf[i].Cache.LineSize;
-+                break;
-+            case CacheInstruction:
-+                *isize = buf[i].Cache.LineSize;
-+                break;
-+            case CacheData:
-+                *dsize = buf[i].Cache.LineSize;
-+                break;
-+            default:
-+                break;
-+            }
-+        }
-+    }
-+ fail:
-+    g_free(buf);
-+}
-+
-+#elif defined(__APPLE__) \
-+      || defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-+# include <sys/sysctl.h>
-+# if defined(__APPLE__)
-+#  define SYSCTL_CACHELINE_NAME "hw.cachelinesize"
-+# else
-+#  define SYSCTL_CACHELINE_NAME "machdep.cacheline_size"
-+# endif
-+
-+static void sys_cache_info(int *isize, int *dsize)
-+{
-+    /* There's only a single sysctl for both I/D cache line sizes.  */
-+    long size;
-+    size_t len = sizeof(size);
-+    if (!sysctlbyname(SYSCTL_CACHELINE_NAME, &size, &len, NULL, 0)) {
-+        *isize = *dsize = size;
-+    }
-+}
-+
-+#else
-+/* POSIX */
-+
-+static void sys_cache_info(int *isize, int *dsize)
-+{
-+# ifdef _SC_LEVEL1_ICACHE_LINESIZE
-+    *isize = sysconf(_SC_LEVEL1_ICACHE_LINESIZE);
-+# endif
-+# ifdef _SC_LEVEL1_DCACHE_LINESIZE
-+    *dsize = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
-+# endif
-+}
-+#endif /* sys_cache_info */
-+
-+/*
-+ * Architecture (+ OS) specific detection mechanisms.
-+ */
-+
-+#if defined(__aarch64__)
-+
-+static void arch_cache_info(int *isize, int *dsize)
-+{
-+    if (*isize == 0 || *dsize == 0) {
-+        unsigned ctr;
-+
-+        /* The real cache geometry is in CCSIDR_EL1/CLIDR_EL1/CSSELR_EL1,
-+           but (at least under Linux) these are marked protected by the
-+           kernel.  However, CTR_EL0 contains the minimum linesize in the
-+           entire hierarchy, and is used by userspace cache flushing.  */
-+        asm volatile("mrs\t%0, ctr_el0" : "=r"(ctr));
-+        if (*isize == 0) {
-+            *isize = 4 << (ctr & 0xf);
-+        }
-+        if (*dsize == 0) {
-+            *dsize = 4 << ((ctr >> 16) & 0xf);
-+        }
-+    }
-+}
-+
-+#elif defined(_ARCH_PPC) && defined(__linux__)
-+
-+static void arch_cache_info(int *isize, int *dsize)
-+{
-+    if (*isize == 0) {
-+        *isize = qemu_getauxval(AT_ICACHEBSIZE);
-+    }
-+    if (*dsize == 0) {
-+        *dsize = qemu_getauxval(AT_DCACHEBSIZE);
-+    }
-+}
-+
-+#else
-+static void arch_cache_info(int *isize, int *dsize) { }
-+#endif /* arch_cache_info */
-+
-+/*
-+ * ... and if all else fails ...
-+ */
-+
-+static void fallback_cache_info(int *isize, int *dsize)
-+{
-+    /* If we can only find one of the two, assume they're the same.  */
-+    if (*isize) {
-+        if (*dsize) {
-+            /* Success! */
-+        } else {
-+            *dsize = *isize;
-+        }
-+    } else if (*dsize) {
-+        *isize = *dsize;
-+    } else {
-+#if defined(_ARCH_PPC)
-+        /* For PPC, we're going to use the icache size computed for
-+           flush_icache_range.  Which means that we must use the
-+           architecture minimum.  */
-+        *isize = *dsize = 16;
-+#else
-+        /* Otherwise, 64 bytes is not uncommon.  */
-+        *isize = *dsize = 64;
-+#endif
-+    }
-+}
-+
-+static void __attribute__((constructor)) init_cache_info(void)
-+{
-+    int isize = 0, dsize = 0;
-+
-+    sys_cache_info(&isize, &dsize);
-+    arch_cache_info(&isize, &dsize);
-+    fallback_cache_info(&isize, &dsize);
-+
-+    qemu_icache_linesize = isize;
-+    qemu_dcache_linesize = dsize;
-+}
++        tcg_ctx.code_gen_ptr = tb->tc_ptr - struct_size;
+         tcg_ctx.tb_ctx.nb_tbs--;
+     }
+ }
+@@ -1666,7 +1676,7 @@ static TranslationBlock *tb_find_pc(uintptr_t tc_ptr)
+     m_max = tcg_ctx.tb_ctx.nb_tbs - 1;
+     while (m_min <= m_max) {
+         m = (m_min + m_max) >> 1;
+-        tb = &tcg_ctx.tb_ctx.tbs[m];
++        tb = tcg_ctx.tb_ctx.tbs[m];
+         v = (uintptr_t)tb->tc_ptr;
+         if (v == tc_ptr) {
+             return tb;
+@@ -1676,7 +1686,7 @@ static TranslationBlock *tb_find_pc(uintptr_t tc_ptr)
+             m_min = m + 1;
+         }
+     }
+-    return &tcg_ctx.tb_ctx.tbs[m_max];
++    return tcg_ctx.tb_ctx.tbs[m_max];
+ }
+ 
+ #if !defined(CONFIG_USER_ONLY)
+@@ -1874,7 +1884,7 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
+     direct_jmp_count = 0;
+     direct_jmp2_count = 0;
+     for (i = 0; i < tcg_ctx.tb_ctx.nb_tbs; i++) {
+-        tb = &tcg_ctx.tb_ctx.tbs[i];
++        tb = tcg_ctx.tb_ctx.tbs[i];
+         target_code_size += tb->size;
+         if (tb->size > max_target_code_size) {
+             max_target_code_size = tb->size;
+@@ -1894,8 +1904,7 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
+     cpu_fprintf(f, "gen code size       %td/%zd\n",
+                 tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer,
+                 tcg_ctx.code_gen_highwater - tcg_ctx.code_gen_buffer);
+-    cpu_fprintf(f, "TB count            %d/%d\n",
+-            tcg_ctx.tb_ctx.nb_tbs, tcg_ctx.code_gen_max_blocks);
++    cpu_fprintf(f, "TB count            %d\n", tcg_ctx.tb_ctx.nb_tbs);
+     cpu_fprintf(f, "TB avg target size  %d max=%d bytes\n",
+             tcg_ctx.tb_ctx.nb_tbs ? target_code_size /
+                     tcg_ctx.tb_ctx.nb_tbs : 0,
 -- 
 2.9.4
