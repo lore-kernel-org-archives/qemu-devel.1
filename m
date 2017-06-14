@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dL9Jw-0007Aw-1f
+	(envelope-from <pbonzini@redhat.com>) id 1dL9Jw-0007Ay-Qv
 	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:30:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dL9Js-00031E-F4
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:30:55 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:33284)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dL9Js-000319-9L
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:30:52 -0400
-Received: by mail-qk0-x242.google.com with SMTP id u8so297554qka.0
-	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 07:30:52 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170613214736.19963-1-david@redhat.com>
-	<20170613214736.19963-3-david@redhat.com>
-	<3c564230-7879-45ff-ffa1-c4e7bea17902@twiddle.net>
-	<52401112-57c8-201f-d091-afb3a196412f@redhat.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <e379cef7-90e9-46d5-6872-3d069f39fd6a@twiddle.net>
-Date: Wed, 14 Jun 2017 07:30:47 -0700
+	(envelope-from <pbonzini@redhat.com>) id 1dL9Jt-00031f-OZ
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:30:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60154)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dL9Jt-00031W-Hl
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 10:30:53 -0400
+References: <20170606181948.16238-1-rkagan@virtuozzo.com>
+	<20170606181948.16238-21-rkagan@virtuozzo.com>
+	<43a7c4b5-1445-a48f-b45b-f15030bb81b6@redhat.com>
+	<20170614142004.GC2044@rkaganb.sw.ru>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f9211673-d702-993a-a05a-b1eb6a88487d@redhat.com>
+Date: Wed, 14 Jun 2017 16:30:47 +0200
 MIME-Version: 1.0
-In-Reply-To: <52401112-57c8-201f-d091-afb3a196412f@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20170614142004.GC2044@rkaganb.sw.ru>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 2/3] target/s390x: implement mvcos
- instruction
+Subject: Re: [Qemu-devel] [PATCH 20/23] hyperv: process POST_MESSAGE
+ hypercall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,59 +31,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: agraf@suse.de, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, Miroslav Benes <mbenes@suse.cz>
+To: Roman Kagan <rkagan@virtuozzo.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-On 06/14/2017 12:22 AM, David Hildenbrand wrote:
->>> +    if (!(env->psw.mask & PSW_MASK_DAT)) {
->>> +        program_interrupt(env, PGM_SPECIAL_OP, 6);
->>> +    }
+
+
+On 14/06/2017 16:20, Roman Kagan wrote:
+> On Wed, Jun 14, 2017 at 01:19:21PM +0200, Paolo Bonzini wrote:
+>> On 06/06/2017 20:19, Roman Kagan wrote:
+>>> +typedef struct MsgHandler {
+>>> +    struct rcu_head rcu;
+>>> +    QLIST_ENTRY(MsgHandler) le;
+>>> +    uint32_t conn_id;
+>>> +    HvMsgHandler handler;
+>>> +    void *data;
+>>> +} MsgHandler;
+>>> +
+>>> +static QLIST_HEAD(, MsgHandler) msg_handlers;
+>>> +static QemuMutex msg_handlers_mutex;
 >>
->> You should use restore_program_state before program_interrupt (or add a new
->> entry-point to do both).  Then you can drop ...
+>> Maybe use the same mutex for event and message handlers?
 > 
-> restore_program_state -  you mean cpu_restore_state() I assume.
+> Are there other benefits in it beside saving 40 bytes?
 
-Yes, sorry.
+It's generally simpler if one module only uses one mutex, you don't have
+to think of the interactions.  Since everything is RCU-protected on the
+read-side, it should not matter for performance.
 
-> Would it makes sense to
-> 
-> a) move cpu_restore_state() into program_interrupt()
-> b) make all callers forward ra from GETPC() (problem with kvm code that
-> share handlers?)
-> c) fixup callers that already do the cpu_restore_state()
-> d) drop potential_page_fault() completely
-
-Yes, that makes sense.  For B, kvm can pass 0 for RA and nothing will happen. 
-For C, that project is on-going but not complete; D is indeed the ultimate goal.
-
-> Two questions:
-> a) Could we avoid having to forward the ra by doing GETPC directly in
-> program_interrupt()? In mem_helper, I can see that we do GETPC on
-> several places and pass it around, so I assume GETPC() has to be called
-> in the first handler?
-
-You must use GETPC in the first handler.  We're looking for the address of the 
-TCG generated code from where we were called.  So, no, you can't use GETPC from 
-program_interrupt.
-
-> b) With cpu_restore_state(), there is no need for update_psw_addr() +
-> update_cc_op(), correct?
-
-Correct.
-
->>> +    potential_page_fault(s);
->>> +    gen_helper_mvcos(cc_op, cpu_env, o->addr1, o->in2, regs[r3]);
->>
->> ... the potential_page_fault.
-> 
-> I would suggest to leave it in this patch as it and then clean it up all
-> together in one shot (adding 5 cpu_restore_state() vs. one
-> potential_page_fault() temporarily looks better to me).
-
-I would say the opposite, since the code generated by potential_page_fault is 
-always executed, whereas the cpu_restore_state is on an error path which for a 
-well-behaved guest will never be executed.
-
-
-r~
+Paolo
