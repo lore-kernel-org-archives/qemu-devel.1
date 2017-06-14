@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gi-oh.kim@profitbricks.com>) id 1dL3dJ-0001o2-6M
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 04:26:35 -0400
+	(envelope-from <groug@kaod.org>) id 1dL3fD-0003nH-Hh
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 04:28:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gi-oh.kim@profitbricks.com>) id 1dL3dH-0002EF-Hk
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 04:26:33 -0400
-Received: from mail-yw0-x22d.google.com ([2607:f8b0:4002:c05::22d]:35487)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <gi-oh.kim@profitbricks.com>)
-	id 1dL3dH-0002Ds-9G
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 04:26:31 -0400
-Received: by mail-yw0-x22d.google.com with SMTP id v7so44967294ywc.2
-	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 01:26:31 -0700 (PDT)
+	(envelope-from <groug@kaod.org>) id 1dL3f8-0003gR-J4
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 04:28:31 -0400
+Received: from 3.mo5.mail-out.ovh.net ([46.105.40.108]:42938)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dL3f8-0003bf-8Y
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 04:28:26 -0400
+Received: from player799.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 12235104660
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 10:28:23 +0200 (CEST)
+Date: Wed, 14 Jun 2017 10:28:10 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170614102810.49d4389c@bahia.ttt.fr.ibm.com>
+In-Reply-To: <20170602031507.29881-5-david@gibson.dropbear.id.au>
+References: <20170602031507.29881-1-david@gibson.dropbear.id.au>
+	<20170602031507.29881-5-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <0a016e14-d3c7-1bd3-a6db-753b87005609@redhat.com>
-References: <1497346256-10073-1-git-send-email-gi-oh.kim@profitbricks.com>
-	<0a016e14-d3c7-1bd3-a6db-753b87005609@redhat.com>
-From: Gi-Oh Kim <gi-oh.kim@profitbricks.com>
-Date: Wed, 14 Jun 2017 10:25:49 +0200
-Message-ID: <CAJX1YtatV08KF5HDijHCjtn6-_439QcMBY_nHuZ2mgBwUJYWgg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] virtio-blk: drain block before cleanup
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/6Tm9OArNcRyn6w_szS.b4kp";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCHv5 4/4] ppc: Rework CPU compatibility
+ testing across migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,194 +32,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: mst@redhat.com, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: clg@kaod.org, mdroth@linux.vnet.ibm.com, sursingh@redhat.com, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com, abologna@redhat.com, sbobroff@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-Yes, right.
-I forgot to comment that the problem didn't happen for QEMU 2.8~2.9.
+--Sig_/6Tm9OArNcRyn6w_szS.b4kp
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
+On Fri,  2 Jun 2017 13:15:07 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-On Tue, Jun 13, 2017 at 8:04 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
->
-> On 13/06/2017 11:30, Gioh Kim wrote:
->> Hi,
->>
->> I'd like to report one use-after-free problem which is found by AddressSanitizer.
->> My company provides virtualization server with Qemu-2.7.
->> If customer commands Disk hot-unplug on Web-based application,
->> the application sends "device_del" and "drive_del" commands to qemu process via QMP.
->> It usually works fine.
->> But I found a corner case like following.
->> 1. Customer commands Disk hot-unplug via Web-based application.
->> 2. The application sends "device_del" that sometimes takes unpredictable time.
->> 3. There are some inflight IOs
->> 4. Customer does reboot or shutdown the guest OS
->> 4. Qemu process generates segfault.
->>
->> If a disk is unplugged with "device_del" and "drive_del" commands,
->> qemu does not generate problem. But if only "device_del" command are finished and
->> guest os reboots, qemu generates segfault.
->> I can reproduce that case easily with following commands
->> 1. generate heavy IO on disk in Guest OS
->> 2. run "device_del" on the qemu monitor
->> 3. run "system_reboot" on the qemu monitor
->>
->> According to AdressSanitizer, VirtQueue is freed by virtio_cleanup but dereferenced
->> by asynchronous request. I think asynchronous requests should be finished
->> before virtio_cleanup, so I added blk_drain() before virtio_cleanup.
->
-> Hi Gioh,
->
-> this was fixed in QEMU 2.8 by commit c611c76417 ("virtio: add
-> MemoryListener to cache ring translations", 2017-02-17).
->
-> Even though the MemoryRegionCache mechanism is currently not caching
-> anything (commit 90c4fe5fc5, "exec: revert MemoryRegionCache",
-> 2017-04-03), the virtio bugfix remains.
->
-> Your patch looks good as a workaround for QEMU 2.7.
->
-> Paolo
->
->> Following is configure options I used to build qemu with AddressSanitizer.
->> ./configure --target-list=x86_64-softmmu --extra-cflags="-fsanitize=address -fno-omit-frame-pointer" --enable-debug
->>
->> Following is the report of AddressSanitizer.
->>
->> ------------------------------------- 8< ----------------------------------------
->> ==8801==WARNING: ASan doesn't fully support makecontext/swapcontext functions and may produce false positives in some cases!
->> ==8801==WARNING: ASan is ignoring requested __asan_handle_no_return: stack top: 0x7ffc984da000; bottom 0x7fa524363000; size: 0x005774177000 (375609847808)
->> False positive error reports may follow
->> For details see http://code.google.com/p/address-sanitizer/issues/detail?id=189
->> =================================================================
->> ==8801==ERROR: AddressSanitizer: heap-use-after-free on address 0x7fa5240ab82c at pc 0x55ccd7bffb76 bp 0x7fa524364590 sp 0x7fa524364580
->> READ of size 2 at 0x7fa5240ab82c thread T0
->>     #0 0x55ccd7bffb75 in virtqueue_fill /home/gohkim/work/tools/qemu/hw/virtio/virtio.c:284
->>     #1 0x55ccd7bffe46 in virtqueue_push /home/gohkim/work/tools/qemu/hw/virtio/virtio.c:308
->>     #2 0x55ccd7b66c74 in virtio_blk_req_complete /home/gohkim/work/tools/qemu/hw/block/virtio-blk.c:58
->>     #3 0x55ccd7b67154 in virtio_blk_rw_complete /home/gohkim/work/tools/qemu/hw/block/virtio-blk.c:121
->>     #4 0x55ccd83852b9 in blk_aio_complete block/block-backend.c:923
->>     #5 0x55ccd8385a73 in blk_aio_write_entry block/block-backend.c:984
->>     #6 0x55ccd84c7d68 in coroutine_trampoline util/coroutine-ucontext.c:78
->>     #7 0x7fa5702d45cf  (/lib/x86_64-linux-gnu/libc.so.6+0x495cf)
->>
->> 0x7fa5240ab82c is located 44 bytes inside of 131072-byte region [0x7fa5240ab800,0x7fa5240cb800)
->> freed by thread T0 here:
->>     #0 0x7fa573f876aa in __interceptor_free (/usr/lib/x86_64-linux-gnu/libasan.so.2+0x986aa)
->>     #1 0x55ccd7c07fa4 in virtio_cleanup /home/gohkim/work/tools/qemu/hw/virtio/virtio.c:1678
->>     #2 0x55ccd7b6c585 in virtio_blk_device_unrealize /home/gohkim/work/tools/qemu/hw/block/virtio-blk.c:948
->>     #3 0x55ccd7c09734 in virtio_device_unrealize /home/gohkim/work/tools/qemu/hw/virtio/virtio.c:1950
->>     #4 0x55ccd7eb9bb7 in device_set_realized hw/core/qdev.c:964
->>     #5 0x55ccd82c1bef in property_set_bool qom/object.c:1853
->>     #6 0x55ccd82be535 in object_property_set qom/object.c:1087
->>     #7 0x55ccd82c454f in object_property_set_qobject qom/qom-qobject.c:27
->>     #8 0x55ccd82be810 in object_property_set_bool qom/object.c:1156
->>     #9 0x55ccd7ec1395 in bus_set_realized hw/core/bus.c:181
->>     #10 0x55ccd82c1bef in property_set_bool qom/object.c:1853
->>     #11 0x55ccd82be535 in object_property_set qom/object.c:1087
->>     #12 0x55ccd82c454f in object_property_set_qobject qom/qom-qobject.c:27
->>     #13 0x55ccd82be810 in object_property_set_bool qom/object.c:1156
->>     #14 0x55ccd7eb9a8a in device_set_realized hw/core/qdev.c:956
->>     #15 0x55ccd82c1bef in property_set_bool qom/object.c:1853
->>     #16 0x55ccd82be535 in object_property_set qom/object.c:1087
->>     #17 0x55ccd82c454f in object_property_set_qobject qom/qom-qobject.c:27
->>     #18 0x55ccd82be810 in object_property_set_bool qom/object.c:1156
->>     #19 0x55ccd7eba820 in device_unparent hw/core/qdev.c:1099
->>     #20 0x55ccd82bf50b in object_finalize_child_property qom/object.c:1362
->>     #21 0x55ccd82bb3c6 in object_property_del_child qom/object.c:422
->>     #22 0x55ccd82bb601 in object_unparent qom/object.c:441
->>     #23 0x55ccd7e221f1 in acpi_pcihp_eject_slot hw/acpi/pcihp.c:139
->>     #24 0x55ccd7e22301 in acpi_pcihp_update_hotplug_bus hw/acpi/pcihp.c:152
->>     #25 0x55ccd7e22600 in acpi_pcihp_update hw/acpi/pcihp.c:176
->>     #26 0x55ccd7e22628 in acpi_pcihp_reset hw/acpi/pcihp.c:182
->>     #27 0x55ccd7e1fc10 in piix4_reset hw/acpi/piix4.c:363
->>     #28 0x55ccd7da4ebd in qemu_devices_reset /home/gohkim/work/tools/qemu/vl.c:1713
->>     #29 0x55ccd7c28354 in pc_machine_reset /home/gohkim/work/tools/qemu/hw/i386/pc.c:2178
->>
->> previously allocated by thread T0 here:
->>     #0 0x7fa573f87b49 in __interceptor_calloc (/usr/lib/x86_64-linux-gnu/libasan.so.2+0x98b49)
->>     #1 0x7fa5718575d0 in g_malloc0 (/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x4f5d0)
->>     #2 0x55ccd7b6bfa5 in virtio_blk_device_realize /home/gohkim/work/tools/qemu/hw/block/virtio-blk.c:910
->>     #3 0x55ccd7c09500 in virtio_device_realize /home/gohkim/work/tools/qemu/hw/virtio/virtio.c:1927
->>     #4 0x55ccd7eb9690 in device_set_realized hw/core/qdev.c:918
->>     #5 0x55ccd82c1bef in property_set_bool qom/object.c:1853
->>     #6 0x55ccd82be535 in object_property_set qom/object.c:1087
->>     #7 0x55ccd82c454f in object_property_set_qobject qom/qom-qobject.c:27
->>     #8 0x55ccd82be810 in object_property_set_bool qom/object.c:1156
->>     #9 0x55ccd81b1b5c in virtio_blk_pci_realize hw/virtio/virtio-pci.c:1897
->>     #10 0x55ccd81b14df in virtio_pci_realize hw/virtio/virtio-pci.c:1799
->>     #11 0x55ccd805e2c5 in pci_qdev_realize hw/pci/pci.c:1966
->>     #12 0x55ccd81b17db in virtio_pci_dc_realize hw/virtio/virtio-pci.c:1852
->>     #13 0x55ccd7eb9690 in device_set_realized hw/core/qdev.c:918
->>     #14 0x55ccd82c1bef in property_set_bool qom/object.c:1853
->>     #15 0x55ccd82be535 in object_property_set qom/object.c:1087
->>     #16 0x55ccd82c454f in object_property_set_qobject qom/qom-qobject.c:27
->>     #17 0x55ccd82be810 in object_property_set_bool qom/object.c:1156
->>     #18 0x55ccd7d8141e in qdev_device_add /home/gohkim/work/tools/qemu/qdev-monitor.c:618
->>     #19 0x55ccd7dab462 in device_init_func /home/gohkim/work/tools/qemu/vl.c:2316
->>     #20 0x55ccd84bd18c in qemu_opts_foreach util/qemu-option.c:1116
->>     #21 0x55ccd7db2bdb in main /home/gohkim/work/tools/qemu/vl.c:4507
->>     #22 0x7fa5702ababf in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x20abf)
->>
->> SUMMARY: AddressSanitizer: heap-use-after-free /home/gohkim/work/tools/qemu/hw/virtio/virtio.c:284 virtqueue_fill
->> Shadow bytes around the buggy address:
->>   0x0ff52480d6b0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
->>   0x0ff52480d6c0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
->>   0x0ff52480d6d0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
->>   0x0ff52480d6e0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
->>   0x0ff52480d6f0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
->> =>0x0ff52480d700: fd fd fd fd fd[fd]fd fd fd fd fd fd fd fd fd fd
->>   0x0ff52480d710: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
->>   0x0ff52480d720: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
->>   0x0ff52480d730: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
->>   0x0ff52480d740: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
->>   0x0ff52480d750: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
->> Shadow byte legend (one shadow byte represents 8 application bytes):
->>   Addressable:           00
->>   Partially addressable: 01 02 03 04 05 06 07
->>   Heap left redzone:       fa
->>   Heap right redzone:      fb
->>   Freed heap region:       fd
->>   Stack left redzone:      f1
->>   Stack mid redzone:       f2
->>   Stack right redzone:     f3
->>   Stack partial redzone:   f4
->>   Stack after return:      f5
->>   Stack use after scope:   f8
->>   Global redzone:          f9
->>   Global init order:       f6
->>   Poisoned by user:        f7
->>   Container overflow:      fc
->>   Array cookie:            ac
->>   Intra object redzone:    bb
->>   ASan internal:           fe
->> ==8801==ABORTING
->>
->>
->> Signed-off-by: Gioh Kim <gi-oh.kim@profitbricks.com>
->> ---
->>  hw/block/virtio-blk.c | 2 ++
->>  1 file changed, 2 insertions(+)
->>
->> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
->> index 331d766..cc39934 100644
->> --- a/hw/block/virtio-blk.c
->> +++ b/hw/block/virtio-blk.c
->> @@ -939,6 +939,8 @@ static void virtio_blk_device_unrealize(DeviceState *dev, Error **errp)
->>      virtio_blk_data_plane_destroy(s->dataplane);
->>      s->dataplane = NULL;
->>      qemu_del_vm_change_state_handler(s->change);
->> +    if (blk_bs(s->blk) && bdrv_requests_pending((blk_bs(s->blk))))
->> +        blk_drain(s->blk);
->>      blockdev_mark_auto_del(s->blk);
->>      virtio_cleanup(vdev);
->>  }
->>
+> Migrating between different CPU versions is a bit complicated for ppc.
+> A long time ago, we ensured identical CPU versions at either end by
+> checking the PVR had the same value.  However, this breaks under KVM
+> HV, because we always have to use the host's PVR - it's not
+> virtualized.  That would mean we couldn't migrate between hosts with
+> different PVRs, even if the CPUs are close enough to compatible in
+> practice (sometimes identical cores with different surrounding logic
+> have different PVRs, so this happens in practice quite often).
+>=20
+> So, we removed the PVR check, but instead checked that several flags
+> indicating supported instructions matched.  This turns out to be a bad
+> idea, because those instruction masks are not architected information, but
+> essentially a TCG implementation detail.  So changes to qemu internal CPU
+> modelling can break migration - this happened between qemu-2.6 and
+> qemu-2.7.  That was addressed by 146c11f1 "target-ppc: Allow eventual
+> removal of old migration mistakes".
+>=20
+> Now, verification of CPU compatibility across a migration basically doesn=
+'t
+> happen.  We simply ignore the PVR of the incoming migration, and hope the
+> cpu on the destination is close enough to work.
+>=20
+> Now that we've cleaned up handling of processor compatibility modes for
+> pseries machine type, we can do better.  We allow migration if:
+>=20
+>     * The source and destination PVRs are for the same type of CPU, as
+>       determined by CPU class's pvr_match function
+> OR  * When the source was in a compatibility mode, and the destination CPU
+>       supports the same compatibility mode
+>=20
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> Reviewed-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> ---
+>  target/ppc/machine.c | 69 ++++++++++++++++++++++++++++++++++++++++++++++=
++++---
+>  1 file changed, 66 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/target/ppc/machine.c b/target/ppc/machine.c
+> index 6cb3a48..a29aabe 100644
+> --- a/target/ppc/machine.c
+> +++ b/target/ppc/machine.c
+> @@ -8,6 +8,7 @@
+>  #include "helper_regs.h"
+>  #include "mmu-hash64.h"
+>  #include "migration/cpu.h"
+> +#include "qapi/error.h"
+> =20
+>  static int cpu_load_old(QEMUFile *f, void *opaque, int version_id)
+>  {
+> @@ -195,6 +196,27 @@ static void cpu_pre_save(void *opaque)
+>      }
+>  }
+> =20
+> +/*
+> + * Determine if a given PVR is a "close enough" match to the CPU
+> + * object.  For TCG and KVM PR it would probably be sufficient to
+> + * require an exact PVR match.  However for KVM HV the user is
+> + * restricted to a PVR exactly matching the host CPU.  The correct way
+> + * to handle this is to put the guest into an architected
+> + * compatibility mode.  However, to allow a more forgiving transition
+> + * and migration from before this was widely done, we allow migration
+> + * between sufficiently similar PVRs, as determined by the CPU class's
+> + * pvr_match() hook.
+> + */
+> +static bool pvr_match(PowerPCCPU *cpu, uint32_t pvr)
+> +{
+> +    PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+> +
+> +    if (pvr =3D=3D pcc->pvr) {
+> +        return true;
+> +    }
+> +    return pcc->pvr_match(pcc, pvr);
+> +}
+> +
+>  static int cpu_post_load(void *opaque, int version_id)
+>  {
+>      PowerPCCPU *cpu =3D opaque;
+> @@ -203,10 +225,31 @@ static int cpu_post_load(void *opaque, int version_=
+id)
+>      target_ulong msr;
+> =20
+>      /*
+> -     * We always ignore the source PVR. The user or management
+> -     * software has to take care of running QEMU in a compatible mode.
+> +     * If we're operating in compat mode, we should be ok as long as
+> +     * the destination supports the same compatiblity mode.
+> +     *
+> +     * Otherwise, however, we require that the destination has exactly
+> +     * the same CPU model as the source.
+>       */
+> -    env->spr[SPR_PVR] =3D env->spr_cb[SPR_PVR].default_value;
+> +
+> +#if defined(TARGET_PPC64)
+> +    if (cpu->compat_pvr) {
+> +        Error *local_err =3D NULL;
+> +
+> +        ppc_set_compat(cpu, cpu->compat_pvr, &local_err);
+> +        if (local_err) {
+> +            error_report_err(local_err);
+> +            error_free(local_err);
+> +            return -1;
+> +        }
+> +    } else
+> +#endif
+> +    {
+> +        if (!pvr_match(cpu, env->spr[SPR_PVR])) {
+> +            return -1;
+> +        }
+> +    }
+> +
+>      env->lr =3D env->spr[SPR_LR];
+>      env->ctr =3D env->spr[SPR_CTR];
+>      cpu_write_xer(env, env->spr[SPR_XER]);
+> @@ -560,6 +603,25 @@ static const VMStateDescription vmstate_tlbmas =3D {
+>      }
+>  };
+> =20
+> +static bool compat_needed(void *opaque)
+> +{
+> +    PowerPCCPU *cpu =3D opaque;
+> +
+> +    assert(!(cpu->compat_pvr && !cpu->vhyp));
+> +    return (cpu->compat_pvr !=3D 0);
+
+Since the CAS logic rework in 2.9, compat_pvr is likely to be !=3D 0 and
+the subsection is sent even for older machine types. This breaks backward
+migration of such machines...
+
+> +}
+> +
+> +static const VMStateDescription vmstate_compat =3D {
+> +    .name =3D "cpu/compat",
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 1,
+> +    .needed =3D compat_needed,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_UINT32(compat_pvr, PowerPCCPU),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>  const VMStateDescription vmstate_ppc_cpu =3D {
+>      .name =3D "cpu",
+>      .version_id =3D 5,
+> @@ -613,6 +675,7 @@ const VMStateDescription vmstate_ppc_cpu =3D {
+>          &vmstate_tlb6xx,
+>          &vmstate_tlbemb,
+>          &vmstate_tlbmas,
+> +        &vmstate_compat,
+>          NULL
+>      }
+>  };
 
 
+--Sig_/6Tm9OArNcRyn6w_szS.b4kp
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
--- 
-Best regards,
-Gi-Oh Kim
-TEL: 0176 2697 8962
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAllA85oACgkQAvw66wEB28Iu6wCcD/yWEFbZc+51hsE5GdNfx35Z
+GPsAn3aUlj2JZbbn4QAP8utJVEdx4N3U
+=iT9b
+-----END PGP SIGNATURE-----
+
+--Sig_/6Tm9OArNcRyn6w_szS.b4kp--
