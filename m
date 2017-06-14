@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1dL0lD-0001PO-Re
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 01:22:32 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dL0m0-0001mG-4G
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 01:23:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1dL0lA-00070m-Le
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 01:22:31 -0400
-Received: from mail-wr0-f195.google.com ([209.85.128.195]:34763)
+	(envelope-from <rth7680@gmail.com>) id 1dL0lw-0007HX-Vk
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 01:23:20 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:33558)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1dL0lA-00070b-Ek
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 01:22:28 -0400
-Received: by mail-wr0-f195.google.com with SMTP id u101so36322693wrc.1
-	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 22:22:28 -0700 (PDT)
-References: <20170608193822.24418-1-rolnik@amazon.com>
-	<20170608193822.24418-2-rolnik@amazon.com>
-	<a0116cc5-42e3-b784-e6b2-bbe8a63c5225@redhat.com>
-	<CAK4993jF-u_ZJccyQmQAdP-_+EHQit2h8EL7szkrpi5f=vNBeg@mail.gmail.com>
-From: Thomas Huth <huth@tuxfamily.org>
-Message-ID: <c66327ad-276e-1d00-1701-b919e650b4b8@tuxfamily.org>
-Date: Wed, 14 Jun 2017 07:22:26 +0200
-MIME-Version: 1.0
-In-Reply-To: <CAK4993jF-u_ZJccyQmQAdP-_+EHQit2h8EL7szkrpi5f=vNBeg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC v19 11/13] target-avr: Put all
- translation code into one compilation unit
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dL0lw-0007Gg-Qo
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 01:23:16 -0400
+Received: by mail-qk0-x243.google.com with SMTP id u8so2292211qka.0
+	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 22:23:16 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Date: Tue, 13 Jun 2017 22:23:01 -0700
+Message-Id: <20170614052311.13785-1-rth@twiddle.net>
+Subject: [Qemu-devel] [PULL 00/10] TCG queued patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,37 +24,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Rolnik <mrolnik@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Anichang <anichang@protonmail.ch>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On 13.06.2017 22:30, Michael Rolnik wrote:
-> please explain.
-
-There are two "From:" lines in the mail body - normally there should be
-only one "From:" line (if you're sending a patch that has originally
-been written by someone else), or none at all. If the patch has been
-changed by multiple persons, this should be indicated by multiple
-"Signed-off-by" lines instead.
-
- Thomas
+The patches from Emilio, plus the code reversions suggested by Alex.
 
 
-> On Tue, Jun 13, 2017 at 11:07 PM, Thomas Huth <thuth@redhat.com
-> <mailto:thuth@redhat.com>> wrote:
-> 
->     On 08.06.2017 21:38, Michael Rolnik wrote:
->     > From: Michael Rolnik <mrolnik@gmail.com <mailto:mrolnik@gmail.com>>
->     >
->     > From: Richard Henderson <rth@twiddle.net <mailto:rth@twiddle.net>>
-> 
->     From whom is this patch? ... looks like there is something wrong with
->     the way you send the patches...
-> 
->      Thomas
-> 
-> 
-> 
-> 
-> -- 
-> Best Regards,
-> Michael Rolnik
+r~
+
+
+
+The following changes since commit 3f0602927b120a480b35dcf58cf6f95435b3ae91:
+
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20170613' into staging (2017-06-13 15:49:07 +0100)
+
+are available in the git repository at:
+
+  git://github.com/rth7680/qemu.git tags/pull-tcg-20170613
+
+for you to fetch changes up to a2dd0eba95c436d500c9450ecb794f6b5db731ab:
+
+  tcg: Remove tb_htable_lookup from helper_lookup_tb_ptr (2017-06-13 22:13:05 -0700)
+
+----------------------------------------------------------------
+Queued TCG patches
+
+----------------------------------------------------------------
+Emilio G. Cota (3):
+      util: add cacheinfo
+      tcg: allocate TB structs before the corresponding translated code
+      translate-all: consolidate tb init in tb_gen_code
+
+Richard Henderson (7):
+      tcg/aarch64: Use ADR in tcg_out_movi
+      tcg/arm: Use indirect branch for goto_tb
+      tcg/arm: Remove limit on code buffer size
+      tcg/arm: Try pc-relative addresses for movi
+      tcg/arm: Use ldr (literal) for goto_tb
+      Revert "target/aarch64: optimize indirect branches"
+      tcg: Remove tb_htable_lookup from helper_lookup_tb_ptr
+
+ include/exec/exec-all.h      |   5 +-
+ include/exec/tb-context.h    |   3 +-
+ include/qemu/osdep.h         |   3 +
+ target/arm/translate-a64.c   |   3 +-
+ tcg-runtime.c                |  32 +++-----
+ tcg/aarch64/tcg-target.inc.c |   7 +-
+ tcg/arm/tcg-target.inc.c     |  78 ++++++++++--------
+ tcg/ppc/tcg-target.inc.c     |  71 +----------------
+ tcg/tcg.c                    |  20 +++++
+ tcg/tcg.h                    |   2 +-
+ translate-all.c              |  46 ++++++-----
+ util/Makefile.objs           |   1 +
+ util/cacheinfo.c             | 185 +++++++++++++++++++++++++++++++++++++++++++
+ 13 files changed, 308 insertions(+), 148 deletions(-)
+ create mode 100644 util/cacheinfo.c
