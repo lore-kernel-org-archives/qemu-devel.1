@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dL07e-0005Tb-Re
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 00:41:39 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dL07h-0005U7-R5
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 00:41:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dL07b-0002vb-Cl
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 00:41:38 -0400
-Received: from mail-qk0-x22e.google.com ([2607:f8b0:400d:c09::22e]:32844)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dL07b-0002vL-6Y
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 00:41:35 -0400
-Received: by mail-qk0-x22e.google.com with SMTP id r62so27783049qkf.0
-	for <qemu-devel@nongnu.org>; Tue, 13 Jun 2017 21:41:35 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170613214736.19963-1-david@redhat.com>
-	<20170613214736.19963-3-david@redhat.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <3c564230-7879-45ff-ffa1-c4e7bea17902@twiddle.net>
-Date: Tue, 13 Jun 2017 21:41:30 -0700
+	(envelope-from <dgibson@ozlabs.org>) id 1dL07g-0002wm-QM
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 00:41:41 -0400
+Date: Wed, 14 Jun 2017 10:30:17 +0800
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170614023017.GG13420@umbus>
+References: <1497383329-10393-1-git-send-email-thuth@redhat.com>
+	<149738389265.243.11409224507286961666@4a9a010726c0>
+	<20170614051851-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20170613214736.19963-3-david@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 2/3] target/s390x: implement mvcos
- instruction
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="0z5c7mBtSy1wdr4F"
+Content-Disposition: inline
+In-Reply-To: <20170614051851-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH] hw/pci-bridge/dec: Classify the DEC PCI
+ bridge as bridge device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,59 +26,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: agraf@suse.de, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, Miroslav Benes <mbenes@suse.cz>
-
-On 06/13/2017 02:47 PM, David Hildenbrand wrote:
-> +static inline bool psw_key_valid(CPUS390XState *env, uint8_t psw_key)
-> +{
-> +    uint16_t pkm = ((env->cregs[3] & CR3_PKM) >> 16);
-> +
-> +    if (env->psw.mask & PSW_MASK_PSTATE) {
-> +        /* PSW key has range 0..15, it is valid if the bit is 1 in the PKM */
-> +        return pkm & (1 << (psw_key & 0xff));
-
-Did you intend to write & 0xf?  Otherwise this mask is pointless...
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, thuth@redhat.com, famz@redhat.com, agraf@suse.de, marcel@redhat.com, qemu-trivial@nongnu.org, qemu-ppc@nongnu.org
 
 
-> +        switch (src_as) {
-> +        case 0x0:
-> +            x = cpu_ldub_primary_ra(env, src, ra);
-> +            break;
-> +        case 0x2:
-> +            x = cpu_ldub_secondary_ra(env, src, ra);
-> +            break;
-> +        case 0x3:
-> +            x = cpu_ldub_home_ra(env, src, ra);
-> +            break;
-> +        }
-> +        switch (dest_as) {
-> +        case 0x0:
-> +            cpu_stb_primary_ra(env, dest, x, ra);
-> +            break;
-> +        case 0x2:
-> +            cpu_stb_secondary_ra(env, dest, x, ra);
-> +            break;
-> +        case 0x3:
-> +            cpu_stb_home_ra(env, dest, x, ra);
-> +            break;
-> +        }
+--0z5c7mBtSy1wdr4F
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Rather than these switches, you can use helper_ret_ldub_mmu.  Of course, that 
-will only work for SOFTMMU.  But for CONFIG_USER_ONLY, there's surely only one 
-address space that's legal, so you could simply forward to fast_memmove.
+On Wed, Jun 14, 2017 at 05:19:18AM +0300, Michael S. Tsirkin wrote:
+> On Tue, Jun 13, 2017 at 12:58:13PM -0700, no-reply@patchew.org wrote:
+> > In file included from /tmp/qemu-test/src/hw/net/vmxnet3.c:30:
+> > /tmp/qemu-test/src/include/migration/register.h:18: error: redefinition=
+ of typedef =E2=80=98LoadStateHandler=E2=80=99
+> > /tmp/qemu-test/src/include/migration/vmstate.h:32: note: previous decla=
+ration of =E2=80=98LoadStateHandler=E2=80=99 was here
+> > make: *** [hw/net/vmxnet3.o] Error 1
+> > make: *** Waiting for unfinished jobs....
+> > tests/docker/Makefile.include:118: recipe for target 'docker-run' failed
+> > make[1]: *** [docker-run] Error 2
+> > make[1]: Leaving directory '/var/tmp/patchew-tester-tmp-dv2lv743/src'
+> > tests/docker/Makefile.include:149: recipe for target 'docker-run-test-q=
+uick@centos6' failed
+> > make: *** [docker-run-test-quick@centos6] Error 2
+> > =3D=3D=3D OUTPUT END =3D=3D=3D
+> >=20
+> > Test command exited with code: 2
+>=20
+> Any idea what's going on here?
 
-> +    if (!(env->psw.mask & PSW_MASK_DAT)) {
-> +        program_interrupt(env, PGM_SPECIAL_OP, 6);
-> +    }
+I _think_ that's unrelated to the patch here.  Looks like the
+autobuilder is using a compiler version that doesn't like typedef
+redefinitions, even if they're identical.
 
-You should use restore_program_state before program_interrupt (or add a new 
-entry-point to do both).  Then you can drop ...
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-> +    potential_page_fault(s);
-> +    gen_helper_mvcos(cc_op, cpu_env, o->addr1, o->in2, regs[r3]);
+--0z5c7mBtSy1wdr4F
+Content-Type: application/pgp-signature; name="signature.asc"
 
-... the potential_page_fault.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
+iQIcBAEBCAAGBQJZQJ+2AAoJEGw4ysog2bOSlSoP/iR3BoK7sWXpk8rVGQhEYra1
+bWEq143Fr0Xhg/AUZrZYiMnlAnWYqILcgVfSXJoq4leEPy7iDoGdWDxjEbMddsG1
+LXvo7A/eahl33I3wc13PF+nkEAPam5enxbclI4cyQzEcpX2PtMKL82pKED1oLc9N
+RmjVrMmZxnjAdsIFArKS+LyOI1H0+ksfPMrg9cGdw5MIy8s1jKW/GODTXwcl8OzB
+EdJp7FnnVY8DsanfsKFMj/iBzQcjCOvpW2FDA3ZvW7mUXUxqFxtggc8lvsVqBmE8
+hgPSOzJtGtQgVkxCeW2nI7QoDnTm4WAbGFWJMSUATWGLnmBbVW5N2onxvItiG0Lf
+GjVqzKY8kPhhNW9FgtIKSqUWOodonQbCnBgB+QIHiIc9MrR08/LlehKt76qGd7vL
+jd/nSJKPNhxM1vpclorOKT4bcNAs1mRAghGh3zoRz/Z8vtWSiJtTemG8FmWbvfgh
+QBHi+wuHUySK7omLNb/ygAVVmiWdf0ncqjWRemepyKoL06CUTt8G1VtrccaOLoZL
+rHGRJboslA2+mznrxMMYBp2F7A69UTqwUpcZlu2Msz68gnH+kUNSM6DryB/bDp/m
+D7bxAFzjc0D4Uok5yGNLTXl/bkp/bDogdebkMb8fbWL2T9g3I/Oyfi0UZhpCnuf/
++Pj7ekhIPv4BhPAuQmuk
+=5v2A
+-----END PGP SIGNATURE-----
 
-r~
+--0z5c7mBtSy1wdr4F--
