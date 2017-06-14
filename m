@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1dLCF4-0003Di-5B
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:38:07 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1dLCMl-0005kJ-TA
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:46:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1dLCF1-0006fU-06
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:38:06 -0400
-Received: from us-smtp-delivery-101.mimecast.com ([216.205.24.101]:55151)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <felipe@nutanix.com>) id 1dLCF0-0006dq-Nl
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:38:02 -0400
-From: Felipe Franciosi <felipe@nutanix.com>
-Date: Wed, 14 Jun 2017 17:37:55 +0000
-Message-ID: <82A46075-1FA0-400D-A52B-85233A888F9A@nutanix.com>
-References: <1497458486-15673-1-git-send-email-felipe@nutanix.com>
-	<CAJ+F1CLKvSywR1EN8LXaCd7S1Ya0gebE25QYBWfK4LW2Nmm2=g@mail.gmail.com>
-In-Reply-To: <CAJ+F1CLKvSywR1EN8LXaCd7S1Ya0gebE25QYBWfK4LW2Nmm2=g@mail.gmail.com>
-Content-Language: en-US
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH] vhost-user: support cross-endianess
- negatiation
+	(envelope-from <edgar.iglesias@gmail.com>) id 1dLCMi-00013A-4K
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:46:03 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:35451)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
+	id 1dLCMh-00012K-Sa
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 13:46:00 -0400
+Received: by mail-lf0-x243.google.com with SMTP id v20so963576lfa.2
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 10:45:58 -0700 (PDT)
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Date: Wed, 14 Jun 2017 19:45:47 +0200
+Message-Id: <1497462353-3432-2-git-send-email-edgar.iglesias@gmail.com>
+In-Reply-To: <1497462353-3432-1-git-send-email-edgar.iglesias@gmail.com>
+References: <1497462353-3432-1-git-send-email-edgar.iglesias@gmail.com>
+Subject: [Qemu-devel] [PULL v1 1/7] cputlb: cleanup get_page_addr_code to
+ use VICTIM_TLB_HIT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +27,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Mike Cui <cui@nutanix.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: fred.konrad@greensocs.com, pbonzini@redhat.com, rth@twiddle.net, edgar.iglesias@xilinx.com
 
-SGVsbG8hDQoNCk9uIDE0IEp1biAyMDE3LCBhdCAxODoxNywgTWFyYy1BbmRyw6kgTHVyZWF1IDxt
-YXJjYW5kcmUubHVyZWF1QGdtYWlsLmNvbTxtYWlsdG86bWFyY2FuZHJlLmx1cmVhdUBnbWFpbC5j
-b20+PiB3cm90ZToNCg0KSA0KDQpPbiBXZWQsIEp1biAxNCwgMjAxNyBhdCA4OjQyIFBNIEZlbGlw
-ZSBGcmFuY2lvc2kgPGZlbGlwZUBudXRhbml4LmNvbTxtYWlsdG86ZmVsaXBlQG51dGFuaXguY29t
-Pj4gd3JvdGU6DQoNCi4uLg0KQEAgLTU4MCw2ICs1ODEsMTkgQEAgTWFzdGVyIG1lc3NhZ2UgdHlw
-ZXMNCiAgICAgICBUaGlzIHJlcXVlc3Qgc2hvdWxkIGJlIHNlbmQgb25seSB3aGVuIFZJUlRJT19G
-X0lPTU1VX1BMQVRGT1JNIGZlYXR1cmUNCiAgICAgICBoYXMgYmVlbiBzdWNjZXNzZnVsbHkgbmVn
-b3RpYXRlZC4NCg0KKyAqIFZIT1NUX1VTRVJfU0VUX1ZSSU5HX0VORElBTg0KKw0KKyAgICAgIElk
-OiAyMg0KKyAgICAgIEVxdWl2YWxlbnQgaW9jdGw6IFZIT1NUX1NFVF9WUklOR19FTkRJQU4NCisg
-ICAgICBNYXN0ZXIgcGF5bG9hZDogdnJpbmcgc3RhdGUgZGVzY3JpcHRpb24NCisNCisgICAgICBT
-ZXQgdGhlIGVuZGlhbmVzcyBvZiBhIFZRIGZvciBsZWdhY3kgZGV2aWNlcy4gQmlnLWVuZGlhbiBp
-cyBpbmRpY2F0ZWQNCisgICAgICB3aXRoIHN0YXRlLm51bSBzZXQgdG8gdHJ1ZSwgYW5kIGxpdHRs
-ZS1lbmRpYW4gaXMgaW5kaWNhdGVkIHdpdGggc3RhdGUubnVtDQorICAgICAgc2V0IHRvIGZhbHNl
-Lg0KKyAgICAgIFRoaXMgcmVxdWVzdCBzaG91bGQgYmUgc2VudCBvbmx5IHdoZW4gVkhPU1RfVVNF
-Ul9QUk9UT0NPTF9GX0NST1NTX0VORElBTg0KKyAgICAgIGhhcyBiZWVuIG5lZ290aWF0ZWQuDQoN
-CkFuZCBpdCBjYW4gYmUgc2VudCBhdCBhbnkgdGltZT8gbXVsdGlwbGUgdGltZXM/IERvIHdlIGV4
-cGVjdCB0aGUgYmFja2VuZCB0byBoYW5kbGUgYW55IGVuZGlhbmVzcz8NCg0KVGhhbmtzIGZvciB0
-aGUgZmVlZGJhY2suIEkgdHJpZWQgdG8gd3JpdGUgdGhlIGRvY3MgdG8gdGhlIHNhbWUgbGV2ZWwg
-b2YgZGV0YWlsIG9mIHRoZSBvdGhlciBtZXNzYWdlcywgYnV0IGFncmVlIHRoYXQgd2Ugc2hvdWxk
-IHN0YXJ0IHRvIG1ha2UgYW4gZWZmb3J0IHRvIGhhdmUgbW9yZSBlbGFib3JhdGUgZG9jdW1lbnRh
-dGlvbi4gSSdsbCBhZGRyZXNzIHlvdXIgcXVlc3Rpb25zIG9uIHRoZSBzcGVjIGFuZCBzZW5kIGEg
-djIuDQoNCkkgYWxzbyBub3RpY2VkIHRoZSAiaWQiIGFib3ZlIChvbiB0aGUgZG9jKSBzaG91bGQg
-YmUgMjMuDQoNClRoYW5rcywNCkZlbGlwZQ0K
+From: KONRAD Frederic <fred.konrad@greensocs.com>
+
+This replaces env1 and page_index variables by env and index
+so we can use VICTIM_TLB_HIT macro later.
+
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
+---
+ cputlb.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/cputlb.c b/cputlb.c
+index 743776a..1cc382d 100644
+--- a/cputlb.c
++++ b/cputlb.c
+@@ -751,21 +751,21 @@ static inline ram_addr_t qemu_ram_addr_from_host_nofail(void *ptr)
+  * is actually a ram_addr_t (in system mode; the user mode emulation
+  * version of this function returns a guest virtual address).
+  */
+-tb_page_addr_t get_page_addr_code(CPUArchState *env1, target_ulong addr)
++tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
+ {
+-    int mmu_idx, page_index, pd;
++    int mmu_idx, index, pd;
+     void *p;
+     MemoryRegion *mr;
+-    CPUState *cpu = ENV_GET_CPU(env1);
++    CPUState *cpu = ENV_GET_CPU(env);
+     CPUIOTLBEntry *iotlbentry;
+ 
+-    page_index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
+-    mmu_idx = cpu_mmu_index(env1, true);
+-    if (unlikely(env1->tlb_table[mmu_idx][page_index].addr_code !=
++    index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
++    mmu_idx = cpu_mmu_index(env, true);
++    if (unlikely(env->tlb_table[mmu_idx][index].addr_code !=
+                  (addr & TARGET_PAGE_MASK))) {
+-        cpu_ldub_code(env1, addr);
++        cpu_ldub_code(env, addr);
+     }
+-    iotlbentry = &env1->iotlb[mmu_idx][page_index];
++    iotlbentry = &env->iotlb[mmu_idx][index];
+     pd = iotlbentry->addr & ~TARGET_PAGE_MASK;
+     mr = iotlb_to_region(cpu, pd, iotlbentry->attrs);
+     if (memory_region_is_unassigned(mr)) {
+@@ -777,7 +777,7 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env1, target_ulong addr)
+         report_bad_exec(cpu, addr);
+         exit(1);
+     }
+-    p = (void *)((uintptr_t)addr + env1->tlb_table[mmu_idx][page_index].addend);
++    p = (void *)((uintptr_t)addr + env->tlb_table[mmu_idx][index].addend);
+     return qemu_ram_addr_from_host_nofail(p);
+ }
+ 
+-- 
+2.7.4
