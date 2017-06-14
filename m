@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48361)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dL6jU-0005ha-9n
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:45:09 -0400
+	(envelope-from <quintela@redhat.com>) id 1dL6py-0007q5-0R
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:51:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dL6jQ-0005tQ-8Q
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:45:08 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:33431)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dL6jP-0005rz-Vj
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:45:04 -0400
-Received: by mail-wr0-x231.google.com with SMTP id v104so174059112wrb.0
-	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 04:45:03 -0700 (PDT)
-References: <20170609170100.3599-1-alex.bennee@linaro.org>
-	<20170609170100.3599-4-alex.bennee@linaro.org>
-	<fc351edb-7c08-c341-d8ee-85f6768e4931@twiddle.net>
-	<87vao4b4z5.fsf@linaro.org>
-	<9776b437-90b4-f2c2-4a0c-c1c6585379bf@twiddle.net>
-	<20170611050730.GA12317@flamenco> <20170613225352.GA26288@flamenco>
-	<db800d74-7cfa-d9e3-60d7-3e7b19565b9b@twiddle.net>
-	<5036e9ad-257a-b098-5093-050fca825627@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <5036e9ad-257a-b098-5093-050fca825627@redhat.com>
-Date: Wed, 14 Jun 2017 12:45:34 +0100
-Message-ID: <87r2ymiyht.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] target/aarch64: exit to main loop after
- handling MSR
+	(envelope-from <quintela@redhat.com>) id 1dL6pv-0000S3-M7
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:51:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44084)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dL6pv-0000Rk-FN
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 07:51:47 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4B4AB80C0A
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 11:51:46 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Wed, 14 Jun 2017 13:51:34 +0200
+Message-Id: <20170614115138.19571-2-quintela@redhat.com>
+In-Reply-To: <20170614115138.19571-1-quintela@redhat.com>
+References: <20170614115138.19571-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PULL 1/5] migration: Fix compilation with older
+ compilers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,43 +30,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>, "Emilio G. Cota" <cota@braap.org>, peter.maydell@linaro.org, edgar.iglesias@xilinx.com, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "open list:ARM" <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
+That typedefs are needed on both files.  New compilers (F25 where I
+work) don't complain about repeating a typedef.  But older ones
+complain.
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+---
+ include/migration/register.h | 3 ---
+ include/migration/vmstate.h  | 1 -
+ include/qemu/typedefs.h      | 2 ++
+ 3 files changed, 2 insertions(+), 4 deletions(-)
 
-> On 14/06/2017 06:48, Richard Henderson wrote:
->>>
->>> Commit e75449a3 ("target/aarch64: optimize indirect branches") causes
->>> a regression by which aarch64 guests freeze under TCG with -smp > 1,
->>> even with `-accel accel=tcg,thread=single' (i.e. MTTCG disabled).
->>>
->>> I isolated the problem to the MSR handler. This patch forces an exit
->>> after the handler is executed, which fixes the regression.
->>
->> Why would that be?  The cpu_get_tb_cpu_state within helper_lookup_tb_ptr
->> is supposed to read the new state that the msr handler would have
->> installed.
->
-> Could some of these cause an interrupt, or some other change in the
-> cpu_exec flow?
-
-Well what I was observing was the secondary_start_kernel stalling and
-leaving the main cpu spinning. The msr is actually:
-
-	local_irq_enable();
-	local_fiq_enable();
-
-Which I assume would re-enable IRQs if they are ready to go. However I
-guess if we sink into our cpu_idle without exiting the main loop we
-never set any pending IRQs?
-
->
-> Thanks,
->
-> Paolo
-
-
---
-Alex Bennée
+diff --git a/include/migration/register.h b/include/migration/register.h
+index 717c617..d9498d9 100644
+--- a/include/migration/register.h
++++ b/include/migration/register.h
+@@ -14,9 +14,6 @@
+ #ifndef MIGRATION_REGISTER_H
+ #define MIGRATION_REGISTER_H
+ 
+-typedef void SaveStateHandler(QEMUFile *f, void *opaque);
+-typedef int LoadStateHandler(QEMUFile *f, void *opaque, int version_id);
+-
+ typedef struct SaveVMHandlers {
+     /* This runs inside the iothread lock.  */
+     SaveStateHandler *save_state;
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index f3f3c2a..e85fbd8 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -29,7 +29,6 @@
+ 
+ #include "migration/qjson.h"
+ 
+-typedef int LoadStateHandler(QEMUFile *f, void *opaque, int version_id);
+ typedef struct VMStateInfo VMStateInfo;
+ typedef struct VMStateDescription VMStateDescription;
+ typedef struct VMStateField VMStateField;
+diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+index 51958bf..f745d5f 100644
+--- a/include/qemu/typedefs.h
++++ b/include/qemu/typedefs.h
+@@ -96,5 +96,7 @@ typedef struct uWireSlave uWireSlave;
+ typedef struct VirtIODevice VirtIODevice;
+ typedef struct Visitor Visitor;
+ typedef struct node_info NodeInfo;
++typedef void SaveStateHandler(QEMUFile *f, void *opaque);
++typedef int LoadStateHandler(QEMUFile *f, void *opaque, int version_id);
+ 
+ #endif /* QEMU_TYPEDEFS_H */
+-- 
+2.9.4
