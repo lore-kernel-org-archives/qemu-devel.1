@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dLRoi-0006cF-Rg
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:15:58 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dLSL5-0005xT-E7
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:49:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dLRoh-0002zZ-HT
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:15:56 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:36339)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dLRoh-0002zJ-5O
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:15:55 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id 36so14940063wry.3
-	for <qemu-devel@nongnu.org>; Thu, 15 Jun 2017 03:15:55 -0700 (PDT)
+	(envelope-from <stefanha@gmail.com>) id 1dLSL4-00068x-Kx
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:49:23 -0400
+Date: Thu, 15 Jun 2017 11:49:10 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170615104910.GB27346@stefanha-x1.localdomain>
+References: <20170613205726.13544-1-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170614105547.Horde.Qq_wt1XJCR6spCHFrm8xE9K@www.quantumachine.net>
-References: <20170614105547.Horde.Qq_wt1XJCR6spCHFrm8xE9K@www.quantumachine.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 15 Jun 2017 11:15:33 +0100
-Message-ID: <CAFEAcA8idTcunTM61VVOnHSgryo1ZS5wK+MkZgCnn5C0h4+KuA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] DragonFly BSD support
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="PmA2V3Z32TCmWXqI"
+Content-Disposition: inline
+In-Reply-To: <20170613205726.13544-1-mreitz@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] block: Do not strcmp()
+ with NULL uri->scheme
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +24,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Antonio_Huete_Jim=C3=A9nez?= <tuxillo@quantumachine.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org, qemu-devel@nongnu.org
 
-On 14 June 2017 at 11:55, Antonio Huete Jim=C3=A9nez
-<tuxillo@quantumachine.net> wrote:
-> According to 2.9 changelog page, DragonFly BSD will be listed as unsuppor=
-ted
-> with the possibility of dropping support completely in the future:
->
-> http://wiki.qemu.org/ChangeLog/2.9
->
-> I'd like to volunteer so that qemu can keep DragonFly BSD as a supported
-> platform.
-> Could you please let me know the requirements needed to do so?
 
-Thanks for volunteering!
+--PmA2V3Z32TCmWXqI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-So, what we need comes in two parts:
- (1) a machine we can use for our build tests (ie which I can have
-an ssh account on; we may set up more formal continuous-integration
-later). Since I don't know the BSDs somebody else needs to be
-handling sysadmin work for it.
-At a pinch, detailed instructions on how to set up a VM on
-Linux running DragonFly BSD would do; we have those for some
-of the BSDs here: http://wiki.qemu.org/Hosts/BSD
+On Tue, Jun 13, 2017 at 10:57:26PM +0200, Max Reitz wrote:
+> uri_parse(...)->scheme may be NULL. In fact, probably every field may be
+> NULL, and the callers do test this for all of the other fields but not
+> for scheme (except for block/gluster.c; block/vxhs.c does not access
+> that field at all).
+>=20
+> We can easily fix this by using g_strcmp0() instead of strcmp().
+>=20
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+> v2:
+> - Fix all affected block drivers, not just nfs [Peter]
+> - Use g_strcmp0() [Markus]
+> ---
+>  block/nbd.c      | 6 +++---
+>  block/nfs.c      | 2 +-
+>  block/sheepdog.c | 6 +++---
+>  block/ssh.c      | 2 +-
+>  4 files changed, 8 insertions(+), 8 deletions(-)
 
- (2) somebody who's prepared to list themselves as the maintainer
-for the host OS, and respond to problems/patches relating to it.
-In particular the first thing will be to ensure that QEMU actually
-builds and passes 'make check' on this OS and submit any patches
-needed to fix problems. If there are any non-upstream patches
-lurking around in a ports system, then you'll also want to start
-cleaning those up and getting them upstream.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-When we get to the point where we have a machine in our
-standard build-and-test setup which passes 'make && make check'
-then we can drop the "this is unsupported" note from configure.
+--PmA2V3Z32TCmWXqI
+Content-Type: application/pgp-signature; name="signature.asc"
 
-thanks
--- PMM
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZQmYmAAoJEJykq7OBq3PIX7kIAKFM1ktxglvQJS2SFVORtp6a
+JLPP8rQzm1GaEcd52y1U1EXL35Dj43VPZyrVFCZuh5BfRa51cNzMfV+JRLAOr0Ks
+mB9qUarI0oaxaXTNeqJKf04iCRcpSOjwJn75vWs2G3bhaaWR6cVWrIGjG8cYe4Na
+Fpago6TXaAyNGymxJNgrxRObqpu6imyUMn4dHcJ4vu8t1RGTXrvCKLxkH3Fx0Qic
+0Yk8ebBps+yci4s2TB5NeWAsNU/YXzJRariVjtgFRJYcAjFka+YA57TxEfCNv4bt
+Z6/O7GPyUDUhHQOmnGH6tj6fEwPsFWrvDV0bXkqM5DHilGfL+Ay+BBAcEmaKCyg=
+=q0K2
+-----END PGP SIGNATURE-----
+
+--PmA2V3Z32TCmWXqI--
