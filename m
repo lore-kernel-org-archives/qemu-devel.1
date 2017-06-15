@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dLWhn-0005eN-DD
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 11:29:08 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dLWmR-0006fa-FR
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 11:33:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dLWhk-0001Pe-3m
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 11:29:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45982)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dLWhj-0001Ot-U4
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 11:29:04 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 50A3261BAE
-	for <qemu-devel@nongnu.org>; Thu, 15 Jun 2017 15:29:00 +0000 (UTC)
-Date: Thu, 15 Jun 2017 16:28:52 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170615152852.GB2399@work-vm>
+	(envelope-from <peter.maydell@linaro.org>) id 1dLWmQ-0002qJ-PP
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 11:33:55 -0400
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:32964)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dLWmQ-0002q0-HN
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 11:33:54 -0400
+Received: by mail-wr0-x232.google.com with SMTP id r103so24588974wrb.0
+	for <qemu-devel@nongnu.org>; Thu, 15 Jun 2017 08:33:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] ahci-test failures with 'Failed to get "write" lock'
+In-Reply-To: <20170613202659.1920-1-rth@twiddle.net>
+References: <20170613202659.1920-1-rth@twiddle.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 15 Jun 2017 16:33:32 +0100
+Message-ID: <CAFEAcA8f4zicyThvnEeZkqLDzwFMGPNmQvYNDGffSS3WGNEwwA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/3] Queued s390x tcg patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,31 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, jsnow@redhat.com, kwolf@redhat.com
-Cc: stefanha@redhat.com, mreitz@redhat.com
+To: Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Hi,
-  Peter noticed that there were some hangs in the ahci-test;
-I can reproduce them on my laptop as long as the laptop has
-some other load on it (a few md5sum /dev/zero's help).
+On 13 June 2017 at 21:26, Richard Henderson <rth@twiddle.net> wrote:
+> Cleanups and fixes from David Hildenbrand.
+>
+>
+> r~
+>
+>
+>
+> The following changes since commit 3f0602927b120a480b35dcf58cf6f95435b3ae91:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20170613' into staging (2017-06-13 15:49:07 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/rth7680/qemu.git tags/pull-s390-20170613
+>
+> for you to fetch changes up to 076d4d39b65f50ca1bba3d3c8a8f1cf977c1c3f0:
+>
+>   s390x/cpumodel: wire up cpu type + id for TCG (2017-06-13 11:09:39 -0700)
+>
+> ----------------------------------------------------------------
+> Queued s390 patches
+>
+> ----------------------------------------------------------------
+> David Hildenbrand (3):
+>       target/s390x: correctly indicate PER nullification
+>       target/s390x: rework PGM interrupt psw.addr handling
+>       s390x/cpumodel: wire up cpu type + id for TCG
 
-/x86_64/ahci/flush/migrate: qemu-system-x86_64: Failed to get "write" lock
-Is another process using the image?
-OK
-/x86_64/ahci/migrate/sanity: qemu-system-x86_64: Failed to get "write" lock
-Is another process using the image?
+Applied, thanks.
 
-and that hangs in sanity.
-
-That seems to be the common case, I've also had one:
-
-/x86_64/ahci/migrate/ncq/halted: qemu-system-x86_64: Failed to get "write" lock
-Is another process using the image?
-qemu-system-x86_64: /home/dgilbert/git/qemu/block/io.c:1352: bdrv_aligned_pwritev: Assertion `child->perm & BLK_PERM_WRITE' failed.
-
-
-Neither of these always fail.
-
-Dave
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- PMM
