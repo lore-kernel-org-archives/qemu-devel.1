@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55469)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dLcAq-0001qV-9S
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 17:19:29 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dLcBO-000246-GW
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 17:20:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dLcAp-0006Xi-5M
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 17:19:28 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:57524)
+	(envelope-from <aurelien@aurel32.net>) id 1dLcBN-0006oY-KG
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 17:20:02 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:57542)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dLcAo-0006X5-UP
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 17:19:27 -0400
-Date: Thu, 15 Jun 2017 23:19:20 +0200
+	id 1dLcBN-0006o9-Fb
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 17:20:01 -0400
+Date: Thu, 15 Jun 2017 23:19:59 +0200
 From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170615211920.c7y2xaixy6tm2fan@aurel32.net>
-References: <20170614194821.8754-1-rth@twiddle.net>
-	<20170614194821.8754-4-rth@twiddle.net>
+Message-ID: <20170615211959.kl3d2umj7s2o7prm@aurel32.net>
+References: <20170615055356.20684-1-rth@twiddle.net>
+	<20170615055356.20684-6-rth@twiddle.net>
+	<20170615204908.3izswcs4q6l34wrg@aurel32.net>
+	<a1abdb2d-68c0-74d1-cb32-9ceb5c879151@twiddle.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170614194821.8754-4-rth@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] target/mips: Exit after enabling
- interrupts
+In-Reply-To: <a1abdb2d-68c0-74d1-cb32-9ceb5c879151@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH 5/5] target/s390x: mark CSST, CSST2,
+ FPSEH facilities as available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +32,21 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org, cota@braap.org, pbonzini@redhat.com, Yongbok Kim <yongbok.kim@imgtec.com>
+Cc: qemu-devel@nongnu.org, david@redhat.com
 
-On 2017-06-14 12:48, Richard Henderson wrote:
-> From: Paolo Bonzini <pbonzini@redhat.com>
+On 2017-06-15 14:10, Richard Henderson wrote:
+> On 06/15/2017 01:49 PM, Aurelien Jarno wrote:
+> > > +        S390_FEAT_FLOATING_POINT_SUPPPORT_ENH,
+> > 
+> > Theoretically the floating-point-support-enhancement facilities include
+> > the DFP rounding facility. Given We don't implement the DFP facility I
+> > guess this can be ignored.
 > 
-> Exit to cpu loop so we reevaluate cpu_mips_hw_interrupts.
+> We *do* implement the one instruction in DFP-rounding-facility: SRNMT.
 > 
-> Cc: Aurelien Jarno <aurelien@aurel32.net>
-> Cc: Yongbok Kim <yongbok.kim@imgtec.com>
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
-> ---
->  target/mips/translate.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index 559f8fe..891f14b 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
-> @@ -13403,9 +13403,11 @@ static void gen_pool32axf (CPUMIPSState *env, DisasContext *ctx, int rt, int rs)
->                  save_cpu_state(ctx, 1);
->                  gen_helper_ei(t0, cpu_env);
->                  gen_store_gpr(t0, rs);
-> -                /* Stop translation as we may have switched the execution mode */
-> -                ctx->bstate = BS_STOP;
->                  tcg_temp_free(t0);
-> +                /* BS_STOP isn't good enough here;
-> +                   reevaluate cpu_mips_hw_interrupts_enabled.  */
-> +                gen_save_pc(ctx->pc + 4);
-> +                ctx->bstate = BS_EXCP;
->              }
->              break;
->          default:
 
-While the above looks correct, it's not complete. It only fixes the
-microMIPS EI instruction. The MIPS one also has to be fixed.
-
-For what I understood, anything that can change the result of
-cpu_mips_hw_interrupts_enabled has to stop the translation. In that case
-I checked that ERET/ERETNC and MTC0/DMTC0 to the Status register are
-already correct, that said it might be a good idea to update the
-comments to mention it.
-
-I can work on a better patch, but I doubt I'll have time before the
-week-end.
-
-Aurelien
+Ah ok, nevermind then. The DFP support is in better state than I
+thought ;-).
 
 -- 
 Aurelien Jarno                          GPG: 4096R/1DDD8C9B
