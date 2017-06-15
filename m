@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dLMQV-0005SF-B4
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 00:30:36 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dLMRd-00061e-1x
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 00:31:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dLMQU-0005e3-18
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 00:30:35 -0400
-Date: Thu, 15 Jun 2017 00:30:22 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170615043022.GF2767@localhost.localdomain>
-References: <20170614215526.9218-1-jcody@redhat.com>
-	<149747921115.2241.11634852803092743941@4a9a010726c0>
+	(envelope-from <jasowang@redhat.com>) id 1dLMRW-0005oh-Vl
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 00:31:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37122)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dLMRW-0005oZ-QF
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 00:31:38 -0400
+References: <1496829322-17099-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1496829322-17099-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<4d998686-136d-1b6d-a641-9332930dcc93@redhat.com>
+	<28122598-b6b3-9eb6-b726-bd7c22735780@cn.fujitsu.com>
+	<93409ed0-7dcb-a167-9438-f5f2b1f3bef5@redhat.com>
+	<5eff3578-61ac-f41a-1cab-9cc6ef40d7db@cn.fujitsu.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <2b200cad-ac3a-fa86-0fa4-cc4dc39b2e09@redhat.com>
+Date: Thu, 15 Jun 2017 12:31:30 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <149747921115.2241.11634852803092743941@4a9a010726c0>
+In-Reply-To: <5eff3578-61ac-f41a-1cab-9cc6ef40d7db@cn.fujitsu.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/2] Block patches
+Subject: Re: [Qemu-devel] [PATCH V6 02/10] net/filter-mirror.c: Make filter
+ mirror support vnet support.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,73 +33,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, qemu-block@nongnu.org, peter.maydell@linaro.org, stefanha@redhat.com
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
+Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, weifuqiang <weifuqiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>
 
-On Wed, Jun 14, 2017 at 03:26:52PM -0700, no-reply@patchew.org wrote:
-> Hi,
->=20
-> This series failed automatic build test. Please find the testing comman=
-ds and
-> their output below. If you have docker installed, you can probably repr=
-oduce it
-> locally.
->=20
-> Type: series
-> Subject: [Qemu-devel] [PULL 0/2] Block patches
-> Message-id: 20170614215526.9218-1-jcody@redhat.com
->=20
-> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
-> #!/bin/bash
-> set -e
-> git submodule update --init dtc
-> # Let docker tests dump environment info
-> export SHOW_ENV=3D1
-> export J=3D8
-> # master is broken, skip centos6...
-> #time make docker-test-quick@centos6
-> time make docker-test-mingw@fedora
-> time make docker-test-build@min-glib
-> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
->=20
-> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> From https://github.com/patchew-project/qemu
->  * [new tag]         patchew/20170614215526.9218-1-jcody@redhat.com -> =
-patchew/20170614215526.9218-1-jcody@redhat.com
-> Switched to a new branch 'test'
-> 2f0938b block/iscsi: enable filename option and parsing
-> e6b28ad block/rbd: enable filename option and parsing
+
+
+On 2017=E5=B9=B406=E6=9C=8814=E6=97=A5 16:04, Zhang Chen wrote:
 >
+>
+> On 06/13/2017 05:14 PM, Jason Wang wrote:
+>>
+>>
+>> On 2017=E5=B9=B406=E6=9C=8812=E6=97=A5 17:27, Zhang Chen wrote:
+>>>>
+>>>>> +        if (nf->direction =3D=3D NET_FILTER_DIRECTION_RX ||
+>>>>> +            nf->direction =3D=3D NET_FILTER_DIRECTION_ALL) {
+>>>>> +            vnet_hdr_len =3D nf->netdev->vnet_hdr_len;
+>>>>
+>>>> This can only work if e.g virtio-net set its own vnet_hdr_len. But=20
+>>>> looks like it use guest_hdr_len instead.
+>>>
+>>> I see in hw/net/virtio-net.c use the=20
+>>> "qemu_set_vnet_hdr_len(nc->peer, n->guest_hdr_len);" to
+>>> set the nf->netdev->vnet_hdr_len, any case not include here?=20
+>>
+>> You mean:
+>>
+>>         if (peer_has_vnet_hdr(n) &&
+>>             qemu_has_vnet_hdr_len(nc->peer, n->guest_hdr_len)) {
+>>             qemu_set_vnet_hdr_len(nc->peer, n->guest_hdr_len);
+>>             n->host_hdr_len =3D n->guest_hdr_len;
+>>         }
+>>
+>> ?
+>>
+>> From the code, it only set peer's vnet header when peer supports=20
+>> vnet_hdr up to n->guest_hdr_len. If peer can't, virtio-net will strip=20
+>> the header.
+>
+> So, We should get the n->guest_hdr_len in another way? like set a new=20
+> parameter in NetClientState?
+> Any suggestion about it?
+>
+> Thanks
+> Zhang Chen
 
-[...]
+Rethink about this, a question is do we really care guest vnet header=20
+len? During guest transmission, when packet reaches netfilter. The=20
+vnet_header should have been stripped to netdev->vnet_hdr_len.
 
->   CC      hw/pci-bridge/pcie_root_port.o
->   CC      hw/pci-bridge/gen_pcie_root_port.o
->   CC      hw/pci-bridge/pci_expander_bridge.o
-> In file included from /tmp/qemu-test/src/hw/net/vmxnet3.c:30:
-> /tmp/qemu-test/src/include/migration/register.h:18: error: redefinition=
- of typedef =E2=80=98LoadStateHandler=E2=80=99
-> /tmp/qemu-test/src/include/migration/vmstate.h:32: note: previous decla=
-ration of =E2=80=98LoadStateHandler=E2=80=99 was here
+I still think use nf->netdev->vnet_hdr_len is sufficient.
 
-Just an FYI, this appears to be unrelated to the actual patches in the pu=
-ll
-req.
+Thanks
 
-> make: *** [hw/net/vmxnet3.o] Error 1
-> make: *** Waiting for unfinished jobs....
-> tests/docker/Makefile.include:118: recipe for target 'docker-run' faile=
-d
-> make[1]: *** [docker-run] Error 2
-> make[1]: Leaving directory '/var/tmp/patchew-tester-tmp-aceb4nxr/src'
-> tests/docker/Makefile.include:149: recipe for target 'docker-run-test-b=
-uild@min-glib' failed
-> make: *** [docker-run-test-build@min-glib] Error 2
-> =3D=3D=3D OUTPUT END =3D=3D=3D
->=20
-> Test command exited with code: 2
->=20
->=20
-> ---
-> Email generated automatically by Patchew [http://patchew.org/].
-> Please send your feedback to patchew-devel@freelists.org
+>
+>>
+>> Thanks
+>>
+>>
+>>
+>
