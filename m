@@ -1,17 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sochin.jiang@huawei.com>) id 1dLOct-0003yu-89
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 02:51:32 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dLOsn-0008As-5m
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 03:07:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sochin.jiang@huawei.com>) id 1dLOcs-0002xk-6W
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 02:51:31 -0400
-From: "sochin.jiang" <sochin.jiang@huawei.com>
-Date: Thu, 15 Jun 2017 14:47:33 +0800
-Message-ID: <1497509253-28941-1-git-send-email-sochin.jiang@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] fix: avoid an infinite loop or a dangling
- pointer problem in img_commit
+	(envelope-from <kraxel@redhat.com>) id 1dLOsi-0006sf-7B
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 03:07:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57458)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dLOsi-0006rT-04
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 03:07:52 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id ED87C8553C
+	for <qemu-devel@nongnu.org>; Thu, 15 Jun 2017 07:07:49 +0000 (UTC)
+Message-ID: <1497510465.5952.1.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 15 Jun 2017 09:07:45 +0200
+In-Reply-To: <20170614211927-mutt-send-email-mst@kernel.org>
+References: <20170608161013.17920-1-lersek@redhat.com>
+	<20170608204026-mutt-send-email-mst@kernel.org>
+	<1496951333.29761.5.camel@redhat.com>
+	<20170608224942-mutt-send-email-mst@kernel.org>
+	<7a7647cd-3d7a-0b6f-0691-d656c9026f44@redhat.com>
+	<1497038478.10080.1.camel@redhat.com>
+	<20170614211927-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] q35/mch: implement extended TSEG sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,111 +38,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, sochin.jiang@huawei.com, eric.fangyi@huawei.com, subo7@huawei.com, xieyingtai@huawei.com, lina.lulina@huawei.com, zhangshuai13@huawei.com, lizhengui@huawei.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, qemu devel list <qemu-devel@nongnu.org>
 
-From: "sochin.jiang" <sochin.jiang@huawei.com>
+  Hi,
 
-img_commit could fall into an infinite loop calling run_block_job() if
-its blockjob fails on any I/O error, fix this already known problem.
+> To be specific, what I meant is a bit that tells guest that a
+> config space register is available, and lets host find out
+> that guest is going to use it.
+> 
+> This to ensure full forward and backward compatibility.
+> 
+> I agree a fw cfg file for a single bit seems like an overkill, that's
+> why I thought sharing feature files with SMI would be a good idea.
+> 
+> Do you see an issue with that?
 
-Signed-off-by: sochin.jiang <sochin.jiang@huawei.com>
----
- blockjob.c               |  4 ++--
- include/block/blockjob.h | 18 ++++++++++++++++++
- qemu-img.c               | 20 +++++++++++++-------
- 3 files changed, 33 insertions(+), 9 deletions(-)
+The point of placing the extended-tseg-size register in mch pci config
+is that the firmware can figure this easily *without* looking somewhere
+else, as all the other tseg (and smram) config bits are in mch pci
+config space too.
 
-diff --git a/blockjob.c b/blockjob.c
-index a0d7e29..70a7818 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -139,7 +139,7 @@ static void block_job_resume(BlockJob *job)
-     block_job_enter(job);
- }
- 
--static void block_job_ref(BlockJob *job)
-+void block_job_ref(BlockJob *job)
- {
-     ++job->refcnt;
- }
-@@ -148,7 +148,7 @@ static void block_job_attached_aio_context(AioContext *new_context,
-                                            void *opaque);
- static void block_job_detach_aio_context(void *opaque);
- 
--static void block_job_unref(BlockJob *job)
-+void block_job_unref(BlockJob *job)
- {
-     if (--job->refcnt == 0) {
-         BlockDriverState *bs = blk_bs(job->blk);
-diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index 09c7c69..67c0968 100644
---- a/include/block/blockjob.h
-+++ b/include/block/blockjob.h
-@@ -321,6 +321,24 @@ void block_job_iostatus_reset(BlockJob *job);
- BlockJobTxn *block_job_txn_new(void);
- 
- /**
-+ * block_job_ref:
-+ *
-+ * Add a reference to BlockJob refcnt, it will be decreased with
-+ * block_job_unref, and then be freed if it comes to be the last
-+ * reference.
-+ */
-+void block_job_ref(BlockJob *job);
-+
-+/**
-+ * block_job_unref:
-+ *
-+ * Release a reference that was previously acquired with block_job_ref
-+ * or block_job_create. If it's the last reference to the object, it will be
-+ * freed.
-+ */
-+void block_job_unref(BlockJob *job);
-+
-+/**
-  * block_job_txn_unref:
-  *
-  * Release a reference that was previously acquired with block_job_txn_add_job
-diff --git a/qemu-img.c b/qemu-img.c
-index 0ad698d..e70d515 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -887,22 +887,28 @@ static void common_block_job_cb(void *opaque, int ret)
- static void run_block_job(BlockJob *job, Error **errp)
- {
-     AioContext *aio_context = blk_get_aio_context(job->blk);
-+    int ret = 0;
- 
--    /* FIXME In error cases, the job simply goes away and we access a dangling
--     * pointer below. */
-     aio_context_acquire(aio_context);
-+    block_job_ref(job);
-     do {
-         aio_poll(aio_context, true);
-         qemu_progress_print(job->len ?
-                             ((float)job->offset / job->len * 100.f) : 0.0f, 0);
--    } while (!job->ready);
-+    } while (!job->ready && !job->completed);
- 
--    block_job_complete_sync(job, errp);
-+    if (!job->completed) {
-+        ret = block_job_complete_sync(job, errp);
-+    } else {
-+        ret = job->ret;
-+    }
-+    block_job_unref(job);
-     aio_context_release(aio_context);
- 
--    /* A block job may finish instantaneously without publishing any progress,
--     * so just signal completion here */
--    qemu_progress_print(100.f, 0);
-+    /* publish completion progress only when success */
-+    if (!ret) {
-+        qemu_progress_print(100.f, 0);
-+    }
- }
- 
- static int img_commit(int argc, char **argv)
--- 
-1.8.3.1
+When involving fw_cfg there is no reason to keep the extended-tseg-size 
+register in mch.  We can simply place a "etc/q35-extended-tseg-size"
+file in fw_cfg then (which is either not present or contains the
+extended tseg size).  So a feature bit in fw_cfg looks absolutely
+pointless to me.
+
+I still think the approach and patch by Laszlo is perfectly fine. 
+While being at it:
+
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+
+cheers,
+  Gerd
