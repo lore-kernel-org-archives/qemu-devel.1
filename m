@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dLSPK-000069-L9
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:50 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dLSPP-0000D7-Mk
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dLSPJ-0007fu-Ob
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:46 -0400
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:34293)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dLSPN-0007ic-Pk
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:51 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:35320)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dLSPJ-0007fI-Ef
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:45 -0400
-Received: by mail-wr0-x22e.google.com with SMTP id 77so16400104wrb.1
-	for <qemu-devel@nongnu.org>; Thu, 15 Jun 2017 03:53:45 -0700 (PDT)
+	id 1dLSPN-0007i7-Js
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:49 -0400
+Received: by mail-wr0-x242.google.com with SMTP id z45so2764721wrb.2
+	for <qemu-devel@nongnu.org>; Thu, 15 Jun 2017 03:53:49 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 15 Jun 2017 12:52:50 +0200
-Message-Id: <1497523981-38449-31-git-send-email-pbonzini@redhat.com>
+Date: Thu, 15 Jun 2017 12:52:54 +0200
+Message-Id: <1497523981-38449-35-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1497523981-38449-1-git-send-email-pbonzini@redhat.com>
 References: <1497523981-38449-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 30/41] nbd/server: refactor
- nbd_co_receive_request
+Subject: [Qemu-devel] [PULL 34/41] nbd/server: rename rc to ret
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,126 +32,115 @@ Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Move function tail, about receiving next request out of the function.
-Error path is simplified and nbd_co_receive_request becomes more
-corresponding to its name.
+For consistency use 'ret' name for saving return code everywhere
+in the file.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20170602150150.258222-8-vsementsov@virtuozzo.com>
+Message-Id: <20170602150150.258222-12-vsementsov@virtuozzo.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- nbd/server.c | 41 +++++++++++++----------------------------
- 1 file changed, 13 insertions(+), 28 deletions(-)
+ nbd/server.c | 38 +++++++++++++++++++-------------------
+ 1 file changed, 19 insertions(+), 19 deletions(-)
 
 diff --git a/nbd/server.c b/nbd/server.c
-index 00a19f6..9fb03ce 100644
+index 3b46038..f19f5fd 100644
 --- a/nbd/server.c
 +++ b/nbd/server.c
-@@ -1006,14 +1006,11 @@ static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len)
- static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request)
+@@ -211,15 +211,15 @@ static int nbd_negotiate_send_rep_list(QIOChannel *ioc, NBDExport *exp)
+     uint32_t len;
+     const char *name = exp->name ? exp->name : "";
+     const char *desc = exp->description ? exp->description : "";
+-    int rc;
++    int ret;
+ 
+     TRACE("Advertising export name '%s' description '%s'", name, desc);
+     name_len = strlen(name);
+     desc_len = strlen(desc);
+     len = name_len + desc_len + sizeof(len);
+-    rc = nbd_negotiate_send_rep_len(ioc, NBD_REP_SERVER, NBD_OPT_LIST, len);
+-    if (rc < 0) {
+-        return rc;
++    ret = nbd_negotiate_send_rep_len(ioc, NBD_REP_SERVER, NBD_OPT_LIST, len);
++    if (ret < 0) {
++        return ret;
+     }
+ 
+     len = cpu_to_be32(name_len);
+@@ -536,7 +536,7 @@ static int nbd_negotiate_options(NBDClient *client)
+ static coroutine_fn int nbd_negotiate(NBDClient *client)
+ {
+     char buf[8 + 8 + 8 + 128];
+-    int rc;
++    int ret;
+     const uint16_t myflags = (NBD_FLAG_HAS_FLAGS | NBD_FLAG_SEND_TRIM |
+                               NBD_FLAG_SEND_FLUSH | NBD_FLAG_SEND_FUA |
+                               NBD_FLAG_SEND_WRITE_ZEROES);
+@@ -593,10 +593,10 @@ static coroutine_fn int nbd_negotiate(NBDClient *client)
+             LOG("write failed");
+             return -EINVAL;
+         }
+-        rc = nbd_negotiate_options(client);
+-        if (rc != 0) {
++        ret = nbd_negotiate_options(client);
++        if (ret != 0) {
+             LOG("option negotiation failed");
+-            return rc;
++            return ret;
+         }
+ 
+         TRACE("advertising size %" PRIu64 " and flags %x",
+@@ -604,10 +604,10 @@ static coroutine_fn int nbd_negotiate(NBDClient *client)
+         stq_be_p(buf + 18, client->exp->size);
+         stw_be_p(buf + 26, client->exp->nbdflags | myflags);
+         len = client->no_zeroes ? 10 : sizeof(buf) - 18;
+-        rc = nbd_write(client->ioc, buf + 18, len, NULL);
+-        if (rc < 0) {
++        ret = nbd_write(client->ioc, buf + 18, len, NULL);
++        if (ret < 0) {
+             LOG("write failed");
+-            return rc;
++            return ret;
+         }
+     }
+ 
+@@ -963,21 +963,21 @@ void nbd_export_close_all(void)
+ static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len)
  {
      NBDClient *client = req->client;
 -    int rc;
++    int ret;
  
      g_assert(qemu_in_coroutine());
-     assert(client->recv_coroutine == qemu_coroutine_self());
--    rc = nbd_receive_request(client->ioc, request);
--    if (rc < 0) {
--        rc = -EIO;
--        goto out;
-+    if (nbd_receive_request(client->ioc, request) < 0) {
-+        return -EIO;
-     }
+     qemu_co_mutex_lock(&client->send_lock);
+     client->send_coroutine = qemu_coroutine_self();
  
-     TRACE("Decoding type");
-@@ -1027,8 +1024,7 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request)
-         /* Special case: we're going to disconnect without a reply,
-          * whether or not flags, from, or len are bogus */
-         TRACE("Request type is DISCONNECT");
--        rc = -EIO;
--        goto out;
-+        return -EIO;
-     }
- 
-     /* Check for sanity in the parameters, part 1.  Defer as many
-@@ -1036,22 +1032,19 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request)
-      * payload, so we can try and keep the connection alive.  */
-     if ((request->from + request->len) < request->from) {
-         LOG("integer overflow detected, you're probably being attacked");
--        rc = -EINVAL;
--        goto out;
-+        return -EINVAL;
-     }
- 
-     if (request->type == NBD_CMD_READ || request->type == NBD_CMD_WRITE) {
-         if (request->len > NBD_MAX_BUFFER_SIZE) {
-             LOG("len (%" PRIu32" ) is larger than max len (%u)",
-                 request->len, NBD_MAX_BUFFER_SIZE);
--            rc = -EINVAL;
--            goto out;
-+            return -EINVAL;
+     if (!len) {
+-        rc = nbd_send_reply(client->ioc, reply);
++        ret = nbd_send_reply(client->ioc, reply);
+     } else {
+         qio_channel_set_cork(client->ioc, true);
+-        rc = nbd_send_reply(client->ioc, reply);
+-        if (rc == 0) {
+-            rc = nbd_write(client->ioc, req->data, len, NULL);
+-            if (rc < 0) {
+-                rc = -EIO;
++        ret = nbd_send_reply(client->ioc, reply);
++        if (ret == 0) {
++            ret = nbd_write(client->ioc, req->data, len, NULL);
++            if (ret < 0) {
++                ret = -EIO;
+             }
          }
+         qio_channel_set_cork(client->ioc, false);
+@@ -985,7 +985,7 @@ static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len)
  
-         req->data = blk_try_blockalign(client->exp->blk, request->len);
-         if (req->data == NULL) {
--            rc = -ENOMEM;
--            goto out;
-+            return -ENOMEM;
-         }
-     }
-     if (request->type == NBD_CMD_WRITE) {
-@@ -1059,8 +1052,7 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request)
- 
-         if (nbd_read(client->ioc, req->data, request->len, NULL) < 0) {
-             LOG("reading from socket failed");
--            rc = -EIO;
--            goto out;
-+            return -EIO;
-         }
-         req->complete = true;
-     }
-@@ -1070,28 +1062,19 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request)
-         LOG("operation past EOF; From: %" PRIu64 ", Len: %" PRIu32
-             ", Size: %" PRIu64, request->from, request->len,
-             (uint64_t)client->exp->size);
--        rc = request->type == NBD_CMD_WRITE ? -ENOSPC : -EINVAL;
--        goto out;
-+        return request->type == NBD_CMD_WRITE ? -ENOSPC : -EINVAL;
-     }
-     if (request->flags & ~(NBD_CMD_FLAG_FUA | NBD_CMD_FLAG_NO_HOLE)) {
-         LOG("unsupported flags (got 0x%x)", request->flags);
--        rc = -EINVAL;
--        goto out;
-+        return -EINVAL;
-     }
-     if (request->type != NBD_CMD_WRITE_ZEROES &&
-         (request->flags & NBD_CMD_FLAG_NO_HOLE)) {
-         LOG("unexpected flags (got 0x%x)", request->flags);
--        rc = -EINVAL;
--        goto out;
-+        return -EINVAL;
-     }
- 
--    rc = 0;
--
--out:
--    client->recv_coroutine = NULL;
--    nbd_client_receive_next_request(client);
--
+     client->send_coroutine = NULL;
+     qemu_co_mutex_unlock(&client->send_lock);
 -    return rc;
-+    return 0;
++    return ret;
  }
  
- /* Owns a reference to the NBDClient passed as opaque.  */
-@@ -1113,6 +1096,8 @@ static coroutine_fn void nbd_trip(void *opaque)
- 
-     req = nbd_request_get(client);
-     ret = nbd_co_receive_request(req, &request);
-+    client->recv_coroutine = NULL;
-+    nbd_client_receive_next_request(client);
-     if (ret == -EIO) {
-         goto out;
-     }
+ /* nbd_co_receive_request
 -- 
 1.8.3.1
