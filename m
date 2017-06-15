@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dLNjI-0000oE-5C
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 01:54:04 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dLNjI-0000oD-5E
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 01:54:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dLNjG-00017z-Nv
+	(envelope-from <rth7680@gmail.com>) id 1dLNjF-00017g-PV
 	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 01:54:04 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:35795)
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:34188)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dLNjG-00017m-IG
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 01:54:02 -0400
-Received: by mail-pf0-x244.google.com with SMTP id s66so713497pfs.2
-	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 22:54:02 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dLNjF-00017N-JD
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 01:54:01 -0400
+Received: by mail-pf0-x244.google.com with SMTP id d5so717257pfe.1
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 22:54:01 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Wed, 14 Jun 2017 22:53:53 -0700
-Message-Id: <20170615055356.20684-3-rth@twiddle.net>
+Date: Wed, 14 Jun 2017 22:53:52 -0700
+Message-Id: <20170615055356.20684-2-rth@twiddle.net>
 In-Reply-To: <20170615055356.20684-1-rth@twiddle.net>
 References: <20170615055356.20684-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH 2/5] target/s390x: Enforce instruction features
+Subject: [Qemu-devel] [PATCH 1/5] target/s390x: Map existing FAC_* names to
+ S390_FEAT_* names
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +30,93 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: david@redhat.com, aurelien@aurel32.net
 
+The FAC_ names were placeholders prior to the introduction
+of the current facility modeling.
+
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/s390x/translate.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ target/s390x/translate.c | 59 ++++++++++++++++++++++++------------------------
+ 1 file changed, 29 insertions(+), 30 deletions(-)
 
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index af18ffb..48cee25 100644
+index 8c055b7..af18ffb 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -55,6 +55,7 @@ typedef struct DisasFields DisasFields;
+@@ -1178,39 +1178,10 @@ typedef enum {
+     EXIT_NORETURN,
+ } ExitStatus;
  
- struct DisasContext {
-     struct TranslationBlock *tb;
-+    const unsigned long *features;
-     const DisasInsn *insn;
-     DisasFields *fields;
-     uint64_t ex_value;
-@@ -5600,6 +5601,12 @@ static ExitStatus translate_one(CPUS390XState *env, DisasContext *s)
-     }
- #endif
+-typedef enum DisasFacility {
+-    FAC_Z,                  /* zarch (default) */
+-    FAC_CASS,               /* compare and swap and store */
+-    FAC_CASS2,              /* compare and swap and store 2*/
+-    FAC_DFP,                /* decimal floating point */
+-    FAC_DFPR,               /* decimal floating point rounding */
+-    FAC_DO,                 /* distinct operands */
+-    FAC_EE,                 /* execute extensions */
+-    FAC_EI,                 /* extended immediate */
+-    FAC_FPE,                /* floating point extension */
+-    FAC_FPSSH,              /* floating point support sign handling */
+-    FAC_FPRGR,              /* FPR-GR transfer */
+-    FAC_GIE,                /* general instructions extension */
+-    FAC_HFP_MA,             /* HFP multiply-and-add/subtract */
+-    FAC_HW,                 /* high-word */
+-    FAC_IEEEE_SIM,          /* IEEE exception sumilation */
+-    FAC_MIE,                /* miscellaneous-instruction-extensions */
+-    FAC_LAT,                /* load-and-trap */
+-    FAC_LOC,                /* load/store on condition */
+-    FAC_LD,                 /* long displacement */
+-    FAC_PC,                 /* population count */
+-    FAC_SCF,                /* store clock fast */
+-    FAC_SFLE,               /* store facility list extended */
+-    FAC_ILA,                /* interlocked access facility 1 */
+-    FAC_LPP,                /* load-program-parameter */
+-    FAC_DAT_ENH,            /* DAT-enhancement */
+-    FAC_E2,                 /* extended-translation facility 2 */
+-} DisasFacility;
+-
+ struct DisasInsn {
+     unsigned opc:16;
+     DisasFormat fmt:8;
+-    DisasFacility fac:8;
++    unsigned fac:8;
+     unsigned spec:8;
  
-+    /* Check for insn feature enabled.  */
-+    if (!test_bit(insn->fac, s->features)) {
-+        gen_program_exception(s, PGM_OPERATION);
-+        return EXIT_NORETURN;
-+    }
+     const char *name;
+@@ -5413,6 +5384,34 @@ enum DisasInsnEnum {
+ #define SPEC_prep_0 0
+ #define SPEC_wout_0 0
+ 
++/* Give smaller names to the various facilities.  */
++#define FAC_Z           S390_FEAT_ZARCH
++#define FAC_CASS        S390_FEAT_COMPARE_AND_SWAP_AND_STORE
++#define FAC_CASS2       S390_FEAT_COMPARE_AND_SWAP_AND_STORE_2
++#define FAC_DFP         S390_FEAT_DFP
++#define FAC_DFPR        S390_FEAT_FLOATING_POINT_SUPPPORT_ENH /* DFP-rounding */
++#define FAC_DO          S390_FEAT_STFLE_45 /* distinct-operands */
++#define FAC_EE          S390_FEAT_EXECUTE_EXT
++#define FAC_EI          S390_FEAT_EXTENDED_IMMEDIATE
++#define FAC_FPE         S390_FEAT_FLOATING_POINT_EXT
++#define FAC_FPSSH       S390_FEAT_FLOATING_POINT_SUPPPORT_ENH /* FPS-sign-handling */
++#define FAC_FPRGR       S390_FEAT_FLOATING_POINT_SUPPPORT_ENH /* FPR-GR-transfer */
++#define FAC_GIE         S390_FEAT_GENERAL_INSTRUCTIONS_EXT
++#define FAC_HFP_MA      S390_FEAT_HFP_MADDSUB
++#define FAC_HW          S390_FEAT_STFLE_45 /* high-word */
++#define FAC_IEEEE_SIM   S390_FEAT_FLOATING_POINT_SUPPPORT_ENH /* IEEE-exception-simulation */
++#define FAC_MIE         S390_FEAT_STFLE_49 /* misc-instruction-extensions */
++#define FAC_LAT         S390_FEAT_STFLE_49 /* load-and-trap */
++#define FAC_LOC         S390_FEAT_STFLE_45 /* load/store on condition 1 */
++#define FAC_LD          S390_FEAT_LONG_DISPLACEMENT
++#define FAC_PC          S390_FEAT_STFLE_45 /* population count */
++#define FAC_SCF         S390_FEAT_STORE_CLOCK_FAST
++#define FAC_SFLE        S390_FEAT_STFLE
++#define FAC_ILA         S390_FEAT_STFLE_45 /* interlocked-access-facility 1 */
++#define FAC_LPP         S390_FEAT_SET_PROGRAM_PARAMETERS /* load-program-parameter */
++#define FAC_DAT_ENH     S390_FEAT_DAT_ENH
++#define FAC_E2          S390_FEAT_EXTENDED_TRANSLATION_2
 +
-     /* Check for insn specification exceptions.  */
-     if (insn->spec) {
-         int spec = insn->spec, excp = 0, r;
-@@ -5726,6 +5733,7 @@ void gen_intermediate_code(CPUS390XState *env, struct TranslationBlock *tb)
-     }
- 
-     dc.tb = tb;
-+    dc.features = cpu->model->features;
-     dc.pc = pc_start;
-     dc.cc_op = CC_OP_DYNAMIC;
-     dc.ex_value = tb->cs_base;
+ static const DisasInsn insn_info[] = {
+ #include "insn-data.def"
+ };
 -- 
 2.9.4
