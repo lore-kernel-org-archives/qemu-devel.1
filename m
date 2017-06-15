@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dLc2N-0006W0-8N
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 17:10:44 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dLcAq-0001qV-9S
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 17:19:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dLc2I-0000Vp-1z
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 17:10:43 -0400
-Received: from mail-qt0-x22c.google.com ([2607:f8b0:400d:c0d::22c]:34829)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dLc2H-0000Vg-Sw
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 17:10:37 -0400
-Received: by mail-qt0-x22c.google.com with SMTP id w1so37434225qtg.2
-	for <qemu-devel@nongnu.org>; Thu, 15 Jun 2017 14:10:37 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170615055356.20684-1-rth@twiddle.net>
-	<20170615055356.20684-6-rth@twiddle.net>
-	<20170615204908.3izswcs4q6l34wrg@aurel32.net>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <a1abdb2d-68c0-74d1-cb32-9ceb5c879151@twiddle.net>
-Date: Thu, 15 Jun 2017 14:10:34 -0700
+	(envelope-from <aurelien@aurel32.net>) id 1dLcAp-0006Xi-5M
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 17:19:28 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:57524)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+	id 1dLcAo-0006X5-UP
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 17:19:27 -0400
+Date: Thu, 15 Jun 2017 23:19:20 +0200
+From: Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <20170615211920.c7y2xaixy6tm2fan@aurel32.net>
+References: <20170614194821.8754-1-rth@twiddle.net>
+	<20170614194821.8754-4-rth@twiddle.net>
 MIME-Version: 1.0
-In-Reply-To: <20170615204908.3izswcs4q6l34wrg@aurel32.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 5/5] target/s390x: mark CSST, CSST2,
- FPSEH facilities as available
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170614194821.8754-4-rth@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] target/mips: Exit after enabling
+ interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,17 +29,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aurelien Jarno <aurelien@aurel32.net>
-Cc: qemu-devel@nongnu.org, david@redhat.com
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org, cota@braap.org, pbonzini@redhat.com, Yongbok Kim <yongbok.kim@imgtec.com>
 
-On 06/15/2017 01:49 PM, Aurelien Jarno wrote:
->> +        S390_FEAT_FLOATING_POINT_SUPPPORT_ENH,
+On 2017-06-14 12:48, Richard Henderson wrote:
+> From: Paolo Bonzini <pbonzini@redhat.com>
 > 
-> Theoretically the floating-point-support-enhancement facilities include
-> the DFP rounding facility. Given We don't implement the DFP facility I
-> guess this can be ignored.
+> Exit to cpu loop so we reevaluate cpu_mips_hw_interrupts.
+> 
+> Cc: Aurelien Jarno <aurelien@aurel32.net>
+> Cc: Yongbok Kim <yongbok.kim@imgtec.com>
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
+> ---
+>  target/mips/translate.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> index 559f8fe..891f14b 100644
+> --- a/target/mips/translate.c
+> +++ b/target/mips/translate.c
+> @@ -13403,9 +13403,11 @@ static void gen_pool32axf (CPUMIPSState *env, DisasContext *ctx, int rt, int rs)
+>                  save_cpu_state(ctx, 1);
+>                  gen_helper_ei(t0, cpu_env);
+>                  gen_store_gpr(t0, rs);
+> -                /* Stop translation as we may have switched the execution mode */
+> -                ctx->bstate = BS_STOP;
+>                  tcg_temp_free(t0);
+> +                /* BS_STOP isn't good enough here;
+> +                   reevaluate cpu_mips_hw_interrupts_enabled.  */
+> +                gen_save_pc(ctx->pc + 4);
+> +                ctx->bstate = BS_EXCP;
+>              }
+>              break;
+>          default:
 
-We *do* implement the one instruction in DFP-rounding-facility: SRNMT.
+While the above looks correct, it's not complete. It only fixes the
+microMIPS EI instruction. The MIPS one also has to be fixed.
 
+For what I understood, anything that can change the result of
+cpu_mips_hw_interrupts_enabled has to stop the translation. In that case
+I checked that ERET/ERETNC and MTC0/DMTC0 to the Status register are
+already correct, that said it might be a good idea to update the
+comments to mention it.
 
-r~
+I can work on a better patch, but I doubt I'll have time before the
+week-end.
+
+Aurelien
+
+-- 
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
