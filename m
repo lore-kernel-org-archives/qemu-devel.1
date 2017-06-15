@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <casasfernando@hotmail.com>) id 1dLGHI-0000fu-Gh
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 17:56:42 -0400
+	(envelope-from <miodrag.dinic@rt-rk.com>) id 1dLVdz-00022a-TA
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 10:21:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <casasfernando@hotmail.com>) id 1dLGHE-0004zL-Fv
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 17:56:40 -0400
-Received: from mail-oln040092067057.outbound.protection.outlook.com
-	([40.92.67.57]:11047
-	helo=EUR02-AM5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <casasfernando@hotmail.com>)
-	id 1dLGHD-0004yL-V1
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 17:56:36 -0400
-From: =?utf-8?B?RmVybmFuZG8gQ2FzYXMgU2Now7Zzc293?= <casasfernando@hotmail.com>
-Date: Wed, 14 Jun 2017 21:56:33 +0000
-Message-ID: <VI1PR1001MB137395F2FCBDE6389A9AC5FCB7C30@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
-Content-Language: en-US
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: [Qemu-devel] Guest unresponsive after Virtqueue size exceeded error
+	(envelope-from <miodrag.dinic@rt-rk.com>) id 1dLVdv-00061Q-Ub
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 10:21:07 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:50787 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <miodrag.dinic@rt-rk.com>)
+	id 1dLVdv-0005mk-MC
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 10:21:03 -0400
+From: Miodrag Dinic <miodrag.dinic@rt-rk.com>
+Date: Thu, 15 Jun 2017 16:20:33 +0200
+Message-Id: <1497536433-28009-1-git-send-email-miodrag.dinic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH] target/mips: fix msa copy_[s|u]_df rd = 0
+ corner case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,96 +23,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: aurelien@aurel32.net, yongbok.kim@imgtec.com, qemu-devel@nongnu.org
+Cc: aleksandar.markovic@imgtec.com, petar.jovanovic@imgtec.com, raghu.gandham@imgtec.com, miodrag.dinic@imgtec.com
 
-SGkgdGhlcmUsDQoNCkkgcmVjZW50bHkgbWlncmF0ZWQgYSBIeXBlci1WIGhvc3QgdG8gcWVtdS9r
-dm0gcnVuaW5nIG9uIEFscGluZSBMaW51eCAzLjYuMSAoa2VybmVsIDQuOS4zMCAtd2l0aCBncnNl
-YyBwYXRjaGVzLSBhbmQgcWVtdSAyLjguMSkuDQoNCkFsbW9zdCBvbiBkYWlseSBiYXNpcyBhdCBs
-ZWFzdCBvbmUgb2YgdGhlIGd1ZXN0cyBpcyBzaG93aW5nIHRoZSBmb2xsb3dpbmcgZXJyb3IgaW4g
-dGhlIGxvZyBhbmQgdGhlIGl0IG5lZWRzIHRvIGJlIHRlcm1pbmF0ZWQgYW5kIHJlc3RhcnRlZCB0
-byByZWNvdmVyIGl0Og0KDQpxZW11LXN5c3RlbS14ODZfNjQ6IFZpcnRxdWV1ZSBzaXplIGV4Y2Vl
-ZGVkDQoNCklzIG5vdCBhbHdheXMgdGhlIHNhbWUgZ3Vlc3QsIGFuZCB0aGUgZXJyb3IgaXMgYXBw
-ZWFyaW5nIGZvciBib3RoLCBMaW51eCAoQ2VudE9TIDcuMykgYW5kIFdpbmRvd3MgKDIwMTJSMikg
-Z3Vlc3RzLg0KQXMgc29vbiBhcyB0aGlzIGVycm9yIGFwcGVhcnMgdGhlIGd1ZXN0IGlzIG5vdCBy
-ZWFsbHkgd29ya2luZyBhbnltb3JlLiBJdCBtYXkgcmVzcG9uZCB0byBwaW5nIG9yIHlvdSBjYW4g
-ZXZlbiB0cnkgdG8gbG9naW4gYnV0IHRoZW4gZXZlcnl0aGluZyBpcyB2ZXJ5IHNsb3cgb3IgY29t
-cGxldGVseSB1bnJlc3BvbnNpdmUuIFJlc3RhcnRpbmcgdGhlIGd1ZXN0IGZyb20gd2l0aGluIHRo
-ZSBndWVzdCBPUyBpcyBub3Qgd29ya2luZyBlaXRoZXIgYW5kIHRoZSBvbmx5IHRoaW5nIEkgY2Fu
-IGRvIGlzIHRvIHRlcm1pbmF0ZSBpdCAodmlyc2ggZGVzdHJveSkgYW5kIHN0YXJ0IGl0IGFnYWlu
-IHVudGlsIHRoZSBuZXh0IGZhaWx1cmUuDQoNCkluIFdpbmRvd3MgZ3Vlc3QgdGhlIGVycm9yIHNl
-ZW1zIHRvIGJlIHJlbGF0ZWQgdG8gZGlzazoNCiJSZXNldCB0byBkZXZpY2UsIFxEZXZpY2VcUmFp
-ZFBvcnQyLCB3YXMgaXNzdWVkIiBhbmQgdGhlIHNvdXJjZSBpcyB2aW9zdG9yDQoNCkFuZCBpbiBM
-aW51eCBndWVzdHMgdGhlIGVycm9yIGlzIGFsd2F5cyAod2l0aCB0aGUgcHJvY2VzcyBhbmQgcGlk
-IGNoYW5naW5nKToNCg0KSU5GTzogdGFzayA8cHJvY2Vzcz46PHBpZD4gYmxvY2tlZCBmb3IgbW9y
-ZSB0aGFuIDEyMCBzZWNvbmRzDQoNCkJ1dCB1bmZvcnR1bmF0ZWx5IEkgd2FzIG5vdCBhYmxlIHRv
-IGZpbmQgYW55IG90aGVyIGluZGljYXRpb24gb2YgYSBwcm9ibGVtIGluIHRoZSBndWVzdHMgbG9n
-cyBub3IgaW4gdGhlIGhvc3QgbG9ncyBleGNlcHQgZm9yIHRoZSBlcnJvciByZWdhcmRpbmcgdGhl
-IHZpcnRxdWV1ZSBzaXplLiBUaGUgcHJvYmxlbSBpcyBoYXBwZW5pbmcgYXQgZGlmZmVyZW50IHRp
-bWVzIG9mIGRheSBhbmQgSSBjb3VsZG4ndCBmaW5kIGFueSBwYXR0ZXJucyB5ZXQuDQoNCkFsbCB0
-aGUgV2luZG93cyBndWVzdHMgYXJlIHVzaW5nIHZpcnRpbyBkcml2ZXJzIHZlcnNpb24gMTI2IGFu
-ZCBhbGwgTGludXggZ3Vlc3RzIGFyZSBDZW50T1MgNy4zIHVzaW5nIHRoZSBsYXRlc3Qga2VybmVs
-IGF2YWlsYWJsZSBpbiB0aGUgZGlzdHJpYnV0aW9uICgzLjEwLjAtNTE0LjIxLjEpLiBUaGV5IGFs
-bCBydW4gcWVtdS1ndWVzdCBhZ2VudCBhcyB3ZWxsLg0KQWxsIHRoZSBndWVzdCBkaXNrcyBhcmUg
-cWNvdzIgaW1hZ2VzIHdpdGggY2FjaGU9bm9uZSBhbmQgYWltb2RlPXRocmVhZHMgKHRyaWVkIG5h
-dGl2ZSBtb2RlIGJlZm9yZSBidXQgd2l0aCB0aGUgc2FtZSByZXN1bHRzKS4NCg0KRXhhbXBsZSBx
-ZW11IGNvbW1hbmQgZm9yIGEgTGludXggZ3Vlc3Q6DQoNCi91c3IvYmluL3FlbXUtc3lzdGVtLXg4
-Nl82NCAtbmFtZSBndWVzdD1ET0NLRVIwMSxkZWJ1Zy10aHJlYWRzPW9uIC1TIC1vYmplY3Qgc2Vj
-cmV0LGlkPW1hc3RlcktleTAsZm9ybWF0PXJhdyxmaWxlPS92YXIvbGliL2xpYnZpcnQvcWVtdS9k
-b21haW4tMjQtRE9DS0VSMDEvbWFzdGVyLWtleS5hZXMgLW1hY2hpbmUgcGMtaTQ0MGZ4LTIuOCxh
-Y2NlbD1rdm0sdXNiPW9mZixkdW1wLWd1ZXN0LWNvcmU9b2ZmIC1jcHUgSXZ5QnJpZGdlLCtkcywr
-YWNwaSwrc3MsK2h0LCt0bSwrcGJlLCtkdGVzNjQsK21vbml0b3IsK2RzX2NwbCwrdm14LCtzbXgs
-K2VzdCwrdG0yLCt4dHByLCtwZGNtLCtwY2lkLCtvc3hzYXZlLCthcmF0LCt4c2F2ZW9wdCAtZHJp
-dmUgZmlsZT0vdXNyL3NoYXJlL2VkazIuZ2l0L292bWYteDY0L09WTUZfQ09ERS1wdXJlLWVmaS5m
-ZCxpZj1wZmxhc2gsZm9ybWF0PXJhdyx1bml0PTAscmVhZG9ubHk9b24gLWRyaXZlIGZpbGU9L3Zh
-ci9saWIvbGlidmlydC9xZW11L252cmFtL0RPQ0tFUjAxX1ZBUlMuZmQsaWY9cGZsYXNoLGZvcm1h
-dD1yYXcsdW5pdD0xIC1tIDIwNDggLXJlYWx0aW1lIG1sb2NrPW9mZiAtc21wIDIsc29ja2V0cz0y
-LGNvcmVzPTEsdGhyZWFkcz0xIC11dWlkIDQ3MDViMTQ2LTNiMTQtNGMyMC05MjNjLTQyMTA1ZDQ3
-ZTdmYyAtbm8tdXNlci1jb25maWcgLW5vZGVmYXVsdHMgLWNoYXJkZXYgc29ja2V0LGlkPWNoYXJt
-b25pdG9yLHBhdGg9L3Zhci9saWIvbGlidmlydC9xZW11L2RvbWFpbi0yNC1ET0NLRVIwMS9tb25p
-dG9yLnNvY2ssc2VydmVyLG5vd2FpdCAtbW9uIGNoYXJkZXY9Y2hhcm1vbml0b3IsaWQ9bW9uaXRv
-cixtb2RlPWNvbnRyb2wgLXJ0YyBiYXNlPXV0YyxkcmlmdGZpeD1zbGV3IC1nbG9iYWwga3ZtLXBp
-dC5sb3N0X3RpY2tfcG9saWN5PWRlbGF5IC1uby1ocGV0IC1uby1zaHV0ZG93biAtZ2xvYmFsIFBJ
-SVg0X1BNLmRpc2FibGVfczM9MSAtZ2xvYmFsIFBJSVg0X1BNLmRpc2FibGVfczQ9MSAtYm9vdCBz
-dHJpY3Q9b24gLWRldmljZSBpY2g5LXVzYi1laGNpMSxpZD11c2IsYnVzPXBjaS4wLGFkZHI9MHg0
-LjB4NyAtZGV2aWNlIGljaDktdXNiLXVoY2kxLG1hc3RlcmJ1cz11c2IuMCxmaXJzdHBvcnQ9MCxi
-dXM9cGNpLjAsbXVsdGlmdW5jdGlvbj1vbixhZGRyPTB4NCAtZGV2aWNlIGljaDktdXNiLXVoY2ky
-LG1hc3RlcmJ1cz11c2IuMCxmaXJzdHBvcnQ9MixidXM9cGNpLjAsYWRkcj0weDQuMHgxIC1kZXZp
-Y2UgaWNoOS11c2ItdWhjaTMsbWFzdGVyYnVzPXVzYi4wLGZpcnN0cG9ydD00LGJ1cz1wY2kuMCxh
-ZGRyPTB4NC4weDIgLWRldmljZSB2aXJ0aW8tc2VyaWFsLXBjaSxpZD12aXJ0aW8tc2VyaWFsMCxi
-dXM9cGNpLjAsYWRkcj0weDUgLWRyaXZlIGZpbGU9L3N0b3JhZ2Uvc3RvcmFnZS1zc2Qtdm1zL3Zp
-cnR1YWxfbWFjaGluZXNfc3NkL2RvY2tlcjAxLnFjb3cyLGZvcm1hdD1xY293MixpZj1ub25lLGlk
-PWRyaXZlLXZpcnRpby1kaXNrMCxjYWNoZT1ub25lLGFpbz10aHJlYWRzIC1kZXZpY2UgdmlydGlv
-LWJsay1wY2ksc2NzaT1vZmYsYnVzPXBjaS4wLGFkZHI9MHg2LGRyaXZlPWRyaXZlLXZpcnRpby1k
-aXNrMCxpZD12aXJ0aW8tZGlzazAsYm9vdGluZGV4PTEgLW5ldGRldiB0YXAsZmQ9MzUsaWQ9aG9z
-dG5ldDAsdmhvc3Q9b24sdmhvc3RmZD00NSAtZGV2aWNlIHZpcnRpby1uZXQtcGNpLG5ldGRldj1o
-b3N0bmV0MCxpZD1uZXQwLG1hYz01Mjo1NDowMDoxYzphZjpjZSxidXM9cGNpLjAsYWRkcj0weDMg
-LWNoYXJkZXYgcHR5LGlkPWNoYXJzZXJpYWwwIC1kZXZpY2UgaXNhLXNlcmlhbCxjaGFyZGV2PWNo
-YXJzZXJpYWwwLGlkPXNlcmlhbDAgLWNoYXJkZXYgc29ja2V0LGlkPWNoYXJjaGFubmVsMCxwYXRo
-PS92YXIvbGliL2xpYnZpcnQvcWVtdS9jaGFubmVsL3RhcmdldC9kb21haW4tMjQtRE9DS0VSMDEv
-b3JnLnFlbXUuZ3Vlc3RfYWdlbnQuMCxzZXJ2ZXIsbm93YWl0IC1kZXZpY2UgdmlydHNlcmlhbHBv
-cnQsYnVzPXZpcnRpby1zZXJpYWwwLjAsbnI9MSxjaGFyZGV2PWNoYXJjaGFubmVsMCxpZD1jaGFu
-bmVsMCxuYW1lPW9yZy5xZW11Lmd1ZXN0X2FnZW50LjAgLWNoYXJkZXYgc3BpY2V2bWMsaWQ9Y2hh
-cmNoYW5uZWwxLG5hbWU9dmRhZ2VudCAtZGV2aWNlIHZpcnRzZXJpYWxwb3J0LGJ1cz12aXJ0aW8t
-c2VyaWFsMC4wLG5yPTIsY2hhcmRldj1jaGFyY2hhbm5lbDEsaWQ9Y2hhbm5lbDEsbmFtZT1jb20u
-cmVkaGF0LnNwaWNlLjAgLWRldmljZSB1c2ItdGFibGV0LGlkPWlucHV0MCxidXM9dXNiLjAscG9y
-dD0xIC1zcGljZSBwb3J0PTU5MDUsYWRkcj0xMjcuMC4wLjEsZGlzYWJsZS10aWNrZXRpbmcsc2Vh
-bWxlc3MtbWlncmF0aW9uPW9uIC1kZXZpY2UgcXhsLXZnYSxpZD12aWRlbzAscmFtX3NpemU9Njcx
-MDg4NjQsdnJhbV9zaXplPTY3MTA4ODY0LHZyYW02NF9zaXplX21iPTAsdmdhbWVtX21iPTE2LG1h
-eF9vdXRwdXRzPTEsYnVzPXBjaS4wLGFkZHI9MHgyIC1jaGFyZGV2IHNwaWNldm1jLGlkPWNoYXJy
-ZWRpcjAsbmFtZT11c2JyZWRpciAtZGV2aWNlIHVzYi1yZWRpcixjaGFyZGV2PWNoYXJyZWRpcjAs
-aWQ9cmVkaXIwLGJ1cz11c2IuMCxwb3J0PTIgLWNoYXJkZXYgc3BpY2V2bWMsaWQ9Y2hhcnJlZGly
-MSxuYW1lPXVzYnJlZGlyIC1kZXZpY2UgdXNiLXJlZGlyLGNoYXJkZXY9Y2hhcnJlZGlyMSxpZD1y
-ZWRpcjEsYnVzPXVzYi4wLHBvcnQ9MyAtZGV2aWNlIHZpcnRpby1iYWxsb29uLXBjaSxpZD1iYWxs
-b29uMCxidXM9cGNpLjAsYWRkcj0weDcgLW9iamVjdCBybmctcmFuZG9tLGlkPW9ianJuZzAsZmls
-ZW5hbWU9L2Rldi9yYW5kb20gLWRldmljZSB2aXJ0aW8tcm5nLXBjaSxybmc9b2Jqcm5nMCxpZD1y
-bmcwLGJ1cz1wY2kuMCxhZGRyPTB4OCAtbXNnIHRpbWVzdGFtcD1vbg0KDQpGb3Igd2hhdCBpdCB3
-b3J0aCwgdGhlIHNhbWUgZ3Vlc3RzIHdlcmUgd29ya2luZyBmaW5lIGZvciB5ZWFycyBvbiBIeXBl
-ci1WIG9uIHRoZSBzYW1lIGhhcmR3YXJlIChJbnRlbCBYZW9uIEUzLCAzMkdCIFJBTSwgU3VwZXJt
-aWNybyBtYWluYm9hcmQsIDZ4M1RCIFdlc3Rlcm4gRGlnaXRhbCBSZWQgZGlza3MgYW5kIDZ4MTIw
-TUIgS2luZ3N0b24gVjMwMCBTU0QgYWxsIGNvbm5lY3RlZCB0byBhIExTSSBMU0lTQVMyMDA4IGNv
-bnRyb2xsZXIpLg0KRXhjZXB0IGZvciB0aGlzIHN0YWJpbGl0eSBpc3N1ZSB0aGF0IEkgaG9wZSB0
-byBzb2x2ZSBldmVyeXRoaW5nIGVsc2UgaXMgd29ya2luZyBncmVhdCBhbmQgb3V0cGVyZm9ybWlu
-ZyBIeXBlci1WLg0KDQpBbnkgaWRlYXMsIHRob3VnaHRzIG9yIHN1Z2dlc3Rpb25zIHRvIHRyeSB0
-byBuYXJyb3cgZG93biB0aGUgcHJvYmxlbT8NCg0KVGhhbmtzIGluIGFkdmFuY2UgYW5kIHNvcnJ5
-IGZvciB0aGUgbG9uZyBlbWFpbCBidXQgSSB3YW50ZWQgdG8gYmUgYXMgZGVzY3JpcHRpdmUgYXMg
-cG9zc2libGUuDQoNCkZlcg0K
+From: Miodrag Dinic <miodrag.dinic@imgtec.com>
+
+This patch fixes the msa copy_[s|u]_df instruction emulation when
+the destination register rd is zero. Without this patch the zero
+register would get clobbered, which should never happen because it
+is supposed to be hardwired to 0.
+
+Fix this corner case by explicitly checking rd = 0 and effectively
+making these instructions emulation no-op in that case.
+
+Signed-off-by: Miodrag Dinic <miodrag.dinic@imgtec.com>
+---
+ target/mips/translate.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 559f8fe..befb87f 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -18712,10 +18712,14 @@ static void gen_msa_elm_df(CPUMIPSState *env, DisasContext *ctx, uint32_t df,
+ #endif
+         switch (MASK_MSA_ELM(ctx->opcode)) {
+         case OPC_COPY_S_df:
+-            gen_helper_msa_copy_s_df(cpu_env, tdf, twd, tws, tn);
++            if (likely(wd != 0)) {
++                gen_helper_msa_copy_s_df(cpu_env, tdf, twd, tws, tn);
++            }
+             break;
+         case OPC_COPY_U_df:
+-            gen_helper_msa_copy_u_df(cpu_env, tdf, twd, tws, tn);
++            if (likely(wd != 0)) {
++                gen_helper_msa_copy_u_df(cpu_env, tdf, twd, tws, tn);
++            }
+             break;
+         case OPC_INSERT_df:
+             gen_helper_msa_insert_df(cpu_env, tdf, twd, tws, tn);
+-- 
+1.9.1
