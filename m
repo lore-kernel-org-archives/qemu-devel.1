@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dLSPP-0000D7-Mk
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:52 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dLSPN-0007ic-Pk
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dLSPO-0000BG-Fs
 	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:51 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:35320)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dLSPK-0007gV-LO
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:50 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:34400)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dLSPN-0007i7-Js
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:49 -0400
-Received: by mail-wr0-x242.google.com with SMTP id z45so2764721wrb.2
-	for <qemu-devel@nongnu.org>; Thu, 15 Jun 2017 03:53:49 -0700 (PDT)
+	id 1dLSPK-0007g8-Ei
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:46 -0400
+Received: by mail-wr0-x243.google.com with SMTP id y25so548045wrd.1
+	for <qemu-devel@nongnu.org>; Thu, 15 Jun 2017 03:53:46 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 15 Jun 2017 12:52:54 +0200
-Message-Id: <1497523981-38449-35-git-send-email-pbonzini@redhat.com>
+Date: Thu, 15 Jun 2017 12:52:51 +0200
+Message-Id: <1497523981-38449-32-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1497523981-38449-1-git-send-email-pbonzini@redhat.com>
 References: <1497523981-38449-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 34/41] nbd/server: rename rc to ret
+Subject: [Qemu-devel] [PULL 31/41] nbd/server: remove NBDClientNewData
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,115 +32,84 @@ Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-For consistency use 'ret' name for saving return code everywhere
-in the file.
+"co" field of NBDClientNewData has never been used, all the way back to
+its declaration in commit 1a6245a5. So let's just use client pointer
+instead of extra structure.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20170602150150.258222-12-vsementsov@virtuozzo.com>
+Message-Id: <20170602150150.258222-9-vsementsov@virtuozzo.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- nbd/server.c | 38 +++++++++++++++++++-------------------
- 1 file changed, 19 insertions(+), 19 deletions(-)
+ nbd/server.c | 25 +++++++------------------
+ 1 file changed, 7 insertions(+), 18 deletions(-)
 
 diff --git a/nbd/server.c b/nbd/server.c
-index 3b46038..f19f5fd 100644
+index 9fb03ce..d526827 100644
 --- a/nbd/server.c
 +++ b/nbd/server.c
-@@ -211,15 +211,15 @@ static int nbd_negotiate_send_rep_list(QIOChannel *ioc, NBDExport *exp)
-     uint32_t len;
-     const char *name = exp->name ? exp->name : "";
-     const char *desc = exp->description ? exp->description : "";
--    int rc;
-+    int ret;
- 
-     TRACE("Advertising export name '%s' description '%s'", name, desc);
-     name_len = strlen(name);
-     desc_len = strlen(desc);
-     len = name_len + desc_len + sizeof(len);
--    rc = nbd_negotiate_send_rep_len(ioc, NBD_REP_SERVER, NBD_OPT_LIST, len);
--    if (rc < 0) {
--        return rc;
-+    ret = nbd_negotiate_send_rep_len(ioc, NBD_REP_SERVER, NBD_OPT_LIST, len);
-+    if (ret < 0) {
-+        return ret;
+@@ -535,14 +535,8 @@ static int nbd_negotiate_options(NBDClient *client)
      }
- 
-     len = cpu_to_be32(name_len);
-@@ -536,7 +536,7 @@ static int nbd_negotiate_options(NBDClient *client)
- static coroutine_fn int nbd_negotiate(NBDClient *client)
- {
-     char buf[8 + 8 + 8 + 128];
--    int rc;
-+    int ret;
-     const uint16_t myflags = (NBD_FLAG_HAS_FLAGS | NBD_FLAG_SEND_TRIM |
-                               NBD_FLAG_SEND_FLUSH | NBD_FLAG_SEND_FUA |
-                               NBD_FLAG_SEND_WRITE_ZEROES);
-@@ -593,10 +593,10 @@ static coroutine_fn int nbd_negotiate(NBDClient *client)
-             LOG("write failed");
-             return -EINVAL;
-         }
--        rc = nbd_negotiate_options(client);
--        if (rc != 0) {
-+        ret = nbd_negotiate_options(client);
-+        if (ret != 0) {
-             LOG("option negotiation failed");
--            return rc;
-+            return ret;
-         }
- 
-         TRACE("advertising size %" PRIu64 " and flags %x",
-@@ -604,10 +604,10 @@ static coroutine_fn int nbd_negotiate(NBDClient *client)
-         stq_be_p(buf + 18, client->exp->size);
-         stw_be_p(buf + 26, client->exp->nbdflags | myflags);
-         len = client->no_zeroes ? 10 : sizeof(buf) - 18;
--        rc = nbd_write(client->ioc, buf + 18, len, NULL);
--        if (rc < 0) {
-+        ret = nbd_write(client->ioc, buf + 18, len, NULL);
-+        if (ret < 0) {
-             LOG("write failed");
--            return rc;
-+            return ret;
-         }
-     }
- 
-@@ -963,21 +963,21 @@ void nbd_export_close_all(void)
- static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len)
- {
-     NBDClient *client = req->client;
--    int rc;
-+    int ret;
- 
-     g_assert(qemu_in_coroutine());
-     qemu_co_mutex_lock(&client->send_lock);
-     client->send_coroutine = qemu_coroutine_self();
- 
-     if (!len) {
--        rc = nbd_send_reply(client->ioc, reply);
-+        ret = nbd_send_reply(client->ioc, reply);
-     } else {
-         qio_channel_set_cork(client->ioc, true);
--        rc = nbd_send_reply(client->ioc, reply);
--        if (rc == 0) {
--            rc = nbd_write(client->ioc, req->data, len, NULL);
--            if (rc < 0) {
--                rc = -EIO;
-+        ret = nbd_send_reply(client->ioc, reply);
-+        if (ret == 0) {
-+            ret = nbd_write(client->ioc, req->data, len, NULL);
-+            if (ret < 0) {
-+                ret = -EIO;
-             }
-         }
-         qio_channel_set_cork(client->ioc, false);
-@@ -985,7 +985,7 @@ static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len)
- 
-     client->send_coroutine = NULL;
-     qemu_co_mutex_unlock(&client->send_lock);
--    return rc;
-+    return ret;
  }
  
- /* nbd_co_receive_request
+-typedef struct {
+-    NBDClient *client;
+-    Coroutine *co;
+-} NBDClientNewData;
+-
+-static coroutine_fn int nbd_negotiate(NBDClientNewData *data)
++static coroutine_fn int nbd_negotiate(NBDClient *client)
+ {
+-    NBDClient *client = data->client;
+     char buf[8 + 8 + 8 + 128];
+     int rc;
+     const uint16_t myflags = (NBD_FLAG_HAS_FLAGS | NBD_FLAG_SEND_TRIM |
+@@ -1268,8 +1262,7 @@ static void nbd_client_receive_next_request(NBDClient *client)
+ 
+ static coroutine_fn void nbd_co_client_start(void *opaque)
+ {
+-    NBDClientNewData *data = opaque;
+-    NBDClient *client = data->client;
++    NBDClient *client = opaque;
+     NBDExport *exp = client->exp;
+ 
+     if (exp) {
+@@ -1278,15 +1271,12 @@ static coroutine_fn void nbd_co_client_start(void *opaque)
+     }
+     qemu_co_mutex_init(&client->send_lock);
+ 
+-    if (nbd_negotiate(data)) {
++    if (nbd_negotiate(client)) {
+         client_close(client, false);
+-        goto out;
++        return;
+     }
+ 
+     nbd_client_receive_next_request(client);
+-
+-out:
+-    g_free(data);
+ }
+ 
+ /*
+@@ -1302,7 +1292,7 @@ void nbd_client_new(NBDExport *exp,
+                     void (*close_fn)(NBDClient *, bool))
+ {
+     NBDClient *client;
+-    NBDClientNewData *data = g_new(NBDClientNewData, 1);
++    Coroutine *co;
+ 
+     client = g_malloc0(sizeof(NBDClient));
+     client->refcount = 1;
+@@ -1318,7 +1308,6 @@ void nbd_client_new(NBDExport *exp,
+     object_ref(OBJECT(client->ioc));
+     client->close_fn = close_fn;
+ 
+-    data->client = client;
+-    data->co = qemu_coroutine_create(nbd_co_client_start, data);
+-    qemu_coroutine_enter(data->co);
++    co = qemu_coroutine_create(nbd_co_client_start, client);
++    qemu_coroutine_enter(co);
+ }
 -- 
 1.8.3.1
