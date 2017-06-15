@@ -1,27 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dLT8h-0000E6-2s
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 07:40:40 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1dLT8j-0000Ep-9q
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 07:40:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dLT8d-00065V-5L
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 07:40:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50690)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dLT8c-00065L-S8
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 07:40:35 -0400
-References: <20170614133819.18480-1-david@redhat.com>
-	<20170614133819.18480-3-david@redhat.com>
-	<25d4dffd-786c-9a24-80ed-6a71724435ae@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <bb20b5ae-df1a-6345-d789-95e2420ac41b@redhat.com>
-Date: Thu, 15 Jun 2017 13:40:30 +0200
+	(envelope-from <rkagan@virtuozzo.com>) id 1dLT8f-000675-Cp
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 07:40:41 -0400
+Received: from mail-ve1eur01on0100.outbound.protection.outlook.com
+	([104.47.1.100]:42688
+	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1dLT8e-00065N-IM
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 07:40:37 -0400
+Date: Thu, 15 Jun 2017 14:40:25 +0300
+From: Roman Kagan <rkagan@virtuozzo.com>
+Message-ID: <20170615114024.GA28349@rkaganb.sw.ru>
+References: <6bb8f5e3-b6bf-c62a-93f3-9fe338d43881@redhat.com>
+	<20170614130149.GD5016@thinpad.lan.raisama.net>
+	<20170614151117.42235246@nial.brq.redhat.com>
+	<71b4d258-4299-43dd-ec0c-e7a2ab9e128e@redhat.com>
+	<20170614132216.GF5016@thinpad.lan.raisama.net>
+	<20170614153859.3d990da4@nial.brq.redhat.com>
+	<20170614134523.GH5016@thinpad.lan.raisama.net>
+	<20170614184035.GB20211@rkaganb.sw.ru>
+	<20170614185900.GL5016@thinpad.lan.raisama.net>
+	<3567a47c-6f01-eed6-febe-832eb2dc5d06@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <25d4dffd-786c-9a24-80ed-6a71724435ae@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] target/s390x: implement mvcos
- instruction
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3567a47c-6f01-eed6-febe-832eb2dc5d06@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 05/23] hyperv: ensure VP index equal to
+ QEMU cpu_index
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,142 +39,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: rth@twiddle.net, agraf@suse.de, Aurelien Jarno <aurelien@aurel32.net>, Miroslav Benes <mbenes@suse.cz>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-
->>  
->> +#ifndef CONFIG_USER_ONLY
->> +static void fast_memmove_idx(CPUS390XState *env, uint64_t dest, uint64_t src,
->> +                             uint32_t len, int dest_idx, int src_idx,
->> +                             uintptr_t ra)
->> +{
->> +    TCGMemOpIdx oi_dest = make_memop_idx(MO_UB, dest_idx);
->> +    TCGMemOpIdx oi_src = make_memop_idx(MO_UB, src_idx);
->> +    uint32_t len_adj;
->> +    void *src_p;
->> +    void *dest_p;
->> +    uint8_t x;
->> +
->> +    while (len > 0) {
->> +        src = wrap_address(env, src);
->> +        dest = wrap_address(env, dest);
->> +        src_p = tlb_vaddr_to_host(env, src, MMU_DATA_LOAD, src_idx);
->> +        dest_p = tlb_vaddr_to_host(env, dest, MMU_DATA_STORE, dest_idx);
->> +
->> +        if (src_p && dest_p) {
->> +            /* Access to both whole pages granted.  */
->> +            len_adj = adj_len_to_page(adj_len_to_page(len, src), dest);
->> +            memmove(dest_p, src_p, len_adj);
->> +        } else {
->> +            /* We failed to get access to one or both whole pages. The next
->> +               read or write access will likely fill the QEMU TLB for the
->> +               next iteration.  */
->> +            len_adj = 1;
->> +            x = helper_ret_ldub_mmu(env, src, oi_src, ra);
->> +            helper_ret_stb_mmu(env, dest, x, oi_dest, ra);
->> +        }
->> +        src += len_adj;
->> +        dest += len_adj;
->> +        len -= len_adj;
->> +    }
->> +}
+On Thu, Jun 15, 2017 at 10:26:58AM +0200, Paolo Bonzini wrote:
+> On 14/06/2017 20:59, Eduardo Habkost wrote:
+> > On Wed, Jun 14, 2017 at 09:40:37PM +0300, Roman Kagan wrote:
+> >> One more data point is that until now there was no use for vp_index in
+> >> QEMU, so it didn't care how KVM managed it.  In KVM the only
+> >> vp_index-aware path that the guests could trigger was exactly reading of
+> >> HV_X64_MSR_VP_INDEX.
+> >>
+> >> So let me try to sum up (to make sure I understand it right);
+> >>
+> >> 1) we add KVM_CAP_HYPERV_SYNIC2 to KVM; when QEMU enables it KVM
+> >>    switches to using vcpu_id as vp_index and stops zeroing synic pages
+> > 
+> > If we want to keep KVM code simpler, we could make QEMU
+> > explicitly initialize vp_index using vcpu_id (== arch_id == apic_id)
+> > if KVM_CAP_HYPERV_SYNIC2 is reported as supported.
+> >
+> >> 2) new QEMU refuses to start in non-compat mode when
+> >>    KVM_CAP_HYPERV_SYNIC2 is not supported
+> > 
+> > It depends on which cases are considered "in non-compat mode".
+> > Getting a VM not runnable just because the machine-type was
+> > updated is not desirable, especially considering that on most
+> > cases we will create the VCPUs on the same order and things would
+> > keep working.  Probably the best we can do on this case is to
+> > automatically enable compat mode, but print a warning saying
+> > future QEMU versions might break if the kernel is not upgraded.
 > 
-> The code is pretty similar to fast_memmove() ... I wonder whether it makes
-> sense to change fast_memmove() to call fast_memmove_idx(), too?
-> 
-> Something like:
-> 
-> static void fast_memmove(CPUS390XState *env, uint64_t dest, uint64_t src,
->                          uint32_t l, uintptr_t ra)
-> {
->     int mmu_idx = cpu_mmu_index(env, false);
-> 
->     fast_memmove_idx(env, dest, src, l, mmu_idx, mmu_idx, ra);
-> }
+> Anything that specifies hv_synic can be broken.  There was really no
+> reason to specify it for anything except experimenting.
 
-The problem is that all these instructions have different specialties,
-especially regarding
-a) address wrapping (which would be wrong in this case! only mvcos
-states to do that)
-b) how overlapping operands are handled (e.g. that's a reason why MOVE
-TO PRIMARY/SECONDARY cannot simply reuse fast_memmove_idx - they have
-to fallback to byte-based copies if in doubt).
-c) MVPG theoretically exception suppression (not implemented)
+Hyper-V SynIC timers depend on it, and they work since QEMU 2.6 / KVM
+4.5 and even supported by libvirt since 1.3.3.
 
-We could implement all in one function by adding additional parameters
-(wrap, check_overlap), but I think we should do that later on.
+> So QEMU never has to enable KVM_CAP_HYPERV_SYNIC.  No compat mode is
+> necessary.  In fact, I don't see any reason to _keep_
+> KVM_CAP_HYPERV_SYNIC in the kernel, either.  This means that KVM can
+> also switch unconditionally the vp_index to vcpu_id, because old QEMU +
+> new kernel won't even start.
 
-> 
-> Or could that result in some speed penalty here?
-> Anyway, this should likely be done in a separate patch.
-> 
->> +static int mmu_idx_from_as(uint8_t as)
->> +{
->> +    switch (as) {
->> +    case AS_PRIMARY:
->> +        return MMU_PRIMARY_IDX;
->> +    case AS_SECONDARY:
->> +        return MMU_SECONDARY_IDX;
->> +    case AS_HOME:
->> +        return MMU_HOME_IDX;
->> +    }
->> +    /* FIXME AS_ACCREG */
->> +    assert(false);
->> +    return -1;
->> +}
-> 
-> Hmm, maybe it would make sense to change the MMU_*_IDX defines to match
-> the AS value directly?
+I'm afraid this is too harsh on users...
 
-Let's defer that to introduction of ACC range, otherwise we would have
-holes in our MMU_.*_IDX definition
-
-> 
->> +static void fast_memmove_as(CPUS390XState *env, uint64_t dest, uint64_t src,
->> +                            uint32_t len, uint8_t dest_as, uint8_t src_as,
->> +                            uintptr_t ra)
->> +{
->> +    int src_idx = mmu_idx_from_as(src_as);
->> +    int dest_idx = mmu_idx_from_as(dest_as);
->> +
->> +    fast_memmove_idx(env, dest, src, len, dest_idx, src_idx, ra);
->> +}
->> +#endif
->> +
->>  static void fast_memmove(CPUS390XState *env, uint64_t dest, uint64_t src,
-[...]
->> +    if (!dest_k) {
->> +        dest_key = psw_key;
->> +    }
->> +    if (!src_k) {
->> +        src_key = psw_key;
->> +    }
->> +    if (!dest_a) {
->> +        dest_as = psw_as;
->> +    }
->> +    if (!src_a) {
->> +        src_as = psw_as;
->> +    }
-> 
-> Not sure, but maybe it's nicer to write all this in a more compact way?
-
-Yes, we could to that, at least to reduce the LOC. As Richard already
-picked up that patch for his series, I think we could do that as an
-addon patch later.
-
-[...]
-> 
-> Apart from the bikeshed-painting-worthy cosmetic nits, this looks fine
-> now to me. Thanks for tackling this!
-> 
->  Thomas
-> 
-
-Thanks Thomas for your very helpful review(s)!
-
--- 
-
-Thanks,
-
-David
+Roman.
