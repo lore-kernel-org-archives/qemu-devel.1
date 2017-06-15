@@ -1,35 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dLQ7Q-00050W-Ts
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:27:09 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dLQAP-000762-LD
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:30:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dLQ7N-0004hp-OQ
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:27:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55072)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dLQ7N-0004hY-FC
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:27:05 -0400
-References: <20170613185752.GZ5016@thinpad.lan.raisama.net>
-	<20170614112506.GI2004@rkaganb.sw.ru>
-	<6bb8f5e3-b6bf-c62a-93f3-9fe338d43881@redhat.com>
-	<20170614130149.GD5016@thinpad.lan.raisama.net>
-	<20170614151117.42235246@nial.brq.redhat.com>
-	<71b4d258-4299-43dd-ec0c-e7a2ab9e128e@redhat.com>
-	<20170614132216.GF5016@thinpad.lan.raisama.net>
-	<20170614153859.3d990da4@nial.brq.redhat.com>
-	<20170614134523.GH5016@thinpad.lan.raisama.net>
-	<20170614184035.GB20211@rkaganb.sw.ru>
-	<20170614185900.GL5016@thinpad.lan.raisama.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3567a47c-6f01-eed6-febe-832eb2dc5d06@redhat.com>
-Date: Thu, 15 Jun 2017 10:26:58 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1dLQAM-0005wf-HH
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:30:13 -0400
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:36065)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dLQAM-0005w0-A6
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:30:10 -0400
+Received: by mail-wr0-x232.google.com with SMTP id 36so11127877wry.3
+	for <qemu-devel@nongnu.org>; Thu, 15 Jun 2017 01:30:10 -0700 (PDT)
+References: <20170614194821.8754-1-rth@twiddle.net>
+	<20170614194821.8754-6-rth@twiddle.net>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170614194821.8754-6-rth@twiddle.net>
+Date: Thu, 15 Jun 2017 09:30:44 +0100
+Message-ID: <87y3stmz4b.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170614185900.GL5016@thinpad.lan.raisama.net>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 05/23] hyperv: ensure VP index equal to
- QEMU cpu_index
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] target/arm: Exit after clearing
+ interrupt mask
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,46 +31,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, cota@braap.org, pbonzini@redhat.com, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
 
+Richard Henderson <rth@twiddle.net> writes:
 
-On 14/06/2017 20:59, Eduardo Habkost wrote:
-> On Wed, Jun 14, 2017 at 09:40:37PM +0300, Roman Kagan wrote:
->> One more data point is that until now there was no use for vp_index in
->> QEMU, so it didn't care how KVM managed it.  In KVM the only
->> vp_index-aware path that the guests could trigger was exactly reading =
-of
->> HV_X64_MSR_VP_INDEX.
->>
->> So let me try to sum up (to make sure I understand it right);
->>
->> 1) we add KVM_CAP_HYPERV_SYNIC2 to KVM; when QEMU enables it KVM
->>    switches to using vcpu_id as vp_index and stops zeroing synic pages
->=20
-> If we want to keep KVM code simpler, we could make QEMU
-> explicitly initialize vp_index using vcpu_id (=3D=3D arch_id =3D=3D api=
-c_id)
-> if KVM_CAP_HYPERV_SYNIC2 is reported as supported.
+> Exit to cpu loop so we reevaluate cpu_arm_hw_interrupts.
 >
->> 2) new QEMU refuses to start in non-compat mode when
->>    KVM_CAP_HYPERV_SYNIC2 is not supported
->=20
-> It depends on which cases are considered "in non-compat mode".
-> Getting a VM not runnable just because the machine-type was
-> updated is not desirable, especially considering that on most
-> cases we will create the VCPUs on the same order and things would
-> keep working.  Probably the best we can do on this case is to
-> automatically enable compat mode, but print a warning saying
-> future QEMU versions might break if the kernel is not upgraded.
+> Cc: qemu-arm@nongnu.org
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
 
-Anything that specifies hv_synic can be broken.  There was really no
-reason to specify it for anything except experimenting.
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Tested-by: Alex Bennée <alex.bennee@linaro.org>
 
-So QEMU never has to enable KVM_CAP_HYPERV_SYNIC.  No compat mode is
-necessary.  In fact, I don't see any reason to _keep_
-KVM_CAP_HYPERV_SYNIC in the kernel, either.  This means that KVM can
-also switch unconditionally the vp_index to vcpu_id, because old QEMU +
-new kernel won't even start.
+> ---
+>  target/arm/translate-a64.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+>
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index 860e279..e55547d 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -1422,7 +1422,9 @@ static void handle_msr_i(DisasContext *s, uint32_t insn,
+>          gen_helper_msr_i_pstate(cpu_env, tcg_op, tcg_imm);
+>          tcg_temp_free_i32(tcg_imm);
+>          tcg_temp_free_i32(tcg_op);
+> -        s->is_jmp = DISAS_UPDATE;
+> +        /* For DAIFClear, exit the cpu loop to re-evaluate pending IRQs.  */
+> +        gen_a64_set_pc_im(s->pc);
+> +        s->is_jmp = (op == 0x1f ? DISAS_EXIT : DISAS_JUMP);
+>          break;
+>      }
+>      default:
+> @@ -11369,6 +11371,9 @@ void gen_intermediate_code_a64(ARMCPU *cpu, TranslationBlock *tb)
+>          case DISAS_JUMP:
+>              tcg_gen_lookup_and_goto_ptr(cpu_pc);
+>              break;
+> +        case DISAS_EXIT:
+> +            tcg_gen_exit_tb(0);
+> +            break;
+>          case DISAS_TB_JUMP:
+>          case DISAS_EXC:
+>          case DISAS_SWI:
 
-Paolo
+
+--
+Alex Bennée
