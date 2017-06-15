@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dLZDA-00081s-Nd
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 14:09:41 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dLZKr-0001rf-Ff
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 14:17:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dLZD7-0005nr-I4
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 14:09:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57276)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1dLZD7-0005na-BJ
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 14:09:37 -0400
-References: <20170614105547.Horde.Qq_wt1XJCR6spCHFrm8xE9K@www.quantumachine.net>
-	<CAFEAcA8idTcunTM61VVOnHSgryo1ZS5wK+MkZgCnn5C0h4+KuA@mail.gmail.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <8abfe17b-3fed-81c9-aad4-f99f31243c31@redhat.com>
-Date: Thu, 15 Jun 2017 14:09:34 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dLZKq-00081V-BJ
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 14:17:37 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:37875)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dLZKq-00081D-2u
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 14:17:36 -0400
+Received: by mail-wm0-x233.google.com with SMTP id d73so6088763wma.0
+	for <qemu-devel@nongnu.org>; Thu, 15 Jun 2017 11:17:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8idTcunTM61VVOnHSgryo1ZS5wK+MkZgCnn5C0h4+KuA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] DragonFly BSD support
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 15 Jun 2017 19:17:14 +0100
+Message-ID: <CAFEAcA9+HauZoeSxrdXE+cENswUPsjoSOVFJ-wMfboYH5wC2=Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] QEMU issues on SPARC hosts due to
+ more-than-page-alignment requirement for MAP_SHARED|MAP_FIXED...
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +27,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Antonio_Huete_Jim=c3=a9nez?= <tuxillo@quantumachine.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 
+It turns out that SPARC hosts impose a requirement that
+if you mmap MAP_SHARED|MAP_FIXED then the address must be
+aligned to SHMLBA alignment, which for SPARC is 16K and
+larger than the 8K page size:
+ http://lxr.linux.no/#linux+v4.10.1/arch/sparc/kernel/sys_sparc_64.c#L158
 
+QEMU doesn't really cope with this. In particular, ivmshm
+doesn't work:
 
-On 06/15/2017 06:15 AM, Peter Maydell wrote:
-> On 14 June 2017 at 11:55, Antonio Huete Jim=C3=A9nez
-> <tuxillo@quantumachine.net> wrote:
->> According to 2.9 changelog page, DragonFly BSD will be listed as unsup=
-ported
->> with the possibility of dropping support completely in the future:
->>
->> http://wiki.qemu.org/ChangeLog/2.9
->>
->> I'd like to volunteer so that qemu can keep DragonFly BSD as a support=
-ed
->> platform.
->> Could you please let me know the requirements needed to do so?
->=20
-> Thanks for volunteering!
->=20
-> So, what we need comes in two parts:
->  (1) a machine we can use for our build tests (ie which I can have
-> an ssh account on; we may set up more formal continuous-integration
-> later). Since I don't know the BSDs somebody else needs to be
-> handling sysadmin work for it.
-> At a pinch, detailed instructions on how to set up a VM on
-> Linux running DragonFly BSD would do; we have those for some
-> of the BSDs here: http://wiki.qemu.org/Hosts/BSD
->=20
->  (2) somebody who's prepared to list themselves as the maintainer
-> for the host OS, and respond to problems/patches relating to it.
-> In particular the first thing will be to ensure that QEMU actually
-> builds and passes 'make check' on this OS and submit any patches
-> needed to fix problems. If there are any non-upstream patches
-> lurking around in a ports system, then you'll also want to start
-> cleaning those up and getting them upstream.
->=20
-> When we get to the point where we have a machine in our
-> standard build-and-test setup which passes 'make && make check'
-> then we can drop the "this is unsupported" note from configure.
->=20
-> thanks
-> -- PMM
->=20
+$ ppc64-softmmu/qemu-system-ppc64 -display none -device
+ivshmem,shm=/qtest-20273-1334572184,size=0x1
+qemu-system-ppc64: System page size 0x2000 is not enabled in
+page_size_mask (0x11000). Performance may be slow
+qemu-system-ppc64: -device
+ivshmem,shm=/qtest-20273-1334572184,size=0x1: ivshmem is deprecated,
+please use ivshmem-plain or ivshmem-doorbell instead
+Unexpected error in file_ram_alloc() at /home/pm215/qemu/exec.c:1599:
+qemu-system-ppc64: -device
+ivshmem,shm=/qtest-20273-1334572184,size=0x1: unable to map backing
+store for guest RAM: Invalid argument
+Aborted
 
-Peter, do we have a wiki page detailing what it takes to get an
-operating system considered "supported" with hints and tips for
-prospective maintainers?
+(noticed because this is a make check failure).
 
-Perhaps we could and include a link to the deprecation warnings.
+exec.c calls qemu_fd_getpagesize() to figure out the alignment
+here (on a file in /dev/shm/) and ends up in its default codepath
+that returns getpagesize(), which is too small.
 
-(Then again, how many times will this be useful again in the future? How
-many operating systems could there be that care about QEMU? ...)
+What's the best way to fix this? As far as I can tell
+the restriction applies to any mapping, not just /dev/shm files.
+QEMU's assumptions that pagesize is the alignment requirement
+seem fairly widespread :-(
 
---js
+thanks
+-- PMM
