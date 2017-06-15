@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dLSOw-0008Bx-9M
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:23 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dLSP5-0008Fg-J0
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dLSOv-0007W7-HW
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:22 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:35256)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dLSP1-0007Yi-Mc
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:31 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:36474)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dLSOv-0007Ve-CA
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:21 -0400
-Received: by mail-wr0-x242.google.com with SMTP id z45so2761739wrb.2
-	for <qemu-devel@nongnu.org>; Thu, 15 Jun 2017 03:53:21 -0700 (PDT)
-Received: from 640k.lan (94-39-191-51.adsl-ull.clienti.tiscali.it.
-	[94.39.191.51])
-	by smtp.gmail.com with ESMTPSA id f21sm3258597wra.5.2017.06.15.03.53.19
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 15 Jun 2017 03:53:19 -0700 (PDT)
+	id 1dLSP1-0007YV-GE
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:27 -0400
+Received: by mail-wr0-x241.google.com with SMTP id 77so2746759wrb.3
+	for <qemu-devel@nongnu.org>; Thu, 15 Jun 2017 03:53:27 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 15 Jun 2017 12:52:29 +0200
-Message-Id: <1497523981-38449-10-git-send-email-pbonzini@redhat.com>
+Date: Thu, 15 Jun 2017 12:52:34 +0200
+Message-Id: <1497523981-38449-15-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1497523981-38449-1-git-send-email-pbonzini@redhat.com>
 References: <1497523981-38449-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 09/41] megasas: do not read iovec count more
- than once from frame
+Subject: [Qemu-devel] [PULL 14/41] Makefile: Do not generate files if
+ "configure" has not been run yet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,38 +29,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>
 
-Avoid TOC-TOU bugs depending on how the compiler behaves.
+From: Thomas Huth <thuth@redhat.com>
 
+When doing a "make -j10" in the vanilla QEMU source tree (without
+running "configure" first), the Makefile currently generates two
+files already, qemu-version.h and qemu-options.def. This should not
+happen, so let's only build the generated files if config-host.mak
+is available (i.e. "configure" has been run already).
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1496926799-13040-1-git-send-email-thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/megasas.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
-index 1888118..c353118 100644
---- a/hw/scsi/megasas.c
-+++ b/hw/scsi/megasas.c
-@@ -675,15 +675,16 @@ out:
- static int megasas_map_dcmd(MegasasState *s, MegasasCmd *cmd)
- {
-     dma_addr_t iov_pa, iov_size;
-+    int iov_count;
+diff --git a/Makefile b/Makefile
+index c830d7a..32d4441 100644
+--- a/Makefile
++++ b/Makefile
+@@ -791,9 +791,11 @@ endif # CONFIG_WIN
  
-     cmd->flags = le16_to_cpu(cmd->frame->header.flags);
--    if (!cmd->frame->header.sge_count) {
-+    iov_count = cmd->frame->header.sge_count;
-+    if (!iov_count) {
-         trace_megasas_dcmd_zero_sge(cmd->index);
-         cmd->iov_size = 0;
-         return 0;
--    } else if (cmd->frame->header.sge_count > 1) {
--        trace_megasas_dcmd_invalid_sge(cmd->index,
--                                       cmd->frame->header.sge_count);
-+    } else if (iov_count > 1) {
-+        trace_megasas_dcmd_invalid_sge(cmd->index, iov_count);
-         cmd->iov_size = 0;
-         return -EINVAL;
-     }
+ # Add a dependency on the generated files, so that they are always
+ # rebuilt before other object files
++ifneq ($(wildcard config-host.mak),)
+ ifneq ($(filter-out $(UNCHECKED_GOALS),$(MAKECMDGOALS)),$(if $(MAKECMDGOALS),,fail))
+ Makefile: $(GENERATED_FILES)
+ endif
++endif
+ 
+ .SECONDARY: $(TRACE_HEADERS) $(TRACE_HEADERS:%=%-timestamp) \
+ 	$(TRACE_SOURCES) $(TRACE_SOURCES:%=%-timestamp) \
 -- 
 1.8.3.1
