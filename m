@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dLP7N-0004ZF-AO
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 03:23:05 -0400
+	(envelope-from <quintela@redhat.com>) id 1dLPCU-0005rR-Or
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 03:28:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dLP7M-0002QP-17
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 03:23:01 -0400
-Date: Thu, 15 Jun 2017 15:20:44 +0800
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170615072044.GI2614@umbus>
-References: <1497505464-12796-1-git-send-email-bharata@linux.vnet.ibm.com>
+	(envelope-from <quintela@redhat.com>) id 1dLPCT-0003ws-Q2
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 03:28:18 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170615043022.GF2767@localhost.localdomain> (Jeff Cody's
+	message of "Thu, 15 Jun 2017 00:30:22 -0400")
+References: <20170614215526.9218-1-jcody@redhat.com>
+	<149747921115.2241.11634852803092743941@4a9a010726c0>
+	<20170615043022.GF2767@localhost.localdomain>
+Reply-To: quintela@redhat.com
+Date: Thu, 15 Jun 2017 09:28:04 +0200
+Message-ID: <87r2ylaewr.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="J+eNKFoVC4T1DV3f"
-Content-Disposition: inline
-In-Reply-To: <1497505464-12796-1-git-send-email-bharata@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [FIX PATCH] target/ppc: Proper cleanup when
- ppc_cpu_realizefn fails
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 0/2] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,111 +26,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, famz@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
 
+Jeff Cody <jcody@redhat.com> wrote:
+> On Wed, Jun 14, 2017 at 03:26:52PM -0700, no-reply@patchew.org wrote:
+>> Hi,
+>>=20
+>> This series failed automatic build test. Please find the testing command=
+s and
+>> their output below. If you have docker installed, you can probably repro=
+duce it
+>> locally.
+>>=20
+>> Type: series
+>> Subject: [Qemu-devel] [PULL 0/2] Block patches
+>> Message-id: 20170614215526.9218-1-jcody@redhat.com
+>>=20
+>> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
+>> #!/bin/bash
+>> set -e
+>> git submodule update --init dtc
+>> # Let docker tests dump environment info
+>> export SHOW_ENV=3D1
+>> export J=3D8
+>> # master is broken, skip centos6...
+>> #time make docker-test-quick@centos6
+>> time make docker-test-mingw@fedora
+>> time make docker-test-build@min-glib
+>> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
+>>=20
+>> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+>> From https://github.com/patchew-project/qemu
+>>  * [new tag] patchew/20170614215526.9218-1-jcody@redhat.com ->
+>> patchew/20170614215526.9218-1-jcody@redhat.com
+>> Switched to a new branch 'test'
+>> 2f0938b block/iscsi: enable filename option and parsing
+>> e6b28ad block/rbd: enable filename option and parsing
+>>
+>
+> [...]
+>
+>>   CC      hw/pci-bridge/pcie_root_port.o
+>>   CC      hw/pci-bridge/gen_pcie_root_port.o
+>>   CC      hw/pci-bridge/pci_expander_bridge.o
+>> In file included from /tmp/qemu-test/src/hw/net/vmxnet3.c:30:
+>> /tmp/qemu-test/src/include/migration/register.h:18: error:
+>> redefinition of typedef =E2=80=98LoadStateHandler=E2=80=99
+>> /tmp/qemu-test/src/include/migration/vmstate.h:32: note: previous
+>> declaration of =E2=80=98LoadStateHandler=E2=80=99 was here
+>
+> Just an FYI, this appears to be unrelated to the actual patches in the pu=
+ll
+> req.
 
---J+eNKFoVC4T1DV3f
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+It is, sorry.
 
-On Thu, Jun 15, 2017 at 11:14:24AM +0530, Bharata B Rao wrote:
-> If ppc_cpu_realizefn() fails after cpu_exec_realizefn() has been
-> called, we will have to undo whatever cpu_exec_realizefn() did
-> by explicitly calling cpu_exec_unrealizeffn() which is currently
-> missing. Failure to do this proper cleanup will result in CPU
-> which was never fully realized to linger on the cpus list causing
-> SIGSEGV later (for eg when running "info cpus").
->=20
-> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+I sent a PULL requset with the fix on my last PULL request.
 
-Applied to ppc-for-2.10.
+Peter, should I do something to speed up that one?
 
-> ---
->  target/ppc/translate_init.c | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
->=20
-> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> index e837cd2..53aff5a 100644
-> --- a/target/ppc/translate_init.c
-> +++ b/target/ppc/translate_init.c
-> @@ -9825,14 +9825,14 @@ static void ppc_cpu_realizefn(DeviceState *dev, E=
-rror **errp)
->          error_append_hint(errp, "Adjust the number of cpus to %d "
->                            "or try to raise the number of threads per cor=
-e\n",
->                            cpu->cpu_dt_id * smp_threads / max_smt);
-> -        return;
-> +        goto unrealize;
->      }
->  #endif
-> =20
->      if (tcg_enabled()) {
->          if (ppc_fixup_cpu(cpu) !=3D 0) {
->              error_setg(errp, "Unable to emulate selected CPU with TCG");
-> -            return;
-> +            goto unrealize;
->          }
->      }
-> =20
-> @@ -9841,14 +9841,14 @@ static void ppc_cpu_realizefn(DeviceState *dev, E=
-rror **errp)
->          error_setg(errp, "CPU does not possess a BookE or 4xx MMU. "
->                     "Please use qemu-system-ppc or qemu-system-ppc64 inst=
-ead "
->                     "or choose another CPU model.");
-> -        return;
-> +        goto unrealize;
->      }
->  #endif
-> =20
->      create_ppc_opcodes(cpu, &local_err);
->      if (local_err !=3D NULL) {
->          error_propagate(errp, local_err);
-> -        return;
-> +        goto unrealize;
->      }
->      init_ppc_proc(cpu);
-> =20
-> @@ -10033,6 +10033,10 @@ static void ppc_cpu_realizefn(DeviceState *dev, =
-Error **errp)
->          fflush(stdout);
->      }
->  #endif
-> +    return;
-> +
-> +unrealize:
-> +    cpu_exec_unrealizefn(cs);
->  }
-> =20
->  static void ppc_cpu_unrealizefn(DeviceState *dev, Error **errp)
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---J+eNKFoVC4T1DV3f
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZQjVMAAoJEGw4ysog2bOSFjwP/2x9vyb7xDaRL+Ve1pWanxQu
-mmH483zL7Rtdm68HmWilnqD2kPgJ/NcPmJvDaok9PsurKSS/+GzcTIY52F4fEprC
-gsS7bwhYC8r/ylZH9HQWqm7L3dR5ZNVvPKqLOM3Pn5+3ELlH9P2TwoUPhTCkzh/q
-cu+CeVWUa0aXv118ZR+ofow2yez3tygUIlXdCZptm3r9+FOM7m3lqEbOoP9OdDgG
-YvvoPz5thLKad0ohoE+rUoXwR8AiPFj5E+NnJkQ4IjNsz9HItID6FTRaEG9TzEIh
-qmqVnw/e0XiGgiIDzqf7K814wQeo4iFyYWZ+gyKx2xD1MlHIm6aqZ1M+Z54SzFOg
-cYBbih116EYVCAT85y9z/Mi44W31f2VLJDll17vp1kVgGnUu+nkOqiKR4sIlfUwV
-woTZmxcuGPAgFfq+Al7NU+wxHcwRKqh8JE5+INsvbRPhITkRGTV5KceRxDgQMSx2
-KbGMiyrCn2q/FlkjL9gh4odDkvnygDdEhVOHfs9jHhQsZVj1waZmDPTt37Nlh4XW
-lLARrcTAJ7VSLOEOgYX/1gimDPMyvS14CLW2ytqQGb+eyF4dP39ba19D1sm8g4tW
-Ue/lDU2LuteF5KpiDgZDNMcxux0lsU7RRHNCtJxcpXLDjh3G/HyZuyxFOSWjD5uQ
-kgYY3Wre4au0y5072ImR
-=15/m
------END PGP SIGNATURE-----
-
---J+eNKFoVC4T1DV3f--
+Later, Juan.
