@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dLPfI-0007xm-1b
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 03:58:04 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dLPhT-0000Vf-7b
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:00:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dLPfH-0003bl-Ar
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 03:58:04 -0400
-References: <20170615030801.6260-1-maozy.fnst@cn.fujitsu.com>
-	<87mv99aelr.fsf@secure.mitica>
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Message-ID: <d1ee8202-2f52-74bb-a7dc-da020708025c@cn.fujitsu.com>
-Date: Thu, 15 Jun 2017 15:56:27 +0800
+	(envelope-from <no-reply@patchew.org>) id 1dLPhO-0004kJ-JP
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:00:19 -0400
+Resent-Message-Id: <E1dLPhO-0004kJ-JP@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21499)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dLPhO-0004jt-Bn
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:00:14 -0400
+In-Reply-To: <20170615055356.20684-1-rth@twiddle.net>
+Message-ID: <149751359885.3807.5477345617299762245@4a9a010726c0>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <87mv99aelr.fsf@secure.mitica>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] util: remove the obsolete non-blocking
- connect
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 15 Jun 2017 00:59:59 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/5] More s390x improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,42 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, mreitz@redhat.com, sheepdog@lists.wpkg.org, Cao jin <caoj.fnst@cn.fujitsu.com>, kraxel@redhat.com, pbonzini@redhat.com, namei.unix@gmail.com
+To: rth@twiddle.net
+Cc: famz@redhat.com, qemu-devel@nongnu.org, aurelien@aurel32.net, david@redhat.com
 
-
-
-On 06/15/2017 03:34 PM, Juan Quintela wrote:
-> Mao Zhongyi <maozy.fnst@cn.fujitsu.com> wrote:
->> From: Cao jin <caoj.fnst@cn.fujitsu.com>
->>
->> The non-blocking connect mechanism is obsolete, and it doesn't
->> work well in inet connection, because it will call getaddrinfo
->> first and getaddrinfo will blocks on DNS lookups. Since commit
->> e65c67e4 & d984464e, the non-blocking connect of migration goes
->> through QIOChannel in a different manner(using a thread), and
->> nobody use this old non-blocking connect anymore.
->>
->> Any newly written code which needs a non-blocking connect should
->> use the QIOChannel code, so we can drop NonBlockingConnectHandler
->
->
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
->
->
-> ...
->
->>  int inet_connect_saddr(InetSocketAddress *saddr,
->> -                       NonBlockingConnectHandler *callback, void *opaque,
->>                         Error **errp);
->
-> In case you have to respin it.
->
-> Now you can write the prototype in a single line, no?
-> Same for the rest of appearances.
->
-
-OK, I see, will fix it in the next version.
-
-Thanks
-Mao
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzA2MTUwNTUzNTYuMjA2ODQtMS1ydGhAdHdpZGRsZS5uZXQKU3ViamVjdDogW1FlbXUtZGV2ZWxd
+IFtQQVRDSCAwLzVdIE1vcmUgczM5MHggaW1wcm92ZW1lbnRzClR5cGU6IHNlcmllcwoKPT09IFRF
+U1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdp
+dCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1s
+b2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBU
+cnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpm
+b3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDog
+JChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAt
+LWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhl
+bgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9u
+ZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVh
+OWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5j
+aCAndGVzdCcKMDY0OTZjYiB0YXJnZXQvczM5MHg6IG1hcmsgQ1NTVCwgQ1NTVDIsIEZQU0VIIGZh
+Y2lsaXRpZXMgYXMgYXZhaWxhYmxlCmJiMWY2NzUgdGFyZ2V0L3MzOTB4OiBpbXBsZW1lbnQgbXZj
+b3MgaW5zdHJ1Y3Rpb24KYjI5MDM1ZCB0YXJnZXQvczM5MHg6IGNoYW5nZSBQU1dfU0hJRlRfS0VZ
+CjllNTFkMGIgdGFyZ2V0L3MzOTB4OiBFbmZvcmNlIGluc3RydWN0aW9uIGZlYXR1cmVzCjM0MGQy
+MmQgdGFyZ2V0L3MzOTB4OiBNYXAgZXhpc3RpbmcgRkFDXyogbmFtZXMgdG8gUzM5MF9GRUFUXyog
+bmFtZXMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNTogdGFyZ2V0L3Mz
+OTB4OiBNYXAgZXhpc3RpbmcgRkFDXyogbmFtZXMgdG8gUzM5MF9GRUFUXyogbmFtZXMuLi4KV0FS
+TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzcxOiBGSUxFOiB0YXJnZXQvczM5MHgvdHJh
+bnNsYXRlLmM6NTQwMzoKKyNkZWZpbmUgRkFDX0ZQU1NIICAgICAgIFMzOTBfRkVBVF9GTE9BVElO
+R19QT0lOVF9TVVBQUE9SVF9FTkggLyogRlBTLXNpZ24taGFuZGxpbmcgKi8KCldBUk5JTkc6IGxp
+bmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM3MjogRklMRTogdGFyZ2V0L3MzOTB4L3RyYW5zbGF0ZS5j
+OjU0MDQ6CisjZGVmaW5lIEZBQ19GUFJHUiAgICAgICBTMzkwX0ZFQVRfRkxPQVRJTkdfUE9JTlRf
+U1VQUFBPUlRfRU5IIC8qIEZQUi1HUi10cmFuc2ZlciAqLwoKRVJST1I6IGxpbmUgb3ZlciA5MCBj
+aGFyYWN0ZXJzCiM3NjogRklMRTogdGFyZ2V0L3MzOTB4L3RyYW5zbGF0ZS5jOjU0MDg6CisjZGVm
+aW5lIEZBQ19JRUVFRV9TSU0gICBTMzkwX0ZFQVRfRkxPQVRJTkdfUE9JTlRfU1VQUFBPUlRfRU5I
+IC8qIElFRUUtZXhjZXB0aW9uLXNpbXVsYXRpb24gKi8KCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBj
+aGFyYWN0ZXJzCiM4NTogRklMRTogdGFyZ2V0L3MzOTB4L3RyYW5zbGF0ZS5jOjU0MTc6CisjZGVm
+aW5lIEZBQ19MUFAgICAgICAgICBTMzkwX0ZFQVRfU0VUX1BST0dSQU1fUEFSQU1FVEVSUyAvKiBs
+b2FkLXByb2dyYW0tcGFyYW1ldGVyICovCgp0b3RhbDogMSBlcnJvcnMsIDMgd2FybmluZ3MsIDc0
+IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
+aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
+aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNo
+ZWNraW5nIFBBVENIIDIvNTogdGFyZ2V0L3MzOTB4OiBFbmZvcmNlIGluc3RydWN0aW9uIGZlYXR1
+cmVzLi4uCkNoZWNraW5nIFBBVENIIDMvNTogdGFyZ2V0L3MzOTB4OiBjaGFuZ2UgUFNXX1NISUZU
+X0tFWS4uLgpDaGVja2luZyBQQVRDSCA0LzU6IHRhcmdldC9zMzkweDogaW1wbGVtZW50IG12Y29z
+IGluc3RydWN0aW9uLi4uCkNoZWNraW5nIFBBVENIIDUvNTogdGFyZ2V0L3MzOTB4OiBtYXJrIENT
+U1QsIENTU1QyLCBGUFNFSCBmYWNpbGl0aWVzIGFzIGF2YWlsYWJsZS4uLgo9PT0gT1VUUFVUIEVO
+RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVy
+YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
+c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
