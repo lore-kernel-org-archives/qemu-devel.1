@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42725)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dLQYd-0006kw-SK
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:55:16 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dLQaJ-0007UH-T3
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:57:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dLQYc-0004cO-Vu
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:55:15 -0400
-Date: Thu, 15 Jun 2017 09:54:58 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170615085458.GB26592@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170615030801.6260-1-maozy.fnst@cn.fujitsu.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1dLQaF-00052J-U2
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:56:59 -0400
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:33780)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dLQaF-00052C-MT
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:56:55 -0400
+Received: by mail-wr0-x232.google.com with SMTP id r103so12262537wrb.0
+	for <qemu-devel@nongnu.org>; Thu, 15 Jun 2017 01:56:55 -0700 (PDT)
+References: <20170614194821.8754-1-rth@twiddle.net>
+	<20170614194821.8754-4-rth@twiddle.net>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170614194821.8754-4-rth@twiddle.net>
+Date: Thu, 15 Jun 2017 09:57:29 +0100
+Message-ID: <87tw3hmxvq.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170615030801.6260-1-maozy.fnst@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PATCH] util: remove the obsolete non-blocking
- connect
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] target/mips: Exit after enabling
+ interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,43 +31,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, Cao jin <caoj.fnst@cn.fujitsu.com>, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, qemu-block@nongnu.org, sheepdog@lists.wpkg.org
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, cota@braap.org, pbonzini@redhat.com, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
 
-On Thu, Jun 15, 2017 at 11:08:01AM +0800, Mao Zhongyi wrote:
-> From: Cao jin <caoj.fnst@cn.fujitsu.com>
-> 
-> The non-blocking connect mechanism is obsolete, and it doesn't
-> work well in inet connection, because it will call getaddrinfo
-> first and getaddrinfo will blocks on DNS lookups. Since commit
-> e65c67e4 & d984464e, the non-blocking connect of migration goes
-> through QIOChannel in a different manner(using a thread), and
-> nobody use this old non-blocking connect anymore.
-> 
-> Any newly written code which needs a non-blocking connect should
-> use the QIOChannel code, so we can drop NonBlockingConnectHandler
-> as a concept entirely.
-> 
-> Cc: mitake.hitoshi@lab.ntt.co.jp
-> Cc: namei.unix@gmail.com
-> Cc: jcody@redhat.com
-> Cc: kwolf@redhat.com
-> Cc: mreitz@redhat.com
-> Cc: berrange@redhat.com
-> Cc: kraxel@redhat.com
-> Cc: pbonzini@redhat.com
-> Cc: qemu-block@nongnu.org
-> Cc: sheepdog@lists.wpkg.org
-> Suggested-by: Daniel P. Berrange <berrange@redhat.com>
-> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
-> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+
+Richard Henderson <rth@twiddle.net> writes:
+
+> From: Paolo Bonzini <pbonzini@redhat.com>
+>
+> Exit to cpu loop so we reevaluate cpu_mips_hw_interrupts.
+>
+> Cc: Aurelien Jarno <aurelien@aurel32.net>
+> Cc: Yongbok Kim <yongbok.kim@imgtec.com>
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
 > ---
+>  target/mips/translate.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> index 559f8fe..891f14b 100644
+> --- a/target/mips/translate.c
+> +++ b/target/mips/translate.c
+> @@ -13403,9 +13403,11 @@ static void gen_pool32axf (CPUMIPSState *env, DisasContext *ctx, int rt, int rs)
+>                  save_cpu_state(ctx, 1);
+>                  gen_helper_ei(t0, cpu_env);
+>                  gen_store_gpr(t0, rs);
+> -                /* Stop translation as we may have switched the execution mode */
+> -                ctx->bstate = BS_STOP;
+>                  tcg_temp_free(t0);
+> +                /* BS_STOP isn't good enough here;
+> +                   reevaluate cpu_mips_hw_interrupts_enabled.  */
 
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+nit: technically we want to ensure mips_cpu_exec_interrupt is run (which
+calls cpu_mips_hw_interrupts_enabled)
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> +                gen_save_pc(ctx->pc + 4);
+> +                ctx->bstate = BS_EXCP;
+>              }
+>              break;
+>          default:
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+
+--
+Alex Bennée
