@@ -1,33 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38917)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dLKZF-0000bW-3X
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 22:31:30 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dLKb0-0001rz-JI
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 22:33:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dLKZB-0002G1-UD
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 22:31:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36160)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dLKZB-0002Fr-Jw
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 22:31:25 -0400
-Date: Thu, 15 Jun 2017 10:31:11 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170615023111.GB30118@pxdev.xzpeter.org>
-References: <20170607160445-mutt-send-email-mst@kernel.org>
-	<20170608061150.GA3628@pxdev.xzpeter.org>
-	<20170608215918-mutt-send-email-mst@kernel.org>
-	<20170609015847.GG3628@pxdev.xzpeter.org>
-	<20170611130710-mutt-send-email-mst@kernel.org>
-	<20170611121015.GA18542@umbus>
-	<20170612023443.GA25059@pxdev.xzpeter.org>
-	<20170612060450-mutt-send-email-mst@kernel.org>
-	<20170612040458.GB25059@pxdev.xzpeter.org>
-	<20170614213418-mutt-send-email-mst@kernel.org>
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dLKax-0002lC-AH
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 22:33:18 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41301)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1dLKax-0002iw-0o
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 22:33:15 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v5F2SrHD089736
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 22:33:13 -0400
+Received: from e23smtp05.au.ibm.com (e23smtp05.au.ibm.com [202.81.31.147])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2b3ftyun6t-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 14 Jun 2017 22:33:13 -0400
+Received: from localhost
+	by e23smtp05.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Thu, 15 Jun 2017 12:33:10 +1000
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <87wp8ght4g.fsf@linaro.org>
+References: <1497351329-12936-1-git-send-email-thuth@redhat.com>
+	<87wp8ght4g.fsf@linaro.org>
+Date: Thu, 15 Jun 2017 08:02:11 +0530
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170614213418-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH 2/3] exec: simplify
- address_space_get_iotlb_entry
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <877f0et1zo.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc/excp_helper: Take
+ BQL before calling cpu_interrupt()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,174 +42,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Maxime Coquelin <maxime.coquelin@redhat.com>, Jason Wang <jasowang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Thomas Huth <thuth@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <bherren@au1.ibm.com>
 
-On Wed, Jun 14, 2017 at 09:34:52PM +0300, Michael S. Tsirkin wrote:
-> On Mon, Jun 12, 2017 at 12:04:58PM +0800, Peter Xu wrote:
-> > On Mon, Jun 12, 2017 at 06:07:04AM +0300, Michael S. Tsirkin wrote:
-> > > On Mon, Jun 12, 2017 at 10:34:43AM +0800, Peter Xu wrote:
-> > > > On Sun, Jun 11, 2017 at 08:10:15PM +0800, David Gibson wrote:
-> > > > > On Sun, Jun 11, 2017 at 01:09:26PM +0300, Michael S. Tsirkin wrote:
-> > > > > > On Fri, Jun 09, 2017 at 09:58:47AM +0800, Peter Xu wrote:
-> > > > > > > > > The problem is that when I was fixing the problem that vhost had with
-> > > > > > > > > PT (a764040, "exec: abstract address_space_do_translate()"), I did
-> > > > > > > > > broke the IOTLB translation a bit (it was using page masks). IMHO we
-> > > > > > > > > need to fix it first for correctness (patch 1/2).
-> > > > > > > > > 
-> > > > > > > > > For patch 3, if we can have Jason's patch to allow dynamic
-> > > > > > > > > iommu_platform switching, that'll be the best, then I can rewrite
-> > > > > > > > > patch 3 with the switching logic rather than caching anything. But
-> > > > > > > > > IMHO that can be separated from patch 1/2 if you like.
-> > > > > > > > > 
-> > > > > > > > > Or do you have better suggestion on how should we fix it?
-> > > > > > > > > 
-> > > > > > > > > Thanks,
-> > > > > > > > 
-> > > > > > > > Can we drop masks completely and replace with length? I think we
-> > > > > > > > should do that instead of trying to fix masks.
-> > > > > > > 
-> > > > > > > Do you mean to modify IOMMUTLBEntry.addr_mask into length?
-> > > > > > 
-> > > > > > I think it's better than alternatives.
-> > > > > > 
-> > > > > > > Again, I am not sure this is good... At least we need to get ack from
-> > > > > > > David since spapr should be the initial user of it, and possibly also
-> > > > > > > Alex since vfio should be assuming that (IIUC both in QEMU and kernel)
-> > > > > > > addr_mask is page masks rather than arbirary length.
-> > > > > > > 
-> > > > > > > (CC Alex)
-> > > > > > > 
-> > > > > > > Thanks,
-> > > > > > 
-> > > > > > Callbacks that need powers of two can easily split up the range.
-> > > > > 
-> > > > > I think I missed part of the thread.  What's the original use case for
-> > > > > non-power-of-two IOTLB entries?  It certainly won't happen on Power.
-> > > > 
-> > > > Currently address_space_get_iotlb_entry() didn't really follow the
-> > > > rule, addr_mask can be arbitary length. This series tried to fix it,
-> > > > while Michael was questioning about whether we should really fix that
-> > > > at all.
-> > > > 
-> > > > Michael,
-> > > > 
-> > > > Even if for performance's sake, I should still think we should fix it.
-> > > > Let's consider a most simple worst case: we have a single page mapped
-> > > > with IOVA range (2M page):
-> > > > 
-> > > >  [0x0, 0x200000)
-> > > > 
-> > > > And if guest access IOVA using the following patern:
-> > > > 
-> > > >  0x1fffff, 0x1ffffe, 0x1ffffd, ...
-> > > > 
-> > > > Then now we'll get this:
-> > > > 
-> > > > - request 0x1fffff, cache miss, will get iotlb [0x1fffff, 0x200000)
-> > > > - request 0x1ffffe, cache miss, will get iotlb [0x1ffffe, 0x200000)
-> > > > - request 0x1ffffd, cache miss, will get iotlb [0x1ffffd, 0x200000)
-> > > > - ...
-> > > 
-> > > We pass an offset too, do we not? So callee can figure out
-> > > the region starts at 0x0 and avoid 2nd and 3rd misses.
-> > 
-> > Here when you say "offset", do you mean the offset in
-> > MemoryRegionSection?
-> > 
-> > In address_space_get_iotlb_entry() we have this:
-> > 
-> >     section = address_space_do_translate(as, addr, &xlat, &plen,
-> >                                          is_write, false);
-> > 
-> > One thing to mention is that, imho we cannot really assume the xlat is
-> > valid on the whole "section" range - the section can be a huge GPA
-> > range, while the xlat may only be valid on a single 4K page. The only
-> > safe region we can use here is (xlat, xlat+plen). Outside that, we
-> > should know nothing valid.
+Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
 
-[1]
+> Thomas Huth <thuth@redhat.com> writes:
+>
+>> Since the introduction of MTTCG, using the msgsnd instruction
+>> abort()s if being called without holding the BQL. So let's protect
+>> that part of the code now with qemu_mutex_lock_iothread().
+>>
+>> Buglink: https://bugs.launchpad.net/qemu/+bug/1694998
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>
+> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> p.s. I was checking the ppc code for other CPU_FOREACH patterns and I
+> noticed the tlb_flush calls could probably use the tlb_flush_all_cpus
+> API instead of manually looping themselves.
 
-> > 
-> > Please correct me if I didn't really catch the point..
-> 
-> IIUC section is the translation result. If so all of it is valid,
-> not just one page.
+Will that be synchronous call? In PPC, we do lazy tlb flush, the tlb
+flushes are batched until a synchronization point (for optimization).
+The batching is achieved using a tlb_need_flush (global/local) and when
+there is isync/ptesync or an exception, the actual flush is done. At
+this point we need to make sure that the flush is synchronous.
 
-It should be only one page (I think that depends on how we implemented
-the translation logic). Please check this (gdb session on current
-master):
+> You should also double check the semantics to make sure none of them
+> need to use the _synced variant and a cpu_exit if the flush needs to
+> complete w.r.t the originating CPU.
 
-(gdb) b address_space_get_iotlb_entry 
-Breakpoint 2 at 0x55555576803a: file /root/git/qemu/exec.c, line 512.
-... (until break)
-(gdb) bt
-#0  0x000055555576803a in address_space_get_iotlb_entry (as=0x55555841bbb0, addr=4294959104, is_write=false) at /root/git/qemu/exec.c:512
-#1  0x00005555558322dd in vhost_device_iotlb_miss (dev=0x5555568b03a0, iova=4294959104, write=0) at /root/git/qemu/hw/virtio/vhost.c:982
-#2  0x0000555555834ad9 in vhost_backend_handle_iotlb_msg (dev=0x5555568b03a0, imsg=0x7fffffffd428) at /root/git/qemu/hw/virtio/vhost-backend.c:334
-#3  0x00005555558347be in vhost_kernel_iotlb_read (opaque=0x5555568b03a0) at /root/git/qemu/hw/virtio/vhost-backend.c:204
-#4  0x0000555555c7e7c3 in aio_dispatch_handlers (ctx=0x5555568091b0) at /root/git/qemu/util/aio-posix.c:399
-#5  0x0000555555c7e956 in aio_dispatch (ctx=0x5555568091b0) at /root/git/qemu/util/aio-posix.c:430
-#6  0x0000555555c7a722 in aio_ctx_dispatch (source=0x5555568091b0, callback=0x0, user_data=0x0) at /root/git/qemu/util/async.c:261
-#7  0x00007f98c62f3703 in g_main_context_dispatch () at /lib64/libglib-2.0.so.0
-#8  0x0000555555c7d36c in glib_pollfds_poll () at /root/git/qemu/util/main-loop.c:213
-#9  0x0000555555c7d468 in os_host_main_loop_wait (timeout=29311167) at /root/git/qemu/util/main-loop.c:261
-#10 0x0000555555c7d521 in main_loop_wait (nonblocking=0) at /root/git/qemu/util/main-loop.c:517
-#11 0x00005555558fe234 in main_loop () at /root/git/qemu/vl.c:1918
-#12 0x0000555555905fe8 in main (argc=21, argv=0x7fffffffda48, envp=0x7fffffffdaf8) at /root/git/qemu/vl.c:4752
-(gdb) s
-517         plen = (hwaddr)-1;
-(gdb)
-520         section = address_space_do_translate(as, addr, &xlat, &plen,
-(gdb) n
-524         if (section.mr == &io_mem_unassigned) {
-(gdb) p/x xlat
-$2 = 0x73900000
-(gdb) p/x addr
-$3 = 0xffffe000
-(gdb) p/x plen
-$4 = 0x1000
-(gdb) p section
-$5 = {mr = 0x5555569ad790, address_space = 0x5555562f9b40 <address_space_memory>, offset_within_region = 1048576, size = 0x0000000000000000000000007ff00000, 
-  offset_within_address_space = 1048576, readonly = false}
-
-Here $2-$4 shows that we are translating IOVA 0xffffe000 into
-[0x73900000, 0x73901000) range, while we can see the section is having
-size as 0x7ff00000, which is ranged from [0x100000000, 0x17ff00000).
-That's the upper RAM that the guest has, corresponds to what we can
-see in "info mtree -f" (the guest contains 4G RAM, this is upper 2G):
-
-  0000000100000000-000000017fffffff (prio 0, ram): pc.ram @0000000080000000
-
-Obvious, we cannot assume we have a linear mapping on this whole
-range. So I don't think we can really use section info (though the
-section can be used to obtain some offset information, or address
-space the range belongs) to build up the IOTLB, but only the plen.
-Then, we need to fix current codes.
-
-And this is exactly what I meant above at [1].  Hope this clarifies a
-bit on the issue.  Thanks,
-
-> 
-> > > 
-> > > 
-> > > > We'll all cache miss along the way until we access 0x0. While if we
-> > > > are with page mask, we'll get:
-> > > > 
-> > > > - request 0x1fffff, cache miss, will get iotlb [0x0, 0x200000)
-> > > > - request 0x1ffffe, cache hit
-> > > > - request 0x1ffffd, cache hit
-> > > > - ...
-> > > > 
-> > > > We'll only miss at the first IO.
-> > > 
-> > > I think we should send as much info as we can.
-> > > There should be a way to find full region start and length.
-> > 
-> > Thanks,
-> > 
-> > -- 
-> > Peter Xu
-
--- 
-Peter Xu
+Regards,
+Nikunj
