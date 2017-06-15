@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dLSPF-0008SM-JU
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dLSPG-0008TQ-Ct
 	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dLSPB-0007cn-Ls
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:41 -0400
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:34217)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dLSPF-0007dc-0z
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:42 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:35357)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dLSPB-0007bv-C6
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:37 -0400
-Received: by mail-wr0-x233.google.com with SMTP id 77so16395323wrb.1
-	for <qemu-devel@nongnu.org>; Thu, 15 Jun 2017 03:53:37 -0700 (PDT)
+	id 1dLSPE-0007dN-O6
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:40 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id q97so16329182wrb.2
+	for <qemu-devel@nongnu.org>; Thu, 15 Jun 2017 03:53:40 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 15 Jun 2017 12:52:43 +0200
-Message-Id: <1497523981-38449-24-git-send-email-pbonzini@redhat.com>
+Date: Thu, 15 Jun 2017 12:52:46 +0200
+Message-Id: <1497523981-38449-27-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1497523981-38449-1-git-send-email-pbonzini@redhat.com>
 References: <1497523981-38449-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 23/41] accel: move kvm related accelerator files
- into accel/
+Subject: [Qemu-devel] [PULL 26/41] nbd/server: get rid of nbd_negotiate_read
+ and friends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,162 +29,273 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Yang Zhong <yang.zhong@intel.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-From: Yang Zhong <yang.zhong@intel.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-move kvm related accelerator files into accel/ subdirectory, also
-create one stub subdirectory, which will include accelerator's stub
-files.
+Functions nbd_negotiate_{read,write,drop_sync} were introduced in
+1a6245a5b, when nbd_rwv (was nbd_wr_sync) was working through
+qemu_co_sendv_recvv (the path is nbd_wr_sync -> qemu_co_{recv/send} ->
+qemu_co_send_recv -> qemu_co_sendv_recvv), which just yields, without
+setting any handlers. But starting from ff82911cd nbd_rwv (was
+nbd_wr_syncv) works through qio_channel_yield() which sets handlers, so
+watchers are redundant in nbd_negotiate_{read,write,drop_sync}, then,
+let's just use nbd_{read,write,drop} functions.
 
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-Message-Id: <1496383606-18060-5-git-send-email-yang.zhong@intel.com>
+Functions nbd_{read,write,drop} has errp parameter, which is unused in
+this patch. This will be fixed later.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20170602150150.258222-4-vsementsov@virtuozzo.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile.objs                        |  1 +
- Makefile.target                      |  4 +---
- accel/Makefile.objs                  |  2 ++
- accel/kvm/Makefile.objs              |  1 +
- kvm-all.c => accel/kvm/kvm-all.c     |  2 +-
- accel/kvm/trace-events               | 15 +++++++++++++++
- accel/stubs/Makefile.objs            |  1 +
- kvm-stub.c => accel/stubs/kvm-stub.c |  0
- trace-events                         | 13 -------------
- 9 files changed, 22 insertions(+), 17 deletions(-)
- create mode 100644 accel/kvm/Makefile.objs
- rename kvm-all.c => accel/kvm/kvm-all.c (99%)
- create mode 100644 accel/kvm/trace-events
- create mode 100644 accel/stubs/Makefile.objs
- rename kvm-stub.c => accel/stubs/kvm-stub.c (100%)
+ nbd/server.c | 107 ++++++++++++-----------------------------------------------
+ 1 file changed, 22 insertions(+), 85 deletions(-)
 
-diff --git a/Makefile.objs b/Makefile.objs
-index 871eca8..6e5c706 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -163,6 +163,7 @@ trace-events-subdirs += qom
- trace-events-subdirs += linux-user
- trace-events-subdirs += qapi
- trace-events-subdirs += accel/tcg
-+trace-events-subdirs += accel/kvm
+diff --git a/nbd/server.c b/nbd/server.c
+index d8bd927..7f44ef0 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -104,69 +104,6 @@ struct NBDClient {
  
- trace-events-files = $(SRC_PATH)/trace-events $(trace-events-subdirs:%=$(SRC_PATH)/%/trace-events)
+ static void nbd_client_receive_next_request(NBDClient *client);
  
-diff --git a/Makefile.target b/Makefile.target
-index 73cd9c6..3d49f29 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -88,7 +88,7 @@ all: $(PROGS) stap
- 
- #########################################################
- # cpu emulator library
--obj-y = exec.o
-+obj-y += exec.o
- obj-y += accel/
- obj-y += tcg/tcg.o tcg/tcg-op.o tcg/optimize.o
- obj-y += tcg/tcg-common.o tcg/tcg-runtime.o
-@@ -99,7 +99,6 @@ obj-y += target/$(TARGET_BASE_ARCH)/
- obj-y += disas.o
- obj-$(call notempty,$(TARGET_XML_FILES)) += gdbstub-xml.o
- obj-$(call lnot,$(CONFIG_HAX)) += hax-stub.o
--obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
- 
- obj-$(CONFIG_LIBDECNUMBER) += libdecnumber/decContext.o
- obj-$(CONFIG_LIBDECNUMBER) += libdecnumber/decNumber.o
-@@ -140,7 +139,6 @@ ifdef CONFIG_SOFTMMU
- obj-y += arch_init.o cpus.o monitor.o gdbstub.o balloon.o ioport.o numa.o
- obj-y += qtest.o bootdevice.o
- obj-y += hw/
--obj-$(CONFIG_KVM) += kvm-all.o
- obj-y += memory.o
- obj-y += memory_mapping.o
- obj-y += dump.o
-diff --git a/accel/Makefile.objs b/accel/Makefile.objs
-index 11ad823..cd5702f 100644
---- a/accel/Makefile.objs
-+++ b/accel/Makefile.objs
-@@ -1,2 +1,4 @@
- obj-$(CONFIG_SOFTMMU) += accel.o
-+obj-y += kvm/
- obj-y += tcg/
-+obj-y += stubs/
-diff --git a/accel/kvm/Makefile.objs b/accel/kvm/Makefile.objs
-new file mode 100644
-index 0000000..85351e7
---- /dev/null
-+++ b/accel/kvm/Makefile.objs
-@@ -0,0 +1 @@
-+obj-$(CONFIG_KVM) += kvm-all.o
-diff --git a/kvm-all.c b/accel/kvm/kvm-all.c
-similarity index 99%
-rename from kvm-all.c
-rename to accel/kvm/kvm-all.c
-index 98ad151..75feffa 100644
---- a/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -36,7 +36,7 @@
- #include "exec/ram_addr.h"
- #include "exec/address-spaces.h"
- #include "qemu/event_notifier.h"
--#include "trace-root.h"
-+#include "trace.h"
- #include "hw/irq.h"
- 
- #include "hw/boards.h"
-diff --git a/accel/kvm/trace-events b/accel/kvm/trace-events
-new file mode 100644
-index 0000000..f89ba55
---- /dev/null
-+++ b/accel/kvm/trace-events
-@@ -0,0 +1,15 @@
-+# Trace events for debugging and performance instrumentation
-+
-+# kvm-all.c
-+kvm_ioctl(int type, void *arg) "type 0x%x, arg %p"
-+kvm_vm_ioctl(int type, void *arg) "type 0x%x, arg %p"
-+kvm_vcpu_ioctl(int cpu_index, int type, void *arg) "cpu_index %d, type 0x%x, arg %p"
-+kvm_run_exit(int cpu_index, uint32_t reason) "cpu_index %d, reason %d"
-+kvm_device_ioctl(int fd, int type, void *arg) "dev fd %d, type 0x%x, arg %p"
-+kvm_failed_reg_get(uint64_t id, const char *msg) "Warning: Unable to retrieve ONEREG %" PRIu64 " from KVM: %s"
-+kvm_failed_reg_set(uint64_t id, const char *msg) "Warning: Unable to set ONEREG %" PRIu64 " to KVM: %s"
-+kvm_irqchip_commit_routes(void) ""
-+kvm_irqchip_add_msi_route(char *name, int vector, int virq) "dev %s vector %d virq %d"
-+kvm_irqchip_update_msi_route(int virq) "Updating MSI route virq=%d"
-+kvm_irqchip_release_virq(int virq) "virq %d"
-+
-diff --git a/accel/stubs/Makefile.objs b/accel/stubs/Makefile.objs
-new file mode 100644
-index 0000000..bd5794f
---- /dev/null
-+++ b/accel/stubs/Makefile.objs
-@@ -0,0 +1 @@
-+obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
-diff --git a/kvm-stub.c b/accel/stubs/kvm-stub.c
-similarity index 100%
-rename from kvm-stub.c
-rename to accel/stubs/kvm-stub.c
-diff --git a/trace-events b/trace-events
-index 62d8100..bae63fd 100644
---- a/trace-events
-+++ b/trace-events
-@@ -55,19 +55,6 @@ dma_complete(void *dbs, int ret, void *cb) "dbs=%p ret=%d cb=%p"
- dma_blk_cb(void *dbs, int ret) "dbs=%p ret=%d"
- dma_map_wait(void *dbs) "dbs=%p"
- 
--# kvm-all.c
--kvm_ioctl(int type, void *arg) "type 0x%x, arg %p"
--kvm_vm_ioctl(int type, void *arg) "type 0x%x, arg %p"
--kvm_vcpu_ioctl(int cpu_index, int type, void *arg) "cpu_index %d, type 0x%x, arg %p"
--kvm_run_exit(int cpu_index, uint32_t reason) "cpu_index %d, reason %d"
--kvm_device_ioctl(int fd, int type, void *arg) "dev fd %d, type 0x%x, arg %p"
--kvm_failed_reg_get(uint64_t id, const char *msg) "Warning: Unable to retrieve ONEREG %" PRIu64 " from KVM: %s"
--kvm_failed_reg_set(uint64_t id, const char *msg) "Warning: Unable to set ONEREG %" PRIu64 " to KVM: %s"
--kvm_irqchip_commit_routes(void) ""
--kvm_irqchip_add_msi_route(char *name, int vector, int virq) "dev %s vector %d virq %d"
--kvm_irqchip_update_msi_route(int virq) "Updating MSI route virq=%d"
--kvm_irqchip_release_virq(int virq) "virq %d"
+-static gboolean nbd_negotiate_continue(QIOChannel *ioc,
+-                                       GIOCondition condition,
+-                                       void *opaque)
+-{
+-    qemu_coroutine_enter(opaque);
+-    return TRUE;
+-}
 -
- # memory.c
- memory_region_ops_read(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr %#"PRIx64" value %#"PRIx64" size %u"
- memory_region_ops_write(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr %#"PRIx64" value %#"PRIx64" size %u"
+-static int nbd_negotiate_read(QIOChannel *ioc, void *buffer, size_t size)
+-{
+-    ssize_t ret;
+-    guint watch;
+-
+-    assert(qemu_in_coroutine());
+-    /* Negotiation are always in main loop. */
+-    watch = qio_channel_add_watch(ioc,
+-                                  G_IO_IN,
+-                                  nbd_negotiate_continue,
+-                                  qemu_coroutine_self(),
+-                                  NULL);
+-    ret = nbd_read(ioc, buffer, size, NULL);
+-    g_source_remove(watch);
+-    return ret;
+-
+-}
+-
+-static int nbd_negotiate_write(QIOChannel *ioc, const void *buffer, size_t size)
+-{
+-    ssize_t ret;
+-    guint watch;
+-
+-    assert(qemu_in_coroutine());
+-    /* Negotiation are always in main loop. */
+-    watch = qio_channel_add_watch(ioc,
+-                                  G_IO_OUT,
+-                                  nbd_negotiate_continue,
+-                                  qemu_coroutine_self(),
+-                                  NULL);
+-    ret = nbd_write(ioc, buffer, size, NULL);
+-    g_source_remove(watch);
+-    return ret;
+-}
+-
+-static int nbd_negotiate_drop_sync(QIOChannel *ioc, size_t size)
+-{
+-    ssize_t ret;
+-    uint8_t *buffer = g_malloc(MIN(65536, size));
+-
+-    while (size > 0) {
+-        size_t count = MIN(65536, size);
+-        ret = nbd_negotiate_read(ioc, buffer, count);
+-        if (ret < 0) {
+-            g_free(buffer);
+-            return ret;
+-        }
+-
+-        size -= count;
+-    }
+-
+-    g_free(buffer);
+-    return 0;
+-}
+-
+ /* Basic flow for negotiation
+ 
+    Server         Client
+@@ -205,22 +142,22 @@ static int nbd_negotiate_send_rep_len(QIOChannel *ioc, uint32_t type,
+           type, opt, len);
+ 
+     magic = cpu_to_be64(NBD_REP_MAGIC);
+-    if (nbd_negotiate_write(ioc, &magic, sizeof(magic)) < 0) {
++    if (nbd_write(ioc, &magic, sizeof(magic), NULL) < 0) {
+         LOG("write failed (rep magic)");
+         return -EINVAL;
+     }
+     opt = cpu_to_be32(opt);
+-    if (nbd_negotiate_write(ioc, &opt, sizeof(opt)) < 0) {
++    if (nbd_write(ioc, &opt, sizeof(opt), NULL) < 0) {
+         LOG("write failed (rep opt)");
+         return -EINVAL;
+     }
+     type = cpu_to_be32(type);
+-    if (nbd_negotiate_write(ioc, &type, sizeof(type)) < 0) {
++    if (nbd_write(ioc, &type, sizeof(type), NULL) < 0) {
+         LOG("write failed (rep type)");
+         return -EINVAL;
+     }
+     len = cpu_to_be32(len);
+-    if (nbd_negotiate_write(ioc, &len, sizeof(len)) < 0) {
++    if (nbd_write(ioc, &len, sizeof(len), NULL) < 0) {
+         LOG("write failed (rep data length)");
+         return -EINVAL;
+     }
+@@ -255,7 +192,7 @@ nbd_negotiate_send_rep_err(QIOChannel *ioc, uint32_t type,
+     if (ret < 0) {
+         goto out;
+     }
+-    if (nbd_negotiate_write(ioc, msg, len) < 0) {
++    if (nbd_write(ioc, msg, len, NULL) < 0) {
+         LOG("write failed (error message)");
+         ret = -EIO;
+     } else {
+@@ -286,15 +223,15 @@ static int nbd_negotiate_send_rep_list(QIOChannel *ioc, NBDExport *exp)
+     }
+ 
+     len = cpu_to_be32(name_len);
+-    if (nbd_negotiate_write(ioc, &len, sizeof(len)) < 0) {
++    if (nbd_write(ioc, &len, sizeof(len), NULL) < 0) {
+         LOG("write failed (name length)");
+         return -EINVAL;
+     }
+-    if (nbd_negotiate_write(ioc, name, name_len) < 0) {
++    if (nbd_write(ioc, name, name_len, NULL) < 0) {
+         LOG("write failed (name buffer)");
+         return -EINVAL;
+     }
+-    if (nbd_negotiate_write(ioc, desc, desc_len) < 0) {
++    if (nbd_write(ioc, desc, desc_len, NULL) < 0) {
+         LOG("write failed (description buffer)");
+         return -EINVAL;
+     }
+@@ -308,7 +245,7 @@ static int nbd_negotiate_handle_list(NBDClient *client, uint32_t length)
+     NBDExport *exp;
+ 
+     if (length) {
+-        if (nbd_negotiate_drop_sync(client->ioc, length) < 0) {
++        if (nbd_drop(client->ioc, length, NULL) < 0) {
+             return -EIO;
+         }
+         return nbd_negotiate_send_rep_err(client->ioc,
+@@ -339,7 +276,7 @@ static int nbd_negotiate_handle_export_name(NBDClient *client, uint32_t length)
+         LOG("Bad length received");
+         goto fail;
+     }
+-    if (nbd_negotiate_read(client->ioc, name, length) < 0) {
++    if (nbd_read(client->ioc, name, length, NULL) < 0) {
+         LOG("read failed");
+         goto fail;
+     }
+@@ -372,7 +309,7 @@ static QIOChannel *nbd_negotiate_handle_starttls(NBDClient *client,
+     TRACE("Setting up TLS");
+     ioc = client->ioc;
+     if (length) {
+-        if (nbd_negotiate_drop_sync(ioc, length) < 0) {
++        if (nbd_drop(ioc, length, NULL) < 0) {
+             return NULL;
+         }
+         nbd_negotiate_send_rep_err(ioc, NBD_REP_ERR_INVALID, NBD_OPT_STARTTLS,
+@@ -436,7 +373,7 @@ static int nbd_negotiate_options(NBDClient *client)
+         ...           Rest of request
+     */
+ 
+-    if (nbd_negotiate_read(client->ioc, &flags, sizeof(flags)) < 0) {
++    if (nbd_read(client->ioc, &flags, sizeof(flags), NULL) < 0) {
+         LOG("read failed");
+         return -EIO;
+     }
+@@ -462,7 +399,7 @@ static int nbd_negotiate_options(NBDClient *client)
+         uint32_t clientflags, length;
+         uint64_t magic;
+ 
+-        if (nbd_negotiate_read(client->ioc, &magic, sizeof(magic)) < 0) {
++        if (nbd_read(client->ioc, &magic, sizeof(magic), NULL) < 0) {
+             LOG("read failed");
+             return -EINVAL;
+         }
+@@ -472,15 +409,15 @@ static int nbd_negotiate_options(NBDClient *client)
+             return -EINVAL;
+         }
+ 
+-        if (nbd_negotiate_read(client->ioc, &clientflags,
+-                               sizeof(clientflags)) < 0)
++        if (nbd_read(client->ioc, &clientflags,
++                      sizeof(clientflags), NULL) < 0)
+         {
+             LOG("read failed");
+             return -EINVAL;
+         }
+         clientflags = be32_to_cpu(clientflags);
+ 
+-        if (nbd_negotiate_read(client->ioc, &length, sizeof(length)) < 0) {
++        if (nbd_read(client->ioc, &length, sizeof(length), NULL) < 0) {
+             LOG("read failed");
+             return -EINVAL;
+         }
+@@ -510,7 +447,7 @@ static int nbd_negotiate_options(NBDClient *client)
+                 return -EINVAL;
+ 
+             default:
+-                if (nbd_negotiate_drop_sync(client->ioc, length) < 0) {
++                if (nbd_drop(client->ioc, length, NULL) < 0) {
+                     return -EIO;
+                 }
+                 ret = nbd_negotiate_send_rep_err(client->ioc,
+@@ -548,7 +485,7 @@ static int nbd_negotiate_options(NBDClient *client)
+                 return nbd_negotiate_handle_export_name(client, length);
+ 
+             case NBD_OPT_STARTTLS:
+-                if (nbd_negotiate_drop_sync(client->ioc, length) < 0) {
++                if (nbd_drop(client->ioc, length, NULL) < 0) {
+                     return -EIO;
+                 }
+                 if (client->tlscreds) {
+@@ -567,7 +504,7 @@ static int nbd_negotiate_options(NBDClient *client)
+                 }
+                 break;
+             default:
+-                if (nbd_negotiate_drop_sync(client->ioc, length) < 0) {
++                if (nbd_drop(client->ioc, length, NULL) < 0) {
+                     return -EIO;
+                 }
+                 ret = nbd_negotiate_send_rep_err(client->ioc,
+@@ -656,12 +593,12 @@ static coroutine_fn int nbd_negotiate(NBDClientNewData *data)
+             TRACE("TLS cannot be enabled with oldstyle protocol");
+             goto fail;
+         }
+-        if (nbd_negotiate_write(client->ioc, buf, sizeof(buf)) < 0) {
++        if (nbd_write(client->ioc, buf, sizeof(buf), NULL) < 0) {
+             LOG("write failed");
+             goto fail;
+         }
+     } else {
+-        if (nbd_negotiate_write(client->ioc, buf, 18) < 0) {
++        if (nbd_write(client->ioc, buf, 18, NULL) < 0) {
+             LOG("write failed");
+             goto fail;
+         }
+@@ -676,7 +613,7 @@ static coroutine_fn int nbd_negotiate(NBDClientNewData *data)
+         stq_be_p(buf + 18, client->exp->size);
+         stw_be_p(buf + 26, client->exp->nbdflags | myflags);
+         len = client->no_zeroes ? 10 : sizeof(buf) - 18;
+-        if (nbd_negotiate_write(client->ioc, buf + 18, len) < 0) {
++        if (nbd_write(client->ioc, buf + 18, len, NULL) < 0) {
+             LOG("write failed");
+             goto fail;
+         }
 -- 
 1.8.3.1
