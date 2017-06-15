@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58072)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dLPhT-0000Vf-7b
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:00:20 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dLPha-0000aI-Ox
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:00:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dLPhO-0004kJ-JP
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:00:19 -0400
-Resent-Message-Id: <E1dLPhO-0004kJ-JP@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21499)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dLPhO-0004jt-Bn
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:00:14 -0400
-In-Reply-To: <20170615055356.20684-1-rth@twiddle.net>
-Message-ID: <149751359885.3807.5477345617299762245@4a9a010726c0>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <pbonzini@redhat.com>) id 1dLPhV-0004ne-TD
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:00:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41792)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dLPhV-0004mn-Jw
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:00:21 -0400
+References: <1497486973-25845-1-git-send-email-cota@braap.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2e38a472-3bd0-1b70-e424-bea3e1d18fd1@redhat.com>
+Date: Thu, 15 Jun 2017 10:00:16 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 15 Jun 2017 00:59:59 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/5] More s390x improvements
+In-Reply-To: <1497486973-25845-1-git-send-email-cota@braap.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] tcg: consistently access cpu->tb_jmp_cache
+ atomically
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +28,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: rth@twiddle.net
-Cc: famz@redhat.com, qemu-devel@nongnu.org, aurelien@aurel32.net, david@redhat.com
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA2MTUwNTUzNTYuMjA2ODQtMS1ydGhAdHdpZGRsZS5uZXQKU3ViamVjdDogW1FlbXUtZGV2ZWxd
-IFtQQVRDSCAwLzVdIE1vcmUgczM5MHggaW1wcm92ZW1lbnRzClR5cGU6IHNlcmllcwoKPT09IFRF
-U1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdp
-dCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBU
-cnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpm
-b3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDog
-JChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAt
-LWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhl
-bgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9u
-ZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVh
-OWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5j
-aCAndGVzdCcKMDY0OTZjYiB0YXJnZXQvczM5MHg6IG1hcmsgQ1NTVCwgQ1NTVDIsIEZQU0VIIGZh
-Y2lsaXRpZXMgYXMgYXZhaWxhYmxlCmJiMWY2NzUgdGFyZ2V0L3MzOTB4OiBpbXBsZW1lbnQgbXZj
-b3MgaW5zdHJ1Y3Rpb24KYjI5MDM1ZCB0YXJnZXQvczM5MHg6IGNoYW5nZSBQU1dfU0hJRlRfS0VZ
-CjllNTFkMGIgdGFyZ2V0L3MzOTB4OiBFbmZvcmNlIGluc3RydWN0aW9uIGZlYXR1cmVzCjM0MGQy
-MmQgdGFyZ2V0L3MzOTB4OiBNYXAgZXhpc3RpbmcgRkFDXyogbmFtZXMgdG8gUzM5MF9GRUFUXyog
-bmFtZXMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNTogdGFyZ2V0L3Mz
-OTB4OiBNYXAgZXhpc3RpbmcgRkFDXyogbmFtZXMgdG8gUzM5MF9GRUFUXyogbmFtZXMuLi4KV0FS
-TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzcxOiBGSUxFOiB0YXJnZXQvczM5MHgvdHJh
-bnNsYXRlLmM6NTQwMzoKKyNkZWZpbmUgRkFDX0ZQU1NIICAgICAgIFMzOTBfRkVBVF9GTE9BVElO
-R19QT0lOVF9TVVBQUE9SVF9FTkggLyogRlBTLXNpZ24taGFuZGxpbmcgKi8KCldBUk5JTkc6IGxp
-bmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM3MjogRklMRTogdGFyZ2V0L3MzOTB4L3RyYW5zbGF0ZS5j
-OjU0MDQ6CisjZGVmaW5lIEZBQ19GUFJHUiAgICAgICBTMzkwX0ZFQVRfRkxPQVRJTkdfUE9JTlRf
-U1VQUFBPUlRfRU5IIC8qIEZQUi1HUi10cmFuc2ZlciAqLwoKRVJST1I6IGxpbmUgb3ZlciA5MCBj
-aGFyYWN0ZXJzCiM3NjogRklMRTogdGFyZ2V0L3MzOTB4L3RyYW5zbGF0ZS5jOjU0MDg6CisjZGVm
-aW5lIEZBQ19JRUVFRV9TSU0gICBTMzkwX0ZFQVRfRkxPQVRJTkdfUE9JTlRfU1VQUFBPUlRfRU5I
-IC8qIElFRUUtZXhjZXB0aW9uLXNpbXVsYXRpb24gKi8KCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBj
-aGFyYWN0ZXJzCiM4NTogRklMRTogdGFyZ2V0L3MzOTB4L3RyYW5zbGF0ZS5jOjU0MTc6CisjZGVm
-aW5lIEZBQ19MUFAgICAgICAgICBTMzkwX0ZFQVRfU0VUX1BST0dSQU1fUEFSQU1FVEVSUyAvKiBs
-b2FkLXByb2dyYW0tcGFyYW1ldGVyICovCgp0b3RhbDogMSBlcnJvcnMsIDMgd2FybmluZ3MsIDc0
-IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNo
-ZWNraW5nIFBBVENIIDIvNTogdGFyZ2V0L3MzOTB4OiBFbmZvcmNlIGluc3RydWN0aW9uIGZlYXR1
-cmVzLi4uCkNoZWNraW5nIFBBVENIIDMvNTogdGFyZ2V0L3MzOTB4OiBjaGFuZ2UgUFNXX1NISUZU
-X0tFWS4uLgpDaGVja2luZyBQQVRDSCA0LzU6IHRhcmdldC9zMzkweDogaW1wbGVtZW50IG12Y29z
-IGluc3RydWN0aW9uLi4uCkNoZWNraW5nIFBBVENIIDUvNTogdGFyZ2V0L3MzOTB4OiBtYXJrIENT
-U1QsIENTU1QyLCBGUFNFSCBmYWNpbGl0aWVzIGFzIGF2YWlsYWJsZS4uLgo9PT0gT1VUUFVUIEVO
-RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVy
-YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
-c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+
+
+On 15/06/2017 02:36, Emilio G. Cota wrote:
+> Some code paths can lead to atomic accesses racing with memset()
+> on cpu->tb_jmp_cache, which can result in torn reads/writes
+> and is undefined behaviour in C11.
+> 
+> These torn accesses are unlikely to show up as bugs, but from code
+> inspection they seem possible. For example, tb_phys_invalidate does:
+>     /* remove the TB from the hash list */
+>     h = tb_jmp_cache_hash_func(tb->pc);
+>     CPU_FOREACH(cpu) {
+>         if (atomic_read(&cpu->tb_jmp_cache[h]) == tb) {
+>             atomic_set(&cpu->tb_jmp_cache[h], NULL);
+>         }
+>     }
+> Here atomic_set might race with a concurrent memset (such as the
+> ones scheduled via "unsafe" async work, e.g. tlb_flush_page) and
+> therefore we might end up with a torn pointer (or who knows what,
+> because we are under undefined behaviour).
+
+Also atomic_read could, which is worse (though in this case it would
+only lead to a useless NULL write).
+
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+
+> 
+> This patch converts parallel accesses to cpu->tb_jmp_cache to use
+> atomic primitives, thereby bringing these accesses back to defined
+> behaviour. The price to pay is to potentially execute more instructions
+> when clearing cpu->tb_jmp_cache, but given how infrequently they happen
+> and the small size of the cache, the performance impact I have measured
+> is within noise range when booting debian-arm.
+> 
+> Note that under "safe async" work (e.g. do_tb_flush) we could use memset
+> because no other vcpus are running. However I'm keeping these accesses
+> atomic as well to keep things simple and to avoid confusing analysis
+> tools such as ThreadSanitizer.
+> 
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> ---
+>  cputlb.c          |  4 ++--
+>  include/qom/cpu.h | 11 ++++++++++-
+>  qom/cpu.c         |  5 +----
+>  translate-all.c   | 25 ++++++++++++-------------
+>  4 files changed, 25 insertions(+), 20 deletions(-)
+> 
+> diff --git a/cputlb.c b/cputlb.c
+> index 743776a..e85b6d3 100644
+> --- a/cputlb.c
+> +++ b/cputlb.c
+> @@ -118,7 +118,7 @@ static void tlb_flush_nocheck(CPUState *cpu)
+>  
+>      memset(env->tlb_table, -1, sizeof(env->tlb_table));
+>      memset(env->tlb_v_table, -1, sizeof(env->tlb_v_table));
+> -    memset(cpu->tb_jmp_cache, 0, sizeof(cpu->tb_jmp_cache));
+> +    cpu_tb_jmp_cache_clear(cpu);
+>  
+>      env->vtlb_index = 0;
+>      env->tlb_flush_addr = -1;
+> @@ -183,7 +183,7 @@ static void tlb_flush_by_mmuidx_async_work(CPUState *cpu, run_on_cpu_data data)
+>          }
+>      }
+>  
+> -    memset(cpu->tb_jmp_cache, 0, sizeof(cpu->tb_jmp_cache));
+> +    cpu_tb_jmp_cache_clear(cpu);
+>  
+>      tlb_debug("done\n");
+>  
+> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+> index 89ddb68..2fe7cff 100644
+> --- a/include/qom/cpu.h
+> +++ b/include/qom/cpu.h
+> @@ -346,7 +346,7 @@ struct CPUState {
+>  
+>      void *env_ptr; /* CPUArchState */
+>  
+> -    /* Writes protected by tb_lock, reads not thread-safe  */
+> +    /* Accessed in parallel; all accesses must be atomic */
+>      struct TranslationBlock *tb_jmp_cache[TB_JMP_CACHE_SIZE];
+>  
+>      struct GDBRegisterState *gdb_regs;
+> @@ -422,6 +422,15 @@ extern struct CPUTailQ cpus;
+>  
+>  extern __thread CPUState *current_cpu;
+>  
+> +static inline void cpu_tb_jmp_cache_clear(CPUState *cpu)
+> +{
+> +    unsigned int i;
+> +
+> +    for (i = 0; i < TB_JMP_CACHE_SIZE; i++) {
+> +        atomic_set(&cpu->tb_jmp_cache[i], NULL);
+> +    }
+> +}
+> +
+>  /**
+>   * qemu_tcg_mttcg_enabled:
+>   * Check whether we are running MultiThread TCG or not.
+> diff --git a/qom/cpu.c b/qom/cpu.c
+> index 5069876..585419b 100644
+> --- a/qom/cpu.c
+> +++ b/qom/cpu.c
+> @@ -274,7 +274,6 @@ void cpu_reset(CPUState *cpu)
+>  static void cpu_common_reset(CPUState *cpu)
+>  {
+>      CPUClass *cc = CPU_GET_CLASS(cpu);
+> -    int i;
+>  
+>      if (qemu_loglevel_mask(CPU_LOG_RESET)) {
+>          qemu_log("CPU Reset (CPU %d)\n", cpu->cpu_index);
+> @@ -292,9 +291,7 @@ static void cpu_common_reset(CPUState *cpu)
+>      cpu->crash_occurred = false;
+>  
+>      if (tcg_enabled()) {
+> -        for (i = 0; i < TB_JMP_CACHE_SIZE; ++i) {
+> -            atomic_set(&cpu->tb_jmp_cache[i], NULL);
+> -        }
+> +        cpu_tb_jmp_cache_clear(cpu);
+>  
+>  #ifdef CONFIG_SOFTMMU
+>          tlb_flush(cpu, 0);
+> diff --git a/translate-all.c b/translate-all.c
+> index b3ee876..af3c4df 100644
+> --- a/translate-all.c
+> +++ b/translate-all.c
+> @@ -923,11 +923,7 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
+>      }
+>  
+>      CPU_FOREACH(cpu) {
+> -        int i;
+> -
+> -        for (i = 0; i < TB_JMP_CACHE_SIZE; ++i) {
+> -            atomic_set(&cpu->tb_jmp_cache[i], NULL);
+> -        }
+> +        cpu_tb_jmp_cache_clear(cpu);
+>      }
+>  
+>      tcg_ctx.tb_ctx.nb_tbs = 0;
+> @@ -1806,19 +1802,22 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
+>      cpu_loop_exit_noexc(cpu);
+>  }
+>  
+> -void tb_flush_jmp_cache(CPUState *cpu, target_ulong addr)
+> +static void tb_jmp_cache_clear_page(CPUState *cpu, target_ulong page_addr)
+>  {
+> +    unsigned int i0 = tb_jmp_cache_hash_page(page_addr);
+>      unsigned int i;
+>  
+> +    for (i = 0; i < TB_JMP_PAGE_SIZE; i++) {
+> +        atomic_set(&cpu->tb_jmp_cache[i0 + i], NULL);
+> +    }
+> +}
+> +
+> +void tb_flush_jmp_cache(CPUState *cpu, target_ulong addr)
+> +{
+>      /* Discard jump cache entries for any tb which might potentially
+>         overlap the flushed page.  */
+> -    i = tb_jmp_cache_hash_page(addr - TARGET_PAGE_SIZE);
+> -    memset(&cpu->tb_jmp_cache[i], 0,
+> -           TB_JMP_PAGE_SIZE * sizeof(TranslationBlock *));
+> -
+> -    i = tb_jmp_cache_hash_page(addr);
+> -    memset(&cpu->tb_jmp_cache[i], 0,
+> -           TB_JMP_PAGE_SIZE * sizeof(TranslationBlock *));
+> +    tb_jmp_cache_clear_page(cpu, addr - TARGET_PAGE_SIZE);
+> +    tb_jmp_cache_clear_page(cpu, addr);
+>  }
+>  
+>  static void print_qht_statistics(FILE *f, fprintf_function cpu_fprintf,
+> 
