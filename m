@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dLNC5-0001Cv-3R
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 01:19:46 -0400
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dLNaI-0006kR-MQ
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 01:44:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dLNC4-0000xW-5H
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 01:19:45 -0400
-Date: Thu, 15 Jun 2017 01:19:35 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170615051935.GA6079@flamenco>
-References: <20170614194821.8754-1-rth@twiddle.net>
-	<20170614194821.8754-6-rth@twiddle.net>
-	<20170614203343.GB8420@flamenco>
-	<f348b0f7-a8ef-0347-2312-93462d8652f6@twiddle.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f348b0f7-a8ef-0347-2312-93462d8652f6@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH] target/aarch64: exit to main loop after
- 'msr daifclr'
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dLNaG-00075Z-Vh
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 01:44:46 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38478
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
+	id 1dLNaG-00075V-Px
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 01:44:44 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v5F5ho05074691
+	for <qemu-devel@nongnu.org>; Thu, 15 Jun 2017 01:44:44 -0400
+Received: from e23smtp06.au.ibm.com (e23smtp06.au.ibm.com [202.81.31.148])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2b3ep5cj92-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 15 Jun 2017 01:44:43 -0400
+Received: from localhost
+	by e23smtp06.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
+	Thu, 15 Jun 2017 15:44:39 +1000
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Date: Thu, 15 Jun 2017 11:14:24 +0530
+Message-Id: <1497505464-12796-1-git-send-email-bharata@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [FIX PATCH] target/ppc: Proper cleanup when
+ ppc_cpu_realizefn fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,54 +37,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org, pbonzini@redhat.com, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-On Wed, Jun 14, 2017 at 18:20:29 -0700, Richard Henderson wrote:
-> On 06/14/2017 01:33 PM, Emilio G. Cota wrote:
-> >On Wed, Jun 14, 2017 at 12:48:21 -0700, Richard Henderson wrote:
-> >>Exit to cpu loop so we reevaluate cpu_arm_hw_interrupts.
-> >>
-> >>Cc: qemu-arm@nongnu.org
-> >>Cc: Peter Maydell <peter.maydell@linaro.org>
-> >>Signed-off-by: Richard Henderson <rth@twiddle.net>
-> >>---
-> >>  target/arm/translate-a64.c | 7 ++++++-
-> >>  1 file changed, 6 insertions(+), 1 deletion(-)
-> >>
-> >>diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> >>index 860e279..e55547d 100644
-> >>--- a/target/arm/translate-a64.c
-> >>+++ b/target/arm/translate-a64.c
-> >>@@ -1422,7 +1422,9 @@ static void handle_msr_i(DisasContext *s, uint32_t insn,
-> >>          gen_helper_msr_i_pstate(cpu_env, tcg_op, tcg_imm);
-> >>          tcg_temp_free_i32(tcg_imm);
-> >>          tcg_temp_free_i32(tcg_op);
-> >>-        s->is_jmp = DISAS_UPDATE;
-> >>+        /* For DAIFClear, exit the cpu loop to re-evaluate pending IRQs.  */
-> >>+        gen_a64_set_pc_im(s->pc);
-> >
-> >For op != 0x1f we end up setting the pc twice (first here, then in
-> >the switch statement). It's still correct though.
-> 
-> No, that's why I switched to DISAS_JUMP.
-> 
-(snip)
-> >+        case DISAS_EXIT:
-> >+            gen_a64_set_pc_im(dc->pc);
-> >+            tcg_gen_exit_tb(0);
-> >+            break;
-> 
-> This gives translate-a64.c and translate.c different semantics for
-> DISAS_EXIT. I considered that to be a bad thing.
+If ppc_cpu_realizefn() fails after cpu_exec_realizefn() has been
+called, we will have to undo whatever cpu_exec_realizefn() did
+by explicitly calling cpu_exec_unrealizeffn() which is currently
+missing. Failure to do this proper cleanup will result in CPU
+which was never fully realized to linger on the cpus list causing
+SIGSEGV later (for eg when running "info cpus").
 
-Agreed with the above two. Sorry I missed this in my first read
-of the patch, it seems that my writing of my version of this patch
-impaired my ability to review another version :-)
+Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+---
+ target/ppc/translate_init.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-Thanks for the clarifications!
-
-Reviewed-by: Emilio G. Cota <cota@braap.org>
-Tested-by: Emilio G. Cota <cota@braap.org>
-
-		E.
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index e837cd2..53aff5a 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -9825,14 +9825,14 @@ static void ppc_cpu_realizefn(DeviceState *dev, Error **errp)
+         error_append_hint(errp, "Adjust the number of cpus to %d "
+                           "or try to raise the number of threads per core\n",
+                           cpu->cpu_dt_id * smp_threads / max_smt);
+-        return;
++        goto unrealize;
+     }
+ #endif
+ 
+     if (tcg_enabled()) {
+         if (ppc_fixup_cpu(cpu) != 0) {
+             error_setg(errp, "Unable to emulate selected CPU with TCG");
+-            return;
++            goto unrealize;
+         }
+     }
+ 
+@@ -9841,14 +9841,14 @@ static void ppc_cpu_realizefn(DeviceState *dev, Error **errp)
+         error_setg(errp, "CPU does not possess a BookE or 4xx MMU. "
+                    "Please use qemu-system-ppc or qemu-system-ppc64 instead "
+                    "or choose another CPU model.");
+-        return;
++        goto unrealize;
+     }
+ #endif
+ 
+     create_ppc_opcodes(cpu, &local_err);
+     if (local_err != NULL) {
+         error_propagate(errp, local_err);
+-        return;
++        goto unrealize;
+     }
+     init_ppc_proc(cpu);
+ 
+@@ -10033,6 +10033,10 @@ static void ppc_cpu_realizefn(DeviceState *dev, Error **errp)
+         fflush(stdout);
+     }
+ #endif
++    return;
++
++unrealize:
++    cpu_exec_unrealizefn(cs);
+ }
+ 
+ static void ppc_cpu_unrealizefn(DeviceState *dev, Error **errp)
+-- 
+2.7.4
