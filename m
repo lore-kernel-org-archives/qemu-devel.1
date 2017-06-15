@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dLSOv-0008Az-6L
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dLSOv-0008B0-68
 	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dLSOu-0007VL-Ca
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dLSOs-0007US-Au
 	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:21 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:34337)
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:34313)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dLSOu-0007V4-6I
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:20 -0400
-Received: by mail-wr0-x241.google.com with SMTP id y25so545332wrd.1
-	for <qemu-devel@nongnu.org>; Thu, 15 Jun 2017 03:53:20 -0700 (PDT)
-Received: from 640k.lan (94-39-191-51.adsl-ull.clienti.tiscali.it.
-	[94.39.191.51])
-	by smtp.gmail.com with ESMTPSA id f21sm3258597wra.5.2017.06.15.03.53.18
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 15 Jun 2017 03:53:18 -0700 (PDT)
+	id 1dLSOs-0007U5-4L
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 06:53:18 -0400
+Received: by mail-wr0-x242.google.com with SMTP id y25so545047wrd.1
+	for <qemu-devel@nongnu.org>; Thu, 15 Jun 2017 03:53:17 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 15 Jun 2017 12:52:28 +0200
-Message-Id: <1497523981-38449-9-git-send-email-pbonzini@redhat.com>
+Date: Thu, 15 Jun 2017 12:52:26 +0200
+Message-Id: <1497523981-38449-7-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1497523981-38449-1-git-send-email-pbonzini@redhat.com>
 References: <1497523981-38449-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 08/41] megasas: do not read sense length more
- than once from frame
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 06/41] memory: remove memory_region_set_fd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,31 +31,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Avoid TOC-TOU bugs depending on how the compiler behaves.
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
+Now unnecessary since ivshmem uses memory_region_init_ram_from_fd.
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20170602141229.15326-7-marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/megasas.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ include/exec/memory.h | 11 -----------
+ memory.c              | 10 ----------
+ 2 files changed, 21 deletions(-)
 
-diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
-index 804122a..1888118 100644
---- a/hw/scsi/megasas.c
-+++ b/hw/scsi/megasas.c
-@@ -309,9 +309,11 @@ static int megasas_build_sense(MegasasCmd *cmd, uint8_t *sense_ptr,
-     PCIDevice *pcid = PCI_DEVICE(cmd->state);
-     uint32_t pa_hi = 0, pa_lo;
-     hwaddr pa;
-+    int frame_sense_len;
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 51a54c9..37f8e78 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -825,17 +825,6 @@ static inline bool memory_region_is_rom(MemoryRegion *mr)
+ int memory_region_get_fd(MemoryRegion *mr);
  
--    if (sense_len > cmd->frame->header.sense_len) {
--        sense_len = cmd->frame->header.sense_len;
-+    frame_sense_len = cmd->frame->header.sense_len;
-+    if (sense_len > frame_sense_len) {
-+        sense_len = frame_sense_len;
-     }
-     if (sense_len) {
-         pa_lo = le32_to_cpu(cmd->frame->pass.sense_addr_lo);
+ /**
+- * memory_region_set_fd: Mark a RAM memory region as backed by a
+- * file descriptor.
+- *
+- * This function is typically used after memory_region_init_ram_ptr().
+- *
+- * @mr: the memory region being queried.
+- * @fd: the file descriptor that backs @mr.
+- */
+-void memory_region_set_fd(MemoryRegion *mr, int fd);
+-
+-/**
+  * memory_region_from_host: Convert a pointer into a RAM memory region
+  * and an offset within it.
+  *
+diff --git a/memory.c b/memory.c
+index b2ace20..e08fa0a 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1851,16 +1851,6 @@ int memory_region_get_fd(MemoryRegion *mr)
+     return fd;
+ }
+ 
+-void memory_region_set_fd(MemoryRegion *mr, int fd)
+-{
+-    rcu_read_lock();
+-    while (mr->alias) {
+-        mr = mr->alias;
+-    }
+-    mr->ram_block->fd = fd;
+-    rcu_read_unlock();
+-}
+-
+ void *memory_region_get_ram_ptr(MemoryRegion *mr)
+ {
+     void *ptr;
 -- 
 1.8.3.1
