@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dLPqV-0005Fj-1h
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:09:40 -0400
+	(envelope-from <laurent@vivier.eu>) id 1dLPxw-0007uJ-60
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:17:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dLPqR-0007dR-2P
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:09:39 -0400
-Received: from [59.151.112.132] (port=62181 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dLPqQ-0007cy-2q
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:09:35 -0400
-References: <1496829322-17099-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1496829322-17099-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<4d998686-136d-1b6d-a641-9332930dcc93@redhat.com>
-	<28122598-b6b3-9eb6-b726-bd7c22735780@cn.fujitsu.com>
-	<93409ed0-7dcb-a167-9438-f5f2b1f3bef5@redhat.com>
-	<5eff3578-61ac-f41a-1cab-9cc6ef40d7db@cn.fujitsu.com>
-	<2b200cad-ac3a-fa86-0fa4-cc4dc39b2e09@redhat.com>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <e11c94c0-46d9-d711-2c69-15570a6a357f@cn.fujitsu.com>
-Date: Thu, 15 Jun 2017 16:10:48 +0800
-MIME-Version: 1.0
-In-Reply-To: <2b200cad-ac3a-fa86-0fa4-cc4dc39b2e09@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH V6 02/10] net/filter-mirror.c: Make filter
- mirror support vnet support.
+	(envelope-from <laurent@vivier.eu>) id 1dLPxs-0001uV-4v
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:17:20 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:64416)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dLPxr-0001tz-Oc
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:17:16 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Thu, 15 Jun 2017 10:17:08 +0200
+Message-Id: <20170615081711.25347-2-laurent@vivier.eu>
+In-Reply-To: <20170615081711.25347-1-laurent@vivier.eu>
+References: <20170615081711.25347-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PULL 1/4] target/m68k: fix V flag for CC_OP_SUBx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,121 +23,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, qemu devel <qemu-devel@nongnu.org>
-Cc: zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, weifuqiang <weifuqiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>
+To: qemu-devel@nongnu.org
+Cc: Laurent Vivier <laurent@vivier.eu>
 
+V flag for subtraction is:
 
+   v = (res ^ src1) & (src1 ^ src2)
 
-On 06/15/2017 12:31 PM, Jason Wang wrote:
->
->
-> On 2017年06月14日 16:04, Zhang Chen wrote:
->>
->>
->> On 06/13/2017 05:14 PM, Jason Wang wrote:
->>>
->>>
->>> On 2017年06月12日 17:27, Zhang Chen wrote:
->>>>>
->>>>>> +        if (nf->direction == NET_FILTER_DIRECTION_RX ||
->>>>>> +            nf->direction == NET_FILTER_DIRECTION_ALL) {
->>>>>> +            vnet_hdr_len = nf->netdev->vnet_hdr_len;
->>>>>
->>>>> This can only work if e.g virtio-net set its own vnet_hdr_len. But 
->>>>> looks like it use guest_hdr_len instead.
->>>>
->>>> I see in hw/net/virtio-net.c use the 
->>>> "qemu_set_vnet_hdr_len(nc->peer, n->guest_hdr_len);" to
->>>> set the nf->netdev->vnet_hdr_len, any case not include here? 
->>>
->>> You mean:
->>>
->>>         if (peer_has_vnet_hdr(n) &&
->>>             qemu_has_vnet_hdr_len(nc->peer, n->guest_hdr_len)) {
->>>             qemu_set_vnet_hdr_len(nc->peer, n->guest_hdr_len);
->>>             n->host_hdr_len = n->guest_hdr_len;
->>>         }
->>>
->>> ?
->>>
->>> From the code, it only set peer's vnet header when peer supports 
->>> vnet_hdr up to n->guest_hdr_len. If peer can't, virtio-net will 
->>> strip the header.
->>
->> So, We should get the n->guest_hdr_len in another way? like set a new 
->> parameter in NetClientState?
->> Any suggestion about it?
->>
->> Thanks
->> Zhang Chen
->
-> Rethink about this, a question is do we really care guest vnet header 
-> len? During guest transmission, when packet reaches netfilter. The 
-> vnet_header should have been stripped to netdev->vnet_hdr_len.
+(see COMPUTE_CCR() in target/m68k/helper.c)
 
-But we use filter-redirector send packet to colo-compare that get the 
-packet with the vnet header.
+But gen_flush_flags() uses:
 
-That is colo-compare see:
+   v = (res ^ src2) & (src1 ^ src2)
 
-1241@1497507100.108799:colo_compare_pkt_info_src src/dst: 192.168.4.144 
-s: seq/ack=2181260317/2075177759 res=0 flags=18 spkt_size: 95
+The problem has been found with the following program:
 
-1241@1497507100.108803:colo_compare_pkt_info_dst src/dst: 192.168.4.88 
-d: seq/ack=2181260317/2075177759 res=0 flags=18 dpkt_size: 95
+        .global _start
+_start:
+        move.l  #-2147483648,%d0
+        subq.l  #1,%d0
+        jvc     1f
+        move.l #1,%d1
+        move.l #1,%d0
+        trap #0
+1:
+        move.l #0,%d1
+        move.l #1,%d0
+        trap #0
 
-colo-compare ppkt: 0000:  01 00 00 00  00 00 22 00  10 00 00 00  12 14 
-fc 1d ......".........
-colo-compare ppkt: 0010:  1a 6b 52 54  00 12 34 56  08 00 45 00  00 45 
-12 61 .kRT..4V..E..E.a
-colo-compare ppkt: 0020:  40 00 40 06  9e 19 c0 a8  04 90 c0 a8  04 58 
-04 d2 @.@..........X..
-colo-compare ppkt: 0030:  ca 98 82 03  64 1d 7b b0  b3 1f 80 18  00 e3 
-8a 70 ....d.{........p
-colo-compare ppkt: 0040:  00 00 01 01  08 0a 00 00  5b fa 00 4d  f1 aa 
-73 65 ........[..M..se
-colo-compare ppkt: 0050:  72 76 65 72  20 67 65 74  20 69 74 20  34 36 
-38    rver get it 468
-colo-compare spkt: 0000:  01 00 00 00  00 00 22 00  10 00 00 00  12 14 
-fc 1d ......".........
-colo-compare spkt: 0010:  1a 6b 52 54  00 12 34 56  08 00 45 00  00 45 
-12 61 .kRT..4V..E..E.a
-colo-compare spkt: 0020:  40 00 40 06  9e 19 c0 a8  04 90 c0 a8  04 58 
-04 d2 @.@..........X..
-colo-compare spkt: 0030:  ca 98 82 03  64 1d 7b b0  b3 1f 80 18  00 e3 
-8a 70 ....d.{........p
-colo-compare spkt: 0040:  00 00 01 01  08 0a 00 00  5c 02 00 4d  f1 aa 
-73 65 ........\..M..se
-colo-compare spkt: 0050:  72 76 65 72  20 67 65 74  20 69 74 20  34 36 
-38    rver get it 468
+It works fine (exit(1)) on real hardware, and with "-singlestep".
 
-So, colo-compare need to know the vnet_hdr_len for skip this field, then 
-colo-compare
-can parse the net packet correctly.
-Back to this patch, how should I fix it?
+"-singlestep" uses gen_helper_flush_flags(), whereas
+without "-singlestep", V flag is computed directly in
+gen_flush_flags().
 
-Thanks
-Zhang Chen
+This patch updates gen_flush_flags() to have the same result
+as with gen_helper_flush_flags().
 
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Message-Id: <20170614203905.19657-1-laurent@vivier.eu>
+---
+ target/m68k/translate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->
-> I still think use nf->netdev->vnet_hdr_len is sufficient.
->
-> Thanks
->
->>
->>>
->>> Thanks
->>>
->>>
->>>
->>
->
->
->
-> .
->
-
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index ad4d4ef..52653f6 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -565,7 +565,7 @@ static void gen_flush_flags(DisasContext *s)
+         t1 = tcg_temp_new();
+         tcg_gen_add_i32(t0, QREG_CC_N, QREG_CC_V);
+         gen_ext(t0, t0, s->cc_op - CC_OP_SUBB, 1);
+-        tcg_gen_xor_i32(t1, QREG_CC_N, QREG_CC_V);
++        tcg_gen_xor_i32(t1, QREG_CC_N, t0);
+         tcg_gen_xor_i32(QREG_CC_V, QREG_CC_V, t0);
+         tcg_temp_free(t0);
+         tcg_gen_and_i32(QREG_CC_V, QREG_CC_V, t1);
 -- 
-Thanks
-Zhang Chen
+2.9.4
