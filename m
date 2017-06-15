@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dLbnq-00023g-Sq
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 16:55:44 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dLc2N-0006W0-8N
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 17:10:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dLbnp-0001ad-Sq
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 16:55:42 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:57376)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dLbnp-0001ZT-La
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 16:55:41 -0400
-Date: Thu, 15 Jun 2017 22:55:37 +0200
-From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170615205537.32nsoi75esd7zdp6@aurel32.net>
+	(envelope-from <rth7680@gmail.com>) id 1dLc2I-0000Vp-1z
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 17:10:43 -0400
+Received: from mail-qt0-x22c.google.com ([2607:f8b0:400d:c0d::22c]:34829)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dLc2H-0000Vg-Sw
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 17:10:37 -0400
+Received: by mail-qt0-x22c.google.com with SMTP id w1so37434225qtg.2
+	for <qemu-devel@nongnu.org>; Thu, 15 Jun 2017 14:10:37 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
 References: <20170615055356.20684-1-rth@twiddle.net>
-	<20170615055356.20684-3-rth@twiddle.net>
-	<20170615070122.z44mdwhe25wlrn6q@aurel32.net>
-	<97f3a8c2-5fc4-4df9-2372-f5b258ca7808@redhat.com>
-	<20170615125312.nlzx37tfduoakceg@aurel32.net>
-	<a01099f8-9d81-6dbc-0985-d177da0ff61a@redhat.com>
+	<20170615055356.20684-6-rth@twiddle.net>
+	<20170615204908.3izswcs4q6l34wrg@aurel32.net>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <a1abdb2d-68c0-74d1-cb32-9ceb5c879151@twiddle.net>
+Date: Thu, 15 Jun 2017 14:10:34 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a01099f8-9d81-6dbc-0985-d177da0ff61a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/5] target/s390x: Enforce instruction
- features
+In-Reply-To: <20170615204908.3izswcs4q6l34wrg@aurel32.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 5/5] target/s390x: mark CSST, CSST2,
+ FPSEH facilities as available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,56 +33,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+To: Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org, david@redhat.com
 
-On 2017-06-15 15:10, David Hildenbrand wrote:
+On 06/15/2017 01:49 PM, Aurelien Jarno wrote:
+>> +        S390_FEAT_FLOATING_POINT_SUPPPORT_ENH,
 > 
-> >> A "sane" guest (e.g. Linux) will only use an instruction if the
-> >> corresponding stfl(e) bit is set. So in my opinion, this should be just
-> >> fine. If the bit is not set currently, the guest will not use it == dead
-> >> code.
-> > 
-> > Not necessarily. Depending on the distribution, gcc and hence binaries
-> > default to a different ISA. Over the time people have added the
-> > corresponding instructions to QEMU so that these binaries work. Now
-> > given that GCC does not necessarily use all the instructions from a
-> > given facility, we end up with missing instructions.
-> 
-> That's true, glibc sometimes assumes a certain architecture level
-> without checking. So you're right, maybe we should defer this "big
-> hammer" change until we have all facilities as part of the qemu CPU
+> Theoretically the floating-point-support-enhancement facilities include
+> the DFP rounding facility. Given We don't implement the DFP facility I
+> guess this can be ignored.
 
-Well the GNU libc itself correctly probe the facilities with stfl/stfle.
-What happens is that newer instructions might be generated directly by
-GCC if told to do so (with -march=xxx or the default architecture).
+We *do* implement the one instruction in DFP-rounding-facility: SRNMT.
 
 
-> model. Then, e.g. runnning -cpu qemu will not break such stuff, however
-> e.g. -cpu z900 could correctly simulate that architecture level.
-> 
-> One option would be:
-> 
-> /* for now, we don't fake absence of features for the qemu model */
-> if (!object_dynamic_cast(cpu, "qemu-s390x-cpu") {
-> 	dc.features = cpu->model->features;
-> }
-> 
-> 
-> ...
-> 
-> if (s->features && !test_bit(insn->fac, s->features)) {
->     gen_program_exception(s, PGM_OPERATION);
->     return EXIT_NORETURN;
-> }
-
-I don't know that part of the code enough to tell if it is the good way
-to do that, but certainly having a "qemu" CPU that supports all
-instructions look like the way to go, especially for the linux-user
-emulation.
-
-Aurelien
-
--- 
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+r~
