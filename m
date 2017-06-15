@@ -1,14 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dLanT-0008PH-VE
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 15:51:16 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dLaoR-0000RM-CW
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 15:52:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dLanR-0006Cd-Ei
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 15:51:16 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dLaoO-0007Ey-SY
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 15:52:15 -0400
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 15 Jun 2017 21:51:10 +0200
-Message-Id: <20170615195110.17479-1-pbonzini@redhat.com>
+Date: Thu, 15 Jun 2017 21:52:09 +0200
+Message-Id: <20170615195209.17720-1-pbonzini@redhat.com>
 Subject: [Qemu-devel] [PATCH] nbd: fix NBD over TLS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
