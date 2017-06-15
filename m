@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dLPp1-0004DC-UG
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:08:09 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dLPqV-0005Fj-1h
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:09:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dLPox-0007My-Um
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:08:07 -0400
-Received: from mga11.intel.com ([192.55.52.93]:4950)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dLPox-0007Mn-Iy
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:08:03 -0400
-Message-ID: <594240E9.2070705@intel.com>
-Date: Thu, 15 Jun 2017 16:10:17 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dLPqR-0007dR-2P
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:09:39 -0400
+Received: from [59.151.112.132] (port=62181 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dLPqQ-0007cy-2q
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 04:09:35 -0400
+References: <1496829322-17099-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1496829322-17099-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<4d998686-136d-1b6d-a641-9332930dcc93@redhat.com>
+	<28122598-b6b3-9eb6-b726-bd7c22735780@cn.fujitsu.com>
+	<93409ed0-7dcb-a167-9438-f5f2b1f3bef5@redhat.com>
+	<5eff3578-61ac-f41a-1cab-9cc6ef40d7db@cn.fujitsu.com>
+	<2b200cad-ac3a-fa86-0fa4-cc4dc39b2e09@redhat.com>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <e11c94c0-46d9-d711-2c69-15570a6a357f@cn.fujitsu.com>
+Date: Thu, 15 Jun 2017 16:10:48 +0800
 MIME-Version: 1.0
-References: <1497004901-30593-1-git-send-email-wei.w.wang@intel.com>
-	<1497004901-30593-4-git-send-email-wei.w.wang@intel.com>
-	<20170613200049-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20170613200049-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v11 3/6] virtio-balloon:
- VIRTIO_BALLOON_F_PAGE_CHUNKS
+In-Reply-To: <2b200cad-ac3a-fa86-0fa4-cc4dc39b2e09@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH V6 02/10] net/filter-mirror.c: Make filter
+ mirror support vnet support.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,168 +34,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, dave.hansen@intel.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, Matthew Wilcox <willy@infradead.org>
-
-On 06/14/2017 01:56 AM, Michael S. Tsirkin wrote:
-> On Fri, Jun 09, 2017 at 06:41:38PM +0800, Wei Wang wrote:
->> Add a new feature, VIRTIO_BALLOON_F_PAGE_CHUNKS, which enables
->> the transfer of the ballooned (i.e. inflated/deflated) pages in
->> chunks to the host.
-> so now these chunks are just s/g list entry.
-> So let's rename this VIRTIO_BALLOON_F_SG with a comment:
-> * Use standard virtio s/g instead of PFN lists *
-
-Actually, it's not using the standard s/g list in the implementation,
-because:
-using the standard s/g will need kmalloc() the indirect table on
-demand (i.e. when virtqueue_add() converts s/g to indirect table);
-
-The implementation directly pre-allocates an indirect desc table,
-and uses a entry (i.e. vring_desc) to describe a chunk. This
-avoids the overhead of kmalloc() the indirect table.
+To: Jason Wang <jasowang@redhat.com>, qemu devel <qemu-devel@nongnu.org>
+Cc: zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, weifuqiang <weifuqiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>
 
 
->> +/*
->> + * Callulates how many pfns can a page_bmap record. A bit corresponds to a
->> + * page of PAGE_SIZE.
->> + */
->> +#define VIRTIO_BALLOON_PFNS_PER_PAGE_BMAP \
->> +	(VIRTIO_BALLOON_PAGE_BMAP_SIZE * BITS_PER_BYTE)
->> +
->> +/* The number of page_bmap to allocate by default. */
->> +#define VIRTIO_BALLOON_PAGE_BMAP_DEFAULT_NUM	1
-> It's not by default, it's at probe time, right?
-It is the number of page bitmap being kept throughout the whole
-lifecycle of the driver. The page bmap will be temporarily extended
-due to insufficiency during a ballooning process, but when that
-ballooning finishes, the extended part will be freed.
->> +/* The maximum number of page_bmap that can be allocated. */
-> Not really, this is the size of the array we use to keep them.
 
-This is the max number of the page bmap that can be
-extended temporarily.
-
->> +#define VIRTIO_BALLOON_PAGE_BMAP_MAX_NUM	32
->> +
-> So you still have a home-grown bitmap. I'd like to know why
-> isn't xbitmap suggested for this purpose by Matthew Wilcox
-> appropriate. Please add a comment explaining the requirements
-> from the data structure.
-
-I didn't find his xbitmap being upstreamed, did you?
-
->> +/*
->> + * QEMU virtio implementation requires the desc table size less than
->> + * VIRTQUEUE_MAX_SIZE, so minus 1 here.
-> I think it doesn't, the issue is probably that you add a header
-> as a separate s/g. In any case see below.
+On 06/15/2017 12:31 PM, Jason Wang wrote:
 >
->> + */
->> +#define VIRTIO_BALLOON_MAX_PAGE_CHUNKS (VIRTQUEUE_MAX_SIZE - 1)
-> This is wrong, virtio spec says s/g size should not exceed VQ size.
-> If you want to support huge VQ sizes, you can add a fallback to
-> smaller sizes until it fits in 1 page.
-
-Probably no need for huge VQ size, 1024 queue size should be
-enough. And we can have 1024 descriptors in the indirect
-table, so the above size doesn't exceed the vq size, right?
-
-
-> +static unsigned int extend_page_bmap_size(struct virtio_balloon *vb,
-> +					  unsigned long pfn_num)
-> what's this API doing?  Pls add comments. this seems to assume
-> it will only be called once.
-OK, I will add some comments here. This is the function to extend
-the number of page bitmap when the original 1 page bmap is
-not sufficient during a ballooning process. As mentioned above,
-at the end of this ballooning process, the extended part will be freed.
-
-> it would be better to avoid making
-> this assumption, just look at what has been allocated
-> and extend it.
-Actually it's not an assumption. The rule here is that we always keep
-"1" page bmap. "1" is defined by the
-VIRTIO_BALLOON_PAGE_BMAP_DEFAULT_NUM. So when freeing, it also
-references VIRTIO_BALLOON_PAGE_BMAP_DEFAULT_NUM (not assuming
-any number)
-
-> +}
-> +
-> +/* Add a chunk to the buffer. */
-> +static void add_one_chunk(struct virtio_balloon *vb, struct virtqueue *vq,
-> +			  u64 base_addr, u32 size)
-> +{
-> +	unsigned int *num = &vb->balloon_page_chunk.chunk_num;
-> +	struct vring_desc *desc = &vb->balloon_page_chunk.desc_table[*num];
-> +
-> +	desc->addr = cpu_to_virtio64(vb->vdev, base_addr);
-> +	desc->len = cpu_to_virtio32(vb->vdev, size);
-> +	*num += 1;
-> +	if (*num == VIRTIO_BALLOON_MAX_PAGE_CHUNKS)
-> +		send_page_chunks(vb, vq);
-> +}
-> +
-> Poking at virtio internals like this is not nice. Pls move to virtio
-> code.  Also, pages must be read descriptors as host might modify them.
 >
-> This also lacks viommu support but this is not mandatory as
-> that is borken atm anyway. I'll send a patch to at least fail cleanly.
-OK, thanks.
+> On 2017年06月14日 16:04, Zhang Chen wrote:
+>>
+>>
+>> On 06/13/2017 05:14 PM, Jason Wang wrote:
+>>>
+>>>
+>>> On 2017年06月12日 17:27, Zhang Chen wrote:
+>>>>>
+>>>>>> +        if (nf->direction == NET_FILTER_DIRECTION_RX ||
+>>>>>> +            nf->direction == NET_FILTER_DIRECTION_ALL) {
+>>>>>> +            vnet_hdr_len = nf->netdev->vnet_hdr_len;
+>>>>>
+>>>>> This can only work if e.g virtio-net set its own vnet_hdr_len. But 
+>>>>> looks like it use guest_hdr_len instead.
+>>>>
+>>>> I see in hw/net/virtio-net.c use the 
+>>>> "qemu_set_vnet_hdr_len(nc->peer, n->guest_hdr_len);" to
+>>>> set the nf->netdev->vnet_hdr_len, any case not include here? 
+>>>
+>>> You mean:
+>>>
+>>>         if (peer_has_vnet_hdr(n) &&
+>>>             qemu_has_vnet_hdr_len(nc->peer, n->guest_hdr_len)) {
+>>>             qemu_set_vnet_hdr_len(nc->peer, n->guest_hdr_len);
+>>>             n->host_hdr_len = n->guest_hdr_len;
+>>>         }
+>>>
+>>> ?
+>>>
+>>> From the code, it only set peer's vnet header when peer supports 
+>>> vnet_hdr up to n->guest_hdr_len. If peer can't, virtio-net will 
+>>> strip the header.
+>>
+>> So, We should get the n->guest_hdr_len in another way? like set a new 
+>> parameter in NetClientState?
+>> Any suggestion about it?
+>>
+>> Thanks
+>> Zhang Chen
+>
+> Rethink about this, a question is do we really care guest vnet header 
+> len? During guest transmission, when packet reaches netfilter. The 
+> vnet_header should have been stripped to netdev->vnet_hdr_len.
 
->> +static void convert_bmap_to_chunks(struct virtio_balloon *vb,
->> +				   struct virtqueue *vq,
->> +				   unsigned long *bmap,
->> +				   unsigned long pfn_start,
->> +				   unsigned long size)
->> +{
->> +	unsigned long next_one, next_zero, pos = 0;
->> +	u64 chunk_base_addr;
->> +	u32 chunk_size;
->> +
->> +	while (pos < size) {
->> +		next_one = find_next_bit(bmap, size, pos);
->> +		/*
->> +		 * No "1" bit found, which means that there is no pfn
->> +		 * recorded in the rest of this bmap.
->> +		 */
->> +		if (next_one == size)
->> +			break;
->> +		next_zero = find_next_zero_bit(bmap, size, next_one + 1);
->> +		/*
->> +		 * A bit in page_bmap corresponds to a page of PAGE_SIZE.
->> +		 * Convert it to be pages of 4KB balloon page size when
->> +		 * adding it to a chunk.
-> This looks wrong. add_one_chunk assumes size in bytes. So should be just
-> PAGE_SIZE.
+But we use filter-redirector send packet to colo-compare that get the 
+packet with the vnet header.
 
-It's intended to be "chunk size", which is the number of pfns. The 
-benefit is
-that the 32-bit desc->len won't be overflow, as you mentioned below.
+That is colo-compare see:
+
+1241@1497507100.108799:colo_compare_pkt_info_src src/dst: 192.168.4.144 
+s: seq/ack=2181260317/2075177759 res=0 flags=18 spkt_size: 95
+
+1241@1497507100.108803:colo_compare_pkt_info_dst src/dst: 192.168.4.88 
+d: seq/ack=2181260317/2075177759 res=0 flags=18 dpkt_size: 95
+
+colo-compare ppkt: 0000:  01 00 00 00  00 00 22 00  10 00 00 00  12 14 
+fc 1d ......".........
+colo-compare ppkt: 0010:  1a 6b 52 54  00 12 34 56  08 00 45 00  00 45 
+12 61 .kRT..4V..E..E.a
+colo-compare ppkt: 0020:  40 00 40 06  9e 19 c0 a8  04 90 c0 a8  04 58 
+04 d2 @.@..........X..
+colo-compare ppkt: 0030:  ca 98 82 03  64 1d 7b b0  b3 1f 80 18  00 e3 
+8a 70 ....d.{........p
+colo-compare ppkt: 0040:  00 00 01 01  08 0a 00 00  5b fa 00 4d  f1 aa 
+73 65 ........[..M..se
+colo-compare ppkt: 0050:  72 76 65 72  20 67 65 74  20 69 74 20  34 36 
+38    rver get it 468
+colo-compare spkt: 0000:  01 00 00 00  00 00 22 00  10 00 00 00  12 14 
+fc 1d ......".........
+colo-compare spkt: 0010:  1a 6b 52 54  00 12 34 56  08 00 45 00  00 45 
+12 61 .kRT..4V..E..E.a
+colo-compare spkt: 0020:  40 00 40 06  9e 19 c0 a8  04 90 c0 a8  04 58 
+04 d2 @.@..........X..
+colo-compare spkt: 0030:  ca 98 82 03  64 1d 7b b0  b3 1f 80 18  00 e3 
+8a 70 ....d.{........p
+colo-compare spkt: 0040:  00 00 01 01  08 0a 00 00  5c 02 00 4d  f1 aa 
+73 65 ........\..M..se
+colo-compare spkt: 0050:  72 76 65 72  20 67 65 74  20 69 74 20  34 36 
+38    rver get it 468
+
+So, colo-compare need to know the vnet_hdr_len for skip this field, then 
+colo-compare
+can parse the net packet correctly.
+Back to this patch, how should I fix it?
+
+Thanks
+Zhang Chen
 
 
 >
->> +		 */
->> +		chunk_size = (next_zero - next_one) *
->> +			     VIRTIO_BALLOON_PAGES_PER_PAGE;
-> How do you know this won't overflow a 32 bit integer? Needs a comment.
+> I still think use nf->netdev->vnet_hdr_len is sufficient.
+>
+> Thanks
+>
+>>
+>>>
+>>> Thanks
+>>>
+>>>
+>>>
+>>
+>
+>
+>
+> .
+>
 
-If it stores size in bytes, it has the possibility to overflow.
-If storing number of pfns, the 32-bit value can support 2^32*4KB=8TB
-memory, unlikely to overflow.
-> +
-> +static int balloon_page_chunk_init(struct virtio_balloon *vb)
-> +{
-> +	int i;
-> +
-> +	vb->balloon_page_chunk.desc_table = alloc_indirect(vb->vdev,
-> +						VIRTIO_BALLOON_MAX_PAGE_CHUNKS,
-> +						GFP_KERNEL);
-> This one's problematic, you aren't supposed to use APIs when device
-> is not inited yet. Seems to work by luck here. I suggest moving
-> this to probe, that's where we do a bunch of inits.
-> And then you can move private init back to allocate too.
-
-This is just to allocate an indirect desc table. If allocation fails, we 
-need to clear
-the related feature bit in ->validate(), right?
+-- 
+Thanks
+Zhang Chen
