@@ -1,27 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dLORC-0008RR-2i
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 02:39:27 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1dLObJ-0003Mk-Le
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 02:49:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dLOR9-0008MY-0t
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 02:39:26 -0400
-Received: from 9.mo178.mail-out.ovh.net ([46.105.75.45]:56299)
+	(envelope-from <wei.w.wang@intel.com>) id 1dLObG-0002kR-Gz
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 02:49:53 -0400
+Received: from mga14.intel.com ([192.55.52.115]:10999)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dLOR8-0008L4-Qr
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 02:39:22 -0400
-Received: from player728.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 11AA83CF88
-	for <qemu-devel@nongnu.org>; Thu, 15 Jun 2017 08:39:14 +0200 (CEST)
-References: <149744692318.5507.14451686460325895979.stgit@bahia.lan>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <32c9b289-e151-0c7e-9519-8d729ef16367@kaod.org>
-Date: Thu, 15 Jun 2017 08:39:01 +0200
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1dLObG-0002k1-5n
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 02:49:50 -0400
+Message-ID: <59422E91.7080407@intel.com>
+Date: Thu, 15 Jun 2017 14:52:01 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <149744692318.5507.14451686460325895979.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 0/3] spapr/xics: fix migration of older
- machine types
+References: <4639c51b-32a6-3528-2ed6-c5f6296b6300@redhat.com>
+	<593F6133.9050804@intel.com>
+	<65faf3f9-a839-0b04-c740-6b2a60a51cf6@redhat.com>
+	<593F8153.7080209@intel.com>
+	<f8a64b2c-e769-4e9c-1cc6-ad31ea266010@redhat.com>
+	<593F9187.6040800@intel.com>
+	<9f196d71-f06b-7520-ca03-e94bf3b5a986@redhat.com>
+	<593FB550.6090903@intel.com>
+	<26250da7-b394-4964-8842-5c45bbe85e09@redhat.com>
+	<6547dfcf-ea3a-f5f6-222d-40ff274654df@redhat.com>
+	<20170614180459-mutt-send-email-mst@kernel.org>
+	<b59be2f1-ee8c-e660-4f82-bbe63e22b603@redhat.com>
+In-Reply-To: <b59be2f1-ee8c-e660-4f82-bbe63e22b603@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [virtio-dev] Re:
+ [PATCH v1] virtio-net: enable configurable tx queue size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,95 +39,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>
+To: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "stefanha@gmail.com" <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "jan.scheurich@ericsson.com" <jan.scheurich@ericsson.com>, "armbru@redhat.com" <armbru@redhat.com>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
 
-On 06/14/2017 03:28 PM, Greg Kurz wrote:
-> Cc'ing Laurent because I needed to incorporate the "spapr: manage hotplugged
-> devices while the VM is not started" patch in this series to be able to
-> verify that the "CPU core unplug" part of patch 3 behaves as expected.
-> 
-> With this series, I could successfully do the following on POWER8 host with
-> full cores:
+On 06/15/2017 12:16 PM, Jason Wang wrote:
 >
-> 1) start a pseries-2.9 machine with QEMU 2.9:
->         -smp cores=1,threads=2,maxcpus=8
-> 
-> 2) hotplug a core:
->     device_add host-spapr-cpu-core,core-id=4,id=core4
-> 
-> 3) migrate to QEMU 2.10 with core4 added (ie, started with same -smp as in
->    step 1 and same device_add as step 2):
-> 
-> 4) hotplug another core:
->     device_add host-spapr-cpu-core,core-id=2,id=core2
-> 
-> 5) migrate back to QEMU 2.9 with core4 and core2 added
-> 
-> 6) hotplug the core in the last available slot:
->     device_add host-spapr-cpu-core,core-id=6,id=core6
-> 
-> 7) migrate to QEMU 2.10 with core4, core2 and core6 added
-> 
-> The following step requires Laurent's patch, otherwise the guest complains
-> about the non-existing DRC and fails to unplug the cores.
-> 
-> 8) unplug some cores:
->     device_del core4
->     device_del core2
-> 
-> 9) migrate back to QEMU 2.9 with core6 added
+>
+> On 2017年06月14日 23:22, Michael S. Tsirkin wrote:
+>> On Wed, Jun 14, 2017 at 07:26:54PM +0800, Jason Wang wrote:
+>>>
+>>> On 2017年06月13日 18:46, Jason Wang wrote:
+>>>>
+>>>> On 2017年06月13日 17:50, Wei Wang wrote:
+>>>>> On 06/13/2017 05:04 PM, Jason Wang wrote:
+>>>>>>
+>>>>>> On 2017年06月13日 15:17, Wei Wang wrote:
+>>>>>>> On 06/13/2017 02:29 PM, Jason Wang wrote:
+>>>>>>>> The issue is what if there's a mismatch of max #sgs between 
+>>>>>>>> qemu and
+>>>>>>>>>>> When the vhost backend is used, QEMU is not
+>>>>>>>>>>> involved in the data path.
+>>>>>>>>>>> The vhost backend
+>>>>>>>>>>> directly gets what is offered by the guest from the vq. Why 
+>>>>>>>>>>> would
+>>>>>>>>>>> there be a mismatch of
+>>>>>>>>>>> max #sgs between QEMU and vhost, and what is
+>>>>>>>>>>> the QEMU side max #sgs
+>>>>>>>>>>> used for? Thanks.
+>>>>>>>>>> You need query the backend max #sgs in this case
+>>>>>>>>>> at least. no? If not
+>>>>>>>>>> how do you know the value is supported by the backend?
+>>>>>>>>>>
+>>>>>>>>>> Thanks
+>>>>>>>>>>
+>>>>>>>>> Here is my thought: vhost backend has already been
+>>>>>>>>> supporting 1024 sgs,
+>>>>>>>>> so I think it might not be necessary to query the
+>>>>>>>>> max sgs that the vhost
+>>>>>>>>> backend supports. In the setup phase, when QEMU
+>>>>>>>>> detects the backend is
+>>>>>>>>> vhost, it assumes 1024 max sgs is supported, instead
+>>>>>>>>> of giving an extra
+>>>>>>>>> call to query.
+>>>>>>>> We can probably assume vhost kernel supports up to 1024
+>>>>>>>> sgs. But how about for other vhost-user backends?
+>>>>>>>>
+>>>>>>> So far, I haven't seen any vhost backend implementation
+>>>>>>> supporting less than 1024 sgs.
+>>>>>> Since vhost-user is an open protocol we can not check each
+>>>>>> implementation (some may be even close sourced). For safety, we
+>>>>>> need an explicit clarification on this.
+>>>>>>
+>>>>>>>
+>>>>>>>> And what you said here makes me ask one of my questions in the 
+>>>>>>>> past:
+>>>>>>>>
+>>>>>>>> Do we have plan to extend 1024 to a larger value or 1024
+>>>>>>>> looks good for the future years? If we only care about
+>>>>>>>> 1024, there's even no need for a new config filed, a
+>>>>>>>> feature flag is more than enough. If we want to extend
+>>>>>>>> it to e.g 2048, we definitely need to query vhost
+>>>>>>>> backend's limit (even for vhost-kernel).
+>>>>>>>>
+>>>>>>> According to virtio spec (e.g. 2.4.4), unreasonably large
+>>>>>>> descriptors are
+>>>>>>> not encouraged to be used by the guest. If possible, I would
+>>>>>>> suggest to use
+>>>>>>> 1024 as the largest number of descriptors that the guest can
+>>>>>>> chain, even when
+>>>>>>> we have larger queue size in the future. That is,
+>>>>>>> if (backend == QEMU backend)
+>>>>>>>      config.max_chain_size = 1023 (defined by the qemu
+>>>>>>> backend implementation);
+>>>>>>> else if (backend == vhost)
+>>>>>>>      config.max_chain_size = 1024;
+>>>>>>>
+>>>>>>> It is transparent to the guest. From the guest's point of
+>>>>>>> view, all it knows is a value
+>>>>>>> given to him via reading config.max_chain_size.
+>>>>>> So not transparent actually, guest at least guest need to see
+>>>>>> and check for this. So the question still, since you only care
+>>>>>> about two cases in fact:
+>>>>>>
+>>>>>> - backend supports 1024
+>>>>>> - backend supports <1024 (qemu or whatever other backends)
+>>>>>>
+>>>>>> So it looks like a new feature flag is more than enough. If
+>>>>>> device(backends) support this feature, it can make sure 1024 sgs
+>>>>>> is supported?
+>>>>>>
+>>>>> That wouldn't be enough. For example, QEMU3.0 backend supports
+>>>>> max_chain_size=1023,
+>>>>> while QEMU4.0 backend supports max_chain_size=1021. How would the
+>>>>> guest know
+>>>>> the max size with the same feature flag? Would it still chain 1023
+>>>>> descriptors with QEMU4.0?
+>>>>>
+>>>>> Best,
+>>>>> Wei
+>>>> I believe we won't go back to less than 1024 in the future. It may be
+>>>> worth to add a unittest for this to catch regression early.
+>>>>
+>>>> Thanks
+>> I think I disagree with that. Smaller pipes a better (e.g. less cache
+>> pressure) and you only need huge pipes because host thread gets
+>> scheduled out for too long. With more CPUs there's less of a chance of
+>> an overcommit so we'll be able to get by with smaller pipes in the
+>> future.
+>
+> Agree, but we are talking about the upper limit. Even if 1024 is 
+> supported, small number of #sgs is still encouraged.
+>
+>>
+>>> Consider the queue size is 256 now, I think maybe we can first make 
+>>> tx queue
+>>> size configurable up to 1024, and then do the #sg stuffs on top.
+>>>
+>>> What's your opinion, Michael?
+>>>
+>>> Thanks
+>> With a kernel backend, 1024 is problematic since we are then unable
+>> to add any entries or handle cases where an entry crosses an MR region
+>> boundary. We could support up to 512 with a kernel backend but no one
+>> seems to want that :)
+>
+> Then I see issues with indirect descriptors.
+>
+> We try to allow up 1024 chained descriptors implicitly since 
+> e0e9b406470b ("vhost: max s/g to match qemu"). If guest can submit 
+> crossing MR descs, I'm afraid we've already had this bug since this 
+> commit. And actually this seems conflict to what spec said in 2.4.5:
+>
+> """
+> The number of descriptors in the table is defined by the queue size 
+> for this virtqueue: this is the maximum possible descriptor chain length.
+> """
+>
+> Technically, we had the same issue for rx since we allow 1024 queue 
+> size now.
+>
+> So actually, allowing the size to 1024 does not introduce any new 
+> trouble?
+>>
+>> With vhost-user the backend might be able to handle that. So an
+>> acceptable option would be to allow 1K with vhost-user backends
+>> only, trim it back with other backends.
+>>
+>
+> I believe the idea is to clarify the maximum chain size instead of 
+> having any assumption.
+>
+>
 
-Thanks for the amount of time you have put into fixing this 
-regression. That was complex and it required skill and patience.
+I think the issues can be solved by VIRTIO_F_MAX_CHAIN_SIZE.
 
-It would be good to have some framework to test migration across
-different QEMU versions. Does it exists ? I really don't know how 
-feasible this is. I remember Thomas working on migration script
-for kvm-unit-tests. That was quite promising. 
+For now, how about splitting it into two series of patches:
+1) enable 1024 tx queue size for vhost-user, to let the users of 
+vhost-user to easily use 1024 queue size.
+2) enable VIRTIO_F_MAX_CHAIN_SIZE,  to enhance robustness.
 
-Cheers,
-
-C. 
-
-
-> 
-> v5: - some patches from v4 got merged
->     - rebased and added Laurent's change to manage hotplugging of CPU
->       on the destination host (patch 1)
->     - see individual changelog for patches 2 and 3
-> 
-> v4: - some patches from v3 got merged
->     - added some more preparatory cleanup in xics (patches 1,2)
->     - merge cpu_setup() handler into realize() (patch 4)
->     - see individual changelog for patches 3 and 6
-> 
-> v3: - preparatory cleanup in pnv (patch 1)
->     - rework ICPState realization and vmstate registration (patches 2,3,4)
->     - fix migration using dummy icp/server entries (patch 5)
-> 
-> v2: - some patches from v1 are already merged in ppc-for-2.10
->     - added a new fix to a potential memory leak (patch 1)
->     - consolidate dt_id computation (patch 3)
->     - see individual changelogs for patch 2 and 4
-> 
-> Cheers.
-> 
-> --
-> Greg
-> 
-> ---
-> 
-> Greg Kurz (2):
->       xics: directly register ICPState objects to vmstate
->       spapr: fix migration of ICPState objects from/to older QEMU
-> 
-> Laurent Vivier (1):
->       spapr: manage hotplugged devices while the VM is not started
-> 
-> 
->  hw/intc/xics.c         |    5 ++
->  hw/ppc/spapr.c         |  107 ++++++++++++++++++++++++++++++++++++++++++++----
->  include/hw/ppc/spapr.h |    1 
->  3 files changed, 104 insertions(+), 9 deletions(-)
-> 
+Best,
+Wei
