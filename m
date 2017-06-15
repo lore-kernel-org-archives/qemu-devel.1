@@ -1,22 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sochin.jiang@huawei.com>) id 1dLLQ5-0007TL-Tx
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 23:26:07 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dLMCm-0001cg-3M
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 00:16:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sochin.jiang@huawei.com>) id 1dLLQ4-0006PS-JU
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 23:26:05 -0400
-References: <1497421359-32660-1-git-send-email-sochin.jiang@huawei.com>
-	<76e5666c-ecbf-5c7d-5dbb-e1fa845d2150@redhat.com>
-	<d9eea04a-9ea7-34b4-121e-f635786cac58@huawei.com>
-From: "sochin.jiang" <sochin.jiang@huawei.com>
-Message-ID: <32e53825-0987-19d0-5f51-52aa5a0308f7@huawei.com>
-Date: Thu, 15 Jun 2017 11:24:27 +0800
+	(envelope-from <jasowang@redhat.com>) id 1dLMCi-0006Zg-T9
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 00:16:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47288)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dLMCi-0006ZA-K6
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 00:16:20 -0400
+References: <4639c51b-32a6-3528-2ed6-c5f6296b6300@redhat.com>
+	<593F6133.9050804@intel.com>
+	<65faf3f9-a839-0b04-c740-6b2a60a51cf6@redhat.com>
+	<593F8153.7080209@intel.com>
+	<f8a64b2c-e769-4e9c-1cc6-ad31ea266010@redhat.com>
+	<593F9187.6040800@intel.com>
+	<9f196d71-f06b-7520-ca03-e94bf3b5a986@redhat.com>
+	<593FB550.6090903@intel.com>
+	<26250da7-b394-4964-8842-5c45bbe85e09@redhat.com>
+	<6547dfcf-ea3a-f5f6-222d-40ff274654df@redhat.com>
+	<20170614180459-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <b59be2f1-ee8c-e660-4f82-bbe63e22b603@redhat.com>
+Date: Thu, 15 Jun 2017 12:16:09 +0800
 MIME-Version: 1.0
-In-Reply-To: <d9eea04a-9ea7-34b4-121e-f635786cac58@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] fix: avoid infinite loop when blockjob
- encountering failure
+In-Reply-To: <20170614180459-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [PATCH v1]
+ virtio-net: enable configurable tx queue size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,117 +38,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, kwolf@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, eric.fangyi@huawei.com, subo7@huawei.com, xieyingtai@huawei.com, lina.lulina@huawei.com, zhangshuai13@huawei.com, lizhengui@huawei.com
-
-I realized blockjob is freed after completed unless we call block_job_ref()
-
-before run_block_job is called.
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "stefanha@gmail.com" <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "jan.scheurich@ericsson.com" <jan.scheurich@ericsson.com>, "armbru@redhat.com" <armbru@redhat.com>, Wei Wang <wei.w.wang@intel.com>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
 
 
-On 2017/6/15 10:38, sochin.jiang wrote:
-> Thanks for your kindly reply.
->
-> I do have made a mistake that ignoring the AIOContext lock.
->
-> About the patch, firstly, if job->ret comes to be non-zero(also means job->completed to be true) , blockjob 'callback'(common_block_job_cb) will be called, blockjob error will be put into errp. It won't report success.
->
-> Secondly, blockjob fails with 'ret < 0' and without calling block_job_complete_sync(), we won't have segfault because bdrv_reopen won't be called. Also, with the use-after-free problems.
->
-> So, skip the block_job_complete_sync() call if job->completed(job->ret to be non-zero) is true can avoid all the problems, am I right ?
->
-> Thank you again.
->
->
-> Best Regard.
->
-> Sochin
->
->
->
->
->
->
->
-> On 2017/6/14 21:12, Max Reitz wrote:
->> Thanks for your patch! The issue can be reproduced as follows:
+
+On 2017=E5=B9=B406=E6=9C=8814=E6=97=A5 23:22, Michael S. Tsirkin wrote:
+> On Wed, Jun 14, 2017 at 07:26:54PM +0800, Jason Wang wrote:
 >>
->> $ qemu-img create -f qcow2 -b \
->>     "json:{'driver':'raw','file':{
->>         'driver':'blkdebug','inject-error':[{'event':'write_aio'}],
->>         'image':{'driver':'null-co'}}}" \
->>      overlay.qcow2
->> $ qemu-io -c 'write 0 64k' overlay.qcow2
->> $ qemu-img commit overlay.qcow2
->>
->> While your patch fixes that issue, I still have some comments:
->>
->> On 2017-06-14 08:22, sochin.jiang wrote:
->>> From: "sochin.jiang" <sochin.jiang@huawei.com>
+>> On 2017=E5=B9=B406=E6=9C=8813=E6=97=A5 18:46, Jason Wang wrote:
 >>>
->>> img_commit could fall into infinite loop if it's blockjob
->> This should be "into an infinite loop" and "its" instead if "it's".
->>
->> This empty line should be omitted.
->>
->>> fail encountering any I/O error. Try to fix it.
->> Should be "fails on any I/O error" or "fails on encountering any I/O
->> error". Also, you're not trying to fix it but let's all hope you really
->> are fixing it. :-)
->>
->> (So "Fix it." instead of "Try to fix it.")
->>
->>> Signed-off-by: sochin.jiang <sochin.jiang@huawei.com>
->>> ---
->>>  qemu-img.c | 5 ++++-
->>>  1 file changed, 4 insertions(+), 1 deletion(-)
+>>> On 2017=E5=B9=B406=E6=9C=8813=E6=97=A5 17:50, Wei Wang wrote:
+>>>> On 06/13/2017 05:04 PM, Jason Wang wrote:
+>>>>>
+>>>>> On 2017=E5=B9=B406=E6=9C=8813=E6=97=A5 15:17, Wei Wang wrote:
+>>>>>> On 06/13/2017 02:29 PM, Jason Wang wrote:
+>>>>>>> The issue is what if there's a mismatch of max #sgs between qemu =
+and
+>>>>>>>>>> When the vhost backend is used, QEMU is not
+>>>>>>>>>> involved in the data path.
+>>>>>>>>>> The vhost backend
+>>>>>>>>>> directly gets what is offered by the guest from the vq. Why wo=
+uld
+>>>>>>>>>> there be a mismatch of
+>>>>>>>>>> max #sgs between QEMU and vhost, and what is
+>>>>>>>>>> the QEMU side max #sgs
+>>>>>>>>>> used for? Thanks.
+>>>>>>>>> You need query the backend max #sgs in this case
+>>>>>>>>> at least. no? If not
+>>>>>>>>> how do you know the value is supported by the backend?
+>>>>>>>>>
+>>>>>>>>> Thanks
+>>>>>>>>>
+>>>>>>>> Here is my thought: vhost backend has already been
+>>>>>>>> supporting 1024 sgs,
+>>>>>>>> so I think it might not be necessary to query the
+>>>>>>>> max sgs that the vhost
+>>>>>>>> backend supports. In the setup phase, when QEMU
+>>>>>>>> detects the backend is
+>>>>>>>> vhost, it assumes 1024 max sgs is supported, instead
+>>>>>>>> of giving an extra
+>>>>>>>> call to query.
+>>>>>>> We can probably assume vhost kernel supports up to 1024
+>>>>>>> sgs. But how about for other vhost-user backends?
+>>>>>>>
+>>>>>> So far, I haven't seen any vhost backend implementation
+>>>>>> supporting less than 1024 sgs.
+>>>>> Since vhost-user is an open protocol we can not check each
+>>>>> implementation (some may be even close sourced). For safety, we
+>>>>> need an explicit clarification on this.
+>>>>>
+>>>>>>
+>>>>>>> And what you said here makes me ask one of my questions in the pa=
+st:
+>>>>>>>
+>>>>>>> Do we have plan to extend 1024 to a larger value or 1024
+>>>>>>> looks good for the future years? If we only care about
+>>>>>>> 1024, there's even no need for a new config filed, a
+>>>>>>> feature flag is more than enough. If we want to extend
+>>>>>>> it to e.g 2048, we definitely need to query vhost
+>>>>>>> backend's limit (even for vhost-kernel).
+>>>>>>>
+>>>>>> According to virtio spec (e.g. 2.4.4), unreasonably large
+>>>>>> descriptors are
+>>>>>> not encouraged to be used by the guest. If possible, I would
+>>>>>> suggest to use
+>>>>>> 1024 as the largest number of descriptors that the guest can
+>>>>>> chain, even when
+>>>>>> we have larger queue size in the future. That is,
+>>>>>> if (backend =3D=3D QEMU backend)
+>>>>>>      config.max_chain_size =3D 1023 (defined by the qemu
+>>>>>> backend implementation);
+>>>>>> else if (backend =3D=3D vhost)
+>>>>>>      config.max_chain_size =3D 1024;
+>>>>>>
+>>>>>> It is transparent to the guest. From the guest's point of
+>>>>>> view, all it knows is a value
+>>>>>> given to him via reading config.max_chain_size.
+>>>>> So not transparent actually, guest at least guest need to see
+>>>>> and check for this. So the question still, since you only care
+>>>>> about two cases in fact:
+>>>>>
+>>>>> - backend supports 1024
+>>>>> - backend supports <1024 (qemu or whatever other backends)
+>>>>>
+>>>>> So it looks like a new feature flag is more than enough. If
+>>>>> device(backends) support this feature, it can make sure 1024 sgs
+>>>>> is supported?
+>>>>>
+>>>> That wouldn't be enough. For example, QEMU3.0 backend supports
+>>>> max_chain_size=3D1023,
+>>>> while QEMU4.0 backend supports max_chain_size=3D1021. How would the
+>>>> guest know
+>>>> the max size with the same feature flag? Would it still chain 1023
+>>>> descriptors with QEMU4.0?
+>>>>
+>>>> Best,
+>>>> Wei
+>>> I believe we won't go back to less than 1024 in the future. It may be
+>>> worth to add a unittest for this to catch regression early.
 >>>
->>> diff --git a/qemu-img.c b/qemu-img.c
->>> index 0ad698d..6ba565d 100644
->>> --- a/qemu-img.c
->>> +++ b/qemu-img.c
->>> @@ -895,8 +895,11 @@ static void run_block_job(BlockJob *job, Error **errp)
->>>          aio_poll(aio_context, true);
->>>          qemu_progress_print(job->len ?
->>>                              ((float)job->offset / job->len * 100.f) : 0.0f, 0);
->>> -    } while (!job->ready);
->>> +    } while (!job->ready && !job->ret);
->> I think it would be better to test job->completed instead of job->ret.
+>>> Thanks
+> I think I disagree with that. Smaller pipes a better (e.g. less cache
+> pressure) and you only need huge pipes because host thread gets
+> scheduled out for too long. With more CPUs there's less of a chance of
+> an overcommit so we'll be able to get by with smaller pipes in the
+> future.
+
+Agree, but we are talking about the upper limit. Even if 1024 is=20
+supported, small number of #sgs is still encouraged.
+
+>
+>> Consider the queue size is 256 now, I think maybe we can first make tx=
+ queue
+>> size configurable up to 1024, and then do the #sg stuffs on top.
 >>
->>>  
->>> +    if (job->ret) {
->>> +        return;
->>> +    }
->> We shouldn't just return here but still do all the deinitialization like
->> call aio_context_release(). I guess the best would be to just skip the
->> block_job_complete_sync() call if job->completed is true.
+>> What's your opinion, Michael?
 >>
->>>      block_job_complete_sync(job, errp);
->>>      aio_context_release(aio_context);
->> Then, there are three more issues I found while reviewing this patch:
->>
->> First, if the block job is completed before block_job_complete_sync() is
->> called (i.e. if an error occurred), it is automatically freed. This is
->> bad because this means we'll have some instances of use-after-free here.
->> Therefore, we need to invoke block_job_ref() before run_block_job() and
->> block_job_unref() afterwards. (And since these functions are currenctly
->> static in blockjob.c, we'll have to make them global.)
->>
->> Secondly, run_block_job() doesn't evaluate job->ret. Therefore it will
->> report success even if the commit failed (it is expecting
->> block_job_complete_sync() to put an error into errp, but it will not do
->> that). So we'll have to do that (manually check job->ret and if it's
->> negative, put an error message into errp; also, assert that
->> job->cancelled is false).
->>
->> Thirdly, we have segfault in bdrv_reopen_prepare() if the image has
->> non-string options... I'll handle this one.
->>
->> I can also handle the other two issues, if you'd like me to.
->>
->>
->> Finally, an iotest would be nice (see my reproducer above). But I can
->> handle that as well, if you decide not to write one.
->>
->> Max
->>
+>> Thanks
+> With a kernel backend, 1024 is problematic since we are then unable
+> to add any entries or handle cases where an entry crosses an MR region
+> boundary. We could support up to 512 with a kernel backend but no one
+> seems to want that :)
+
+Then I see issues with indirect descriptors.
+
+We try to allow up 1024 chained descriptors implicitly since=20
+e0e9b406470b ("vhost: max s/g to match qemu"). If guest can submit=20
+crossing MR descs, I'm afraid we've already had this bug since this=20
+commit. And actually this seems conflict to what spec said in 2.4.5:
+
+"""
+The number of descriptors in the table is defined by the queue size for=20
+this virtqueue: this is the maximum possible descriptor chain length.
+"""
+
+Technically, we had the same issue for rx since we allow 1024 queue size=20
+now.
+
+So actually, allowing the size to 1024 does not introduce any new trouble=
+?
+>
+> With vhost-user the backend might be able to handle that. So an
+> acceptable option would be to allow 1K with vhost-user backends
+> only, trim it back with other backends.
+>
+
+I believe the idea is to clarify the maximum chain size instead of=20
+having any assumption.
+
+Thanks
