@@ -1,33 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dLKyg-0008Kx-8D
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 22:57:47 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dLLB8-0002Vz-7m
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 23:10:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dLKyb-0004E9-C9
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 22:57:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49640)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dLKyb-0004Cp-2Q
-	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 22:57:41 -0400
-Date: Thu, 15 Jun 2017 10:57:27 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170615025727.GC30118@pxdev.xzpeter.org>
-References: <20170608061150.GA3628@pxdev.xzpeter.org>
-	<20170608215918-mutt-send-email-mst@kernel.org>
-	<20170609015847.GG3628@pxdev.xzpeter.org>
-	<20170611130710-mutt-send-email-mst@kernel.org>
-	<20170611121015.GA18542@umbus>
-	<20170612023443.GA25059@pxdev.xzpeter.org>
-	<20170612060450-mutt-send-email-mst@kernel.org>
-	<20170612040458.GB25059@pxdev.xzpeter.org>
-	<20170614213418-mutt-send-email-mst@kernel.org>
-	<20170615023111.GB30118@pxdev.xzpeter.org>
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dLLB5-0001Su-Tp
+	for qemu-devel@nongnu.org; Wed, 14 Jun 2017 23:10:38 -0400
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Date: Thu, 15 Jun 2017 11:08:01 +0800
+Message-ID: <20170615030801.6260-1-maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170615023111.GB30118@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH 2/3] exec: simplify
- address_space_get_iotlb_entry
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] util: remove the obsolete non-blocking connect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,189 +19,496 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, Maxime Coquelin <maxime.coquelin@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: Cao jin <caoj.fnst@cn.fujitsu.com>, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, berrange@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, qemu-block@nongnu.org, sheepdog@lists.wpkg.org
 
-On Thu, Jun 15, 2017 at 10:31:11AM +0800, Peter Xu wrote:
-> On Wed, Jun 14, 2017 at 09:34:52PM +0300, Michael S. Tsirkin wrote:
-> > On Mon, Jun 12, 2017 at 12:04:58PM +0800, Peter Xu wrote:
-> > > On Mon, Jun 12, 2017 at 06:07:04AM +0300, Michael S. Tsirkin wrote:
-> > > > On Mon, Jun 12, 2017 at 10:34:43AM +0800, Peter Xu wrote:
-> > > > > On Sun, Jun 11, 2017 at 08:10:15PM +0800, David Gibson wrote:
-> > > > > > On Sun, Jun 11, 2017 at 01:09:26PM +0300, Michael S. Tsirkin wrote:
-> > > > > > > On Fri, Jun 09, 2017 at 09:58:47AM +0800, Peter Xu wrote:
-> > > > > > > > > > The problem is that when I was fixing the problem that vhost had with
-> > > > > > > > > > PT (a764040, "exec: abstract address_space_do_translate()"), I did
-> > > > > > > > > > broke the IOTLB translation a bit (it was using page masks). IMHO we
-> > > > > > > > > > need to fix it first for correctness (patch 1/2).
-> > > > > > > > > > 
-> > > > > > > > > > For patch 3, if we can have Jason's patch to allow dynamic
-> > > > > > > > > > iommu_platform switching, that'll be the best, then I can rewrite
-> > > > > > > > > > patch 3 with the switching logic rather than caching anything. But
-> > > > > > > > > > IMHO that can be separated from patch 1/2 if you like.
-> > > > > > > > > > 
-> > > > > > > > > > Or do you have better suggestion on how should we fix it?
-> > > > > > > > > > 
-> > > > > > > > > > Thanks,
-> > > > > > > > > 
-> > > > > > > > > Can we drop masks completely and replace with length? I think we
-> > > > > > > > > should do that instead of trying to fix masks.
-> > > > > > > > 
-> > > > > > > > Do you mean to modify IOMMUTLBEntry.addr_mask into length?
-> > > > > > > 
-> > > > > > > I think it's better than alternatives.
-> > > > > > > 
-> > > > > > > > Again, I am not sure this is good... At least we need to get ack from
-> > > > > > > > David since spapr should be the initial user of it, and possibly also
-> > > > > > > > Alex since vfio should be assuming that (IIUC both in QEMU and kernel)
-> > > > > > > > addr_mask is page masks rather than arbirary length.
-> > > > > > > > 
-> > > > > > > > (CC Alex)
-> > > > > > > > 
-> > > > > > > > Thanks,
-> > > > > > > 
-> > > > > > > Callbacks that need powers of two can easily split up the range.
-> > > > > > 
-> > > > > > I think I missed part of the thread.  What's the original use case for
-> > > > > > non-power-of-two IOTLB entries?  It certainly won't happen on Power.
-> > > > > 
-> > > > > Currently address_space_get_iotlb_entry() didn't really follow the
-> > > > > rule, addr_mask can be arbitary length. This series tried to fix it,
-> > > > > while Michael was questioning about whether we should really fix that
-> > > > > at all.
-> > > > > 
-> > > > > Michael,
-> > > > > 
-> > > > > Even if for performance's sake, I should still think we should fix it.
-> > > > > Let's consider a most simple worst case: we have a single page mapped
-> > > > > with IOVA range (2M page):
-> > > > > 
-> > > > >  [0x0, 0x200000)
-> > > > > 
-> > > > > And if guest access IOVA using the following patern:
-> > > > > 
-> > > > >  0x1fffff, 0x1ffffe, 0x1ffffd, ...
-> > > > > 
-> > > > > Then now we'll get this:
-> > > > > 
-> > > > > - request 0x1fffff, cache miss, will get iotlb [0x1fffff, 0x200000)
-> > > > > - request 0x1ffffe, cache miss, will get iotlb [0x1ffffe, 0x200000)
-> > > > > - request 0x1ffffd, cache miss, will get iotlb [0x1ffffd, 0x200000)
-> > > > > - ...
-> > > > 
-> > > > We pass an offset too, do we not? So callee can figure out
-> > > > the region starts at 0x0 and avoid 2nd and 3rd misses.
-> > > 
-> > > Here when you say "offset", do you mean the offset in
-> > > MemoryRegionSection?
-> > > 
-> > > In address_space_get_iotlb_entry() we have this:
-> > > 
-> > >     section = address_space_do_translate(as, addr, &xlat, &plen,
-> > >                                          is_write, false);
-> > > 
-> > > One thing to mention is that, imho we cannot really assume the xlat is
-> > > valid on the whole "section" range - the section can be a huge GPA
-> > > range, while the xlat may only be valid on a single 4K page. The only
-> > > safe region we can use here is (xlat, xlat+plen). Outside that, we
-> > > should know nothing valid.
-> 
-> [1]
-> 
-> > > 
-> > > Please correct me if I didn't really catch the point..
-> > 
-> > IIUC section is the translation result. If so all of it is valid,
-> > not just one page.
-> 
-> It should be only one page (I think that depends on how we implemented
-> the translation logic). Please check this (gdb session on current
-> master):
-> 
-> (gdb) b address_space_get_iotlb_entry 
-> Breakpoint 2 at 0x55555576803a: file /root/git/qemu/exec.c, line 512.
-> ... (until break)
-> (gdb) bt
-> #0  0x000055555576803a in address_space_get_iotlb_entry (as=0x55555841bbb0, addr=4294959104, is_write=false) at /root/git/qemu/exec.c:512
-> #1  0x00005555558322dd in vhost_device_iotlb_miss (dev=0x5555568b03a0, iova=4294959104, write=0) at /root/git/qemu/hw/virtio/vhost.c:982
-> #2  0x0000555555834ad9 in vhost_backend_handle_iotlb_msg (dev=0x5555568b03a0, imsg=0x7fffffffd428) at /root/git/qemu/hw/virtio/vhost-backend.c:334
-> #3  0x00005555558347be in vhost_kernel_iotlb_read (opaque=0x5555568b03a0) at /root/git/qemu/hw/virtio/vhost-backend.c:204
-> #4  0x0000555555c7e7c3 in aio_dispatch_handlers (ctx=0x5555568091b0) at /root/git/qemu/util/aio-posix.c:399
-> #5  0x0000555555c7e956 in aio_dispatch (ctx=0x5555568091b0) at /root/git/qemu/util/aio-posix.c:430
-> #6  0x0000555555c7a722 in aio_ctx_dispatch (source=0x5555568091b0, callback=0x0, user_data=0x0) at /root/git/qemu/util/async.c:261
-> #7  0x00007f98c62f3703 in g_main_context_dispatch () at /lib64/libglib-2.0.so.0
-> #8  0x0000555555c7d36c in glib_pollfds_poll () at /root/git/qemu/util/main-loop.c:213
-> #9  0x0000555555c7d468 in os_host_main_loop_wait (timeout=29311167) at /root/git/qemu/util/main-loop.c:261
-> #10 0x0000555555c7d521 in main_loop_wait (nonblocking=0) at /root/git/qemu/util/main-loop.c:517
-> #11 0x00005555558fe234 in main_loop () at /root/git/qemu/vl.c:1918
-> #12 0x0000555555905fe8 in main (argc=21, argv=0x7fffffffda48, envp=0x7fffffffdaf8) at /root/git/qemu/vl.c:4752
-> (gdb) s
-> 517         plen = (hwaddr)-1;
-> (gdb)
-> 520         section = address_space_do_translate(as, addr, &xlat, &plen,
-> (gdb) n
-> 524         if (section.mr == &io_mem_unassigned) {
-> (gdb) p/x xlat
-> $2 = 0x73900000
-> (gdb) p/x addr
-> $3 = 0xffffe000
-> (gdb) p/x plen
-> $4 = 0x1000
-> (gdb) p section
-> $5 = {mr = 0x5555569ad790, address_space = 0x5555562f9b40 <address_space_memory>, offset_within_region = 1048576, size = 0x0000000000000000000000007ff00000, 
->   offset_within_address_space = 1048576, readonly = false}
-> 
-> Here $2-$4 shows that we are translating IOVA 0xffffe000 into
-> [0x73900000, 0x73901000) range, while we can see the section is having
-> size as 0x7ff00000,
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
 
-> which is ranged from [0x100000000, 0x17ff00000).
-> That's the upper RAM that the guest has, corresponds to what we can
-> see in "info mtree -f" (the guest contains 4G RAM, this is upper 2G):
-> 
->   0000000100000000-000000017fffffff (prio 0, ram): pc.ram @0000000080000000
+The non-blocking connect mechanism is obsolete, and it doesn't
+work well in inet connection, because it will call getaddrinfo
+first and getaddrinfo will blocks on DNS lookups. Since commit
+e65c67e4 & d984464e, the non-blocking connect of migration goes
+through QIOChannel in a different manner(using a thread), and
+nobody use this old non-blocking connect anymore.
 
-Hmm I made a mistake here... It should be the lower 2G mem (not
-upper), which ranges from:
+Any newly written code which needs a non-blocking connect should
+use the QIOChannel code, so we can drop NonBlockingConnectHandler
+as a concept entirely.
 
-  0000000000100000-000000007fffffff (prio 0, ram): pc.ram @0000000000100000
+Cc: mitake.hitoshi@lab.ntt.co.jp
+Cc: namei.unix@gmail.com
+Cc: jcody@redhat.com
+Cc: kwolf@redhat.com
+Cc: mreitz@redhat.com
+Cc: berrange@redhat.com
+Cc: kraxel@redhat.com
+Cc: pbonzini@redhat.com
+Cc: qemu-block@nongnu.org
+Cc: sheepdog@lists.wpkg.org
+Suggested-by: Daniel P. Berrange <berrange@redhat.com>
+Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+---
+This patch was reviewed by Daniel about a years ago, but it has never
+been merged just since socket_connect() called by net_socket_connect_init()
+where NonBlockingConnectHandler was passed to socket_connect(). it's broken.
 
-Though the main point still stands below...
+Now this problem was worked around by Daniel's patch(commit 6701e551 'Revert
+"Change net/socket.c to use socket_*() functions" again'). Therefore, resend
+it, of course, part of related code has changed over the years, so changed
+the patch accordingly.
 
-> 
-> Obvious, we cannot assume we have a linear mapping on this whole
-> range. So I don't think we can really use section info (though the
-> section can be used to obtain some offset information, or address
-> space the range belongs) to build up the IOTLB, but only the plen.
-> Then, we need to fix current codes.
-> 
-> And this is exactly what I meant above at [1].  Hope this clarifies a
-> bit on the issue.  Thanks,
-> 
-> > 
-> > > > 
-> > > > 
-> > > > > We'll all cache miss along the way until we access 0x0. While if we
-> > > > > are with page mask, we'll get:
-> > > > > 
-> > > > > - request 0x1fffff, cache miss, will get iotlb [0x0, 0x200000)
-> > > > > - request 0x1ffffe, cache hit
-> > > > > - request 0x1ffffd, cache hit
-> > > > > - ...
-> > > > > 
-> > > > > We'll only miss at the first IO.
-> > > > 
-> > > > I think we should send as much info as we can.
-> > > > There should be a way to find full region start and length.
-> > > 
-> > > Thanks,
-> > > 
-> > > -- 
-> > > Peter Xu
-> 
-> -- 
-> Peter Xu
-> 
+The reviewed patch listed on:
+https://lists.gnu.org/archive/html/qemu-devel/2016-07/msg06373.html
 
+ block/sheepdog.c       |   2 +-
+ include/qemu/sockets.h |   9 +--
+ io/channel-socket.c    |   2 +-
+ util/qemu-sockets.c    | 198 ++++++-------------------------------------------
+ 4 files changed, 26 insertions(+), 185 deletions(-)
+
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index a18315a..97e6c96 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -589,7 +589,7 @@ static int connect_to_sdog(BDRVSheepdogState *s, Error **errp)
+ {
+     int fd;
+ 
+-    fd = socket_connect(s->addr, NULL, NULL, errp);
++    fd = socket_connect(s->addr, errp);
+ 
+     if (s->addr->type == SOCKET_ADDRESS_TYPE_INET && fd >= 0) {
+         int ret = socket_set_nodelay(fd);
+diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
+index 5c326db..b2f0478 100644
+--- a/include/qemu/sockets.h
++++ b/include/qemu/sockets.h
+@@ -27,17 +27,11 @@ int socket_set_fast_reuse(int fd);
+ #define SHUT_RDWR 2
+ #endif
+ 
+-/* callback function for nonblocking connect
+- * valid fd on success, negative error code on failure
+- */
+-typedef void NonBlockingConnectHandler(int fd, Error *err, void *opaque);
+-
+ int inet_ai_family_from_address(InetSocketAddress *addr,
+                                 Error **errp);
+ int inet_parse(InetSocketAddress *addr, const char *str, Error **errp);
+ int inet_connect(const char *str, Error **errp);
+ int inet_connect_saddr(InetSocketAddress *saddr,
+-                       NonBlockingConnectHandler *callback, void *opaque,
+                        Error **errp);
+ 
+ NetworkAddressFamily inet_netfamily(int family);
+@@ -46,8 +40,7 @@ int unix_listen(const char *path, char *ostr, int olen, Error **errp);
+ int unix_connect(const char *path, Error **errp);
+ 
+ SocketAddress *socket_parse(const char *str, Error **errp);
+-int socket_connect(SocketAddress *addr, NonBlockingConnectHandler *callback,
+-                   void *opaque, Error **errp);
++int socket_connect(SocketAddress *addr, Error **errp);
+ int socket_listen(SocketAddress *addr, Error **errp);
+ void socket_listen_cleanup(int fd, Error **errp);
+ int socket_dgram(SocketAddress *remote, SocketAddress *local, Error **errp);
+diff --git a/io/channel-socket.c b/io/channel-socket.c
+index 53386b7..05ea120 100644
+--- a/io/channel-socket.c
++++ b/io/channel-socket.c
+@@ -140,7 +140,7 @@ int qio_channel_socket_connect_sync(QIOChannelSocket *ioc,
+     int fd;
+ 
+     trace_qio_channel_socket_connect_sync(ioc, addr);
+-    fd = socket_connect(addr, NULL, NULL, errp);
++    fd = socket_connect(addr, errp);
+     if (fd < 0) {
+         trace_qio_channel_socket_connect_fail(ioc);
+         return -1;
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index 82290cb..e086497 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -263,88 +263,21 @@ listen:
+     ((rc) == -EINPROGRESS)
+ #endif
+ 
+-/* Struct to store connect state for non blocking connect */
+-typedef struct ConnectState {
+-    int fd;
+-    struct addrinfo *addr_list;
+-    struct addrinfo *current_addr;
+-    NonBlockingConnectHandler *callback;
+-    void *opaque;
+-} ConnectState;
+-
+-static int inet_connect_addr(struct addrinfo *addr, bool *in_progress,
+-                             ConnectState *connect_state, Error **errp);
+-
+-static void wait_for_connect(void *opaque)
+-{
+-    ConnectState *s = opaque;
+-    int val = 0, rc = 0;
+-    socklen_t valsize = sizeof(val);
+-    bool in_progress;
+-    Error *err = NULL;
+-
+-    qemu_set_fd_handler(s->fd, NULL, NULL, NULL);
+-
+-    do {
+-        rc = qemu_getsockopt(s->fd, SOL_SOCKET, SO_ERROR, &val, &valsize);
+-    } while (rc == -1 && errno == EINTR);
+-
+-    /* update rc to contain error */
+-    if (!rc && val) {
+-        rc = -1;
+-        errno = val;
+-    }
+-
+-    /* connect error */
+-    if (rc < 0) {
+-        error_setg_errno(&err, errno, "Error connecting to socket");
+-        closesocket(s->fd);
+-        s->fd = rc;
+-    }
+-
+-    /* try to connect to the next address on the list */
+-    if (s->current_addr) {
+-        while (s->current_addr->ai_next != NULL && s->fd < 0) {
+-            s->current_addr = s->current_addr->ai_next;
+-            s->fd = inet_connect_addr(s->current_addr, &in_progress, s, NULL);
+-            if (s->fd < 0) {
+-                error_free(err);
+-                err = NULL;
+-                error_setg_errno(&err, errno, "Unable to start socket connect");
+-            }
+-            /* connect in progress */
+-            if (in_progress) {
+-                goto out;
+-            }
+-        }
+-
+-        freeaddrinfo(s->addr_list);
+-    }
+-
+-    if (s->callback) {
+-        s->callback(s->fd, err, s->opaque);
+-    }
+-    g_free(s);
+-out:
+-    error_free(err);
+-}
++static int inet_connect_addr(struct addrinfo *addr,
++                             Error **errp);
+ 
+-static int inet_connect_addr(struct addrinfo *addr, bool *in_progress,
+-                             ConnectState *connect_state, Error **errp)
++static int inet_connect_addr(struct addrinfo *addr,
++                             Error **errp)
+ {
+     int sock, rc;
+ 
+-    *in_progress = false;
+-
+     sock = qemu_socket(addr->ai_family, addr->ai_socktype, addr->ai_protocol);
+     if (sock < 0) {
+         error_setg_errno(errp, errno, "Failed to create socket");
+         return -1;
+     }
+     socket_set_fast_reuse(sock);
+-    if (connect_state != NULL) {
+-        qemu_set_nonblock(sock);
+-    }
++
+     /* connect to peer */
+     do {
+         rc = 0;
+@@ -353,15 +286,12 @@ static int inet_connect_addr(struct addrinfo *addr, bool *in_progress,
+         }
+     } while (rc == -EINTR);
+ 
+-    if (connect_state != NULL && QEMU_SOCKET_RC_INPROGRESS(rc)) {
+-        connect_state->fd = sock;
+-        qemu_set_fd_handler(sock, NULL, wait_for_connect, connect_state);
+-        *in_progress = true;
+-    } else if (rc < 0) {
++    if (rc < 0) {
+         error_setg_errno(errp, errno, "Failed to connect socket");
+         closesocket(sock);
+         return -1;
+     }
++
+     return sock;
+ }
+ 
+@@ -419,44 +349,24 @@ static struct addrinfo *inet_parse_connect_saddr(InetSocketAddress *saddr,
+  *
+  * @saddr: Inet socket address specification
+  * @errp: set on error
+- * @callback: callback function for non-blocking connect
+- * @opaque: opaque for callback function
+  *
+  * Returns: -1 on error, file descriptor on success.
+- *
+- * If @callback is non-null, the connect is non-blocking.  If this
+- * function succeeds, callback will be called when the connection
+- * completes, with the file descriptor on success, or -1 on error.
+  */
+-int inet_connect_saddr(InetSocketAddress *saddr,
+-                       NonBlockingConnectHandler *callback, void *opaque,
+-                       Error **errp)
++int inet_connect_saddr(InetSocketAddress *saddr, Error **errp)
+ {
+     Error *local_err = NULL;
+     struct addrinfo *res, *e;
+     int sock = -1;
+-    bool in_progress;
+-    ConnectState *connect_state = NULL;
+ 
+     res = inet_parse_connect_saddr(saddr, errp);
+     if (!res) {
+         return -1;
+     }
+ 
+-    if (callback != NULL) {
+-        connect_state = g_malloc0(sizeof(*connect_state));
+-        connect_state->addr_list = res;
+-        connect_state->callback = callback;
+-        connect_state->opaque = opaque;
+-    }
+-
+     for (e = res; e != NULL; e = e->ai_next) {
+         error_free(local_err);
+         local_err = NULL;
+-        if (connect_state != NULL) {
+-            connect_state->current_addr = e;
+-        }
+-        sock = inet_connect_addr(e, &in_progress, connect_state, &local_err);
++        sock = inet_connect_addr(e, &local_err);
+         if (sock >= 0) {
+             break;
+         }
+@@ -464,15 +374,8 @@ int inet_connect_saddr(InetSocketAddress *saddr,
+ 
+     if (sock < 0) {
+         error_propagate(errp, local_err);
+-    } else if (in_progress) {
+-        /* wait_for_connect() will do the rest */
+-        return sock;
+-    } else {
+-        if (callback) {
+-            callback(sock, NULL, opaque);
+-        }
+     }
+-    g_free(connect_state);
++
+     freeaddrinfo(res);
+     return sock;
+ }
+@@ -655,7 +558,7 @@ int inet_connect(const char *str, Error **errp)
+     InetSocketAddress *addr = g_new(InetSocketAddress, 1);
+ 
+     if (!inet_parse(addr, str, errp)) {
+-        sock = inet_connect_saddr(addr, NULL, NULL, errp);
++        sock = inet_connect_saddr(addr, errp);
+     }
+     qapi_free_InetSocketAddress(addr);
+     return sock;
+@@ -688,21 +591,17 @@ static bool vsock_parse_vaddr_to_sockaddr(const VsockSocketAddress *vaddr,
+     return true;
+ }
+ 
+-static int vsock_connect_addr(const struct sockaddr_vm *svm, bool *in_progress,
+-                              ConnectState *connect_state, Error **errp)
++static int vsock_connect_addr(const struct sockaddr_vm *svm,
++                              Error **errp)
+ {
+     int sock, rc;
+ 
+-    *in_progress = false;
+-
+     sock = qemu_socket(AF_VSOCK, SOCK_STREAM, 0);
+     if (sock < 0) {
+         error_setg_errno(errp, errno, "Failed to create socket");
+         return -1;
+     }
+-    if (connect_state != NULL) {
+-        qemu_set_nonblock(sock);
+-    }
++
+     /* connect to peer */
+     do {
+         rc = 0;
+@@ -711,50 +610,27 @@ static int vsock_connect_addr(const struct sockaddr_vm *svm, bool *in_progress,
+         }
+     } while (rc == -EINTR);
+ 
+-    if (connect_state != NULL && QEMU_SOCKET_RC_INPROGRESS(rc)) {
+-        connect_state->fd = sock;
+-        qemu_set_fd_handler(sock, NULL, wait_for_connect, connect_state);
+-        *in_progress = true;
+-    } else if (rc < 0) {
++    if (rc < 0) {
+         error_setg_errno(errp, errno, "Failed to connect socket");
+         closesocket(sock);
+         return -1;
+     }
++
+     return sock;
+ }
+ 
+ static int vsock_connect_saddr(VsockSocketAddress *vaddr,
+-                               NonBlockingConnectHandler *callback,
+-                               void *opaque,
+                                Error **errp)
+ {
+     struct sockaddr_vm svm;
+     int sock = -1;
+-    bool in_progress;
+-    ConnectState *connect_state = NULL;
+ 
+     if (!vsock_parse_vaddr_to_sockaddr(vaddr, &svm, errp)) {
+         return -1;
+     }
+ 
+-    if (callback != NULL) {
+-        connect_state = g_malloc0(sizeof(*connect_state));
+-        connect_state->callback = callback;
+-        connect_state->opaque = opaque;
+-    }
++    sock = vsock_connect_addr(&svm, errp);
+ 
+-    sock = vsock_connect_addr(&svm, &in_progress, connect_state, errp);
+-    if (sock < 0) {
+-        /* do nothing */
+-    } else if (in_progress) {
+-        /* wait_for_connect() will do the rest */
+-        return sock;
+-    } else {
+-        if (callback) {
+-            callback(sock, NULL, opaque);
+-        }
+-    }
+-    g_free(connect_state);
+     return sock;
+ }
+ 
+@@ -815,8 +691,7 @@ static void vsock_unsupported(Error **errp)
+ }
+ 
+ static int vsock_connect_saddr(VsockSocketAddress *vaddr,
+-                               NonBlockingConnectHandler *callback,
+-                               void *opaque, Error **errp)
++                               Error **errp)
+ {
+     vsock_unsupported(errp);
+     return -1;
+@@ -920,11 +795,9 @@ err:
+ }
+ 
+ static int unix_connect_saddr(UnixSocketAddress *saddr,
+-                              NonBlockingConnectHandler *callback, void *opaque,
+                               Error **errp)
+ {
+     struct sockaddr_un un;
+-    ConnectState *connect_state = NULL;
+     int sock, rc;
+ 
+     if (saddr->path == NULL) {
+@@ -937,12 +810,6 @@ static int unix_connect_saddr(UnixSocketAddress *saddr,
+         error_setg_errno(errp, errno, "Failed to create socket");
+         return -1;
+     }
+-    if (callback != NULL) {
+-        connect_state = g_malloc0(sizeof(*connect_state));
+-        connect_state->callback = callback;
+-        connect_state->opaque = opaque;
+-        qemu_set_nonblock(sock);
+-    }
+ 
+     if (strlen(saddr->path) > sizeof(un.sun_path)) {
+         error_setg(errp, "UNIX socket path '%s' is too long", saddr->path);
+@@ -963,29 +830,16 @@ static int unix_connect_saddr(UnixSocketAddress *saddr,
+         }
+     } while (rc == -EINTR);
+ 
+-    if (connect_state != NULL && QEMU_SOCKET_RC_INPROGRESS(rc)) {
+-        connect_state->fd = sock;
+-        qemu_set_fd_handler(sock, NULL, wait_for_connect, connect_state);
+-        return sock;
+-    } else if (rc >= 0) {
+-        /* non blocking socket immediate success, call callback */
+-        if (callback != NULL) {
+-            callback(sock, NULL, opaque);
+-        }
+-    }
+-
+     if (rc < 0) {
+         error_setg_errno(errp, -rc, "Failed to connect socket %s",
+                          saddr->path);
+         goto err;
+     }
+ 
+-    g_free(connect_state);
+     return sock;
+ 
+  err:
+     close(sock);
+-    g_free(connect_state);
+     return -1;
+ }
+ 
+@@ -1001,7 +855,6 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
+ }
+ 
+ static int unix_connect_saddr(UnixSocketAddress *saddr,
+-                              NonBlockingConnectHandler *callback, void *opaque,
+                               Error **errp)
+ {
+     error_setg(errp, "unix sockets are not available on windows");
+@@ -1048,7 +901,7 @@ int unix_connect(const char *path, Error **errp)
+ 
+     saddr = g_new0(UnixSocketAddress, 1);
+     saddr->path = g_strdup(path);
+-    sock = unix_connect_saddr(saddr, NULL, NULL, errp);
++    sock = unix_connect_saddr(saddr, errp);
+     qapi_free_UnixSocketAddress(saddr);
+     return sock;
+ }
+@@ -1093,30 +946,25 @@ fail:
+     return NULL;
+ }
+ 
+-int socket_connect(SocketAddress *addr, NonBlockingConnectHandler *callback,
+-                   void *opaque, Error **errp)
++int socket_connect(SocketAddress *addr, Error **errp)
+ {
+     int fd;
+ 
+     switch (addr->type) {
+     case SOCKET_ADDRESS_TYPE_INET:
+-        fd = inet_connect_saddr(&addr->u.inet, callback, opaque, errp);
++        fd = inet_connect_saddr(&addr->u.inet, errp);
+         break;
+ 
+     case SOCKET_ADDRESS_TYPE_UNIX:
+-        fd = unix_connect_saddr(&addr->u.q_unix, callback, opaque, errp);
++        fd = unix_connect_saddr(&addr->u.q_unix, errp);
+         break;
+ 
+     case SOCKET_ADDRESS_TYPE_FD:
+         fd = monitor_get_fd(cur_mon, addr->u.fd.str, errp);
+-        if (fd >= 0 && callback) {
+-            qemu_set_nonblock(fd);
+-            callback(fd, NULL, opaque);
+-        }
+         break;
+ 
+     case SOCKET_ADDRESS_TYPE_VSOCK:
+-        fd = vsock_connect_saddr(&addr->u.vsock, callback, opaque, errp);
++        fd = vsock_connect_saddr(&addr->u.vsock, errp);
+         break;
+ 
+     default:
 -- 
-Peter Xu
+2.9.3
