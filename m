@@ -1,36 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33263)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dLhri-0002UV-Dl
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 23:24:07 -0400
+	(envelope-from <mst@redhat.com>) id 1dLhth-0003CA-TS
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 23:26:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dLhrf-0000Lm-AP
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 23:24:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38116)
+	(envelope-from <mst@redhat.com>) id 1dLhte-0002Z3-M4
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 23:26:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34804)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dLhrf-0000L0-4Z
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 23:24:03 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 22F33C0587CF
-	for <qemu-devel@nongnu.org>; Fri, 16 Jun 2017 03:24:02 +0000 (UTC)
-Date: Fri, 16 Jun 2017 06:23:59 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dLhte-0002Yl-CT
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 23:26:06 -0400
+Date: Fri, 16 Jun 2017 06:26:01 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170616062332-mutt-send-email-mst@kernel.org>
-References: <20170608161013.17920-1-lersek@redhat.com>
-	<20170608204026-mutt-send-email-mst@kernel.org>
-	<1496951333.29761.5.camel@redhat.com>
-	<20170608224942-mutt-send-email-mst@kernel.org>
-	<7a7647cd-3d7a-0b6f-0691-d656c9026f44@redhat.com>
-	<1497038478.10080.1.camel@redhat.com>
-	<20170614211927-mutt-send-email-mst@kernel.org>
-	<1497510465.5952.1.camel@redhat.com>
+Message-ID: <20170616062512-mutt-send-email-mst@kernel.org>
+References: <20170615163813.7255-1-stefanha@redhat.com>
+	<20170615163813.7255-2-stefanha@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1497510465.5952.1.camel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] q35/mch: implement extended TSEG sizes
+In-Reply-To: <20170615163813.7255-2-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/5] virtio-pci: use ioeventfd even when
+ KVM is disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,45 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, qemu devel list <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Pavel Butsykin <pbutsykin@virtuozzo.com>
 
-On Thu, Jun 15, 2017 at 09:07:45AM +0200, Gerd Hoffmann wrote:
->   Hi,
+On Thu, Jun 15, 2017 at 05:38:09PM +0100, Stefan Hajnoczi wrote:
+> Old kvm.ko versions only supported a tiny number of ioeventfds so
+> virtio-pci avoids ioeventfds when kvm_has_many_ioeventfds() returns 0.
 > 
-> > To be specific, what I meant is a bit that tells guest that a
-> > config space register is available, and lets host find out
-> > that guest is going to use it.
-> > 
-> > This to ensure full forward and backward compatibility.
-> > 
-> > I agree a fw cfg file for a single bit seems like an overkill, that's
-> > why I thought sharing feature files with SMI would be a good idea.
-> > 
-> > Do you see an issue with that?
+> Do not check kvm_has_many_ioeventfds() when KVM is disabled since it
+> always returns 0.  Since commit 8c56c1a592b5092d91da8d8943c17777d6462a6f
+> ("memory: emulate ioeventfd") it has been possible to use ioeventfds in
+> qtest or TCG mode.
 > 
-> The point of placing the extended-tseg-size register in mch pci config
-> is that the firmware can figure this easily *without* looking somewhere
-> else, as all the other tseg (and smram) config bits are in mch pci
-> config space too.
+> This patch makes -device virtio-blk-pci,iothread=iothread0 work even
+> when KVM is disabled.
 > 
-> When involving fw_cfg there is no reason to keep the extended-tseg-size 
-> register in mch.  We can simply place a "etc/q35-extended-tseg-size"
-> file in fw_cfg then (which is either not present or contains the
-> extended tseg size).  So a feature bit in fw_cfg looks absolutely
-> pointless to me.
+> I have tested that virtio-blk-pci works under TCG both with and without
+> iothread.
 > 
-> I still think the approach and patch by Laszlo is perfectly fine. 
-> While being at it:
-> 
-> Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
-> 
-> cheers,
->   Gerd
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
+Don't we need to check we are on a host that supports eventfd?
 
-I guess I'll merge it and we'll see if there's any fallout.
-Thanks everyone.
-
--- 
-MST
+> ---
+>  hw/virtio/virtio-pci.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> index f9b7244..9f55476 100644
+> --- a/hw/virtio/virtio-pci.c
+> +++ b/hw/virtio/virtio-pci.c
+> @@ -1740,7 +1740,7 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
+>      bool pcie_port = pci_bus_is_express(pci_dev->bus) &&
+>                       !pci_bus_is_root(pci_dev->bus);
+>  
+> -    if (!kvm_has_many_ioeventfds()) {
+> +    if (kvm_enabled() && !kvm_has_many_ioeventfds()) {
+>          proxy->flags &= ~VIRTIO_PCI_FLAG_USE_IOEVENTFD;
+>      }
+>  
+> -- 
+> 2.9.4
