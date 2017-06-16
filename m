@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dLoFM-0005rt-3U
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 06:12:57 -0400
+	(envelope-from <berrange@redhat.com>) id 1dLoFN-0005s4-5s
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 06:12:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dLoFI-0002XZ-Tv
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 06:12:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43140)
+	(envelope-from <berrange@redhat.com>) id 1dLoFL-0002dv-UM
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 06:12:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59393)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dLoFI-0002VA-L4
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 06:12:52 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dLoFL-0002br-LB
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 06:12:55 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Fri, 16 Jun 2017 11:12:41 +0100
-Message-Id: <20170616101246.1550-1-berrange@redhat.com>
+Date: Fri, 16 Jun 2017 11:12:42 +0100
+Message-Id: <20170616101246.1550-2-berrange@redhat.com>
+In-Reply-To: <20170616101246.1550-1-berrange@redhat.com>
+References: <20170616101246.1550-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 0/5] Fix handling of IPv4/IPv6 dual stack
+Subject: [Qemu-devel] [PATCH v4 1/5] sockets: ensure we can bind to both
+ ipv4 & ipv6 separately
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,76 +30,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-This is a followup to:
+When binding to an IPv6 socket we currently force the
+IPV6_V6ONLY flag to off. This means that the IPv6 socket
+will accept both IPv4 & IPv6 sockets when QEMU is launched
+with something like
 
-  v1: https://lists.nongnu.org/archive/html/qemu-devel/2017-04/msg05659.h=
-tml
-  v2: https://lists.nongnu.org/archive/html/qemu-devel/2017-05/msg04706.h=
-tml
-  v3: https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg00027.html
+  -vnc :::1
 
-This was posted as a pull request here:
+While this is good for that case, it is bad for other
+cases. For example if an empty hostname is given,
+getaddrinfo resolves it to 2 addresses 0.0.0.0 and ::,
+in that order. We will thus bind to 0.0.0.0 first, and
+then fail to bind to :: on the same port. The same
+problem can happen if any other hostname lookup causes
+the IPv4 address to be reported before the IPv6 address.
 
-  https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg01940.html
+When we get an IPv6 bind failure, we should re-try the
+same port, but with IPV6_V6ONLY turned on again, to
+avoid clash with any IPv4 listener.
 
-However, the fixes to patch 5 were non-trivial, so I need to get review
-on patch 5 before I send a second pull request.
+This ensures that
 
-This series aims to fix a lot of bugs related to handling of IPv4 / IPv6
-dual stack.
+  -vnc :1
 
- - The VNC server mistakenly listened on two separate ports 5900+5901
-   when the to=3D parameter was given
- - IPv6 sockets are accepting IPv4 clients even when IPv4 is set to
-   be disabled
- - IPv6 sockets are failing to accept IPv4 clients when IPv4 is not set
-   to be disabled
- - The VNC server was loosing the ipv4=3D/ipv6=3D settings due to a bug
-   in the DNS resolver
+will bind successfully to both 0.0.0.0 and ::, and also
+avoid
 
-The behaviour of all this is really subtle and hard to get working correc=
-tly
-across all the different network backends. Thus, the most important part =
-of
-this patch series is the last patch which adds a test case covering the
-backends for -vnc, -chardev tcp, -net socket, and -incoming socket, with
-a 120 entry matrix.
+  -vnc :1,to=3D2
 
-IOW, if you think any of the first 4 patches are applying the wrong logic=
-,
-then take a look at the last patch and indicate which test matrix entries
-are believed to be defining wrong behaviour :-)
+from mistakenly using a 2nd port for the :: listener.
 
-Changed in v4:
+Acked-by: Gerd Hoffmann <kraxel@gmail.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ util/qemu-sockets.c | 31 +++++++++++++++++++++++--------
+ 1 file changed, 23 insertions(+), 8 deletions(-)
 
- - Change test suite so that it copes with differing getaddrinfo()
-   ordering for IPv4 vs IPv6 results for hostname=3D=3DNULL
- - List test suite for all qtest arches, not only i386/ppc64
- - Use -machine none so test suite passes on aarch64 and other
-   arches with no default machine type.
-
-Changed in v3:
-
- - Clarified error message in commit message
- - Replace assert with exit (Eric)
- - Fix typo in test comment (Eric)
- - Fix wierd copyright line (Eric)
-
-Daniel P. Berrange (5):
-  sockets: ensure we can bind to both ipv4 & ipv6 separately
-  sockets: don't block IPv4 clients when listening on "::"
-  sockets: ensure we don't accept IPv4 clients when IPv4 is disabled
-  io: preserve ipv4/ipv6 flags when resolving InetSocketAddress
-  tests: add functional test validating ipv4/ipv6 address flag handling
-
- io/dns-resolver.c          |   6 +-
- tests/.gitignore           |   1 +
- tests/Makefile.include     |   3 +
- tests/test-sockets-proto.c | 921 +++++++++++++++++++++++++++++++++++++++=
-++++++
- util/qemu-sockets.c        |  71 +++-
- 5 files changed, 981 insertions(+), 21 deletions(-)
- create mode 100644 tests/test-sockets-proto.c
-
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index 82290cb..f00cc5b 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -208,22 +208,37 @@ static int inet_listen_saddr(InetSocketAddress *sad=
+dr,
+         }
+=20
+         socket_set_fast_reuse(slisten);
+-#ifdef IPV6_V6ONLY
+-        if (e->ai_family =3D=3D PF_INET6) {
+-            /* listen on both ipv4 and ipv6 */
+-            const int off =3D 0;
+-            qemu_setsockopt(slisten, IPPROTO_IPV6, IPV6_V6ONLY, &off,
+-                            sizeof(off));
+-        }
+-#endif
+=20
+         port_min =3D inet_getport(e);
+         port_max =3D saddr->has_to ? saddr->to + port_offset : port_min;
+         for (p =3D port_min; p <=3D port_max; p++) {
++#ifdef IPV6_V6ONLY
++            /* listen on both ipv4 and ipv6 */
++            int v6only =3D 0;
++#endif
+             inet_setport(e, p);
++#ifdef IPV6_V6ONLY
++        rebind:
++            if (e->ai_family =3D=3D PF_INET6) {
++                qemu_setsockopt(slisten, IPPROTO_IPV6, IPV6_V6ONLY, &v6o=
+nly,
++                                sizeof(v6only));
++            }
++#endif
+             if (bind(slisten, e->ai_addr, e->ai_addrlen) =3D=3D 0) {
+                 goto listen;
+             }
++
++#ifdef IPV6_V6ONLY
++            /* If we got EADDRINUSE from an IPv6 bind & V6ONLY is unset,
++             * it could be that the IPv4 port is already claimed, so ret=
+ry
++             * with V6ONLY set
++             */
++            if (e->ai_family =3D=3D PF_INET6 && errno =3D=3D EADDRINUSE =
+&& !v6only) {
++                v6only =3D 1;
++                goto rebind;
++            }
++#endif
++
+             if (p =3D=3D port_max) {
+                 if (!e->ai_next) {
+                     error_setg_errno(errp, errno, "Failed to bind socket=
+");
 --=20
 2.9.3
