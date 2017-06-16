@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dLsTp-0003OG-Du
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 10:44:11 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dLsTq-0003PH-JB
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 10:44:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dLsTn-00082K-IW
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 10:44:09 -0400
-Date: Fri, 16 Jun 2017 22:40:53 +0800
+	(envelope-from <dgibson@ozlabs.org>) id 1dLsTn-00082B-EX
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 10:44:10 -0400
+Date: Fri, 16 Jun 2017 22:28:59 +0800
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170616144053.GH30484@umbus>
-References: <20170530160445.12810-1-lvivier@redhat.com>
-	<20170531043557.GI12163@umbus.fritz.box>
-	<149695205346.23353.3484869110998357783@loki>
-	<20170609102733.0eb7293d@nial.brq.redhat.com>
-	<149739016562.5725.6958577924052221756@loki>
-	<20170614110001.7816209b@nial.brq.redhat.com>
-	<149748643237.3448.7122634958390452661@loki>
-	<20170616155312.623f859e@nial.brq.redhat.com>
+Message-ID: <20170616142859.GG30484@umbus>
+References: <149692935202.12119.3614006195497745877.stgit@bahia>
+	<20170609022813.GF26521@umbus.fritz.box>
+	<20170609113631.229dd346@bahia.ttt.fr.ibm.com>
+	<20170609102832.GL26521@umbus.fritz.box>
+	<20170609170913.2e6526c3@bahia.ttt.fr.ibm.com>
+	<20170611093842.GA13479@umbus>
+	<20170613094302.1cb4012c@bahia.ttt.fr.ibm.com>
+	<8760g01eae.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<87fuf0w6dp.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="8/pVXlBMPtxfSuJG"
+	protocol="application/pgp-signature"; boundary="ahP6B03r4gLOj5uD"
 Content-Disposition: inline
-In-Reply-To: <20170616155312.623f859e@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] spapr: manage hotplugged devices while the
- VM is not started
+In-Reply-To: <87fuf0w6dp.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH v4 0/6] spapr/xics: fix migration of older
+ machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,259 +32,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Cc: Greg Kurz <groug@kaod.org>, rth@twiddle.net, alex.bennee@linaro.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>
 
 
---8/pVXlBMPtxfSuJG
+--ahP6B03r4gLOj5uD
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 16, 2017 at 03:53:12PM +0200, Igor Mammedov wrote:
-> On Wed, 14 Jun 2017 19:27:12 -0500
-> Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+On Fri, Jun 16, 2017 at 04:23:38PM +0530, Nikunj A Dadhania wrote:
+> Nikunj A Dadhania <nikunj@linux.vnet.ibm.com> writes:
 >=20
-> > Quoting Igor Mammedov (2017-06-14 04:00:01)
-> > > On Tue, 13 Jun 2017 16:42:45 -0500
-> > > Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
-> > >  =20
-> > > > Quoting Igor Mammedov (2017-06-09 03:27:33) =20
-> [...]
+> > Greg Kurz <groug@kaod.org> writes:
+> >
+> >> On Sun, 11 Jun 2017 17:38:42 +0800
+> >> David Gibson <david@gibson.dropbear.id.au> wrote:
+> >>
+> >>> On Fri, Jun 09, 2017 at 05:09:13PM +0200, Greg Kurz wrote:
+> >>> > On Fri, 9 Jun 2017 20:28:32 +1000
+> >>> > David Gibson <david@gibson.dropbear.id.au> wrote:
+> >>> >  =20
+> >>> > > On Fri, Jun 09, 2017 at 11:36:31AM +0200, Greg Kurz wrote: =20
+> >>> > > > On Fri, 9 Jun 2017 12:28:13 +1000
+> >>> > > > David Gibson <david@gibson.dropbear.id.au> wrote:
+> >>> > > >    =20
+> >>> > 1) start guest
+> >>> >=20
+> >>> > qemu-system-ppc64 \
+> >>> >  -nodefaults -nographic -snapshot -no-shutdown -serial mon:stdio \
+> >>> >  -device virtio-net,netdev=3Dnetdev0,id=3Dnet0 \
+> >>> >  -netdev bridge,id=3Dnetdev0,br=3Dvirbr0,helper=3D/usr/libexec/qemu=
+-bridge-helper \
+> >>> >  -device virtio-blk,drive=3Ddrive0,id=3Dblk0 \
+> >>> >  -drive file=3D/home/greg/images/sle12-sp1-ppc64le.qcow2,id=3Ddrive=
+0,if=3Dnone \
+> >>> >  -machine type=3Dpseries,accel=3Dtcg -cpu POWER8
+> >
+> > Strangely, your command line does not have multiple threads. Need to see
+> > what is the side effect of enabling MTTCG by default here.
+> >
+> >>> >=20
+> >>> > 2) migrate
+> >>> >=20
+> >>> > 3) destination crashes (immediately or after very short delay) or
+> >>> > hangs =20
+> >>>=20
+> >>> Ok.  I'll bisect it when I can, but you might well get to it first.
+> >>>=20
+> >>>=20
+> >>
+> >> Heh, maybe you didn't see in my mail but I did bisect:
+> >>
+> >> f0b0685d6694a28c66018f438e822596243b1250 is the first bad commit
+> >> commit f0b0685d6694a28c66018f438e822596243b1250
+> >> Author: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+> >> Date:   Thu Apr 27 10:48:23 2017 +0530
+> >>
+> >>     tcg: enable MTTCG by default for PPC64 on x86
+> >
+> > Let me have a look at it.
 >=20
-> > > Currently I'd suggest to look into always migrate DRCs if cpu hotplug
-> > > is enabled even if dev->hotplugged is false (not nice but it might wo=
-rk).
-> > > Consider:
-> > >   SRC1: hotplug CPU1 =3D> CPU1.hotplugged =3D true
-> > >   DST1: -device CPU1 =3D> CPU1.hotplugged =3D false
-> > > so in current code relying on CPU1.hotplugged would not work as expec=
-ted,
-> > > it works by accident because libvirt uses device_add on target
-> > >   DST1: device_add CPU1 =3D> CPU1.hotplugged =3D true =20
-> >=20
-> > It's actually the reverse for us, DST1: -device CPU1 works, because
-> > default DRC state for CPU1.hotplugged =3D false matches the state a
-> > hotplugged CPU will be brought to after onlining at the source, so
-> > we don't send it over the wire in the first place once it reaches
-> > that post-hotplug/coldplug state. So things work as expected, even
-> > though technically the source has dev->hotplugged =3D=3D true, whereas
-> > the dest has dev->hotplugged =3D=3D false.
-> in your case it seems fragile to rely on -device setting hotplugged cpu
-> on target the way you want.
+> Interesting problem here, I see that when the migration is completed on
+> source and there is a crash on destination:
 >=20
-> it could be:
+> [   56.185314] Unable to handle kernel paging request for data at address=
+ 0x5deadbeef0000108
+> [   56.185401] Faulting instruction address: 0xc000000000277bc8
 >=20
-> SRC: hotplug CPU and start migration with DST: -device cpu[,hotplugged=3D=
-false]
->   *: machine is in hotplugging state and one would lose transitional stat=
-e if DRC is not migrated.
-> =20
-> > It's the DST1: device_add case that wasn't accounted for when the DRC
-> > migration patches were written, as those don't default to coldplug,
-> > so, because the source doesn't send it, it ends up being presented
-> > in pre-hotplug state because the dest doesn't know that the guest
-> > already onlined the resource and transitioned it to
-> > post-hotplug/coldplug state. Ironically, dev->hotplugged
-> > is true on both source and dest in this case, but it ends up being
-> > the broken one.
-> it looks like for hotplugged CPUs DRC state should be always migrated
-
-Yeah, I think in the first instance we should just unconditionally
-transfer DRC state for newer machine types (at least once I clean up
-what exactly the DRC state _is_).  For old machine types things are
-still likely to be broken, but it won't be a regression.
-
-If we can work out a way to fix things for older machine types, that's
-a bonus, but it looks like it's very difficult, maybe impossible.
-First priority should be sane semantics for the newer machine types.
-
-> > But your point stands, the fact that both situations are possible
-> > means we can't currently rely on dev->hotplugged without migrating
-> > it, infering it based on QEMU lifecycle, or forcing management to
-> > set it.
-> >=20
-> > But that raises a 2nd point. Our dilemma isn't that we can't
-> > rely on dev->hotplugged being synchronized (though if it
-> > was we could build something around that), our dilemma is
-> > that we make the following assumption in our code:
-> >=20
-> > "Devices present at start-time will be handled the same way,
-> > on source or dest, regardless of whether they were added via
-> > cmdline or via device_add prior to machine start / migration
-> > stream processing."
-> >=20
-> > And I think that's a sensible expectation, since in theory
-> > even the source could build up a machine via device_add
-> > prior to starting it, and the reasonable default there is
-> > dev->hotplugged =3D false rather than the opposite. That
-> > suggests a need to fix things outside of migration.
-> Agreed to a degree, i.e.
+>    0xc000000000277bb8 <+168>:	ld      r7,8(r4)
+>    0xc000000000277bbc <+172>:	ld      r6,0(r4)                  <=3D=3D=
+=3D=3D=3D=3D=3D=3D
+>    0xc000000000277bc0 <+176>:	ori     r8,r8,56302
+>    0xc000000000277bc4 <+180>:	rldicr  r8,r8,32,31
+>    0xc000000000277bc8 <+184>:	std     r7,8(r6)
 >=20
->   -device/device_add before machine has been started
-> without migration should follow coldplug path
+> r4 =3D 0xf0000000000107a0
+> r6 =3D 0x5deadbeef0000100
 >=20
-> it shouldn't cause problems for CPU/mem hotplug on x86
-> and maybe will work for PCI (it may change behavior of
-> ACPI based hotplug and bridges),
-> CCing Marcel to confirm.
-
-So for ppc the main problem with early plugged devices is a
-duplication of device tree info between that delivered by CAS, and
-that delivered through configure-connector.  I see two basic
-approaches to fixing this:
-
-1) At CAS, reset all DRCs before building the device tree to send to
-the guest.  That will essentially "convert" everything present at CAS
-time into coldplugged device.  There might still be a problem if there
-are existing hotplug events in the queue from before CAS.
-
-2) When building the device tree (at both CAS and reset) check the DRC
-state, and omit DT information for anything that's not in CONFIGURED
-state.  That should be correct, because the guest should call
-configure-connector for anything not yet in CONFIGURED state, at which
-point it will get the DT information.
-
-I'm not sure which approach is best yet.  I'm not 100% sure of (1) is
-correct in all cases, but it is a bit simpler than (2).
-
-> > So far, all QEMU's existing migration code has managed ok
-> > with the dest being starting with dev->hotplugged =3D=3D false
-> > via cmdline devices, even though maybe they were hotplugged
-> > on the source. To me, it makes more sense to maintain this
-> > behavior by fixing up this relatively new use-case of
-> > adding devices via device_add before start to match the
-> > same expectations we have around cmdline-specified devices.
-> >=20
-> > This would fix migration for spapr, leave it working for
-> > everyone else (since that's basically what we expect for
-> > everything except newer-style cpu hotplug), and also make
-> > the device-add-before-start be truly synonymous with
-> > cmdline-created devices (which is applicable even outside
-> > of migration).
-> Neither -device or device_add can't really bring DRC/CPU into
-> the state that devices might be at the moment when their state
-> is transferred to target.
+> Code at 0xc000000000277bbc <+172>, gave junk value in r6, that leads to
+> the guest crash. When I inspect the memory on source and destination in
+> qemu monitor, I get the following differences:
 >=20
-> i.e. any state that has been changed after -device/device_add
-> on SRC, should be in migration stream. I'd say even if state would
-> eventually go back default (coldplugged) when hotplug is completed.
-> So trying to avoid transmitting runtime state to optimize some bytes
-> on migration stream is just asking for trouble.
+> diff -u s.txt d.txt=20
+> --- s.txt	2017-06-16 10:34:39.657221125 +0530
+> +++ d.txt	2017-06-16 10:34:18.452238305 +0530
+> @@ -8,8 +8,8 @@
+>  f000000000010760: 0x20de0b00 0x000000f0 0x60040100 0x000000f0
+>  f000000000010770: 0x00000000 0x00000000 0x0004036d 0x000000c0
+>  f000000000010780: 0x6c000100 0xf8ff3f00 0x7817f977 0x000000c0
+> -f000000000010790: 0x15000000 0x00000000 0xffffffff 0x01000000
+> -f0000000000107a0: 0x3090a96d 0x000000c0 0x3090a96d 0x000000c0
+> +f000000000010790: 0x01000000 0x00000000 0xffffffff 0x01000000
+> +f0000000000107a0: 0x000100f0 0xeedbea5d 0x000200f0 0xeedbea5d
+>  f0000000000107b0: 0x00000000 0x00000000 0x00d0a96d 0x000000c0
+>  f0000000000107c0: 0x28000000 0xf8ff3f00 0x8852cc77 0x000000c0
+>  f0000000000107d0: 0x00000000 0x00000000 0xffffffff 0x01000000
+>=20
+> Source had a valid address at 0xf0000000000107a0, while garbage on the
+> destination.
+>=20
+> Some observations:
+>=20
+> * Source updates the memory location (probably atomic_cmpxchg), but the
+>   updated page didnt get transferred to the destination
+>  =20
+> * Getting rid of atomic_cmpxchg tcg ops in ldarx/stdcx, makes migration
+>   work fine. MTTCG running with 1 cpu.
+>=20
+> While I continue debugging, any hints would help.
 
-Yeah, I'm coming to the same conclusion.  Note that the reason for
-omitting state wasn't to save space in the migration stream, but to
-make the stream compatible with older versions which never transmit
-the state - at least in as many cases as possible.
+My first guess would be that some or all of the new TCG atomic
+primitives aren't updating the dirty page bitmap.
 
-> [...]
-> > >=20
-> > > May be we should
-> > >  1. make DeviceState:hotpluggable property write-able again
-> > >  2. transmit DeviceState:hotpluggable as part of migration stream
-> > >  3. add generic migration hook which will check if target and
-> > >     source value match, if value differs =3D> fail/abort migration.
-> > >  4. in case values mismatch mgmt will be forced to explicitly
-> > >     provide hotplugged property value on -device/device_add
-> > > That would enforce consistent DeviceState:hotpluggable value
-> > > on target and source.
-> > > We can enforce it only for new machine types so it won't break
-> > > old mgmt tools with old machine types but would force mgmt
-> > > for new machines to use hotplugged property on target
-> > > so QEMU could rely on its value for migration purposes.
-> > >  =20
-> >=20
-> > That would work, and generalizing this beyond spapr seems
-> > appropriate.
-> >=20
-> > It also has reasonable semantics, and it would work for us
-> > *provided that* we always send DRC state for hotplugged devices
-> > and not just DRCs in a transitional state:
-> >=20
-> > SRC1: device_add $cpu
-> >  -> dev->hotplugged =3D=3D true
-> >  -> device starts in pre-hotplug, ends up in post-hotplug state =20
-> >     after guest onlines it
-> > <migrate>
-> > DST1: device_add $cpu,hotplugged=3Dtrue
-> >  -> dev->hotplugged =3D=3D true
-> >  -> device starts in pre-hotplug state. guest sends updated state =20
-> >     to transition DRC to post-hotplug
-> >=20
-> > But what about stuff like mem/pci? Currently, migration works for
-> > cases like:
-> >=20
-> > SRC1: device_add virtio-net-pci
-> > DST1: qemu -device virtio-net-pci
-> >=20
-> > Even though DST1 has dev->hotplugged =3D=3D false, and SRC1 has the
-> > opposite. So for new machines, checking SRC1:dev->hotplugged =3D=3D
-> > DST1:dev->hotplugged would fail, even though the migration
-> > scenario is unchanged from before.
-> >=20
-> > So management would now have to do:
-> >=20
-> > SRC1: device_add virtio-net-pci
-> > DST1: qemu -device virtio-net-pci,hotplugged=3Dtrue
-> >=20
-> > But the code behavior is a bit different then, since we now get
-> > an ACPI hotplug event via the hotplug handler. Maybe the
-> > migration stream fixes that up for us, but I think we would need
-> > to audit this and similar cases to be sure.
-> >=20
-> > That's all fine if it's necessary, but I feel like this is
-> > the hard way to address what's actually a much more specific
-> > issue: that device_add before machine-start doesn't currently
-> > match the behavior for a device started via cmdline. i.e.
-> > dev->hotplugged in the former vs. !dev->hotplugged in the
-> > latter. I don't really see a good reason these 2 cases should
-> > be different, and we can bring them to parity by doing
-> > something like:
-> >=20
-> > 1. For device_adds after qdev_machine_creation_done(), but
-> >    before machine start, set a flag: reset_before_start.
-> > 2. At the start of processing migration stream, or unpausing
-> >    a -S guest (in the non-migration case), issue a system-wide
-> >    reset if reset_before_start is set.
-> > 3. reset handlers will already unset dev->hotplugged at that
-> >    point and re-execute all the hotplug hooks with
-> >    dev->hotplugged =3D=3D false. This should put everything in
-> >    a state that's identical to cmdline-created devices.
-> instead of flag for non migration case we could use
->  RUN_STATE_PRELAUNCH -> RUN_STATE_RUNNING
-> transition to reset all devices or
-> maybe do something like this:
-
-Hrm, does the general reset call happen now before or after this
-transition?  Resetting DRCs at CAS time should accomplish the same thing.
-
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 0ce45a2..cdeb8f8 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
->=20
-> @@ -1020,7 +1010,7 @@ static void device_initfn(Object *obj)
->      ObjectClass *class;
->      Property *prop;
-> =20
-> -    if (qdev_hotplug) {
-> +    if (runstate_check(RUN_STATE_RUNNING) || ...) {
->          dev->hotplugged =3D 1;
->          qdev_hot_added =3D true;
->      }
->=20
-> > 4. Only allow management to do device_add before it sends
-> >    the migration stream (if management doesn't already guard
-> >    against this then it's probably a bug anyway)
-> seems like Juan already took care of it.
->=20
-> > This allows management to treat device_add/cmdline as being
-> > completely synonymous for guests that haven't started yet,
-> > both for -incoming and -S in general, and it maintains
-> > the behavior that existing migration code expects of
-> > cmdline-specified devices.
->=20
->=20
+My second guess would be a race between the atomic TCG ops and the
+migration / dirty map handling which means we can lost a memory update
+and not transfer it to the destination.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -291,25 +155,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---8/pVXlBMPtxfSuJG
+--ahP6B03r4gLOj5uD
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZQ+3yAAoJEGw4ysog2bOSIdQP/3Rqr7w97xkWUHoD/hIeJE8A
-Tar9+WyOaAC+60Tp5jNX6lpsRascCG3Uz4qzh+bJB0DXZQsIrXOrgIWJxdGfS83B
-nHyYWXmlyXCqakyVkwJxF+BaL6RvGjqpftFFBr1kKJz6lU3J0vF8t24vrfVryjnL
-xs0y7Y4EpJ35bRBTzUT2h0TBwlnxBH0U4LlM31WJ4G3ztoQa+qd5LV+0Enx/BwIm
-3JWM1i/l8hF4+33vB/HaveRw3GTVByDMMQKhAiIzWthOhnR6hZYiq+rtX7hihJYB
-hKd2G9odM8j3KmBDOIdgw817sCXrDVvbZP6JeCOCv/mIw90n0rUnKyjqWDFLzMeM
-b2FfPT2EFCmVsrQtxCXlS8T9KA6gw2f6ZuhtjTd4w8H7ZK7sNzpchpRnzoF+M+Rt
-vVF/Jys7rO2t3UeA4Hy6+4ZoGLEJPiRxHFyZGkd8eb8HX+0SYh9d3C0kP7DAOvFf
-a1nXmCxILn6cXnu5xUCq3g5dTXFW1fxd4X8JCFF7Hr6hGC7MOpSx7/2swQMI62Qn
-mpXeIyfT4GMQWRxUzd9/n16dxststF5ifk7zwBS9FytKludsu28DSgrsHcrq4A0g
-4okl33sUl9erIoScH5J/KVcMuvhnaQFwyNNGvBSk7h62r8gdKMow4z2proBrmuWr
-eXYbSHUDOF4wBApVd/H7
-=tg8F
+iQIcBAEBCAAGBQJZQ+spAAoJEGw4ysog2bOS5h0P/3If52/P83yC2U5KH4EQmZIe
+K9jp1ngeOQ4Yf48VQGsTEJpGk8B8oIMEoXZjVraK8AF30IKJ9Hq4ot6sUVEiKPSC
+LGbBCzhnrucIGoAVLJ7OA5wD5K55VwAI9OG9VewgOda55orB1ddprgTxH+B2JB9Q
+5doc5lAyP/76RlKomWu7e6EC351ajUL3/TiBduWF+5GCSaSFG0CxZNEr7swY58q+
+Cdg4E9HhRSehUbmONpa8AeycPZnxNP/d/URAbcC+n/Ompn6rDzPL6kcp1Yltlpve
+zsGS3BT5LtGcZ8ol9d/SJY3gtSc6W8Le962l1LCt9ccst8OapsIVGUmWOeUTDuOC
+YP0+Z4xINLhFZfEHbXxUMPfou4NNSjhJDTFcChtRc4eo/6bf6P1X+ZVTqVerULCN
+sbSSCJPXZWgfJ8Pu2TZIGKitBGZC8EzNgeFhQ+I98x8/ZD/5KC1fVz+xz1MQeIy2
+ozQMLwPenRKHgRUTP+SwAWdDvQeU/4CDhmWZlBO/YENqUszZFqM1G+Q9tnleP3Aa
+H34Q1DKOe/CkdPnjFfhQUT4qoY0M+HNDD5zkqQFyya3DYM39UhLOlaaphtc0s+DX
+KQsjKSd3gjx+BYaodWedjz6U/6OvONVyCPVIiSOawlpXFakaOtchOU+OLoyvUIMg
+VkVg90w1y4ZSVJIeO6L8
+=0FR4
 -----END PGP SIGNATURE-----
 
---8/pVXlBMPtxfSuJG--
+--ahP6B03r4gLOj5uD--
