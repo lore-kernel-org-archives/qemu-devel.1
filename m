@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dLf17-0003wC-9F
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 20:21:38 -0400
+	(envelope-from <famz@redhat.com>) id 1dLf8R-0006Kf-Ca
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 20:29:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dLf16-00024a-59
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 20:21:37 -0400
-Date: Fri, 16 Jun 2017 08:21:25 +0800
+	(envelope-from <famz@redhat.com>) id 1dLf8Q-0006Zv-5r
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 20:29:11 -0400
+Date: Fri, 16 Jun 2017 08:28:58 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170616002125.GC21807@lemon.lan>
-References: <20170615030801.6260-1-maozy.fnst@cn.fujitsu.com>
+Message-ID: <20170616002858.GD21807@lemon.lan>
+References: <20170614092930.11234-1-stefanha@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170615030801.6260-1-maozy.fnst@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PATCH] util: remove the obsolete non-blocking
- connect
+In-Reply-To: <20170614092930.11234-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] virtio-blk: trace vdev so devices can be
+ distinguished
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,54 +23,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, mreitz@redhat.com, sheepdog@lists.wpkg.org, Cao jin <caoj.fnst@cn.fujitsu.com>, kraxel@redhat.com, pbonzini@redhat.com, namei.unix@gmail.com
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Thu, 06/15 11:08, Mao Zhongyi wrote:
-> From: Cao jin <caoj.fnst@cn.fujitsu.com>
+On Wed, 06/14 10:29, Stefan Hajnoczi wrote:
+> It is hard to analyze trace logs with multiple virtio-blk devices
+> because none of the trace events include the VirtIODevice *vdev.
 > 
-> The non-blocking connect mechanism is obsolete, and it doesn't
-> work well in inet connection, because it will call getaddrinfo
-> first and getaddrinfo will blocks on DNS lookups. Since commit
-> e65c67e4 & d984464e, the non-blocking connect of migration goes
-> through QIOChannel in a different manner(using a thread), and
-> nobody use this old non-blocking connect anymore.
+> This patch adds vdev so it's clear which device a request is associated
+> with.
 > 
-> Any newly written code which needs a non-blocking connect should
-> use the QIOChannel code, so we can drop NonBlockingConnectHandler
-> as a concept entirely.
+> I considered using VirtIOBlock *s instead but VirtIODevice *vdev is more
+> general and may be correlated with generic virtio trace events like
+> virtio_set_status.
 > 
-> Cc: mitake.hitoshi@lab.ntt.co.jp
-> Cc: namei.unix@gmail.com
-> Cc: jcody@redhat.com
-> Cc: kwolf@redhat.com
-> Cc: mreitz@redhat.com
-> Cc: berrange@redhat.com
-> Cc: kraxel@redhat.com
-> Cc: pbonzini@redhat.com
-> Cc: qemu-block@nongnu.org
-> Cc: sheepdog@lists.wpkg.org
-> Suggested-by: Daniel P. Berrange <berrange@redhat.com>
-> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
-> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
-> This patch was reviewed by Daniel about a years ago, but it has never
-> been merged just since socket_connect() called by net_socket_connect_init()
-> where NonBlockingConnectHandler was passed to socket_connect(). it's broken.
+>  hw/block/virtio-blk.c | 12 +++++++-----
+>  hw/block/trace-events | 10 +++++-----
+>  2 files changed, 12 insertions(+), 10 deletions(-)
 > 
-> Now this problem was worked around by Daniel's patch(commit 6701e551 'Revert
-> "Change net/socket.c to use socket_*() functions" again'). Therefore, resend
-> it, of course, part of related code has changed over the years, so changed
-> the patch accordingly.
-> 
-> The reviewed patch listed on:
-> https://lists.gnu.org/archive/html/qemu-devel/2016-07/msg06373.html
-> 
->  block/sheepdog.c       |   2 +-
->  include/qemu/sockets.h |   9 +--
->  io/channel-socket.c    |   2 +-
->  util/qemu-sockets.c    | 198 ++++++-------------------------------------------
+> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+> index 604d37d..c0bd247 100644
+> --- a/hw/block/virtio-blk.c
+> +++ b/hw/block/virtio-blk.c
+> @@ -50,7 +50,7 @@ static void virtio_blk_req_complete(VirtIOBlockReq *req, unsigned char status)
+>      VirtIOBlock *s = req->dev;
+>      VirtIODevice *vdev = VIRTIO_DEVICE(s);
+>  
+> -    trace_virtio_blk_req_complete(req, status);
+> +    trace_virtio_blk_req_complete(vdev, req, status);
+>  
+>      stb_p(&req->in->status, status);
+>      virtqueue_push(req->vq, &req->elem, req->in_len);
+> @@ -88,12 +88,13 @@ static void virtio_blk_rw_complete(void *opaque, int ret)
+>  {
+>      VirtIOBlockReq *next = opaque;
+>      VirtIOBlock *s = next->dev;
+> +    VirtIODevice *vdev = VIRTIO_DEVICE(s);
+>  
+>      aio_context_acquire(blk_get_aio_context(s->conf.conf.blk));
+>      while (next) {
+>          VirtIOBlockReq *req = next;
+>          next = req->mr_next;
+> -        trace_virtio_blk_rw_complete(req, ret);
+> +        trace_virtio_blk_rw_complete(vdev, req, ret);
+>  
+>          if (req->qiov.nalloc != -1) {
+>              /* If nalloc is != 1 req->qiov is a local copy of the original
+> @@ -355,7 +356,8 @@ static inline void submit_requests(BlockBackend *blk, MultiReqBuffer *mrb,
+>              mrb->reqs[i - 1]->mr_next = mrb->reqs[i];
+>          }
+>  
+> -        trace_virtio_blk_submit_multireq(mrb, start, num_reqs,
+> +        trace_virtio_blk_submit_multireq(VIRTIO_DEVICE(mrb->reqs[start]->dev),
 
-As pointed out by patchew, looks like you forgot to update block/ssh.c.
+QOM casting is not strictly necessary because the parameter type is void *, but
+it's clearer.
 
-Fam
+> +                                         mrb, start, num_reqs,
+>                                           sector_num << BDRV_SECTOR_BITS,
+>                                           qiov->size, is_write);
+>          block_acct_merge_done(blk_get_stats(blk),
+> @@ -526,11 +528,11 @@ static int virtio_blk_handle_request(VirtIOBlockReq *req, MultiReqBuffer *mrb)
+>  
+>          if (is_write) {
+>              qemu_iovec_init_external(&req->qiov, iov, out_num);
+> -            trace_virtio_blk_handle_write(req, req->sector_num,
+> +            trace_virtio_blk_handle_write(vdev, req, req->sector_num,
+>                                            req->qiov.size / BDRV_SECTOR_SIZE);
+>          } else {
+>              qemu_iovec_init_external(&req->qiov, in_iov, in_num);
+> -            trace_virtio_blk_handle_read(req, req->sector_num,
+> +            trace_virtio_blk_handle_read(vdev, req, req->sector_num,
+>                                           req->qiov.size / BDRV_SECTOR_SIZE);
+>          }
+>  
+> diff --git a/hw/block/trace-events b/hw/block/trace-events
+> index 65e83dc..c332c01 100644
+> --- a/hw/block/trace-events
+> +++ b/hw/block/trace-events
+> @@ -1,11 +1,11 @@
+>  # See docs/tracing.txt for syntax documentation.
+>  
+>  # hw/block/virtio-blk.c
+> -virtio_blk_req_complete(void *req, int status) "req %p status %d"
+> -virtio_blk_rw_complete(void *req, int ret) "req %p ret %d"
+> -virtio_blk_handle_write(void *req, uint64_t sector, size_t nsectors) "req %p sector %"PRIu64" nsectors %zu"
+> -virtio_blk_handle_read(void *req, uint64_t sector, size_t nsectors) "req %p sector %"PRIu64" nsectors %zu"
+> -virtio_blk_submit_multireq(void *mrb, int start, int num_reqs, uint64_t offset, size_t size, bool is_write) "mrb %p start %d num_reqs %d offset %"PRIu64" size %zu is_write %d"
+> +virtio_blk_req_complete(void *vdev, void *req, int status) "vdev %p req %p status %d"
+> +virtio_blk_rw_complete(void *vdev, void *req, int ret) "vdev %p req %p ret %d"
+> +virtio_blk_handle_write(void *vdev, void *req, uint64_t sector, size_t nsectors) "vdev %p req %p sector %"PRIu64" nsectors %zu"
+> +virtio_blk_handle_read(void *vdev, void *req, uint64_t sector, size_t nsectors) "vdev %p req %p sector %"PRIu64" nsectors %zu"
+> +virtio_blk_submit_multireq(void *vdev, void *mrb, int start, int num_reqs, uint64_t offset, size_t size, bool is_write) "vdev %p mrb %p start %d num_reqs %d offset %"PRIu64" size %zu is_write %d"
+>  
+>  # hw/block/hd-geometry.c
+>  hd_geometry_lchs_guess(void *blk, int cyls, int heads, int secs) "blk %p LCHS %d %d %d"
+> -- 
+> 2.9.4
+> 
+> 
+
+Reviewed-by: Fam Zheng <famz@redhat.com>
