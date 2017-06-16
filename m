@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dLvBb-0005W7-F9
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 13:37:32 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dLvBm-0005hC-9q
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 13:37:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dLvBa-00019H-G8
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 13:37:31 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dLvBl-0001E6-CF
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 13:37:42 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 16 Jun 2017 19:36:46 +0200
-Message-Id: <1497634636-20230-2-git-send-email-kwolf@redhat.com>
+Date: Fri, 16 Jun 2017 19:36:47 +0200
+Message-Id: <1497634636-20230-3-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1497634636-20230-1-git-send-email-kwolf@redhat.com>
 References: <1497634636-20230-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 01/31] qed: Use bottom half to resume
- waiting requests
+Subject: [Qemu-devel] [PATCH v2 02/31] qed: Make qed_read_table() synchronous
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,61 +22,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
 
-The qed driver serialises allocating write requests. When the active
-allocation is finished, the AIO callback is called, but after this, the
-next allocating request is immediately processed instead of leaving the
-coroutine. Resuming another allocation request in the same request
-coroutine means that the request now runs in the wrong coroutine.
-
-The following is one of the possible effects of this: The completed
-request will generally reenter its request coroutine in a bottom half,
-expecting that it completes the request in bdrv_driver_pwritev().
-However, if the second request actually yielded before leaving the
-coroutine, the reused request coroutine is in an entirely different
-place and is reentered prematurely. Not a good idea.
-
-Let's make sure that we exit the coroutine after completing the first
-request by resuming the next allocating request only with a bottom
-half.
+Note that this code is generally not running in coroutine context, so
+this is an actual blocking synchronous operation. We'll fix this in a
+moment.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/qed.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ block/qed-table.c | 56 ++++++++++++++++++-------------------------------------
+ 1 file changed, 18 insertions(+), 38 deletions(-)
 
-diff --git a/block/qed.c b/block/qed.c
-index 8d899fd..a837a28 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -967,6 +967,11 @@ static void qed_aio_complete_bh(void *opaque)
+diff --git a/block/qed-table.c b/block/qed-table.c
+index b12c298..f330538 100644
+--- a/block/qed-table.c
++++ b/block/qed-table.c
+@@ -18,59 +18,39 @@
+ #include "qed.h"
+ #include "qemu/bswap.h"
+ 
+-typedef struct {
+-    GenericCB gencb;
+-    BDRVQEDState *s;
+-    QEDTable *table;
+-
+-    struct iovec iov;
++static void qed_read_table(BDRVQEDState *s, uint64_t offset, QEDTable *table,
++                           BlockCompletionFunc *cb, void *opaque)
++{
+     QEMUIOVector qiov;
+-} QEDReadTableCB;
++    int noffsets;
++    int i, ret;
+ 
+-static void qed_read_table_cb(void *opaque, int ret)
+-{
+-    QEDReadTableCB *read_table_cb = opaque;
+-    QEDTable *table = read_table_cb->table;
+-    BDRVQEDState *s = read_table_cb->s;
+-    int noffsets = read_table_cb->qiov.size / sizeof(uint64_t);
+-    int i;
++    struct iovec iov = {
++        .iov_base = table->offsets,
++        .iov_len = s->header.cluster_size * s->header.table_size,
++    };
++    qemu_iovec_init_external(&qiov, &iov, 1);
+ 
+-    /* Handle I/O error */
+-    if (ret) {
++    trace_qed_read_table(s, offset, table);
++
++    ret = bdrv_preadv(s->bs->file, offset, &qiov);
++    if (ret < 0) {
+         goto out;
+     }
+ 
+     /* Byteswap offsets */
+     qed_acquire(s);
++    noffsets = qiov.size / sizeof(uint64_t);
+     for (i = 0; i < noffsets; i++) {
+         table->offsets[i] = le64_to_cpu(table->offsets[i]);
+     }
      qed_release(s);
+ 
++    ret = 0;
+ out:
+     /* Completion */
+-    trace_qed_read_table_cb(s, read_table_cb->table, ret);
+-    gencb_complete(&read_table_cb->gencb, ret);
+-}
+-
+-static void qed_read_table(BDRVQEDState *s, uint64_t offset, QEDTable *table,
+-                           BlockCompletionFunc *cb, void *opaque)
+-{
+-    QEDReadTableCB *read_table_cb = gencb_alloc(sizeof(*read_table_cb),
+-                                                cb, opaque);
+-    QEMUIOVector *qiov = &read_table_cb->qiov;
+-
+-    trace_qed_read_table(s, offset, table);
+-
+-    read_table_cb->s = s;
+-    read_table_cb->table = table;
+-    read_table_cb->iov.iov_base = table->offsets,
+-    read_table_cb->iov.iov_len = s->header.cluster_size * s->header.table_size,
+-
+-    qemu_iovec_init_external(qiov, &read_table_cb->iov, 1);
+-    bdrv_aio_readv(s->bs->file, offset / BDRV_SECTOR_SIZE, qiov,
+-                   qiov->size / BDRV_SECTOR_SIZE,
+-                   qed_read_table_cb, read_table_cb);
++    trace_qed_read_table_cb(s, table, ret);
++    cb(opaque, ret);
  }
  
-+static void qed_resume_alloc_bh(void *opaque)
-+{
-+    qed_aio_start_io(opaque);
-+}
-+
- static void qed_aio_complete(QEDAIOCB *acb, int ret)
- {
-     BDRVQEDState *s = acb_to_s(acb);
-@@ -995,10 +1000,12 @@ static void qed_aio_complete(QEDAIOCB *acb, int ret)
-      * requests multiple times but rather finish one at a time completely.
-      */
-     if (acb == QSIMPLEQ_FIRST(&s->allocating_write_reqs)) {
-+        QEDAIOCB *next_acb;
-         QSIMPLEQ_REMOVE_HEAD(&s->allocating_write_reqs, next);
--        acb = QSIMPLEQ_FIRST(&s->allocating_write_reqs);
--        if (acb) {
--            qed_aio_start_io(acb);
-+        next_acb = QSIMPLEQ_FIRST(&s->allocating_write_reqs);
-+        if (next_acb) {
-+            aio_bh_schedule_oneshot(bdrv_get_aio_context(acb->common.bs),
-+                                    qed_resume_alloc_bh, next_acb);
-         } else if (s->header.features & QED_F_NEED_CHECK) {
-             qed_start_need_check_timer(s);
-         }
+ typedef struct {
 -- 
 1.8.3.1
