@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abdallah.bouassida@lauterbach.com>)
-	id 1dLtAw-0001AS-17
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:28:43 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dLtDr-0001wu-Eo
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:31:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abdallah.bouassida@lauterbach.com>)
-	id 1dLtAs-0006pz-4O
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:28:42 -0400
-Received: from smtp1.lauterbach.com ([62.154.241.196]:45363)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <abdallah.bouassida@lauterbach.com>)
-	id 1dLtAr-0006oK-Ps
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:28:38 -0400
-References: <1701daf4-b2de-a9fb-7337-7aa791676516@lauterbach.com>
-	<CAFEAcA_+rS8gjjU+g1e71vBBioxaWX94+SvMqVh=Ta37ZhYGjA@mail.gmail.com>
-From: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
-Message-ID: <5f1df0fb-6c63-a0db-90fc-1e6c455ce2bd@lauterbach.com>
-Date: Fri, 16 Jun 2017 16:28:44 +0100
+	(envelope-from <kwolf@redhat.com>) id 1dLtDq-00089Y-Lo
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:31:43 -0400
+Date: Fri, 16 Jun 2017 17:31:27 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170616153127.GA4366@noname.fritz.box>
+References: <cover.1496844254.git.berto@igalia.com>
+	<ab53bc08e26b3e4cc5b1a14eee9e64fd0e03871d.1496844254.git.berto@igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_+rS8gjjU+g1e71vBBioxaWX94+SvMqVh=Ta37ZhYGjA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] target-arm: Bug fix in filling the cp_regs
- hashtable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ab53bc08e26b3e4cc5b1a14eee9e64fd0e03871d.1496844254.git.berto@igalia.com>
+Subject: Re: [Qemu-devel] [PATCH v2 6/7] qcow2: Pass a QEMUIOVector to
+ do_perform_cow_{read, write}()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,34 +24,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Khaled Jmal <khaled.jmal@lauterbach.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Oh, I see!
-Thanks for the details!
+Am 07.06.2017 um 16:08 hat Alberto Garcia geschrieben:
+> Instead of passing a single buffer pointer to do_perform_cow_write(),
+> pass a QEMUIOVector. This will allow us to merge the write requests
+> for the COW regions and the actual data into a single one.
+> 
+> Although do_perform_cow_read() does not strictly need to change its
+> API, we're doing it here as well for consistency.
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/qcow2-cluster.c | 51 ++++++++++++++++++++++++---------------------------
+>  1 file changed, 24 insertions(+), 27 deletions(-)
 
-Regards,
-Abdallah
+> @@ -807,22 +798,25 @@ static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
+>      /* The part of the buffer where the end region is located */
+>      end_buffer = start_buffer + buffer_size - end->nb_bytes;
+>  
+> +    qemu_iovec_init(&qiov, 3);
+> +
 
-Le 6/16/2017 à 3:51 PM, Peter Maydell a écrit :
-> On 16 June 2017 at 15:42, Abdallah Bouassida
-> <abdallah.bouassida@lauterbach.com> wrote:
->> Check if the CPU supports AARCH64 before adding  the 64bit view of
->> the coprocessor's register to the cp_regs hashtable.
->>
->> Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
->> ---
->> Bug description: if a register has the .state = ARM_CP_STATE_BOTH, its 64bit
->> view will be added to the hashtable even if the CPU is not 64bit.
-> This is deliberate and required. Where the AArch64 and AArch32
-> states both have a register which shares underlying architectural
-> state, QEMU chooses to implement migration of that state usually
-> via the AArch64 version's ARMCPRegInfo struct. If the AArch64
-> version is not included in the hashtable for an AArch32-only
-> CPU then the state of the 32-bit register won't be migrated.
-> The AArch64 register is of course invisible to the guest because
-> it is only accessible via 64-bit instructions, but it's used
-> during migration.
->
-> thanks
-> -- PMM
+You don't actually make use of more than one iovec in this patch. And
+after the last patch, the value is potentially too low - which isn't
+fatal because this is not a fixed maximum, but just a hint, but it can
+cause unnecessary memory allocations.
+
+It would probably be better to use 1 here and change it into
+2 + m->data_qiov->niov when you add write merging.
+
+Kevin
