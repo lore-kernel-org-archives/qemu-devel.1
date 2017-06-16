@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dLvCd-0006WE-My
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 13:38:36 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dLvCf-0006Yd-MF
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 13:38:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dLvCc-00028e-PE
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 13:38:35 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dLvCe-0002CH-L0
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 13:38:37 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 16 Jun 2017 19:37:08 +0200
-Message-Id: <1497634636-20230-24-git-send-email-kwolf@redhat.com>
+Date: Fri, 16 Jun 2017 19:37:10 +0200
+Message-Id: <1497634636-20230-26-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1497634636-20230-1-git-send-email-kwolf@redhat.com>
 References: <1497634636-20230-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 23/31] qed: Remove ret argument from
- qed_aio_next_io()
+Subject: [Qemu-devel] [PATCH v2 25/31] qed: Implement .bdrv_co_readv/writev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,70 +22,167 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
 
-All callers pass ret = 0, so we can just remove it.
+Most of the qed code is now synchronous and matches the coroutine model.
+One notable exception is the serialisation between requests which can
+still schedule a callback. Before we can replace this with coroutine
+locks, let's convert the driver's external interfaces to the coroutine
+versions.
+
+We need to be careful to handle both requests that call the completion
+callback directly from the calling coroutine (i.e. fully synchronous
+code) and requests that involve some callback, so that we need to yield
+and wait for the completion callback coming from outside the coroutine.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/qed.c | 17 ++++++-----------
- 1 file changed, 6 insertions(+), 11 deletions(-)
+ block/qed.c | 97 ++++++++++++++++++++++++++-----------------------------------
+ 1 file changed, 42 insertions(+), 55 deletions(-)
 
 diff --git a/block/qed.c b/block/qed.c
-index 6f83831..db80987 100644
+index e762169..a5111fd 100644
 --- a/block/qed.c
 +++ b/block/qed.c
-@@ -253,11 +253,11 @@ static CachedL2Table *qed_new_l2_table(BDRVQEDState *s)
-     return l2_table;
+@@ -1322,16 +1322,32 @@ static void qed_aio_next_io(QEDAIOCB *acb)
+     }
  }
  
--static void qed_aio_next_io(QEDAIOCB *acb, int ret);
-+static void qed_aio_next_io(QEDAIOCB *acb);
- 
- static void qed_aio_start_io(QEDAIOCB *acb)
- {
--    qed_aio_next_io(acb, 0);
-+    qed_aio_next_io(acb);
- }
- 
- static void qed_plug_allocating_write_reqs(BDRVQEDState *s)
-@@ -1273,13 +1273,14 @@ static int qed_aio_read_data(void *opaque, int ret, uint64_t offset, size_t len)
- /**
-  * Begin next I/O or complete the request
-  */
--static void qed_aio_next_io(QEDAIOCB *acb, int ret)
-+static void qed_aio_next_io(QEDAIOCB *acb)
- {
-     BDRVQEDState *s = acb_to_s(acb);
-     uint64_t offset;
-     size_t len;
+-static BlockAIOCB *qed_aio_setup(BlockDriverState *bs,
+-                                 int64_t sector_num,
+-                                 QEMUIOVector *qiov, int nb_sectors,
+-                                 BlockCompletionFunc *cb,
+-                                 void *opaque, int flags)
++typedef struct QEDRequestCo {
++    Coroutine *co;
++    bool done;
 +    int ret;
++} QEDRequestCo;
++
++static void qed_co_request_cb(void *opaque, int ret)
+ {
+-    QEDAIOCB *acb = qemu_aio_get(&qed_aiocb_info, bs, cb, opaque);
++    QEDRequestCo *co = opaque;
  
--    trace_qed_aio_next_io(s, acb, ret, acb->cur_pos + acb->cur_qiov.size);
-+    trace_qed_aio_next_io(s, acb, 0, acb->cur_pos + acb->cur_qiov.size);
+-    trace_qed_aio_setup(bs->opaque, acb, sector_num, nb_sectors,
+-                        opaque, flags);
++    co->done = true;
++    co->ret = ret;
++    qemu_coroutine_enter_if_inactive(co->co);
++}
++
++static int coroutine_fn qed_co_request(BlockDriverState *bs, int64_t sector_num,
++                                       QEMUIOVector *qiov, int nb_sectors,
++                                       int flags)
++{
++    QEDRequestCo co = {
++        .co     = qemu_coroutine_self(),
++        .done   = false,
++    };
++    QEDAIOCB *acb = qemu_aio_get(&qed_aiocb_info, bs, qed_co_request_cb, &co);
++
++    trace_qed_aio_setup(bs->opaque, acb, sector_num, nb_sectors, &co, flags);
  
-     if (acb->backing_qiov) {
-         qemu_iovec_destroy(acb->backing_qiov);
-@@ -1287,12 +1288,6 @@ static void qed_aio_next_io(QEDAIOCB *acb, int ret)
-         acb->backing_qiov = NULL;
-     }
+     acb->flags = flags;
+     acb->qiov = qiov;
+@@ -1344,43 +1360,26 @@ static BlockAIOCB *qed_aio_setup(BlockDriverState *bs,
  
--    /* Handle I/O error */
--    if (ret) {
--        qed_aio_complete(acb, ret);
--        return;
--    }
--
-     acb->qiov_offset += acb->cur_qiov.size;
-     acb->cur_pos += acb->cur_qiov.size;
-     qemu_iovec_reset(&acb->cur_qiov);
-@@ -1323,7 +1318,7 @@ static void qed_aio_next_io(QEDAIOCB *acb, int ret)
-         }
-         return;
-     }
--    qed_aio_next_io(acb, 0);
-+    qed_aio_next_io(acb);
+     /* Start request */
+     qed_aio_start_io(acb);
+-    return &acb->common;
+-}
+ 
+-static BlockAIOCB *bdrv_qed_aio_readv(BlockDriverState *bs,
+-                                      int64_t sector_num,
+-                                      QEMUIOVector *qiov, int nb_sectors,
+-                                      BlockCompletionFunc *cb,
+-                                      void *opaque)
+-{
+-    return qed_aio_setup(bs, sector_num, qiov, nb_sectors, cb, opaque, 0);
++    if (!co.done) {
++        qemu_coroutine_yield();
++    }
++
++    return co.ret;
  }
  
- static BlockAIOCB *qed_aio_setup(BlockDriverState *bs,
+-static BlockAIOCB *bdrv_qed_aio_writev(BlockDriverState *bs,
+-                                       int64_t sector_num,
+-                                       QEMUIOVector *qiov, int nb_sectors,
+-                                       BlockCompletionFunc *cb,
+-                                       void *opaque)
++static int coroutine_fn bdrv_qed_co_readv(BlockDriverState *bs,
++                                          int64_t sector_num, int nb_sectors,
++                                          QEMUIOVector *qiov)
+ {
+-    return qed_aio_setup(bs, sector_num, qiov, nb_sectors, cb,
+-                         opaque, QED_AIOCB_WRITE);
++    return qed_co_request(bs, sector_num, qiov, nb_sectors, 0);
+ }
+ 
+-typedef struct {
+-    Coroutine *co;
+-    int ret;
+-    bool done;
+-} QEDWriteZeroesCB;
+-
+-static void coroutine_fn qed_co_pwrite_zeroes_cb(void *opaque, int ret)
++static int coroutine_fn bdrv_qed_co_writev(BlockDriverState *bs,
++                                           int64_t sector_num, int nb_sectors,
++                                           QEMUIOVector *qiov)
+ {
+-    QEDWriteZeroesCB *cb = opaque;
+-
+-    cb->done = true;
+-    cb->ret = ret;
+-    if (cb->co) {
+-        aio_co_wake(cb->co);
+-    }
++    return qed_co_request(bs, sector_num, qiov, nb_sectors, QED_AIOCB_WRITE);
+ }
+ 
+ static int coroutine_fn bdrv_qed_co_pwrite_zeroes(BlockDriverState *bs,
+@@ -1388,9 +1387,7 @@ static int coroutine_fn bdrv_qed_co_pwrite_zeroes(BlockDriverState *bs,
+                                                   int count,
+                                                   BdrvRequestFlags flags)
+ {
+-    BlockAIOCB *blockacb;
+     BDRVQEDState *s = bs->opaque;
+-    QEDWriteZeroesCB cb = { .done = false };
+     QEMUIOVector qiov;
+     struct iovec iov;
+ 
+@@ -1407,19 +1404,9 @@ static int coroutine_fn bdrv_qed_co_pwrite_zeroes(BlockDriverState *bs,
+     iov.iov_len = count;
+ 
+     qemu_iovec_init_external(&qiov, &iov, 1);
+-    blockacb = qed_aio_setup(bs, offset >> BDRV_SECTOR_BITS, &qiov,
+-                             count >> BDRV_SECTOR_BITS,
+-                             qed_co_pwrite_zeroes_cb, &cb,
+-                             QED_AIOCB_WRITE | QED_AIOCB_ZERO);
+-    if (!blockacb) {
+-        return -EIO;
+-    }
+-    if (!cb.done) {
+-        cb.co = qemu_coroutine_self();
+-        qemu_coroutine_yield();
+-    }
+-    assert(cb.done);
+-    return cb.ret;
++    return qed_co_request(bs, offset >> BDRV_SECTOR_BITS, &qiov,
++                          count >> BDRV_SECTOR_BITS,
++                          QED_AIOCB_WRITE | QED_AIOCB_ZERO);
+ }
+ 
+ static int bdrv_qed_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
+@@ -1615,8 +1602,8 @@ static BlockDriver bdrv_qed = {
+     .bdrv_create              = bdrv_qed_create,
+     .bdrv_has_zero_init       = bdrv_has_zero_init_1,
+     .bdrv_co_get_block_status = bdrv_qed_co_get_block_status,
+-    .bdrv_aio_readv           = bdrv_qed_aio_readv,
+-    .bdrv_aio_writev          = bdrv_qed_aio_writev,
++    .bdrv_co_readv            = bdrv_qed_co_readv,
++    .bdrv_co_writev           = bdrv_qed_co_writev,
+     .bdrv_co_pwrite_zeroes    = bdrv_qed_co_pwrite_zeroes,
+     .bdrv_truncate            = bdrv_qed_truncate,
+     .bdrv_getlength           = bdrv_qed_getlength,
 -- 
 1.8.3.1
