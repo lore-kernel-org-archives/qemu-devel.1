@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dLlD5-00038L-Fr
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 02:58:24 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dLlkb-0003Rs-At
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 03:33:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dLlD1-0002Ar-J4
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 02:58:23 -0400
-Received: from mail-vk0-f48.google.com ([209.85.213.48]:32863)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dLlD1-00029G-CE
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 02:58:19 -0400
-Received: by mail-vk0-f48.google.com with SMTP id p62so17991583vkp.0
-	for <qemu-devel@nongnu.org>; Thu, 15 Jun 2017 23:58:18 -0700 (PDT)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dLlkZ-0005Bl-4k
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 03:33:01 -0400
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Date: Fri, 16 Jun 2017 15:31:07 +0800
+Message-ID: <5b2ec66b3434b98de0ef7d59fd8a1de09f966c1a.1497595807.git.maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <VI1PR1001MB137395F2FCBDE6389A9AC5FCB7C30@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
-References: <VI1PR1001MB137395F2FCBDE6389A9AC5FCB7C30@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Fri, 16 Jun 2017 08:58:17 +0200
-Message-ID: <CABdb7358YVXbk++Z7s+q6Z5O0Q=6CQiQvYsTdc35eqmQeUnP_Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Guest unresponsive after Virtqueue size exceeded
- error
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2] util: remove the obsolete non-blocking
+ connect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,132 +20,535 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Fernando_Casas_Sch=C3=B6ssow?= <casasfernando@hotmail.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Cao jin <caoj.fnst@cn.fujitsu.com>, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, berrange@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, qemu-block@nongnu.org, sheepdog@lists.wpkg.org, famz@redhat.com, quintela@redhat.com
 
-Hi,
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
 
-On Wed, Jun 14, 2017 at 11:56 PM, Fernando Casas Sch=C3=B6ssow
-<casasfernando@hotmail.com> wrote:
-> Hi there,
->
-> I recently migrated a Hyper-V host to qemu/kvm runing on Alpine Linux 3.6=
-.1 (kernel 4.9.30 -with grsec patches- and qemu 2.8.1).
->
-> Almost on daily basis at least one of the guests is showing the following=
- error in the log and the it needs to be terminated and restarted to recove=
-r it:
->
-> qemu-system-x86_64: Virtqueue size exceeded
->
-> Is not always the same guest, and the error is appearing for both, Linux =
-(CentOS 7.3) and Windows (2012R2) guests.
-> As soon as this error appears the guest is not really working anymore. It=
- may respond to ping or you can even try to login but then everything is ve=
-ry slow or completely unresponsive. Restarting the guest from within the gu=
-est OS is not working either and the only thing I can do is to terminate it=
- (virsh destroy) and start it again until the next failure.
->
-> In Windows guest the error seems to be related to disk:
-> "Reset to device, \Device\RaidPort2, was issued" and the source is viosto=
-r
->
-> And in Linux guests the error is always (with the process and pid changin=
-g):
->
-> INFO: task <process>:<pid> blocked for more than 120 seconds
->
-> But unfortunately I was not able to find any other indication of a proble=
-m in the guests logs nor in the host logs except for the error regarding th=
-e virtqueue size. The problem is happening at different times of day and I =
-couldn't find any patterns yet.
->
-> All the Windows guests are using virtio drivers version 126 and all Linux=
- guests are CentOS 7.3 using the latest kernel available in the distributio=
-n (3.10.0-514.21.1). They all run qemu-guest agent as well.
-> All the guest disks are qcow2 images with cache=3Dnone and aimode=3Dthrea=
-ds (tried native mode before but with the same results).
->
-> Example qemu command for a Linux guest:
->
-> /usr/bin/qemu-system-x86_64 -name guest=3DDOCKER01,debug-threads=3Don -S =
--object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/do=
-main-24-DOCKER01/master-key.aes -machine pc-i440fx-2.8,accel=3Dkvm,usb=3Dof=
-f,dump-guest-core=3Doff -cpu IvyBridge,+ds,+acpi,+ss,+ht,+tm,+pbe,+dtes64,+=
-monitor,+ds_cpl,+vmx,+smx,+est,+tm2,+xtpr,+pdcm,+pcid,+osxsave,+arat,+xsave=
-opt -drive file=3D/usr/share/edk2.git/ovmf-x64/OVMF_CODE-pure-efi.fd,if=3Dp=
-flash,format=3Draw,unit=3D0,readonly=3Don -drive file=3D/var/lib/libvirt/qe=
-mu/nvram/DOCKER01_VARS.fd,if=3Dpflash,format=3Draw,unit=3D1 -m 2048 -realti=
-me mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -uuid 4705b146-3b14=
--4c20-923c-42105d47e7fc -no-user-config -nodefaults -chardev socket,id=3Dch=
-armonitor,path=3D/var/lib/libvirt/qemu/domain-24-DOCKER01/monitor.sock,serv=
-er,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=
-=3Dutc,driftfix=3Dslew -global kvm-pit.lost_tick_policy=3Ddelay -no-hpet -n=
-o-shutdown -global PIIX4_PM.disable_s3=3D1 -global PIIX4_PM.disable_s4=3D1 =
--boot strict=3Don -device ich9-usb-ehci1,id=3Dusb,bus=3Dpci.0,addr=3D0x4.0x=
-7 -device ich9-usb-uhci1,masterbus=3Dusb.0,firstport=3D0,bus=3Dpci.0,multif=
-unction=3Don,addr=3D0x4 -device ich9-usb-uhci2,masterbus=3Dusb.0,firstport=
-=3D2,bus=3Dpci.0,addr=3D0x4.0x1 -device ich9-usb-uhci3,masterbus=3Dusb.0,fi=
-rstport=3D4,bus=3Dpci.0,addr=3D0x4.0x2 -device virtio-serial-pci,id=3Dvirti=
-o-serial0,bus=3Dpci.0,addr=3D0x5 -drive file=3D/storage/storage-ssd-vms/vir=
-tual_machines_ssd/docker01.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio=
--disk0,cache=3Dnone,aio=3Dthreads -device virtio-blk-pci,scsi=3Doff,bus=3Dp=
-ci.0,addr=3D0x6,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1 =
--netdev tap,fd=3D35,id=3Dhostnet0,vhost=3Don,vhostfd=3D45 -device virtio-ne=
-t-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:1c:af:ce,bus=3Dpci.0,addr=
-=3D0x3 -chardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharseria=
-l0,id=3Dserial0 -chardev socket,id=3Dcharchannel0,path=3D/var/lib/libvirt/q=
-emu/channel/target/domain-24-DOCKER01/org.qemu.guest_agent.0,server,nowait =
--device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchannel0=
-,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0 -chardev spicevmc,id=3Dcharcha=
-nnel1,name=3Dvdagent -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D2,c=
-hardev=3Dcharchannel1,id=3Dchannel1,name=3Dcom.redhat.spice.0 -device usb-t=
-ablet,id=3Dinput0,bus=3Dusb.0,port=3D1 -spice port=3D5905,addr=3D127.0.0.1,=
-disable-ticketing,seamless-migration=3Don -device qxl-vga,id=3Dvideo0,ram_s=
-ize=3D67108864,vram_size=3D67108864,vram64_size_mb=3D0,vgamem_mb=3D16,max_o=
-utputs=3D1,bus=3Dpci.0,addr=3D0x2 -chardev spicevmc,id=3Dcharredir0,name=3D=
-usbredir -device usb-redir,chardev=3Dcharredir0,id=3Dredir0,bus=3Dusb.0,por=
-t=3D2 -chardev spicevmc,id=3Dcharredir1,name=3Dusbredir -device usb-redir,c=
-hardev=3Dcharredir1,id=3Dredir1,bus=3Dusb.0,port=3D3 -device virtio-balloon=
--pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x7 -object rng-random,id=3Dobjrng0,f=
-ilename=3D/dev/random -device virtio-rng-pci,rng=3Dobjrng0,id=3Drng0,bus=3D=
-pci.0,addr=3D0x8 -msg timestamp=3Don
->
-> For what it worth, the same guests were working fine for years on Hyper-V=
- on the same hardware (Intel Xeon E3, 32GB RAM, Supermicro mainboard, 6x3TB=
- Western Digital Red disks and 6x120MB Kingston V300 SSD all connected to a=
- LSI LSISAS2008 controller).
-> Except for this stability issue that I hope to solve everything else is w=
-orking great and outperforming Hyper-V.
->
-> Any ideas, thoughts or suggestions to try to narrow down the problem?
+The non-blocking connect mechanism is obsolete, and it doesn't
+work well in inet connection, because it will call getaddrinfo
+first and getaddrinfo will blocks on DNS lookups. Since commit
+e65c67e4 & d984464e, the non-blocking connect of migration goes
+through QIOChannel in a different manner(using a thread), and
+nobody use this old non-blocking connect anymore.
 
-Would you be able to enhance the error message and rebuild QEMU?
+Any newly written code which needs a non-blocking connect should
+use the QIOChannel code, so we can drop NonBlockingConnectHandler
+as a concept entirely.
 
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -856,7 +856,7 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz)
-     max =3D vq->vring.num;
+Cc: mitake.hitoshi@lab.ntt.co.jp
+Cc: namei.unix@gmail.com
+Cc: jcody@redhat.com
+Cc: kwolf@redhat.com
+Cc: mreitz@redhat.com
+Cc: berrange@redhat.com
+Cc: kraxel@redhat.com
+Cc: pbonzini@redhat.com
+Cc: qemu-block@nongnu.org
+Cc: sheepdog@lists.wpkg.org
+Cc: famz@redhat.com
+Cc: quintela@redhat.com
+Suggested-by: Daniel P. Berrange <berrange@redhat.com>
+Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+---
+v2:
+1. block/ssh.c is not compiled in v1 which leads to no error 
+   reported when I run make & make check, although I make a 
+	mistake in block/ssh.c, because the package libssh2-devel 
+	missed in my system. Now fixed it.
+2. Write the prototype in a single line. [Juan Quintela]
 
-     if (vq->inuse >=3D vq->vring.num) {
--        virtio_error(vdev, "Virtqueue size exceeded");
-+        virtio_error(vdev, "Virtqueue %u device %s size exceeded",
-vq->queue_index, vdev->name);
-         goto done;
+Because it's a minor change, so still add the r-b.
+
+v1:
+This patch was reviewed by Daniel about a years ago, but it has never
+been merged just since socket_connect() called by net_socket_connect_init()
+where NonBlockingConnectHandler was passed to socket_connect(). it's broken.
+
+Now this problem was worked around by Daniel's patch(commit 6701e551 'Revert
+"Change net/socket.c to use socket_*() functions" again'). Therefore, resend
+it, of course, part of related code has changed over the years, so changed
+the patch accordingly.
+
+The reviewed patch listed on:
+https://lists.gnu.org/archive/html/qemu-devel/2016-07/msg06373.html
+
+ --help                 |   0
+ block/sheepdog.c       |   2 +-
+ block/ssh.c            |   2 +-
+ include/qemu/sockets.h |  12 +--
+ io/channel-socket.c    |   2 +-
+ util/qemu-sockets.c    | 205 ++++++-------------------------------------------
+ 6 files changed, 28 insertions(+), 195 deletions(-)
+ create mode 100644 --help
+
+diff --git a/--help b/--help
+new file mode 100644
+index 0000000..e69de29
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index a18315a..97e6c96 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -589,7 +589,7 @@ static int connect_to_sdog(BDRVSheepdogState *s, Error **errp)
+ {
+     int fd;
+ 
+-    fd = socket_connect(s->addr, NULL, NULL, errp);
++    fd = socket_connect(s->addr, errp);
+ 
+     if (s->addr->type == SOCKET_ADDRESS_TYPE_INET && fd >= 0) {
+         int ret = socket_set_nodelay(fd);
+diff --git a/block/ssh.c b/block/ssh.c
+index 11203fc..d6a82ae 100644
+--- a/block/ssh.c
++++ b/block/ssh.c
+@@ -679,7 +679,7 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
      }
-
-This would at least confirm the theory that it's caused by virtio-blk-pci.
-
-If rebuilding is not feasible I would start by removing other virtio
-devices -- particularly balloon which has had quite a few virtio
-related bugs fixed recently.
-
-Does your environment involve VM migrations or saving/resuming, or
-does the crashing QEMU process always run the VM from its boot?
-
-Thanks!
-
-> Thanks in advance and sorry for the long email but I wanted to be as desc=
-riptive as possible.
->
-> Fer
+ 
+     /* Open the socket and connect. */
+-    s->sock = inet_connect_saddr(s->inet, NULL, NULL, errp);
++    s->sock = inet_connect_saddr(s->inet, errp);
+     if (s->sock < 0) {
+         ret = -EIO;
+         goto err;
+diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
+index 5c326db..dce0e41 100644
+--- a/include/qemu/sockets.h
++++ b/include/qemu/sockets.h
+@@ -27,18 +27,11 @@ int socket_set_fast_reuse(int fd);
+ #define SHUT_RDWR 2
+ #endif
+ 
+-/* callback function for nonblocking connect
+- * valid fd on success, negative error code on failure
+- */
+-typedef void NonBlockingConnectHandler(int fd, Error *err, void *opaque);
+-
+ int inet_ai_family_from_address(InetSocketAddress *addr,
+                                 Error **errp);
+ int inet_parse(InetSocketAddress *addr, const char *str, Error **errp);
+ int inet_connect(const char *str, Error **errp);
+-int inet_connect_saddr(InetSocketAddress *saddr,
+-                       NonBlockingConnectHandler *callback, void *opaque,
+-                       Error **errp);
++int inet_connect_saddr(InetSocketAddress *saddr, Error **errp);
+ 
+ NetworkAddressFamily inet_netfamily(int family);
+ 
+@@ -46,8 +39,7 @@ int unix_listen(const char *path, char *ostr, int olen, Error **errp);
+ int unix_connect(const char *path, Error **errp);
+ 
+ SocketAddress *socket_parse(const char *str, Error **errp);
+-int socket_connect(SocketAddress *addr, NonBlockingConnectHandler *callback,
+-                   void *opaque, Error **errp);
++int socket_connect(SocketAddress *addr, Error **errp);
+ int socket_listen(SocketAddress *addr, Error **errp);
+ void socket_listen_cleanup(int fd, Error **errp);
+ int socket_dgram(SocketAddress *remote, SocketAddress *local, Error **errp);
+diff --git a/io/channel-socket.c b/io/channel-socket.c
+index 53386b7..05ea120 100644
+--- a/io/channel-socket.c
++++ b/io/channel-socket.c
+@@ -140,7 +140,7 @@ int qio_channel_socket_connect_sync(QIOChannelSocket *ioc,
+     int fd;
+ 
+     trace_qio_channel_socket_connect_sync(ioc, addr);
+-    fd = socket_connect(addr, NULL, NULL, errp);
++    fd = socket_connect(addr, errp);
+     if (fd < 0) {
+         trace_qio_channel_socket_connect_fail(ioc);
+         return -1;
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index 82290cb..af14f33 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -263,88 +263,19 @@ listen:
+     ((rc) == -EINPROGRESS)
+ #endif
+ 
+-/* Struct to store connect state for non blocking connect */
+-typedef struct ConnectState {
+-    int fd;
+-    struct addrinfo *addr_list;
+-    struct addrinfo *current_addr;
+-    NonBlockingConnectHandler *callback;
+-    void *opaque;
+-} ConnectState;
+-
+-static int inet_connect_addr(struct addrinfo *addr, bool *in_progress,
+-                             ConnectState *connect_state, Error **errp);
++static int inet_connect_addr(struct addrinfo *addr, Error **errp);
+ 
+-static void wait_for_connect(void *opaque)
+-{
+-    ConnectState *s = opaque;
+-    int val = 0, rc = 0;
+-    socklen_t valsize = sizeof(val);
+-    bool in_progress;
+-    Error *err = NULL;
+-
+-    qemu_set_fd_handler(s->fd, NULL, NULL, NULL);
+-
+-    do {
+-        rc = qemu_getsockopt(s->fd, SOL_SOCKET, SO_ERROR, &val, &valsize);
+-    } while (rc == -1 && errno == EINTR);
+-
+-    /* update rc to contain error */
+-    if (!rc && val) {
+-        rc = -1;
+-        errno = val;
+-    }
+-
+-    /* connect error */
+-    if (rc < 0) {
+-        error_setg_errno(&err, errno, "Error connecting to socket");
+-        closesocket(s->fd);
+-        s->fd = rc;
+-    }
+-
+-    /* try to connect to the next address on the list */
+-    if (s->current_addr) {
+-        while (s->current_addr->ai_next != NULL && s->fd < 0) {
+-            s->current_addr = s->current_addr->ai_next;
+-            s->fd = inet_connect_addr(s->current_addr, &in_progress, s, NULL);
+-            if (s->fd < 0) {
+-                error_free(err);
+-                err = NULL;
+-                error_setg_errno(&err, errno, "Unable to start socket connect");
+-            }
+-            /* connect in progress */
+-            if (in_progress) {
+-                goto out;
+-            }
+-        }
+-
+-        freeaddrinfo(s->addr_list);
+-    }
+-
+-    if (s->callback) {
+-        s->callback(s->fd, err, s->opaque);
+-    }
+-    g_free(s);
+-out:
+-    error_free(err);
+-}
+-
+-static int inet_connect_addr(struct addrinfo *addr, bool *in_progress,
+-                             ConnectState *connect_state, Error **errp)
++static int inet_connect_addr(struct addrinfo *addr, Error **errp)
+ {
+     int sock, rc;
+ 
+-    *in_progress = false;
+-
+     sock = qemu_socket(addr->ai_family, addr->ai_socktype, addr->ai_protocol);
+     if (sock < 0) {
+         error_setg_errno(errp, errno, "Failed to create socket");
+         return -1;
+     }
+     socket_set_fast_reuse(sock);
+-    if (connect_state != NULL) {
+-        qemu_set_nonblock(sock);
+-    }
++
+     /* connect to peer */
+     do {
+         rc = 0;
+@@ -353,15 +284,12 @@ static int inet_connect_addr(struct addrinfo *addr, bool *in_progress,
+         }
+     } while (rc == -EINTR);
+ 
+-    if (connect_state != NULL && QEMU_SOCKET_RC_INPROGRESS(rc)) {
+-        connect_state->fd = sock;
+-        qemu_set_fd_handler(sock, NULL, wait_for_connect, connect_state);
+-        *in_progress = true;
+-    } else if (rc < 0) {
++    if (rc < 0) {
+         error_setg_errno(errp, errno, "Failed to connect socket");
+         closesocket(sock);
+         return -1;
+     }
++
+     return sock;
+ }
+ 
+@@ -419,44 +347,24 @@ static struct addrinfo *inet_parse_connect_saddr(InetSocketAddress *saddr,
+  *
+  * @saddr: Inet socket address specification
+  * @errp: set on error
+- * @callback: callback function for non-blocking connect
+- * @opaque: opaque for callback function
+  *
+  * Returns: -1 on error, file descriptor on success.
+- *
+- * If @callback is non-null, the connect is non-blocking.  If this
+- * function succeeds, callback will be called when the connection
+- * completes, with the file descriptor on success, or -1 on error.
+  */
+-int inet_connect_saddr(InetSocketAddress *saddr,
+-                       NonBlockingConnectHandler *callback, void *opaque,
+-                       Error **errp)
++int inet_connect_saddr(InetSocketAddress *saddr, Error **errp)
+ {
+     Error *local_err = NULL;
+     struct addrinfo *res, *e;
+     int sock = -1;
+-    bool in_progress;
+-    ConnectState *connect_state = NULL;
+ 
+     res = inet_parse_connect_saddr(saddr, errp);
+     if (!res) {
+         return -1;
+     }
+ 
+-    if (callback != NULL) {
+-        connect_state = g_malloc0(sizeof(*connect_state));
+-        connect_state->addr_list = res;
+-        connect_state->callback = callback;
+-        connect_state->opaque = opaque;
+-    }
+-
+     for (e = res; e != NULL; e = e->ai_next) {
+         error_free(local_err);
+         local_err = NULL;
+-        if (connect_state != NULL) {
+-            connect_state->current_addr = e;
+-        }
+-        sock = inet_connect_addr(e, &in_progress, connect_state, &local_err);
++        sock = inet_connect_addr(e, &local_err);
+         if (sock >= 0) {
+             break;
+         }
+@@ -464,15 +372,8 @@ int inet_connect_saddr(InetSocketAddress *saddr,
+ 
+     if (sock < 0) {
+         error_propagate(errp, local_err);
+-    } else if (in_progress) {
+-        /* wait_for_connect() will do the rest */
+-        return sock;
+-    } else {
+-        if (callback) {
+-            callback(sock, NULL, opaque);
+-        }
+     }
+-    g_free(connect_state);
++
+     freeaddrinfo(res);
+     return sock;
+ }
+@@ -655,7 +556,7 @@ int inet_connect(const char *str, Error **errp)
+     InetSocketAddress *addr = g_new(InetSocketAddress, 1);
+ 
+     if (!inet_parse(addr, str, errp)) {
+-        sock = inet_connect_saddr(addr, NULL, NULL, errp);
++        sock = inet_connect_saddr(addr, errp);
+     }
+     qapi_free_InetSocketAddress(addr);
+     return sock;
+@@ -688,21 +589,16 @@ static bool vsock_parse_vaddr_to_sockaddr(const VsockSocketAddress *vaddr,
+     return true;
+ }
+ 
+-static int vsock_connect_addr(const struct sockaddr_vm *svm, bool *in_progress,
+-                              ConnectState *connect_state, Error **errp)
++static int vsock_connect_addr(const struct sockaddr_vm *svm, Error **errp)
+ {
+     int sock, rc;
+ 
+-    *in_progress = false;
+-
+     sock = qemu_socket(AF_VSOCK, SOCK_STREAM, 0);
+     if (sock < 0) {
+         error_setg_errno(errp, errno, "Failed to create socket");
+         return -1;
+     }
+-    if (connect_state != NULL) {
+-        qemu_set_nonblock(sock);
+-    }
++
+     /* connect to peer */
+     do {
+         rc = 0;
+@@ -711,50 +607,26 @@ static int vsock_connect_addr(const struct sockaddr_vm *svm, bool *in_progress,
+         }
+     } while (rc == -EINTR);
+ 
+-    if (connect_state != NULL && QEMU_SOCKET_RC_INPROGRESS(rc)) {
+-        connect_state->fd = sock;
+-        qemu_set_fd_handler(sock, NULL, wait_for_connect, connect_state);
+-        *in_progress = true;
+-    } else if (rc < 0) {
++    if (rc < 0) {
+         error_setg_errno(errp, errno, "Failed to connect socket");
+         closesocket(sock);
+         return -1;
+     }
++
+     return sock;
+ }
+ 
+-static int vsock_connect_saddr(VsockSocketAddress *vaddr,
+-                               NonBlockingConnectHandler *callback,
+-                               void *opaque,
+-                               Error **errp)
++static int vsock_connect_saddr(VsockSocketAddress *vaddr, Error **errp)
+ {
+     struct sockaddr_vm svm;
+     int sock = -1;
+-    bool in_progress;
+-    ConnectState *connect_state = NULL;
+ 
+     if (!vsock_parse_vaddr_to_sockaddr(vaddr, &svm, errp)) {
+         return -1;
+     }
+ 
+-    if (callback != NULL) {
+-        connect_state = g_malloc0(sizeof(*connect_state));
+-        connect_state->callback = callback;
+-        connect_state->opaque = opaque;
+-    }
++    sock = vsock_connect_addr(&svm, errp);
+ 
+-    sock = vsock_connect_addr(&svm, &in_progress, connect_state, errp);
+-    if (sock < 0) {
+-        /* do nothing */
+-    } else if (in_progress) {
+-        /* wait_for_connect() will do the rest */
+-        return sock;
+-    } else {
+-        if (callback) {
+-            callback(sock, NULL, opaque);
+-        }
+-    }
+-    g_free(connect_state);
+     return sock;
+ }
+ 
+@@ -814,9 +686,7 @@ static void vsock_unsupported(Error **errp)
+     error_setg(errp, "socket family AF_VSOCK unsupported");
+ }
+ 
+-static int vsock_connect_saddr(VsockSocketAddress *vaddr,
+-                               NonBlockingConnectHandler *callback,
+-                               void *opaque, Error **errp)
++static int vsock_connect_saddr(VsockSocketAddress *vaddr, Error **errp)
+ {
+     vsock_unsupported(errp);
+     return -1;
+@@ -919,12 +789,9 @@ err:
+     return -1;
+ }
+ 
+-static int unix_connect_saddr(UnixSocketAddress *saddr,
+-                              NonBlockingConnectHandler *callback, void *opaque,
+-                              Error **errp)
++static int unix_connect_saddr(UnixSocketAddress *saddr, Error **errp)
+ {
+     struct sockaddr_un un;
+-    ConnectState *connect_state = NULL;
+     int sock, rc;
+ 
+     if (saddr->path == NULL) {
+@@ -937,12 +804,6 @@ static int unix_connect_saddr(UnixSocketAddress *saddr,
+         error_setg_errno(errp, errno, "Failed to create socket");
+         return -1;
+     }
+-    if (callback != NULL) {
+-        connect_state = g_malloc0(sizeof(*connect_state));
+-        connect_state->callback = callback;
+-        connect_state->opaque = opaque;
+-        qemu_set_nonblock(sock);
+-    }
+ 
+     if (strlen(saddr->path) > sizeof(un.sun_path)) {
+         error_setg(errp, "UNIX socket path '%s' is too long", saddr->path);
+@@ -963,29 +824,16 @@ static int unix_connect_saddr(UnixSocketAddress *saddr,
+         }
+     } while (rc == -EINTR);
+ 
+-    if (connect_state != NULL && QEMU_SOCKET_RC_INPROGRESS(rc)) {
+-        connect_state->fd = sock;
+-        qemu_set_fd_handler(sock, NULL, wait_for_connect, connect_state);
+-        return sock;
+-    } else if (rc >= 0) {
+-        /* non blocking socket immediate success, call callback */
+-        if (callback != NULL) {
+-            callback(sock, NULL, opaque);
+-        }
+-    }
+-
+     if (rc < 0) {
+         error_setg_errno(errp, -rc, "Failed to connect socket %s",
+                          saddr->path);
+         goto err;
+     }
+ 
+-    g_free(connect_state);
+     return sock;
+ 
+  err:
+     close(sock);
+-    g_free(connect_state);
+     return -1;
+ }
+ 
+@@ -1000,9 +848,7 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
+     return -1;
+ }
+ 
+-static int unix_connect_saddr(UnixSocketAddress *saddr,
+-                              NonBlockingConnectHandler *callback, void *opaque,
+-                              Error **errp)
++static int unix_connect_saddr(UnixSocketAddress *saddr, Error **errp)
+ {
+     error_setg(errp, "unix sockets are not available on windows");
+     errno = ENOTSUP;
+@@ -1048,7 +894,7 @@ int unix_connect(const char *path, Error **errp)
+ 
+     saddr = g_new0(UnixSocketAddress, 1);
+     saddr->path = g_strdup(path);
+-    sock = unix_connect_saddr(saddr, NULL, NULL, errp);
++    sock = unix_connect_saddr(saddr, errp);
+     qapi_free_UnixSocketAddress(saddr);
+     return sock;
+ }
+@@ -1093,30 +939,25 @@ fail:
+     return NULL;
+ }
+ 
+-int socket_connect(SocketAddress *addr, NonBlockingConnectHandler *callback,
+-                   void *opaque, Error **errp)
++int socket_connect(SocketAddress *addr, Error **errp)
+ {
+     int fd;
+ 
+     switch (addr->type) {
+     case SOCKET_ADDRESS_TYPE_INET:
+-        fd = inet_connect_saddr(&addr->u.inet, callback, opaque, errp);
++        fd = inet_connect_saddr(&addr->u.inet, errp);
+         break;
+ 
+     case SOCKET_ADDRESS_TYPE_UNIX:
+-        fd = unix_connect_saddr(&addr->u.q_unix, callback, opaque, errp);
++        fd = unix_connect_saddr(&addr->u.q_unix, errp);
+         break;
+ 
+     case SOCKET_ADDRESS_TYPE_FD:
+         fd = monitor_get_fd(cur_mon, addr->u.fd.str, errp);
+-        if (fd >= 0 && callback) {
+-            qemu_set_nonblock(fd);
+-            callback(fd, NULL, opaque);
+-        }
+         break;
+ 
+     case SOCKET_ADDRESS_TYPE_VSOCK:
+-        fd = vsock_connect_saddr(&addr->u.vsock, callback, opaque, errp);
++        fd = vsock_connect_saddr(&addr->u.vsock, errp);
+         break;
+ 
+     default:
+-- 
+2.9.3
