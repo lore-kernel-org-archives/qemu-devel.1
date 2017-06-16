@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dLrHj-0000Un-Tq
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 09:27:37 -0400
+	(envelope-from <berto@igalia.com>) id 1dLrRd-00051k-Ex
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 09:37:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dLrHj-0000uS-2M
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 09:27:35 -0400
-References: <1497509253-28941-1-git-send-email-sochin.jiang@huawei.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <49c65c67-5dcc-5822-c2f9-e1c3ff0181de@redhat.com>
-Date: Fri, 16 Jun 2017 15:27:22 +0200
-MIME-Version: 1.0
-In-Reply-To: <1497509253-28941-1-git-send-email-sochin.jiang@huawei.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="OSB4wgUjP8cIFiVCFBH3Lhjj723qGULDU"
-Subject: Re: [Qemu-devel] [PATCH] fix: avoid an infinite loop or a dangling
- pointer problem in img_commit
+	(envelope-from <berto@igalia.com>) id 1dLrRY-0000gU-GF
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 09:37:49 -0400
+From: Alberto Garcia <berto@igalia.com>
+Date: Fri, 16 Jun 2017 16:37:06 +0300
+Message-Id: <dde1e87b36ef975f785772c636cdd0abdd24f072.1497619885.git.berto@igalia.com>
+In-Reply-To: <cover.1497619885.git.berto@igalia.com>
+References: <cover.1497619885.git.berto@igalia.com>
+In-Reply-To: <cover.1497619885.git.berto@igalia.com>
+References: <cover.1497619885.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH v3 6/7] qcow2: Pass a QEMUIOVector to
+ do_perform_cow_{read, write}()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +22,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "sochin.jiang" <sochin.jiang@huawei.com>, jcody@redhat.com, kwolf@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, eric.fangyi@huawei.com, subo7@huawei.com, xieyingtai@huawei.com, lina.lulina@huawei.com, zhangshuai13@huawei.com, lizhengui@huawei.com
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---OSB4wgUjP8cIFiVCFBH3Lhjj723qGULDU
-From: Max Reitz <mreitz@redhat.com>
-To: "sochin.jiang" <sochin.jiang@huawei.com>, jcody@redhat.com,
- kwolf@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, eric.fangyi@huawei.com,
- subo7@huawei.com, xieyingtai@huawei.com, lina.lulina@huawei.com,
- zhangshuai13@huawei.com, lizhengui@huawei.com
-Message-ID: <49c65c67-5dcc-5822-c2f9-e1c3ff0181de@redhat.com>
-Subject: Re: [PATCH] fix: avoid an infinite loop or a dangling pointer problem
- in img_commit
-References: <1497509253-28941-1-git-send-email-sochin.jiang@huawei.com>
-In-Reply-To: <1497509253-28941-1-git-send-email-sochin.jiang@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Instead of passing a single buffer pointer to do_perform_cow_write(),
+pass a QEMUIOVector. This will allow us to merge the write requests
+for the COW regions and the actual data into a single one.
 
-On 2017-06-15 08:47, sochin.jiang wrote:
-> From: "sochin.jiang" <sochin.jiang@huawei.com>
->=20
-> img_commit could fall into an infinite loop calling run_block_job() if
-> its blockjob fails on any I/O error, fix this already known problem.
->=20
-> Signed-off-by: sochin.jiang <sochin.jiang@huawei.com>
-> ---
->  blockjob.c               |  4 ++--
->  include/block/blockjob.h | 18 ++++++++++++++++++
->  qemu-img.c               | 20 +++++++++++++-------
->  3 files changed, 33 insertions(+), 9 deletions(-)
+Although do_perform_cow_read() does not strictly need to change its
+API, we're doing it here as well for consistency.
 
-Thanks! I've applied the patch to my block branch:
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+---
+ block/qcow2-cluster.c | 51 ++++++++++++++++++++++++---------------------------
+ 1 file changed, 24 insertions(+), 27 deletions(-)
 
-https://github.com/XanClic/qemu/commits/block
-
-PS: In the future, please change the subject prefix to "PATCH v2" (etc.)
-for updated versions of a patch.
-
-Max
-
-
---OSB4wgUjP8cIFiVCFBH3Lhjj723qGULDU
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEvBAEBCAAZBQJZQ9y6EhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQA/2
-B/42e0NItPvBZU3/0g3eNmh2WDlgFu2TzCgSe4B0afUAkZZXDLUg5vghEiDMr2jw
-aXszTlcT9kOAax3TL/NMKHrtwgw9XN5FyYIX6KbmZk/yaBMvpOpLHUoXdsD7F+Qn
-RkcBjvz9CvQB+nHjJIEjyEEOcTXk8oK7ewpfhq+ek1PNMJUycwtI+YHypQMlqyVg
-5CN0iHW8e0VYe7ZHDa6ybLTovc55lu6+EfoaH1AKOBQc0H70nOtpRp7VnXv1BdrM
-7Yp6maOa7oxRD1k+5IHlB+mF5hA69XfNBO7SMmZv8M9q4AeqZu3thdREcRLNMQ8F
-LppS3y9m7AwcFyeUDtzY2GPp
-=ZtTZ
------END PGP SIGNATURE-----
-
---OSB4wgUjP8cIFiVCFBH3Lhjj723qGULDU--
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 20fb531932..e1e45bd122 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -406,19 +406,14 @@ int qcow2_encrypt_sectors(BDRVQcow2State *s, int64_t sector_num,
+ static int coroutine_fn do_perform_cow_read(BlockDriverState *bs,
+                                             uint64_t src_cluster_offset,
+                                             unsigned offset_in_cluster,
+-                                            uint8_t *buffer,
+-                                            unsigned bytes)
++                                            QEMUIOVector *qiov)
+ {
+-    QEMUIOVector qiov;
+-    struct iovec iov = { .iov_base = buffer, .iov_len = bytes };
+     int ret;
+ 
+-    if (bytes == 0) {
++    if (qiov->size == 0) {
+         return 0;
+     }
+ 
+-    qemu_iovec_init_external(&qiov, &iov, 1);
+-
+     BLKDBG_EVENT(bs->file, BLKDBG_COW_READ);
+ 
+     if (!bs->drv) {
+@@ -430,7 +425,7 @@ static int coroutine_fn do_perform_cow_read(BlockDriverState *bs,
+      * which can lead to deadlock when block layer copy-on-read is enabled.
+      */
+     ret = bs->drv->bdrv_co_preadv(bs, src_cluster_offset + offset_in_cluster,
+-                                  bytes, &qiov, 0);
++                                  qiov->size, qiov, 0);
+     if (ret < 0) {
+         return ret;
+     }
+@@ -462,28 +457,23 @@ static bool coroutine_fn do_perform_cow_encrypt(BlockDriverState *bs,
+ static int coroutine_fn do_perform_cow_write(BlockDriverState *bs,
+                                              uint64_t cluster_offset,
+                                              unsigned offset_in_cluster,
+-                                             uint8_t *buffer,
+-                                             unsigned bytes)
++                                             QEMUIOVector *qiov)
+ {
+-    QEMUIOVector qiov;
+-    struct iovec iov = { .iov_base = buffer, .iov_len = bytes };
+     int ret;
+ 
+-    if (bytes == 0) {
++    if (qiov->size == 0) {
+         return 0;
+     }
+ 
+-    qemu_iovec_init_external(&qiov, &iov, 1);
+-
+     ret = qcow2_pre_write_overlap_check(bs, 0,
+-            cluster_offset + offset_in_cluster, bytes);
++            cluster_offset + offset_in_cluster, qiov->size);
+     if (ret < 0) {
+         return ret;
+     }
+ 
+     BLKDBG_EVENT(bs->file, BLKDBG_COW_WRITE);
+     ret = bdrv_co_pwritev(bs->file, cluster_offset + offset_in_cluster,
+-                          bytes, &qiov, 0);
++                          qiov->size, qiov, 0);
+     if (ret < 0) {
+         return ret;
+     }
+@@ -780,6 +770,7 @@ static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
+     unsigned data_bytes = end->offset - (start->offset + start->nb_bytes);
+     bool merge_reads;
+     uint8_t *start_buffer, *end_buffer;
++    QEMUIOVector qiov;
+     int ret;
+ 
+     assert(start->nb_bytes <= UINT_MAX - end->nb_bytes);
+@@ -816,22 +807,25 @@ static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
+     /* The part of the buffer where the end region is located */
+     end_buffer = start_buffer + buffer_size - end->nb_bytes;
+ 
++    qemu_iovec_init(&qiov, 3);
++
+     qemu_co_mutex_unlock(&s->lock);
+     /* First we read the existing data from both COW regions. We
+      * either read the whole region in one go, or the start and end
+      * regions separately. */
+     if (merge_reads) {
+-        ret = do_perform_cow_read(bs, m->offset, start->offset,
+-                                  start_buffer, buffer_size);
++        qemu_iovec_add(&qiov, start_buffer, buffer_size);
++        ret = do_perform_cow_read(bs, m->offset, start->offset, &qiov);
+     } else {
+-        ret = do_perform_cow_read(bs, m->offset, start->offset,
+-                                  start_buffer, start->nb_bytes);
++        qemu_iovec_add(&qiov, start_buffer, start->nb_bytes);
++        ret = do_perform_cow_read(bs, m->offset, start->offset, &qiov);
+         if (ret < 0) {
+             goto fail;
+         }
+ 
+-        ret = do_perform_cow_read(bs, m->offset, end->offset,
+-                                  end_buffer, end->nb_bytes);
++        qemu_iovec_reset(&qiov);
++        qemu_iovec_add(&qiov, end_buffer, end->nb_bytes);
++        ret = do_perform_cow_read(bs, m->offset, end->offset, &qiov);
+     }
+     if (ret < 0) {
+         goto fail;
+@@ -849,14 +843,16 @@ static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
+     }
+ 
+     /* And now we can write everything */
+-    ret = do_perform_cow_write(bs, m->alloc_offset, start->offset,
+-                               start_buffer, start->nb_bytes);
++    qemu_iovec_reset(&qiov);
++    qemu_iovec_add(&qiov, start_buffer, start->nb_bytes);
++    ret = do_perform_cow_write(bs, m->alloc_offset, start->offset, &qiov);
+     if (ret < 0) {
+         goto fail;
+     }
+ 
+-    ret = do_perform_cow_write(bs, m->alloc_offset, end->offset,
+-                               end_buffer, end->nb_bytes);
++    qemu_iovec_reset(&qiov);
++    qemu_iovec_add(&qiov, end_buffer, end->nb_bytes);
++    ret = do_perform_cow_write(bs, m->alloc_offset, end->offset, &qiov);
+ fail:
+     qemu_co_mutex_lock(&s->lock);
+ 
+@@ -870,6 +866,7 @@ fail:
+     }
+ 
+     qemu_vfree(start_buffer);
++    qemu_iovec_destroy(&qiov);
+     return ret;
+ }
+ 
+-- 
+2.11.0
