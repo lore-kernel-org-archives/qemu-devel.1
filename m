@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50021)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dLuzM-0008Ng-Mx
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 13:24:53 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dLv4e-0001yb-8O
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 13:30:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dLuzH-0001SS-Pf
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 13:24:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33094)
+	(envelope-from <dgilbert@redhat.com>) id 1dLv4Z-0005Er-9i
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 13:30:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59886)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dLuzH-0001Rt-GX
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 13:24:47 -0400
-References: <1497625153-19812-1-git-send-email-thuth@redhat.com>
-	<1497625153-19812-6-git-send-email-thuth@redhat.com>
-	<87h8zfc13z.fsf@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7388ac00-b7bd-c081-fdb2-4493e1273b34@redhat.com>
-Date: Fri, 16 Jun 2017 19:24:43 +0200
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dLv4Z-0005Cp-0Z
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 13:30:15 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9D004C0587FC
+	for <qemu-devel@nongnu.org>; Fri, 16 Jun 2017 17:30:13 +0000 (UTC)
+Date: Fri, 16 Jun 2017 18:30:00 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170616173000.GB19805@work-vm>
+References: <20170613095338.11560-1-quintela@redhat.com>
+	<20170613095338.11560-2-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87h8zfc13z.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 5/7] cpu: Introduce a wrapper for
- tlb_flush() that can be used in common code
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170613095338.11560-2-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/5] migration: Rename save_live_setup()
+ to save_setup()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,92 +34,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, kwolf@redhat.com, stefanha@redhat.com
 
+* Juan Quintela (quintela@redhat.com) wrote:
+> We are going to use it now for more than save live regions.
+> Once there rename qemu_savevm_state_begin() to qemu_savevm_state_setup().
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-On 16/06/2017 19:07, Alex Benn=C3=A9e wrote:
->=20
-> Thomas Huth <thuth@redhat.com> writes:
->=20
->> Commit 1f5c00cfdb8114c ("qom/cpu: move tlb_flush to cpu_common_reset")
->> moved the call to tlb_flush() from the target-specific reset handlers
->> into the common code qom/cpu.c file, and protected the call with
->> "#ifdef CONFIG_SOFTMMU" to avoid that it is called for linux-user
->> only targets. But since qom/cpu.c is common code, CONFIG_SOFTMMU is
->> *never* defined here, so the tlb_flush() was simply never executed
->> anymore. Fix it by introducing a wrapper for tlb_flush() in a file
->> that is re-compiled for each target, i.e. in translate-all.c.
->>
->> Fixes: 1f5c00cfdb8114c1e3a13426588ceb64f82c9ddb
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  include/exec/cpu-common.h | 2 ++
->>  qom/cpu.c                 | 5 ++---
->>  translate-all.c           | 8 ++++++++
->>  3 files changed, 12 insertions(+), 3 deletions(-)
->>
->> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
->> index 4d45a72..74341b1 100644
->> --- a/include/exec/cpu-common.h
->> +++ b/include/exec/cpu-common.h
->> @@ -28,6 +28,8 @@ void qemu_init_cpu_list(void);
->>  void cpu_list_lock(void);
->>  void cpu_list_unlock(void);
->>
->> +void tcg_flush_softmmu_tlb(CPUState *cs);
->> +
->>  #if !defined(CONFIG_USER_ONLY)
->>
->>  enum device_endian {
->> diff --git a/qom/cpu.c b/qom/cpu.c
->> index 5069876..303eb42 100644
->> --- a/qom/cpu.c
->> +++ b/qom/cpu.c
->> @@ -26,6 +26,7 @@
->>  #include "qemu/notify.h"
->>  #include "qemu/log.h"
->>  #include "exec/log.h"
->> +#include "exec/cpu-common.h"
->>  #include "qemu/error-report.h"
->>  #include "sysemu/sysemu.h"
->>  #include "hw/qdev-properties.h"
->> @@ -296,9 +297,7 @@ static void cpu_common_reset(CPUState *cpu)
->>              atomic_set(&cpu->tb_jmp_cache[i], NULL);
->>          }
->>
->> -#ifdef CONFIG_SOFTMMU
->> -        tlb_flush(cpu, 0);
->> -#endif
->> +        tcg_flush_softmmu_tlb(cpu);
->>      }
->>  }
->>
->> diff --git a/translate-all.c b/translate-all.c
->> index b3ee876..a45480f 100644
->> --- a/translate-all.c
->> +++ b/translate-all.c
->> @@ -2219,3 +2219,11 @@ int page_unprotect(target_ulong address, uintpt=
-r_t pc)
->>      return 0;
->>  }
->>  #endif /* CONFIG_USER_ONLY */
->> +
->> +/* This is a wrapper for common code that can not use CONFIG_SOFTMMU =
-*/
->> +void tcg_flush_softmmu_tlb(CPUState *cs)
->> +{
->> +#ifdef CONFIG_SOFTMMU
->> +    tlb_flush(cs);
->> +#endif
->> +}
->=20
-> Don't you usually have a empty inline for the stub in the headers so th=
-e
-> non-SoftMMU build can optimize away rather than link to an empty functi=
-on?
-
-Optimizing reset doesn't seem worthwhile. :)
-
-Paolo
+> ---
+>  hw/ppc/spapr.c               |  2 +-
+>  include/migration/register.h |  2 +-
+>  migration/block.c            |  2 +-
+>  migration/colo.c             |  2 +-
+>  migration/migration.c        |  2 +-
+>  migration/ram.c              |  2 +-
+>  migration/savevm.c           | 12 ++++++------
+>  migration/savevm.h           |  2 +-
+>  migration/trace-events       |  2 +-
+>  9 files changed, 14 insertions(+), 14 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index dcd44a1..7db5396 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1868,7 +1868,7 @@ static void htab_cleanup(void *opaque)
+>  }
+>  
+>  static SaveVMHandlers savevm_htab_handlers = {
+> -    .save_live_setup = htab_save_setup,
+> +    .save_setup = htab_save_setup,
+>      .save_live_iterate = htab_save_iterate,
+>      .save_live_complete_precopy = htab_save_complete,
+>      .cleanup = htab_cleanup,
+> diff --git a/include/migration/register.h b/include/migration/register.h
+> index 717c617..333e3df 100644
+> --- a/include/migration/register.h
+> +++ b/include/migration/register.h
+> @@ -36,7 +36,7 @@ typedef struct SaveVMHandlers {
+>      int (*save_live_iterate)(QEMUFile *f, void *opaque);
+>  
+>      /* This runs outside the iothread lock!  */
+> -    int (*save_live_setup)(QEMUFile *f, void *opaque);
+> +    int (*save_setup)(QEMUFile *f, void *opaque);
+>      void (*save_live_pending)(QEMUFile *f, void *opaque,
+>                                uint64_t threshold_size,
+>                                uint64_t *non_postcopiable_pending,
+> diff --git a/migration/block.c b/migration/block.c
+> index 3aae5a3..c160d41 100644
+> --- a/migration/block.c
+> +++ b/migration/block.c
+> @@ -1007,7 +1007,7 @@ static bool block_is_active(void *opaque)
+>  }
+>  
+>  static SaveVMHandlers savevm_block_handlers = {
+> -    .save_live_setup = block_save_setup,
+> +    .save_setup = block_save_setup,
+>      .save_live_iterate = block_save_iterate,
+>      .save_live_complete_precopy = block_save_complete,
+>      .save_live_pending = block_save_pending,
+> diff --git a/migration/colo.c b/migration/colo.c
+> index c436d63..8bc1690 100644
+> --- a/migration/colo.c
+> +++ b/migration/colo.c
+> @@ -350,7 +350,7 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
+>      /* Disable block migration */
+>      migrate_set_block_enabled(false, &local_err);
+>      qemu_savevm_state_header(fb);
+> -    qemu_savevm_state_begin(fb);
+> +    qemu_savevm_state_setup(fb);
+>      qemu_mutex_lock_iothread();
+>      qemu_savevm_state_complete_precopy(fb, false);
+>      qemu_mutex_unlock_iothread();
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 52dac9d..0799424 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1825,7 +1825,7 @@ static void *migration_thread(void *opaque)
+>          qemu_savevm_send_postcopy_advise(s->to_dst_file);
+>      }
+>  
+> -    qemu_savevm_state_begin(s->to_dst_file);
+> +    qemu_savevm_state_setup(s->to_dst_file);
+>  
+>      s->setup_time = qemu_clock_get_ms(QEMU_CLOCK_HOST) - setup_start;
+>      migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 7f687f5..3454bf7 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -2605,7 +2605,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>  }
+>  
+>  static SaveVMHandlers savevm_ram_handlers = {
+> -    .save_live_setup = ram_save_setup,
+> +    .save_setup = ram_save_setup,
+>      .save_live_iterate = ram_save_iterate,
+>      .save_live_complete_postcopy = ram_save_complete,
+>      .save_live_complete_precopy = ram_save_complete,
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index f32a82d..7f2a5bd 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -606,7 +606,7 @@ int register_savevm_live(DeviceState *dev,
+>      se->opaque = opaque;
+>      se->vmsd = NULL;
+>      /* if this is a live_savem then set is_ram */
+> -    if (ops->save_live_setup != NULL) {
+> +    if (ops->save_setup != NULL) {
+>          se->is_ram = 1;
+>      }
+>  
+> @@ -977,14 +977,14 @@ void qemu_savevm_state_header(QEMUFile *f)
+>  
+>  }
+>  
+> -void qemu_savevm_state_begin(QEMUFile *f)
+> +void qemu_savevm_state_setup(QEMUFile *f)
+>  {
+>      SaveStateEntry *se;
+>      int ret;
+>  
+> -    trace_savevm_state_begin();
+> +    trace_savevm_state_setup();
+>      QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> -        if (!se->ops || !se->ops->save_live_setup) {
+> +        if (!se->ops || !se->ops->save_setup) {
+>              continue;
+>          }
+>          if (se->ops && se->ops->is_active) {
+> @@ -994,7 +994,7 @@ void qemu_savevm_state_begin(QEMUFile *f)
+>          }
+>          save_section_header(f, se, QEMU_VM_SECTION_START);
+>  
+> -        ret = se->ops->save_live_setup(f, se->opaque);
+> +        ret = se->ops->save_setup(f, se->opaque);
+>          save_section_footer(f, se);
+>          if (ret < 0) {
+>              qemu_file_set_error(f, ret);
+> @@ -1252,7 +1252,7 @@ static int qemu_savevm_state(QEMUFile *f, Error **errp)
+>  
+>      qemu_mutex_unlock_iothread();
+>      qemu_savevm_state_header(f);
+> -    qemu_savevm_state_begin(f);
+> +    qemu_savevm_state_setup(f);
+>      qemu_mutex_lock_iothread();
+>  
+>      while (qemu_file_get_error(f) == 0) {
+> diff --git a/migration/savevm.h b/migration/savevm.h
+> index 45b59c1..54ce8f6 100644
+> --- a/migration/savevm.h
+> +++ b/migration/savevm.h
+> @@ -30,7 +30,7 @@
+>  #define QEMU_VM_SECTION_FOOTER       0x7e
+>  
+>  bool qemu_savevm_state_blocked(Error **errp);
+> -void qemu_savevm_state_begin(QEMUFile *f);
+> +void qemu_savevm_state_setup(QEMUFile *f);
+>  void qemu_savevm_state_header(QEMUFile *f);
+>  int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy);
+>  void qemu_savevm_state_cleanup(void);
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 38345be..9669e94 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -32,7 +32,7 @@ savevm_send_open_return_path(void) ""
+>  savevm_send_ping(uint32_t val) "%x"
+>  savevm_send_postcopy_listen(void) ""
+>  savevm_send_postcopy_run(void) ""
+> -savevm_state_begin(void) ""
+> +savevm_state_setup(void) ""
+>  savevm_state_header(void) ""
+>  savevm_state_iterate(void) ""
+>  savevm_state_cleanup(void) ""
+> -- 
+> 2.9.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
