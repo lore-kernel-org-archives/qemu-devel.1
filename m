@@ -1,27 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38372)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44496)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dLuHl-00075h-Tk
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 12:39:50 -0400
+	(envelope-from <maxime.coquelin@redhat.com>) id 1dLufr-0006hc-PT
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 13:04:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dLuHj-0004yz-AX
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 12:39:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50818)
+	(envelope-from <maxime.coquelin@redhat.com>) id 1dLufo-0000hi-Lt
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 13:04:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48048)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dLuHj-0004yQ-28
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 12:39:47 -0400
-Date: Fri, 16 Jun 2017 17:39:39 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170616163938.GD2179@work-vm>
-References: <1497544575-18628-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170615163630eucas1p1f7fc8849597e8402e1c537769f4255d6@eucas1p1.samsung.com>
-	<1497544575-18628-3-git-send-email-a.perevalov@samsung.com>
-	<20170616084936.GG30118@pxdev.xzpeter.org>
+	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
+	id 1dLufo-0000hM-CH
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 13:04:40 -0400
+References: <593F9187.6040800@intel.com>
+	<9f196d71-f06b-7520-ca03-e94bf3b5a986@redhat.com>
+	<593FB550.6090903@intel.com>
+	<26250da7-b394-4964-8842-5c45bbe85e09@redhat.com>
+	<6547dfcf-ea3a-f5f6-222d-40ff274654df@redhat.com>
+	<20170614180459-mutt-send-email-mst@kernel.org>
+	<b59be2f1-ee8c-e660-4f82-bbe63e22b603@redhat.com>
+	<59422E91.7080407@intel.com>
+	<20170616061949-mutt-send-email-mst@kernel.org>
+	<40a12829-6e84-e63e-ac47-6f09cc85c3cc@redhat.com>
+	<20170616181607-mutt-send-email-mst@kernel.org>
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Message-ID: <199a82f9-b122-08de-696a-04f7c6a369c6@redhat.com>
+Date: Fri, 16 Jun 2017 19:04:27 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170616084936.GG30118@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] migration: introduce
- qemu_ufd_copy_ioctl helper
+In-Reply-To: <20170616181607-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [virtio-dev] Re:
+ [PATCH v1] virtio-net: enable configurable tx queue size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,113 +39,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Alexey Perevalov <a.perevalov@samsung.com>, qemu-devel@nongnu.org, i.maximets@samsung.com, quintela@redhat.com
-
-* Peter Xu (peterx@redhat.com) wrote:
-> On Thu, Jun 15, 2017 at 07:36:14PM +0300, Alexey Perevalov wrote:
-> > Just for placing auxilary operations inside helper,
-> > auxilary operations like: track received pages,
-> > notify about copying operation in futher patches.
-> > 
-> > Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-> > ---
-> >  migration/postcopy-ram.c | 35 ++++++++++++++++++++++-------------
-> >  1 file changed, 22 insertions(+), 13 deletions(-)
-> > 
-> > diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> > index 743ca6c..38a429a 100644
-> > --- a/migration/postcopy-ram.c
-> > +++ b/migration/postcopy-ram.c
-> > @@ -561,6 +561,26 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
-> >      return 0;
-> >  }
-> >  
-> > +static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
-> > +        void *from_addr, uint64_t pagesize)
-> > +{
-> > +    if (from_addr) {
-> > +        struct uffdio_copy copy_struct;
-> > +        copy_struct.dst = (uint64_t)(uintptr_t)host_addr;
-> > +        copy_struct.src = (uint64_t)(uintptr_t)from_addr;
-> > +        copy_struct.len = pagesize;
-> > +        copy_struct.mode = 0;
-> > +        return ioctl(userfault_fd, UFFDIO_COPY, &copy_struct);
-> > +    } else {
-> > +        struct uffdio_zeropage zero_struct;
-> > +        zero_struct.range.start = (uint64_t)(uintptr_t)host_addr;
-> > +        zero_struct.range.len = pagesize;
-> > +        zero_struct.mode = 0;
-> > +        return ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
-> > +    }
-> > +    return 0;
-> 
-> Remove this line?
-
-Yes, probably should; only minor.
-
-> > +}
-> > +
-> >  /*
-> >   * Place a host page (from) at (host) atomically
-> >   * returns 0 on success
-> > @@ -568,20 +588,14 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
-> >  int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
-> >                          RAMBlock *rb)
-> >  {
-> > -    struct uffdio_copy copy_struct;
-> >      size_t pagesize = qemu_ram_pagesize(rb);
-> >  
-> > -    copy_struct.dst = (uint64_t)(uintptr_t)host;
-> > -    copy_struct.src = (uint64_t)(uintptr_t)from;
-> > -    copy_struct.len = pagesize;
-> > -    copy_struct.mode = 0;
-> > -
-> >      /* copy also acks to the kernel waking the stalled thread up
-> >       * TODO: We can inhibit that ack and only do it if it was requested
-> >       * which would be slightly cheaper, but we'd have to be careful
-> >       * of the order of updating our page state.
-> >       */
-> > -    if (ioctl(mis->userfault_fd, UFFDIO_COPY, &copy_struct)) {
-> > +    if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, from, pagesize)) {
-> 
-> (hmm I know "from" won't be zero, but naturally if without the context
->  I would doubt it. Shall we add an assert here? You call.)
-
-Doesn't seem worth it.
-
-> Besides:
-> 
-> Reviewed-by: Peter Xu <peterx@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
+Cc: Wei Wang <wei.w.wang@intel.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "stefanha@gmail.com" <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "jan.scheurich@ericsson.com" <jan.scheurich@ericsson.com>, "armbru@redhat.com" <armbru@redhat.com>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
 
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-> 
-> Thanks,
-> 
-> >          int e = errno;
-> >          error_report("%s: %s copy host: %p from: %p (size: %zd)",
-> >                       __func__, strerror(e), host, from, pagesize);
-> > @@ -605,12 +619,7 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
-> >  
-> >      pagesize = qemu_ram_pagesize(rb);
-> >      if (pagesize == getpagesize()) {
-> > -        struct uffdio_zeropage zero_struct;
-> > -        zero_struct.range.start = (uint64_t)(uintptr_t)host;
-> > -        zero_struct.range.len = getpagesize();
-> > -        zero_struct.mode = 0;
-> > -
-> > -        if (ioctl(mis->userfault_fd, UFFDIO_ZEROPAGE, &zero_struct)) {
-> > +        if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, 0, getpagesize())) {
-> >              int e = errno;
-> >              error_report("%s: %s zero host: %p",
-> >                           __func__, strerror(e), host);
-> > -- 
-> > 1.9.1
-> > 
-> 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+On 06/16/2017 05:19 PM, Michael S. Tsirkin wrote:
+> On Fri, Jun 16, 2017 at 04:57:01PM +0800, Jason Wang wrote:
+>>
+>>
+>> On 2017=E5=B9=B406=E6=9C=8816=E6=97=A5 11:22, Michael S. Tsirkin wrote=
+:
+>>>> I think the issues can be solved by VIRTIO_F_MAX_CHAIN_SIZE.
+>>>>
+>>>> For now, how about splitting it into two series of patches:
+>>>> 1) enable 1024 tx queue size for vhost-user, to let the users of vho=
+st-user
+>>>> to easily use 1024 queue size.
+>>> Fine with me. 1) will get property from user but override it on
+>>> !vhost-user. Do we need a protocol flag? It seems prudent but we get
+>>> back to cross-version migration issues that a04re still pending solut=
+ion.
+>>> Marc Andre, what's the status of that work?
+>>>
+>>>> 2) enable VIRTIO_F_MAX_CHAIN_SIZE,  to enhance robustness.
+>>> Rather, to support it for more backends.
+>>
+>> Ok, if we want to support different values of max chain size in the fu=
+ture.
+>> It would be problematic for migration of cross backends, consider the =
+case
+>> when migrating from 2048 (vhost-user) to 1024 (qemu/vhost-kernel).
+>>
+>> Thanks
+>=20
+> That's already a problem, and it's growing with each new feature.
+> Maxime looked at supporting vhost-user backends cross-version migration=
+,
+> I think we must merge some solution sooner rather than later, preferabl=
+y
+> by the next release.
+>=20
+> Maxime, any update here? Do we need a meeting to reach consensus?
+
+No update, I haven't found time to progress on the topic yet.
+
+For those who aren't aware of my initial proposal, you may find it here:
+https://www.spinics.net/linux/fedora/libvir/msg142668.html
+
+If my understanding is correct, you were concerned about the complexity=20
+of my
+proposal which involved too many layers. Your suggestion was to have a to=
+ol
+provided with qemu that would connect to vhost-user socket and query the
+backend capabilities.
+I'm not 100% clear how it would work, as the trend is to start the=20
+backend in
+client mode, meaning QEMU creates the socket. In this case, should the to=
+ol
+create the socket and management tool request the backend to connect to i=
+t?
+
+I think it could make sense to have a meeting, but maybe we should first
+discuss the solutions on the list for efficiency.
+
+For the delivery, what is QEMU v2.10 planned release date?
+
+Note that my solution doesn't involve QEMU, so it would not be tight to Q=
+EMU
+release date. But, that doesn't mean it would be delivered sooner than
+your solution.
+
+Maxime
