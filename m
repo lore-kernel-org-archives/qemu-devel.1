@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53904)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dLsj1-0002YF-SM
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 10:59:52 -0400
+	(envelope-from <thuth@redhat.com>) id 1dLsj5-0002br-H0
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 10:59:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dLsiy-0008EN-L1
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 10:59:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55612)
+	(envelope-from <thuth@redhat.com>) id 1dLsj4-0008GY-JC
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 10:59:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:1780)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dLsiy-0008E2-BD
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 10:59:48 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dLsj4-0008GJ-D0
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 10:59:54 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Fri, 16 Jun 2017 16:59:10 +0200
-Message-Id: <1497625153-19812-5-git-send-email-thuth@redhat.com>
+Date: Fri, 16 Jun 2017 16:59:11 +0200
+Message-Id: <1497625153-19812-6-git-send-email-thuth@redhat.com>
 In-Reply-To: <1497625153-19812-1-git-send-email-thuth@redhat.com>
 References: <1497625153-19812-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/7] include/exec/poison: Mark CONFIG_KVM as
- poisoned, too
+Subject: [Qemu-devel] [PATCH 5/7] cpu: Introduce a wrapper for tlb_flush()
+ that can be used in common code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,96 +27,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc: Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-CONFIG_KVM is only defined for target-specific code, so nobody should
-use it by accident in common code. To avoid such subtle bugs,
-CONFIG_KVM is now marked as poisoned in common code. The header
-include/sysemu/kvm.h is somewhat special since it is included
-all over the place from common code, too, so we need some extra
-logic via "#ifdef NEED_CPU_H" here to make sure that we can
-compile all files without problems.
+Commit 1f5c00cfdb8114c ("qom/cpu: move tlb_flush to cpu_common_reset")
+moved the call to tlb_flush() from the target-specific reset handlers
+into the common code qom/cpu.c file, and protected the call with
+"#ifdef CONFIG_SOFTMMU" to avoid that it is called for linux-user
+only targets. But since qom/cpu.c is common code, CONFIG_SOFTMMU is
+*never* defined here, so the tlb_flush() was simply never executed
+anymore. Fix it by introducing a wrapper for tlb_flush() in a file
+that is re-compiled for each target, i.e. in translate-all.c.
 
+Fixes: 1f5c00cfdb8114c1e3a13426588ceb64f82c9ddb
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/acpi/ich9.c        |  1 -
- include/exec/poison.h |  1 +
- include/sysemu/kvm.h  | 18 +++++++++++++-----
- 3 files changed, 14 insertions(+), 6 deletions(-)
+ include/exec/cpu-common.h | 2 ++
+ qom/cpu.c                 | 5 ++---
+ translate-all.c           | 8 ++++++++
+ 3 files changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
-index 5c279bb..c5d8646 100644
---- a/hw/acpi/ich9.c
-+++ b/hw/acpi/ich9.c
-@@ -33,7 +33,6 @@
+diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+index 4d45a72..74341b1 100644
+--- a/include/exec/cpu-common.h
++++ b/include/exec/cpu-common.h
+@@ -28,6 +28,8 @@ void qemu_init_cpu_list(void);
+ void cpu_list_lock(void);
+ void cpu_list_unlock(void);
+ 
++void tcg_flush_softmmu_tlb(CPUState *cs);
++
+ #if !defined(CONFIG_USER_ONLY)
+ 
+ enum device_endian {
+diff --git a/qom/cpu.c b/qom/cpu.c
+index 5069876..303eb42 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -26,6 +26,7 @@
+ #include "qemu/notify.h"
+ #include "qemu/log.h"
+ #include "exec/log.h"
++#include "exec/cpu-common.h"
+ #include "qemu/error-report.h"
  #include "sysemu/sysemu.h"
- #include "hw/acpi/acpi.h"
- #include "hw/acpi/tco.h"
--#include "sysemu/kvm.h"
- #include "exec/address-spaces.h"
+ #include "hw/qdev-properties.h"
+@@ -296,9 +297,7 @@ static void cpu_common_reset(CPUState *cpu)
+             atomic_set(&cpu->tb_jmp_cache[i], NULL);
+         }
  
- #include "hw/i386/ich9.h"
-diff --git a/include/exec/poison.h b/include/exec/poison.h
-index 5ffed4d..540fc70 100644
---- a/include/exec/poison.h
-+++ b/include/exec/poison.h
-@@ -80,6 +80,7 @@
- 
- #pragma GCC poison CONFIG_LINUX_USER
- #pragma GCC poison CONFIG_VHOST_NET
-+#pragma GCC poison CONFIG_KVM
- 
- #endif
- #endif
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index ca40b6e..052e11f 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -19,11 +19,18 @@
- #include "exec/memattrs.h"
- #include "hw/irq.h"
- 
--#ifdef CONFIG_KVM
--#include <linux/kvm.h>
--#include <linux/kvm_para.h>
-+#ifdef NEED_CPU_H
-+# ifdef CONFIG_KVM
-+#  include <linux/kvm.h>
-+#  include <linux/kvm_para.h>
-+#  define CONFIG_KVM_IS_POSSIBLE
-+# endif
-+#else
-+# define CONFIG_KVM_IS_POSSIBLE
- #endif
- 
-+#ifdef CONFIG_KVM_IS_POSSIBLE
-+
- extern bool kvm_allowed;
- extern bool kvm_kernel_irqchip;
- extern bool kvm_split_irqchip;
-@@ -40,7 +47,6 @@ extern bool kvm_direct_msi_allowed;
- extern bool kvm_ioeventfd_any_length_allowed;
- extern bool kvm_msi_use_devid;
- 
--#if defined CONFIG_KVM || !defined NEED_CPU_H
- #define kvm_enabled()           (kvm_allowed)
- /**
-  * kvm_irqchip_in_kernel:
-@@ -163,6 +169,7 @@ extern bool kvm_msi_use_devid;
- #define kvm_msi_devid_required() (kvm_msi_use_devid)
- 
- #else
-+
- #define kvm_enabled()           (0)
- #define kvm_irqchip_in_kernel() (false)
- #define kvm_irqchip_is_split() (false)
-@@ -178,7 +185,8 @@ extern bool kvm_msi_use_devid;
- #define kvm_direct_msi_enabled() (false)
- #define kvm_ioeventfd_any_length_enabled() (false)
- #define kvm_msi_devid_required() (false)
+-#ifdef CONFIG_SOFTMMU
+-        tlb_flush(cpu, 0);
 -#endif
-+
-+#endif  /* CONFIG_KVM_IS_POSSIBLE */
++        tcg_flush_softmmu_tlb(cpu);
+     }
+ }
  
- struct kvm_run;
- struct kvm_lapic_state;
+diff --git a/translate-all.c b/translate-all.c
+index b3ee876..a45480f 100644
+--- a/translate-all.c
++++ b/translate-all.c
+@@ -2219,3 +2219,11 @@ int page_unprotect(target_ulong address, uintptr_t pc)
+     return 0;
+ }
+ #endif /* CONFIG_USER_ONLY */
++
++/* This is a wrapper for common code that can not use CONFIG_SOFTMMU */
++void tcg_flush_softmmu_tlb(CPUState *cs)
++{
++#ifdef CONFIG_SOFTMMU
++    tlb_flush(cs);
++#endif
++}
 -- 
 1.8.3.1
