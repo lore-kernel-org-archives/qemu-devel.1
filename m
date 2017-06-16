@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55219)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dLsoU-0007vp-8s
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:05:31 -0400
+	(envelope-from <mst@redhat.com>) id 1dLsyP-0003Qa-Os
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:15:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dLsoR-0001DV-2Y
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:05:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46112)
+	(envelope-from <mst@redhat.com>) id 1dLsyK-0007fk-Rv
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:15:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51176)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dLsoQ-0001C1-Td
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:05:27 -0400
-References: <1497625153-19812-1-git-send-email-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b2343916-49d4-5c18-8b2f-f3538839b46e@redhat.com>
-Date: Fri, 16 Jun 2017 17:05:21 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dLsyK-0007ep-I0
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:15:40 -0400
+Date: Fri, 16 Jun 2017 18:15:37 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170616181040-mutt-send-email-mst@kernel.org>
+References: <9f196d71-f06b-7520-ca03-e94bf3b5a986@redhat.com>
+	<593FB550.6090903@intel.com>
+	<26250da7-b394-4964-8842-5c45bbe85e09@redhat.com>
+	<6547dfcf-ea3a-f5f6-222d-40ff274654df@redhat.com>
+	<20170614180459-mutt-send-email-mst@kernel.org>
+	<b59be2f1-ee8c-e660-4f82-bbe63e22b603@redhat.com>
+	<59422E91.7080407@intel.com>
+	<20170616061949-mutt-send-email-mst@kernel.org>
+	<40a12829-6e84-e63e-ac47-6f09cc85c3cc@redhat.com>
+	<5943AE93.7020502@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1497625153-19812-1-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] Poison some more target-specific
- defines
+Content-Disposition: inline
+In-Reply-To: <5943AE93.7020502@intel.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [virtio-dev] Re:
+ [PATCH v1] virtio-net: enable configurable tx queue size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +37,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: Jason Wang <jasowang@redhat.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "stefanha@gmail.com" <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "jan.scheurich@ericsson.com" <jan.scheurich@ericsson.com>, "armbru@redhat.com" <armbru@redhat.com>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
 
-On 16/06/2017 16:59, Thomas Huth wrote:
-> This series marks some more #defines as poisoned, which are
-> target-specific (declared in config-target.h) and thus must
-> not be used in common code.
-> 
-> v2:
->  - First two patches are the same as in v1
->  - Reworked the CONFIG_KVM patches according to Paolo's review feedback
->  - Added two new patches to finally poison CONFIG_SOFTMMU, too
->  - Added a final patch to move bootdevice.o to common-obj now
->    (based on an earlier patch where I also tried to move numa.o and
->    balloon.o, too - but these files are indirectly target-dependent as
->    I now know, so they can't be moved)
+On Fri, Jun 16, 2017 at 06:10:27PM +0800, Wei Wang wrote:
+> On 06/16/2017 04:57 PM, Jason Wang wrote:
+> >=20
+> >=20
+> > On 2017=E5=B9=B406=E6=9C=8816=E6=97=A5 11:22, Michael S. Tsirkin wrot=
+e:
+> > > > I think the issues can be solved by VIRTIO_F_MAX_CHAIN_SIZE.
+> > > >=20
+> > > > For now, how about splitting it into two series of patches:
+> > > > 1) enable 1024 tx queue size for vhost-user, to let the users of
+> > > > vhost-user
+> > > > to easily use 1024 queue size.
+> > > Fine with me. 1) will get property from user but override it on
+> > > !vhost-user. Do we need a protocol flag? It seems prudent but we ge=
+t
+> > > back to cross-version migration issues that are still pending solut=
+ion.
+> What do you have in mind about the protocol flag?
 
-Why do you say they can't be moved?  They can, and your series should
-change nothing about it, thanks to what you're doing now with
-CONFIG_KVM_IS_POSSIBLE (which was also done before with NEED_CPU_H).
+Merely this: older clients might be confused if they get
+a s/g with 1024 entries.
 
-If it compiles, it's perfect. :)  (Almost---your patches 5-6 show it's
-not entirely true, but poisoning helps).
+> Btw, I just tested the patch of 1), and it works fine with migration fr=
+om
+> the
+> patched to non-patched version of QEMU. I'll send it out. Please have a
+> check.
+>=20
+>=20
+> > > Marc Andre, what's the status of that work?
+> > >=20
+> > > > 2) enable VIRTIO_F_MAX_CHAIN_SIZE,  to enhance robustness.
+> > > Rather, to support it for more backends.
+> >=20
+> > Ok, if we want to support different values of max chain size in the
+> > future. It would be problematic for migration of cross backends,
+> > consider the case when migrating from 2048 (vhost-user) to 1024
+> > (qemu/vhost-kernel).
+> >=20
+>=20
+> I think that wouldn't be a problem. If there is a possibility to change=
+ the
+> backend resulting in a change of config.max_change_size, a configuratio=
+n
+> change notification can be injected to the guest, then guest will read =
+and
+> get the new value.
+>=20
+> Best,
+> Wei
 
-Paolo
+This might not be supportable by all guests. E.g. some requests might
+already be in the queue. I'm not against reconfiguring devices across
+migration but I think it's a big project. As a 1st step I would focus on
+keeping configuration consistent across migrations.
 
-> Thomas Huth (7):
->   include/exec/poison: Add missing TARGET defines
->   include/exec/poison: Mark some CONFIG defines as poisoned, too
->   Move CONFIG_KVM related definitions to kvm_i386.h
->   include/exec/poison: Mark CONFIG_KVM as poisoned, too
->   cpu: Introduce a wrapper for tlb_flush() that can be used in common
->     code
->   include/exec/poison: Mark CONFIG_SOFTMMU as poisoned
->   Makefile: Move bootdevice.o to common-obj-y
-> 
->  Makefile.objs             |  2 +-
->  Makefile.target           |  2 +-
->  bootdevice.c              |  2 +-
->  hw/acpi/ich9.c            |  1 -
->  hw/i386/pc_q35.c          |  1 +
->  include/exec/cpu-common.h |  2 ++
->  include/exec/poison.h     | 33 +++++++++++++++++++++++++++++++++
->  include/hw/i386/pc.h      | 13 -------------
->  include/qom/cpu.h         |  8 ++++++++
->  include/sysemu/kvm.h      | 31 ++++++++++++-------------------
->  qom/cpu.c                 |  5 ++---
->  target/i386/kvm_i386.h    | 23 +++++++++++++++++++++++
->  translate-all.c           |  8 ++++++++
->  13 files changed, 92 insertions(+), 39 deletions(-)
-> 
+--=20
+MST
