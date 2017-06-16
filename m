@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dLtmG-0000z6-2r
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 12:07:17 -0400
+	(envelope-from <famz@redhat.com>) id 1dLtmJ-00012a-9F
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 12:07:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dLtmB-0000gl-9N
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 12:07:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35328)
+	(envelope-from <famz@redhat.com>) id 1dLtmI-0000iB-Cy
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 12:07:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47528)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dLtmB-0000ga-0v
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 12:07:11 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dLtmI-0000i2-6Z
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 12:07:18 -0400
+Date: Sat, 17 Jun 2017 00:07:11 +0800
 From: Fam Zheng <famz@redhat.com>
-Date: Sat, 17 Jun 2017 00:06:58 +0800
-Message-Id: <20170616160658.32290-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH] migration: Fix race of image locking between
- src and dst
+Message-ID: <20170616160711.GA20922@lemon.lan>
+References: <20170615152852.GB2399@work-vm>
+	<6e150052-91ca-d260-b0e9-6894f93fc15d@redhat.com>
+	<CAFEAcA_pEkfR9w9+oES=965dkDBCo=2yAyWEQ_eujfcyu1XQ-w@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_pEkfR9w9+oES=965dkDBCo=2yAyWEQ_eujfcyu1XQ-w@mail.gmail.com>
+Subject: Re: [Qemu-devel] ahci-test failures with 'Failed to get "write"
+ lock'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,166 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, peterx@redhat.com, mreitz@redhat.com, stefanha@redhat.com, Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jsnow@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-Previously, dst side will immediately try to lock the write byte upon
-receiving QEMU_VM_EOF, but at src side, bdrv_inactivate_all() is only
-done after sending it. If the src host is under load, dst may fail to
-acquire the lock due to racing with the src unlocking it.
+On Fri, 06/16 10:23, Peter Maydell wrote:
+> On 15 June 2017 at 17:16, John Snow <jsnow@redhat.com> wrote:
+> > On 06/15/2017 11:28 AM, Dr. David Alan Gilbert wrote:
+> >> Hi,
+> >>   Peter noticed that there were some hangs in the ahci-test;
+> >> I can reproduce them on my laptop as long as the laptop has
+> >> some other load on it (a few md5sum /dev/zero's help).
+> >>
+> >> /x86_64/ahci/flush/migrate: qemu-system-x86_64: Failed to get "write" lock
+> >> Is another process using the image?
+> >> OK
+> >> /x86_64/ahci/migrate/sanity: qemu-system-x86_64: Failed to get "write" lock
+> >> Is another process using the image?
+> >>
+> >> and that hangs in sanity.
+> >>
+> >> That seems to be the common case, I've also had one:
+> >>
+> >> /x86_64/ahci/migrate/ncq/halted: qemu-system-x86_64: Failed to get "write" lock
+> >> Is another process using the image?
+> >> qemu-system-x86_64: /home/dgilbert/git/qemu/block/io.c:1352: bdrv_aligned_pwritev: Assertion `child->perm & BLK_PERM_WRITE' failed.
+> >>
+> >>
+> >> Neither of these always fail.
+> 
+> > Haven't observed myself and I run the tests pretty frequently. I'll keep
+> > an eye out. I see many similar problems in iotests for other areas, too.
+> 
+> If we can figure out this quickly that would be good -- it's
+> causing my build tests to fail often enough that I'm a bit
+> reluctant to try to merge more pull requests until we've
+> squished this bug...
 
-Fix this by hoisting the bdrv_inactivate_all() operation before
-QEMU_VM_EOF.
+I have posted a patch:
 
-N.B. A further improvement could possibly be done to cleanly handover
-locks between src and dst, so that there is no window where a third QEMU
-could steal the locks and prevent src and dst from running.
+[PATCH] migration: Fix race of image locking between src and dst
 
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- migration/colo.c      |  2 +-
- migration/migration.c | 19 +++++++------------
- migration/savevm.c    | 19 +++++++++++++++----
- migration/savevm.h    |  3 ++-
- 4 files changed, 25 insertions(+), 18 deletions(-)
+(You are Cc'ed)
 
-diff --git a/migration/colo.c b/migration/colo.c
-index c436d63..c4ba4c3 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -352,7 +352,7 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
-     qemu_savevm_state_header(fb);
-     qemu_savevm_state_begin(fb);
-     qemu_mutex_lock_iothread();
--    qemu_savevm_state_complete_precopy(fb, false);
-+    qemu_savevm_state_complete_precopy(fb, false, false);
-     qemu_mutex_unlock_iothread();
- 
-     qemu_fflush(fb);
-diff --git a/migration/migration.c b/migration/migration.c
-index b9d8798..f588329 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1553,7 +1553,7 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
-      * Cause any non-postcopiable, but iterative devices to
-      * send out their final data.
-      */
--    qemu_savevm_state_complete_precopy(ms->to_dst_file, true);
-+    qemu_savevm_state_complete_precopy(ms->to_dst_file, true, false);
- 
-     /*
-      * in Finish migrate and with the io-lock held everything should
-@@ -1597,7 +1597,7 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
-      */
-     qemu_savevm_send_postcopy_listen(fb);
- 
--    qemu_savevm_state_complete_precopy(fb, false);
-+    qemu_savevm_state_complete_precopy(fb, false, false);
-     qemu_savevm_send_ping(fb, 3);
- 
-     qemu_savevm_send_postcopy_run(fb);
-@@ -1695,20 +1695,15 @@ static void migration_completion(MigrationState *s, int current_active_state,
-         ret = global_state_store();
- 
-         if (!ret) {
-+            bool inactivate = !migrate_colo_enabled();
-             ret = vm_stop_force_state(RUN_STATE_FINISH_MIGRATE);
-             if (ret >= 0) {
-                 qemu_file_set_rate_limit(s->to_dst_file, INT64_MAX);
--                qemu_savevm_state_complete_precopy(s->to_dst_file, false);
-+                ret = qemu_savevm_state_complete_precopy(s->to_dst_file, false,
-+                                                         inactivate);
-             }
--            /*
--             * Don't mark the image with BDRV_O_INACTIVE flag if
--             * we will go into COLO stage later.
--             */
--            if (ret >= 0 && !migrate_colo_enabled()) {
--                ret = bdrv_inactivate_all();
--                if (ret >= 0) {
--                    s->block_inactive = true;
--                }
-+            if (inactivate && ret >= 0) {
-+                s->block_inactive = true;
-             }
-         }
-         qemu_mutex_unlock_iothread();
-diff --git a/migration/savevm.c b/migration/savevm.c
-index f32a82d..6bfd489 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1104,7 +1104,8 @@ void qemu_savevm_state_complete_postcopy(QEMUFile *f)
-     qemu_fflush(f);
- }
- 
--void qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only)
-+int qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only,
-+                                       bool inactivate_disks)
- {
-     QJSON *vmdesc;
-     int vmdesc_len;
-@@ -1138,12 +1139,12 @@ void qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only)
-         save_section_footer(f, se);
-         if (ret < 0) {
-             qemu_file_set_error(f, ret);
--            return;
-+            return -1;
-         }
-     }
- 
-     if (iterable_only) {
--        return;
-+        return 0;
-     }
- 
-     vmdesc = qjson_new();
-@@ -1173,6 +1174,15 @@ void qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only)
-         json_end_object(vmdesc);
-     }
- 
-+    if (inactivate_disks) {
-+        /* Inactivate before sending QEMU_VM_EOF so that the
-+         * bdrv_invalidate_cache_all() on the other end won't fail. */
-+        ret = bdrv_inactivate_all();
-+        if (ret) {
-+            qemu_file_set_error(f, ret);
-+            return ret;
-+        }
-+    }
-     if (!in_postcopy) {
-         /* Postcopy stream will still be going */
-         qemu_put_byte(f, QEMU_VM_EOF);
-@@ -1190,6 +1200,7 @@ void qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only)
-     qjson_destroy(vmdesc);
- 
-     qemu_fflush(f);
-+    return 0;
- }
- 
- /* Give an estimate of the amount left to be transferred,
-@@ -1263,7 +1274,7 @@ static int qemu_savevm_state(QEMUFile *f, Error **errp)
- 
-     ret = qemu_file_get_error(f);
-     if (ret == 0) {
--        qemu_savevm_state_complete_precopy(f, false);
-+        qemu_savevm_state_complete_precopy(f, false, false);
-         ret = qemu_file_get_error(f);
-     }
-     qemu_savevm_state_cleanup();
-diff --git a/migration/savevm.h b/migration/savevm.h
-index 45b59c1..5a2ed11 100644
---- a/migration/savevm.h
-+++ b/migration/savevm.h
-@@ -35,7 +35,8 @@ void qemu_savevm_state_header(QEMUFile *f);
- int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy);
- void qemu_savevm_state_cleanup(void);
- void qemu_savevm_state_complete_postcopy(QEMUFile *f);
--void qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only);
-+int qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only,
-+                                       bool inactivate_disks);
- void qemu_savevm_state_pending(QEMUFile *f, uint64_t max_size,
-                                uint64_t *res_non_postcopiable,
-                                uint64_t *res_postcopiable);
--- 
-2.9.4
+Fam
