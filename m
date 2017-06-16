@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dLwKt-0002dh-RX
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 14:51:12 -0400
+	(envelope-from <gsomlo@gmail.com>) id 1dLwP8-0004UD-0t
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 14:55:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dLwKq-00039R-Ot
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 14:51:11 -0400
-Date: Fri, 16 Jun 2017 14:50:56 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170616185056.GA3055@flamenco>
-References: <1497567879-13734-1-git-send-email-cota@braap.org>
-	<1497567879-13734-2-git-send-email-cota@braap.org>
-	<df6ef6c7-6bb5-a509-5e8e-66757598b11f@redhat.com>
+	(envelope-from <gsomlo@gmail.com>) id 1dLwP5-0006Vs-08
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 14:55:34 -0400
+Received: from mail-qt0-x229.google.com ([2607:f8b0:400d:c0d::229]:33202)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <gsomlo@gmail.com>) id 1dLwP4-0006UU-OA
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 14:55:30 -0400
+Received: by mail-qt0-x229.google.com with SMTP id u12so75316258qth.0
+	for <qemu-devel@nongnu.org>; Fri, 16 Jun 2017 11:55:28 -0700 (PDT)
+From: "Gabriel L. Somlo" <gsomlo@gmail.com>
+Date: Fri, 16 Jun 2017 14:55:13 -0400
+Message-Id: <1497639316-22202-1-git-send-email-gsomlo@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <df6ef6c7-6bb5-a509-5e8e-66757598b11f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] gen-icount: pass cpu_env as a
- parameter to gen_* inlines
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 0/3] Update AppleSMC for OS X 10.12.4+ guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,24 +26,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Michael Walle <michael@walle.cc>, Laurent Vivier <laurent@vivier.eu>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Anthony Green <green@moxielogic.com>, Chris Wulff <crwulff@gmail.com>, Marek Vasut <marex@denx.de>, Stafford Horne <shorne@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Max Filippov <jcmvbkbc@gmail.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
+To: qemu-devel@nongnu.org
+Cc: agraf@suse.de, pbonzini@redhat.com, f4bug@amsat.org, eshelton@pobox.com
 
-On Fri, Jun 16, 2017 at 10:32:14 +0200, Paolo Bonzini wrote:
-> On 16/06/2017 01:04, Emilio G. Cota wrote:
-> >              va = dest_gpr(ctx, ra);
-> >              if (ctx->tb->cflags & CF_USE_ICOUNT) {
-> > -                gen_io_start();
-> > +                gen_io_start(cpu_env);
-> >                  gen_helper_load_pcc(va, cpu_env);
-> > -                gen_io_end();
-> > +                gen_io_start(cpu_env);
-> 
-> Careful, looks like a cut-and-paste issue here.
+As of 10.12.4, OS X refuses to boot unless the AppleSMC supports a
+third I/O port, which provides the current error status when read.
 
-Ouch, messed up the regex there -- thanks.
+New since v2:
+	- updated "reviewd-by" fields
+	- ping ?
 
-Fixed in the upcoming v2, which doesn't need to go through all this churn
-and instead takes the value from tcg_ctx as Richard pointed out.
+>New since v1:
+>
+>        - 1/3: don't touch the default OSK string, as it's unnecessary
+>                at this time
+>
+>        - 2/3: don't consolidate I/O regions, leave as-is for data
+>                and cmd; This patch now implements the error-code state
+>                machine, AND adds an i/o region dedicaded to the error
+>                status port, complete with read/write access methods.
+>
+>        - 3/3: set access width to 1-byte on data and cmd i/o regions.
+>                Tested on OS X versions 10.[6..12].
+>
+>> This series consists of three patches:
+>>
+>>       - 1/3: indentation/whitespace cleanup for applesmc.c to the point
+>>               where it now passes scripts/checkpatc.pl, and allows
+>>               subsequent changes to look nice in diff-patch format :)
+>>
+>>       - 2/3: consolidate Port I/O into a single region, and invoke
+>>               appropriate read/write methods based on the offset being
+>>               accessed
+>>
+>>       - 3/3: implement read-only error/status port, and update
+>>               data and command read/write methods to correctly
+>>               maintain the state machine for keeping the status_1e
+>>               value up to date.
 
-		E.
+
+Gabriel L. Somlo (3):
+  applesmc: cosmetic whitespace and indentation cleanup
+  applesmc: implement error status port
+  applesmc: fix port i/o access width
+
+ hw/misc/applesmc.c | 219 +++++++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 155 insertions(+), 64 deletions(-)
+
+-- 
+2.7.4
