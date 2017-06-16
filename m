@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dLvD2-0006uR-53
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 13:39:01 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dLvSG-0005sk-5T
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 13:54:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dLvCy-0002Vk-2X
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 13:39:00 -0400
-Received: from mailout4.w1.samsung.com ([210.118.77.14]:19795)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1dLvCx-0002V5-Q4
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 13:38:56 -0400
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout4.w1.samsung.com
-	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
-	2014)) with ESMTP id <0ORN00HZHICQOA00@mailout4.w1.samsung.com> for
-	qemu-devel@nongnu.org; Fri, 16 Jun 2017 18:38:50 +0100 (BST)
-From: Alexey Perevalov <a.perevalov@samsung.com>
-Message-id: <c32fa26f-7de7-63f8-4202-2eaaa914add3@samsung.com>
-Date: Fri, 16 Jun 2017 20:38:46 +0300
-MIME-version: 1.0
-In-reply-to: <20170616171412.GA19805@work-vm>
-Content-type: text/plain; charset=utf-8; format=flowed
-Content-transfer-encoding: 7bit
-Content-language: en-GB
-References: <1497544575-18628-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170615163630eucas1p24f8f92a8acc7e408849696645f9557f2@eucas1p2.samsung.com>
-	<1497544575-18628-4-git-send-email-a.perevalov@samsung.com>
-	<20170616171412.GA19805@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] migration: add bitmap for received
- page
+	(envelope-from <dgilbert@redhat.com>) id 1dLvSF-0006IF-9c
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 13:54:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55626)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dLvSF-0006IA-09
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 13:54:43 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CF9F764DAC
+	for <qemu-devel@nongnu.org>; Fri, 16 Jun 2017 17:54:41 +0000 (UTC)
+Date: Fri, 16 Jun 2017 18:54:18 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170616175417.GD19805@work-vm>
+References: <20170613095338.11560-1-quintela@redhat.com>
+	<20170613095338.11560-4-quintela@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170613095338.11560-4-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] migration: Create
+ load_setup()/cleanup() methods
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,186 +34,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, peterx@redhat.com, i.maximets@samsung.com, quintela@redhat.com
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, kwolf@redhat.com, stefanha@redhat.com
 
-On 06/16/2017 08:14 PM, Dr. David Alan Gilbert wrote:
-> * Alexey Perevalov (a.perevalov@samsung.com) wrote:
->> This patch adds ability to track down already received
->> pages, it's necessary for calculation vCPU block time in
->> postcopy migration feature, maybe for restore after
->> postcopy migration failure.
->> Also it's necessary to solve shared memory issue in
->> postcopy livemigration. Information about received pages
->> will be transferred to the software virtual bridge
->> (e.g. OVS-VSWITCHD), to avoid fallocate (unmap) for
->> already received pages. fallocate syscall is required for
->> remmaped shared memory, due to remmaping itself blocks
->> ioctl(UFFDIO_COPY, ioctl in this case will end with EEXIT
->> error (struct page is exists after remmap).
->>
->> Bitmap is placed into RAMBlock as another postcopy/precopy
->> related bitmaps.
->>
->> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
->> ---
->>   include/exec/ram_addr.h  |  2 ++
->>   migration/postcopy-ram.c | 11 ++++++++---
->>   migration/ram.c          | 33 +++++++++++++++++++++++++++++++++
->>   migration/ram.h          |  5 +++++
->>   migration/savevm.c       |  1 +
->>   5 files changed, 49 insertions(+), 3 deletions(-)
->>
->> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
->> index 140efa8..c2c1dfe 100644
->> --- a/include/exec/ram_addr.h
->> +++ b/include/exec/ram_addr.h
->> @@ -47,6 +47,8 @@ struct RAMBlock {
->>        * of the postcopy phase
->>        */
->>       unsigned long *unsentmap;
->> +    /* bitmap of already received pages in postcopy */
->> +    unsigned long *receivedmap;
->>   };
->>   
->>   static inline bool offset_in_ramblock(RAMBlock *b, ram_addr_t offset)
->> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
->> index 38a429a..5ac3ed2 100644
->> --- a/migration/postcopy-ram.c
->> +++ b/migration/postcopy-ram.c
->> @@ -562,8 +562,13 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
->>   }
->>   
->>   static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
->> -        void *from_addr, uint64_t pagesize)
->> +        void *from_addr, uint64_t pagesize, RAMBlock *rb)
->>   {
->> +    /* received page isn't feature of blocktime calculation,
->> +     * it's more general entity, so keep it here,
->> +     * but gup betwean two following operation could be high,
->> +     * and in this case blocktime for such small interval will be lost */
->> +    set_receivedmap_by_addr(host_addr, rb);
->>       if (from_addr) {
->>           struct uffdio_copy copy_struct;
->>           copy_struct.dst = (uint64_t)(uintptr_t)host_addr;
->> @@ -595,7 +600,7 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
->>        * which would be slightly cheaper, but we'd have to be careful
->>        * of the order of updating our page state.
->>        */
->> -    if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, from, pagesize)) {
->> +    if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, from, pagesize, rb)) {
-> In your first patch of the series you changed postcopy_place_page to
-> take a RAMBlock* *rather* than a pagesize; perhaps it would be better
-> to do the same here?
-that's true only for postcopy_place_page where pagesize is getting from 
-ramblock,
-but not true for postcopy_place_page_zero, where initially was len = 
-getpagesize()
->
-> Other than that looks pretty good.
->
-> Dave
->
->>           int e = errno;
->>           error_report("%s: %s copy host: %p from: %p (size: %zd)",
->>                        __func__, strerror(e), host, from, pagesize);
->> @@ -619,7 +624,7 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
->>   
->>       pagesize = qemu_ram_pagesize(rb);
->>       if (pagesize == getpagesize()) {
->> -        if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, 0, getpagesize())) {
->> +        if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, 0, getpagesize(), rb)) {
->>               int e = errno;
->>               error_report("%s: %s zero host: %p",
->>                            __func__, strerror(e), host);
->> diff --git a/migration/ram.c b/migration/ram.c
->> index f50479d..f5ea3c2 100644
->> --- a/migration/ram.c
->> +++ b/migration/ram.c
->> @@ -151,6 +151,34 @@ out:
->>       return ret;
->>   }
->>   
->> +void init_receivedmap(void)
->> +{
->> +    RAMBlock *rb;
->> +
->> +    RAMBLOCK_FOREACH(rb) {
->> +        unsigned long pages;
->> +        pages = rb->max_length >> TARGET_PAGE_BITS;
->> +        rb->receivedmap = bitmap_new(pages);
->> +    }
->> +}
->> +
->> +static unsigned long int get_received_bit_offset(void *host_addr, RAMBlock *rb)
->> +{
->> +    uint64_t host_addr_offset = (uint64_t)(uintptr_t)(host_addr
->> +                                                      - (void *)rb->host);
->> +    return host_addr_offset >> TARGET_PAGE_BITS;
->> +}
->> +
->> +int test_receivedmap_by_addr(void *host_addr, RAMBlock *rb)
->> +{
->> +    return test_bit(get_received_bit_offset(host_addr, rb), rb->receivedmap);
->> +}
->> +
->> +void set_receivedmap_by_addr(void *host_addr, RAMBlock *rb)
->> +{
->> +    set_bit_atomic(get_received_bit_offset(host_addr, rb), rb->receivedmap);
->> +}
->> +
->>   /*
->>    * An outstanding page request, on the source, having been received
->>    * and queued
->> @@ -2324,8 +2352,13 @@ static int ram_load_setup(QEMUFile *f, void *opaque)
->>   
->>   static int ram_load_cleanup(void *opaque)
->>   {
->> +    RAMBlock *rb;
->>       xbzrle_load_cleanup();
->>       compress_threads_load_cleanup();
->> +
->> +    RAMBLOCK_FOREACH(rb) {
->> +        g_free(rb->receivedmap);
->> +    }
->>       return 0;
->>   }
->>   
->> diff --git a/migration/ram.h b/migration/ram.h
->> index c081fde..7048ff9 100644
->> --- a/migration/ram.h
->> +++ b/migration/ram.h
->> @@ -52,4 +52,9 @@ int ram_discard_range(const char *block_name, uint64_t start, size_t length);
->>   int ram_postcopy_incoming_init(MigrationIncomingState *mis);
->>   
->>   void ram_handle_compressed(void *host, uint8_t ch, uint64_t size);
->> +
->> +void init_receivedmap(void);
->> +int test_receivedmap_by_addr(void *host_addr, RAMBlock *rb);
->> +void set_receivedmap_by_addr(void *host_addr, RAMBlock *rb);
->> +
->>   #endif
->> diff --git a/migration/savevm.c b/migration/savevm.c
->> index 31158da..668d3bb 100644
->> --- a/migration/savevm.c
->> +++ b/migration/savevm.c
->> @@ -1372,6 +1372,7 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
->>           return -1;
->>       }
->>   
->> +    init_receivedmap();
->>       remote_pagesize_summary = qemu_get_be64(mis->from_src_file);
->>       local_pagesize_summary = ram_pagesize_summary();
->>   
->> -- 
->> 1.9.1
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
->
->
+* Juan Quintela (quintela@redhat.com) wrote:
+> We need to do things at load time and at cleanup time.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  include/migration/register.h |  2 ++
+>  migration/savevm.c           | 44 ++++++++++++++++++++++++++++++++++++++++++++
+>  migration/trace-events       |  2 ++
+>  3 files changed, 48 insertions(+)
+> 
+> diff --git a/include/migration/register.h b/include/migration/register.h
+> index 9ad1e4c..4b5c0e0 100644
+> --- a/include/migration/register.h
+> +++ b/include/migration/register.h
+> @@ -42,6 +42,8 @@ typedef struct SaveVMHandlers {
+>                                uint64_t *non_postcopiable_pending,
+>                                uint64_t *postcopiable_pending);
+>      LoadStateHandler *load_state;
+> +    int (*load_setup)(QEMUFile *f, void *opaque);
+> +    int (*load_cleanup)(void *opaque);
+>  } SaveVMHandlers;
+>  
+>  int register_savevm_live(DeviceState *dev,
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index fb93931..ed36f35 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1912,6 +1912,43 @@ qemu_loadvm_section_part_end(QEMUFile *f, MigrationIncomingState *mis)
+>      return 0;
+>  }
+>  
+> +static int qemu_loadvm_state_setup(QEMUFile *f)
+> +{
+> +    SaveStateEntry *se;
+> +    int ret;
+> +
+> +    trace_loadvm_state_setup();
+> +    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +        if (!se->ops || !se->ops->load_setup) {
+> +            continue;
+> +        }
+> +        if (se->ops && se->ops->is_active) {
+> +            if (!se->ops->is_active(se->opaque)) {
+> +                continue;
+> +            }
+> +        }
+> +
+> +        ret = se->ops->load_setup(f, se->opaque);
+> +        if (ret < 0) {
+> +            qemu_file_set_error(f, ret);
+> +            return ret;
+> +        }
+> +    }
+> +    return 0;
+> +}
+> +
+> +static void qemu_loadvm_state_cleanup(void)
+> +{
+> +    SaveStateEntry *se;
+> +
+> +    trace_loadvm_state_cleanup();
+> +    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +        if (se->ops && se->ops->load_cleanup) {
+> +            se->ops->load_cleanup(se->opaque);
+> +        }
+> +    }
+> +}
+> +
+>  static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
+>  {
+>      uint8_t section_type;
+> @@ -1984,6 +2021,12 @@ int qemu_loadvm_state(QEMUFile *f)
+>          return -ENOTSUP;
+>      }
+>  
+> +
+> +    if (qemu_loadvm_state_setup(f) != 0) {
+> +        error_report("Load state of one device failed");
+> +        return -EINVAL;
 
--- 
-Best regards,
-Alexey Perevalov
+I'd prefer if that was an error report in qemu_loadvm_state_setup,
+because then it would be easy to print the device name rather than
+'one'.
+
+Dave
+> +    }
+> +
+>      if (!savevm_state.skip_configuration || enforce_config_section()) {
+>          if (qemu_get_byte(f) != QEMU_VM_CONFIGURATION) {
+>              error_report("Configuration section missing");
+> @@ -2047,6 +2090,7 @@ int qemu_loadvm_state(QEMUFile *f)
+>          }
+>      }
+>  
+> +    qemu_loadvm_state_cleanup();
+>      cpu_synchronize_all_post_init();
+>  
+>      return ret;
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 9669e94..cb2c4b5 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -7,6 +7,8 @@ qemu_loadvm_state_section_partend(uint32_t section_id) "%u"
+>  qemu_loadvm_state_post_main(int ret) "%d"
+>  qemu_loadvm_state_section_startfull(uint32_t section_id, const char *idstr, uint32_t instance_id, uint32_t version_id) "%u(%s) %u %u"
+>  qemu_savevm_send_packaged(void) ""
+> +loadvm_state_setup(void) ""
+> +loadvm_state_cleanup(void) ""
+>  loadvm_handle_cmd_packaged(unsigned int length) "%u"
+>  loadvm_handle_cmd_packaged_main(int ret) "%d"
+>  loadvm_handle_cmd_packaged_received(int ret) "%d"
+> -- 
+> 2.9.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
