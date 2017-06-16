@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dLxiJ-0000Lv-PZ
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 16:19:29 -0400
+	(envelope-from <mst@redhat.com>) id 1dLxin-0000Vy-Rg
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 16:19:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dLxiG-0003Np-L6
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 16:19:27 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:46029)
+	(envelope-from <mst@redhat.com>) id 1dLxik-0003R7-NM
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 16:19:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33100)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dLxiG-0003Ni-Cg
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 16:19:24 -0400
-Date: Fri, 16 Jun 2017 16:19:21 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170616201921.GB27617@flamenco>
-References: <20170614194821.8754-1-rth@twiddle.net>
-	<20170614194821.8754-2-rth@twiddle.net>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dLxik-0003Qs-DU
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 16:19:54 -0400
+Date: Fri, 16 Jun 2017 23:19:49 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170616231036-mutt-send-email-mst@kernel.org>
+References: <547865a9-d6c2-7140-47e2-5af01e7d761d@redhat.com>
+	<20170616175748-mutt-send-email-mst@kernel.org>
+	<4cdf547c-079b-6b44-484f-e1132e960364@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170614194821.8754-2-rth@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH v2 1/5] tcg: Refactor helper_lookup_tb_ptr
+In-Reply-To: <4cdf547c-079b-6b44-484f-e1132e960364@redhat.com>
+Subject: Re: [Qemu-devel] [RFC] virtio-mem: paravirtualized memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,64 +28,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org, pbonzini@redhat.com
+To: David Hildenbrand <david@redhat.com>
+Cc: KVM <kvm@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, Andrea Arcangeli <aarcange@redhat.com>
 
-On Wed, Jun 14, 2017 at 12:48:17 -0700, Richard Henderson wrote:
-> --- a/tcg-runtime.c
-> +++ b/tcg-runtime.c
-(snip)
->          tb = tb_htable_lookup(cpu, addr, cs_base, flags);
-> -        if (likely(tb)) {
-> -            atomic_set(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)], tb);
-> -            goto found;
-> +        if (!tb) {
-> +            return ret;
+On Fri, Jun 16, 2017 at 05:59:07PM +0200, David Hildenbrand wrote:
+> On 16.06.2017 17:04, Michael S. Tsirkin wrote:
+> > On Fri, Jun 16, 2017 at 04:20:02PM +0200, David Hildenbrand wrote:
+> >> Hi,
+> >>
+> >> this is an idea that is based on Andrea Arcangeli's original idea to
+> >> host enforce guest access to memory given up using virtio-balloon using
+> >> userfaultfd in the hypervisor. While looking into the details, I
+> >> realized that host-enforcing virtio-balloon would result in way too many
+> >> problems (mainly backwards compatibility) and would also have some
+> >> conceptual restrictions that I want to avoid. So I developed the idea of
+> >> virtio-mem - "paravirtualized memory".
+> > 
+> > Thanks! I went over this quickly, will read some more in the
+> > coming days. I would like to ask for some clarifications
+> > on one part meanwhile:
+> 
+> Thanks for looking into it that fast! :)
+> 
+> In general, what this section is all about: Why to not simply host
+> enforce virtio-balloon.
+> > 
+> >> Q: Why not reuse virtio-balloon?
+> >>
+> >> A: virtio-balloon is for cooperative memory management. It has a fixed
+> >>    page size
+> > 
+> > We are fixing that with VIRTIO_BALLOON_F_PAGE_CHUNKS btw.
+> > I would appreciate you looking into that patchset.
+> 
+> Will do, thanks. Problem is that there is no "enforcement" on the page
+> size. VIRTIO_BALLOON_F_PAGE_CHUNKS simply allows to send bigger chunks.
+> Nobody hinders the guest (especially legacy virtio-balloon drivers) from
+> sending 4k pages.
+> 
+> So this doesn't really fix the issue (we have here), it just allows to
+> speed up transfer. Which is a good thing, but does not help for
+> enforcement at all. So, yes support for page sizes > 4k, but no way to
+> enforce it.
+> 
+> > 
+> >> and will deflate in certain situations.
+> > 
+> > What does this refer to?
+> 
+> A Linux guest will deflate the balloon (all or some pages) in the
+> following scenarios:
+> a) page migration
 
-While booting debian-arm I'm measuring (see below) a hit rate in the
-high 90's for the htable lookups here, so adding an 'unlikely()'
-hint would be a good idea.
+It inflates it first, doesn't it?
 
-[ I'm using the patch currently in your tcg-next branch, i.e. 0a2adf4e2 ]
+> b) unload virtio-balloon kernel module
+> c) hibernate/suspension
+> d) (DEFLATE_ON_OOM)
 
-		E.
+You need to set a flag in the balloon to allow this, right?
 
-The below prints during bootup+shutdown:
+> A Linux guest will touch memory without deflating:
+> a) During a kexec() dump
+> d) On reboots (regular, after kexec(), system_reset)
+> > 
+> >> Any change we
+> >>    introduce will break backwards compatibility.
+> > 
+> > Why does this have to be the case
+> If we suddenly enforce the existing virtio-balloon, we will break legacy
+> guests.
 
-hit rate: 94.599500%
-hit rate: 95.794100%
-hit rate: 96.617900%
-hit rate: 96.527275%
-hit rate: 96.341320%
-hit rate: 96.641883%
+Can't we do it with a feature flag?
+
+> Simple example:
+> Guest with inflated virtio-balloon reboots. Touches inflated memory.
+> Gets killed at some random point.
+> 
+> Of course, another discussion would be "can't we move virtio-mem
+> functionality into virtio-balloon instead of changing virtio-balloon".
+> With the current concept this is also not possible (one region per
+> device vs. one virtio-balloon device). And I think while similar, these
+> are two different concepts.
+> 
+> > 
+> >> virtio-balloon was not
+> >>    designed to give guarantees. Nobody can hinder the guest from
+> >>    deflating/reusing inflated memory.
+> > 
+> > Reusing without deflate is forbidden with TELL_HOST, right?
+> 
+> TELL_HOST just means "please inform me". There is no way to NACK a
+> request. It is not a permission to do so, just a "friendly
+> notification". And this is exactly not what we want when host enforcing
+> memory access.
+> 
+> 
+> > 
+> >>    In addition, it might make perfect
+> >>    sense to have both, virtio-balloon and virtio-mem at the same time,
+> >>    especially looking at the DEFLATE_ON_OOM or STATS features of
+> >>    virtio-balloon. While virtio-mem is all about guarantees, virtio-
+> >>    balloon is about cooperation.
+> > 
+> > Thanks, and I intend to look more into this next week.
+> > 
+> 
+> I know that it is tempting to force this concept into virtio-balloon. I
+> spent quite some time thinking about this (and possible other techniques
+> like implicit memory deflation on reboots) and decided not to do it. We
+> just end up trying to hack around all possible things that could go
+> wrong, while still not being able to handle all requirements properly.
+
+I agree there's a large # of requirements here not addressed by the balloon.
+
+One other thing that would be helpful here is pointing out the
+similarities between virtio-mem and the balloon. I'll ponder it
+over the weekend.
+
+The biggest worry for me is inability to support DMA into this memory.
+Is this hard to fix?
 
 
-diff --git a/tcg-runtime.c b/tcg-runtime.c
-index ec3a34e..addc3fa 100644
---- a/tcg-runtime.c
-+++ b/tcg-runtime.c
-@@ -150,6 +150,7 @@ void *HELPER(lookup_tb_ptr)(CPUArchState *env, target_ulong addr)
-     TranslationBlock *tb;
-     target_ulong cs_base, pc;
-     uint32_t flags, addr_hash;
-+    static unsigned long long accesses, found;
+Thanks!
 
-     addr_hash = tb_jmp_cache_hash_func(addr);
-     tb = atomic_rcu_read(&cpu->tb_jmp_cache[addr_hash]);
-@@ -159,11 +160,16 @@ void *HELPER(lookup_tb_ptr)(CPUArchState *env, target_ulong addr)
-                    && tb->pc == addr
-                    && tb->cs_base == cs_base
-                    && tb->flags == flags))) {
-+        accesses++;
-+        if (!(accesses % 1000000)) {
-+            fprintf(stderr, "hit rate: %f%%\n", (double)found * 100 / accesses);
-+        }
-         tb = tb_htable_lookup(cpu, addr, cs_base, flags);
-         if (!tb) {
-             return tcg_ctx.code_gen_epilogue;
-         }
-         atomic_set(&cpu->tb_jmp_cache[addr_hash], tb);
-+        found++;
-     }
 
-     qemu_log_mask_and_addr(CPU_LOG_EXEC, addr,
+
+> -- 
+> 
+> Thanks,
+> 
+> David
