@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37833)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dLuGv-0006Yi-O5
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 12:38:58 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dLuHl-00075h-Tk
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 12:39:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dLuGu-00049z-Oe
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 12:38:57 -0400
-References: <20170613205726.13544-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <93df6700-6dd0-69a0-053e-a840a4bad2aa@redhat.com>
-Date: Fri, 16 Jun 2017 18:38:49 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1dLuHj-0004yz-AX
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 12:39:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50818)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dLuHj-0004yQ-28
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 12:39:47 -0400
+Date: Fri, 16 Jun 2017 17:39:39 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170616163938.GD2179@work-vm>
+References: <1497544575-18628-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170615163630eucas1p1f7fc8849597e8402e1c537769f4255d6@eucas1p1.samsung.com>
+	<1497544575-18628-3-git-send-email-a.perevalov@samsung.com>
+	<20170616084936.GG30118@pxdev.xzpeter.org>
 MIME-Version: 1.0
-In-Reply-To: <20170613205726.13544-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="9wFbtGHrLvP5kjOADlmatuTKVPNNK6aih"
-Subject: Re: [Qemu-devel] [PATCH v2] block: Do not strcmp() with NULL
- uri->scheme
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170616084936.GG30118@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] migration: introduce
+ qemu_ufd_copy_ioctl helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,67 +30,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: Alexey Perevalov <a.perevalov@samsung.com>, qemu-devel@nongnu.org, i.maximets@samsung.com, quintela@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9wFbtGHrLvP5kjOADlmatuTKVPNNK6aih
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <93df6700-6dd0-69a0-053e-a840a4bad2aa@redhat.com>
-Subject: Re: [PATCH v2] block: Do not strcmp() with NULL uri->scheme
-References: <20170613205726.13544-1-mreitz@redhat.com>
-In-Reply-To: <20170613205726.13544-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+* Peter Xu (peterx@redhat.com) wrote:
+> On Thu, Jun 15, 2017 at 07:36:14PM +0300, Alexey Perevalov wrote:
+> > Just for placing auxilary operations inside helper,
+> > auxilary operations like: track received pages,
+> > notify about copying operation in futher patches.
+> > 
+> > Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> > ---
+> >  migration/postcopy-ram.c | 35 ++++++++++++++++++++++-------------
+> >  1 file changed, 22 insertions(+), 13 deletions(-)
+> > 
+> > diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> > index 743ca6c..38a429a 100644
+> > --- a/migration/postcopy-ram.c
+> > +++ b/migration/postcopy-ram.c
+> > @@ -561,6 +561,26 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+> >      return 0;
+> >  }
+> >  
+> > +static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
+> > +        void *from_addr, uint64_t pagesize)
+> > +{
+> > +    if (from_addr) {
+> > +        struct uffdio_copy copy_struct;
+> > +        copy_struct.dst = (uint64_t)(uintptr_t)host_addr;
+> > +        copy_struct.src = (uint64_t)(uintptr_t)from_addr;
+> > +        copy_struct.len = pagesize;
+> > +        copy_struct.mode = 0;
+> > +        return ioctl(userfault_fd, UFFDIO_COPY, &copy_struct);
+> > +    } else {
+> > +        struct uffdio_zeropage zero_struct;
+> > +        zero_struct.range.start = (uint64_t)(uintptr_t)host_addr;
+> > +        zero_struct.range.len = pagesize;
+> > +        zero_struct.mode = 0;
+> > +        return ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
+> > +    }
+> > +    return 0;
+> 
+> Remove this line?
 
-On 2017-06-13 22:57, Max Reitz wrote:
-> uri_parse(...)->scheme may be NULL. In fact, probably every field may b=
-e
-> NULL, and the callers do test this for all of the other fields but not
-> for scheme (except for block/gluster.c; block/vxhs.c does not access
-> that field at all).
->=20
-> We can easily fix this by using g_strcmp0() instead of strcmp().
->=20
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
-> v2:
-> - Fix all affected block drivers, not just nfs [Peter]
-> - Use g_strcmp0() [Markus]
-> ---
->  block/nbd.c      | 6 +++---
->  block/nfs.c      | 2 +-
->  block/sheepdog.c | 6 +++---
->  block/ssh.c      | 2 +-
->  4 files changed, 8 insertions(+), 8 deletions(-)
+Yes, probably should; only minor.
 
-Applied to my block tree:
+> > +}
+> > +
+> >  /*
+> >   * Place a host page (from) at (host) atomically
+> >   * returns 0 on success
+> > @@ -568,20 +588,14 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+> >  int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
+> >                          RAMBlock *rb)
+> >  {
+> > -    struct uffdio_copy copy_struct;
+> >      size_t pagesize = qemu_ram_pagesize(rb);
+> >  
+> > -    copy_struct.dst = (uint64_t)(uintptr_t)host;
+> > -    copy_struct.src = (uint64_t)(uintptr_t)from;
+> > -    copy_struct.len = pagesize;
+> > -    copy_struct.mode = 0;
+> > -
+> >      /* copy also acks to the kernel waking the stalled thread up
+> >       * TODO: We can inhibit that ack and only do it if it was requested
+> >       * which would be slightly cheaper, but we'd have to be careful
+> >       * of the order of updating our page state.
+> >       */
+> > -    if (ioctl(mis->userfault_fd, UFFDIO_COPY, &copy_struct)) {
+> > +    if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, from, pagesize)) {
+> 
+> (hmm I know "from" won't be zero, but naturally if without the context
+>  I would doubt it. Shall we add an assert here? You call.)
 
-https://github.com/XanClic/qemu/commits/block
+Doesn't seem worth it.
 
-Max
+> Besides:
+> 
+> Reviewed-by: Peter Xu <peterx@redhat.com>
 
 
---9wFbtGHrLvP5kjOADlmatuTKVPNNK6aih
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEvBAEBCAAZBQJZRAmaEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQCqu
-B/9JEqyqcqrKhUb9EnC7hv3kyD4JqBOssI+XY+HgqfuyfUSDjcKZL8n96vs86BUF
-bhPY9s7y2o0WaZBPc1T52VQSilHvD++NFSnWfZhJ2B7imZfB6ozfmSzXUBZxiKqr
-QHVuGBZUbZZ4f8exg2GiR5o9dhvuyZUMEdOeGExxs60iwGAk+Lb6BbnXm3sdWakA
-2IYXRaz6tsekJECkQDYY3vftges/NmGymyr/1THs5d6KTO4IAtzsw0pk0p0I5f37
-13rwFyyV6BrQJ0EfrI2MLgtbiDVzE2gf8gRYg6lKy+dGLziypP+3OH7z4g883SfD
-ip25uHc4Lhq8RJyouE/Qi2gq
-=kD0B
------END PGP SIGNATURE-----
-
---9wFbtGHrLvP5kjOADlmatuTKVPNNK6aih--
+> 
+> Thanks,
+> 
+> >          int e = errno;
+> >          error_report("%s: %s copy host: %p from: %p (size: %zd)",
+> >                       __func__, strerror(e), host, from, pagesize);
+> > @@ -605,12 +619,7 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
+> >  
+> >      pagesize = qemu_ram_pagesize(rb);
+> >      if (pagesize == getpagesize()) {
+> > -        struct uffdio_zeropage zero_struct;
+> > -        zero_struct.range.start = (uint64_t)(uintptr_t)host;
+> > -        zero_struct.range.len = getpagesize();
+> > -        zero_struct.mode = 0;
+> > -
+> > -        if (ioctl(mis->userfault_fd, UFFDIO_ZEROPAGE, &zero_struct)) {
+> > +        if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, 0, getpagesize())) {
+> >              int e = errno;
+> >              error_report("%s: %s zero host: %p",
+> >                           __func__, strerror(e), host);
+> > -- 
+> > 1.9.1
+> > 
+> 
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
