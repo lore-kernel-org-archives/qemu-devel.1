@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dLvBb-0005Vs-8z
+	(envelope-from <kwolf@redhat.com>) id 1dLvBb-0005W7-F9
 	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 13:37:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dLvBa-00019B-Db
+	(envelope-from <kwolf@redhat.com>) id 1dLvBa-00019H-G8
 	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 13:37:31 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 16 Jun 2017 19:36:45 +0200
-Message-Id: <1497634636-20230-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 00/31] qed: Convert to coroutines
+Date: Fri, 16 Jun 2017 19:36:46 +0200
+Message-Id: <1497634636-20230-2-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1497634636-20230-1-git-send-email-kwolf@redhat.com>
+References: <1497634636-20230-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 01/31] qed: Use bottom half to resume
+ waiting requests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,69 +23,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
 
-The qed block driver is one of the last remaining block drivers that use the
-AIO callback style interfaces. This series converts it to the coroutine model
-that other drivers are using and removes some AIO functions from the block
-layer API afterwards.
+The qed driver serialises allocating write requests. When the active
+allocation is finished, the AIO callback is called, but after this, the
+next allocating request is immediately processed instead of leaving the
+coroutine. Resuming another allocation request in the same request
+coroutine means that the request now runs in the wrong coroutine.
 
-If this isn't compelling enough, the diffstat should speak for itself.
+The following is one of the possible effects of this: The completed
+request will generally reenter its request coroutine in a bottom half,
+expecting that it completes the request in bdrv_driver_pwritev().
+However, if the second request actually yielded before leaving the
+coroutine, the reused request coroutine is in an entirely different
+place and is reentered prematurely. Not a good idea.
 
-This series is relatively long, but it consists mostly of mechanical
-conversions of one function per patch, so it should be easy to review.
+Let's make sure that we exit the coroutine after completing the first
+request by resuming the next allocating request only with a bottom
+half.
 
-v2:
-- Add coroutine_fn markers [Stefan, Paolo]
-- Use bdrv_co_*() instead of bdrv_*() in coroutine_fns
-- Use ACB on stack in qed_co_request [Paolo]
-- Updated some comments [Paolo]
-- Unplug earlier in qed_clear_need_check() [Stefan]
-- Removed now unused trace events [Stefan]
-- Improved commit message of patch creating qed_aio_write_cow() [Eric]
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ block/qed.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-Kevin Wolf (31):
-  qed: Use bottom half to resume waiting requests
-  qed: Make qed_read_table() synchronous
-  qed: Remove callback from qed_read_table()
-  qed: Remove callback from qed_read_l2_table()
-  qed: Remove callback from qed_find_cluster()
-  qed: Make qed_read_backing_file() synchronous
-  qed: Make qed_copy_from_backing_file() synchronous
-  qed: Remove callback from qed_copy_from_backing_file()
-  qed: Make qed_write_header() synchronous
-  qed: Remove callback from qed_write_header()
-  qed: Make qed_write_table() synchronous
-  qed: Remove GenericCB
-  qed: Remove callback from qed_write_table()
-  qed: Make qed_aio_read_data() synchronous
-  qed: Make qed_aio_write_main() synchronous
-  qed: Inline qed_commit_l2_update()
-  qed: Add return value to qed_aio_write_l1_update()
-  qed: Add return value to qed_aio_write_l2_update()
-  qed: Add return value to qed_aio_write_main()
-  qed: Add return value to qed_aio_write_cow()
-  qed: Add return value to qed_aio_write_inplace/alloc()
-  qed: Add return value to qed_aio_read/write_data()
-  qed: Remove ret argument from qed_aio_next_io()
-  qed: Remove recursion in qed_aio_next_io()
-  qed: Implement .bdrv_co_readv/writev
-  qed: Use CoQueue for serialising allocations
-  qed: Simplify request handling
-  qed: Use a coroutine for need_check_timer
-  qed: Add coroutine_fn to I/O path functions
-  qed: Use bdrv_co_* for coroutine_fns
-  block: Remove bdrv_aio_readv/writev/flush()
-
- block/Makefile.objs   |   2 +-
- block/io.c            | 171 -----------
- block/qed-cluster.c   | 124 ++++----
- block/qed-gencb.c     |  33 ---
- block/qed-table.c     | 261 ++++++-----------
- block/qed.c           | 773 +++++++++++++++++++-------------------------------
- block/qed.h           |  54 +---
- block/trace-events    |   3 -
- include/block/block.h |   8 -
- 9 files changed, 438 insertions(+), 991 deletions(-)
- delete mode 100644 block/qed-gencb.c
-
+diff --git a/block/qed.c b/block/qed.c
+index 8d899fd..a837a28 100644
+--- a/block/qed.c
++++ b/block/qed.c
+@@ -967,6 +967,11 @@ static void qed_aio_complete_bh(void *opaque)
+     qed_release(s);
+ }
+ 
++static void qed_resume_alloc_bh(void *opaque)
++{
++    qed_aio_start_io(opaque);
++}
++
+ static void qed_aio_complete(QEDAIOCB *acb, int ret)
+ {
+     BDRVQEDState *s = acb_to_s(acb);
+@@ -995,10 +1000,12 @@ static void qed_aio_complete(QEDAIOCB *acb, int ret)
+      * requests multiple times but rather finish one at a time completely.
+      */
+     if (acb == QSIMPLEQ_FIRST(&s->allocating_write_reqs)) {
++        QEDAIOCB *next_acb;
+         QSIMPLEQ_REMOVE_HEAD(&s->allocating_write_reqs, next);
+-        acb = QSIMPLEQ_FIRST(&s->allocating_write_reqs);
+-        if (acb) {
+-            qed_aio_start_io(acb);
++        next_acb = QSIMPLEQ_FIRST(&s->allocating_write_reqs);
++        if (next_acb) {
++            aio_bh_schedule_oneshot(bdrv_get_aio_context(acb->common.bs),
++                                    qed_resume_alloc_bh, next_acb);
+         } else if (s->header.features & QED_F_NEED_CHECK) {
+             qed_start_need_check_timer(s);
+         }
 -- 
 1.8.3.1
