@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53821)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dLsiq-0002Or-5P
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 10:59:41 -0400
+	(envelope-from <thuth@redhat.com>) id 1dLsis-0002Q7-Eg
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 10:59:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dLsin-00089M-4L
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 10:59:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44476)
+	(envelope-from <thuth@redhat.com>) id 1dLsir-0008C0-EP
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 10:59:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44830)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dLsim-000888-UN
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 10:59:37 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dLsir-0008BP-5W
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 10:59:41 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Fri, 16 Jun 2017 16:59:08 +0200
-Message-Id: <1497625153-19812-3-git-send-email-thuth@redhat.com>
+Date: Fri, 16 Jun 2017 16:59:09 +0200
+Message-Id: <1497625153-19812-4-git-send-email-thuth@redhat.com>
 In-Reply-To: <1497625153-19812-1-git-send-email-thuth@redhat.com>
 References: <1497625153-19812-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/7] include/exec/poison: Mark some CONFIG
- defines as poisoned, too
+Subject: [Qemu-devel] [PATCH 3/7] Move CONFIG_KVM related definitions to
+ kvm_i386.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,43 +27,118 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc: Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-These are defined in config-target.h and thus should never be
-used in common code.
+pc.h and sysemu/kvm.h are also included from common code (where
+CONFIG_KVM is not available), so the #defines that depend on CONFIG_KVM
+should not be declared here to avoid that anybody is using them in a
+wrong way. Since we're also going to poison CONFIG_KVM for common code,
+let's move them to kvm_i386.h instead. Most of the dummy definitions
+from sysemu/kvm.h are also unused since the code that uses them is
+only compiled for CONFIG_KVM (e.g. target/i386/kvm.c), so the unused
+defines are also simply dropped here instead of being moved.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- include/exec/poison.h | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ hw/i386/pc_q35.c       |  1 +
+ include/hw/i386/pc.h   | 13 -------------
+ include/sysemu/kvm.h   | 15 ---------------
+ target/i386/kvm_i386.h | 23 +++++++++++++++++++++++
+ 4 files changed, 24 insertions(+), 28 deletions(-)
 
-diff --git a/include/exec/poison.h b/include/exec/poison.h
-index 9356d5f..5ffed4d 100644
---- a/include/exec/poison.h
-+++ b/include/exec/poison.h
-@@ -61,5 +61,25 @@
- #pragma GCC poison CPU_INTERRUPT_TGT_INT_1
- #pragma GCC poison CPU_INTERRUPT_TGT_INT_2
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 1523ef3..8f696b7 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -36,6 +36,7 @@
+ #include "hw/timer/mc146818rtc.h"
+ #include "hw/xen/xen.h"
+ #include "sysemu/kvm.h"
++#include "kvm_i386.h"
+ #include "hw/kvm/clock.h"
+ #include "hw/pci-host/q35.h"
+ #include "exec/address-spaces.h"
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index d071c9c..a31f7aa 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -20,19 +20,6 @@
  
-+#pragma GCC poison CONFIG_ALPHA_DIS
-+#pragma GCC poison CONFIG_ARM_A64_DIS
-+#pragma GCC poison CONFIG_ARM_DIS
-+#pragma GCC poison CONFIG_CRIS_DIS
-+#pragma GCC poison CONFIG_I386_DIS
-+#pragma GCC poison CONFIG_LM32_DIS
-+#pragma GCC poison CONFIG_M68K_DIS
-+#pragma GCC poison CONFIG_MICROBLAZE_DIS
-+#pragma GCC poison CONFIG_MIPS_DIS
-+#pragma GCC poison CONFIG_MOXIE_DIS
-+#pragma GCC poison CONFIG_NIOS2_DIS
-+#pragma GCC poison CONFIG_PPC_DIS
-+#pragma GCC poison CONFIG_S390_DIS
-+#pragma GCC poison CONFIG_SH4_DIS
-+#pragma GCC poison CONFIG_SPARC_DIS
-+#pragma GCC poison CONFIG_XTENSA_DIS
-+
-+#pragma GCC poison CONFIG_LINUX_USER
-+#pragma GCC poison CONFIG_VHOST_NET
-+
+ #define HPET_INTCAP "hpet-intcap"
+ 
+-#ifdef CONFIG_KVM
+-#define kvm_pit_in_kernel() \
+-    (kvm_irqchip_in_kernel() && !kvm_irqchip_is_split())
+-#define kvm_pic_in_kernel()  \
+-    (kvm_irqchip_in_kernel() && !kvm_irqchip_is_split())
+-#define kvm_ioapic_in_kernel() \
+-    (kvm_irqchip_in_kernel() && !kvm_irqchip_is_split())
+-#else
+-#define kvm_pit_in_kernel()      0
+-#define kvm_pic_in_kernel()      0
+-#define kvm_ioapic_in_kernel()   0
+-#endif
+-
+ /**
+  * PCMachineState:
+  * @acpi_dev: link to ACPI PM device that performs ACPI hotplug handling
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 1e91613..ca40b6e 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -22,21 +22,6 @@
+ #ifdef CONFIG_KVM
+ #include <linux/kvm.h>
+ #include <linux/kvm_para.h>
+-#else
+-/* These constants must never be used at runtime if kvm_enabled() is false.
+- * They exist so we don't need #ifdefs around KVM-specific code that already
+- * checks kvm_enabled() properly.
+- */
+-#define KVM_CPUID_SIGNATURE      0
+-#define KVM_CPUID_FEATURES       0
+-#define KVM_FEATURE_CLOCKSOURCE  0
+-#define KVM_FEATURE_NOP_IO_DELAY 0
+-#define KVM_FEATURE_MMU_OP       0
+-#define KVM_FEATURE_CLOCKSOURCE2 0
+-#define KVM_FEATURE_ASYNC_PF     0
+-#define KVM_FEATURE_STEAL_TIME   0
+-#define KVM_FEATURE_PV_EOI       0
+-#define KVM_FEATURE_CLOCKSOURCE_STABLE_BIT 0
  #endif
- #endif
+ 
+ extern bool kvm_allowed;
+diff --git a/target/i386/kvm_i386.h b/target/i386/kvm_i386.h
+index bfce427..1de9876 100644
+--- a/target/i386/kvm_i386.h
++++ b/target/i386/kvm_i386.h
+@@ -15,6 +15,29 @@
+ 
+ #define kvm_apic_in_kernel() (kvm_irqchip_in_kernel())
+ 
++#ifdef CONFIG_KVM
++
++#define kvm_pit_in_kernel() \
++    (kvm_irqchip_in_kernel() && !kvm_irqchip_is_split())
++#define kvm_pic_in_kernel()  \
++    (kvm_irqchip_in_kernel() && !kvm_irqchip_is_split())
++#define kvm_ioapic_in_kernel() \
++    (kvm_irqchip_in_kernel() && !kvm_irqchip_is_split())
++
++#else
++
++#define kvm_pit_in_kernel()      0
++#define kvm_pic_in_kernel()      0
++#define kvm_ioapic_in_kernel()   0
++
++/* These constants must never be used at runtime if kvm_enabled() is false.
++ * They exist so we don't need #ifdefs around KVM-specific code that already
++ * checks kvm_enabled() properly.
++ */
++#define KVM_CPUID_FEATURES       0
++
++#endif  /* CONFIG_KVM */
++
+ bool kvm_allows_irq0_override(void);
+ bool kvm_has_smm(void);
+ bool kvm_has_adjust_clock_stable(void);
 -- 
 1.8.3.1
