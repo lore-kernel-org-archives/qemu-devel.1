@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dLtaA-0007Tz-L4
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:54:48 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dLtaE-0007ci-Sf
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:54:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dLta9-0001ic-3r
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:54:46 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dLta9-0001im-4J
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:54:51 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 16 Jun 2017 17:54:34 +0200
-Message-Id: <1497628474-13275-3-git-send-email-kwolf@redhat.com>
+Date: Fri, 16 Jun 2017 17:54:33 +0200
+Message-Id: <1497628474-13275-2-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1497628474-13275-1-git-send-email-kwolf@redhat.com>
 References: <1497628474-13275-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH RESEND v3 2/2] doc: Document driver-specific
- -blockdev options
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH RESEND v3 1/2] doc: Document generic -blockdev
+ options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,149 +26,247 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-This documents the driver-specific options for the raw, qcow2 and file
-block drivers for the man page. For everything else, we refer to the
-QAPI documentation.
+This adds documentation for the -blockdev options that apply to all
+nodes independent of the block driver used.
+
+All options that are shared by -blockdev and -drive are now explained in
+the section for -blockdev. The documentation of -drive mentions that all
+-blockdev options are accepted as well.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- qemu-options.hx | 115 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 114 insertions(+), 1 deletion(-)
+ qemu-options.hx | 108 +++++++++++++++++++++++++++++++++++++++++---------=
+------
+ 1 file changed, 79 insertions(+), 29 deletions(-)
 
 diff --git a/qemu-options.hx b/qemu-options.hx
-index db20866..896ff17 100644
+index 30c4f98..db20866 100644
 --- a/qemu-options.hx
 +++ b/qemu-options.hx
-@@ -614,7 +614,18 @@ STEXI
- @item -blockdev @var{option}[,@var{option}[,@var{option}[,...]]]
- @findex -blockdev
- 
--Define a new block driver node.
-+Define a new block driver node. Some of the options apply to all block drivers,
-+other options are only accepted for a specific block driver. See below for a
-+list of generic options and options for the most common block drivers.
+@@ -610,6 +610,53 @@ DEF("blockdev", HAS_ARG, QEMU_OPTION_blockdev,
+     "          [,read-only=3Don|off][,detect-zeroes=3Don|off|unmap]\n"
+     "          [,driver specific parameters...]\n"
+     "                configure a block backend\n", QEMU_ARCH_ALL)
++STEXI
++@item -blockdev @var{option}[,@var{option}[,@var{option}[,...]]]
++@findex -blockdev
 +
-+Options that expect a reference to another node (e.g. @code{file}) can be
-+given in two ways. Either you specify the node name of an already existing node
-+(file=@var{node-name}), or you define a new node inline, adding options
-+for the referenced node after a dot (file.filename=@var{path},file.aio=native).
++Define a new block driver node.
 +
-+A block driver node created with @option{-blockdev} can be used for a guest
-+device by specifying its node name for the @code{drive} property in a
-+@option{-device} argument that defines a block device.
- 
++@table @option
++@item Valid options for any block driver node:
++
++@table @code
++@item driver
++Specifies the block driver to use for the given node.
++@item node-name
++This defines the name of the block driver node by which it will be refer=
+enced
++later. The name must be unique, i.e. it must not match the name of a dif=
+ferent
++block driver node, or (if you use @option{-drive} as well) the ID of a d=
+rive.
++
++If no node name is specified, it is automatically generated. The generat=
+ed node
++name is not intended to be predictable and changes between QEMU invocati=
+ons.
++For the top level, an explicit node name must be specified.
++@item read-only
++Open the node read-only. Guest write attempts will fail.
++@item cache.direct
++The host page cache can be avoided with @option{cache.direct=3Don}. This=
+ will
++attempt to do disk IO directly to the guest's memory. QEMU may still per=
+form an
++internal copy of the data.
++@item cache.no-flush
++In case you don't care about data integrity over host failures, you can =
+use
++@option{cache.no-flush=3Don}. This option tells QEMU that it never needs=
+ to write
++any data to the disk but can instead keep things in cache. If anything g=
+oes
++wrong, like your host losing power, the disk storage getting disconnecte=
+d
++accidentally, etc. your image will most probably be rendered unusable.
++@item discard=3D@var{discard}
++@var{discard} is one of "ignore" (or "off") or "unmap" (or "on") and con=
+trols
++whether @code{discard} (also known as @code{trim} or @code{unmap}) reque=
+sts are
++ignored or passed to the filesystem. Some machine types may not support
++discard requests.
++@item detect-zeroes=3D@var{detect-zeroes}
++@var{detect-zeroes} is "off", "on" or "unmap" and enables the automatic
++conversion of plain zero writes by the OS to driver specific optimized
++zero write commands. You may even choose "unmap" if @var{discard} is set
++to "unmap" to allow a zero write to be converted to an @code{unmap} oper=
+ation.
++@end table
++
++@end table
++
++ETEXI
+=20
+ DEF("drive", HAS_ARG, QEMU_OPTION_drive,
+     "-drive [file=3Dfile][,if=3Dtype][,bus=3Dn][,unit=3Dm][,media=3Dd][,=
+index=3Di]\n"
+@@ -630,7 +677,12 @@ STEXI
+ @item -drive @var{option}[,@var{option}[,@var{option}[,...]]]
+ @findex -drive
+=20
+-Define a new drive. Valid options are:
++Define a new drive. This includes creating a block driver node (the back=
+end) as
++well as a guest device, and is mostly a shortcut for defining the corres=
+ponding
++@option{-blockdev} and @option{-device} options.
++
++@option{-drive} accepts all options that are accepted by @option{-blockd=
+ev}. In
++addition, it knows the following options:
+=20
  @table @option
- @item Valid options for any block driver node:
-@@ -654,6 +665,108 @@ zero write commands. You may even choose "unmap" if @var{discard} is set
- to "unmap" to allow a zero write to be converted to an @code{unmap} operation.
+ @item file=3D@var{file}
+@@ -657,11 +709,31 @@ These options have the same definition as they have=
+ in @option{-hdachs}.
+ @var{snapshot} is "on" or "off" and controls snapshot mode for the given=
+ drive
+ (see @option{-snapshot}).
+ @item cache=3D@var{cache}
+-@var{cache} is "none", "writeback", "unsafe", "directsync" or "writethro=
+ugh" and controls how the host cache is used to access block data.
++@var{cache} is "none", "writeback", "unsafe", "directsync" or "writethro=
+ugh"
++and controls how the host cache is used to access block data. This is a
++shortcut that sets the @option{cache.direct} and @option{cache.no-flush}
++options (as in @option{-blockdev}), and additionally @option{cache.write=
+back},
++which provides a default for the @option{write-cache} option of block gu=
+est
++devices (as in @option{-device}). The modes correspond to the following
++settings:
++
++@c Our texi2pod.pl script doesn't support @multitable, so fall back to u=
+sing
++@c plain ASCII art (well, UTF-8 art really). This looks okay both in the=
+ manpage
++@c and the HTML output.
++@example
++@             =E2=94=82 cache.writeback   cache.direct   cache.no-flush
++=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=BC=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80
++writeback    =E2=94=82 on                off            off
++none         =E2=94=82 on                on             off
++writethrough =E2=94=82 off               off            off
++directsync   =E2=94=82 off               on             off
++unsafe       =E2=94=82 on                off            on
++@end example
++
++The default mode is @option{cache=3Dwriteback}.
++
+ @item aio=3D@var{aio}
+ @var{aio} is "threads", or "native" and selects between pthread based di=
+sk I/O and native Linux AIO.
+-@item discard=3D@var{discard}
+-@var{discard} is one of "ignore" (or "off") or "unmap" (or "on") and con=
+trols whether @dfn{discard} (also known as @dfn{trim} or @dfn{unmap}) req=
+uests are ignored or passed to the filesystem.  Some machine types may no=
+t support discard requests.
+ @item format=3D@var{format}
+ Specify which disk @var{format} will be used rather than detecting
+ the format.  Can be used to specify format=3Draw to avoid interpreting
+@@ -676,16 +748,9 @@ Specify which @var{action} to take on write and read=
+ errors. Valid actions are:
+ "report" (report the error to the guest), "enospc" (pause QEMU only if t=
+he
+ host disk is full; report the error to the guest otherwise).
+ The default setting is @option{werror=3Denospc} and @option{rerror=3Drep=
+ort}.
+-@item readonly
+-Open drive @option{file} as read-only. Guest write attempts will fail.
+ @item copy-on-read=3D@var{copy-on-read}
+ @var{copy-on-read} is "on" or "off" and enables whether to copy read bac=
+king
+ file sectors into the image file.
+-@item detect-zeroes=3D@var{detect-zeroes}
+-@var{detect-zeroes} is "off", "on" or "unmap" and enables the automatic
+-conversion of plain zero writes by the OS to driver specific optimized
+-zero write commands. You may even choose "unmap" if @var{discard} is set
+-to "unmap" to allow a zero write to be converted to an UNMAP operation.
+ @item bps=3D@var{b},bps_rd=3D@var{r},bps_wr=3D@var{w}
+ Specify bandwidth throttling limits in bytes per second, either for all =
+request
+ types or for reads or writes only.  Small values can lead to timeouts or=
+ hangs
+@@ -712,34 +777,19 @@ prevent guests from circumventing throttling limits=
+ by using many small disks
+ instead of a single larger disk.
  @end table
- 
-+@item Driver-specific options for @code{file}
-+
-+This is the protocol-level block driver for accessing regular files.
-+
-+@table @code
-+@item filename
-+The path to the image file in the local filesystem
-+@item aio
-+Specifies the AIO backend (threads/native, default: threads)
-+@end table
-+Example:
-+@example
-+-blockdev driver=file,node-name=disk,filename=disk.img
-+@end example
-+
-+@item Driver-specific options for @code{raw}
-+
-+This is the image format block driver for raw images. It is usually
-+stacked on top of a protocol level block driver such as @code{file}.
-+
-+@table @code
-+@item file
-+Reference to or definition of the data source block driver node
-+(e.g. a @code{file} driver node)
-+@end table
-+Example 1:
-+@example
-+-blockdev driver=file,node-name=disk_file,filename=disk.img
-+-blockdev driver=raw,node-name=disk,file=disk_file
-+@end example
-+Example 2:
-+@example
-+-blockdev driver=raw,node-name=disk,file.driver=file,file.filename=disk.img
-+@end example
-+
-+@item Driver-specific options for @code{qcow2}
-+
-+This is the image format block driver for qcow2 images. It is usually
-+stacked on top of a protocol level block driver such as @code{file}.
-+
-+@table @code
-+@item file
-+Reference to or definition of the data source block driver node
-+(e.g. a @code{file} driver node)
-+
-+@item backing
-+Reference to or definition of the backing file block device (default is taken
-+from the image file). It is allowed to pass an empty string here in order to
-+disable the default backing file.
-+
-+@item lazy-refcounts
-+Whether to enable the lazy refcounts feature (on/off; default is taken from the
-+image file)
-+
-+@item cache-size
-+The maximum total size of the L2 table and refcount block caches in bytes
-+(default: 1048576 bytes or 8 clusters, whichever is larger)
-+
-+@item l2-cache-size
-+The maximum size of the L2 table cache in bytes
-+(default: 4/5 of the total cache size)
-+
-+@item refcount-cache-size
-+The maximum size of the refcount block cache in bytes
-+(default: 1/5 of the total cache size)
-+
-+@item cache-clean-interval
-+Clean unused entries in the L2 and refcount caches. The interval is in seconds.
-+The default value is 0 and it disables this feature.
-+
-+@item pass-discard-request
-+Whether discard requests to the qcow2 device should be forwarded to the data
-+source (on/off; default: on if discard=unmap is specified, off otherwise)
-+
-+@item pass-discard-snapshot
-+Whether discard requests for the data source should be issued when a snapshot
-+operation (e.g. deleting a snapshot) frees clusters in the qcow2 file (on/off;
-+default: on)
-+
-+@item pass-discard-other
-+Whether discard requests for the data source should be issued on other
-+occasions where a cluster gets freed (on/off; default: off)
-+
-+@item overlap-check
-+Which overlap checks to perform for writes to the image
-+(none/constant/cached/all; default: cached). For details or finer
-+granularity control refer to the QAPI documentation of @code{blockdev-add}.
-+@end table
-+
-+Example 1:
-+@example
-+-blockdev driver=file,node-name=my_file,filename=/tmp/disk.qcow2
-+-blockdev driver=qcow2,node-name=hda,file=my_file,overlap-check=none,cache-size=16777216
-+@end example
-+Example 2:
-+@example
-+-blockdev driver=qcow2,node-name=disk,file.driver=http,file.filename=http://example.com/image.qcow2
-+@end example
-+
-+@item Driver-specific options for other drivers
-+Please refer to the QAPI documentation of the @code{blockdev-add} QMP command.
-+
- @end table
- 
- ETEXI
--- 
+=20
+-By default, the @option{cache=3Dwriteback} mode is used. It will report =
+data
++By default, the @option{cache.writeback=3Don} mode is used. It will repo=
+rt data
+ writes as completed as soon as the data is present in the host page cach=
+e.
+ This is safe as long as your guest OS makes sure to correctly flush disk=
+ caches
+ where needed. If your guest OS does not handle volatile disk write cache=
+s
+ correctly and your host crashes or loses power, then the guest may exper=
+ience
+ data corruption.
+=20
+-For such guests, you should consider using @option{cache=3Dwritethrough}=
+. This
++For such guests, you should consider using @option{cache.writeback=3Doff=
+}. This
+ means that the host page cache will be used to read and write data, but =
+write
+ notification will be sent to the guest only after QEMU has made sure to =
+flush
+ each write to the disk. Be aware that this has a major impact on perform=
+ance.
+=20
+-The host page cache can be avoided entirely with @option{cache=3Dnone}. =
+ This will
+-attempt to do disk IO directly to the guest's memory.  QEMU may still pe=
+rform
+-an internal copy of the data. Note that this is considered a writeback m=
+ode and
+-the guest OS must handle the disk write cache correctly in order to avoi=
+d data
+-corruption on host crashes.
+-
+-The host page cache can be avoided while only sending write notification=
+s to
+-the guest when the data has been flushed to the disk using
+-@option{cache=3Ddirectsync}.
+-
+-In case you don't care about data integrity over host failures, use
+-@option{cache=3Dunsafe}. This option tells QEMU that it never needs to w=
+rite any
+-data to the disk but can instead keep things in cache. If anything goes =
+wrong,
+-like your host losing power, the disk storage getting disconnected accid=
+entally,
+-etc. your image will most probably be rendered unusable.   When using
+-the @option{-snapshot} option, unsafe caching is always used.
++When using the @option{-snapshot} option, unsafe caching is always used.
+=20
+ Copy-on-read avoids accessing the same backing file sectors repeatedly a=
+nd is
+ useful when the backing file is over a slow network.  By default copy-on=
+-read
+--=20
 1.8.3.1
