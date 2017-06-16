@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dLhth-0003CA-TS
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 23:26:10 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dLiWx-0003n0-82
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 00:06:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dLhte-0002Z3-M4
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 23:26:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34804)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dLhte-0002Yl-CT
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 23:26:06 -0400
-Date: Fri, 16 Jun 2017 06:26:01 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170616062512-mutt-send-email-mst@kernel.org>
-References: <20170615163813.7255-1-stefanha@redhat.com>
-	<20170615163813.7255-2-stefanha@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1dLiWu-0007AT-2C
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 00:06:43 -0400
+Date: Fri, 16 Jun 2017 12:00:31 +0800
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170616040031.GE30484@umbus>
+References: <20170608050930.2613-1-david@gibson.dropbear.id.au>
+	<4f1e9592-566f-b558-91e8-e39ac8691455@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="WBsA/oQW3eTA3LlM"
 Content-Disposition: inline
-In-Reply-To: <20170615163813.7255-2-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/5] virtio-pci: use ioeventfd even when
- KVM is disabled
+In-Reply-To: <4f1e9592-566f-b558-91e8-e39ac8691455@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/6] spapr: DRC cleanups (part IV)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +24,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Pavel Butsykin <pbutsykin@virtuozzo.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: mdroth@linux.vnet.ibm.com, sursingh@redhat.com, qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org, bharata@linux.vnet.ibm.com
 
-On Thu, Jun 15, 2017 at 05:38:09PM +0100, Stefan Hajnoczi wrote:
-> Old kvm.ko versions only supported a tiny number of ioeventfds so
-> virtio-pci avoids ioeventfds when kvm_has_many_ioeventfds() returns 0.
-> 
-> Do not check kvm_has_many_ioeventfds() when KVM is disabled since it
-> always returns 0.  Since commit 8c56c1a592b5092d91da8d8943c17777d6462a6f
-> ("memory: emulate ioeventfd") it has been possible to use ioeventfds in
-> qtest or TCG mode.
-> 
-> This patch makes -device virtio-blk-pci,iothread=iothread0 work even
-> when KVM is disabled.
-> 
-> I have tested that virtio-blk-pci works under TCG both with and without
-> iothread.
-> 
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Don't we need to check we are on a host that supports eventfd?
+--WBsA/oQW3eTA3LlM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> ---
->  hw/virtio/virtio-pci.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-> index f9b7244..9f55476 100644
-> --- a/hw/virtio/virtio-pci.c
-> +++ b/hw/virtio/virtio-pci.c
-> @@ -1740,7 +1740,7 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
->      bool pcie_port = pci_bus_is_express(pci_dev->bus) &&
->                       !pci_bus_is_root(pci_dev->bus);
->  
-> -    if (!kvm_has_many_ioeventfds()) {
-> +    if (kvm_enabled() && !kvm_has_many_ioeventfds()) {
->          proxy->flags &= ~VIRTIO_PCI_FLAG_USE_IOEVENTFD;
->      }
->  
-> -- 
-> 2.9.4
+On Thu, Jun 15, 2017 at 07:10:55PM +0200, Laurent Vivier wrote:
+> On 08/06/2017 07:09, David Gibson wrote:
+> > This fourth isntallment of cleanups to the DRC code introduces the
+> > first changes to the fundamental state handling.  We change the
+> > initial states in the reset code and attach code for PCI devices, and
+> > are able to remove the 'signalled' state variable with those fixes.
+> >=20
+> > There are also some more mechanical cleanups in preparation for
+> > further cleanups and fixes to the state management.
+> >=20
+> > David Gibson (6):
+> >   spapr: Start hotplugged PCI devices in ISOLATED state
+> >   spapr: Eliminate DRC 'signalled' state variable
+> >   spapr: Split DRC release from DRC detach
+> >   spapr: Make DRC reset force DRC into known state
+> >   spapr: Clean up DRC set_allocation_state path
+> >   spapr: Clean up DRC set_isolation_state() path
+> >=20
+> >  hw/ppc/spapr.c             |  15 --
+> >  hw/ppc/spapr_drc.c         | 363 +++++++++++++++++++++++--------------=
+--------
+> >  hw/ppc/spapr_events.c      |  10 --
+> >  include/hw/ppc/spapr_drc.h |  10 +-
+> >  4 files changed, 188 insertions(+), 210 deletions(-)
+> >=20
+>=20
+> I've tested your series rebased on master.
+>=20
+> - plugging a CPU while the OS is not started (stopped in SLOF/GRUB):
+>=20
+>     The cpu can be hotplugged, but once the OS is started, the OS
+>     doesn't detect it and it can't be unplugged.
+>=20
+> - plugging a memory DIMM while the OS is not started:
+>=20
+>     The first device_del does nothing, the second one crashes qemu
+>=20
+> - migration with hotplugged cpu (with OS started):
+>=20
+>      CPU cannot be unplugged on destination side
+>=20
+> - migration with hotplugged memory DIMM (with OS started):
+>=20
+>      The first device_del does nothing, the second one crashes qemu
+>=20
+> As it's cleanup, I guess this is what is expected
+> (the results are the same as before cleanup series).
+
+Right, I wouldn't expect this series to fix problems yet - it just
+makes the code clearer so it will be easier to do so in future.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--WBsA/oQW3eTA3LlM
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZQ1fcAAoJEGw4ysog2bOSjX4P/Ro7o64x79uREUv5PhmbcvVc
+YW4XK848QyXfIXun9e7V4BXuQ290Kr7oFsT+K81j1wt26o8AVp8ZaLgIHl1iX3eA
+g3xkvOPmNILlfEbd4PHUGQXWvm9t7seDv/4XsEbqcLjkw2r11Q6FBObgLgTB493w
+8dANOGE317wTyvZR0Dur7PlNSFLGKVo0V+DFqpXRv9HyIEhvcvEaSazsVULlf10F
+H35rgz82yVul7W4oRPdZcM0q/mUN/fMXu3OdxzRaaedvY2Ez58yFUwWyDIJs7WMl
+4FxiJeUl/s84EIB97ve7P3XjGfUvsO26m1HFH2tkcboGhGvWl3FEv/ASD4kO5OHZ
+6PYv2tyJEJQGeRK76Jbo7dB5LiOG6GZLHJcTZA7UVeVYule/s/aSdKDdF+qa92I+
+789FKxuaCHhwdMyQtRnjSjpGRMb2L6yFrE3N8SrJ/gY5zeDzrhEL2GdEe8R1xul9
+egpngtlSFQ5Hv5KEbrOYv8S14pUmDKn0tJe+rEXSoaDZP9VC23na6JzntB/Pb+ah
+I8VNc8vWt/7tQ2CA2kg77s6262+QlI+5Kju/soUuGZrcDVo5J/ByZio+Eqfz8aV3
+kYDwks/qM+6/b4mfcdWyQafF1cPd8pO46u31wgvz+joaOjRug4dBzllHiGf1cb5Z
+ueBKjyrdSQ5/CUXX0WW4
+=9l1t
+-----END PGP SIGNATURE-----
+
+--WBsA/oQW3eTA3LlM--
