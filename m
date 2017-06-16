@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dLm7W-0000xx-JA
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 03:56:44 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dLm8U-0001kG-LO
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 03:57:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dLm7V-0006lA-F8
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 03:56:42 -0400
-Date: Fri, 16 Jun 2017 15:56:27 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170616075627.GF21807@lemon.lan>
-References: <5b2ec66b3434b98de0ef7d59fd8a1de09f966c1a.1497595807.git.maozy.fnst@cn.fujitsu.com>
+	(envelope-from <aik@ozlabs.ru>) id 1dLm8Q-0000AV-Of
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 03:57:42 -0400
+Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:34019)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1dLm8Q-00008E-Iw
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 03:57:38 -0400
+Received: by mail-it0-x243.google.com with SMTP id 201so4167601itu.1
+	for <qemu-devel@nongnu.org>; Fri, 16 Jun 2017 00:57:36 -0700 (PDT)
+References: <20170608050930.2613-1-david@gibson.dropbear.id.au>
+	<4f1e9592-566f-b558-91e8-e39ac8691455@redhat.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <06ef9280-959a-82ca-7de6-b2c7a991093c@ozlabs.ru>
+Date: Fri, 16 Jun 2017 17:57:29 +1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5b2ec66b3434b98de0ef7d59fd8a1de09f966c1a.1497595807.git.maozy.fnst@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PATCH v2] util: remove the obsolete non-blocking
- connect
+In-Reply-To: <4f1e9592-566f-b558-91e8-e39ac8691455@redhat.com>
+Content-Type: text/plain; charset=koi8-r
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/6] spapr: DRC cleanups (part IV)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,76 +30,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, mreitz@redhat.com, sheepdog@lists.wpkg.org, Cao jin <caoj.fnst@cn.fujitsu.com>, kraxel@redhat.com, pbonzini@redhat.com, namei.unix@gmail.com
+To: Laurent Vivier <lvivier@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, mdroth@linux.vnet.ibm.com
+Cc: sursingh@redhat.com, bharata@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org
 
-On Fri, 06/16 15:31, Mao Zhongyi wrote:
-> From: Cao jin <caoj.fnst@cn.fujitsu.com>
+On 16/06/17 03:10, Laurent Vivier wrote:
+> On 08/06/2017 07:09, David Gibson wrote:
+>> This fourth isntallment of cleanups to the DRC code introduces the
+>> first changes to the fundamental state handling.  We change the
+>> initial states in the reset code and attach code for PCI devices, and
+>> are able to remove the 'signalled' state variable with those fixes.
+>>
+>> There are also some more mechanical cleanups in preparation for
+>> further cleanups and fixes to the state management.
+>>
+>> David Gibson (6):
+>>   spapr: Start hotplugged PCI devices in ISOLATED state
+>>   spapr: Eliminate DRC 'signalled' state variable
+>>   spapr: Split DRC release from DRC detach
+>>   spapr: Make DRC reset force DRC into known state
+>>   spapr: Clean up DRC set_allocation_state path
+>>   spapr: Clean up DRC set_isolation_state() path
+>>
+>>  hw/ppc/spapr.c             |  15 --
+>>  hw/ppc/spapr_drc.c         | 363 +++++++++++++++++++++++----------------------
+>>  hw/ppc/spapr_events.c      |  10 --
+>>  include/hw/ppc/spapr_drc.h |  10 +-
+>>  4 files changed, 188 insertions(+), 210 deletions(-)
+>>
 > 
-> The non-blocking connect mechanism is obsolete, and it doesn't
-> work well in inet connection, because it will call getaddrinfo
-> first and getaddrinfo will blocks on DNS lookups. Since commit
-> e65c67e4 & d984464e, the non-blocking connect of migration goes
-> through QIOChannel in a different manner(using a thread), and
-> nobody use this old non-blocking connect anymore.
-> 
-> Any newly written code which needs a non-blocking connect should
-> use the QIOChannel code, so we can drop NonBlockingConnectHandler
-> as a concept entirely.
-> 
-> Cc: mitake.hitoshi@lab.ntt.co.jp
-> Cc: namei.unix@gmail.com
-> Cc: jcody@redhat.com
-> Cc: kwolf@redhat.com
-> Cc: mreitz@redhat.com
-> Cc: berrange@redhat.com
-> Cc: kraxel@redhat.com
-> Cc: pbonzini@redhat.com
-> Cc: qemu-block@nongnu.org
-> Cc: sheepdog@lists.wpkg.org
-> Cc: famz@redhat.com
-> Cc: quintela@redhat.com
-> Suggested-by: Daniel P. Berrange <berrange@redhat.com>
-> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
-> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
-> Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
-> v2:
-> 1. block/ssh.c is not compiled in v1 which leads to no error 
->    reported when I run make & make check, although I make a 
-> 	mistake in block/ssh.c, because the package libssh2-devel 
-> 	missed in my system. Now fixed it.
-> 2. Write the prototype in a single line. [Juan Quintela]
-> 
-> Because it's a minor change, so still add the r-b.
-> 
-> v1:
-> This patch was reviewed by Daniel about a years ago, but it has never
-> been merged just since socket_connect() called by net_socket_connect_init()
-> where NonBlockingConnectHandler was passed to socket_connect(). it's broken.
-> 
-> Now this problem was worked around by Daniel's patch(commit 6701e551 'Revert
-> "Change net/socket.c to use socket_*() functions" again'). Therefore, resend
-> it, of course, part of related code has changed over the years, so changed
-> the patch accordingly.
-> 
-> The reviewed patch listed on:
-> https://lists.gnu.org/archive/html/qemu-devel/2016-07/msg06373.html
-> 
->  --help                 |   0
->  block/sheepdog.c       |   2 +-
->  block/ssh.c            |   2 +-
->  include/qemu/sockets.h |  12 +--
->  io/channel-socket.c    |   2 +-
->  util/qemu-sockets.c    | 205 ++++++-------------------------------------------
->  6 files changed, 28 insertions(+), 195 deletions(-)
->  create mode 100644 --help
-> 
-> diff --git a/--help b/--help
-> new file mode 100644
-> index 0000000..e69de29
+> I've tested your series rebased on master.
 
-NACK, I believe you added a new file '--help' by mistake.
 
-Fam
+I have tested git://github.com/dgibson/qemu.git drcIV branch with 2xXHCI
+multifunction PCI hotplug, works fine.
+
+
+> 
+> - plugging a CPU while the OS is not started (stopped in SLOF/GRUB):
+> 
+>     The cpu can be hotplugged, but once the OS is started, the OS
+>     doesn't detect it and it can't be unplugged.
+> 
+> - plugging a memory DIMM while the OS is not started:
+> 
+>     The first device_del does nothing, the second one crashes qemu
+> 
+> - migration with hotplugged cpu (with OS started):
+> 
+>      CPU cannot be unplugged on destination side
+> 
+> - migration with hotplugged memory DIMM (with OS started):
+> 
+>      The first device_del does nothing, the second one crashes qemu
+> 
+> As it's cleanup, I guess this is what is expected
+> (the results are the same as before cleanup series).
+> 
+> Laurent
+> 
+
+
+-- 
+Alexey
