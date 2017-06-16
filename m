@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dLt3y-0005bA-Jr
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:21:31 -0400
+	(envelope-from <abdallah.bouassida@lauterbach.com>)
+	id 1dLtAw-0001AS-17
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:28:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dLt3t-0002cF-O6
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:21:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60688)
+	(envelope-from <abdallah.bouassida@lauterbach.com>)
+	id 1dLtAs-0006pz-4O
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:28:42 -0400
+Received: from smtp1.lauterbach.com ([62.154.241.196]:45363)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dLt3t-0002c0-Hv
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:21:25 -0400
-References: <1497625153-19812-1-git-send-email-thuth@redhat.com>
-	<b2343916-49d4-5c18-8b2f-f3538839b46e@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <76504ef2-8dd0-ecbc-6e25-55be6abcb14a@redhat.com>
-Date: Fri, 16 Jun 2017 17:21:20 +0200
+	(Exim 4.71) (envelope-from <abdallah.bouassida@lauterbach.com>)
+	id 1dLtAr-0006oK-Ps
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:28:38 -0400
+References: <1701daf4-b2de-a9fb-7337-7aa791676516@lauterbach.com>
+	<CAFEAcA_+rS8gjjU+g1e71vBBioxaWX94+SvMqVh=Ta37ZhYGjA@mail.gmail.com>
+From: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+Message-ID: <5f1df0fb-6c63-a0db-90fc-1e6c455ce2bd@lauterbach.com>
+Date: Fri, 16 Jun 2017 16:28:44 +0100
 MIME-Version: 1.0
-In-Reply-To: <b2343916-49d4-5c18-8b2f-f3538839b46e@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAFEAcA_+rS8gjjU+g1e71vBBioxaWX94+SvMqVh=Ta37ZhYGjA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] Poison some more target-specific
- defines
+Subject: Re: [Qemu-devel] [PATCH] target-arm: Bug fix in filling the cp_regs
+ hashtable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +32,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Khaled Jmal <khaled.jmal@lauterbach.com>
 
-On 16.06.2017 17:05, Paolo Bonzini wrote:
-> On 16/06/2017 16:59, Thomas Huth wrote:
->> This series marks some more #defines as poisoned, which are
->> target-specific (declared in config-target.h) and thus must
->> not be used in common code.
+Oh, I see!
+Thanks for the details!
+
+Regards,
+Abdallah
+
+Le 6/16/2017 à 3:51 PM, Peter Maydell a écrit :
+> On 16 June 2017 at 15:42, Abdallah Bouassida
+> <abdallah.bouassida@lauterbach.com> wrote:
+>> Check if the CPU supports AARCH64 before adding  the 64bit view of
+>> the coprocessor's register to the cp_regs hashtable.
 >>
->> v2:
->>  - First two patches are the same as in v1
->>  - Reworked the CONFIG_KVM patches according to Paolo's review feedbac=
-k
->>  - Added two new patches to finally poison CONFIG_SOFTMMU, too
->>  - Added a final patch to move bootdevice.o to common-obj now
->>    (based on an earlier patch where I also tried to move numa.o and
->>    balloon.o, too - but these files are indirectly target-dependent as
->>    I now know, so they can't be moved)
->=20
-> Why do you say they can't be moved?  They can, and your series should
-> change nothing about it, thanks to what you're doing now with
-> CONFIG_KVM_IS_POSSIBLE (which was also done before with NEED_CPU_H).
-
-numa.c and balloon.c both use ram_addr_t (numa.c uses it directly, and
-balloon.c indirectly via the QEMUBalloonEvent typedef from the header).
-And ram_addr_t is currently target-specific - it depends on
-CONFIG_XEN_BACKEND. So this could break in certain subtle cases, e.g.
-when compiling on a 32-bit host with XEN enabled.
-
- Thomas
+>> Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+>> ---
+>> Bug description: if a register has the .state = ARM_CP_STATE_BOTH, its 64bit
+>> view will be added to the hashtable even if the CPU is not 64bit.
+> This is deliberate and required. Where the AArch64 and AArch32
+> states both have a register which shares underlying architectural
+> state, QEMU chooses to implement migration of that state usually
+> via the AArch64 version's ARMCPRegInfo struct. If the AArch64
+> version is not included in the hashtable for an AArch32-only
+> CPU then the state of the 32-bit register won't be migrated.
+> The AArch64 register is of course invisible to the guest because
+> it is only accessible via 64-bit instructions, but it's used
+> during migration.
+>
+> thanks
+> -- PMM
