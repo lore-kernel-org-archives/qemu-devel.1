@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44584)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gsomlo@gmail.com>) id 1dLwP8-0004UD-0t
+	(envelope-from <gsomlo@gmail.com>) id 1dLwP8-0004UL-QT
 	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 14:55:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gsomlo@gmail.com>) id 1dLwP5-0006Vs-08
+	(envelope-from <gsomlo@gmail.com>) id 1dLwP7-0006Ym-W5
 	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 14:55:34 -0400
-Received: from mail-qt0-x229.google.com ([2607:f8b0:400d:c0d::229]:33202)
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:35160)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <gsomlo@gmail.com>) id 1dLwP4-0006UU-OA
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 14:55:30 -0400
-Received: by mail-qt0-x229.google.com with SMTP id u12so75316258qth.0
-	for <qemu-devel@nongnu.org>; Fri, 16 Jun 2017 11:55:28 -0700 (PDT)
+	(Exim 4.71) (envelope-from <gsomlo@gmail.com>) id 1dLwP7-0006Y6-SZ
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 14:55:33 -0400
+Received: by mail-qt0-x243.google.com with SMTP id x58so12311685qtc.2
+	for <qemu-devel@nongnu.org>; Fri, 16 Jun 2017 11:55:33 -0700 (PDT)
 From: "Gabriel L. Somlo" <gsomlo@gmail.com>
-Date: Fri, 16 Jun 2017 14:55:13 -0400
-Message-Id: <1497639316-22202-1-git-send-email-gsomlo@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 0/3] Update AppleSMC for OS X 10.12.4+ guests
+Date: Fri, 16 Jun 2017 14:55:16 -0400
+Message-Id: <1497639316-22202-4-git-send-email-gsomlo@gmail.com>
+In-Reply-To: <1497639316-22202-1-git-send-email-gsomlo@gmail.com>
+References: <1497639316-22202-1-git-send-email-gsomlo@gmail.com>
+Subject: [Qemu-devel] [PATCH v3 3/3] applesmc: fix port i/o access width
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +28,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: agraf@suse.de, pbonzini@redhat.com, f4bug@amsat.org, eshelton@pobox.com
 
-As of 10.12.4, OS X refuses to boot unless the AppleSMC supports a
-third I/O port, which provides the current error status when read.
+Set access width of all AppleSMC i/o regions to 1 byte, since they
+all represent 8-bit-wide ports.
 
-New since v2:
-	- updated "reviewd-by" fields
-	- ping ?
+Signed-off-by: Gabriel Somlo <gsomlo@gmail.com>
+Reviewed-by: Alexander Graf <agraf@suse.de>
+---
+ hw/misc/applesmc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
->New since v1:
->
->        - 1/3: don't touch the default OSK string, as it's unnecessary
->                at this time
->
->        - 2/3: don't consolidate I/O regions, leave as-is for data
->                and cmd; This patch now implements the error-code state
->                machine, AND adds an i/o region dedicaded to the error
->                status port, complete with read/write access methods.
->
->        - 3/3: set access width to 1-byte on data and cmd i/o regions.
->                Tested on OS X versions 10.[6..12].
->
->> This series consists of three patches:
->>
->>       - 1/3: indentation/whitespace cleanup for applesmc.c to the point
->>               where it now passes scripts/checkpatc.pl, and allows
->>               subsequent changes to look nice in diff-patch format :)
->>
->>       - 2/3: consolidate Port I/O into a single region, and invoke
->>               appropriate read/write methods based on the offset being
->>               accessed
->>
->>       - 3/3: implement read-only error/status port, and update
->>               data and command read/write methods to correctly
->>               maintain the state machine for keeping the status_1e
->>               value up to date.
-
-
-Gabriel L. Somlo (3):
-  applesmc: cosmetic whitespace and indentation cleanup
-  applesmc: implement error status port
-  applesmc: fix port i/o access width
-
- hw/misc/applesmc.c | 219 +++++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 155 insertions(+), 64 deletions(-)
-
+diff --git a/hw/misc/applesmc.c b/hw/misc/applesmc.c
+index 0d882e8..7896812 100644
+--- a/hw/misc/applesmc.c
++++ b/hw/misc/applesmc.c
+@@ -316,12 +316,12 @@ static void applesmc_isa_realize(DeviceState *dev, Error **errp)
+     AppleSMCState *s = APPLE_SMC(dev);
+ 
+     memory_region_init_io(&s->io_data, OBJECT(s), &applesmc_data_io_ops, s,
+-                          "applesmc-data", 4);
++                          "applesmc-data", 1);
+     isa_register_ioport(&s->parent_obj, &s->io_data,
+                         s->iobase + APPLESMC_DATA_PORT);
+ 
+     memory_region_init_io(&s->io_cmd, OBJECT(s), &applesmc_cmd_io_ops, s,
+-                          "applesmc-cmd", 4);
++                          "applesmc-cmd", 1);
+     isa_register_ioport(&s->parent_obj, &s->io_cmd,
+                         s->iobase + APPLESMC_CMD_PORT);
+ 
 -- 
 2.7.4
