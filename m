@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dLsjA-0002fW-4l
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:00:04 -0400
+	(envelope-from <mst@redhat.com>) id 1dLsnJ-00076z-Kk
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:04:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dLsj7-0008HL-3X
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:00:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43790)
+	(envelope-from <mst@redhat.com>) id 1dLsnG-0000jo-Gl
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:04:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40202)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dLsj6-0008Gr-Tk
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 10:59:57 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Fri, 16 Jun 2017 16:59:12 +0200
-Message-Id: <1497625153-19812-7-git-send-email-thuth@redhat.com>
-In-Reply-To: <1497625153-19812-1-git-send-email-thuth@redhat.com>
-References: <1497625153-19812-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 6/7] include/exec/poison: Mark CONFIG_SOFTMMU
- as poisoned
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dLsnG-0000jS-AD
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:04:14 -0400
+Date: Fri, 16 Jun 2017 18:04:06 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170616175748-mutt-send-email-mst@kernel.org>
+References: <547865a9-d6c2-7140-47e2-5af01e7d761d@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <547865a9-d6c2-7140-47e2-5af01e7d761d@redhat.com>
+Subject: Re: [Qemu-devel] [RFC] virtio-mem: paravirtualized memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,69 +26,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: KVM <kvm@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, Andrea Arcangeli <aarcange@redhat.com>
 
-CONFIG_SOFTMMU should never be used in common code, so mark
-it as poisoned, too.
+On Fri, Jun 16, 2017 at 04:20:02PM +0200, David Hildenbrand wrote:
+> Hi,
+> 
+> this is an idea that is based on Andrea Arcangeli's original idea to
+> host enforce guest access to memory given up using virtio-balloon using
+> userfaultfd in the hypervisor. While looking into the details, I
+> realized that host-enforcing virtio-balloon would result in way too many
+> problems (mainly backwards compatibility) and would also have some
+> conceptual restrictions that I want to avoid. So I developed the idea of
+> virtio-mem - "paravirtualized memory".
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- include/exec/poison.h | 1 +
- include/qom/cpu.h     | 8 ++++++++
- 2 files changed, 9 insertions(+)
+Thanks! I went over this quickly, will read some more in the
+coming days. I would like to ask for some clarifications
+on one part meanwhile:
 
-diff --git a/include/exec/poison.h b/include/exec/poison.h
-index 540fc70..c932d6f 100644
---- a/include/exec/poison.h
-+++ b/include/exec/poison.h
-@@ -81,6 +81,7 @@
- #pragma GCC poison CONFIG_LINUX_USER
- #pragma GCC poison CONFIG_VHOST_NET
- #pragma GCC poison CONFIG_KVM
-+#pragma GCC poison CONFIG_SOFTMMU
- 
- #endif
- #endif
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 89ddb68..c41e1e3 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -783,6 +783,8 @@ bool cpu_throttle_active(void);
-  */
- int cpu_throttle_get_percentage(void);
- 
-+#ifdef NEED_CPU_H
-+
- #ifndef CONFIG_USER_ONLY
- 
- typedef void (*CPUInterruptHandler)(CPUState *, int);
-@@ -829,6 +831,8 @@ static inline void cpu_unaligned_access(CPUState *cpu, vaddr addr,
- }
- #endif
- 
-+#endif /* NEED_CPU_H */
-+
- /**
-  * cpu_set_pc:
-  * @cpu: The CPU to set the program counter for.
-@@ -1005,6 +1009,8 @@ void cpu_exec_initfn(CPUState *cpu);
- void cpu_exec_realizefn(CPUState *cpu, Error **errp);
- void cpu_exec_unrealizefn(CPUState *cpu);
- 
-+#ifdef NEED_CPU_H
-+
- #ifdef CONFIG_SOFTMMU
- extern const struct VMStateDescription vmstate_cpu_common;
- #else
-@@ -1019,6 +1025,8 @@ extern const struct VMStateDescription vmstate_cpu_common;
-     .offset = 0,                                                            \
- }
- 
-+#endif /* NEED_CPU_H */
-+
- #define UNASSIGNED_CPU_INDEX -1
- 
- #endif
+> Q: Why not reuse virtio-balloon?
+> 
+> A: virtio-balloon is for cooperative memory management. It has a fixed
+>    page size
+
+We are fixing that with VIRTIO_BALLOON_F_PAGE_CHUNKS btw.
+I would appreciate you looking into that patchset.
+
+> and will deflate in certain situations.
+
+What does this refer to?
+
+> Any change we
+>    introduce will break backwards compatibility.
+
+Why does this have to be the case?
+
+> virtio-balloon was not
+>    designed to give guarantees. Nobody can hinder the guest from
+>    deflating/reusing inflated memory.
+
+Reusing without deflate is forbidden with TELL_HOST, right?
+
+>    In addition, it might make perfect
+>    sense to have both, virtio-balloon and virtio-mem at the same time,
+>    especially looking at the DEFLATE_ON_OOM or STATS features of
+>    virtio-balloon. While virtio-mem is all about guarantees, virtio-
+>    balloon is about cooperation.
+
+Thanks, and I intend to look more into this next week.
+
 -- 
-1.8.3.1
+MST
