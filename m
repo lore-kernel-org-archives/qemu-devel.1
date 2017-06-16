@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dLtVf-0002yW-UT
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:50:08 -0400
+	(envelope-from <mst@redhat.com>) id 1dLtVk-00035w-Pt
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:50:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dLtVe-0002yP-O0
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:50:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59832)
+	(envelope-from <mst@redhat.com>) id 1dLtVj-00033K-O1
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:50:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59934)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dLtVe-0002xa-HK
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:50:06 -0400
-Date: Fri, 16 Jun 2017 18:50:01 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dLtVj-00032k-Dv
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:50:11 -0400
+Date: Fri, 16 Jun 2017 18:50:05 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1497628168-30489-7-git-send-email-mst@redhat.com>
+Message-ID: <1497628168-30489-8-git-send-email-mst@redhat.com>
 References: <1497628168-30489-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1497628168-30489-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 6/7] intel_iommu: cleanup
- vtd_interrupt_remap_msi()
+Subject: [Qemu-devel] [PULL 7/7] hw/i386: fix nvdimm check error path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,58 +27,88 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-From: Peter Xu <peterx@redhat.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-Move the memcpy upper into where needed, then share the trace so that we
-trace every correct remapping.
+Commit e987c37aee1752177906847630d32477da57e705 ("hw/i386: check if
+nvdimm is enabled before plugging") introduced a check to reject nvdimm
+hotplug if -machine pc,nvdimm=on was not given.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
+This check executes after pc_dimm_memory_plug() has already completed
+and does not reverse the effect of this function in the case of failure.
+
+Perform the check before calling pc_dimm_memory_plug().  This fixes the
+following abort:
+
+  $ qemu -M accel=kvm -m 1G,slots=4,maxmem=8G \
+         -object memory-backend-file,id=mem1,share=on,mem-path=nvdimm.dat,size=1G
+  (qemu) device_add nvdimm,memdev=mem1
+  nvdimm is not enabled: missing 'nvdimm' in '-M'
+  (qemu) device_add nvdimm,memdev=mem1
+  Core dumped
+
+The backtrace is:
+
+  #0  0x00007fffdb5b191f in raise () at /lib64/libc.so.6
+  #1  0x00007fffdb5b351a in abort () at /lib64/libc.so.6
+  #2  0x00007fffdb5a9da7 in __assert_fail_base () at /lib64/libc.so.6
+  #3  0x00007fffdb5a9e52 in  () at /lib64/libc.so.6
+  #4  0x000055555577a5fa in qemu_ram_set_idstr (new_block=0x555556747a00, name=<optimized out>, dev=dev@entry=0x555556705590) at qemu/exec.c:1709
+  #5  0x0000555555a0fe86 in vmstate_register_ram (mr=mr@entry=0x55555673a0e0, dev=dev@entry=0x555556705590) at migration/savevm.c:2293
+  #6  0x0000555555965088 in pc_dimm_memory_plug (dev=dev@entry=0x555556705590, hpms=hpms@entry=0x5555566bb0e0, mr=mr@entry=0x555556705630, align=<optimized out>, errp=errp@entry=0x7fffffffc660)
+      at hw/mem/pc-dimm.c:110
+  #7  0x000055555581d89b in pc_dimm_plug (errp=0x7fffffffc6c0, dev=0x555556705590, hotplug_dev=<optimized out>) at qemu/hw/i386/pc.c:1713
+  #8  0x000055555581d89b in pc_machine_device_plug_cb (hotplug_dev=<optimized out>, dev=0x555556705590, errp=0x7fffffffc6c0) at qemu/hw/i386/pc.c:2004
+  #9  0x0000555555914da6 in device_set_realized (obj=<optimized out>, value=<optimized out>, errp=0x7fffffffc7e8) at hw/core/qdev.c:926
+
+Cc: Haozhong Zhang <haozhong.zhang@intel.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Haozhong Zhang <haozhong.zhang@intel.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/i386/intel_iommu.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ hw/i386/pc.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 24bdd00..a9b59bd 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -2520,7 +2520,8 @@ static int vtd_interrupt_remap_msi(IntelIOMMUState *iommu,
-     trace_vtd_ir_remap_msi_req(origin->address, origin->data);
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 5b8c6fb..db41cca 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1692,6 +1692,7 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
+     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+     MemoryRegion *mr = ddc->get_memory_region(dimm);
+     uint64_t align = TARGET_PAGE_SIZE;
++    bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
  
-     if (!iommu || !iommu->intr_enabled) {
--        goto do_not_translate;
-+        memcpy(translated, origin, sizeof(*origin));
-+        goto out;
+     if (memory_region_get_alignment(mr) && pcmc->enforce_aligned_dimm) {
+         align = memory_region_get_alignment(mr);
+@@ -1703,17 +1704,18 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
+         goto out;
      }
  
-     if (origin->address & VTD_MSI_ADDR_HI_MASK) {
-@@ -2537,7 +2538,8 @@ static int vtd_interrupt_remap_msi(IntelIOMMUState *iommu,
- 
-     /* This is compatible mode. */
-     if (addr.addr.int_mode != VTD_IR_INT_FORMAT_REMAP) {
--        goto do_not_translate;
-+        memcpy(translated, origin, sizeof(*origin));
++    if (is_nvdimm && !pcms->acpi_nvdimm_state.is_enabled) {
++        error_setg(&local_err,
++                   "nvdimm is not enabled: missing 'nvdimm' in '-M'");
 +        goto out;
++    }
++
+     pc_dimm_memory_plug(dev, &pcms->hotplug_memory, mr, align, &local_err);
+     if (local_err) {
+         goto out;
      }
  
-     index = addr.addr.index_h << 15 | le16_to_cpu(addr.addr.index_l);
-@@ -2589,13 +2591,9 @@ static int vtd_interrupt_remap_msi(IntelIOMMUState *iommu,
-     /* Translate VTDIrq to MSI message */
-     vtd_generate_msi_message(&irq, translated);
- 
-+out:
-     trace_vtd_ir_remap_msi(origin->address, origin->data,
-                            translated->address, translated->data);
--
--    return 0;
--
--do_not_translate:
--    memcpy(translated, origin, sizeof(*origin));
-     return 0;
- }
+-    if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
+-        if (!pcms->acpi_nvdimm_state.is_enabled) {
+-            error_setg(&local_err,
+-                       "nvdimm is not enabled: missing 'nvdimm' in '-M'");
+-            goto out;
+-        }
++    if (is_nvdimm) {
+         nvdimm_plug(&pcms->acpi_nvdimm_state);
+     }
  
 -- 
 MST
