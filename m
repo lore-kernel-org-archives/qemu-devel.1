@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dLteV-0002zW-RM
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:59:17 -0400
+	(envelope-from <famz@redhat.com>) id 1dLtmG-0000z6-2r
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 12:07:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dLteS-0006rG-Pi
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:59:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44044)
+	(envelope-from <famz@redhat.com>) id 1dLtmB-0000gl-9N
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 12:07:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35328)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dLteS-0006qW-EI
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:59:12 -0400
-References: <547865a9-d6c2-7140-47e2-5af01e7d761d@redhat.com>
-	<20170616175748-mutt-send-email-mst@kernel.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <4cdf547c-079b-6b44-484f-e1132e960364@redhat.com>
-Date: Fri, 16 Jun 2017 17:59:07 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170616175748-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] virtio-mem: paravirtualized memory
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dLtmB-0000ga-0v
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 12:07:11 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Sat, 17 Jun 2017 00:06:58 +0800
+Message-Id: <20170616160658.32290-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH] migration: Fix race of image locking between
+ src and dst
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,114 +22,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: KVM <kvm@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, Andrea Arcangeli <aarcange@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, peterx@redhat.com, mreitz@redhat.com, stefanha@redhat.com, Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jsnow@redhat.com
 
-On 16.06.2017 17:04, Michael S. Tsirkin wrote:
-> On Fri, Jun 16, 2017 at 04:20:02PM +0200, David Hildenbrand wrote:
->> Hi,
->>
->> this is an idea that is based on Andrea Arcangeli's original idea to
->> host enforce guest access to memory given up using virtio-balloon using
->> userfaultfd in the hypervisor. While looking into the details, I
->> realized that host-enforcing virtio-balloon would result in way too many
->> problems (mainly backwards compatibility) and would also have some
->> conceptual restrictions that I want to avoid. So I developed the idea of
->> virtio-mem - "paravirtualized memory".
-> 
-> Thanks! I went over this quickly, will read some more in the
-> coming days. I would like to ask for some clarifications
-> on one part meanwhile:
+Previously, dst side will immediately try to lock the write byte upon
+receiving QEMU_VM_EOF, but at src side, bdrv_inactivate_all() is only
+done after sending it. If the src host is under load, dst may fail to
+acquire the lock due to racing with the src unlocking it.
 
-Thanks for looking into it that fast! :)
+Fix this by hoisting the bdrv_inactivate_all() operation before
+QEMU_VM_EOF.
 
-In general, what this section is all about: Why to not simply host
-enforce virtio-balloon.
+N.B. A further improvement could possibly be done to cleanly handover
+locks between src and dst, so that there is no window where a third QEMU
+could steal the locks and prevent src and dst from running.
 
-> 
->> Q: Why not reuse virtio-balloon?
->>
->> A: virtio-balloon is for cooperative memory management. It has a fixed
->>    page size
-> 
-> We are fixing that with VIRTIO_BALLOON_F_PAGE_CHUNKS btw.
-> I would appreciate you looking into that patchset.
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ migration/colo.c      |  2 +-
+ migration/migration.c | 19 +++++++------------
+ migration/savevm.c    | 19 +++++++++++++++----
+ migration/savevm.h    |  3 ++-
+ 4 files changed, 25 insertions(+), 18 deletions(-)
 
-Will do, thanks. Problem is that there is no "enforcement" on the page
-size. VIRTIO_BALLOON_F_PAGE_CHUNKS simply allows to send bigger chunks.
-Nobody hinders the guest (especially legacy virtio-balloon drivers) from
-sending 4k pages.
-
-So this doesn't really fix the issue (we have here), it just allows to
-speed up transfer. Which is a good thing, but does not help for
-enforcement at all. So, yes support for page sizes > 4k, but no way to
-enforce it.
-
-> 
->> and will deflate in certain situations.
-> 
-> What does this refer to?
-
-A Linux guest will deflate the balloon (all or some pages) in the
-following scenarios:
-a) page migration
-b) unload virtio-balloon kernel module
-c) hibernate/suspension
-d) (DEFLATE_ON_OOM)
-
-A Linux guest will touch memory without deflating:
-a) During a kexec() dump
-d) On reboots (regular, after kexec(), system_reset)
-
-> 
->> Any change we
->>    introduce will break backwards compatibility.
-> 
-> Why does this have to be the case
-If we suddenly enforce the existing virtio-balloon, we will break legacy
-guests.
-
-Simple example:
-Guest with inflated virtio-balloon reboots. Touches inflated memory.
-Gets killed at some random point.
-
-Of course, another discussion would be "can't we move virtio-mem
-functionality into virtio-balloon instead of changing virtio-balloon".
-With the current concept this is also not possible (one region per
-device vs. one virtio-balloon device). And I think while similar, these
-are two different concepts.
-
-> 
->> virtio-balloon was not
->>    designed to give guarantees. Nobody can hinder the guest from
->>    deflating/reusing inflated memory.
-> 
-> Reusing without deflate is forbidden with TELL_HOST, right?
-
-TELL_HOST just means "please inform me". There is no way to NACK a
-request. It is not a permission to do so, just a "friendly
-notification". And this is exactly not what we want when host enforcing
-memory access.
-
-
-> 
->>    In addition, it might make perfect
->>    sense to have both, virtio-balloon and virtio-mem at the same time,
->>    especially looking at the DEFLATE_ON_OOM or STATS features of
->>    virtio-balloon. While virtio-mem is all about guarantees, virtio-
->>    balloon is about cooperation.
-> 
-> Thanks, and I intend to look more into this next week.
-> 
-
-I know that it is tempting to force this concept into virtio-balloon. I
-spent quite some time thinking about this (and possible other techniques
-like implicit memory deflation on reboots) and decided not to do it. We
-just end up trying to hack around all possible things that could go
-wrong, while still not being able to handle all requirements properly.
-
+diff --git a/migration/colo.c b/migration/colo.c
+index c436d63..c4ba4c3 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -352,7 +352,7 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
+     qemu_savevm_state_header(fb);
+     qemu_savevm_state_begin(fb);
+     qemu_mutex_lock_iothread();
+-    qemu_savevm_state_complete_precopy(fb, false);
++    qemu_savevm_state_complete_precopy(fb, false, false);
+     qemu_mutex_unlock_iothread();
+ 
+     qemu_fflush(fb);
+diff --git a/migration/migration.c b/migration/migration.c
+index b9d8798..f588329 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1553,7 +1553,7 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
+      * Cause any non-postcopiable, but iterative devices to
+      * send out their final data.
+      */
+-    qemu_savevm_state_complete_precopy(ms->to_dst_file, true);
++    qemu_savevm_state_complete_precopy(ms->to_dst_file, true, false);
+ 
+     /*
+      * in Finish migrate and with the io-lock held everything should
+@@ -1597,7 +1597,7 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
+      */
+     qemu_savevm_send_postcopy_listen(fb);
+ 
+-    qemu_savevm_state_complete_precopy(fb, false);
++    qemu_savevm_state_complete_precopy(fb, false, false);
+     qemu_savevm_send_ping(fb, 3);
+ 
+     qemu_savevm_send_postcopy_run(fb);
+@@ -1695,20 +1695,15 @@ static void migration_completion(MigrationState *s, int current_active_state,
+         ret = global_state_store();
+ 
+         if (!ret) {
++            bool inactivate = !migrate_colo_enabled();
+             ret = vm_stop_force_state(RUN_STATE_FINISH_MIGRATE);
+             if (ret >= 0) {
+                 qemu_file_set_rate_limit(s->to_dst_file, INT64_MAX);
+-                qemu_savevm_state_complete_precopy(s->to_dst_file, false);
++                ret = qemu_savevm_state_complete_precopy(s->to_dst_file, false,
++                                                         inactivate);
+             }
+-            /*
+-             * Don't mark the image with BDRV_O_INACTIVE flag if
+-             * we will go into COLO stage later.
+-             */
+-            if (ret >= 0 && !migrate_colo_enabled()) {
+-                ret = bdrv_inactivate_all();
+-                if (ret >= 0) {
+-                    s->block_inactive = true;
+-                }
++            if (inactivate && ret >= 0) {
++                s->block_inactive = true;
+             }
+         }
+         qemu_mutex_unlock_iothread();
+diff --git a/migration/savevm.c b/migration/savevm.c
+index f32a82d..6bfd489 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -1104,7 +1104,8 @@ void qemu_savevm_state_complete_postcopy(QEMUFile *f)
+     qemu_fflush(f);
+ }
+ 
+-void qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only)
++int qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only,
++                                       bool inactivate_disks)
+ {
+     QJSON *vmdesc;
+     int vmdesc_len;
+@@ -1138,12 +1139,12 @@ void qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only)
+         save_section_footer(f, se);
+         if (ret < 0) {
+             qemu_file_set_error(f, ret);
+-            return;
++            return -1;
+         }
+     }
+ 
+     if (iterable_only) {
+-        return;
++        return 0;
+     }
+ 
+     vmdesc = qjson_new();
+@@ -1173,6 +1174,15 @@ void qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only)
+         json_end_object(vmdesc);
+     }
+ 
++    if (inactivate_disks) {
++        /* Inactivate before sending QEMU_VM_EOF so that the
++         * bdrv_invalidate_cache_all() on the other end won't fail. */
++        ret = bdrv_inactivate_all();
++        if (ret) {
++            qemu_file_set_error(f, ret);
++            return ret;
++        }
++    }
+     if (!in_postcopy) {
+         /* Postcopy stream will still be going */
+         qemu_put_byte(f, QEMU_VM_EOF);
+@@ -1190,6 +1200,7 @@ void qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only)
+     qjson_destroy(vmdesc);
+ 
+     qemu_fflush(f);
++    return 0;
+ }
+ 
+ /* Give an estimate of the amount left to be transferred,
+@@ -1263,7 +1274,7 @@ static int qemu_savevm_state(QEMUFile *f, Error **errp)
+ 
+     ret = qemu_file_get_error(f);
+     if (ret == 0) {
+-        qemu_savevm_state_complete_precopy(f, false);
++        qemu_savevm_state_complete_precopy(f, false, false);
+         ret = qemu_file_get_error(f);
+     }
+     qemu_savevm_state_cleanup();
+diff --git a/migration/savevm.h b/migration/savevm.h
+index 45b59c1..5a2ed11 100644
+--- a/migration/savevm.h
++++ b/migration/savevm.h
+@@ -35,7 +35,8 @@ void qemu_savevm_state_header(QEMUFile *f);
+ int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy);
+ void qemu_savevm_state_cleanup(void);
+ void qemu_savevm_state_complete_postcopy(QEMUFile *f);
+-void qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only);
++int qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only,
++                                       bool inactivate_disks);
+ void qemu_savevm_state_pending(QEMUFile *f, uint64_t max_size,
+                                uint64_t *res_non_postcopiable,
+                                uint64_t *res_postcopiable);
 -- 
-
-Thanks,
-
-David
+2.9.4
