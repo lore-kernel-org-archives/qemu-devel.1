@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dLnTS-0000Qw-UO
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 05:23:27 -0400
+	(envelope-from <berrange@redhat.com>) id 1dLnrb-0006LB-BS
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 05:48:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dLnTS-0003Ln-0h
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 05:23:26 -0400
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:35613)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dLnTR-0003Km-QQ
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 05:23:25 -0400
-Received: by mail-wr0-x22e.google.com with SMTP id q97so35047257wrb.2
-	for <qemu-devel@nongnu.org>; Fri, 16 Jun 2017 02:23:25 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1dLnra-0002iU-EG
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 05:48:23 -0400
+Date: Fri, 16 Jun 2017 10:48:09 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170616094809.GC25765@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170615195209.17720-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <6e150052-91ca-d260-b0e9-6894f93fc15d@redhat.com>
-References: <20170615152852.GB2399@work-vm>
-	<6e150052-91ca-d260-b0e9-6894f93fc15d@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 16 Jun 2017 10:23:04 +0100
-Message-ID: <CAFEAcA_pEkfR9w9+oES=965dkDBCo=2yAyWEQ_eujfcyu1XQ-w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] ahci-test failures with 'Failed to get "write"
- lock'
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170615195209.17720-1-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] nbd: fix NBD over TLS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +23,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-stable@nongnu.org
 
-On 15 June 2017 at 17:16, John Snow <jsnow@redhat.com> wrote:
-> On 06/15/2017 11:28 AM, Dr. David Alan Gilbert wrote:
->> Hi,
->>   Peter noticed that there were some hangs in the ahci-test;
->> I can reproduce them on my laptop as long as the laptop has
->> some other load on it (a few md5sum /dev/zero's help).
->>
->> /x86_64/ahci/flush/migrate: qemu-system-x86_64: Failed to get "write" lock
->> Is another process using the image?
->> OK
->> /x86_64/ahci/migrate/sanity: qemu-system-x86_64: Failed to get "write" lock
->> Is another process using the image?
->>
->> and that hangs in sanity.
->>
->> That seems to be the common case, I've also had one:
->>
->> /x86_64/ahci/migrate/ncq/halted: qemu-system-x86_64: Failed to get "write" lock
->> Is another process using the image?
->> qemu-system-x86_64: /home/dgilbert/git/qemu/block/io.c:1352: bdrv_aligned_pwritev: Assertion `child->perm & BLK_PERM_WRITE' failed.
->>
->>
->> Neither of these always fail.
+On Thu, Jun 15, 2017 at 09:52:09PM +0200, Paolo Bonzini wrote:
+> When attaching the NBD QIOChannel to an AioContext, the TLS channel should
+> be used, not the underlying socket channel.  This is because, trivially,
+> the TLS channel will be the one that we read/write to and thus the one
+> that will get the qio_channel_yield() call.
+> 
+> Fixes: ff82911cd3f69f028f2537825c9720ff78bc3f19
+> Cc: qemu-stable@nongnu.org
+> Cc: Daniel P. Berrange <berrange@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  block/nbd-client.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-> Haven't observed myself and I run the tests pretty frequently. I'll keep
-> an eye out. I see many similar problems in iotests for other areas, too.
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+Tested-by: Daniel P. Berrange <berrange@redhat.com>
 
-If we can figure out this quickly that would be good -- it's
-causing my build tests to fail often enough that I'm a bit
-reluctant to try to merge more pull requests until we've
-squished this bug...
 
-thanks
--- PMM
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
