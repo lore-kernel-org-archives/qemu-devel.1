@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dLyYI-0006I2-U6
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 17:13:11 -0400
+	(envelope-from <lersek@redhat.com>) id 1dLymv-0001hg-4P
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 17:28:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dLyYD-0006IB-Up
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 17:13:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55940)
+	(envelope-from <lersek@redhat.com>) id 1dLymq-0007GX-Vi
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 17:28:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50100)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dLyYD-0006HP-Ly
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 17:13:05 -0400
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dLymq-0007FD-MF
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 17:28:12 -0400
 References: <1497619387-11333-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1497619387-11333-5-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1497619387-11333-6-git-send-email-mark.cave-ayland@ilande.co.uk>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <ba3ab05a-6ae7-a311-d61d-bafdf0044e93@redhat.com>
-Date: Fri, 16 Jun 2017 23:12:59 +0200
+Message-ID: <5aeecfd3-69be-eec2-240d-68624adb3ffc@redhat.com>
+Date: Fri, 16 Jun 2017 23:28:03 +0200
 MIME-Version: 1.0
-In-Reply-To: <1497619387-11333-5-git-send-email-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <1497619387-11333-6-git-send-email-mark.cave-ayland@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCHv4 4/5] fw_cfg: move qdev_init_nofail() from
- fw_cfg_init1() to callers
+Subject: Re: [Qemu-devel] [PATCHv4 5/5] fw_cfg: move QOM type defines and
+ fw_cfg types into fw_cfg.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,84 +32,208 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, somlo@cmu.edu, ehabkost@redhat.com, mst@redhat.com, pbonzini@redhat.com, rjones@redhat.com, imammedo@redhat.com, peter.maydell@linaro.org
 
 On 06/16/17 15:23, Mark Cave-Ayland wrote:
-> When looking to instantiate a TYPE_FW_CFG_MEM or TYPE_FW_CFG_IO device to be
-> able to wire it up differently, it is much more convenient for the caller to
-> instantiate the device and have the fw_cfg default files already preloaded
-> during realize.
-> 
-> Move fw_cfg_init1() to the end of both the fw_cfg_mem_realize() and
-> fw_cfg_io_realize() functions so it no longer needs to be called manually
-> when instantiating the device, and also rename it to fw_cfg_common_realize()
-> which better describes its new purpose.
+> This allows the device to be instantiated externally for boards that
+> wish to wire up the fw_cfg device themselves.
 > 
 > Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 > ---
->  hw/nvram/fw_cfg.c |   12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
+>  hw/nvram/fw_cfg.c         |   56 -------------------------------------------
+>  include/hw/nvram/fw_cfg.h |   58 +++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 58 insertions(+), 56 deletions(-)
 > 
 > diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> index 39fcc04..b5f10ac 100644
+> index b5f10ac..00771c9 100644
 > --- a/hw/nvram/fw_cfg.c
 > +++ b/hw/nvram/fw_cfg.c
-> @@ -910,14 +910,12 @@ static void fw_cfg_machine_ready(struct Notifier *n, void *data)
+> @@ -40,14 +40,6 @@
+>  #define FW_CFG_NAME "fw_cfg"
+>  #define FW_CFG_PATH "/machine/" FW_CFG_NAME
 >  
->  
->  
-> -static void fw_cfg_init1(DeviceState *dev)
-> +static void fw_cfg_common_realize(DeviceState *dev)
->  {
->      FWCfgState *s = FW_CFG(dev);
->      MachineState *machine = MACHINE(qdev_get_machine());
->      uint32_t version = FW_CFG_VERSION;
->  
-> -    qdev_init_nofail(dev);
+> -#define TYPE_FW_CFG     "fw_cfg"
+> -#define TYPE_FW_CFG_IO  "fw_cfg_io"
+> -#define TYPE_FW_CFG_MEM "fw_cfg_mem"
 > -
->      fw_cfg_add_bytes(s, FW_CFG_SIGNATURE, (char *)"QEMU", 4);
->      fw_cfg_add_bytes(s, FW_CFG_UUID, &qemu_uuid, 16);
->      fw_cfg_add_i16(s, FW_CFG_NOGRAPHIC, (uint16_t)!machine->enable_graphics);
-> @@ -949,7 +947,7 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
->          qdev_prop_set_bit(dev, "dma_enabled", false);
->      }
+> -#define FW_CFG(obj)     OBJECT_CHECK(FWCfgState,    (obj), TYPE_FW_CFG)
+> -#define FW_CFG_IO(obj)  OBJECT_CHECK(FWCfgIoState,  (obj), TYPE_FW_CFG_IO)
+> -#define FW_CFG_MEM(obj) OBJECT_CHECK(FWCfgMemState, (obj), TYPE_FW_CFG_MEM)
+> -
+>  /* FW_CFG_VERSION bits */
+>  #define FW_CFG_VERSION      0x01
+>  #define FW_CFG_VERSION_DMA  0x02
+> @@ -61,54 +53,6 @@
 >  
-> -    fw_cfg_init1(dev);
-> +    qdev_init_nofail(dev);
+>  #define FW_CFG_DMA_SIGNATURE 0x51454d5520434647ULL /* "QEMU CFG" */
 >  
->      sbd = SYS_BUS_DEVICE(dev);
->      ios = FW_CFG_IO(dev);
-> @@ -987,7 +985,7 @@ FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
->          qdev_prop_set_bit(dev, "dma_enabled", false);
->      }
+> -typedef struct FWCfgEntry {
+> -    uint32_t len;
+> -    bool allow_write;
+> -    uint8_t *data;
+> -    void *callback_opaque;
+> -    FWCfgReadCallback read_callback;
+> -} FWCfgEntry;
+> -
+> -struct FWCfgState {
+> -    /*< private >*/
+> -    SysBusDevice parent_obj;
+> -    /*< public >*/
+> -
+> -    uint16_t file_slots;
+> -    FWCfgEntry *entries[2];
+> -    int *entry_order;
+> -    FWCfgFiles *files;
+> -    uint16_t cur_entry;
+> -    uint32_t cur_offset;
+> -    Notifier machine_ready;
+> -
+> -    int fw_cfg_order_override;
+> -
+> -    bool dma_enabled;
+> -    dma_addr_t dma_addr;
+> -    AddressSpace *dma_as;
+> -    MemoryRegion dma_iomem;
+> -};
+> -
+> -struct FWCfgIoState {
+> -    /*< private >*/
+> -    FWCfgState parent_obj;
+> -    /*< public >*/
+> -
+> -    MemoryRegion comb_iomem;
+> -    uint32_t iobase, dma_iobase;
+> -};
+> -
+> -struct FWCfgMemState {
+> -    /*< private >*/
+> -    FWCfgState parent_obj;
+> -    /*< public >*/
+> -
+> -    MemoryRegion ctl_iomem, data_iomem;
+> -    uint32_t data_width;
+> -    MemoryRegionOps wide_data_ops;
+> -};
+> -
+>  #define JPG_FILE 0
+>  #define BMP_FILE 1
 >  
-> -    fw_cfg_init1(dev);
-> +    qdev_init_nofail(dev);
+> diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
+> index b980cba..a16907a 100644
+> --- a/include/hw/nvram/fw_cfg.h
+> +++ b/include/hw/nvram/fw_cfg.h
+> @@ -3,6 +3,16 @@
 >  
->      sbd = SYS_BUS_DEVICE(dev);
->      sysbus_mmio_map(sbd, 0, ctl_addr);
-> @@ -1098,6 +1096,8 @@ static void fw_cfg_io_realize(DeviceState *dev, Error **errp)
->                                &fw_cfg_dma_mem_ops, FW_CFG(s), "fwcfg.dma",
->                                sizeof(dma_addr_t));
->      }
+>  #include "exec/hwaddr.h"
+>  #include "hw/nvram/fw_cfg_keys.h"
+> +#include "hw/sysbus.h"
+> +#include "sysemu/dma.h"
 > +
-> +    fw_cfg_common_realize(dev);
->  }
->  
->  static void fw_cfg_io_class_init(ObjectClass *klass, void *data)
-> @@ -1164,6 +1164,8 @@ static void fw_cfg_mem_realize(DeviceState *dev, Error **errp)
->                                sizeof(dma_addr_t));
->          sysbus_init_mmio(sbd, &FW_CFG(s)->dma_iomem);
->      }
+> +#define TYPE_FW_CFG     "fw_cfg"
+> +#define TYPE_FW_CFG_IO  "fw_cfg_io"
+> +#define TYPE_FW_CFG_MEM "fw_cfg_mem"
 > +
-> +    fw_cfg_common_realize(dev);
->  }
+> +#define FW_CFG(obj)     OBJECT_CHECK(FWCfgState,    (obj), TYPE_FW_CFG)
+> +#define FW_CFG_IO(obj)  OBJECT_CHECK(FWCfgIoState,  (obj), TYPE_FW_CFG_IO)
+> +#define FW_CFG_MEM(obj) OBJECT_CHECK(FWCfgMemState, (obj), TYPE_FW_CFG_MEM)
 >  
->  static void fw_cfg_mem_class_init(ObjectClass *klass, void *data)
+>  typedef struct FWCfgFile {
+>      uint32_t  size;        /* file size */
+> @@ -35,6 +45,54 @@ typedef struct FWCfgDmaAccess {
+>  
+>  typedef void (*FWCfgReadCallback)(void *opaque);
+>  
+> +typedef struct FWCfgEntry {
+> +    uint32_t len;
+> +    bool allow_write;
+> +    uint8_t *data;
+> +    void *callback_opaque;
+> +    FWCfgReadCallback read_callback;
+> +} FWCfgEntry;
+> +
+> +struct FWCfgState {
+> +    /*< private >*/
+> +    SysBusDevice parent_obj;
+> +    /*< public >*/
+> +
+> +    uint16_t file_slots;
+> +    FWCfgEntry *entries[2];
+> +    int *entry_order;
+> +    FWCfgFiles *files;
+> +    uint16_t cur_entry;
+> +    uint32_t cur_offset;
+> +    Notifier machine_ready;
+> +
+> +    int fw_cfg_order_override;
+> +
+> +    bool dma_enabled;
+> +    dma_addr_t dma_addr;
+> +    AddressSpace *dma_as;
+> +    MemoryRegion dma_iomem;
+> +};
+> +
+> +struct FWCfgIoState {
+> +    /*< private >*/
+> +    FWCfgState parent_obj;
+> +    /*< public >*/
+> +
+> +    MemoryRegion comb_iomem;
+> +    uint32_t iobase, dma_iobase;
+> +};
+> +
+> +struct FWCfgMemState {
+> +    /*< private >*/
+> +    FWCfgState parent_obj;
+> +    /*< public >*/
+> +
+> +    MemoryRegion ctl_iomem, data_iomem;
+> +    uint32_t data_width;
+> +    MemoryRegionOps wide_data_ops;
+> +};
+> +
+>  /**
+>   * fw_cfg_add_bytes:
+>   * @s: fw_cfg device being modified
 > 
 
-Right, this looks good now. All the operations keep their relative
-order, and whatever remains in fw_cfg_common_realize() seems appropriate
-to me for calling from a realize method.
+This patch is generally good, but I'd like to suggest improvements:
 
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+(1) In the commit message, please mention that we are exposing the
+internals of FWCfgIoState and FWCfgMemState so that board code can map
+the MemoryRegion fields (such as comb_iomem) *by name*.
 
-Thanks,
+(2) FWCfgEntry need not be moved from the C file to the header file,
+since we never depend on the *size* of that structure. Instead, please
+add a single line to "include/qemu/typedefs.h":
+
+   typedef struct FWCfgEntry FWCfgEntry;
+
+and modify
+
+    typedef struct FWCfgEntry {
+    ...
+    } FWCfgEntry;
+
+in "fw_cfg.c" to just
+
+    struct FWCfgEntry {
+    ...
+    };
+
+Then "fw_cfg.h" can simply include "typedefs.h" and say
+
+    ...
+    FWCfgEntry *entries[2];
+    ...
+
+IOW, it's fine to leave FWCfgEntry an incomplete type in "fw_cfg.h".
+
+(3) When you fix up patch #1 like I requested, removing the
+"FWCfgIoState.iobase" and "FWCfgIoState.dma_iobase" fields, please don't
+forget to update this patch as well, so that you not re-introduce those
+fields in the header file.
+
+... I'm positively satisfied with this series (I plan to "grant" my R-b
+for PATCH v5 5/5, with the above updates), but given that I'm no QOM
+expert by any means, I'd like someone with more QOM experience to review
+the patchset as well.
+
+Thanks!
 Laszlo
