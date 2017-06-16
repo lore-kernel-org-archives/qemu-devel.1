@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37327)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dLrzA-0004s2-9K
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 10:12:29 -0400
+	(envelope-from <mst@redhat.com>) id 1dLs5k-0007XI-QO
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 10:19:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dLrz5-0006ih-6R
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 10:12:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54548)
+	(envelope-from <mst@redhat.com>) id 1dLs5f-0003fE-Uo
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 10:19:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51731)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dLrz5-0006hm-0V
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 10:12:23 -0400
-Date: Fri, 16 Jun 2017 17:12:18 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dLs5f-0003dj-Lf
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 10:19:11 -0400
+Date: Fri, 16 Jun 2017 17:19:08 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170616171149-mutt-send-email-mst@kernel.org>
-References: <20170615163813.7255-1-stefanha@redhat.com>
-	<20170615163813.7255-2-stefanha@redhat.com>
+Message-ID: <20170616171617-mutt-send-email-mst@kernel.org>
+References: <1497610119-45041-1-git-send-email-wei.w.wang@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170615163813.7255-2-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/5] virtio-pci: use ioeventfd even when
- KVM is disabled
+In-Reply-To: <1497610119-45041-1-git-send-email-wei.w.wang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] virtio-net: enable configurable tx
+ queue size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +27,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Pavel Butsykin <pbutsykin@virtuozzo.com>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: jasowang@redhat.com, marcandre.lureau@gmail.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, stefanha@gmail.com, pbonzini@redhat.com, armbru@redhat.com, jan.scheurich@ericsson.com
 
-On Thu, Jun 15, 2017 at 05:38:09PM +0100, Stefan Hajnoczi wrote:
-> Old kvm.ko versions only supported a tiny number of ioeventfds so
-> virtio-pci avoids ioeventfds when kvm_has_many_ioeventfds() returns 0.
+On Fri, Jun 16, 2017 at 06:48:38PM +0800, Wei Wang wrote:
+> This patch enables the virtio-net tx queue size to be configurable
+> between 256 (the default queue size) and 1024 by the user when the
+> vhost-user backend is used.
 > 
-> Do not check kvm_has_many_ioeventfds() when KVM is disabled since it
-> always returns 0.  Since commit 8c56c1a592b5092d91da8d8943c17777d6462a6f
-> ("memory: emulate ioeventfd") it has been possible to use ioeventfds in
-> qtest or TCG mode.
+> Currently, the maximum tx queue size for other backends is 512 due
+> to the following limitations:
+> - QEMU backend: the QEMU backend implementation in some cases may
+> send 1024+1 iovs to writev.
+> - Vhost_net backend: there are possibilities that the guest sends
+> a vring_desc of memory which corsses a MemoryRegion thereby
+> generating more than 1024 iovs in total after translattion from
+> guest-physical address in the backend.
 > 
-> This patch makes -device virtio-blk-pci,iothread=iothread0 work even
-> when KVM is disabled.
-> 
-> I have tested that virtio-blk-pci works under TCG both with and without
-> iothread.
-> 
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-
-
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-
-Do you want to merge this with the rest of the patchset,
-or should I?
-
+> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
 > ---
->  hw/virtio/virtio-pci.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  hw/net/virtio-net.c            | 46 ++++++++++++++++++++++++++++++++++--------
+>  include/hw/virtio/virtio-net.h |  1 +
+>  2 files changed, 39 insertions(+), 8 deletions(-)
 > 
-> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-> index f9b7244..9f55476 100644
-> --- a/hw/virtio/virtio-pci.c
-> +++ b/hw/virtio/virtio-pci.c
-> @@ -1740,7 +1740,7 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
->      bool pcie_port = pci_bus_is_express(pci_dev->bus) &&
->                       !pci_bus_is_root(pci_dev->bus);
+> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> index 7d091c9..e1a08fd 100644
+> --- a/hw/net/virtio-net.c
+> +++ b/hw/net/virtio-net.c
+> @@ -33,8 +33,11 @@
 >  
-> -    if (!kvm_has_many_ioeventfds()) {
-> +    if (kvm_enabled() && !kvm_has_many_ioeventfds()) {
->          proxy->flags &= ~VIRTIO_PCI_FLAG_USE_IOEVENTFD;
+>  /* previously fixed value */
+>  #define VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE 256
+> +#define VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE 256
+> +
+>  /* for now, only allow larger queues; with virtio-1, guest can downsize */
+>  #define VIRTIO_NET_RX_QUEUE_MIN_SIZE VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE
+> +#define VIRTIO_NET_TX_QUEUE_MIN_SIZE VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE
+>  
+>  /*
+>   * Calculate the number of bytes up to and including the given 'field' of
+> @@ -1491,18 +1494,33 @@ static void virtio_net_tx_bh(void *opaque)
+>  static void virtio_net_add_queue(VirtIONet *n, int index)
+>  {
+>      VirtIODevice *vdev = VIRTIO_DEVICE(n);
+> +    NetClientState *nc = qemu_get_queue(n->nic);
+>  
+>      n->vqs[index].rx_vq = virtio_add_queue(vdev, n->net_conf.rx_queue_size,
+>                                             virtio_net_handle_rx);
+> +
+> +    /*
+> +     * Currently, backends other than vhost-user don't support 1024 queue
+> +     * size.
+> +     */
+> +    if (n->net_conf.tx_queue_size == VIRTQUEUE_MAX_SIZE &&
+> +        nc->peer->info->type != NET_CLIENT_DRIVER_VHOST_USER) {
+> +        fprintf(stderr, "warning: %s: queue size %d not supported\n",
+> +                __func__, n->net_conf.tx_queue_size);
+
+OK but it's best to avoid fprintfs. Queue size is easy to see so
+I don't think we need it. I've dropped this from the patch for now,
+feel free to send a separate patch re-adding this.
+
+> +        n->net_conf.tx_queue_size = VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE;
+> +    }
+> +
+>      if (n->net_conf.tx && !strcmp(n->net_conf.tx, "timer")) {
+>          n->vqs[index].tx_vq =
+> -            virtio_add_queue(vdev, 256, virtio_net_handle_tx_timer);
+> +            virtio_add_queue(vdev, n->net_conf.tx_queue_size,
+> +                             virtio_net_handle_tx_timer);
+>          n->vqs[index].tx_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
+>                                                virtio_net_tx_timer,
+>                                                &n->vqs[index]);
+>      } else {
+>          n->vqs[index].tx_vq =
+> -            virtio_add_queue(vdev, 256, virtio_net_handle_tx_bh);
+> +            virtio_add_queue(vdev, n->net_conf.tx_queue_size,
+> +                             virtio_net_handle_tx_bh);
+>          n->vqs[index].tx_bh = qemu_bh_new(virtio_net_tx_bh, &n->vqs[index]);
 >      }
 >  
+> @@ -1910,6 +1928,17 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
+>          return;
+>      }
+>  
+> +    if (n->net_conf.tx_queue_size < VIRTIO_NET_TX_QUEUE_MIN_SIZE ||
+> +        n->net_conf.tx_queue_size > VIRTQUEUE_MAX_SIZE ||
+> +        !is_power_of_2(n->net_conf.tx_queue_size)) {
+> +        error_setg(errp, "Invalid tx_queue_size (= %" PRIu16 "), "
+> +                   "must be a power of 2 between %d and %d",
+> +                   n->net_conf.tx_queue_size, VIRTIO_NET_TX_QUEUE_MIN_SIZE,
+> +                   VIRTQUEUE_MAX_SIZE);
+> +        virtio_cleanup(vdev);
+> +        return;
+> +    }
+> +
+>      n->max_queues = MAX(n->nic_conf.peers.queues, 1);
+>      if (n->max_queues * 2 + 1 > VIRTIO_QUEUE_MAX) {
+>          error_setg(errp, "Invalid number of queues (= %" PRIu32 "), "
+> @@ -1930,17 +1959,11 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
+>          error_report("Defaulting to \"bh\"");
+>      }
+>  
+> -    for (i = 0; i < n->max_queues; i++) {
+> -        virtio_net_add_queue(n, i);
+> -    }
+> -
+> -    n->ctrl_vq = virtio_add_queue(vdev, 64, virtio_net_handle_ctrl);
+>      qemu_macaddr_default_if_unset(&n->nic_conf.macaddr);
+>      memcpy(&n->mac[0], &n->nic_conf.macaddr, sizeof(n->mac));
+>      n->status = VIRTIO_NET_S_LINK_UP;
+>      n->announce_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL,
+>                                       virtio_net_announce_timer, n);
+> -
+>      if (n->netclient_type) {
+>          /*
+>           * Happen when virtio_net_set_netclient_name has been called.
+> @@ -1952,6 +1975,11 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
+>                                object_get_typename(OBJECT(dev)), dev->id, n);
+>      }
+>  
+> +    for (i = 0; i < n->max_queues; i++) {
+> +        virtio_net_add_queue(n, i);
+> +    }
+> +    n->ctrl_vq = virtio_add_queue(vdev, 64, virtio_net_handle_ctrl);
+> +
+>      peer_test_vnet_hdr(n);
+>      if (peer_has_vnet_hdr(n)) {
+>          for (i = 0; i < n->max_queues; i++) {
+> @@ -2089,6 +2117,8 @@ static Property virtio_net_properties[] = {
+>      DEFINE_PROP_STRING("tx", VirtIONet, net_conf.tx),
+>      DEFINE_PROP_UINT16("rx_queue_size", VirtIONet, net_conf.rx_queue_size,
+>                         VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE),
+> +    DEFINE_PROP_UINT16("tx_queue_size", VirtIONet, net_conf.tx_queue_size,
+> +                       VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE),
+>      DEFINE_PROP_UINT16("host_mtu", VirtIONet, net_conf.mtu, 0),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+> diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
+> index 1eec9a2..fd944ba 100644
+> --- a/include/hw/virtio/virtio-net.h
+> +++ b/include/hw/virtio/virtio-net.h
+> @@ -36,6 +36,7 @@ typedef struct virtio_net_conf
+>      int32_t txburst;
+>      char *tx;
+>      uint16_t rx_queue_size;
+> +    uint16_t tx_queue_size;
+>      uint16_t mtu;
+>  } virtio_net_conf;
+>  
 > -- 
-> 2.9.4
+> 2.7.4
