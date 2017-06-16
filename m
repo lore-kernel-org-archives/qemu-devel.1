@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57450)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dLhnN-0007w4-UL
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 23:19:40 -0400
+	(envelope-from <mst@redhat.com>) id 1dLhqi-0001MZ-Qs
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 23:23:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dLhnI-00034S-SO
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 23:19:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58850)
+	(envelope-from <mst@redhat.com>) id 1dLhqf-0007Lx-N6
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 23:23:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59950)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dLhnI-00031m-J5
-	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 23:19:32 -0400
-Date: Fri, 16 Jun 2017 06:19:22 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dLhqf-0007LJ-DZ
+	for qemu-devel@nongnu.org; Thu, 15 Jun 2017 23:23:01 -0400
+Date: Fri, 16 Jun 2017 06:22:57 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170616061009-mutt-send-email-mst@kernel.org>
-References: <1497004901-30593-1-git-send-email-wei.w.wang@intel.com>
-	<1497004901-30593-4-git-send-email-wei.w.wang@intel.com>
-	<20170613200049-mutt-send-email-mst@kernel.org>
-	<594240E9.2070705@intel.com>
+Message-ID: <20170616061949-mutt-send-email-mst@kernel.org>
+References: <593F8153.7080209@intel.com>
+	<f8a64b2c-e769-4e9c-1cc6-ad31ea266010@redhat.com>
+	<593F9187.6040800@intel.com>
+	<9f196d71-f06b-7520-ca03-e94bf3b5a986@redhat.com>
+	<593FB550.6090903@intel.com>
+	<26250da7-b394-4964-8842-5c45bbe85e09@redhat.com>
+	<6547dfcf-ea3a-f5f6-222d-40ff274654df@redhat.com>
+	<20170614180459-mutt-send-email-mst@kernel.org>
+	<b59be2f1-ee8c-e660-4f82-bbe63e22b603@redhat.com>
+	<59422E91.7080407@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <594240E9.2070705@intel.com>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v11 3/6] virtio-balloon:
- VIRTIO_BALLOON_F_PAGE_CHUNKS
+In-Reply-To: <59422E91.7080407@intel.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [virtio-dev] Re:
+ [PATCH v1] virtio-net: enable configurable tx queue size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,196 +38,196 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Wei Wang <wei.w.wang@intel.com>
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, dave.hansen@intel.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, Matthew Wilcox <willy@infradead.org>
+Cc: Jason Wang <jasowang@redhat.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "stefanha@gmail.com" <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "jan.scheurich@ericsson.com" <jan.scheurich@ericsson.com>, "armbru@redhat.com" <armbru@redhat.com>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
 
-On Thu, Jun 15, 2017 at 04:10:17PM +0800, Wei Wang wrote:
-> On 06/14/2017 01:56 AM, Michael S. Tsirkin wrote:
-> > On Fri, Jun 09, 2017 at 06:41:38PM +0800, Wei Wang wrote:
-> > > Add a new feature, VIRTIO_BALLOON_F_PAGE_CHUNKS, which enables
-> > > the transfer of the ballooned (i.e. inflated/deflated) pages in
-> > > chunks to the host.
-> > so now these chunks are just s/g list entry.
-> > So let's rename this VIRTIO_BALLOON_F_SG with a comment:
-> > * Use standard virtio s/g instead of PFN lists *
-> 
-> Actually, it's not using the standard s/g list in the implementation,
-> because:
-> using the standard s/g will need kmalloc() the indirect table on
-> demand (i.e. when virtqueue_add() converts s/g to indirect table);
-> 
-> The implementation directly pre-allocates an indirect desc table,
-> and uses a entry (i.e. vring_desc) to describe a chunk. This
-> avoids the overhead of kmalloc() the indirect table.
+On Thu, Jun 15, 2017 at 02:52:01PM +0800, Wei Wang wrote:
+> On 06/15/2017 12:16 PM, Jason Wang wrote:
+> >=20
+> >=20
+> > On 2017=E5=B9=B406=E6=9C=8814=E6=97=A5 23:22, Michael S. Tsirkin wrot=
+e:
+> > > On Wed, Jun 14, 2017 at 07:26:54PM +0800, Jason Wang wrote:
+> > > >=20
+> > > > On 2017=E5=B9=B406=E6=9C=8813=E6=97=A5 18:46, Jason Wang wrote:
+> > > > >=20
+> > > > > On 2017=E5=B9=B406=E6=9C=8813=E6=97=A5 17:50, Wei Wang wrote:
+> > > > > > On 06/13/2017 05:04 PM, Jason Wang wrote:
+> > > > > > >=20
+> > > > > > > On 2017=E5=B9=B406=E6=9C=8813=E6=97=A5 15:17, Wei Wang wrot=
+e:
+> > > > > > > > On 06/13/2017 02:29 PM, Jason Wang wrote:
+> > > > > > > > > The issue is what if there's a mismatch of
+> > > > > > > > > max #sgs between qemu and
+> > > > > > > > > > > > When the vhost backend is used, QEMU is not
+> > > > > > > > > > > > involved in the data path.
+> > > > > > > > > > > > The vhost backend
+> > > > > > > > > > > > directly gets what is offered by
+> > > > > > > > > > > > the guest from the vq. Why would
+> > > > > > > > > > > > there be a mismatch of
+> > > > > > > > > > > > max #sgs between QEMU and vhost, and what is
+> > > > > > > > > > > > the QEMU side max #sgs
+> > > > > > > > > > > > used for? Thanks.
+> > > > > > > > > > > You need query the backend max #sgs in this case
+> > > > > > > > > > > at least. no? If not
+> > > > > > > > > > > how do you know the value is supported by the backe=
+nd?
+> > > > > > > > > > >=20
+> > > > > > > > > > > Thanks
+> > > > > > > > > > >=20
+> > > > > > > > > > Here is my thought: vhost backend has already been
+> > > > > > > > > > supporting 1024 sgs,
+> > > > > > > > > > so I think it might not be necessary to query the
+> > > > > > > > > > max sgs that the vhost
+> > > > > > > > > > backend supports. In the setup phase, when QEMU
+> > > > > > > > > > detects the backend is
+> > > > > > > > > > vhost, it assumes 1024 max sgs is supported, instead
+> > > > > > > > > > of giving an extra
+> > > > > > > > > > call to query.
+> > > > > > > > > We can probably assume vhost kernel supports up to 1024
+> > > > > > > > > sgs. But how about for other vhost-user backends?
+> > > > > > > > >=20
+> > > > > > > > So far, I haven't seen any vhost backend implementation
+> > > > > > > > supporting less than 1024 sgs.
+> > > > > > > Since vhost-user is an open protocol we can not check each
+> > > > > > > implementation (some may be even close sourced). For safety=
+, we
+> > > > > > > need an explicit clarification on this.
+> > > > > > >=20
+> > > > > > > >=20
+> > > > > > > > > And what you said here makes me ask one of
+> > > > > > > > > my questions in the past:
+> > > > > > > > >=20
+> > > > > > > > > Do we have plan to extend 1024 to a larger value or 102=
+4
+> > > > > > > > > looks good for the future years? If we only care about
+> > > > > > > > > 1024, there's even no need for a new config filed, a
+> > > > > > > > > feature flag is more than enough. If we want to extend
+> > > > > > > > > it to e.g 2048, we definitely need to query vhost
+> > > > > > > > > backend's limit (even for vhost-kernel).
+> > > > > > > > >=20
+> > > > > > > > According to virtio spec (e.g. 2.4.4), unreasonably large
+> > > > > > > > descriptors are
+> > > > > > > > not encouraged to be used by the guest. If possible, I wo=
+uld
+> > > > > > > > suggest to use
+> > > > > > > > 1024 as the largest number of descriptors that the guest =
+can
+> > > > > > > > chain, even when
+> > > > > > > > we have larger queue size in the future. That is,
+> > > > > > > > if (backend =3D=3D QEMU backend)
+> > > > > > > >      config.max_chain_size =3D 1023 (defined by the qemu
+> > > > > > > > backend implementation);
+> > > > > > > > else if (backend =3D=3D vhost)
+> > > > > > > >      config.max_chain_size =3D 1024;
+> > > > > > > >=20
+> > > > > > > > It is transparent to the guest. From the guest's point of
+> > > > > > > > view, all it knows is a value
+> > > > > > > > given to him via reading config.max_chain_size.
+> > > > > > > So not transparent actually, guest at least guest need to s=
+ee
+> > > > > > > and check for this. So the question still, since you only c=
+are
+> > > > > > > about two cases in fact:
+> > > > > > >=20
+> > > > > > > - backend supports 1024
+> > > > > > > - backend supports <1024 (qemu or whatever other backends)
+> > > > > > >=20
+> > > > > > > So it looks like a new feature flag is more than enough. If
+> > > > > > > device(backends) support this feature, it can make sure 102=
+4 sgs
+> > > > > > > is supported?
+> > > > > > >=20
+> > > > > > That wouldn't be enough. For example, QEMU3.0 backend support=
+s
+> > > > > > max_chain_size=3D1023,
+> > > > > > while QEMU4.0 backend supports max_chain_size=3D1021. How wou=
+ld the
+> > > > > > guest know
+> > > > > > the max size with the same feature flag? Would it still chain=
+ 1023
+> > > > > > descriptors with QEMU4.0?
+> > > > > >=20
+> > > > > > Best,
+> > > > > > Wei
+> > > > > I believe we won't go back to less than 1024 in the future. It =
+may be
+> > > > > worth to add a unittest for this to catch regression early.
+> > > > >=20
+> > > > > Thanks
+> > > I think I disagree with that. Smaller pipes a better (e.g. less cac=
+he
+> > > pressure) and you only need huge pipes because host thread gets
+> > > scheduled out for too long. With more CPUs there's less of a chance=
+ of
+> > > an overcommit so we'll be able to get by with smaller pipes in the
+> > > future.
+> >=20
+> > Agree, but we are talking about the upper limit. Even if 1024 is
+> > supported, small number of #sgs is still encouraged.
+> >=20
+> > >=20
+> > > > Consider the queue size is 256 now, I think maybe we can first
+> > > > make tx queue
+> > > > size configurable up to 1024, and then do the #sg stuffs on top.
+> > > >=20
+> > > > What's your opinion, Michael?
+> > > >=20
+> > > > Thanks
+> > > With a kernel backend, 1024 is problematic since we are then unable
+> > > to add any entries or handle cases where an entry crosses an MR reg=
+ion
+> > > boundary. We could support up to 512 with a kernel backend but no o=
+ne
+> > > seems to want that :)
+> >=20
+> > Then I see issues with indirect descriptors.
+> >=20
+> > We try to allow up 1024 chained descriptors implicitly since
+> > e0e9b406470b ("vhost: max s/g to match qemu"). If guest can submit
+> > crossing MR descs, I'm afraid we've already had this bug since this
+> > commit. And actually this seems conflict to what spec said in 2.4.5:
+> >=20
+> > """
+> > The number of descriptors in the table is defined by the queue size f=
+or
+> > this virtqueue: this is the maximum possible descriptor chain length.
+> > """
+> >=20
+> > Technically, we had the same issue for rx since we allow 1024 queue s=
+ize
+> > now.
+> >=20
+> > So actually, allowing the size to 1024 does not introduce any new
+> > trouble?
+> > >=20
+> > > With vhost-user the backend might be able to handle that. So an
+> > > acceptable option would be to allow 1K with vhost-user backends
+> > > only, trim it back with other backends.
+> > >=20
+> >=20
+> > I believe the idea is to clarify the maximum chain size instead of
+> > having any assumption.
+> >=20
+> >=20
+>=20
+> I think the issues can be solved by VIRTIO_F_MAX_CHAIN_SIZE.
+>=20
+> For now, how about splitting it into two series of patches:
+> 1) enable 1024 tx queue size for vhost-user, to let the users of vhost-=
+user
+> to easily use 1024 queue size.
 
-It's a separate API but the host/guest interface is standard.
+Fine with me. 1) will get property from user but override it on
+!vhost-user. Do we need a protocol flag? It seems prudent but we get
+back to cross-version migration issues that are still pending solution.
+Marc Andre, what's the status of that work?
 
-> 
-> > > +/*
-> > > + * Callulates how many pfns can a page_bmap record. A bit corresponds to a
-> > > + * page of PAGE_SIZE.
-> > > + */
-> > > +#define VIRTIO_BALLOON_PFNS_PER_PAGE_BMAP \
-> > > +	(VIRTIO_BALLOON_PAGE_BMAP_SIZE * BITS_PER_BYTE)
-> > > +
-> > > +/* The number of page_bmap to allocate by default. */
-> > > +#define VIRTIO_BALLOON_PAGE_BMAP_DEFAULT_NUM	1
-> > It's not by default, it's at probe time, right?
-> It is the number of page bitmap being kept throughout the whole
-> lifecycle of the driver. The page bmap will be temporarily extended
-> due to insufficiency during a ballooning process, but when that
-> ballooning finishes, the extended part will be freed.
-> > > +/* The maximum number of page_bmap that can be allocated. */
-> > Not really, this is the size of the array we use to keep them.
-> 
-> This is the max number of the page bmap that can be
-> extended temporarily.
+> 2) enable VIRTIO_F_MAX_CHAIN_SIZE,  to enhance robustness.
 
-That's just a confusing way to say the same.
+Rather, to support it for more backends.
 
-> > > +#define VIRTIO_BALLOON_PAGE_BMAP_MAX_NUM	32
-> > > +
-> > So you still have a home-grown bitmap. I'd like to know why
-> > isn't xbitmap suggested for this purpose by Matthew Wilcox
-> > appropriate. Please add a comment explaining the requirements
-> > from the data structure.
-> 
-> I didn't find his xbitmap being upstreamed, did you?
+> Best,
+> Wei
 
-It's from dax tree - Matthew?
-
-> > > +/*
-> > > + * QEMU virtio implementation requires the desc table size less than
-> > > + * VIRTQUEUE_MAX_SIZE, so minus 1 here.
-> > I think it doesn't, the issue is probably that you add a header
-> > as a separate s/g. In any case see below.
-> > 
-> > > + */
-> > > +#define VIRTIO_BALLOON_MAX_PAGE_CHUNKS (VIRTQUEUE_MAX_SIZE - 1)
-> > This is wrong, virtio spec says s/g size should not exceed VQ size.
-> > If you want to support huge VQ sizes, you can add a fallback to
-> > smaller sizes until it fits in 1 page.
-> 
-> Probably no need for huge VQ size, 1024 queue size should be
-> enough. And we can have 1024 descriptors in the indirect
-> table, so the above size doesn't exceed the vq size, right?
-
-You need to look at vq size, you shouldn't assume it's > 1024.
-
-
-> 
-> > +static unsigned int extend_page_bmap_size(struct virtio_balloon *vb,
-> > +					  unsigned long pfn_num)
-> > what's this API doing?  Pls add comments. this seems to assume
-> > it will only be called once.
-> OK, I will add some comments here. This is the function to extend
-> the number of page bitmap when the original 1 page bmap is
-> not sufficient during a ballooning process. As mentioned above,
-> at the end of this ballooning process, the extended part will be freed.
-> 
-> > it would be better to avoid making
-> > this assumption, just look at what has been allocated
-> > and extend it.
-> Actually it's not an assumption. The rule here is that we always keep
-> "1" page bmap. "1" is defined by the
-> VIRTIO_BALLOON_PAGE_BMAP_DEFAULT_NUM. So when freeing, it also
-> references VIRTIO_BALLOON_PAGE_BMAP_DEFAULT_NUM (not assuming
-> any number)
-
-When allocating, why don't you check what's allocated already?
-why assume VIRTIO_BALLOON_PAGE_BMAP_DEFAULT_NUM was allocated?
-Then calling extend_page_bmap_size many times would be idempotent.
-
-> > +}
-> > +
-> > +/* Add a chunk to the buffer. */
-> > +static void add_one_chunk(struct virtio_balloon *vb, struct virtqueue *vq,
-> > +			  u64 base_addr, u32 size)
-> > +{
-> > +	unsigned int *num = &vb->balloon_page_chunk.chunk_num;
-> > +	struct vring_desc *desc = &vb->balloon_page_chunk.desc_table[*num];
-> > +
-> > +	desc->addr = cpu_to_virtio64(vb->vdev, base_addr);
-> > +	desc->len = cpu_to_virtio32(vb->vdev, size);
-> > +	*num += 1;
-> > +	if (*num == VIRTIO_BALLOON_MAX_PAGE_CHUNKS)
-> > +		send_page_chunks(vb, vq);
-> > +}
-> > +
-> > Poking at virtio internals like this is not nice. Pls move to virtio
-> > code.  Also, pages must be read descriptors as host might modify them.
-> > 
-> > This also lacks viommu support but this is not mandatory as
-> > that is borken atm anyway. I'll send a patch to at least fail cleanly.
-> OK, thanks.
-> 
-> > > +static void convert_bmap_to_chunks(struct virtio_balloon *vb,
-> > > +				   struct virtqueue *vq,
-> > > +				   unsigned long *bmap,
-> > > +				   unsigned long pfn_start,
-> > > +				   unsigned long size)
-> > > +{
-> > > +	unsigned long next_one, next_zero, pos = 0;
-> > > +	u64 chunk_base_addr;
-> > > +	u32 chunk_size;
-> > > +
-> > > +	while (pos < size) {
-> > > +		next_one = find_next_bit(bmap, size, pos);
-> > > +		/*
-> > > +		 * No "1" bit found, which means that there is no pfn
-> > > +		 * recorded in the rest of this bmap.
-> > > +		 */
-> > > +		if (next_one == size)
-> > > +			break;
-> > > +		next_zero = find_next_zero_bit(bmap, size, next_one + 1);
-> > > +		/*
-> > > +		 * A bit in page_bmap corresponds to a page of PAGE_SIZE.
-> > > +		 * Convert it to be pages of 4KB balloon page size when
-> > > +		 * adding it to a chunk.
-> > This looks wrong. add_one_chunk assumes size in bytes. So should be just
-> > PAGE_SIZE.
-> 
-> It's intended to be "chunk size", which is the number of pfns. The benefit
-> is
-> that the 32-bit desc->len won't be overflow, as you mentioned below.
-> 
-
-You can safely assume PAGE_SIZE >= 4K. Just pass # of pages.
-
-> > 
-> > > +		 */
-> > > +		chunk_size = (next_zero - next_one) *
-> > > +			     VIRTIO_BALLOON_PAGES_PER_PAGE;
-> > How do you know this won't overflow a 32 bit integer? Needs a comment.
-> 
-> If it stores size in bytes, it has the possibility to overflow.
-> If storing number of pfns, the 32-bit value can support 2^32*4KB=8TB
-> memory, unlikely to overflow.
-
-Do you put in len in the descriptor in 4K chunks then? That
-needs some thought. Also, processors support up to 256TB now,
-I don't think we can just assume it won't overflow anymore.
-All in all I'd prefer we just split everything up to 2G chunks.
-We can discuss extending len to more bits or specifying alignment
-in the descriptor separately down the road.
-
-> > +
-> > +static int balloon_page_chunk_init(struct virtio_balloon *vb)
-> > +{
-> > +	int i;
-> > +
-> > +	vb->balloon_page_chunk.desc_table = alloc_indirect(vb->vdev,
-> > +						VIRTIO_BALLOON_MAX_PAGE_CHUNKS,
-> > +						GFP_KERNEL);
-> > This one's problematic, you aren't supposed to use APIs when device
-> > is not inited yet. Seems to work by luck here. I suggest moving
-> > this to probe, that's where we do a bunch of inits.
-> > And then you can move private init back to allocate too.
-> 
-> This is just to allocate an indirect desc table. If allocation fails, we
-> need to clear
-> the related feature bit in ->validate(), right?
-
-Failing probe on OOM is ok too.
-
--- 
+--=20
 MST
