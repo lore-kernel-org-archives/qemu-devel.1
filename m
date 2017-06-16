@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dLxin-0000Vy-Rg
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 16:19:59 -0400
+	(envelope-from <mst@redhat.com>) id 1dLxvb-00044X-5t
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 16:33:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dLxik-0003R7-NM
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 16:19:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33100)
+	(envelope-from <mst@redhat.com>) id 1dLxvW-0001vh-HM
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 16:33:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49836)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dLxik-0003Qs-DU
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 16:19:54 -0400
-Date: Fri, 16 Jun 2017 23:19:49 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dLxvW-0001tm-7y
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 16:33:06 -0400
+Date: Fri, 16 Jun 2017 23:33:01 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170616231036-mutt-send-email-mst@kernel.org>
-References: <547865a9-d6c2-7140-47e2-5af01e7d761d@redhat.com>
-	<20170616175748-mutt-send-email-mst@kernel.org>
-	<4cdf547c-079b-6b44-484f-e1132e960364@redhat.com>
+Message-ID: <20170616232937-mutt-send-email-mst@kernel.org>
+References: <593FB550.6090903@intel.com>
+	<26250da7-b394-4964-8842-5c45bbe85e09@redhat.com>
+	<6547dfcf-ea3a-f5f6-222d-40ff274654df@redhat.com>
+	<20170614180459-mutt-send-email-mst@kernel.org>
+	<b59be2f1-ee8c-e660-4f82-bbe63e22b603@redhat.com>
+	<59422E91.7080407@intel.com>
+	<20170616061949-mutt-send-email-mst@kernel.org>
+	<40a12829-6e84-e63e-ac47-6f09cc85c3cc@redhat.com>
+	<20170616181607-mutt-send-email-mst@kernel.org>
+	<199a82f9-b122-08de-696a-04f7c6a369c6@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <4cdf547c-079b-6b44-484f-e1132e960364@redhat.com>
-Subject: Re: [Qemu-devel] [RFC] virtio-mem: paravirtualized memory
+In-Reply-To: <199a82f9-b122-08de-696a-04f7c6a369c6@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [virtio-dev] Re:
+ [PATCH v1] virtio-net: enable configurable tx queue size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,134 +37,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: KVM <kvm@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, Andrea Arcangeli <aarcange@redhat.com>
+To: Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Wei Wang <wei.w.wang@intel.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "stefanha@gmail.com" <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "jan.scheurich@ericsson.com" <jan.scheurich@ericsson.com>, "armbru@redhat.com" <armbru@redhat.com>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
 
-On Fri, Jun 16, 2017 at 05:59:07PM +0200, David Hildenbrand wrote:
-> On 16.06.2017 17:04, Michael S. Tsirkin wrote:
-> > On Fri, Jun 16, 2017 at 04:20:02PM +0200, David Hildenbrand wrote:
-> >> Hi,
-> >>
-> >> this is an idea that is based on Andrea Arcangeli's original idea to
-> >> host enforce guest access to memory given up using virtio-balloon using
-> >> userfaultfd in the hypervisor. While looking into the details, I
-> >> realized that host-enforcing virtio-balloon would result in way too many
-> >> problems (mainly backwards compatibility) and would also have some
-> >> conceptual restrictions that I want to avoid. So I developed the idea of
-> >> virtio-mem - "paravirtualized memory".
-> > 
-> > Thanks! I went over this quickly, will read some more in the
-> > coming days. I would like to ask for some clarifications
-> > on one part meanwhile:
-> 
-> Thanks for looking into it that fast! :)
-> 
-> In general, what this section is all about: Why to not simply host
-> enforce virtio-balloon.
-> > 
-> >> Q: Why not reuse virtio-balloon?
-> >>
-> >> A: virtio-balloon is for cooperative memory management. It has a fixed
-> >>    page size
-> > 
-> > We are fixing that with VIRTIO_BALLOON_F_PAGE_CHUNKS btw.
-> > I would appreciate you looking into that patchset.
-> 
-> Will do, thanks. Problem is that there is no "enforcement" on the page
-> size. VIRTIO_BALLOON_F_PAGE_CHUNKS simply allows to send bigger chunks.
-> Nobody hinders the guest (especially legacy virtio-balloon drivers) from
-> sending 4k pages.
-> 
-> So this doesn't really fix the issue (we have here), it just allows to
-> speed up transfer. Which is a good thing, but does not help for
-> enforcement at all. So, yes support for page sizes > 4k, but no way to
-> enforce it.
-> 
-> > 
-> >> and will deflate in certain situations.
-> > 
-> > What does this refer to?
-> 
-> A Linux guest will deflate the balloon (all or some pages) in the
-> following scenarios:
-> a) page migration
+On Fri, Jun 16, 2017 at 07:04:27PM +0200, Maxime Coquelin wrote:
+>=20
+>=20
+> On 06/16/2017 05:19 PM, Michael S. Tsirkin wrote:
+> > On Fri, Jun 16, 2017 at 04:57:01PM +0800, Jason Wang wrote:
+> > >=20
+> > >=20
+> > > On 2017=E5=B9=B406=E6=9C=8816=E6=97=A5 11:22, Michael S. Tsirkin wr=
+ote:
+> > > > > I think the issues can be solved by VIRTIO_F_MAX_CHAIN_SIZE.
+> > > > >=20
+> > > > > For now, how about splitting it into two series of patches:
+> > > > > 1) enable 1024 tx queue size for vhost-user, to let the users o=
+f vhost-user
+> > > > > to easily use 1024 queue size.
+> > > > Fine with me. 1) will get property from user but override it on
+> > > > !vhost-user. Do we need a protocol flag? It seems prudent but we =
+get
+> > > > back to cross-version migration issues that a04re still pending s=
+olution.
+> > > > Marc Andre, what's the status of that work?
+> > > >=20
+> > > > > 2) enable VIRTIO_F_MAX_CHAIN_SIZE,  to enhance robustness.
+> > > > Rather, to support it for more backends.
+> > >=20
+> > > Ok, if we want to support different values of max chain size in the=
+ future.
+> > > It would be problematic for migration of cross backends, consider t=
+he case
+> > > when migrating from 2048 (vhost-user) to 1024 (qemu/vhost-kernel).
+> > >=20
+> > > Thanks
+> >=20
+> > That's already a problem, and it's growing with each new feature.
+> > Maxime looked at supporting vhost-user backends cross-version migrati=
+on,
+> > I think we must merge some solution sooner rather than later, prefera=
+bly
+> > by the next release.
+> >=20
+> > Maxime, any update here? Do we need a meeting to reach consensus?
+>=20
+> No update, I haven't found time to progress on the topic yet.
+>=20
+> For those who aren't aware of my initial proposal, you may find it here=
+:
+> https://www.spinics.net/linux/fedora/libvir/msg142668.html
+>=20
+> If my understanding is correct, you were concerned about the complexity=
+ of
+> my
+> proposal which involved too many layers. Your suggestion was to have a =
+tool
+> provided with qemu that would connect to vhost-user socket and query th=
+e
+> backend capabilities.
+> I'm not 100% clear how it would work, as the trend is to start the back=
+end
+> in
+> client mode, meaning QEMU creates the socket. In this case, should the =
+tool
+> create the socket and management tool request the backend to connect to=
+ it?
+>=20
+> I think it could make sense to have a meeting, but maybe we should firs=
+t
+> discuss the solutions on the list for efficiency.
+>=20
+> For the delivery, what is QEMU v2.10 planned release date?
+>=20
+> Note that my solution doesn't involve QEMU, so it would not be tight to=
+ QEMU
+> release date. But, that doesn't mean it would be delivered sooner than
+> your solution.
+>=20
+> Maxime
 
-It inflates it first, doesn't it?
+I'd say let's go with your proposal (Solution 3 above).
 
-> b) unload virtio-balloon kernel module
-> c) hibernate/suspension
-> d) (DEFLATE_ON_OOM)
-
-You need to set a flag in the balloon to allow this, right?
-
-> A Linux guest will touch memory without deflating:
-> a) During a kexec() dump
-> d) On reboots (regular, after kexec(), system_reset)
-> > 
-> >> Any change we
-> >>    introduce will break backwards compatibility.
-> > 
-> > Why does this have to be the case
-> If we suddenly enforce the existing virtio-balloon, we will break legacy
-> guests.
-
-Can't we do it with a feature flag?
-
-> Simple example:
-> Guest with inflated virtio-balloon reboots. Touches inflated memory.
-> Gets killed at some random point.
-> 
-> Of course, another discussion would be "can't we move virtio-mem
-> functionality into virtio-balloon instead of changing virtio-balloon".
-> With the current concept this is also not possible (one region per
-> device vs. one virtio-balloon device). And I think while similar, these
-> are two different concepts.
-> 
-> > 
-> >> virtio-balloon was not
-> >>    designed to give guarantees. Nobody can hinder the guest from
-> >>    deflating/reusing inflated memory.
-> > 
-> > Reusing without deflate is forbidden with TELL_HOST, right?
-> 
-> TELL_HOST just means "please inform me". There is no way to NACK a
-> request. It is not a permission to do so, just a "friendly
-> notification". And this is exactly not what we want when host enforcing
-> memory access.
-> 
-> 
-> > 
-> >>    In addition, it might make perfect
-> >>    sense to have both, virtio-balloon and virtio-mem at the same time,
-> >>    especially looking at the DEFLATE_ON_OOM or STATS features of
-> >>    virtio-balloon. While virtio-mem is all about guarantees, virtio-
-> >>    balloon is about cooperation.
-> > 
-> > Thanks, and I intend to look more into this next week.
-> > 
-> 
-> I know that it is tempting to force this concept into virtio-balloon. I
-> spent quite some time thinking about this (and possible other techniques
-> like implicit memory deflation on reboots) and decided not to do it. We
-> just end up trying to hack around all possible things that could go
-> wrong, while still not being able to handle all requirements properly.
-
-I agree there's a large # of requirements here not addressed by the balloon.
-
-One other thing that would be helpful here is pointing out the
-similarities between virtio-mem and the balloon. I'll ponder it
-over the weekend.
-
-The biggest worry for me is inability to support DMA into this memory.
-Is this hard to fix?
-
-
-Thanks!
-
-
-
-> -- 
-> 
-> Thanks,
-> 
-> David
+--=20
+MST
