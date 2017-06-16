@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49078)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dLtdu-0002Zk-8L
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:58:39 -0400
+	(envelope-from <david@redhat.com>) id 1dLteV-0002zW-RM
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:59:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dLtdp-0006RT-Kx
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:58:38 -0400
-Date: Fri, 16 Jun 2017 17:58:23 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170616175823.3308616c@nial.brq.redhat.com>
-In-Reply-To: <20170616144053.GH30484@umbus>
-References: <20170530160445.12810-1-lvivier@redhat.com>
-	<20170531043557.GI12163@umbus.fritz.box>
-	<149695205346.23353.3484869110998357783@loki>
-	<20170609102733.0eb7293d@nial.brq.redhat.com>
-	<149739016562.5725.6958577924052221756@loki>
-	<20170614110001.7816209b@nial.brq.redhat.com>
-	<149748643237.3448.7122634958390452661@loki>
-	<20170616155312.623f859e@nial.brq.redhat.com>
-	<20170616144053.GH30484@umbus>
+	(envelope-from <david@redhat.com>) id 1dLteS-0006rG-Pi
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:59:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44044)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dLteS-0006qW-EI
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 11:59:12 -0400
+References: <547865a9-d6c2-7140-47e2-5af01e7d761d@redhat.com>
+	<20170616175748-mutt-send-email-mst@kernel.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <4cdf547c-079b-6b44-484f-e1132e960364@redhat.com>
+Date: Fri, 16 Jun 2017 17:59:07 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20170616175748-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] spapr: manage hotplugged devices while the
- VM is not started
+Subject: Re: [Qemu-devel] [RFC] virtio-mem: paravirtualized memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,164 +28,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: KVM <kvm@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, Andrea Arcangeli <aarcange@redhat.com>
 
-On Fri, 16 Jun 2017 22:40:53 +0800
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> On Fri, Jun 16, 2017 at 03:53:12PM +0200, Igor Mammedov wrote:
-> > On Wed, 14 Jun 2017 19:27:12 -0500
-> > Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
-> >   
-> > > Quoting Igor Mammedov (2017-06-14 04:00:01)  
-> > > > On Tue, 13 Jun 2017 16:42:45 -0500
-> > > > Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
-> > > >     
-> > > > > Quoting Igor Mammedov (2017-06-09 03:27:33)    
-
-[...]
-
-> > > > 
-> > > > May be we should
-> > > >  1. make DeviceState:hotpluggable property write-able again
-> > > >  2. transmit DeviceState:hotpluggable as part of migration stream
-> > > >  3. add generic migration hook which will check if target and
-> > > >     source value match, if value differs => fail/abort migration.
-> > > >  4. in case values mismatch mgmt will be forced to explicitly
-> > > >     provide hotplugged property value on -device/device_add
-> > > > That would enforce consistent DeviceState:hotpluggable value
-> > > > on target and source.
-> > > > We can enforce it only for new machine types so it won't break
-> > > > old mgmt tools with old machine types but would force mgmt
-> > > > for new machines to use hotplugged property on target
-> > > > so QEMU could rely on its value for migration purposes.
-> > > >     
-> > > 
-> > > That would work, and generalizing this beyond spapr seems
-> > > appropriate.
-> > > 
-> > > It also has reasonable semantics, and it would work for us
-> > > *provided that* we always send DRC state for hotplugged devices
-> > > and not just DRCs in a transitional state:
-> > > 
-> > > SRC1: device_add $cpu  
-> > >  -> dev->hotplugged == true
-> > >  -> device starts in pre-hotplug, ends up in post-hotplug state    
-> > >     after guest onlines it
-> > > <migrate>
-> > > DST1: device_add $cpu,hotplugged=true  
-> > >  -> dev->hotplugged == true
-> > >  -> device starts in pre-hotplug state. guest sends updated state    
-> > >     to transition DRC to post-hotplug
-> > > 
-> > > But what about stuff like mem/pci? Currently, migration works for
-> > > cases like:
-> > > 
-> > > SRC1: device_add virtio-net-pci
-> > > DST1: qemu -device virtio-net-pci
-> > > 
-> > > Even though DST1 has dev->hotplugged == false, and SRC1 has the
-> > > opposite. So for new machines, checking SRC1:dev->hotplugged ==
-> > > DST1:dev->hotplugged would fail, even though the migration
-> > > scenario is unchanged from before.
-> > > 
-> > > So management would now have to do:
-> > > 
-> > > SRC1: device_add virtio-net-pci
-> > > DST1: qemu -device virtio-net-pci,hotplugged=true
-> > > 
-> > > But the code behavior is a bit different then, since we now get
-> > > an ACPI hotplug event via the hotplug handler. Maybe the
-> > > migration stream fixes that up for us, but I think we would need
-> > > to audit this and similar cases to be sure.
-> > > 
-> > > That's all fine if it's necessary, but I feel like this is
-> > > the hard way to address what's actually a much more specific
-> > > issue: that device_add before machine-start doesn't currently
-> > > match the behavior for a device started via cmdline. i.e.
-> > > dev->hotplugged in the former vs. !dev->hotplugged in the
-> > > latter. I don't really see a good reason these 2 cases should
-> > > be different, and we can bring them to parity by doing
-> > > something like:
-> > > 
-> > > 1. For device_adds after qdev_machine_creation_done(), but
-> > >    before machine start, set a flag: reset_before_start.
-> > > 2. At the start of processing migration stream, or unpausing
-> > >    a -S guest (in the non-migration case), issue a system-wide
-> > >    reset if reset_before_start is set.
-> > > 3. reset handlers will already unset dev->hotplugged at that
-> > >    point and re-execute all the hotplug hooks with
-> > >    dev->hotplugged == false. This should put everything in
-> > >    a state that's identical to cmdline-created devices.  
-> > instead of flag for non migration case we could use
-> >  RUN_STATE_PRELAUNCH -> RUN_STATE_RUNNING
-> > transition to reset all devices or
-> > maybe do something like this:  
+On 16.06.2017 17:04, Michael S. Tsirkin wrote:
+> On Fri, Jun 16, 2017 at 04:20:02PM +0200, David Hildenbrand wrote:
+>> Hi,
+>>
+>> this is an idea that is based on Andrea Arcangeli's original idea to
+>> host enforce guest access to memory given up using virtio-balloon using
+>> userfaultfd in the hypervisor. While looking into the details, I
+>> realized that host-enforcing virtio-balloon would result in way too many
+>> problems (mainly backwards compatibility) and would also have some
+>> conceptual restrictions that I want to avoid. So I developed the idea of
+>> virtio-mem - "paravirtualized memory".
 > 
-> Hrm, does the general reset call happen now before or after this
-> transition?  Resetting DRCs at CAS time should accomplish the same thing.
-currently it's before, see vl.c
+> Thanks! I went over this quickly, will read some more in the
+> coming days. I would like to ask for some clarifications
+> on one part meanwhile:
 
-    qdev_machine_creation_done();                                                
-                                                                                                                         
-    qemu_register_reset(qbus_reset_all_fn, sysbus_get_default());                
-    qemu_run_machine_init_done_notifiers();
-...                                        
-    qemu_system_reset(SHUTDOWN_CAUSE_NONE);                                      
-    register_global_state();                                                     
-    if (replay_mode != REPLAY_MODE_NONE) {                                       
-        replay_vmstate_init();                                                   
-    } else if (loadvm) {                                                         
-        Error *local_err = NULL;                                                 
-        if (load_snapshot(loadvm, &local_err) < 0) {                             
-            error_report_err(local_err);                                         
-            autostart = 0;                                                       
-        }                                                                        
-    }                                                                            
-...                                                                   
-    } else if (autostart) {                                                      
-        vm_start();                                                           
-    }         
-...
-main_loop(); <-- currently device_add works here
+Thanks for looking into it that fast! :)
 
+In general, what this section is all about: Why to not simply host
+enforce virtio-balloon.
 
-simplified version:
-without migration and with -S option 'autostart = 0'
-so we get monitor/qmp prompt with RUN_STATE_PRELAUNCH
+> 
+>> Q: Why not reuse virtio-balloon?
+>>
+>> A: virtio-balloon is for cooperative memory management. It has a fixed
+>>    page size
+> 
+> We are fixing that with VIRTIO_BALLOON_F_PAGE_CHUNKS btw.
+> I would appreciate you looking into that patchset.
 
-and when command 'cont' is issued,
-  RUN_STATE_PRELAUNCH -> RUN_STATE_RUNNING
+Will do, thanks. Problem is that there is no "enforcement" on the page
+size. VIRTIO_BALLOON_F_PAGE_CHUNKS simply allows to send bigger chunks.
+Nobody hinders the guest (especially legacy virtio-balloon drivers) from
+sending 4k pages.
 
+So this doesn't really fix the issue (we have here), it just allows to
+speed up transfer. Which is a good thing, but does not help for
+enforcement at all. So, yes support for page sizes > 4k, but no way to
+enforce it.
+
+> 
+>> and will deflate in certain situations.
+> 
+> What does this refer to?
+
+A Linux guest will deflate the balloon (all or some pages) in the
+following scenarios:
+a) page migration
+b) unload virtio-balloon kernel module
+c) hibernate/suspension
+d) (DEFLATE_ON_OOM)
+
+A Linux guest will touch memory without deflating:
+a) During a kexec() dump
+d) On reboots (regular, after kexec(), system_reset)
+
+> 
+>> Any change we
+>>    introduce will break backwards compatibility.
+> 
+> Why does this have to be the case
+If we suddenly enforce the existing virtio-balloon, we will break legacy
+guests.
+
+Simple example:
+Guest with inflated virtio-balloon reboots. Touches inflated memory.
+Gets killed at some random point.
+
+Of course, another discussion would be "can't we move virtio-mem
+functionality into virtio-balloon instead of changing virtio-balloon".
+With the current concept this is also not possible (one region per
+device vs. one virtio-balloon device). And I think while similar, these
+are two different concepts.
+
+> 
+>> virtio-balloon was not
+>>    designed to give guarantees. Nobody can hinder the guest from
+>>    deflating/reusing inflated memory.
+> 
+> Reusing without deflate is forbidden with TELL_HOST, right?
+
+TELL_HOST just means "please inform me". There is no way to NACK a
+request. It is not a permission to do so, just a "friendly
+notification". And this is exactly not what we want when host enforcing
+memory access.
 
 
 > 
-> > diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> > index 0ce45a2..cdeb8f8 100644
-> > --- a/hw/core/qdev.c
-> > +++ b/hw/core/qdev.c
-> > 
-> > @@ -1020,7 +1010,7 @@ static void device_initfn(Object *obj)
-> >      ObjectClass *class;
-> >      Property *prop;
-> >  
-> > -    if (qdev_hotplug) {
-> > +    if (runstate_check(RUN_STATE_RUNNING) || ...) {
-> >          dev->hotplugged = 1;
-> >          qdev_hot_added = true;
-> >      }
-> >   
-> > > 4. Only allow management to do device_add before it sends
-> > >    the migration stream (if management doesn't already guard
-> > >    against this then it's probably a bug anyway)  
-> > seems like Juan already took care of it.
-> >   
-> > > This allows management to treat device_add/cmdline as being
-> > > completely synonymous for guests that haven't started yet,
-> > > both for -incoming and -S in general, and it maintains
-> > > the behavior that existing migration code expects of
-> > > cmdline-specified devices.  
-> > 
-> >   
+>>    In addition, it might make perfect
+>>    sense to have both, virtio-balloon and virtio-mem at the same time,
+>>    especially looking at the DEFLATE_ON_OOM or STATS features of
+>>    virtio-balloon. While virtio-mem is all about guarantees, virtio-
+>>    balloon is about cooperation.
 > 
+> Thanks, and I intend to look more into this next week.
+> 
+
+I know that it is tempting to force this concept into virtio-balloon. I
+spent quite some time thinking about this (and possible other techniques
+like implicit memory deflation on reboots) and decided not to do it. We
+just end up trying to hack around all possible things that could go
+wrong, while still not being able to handle all requirements properly.
+
+-- 
+
+Thanks,
+
+David
