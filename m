@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gsomlo@gmail.com>) id 1dLwP8-0004UC-0B
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 14:55:35 -0400
+	(envelope-from <cota@braap.org>) id 1dLwQI-0005Mm-IV
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 14:56:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gsomlo@gmail.com>) id 1dLwP4-0006Vn-VT
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 14:55:34 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:35154)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <gsomlo@gmail.com>) id 1dLwP4-0006VT-Oa
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 14:55:30 -0400
-Received: by mail-qt0-x243.google.com with SMTP id x58so12311428qtc.2
-	for <qemu-devel@nongnu.org>; Fri, 16 Jun 2017 11:55:30 -0700 (PDT)
-From: "Gabriel L. Somlo" <gsomlo@gmail.com>
-Date: Fri, 16 Jun 2017 14:55:14 -0400
-Message-Id: <1497639316-22202-2-git-send-email-gsomlo@gmail.com>
-In-Reply-To: <1497639316-22202-1-git-send-email-gsomlo@gmail.com>
-References: <1497639316-22202-1-git-send-email-gsomlo@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 1/3] applesmc: cosmetic whitespace and
- indentation cleanup
+	(envelope-from <cota@braap.org>) id 1dLwQH-000790-F6
+	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 14:56:46 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Date: Fri, 16 Jun 2017 14:56:37 -0400
+Message-Id: <1497639397-19453-3-git-send-email-cota@braap.org>
+In-Reply-To: <1497639397-19453-1-git-send-email-cota@braap.org>
+References: <1497639397-19453-1-git-send-email-cota@braap.org>
+Subject: [Qemu-devel] [PATCH v2 2/2] gen-icount: use tcg_ctx.tcg_env instead
+ of cpu_env
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,169 +21,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: agraf@suse.de, pbonzini@redhat.com, f4bug@amsat.org, eshelton@pobox.com
+Cc: Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Michael Walle <michael@walle.cc>, Laurent Vivier <laurent@vivier.eu>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Anthony Green <green@moxielogic.com>, Chris Wulff <crwulff@gmail.com>, Marek Vasut <marex@denx.de>, Stafford Horne <shorne@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Max Filippov <jcmvbkbc@gmail.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>
 
-Signed-off-by: Gabriel Somlo <gsomlo@gmail.com>
-Reviewed-by: Alexander Graf <agraf@suse.de>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Phil Dennis-Jordan <phil@philjordan.eu>
+We are relying on cpu_env being defined as a global, yet most
+targets (i.e. all but arm/a64) have it defined as a local variable.
+Luckily all of them use the same "cpu_env" name, but really
+compilation shouldn't break if the name of that local variable
+changed.
+
+Fix it by using tcg_ctx.tcg_env, which all targets set in their
+translate_init function. This change also helps paving the way
+for the upcoming "translation loop common to all targets" work.
+
+Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- hw/misc/applesmc.c | 98 ++++++++++++++++++++++++++++--------------------------
- 1 file changed, 50 insertions(+), 48 deletions(-)
+ include/exec/gen-icount.h | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/hw/misc/applesmc.c b/hw/misc/applesmc.c
-index 77fab5b..6381197 100644
---- a/hw/misc/applesmc.c
-+++ b/hw/misc/applesmc.c
-@@ -39,21 +39,24 @@
- /* #define DEBUG_SMC */
- 
- #define APPLESMC_DEFAULT_IOBASE        0x300
--/* data port used by Apple SMC */
--#define APPLESMC_DATA_PORT             0x0
--/* command/status port used by Apple SMC */
--#define APPLESMC_CMD_PORT              0x4
--#define APPLESMC_NR_PORTS              32
- 
--#define APPLESMC_READ_CMD              0x10
--#define APPLESMC_WRITE_CMD             0x11
--#define APPLESMC_GET_KEY_BY_INDEX_CMD  0x12
--#define APPLESMC_GET_KEY_TYPE_CMD      0x13
-+enum {
-+    APPLESMC_DATA_PORT               = 0x00,
-+    APPLESMC_CMD_PORT                = 0x04,
-+    APPLESMC_NUM_PORTS               = 0x20,
-+};
-+
-+enum {
-+    APPLESMC_READ_CMD                = 0x10,
-+    APPLESMC_WRITE_CMD               = 0x11,
-+    APPLESMC_GET_KEY_BY_INDEX_CMD    = 0x12,
-+    APPLESMC_GET_KEY_TYPE_CMD        = 0x13,
-+};
- 
- #ifdef DEBUG_SMC
- #define smc_debug(...) fprintf(stderr, "AppleSMC: " __VA_ARGS__)
- #else
--#define smc_debug(...) do { } while(0)
-+#define smc_debug(...) do { } while (0)
- #endif
- 
- static char default_osk[64] = "This is a dummy key. Enter the real key "
-@@ -77,12 +80,11 @@ struct AppleSMCState {
-     uint32_t iobase;
-     uint8_t cmd;
-     uint8_t status;
--    uint8_t key[4];
-+    char key[4];
-     uint8_t read_pos;
-     uint8_t data_len;
-     uint8_t data_pos;
-     uint8_t data[255];
--    uint8_t charactic[4];
-     char *osk;
-     QLIST_HEAD(, AppleSMCData) data_def;
- };
-@@ -93,10 +95,10 @@ static void applesmc_io_cmd_write(void *opaque, hwaddr addr, uint64_t val,
-     AppleSMCState *s = opaque;
- 
-     smc_debug("CMD Write B: %#x = %#x\n", addr, val);
--    switch(val) {
--        case APPLESMC_READ_CMD:
--            s->status = 0x0c;
--            break;
-+    switch (val) {
-+    case APPLESMC_READ_CMD:
-+        s->status = 0x0c;
-+        break;
+diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
+index 547c979..9b3cb14 100644
+--- a/include/exec/gen-icount.h
++++ b/include/exec/gen-icount.h
+@@ -19,7 +19,7 @@ static inline void gen_tb_start(TranslationBlock *tb)
+         count = tcg_temp_new_i32();
      }
-     s->cmd = val;
-     s->read_pos = 0;
-@@ -123,54 +125,54 @@ static void applesmc_io_data_write(void *opaque, hwaddr addr, uint64_t val,
-     AppleSMCState *s = opaque;
  
-     smc_debug("DATA Write B: %#x = %#x\n", addr, val);
--    switch(s->cmd) {
--        case APPLESMC_READ_CMD:
--            if(s->read_pos < 4) {
--                s->key[s->read_pos] = val;
--                s->status = 0x04;
--            } else if(s->read_pos == 4) {
--                s->data_len = val;
--                s->status = 0x05;
--                s->data_pos = 0;
--                smc_debug("Key = %c%c%c%c Len = %d\n", s->key[0],
--                          s->key[1], s->key[2], s->key[3], val);
--                applesmc_fill_data(s);
--            }
--            s->read_pos++;
--            break;
-+    switch (s->cmd) {
-+    case APPLESMC_READ_CMD:
-+        if (s->read_pos < 4) {
-+            s->key[s->read_pos] = val;
-+            s->status = 0x04;
-+        } else if (s->read_pos == 4) {
-+            s->data_len = val;
-+            s->status = 0x05;
-+            s->data_pos = 0;
-+            smc_debug("Key = %c%c%c%c Len = %d\n", s->key[0],
-+                      s->key[1], s->key[2], s->key[3], val);
-+            applesmc_fill_data(s);
-+        }
-+        s->read_pos++;
-+        break;
+-    tcg_gen_ld_i32(count, cpu_env,
++    tcg_gen_ld_i32(count, tcg_ctx.tcg_env,
+                    -ENV_OFFSET + offsetof(CPUState, icount_decr.u32));
+ 
+     if (tb->cflags & CF_USE_ICOUNT) {
+@@ -37,7 +37,7 @@ static inline void gen_tb_start(TranslationBlock *tb)
+     tcg_gen_brcondi_i32(TCG_COND_LT, count, 0, exitreq_label);
+ 
+     if (tb->cflags & CF_USE_ICOUNT) {
+-        tcg_gen_st16_i32(count, cpu_env,
++        tcg_gen_st16_i32(count, tcg_ctx.tcg_env,
+                          -ENV_OFFSET + offsetof(CPUState, icount_decr.u16.low));
      }
+ 
+@@ -62,14 +62,16 @@ static inline void gen_tb_end(TranslationBlock *tb, int num_insns)
+ static inline void gen_io_start(void)
+ {
+     TCGv_i32 tmp = tcg_const_i32(1);
+-    tcg_gen_st_i32(tmp, cpu_env, -ENV_OFFSET + offsetof(CPUState, can_do_io));
++    tcg_gen_st_i32(tmp, tcg_ctx.tcg_env,
++                   -ENV_OFFSET + offsetof(CPUState, can_do_io));
+     tcg_temp_free_i32(tmp);
  }
  
--static uint64_t applesmc_io_data_read(void *opaque, hwaddr addr1,
--                                      unsigned size)
-+static uint64_t applesmc_io_data_read(void *opaque, hwaddr addr, unsigned size)
+ static inline void gen_io_end(void)
  {
-     AppleSMCState *s = opaque;
-     uint8_t retval = 0;
- 
--    switch(s->cmd) {
--        case APPLESMC_READ_CMD:
--            if(s->data_pos < s->data_len) {
--                retval = s->data[s->data_pos];
--                smc_debug("READ_DATA[%d] = %#hhx\n", s->data_pos,
--                          retval);
--                s->data_pos++;
--                if(s->data_pos == s->data_len) {
--                    s->status = 0x00;
--                    smc_debug("EOF\n");
--                } else
--                    s->status = 0x05;
-+    switch (s->cmd) {
-+    case APPLESMC_READ_CMD:
-+        if (s->data_pos < s->data_len) {
-+            retval = s->data[s->data_pos];
-+            smc_debug("READ_DATA[%d] = %#hhx\n", s->data_pos,
-+                      retval);
-+            s->data_pos++;
-+            if (s->data_pos == s->data_len) {
-+                s->status = 0x00;
-+                smc_debug("EOF\n");
-+            } else {
-+                s->status = 0x05;
-             }
-+        }
-     }
--    smc_debug("DATA Read b: %#x = %#x\n", addr1, retval);
-+    smc_debug("DATA Read b: %#x = %#x\n", addr, retval);
- 
-     return retval;
- }
- 
--static uint64_t applesmc_io_cmd_read(void *opaque, hwaddr addr1, unsigned size)
-+static uint64_t applesmc_io_cmd_read(void *opaque, hwaddr addr, unsigned size)
- {
-     AppleSMCState *s = opaque;
- 
--    smc_debug("CMD Read B: %#x\n", addr1);
-+    smc_debug("CMD Read B: %#x\n", addr);
-     return s->status;
+     TCGv_i32 tmp = tcg_const_i32(0);
+-    tcg_gen_st_i32(tmp, cpu_env, -ENV_OFFSET + offsetof(CPUState, can_do_io));
++    tcg_gen_st_i32(tmp, tcg_ctx.tcg_env,
++                   -ENV_OFFSET + offsetof(CPUState, can_do_io));
+     tcg_temp_free_i32(tmp);
  }
  
 -- 
