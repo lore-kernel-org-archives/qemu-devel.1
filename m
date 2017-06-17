@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49048)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sochin.jiang@huawei.com>) id 1dM2Rj-0001ct-Q0
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 21:22:40 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dM8k3-0004k8-An
+	for qemu-devel@nongnu.org; Sat, 17 Jun 2017 04:06:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sochin.jiang@huawei.com>) id 1dM2Rg-0001Uh-NG
-	for qemu-devel@nongnu.org; Fri, 16 Jun 2017 21:22:39 -0400
-References: <1497509253-28941-1-git-send-email-sochin.jiang@huawei.com>
-	<49c65c67-5dcc-5822-c2f9-e1c3ff0181de@redhat.com>
-From: "sochin.jiang" <sochin.jiang@huawei.com>
-Message-ID: <099fe86b-add8-d8c9-5696-aef97f8dc1a3@huawei.com>
-Date: Sat, 17 Jun 2017 09:22:06 +0800
+	(envelope-from <alex.bennee@linaro.org>) id 1dM8k0-0007nI-5r
+	for qemu-devel@nongnu.org; Sat, 17 Jun 2017 04:05:59 -0400
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:37396)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dM8jz-0007lf-UT
+	for qemu-devel@nongnu.org; Sat, 17 Jun 2017 04:05:56 -0400
+Received: by mail-wm0-x22c.google.com with SMTP id d73so38529528wma.0
+	for <qemu-devel@nongnu.org>; Sat, 17 Jun 2017 01:05:55 -0700 (PDT)
+References: <20170616161334.7492-1-f4bug@amsat.org>
+	<20170616161334.7492-4-f4bug@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170616161334.7492-4-f4bug@amsat.org>
+Date: Sat, 17 Jun 2017 09:06:32 +0100
+Message-ID: <87lgorujg7.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <49c65c67-5dcc-5822-c2f9-e1c3ff0181de@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] fix: avoid an infinite loop or a dangling
- pointer problem in img_commit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 03/11] travis: use yes/no variable to
+ enable/disable tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,31 +31,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, jcody@redhat.com, kwolf@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, eric.fangyi@huawei.com, subo7@huawei.com, xieyingtai@huawei.com, lina.lulina@huawei.com, zhangshuai13@huawei.com, lizhengui@huawei.com
-
-Good advice, thank you, Max.
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
 
-On 2017/6/16 21:27, Max Reitz wrote:
-> On 2017-06-15 08:47, sochin.jiang wrote:
->> From: "sochin.jiang" <sochin.jiang@huawei.com>
->>
->> img_commit could fall into an infinite loop calling run_block_job() if
->> its blockjob fails on any I/O error, fix this already known problem.
->>
->> Signed-off-by: sochin.jiang <sochin.jiang@huawei.com>
->> ---
->>  blockjob.c               |  4 ++--
->>  include/block/blockjob.h | 18 ++++++++++++++++++
->>  qemu-img.c               | 20 +++++++++++++-------
->>  3 files changed, 33 insertions(+), 9 deletions(-)
-> Thanks! I've applied the patch to my block branch:
+Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+
+> having the command to run in the variable make scripts harder to
+> manage.
+
+I'm not sure this adds much over the TEST_CMD not set == don't run we
+had before.
+
 >
-> https://github.com/XanClic/qemu/commits/block
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
 >
-> PS: In the future, please change the subject prefix to "PATCH v2" (etc.)
-> for updated versions of a patch.
+> using 0/1 or no/yes is pretty much the same.
 >
-> Max
+>  .travis.yml | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
 >
+> diff --git a/.travis.yml b/.travis.yml
+> index b2c69fdd59..c9ac741afc 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -46,7 +46,7 @@ notifications:
+>  env:
+>    global:
+>      - PARALLEL_JOBS="$(($(getconf _NPROCESSORS_ONLN) + 1))"
+> -    - TEST_CMD="make check"
+> +    - RUN_TESTS="yes"
+>    matrix:
+>      - CONFIG=""
+>      - CONFIG="--enable-debug --enable-debug-tcg --enable-trace-backends=log"
+> @@ -66,7 +66,7 @@ before_script:
+>    - ./configure ${CONFIG}
+>  script:
+>    - make -j${PARALLEL_JOBS}
+> -  - test -z "${TEST_CMD}" || ${TEST_CMD}
+> +  - if [ "${RUN_TESTS}" == "yes" ]; then make check; fi
+>  matrix:
+>    include:
+>      # Test with CLang for compile portability
+> @@ -77,16 +77,16 @@ matrix:
+>        compiler: gcc
+>      # We manually include builds which we disable "make check" for
+>      - env: CONFIG="--enable-debug --enable-tcg-interpreter"
+> -           TEST_CMD=""
+> +           RUN_TESTS="no"
+>        compiler: gcc
+>      - env: CONFIG="--enable-trace-backends=simple"
+> -           TEST_CMD=""
+> +           RUN_TESTS="no"
+>        compiler: gcc
+>      - env: CONFIG="--enable-trace-backends=ftrace"
+> -           TEST_CMD=""
+> +           RUN_TESTS="no"
+>        compiler: gcc
+>      - env: CONFIG="--enable-trace-backends=ust"
+> -           TEST_CMD=""
+> +           RUN_TESTS="no"
+>        compiler: gcc
+>      - env: CONFIG=""
+>        os: osx
+> @@ -191,6 +191,6 @@ matrix:
+>        env:
+>          - COMPILER_NAME=gcc CXX=g++-5 CC=gcc-5
+>          - CONFIG="--cc=gcc-5 --cxx=g++-5 --disable-pie --disable-linux-user"
+> -        - TEST_CMD=""
+> +        - RUN_TESTS="no"
+>        before_script:
+>          - ./configure ${CONFIG} --extra-cflags="-g3 -O0 -fsanitize=thread -fuse-ld=gold" || cat config.log
+
+
+--
+Alex Bennée
