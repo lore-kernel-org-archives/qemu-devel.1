@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dM9Cu-0002iK-Bd
-	for qemu-devel@nongnu.org; Sat, 17 Jun 2017 04:35:49 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dMC1h-00005G-6q
+	for qemu-devel@nongnu.org; Sat, 17 Jun 2017 07:36:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dM9Cs-0001S3-2h
-	for qemu-devel@nongnu.org; Sat, 17 Jun 2017 04:35:48 -0400
-Received: from mga09.intel.com ([134.134.136.24]:63355)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dM9Cr-0001RK-Ow
-	for qemu-devel@nongnu.org; Sat, 17 Jun 2017 04:35:45 -0400
-Message-ID: <5944EA6B.2080606@intel.com>
-Date: Sat, 17 Jun 2017 16:38:03 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <el13635@mail.ntua.gr>) id 1dMC1c-0004Cu-Ib
+	for qemu-devel@nongnu.org; Sat, 17 Jun 2017 07:36:25 -0400
+Date: Sat, 17 Jun 2017 14:36:09 +0300
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20170617113609.vq3eegatdfjv3qps@postretch>
+References: <1497634636-20230-1-git-send-email-kwolf@redhat.com>
+	<1497634636-20230-26-git-send-email-kwolf@redhat.com>
 MIME-Version: 1.0
-References: <1497610119-45041-1-git-send-email-wei.w.wang@intel.com>
-	<20170616172531-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20170616172531-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] virtio-net: enable configurable tx
- queue size
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ty3civrrgn3cmx7m"
+Content-Disposition: inline
+In-Reply-To: <1497634636-20230-26-git-send-email-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 25/31] qed: Implement
+ .bdrv_co_readv/writev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +25,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: jasowang@redhat.com, marcandre.lureau@gmail.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, stefanha@gmail.com, pbonzini@redhat.com, armbru@redhat.com, jan.scheurich@ericsson.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, pbonzini@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com
 
-On 06/16/2017 10:31 PM, Michael S. Tsirkin wrote:
-> On Fri, Jun 16, 2017 at 06:48:38PM +0800, Wei Wang wrote:
->> This patch enables the virtio-net tx queue size to be configurable
->> between 256 (the default queue size) and 1024 by the user when the
->> vhost-user backend is used.
->>
->> Currently, the maximum tx queue size for other backends is 512 due
->> to the following limitations:
->> - QEMU backend: the QEMU backend implementation in some cases may
->> send 1024+1 iovs to writev.
->> - Vhost_net backend: there are possibilities that the guest sends
->> a vring_desc of memory which corsses a MemoryRegion thereby
->> generating more than 1024 iovs in total after translattion from
->> guest-physical address in the backend.
->>
->> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
->> ---
->>   hw/net/virtio-net.c            | 46 ++++++++++++++++++++++++++++++++++--------
->>   include/hw/virtio/virtio-net.h |  1 +
->>   2 files changed, 39 insertions(+), 8 deletions(-)
->>
->> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
->> index 7d091c9..e1a08fd 100644
->> --- a/hw/net/virtio-net.c
->> +++ b/hw/net/virtio-net.c
->> @@ -33,8 +33,11 @@
->>   
->>   /* previously fixed value */
->>   #define VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE 256
->> +#define VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE 256
->> +
->>   /* for now, only allow larger queues; with virtio-1, guest can downsize */
->>   #define VIRTIO_NET_RX_QUEUE_MIN_SIZE VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE
->> +#define VIRTIO_NET_TX_QUEUE_MIN_SIZE VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE
->>   
->>   /*
->>    * Calculate the number of bytes up to and including the given 'field' of
->> @@ -1491,18 +1494,33 @@ static void virtio_net_tx_bh(void *opaque)
->>   static void virtio_net_add_queue(VirtIONet *n, int index)
->>   {
->>       VirtIODevice *vdev = VIRTIO_DEVICE(n);
->> +    NetClientState *nc = qemu_get_queue(n->nic);
->>   
->>       n->vqs[index].rx_vq = virtio_add_queue(vdev, n->net_conf.rx_queue_size,
->>                                              virtio_net_handle_rx);
->> +
->> +    /*
->> +     * Currently, backends other than vhost-user don't support 1024 queue
->> +     * size.
->> +     */
->> +    if (n->net_conf.tx_queue_size == VIRTQUEUE_MAX_SIZE &&
->> +        nc->peer->info->type != NET_CLIENT_DRIVER_VHOST_USER) {
->> +        fprintf(stderr, "warning: %s: queue size %d not supported\n",
->> +                __func__, n->net_conf.tx_queue_size);
->> +        n->net_conf.tx_queue_size = VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE;
->> +    }
->> +
-> Also, I suspect we can get here with no peer, and above will crash.
-> It seems ugly to do this on each virtio_net_add_queue.
-> How about moving this to realize?
 
-The code has been re-arranged to make sure nc->peer is ready before
-it's used, but I agree that it looks better to move the above to realize().
+--ty3civrrgn3cmx7m
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Best,
-Wei
+Reviewed-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+
+On Fri, Jun 16, 2017 at 07:37:10PM +0200, Kevin Wolf wrote:
+>Most of the qed code is now synchronous and matches the coroutine model.
+>One notable exception is the serialisation between requests which can
+>still schedule a callback. Before we can replace this with coroutine
+>locks, let's convert the driver's external interfaces to the coroutine
+>versions.
+>
+>We need to be careful to handle both requests that call the completion
+>callback directly from the calling coroutine (i.e. fully synchronous
+>code) and requests that involve some callback, so that we need to yield
+>and wait for the completion callback coming from outside the coroutine.
+>
+>Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>---
+> block/qed.c | 97 ++++++++++++++++++++++++++------------------------------=
+-----
+> 1 file changed, 42 insertions(+), 55 deletions(-)
+>
+>diff --git a/block/qed.c b/block/qed.c
+>index e762169..a5111fd 100644
+>--- a/block/qed.c
+>+++ b/block/qed.c
+>@@ -1322,16 +1322,32 @@ static void qed_aio_next_io(QEDAIOCB *acb)
+>     }
+> }
+>
+>-static BlockAIOCB *qed_aio_setup(BlockDriverState *bs,
+>-                                 int64_t sector_num,
+>-                                 QEMUIOVector *qiov, int nb_sectors,
+>-                                 BlockCompletionFunc *cb,
+>-                                 void *opaque, int flags)
+>+typedef struct QEDRequestCo {
+>+    Coroutine *co;
+>+    bool done;
+>+    int ret;
+>+} QEDRequestCo;
+>+
+>+static void qed_co_request_cb(void *opaque, int ret)
+> {
+>-    QEDAIOCB *acb =3D qemu_aio_get(&qed_aiocb_info, bs, cb, opaque);
+>+    QEDRequestCo *co =3D opaque;
+>
+>-    trace_qed_aio_setup(bs->opaque, acb, sector_num, nb_sectors,
+>-                        opaque, flags);
+>+    co->done =3D true;
+>+    co->ret =3D ret;
+>+    qemu_coroutine_enter_if_inactive(co->co);
+>+}
+>+
+>+static int coroutine_fn qed_co_request(BlockDriverState *bs, int64_t sect=
+or_num,
+>+                                       QEMUIOVector *qiov, int nb_sectors,
+>+                                       int flags)
+>+{
+>+    QEDRequestCo co =3D {
+>+        .co     =3D qemu_coroutine_self(),
+>+        .done   =3D false,
+>+    };
+>+    QEDAIOCB *acb =3D qemu_aio_get(&qed_aiocb_info, bs, qed_co_request_cb=
+, &co);
+>+
+>+    trace_qed_aio_setup(bs->opaque, acb, sector_num, nb_sectors, &co, fla=
+gs);
+>
+>     acb->flags =3D flags;
+>     acb->qiov =3D qiov;
+>@@ -1344,43 +1360,26 @@ static BlockAIOCB *qed_aio_setup(BlockDriverState =
+*bs,
+>
+>     /* Start request */
+>     qed_aio_start_io(acb);
+>-    return &acb->common;
+>-}
+>
+>-static BlockAIOCB *bdrv_qed_aio_readv(BlockDriverState *bs,
+>-                                      int64_t sector_num,
+>-                                      QEMUIOVector *qiov, int nb_sectors,
+>-                                      BlockCompletionFunc *cb,
+>-                                      void *opaque)
+>-{
+>-    return qed_aio_setup(bs, sector_num, qiov, nb_sectors, cb, opaque, 0);
+>+    if (!co.done) {
+>+        qemu_coroutine_yield();
+>+    }
+>+
+>+    return co.ret;
+> }
+>
+>-static BlockAIOCB *bdrv_qed_aio_writev(BlockDriverState *bs,
+>-                                       int64_t sector_num,
+>-                                       QEMUIOVector *qiov, int nb_sectors,
+>-                                       BlockCompletionFunc *cb,
+>-                                       void *opaque)
+>+static int coroutine_fn bdrv_qed_co_readv(BlockDriverState *bs,
+>+                                          int64_t sector_num, int nb_sect=
+ors,
+>+                                          QEMUIOVector *qiov)
+> {
+>-    return qed_aio_setup(bs, sector_num, qiov, nb_sectors, cb,
+>-                         opaque, QED_AIOCB_WRITE);
+>+    return qed_co_request(bs, sector_num, qiov, nb_sectors, 0);
+> }
+>
+>-typedef struct {
+>-    Coroutine *co;
+>-    int ret;
+>-    bool done;
+>-} QEDWriteZeroesCB;
+>-
+>-static void coroutine_fn qed_co_pwrite_zeroes_cb(void *opaque, int ret)
+>+static int coroutine_fn bdrv_qed_co_writev(BlockDriverState *bs,
+>+                                           int64_t sector_num, int nb_sec=
+tors,
+>+                                           QEMUIOVector *qiov)
+> {
+>-    QEDWriteZeroesCB *cb =3D opaque;
+>-
+>-    cb->done =3D true;
+>-    cb->ret =3D ret;
+>-    if (cb->co) {
+>-        aio_co_wake(cb->co);
+>-    }
+>+    return qed_co_request(bs, sector_num, qiov, nb_sectors, QED_AIOCB_WRI=
+TE);
+> }
+>
+> static int coroutine_fn bdrv_qed_co_pwrite_zeroes(BlockDriverState *bs,
+>@@ -1388,9 +1387,7 @@ static int coroutine_fn bdrv_qed_co_pwrite_zeroes(Bl=
+ockDriverState *bs,
+>                                                   int count,
+>                                                   BdrvRequestFlags flags)
+> {
+>-    BlockAIOCB *blockacb;
+>     BDRVQEDState *s =3D bs->opaque;
+>-    QEDWriteZeroesCB cb =3D { .done =3D false };
+>     QEMUIOVector qiov;
+>     struct iovec iov;
+>
+>@@ -1407,19 +1404,9 @@ static int coroutine_fn bdrv_qed_co_pwrite_zeroes(B=
+lockDriverState *bs,
+>     iov.iov_len =3D count;
+>
+>     qemu_iovec_init_external(&qiov, &iov, 1);
+>-    blockacb =3D qed_aio_setup(bs, offset >> BDRV_SECTOR_BITS, &qiov,
+>-                             count >> BDRV_SECTOR_BITS,
+>-                             qed_co_pwrite_zeroes_cb, &cb,
+>-                             QED_AIOCB_WRITE | QED_AIOCB_ZERO);
+>-    if (!blockacb) {
+>-        return -EIO;
+>-    }
+>-    if (!cb.done) {
+>-        cb.co =3D qemu_coroutine_self();
+>-        qemu_coroutine_yield();
+>-    }
+>-    assert(cb.done);
+>-    return cb.ret;
+>+    return qed_co_request(bs, offset >> BDRV_SECTOR_BITS, &qiov,
+>+                          count >> BDRV_SECTOR_BITS,
+>+                          QED_AIOCB_WRITE | QED_AIOCB_ZERO);
+> }
+>
+> static int bdrv_qed_truncate(BlockDriverState *bs, int64_t offset, Error =
+**errp)
+>@@ -1615,8 +1602,8 @@ static BlockDriver bdrv_qed =3D {
+>     .bdrv_create              =3D bdrv_qed_create,
+>     .bdrv_has_zero_init       =3D bdrv_has_zero_init_1,
+>     .bdrv_co_get_block_status =3D bdrv_qed_co_get_block_status,
+>-    .bdrv_aio_readv           =3D bdrv_qed_aio_readv,
+>-    .bdrv_aio_writev          =3D bdrv_qed_aio_writev,
+>+    .bdrv_co_readv            =3D bdrv_qed_co_readv,
+>+    .bdrv_co_writev           =3D bdrv_qed_co_writev,
+>     .bdrv_co_pwrite_zeroes    =3D bdrv_qed_co_pwrite_zeroes,
+>     .bdrv_truncate            =3D bdrv_qed_truncate,
+>     .bdrv_getlength           =3D bdrv_qed_getlength,
+>--=20
+>1.8.3.1
+>
+>
+>
+
+--ty3civrrgn3cmx7m
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAllFFCkACgkQc2J8L2kN
+9xCmihAAxAqropvsW51a5BFHcxLtXnQ3S5kQu5YrwCVfQnEsEQ4r5h6cHIJHP+Lg
+pno9JuplmIRt9Zm2SUtxAQ9NA7oXg2fXKwk4vYs/QtsfWlw97taT1fvtYwI6ZJZ3
++pdrASZmuXPlu68l/KrKJ+NpVKdgccSkP/PdA454xk0wf05jtD2eh/sDKx6GNFK0
+Y+vyTrpRjc+nKlFG9f3Rj1CpNtOvRjrid1HcG29LnAo1uagcfdGIPNXIO92PylBU
+CIvTEXHGzvWniIeoBX7V7F70yRXa0bEDCGz28+YrR44scEqs4g8bZkzCOjNqUlSp
+5fz+iPEKyaNyEDt/G5OB6HEA12dqU5HrglQCNQdCA/JUL4rJAjBTs+kbjmqWmjK3
+zvgG0A08fvcwzbvwII9pe47cg3YB58dhAZblR9usrz7HTe0MpuNzVdk46lBBsZlk
+ue7evj5nV/NTWh/AgNJTi2N07L+kPp9asH4T1+1L4XvIKNKnbzL/OMyvpJCaRiBb
+mTleqPoLOeqF8pZsRgIZt/8sOsVUKeVsuzT9OzAEx18is56uhkItYKXmTxnbwvoi
+nJebA2brnCB+GVbKC5paVQqRdgv4gI2RmIaEaEwU541ZrnYBUcjbv6E69qpChWFv
+u8SwNKKmtDPWMmg5awsX+dshECxqbu0lnjMz+nDxaRTiiDk4fnk=
+=E5g1
+-----END PGP SIGNATURE-----
+
+--ty3civrrgn3cmx7m--
