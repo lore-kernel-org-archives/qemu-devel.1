@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60238)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dMC1h-00005G-6q
-	for qemu-devel@nongnu.org; Sat, 17 Jun 2017 07:36:26 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dMC6G-0001NO-77
+	for qemu-devel@nongnu.org; Sat, 17 Jun 2017 07:41:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dMC1c-0004Cu-Ib
-	for qemu-devel@nongnu.org; Sat, 17 Jun 2017 07:36:25 -0400
-Date: Sat, 17 Jun 2017 14:36:09 +0300
+	(envelope-from <el13635@mail.ntua.gr>) id 1dMC6B-0006ar-A8
+	for qemu-devel@nongnu.org; Sat, 17 Jun 2017 07:41:08 -0400
+Date: Sat, 17 Jun 2017 14:41:01 +0300
 From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170617113609.vq3eegatdfjv3qps@postretch>
+Message-ID: <20170617114101.767vztiyl5xy7qoh@postretch>
 References: <1497634636-20230-1-git-send-email-kwolf@redhat.com>
-	<1497634636-20230-26-git-send-email-kwolf@redhat.com>
+	<1497634636-20230-31-git-send-email-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ty3civrrgn3cmx7m"
+	protocol="application/pgp-signature"; boundary="dqmu2bqtz4upvyag"
 Content-Disposition: inline
-In-Reply-To: <1497634636-20230-26-git-send-email-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 25/31] qed: Implement
- .bdrv_co_readv/writev
+In-Reply-To: <1497634636-20230-31-git-send-email-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 30/31] qed: Use bdrv_co_*
+ for coroutine_fns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,211 +29,122 @@ To: Kevin Wolf <kwolf@redhat.com>
 Cc: qemu-block@nongnu.org, pbonzini@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com
 
 
---ty3civrrgn3cmx7m
+--dqmu2bqtz4upvyag
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
 Reviewed-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
 
-On Fri, Jun 16, 2017 at 07:37:10PM +0200, Kevin Wolf wrote:
->Most of the qed code is now synchronous and matches the coroutine model.
->One notable exception is the serialisation between requests which can
->still schedule a callback. Before we can replace this with coroutine
->locks, let's convert the driver's external interfaces to the coroutine
->versions.
->
->We need to be careful to handle both requests that call the completion
->callback directly from the calling coroutine (i.e. fully synchronous
->code) and requests that involve some callback, so that we need to yield
->and wait for the completion callback coming from outside the coroutine.
+On Fri, Jun 16, 2017 at 07:37:15PM +0200, Kevin Wolf wrote:
+>All functions that are marked coroutine_fn can directly call the
+>bdrv_co_* version of functions instead of going through the wrapper.
 >
 >Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 >---
-> block/qed.c | 97 ++++++++++++++++++++++++++------------------------------=
------
-> 1 file changed, 42 insertions(+), 55 deletions(-)
+> block/qed.c | 16 +++++++++-------
+> 1 file changed, 9 insertions(+), 7 deletions(-)
 >
 >diff --git a/block/qed.c b/block/qed.c
->index e762169..a5111fd 100644
+>index 48f2b0e..c073baa 100644
 >--- a/block/qed.c
 >+++ b/block/qed.c
->@@ -1322,16 +1322,32 @@ static void qed_aio_next_io(QEDAIOCB *acb)
->     }
-> }
->
->-static BlockAIOCB *qed_aio_setup(BlockDriverState *bs,
->-                                 int64_t sector_num,
->-                                 QEMUIOVector *qiov, int nb_sectors,
->-                                 BlockCompletionFunc *cb,
->-                                 void *opaque, int flags)
->+typedef struct QEDRequestCo {
->+    Coroutine *co;
->+    bool done;
->+    int ret;
->+} QEDRequestCo;
->+
->+static void qed_co_request_cb(void *opaque, int ret)
-> {
->-    QEDAIOCB *acb =3D qemu_aio_get(&qed_aiocb_info, bs, cb, opaque);
->+    QEDRequestCo *co =3D opaque;
->
->-    trace_qed_aio_setup(bs->opaque, acb, sector_num, nb_sectors,
->-                        opaque, flags);
->+    co->done =3D true;
->+    co->ret =3D ret;
->+    qemu_coroutine_enter_if_inactive(co->co);
->+}
->+
->+static int coroutine_fn qed_co_request(BlockDriverState *bs, int64_t sect=
-or_num,
->+                                       QEMUIOVector *qiov, int nb_sectors,
->+                                       int flags)
->+{
->+    QEDRequestCo co =3D {
->+        .co     =3D qemu_coroutine_self(),
->+        .done   =3D false,
->+    };
->+    QEDAIOCB *acb =3D qemu_aio_get(&qed_aiocb_info, bs, qed_co_request_cb=
-, &co);
->+
->+    trace_qed_aio_setup(bs->opaque, acb, sector_num, nb_sectors, &co, fla=
-gs);
->
->     acb->flags =3D flags;
->     acb->qiov =3D qiov;
->@@ -1344,43 +1360,26 @@ static BlockAIOCB *qed_aio_setup(BlockDriverState =
-*bs,
->
->     /* Start request */
->     qed_aio_start_io(acb);
->-    return &acb->common;
->-}
->
->-static BlockAIOCB *bdrv_qed_aio_readv(BlockDriverState *bs,
->-                                      int64_t sector_num,
->-                                      QEMUIOVector *qiov, int nb_sectors,
->-                                      BlockCompletionFunc *cb,
->-                                      void *opaque)
->-{
->-    return qed_aio_setup(bs, sector_num, qiov, nb_sectors, cb, opaque, 0);
->+    if (!co.done) {
->+        qemu_coroutine_yield();
->+    }
->+
->+    return co.ret;
-> }
->
->-static BlockAIOCB *bdrv_qed_aio_writev(BlockDriverState *bs,
->-                                       int64_t sector_num,
->-                                       QEMUIOVector *qiov, int nb_sectors,
->-                                       BlockCompletionFunc *cb,
->-                                       void *opaque)
->+static int coroutine_fn bdrv_qed_co_readv(BlockDriverState *bs,
->+                                          int64_t sector_num, int nb_sect=
-ors,
->+                                          QEMUIOVector *qiov)
-> {
->-    return qed_aio_setup(bs, sector_num, qiov, nb_sectors, cb,
->-                         opaque, QED_AIOCB_WRITE);
->+    return qed_co_request(bs, sector_num, qiov, nb_sectors, 0);
-> }
->
->-typedef struct {
->-    Coroutine *co;
->-    int ret;
->-    bool done;
->-} QEDWriteZeroesCB;
->-
->-static void coroutine_fn qed_co_pwrite_zeroes_cb(void *opaque, int ret)
->+static int coroutine_fn bdrv_qed_co_writev(BlockDriverState *bs,
->+                                           int64_t sector_num, int nb_sec=
-tors,
->+                                           QEMUIOVector *qiov)
-> {
->-    QEDWriteZeroesCB *cb =3D opaque;
->-
->-    cb->done =3D true;
->-    cb->ret =3D ret;
->-    if (cb->co) {
->-        aio_co_wake(cb->co);
->-    }
->+    return qed_co_request(bs, sector_num, qiov, nb_sectors, QED_AIOCB_WRI=
-TE);
-> }
->
-> static int coroutine_fn bdrv_qed_co_pwrite_zeroes(BlockDriverState *bs,
->@@ -1388,9 +1387,7 @@ static int coroutine_fn bdrv_qed_co_pwrite_zeroes(Bl=
-ockDriverState *bs,
->                                                   int count,
->                                                   BdrvRequestFlags flags)
-> {
->-    BlockAIOCB *blockacb;
->     BDRVQEDState *s =3D bs->opaque;
->-    QEDWriteZeroesCB cb =3D { .done =3D false };
->     QEMUIOVector qiov;
->     struct iovec iov;
->
->@@ -1407,19 +1404,9 @@ static int coroutine_fn bdrv_qed_co_pwrite_zeroes(B=
-lockDriverState *bs,
->     iov.iov_len =3D count;
->
+>@@ -116,7 +116,7 @@ static int coroutine_fn qed_write_header(BDRVQEDState =
+*s)
+>     };
 >     qemu_iovec_init_external(&qiov, &iov, 1);
->-    blockacb =3D qed_aio_setup(bs, offset >> BDRV_SECTOR_BITS, &qiov,
->-                             count >> BDRV_SECTOR_BITS,
->-                             qed_co_pwrite_zeroes_cb, &cb,
->-                             QED_AIOCB_WRITE | QED_AIOCB_ZERO);
->-    if (!blockacb) {
->-        return -EIO;
->-    }
->-    if (!cb.done) {
->-        cb.co =3D qemu_coroutine_self();
->-        qemu_coroutine_yield();
->-    }
->-    assert(cb.done);
->-    return cb.ret;
->+    return qed_co_request(bs, offset >> BDRV_SECTOR_BITS, &qiov,
->+                          count >> BDRV_SECTOR_BITS,
->+                          QED_AIOCB_WRITE | QED_AIOCB_ZERO);
-> }
 >
-> static int bdrv_qed_truncate(BlockDriverState *bs, int64_t offset, Error =
-**errp)
->@@ -1615,8 +1602,8 @@ static BlockDriver bdrv_qed =3D {
->     .bdrv_create              =3D bdrv_qed_create,
->     .bdrv_has_zero_init       =3D bdrv_has_zero_init_1,
->     .bdrv_co_get_block_status =3D bdrv_qed_co_get_block_status,
->-    .bdrv_aio_readv           =3D bdrv_qed_aio_readv,
->-    .bdrv_aio_writev          =3D bdrv_qed_aio_writev,
->+    .bdrv_co_readv            =3D bdrv_qed_co_readv,
->+    .bdrv_co_writev           =3D bdrv_qed_co_writev,
->     .bdrv_co_pwrite_zeroes    =3D bdrv_qed_co_pwrite_zeroes,
->     .bdrv_truncate            =3D bdrv_qed_truncate,
->     .bdrv_getlength           =3D bdrv_qed_getlength,
+>-    ret =3D bdrv_preadv(s->bs->file, 0, &qiov);
+>+    ret =3D bdrv_co_preadv(s->bs->file, 0, qiov.size, &qiov, 0);
+>     if (ret < 0) {
+>         goto out;
+>     }
+>@@ -124,7 +124,7 @@ static int coroutine_fn qed_write_header(BDRVQEDState =
+*s)
+>     /* Update header */
+>     qed_header_cpu_to_le(&s->header, (QEDHeader *) buf);
+>
+>-    ret =3D bdrv_pwritev(s->bs->file, 0, &qiov);
+>+    ret =3D bdrv_co_pwritev(s->bs->file, 0, qiov.size,  &qiov, 0);
+>     if (ret < 0) {
+>         goto out;
+>     }
+>@@ -796,7 +796,7 @@ static int coroutine_fn qed_read_backing_file(BDRVQEDS=
+tate *s, uint64_t pos,
+>     qemu_iovec_concat(*backing_qiov, qiov, 0, size);
+>
+>     BLKDBG_EVENT(s->bs->file, BLKDBG_READ_BACKING_AIO);
+>-    ret =3D bdrv_preadv(s->bs->backing, pos, *backing_qiov);
+>+    ret =3D bdrv_co_preadv(s->bs->backing, pos, size, *backing_qiov, 0);
+>     if (ret < 0) {
+>         return ret;
+>     }
+>@@ -844,7 +844,7 @@ static int coroutine_fn qed_copy_from_backing_file(BDR=
+VQEDState *s,
+>     }
+>
+>     BLKDBG_EVENT(s->bs->file, BLKDBG_COW_WRITE);
+>-    ret =3D bdrv_pwritev(s->bs->file, offset, &qiov);
+>+    ret =3D bdrv_co_pwritev(s->bs->file, offset, qiov.size, &qiov, 0);
+>     if (ret < 0) {
+>         goto out;
+>     }
+>@@ -987,7 +987,8 @@ static int coroutine_fn qed_aio_write_main(QEDAIOCB *a=
+cb)
+>     trace_qed_aio_write_main(s, acb, 0, offset, acb->cur_qiov.size);
+>
+>     BLKDBG_EVENT(s->bs->file, BLKDBG_WRITE_AIO);
+>-    ret =3D bdrv_pwritev(s->bs->file, offset, &acb->cur_qiov);
+>+    ret =3D bdrv_co_pwritev(s->bs->file, offset, acb->cur_qiov.size,
+>+                          &acb->cur_qiov, 0);
+>     if (ret < 0) {
+>         return ret;
+>     }
+>@@ -1004,7 +1005,7 @@ static int coroutine_fn qed_aio_write_main(QEDAIOCB =
+*acb)
+>              * region.  The solution is to flush after writing a new data
+>              * cluster and before updating the L2 table.
+>              */
+>-            ret =3D bdrv_flush(s->bs->file->bs);
+>+            ret =3D bdrv_co_flush(s->bs->file->bs);
+>             if (ret < 0) {
+>                 return ret;
+>             }
+>@@ -1221,7 +1222,8 @@ static int coroutine_fn qed_aio_read_data(void *opaq=
+ue, int ret,
+>     }
+>
+>     BLKDBG_EVENT(bs->file, BLKDBG_READ_AIO);
+>-    ret =3D bdrv_preadv(bs->file, offset, &acb->cur_qiov);
+>+    ret =3D bdrv_co_preadv(bs->file, offset, acb->cur_qiov.size,
+>+                         &acb->cur_qiov, 0);
+>     if (ret < 0) {
+>         return ret;
+>     }
 >--=20
 >1.8.3.1
 >
 >
 >
 
---ty3civrrgn3cmx7m
+--dqmu2bqtz4upvyag
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAllFFCkACgkQc2J8L2kN
-9xCmihAAxAqropvsW51a5BFHcxLtXnQ3S5kQu5YrwCVfQnEsEQ4r5h6cHIJHP+Lg
-pno9JuplmIRt9Zm2SUtxAQ9NA7oXg2fXKwk4vYs/QtsfWlw97taT1fvtYwI6ZJZ3
-+pdrASZmuXPlu68l/KrKJ+NpVKdgccSkP/PdA454xk0wf05jtD2eh/sDKx6GNFK0
-Y+vyTrpRjc+nKlFG9f3Rj1CpNtOvRjrid1HcG29LnAo1uagcfdGIPNXIO92PylBU
-CIvTEXHGzvWniIeoBX7V7F70yRXa0bEDCGz28+YrR44scEqs4g8bZkzCOjNqUlSp
-5fz+iPEKyaNyEDt/G5OB6HEA12dqU5HrglQCNQdCA/JUL4rJAjBTs+kbjmqWmjK3
-zvgG0A08fvcwzbvwII9pe47cg3YB58dhAZblR9usrz7HTe0MpuNzVdk46lBBsZlk
-ue7evj5nV/NTWh/AgNJTi2N07L+kPp9asH4T1+1L4XvIKNKnbzL/OMyvpJCaRiBb
-mTleqPoLOeqF8pZsRgIZt/8sOsVUKeVsuzT9OzAEx18is56uhkItYKXmTxnbwvoi
-nJebA2brnCB+GVbKC5paVQqRdgv4gI2RmIaEaEwU541ZrnYBUcjbv6E69qpChWFv
-u8SwNKKmtDPWMmg5awsX+dshECxqbu0lnjMz+nDxaRTiiDk4fnk=
-=E5g1
+iQIzBAABCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAllFFU0ACgkQc2J8L2kN
+9xAxBBAAgM/tCulien/Ffy2+cbSDh3rGzYTwB3r57GBFU69EbUinsWZmEpScDCrb
+gEjVmXQNlQoKytFU1Aj0gDGEj7msE7I61KC6RjkKxVIhNsB3DpykR6gedXqT05Hp
+6/aiZXtNot6WEjdfJGq7d4+N4iImLRcq91Vvrtg9f1gCVFPmKtjZfj0fORgzsTP+
+sLUK+Q/FKCVNOFcrY5L8fOzgYe5FfiwcEBEGs5RiLAaDQEdSnx+v0lK24LAF82co
+Jyo38bfk420Xq4DepgX4BaWbQ3u/HWE+ZMuycXxRl2M6tG4sNWnHgSIbFW/7uDQX
+8sNT28BeagOK1bgSlk+mHam///O1LRpwd4KVABE+Sa3ZthJ1MjAxR/3hUZiU//RJ
+Bh4tT0f+a3c+bKfLWt4ZzUzYKS6t2DnnzjQz9Vit/bNdxCxi+EDx9i6H9ii3njvF
+JpBeEm7+HgqrdlfcgAQj/bP4q3wRQNlUyIvyhBlijONwetfCQforniO9z6EpS0T7
+F0Du+Vx7l0LdMCJvo2DSJK4Ux430mn70ZRodkXlWRfTQBUAraTXpXXDr/3k68JuS
+h+/9kxtw5sWcIULd362b7r6jfRJxIeFXFiKyX+9XqE+cQq/fq765qv2xq+IBc8TN
+4rMEtaKFNslDCPkS7waduyhHZAsFlNxw4rEDBhMMmds961DckJA=
+=LIQY
 -----END PGP SIGNATURE-----
 
---ty3civrrgn3cmx7m--
+--dqmu2bqtz4upvyag--
