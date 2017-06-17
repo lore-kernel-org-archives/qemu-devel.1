@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dMC6G-0001NO-77
-	for qemu-devel@nongnu.org; Sat, 17 Jun 2017 07:41:09 -0400
+	(envelope-from <lersek@redhat.com>) id 1dMGxB-0004me-Lg
+	for qemu-devel@nongnu.org; Sat, 17 Jun 2017 12:52:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dMC6B-0006ar-A8
-	for qemu-devel@nongnu.org; Sat, 17 Jun 2017 07:41:08 -0400
-Date: Sat, 17 Jun 2017 14:41:01 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170617114101.767vztiyl5xy7qoh@postretch>
-References: <1497634636-20230-1-git-send-email-kwolf@redhat.com>
-	<1497634636-20230-31-git-send-email-kwolf@redhat.com>
+	(envelope-from <lersek@redhat.com>) id 1dMGx6-00005D-SN
+	for qemu-devel@nongnu.org; Sat, 17 Jun 2017 12:52:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57008)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dMGx6-0008WF-JR
+	for qemu-devel@nongnu.org; Sat, 17 Jun 2017 12:52:00 -0400
+References: <5d090b82-dae7-ac67-a032-92c2e776b70f@univention.de>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <2e7e9fe3-e603-d75f-84c6-d0fb048266da@redhat.com>
+Date: Sat, 17 Jun 2017 18:51:56 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="dqmu2bqtz4upvyag"
-Content-Disposition: inline
-In-Reply-To: <1497634636-20230-31-git-send-email-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 30/31] qed: Use bdrv_co_*
- for coroutine_fns
+In-Reply-To: <5d090b82-dae7-ac67-a032-92c2e776b70f@univention.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFH] qemu-2.6 memory corruption with OVMF and
+ linux-4.9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,126 +28,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, pbonzini@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com
+To: Philipp Hahn <hahn@univention.de>
+Cc: qemu-devel@nongnu.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Peter Jones <pjones@redhat.com>, linux-fbdev@vger.kernel.org
 
+On 06/16/17 19:03, Philipp Hahn wrote:
 
---dqmu2bqtz4upvyag
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Comparing the corrupted (left) with the supposed (right) driver shows
+> the following pattern:
+>> /tmp/uefi.bin [+]                                   15038,1      Alles /tmp/uefi.ko [+]                                    15038,1      Alles
+>>   003ac00: e801 0000 0000 0000 3c00 0000 1700 0000  ........<.......  |  003ac00: e801 0000 0000 0000 5e8c 0000 1000 f1ff  ........^.......
+>>   003ac10: 785b 3e8a 0000 0000 3c00 0000 0700 0000  x[>.....<.......  |  003ac10: 785b 3e8a 0000 0000 0000 0000 0000 0000  x[>.............
+>>   003ac20: 778c 0000 1200 0200 3c00 0000 0700 0000  w.......<.......  |  003ac20: 778c 0000 1200 0200 f018 0000 0000 0000  w...............
+>>   003ac30: 1e00 0000 0000 0000 3c00 0000 1700 0000  ........<.......  |  003ac30: 1e00 0000 0000 0000 8c8c 0000 1200 0200  ................
+>>   003ac40: 7007 0000 0000 0000 3c00 0000 0700 0000  p.......<.......  |  003ac40: 7007 0000 0000 0000 1400 0000 0000 0000  p...............
+>>   003ac50: 9c8c 0000 1200 0200 3c00 0000 0700 0000  ........<.......  |  003ac50: 9c8c 0000 1200 0200 0022 0000 0000 0000  ........."......
+>>   003ac60: 4000 0000 0000 0000 3c00 0000 1700 0000  @.......<.......  |  003ac60: 4000 0000 0000 0000 ac8c 0000 1000 f1ff  @...............
 
-Reviewed-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Let me give you a different visual representation. First good, then bad.
 
-On Fri, Jun 16, 2017 at 07:37:15PM +0200, Kevin Wolf wrote:
->All functions that are marked coroutine_fn can directly call the
->bdrv_co_* version of functions instead of going through the wrapper.
->
->Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->---
-> block/qed.c | 16 +++++++++-------
-> 1 file changed, 9 insertions(+), 7 deletions(-)
->
->diff --git a/block/qed.c b/block/qed.c
->index 48f2b0e..c073baa 100644
->--- a/block/qed.c
->+++ b/block/qed.c
->@@ -116,7 +116,7 @@ static int coroutine_fn qed_write_header(BDRVQEDState =
-*s)
->     };
->     qemu_iovec_init_external(&qiov, &iov, 1);
->
->-    ret =3D bdrv_preadv(s->bs->file, 0, &qiov);
->+    ret =3D bdrv_co_preadv(s->bs->file, 0, qiov.size, &qiov, 0);
->     if (ret < 0) {
->         goto out;
->     }
->@@ -124,7 +124,7 @@ static int coroutine_fn qed_write_header(BDRVQEDState =
-*s)
->     /* Update header */
->     qed_header_cpu_to_le(&s->header, (QEDHeader *) buf);
->
->-    ret =3D bdrv_pwritev(s->bs->file, 0, &qiov);
->+    ret =3D bdrv_co_pwritev(s->bs->file, 0, qiov.size,  &qiov, 0);
->     if (ret < 0) {
->         goto out;
->     }
->@@ -796,7 +796,7 @@ static int coroutine_fn qed_read_backing_file(BDRVQEDS=
-tate *s, uint64_t pos,
->     qemu_iovec_concat(*backing_qiov, qiov, 0, size);
->
->     BLKDBG_EVENT(s->bs->file, BLKDBG_READ_BACKING_AIO);
->-    ret =3D bdrv_preadv(s->bs->backing, pos, *backing_qiov);
->+    ret =3D bdrv_co_preadv(s->bs->backing, pos, size, *backing_qiov, 0);
->     if (ret < 0) {
->         return ret;
->     }
->@@ -844,7 +844,7 @@ static int coroutine_fn qed_copy_from_backing_file(BDR=
-VQEDState *s,
->     }
->
->     BLKDBG_EVENT(s->bs->file, BLKDBG_COW_WRITE);
->-    ret =3D bdrv_pwritev(s->bs->file, offset, &qiov);
->+    ret =3D bdrv_co_pwritev(s->bs->file, offset, qiov.size, &qiov, 0);
->     if (ret < 0) {
->         goto out;
->     }
->@@ -987,7 +987,8 @@ static int coroutine_fn qed_aio_write_main(QEDAIOCB *a=
-cb)
->     trace_qed_aio_write_main(s, acb, 0, offset, acb->cur_qiov.size);
->
->     BLKDBG_EVENT(s->bs->file, BLKDBG_WRITE_AIO);
->-    ret =3D bdrv_pwritev(s->bs->file, offset, &acb->cur_qiov);
->+    ret =3D bdrv_co_pwritev(s->bs->file, offset, acb->cur_qiov.size,
->+                          &acb->cur_qiov, 0);
->     if (ret < 0) {
->         return ret;
->     }
->@@ -1004,7 +1005,7 @@ static int coroutine_fn qed_aio_write_main(QEDAIOCB =
-*acb)
->              * region.  The solution is to flush after writing a new data
->              * cluster and before updating the L2 table.
->              */
->-            ret =3D bdrv_flush(s->bs->file->bs);
->+            ret =3D bdrv_co_flush(s->bs->file->bs);
->             if (ret < 0) {
->                 return ret;
->             }
->@@ -1221,7 +1222,8 @@ static int coroutine_fn qed_aio_read_data(void *opaq=
-ue, int ret,
->     }
->
->     BLKDBG_EVENT(bs->file, BLKDBG_READ_AIO);
->-    ret =3D bdrv_preadv(bs->file, offset, &acb->cur_qiov);
->+    ret =3D bdrv_co_preadv(bs->file, offset, acb->cur_qiov.size,
->+                         &acb->cur_qiov, 0);
->     if (ret < 0) {
->         return ret;
->     }
->--=20
->1.8.3.1
->
->
->
+(I also recommend using the "vbindiff" tool for such problems, it is
+great for picking out patterns.)
 
---dqmu2bqtz4upvyag
-Content-Type: application/pgp-signature; name="signature.asc"
+          ** ** ** ** ** ** ** **   8  9 ** ** ** 13 14 15
+          -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- --
+00000000  01 e8 00 00 00 00 00 00  8c 5e 00 00 00 10 ff f1
+00000010  5b 78 8a 3e 00 00 00 00  00 00 00 00 00 00 00 00
+00000020  8c 77 00 00 00 12 00 02  18 f0 00 00 00 00 00 00
+00000030  00 1e 00 00 00 00 00 00  8c 8c 00 00 00 12 00 02
+00000040  07 70 00 00 00 00 00 00  00 14 00 00 00 00 00 00
+00000050  8c 9c 00 00 00 12 00 02  22 00 00 00 00 00 00 00
+00000060  00 40 00 00 00 00 00 00  8c ac 00 00 00 10 ff f1
 
------BEGIN PGP SIGNATURE-----
+00000000  01 e8 00 00 00 00 00 00  00 3c 00 00 00 17 00 00
+00000010  5b 78 8a 3e 00 00 00 00  00 3c 00 00 00 07 00 00
+00000020  8c 77 00 00 00 12 00 02  00 3c 00 00 00 07 00 00
+00000030  00 1e 00 00 00 00 00 00  00 3c 00 00 00 17 00 00
+00000040  07 70 00 00 00 00 00 00  00 3c 00 00 00 07 00 00
+00000050  8c 9c 00 00 00 12 00 02  00 3c 00 00 00 07 00 00
+00000060  00 40 00 00 00 00 00 00  00 3c 00 00 00 17 00 00
+          -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- --
+          ** ** ** ** ** ** ** **   8  9 ** ** ** 13 14 15
 
-iQIzBAABCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAllFFU0ACgkQc2J8L2kN
-9xAxBBAAgM/tCulien/Ffy2+cbSDh3rGzYTwB3r57GBFU69EbUinsWZmEpScDCrb
-gEjVmXQNlQoKytFU1Aj0gDGEj7msE7I61KC6RjkKxVIhNsB3DpykR6gedXqT05Hp
-6/aiZXtNot6WEjdfJGq7d4+N4iImLRcq91Vvrtg9f1gCVFPmKtjZfj0fORgzsTP+
-sLUK+Q/FKCVNOFcrY5L8fOzgYe5FfiwcEBEGs5RiLAaDQEdSnx+v0lK24LAF82co
-Jyo38bfk420Xq4DepgX4BaWbQ3u/HWE+ZMuycXxRl2M6tG4sNWnHgSIbFW/7uDQX
-8sNT28BeagOK1bgSlk+mHam///O1LRpwd4KVABE+Sa3ZthJ1MjAxR/3hUZiU//RJ
-Bh4tT0f+a3c+bKfLWt4ZzUzYKS6t2DnnzjQz9Vit/bNdxCxi+EDx9i6H9ii3njvF
-JpBeEm7+HgqrdlfcgAQj/bP4q3wRQNlUyIvyhBlijONwetfCQforniO9z6EpS0T7
-F0Du+Vx7l0LdMCJvo2DSJK4Ux430mn70ZRodkXlWRfTQBUAraTXpXXDr/3k68JuS
-h+/9kxtw5sWcIULd362b7r6jfRJxIeFXFiKyX+9XqE+cQq/fq765qv2xq+IBc8TN
-4rMEtaKFNslDCPkS7waduyhHZAsFlNxw4rEDBhMMmds961DckJA=
-=LIQY
------END PGP SIGNATURE-----
+The columns that I marked with "**" are identical between "good" and
+"bad". (These are columns 0-7, 10-12.)
 
---dqmu2bqtz4upvyag--
+Column 8 is overwritten by zeros (every 16th byte).
+
+Column 9 is overwritten by 0x3c (every 16th byte).
+
+Column 13 is super interesting. The most significant nibble in that
+column is not disturbed. And, in the least significant nibble, the least
+significant three bits are turned on. Basically, the corruption could be
+described, for this column (i.e., every 16th byte), as
+
+  bad = good | 0x7
+
+Column 14 is overwritten by zeros (every 16th byte).
+
+Column 15 is overwritten by zeros (every 16th byte).
+
+My take is that your host machine has faulty RAM. Please run memtest86+
+or something similar.
+
+Thanks
+Laszlo
