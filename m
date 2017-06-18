@@ -1,13 +1,13 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32970)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dMXmS-0004g6-Lx
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 06:50:10 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dMXmU-0004hU-9V
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 06:50:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dMXmQ-00069a-AW
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 06:50:08 -0400
-Date: Sun, 18 Jun 2017 18:24:22 +0800
+	(envelope-from <dgibson@ozlabs.org>) id 1dMXmQ-00069Z-A9
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 06:50:10 -0400
+Date: Sun, 18 Jun 2017 17:59:33 +0800
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170618102422.GD22449@umbus>
+Message-ID: <20170618095933.GC22449@umbus>
 References: <20170530160445.12810-1-lvivier@redhat.com>
 	<20170531043557.GI12163@umbus.fritz.box>
 	<149695205346.23353.3484869110998357783@loki>
@@ -16,12 +16,13 @@ References: <20170530160445.12810-1-lvivier@redhat.com>
 	<20170614110001.7816209b@nial.brq.redhat.com>
 	<149748643237.3448.7122634958390452661@loki>
 	<20170616155312.623f859e@nial.brq.redhat.com>
-	<149763356603.3448.7721371395232026174@loki>
+	<20170616144053.GH30484@umbus>
+	<149762974633.3448.430788338392037467@loki>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="gE7i1rD7pdK0Ng3j"
+	protocol="application/pgp-signature"; boundary="ABTtc+pdwF7KHXCz"
 Content-Disposition: inline
-In-Reply-To: <149763356603.3448.7721371395232026174@loki>
+In-Reply-To: <149762974633.3448.430788338392037467@loki>
 Subject: Re: [Qemu-devel] [PATCH] spapr: manage hotplugged devices while the
  VM is not started
 List-Id: <qemu-devel.nongnu.org>
@@ -36,342 +37,311 @@ To: Michael Roth <mdroth@linux.vnet.ibm.com>
 Cc: Igor Mammedov <imammedo@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
 
---gE7i1rD7pdK0Ng3j
+--ABTtc+pdwF7KHXCz
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 16, 2017 at 12:19:26PM -0500, Michael Roth wrote:
-> Quoting Igor Mammedov (2017-06-16 08:53:12)
-> > On Wed, 14 Jun 2017 19:27:12 -0500
-> > Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
-> >=20
-> > > Quoting Igor Mammedov (2017-06-14 04:00:01)
-> > > > On Tue, 13 Jun 2017 16:42:45 -0500
-> > > > Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
-> > > >  =20
-> > > > > Quoting Igor Mammedov (2017-06-09 03:27:33) =20
-> > [...]
-> >=20
-> > > > Currently I'd suggest to look into always migrate DRCs if cpu hotpl=
-ug
-> > > > is enabled even if dev->hotplugged is false (not nice but it might =
-work).
-> > > > Consider:
-> > > >   SRC1: hotplug CPU1 =3D> CPU1.hotplugged =3D true
-> > > >   DST1: -device CPU1 =3D> CPU1.hotplugged =3D false
-> > > > so in current code relying on CPU1.hotplugged would not work as exp=
-ected,
-> > > > it works by accident because libvirt uses device_add on target
-> > > >   DST1: device_add CPU1 =3D> CPU1.hotplugged =3D true =20
+On Fri, Jun 16, 2017 at 11:15:46AM -0500, Michael Roth wrote:
+> Quoting David Gibson (2017-06-16 09:40:53)
+> > On Fri, Jun 16, 2017 at 03:53:12PM +0200, Igor Mammedov wrote:
+> > > On Wed, 14 Jun 2017 19:27:12 -0500
+> > > Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
 > > >=20
-> > > It's actually the reverse for us, DST1: -device CPU1 works, because
-> > > default DRC state for CPU1.hotplugged =3D false matches the state a
-> > > hotplugged CPU will be brought to after onlining at the source, so
-> > > we don't send it over the wire in the first place once it reaches
-> > > that post-hotplug/coldplug state. So things work as expected, even
-> > > though technically the source has dev->hotplugged =3D=3D true, whereas
-> > > the dest has dev->hotplugged =3D=3D false.
-> > in your case it seems fragile to rely on -device setting hotplugged cpu
-> > on target the way you want.
->=20
-> Well, it's fragile in the sense that we try to assume post-hotplug =3D=3D
-> coldplug as a way to avoid migrating hotplugged devices in some cases.
-> This was mostly done to allow for backward-compatibility without
-> relying on machine-specific behavior, but I have no problem with just
-> always migrating DRC state for hotplugged devices.
->=20
-> But that still leaves the following issue: on the source, we want to
-> assume the default DRC state is coldplugged state. Based on that,
-> we just migrate the hotplugged DRCs and everything would be fine,
-> since we assume the target will initially put the DRC state in the
-> coldplug state for all DRCs, same way it would for -device cpu/etc.
->=20
-> But device_add on the target doesn't behave this way, it defaults to
-> hotplugged state. It doesn't matter if the device is still in a hotplug
-> state on the source, even if we reset the machine on the source side
-> before migrating, device_add would still default to dev->hotplugged,
-> and -device would still default to !dev->hotplugged.
->=20
-> So we can't just send hotplugged DRCs, nor can we just send coldplugged
-> DRCs, because there's no consistency in what the initial starting state
-> will be on the dest. If they use -device to specify it it does one
-> thing, if they use device_add it does another. So we're still stuck
-> sending *all* DRCs.
->=20
-> So addressing that inconsistency is the key issue I think.
-
-I think that trying to do this in terms of dev->hotplugged is a
-mistake.  That's really more about the device's history than its
-current state.
-
-What we want to detect is when the DRC is in a "transitional" state.
-Basically if no hotplug processing is ongoing, a DRC should be in one
-of two states:
-
-A) DRC in UNUSABLE/ISOLATED state, no device plugged.
-
-B) DRC in CONFIGURED state, device plugged.
-
-Coldplugged devices go straight to state (B), an "empty" DRC is in
-state (A).  When something is hotplugged the DRCs go through a few
-transitional states, before arriving at state (B).  Likewise when
-something is unplugged, there are various transitions, and then it
-reaches state (A).
-
-This is the common case, of course; if the guest is doing something
-unusual, a "transitional" state can last arbitrarily long.
-
-So, I think we always need to transfer DRC state if it's anything
-other than (A) or (B).  On the destination, we determine starting
-state (A) or (B) depending on whether a device is plugged (my reset
-patch in DRC cleanups Part IV will already do this, I think).
-
-No reference to, or manipulation of, dev->hotplugged is necessary.
-
-> > it could be:
-> >=20
-> > SRC: hotplug CPU and start migration with DST: -device cpu[,hotplugged=
-=3Dfalse]
-> >   *: machine is in hotplugging state and one would lose transitional st=
-ate if DRC is not migrated.
->=20
-> In this case we'd actually check to see that the DRC is in a transitional
-> state via .needed and migrate it. It's only when we've concluded that
-> the state is identical to coldplug state that we don't send it.
->=20
-> But as mentioned above, this is more of an optimization, even if we
-> just always send DRC's for hotplugged devices, things are still broken,
-> and we need a reliable way to infer the starting state of devices on
-> the dest to fix them.
->=20
-> >=20
-> > > It's the DST1: device_add case that wasn't accounted for when the DRC
-> > > migration patches were written, as those don't default to coldplug,
-> > > so, because the source doesn't send it, it ends up being presented
-> > > in pre-hotplug state because the dest doesn't know that the guest
-> > > already onlined the resource and transitioned it to
-> > > post-hotplug/coldplug state. Ironically, dev->hotplugged
-> > > is true on both source and dest in this case, but it ends up being
-> > > the broken one.
-> > it looks like for hotplugged CPUs DRC state should be always migrated
->=20
-> That would fix this case, but even if we adopt that approach we still
-> have this scenario that's broken:
->=20
-> SRC: hotplug CPU, reboot, CPU is now in a coldplugged state, so we don't
->      migrate it
-> DST: device_add CPU, currently this defaults to dev->hotplugged =3D=3D tr=
-ue,
->      so this incorrectly gets exposed to the guest as being in a
->      transitional state.
->=20
-> This all stems from pre-start device_add semantics not aligning with
-> cmdline-specified ones.
-
-Right, we can fix this if we reset all DRC states based on device
-presence before processing the incoming migration.
-
->=20
-> >=20
-> >=20
-> > > But your point stands, the fact that both situations are possible
-> > > means we can't currently rely on dev->hotplugged without migrating
-> > > it, infering it based on QEMU lifecycle, or forcing management to
-> > > set it.
+> > > > Quoting Igor Mammedov (2017-06-14 04:00:01)
+> > > > > On Tue, 13 Jun 2017 16:42:45 -0500
+> > > > > Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+> > > > >  =20
+> > > > > > Quoting Igor Mammedov (2017-06-09 03:27:33) =20
+> > > [...]
 > > >=20
-> > > But that raises a 2nd point. Our dilemma isn't that we can't
-> > > rely on dev->hotplugged being synchronized (though if it
-> > > was we could build something around that), our dilemma is
-> > > that we make the following assumption in our code:
-> > >=20
-> > > "Devices present at start-time will be handled the same way,
-> > > on source or dest, regardless of whether they were added via
-> > > cmdline or via device_add prior to machine start / migration
-> > > stream processing."
-> > >=20
-> > > And I think that's a sensible expectation, since in theory
-> > > even the source could build up a machine via device_add
-> > > prior to starting it, and the reasonable default there is
-> > > dev->hotplugged =3D false rather than the opposite. That
-> > > suggests a need to fix things outside of migration.
-> > Agreed to a degree, i.e.
-> >=20
-> >   -device/device_add before machine has been started
-> > without migration should follow coldplug path
->=20
-> I really feel like adopting this for the migration case as
-> well is the cleanest solution. AFAICT none of the migration
-> code really cares about synchronizing dev->hotplugged,
-> something as simple as:
->=20
-> SRC: device_add virtio-net-pci
-> DST: -device virtio-net-pci
->=20
-> results in a mismatch between dev->hotplugged. But the migration
-> code doesn't really care, it's all based around knowledge of
-> what the initial starting state of the device on DST will be.
->=20
-> Now that we cases where device_add might be used instead of
-> -device on DST, we no longer have that knowledge on the source.
-> Having device_add-before-start match existing cmdline behavior
-> seems like the most direct way to address this, and it seems
-> sensible since they ostensibly serve the exact same purpose.
-
-Come to think of it, I'm not sure we should really have any tests of
-dev->hotplugged in our hotplug paths.  If we put everything into
-"hotplugged" state, but the reset converts already attached things to
-coldplug state, I think that should cover it, yes?
-
-Maybe we need to omit notifications with !dev->hotplugged, although
-even then we should flush the event queue on reset.
-
-> > it shouldn't cause problems for CPU/mem hotplug on x86
-> > and maybe will work for PCI (it may change behavior of
-> > ACPI based hotplug and bridges),
-> > CCing Marcel to confirm.
-> >=20
-> >=20
-> > > So far, all QEMU's existing migration code has managed ok
-> > > with the dest being starting with dev->hotplugged =3D=3D false
-> > > via cmdline devices, even though maybe they were hotplugged
-> > > on the source. To me, it makes more sense to maintain this
-> > > behavior by fixing up this relatively new use-case of
-> > > adding devices via device_add before start to match the
-> > > same expectations we have around cmdline-specified devices.
-> > >=20
-> > > This would fix migration for spapr, leave it working for
-> > > everyone else (since that's basically what we expect for
-> > > everything except newer-style cpu hotplug), and also make
-> > > the device-add-before-start be truly synonymous with
-> > > cmdline-created devices (which is applicable even outside
-> > > of migration).
-> > Neither -device or device_add can't really bring DRC/CPU into
-> > the state that devices might be at the moment when their state
-> > is transferred to target.
-> >=20
-> > i.e. any state that has been changed after -device/device_add
-> > on SRC, should be in migration stream. I'd say even if state would
-> > eventually go back default (coldplugged) when hotplug is completed.
-> > So trying to avoid transmitting runtime state to optimize some bytes
-> > on migration stream is just asking for trouble.
-> >=20
-> > [...]
+> > > > > Currently I'd suggest to look into always migrate DRCs if cpu hot=
+plug
+> > > > > is enabled even if dev->hotplugged is false (not nice but it migh=
+t work).
+> > > > > Consider:
+> > > > >   SRC1: hotplug CPU1 =3D> CPU1.hotplugged =3D true
+> > > > >   DST1: -device CPU1 =3D> CPU1.hotplugged =3D false
+> > > > > so in current code relying on CPU1.hotplugged would not work as e=
+xpected,
+> > > > > it works by accident because libvirt uses device_add on target
+> > > > >   DST1: device_add CPU1 =3D> CPU1.hotplugged =3D true =20
 > > > >=20
-> > > > May be we should
-> > > >  1. make DeviceState:hotpluggable property write-able again
-> > > >  2. transmit DeviceState:hotpluggable as part of migration stream
-> > > >  3. add generic migration hook which will check if target and
-> > > >     source value match, if value differs =3D> fail/abort migration.
-> > > >  4. in case values mismatch mgmt will be forced to explicitly
-> > > >     provide hotplugged property value on -device/device_add
-> > > > That would enforce consistent DeviceState:hotpluggable value
-> > > > on target and source.
-> > > > We can enforce it only for new machine types so it won't break
-> > > > old mgmt tools with old machine types but would force mgmt
-> > > > for new machines to use hotplugged property on target
-> > > > so QEMU could rely on its value for migration purposes.
-> > > >  =20
+> > > > It's actually the reverse for us, DST1: -device CPU1 works, because
+> > > > default DRC state for CPU1.hotplugged =3D false matches the state a
+> > > > hotplugged CPU will be brought to after onlining at the source, so
+> > > > we don't send it over the wire in the first place once it reaches
+> > > > that post-hotplug/coldplug state. So things work as expected, even
+> > > > though technically the source has dev->hotplugged =3D=3D true, wher=
+eas
+> > > > the dest has dev->hotplugged =3D=3D false.
+> > > in your case it seems fragile to rely on -device setting hotplugged c=
+pu
+> > > on target the way you want.
 > > >=20
-> > > That would work, and generalizing this beyond spapr seems
-> > > appropriate.
+> > > it could be:
 > > >=20
-> > > It also has reasonable semantics, and it would work for us
-> > > *provided that* we always send DRC state for hotplugged devices
-> > > and not just DRCs in a transitional state:
-> > >=20
-> > > SRC1: device_add $cpu
-> > >  -> dev->hotplugged =3D=3D true
-> > >  -> device starts in pre-hotplug, ends up in post-hotplug state =20
-> > >     after guest onlines it
-> > > <migrate>
-> > > DST1: device_add $cpu,hotplugged=3Dtrue
-> > >  -> dev->hotplugged =3D=3D true
-> > >  -> device starts in pre-hotplug state. guest sends updated state =20
-> > >     to transition DRC to post-hotplug
-> > >=20
-> > > But what about stuff like mem/pci? Currently, migration works for
-> > > cases like:
-> > >=20
-> > > SRC1: device_add virtio-net-pci
-> > > DST1: qemu -device virtio-net-pci
-> > >=20
-> > > Even though DST1 has dev->hotplugged =3D=3D false, and SRC1 has the
-> > > opposite. So for new machines, checking SRC1:dev->hotplugged =3D=3D
-> > > DST1:dev->hotplugged would fail, even though the migration
-> > > scenario is unchanged from before.
-> > >=20
-> > > So management would now have to do:
-> > >=20
-> > > SRC1: device_add virtio-net-pci
-> > > DST1: qemu -device virtio-net-pci,hotplugged=3Dtrue
-> > >=20
-> > > But the code behavior is a bit different then, since we now get
-> > > an ACPI hotplug event via the hotplug handler. Maybe the
-> > > migration stream fixes that up for us, but I think we would need
-> > > to audit this and similar cases to be sure.
-> > >=20
-> > > That's all fine if it's necessary, but I feel like this is
-> > > the hard way to address what's actually a much more specific
-> > > issue: that device_add before machine-start doesn't currently
-> > > match the behavior for a device started via cmdline. i.e.
-> > > dev->hotplugged in the former vs. !dev->hotplugged in the
-> > > latter. I don't really see a good reason these 2 cases should
-> > > be different, and we can bring them to parity by doing
-> > > something like:
-> > >=20
-> > > 1. For device_adds after qdev_machine_creation_done(), but
-> > >    before machine start, set a flag: reset_before_start.
-> > > 2. At the start of processing migration stream, or unpausing
-> > >    a -S guest (in the non-migration case), issue a system-wide
-> > >    reset if reset_before_start is set.
-> > > 3. reset handlers will already unset dev->hotplugged at that
-> > >    point and re-execute all the hotplug hooks with
-> > >    dev->hotplugged =3D=3D false. This should put everything in
-> > >    a state that's identical to cmdline-created devices.
-> > instead of flag for non migration case we could use
-> >  RUN_STATE_PRELAUNCH -> RUN_STATE_RUNNING
-> > transition to reset all devices or
-> > maybe do something like this:
+> > > SRC: hotplug CPU and start migration with DST: -device cpu[,hotplugge=
+d=3Dfalse]
+> > >   *: machine is in hotplugging state and one would lose transitional =
+state if DRC is not migrated.
+> > > =20
+> > > > It's the DST1: device_add case that wasn't accounted for when the D=
+RC
+> > > > migration patches were written, as those don't default to coldplug,
+> > > > so, because the source doesn't send it, it ends up being presented
+> > > > in pre-hotplug state because the dest doesn't know that the guest
+> > > > already onlined the resource and transitioned it to
+> > > > post-hotplug/coldplug state. Ironically, dev->hotplugged
+> > > > is true on both source and dest in this case, but it ends up being
+> > > > the broken one.
+> > > it looks like for hotplugged CPUs DRC state should be always migrated
 > >=20
-> > diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> > index 0ce45a2..cdeb8f8 100644
-> > --- a/hw/core/qdev.c
-> > +++ b/hw/core/qdev.c
+> > Yeah, I think in the first instance we should just unconditionally
+> > transfer DRC state for newer machine types (at least once I clean up
+> > what exactly the DRC state _is_).  For old machine types things are
+> > still likely to be broken, but it won't be a regression.
 > >=20
-> > @@ -1020,7 +1010,7 @@ static void device_initfn(Object *obj)
-> >      ObjectClass *class;
-> >      Property *prop;
+> > If we can work out a way to fix things for older machine types, that's
+> > a bonus, but it looks like it's very difficult, maybe impossible.
+> > First priority should be sane semantics for the newer machine types.
 > >=20
-> > -    if (qdev_hotplug) {
-> > +    if (runstate_check(RUN_STATE_RUNNING) || ...) {
-> >          dev->hotplugged =3D 1;
-> >          qdev_hot_added =3D true;
-> >      }
+> > > > But your point stands, the fact that both situations are possible
+> > > > means we can't currently rely on dev->hotplugged without migrating
+> > > > it, infering it based on QEMU lifecycle, or forcing management to
+> > > > set it.
+> > > >=20
+> > > > But that raises a 2nd point. Our dilemma isn't that we can't
+> > > > rely on dev->hotplugged being synchronized (though if it
+> > > > was we could build something around that), our dilemma is
+> > > > that we make the following assumption in our code:
+> > > >=20
+> > > > "Devices present at start-time will be handled the same way,
+> > > > on source or dest, regardless of whether they were added via
+> > > > cmdline or via device_add prior to machine start / migration
+> > > > stream processing."
+> > > >=20
+> > > > And I think that's a sensible expectation, since in theory
+> > > > even the source could build up a machine via device_add
+> > > > prior to starting it, and the reasonable default there is
+> > > > dev->hotplugged =3D false rather than the opposite. That
+> > > > suggests a need to fix things outside of migration.
+> > > Agreed to a degree, i.e.
+> > >=20
+> > >   -device/device_add before machine has been started
+> > > without migration should follow coldplug path
+> > >=20
+> > > it shouldn't cause problems for CPU/mem hotplug on x86
+> > > and maybe will work for PCI (it may change behavior of
+> > > ACPI based hotplug and bridges),
+> > > CCing Marcel to confirm.
+> >=20
+> > So for ppc the main problem with early plugged devices is a
+> > duplication of device tree info between that delivered by CAS, and
+> > that delivered through configure-connector.  I see two basic
+> > approaches to fixing this:
+> >=20
+> > 1) At CAS, reset all DRCs before building the device tree to send to
+> > the guest.  That will essentially "convert" everything present at CAS
+> > time into coldplugged device.  There might still be a problem if there
+> > are existing hotplug events in the queue from before CAS.
+> >=20
+> > 2) When building the device tree (at both CAS and reset) check the DRC
+> > state, and omit DT information for anything that's not in CONFIGURED
+> > state.  That should be correct, because the guest should call
+> > configure-connector for anything not yet in CONFIGURED state, at which
+> > point it will get the DT information.
+> >=20
+> > I'm not sure which approach is best yet.  I'm not 100% sure of (1) is
+> > correct in all cases, but it is a bit simpler than (2).
 >=20
-> Yah that sort of approach (this would coincedentally address the
-> migration case as well, not sure if you are on board with that
-> approach or not) is what I initially had in mind. The
-> global flag seemed safer because we get a machine-wide reset
-> will all devices already plugged just like for cmdline, but I'm
-> not sure if that is really needed or not. This is definitely more
-> elegant though.
->=20
+> This fixes up devices added before CAS (whether via -device/device_add)
+> on the source, but at the time of migration we will have (usually)
+> already completed CAS. We also can't repeat the CAS-time fixups on the
+> target, because that would reset any DRC state sent via migration (which
+> would include things like transitional states outside of
+> post-hotplug/coldplug).
+
+Sorry, I wasn't clear.  The options above are for the problems with
+hotplug during early boot, they won't help migration cases.
+
+> So either we sent all DRC state (regardless of hotplug or not), or
+> we need a reliable starting state on the dest from which we can
+> determine what needs to be sent by the source. The 2 options are:
+
+So for new machine types, I think we should always send DRC state.
+
+> a) ensure all devices on the dest start off in a coldplug state, at
+>    point we can simply send DRC for anything hotplugged. This isn't
+>    the case now because device_add on the target results in the initial
+>    state being hotplug, where -device's are in coldplug. I'm proposing
+>    we ensure both these cases default coldplug state on the target if
+>    device_add occurs before the dest is started.
+
+I think that will become the case with my Part IV DRC cleanups.  IIRC,
+there is a system reset performed before processing the incoming
+migration.  With my DRC changes we reset the DRC state based only on
+the device presence at reset time.  Since the device will be
+hotplugged before the incoming migration, it should be reset to
+coldplug equivalent state.
+
+> b) ensure dev->hotplugged is in sync between src/dest by migrating it
+>    or forcing management to set it. Based on that knowledge, we can
+>    determine on the src side what the default state will be on the dest,
+>    and from that knowledge determine what state needs to be sent. Igor
+>    has suggested an approach for handling it this way.
+
+This sounds like a bad idea - I don't know what other effects altering
+this generic qemu state will have.
+
+> Personally I'm leaning toward a), since assuming that dest devices will
+> start in a coldplug state is basically what most of the migration code
+> already does (since up until fairly recently, the hotplugged devices
+> were generally specified via cmdline on the dest and not via
+> device_add)
+
+Yes, I agree.
+
+> > > > So far, all QEMU's existing migration code has managed ok
+> > > > with the dest being starting with dev->hotplugged =3D=3D false
+> > > > via cmdline devices, even though maybe they were hotplugged
+> > > > on the source. To me, it makes more sense to maintain this
+> > > > behavior by fixing up this relatively new use-case of
+> > > > adding devices via device_add before start to match the
+> > > > same expectations we have around cmdline-specified devices.
+> > > >=20
+> > > > This would fix migration for spapr, leave it working for
+> > > > everyone else (since that's basically what we expect for
+> > > > everything except newer-style cpu hotplug), and also make
+> > > > the device-add-before-start be truly synonymous with
+> > > > cmdline-created devices (which is applicable even outside
+> > > > of migration).
+> > > Neither -device or device_add can't really bring DRC/CPU into
+> > > the state that devices might be at the moment when their state
+> > > is transferred to target.
+> > >=20
+> > > i.e. any state that has been changed after -device/device_add
+> > > on SRC, should be in migration stream. I'd say even if state would
+> > > eventually go back default (coldplugged) when hotplug is completed.
+> > > So trying to avoid transmitting runtime state to optimize some bytes
+> > > on migration stream is just asking for trouble.
 > >=20
-> > > 4. Only allow management to do device_add before it sends
-> > >    the migration stream (if management doesn't already guard
-> > >    against this then it's probably a bug anyway)
-> > seems like Juan already took care of it.
->=20
-> Ok, good to know.
->=20
+> > Yeah, I'm coming to the same conclusion.  Note that the reason for
+> > omitting state wasn't to save space in the migration stream, but to
+> > make the stream compatible with older versions which never transmit
+> > the state - at least in as many cases as possible.
 > >=20
-> > > This allows management to treat device_add/cmdline as being
-> > > completely synonymous for guests that haven't started yet,
-> > > both for -incoming and -S in general, and it maintains
-> > > the behavior that existing migration code expects of
-> > > cmdline-specified devices.
+> > > [...]
+> > > > >=20
+> > > > > May be we should
+> > > > >  1. make DeviceState:hotpluggable property write-able again
+> > > > >  2. transmit DeviceState:hotpluggable as part of migration stream
+> > > > >  3. add generic migration hook which will check if target and
+> > > > >     source value match, if value differs =3D> fail/abort migratio=
+n.
+> > > > >  4. in case values mismatch mgmt will be forced to explicitly
+> > > > >     provide hotplugged property value on -device/device_add
+> > > > > That would enforce consistent DeviceState:hotpluggable value
+> > > > > on target and source.
+> > > > > We can enforce it only for new machine types so it won't break
+> > > > > old mgmt tools with old machine types but would force mgmt
+> > > > > for new machines to use hotplugged property on target
+> > > > > so QEMU could rely on its value for migration purposes.
+> > > > >  =20
+> > > >=20
+> > > > That would work, and generalizing this beyond spapr seems
+> > > > appropriate.
+> > > >=20
+> > > > It also has reasonable semantics, and it would work for us
+> > > > *provided that* we always send DRC state for hotplugged devices
+> > > > and not just DRCs in a transitional state:
+> > > >=20
+> > > > SRC1: device_add $cpu
+> > > >  -> dev->hotplugged =3D=3D true
+> > > >  -> device starts in pre-hotplug, ends up in post-hotplug state =20
+> > > >     after guest onlines it
+> > > > <migrate>
+> > > > DST1: device_add $cpu,hotplugged=3Dtrue
+> > > >  -> dev->hotplugged =3D=3D true
+> > > >  -> device starts in pre-hotplug state. guest sends updated state =
+=20
+> > > >     to transition DRC to post-hotplug
+> > > >=20
+> > > > But what about stuff like mem/pci? Currently, migration works for
+> > > > cases like:
+> > > >=20
+> > > > SRC1: device_add virtio-net-pci
+> > > > DST1: qemu -device virtio-net-pci
+> > > >=20
+> > > > Even though DST1 has dev->hotplugged =3D=3D false, and SRC1 has the
+> > > > opposite. So for new machines, checking SRC1:dev->hotplugged =3D=3D
+> > > > DST1:dev->hotplugged would fail, even though the migration
+> > > > scenario is unchanged from before.
+> > > >=20
+> > > > So management would now have to do:
+> > > >=20
+> > > > SRC1: device_add virtio-net-pci
+> > > > DST1: qemu -device virtio-net-pci,hotplugged=3Dtrue
+> > > >=20
+> > > > But the code behavior is a bit different then, since we now get
+> > > > an ACPI hotplug event via the hotplug handler. Maybe the
+> > > > migration stream fixes that up for us, but I think we would need
+> > > > to audit this and similar cases to be sure.
+> > > >=20
+> > > > That's all fine if it's necessary, but I feel like this is
+> > > > the hard way to address what's actually a much more specific
+> > > > issue: that device_add before machine-start doesn't currently
+> > > > match the behavior for a device started via cmdline. i.e.
+> > > > dev->hotplugged in the former vs. !dev->hotplugged in the
+> > > > latter. I don't really see a good reason these 2 cases should
+> > > > be different, and we can bring them to parity by doing
+> > > > something like:
+> > > >=20
+> > > > 1. For device_adds after qdev_machine_creation_done(), but
+> > > >    before machine start, set a flag: reset_before_start.
+> > > > 2. At the start of processing migration stream, or unpausing
+> > > >    a -S guest (in the non-migration case), issue a system-wide
+> > > >    reset if reset_before_start is set.
+> > > > 3. reset handlers will already unset dev->hotplugged at that
+> > > >    point and re-execute all the hotplug hooks with
+> > > >    dev->hotplugged =3D=3D false. This should put everything in
+> > > >    a state that's identical to cmdline-created devices.
+> > > instead of flag for non migration case we could use
+> > >  RUN_STATE_PRELAUNCH -> RUN_STATE_RUNNING
+> > > transition to reset all devices or
+> > > maybe do something like this:
 > >=20
+> > Hrm, does the general reset call happen now before or after this
+> > transition?  Resetting DRCs at CAS time should accomplish the same thin=
+g.
+> >=20
+> > > diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> > > index 0ce45a2..cdeb8f8 100644
+> > > --- a/hw/core/qdev.c
+> > > +++ b/hw/core/qdev.c
+> > >=20
+> > > @@ -1020,7 +1010,7 @@ static void device_initfn(Object *obj)
+> > >      ObjectClass *class;
+> > >      Property *prop;
+> > > =20
+> > > -    if (qdev_hotplug) {
+> > > +    if (runstate_check(RUN_STATE_RUNNING) || ...) {
+> > >          dev->hotplugged =3D 1;
+> > >          qdev_hot_added =3D true;
+> > >      }
+> > >=20
+> > > > 4. Only allow management to do device_add before it sends
+> > > >    the migration stream (if management doesn't already guard
+> > > >    against this then it's probably a bug anyway)
+> > > seems like Juan already took care of it.
+> > >=20
+> > > > This allows management to treat device_add/cmdline as being
+> > > > completely synonymous for guests that haven't started yet,
+> > > > both for -incoming and -S in general, and it maintains
+> > > > the behavior that existing migration code expects of
+> > > > cmdline-specified devices.
+> > >=20
+> > >=20
 > >=20
 >=20
 
@@ -381,25 +351,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---gE7i1rD7pdK0Ng3j
+--ABTtc+pdwF7KHXCz
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZRlTRAAoJEGw4ysog2bOS5n8QANOAfOdVFL4AkuTpcgm4oAa9
-y3tdNyxbjX+d/LAI2Jrfophe95itPWVPMXBvmF9glaE1XaMlEQ4La8Cr6ZYm8ghx
-cD68V6h532BCUNnwzZnZMW09uDQewYucdaMxwYDEWhvM3tlccUxdNrgB4HsxcLhc
-HXxyEdIx9WA4XpVIHS8i2j/VaKFlqWI6apbfFrYipfWNPgY1qWpXC0Kkhjer+MZv
-sr/Ht+zjwPW6sni1/q+p8uVQTgIzYm2ko14uOKlVWtQsAQWH42ITpIaxyD+sojfB
-hY/pyuUDrm97PKkTctxH4l7UI8hL6pKbqef1lMBKSYBq9gtEbHVdY4IxjVWTDhDd
-ZGPQ3uJ7aKUNGcduKiee+W2S24L0JCtHW8t+FwEfNg+p+7HuKfrKx1p94xzrzKUw
-lrPZY9sOKIr03ibrZUJzMIzZVvELu0s2jIsQsh/yu32CVtHO1FfBjQUCYZ7WasuR
-7m+LAGyWJEou6YHYdY8bYX/sbxnZtn1GOvKIUT3Gbe7isXvK+6QgX/DhuBVx1vcM
-Qk305gexvMSy/wK41dLtcn8IWoXRFQz016pZdx7eEq/nAmcl3gey+7SIJ8axBleM
-KlwiM/6KZwf/S3hXtejNpDRT8qZRBxUgFIKEpdRnwkfI57Z4/QzzJDeBjO6YP+H9
-KQRYtqtD4wTYgXPKiCdd
-=X8Cf
+iQIcBAEBCAAGBQJZRk8DAAoJEGw4ysog2bOSHGIP/ipg+mCcXDlnh16uVY3IM1Z8
+py5m+ArsUBi0vBIbWVh3nv60cp7jV//zZa48hF+LDAQ3lB4Lw1A3qyCeZmQXExAl
+PNSesoJJUsphoudtMn3dfLojXlPDl3XRGWCH8hkjQBOuvXiKEnxVS+X8ort/hw5W
+tXWjJZXR3IAd+GMVwtwzuSgTNDU75E4JIsH1JTAouH/bwJ1BmwTo27kGHHd4FEYm
+xiG4v6YQCCReb9w0xZ8vv+sa9aR8MG9ySEvillhVHcYDpyMNV3cxT8QbRbcBdQAD
+bYfkDbUMq+u99XfeLXq5kv/o2345RvpCETkVgr+fK41hsP0zSVli6e2f7yVMHH2y
+iwjOOZyqLfJVgJKFMbdul4MpDVmdatgzvAACBmJXVW2OTuTXsmOwbFm9tYbUn2cZ
+bj5yvtkscABUU5z/A4YKEbPjo2Lb4I2Nl7cBqub8j1TULlUnVQvsgH3Iy5t0gKG3
+BL1X02AD0HAxIBbuTptdVlL02Kp4niL+QGCwXvYElur341QIM8A3ubw/yqTs74iS
+m/TwBzVZ09Sj4sq/p0wo0a0ESlLvCBYng/kDP5ezqXPBDmjA6rBCK8Ty2YE4iawo
+vtOWnTUxSA6i1aN7UXAUw01AdJRtNJDdKZFHLallgXHhu1poUd2OcWFuh+T8hhPx
+W1y9WSH8huCIIGBK9DXx
+=fj00
 -----END PGP SIGNATURE-----
 
---gE7i1rD7pdK0Ng3j--
+--ABTtc+pdwF7KHXCz--
