@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hahn@univention.de>) id 1dMeqO-0004sT-Jk
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 14:22:41 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dMerO-0005KA-IN
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 14:23:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hahn@univention.de>) id 1dMeqL-00020q-7S
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 14:22:40 -0400
-Received: from mail.univention.de ([82.198.197.8]:9047)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <hahn@univention.de>) id 1dMeqL-00020E-01
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 14:22:37 -0400
-References: <5d090b82-dae7-ac67-a032-92c2e776b70f@univention.de>
-	<2e7e9fe3-e603-d75f-84c6-d0fb048266da@redhat.com>
-From: Philipp Hahn <hahn@univention.de>
-Message-ID: <58d3a273-e857-fe9e-0b1e-a4aca4aa54ef@univention.de>
-Date: Sun, 18 Jun 2017 20:22:24 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1dMerN-0002yw-L8
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 14:23:42 -0400
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:34122)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dMerN-0002wm-Dl
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 14:23:41 -0400
+Received: by mail-wr0-x232.google.com with SMTP id 77so60891093wrb.1
+	for <qemu-devel@nongnu.org>; Sun, 18 Jun 2017 11:23:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <2e7e9fe3-e603-d75f-84c6-d0fb048266da@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFH] qemu-2.6 memory corruption with OVMF and
- linux-4.9
+In-Reply-To: <87efujbu0g.fsf@linaro.org>
+References: <CAFEAcA8ZTj4YRdcnSdMw6fEizEKa-cJndZG+=WFkkMDKHX9mYw@mail.gmail.com>
+	<87efujbu0g.fsf@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 18 Jun 2017 19:23:19 +0100
+Message-ID: <CAFEAcA_Dc4_vUPASjxmscxPUX2F0H=sE9pO5ygjch50RGGv6dw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] ARM v6 memory barrier cp15 ops still implemented
+ as NOPs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,65 +31,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu-devel@nongnu.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Peter Jones <pjones@redhat.com>, linux-fbdev@vger.kernel.org
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Pranith Kumar <bobby.prani@gmail.com>
 
-Hello,
+On 16 June 2017 at 20:41, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+>
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>
+>> Hi; I just noticed that we seem to still implement the ARM v6
+>> memory-barrier cp15 ops as NOPs:
+>>
+>>     { .name =3D "ISB", .cp =3D 15, .crn =3D 7, .crm =3D 5, .opc1 =3D 0, =
+.opc2 =3D 4,
+>>       .access =3D PL0_W, .type =3D ARM_CP_NO_RAW, .writefn =3D arm_cp_wr=
+ite_ignore },
+>>     { .name =3D "DSB", .cp =3D 15, .crn =3D 7, .crm =3D 10, .opc1 =3D 0,=
+ .opc2 =3D 4,
+>>       .access =3D PL0_W, .type =3D ARM_CP_NOP },
+>>     { .name =3D "DMB", .cp =3D 15, .crn =3D 7, .crm =3D 10, .opc1 =3D 0,=
+ .opc2 =3D 5,
+>>       .access =3D PL0_W, .type =3D ARM_CP_NOP },
+>>
+>> Don't these need to do something more complicated with the
+>> advent of MTTCG ?
+>
+> Yeah they should - what does ISB do that it needs a write handler?
 
-Am 17.06.2017 um 18:51 schrieb Laszlo Ersek:
-> (I also recommend using the "vbindiff" tool for such problems, it is
-> great for picking out patterns.)
-> 
->           ** ** ** ** ** ** ** **   8  9 ** ** ** 13 14 15
->           -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- --
-> 00000000  01 e8 00 00 00 00 00 00  8c 5e 00 00 00 10 ff f1
-> 00000010  5b 78 8a 3e 00 00 00 00  00 00 00 00 00 00 00 00
-> 00000020  8c 77 00 00 00 12 00 02  18 f0 00 00 00 00 00 00
-> 00000030  00 1e 00 00 00 00 00 00  8c 8c 00 00 00 12 00 02
-> 00000040  07 70 00 00 00 00 00 00  00 14 00 00 00 00 00 00
-> 00000050  8c 9c 00 00 00 12 00 02  22 00 00 00 00 00 00 00
-> 00000060  00 40 00 00 00 00 00 00  8c ac 00 00 00 10 ff f1
-> 
-> 00000000  01 e8 00 00 00 00 00 00  00 3c 00 00 00 17 00 00
-> 00000010  5b 78 8a 3e 00 00 00 00  00 3c 00 00 00 07 00 00
-> 00000020  8c 77 00 00 00 12 00 02  00 3c 00 00 00 07 00 00
-> 00000030  00 1e 00 00 00 00 00 00  00 3c 00 00 00 17 00 00
-> 00000040  07 70 00 00 00 00 00 00  00 3c 00 00 00 07 00 00
-> 00000050  8c 9c 00 00 00 12 00 02  00 3c 00 00 00 07 00 00
-> 00000060  00 40 00 00 00 00 00 00  00 3c 00 00 00 17 00 00
->           -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- --
->           ** ** ** ** ** ** ** **   8  9 ** ** ** 13 14 15
-> 
-> The columns that I marked with "**" are identical between "good" and
-> "bad". (These are columns 0-7, 10-12.)
-> 
-> Column 8 is overwritten by zeros (every 16th byte).
-> 
-> Column 9 is overwritten by 0x3c (every 16th byte).
-> 
-> Column 13 is super interesting. The most significant nibble in that
-> column is not disturbed. And, in the least significant nibble, the least
-> significant three bits are turned on. Basically, the corruption could be
-> described, for this column (i.e., every 16th byte), as
-> 
->   bad = good | 0x7
-> 
-> Column 14 is overwritten by zeros (every 16th byte).
-> 
-> Column 15 is overwritten by zeros (every 16th byte).
-> 
-> My take is that your host machine has faulty RAM. Please run memtest86+
-> or something similar.
+The comment just above the ISB definition says:
 
-I will do so, but for me very unlikely:
-- it never happens with BIOS, only with OVMF
-- for each test I start q new QEMU process, which should use a different
-memory region
-- it repeatedly hits e1000 or libata.ko
+    /* We need to break the TB after ISB to execute self-modifying code
+     * correctly and also to take any pending interrupts immediately.
+     * So use arm_cp_write_ignore() function instead of ARM_CP_NOP flag.
+     */
 
-After updating from OVMF to 0~20161202.7bbe0b3e-1 from
-(0~20160813.de74668f-2 it has not yet happened again.
-
-Anyway, thank you for your help.
-
-Philipp
+thanks
+-- PMM
