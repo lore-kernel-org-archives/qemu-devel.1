@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dMPlC-00081Z-TV
-	for qemu-devel@nongnu.org; Sat, 17 Jun 2017 22:16:19 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dMQgT-0002Us-W9
+	for qemu-devel@nongnu.org; Sat, 17 Jun 2017 23:15:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dMPlB-0003Si-Qf
-	for qemu-devel@nongnu.org; Sat, 17 Jun 2017 22:16:18 -0400
-Date: Sat, 17 Jun 2017 23:04:31 +0800
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170617150431.GA22102@umbus>
-References: <20170616172230.22755-1-danielhb@linux.vnet.ibm.com>
+	(envelope-from <ehabkost@redhat.com>) id 1dMQgQ-00051i-He
+	for qemu-devel@nongnu.org; Sat, 17 Jun 2017 23:15:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34552)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dMQgQ-00050k-87
+	for qemu-devel@nongnu.org; Sat, 17 Jun 2017 23:15:26 -0400
+Date: Sun, 18 Jun 2017 00:15:16 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170618031516.GN22043@thinpad.lan.raisama.net>
+References: <20170615141715.17708-1-sferdjao@redhat.com>
+	<20170615141715.17708-2-sferdjao@redhat.com>
+	<2bb5a8a3-37c9-3dd2-4483-c8a2fed5bb4d@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="6TrnltStXW4iwmi0"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170616172230.22755-1-danielhb@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/ppc/spapr.c: consecutive
- 'spapr->patb_entry = 0' statements
+In-Reply-To: <2bb5a8a3-37c9-3dd2-4483-c8a2fed5bb4d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/3] qemu: add capability for vhost-net
+ busy polling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,82 +29,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com
+To: Laine Stump <laine@redhat.com>
+Cc: libvir-list@redhat.com, sferdjao@redhat.com, berrange@redhat.com, Sahid Orentino Ferdjaoui <sahid.ferdjaoui@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
+(CCing qemu-devel and the QAPI maintainers.  I have a question
+about introspection below.)
 
---6TrnltStXW4iwmi0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Sat, Jun 17, 2017 at 11:48:10AM -0400, Laine Stump wrote:
+[...]
+> > +    /* Support for busy polling on vhost-net devices ("-netdev
+> > +     * tap,...,poll-us=n") */
+> > +    if (qemuCaps->version >= 2007000)
+> > +        virQEMUCapsSet(qemuCaps, QEMU_CAPS_VHOST_NET_POLL_US);
+> > +
+> 
+> Enabling a capability based purely on the qemu binary version is
+> something that's only done as a last resort if it can't be determined by
+> QMP probes. This is because the version number is an inaccurate
+> indicator - it often happens that a new capability is added to upstream
+> in qemu version "Y", but then that feature is backported to qemu version
+> "X" in some downstream distro package; if we based the capability on
+> version number, then libvirt wouldn't take advantage of the feature even
+> though qemu had it.
+> 
+> 
+> What *should* get us the info we need is to add a table entry to
+> virQEMUCapsCommandLine to check whether or not the poll-us option exists
+> in the current qemu binary. Something like this:
+> 
+> static struct virQEMUCapsCommandLineProps virQEMUCapsCommandLine[] = {
+>     ...
+>     { "netdev", "poll-us", QEMU_CAPS_NETDEV_POLL_US },
+> 
+> 
+> Unfortunately when I add that and regenerate the .replies file for qemu
+> 2.9.0 (with the command "tests/qemucapsprobe
+> /usr/bin/qemu-system-x86_64"), this is the info it finds for netdev:
+> 
+>     {
+>       "parameters": [
+>       ],
+>       "option": "netdev"
+>     },
+> 
+> My understanding was that the possible parameters to the netdev
+> commandline option should be listed, but instead the parameters list is
+> empty :-/.
+> 
+> Maybe Eduardo can help me understand why the parameters are empty, and
+> (more importantly) what needs to be done to get the supported parameters
+> for -netdev - basically we need to know what are the available
+> parameters to "-netdev tap,...". I hope we don't end up needing to base
+> the check purely on qemu version.
 
-On Fri, Jun 16, 2017 at 02:22:30PM -0300, Daniel Henrique Barboza wrote:
-> In ppc_spapr_reset(), if the guest is using HPT, the code was executing:
->=20
->     } else {
->         spapr->patb_entry =3D 0;
->         spapr_setup_hpt_and_vrma(spapr);
->     }
->=20
-> And, at the end of spapr_setup_hpt_and_vrma:
->=20
->     /* We're setting up a hash table, so that means we're not radix */
->     spapr->patb_entry =3D 0;
->=20
-> Resulting in spapr->patb_entry being assigned to 0 twice in a row.
->=20
-> Given that 'spapr_setup_hpt_and_vrma' is also called inside
-> 'spapr_check_setup_free_hpt' of spapr_hcall.c, this trivial patch removes
-> the 'patb_entry =3D 0' assignment from the 'else' clause inside ppc_spapr=
-_reset
-> to avoid this behavior.
->=20
-> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+query-command-line-options is incomplete and useless on many
+cases (including but not limited to -device, -object, and
+-netdev).  It is not capable to model cases where the set of
+accepted options depends on a discriminator option (e.g. a
+"driver" or "type" option).
 
-Applied to ppc-for-2.10.
+Fortunately, netdev options are modelled in the QAPI schema as
+union Netdev.  However, 'query-qmp-schema' doesn't seem to
+include union Netdev because it is not referenced by any QMP
+command or event.
 
-> ---
->  hw/ppc/spapr.c | 1 -
->  1 file changed, 1 deletion(-)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index e877d45..bd31972 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1326,7 +1326,6 @@ static void ppc_spapr_reset(void)
->           * Set the GR bit in PATB so that we know there is no HPT. */
->          spapr->patb_entry =3D PATBE1_GR;
->      } else {
-> -        spapr->patb_entry =3D 0;
->          spapr_setup_hpt_and_vrma(spapr);
->      }
-> =20
+Markus, Eric, Michael: is there any way libvirt can query the
+definition of union Netdev from the schema with current QEMU?
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---6TrnltStXW4iwmi0
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZRUT9AAoJEGw4ysog2bOSHugP/RliM4lTAJuunsPuEub9B2dT
-GVAKAHr85ktPy9jKWUVDEaPcbAPcqTBYMpAzP9ltOMlJwiS0M0SFLnRK/O58xe6D
-mIlPqSXG+IeK5saYfI/YWRfwJcAe+RbBdtd3t/8Wn2PmEAGPO8Uk5BgOz4ief9IX
-Pgq7HAmVmA9YtBmwuER5NUgjvP9SW11Ra4NFa5fK/mm8eftLqy7Ct4Nto9v/g5mv
-d4gZCx83DbuwzFWq1xMnHy24nyzZY2rY6DxOYI4Th93Sz7iQDH5PuK6m5nyIxP5d
-Rhj23ubu16X/Tlg2+zscLUzfh2vBH3kPw4PttYPjDMn4H2Z59kk+svY5tQr46iwq
-G42Z0Wc81LxvthstGiqwzSmx/wair+Gv1bd2w1YXYZYGdExRv9RYfGbpzcZgjRJh
-Ngba/rdM+1+juBGkykJCkh2qWwYMKo/XYOR4SgS5rMNs6EdXfnCl2HNgPQdaUmGa
-3e2CLuhJMyPYW7xeMC/e05Pkt+ue+6GHsLmrAYQS3XYPJFkcZKfwMGvZAcouwlQq
-3T54FqH5BjFweFqEJQIBp0nBC0JNu6ECoGxR/PuJWSII6pzL9gHbHNJsU01UBoyy
-BTzdbdAnLpyjE2oF4Xyahl+cmoclP7VHHKlAuxDoKScy44rgdID7YWsol0g/2WhV
-kXejy+QJbSOXGEHn1Y6j
-=tR2Y
------END PGP SIGNATURE-----
-
---6TrnltStXW4iwmi0--
+-- 
+Eduardo
