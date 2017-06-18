@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dMcQ9-0001OB-Rd
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 11:47:26 -0400
+	(envelope-from <tobleminer@gmail.com>) id 1dMcuj-00028z-JF
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 12:19:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dMcQ5-0002Vr-TE
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 11:47:25 -0400
-Received: from roura.ac.upc.edu ([147.83.33.10]:57273 helo=roura.ac.upc.es)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dMcQ5-0002VD-HF
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 11:47:21 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <149727922719.28532.11985025310576184920.stgit@frigg.lan>
-	<149727924970.28532.9346819516051209538.stgit@frigg.lan>
-	<20170615221911.GB26408@flamenco> <20170615232507.GA15332@flamenco>
-	<87r2yhe5os.fsf@frigg.lan>
-Date: Sun, 18 Jun 2017 18:47:07 +0300
-In-Reply-To: <87r2yhe5os.fsf@frigg.lan> (=?utf-8?Q?=22Llu=C3=ADs?=
-	Vilanova"'s message of "Sun, 18 Jun 2017 17:22:43 +0300")
-Message-ID: <87a855b8n8.fsf@frigg.lan>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 3/6] target: [tcg] Add generic
- translation framework
+	(envelope-from <tobleminer@gmail.com>) id 1dMcui-0008Ll-VT
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 12:19:01 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:35473)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tobleminer@gmail.com>)
+	id 1dMcui-0008Lf-Or
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 12:19:00 -0400
+Received: by mail-wr0-x243.google.com with SMTP id z45so10889453wrb.2
+	for <qemu-devel@nongnu.org>; Sun, 18 Jun 2017 09:19:00 -0700 (PDT)
+From: Tobias Schramm <tobleminer@gmail.com>
+Date: Sun, 18 Jun 2017 18:17:26 +0200
+Message-Id: <20170618161727.18404-1-tobleminer@gmail.com>
+Subject: [Qemu-devel] [PATCH v3 0/1] Add fmask/dmask option for 9p mapped
+ mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,65 +25,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: aneesh.kumar@linux.vnet.ibm.com, groug@kaod.org, el13635@mail.ntua.gr, Tobias Schramm <tobleminer@gmail.com>
 
-Llu=C3=ADs Vilanova writes:
+Hi,
 
-> Emilio G Cota writes:
->> On Thu, Jun 15, 2017 at 18:19:11 -0400, Emilio G. Cota wrote:
->>> (snip)
->>> > +/**
->>> > + * DisasContextBase:
->>> > + * @tb: Translation block for this disassembly.
->>> > + * @pc_first: Address of first guest instruction in this TB.
->>> > + * @pc_next: Address of next guest instruction in this TB (current d=
-uring
->>> > + *           disassembly).
->>> > + * @num_insns: Number of translated instructions (including current).
->>> > + * @singlestep_enabled: "Hardware" single stepping enabled.
->>> > + *
->>> > + * Architecture-agnostic disassembly context.
->>> > + */
->>> > +typedef struct DisasContextBase {
->>> > +    TranslationBlock *tb;
->>> > +    target_ulong pc_first;
->>> > +    target_ulong pc_next;
->>> > +    DisasJumpType jmp_type;
->>> > +    unsigned int num_insns;
->>> > +    bool singlestep_enabled;
->>> > +} DisasContextBase;
->>>=20
->>> - @pc_next: I'd stick with @pc, it's shorter, it's everywhere already, =
-and
->>> with the documentation it's very clear what it is for.
->>> - @jmp_type: missing doc :-)
+as per Manos suggestion I'm now parsing the fmask/dmask as unsigned rather than signed longs.
 
->> Also, consider keeping the @is_jmp name instead of renaming it to
->> @jmp_type. (@jmp would be shorter but it would be confusing though,
->> e.g. cris has both dc->jmp and dc->is_jmp.)
-
-> I just figured that this series could also take the chance of trying to r=
-ename a
-> few common variables I'm changing to something more readable.
-
-> But if you feel very strongly about keeping the original names (and minim=
-izing
-> the diffs as you say later), I'll revert the name changes.
-
-Also, going through the changes to break them down into smaller pieces, I s=
-aw
-that TranslationBlock (at least in i386) already has a "pc" member, so using
-"pc_next" in DisasContextBase makes it even clearer it's a different variab=
-le.
-
-You comments still apply to "is_jmp" vs "jmp_type" though. Unless you or an=
-ybody
-else feels strongly against it, I'll keep "jmp_type", since I'm already cha=
-nging
-all lines that reference "is_jmp" to use DisasContextBase (instead of
-DisasContext).
+Tobias Schramm
 
 
-Thanks,
-  Lluis
+Tobias Schramm (1):
+  Add support for custom fmasks/dmasks in 9ps mapped mode
+
+ fsdev/file-op-9p.h      |  4 ++++
+ fsdev/qemu-fsdev-opts.c | 12 ++++++++++++
+ hw/9pfs/9p-local.c      | 29 +++++++++++++++++++++++++----
+ hw/9pfs/9p.c            |  3 +++
+ 4 files changed, 44 insertions(+), 4 deletions(-)
+
+-- 
+2.13.1
