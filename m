@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37525)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dMg9C-0008QG-7c
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 15:46:11 -0400
+	(envelope-from <hahn@univention.de>) id 1dMgHF-0003Rh-T0
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 15:54:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dMg99-0006vp-5v
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 15:46:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32832)
+	(envelope-from <hahn@univention.de>) id 1dMgHC-0003PE-RJ
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 15:54:29 -0400
+Received: from mail.univention.de ([82.198.197.8]:22244)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dMg98-0006v8-Sp
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 15:46:07 -0400
-Date: Sun, 18 Jun 2017 22:46:01 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170618224025-mutt-send-email-mst@kernel.org>
-References: <26250da7-b394-4964-8842-5c45bbe85e09@redhat.com>
-	<6547dfcf-ea3a-f5f6-222d-40ff274654df@redhat.com>
-	<20170614180459-mutt-send-email-mst@kernel.org>
-	<b59be2f1-ee8c-e660-4f82-bbe63e22b603@redhat.com>
-	<59422E91.7080407@intel.com>
-	<20170616061949-mutt-send-email-mst@kernel.org>
-	<40a12829-6e84-e63e-ac47-6f09cc85c3cc@redhat.com>
-	<5943AE93.7020502@intel.com>
-	<20170616181040-mutt-send-email-mst@kernel.org>
-	<5944EA2E.9030608@intel.com>
+	(Exim 4.71) (envelope-from <hahn@univention.de>) id 1dMgHC-0003Nx-GZ
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 15:54:26 -0400
+References: <5d090b82-dae7-ac67-a032-92c2e776b70f@univention.de>
+	<2e7e9fe3-e603-d75f-84c6-d0fb048266da@redhat.com>
+	<58d3a273-e857-fe9e-0b1e-a4aca4aa54ef@univention.de>
+	<20170618182756.GB5215@gallifrey>
+From: Philipp Hahn <hahn@univention.de>
+Message-ID: <31917a94-5752-8333-08ad-f895139e73e8@univention.de>
+Date: Sun, 18 Jun 2017 21:54:21 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <5944EA2E.9030608@intel.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [virtio-dev] Re:
- [PATCH v1] virtio-net: enable configurable tx queue size
+In-Reply-To: <20170618182756.GB5215@gallifrey>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFH] qemu-2.6 memory corruption with OVMF and
+ linux-4.9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,98 +30,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: Jason Wang <jasowang@redhat.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "stefanha@gmail.com" <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "jan.scheurich@ericsson.com" <jan.scheurich@ericsson.com>, "armbru@redhat.com" <armbru@redhat.com>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+To: "Dr. David Alan Gilbert" <linux@treblig.org>
+Cc: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Peter Jones <pjones@redhat.com>, linux-fbdev@vger.kernel.org
 
-On Sat, Jun 17, 2017 at 04:37:02PM +0800, Wei Wang wrote:
-> On 06/16/2017 11:15 PM, Michael S. Tsirkin wrote:
-> > On Fri, Jun 16, 2017 at 06:10:27PM +0800, Wei Wang wrote:
-> > > On 06/16/2017 04:57 PM, Jason Wang wrote:
-> > > >=20
-> > > > On 2017=E5=B9=B406=E6=9C=8816=E6=97=A5 11:22, Michael S. Tsirkin =
-wrote:
-> > > > > > I think the issues can be solved by VIRTIO_F_MAX_CHAIN_SIZE.
-> > > > > >=20
-> > > > > > For now, how about splitting it into two series of patches:
-> > > > > > 1) enable 1024 tx queue size for vhost-user, to let the users=
- of
-> > > > > > vhost-user
-> > > > > > to easily use 1024 queue size.
-> > > > > Fine with me. 1) will get property from user but override it on
-> > > > > !vhost-user. Do we need a protocol flag? It seems prudent but w=
-e get
-> > > > > back to cross-version migration issues that are still pending s=
-olution.
-> > > What do you have in mind about the protocol flag?
-> > Merely this: older clients might be confused if they get
-> > a s/g with 1024 entries.
->=20
-> I don't disagree to add that. But the client (i.e. vhost-user
-> slave) is a host userspace program, and it seems that users can
-> easily patch their host side applications if there is any issue,
-> maybe we also don't need to be too prudent about that, do we?
+Am 18.06.2017 um 20:27 schrieb Dr. David Alan Gilbert:
+> * Philipp Hahn (hahn@univention.de) wrote:
+>> Hello,
+>>
+>> Am 17.06.2017 um 18:51 schrieb Laszlo Ersek:
+>>> (I also recommend using the "vbindiff" tool for such problems, it is
+>>> great for picking out patterns.)
+>>>
+>>>           ** ** ** ** ** ** ** **   8  9 ** ** ** 13 14 15
+>>>           -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- --
+>>> 00000000  01 e8 00 00 00 00 00 00  8c 5e 00 00 00 10 ff f1
+>>> 00000010  5b 78 8a 3e 00 00 00 00  00 00 00 00 00 00 00 00
+>>> 00000020  8c 77 00 00 00 12 00 02  18 f0 00 00 00 00 00 00
+>>> 00000030  00 1e 00 00 00 00 00 00  8c 8c 00 00 00 12 00 02
+>>> 00000040  07 70 00 00 00 00 00 00  00 14 00 00 00 00 00 00
+>>> 00000050  8c 9c 00 00 00 12 00 02  22 00 00 00 00 00 00 00
+>>> 00000060  00 40 00 00 00 00 00 00  8c ac 00 00 00 10 ff f1
+>>>
+>>> 00000000  01 e8 00 00 00 00 00 00  00 3c 00 00 00 17 00 00
+>>> 00000010  5b 78 8a 3e 00 00 00 00  00 3c 00 00 00 07 00 00
+>>> 00000020  8c 77 00 00 00 12 00 02  00 3c 00 00 00 07 00 00
+>>> 00000030  00 1e 00 00 00 00 00 00  00 3c 00 00 00 17 00 00
+>>> 00000040  07 70 00 00 00 00 00 00  00 3c 00 00 00 07 00 00
+>>> 00000050  8c 9c 00 00 00 12 00 02  00 3c 00 00 00 07 00 00
+>>> 00000060  00 40 00 00 00 00 00 00  00 3c 00 00 00 17 00 00
+>>>           -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- --
+>>>           ** ** ** ** ** ** ** **   8  9 ** ** ** 13 14 15
+>>>
+>>> The columns that I marked with "**" are identical between "good" and
+>>> "bad". (These are columns 0-7, 10-12.)
+>>>
+>>> Column 8 is overwritten by zeros (every 16th byte).
+>>>
+>>> Column 9 is overwritten by 0x3c (every 16th byte).
+>>>
+>>> Column 13 is super interesting. The most significant nibble in that
+>>> column is not disturbed. And, in the least significant nibble, the least
+>>> significant three bits are turned on. Basically, the corruption could be
+>>> described, for this column (i.e., every 16th byte), as
+>>>
+>>>   bad = good | 0x7
+>>>
+>>> Column 14 is overwritten by zeros (every 16th byte).
+>>>
+>>> Column 15 is overwritten by zeros (every 16th byte).
+>>>
+>>> My take is that your host machine has faulty RAM. Please run memtest86+
+>>> or something similar.
+>>
+>> I will do so, but for me very unlikely:
+>> - it never happens with BIOS, only with OVMF
+>> - for each test I start q new QEMU process, which should use a different
+>> memory region
+>> - it repeatedly hits e1000 or libata.ko
+>>
+>> After updating from OVMF to 0~20161202.7bbe0b3e-1 from
+>> (0~20160813.de74668f-2 it has not yet happened again.
+>>
+>> Anyway, thank you for your help.
+> 
+> What host CPU are you using?
 
-I won't insist on this but it might not be easy. For example, are there
-clients that want to forward the packet to host kernel as a s/g?
+Everything is amd64:
+> processor       : 3
+> vendor_id       : GenuineIntel
+> cpu family      : 6
+> model           : 58
+> model name      : Intel(R) Core(TM) i5-3337U CPU @ 1.80GHz
+> stepping        : 9
+> microcode       : 0x19
+> cpu MHz         : 2591.015
+> cache size      : 3072 KB
+> physical id     : 0
+> siblings        : 4
+> core id         : 1
+> cpu cores       : 2
+> apicid          : 3
+> initial apicid  : 3
+> fpu             : yes
+> fpu_exception   : yes
+> cpuid level     : 13
+> wp              : yes
+> flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx est tm2 ssse3 cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm epb tpr_shadow vnmi flexpriority ept vpid fsgsbase smep erms xsaveopt dtherm ida arat pln pts
+> bugs            :
+> bogomips        : 3592.75
+> clflush size    : 64
+> cache_alignment : 64
+> address sizes   : 36 bits physical, 48 bits virtual
+> power management:
 
->=20
-> Also, the usage of the protocol flag looks like a duplicate of what
-> we plan to add in the next step - the virtio common feature flag,
-> VIRTIO_F_MAX_CHAIN_SIZE, which is more general and can be used
-> across different backends.
->
-> > > Btw, I just tested the patch of 1), and it works fine with migratio=
-n from
-> > > the
-> > > patched to non-patched version of QEMU. I'll send it out. Please ha=
-ve a
-> > > check.
-> > >=20
-> > >=20
-> > > > > Marc Andre, what's the status of that work?
-> > > > >=20
-> > > > > > 2) enable VIRTIO_F_MAX_CHAIN_SIZE,  to enhance robustness.
-> > > > > Rather, to support it for more backends.
-> > > > Ok, if we want to support different values of max chain size in t=
-he
-> > > > future. It would be problematic for migration of cross backends,
-> > > > consider the case when migrating from 2048 (vhost-user) to 1024
-> > > > (qemu/vhost-kernel).
-> > > >=20
-> > > I think that wouldn't be a problem. If there is a possibility to ch=
-ange the
-> > > backend resulting in a change of config.max_change_size, a configur=
-ation
-> > > change notification can be injected to the guest, then guest will r=
-ead and
-> > > get the new value.
-> > >=20
-> > > Best,
-> > > Wei
-> > This might not be supportable by all guests. E.g. some requests might
-> > already be in the queue. I'm not against reconfiguring devices across
-> > migration but I think it's a big project. As a 1st step I would focus=
- on
-> > keeping configuration consistent across migrations.
-> >=20
->=20
-> Would it be common and fair for vendors to migrate from a new QEMU
-> to an old QEMU, which would downgrade the services that they provide
-> to their users?
->=20
-> Even for any reason that downgrade happens, I think it is
-> sensible to sacrifice something (e.g. drop the unsupported
-> requests from the queue) for the transition, right?
->=20
-> On the other side, packet drop is normally handled at the packet
-> protocol layer, e.g. TCP. Also, usually some amount of packet drop
-> is acceptable during live migration.
->=20
-> Best,
-> Wei
-
-This isn't how people expect migration to be handled ATM.
-For now, I suggest we assume both sides need to be consistent.
-
---=20
-MST
+Philipp
