@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55340)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tobleminer@gmail.com>) id 1dMcul-000295-BK
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 12:19:04 -0400
+	(envelope-from <hahn@univention.de>) id 1dMeqO-0004sT-Jk
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 14:22:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tobleminer@gmail.com>) id 1dMcuk-0008Lz-5H
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 12:19:03 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:36162)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tobleminer@gmail.com>)
-	id 1dMcuj-0008Lp-Rp
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 12:19:02 -0400
-Received: by mail-wr0-x241.google.com with SMTP id 77so10889812wrb.3
-	for <qemu-devel@nongnu.org>; Sun, 18 Jun 2017 09:19:01 -0700 (PDT)
-From: Tobias Schramm <tobleminer@gmail.com>
-Date: Sun, 18 Jun 2017 18:17:27 +0200
-Message-Id: <20170618161727.18404-2-tobleminer@gmail.com>
-In-Reply-To: <20170618161727.18404-1-tobleminer@gmail.com>
-References: <20170618161727.18404-1-tobleminer@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 1/1] Add support for custom fmasks/dmasks in
- 9ps mapped mode
+	(envelope-from <hahn@univention.de>) id 1dMeqL-00020q-7S
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 14:22:40 -0400
+Received: from mail.univention.de ([82.198.197.8]:9047)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <hahn@univention.de>) id 1dMeqL-00020E-01
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 14:22:37 -0400
+References: <5d090b82-dae7-ac67-a032-92c2e776b70f@univention.de>
+	<2e7e9fe3-e603-d75f-84c6-d0fb048266da@redhat.com>
+From: Philipp Hahn <hahn@univention.de>
+Message-ID: <58d3a273-e857-fe9e-0b1e-a4aca4aa54ef@univention.de>
+Date: Sun, 18 Jun 2017 20:22:24 +0200
+MIME-Version: 1.0
+In-Reply-To: <2e7e9fe3-e603-d75f-84c6-d0fb048266da@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFH] qemu-2.6 memory corruption with OVMF and
+ linux-4.9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,160 +28,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: aneesh.kumar@linux.vnet.ibm.com, groug@kaod.org, el13635@mail.ntua.gr, Tobias Schramm <tobleminer@gmail.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Peter Jones <pjones@redhat.com>, linux-fbdev@vger.kernel.org
 
-Signed-off-by: Tobias Schramm <tobleminer@gmail.com>
----
- v3: Use unsigned types for umask
- v2: Adjust patch to QEMU code style
+Hello,
 
- fsdev/file-op-9p.h      |  4 ++++
- fsdev/qemu-fsdev-opts.c | 12 ++++++++++++
- hw/9pfs/9p-local.c      | 29 +++++++++++++++++++++++++----
- hw/9pfs/9p.c            |  3 +++
- 4 files changed, 44 insertions(+), 4 deletions(-)
+Am 17.06.2017 um 18:51 schrieb Laszlo Ersek:
+> (I also recommend using the "vbindiff" tool for such problems, it is
+> great for picking out patterns.)
+> 
+>           ** ** ** ** ** ** ** **   8  9 ** ** ** 13 14 15
+>           -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- --
+> 00000000  01 e8 00 00 00 00 00 00  8c 5e 00 00 00 10 ff f1
+> 00000010  5b 78 8a 3e 00 00 00 00  00 00 00 00 00 00 00 00
+> 00000020  8c 77 00 00 00 12 00 02  18 f0 00 00 00 00 00 00
+> 00000030  00 1e 00 00 00 00 00 00  8c 8c 00 00 00 12 00 02
+> 00000040  07 70 00 00 00 00 00 00  00 14 00 00 00 00 00 00
+> 00000050  8c 9c 00 00 00 12 00 02  22 00 00 00 00 00 00 00
+> 00000060  00 40 00 00 00 00 00 00  8c ac 00 00 00 10 ff f1
+> 
+> 00000000  01 e8 00 00 00 00 00 00  00 3c 00 00 00 17 00 00
+> 00000010  5b 78 8a 3e 00 00 00 00  00 3c 00 00 00 07 00 00
+> 00000020  8c 77 00 00 00 12 00 02  00 3c 00 00 00 07 00 00
+> 00000030  00 1e 00 00 00 00 00 00  00 3c 00 00 00 17 00 00
+> 00000040  07 70 00 00 00 00 00 00  00 3c 00 00 00 07 00 00
+> 00000050  8c 9c 00 00 00 12 00 02  00 3c 00 00 00 07 00 00
+> 00000060  00 40 00 00 00 00 00 00  00 3c 00 00 00 17 00 00
+>           -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- --
+>           ** ** ** ** ** ** ** **   8  9 ** ** ** 13 14 15
+> 
+> The columns that I marked with "**" are identical between "good" and
+> "bad". (These are columns 0-7, 10-12.)
+> 
+> Column 8 is overwritten by zeros (every 16th byte).
+> 
+> Column 9 is overwritten by 0x3c (every 16th byte).
+> 
+> Column 13 is super interesting. The most significant nibble in that
+> column is not disturbed. And, in the least significant nibble, the least
+> significant three bits are turned on. Basically, the corruption could be
+> described, for this column (i.e., every 16th byte), as
+> 
+>   bad = good | 0x7
+> 
+> Column 14 is overwritten by zeros (every 16th byte).
+> 
+> Column 15 is overwritten by zeros (every 16th byte).
+> 
+> My take is that your host machine has faulty RAM. Please run memtest86+
+> or something similar.
 
-diff --git a/fsdev/file-op-9p.h b/fsdev/file-op-9p.h
-index 0844a403dc..0ecb1d392b 100644
---- a/fsdev/file-op-9p.h
-+++ b/fsdev/file-op-9p.h
-@@ -76,6 +76,8 @@ typedef struct FsDriverEntry {
-     int export_flags;
-     FileOperations *ops;
-     FsThrottle fst;
-+    mode_t fmask;
-+    mode_t dmask;
- } FsDriverEntry;
- 
- typedef struct FsContext
-@@ -88,6 +90,8 @@ typedef struct FsContext
-     FsThrottle *fst;
-     /* fs driver specific data */
-     void *private;
-+    mode_t fmask;
-+    mode_t dmask;
- } FsContext;
- 
- typedef struct V9fsPath {
-diff --git a/fsdev/qemu-fsdev-opts.c b/fsdev/qemu-fsdev-opts.c
-index bf5713008a..dd6391edb0 100644
---- a/fsdev/qemu-fsdev-opts.c
-+++ b/fsdev/qemu-fsdev-opts.c
-@@ -38,6 +38,12 @@ static QemuOptsList qemu_fsdev_opts = {
-         }, {
-             .name = "sock_fd",
-             .type = QEMU_OPT_NUMBER,
-+        }, {
-+            .name = "fmask",
-+            .type = QEMU_OPT_STRING,
-+        }, {
-+            .name = "dmask",
-+            .type = QEMU_OPT_STRING,
-         },
- 
-         THROTTLE_OPTS,
-@@ -75,6 +81,12 @@ static QemuOptsList qemu_virtfs_opts = {
-         }, {
-             .name = "sock_fd",
-             .type = QEMU_OPT_NUMBER,
-+        }, {
-+            .name = "fmask",
-+            .type = QEMU_OPT_STRING,
-+        }, {
-+            .name = "dmask",
-+            .type = QEMU_OPT_STRING,
-         },
- 
-         { /*End of list */ }
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 1e78b7c9e9..ef7282e294 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -633,7 +633,7 @@ static int local_mknod(FsContext *fs_ctx, V9fsPath *dir_path,
- 
-     if (fs_ctx->export_flags & V9FS_SM_MAPPED ||
-         fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
--        err = mknodat(dirfd, name, SM_LOCAL_MODE_BITS | S_IFREG, 0);
-+        err = mknodat(dirfd, name, fs_ctx->fmask | S_IFREG, 0);
-         if (err == -1) {
-             goto out;
-         }
-@@ -685,7 +685,7 @@ static int local_mkdir(FsContext *fs_ctx, V9fsPath *dir_path,
- 
-     if (fs_ctx->export_flags & V9FS_SM_MAPPED ||
-         fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
--        err = mkdirat(dirfd, name, SM_LOCAL_DIR_MODE_BITS);
-+        err = mkdirat(dirfd, name, fs_ctx->dmask);
-         if (err == -1) {
-             goto out;
-         }
-@@ -786,7 +786,7 @@ static int local_open2(FsContext *fs_ctx, V9fsPath *dir_path, const char *name,
-     /* Determine the security model */
-     if (fs_ctx->export_flags & V9FS_SM_MAPPED ||
-         fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
--        fd = openat_file(dirfd, name, flags, SM_LOCAL_MODE_BITS);
-+        fd = openat_file(dirfd, name, flags, fs_ctx->fmask);
-         if (fd == -1) {
-             goto out;
-         }
-@@ -849,7 +849,7 @@ static int local_symlink(FsContext *fs_ctx, const char *oldpath,
-         ssize_t oldpath_size, write_size;
- 
-         fd = openat_file(dirfd, name, O_CREAT | O_EXCL | O_RDWR,
--                         SM_LOCAL_MODE_BITS);
-+                         fs_ctx->fmask);
-         if (fd == -1) {
-             goto out;
-         }
-@@ -1431,6 +1431,9 @@ static int local_parse_opts(QemuOpts *opts, struct FsDriverEntry *fse)
- {
-     const char *sec_model = qemu_opt_get(opts, "security_model");
-     const char *path = qemu_opt_get(opts, "path");
-+    const char *fmask = qemu_opt_get(opts, "fmask");
-+    const char *dmask = qemu_opt_get(opts, "dmask");
-+    unsigned long mask;
-     Error *err = NULL;
- 
-     if (!sec_model) {
-@@ -1469,6 +1472,24 @@ static int local_parse_opts(QemuOpts *opts, struct FsDriverEntry *fse)
- 
-     fse->path = g_strdup(path);
- 
-+    fse->fmask = SM_LOCAL_MODE_BITS;
-+    if (fmask) {
-+        if (qemu_strtoul(fmask, NULL, 0, &mask)) {
-+            error_report("Invalid fmask %s specified", fmask);
-+            return -1;
-+        }
-+        fse->fmask = ((mode_t)mask) & 0777;
-+    }
-+
-+    fse->dmask = SM_LOCAL_DIR_MODE_BITS;
-+    if (dmask) {
-+        if (qemu_strtoul(dmask, NULL, 0, &mask)) {
-+            error_report("Invalid dmask %s specified", dmask);
-+            return -1;
-+        }
-+        fse->dmask = ((mode_t)mask) & 0777;
-+    }
-+
-     return 0;
- }
- 
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index 96d2683348..40290dbade 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -3533,6 +3533,9 @@ int v9fs_device_realize_common(V9fsState *s, Error **errp)
- 
-     s->ops = fse->ops;
- 
-+    s->ctx.fmask = fse->fmask;
-+    s->ctx.dmask = fse->dmask;
-+
-     s->fid_list = NULL;
-     qemu_co_rwlock_init(&s->rename_lock);
- 
--- 
-2.13.1
+I will do so, but for me very unlikely:
+- it never happens with BIOS, only with OVMF
+- for each test I start q new QEMU process, which should use a different
+memory region
+- it repeatedly hits e1000 or libata.ko
+
+After updating from OVMF to 0~20161202.7bbe0b3e-1 from
+(0~20160813.de74668f-2 it has not yet happened again.
+
+Anyway, thank you for your help.
+
+Philipp
