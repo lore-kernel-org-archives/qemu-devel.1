@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55523)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dMerO-0005KA-IN
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 14:23:43 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dMeum-00068N-BB
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 14:27:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dMerN-0002yw-L8
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 14:23:42 -0400
-Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:34122)
+	(envelope-from <peter.maydell@linaro.org>) id 1dMeul-0004Wl-8q
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 14:27:12 -0400
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:33579)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dMerN-0002wm-Dl
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 14:23:41 -0400
-Received: by mail-wr0-x232.google.com with SMTP id 77so60891093wrb.1
-	for <qemu-devel@nongnu.org>; Sun, 18 Jun 2017 11:23:41 -0700 (PDT)
+	id 1dMeul-0004Wd-2I
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 14:27:11 -0400
+Received: by mail-wr0-x236.google.com with SMTP id r103so61079936wrb.0
+	for <qemu-devel@nongnu.org>; Sun, 18 Jun 2017 11:27:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87efujbu0g.fsf@linaro.org>
-References: <CAFEAcA8ZTj4YRdcnSdMw6fEizEKa-cJndZG+=WFkkMDKHX9mYw@mail.gmail.com>
-	<87efujbu0g.fsf@linaro.org>
+In-Reply-To: <87y3spcqfg.fsf@frigg.lan>
+References: <149727922719.28532.11985025310576184920.stgit@frigg.lan>
+	<149727924970.28532.9346819516051209538.stgit@frigg.lan>
+	<20170615220501.GA26408@flamenco> <87y3spcqfg.fsf@frigg.lan>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sun, 18 Jun 2017 19:23:19 +0100
-Message-ID: <CAFEAcA_Dc4_vUPASjxmscxPUX2F0H=sE9pO5ygjch50RGGv6dw@mail.gmail.com>
+Date: Sun, 18 Jun 2017 19:26:49 +0100
+Message-ID: <CAFEAcA9ue9UbZ_q=hgOnqkkLG-6Pup1ykTb8UBWAWS3ztSBQcA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] ARM v6 memory barrier cp15 ops still implemented
- as NOPs
+Subject: Re: [Qemu-devel] [PATCH] translator mega-patch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,38 +31,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Pranith Kumar <bobby.prani@gmail.com>
+To: "Emilio G. Cota" <cota@braap.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
 
-On 16 June 2017 at 20:41, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+On 18 June 2017 at 15:37, Llu=C3=ADs Vilanova <vilanova@ac.upc.edu> wrote:
+> I seem to remember we discussed this at some point before I sent the firs=
+t
+> version, to allow multiple targets on the same binary, but decided agains=
+t it.
 >
-> Peter Maydell <peter.maydell@linaro.org> writes:
+> Still, I can leave the ops struct in place without even trying to support
+> multiple targets. It should be a little bit slower (using function pointe=
+rs
+> instead of a "template"), but I don't think performance will suffer that =
+much
+> since we're at the translation path.
 >
->> Hi; I just noticed that we seem to still implement the ARM v6
->> memory-barrier cp15 ops as NOPs:
->>
->>     { .name =3D "ISB", .cp =3D 15, .crn =3D 7, .crm =3D 5, .opc1 =3D 0, =
-.opc2 =3D 4,
->>       .access =3D PL0_W, .type =3D ARM_CP_NO_RAW, .writefn =3D arm_cp_wr=
-ite_ignore },
->>     { .name =3D "DSB", .cp =3D 15, .crn =3D 7, .crm =3D 10, .opc1 =3D 0,=
- .opc2 =3D 4,
->>       .access =3D PL0_W, .type =3D ARM_CP_NOP },
->>     { .name =3D "DMB", .cp =3D 15, .crn =3D 7, .crm =3D 10, .opc1 =3D 0,=
- .opc2 =3D 5,
->>       .access =3D PL0_W, .type =3D ARM_CP_NOP },
->>
->> Don't these need to do something more complicated with the
->> advent of MTTCG ?
->
-> Yeah they should - what does ISB do that it needs a write handler?
+> Any other opinions on this and the point above?
 
-The comment just above the ISB definition says:
-
-    /* We need to break the TB after ISB to execute self-modifying code
-     * correctly and also to take any pending interrupts immediately.
-     * So use arm_cp_write_ignore() function instead of ARM_CP_NOP flag.
-     */
+Multiple targets in one binary is one of those things that I would
+like to see us do some day. So while I wouldn't do huge amounts
+of work purely to support it, if we have two designs which are
+otherwise more-or-less equivalent and only one has a path available
+to support multi-target binaries we should probably prefer that one.
 
 thanks
 -- PMM
