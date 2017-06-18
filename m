@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58404)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tobleminer@gmail.com>) id 1dMbb0-0005sQ-4N
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 10:54:35 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dMc96-00064r-EH
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 11:29:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tobleminer@gmail.com>) id 1dMbaz-0003ot-0U
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 10:54:34 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:34121)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tobleminer@gmail.com>)
-	id 1dMbay-0003og-Mt
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 10:54:32 -0400
-Received: by mail-wm0-x244.google.com with SMTP id 70so12724725wme.1
-	for <qemu-devel@nongnu.org>; Sun, 18 Jun 2017 07:54:32 -0700 (PDT)
-From: Tobias Schramm <tobleminer@gmail.com>
-Date: Sun, 18 Jun 2017 16:52:58 +0200
-Message-Id: <20170618145258.16231-2-tobleminer@gmail.com>
-In-Reply-To: <20170618145258.16231-1-tobleminer@gmail.com>
-References: <20170618145258.16231-1-tobleminer@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 1/1] Add support for custom fmasks/dmasks in
- 9ps mapped mode
+	(envelope-from <ehabkost@redhat.com>) id 1dMc91-00039C-HC
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 11:29:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43802)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dMc91-00037w-Ar
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 11:29:43 -0400
+Date: Sun, 18 Jun 2017 12:29:36 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170618152936.GO22043@thinpad.lan.raisama.net>
+References: <20170606181948.16238-1-rkagan@virtuozzo.com>
+	<20170606181948.16238-6-rkagan@virtuozzo.com>
+	<20170613185752.GZ5016@thinpad.lan.raisama.net>
+	<20170614112506.GI2004@rkaganb.sw.ru>
+	<6bb8f5e3-b6bf-c62a-93f3-9fe338d43881@redhat.com>
+	<20170614150027.12e5626e@nial.brq.redhat.com>
+	<20170615124106.GA2046@rkaganb.sw.ru>
+	<20170615152728.54ffa55c@nial.brq.redhat.com>
+	<20170615160527.GA2008@rkaganb.sw.ru>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170615160527.GA2008@rkaganb.sw.ru>
+Subject: Re: [Qemu-devel] [PATCH 05/23] hyperv: ensure VP index equal to
+ QEMU cpu_index
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,159 +35,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: aneesh.kumar@linux.vnet.ibm.com, groug@kaod.org, Tobias Schramm <tobleminer@gmail.com>
+To: Roman Kagan <rkagan@virtuozzo.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
 
-Signed-off-by: Tobias Schramm <tobleminer@gmail.com>
----
- v2: Adjust patch to QEMU code style
+On Thu, Jun 15, 2017 at 07:05:29PM +0300, Roman Kagan wrote:
+> On Thu, Jun 15, 2017 at 03:27:28PM +0200, Igor Mammedov wrote:
+[...]
+> > > > > future.  But the APIC id is also the KVM vcpu_id, so there's no need to
+> > > > > have VP_INDEX maintained by QEMU.  
+> > > > agreed it'd be better to reuse vcpu_id/apic id as interface between
+> > > > qemu/kvm/guest instead of adding additional cpu_index concept in ABI  
+> > > 
+> > > Having consulted the spec, I'm not so confident any more this is the
+> > > right move.
+> > > 
+> > > > 7.8.1 Virtual Processor Index
+> > > > 
+> > > > Virtual processors are identified by using an index (VP index). The
+> > > > maximum number of virtual processors per partition supported by the
+> > > > current implementation of the hypervisor can be obtained through CPUID
+> > > > leaf 0x40000005. A virtual processor index must be less than the
+> > > > maximum number of virtual processors per partition.
+> > > 
+> > > This seems to imply that VP index should be dense.  As if they use it
+> > > directly as an index into an array whose length is equal to the max
+> > > number of vcpus.  (BTW the value we report for it is currently hardcoded
+> > > to 0x40 which probably needs fixing, too.)
+> > the question here is where "maximum number of virtual processors" comes from
+> 
+> We provide it in a corresponding cpuid leaf.
+> 
+> > if it's possible to tell guest value explicitly,
+> > we can use pcms->apic_id_limit for it.
+> 
+> But, depending on the apic_id encoding scheme, this can be arbitrarily
+> bigger than the actual maximum number of vcpus.  Which can result in
+> guest confusion or inefficiency.
 
- fsdev/file-op-9p.h      |  4 ++++
- fsdev/qemu-fsdev-opts.c | 12 ++++++++++++
- hw/9pfs/9p-local.c      | 29 +++++++++++++++++++++++++----
- hw/9pfs/9p.c            |  3 +++
- 4 files changed, 44 insertions(+), 4 deletions(-)
+Note that it will be bigger only if threads-per-core or
+cores-per-thread are not powers of 2.  If your use case don't
+require configuration of a virtual thread/core topology, the APIC
+IDs can be always contiguous.
 
-diff --git a/fsdev/file-op-9p.h b/fsdev/file-op-9p.h
-index 0844a403dc..0ecb1d392b 100644
---- a/fsdev/file-op-9p.h
-+++ b/fsdev/file-op-9p.h
-@@ -76,6 +76,8 @@ typedef struct FsDriverEntry {
-     int export_flags;
-     FileOperations *ops;
-     FsThrottle fst;
-+    mode_t fmask;
-+    mode_t dmask;
- } FsDriverEntry;
- 
- typedef struct FsContext
-@@ -88,6 +90,8 @@ typedef struct FsContext
-     FsThrottle *fst;
-     /* fs driver specific data */
-     void *private;
-+    mode_t fmask;
-+    mode_t dmask;
- } FsContext;
- 
- typedef struct V9fsPath {
-diff --git a/fsdev/qemu-fsdev-opts.c b/fsdev/qemu-fsdev-opts.c
-index bf5713008a..dd6391edb0 100644
---- a/fsdev/qemu-fsdev-opts.c
-+++ b/fsdev/qemu-fsdev-opts.c
-@@ -38,6 +38,12 @@ static QemuOptsList qemu_fsdev_opts = {
-         }, {
-             .name = "sock_fd",
-             .type = QEMU_OPT_NUMBER,
-+        }, {
-+            .name = "fmask",
-+            .type = QEMU_OPT_STRING,
-+        }, {
-+            .name = "dmask",
-+            .type = QEMU_OPT_STRING,
-         },
- 
-         THROTTLE_OPTS,
-@@ -75,6 +81,12 @@ static QemuOptsList qemu_virtfs_opts = {
-         }, {
-             .name = "sock_fd",
-             .type = QEMU_OPT_NUMBER,
-+        }, {
-+            .name = "fmask",
-+            .type = QEMU_OPT_STRING,
-+        }, {
-+            .name = "dmask",
-+            .type = QEMU_OPT_STRING,
-         },
- 
-         { /*End of list */ }
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 1e78b7c9e9..4f526ab7d4 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -633,7 +633,7 @@ static int local_mknod(FsContext *fs_ctx, V9fsPath *dir_path,
- 
-     if (fs_ctx->export_flags & V9FS_SM_MAPPED ||
-         fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
--        err = mknodat(dirfd, name, SM_LOCAL_MODE_BITS | S_IFREG, 0);
-+        err = mknodat(dirfd, name, fs_ctx->fmask | S_IFREG, 0);
-         if (err == -1) {
-             goto out;
-         }
-@@ -685,7 +685,7 @@ static int local_mkdir(FsContext *fs_ctx, V9fsPath *dir_path,
- 
-     if (fs_ctx->export_flags & V9FS_SM_MAPPED ||
-         fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
--        err = mkdirat(dirfd, name, SM_LOCAL_DIR_MODE_BITS);
-+        err = mkdirat(dirfd, name, fs_ctx->dmask);
-         if (err == -1) {
-             goto out;
-         }
-@@ -786,7 +786,7 @@ static int local_open2(FsContext *fs_ctx, V9fsPath *dir_path, const char *name,
-     /* Determine the security model */
-     if (fs_ctx->export_flags & V9FS_SM_MAPPED ||
-         fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
--        fd = openat_file(dirfd, name, flags, SM_LOCAL_MODE_BITS);
-+        fd = openat_file(dirfd, name, flags, fs_ctx->fmask);
-         if (fd == -1) {
-             goto out;
-         }
-@@ -849,7 +849,7 @@ static int local_symlink(FsContext *fs_ctx, const char *oldpath,
-         ssize_t oldpath_size, write_size;
- 
-         fd = openat_file(dirfd, name, O_CREAT | O_EXCL | O_RDWR,
--                         SM_LOCAL_MODE_BITS);
-+                         fs_ctx->fmask);
-         if (fd == -1) {
-             goto out;
-         }
-@@ -1431,6 +1431,9 @@ static int local_parse_opts(QemuOpts *opts, struct FsDriverEntry *fse)
- {
-     const char *sec_model = qemu_opt_get(opts, "security_model");
-     const char *path = qemu_opt_get(opts, "path");
-+    const char *fmask = qemu_opt_get(opts, "fmask");
-+    const char *dmask = qemu_opt_get(opts, "dmask");
-+    long mask;
-     Error *err = NULL;
- 
-     if (!sec_model) {
-@@ -1469,6 +1472,24 @@ static int local_parse_opts(QemuOpts *opts, struct FsDriverEntry *fse)
- 
-     fse->path = g_strdup(path);
- 
-+    fse->fmask = SM_LOCAL_MODE_BITS;
-+    if (fmask) {
-+        if (qemu_strtol(fmask, NULL, 0, &mask)) {
-+            error_report("Invalid fmask %s specified", fmask);
-+            return -1;
-+        }
-+        fse->fmask = ((mode_t)mask) & 0777;
-+    }
-+
-+    fse->dmask = SM_LOCAL_DIR_MODE_BITS;
-+    if (dmask) {
-+        if (qemu_strtol(dmask, NULL, 0, &mask)) {
-+            error_report("Invalid dmask %s specified", dmask);
-+            return -1;
-+        }
-+        fse->dmask = ((mode_t)mask) & 0777;
-+    }
-+
-     return 0;
- }
- 
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index 96d2683348..40290dbade 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -3533,6 +3533,9 @@ int v9fs_device_realize_common(V9fsState *s, Error **errp)
- 
-     s->ops = fse->ops;
- 
-+    s->ctx.fmask = fse->fmask;
-+    s->ctx.dmask = fse->dmask;
-+
-     s->fid_list = NULL;
-     qemu_co_rwlock_init(&s->rename_lock);
- 
 -- 
-2.13.1
+Eduardo
