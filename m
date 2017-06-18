@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49108)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dMaXy-0001r6-U3
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 09:47:24 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dMaiL-0004Sg-Fz
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 09:58:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dMaXv-0003Tu-Px
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 09:47:22 -0400
-Resent-Message-Id: <E1dMaXv-0003Tu-Px@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21474)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dMaXv-0003SB-DI
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 09:47:19 -0400
-In-Reply-To: <20170618082813.8091-1-tobleminer@gmail.com>
-Message-ID: <149779362756.21003.3529997447853374496@4a9a010726c0>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <el13635@mail.ntua.gr>) id 1dMaiG-0000Bm-Ko
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 09:58:05 -0400
+Received: from smtp1.ntua.gr ([2001:648:2000:de::183]:35605)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <el13635@mail.ntua.gr>) id 1dMaiG-00007S-8i
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 09:58:00 -0400
+Date: Sun, 18 Jun 2017 16:57:50 +0300
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20170618135750.2sxnenwtmcwyhls3@postretch>
+References: <20170618082813.8091-1-tobleminer@gmail.com>
+	<20170618082813.8091-2-tobleminer@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 18 Jun 2017 06:47:08 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/1] Add fmask/dmask option for 9p mapped
- mode
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="wzz6koalg3deyjow"
+Content-Disposition: inline
+In-Reply-To: <20170618082813.8091-2-tobleminer@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] Add support for custom fmasks/dmasks
+ in 9ps mapped mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +29,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: tobleminer@gmail.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Tobias Schramm <tobleminer@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA2MTgwODI4MTMuODA5MS0xLXRvYmxlbWluZXJAZ21haWwuY29tClR5cGU6IHNlcmllcwpTdWJq
-ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvMV0gQWRkIGZtYXNrL2RtYXNrIG9wdGlvbiBmb3Ig
-OXAgbWFwcGVkIG1vZGUKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJB
-U0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZh
-aWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVI
-IC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVj
-a2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIK
-ICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRj
-aC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAg
-IGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5E
-ID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApT
-d2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjNmYTNjOGYgQWRkIHN1cHBvcnQgZm9yIGN1
-c3RvbSBmbWFza3MvZG1hc2tzIGluIDlwcyBtYXBwZWQgbW9kZQoKPT09IE9VVFBVVCBCRUdJTiA9
-PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBBZGQgc3VwcG9ydCBmb3IgY3VzdG9tIGZtYXNrcy9kbWFz
-a3MgaW4gOXBzIG1hcHBlZCBtb2RlLi4uCkVSUk9SOiBjb25zaWRlciB1c2luZyBxZW11X3N0cnRv
-bCBpbiBwcmVmZXJlbmNlIHRvIHN0cnRvbAojMTE3OiBGSUxFOiBody85cGZzLzlwLWxvY2FsLmM6
-MTQ3NzoKKyAgICAgICAgbWFzayA9IHN0cnRvbChmbWFzaywgTlVMTCwgMCk7CgpFUlJPUjogdGhh
-dCBvcGVuIGJyYWNlIHsgc2hvdWxkIGJlIG9uIHRoZSBwcmV2aW91cyBsaW5lCiMxMTg6IEZJTEU6
-IGh3LzlwZnMvOXAtbG9jYWwuYzoxNDc4OgorICAgICAgICBpZigoIW1hc2sgfHwgbWFzayA9PSBM
-T05HX01JTiB8fCBtYXNrID09IExPTkdfTUFYKSAmJiBlcnJubykKKyAgICAgICAgewoKRVJST1I6
-IHNwYWNlIHJlcXVpcmVkIGJlZm9yZSB0aGUgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzExODogRklM
-RTogaHcvOXBmcy85cC1sb2NhbC5jOjE0Nzg6CisgICAgICAgIGlmKCghbWFzayB8fCBtYXNrID09
-IExPTkdfTUlOIHx8IG1hc2sgPT0gTE9OR19NQVgpICYmIGVycm5vKQoKRVJST1I6IGNvZGUgaW5k
-ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTIyOiBGSUxFOiBody85cGZzLzlwLWxvY2FsLmM6
-MTQ4MjoKK15JfSQKCkVSUk9SOiBjb25zaWRlciB1c2luZyBxZW11X3N0cnRvbCBpbiBwcmVmZXJl
-bmNlIHRvIHN0cnRvbAojMTI4OiBGSUxFOiBody85cGZzLzlwLWxvY2FsLmM6MTQ4ODoKKyAgICAg
-ICAgbWFzayA9IHN0cnRvbChkbWFzaywgTlVMTCwgMCk7CgpFUlJPUjogdGhhdCBvcGVuIGJyYWNl
-IHsgc2hvdWxkIGJlIG9uIHRoZSBwcmV2aW91cyBsaW5lCiMxMjk6IEZJTEU6IGh3LzlwZnMvOXAt
-bG9jYWwuYzoxNDg5OgorICAgICAgICBpZigoIW1hc2sgfHwgbWFzayA9PSBMT05HX01JTiB8fCBt
-YXNrID09IExPTkdfTUFYKSAmJiBlcnJubykKKyAgICAgICAgewoKRVJST1I6IHNwYWNlIHJlcXVp
-cmVkIGJlZm9yZSB0aGUgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzEyOTogRklMRTogaHcvOXBmcy85
-cC1sb2NhbC5jOjE0ODk6CisgICAgICAgIGlmKCghbWFzayB8fCBtYXNrID09IExPTkdfTUlOIHx8
-IG1hc2sgPT0gTE9OR19NQVgpICYmIGVycm5vKQoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBu
-ZXZlciB1c2UgdGFicwojMTMzOiBGSUxFOiBody85cGZzLzlwLWxvY2FsLmM6MTQ5MzoKK15JfSQK
-CnRvdGFsOiA4IGVycm9ycywgMCB3YXJuaW5ncywgMTE4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
-Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBj
-b21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
-Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
-ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+
+--wzz6koalg3deyjow
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Sun, Jun 18, 2017 at 10:28:13AM +0200, Tobias Schramm wrote:
+>@@ -1469,6 +1472,28 @@ static int local_parse_opts(QemuOpts *opts, struct =
+FsDriverEntry *fse)
+>
+>     fse->path =3D g_strdup(path);
+>
+>+    fse->fmask =3D SM_LOCAL_MODE_BITS;
+>+    if (fmask) {
+>+        mask =3D strtol(fmask, NULL, 0);
+
+(Use qemu_strtol(), or maybe parse_uint() since it has to be positive)
+
+If a mode without the '0' prefix is supplied (as required by strtol to=20
+parse an octal), the input will be parsed as a decimal and will result=20
+in a wrong value. Also, maybe you should check for mask > 0777 and for=20
+negative input as well instead of &ing.
+
+
+>+        if((!mask || mask =3D=3D LONG_MIN || mask =3D=3D LONG_MAX) && err=
+no)
+>+        {
+>+            error_report("Invalid fmask %s specified", fmask);
+>+            return -1;
+>+	}
+>+        fse->fmask =3D ((mode_t)mask) & 0777;
+>+    }
+>+
+>+    fse->dmask =3D SM_LOCAL_DIR_MODE_BITS;
+>+    if (dmask) {
+>+        mask =3D strtol(dmask, NULL, 0);
+>+        if((!mask || mask =3D=3D LONG_MIN || mask =3D=3D LONG_MAX) && err=
+no)
+>+        {
+>+            error_report("Invalid dmask %s specified", dmask);
+>+            return -1;
+>+	}
+>+        fse->dmask =3D ((mode_t)mask) & 0777;
+
+Same here.
+
+>+    }
+>+
+>     return 0;
+> }
+>
+>diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+>index 96d2683348..40290dbade 100644
+>--- a/hw/9pfs/9p.c
+>+++ b/hw/9pfs/9p.c
+>@@ -3533,6 +3533,9 @@ int v9fs_device_realize_common(V9fsState *s, Error *=
+*errp)
+>
+>     s->ops =3D fse->ops;
+>
+>+    s->ctx.fmask =3D fse->fmask;
+>+    s->ctx.dmask =3D fse->dmask;
+>+
+>     s->fid_list =3D NULL;
+>     qemu_co_rwlock_init(&s->rename_lock);
+>
+>--=20
+>2.13.1
+>
+>
+>
+
+--wzz6koalg3deyjow
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAllGht4ACgkQc2J8L2kN
+9xBLsg//fLGrseKcDkULBBgDFYc/3Heer3mx8TgULpxa70eHPpR0i6Mo716RI6sz
+P6IMcs9pqjqwO2yGB4v88IiijxsGnw4HQP9tqTudVpqAyzmRNx2ZiZct8YtLyEgw
+mpWvCSc9UCjEKxyTQetY+BiLWEO+Gn7HHf+JyAM4e/hnftj1+mLx9aFBYrTw98Gr
+ObBqrAQWBN6JkpHXBTe2F5CInE51pFZLJ46UaC/ZMvh1HbzgQHZHBrYDuDeAZCpK
+X9X30IRmj6FIZPn3RjXJkyHvuIhRXJ/y4QBTniiEzygvX3aYwNnbxWcYSK7cnp/d
+hjusZrP1oF3beEg7wPk9ZWtq0GtAj801xlNXizvcOTuvdXGoRvMD6vv2Dw6cZ7FO
+yt25zLyrUEEiN7eRcHH39jV7UirlJn8bj1tEQbIyY4n6VpQV5JVhTMljN6jjjkhl
+FZQ9JehWGON02Jf8+zi1QCEvixSCVW9V9W9+yUORdAi83oXy0zdWyekQLML5DRAi
+YsORoNth6XLRThgByU9DNzB9nXNaVUONLVz8Iv+PgBVnCN34f5fIXGSzMUk3xeZF
+Q7H93wIE62+3Pbx+KFOHXqOWZBOmz85c58G1CyUl0q0BUHep2/cg2crmuK07cR/v
+6ishwPxLRgfcDhh9DPkTYohZHW9ySS6Gyu1pbQGQraAOmj3khfM=
+=lUKN
+-----END PGP SIGNATURE-----
+
+--wzz6koalg3deyjow--
