@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tobleminer@gmail.com>) id 1dMVaq-0005dj-Tr
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 04:30:02 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dMWLf-0000sx-LF
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 05:18:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tobleminer@gmail.com>) id 1dMVap-000591-QZ
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 04:30:00 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:35007)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tobleminer@gmail.com>)
-	id 1dMVap-000581-Gd
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 04:29:59 -0400
-Received: by mail-wm0-x242.google.com with SMTP id d64so11817573wmf.2
-	for <qemu-devel@nongnu.org>; Sun, 18 Jun 2017 01:29:59 -0700 (PDT)
-From: Tobias Schramm <tobleminer@gmail.com>
-Date: Sun, 18 Jun 2017 10:28:13 +0200
-Message-Id: <20170618082813.8091-2-tobleminer@gmail.com>
-In-Reply-To: <20170618082813.8091-1-tobleminer@gmail.com>
-References: <20170618082813.8091-1-tobleminer@gmail.com>
-Subject: [Qemu-devel] [PATCH 1/1] Add support for custom fmasks/dmasks in
- 9ps mapped mode
+	(envelope-from <dgibson@ozlabs.org>) id 1dMWLc-0002hu-GR
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 05:18:23 -0400
+Date: Sun, 18 Jun 2017 17:04:48 +0800
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170618090448.GB22449@umbus>
+References: <201706051722.v55HMrD0024174@linux03a.ddci.com>
+	<OF9DCCDCC7.1E15B7C2-ON86258141.005A829A-86258141.005ABB35@ddci.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="IiVenqGWf+H9Y6IX"
+Content-Disposition: inline
+In-Reply-To: <OF9DCCDCC7.1E15B7C2-ON86258141.005A829A-86258141.005ABB35@ddci.com>
+Subject: Re: [Qemu-devel] [PATCH v3] target-ppc: Enable open-pic timers to
+ count and generate interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,161 +25,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Tobias Schramm <tobleminer@gmail.com>
+To: alarson@ddci.com
+Cc: agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-Signed-off-by: Tobias Schramm <tobleminer@gmail.com>
----
- fsdev/file-op-9p.h      |  4 ++++
- fsdev/qemu-fsdev-opts.c | 12 ++++++++++++
- hw/9pfs/9p-local.c      | 33 +++++++++++++++++++++++++++++----
- hw/9pfs/9p.c            |  3 +++
- 4 files changed, 48 insertions(+), 4 deletions(-)
 
-diff --git a/fsdev/file-op-9p.h b/fsdev/file-op-9p.h
-index 0844a403dc..0ecb1d392b 100644
---- a/fsdev/file-op-9p.h
-+++ b/fsdev/file-op-9p.h
-@@ -76,6 +76,8 @@ typedef struct FsDriverEntry {
-     int export_flags;
-     FileOperations *ops;
-     FsThrottle fst;
-+    mode_t fmask;
-+    mode_t dmask;
- } FsDriverEntry;
- 
- typedef struct FsContext
-@@ -88,6 +90,8 @@ typedef struct FsContext
-     FsThrottle *fst;
-     /* fs driver specific data */
-     void *private;
-+    mode_t fmask;
-+    mode_t dmask;
- } FsContext;
- 
- typedef struct V9fsPath {
-diff --git a/fsdev/qemu-fsdev-opts.c b/fsdev/qemu-fsdev-opts.c
-index bf5713008a..dd6391edb0 100644
---- a/fsdev/qemu-fsdev-opts.c
-+++ b/fsdev/qemu-fsdev-opts.c
-@@ -38,6 +38,12 @@ static QemuOptsList qemu_fsdev_opts = {
-         }, {
-             .name = "sock_fd",
-             .type = QEMU_OPT_NUMBER,
-+        }, {
-+            .name = "fmask",
-+            .type = QEMU_OPT_STRING,
-+        }, {
-+            .name = "dmask",
-+            .type = QEMU_OPT_STRING,
-         },
- 
-         THROTTLE_OPTS,
-@@ -75,6 +81,12 @@ static QemuOptsList qemu_virtfs_opts = {
-         }, {
-             .name = "sock_fd",
-             .type = QEMU_OPT_NUMBER,
-+        }, {
-+            .name = "fmask",
-+            .type = QEMU_OPT_STRING,
-+        }, {
-+            .name = "dmask",
-+            .type = QEMU_OPT_STRING,
-         },
- 
-         { /*End of list */ }
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 1e78b7c9e9..5c312298e8 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -633,7 +633,7 @@ static int local_mknod(FsContext *fs_ctx, V9fsPath *dir_path,
- 
-     if (fs_ctx->export_flags & V9FS_SM_MAPPED ||
-         fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
--        err = mknodat(dirfd, name, SM_LOCAL_MODE_BITS | S_IFREG, 0);
-+        err = mknodat(dirfd, name, fs_ctx->fmask | S_IFREG, 0);
-         if (err == -1) {
-             goto out;
-         }
-@@ -685,7 +685,7 @@ static int local_mkdir(FsContext *fs_ctx, V9fsPath *dir_path,
- 
-     if (fs_ctx->export_flags & V9FS_SM_MAPPED ||
-         fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
--        err = mkdirat(dirfd, name, SM_LOCAL_DIR_MODE_BITS);
-+        err = mkdirat(dirfd, name, fs_ctx->dmask);
-         if (err == -1) {
-             goto out;
-         }
-@@ -786,7 +786,7 @@ static int local_open2(FsContext *fs_ctx, V9fsPath *dir_path, const char *name,
-     /* Determine the security model */
-     if (fs_ctx->export_flags & V9FS_SM_MAPPED ||
-         fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
--        fd = openat_file(dirfd, name, flags, SM_LOCAL_MODE_BITS);
-+        fd = openat_file(dirfd, name, flags, fs_ctx->fmask);
-         if (fd == -1) {
-             goto out;
-         }
-@@ -849,7 +849,7 @@ static int local_symlink(FsContext *fs_ctx, const char *oldpath,
-         ssize_t oldpath_size, write_size;
- 
-         fd = openat_file(dirfd, name, O_CREAT | O_EXCL | O_RDWR,
--                         SM_LOCAL_MODE_BITS);
-+                         fs_ctx->fmask);
-         if (fd == -1) {
-             goto out;
-         }
-@@ -1431,6 +1431,9 @@ static int local_parse_opts(QemuOpts *opts, struct FsDriverEntry *fse)
- {
-     const char *sec_model = qemu_opt_get(opts, "security_model");
-     const char *path = qemu_opt_get(opts, "path");
-+    const char *fmask = qemu_opt_get(opts, "fmask");
-+    const char *dmask = qemu_opt_get(opts, "dmask");
-+    long mask;
-     Error *err = NULL;
- 
-     if (!sec_model) {
-@@ -1469,6 +1472,28 @@ static int local_parse_opts(QemuOpts *opts, struct FsDriverEntry *fse)
- 
-     fse->path = g_strdup(path);
- 
-+    fse->fmask = SM_LOCAL_MODE_BITS;
-+    if (fmask) {
-+        mask = strtol(fmask, NULL, 0);
-+        if((!mask || mask == LONG_MIN || mask == LONG_MAX) && errno)
-+        {
-+            error_report("Invalid fmask %s specified", fmask);
-+            return -1;
-+	}
-+        fse->fmask = ((mode_t)mask) & 0777;
-+    }
-+
-+    fse->dmask = SM_LOCAL_DIR_MODE_BITS;
-+    if (dmask) {
-+        mask = strtol(dmask, NULL, 0);
-+        if((!mask || mask == LONG_MIN || mask == LONG_MAX) && errno)
-+        {
-+            error_report("Invalid dmask %s specified", dmask);
-+            return -1;
-+	}
-+        fse->dmask = ((mode_t)mask) & 0777;
-+    }
-+
-     return 0;
- }
- 
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index 96d2683348..40290dbade 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -3533,6 +3533,9 @@ int v9fs_device_realize_common(V9fsState *s, Error **errp)
- 
-     s->ops = fse->ops;
- 
-+    s->ctx.fmask = fse->fmask;
-+    s->ctx.dmask = fse->dmask;
-+
-     s->fid_list = NULL;
-     qemu_co_rwlock_init(&s->rename_lock);
- 
--- 
-2.13.1
+--IiVenqGWf+H9Y6IX
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Jun 16, 2017 at 11:31:02AM -0500, alarson@ddci.com wrote:
+> Aaron Larson <alarson@ddci.com> wrote on 06/05/2017 12:22:53 PM:
+>=20
+> > From: Aaron Larson <alarson@ddci.com>
+> > To: agraf@suse.de, alarson@ddci.com, david@gibson.dropbear.id.au,=20
+> qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+> > Date: 06/05/2017 12:22 PM
+> > Subject: [PATCH v3] target-ppc: Enable open-pic timers to count and=20
+> generate interrupts
+> >=20
+> > Previously QEMU open-pic implemented the 4 open-pic timers including
+> > all timer registers, but the timers did not "count" or generate any
+> > interrupts.  The patch makes the timers both count and generate
+> > interrupts.  The timer clock frequency is fixed at 25MHZ.
+>=20
+>=20
+> I haven't received any feedback on this patch, and I don't see a response=
+=20
+> on the mailing list archive.  Did it get lost?
+
+No, I've just been busy and then sick.  I'll get to it eventually..
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--IiVenqGWf+H9Y6IX
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZRkItAAoJEGw4ysog2bOSb7sQAOPkLERv6jg1/OgKH1FNUUto
+uxZlT2ipz/JLT9qCAk9XP6j7/j6cI1kygJbhfmmQLVQ/HkPuCURxl1UIel/OgWik
+JTSvOHzK39rpnlcE++v9t114JLYWxpxEAjYjgq3uk7wZDETw3IYbKnCdwqoLwuRo
+h/uisYpOYFKs2TDACy16gWHUAMvhcmAmnJeZ4ciDASdz/Xm0rWUhoX9DwOWYhsNM
+uTEOaafQVmV7Cs+qR77j3XS+4JUr3ZpF9Y+x/KShYJvGMnl2mdPIRujeqJf2qfDR
+g9yd49nOnkCPe5PC2GOz0TCt8BVxbCKnDNdKCpbhQ/dzYR+6WAMYDsgWjqEMwE0G
+HUdNwgifxd7ysNWLG2riHqm0SaJvvlcPBLQirUWcRkrYk3X0rbeDLgvM6hLocDFt
+JT9qfgCvN5yKCmPwIj9rinDPj29zdZookuQF4h4XuL07YUcR9gOmZxgMndfzMnzB
+Bvc6wBBxb64bURZVcZt36QBsj34ON0H2m5zI6kqYYMkW/YunXxYbNf1kfSFg7SBX
+rM6G7bcBXCmjgydYSjygLIMgLxWwnb5x7Fzjb6Rg/8byagkBOINGsdFG5r4CGGF2
+m35ASo5OO3CzCdoltBTHkWqJWZj8TCn776B0uqag+3OEtlLqvY8tuu6EckGeaeK1
+/znwRElq45Jo4/5L6uE4
+=64A6
+-----END PGP SIGNATURE-----
+
+--IiVenqGWf+H9Y6IX--
