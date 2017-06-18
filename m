@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dMWLf-0000sx-LF
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 05:18:24 -0400
+	(envelope-from <david@redhat.com>) id 1dMXGn-0005rz-HP
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 06:17:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dMWLc-0002hu-GR
-	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 05:18:23 -0400
-Date: Sun, 18 Jun 2017 17:04:48 +0800
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170618090448.GB22449@umbus>
-References: <201706051722.v55HMrD0024174@linux03a.ddci.com>
-	<OF9DCCDCC7.1E15B7C2-ON86258141.005A829A-86258141.005ABB35@ddci.com>
+	(envelope-from <david@redhat.com>) id 1dMXGk-0006g4-Be
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 06:17:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57024)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dMXGk-0006fS-2A
+	for qemu-devel@nongnu.org; Sun, 18 Jun 2017 06:17:22 -0400
+References: <547865a9-d6c2-7140-47e2-5af01e7d761d@redhat.com>
+	<20170616175748-mutt-send-email-mst@kernel.org>
+	<4cdf547c-079b-6b44-484f-e1132e960364@redhat.com>
+	<20170616231036-mutt-send-email-mst@kernel.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <c852ce3a-2313-d2ea-b67e-7c0e26dc4c24@redhat.com>
+Date: Sun, 18 Jun 2017 12:17:15 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="IiVenqGWf+H9Y6IX"
-Content-Disposition: inline
-In-Reply-To: <OF9DCCDCC7.1E15B7C2-ON86258141.005A829A-86258141.005ABB35@ddci.com>
-Subject: Re: [Qemu-devel] [PATCH v3] target-ppc: Enable open-pic timers to
- count and generate interrupts
+In-Reply-To: <20170616231036-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] virtio-mem: paravirtualized memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,62 +30,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alarson@ddci.com
-Cc: agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: KVM <kvm@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, Andrea Arcangeli <aarcange@redhat.com>
 
+>> A Linux guest will deflate the balloon (all or some pages) in the
+>> following scenarios:
+>> a) page migration
+> 
+> It inflates it first, doesn't it?
 
---IiVenqGWf+H9Y6IX
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Yes, that that is true. I was just listing all scenarios.
 
-On Fri, Jun 16, 2017 at 11:31:02AM -0500, alarson@ddci.com wrote:
-> Aaron Larson <alarson@ddci.com> wrote on 06/05/2017 12:22:53 PM:
->=20
-> > From: Aaron Larson <alarson@ddci.com>
-> > To: agraf@suse.de, alarson@ddci.com, david@gibson.dropbear.id.au,=20
-> qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-> > Date: 06/05/2017 12:22 PM
-> > Subject: [PATCH v3] target-ppc: Enable open-pic timers to count and=20
-> generate interrupts
-> >=20
-> > Previously QEMU open-pic implemented the 4 open-pic timers including
-> > all timer registers, but the timers did not "count" or generate any
-> > interrupts.  The patch makes the timers both count and generate
-> > interrupts.  The timer clock frequency is fixed at 25MHZ.
->=20
->=20
-> I haven't received any feedback on this patch, and I don't see a response=
-=20
-> on the mailing list archive.  Did it get lost?
+> 
+>> b) unload virtio-balloon kernel module
+>> c) hibernate/suspension
+>> d) (DEFLATE_ON_OOM)
+> 
+> You need to set a flag in the balloon to allow this, right?
 
-No, I've just been busy and then sick.  I'll get to it eventually..
+Yes, has to be enabled in QEMU and will propagate to the guest. It is
+used in various setups and you could either go for DEFLATE_ON_OOM
+(cooperative memory manangement) or memory unplug, not both.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+> 
+>> A Linux guest will touch memory without deflating:
+>> a) During a kexec() dump
+>> d) On reboots (regular, after kexec(), system_reset)
+>>>
+>>>> Any change we
+>>>>    introduce will break backwards compatibility.
+>>>
+>>> Why does this have to be the case
+>> If we suddenly enforce the existing virtio-balloon, we will break legacy
+>> guests.
+> 
+> Can't we do it with a feature flag?
 
---IiVenqGWf+H9Y6IX
-Content-Type: application/pgp-signature; name="signature.asc"
+I haven't found an easy way to do that, without turning all existing
+virtio-balloon implementations useless. But honestly, whatever you do,
+you will be confronted with the very basic problems of this approach:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+Random memory holes on a reboot and the chance that the guest that comes up
 
-iQIcBAEBCAAGBQJZRkItAAoJEGw4ysog2bOSb7sQAOPkLERv6jg1/OgKH1FNUUto
-uxZlT2ipz/JLT9qCAk9XP6j7/j6cI1kygJbhfmmQLVQ/HkPuCURxl1UIel/OgWik
-JTSvOHzK39rpnlcE++v9t114JLYWxpxEAjYjgq3uk7wZDETw3IYbKnCdwqoLwuRo
-h/uisYpOYFKs2TDACy16gWHUAMvhcmAmnJeZ4ciDASdz/Xm0rWUhoX9DwOWYhsNM
-uTEOaafQVmV7Cs+qR77j3XS+4JUr3ZpF9Y+x/KShYJvGMnl2mdPIRujeqJf2qfDR
-g9yd49nOnkCPe5PC2GOz0TCt8BVxbCKnDNdKCpbhQ/dzYR+6WAMYDsgWjqEMwE0G
-HUdNwgifxd7ysNWLG2riHqm0SaJvvlcPBLQirUWcRkrYk3X0rbeDLgvM6hLocDFt
-JT9qfgCvN5yKCmPwIj9rinDPj29zdZookuQF4h4XuL07YUcR9gOmZxgMndfzMnzB
-Bvc6wBBxb64bURZVcZt36QBsj34ON0H2m5zI6kqYYMkW/YunXxYbNf1kfSFg7SBX
-rM6G7bcBXCmjgydYSjygLIMgLxWwnb5x7Fzjb6Rg/8byagkBOINGsdFG5r4CGGF2
-m35ASo5OO3CzCdoltBTHkWqJWZj8TCn776B0uqag+3OEtlLqvY8tuu6EckGeaeK1
-/znwRElq45Jo4/5L6uE4
-=64A6
------END PGP SIGNATURE-----
+a) contains a legacy virtio-balloon
+b) contains no virtio-balloon at all
+c) starts up virtio-balloon too late to fill the holes
 
---IiVenqGWf+H9Y6IX--
+Now, there are various possible approaches that require their own hacks
+and only solve a subset of these problems. Just a very short version of
+it all:
+
+1) very early virtio-balloon that queries a bitmap of inflated memory
+via some interface. This is just a giant hack (e.g. what about Windows?)
+and even the bios might already touch inflated memory. Still breaks at
+least b) and c). No good.
+
+2) Do "implicit" balloon inflation on a reboot. Any page the guest
+touches is marked as inflated. This requires a lot of quirks in the host
+and still breaks at least b) and c). Basically no good for us.
+
+Yo can read more about the involved problems at
+https://blog.xenproject.org/2014/02/14/ballooning-rebooting-and-the-feature-youve-never-heard-of/
+
+3) Try to mark inflated pages as reserved in the a820 bitmap and make
+the balloon hotplug these. Well, this is x86 special and has some other
+problems (e.g. what to do with ACPI hotplugged memory?). Also, how to
+handle this on windows? Exploding size of the a820 map. No good.
+
+4) Try to resize the guest main memory, to compensate unplugged memory.
+While this sounds promising, there are elementary problems to solve: How
+to deal with ACPI hotplugged memory? What to resize? And there has to be
+ACPI hotplug, otherwise you cannot add more memory to a guest. While we
+could solve some x86 specific problems here, migration on the QEMU side
+will also be "fun". virtio-mem heavily simplifies that all by only
+working on its own memory.
+
+But again, these are all hacks, and at least I don't want to create a
+giant hack and call it virtio-*, that is restricted to some very
+specific use cases and/or architectures. Let's just do it in a clean way
+if possible.
+
+[...]
+
+> I agree there's a large # of requirements here not addressed by the
+> balloon.
+
+Exactly, and it tries to solve the basic problem of rebooting into a
+guest that does not contain a fitting guest driver.
+
+>
+> One other thing that would be helpful here is pointing out the
+> similarities between virtio-mem and the balloon. I'll ponder it
+> over the weekend.
+
+There is much more difference here than similarity. The only thing they
+share is allocating/freeing memory and tell the host about it. But
+already how/from where memory is allocated is different. I think even
+the general use case is different. Again, I think both concepts make
+sense to coexist.
+
+> 
+> The biggest worry for me is inability to support DMA into this memory.
+> Is this hard to fix?
+
+As a short term solution: Always give your (x86) guest at least 3.x G of
+base memory. And I mean that is the exact same thing you have with
+ordinary ACPI based memory hotplug right now. That will also never
+become DMA memory. So it is not worse compared to what we have right now.
+
+Long term solution: I think this was never a use case. Usually, all
+memory you "add", you theoretically want to be able to "remove" again.
+So from that point, it does not make sense to mark it as DMA and feed it
+to some driver that will not let go of it. I haven't had a deep look at
+it, but I at least think it could be done with some effort. Not sure
+about Windows.
+
+Thanks!
+
+-- 
+
+Thanks,
+
+David
