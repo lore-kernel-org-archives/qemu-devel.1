@@ -1,47 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dMwl6-0005H0-0d
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 09:30:30 -0400
+	(envelope-from <berto@igalia.com>) id 1dMwuz-0008RM-NX
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 09:40:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dMwl1-0004vm-KO
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 09:30:24 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51742)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1dMwl1-0004v4-BM
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 09:30:19 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v5JDTAAU080832
-	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 09:30:17 -0400
-Received: from e24smtp04.br.ibm.com (e24smtp04.br.ibm.com [32.104.18.25])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2b6cks1r5x-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 09:30:17 -0400
-Received: from localhost
-	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Mon, 19 Jun 2017 10:30:14 -0300
-References: <20170530160445.12810-1-lvivier@redhat.com>
-	<20170531043557.GI12163@umbus.fritz.box>
-	<149695205346.23353.3484869110998357783@loki>
-	<20170609102733.0eb7293d@nial.brq.redhat.com>
-	<149739016562.5725.6958577924052221756@loki>
-	<20170614110001.7816209b@nial.brq.redhat.com>
-	<149748643237.3448.7122634958390452661@loki>
-	<20170616155312.623f859e@nial.brq.redhat.com>
-	<7285021b-79e7-0820-a006-24062b85a2b8@redhat.com>
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Mon, 19 Jun 2017 10:30:05 -0300
-MIME-Version: 1.0
-In-Reply-To: <7285021b-79e7-0820-a006-24062b85a2b8@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Message-Id: <7a83004a-5592-9865-7a09-4b5c941ac59d@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] spapr: manage hotplugged
- devices while the VM is not started
+	(envelope-from <berto@igalia.com>) id 1dMwuw-0001dx-KU
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 09:40:37 -0400
+From: Alberto Garcia <berto@igalia.com>
+Date: Mon, 19 Jun 2017 16:40:07 +0300
+Message-Id: <484752bd226b7e63b51b9c32f47bc5bc831c1752.1497879398.git.berto@igalia.com>
+In-Reply-To: <cover.1497879398.git.berto@igalia.com>
+References: <cover.1497879398.git.berto@igalia.com>
+In-Reply-To: <cover.1497879398.git.berto@igalia.com>
+References: <cover.1497879398.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH v4 6/7] qcow2: Pass a QEMUIOVector to
+ do_perform_cow_{read, write}()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -50,95 +22,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>
 
+Instead of passing a single buffer pointer to do_perform_cow_write(),
+pass a QEMUIOVector. This will allow us to merge the write requests
+for the COW regions and the actual data into a single one.
 
+Although do_perform_cow_read() does not strictly need to change its
+API, we're doing it here as well for consistency.
 
-On 06/19/2017 09:40 AM, Marcel Apfelbaum wrote:
-> On 16/06/2017 16:53, Igor Mammedov wrote:
->> On Wed, 14 Jun 2017 19:27:12 -0500
->> Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
->>
->>> Quoting Igor Mammedov (2017-06-14 04:00:01)
->>>> On Tue, 13 Jun 2017 16:42:45 -0500
->>>> Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
->>>>> Quoting Igor Mammedov (2017-06-09 03:27:33)
->
-> [...]
->
->>> But that raises a 2nd point. Our dilemma isn't that we can't
->>> rely on dev->hotplugged being synchronized (though if it
->>> was we could build something around that), our dilemma is
->>> that we make the following assumption in our code:
->>>
->>> "Devices present at start-time will be handled the same way,
->>> on source or dest, regardless of whether they were added via
->>> cmdline or via device_add prior to machine start / migration
->>> stream processing."
->>>
->>> And I think that's a sensible expectation, since in theory
->>> even the source could build up a machine via device_add
->>> prior to starting it, and the reasonable default there is
->>> dev->hotplugged = false rather than the opposite. That
->>> suggests a need to fix things outside of migration.
->> Agreed to a degree, i.e.
->>
->>    -device/device_add before machine has been started
->> without migration should follow coldplug path
->>
->> it shouldn't cause problems for CPU/mem hotplug on x86
->> and maybe will work for PCI (it may change behavior of
->> ACPI based hotplug and bridges),
->> CCing Marcel to confirm.
->>
->
-> As long as machine_done is not triggered and the dev->hotplugged
-> is not set I suppose it will work for PCI.
->
-> But why allow device_add before the machine is running?
-> I don't see the benefits for it. I did see in the mail thread
-> that libvirt may build the machine using device_add, but
-> again, what is the gain? What you can do before the machine is running
-> do it at command line.
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block/qcow2-cluster.c | 51 ++++++++++++++++++++++++---------------------------
+ 1 file changed, 24 insertions(+), 27 deletions(-)
 
-This takes us back to an older discussion about this subject. If I 
-recall correctly
-the only reason we're allowing this is because Libvirt does it. At that 
-time there
-where no mentions of any other use case or benefits from allowing it in PPC.
-
-I haven't had the time to check it but if Libvirt can get away with 
-device_add
-before the machine is running in x86 (or any other arch for instance) 
-then supporting
-this scenario in PPC makes management happier, avoiding more arch specific
-code from their side to handle migration and hotplugs.
-
-A discussion that might be worth having is why support device_add/del 
-operations
-before the machine is started in any architecture at all, not just 
-pseries. Not sure
-if this is the right moment/thread for that though.
-
-
-Thanks,
-
-Daniel
-
-
->
-> I would also not allow hot-plugging once migration is started
-> and delay migration until we finish all hot-plugging operations (not 
-> directly related to this thread).
->
->
-> Thanks,
-> Marcel
->
->
->>
->
->
-> [...]
->
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 20fb531932..3ac26d6bf7 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -406,19 +406,14 @@ int qcow2_encrypt_sectors(BDRVQcow2State *s, int64_t sector_num,
+ static int coroutine_fn do_perform_cow_read(BlockDriverState *bs,
+                                             uint64_t src_cluster_offset,
+                                             unsigned offset_in_cluster,
+-                                            uint8_t *buffer,
+-                                            unsigned bytes)
++                                            QEMUIOVector *qiov)
+ {
+-    QEMUIOVector qiov;
+-    struct iovec iov = { .iov_base = buffer, .iov_len = bytes };
+     int ret;
+ 
+-    if (bytes == 0) {
++    if (qiov->size == 0) {
+         return 0;
+     }
+ 
+-    qemu_iovec_init_external(&qiov, &iov, 1);
+-
+     BLKDBG_EVENT(bs->file, BLKDBG_COW_READ);
+ 
+     if (!bs->drv) {
+@@ -430,7 +425,7 @@ static int coroutine_fn do_perform_cow_read(BlockDriverState *bs,
+      * which can lead to deadlock when block layer copy-on-read is enabled.
+      */
+     ret = bs->drv->bdrv_co_preadv(bs, src_cluster_offset + offset_in_cluster,
+-                                  bytes, &qiov, 0);
++                                  qiov->size, qiov, 0);
+     if (ret < 0) {
+         return ret;
+     }
+@@ -462,28 +457,23 @@ static bool coroutine_fn do_perform_cow_encrypt(BlockDriverState *bs,
+ static int coroutine_fn do_perform_cow_write(BlockDriverState *bs,
+                                              uint64_t cluster_offset,
+                                              unsigned offset_in_cluster,
+-                                             uint8_t *buffer,
+-                                             unsigned bytes)
++                                             QEMUIOVector *qiov)
+ {
+-    QEMUIOVector qiov;
+-    struct iovec iov = { .iov_base = buffer, .iov_len = bytes };
+     int ret;
+ 
+-    if (bytes == 0) {
++    if (qiov->size == 0) {
+         return 0;
+     }
+ 
+-    qemu_iovec_init_external(&qiov, &iov, 1);
+-
+     ret = qcow2_pre_write_overlap_check(bs, 0,
+-            cluster_offset + offset_in_cluster, bytes);
++            cluster_offset + offset_in_cluster, qiov->size);
+     if (ret < 0) {
+         return ret;
+     }
+ 
+     BLKDBG_EVENT(bs->file, BLKDBG_COW_WRITE);
+     ret = bdrv_co_pwritev(bs->file, cluster_offset + offset_in_cluster,
+-                          bytes, &qiov, 0);
++                          qiov->size, qiov, 0);
+     if (ret < 0) {
+         return ret;
+     }
+@@ -780,6 +770,7 @@ static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
+     unsigned data_bytes = end->offset - (start->offset + start->nb_bytes);
+     bool merge_reads;
+     uint8_t *start_buffer, *end_buffer;
++    QEMUIOVector qiov;
+     int ret;
+ 
+     assert(start->nb_bytes <= UINT_MAX - end->nb_bytes);
+@@ -816,22 +807,25 @@ static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
+     /* The part of the buffer where the end region is located */
+     end_buffer = start_buffer + buffer_size - end->nb_bytes;
+ 
++    qemu_iovec_init(&qiov, 1);
++
+     qemu_co_mutex_unlock(&s->lock);
+     /* First we read the existing data from both COW regions. We
+      * either read the whole region in one go, or the start and end
+      * regions separately. */
+     if (merge_reads) {
+-        ret = do_perform_cow_read(bs, m->offset, start->offset,
+-                                  start_buffer, buffer_size);
++        qemu_iovec_add(&qiov, start_buffer, buffer_size);
++        ret = do_perform_cow_read(bs, m->offset, start->offset, &qiov);
+     } else {
+-        ret = do_perform_cow_read(bs, m->offset, start->offset,
+-                                  start_buffer, start->nb_bytes);
++        qemu_iovec_add(&qiov, start_buffer, start->nb_bytes);
++        ret = do_perform_cow_read(bs, m->offset, start->offset, &qiov);
+         if (ret < 0) {
+             goto fail;
+         }
+ 
+-        ret = do_perform_cow_read(bs, m->offset, end->offset,
+-                                  end_buffer, end->nb_bytes);
++        qemu_iovec_reset(&qiov);
++        qemu_iovec_add(&qiov, end_buffer, end->nb_bytes);
++        ret = do_perform_cow_read(bs, m->offset, end->offset, &qiov);
+     }
+     if (ret < 0) {
+         goto fail;
+@@ -849,14 +843,16 @@ static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
+     }
+ 
+     /* And now we can write everything */
+-    ret = do_perform_cow_write(bs, m->alloc_offset, start->offset,
+-                               start_buffer, start->nb_bytes);
++    qemu_iovec_reset(&qiov);
++    qemu_iovec_add(&qiov, start_buffer, start->nb_bytes);
++    ret = do_perform_cow_write(bs, m->alloc_offset, start->offset, &qiov);
+     if (ret < 0) {
+         goto fail;
+     }
+ 
+-    ret = do_perform_cow_write(bs, m->alloc_offset, end->offset,
+-                               end_buffer, end->nb_bytes);
++    qemu_iovec_reset(&qiov);
++    qemu_iovec_add(&qiov, end_buffer, end->nb_bytes);
++    ret = do_perform_cow_write(bs, m->alloc_offset, end->offset, &qiov);
+ fail:
+     qemu_co_mutex_lock(&s->lock);
+ 
+@@ -870,6 +866,7 @@ fail:
+     }
+ 
+     qemu_vfree(start_buffer);
++    qemu_iovec_destroy(&qiov);
+     return ret;
+ }
+ 
+-- 
+2.11.0
