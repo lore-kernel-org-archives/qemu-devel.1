@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dN0aQ-0004Em-TR
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 13:35:44 -0400
+	(envelope-from <berrange@redhat.com>) id 1dN0aW-0004I8-BL
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 13:35:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dN0aM-0000tD-9b
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 13:35:38 -0400
+	(envelope-from <berrange@redhat.com>) id 1dN0aT-00012h-6C
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 13:35:44 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Mon, 19 Jun 2017 18:34:43 +0100
-Message-Id: <20170619173455.18805-9-berrange@redhat.com>
+Date: Mon, 19 Jun 2017 18:34:45 +0100
+Message-Id: <20170619173455.18805-11-berrange@redhat.com>
 In-Reply-To: <20170619173455.18805-1-berrange@redhat.com>
 References: <20170619173455.18805-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v9 08/20] qcow: make encrypt_sectors encrypt in
- place
+Subject: [Qemu-devel] [PATCH v9 10/20] qcow2: make qcow2_encrypt_sectors
+ encrypt in place
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,40 +24,39 @@ To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
 Instead of requiring separate input/output buffers for
-encrypting data, change encrypt_sectors() to assume
-use of a single buffer, encrypting in place. One current
-caller uses the same buffer for input/output already
-and the other two callers are easily converted to do so.
+encrypting data, change qcow2_encrypt_sectors() to assume
+use of a single buffer, encrypting in place. The current
+callers all used the same buffer for input/output already.
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- block/qcow.c | 45 +++++++++++++++------------------------------
- 1 file changed, 15 insertions(+), 30 deletions(-)
+ block/qcow2-cluster.c | 17 ++++++-----------
+ block/qcow2.c         |  4 ++--
+ block/qcow2.h         |  3 +--
+ 3 files changed, 9 insertions(+), 15 deletions(-)
 
-diff --git a/block/qcow.c b/block/qcow.c
-index 3047a61..2306e4f 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -322,11 +322,10 @@ static int qcow_set_key(BlockDriverState *bs, const char *key)
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index d779ea1..6400147 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -358,11 +358,9 @@ static int count_contiguous_clusters_unallocated(int nb_clusters,
  }
  
  /* The crypt function is compatible with the linux cryptoloop
 -   algorithm for < 4 GB images. NOTE: out_buf == in_buf is
 -   supported */
 +   algorithm for < 4 GB images. */
- static int encrypt_sectors(BDRVQcowState *s, int64_t sector_num,
--                           uint8_t *out_buf, const uint8_t *in_buf,
--                           int nb_sectors, bool enc, Error **errp)
-+                           uint8_t *buf, int nb_sectors, bool enc,
-+                           Error **errp)
+ int qcow2_encrypt_sectors(BDRVQcow2State *s, int64_t sector_num,
+-                          uint8_t *out_buf, const uint8_t *in_buf,
+-                          int nb_sectors, bool enc,
++                          uint8_t *buf, int nb_sectors, bool enc,
+                           Error **errp)
  {
      union {
-         uint64_t ll[2];
-@@ -345,14 +344,12 @@ static int encrypt_sectors(BDRVQcowState *s, int64_t sector_num,
+@@ -382,14 +380,12 @@ int qcow2_encrypt_sectors(BDRVQcow2State *s, int64_t sector_num,
          }
          if (enc) {
              ret = qcrypto_cipher_encrypt(s->cipher,
@@ -74,7 +73,7 @@ index 3047a61..2306e4f 100644
                                           512,
                                           errp);
          }
-@@ -360,8 +357,7 @@ static int encrypt_sectors(BDRVQcowState *s, int64_t sector_num,
+@@ -397,8 +393,7 @@ int qcow2_encrypt_sectors(BDRVQcow2State *s, int64_t sector_num,
              return -1;
          }
          sector_num++;
@@ -84,87 +83,50 @@ index 3047a61..2306e4f 100644
      }
      return 0;
  }
-@@ -481,13 +477,12 @@ static uint64_t get_cluster_offset(BlockDriverState *bs,
-                     uint64_t start_sect;
-                     assert(s->cipher);
-                     start_sect = (offset & ~(s->cluster_size - 1)) >> 9;
--                    memset(s->cluster_data + 512, 0x00, 512);
-                     for(i = 0; i < s->cluster_sectors; i++) {
-                         if (i < n_start || i >= n_end) {
-                             Error *err = NULL;
-+                            memset(s->cluster_data, 0x00, 512);
-                             if (encrypt_sectors(s, start_sect + i,
--                                                s->cluster_data,
--                                                s->cluster_data + 512, 1,
-+                                                s->cluster_data, 1,
-                                                 true, &err) < 0) {
-                                 error_free(err);
-                                 errno = EIO;
-@@ -665,7 +660,7 @@ static coroutine_fn int qcow_co_readv(BlockDriverState *bs, int64_t sector_num,
-             }
-             if (bs->encrypted) {
-                 assert(s->cipher);
--                if (encrypt_sectors(s, sector_num, buf, buf,
-+                if (encrypt_sectors(s, sector_num, buf,
-                                     n, false, &err) < 0) {
-                     goto fail;
-                 }
-@@ -700,9 +695,7 @@ static coroutine_fn int qcow_co_writev(BlockDriverState *bs, int64_t sector_num,
-     BDRVQcowState *s = bs->opaque;
-     int index_in_cluster;
-     uint64_t cluster_offset;
--    const uint8_t *src_buf;
-     int ret = 0, n;
--    uint8_t *cluster_data = NULL;
-     struct iovec hd_iov;
-     QEMUIOVector hd_qiov;
-     uint8_t *buf;
-@@ -710,7 +703,9 @@ static coroutine_fn int qcow_co_writev(BlockDriverState *bs, int64_t sector_num,
+@@ -446,7 +441,7 @@ static int coroutine_fn do_perform_cow(BlockDriverState *bs,
+         assert(s->cipher);
+         assert((offset_in_cluster & ~BDRV_SECTOR_MASK) == 0);
+         assert((bytes & ~BDRV_SECTOR_MASK) == 0);
+-        if (qcow2_encrypt_sectors(s, sector, iov.iov_base, iov.iov_base,
++        if (qcow2_encrypt_sectors(s, sector, iov.iov_base,
+                                   bytes >> BDRV_SECTOR_BITS, true, &err) < 0) {
+             ret = -EIO;
+             error_free(err);
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 652e6a4..b985ba7 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1543,7 +1543,7 @@ static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
+                 assert((cur_bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
+                 Error *err = NULL;
+                 if (qcow2_encrypt_sectors(s, offset >> BDRV_SECTOR_BITS,
+-                                          cluster_data, cluster_data,
++                                          cluster_data,
+                                           cur_bytes >> BDRV_SECTOR_BITS,
+                                           false, &err) < 0) {
+                     error_free(err);
+@@ -1639,7 +1639,7 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+             qemu_iovec_to_buf(&hd_qiov, 0, cluster_data, hd_qiov.size);
  
-     s->cluster_cache_offset = -1; /* disable compressed cache */
- 
--    if (qiov->niov > 1) {
-+    /* We must always copy the iov when encrypting, so we
-+     * don't modify the original data buffer during encryption */
-+    if (bs->encrypted || qiov->niov > 1) {
-         buf = orig_buf = qemu_try_blockalign(bs, qiov->size);
-         if (buf == NULL) {
-             return -ENOMEM;
-@@ -740,21 +735,14 @@ static coroutine_fn int qcow_co_writev(BlockDriverState *bs, int64_t sector_num,
-         if (bs->encrypted) {
-             Error *err = NULL;
-             assert(s->cipher);
--            if (!cluster_data) {
--                cluster_data = g_malloc0(s->cluster_size);
--            }
--            if (encrypt_sectors(s, sector_num, cluster_data, buf,
--                                n, true, &err) < 0) {
-+            if (encrypt_sectors(s, sector_num, buf, n, true, &err) < 0) {
+             if (qcow2_encrypt_sectors(s, offset >> BDRV_SECTOR_BITS,
+-                                      cluster_data, cluster_data,
++                                      cluster_data,
+                                       cur_bytes >>BDRV_SECTOR_BITS,
+                                       true, &err) < 0) {
                  error_free(err);
-                 ret = -EIO;
-                 break;
-             }
--            src_buf = cluster_data;
--        } else {
--            src_buf = buf;
-         }
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 1801dc3..6b3d5de 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -538,8 +538,7 @@ int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
+ int qcow2_write_l1_entry(BlockDriverState *bs, int l1_index);
+ int qcow2_decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset);
+ int qcow2_encrypt_sectors(BDRVQcow2State *s, int64_t sector_num,
+-                          uint8_t *out_buf, const uint8_t *in_buf,
+-                          int nb_sectors, bool enc, Error **errp);
++                          uint8_t *buf, int nb_sectors, bool enc, Error **errp);
  
--        hd_iov.iov_base = (void *)src_buf;
-+        hd_iov.iov_base = (void *)buf;
-         hd_iov.iov_len = n * 512;
-         qemu_iovec_init_external(&hd_qiov, &hd_iov, 1);
-         qemu_co_mutex_unlock(&s->lock);
-@@ -773,10 +761,7 @@ static coroutine_fn int qcow_co_writev(BlockDriverState *bs, int64_t sector_num,
-     }
-     qemu_co_mutex_unlock(&s->lock);
- 
--    if (qiov->niov > 1) {
--        qemu_vfree(orig_buf);
--    }
--    g_free(cluster_data);
-+    qemu_vfree(orig_buf);
- 
-     return ret;
- }
+ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
+                              unsigned int *bytes, uint64_t *cluster_offset);
 -- 
 2.9.3
