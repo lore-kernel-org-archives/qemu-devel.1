@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alarson@ddci.com>) id 1dMxBT-0001iC-8g
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 09:57:40 -0400
+	(envelope-from <berrange@redhat.com>) id 1dMxD2-0002jh-K1
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 09:59:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alarson@ddci.com>) id 1dMxBQ-0002ga-80
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 09:57:39 -0400
-In-Reply-To: <20170618090448.GB22449@umbus>
-References: <201706051722.v55HMrD0024174@linux03a.ddci.com>
-	<OF9DCCDCC7.1E15B7C2-ON86258141.005A829A-86258141.005ABB35@ddci.com>
-	<20170618090448.GB22449@umbus>
+	(envelope-from <berrange@redhat.com>) id 1dMxD1-0003Nf-LV
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 09:59:16 -0400
+Date: Mon, 19 Jun 2017 14:58:57 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170619135857.GF2640@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170601172734.9039-1-berrange@redhat.com>
+	<20170601172734.9039-10-berrange@redhat.com>
+	<e362e833-32b9-57ec-4a92-c17293eefbbe@redhat.com>
 MIME-Version: 1.0
-From: alarson@ddci.com
-Message-ID: <OF9D367707.E5592B49-ON86258144.004BE080-86258144.004CACCB@ddci.com>
-Date: Mon, 19 Jun 2017 08:57:30 -0500
-Content-Type: text/plain; charset="US-ASCII"
-Subject: Re: [Qemu-devel] [PATCH v3] target-ppc: Enable open-pic timers to
- count and generate interrupts
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <e362e833-32b9-57ec-4a92-c17293eefbbe@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v8 09/20] qcow: convert QCow to use
+ QCryptoBlock for encryption
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,22 +26,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-David Gibson <david@gibson.dropbear.id.au> wrote on 06/18/2017 04:04:48 
-AM:
-> On Fri, Jun 16, 2017 at 11:31:02AM -0500, alarson@ddci.com wrote:
-
-> > I haven't received any feedback on this patch, ...  Did it get lost?
+On Wed, Jun 07, 2017 at 06:55:39PM +0200, Max Reitz wrote:
+> On 2017-06-01 19:27, Daniel P. Berrange wrote:
+> > This converts the qcow driver to make use of the QCryptoBlock
+> > APIs for encrypting image content. This is only wired up to
+> > permit use of the legacy QCow encryption format. Users who wish
+> > to have the strong LUKS format should switch to qcow2 instead.
+> > 
+> > With this change it is now required to use the QCryptoSecret
+> > object for providing passwords, instead of the current block
+> > password APIs / interactive prompting.
+> > 
 > 
-> No, I've just been busy and then sick.  I'll get to it eventually..
+> Beware, nit picks incoming:
+> 
+> >   $QEMU \
+> >     -object secret,id=sec0,filename=/home/berrange/encrypted.pw \>     -drive file=/home/berrange/encrypted.qcow,encrypt.format=qcow,\
+> 
+> encrypt.format should be "aes".
+> 
+> >            encrypt.key-secret=sec0
+> 
+> This doesn't work at all, though, because:
+> 
+> Use of AES-CBC encrypted qcow images is no longer supported in system
+> emulators
+> You can use 'qemu-img convert' to convert your image to an alternative
+> supported format, such as unencrypted qcow, or raw with the LUKS format
+> instead.
 
-As always, thanks for your efforts.  You have been so responsive in the
-past I figured something was up.  I hope you're feeling better.
+Good point. I'll leave this example here, since it is
+useful to illustrate the overall syntax approach, but
+I'll add a note that this example won't let you run
+the VM
 
-If karma is any consolation, I was just going through my QEMU "todo" list
-and found that I neglected to submit a follow up patch to an email
-conversation from last July.  Ouch.  I'll get that in the mail ASAP.
+> > Likewise when creating images with the legacy AES-CBC format
+> > 
+> >   qemu-img create -f qcow \
+> >     -object secret,id=sec0,filename=/home/berrange/encrypted.pw \
+> 
+> Should be --object.
 
-http://lists.nongnu.org/archive/html/qemu-ppc/2016-07/msg00916.html
+Yep
+
+> 
+> >     -o encrypt.format=aes,encrypt.key-secret=sec0 \
+> >     /home/berrange/encrypted.qcow
+> 
+> There should be a size here to make it work.
+
+Ok
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
