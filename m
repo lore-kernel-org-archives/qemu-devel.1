@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33424)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dN1GL-0008Sr-ML
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 14:18:58 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dN1kQ-0005HD-PA
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 14:50:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dN1GK-0002JA-O2
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 14:18:57 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:32778)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dN1GK-0002Ij-I8
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 14:18:56 -0400
-Received: by mail-pf0-x241.google.com with SMTP id w12so18592149pfk.0
-	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 11:18:56 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Date: Mon, 19 Jun 2017 11:18:39 -0700
-Message-Id: <20170619181839.25249-13-rth@twiddle.net>
-In-Reply-To: <20170619181839.25249-1-rth@twiddle.net>
-References: <20170619181839.25249-1-rth@twiddle.net>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dN1kM-0003H0-Sd
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 14:50:02 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:34125
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1dN1kM-0003Fh-LN
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 14:49:58 -0400
+References: <1497877149-19253-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1497877149-19253-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20170619142852.GS5016@thinpad.lan.raisama.net>
+	<7d5904ae-e66c-5594-cfff-747578d91f4b@ilande.co.uk>
+	<08da52ec-e4d2-d836-49bd-90baf21747fb@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <1d8147a6-d55c-4951-68db-4c1cf502a4f3@ilande.co.uk>
+Date: Mon, 19 Jun 2017 19:49:40 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 12/12] target/arm: Exit after clearing aarch64
- interrupt mask
+In-Reply-To: <08da52ec-e4d2-d836-49bd-90baf21747fb@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCHv6 3/5] fw_cfg: move assert() and linking of
+ fw_cfg device to the machine into instance_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +33,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: Laszlo Ersek <lersek@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, pbonzini@redhat.com, imammedo@redhat.com
 
-Exit to cpu loop so we reevaluate cpu_arm_hw_interrupts.
+On 19/06/17 18:09, Laszlo Ersek wrote:
 
-Tested-by: Emilio G. Cota <cota@braap.org>
-Tested-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Emilio G. Cota <cota@braap.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Richard Henderson <rth@twiddle.net>
----
- target/arm/translate-a64.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+>> What seems to happen is that calling object_property_add_child() only
+>> succeeds for the first instance and so a simple comparison is enough to
+>> determine that the device already exists at FW_CFG_PATH. Or is this a
+>> fairly terrible (ab)use of the QOM APIs?
+> 
+> This has jogged my memory about how we ensure "at most one" for the
+> vmgenid device. Please see:
+> 
+>   vmgenid_realize()    [hw/acpi/vmgenid.c]
+>     find_vmgenid_dev() [include/hw/acpi/vmgenid.h]
+> 
+> ... I was quite silly not to think of this on my own now, despite having
+> authored commit f92063028a0e ("hw/acpi/vmgenid: prevent more than one
+> vmgenid device", 2017-03-20) :/
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 860e279..e55547d 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -1422,7 +1422,9 @@ static void handle_msr_i(DisasContext *s, uint32_t insn,
-         gen_helper_msr_i_pstate(cpu_env, tcg_op, tcg_imm);
-         tcg_temp_free_i32(tcg_imm);
-         tcg_temp_free_i32(tcg_op);
--        s->is_jmp = DISAS_UPDATE;
-+        /* For DAIFClear, exit the cpu loop to re-evaluate pending IRQs.  */
-+        gen_a64_set_pc_im(s->pc);
-+        s->is_jmp = (op == 0x1f ? DISAS_EXIT : DISAS_JUMP);
-         break;
-     }
-     default:
-@@ -11369,6 +11371,9 @@ void gen_intermediate_code_a64(ARMCPU *cpu, TranslationBlock *tb)
-         case DISAS_JUMP:
-             tcg_gen_lookup_and_goto_ptr(cpu_pc);
-             break;
-+        case DISAS_EXIT:
-+            tcg_gen_exit_tb(0);
-+            break;
-         case DISAS_TB_JUMP:
-         case DISAS_EXC:
-         case DISAS_SWI:
--- 
-2.9.4
+Right that definitely helps - the following code seems to work correctly
+when trying to instantiate a mixture of fw_cfg_io and/or fw_cfg_mem types:
+
+if (!object_resolve_path_type("", TYPE_FW_CFG, NULL)) {
+    error_setg(errp, "at most one %s device is permitted", TYPE_FW_CFG);
+    return;
+}
+
+I've also copied the wording from the above commit to make everything
+consistent. Does that seem okay? If so, I'll fold it into a v7 patchset.
+
+
+ATB,
+
+Mark.
