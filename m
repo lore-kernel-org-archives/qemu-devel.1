@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dMrkD-0006Fq-Pu
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 04:09:10 -0400
+	(envelope-from <peterx@redhat.com>) id 1dMs3j-0002Ht-V9
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 04:29:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dMrkA-0003VX-JN
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 04:09:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34388)
+	(envelope-from <peterx@redhat.com>) id 1dMs3e-0000qx-Vn
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 04:29:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34816)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dMrkA-0003V0-9k
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 04:09:06 -0400
-References: <20170615203735.19649-1-rth@twiddle.net>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <82919db8-1004-9e42-e2a1-a4791e992524@redhat.com>
-Date: Mon, 19 Jun 2017 10:08:59 +0200
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dMs3e-0000q2-Ma
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 04:29:14 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2D544624BE
+	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 08:29:13 +0000 (UTC)
+Date: Mon, 19 Jun 2017 16:29:05 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170619082905.GD16787@pxdev.xzpeter.org>
+References: <20170619073116.10302-1-lprosek@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170615203735.19649-1-rth@twiddle.net>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/s390x: Implement CSST
+Content-Disposition: inline
+In-Reply-To: <20170619073116.10302-1-lprosek@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] intel_iommu: relax iq tail check on
+ VTD_GCMD_QIE enable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,76 +33,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, David Hildenbrand <david@redhat.com>
+To: Ladi Prosek <lprosek@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com
 
-On 15.06.2017 22:37, Richard Henderson wrote:
-> There are no uses in a Linux system with which to test,
-> but it Looks Right by my reading of the PoO.
+On Mon, Jun 19, 2017 at 09:31:16AM +0200, Ladi Prosek wrote:
+> The VT-d spec (section 6.5.2) prescribes software to zero the
+> Invalidation Queue Tail Register before enabling the VTD_GCMD_QIE
+> Global Command Register bit. Windows Server 2012 R2 and possibly
+> other older Windows versions violate the protocol and set a
+> non-zero queue tail first, which in effect makes them crash early
+> on boot with -device intel-iommu,intremap=on.
 > 
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
+> This commit relaxes the check and instead of failing to enable
+> VTD_GCMD_QIE with vtd_err_qi_enable, it behaves as if the tail
+> register was set just after enabling VTD_GCMD_QIE
+> (see vtd_handle_iqt_write).
+> 
+> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+
+Reviewed-by: Peter Xu <peterx@redhat.com>
+
 > ---
->  target/s390x/helper.h      |   1 +
->  target/s390x/insn-data.def |   2 +
->  target/s390x/mem_helper.c  | 189 +++++++++++++++++++++++++++++++++++++++++++++
->  target/s390x/translate.c   |  13 +++-
->  4 files changed, 204 insertions(+), 1 deletion(-)
 > 
-> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-> index b268367..456aaa9 100644
-> --- a/target/s390x/helper.h
-> +++ b/target/s390x/helper.h
-> @@ -33,6 +33,7 @@ DEF_HELPER_3(celgb, i64, env, i64, i32)
->  DEF_HELPER_3(cdlgb, i64, env, i64, i32)
->  DEF_HELPER_3(cxlgb, i64, env, i64, i32)
->  DEF_HELPER_4(cdsg, void, env, i64, i32, i32)
-> +DEF_HELPER_4(csst, i32, env, i32, i64, i64)
->  DEF_HELPER_FLAGS_3(aeb, TCG_CALL_NO_WG, i64, env, i64, i64)
->  DEF_HELPER_FLAGS_3(adb, TCG_CALL_NO_WG, i64, env, i64, i64)
->  DEF_HELPER_FLAGS_5(axb, TCG_CALL_NO_WG, i64, env, i64, i64, i64, i64)
-> diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-> index aa4c5b2..ef02a8e 100644
-> --- a/target/s390x/insn-data.def
-> +++ b/target/s390x/insn-data.def
-> @@ -256,6 +256,8 @@
->      D(0xbb00, CDS,     RS_a,  Z,   r3_D32, r1_D32, new, r1_D32, cs, 0, MO_TEQ)
->      D(0xeb31, CDSY,    RSY_a, LD,  r3_D32, r1_D32, new, r1_D32, cs, 0, MO_TEQ)
->      C(0xeb3e, CDSG,    RSY_a, Z,   0, 0, 0, 0, cdsg, 0)
-> +/* COMPARE AND SWAP AND STORE */
-> +    C(0xc802, CSST,    SSF,   CASS, la1, a2, 0, 0, csst, 0)
->  
->  /* COMPARE AND TRAP */
->      D(0xb972, CRT,     RRF_c, GIE, r1_32s, r2_32s, 0, 0, ct, 0, 0)
-> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-> index 6125725..4a7d770 100644
-> --- a/target/s390x/mem_helper.c
-> +++ b/target/s390x/mem_helper.c
-> @@ -1344,6 +1344,195 @@ void HELPER(cdsg)(CPUS390XState *env, uint64_t addr,
->      env->regs[r1 + 1] = int128_getlo(oldv);
+> v1->v2:
+> * rebased on top of Michael's repo
+> * trace_vtd_warn_invalid_qi_tail instead of VTD_DPRINTF, called on
+>   non-zero iq_tail
+> * added a comment
+> 
+> 
+>  hw/i386/intel_iommu.c | 33 +++++++++++++++++++--------------
+>  hw/i386/trace-events  |  2 +-
+>  2 files changed, 20 insertions(+), 15 deletions(-)
+> 
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index a9b59bd..2ddf3bd 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -1450,10 +1450,7 @@ static uint64_t vtd_iotlb_flush(IntelIOMMUState *s, uint64_t val)
+>      return iaig;
 >  }
 >  
-> +uint32_t HELPER(csst)(CPUS390XState *env, uint32_t r3, uint64_t a1, uint64_t a2)
-> +{
-> +#if !defined(CONFIG_USER_ONLY) || defined(CONFIG_ATOMIC128)
-> +    uint32_t mem_idx = cpu_mmu_index(env, false);
-> +#endif
-> +    uintptr_t ra = GETPC();
-> +    uint32_t fc = extract32(env->regs[0], 0, 8);
-> +    uint32_t sc = extract32(env->regs[0], 8, 8);
-> +    uint64_t pl = get_address(env, 1) & -16;
-> +    uint64_t svh, svl;
-> +    uint32_t cc;
+> -static inline bool vtd_queued_inv_enable_check(IntelIOMMUState *s)
+> -{
+> -    return s->iq_tail == 0;
+> -}
+> +static void vtd_fetch_inv_desc(IntelIOMMUState *s);
+>  
+>  static inline bool vtd_queued_inv_disable_check(IntelIOMMUState *s)
+>  {
+> @@ -1468,16 +1465,24 @@ static void vtd_handle_gcmd_qie(IntelIOMMUState *s, bool en)
+>      trace_vtd_inv_qi_enable(en);
+>  
+>      if (en) {
+> -        if (vtd_queued_inv_enable_check(s)) {
+> -            s->iq = iqa_val & VTD_IQA_IQA_MASK;
+> -            /* 2^(x+8) entries */
+> -            s->iq_size = 1UL << ((iqa_val & VTD_IQA_QS) + 8);
+> -            s->qi_enabled = true;
+> -            trace_vtd_inv_qi_setup(s->iq, s->iq_size);
+> -            /* Ok - report back to driver */
+> -            vtd_set_clear_mask_long(s, DMAR_GSTS_REG, 0, VTD_GSTS_QIES);
+> -        } else {
+> -            trace_vtd_err_qi_enable(s->iq_tail);
+> +        s->iq = iqa_val & VTD_IQA_IQA_MASK;
+> +        /* 2^(x+8) entries */
+> +        s->iq_size = 1UL << ((iqa_val & VTD_IQA_QS) + 8);
+> +        s->qi_enabled = true;
+> +        trace_vtd_inv_qi_setup(s->iq, s->iq_size);
+> +        /* Ok - report back to driver */
+> +        vtd_set_clear_mask_long(s, DMAR_GSTS_REG, 0, VTD_GSTS_QIES);
 > +
-> +    /* Sanity check the function code and storage characteristic.  */
-> +    if (fc > 1 || sc > 3) {
-> +        if (!s390_has_feat(S390_FEAT_COMPARE_AND_SWAP_AND_STORE_2)) {
-> +            goto spec_exception;
-> +        }
-> +        if (fc > 2 || sc > 4 || (fc == 2 && (r3 & 1))) {
+> +        if (s->iq_tail != 0) {
+> +            /*
+> +             * This is a spec violation but Windows guests are known to set up
+> +             * Queued Invalidation this way so we allow the write and process
+> +             * Invalidation Descriptors right away.
+> +             */
+> +            trace_vtd_warn_invalid_qi_tail(s->iq_tail);
+> +            if (!(vtd_get_long_raw(s, DMAR_FSTS_REG) & VTD_FSTS_IQE)) {
+> +                vtd_fetch_inv_desc(s);
+> +            }
+>          }
+>      } else {
+>          if (vtd_queued_inv_disable_check(s)) {
+> diff --git a/hw/i386/trace-events b/hw/i386/trace-events
+> index 5f111d6..42d8a7e 100644
+> --- a/hw/i386/trace-events
+> +++ b/hw/i386/trace-events
+> @@ -74,7 +74,7 @@ vtd_err_dmar_slpte_read_error(uint64_t iova, int level) "iova 0x%"PRIx64" level
+>  vtd_err_dmar_slpte_perm_error(uint64_t iova, int level, uint64_t slpte, bool is_write) "iova 0x%"PRIx64" level %d slpte 0x%"PRIx64" write %d"
+>  vtd_err_dmar_slpte_resv_error(uint64_t iova, int level, uint64_t slpte) "iova 0x%"PRIx64" level %d slpte 0x%"PRIx64
+>  vtd_err_dmar_translate(uint8_t bus, uint8_t slot, uint8_t func, uint64_t iova) "dev %02x:%02x.%02x iova 0x%"PRIx64
+> -vtd_err_qi_enable(uint16_t tail) "tail 0x%"PRIx16
+> +vtd_warn_invalid_qi_tail(uint16_t tail) "tail 0x%"PRIx16
+>  vtd_err_qi_disable(uint16_t head, uint16_t tail, int type) "head 0x%"PRIx16" tail 0x%"PRIx16" last_desc_type %d"
+>  vtd_err_qi_tail(uint16_t tail, uint16_t size) "tail 0x%"PRIx16" size 0x%"PRIx16
+>  vtd_err_irte(int index, uint64_t lo, uint64_t hi) "index %d low 0x%"PRIx64" high 0x%"PRIx64
+> -- 
+> 2.9.3
+> 
 
-I think you could omit the "fc == 2" here. fc has to be bigger than 1
-due to the outer if-statement, and if it is not 2, the first "fc > 1"
-has already triggered. So "fc" has to be 2 here and the "fc == 2" is a
-redundant check.
-
- Thomas
+-- 
+Peter Xu
