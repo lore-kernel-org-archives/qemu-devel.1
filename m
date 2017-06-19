@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <casasfernando@hotmail.com>) id 1dN4sI-0000BC-4L
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 18:10:23 -0400
+	(envelope-from <lersek@redhat.com>) id 1dN5OM-0007Xs-3B
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 18:43:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <casasfernando@hotmail.com>) id 1dN4sE-0004z1-PO
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 18:10:22 -0400
-Received: from mail-oln040092072102.outbound.protection.outlook.com
-	([40.92.72.102]:48337
-	helo=EUR03-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <casasfernando@hotmail.com>)
-	id 1dN4sE-0004yb-7v
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 18:10:18 -0400
-From: =?utf-8?B?RmVybmFuZG8gQ2FzYXMgU2Now7Zzc293?= <casasfernando@hotmail.com>
-Date: Mon, 19 Jun 2017 22:10:15 +0000
-Message-ID: <VI1PR1001MB1373B1F3C97D9528166E2305B7C40@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
-References: <VI1PR1001MB137395F2FCBDE6389A9AC5FCB7C30@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
-	<CABdb7358YVXbk++Z7s+q6Z5O0Q=6CQiQvYsTdc35eqmQeUnP_Q@mail.gmail.com>
-	<VI1PR1001MB1373C8915C51F7453D41B950B7C10@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
-	<CABdb7345_Nu_kpsSDGq7OyOSuKmgtyS-DuXTafkGeaCCXzV5LQ@mail.gmail.com>
-In-Reply-To: <CABdb7345_Nu_kpsSDGq7OyOSuKmgtyS-DuXTafkGeaCCXzV5LQ@mail.gmail.com>
-Content-Language: en-US
+	(envelope-from <lersek@redhat.com>) id 1dN5OJ-00025M-22
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 18:43:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41066)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dN5OI-00024y-R2
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 18:43:26 -0400
+References: <1497877149-19253-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1497877149-19253-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20170619142852.GS5016@thinpad.lan.raisama.net>
+	<7d5904ae-e66c-5594-cfff-747578d91f4b@ilande.co.uk>
+	<08da52ec-e4d2-d836-49bd-90baf21747fb@redhat.com>
+	<1d8147a6-d55c-4951-68db-4c1cf502a4f3@ilande.co.uk>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <9d24bf00-cf82-717a-eccd-f51e2c80dd6f@redhat.com>
+Date: Tue, 20 Jun 2017 00:43:19 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] Guest unresponsive after Virtqueue size exceeded
- error
+In-Reply-To: <1d8147a6-d55c-4951-68db-4c1cf502a4f3@ilande.co.uk>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCHv6 3/5] fw_cfg: move assert() and linking of
+ fw_cfg device to the machine into instance_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,81 +33,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, pbonzini@redhat.com, imammedo@redhat.com
 
-SGkgTGFkaSwNCg0KVG9kYXkgdHdvIGd1ZXN0cyBmYWlsZWQgYWdhaW4gYXQgZGlmZmVyZW50IHRp
-bWVzIG9mIGRheS4NCk9uZSBvZiB0aGVtIHdhcyB0aGUgb25lIEkgc3dpdGNoZWQgZnJvbSB2aXJ0
-aW9fYmxrIHRvIHZpcnRpb19zY3NpIHNvIHRoaXMgY2hhbmdlIGRpZG4ndCBzb2x2ZWQgdGhlIHBy
-b2JsZW0uDQpOb3cgaW4gdGhpcyBndWVzdCBJIGFsc28gZGlzYWJsZWQgdmlydGlvX2JhbGxvb24s
-IGNvbnRpbnVpbmcgd2l0aCB0aGUgZWxpbWluYXRpb24gcHJvY2Vzcy4NCg0KQWxzbyB0aGlzIHRp
-bWUgSSBmb3VuZCBhIGRpZmZlcmVudCBlcnJvciBtZXNzYWdlIGluIHRoZSBndWVzdCBjb25zb2xl
-Lg0KSW4gdGhlIGd1ZXN0IGFscmVhZHkgc3dpdGNoZWQgdG8gdmlydGlvX3Njc2k6DQoNCnZpcnRp
-b19zY3NpIHZpcnRpbzI6IHJlcXVlc3Q6aWQgNDQgaXMgbm90IGEgaGVhZCENCg0KRm9sbG93ZWQg
-YnkgdGhlIHVzdWFsICJ0YXNrIGJsb2NrZWQgZm9yIG1vcmUgdGhhbiAxMjAgc2Vjb25kcy4iIGVy
-cm9yLg0KDQpPbiB0aGUgZ3Vlc3Qgc3RpbGwgcnVubmluZyBvbiB2aXJ0aW9fYmxrIHRoZSBlcnJv
-ciB3YXMgc2ltaWxhcjoNCg0KdmlydGlvX2JsayB2aXJ0aW8yOiByZXEuMDppZCA0MiBpcyBub3Qg
-YSBoZWFkIQ0KYmxrX3VwZGF0ZV9yZXF1ZXN0OiBJL08gZXJyb3IsIGRldiB2ZGEsIHNlY3RvciA2
-NDU2NTc3MzYNCkJ1ZmZlciBJL08gZXJyb3Igb24gZGV2IGRtLTEsIGxvZ2ljYWwgYmxvY2sgNzQx
-MzgyMSwgbG9zdCBhc3luYyBwYWdlIHdyaXRlDQoNCkZvbGxvd2VkIGJ5IHRoZSB1c3VhbCAidGFz
-ayBibG9ja2VkIGZvciBtb3JlIHRoYW4gMTIwIHNlY29uZHMuIiBlcnJvci4NCg0KRG8geW91IHRo
-aW5rIHRoYXQgdGhlIGJsa191cGRhdGVfcmVxdWVzdCBhbmQgdGhlIGJ1ZmZlciBJL08gZXJyb3Ig
-bWF5IGJlIGEgY29uc2VxdWVuY2Ugb2YgdGhlIHByZXZpb3VzICJpcyBub3QgYSBoZWFkISIgZXJy
-b3Igb3Igc2hvdWxkIEkgYmUgd29ycmllZCBmb3IgYSBzdG9yYWdlIGxldmVsIGlzc3VlIGhlcmU/
-DQoNCk5vdyBJIHdpbGwgd2FpdCB0byBzZWUgaWYgZGlzYWJsaW5nIHZpcnRpb19iYWxsb29uIGhl
-bHBzIG9yIG5vdCBhbmQgcmVwb3J0IGJhY2suDQoNClRoYW5rcy4NCg0KRmVyDQoNCk9uIHZpZSwg
-anVuIDE2LCAyMDE3IGF0IDEyOjI1ICwgTGFkaSBQcm9zZWsgPGxwcm9zZWtAcmVkaGF0LmNvbT4g
-d3JvdGU6DQpPbiBGcmksIEp1biAxNiwgMjAxNyBhdCAxMjoxMSBQTSwgRmVybmFuZG8gQ2FzYXMg
-U2Now7Zzc293IDxjYXNhc2Zlcm5hbmRvQGhvdG1haWwuY29tPG1haWx0bzpjYXNhc2Zlcm5hbmRv
-QGhvdG1haWwuY29tPj4gd3JvdGU6DQpIaSBMYWRpLCBUaGFua3MgYSBsb3QgZm9yIGxvb2tpbmcg
-aW50byB0aGlzIGFuZCByZXBseWluZy4gSSB3aWxsIGRvIG15IGJlc3QgdG8gcmVidWlsZCBhbmQg
-ZGVwbG95IEFscGluZSdzIHFlbXUgcGFja2FnZXMgd2l0aCB0aGlzIHBhdGNoIGluY2x1ZGVkIGJ1
-dCBub3Qgc3VyZSBpdHMgZmVhc2libGUgeWV0LiBJbiBhbnkgY2FzZSwgd291bGQgaXQgYmUgcG9z
-c2libGUgdG8gaGF2ZSB0aGlzIHBhdGNoIGluY2x1ZGVkIGluIHRoZSBuZXh0IHFlbXUgcmVsZWFz
-ZT8NClllcywgSSBoYXZlIGFscmVhZHkgYWRkZWQgdGhpcyB0byBteSB0b2RvIGxpc3QuDQpUaGUg
-Y3VycmVudCBlcnJvciBtZXNzYWdlIGlzIGhlbHBmdWwgYnV0IGtub3dpbmcgd2hpY2ggZGV2aWNl
-IHdhcyBpbnZvbHZlZCB3aWxsIGJlIG11Y2ggbW9yZSBoZWxwZnVsLiBSZWdhcmRpbmcgdGhlIGVu
-dmlyb25tZW50LCBJJ20gbm90IGRvaW5nIG1pZ3JhdGlvbnMgYW5kIG9ubHkgbWFuYWdlZCBzYXZl
-IGlzIGRvbmUgaW4gY2FzZSB0aGUgaG9zdCBuZWVkcyB0byBiZSByZWJvb3RlZCBvciBzaHV0ZG93
-bi4gVGhlIFFFTVUgcHJvY2VzcyBpcyBydW5uaW5nIHRoZSBWTSBzaW5jZSB0aGUgaG9zdCBpcyBz
-dGFydGVkIGFuZCB0aGlzIGZhaWx1aXJlIGlzIG9jdXJyaW5nIHJhbmRvbWx5IHdpdGhvdXQgYW55
-IHByZXZpb3VzIG1hbmFnZSBzYXZlIGRvbmUuIEFzIHBhcnQgb2YgdHJvdWJsZXNob290aW5nIG9u
-IG9uZSBvZiB0aGUgZ3Vlc3RzIEkgc3dpdGNoZWQgZnJvbSB2aXJ0aW9fYmxrIHRvIHZpcnRpb19z
-Y3NpIGZvciB0aGUgZ3Vlc3QgZGlza3MgYnV0IEkgd2lsbCBuZWVkIG1vcmUgdGltZSB0byBzZWUg
-aWYgdGhhdCBoZWxwZWQuIElmIEkgaGF2ZSB0aGlzIHByb2JsZW0gYWdhaW4gSSB3aWxsIGZvbGxv
-dyB5b3VyIGFkdmlzZSBhbmQgcmVtb3ZlIHZpcnRpb19iYWxsb29uLg0KVGhhbmtzLCBwbGVhc2Ug
-a2VlcCB1cyBwb3N0ZWQuDQpBbm90aGVyIHF1ZXN0aW9uOiBpcyB0aGVyZSBhbnkgd2F5IHRvIG1v
-bml0b3IgdGhlIHZpcnRxdWV1ZSBzaXplIGVpdGhlciBmcm9tIHRoZSBndWVzdCBpdHNlbGYgb3Ig
-ZnJvbSB0aGUgaG9zdD8gQW55IGZpbGUgaW4gc3lzZnMgb3IgcHJvYz8gVGhpcyBtYXkgaGVscCB0
-byB1bmRlcnN0YW5kIGluIHdoaWNoIGNvbmRpdGlvbnMgdGhpcyBpcyBoYXBwZW5pbmcgYW5kIHRv
-IHJlYWN0IGZhc3RlciB0byBtaXRpZ2F0ZSB0aGUgcHJvYmxlbS4NClRoZSBwcm9ibGVtIGlzIG5v
-dCBpbiB0aGUgdmlydHF1ZXVlIHNpemUgYnV0IGluIG9uZSBwaWVjZSBvZiBpbnRlcm5hbCBzdGF0
-ZSAoImludXNlIikgd2hpY2ggaXMgbWVhbnQgdG8gdHJhY2sgdGhlIG51bWJlciBvZiBidWZmZXJz
-ICJjaGVja2VkIG91dCIgYnkgUUVNVS4gSXQncyBiZWluZyBjb21wYXJlZCB0byB2aXJ0cXVldWUg
-c2l6ZSBtZXJlbHkgYXMgYSBzYW5pdHkgY2hlY2suIEknbSBhZnJhaWQgdGhhdCB0aGVyZSdzIG5v
-IHdheSB0byBleHBvc2UgdGhpcyB2YXJpYWJsZSB3aXRob3V0IHJlYnVpbGRpbmcgUUVNVS4gVGhl
-IGJlc3QgeW91IGNvdWxkIGRvIGlzIGF0dGFjaCBnZGIgdG8gdGhlIFFFTVUgcHJvY2VzcyBhbmQg
-dXNlIHNvbWUgY2xldmVyIGRhdGEgYWNjZXNzIGJyZWFrcG9pbnRzIHRvIGNhdGNoIHN1c3BpY2lv
-dXMgd3JpdGVzIHRvIHRoZSB2YXJpYWJsZS4gQWx0aG91Z2ggaXQncyBsaWtlbHkgdGhhdCBpdCBq
-dXN0IGNyZWVwcyB1cCBzbG93bHkgYW5kIHlvdSB3b24ndCBzZWUgYW55dGhpbmcgaW50ZXJlc3Rp
-bmcuIEl0J3MgcHJvYmFibHkgYmV5b25kIHJlYXNvbmFibGUgYXQgdGhpcyBwb2ludCBhbnl3YXku
-IEkgd291bGQgY29udGludWUgd2l0aCB0aGUgZWxpbWluYXRpb24gcHJvY2VzcyAodmlydGlvX3Nj
-c2kgaW5zdGVhZCBvZiB2aXJ0aW9fYmxrLCBubyBiYWxsb29uLCBldGMuKSBhbmQgdGhlbiBtYXli
-ZSBvbmNlIHdlIGtub3cgd2hpY2ggZGV2aWNlIGl0IGlzLCB3ZSBjYW4gYWRkIHNvbWUgaW5zdHJ1
-bWVudGF0aW9uIHRvIHRoZSBjb2RlLg0KVGhhbmtzIGFnYWluIGZvciB5b3VyIGhlbHAgd2l0aCB0
-aGlzISBGZXIgT24gdmllLCBqdW4gMTYsIDIwMTcgYXQgODo1OCAsIExhZGkgUHJvc2VrIDxscHJv
-c2VrQHJlZGhhdC5jb208bWFpbHRvOmxwcm9zZWtAcmVkaGF0LmNvbT4+IHdyb3RlOiBIaSwgV291
-bGQgeW91IGJlIGFibGUgdG8gZW5oYW5jZSB0aGUgZXJyb3IgbWVzc2FnZSBhbmQgcmVidWlsZCBR
-RU1VPyAtLS0gYS9ody92aXJ0aW8vdmlydGlvLmMgKysrIGIvaHcvdmlydGlvL3ZpcnRpby5jIEBA
-IC04NTYsNyArODU2LDcgQEAgdm9pZCAqdmlydHF1ZXVlX3BvcChWaXJ0UXVldWUgKnZxLCBzaXpl
-X3Qgc3opIG1heCA9IHZxLT52cmluZy5udW07IGlmICh2cS0+aW51c2UNCj0gdnEtPnZyaW5nLm51
-bSkgeyAtIHZpcnRpb19lcnJvcih2ZGV2LCAiVmlydHF1ZXVlIHNpemUgZXhjZWVkZWQiKTsgKw0K
-dmlydGlvX2Vycm9yKHZkZXYsICJWaXJ0cXVldWUgJXUgZGV2aWNlICVzIHNpemUgZXhjZWVkZWQi
-LCB2cS0+cXVldWVfaW5kZXgsIHZkZXYtPm5hbWUpOyBnb3RvIGRvbmU7IH0gVGhpcyB3b3VsZCBh
-dCBsZWFzdCBjb25maXJtIHRoZSB0aGVvcnkgdGhhdCBpdCdzIGNhdXNlZCBieSB2aXJ0aW8tYmxr
-LXBjaS4gSWYgcmVidWlsZGluZyBpcyBub3QgZmVhc2libGUgSSB3b3VsZCBzdGFydCBieSByZW1v
-dmluZyBvdGhlciB2aXJ0aW8gZGV2aWNlcyAtLSBwYXJ0aWN1bGFybHkgYmFsbG9vbiB3aGljaCBo
-YXMgaGFkIHF1aXRlIGEgZmV3IHZpcnRpbyByZWxhdGVkIGJ1Z3MgZml4ZWQgcmVjZW50bHkuIERv
-ZXMgeW91ciBlbnZpcm9ubWVudCBpbnZvbHZlIFZNIG1pZ3JhdGlvbnMgb3Igc2F2aW5nL3Jlc3Vt
-aW5nLCBvciBkb2VzIHRoZSBjcmFzaGluZyBRRU1VIHByb2Nlc3MgYWx3YXlzIHJ1biB0aGUgVk0g
-ZnJvbSBpdHMgYm9vdD8gVGhhbmtzIQ0KDQoNCg==
+On 06/19/17 20:49, Mark Cave-Ayland wrote:
+> On 19/06/17 18:09, Laszlo Ersek wrote:
+> 
+>>> What seems to happen is that calling object_property_add_child() only
+>>> succeeds for the first instance and so a simple comparison is enough to
+>>> determine that the device already exists at FW_CFG_PATH. Or is this a
+>>> fairly terrible (ab)use of the QOM APIs?
+>>
+>> This has jogged my memory about how we ensure "at most one" for the
+>> vmgenid device. Please see:
+>>
+>>   vmgenid_realize()    [hw/acpi/vmgenid.c]
+>>     find_vmgenid_dev() [include/hw/acpi/vmgenid.h]
+>>
+>> ... I was quite silly not to think of this on my own now, despite having
+>> authored commit f92063028a0e ("hw/acpi/vmgenid: prevent more than one
+>> vmgenid device", 2017-03-20) :/
+> 
+> Right that definitely helps - the following code seems to work correctly
+> when trying to instantiate a mixture of fw_cfg_io and/or fw_cfg_mem types:
+> 
+> if (!object_resolve_path_type("", TYPE_FW_CFG, NULL)) {
+>     error_setg(errp, "at most one %s device is permitted", TYPE_FW_CFG);
+>     return;
+> }
+> 
+> I've also copied the wording from the above commit to make everything
+> consistent. Does that seem okay? If so, I'll fold it into a v7 patchset.
+
+It looks good to me, but please await Eduardo's reply as well.
+
+In particular, it should be confirmed that object_resolve_path_type()
+matches instances of *subclasses* as well (as I expect it would). Your
+test results confirm that; let's make sure it is intentional behavior.
+Eduardo (or someone else on the CC list), can you please comment on that?
+
+Thanks!
+Laszlo
