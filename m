@@ -1,30 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dN5U7-0000lI-26
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 18:49:27 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dN5Xa-00024u-Vq
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 18:53:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dN5U3-0004ud-Oh
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 18:49:27 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:35713)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dN5U3-0004uJ-IR
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 18:49:23 -0400
-Received: by mail-qk0-x242.google.com with SMTP id 16so3464267qkg.2
-	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 15:49:23 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <CAFEAcA9+HauZoeSxrdXE+cENswUPsjoSOVFJ-wMfboYH5wC2=Q@mail.gmail.com>
-	<c1efba1b-0af9-50a5-e200-a3f74a88d1c1@redhat.com>
-	<CAFEAcA9ShizMdZRg_EboKK_7kKhakX8rtF32jCgva77e24rnZA@mail.gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <104840a4-9665-324e-329a-3ae92c657b4f@twiddle.net>
-Date: Mon, 19 Jun 2017 15:49:18 -0700
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dN5XX-0006Mk-UY
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 18:53:03 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34038)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1dN5XX-0006MG-Kz
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 18:52:59 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v5JMmY0I001137
+	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 18:52:56 -0400
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2b6chd8x7x-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 18:52:56 -0400
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Mon, 19 Jun 2017 16:52:55 -0600
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9ShizMdZRg_EboKK_7kKhakX8rtF32jCgva77e24rnZA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] QEMU issues on SPARC hosts due to
- more-than-page-alignment requirement for MAP_SHARED|MAP_FIXED...
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20170608050930.2613-1-david@gibson.dropbear.id.au>
+References: <20170608050930.2613-1-david@gibson.dropbear.id.au>
+Date: Mon, 19 Jun 2017 17:52:44 -0500
+Message-Id: <149791276464.25078.16276260311623099840@loki>
+Subject: Re: [Qemu-devel] [PATCH 0/6] spapr: DRC cleanups (part IV)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,18 +40,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: bharata@linux.vnet.ibm.com, sursingh@redhat.com, groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On 06/16/2017 02:18 AM, Peter Maydell wrote:
-> (As an aside I wonder whether any still-used hardware has
-> the cache aliasing constraints in question :-))
+Quoting David Gibson (2017-06-08 00:09:24)
+> This fourth isntallment of cleanups to the DRC code introduces the
+> first changes to the fundamental state handling.  We change the
+> initial states in the reset code and attach code for PCI devices, and
+> are able to remove the 'signalled' state variable with those fixes.
+> =
 
-I strongly doubt it.  Certainly none of the 64-bit chips have this.
+> There are also some more mechanical cleanups in preparation for
+> further cleanups and fixes to the state management.
+> =
 
-Amusingly, while we require a 64-bit chip in TCG, we do allow elf32 via 
-sparcv8plus, which still runs afoul of this check.  In hindsight, sparcv8plus 
-probably should have relaxed this, but it's 20 years too late for that.
+> David Gibson (6):
+>   spapr: Start hotplugged PCI devices in ISOLATED state
+>   spapr: Eliminate DRC 'signalled' state variable
+>   spapr: Split DRC release from DRC detach
+>   spapr: Make DRC reset force DRC into known state
+>   spapr: Clean up DRC set_allocation_state path
+>   spapr: Clean up DRC set_isolation_state() path
 
+Series:
 
-r~
+Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+
+> =
+
+>  hw/ppc/spapr.c             |  15 --
+>  hw/ppc/spapr_drc.c         | 363 +++++++++++++++++++++++----------------=
+------
+>  hw/ppc/spapr_events.c      |  10 --
+>  include/hw/ppc/spapr_drc.h |  10 +-
+>  4 files changed, 188 insertions(+), 210 deletions(-)
+> =
+
+> -- =
+
+> 2.9.4
+>=20
