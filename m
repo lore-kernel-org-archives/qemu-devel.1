@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53148)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dMtFp-0000m2-M6
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 05:45:55 -0400
+	(envelope-from <david@redhat.com>) id 1dMtWr-0004a7-B1
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:03:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dMtFm-0004vy-K3
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 05:45:53 -0400
-Date: Mon, 19 Jun 2017 10:45:43 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170619094543.GC2640@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CAOE=1Z2Dtzt7xsiE=XR=MShSHwb6Z-=JnHdtvRr2MwQpFhpuiQ@mail.gmail.com>
-	<CAOE=1Z2PwNNk0KyEPC+cYSYtD62Vx=VZacaTKTHMBX=SaiBgGQ@mail.gmail.com>
+	(envelope-from <david@redhat.com>) id 1dMtWm-0006ky-Ft
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:03:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58996)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dMtWm-0006kf-9P
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:03:24 -0400
+References: <20170615203735.19649-1-rth@twiddle.net>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <7998cb6b-018e-8069-9d11-a3e1e4e70380@redhat.com>
+Date: Mon, 19 Jun 2017 12:03:20 +0200
 MIME-Version: 1.0
+In-Reply-To: <20170615203735.19649-1-rth@twiddle.net>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAOE=1Z2PwNNk0KyEPC+cYSYtD62Vx=VZacaTKTHMBX=SaiBgGQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] Fwd: [DPDK-memory] how qemu waste such long time
- under dpdk huge page envriment?
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target/s390x: Implement CSST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,102 +27,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sam <batmanustc@gmail.com>
-Cc: qemu-devel@nongnu.org, qemu-discuss@nongnu.org
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, aurelien@aurel32.net
 
-On Mon, Jun 19, 2017 at 05:30:59PM +0800, Sam wrote:
-> Hi all,
-> 
-> I'm running `QEMU_CMD ...` to create a vm under dpdk huge page envriment
-> (which set huge page 1G). And I enable all events in qemu.
+On 15.06.2017 22:37, Richard Henderson wrote:
+> There are no uses in a Linux system with which to test,
+> but it Looks Right by my reading of the PoO.
 
-Please provide the full QEMU command line you are using.
+I am using next.git/master with this patch applied:
+https://git.kernel.org/pub/scm/linux/kernel/git/s390/linux.git/commit/?h=features&id=8aa8680aa383bf6e2ac
 
-> For qemu and ovs-dpdk(ovs-2.4.9 with dpdk-2.2.0) environment, detail log is:
-> 
-> > 30012@1497443246.678304:object_dynamic_cast_assert
-> qemu:memory-region->qemu:memory-region (/home/hu
-> > anghuai/cloud/contrib/qemu-2.6.0/memory.c:1076:memory_region_initfn)
-> > 30012@1497443256.274866:object_dynamic_cast_assert
-> qio-channel-socket->qio-channel-socket (io/chann
-> > el-socket.c:389:qio_channel_socket_init)
-> 
-> 
-> I don't know why qemu doing 'memory_region_initfn' function in this 10
-> second, does anyone know this?
+I am using QEMU with the mvcos patch and your patch applied (and a patch
+that allows enabling csst/csst2).
 
-If memory initialization takes a long time, this is likely a result of
-QEMU pre-allocating the memory pages, which is a fairly slow procedure,
-that can have noticable startup time impact for guests with large RAM
+I am using the following qemu command line:
 
+#!/bin/bash
+/home/dhildenb/git/qemu/s390x-softmmu/qemu-system-s390x \
+	-nographic -nodefaults -machine s390-ccw-virtio,accel=tcg \
+	-cpu qemu,mvcos=on,stfle=on,ldisp=on,ldisphp=on,\
+          eimm=on,stckf=on,csst=on,csst2=on,ginste=on,exrl=on\
+	-m 256M -smp 1 -chardev stdio,id=con0 \
+	-device sclpconsole,chardev=con0 \
+	-kernel vmlinux -initrd /home/dhildenb/initrd.debian
 
-> static void memory_region_initfn(Object *obj)
-> > {
-> >     MemoryRegion *mr = MEMORY_REGION(obj);
-> >     ObjectProperty *op;
-> >     mr->ops = &unassigned_mem_ops;
-> >     mr->enabled = true;
-> >     mr->romd_mode = true;
-> >     mr->global_locking = true;
-> >     mr->destructor = memory_region_destructor_none;
-> >     QTAILQ_INIT(&mr->subregions);
-> >     QTAILQ_INIT(&mr->coalesced);
-> >     op = object_property_add(OBJECT(mr), "container",
-> >                              "link<" TYPE_MEMORY_REGION ">",
-> >                              memory_region_get_container,
-> >                              NULL, /* memory_region_set_container */
-> >                              NULL, NULL, &error_abort);
-> >     op->resolve = memory_region_resolve_container;
-> >     object_property_add(OBJECT(mr), "addr", "uint64",
-> >                         memory_region_get_addr,
-> >                         NULL, /* memory_region_set_addr */
-> >                         NULL, NULL, &error_abort);
-> >     object_property_add(OBJECT(mr), "priority", "uint32",
-> >                         memory_region_get_priority,
-> >                         NULL, /* memory_region_set_priority */
-> >                         NULL, NULL, &error_abort);
-> >     object_property_add_bool(OBJECT(mr), "may-overlap",
-> >                              memory_region_get_may_overlap,
-> >                              NULL, /* memory_region_set_may_overlap */
-> >                              &error_abort);
-> >     object_property_add(OBJECT(mr), "size", "uint64",
-> >                         memory_region_get_size,
-> >                         NULL, /* memory_region_set_size, */
-> >                         NULL, NULL, &error_abort);
-> > }
-> 
-> 
-> I print all system call by `strace -f -T -tt -e trace=all -o output.txt
-> $QEMU_CMD`, and I found this:
-> 
-> 5900  11:08:11.288701 nanosleep({0, 10000000}, 0x7ff103c13a80) = 0
-> > <0.010171>
-> > 5900  11:08:11.299052 futex(0x7ff10be24340, FUTEX_WAIT_PRIVATE, 2, NULL
-> > <unfinished ...>
-> > 5899  11:08:20.138492 rt_sigaction(SIGBUS, {0x7ff10b5b1040, [],
-> > SA_RESTORER|SA_SIGINFO, 0x7ff1085fd100}, NULL, 8) = 0 <0.000012>
-> > 5899  11:08:20.138598 rt_sigprocmask(SIG_SETMASK, [BUS USR1 ALRM IO],
-> > NULL, 8) = 0 <0.000008>
-> > 5899  11:08:20.138646 mmap(NULL, 266240, PROT_READ|PROT_WRITE,
-> > MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7ff10b380000 <0.000013>
-> > 5899  11:08:20.138793 mmap(NULL, 266240, PROT_READ|PROT_WRITE,
-> > MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7ff10b33f000 <0.000009>
-> 
-> 
-> I don't know who call `futex`, and why waste such long time.
+Right now, I can start a z9 compiled kernel.
 
-This trace doesn't show enough info to say what is happening - a futex
-is just the syscall used for mutex locking, so that just shows that
-thread 5900 is waiting for some lock. This doesn't imply the time is
-wasted, or really saying anything useful at all.
+When trying to start a z10 compiled kernel (which generates many csst),
+qemu simply crashes / the guests exits (have to debug) without any
+command line output.
 
-Meanwhile thread 5899 was doing some mmap calls. There's no obvious
-relationship between the times in thread 5900 and 58909 in this trace.
-The 9 second gap here is just coincidental.
+So either something in csst is broken or in the other instructions for z10.
 
-Regards,
-Daniel
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
+Thanks,
+
+David
