@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dMuQW-0002nL-74
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 07:01:04 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dMubt-0006SC-MI
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 07:12:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dMuQM-0004yF-US
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 07:01:00 -0400
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:38095)
+	(envelope-from <peter.maydell@linaro.org>) id 1dMubs-0003zW-VL
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 07:12:45 -0400
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:38262)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dMuQM-0004y7-J5
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 07:00:50 -0400
-Received: by mail-wm0-x230.google.com with SMTP id u195so58178699wmd.1
-	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 04:00:50 -0700 (PDT)
-References: <20170616161334.7492-1-f4bug@amsat.org>
-	<20170616161334.7492-9-f4bug@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170616161334.7492-9-f4bug@amsat.org>
-Date: Mon, 19 Jun 2017 12:01:29 +0100
-Message-ID: <871sqgutpy.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dMubs-0003z8-Nv
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 07:12:44 -0400
+Received: by mail-wm0-x22c.google.com with SMTP id u195so58461609wmd.1
+	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 04:12:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 08/11] travis: install more library
- dependencies
+In-Reply-To: <874lvcutv9.fsf@linaro.org>
+References: <20170616161334.7492-1-f4bug@amsat.org>
+	<20170616161334.7492-6-f4bug@amsat.org> <874lvcutv9.fsf@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 19 Jun 2017 12:12:23 +0100
+Message-ID: <CAFEAcA-GKYXrA1uEkS-kav_H_B4e2nfoVZLNMz_mjhfrJNjOSQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 05/11] travis: build tests objects in
+ parallel, then run tests sequentially
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,71 +31,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>
 
-
-Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
-
-> so more codebase is built
+On 19 June 2017 at 11:58, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
 >
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-Acked-by: Alex Bennée <alex.bennee@linaro.org>
-
-> ---
->  .travis.yml | 8 ++++++++
->  1 file changed, 8 insertions(+)
+> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 >
-> diff --git a/.travis.yml b/.travis.yml
-> index 4889c192c2..4c0f7f444e 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -9,10 +9,12 @@ addons:
->    apt:
->      packages:
->        # Build dependencies
-> +      - glusterfs-common
->        - libaio-dev
->        - libattr1-dev
->        - libbluetooth-dev
->        - libbrlapi-dev
-> +      - libbz2-dev
->        - libcap-dev
->        - libcap-ng-dev
->        - libgnutls-dev
-> @@ -22,6 +24,8 @@ addons:
->        - liblzo2-dev
->        - libnfs-dev
->        - libncurses5-dev
-> +      - libncursesw5-dev
-> +      - libnfs-dev
->        - libnss3-dev
->        - libpixman-1-dev
->        - libpng12-dev
-> @@ -171,10 +175,12 @@ matrix:
->              - gcc-5
->              - g++-5
->              # Build dependencies
-> +            - glusterfs-common
->              - libaio-dev
->              - libattr1-dev
->              - libbluetooth-dev
->              - libbrlapi-dev
-> +            - libbz2-dev
->              - libcap-dev
->              - libcap-ng-dev
->              - libgnutls-dev
-> @@ -184,6 +190,8 @@ matrix:
->              - liblzo2-dev
->              - libnfs-dev
->              - libncurses5-dev
-> +            - libncursesw5-dev
-> +            - libnfs-dev
->              - libnss3-dev
->              - libpixman-1-dev
->              - libpng12-dev
+>> tests are run sequentially to avoid mixed results output.
+>
+> I'm not so sure we are worried about mixed results output. I don't think
+> anyone can compare the entire log and they tend to scroll to the end
+> where the error will be.
 
+Indeed, and make's --output-sync flag should be enough to keep
+individual test output distinct.
 
---
-Alex Bennée
+What is perhaps a problem is that I'm not sure our tests all support
+being run in parallel with each other without tripping each other up by
+using the same temporary file / TCP port / etc at once. To the
+extent that this doesn't work it's a bug, but we should start
+by doing a solid soak test of the test suite to make sure -j<bignum>
+works reliably.
+
+thanks
+-- PMM
