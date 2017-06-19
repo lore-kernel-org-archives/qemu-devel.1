@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59040)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dMycF-0005Cx-Iu
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 11:29:24 -0400
+	(envelope-from <quintela@redhat.com>) id 1dMytq-0001m4-Nu
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 11:47:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dMycB-0003FT-LX
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 11:29:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49630)
+	(envelope-from <quintela@redhat.com>) id 1dMytm-0004qx-Po
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 11:47:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33440)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dMycB-0003Ey-F8
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 11:29:19 -0400
-Date: Mon, 19 Jun 2017 16:28:58 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170619152858.GK2640@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170616160658.32290-1-famz@redhat.com>
-	<20170619144932.GI2640@redhat.com>
-	<CAFEAcA8sFcma8nspaGE7Sx-72VUGGo491JKp+We2XwgDmGX18A@mail.gmail.com>
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dMytm-0004qe-JV
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 11:47:30 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1A9284E4FC
+	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 15:47:29 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <1497876588-947-11-git-send-email-peterx@redhat.com> (Peter Xu's
+	message of "Mon, 19 Jun 2017 20:49:45 +0800")
+References: <1497876588-947-1-git-send-email-peterx@redhat.com>
+	<1497876588-947-11-git-send-email-peterx@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Mon, 19 Jun 2017 17:47:23 +0200
+Message-ID: <87y3so9dys.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8sFcma8nspaGE7Sx-72VUGGo491JKp+We2XwgDmGX18A@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] migration: Fix race of image locking
- between src and dst
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 10/13] migration: move
+ global_state.optional out
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +35,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Fam Zheng <famz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Mon, Jun 19, 2017 at 04:27:53PM +0100, Peter Maydell wrote:
-> On 19 June 2017 at 15:49, Daniel P. Berrange <berrange@redhat.com> wrote:
-> > IIUC as well as fixing the race condition, you're also improving
-> > error reporting by using qemu_file_set_error() which was not done
-> > previously. Would be nice to mention that in the commit message
-> > too if you respin for any other reason, but that's just a nit-pick
-> 
-> I've added
->     N.B. This commit includes a minor improvement to the error handling
->     by using qemu_file_set_error().
-> 
-> to the commit message -- is that OK or do you want to suggest a
-> different wording?
+Peter Xu <peterx@redhat.com> wrote:
+> Put it into MigrationState then we can use the properties to specify
+> whether to enable storing global state.
+>
+> Removing global_state_set_optional() since now we can use HW_COMPAT_2_3
+> for x86/power, and accel_register_prop() for xen_init().
+>
 
-That's fine with me.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Reviewed-by: Juan Quintela <quintela@redhat.com>
