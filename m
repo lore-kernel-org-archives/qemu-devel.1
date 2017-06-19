@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dMw8r-0003Cq-TB
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:50:54 -0400
+	(envelope-from <peterx@redhat.com>) id 1dMw91-0003M3-2D
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:51:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dMw8q-0004x5-Un
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:50:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35128)
+	(envelope-from <peterx@redhat.com>) id 1dMw8x-00052I-Ux
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:51:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40552)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dMw8q-0004wL-P7
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:50:52 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dMw8x-00051i-MG
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:50:59 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A73A54E35B
-	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 12:50:51 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 98D47201FB
+	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 12:50:58 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Mon, 19 Jun 2017 20:49:43 +0800
-Message-Id: <1497876588-947-9-git-send-email-peterx@redhat.com>
+Date: Mon, 19 Jun 2017 20:49:44 +0800
+Message-Id: <1497876588-947-10-git-send-email-peterx@redhat.com>
 In-Reply-To: <1497876588-947-1-git-send-email-peterx@redhat.com>
 References: <1497876588-947-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 08/13] trace: add qdev_global_prop_apply
+Subject: [Qemu-devel] [PATCH v3 09/13] migration: let MigrationState be a
+ qdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,57 +33,148 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Trace global property applying. Now there are machine compat properties,
-accel compat properties, and user specified global properties. It
-provides a way to trace those properties that really applied.
+Let the old man "MigrationState" join the object family. Direct benefit
+is that we can start to use all the property features derived from
+current QDev, like: HW_COMPAT_* bits, command line setup for migration
+parameters (so will never need to set them up each time using HMP/QMP,
+this is really, really attractive for test writters), etc.
 
+I see no reason to disallow this happen yet. So let's start from this
+one, to see whether it would be anything good.
+
+No functional change at all.
+
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- Makefile.objs             | 1 +
- hw/core/qdev-properties.c | 2 ++
- hw/core/trace-events      | 2 ++
- 3 files changed, 5 insertions(+)
- create mode 100644 hw/core/trace-events
+ migration/migration.c | 69 +++++++++++++++++++++++++++++++++++----------------
+ migration/migration.h | 19 ++++++++++++++
+ 2 files changed, 67 insertions(+), 21 deletions(-)
 
-diff --git a/Makefile.objs b/Makefile.objs
-index 0575802..e199f5d 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -121,6 +121,7 @@ trace-events-subdirs += migration
- trace-events-subdirs += block
- trace-events-subdirs += backends
- trace-events-subdirs += chardev
-+trace-events-subdirs += hw/core
- trace-events-subdirs += hw/block
- trace-events-subdirs += hw/block/dataplane
- trace-events-subdirs += hw/char
-diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index e9efb78..69c3f15 100644
---- a/hw/core/qdev-properties.c
-+++ b/hw/core/qdev-properties.c
-@@ -10,6 +10,7 @@
- #include "net/hub.h"
- #include "qapi/visitor.h"
- #include "chardev/char.h"
-+#include "trace.h"
+diff --git a/migration/migration.c b/migration/migration.c
+index b9d8798..4ba1212 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -101,29 +101,13 @@ enum mig_rp_message_type {
+ /* For outgoing */
+ MigrationState *migrate_get_current(void)
+ {
+-    static bool once;
+-    static MigrationState current_migration = {
+-        .state = MIGRATION_STATUS_NONE,
+-        .xbzrle_cache_size = DEFAULT_MIGRATE_CACHE_SIZE,
+-        .mbps = -1,
+-        .parameters = {
+-            .compress_level = DEFAULT_MIGRATE_COMPRESS_LEVEL,
+-            .compress_threads = DEFAULT_MIGRATE_COMPRESS_THREAD_COUNT,
+-            .decompress_threads = DEFAULT_MIGRATE_DECOMPRESS_THREAD_COUNT,
+-            .cpu_throttle_initial = DEFAULT_MIGRATE_CPU_THROTTLE_INITIAL,
+-            .cpu_throttle_increment = DEFAULT_MIGRATE_CPU_THROTTLE_INCREMENT,
+-            .max_bandwidth = MAX_THROTTLE,
+-            .downtime_limit = DEFAULT_MIGRATE_SET_DOWNTIME,
+-            .x_checkpoint_delay = DEFAULT_MIGRATE_X_CHECKPOINT_DELAY,
+-        },
+-    };
++    static MigrationState *current_migration;
  
- void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
-                                   Error **errp)
-@@ -1150,6 +1151,7 @@ static void qdev_prop_set_globals_for_type(DeviceState *dev,
-         if (strcmp(typename, prop->driver) != 0) {
-             continue;
-         }
-+        trace_qdev_global_prop_apply(typename, prop->property, prop->value);
-         prop->used = true;
-         object_property_parse(OBJECT(dev), prop->value, prop->property, &err);
-         if (err != NULL) {
-diff --git a/hw/core/trace-events b/hw/core/trace-events
-new file mode 100644
-index 0000000..0a0a79f
---- /dev/null
-+++ b/hw/core/trace-events
-@@ -0,0 +1,2 @@
-+# hw/core/qdev-properties.c
-+qdev_global_prop_apply(const char *type, const char *prop, const char *value) "type '%s' prop '%s' value '%s'"
+-    if (!once) {
+-        current_migration.parameters.tls_creds = g_strdup("");
+-        current_migration.parameters.tls_hostname = g_strdup("");
+-        once = true;
++    if (!current_migration) {
++        current_migration = MIGRATION_OBJ(object_new(TYPE_MIGRATION));
+     }
+-    return &current_migration;
++
++    return current_migration;
+ }
+ 
+ MigrationIncomingState *migration_incoming_get_current(void)
+@@ -1992,3 +1976,46 @@ void migrate_fd_connect(MigrationState *s)
+     s->migration_thread_running = true;
+ }
+ 
++static void migration_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->user_creatable = false;
++}
++
++static void migration_instance_init(Object *obj)
++{
++    MigrationState *ms = MIGRATION_OBJ(obj);
++
++    ms->state = MIGRATION_STATUS_NONE;
++    ms->xbzrle_cache_size = DEFAULT_MIGRATE_CACHE_SIZE;
++    ms->mbps = -1;
++    ms->parameters = (MigrationParameters) {
++        .compress_level = DEFAULT_MIGRATE_COMPRESS_LEVEL,
++        .compress_threads = DEFAULT_MIGRATE_COMPRESS_THREAD_COUNT,
++        .decompress_threads = DEFAULT_MIGRATE_DECOMPRESS_THREAD_COUNT,
++        .cpu_throttle_initial = DEFAULT_MIGRATE_CPU_THROTTLE_INITIAL,
++        .cpu_throttle_increment = DEFAULT_MIGRATE_CPU_THROTTLE_INCREMENT,
++        .max_bandwidth = MAX_THROTTLE,
++        .downtime_limit = DEFAULT_MIGRATE_SET_DOWNTIME,
++        .x_checkpoint_delay = DEFAULT_MIGRATE_X_CHECKPOINT_DELAY,
++    };
++    ms->parameters.tls_creds = g_strdup("");
++    ms->parameters.tls_hostname = g_strdup("");
++}
++
++static const TypeInfo migration_type = {
++    .name = TYPE_MIGRATION,
++    .parent = TYPE_DEVICE,
++    .class_init = migration_class_init,
++    .class_size = sizeof(MigrationClass),
++    .instance_size = sizeof(MigrationState),
++    .instance_init = migration_instance_init,
++};
++
++static void register_migration_types(void)
++{
++    type_register_static(&migration_type);
++}
++
++type_init(register_migration_types);
+diff --git a/migration/migration.h b/migration/migration.h
+index d9a268a..3fca364 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -19,6 +19,7 @@
+ #include "qapi-types.h"
+ #include "exec/cpu-common.h"
+ #include "qemu/coroutine_int.h"
++#include "hw/qdev.h"
+ 
+ /* State for the incoming migration */
+ struct MigrationIncomingState {
+@@ -62,8 +63,26 @@ struct MigrationIncomingState {
+ MigrationIncomingState *migration_incoming_get_current(void);
+ void migration_incoming_state_destroy(void);
+ 
++#define TYPE_MIGRATION "migration"
++
++#define MIGRATION_CLASS(klass) \
++    OBJECT_CLASS_CHECK(MigrationClass, (klass), TYPE_MIGRATION)
++#define MIGRATION_OBJ(obj) \
++    OBJECT_CHECK(MigrationState, (obj), TYPE_MIGRATION)
++#define MIGRATION_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(MigrationClass, (obj), TYPE_MIGRATION)
++
++typedef struct MigrationClass {
++    /*< private >*/
++    DeviceClass parent_class;
++} MigrationClass;
++
+ struct MigrationState
+ {
++    /*< private >*/
++    DeviceState parent_obj;
++
++    /*< public >*/
+     size_t bytes_xfer;
+     size_t xfer_limit;
+     QemuThread thread;
 -- 
 2.7.4
