@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dMuFS-0001re-4w
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:49:35 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dMuIT-0004TP-KC
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:52:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dMuFR-0006tY-92
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:49:34 -0400
-Date: Mon, 19 Jun 2017 12:49:15 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170619104915.GC6113@noname.redhat.com>
-References: <7ec58051-d835-a485-7578-2022351c9712@gmail.com>
-	<20170619072727.GA6113@noname.redhat.com>
-	<6324ce25-8fa8-9204-d15b-32f20fb71e4b@gmail.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1dMuIS-0000Nl-CD
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:52:41 -0400
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:33905)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dMuIS-0000N1-5k
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:52:40 -0400
+Received: by mail-wr0-x234.google.com with SMTP id 77so69584236wrb.1
+	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 03:52:39 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Mon, 19 Jun 2017 11:46:54 +0100
+Message-Id: <20170619104655.31104-13-alex.bennee@linaro.org>
+In-Reply-To: <20170619104655.31104-1-alex.bennee@linaro.org>
+References: <20170619104655.31104-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <6324ce25-8fa8-9204-d15b-32f20fb71e4b@gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Question] How can we confirm hot-plug disk
- succesfully?
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RISU PATCH v5 12/13] new: record_traces.sh helper
+ script
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,84 +30,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xie Changlong <xiechanglong.d@gmail.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, armbru@redhat.com
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Am 19.06.2017 um 12:27 hat Xie Changlong geschrieben:
-> =E5=9C=A8 6/19/2017 3:27 PM, Kevin Wolf =E5=86=99=E9=81=93:
-> >Am 18.06.2017 um 09:21 hat Xie Changlong geschrieben:
-> >>In device hot-remove scenario, if we don't probe acpiphp module on
-> >>the guest, 'device_del' will never emit DEVICE_DELETED event(because
-> >>guest will not write to __EJ0) . So we can confirm that hot-remove
-> >>failed. But IIUC, there is no event such as DEVICE_ADDED, so
-> >>1) How can we confirm hotplug('device_add') successfully?
-> >>2) It seems when hot-plug disk, we don't care acpiphp module status
-> >>on the guest, am I right?
-> >>3) Why there is no DEVICE_ADDED like event?
-> >
-> >device_add doesn't need guest cooperation, so it is immediately
-> >completed when the QMP command returns success.
-> >
->=20
-> That's what i though too. But I have a question, if we don't proble
-> acpiphp on the guest, and execute below commands:
->=20
-> Hot plug:
-> (qemu) drive_add 0
-> file=3D/resource/changlox/test.raw,id=3Ddrive-virtio-disk1,if=3Dnone
-> (qemu) device_add virtio-blk-pci,drive=3Ddrive-virtio-disk1,id=3Dvirtio=
--disk1
->=20
-> Hot remove:
-> (qemu) device_del virtio-disk1
-> (qemu) drive_del drive-virtio-disk1
-> (qemu) qom-list /machine/peripheral
-> type (string)
-> virtio-disk1 (child<virtio-blk-pci>)
-> (qemu) info block
-> foo (#block122): suse1.qcow2 (qcow2)
->     Cache mode:       writeback, direct
->     Backing file:     suse.qcow2.orgin (chain depth: 1)
->=20
-> ide1-cd0: [not inserted]
->     Removable device: not locked, tray closed
->=20
-> floppy0: [not inserted]
->     Removable device: not locked, tray closed
->=20
-> sd0: [not inserted]
->     Removable device: not locked, tray closed
-> (qemu) drive_add 0
-> file=3D/resource/changlox/test.raw,id=3Ddrive-virtio-disk1,if=3Dnone
-> Duplicate ID 'drive-virtio-disk1' for drive
->=20
-> 'info block' shows nothing, but we can't add drive who's id
-> is'drive-virtio-disk1' too.
+A simple script to run through a bunch of binaries and generate their
+trace files.
 
-Yes, the old BlockBackend is only fully freed when the guest actually
-unplugs the device. Specifically, we would have to free the QemuOpts
-in DriveInfo that keeps the ID reserved. Currently, it is only freed
-when the BlockBackend is destroyed:
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-    blockdev_auto_del()
-        blk_unref()
-            blk_delete()
-                drive_info_del()
+---
+v5
+  - author, license and usage header
+v3
+  - allow overriding of RISU binary
+---
+ record_traces.sh | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+ create mode 100755 record_traces.sh
 
-We can't free the DriveInfo earlier because it's still needed while the
-guest device is still alive.
-
-I'm not sure, but it may be possible to free just the QemuOpts in
-monitor_remove_blk(), so that the ID can immediately be reused.
-
-Markus, would you know?
-
-> There is a more serious situation, we
-> could *never* destory device memory with 'device_del', it's memory
-> leak to me if the guest os never support hot-plug and the user don't
-> know this information.
-
-The user sees that they never get a DEVICE_REMOVED event, so in some way
-the do know about it.
-
-Kevin
+diff --git a/record_traces.sh b/record_traces.sh
+new file mode 100755
+index 0000000..1234a61
+--- /dev/null
++++ b/record_traces.sh
+@@ -0,0 +1,32 @@
++#!/bin/sh
++#
++# A risu helper script to batch process a bunch of binaries and record their outputs
++#
++# Copyright (c) 2017 Linaro Limited
++# All rights reserved. This program and the accompanying materials
++# are made available under the terms of the Eclipse Public License v1.0
++# which accompanies this distribution, and is available at
++# http://www.eclipse.org/legal/epl-v10.html
++#
++# Contributors:
++#     Alex Bennée <alex.bennee@linaro.org> - initial implementation
++#
++# Usage:
++#   export RISU=/path/to/risu
++#   ./record_traces.sh  ./testcases.aarch64/*.bin
++#
++
++set -e
++
++if test -z "$RISU"; then
++    script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
++    RISU=${script_dir}/risu
++fi
++
++for f in $@; do
++    echo "Running risu against $f"
++    t="$f.trace"
++    ${RISU} --master $f -t $t
++    echo "Checking trace file OK"
++    ${RISU} $f -t $t
++done
+-- 
+2.13.0
