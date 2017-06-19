@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33144)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dMxD2-0002jh-K1
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 09:59:17 -0400
+	(envelope-from <berrange@redhat.com>) id 1dMxEb-0003v6-7O
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 10:00:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dMxD1-0003Nf-LV
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 09:59:16 -0400
-Date: Mon, 19 Jun 2017 14:58:57 +0100
+	(envelope-from <berrange@redhat.com>) id 1dMxEX-0004Qb-Vz
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 10:00:53 -0400
+Date: Mon, 19 Jun 2017 15:00:34 +0100
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170619135857.GF2640@redhat.com>
+Message-ID: <20170619140034.GG2640@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <20170601172734.9039-1-berrange@redhat.com>
-	<20170601172734.9039-10-berrange@redhat.com>
-	<e362e833-32b9-57ec-4a92-c17293eefbbe@redhat.com>
+	<20170601172734.9039-14-berrange@redhat.com>
+	<a2a698c4-9169-100c-e2a7-eeb324d70818@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <e362e833-32b9-57ec-4a92-c17293eefbbe@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v8 09/20] qcow: convert QCow to use
- QCryptoBlock for encryption
+In-Reply-To: <a2a698c4-9169-100c-e2a7-eeb324d70818@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v8 13/20] qcow2: add support for LUKS
+ encryption format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +29,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Max Reitz <mreitz@redhat.com>
 Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-On Wed, Jun 07, 2017 at 06:55:39PM +0200, Max Reitz wrote:
+On Wed, Jun 07, 2017 at 07:19:28PM +0200, Max Reitz wrote:
 > On 2017-06-01 19:27, Daniel P. Berrange wrote:
-> > This converts the qcow driver to make use of the QCryptoBlock
-> > APIs for encrypting image content. This is only wired up to
-> > permit use of the legacy QCow encryption format. Users who wish
-> > to have the strong LUKS format should switch to qcow2 instead.
+> > This adds support for using LUKS as an encryption format
+> > with the qcow2 file, using the new encrypt.format parameter
+> > to request "luks" format. e.g.
 > > 
-> > With this change it is now required to use the QCryptoSecret
-> > object for providing passwords, instead of the current block
-> > password APIs / interactive prompting.
+> >   # qemu-img create --object secret,data=123456,id=sec0 \
+> >        -f qcow2 -o encrypt.format=luks,encrypt.key-secret=sec0 \
+> >        test.qcow2 10G
 > > 
-> 
-> Beware, nit picks incoming:
-> 
-> >   $QEMU \
-> >     -object secret,id=sec0,filename=/home/berrange/encrypted.pw \>     -drive file=/home/berrange/encrypted.qcow,encrypt.format=qcow,\
-> 
-> encrypt.format should be "aes".
-> 
-> >            encrypt.key-secret=sec0
-> 
-> This doesn't work at all, though, because:
-> 
-> Use of AES-CBC encrypted qcow images is no longer supported in system
-> emulators
-> You can use 'qemu-img convert' to convert your image to an alternative
-> supported format, such as unencrypted qcow, or raw with the LUKS format
-> instead.
-
-Good point. I'll leave this example here, since it is
-useful to illustrate the overall syntax approach, but
-I'll add a note that this example won't let you run
-the VM
-
-> > Likewise when creating images with the legacy AES-CBC format
+> > The legacy "encryption=on" parameter still results in
+> > creation of the old qcow2 AES format (and is equivalent
+> > to the new 'encryption-format=aes'). e.g. the following are
+> > equivalent:
 > > 
-> >   qemu-img create -f qcow \
-> >     -object secret,id=sec0,filename=/home/berrange/encrypted.pw \
+> >   # qemu-img create --object secret,data=123456,id=sec0 \
+> >        -f qcow2 -o encryption=on,encrypt.key-secret=sec0 \
+> >        test.qcow2 10G
+> > 
+> >  # qemu-img create --object secret,data=123456,id=sec0 \
+> >        -f qcow2 -o encryption-format=aes,encrypt.key-secret=sec0 \
+> >        test.qcow2 10G
+> > 
+> > With the LUKS format it is necessary to store the LUKS
+> > partition header and key material in the QCow2 file. This
+> > data can be many MB in size, so cannot go into the QCow2
+> > header region directly. Thus the spec defines a FDE
+> > (Full Disk Encryption) header extension that specifies
+> > the offset of a set of clusters to hold the FDE headers,
+> > as well as the length of that region. The LUKS header is
+> > thus stored in these extra allocated clusters before the
+> > main image payload.
+> > 
+> > Aside from all the cryptographic differences implied by
+> > use of the LUKS format, there is one further key difference
+> > between the use of legacy AES and LUKS encryption in qcow2.
+> > For LUKS, the initialiazation vectors are generated using
+> > the host physical sector as the input, rather than the
+> > guest virtual sector. This guarantees unique initialization
+> > vectors for all sectors when qcow2 internal snapshots are
+> > used, thus giving stronger protection against watermarking
+> > attacks.
+> > 
+> > Reviewed-by: Eric Blake <eblake@redhat.com>
+> > Reviewed-by: Alberto Garcia <berto@igalia.com>
+> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> > ---
+> >  block/qcow2-cluster.c      |   4 +-
+> >  block/qcow2-refcount.c     |  10 ++
+> >  block/qcow2.c              | 267 ++++++++++++++++++++++++++++++++++++++------
+> >  block/qcow2.h              |   9 ++
+> >  qapi/block-core.json       |   5 +-
+> >  tests/qemu-iotests/082.out | 270 ++++++++++++++++++++++++++++++++++++---------
+> >  6 files changed, 477 insertions(+), 88 deletions(-)
 > 
-> Should be --object.
-
-Yep
-
+> [...]
 > 
-> >     -o encrypt.format=aes,encrypt.key-secret=sec0 \
-> >     /home/berrange/encrypted.qcow
+> > diff --git a/block/qcow2.c b/block/qcow2.c
+> > index 38c0420..30d0343 100644
+> > --- a/block/qcow2.c
+> > +++ b/block/qcow2.c
 > 
-> There should be a size here to make it work.
+> [...]
+> 
+> > @@ -2072,22 +2253,30 @@ static int qcow2_set_up_encryption(BlockDriverState *bs, const char *encryptfmt,
+> >      qdict_extract_subqdict(options, &encryptopts, "encrypt.");
+> >      QDECREF(options);
+> >  
+> > -    if (!g_str_equal(encryptfmt, "aes")) {
+> > -        error_setg(errp, "Unknown encryption format '%s', expected 'aes'",
+> > -                   encryptfmt);
+> > -        ret = -EINVAL;
+> > -        goto out;
+> > +    int fmt = qcow2_crypt_method_from_format(encryptfmt);
+> 
+> Because I love nit picking: Variable declarations should be at the start
+> of the surrounding block.
 
-Ok
-
+Opps, dunno what I was thinking there.
 
 Regards,
 Daniel
