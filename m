@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dMvQl-0006Gr-3Y
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:05:24 -0400
+	(envelope-from <groug@kaod.org>) id 1dMvUr-0001dc-8O
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:09:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dMvQj-0005CN-Hl
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:05:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44064)
+	(envelope-from <groug@kaod.org>) id 1dMvUm-0007ZI-7i
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:09:33 -0400
+Received: from 8.mo179.mail-out.ovh.net ([46.105.75.26]:44558)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dMvQj-0005Bt-8b
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:05:17 -0400
-From: David Hildenbrand <david@redhat.com>
-References: <20170615203735.19649-1-rth@twiddle.net>
-	<7998cb6b-018e-8069-9d11-a3e1e4e70380@redhat.com>
-Message-ID: <429793f7-a3c1-91ec-9a83-908ee779e703@redhat.com>
-Date: Mon, 19 Jun 2017 14:05:13 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dMvUl-0007X2-US
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:09:28 -0400
+Received: from player716.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 58A6E4D932
+	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 14:09:26 +0200 (CEST)
+Date: Mon, 19 Jun 2017 14:09:16 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170619140916.43dcea72@bahia.ttt.fr.ibm.com>
+In-Reply-To: <20170608050930.2613-6-david@gibson.dropbear.id.au>
+References: <20170608050930.2613-1-david@gibson.dropbear.id.au>
+	<20170608050930.2613-6-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <7998cb6b-018e-8069-9d11-a3e1e4e70380@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/s390x: Implement CSST
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/ykQ1ODzrPQTmkVSM=iJhN=E";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH 5/6] spapr: Clean up DRC
+ set_allocation_state path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,114 +32,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com, aurelien@aurel32.net
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: mdroth@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com, sursingh@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On 19.06.2017 12:03, David Hildenbrand wrote:
-> On 15.06.2017 22:37, Richard Henderson wrote:
->> There are no uses in a Linux system with which to test,
->> but it Looks Right by my reading of the PoO.
-> 
-> I am using next.git/master with this patch applied:
-> https://git.kernel.org/pub/scm/linux/kernel/git/s390/linux.git/commit/?h=features&id=8aa8680aa383bf6e2ac
-> 
-> I am using QEMU with the mvcos patch and your patch applied (and a patch
-> that allows enabling csst/csst2).
-> 
-> I am using the following qemu command line:
-> 
-> #!/bin/bash
-> /home/dhildenb/git/qemu/s390x-softmmu/qemu-system-s390x \
-> 	-nographic -nodefaults -machine s390-ccw-virtio,accel=tcg \
-> 	-cpu qemu,mvcos=on,stfle=on,ldisp=on,ldisphp=on,\
->           eimm=on,stckf=on,csst=on,csst2=on,ginste=on,exrl=on\
-> 	-m 256M -smp 1 -chardev stdio,id=con0 \
-> 	-device sclpconsole,chardev=con0 \
-> 	-kernel vmlinux -initrd /home/dhildenb/initrd.debian
-> 
-> Right now, I can start a z9 compiled kernel.
-> 
-> When trying to start a z10 compiled kernel (which generates many csst),
-> qemu simply crashes / the guests exits (have to debug) without any
-> command line output.
-> 
-> So either something in csst is broken or in the other instructions for z10.
-> 
+--Sig_/ykQ1ODzrPQTmkVSM=iJhN=E
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-With CONFIG_DEBUG_LOCKDEP I get a pgm exception in check_no_collision()
-and the kernel can't find an exception table for it, resulting in a panic().
+On Thu,  8 Jun 2017 15:09:29 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-#0  0x00000000001cf584 in check_no_collision (chain=<optimized out>,
-hlock=<optimized out>, curr=<optimized out>)
-    at kernel/locking/lockdep.c:2111
-#1  lookup_chain_cache (chain_key=<optimized out>, hlock=<optimized
-out>, curr=<optimized out>)
-    at kernel/locking/lockdep.c:2158
-#2  validate_chain (curr=0xdad300 <init_task>, hlock=0x18398c8
-<lock_classes>, chain_head=<optimized out>,
-    chain_key=10957502631322533163, lock=<optimized out>) at
-kernel/locking/lockdep.c:2252
-#3  0x00000000001d089a in __lock_acquire (lock=<optimized out>,
-subclass=<optimized out>, trylock=0, read=0,
-    check=1, hardirqs_off=<optimized out>, nest_lock=0x0, ip=15545474,
-references=<optimized out>,
-    pin_count=<optimized out>) at kernel/locking/lockdep.c:3367
-#4  0x00000000001d15a6 in lock_acquire (lock=<optimized out>,
-subclass=<optimized out>, trylock=<optimized out>,
-    read=<optimized out>, check=1, nest_lock=0x0, ip=15545474) at
-kernel/locking/lockdep.c:3855
-#5  0x00000000009b76cc in __mutex_lock_common (use_ww_ctx=<optimized
-out>, ww_ctx=<optimized out>,
-    ip=<optimized out>, nest_lock=<optimized out>, subclass=<optimized
-out>, state=<optimized out>,
-    lock=<optimized out>) at kernel/locking/mutex.c:756
-#6  __mutex_lock (lock=0xded840 <cgroup_mutex>, state=2, subclass=0,
-nest_lock=0x0, ip=<optimized out>)
-    at kernel/locking/mutex.c:893
-#7  0x00000000009b801a in mutex_lock_nested (lock=<optimized out>,
-subclass=<optimized out>)
-    at kernel/locking/mutex.c:908
-#8  0x0000000000ed3482 in cgroup_init_subsys (ss=0xdd2340
-<cpu_cgrp_subsys>, early=true)
-    at kernel/cgroup/cgroup.c:4403
-#9  0x0000000000ed3752 in cgroup_init_early () at
-kernel/cgroup/cgroup.c:4481
-#10 0x0000000000ebd79a in start_kernel () at init/main.c:502
-#11 0x0000000000100020 in _stext () at arch/s390/kernel/head64.S:100
+> The allocation-state indicator should only actually be implemented for
+> "logical" DRCs, not physical ones.  Factor a check for this, and also for
+> valid indicator state values into rtas_set_allocation_state().  Because
+> they don't exist for physical DRCs, there's no reason that we'd ever want
+> more than one method implementation, so it can just be a plain function.
+>=20
+> In addition, the setting to USABLE and setting to UNUSABLE paths in
+> set_allocation_state() don't actually have much in common.  So, split the
+> method separate functions for each parameter value (drc_set_usable()
+> and drc_set_unusable()).
+>=20
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  hw/ppc/spapr_drc.c         | 85 +++++++++++++++++++++++++---------------=
+------
+>  include/hw/ppc/spapr_drc.h |  2 --
+>  2 files changed, 46 insertions(+), 41 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> index 7e17f34..9e01d7b 100644
+> --- a/hw/ppc/spapr_drc.c
+> +++ b/hw/ppc/spapr_drc.c
+> @@ -114,44 +114,43 @@ static uint32_t set_isolation_state(sPAPRDRConnecto=
+r *drc,
+>      return RTAS_OUT_SUCCESS;
+>  }
+> =20
+> -static uint32_t set_allocation_state(sPAPRDRConnector *drc,
+> -                                     sPAPRDRAllocationState state)
+> +static uint32_t drc_set_usable(sPAPRDRConnector *drc)
+>  {
+> -    trace_spapr_drc_set_allocation_state(spapr_drc_index(drc), state);
+> -
+> -    if (state =3D=3D SPAPR_DR_ALLOCATION_STATE_USABLE) {
+> -        /* if there's no resource/device associated with the DRC, there's
+> -         * no way for us to put it in an allocation state consistent with
+> -         * being 'USABLE'. PAPR 2.7, 13.5.3.4 documents that this should
+> -         * result in an RTAS return code of -3 / "no such indicator"
+> +    /* if there's no resource/device associated with the DRC, there's
+> +     * no way for us to put it in an allocation state consistent with
+> +     * being 'USABLE'. PAPR 2.7, 13.5.3.4 documents that this should
+> +     * result in an RTAS return code of -3 / "no such indicator"
+> +     */
+> +    if (!drc->dev) {
+> +        return RTAS_OUT_NO_SUCH_INDICATOR;
+> +    }
+> +    if (drc->awaiting_release && drc->awaiting_allocation) {
+> +        /* kernel is acknowledging a previous hotplug event
+> +         * while we are already removing it.
+> +         * it's safe to ignore awaiting_allocation here since we know the
+> +         * situation is predicated on the guest either already having do=
+ne
+> +         * so (boot-time hotplug), or never being able to acquire in the
+> +         * first place (hotplug followed by immediate unplug).
+>           */
+> -        if (!drc->dev) {
+> -            return RTAS_OUT_NO_SUCH_INDICATOR;
+> -        }
+> -        if (drc->awaiting_release && drc->awaiting_allocation) {
+> -            /* kernel is acknowledging a previous hotplug event
+> -             * while we are already removing it.
+> -             * it's safe to ignore awaiting_allocation here since we kno=
+w the
+> -             * situation is predicated on the guest either already havin=
+g done
+> -             * so (boot-time hotplug), or never being able to acquire in=
+ the
+> -             * first place (hotplug followed by immediate unplug).
+> -             */
+> -            drc->awaiting_allocation_skippable =3D true;
+> -            return RTAS_OUT_NO_SUCH_INDICATOR;
+> -        }
+> +        drc->awaiting_allocation_skippable =3D true;
+> +        return RTAS_OUT_NO_SUCH_INDICATOR;
+>      }
+> =20
+> -    if (spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_PCI) {
+> -        drc->allocation_state =3D state;
+> -        if (drc->awaiting_release &&
+> -            drc->allocation_state =3D=3D SPAPR_DR_ALLOCATION_STATE_UNUSA=
+BLE) {
+> -            uint32_t drc_index =3D spapr_drc_index(drc);
+> -            trace_spapr_drc_set_allocation_state_finalizing(drc_index);
+> -            spapr_drc_detach(drc, DEVICE(drc->dev), NULL);
+> -        } else if (drc->allocation_state =3D=3D SPAPR_DR_ALLOCATION_STAT=
+E_USABLE) {
+> -            drc->awaiting_allocation =3D false;
+> -        }
+> +    drc->allocation_state =3D SPAPR_DR_ALLOCATION_STATE_USABLE;
+> +    drc->awaiting_allocation =3D false;
+> +
+> +    return RTAS_OUT_SUCCESS;
+> +}
+> +
+> +static uint32_t drc_set_unusable(sPAPRDRConnector *drc)
+> +{
+> +    drc->allocation_state =3D SPAPR_DR_ALLOCATION_STATE_UNUSABLE;
+> +    if (drc->awaiting_release) {
+> +        uint32_t drc_index =3D spapr_drc_index(drc);
+> +        trace_spapr_drc_set_allocation_state_finalizing(drc_index);
+> +        spapr_drc_detach(drc, DEVICE(drc->dev), NULL);
+>      }
+> +
+>      return RTAS_OUT_SUCCESS;
+>  }
+> =20
+> @@ -553,7 +552,6 @@ static void spapr_dr_connector_class_init(ObjectClass=
+ *k, void *data)
+>      dk->realize =3D realize;
+>      dk->unrealize =3D unrealize;
+>      drck->set_isolation_state =3D set_isolation_state;
+> -    drck->set_allocation_state =3D set_allocation_state;
+>      drck->release_pending =3D release_pending;
+>      /*
+>       * Reason: it crashes FIXME find and document the real reason
+> @@ -823,14 +821,23 @@ static uint32_t rtas_set_isolation_state(uint32_t i=
+dx, uint32_t state)
+>  static uint32_t rtas_set_allocation_state(uint32_t idx, uint32_t state)
+>  {
+>      sPAPRDRConnector *drc =3D spapr_drc_by_index(idx);
+> -    sPAPRDRConnectorClass *drck;
+> =20
+> -    if (!drc) {
+> -        return RTAS_OUT_PARAM_ERROR;
+> +    if (!drc || !object_dynamic_cast(OBJECT(drc), TYPE_SPAPR_DRC_LOGICAL=
+)) {
+> +        return RTAS_OUT_NO_SUCH_INDICATOR;
+>      }
+> =20
+> -    drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+> -    return drck->set_allocation_state(drc, state);
+> +    trace_spapr_drc_set_allocation_state(spapr_drc_index(drc), state);
+> +
+> +    switch (state) {
+> +    case SPAPR_DR_ALLOCATION_STATE_USABLE:
+> +        return drc_set_usable(drc);
+> +
+> +    case SPAPR_DR_ALLOCATION_STATE_UNUSABLE:
+> +        return drc_set_unusable(drc);
+> +
+> +    default:
+> +        return RTAS_OUT_PARAM_ERROR;
+> +    }
+>  }
+> =20
+>  static uint32_t rtas_set_dr_indicator(uint32_t idx, uint32_t state)
+> diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+> index f24188d..0e09afb 100644
+> --- a/include/hw/ppc/spapr_drc.h
+> +++ b/include/hw/ppc/spapr_drc.h
+> @@ -220,8 +220,6 @@ typedef struct sPAPRDRConnectorClass {
+>      /* accessors for guest-visible (generally via RTAS) DR state */
+>      uint32_t (*set_isolation_state)(sPAPRDRConnector *drc,
+>                                      sPAPRDRIsolationState state);
+> -    uint32_t (*set_allocation_state)(sPAPRDRConnector *drc,
+> -                                     sPAPRDRAllocationState state);
+> =20
+>      /* QEMU interfaces for managing hotplug operations */
+>      bool (*release_pending)(sPAPRDRConnector *drc);
 
 
-  1cf552:       e3 10 c0 30 00 04       lg      %r1,48(%r12)
-  1cf558:       eb 11 00 33 00 0c       srlg    %r1,%r1,51
-  1cf55e:       eb c1 00 05 00 0d       sllg    %r12,%r1,5
-  1cf564:       b9 09 00 c1             sgr     %r12,%r1
-  1cf568:       eb cc 00 04 00 0d       sllg    %r12,%r12,4
-  1cf56e:       e3 c0 d0 28 00 08       ag      %r12,40(%r13)
-  1cf574:       a7 f4 ff 6f             j       1cf452
-<validate_chain.isra.23+0xba2>
-        if (DEBUG_LOCKS_WARN_ON(chain->depth != curr->lockdep_depth - (i
-- 1))) {
-  1cf578:       c0 30 00 4c cc e3       larl    %r3,b68f3e
-<kallsyms_token_index+0x10626>
-  1cf57e:       c0 20 00 4c 95 37       larl    %r2,b61fec
-<kallsyms_token_index+0x96d4>
-  1cf584:       c0 e5 00 07 f1 2e       brasl   %r14,2cd7e0 <printk>
-  1cf58a:       a7 f4 00 01             j       1cf58c
-<validate_chain.isra.23+0xcdc>
-  1cf58e:       a7 f4 fc d9             j       1cef40
-<validate_chain.isra.23+0x690>
+--Sig_/ykQ1ODzrPQTmkVSM=iJhN=E
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-Without CONFIG_DEBUG_LOCKDEP:
+iEYEARECAAYFAllHvuwACgkQAvw66wEB28ISQgCfRGU1MPiOo8VMnh4oyWQZwMNI
+Go8AoI+6LjCqQRd6oQ54M+LsTMl0nKKS
+=pvDZ
+-----END PGP SIGNATURE-----
 
-I get a similar crash in static void __init mm_init(void).
-
-
-Not sure yet what the real root cause is. Maybe something not related to
-CSST.
-
-
--- 
-
-Thanks,
-
-David
+--Sig_/ykQ1ODzrPQTmkVSM=iJhN=E--
