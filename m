@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dMxfo-0006sc-0W
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 10:29:03 -0400
+	(envelope-from <tobleminer@gmail.com>) id 1dMxiS-0007q2-4r
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 10:31:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dMxfk-0004PC-Rt
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 10:28:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54714)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dMxfk-0004Ot-I9
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 10:28:56 -0400
-Date: Mon, 19 Jun 2017 11:28:52 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170619142852.GS5016@thinpad.lan.raisama.net>
-References: <1497877149-19253-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1497877149-19253-4-git-send-email-mark.cave-ayland@ilande.co.uk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1497877149-19253-4-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCHv6 3/5] fw_cfg: move assert() and linking of
- fw_cfg device to the machine into instance_init()
+	(envelope-from <tobleminer@gmail.com>) id 1dMxiR-0005sK-4v
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 10:31:44 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33421)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tobleminer@gmail.com>)
+	id 1dMxiQ-0005rA-Tr
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 10:31:43 -0400
+Received: by mail-wm0-x241.google.com with SMTP id f90so16723658wmh.0
+	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 07:31:42 -0700 (PDT)
+From: Tobias Schramm <tobleminer@gmail.com>
+Date: Mon, 19 Jun 2017 16:28:47 +0200
+Message-Id: <20170619142848.14258-1-tobleminer@gmail.com>
+Subject: [Qemu-devel] [PATCH v4 0/1] 9pfs: local: Add support for custom
+ fmode/dmode in 9ps mapped security modes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,89 +25,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, lersek@redhat.com, somlo@cmu.edu, mst@redhat.com, pbonzini@redhat.com, rjones@redhat.com, imammedo@redhat.com, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
+Cc: aneesh.kumar@linux.vnet.ibm.com, groug@kaod.org, el13635@mail.ntua.gr, Tobias Schramm <tobleminer@gmail.com>
 
-On Mon, Jun 19, 2017 at 01:59:07PM +0100, Mark Cave-Ayland wrote:
-> In preparation for calling fw_cfg_init1() during realize rather than during
-> init, move the assert() checking for existing fw_cfg devices and the linking
-> of the device to the machine with object_property_add_child() to a new
-> fw_cfg instance_init() function.
-> 
-> This guarantees that we will still assert() correctly if more than one fw_cfg
-> device is instantiated by accident.
-> 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-> Tested-by: Laszlo Ersek <lersek@redhat.com>
-> ---
->  hw/nvram/fw_cfg.c |   14 ++++++++++----
->  1 file changed, 10 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> index 99bdbc2..af45012 100644
-> --- a/hw/nvram/fw_cfg.c
-> +++ b/hw/nvram/fw_cfg.c
-> @@ -915,10 +915,6 @@ static void fw_cfg_init1(DeviceState *dev)
->      MachineState *machine = MACHINE(qdev_get_machine());
->      uint32_t version = FW_CFG_VERSION;
->  
-> -    assert(!object_resolve_path(FW_CFG_PATH, NULL));
-> -
-> -    object_property_add_child(OBJECT(machine), FW_CFG_NAME, OBJECT(s), NULL);
-> -
->      qdev_init_nofail(dev);
->  
->      fw_cfg_add_bytes(s, FW_CFG_SIGNATURE, (char *)"QEMU", 4);
-> @@ -1020,6 +1016,15 @@ FWCfgState *fw_cfg_find(void)
->      return FW_CFG(object_resolve_path(FW_CFG_PATH, NULL));
->  }
->  
-> +static void fw_cfg_init(Object *obj)
-> +{
-> +    MachineState *machine = MACHINE(qdev_get_machine());
-> +
-> +    assert(!object_resolve_path(FW_CFG_PATH, NULL));
-> +
-> +    object_property_add_child(OBJECT(machine), FW_CFG_NAME, obj, NULL);
+Hi,
 
-I don't think this belongs to instance_init.  We must always be
-able to instantiate objects without crashing QEMU or affecting
-QEMU global state.  This patch makes device-list-properties
-crash:
+i've noticed that there is no way to control the permissions of newly created files and
+folders on the host when using 9p in mapped security mode. This can be a big problem when
+configuring permissions for access to such data for groups and via ACLs on the host.
+Thus I added the options fmode and dmode to the fsdev and virtfs options that set the actual
+permissions of newly created files and folders on the host.
 
-  $ qemu-system-x86_64 -display none -qmp unix:/tmp/qmp,server,nowait &
-  [1] 2848
-  $ echo 'device-list-properties typename=fw_cfg_mem' | ./scripts/qmp/qmp-shell /tmp/qmp
-  Welcome to the QMP low-level shell!
-  Connected to QEMU 2.9.50
-  
-  qemu-system-x86_64: qemu/hw/nvram/fw_cfg.c:974: fw_cfg_init: Assertion `!object_resolve_path(FW_CFG_PATH, NULL)' failed.
-  (QEMU) Disconnected
-  [1]+  Aborted                 (core dumped) qemu-system-x86_64 -display none -qmp unix:/tmp/qmp,server,nowait
-  $ 
+This version of the patch fixes the back to front "mask" naming in the previous patches. I
+always meant "mode" when actually writing "mask".
 
+Also specifying fmode and dmode only has an effect in mapped security modes. Specifying it
+in any other mode now throws an error.
 
-I suggest moving this check to realize, like the rest of
-fw_cfg_init1(), but change it to do proper error reporting
-instead of asserting.
+Additionally I've switched fmode and dmode to QEMU_OPT_NUMBER because it handels octal input
+just fine.
 
-> +}
-> +
->  static void fw_cfg_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(klass);
-> @@ -1033,6 +1038,7 @@ static const TypeInfo fw_cfg_info = {
->      .parent        = TYPE_SYS_BUS_DEVICE,
->      .abstract      = true,
->      .instance_size = sizeof(FWCfgState),
-> +    .instance_init = fw_cfg_init,
->      .class_init    = fw_cfg_class_init,
->  };
->  
-> -- 
-> 1.7.10.4
-> 
+Also previous versions leaked a string with g_strdup if an error during parsing of fmode/dmode
+occurred.
+
+Thanks to Greg Kurz for pointing out most of the above issues to me.
+
+Tobias Schramm
+
+Tobias Schramm (1):
+  Add support for custom fmode/dmode in 9ps mapped security modes
+
+ fsdev/file-op-9p.h      |  4 ++++
+ fsdev/qemu-fsdev-opts.c | 12 ++++++++++++
+ hw/9pfs/9p-local.c      | 34 +++++++++++++++++++++++++---------
+ hw/9pfs/9p.c            |  3 +++
+ qemu-options.hx         | 20 ++++++++++++++++----
+ 5 files changed, 60 insertions(+), 13 deletions(-)
 
 -- 
-Eduardo
+2.13.1
