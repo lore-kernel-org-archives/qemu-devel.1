@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dN07R-00049i-Jv
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 13:05:42 -0400
+	(envelope-from <lersek@redhat.com>) id 1dN0BI-00061x-EC
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 13:09:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dN07N-0000R4-CG
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 13:05:41 -0400
-Received: from 6.mo179.mail-out.ovh.net ([46.105.56.76]:53672)
+	(envelope-from <lersek@redhat.com>) id 1dN0BE-0002Sx-6S
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 13:09:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39476)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dN07N-0000Ps-30
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 13:05:37 -0400
-Received: from player716.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id A0A854D546
-	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 19:05:30 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Mon, 19 Jun 2017 19:05:20 +0200
-Message-ID: <149789192064.8356.6383758991647148922.stgit@bahia.lan>
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dN0BD-0002S1-Th
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 13:09:36 -0400
+References: <1497877149-19253-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1497877149-19253-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20170619142852.GS5016@thinpad.lan.raisama.net>
+	<7d5904ae-e66c-5594-cfff-747578d91f4b@ilande.co.uk>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <08da52ec-e4d2-d836-49bd-90baf21747fb@redhat.com>
+Date: Mon, 19 Jun 2017 19:09:13 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <7d5904ae-e66c-5594-cfff-747578d91f4b@ilande.co.uk>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] spapr/ppc: fix backward migration to QEMU 2.9
+Subject: Re: [Qemu-devel] [PATCHv6 3/5] fw_cfg: move assert() and linking of
+ fw_cfg device to the machine into instance_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,87 +31,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, imammedo@redhat.com, pbonzini@redhat.com
 
-Commit c783b0012708 ("ppc: Rework CPU compatibility testing across
-migration") added a subsection to the vmstate description of CPUs.
-This subsection is sent when the CPU compat_pvr field is non-zero,
-which is likely to happen after CAS negociation (since QEMU 2.9) or
-even before CAS negociation if the user explicitely asked for compat
-mode.
+On 06/19/17 18:57, Mark Cave-Ayland wrote:
+> On 19/06/17 15:28, Eduardo Habkost wrote:
+> 
+>> On Mon, Jun 19, 2017 at 01:59:07PM +0100, Mark Cave-Ayland wrote:
+>>> In preparation for calling fw_cfg_init1() during realize rather than during
+>>> init, move the assert() checking for existing fw_cfg devices and the linking
+>>> of the device to the machine with object_property_add_child() to a new
+>>> fw_cfg instance_init() function.
+>>>
+>>> This guarantees that we will still assert() correctly if more than one fw_cfg
+>>> device is instantiated by accident.
+>>>
+>>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>>> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+>>> Tested-by: Laszlo Ersek <lersek@redhat.com>
+>>> ---
+>>>  hw/nvram/fw_cfg.c |   14 ++++++++++----
+>>>  1 file changed, 10 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+>>> index 99bdbc2..af45012 100644
+>>> --- a/hw/nvram/fw_cfg.c
+>>> +++ b/hw/nvram/fw_cfg.c
+>>> @@ -915,10 +915,6 @@ static void fw_cfg_init1(DeviceState *dev)
+>>>      MachineState *machine = MACHINE(qdev_get_machine());
+>>>      uint32_t version = FW_CFG_VERSION;
+>>>  
+>>> -    assert(!object_resolve_path(FW_CFG_PATH, NULL));
+>>> -
+>>> -    object_property_add_child(OBJECT(machine), FW_CFG_NAME, OBJECT(s), NULL);
+>>> -
+>>>      qdev_init_nofail(dev);
+>>>  
+>>>      fw_cfg_add_bytes(s, FW_CFG_SIGNATURE, (char *)"QEMU", 4);
+>>> @@ -1020,6 +1016,15 @@ FWCfgState *fw_cfg_find(void)
+>>>      return FW_CFG(object_resolve_path(FW_CFG_PATH, NULL));
+>>>  }
+>>>  
+>>> +static void fw_cfg_init(Object *obj)
+>>> +{
+>>> +    MachineState *machine = MACHINE(qdev_get_machine());
+>>> +
+>>> +    assert(!object_resolve_path(FW_CFG_PATH, NULL));
+>>> +
+>>> +    object_property_add_child(OBJECT(machine), FW_CFG_NAME, obj, NULL);
+>>
+>> I don't think this belongs to instance_init.  We must always be
+>> able to instantiate objects without crashing QEMU or affecting
+>> QEMU global state.  This patch makes device-list-properties
+>> crash:
+>>
+>>   $ qemu-system-x86_64 -display none -qmp unix:/tmp/qmp,server,nowait &
+>>   [1] 2848
+>>   $ echo 'device-list-properties typename=fw_cfg_mem' | ./scripts/qmp/qmp-shell /tmp/qmp
+>>   Welcome to the QMP low-level shell!
+>>   Connected to QEMU 2.9.50
+>>   
+>>   qemu-system-x86_64: qemu/hw/nvram/fw_cfg.c:974: fw_cfg_init: Assertion `!object_resolve_path(FW_CFG_PATH, NULL)' failed.
+>>   (QEMU) Disconnected
+>>   [1]+  Aborted                 (core dumped) qemu-system-x86_64 -display none -qmp unix:/tmp/qmp,server,nowait
+>>   $ 
+>>
+>>
+>> I suggest moving this check to realize, like the rest of
+>> fw_cfg_init1(), but change it to do proper error reporting
+>> instead of asserting.
+> 
+> In that case what do you think is the best way to prevent realization of
+> a second instance? With some playing I've managed to come up with the
+> following (partial) diff that seems to work in some simple local tests:
+> 
+> 
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index 9b0aaa2..e678ec0 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -862,12 +862,20 @@ static void fw_cfg_machine_ready(struct Notifier
+> *n, void *data)
+> 
+> -static void fw_cfg_common_realize(DeviceState *dev)
+> +static void fw_cfg_common_realize(DeviceState *dev, Error **errp)
+>  {
+>      FWCfgState *s = FW_CFG(dev);
+>      MachineState *machine = MACHINE(qdev_get_machine());
+>      uint32_t version = FW_CFG_VERSION;
+> -
+> +    Object *obj;
+> +
+> +    obj = object_resolve_path(FW_CFG_PATH, NULL);
+> +    if (obj != OBJECT(dev)) {
+> +        error_setg(errp, "Only one fw_cfg device can be instantiated per "
+> +                         "machine");
+> +        return;
+> +    }
+> +
+>      fw_cfg_add_bytes(s, FW_CFG_SIGNATURE, (char *)"QEMU", 4);
+>      fw_cfg_add_bytes(s, FW_CFG_UUID, &qemu_uuid, 16);
+>      fw_cfg_add_i16(s, FW_CFG_NOGRAPHIC,
+> (uint16_t)!machine->enable_graphics);
+> 
+> 
+> What seems to happen is that calling object_property_add_child() only
+> succeeds for the first instance and so a simple comparison is enough to
+> determine that the device already exists at FW_CFG_PATH. Or is this a
+> fairly terrible (ab)use of the QOM APIs?
 
-This breaks backward migration of existing pseries-2.9 machine types
-since they don't know about this "compat" subsection:
+This has jogged my memory about how we ensure "at most one" for the
+vmgenid device. Please see:
 
-qemu-system-ppc64: error while loading state for instance 0x0 of
- device 'cpu'
+  vmgenid_realize()    [hw/acpi/vmgenid.c]
+    find_vmgenid_dev() [include/hw/acpi/vmgenid.h]
 
-This patch reverts to the behavior of simply ignoring the PVR when
-migrating older machines (ie, let the migration succeed if the user
-is sure that the CPU on the destination is close enough to work).
+... I was quite silly not to think of this on my own now, despite having
+authored commit f92063028a0e ("hw/acpi/vmgenid: prevent more than one
+vmgenid device", 2017-03-20) :/
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr.c              |    7 ++++++-
- target/ppc/cpu.h            |    1 +
- target/ppc/machine.c        |    2 +-
- target/ppc/translate_init.c |    2 ++
- 4 files changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index d4d781876b27..265d49bbcd7f 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3474,7 +3474,12 @@ DEFINE_SPAPR_MACHINE(2_10, "2.10", true);
-  * pseries-2.9
-  */
- #define SPAPR_COMPAT_2_9                                               \
--    HW_COMPAT_2_9
-+    HW_COMPAT_2_9                                                      \
-+    {                                                                  \
-+        .driver = TYPE_POWERPC_CPU,                                    \
-+        .property = "pre-2.10-migration",                              \
-+        .value    = "on",                                              \
-+    },                                                                 \
- 
- static void spapr_machine_2_9_instance_options(MachineState *machine)
- {
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 09393e601fd9..6ee2a26a963d 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1211,6 +1211,7 @@ struct PowerPCCPU {
-     uint64_t mig_insns_flags;
-     uint64_t mig_insns_flags2;
-     uint32_t mig_nb_BATs;
-+    bool pre_2_10_migration;
- };
- 
- static inline PowerPCCPU *ppc_env_get_cpu(CPUPPCState *env)
-diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-index a29aabe8f079..1b7aede579ea 100644
---- a/target/ppc/machine.c
-+++ b/target/ppc/machine.c
-@@ -608,7 +608,7 @@ static bool compat_needed(void *opaque)
-     PowerPCCPU *cpu = opaque;
- 
-     assert(!(cpu->compat_pvr && !cpu->vhyp));
--    return (cpu->compat_pvr != 0);
-+    return !cpu->pre_2_10_migration && cpu->compat_pvr != 0;
- }
- 
- static const VMStateDescription vmstate_compat = {
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 53aff5a7b734..783bf98217cc 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -10610,6 +10610,8 @@ static gchar *ppc_gdb_arch_name(CPUState *cs)
- 
- static Property ppc_cpu_properties[] = {
-     DEFINE_PROP_BOOL("pre-2.8-migration", PowerPCCPU, pre_2_8_migration, false),
-+    DEFINE_PROP_BOOL("pre-2.10-migration", PowerPCCPU, pre_2_10_migration,
-+                     false),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
+Thanks,
+Laszlo
