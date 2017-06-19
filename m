@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47778)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1dN3eP-0006FI-4x
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 16:51:58 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dN3fw-0006x1-OX
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 16:53:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1dN3eK-00076A-7l
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 16:51:57 -0400
-Received: from research.iiit.ac.in ([196.12.53.8]:55238)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1dN3eJ-00072y-9G
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 16:51:52 -0400
-From: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
-Date: Tue, 20 Jun 2017 01:44:22 +0530
-Message-Id: <1497903262-18626-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+	(envelope-from <rth7680@gmail.com>) id 1dN3fr-0007ll-R6
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 16:53:32 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:36628)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dN3fr-0007lZ-M2
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 16:53:27 -0400
+Received: by mail-qk0-x244.google.com with SMTP id r62so8482045qkf.3
+	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 13:53:25 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170611231633.32582-1-laurent@vivier.eu>
+	<20170611231633.32582-6-laurent@vivier.eu>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <a229ea36-7ae8-daee-f446-8670fc3f6e53@twiddle.net>
+Date: Mon, 19 Jun 2017 13:53:20 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3] Add manpage for QEMU Backup Tool
+In-Reply-To: <20170611231633.32582-6-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 5/7] target-m68k: use floatx80 internally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,203 +31,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, jsnow@redhat.com, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>
 
-qemu-backup will be a command-line tool for performing full and increment=
-al disk backups on running
-VMs.  It is intended as a reference implementation for management stack a=
-nd backup developers to
-see QEMU's backup features in action. The following commit is an initial =
-implementation of manpage
-listing the commands which the backup tool will support.
+On 06/11/2017 04:16 PM, Laurent Vivier wrote:
+> +static void gen_load_fp(DisasContext *s, int opsize, TCGv addr, TCGv_ptr fp)
+> +{
+> +    TCGv tmp;
+> +    TCGv_i64 t64;
+> +    int index = IS_USER(s);
+> +
+> +    t64 = tcg_temp_new_i64();
+> +    tmp = tcg_temp_new();
+> +    switch (opsize) {
+> +    case OS_BYTE:
+> +        tcg_gen_qemu_ld8s(tmp, addr, index);
+> +        gen_helper_exts32(cpu_env, fp, tmp);
+> +        break;
+> +    case OS_WORD:
+> +        tcg_gen_qemu_ld16s(tmp, addr, index);
+> +        gen_helper_exts32(cpu_env, fp, tmp);
+> +        break;
+> +    case OS_LONG:
+> +        tcg_gen_qemu_ld32u(tmp, addr, index);
+> +        gen_helper_exts32(cpu_env, fp, tmp);
+> +        break;
+> +    case OS_SINGLE:
+> +        tcg_gen_qemu_ld32u(tmp, addr, index);
+> +        gen_helper_extf32(cpu_env, fp, tmp);
+> +        break;
+> +    case OS_DOUBLE:
+> +        tcg_gen_qemu_ld64(t64, addr, index);
+> +        gen_helper_extf64(cpu_env, fp, t64);
+> +        tcg_temp_free_i64(t64);
+> +        break;
+> +    case OS_EXTENDED:
+> +        tcg_gen_qemu_ld32u(tmp, addr, index);
+> +        tcg_gen_shri_i32(tmp, tmp, 16);
+> +        tcg_gen_st16_i32(tmp, fp, offsetof(FPReg, l.upper));
+> +        tcg_gen_addi_i32(tmp, addr, 4);
+> +        tcg_gen_qemu_ld64(t64, tmp, index);
+> +        tcg_gen_st_i64(t64, fp, offsetof(FPReg, l.lower));
+> +        break;
+> +    case OS_PACKED:
+> +        tcg_gen_qemu_ld32u(tmp, addr, index);
+> +        tcg_gen_st16_i32(tmp, fp, offsetof(FPReg, l.upper));
+> +        tcg_gen_addi_i32(tmp, addr, 4);
+> +        tcg_gen_qemu_ld64(t64, tmp, index);
+> +        tcg_gen_st_i64(t64, fp, offsetof(FPReg, l.lower));
 
-Signed-off-by: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
----
- Makefile                        |   2 +-
- contrib/backup/qemu-backup.texi | 139 ++++++++++++++++++++++++++++++++++=
-++++++
- 2 files changed, 140 insertions(+), 1 deletion(-)
- create mode 100644 contrib/backup/qemu-backup.texi
+I don't see how this can be correct.  Doesn't the packed-decimal format use all 
+12 bytes (with two unaligned nibbles unused)?
 
-diff --git a/Makefile b/Makefile
-index c830d7a..094f291 100644
---- a/Makefile
-+++ b/Makefile
-@@ -504,7 +504,7 @@ clean:
- VERSION ?=3D $(shell cat VERSION)
-=20
- dist: qemu-$(VERSION).tar.bz2
--
-+qemu-backup.8: contrib/backup/qemu-backup.texi
- qemu-%.tar.bz2:
- 	$(SRC_PATH)/scripts/make-release "$(SRC_PATH)" "$(patsubst qemu-%.tar.b=
-z2,%,$@)"
-=20
-diff --git a/contrib/backup/qemu-backup.texi b/contrib/backup/qemu-backup=
-.texi
-new file mode 100644
-index 0000000..1db63c0
---- /dev/null
-+++ b/contrib/backup/qemu-backup.texi
-@@ -0,0 +1,139 @@
-+@setfilename qemu-backup-tool-manpage
-+
-+@documentlanguage en
-+@documentencoding UTF-8
-+
-+\input texinfo
-+@settitle Manpage_backup_tool 1.0
-+@copying
-+This is a manpage for qemu_backup_tool, version 1.0.
-+
-+Copyright @copyright{} 2016 Free Software Foundation, Inc.
-+@end copying
-+@ifinfo
-+@direntry
-+* QEMU: (qemu-backup-tool-manpage).    Man page for QEMU backup tool.
-+@end direntry
-+@end ifinfo
-+@iftex
-+@titlepage
-+@sp 7
-+@center @titlefont{QEMU_backup_tool}
-+@sp 1
-+@center @titlefont{Man Page}
-+@sp 3
-+@end titlepage
-+@end iftex
-+@ifnottex
-+@node Top
-+@top Short Sample
-+
-+@menu
-+* Name::
-+* Synopsis::
-+* list of Commands::
-+* Command Parameters::
-+* Command Descriptions::
-+* License::
-+@end menu
-+
-+@end ifnottex
-+
-+@node Name
-+@chapter Name
-+
-+QEMU disk backup tool.
-+
-+@node Synopsis
-+@chapter Synopsis
-+
-+qemu-backup command [ command options].
-+
-+@node  list of Commands
-+@chapter  list of Commands
-+@cindex chapter, first dummy
-+@itemize
-+@item qemu-backup guest add [--id id] [--qmp socketpath]
-+@item qemu-backup guest list
-+@item qemu-backup drive add [--guest guestname] [--id driveid] [--target=
- target]
-+@item qemu-backup drive list [--guest guestname]
-+@item qemu-backup backup [--guest guestname]
-+@item qemu-backup restore [--guest guestname]
-+@item qemu-backup drive-remove [--guest guestname] [--id driveid]
-+@item qemu-backup remove [--guest guestname]
-+@item qemu-backup drive add [--all] [--guest guestname] [--target target=
-]
-+@item qemu-backup backup [--inc] [--guest guestname]
-+@end itemize
-+@node  Command Parameters
-+@chapter  Command Parameters
-+@cindex chapter, first dummy
-+@itemize
-+@item --guest: Name of the guest.
-+@item --id: id of guest or drive.
-+@item --target: Destination on which you want your backup to be made.
-+@item --all: Add all the drives present in a guest for backup except cd-=
-rom.
-+@item --inc: For incremental backup.
-+@item --qmp: Path of qmp socket.
-+@end itemize
-+
-+@node  Command Descriptions
-+@chapter  Command Descriptions
-+@cindex chapter, first dummy
-+@itemize
-+@item qemu-backup guest add [--id id] [--qmp socketpath]
-+This command adds a guest to the configuration file given its path to qm=
-p socket.
-+example:
-+qemu-backup guest add --id=3Dfedora =E2=80=93qmp=3D/var/run/qemu/fedora.=
-sock
-+
-+@item qemu-backup guest list
-+This commands lists the names of guests which are added to configuration=
- file.
-+
-+@item qemu-backup drive add [--guest guestname] [--id driveid] [--target=
- target]
-+This command adds different drives for backup in a particular guest by g=
-iving the name of drive to be backed up and target imagefile in which we =
-want to store the drive backup.
-+example:
-+qemu-backup drive add --guest=3Dfedora --id=3Droot
-+--target=3D/backup/fedora/root.img
-+qemu-backup drive add --guest=3Dfedora --id=3Ddata
-+--target=3D/backup/fedora/data.img
-+
-+@item qemu-backup drive list [--guest guestname]
-+This commands gives the names of the drive present in a guest which are =
-added for backup.
-+example: qemu-backup drive list --guest=3Dfedora
-+
-+@item qemu-backup backup [--guest guestname]
-+
-+This command makes the backup of the drives, in their respective given d=
-estinations. The ids of drive and their destinations are taken from the c=
-onfiguration file.
-+example: qemu-backup backup --guest=3Dfedora
-+
-+@item qemu-backup restore [--guest guestname]
-+This command is needed if we want to restore the backup. It will list th=
-e commands to be run for performing the same but will not perform any act=
-ion.
-+example: qemu-backup restore --guest=3Dfedora
-+cp /backup/fedora/root.img /var/run/qemu/fedora/root.img
-+cp /backup/fedora/data.img /var/run/qemu/fedora/data.img
-+
-+@item qemu-backup drive-remove [--guest guestname] [--id driveid]
-+This command helps remove a drive which is set for backup in configurati=
-on of given host.
-+example: qemu-backup remove --guest=3Dfedora --id=3Droot
-+
-+@item qemu-backup remove [--guest guestname]
-+This command removes the guest from the configuration file.
-+example: qemu-backup remove =E2=80=93guest=3Dfedora
-+
-+@item qemu-backup drive add --all [-guest guestname] [-destination desti=
-nation]
-+This command adds all the drives of the guest for backup other than CDRO=
-M drive. Here all the backup drives will have the same names as original =
-drives and target will be the destination folder.
-+example: qemu-backup drive add --all --guest fedora --destination =3D/ba=
-ckup/fedora/
-+
-+@end itemize
-+
-+
-+@node License
-+@appendix License
-+
-+QEMU is a trademark of Fabrice Bellard.
-+
-+QEMU is released under the GNU General Public License (TODO: add link).
-+Parts of QEMU have specific licenses, see file LICENSE.
-+
-+TODO (refer to file LICENSE, include it, include the GPL?)
-+
-+@bye
---=20
-2.7.4
+It would also make me happier if we were to adjust the definition of fl0atx80 
+to more closely match m68k and those missing zeros.  Shouldn't real hardware 
+move instructions propagate those middle 2 bytes regardless of contents?
+
+Perhaps something like
+
+#ifdef TARGET_M68K
+   typedef struct {
+     uint64_t low;
+     union {
+       uin32_t high32;
+       struct {
+#ifdef HOST_WORDS_BIGENDIAN
+         uint16_t high, zero;
+#else
+         uint16_t zero, high;
+#endif
+       };
+     };
+   } floatx80;
+#else
+   ...
+#endif
+
+(with a minor fix to make_floatx80 to use named initializers).
+
+Then you can use full 32-bit store insns when copying data here.  Which also 
+allows you to drop some of the shifts you're needing to add.
+
+And, in future, when you actually implement the packed decimal, you'll be able 
+to use the high32 field to Do the Right Thing.
+
+All of the rest of the patch looks good.
+
+
+r~
