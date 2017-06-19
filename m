@@ -1,15 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34911)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dN07K-00045v-7f
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 13:05:35 -0400
+	(envelope-from <groug@kaod.org>) id 1dN07R-00049i-Jv
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 13:05:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dN07G-0000M1-0E
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 13:05:34 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 19 Jun 2017 19:05:26 +0200
-Message-Id: <1497891926-25299-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/misc/edu: Compile the edu device as common
- object
+	(envelope-from <groug@kaod.org>) id 1dN07N-0000R4-CG
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 13:05:41 -0400
+Received: from 6.mo179.mail-out.ovh.net ([46.105.56.76]:53672)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dN07N-0000Ps-30
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 13:05:37 -0400
+Received: from player716.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id A0A854D546
+	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 19:05:30 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Mon, 19 Jun 2017 19:05:20 +0200
+Message-ID: <149789192064.8356.6383758991647148922.stgit@bahia.lan>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] spapr/ppc: fix backward migration to QEMU 2.9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,36 +27,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Jiri Slaby <jslaby@suse.cz>
-Cc: qemu-trivial@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-edu.c seems not to contain any target-specific code, so we can
-put it into common-obj-y to compile it only once for all targets.
+Commit c783b0012708 ("ppc: Rework CPU compatibility testing across
+migration") added a subsection to the vmstate description of CPUs.
+This subsection is sent when the CPU compat_pvr field is non-zero,
+which is likely to happen after CAS negociation (since QEMU 2.9) or
+even before CAS negociation if the user explicitely asked for compat
+mode.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+This breaks backward migration of existing pseries-2.9 machine types
+since they don't know about this "compat" subsection:
+
+qemu-system-ppc64: error while loading state for instance 0x0 of
+ device 'cpu'
+
+This patch reverts to the behavior of simply ignoring the PVR when
+migrating older machines (ie, let the migration succeed if the user
+is sure that the CPU on the destination is close enough to work).
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/misc/Makefile.objs | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/ppc/spapr.c              |    7 ++++++-
+ target/ppc/cpu.h            |    1 +
+ target/ppc/machine.c        |    2 +-
+ target/ppc/translate_init.c |    2 ++
+ 4 files changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 2019846..7fc4e41 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -6,6 +6,7 @@ common-obj-$(CONFIG_ISA_DEBUG) += debugexit.o
- common-obj-$(CONFIG_SGA) += sga.o
- common-obj-$(CONFIG_ISA_TESTDEV) += pc-testdev.o
- common-obj-$(CONFIG_PCI_TESTDEV) += pci-testdev.o
-+common-obj-$(CONFIG_EDU) += edu.o
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index d4d781876b27..265d49bbcd7f 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3474,7 +3474,12 @@ DEFINE_SPAPR_MACHINE(2_10, "2.10", true);
+  * pseries-2.9
+  */
+ #define SPAPR_COMPAT_2_9                                               \
+-    HW_COMPAT_2_9
++    HW_COMPAT_2_9                                                      \
++    {                                                                  \
++        .driver = TYPE_POWERPC_CPU,                                    \
++        .property = "pre-2.10-migration",                              \
++        .value    = "on",                                              \
++    },                                                                 \
  
- common-obj-y += unimp.o
+ static void spapr_machine_2_9_instance_options(MachineState *machine)
+ {
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 09393e601fd9..6ee2a26a963d 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1211,6 +1211,7 @@ struct PowerPCCPU {
+     uint64_t mig_insns_flags;
+     uint64_t mig_insns_flags2;
+     uint32_t mig_nb_BATs;
++    bool pre_2_10_migration;
+ };
  
-@@ -53,7 +54,6 @@ obj-$(CONFIG_MIPS_CPS) += mips_cpc.o
- obj-$(CONFIG_MIPS_ITU) += mips_itu.o
+ static inline PowerPCCPU *ppc_env_get_cpu(CPUPPCState *env)
+diff --git a/target/ppc/machine.c b/target/ppc/machine.c
+index a29aabe8f079..1b7aede579ea 100644
+--- a/target/ppc/machine.c
++++ b/target/ppc/machine.c
+@@ -608,7 +608,7 @@ static bool compat_needed(void *opaque)
+     PowerPCCPU *cpu = opaque;
  
- obj-$(CONFIG_PVPANIC) += pvpanic.o
--obj-$(CONFIG_EDU) += edu.o
- obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
- obj-$(CONFIG_AUX) += auxbus.o
- obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
--- 
-1.8.3.1
+     assert(!(cpu->compat_pvr && !cpu->vhyp));
+-    return (cpu->compat_pvr != 0);
++    return !cpu->pre_2_10_migration && cpu->compat_pvr != 0;
+ }
+ 
+ static const VMStateDescription vmstate_compat = {
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 53aff5a7b734..783bf98217cc 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -10610,6 +10610,8 @@ static gchar *ppc_gdb_arch_name(CPUState *cs)
+ 
+ static Property ppc_cpu_properties[] = {
+     DEFINE_PROP_BOOL("pre-2.8-migration", PowerPCCPU, pre_2_8_migration, false),
++    DEFINE_PROP_BOOL("pre-2.10-migration", PowerPCCPU, pre_2_10_migration,
++                     false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
