@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dMvzu-0006c7-Tv
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:41:40 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dMw1y-0008FE-RM
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:43:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dMvzq-0007VZ-Uk
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:41:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36948)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dMvzq-0007VM-LY
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:41:34 -0400
-References: <20170615203735.19649-1-rth@twiddle.net>
-	<7998cb6b-018e-8069-9d11-a3e1e4e70380@redhat.com>
-	<429793f7-a3c1-91ec-9a83-908ee779e703@redhat.com>
-	<9362010b-5c05-c29f-6e67-c182d2ae57ec@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <e348f832-9a78-fffd-b425-426b5e66f8e6@redhat.com>
-Date: Mon, 19 Jun 2017 14:41:31 +0200
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dMw1t-0000Lp-S7
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:43:46 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:60175
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1dMw1t-0000LN-LB
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:43:41 -0400
+References: <1497772934-15561-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1497772934-15561-6-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20170618232055-mutt-send-email-mst@kernel.org>
+	<e0a92b1f-9f5d-abc3-65f6-72546748c992@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <78cb8153-e189-32d2-eec3-9d5cfc9ab77d@ilande.co.uk>
+Date: Mon, 19 Jun 2017 13:43:32 +0100
 MIME-Version: 1.0
-In-Reply-To: <9362010b-5c05-c29f-6e67-c182d2ae57ec@de.ibm.com>
+In-Reply-To: <e0a92b1f-9f5d-abc3-65f6-72546748c992@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/s390x: Implement CSST
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCHv5 5/5] fw_cfg: move QOM type defines and
+ fw_cfg types into fw_cfg.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,82 +32,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com, aurelien@aurel32.net
+To: Laszlo Ersek <lersek@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, imammedo@redhat.com, pbonzini@redhat.com
 
-On 19.06.2017 14:33, Christian Borntraeger wrote:
-> On 06/19/2017 02:05 PM, David Hildenbrand wrote:
->> On 19.06.2017 12:03, David Hildenbrand wrote:
->>> On 15.06.2017 22:37, Richard Henderson wrote:
->>>> There are no uses in a Linux system with which to test,
->>>> but it Looks Right by my reading of the PoO.
+On 19/06/17 09:57, Laszlo Ersek wrote:
+
+> On 06/18/17 22:23, Michael S. Tsirkin wrote:
+>> On Sun, Jun 18, 2017 at 09:02:14AM +0100, Mark Cave-Ayland wrote:
+>>> By exposing FWCfgIoState and FWCfgMemState internals we allow the possibility
+>>> for the internal MemoryRegion fields to be mapped by name for boards that wish
+>>> to wire up the fw_cfg device themselves.
 >>>
->>> I am using next.git/master with this patch applied:
->>> https://git.kernel.org/pub/scm/linux/kernel/git/s390/linux.git/commit/?h=features&id=8aa8680aa383bf6e2ac
->>>
->>> I am using QEMU with the mvcos patch and your patch applied (and a patch
->>> that allows enabling csst/csst2).
->>>
->>> I am using the following qemu command line:
->>>
->>> #!/bin/bash
->>> /home/dhildenb/git/qemu/s390x-softmmu/qemu-system-s390x \
->>> 	-nographic -nodefaults -machine s390-ccw-virtio,accel=tcg \
->>> 	-cpu qemu,mvcos=on,stfle=on,ldisp=on,ldisphp=on,\
->>>           eimm=on,stckf=on,csst=on,csst2=on,ginste=on,exrl=on\
->>> 	-m 256M -smp 1 -chardev stdio,id=con0 \
->>> 	-device sclpconsole,chardev=con0 \
->>> 	-kernel vmlinux -initrd /home/dhildenb/initrd.debian
->>>
->>> Right now, I can start a z9 compiled kernel.
->>>
->>> When trying to start a z10 compiled kernel (which generates many csst),
+>>> An additional minor tidy-up is that the FWCfgEntry typedef is moved from the
+>>> struct definitions in fw_cfg.h to typedefs.h along with the others.
 > 
+> I think this paragraph should be dropped.
+
+No problem, I'll do that for the follow-up v6 patchset.
+
+>>>
+>>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>>> ---
+>>>  hw/nvram/fw_cfg.c         |   55 ------------------------------------------
+>>>  include/hw/nvram/fw_cfg.h |   58 +++++++++++++++++++++++++++++++++++++++++++++
+>>>  include/qemu/typedefs.h   |    1 +
+>>>  3 files changed, 59 insertions(+), 55 deletions(-)
+>>>
+>>> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+>>> index df99903..00771c9 100644
+>>> --- a/hw/nvram/fw_cfg.c
+>>> +++ b/hw/nvram/fw_cfg.c
+>>> @@ -40,14 +40,6 @@
+>>>  #define FW_CFG_NAME "fw_cfg"
+>>>  #define FW_CFG_PATH "/machine/" FW_CFG_NAME
+>>>
+>>> -#define TYPE_FW_CFG     "fw_cfg"
+>>> -#define TYPE_FW_CFG_IO  "fw_cfg_io"
+>>> -#define TYPE_FW_CFG_MEM "fw_cfg_mem"
+>>> -
+>>> -#define FW_CFG(obj)     OBJECT_CHECK(FWCfgState,    (obj), TYPE_FW_CFG)
+>>> -#define FW_CFG_IO(obj)  OBJECT_CHECK(FWCfgIoState,  (obj), TYPE_FW_CFG_IO)
+>>> -#define FW_CFG_MEM(obj) OBJECT_CHECK(FWCfgMemState, (obj), TYPE_FW_CFG_MEM)
+>>> -
+>>>  /* FW_CFG_VERSION bits */
+>>>  #define FW_CFG_VERSION      0x01
+>>>  #define FW_CFG_VERSION_DMA  0x02
+>>> @@ -61,53 +53,6 @@
+>>>
+>>>  #define FW_CFG_DMA_SIGNATURE 0x51454d5520434647ULL /* "QEMU CFG" */
+>>>
+>>> -typedef struct FWCfgEntry {
+>>> -    uint32_t len;
+>>> -    bool allow_write;
+>>> -    uint8_t *data;
+>>> -    void *callback_opaque;
+>>> -    FWCfgReadCallback read_callback;
+>>> -} FWCfgEntry;
+>>
+>> This still doesn't seem to do what Laszlo requested which is to keep
+>> as many types and macros as possible in fw_cfg.c, only put typedefs in
+>> fw_cfg.h.
 > 
-> I would be very surprised if the kernel would contain any csst. gcc does not
-> emit csst and the kernel source also does not contain it.
+> Sort of; what's missing from this version (for me anyway) is that the
+> internals of FWCfgEntry should remain in the C file, because we never
+> depend on those fields -- or the size of that structure -- externally.
+> I'm OK with the rest.
 > 
+> Mark, can you please squash the following diff into this patch -- this
+> is what would implement my request (2) in
+> <https://www.mail-archive.com/qemu-devel@nongnu.org/msg458313.html>:
+> 
+>> diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
+>> index b0511b9a9d77..b77ea48abb1d 100644
+>> --- a/include/hw/nvram/fw_cfg.h
+>> +++ b/include/hw/nvram/fw_cfg.h
+>> @@ -46,14 +46,6 @@ typedef struct FWCfgDmaAccess {
+>>
+>>  typedef void (*FWCfgReadCallback)(void *opaque);
+>>
+>> -struct FWCfgEntry {
+>> -    uint32_t len;
+>> -    bool allow_write;
+>> -    uint8_t *data;
+>> -    void *callback_opaque;
+>> -    FWCfgReadCallback read_callback;
+>> -};
+>> -
+>>  struct FWCfgState {
+>>      /*< private >*/
+>>      SysBusDevice parent_obj;
+>> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+>> index 00771c98505c..9b0aaa21a202 100644
+>> --- a/hw/nvram/fw_cfg.c
+>> +++ b/hw/nvram/fw_cfg.c
+>> @@ -53,6 +53,14 @@
+>>
+>>  #define FW_CFG_DMA_SIGNATURE 0x51454d5520434647ULL /* "QEMU CFG" */
+>>
+>> +struct FWCfgEntry {
+>> +    uint32_t len;
+>> +    bool allow_write;
+>> +    uint8_t *data;
+>> +    void *callback_opaque;
+>> +    FWCfgReadCallback read_callback;
+>> +};
+>> +
+>>  #define JPG_FILE 0
+>>  #define BMP_FILE 1
+>>
+> 
+> As I wrote in the msg linked above, 'FWCfgEntry need not be moved from
+> the C file to the header file [...] it's fine to leave FWCfgEntry an
+> incomplete type in "fw_cfg.h"'.
 
-I only did a grep on the objdump output:
+Yes, that's totally my fault as I misinterpreted your comment from your
+previous email - sorry about that.
 
-t460s: ~/git/linux-s390 next $ /usr/bin/s390x-linux-gnu-objdump -D
-vmlinux | grep csst
-  912826:       c8 e2 f1 7c 56 02       csst    380(%r15),1538(%r5),%r14
-  954684:       c8 62 dc 35 2b 65       csst    3125(%r13),2917(%r2),%r6
-  95e6e4:       c8 a2 1c 76 0a 60       csst    3190(%r1),2656,%r10
-  95f68a:       c8 b2 c9 b3 3d 47       csst    2483(%r12),3399(%r3),%r11
-  96067a:       c8 42 d3 59 da 50       csst    857(%r13),2640(%r13),%r4
-  963642:       c8 72 73 c9 1a a0       csst    969(%r7),2720(%r1),%r7
-  9656de:       c8 12 d3 09 7a a0       csst    777(%r13),2720(%r7),%r1
-  9676a6:       c8 32 6d 97 84 7e       csst    3479(%r6),1150(%r8),%r3
-  9d470a:       c8 a2 70 11 74 02       csst    17(%r7),1026(%r7),%r10
-  9d6c4a:       c8 a2 de 0c 54 4a       csst    3596(%r13),1098(%r5),%r10
-  9e3af8:       c8 a2 de 09 54 73       csst    3593(%r13),1139(%r5),%r10
-  9e3b02:       c8 a2 de 0f 54 73       csst    3599(%r13),1139(%r5),%r10
-  9e7992:       c8 a2 de 0c 54 d4       csst    3596(%r13),1236(%r5),%r10
-  9e79ea:       c8 a2 40 f6 c3 0e       csst    246(%r4),782(%r12),%r10
-  9e7e3c:       c8 a2 40 6c d1 74       csst    108(%r4),372(%r13),%r10
-  9e8036:       c8 a2 de 0d 54 cd       csst    3597(%r13),1229(%r5),%r10
-  9e81ea:       c8 a2 40 63 2f b8       csst    99(%r4),4024(%r2),%r10
-  9e81fe:       c8 a2 de 0f 54 68       csst    3599(%r13),1128(%r5),%r10
-  9e8e10:       c8 72 93 83 69 bd       csst    899(%r9),2493(%r6),%r7
-  9e8ea4:       c8 72 c6 04 54 63       csst    1540(%r12),1123(%r5),%r7
-  9e8eae:       c8 72 c6 f1 98 77       csst    1777(%r12),2167(%r9),%r7
-  9e8ebc:       c8 72 93 ba f5 07       csst    954(%r9),1287(%r15),%r7
-  a0702e:       c8 a2 14 74 6e 5f       csst    1140(%r1),3679(%r6),%r10
-  a083ea:       c8 a2 73 08 74 da       csst    776(%r7),1242(%r7),%r10
-  a0ec06:       c8 a2 f8 f6 c3 08       csst    2294(%r15),776(%r12),%r10
-  a11890:       c8 a2 f8 fa 5f ac       csst    2298(%r15),4012(%r5),%r10
-  a11b6e:       c8 a2 73 0a 74 74       csst    778(%r7),1140(%r7),%r10
-  a11be0:       c8 a2 f8 fa 5f ac       csst    2298(%r15),4012(%r5),%r10
-  a11ef4:       c8 a2 73 0b b3 7c       csst    779(%r7),892(%r11),%r10
-[...]
- 14c9e5a:       c8 02 d0 2d 00 0d       csst    45(%r13),13,%r0
+> With the above two changes (commit message and code update) squashed
+> into patch #5:
+> 
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+> 
+> and also for the series:
+> 
+> Tested-by: Laszlo Ersek <lersek@redhat.com>
+> 
+> (I tested the IO mapped variant with OVMF, exercising fw_cfg DMA and
+> fw_cfg write, and the MMIO mapped variant with ArmVirtQemu (aka
+> "AAVMF"), exercising fw_cfg DMA.)
+
+Fantastic! It's good to know that the changes don't cause any
+regressions for both DMA operations and MMIO fw_cfg instances.
+
+I'll squash your diff into patch 5, update the tags and then re-post a
+v6 shortly.
+
+Assuming that this is the final revision, who is the right person to
+accept the patchset into their queue for merge upstream?
 
 
-That made me assume we have csst in the kernel :)
+ATB,
 
-
-Thanks,
-
-David
+Mark.
