@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dN1GJ-0008Q3-4o
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 14:18:56 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dN1GH-0002HI-8k
+	(envelope-from <rth7680@gmail.com>) id 1dN1GG-0008OZ-1z
 	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 14:18:55 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:32770)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <rth7680@gmail.com>) id 1dN1GF-0002GW-62
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 14:18:52 -0400
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:34758)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dN1GH-0002H7-2l
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 14:18:53 -0400
-Received: by mail-pf0-x244.google.com with SMTP id w12so18591893pfk.0
-	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 11:18:53 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dN1GE-0002FC-W8
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 14:18:51 -0400
+Received: by mail-pg0-x241.google.com with SMTP id j186so17439647pge.1
+	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 11:18:50 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Mon, 19 Jun 2017 11:18:36 -0700
-Message-Id: <20170619181839.25249-10-rth@twiddle.net>
+Date: Mon, 19 Jun 2017 11:18:34 -0700
+Message-Id: <20170619181839.25249-8-rth@twiddle.net>
 In-Reply-To: <20170619181839.25249-1-rth@twiddle.net>
 References: <20170619181839.25249-1-rth@twiddle.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 09/12] tcg: Increase hit rate of lookup_tb_ptr
+Subject: [Qemu-devel] [PULL 07/12] tcg/arm: Try pc-relative addresses for
+ movi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,64 +28,67 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, "Emilio G . Cota" <cota@braap.org>
+Cc: peter.maydell@linaro.org
 
-We can call tb_htable_lookup even when the tb_jmp_cache is completely
-empty.  Therefore, un-nest most of the code dependent on tb != NULL
-from the read from the cache.
-
-This improves the hit rate of lookup_tb_ptr; for instance, when booting
-and immediately shutting down debian-arm, the hit rate improves from
-93.2% to 99.4%.
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg-runtime.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+ tcg/arm/tcg-target.inc.c | 40 +++++++++++++++++++++++++++-------------
+ 1 file changed, 27 insertions(+), 13 deletions(-)
 
-diff --git a/tcg-runtime.c b/tcg-runtime.c
-index 7fa90ce..ec3a34e 100644
---- a/tcg-runtime.c
-+++ b/tcg-runtime.c
-@@ -149,23 +149,23 @@ void *HELPER(lookup_tb_ptr)(CPUArchState *env, target_ulong addr)
-     CPUState *cpu = ENV_GET_CPU(env);
-     TranslationBlock *tb;
-     target_ulong cs_base, pc;
--    uint32_t flags;
+diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
+index fce382f..42370e5 100644
+--- a/tcg/arm/tcg-target.inc.c
++++ b/tcg/arm/tcg-target.inc.c
+@@ -418,23 +418,37 @@ static inline void tcg_out_dat_imm(TCGContext *s,
+ 
+ static void tcg_out_movi32(TCGContext *s, int cond, int rd, uint32_t arg)
+ {
+-    int rot, opc, rn;
 -
--    tb = atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)]);
--    if (likely(tb)) {
--        cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
--        if (likely(tb->pc == addr && tb->cs_base == cs_base &&
--                   tb->flags == flags)) {
--            goto found;
--        }
-+    uint32_t flags, addr_hash;
+-    /* For armv7, make sure not to use movw+movt when mov/mvn would do.
+-       Speed things up by only checking when movt would be required.
+-       Prior to armv7, have one go at fully rotated immediates before
+-       doing the decomposition thing below.  */
+-    if (!use_armv7_instructions || (arg & 0xffff0000)) {
+-        rot = encode_imm(arg);
++    int rot, opc, rn, diff;
 +
-+    addr_hash = tb_jmp_cache_hash_func(addr);
-+    tb = atomic_rcu_read(&cpu->tb_jmp_cache[addr_hash]);
-+    cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
++    /* Check a single MOV/MVN before anything else.  */
++    rot = encode_imm(arg);
++    if (rot >= 0) {
++        tcg_out_dat_imm(s, cond, ARITH_MOV, rd, 0,
++                        rotl(arg, rot) | (rot << 7));
++        return;
++    }
++    rot = encode_imm(~arg);
++    if (rot >= 0) {
++        tcg_out_dat_imm(s, cond, ARITH_MVN, rd, 0,
++                        rotl(~arg, rot) | (rot << 7));
++        return;
++    }
 +
-+    if (unlikely(!(tb
-+                   && tb->pc == addr
-+                   && tb->cs_base == cs_base
-+                   && tb->flags == flags))) {
-         tb = tb_htable_lookup(cpu, addr, cs_base, flags);
--        if (likely(tb)) {
--            atomic_set(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)], tb);
--            goto found;
-+        if (!tb) {
-+            return tcg_ctx.code_gen_epilogue;
++    /* Check for a pc-relative address.  This will usually be the TB,
++       or within the TB, which is immediately before the code block.  */
++    diff = arg - ((intptr_t)s->code_ptr + 8);
++    if (diff >= 0) {
++        rot = encode_imm(diff);
+         if (rot >= 0) {
+-            tcg_out_dat_imm(s, cond, ARITH_MOV, rd, 0,
+-                            rotl(arg, rot) | (rot << 7));
++            tcg_out_dat_imm(s, cond, ARITH_ADD, rd, TCG_REG_PC,
++                            rotl(diff, rot) | (rot << 7));
+             return;
          }
-+        atomic_set(&cpu->tb_jmp_cache[addr_hash], tb);
+-        rot = encode_imm(~arg);
++    } else {
++        rot = encode_imm(-diff);
+         if (rot >= 0) {
+-            tcg_out_dat_imm(s, cond, ARITH_MVN, rd, 0,
+-                            rotl(~arg, rot) | (rot << 7));
++            tcg_out_dat_imm(s, cond, ARITH_SUB, rd, TCG_REG_PC,
++                            rotl(-diff, rot) | (rot << 7));
+             return;
+         }
      }
--    return tcg_ctx.code_gen_epilogue;
-- found:
-+
-     qemu_log_mask_and_addr(CPU_LOG_EXEC, addr,
-                            "Chain %p [%d: " TARGET_FMT_lx "] %s\n",
-                            tb->tc_ptr, cpu->cpu_index, addr,
 -- 
 2.9.4
