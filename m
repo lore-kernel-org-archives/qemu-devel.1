@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dN0ae-0004RN-VK
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 13:35:54 -0400
+	(envelope-from <berrange@redhat.com>) id 1dN0am-0004Zg-Pq
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 13:36:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dN0ad-0001HI-QX
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 13:35:53 -0400
+	(envelope-from <berrange@redhat.com>) id 1dN0ak-0001Nc-CA
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 13:36:00 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Mon, 19 Jun 2017 18:34:47 +0100
-Message-Id: <20170619173455.18805-13-berrange@redhat.com>
+Date: Mon, 19 Jun 2017 18:34:49 +0100
+Message-Id: <20170619173455.18805-15-berrange@redhat.com>
 In-Reply-To: <20170619173455.18805-1-berrange@redhat.com>
 References: <20170619173455.18805-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v9 12/20] qcow2: extend specification to cover
- LUKS encryption
+Subject: [Qemu-devel] [PATCH v9 14/20] qcow2: add iotests to cover LUKS
+ encryption support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,145 +23,353 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Update the qcow2 specification to describe how the LUKS header is
-placed inside a qcow2 file, when using LUKS encryption for the
-qcow2 payload instead of the legacy AES-CBC encryption
+This extends the 087 iotest to cover LUKS encryption when doing
+blockdev-add.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Two further tests are added to validate read/write of LUKS
+encrypted images with a single file and with a backing file.
+
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- docs/specs/qcow2.txt | 103 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 103 insertions(+)
+ tests/qemu-iotests/087     | 35 ++++++++++++++++++-
+ tests/qemu-iotests/087.out | 14 +++++++-
+ tests/qemu-iotests/188     | 76 ++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/188.out | 18 ++++++++++
+ tests/qemu-iotests/189     | 86 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/189.out | 26 ++++++++++++++
+ tests/qemu-iotests/group   |  2 ++
+ 7 files changed, 255 insertions(+), 2 deletions(-)
+ create mode 100755 tests/qemu-iotests/188
+ create mode 100644 tests/qemu-iotests/188.out
+ create mode 100755 tests/qemu-iotests/189
+ create mode 100644 tests/qemu-iotests/189.out
 
-diff --git a/docs/specs/qcow2.txt b/docs/specs/qcow2.txt
-index 80cdfd0..886a546 100644
---- a/docs/specs/qcow2.txt
-+++ b/docs/specs/qcow2.txt
-@@ -45,6 +45,7 @@ The first cluster of a qcow2 image contains the file header:
-          32 - 35:   crypt_method
-                     0 for no encryption
-                     1 for AES encryption
-+                    2 for LUKS encryption
+diff --git a/tests/qemu-iotests/087 b/tests/qemu-iotests/087
+index 1d595b2..f8e4903 100755
+--- a/tests/qemu-iotests/087
++++ b/tests/qemu-iotests/087
+@@ -119,7 +119,7 @@ run_qemu <<EOF
+ EOF
  
-          36 - 39:   l1_size
-                     Number of entries in the active L1 table
-@@ -135,6 +136,7 @@ be stored. Each extension has a structure like the following:
-                         0xE2792ACA - Backing file format name
-                         0x6803f857 - Feature name table
-                         0x23852875 - Bitmaps extension
-+                        0x0537be77 - Full disk encryption header pointer
-                         other      - Unknown header extension, can be safely
-                                      ignored
+ echo
+-echo === Encrypted image ===
++echo === Encrypted image QCow ===
+ echo
  
-@@ -207,6 +209,107 @@ The fields of the bitmaps extension are:
-                    Offset into the image file at which the bitmap directory
-                    starts. Must be aligned to a cluster boundary.
+ _make_test_img --object secret,id=sec0,data=123456 -o encryption=on,encrypt.key-secret=sec0 $size
+@@ -152,6 +152,39 @@ run_qemu <<EOF
+ EOF
  
-+== Full disk encryption header pointer ==
+ echo
++echo === Encrypted image LUKS ===
++echo
 +
-+The full disk encryption header must be present if, and only if, the
-+'crypt_method' header requires metadata. Currently this is only true
-+of the 'LUKS' crypt method. The header extension must be absent for
-+other methods.
++_make_test_img --object secret,id=sec0,data=123456 -o encrypt.format=luks,encrypt.key-secret=sec0 $size
++run_qemu <<EOF
++{ "execute": "qmp_capabilities" }
++{ "execute": "object-add",
++  "arguments": {
++      "qom-type": "secret",
++      "id": "sec0",
++      "props": {
++          "data": "123456"
++      }
++  }
++}
++{ "execute": "blockdev-add",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "node-name": "disk",
++      "file": {
++          "driver": "file",
++          "filename": "$TEST_IMG"
++      },
++      "encrypt": {
++        "format": "luks",
++        "key-secret": "sec0"
++      }
++    }
++  }
++{ "execute": "quit" }
++EOF
 +
-+This header provides the offset at which the crypt method can store
-+its additional data, as well as the length of such data.
-+
-+    Byte  0 -  7:   Offset into the image file at which the encryption
-+                    header starts in bytes. Must be aligned to a cluster
-+                    boundary.
-+    Byte  8 - 15:   Length of the written encryption header in bytes.
-+                    Note actual space allocated in the qcow2 file may
-+                    be larger than this value, since it will be rounded
-+                    to the nearest multiple of the cluster size. Any
-+                    unused bytes in the allocated space will be initialized
-+                    to 0.
-+
-+For the LUKS crypt method, the encryption header works as follows.
-+
-+The first 592 bytes of the header clusters will contain the LUKS
-+partition header. This is then followed by the key material data areas.
-+The size of the key material data areas is determined by the number of
-+stripes in the key slot and key size. Refer to the LUKS format
-+specification ('docs/on-disk-format.pdf' in the cryptsetup source
-+package) for details of the LUKS partition header format.
-+
-+In the LUKS partition header, the "payload-offset" field will be
-+calculated as normal for the LUKS spec. ie the size of the LUKS
-+header, plus key material regions, plus padding, relative to the
-+start of the LUKS header. This offset value is not required to be
-+qcow2 cluster aligned. Its value is currently never used in the
-+context of qcow2, since the qcow2 file format itself defines where
-+the real payload offset is, but none the less a valid payload offset
-+should always be present.
-+
-+In the LUKS key slots header, the "key-material-offset" is relative
-+to the start of the LUKS header clusters in the qcow2 container,
-+not the start of the qcow2 file.
-+
-+Logically the layout looks like
-+
-+  +-----------------------------+
-+  | QCow2 header                |
-+  | QCow2 header extension X    |
-+  | QCow2 header extension FDE  |
-+  | QCow2 header extension ...  |
-+  | QCow2 header extension Z    |
-+  +-----------------------------+
-+  | ....other QCow2 tables....  |
-+  .                             .
-+  .                             .
-+  +-----------------------------+
-+  | +-------------------------+ |
-+  | | LUKS partition header   | |
-+  | +-------------------------+ |
-+  | | LUKS key material 1     | |
-+  | +-------------------------+ |
-+  | | LUKS key material 2     | |
-+  | +-------------------------+ |
-+  | | LUKS key material ...   | |
-+  | +-------------------------+ |
-+  | | LUKS key material 8     | |
-+  | +-------------------------+ |
-+  +-----------------------------+
-+  | QCow2 cluster payload       |
-+  .                             .
-+  .                             .
-+  .                             .
-+  |                             |
-+  +-----------------------------+
-+
-+== Data encryption ==
-+
-+When an encryption method is requested in the header, the image payload
-+data must be encrypted/decrypted on every write/read. The image headers
-+and metadata are never encrypted.
-+
-+The algorithms used for encryption vary depending on the method
-+
-+ - AES:
-+
-+   The AES cipher, in CBC mode, with 256 bit keys.
-+
-+   Initialization vectors generated using plain64 method, with
-+   the virtual disk sector as the input tweak.
-+
-+   This format is no longer supported in QEMU system emulators, due
-+   to a number of design flaws affecting its security. It is only
-+   supported in the command line tools for the sake of back compatibility
-+   and data liberation.
-+
-+ - LUKS:
-+
-+   The algorithms are specified in the LUKS header.
-+
-+   Initialization vectors generated using the method specified
-+   in the LUKS header, with the physical disk sector as the
-+   input tweak.
++echo
+ echo === Missing driver ===
+ echo
  
- == Host cluster management ==
+diff --git a/tests/qemu-iotests/087.out b/tests/qemu-iotests/087.out
+index 69e4c3b..b1318c6 100644
+--- a/tests/qemu-iotests/087.out
++++ b/tests/qemu-iotests/087.out
+@@ -32,7 +32,7 @@ QMP_VERSION
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
  
+ 
+-=== Encrypted image ===
++=== Encrypted image QCow ===
+ 
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on encrypt.key-secret=sec0
+ Testing:
+@@ -44,6 +44,18 @@ QMP_VERSION
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ 
+ 
++=== Encrypted image LUKS ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encrypt.format=luks encrypt.key-secret=sec0
++Testing:
++QMP_VERSION
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++
++
+ === Missing driver ===
+ 
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on encrypt.key-secret=sec0
+diff --git a/tests/qemu-iotests/188 b/tests/qemu-iotests/188
+new file mode 100755
+index 0000000..83ed03e
+--- /dev/null
++++ b/tests/qemu-iotests/188
+@@ -0,0 +1,76 @@
++#!/bin/bash
++#
++# Test encrypted read/write using plain bdrv_read/bdrv_write
++#
++# Copyright (C) 2017 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=berrange@redhat.com
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++here=`pwd`
++status=1	# failure is the default!
++
++_cleanup()
++{
++	_cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
++_supported_fmt qcow2
++_supported_proto generic
++_supported_os Linux
++
++
++size=16M
++
++SECRET="secret,id=sec0,data=astrochicken"
++SECRETALT="secret,id=sec0,data=platypus"
++
++_make_test_img --object $SECRET -o "encrypt.format=luks,encrypt.key-secret=sec0,encrypt.iter-time=10" $size
++
++IMGSPEC="driver=$IMGFMT,file.filename=$TEST_IMG,encrypt.key-secret=sec0"
++
++QEMU_IO_OPTIONS=$QEMU_IO_OPTIONS_NO_FMT
++
++echo
++echo "== reading whole image =="
++$QEMU_IO --object $SECRET -c "read -P 0 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
++
++echo
++echo "== rewriting whole image =="
++$QEMU_IO --object $SECRET -c "write -P 0xa 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
++
++echo
++echo "== verify pattern =="
++$QEMU_IO --object $SECRET -c "read -P 0xa 0 $size"  --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
++
++echo
++echo "== verify open failure with wrong password =="
++$QEMU_IO --object $SECRETALT -c "read -P 0xa 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
++
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/188.out b/tests/qemu-iotests/188.out
+new file mode 100644
+index 0000000..8af24e5
+--- /dev/null
++++ b/tests/qemu-iotests/188.out
+@@ -0,0 +1,18 @@
++QA output created by 188
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216 encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10
++
++== reading whole image ==
++read 16777216/16777216 bytes at offset 0
++16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== rewriting whole image ==
++wrote 16777216/16777216 bytes at offset 0
++16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== verify pattern ==
++read 16777216/16777216 bytes at offset 0
++16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== verify open failure with wrong password ==
++can't open: Invalid password, cannot unlock any keyslot
++*** done
+diff --git a/tests/qemu-iotests/189 b/tests/qemu-iotests/189
+new file mode 100755
+index 0000000..54ad980
+--- /dev/null
++++ b/tests/qemu-iotests/189
+@@ -0,0 +1,86 @@
++#!/bin/bash
++#
++# Test encrypted read/write using backing files
++#
++# Copyright (C) 2017 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=berrange@redhat.com
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++here=`pwd`
++status=1	# failure is the default!
++
++_cleanup()
++{
++	_cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
++_supported_fmt qcow2
++_supported_proto generic
++_supported_os Linux
++
++
++size=16M
++TEST_IMG_BASE=$TEST_IMG.base
++SECRET0="secret,id=sec0,data=astrochicken"
++SECRET1="secret,id=sec1,data=furby"
++
++TEST_IMG_SAVE=$TEST_IMG
++TEST_IMG=$TEST_IMG_BASE
++echo "== create base =="
++_make_test_img --object $SECRET0 -o "encrypt.format=luks,encrypt.key-secret=sec0,encrypt.iter-time=10" $size
++TEST_IMG=$TEST_IMG_SAVE
++
++IMGSPECBASE="driver=$IMGFMT,file.filename=$TEST_IMG_BASE,encrypt.key-secret=sec0"
++IMGSPEC="driver=$IMGFMT,file.filename=$TEST_IMG,backing.driver=$IMGFMT,backing.file.filename=$TEST_IMG_BASE,backing.encrypt.key-secret=sec0,encrypt.key-secret=sec1"
++QEMU_IO_OPTIONS=$QEMU_IO_OPTIONS_NO_FMT
++
++echo
++echo "== writing whole image =="
++$QEMU_IO --object $SECRET0 -c "write -P 0xa 0 $size" --image-opts $IMGSPECBASE | _filter_qemu_io | _filter_testdir
++
++echo
++echo "== verify pattern =="
++$QEMU_IO --object $SECRET0 -c "read -P 0xa 0 $size" --image-opts $IMGSPECBASE | _filter_qemu_io | _filter_testdir
++
++echo "== create overlay =="
++_make_test_img --object $SECRET1 -o "encrypt.format=luks,encrypt.key-secret=sec1,encrypt.iter-time=10" -b "$TEST_IMG_BASE" $size
++
++echo
++echo "== writing part of a cluster =="
++$QEMU_IO --object $SECRET0 --object $SECRET1 -c "write -P 0xe 0 1024" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
++
++echo
++echo "== verify pattern =="
++$QEMU_IO --object $SECRET0 --object $SECRET1 -c "read -P 0xe 0 1024" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
++echo
++echo "== verify pattern =="
++$QEMU_IO --object $SECRET0 --object $SECRET1 -c "read -P 0xa 1024 64512" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
++
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/189.out b/tests/qemu-iotests/189.out
+new file mode 100644
+index 0000000..a0b7c9c
+--- /dev/null
++++ b/tests/qemu-iotests/189.out
+@@ -0,0 +1,26 @@
++QA output created by 189
++== create base ==
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=16777216 encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10
++
++== writing whole image ==
++wrote 16777216/16777216 bytes at offset 0
++16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== verify pattern ==
++read 16777216/16777216 bytes at offset 0
++16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++== create overlay ==
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216 backing_file=TEST_DIR/t.IMGFMT.base encrypt.format=luks encrypt.key-secret=sec1 encrypt.iter-time=10
++
++== writing part of a cluster ==
++wrote 1024/1024 bytes at offset 0
++1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== verify pattern ==
++read 1024/1024 bytes at offset 0
++1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== verify pattern ==
++read 64512/64512 bytes at offset 1024
++63 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index a6acaff..9209fdd 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -175,3 +175,5 @@
+ 181 rw auto migration
+ 182 rw auto quick
+ 183 rw auto migration
++188 rw auto quick
++189 rw auto quick
 -- 
 2.9.3
