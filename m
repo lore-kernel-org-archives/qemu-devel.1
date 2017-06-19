@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dMtWr-0004a7-B1
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:03:30 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dMtba-0006KU-Fi
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:08:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dMtWm-0006ky-Ft
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:03:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58996)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dMtWm-0006kf-9P
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:03:24 -0400
-References: <20170615203735.19649-1-rth@twiddle.net>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <7998cb6b-018e-8069-9d11-a3e1e4e70380@redhat.com>
-Date: Mon, 19 Jun 2017 12:03:20 +0200
+	(envelope-from <stefanha@gmail.com>) id 1dMtbW-00014S-C5
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:08:22 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:37889)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dMtbW-00012o-4n
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:08:18 -0400
+Received: by mail-wm0-x229.google.com with SMTP id u195so56979675wmd.1
+	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 03:08:18 -0700 (PDT)
+Date: Mon, 19 Jun 2017 11:08:13 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170619100813.GB17304@stefanha-x1.localdomain>
+References: <547865a9-d6c2-7140-47e2-5af01e7d761d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170615203735.19649-1-rth@twiddle.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/s390x: Implement CSST
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="ADZbWkCsHQ7r3kzd"
+Content-Disposition: inline
+In-Reply-To: <547865a9-d6c2-7140-47e2-5af01e7d761d@redhat.com>
+Subject: Re: [Qemu-devel] [RFC] virtio-mem: paravirtualized memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com, aurelien@aurel32.net
+To: David Hildenbrand <david@redhat.com>
+Cc: KVM <kvm@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, Andrea Arcangeli <aarcange@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 15.06.2017 22:37, Richard Henderson wrote:
-> There are no uses in a Linux system with which to test,
-> but it Looks Right by my reading of the PoO.
 
-I am using next.git/master with this patch applied:
-https://git.kernel.org/pub/scm/linux/kernel/git/s390/linux.git/commit/?h=features&id=8aa8680aa383bf6e2ac
+--ADZbWkCsHQ7r3kzd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-I am using QEMU with the mvcos patch and your patch applied (and a patch
-that allows enabling csst/csst2).
+On Fri, Jun 16, 2017 at 04:20:02PM +0200, David Hildenbrand wrote:
+> Important restrictions of this concept:
+> - Guests without a virtio-mem guest driver can't see that memory.
+> - We will always require some boot memory that cannot get unplugged.
+>   Also, virtio-mem memory (as all other hotplugged memory) cannot become
+>   DMA memory under Linux. So the boot memory also defines the amount of
+>   DMA memory.
 
-I am using the following qemu command line:
+I didn't know that hotplug memory cannot become DMA memory.
 
-#!/bin/bash
-/home/dhildenb/git/qemu/s390x-softmmu/qemu-system-s390x \
-	-nographic -nodefaults -machine s390-ccw-virtio,accel=tcg \
-	-cpu qemu,mvcos=on,stfle=on,ldisp=on,ldisphp=on,\
-          eimm=on,stckf=on,csst=on,csst2=on,ginste=on,exrl=on\
-	-m 256M -smp 1 -chardev stdio,id=con0 \
-	-device sclpconsole,chardev=con0 \
-	-kernel vmlinux -initrd /home/dhildenb/initrd.debian
+Ouch.  Zero-copy disk I/O with O_DIRECT and network I/O with virtio-net
+won't be possible.
 
-Right now, I can start a z9 compiled kernel.
+When running an application that uses O_DIRECT file I/O this probably
+means we now have 2 copies of pages in memory: 1. in the application and
+2. in the kernel page cache.
 
-When trying to start a z10 compiled kernel (which generates many csst),
-qemu simply crashes / the guests exits (have to debug) without any
-command line output.
+So this increases pressure on the page cache and reduces performance :(.
 
-So either something in csst is broken or in the other instructions for z10.
+Stefan
 
--- 
+--ADZbWkCsHQ7r3kzd
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Thanks,
+-----BEGIN PGP SIGNATURE-----
 
-David
+iQEcBAEBAgAGBQJZR6KNAAoJEJykq7OBq3PIQqMH/0S2AZbkzrqnJOKdCz8yKg9X
+qBbZG8McVs38XBZtkkzU4J4JKQMsS7b+boDjJ8N5LmjuHrNFfnJrwScVVc8aQ++E
+muHRRed4s556aSBAcSvk/OT7CtxYdwrraFuvzp2O1Rt84m9RPrMv719xZxeWsbzo
+69e7xRq3NIAgv2zLbPIWV/RiqXJIYWJatGP95n0PvKIeRwxl8jK68BUdEchWGjAQ
+mcjgcM8gch/facSMSd0OcRR4IgCLKuEV3RqKXJ2WKy//xWIjQc95m0sQEFWdwBtB
+Eri7GCsR0SDsOfGtoMmBvuQOePISkS1YiqNNLcSVKY2WJ5agzszR/rnFl6vvAF0=
+=zROB
+-----END PGP SIGNATURE-----
+
+--ADZbWkCsHQ7r3kzd--
