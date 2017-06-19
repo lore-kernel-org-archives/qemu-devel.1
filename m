@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dMuNL-0000kM-Mb
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:57:49 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dMuPu-0002RS-SR
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 07:00:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dMuNH-0003Nk-O9
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:57:43 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:35242)
+	(envelope-from <alex.bennee@linaro.org>) id 1dMuPq-0004oe-Gx
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 07:00:22 -0400
+Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:35653)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dMuNH-0003NE-Hi
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:57:39 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id x70so75721782wme.0
-	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 03:57:39 -0700 (PDT)
+	id 1dMuPq-0004oT-AC
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 07:00:18 -0400
+Received: by mail-wr0-x235.google.com with SMTP id y25so30474967wrd.2
+	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 04:00:18 -0700 (PDT)
 References: <20170616161334.7492-1-f4bug@amsat.org>
-	<20170616161334.7492-6-f4bug@amsat.org>
+	<20170616161334.7492-7-f4bug@amsat.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170616161334.7492-6-f4bug@amsat.org>
-Date: Mon, 19 Jun 2017 11:58:18 +0100
-Message-ID: <874lvcutv9.fsf@linaro.org>
+In-reply-to: <20170616161334.7492-7-f4bug@amsat.org>
+Date: Mon, 19 Jun 2017 12:00:55 +0100
+Message-ID: <8737awutqw.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 05/11] travis: build tests objects in
- parallel, then run tests sequentially
+Subject: Re: [Qemu-devel] [PATCH 06/11] travis: retry if llvm.org timeouts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,31 +36,58 @@ Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.may
 
 Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
 
-> tests are run sequentially to avoid mixed results output.
-
-I'm not so sure we are worried about mixed results output. I don't think
-anyone can compare the entire log and they tend to scroll to the end
-where the error will be.
-
+> example of failure: https://travis-ci.org/qemu/qemu/jobs/243232857
+>
+>     $ sudo apt-get update -qq
+>     W: Failed to fetch http://llvm.org/apt/trusty/dists/llvm-toolchain-trusty-3.9/Release.gpg  Connection failed
+>     E: Some index files failed to download. They have been ignored, or old ones used instead.
+>     The command "sudo apt-get update -qq" failed and exited with 100 during .
+>     Your build has been stopped.
 >
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+This is good - I suspect there are other places we could use travis_retry.
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+
 > ---
->  .travis.yml | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  .travis.yml | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
 >
 > diff --git a/.travis.yml b/.travis.yml
-> index c9ac741afc..dbbb11617d 100644
+> index dbbb11617d..69a960b714 100644
 > --- a/.travis.yml
 > +++ b/.travis.yml
-> @@ -66,7 +66,7 @@ before_script:
->    - ./configure ${CONFIG}
->  script:
->    - make -j${PARALLEL_JOBS}
-> -  - if [ "${RUN_TESTS}" == "yes" ]; then make check; fi
-> +  - if [ "${RUN_TESTS}" == "yes" ]; then make -j${PARALLEL_JOBS} check-compile && make check; fi
->  matrix:
->    include:
->      # Test with CLang for compile portability
+> @@ -123,10 +123,10 @@ matrix:
+>          - COMPILER_NAME=clang CXX=clang++-3.9 CC=clang-3.9
+>          - CONFIG="--disable-linux-user --cc=clang-3.9 --cxx=clang++-3.9"
+>        before_install:
+> -        - wget -nv -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
+> -        - sudo apt-add-repository -y 'deb http://llvm.org/apt/trusty llvm-toolchain-trusty-3.9 main'
+> -        - sudo apt-get update -qq
+> -        - sudo apt-get install -qq -y clang-3.9
+> +        - travis_retry wget -nv -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
+> +        - travis_retry sudo apt-add-repository -y 'deb http://llvm.org/apt/trusty llvm-toolchain-trusty-3.9 main'
+> +        - travis_retry sudo apt-get update -qq
+> +        - travis_retry sudo apt-get install -qq -y clang-3.9
+>          - sudo apt-get build-dep -qq qemu
+>          - wget -O - http://people.linaro.org/~alex.bennee/qemu-submodule-git-seed.tar.xz | tar -xvJ
+>          - git submodule update --init --recursive
+> @@ -142,10 +142,10 @@ matrix:
+>          - COMPILER_NAME=clang CXX=clang++-3.9 CC=clang-3.9
+>          - CONFIG="--disable-system --cc=clang-3.9 --cxx=clang++-3.9"
+>        before_install:
+> -        - wget -nv -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
+> -        - sudo apt-add-repository -y 'deb http://llvm.org/apt/trusty llvm-toolchain-trusty-3.9 main'
+> -        - sudo apt-get update -qq
+> -        - sudo apt-get install -qq -y clang-3.9
+> +        - travis_retry wget -nv -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
+> +        - travis_retry sudo apt-add-repository -y 'deb http://llvm.org/apt/trusty llvm-toolchain-trusty-3.9 main'
+> +        - travis_retry sudo apt-get update -qq
+> +        - travis_retry sudo apt-get install -qq -y clang-3.9
+>          - sudo apt-get build-dep -qq qemu
+>          - wget -O - http://people.linaro.org/~alex.bennee/qemu-submodule-git-seed.tar.xz | tar -xvJ
+>          - git submodule update --init --recursive
 
 
 --
