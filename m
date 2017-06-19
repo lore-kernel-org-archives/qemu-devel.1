@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dMvDH-0003KU-Iz
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 07:51:24 -0400
+	(envelope-from <gsomlo@gmail.com>) id 1dMvKT-0004NM-57
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 07:58:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dMvDE-000562-Hr
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 07:51:23 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20170616153142.GB4366@noname.fritz.box>
-References: <cover.1496844254.git.berto@igalia.com>
-	<1f133befcfa4b89978d7fee980bb61ae1298e224.1496844254.git.berto@igalia.com>
-	<20170616153142.GB4366@noname.fritz.box>
-Date: Mon, 19 Jun 2017 13:50:39 +0200
-Message-ID: <w51k248ryb4.fsf@maestria.local.igalia.com>
+	(envelope-from <gsomlo@gmail.com>) id 1dMvKQ-0002G4-5T
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 07:58:49 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:34825)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <gsomlo@gmail.com>) id 1dMvKQ-0002Fp-1Q
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 07:58:46 -0400
+Received: by mail-qk0-x244.google.com with SMTP id 16so1060741qkg.2
+	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 04:58:45 -0700 (PDT)
+Date: Mon, 19 Jun 2017 07:58:36 -0400
+From: "Gabriel L. Somlo" <gsomlo@gmail.com>
+Message-ID: <20170619115834.GA2242@HEDWIG.INI.CMU.EDU>
+References: <alpine.BSF.2.21.1706182319020.18505@zero.eik.bme.hu>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 7/7] qcow2: Merge the writing of the COW
- regions with the guest data
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.BSF.2.21.1706182319020.18505@zero.eik.bme.hu>
+Subject: Re: [Qemu-devel] Commit 77af8a2b9 breaks (mac)OS X 10.11.6
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,23 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, Phil Dennis-Jordan <phil@philjordan.eu>
 
-On Fri 16 Jun 2017 05:31:42 PM CEST, Kevin Wolf wrote:
->> +        /* Make sure that adding both COW regions to the QEMUIOVector
->> +         * does not exceed IOV_MAX */
->> +        if (hd_qiov->niov > IOV_MAX - 2) {
->> +            continue;
->> +        }
->> +
->> +        m->data_qiov = hd_qiov;
->
-> I don't think having this side effect is good for a function that is
-> called can_xyz(). I'd either call it merge_cow() or move the
-> assignment to the caller.
+Zoltan, Phil:
 
-You're right, I think I prefer to move the assignment to the caller for
-now.
+On Sun, Jun 18, 2017 at 11:25:15PM +0200, BALATON Zoltan wrote:
+> After 77af8a2b9 (hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to
+> improve guest OS support.) OS X 10.11.6 hangs during boot near detecting
+> IOAPIC. (Gabriel's latest v3 applesmc patch series does not fix this.) Maybe
+> another register needs to be implemented somewhere?
 
-Berto
+I can (still) boot off my 10.11.0 installer iso image, and
+successfully upgraded from 10.11.4 to 10.11.6, with the latter
+continuing to boot without problems.
+
+This is with qemu master (patched for applesmc with the latest v3
+pending series that's also on the mailing list), and OVMF master
+(patched for HFS+).
+
+Zoltan: did reverting 77af8a2b9 actually help in your case ? Leaving
+it in doesn't seem to be a problem for me...
+
+Thanks,
+--Gabriel
