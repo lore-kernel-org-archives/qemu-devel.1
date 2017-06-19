@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jean-philippe.brucker@arm.com>) id 1dMtgk-00017D-8f
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:13:43 -0400
+	(envelope-from <groug@kaod.org>) id 1dMthz-0002BW-GL
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:15:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jean-philippe.brucker@arm.com>) id 1dMtgj-00041S-8R
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:13:42 -0400
-References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
-	<AM5PR0401MB2545AFD256A96420ACC44CD89ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<14c83c14-1e7e-f142-77b0-fa8c873e2d41@redhat.com>
-	<AM5PR0401MB2545C0E76C4BE6F82FE376D09ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<6f22079e-4b4b-6476-77be-51ec83104c0d@redhat.com>
-	<AM5PR0401MB25459FDAA8C9AFA52503AAE99AC40@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Message-ID: <589f1642-775c-4805-74ac-bf67eb504733@arm.com>
-Date: Mon, 19 Jun 2017 11:15:28 +0100
+	(envelope-from <groug@kaod.org>) id 1dMthv-0004cI-C8
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:14:59 -0400
+Received: from 6.mo179.mail-out.ovh.net ([46.105.56.76]:42405)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dMthv-0004bW-5r
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:14:55 -0400
+Received: from player716.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id B7A4248E7E
+	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 12:14:53 +0200 (CEST)
+Date: Mon, 19 Jun 2017 12:14:47 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170619121447.53bec317@bahia.ttt.fr.ibm.com>
+In-Reply-To: <20170608050930.2613-4-david@gibson.dropbear.id.au>
+References: <20170608050930.2613-1-david@gibson.dropbear.id.au>
+	<20170608050930.2613-4-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <AM5PR0401MB25459FDAA8C9AFA52503AAE99AC40@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 0/8] VIRTIO-IOMMU device
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/2JJulu2Zw_KxYugSJ1Y9V+n";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH 3/6] spapr: Split DRC release from DRC
+ detach
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,56 +32,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bharat Bhushan <bharat.bhushan@nxp.com>, Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "wei@redhat.com" <wei@redhat.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: mdroth@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com, sursingh@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On 19/06/17 08:54, Bharat Bhushan wrote:
-> Hi Eric,
-> 
-> I started added replay in virtio-iommu and came across how MSI interrupts with work with VFIO. 
-> I understand that on intel this works differently but vsmmu will have same requirement. 
-> kvm-msi-irq-route are added using the msi-address to be translated by viommu and not the final translated address.
-> While currently the irqfd framework does not know about emulated iommus (virtio-iommu, vsmmuv3/vintel-iommu).
-> So in my view we have following options:
-> - Programming with translated address when setting up kvm-msi-irq-route
-> - Route the interrupts via QEMU, which is bad from performance
-> - vhost-virtio-iommu may solve the problem in long term
-> 
-> Is there any other better option I am missing?
+--Sig_/2JJulu2Zw_KxYugSJ1Y9V+n
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Since we're on the topic of MSIs... I'm currently trying to figure out how
-we'll handle MSIs in the nested translation mode, where the guest manages
-S1 page tables and the host doesn't know about GVA->GPA translation.
+On Thu,  8 Jun 2017 15:09:27 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-I'm also wondering about the benefits of having SW-mapped MSIs in the
-guest. It seems unavoidable for vSMMU since that's what a physical system
-would do. But in a paravirtualized solution there doesn't seem to be any
-compelling reason for having the guest map MSI doorbells. These addresses
-are never accessed directly, they are only used for setting up IRQ routing
-(at least on kvmtool). So here's what I'd like to have. Note that I
-haven't investigated the feasibility in Qemu yet, I don't know how it
-deals with MSIs.
+> spapr_drc_detach() is called when qemu generic code requests a device be
+> unplugged.  It makes a number of tests, which could well delay further
+> action until later, before actually detach the device from the DRC.
+>=20
+> This splits out the part which actually removes the device from the DRC
+> into spapr_drc_release().  This will be useful for further cleanups.
+>=20
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
 
-(1) Guest uses the guest-physical MSI doorbell when setting up MSIs. For
-ARM with GICv3 this would be GITS_TRANSLATER, for x86 it would be the
-fixed MSI doorbell. This way the host wouldn't need to inspect IOMMU
-mappings when handling writes to PCI MSI-X tables.
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-(2) In nested mode (with VFIO) on ARM, the pSMMU will still translate MSIs
-via S1+S2. Therefore the host needs to map MSIs at stage-1, and I'd like
-to use the (currently unused) TTB1 tables in that case. In addition, using
-TTB1 would be useful for SVM, when endpoints write MSIs with PASIDs and we
-don't want to map them in user address space.
+>  hw/ppc/spapr_drc.c | 54 ++++++++++++++++++++++++++++++------------------=
+------
+>  1 file changed, 30 insertions(+), 24 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> index afd68f4..dc4ac77 100644
+> --- a/hw/ppc/spapr_drc.c
+> +++ b/hw/ppc/spapr_drc.c
+> @@ -326,31 +326,9 @@ void spapr_drc_attach(sPAPRDRConnector *drc, DeviceS=
+tate *d, void *fdt,
+>                               NULL, 0, NULL);
+>  }
+> =20
+> -void spapr_drc_detach(sPAPRDRConnector *drc, DeviceState *d, Error **err=
+p)
+> -{
+> -    trace_spapr_drc_detach(spapr_drc_index(drc));
+> -
+> -    if (drc->isolation_state !=3D SPAPR_DR_ISOLATION_STATE_ISOLATED) {
+> -        trace_spapr_drc_awaiting_isolated(spapr_drc_index(drc));
+> -        drc->awaiting_release =3D true;
+> -        return;
+> -    }
+> -
+> -    if (spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_PCI &&
+> -        drc->allocation_state !=3D SPAPR_DR_ALLOCATION_STATE_UNUSABLE) {
+> -        trace_spapr_drc_awaiting_unusable(spapr_drc_index(drc));
+> -        drc->awaiting_release =3D true;
+> -        return;
+> -    }
+> -
+> -    if (drc->awaiting_allocation) {
+> -        if (!drc->awaiting_allocation_skippable) {
+> -            drc->awaiting_release =3D true;
+> -            trace_spapr_drc_awaiting_allocation(spapr_drc_index(drc));
+> -            return;
+> -        }
+> -    }
+> =20
+> +static void spapr_drc_release(sPAPRDRConnector *drc)
+> +{
+>      drc->dr_indicator =3D SPAPR_DR_INDICATOR_INACTIVE;
+> =20
+>      /* Calling release callbacks based on spapr_drc_type(drc). */
+> @@ -379,6 +357,34 @@ void spapr_drc_detach(sPAPRDRConnector *drc, DeviceS=
+tate *d, Error **errp)
+>      drc->dev =3D NULL;
+>  }
+> =20
+> +void spapr_drc_detach(sPAPRDRConnector *drc, DeviceState *d, Error **err=
+p)
+> +{
+> +    trace_spapr_drc_detach(spapr_drc_index(drc));
+> +
+> +    if (drc->isolation_state !=3D SPAPR_DR_ISOLATION_STATE_ISOLATED) {
+> +        trace_spapr_drc_awaiting_isolated(spapr_drc_index(drc));
+> +        drc->awaiting_release =3D true;
+> +        return;
+> +    }
+> +
+> +    if (spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_PCI &&
+> +        drc->allocation_state !=3D SPAPR_DR_ALLOCATION_STATE_UNUSABLE) {
+> +        trace_spapr_drc_awaiting_unusable(spapr_drc_index(drc));
+> +        drc->awaiting_release =3D true;
+> +        return;
+> +    }
+> +
+> +    if (drc->awaiting_allocation) {
+> +        if (!drc->awaiting_allocation_skippable) {
+> +            drc->awaiting_release =3D true;
+> +            trace_spapr_drc_awaiting_allocation(spapr_drc_index(drc));
+> +            return;
+> +        }
+> +    }
+> +
+> +    spapr_drc_release(drc);
+> +}
+> +
+>  static bool release_pending(sPAPRDRConnector *drc)
+>  {
+>      return drc->awaiting_release;
 
-This means that the host needs to use different doorbell addresses in
-nested mode, since it would be unable to map at S1 the same IOVA as S2
-(TTB1 manages negative addresses - 0xffff............, which are not
-representable as GPAs.) It also requires to use 32-bit page tables for
-endpoints that are not capable of using 64-bit MSI addresses.
 
+--Sig_/2JJulu2Zw_KxYugSJ1Y9V+n
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-Now (2) is entirely handled in the host kernel, so it's more a Linux
-question. But does (1) seem acceptable for virtio-iommu in Qemu?
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-Thanks,
-Jean
+iEYEARECAAYFAllHpBcACgkQAvw66wEB28JcrQCeJnX1Lv72N1noE9ZaBnQHR9TE
+AsYAn1SfBJGUELXj5uPj/HQTqPZyRVsc
+=W5gp
+-----END PGP SIGNATURE-----
+
+--Sig_/2JJulu2Zw_KxYugSJ1Y9V+n--
