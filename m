@@ -1,35 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dMrGf-00051N-TQ
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 03:38:38 -0400
+	(envelope-from <armbru@redhat.com>) id 1dMrKo-0006ix-EX
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 03:42:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dMrGc-0002H1-Pu
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 03:38:37 -0400
-Received: from mga02.intel.com ([134.134.136.20]:44667)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dMrGc-0002Er-FG
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 03:38:34 -0400
-Message-ID: <59478003.6040709@intel.com>
-Date: Mon, 19 Jun 2017 15:40:51 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <armbru@redhat.com>) id 1dMrKl-0003ol-9n
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 03:42:54 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170531120049.14111-1-n54@gmx.com>
+	<26b48c35-b6cc-708d-c4d2-b26a9382e10a@msgid.tls.msk.ru>
+	<df623a80-4017-2e79-6bf3-7c402f24b275@gmx.com>
+	<877f0p38tr.fsf@dusky.pond.sub.org>
+	<b60c5d7b-6ae7-4aa0-6263-b96c964b9195@msgid.tls.msk.ru>
+	<55dd32a9-7f01-93e3-e22e-3826dcef1d9d@gmx.com>
+	<CAFEAcA_2X6QRBS_mbL15Rkq51HxTAX-vb9TJQxKMnwuRsixkiw@mail.gmail.com>
+	<6620e2b9-6cc7-48fc-6ecf-4065718d765d@gmx.com>
+	<cdc49669-c996-b84d-8110-b7b62ada8ad0@gmx.com>
+	<87lgoz98mc.fsf@dusky.pond.sub.org>
+	<03bf9574-79a4-0778-bb6d-e0a6da7d1d86@gmx.com>
+Date: Mon, 19 Jun 2017 09:42:45 +0200
+In-Reply-To: <03bf9574-79a4-0778-bb6d-e0a6da7d1d86@gmx.com> (Kamil
+	Rytarowski's message of "Sat, 10 Jun 2017 17:24:28 +0200")
+Message-ID: <87poe0qv7u.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <26250da7-b394-4964-8842-5c45bbe85e09@redhat.com>
-	<6547dfcf-ea3a-f5f6-222d-40ff274654df@redhat.com>
-	<20170614180459-mutt-send-email-mst@kernel.org>
-	<b59be2f1-ee8c-e660-4f82-bbe63e22b603@redhat.com>
-	<59422E91.7080407@intel.com>
-	<20170616061949-mutt-send-email-mst@kernel.org>
-	<40a12829-6e84-e63e-ac47-6f09cc85c3cc@redhat.com>
-	<5943AE93.7020502@intel.com>
-	<20170616181040-mutt-send-email-mst@kernel.org>
-	<5944EA2E.9030608@intel.com>
-	<20170618224025-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20170618224025-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [virtio-dev] Re:
- [PATCH v1] virtio-net: enable configurable tx queue size
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v3] ivshmem-server:
+ ivshmem-client: Build when eventfd() is available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,25 +33,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "stefanha@gmail.com" <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "jan.scheurich@ericsson.com" <jan.scheurich@ericsson.com>, "armbru@redhat.com" <armbru@redhat.com>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+To: Kamil Rytarowski <n54@gmx.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Michael Tokarev <mjt@tls.msk.ru>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
 
-On 06/19/2017 03:46 AM, Michael S. Tsirkin wrote:
+Kamil Rytarowski <n54@gmx.com> writes:
+
+> On 10.06.2017 17:15, Markus Armbruster wrote:
+>> Kamil Rytarowski <n54@gmx.com> writes:
+>> 
+>>> On 06.06.2017 16:56, Kamil Rytarowski wrote:
+>>>> On 06.06.2017 16:34, Peter Maydell wrote:
+>>>>> On 6 June 2017 at 14:38, Kamil Rytarowski <n54@gmx.com> wrote:
+>>>>>> I've linked qemu with the original patch and:
+>>>>>> ./configure --disable-linux-user --disable-system --static
+>>>>>>
+>>>>>> I got some warnings, I think they are originated from our libc and are
+>>>>>> not related to qemu:
+>>>>>>   LINK    sparc64-bsd-user/qemu-sparc64
+>>>>>> /usr/lib/libc.a(initfini.o): warning: common of `__ps_strings'
+>>>>>> overridden by definition
+>>>>>> /usr/lib/crt0.o: warning: defined here
+>>>>>> /usr/lib/libc.a(_env.o): warning: multiple common of `environ'
+>>>>>> /usr/lib/crt0.o: warning: previous common is here
+>>>>>> /usr/lib/libc.a(getprogname.o): warning: common of `__progname'
+>>>>>> overridden by definition
+>>>>>> /usr/lib/crt0.o: warning: defined here
+>>>>>
+>>>>> Yes, I think I've seen those before on NetBSD -- they look
+>>>>> like a bug in your libc to me, it shouldn't be confusing itself
+>>>>> with itself like that :-)
+>>>>>
+>>>>> thanks
+>>>>> -- PMM
+>>>>>
 >>>>
->>>> What do you have in mind about the protocol flag?
->>> Merely this: older clients might be confused if they get
->>> a s/g with 1024 entries.
->> I don't disagree to add that. But the client (i.e. vhost-user
->> slave) is a host userspace program, and it seems that users can
->> easily patch their host side applications if there is any issue,
->> maybe we also don't need to be too prudent about that, do we?
-> I won't insist on this but it might not be easy. For example, are there
-> clients that want to forward the packet to host kernel as a s/g?
+>>>> I have filed this bug upstream: http://gnats.netbsd.org/52278
+>>>>
+>>>>
+>>>
+>>>
+>>> What's the status with this patch?
+>>>
+>>> NetBSD build still breaks due to ivshmem-*.
+>> 
+>> I guess Michael expects a v4 that doesn't break the static build.
+>> 
+>
+> -static works for me, I have restricted options to test build on !NetBSD
+> systems.
+>
+> Was this patch ok?
+>
+> diff --git a/Makefile b/Makefile
+> index c830d7a..2ef5a78 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -469,10 +469,12 @@ ifneq ($(EXESUF),)
+>  qemu-ga: qemu-ga$(EXESUF) $(QGA_VSS_PROVIDER) $(QEMU_GA_MSI)
+>  endif
+>
+> +ifdef CONFIG_IVSHMEM
+>  ivshmem-client$(EXESUF): $(ivshmem-client-obj-y) $(COMMON_LDADDS)
+>  	$(call LINK, $^)
+>  ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADDS)
+>  	$(call LINK, $^)
+> +endif
+>
+>
+> So I could amend it.
 
-Not sure about all the client implementation, but it sounds like a
-strange and inefficient usage of vhost-user to pass packets to
-the host kernel, given vhost kernel backend is already there
-for the usage.
+Please do.  Additionally consider
 
-Best,
-Wei
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index f42f3df..ab70d01 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -203,7 +203,7 @@ gcov-files-pci-y += hw/display/virtio-gpu-pci.c
+ gcov-files-pci-$(CONFIG_VIRTIO_VGA) += hw/display/virtio-vga.c
+ check-qtest-pci-y += tests/intel-hda-test$(EXESUF)
+ gcov-files-pci-y += hw/audio/intel-hda.c hw/audio/hda-codec.c
+-check-qtest-pci-$(CONFIG_EVENTFD) += tests/ivshmem-test$(EXESUF)
++check-qtest-pci-$(CONFIG_IVSHMEM) += tests/ivshmem-test$(EXESUF)
+ gcov-files-pci-y += hw/misc/ivshmem.c
+ 
+ check-qtest-i386-y = tests/endianness-test$(EXESUF)
