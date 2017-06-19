@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dN0BI-00061x-EC
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 13:09:41 -0400
+	(envelope-from <berrange@redhat.com>) id 1dN0a2-0003uC-Df
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 13:35:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dN0BE-0002Sx-6S
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 13:09:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39476)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dN0BD-0002S1-Th
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 13:09:36 -0400
-References: <1497877149-19253-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1497877149-19253-4-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<20170619142852.GS5016@thinpad.lan.raisama.net>
-	<7d5904ae-e66c-5594-cfff-747578d91f4b@ilande.co.uk>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <08da52ec-e4d2-d836-49bd-90baf21747fb@redhat.com>
-Date: Mon, 19 Jun 2017 19:09:13 +0200
-MIME-Version: 1.0
-In-Reply-To: <7d5904ae-e66c-5594-cfff-747578d91f4b@ilande.co.uk>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCHv6 3/5] fw_cfg: move assert() and linking of
- fw_cfg device to the machine into instance_init()
+	(envelope-from <berrange@redhat.com>) id 1dN0a0-0000aT-MX
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 13:35:14 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Mon, 19 Jun 2017 18:34:36 +0100
+Message-Id: <20170619173455.18805-2-berrange@redhat.com>
+In-Reply-To: <20170619173455.18805-1-berrange@redhat.com>
+References: <20170619173455.18805-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v9 01/20] block: expose crypto option names /
+ defs to other drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,124 +20,295 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, imammedo@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On 06/19/17 18:57, Mark Cave-Ayland wrote:
-> On 19/06/17 15:28, Eduardo Habkost wrote:
-> 
->> On Mon, Jun 19, 2017 at 01:59:07PM +0100, Mark Cave-Ayland wrote:
->>> In preparation for calling fw_cfg_init1() during realize rather than during
->>> init, move the assert() checking for existing fw_cfg devices and the linking
->>> of the device to the machine with object_property_add_child() to a new
->>> fw_cfg instance_init() function.
->>>
->>> This guarantees that we will still assert() correctly if more than one fw_cfg
->>> device is instantiated by accident.
->>>
->>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->>> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
->>> Tested-by: Laszlo Ersek <lersek@redhat.com>
->>> ---
->>>  hw/nvram/fw_cfg.c |   14 ++++++++++----
->>>  1 file changed, 10 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
->>> index 99bdbc2..af45012 100644
->>> --- a/hw/nvram/fw_cfg.c
->>> +++ b/hw/nvram/fw_cfg.c
->>> @@ -915,10 +915,6 @@ static void fw_cfg_init1(DeviceState *dev)
->>>      MachineState *machine = MACHINE(qdev_get_machine());
->>>      uint32_t version = FW_CFG_VERSION;
->>>  
->>> -    assert(!object_resolve_path(FW_CFG_PATH, NULL));
->>> -
->>> -    object_property_add_child(OBJECT(machine), FW_CFG_NAME, OBJECT(s), NULL);
->>> -
->>>      qdev_init_nofail(dev);
->>>  
->>>      fw_cfg_add_bytes(s, FW_CFG_SIGNATURE, (char *)"QEMU", 4);
->>> @@ -1020,6 +1016,15 @@ FWCfgState *fw_cfg_find(void)
->>>      return FW_CFG(object_resolve_path(FW_CFG_PATH, NULL));
->>>  }
->>>  
->>> +static void fw_cfg_init(Object *obj)
->>> +{
->>> +    MachineState *machine = MACHINE(qdev_get_machine());
->>> +
->>> +    assert(!object_resolve_path(FW_CFG_PATH, NULL));
->>> +
->>> +    object_property_add_child(OBJECT(machine), FW_CFG_NAME, obj, NULL);
->>
->> I don't think this belongs to instance_init.  We must always be
->> able to instantiate objects without crashing QEMU or affecting
->> QEMU global state.  This patch makes device-list-properties
->> crash:
->>
->>   $ qemu-system-x86_64 -display none -qmp unix:/tmp/qmp,server,nowait &
->>   [1] 2848
->>   $ echo 'device-list-properties typename=fw_cfg_mem' | ./scripts/qmp/qmp-shell /tmp/qmp
->>   Welcome to the QMP low-level shell!
->>   Connected to QEMU 2.9.50
->>   
->>   qemu-system-x86_64: qemu/hw/nvram/fw_cfg.c:974: fw_cfg_init: Assertion `!object_resolve_path(FW_CFG_PATH, NULL)' failed.
->>   (QEMU) Disconnected
->>   [1]+  Aborted                 (core dumped) qemu-system-x86_64 -display none -qmp unix:/tmp/qmp,server,nowait
->>   $ 
->>
->>
->> I suggest moving this check to realize, like the rest of
->> fw_cfg_init1(), but change it to do proper error reporting
->> instead of asserting.
-> 
-> In that case what do you think is the best way to prevent realization of
-> a second instance? With some playing I've managed to come up with the
-> following (partial) diff that seems to work in some simple local tests:
-> 
-> 
-> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> index 9b0aaa2..e678ec0 100644
-> --- a/hw/nvram/fw_cfg.c
-> +++ b/hw/nvram/fw_cfg.c
-> @@ -862,12 +862,20 @@ static void fw_cfg_machine_ready(struct Notifier
-> *n, void *data)
-> 
-> -static void fw_cfg_common_realize(DeviceState *dev)
-> +static void fw_cfg_common_realize(DeviceState *dev, Error **errp)
->  {
->      FWCfgState *s = FW_CFG(dev);
->      MachineState *machine = MACHINE(qdev_get_machine());
->      uint32_t version = FW_CFG_VERSION;
-> -
-> +    Object *obj;
-> +
-> +    obj = object_resolve_path(FW_CFG_PATH, NULL);
-> +    if (obj != OBJECT(dev)) {
-> +        error_setg(errp, "Only one fw_cfg device can be instantiated per "
-> +                         "machine");
-> +        return;
-> +    }
-> +
->      fw_cfg_add_bytes(s, FW_CFG_SIGNATURE, (char *)"QEMU", 4);
->      fw_cfg_add_bytes(s, FW_CFG_UUID, &qemu_uuid, 16);
->      fw_cfg_add_i16(s, FW_CFG_NOGRAPHIC,
-> (uint16_t)!machine->enable_graphics);
-> 
-> 
-> What seems to happen is that calling object_property_add_child() only
-> succeeds for the first instance and so a simple comparison is enough to
-> determine that the device already exists at FW_CFG_PATH. Or is this a
-> fairly terrible (ab)use of the QOM APIs?
+The block/crypto.c defines a set of QemuOpts that provide
+parameters for encryption. This will also be needed by
+the qcow/qcow2 integration, so expose the relevant pieces
+in a new block/crypto.h header. Some helper methods taking
+QemuOpts are changed to take QDict to simplify usage in
+other places.
 
-This has jogged my memory about how we ensure "at most one" for the
-vmgenid device. Please see:
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ block/crypto.c | 82 +++++++++++++++++-----------------------------------
+ block/crypto.h | 91 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 117 insertions(+), 56 deletions(-)
+ create mode 100644 block/crypto.h
 
-  vmgenid_realize()    [hw/acpi/vmgenid.c]
-    find_vmgenid_dev() [include/hw/acpi/vmgenid.h]
-
-... I was quite silly not to think of this on my own now, despite having
-authored commit f92063028a0e ("hw/acpi/vmgenid: prevent more than one
-vmgenid device", 2017-03-20) :/
-
-Thanks,
-Laszlo
+diff --git a/block/crypto.c b/block/crypto.c
+index 10e5ddc..ea40ba4 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -24,16 +24,10 @@
+ #include "sysemu/block-backend.h"
+ #include "crypto/block.h"
+ #include "qapi/opts-visitor.h"
++#include "qapi/qobject-input-visitor.h"
+ #include "qapi-visit.h"
+ #include "qapi/error.h"
+-
+-#define BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET "key-secret"
+-#define BLOCK_CRYPTO_OPT_LUKS_CIPHER_ALG "cipher-alg"
+-#define BLOCK_CRYPTO_OPT_LUKS_CIPHER_MODE "cipher-mode"
+-#define BLOCK_CRYPTO_OPT_LUKS_IVGEN_ALG "ivgen-alg"
+-#define BLOCK_CRYPTO_OPT_LUKS_IVGEN_HASH_ALG "ivgen-hash-alg"
+-#define BLOCK_CRYPTO_OPT_LUKS_HASH_ALG "hash-alg"
+-#define BLOCK_CRYPTO_OPT_LUKS_ITER_TIME "iter-time"
++#include "block/crypto.h"
+ 
+ typedef struct BlockCrypto BlockCrypto;
+ 
+@@ -135,11 +129,7 @@ static QemuOptsList block_crypto_runtime_opts_luks = {
+     .name = "crypto",
+     .head = QTAILQ_HEAD_INITIALIZER(block_crypto_runtime_opts_luks.head),
+     .desc = {
+-        {
+-            .name = BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET,
+-            .type = QEMU_OPT_STRING,
+-            .help = "ID of the secret that provides the encryption key",
+-        },
++        BLOCK_CRYPTO_OPT_DEF_LUKS_KEY_SECRET,
+         { /* end of list */ }
+     },
+ };
+@@ -154,49 +144,21 @@ static QemuOptsList block_crypto_create_opts_luks = {
+             .type = QEMU_OPT_SIZE,
+             .help = "Virtual disk size"
+         },
+-        {
+-            .name = BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET,
+-            .type = QEMU_OPT_STRING,
+-            .help = "ID of the secret that provides the encryption key",
+-        },
+-        {
+-            .name = BLOCK_CRYPTO_OPT_LUKS_CIPHER_ALG,
+-            .type = QEMU_OPT_STRING,
+-            .help = "Name of encryption cipher algorithm",
+-        },
+-        {
+-            .name = BLOCK_CRYPTO_OPT_LUKS_CIPHER_MODE,
+-            .type = QEMU_OPT_STRING,
+-            .help = "Name of encryption cipher mode",
+-        },
+-        {
+-            .name = BLOCK_CRYPTO_OPT_LUKS_IVGEN_ALG,
+-            .type = QEMU_OPT_STRING,
+-            .help = "Name of IV generator algorithm",
+-        },
+-        {
+-            .name = BLOCK_CRYPTO_OPT_LUKS_IVGEN_HASH_ALG,
+-            .type = QEMU_OPT_STRING,
+-            .help = "Name of IV generator hash algorithm",
+-        },
+-        {
+-            .name = BLOCK_CRYPTO_OPT_LUKS_HASH_ALG,
+-            .type = QEMU_OPT_STRING,
+-            .help = "Name of encryption hash algorithm",
+-        },
+-        {
+-            .name = BLOCK_CRYPTO_OPT_LUKS_ITER_TIME,
+-            .type = QEMU_OPT_NUMBER,
+-            .help = "Time to spend in PBKDF in milliseconds",
+-        },
++        BLOCK_CRYPTO_OPT_DEF_LUKS_KEY_SECRET,
++        BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_ALG,
++        BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_MODE,
++        BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_ALG,
++        BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG,
++        BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG,
++        BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME,
+         { /* end of list */ }
+     },
+ };
+ 
+ 
+-static QCryptoBlockOpenOptions *
++QCryptoBlockOpenOptions *
+ block_crypto_open_opts_init(QCryptoBlockFormat format,
+-                            QemuOpts *opts,
++                            QDict *opts,
+                             Error **errp)
+ {
+     Visitor *v;
+@@ -206,7 +168,7 @@ block_crypto_open_opts_init(QCryptoBlockFormat format,
+     ret = g_new0(QCryptoBlockOpenOptions, 1);
+     ret->format = format;
+ 
+-    v = opts_visitor_new(opts);
++    v = qobject_input_visitor_new_keyval(QOBJECT(opts));
+ 
+     visit_start_struct(v, NULL, NULL, 0, &local_err);
+     if (local_err) {
+@@ -240,9 +202,9 @@ block_crypto_open_opts_init(QCryptoBlockFormat format,
+ }
+ 
+ 
+-static QCryptoBlockCreateOptions *
++QCryptoBlockCreateOptions *
+ block_crypto_create_opts_init(QCryptoBlockFormat format,
+-                              QemuOpts *opts,
++                              QDict *opts,
+                               Error **errp)
+ {
+     Visitor *v;
+@@ -252,7 +214,7 @@ block_crypto_create_opts_init(QCryptoBlockFormat format,
+     ret = g_new0(QCryptoBlockCreateOptions, 1);
+     ret->format = format;
+ 
+-    v = opts_visitor_new(opts);
++    v = qobject_input_visitor_new_keyval(QOBJECT(opts));
+ 
+     visit_start_struct(v, NULL, NULL, 0, &local_err);
+     if (local_err) {
+@@ -299,6 +261,7 @@ static int block_crypto_open_generic(QCryptoBlockFormat format,
+     int ret = -EINVAL;
+     QCryptoBlockOpenOptions *open_opts = NULL;
+     unsigned int cflags = 0;
++    QDict *cryptoopts = NULL;
+ 
+     bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file,
+                                false, errp);
+@@ -313,7 +276,9 @@ static int block_crypto_open_generic(QCryptoBlockFormat format,
+         goto cleanup;
+     }
+ 
+-    open_opts = block_crypto_open_opts_init(format, opts, errp);
++    cryptoopts = qemu_opts_to_qdict(opts, NULL);
++
++    open_opts = block_crypto_open_opts_init(format, cryptoopts, errp);
+     if (!open_opts) {
+         goto cleanup;
+     }
+@@ -337,6 +302,7 @@ static int block_crypto_open_generic(QCryptoBlockFormat format,
+ 
+     ret = 0;
+  cleanup:
++    QDECREF(cryptoopts);
+     qapi_free_QCryptoBlockOpenOptions(open_opts);
+     return ret;
+ }
+@@ -356,8 +322,11 @@ static int block_crypto_create_generic(QCryptoBlockFormat format,
+         .opts = opts,
+         .filename = filename,
+     };
++    QDict *cryptoopts;
++
++    cryptoopts = qemu_opts_to_qdict(opts, NULL);
+ 
+-    create_opts = block_crypto_create_opts_init(format, opts, errp);
++    create_opts = block_crypto_create_opts_init(format, cryptoopts, errp);
+     if (!create_opts) {
+         return -1;
+     }
+@@ -375,6 +344,7 @@ static int block_crypto_create_generic(QCryptoBlockFormat format,
+ 
+     ret = 0;
+  cleanup:
++    QDECREF(cryptoopts);
+     qcrypto_block_free(crypto);
+     blk_unref(data.blk);
+     qapi_free_QCryptoBlockCreateOptions(create_opts);
+diff --git a/block/crypto.h b/block/crypto.h
+new file mode 100644
+index 0000000..c0e9b54
+--- /dev/null
++++ b/block/crypto.h
+@@ -0,0 +1,91 @@
++/*
++ * QEMU block full disk encryption
++ *
++ * Copyright (c) 2015-2017 Red Hat, Inc.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#ifndef BLOCK_CRYPTO_H__
++#define BLOCK_CRYPTO_H__
++
++#define BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET "key-secret"
++#define BLOCK_CRYPTO_OPT_LUKS_CIPHER_ALG "cipher-alg"
++#define BLOCK_CRYPTO_OPT_LUKS_CIPHER_MODE "cipher-mode"
++#define BLOCK_CRYPTO_OPT_LUKS_IVGEN_ALG "ivgen-alg"
++#define BLOCK_CRYPTO_OPT_LUKS_IVGEN_HASH_ALG "ivgen-hash-alg"
++#define BLOCK_CRYPTO_OPT_LUKS_HASH_ALG "hash-alg"
++#define BLOCK_CRYPTO_OPT_LUKS_ITER_TIME "iter-time"
++
++#define BLOCK_CRYPTO_OPT_DEF_LUKS_KEY_SECRET                            \
++    {                                                                   \
++        .name = BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET,                       \
++        .type = QEMU_OPT_STRING,                                        \
++        .help = "ID of the secret that provides the keyslot passphrase", \
++    }
++
++#define BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_ALG               \
++    {                                                      \
++        .name = BLOCK_CRYPTO_OPT_LUKS_CIPHER_ALG,          \
++        .type = QEMU_OPT_STRING,                           \
++        .help = "Name of encryption cipher algorithm",     \
++    }
++
++#define BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_MODE         \
++    {                                                 \
++        .name = BLOCK_CRYPTO_OPT_LUKS_CIPHER_MODE,    \
++        .type = QEMU_OPT_STRING,                      \
++        .help = "Name of encryption cipher mode",     \
++    }
++
++#define BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_ALG           \
++    {                                                 \
++        .name = BLOCK_CRYPTO_OPT_LUKS_IVGEN_ALG,      \
++        .type = QEMU_OPT_STRING,                      \
++        .help = "Name of IV generator algorithm",     \
++    }
++
++#define BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG                \
++    {                                                           \
++        .name = BLOCK_CRYPTO_OPT_LUKS_IVGEN_HASH_ALG,           \
++        .type = QEMU_OPT_STRING,                                \
++        .help = "Name of IV generator hash algorithm",          \
++    }
++
++#define BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG               \
++    {                                                    \
++        .name = BLOCK_CRYPTO_OPT_LUKS_HASH_ALG,          \
++        .type = QEMU_OPT_STRING,                         \
++        .help = "Name of encryption hash algorithm",     \
++    }
++
++#define BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME                   \
++    {                                                         \
++        .name = BLOCK_CRYPTO_OPT_LUKS_ITER_TIME,              \
++        .type = QEMU_OPT_NUMBER,                              \
++        .help = "Time to spend in PBKDF in milliseconds",     \
++    }
++
++QCryptoBlockCreateOptions *
++block_crypto_create_opts_init(QCryptoBlockFormat format,
++                              QDict *opts,
++                              Error **errp);
++
++QCryptoBlockOpenOptions *
++block_crypto_open_opts_init(QCryptoBlockFormat format,
++                            QDict *opts,
++                            Error **errp);
++
++#endif /* BLOCK_CRYPTO_H__ */
+-- 
+2.9.3
