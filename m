@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dMvQk-0006Go-8U
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:05:19 -0400
+	(envelope-from <david@redhat.com>) id 1dMvQl-0006Gr-3Y
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:05:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dMvQe-0005AG-0W
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:05:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40876)
+	(envelope-from <david@redhat.com>) id 1dMvQj-0005CN-Hl
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:05:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44064)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dMvQd-00059u-MN
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:05:11 -0400
-References: <cover.1497272778.git.maozy.fnst@cn.fujitsu.com>
-	<755cb5b3a23be771f27ab9c2cd020fa002d197d4.1497272778.git.maozy.fnst@cn.fujitsu.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <2730d545-ece5-adf1-7e9e-5c08ba2a8e58@redhat.com>
-Date: Mon, 19 Jun 2017 15:05:02 +0300
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dMvQj-0005Bt-8b
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:05:17 -0400
+From: David Hildenbrand <david@redhat.com>
+References: <20170615203735.19649-1-rth@twiddle.net>
+	<7998cb6b-018e-8069-9d11-a3e1e4e70380@redhat.com>
+Message-ID: <429793f7-a3c1-91ec-9a83-908ee779e703@redhat.com>
+Date: Mon, 19 Jun 2017 14:05:13 +0200
 MIME-Version: 1.0
-In-Reply-To: <755cb5b3a23be771f27ab9c2cd020fa002d197d4.1497272778.git.maozy.fnst@cn.fujitsu.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <7998cb6b-018e-8069-9d11-a3e1e4e70380@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 7/9] pci: Convert shpc_init() to Error
+Subject: Re: [Qemu-devel] [PATCH] target/s390x: Implement CSST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,223 +28,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, armbru@redhat.com
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, aurelien@aurel32.net
 
-On 12/06/2017 16:48, Mao Zhongyi wrote:
-> In order to propagate error message better, convert shpc_init() to
-> Error also convert the pci_bridge_dev_initfn() to realize.
+On 19.06.2017 12:03, David Hildenbrand wrote:
+> On 15.06.2017 22:37, Richard Henderson wrote:
+>> There are no uses in a Linux system with which to test,
+>> but it Looks Right by my reading of the PoO.
 > 
-> Cc: mst@redhat.com
-> Cc: marcel@redhat.com
-> Cc: armbru@redhat.com
-> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-> ---
->   hw/pci-bridge/pci_bridge_dev.c | 21 ++++++++-------------
->   hw/pci/shpc.c                  | 11 +++++------
->   hw/pci/slotid_cap.c            | 11 +++++------
->   include/hw/pci/shpc.h          |  3 ++-
->   include/hw/pci/slotid_cap.h    |  3 ++-
->   5 files changed, 22 insertions(+), 27 deletions(-)
+> I am using next.git/master with this patch applied:
+> https://git.kernel.org/pub/scm/linux/kernel/git/s390/linux.git/commit/?h=features&id=8aa8680aa383bf6e2ac
 > 
-> diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
-> index 5dbd933..30c4186 100644
-> --- a/hw/pci-bridge/pci_bridge_dev.c
-> +++ b/hw/pci-bridge/pci_bridge_dev.c
-> @@ -49,12 +49,11 @@ struct PCIBridgeDev {
->   };
->   typedef struct PCIBridgeDev PCIBridgeDev;
->   
-> -static int pci_bridge_dev_initfn(PCIDevice *dev)
-> +static void pci_bridge_dev_realize(PCIDevice *dev, Error **errp)
->   {
->       PCIBridge *br = PCI_BRIDGE(dev);
->       PCIBridgeDev *bridge_dev = PCI_BRIDGE_DEV(dev);
->       int err;
-> -    Error *local_err = NULL;
->   
->       pci_bridge_initfn(dev, TYPE_PCI_BUS);
->   
-> @@ -62,7 +61,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
->           dev->config[PCI_INTERRUPT_PIN] = 0x1;
->           memory_region_init(&bridge_dev->bar, OBJECT(dev), "shpc-bar",
->                              shpc_bar_size(dev));
-> -        err = shpc_init(dev, &br->sec_bus, &bridge_dev->bar, 0);
-> +        err = shpc_init(dev, &br->sec_bus, &bridge_dev->bar, 0, errp);
->           if (err) {
->               goto shpc_error;
->           }
-> @@ -71,7 +70,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
->           bridge_dev->msi = ON_OFF_AUTO_OFF;
->       }
->   
-> -    err = slotid_cap_init(dev, 0, bridge_dev->chassis_nr, 0);
-> +    err = slotid_cap_init(dev, 0, bridge_dev->chassis_nr, 0, errp);
->       if (err) {
->           goto slotid_error;
->       }
-> @@ -79,20 +78,18 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
->       if (bridge_dev->msi != ON_OFF_AUTO_OFF) {
->           /* it means SHPC exists, because MSI is needed by SHPC */
->   
-> -        err = msi_init(dev, 0, 1, true, true, &local_err);
-> +        err = msi_init(dev, 0, 1, true, true, errp);
->           /* Any error other than -ENOTSUP(board's MSI support is broken)
->            * is a programming error */
->           assert(!err || err == -ENOTSUP);
->           if (err && bridge_dev->msi == ON_OFF_AUTO_ON) {
->               /* Can't satisfy user's explicit msi=on request, fail */
-> -            error_append_hint(&local_err, "You have to use msi=auto (default) "
-> +            error_append_hint(errp, "You have to use msi=auto (default) "
->                       "or msi=off with this machine type.\n");
-> -            error_report_err(local_err);
->               goto msi_error;
->           }
-> -        assert(!local_err || bridge_dev->msi == ON_OFF_AUTO_AUTO);
-> +        assert(bridge_dev->msi == ON_OFF_AUTO_AUTO);
+> I am using QEMU with the mvcos patch and your patch applied (and a patch
+> that allows enabling csst/csst2).
+> 
+> I am using the following qemu command line:
+> 
+> #!/bin/bash
+> /home/dhildenb/git/qemu/s390x-softmmu/qemu-system-s390x \
+> 	-nographic -nodefaults -machine s390-ccw-virtio,accel=tcg \
+> 	-cpu qemu,mvcos=on,stfle=on,ldisp=on,ldisphp=on,\
+>           eimm=on,stckf=on,csst=on,csst2=on,ginste=on,exrl=on\
+> 	-m 256M -smp 1 -chardev stdio,id=con0 \
+> 	-device sclpconsole,chardev=con0 \
+> 	-kernel vmlinux -initrd /home/dhildenb/initrd.debian
+> 
+> Right now, I can start a z9 compiled kernel.
+> 
+> When trying to start a z10 compiled kernel (which generates many csst),
+> qemu simply crashes / the guests exits (have to debug) without any
+> command line output.
+> 
+> So either something in csst is broken or in the other instructions for z10.
+> 
 
-I am not sure we can drop the !local_err assert.
-We don't have a local_err anymore, but the error
-is stored now in errp.
+With CONFIG_DEBUG_LOCKDEP I get a pgm exception in check_no_collision()
+and the kernel can't find an exception table for it, resulting in a panic().
+
+#0  0x00000000001cf584 in check_no_collision (chain=<optimized out>,
+hlock=<optimized out>, curr=<optimized out>)
+    at kernel/locking/lockdep.c:2111
+#1  lookup_chain_cache (chain_key=<optimized out>, hlock=<optimized
+out>, curr=<optimized out>)
+    at kernel/locking/lockdep.c:2158
+#2  validate_chain (curr=0xdad300 <init_task>, hlock=0x18398c8
+<lock_classes>, chain_head=<optimized out>,
+    chain_key=10957502631322533163, lock=<optimized out>) at
+kernel/locking/lockdep.c:2252
+#3  0x00000000001d089a in __lock_acquire (lock=<optimized out>,
+subclass=<optimized out>, trylock=0, read=0,
+    check=1, hardirqs_off=<optimized out>, nest_lock=0x0, ip=15545474,
+references=<optimized out>,
+    pin_count=<optimized out>) at kernel/locking/lockdep.c:3367
+#4  0x00000000001d15a6 in lock_acquire (lock=<optimized out>,
+subclass=<optimized out>, trylock=<optimized out>,
+    read=<optimized out>, check=1, nest_lock=0x0, ip=15545474) at
+kernel/locking/lockdep.c:3855
+#5  0x00000000009b76cc in __mutex_lock_common (use_ww_ctx=<optimized
+out>, ww_ctx=<optimized out>,
+    ip=<optimized out>, nest_lock=<optimized out>, subclass=<optimized
+out>, state=<optimized out>,
+    lock=<optimized out>) at kernel/locking/mutex.c:756
+#6  __mutex_lock (lock=0xded840 <cgroup_mutex>, state=2, subclass=0,
+nest_lock=0x0, ip=<optimized out>)
+    at kernel/locking/mutex.c:893
+#7  0x00000000009b801a in mutex_lock_nested (lock=<optimized out>,
+subclass=<optimized out>)
+    at kernel/locking/mutex.c:908
+#8  0x0000000000ed3482 in cgroup_init_subsys (ss=0xdd2340
+<cpu_cgrp_subsys>, early=true)
+    at kernel/cgroup/cgroup.c:4403
+#9  0x0000000000ed3752 in cgroup_init_early () at
+kernel/cgroup/cgroup.c:4481
+#10 0x0000000000ebd79a in start_kernel () at init/main.c:502
+#11 0x0000000000100020 in _stext () at arch/s390/kernel/head64.S:100
 
 
-Other than that, the patch looks OK to me.
+  1cf552:       e3 10 c0 30 00 04       lg      %r1,48(%r12)
+  1cf558:       eb 11 00 33 00 0c       srlg    %r1,%r1,51
+  1cf55e:       eb c1 00 05 00 0d       sllg    %r12,%r1,5
+  1cf564:       b9 09 00 c1             sgr     %r12,%r1
+  1cf568:       eb cc 00 04 00 0d       sllg    %r12,%r12,4
+  1cf56e:       e3 c0 d0 28 00 08       ag      %r12,40(%r13)
+  1cf574:       a7 f4 ff 6f             j       1cf452
+<validate_chain.isra.23+0xba2>
+        if (DEBUG_LOCKS_WARN_ON(chain->depth != curr->lockdep_depth - (i
+- 1))) {
+  1cf578:       c0 30 00 4c cc e3       larl    %r3,b68f3e
+<kallsyms_token_index+0x10626>
+  1cf57e:       c0 20 00 4c 95 37       larl    %r2,b61fec
+<kallsyms_token_index+0x96d4>
+  1cf584:       c0 e5 00 07 f1 2e       brasl   %r14,2cd7e0 <printk>
+  1cf58a:       a7 f4 00 01             j       1cf58c
+<validate_chain.isra.23+0xcdc>
+  1cf58e:       a7 f4 fc d9             j       1cef40
+<validate_chain.isra.23+0x690>
+
+
+Without CONFIG_DEBUG_LOCKDEP:
+
+I get a similar crash in static void __init mm_init(void).
+
+
+Not sure yet what the real root cause is. Maybe something not related to
+CSST.
+
+
+-- 
 
 Thanks,
-Marcel
 
->           /* With msi=auto, we fall back to MSI off silently */
-> -        error_free(local_err);
->       }
->   
->       if (shpc_present(dev)) {
-> @@ -101,7 +98,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
->           pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
->                            PCI_BASE_ADDRESS_MEM_TYPE_64, &bridge_dev->bar);
->       }
-> -    return 0;
-> +    return;
->   
->   msi_error:
->       slotid_cap_cleanup(dev);
-> @@ -111,8 +108,6 @@ slotid_error:
->       }
->   shpc_error:
->       pci_bridge_exitfn(dev);
-> -
-> -    return err;
->   }
->   
->   static void pci_bridge_dev_exitfn(PCIDevice *dev)
-> @@ -216,7 +211,7 @@ static void pci_bridge_dev_class_init(ObjectClass *klass, void *data)
->       PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
->       HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
->   
-> -    k->init = pci_bridge_dev_initfn;
-> +    k->realize = pci_bridge_dev_realize;
->       k->exit = pci_bridge_dev_exitfn;
->       k->config_write = pci_bridge_dev_write_config;
->       k->vendor_id = PCI_VENDOR_ID_REDHAT;
-> diff --git a/hw/pci/shpc.c b/hw/pci/shpc.c
-> index d72d5e4..69fc14b 100644
-> --- a/hw/pci/shpc.c
-> +++ b/hw/pci/shpc.c
-> @@ -446,16 +446,14 @@ static void shpc_cap_update_dword(PCIDevice *d)
->   }
->   
->   /* Add SHPC capability to the config space for the device. */
-> -static int shpc_cap_add_config(PCIDevice *d)
-> +static int shpc_cap_add_config(PCIDevice *d, Error **errp)
->   {
->       uint8_t *config;
->       int config_offset;
-> -    Error *local_err = NULL;
->       config_offset = pci_add_capability(d, PCI_CAP_ID_SHPC,
->                                          0, SHPC_CAP_LENGTH,
-> -                                       &local_err);
-> +                                       errp);
->       if (config_offset < 0) {
-> -        error_report_err(local_err);
->           return config_offset;
->       }
->       config = d->config + config_offset;
-> @@ -584,13 +582,14 @@ void shpc_device_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
->   }
->   
->   /* Initialize the SHPC structure in bridge's BAR. */
-> -int shpc_init(PCIDevice *d, PCIBus *sec_bus, MemoryRegion *bar, unsigned offset)
-> +int shpc_init(PCIDevice *d, PCIBus *sec_bus, MemoryRegion *bar,
-> +              unsigned offset, Error **errp)
->   {
->       int i, ret;
->       int nslots = SHPC_MAX_SLOTS; /* TODO: qdev property? */
->       SHPCDevice *shpc = d->shpc = g_malloc0(sizeof(*d->shpc));
->       shpc->sec_bus = sec_bus;
-> -    ret = shpc_cap_add_config(d);
-> +    ret = shpc_cap_add_config(d, errp);
->       if (ret) {
->           g_free(d->shpc);
->           return ret;
-> diff --git a/hw/pci/slotid_cap.c b/hw/pci/slotid_cap.c
-> index bdca205..36d021b 100644
-> --- a/hw/pci/slotid_cap.c
-> +++ b/hw/pci/slotid_cap.c
-> @@ -9,14 +9,14 @@
->   
->   int slotid_cap_init(PCIDevice *d, int nslots,
->                       uint8_t chassis,
-> -                    unsigned offset)
-> +                    unsigned offset,
-> +                    Error **errp)
->   {
->       int cap;
-> -    Error *local_err = NULL;
->   
->       if (!chassis) {
-> -        error_report("Bridge chassis not specified. Each bridge is required "
-> -                     "to be assigned a unique chassis id > 0.");
-> +        error_setg(errp, "Bridge chassis not specified. Each bridge is required"
-> +                   " to be assigned a unique chassis id > 0.");
->           return -EINVAL;
->       }
->       if (nslots < 0 || nslots > (PCI_SID_ESR_NSLOTS >> SLOTID_NSLOTS_SHIFT)) {
-> @@ -25,9 +25,8 @@ int slotid_cap_init(PCIDevice *d, int nslots,
->       }
->   
->       cap = pci_add_capability(d, PCI_CAP_ID_SLOTID, offset,
-> -                             SLOTID_CAP_LENGTH, &local_err);
-> +                             SLOTID_CAP_LENGTH, errp);
->       if (cap < 0) {
-> -        error_report_err(local_err);
->           return cap;
->       }
->       /* We make each chassis unique, this way each bridge is First in Chassis */
-> diff --git a/include/hw/pci/shpc.h b/include/hw/pci/shpc.h
-> index 71e836b..ee19fec 100644
-> --- a/include/hw/pci/shpc.h
-> +++ b/include/hw/pci/shpc.h
-> @@ -38,7 +38,8 @@ struct SHPCDevice {
->   
->   void shpc_reset(PCIDevice *d);
->   int shpc_bar_size(PCIDevice *dev);
-> -int shpc_init(PCIDevice *dev, PCIBus *sec_bus, MemoryRegion *bar, unsigned off);
-> +int shpc_init(PCIDevice *dev, PCIBus *sec_bus, MemoryRegion *bar,
-> +              unsigned off, Error **errp);
->   void shpc_cleanup(PCIDevice *dev, MemoryRegion *bar);
->   void shpc_free(PCIDevice *dev);
->   void shpc_cap_write_config(PCIDevice *d, uint32_t addr, uint32_t val, int len);
-> diff --git a/include/hw/pci/slotid_cap.h b/include/hw/pci/slotid_cap.h
-> index 70db047..a777ea0 100644
-> --- a/include/hw/pci/slotid_cap.h
-> +++ b/include/hw/pci/slotid_cap.h
-> @@ -5,7 +5,8 @@
->   
->   int slotid_cap_init(PCIDevice *dev, int nslots,
->                       uint8_t chassis,
-> -                    unsigned offset);
-> +                    unsigned offset,
-> +                    Error **errp);
->   void slotid_cap_cleanup(PCIDevice *dev);
->   
->   #endif
-> 
+David
