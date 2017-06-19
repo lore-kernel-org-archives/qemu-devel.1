@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dMtte-0000G7-CQ
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:27:03 -0400
+	(envelope-from <xiechanglong.d@gmail.com>) id 1dMtuk-0000sv-EY
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:28:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dMttb-0003gP-63
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:27:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35490)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dMtta-0003fb-W9
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:26:59 -0400
-References: <547865a9-d6c2-7140-47e2-5af01e7d761d@redhat.com>
-	<20170619100813.GB17304@stefanha-x1.localdomain>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <4cec825b-d92e-832e-3a76-103767032528@redhat.com>
-Date: Mon, 19 Jun 2017 12:26:52 +0200
+	(envelope-from <xiechanglong.d@gmail.com>) id 1dMtuj-00049L-GA
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:28:10 -0400
+References: <7ec58051-d835-a485-7578-2022351c9712@gmail.com>
+	<20170619072727.GA6113@noname.redhat.com>
+From: Xie Changlong <xiechanglong.d@gmail.com>
+Message-ID: <6324ce25-8fa8-9204-d15b-32f20fb71e4b@gmail.com>
+Date: Mon, 19 Jun 2017 18:27:21 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170619100813.GB17304@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] virtio-mem: paravirtualized memory
+In-Reply-To: <20170619072727.GA6113@noname.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Question] How can we confirm hot-plug disk
+ succesfully?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +24,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: KVM <kvm@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, Andrea Arcangeli <aarcange@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 19.06.2017 12:08, Stefan Hajnoczi wrote:
-> On Fri, Jun 16, 2017 at 04:20:02PM +0200, David Hildenbrand wrote:
->> Important restrictions of this concept:
->> - Guests without a virtio-mem guest driver can't see that memory.
->> - We will always require some boot memory that cannot get unplugged.
->>   Also, virtio-mem memory (as all other hotplugged memory) cannot become
->>   DMA memory under Linux. So the boot memory also defines the amount of
->>   DMA memory.
+在 6/19/2017 3:27 PM, Kevin Wolf 写道:
+> Am 18.06.2017 um 09:21 hat Xie Changlong geschrieben:
+>> In device hot-remove scenario, if we don't probe acpiphp module on
+>> the guest, 'device_del' will never emit DEVICE_DELETED event(because
+>> guest will not write to __EJ0) . So we can confirm that hot-remove
+>> failed. But IIUC, there is no event such as DEVICE_ADDED, so
+>> 1) How can we confirm hotplug('device_add') successfully?
+>> 2) It seems when hot-plug disk, we don't care acpiphp module status
+>> on the guest, am I right?
+>> 3) Why there is no DEVICE_ADDED like event?
 > 
-> I didn't know that hotplug memory cannot become DMA memory.
-> 
-> Ouch.  Zero-copy disk I/O with O_DIRECT and network I/O with virtio-net
-> won't be possible.
-> 
-> When running an application that uses O_DIRECT file I/O this probably
-> means we now have 2 copies of pages in memory: 1. in the application and
-> 2. in the kernel page cache.
-> 
-> So this increases pressure on the page cache and reduces performance :(.
-> 
-> Stefan
+> device_add doesn't need guest cooperation, so it is immediately
+> completed when the QMP command returns success.
 > 
 
-arch/x86/mm/init_64.c:
+That's what i though too. But I have a question, if we don't proble 
+acpiphp on the guest, and execute below commands:
 
-/*
- * Memory is added always to NORMAL zone. This means you will never get
- * additional DMA/DMA32 memory.
- */
-int arch_add_memory(int nid, u64 start, u64 size, bool for_device)
-{
+Hot plug:
+(qemu) drive_add 0 
+file=/resource/changlox/test.raw,id=drive-virtio-disk1,if=none
+(qemu) device_add virtio-blk-pci,drive=drive-virtio-disk1,id=virtio-disk1
 
-The is for sure something to work on in the future. Until then, base
-memory of 3.X GB should be sufficient, right?
+Hot remove:
+(qemu) device_del virtio-disk1
+(qemu) drive_del drive-virtio-disk1
+(qemu) qom-list /machine/peripheral
+type (string)
+virtio-disk1 (child<virtio-blk-pci>)
+(qemu) info block
+foo (#block122): suse1.qcow2 (qcow2)
+     Cache mode:       writeback, direct
+     Backing file:     suse.qcow2.orgin (chain depth: 1)
+
+ide1-cd0: [not inserted]
+     Removable device: not locked, tray closed
+
+floppy0: [not inserted]
+     Removable device: not locked, tray closed
+
+sd0: [not inserted]
+     Removable device: not locked, tray closed
+(qemu) drive_add 0 
+file=/resource/changlox/test.raw,id=drive-virtio-disk1,if=none
+Duplicate ID 'drive-virtio-disk1' for drive
+
+'info block' shows nothing, but we can't add drive who's id 
+is'drive-virtio-disk1' too。 There is a more serious situation, we could 
+*never* destory device memory with 'device_del', it's memory leak to me 
+if the guest os never support hot-plug and the user don't know this 
+information.
+
+
+
+> Kevin
+> 
 
 -- 
-
-Thanks,
-
-David
+Thanks
+     -Xie
