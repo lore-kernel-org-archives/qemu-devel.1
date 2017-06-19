@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43973)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1dMuLm-0007jn-Me
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:56:12 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dMuM1-0007vr-5z
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:56:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1dMuLi-0002UY-5t
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:56:06 -0400
-Date: Mon, 19 Jun 2017 12:55:47 +0200
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20170619105547.bkjv3hrc7epvqqow@eukaryote>
-References: <1497624690-1156-2-git-send-email-kchamart@redhat.com>
-	<1497627680.3289.1.camel@that.guru>
+	(envelope-from <alex.bennee@linaro.org>) id 1dMuLx-0002as-4i
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:56:21 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:36093)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dMuLw-0002ao-VH
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:56:17 -0400
+Received: by mail-wm0-x233.google.com with SMTP id m125so76078951wmm.1
+	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 03:56:16 -0700 (PDT)
+References: <20170616161334.7492-1-f4bug@amsat.org>
+	<20170616161334.7492-5-f4bug@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170616161334.7492-5-f4bug@amsat.org>
+Date: Mon, 19 Jun 2017 11:56:56 +0100
+Message-ID: <8760fsutxj.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <1497627680.3289.1.camel@that.guru>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] live-block-ops.txt: Rename, rewrite,
- and improve it
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 04/11] tests: add rule to compile many
+ objects used by tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,229 +31,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stephen Finucane <stephen@that.guru>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On Fri, Jun 16, 2017 at 04:41:20PM +0100, Stephen Finucane wrote:
-> On Fri, 2017-06-16 at 16:51 +0200, Kashyap Chamarthy wrote:
 
-[...]
+Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
 
-> As requested, a couple of rST pointers below that will help you if/when=
- you
-> switch to Sphinx. I've only focused on the design aspect, not the conte=
-nt.
+> all those objects can get compiled simultaneously
+>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  tests/Makefile.include | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index f42f3dfa72..3773f9d8d2 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -804,6 +804,7 @@ check-help:
+>  	@echo " make check-qapi-schema    Run QAPI schema tests"
+>  	@echo " make check-block          Run block tests"
+>  	@echo " make check-report.html    Generates an HTML test report"
+> +	@echo " make check-compile        Compile objects used by tests"
+>  	@echo " make check-clean          Clean the tests"
+>  	@echo
+>  	@echo "Please note that HTML reports do not regenerate if the unit tests"
+> @@ -887,7 +888,7 @@ check-tests/qapi-schema/doc-good.texi: tests/qapi-schema/doc-good.test.texi
+>
+>  # Consolidated targets
+>
+> -.PHONY: check-qapi-schema check-qtest check-unit check check-clean
+> +.PHONY: check-qapi-schema check-qtest check-unit check check-clean check-compile
+>  check-qapi-schema: $(patsubst %,check-%, $(check-qapi-schema-y)) check-tests/qapi-schema/doc-good.texi
+>  check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
+>  check-unit: $(patsubst %,check-%, $(check-unit-y))
+> @@ -897,7 +898,10 @@ check-clean:
+>  	$(MAKE) -C tests/tcg clean
+>  	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+>  	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
+> -
+> +check-compile: $(check-qtest-generic-y) $(check-unit-y) $(test-util-obj-y) $(qtest-obj-y) $(test-io-obj-y) $(libqos-virtio-obj-y) $(libqos-pc-obj-y) $(chardev-obj-y) $(QEMU_IOTESTS_HELPERS-y)
+> +ifeq ($(CONFIG_SOFTMMU),y)
+> +check-compile: $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)))
+> +endif
+>  clean: check-clean
+>
+>  # Build the help program automatically
 
-Thanks for the Sphinx / rST review.  Eric Blake is reviewing the
-content, and probably others will chime in, too.
+Something has gone wrong here:
 
-[...]
+  11:54 alex@zen taken:111, git:review/travis-speedup, [/home/alex/lsrc/qemu/qemu.git]> make check-compile
+          CHK version_gen.h
+    LINK    tests/ac97-test
+  tests/ac97-test.o: In function `main':
+  /home/alex/lsrc/qemu/qemu.git/tests/ac97-test.c:23: undefined reference to `qtest_add_func'
+  tests/ac97-test.o: In function `qtest_start':
+  /home/alex/lsrc/qemu/qemu.git/tests/libqtest.h:521: undefined reference to `qtest_init'
+  /home/alex/lsrc/qemu/qemu.git/tests/libqtest.h:521: undefined reference to `global_qtest'
+  tests/ac97-test.o: In function `qtest_end':
+  /home/alex/lsrc/qemu/qemu.git/tests/libqtest.h:532: undefined reference to `global_qtest'
+  /home/alex/lsrc/qemu/qemu.git/tests/libqtest.h:532: undefined reference to `qtest_quit'
+  /home/alex/lsrc/qemu/qemu.git/tests/libqtest.h:533: undefined reference to `global_qtest'
+  collect2: error: ld returned 1 exit status
+  /home/alex/lsrc/qemu/qemu.git/rules.mak:121: recipe for target 'tests/ac97-test' failed
+  make: *** [tests/ac97-test] Error 1
 
-> > +Copyright (C) 2017 Red Hat Inc.
-> > +
-> > +This work is licensed under the terms of the GNU GPL, version 2 or
-> > +later.=A0=A0See the COPYING file in the top-level directory.
-> > +
-> > +---
-> > +
->=20
-> This information doesn't need to be output in the web version, IMO. If =
-write it
-> like a comment, it will only be visible in the source. See what we do i=
-n OVS
-> docs [1] for an example.
->=20
-> [1] https://raw.githubusercontent.com/openvswitch/ovs/master/Documentat=
-ion/index.rst
+Yet "make check" completes without issue.
 
-Yep, that's useful.  Fixed in v3.
+Also I would expect the check: target to have check-compile as one of
+its pre-requisites otherwise this target will bit rot.
 
-[...]
-
-> > +NB: The file ``qapi/block-core.json`` in the QEMU source tree has th=
-e
-> > +canonical QEMU API (QAPI) schema documentation for the QMP primitive=
-s
-> > +discussed here.
-> > +
->=20
-> You might consider using admonitions here and elsewhere. This would mak=
-e sense
-> as a 'note' or 'important' directive:
->=20
->   .. note::
->=20
->       The file ``qapi/block-core.json`` ...
-
-Yes, done.
-
-> > +
-> > +.. contents::
->=20
-> This can probably go if/when Sphinx is integrated - Sphinx includes a T=
-oC in
-> the sidebar by default. Perhaps include a TODO to remove this?
->=20
->   .. TODO(kashyap): Remove this when Sphinx is integrated
-
-Useful, done.
-
-[...]
-
-> > +(1) Directional: 'base' and 'top'.=A0=A0Given the simple disk image =
-chain
-> > +=A0=A0=A0=A0above, image [A] can be referred to as 'base', and image=
- [B] as
-> > +=A0=A0=A0=A0'top'.=A0=A0(This terminology can be seen in in QAPI sch=
-ema file,
-> > +=A0=A0=A0=A0block-core.json.)
->=20
-> This looks really like a definition list, which is rST are written like=
- so:
->=20
->   term
->=20
->     Detailed description of the term here...
->=20
-> So this would become:
->=20
->   Directional
->=20
->     'base' and 'top'. Given...
-
-Yeah, I tried it, but it's just creating needless blank lines for me in
-the HTML rendering.  So I stuck with using numbers.
-
-[...]
-
-> > +NB: The base disk image can be raw format; however, all the overlay
-> > +files must be of QCOW2 format.
->=20
-> .. important::
-
-Yes, noted.
-
-[...]
-
-> > +Brief overview of live block QMP primitives
-> > +-------------------------------------------
-
-[...]
-
-> Definition list?
-
-Not quite.  It's more a quick overview.
-=20
-> > +
-> > +
-> > +.. _`Interacting with a QEMU instance`:
->=20
-> If you're not linking to this, you don't need to include this. The 'con=
-tents'
-> directive will automatically insert an anchor for each heading.
-
-Yeah, I actually did link to to further below, hence I retained it.
-
-[...]
-
-> > +The ``-blockdev`` command-line option, used above, is available from
-> > +QEMU 2.9 onwards.=A0=A0In the above invocation, notice the 'node-nam=
-e'
->=20
-> ``node-name``?
-
-Yes.
-
->=20
-> > +parameter that is used to refer to the disk image a.qcow2 ('node-A')=
- --
->=20
-> ``a.qcow2``?
-
-Perhaps.
-
-[...]
-
-> > +NB: In the event we have to repeat a certain QMP command, we will: f=
-or
-> > +the first occurrence of it, show the the ``qmp-shell`` invocation,
-> > +*and* the corresponding raw JSON QMP syntax; but for subsequent
-> > +invocations, present just the ``qmp-shell`` syntax, and omit the
-> > +equivalent JSON output.
->=20
-> .. important::
-
-Yeah, it's more of a ".. note::", will fix.
-
-[...]
-
-> > +Here, "node-A" is the name QEMU internally uses to refer to the base
-> > +image [A] -- it is the backing file, based on which the overlay imag=
-e,
-> > +[B], is created.
->=20
-> I guess you should probably use ``[A]`` here to preserve formatting
-
-Hmm, noted.
-
-[...]
-
-> > +
-> > +A note on points-in-time vs file names
-> > +--------------------------------------
-> > +
-> > +In our disk disk image chain:
-> > +
-> > +::
->=20
-> repeated word and no need for ':\n\n::' - you can just use '::'.
->=20
->   In our disk image chain::
->=20
-> ditto for the rest of the file
-
-Ah, indeed.  I recall using it in the past, but forgot.  Avoids needless
-blank lines.  Will fix throughout.
-
-[...]
-
-> > +
-> > +
-> > +Live block streaming --- ``block-stream``
-> > +-----------------------------------------
-> > +
-> > +The ``block-stream`` command allows you to do live copy data from ba=
-cking
-> > +files into overlay images.
-> > +
-> > +Given our original example disk image chain from earlier:
-> > +
-> > +::
-> > +
-> > +=A0=A0=A0=A0[A] <-- [B] <-- [C] <-- [D]
-> > +
-> > +The disk image chain can be shortened in one of the following differ=
-ent
-> > +ways (not an exhaustive list).
-> > +
->=20
-> Maybe you should include an anchor here, so you can link to it below.
-
-Yes, makes sense.  I know by "link to it below", you mean link to it in
-the next where I refer to these.
-
-[...]
-
-> > +[The invocation for rest of the cases, discussed in the previous
-> > +section, is omitted for brevity.]
->=20
-> This looks like a:
->=20
->   .. note::
-
-Yes; will fix.
-
-[...]
-
---=20
-/kashyap
+--
+Alex Bennée
