@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dMzwf-0007op-Ii
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 12:54:34 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dMzzz-0001Hr-S9
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 12:58:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dMzwe-0001oy-KA
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 12:54:33 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:36214)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dMzwe-0001oq-E1
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 12:54:32 -0400
-Received: by mail-wm0-x234.google.com with SMTP id m125so82352801wmm.1
-	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 09:54:32 -0700 (PDT)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dMzzx-0003ZN-5s
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 12:57:59 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:33523
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1dMzzw-0003XW-V1
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 12:57:57 -0400
+References: <1497877149-19253-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1497877149-19253-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20170619142852.GS5016@thinpad.lan.raisama.net>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <7d5904ae-e66c-5594-cfff-747578d91f4b@ilande.co.uk>
+Date: Mon, 19 Jun 2017 17:57:33 +0100
 MIME-Version: 1.0
-In-Reply-To: <8760fsatis.fsf@secure.mitica>
-References: <20170616160658.32290-1-famz@redhat.com>
-	<8760fsatis.fsf@secure.mitica>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 19 Jun 2017 17:54:10 +0100
-Message-ID: <CAFEAcA-g8Ofu_WZjLBGb70qnXfdyM+DUqXQHf0-HixaDWmmy=g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] migration: Fix race of image locking
- between src and dst
+In-Reply-To: <20170619142852.GS5016@thinpad.lan.raisama.net>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCHv6 3/5] fw_cfg: move assert() and linking of
+ fw_cfg device to the machine into instance_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +31,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Peter Xu <peterx@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, John Snow <jsnow@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, lersek@redhat.com
 
-On 19 June 2017 at 16:26, Juan Quintela <quintela@redhat.com> wrote:
-> Fam Zheng <famz@redhat.com> wrote:
->> Previously, dst side will immediately try to lock the write byte upon
->> receiving QEMU_VM_EOF, but at src side, bdrv_inactivate_all() is only
->> done after sending it. If the src host is under load, dst may fail to
->> acquire the lock due to racing with the src unlocking it.
->>
->> Fix this by hoisting the bdrv_inactivate_all() operation before
->> QEMU_VM_EOF.
->>
->> N.B. A further improvement could possibly be done to cleanly handover
->> locks between src and dst, so that there is no window where a third QEMU
->> could steal the locks and prevent src and dst from running.
->>
->> Reported-by: Peter Maydell <peter.maydell@linaro.org>
->> Signed-off-by: Fam Zheng <famz@redhat.com>
->
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
+On 19/06/17 15:28, Eduardo Habkost wrote:
 
-Applied to master, thanks all.
+> On Mon, Jun 19, 2017 at 01:59:07PM +0100, Mark Cave-Ayland wrote:
+>> In preparation for calling fw_cfg_init1() during realize rather than during
+>> init, move the assert() checking for existing fw_cfg devices and the linking
+>> of the device to the machine with object_property_add_child() to a new
+>> fw_cfg instance_init() function.
+>>
+>> This guarantees that we will still assert() correctly if more than one fw_cfg
+>> device is instantiated by accident.
+>>
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+>> Tested-by: Laszlo Ersek <lersek@redhat.com>
+>> ---
+>>  hw/nvram/fw_cfg.c |   14 ++++++++++----
+>>  1 file changed, 10 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+>> index 99bdbc2..af45012 100644
+>> --- a/hw/nvram/fw_cfg.c
+>> +++ b/hw/nvram/fw_cfg.c
+>> @@ -915,10 +915,6 @@ static void fw_cfg_init1(DeviceState *dev)
+>>      MachineState *machine = MACHINE(qdev_get_machine());
+>>      uint32_t version = FW_CFG_VERSION;
+>>  
+>> -    assert(!object_resolve_path(FW_CFG_PATH, NULL));
+>> -
+>> -    object_property_add_child(OBJECT(machine), FW_CFG_NAME, OBJECT(s), NULL);
+>> -
+>>      qdev_init_nofail(dev);
+>>  
+>>      fw_cfg_add_bytes(s, FW_CFG_SIGNATURE, (char *)"QEMU", 4);
+>> @@ -1020,6 +1016,15 @@ FWCfgState *fw_cfg_find(void)
+>>      return FW_CFG(object_resolve_path(FW_CFG_PATH, NULL));
+>>  }
+>>  
+>> +static void fw_cfg_init(Object *obj)
+>> +{
+>> +    MachineState *machine = MACHINE(qdev_get_machine());
+>> +
+>> +    assert(!object_resolve_path(FW_CFG_PATH, NULL));
+>> +
+>> +    object_property_add_child(OBJECT(machine), FW_CFG_NAME, obj, NULL);
+> 
+> I don't think this belongs to instance_init.  We must always be
+> able to instantiate objects without crashing QEMU or affecting
+> QEMU global state.  This patch makes device-list-properties
+> crash:
+> 
+>   $ qemu-system-x86_64 -display none -qmp unix:/tmp/qmp,server,nowait &
+>   [1] 2848
+>   $ echo 'device-list-properties typename=fw_cfg_mem' | ./scripts/qmp/qmp-shell /tmp/qmp
+>   Welcome to the QMP low-level shell!
+>   Connected to QEMU 2.9.50
+>   
+>   qemu-system-x86_64: qemu/hw/nvram/fw_cfg.c:974: fw_cfg_init: Assertion `!object_resolve_path(FW_CFG_PATH, NULL)' failed.
+>   (QEMU) Disconnected
+>   [1]+  Aborted                 (core dumped) qemu-system-x86_64 -display none -qmp unix:/tmp/qmp,server,nowait
+>   $ 
+> 
+> 
+> I suggest moving this check to realize, like the rest of
+> fw_cfg_init1(), but change it to do proper error reporting
+> instead of asserting.
 
--- PMM
+In that case what do you think is the best way to prevent realization of
+a second instance? With some playing I've managed to come up with the
+following (partial) diff that seems to work in some simple local tests:
+
+
+diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+index 9b0aaa2..e678ec0 100644
+--- a/hw/nvram/fw_cfg.c
++++ b/hw/nvram/fw_cfg.c
+@@ -862,12 +862,20 @@ static void fw_cfg_machine_ready(struct Notifier
+*n, void *data)
+
+-static void fw_cfg_common_realize(DeviceState *dev)
++static void fw_cfg_common_realize(DeviceState *dev, Error **errp)
+ {
+     FWCfgState *s = FW_CFG(dev);
+     MachineState *machine = MACHINE(qdev_get_machine());
+     uint32_t version = FW_CFG_VERSION;
+-
++    Object *obj;
++
++    obj = object_resolve_path(FW_CFG_PATH, NULL);
++    if (obj != OBJECT(dev)) {
++        error_setg(errp, "Only one fw_cfg device can be instantiated per "
++                         "machine");
++        return;
++    }
++
+     fw_cfg_add_bytes(s, FW_CFG_SIGNATURE, (char *)"QEMU", 4);
+     fw_cfg_add_bytes(s, FW_CFG_UUID, &qemu_uuid, 16);
+     fw_cfg_add_i16(s, FW_CFG_NOGRAPHIC,
+(uint16_t)!machine->enable_graphics);
+
+
+What seems to happen is that calling object_property_add_child() only
+succeeds for the first instance and so a simple comparison is enough to
+determine that the device already exists at FW_CFG_PATH. Or is this a
+fairly terrible (ab)use of the QOM APIs?
+
+
+ATB,
+
+Mark.
