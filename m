@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dN2Dx-0005aL-Lx
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 15:20:35 -0400
+	(envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dN3eP-0006FI-4x
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 16:51:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dN2Ds-0000GO-Me
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 15:20:33 -0400
-Received: from 2.mo179.mail-out.ovh.net ([178.33.250.45]:47485)
+	(envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dN3eK-00076A-7l
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 16:51:57 -0400
+Received: from research.iiit.ac.in ([196.12.53.8]:55238)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dN2Ds-0000Fs-C7
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 15:20:28 -0400
-Received: from player716.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 9E3284B4E8
-	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 21:20:26 +0200 (CEST)
-Date: Mon, 19 Jun 2017 21:20:21 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170619212021.4808b363@bahia.ttt.fr.ibm.com>
-In-Reply-To: <20170619142848.14258-2-tobleminer@gmail.com>
-References: <20170619142848.14258-1-tobleminer@gmail.com>
-	<20170619142848.14258-2-tobleminer@gmail.com>
+	(Exim 4.71) (envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dN3eJ-00072y-9G
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 16:51:52 -0400
+From: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+Date: Tue, 20 Jun 2017 01:44:22 +0530
+Message-Id: <1497903262-18626-1-git-send-email-chugh.ishani@research.iiit.ac.in>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/3hI9_t+ZCPmL7TAhPQjA3+c";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v4 1/1] 9pfs: local: Add support for custom
- fmode/dmode in 9ps mapped security modes
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3] Add manpage for QEMU Backup Tool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,336 +27,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tobias Schramm <tobleminer@gmail.com>
-Cc: qemu-devel@nongnu.org, aneesh.kumar@linux.vnet.ibm.com, el13635@mail.ntua.gr
+To: qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, jsnow@redhat.com, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
 
---Sig_/3hI9_t+ZCPmL7TAhPQjA3+c
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+qemu-backup will be a command-line tool for performing full and increment=
+al disk backups on running
+VMs.  It is intended as a reference implementation for management stack a=
+nd backup developers to
+see QEMU's backup features in action. The following commit is an initial =
+implementation of manpage
+listing the commands which the backup tool will support.
 
-On Mon, 19 Jun 2017 16:28:48 +0200
-Tobias Schramm <tobleminer@gmail.com> wrote:
+Signed-off-by: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+---
+ Makefile                        |   2 +-
+ contrib/backup/qemu-backup.texi | 139 ++++++++++++++++++++++++++++++++++=
+++++++
+ 2 files changed, 140 insertions(+), 1 deletion(-)
+ create mode 100644 contrib/backup/qemu-backup.texi
 
-I saw you wrote the full story in the cover letter, but I was asking for
-something to be written here (so that it appears in git log). Something
-concise and clear like:
-
-"In mapped security mode, files get created with restricted file mode (0600=
- for
-regular files and 0700 for directories). This makes file sharing between se=
-veral
-users on the host rather complicated (examples?)
-
-This patch makes the default mode for both files and directories configurab=
-le
-through the command line. Existing setups that don't know about the new com=
-mand
-line go on with the current secure behavior."
-
-or anything better you can come up with.
-
-> Signed-off-by: Tobias Schramm <tobleminer@gmail.com>
-> ---
->  v4: Use OPT_NUMBER for file mode arguments, fix back to front naming,
->      fix resource leak and add sanity checking for fmode/dmode arguments
->  v3: Use unsigned types for umask
->  v2: Adjust patch to QEMU code style
->=20
->  fsdev/file-op-9p.h      |  4 ++++
->  fsdev/qemu-fsdev-opts.c | 12 ++++++++++++
->  hw/9pfs/9p-local.c      | 34 +++++++++++++++++++++++++---------
->  hw/9pfs/9p.c            |  3 +++
->  qemu-options.hx         | 20 ++++++++++++++++----
->  5 files changed, 60 insertions(+), 13 deletions(-)
->=20
-> diff --git a/fsdev/file-op-9p.h b/fsdev/file-op-9p.h
-> index 0844a403dc..474c79d003 100644
-> --- a/fsdev/file-op-9p.h
-> +++ b/fsdev/file-op-9p.h
-> @@ -76,6 +76,8 @@ typedef struct FsDriverEntry {
->      int export_flags;
->      FileOperations *ops;
->      FsThrottle fst;
-> +    mode_t fmode;
-> +    mode_t dmode;
->  } FsDriverEntry;
-> =20
->  typedef struct FsContext
-> @@ -88,6 +90,8 @@ typedef struct FsContext
->      FsThrottle *fst;
->      /* fs driver specific data */
->      void *private;
-> +    mode_t fmode;
-> +    mode_t dmode;
->  } FsContext;
-> =20
->  typedef struct V9fsPath {
-> diff --git a/fsdev/qemu-fsdev-opts.c b/fsdev/qemu-fsdev-opts.c
-> index bf5713008a..7c31ffffaf 100644
-> --- a/fsdev/qemu-fsdev-opts.c
-> +++ b/fsdev/qemu-fsdev-opts.c
-> @@ -38,6 +38,12 @@ static QemuOptsList qemu_fsdev_opts =3D {
->          }, {
->              .name =3D "sock_fd",
->              .type =3D QEMU_OPT_NUMBER,
-> +        }, {
-> +            .name =3D "fmode",
-> +            .type =3D QEMU_OPT_NUMBER,
-> +        }, {
-> +            .name =3D "dmode",
-> +            .type =3D QEMU_OPT_NUMBER,
->          },
-> =20
->          THROTTLE_OPTS,
-> @@ -75,6 +81,12 @@ static QemuOptsList qemu_virtfs_opts =3D {
->          }, {
->              .name =3D "sock_fd",
->              .type =3D QEMU_OPT_NUMBER,
-> +        }, {
-> +            .name =3D "fmode",
-> +            .type =3D QEMU_OPT_NUMBER,
-> +        }, {
-> +            .name =3D "dmode",
-> +            .type =3D QEMU_OPT_NUMBER,
->          },
-> =20
->          { /*End of list */ }
-> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-> index 1e78b7c9e9..696e2b75dc 100644
-> --- a/hw/9pfs/9p-local.c
-> +++ b/hw/9pfs/9p-local.c
-> @@ -633,7 +633,7 @@ static int local_mknod(FsContext *fs_ctx, V9fsPath *d=
-ir_path,
-> =20
->      if (fs_ctx->export_flags & V9FS_SM_MAPPED ||
->          fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
-> -        err =3D mknodat(dirfd, name, SM_LOCAL_MODE_BITS | S_IFREG, 0);
-> +        err =3D mknodat(dirfd, name, fs_ctx->fmode | S_IFREG, 0);
->          if (err =3D=3D -1) {
->              goto out;
->          }
-> @@ -685,7 +685,7 @@ static int local_mkdir(FsContext *fs_ctx, V9fsPath *d=
-ir_path,
-> =20
->      if (fs_ctx->export_flags & V9FS_SM_MAPPED ||
->          fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
-> -        err =3D mkdirat(dirfd, name, SM_LOCAL_DIR_MODE_BITS);
-> +        err =3D mkdirat(dirfd, name, fs_ctx->dmode);
->          if (err =3D=3D -1) {
->              goto out;
->          }
-> @@ -786,7 +786,7 @@ static int local_open2(FsContext *fs_ctx, V9fsPath *d=
-ir_path, const char *name,
->      /* Determine the security model */
->      if (fs_ctx->export_flags & V9FS_SM_MAPPED ||
->          fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
-> -        fd =3D openat_file(dirfd, name, flags, SM_LOCAL_MODE_BITS);
-> +        fd =3D openat_file(dirfd, name, flags, fs_ctx->fmode);
->          if (fd =3D=3D -1) {
->              goto out;
->          }
-> @@ -849,7 +849,7 @@ static int local_symlink(FsContext *fs_ctx, const cha=
-r *oldpath,
->          ssize_t oldpath_size, write_size;
-> =20
->          fd =3D openat_file(dirfd, name, O_CREAT | O_EXCL | O_RDWR,
-> -                         SM_LOCAL_MODE_BITS);
-> +                         fs_ctx->fmode);
->          if (fd =3D=3D -1) {
->              goto out;
->          }
-> @@ -1431,6 +1431,8 @@ static int local_parse_opts(QemuOpts *opts, struct =
-FsDriverEntry *fse)
->  {
->      const char *sec_model =3D qemu_opt_get(opts, "security_model");
->      const char *path =3D qemu_opt_get(opts, "path");
-> +    uint64_t fmode =3D qemu_opt_get_number(opts, "fmode", SM_LOCAL_MODE_=
-BITS);
-> +    uint64_t dmode =3D qemu_opt_get_number(opts, "dmode", SM_LOCAL_DIR_M=
-ODE_BITS);
-
-We don't need to get this options in non-mapped security modes. And since t=
-hese
-variables only have one user, I guess you don't need them.
-
->      Error *err =3D NULL;
-> =20
->      if (!sec_model) {
-> @@ -1456,17 +1458,31 @@ static int local_parse_opts(QemuOpts *opts, struc=
-t FsDriverEntry *fse)
->          return -1;
->      }
-> =20
-> -    if (!path) {
-> -        error_report("fsdev: No path specified");
-> -        return -1;
-> -    }
-> -
-
-Why are you moving these lines ? The path is mandatory, just like the secur=
-ity model. It
-makes more sense to do the sanity check here, rather than....(*)
-
->      fsdev_throttle_parse_opts(opts, &fse->fst, &err);
->      if (err) {
->          error_reportf_err(err, "Throttle configuration is not valid: ");
->          return -1;
->      }
-> =20
-> +    if (!(fse->export_flags & (V9FS_SM_MAPPED | V9FS_SM_MAPPED_FILE))) {
-
-I'd prefer this for clarity and consistency with other places where the same
-check is performed:
-
-    if (fse->export_flags & V9FS_SM_MAPPED ||
-        fse->export_flags & V9FS_SM_MAPPED_FILE) {
-        fse->fmode =3D
-            qemu_opt_get_number(opts, "fmode", SM_LOCAL_MODE_BITS) && 0777;
-        fse->dmode =3D
-            qemu_opt_get_number(opts, "dmode", SM_LOCAL_DIR_MODE_BITS) && 0=
-777;
-    } else {
-        /* error stuff */
-    }
-
-> +        if (qemu_opt_find(opts, "fmode")) {
-> +            error_report("fmode is only valid for mapped 9p modes");
-> +            return -1;
-> +        }
-> +        if (qemu_opt_find(opts, "dmode")) {
-> +            error_report("dmode is only valid for mapped 9p modes");
-> +            return -1;
-> +        }
-> +    }
-> +
-> +    fse->fmode =3D ((mode_t)fmode) & 0777;
-> +    fse->dmode =3D ((mode_t)dmode) & 0777;
-> +
-> +    if (!path) {
-> +        error_report("fsdev: No path specified");
-> +        return -1;
-> +    }
-
-(*).... here, after we have parsed all optional settings.
-
-> +
->      fse->path =3D g_strdup(path);
-> =20
->      return 0;
-> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> index 96d2683348..a0ae98f7ca 100644
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -3533,6 +3533,9 @@ int v9fs_device_realize_common(V9fsState *s, Error =
-**errp)
-> =20
->      s->ops =3D fse->ops;
-> =20
-> +    s->ctx.fmode =3D fse->fmode;
-> +    s->ctx.dmode =3D fse->dmode;
-> +
->      s->fid_list =3D NULL;
->      qemu_co_rwlock_init(&s->rename_lock);
-> =20
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 30c4f9850f..5999719720 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -847,7 +847,7 @@ ETEXI
-> =20
->  DEF("fsdev", HAS_ARG, QEMU_OPTION_fsdev,
->      "-fsdev fsdriver,id=3Did[,path=3Dpath,][security_model=3D{mapped-xat=
-tr|mapped-file|passthrough|none}]\n"
-> -    " [,writeout=3Dimmediate][,readonly][,socket=3Dsocket|sock_fd=3Dsock=
-_fd]\n"
-> +    " [,writeout=3Dimmediate][,readonly][,socket=3Dsocket|sock_fd=3Dsock=
-_fd][,fmode=3Dfmode][,dmode=3Ddmode]\n"
->      " [[,throttling.bps-total=3Db]|[[,throttling.bps-read=3Dr][,throttli=
-ng.bps-write=3Dw]]]\n"
->      " [[,throttling.iops-total=3Di]|[[,throttling.iops-read=3Dr][,thrott=
-ling.iops-write=3Dw]]]\n"
->      " [[,throttling.bps-total-max=3Dbm]|[[,throttling.bps-read-max=3Drm]=
-[,throttling.bps-write-max=3Dwm]]]\n"
-> @@ -857,7 +857,7 @@ DEF("fsdev", HAS_ARG, QEMU_OPTION_fsdev,
-> =20
->  STEXI
-> =20
-> -@item -fsdev @var{fsdriver},id=3D@var{id},path=3D@var{path},[security_mo=
-del=3D@var{security_model}][,writeout=3D@var{writeout}][,readonly][,socket=
-=3D@var{socket}|sock_fd=3D@var{sock_fd}]
-> +@item -fsdev @var{fsdriver},id=3D@var{id},path=3D@var{path},[security_mo=
-del=3D@var{security_model}][,writeout=3D@var{writeout}][,readonly][,socket=
-=3D@var{socket}|sock_fd=3D@var{sock_fd}][,fmode=3D@var{fmode}][,dmode=3D@va=
-r{dmode}]
->  @findex -fsdev
->  Define a new file system device. Valid options are:
->  @table @option
-> @@ -898,6 +898,12 @@ with virtfs-proxy-helper
->  Enables proxy filesystem driver to use passed socket descriptor for
->  communicating with virtfs-proxy-helper. Usually a helper like libvirt
->  will create socketpair and pass one of the fds as sock_fd
-> +@item fmode=3D@var{fmode}
-> +Specifies the default mode for newly created files on the host. Works on=
-ly
-> +with security models "mapped-xattr" and "mapped-file".
-> +@item dmode=3D@var{dmode}
-> +Specifies the default mode for newly created directories on the host. Wo=
-rks
-> +only with security models "mapped-xattr" and "mapped-file".
->  @end table
-> =20
->  -fsdev option is used along with -device driver "virtio-9p-pci".
-> @@ -914,12 +920,12 @@ ETEXI
-> =20
->  DEF("virtfs", HAS_ARG, QEMU_OPTION_virtfs,
->      "-virtfs local,path=3Dpath,mount_tag=3Dtag,security_model=3D[mapped-=
-xattr|mapped-file|passthrough|none]\n"
-> -    "        [,id=3Did][,writeout=3Dimmediate][,readonly][,socket=3Dsock=
-et|sock_fd=3Dsock_fd]\n",
-> +    "        [,id=3Did][,writeout=3Dimmediate][,readonly][,socket=3Dsock=
-et|sock_fd=3Dsock_fd][,fmode=3Dfmode][,dmode=3Ddmode]\n",
->      QEMU_ARCH_ALL)
-> =20
->  STEXI
-> =20
-> -@item -virtfs @var{fsdriver}[,path=3D@var{path}],mount_tag=3D@var{mount_=
-tag}[,security_model=3D@var{security_model}][,writeout=3D@var{writeout}][,r=
-eadonly][,socket=3D@var{socket}|sock_fd=3D@var{sock_fd}]
-> +@item -virtfs @var{fsdriver}[,path=3D@var{path}],mount_tag=3D@var{mount_=
-tag}[,security_model=3D@var{security_model}][,writeout=3D@var{writeout}][,r=
-eadonly][,socket=3D@var{socket}|sock_fd=3D@var{sock_fd}][,fmode=3D@var{fmod=
-e}][,dmode=3D@var{dmode}]
->  @findex -virtfs
-> =20
->  The general form of a Virtual File system pass-through options are:
-> @@ -961,6 +967,12 @@ will create socketpair and pass one of the fds as so=
-ck_fd
->  @item sock_fd
->  Enables proxy filesystem driver to use passed 'sock_fd' as the socket
->  descriptor for interfacing with virtfs-proxy-helper
-> +@item fmode=3D@var{fmode}
-> +Specifies the default mode for newly created files on the host. Works on=
-ly
-> +with security models "mapped-xattr" and "mapped-file".
-> +@item dmode=3D@var{dmode}
-> +Specifies the default mode for newly created directories on the host. Wo=
-rks
-> +only with security models "mapped-xattr" and "mapped-file".
->  @end table
->  ETEXI
-> =20
-
-
---Sig_/3hI9_t+ZCPmL7TAhPQjA3+c
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAllII/YACgkQAvw66wEB28JbXwCfeUTsehusUxKBlD6WBg5R+RAQ
-E2cAoKAhj/wMXBNJoSzP33igxzCveW+s
-=ceC7
------END PGP SIGNATURE-----
-
---Sig_/3hI9_t+ZCPmL7TAhPQjA3+c--
+diff --git a/Makefile b/Makefile
+index c830d7a..094f291 100644
+--- a/Makefile
++++ b/Makefile
+@@ -504,7 +504,7 @@ clean:
+ VERSION ?=3D $(shell cat VERSION)
+=20
+ dist: qemu-$(VERSION).tar.bz2
+-
++qemu-backup.8: contrib/backup/qemu-backup.texi
+ qemu-%.tar.bz2:
+ 	$(SRC_PATH)/scripts/make-release "$(SRC_PATH)" "$(patsubst qemu-%.tar.b=
+z2,%,$@)"
+=20
+diff --git a/contrib/backup/qemu-backup.texi b/contrib/backup/qemu-backup=
+.texi
+new file mode 100644
+index 0000000..1db63c0
+--- /dev/null
++++ b/contrib/backup/qemu-backup.texi
+@@ -0,0 +1,139 @@
++@setfilename qemu-backup-tool-manpage
++
++@documentlanguage en
++@documentencoding UTF-8
++
++\input texinfo
++@settitle Manpage_backup_tool 1.0
++@copying
++This is a manpage for qemu_backup_tool, version 1.0.
++
++Copyright @copyright{} 2016 Free Software Foundation, Inc.
++@end copying
++@ifinfo
++@direntry
++* QEMU: (qemu-backup-tool-manpage).    Man page for QEMU backup tool.
++@end direntry
++@end ifinfo
++@iftex
++@titlepage
++@sp 7
++@center @titlefont{QEMU_backup_tool}
++@sp 1
++@center @titlefont{Man Page}
++@sp 3
++@end titlepage
++@end iftex
++@ifnottex
++@node Top
++@top Short Sample
++
++@menu
++* Name::
++* Synopsis::
++* list of Commands::
++* Command Parameters::
++* Command Descriptions::
++* License::
++@end menu
++
++@end ifnottex
++
++@node Name
++@chapter Name
++
++QEMU disk backup tool.
++
++@node Synopsis
++@chapter Synopsis
++
++qemu-backup command [ command options].
++
++@node  list of Commands
++@chapter  list of Commands
++@cindex chapter, first dummy
++@itemize
++@item qemu-backup guest add [--id id] [--qmp socketpath]
++@item qemu-backup guest list
++@item qemu-backup drive add [--guest guestname] [--id driveid] [--target=
+ target]
++@item qemu-backup drive list [--guest guestname]
++@item qemu-backup backup [--guest guestname]
++@item qemu-backup restore [--guest guestname]
++@item qemu-backup drive-remove [--guest guestname] [--id driveid]
++@item qemu-backup remove [--guest guestname]
++@item qemu-backup drive add [--all] [--guest guestname] [--target target=
+]
++@item qemu-backup backup [--inc] [--guest guestname]
++@end itemize
++@node  Command Parameters
++@chapter  Command Parameters
++@cindex chapter, first dummy
++@itemize
++@item --guest: Name of the guest.
++@item --id: id of guest or drive.
++@item --target: Destination on which you want your backup to be made.
++@item --all: Add all the drives present in a guest for backup except cd-=
+rom.
++@item --inc: For incremental backup.
++@item --qmp: Path of qmp socket.
++@end itemize
++
++@node  Command Descriptions
++@chapter  Command Descriptions
++@cindex chapter, first dummy
++@itemize
++@item qemu-backup guest add [--id id] [--qmp socketpath]
++This command adds a guest to the configuration file given its path to qm=
+p socket.
++example:
++qemu-backup guest add --id=3Dfedora =E2=80=93qmp=3D/var/run/qemu/fedora.=
+sock
++
++@item qemu-backup guest list
++This commands lists the names of guests which are added to configuration=
+ file.
++
++@item qemu-backup drive add [--guest guestname] [--id driveid] [--target=
+ target]
++This command adds different drives for backup in a particular guest by g=
+iving the name of drive to be backed up and target imagefile in which we =
+want to store the drive backup.
++example:
++qemu-backup drive add --guest=3Dfedora --id=3Droot
++--target=3D/backup/fedora/root.img
++qemu-backup drive add --guest=3Dfedora --id=3Ddata
++--target=3D/backup/fedora/data.img
++
++@item qemu-backup drive list [--guest guestname]
++This commands gives the names of the drive present in a guest which are =
+added for backup.
++example: qemu-backup drive list --guest=3Dfedora
++
++@item qemu-backup backup [--guest guestname]
++
++This command makes the backup of the drives, in their respective given d=
+estinations. The ids of drive and their destinations are taken from the c=
+onfiguration file.
++example: qemu-backup backup --guest=3Dfedora
++
++@item qemu-backup restore [--guest guestname]
++This command is needed if we want to restore the backup. It will list th=
+e commands to be run for performing the same but will not perform any act=
+ion.
++example: qemu-backup restore --guest=3Dfedora
++cp /backup/fedora/root.img /var/run/qemu/fedora/root.img
++cp /backup/fedora/data.img /var/run/qemu/fedora/data.img
++
++@item qemu-backup drive-remove [--guest guestname] [--id driveid]
++This command helps remove a drive which is set for backup in configurati=
+on of given host.
++example: qemu-backup remove --guest=3Dfedora --id=3Droot
++
++@item qemu-backup remove [--guest guestname]
++This command removes the guest from the configuration file.
++example: qemu-backup remove =E2=80=93guest=3Dfedora
++
++@item qemu-backup drive add --all [-guest guestname] [-destination desti=
+nation]
++This command adds all the drives of the guest for backup other than CDRO=
+M drive. Here all the backup drives will have the same names as original =
+drives and target will be the destination folder.
++example: qemu-backup drive add --all --guest fedora --destination =3D/ba=
+ckup/fedora/
++
++@end itemize
++
++
++@node License
++@appendix License
++
++QEMU is a trademark of Fabrice Bellard.
++
++QEMU is released under the GNU General Public License (TODO: add link).
++Parts of QEMU have specific licenses, see file LICENSE.
++
++TODO (refer to file LICENSE, include it, include the GPL?)
++
++@bye
+--=20
+2.7.4
