@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dMtEE-00009D-0m
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 05:44:15 -0400
+	(envelope-from <berrange@redhat.com>) id 1dMtFp-0000m2-M6
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 05:45:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dMtED-00047x-3v
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 05:44:14 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:36164)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dMtEC-00047l-Sk
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 05:44:13 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id m125so74250649wmm.1
-	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 02:44:12 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1dMtFm-0004vy-K3
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 05:45:53 -0400
+Date: Mon, 19 Jun 2017 10:45:43 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170619094543.GC2640@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <CAOE=1Z2Dtzt7xsiE=XR=MShSHwb6Z-=JnHdtvRr2MwQpFhpuiQ@mail.gmail.com>
+	<CAOE=1Z2PwNNk0KyEPC+cYSYtD62Vx=VZacaTKTHMBX=SaiBgGQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170619084843.GB2104@work-vm>
-References: <20170613165313.20954-1-ehabkost@redhat.com>
-	<20170613165313.20954-16-ehabkost@redhat.com>
-	<20170615121407.GA2399@work-vm>
-	<20170617193349.GM22043@thinpad.lan.raisama.net>
-	<20170619084843.GB2104@work-vm>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 19 Jun 2017 10:43:51 +0100
-Message-ID: <CAFEAcA8G475i8JE_X+5UHGfz7HP8gbOkmQJ8bbSFOoGbULy_tA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC 15/15] [test only] Use 'Error *err[static 1]'
- instead of 'Error **errp' to catch NULL errp arguments
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAOE=1Z2PwNNk0KyEPC+cYSYtD62Vx=VZacaTKTHMBX=SaiBgGQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] Fwd: [DPDK-memory] how qemu waste such long time
+ under dpdk huge page envriment?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,35 +25,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: Sam <batmanustc@gmail.com>
+Cc: qemu-devel@nongnu.org, qemu-discuss@nongnu.org
 
-On 19 June 2017 at 09:48, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
-> * Eduardo Habkost (ehabkost@redhat.com) wrote:
->> On Thu, Jun 15, 2017 at 01:14:15PM +0100, Dr. David Alan Gilbert wrote:
->> > * Eduardo Habkost (ehabkost@redhat.com) wrote:
->> > >  void visit_start_struct(Visitor *v, const char *name, void **obj,
->> > > -                        size_t size, Error **errp);
->> > > +                        size_t size, Error *errp[static 1]);
->> > >
->> >
->> > Is it possible to typedef that to something that hides the magic syntax?
->> > Then we could get that down to QError errp   or something like that?
->>
->> Unfortunately it is not possible to hide it in a typedef: the
->> "static" keyword inside the square brackets is a feature of
->> function parameter declarations only.  Using it on a typedef
->> results in:
->>
->> a.c:3:16: error: static or type qualifiers in non-parameter array declarator
->>  typedef Error *ErrorPtr[static 1];
->
-> That's a shame; it's rather odd looking; still I think it's
-> worth it if it simplifies the error code.
+On Mon, Jun 19, 2017 at 05:30:59PM +0800, Sam wrote:
+> Hi all,
+> 
+> I'm running `QEMU_CMD ...` to create a vm under dpdk huge page envriment
+> (which set huge page 1G). And I enable all events in qemu.
 
-Is gcc's __attribute__((nonnull)) any better? It seems to apply
-to the whole function prototype rather than an individual argument
-though so probably not :-(
+Please provide the full QEMU command line you are using.
 
-thanks
--- PMM
+> For qemu and ovs-dpdk(ovs-2.4.9 with dpdk-2.2.0) environment, detail log is:
+> 
+> > 30012@1497443246.678304:object_dynamic_cast_assert
+> qemu:memory-region->qemu:memory-region (/home/hu
+> > anghuai/cloud/contrib/qemu-2.6.0/memory.c:1076:memory_region_initfn)
+> > 30012@1497443256.274866:object_dynamic_cast_assert
+> qio-channel-socket->qio-channel-socket (io/chann
+> > el-socket.c:389:qio_channel_socket_init)
+> 
+> 
+> I don't know why qemu doing 'memory_region_initfn' function in this 10
+> second, does anyone know this?
+
+If memory initialization takes a long time, this is likely a result of
+QEMU pre-allocating the memory pages, which is a fairly slow procedure,
+that can have noticable startup time impact for guests with large RAM
+
+
+> static void memory_region_initfn(Object *obj)
+> > {
+> >     MemoryRegion *mr = MEMORY_REGION(obj);
+> >     ObjectProperty *op;
+> >     mr->ops = &unassigned_mem_ops;
+> >     mr->enabled = true;
+> >     mr->romd_mode = true;
+> >     mr->global_locking = true;
+> >     mr->destructor = memory_region_destructor_none;
+> >     QTAILQ_INIT(&mr->subregions);
+> >     QTAILQ_INIT(&mr->coalesced);
+> >     op = object_property_add(OBJECT(mr), "container",
+> >                              "link<" TYPE_MEMORY_REGION ">",
+> >                              memory_region_get_container,
+> >                              NULL, /* memory_region_set_container */
+> >                              NULL, NULL, &error_abort);
+> >     op->resolve = memory_region_resolve_container;
+> >     object_property_add(OBJECT(mr), "addr", "uint64",
+> >                         memory_region_get_addr,
+> >                         NULL, /* memory_region_set_addr */
+> >                         NULL, NULL, &error_abort);
+> >     object_property_add(OBJECT(mr), "priority", "uint32",
+> >                         memory_region_get_priority,
+> >                         NULL, /* memory_region_set_priority */
+> >                         NULL, NULL, &error_abort);
+> >     object_property_add_bool(OBJECT(mr), "may-overlap",
+> >                              memory_region_get_may_overlap,
+> >                              NULL, /* memory_region_set_may_overlap */
+> >                              &error_abort);
+> >     object_property_add(OBJECT(mr), "size", "uint64",
+> >                         memory_region_get_size,
+> >                         NULL, /* memory_region_set_size, */
+> >                         NULL, NULL, &error_abort);
+> > }
+> 
+> 
+> I print all system call by `strace -f -T -tt -e trace=all -o output.txt
+> $QEMU_CMD`, and I found this:
+> 
+> 5900  11:08:11.288701 nanosleep({0, 10000000}, 0x7ff103c13a80) = 0
+> > <0.010171>
+> > 5900  11:08:11.299052 futex(0x7ff10be24340, FUTEX_WAIT_PRIVATE, 2, NULL
+> > <unfinished ...>
+> > 5899  11:08:20.138492 rt_sigaction(SIGBUS, {0x7ff10b5b1040, [],
+> > SA_RESTORER|SA_SIGINFO, 0x7ff1085fd100}, NULL, 8) = 0 <0.000012>
+> > 5899  11:08:20.138598 rt_sigprocmask(SIG_SETMASK, [BUS USR1 ALRM IO],
+> > NULL, 8) = 0 <0.000008>
+> > 5899  11:08:20.138646 mmap(NULL, 266240, PROT_READ|PROT_WRITE,
+> > MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7ff10b380000 <0.000013>
+> > 5899  11:08:20.138793 mmap(NULL, 266240, PROT_READ|PROT_WRITE,
+> > MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7ff10b33f000 <0.000009>
+> 
+> 
+> I don't know who call `futex`, and why waste such long time.
+
+This trace doesn't show enough info to say what is happening - a futex
+is just the syscall used for mutex locking, so that just shows that
+thread 5900 is waiting for some lock. This doesn't imply the time is
+wasted, or really saying anything useful at all.
+
+Meanwhile thread 5899 was doing some mmap calls. There's no obvious
+relationship between the times in thread 5900 and 58909 in this trace.
+The 9 second gap here is just coincidental.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
