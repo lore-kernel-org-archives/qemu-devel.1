@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48626)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dMy6j-0007Ex-Jz
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 10:56:50 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dMy9Q-0000bH-NI
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 10:59:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dMy6f-0002LX-Lv
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 10:56:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55324)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dMy6f-0002Kp-Cj
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 10:56:45 -0400
-References: <1497877149-19253-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1497877149-19253-4-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<20170619142852.GS5016@thinpad.lan.raisama.net>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <f4a78349-c7f0-177a-9d23-5df21e2172f7@redhat.com>
-Date: Mon, 19 Jun 2017 16:56:38 +0200
+	(envelope-from <mreitz@redhat.com>) id 1dMy9M-0003Jp-Og
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 10:59:36 -0400
+References: <20170614153102.9077-1-mreitz@redhat.com>
+	<20170614153102.9077-3-mreitz@redhat.com>
+	<20170619135525.GG6113@noname.redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <151020e7-3e68-3a57-34c2-100542a02c36@redhat.com>
+Date: Mon, 19 Jun 2017 16:59:16 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170619142852.GS5016@thinpad.lan.raisama.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCHv6 3/5] fw_cfg: move assert() and linking of
- fw_cfg device to the machine into instance_init()
+In-Reply-To: <20170619135525.GG6113@noname.redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Gtm1K17L4AeFcShGkLWm5PKSdN4UbHTnf"
+Subject: Re: [Qemu-devel] [PATCH 2/4] qapi: Add qobject_is_equal()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,97 +25,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, somlo@cmu.edu, mst@redhat.com, pbonzini@redhat.com, rjones@redhat.com, imammedo@redhat.com, peter.maydell@linaro.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-On 06/19/17 16:28, Eduardo Habkost wrote:
-> On Mon, Jun 19, 2017 at 01:59:07PM +0100, Mark Cave-Ayland wrote:
->> In preparation for calling fw_cfg_init1() during realize rather than during
->> init, move the assert() checking for existing fw_cfg devices and the linking
->> of the device to the machine with object_property_add_child() to a new
->> fw_cfg instance_init() function.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Gtm1K17L4AeFcShGkLWm5PKSdN4UbHTnf
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>
+Message-ID: <151020e7-3e68-3a57-34c2-100542a02c36@redhat.com>
+Subject: Re: [PATCH 2/4] qapi: Add qobject_is_equal()
+References: <20170614153102.9077-1-mreitz@redhat.com>
+ <20170614153102.9077-3-mreitz@redhat.com>
+ <20170619135525.GG6113@noname.redhat.com>
+In-Reply-To: <20170619135525.GG6113@noname.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2017-06-19 15:55, Kevin Wolf wrote:
+> Am 14.06.2017 um 17:31 hat Max Reitz geschrieben:
+>> This generic function (along with its implementations for different
+>> types) determines whether two QObjects are equal.
 >>
->> This guarantees that we will still assert() correctly if more than one fw_cfg
->> device is instantiated by accident.
->>
->> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
->> Tested-by: Laszlo Ersek <lersek@redhat.com>
->> ---
->>  hw/nvram/fw_cfg.c |   14 ++++++++++----
->>  1 file changed, 10 insertions(+), 4 deletions(-)
->>
->> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
->> index 99bdbc2..af45012 100644
->> --- a/hw/nvram/fw_cfg.c
->> +++ b/hw/nvram/fw_cfg.c
->> @@ -915,10 +915,6 @@ static void fw_cfg_init1(DeviceState *dev)
->>      MachineState *machine = MACHINE(qdev_get_machine());
->>      uint32_t version = FW_CFG_VERSION;
->>  
->> -    assert(!object_resolve_path(FW_CFG_PATH, NULL));
->> -
->> -    object_property_add_child(OBJECT(machine), FW_CFG_NAME, OBJECT(s), NULL);
->> -
->>      qdev_init_nofail(dev);
->>  
->>      fw_cfg_add_bytes(s, FW_CFG_SIGNATURE, (char *)"QEMU", 4);
->> @@ -1020,6 +1016,15 @@ FWCfgState *fw_cfg_find(void)
->>      return FW_CFG(object_resolve_path(FW_CFG_PATH, NULL));
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>=20
+>> diff --git a/qobject/qdict.c b/qobject/qdict.c
+>> index 88e2ecd..2ed57ca 100644
+>> --- a/qobject/qdict.c
+>> +++ b/qobject/qdict.c
+>> @@ -410,6 +410,30 @@ void qdict_del(QDict *qdict, const char *key)
 >>  }
->>  
->> +static void fw_cfg_init(Object *obj)
+>> =20
+>>  /**
+>> + * qdict_is_equal(): Tests whether the two QDicts are equal
+>=20
+> This should specify what equality means for QDicts: Do their entries
+> have to point to the same objects, or is it enough if the objects
+> compare equal? It seems you're trying to implement the lattter.
+
+Yes, I'll add a comment.
+
+>> + */
+>> +bool qdict_is_equal(const QObject *x, const QObject *y)
 >> +{
->> +    MachineState *machine = MACHINE(qdev_get_machine());
+>> +    const QDict *dict_x =3D qobject_to_qdict(x), *dict_y =3D qobject_=
+to_qdict(y);
+>> +    const QDictEntry *e;
 >> +
->> +    assert(!object_resolve_path(FW_CFG_PATH, NULL));
+>> +    if (qdict_size(dict_x) !=3D qdict_size(dict_y)) {
+>> +        return false;
+>> +    }
 >> +
->> +    object_property_add_child(OBJECT(machine), FW_CFG_NAME, obj, NULL);
-> 
-> I don't think this belongs to instance_init.  We must always be
-> able to instantiate objects without crashing QEMU or affecting
-> QEMU global state.  This patch makes device-list-properties
-> crash:
-> 
->   $ qemu-system-x86_64 -display none -qmp unix:/tmp/qmp,server,nowait &
->   [1] 2848
->   $ echo 'device-list-properties typename=fw_cfg_mem' | ./scripts/qmp/qmp-shell /tmp/qmp
->   Welcome to the QMP low-level shell!
->   Connected to QEMU 2.9.50
->   
->   qemu-system-x86_64: qemu/hw/nvram/fw_cfg.c:974: fw_cfg_init: Assertion `!object_resolve_path(FW_CFG_PATH, NULL)' failed.
->   (QEMU) Disconnected
->   [1]+  Aborted                 (core dumped) qemu-system-x86_64 -display none -qmp unix:/tmp/qmp,server,nowait
->   $ 
-> 
-> 
-> I suggest moving this check to realize, like the rest of
-> fw_cfg_init1(), but change it to do proper error reporting
-> instead of asserting.
+>> +    for (e =3D qdict_first(dict_x); e; e =3D qdict_next(dict_x, e)) {=
 
-Originally I argued against that, but as I said back then (I think?) I
-didn't have a better reason for that comment of mine than a gut feeling.
-So this feedback is definitely welcome by me. (Mark: sorry about the
-churn, I made it clear up-front that I wasn't a QOM expert...)
+>> +        const QObject *obj_x =3D qdict_entry_value(e);
+>> +        const QObject *obj_y =3D qdict_get(dict_y, qdict_entry_key(e)=
+);
+>> +
+>> +        if (!qobject_is_equal(obj_x, obj_y)) {
+>> +            return false;
+>> +        }
+>> +    }
+>> +
+>> +    return true;
+>> +}
+>=20
+> If I'm not mistaken, this doesn't actually check equality, but that the=
 
-Thanks
-Laszlo
+> entries of x are a subset of the entries of y.
 
-> 
+That's why I'm checking that x and y have the same size before.
+
+>> +/**
+>>   * qdict_destroy_obj(): Free all the memory allocated by a QDict
+>>   */
+>>  void qdict_destroy_obj(QObject *obj)
+>> diff --git a/qobject/qlist.c b/qobject/qlist.c
+>> index 86b60cb..b3033c6 100644
+>> --- a/qobject/qlist.c
+>> +++ b/qobject/qlist.c
+>> @@ -140,6 +140,31 @@ QList *qobject_to_qlist(const QObject *obj)
+>>  }
+>> =20
+>>  /**
+>> + * qlist_is_equal(): Tests whether the two QLists are equal
+>=20
+> Like for QDict, this isn't a complete description.
+
+Yes, I'll add a comment here, too.
+
+> Your implementation seems to check that both lists contain objects that=
+
+> compare equal at each index (i.e. order matters).
+
+Of course it does because lists are not sets but arrays (in contrast to
+dicts).
+
+Max
+
+>> + */
+>> +bool qlist_is_equal(const QObject *x, const QObject *y)
+>> +{
+>> +    const QList *list_x =3D qobject_to_qlist(x), *list_y =3D qobject_=
+to_qlist(y);
+>> +    const QListEntry *entry_x, *entry_y;
+>> +
+>> +    entry_x =3D qlist_first(list_x);
+>> +    entry_y =3D qlist_first(list_y);
+>> +
+>> +    while (entry_x && entry_y) {
+>> +        if (!qobject_is_equal(qlist_entry_obj(entry_x),
+>> +                              qlist_entry_obj(entry_y)))
+>> +        {
+>> +            return false;
+>> +        }
+>> +
+>> +        entry_x =3D qlist_next(entry_x);
+>> +        entry_y =3D qlist_next(entry_y);
+>> +    }
+>> +
+>> +    return !entry_x && !entry_y;
 >> +}
 >> +
->>  static void fw_cfg_class_init(ObjectClass *klass, void *data)
->>  {
->>      DeviceClass *dc = DEVICE_CLASS(klass);
->> @@ -1033,6 +1038,7 @@ static const TypeInfo fw_cfg_info = {
->>      .parent        = TYPE_SYS_BUS_DEVICE,
->>      .abstract      = true,
->>      .instance_size = sizeof(FWCfgState),
->> +    .instance_init = fw_cfg_init,
->>      .class_init    = fw_cfg_class_init,
->>  };
->>  
->> -- 
->> 1.7.10.4
->>
-> 
+>> +/**
+>>   * qlist_destroy_obj(): Free all the memory allocated by a QList
+>>   */
+>=20
+> Kevin
+>=20
+
+
+
+--Gtm1K17L4AeFcShGkLWm5PKSdN4UbHTnf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEvBAEBCAAZBQJZR+bEEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQJyV
+CAC5JJ7WQ6nSmqiYcTn1NOx7JL+FUAbnAegup5xYOEK1BXcLoSZnLxjoZTmOorMO
+wGmTgv6sUybrY6wkd0+yt1LWrpMUwV15/CO2ek+/LloQdczOEvXKugglrZJtkV/k
+0aQ+TYGYZTmKxj72+OK+axUpehpQj2V61dzG/Eid/vB8MzAQ9OBIYhY6Y12DIdFE
+8xd5VU5uZbPakyChpkIhgz2gdH8h5eh2hzP11ZJpgZ9V+ylo7huExv7SJbLMnp6R
+DQuhw8wV4SzZ8YuOuwtegXEEQbdJOAdD78RFCvnS6vvmkSpFWC1lVQNuzE49ufUX
+ZMOx9r476Akk9Y4MrlRAnLxU
+=xgHJ
+-----END PGP SIGNATURE-----
+
+--Gtm1K17L4AeFcShGkLWm5PKSdN4UbHTnf--
