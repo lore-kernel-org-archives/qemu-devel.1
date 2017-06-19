@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dMxeh-0006JV-5k
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 10:27:52 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dMxfo-0006sc-0W
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 10:29:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dMxed-0003y0-W9
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 10:27:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40592)
+	(envelope-from <ehabkost@redhat.com>) id 1dMxfk-0004PC-Rt
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 10:28:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54714)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1dMxed-0003xn-Ms
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 10:27:47 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6DE5B85359
-	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 14:27:46 +0000 (UTC)
-References: <1497876588-947-1-git-send-email-peterx@redhat.com>
-	<1497876588-947-2-git-send-email-peterx@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <4ed9fab7-19e4-42b7-03cb-99f640f8ec0a@redhat.com>
-Date: Mon, 19 Jun 2017 16:27:39 +0200
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dMxfk-0004Ot-I9
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 10:28:56 -0400
+Date: Mon, 19 Jun 2017 11:28:52 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170619142852.GS5016@thinpad.lan.raisama.net>
+References: <1497877149-19253-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1497877149-19253-4-git-send-email-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-In-Reply-To: <1497876588-947-2-git-send-email-peterx@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 01/13] machine: export
- register_compat_prop()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1497877149-19253-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCHv6 3/5] fw_cfg: move assert() and linking of
+ fw_cfg device to the machine into instance_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,124 +28,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel@nongnu.org, lersek@redhat.com, somlo@cmu.edu, mst@redhat.com, pbonzini@redhat.com, rjones@redhat.com, imammedo@redhat.com, peter.maydell@linaro.org
 
-On 19/06/2017 14:49, Peter Xu wrote:
-> We have HW_COMPAT_*, however that's only binded to machines, not other
-> things (like accelerators).  Behind it, it was register_compat_prop()
-> that played the trick.  Let's export the function for further use
-> outside HW_COMPAT_* magic.
+On Mon, Jun 19, 2017 at 01:59:07PM +0100, Mark Cave-Ayland wrote:
+> In preparation for calling fw_cfg_init1() during realize rather than during
+> init, move the assert() checking for existing fw_cfg devices and the linking
+> of the device to the machine with object_property_add_child() to a new
+> fw_cfg instance_init() function.
 > 
-> Meanwhile, move it to qdev-properties.c where seems more proper.
-> Refactor it a bit to provide global_prop_list_add() for further
-> use (will use it in cases where we need a GlobalProperty list).
+> This guarantees that we will still assert() correctly if more than one fw_cfg
+> device is instantiated by accident.
 > 
-> CC: Eduardo Habkost <ehabkost@redhat.com>
-> CC: Markus Armbruster <armbru@redhat.com>
-> CC: Marcel Apfelbaum <marcel@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+> Tested-by: Laszlo Ersek <lersek@redhat.com>
 > ---
->  accel.c                      |  1 +
->  hw/core/machine.c            | 14 +-------------
->  hw/core/qdev-properties.c    | 22 ++++++++++++++++++++++
->  include/hw/qdev-properties.h |  5 +++++
->  4 files changed, 29 insertions(+), 13 deletions(-)
+>  hw/nvram/fw_cfg.c |   14 ++++++++++----
+>  1 file changed, 10 insertions(+), 4 deletions(-)
 > 
-> diff --git a/accel.c b/accel.c
-> index 664bb88..62edd29 100644
-> --- a/accel.c
-> +++ b/accel.c
-> @@ -26,6 +26,7 @@
->  #include "qemu/osdep.h"
->  #include "sysemu/accel.h"
->  #include "hw/boards.h"
-> +#include "hw/qdev-properties.h"
->  #include "qemu-common.h"
->  #include "sysemu/arch_init.h"
->  #include "sysemu/sysemu.h"
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 2e7e977..b4b3449 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -16,6 +16,7 @@
->  #include "qapi-visit.h"
->  #include "qapi/visitor.h"
->  #include "hw/sysbus.h"
-> +#include "hw/qdev-properties.h"
->  #include "sysemu/sysemu.h"
->  #include "sysemu/numa.h"
->  #include "qemu/error-report.h"
-> @@ -770,19 +771,6 @@ static void machine_class_finalize(ObjectClass *klass, void *data)
->      g_free(mc->name);
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index 99bdbc2..af45012 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -915,10 +915,6 @@ static void fw_cfg_init1(DeviceState *dev)
+>      MachineState *machine = MACHINE(qdev_get_machine());
+>      uint32_t version = FW_CFG_VERSION;
+>  
+> -    assert(!object_resolve_path(FW_CFG_PATH, NULL));
+> -
+> -    object_property_add_child(OBJECT(machine), FW_CFG_NAME, OBJECT(s), NULL);
+> -
+>      qdev_init_nofail(dev);
+>  
+>      fw_cfg_add_bytes(s, FW_CFG_SIGNATURE, (char *)"QEMU", 4);
+> @@ -1020,6 +1016,15 @@ FWCfgState *fw_cfg_find(void)
+>      return FW_CFG(object_resolve_path(FW_CFG_PATH, NULL));
 >  }
 >  
-> -static void register_compat_prop(const char *driver,
-> -                                 const char *property,
-> -                                 const char *value)
-> -{
-> -    GlobalProperty *p = g_new0(GlobalProperty, 1);
-> -    /* Machine compat_props must never cause errors: */
-> -    p->errp = &error_abort;
-> -    p->driver = driver;
-> -    p->property = property;
-> -    p->value = value;
-> -    qdev_prop_register_global(p);
-> -}
-> -
->  static void machine_register_compat_for_subclass(ObjectClass *oc, void *opaque)
->  {
->      GlobalProperty *p = opaque;
-> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-> index 9f1a497..4b74382 100644
-> --- a/hw/core/qdev-properties.c
-> +++ b/hw/core/qdev-properties.c
-> @@ -1042,6 +1042,28 @@ void qdev_prop_set_ptr(DeviceState *dev, const char *name, void *value)
->  
->  static GList *global_props;
->  
-> +GList *global_prop_list_add(GList *list, const char *driver,
-> +                            const char *property, const char *value)
+> +static void fw_cfg_init(Object *obj)
 > +{
-> +    GlobalProperty *p = g_new0(GlobalProperty, 1);
+> +    MachineState *machine = MACHINE(qdev_get_machine());
 > +
-> +    /* These properties cannot fail the apply */
-> +    p->errp = &error_abort;
-> +    p->driver = driver;
-> +    p->property = property;
-> +    p->value = value;
+> +    assert(!object_resolve_path(FW_CFG_PATH, NULL));
 > +
-> +    return g_list_append(list, p);
+> +    object_property_add_child(OBJECT(machine), FW_CFG_NAME, obj, NULL);
+
+I don't think this belongs to instance_init.  We must always be
+able to instantiate objects without crashing QEMU or affecting
+QEMU global state.  This patch makes device-list-properties
+crash:
+
+  $ qemu-system-x86_64 -display none -qmp unix:/tmp/qmp,server,nowait &
+  [1] 2848
+  $ echo 'device-list-properties typename=fw_cfg_mem' | ./scripts/qmp/qmp-shell /tmp/qmp
+  Welcome to the QMP low-level shell!
+  Connected to QEMU 2.9.50
+  
+  qemu-system-x86_64: qemu/hw/nvram/fw_cfg.c:974: fw_cfg_init: Assertion `!object_resolve_path(FW_CFG_PATH, NULL)' failed.
+  (QEMU) Disconnected
+  [1]+  Aborted                 (core dumped) qemu-system-x86_64 -display none -qmp unix:/tmp/qmp,server,nowait
+  $ 
+
+
+I suggest moving this check to realize, like the rest of
+fw_cfg_init1(), but change it to do proper error reporting
+instead of asserting.
+
 > +}
 > +
-> +void register_compat_prop(const char *driver,
-> +                          const char *property,
-> +                          const char *value)
-> +{
-> +    global_props = global_prop_list_add(global_props, driver,
-> +                                        property, value);
-> +}
-> +
->  void qdev_prop_register_global(GlobalProperty *prop)
+>  static void fw_cfg_class_init(ObjectClass *klass, void *data)
 >  {
->      global_props = g_list_append(global_props, prop);
-> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-> index d206fc9..15ee6ba 100644
-> --- a/include/hw/qdev-properties.h
-> +++ b/include/hw/qdev-properties.h
-> @@ -201,6 +201,11 @@ void qdev_prop_set_globals(DeviceState *dev);
->  void error_set_from_qdev_prop_error(Error **errp, int ret, DeviceState *dev,
->                                      Property *prop, const char *value);
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+> @@ -1033,6 +1038,7 @@ static const TypeInfo fw_cfg_info = {
+>      .parent        = TYPE_SYS_BUS_DEVICE,
+>      .abstract      = true,
+>      .instance_size = sizeof(FWCfgState),
+> +    .instance_init = fw_cfg_init,
+>      .class_init    = fw_cfg_class_init,
+>  };
 >  
-> +GList *global_prop_list_add(GList *list, const char *driver,
-> +                            const char *property, const char *value);
-> +void register_compat_prop(const char *driver, const char *property,
-> +                          const char *value);
-> +
->  /**
->   * qdev_property_add_static:
->   * @dev: Device to add the property to.
+> -- 
+> 1.7.10.4
 > 
+
+-- 
+Eduardo
