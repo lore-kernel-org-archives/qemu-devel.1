@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dMw9q-0003zn-Vt
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:51:56 -0400
+	(envelope-from <david@redhat.com>) id 1dMwAL-0004S7-Le
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:52:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dMw9n-0005kO-RH
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:51:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38180)
+	(envelope-from <david@redhat.com>) id 1dMwAI-00063t-Iw
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:52:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43326)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dMw9n-0005k1-Hi
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:51:51 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6FDC64E334
-	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 12:51:50 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Mon, 19 Jun 2017 20:49:48 +0800
-Message-Id: <1497876588-947-14-git-send-email-peterx@redhat.com>
-In-Reply-To: <1497876588-947-1-git-send-email-peterx@redhat.com>
-References: <1497876588-947-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 13/13] migration: move skip_section_footers
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dMwAI-00063F-9O
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:52:22 -0400
+References: <20170615203735.19649-1-rth@twiddle.net>
+	<7998cb6b-018e-8069-9d11-a3e1e4e70380@redhat.com>
+	<429793f7-a3c1-91ec-9a83-908ee779e703@redhat.com>
+	<9362010b-5c05-c29f-6e67-c182d2ae57ec@de.ibm.com>
+	<e348f832-9a78-fffd-b425-426b5e66f8e6@redhat.com>
+	<7b96196c-8bdf-c308-280c-97dda21062ed@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <304b2577-2d58-e61f-be67-6e55340c6ff4@redhat.com>
+Date: Mon, 19 Jun 2017 14:52:18 +0200
+MIME-Version: 1.0
+In-Reply-To: <7b96196c-8bdf-c308-280c-97dda21062ed@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target/s390x: Implement CSST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,159 +32,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, aurelien@aurel32.net
 
-Move it into MigrationState, revert its meaning and renaming it to
-send_section_footer, with a property bound to it. Same trick is played
-like previous patches.
+On 19.06.2017 14:47, Christian Borntraeger wrote:
+> On 06/19/2017 02:41 PM, David Hildenbrand wrote:
+>> On 19.06.2017 14:33, Christian Borntraeger wrote:
+>>> On 06/19/2017 02:05 PM, David Hildenbrand wrote:
+>>>> On 19.06.2017 12:03, David Hildenbrand wrote:
+>>>>> On 15.06.2017 22:37, Richard Henderson wrote:
+>>>>>> There are no uses in a Linux system with which to test,
+>>>>>> but it Looks Right by my reading of the PoO.
+>>>>>
+>>>>> I am using next.git/master with this patch applied:
+>>>>> https://git.kernel.org/pub/scm/linux/kernel/git/s390/linux.git/commit/?h=features&id=8aa8680aa383bf6e2ac
+>>>>>
+>>>>> I am using QEMU with the mvcos patch and your patch applied (and a patch
+>>>>> that allows enabling csst/csst2).
+>>>>>
+>>>>> I am using the following qemu command line:
+>>>>>
+>>>>> #!/bin/bash
+>>>>> /home/dhildenb/git/qemu/s390x-softmmu/qemu-system-s390x \
+>>>>> 	-nographic -nodefaults -machine s390-ccw-virtio,accel=tcg \
+>>>>> 	-cpu qemu,mvcos=on,stfle=on,ldisp=on,ldisphp=on,\
+>>>>>           eimm=on,stckf=on,csst=on,csst2=on,ginste=on,exrl=on\
+>>>>> 	-m 256M -smp 1 -chardev stdio,id=con0 \
+>>>>> 	-device sclpconsole,chardev=con0 \
+>>>>> 	-kernel vmlinux -initrd /home/dhildenb/initrd.debian
+>>>>>
+>>>>> Right now, I can start a z9 compiled kernel.
+>>>>>
+>>>>> When trying to start a z10 compiled kernel (which generates many csst),
+>>>
+>>>
+>>> I would be very surprised if the kernel would contain any csst. gcc does not
+>>> emit csst and the kernel source also does not contain it.
+>>>
+>>
+>> I only did a grep on the objdump output:
+>>
+>> t460s: ~/git/linux-s390 next $ /usr/bin/s390x-linux-gnu-objdump -D
+>> vmlinux | grep csst
+>>   912826:       c8 e2 f1 7c 56 02       csst    380(%r15),1538(%r5),%r14
+>>   954684:       c8 62 dc 35 2b 65       csst    3125(%r13),2917(%r2),%r6
+>>   95e6e4:       c8 a2 1c 76 0a 60       csst    3190(%r1),2656,%r10
+>>   95f68a:       c8 b2 c9 b3 3d 47       csst    2483(%r12),3399(%r3),%r11
+>>   96067a:       c8 42 d3 59 da 50       csst    857(%r13),2640(%r13),%r4
+>>   963642:       c8 72 73 c9 1a a0       csst    969(%r7),2720(%r1),%r7
+>>   9656de:       c8 12 d3 09 7a a0       csst    777(%r13),2720(%r7),%r1
+>>   9676a6:       c8 32 6d 97 84 7e       csst    3479(%r6),1150(%r8),%r3
+>>   9d470a:       c8 a2 70 11 74 02       csst    17(%r7),1026(%r7),%r10
+>>   9d6c4a:       c8 a2 de 0c 54 4a       csst    3596(%r13),1098(%r5),%r10
+>>   9e3af8:       c8 a2 de 09 54 73       csst    3593(%r13),1139(%r5),%r10
+>>   9e3b02:       c8 a2 de 0f 54 73       csst    3599(%r13),1139(%r5),%r10
+>>   9e7992:       c8 a2 de 0c 54 d4       csst    3596(%r13),1236(%r5),%r10
+>>   9e79ea:       c8 a2 40 f6 c3 0e       csst    246(%r4),782(%r12),%r10
+>>   9e7e3c:       c8 a2 40 6c d1 74       csst    108(%r4),372(%r13),%r10
+>>   9e8036:       c8 a2 de 0d 54 cd       csst    3597(%r13),1229(%r5),%r10
+>>   9e81ea:       c8 a2 40 63 2f b8       csst    99(%r4),4024(%r2),%r10
+>>   9e81fe:       c8 a2 de 0f 54 68       csst    3599(%r13),1128(%r5),%r10
+>>   9e8e10:       c8 72 93 83 69 bd       csst    899(%r9),2493(%r6),%r7
+>>   9e8ea4:       c8 72 c6 04 54 63       csst    1540(%r12),1123(%r5),%r7
+>>   9e8eae:       c8 72 c6 f1 98 77       csst    1777(%r12),2167(%r9),%r7
+>>   9e8ebc:       c8 72 93 ba f5 07       csst    954(%r9),1287(%r15),%r7
+>>   a0702e:       c8 a2 14 74 6e 5f       csst    1140(%r1),3679(%r6),%r10
+>>   a083ea:       c8 a2 73 08 74 da       csst    776(%r7),1242(%r7),%r10
+>>   a0ec06:       c8 a2 f8 f6 c3 08       csst    2294(%r15),776(%r12),%r10
+>>   a11890:       c8 a2 f8 fa 5f ac       csst    2298(%r15),4012(%r5),%r10
+>>   a11b6e:       c8 a2 73 0a 74 74       csst    778(%r7),1140(%r7),%r10
+>>   a11be0:       c8 a2 f8 fa 5f ac       csst    2298(%r15),4012(%r5),%r10
+>>   a11ef4:       c8 a2 73 0b b3 7c       csst    779(%r7),892(%r11),%r10
+>> [...]
+>>  14c9e5a:       c8 02 d0 2d 00 0d       csst    45(%r13),13,%r0
+>>
+>>
+>> That made me assume we have csst in the kernel :)
+> 
+> you used -D (which also disassembles data).  Do you still see any csst with -d ?
+> 
 
-Removing savevm_skip_section_footers().
+... probably I should have lunch now :)
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- hw/i386/pc_piix.c        |  1 -
- hw/ppc/spapr.c           |  1 -
- hw/xen/xen-common.c      |  2 +-
- include/hw/compat.h      |  4 ++++
- include/migration/misc.h |  1 -
- migration/migration.c    |  2 ++
- migration/migration.h    |  2 ++
- migration/savevm.c       | 11 ++---------
- 8 files changed, 11 insertions(+), 13 deletions(-)
+No csst, therefore the panic I am seeing is unrelated to this ...
+(I wonder why CSST is a required kernel facility if nobody uses it? hm)
 
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 537de7c..04e2b2e 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -322,7 +322,6 @@ static void x86_cpu_change_kvm_default(const char *prop,
- static void pc_compat_2_3(MachineState *machine)
- {
-     PCMachineState *pcms = PC_MACHINE(machine);
--    savevm_skip_section_footers();
-     if (kvm_enabled()) {
-         pcms->smm = ON_OFF_AUTO_OFF;
-     }
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 29fac1b..7c40fdf 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3579,7 +3579,6 @@ DEFINE_SPAPR_MACHINE(2_4, "2.4", false);
- static void spapr_machine_2_3_instance_options(MachineState *machine)
- {
-     spapr_machine_2_4_instance_options(machine);
--    savevm_skip_section_footers();
- }
- 
- static void spapr_machine_2_3_class_options(MachineClass *mc)
-diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
-index ac6a2b9..069458c 100644
---- a/hw/xen/xen-common.c
-+++ b/hw/xen/xen-common.c
-@@ -144,7 +144,7 @@ static int xen_init(MachineState *ms)
- 
-     accel_register_prop(accel, "migration", "store-global-state", "off");
-     accel_register_prop(accel, "migration", "send-configuration", "off");
--    savevm_skip_section_footers();
-+    accel_register_prop(accel, "migration", "send-section-footer", "off");
- 
-     return 0;
- }
-diff --git a/include/hw/compat.h b/include/hw/compat.h
-index 1a3fd94..08f3600 100644
---- a/include/hw/compat.h
-+++ b/include/hw/compat.h
-@@ -187,6 +187,10 @@
-         .value    = "off",\
-     },{\
-         .driver   = "migration",\
-+        .property = "send-section-footer",\
-+        .value    = "off",\
-+    },{\
-+        .driver   = "migration",\
-         .property = "store-global-state",\
-         .value    = "off",\
-     },
-diff --git a/include/migration/misc.h b/include/migration/misc.h
-index 35b41bc..114f032 100644
---- a/include/migration/misc.h
-+++ b/include/migration/misc.h
-@@ -41,7 +41,6 @@ int64_t self_announce_delay(int round)
- /* migration/savevm.c */
- 
- void dump_vmstate_json_to_file(FILE *out_fp);
--void savevm_skip_section_footers(void);
- 
- /* migration/migration.c */
- void qemu_start_incoming_migration(const char *uri, Error **errp);
-diff --git a/migration/migration.c b/migration/migration.c
-index f69fe28..c06c7ff 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1987,6 +1987,8 @@ static Property migration_properties[] = {
-     DEFINE_PROP_BOOL("only-migratable", MigrationState, only_migratable, false),
-     DEFINE_PROP_BOOL("send-configuration", MigrationState,
-                      send_configuration, true),
-+    DEFINE_PROP_BOOL("send-section-footer", MigrationState,
-+                     send_section_footer, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/migration/migration.h b/migration/migration.h
-index 4d4ea0d..994b017 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -145,6 +145,8 @@ struct MigrationState
- 
-     /* Whether we send QEMU_VM_CONFIGURATION during migration */
-     bool send_configuration;
-+    /* Whether we send section footer during migration */
-+    bool send_section_footer;
- };
- 
- void migrate_set_state(int *state, int old_state, int new_state);
-diff --git a/migration/savevm.c b/migration/savevm.c
-index f678a8a..df22f90 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -62,8 +62,6 @@
- 
- const unsigned int postcopy_ram_discard_version = 0;
- 
--static bool skip_section_footers;
--
- /* Subcommands for QEMU_VM_COMMAND */
- enum qemu_vm_cmd {
-     MIG_CMD_INVALID = 0,   /* Must be 0 */
-@@ -761,11 +759,6 @@ static void vmstate_save(QEMUFile *f, SaveStateEntry *se, QJSON *vmdesc)
-     vmstate_save_state(f, se->vmsd, se->opaque, vmdesc);
- }
- 
--void savevm_skip_section_footers(void)
--{
--    skip_section_footers = true;
--}
--
- /*
-  * Write the header for device section (QEMU_VM_SECTION START/END/PART/FULL)
-  */
-@@ -793,7 +786,7 @@ static void save_section_header(QEMUFile *f, SaveStateEntry *se,
-  */
- static void save_section_footer(QEMUFile *f, SaveStateEntry *se)
- {
--    if (!skip_section_footers) {
-+    if (migrate_get_current()->send_section_footer) {
-         qemu_put_byte(f, QEMU_VM_SECTION_FOOTER);
-         qemu_put_be32(f, se->section_id);
-     }
-@@ -1791,7 +1784,7 @@ static bool check_section_footer(QEMUFile *f, SaveStateEntry *se)
-     uint8_t read_mark;
-     uint32_t read_section_id;
- 
--    if (skip_section_footers) {
-+    if (!migrate_get_current()->send_section_footer) {
-         /* No footer to check */
-         return true;
-     }
+Thanks Christian!
+
 -- 
-2.7.4
+
+Thanks,
+
+David
