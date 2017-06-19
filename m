@@ -1,44 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dMwI1-0004H7-Hn
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 09:00:23 -0400
+	(envelope-from <pradeepkiruvale@gmail.com>) id 1dMwU2-00035w-Cj
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 09:12:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dMwHw-0002p5-6l
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 09:00:21 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32849)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dMwHv-0002nO-Ts
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 09:00:16 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v5JCwv44067407
-	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 09:00:14 -0400
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2b69tuh465-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 09:00:13 -0400
-Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 19 Jun 2017 07:00:12 -0600
-References: <20170615203735.19649-1-rth@twiddle.net>
-	<7998cb6b-018e-8069-9d11-a3e1e4e70380@redhat.com>
-	<429793f7-a3c1-91ec-9a83-908ee779e703@redhat.com>
-	<9362010b-5c05-c29f-6e67-c182d2ae57ec@de.ibm.com>
-	<e348f832-9a78-fffd-b425-426b5e66f8e6@redhat.com>
-	<7b96196c-8bdf-c308-280c-97dda21062ed@de.ibm.com>
-	<304b2577-2d58-e61f-be67-6e55340c6ff4@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 19 Jun 2017 15:00:06 +0200
-MIME-Version: 1.0
-In-Reply-To: <304b2577-2d58-e61f-be67-6e55340c6ff4@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-IE
-Content-Transfer-Encoding: 7bit
-Message-Id: <b37e334a-4710-a63d-fe98-0d64f00f60af@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] target/s390x: Implement CSST
+	(envelope-from <pradeepkiruvale@gmail.com>) id 1dMwTz-0001pa-7H
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 09:12:46 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:33384)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pradeepkiruvale@gmail.com>)
+	id 1dMwTz-0001p4-0e
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 09:12:43 -0400
+Received: by mail-wr0-x244.google.com with SMTP id x23so13443946wrb.0
+	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 06:12:42 -0700 (PDT)
+From: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
+Date: Mon, 19 Jun 2017 09:11:31 -0400
+Message-Id: <1497877896-35700-1-git-send-email-pradeep.jagadeesh@huawei.com>
+Subject: [Qemu-devel] [PATCH v5 0/5] fsdev: qmp interface for io throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,91 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com, aurelien@aurel32.net
+To: eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>
+Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-On 06/19/2017 02:52 PM, David Hildenbrand wrote:
-> On 19.06.2017 14:47, Christian Borntraeger wrote:
->> On 06/19/2017 02:41 PM, David Hildenbrand wrote:
->>> On 19.06.2017 14:33, Christian Borntraeger wrote:
->>>> On 06/19/2017 02:05 PM, David Hildenbrand wrote:
->>>>> On 19.06.2017 12:03, David Hildenbrand wrote:
->>>>>> On 15.06.2017 22:37, Richard Henderson wrote:
->>>>>>> There are no uses in a Linux system with which to test,
->>>>>>> but it Looks Right by my reading of the PoO.
->>>>>>
->>>>>> I am using next.git/master with this patch applied:
->>>>>> https://git.kernel.org/pub/scm/linux/kernel/git/s390/linux.git/commit/?h=features&id=8aa8680aa383bf6e2ac
->>>>>>
->>>>>> I am using QEMU with the mvcos patch and your patch applied (and a patch
->>>>>> that allows enabling csst/csst2).
->>>>>>
->>>>>> I am using the following qemu command line:
->>>>>>
->>>>>> #!/bin/bash
->>>>>> /home/dhildenb/git/qemu/s390x-softmmu/qemu-system-s390x \
->>>>>> 	-nographic -nodefaults -machine s390-ccw-virtio,accel=tcg \
->>>>>> 	-cpu qemu,mvcos=on,stfle=on,ldisp=on,ldisphp=on,\
->>>>>>           eimm=on,stckf=on,csst=on,csst2=on,ginste=on,exrl=on\
->>>>>> 	-m 256M -smp 1 -chardev stdio,id=con0 \
->>>>>> 	-device sclpconsole,chardev=con0 \
->>>>>> 	-kernel vmlinux -initrd /home/dhildenb/initrd.debian
->>>>>>
->>>>>> Right now, I can start a z9 compiled kernel.
->>>>>>
->>>>>> When trying to start a z10 compiled kernel (which generates many csst),
->>>>
->>>>
->>>> I would be very surprised if the kernel would contain any csst. gcc does not
->>>> emit csst and the kernel source also does not contain it.
->>>>
->>>
->>> I only did a grep on the objdump output:
->>>
->>> t460s: ~/git/linux-s390 next $ /usr/bin/s390x-linux-gnu-objdump -D
->>> vmlinux | grep csst
->>>   912826:       c8 e2 f1 7c 56 02       csst    380(%r15),1538(%r5),%r14
->>>   954684:       c8 62 dc 35 2b 65       csst    3125(%r13),2917(%r2),%r6
->>>   95e6e4:       c8 a2 1c 76 0a 60       csst    3190(%r1),2656,%r10
->>>   95f68a:       c8 b2 c9 b3 3d 47       csst    2483(%r12),3399(%r3),%r11
->>>   96067a:       c8 42 d3 59 da 50       csst    857(%r13),2640(%r13),%r4
->>>   963642:       c8 72 73 c9 1a a0       csst    969(%r7),2720(%r1),%r7
->>>   9656de:       c8 12 d3 09 7a a0       csst    777(%r13),2720(%r7),%r1
->>>   9676a6:       c8 32 6d 97 84 7e       csst    3479(%r6),1150(%r8),%r3
->>>   9d470a:       c8 a2 70 11 74 02       csst    17(%r7),1026(%r7),%r10
->>>   9d6c4a:       c8 a2 de 0c 54 4a       csst    3596(%r13),1098(%r5),%r10
->>>   9e3af8:       c8 a2 de 09 54 73       csst    3593(%r13),1139(%r5),%r10
->>>   9e3b02:       c8 a2 de 0f 54 73       csst    3599(%r13),1139(%r5),%r10
->>>   9e7992:       c8 a2 de 0c 54 d4       csst    3596(%r13),1236(%r5),%r10
->>>   9e79ea:       c8 a2 40 f6 c3 0e       csst    246(%r4),782(%r12),%r10
->>>   9e7e3c:       c8 a2 40 6c d1 74       csst    108(%r4),372(%r13),%r10
->>>   9e8036:       c8 a2 de 0d 54 cd       csst    3597(%r13),1229(%r5),%r10
->>>   9e81ea:       c8 a2 40 63 2f b8       csst    99(%r4),4024(%r2),%r10
->>>   9e81fe:       c8 a2 de 0f 54 68       csst    3599(%r13),1128(%r5),%r10
->>>   9e8e10:       c8 72 93 83 69 bd       csst    899(%r9),2493(%r6),%r7
->>>   9e8ea4:       c8 72 c6 04 54 63       csst    1540(%r12),1123(%r5),%r7
->>>   9e8eae:       c8 72 c6 f1 98 77       csst    1777(%r12),2167(%r9),%r7
->>>   9e8ebc:       c8 72 93 ba f5 07       csst    954(%r9),1287(%r15),%r7
->>>   a0702e:       c8 a2 14 74 6e 5f       csst    1140(%r1),3679(%r6),%r10
->>>   a083ea:       c8 a2 73 08 74 da       csst    776(%r7),1242(%r7),%r10
->>>   a0ec06:       c8 a2 f8 f6 c3 08       csst    2294(%r15),776(%r12),%r10
->>>   a11890:       c8 a2 f8 fa 5f ac       csst    2298(%r15),4012(%r5),%r10
->>>   a11b6e:       c8 a2 73 0a 74 74       csst    778(%r7),1140(%r7),%r10
->>>   a11be0:       c8 a2 f8 fa 5f ac       csst    2298(%r15),4012(%r5),%r10
->>>   a11ef4:       c8 a2 73 0b b3 7c       csst    779(%r7),892(%r11),%r10
->>> [...]
->>>  14c9e5a:       c8 02 d0 2d 00 0d       csst    45(%r13),13,%r0
->>>
->>>
->>> That made me assume we have csst in the kernel :)
->>
->> you used -D (which also disassembles data).  Do you still see any csst with -d ?
->>
-> 
-> ... probably I should have lunch now :)
-> 
-> No csst, therefore the panic I am seeing is unrelated to this ...
-> (I wonder why CSST is a required kernel facility if nobody uses it? hm)
+These patches provide the qmp interface, to query the io throttle 
+status of the all fsdev devices that are present in a vm.
+also, it provides an interface to set the io throttle parameters of a
+fsdev to a required value. some of the patches also remove the duplicate
+code that was present in block and fsdev files. 
 
-I guess because in theory gcc could use that instruction for -march=z9-ec.
-It does not seem to be hypervisor-managed and should be available on all z9 guests.
+Pradeep Jagadeesh (5):
+  throttle: factor out duplicate code
+  qmp: Create IOThrottle structure
+  qmp: refactor duplicate code
+  fsdev: hmp interface for throttling
+  fsdev: QMP interface for throttling
+
+ Makefile                        |   3 +
+ blockdev.c                      |  97 ++-------------------------------
+ fsdev/qemu-fsdev-dummy.c        |  10 ++++
+ fsdev/qemu-fsdev-throttle.c     | 118 ++++++++++++++++++++++++++--------------
+ fsdev/qemu-fsdev-throttle.h     |  13 +++++
+ fsdev/qemu-fsdev.c              |  37 +++++++++++++
+ hmp-commands-info.hx            |  18 ++++++
+ hmp-commands.hx                 |  19 +++++++
+ hmp.c                           |  87 +++++++++++++++++++++++++++--
+ hmp.h                           |   4 ++
+ include/qemu/throttle-options.h |   7 +++
+ monitor.c                       |   5 ++
+ qapi-schema.json                |   3 +
+ qapi/block-core.json            |  76 +-------------------------
+ qapi/fsdev.json                 |  84 ++++++++++++++++++++++++++++
+ qapi/iothrottle.json            |  88 ++++++++++++++++++++++++++++++
+ qmp.c                           |  15 +++++
+ util/throttle.c                 | 110 +++++++++++++++++++++++++++++++++++++
+ 18 files changed, 580 insertions(+), 214 deletions(-)
+ create mode 100644 qapi/fsdev.json
+ create mode 100644 qapi/iothrottle.json
+
+v0 -> v1:
+ Addressed comments from Eric Blake, Greg Kurz and Daniel P.Berrange
+ Mainly renaming the functions and removing the redundant code.
+
+v1 -> v2:
+ Addressed comments from Eric Blake and Greg Kurz.
+ As per the suggestion I split the patches into smaller patches.
+ Removed some more duplicate code.
+
+v2 -> v3:
+ Addresssed comments from Alberto Garcia.
+ Changed the comment from block to iothrottle in the iothrottle.json 
+ Added the dummy functions in qemu-fsdev-dummy.c to address the compilation
+ issues that were observed.
+
+v3 -> v4:
+ Addressed comments from Eric Blake and Greg Kurz
+ Re-ordered the patches
+ Added the dummy functions in qmp.c to address the cross compilation issues
+
+v4 -> v5:
+ Addressed comments from Eric Blake and Greg Kurz
+ Split the fsdev qmp patch into hmp and qmp related patches
+ Moved the common functionalities to throttle.c instead of creating a new file
+
+-- 
+1.8.3.1
