@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dMuCR-0007Ki-AH
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:46:28 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dMuCT-0007Lo-ED
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:46:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dMuCQ-0004rw-65
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:46:27 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:35280)
+	(envelope-from <alex.bennee@linaro.org>) id 1dMuCS-0004tY-6L
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:46:29 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:34411)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dMuCP-0004r2-W4
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:46:26 -0400
-Received: by mail-wr0-x234.google.com with SMTP id y25so30273710wrd.2
-	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 03:46:25 -0700 (PDT)
+	id 1dMuCR-0004su-TK
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 06:46:28 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id 77so69495261wrb.1
+	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 03:46:27 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 19 Jun 2017 11:46:47 +0100
-Message-Id: <20170619104655.31104-6-alex.bennee@linaro.org>
+Date: Mon, 19 Jun 2017 11:46:49 +0100
+Message-Id: <20170619104655.31104-8-alex.bennee@linaro.org>
 In-Reply-To: <20170619104655.31104-1-alex.bennee@linaro.org>
 References: <20170619104655.31104-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RISU PATCH v5 05/13] build-all-archs: support cross
- building via docker
+Subject: [Qemu-devel] [RISU PATCH v5 07/13] risu: paramterise send/receive
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,125 +33,202 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-If we want to link to any other libraries we might find using simple
-cross toolchains doesn't work so well. One way around this is to use a
-dockerised cross-toolchain which then won't clash with your host
-system. If the user specifies --use-docker the obvious will be done.
-
-By default we use the QEMU projects qemu:debian-FOO-cross images as
-RISU hackers are likely to be QEMU developers too. However any docker
-tag can be passed on the command line.
-
-If none of the docker images have usable compilers we fall back to
-checking the host path.
+This is a precursor to record/playback support. Instead of passing the
+socket fd we now pass helper functions for reading/writing and
+responding. This will allow us to do the rest of the record/playback
+cleanly outside of the main worker function.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
 ---
 v5
-  - swapped with --static patch so this can be dropped if desired
+  - re-base without tab/format cleanps
+v4
+  - split header code
+  - fix formatting foo-bar's
+v3
+  - new for v3
+  - arm, aarch64, ppc64
 ---
- build-all-archs | 46 +++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 39 insertions(+), 7 deletions(-)
+ reginfo.c | 39 +++++++++++++++++++--------------------
+ risu.c    | 23 +++++++++++++++++++++--
+ risu.h    | 11 +++++++++--
+ 3 files changed, 49 insertions(+), 24 deletions(-)
 
-diff --git a/build-all-archs b/build-all-archs
-index 581a1b4..63918e5 100755
---- a/build-all-archs
-+++ b/build-all-archs
-@@ -11,9 +11,6 @@
- # Contributors:
- #     Peter Maydell (Linaro) - initial implementation
+diff --git a/reginfo.c b/reginfo.c
+index 31bb99f..90cea8f 100644
+--- a/reginfo.c
++++ b/reginfo.c
+@@ -21,7 +21,7 @@ uint8_t apprentice_memblock[MEMBLOCKLEN];
+ static int mem_used;
+ static int packet_mismatch;
  
--# So we notice risugen failing even though it's in a pipeline
--set -o pipefail
+-int send_register_info(int sock, void *uc)
++int send_register_info(write_fn write_fn, void *uc)
+ {
+     struct reginfo ri;
+     int op;
+@@ -29,24 +29,25 @@ int send_register_info(int sock, void *uc)
+     op = get_risuop(&ri);
+ 
+     switch (op) {
+-    case OP_COMPARE:
+     case OP_TESTEND:
+-    default:
+-        /* Do a simple register compare on (a) explicit request
+-         * (b) end of test (c) a non-risuop UNDEF
+-         */
+-        return send_data_pkt(sock, &ri, sizeof(ri));
++        write_fn(&ri, sizeof(ri));
++        return 1;
+     case OP_SETMEMBLOCK:
+-        memblock = (void *) (uintptr_t) get_reginfo_paramreg(&ri);
++        memblock = (void *)(uintptr_t)get_reginfo_paramreg(&ri);
+         break;
+     case OP_GETMEMBLOCK:
+         set_ucontext_paramreg(uc,
+-                              get_reginfo_paramreg(&ri) +
+-                              (uintptr_t) memblock);
++                              get_reginfo_paramreg(&ri) + (uintptr_t)memblock);
+         break;
+     case OP_COMPAREMEM:
+-        return send_data_pkt(sock, memblock, MEMBLOCKLEN);
++        return write_fn(memblock, MEMBLOCKLEN);
+         break;
++    case OP_COMPARE:
++    default:
++        /* Do a simple register compare on (a) explicit request
++         * (b) end of test (c) a non-risuop UNDEF
++         */
++        return write_fn(&ri, sizeof(ri));
+     }
+     return 0;
+ }
+@@ -59,7 +60,7 @@ int send_register_info(int sock, void *uc)
+  * that says whether it is register or memory data, so if the two
+  * sides get out of sync then we will fail obscurely.
+  */
+-int recv_and_compare_register_info(int sock, void *uc)
++int recv_and_compare_register_info(read_fn read_fn, respond_fn resp_fn, void *uc)
+ {
+     int resp = 0, op;
+ 
+@@ -73,36 +74,34 @@ int recv_and_compare_register_info(int sock, void *uc)
+         /* Do a simple register compare on (a) explicit request
+          * (b) end of test (c) a non-risuop UNDEF
+          */
+-        if (recv_data_pkt(sock, &apprentice_ri, sizeof(apprentice_ri))) {
++        if (read_fn(&apprentice_ri, sizeof(apprentice_ri))) {
+             packet_mismatch = 1;
+             resp = 2;
 -
- # Simple usage
- usage() {
-     cat <<-EOF
-@@ -21,7 +18,10 @@ usage() {
+         } else if (!reginfo_is_eq(&master_ri, &apprentice_ri)) {
+             /* register mismatch */
+             resp = 2;
+-
+         } else if (op == OP_TESTEND) {
+             resp = 1;
+         }
+-        send_response_byte(sock, resp);
++        resp_fn(resp);
+         break;
+     case OP_SETMEMBLOCK:
+-        memblock = (void *) (uintptr_t) get_reginfo_paramreg(&master_ri);
++        memblock = (void *)(uintptr_t)get_reginfo_paramreg(&master_ri);
+         break;
+     case OP_GETMEMBLOCK:
+         set_ucontext_paramreg(uc, get_reginfo_paramreg(&master_ri) +
+-                              (uintptr_t) memblock);
++                              (uintptr_t)memblock);
+         break;
+     case OP_COMPAREMEM:
+         mem_used = 1;
+-        if (recv_data_pkt(sock, apprentice_memblock, MEMBLOCKLEN)) {
++        if (read_fn(apprentice_memblock, MEMBLOCKLEN)) {
+             packet_mismatch = 1;
+             resp = 2;
+         } else if (memcmp(memblock, apprentice_memblock, MEMBLOCKLEN) != 0) {
+             /* memory mismatch */
+             resp = 2;
+         }
+-        send_response_byte(sock, resp);
++        resp_fn(resp);
+         break;
+     }
  
-         Options include:
-             --static               build a static binary
-+            --use-docker[=tags]    use docker cross compile
+diff --git a/risu.c b/risu.c
+index a10422a..88e586c 100644
+--- a/risu.c
++++ b/risu.c
+@@ -37,9 +37,28 @@ sigjmp_buf jmpbuf;
+ /* Should we test for FP exception status bits? */
+ int test_fp_exc;
  
-+        If specifying docker the default will be to use the any
-+        qemu:debian-FOO-cross targets available on your system.
- EOF
-     exit 1
- }
-@@ -37,6 +37,14 @@ while [[ "$1" = -* ]]; do
-         --static)
-             CONF="--static"
-             ;;
-+        --use-docker)
-+            if [ -z "$arg" ]; then
-+                default_tags=$(docker images qemu --format "{{.Repository}}:{{.Tag}}" | grep "\(arm\|power\).*cross$")
-+                docker_tags=$(echo $default_tags | sed 's/\n/\s/g' )
-+            else
-+                docker_tags="$arg"
-+            fi
-+            ;;
-         --help)
-             usage
-             ;;
-@@ -48,10 +56,24 @@ done
- 
- # Debian stretch and Ubuntu Xenial have cross compiler packages for
- # all of these:
--# gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu gcc-m68k-linux-gnu
--# gcc-powerpc64le-linux-gnu gcc-powerpc64-linux-gnu
-+#   gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu gcc-m68k-linux-gnu
-+#   gcc-powerpc64le-linux-gnu gcc-powerpc64-linux-gnu
-+# If docker is enabled we just brute force the various images until we
-+# can set the one that has a workable cross compiler.
++/* Master functions */
 +
-+DOCKER_RUN="docker run --rm -t -u $(id -u) -v $(pwd):$(pwd) -w $(pwd)"
- 
- program_exists() {
-+    if [ ! -z "$docker_tags" ]; then
-+        use_docker_tag=""
-+        for tag in $docker_tags; do
-+            if ${DOCKER_RUN} ${tag} /bin/bash -c "command -v $1 >/dev/null"; then
-+                use_docker_tag=$tag
-+                return
-+            fi
-+        done
-+    fi
++int read_sock(void *ptr, size_t bytes)
++{
++    return recv_data_pkt(master_socket, ptr, bytes);
++}
 +
-     command -v "$1" >/dev/null 2>&1
- }
++void respond_sock(int r)
++{
++    send_response_byte(master_socket, r);
++}
++
++/* Apprentice function */
++
++int write_sock(void *ptr, size_t bytes)
++{
++    return send_data_pkt(apprentice_socket, ptr, bytes);
++}
++
+ void master_sigill(int sig, siginfo_t *si, void *uc)
+ {
+-    switch (recv_and_compare_register_info(master_socket, uc)) {
++    switch (recv_and_compare_register_info(read_sock, respond_sock, uc)) {
+     case 0:
+         /* match OK */
+         advance_pc(uc);
+@@ -52,7 +71,7 @@ void master_sigill(int sig, siginfo_t *si, void *uc)
  
-@@ -62,19 +84,29 @@ for triplet in aarch64-linux-gnu arm-linux-gnueabihf m68k-linux-gnu \
-     if ! program_exists "${triplet}-gcc"; then
-         echo "Skipping ${triplet}: no compiler found"
-         continue
-+    else
-+        echo "Building ${triplet} on ${use_docker_tag:-host}..."
-     fi
+ void apprentice_sigill(int sig, siginfo_t *si, void *uc)
+ {
+-    switch (send_register_info(apprentice_socket, uc)) {
++    switch (send_register_info(write_sock, uc)) {
+     case 0:
+         /* match OK */
+         advance_pc(uc);
+diff --git a/risu.h b/risu.h
+index 78a7313..32241bc 100644
+--- a/risu.h
++++ b/risu.h
+@@ -53,17 +53,24 @@ struct reginfo;
  
-     # Do a complete rebuild from scratch, because it's cheap enough.
-     rm -rf build/${triplet}
-     mkdir -p build/${triplet}
+ /* Functions operating on reginfo */
  
--    (cd build/${triplet} && CROSS_PREFIX="${triplet}-"  ../../configure ${CONF})
--    make -C build/${triplet} EXTRA_CFLAGS=-Werror
-+    CONFIGURE="cd build/${triplet} && CROSS_PREFIX="${triplet}-"  ../../configure ${CONF}"
-+    MAKE="make -C build/${triplet} EXTRA_CFLAGS=-Werror"
++/* To keep the read/write logic from multiplying across all arches
++ * we wrap up the function here to keep all the changes in one place
++ */
++typedef int (*write_fn) (void *ptr, size_t bytes);
++typedef int (*read_fn) (void *ptr, size_t bytes);
++typedef void (*respond_fn) (int response);
++
+ /* Send the register information from the struct ucontext down the socket.
+  * Return the response code from the master.
+  * NB: called from a signal handler.
+  */
+-int send_register_info(int sock, void *uc);
++int send_register_info(write_fn write_fn, void *uc);
  
-+    if [ -z "$use_docker_tag" ]; then
-+        /bin/bash -c "${CONFIGURE}"
-+        ${MAKE}
-+    else
-+        ${DOCKER_RUN} $use_docker_tag /bin/bash -c "${CONFIGURE}"
-+        ${DOCKER_RUN} $use_docker_tag /bin/bash -c "${MAKE}"
-+    fi
- done
+ /* Read register info from the socket and compare it with that from the
+  * ucontext. Return 0 for match, 1 for end-of-test, 2 for mismatch.
+  * NB: called from a signal handler.
+  */
+-int recv_and_compare_register_info(int sock, void *uc);
++int recv_and_compare_register_info(read_fn read_fn, respond_fn respond, void *uc);
  
- # Now run risugen for all architectures
- mkdir -p build/risuout
-+set -o pipefail # detect failures in pipeline
- 
- for f in *.risu; do
-     echo "Running risugen on $f..."
+ /* Print a useful report on the status of the last comparison
+  * done in recv_and_compare_register_info(). This is called on
 -- 
 2.13.0
