@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59891)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dN4Kh-0002Su-EV
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 17:35:43 -0400
+	(envelope-from <laurent@vivier.eu>) id 1dN4Rs-00062h-Us
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 17:43:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dN4Kb-0002wV-An
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 17:35:39 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:34405)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dN4Kb-0002wD-5e
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 17:35:33 -0400
-Received: by mail-qt0-x242.google.com with SMTP id o21so21031907qtb.1
-	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 14:35:33 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170610223135.1731-1-f4bug@amsat.org> <87vanzitxx.fsf@linaro.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <a8a14467-768e-ca8d-648a-4fb025579619@twiddle.net>
-Date: Mon, 19 Jun 2017 14:35:29 -0700
+	(envelope-from <laurent@vivier.eu>) id 1dN4Rn-0006aR-UY
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 17:43:04 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:50383)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dN4Rn-0006Yj-K0
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 17:42:59 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+References: <20170611231633.32582-1-laurent@vivier.eu>
+	<20170611231633.32582-6-laurent@vivier.eu>
+	<a229ea36-7ae8-daee-f446-8670fc3f6e53@twiddle.net>
+	<47a2835f-5480-4d85-d55a-36e55a2b4f47@vivier.eu>
+Message-ID: <f7e5acc9-a23d-fbd1-c2e5-3c2235f40c19@vivier.eu>
+Date: Mon, 19 Jun 2017 23:42:07 +0200
 MIME-Version: 1.0
-In-Reply-To: <87vanzitxx.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <47a2835f-5480-4d85-d55a-36e55a2b4f47@vivier.eu>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] tcg/tci: enable bswap16_i64
+Subject: Re: [Qemu-devel] [PATCH v4 5/7] target-m68k: use floatx80 internally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +30,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: "Emilio G . Cota" <cota@braap.org>, qemu-devel@nongnu.org
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>
 
-On 06/13/2017 12:11 PM, Alex Bennée wrote:
+Le 19/06/2017 à 23:03, Laurent Vivier a écrit :
+> Le 19/06/2017 à 22:53, Richard Henderson a écrit :
+>>
+>> It would also make me happier if we were to adjust the definition of
+>> fl0atx80 to more closely match m68k and those missing zeros.  Shouldn't
+>> real hardware move instructions propagate those middle 2 bytes
+>> regardless of contents?
+>>
+>> Perhaps something like
+>>
+>> #ifdef TARGET_M68K
+>>   typedef struct {
+>>     uint64_t low;
+>>     union {
+>>       uin32_t high32;
+>>       struct {
+>> #ifdef HOST_WORDS_BIGENDIAN
+>>         uint16_t high, zero;
+>> #else
+>>         uint16_t zero, high;
+>> #endif
+>>       };
+>>     };
+>>   } floatx80;
+>> #else
+>>   ...
+>> #endif
+>>
+>> (with a minor fix to make_floatx80 to use named initializers).
+>>
+>> Then you can use full 32-bit store insns when copying data here.  Which
+>> also allows you to drop some of the shifts you're needing to add.
 > 
-> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
-> 
->> remove some copy/paste leftover, code seems sane.
->>
->> while running Alex Bennée's image aarch64-linux-3.15rc2-buildroot.img:
->>
->> Trace 0x7fa1904b0890 [0: ffffffc00036cd04]
->> ----------------
->> IN:
->> 0xffffffc00036cd24:  5ac00694      rev16 w20, w20
->>
->> OP:
->>   ---- ffffffc00036cd24 0000000000000000 0000000000000000
->>   ext32u_i64 tmp3,x20
->>   ext16u_i64 tmp2,tmp3
->>   bswap16_i64 x20,tmp2
->>   movi_i64 tmp4,$0x10
->>   shr_i64 tmp2,tmp3,tmp4
->>   ext16u_i64 tmp2,tmp2
->>   bswap16_i64 tmp2,tmp2
->>   deposit_i64 x20,x20,tmp2,$0x10,$0x10
->>
->> Linking TBs 0x7fa1904b0890 [ffffffc00036cd04] index 0 -> 0x7fa1904b0aa0 [ffffffc00036cd24]
->> Trace 0x7fa1904b0aa0 [0: ffffffc00036cd24]
->> TODO qemu/tci.c:1049: tcg_qemu_tb_exec()
->> qemu/tci.c:1049: tcg fatal error
->> Aborted
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> 
-> Possibly the only person who has run tci recently ;-)
+> OK, I will.
 
-Is it time to remove it?  I'm pretty sure the only hosts for which it will work 
-have proper backends...
+The softfloat is in the target independent code, so we can't adjust the
+size of floatx80 by target, TARGET_XXXX are poisoned when used in
+softfloat.h.
 
-
-r~
+Laurent
