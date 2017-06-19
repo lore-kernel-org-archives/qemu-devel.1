@@ -1,42 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dMw5w-0001az-Ow
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:47:54 -0400
+	(envelope-from <peterx@redhat.com>) id 1dMw86-0002hQ-Cg
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:50:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dMw5r-0002U9-JK
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:47:52 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48589)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dMw5r-0002Tl-9Q
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:47:47 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v5JCjjQV142563
-	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 08:47:45 -0400
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2b6ev9r7qu-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 08:47:45 -0400
-Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 19 Jun 2017 06:47:44 -0600
-References: <20170615203735.19649-1-rth@twiddle.net>
-	<7998cb6b-018e-8069-9d11-a3e1e4e70380@redhat.com>
-	<429793f7-a3c1-91ec-9a83-908ee779e703@redhat.com>
-	<9362010b-5c05-c29f-6e67-c182d2ae57ec@de.ibm.com>
-	<e348f832-9a78-fffd-b425-426b5e66f8e6@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 19 Jun 2017 14:47:38 +0200
-MIME-Version: 1.0
-In-Reply-To: <e348f832-9a78-fffd-b425-426b5e66f8e6@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-IE
-Content-Transfer-Encoding: 7bit
-Message-Id: <7b96196c-8bdf-c308-280c-97dda21062ed@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] target/s390x: Implement CSST
+	(envelope-from <peterx@redhat.com>) id 1dMw83-000494-8E
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:50:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37898)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dMw82-00048i-VM
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:50:03 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D075661D3B
+	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 12:50:01 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Mon, 19 Jun 2017 20:49:35 +0800
+Message-Id: <1497876588-947-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 00/13] migration: objectify MigrationState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,80 +27,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com, aurelien@aurel32.net
+To: qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-On 06/19/2017 02:41 PM, David Hildenbrand wrote:
-> On 19.06.2017 14:33, Christian Borntraeger wrote:
->> On 06/19/2017 02:05 PM, David Hildenbrand wrote:
->>> On 19.06.2017 12:03, David Hildenbrand wrote:
->>>> On 15.06.2017 22:37, Richard Henderson wrote:
->>>>> There are no uses in a Linux system with which to test,
->>>>> but it Looks Right by my reading of the PoO.
->>>>
->>>> I am using next.git/master with this patch applied:
->>>> https://git.kernel.org/pub/scm/linux/kernel/git/s390/linux.git/commit/?h=features&id=8aa8680aa383bf6e2ac
->>>>
->>>> I am using QEMU with the mvcos patch and your patch applied (and a patch
->>>> that allows enabling csst/csst2).
->>>>
->>>> I am using the following qemu command line:
->>>>
->>>> #!/bin/bash
->>>> /home/dhildenb/git/qemu/s390x-softmmu/qemu-system-s390x \
->>>> 	-nographic -nodefaults -machine s390-ccw-virtio,accel=tcg \
->>>> 	-cpu qemu,mvcos=on,stfle=on,ldisp=on,ldisphp=on,\
->>>>           eimm=on,stckf=on,csst=on,csst2=on,ginste=on,exrl=on\
->>>> 	-m 256M -smp 1 -chardev stdio,id=con0 \
->>>> 	-device sclpconsole,chardev=con0 \
->>>> 	-kernel vmlinux -initrd /home/dhildenb/initrd.debian
->>>>
->>>> Right now, I can start a z9 compiled kernel.
->>>>
->>>> When trying to start a z10 compiled kernel (which generates many csst),
->>
->>
->> I would be very surprised if the kernel would contain any csst. gcc does not
->> emit csst and the kernel source also does not contain it.
->>
-> 
-> I only did a grep on the objdump output:
-> 
-> t460s: ~/git/linux-s390 next $ /usr/bin/s390x-linux-gnu-objdump -D
-> vmlinux | grep csst
->   912826:       c8 e2 f1 7c 56 02       csst    380(%r15),1538(%r5),%r14
->   954684:       c8 62 dc 35 2b 65       csst    3125(%r13),2917(%r2),%r6
->   95e6e4:       c8 a2 1c 76 0a 60       csst    3190(%r1),2656,%r10
->   95f68a:       c8 b2 c9 b3 3d 47       csst    2483(%r12),3399(%r3),%r11
->   96067a:       c8 42 d3 59 da 50       csst    857(%r13),2640(%r13),%r4
->   963642:       c8 72 73 c9 1a a0       csst    969(%r7),2720(%r1),%r7
->   9656de:       c8 12 d3 09 7a a0       csst    777(%r13),2720(%r7),%r1
->   9676a6:       c8 32 6d 97 84 7e       csst    3479(%r6),1150(%r8),%r3
->   9d470a:       c8 a2 70 11 74 02       csst    17(%r7),1026(%r7),%r10
->   9d6c4a:       c8 a2 de 0c 54 4a       csst    3596(%r13),1098(%r5),%r10
->   9e3af8:       c8 a2 de 09 54 73       csst    3593(%r13),1139(%r5),%r10
->   9e3b02:       c8 a2 de 0f 54 73       csst    3599(%r13),1139(%r5),%r10
->   9e7992:       c8 a2 de 0c 54 d4       csst    3596(%r13),1236(%r5),%r10
->   9e79ea:       c8 a2 40 f6 c3 0e       csst    246(%r4),782(%r12),%r10
->   9e7e3c:       c8 a2 40 6c d1 74       csst    108(%r4),372(%r13),%r10
->   9e8036:       c8 a2 de 0d 54 cd       csst    3597(%r13),1229(%r5),%r10
->   9e81ea:       c8 a2 40 63 2f b8       csst    99(%r4),4024(%r2),%r10
->   9e81fe:       c8 a2 de 0f 54 68       csst    3599(%r13),1128(%r5),%r10
->   9e8e10:       c8 72 93 83 69 bd       csst    899(%r9),2493(%r6),%r7
->   9e8ea4:       c8 72 c6 04 54 63       csst    1540(%r12),1123(%r5),%r7
->   9e8eae:       c8 72 c6 f1 98 77       csst    1777(%r12),2167(%r9),%r7
->   9e8ebc:       c8 72 93 ba f5 07       csst    954(%r9),1287(%r15),%r7
->   a0702e:       c8 a2 14 74 6e 5f       csst    1140(%r1),3679(%r6),%r10
->   a083ea:       c8 a2 73 08 74 da       csst    776(%r7),1242(%r7),%r10
->   a0ec06:       c8 a2 f8 f6 c3 08       csst    2294(%r15),776(%r12),%r10
->   a11890:       c8 a2 f8 fa 5f ac       csst    2298(%r15),4012(%r5),%r10
->   a11b6e:       c8 a2 73 0a 74 74       csst    778(%r7),1140(%r7),%r10
->   a11be0:       c8 a2 f8 fa 5f ac       csst    2298(%r15),4012(%r5),%r10
->   a11ef4:       c8 a2 73 0b b3 7c       csst    779(%r7),892(%r11),%r10
-> [...]
->  14c9e5a:       c8 02 d0 2d 00 0d       csst    45(%r13),13,%r0
-> 
-> 
-> That made me assume we have csst in the kernel :)
+v3 contains too much new things. So here comes a new cover letter with
+richer information.
 
-you used -D (which also disassembles data).  Do you still see any csst with -d ?
+The main goal of this series is to let MigrationState be a QDev.
+
+It helps in many use cases.
+
+First of all, we can remove many legacy tricky functions. To name
+some: savevm_skip_section_footers(), savevm_skip_configuration(), etc.
+They didn't do much thing but setup a bool value. If MigrationState
+can be a QDev, then these things can be setup by the HW_COMPAT_* magic
+with some lines like:
+
+{
+    .driver   = "migration",
+    .property = "send-configuration",
+    .value    = "off",
+}
+
+Next, if this can be merged and okay, we can move on to convert more
+things into properties for migration. A very attractive use case of it
+is, we will be able to do this for migration:
+
+  -global migration.postcopy=on
+
+Then we don't need to use either HMP/QMP interface to enable it. It
+greatly simplifies the migration test scripts.
+
+Why QDev not QObject? The answer is simple: all the magic that we want
+for migration is bound to QDev (HW_COMPAT, "-global"). If one day we
+want to move these features from QDev to QObject, that'll be fine and
+easy for MigrationState. But before that, let's have MigrationState a
+QDev. :-)
+
+Here's what individual patch does:
+
+patch 1-8: introduce AccelState.global_props list.
+
+      This is an idea suggested by Eduardo in general, it is just more
+      complicated than I thought. Here each patch has rich commit
+      message to read (especially patch 6). Things to mention:
+      - patch 5 fixes a test break
+      - patch 8 added a trace so that I can verify all the x86 cpu
+        properties are applied correctly on tcg/x86/pc-i440fx-*.
+
+patch 9-13: the original patches for the objectify of MigrationState.
+
+Please kindly review. Thanks.
+
+Peter Xu (13):
+  machine: export register_compat_prop()
+  qdev: enhance global_prop_list_add()
+  qdev: remove qdev_prop_register_global()
+  accel: introduce AccelState.global_props
+  tests: avoid check GlobalProperty.used
+  kvm: let kvm use AccelState.global_props
+  tcg: use AccelState.global_props
+  trace: add qdev_global_prop_apply
+  migration: let MigrationState be a qdev
+  migration: move global_state.optional out
+  migration: move only_migratable to MigrationState
+  migration: move skip_configuration out
+  migration: move skip_section_footers
+
+ Makefile.objs                    |  1 +
+ accel.c                          | 50 +++++++++++++++++++++++
+ hw/core/machine.c                | 20 +++------
+ hw/core/qdev-properties.c        | 56 +++++++++++++++++++++++--
+ hw/core/trace-events             |  2 +
+ hw/i386/pc_piix.c                | 11 +++--
+ hw/ppc/spapr.c                   |  3 --
+ hw/xen/xen-common.c              |  9 ++--
+ include/hw/compat.h              | 12 ++++++
+ include/hw/qdev-properties.h     | 17 +++++++-
+ include/migration/global_state.h |  1 -
+ include/migration/misc.h         |  4 +-
+ include/sysemu/accel.h           | 20 +++++++++
+ include/sysemu/sysemu.h          |  1 -
+ kvm-all.c                        | 30 ++++++++++++++
+ migration/global_state.c         |  9 +---
+ migration/migration.c            | 88 ++++++++++++++++++++++++++++++----------
+ migration/migration.h            | 33 +++++++++++++++
+ migration/savevm.c               | 28 ++++---------
+ qom/cpu.c                        |  8 +---
+ target/i386/cpu.c                | 77 +----------------------------------
+ target/i386/cpu.h                | 11 -----
+ tests/test-qdev-global-props.c   | 12 ------
+ vl.c                             | 54 ++++++++++--------------
+ 24 files changed, 339 insertions(+), 218 deletions(-)
+ create mode 100644 hw/core/trace-events
+
+-- 
+2.7.4
