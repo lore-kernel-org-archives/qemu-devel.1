@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dMw86-0002hQ-Cg
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:50:12 -0400
+	(envelope-from <peterx@redhat.com>) id 1dMw8G-0002ns-Tk
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:50:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dMw83-000494-8E
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:50:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37898)
+	(envelope-from <peterx@redhat.com>) id 1dMw8D-0004GY-Ol
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:50:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53006)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dMw82-00048i-VM
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:50:03 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dMw8D-0004FY-Ft
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:50:13 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D075661D3B
-	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 12:50:01 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 533F3C056783
+	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 12:50:12 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Mon, 19 Jun 2017 20:49:35 +0800
-Message-Id: <1497876588-947-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 00/13] migration: objectify MigrationState
+Date: Mon, 19 Jun 2017 20:49:36 +0800
+Message-Id: <1497876588-947-2-git-send-email-peterx@redhat.com>
+In-Reply-To: <1497876588-947-1-git-send-email-peterx@redhat.com>
+References: <1497876588-947-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 01/13] machine: export register_compat_prop()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,98 +30,120 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com, Marcel Apfelbaum <marcel@redhat.com>
 
-v3 contains too much new things. So here comes a new cover letter with
-richer information.
+We have HW_COMPAT_*, however that's only binded to machines, not other
+things (like accelerators).  Behind it, it was register_compat_prop()
+that played the trick.  Let's export the function for further use
+outside HW_COMPAT_* magic.
 
-The main goal of this series is to let MigrationState be a QDev.
+Meanwhile, move it to qdev-properties.c where seems more proper.
+Refactor it a bit to provide global_prop_list_add() for further
+use (will use it in cases where we need a GlobalProperty list).
 
-It helps in many use cases.
+CC: Eduardo Habkost <ehabkost@redhat.com>
+CC: Markus Armbruster <armbru@redhat.com>
+CC: Marcel Apfelbaum <marcel@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ accel.c                      |  1 +
+ hw/core/machine.c            | 14 +-------------
+ hw/core/qdev-properties.c    | 22 ++++++++++++++++++++++
+ include/hw/qdev-properties.h |  5 +++++
+ 4 files changed, 29 insertions(+), 13 deletions(-)
 
-First of all, we can remove many legacy tricky functions. To name
-some: savevm_skip_section_footers(), savevm_skip_configuration(), etc.
-They didn't do much thing but setup a bool value. If MigrationState
-can be a QDev, then these things can be setup by the HW_COMPAT_* magic
-with some lines like:
-
-{
-    .driver   = "migration",
-    .property = "send-configuration",
-    .value    = "off",
-}
-
-Next, if this can be merged and okay, we can move on to convert more
-things into properties for migration. A very attractive use case of it
-is, we will be able to do this for migration:
-
-  -global migration.postcopy=on
-
-Then we don't need to use either HMP/QMP interface to enable it. It
-greatly simplifies the migration test scripts.
-
-Why QDev not QObject? The answer is simple: all the magic that we want
-for migration is bound to QDev (HW_COMPAT, "-global"). If one day we
-want to move these features from QDev to QObject, that'll be fine and
-easy for MigrationState. But before that, let's have MigrationState a
-QDev. :-)
-
-Here's what individual patch does:
-
-patch 1-8: introduce AccelState.global_props list.
-
-      This is an idea suggested by Eduardo in general, it is just more
-      complicated than I thought. Here each patch has rich commit
-      message to read (especially patch 6). Things to mention:
-      - patch 5 fixes a test break
-      - patch 8 added a trace so that I can verify all the x86 cpu
-        properties are applied correctly on tcg/x86/pc-i440fx-*.
-
-patch 9-13: the original patches for the objectify of MigrationState.
-
-Please kindly review. Thanks.
-
-Peter Xu (13):
-  machine: export register_compat_prop()
-  qdev: enhance global_prop_list_add()
-  qdev: remove qdev_prop_register_global()
-  accel: introduce AccelState.global_props
-  tests: avoid check GlobalProperty.used
-  kvm: let kvm use AccelState.global_props
-  tcg: use AccelState.global_props
-  trace: add qdev_global_prop_apply
-  migration: let MigrationState be a qdev
-  migration: move global_state.optional out
-  migration: move only_migratable to MigrationState
-  migration: move skip_configuration out
-  migration: move skip_section_footers
-
- Makefile.objs                    |  1 +
- accel.c                          | 50 +++++++++++++++++++++++
- hw/core/machine.c                | 20 +++------
- hw/core/qdev-properties.c        | 56 +++++++++++++++++++++++--
- hw/core/trace-events             |  2 +
- hw/i386/pc_piix.c                | 11 +++--
- hw/ppc/spapr.c                   |  3 --
- hw/xen/xen-common.c              |  9 ++--
- include/hw/compat.h              | 12 ++++++
- include/hw/qdev-properties.h     | 17 +++++++-
- include/migration/global_state.h |  1 -
- include/migration/misc.h         |  4 +-
- include/sysemu/accel.h           | 20 +++++++++
- include/sysemu/sysemu.h          |  1 -
- kvm-all.c                        | 30 ++++++++++++++
- migration/global_state.c         |  9 +---
- migration/migration.c            | 88 ++++++++++++++++++++++++++++++----------
- migration/migration.h            | 33 +++++++++++++++
- migration/savevm.c               | 28 ++++---------
- qom/cpu.c                        |  8 +---
- target/i386/cpu.c                | 77 +----------------------------------
- target/i386/cpu.h                | 11 -----
- tests/test-qdev-global-props.c   | 12 ------
- vl.c                             | 54 ++++++++++--------------
- 24 files changed, 339 insertions(+), 218 deletions(-)
- create mode 100644 hw/core/trace-events
-
+diff --git a/accel.c b/accel.c
+index 664bb88..62edd29 100644
+--- a/accel.c
++++ b/accel.c
+@@ -26,6 +26,7 @@
+ #include "qemu/osdep.h"
+ #include "sysemu/accel.h"
+ #include "hw/boards.h"
++#include "hw/qdev-properties.h"
+ #include "qemu-common.h"
+ #include "sysemu/arch_init.h"
+ #include "sysemu/sysemu.h"
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 2e7e977..b4b3449 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -16,6 +16,7 @@
+ #include "qapi-visit.h"
+ #include "qapi/visitor.h"
+ #include "hw/sysbus.h"
++#include "hw/qdev-properties.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/numa.h"
+ #include "qemu/error-report.h"
+@@ -770,19 +771,6 @@ static void machine_class_finalize(ObjectClass *klass, void *data)
+     g_free(mc->name);
+ }
+ 
+-static void register_compat_prop(const char *driver,
+-                                 const char *property,
+-                                 const char *value)
+-{
+-    GlobalProperty *p = g_new0(GlobalProperty, 1);
+-    /* Machine compat_props must never cause errors: */
+-    p->errp = &error_abort;
+-    p->driver = driver;
+-    p->property = property;
+-    p->value = value;
+-    qdev_prop_register_global(p);
+-}
+-
+ static void machine_register_compat_for_subclass(ObjectClass *oc, void *opaque)
+ {
+     GlobalProperty *p = opaque;
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index 9f1a497..4b74382 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -1042,6 +1042,28 @@ void qdev_prop_set_ptr(DeviceState *dev, const char *name, void *value)
+ 
+ static GList *global_props;
+ 
++GList *global_prop_list_add(GList *list, const char *driver,
++                            const char *property, const char *value)
++{
++    GlobalProperty *p = g_new0(GlobalProperty, 1);
++
++    /* These properties cannot fail the apply */
++    p->errp = &error_abort;
++    p->driver = driver;
++    p->property = property;
++    p->value = value;
++
++    return g_list_append(list, p);
++}
++
++void register_compat_prop(const char *driver,
++                          const char *property,
++                          const char *value)
++{
++    global_props = global_prop_list_add(global_props, driver,
++                                        property, value);
++}
++
+ void qdev_prop_register_global(GlobalProperty *prop)
+ {
+     global_props = g_list_append(global_props, prop);
+diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+index d206fc9..15ee6ba 100644
+--- a/include/hw/qdev-properties.h
++++ b/include/hw/qdev-properties.h
+@@ -201,6 +201,11 @@ void qdev_prop_set_globals(DeviceState *dev);
+ void error_set_from_qdev_prop_error(Error **errp, int ret, DeviceState *dev,
+                                     Property *prop, const char *value);
+ 
++GList *global_prop_list_add(GList *list, const char *driver,
++                            const char *property, const char *value);
++void register_compat_prop(const char *driver, const char *property,
++                          const char *value);
++
+ /**
+  * qdev_property_add_static:
+  * @dev: Device to add the property to.
 -- 
 2.7.4
