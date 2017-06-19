@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58340)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dMzeB-00031g-BS
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 12:35:28 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dMzwf-0007op-Ii
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 12:54:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dMze5-0007pJ-4i
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 12:35:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52796)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dMze4-0007oZ-S4
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 12:35:21 -0400
-References: <20170618191101.3457-1-Sergio.G.DelReal@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b5df4ca0-a337-1385-58e3-5217ee00cbfb@redhat.com>
-Date: Mon, 19 Jun 2017 18:35:14 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1dMzwe-0001oy-KA
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 12:54:33 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:36214)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dMzwe-0001oq-E1
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 12:54:32 -0400
+Received: by mail-wm0-x234.google.com with SMTP id m125so82352801wmm.1
+	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 09:54:32 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170618191101.3457-1-Sergio.G.DelReal@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] vcpu_dirty: share the same field in
- CPUState for all accelerators
+In-Reply-To: <8760fsatis.fsf@secure.mitica>
+References: <20170616160658.32290-1-famz@redhat.com>
+	<8760fsatis.fsf@secure.mitica>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 19 Jun 2017 17:54:10 +0100
+Message-ID: <CAFEAcA-g8Ofu_WZjLBGb70qnXfdyM+DUqXQHf0-HixaDWmmy=g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] migration: Fix race of image locking
+ between src and dst
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,204 +30,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
-Cc: Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, James Hogan <james.hogan@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, "open list:CPU" <qemu-devel@nongnu.org>, "open list:Overall" <kvm@vger.kernel.org>
+To: Juan Quintela <quintela@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Peter Xu <peterx@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, John Snow <jsnow@redhat.com>
 
+On 19 June 2017 at 16:26, Juan Quintela <quintela@redhat.com> wrote:
+> Fam Zheng <famz@redhat.com> wrote:
+>> Previously, dst side will immediately try to lock the write byte upon
+>> receiving QEMU_VM_EOF, but at src side, bdrv_inactivate_all() is only
+>> done after sending it. If the src host is under load, dst may fail to
+>> acquire the lock due to racing with the src unlocking it.
+>>
+>> Fix this by hoisting the bdrv_inactivate_all() operation before
+>> QEMU_VM_EOF.
+>>
+>> N.B. A further improvement could possibly be done to cleanly handover
+>> locks between src and dst, so that there is no window where a third QEMU
+>> could steal the locks and prevent src and dst from running.
+>>
+>> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+>> Signed-off-by: Fam Zheng <famz@redhat.com>
+>
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
 
+Applied to master, thanks all.
 
-On 18/06/2017 21:11, Sergio Andres Gomez Del Real wrote:
-> This patch simply replaces the separate boolean field in CPUState that
-> kvm, hax (and upcoming hvf) have for keeping track of vcpu dirtiness
-> with a single shared field.
-> 
-> Signed-off-by: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
-> ---
->  include/qom/cpu.h     |  5 +++--
->  kvm-all.c             | 18 +++++++++---------
->  target/i386/hax-all.c | 12 ++++++------
->  target/mips/kvm.c     |  4 ++--
->  4 files changed, 20 insertions(+), 19 deletions(-)
-> 
-> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-> index 89ddb686fb..2098eeae03 100644
-> --- a/include/qom/cpu.h
-> +++ b/include/qom/cpu.h
-> @@ -369,7 +369,6 @@ struct CPUState {
->      vaddr mem_io_vaddr;
->  
->      int kvm_fd;
-> -    bool kvm_vcpu_dirty;
->      struct KVMState *kvm_state;
->      struct kvm_run *kvm_run;
->  
-> @@ -386,6 +385,9 @@ struct CPUState {
->      uint32_t can_do_io;
->      int32_t exception_index; /* used by m68k TCG */
->  
-> +    /* shared by kvm, hax and hvf */
-> +    bool vcpu_dirty;
-> +
->      /* Used to keep track of an outstanding cpu throttle thread for migration
->       * autoconverge
->       */
-> @@ -400,7 +402,6 @@ struct CPUState {
->          icount_decr_u16 u16;
->      } icount_decr;
->  
-> -    bool hax_vcpu_dirty;
->      struct hax_vcpu_state *hax_vcpu;
->  
->      /* The pending_tlb_flush flag is set and cleared atomically to
-> diff --git a/kvm-all.c b/kvm-all.c
-> index ab8262f672..a5eaff270e 100644
-> --- a/kvm-all.c
-> +++ b/kvm-all.c
-> @@ -318,7 +318,7 @@ int kvm_init_vcpu(CPUState *cpu)
->  
->      cpu->kvm_fd = ret;
->      cpu->kvm_state = s;
-> -    cpu->kvm_vcpu_dirty = true;
-> +    cpu->vcpu_dirty = true;
->  
->      mmap_size = kvm_ioctl(s, KVM_GET_VCPU_MMAP_SIZE, 0);
->      if (mmap_size < 0) {
-> @@ -1864,15 +1864,15 @@ void kvm_flush_coalesced_mmio_buffer(void)
->  
->  static void do_kvm_cpu_synchronize_state(CPUState *cpu, run_on_cpu_data arg)
->  {
-> -    if (!cpu->kvm_vcpu_dirty) {
-> +    if (!cpu->vcpu_dirty) {
->          kvm_arch_get_registers(cpu);
-> -        cpu->kvm_vcpu_dirty = true;
-> +        cpu->vcpu_dirty = true;
->      }
->  }
->  
->  void kvm_cpu_synchronize_state(CPUState *cpu)
->  {
-> -    if (!cpu->kvm_vcpu_dirty) {
-> +    if (!cpu->vcpu_dirty) {
->          run_on_cpu(cpu, do_kvm_cpu_synchronize_state, RUN_ON_CPU_NULL);
->      }
->  }
-> @@ -1880,7 +1880,7 @@ void kvm_cpu_synchronize_state(CPUState *cpu)
->  static void do_kvm_cpu_synchronize_post_reset(CPUState *cpu, run_on_cpu_data arg)
->  {
->      kvm_arch_put_registers(cpu, KVM_PUT_RESET_STATE);
-> -    cpu->kvm_vcpu_dirty = false;
-> +    cpu->vcpu_dirty = false;
->  }
->  
->  void kvm_cpu_synchronize_post_reset(CPUState *cpu)
-> @@ -1891,7 +1891,7 @@ void kvm_cpu_synchronize_post_reset(CPUState *cpu)
->  static void do_kvm_cpu_synchronize_post_init(CPUState *cpu, run_on_cpu_data arg)
->  {
->      kvm_arch_put_registers(cpu, KVM_PUT_FULL_STATE);
-> -    cpu->kvm_vcpu_dirty = false;
-> +    cpu->vcpu_dirty = false;
->  }
->  
->  void kvm_cpu_synchronize_post_init(CPUState *cpu)
-> @@ -1901,7 +1901,7 @@ void kvm_cpu_synchronize_post_init(CPUState *cpu)
->  
->  static void do_kvm_cpu_synchronize_pre_loadvm(CPUState *cpu, run_on_cpu_data arg)
->  {
-> -    cpu->kvm_vcpu_dirty = true;
-> +    cpu->vcpu_dirty = true;
->  }
->  
->  void kvm_cpu_synchronize_pre_loadvm(CPUState *cpu)
-> @@ -1981,9 +1981,9 @@ int kvm_cpu_exec(CPUState *cpu)
->      do {
->          MemTxAttrs attrs;
->  
-> -        if (cpu->kvm_vcpu_dirty) {
-> +        if (cpu->vcpu_dirty) {
->              kvm_arch_put_registers(cpu, KVM_PUT_RUNTIME_STATE);
-> -            cpu->kvm_vcpu_dirty = false;
-> +            cpu->vcpu_dirty = false;
->          }
->  
->          kvm_arch_pre_run(cpu, run);
-> diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-> index 097db5cae1..3ada8b54d4 100644
-> --- a/target/i386/hax-all.c
-> +++ b/target/i386/hax-all.c
-> @@ -232,7 +232,7 @@ int hax_init_vcpu(CPUState *cpu)
->      }
->  
->      cpu->hax_vcpu = hax_global.vm->vcpus[cpu->cpu_index];
-> -    cpu->hax_vcpu_dirty = true;
-> +    cpu->vcpu_dirty = true;
->      qemu_register_reset(hax_reset_vcpu_state, (CPUArchState *) (cpu->env_ptr));
->  
->      return ret;
-> @@ -598,12 +598,12 @@ static void do_hax_cpu_synchronize_state(CPUState *cpu, run_on_cpu_data arg)
->      CPUArchState *env = cpu->env_ptr;
->  
->      hax_arch_get_registers(env);
-> -    cpu->hax_vcpu_dirty = true;
-> +    cpu->vcpu_dirty = true;
->  }
->  
->  void hax_cpu_synchronize_state(CPUState *cpu)
->  {
-> -    if (!cpu->hax_vcpu_dirty) {
-> +    if (!cpu->vcpu_dirty) {
->          run_on_cpu(cpu, do_hax_cpu_synchronize_state, RUN_ON_CPU_NULL);
->      }
->  }
-> @@ -614,7 +614,7 @@ static void do_hax_cpu_synchronize_post_reset(CPUState *cpu,
->      CPUArchState *env = cpu->env_ptr;
->  
->      hax_vcpu_sync_state(env, 1);
-> -    cpu->hax_vcpu_dirty = false;
-> +    cpu->vcpu_dirty = false;
->  }
->  
->  void hax_cpu_synchronize_post_reset(CPUState *cpu)
-> @@ -627,7 +627,7 @@ static void do_hax_cpu_synchronize_post_init(CPUState *cpu, run_on_cpu_data arg)
->      CPUArchState *env = cpu->env_ptr;
->  
->      hax_vcpu_sync_state(env, 1);
-> -    cpu->hax_vcpu_dirty = false;
-> +    cpu->vcpu_dirty = false;
->  }
->  
->  void hax_cpu_synchronize_post_init(CPUState *cpu)
-> @@ -637,7 +637,7 @@ void hax_cpu_synchronize_post_init(CPUState *cpu)
->  
->  static void do_hax_cpu_synchronize_pre_loadvm(CPUState *cpu, run_on_cpu_data arg)
->  {
-> -    cpu->hax_vcpu_dirty = true;
-> +    cpu->vcpu_dirty = true;
->  }
->  
->  void hax_cpu_synchronize_pre_loadvm(CPUState *cpu)
-> diff --git a/target/mips/kvm.c b/target/mips/kvm.c
-> index 0982e874bb..3317905e71 100644
-> --- a/target/mips/kvm.c
-> +++ b/target/mips/kvm.c
-> @@ -523,7 +523,7 @@ static void kvm_mips_update_state(void *opaque, int running, RunState state)
->       * already saved and can be restored when it is synced back to KVM.
->       */
->      if (!running) {
-> -        if (!cs->kvm_vcpu_dirty) {
-> +        if (!cs->vcpu_dirty) {
->              ret = kvm_mips_save_count(cs);
->              if (ret < 0) {
->                  fprintf(stderr, "Failed saving count\n");
-> @@ -539,7 +539,7 @@ static void kvm_mips_update_state(void *opaque, int running, RunState state)
->              return;
->          }
->  
-> -        if (!cs->kvm_vcpu_dirty) {
-> +        if (!cs->vcpu_dirty) {
->              ret = kvm_mips_restore_count(cs);
->              if (ret < 0) {
->                  fprintf(stderr, "Failed restoring count\n");
-> 
-
-Thanks, I queued this patch for 2.9.
-
-Paolo
+-- PMM
