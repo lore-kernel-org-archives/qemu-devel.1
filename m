@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dN6ej-0003cq-Jm
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 20:04:30 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dN7Vw-0006ch-IF
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 20:59:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dN6eh-00020k-J6
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 20:04:29 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:33206)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dN6eh-00020e-Ct
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 20:04:27 -0400
-Received: by mail-pg0-x241.google.com with SMTP id u62so12966995pgb.0
-	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 17:04:27 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Date: Mon, 19 Jun 2017 17:04:05 -0700
-Message-Id: <20170620000405.3391-19-rth@twiddle.net>
-In-Reply-To: <20170620000405.3391-1-rth@twiddle.net>
-References: <20170620000405.3391-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v3 18/18] target/s390x: Clean up TB flag bits
+	(envelope-from <dgibson@ozlabs.org>) id 1dN7Vt-0005L4-HH
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 20:59:28 -0400
+Date: Tue, 20 Jun 2017 03:51:52 +0800
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170619195152.GJ22449@umbus>
+References: <20170608050930.2613-1-david@gibson.dropbear.id.au>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="Z8yxTSU1mh2gsre7"
+Content-Disposition: inline
+In-Reply-To: <20170608050930.2613-1-david@gibson.dropbear.id.au>
+Subject: Re: [Qemu-devel] [PATCH 0/6] spapr: DRC cleanups (part IV)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,113 +23,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, aurelien@aurel32.net
+To: mdroth@linux.vnet.ibm.com
+Cc: bharata@linux.vnet.ibm.com, sursingh@redhat.com, groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Most of the PSW bits that were being copied into TB->flags
-are not relevant to translation.  Removing those that are
-unnecessary reduces the amount of translation required.
 
-Signed-off-by: Richard Henderson <rth@twiddle.net>
----
- target/s390x/cpu.h       | 24 +++++++++---------------
- target/s390x/translate.c | 16 ++++++++--------
- 2 files changed, 17 insertions(+), 23 deletions(-)
+--Z8yxTSU1mh2gsre7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 5b94ace..9faca04 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -346,19 +346,14 @@ void s390x_cpu_debug_excp_handler(CPUState *cs);
- 
- /* tb flags */
- 
--#define FLAG_MASK_PER           (PSW_MASK_PER    >> 32)
--#define FLAG_MASK_DAT           (PSW_MASK_DAT    >> 32)
--#define FLAG_MASK_IO            (PSW_MASK_IO     >> 32)
--#define FLAG_MASK_EXT           (PSW_MASK_EXT    >> 32)
--#define FLAG_MASK_KEY           (PSW_MASK_KEY    >> 32)
--#define FLAG_MASK_MCHECK        (PSW_MASK_MCHECK >> 32)
--#define FLAG_MASK_WAIT          (PSW_MASK_WAIT   >> 32)
--#define FLAG_MASK_PSTATE        (PSW_MASK_PSTATE >> 32)
--#define FLAG_MASK_ASC           (PSW_MASK_ASC    >> 32)
--#define FLAG_MASK_CC            (PSW_MASK_CC     >> 32)
--#define FLAG_MASK_PM            (PSW_MASK_PM     >> 32)
--#define FLAG_MASK_64            (PSW_MASK_64     >> 32)
--#define FLAG_MASK_32            0x00001000
-+#define FLAG_MASK_PSW_SHIFT     31
-+#define FLAG_MASK_PER           (PSW_MASK_PER    >> FLAG_MASK_PSW_SHIFT)
-+#define FLAG_MASK_PSTATE        (PSW_MASK_PSTATE >> FLAG_MASK_PSW_SHIFT)
-+#define FLAG_MASK_ASC           (PSW_MASK_ASC    >> FLAG_MASK_PSW_SHIFT)
-+#define FLAG_MASK_64            (PSW_MASK_64     >> FLAG_MASK_PSW_SHIFT)
-+#define FLAG_MASK_32            (PSW_MASK_32     >> FLAG_MASK_PSW_SHIFT)
-+#define FLAG_MASK_PSW		(FLAG_MASK_PER | FLAG_MASK_PSTATE \
-+                                | FLAG_MASK_ASC | FLAG_MASK_64 | FLAG_MASK_32)
- 
- /* Control register 0 bits */
- #define CR0_LOWPROT             0x0000000010000000ULL
-@@ -416,8 +411,7 @@ static inline void cpu_get_tb_cpu_state(CPUS390XState* env, target_ulong *pc,
- {
-     *pc = env->psw.addr;
-     *cs_base = env->ex_value;
--    *flags = ((env->psw.mask >> 32) & ~FLAG_MASK_CC) |
--             ((env->psw.mask & PSW_MASK_32) ? FLAG_MASK_32 : 0);
-+    *flags = (env->psw.mask >> FLAG_MASK_PSW_SHIFT) & FLAG_MASK_PSW;
- }
- 
- #define MAX_ILEN 6
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 9893551..bee163f 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -323,11 +323,11 @@ static inline uint64_t ld_code4(CPUS390XState *env, uint64_t pc)
- static int get_mem_index(DisasContext *s)
- {
-     switch (s->tb->flags & FLAG_MASK_ASC) {
--    case PSW_ASC_PRIMARY >> 32:
-+    case PSW_ASC_PRIMARY >> FLAG_MASK_PSW_SHIFT:
-         return 0;
--    case PSW_ASC_SECONDARY >> 32:
-+    case PSW_ASC_SECONDARY >> FLAG_MASK_PSW_SHIFT:
-         return 1;
--    case PSW_ASC_HOME >> 32:
-+    case PSW_ASC_HOME >> FLAG_MASK_PSW_SHIFT:
-         return 2;
-     default:
-         tcg_abort();
-@@ -387,7 +387,7 @@ static inline void gen_trap(DisasContext *s)
- #ifndef CONFIG_USER_ONLY
- static void check_privileged(DisasContext *s)
- {
--    if (s->tb->flags & (PSW_MASK_PSTATE >> 32)) {
-+    if (s->tb->flags & FLAG_MASK_PSTATE) {
-         gen_program_exception(s, PGM_PRIVILEGED);
-     }
- }
-@@ -2985,20 +2985,20 @@ static ExitStatus op_mov2e(DisasContext *s, DisasOps *o)
-     o->g_in2 = false;
- 
-     switch (s->tb->flags & FLAG_MASK_ASC) {
--    case PSW_ASC_PRIMARY >> 32:
-+    case PSW_ASC_PRIMARY >> FLAG_MASK_PSW_SHIFT:
-         tcg_gen_movi_i64(ar1, 0);
-         break;
--    case PSW_ASC_ACCREG >> 32:
-+    case PSW_ASC_ACCREG >> FLAG_MASK_PSW_SHIFT:
-         tcg_gen_movi_i64(ar1, 1);
-         break;
--    case PSW_ASC_SECONDARY >> 32:
-+    case PSW_ASC_SECONDARY >> FLAG_MASK_PSW_SHIFT:
-         if (b2) {
-             tcg_gen_ld32u_i64(ar1, cpu_env, offsetof(CPUS390XState, aregs[b2]));
-         } else {
-             tcg_gen_movi_i64(ar1, 0);
-         }
-         break;
--    case PSW_ASC_HOME >> 32:
-+    case PSW_ASC_HOME >> FLAG_MASK_PSW_SHIFT:
-         tcg_gen_movi_i64(ar1, 2);
-         break;
-     }
--- 
-2.9.4
+On Thu, Jun 08, 2017 at 03:09:24PM +1000, David Gibson wrote:
+> This fourth isntallment of cleanups to the DRC code introduces the
+> first changes to the fundamental state handling.  We change the
+> initial states in the reset code and attach code for PCI devices, and
+> are able to remove the 'signalled' state variable with those fixes.
+>=20
+> There are also some more mechanical cleanups in preparation for
+> further cleanups and fixes to the state management.
+
+Merged to ppc-for-2.10.
+
+>=20
+> David Gibson (6):
+>   spapr: Start hotplugged PCI devices in ISOLATED state
+>   spapr: Eliminate DRC 'signalled' state variable
+>   spapr: Split DRC release from DRC detach
+>   spapr: Make DRC reset force DRC into known state
+>   spapr: Clean up DRC set_allocation_state path
+>   spapr: Clean up DRC set_isolation_state() path
+>=20
+>  hw/ppc/spapr.c             |  15 --
+>  hw/ppc/spapr_drc.c         | 363 +++++++++++++++++++++++----------------=
+------
+>  hw/ppc/spapr_events.c      |  10 --
+>  include/hw/ppc/spapr_drc.h |  10 +-
+>  4 files changed, 188 insertions(+), 210 deletions(-)
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--Z8yxTSU1mh2gsre7
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZSCtVAAoJEGw4ysog2bOSxZEP/09gU4WCZflEBfu+FQ4K85XW
+e9J/1GxiURINY97C34ur0TZCyMrRHF/vM/Q1u6HjH8hyoMdWBTc83QzkKXF9ucdI
+RiApQWMz/L1HK6wjVtQ8IL5UNEo/xTGjWPuygPPKLa4eRSQy6GaytBfhBmlEkrsz
+STjVazn/J9yaP5sHRncXAKdNkEnVCEvPN+aeSrAuBdaemhmCHE3XCPWeudsRYHlm
+dcQczrX7Ggnly+v/MtSZOkX+/PzehmoFd0cdvIvkYWPrMxUSNPoTYAD0cZcxGANW
+x9hQTBnZY8X7Dn62+ClAp489RR+M1O0dfyDGLnXISHqVrANQih2y4wkT6HUwcMsi
+JLewbnJt//03L6GjiAv8AGwjtOKRAgGaz1BVgg/rKE5GwA5kYReRZ5dMKeDyWqQB
+Kp8aIkQa6Y1anymYze5zrAikishfj3B5ic4IkjZe4r9oDrMlPAjqVAmmHkVlbZuO
+8aaC+7AJyvQLX/L0rrPwcUYUgSEycVd+6Nxg5pxrxwlGm/8dzkPgjDRmc3nOLHSj
+Z2Gs48HkgEhIPkkyPcOBG6ckh3dQc6qFCrBC8O1kr6SsgSqVS71JEAwm+XkVBHD/
+eCM3V/IYiMQi9lYy5WxDk7FEGG1KPDTX/RkpEpOn2hUkgumnWZQQx6OvtEIvCggU
+cL8SmZ1tP9sd6vyxTW8Z
+=nAgq
+-----END PGP SIGNATURE-----
+
+--Z8yxTSU1mh2gsre7--
