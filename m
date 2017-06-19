@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dMw8n-00038t-Dp
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:50:52 -0400
+	(envelope-from <peterx@redhat.com>) id 1dMw8r-0003Cq-TB
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:50:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dMw8m-0004rG-FB
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:50:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49656)
+	(envelope-from <peterx@redhat.com>) id 1dMw8q-0004x5-Un
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:50:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35128)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dMw8l-0004qS-Ud
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:50:48 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dMw8q-0004wL-P7
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 08:50:52 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D1290811A9
-	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 12:50:46 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A73A54E35B
+	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 12:50:51 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Mon, 19 Jun 2017 20:49:42 +0800
-Message-Id: <1497876588-947-8-git-send-email-peterx@redhat.com>
+Date: Mon, 19 Jun 2017 20:49:43 +0800
+Message-Id: <1497876588-947-9-git-send-email-peterx@redhat.com>
 In-Reply-To: <1497876588-947-1-git-send-email-peterx@redhat.com>
 References: <1497876588-947-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 07/13] tcg: use AccelState.global_props
+Subject: [Qemu-devel] [PATCH v3 08/13] trace: add qdev_global_prop_apply
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,100 +32,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Let tcg use the new AccelState.global_props as well (used similar trick
-for the kvm convertion in previous patch). Basically we are moving the
-tcg_default_props into tcg codes, and link these compat properties onto
-newly created AccelState.global_props.
-
-This is much simpler than KVM.
+Trace global property applying. Now there are machine compat properties,
+accel compat properties, and user specified global properties. It
+provides a way to trace those properties that really applied.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- accel.c           | 15 +++++++++++++++
- target/i386/cpu.c | 28 ----------------------------
- 2 files changed, 15 insertions(+), 28 deletions(-)
+ Makefile.objs             | 1 +
+ hw/core/qdev-properties.c | 2 ++
+ hw/core/trace-events      | 2 ++
+ 3 files changed, 5 insertions(+)
+ create mode 100644 hw/core/trace-events
 
-diff --git a/accel.c b/accel.c
-index ca1d0f5..f4c2b10 100644
---- a/accel.c
-+++ b/accel.c
-@@ -38,9 +38,24 @@
- int tcg_tb_size;
- static bool tcg_allowed = true;
+diff --git a/Makefile.objs b/Makefile.objs
+index 0575802..e199f5d 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -121,6 +121,7 @@ trace-events-subdirs += migration
+ trace-events-subdirs += block
+ trace-events-subdirs += backends
+ trace-events-subdirs += chardev
++trace-events-subdirs += hw/core
+ trace-events-subdirs += hw/block
+ trace-events-subdirs += hw/block/dataplane
+ trace-events-subdirs += hw/char
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index e9efb78..69c3f15 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -10,6 +10,7 @@
+ #include "net/hub.h"
+ #include "qapi/visitor.h"
+ #include "chardev/char.h"
++#include "trace.h"
  
-+static AccelPropValue x86_tcg_default_props[] = {
-+    { "vme", "off" },
-+    { NULL, NULL },
-+};
-+
-+static void tcg_register_accel_props(AccelState *accel)
-+{
-+    AccelPropValue *entry;
-+
-+    for (entry = x86_tcg_default_props; entry->prop; entry++) {
-+        accel_register_x86_cpu_props(accel, entry->prop, entry->value);
-+    }
-+}
-+
- static int tcg_init(MachineState *ms)
- {
-     tcg_exec_init(tcg_tb_size * 1024 * 1024);
-+    tcg_register_accel_props(ms->accelerator);
-     return 0;
- }
- 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 5214fba..89f67b0 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1480,17 +1480,6 @@ static X86CPUDefinition builtin_x86_defs[] = {
-     },
- };
- 
--typedef struct PropValue {
--    const char *prop, *value;
--} PropValue;
--
--/* TCG-specific defaults that override all CPU models when using TCG
-- */
--static PropValue tcg_default_props[] = {
--    { "vme", "off" },
--    { NULL, NULL },
--};
--
- static uint32_t x86_cpu_get_supported_feature_word(FeatureWord w,
-                                                    bool migratable_only);
- 
-@@ -2262,18 +2251,6 @@ static void x86_cpu_report_filtered_features(X86CPU *cpu)
-     }
- }
- 
--static void x86_cpu_apply_props(X86CPU *cpu, PropValue *props)
--{
--    PropValue *pv;
--    for (pv = props; pv->prop; pv++) {
--        if (!pv->value) {
--            continue;
--        }
--        object_property_parse(OBJECT(cpu), pv->value, pv->prop,
--                              &error_abort);
--    }
--}
--
- /* Load data from X86CPUDefinition into a X86CPU object
-  */
- static void x86_cpu_load_def(X86CPU *cpu, X86CPUDefinition *def, Error **errp)
-@@ -2300,11 +2277,6 @@ static void x86_cpu_load_def(X86CPU *cpu, X86CPUDefinition *def, Error **errp)
-         env->features[w] = def->features[w];
-     }
- 
--    /* Special cases not set in the X86CPUDefinition structs: */
--    if (tcg_enabled()) {
--        x86_cpu_apply_props(cpu, tcg_default_props);
--    }
--
-     env->features[FEAT_1_ECX] |= CPUID_EXT_HYPERVISOR;
- 
-     /* sysenter isn't supported in compatibility mode on AMD,
+ void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
+                                   Error **errp)
+@@ -1150,6 +1151,7 @@ static void qdev_prop_set_globals_for_type(DeviceState *dev,
+         if (strcmp(typename, prop->driver) != 0) {
+             continue;
+         }
++        trace_qdev_global_prop_apply(typename, prop->property, prop->value);
+         prop->used = true;
+         object_property_parse(OBJECT(dev), prop->value, prop->property, &err);
+         if (err != NULL) {
+diff --git a/hw/core/trace-events b/hw/core/trace-events
+new file mode 100644
+index 0000000..0a0a79f
+--- /dev/null
++++ b/hw/core/trace-events
+@@ -0,0 +1,2 @@
++# hw/core/qdev-properties.c
++qdev_global_prop_apply(const char *type, const char *prop, const char *value) "type '%s' prop '%s' value '%s'"
 -- 
 2.7.4
