@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dN8MX-0005oZ-V3
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 21:53:50 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dN8MY-0005ob-1t
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 21:53:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dN8MX-0004CH-8V
+	(envelope-from <dgibson@ozlabs.org>) id 1dN8MX-0004CA-61
 	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 21:53:50 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 20 Jun 2017 09:53:28 +0800
-Message-Id: <20170620015332.13874-2-david@gibson.dropbear.id.au>
+Date: Tue, 20 Jun 2017 09:53:31 +0800
+Message-Id: <20170620015332.13874-5-david@gibson.dropbear.id.au>
 In-Reply-To: <20170620015332.13874-1-david@gibson.dropbear.id.au>
 References: <20170620015332.13874-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCH 1/5] spapr: Leave DR-indicator management to
- the guest
+Subject: [Qemu-devel] [PATCH 4/5] spapr: Remove unnecessary differences
+ between hotplug and coldplug paths
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,60 +23,107 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mdroth@linux.vnet.ibm.com
 Cc: bharata@linux.vnet.ibm.com, sursingh@redhat.com, groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-The DR-indicator is essentially a "virtual LED" attached to a hotpluggable
-device, which the guest can set to various states for the attention of
-the operator or management layers.
-
-It's mostly guest managed, except that we once-off set it to
-ACTIVE/INACTIVE in the attach/detach path.  While that makes certain sense,
-there's no indication in PAPR that the hypervisor should do this, and the
-drmgr code on the guest side doesn't appear to need it (it will already set
-the indicator to ACTIVE on hotplug, and INACTIVE on remove).
-
-So, leave the DR-indicator entirely to the guest; the only thing we need
-to do is ensure it's in a sane state on reset.
+spapr_drc_attach() has a 'coldplug' parameter which sets the DRC into
+configured state initially, instead of the usual ISOLATED/UNUSABLE state.
+It turns out this is unnecessary: although coldplugged devices do need to
+be in CONFIGURED state once the guest starts, that will already be
+accomplished by the reset code which will move DRCs for already plugged
+devices into a coldplug equivalent state.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_drc.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ hw/ppc/spapr.c             | 13 +++----------
+ hw/ppc/spapr_drc.c         |  5 ++---
+ hw/ppc/spapr_pci.c         |  3 +--
+ include/hw/ppc/spapr_drc.h |  2 +-
+ 4 files changed, 7 insertions(+), 16 deletions(-)
 
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index f12bc4d..35f2d4b 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2611,7 +2611,7 @@ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
+         fdt_offset = spapr_populate_memory_node(fdt, node, addr,
+                                                 SPAPR_MEMORY_BLOCK_SIZE);
+ 
+-        spapr_drc_attach(drc, dev, fdt, fdt_offset, !dev->hotplugged, errp);
++        spapr_drc_attach(drc, dev, fdt, fdt_offset, errp);
+         addr += SPAPR_MEMORY_BLOCK_SIZE;
+     }
+     /* send hotplug notification to the
+@@ -2955,17 +2955,10 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+ 
+     g_assert(drc || !mc->has_hotpluggable_cpus);
+ 
+-    /*
+-     * Setup CPU DT entries only for hotplugged CPUs. For boot time or
+-     * coldplugged CPUs DT entries are setup in spapr_build_fdt().
+-     */
+-    if (dev->hotplugged) {
+-        fdt = spapr_populate_hotplug_cpu_dt(cs, &fdt_offset, spapr);
+-    }
++    fdt = spapr_populate_hotplug_cpu_dt(cs, &fdt_offset, spapr);
+ 
+     if (drc) {
+-        spapr_drc_attach(drc, dev, fdt, fdt_offset, !dev->hotplugged,
+-                         &local_err);
++        spapr_drc_attach(drc, dev, fdt, fdt_offset, &local_err);
+         if (local_err) {
+             g_free(fdt);
+             error_propagate(errp, local_err);
 diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index fd9e07d..0bc9046 100644
+index 32e39f2..e70879a 100644
 --- a/hw/ppc/spapr_drc.c
 +++ b/hw/ppc/spapr_drc.c
-@@ -353,8 +353,6 @@ void spapr_drc_attach(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
-     }
-     g_assert(fdt || coldplug);
+@@ -340,7 +340,7 @@ static void prop_get_fdt(Object *obj, Visitor *v, const char *name,
+ }
  
--    drc->dr_indicator = SPAPR_DR_INDICATOR_ACTIVE;
--
+ void spapr_drc_attach(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
+-                      int fdt_start_offset, bool coldplug, Error **errp)
++                      int fdt_start_offset, Error **errp)
+ {
+     trace_spapr_drc_attach(spapr_drc_index(drc));
+ 
+@@ -351,12 +351,11 @@ void spapr_drc_attach(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
+     if (spapr_drc_type(drc) == SPAPR_DR_CONNECTOR_TYPE_PCI) {
+         g_assert(drc->allocation_state == SPAPR_DR_ALLOCATION_STATE_USABLE);
+     }
+-    g_assert(fdt || coldplug);
++    g_assert(fdt);
+ 
      drc->dev = d;
      drc->fdt = fdt;
      drc->fdt_start_offset = fdt_start_offset;
-@@ -372,8 +370,6 @@ void spapr_drc_attach(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
+-    drc->configured = coldplug;
  
- static void spapr_drc_release(sPAPRDRConnector *drc)
- {
--    drc->dr_indicator = SPAPR_DR_INDICATOR_INACTIVE;
--
-     /* Calling release callbacks based on spapr_drc_type(drc). */
-     switch (spapr_drc_type(drc)) {
-     case SPAPR_DR_CONNECTOR_TYPE_CPU:
-@@ -452,12 +448,14 @@ static void reset(DeviceState *d)
-         if (spapr_drc_type(drc) != SPAPR_DR_CONNECTOR_TYPE_PCI) {
-             drc->allocation_state = SPAPR_DR_ALLOCATION_STATE_USABLE;
-         }
-+        drc->dr_indicator = SPAPR_DR_INDICATOR_ACTIVE;
-     } else {
-         /* Otherwise device is absent, but might be hotplugged */
-         drc->isolation_state = SPAPR_DR_ISOLATION_STATE_ISOLATED;
-         if (spapr_drc_type(drc) != SPAPR_DR_CONNECTOR_TYPE_PCI) {
-             drc->allocation_state = SPAPR_DR_ALLOCATION_STATE_UNUSABLE;
-         }
-+        drc->dr_indicator = SPAPR_DR_INDICATOR_INACTIVE;
+     if (spapr_drc_type(drc) != SPAPR_DR_CONNECTOR_TYPE_PCI) {
+         drc->awaiting_allocation = true;
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index 0b447f2..f2543ef 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1435,8 +1435,7 @@ static void spapr_phb_hot_plug_child(HotplugHandler *plug_handler,
+         goto out;
      }
- }
  
+-    spapr_drc_attach(drc, DEVICE(pdev), fdt, fdt_start_offset,
+-                     !plugged_dev->hotplugged, &local_err);
++    spapr_drc_attach(drc, DEVICE(pdev), fdt, fdt_start_offset, &local_err);
+     if (local_err) {
+         goto out;
+     }
+diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+index 6fd84d1..d15e9eb 100644
+--- a/include/hw/ppc/spapr_drc.h
++++ b/include/hw/ppc/spapr_drc.h
+@@ -234,7 +234,7 @@ int spapr_drc_populate_dt(void *fdt, int fdt_offset, Object *owner,
+                           uint32_t drc_type_mask);
+ 
+ void spapr_drc_attach(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
+-                      int fdt_start_offset, bool coldplug, Error **errp);
++                      int fdt_start_offset, Error **errp);
+ void spapr_drc_detach(sPAPRDRConnector *drc, DeviceState *d, Error **errp);
+ 
+ #endif /* HW_SPAPR_DRC_H */
 -- 
 2.9.4
