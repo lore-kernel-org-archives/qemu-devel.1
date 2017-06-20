@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dNJch-0005gX-6F
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 09:55:16 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dNJdI-00060Q-24
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 09:55:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dNJcc-0002hI-Ai
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 09:55:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35546)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dNJcc-0002h0-2M
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 09:55:10 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C7C775F7B0
-	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 13:55:08 +0000 (UTC)
-Date: Tue, 20 Jun 2017 21:55:03 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170620135503.GB3662@pxdev.xzpeter.org>
-References: <1497876588-947-1-git-send-email-peterx@redhat.com>
-	<1497876588-947-7-git-send-email-peterx@redhat.com>
-	<20170619161403.GU5016@thinpad.lan.raisama.net>
+	(envelope-from <peter.maydell@linaro.org>) id 1dNJdG-0002tf-Od
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 09:55:52 -0400
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:36161)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dNJdG-0002t8-Eo
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 09:55:50 -0400
+Received: by mail-wr0-x232.google.com with SMTP id c11so36945398wrc.3
+	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 06:55:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170619161403.GU5016@thinpad.lan.raisama.net>
-Subject: Re: [Qemu-devel] [PATCH v3 06/13] kvm: let kvm use
- AccelState.global_props
+In-Reply-To: <20170619104655.31104-9-alex.bennee@linaro.org>
+References: <20170619104655.31104-1-alex.bennee@linaro.org>
+	<20170619104655.31104-9-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 20 Jun 2017 14:55:28 +0100
+Message-ID: <CAFEAcA-wdfpzc-w6xKNH65KSsO01GXdyq-Nx9gKBWQoW_BJd_g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RISU PATCH v5 08/13] risu: add header to trace
+ stream
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,117 +31,261 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, Jun 19, 2017 at 01:14:03PM -0300, Eduardo Habkost wrote:
-> On Mon, Jun 19, 2017 at 08:49:41PM +0800, Peter Xu wrote:
-> > Let KVM be the first user of the new AccelState.global_props field.
-> > Basically kvm accel only contains accel props for TYPE_X86_CPUs but not
-> > anything else yet.
-> > 
-> > There will be a change on how these global properties are applied for
-> > TYPE_X86_CPU devices. The general workflow of the global property stuff
-> > for TYPE_X86_CPU devices can be simplied as following (this is a example
-> > routine of KVM that contains both old/new workflow, similar thing apply
-> > to TCG, but even simpler):
-> > 
-> >    - HW_COMPAT/type_init() magic played before even entering main() [1]
-> 
-> What do you mean by this?  HW_COMPAT_* is used only in
-> MachineClass::compat_props[4], and type_init() magic is triggered
-> by module_call_init(MODULE_INIT_QOM) in main().
+On 19 June 2017 at 11:46, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+> I've also added a header packet with pc/risu op in it so we can keep
+> better track of how things are going.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> ---
+> v5
+>   - re-base without formatting fixes
+>   - dropped fprintfs in signal context
+> v4
+>   - split from previous patch
+> ---
+>  reginfo.c      | 94 +++++++++++++++++++++++++++++++++++++---------------=
+------
+>  risu.h         |  9 ++++++
+>  risu_aarch64.c |  5 ++++
+>  risu_arm.c     |  5 ++++
+>  risu_m68k.c    |  5 ++++
+>  risu_ppc64.c   |  5 ++++
+>  6 files changed, 89 insertions(+), 34 deletions(-)
+>
+> diff --git a/reginfo.c b/reginfo.c
+> index 90cea8f..4ff937f 100644
+> --- a/reginfo.c
+> +++ b/reginfo.c
+> @@ -24,10 +24,19 @@ static int packet_mismatch;
+>  int send_register_info(write_fn write_fn, void *uc)
+>  {
+>      struct reginfo ri;
+> +    trace_header_t header;
+>      int op;
+> +
+>      reginfo_init(&ri, uc);
+>      op =3D get_risuop(&ri);
+>
+> +    /* Write a header with PC/op to keep in sync */
+> +    header.pc =3D get_pc(&ri);
+> +    header.risu_op =3D op;
+> +    if (write_fn(&header, sizeof(header)) !=3D 0) {
+> +        return -1;
+> +    }
+> +
+>      switch (op) {
+>      case OP_TESTEND:
+>          write_fn(&ri, sizeof(ri));
+> @@ -63,46 +72,63 @@ int send_register_info(write_fn write_fn, void *uc)
+>  int recv_and_compare_register_info(read_fn read_fn, respond_fn resp_fn, =
+void *uc)
+>  {
+>      int resp =3D 0, op;
+> +    trace_header_t header;
+>
+>      reginfo_init(&master_ri, uc);
+>      op =3D get_risuop(&master_ri);
+>
+> -    switch (op) {
+> -    case OP_COMPARE:
+> -    case OP_TESTEND:
+> -    default:
+> -        /* Do a simple register compare on (a) explicit request
+> -         * (b) end of test (c) a non-risuop UNDEF
+> -         */
+> -        if (read_fn(&apprentice_ri, sizeof(apprentice_ri))) {
+> -            packet_mismatch =3D 1;
+> -            resp =3D 2;
+> -        } else if (!reginfo_is_eq(&master_ri, &apprentice_ri)) {
+> -            /* register mismatch */
+> -            resp =3D 2;
+> -        } else if (op =3D=3D OP_TESTEND) {
+> -            resp =3D 1;
+> -        }
+> -        resp_fn(resp);
+> -        break;
+> -    case OP_SETMEMBLOCK:
+> -        memblock =3D (void *)(uintptr_t)get_reginfo_paramreg(&master_ri)=
+;
+> -        break;
+> -    case OP_GETMEMBLOCK:
+> -        set_ucontext_paramreg(uc, get_reginfo_paramreg(&master_ri) +
+> -                              (uintptr_t)memblock);
+> -        break;
+> -    case OP_COMPAREMEM:
+> -        mem_used =3D 1;
+> -        if (read_fn(apprentice_memblock, MEMBLOCKLEN)) {
+> -            packet_mismatch =3D 1;
+> -            resp =3D 2;
+> -        } else if (memcmp(memblock, apprentice_memblock, MEMBLOCKLEN) !=
+=3D 0) {
+> -            /* memory mismatch */
+> -            resp =3D 2;
+> +    if (read_fn(&header, sizeof(header)) !=3D 0) {
+> +        return -1;
+> +    }
+> +
+> +    if (header.risu_op =3D=3D op ) {
 
-Sorry. It should be the thing you mentioned.
+Stray extra space.
 
-> 
-> >    - main() in vl.c
-> >      - configure_accelerator()
-> >        - AccelClass.init_machine() [2]
-> >          - kvm_init() (for KVM accel)
-> >      - register global properties
-> >        - accel_register_compat_props(): register accel compat props [3]
-> >        - machine_register_compat_props(): register machine compat
-> >          props (here we'll apply all the HW_COMPAT magic into
-> >          global_props) [4]
-> >      - machine init()
-> >        - cpu init() [5]
-> >        - ...
-> > 
-> > Before this patch, the code setup TYPE_X86_CPU properties at [4] by
-> > keeping the kvm_default_props list and apply them directly to the device
-> > using x86_cpu_apply_props().
-> > 
-> > After this patch, the code setup the same properties in the sequence of
-> > [1]->[2]->[3][4]->[5]:
-> > 
-> >   - At [1] we setup machine global properties.  Note: there will be
-> >     properties that with value==NULL but it's okay - when it was applied
-> >     to global list, it'll be used to remove an entry at step [4], it
-> >     works just like the old kvm_default_props, but we just unified it to
-> >     a single place, which is the global_props list.
-> > 
-> >   - At [2] we setup accel global properties.
-> 
-> Why isn't AccelClass::global_props set up at class_init(), just
-> like we do on MachineClass::compat_props?
+> +
+> +        /* send OK for the header */
+> +        resp_fn(0);
+> +
+> +        switch (op) {
+> +        case OP_COMPARE:
+> +        case OP_TESTEND:
+> +        default:
+> +            /* Do a simple register compare on (a) explicit request
+> +             * (b) end of test (c) a non-risuop UNDEF
+> +             */
+> +            if (read_fn(&apprentice_ri, sizeof(apprentice_ri))) {
+> +                packet_mismatch =3D 1;
+> +                resp =3D 2;
+> +
+> +            } else if (!reginfo_is_eq(&master_ri, &apprentice_ri)) {
+> +                /* register mismatch */
+> +                resp =3D 2;
+> +
+> +            } else if (op =3D=3D OP_TESTEND) {
+> +                resp =3D 1;
+> +            }
+> +            resp_fn(resp);
+> +            break;
+> +        case OP_SETMEMBLOCK:
+> +            memblock =3D (void *)(uintptr_t)get_reginfo_paramreg(&master=
+_ri);
+> +            break;
+> +        case OP_GETMEMBLOCK:
+> +            set_ucontext_paramreg(uc, get_reginfo_paramreg(&master_ri) +
+> +                                  (uintptr_t)memblock);
+> +            break;
+> +        case OP_COMPAREMEM:
+> +            mem_used =3D 1;
+> +            if (read_fn(apprentice_memblock, MEMBLOCKLEN)) {
+> +                packet_mismatch =3D 1;
+> +                resp =3D 2;
+> +            } else if (memcmp(memblock, apprentice_memblock, MEMBLOCKLEN=
+) !=3D 0) {
+> +                /* memory mismatch */
+> +                resp =3D 2;
+> +            }
+> +            resp_fn(resp);
+> +            break;
+>          }
+> +    } else {
+> +        /* We are out of sync */
+> +        resp =3D 2;
+>          resp_fn(resp);
+> -        break;
 
-(explained in other thread: there is a property we only need to
- register when split irqchip is used)
+This is probably easier to read if structured the other way
+up, so:
 
-> 
-> > 
-> >   - At [3]/[4] we move machine/accel properties into global property
-> >     list. One thing to mention is that, we do [3] before [4], since we
-> >     have some cross-relation properties, e.g., property that is required
-> >     when both PC=2.1 && ACCEL=kvm happen. For now, all this kind of
-> >     properties are still in machine compat properties.
-> > 
-> >   - At [5] when TYPE_X86_CPU creates, it applies the global property from
-> >     the global property list, which is now a merged list of three: accel
-> >     property list, machine property list, and user specified "-global"
-> >     properties.
-> 
-> On which category above would the x86_cpu_change_kvm_default()
-> calls in pc_piix.c would be?  We would need to ensure they
-> override the globals registered by the accel code, but they must
-> not override the user-provided global properties (including
-> -global and -cpu options).
+     if (header.risu_op !=3D op) {
+        /* out of sync */
+        ...
+        return resp;
+     }
 
-Oh I didn't realize this difference. x86_cpu_change_kvm_default() is
-called in [5]. It indeed breaks this rule.
+and then you can leave the rest of the function alone.
 
-> 
-> This is where things get tricky and fragile: the translation from
-> -cpu to global properties is done very late inside machine init
-> today, but we should be able to do that much earlier, once we
-> refactor the -cpu parsing code.
-> 
-> Hence my suggestion is to not touch x86_cpu_change_kvm_default()
-> and just move the other properties (everything in
-> kvm_default_props except svm, x2apic, and kvm-pv-eoi) to a static
-> AccelClass::global_props field.
 
-Yes it's fragile and complicated.
+>      }
+>
+>      return resp;
+> diff --git a/risu.h b/risu.h
+> index 32241bc..e9e70ab 100644
+> --- a/risu.h
+> +++ b/risu.h
+> @@ -51,6 +51,12 @@ extern int ismaster;
+>
+>  struct reginfo;
+>
+> +typedef struct
+> +{
+> +   uintptr_t pc;
+> +   uint32_t risu_op;
+> +} trace_header_t;
+> +
+>  /* Functions operating on reginfo */
+>
+>  /* To keep the read/write logic from multiplying across all arches
+> @@ -102,6 +108,9 @@ uint64_t get_reginfo_paramreg(struct reginfo *ri);
+>   */
+>  int get_risuop(struct reginfo *ri);
+>
+> +/* Return the PC from a reginfo */
+> +uintptr_t get_pc(struct reginfo *ri);
+> +
+>  /* initialize structure from a ucontext */
+>  void reginfo_init(struct reginfo *ri, ucontext_t *uc);
+>
+> diff --git a/risu_aarch64.c b/risu_aarch64.c
+> index 9c6809d..492d141 100644
+> --- a/risu_aarch64.c
+> +++ b/risu_aarch64.c
+> @@ -40,3 +40,8 @@ int get_risuop(struct reginfo *ri)
+>      uint32_t risukey =3D 0x00005af0;
+>      return (key !=3D risukey) ? -1 : op;
+>  }
+> +
+> +uintptr_t get_pc(struct reginfo *ri)
+> +{
+> +   return ri->pc;
 
-How about this:
+Indent here (and in some of the other versions of this
+function) isn't matching the standard set up in earlier patches.
 
-I introduce AccelClass::global_props, only use it in Xen but nowhere
-else? After all, what I really want to do is just let migration codes
-start to use "-global" properties and compatibility fields. And if
-there is still no good idea to ideally solve this x86 cpu property
-issue, I would prefer to keep it (it'll also be simpler for me).
+> +}
+> diff --git a/risu_arm.c b/risu_arm.c
+> index a55c6c2..5fcb2a5 100644
+> --- a/risu_arm.c
+> +++ b/risu_arm.c
+> @@ -68,3 +68,8 @@ int get_risuop(struct reginfo *ri)
+>      uint32_t risukey =3D (isz =3D=3D 2) ? 0xdee0 : 0xe7fe5af0;
+>      return (key !=3D risukey) ? -1 : op;
+>  }
+> +
+> +uintptr_t get_pc(struct reginfo *ri)
+> +{
+> +   return ri->gpreg[15];
+> +}
+> diff --git a/risu_m68k.c b/risu_m68k.c
+> index 0bf5c14..1056eef 100644
+> --- a/risu_m68k.c
+> +++ b/risu_m68k.c
+> @@ -33,3 +33,8 @@ int get_risuop(struct reginfo *ri)
+>      uint32_t risukey =3D 0x4afc7000;
+>      return (key !=3D risukey) ? -1 : op;
+>  }
+> +
+> +uintptr_t get_pc(struct reginfo *ri)
+> +{
+> +    return ri->gregs[R_PC];
+> +}
+> diff --git a/risu_ppc64.c b/risu_ppc64.c
+> index eb60573..83f8d1f 100644
+> --- a/risu_ppc64.c
+> +++ b/risu_ppc64.c
+> @@ -38,3 +38,8 @@ int get_risuop(struct reginfo *ri)
+>      uint32_t risukey =3D 0x00005af0;
+>      return (key !=3D risukey) ? -1 : op;
+>  }
+> +
+> +uintptr_t get_pc(struct reginfo *ri)
+> +{
+> +   return ri->nip;
+> +}
+> --
 
-Another thing worries me a bit is that I may make things more
-confusing if I separate this list into two (then we'll have part of
-the properties in accel code, and the rest ones still in cpu.c).
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-(then I can also avoid using hard code in accel.c/kvm.c as well, which
- is something I really want to stop from doing. Maybe there can be
- some better idea, but I cannot really figure it out now...)
-
-I'll just hold here to see whether you like above idea before moving
-on to further comments.  Thanks,
-
--- 
-Peter Xu
+thanks
+-- PMM
