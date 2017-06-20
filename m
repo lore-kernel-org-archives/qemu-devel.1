@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dNNr8-0001KD-GJ
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 14:26:27 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dNO4q-0005F8-Uf
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 14:40:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dNNr5-0002Tf-A1
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 14:26:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38712)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dNNr5-0002TR-1E
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 14:26:23 -0400
-Date: Tue, 20 Jun 2017 21:26:15 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170620212107-mutt-send-email-mst@kernel.org>
-References: <1497004901-30593-1-git-send-email-wei.w.wang@intel.com>
-	<1497004901-30593-5-git-send-email-wei.w.wang@intel.com>
-	<b92af473-f00e-b956-ea97-eb4626601789@intel.com>
-	<1497977049.20270.100.camel@redhat.com>
-	<7b626551-6d1b-c8d5-4ef7-e357399e78dc@redhat.com>
-	<1497979740.20270.102.camel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1497979740.20270.102.camel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v11 4/6] mm: function to offer a page block
- on the free list
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dNO4n-0000nC-Uo
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 14:40:37 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33827
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1dNO4n-0000lp-Nd
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 14:40:33 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v5KIciUV081247
+	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 14:40:31 -0400
+Received: from e24smtp02.br.ibm.com (e24smtp02.br.ibm.com [32.104.18.86])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2b6qep6ebx-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 14:40:31 -0400
+Received: from localhost
+	by e24smtp02.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Tue, 20 Jun 2017 15:40:29 -0300
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Tue, 20 Jun 2017 15:40:16 -0300
+Message-Id: <20170620184017.17919-1-danielhb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v14] migration: spapr: migrate pending_events
+ of spapr state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,69 +37,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Rik van Riel <riel@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, Dave Hansen <dave.hansen@intel.com>, Wei Wang <wei.w.wang@intel.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, Nitesh Narayan Lal <nilal@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, mdroth@linux.vnet.ibm.com
 
-On Tue, Jun 20, 2017 at 01:29:00PM -0400, Rik van Riel wrote:
-> On Tue, 2017-06-20 at 18:49 +0200, David Hildenbrand wrote:
-> > On 20.06.2017 18:44, Rik van Riel wrote:
-> 
-> > > Nitesh Lal (on the CC list) is working on a way
-> > > to efficiently batch recently freed pages for
-> > > free page hinting to the hypervisor.
-> > > 
-> > > If that is done efficiently enough (eg. with
-> > > MADV_FREE on the hypervisor side for lazy freeing,
-> > > and lazy later re-use of the pages), do we still
-> > > need the harder to use batch interface from this
-> > > patch?
-> > > 
-> > 
-> > David's opinion incoming:
-> > 
-> > No, I think proper free page hinting would be the optimum solution,
-> > if
-> > done right. This would avoid the batch interface and even turn
-> > virtio-balloon in some sense useless.
-> 
-> I agree with that.  Let me go into some more detail of
-> what Nitesh is implementing:
-> 
-> 1) In arch_free_page, the being-freed page is added
->    to a per-cpu set of freed pages.
-> 2) Once that set is full, arch_free_pages goes into a
->    slow path, which:
->    2a) Iterates over the set of freed pages, and
->    2b) Checks whether they are still free, and
->    2c) Adds the still free pages to a list that is
->        to be passed to the hypervisor, to be MADV_FREEd.
->    2d) Makes that hypercall.
-> 
-> Meanwhile all arch_alloc_pages has to do is make sure it
-> does not allocate a page while it is currently being
-> MADV_FREEd on the hypervisor side.
-> 
-> The code Wei is working on looks like it could be 
-> suitable for steps (2c) and (2d) above. Nitesh already
-> has code for steps 1 through 2b.
-> 
-> -- 
-> All rights reversed
+v14:
+- several changes made in spapr_events.c to allow for a minimal VMSD to be
+migrated. Please check the commit message of the patch for more information.
 
 
-So my question is this: Wei posted these numbers for balloon
-inflation times:
-inflating 7GB of an 8GB idle guest:
+This is the next version of the v13 that was sent a month ago. You can
+check out the v13 discussions here:
 
-	1) allocating pages (6.5%)
-	2) sending PFNs to host (68.3%)
-	3) address translation (6.1%)
-	4) madvise (19%)
+https://lists.nongnu.org/archive/html/qemu-devel/2017-05/msg04992.html
 
-	It takes about 4126ms for the inflating process to complete.
+Previous changes:
 
-It seems that this is an excessive amount of time to stay
-under a lock. What are your estimates for Nitesh's work?
+v13:
+- rebased with dgibson/ppc-for-2.10
+- patch 1 removed from the series (already applied at ppc-for-2.10)
+- data_size is now being calculated by using the extended_length field inside
+rtas_event_log_queue
+
+v12:
+- patch 2: added a switch statement to get the proper data_size based on
+the log_type
+
+v11:
+- patch 1 (new): cleanup of spapr_events.c:
+    * removed the 'exception' boolean from the sPAPREventLogEntry
+    * simplified the 'event_scan' function
+- patch 2:
+    * data_size is now calculated inside rtas_event_log_queue()
+    * using VBUFFER instead of VARRAY to avoid casts
+    * log_type changed to int32_t
+
+v10: detached from DRC patch set
+
+v9: no changes
+
+v8: no changes
+
+v7: no changes
+
+v6: - Rebased with QEMU master after 6+ months.
+class and minor improvements.
+    - Added clarifications from the previous v5 discussions in the commit 
+messages.
+
+v5: - Rebased on David's ppc-for-2.8.
+
+v4: - Rebased on David's ppc-for-2.7. 
+
+v3: - Simplify overall design followng discussion with Paolo. No longer need
+      metadata to migrate QTAILQ.
+    - Extend VMStateInfo instead of adding similar fields to VMStateField.
+
+v2: - Put the newly added migrating fields in subsections so that backward 
+      migration is not broken.  
+(link: https://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg04188.html)
+
+v1: - Inital version.
+(link: https://lists.nongnu.org/archive/html/qemu-devel/2016-04/msg02601.html)
+
+
+
+Daniel Henrique Barboza (1):
+  migration: spapr: migrate pending_events of spapr state
+
+ hw/ppc/spapr.c         | 32 +++++++++++++++++
+ hw/ppc/spapr_events.c  | 98 +++++++++++++++++++++++++++++++-------------------
+ include/hw/ppc/spapr.h |  9 +++--
+ 3 files changed, 101 insertions(+), 38 deletions(-)
 
 -- 
-MST
+2.9.4
