@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50351)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=33755ff8a=anthony.perard@citrix.com>)
-	id 1dNKTQ-0005vH-OT
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 10:49:45 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dNKa0-0000LC-MF
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 10:56:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=33755ff8a=anthony.perard@citrix.com>)
-	id 1dNKTM-0003qI-2l
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 10:49:44 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:36248)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=33755ff8a=anthony.perard@citrix.com>)
-	id 1dNKTL-0003pz-TJ
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 10:49:40 -0400
-Date: Tue, 20 Jun 2017 15:49:33 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20170620144933.GB1702@perard.uk.xensource.com>
-References: <20170619081945.30001-1-ross.lagerwall@citrix.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1dNKZx-0006QC-L2
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 10:56:32 -0400
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:34540)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dNKZx-0006Pu-El
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 10:56:29 -0400
+Received: by mail-wr0-x22d.google.com with SMTP id 77so94415562wrb.1
+	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 07:56:29 -0700 (PDT)
+References: <20170619104655.31104-1-alex.bennee@linaro.org>
+	<20170619104655.31104-6-alex.bennee@linaro.org>
+	<CAFEAcA_jQ7V9YPHUamnbTjDYZEuLcETi71AXAGb7qv3YrushKQ@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA_jQ7V9YPHUamnbTjDYZEuLcETi71AXAGb7qv3YrushKQ@mail.gmail.com>
+Date: Tue, 20 Jun 2017 15:57:09 +0100
+Message-ID: <87y3smu2pm.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20170619081945.30001-1-ross.lagerwall@citrix.com>
-Subject: Re: [Qemu-devel] [PATCH] xen-platform: Cleanup network
- infrastructure when emulated NICs are unplugged
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RISU PATCH v5 05/13] build-all-archs: support
+ cross building via docker
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +32,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ross Lagerwall <ross.lagerwall@citrix.com>
-Cc: qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, Jun 19, 2017 at 09:19:45AM +0100, Ross Lagerwall wrote:
-> When the guest unplugs the emulated NICs, call net_cleanup() to cleanup
-> the network infrastructure in QEMU as it is not needed anymore. Most
-> importantly, this allows the tap interfaces which QEMU holds open to be
-> closed and removed.
-> 
-> Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
-> ---
->  hw/i386/xen/xen_platform.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/i386/xen/xen_platform.c b/hw/i386/xen/xen_platform.c
-> index 1419fc9..180abc7 100644
-> --- a/hw/i386/xen/xen_platform.c
-> +++ b/hw/i386/xen/xen_platform.c
-> @@ -105,6 +105,7 @@ static void unplug_nic(PCIBus *b, PCIDevice *d, void *o)
->  static void pci_unplug_nics(PCIBus *bus)
->  {
->      pci_for_each_device(bus, 0, unplug_nic, NULL);
-> +    net_cleanup();
 
-This makes QEMU segv when QEMU is shutting down. When net_cleanup() is
-called a second time, qemu crash. That probably not a good sign, even if
-the guest continue to live after a reboot or a migration.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
--- 
-Anthony PERARD
+> On 19 June 2017 at 11:46, Alex Bennée <alex.bennee@linaro.org> wrote:
+>> If we want to link to any other libraries we might find using simple
+>> cross toolchains doesn't work so well. One way around this is to use a
+>> dockerised cross-toolchain which then won't clash with your host
+>> system. If the user specifies --use-docker the obvious will be done.
+>>
+>> By default we use the QEMU projects qemu:debian-FOO-cross images as
+>> RISU hackers are likely to be QEMU developers too. However any docker
+>> tag can be passed on the command line.
+>>
+>> If none of the docker images have usable compilers we fall back to
+>> checking the host path.
+>>
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>
+> $ ./build-all-archs --use-docker
+> Got permission denied while trying to connect to the Docker daemon
+> socket at unix:///var/run/docker.sock: Get
+> http://%2Fvar%2Frun%2Fdocker.sock/v1.27/images/json?filters=%7B%22reference%22%3A%7B%22qemu%22%3Atrue%7D%7D:
+> dial unix /var/run/docker.sock: connect: permission denied
+>
+> but maybe my local docker setup is just broken?
+
+Generally you need to add yourself to the "docker" group to have access.
+This isn't recommended in production but the alternative is to preface
+all docker calls with sudo and set up permissions that way. The official
+docs discuss it here:
+
+  https://docs.docker.com/engine/installation/linux/linux-postinstall/
+
+The advice that "only trusted users should be allowed to control your
+Docker daemon." is valid but irrelevant to developers who generally have
+complete control of their own box.
+
+>
+> thanks
+> -- PMM
+
+
+--
+Alex Bennée
