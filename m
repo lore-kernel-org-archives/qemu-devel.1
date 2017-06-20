@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dNHor-0002Qe-KJ
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 07:59:42 -0400
+	(envelope-from <berrange@redhat.com>) id 1dNHrp-00054r-QX
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 08:02:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dNHon-00047f-Au
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 07:59:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49706)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dNHon-00047H-32
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 07:59:37 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1497016045-6009-1-git-send-email-armbru@redhat.com>
-	<CAFEAcA83HnSBD+c+pyUot+v-yBfhFvHU1J_zAb9ZqY3f9f-Sfg@mail.gmail.com>
-Date: Tue, 20 Jun 2017 13:59:31 +0200
-In-Reply-To: <CAFEAcA83HnSBD+c+pyUot+v-yBfhFvHU1J_zAb9ZqY3f9f-Sfg@mail.gmail.com>
-	(Peter Maydell's message of "Mon, 12 Jun 2017 11:39:01 +0100")
-Message-ID: <8737au3m58.fsf@dusky.pond.sub.org>
+	(envelope-from <berrange@redhat.com>) id 1dNHrg-0004ns-E0
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 08:02:45 -0400
+Date: Tue, 20 Jun 2017 13:02:06 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170620120206.GA23328@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170619173455.18805-1-berrange@redhat.com>
+	<20170619173455.18805-8-berrange@redhat.com>
+	<w51d19y51e5.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/41] QAPI patches for 2017-06-09
+Content-Disposition: inline
+In-Reply-To: <w51d19y51e5.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [PATCH v9 07/20] block: deprecate "encryption=on"
+ in favor of "encrypt.format=aes"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,79 +26,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+On Tue, Jun 20, 2017 at 01:44:50PM +0200, Alberto Garcia wrote:
+> On Mon 19 Jun 2017 07:34:42 PM CEST, Daniel P. Berrange wrote:
+> > Historically the qcow & qcow2 image formats supported a property
+> > "encryption=on" to enable their built-in AES encryption. We'll
+> > soon be supporting LUKS for qcow2, so need a more general purpose
+> > way to enable encryption, with a choice of formats.
+> >
+> > This introduces an "encrypt.format" option, which will later be
+> > joined by a number of other "encrypt.XXX" options. The use of
+> > a "encrypt." prefix instead of "encrypt-" is done to facilitate
+> > mapping to a nested QAPI schema at later date.
+> >
+> > e.g. the preferred syntax is now
+> >
+> >   qemu-img create -f qcow2 -o encrypt.format=aes demo.qcow2
+> >
+> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> > +    if (encryptfmt) {
+> > +        buf = qemu_opt_get_del(opts, BLOCK_OPT_ENCRYPT);
+> > +        if (buf != NULL) {
+> > +            g_free(buf);
+> 
+> If you use qemu_opt_get() instead then you don't need "buf" at all, do
+> you?
 
-> On 9 June 2017 at 14:46, Markus Armbruster <armbru@redhat.com> wrote:
->> The following changes since commit 64175afc695c0672876fbbfc31b299c86d562=
-cb4:
->>
->>   arm_gicv3: Fix ICC_BPR1 reset value when EL3 not implemented (2017-06-=
-07 17:21:44 +0100)
->>
->> are available in the git repository at:
->>
->>   git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2017-06-09
->>
->> for you to fetch changes up to 9f70c3652654d59a1cc0e2ef4cc5b0e541d93579:
->>
->>   tests/qdict: check more get_try_int() cases (2017-06-09 13:48:45 +0200)
->>
->> ----------------------------------------------------------------
->> QAPI patches for 2017-06-09
->>
->
-> Some compilers don't like the assert(0) idiom used in qnum.c to
-> say "code flow doesn't reach end of function":
->
-> /home/petmay01/linaro/qemu-for-merges/qobject/qnum.c: In function
-> =E2=80=98qnum_get_double=E2=80=99:
-> /home/petmay01/linaro/qemu-for-merges/qobject/qnum.c:162:1: error:
-> control reaches end of non-void function [-Werror=3Dreturn-type]
->  }
->  ^
-> /home/petmay01/linaro/qemu-for-merges/qobject/qnum.c: In function
-> =E2=80=98qnum_to_string=E2=80=99:
-> /home/petmay01/linaro/qemu-for-merges/qobject/qnum.c:200:1: error:
-> control reaches end of non-void function [-Werror=3Dreturn-type]
->  }
->  ^
->
-> (probably older gcc; that was the w32 gcc compiler; one of
-> patchew's build environments fails the same way).
->
-> I think one common working idiom for this is:
-> int foo(void) {
->    switch (whatever) {
->        case X:
->           return 0;
->        case Y:
->           return 1;
->        default:
->           g_assert_not_reached();
->    }
-> }
+IIRC, we needed to delete the option from opts, otherwise something
+will later complain that there are opts that are not consumed.
 
-Two differences: (1) push the "not reached" assertion into the switch,
-and (2) use g_assert_not_reached().
+> 
+> > +    if (encryptfmt) {
+> > +        buf = qemu_opt_get_del(opts, BLOCK_OPT_ENCRYPT);
+> > +        if (buf != NULL) {
+> > +            g_free(buf);
+> 
+> Same here.
+> 
+> Everything else looks fine.
+> 
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
 
-In theory, (1) shouldn't affect the warning, because either the compiler
-groks "not reached" or it doesn't, and if it doesn't, whether we insert
-another jump on the way to the implicit return shouldn't matter.  But
-we're talking about a possibly confused compiler here, so who knows.
-
-If it's (2), then /usr/include/assert.h is likely broken.  Meh, but
-having to work around broken stuff is par for the course.
-
-Elsewhere in the file, we do
-
-    assert(0);
-    return $DUMMY_VALUE;
-
-I'll stick to that for local consistency.
-
-> Can you fix and resend the pullreq, please?
-
-In a couple of minutes.  Sorry for the inconvenience.
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
