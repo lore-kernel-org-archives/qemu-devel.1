@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dNBUS-0002vW-KA
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 01:14:13 -0400
+	(envelope-from <thuth@redhat.com>) id 1dNBYM-0004Dq-KO
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 01:18:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dNBUO-0007J9-Gu
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 01:14:12 -0400
-Resent-Message-Id: <E1dNBUO-0007J9-Gu@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21361)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dNBUO-0007Ha-2x
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 01:14:08 -0400
-In-Reply-To: <1497879848-7612-1-git-send-email-cludwig@genua.de>
-Message-ID: <149793563384.31734.10580944749568637967@4a9a010726c0>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <thuth@redhat.com>) id 1dNBYI-0000Hf-MX
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 01:18:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47298)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dNBYI-0000HS-GR
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 01:18:10 -0400
+References: <1497468113-2874-1-git-send-email-thuth@redhat.com>
+	<1497468113-2874-2-git-send-email-thuth@redhat.com>
+	<7b5278e2-9624-2faa-b888-eaa23492c405@twiddle.net>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <cfb64cc2-10ce-3e60-3b85-361d571112e2@redhat.com>
+Date: Tue, 20 Jun 2017 07:18:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 19 Jun 2017 22:13:54 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] AcpiDeviceIf: More readable bitmask
- definition
+In-Reply-To: <7b5278e2-9624-2faa-b888-eaa23492c405@twiddle.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/4] include/exec/poison: Add missing
+ TARGET defines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +30,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: cludwig@genua.de
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSF0gQWNwaURldmljZUlmOiBNb3JlIHJlYWRhYmxlIGJpdG1hc2sgZGVmaW5p
-dGlvbgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMTQ5Nzg3OTg0OC03NjEyLTEtZ2l0LXNlbmQt
-ZW1haWwtY2x1ZHdpZ0BnZW51YS5kZQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
-YmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3
-YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1m
-b3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVj
-aG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMg
-JGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9j
-aGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAg
-ZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFND
-UklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4
-NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKN2RhOWY5OSBBY3BpRGV2aWNl
-SWY6IE1vcmUgcmVhZGFibGUgYml0bWFzayBkZWZpbml0aW9uCgo9PT0gT1VUUFVUIEJFR0lOID09
-PQpDaGVja2luZyBQQVRDSCAxLzE6IEFjcGlEZXZpY2VJZjogTW9yZSByZWFkYWJsZSBiaXRtYXNr
-IGRlZmluaXRpb24uLi4KRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwoj
-Mjg6IEZJTEU6IGluY2x1ZGUvaHcvYWNwaS9hY3BpX2Rldl9pbnRlcmZhY2UuaDoxMDoKKyAgICBB
-Q1BJX1BDSV9IT1RQTFVHX1NUQVRVUyA9XkleSSgxIDw8IDEpLCQKCkVSUk9SOiBjb2RlIGluZGVu
-dCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzI5OiBGSUxFOiBpbmNsdWRlL2h3L2FjcGkvYWNwaV9k
-ZXZfaW50ZXJmYWNlLmg6MTE6CisgICAgQUNQSV9DUFVfSE9UUExVR19TVEFUVVMgPV5JXkkoMSA8
-PCAyKSwkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzMDogRklM
-RTogaW5jbHVkZS9ody9hY3BpL2FjcGlfZGV2X2ludGVyZmFjZS5oOjEyOgorICAgIEFDUElfTUVN
-T1JZX0hPVFBMVUdfU1RBVFVTID1eSSgxIDw8IDMpLCQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91
-bGQgbmV2ZXIgdXNlIHRhYnMKIzMxOiBGSUxFOiBpbmNsdWRlL2h3L2FjcGkvYWNwaV9kZXZfaW50
-ZXJmYWNlLmg6MTM6CisgICAgQUNQSV9OVkRJTU1fSE9UUExVR19TVEFUVVMgPV5JKDEgPDwgNCks
-JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzI6IEZJTEU6IGlu
-Y2x1ZGUvaHcvYWNwaS9hY3BpX2Rldl9pbnRlcmZhY2UuaDoxNDoKKyAgICBBQ1BJX1ZNR0VOSURf
-Q0hBTkdFX1NUQVRVUyA9XkkoMSA8PCA1KSwkCgp0b3RhbDogNSBlcnJvcnMsIDAgd2FybmluZ3Ms
-IDE2IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgot
-LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
-ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVl
-bGlzdHMub3Jn
+On 19.06.2017 23:49, Richard Henderson wrote:
+> On 06/14/2017 12:21 PM, Thomas Huth wrote:
+>>   #pragma GCC poison TARGET_CRIS
+>>   #pragma GCC poison TARGET_LM32
+> 
+> Missing HPPA and TILEGX.
+
+Oh, looks like I missed the new defines from the -linux-user targets ...
+thanks for the hint, I'll send a new version.
+
+ Thomas
