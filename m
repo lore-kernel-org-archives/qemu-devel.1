@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dNJoz-0004TD-Hz
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 10:07:58 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dNJqp-0005ux-FH
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 10:09:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dNJou-0006td-KM
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 10:07:57 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20170620120206.GA23328@redhat.com>
-References: <20170619173455.18805-1-berrange@redhat.com>
-	<20170619173455.18805-8-berrange@redhat.com>
-	<w51d19y51e5.fsf@maestria.local.igalia.com>
-	<20170620120206.GA23328@redhat.com>
-Date: Tue, 20 Jun 2017 16:07:49 +0200
-Message-ID: <w517f06lpl6.fsf@maestria.local.igalia.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dNJqj-0007f5-Rp
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 10:09:51 -0400
+Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:36486)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dNJqj-0007ev-LT
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 10:09:45 -0400
+Received: by mail-wr0-x230.google.com with SMTP id c11so37248399wrc.3
+	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 07:09:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v9 07/20] block: deprecate "encryption=on"
- in favor of "encrypt.format=aes"
+In-Reply-To: <20170619104655.31104-6-alex.bennee@linaro.org>
+References: <20170619104655.31104-1-alex.bennee@linaro.org>
+	<20170619104655.31104-6-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 20 Jun 2017 15:09:24 +0100
+Message-ID: <CAFEAcA_jQ7V9YPHUamnbTjDYZEuLcETi71AXAGb7qv3YrushKQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RISU PATCH v5 05/13] build-all-archs: support
+ cross building via docker
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,34 +31,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue 20 Jun 2017 02:02:06 PM CEST, Daniel P. Berrange wrote:
->> > +    if (encryptfmt) {
->> > +        buf = qemu_opt_get_del(opts, BLOCK_OPT_ENCRYPT);
->> > +        if (buf != NULL) {
->> > +            g_free(buf);
->> 
->> If you use qemu_opt_get() instead then you don't need "buf" at all,
->> do you?
+On 19 June 2017 at 11:46, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+> If we want to link to any other libraries we might find using simple
+> cross toolchains doesn't work so well. One way around this is to use a
+> dockerised cross-toolchain which then won't clash with your host
+> system. If the user specifies --use-docker the obvious will be done.
 >
-> IIRC, we needed to delete the option from opts, otherwise something
-> will later complain that there are opts that are not consumed.
+> By default we use the QEMU projects qemu:debian-FOO-cross images as
+> RISU hackers are likely to be QEMU developers too. However any docker
+> tag can be passed on the command line.
+>
+> If none of the docker images have usable compilers we fall back to
+> checking the host path.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-I don't see how, since once you reached this point it means that you
-cannot create the image because the options are already wrong.
+$ ./build-all-archs --use-docker
+Got permission denied while trying to connect to the Docker daemon
+socket at unix:///var/run/docker.sock: Get
+http://%2Fvar%2Frun%2Fdocker.sock/v1.27/images/json?filters=3D%7B%22referen=
+ce%22%3A%7B%22qemu%22%3Atrue%7D%7D:
+dial unix /var/run/docker.sock: connect: permission denied
 
-Anyway, there's a more important problem with this patch that I just
-noticed: in this scenario you're freeing 'buf' twice, first in the snip
-I quoted above, and then at the end of qcow2_create().
+but maybe my local docker setup is just broken?
 
-qcow_create() from qcow.c is safe, but perhaps it's clearer if you put
-the declaration of the 'buf' variable inside the 'if (encryptfmt)'
-block.
-
-That assuming that you really need to use qemu_opt_get_del() there. With
-the double-free bug fixed, I don't see any difference when using
-qemu_opt_get_del() vs qemu_opt_get().
-
-Berto
+thanks
+-- PMM
