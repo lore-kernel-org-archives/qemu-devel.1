@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dN98L-0004bJ-1M
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 22:43:14 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dN9JO-00079C-5u
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 22:54:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dN98H-0007SD-S0
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 22:43:13 -0400
-Received: from [59.151.112.132] (port=63552 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dN98G-0007DX-Ld
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 22:43:09 -0400
-References: <cover.1497272778.git.maozy.fnst@cn.fujitsu.com>
-	<41cdfa0bee8125dcf347822fb0d9b279ee8b61fa.1497272778.git.maozy.fnst@cn.fujitsu.com>
-	<486020ee-8b90-8eae-2e41-63e0d4afb14b@redhat.com>
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Message-ID: <62b32f24-bd82-f3e1-aef1-8a8710d3cab1@cn.fujitsu.com>
-Date: Tue, 20 Jun 2017 10:41:21 +0800
+	(envelope-from <aik@ozlabs.ru>) id 1dN9JJ-0003zH-BD
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 22:54:38 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:35974)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1dN9JJ-0003y3-1j
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 22:54:33 -0400
+Received: by mail-pf0-x243.google.com with SMTP id y7so20434091pfd.3
+	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 19:54:31 -0700 (PDT)
+References: <CAFEAcA_3Uf-t7MgvTqO52XX61z3Mcnmpk1XNJRqgdFJiVP1ALQ@mail.gmail.com>
+	<08ab93cb-4d42-2b8b-71e6-057b9529d0b7@suse.de>
+	<e72dab1b-7544-65ea-0e07-abfd78413706@redhat.com>
+	<20170620010258.GK22449@umbus>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <4df57772-2f40-2538-399c-77118b6c01e7@ozlabs.ru>
+Date: Tue, 20 Jun 2017 12:54:24 +1000
 MIME-Version: 1.0
-In-Reply-To: <486020ee-8b90-8eae-2e41-63e0d4afb14b@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 6/9] pci: Convert to realize
+In-Reply-To: <20170620010258.GK22449@umbus>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="iVEvoCuHpGe550eV4BLBDCk1Dge1pr7wV"
+Subject: Re: [Qemu-devel] spapr guests warn "System page size 0x2000 is not
+ enabled in page_size_mask (0x11000). Performance may be slow" on SPARC
+ hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,379 +34,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, armbru@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>
+Cc: Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Hi, Marcel
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--iVEvoCuHpGe550eV4BLBDCk1Dge1pr7wV
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+To: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>
+Cc: Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <4df57772-2f40-2538-399c-77118b6c01e7@ozlabs.ru>
+Subject: Re: [Qemu-devel] spapr guests warn "System page size 0x2000 is not
+ enabled in page_size_mask (0x11000). Performance may be slow" on SPARC hosts
+References: <CAFEAcA_3Uf-t7MgvTqO52XX61z3Mcnmpk1XNJRqgdFJiVP1ALQ@mail.gmail.com>
+ <08ab93cb-4d42-2b8b-71e6-057b9529d0b7@suse.de>
+ <e72dab1b-7544-65ea-0e07-abfd78413706@redhat.com>
+ <20170620010258.GK22449@umbus>
+In-Reply-To: <20170620010258.GK22449@umbus>
+Content-Type: text/plain; charset=koi8-r
+Content-Transfer-Encoding: quoted-printable
 
-On 06/19/2017 07:42 PM, Marcel Apfelbaum wrote:
-> On 12/06/2017 16:48, Mao Zhongyi wrote:
->> The pci-birdge device i82801b11
->
-> It is a dmi-to-pci brigde
->
->> and io3130_upstream/downstream
->
-> You forgot to mention the pcie_root_port.
->
->> still implements the old PCIDeviceClass .init() through *_init()
->> instead of the new .realize(). All devices need to be converted
->> to .realize(). So convert it and rename it to *_realize().
+On 20/06/17 11:02, David Gibson wrote:
+> On Mon, Jun 19, 2017 at 12:32:48PM +0200, Thomas Huth wrote:
+>> On 19.06.2017 11:39, Alexander Graf wrote:
+>>> On 06/15/2017 03:33 PM, Peter Maydell wrote:
+>>>> I've just noticed that on a SPARC host, some of the PPC guests
+>>>> warn during make check:
+>>>>
+>>>>    /ppc64/prom-env/pseries:
+>>>> qemu-system-ppc64: System page size 0x2000 is not enabled in
+>>>> page_size_mask (0x11000). Performance may be slow
+>>>>
+>>>> Is this really a performance problem on a TCG guest?
+>>>> It makes the 'make check' output a bit noisy, but not
+>>>> unbearably so.
+>>>
+>>> From what I can tell this really only affects DDW which should be pag=
+e
+>>> size agnostic when only using emulated devices. Maybe Alexey thought =
+of
+>>> using VFIO-pci devices in a TCG guest?
 >>
->
->
-> I would change the message to something more concise like:
->
-> "Convert i82801b11, xio3130_downstream, xio3130_upstream
->  and pcie_root_port devices to realize."
->
-> I am sure it worth a re-spin though.
+>> Maybe we could at least silence the warning by checking
+>> qtest_enabled()?
+>=20
+>=20
+> So,
+>=20
+> 1) Yes, we should at least silence the warning.
 
-Thanks for your kind suggestion, I will. :)
+Agree, wrapping it into kvm_enabled() should do it.
 
->
->> Cc: mst@redhat.com
->> Cc: marcel@redhat.com
->> Cc: armbru@redhat.com
->> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
->> ---
->>   hw/pci-bridge/i82801b11.c          | 11 +++++------
->>   hw/pci-bridge/pcie_root_port.c     | 15 ++++++---------
->>   hw/pci-bridge/xio3130_downstream.c | 20 +++++++++-----------
->>   hw/pci-bridge/xio3130_upstream.c   | 20 +++++++++-----------
->>   hw/pci/pci_bridge.c                |  7 +++----
->>   hw/pci/pcie.c                      | 11 ++++++-----
->>   include/hw/pci/pci_bridge.h        |  3 ++-
->>   include/hw/pci/pcie.h              |  3 ++-
->>   8 files changed, 42 insertions(+), 48 deletions(-)
->>
->> diff --git a/hw/pci-bridge/i82801b11.c b/hw/pci-bridge/i82801b11.c
->> index 2c065c3..2c1b747 100644
->> --- a/hw/pci-bridge/i82801b11.c
->> +++ b/hw/pci-bridge/i82801b11.c
->> @@ -59,24 +59,23 @@ typedef struct I82801b11Bridge {
->>       /*< public >*/
->>   } I82801b11Bridge;
->>   -static int i82801b11_bridge_initfn(PCIDevice *d)
->> +static void i82801b11_bridge_realize(PCIDevice *d, Error **errp)
->>   {
->>       int rc;
->>         pci_bridge_initfn(d, TYPE_PCI_BUS);
->>         rc = pci_bridge_ssvid_init(d, I82801ba_SSVID_OFFSET,
->> -                               I82801ba_SSVID_SVID, I82801ba_SSVID_SSID);
->> +                               I82801ba_SSVID_SVID, I82801ba_SSVID_SSID,
->> +                               errp);
->>       if (rc < 0) {
->>           goto err_bridge;
->>       }
->>       pci_config_set_prog_interface(d->config, PCI_CLASS_BRIDGE_PCI_INF_SUB);
->> -    return 0;
->> +    return;
->>     err_bridge:
->>       pci_bridge_exitfn(d);
->> -
->> -    return rc;
->>   }
->>     static const VMStateDescription i82801b11_bridge_dev_vmstate = {
->> @@ -96,7 +95,7 @@ static void i82801b11_bridge_class_init(ObjectClass *klass, void *data)
->>       k->vendor_id = PCI_VENDOR_ID_INTEL;
->>       k->device_id = PCI_DEVICE_ID_INTEL_82801BA_11;
->>       k->revision = ICH9_D2P_A2_REVISION;
->> -    k->init = i82801b11_bridge_initfn;
->> +    k->realize = i82801b11_bridge_realize;
->>       k->config_write = pci_bridge_write_config;
->>       dc->vmsd = &i82801b11_bridge_dev_vmstate;
->>       set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
->> diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
->> index cf36318..00f0b1f 100644
->> --- a/hw/pci-bridge/pcie_root_port.c
->> +++ b/hw/pci-bridge/pcie_root_port.c
->> @@ -59,29 +59,27 @@ static void rp_realize(PCIDevice *d, Error **errp)
->>       PCIDeviceClass *dc = PCI_DEVICE_GET_CLASS(d);
->>       PCIERootPortClass *rpc = PCIE_ROOT_PORT_GET_CLASS(d);
->>       int rc;
->> -    Error *local_err = NULL;
->>         pci_config_set_interrupt_pin(d->config, 1);
->>       pci_bridge_initfn(d, TYPE_PCIE_BUS);
->>       pcie_port_init_reg(d);
->>   -    rc = pci_bridge_ssvid_init(d, rpc->ssvid_offset, dc->vendor_id, rpc->ssid);
->> +    rc = pci_bridge_ssvid_init(d, rpc->ssvid_offset, dc->vendor_id,
->> +                               rpc->ssid, errp);
->>       if (rc < 0) {
->> -        error_setg(errp, "Can't init SSV ID, error %d", rc);
->
->
-> I suggest using 'error_append_hint' instead of removing
-> the message; even if it does not add a lot of information,
-> maybe someone is expecting it to be in the logs.
 
-OK, I see.
+>=20
+> 2) Certainly the mentioned slowdown shouldn't be significant for TCG
+> guests.
 
->
->>           goto err_bridge;
->>       }
->>         if (rpc->interrupts_init) {
->> -        rc = rpc->interrupts_init(d, &local_err);
->> +        rc = rpc->interrupts_init(d, errp);
->>           if (rc < 0) {
->> -            error_propagate(errp, local_err);
->>               goto err_bridge;
->>           }
->>       }
->>   -    rc = pcie_cap_init(d, rpc->exp_offset, PCI_EXP_TYPE_ROOT_PORT, p->port);
->> +    rc = pcie_cap_init(d, rpc->exp_offset, PCI_EXP_TYPE_ROOT_PORT,
->> +                       p->port, errp);
->>       if (rc < 0) {
->> -        error_setg(errp, "Can't add Root Port capability, error %d", rc);
->>           goto err_int;
->>       }
->>   @@ -98,9 +96,8 @@ static void rp_realize(PCIDevice *d, Error **errp)
->>       }
->>         rc = pcie_aer_init(d, PCI_ERR_VER, rpc->aer_offset,
->> -                       PCI_ERR_SIZEOF, &local_err);
->> +                       PCI_ERR_SIZEOF, errp);
->>       if (rc < 0) {
->> -        error_propagate(errp, local_err);
->>           goto err;
->>       }
->>       pcie_aer_root_init(d);
->> diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_downstream.c
->> index cfe8a36..e706f36 100644
->> --- a/hw/pci-bridge/xio3130_downstream.c
->> +++ b/hw/pci-bridge/xio3130_downstream.c
->> @@ -56,33 +56,33 @@ static void xio3130_downstream_reset(DeviceState *qdev)
->>       pci_bridge_reset(qdev);
->>   }
->>   -static int xio3130_downstream_initfn(PCIDevice *d)
->> +static void xio3130_downstream_realize(PCIDevice *d, Error **errp)
->>   {
->>       PCIEPort *p = PCIE_PORT(d);
->>       PCIESlot *s = PCIE_SLOT(d);
->>       int rc;
->> -    Error *err = NULL;
->>         pci_bridge_initfn(d, TYPE_PCIE_BUS);
->>       pcie_port_init_reg(d);
->>         rc = msi_init(d, XIO3130_MSI_OFFSET, XIO3130_MSI_NR_VECTOR,
->>                     XIO3130_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_64BIT,
->> -                  XIO3130_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_MASKBIT, &err);
->> +                  XIO3130_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_MASKBIT,
->> +                  errp);
->>       if (rc < 0) {
->>           assert(rc == -ENOTSUP);
->> -        error_report_err(err);
->>           goto err_bridge;
->>       }
->>         rc = pci_bridge_ssvid_init(d, XIO3130_SSVID_OFFSET,
->> -                               XIO3130_SSVID_SVID, XIO3130_SSVID_SSID);
->> +                               XIO3130_SSVID_SVID, XIO3130_SSVID_SSID,
->> +                               errp);
->>       if (rc < 0) {
->>           goto err_bridge;
->>       }
->>         rc = pcie_cap_init(d, XIO3130_EXP_OFFSET, PCI_EXP_TYPE_DOWNSTREAM,
->> -                       p->port);
->> +                       p->port, errp);
->>       if (rc < 0) {
->>           goto err_msi;
->>       }
->> @@ -98,13 +98,12 @@ static int xio3130_downstream_initfn(PCIDevice *d)
->>       }
->>         rc = pcie_aer_init(d, PCI_ERR_VER, XIO3130_AER_OFFSET,
->> -                       PCI_ERR_SIZEOF, &err);
->> +                       PCI_ERR_SIZEOF, errp);
->>       if (rc < 0) {
->> -        error_report_err(err);
->>           goto err;
->>       }
->>   -    return 0;
->> +    return;
->>     err:
->>       pcie_chassis_del_slot(s);
->> @@ -114,7 +113,6 @@ err_msi:
->>       msi_uninit(d);
->>   err_bridge:
->>       pci_bridge_exitfn(d);
->> -    return rc;
->>   }
->>     static void xio3130_downstream_exitfn(PCIDevice *d)
->> @@ -181,7 +179,7 @@ static void xio3130_downstream_class_init(ObjectClass *klass, void *data)
->>       k->is_express = 1;
->>       k->is_bridge = 1;
->>       k->config_write = xio3130_downstream_write_config;
->> -    k->init = xio3130_downstream_initfn;
->> +    k->realize = xio3130_downstream_realize;
->>       k->exit = xio3130_downstream_exitfn;
->>       k->vendor_id = PCI_VENDOR_ID_TI;
->>       k->device_id = PCI_DEVICE_ID_TI_XIO3130D;
->> diff --git a/hw/pci-bridge/xio3130_upstream.c b/hw/pci-bridge/xio3130_upstream.c
->> index 401c784..a052224 100644
->> --- a/hw/pci-bridge/xio3130_upstream.c
->> +++ b/hw/pci-bridge/xio3130_upstream.c
->> @@ -53,32 +53,32 @@ static void xio3130_upstream_reset(DeviceState *qdev)
->>       pcie_cap_deverr_reset(d);
->>   }
->>   -static int xio3130_upstream_initfn(PCIDevice *d)
->> +static void xio3130_upstream_realize(PCIDevice *d, Error **errp)
->>   {
->>       PCIEPort *p = PCIE_PORT(d);
->>       int rc;
->> -    Error *err = NULL;
->>         pci_bridge_initfn(d, TYPE_PCIE_BUS);
->>       pcie_port_init_reg(d);
->>         rc = msi_init(d, XIO3130_MSI_OFFSET, XIO3130_MSI_NR_VECTOR,
->>                     XIO3130_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_64BIT,
->> -                  XIO3130_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_MASKBIT, &err);
->> +                  XIO3130_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_MASKBIT,
->> +                  errp);
->>       if (rc < 0) {
->>           assert(rc == -ENOTSUP);
->> -        error_report_err(err);
->>           goto err_bridge;
->>       }
->>         rc = pci_bridge_ssvid_init(d, XIO3130_SSVID_OFFSET,
->> -                               XIO3130_SSVID_SVID, XIO3130_SSVID_SSID);
->> +                               XIO3130_SSVID_SVID, XIO3130_SSVID_SSID,
->> +                               errp);
->>       if (rc < 0) {
->>           goto err_bridge;
->>       }
->>         rc = pcie_cap_init(d, XIO3130_EXP_OFFSET, PCI_EXP_TYPE_UPSTREAM,
->> -                       p->port);
->> +                       p->port, errp);
->>       if (rc < 0) {
->>           goto err_msi;
->>       }
->> @@ -86,13 +86,12 @@ static int xio3130_upstream_initfn(PCIDevice *d)
->>       pcie_cap_deverr_init(d);
->>         rc = pcie_aer_init(d, PCI_ERR_VER, XIO3130_AER_OFFSET,
->> -                       PCI_ERR_SIZEOF, &err);
->> +                       PCI_ERR_SIZEOF, errp);
->>       if (rc < 0) {
->> -        error_report_err(err);
->>           goto err;
->>       }
->>   -    return 0;
->> +    return;
->>     err:
->>       pcie_cap_exit(d);
->> @@ -100,7 +99,6 @@ err_msi:
->>       msi_uninit(d);
->>   err_bridge:
->>       pci_bridge_exitfn(d);
->> -    return rc;
->>   }
->>     static void xio3130_upstream_exitfn(PCIDevice *d)
->> @@ -153,7 +151,7 @@ static void xio3130_upstream_class_init(ObjectClass *klass, void *data)
->>       k->is_express = 1;
->>       k->is_bridge = 1;
->>       k->config_write = xio3130_upstream_write_config;
->> -    k->init = xio3130_upstream_initfn;
->> +    k->realize = xio3130_upstream_realize;
->>       k->exit = xio3130_upstream_exitfn;
->>       k->vendor_id = PCI_VENDOR_ID_TI;
->>       k->device_id = PCI_DEVICE_ID_TI_XIO3130U;
->> diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
->> index bb0f3a3..720119b 100644
->> --- a/hw/pci/pci_bridge.c
->> +++ b/hw/pci/pci_bridge.c
->> @@ -41,15 +41,14 @@
->>   #define PCI_SSVID_SSID          6
->>     int pci_bridge_ssvid_init(PCIDevice *dev, uint8_t offset,
->> -                          uint16_t svid, uint16_t ssid)
->> +                          uint16_t svid, uint16_t ssid,
->> +                          Error **errp)
->>   {
->>       int pos;
->> -    Error *local_err = NULL;
->>         pos = pci_add_capability(dev, PCI_CAP_ID_SSVID, offset,
->> -                             PCI_SSVID_SIZEOF, &local_err);
->> +                             PCI_SSVID_SIZEOF, errp);
->>       if (pos < 0) {
->> -        error_report_err(local_err);
->>           return pos;
->>       }
->>   diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
->> index f187512..05d091a 100644
->> --- a/hw/pci/pcie.c
->> +++ b/hw/pci/pcie.c
->> @@ -86,19 +86,19 @@ pcie_cap_v1_fill(PCIDevice *dev, uint8_t port, uint8_t type, uint8_t version)
->>       pci_set_word(cmask + PCI_EXP_LNKSTA, 0);
->>   }
->>   -int pcie_cap_init(PCIDevice *dev, uint8_t offset, uint8_t type, uint8_t port)
->> +int pcie_cap_init(PCIDevice *dev, uint8_t offset,
->> +                  uint8_t type, uint8_t port,
->> +                  Error **errp)
->>   {
->>       /* PCIe cap v2 init */
->>       int pos;
->>       uint8_t *exp_cap;
->> -    Error *local_err = NULL;
->>         assert(pci_is_express(dev));
->>         pos = pci_add_capability(dev, PCI_CAP_ID_EXP, offset,
->> -                             PCI_EXP_VER2_SIZEOF, &local_err);
->> +                             PCI_EXP_VER2_SIZEOF, errp);
->>       if (pos < 0) {
->> -        error_report_err(local_err);
->>           return pos;
->>       }
->>       dev->exp.exp_cap = pos;
->> @@ -147,6 +147,7 @@ static int
->>   pcie_endpoint_cap_common_init(PCIDevice *dev, uint8_t offset, uint8_t cap_size)
->>   {
->>       uint8_t type = PCI_EXP_TYPE_ENDPOINT;
->> +    Error *local_err = NULL;
->>         /*
->>        * Windows guests will report Code 10, device cannot start, if
->> @@ -159,7 +160,7 @@ pcie_endpoint_cap_common_init(PCIDevice *dev, uint8_t offset, uint8_t cap_size)
->>         return (cap_size == PCI_EXP_VER1_SIZEOF)
->>           ? pcie_cap_v1_init(dev, offset, type, 0)
->> -        : pcie_cap_init(dev, offset, type, 0);
->> +        : pcie_cap_init(dev, offset, type, 0, &local_err);
->
-> You have some extra info on  local_err,
-> I think you should print an err message or propagate it with an
-> extra parameter.
+It is not significant at all. While in-kernel TCE handling improves
+throughput for VFIO devices quite a lot (200mb/s -> 1000mb/s), TCG could
+not do any better than 20mb/s anyway.
 
-Yes, it's true to report the error message from local_err, will
-fix it in the next.
 
->
->>   }
->>     int pcie_endpoint_cap_init(PCIDevice *dev, uint8_t offset)
->> diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
->> index d5891cd..ff7cbaa 100644
->> --- a/include/hw/pci/pci_bridge.h
->> +++ b/include/hw/pci/pci_bridge.h
->> @@ -33,7 +33,8 @@
->>   #define PCI_BRIDGE_DEV_PROP_SHPC       "shpc"
->>     int pci_bridge_ssvid_init(PCIDevice *dev, uint8_t offset,
->> -                          uint16_t svid, uint16_t ssid);
->> +                          uint16_t svid, uint16_t ssid,
->> +                          Error **errp);
->>     PCIDevice *pci_bridge_get_device(PCIBus *bus);
->>   PCIBus *pci_bridge_get_sec_bus(PCIBridge *br);
->> diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
->> index 3d8f24b..b71e369 100644
->> --- a/include/hw/pci/pcie.h
->> +++ b/include/hw/pci/pcie.h
->> @@ -84,7 +84,8 @@ struct PCIExpressDevice {
->>   #define COMPAT_PROP_PCP "power_controller_present"
->>     /* PCI express capability helper functions */
->> -int pcie_cap_init(PCIDevice *dev, uint8_t offset, uint8_t type, uint8_t port);
->> +int pcie_cap_init(PCIDevice *dev, uint8_t offset, uint8_t type,
->> +                  uint8_t port, Error **errp);
->>   int pcie_cap_v1_init(PCIDevice *dev, uint8_t offset,
->>                        uint8_t type, uint8_t port);
->>   int pcie_endpoint_cap_init(PCIDevice *dev, uint8_t offset);
->>
->
->
-> Thanks for converting the devices to realize!
-> Other than some minor comments, the patch looks reaaly good.
+> 3) I _think_ the restriction which causes the slowdown doesn't even
+> exist for TCG, but I haven't 100% convinced myself of this.  I've been
+> sick lately, so my brain isn't working all that well.
 
-Thanks :)
-Mao
+Mismatch between system page size and IOMMU page size means H_PUT_TCE is
+going to be called more often than needed; if VFIO is involved, then more=
 
-> Thanks,
-> Marcel
->
+ioctl(vfio_container_fd, DMAP_MAP) calls. But - we cannot do 8K IOMMU pag=
+es
+at all, SPARC does not support VFIO (or does it?), and TCG is slow anyway=
+=2E
+
+
+
+--=20
+Alexey
+
+
+--iVEvoCuHpGe550eV4BLBDCk1Dge1pr7wV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIrBAEBCAAVBQJZSI5hDhxhaWtAb3psYWJzLnJ1AAoJEIYTPdgrwSC5TeEQAIJe
+AGKPbjtCtzcuh4Axy9zdX0k5BVUU8GfiAEYwfYTvws/ZOuqt7s7kKXUtQkZOBvfZ
+j7aF4/cP1ojHxVBFzxfjgWEdheKZjZpzsbN9z0LFG76myr9tJB++zNCgeSBDf5q8
+Cqno/lKHCpqrpk3h1/uZVl8CRFvmKsIE/JJAKCVqpz6wwXuTV7sRqQo3iNDzHyGu
+VJ5OSWoGkEDKn42MRBaUW7gvs7YFChBv8DgiLxO6zoGtCN24Fwx7YQYoDk99BsJe
+yhtzVe7JHwE74SXcQIJ9pCXgk+HmaqqgGenkcCfc3Jdgr76qBZvW3Q4/2odbYJU6
+Ekk+PXclBewHVLlA2QTj4bcr1khKLLYRENQHY+GcU7tBUvNeeZIIdLVBhcpZr9QI
+jTOP5PJuOkZCB6IEtNUCL87B6fDVKS3mez9VeXnSuQc08R6saaavKkm3ih9U31Ks
+xFLor8PS+Ab9c4kqohvfxCHpGDy+AyoMxvmE7YPwYEWQR7yn+yTl4Usv9caTurV7
+5Q2pnEB2PNHFr1Z8gbRaNuaPtKdGZT/ENwqMWf0KDIccDsUVyUgjA2y1uvvhQVt4
+P8aknaQWylNVZ4MbUFjhCIi6G7TwHpHQ8m2n+WG6ZoRuUdSTiQuFr9hdmE8w6xoD
+Gn3CoNEHlDwLkFUl+zvZ6AYtrA66yN5fweZIEWqQ
+=apyu
+-----END PGP SIGNATURE-----
+
+--iVEvoCuHpGe550eV4BLBDCk1Dge1pr7wV--
