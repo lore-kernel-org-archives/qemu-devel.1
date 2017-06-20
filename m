@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44220)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dNLh2-000208-56
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 12:07:53 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1dNLiK-0002tO-1E
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 12:09:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dNLh0-0002f1-VI
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 12:07:52 -0400
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20170620134756.9632-1-paul.durrant@citrix.com>
-	<20170620134756.9632-4-paul.durrant@citrix.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <64fb8424-8cb0-ece1-a047-88e3259ef577@redhat.com>
-Date: Tue, 20 Jun 2017 18:07:39 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170620134756.9632-4-paul.durrant@citrix.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/3] xen-disk: use an IOThread per instance
+	(envelope-from <edgar.iglesias@gmail.com>) id 1dNLiI-0003ZF-Ap
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 12:09:12 -0400
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:35731)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
+	id 1dNLiI-0003YH-3N
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 12:09:10 -0400
+Received: by mail-lf0-x242.google.com with SMTP id n136so4201569lfn.2
+	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 09:09:10 -0700 (PDT)
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Date: Tue, 20 Jun 2017 18:08:59 +0200
+Message-Id: <1497974944-27050-3-git-send-email-edgar.iglesias@gmail.com>
+In-Reply-To: <1497974944-27050-1-git-send-email-edgar.iglesias@gmail.com>
+References: <1497974944-27050-1-git-send-email-edgar.iglesias@gmail.com>
+Subject: [Qemu-devel] [PATCH v1 2/7] target-microblaze: dec_barrel: Use
+ extract32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,174 +27,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: rth@twiddle.net, alistai@xilinx.com, sai.pavan.boddu@xilinx.com, edgar.iglesias@xilinx.com
 
-On 20/06/2017 15:47, Paul Durrant wrote:
-> This patch allocates an IOThread object for each xen_disk instance and
-> sets the AIO context appropriately on connect. This allows processing
-> of I/O to proceed in parallel.
-> 
-> The patch also adds tracepoints into xen_disk to make it possible to
-> follow the state transtions of an instance in the log.
-> 
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-The QEMU block layer is not yet thread safe, but code running in
-IOThreads still has to take the AioContext lock.  You need to call
-aio_context_acquire/release in blk_bh and qemu_aio_complete.
+Use extract32 instead of opencoding the shifting and masking.
+No functional change.
 
-Paolo
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+---
+ target/microblaze/translate.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> ---
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> ---
->  hw/block/trace-events |  7 +++++++
->  hw/block/xen_disk.c   | 44 +++++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 50 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/block/trace-events b/hw/block/trace-events
-> index 65e83dc258..608b24ba66 100644
-> --- a/hw/block/trace-events
-> +++ b/hw/block/trace-events
-> @@ -10,3 +10,10 @@ virtio_blk_submit_multireq(void *mrb, int start, int num_reqs, uint64_t offset,
->  # hw/block/hd-geometry.c
->  hd_geometry_lchs_guess(void *blk, int cyls, int heads, int secs) "blk %p LCHS %d %d %d"
->  hd_geometry_guess(void *blk, uint32_t cyls, uint32_t heads, uint32_t secs, int trans) "blk %p CHS %u %u %u trans %d"
-> +
-> +# hw/block/xen_disk.c
-> +xen_disk_alloc(char *name) "%s"
-> +xen_disk_init(char *name) "%s"
-> +xen_disk_connect(char *name) "%s"
-> +xen_disk_disconnect(char *name) "%s"
-> +xen_disk_free(char *name) "%s"
-> diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
-> index a9942d32db..ec1085c802 100644
-> --- a/hw/block/xen_disk.c
-> +++ b/hw/block/xen_disk.c
-> @@ -27,10 +27,13 @@
->  #include "hw/xen/xen_backend.h"
->  #include "xen_blkif.h"
->  #include "sysemu/blockdev.h"
-> +#include "sysemu/iothread.h"
->  #include "sysemu/block-backend.h"
->  #include "qapi/error.h"
->  #include "qapi/qmp/qdict.h"
->  #include "qapi/qmp/qstring.h"
-> +#include "qom/object_interfaces.h"
-> +#include "trace.h"
->  
->  /* ------------------------------------------------------------- */
->  
-> @@ -128,6 +131,9 @@ struct XenBlkDev {
->      DriveInfo           *dinfo;
->      BlockBackend        *blk;
->      QEMUBH              *bh;
-> +
-> +    IOThread            *iothread;
-> +    AioContext          *ctx;
->  };
->  
->  /* ------------------------------------------------------------- */
-> @@ -923,11 +929,31 @@ static void blk_bh(void *opaque)
->  static void blk_alloc(struct XenDevice *xendev)
->  {
->      struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
-> +    Object *obj;
-> +    char *name;
-> +    Error *err = NULL;
-> +
-> +    trace_xen_disk_alloc(xendev->name);
->  
->      QLIST_INIT(&blkdev->inflight);
->      QLIST_INIT(&blkdev->finished);
->      QLIST_INIT(&blkdev->freelist);
-> -    blkdev->bh = qemu_bh_new(blk_bh, blkdev);
-> +
-> +    obj = object_new(TYPE_IOTHREAD);
-> +    name = g_strdup_printf("iothread-%s", xendev->name);
-> +
-> +    object_property_add_child(object_get_objects_root(), name, obj, &err);
-> +    assert(!err);
-> +
-> +    g_free(name);
-> +
-> +    user_creatable_complete(obj, &err);
-> +    assert(!err);
-> +
-> +    blkdev->iothread = (IOThread *)object_dynamic_cast(obj, TYPE_IOTHREAD);
-> +    blkdev->ctx = iothread_get_aio_context(blkdev->iothread);
-> +    blkdev->bh = aio_bh_new(blkdev->ctx, blk_bh, blkdev);
-> +
->      if (xen_mode != XEN_EMULATE) {
->          batch_maps = 1;
->      }
-> @@ -954,6 +980,8 @@ static int blk_init(struct XenDevice *xendev)
->      int info = 0;
->      char *directiosafe = NULL;
->  
-> +    trace_xen_disk_init(xendev->name);
-> +
->      /* read xenstore entries */
->      if (blkdev->params == NULL) {
->          char *h = NULL;
-> @@ -1069,6 +1097,8 @@ static int blk_connect(struct XenDevice *xendev)
->      unsigned int i;
->      uint32_t *domids;
->  
-> +    trace_xen_disk_connect(xendev->name);
-> +
->      /* read-only ? */
->      if (blkdev->directiosafe) {
->          qflags = BDRV_O_NOCACHE | BDRV_O_NATIVE_AIO;
-> @@ -1285,6 +1315,8 @@ static int blk_connect(struct XenDevice *xendev)
->          blkdev->persistent_gnt_count = 0;
->      }
->  
-> +    blk_set_aio_context(blkdev->blk, blkdev->ctx);
-> +
->      xen_be_bind_evtchn(&blkdev->xendev);
->  
->      xen_pv_printf(&blkdev->xendev, 1, "ok: proto %s, nr-ring-ref %u, "
-> @@ -1298,13 +1330,20 @@ static void blk_disconnect(struct XenDevice *xendev)
->  {
->      struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
->  
-> +    trace_xen_disk_disconnect(xendev->name);
-> +
-> +    aio_context_acquire(blkdev->ctx);
-> +
->      if (blkdev->blk) {
-> +        blk_set_aio_context(blkdev->blk, qemu_get_aio_context());
->          blk_detach_dev(blkdev->blk, blkdev);
->          blk_unref(blkdev->blk);
->          blkdev->blk = NULL;
->      }
->      xen_pv_unbind_evtchn(&blkdev->xendev);
->  
-> +    aio_context_release(blkdev->ctx);
-> +
->      if (blkdev->sring) {
->          xengnttab_unmap(blkdev->xendev.gnttabdev, blkdev->sring,
->                          blkdev->nr_ring_ref);
-> @@ -1338,6 +1377,8 @@ static int blk_free(struct XenDevice *xendev)
->      struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
->      struct ioreq *ioreq;
->  
-> +    trace_xen_disk_free(xendev->name);
-> +
->      if (blkdev->blk || blkdev->sring) {
->          blk_disconnect(xendev);
->      }
-> @@ -1355,6 +1396,7 @@ static int blk_free(struct XenDevice *xendev)
->      g_free(blkdev->dev);
->      g_free(blkdev->devtype);
->      qemu_bh_delete(blkdev->bh);
-> +    object_unparent(OBJECT(blkdev->iothread));
->      return 0;
->  }
->  
-> 
+diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
+index 4136a8e..e959de7 100644
+--- a/target/microblaze/translate.c
++++ b/target/microblaze/translate.c
+@@ -670,8 +670,8 @@ static void dec_barrel(DisasContext *dc)
+         return;
+     }
+ 
+-    s = dc->imm & (1 << 10);
+-    t = dc->imm & (1 << 9);
++    s = extract32(dc->imm, 10, 1);
++    t = extract32(dc->imm, 9, 1);
+ 
+     LOG_DIS("bs%s%s r%d r%d r%d\n",
+             s ? "l" : "r", t ? "a" : "l", dc->rd, dc->ra, dc->rb);
+-- 
+2.7.4
