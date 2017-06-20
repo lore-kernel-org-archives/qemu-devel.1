@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batmanustc@gmail.com>) id 1dN8pO-0008Ce-Sh
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 22:23:41 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dN98L-0004bJ-1M
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 22:43:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <batmanustc@gmail.com>) id 1dN8pM-0005wM-Fc
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 22:23:38 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dN98H-0007SD-S0
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 22:43:13 -0400
+Received: from [59.151.112.132] (port=63552 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dN98G-0007DX-Ld
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 22:43:09 -0400
+References: <cover.1497272778.git.maozy.fnst@cn.fujitsu.com>
+	<41cdfa0bee8125dcf347822fb0d9b279ee8b61fa.1497272778.git.maozy.fnst@cn.fujitsu.com>
+	<486020ee-8b90-8eae-2e41-63e0d4afb14b@redhat.com>
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Message-ID: <62b32f24-bd82-f3e1-aef1-8a8710d3cab1@cn.fujitsu.com>
+Date: Tue, 20 Jun 2017 10:41:21 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170619094543.GC2640@redhat.com>
-References: <CAOE=1Z2Dtzt7xsiE=XR=MShSHwb6Z-=JnHdtvRr2MwQpFhpuiQ@mail.gmail.com>
-	<CAOE=1Z2PwNNk0KyEPC+cYSYtD62Vx=VZacaTKTHMBX=SaiBgGQ@mail.gmail.com>
-	<20170619094543.GC2640@redhat.com>
-From: Sam <batmanustc@gmail.com>
-Date: Tue, 20 Jun 2017 10:23:35 +0800
-Message-ID: <CAOE=1Z1utX_z-C9CUr-4Eo+mMwLevh6zkwBMrdn1kHoiinF=xA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Fwd: [DPDK-memory] how qemu waste such long time
- under dpdk huge page envriment?
+In-Reply-To: <486020ee-8b90-8eae-2e41-63e0d4afb14b@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 6/9] pci: Convert to realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,175 +28,379 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-discuss@nongnu.org
+To: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, armbru@redhat.com
 
-OK,
+Hi, Marcel
 
-Grub is bellow, which use huge page 1G.
-
-linux16 /boot/vmlinuz-0-rescue-1324ca4d8099476d99a8633e7cb952b7
-> root=UUID=9c3cf5ff-7c35-40c4-a6d9-0fc67683c4ed ro crashkernel=auto rhgb
-> quiet default_hugepagesz=1G hugepagesz=1G hugepages=112, isolcpus=2,18
-
-
-this is command line, ddc979cd is vhostuser interface connect with
-ovs-dpdk. For normal ovs, which is not ovs-dpdk, start time is 2 second,
-and there is no dpdk vhost user interface. For ovs-dpdk, start time is 15+
-second, and there is dpdk vhost user interface.
-
-CMD="$QEMU_CMD -enable-kvm -cpu
-> qemu64,+vmx,+ssse3,+sse4.1,+sse4.2,+x2apic,+aes,+avx,+vme,+pat,+ss,+pclmulqdq,+xsave,level=13
-> -machine pc,accel=kvm -chardev
-> socket,id=hmqmondev,port=55902,host=127.0.0.1,nodelay,server,nowait -mon
-> chardev=hmqmondev,id=hmqmon,mode=readline -rtc
-> base=utc,clock=host,driftfix=none -usb -device usb-tablet -daemonize
-> -nodefaults -nodefconfig -no-kvm-pit-reinjection -global
-> kvm-pit.lost_tick_policy=discard -vga std -k en-us -smp 8 -name test-name-5
-> -m 40960 -boot order=cdn -vnc :2,password -drive
-> file=$DISK_0,if=none,id=drive_0,format=qcow2,cache=none,aio=native -device
-> virtio-blk-pci,id=dev_drive_0,drive=drive_0,bus=pci.0,addr=0x5 -drive
-> file=$DISK_1,if=none,id=drive_1,format=qcow2,cache=none,aio=native -device
-> virtio-blk-pci,id=dev_drive_1,drive=drive_1,bus=pci.0,addr=0x6 -drive
-> file=$DISK_2,if=none,id=drive_2,format=qcow2,cache=none,aio=native -device
-> virtio-blk-pci,id=dev_drive_2,drive=drive_2,bus=pci.0,addr=0x7 -device
-> ide-cd,drive=ide0-cd0,bus=ide.1,unit=1 -drive
-> id=ide0-cd0,media=cdrom,if=none -chardev
-> socket,id=char-n-ddc979cd,path=/usr/local/var/run/openvswitch/n-ddc979cd,server
-> -netdev type=vhost-user,id=n-ddc979cd,chardev=char-n-ddc979cd,vhostforce=on
-> -device
-> virtio-net-pci,netdev=n-ddc979cd,mac=00:22:dd:c9:79:cd,id=netdev-n-ddc979cd,addr=0xf$(nic_speed
-> 10000) -object
-> memory-backend-file,id=mem,size=40960M,mem-path=/mnt/huge,share=on -numa
-> node,memdev=mem -mem-prealloc -pidfile $PID_FILE -chardev
-> socket,path=/opt/cloud/workspace/servers/b2cebb02-d171-4929-95d6-61e54cd647f7/qga.sock,server,nowait,id=qga0
-> -device virtio-serial -device
-> virtserialport,chardev=qga0,name=org.qemu.guest_agent.0"
-
-
-$QEMU_CMD is qemu binary file like 'qemu-system-x86_64_2.6.0'.
-
-BTW, when I only start ovs-dpdk in huge page enviroment, ovs-dpdk start
-time is also longer then normal ovs, and it is hang in EAL initializition
-and seetting up physical contiguous memory, log like this:
-
-EAL: Setting up physically contiguous memory...
-
-
-But qemu don't need EAL initilizition, that's the question I can't figure
-out.
-
-And qemu long time start up only happened in huge page enviroment, I don't
-know why.
-
-
-
-
-
-
-
-
-
-2017-06-19 17:45 GMT+08:00 Daniel P. Berrange <berrange@redhat.com>:
-
-> On Mon, Jun 19, 2017 at 05:30:59PM +0800, Sam wrote:
-> > Hi all,
-> >
-> > I'm running `QEMU_CMD ...` to create a vm under dpdk huge page envriment
-> > (which set huge page 1G). And I enable all events in qemu.
+On 06/19/2017 07:42 PM, Marcel Apfelbaum wrote:
+> On 12/06/2017 16:48, Mao Zhongyi wrote:
+>> The pci-birdge device i82801b11
 >
-> Please provide the full QEMU command line you are using.
+> It is a dmi-to-pci brigde
 >
-> > For qemu and ovs-dpdk(ovs-2.4.9 with dpdk-2.2.0) environment, detail log
-> is:
-> >
-> > > 30012@1497443246.678304:object_dynamic_cast_assert
-> > qemu:memory-region->qemu:memory-region (/home/hu
-> > > anghuai/cloud/contrib/qemu-2.6.0/memory.c:1076:memory_region_initfn)
-> > > 30012@1497443256.274866:object_dynamic_cast_assert
-> > qio-channel-socket->qio-channel-socket (io/chann
-> > > el-socket.c:389:qio_channel_socket_init)
-> >
-> >
-> > I don't know why qemu doing 'memory_region_initfn' function in this 10
-> > second, does anyone know this?
+>> and io3130_upstream/downstream
 >
-> If memory initialization takes a long time, this is likely a result of
-> QEMU pre-allocating the memory pages, which is a fairly slow procedure,
-> that can have noticable startup time impact for guests with large RAM
+> You forgot to mention the pcie_root_port.
+>
+>> still implements the old PCIDeviceClass .init() through *_init()
+>> instead of the new .realize(). All devices need to be converted
+>> to .realize(). So convert it and rename it to *_realize().
+>>
 >
 >
-> > static void memory_region_initfn(Object *obj)
-> > > {
-> > >     MemoryRegion *mr = MEMORY_REGION(obj);
-> > >     ObjectProperty *op;
-> > >     mr->ops = &unassigned_mem_ops;
-> > >     mr->enabled = true;
-> > >     mr->romd_mode = true;
-> > >     mr->global_locking = true;
-> > >     mr->destructor = memory_region_destructor_none;
-> > >     QTAILQ_INIT(&mr->subregions);
-> > >     QTAILQ_INIT(&mr->coalesced);
-> > >     op = object_property_add(OBJECT(mr), "container",
-> > >                              "link<" TYPE_MEMORY_REGION ">",
-> > >                              memory_region_get_container,
-> > >                              NULL, /* memory_region_set_container */
-> > >                              NULL, NULL, &error_abort);
-> > >     op->resolve = memory_region_resolve_container;
-> > >     object_property_add(OBJECT(mr), "addr", "uint64",
-> > >                         memory_region_get_addr,
-> > >                         NULL, /* memory_region_set_addr */
-> > >                         NULL, NULL, &error_abort);
-> > >     object_property_add(OBJECT(mr), "priority", "uint32",
-> > >                         memory_region_get_priority,
-> > >                         NULL, /* memory_region_set_priority */
-> > >                         NULL, NULL, &error_abort);
-> > >     object_property_add_bool(OBJECT(mr), "may-overlap",
-> > >                              memory_region_get_may_overlap,
-> > >                              NULL, /* memory_region_set_may_overlap */
-> > >                              &error_abort);
-> > >     object_property_add(OBJECT(mr), "size", "uint64",
-> > >                         memory_region_get_size,
-> > >                         NULL, /* memory_region_set_size, */
-> > >                         NULL, NULL, &error_abort);
-> > > }
-> >
-> >
-> > I print all system call by `strace -f -T -tt -e trace=all -o output.txt
-> > $QEMU_CMD`, and I found this:
-> >
-> > 5900  11:08:11.288701 nanosleep({0, 10000000}, 0x7ff103c13a80) = 0
-> > > <0.010171>
-> > > 5900  11:08:11.299052 futex(0x7ff10be24340, FUTEX_WAIT_PRIVATE, 2, NULL
-> > > <unfinished ...>
-> > > 5899  11:08:20.138492 rt_sigaction(SIGBUS, {0x7ff10b5b1040, [],
-> > > SA_RESTORER|SA_SIGINFO, 0x7ff1085fd100}, NULL, 8) = 0 <0.000012>
-> > > 5899  11:08:20.138598 rt_sigprocmask(SIG_SETMASK, [BUS USR1 ALRM IO],
-> > > NULL, 8) = 0 <0.000008>
-> > > 5899  11:08:20.138646 mmap(NULL, 266240, PROT_READ|PROT_WRITE,
-> > > MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7ff10b380000 <0.000013>
-> > > 5899  11:08:20.138793 mmap(NULL, 266240, PROT_READ|PROT_WRITE,
-> > > MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7ff10b33f000 <0.000009>
-> >
-> >
-> > I don't know who call `futex`, and why waste such long time.
+> I would change the message to something more concise like:
 >
-> This trace doesn't show enough info to say what is happening - a futex
-> is just the syscall used for mutex locking, so that just shows that
-> thread 5900 is waiting for some lock. This doesn't imply the time is
-> wasted, or really saying anything useful at all.
+> "Convert i82801b11, xio3130_downstream, xio3130_upstream
+>  and pcie_root_port devices to realize."
 >
-> Meanwhile thread 5899 was doing some mmap calls. There's no obvious
-> relationship between the times in thread 5900 and 58909 in this trace.
-> The 9 second gap here is just coincidental.
+> I am sure it worth a re-spin though.
+
+Thanks for your kind suggestion, I will. :)
+
 >
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/
-> dberrange :|
-> |: https://libvirt.org         -o-
-> https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/
-> dberrange :|
+>> Cc: mst@redhat.com
+>> Cc: marcel@redhat.com
+>> Cc: armbru@redhat.com
+>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+>> ---
+>>   hw/pci-bridge/i82801b11.c          | 11 +++++------
+>>   hw/pci-bridge/pcie_root_port.c     | 15 ++++++---------
+>>   hw/pci-bridge/xio3130_downstream.c | 20 +++++++++-----------
+>>   hw/pci-bridge/xio3130_upstream.c   | 20 +++++++++-----------
+>>   hw/pci/pci_bridge.c                |  7 +++----
+>>   hw/pci/pcie.c                      | 11 ++++++-----
+>>   include/hw/pci/pci_bridge.h        |  3 ++-
+>>   include/hw/pci/pcie.h              |  3 ++-
+>>   8 files changed, 42 insertions(+), 48 deletions(-)
+>>
+>> diff --git a/hw/pci-bridge/i82801b11.c b/hw/pci-bridge/i82801b11.c
+>> index 2c065c3..2c1b747 100644
+>> --- a/hw/pci-bridge/i82801b11.c
+>> +++ b/hw/pci-bridge/i82801b11.c
+>> @@ -59,24 +59,23 @@ typedef struct I82801b11Bridge {
+>>       /*< public >*/
+>>   } I82801b11Bridge;
+>>   -static int i82801b11_bridge_initfn(PCIDevice *d)
+>> +static void i82801b11_bridge_realize(PCIDevice *d, Error **errp)
+>>   {
+>>       int rc;
+>>         pci_bridge_initfn(d, TYPE_PCI_BUS);
+>>         rc = pci_bridge_ssvid_init(d, I82801ba_SSVID_OFFSET,
+>> -                               I82801ba_SSVID_SVID, I82801ba_SSVID_SSID);
+>> +                               I82801ba_SSVID_SVID, I82801ba_SSVID_SSID,
+>> +                               errp);
+>>       if (rc < 0) {
+>>           goto err_bridge;
+>>       }
+>>       pci_config_set_prog_interface(d->config, PCI_CLASS_BRIDGE_PCI_INF_SUB);
+>> -    return 0;
+>> +    return;
+>>     err_bridge:
+>>       pci_bridge_exitfn(d);
+>> -
+>> -    return rc;
+>>   }
+>>     static const VMStateDescription i82801b11_bridge_dev_vmstate = {
+>> @@ -96,7 +95,7 @@ static void i82801b11_bridge_class_init(ObjectClass *klass, void *data)
+>>       k->vendor_id = PCI_VENDOR_ID_INTEL;
+>>       k->device_id = PCI_DEVICE_ID_INTEL_82801BA_11;
+>>       k->revision = ICH9_D2P_A2_REVISION;
+>> -    k->init = i82801b11_bridge_initfn;
+>> +    k->realize = i82801b11_bridge_realize;
+>>       k->config_write = pci_bridge_write_config;
+>>       dc->vmsd = &i82801b11_bridge_dev_vmstate;
+>>       set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+>> diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+>> index cf36318..00f0b1f 100644
+>> --- a/hw/pci-bridge/pcie_root_port.c
+>> +++ b/hw/pci-bridge/pcie_root_port.c
+>> @@ -59,29 +59,27 @@ static void rp_realize(PCIDevice *d, Error **errp)
+>>       PCIDeviceClass *dc = PCI_DEVICE_GET_CLASS(d);
+>>       PCIERootPortClass *rpc = PCIE_ROOT_PORT_GET_CLASS(d);
+>>       int rc;
+>> -    Error *local_err = NULL;
+>>         pci_config_set_interrupt_pin(d->config, 1);
+>>       pci_bridge_initfn(d, TYPE_PCIE_BUS);
+>>       pcie_port_init_reg(d);
+>>   -    rc = pci_bridge_ssvid_init(d, rpc->ssvid_offset, dc->vendor_id, rpc->ssid);
+>> +    rc = pci_bridge_ssvid_init(d, rpc->ssvid_offset, dc->vendor_id,
+>> +                               rpc->ssid, errp);
+>>       if (rc < 0) {
+>> -        error_setg(errp, "Can't init SSV ID, error %d", rc);
+>
+>
+> I suggest using 'error_append_hint' instead of removing
+> the message; even if it does not add a lot of information,
+> maybe someone is expecting it to be in the logs.
+
+OK, I see.
+
+>
+>>           goto err_bridge;
+>>       }
+>>         if (rpc->interrupts_init) {
+>> -        rc = rpc->interrupts_init(d, &local_err);
+>> +        rc = rpc->interrupts_init(d, errp);
+>>           if (rc < 0) {
+>> -            error_propagate(errp, local_err);
+>>               goto err_bridge;
+>>           }
+>>       }
+>>   -    rc = pcie_cap_init(d, rpc->exp_offset, PCI_EXP_TYPE_ROOT_PORT, p->port);
+>> +    rc = pcie_cap_init(d, rpc->exp_offset, PCI_EXP_TYPE_ROOT_PORT,
+>> +                       p->port, errp);
+>>       if (rc < 0) {
+>> -        error_setg(errp, "Can't add Root Port capability, error %d", rc);
+>>           goto err_int;
+>>       }
+>>   @@ -98,9 +96,8 @@ static void rp_realize(PCIDevice *d, Error **errp)
+>>       }
+>>         rc = pcie_aer_init(d, PCI_ERR_VER, rpc->aer_offset,
+>> -                       PCI_ERR_SIZEOF, &local_err);
+>> +                       PCI_ERR_SIZEOF, errp);
+>>       if (rc < 0) {
+>> -        error_propagate(errp, local_err);
+>>           goto err;
+>>       }
+>>       pcie_aer_root_init(d);
+>> diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_downstream.c
+>> index cfe8a36..e706f36 100644
+>> --- a/hw/pci-bridge/xio3130_downstream.c
+>> +++ b/hw/pci-bridge/xio3130_downstream.c
+>> @@ -56,33 +56,33 @@ static void xio3130_downstream_reset(DeviceState *qdev)
+>>       pci_bridge_reset(qdev);
+>>   }
+>>   -static int xio3130_downstream_initfn(PCIDevice *d)
+>> +static void xio3130_downstream_realize(PCIDevice *d, Error **errp)
+>>   {
+>>       PCIEPort *p = PCIE_PORT(d);
+>>       PCIESlot *s = PCIE_SLOT(d);
+>>       int rc;
+>> -    Error *err = NULL;
+>>         pci_bridge_initfn(d, TYPE_PCIE_BUS);
+>>       pcie_port_init_reg(d);
+>>         rc = msi_init(d, XIO3130_MSI_OFFSET, XIO3130_MSI_NR_VECTOR,
+>>                     XIO3130_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_64BIT,
+>> -                  XIO3130_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_MASKBIT, &err);
+>> +                  XIO3130_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_MASKBIT,
+>> +                  errp);
+>>       if (rc < 0) {
+>>           assert(rc == -ENOTSUP);
+>> -        error_report_err(err);
+>>           goto err_bridge;
+>>       }
+>>         rc = pci_bridge_ssvid_init(d, XIO3130_SSVID_OFFSET,
+>> -                               XIO3130_SSVID_SVID, XIO3130_SSVID_SSID);
+>> +                               XIO3130_SSVID_SVID, XIO3130_SSVID_SSID,
+>> +                               errp);
+>>       if (rc < 0) {
+>>           goto err_bridge;
+>>       }
+>>         rc = pcie_cap_init(d, XIO3130_EXP_OFFSET, PCI_EXP_TYPE_DOWNSTREAM,
+>> -                       p->port);
+>> +                       p->port, errp);
+>>       if (rc < 0) {
+>>           goto err_msi;
+>>       }
+>> @@ -98,13 +98,12 @@ static int xio3130_downstream_initfn(PCIDevice *d)
+>>       }
+>>         rc = pcie_aer_init(d, PCI_ERR_VER, XIO3130_AER_OFFSET,
+>> -                       PCI_ERR_SIZEOF, &err);
+>> +                       PCI_ERR_SIZEOF, errp);
+>>       if (rc < 0) {
+>> -        error_report_err(err);
+>>           goto err;
+>>       }
+>>   -    return 0;
+>> +    return;
+>>     err:
+>>       pcie_chassis_del_slot(s);
+>> @@ -114,7 +113,6 @@ err_msi:
+>>       msi_uninit(d);
+>>   err_bridge:
+>>       pci_bridge_exitfn(d);
+>> -    return rc;
+>>   }
+>>     static void xio3130_downstream_exitfn(PCIDevice *d)
+>> @@ -181,7 +179,7 @@ static void xio3130_downstream_class_init(ObjectClass *klass, void *data)
+>>       k->is_express = 1;
+>>       k->is_bridge = 1;
+>>       k->config_write = xio3130_downstream_write_config;
+>> -    k->init = xio3130_downstream_initfn;
+>> +    k->realize = xio3130_downstream_realize;
+>>       k->exit = xio3130_downstream_exitfn;
+>>       k->vendor_id = PCI_VENDOR_ID_TI;
+>>       k->device_id = PCI_DEVICE_ID_TI_XIO3130D;
+>> diff --git a/hw/pci-bridge/xio3130_upstream.c b/hw/pci-bridge/xio3130_upstream.c
+>> index 401c784..a052224 100644
+>> --- a/hw/pci-bridge/xio3130_upstream.c
+>> +++ b/hw/pci-bridge/xio3130_upstream.c
+>> @@ -53,32 +53,32 @@ static void xio3130_upstream_reset(DeviceState *qdev)
+>>       pcie_cap_deverr_reset(d);
+>>   }
+>>   -static int xio3130_upstream_initfn(PCIDevice *d)
+>> +static void xio3130_upstream_realize(PCIDevice *d, Error **errp)
+>>   {
+>>       PCIEPort *p = PCIE_PORT(d);
+>>       int rc;
+>> -    Error *err = NULL;
+>>         pci_bridge_initfn(d, TYPE_PCIE_BUS);
+>>       pcie_port_init_reg(d);
+>>         rc = msi_init(d, XIO3130_MSI_OFFSET, XIO3130_MSI_NR_VECTOR,
+>>                     XIO3130_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_64BIT,
+>> -                  XIO3130_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_MASKBIT, &err);
+>> +                  XIO3130_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_MASKBIT,
+>> +                  errp);
+>>       if (rc < 0) {
+>>           assert(rc == -ENOTSUP);
+>> -        error_report_err(err);
+>>           goto err_bridge;
+>>       }
+>>         rc = pci_bridge_ssvid_init(d, XIO3130_SSVID_OFFSET,
+>> -                               XIO3130_SSVID_SVID, XIO3130_SSVID_SSID);
+>> +                               XIO3130_SSVID_SVID, XIO3130_SSVID_SSID,
+>> +                               errp);
+>>       if (rc < 0) {
+>>           goto err_bridge;
+>>       }
+>>         rc = pcie_cap_init(d, XIO3130_EXP_OFFSET, PCI_EXP_TYPE_UPSTREAM,
+>> -                       p->port);
+>> +                       p->port, errp);
+>>       if (rc < 0) {
+>>           goto err_msi;
+>>       }
+>> @@ -86,13 +86,12 @@ static int xio3130_upstream_initfn(PCIDevice *d)
+>>       pcie_cap_deverr_init(d);
+>>         rc = pcie_aer_init(d, PCI_ERR_VER, XIO3130_AER_OFFSET,
+>> -                       PCI_ERR_SIZEOF, &err);
+>> +                       PCI_ERR_SIZEOF, errp);
+>>       if (rc < 0) {
+>> -        error_report_err(err);
+>>           goto err;
+>>       }
+>>   -    return 0;
+>> +    return;
+>>     err:
+>>       pcie_cap_exit(d);
+>> @@ -100,7 +99,6 @@ err_msi:
+>>       msi_uninit(d);
+>>   err_bridge:
+>>       pci_bridge_exitfn(d);
+>> -    return rc;
+>>   }
+>>     static void xio3130_upstream_exitfn(PCIDevice *d)
+>> @@ -153,7 +151,7 @@ static void xio3130_upstream_class_init(ObjectClass *klass, void *data)
+>>       k->is_express = 1;
+>>       k->is_bridge = 1;
+>>       k->config_write = xio3130_upstream_write_config;
+>> -    k->init = xio3130_upstream_initfn;
+>> +    k->realize = xio3130_upstream_realize;
+>>       k->exit = xio3130_upstream_exitfn;
+>>       k->vendor_id = PCI_VENDOR_ID_TI;
+>>       k->device_id = PCI_DEVICE_ID_TI_XIO3130U;
+>> diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
+>> index bb0f3a3..720119b 100644
+>> --- a/hw/pci/pci_bridge.c
+>> +++ b/hw/pci/pci_bridge.c
+>> @@ -41,15 +41,14 @@
+>>   #define PCI_SSVID_SSID          6
+>>     int pci_bridge_ssvid_init(PCIDevice *dev, uint8_t offset,
+>> -                          uint16_t svid, uint16_t ssid)
+>> +                          uint16_t svid, uint16_t ssid,
+>> +                          Error **errp)
+>>   {
+>>       int pos;
+>> -    Error *local_err = NULL;
+>>         pos = pci_add_capability(dev, PCI_CAP_ID_SSVID, offset,
+>> -                             PCI_SSVID_SIZEOF, &local_err);
+>> +                             PCI_SSVID_SIZEOF, errp);
+>>       if (pos < 0) {
+>> -        error_report_err(local_err);
+>>           return pos;
+>>       }
+>>   diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+>> index f187512..05d091a 100644
+>> --- a/hw/pci/pcie.c
+>> +++ b/hw/pci/pcie.c
+>> @@ -86,19 +86,19 @@ pcie_cap_v1_fill(PCIDevice *dev, uint8_t port, uint8_t type, uint8_t version)
+>>       pci_set_word(cmask + PCI_EXP_LNKSTA, 0);
+>>   }
+>>   -int pcie_cap_init(PCIDevice *dev, uint8_t offset, uint8_t type, uint8_t port)
+>> +int pcie_cap_init(PCIDevice *dev, uint8_t offset,
+>> +                  uint8_t type, uint8_t port,
+>> +                  Error **errp)
+>>   {
+>>       /* PCIe cap v2 init */
+>>       int pos;
+>>       uint8_t *exp_cap;
+>> -    Error *local_err = NULL;
+>>         assert(pci_is_express(dev));
+>>         pos = pci_add_capability(dev, PCI_CAP_ID_EXP, offset,
+>> -                             PCI_EXP_VER2_SIZEOF, &local_err);
+>> +                             PCI_EXP_VER2_SIZEOF, errp);
+>>       if (pos < 0) {
+>> -        error_report_err(local_err);
+>>           return pos;
+>>       }
+>>       dev->exp.exp_cap = pos;
+>> @@ -147,6 +147,7 @@ static int
+>>   pcie_endpoint_cap_common_init(PCIDevice *dev, uint8_t offset, uint8_t cap_size)
+>>   {
+>>       uint8_t type = PCI_EXP_TYPE_ENDPOINT;
+>> +    Error *local_err = NULL;
+>>         /*
+>>        * Windows guests will report Code 10, device cannot start, if
+>> @@ -159,7 +160,7 @@ pcie_endpoint_cap_common_init(PCIDevice *dev, uint8_t offset, uint8_t cap_size)
+>>         return (cap_size == PCI_EXP_VER1_SIZEOF)
+>>           ? pcie_cap_v1_init(dev, offset, type, 0)
+>> -        : pcie_cap_init(dev, offset, type, 0);
+>> +        : pcie_cap_init(dev, offset, type, 0, &local_err);
+>
+> You have some extra info on  local_err,
+> I think you should print an err message or propagate it with an
+> extra parameter.
+
+Yes, it's true to report the error message from local_err, will
+fix it in the next.
+
+>
+>>   }
+>>     int pcie_endpoint_cap_init(PCIDevice *dev, uint8_t offset)
+>> diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
+>> index d5891cd..ff7cbaa 100644
+>> --- a/include/hw/pci/pci_bridge.h
+>> +++ b/include/hw/pci/pci_bridge.h
+>> @@ -33,7 +33,8 @@
+>>   #define PCI_BRIDGE_DEV_PROP_SHPC       "shpc"
+>>     int pci_bridge_ssvid_init(PCIDevice *dev, uint8_t offset,
+>> -                          uint16_t svid, uint16_t ssid);
+>> +                          uint16_t svid, uint16_t ssid,
+>> +                          Error **errp);
+>>     PCIDevice *pci_bridge_get_device(PCIBus *bus);
+>>   PCIBus *pci_bridge_get_sec_bus(PCIBridge *br);
+>> diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
+>> index 3d8f24b..b71e369 100644
+>> --- a/include/hw/pci/pcie.h
+>> +++ b/include/hw/pci/pcie.h
+>> @@ -84,7 +84,8 @@ struct PCIExpressDevice {
+>>   #define COMPAT_PROP_PCP "power_controller_present"
+>>     /* PCI express capability helper functions */
+>> -int pcie_cap_init(PCIDevice *dev, uint8_t offset, uint8_t type, uint8_t port);
+>> +int pcie_cap_init(PCIDevice *dev, uint8_t offset, uint8_t type,
+>> +                  uint8_t port, Error **errp);
+>>   int pcie_cap_v1_init(PCIDevice *dev, uint8_t offset,
+>>                        uint8_t type, uint8_t port);
+>>   int pcie_endpoint_cap_init(PCIDevice *dev, uint8_t offset);
+>>
+>
+>
+> Thanks for converting the devices to realize!
+> Other than some minor comments, the patch looks reaaly good.
+
+Thanks :)
+Mao
+
+> Thanks,
+> Marcel
 >
