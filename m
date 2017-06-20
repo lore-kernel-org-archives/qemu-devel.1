@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <casasfernando@hotmail.com>) id 1dNCfu-0006HI-M6
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 02:30:08 -0400
+	(envelope-from <david@redhat.com>) id 1dNDfe-00017n-KE
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 03:33:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <casasfernando@hotmail.com>) id 1dNCfr-0007TQ-GY
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 02:30:06 -0400
-Received: from mail-oln040092072093.outbound.protection.outlook.com
-	([40.92.72.93]:43664
-	helo=EUR03-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <casasfernando@hotmail.com>)
-	id 1dNCfq-0007P8-Ui
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 02:30:03 -0400
-From: =?utf-8?B?RmVybmFuZG8gQ2FzYXMgU2Now7Zzc293?= <casasfernando@hotmail.com>
-Date: Tue, 20 Jun 2017 06:30:00 +0000
-Message-ID: <HE1PR1001MB1371F7874B487B0907C42A7EB7C50@HE1PR1001MB1371.EURPRD10.PROD.OUTLOOK.COM>
-References: <VI1PR1001MB137395F2FCBDE6389A9AC5FCB7C30@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
-	<CABdb7358YVXbk++Z7s+q6Z5O0Q=6CQiQvYsTdc35eqmQeUnP_Q@mail.gmail.com>
-	<VI1PR1001MB1373C8915C51F7453D41B950B7C10@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
-	<CABdb7345_Nu_kpsSDGq7OyOSuKmgtyS-DuXTafkGeaCCXzV5LQ@mail.gmail.com>
-	<VI1PR1001MB1373B1F3C97D9528166E2305B7C40@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
-	<CABdb735e_NjY47LRZ58+zvKGmCRQKAmFo-HhByhsosRzQkOgxA@mail.gmail.com>
-In-Reply-To: <CABdb735e_NjY47LRZ58+zvKGmCRQKAmFo-HhByhsosRzQkOgxA@mail.gmail.com>
-Content-Language: en-US
+	(envelope-from <david@redhat.com>) id 1dNDfb-00040l-Ex
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 03:33:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42210)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dNDfb-00040P-5t
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 03:33:51 -0400
+References: <20170620000405.3391-1-rth@twiddle.net>
+	<20170620000405.3391-15-rth@twiddle.net>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <071f5f1b-6ecd-0695-f9bf-e026b5ecb4b3@redhat.com>
+Date: Tue, 20 Jun 2017 09:33:47 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] Guest unresponsive after Virtqueue size exceeded
- error
+In-Reply-To: <20170620000405.3391-15-rth@twiddle.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 14/18] target/s390x: Tidy SRST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,102 +28,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, aurelien@aurel32.net
 
-SGkgTGFkaSwNCg0KSW4gdGhpcyBjYXNlIGJvdGggZ3Vlc3RzIGFyZSBDZW50T1MgNy4zIHJ1bm5p
-bmcgdGhlIHNhbWUga2VybmVsIDMuMTAuMC01MTQuMjEuMS4NCkFsc28gdGhlIGd1ZXN0IHRoYXQg
-ZmFpbHMgbW9zdCBmcmVxdWVudGx5IGlzIHJ1bm5pbmcgRG9ja2VyIHdpdGggNCBvciA1IGNvbnRh
-aW5lcnMuDQoNCkFub3RoZXIgdGhpbmcgSSB3b3VsZCBsaWtlIHRvIG1lbnRpb24gaXMgdGhhdCB0
-aGUgaG9zdCBpcyBydW5uaW5nIG9uIEFscGluZSdzIGRlZmF1bHQgZ3JzZWMgcGF0Y2hlZCBrZXJu
-ZWwuIEkgaGF2ZSB0aGUgb3B0aW9uIHRvIGluc3RhbGwgYWxzbyBhIHZhbmlsbGEga2VybmVsLiBX
-b3VsZCBpdCBtYWtlIHNlbnNlIHRvIHN3aXRjaCB0byB0aGUgdmFuaWxsYSBrZXJuZWwgb24gdGhl
-IGhvc3QgYW5kIHNlZSBpZiB0aGF0IGhlbHBzPw0KQW5kIGxhc3QgYnV0IG5vdCBsZWFzdCBLU00g
-aXMgZW5hYmxlZCBvbiB0aGUgaG9zdC4gU2hvdWxkIEkgZGlzYWJsZSBpdD8NCg0KRm9sbG93aW5n
-IHlvdXIgYWR2aWNlIEkgd2lsbCBydW4gbWVtdGVzdCBvbiB0aGUgaG9zdCBhbmQgcmVwb3J0IGJh
-Y2suIEp1c3QgYXMgYSBzaWRlIGNvbW1lbnQsIHRoZSBob3N0IGlzIHJ1bm5pbmcgb24gRUNDIG1l
-bW9yeS4NCg0KVGhhbmtzIGZvciBhbGwgeW91ciBoZWxwLg0KDQpGZXIuDQoNCk9uIG1hciwganVu
-IDIwLCAyMDE3IGF0IDc6NTkgLCBMYWRpIFByb3NlayA8bHByb3Nla0ByZWRoYXQuY29tPiB3cm90
-ZToNCkhpIEZlcm5hbmRvLCBPbiBUdWUsIEp1biAyMCwgMjAxNyBhdCAxMjoxMCBBTSwgRmVybmFu
-ZG8gQ2FzYXMgU2Now7Zzc293IDxjYXNhc2Zlcm5hbmRvQGhvdG1haWwuY29tPG1haWx0bzpjYXNh
-c2Zlcm5hbmRvQGhvdG1haWwuY29tPj4gd3JvdGU6DQpIaSBMYWRpLCBUb2RheSB0d28gZ3Vlc3Rz
-IGZhaWxlZCBhZ2FpbiBhdCBkaWZmZXJlbnQgdGltZXMgb2YgZGF5LiBPbmUgb2YgdGhlbSB3YXMg
-dGhlIG9uZSBJIHN3aXRjaGVkIGZyb20gdmlydGlvX2JsayB0byB2aXJ0aW9fc2NzaSBzbyB0aGlz
-IGNoYW5nZSBkaWRuJ3Qgc29sdmVkIHRoZSBwcm9ibGVtLiBOb3cgaW4gdGhpcyBndWVzdCBJIGFs
-c28gZGlzYWJsZWQgdmlydGlvX2JhbGxvb24sIGNvbnRpbnVpbmcgd2l0aCB0aGUgZWxpbWluYXRp
-b24gcHJvY2Vzcy4gQWxzbyB0aGlzIHRpbWUgSSBmb3VuZCBhIGRpZmZlcmVudCBlcnJvciBtZXNz
-YWdlIGluIHRoZSBndWVzdCBjb25zb2xlLiBJbiB0aGUgZ3Vlc3QgYWxyZWFkeSBzd2l0Y2hlZCB0
-byB2aXJ0aW9fc2NzaTogdmlydGlvX3Njc2kgdmlydGlvMjogcmVxdWVzdDppZCA0NCBpcyBub3Qg
-YSBoZWFkISBGb2xsb3dlZCBieSB0aGUgdXN1YWwgInRhc2sgYmxvY2tlZCBmb3IgbW9yZSB0aGFu
-IDEyMCBzZWNvbmRzLiIgZXJyb3IuIE9uIHRoZSBndWVzdCBzdGlsbCBydW5uaW5nIG9uIHZpcnRp
-b19ibGsgdGhlIGVycm9yIHdhcyBzaW1pbGFyOiB2aXJ0aW9fYmxrIHZpcnRpbzI6IHJlcS4wOmlk
-IDQyIGlzIG5vdCBhIGhlYWQhIGJsa191cGRhdGVfcmVxdWVzdDogSS9PIGVycm9yLCBkZXYgdmRh
-LCBzZWN0b3IgNjQ1NjU3NzM2IEJ1ZmZlciBJL08gZXJyb3Igb24gZGV2IGRtLTEsIGxvZ2ljYWwg
-YmxvY2sgNzQxMzgyMSwgbG9zdCBhc3luYyBwYWdlIHdyaXRlIEZvbGxvd2VkIGJ5IHRoZSB1c3Vh
-bCAidGFzayBibG9ja2VkIGZvciBtb3JlIHRoYW4gMTIwIHNlY29uZHMuIiBlcnJvci4NCkhvbmVz
-dGx5IHRoaXMgaXMgc3RhcnRpbmcgdG8gbG9vayBtb3JlIGFuZCBtb3JlIGxpa2UgYSBtZW1vcnkg
-Y29ycnVwdGlvbi4gVHdvIGRpZmZlcmVudCB2aXJ0aW8gZGV2aWNlcyBhbmQgdHdvIGRpZmZlcmVu
-dCBndWVzdCBvcGVyYXRpbmcgc3lzdGVtcywgdGhhdCB3b3VsZCBoYXZlIHRvIGJlIGEgYnVnIGlu
-IHRoZSBjb21tb24gdmlydGlvIGNvZGUgYW5kIHdlIHdvdWxkIGhhdmUgc2VlbiBpdCBzb21ld2hl
-cmUgZWxzZSBhbHJlYWR5LiBXb3VsZCBpdCBiZSBwb3NzaWJsZSBydW4gYSB0aG9yb3VnaCBtZW10
-ZXN0IG9uIHRoZSBob3N0IGp1c3QgaW4gY2FzZT8NCkRvIHlvdSB0aGluayB0aGF0IHRoZSBibGtf
-dXBkYXRlX3JlcXVlc3QgYW5kIHRoZSBidWZmZXIgSS9PIGVycm9yIG1heSBiZSBhIGNvbnNlcXVl
-bmNlIG9mIHRoZSBwcmV2aW91cyAiaXMgbm90IGEgaGVhZCEiIGVycm9yIG9yIHNob3VsZCBJIGJl
-IHdvcnJpZWQgZm9yIGEgc3RvcmFnZSBsZXZlbCBpc3N1ZSBoZXJlPyBOb3cgSSB3aWxsIHdhaXQg
-dG8gc2VlIGlmIGRpc2FibGluZyB2aXJ0aW9fYmFsbG9vbiBoZWxwcyBvciBub3QgYW5kIHJlcG9y
-dCBiYWNrLiBUaGFua3MuIEZlciBPbiB2aWUsIGp1biAxNiwgMjAxNyBhdCAxMjoyNSAsIExhZGkg
-UHJvc2VrIDxscHJvc2VrQHJlZGhhdC5jb208bWFpbHRvOmxwcm9zZWtAcmVkaGF0LmNvbT4+IHdy
-b3RlOiBPbiBGcmksIEp1biAxNiwgMjAxNyBhdCAxMjoxMSBQTSwgRmVybmFuZG8gQ2FzYXMgU2No
-w7Zzc293IDxjYXNhc2Zlcm5hbmRvQGhvdG1haWwuY29tPG1haWx0bzpjYXNhc2Zlcm5hbmRvQGhv
-dG1haWwuY29tPj4gd3JvdGU6IEhpIExhZGksIFRoYW5rcyBhIGxvdCBmb3IgbG9va2luZyBpbnRv
-IHRoaXMgYW5kIHJlcGx5aW5nLiBJIHdpbGwgZG8gbXkgYmVzdCB0byByZWJ1aWxkIGFuZCBkZXBs
-b3kgQWxwaW5lJ3MgcWVtdSBwYWNrYWdlcyB3aXRoIHRoaXMgcGF0Y2ggaW5jbHVkZWQgYnV0IG5v
-dCBzdXJlIGl0cyBmZWFzaWJsZSB5ZXQuIEluIGFueSBjYXNlLCB3b3VsZCBpdCBiZSBwb3NzaWJs
-ZSB0byBoYXZlIHRoaXMgcGF0Y2ggaW5jbHVkZWQgaW4gdGhlIG5leHQgcWVtdSByZWxlYXNlPyBZ
-ZXMsIEkgaGF2ZSBhbHJlYWR5IGFkZGVkIHRoaXMgdG8gbXkgdG9kbyBsaXN0LiBUaGUgY3VycmVu
-dCBlcnJvciBtZXNzYWdlIGlzIGhlbHBmdWwgYnV0IGtub3dpbmcgd2hpY2ggZGV2aWNlIHdhcyBp
-bnZvbHZlZCB3aWxsIGJlIG11Y2ggbW9yZSBoZWxwZnVsLiBSZWdhcmRpbmcgdGhlIGVudmlyb25t
-ZW50LCBJJ20gbm90IGRvaW5nIG1pZ3JhdGlvbnMgYW5kIG9ubHkgbWFuYWdlZCBzYXZlIGlzIGRv
-bmUgaW4gY2FzZSB0aGUgaG9zdCBuZWVkcyB0byBiZSByZWJvb3RlZCBvciBzaHV0ZG93bi4gVGhl
-IFFFTVUgcHJvY2VzcyBpcyBydW5uaW5nIHRoZSBWTSBzaW5jZSB0aGUgaG9zdCBpcyBzdGFydGVk
-IGFuZCB0aGlzIGZhaWx1aXJlIGlzIG9jdXJyaW5nIHJhbmRvbWx5IHdpdGhvdXQgYW55IHByZXZp
-b3VzIG1hbmFnZSBzYXZlIGRvbmUuIEFzIHBhcnQgb2YgdHJvdWJsZXNob290aW5nIG9uIG9uZSBv
-ZiB0aGUgZ3Vlc3RzIEkgc3dpdGNoZWQgZnJvbSB2aXJ0aW9fYmxrIHRvIHZpcnRpb19zY3NpIGZv
-ciB0aGUgZ3Vlc3QgZGlza3MgYnV0IEkgd2lsbCBuZWVkIG1vcmUgdGltZSB0byBzZWUgaWYgdGhh
-dCBoZWxwZWQuIElmIEkgaGF2ZSB0aGlzIHByb2JsZW0gYWdhaW4gSSB3aWxsIGZvbGxvdyB5b3Vy
-IGFkdmlzZSBhbmQgcmVtb3ZlIHZpcnRpb19iYWxsb29uLiBUaGFua3MsIHBsZWFzZSBrZWVwIHVz
-IHBvc3RlZC4gQW5vdGhlciBxdWVzdGlvbjogaXMgdGhlcmUgYW55IHdheSB0byBtb25pdG9yIHRo
-ZSB2aXJ0cXVldWUgc2l6ZSBlaXRoZXIgZnJvbSB0aGUgZ3Vlc3QgaXRzZWxmIG9yIGZyb20gdGhl
-IGhvc3Q/IEFueSBmaWxlIGluIHN5c2ZzIG9yIHByb2M/IFRoaXMgbWF5IGhlbHAgdG8gdW5kZXJz
-dGFuZCBpbiB3aGljaCBjb25kaXRpb25zIHRoaXMgaXMgaGFwcGVuaW5nIGFuZCB0byByZWFjdCBm
-YXN0ZXIgdG8gbWl0aWdhdGUgdGhlIHByb2JsZW0uIFRoZSBwcm9ibGVtIGlzIG5vdCBpbiB0aGUg
-dmlydHF1ZXVlIHNpemUgYnV0IGluIG9uZSBwaWVjZSBvZiBpbnRlcm5hbCBzdGF0ZSAoImludXNl
-Iikgd2hpY2ggaXMgbWVhbnQgdG8gdHJhY2sgdGhlIG51bWJlciBvZiBidWZmZXJzICJjaGVja2Vk
-IG91dCIgYnkgUUVNVS4gSXQncyBiZWluZyBjb21wYXJlZCB0byB2aXJ0cXVldWUgc2l6ZSBtZXJl
-bHkgYXMgYSBzYW5pdHkgY2hlY2suIEknbSBhZnJhaWQgdGhhdCB0aGVyZSdzIG5vIHdheSB0byBl
-eHBvc2UgdGhpcyB2YXJpYWJsZSB3aXRob3V0IHJlYnVpbGRpbmcgUUVNVS4gVGhlIGJlc3QgeW91
-IGNvdWxkIGRvIGlzIGF0dGFjaCBnZGIgdG8gdGhlIFFFTVUgcHJvY2VzcyBhbmQgdXNlIHNvbWUg
-Y2xldmVyIGRhdGEgYWNjZXNzIGJyZWFrcG9pbnRzIHRvIGNhdGNoIHN1c3BpY2lvdXMgd3JpdGVz
-IHRvIHRoZSB2YXJpYWJsZS4gQWx0aG91Z2ggaXQncyBsaWtlbHkgdGhhdCBpdCBqdXN0IGNyZWVw
-cyB1cCBzbG93bHkgYW5kIHlvdSB3b24ndCBzZWUgYW55dGhpbmcgaW50ZXJlc3RpbmcuIEl0J3Mg
-cHJvYmFibHkgYmV5b25kIHJlYXNvbmFibGUgYXQgdGhpcyBwb2ludCBhbnl3YXkuIEkgd291bGQg
-Y29udGludWUgd2l0aCB0aGUgZWxpbWluYXRpb24gcHJvY2VzcyAodmlydGlvX3Njc2kgaW5zdGVh
-ZCBvZiB2aXJ0aW9fYmxrLCBubyBiYWxsb29uLCBldGMuKSBhbmQgdGhlbiBtYXliZSBvbmNlIHdl
-IGtub3cgd2hpY2ggZGV2aWNlIGl0IGlzLCB3ZSBjYW4gYWRkIHNvbWUgaW5zdHJ1bWVudGF0aW9u
-IHRvIHRoZSBjb2RlLiBUaGFua3MgYWdhaW4gZm9yIHlvdXIgaGVscCB3aXRoIHRoaXMhIEZlciBP
-biB2aWUsIGp1biAxNiwgMjAxNyBhdCA4OjU4ICwgTGFkaSBQcm9zZWsgPGxwcm9zZWtAcmVkaGF0
-LmNvbTxtYWlsdG86bHByb3Nla0ByZWRoYXQuY29tPj4gd3JvdGU6IEhpLCBXb3VsZCB5b3UgYmUg
-YWJsZSB0byBlbmhhbmNlIHRoZSBlcnJvciBtZXNzYWdlIGFuZCByZWJ1aWxkIFFFTVU/IC0tLSBh
-L2h3L3ZpcnRpby92aXJ0aW8uYyArKysgYi9ody92aXJ0aW8vdmlydGlvLmMgQEAgLTg1Niw3ICs4
-NTYsNyBAQCB2b2lkICp2aXJ0cXVldWVfcG9wKFZpcnRRdWV1ZSAqdnEsIHNpemVfdCBzeikgbWF4
-ID0gdnEtPnZyaW5nLm51bTsgaWYgKHZxLT5pbnVzZSA9IHZxLT52cmluZy5udW0pIHsgLSB2aXJ0
-aW9fZXJyb3IodmRldiwgIlZpcnRxdWV1ZSBzaXplIGV4Y2VlZGVkIik7ICsgdmlydGlvX2Vycm9y
-KHZkZXYsICJWaXJ0cXVldWUgJXUgZGV2aWNlICVzIHNpemUgZXhjZWVkZWQiLCB2cS0+cXVldWVf
-aW5kZXgsIHZkZXYtPm5hbWUpOyBnb3RvIGRvbmU7IH0gVGhpcyB3b3VsZCBhdCBsZWFzdCBjb25m
-aXJtIHRoZSB0aGVvcnkgdGhhdCBpdCdzIGNhdXNlZCBieSB2aXJ0aW8tYmxrLXBjaS4gSWYgcmVi
-dWlsZGluZyBpcyBub3QgZmVhc2libGUgSSB3b3VsZCBzdGFydCBieSByZW1vdmluZyBvdGhlciB2
-aXJ0aW8gZGV2aWNlcyAtLSBwYXJ0aWN1bGFybHkgYmFsbG9vbiB3aGljaCBoYXMgaGFkIHF1aXRl
-IGEgZmV3IHZpcnRpbyByZWxhdGVkIGJ1Z3MgZml4ZWQgcmVjZW50bHkuIERvZXMgeW91ciBlbnZp
-cm9ubWVudCBpbnZvbHZlIFZNIG1pZ3JhdGlvbnMgb3Igc2F2aW5nL3Jlc3VtaW5nLCBvciBkb2Vz
-IHRoZSBjcmFzaGluZyBRRU1VIHByb2Nlc3MgYWx3YXlzIHJ1biB0aGUgVk0gZnJvbSBpdHMgYm9v
-dD8gVGhhbmtzIQ0KDQoNCg==
+On 20.06.2017 02:04, Richard Henderson wrote:
+> Since we require all registers saved on input, read R0 from ENV instead
+> of passing it manually.  Recognize the specification exception when R0
+> contains incorrect data.
+> 
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+> ---
+>  target/s390x/helper.h     |  2 +-
+>  target/s390x/mem_helper.c | 11 ++++++++---
+>  target/s390x/translate.c  |  2 +-
+>  3 files changed, 10 insertions(+), 5 deletions(-)
+> 
+> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+> index c014820..cd51b89 100644
+> --- a/target/s390x/helper.h
+> +++ b/target/s390x/helper.h
+> @@ -12,7 +12,7 @@ DEF_HELPER_FLAGS_3(divs32, TCG_CALL_NO_WG, s64, env, s64, s64)
+>  DEF_HELPER_FLAGS_3(divu32, TCG_CALL_NO_WG, i64, env, i64, i64)
+>  DEF_HELPER_FLAGS_3(divs64, TCG_CALL_NO_WG, s64, env, s64, s64)
+>  DEF_HELPER_FLAGS_4(divu64, TCG_CALL_NO_WG, i64, env, i64, i64, i64)
+> -DEF_HELPER_4(srst, i64, env, i64, i64, i64)
+> +DEF_HELPER_3(srst, i64, env, i64, i64)
+>  DEF_HELPER_4(clst, i64, env, i64, i64, i64)
+>  DEF_HELPER_FLAGS_4(mvn, TCG_CALL_NO_WG, void, env, i32, i64, i64)
+>  DEF_HELPER_FLAGS_4(mvo, TCG_CALL_NO_WG, void, env, i32, i64, i64)
+> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+> index df082f5..990858e 100644
+> --- a/target/s390x/mem_helper.c
+> +++ b/target/s390x/mem_helper.c
+> @@ -538,12 +538,17 @@ static inline void set_length(CPUS390XState *env, int reg, uint64_t length)
+>  }
+>  
+>  /* search string (c is byte to search, r2 is string, r1 end of string) */
+> -uint64_t HELPER(srst)(CPUS390XState *env, uint64_t r0, uint64_t end,
+> -                      uint64_t str)
+> +uint64_t HELPER(srst)(CPUS390XState *env, uint64_t end, uint64_t str)
+>  {
+>      uintptr_t ra = GETPC();
+>      uint32_t len;
+> -    uint8_t v, c = r0;
+> +    uint8_t v, c = env->regs[0];
+> +
+> +    /* Bits 32-55 must contain all 0.  */
+> +    if (env->regs[0] & 0xffffff00u) {
+> +        cpu_restore_state(ENV_GET_CPU(env), ra);
+> +        program_interrupt(env, PGM_SPECIFICATION, 6);
+> +    }
+>  
+>      str = wrap_address(env, str);
+>      end = wrap_address(env, end);
+> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+> index f8989ec..4a860f1 100644
+> --- a/target/s390x/translate.c
+> +++ b/target/s390x/translate.c
+> @@ -4256,7 +4256,7 @@ static ExitStatus op_stpq(DisasContext *s, DisasOps *o)
+>  
+>  static ExitStatus op_srst(DisasContext *s, DisasOps *o)
+>  {
+> -    gen_helper_srst(o->in1, cpu_env, regs[0], o->in1, o->in2);
+> +    gen_helper_srst(o->in1, cpu_env, o->in1, o->in2);
+>      set_cc_static(s);
+>      return_low128(o->in2);
+>      return NO_EXIT;
+> 
+
+
+-- 
+
+Thanks,
+
+David
