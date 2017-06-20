@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41832)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dN9gu-0004KI-9Y
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 23:19:00 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dNADo-0002rJ-M3
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 23:52:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dN9gt-0005CM-Bj
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 23:18:56 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:36390)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dN9gt-0005CI-7O
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 23:18:55 -0400
-Received: by mail-qt0-x244.google.com with SMTP id s33so21768983qtg.3
-	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 20:18:55 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1497877149-19253-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1497877149-19253-3-git-send-email-mark.cave-ayland@ilande.co.uk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <36f76b27-f90a-ab22-76dd-4024d34ee31a@amsat.org>
-Date: Tue, 20 Jun 2017 00:18:49 -0300
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dNADk-0003oH-4W
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 23:52:56 -0400
+Received: from [59.151.112.132] (port=27527 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dNADj-0003nV-5E
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 23:52:52 -0400
+References: <cover.1497272778.git.maozy.fnst@cn.fujitsu.com>
+	<755cb5b3a23be771f27ab9c2cd020fa002d197d4.1497272778.git.maozy.fnst@cn.fujitsu.com>
+	<2730d545-ece5-adf1-7e9e-5c08ba2a8e58@redhat.com>
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Message-ID: <56493212-a1e6-bdda-1c17-1e2e02be037a@cn.fujitsu.com>
+Date: Tue, 20 Jun 2017 11:51:13 +0800
 MIME-Version: 1.0
-In-Reply-To: <1497877149-19253-3-git-send-email-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCHv6 2/5] fw_cfg: move setting of
- FW_CFG_VERSION_DMA bit to fw_cfg_init1()
+In-Reply-To: <2730d545-ece5-adf1-7e9e-5c08ba2a8e58@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 7/9] pci: Convert shpc_init() to Error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,87 +28,224 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, lersek@redhat.com, somlo@cmu.edu, ehabkost@redhat.com, mst@redhat.com, pbonzini@redhat.com, rjones@redhat.com, imammedo@redhat.com, peter.maydell@linaro.org
+To: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, armbru@redhat.com
 
-On 06/19/2017 09:59 AM, Mark Cave-Ayland wrote:
-> The setting of the FW_CFG_VERSION_DMA bit is the same across both the
-> TYPE_FW_CFG_MEM and TYPE_FW_CFG_IO devices, so unify the logic in
-> fw_cfg_init1().
->
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-> Tested-by: Laszlo Ersek <lersek@redhat.com>
+Hi, Marcel
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On 06/19/2017 08:05 PM, Marcel Apfelbaum wrote:
+> On 12/06/2017 16:48, Mao Zhongyi wrote:
+>> In order to propagate error message better, convert shpc_init() to
+>> Error also convert the pci_bridge_dev_initfn() to realize.
+>>
+>> Cc: mst@redhat.com
+>> Cc: marcel@redhat.com
+>> Cc: armbru@redhat.com
+>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+>> ---
+>>   hw/pci-bridge/pci_bridge_dev.c | 21 ++++++++-------------
+>>   hw/pci/shpc.c                  | 11 +++++------
+>>   hw/pci/slotid_cap.c            | 11 +++++------
+>>   include/hw/pci/shpc.h          |  3 ++-
+>>   include/hw/pci/slotid_cap.h    |  3 ++-
+>>   5 files changed, 22 insertions(+), 27 deletions(-)
+>>
+>> diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
+>> index 5dbd933..30c4186 100644
+>> --- a/hw/pci-bridge/pci_bridge_dev.c
+>> +++ b/hw/pci-bridge/pci_bridge_dev.c
+>> @@ -49,12 +49,11 @@ struct PCIBridgeDev {
+>>   };
+>>   typedef struct PCIBridgeDev PCIBridgeDev;
+>>   -static int pci_bridge_dev_initfn(PCIDevice *dev)
+>> +static void pci_bridge_dev_realize(PCIDevice *dev, Error **errp)
+>>   {
+>>       PCIBridge *br = PCI_BRIDGE(dev);
+>>       PCIBridgeDev *bridge_dev = PCI_BRIDGE_DEV(dev);
+>>       int err;
+>> -    Error *local_err = NULL;
+>>         pci_bridge_initfn(dev, TYPE_PCI_BUS);
+>>   @@ -62,7 +61,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
+>>           dev->config[PCI_INTERRUPT_PIN] = 0x1;
+>>           memory_region_init(&bridge_dev->bar, OBJECT(dev), "shpc-bar",
+>>                              shpc_bar_size(dev));
+>> -        err = shpc_init(dev, &br->sec_bus, &bridge_dev->bar, 0);
+>> +        err = shpc_init(dev, &br->sec_bus, &bridge_dev->bar, 0, errp);
+>>           if (err) {
+>>               goto shpc_error;
+>>           }
+>> @@ -71,7 +70,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
+>>           bridge_dev->msi = ON_OFF_AUTO_OFF;
+>>       }
+>>   -    err = slotid_cap_init(dev, 0, bridge_dev->chassis_nr, 0);
+>> +    err = slotid_cap_init(dev, 0, bridge_dev->chassis_nr, 0, errp);
+>>       if (err) {
+>>           goto slotid_error;
+>>       }
+>> @@ -79,20 +78,18 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
+>>       if (bridge_dev->msi != ON_OFF_AUTO_OFF) {
+>>           /* it means SHPC exists, because MSI is needed by SHPC */
+>>   -        err = msi_init(dev, 0, 1, true, true, &local_err);
+>> +        err = msi_init(dev, 0, 1, true, true, errp);
+>>           /* Any error other than -ENOTSUP(board's MSI support is broken)
+>>            * is a programming error */
+>>           assert(!err || err == -ENOTSUP);
+>>           if (err && bridge_dev->msi == ON_OFF_AUTO_ON) {
+>>               /* Can't satisfy user's explicit msi=on request, fail */
+>> -            error_append_hint(&local_err, "You have to use msi=auto (default) "
+>> +            error_append_hint(errp, "You have to use msi=auto (default) "
+>>                       "or msi=off with this machine type.\n");
+>> -            error_report_err(local_err);
+>>               goto msi_error;
+>>           }
+>> -        assert(!local_err || bridge_dev->msi == ON_OFF_AUTO_AUTO);
+>> +        assert(bridge_dev->msi == ON_OFF_AUTO_AUTO);
+>
+> I am not sure we can drop the !local_err assert.
+> We don't have a local_err anymore, but the error
+> is stored now in errp.
+>
 
-> ---
->  hw/nvram/fw_cfg.c |   16 +++++++---------
->  1 file changed, 7 insertions(+), 9 deletions(-)
+I think it's OK if we drop the !local_err assert; even if we don't store the error
+message to errp.
+
+Because the code can go to assert(!local_err || bridge_dev->msi == ON_OFF_AUTO_AUTO)
+only if the return value of msi_init is 0(success), then the local_err is NULL, no
+error message in it. So the assertation of local_err is always superfluous.
+
+Thanks
+Mao
+
+
+> Other than that, the patch looks OK to me.
 >
-> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> index 4e4f71a..99bdbc2 100644
-> --- a/hw/nvram/fw_cfg.c
-> +++ b/hw/nvram/fw_cfg.c
-> @@ -913,6 +913,7 @@ static void fw_cfg_init1(DeviceState *dev)
->  {
->      FWCfgState *s = FW_CFG(dev);
->      MachineState *machine = MACHINE(qdev_get_machine());
-> +    uint32_t version = FW_CFG_VERSION;
+> Thanks,
+> Marcel
 >
->      assert(!object_resolve_path(FW_CFG_PATH, NULL));
+>>           /* With msi=auto, we fall back to MSI off silently */
+>> -        error_free(local_err);
+>>       }
+>>         if (shpc_present(dev)) {
+>> @@ -101,7 +98,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
+>>           pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
+>>                            PCI_BASE_ADDRESS_MEM_TYPE_64, &bridge_dev->bar);
+>>       }
+>> -    return 0;
+>> +    return;
+>>     msi_error:
+>>       slotid_cap_cleanup(dev);
+>> @@ -111,8 +108,6 @@ slotid_error:
+>>       }
+>>   shpc_error:
+>>       pci_bridge_exitfn(dev);
+>> -
+>> -    return err;
+>>   }
+>>     static void pci_bridge_dev_exitfn(PCIDevice *dev)
+>> @@ -216,7 +211,7 @@ static void pci_bridge_dev_class_init(ObjectClass *klass, void *data)
+>>       PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+>>       HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
+>>   -    k->init = pci_bridge_dev_initfn;
+>> +    k->realize = pci_bridge_dev_realize;
+>>       k->exit = pci_bridge_dev_exitfn;
+>>       k->config_write = pci_bridge_dev_write_config;
+>>       k->vendor_id = PCI_VENDOR_ID_REDHAT;
+>> diff --git a/hw/pci/shpc.c b/hw/pci/shpc.c
+>> index d72d5e4..69fc14b 100644
+>> --- a/hw/pci/shpc.c
+>> +++ b/hw/pci/shpc.c
+>> @@ -446,16 +446,14 @@ static void shpc_cap_update_dword(PCIDevice *d)
+>>   }
+>>     /* Add SHPC capability to the config space for the device. */
+>> -static int shpc_cap_add_config(PCIDevice *d)
+>> +static int shpc_cap_add_config(PCIDevice *d, Error **errp)
+>>   {
+>>       uint8_t *config;
+>>       int config_offset;
+>> -    Error *local_err = NULL;
+>>       config_offset = pci_add_capability(d, PCI_CAP_ID_SHPC,
+>>                                          0, SHPC_CAP_LENGTH,
+>> -                                       &local_err);
+>> +                                       errp);
+>>       if (config_offset < 0) {
+>> -        error_report_err(local_err);
+>>           return config_offset;
+>>       }
+>>       config = d->config + config_offset;
+>> @@ -584,13 +582,14 @@ void shpc_device_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
+>>   }
+>>     /* Initialize the SHPC structure in bridge's BAR. */
+>> -int shpc_init(PCIDevice *d, PCIBus *sec_bus, MemoryRegion *bar, unsigned offset)
+>> +int shpc_init(PCIDevice *d, PCIBus *sec_bus, MemoryRegion *bar,
+>> +              unsigned offset, Error **errp)
+>>   {
+>>       int i, ret;
+>>       int nslots = SHPC_MAX_SLOTS; /* TODO: qdev property? */
+>>       SHPCDevice *shpc = d->shpc = g_malloc0(sizeof(*d->shpc));
+>>       shpc->sec_bus = sec_bus;
+>> -    ret = shpc_cap_add_config(d);
+>> +    ret = shpc_cap_add_config(d, errp);
+>>       if (ret) {
+>>           g_free(d->shpc);
+>>           return ret;
+>> diff --git a/hw/pci/slotid_cap.c b/hw/pci/slotid_cap.c
+>> index bdca205..36d021b 100644
+>> --- a/hw/pci/slotid_cap.c
+>> +++ b/hw/pci/slotid_cap.c
+>> @@ -9,14 +9,14 @@
+>>     int slotid_cap_init(PCIDevice *d, int nslots,
+>>                       uint8_t chassis,
+>> -                    unsigned offset)
+>> +                    unsigned offset,
+>> +                    Error **errp)
+>>   {
+>>       int cap;
+>> -    Error *local_err = NULL;
+>>         if (!chassis) {
+>> -        error_report("Bridge chassis not specified. Each bridge is required "
+>> -                     "to be assigned a unique chassis id > 0.");
+>> +        error_setg(errp, "Bridge chassis not specified. Each bridge is required"
+>> +                   " to be assigned a unique chassis id > 0.");
+>>           return -EINVAL;
+>>       }
+>>       if (nslots < 0 || nslots > (PCI_SID_ESR_NSLOTS >> SLOTID_NSLOTS_SHIFT)) {
+>> @@ -25,9 +25,8 @@ int slotid_cap_init(PCIDevice *d, int nslots,
+>>       }
+>>         cap = pci_add_capability(d, PCI_CAP_ID_SLOTID, offset,
+>> -                             SLOTID_CAP_LENGTH, &local_err);
+>> +                             SLOTID_CAP_LENGTH, errp);
+>>       if (cap < 0) {
+>> -        error_report_err(local_err);
+>>           return cap;
+>>       }
+>>       /* We make each chassis unique, this way each bridge is First in Chassis */
+>> diff --git a/include/hw/pci/shpc.h b/include/hw/pci/shpc.h
+>> index 71e836b..ee19fec 100644
+>> --- a/include/hw/pci/shpc.h
+>> +++ b/include/hw/pci/shpc.h
+>> @@ -38,7 +38,8 @@ struct SHPCDevice {
+>>     void shpc_reset(PCIDevice *d);
+>>   int shpc_bar_size(PCIDevice *dev);
+>> -int shpc_init(PCIDevice *dev, PCIBus *sec_bus, MemoryRegion *bar, unsigned off);
+>> +int shpc_init(PCIDevice *dev, PCIBus *sec_bus, MemoryRegion *bar,
+>> +              unsigned off, Error **errp);
+>>   void shpc_cleanup(PCIDevice *dev, MemoryRegion *bar);
+>>   void shpc_free(PCIDevice *dev);
+>>   void shpc_cap_write_config(PCIDevice *d, uint32_t addr, uint32_t val, int len);
+>> diff --git a/include/hw/pci/slotid_cap.h b/include/hw/pci/slotid_cap.h
+>> index 70db047..a777ea0 100644
+>> --- a/include/hw/pci/slotid_cap.h
+>> +++ b/include/hw/pci/slotid_cap.h
+>> @@ -5,7 +5,8 @@
+>>     int slotid_cap_init(PCIDevice *dev, int nslots,
+>>                       uint8_t chassis,
+>> -                    unsigned offset);
+>> +                    unsigned offset,
+>> +                    Error **errp);
+>>   void slotid_cap_cleanup(PCIDevice *dev);
+>>     #endif
+>>
 >
-> @@ -927,6 +928,12 @@ static void fw_cfg_init1(DeviceState *dev)
->      fw_cfg_bootsplash(s);
->      fw_cfg_reboot(s);
 >
-> +    if (s->dma_enabled) {
-> +        version |= FW_CFG_VERSION_DMA;
-> +    }
-> +
-> +    fw_cfg_add_i32(s, FW_CFG_ID, version);
-> +
->      s->machine_ready.notify = fw_cfg_machine_ready;
->      qemu_add_machine_init_done_notifier(&s->machine_ready);
->  }
-> @@ -938,7 +945,6 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
->      SysBusDevice *sbd;
->      FWCfgIoState *ios;
->      FWCfgState *s;
-> -    uint32_t version = FW_CFG_VERSION;
->      bool dma_requested = dma_iobase && dma_as;
->
->      dev = qdev_create(NULL, TYPE_FW_CFG_IO);
-> @@ -959,12 +965,8 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
->          s->dma_as = dma_as;
->          s->dma_addr = 0;
->          sysbus_add_io(sbd, dma_iobase, &s->dma_iomem);
-> -
-> -        version |= FW_CFG_VERSION_DMA;
->      }
->
-> -    fw_cfg_add_i32(s, FW_CFG_ID, version);
-> -
->      return s;
->  }
->
-> @@ -980,7 +982,6 @@ FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
->      DeviceState *dev;
->      SysBusDevice *sbd;
->      FWCfgState *s;
-> -    uint32_t version = FW_CFG_VERSION;
->      bool dma_requested = dma_addr && dma_as;
->
->      dev = qdev_create(NULL, TYPE_FW_CFG_MEM);
-> @@ -1001,11 +1002,8 @@ FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
->          s->dma_as = dma_as;
->          s->dma_addr = 0;
->          sysbus_mmio_map(sbd, 2, dma_addr);
-> -        version |= FW_CFG_VERSION_DMA;
->      }
->
-> -    fw_cfg_add_i32(s, FW_CFG_ID, version);
-> -
->      return s;
->  }
 >
 >
