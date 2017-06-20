@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dNQ81-0008AK-Qk
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 16:52:03 -0400
+	(envelope-from <laurent@vivier.eu>) id 1dNQ81-0008AJ-PT
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 16:52:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dNQ80-0004EG-1h
+	(envelope-from <laurent@vivier.eu>) id 1dNQ7w-0004Cd-WA
 	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 16:52:01 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:55301)
+Received: from mout.kundenserver.de ([217.72.192.75]:62269)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dNQ7z-0004DN-Lw
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 16:51:59 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dNQ7w-0004CE-Ji
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 16:51:56 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 20 Jun 2017 22:51:19 +0200
-Message-Id: <20170620205121.26515-5-laurent@vivier.eu>
-In-Reply-To: <20170620205121.26515-1-laurent@vivier.eu>
-References: <20170620205121.26515-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v5 4/6] target-m68k: define 96bit FP registers
- for gdb on 680x0
+Date: Tue, 20 Jun 2017 22:51:15 +0200
+Message-Id: <20170620205121.26515-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH v5 0/6] target-m68k: implement 680x0 FPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,117 +24,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Riku Voipio <riku.voipio@iki.fi>, Thomas Huth <huth@tuxfamily.org>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
----
- configure            |  2 +-
- gdb-xml/m68k-fp.xml  | 21 +++++++++++++++++++++
- target/m68k/helper.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 67 insertions(+), 1 deletion(-)
+This series modifies the original ColdFire FPU implementation
+to use floatx80 instead of float64 internally as this
+is the native datatype for 680x0. I didn't keep the float64
+type for ColdFire, but if someone thinks it's required I
+can update this series in this way.
+
+The series also adds the FPU status and control registers.
+
+The floatx80 datatype used here is not exactly the same as the
+one used by 680x0 for its extended precision data type, because
+normally the signaling bit of 680x0 NAN is the MSB of the mantissa
+minus one and in floatx80 it is the MSB.
+
+We also add the gdb server parts to read the new FPU registers.
+A strange thing happens here: while the gdb client running remotely
+from a debian etch-m68k has no issue working with 96bit FPU registers
+(the 680x0 extended precision data type), new gdbs (from a debian unstable
+and gdb for cross-compiled environment) don't expect this FPU registers
+size. But it seems like a bug in gdb, not in this implementation.
+
+v5:
+    rebase, some patches are now part of master
+    call cpu_m68k_set_fpcr() in XX_fpu_gdb_set_reg()
+    generate unimplemented data type exception for
+    packed data type, and only on coldfire, for extended
+    data type
+    remove QEMU_FPCR/QEMU_FPSR
+    rework gen_op_fmove_fcr()
+    replace cpu_abort(...) by qemu_log_mask(LOG_UNIMP, ...)
+    add a patch to reset FPU registers
+    add a patch to manage FPU registers in ucontext (linux-user)
+
+Note: I will replace floatx80 by a floatx96, later, once we
+      have a working linux-user qemu-m68k.
+
+v4:
+    this is only a subset of v3
+    add a patch to move fmove CR to a function
+    use "FPReg *" instead of FP0/FP1 temporaries
+    fcmp/ftst take old FPSR register from parameters
+    and return the new one
+    add R-b from Richard
+
+v3:
+    fix fsave opcode
+    Add comment to define "unnormalized" number
+    Correctly define pickNaN()
+
+v2:
+    complete rework of the series
+    force single precision in ColdFire mode
+    add "forced" precision instructions (fsmove, fdmove, fsadd, ...)
+    fixed Fcc.
+
+Laurent Vivier (6):
+  target-m68k: move fmove CR to a function
+  target-m68k: initialize FPU registers
+  target-m68k: use floatx80 internally
+  target-m68k: define 96bit FP registers for gdb on 680x0
+  target-m68k: add FPCR and FPSR
+  target-m68k,linux-user: manage FP registers in ucontext
+
+ configure                |   2 +-
+ gdb-xml/m68k-fp.xml      |  21 +
+ linux-user/signal.c      |  41 ++
+ target/m68k/cpu.c        |   9 +-
+ target/m68k/cpu.h        |  58 ++-
+ target/m68k/fpu_helper.c | 180 ++++++---
+ target/m68k/helper.c     |  77 +++-
+ target/m68k/helper.h     |  38 +-
+ target/m68k/qregs.def    |   1 -
+ target/m68k/translate.c  | 983 ++++++++++++++++++++++++++++++++---------------
+ 10 files changed, 1025 insertions(+), 385 deletions(-)
  create mode 100644 gdb-xml/m68k-fp.xml
 
-diff --git a/configure b/configure
-index db0798d..4df871c 100755
---- a/configure
-+++ b/configure
-@@ -6066,7 +6066,7 @@ case "$target_name" in
-   ;;
-   m68k)
-     bflt="yes"
--    gdb_xml_files="cf-core.xml cf-fp.xml"
-+    gdb_xml_files="cf-core.xml cf-fp.xml m68k-fp.xml"
-   ;;
-   microblaze|microblazeel)
-     TARGET_ARCH=microblaze
-diff --git a/gdb-xml/m68k-fp.xml b/gdb-xml/m68k-fp.xml
-new file mode 100644
-index 0000000..64290d1
---- /dev/null
-+++ b/gdb-xml/m68k-fp.xml
-@@ -0,0 +1,21 @@
-+<?xml version="1.0"?>
-+<!-- Copyright (C) 2008 Free Software Foundation, Inc.
-+
-+     Copying and distribution of this file, with or without modification,
-+     are permitted in any medium without royalty provided the copyright
-+     notice and this notice are preserved.  -->
-+<!DOCTYPE feature SYSTEM "gdb-target.dtd">
-+<feature name="org.gnu.gdb.coldfire.fp">
-+  <reg name="fp0" bitsize="96" type="float" group="float"/>
-+  <reg name="fp1" bitsize="96" type="float" group="float"/>
-+  <reg name="fp2" bitsize="96" type="float" group="float"/>
-+  <reg name="fp3" bitsize="96" type="float" group="float"/>
-+  <reg name="fp4" bitsize="96" type="float" group="float"/>
-+  <reg name="fp5" bitsize="96" type="float" group="float"/>
-+  <reg name="fp6" bitsize="96" type="float" group="float"/>
-+  <reg name="fp7" bitsize="96" type="float" group="float"/>
-+
-+  <reg name="fpcontrol" bitsize="32" group="float"/>
-+  <reg name="fpstatus" bitsize="32" group="float"/>,
-+  <reg name="fpiaddr" bitsize="32" type="code_ptr" group="float"/>
-+</feature>
-diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index 8bfc881..f2de6b5 100644
---- a/target/m68k/helper.c
-+++ b/target/m68k/helper.c
-@@ -102,6 +102,48 @@ static int cf_fpu_gdb_set_reg(CPUM68KState *env, uint8_t *mem_buf, int n)
-     return 0;
- }
- 
-+static int m68k_fpu_gdb_get_reg(CPUM68KState *env, uint8_t *mem_buf, int n)
-+{
-+    if (n < 8) {
-+        stw_be_p(mem_buf, env->fregs[n].l.upper);
-+        memset(mem_buf + 2, 0, 2);
-+        stq_be_p(mem_buf + 4, env->fregs[n].l.lower);
-+        return 12;
-+    }
-+    switch (n) {
-+    case 8: /* fpcontrol */
-+        stl_be_p(mem_buf, env->fpcr);
-+        return 4;
-+    case 9: /* fpstatus */
-+        stl_be_p(mem_buf, env->fpsr);
-+        return 4;
-+    case 10: /* fpiar, not implemented */
-+        memset(mem_buf, 0, 4);
-+        return 4;
-+    }
-+    return 0;
-+}
-+
-+static int m68k_fpu_gdb_set_reg(CPUM68KState *env, uint8_t *mem_buf, int n)
-+{
-+    if (n < 8) {
-+        env->fregs[n].l.upper = lduw_be_p(mem_buf);
-+        env->fregs[n].l.lower = ldq_be_p(mem_buf + 4);
-+        return 12;
-+    }
-+    switch (n) {
-+    case 8: /* fpcontrol */
-+        env->fpcr = ldl_p(mem_buf);
-+        return 4;
-+    case 9: /* fpstatus */
-+        env->fpsr = ldl_p(mem_buf);
-+        return 4;
-+    case 10: /* fpiar, not implemented */
-+        return 4;
-+    }
-+    return 0;
-+}
-+
- M68kCPU *cpu_m68k_init(const char *cpu_model)
- {
-     M68kCPU *cpu;
-@@ -130,6 +172,9 @@ void m68k_cpu_init_gdb(M68kCPU *cpu)
-     if (m68k_feature(env, M68K_FEATURE_CF_FPU)) {
-         gdb_register_coprocessor(cs, cf_fpu_gdb_get_reg, cf_fpu_gdb_set_reg,
-                                  11, "cf-fp.xml", 18);
-+    } else if (m68k_feature(env, M68K_FEATURE_FPU)) {
-+        gdb_register_coprocessor(cs, m68k_fpu_gdb_get_reg,
-+                                 m68k_fpu_gdb_set_reg, 11, "m68k-fp.xml", 18);
-     }
-     /* TODO: Add [E]MAC registers.  */
- }
 -- 
 2.9.4
