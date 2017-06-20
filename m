@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48809)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51201)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dNIg9-0000ef-NO
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 08:54:47 -0400
+	(envelope-from <berto@igalia.com>) id 1dNInn-0007n7-DL
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 09:02:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dNIg5-0006Vg-5X
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 08:54:45 -0400
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:34875)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dNIg4-0006Va-Tv
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 08:54:41 -0400
-Received: by mail-wm0-x22d.google.com with SMTP id x70so21198317wme.0
-	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 05:54:40 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170619104655.31104-3-alex.bennee@linaro.org>
-References: <20170619104655.31104-1-alex.bennee@linaro.org>
-	<20170619104655.31104-3-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Jun 2017 13:54:19 +0100
-Message-ID: <CAFEAcA--sFHayb4v8rGcWNKuRCcmgjM_ZCvmcr7+6-YHrqoxcw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RISU PATCH v5 02/13] README: document the coding
- style used for risu
+	(envelope-from <berto@igalia.com>) id 1dNInj-0000kg-FN
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 09:02:39 -0400
+From: Alberto Garcia <berto@igalia.com>
+Date: Tue, 20 Jun 2017 16:01:36 +0300
+Message-Id: <20170620130136.14557-1-berto@igalia.com>
+Subject: [Qemu-devel] [PATCH] qcow2: Use offset_into_cluster() and
+ offset_to_l2_index()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,47 +18,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-On 19 June 2017 at 11:46, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
-> We also include the an Emacs .dir-locals (as per QEMU) that enforces
-> this layout.
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  .dir-locals.el | 2 ++
->  README         | 9 +++++++++
->  2 files changed, 11 insertions(+)
->  create mode 100644 .dir-locals.el
->
-> diff --git a/.dir-locals.el b/.dir-locals.el
-> new file mode 100644
-> index 0000000..3ac0cfc
-> --- /dev/null
-> +++ b/.dir-locals.el
-> @@ -0,0 +1,2 @@
-> +((c-mode . ((c-file-style . "stroustrup")
-> +           (indent-tabs-mode . nil))))
+We already have functions for doing these calculations, so let's use
+them instead of doing everything by hand. This makes the code a bit
+more readable.
 
-This prompted me to look at this, and this is wrong: it
-overrides my local emacs config with something that gets
-some bits of style wrong :-( Indeed there's one in QEMU
-now I see, and that is why my emacs behaviour has regressed.
-For instance given
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ block/qcow2-cluster.c | 4 ++--
+ block/qcow2.c         | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-static const VMStateDescription cmsdk_apb_uart_vmstate =3D {
-    .name =3D "cmsdk-apb-uart",
-    .version_id =3D 1,
-    .minimum_version_id =3D 1,
-    .fields =3D (VMStateField[]) {
-        VMSTATE_END_OF_LIST()
-
-
-with cursor on the blank line at the end, if I type '}' then I get
-     }\n
-(ie the cursor moves to a new line) but the cursor should
-stay after the '}' so I can type the ','.
-
-thanks
--- PMM
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index d779ea19cf..a2c612433d 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -548,7 +548,7 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
+ 
+     /* find the cluster offset for the given disk offset */
+ 
+-    l2_index = (offset >> s->cluster_bits) & (s->l2_size - 1);
++    l2_index = offset_to_l2_index(s, offset);
+     *cluster_offset = be64_to_cpu(l2_table[l2_index]);
+ 
+     nb_clusters = size_to_clusters(s, bytes_needed);
+@@ -685,7 +685,7 @@ static int get_cluster_table(BlockDriverState *bs, uint64_t offset,
+ 
+     /* find the cluster offset for the given disk offset */
+ 
+-    l2_index = (offset >> s->cluster_bits) & (s->l2_size - 1);
++    l2_index = offset_to_l2_index(s, offset);
+ 
+     *new_l2_table = l2_table;
+     *new_l2_index = l2_index;
+diff --git a/block/qcow2.c b/block/qcow2.c
+index b3ba5daa93..adb604fc81 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -356,7 +356,7 @@ static int validate_table_offset(BlockDriverState *bs, uint64_t offset,
+     }
+ 
+     /* Tables must be cluster aligned */
+-    if (offset & (s->cluster_size - 1)) {
++    if (offset_into_cluster(s, offset) != 0) {
+         return -EINVAL;
+     }
+ 
+-- 
+2.11.0
