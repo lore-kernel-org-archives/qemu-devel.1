@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dNH63-0006Rt-Dm
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 07:13:27 -0400
+	(envelope-from <quintela@redhat.com>) id 1dNHEw-0000yS-BT
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 07:22:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dNH62-00068Q-Gy
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 07:13:23 -0400
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:37682)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dNH62-00068M-AU
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 07:13:22 -0400
-Received: by mail-wm0-x230.google.com with SMTP id d73so16885050wma.0
-	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 04:13:22 -0700 (PDT)
+	(envelope-from <quintela@redhat.com>) id 1dNHEt-00012m-6w
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 07:22:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45906)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dNHEt-00012S-1O
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 07:22:31 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BC708B146
+	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 11:22:29 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <87wp8o2h1r.fsf@secure.mitica> (Juan Quintela's message of "Wed,
+	07 Jun 2017 13:06:24 +0200")
+References: <87wp8o2h1r.fsf@secure.mitica>
+Reply-To: quintela@redhat.com
+Date: Tue, 20 Jun 2017 13:18:11 +0200
+Message-ID: <87shiunc0c.fsf@secure.laptop>
 MIME-Version: 1.0
-In-Reply-To: <8760fqorbp.fsf@frigg.lan>
-References: <CADR1n+V8R1LOGzbwdBDt5axeZ0mqh=WSCsfUo0Vr2nmE6BYqTQ@mail.gmail.com>
-	<8760fqorbp.fsf@frigg.lan>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Jun 2017 12:13:00 +0100
-Message-ID: <CAFEAcA-434=WhBxC=KB2HBhrPG9b+z1i3jqeFgiE=H8ceZJYzg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Tracing guest virtual addresses
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] KVM call for 2017-06-21
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +33,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jayanto Minocha <jayanto@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Qemu-devel <qemu-devel@nongnu.org>
 
-On 20 June 2017 at 12:02, Llu=C3=ADs Vilanova <vilanova@ac.upc.edu> wrote:
-> Jayanto Minocha writes:
->> But that is only used to instrument the cpu_ld/cpu_st macros, which is o=
-nly
->> called in the case of a tlb miss.
+Juan Quintela <quintela@redhat.com> wrote:
+> Hi
+
+Hi
+
+As there is no topics, call gets cancelled.
+
+Later, Juan.
+
 >
->> I've been going over the archives, and it looks like I need to instrumen=
-t
->> tcg_out_tlb_load. Am I on the right path ?
+> Please, send any topic that you are interested in covering.
 >
-> That event should trace all guest memory accesses performed by the CPU. I=
-f you
-> found any case where this does not hold, it is likely a bug and I'd appre=
-ciate
-> it if you can point me to the smallest possible failing example.
-
-Does it catch memory accesses that are performed via helper functions,
-or only ones done by inline TCG code?
-
-thanks
--- PMM
+> At the end of Monday I will send an email with the agenda or the
+> cancellation of the call, so hurry up.
+>
+> After discussions on the QEMU Summit, we are going to have always open a
+> KVM call where you can add topics.
+>
+>  Call details:
+>
+> By popular demand, a google calendar public entry with it
+>
+>   https://www.google.com/calendar/embed?src=dG9iMXRqcXAzN3Y4ZXZwNzRoMHE4a3BqcXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ
+>
+> (Let me know if you have any problems with the calendar entry.  I just
+> gave up about getting right at the same time CEST, CET, EDT and DST).
+>
+> If you need phone number details,  contact me privately
+>
+> Thanks, Juan.
