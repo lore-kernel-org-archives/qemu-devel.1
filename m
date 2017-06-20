@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dNKOu-0002aZ-Hq
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 10:45:08 -0400
+	(envelope-from <groug@kaod.org>) id 1dNKQo-0003zt-5n
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 10:47:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dNKOo-0002Fo-O6
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 10:45:04 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37303)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dNKOo-0002C4-Gd
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 10:44:58 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Jun 2017 15:44:45 +0100
-Message-Id: <1497969886-17773-2-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1497969886-17773-1-git-send-email-peter.maydell@linaro.org>
-References: <1497969886-17773-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 1/2] risu_reginfo_arm.c: Fix handling of size
- values in sigframe
+	(envelope-from <groug@kaod.org>) id 1dNKQj-0002jn-9G
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 10:47:02 -0400
+Received: from 8.mo68.mail-out.ovh.net ([46.105.74.219]:49964)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dNKQj-0002jP-26
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 10:46:57 -0400
+Received: from player789.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 01BA05E668
+	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 16:46:52 +0200 (CEST)
+Date: Tue, 20 Jun 2017 16:46:48 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170620164648.0b793a32@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <20170619233718.24959-1-tobleminer@gmail.com>
+References: <20170619233718.24959-1-tobleminer@gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/jiZ39tpp2KTkcGs9ND0fjmr";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v5 0/1] 9pfs: local: Add support for custom
+ fmode/dmode in 9ps mapped security modes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,66 +31,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, patches@linaro.org
+To: Tobias Schramm <tobleminer@gmail.com>
+Cc: qemu-devel@nongnu.org, aneesh.kumar@linux.vnet.ibm.com, el13635@mail.ntua.gr
 
-The code in reginfo_init_vfp() to parse the signal frame
-was mishandling the size counts:
- * the size includes the bytes for the magic and size fields,
-   so the code to skip forward over unknown or undersize blocks
-   was adding 4 more than it should
- * the size is in bytes but the "is this block too small"
-   test was checking against an expected size in words
+--Sig_/jiZ39tpp2KTkcGs9ND0fjmr
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-This didn't cause any problems because the kernel happens
-to generate signal frames with the VFP section first.
+On Tue, 20 Jun 2017 01:37:17 +0200
+Tobias Schramm <tobleminer@gmail.com> wrote:
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- risu_reginfo_arm.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+> Hi Greg,
+>=20
+> thank you for your hints on improving this patch. I've implemented them a=
+ll
+> in this version.
+>=20
+> In the last version of the patch I moved the path check down because I mo=
+ved
+> the g_strdup and tried to keep all operations performed on path as close
+> together as possible to increase readability. But I clearly didn't think =
+of
+> madatory vs optional aguments.
+>=20
+> I introduced extra variables for fmode and dmode for clear separation of
+> fetching and processing of arguments. But I guess that trade off is just
+> personal preference.
+>=20
+> I do agree that unifying the mapped mode checks is a good idea. Consideri=
+ng
+> that it is used in quite a few places might it be a good idea to write a =
+macro
+> for that check?
+>=20
 
-diff --git a/risu_reginfo_arm.c b/risu_reginfo_arm.c
-index 0cb9087..b0d5da7 100644
---- a/risu_reginfo_arm.c
-+++ b/risu_reginfo_arm.c
-@@ -36,7 +36,12 @@ static void reginfo_init_vfp(struct reginfo *ri, ucontext_t *uc)
-     unsigned long *rs = uc->uc_regspace;
- 
-     for (;;) {
--        switch (*rs++) {
-+        unsigned long magic = *rs++;
-+        unsigned long size = *rs++;
-+
-+        size -= 8; /* Account for the magic/size fields */
-+
-+        switch (magic) {
-         case 0:
-         {
-             /* We didn't find any VFP at all (probably a no-VFP
-@@ -57,11 +62,11 @@ static void reginfo_init_vfp(struct reginfo *ri, ucontext_t *uc)
-              */
-             int i;
-             /* Skip if it's smaller than we expected (should never happen!) */
--            if (*rs < ((32 * 2) + 1)) {
--                rs += (*rs / 4);
-+            if (size < ((32 * 2) + 1) * 4) {
-+                rs += size / 4;
-                 break;
-             }
--            rs++;
-+
-             for (i = 0; i < 32; i++) {
-                 ri->fpregs[i] = *rs++;
-                 ri->fpregs[i] |= (uint64_t) (*rs++) << 32;
-@@ -86,7 +91,7 @@ static void reginfo_init_vfp(struct reginfo *ri, ucontext_t *uc)
-         }
-         default:
-             /* Some other kind of block, ignore it */
--            rs += (*rs / 4);
-+            rs += size / 4;
-             break;
-         }
-     }
--- 
-2.7.4
+Yeah, I was thinking about some static inline helpers.
+
+> Also I have added a much more descriptive commit message.
+>=20
+> Again, thank you for the great help (and patience :)).
+>=20
+> Regards,
+>=20
+> Tobias Schramm
+>=20
+> Tobias Schramm (1):
+>   9pfs: local: Add support for custom fmode/dmode in 9ps mapped security
+>     modes
+>=20
+>  fsdev/file-op-9p.h      |  4 ++++
+>  fsdev/qemu-fsdev-opts.c | 12 ++++++++++++
+>  hw/9pfs/9p-local.c      | 25 +++++++++++++++++++++----
+>  hw/9pfs/9p.c            |  3 +++
+>  qemu-options.hx         | 20 ++++++++++++++++----
+>  5 files changed, 56 insertions(+), 8 deletions(-)
+>=20
+
+
+--Sig_/jiZ39tpp2KTkcGs9ND0fjmr
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAllJNVgACgkQAvw66wEB28KmjwCcC2vPMbKQAOdC6PThW2h9UCPX
+Dp8Ani7xPPTPv/8lq3EjHctsIcOFVKK/
+=nzLJ
+-----END PGP SIGNATURE-----
+
+--Sig_/jiZ39tpp2KTkcGs9ND0fjmr--
