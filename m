@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dNLRO-00057Q-5K
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 11:51:43 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dNLTt-0007M9-Q1
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 11:54:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dNLRM-00040j-Lk
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 11:51:42 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:32917)
+	(envelope-from <alex.bennee@linaro.org>) id 1dNLTp-000573-Li
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 11:54:17 -0400
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:36586)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1dNLRM-00040a-E4
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 11:51:40 -0400
-Received: by mail-lf0-x241.google.com with SMTP id u62so15460504lfg.0
-	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 08:51:40 -0700 (PDT)
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Tue, 20 Jun 2017 17:51:26 +0200
-Message-Id: <1497973886-26257-9-git-send-email-edgar.iglesias@gmail.com>
-In-Reply-To: <1497973886-26257-1-git-send-email-edgar.iglesias@gmail.com>
-References: <1497973886-26257-1-git-send-email-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v1 8/8] target-microblaze: Introduce a
- use-pcmp-instr property
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dNLTp-00056t-Br
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 11:54:13 -0400
+Received: by mail-wr0-x22d.google.com with SMTP id c11so41113802wrc.3
+	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 08:54:13 -0700 (PDT)
+References: <20170602185630.5059-1-f4bug@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170602185630.5059-1-f4bug@amsat.org>
+Date: Tue, 20 Jun 2017 16:54:53 +0100
+Message-ID: <87podyu01e.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 00/24] docker/shippable: cross-build
+ mipsel and powerpc targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,89 +30,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: alistai@xilinx.com, sai.pavan.boddu@xilinx.com, edgar.iglesias@xilinx.com
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>
 
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Introduce a use-pcmp-instr property making pcmp instructions
-optional.
+Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
 
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
----
- target/microblaze/cpu.c       | 5 +++--
- target/microblaze/cpu.h       | 1 +
- target/microblaze/translate.c | 6 +++---
- 3 files changed, 7 insertions(+), 5 deletions(-)
+> This patchset add 2 more architectures to the cross-build farm.
+>
+> There is still some issue trying to cross-build mips64el-softmmu, it seems the
+> cross tools use the system outdated libfdt instead of the one checkouted in the
+> dtc submodule. I disabled this target for now.
+>
+> The branch https://github.com/philmd/qemu/tree/docker_shippable_v5 can be
+> checked at Shippable:
+>   https://app.shippable.com/github/philmd/qemu/status/dashboard
+>
+> Each arch builds in around ~9min. Using Shippable free open source projects
+> service, the 5 jobs take ~38-44min in total.
 
-diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-index bc96505..6e27c3c 100644
---- a/target/microblaze/cpu.c
-+++ b/target/microblaze/cpu.c
-@@ -157,7 +157,6 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
-                         | PVR2_D_LMB_MASK \
-                         | PVR2_I_OPB_MASK \
-                         | PVR2_I_LMB_MASK \
--                        | PVR2_USE_PCMP_INSTR \
-                         | PVR2_FPU_EXC_MASK \
-                         | 0;
- 
-@@ -188,7 +187,8 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
-                         (cpu->cfg.use_hw_mul > 1 ? PVR2_USE_MUL64_MASK : 0) |
-                         (cpu->cfg.use_barrel ? PVR2_USE_BARREL_MASK : 0) |
-                         (cpu->cfg.use_div ? PVR2_USE_DIV_MASK : 0) |
--                        (cpu->cfg.use_msr_instr ? PVR2_USE_MSR_INSTR : 0);
-+                        (cpu->cfg.use_msr_instr ? PVR2_USE_MSR_INSTR : 0) |
-+                        (cpu->cfg.use_pcmp_instr ? PVR2_USE_PCMP_INSTR : 0);
- 
-     env->pvr.regs[5] |= cpu->cfg.dcache_writeback ?
-                                         PVR5_DCACHE_WRITEBACK_MASK : 0;
-@@ -242,6 +242,7 @@ static Property mb_properties[] = {
-     DEFINE_PROP_BOOL("use-barrel", MicroBlazeCPU, cfg.use_barrel, true),
-     DEFINE_PROP_BOOL("use-div", MicroBlazeCPU, cfg.use_div, true),
-     DEFINE_PROP_BOOL("use-msr-instr", MicroBlazeCPU, cfg.use_msr_instr, true),
-+    DEFINE_PROP_BOOL("use-pcmp-instr", MicroBlazeCPU, cfg.use_pcmp_instr, true),
-     DEFINE_PROP_BOOL("use-mmu", MicroBlazeCPU, cfg.use_mmu, true),
-     DEFINE_PROP_BOOL("dcache-writeback", MicroBlazeCPU, cfg.dcache_writeback,
-                      false),
-diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-index 5c960d0..5ce4c82 100644
---- a/target/microblaze/cpu.h
-+++ b/target/microblaze/cpu.h
-@@ -302,6 +302,7 @@ struct MicroBlazeCPU {
-         bool use_barrel;
-         bool use_div;
-         bool use_msr_instr;
-+        bool use_pcmp_instr;
-         bool use_mmu;
-         bool dcache_writeback;
-         bool endi;
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index bb1bdfa..fbb8bb4 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -326,7 +326,7 @@ static void dec_pattern(DisasContext *dc)
- 
-     if ((dc->tb_flags & MSR_EE_FLAG)
-           && (dc->cpu->env.pvr.regs[2] & PVR2_ILL_OPCODE_EXC_MASK)
--          && !((dc->cpu->env.pvr.regs[2] & PVR2_USE_PCMP_INSTR))) {
-+          && !dc->cpu->cfg.use_pcmp_instr) {
-         tcg_gen_movi_tl(cpu_SR[SR_ESR], ESR_EC_ILLEGAL_OP);
-         t_gen_raise_exception(dc, EXCP_HW_EXCP);
-     }
-@@ -762,11 +762,11 @@ static void dec_bit(DisasContext *dc)
-         case 0xe0:
-             if ((dc->tb_flags & MSR_EE_FLAG)
-                 && (dc->cpu->env.pvr.regs[2] & PVR2_ILL_OPCODE_EXC_MASK)
--                && !((dc->cpu->env.pvr.regs[2] & PVR2_USE_PCMP_INSTR))) {
-+                && !dc->cpu->cfg.use_pcmp_instr) {
-                 tcg_gen_movi_tl(cpu_SR[SR_ESR], ESR_EC_ILLEGAL_OP);
-                 t_gen_raise_exception(dc, EXCP_HW_EXCP);
-             }
--            if (dc->cpu->env.pvr.regs[2] & PVR2_USE_PCMP_INSTR) {
-+            if (dc->cpu->cfg.use_pcmp_instr) {
-                 tcg_gen_clzi_i32(cpu_R[dc->rd], cpu_R[dc->ra], 32);
-             }
-             break;
--- 
-2.7.4
+Fam,
+
+Are you picking this up or shall I roll a pull-req?
+
+>
+> v5:
+> - Addressed minor review feedback from Alex/Fam (improving a comment)
+> - Added Alex R-b
+>
+> v4:
+> - Addressed review feedbacks from Fam (improving english, cleaner hashing)
+> - Added Alex R-b
+>
+> v3:
+> - Addressed review feedbacks from Fam:
+> - Keep building images in various layers, but use DEBIAN_FRONTEND=noninteractive
+> - Document '--extra-files', now it supports adding various files at once
+> - Checksum extra files to trigger a docker image rebuild if modified
+> - Use better regex to generate deb-src entries
+> - Reordered extra libs, to ease further add/remove diffs
+>
+> v2:
+> - Addressed review feedback from Alex, added his R-B
+> - Fixed the "Problem with the SSL CA cert" problem while cloning from github.com
+>   installing the ca-certificates package.
+> - Squashed/split some commits
+> - use 'apt-get clean' instead of brutal 'rm -rf'
+> - checked how many cores are available on Shippable and use them fully
+>   (reduced total time from 44min to 38min)
+> - build armeb-linux-user target
+>
+> v1:
+> - Reorganize Dockerfiles to use less layers, resulting in smaller images.
+>   This also reduce time of image transfer, for example while using:
+>   `docker save qemu:debian | ssh remote docker load`
+> - Install more debian packages so the configure script enable more features and
+>   more code can be compiled/covered.
+> - There are still some incorrect multiarch packages on debian/jessie used in
+>   the docker images, add a script to generate fake packages and avoid
+>   dependencies issues.
+> - Modify the docker.py script to include an extra file while building images.
+>
+> Regards,
+>
+> Phil.
+>
+> Philippe Mathieu-Daudé (24):
+>   docker: let _copy_with_mkdir() sub_path argument be optional
+>   docker: add --include-files argument to 'build' command
+>   docker: rebuild image if 'extra files' checksum does not match
+>   docker: add 'apt-fake' script which generate fake debian packages
+>   docker: install ca-certificates package in base image
+>   docker: create deb-src entry and setup Emdebian in the same layer
+>   docker: use better regex to generate deb-src entries
+>   docker: use eatmydata, install common build packages in base image
+>   docker: use eatmydata in debian armhf image
+>   docker: use eatmydata in debian arm64 image
+>   docker: add extra libs to armhf target to extend codebase coverage
+>   docker: add extra libs to arm64 target to extend codebase coverage
+>   docker: add extra libs to s390x target to extend codebase coverage
+>   docker: add mipsel build target
+>   docker: add powerpc build target
+>   shippable: use C locale to simplify console output
+>   shippable: build using all available cpus
+>   shippable: do not initialize submodules automatically
+>   shippable: be verbose while building docker images
+>   shippable: add armeb-linux-user target
+>   shippable: add powerpc target
+>   shippable: add mipsel target
+>   MAINTAINERS: add Shippable automation platform URL
+>   MAINTAINERS: self-appoint me as reviewer in build/test automation
+>
+>  .shippable.yml                                     | 23 +++++++++--
+>  MAINTAINERS                                        |  2 +
+>  tests/docker/Makefile.include                      |  8 ++++
+>  tests/docker/docker.py                             | 30 ++++++++++----
+>  tests/docker/dockerfiles/debian-apt-fake.sh        | 46 ++++++++++++++++++++++
+>  tests/docker/dockerfiles/debian-arm64-cross.docker | 18 ++++++++-
+>  tests/docker/dockerfiles/debian-armhf-cross.docker | 18 ++++++++-
+>  .../docker/dockerfiles/debian-mipsel-cross.docker  | 41 +++++++++++++++++++
+>  .../docker/dockerfiles/debian-powerpc-cross.docker | 40 +++++++++++++++++++
+>  tests/docker/dockerfiles/debian-s390x-cross.docker | 10 +++++
+>  tests/docker/dockerfiles/debian.docker             | 18 +++++----
+>  11 files changed, 232 insertions(+), 22 deletions(-)
+>  create mode 100755 tests/docker/dockerfiles/debian-apt-fake.sh
+>  create mode 100644 tests/docker/dockerfiles/debian-mipsel-cross.docker
+>  create mode 100644 tests/docker/dockerfiles/debian-powerpc-cross.docker
+
+
+--
+Alex Bennée
