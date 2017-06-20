@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dNQ7z-0008AD-KA
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 16:52:00 -0400
+	(envelope-from <laurent@vivier.eu>) id 1dNQ81-0008AK-Qk
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 16:52:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dNQ7u-0004C3-RN
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 16:51:59 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:65270)
+	(envelope-from <laurent@vivier.eu>) id 1dNQ80-0004EG-1h
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 16:52:01 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:55301)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dNQ7u-0004BV-Gp
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 16:51:54 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dNQ7z-0004DN-Lw
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 16:51:59 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 20 Jun 2017 22:51:16 +0200
-Message-Id: <20170620205121.26515-2-laurent@vivier.eu>
+Date: Tue, 20 Jun 2017 22:51:19 +0200
+Message-Id: <20170620205121.26515-5-laurent@vivier.eu>
 In-Reply-To: <20170620205121.26515-1-laurent@vivier.eu>
 References: <20170620205121.26515-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v5 1/6] target-m68k: move fmove CR to a function
+Subject: [Qemu-devel] [PATCH v5 4/6] target-m68k: define 96bit FP registers
+ for gdb on 680x0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,87 +27,117 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Riku Voipio <riku.voipio@iki.fi>, Thomas Huth <huth@tuxfamily.org>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
 
-Move code of fmove to/from control register to a function
-
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
- target/m68k/translate.c | 56 +++++++++++++++++++++++++++----------------------
- 1 file changed, 31 insertions(+), 25 deletions(-)
+ configure            |  2 +-
+ gdb-xml/m68k-fp.xml  | 21 +++++++++++++++++++++
+ target/m68k/helper.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 67 insertions(+), 1 deletion(-)
+ create mode 100644 gdb-xml/m68k-fp.xml
 
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index dfecfb6..c9a5fe4 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -4099,6 +4099,35 @@ DISAS_INSN(trap)
-     gen_exception(s, s->pc - 2, EXCP_TRAP0 + (insn & 0xf));
+diff --git a/configure b/configure
+index db0798d..4df871c 100755
+--- a/configure
++++ b/configure
+@@ -6066,7 +6066,7 @@ case "$target_name" in
+   ;;
+   m68k)
+     bflt="yes"
+-    gdb_xml_files="cf-core.xml cf-fp.xml"
++    gdb_xml_files="cf-core.xml cf-fp.xml m68k-fp.xml"
+   ;;
+   microblaze|microblazeel)
+     TARGET_ARCH=microblaze
+diff --git a/gdb-xml/m68k-fp.xml b/gdb-xml/m68k-fp.xml
+new file mode 100644
+index 0000000..64290d1
+--- /dev/null
++++ b/gdb-xml/m68k-fp.xml
+@@ -0,0 +1,21 @@
++<?xml version="1.0"?>
++<!-- Copyright (C) 2008 Free Software Foundation, Inc.
++
++     Copying and distribution of this file, with or without modification,
++     are permitted in any medium without royalty provided the copyright
++     notice and this notice are preserved.  -->
++<!DOCTYPE feature SYSTEM "gdb-target.dtd">
++<feature name="org.gnu.gdb.coldfire.fp">
++  <reg name="fp0" bitsize="96" type="float" group="float"/>
++  <reg name="fp1" bitsize="96" type="float" group="float"/>
++  <reg name="fp2" bitsize="96" type="float" group="float"/>
++  <reg name="fp3" bitsize="96" type="float" group="float"/>
++  <reg name="fp4" bitsize="96" type="float" group="float"/>
++  <reg name="fp5" bitsize="96" type="float" group="float"/>
++  <reg name="fp6" bitsize="96" type="float" group="float"/>
++  <reg name="fp7" bitsize="96" type="float" group="float"/>
++
++  <reg name="fpcontrol" bitsize="32" group="float"/>
++  <reg name="fpstatus" bitsize="32" group="float"/>,
++  <reg name="fpiaddr" bitsize="32" type="code_ptr" group="float"/>
++</feature>
+diff --git a/target/m68k/helper.c b/target/m68k/helper.c
+index 8bfc881..f2de6b5 100644
+--- a/target/m68k/helper.c
++++ b/target/m68k/helper.c
+@@ -102,6 +102,48 @@ static int cf_fpu_gdb_set_reg(CPUM68KState *env, uint8_t *mem_buf, int n)
+     return 0;
  }
  
-+static void gen_op_fmove_fcr(CPUM68KState *env, DisasContext *s,
-+                             uint32_t insn, uint32_t ext)
++static int m68k_fpu_gdb_get_reg(CPUM68KState *env, uint8_t *mem_buf, int n)
 +{
-+    int mask = (ext >> 10) & 7;
-+    int is_write = (ext >> 13) & 1;
-+    TCGv val;
-+
-+    switch (mask) {
-+    case 1: /* FPIAR */
-+    case 2: /* FPSR */
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "Unimplemented: fmove to/from control %d",
-+                      mask);
-+        goto undef;
-+    case 4: /* FPCR */
-+        if (is_write) {
-+            val = tcg_const_i32(0);
-+            DEST_EA(env, insn, OS_LONG, val, NULL);
-+            tcg_temp_free(val);
-+        }
-+        /* Not implemented. Ignore register update */
-+        break;
++    if (n < 8) {
++        stw_be_p(mem_buf, env->fregs[n].l.upper);
++        memset(mem_buf + 2, 0, 2);
++        stq_be_p(mem_buf + 4, env->fregs[n].l.lower);
++        return 12;
 +    }
-+    return;
-+undef:
-+    s->pc -= 2;
-+    disas_undef_fpu(env, s, insn);
++    switch (n) {
++    case 8: /* fpcontrol */
++        stl_be_p(mem_buf, env->fpcr);
++        return 4;
++    case 9: /* fpstatus */
++        stl_be_p(mem_buf, env->fpsr);
++        return 4;
++    case 10: /* fpiar, not implemented */
++        memset(mem_buf, 0, 4);
++        return 4;
++    }
++    return 0;
 +}
 +
- /* ??? FP exceptions are not implemented.  Most exceptions are deferred until
-    immediately before the next FP instruction is executed.  */
- DISAS_INSN(fpu)
-@@ -4177,32 +4206,9 @@ DISAS_INSN(fpu)
-         tcg_temp_free_i32(tmp32);
-         return;
-     case 4: /* fmove to control register.  */
--        switch ((ext >> 10) & 7) {
--        case 4: /* FPCR */
--            /* Not implemented.  Ignore writes.  */
--            break;
--        case 1: /* FPIAR */
--        case 2: /* FPSR */
--        default:
--            cpu_abort(NULL, "Unimplemented: fmove to control %d",
--                      (ext >> 10) & 7);
--        }
--        break;
-     case 5: /* fmove from control register.  */
--        switch ((ext >> 10) & 7) {
--        case 4: /* FPCR */
--            /* Not implemented.  Always return zero.  */
--            tmp32 = tcg_const_i32(0);
--            break;
--        case 1: /* FPIAR */
--        case 2: /* FPSR */
--        default:
--            cpu_abort(NULL, "Unimplemented: fmove from control %d",
--                      (ext >> 10) & 7);
--            goto undef;
--        }
--        DEST_EA(env, insn, OS_LONG, tmp32, NULL);
--        break;
-+        gen_op_fmove_fcr(env, s, insn, ext);
-+        return;
-     case 6: /* fmovem */
-     case 7:
-         {
++static int m68k_fpu_gdb_set_reg(CPUM68KState *env, uint8_t *mem_buf, int n)
++{
++    if (n < 8) {
++        env->fregs[n].l.upper = lduw_be_p(mem_buf);
++        env->fregs[n].l.lower = ldq_be_p(mem_buf + 4);
++        return 12;
++    }
++    switch (n) {
++    case 8: /* fpcontrol */
++        env->fpcr = ldl_p(mem_buf);
++        return 4;
++    case 9: /* fpstatus */
++        env->fpsr = ldl_p(mem_buf);
++        return 4;
++    case 10: /* fpiar, not implemented */
++        return 4;
++    }
++    return 0;
++}
++
+ M68kCPU *cpu_m68k_init(const char *cpu_model)
+ {
+     M68kCPU *cpu;
+@@ -130,6 +172,9 @@ void m68k_cpu_init_gdb(M68kCPU *cpu)
+     if (m68k_feature(env, M68K_FEATURE_CF_FPU)) {
+         gdb_register_coprocessor(cs, cf_fpu_gdb_get_reg, cf_fpu_gdb_set_reg,
+                                  11, "cf-fp.xml", 18);
++    } else if (m68k_feature(env, M68K_FEATURE_FPU)) {
++        gdb_register_coprocessor(cs, m68k_fpu_gdb_get_reg,
++                                 m68k_fpu_gdb_set_reg, 11, "m68k-fp.xml", 18);
+     }
+     /* TODO: Add [E]MAC registers.  */
+ }
 -- 
 2.9.4
