@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dNCCD-0008GQ-SZ
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 01:59:27 -0400
+	(envelope-from <casasfernando@hotmail.com>) id 1dNCfu-0006HI-M6
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 02:30:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dNCC9-0006Im-11
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 01:59:25 -0400
-Received: from mail-ua0-f174.google.com ([209.85.217.174]:34517)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dNCC8-0006IY-Rq
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 01:59:20 -0400
-Received: by mail-ua0-f174.google.com with SMTP id d45so32249029uai.1
-	for <qemu-devel@nongnu.org>; Mon, 19 Jun 2017 22:59:20 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <VI1PR1001MB1373B1F3C97D9528166E2305B7C40@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
+	(envelope-from <casasfernando@hotmail.com>) id 1dNCfr-0007TQ-GY
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 02:30:06 -0400
+Received: from mail-oln040092072093.outbound.protection.outlook.com
+	([40.92.72.93]:43664
+	helo=EUR03-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <casasfernando@hotmail.com>)
+	id 1dNCfq-0007P8-Ui
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 02:30:03 -0400
+From: =?utf-8?B?RmVybmFuZG8gQ2FzYXMgU2Now7Zzc293?= <casasfernando@hotmail.com>
+Date: Tue, 20 Jun 2017 06:30:00 +0000
+Message-ID: <HE1PR1001MB1371F7874B487B0907C42A7EB7C50@HE1PR1001MB1371.EURPRD10.PROD.OUTLOOK.COM>
 References: <VI1PR1001MB137395F2FCBDE6389A9AC5FCB7C30@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
 	<CABdb7358YVXbk++Z7s+q6Z5O0Q=6CQiQvYsTdc35eqmQeUnP_Q@mail.gmail.com>
 	<VI1PR1001MB1373C8915C51F7453D41B950B7C10@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
 	<CABdb7345_Nu_kpsSDGq7OyOSuKmgtyS-DuXTafkGeaCCXzV5LQ@mail.gmail.com>
 	<VI1PR1001MB1373B1F3C97D9528166E2305B7C40@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Tue, 20 Jun 2017 07:59:19 +0200
-Message-ID: <CABdb735e_NjY47LRZ58+zvKGmCRQKAmFo-HhByhsosRzQkOgxA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	<CABdb735e_NjY47LRZ58+zvKGmCRQKAmFo-HhByhsosRzQkOgxA@mail.gmail.com>
+In-Reply-To: <CABdb735e_NjY47LRZ58+zvKGmCRQKAmFo-HhByhsosRzQkOgxA@mail.gmail.com>
+Content-Language: en-US
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Subject: Re: [Qemu-devel] Guest unresponsive after Virtqueue size exceeded
  error
 List-Id: <qemu-devel.nongnu.org>
@@ -33,135 +36,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Fernando_Casas_Sch=C3=B6ssow?= <casasfernando@hotmail.com>
+To: Ladi Prosek <lprosek@redhat.com>
 Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Hi Fernando,
-
-On Tue, Jun 20, 2017 at 12:10 AM, Fernando Casas Sch=C3=B6ssow
-<casasfernando@hotmail.com> wrote:
-> Hi Ladi,
->
-> Today two guests failed again at different times of day.
-> One of them was the one I switched from virtio_blk to virtio_scsi so this
-> change didn't solved the problem.
-> Now in this guest I also disabled virtio_balloon, continuing with the
-> elimination process.
->
-> Also this time I found a different error message in the guest console.
-> In the guest already switched to virtio_scsi:
->
-> virtio_scsi virtio2: request:id 44 is not a head!
->
-> Followed by the usual "task blocked for more than 120 seconds." error.
->
-> On the guest still running on virtio_blk the error was similar:
->
-> virtio_blk virtio2: req.0:id 42 is not a head!
-> blk_update_request: I/O error, dev vda, sector 645657736
-> Buffer I/O error on dev dm-1, logical block 7413821, lost async page writ=
-e
->
-> Followed by the usual "task blocked for more than 120 seconds." error.
-
-Honestly this is starting to look more and more like a memory
-corruption. Two different virtio devices and two different guest
-operating systems, that would have to be a bug in the common virtio
-code and we would have seen it somewhere else already.
-
-Would it be possible run a thorough memtest on the host just in case?
-
-> Do you think that the blk_update_request and the buffer I/O error may be =
-a
-> consequence of the previous "is not a head!" error or should I be worried
-> for a storage level issue here?
->
-> Now I will wait to see if disabling virtio_balloon helps or not and repor=
-t
-> back.
->
-> Thanks.
->
-> Fer
->
-> On vie, jun 16, 2017 at 12:25 , Ladi Prosek <lprosek@redhat.com> wrote:
->
-> On Fri, Jun 16, 2017 at 12:11 PM, Fernando Casas Sch=C3=B6ssow
-> <casasfernando@hotmail.com> wrote:
->
-> Hi Ladi, Thanks a lot for looking into this and replying. I will do my be=
-st
-> to rebuild and deploy Alpine's qemu packages with this patch included but
-> not sure its feasible yet. In any case, would it be possible to have this
-> patch included in the next qemu release?
->
-> Yes, I have already added this to my todo list.
->
-> The current error message is helpful but knowing which device was involve=
-d
-> will be much more helpful. Regarding the environment, I'm not doing
-> migrations and only managed save is done in case the host needs to be
-> rebooted or shutdown. The QEMU process is running the VM since the host i=
-s
-> started and this failuire is ocurring randomly without any previous manag=
-e
-> save done. As part of troubleshooting on one of the guests I switched fro=
-m
-> virtio_blk to virtio_scsi for the guest disks but I will need more time t=
-o
-> see if that helped. If I have this problem again I will follow your advis=
-e
-> and remove virtio_balloon.
->
-> Thanks, please keep us posted.
->
-> Another question: is there any way to monitor the virtqueue size either f=
-rom
-> the guest itself or from the host? Any file in sysfs or proc? This may he=
-lp
-> to understand in which conditions this is happening and to react faster t=
-o
-> mitigate the problem.
->
-> The problem is not in the virtqueue size but in one piece of internal sta=
-te
-> ("inuse") which is meant to track the number of buffers "checked out" by
-> QEMU. It's being compared to virtqueue size merely as a sanity check. I'm
-> afraid that there's no way to expose this variable without rebuilding QEM=
-U.
-> The best you could do is attach gdb to the QEMU process and use some clev=
-er
-> data access breakpoints to catch suspicious writes to the variable. Altho=
-ugh
-> it's likely that it just creeps up slowly and you won't see anything
-> interesting. It's probably beyond reasonable at this point anyway. I woul=
-d
-> continue with the elimination process (virtio_scsi instead of virtio_blk,=
- no
-> balloon, etc.) and then maybe once we know which device it is, we can add
-> some instrumentation to the code.
->
-> Thanks again for your help with this! Fer On vie, jun 16, 2017 at 8:58 ,
-> Ladi Prosek <lprosek@redhat.com> wrote: Hi, Would you be able to enhance =
-the
-> error message and rebuild QEMU? --- a/hw/virtio/virtio.c +++
-> b/hw/virtio/virtio.c @@ -856,7 +856,7 @@ void *virtqueue_pop(VirtQueue *v=
-q,
-> size_t sz) max =3D vq->vring.num; if (vq->inuse
->
-> =3D vq->vring.num) { - virtio_error(vdev, "Virtqueue size exceeded"); +
->
-> virtio_error(vdev, "Virtqueue %u device %s size exceeded", vq->queue_inde=
-x,
-> vdev->name); goto done; } This would at least confirm the theory that it'=
-s
-> caused by virtio-blk-pci. If rebuilding is not feasible I would start by
-> removing other virtio devices -- particularly balloon which has had quite=
- a
-> few virtio related bugs fixed recently. Does your environment involve VM
-> migrations or saving/resuming, or does the crashing QEMU process always r=
-un
-> the VM from its boot? Thanks!
->
->
->
+SGkgTGFkaSwNCg0KSW4gdGhpcyBjYXNlIGJvdGggZ3Vlc3RzIGFyZSBDZW50T1MgNy4zIHJ1bm5p
+bmcgdGhlIHNhbWUga2VybmVsIDMuMTAuMC01MTQuMjEuMS4NCkFsc28gdGhlIGd1ZXN0IHRoYXQg
+ZmFpbHMgbW9zdCBmcmVxdWVudGx5IGlzIHJ1bm5pbmcgRG9ja2VyIHdpdGggNCBvciA1IGNvbnRh
+aW5lcnMuDQoNCkFub3RoZXIgdGhpbmcgSSB3b3VsZCBsaWtlIHRvIG1lbnRpb24gaXMgdGhhdCB0
+aGUgaG9zdCBpcyBydW5uaW5nIG9uIEFscGluZSdzIGRlZmF1bHQgZ3JzZWMgcGF0Y2hlZCBrZXJu
+ZWwuIEkgaGF2ZSB0aGUgb3B0aW9uIHRvIGluc3RhbGwgYWxzbyBhIHZhbmlsbGEga2VybmVsLiBX
+b3VsZCBpdCBtYWtlIHNlbnNlIHRvIHN3aXRjaCB0byB0aGUgdmFuaWxsYSBrZXJuZWwgb24gdGhl
+IGhvc3QgYW5kIHNlZSBpZiB0aGF0IGhlbHBzPw0KQW5kIGxhc3QgYnV0IG5vdCBsZWFzdCBLU00g
+aXMgZW5hYmxlZCBvbiB0aGUgaG9zdC4gU2hvdWxkIEkgZGlzYWJsZSBpdD8NCg0KRm9sbG93aW5n
+IHlvdXIgYWR2aWNlIEkgd2lsbCBydW4gbWVtdGVzdCBvbiB0aGUgaG9zdCBhbmQgcmVwb3J0IGJh
+Y2suIEp1c3QgYXMgYSBzaWRlIGNvbW1lbnQsIHRoZSBob3N0IGlzIHJ1bm5pbmcgb24gRUNDIG1l
+bW9yeS4NCg0KVGhhbmtzIGZvciBhbGwgeW91ciBoZWxwLg0KDQpGZXIuDQoNCk9uIG1hciwganVu
+IDIwLCAyMDE3IGF0IDc6NTkgLCBMYWRpIFByb3NlayA8bHByb3Nla0ByZWRoYXQuY29tPiB3cm90
+ZToNCkhpIEZlcm5hbmRvLCBPbiBUdWUsIEp1biAyMCwgMjAxNyBhdCAxMjoxMCBBTSwgRmVybmFu
+ZG8gQ2FzYXMgU2Now7Zzc293IDxjYXNhc2Zlcm5hbmRvQGhvdG1haWwuY29tPG1haWx0bzpjYXNh
+c2Zlcm5hbmRvQGhvdG1haWwuY29tPj4gd3JvdGU6DQpIaSBMYWRpLCBUb2RheSB0d28gZ3Vlc3Rz
+IGZhaWxlZCBhZ2FpbiBhdCBkaWZmZXJlbnQgdGltZXMgb2YgZGF5LiBPbmUgb2YgdGhlbSB3YXMg
+dGhlIG9uZSBJIHN3aXRjaGVkIGZyb20gdmlydGlvX2JsayB0byB2aXJ0aW9fc2NzaSBzbyB0aGlz
+IGNoYW5nZSBkaWRuJ3Qgc29sdmVkIHRoZSBwcm9ibGVtLiBOb3cgaW4gdGhpcyBndWVzdCBJIGFs
+c28gZGlzYWJsZWQgdmlydGlvX2JhbGxvb24sIGNvbnRpbnVpbmcgd2l0aCB0aGUgZWxpbWluYXRp
+b24gcHJvY2Vzcy4gQWxzbyB0aGlzIHRpbWUgSSBmb3VuZCBhIGRpZmZlcmVudCBlcnJvciBtZXNz
+YWdlIGluIHRoZSBndWVzdCBjb25zb2xlLiBJbiB0aGUgZ3Vlc3QgYWxyZWFkeSBzd2l0Y2hlZCB0
+byB2aXJ0aW9fc2NzaTogdmlydGlvX3Njc2kgdmlydGlvMjogcmVxdWVzdDppZCA0NCBpcyBub3Qg
+YSBoZWFkISBGb2xsb3dlZCBieSB0aGUgdXN1YWwgInRhc2sgYmxvY2tlZCBmb3IgbW9yZSB0aGFu
+IDEyMCBzZWNvbmRzLiIgZXJyb3IuIE9uIHRoZSBndWVzdCBzdGlsbCBydW5uaW5nIG9uIHZpcnRp
+b19ibGsgdGhlIGVycm9yIHdhcyBzaW1pbGFyOiB2aXJ0aW9fYmxrIHZpcnRpbzI6IHJlcS4wOmlk
+IDQyIGlzIG5vdCBhIGhlYWQhIGJsa191cGRhdGVfcmVxdWVzdDogSS9PIGVycm9yLCBkZXYgdmRh
+LCBzZWN0b3IgNjQ1NjU3NzM2IEJ1ZmZlciBJL08gZXJyb3Igb24gZGV2IGRtLTEsIGxvZ2ljYWwg
+YmxvY2sgNzQxMzgyMSwgbG9zdCBhc3luYyBwYWdlIHdyaXRlIEZvbGxvd2VkIGJ5IHRoZSB1c3Vh
+bCAidGFzayBibG9ja2VkIGZvciBtb3JlIHRoYW4gMTIwIHNlY29uZHMuIiBlcnJvci4NCkhvbmVz
+dGx5IHRoaXMgaXMgc3RhcnRpbmcgdG8gbG9vayBtb3JlIGFuZCBtb3JlIGxpa2UgYSBtZW1vcnkg
+Y29ycnVwdGlvbi4gVHdvIGRpZmZlcmVudCB2aXJ0aW8gZGV2aWNlcyBhbmQgdHdvIGRpZmZlcmVu
+dCBndWVzdCBvcGVyYXRpbmcgc3lzdGVtcywgdGhhdCB3b3VsZCBoYXZlIHRvIGJlIGEgYnVnIGlu
+IHRoZSBjb21tb24gdmlydGlvIGNvZGUgYW5kIHdlIHdvdWxkIGhhdmUgc2VlbiBpdCBzb21ld2hl
+cmUgZWxzZSBhbHJlYWR5LiBXb3VsZCBpdCBiZSBwb3NzaWJsZSBydW4gYSB0aG9yb3VnaCBtZW10
+ZXN0IG9uIHRoZSBob3N0IGp1c3QgaW4gY2FzZT8NCkRvIHlvdSB0aGluayB0aGF0IHRoZSBibGtf
+dXBkYXRlX3JlcXVlc3QgYW5kIHRoZSBidWZmZXIgSS9PIGVycm9yIG1heSBiZSBhIGNvbnNlcXVl
+bmNlIG9mIHRoZSBwcmV2aW91cyAiaXMgbm90IGEgaGVhZCEiIGVycm9yIG9yIHNob3VsZCBJIGJl
+IHdvcnJpZWQgZm9yIGEgc3RvcmFnZSBsZXZlbCBpc3N1ZSBoZXJlPyBOb3cgSSB3aWxsIHdhaXQg
+dG8gc2VlIGlmIGRpc2FibGluZyB2aXJ0aW9fYmFsbG9vbiBoZWxwcyBvciBub3QgYW5kIHJlcG9y
+dCBiYWNrLiBUaGFua3MuIEZlciBPbiB2aWUsIGp1biAxNiwgMjAxNyBhdCAxMjoyNSAsIExhZGkg
+UHJvc2VrIDxscHJvc2VrQHJlZGhhdC5jb208bWFpbHRvOmxwcm9zZWtAcmVkaGF0LmNvbT4+IHdy
+b3RlOiBPbiBGcmksIEp1biAxNiwgMjAxNyBhdCAxMjoxMSBQTSwgRmVybmFuZG8gQ2FzYXMgU2No
+w7Zzc293IDxjYXNhc2Zlcm5hbmRvQGhvdG1haWwuY29tPG1haWx0bzpjYXNhc2Zlcm5hbmRvQGhv
+dG1haWwuY29tPj4gd3JvdGU6IEhpIExhZGksIFRoYW5rcyBhIGxvdCBmb3IgbG9va2luZyBpbnRv
+IHRoaXMgYW5kIHJlcGx5aW5nLiBJIHdpbGwgZG8gbXkgYmVzdCB0byByZWJ1aWxkIGFuZCBkZXBs
+b3kgQWxwaW5lJ3MgcWVtdSBwYWNrYWdlcyB3aXRoIHRoaXMgcGF0Y2ggaW5jbHVkZWQgYnV0IG5v
+dCBzdXJlIGl0cyBmZWFzaWJsZSB5ZXQuIEluIGFueSBjYXNlLCB3b3VsZCBpdCBiZSBwb3NzaWJs
+ZSB0byBoYXZlIHRoaXMgcGF0Y2ggaW5jbHVkZWQgaW4gdGhlIG5leHQgcWVtdSByZWxlYXNlPyBZ
+ZXMsIEkgaGF2ZSBhbHJlYWR5IGFkZGVkIHRoaXMgdG8gbXkgdG9kbyBsaXN0LiBUaGUgY3VycmVu
+dCBlcnJvciBtZXNzYWdlIGlzIGhlbHBmdWwgYnV0IGtub3dpbmcgd2hpY2ggZGV2aWNlIHdhcyBp
+bnZvbHZlZCB3aWxsIGJlIG11Y2ggbW9yZSBoZWxwZnVsLiBSZWdhcmRpbmcgdGhlIGVudmlyb25t
+ZW50LCBJJ20gbm90IGRvaW5nIG1pZ3JhdGlvbnMgYW5kIG9ubHkgbWFuYWdlZCBzYXZlIGlzIGRv
+bmUgaW4gY2FzZSB0aGUgaG9zdCBuZWVkcyB0byBiZSByZWJvb3RlZCBvciBzaHV0ZG93bi4gVGhl
+IFFFTVUgcHJvY2VzcyBpcyBydW5uaW5nIHRoZSBWTSBzaW5jZSB0aGUgaG9zdCBpcyBzdGFydGVk
+IGFuZCB0aGlzIGZhaWx1aXJlIGlzIG9jdXJyaW5nIHJhbmRvbWx5IHdpdGhvdXQgYW55IHByZXZp
+b3VzIG1hbmFnZSBzYXZlIGRvbmUuIEFzIHBhcnQgb2YgdHJvdWJsZXNob290aW5nIG9uIG9uZSBv
+ZiB0aGUgZ3Vlc3RzIEkgc3dpdGNoZWQgZnJvbSB2aXJ0aW9fYmxrIHRvIHZpcnRpb19zY3NpIGZv
+ciB0aGUgZ3Vlc3QgZGlza3MgYnV0IEkgd2lsbCBuZWVkIG1vcmUgdGltZSB0byBzZWUgaWYgdGhh
+dCBoZWxwZWQuIElmIEkgaGF2ZSB0aGlzIHByb2JsZW0gYWdhaW4gSSB3aWxsIGZvbGxvdyB5b3Vy
+IGFkdmlzZSBhbmQgcmVtb3ZlIHZpcnRpb19iYWxsb29uLiBUaGFua3MsIHBsZWFzZSBrZWVwIHVz
+IHBvc3RlZC4gQW5vdGhlciBxdWVzdGlvbjogaXMgdGhlcmUgYW55IHdheSB0byBtb25pdG9yIHRo
+ZSB2aXJ0cXVldWUgc2l6ZSBlaXRoZXIgZnJvbSB0aGUgZ3Vlc3QgaXRzZWxmIG9yIGZyb20gdGhl
+IGhvc3Q/IEFueSBmaWxlIGluIHN5c2ZzIG9yIHByb2M/IFRoaXMgbWF5IGhlbHAgdG8gdW5kZXJz
+dGFuZCBpbiB3aGljaCBjb25kaXRpb25zIHRoaXMgaXMgaGFwcGVuaW5nIGFuZCB0byByZWFjdCBm
+YXN0ZXIgdG8gbWl0aWdhdGUgdGhlIHByb2JsZW0uIFRoZSBwcm9ibGVtIGlzIG5vdCBpbiB0aGUg
+dmlydHF1ZXVlIHNpemUgYnV0IGluIG9uZSBwaWVjZSBvZiBpbnRlcm5hbCBzdGF0ZSAoImludXNl
+Iikgd2hpY2ggaXMgbWVhbnQgdG8gdHJhY2sgdGhlIG51bWJlciBvZiBidWZmZXJzICJjaGVja2Vk
+IG91dCIgYnkgUUVNVS4gSXQncyBiZWluZyBjb21wYXJlZCB0byB2aXJ0cXVldWUgc2l6ZSBtZXJl
+bHkgYXMgYSBzYW5pdHkgY2hlY2suIEknbSBhZnJhaWQgdGhhdCB0aGVyZSdzIG5vIHdheSB0byBl
+eHBvc2UgdGhpcyB2YXJpYWJsZSB3aXRob3V0IHJlYnVpbGRpbmcgUUVNVS4gVGhlIGJlc3QgeW91
+IGNvdWxkIGRvIGlzIGF0dGFjaCBnZGIgdG8gdGhlIFFFTVUgcHJvY2VzcyBhbmQgdXNlIHNvbWUg
+Y2xldmVyIGRhdGEgYWNjZXNzIGJyZWFrcG9pbnRzIHRvIGNhdGNoIHN1c3BpY2lvdXMgd3JpdGVz
+IHRvIHRoZSB2YXJpYWJsZS4gQWx0aG91Z2ggaXQncyBsaWtlbHkgdGhhdCBpdCBqdXN0IGNyZWVw
+cyB1cCBzbG93bHkgYW5kIHlvdSB3b24ndCBzZWUgYW55dGhpbmcgaW50ZXJlc3RpbmcuIEl0J3Mg
+cHJvYmFibHkgYmV5b25kIHJlYXNvbmFibGUgYXQgdGhpcyBwb2ludCBhbnl3YXkuIEkgd291bGQg
+Y29udGludWUgd2l0aCB0aGUgZWxpbWluYXRpb24gcHJvY2VzcyAodmlydGlvX3Njc2kgaW5zdGVh
+ZCBvZiB2aXJ0aW9fYmxrLCBubyBiYWxsb29uLCBldGMuKSBhbmQgdGhlbiBtYXliZSBvbmNlIHdl
+IGtub3cgd2hpY2ggZGV2aWNlIGl0IGlzLCB3ZSBjYW4gYWRkIHNvbWUgaW5zdHJ1bWVudGF0aW9u
+IHRvIHRoZSBjb2RlLiBUaGFua3MgYWdhaW4gZm9yIHlvdXIgaGVscCB3aXRoIHRoaXMhIEZlciBP
+biB2aWUsIGp1biAxNiwgMjAxNyBhdCA4OjU4ICwgTGFkaSBQcm9zZWsgPGxwcm9zZWtAcmVkaGF0
+LmNvbTxtYWlsdG86bHByb3Nla0ByZWRoYXQuY29tPj4gd3JvdGU6IEhpLCBXb3VsZCB5b3UgYmUg
+YWJsZSB0byBlbmhhbmNlIHRoZSBlcnJvciBtZXNzYWdlIGFuZCByZWJ1aWxkIFFFTVU/IC0tLSBh
+L2h3L3ZpcnRpby92aXJ0aW8uYyArKysgYi9ody92aXJ0aW8vdmlydGlvLmMgQEAgLTg1Niw3ICs4
+NTYsNyBAQCB2b2lkICp2aXJ0cXVldWVfcG9wKFZpcnRRdWV1ZSAqdnEsIHNpemVfdCBzeikgbWF4
+ID0gdnEtPnZyaW5nLm51bTsgaWYgKHZxLT5pbnVzZSA9IHZxLT52cmluZy5udW0pIHsgLSB2aXJ0
+aW9fZXJyb3IodmRldiwgIlZpcnRxdWV1ZSBzaXplIGV4Y2VlZGVkIik7ICsgdmlydGlvX2Vycm9y
+KHZkZXYsICJWaXJ0cXVldWUgJXUgZGV2aWNlICVzIHNpemUgZXhjZWVkZWQiLCB2cS0+cXVldWVf
+aW5kZXgsIHZkZXYtPm5hbWUpOyBnb3RvIGRvbmU7IH0gVGhpcyB3b3VsZCBhdCBsZWFzdCBjb25m
+aXJtIHRoZSB0aGVvcnkgdGhhdCBpdCdzIGNhdXNlZCBieSB2aXJ0aW8tYmxrLXBjaS4gSWYgcmVi
+dWlsZGluZyBpcyBub3QgZmVhc2libGUgSSB3b3VsZCBzdGFydCBieSByZW1vdmluZyBvdGhlciB2
+aXJ0aW8gZGV2aWNlcyAtLSBwYXJ0aWN1bGFybHkgYmFsbG9vbiB3aGljaCBoYXMgaGFkIHF1aXRl
+IGEgZmV3IHZpcnRpbyByZWxhdGVkIGJ1Z3MgZml4ZWQgcmVjZW50bHkuIERvZXMgeW91ciBlbnZp
+cm9ubWVudCBpbnZvbHZlIFZNIG1pZ3JhdGlvbnMgb3Igc2F2aW5nL3Jlc3VtaW5nLCBvciBkb2Vz
+IHRoZSBjcmFzaGluZyBRRU1VIHByb2Nlc3MgYWx3YXlzIHJ1biB0aGUgVk0gZnJvbSBpdHMgYm9v
+dD8gVGhhbmtzIQ0KDQoNCg==
