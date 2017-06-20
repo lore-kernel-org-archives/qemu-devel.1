@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46036)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dNLlZ-0006TP-JY
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 12:12:34 -0400
+	(envelope-from <groug@kaod.org>) id 1dNLm4-0006rm-2W
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 12:13:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dNLlY-0004e7-Rn
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 12:12:33 -0400
-Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:33948)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dNLlY-0004e0-LV
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 12:12:32 -0400
-Received: by mail-wr0-x22f.google.com with SMTP id 77so97252627wrb.1
-	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 09:12:32 -0700 (PDT)
+	(envelope-from <groug@kaod.org>) id 1dNLm0-0004lr-1B
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 12:13:04 -0400
+Received: from 10.mo68.mail-out.ovh.net ([46.105.79.203]:58166)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dNLlz-0004kp-QE
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 12:12:59 -0400
+Received: from player789.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 42D3E5EE29
+	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 18:12:56 +0200 (CEST)
+Date: Tue, 20 Jun 2017 18:12:48 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170620181248.1679d41f@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <20170620015332.13874-2-david@gibson.dropbear.id.au>
+References: <20170620015332.13874-1-david@gibson.dropbear.id.au>
+	<20170620015332.13874-2-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <20170616010827.32307-1-famz@redhat.com>
-References: <20170616010827.32307-1-famz@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Jun 2017 17:12:11 +0100
-Message-ID: <CAFEAcA8d0kjFzxNxYOFK9zpVzwHp2bX_Qf7-kJmbG6YpM2Ln5w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v4 00/23] Docker and block patches
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/NvebB3/QusfOt3GjewlWh/m";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH 1/5] spapr: Leave DR-indicator management
+ to the guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,27 +32,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: mdroth@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com, sursingh@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On 16 June 2017 at 02:08, Fam Zheng <famz@redhat.com> wrote:
-> The following changes since commit edf8bc98424d62035d5e4c0f39542722d72d7979:
->
->   Merge remote-tracking branch 'remotes/rth/tags/pull-s390-20170613' into staging (2017-06-15 13:45:15 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/famz/qemu.git tags/docker-and-block-pull-request
->
-> for you to fetch changes up to 5b50bf77ce6e773b04a303a2912876c9a1bfca43:
->
->   block: make accounting thread-safe (2017-06-16 07:55:00 +0800)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
->
+--Sig_/NvebB3/QusfOt3GjewlWh/m
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Applied, thanks.
+On Tue, 20 Jun 2017 09:53:28 +0800
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
--- PMM
+> The DR-indicator is essentially a "virtual LED" attached to a hotpluggable
+> device, which the guest can set to various states for the attention of
+> the operator or management layers.
+>=20
+> It's mostly guest managed, except that we once-off set it to
+> ACTIVE/INACTIVE in the attach/detach path.  While that makes certain sens=
+e,
+> there's no indication in PAPR that the hypervisor should do this, and the
+> drmgr code on the guest side doesn't appear to need it (it will already s=
+et
+> the indicator to ACTIVE on hotplug, and INACTIVE on remove).
+>=20
+> So, leave the DR-indicator entirely to the guest; the only thing we need
+> to do is ensure it's in a sane state on reset.
+>=20
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  hw/ppc/spapr_drc.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> index fd9e07d..0bc9046 100644
+> --- a/hw/ppc/spapr_drc.c
+> +++ b/hw/ppc/spapr_drc.c
+> @@ -353,8 +353,6 @@ void spapr_drc_attach(sPAPRDRConnector *drc, DeviceSt=
+ate *d, void *fdt,
+>      }
+>      g_assert(fdt || coldplug);
+> =20
+> -    drc->dr_indicator =3D SPAPR_DR_INDICATOR_ACTIVE;
+> -
+>      drc->dev =3D d;
+>      drc->fdt =3D fdt;
+>      drc->fdt_start_offset =3D fdt_start_offset;
+> @@ -372,8 +370,6 @@ void spapr_drc_attach(sPAPRDRConnector *drc, DeviceSt=
+ate *d, void *fdt,
+> =20
+>  static void spapr_drc_release(sPAPRDRConnector *drc)
+>  {
+> -    drc->dr_indicator =3D SPAPR_DR_INDICATOR_INACTIVE;
+> -
+>      /* Calling release callbacks based on spapr_drc_type(drc). */
+>      switch (spapr_drc_type(drc)) {
+>      case SPAPR_DR_CONNECTOR_TYPE_CPU:
+> @@ -452,12 +448,14 @@ static void reset(DeviceState *d)
+>          if (spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_PCI) {
+>              drc->allocation_state =3D SPAPR_DR_ALLOCATION_STATE_USABLE;
+>          }
+> +        drc->dr_indicator =3D SPAPR_DR_INDICATOR_ACTIVE;
+>      } else {
+>          /* Otherwise device is absent, but might be hotplugged */
+>          drc->isolation_state =3D SPAPR_DR_ISOLATION_STATE_ISOLATED;
+>          if (spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_PCI) {
+>              drc->allocation_state =3D SPAPR_DR_ALLOCATION_STATE_UNUSABLE;
+>          }
+> +        drc->dr_indicator =3D SPAPR_DR_INDICATOR_INACTIVE;
+>      }
+>  }
+> =20
+
+
+--Sig_/NvebB3/QusfOt3GjewlWh/m
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAllJSYAACgkQAvw66wEB28JjEQCgo4O+NpjACg7jS2o/qYqkVIeN
+90wAn15e/UR3n+f7uGmYM5urVSYoWNuI
+=B0gY
+-----END PGP SIGNATURE-----
+
+--Sig_/NvebB3/QusfOt3GjewlWh/m--
