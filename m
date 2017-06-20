@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dNRUu-0006Vg-4v
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 18:19:45 -0400
+	(envelope-from <jayanto@gmail.com>) id 1dNRfd-0000Iu-9b
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 18:30:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dNRUt-0003eW-4y
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 18:19:44 -0400
-Date: Tue, 20 Jun 2017 15:19:33 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <20170620134756.9632-2-paul.durrant@citrix.com>
-Message-ID: <alpine.DEB.2.10.1706201510490.12819@sstabellini-ThinkPad-X260>
-References: <20170620134756.9632-1-paul.durrant@citrix.com>
-	<20170620134756.9632-2-paul.durrant@citrix.com>
+	(envelope-from <jayanto@gmail.com>) id 1dNRfb-0007iI-Lf
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 18:30:49 -0400
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:34305)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jayanto@gmail.com>) id 1dNRfb-0007gq-8A
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 18:30:47 -0400
+Received: by mail-lf0-x244.google.com with SMTP id l200so6225518lfg.1
+	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 15:30:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH 1/3] xen-disk: only advertize
- feature-persistent if grant copy is not available
+In-Reply-To: <20170620172002.GA23332@flamenco>
+References: <CADR1n+V8R1LOGzbwdBDt5axeZ0mqh=WSCsfUo0Vr2nmE6BYqTQ@mail.gmail.com>
+	<8760fqorbp.fsf@frigg.lan> <20170620172002.GA23332@flamenco>
+From: Jayanto Minocha <jayanto@gmail.com>
+Date: Tue, 20 Jun 2017 15:30:43 -0700
+Message-ID: <CADR1n+Uw1Yg+0PdsaPwViXUFO7gGkW6ET_oSM86YQL+HRfM=0w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Tracing guest virtual addresses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,77 +29,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>
-Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, qemu-block@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, roger.pau@citrix.com
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: =?UTF-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>, qemu-devel@nongnu.org
 
-On Tue, 20 Jun 2017, Paul Durrant wrote:
-> If grant copy is available then it will always be used in preference to
-> persistent maps. In this case feature-persistent should not be advertized
-> to the frontend, otherwise it may needlessly copy data into persistently
-> granted buffers.
-> 
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+Lluis,
 
-CC'ing Roger.
+My modifications were almost the same as those done by Emilio. There were
+no memory trace events in the trace file.
 
-It is true that using feature-persistent together with grant copies is a
-a very bad idea.
+-J
 
-But this change enstablishes an explicit preference of
-feature_grant_copy over feature-persistent in the xen_disk backend. It
-is not obvious to me that it should be the case.
+On Tue, Jun 20, 2017 at 10:20 AM, Emilio G. Cota <cota@braap.org> wrote:
 
-Why is feature_grant_copy (without feature-persistent) better than
-feature-persistent (without feature_grant_copy)? Shouldn't we simply
-avoid grant copies to copy data to persistent grants?
-
-
-> ---
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> ---
->  hw/block/xen_disk.c | 15 ++++++++-------
->  1 file changed, 8 insertions(+), 7 deletions(-)
-> 
-> diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
-> index 3a22805fbc..9b06e3aa81 100644
-> --- a/hw/block/xen_disk.c
-> +++ b/hw/block/xen_disk.c
-> @@ -1023,11 +1023,18 @@ static int blk_init(struct XenDevice *xendev)
->  
->      blkdev->file_blk  = BLOCK_SIZE;
->  
-> +    blkdev->feature_grant_copy =
-> +                (xengnttab_grant_copy(blkdev->xendev.gnttabdev, 0, NULL) == 0);
-> +
-> +    xen_pv_printf(&blkdev->xendev, 3, "grant copy operation %s\n",
-> +                  blkdev->feature_grant_copy ? "enabled" : "disabled");
-> +
->      /* fill info
->       * blk_connect supplies sector-size and sectors
->       */
->      xenstore_write_be_int(&blkdev->xendev, "feature-flush-cache", 1);
-> -    xenstore_write_be_int(&blkdev->xendev, "feature-persistent", 1);
-> +    xenstore_write_be_int(&blkdev->xendev, "feature-persistent",
-> +                          !blkdev->feature_grant_copy);
->      xenstore_write_be_int(&blkdev->xendev, "info", info);
->  
->      blk_parse_discard(blkdev);
-> @@ -1202,12 +1209,6 @@ static int blk_connect(struct XenDevice *xendev)
->  
->      xen_be_bind_evtchn(&blkdev->xendev);
->  
-> -    blkdev->feature_grant_copy =
-> -                (xengnttab_grant_copy(blkdev->xendev.gnttabdev, 0, NULL) == 0);
-> -
-> -    xen_pv_printf(&blkdev->xendev, 3, "grant copy operation %s\n",
-> -                  blkdev->feature_grant_copy ? "enabled" : "disabled");
-> -
->      xen_pv_printf(&blkdev->xendev, 1, "ok: proto %s, ring-ref %d, "
->                    "remote port %d, local port %d\n",
->                    blkdev->xendev.protocol, blkdev->ring_ref,
-> -- 
-> 2.11.0
-> 
+> On Tue, Jun 20, 2017 at 14:02:02 +0300, Llu=C3=ADs Vilanova wrote:
+> > Jayanto Minocha writes:
+> >
+> > > Hi,
+> > > I think there have been a few threads on the mailing list regarding
+> tracing
+> > > guest virtual addresses for load and store instructions, but I have
+> been
+> > > unable to get it to work. I am trying this for an AArch64 machine, an=
+d
+> am
+> > > using the softmmu.
+> >
+> > > The tracing infrastructure provides the following event:
+> >
+> > > vcpu tcg guest_mem_before(...).
+> >
+> > > But that is only used to instrument the cpu_ld/cpu_st macros, which i=
+s
+> only
+> > > called in the case of a tlb miss.
+> >
+> > > I've been going over the archives, and it looks like I need to
+> instrument
+> > > tcg_out_tlb_load. Am I on the right path ?
+> >
+> > That event should trace all guest memory accesses performed by the CPU.
+> If you
+> > found any case where this does not hold, it is likely a bug and I'd
+> appreciate
+> > it if you can point me to the smallest possible failing example.
+>
+> I'm having trouble with this as well, although I'm pretty sure I must be
+> doing
+> something wrong (never used the tracing infrastructure before). Here's wh=
+at
+> I'm doing:
+>
+> $ git show --pretty=3Dshort
+> commit e85c0d14014514a2f0faeae5b4c23fab5b234de4
+> Merge: 65a0e3e 7f3cf2d
+> Author: Peter Maydell <peter.maydell@linaro.org>
+>
+>     Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into
+> staging
+>
+>
+> $ git diff
+> diff --git a/accel/tcg/trace-events b/accel/tcg/trace-events
+> index 2de8359..385a462 100644
+> --- a/accel/tcg/trace-events
+> +++ b/accel/tcg/trace-events
+> @@ -2,7 +2,7 @@
+>
+>  # TCG related tracing (mostly disabled by default)
+>  # cpu-exec.c
+> -disable exec_tb(void *tb, uintptr_t pc) "tb:%p pc=3D0x%"PRIxPTR
+> +exec_tb(void *tb, uintptr_t pc) "tb:%p pc=3D0x%"PRIxPTR
+>  disable exec_tb_nocache(void *tb, uintptr_t pc) "tb:%p pc=3D0x%"PRIxPTR
+>  disable exec_tb_exit(void *last_tb, unsigned int flags) "tb:%p flags=3D%=
+x"
+>
+> diff --git a/trace-events b/trace-events
+> index bae63fd..7df49a3 100644
+> --- a/trace-events
+> +++ b/trace-events
+> @@ -106,7 +106,7 @@ vcpu guest_cpu_reset(void)
+>  #
+>  # Mode: user, softmmu
+>  # Targets: TCG(all)
+> -disable vcpu tcg guest_mem_before(TCGv vaddr, uint8_t info) "info=3D%d",
+> "vaddr=3D0x%016"PRIx64" info=3D%d"
+> +vcpu tcg guest_mem_before(TCGv vaddr, uint8_t info) "info=3D%d",
+> "vaddr=3D0x%016"PRIx64" info=3D%d"
+>
+>  # @num: System call number.
+>  # @arg*: System call argument value.
+>
+> $ mkdir build
+> $ cd build
+> $ ../configure --target-list=3Darm-softmmu,x86_64-linux-user
+> --enable-trace-backends=3Dsimple && make -j 12
+> [...]
+>
+> $ cat ../ev
+> guest_mem_before_exec
+> guest_mem_before_trans
+> exec_tb
+>
+> $ x86_64-linux-user/qemu-x86_64 -trace events=3D../ev /bin/date
+> Tue Jun 20 13:11:49 EDT 2017
+>
+> $ ls -lt | head | grep trace
+> -rw-rw-r--  1 cota cota   169721 Jun 20 13:11 trace-2150
+>
+> $ scripts/simpletrace.py trace-events-all trace-2150
+> exec_tb 0.000 pid=3D2150 tb=3D0x7f5896667010 pc=3D0x4000801cc0
+> exec_tb 21.648 pid=3D2150 tb=3D0x7f5896667088 pc=3D0x4000805c00
+> [...]
+>
+> 100% of the file is exec_tb lines, i.e. no memory references whatsoever.
+>
+> Similar results with arm-softmmu.
+>
+> Thanks,
+>
+>                 Emilio
+>
+>
