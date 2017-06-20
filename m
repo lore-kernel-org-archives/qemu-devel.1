@@ -1,22 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60085)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dNOfP-0001XK-Lf
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 15:18:24 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dNOlE-000471-5h
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 15:24:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dNOfK-0001mb-VR
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 15:18:23 -0400
-References: <20170620015332.13874-1-david@gibson.dropbear.id.au>
-	<20170620015332.13874-6-david@gibson.dropbear.id.au>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <ca6fa92a-1e88-752f-2f8c-70db47aac16b@redhat.com>
-Date: Tue, 20 Jun 2017 21:18:04 +0200
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dNOl7-0006fP-9l
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 15:24:24 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51685
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1dNOl7-0006fI-2s
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 15:24:17 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v5KJO9lN090939
+	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 15:24:16 -0400
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2b6mknxa9v-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 15:24:15 -0400
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Tue, 20 Jun 2017 15:24:15 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20170620015332.13874-6-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 5/5] spapr: Use unplug_request
- for PCI hot unplug
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20170620185145.2673e759@bahia.lab.toulouse-stg.fr.ibm.com>
+References: <20170620015332.13874-1-david@gibson.dropbear.id.au>
+	<20170620015332.13874-4-david@gibson.dropbear.id.au>
+	<20170620185145.2673e759@bahia.lab.toulouse-stg.fr.ibm.com>
+Date: Tue, 20 Jun 2017 14:24:08 -0500
+Message-Id: <149798664805.10485.16662705281385907661@loki>
+Subject: Re: [Qemu-devel] [PATCH 3/5] spapr: Add DRC release method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,67 +43,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, mdroth@linux.vnet.ibm.com
-Cc: sursingh@redhat.com, qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org, bharata@linux.vnet.ibm.com
+To: David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
+Cc: bharata@linux.vnet.ibm.com, sursingh@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On 20/06/2017 03:53, David Gibson wrote:
-> AIUI, ->unplug_request in the HotplugHandler is used for "soft"
-> unplug, where acknowledgement from the guest is required before
-> completing the unplug, whereas ->unplug is used for "hard" unplug
-> where qemu unilaterally removes the device, and the guest just has to
-> cope with its sudden absence.  For spapr we (correctly) use
-> ->unplug_request for CPU and memory hot unplug but we use ->unplug for
-> PCI.
-> 
-> While I think it might be possible to support "hard" PCI unplug within
-> the PAPR model, that's not how it actually works now.  Although it's
-> called from ->unplug, the PCI unplug path will usually just mark the
-> device for removal, with completion of the unplug delayed until
-> userspace responds to the unplug notification. If the guest doesn't
-> respond as expected, that could delay the unplug completiong
-> arbitrarily long.
-> 
-> To reflect that, change the PCI unplug path to be called from
-> ->unplug_request.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Quoting Greg Kurz (2017-06-20 11:51:45)
+> On Tue, 20 Jun 2017 09:53:30 +0800
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+> =
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+> > At the moment, spapr_drc_release() has an ugly switch on the DRC type to
+> > call the right, device-specific release function.  This cleans it up by
+> > doing that via a proper QOM method.
+> > =
 
-> ---
->  hw/ppc/spapr_pci.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index f2543ef..bda8938 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -1469,8 +1469,8 @@ out:
->      }
->  }
->  
-> -static void spapr_phb_hot_unplug_child(HotplugHandler *plug_handler,
-> -                                       DeviceState *plugged_dev, Error **errp)
-> +static void spapr_pci_unplug_request(HotplugHandler *plug_handler,
-> +                                     DeviceState *plugged_dev, Error **errp)
->  {
->      sPAPRPHBState *phb = SPAPR_PCI_HOST_BRIDGE(DEVICE(plug_handler));
->      PCIDevice *pdev = PCI_DEVICE(plugged_dev);
-> @@ -1485,6 +1485,7 @@ static void spapr_phb_hot_unplug_child(HotplugHandler *plug_handler,
->      }
->  
->      g_assert(drc);
-> +    g_assert(drc->dev == plugged_dev);
->  
->      drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
->      if (!drck->release_pending(drc)) {
-> @@ -1973,7 +1974,7 @@ static void spapr_phb_class_init(ObjectClass *klass, void *data)
->      dc->user_creatable = true;
->      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
->      hp->plug = spapr_phb_hot_plug_child;
-> -    hp->unplug = spapr_phb_hot_unplug_child;
-> +    hp->unplug_request = spapr_pci_unplug_request;
->  }
->  
->  static const TypeInfo spapr_phb_info = {
-> 
+> > It's still arguably an abstraction violation for the DRC code to call i=
+nto
+> > the specific device code, but one mess at a time.
+> > =
+
+> =
+
+> Maybe a second step would be to move DRC subclasses to spapr.c (CPU, LMB)=
+ and
+> spapr_pci.c (PCI) ? This would allow each device-specific release functio=
+n to
+> have local scope at least.
+
+I kind of prefer the proposed approach of registering a callback
+function via drc_new(). This would make it easier to implement
+unit tests without needing to rely on stub functions, and keeps the
+type-specific handling constrained to matters relating to the DRC
+itself and not the resources associated with them.
+
+> =
+
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+> =
+
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> >  hw/ppc/spapr_drc.c         | 22 ++++++----------------
+> >  include/hw/ppc/spapr_drc.h |  1 +
+> >  2 files changed, 7 insertions(+), 16 deletions(-)
+> > =
+
+> > diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> > index e5dff16..32e39f2 100644
+> > --- a/hw/ppc/spapr_drc.c
+> > +++ b/hw/ppc/spapr_drc.c
+> > @@ -370,22 +370,9 @@ void spapr_drc_attach(sPAPRDRConnector *drc, Devic=
+eState *d, void *fdt,
+> >  =
+
+> >  static void spapr_drc_release(sPAPRDRConnector *drc)
+> >  {
+> > -    /* Calling release callbacks based on spapr_drc_type(drc). */
+> > -    switch (spapr_drc_type(drc)) {
+> > -    case SPAPR_DR_CONNECTOR_TYPE_CPU:
+> > -        spapr_core_release(drc->dev);
+> > -        break;
+> > -    case SPAPR_DR_CONNECTOR_TYPE_PCI:
+> > -        spapr_phb_remove_pci_device_cb(drc->dev);
+> > -        break;
+> > -    case SPAPR_DR_CONNECTOR_TYPE_LMB:
+> > -        spapr_lmb_release(drc->dev);
+> > -        break;
+> > -    case SPAPR_DR_CONNECTOR_TYPE_PHB:
+> > -    case SPAPR_DR_CONNECTOR_TYPE_VIO:
+> > -    default:
+> > -        g_assert(false);
+> > -    }
+> > +    sPAPRDRConnectorClass *drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+> > +
+> > +    drck->release(drc->dev);
+> >  =
+
+> >      drc->awaiting_release =3D false;
+> >      g_free(drc->fdt);
+> > @@ -629,6 +616,7 @@ static void spapr_drc_cpu_class_init(ObjectClass *k=
+, void *data)
+> >      drck->typeshift =3D SPAPR_DR_CONNECTOR_TYPE_SHIFT_CPU;
+> >      drck->typename =3D "CPU";
+> >      drck->drc_name_prefix =3D "CPU ";
+> > +    drck->release =3D spapr_core_release;
+> >  }
+> >  =
+
+> >  static void spapr_drc_pci_class_init(ObjectClass *k, void *data)
+> > @@ -638,6 +626,7 @@ static void spapr_drc_pci_class_init(ObjectClass *k=
+, void *data)
+> >      drck->typeshift =3D SPAPR_DR_CONNECTOR_TYPE_SHIFT_PCI;
+> >      drck->typename =3D "28";
+> >      drck->drc_name_prefix =3D "C";
+> > +    drck->release =3D spapr_phb_remove_pci_device_cb;
+> >  }
+> >  =
+
+> >  static void spapr_drc_lmb_class_init(ObjectClass *k, void *data)
+> > @@ -647,6 +636,7 @@ static void spapr_drc_lmb_class_init(ObjectClass *k=
+, void *data)
+> >      drck->typeshift =3D SPAPR_DR_CONNECTOR_TYPE_SHIFT_LMB;
+> >      drck->typename =3D "MEM";
+> >      drck->drc_name_prefix =3D "LMB ";
+> > +    drck->release =3D spapr_lmb_release;
+> >  }
+> >  =
+
+> >  static const TypeInfo spapr_dr_connector_info =3D {
+> > diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+> > index d9cacb3..6fd84d1 100644
+> > --- a/include/hw/ppc/spapr_drc.h
+> > +++ b/include/hw/ppc/spapr_drc.h
+> > @@ -217,6 +217,7 @@ typedef struct sPAPRDRConnectorClass {
+> >      sPAPRDREntitySense (*dr_entity_sense)(sPAPRDRConnector *drc);
+> >      uint32_t (*isolate)(sPAPRDRConnector *drc);
+> >      uint32_t (*unisolate)(sPAPRDRConnector *drc);
+> > +    void (*release)(DeviceState *dev);
+> >  =
+
+> >      /* QEMU interfaces for managing hotplug operations */
+> >      bool (*release_pending)(sPAPRDRConnector *drc);
+>=20
