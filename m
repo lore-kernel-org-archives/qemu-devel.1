@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmhahn@pmhahn.de>) id 1dNG5m-0007dT-KH
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 06:09:03 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dNGAt-00011C-Am
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 06:14:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmhahn@pmhahn.de>) id 1dNG5i-0002lI-Lr
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 06:09:02 -0400
-Received: from parrot.pmhahn.de ([88.198.50.102]:34772)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmhahn@pmhahn.de>) id 1dNG5i-0002lC-EX
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 06:08:58 -0400
-References: <5d090b82-dae7-ac67-a032-92c2e776b70f@univention.de>
-	<2e7e9fe3-e603-d75f-84c6-d0fb048266da@redhat.com>
-	<58d3a273-e857-fe9e-0b1e-a4aca4aa54ef@univention.de>
-From: Philipp Hahn <pmhahn@pmhahn.de>
-Message-ID: <d323a0b6-164f-7378-c565-e42128cf56b6@pmhahn.de>
-Date: Tue, 20 Jun 2017 12:08:56 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1dNGAs-0004j4-DW
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 06:14:19 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:35474)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dNGAs-0004ig-55
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 06:14:18 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id y25so49679954wrd.2
+	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 03:14:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <58d3a273-e857-fe9e-0b1e-a4aca4aa54ef@univention.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFH] qemu-2.6 memory corruption with OVMF and
- linux-4.9
+In-Reply-To: <20170614215526.9218-1-jcody@redhat.com>
+References: <20170614215526.9218-1-jcody@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 20 Jun 2017 11:13:56 +0100
+Message-ID: <CAFEAcA_Oc=fs6sJW9=v57LcEakT3AVVPp4n=S0w3j3s6s+Jhfg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/2] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,69 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philipp Hahn <hahn@univention.de>, Laszlo Ersek <lersek@redhat.com>
-Cc: qemu-devel@nongnu.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Peter Jones <pjones@redhat.com>, linux-fbdev@vger.kernel.org
+To: Jeff Cody <jcody@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Hello,
+On 14 June 2017 at 22:55, Jeff Cody <jcody@redhat.com> wrote:
+> The following changes since commit 3f0602927b120a480b35dcf58cf6f95435b3ae91:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20170613' into staging (2017-06-13 15:49:07 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/codyprime/qemu-kvm-jtc.git tags/block-pull-request
+>
+> for you to fetch changes up to 5c3ad1a6a8fa041c57403dbe1fc5927eec0be66b:
+>
+>   block/iscsi: enable filename option and parsing (2017-06-14 17:39:46 -0400)
+>
+> ----------------------------------------------------------------
+> Block patches
+> ----------------------------------------------------------------
+>
+> Jeff Cody (2):
+>   block/rbd: enable filename option and parsing
+>   block/iscsi: enable filename option and parsing
+>
+>  block/iscsi.c | 22 +++++++++++++++++++++-
+>  block/rbd.c   | 22 +++++++++++++++++++++-
+>  2 files changed, 42 insertions(+), 2 deletions(-)
 
-Am 18.06.2017 um 20:22 schrieb Philipp Hahn:
-> Am 17.06.2017 um 18:51 schrieb Laszlo Ersek:
->> (I also recommend using the "vbindiff" tool for such problems, it is
->> great for picking out patterns.)
->>
->>           ** ** ** ** ** ** ** **   8  9 ** ** ** 13 14 15
->>           -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- --
->> 00000000  01 e8 00 00 00 00 00 00  8c 5e 00 00 00 10 ff f1
->> 00000010  5b 78 8a 3e 00 00 00 00  00 00 00 00 00 00 00 00
->> 00000020  8c 77 00 00 00 12 00 02  18 f0 00 00 00 00 00 00
->> 00000030  00 1e 00 00 00 00 00 00  8c 8c 00 00 00 12 00 02
->> 00000040  07 70 00 00 00 00 00 00  00 14 00 00 00 00 00 00
->> 00000050  8c 9c 00 00 00 12 00 02  22 00 00 00 00 00 00 00
->> 00000060  00 40 00 00 00 00 00 00  8c ac 00 00 00 10 ff f1
->>
->> 00000000  01 e8 00 00 00 00 00 00  00 3c 00 00 00 17 00 00
->> 00000010  5b 78 8a 3e 00 00 00 00  00 3c 00 00 00 07 00 00
->> 00000020  8c 77 00 00 00 12 00 02  00 3c 00 00 00 07 00 00
->> 00000030  00 1e 00 00 00 00 00 00  00 3c 00 00 00 17 00 00
->> 00000040  07 70 00 00 00 00 00 00  00 3c 00 00 00 07 00 00
->> 00000050  8c 9c 00 00 00 12 00 02  00 3c 00 00 00 07 00 00
->> 00000060  00 40 00 00 00 00 00 00  00 3c 00 00 00 17 00 00
->>           -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- --
->>           ** ** ** ** ** ** ** **   8  9 ** ** ** 13 14 15
->>
->> The columns that I marked with "**" are identical between "good" and
->> "bad". (These are columns 0-7, 10-12.)
->>
->> Column 8 is overwritten by zeros (every 16th byte).
->>
->> Column 9 is overwritten by 0x3c (every 16th byte).
->>
->> Column 13 is super interesting. The most significant nibble in that
->> column is not disturbed. And, in the least significant nibble, the least
->> significant three bits are turned on. Basically, the corruption could be
->> described, for this column (i.e., every 16th byte), as
->>
->>   bad = good | 0x7
->>
->> Column 14 is overwritten by zeros (every 16th byte).
->>
->> Column 15 is overwritten by zeros (every 16th byte).
->>
->> My take is that your host machine has faulty RAM. Please run memtest86+
->> or something similar.
-> 
-> I will do so, but for me very unlikely:
-> - it never happens with BIOS, only with OVMF
-> - for each test I start q new QEMU process, which should use a different
-> memory region
-> - it repeatedly hits e1000 or libata.ko
+Applied, thanks.
 
-Okay: memtest+-5.01 run for 8h and did not find any errors in those 3
-passes.
-
-> After updating from OVMF to 0~20161202.7bbe0b3e-1 from
-> (0~20160813.de74668f-2 it has not yet happened again.
-
-Anyway, thank you for your help.
-
-Philipp
+-- PMM
