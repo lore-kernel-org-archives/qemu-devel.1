@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38365)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dNE5w-0007yZ-Kh
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 04:01:05 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dNE8a-0000ir-V0
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 04:03:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dNE5s-0004qA-Ma
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 04:01:04 -0400
-Date: Tue, 20 Jun 2017 10:00:50 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170620080050.GA6306@noname.redhat.com>
-References: <1497348515-6391-1-git-send-email-sbates@raithlin.com>
-	<20170619212435.GB22260@localhost.localdomain>
+	(envelope-from <peter.maydell@linaro.org>) id 1dNE8W-00069Z-VU
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 04:03:48 -0400
+Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:35312)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dNE8W-00068v-Nz
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 04:03:44 -0400
+Received: by mail-wr0-x235.google.com with SMTP id y25so47693472wrd.2
+	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 01:03:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170619212435.GB22260@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH] nvme: Add support for Read Data and Write
- Data in CMBs.
+In-Reply-To: <104840a4-9665-324e-329a-3ae92c657b4f@twiddle.net>
+References: <CAFEAcA9+HauZoeSxrdXE+cENswUPsjoSOVFJ-wMfboYH5wC2=Q@mail.gmail.com>
+	<c1efba1b-0af9-50a5-e200-a3f74a88d1c1@redhat.com>
+	<CAFEAcA9ShizMdZRg_EboKK_7kKhakX8rtF32jCgva77e24rnZA@mail.gmail.com>
+	<104840a4-9665-324e-329a-3ae92c657b4f@twiddle.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 20 Jun 2017 09:03:22 +0100
+Message-ID: <CAFEAcA-65QiZseNUHxD+57x9AXhHvb_Pk0L_qdTPR4gXabXj+w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] QEMU issues on SPARC hosts due to
+ more-than-page-alignment requirement for MAP_SHARED|MAP_FIXED...
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,33 +32,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Keith Busch <keith.busch@intel.com>
-Cc: sbates@raithlin.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, logang@deltatee.com, mreitz@redhat.com
+To: Richard Henderson <rth@twiddle.net>
+Cc: Laszlo Ersek <lersek@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 
-Am 19.06.2017 um 23:24 hat Keith Busch geschrieben:
-> On Tue, Jun 13, 2017 at 04:08:35AM -0600, sbates@raithlin.com wrote:
-> > From: Stephen Bates <sbates@raithlin.com>
-> > 
-> > Add the ability for the NVMe model to support both the RDS and WDS
-> > modes in the Controller Memory Buffer.
-> > 
-> > Although not currently supported in the upstreamed Linux kernel a fork
-> > with support exists [1] and user-space test programs that build on
-> > this also exist [2].
-> > 
-> > Useful for testing CMB functionality in preperation for real CMB
-> > enabled NVMe devices (coming soon).
-> > 
-> > [1] https://github.com/sbates130272/linux-p2pmem
-> > [2] https://github.com/sbates130272/p2pmem-test
-> > 
-> > Signed-off-by: Stephen Bates <sbates@raithlin.com>
-> > Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
-> 
-> This looks good to me.
-> 
-> Reviewed-by: Keith Busch <keith.busch@intel.com>
+On 19 June 2017 at 23:49, Richard Henderson <rth@twiddle.net> wrote:
+> On 06/16/2017 02:18 AM, Peter Maydell wrote:
+>>
+>> (As an aside I wonder whether any still-used hardware has
+>> the cache aliasing constraints in question :-))
+>
+>
+> I strongly doubt it.  Certainly none of the 64-bit chips have this.
 
-Thanks, applied to the block branch.
+If so then it would be possible to make the kernel less strict
+here, I think (without breaking back compat), though for QEMU's
+purposes we probably ought to deal with the kernel as it stands.
 
-Kevin
+thanks
+-- PMM
