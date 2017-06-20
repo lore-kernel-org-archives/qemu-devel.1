@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1dNFGR-0000DM-Fj
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 05:16:00 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1dNFGU-0000Fd-8j
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 05:16:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1dNFGP-0007s0-84
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 05:15:59 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:33167)
+	(envelope-from <guangrong.xiao@gmail.com>) id 1dNFGS-0007t9-4D
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 05:16:02 -0400
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:36553)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1dNFGP-0007rd-1r
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 05:15:57 -0400
-Received: by mail-pf0-x244.google.com with SMTP id w12so21606918pfk.0
-	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 02:15:57 -0700 (PDT)
+	id 1dNFGR-0007se-UH
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 05:16:00 -0400
+Received: by mail-pf0-x241.google.com with SMTP id y7so21600713pfd.3
+	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 02:15:59 -0700 (PDT)
 From: guangrong.xiao@gmail.com
-Date: Tue, 20 Jun 2017 17:15:24 +0800
-Message-Id: <20170620091526.4287-6-xiaoguangrong@tencent.com>
+Date: Tue, 20 Jun 2017 17:15:25 +0800
+Message-Id: <20170620091526.4287-7-xiaoguangrong@tencent.com>
 In-Reply-To: <20170620091526.4287-1-xiaoguangrong@tencent.com>
 References: <20170620091526.4287-1-xiaoguangrong@tencent.com>
-Subject: [Qemu-devel] [PATCH v2 5/7] KVM: MMU: allow dirty log without write
- protect
+Subject: [Qemu-devel] [PATCH v2 6/7] KVM: MMU: clarify
+ fast_pf_fix_direct_spte
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,100 +32,44 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, Xi
 
 From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-A new flag, KVM_DIRTY_LOG_WITHOUT_WRITE_PROTECT, is introduced which
-indicates the userspace just wants to get the snapshot of dirty bitmap
-
-During live migration, after all snapshot of dirty bitmap is fetched
-from KVM, the guest memory can be write protected by calling
-KVM_WRITE_PROTECT_ALL_MEM
+The writable spte can not be locklessly fixed and add a WARN_ON()
+to trigger the warning if something out of our mind happens, that
+is good for us to track if the log for writable spte is missed
+on the fast path
 
 Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
 ---
- arch/x86/kvm/x86.c       |  1 +
- include/uapi/linux/kvm.h |  6 +++++-
- virt/kvm/kvm_main.c      | 15 ++++++++++++---
- 3 files changed, 18 insertions(+), 4 deletions(-)
+ arch/x86/kvm/mmu.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ad62c44..6343e5c 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2677,6 +2677,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_SET_BOOT_CPU_ID:
-  	case KVM_CAP_SPLIT_IRQCHIP:
- 	case KVM_CAP_IMMEDIATE_EXIT:
-+	case KVM_CAP_X86_DIRTY_LOG_WITHOUT_WRITE_PROTECT:
- 		r = 1;
- 		break;
- 	case KVM_CAP_ADJUST_CLOCK:
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 7d4a395..e0f348c 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -443,9 +443,12 @@ struct kvm_interrupt {
- };
+diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+index c011ab0..7711953 100644
+--- a/arch/x86/kvm/mmu.c
++++ b/arch/x86/kvm/mmu.c
+@@ -3240,6 +3240,15 @@ fast_pf_fix_direct_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 	WARN_ON(!sp->role.direct);
  
- /* for KVM_GET_DIRTY_LOG */
+ 	/*
++	 * the original spte can not be writable as only the spte which
++	 * fulfills is_access_track_spte() or
++	 * spte_can_locklessly_be_made_writable() can be locklessly fixed,
++	 * for the former, the W bit is always cleared, for the latter,
++	 * there is nothing to do if it is already writable.
++	 */
++	WARN_ON(is_writable_pte(old_spte));
 +
-+#define KVM_DIRTY_LOG_WITHOUT_WRITE_PROTECT	0x1
-+
- struct kvm_dirty_log {
- 	__u32 slot;
--	__u32 padding1;
-+	__u32 flags;
- 	union {
- 		void __user *dirty_bitmap; /* one bit per page */
- 		__u64 padding2;
-@@ -896,6 +899,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_X86_GUEST_MWAIT 143
- #define KVM_CAP_ARM_USER_IRQ 144
- #define KVM_CAP_X86_WRITE_PROTECT_ALL_MEM 145
-+#define KVM_CAP_X86_DIRTY_LOG_WITHOUT_WRITE_PROTECT 146
++	/*
+ 	 * Theoretically we could also set dirty bit (and flush TLB) here in
+ 	 * order to eliminate unnecessary PML logging. See comments in
+ 	 * set_spte. But fast_page_fault is very unlikely to happen with PML
+@@ -3254,7 +3263,7 @@ fast_pf_fix_direct_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 	if (cmpxchg64(sptep, old_spte, new_spte) != old_spte)
+ 		return false;
  
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index f0fe9d0..8b29462 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1157,6 +1157,12 @@ int kvm_get_dirty_log_protect(struct kvm *kvm,
- 	unsigned long n;
- 	unsigned long *dirty_bitmap;
- 	unsigned long *dirty_bitmap_buffer;
-+	bool write_protect;
-+
-+	if (log->flags & ~KVM_DIRTY_LOG_WITHOUT_WRITE_PROTECT)
-+		return -EINVAL;
-+
-+	write_protect = !(log->flags & KVM_DIRTY_LOG_WITHOUT_WRITE_PROTECT);
- 
- 	as_id = log->slot >> 16;
- 	id = (u16)log->slot;
-@@ -1184,11 +1190,14 @@ int kvm_get_dirty_log_protect(struct kvm *kvm,
- 		if (!dirty_bitmap[i])
- 			continue;
- 
--		*is_dirty = true;
--
- 		mask = xchg(&dirty_bitmap[i], 0);
- 		dirty_bitmap_buffer[i] = mask;
- 
-+		if (!write_protect)
-+			continue;
-+
-+		*is_dirty = true;
-+
- 		if (mask) {
- 			offset = i * BITS_PER_LONG;
- 			kvm_arch_mmu_enable_log_dirty_pt_masked(kvm, memslot,
-@@ -3140,7 +3149,7 @@ static long kvm_vm_compat_ioctl(struct file *filp,
- 				   sizeof(compat_log)))
- 			return -EFAULT;
- 		log.slot	 = compat_log.slot;
--		log.padding1	 = compat_log.padding1;
-+		log.flags	 = compat_log.padding1;
- 		log.padding2	 = compat_log.padding2;
- 		log.dirty_bitmap = compat_ptr(compat_log.dirty_bitmap);
- 
+-	if (is_writable_pte(new_spte) && !is_writable_pte(old_spte)) {
++	if (is_writable_pte(new_spte)) {
+ 		/*
+ 		 * The gfn of direct spte is stable since it is
+ 		 * calculated by sp->gfn.
 -- 
 2.9.4
