@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dNLiK-0002tN-0t
+	(envelope-from <edgar.iglesias@gmail.com>) id 1dNLiK-0002tM-0u
 	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 12:09:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dNLiF-0003Wh-Vd
+	(envelope-from <edgar.iglesias@gmail.com>) id 1dNLiH-0003Y5-3D
 	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 12:09:12 -0400
-Received: from mail-lf0-x22b.google.com ([2a00:1450:4010:c07::22b]:33286)
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:34740)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1dNLiF-0003Vs-NN
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 12:09:07 -0400
-Received: by mail-lf0-x22b.google.com with SMTP id m77so77912982lfe.0
-	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 09:09:07 -0700 (PDT)
+	id 1dNLiG-0003Wm-S5
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 12:09:09 -0400
+Received: by mail-lf0-x241.google.com with SMTP id l200so4067583lfg.1
+	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 09:09:08 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Tue, 20 Jun 2017 18:08:57 +0200
-Message-Id: <1497974944-27050-1-git-send-email-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v1 0/7] target-microblaze: Add support for BSXFI
+Date: Tue, 20 Jun 2017 18:08:58 +0200
+Message-Id: <1497974944-27050-2-git-send-email-edgar.iglesias@gmail.com>
+In-Reply-To: <1497974944-27050-1-git-send-email-edgar.iglesias@gmail.com>
+References: <1497974944-27050-1-git-send-email-edgar.iglesias@gmail.com>
+Subject: [Qemu-devel] [PATCH v1 1/7] target-microblaze: dec_barrel: Use bool
+ instead of unsigned int
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,23 +32,26 @@ Cc: rth@twiddle.net, alistai@xilinx.com, sai.pavan.boddu@xilinx.com, edgar.igles
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Add support for bitfield extract and deposit instructions.
+Use bool instead of unsigned int to represent flags.
+No functional change.
 
-Cheers,
-Edgar
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+---
+ target/microblaze/translate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Edgar E. Iglesias (7):
-  target-microblaze: dec_barrel: Use bool instead of unsigned int
-  target-microblaze: dec_barrel: Use extract32
-  target-microblaze: dec_barrel: Add braces around if-statements
-  target-microblaze: dec_barrel: Plug TCG temp leak
-  target-microblaze: dec_barrel: Add BSEFI
-  target-microblaze: dec_barrel: Add BSIFI
-  target-microblaze: Add CPU version 10.0
-
- target/microblaze/cpu.c       |  1 +
- target/microblaze/translate.c | 54 ++++++++++++++++++++++++++++++++-----------
- 2 files changed, 41 insertions(+), 14 deletions(-)
-
+diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
+index fbb8bb4..4136a8e 100644
+--- a/target/microblaze/translate.c
++++ b/target/microblaze/translate.c
+@@ -660,7 +660,7 @@ static void dec_div(DisasContext *dc)
+ static void dec_barrel(DisasContext *dc)
+ {
+     TCGv t0;
+-    unsigned int s, t;
++    bool s, t;
+ 
+     if ((dc->tb_flags & MSR_EE_FLAG)
+           && (dc->cpu->env.pvr.regs[2] & PVR2_ILL_OPCODE_EXC_MASK)
 -- 
 2.7.4
