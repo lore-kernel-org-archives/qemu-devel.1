@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43391)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dNLf9-0000gA-Kc
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 12:05:56 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dNLh2-000208-56
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 12:07:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dNLf0-0001X6-6n
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 12:05:55 -0400
-References: <20170620015332.13874-1-david@gibson.dropbear.id.au>
-	<20170620015332.13874-2-david@gibson.dropbear.id.au>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <7c20ed8a-10f1-5983-77df-6d44affa9039@redhat.com>
-Date: Tue, 20 Jun 2017 18:05:41 +0200
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dNLh0-0002f1-VI
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 12:07:52 -0400
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20170620134756.9632-1-paul.durrant@citrix.com>
+	<20170620134756.9632-4-paul.durrant@citrix.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <64fb8424-8cb0-ece1-a047-88e3259ef577@redhat.com>
+Date: Tue, 20 Jun 2017 18:07:39 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170620015332.13874-2-david@gibson.dropbear.id.au>
+In-Reply-To: <20170620134756.9632-4-paul.durrant@citrix.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/5] spapr: Leave DR-indicator
- management to the guest
+Subject: Re: [Qemu-devel] [PATCH 3/3] xen-disk: use an IOThread per instance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,65 +25,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, mdroth@linux.vnet.ibm.com
-Cc: sursingh@redhat.com, qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org, bharata@linux.vnet.ibm.com
+To: Paul Durrant <paul.durrant@citrix.com>, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Max Reitz <mreitz@redhat.com>
 
-On 20/06/2017 03:53, David Gibson wrote:
-> The DR-indicator is essentially a "virtual LED" attached to a hotpluggable
-> device, which the guest can set to various states for the attention of
-> the operator or management layers.
+On 20/06/2017 15:47, Paul Durrant wrote:
+> This patch allocates an IOThread object for each xen_disk instance and
+> sets the AIO context appropriately on connect. This allows processing
+> of I/O to proceed in parallel.
 > 
-> It's mostly guest managed, except that we once-off set it to
-> ACTIVE/INACTIVE in the attach/detach path.  While that makes certain sense,
-> there's no indication in PAPR that the hypervisor should do this, and the
-> drmgr code on the guest side doesn't appear to need it (it will already set
-> the indicator to ACTIVE on hotplug, and INACTIVE on remove).
+> The patch also adds tracepoints into xen_disk to make it possible to
+> follow the state transtions of an instance in the log.
 > 
-> So, leave the DR-indicator entirely to the guest; the only thing we need
-> to do is ensure it's in a sane state on reset.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+
+The QEMU block layer is not yet thread safe, but code running in
+IOThreads still has to take the AioContext lock.  You need to call
+aio_context_acquire/release in blk_bh and qemu_aio_complete.
+
+Paolo
+
 > ---
->  hw/ppc/spapr_drc.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
+> Cc: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: Anthony Perard <anthony.perard@citrix.com>
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: Max Reitz <mreitz@redhat.com>
+> ---
+>  hw/block/trace-events |  7 +++++++
+>  hw/block/xen_disk.c   | 44 +++++++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 50 insertions(+), 1 deletion(-)
 > 
-> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-> index fd9e07d..0bc9046 100644
-> --- a/hw/ppc/spapr_drc.c
-> +++ b/hw/ppc/spapr_drc.c
-> @@ -353,8 +353,6 @@ void spapr_drc_attach(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
->      }
->      g_assert(fdt || coldplug);
+> diff --git a/hw/block/trace-events b/hw/block/trace-events
+> index 65e83dc258..608b24ba66 100644
+> --- a/hw/block/trace-events
+> +++ b/hw/block/trace-events
+> @@ -10,3 +10,10 @@ virtio_blk_submit_multireq(void *mrb, int start, int num_reqs, uint64_t offset,
+>  # hw/block/hd-geometry.c
+>  hd_geometry_lchs_guess(void *blk, int cyls, int heads, int secs) "blk %p LCHS %d %d %d"
+>  hd_geometry_guess(void *blk, uint32_t cyls, uint32_t heads, uint32_t secs, int trans) "blk %p CHS %u %u %u trans %d"
+> +
+> +# hw/block/xen_disk.c
+> +xen_disk_alloc(char *name) "%s"
+> +xen_disk_init(char *name) "%s"
+> +xen_disk_connect(char *name) "%s"
+> +xen_disk_disconnect(char *name) "%s"
+> +xen_disk_free(char *name) "%s"
+> diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
+> index a9942d32db..ec1085c802 100644
+> --- a/hw/block/xen_disk.c
+> +++ b/hw/block/xen_disk.c
+> @@ -27,10 +27,13 @@
+>  #include "hw/xen/xen_backend.h"
+>  #include "xen_blkif.h"
+>  #include "sysemu/blockdev.h"
+> +#include "sysemu/iothread.h"
+>  #include "sysemu/block-backend.h"
+>  #include "qapi/error.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qapi/qmp/qstring.h"
+> +#include "qom/object_interfaces.h"
+> +#include "trace.h"
 >  
-> -    drc->dr_indicator = SPAPR_DR_INDICATOR_ACTIVE;
-> -
->      drc->dev = d;
->      drc->fdt = fdt;
->      drc->fdt_start_offset = fdt_start_offset;
-> @@ -372,8 +370,6 @@ void spapr_drc_attach(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
+>  /* ------------------------------------------------------------- */
 >  
->  static void spapr_drc_release(sPAPRDRConnector *drc)
+> @@ -128,6 +131,9 @@ struct XenBlkDev {
+>      DriveInfo           *dinfo;
+>      BlockBackend        *blk;
+>      QEMUBH              *bh;
+> +
+> +    IOThread            *iothread;
+> +    AioContext          *ctx;
+>  };
+>  
+>  /* ------------------------------------------------------------- */
+> @@ -923,11 +929,31 @@ static void blk_bh(void *opaque)
+>  static void blk_alloc(struct XenDevice *xendev)
 >  {
-> -    drc->dr_indicator = SPAPR_DR_INDICATOR_INACTIVE;
-> -
->      /* Calling release callbacks based on spapr_drc_type(drc). */
->      switch (spapr_drc_type(drc)) {
->      case SPAPR_DR_CONNECTOR_TYPE_CPU:
-> @@ -452,12 +448,14 @@ static void reset(DeviceState *d)
->          if (spapr_drc_type(drc) != SPAPR_DR_CONNECTOR_TYPE_PCI) {
->              drc->allocation_state = SPAPR_DR_ALLOCATION_STATE_USABLE;
->          }
-> +        drc->dr_indicator = SPAPR_DR_INDICATOR_ACTIVE;
->      } else {
->          /* Otherwise device is absent, but might be hotplugged */
->          drc->isolation_state = SPAPR_DR_ISOLATION_STATE_ISOLATED;
->          if (spapr_drc_type(drc) != SPAPR_DR_CONNECTOR_TYPE_PCI) {
->              drc->allocation_state = SPAPR_DR_ALLOCATION_STATE_UNUSABLE;
->          }
-> +        drc->dr_indicator = SPAPR_DR_INDICATOR_INACTIVE;
+>      struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
+> +    Object *obj;
+> +    char *name;
+> +    Error *err = NULL;
+> +
+> +    trace_xen_disk_alloc(xendev->name);
+>  
+>      QLIST_INIT(&blkdev->inflight);
+>      QLIST_INIT(&blkdev->finished);
+>      QLIST_INIT(&blkdev->freelist);
+> -    blkdev->bh = qemu_bh_new(blk_bh, blkdev);
+> +
+> +    obj = object_new(TYPE_IOTHREAD);
+> +    name = g_strdup_printf("iothread-%s", xendev->name);
+> +
+> +    object_property_add_child(object_get_objects_root(), name, obj, &err);
+> +    assert(!err);
+> +
+> +    g_free(name);
+> +
+> +    user_creatable_complete(obj, &err);
+> +    assert(!err);
+> +
+> +    blkdev->iothread = (IOThread *)object_dynamic_cast(obj, TYPE_IOTHREAD);
+> +    blkdev->ctx = iothread_get_aio_context(blkdev->iothread);
+> +    blkdev->bh = aio_bh_new(blkdev->ctx, blk_bh, blkdev);
+> +
+>      if (xen_mode != XEN_EMULATE) {
+>          batch_maps = 1;
 >      }
+> @@ -954,6 +980,8 @@ static int blk_init(struct XenDevice *xendev)
+>      int info = 0;
+>      char *directiosafe = NULL;
+>  
+> +    trace_xen_disk_init(xendev->name);
+> +
+>      /* read xenstore entries */
+>      if (blkdev->params == NULL) {
+>          char *h = NULL;
+> @@ -1069,6 +1097,8 @@ static int blk_connect(struct XenDevice *xendev)
+>      unsigned int i;
+>      uint32_t *domids;
+>  
+> +    trace_xen_disk_connect(xendev->name);
+> +
+>      /* read-only ? */
+>      if (blkdev->directiosafe) {
+>          qflags = BDRV_O_NOCACHE | BDRV_O_NATIVE_AIO;
+> @@ -1285,6 +1315,8 @@ static int blk_connect(struct XenDevice *xendev)
+>          blkdev->persistent_gnt_count = 0;
+>      }
+>  
+> +    blk_set_aio_context(blkdev->blk, blkdev->ctx);
+> +
+>      xen_be_bind_evtchn(&blkdev->xendev);
+>  
+>      xen_pv_printf(&blkdev->xendev, 1, "ok: proto %s, nr-ring-ref %u, "
+> @@ -1298,13 +1330,20 @@ static void blk_disconnect(struct XenDevice *xendev)
+>  {
+>      struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
+>  
+> +    trace_xen_disk_disconnect(xendev->name);
+> +
+> +    aio_context_acquire(blkdev->ctx);
+> +
+>      if (blkdev->blk) {
+> +        blk_set_aio_context(blkdev->blk, qemu_get_aio_context());
+>          blk_detach_dev(blkdev->blk, blkdev);
+>          blk_unref(blkdev->blk);
+>          blkdev->blk = NULL;
+>      }
+>      xen_pv_unbind_evtchn(&blkdev->xendev);
+>  
+> +    aio_context_release(blkdev->ctx);
+> +
+>      if (blkdev->sring) {
+>          xengnttab_unmap(blkdev->xendev.gnttabdev, blkdev->sring,
+>                          blkdev->nr_ring_ref);
+> @@ -1338,6 +1377,8 @@ static int blk_free(struct XenDevice *xendev)
+>      struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
+>      struct ioreq *ioreq;
+>  
+> +    trace_xen_disk_free(xendev->name);
+> +
+>      if (blkdev->blk || blkdev->sring) {
+>          blk_disconnect(xendev);
+>      }
+> @@ -1355,6 +1396,7 @@ static int blk_free(struct XenDevice *xendev)
+>      g_free(blkdev->dev);
+>      g_free(blkdev->devtype);
+>      qemu_bh_delete(blkdev->bh);
+> +    object_unparent(OBJECT(blkdev->iothread));
+>      return 0;
 >  }
 >  
 > 
-
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
