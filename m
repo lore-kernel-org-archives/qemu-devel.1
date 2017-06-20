@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dNITG-0004MY-VG
+	(envelope-from <armbru@redhat.com>) id 1dNITB-0004H2-SS
 	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 08:41:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dNITB-0002GM-6y
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 08:41:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56246)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dNITA-0002Eb-WC
+	(envelope-from <armbru@redhat.com>) id 1dNITA-0002Ei-5m
 	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 08:41:21 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+Received: from mx1.redhat.com ([209.132.183.28]:34916)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dNIT9-0002Ds-Vw
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 08:41:20 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A9CD47EBD2
+	by mx1.redhat.com (Postfix) with ESMTPS id 05F9761BA1
 	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 12:41:19 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 20 Jun 2017 14:41:06 +0200
-Message-Id: <1497962468-22936-40-git-send-email-armbru@redhat.com>
+Date: Tue, 20 Jun 2017 14:41:02 +0200
+Message-Id: <1497962468-22936-36-git-send-email-armbru@redhat.com>
 In-Reply-To: <1497962468-22936-1-git-send-email-armbru@redhat.com>
 References: <1497962468-22936-1-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 39/41] i386/cpu: use get_uint() for
- "min-level"/"min-xlevel" properties
+Subject: [Qemu-devel] [PULL v2 35/41] auxbus: use get_uint() for "addr"
+ property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,33 +38,32 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-These are properties of TYPE_X86_CPU, defined with DEFINE_PROP_UINT32()
+This is TYPE_MEMORY_REGION's property.  Its getter
+memory_region_get_addr() uses visit_type_uint64().
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20170607163635.17635-40-marcandre.lureau@redhat.com>
+Message-Id: <20170607163635.17635-36-marcandre.lureau@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- target/i386/cpu.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/misc/auxbus.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index f118a54..642519a 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2324,8 +2324,8 @@ static void x86_cpu_load_def(X86CPU *cpu, X86CPUDef=
-inition *def, Error **errp)
-      */
+diff --git a/hw/misc/auxbus.c b/hw/misc/auxbus.c
+index e4a7ba4..8a90ddd 100644
+--- a/hw/misc/auxbus.c
++++ b/hw/misc/auxbus.c
+@@ -244,7 +244,7 @@ static void aux_slave_dev_print(Monitor *mon, DeviceS=
+tate *dev, int indent)
 =20
-     /* CPU models only set _minimum_ values for level/xlevel: */
--    object_property_set_int(OBJECT(cpu), def->level, "min-level", errp);
--    object_property_set_int(OBJECT(cpu), def->xlevel, "min-xlevel", errp=
-);
-+    object_property_set_uint(OBJECT(cpu), def->level, "min-level", errp)=
-;
-+    object_property_set_uint(OBJECT(cpu), def->xlevel, "min-xlevel", err=
-p);
+     monitor_printf(mon, "%*smemory " TARGET_FMT_plx "/" TARGET_FMT_plx "=
+\n",
+                    indent, "",
+-                   object_property_get_int(OBJECT(s->mmio), "addr", NULL=
+),
++                   object_property_get_uint(OBJECT(s->mmio), "addr", NUL=
+L),
+                    memory_region_size(s->mmio));
+ }
 =20
-     object_property_set_int(OBJECT(cpu), def->family, "family", errp);
-     object_property_set_int(OBJECT(cpu), def->model, "model", errp);
 --=20
 2.7.5
