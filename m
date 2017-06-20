@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47238)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sam.brian@accelerated.com>) id 1dN7lo-00027h-6G
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 21:15:53 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dN7wQ-0005J9-HA
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 21:26:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sam.brian@accelerated.com>) id 1dN7lj-00033b-8M
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 21:15:52 -0400
-Received: from mail-cys01nam02on0041.outbound.protection.outlook.com
-	([104.47.37.41]:59537
-	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sam.brian@accelerated.com>)
-	id 1dN7li-00032q-Pp
-	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 21:15:47 -0400
-References: <20170613234039.27201-1-sam.brian@accelerated.com>
-From: Samuel Brian <sam.brian@accelerated.com>
-Message-ID: <619044aa-78e1-da0e-7e82-4451574c6f39@accelerated.com>
-Date: Tue, 20 Jun 2017 11:15:23 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1dN7wP-0008TB-HM
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 21:26:50 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:53421)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1dN7wO-0008Rc-6b
+	for qemu-devel@nongnu.org; Mon, 19 Jun 2017 21:26:49 -0400
+Date: Tue, 20 Jun 2017 09:02:58 +0800
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170620010258.GK22449@umbus>
+References: <CAFEAcA_3Uf-t7MgvTqO52XX61z3Mcnmpk1XNJRqgdFJiVP1ALQ@mail.gmail.com>
+	<08ab93cb-4d42-2b8b-71e6-057b9529d0b7@suse.de>
+	<e72dab1b-7544-65ea-0e07-abfd78413706@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170613234039.27201-1-sam.brian@accelerated.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] usb-host: support devices with
- sparse/non-sequential USB interfaces
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="J2pR2RtFp0tAjF3C"
+Content-Disposition: inline
+In-Reply-To: <e72dab1b-7544-65ea-0e07-abfd78413706@redhat.com>
+Subject: Re: [Qemu-devel] spapr guests warn "System page size 0x2000 is not
+ enabled in page_size_mask (0x11000). Performance may be slow" on SPARC
+ hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,119 +31,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
-
-Sorry I botched the format in the previous two versions.
-And that automatic build test failure was unrelated.
+To: Thomas Huth <thuth@redhat.com>
+Cc: Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
 
-Gerd, regarding your response to the original patch:
- > Patch looks good but fails to apply.
+--J2pR2RtFp0tAjF3C
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Have you had a chance to consider/test this further?
-Is there anything you would like me to change?
+On Mon, Jun 19, 2017 at 12:32:48PM +0200, Thomas Huth wrote:
+> On 19.06.2017 11:39, Alexander Graf wrote:
+> > On 06/15/2017 03:33 PM, Peter Maydell wrote:
+> >> I've just noticed that on a SPARC host, some of the PPC guests
+> >> warn during make check:
+> >>
+> >>    /ppc64/prom-env/pseries:
+> >> qemu-system-ppc64: System page size 0x2000 is not enabled in
+> >> page_size_mask (0x11000). Performance may be slow
+> >>
+> >> Is this really a performance problem on a TCG guest?
+> >> It makes the 'make check' output a bit noisy, but not
+> >> unbearably so.
+> >=20
+> > From what I can tell this really only affects DDW which should be page
+> > size agnostic when only using emulated devices. Maybe Alexey thought of
+> > using VFIO-pci devices in a TCG guest?
+>=20
+> Maybe we could at least silence the warning by checking
+> qtest_enabled()?
 
-Sam
 
+So,
 
-On 14/06/17 09:40, Samuel Brian wrote:
-> Some USB devices have sparse interface numbering which is not able to be
-> passthroughed.
-> For example, the Sierra Wireless MC7455/MC7430:
-> 
->    # lsusb  -D /dev/bus/usb/003/003 | egrep '1199|9071|bNumInterfaces|bInterfaceNumber'
->    Device: ID 1199:9071 Sierra Wireless, Inc.
->      idVendor           0x1199 Sierra Wireless, Inc.
->      idProduct          0x9071
->        bNumInterfaces          5
->          bInterfaceNumber        0
->          bInterfaceNumber        2
->          bInterfaceNumber        3
->          bInterfaceNumber        8
->          bInterfaceNumber       10
-> 
-> In this case, the interface numbers are 0, 2, 3, 8, 10 and not the
-> 0, 1, 2, 3, 4 that QEMU tries to claim.
-> 
-> This change allows sparse USB interface numbering.
-> Instead of only claiming the interfaces in the range reported by the USB
-> device through bNumInterfaces, QEMU attempts to claim all possible
-> interfaces.
-> 
-> v2 to fix broken v1 patch formatting.
-> v3 to fix indentation.
-> 
-> Signed-off-by: Samuel Brian <sam.brian@accelerated.com>
-> ---
->   hw/usb/host-libusb.c | 24 ++++++++++++++----------
->   1 file changed, 14 insertions(+), 10 deletions(-)
-> 
-> diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
-> index f9c8eafe06..1b0be071cc 100644
-> --- a/hw/usb/host-libusb.c
-> +++ b/hw/usb/host-libusb.c
-> @@ -1107,7 +1107,7 @@ static void usb_host_detach_kernel(USBHostDevice *s)
->       if (rc != 0) {
->           return;
->       }
-> -    for (i = 0; i < conf->bNumInterfaces; i++) {
-> +    for (i = 0; i < USB_MAX_INTERFACES; i++) {
->           rc = libusb_kernel_driver_active(s->dh, i);
->           usb_host_libusb_error("libusb_kernel_driver_active", rc);
->           if (rc != 1) {
-> @@ -1130,7 +1130,7 @@ static void usb_host_attach_kernel(USBHostDevice *s)
->       if (rc != 0) {
->           return;
->       }
-> -    for (i = 0; i < conf->bNumInterfaces; i++) {
-> +    for (i = 0; i < USB_MAX_INTERFACES; i++) {
->           if (!s->ifs[i].detached) {
->               continue;
->           }
-> @@ -1145,7 +1145,7 @@ static int usb_host_claim_interfaces(USBHostDevice *s, int configuration)
->   {
->       USBDevice *udev = USB_DEVICE(s);
->       struct libusb_config_descriptor *conf;
-> -    int rc, i;
-> +    int rc, i, claimed;
->   
->       for (i = 0; i < USB_MAX_INTERFACES; i++) {
->           udev->altsetting[i] = 0;
-> @@ -1164,14 +1164,19 @@ static int usb_host_claim_interfaces(USBHostDevice *s, int configuration)
->           return USB_RET_STALL;
->       }
->   
-> -    for (i = 0; i < conf->bNumInterfaces; i++) {
-> +    claimed = 0;
-> +    for (i = 0; i < USB_MAX_INTERFACES; i++) {
->           trace_usb_host_claim_interface(s->bus_num, s->addr, configuration, i);
->           rc = libusb_claim_interface(s->dh, i);
-> -        usb_host_libusb_error("libusb_claim_interface", rc);
-> -        if (rc != 0) {
-> -            return USB_RET_STALL;
-> +        if (rc == 0) {
-> +            s->ifs[i].claimed = true;
-> +            if (++claimed == conf->bNumInterfaces) {
-> +                break;
-> +            }
->           }
-> -        s->ifs[i].claimed = true;
-> +    }
-> +    if (claimed != conf->bNumInterfaces) {
-> +        return USB_RET_STALL;
->       }
->   
->       udev->ninterfaces   = conf->bNumInterfaces;
-> @@ -1183,10 +1188,9 @@ static int usb_host_claim_interfaces(USBHostDevice *s, int configuration)
->   
->   static void usb_host_release_interfaces(USBHostDevice *s)
->   {
-> -    USBDevice *udev = USB_DEVICE(s);
->       int i, rc;
->   
-> -    for (i = 0; i < udev->ninterfaces; i++) {
-> +    for (i = 0; i < USB_MAX_INTERFACES; i++) {
->           if (!s->ifs[i].claimed) {
->               continue;
->           }
-> 
+1) Yes, we should at least silence the warning.
+
+2) Certainly the mentioned slowdown shouldn't be significant for TCG
+guests.
+
+3) I _think_ the restriction which causes the slowdown doesn't even
+exist for TCG, but I haven't 100% convinced myself of this.  I've been
+sick lately, so my brain isn't working all that well.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--J2pR2RtFp0tAjF3C
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZSHQ9AAoJEGw4ysog2bOSb6sP/jwlQZH40DXo9XoLHu6KnmZb
+awrmPn6Tjib69rorSrg0R5xNkwdBpvJtYaQs53AT0XYbw4Eh2MDX7YbuVoIyQDdD
+Z7lJCwC6arorJRnFh/QlPo5n88l/X0trU+YEZS+yip/+ZkahWco7ec67b3EHJ0Ze
+zjyO8T0JgnIKsQqgYxxQ/N5enoJ2xHIeqTZXJTg35AqiDXaxsJmVD5KpNBG8A2A2
+pDdTIAYacM/IWx0LmNyuFa+dfFc9ELBxQPfXEoO3X31K6QOcrRTy9nzTmD7hsPgE
+E45JQC1MrdqOyec1fd10lTqvZrOMHjGFKHAMKJFHWYo0Jy0UI6lJ6sTAMHqHqmF4
+ZVLlcdelO/i0ZRFHUdeP/JbedKaE+Si+w4Mg/VTdND1WCoTvwccTrkFsW6mH4NJD
+Td8suIwpuvjfc9L5go9aQCiqCedoFM/XD2gJ9Bs/nNuF+YGIHv5PCijhUl8eEeaS
+GXS/X+ngxRSdgr6v8Exn6w6ZpHCS6xnNUlJk3qVs56NXOk4jRxk8mU7NKppOdxae
+mC59Gp7IiwlQf5jwJElN/xis9i+z/3lVarI3JoDO60G8fkf+oeBvW4vRSCOeB+zB
+KlAHTjG4rWTR9NaP7IO446VtPE7NFZXG5ISXgqSDOT+9HJAiYhuIzNg+yNjpi0p3
+sAuSzuU14CEWqIuXTmHL
+=qzrz
+-----END PGP SIGNATURE-----
+
+--J2pR2RtFp0tAjF3C--
