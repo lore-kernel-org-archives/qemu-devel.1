@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dNC5L-0002V1-8v
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 01:52:20 -0400
+	(envelope-from <thuth@redhat.com>) id 1dNC5P-0002Yb-0j
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 01:52:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dNC5K-0003F3-HA
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 01:52:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49724)
+	(envelope-from <thuth@redhat.com>) id 1dNC5N-0003Fs-NO
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 01:52:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40168)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dNC5K-0003Eo-Bq
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 01:52:18 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dNC5N-0003Fe-Gu
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 01:52:21 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 20 Jun 2017 07:52:04 +0200
-Message-Id: <1497937927-19738-6-git-send-email-thuth@redhat.com>
+Date: Tue, 20 Jun 2017 07:52:06 +0200
+Message-Id: <1497937927-19738-8-git-send-email-thuth@redhat.com>
 In-Reply-To: <1497937927-19738-1-git-send-email-thuth@redhat.com>
 References: <1497937927-19738-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 5/8] cpu: Introduce a wrapper for
- tlb_flush() that can be used in common code
+Subject: [Qemu-devel] [PATCH v3 7/8] Makefile: Move bootdevice.o to
+ common-obj-y
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,74 +27,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc: Richard Henderson <rth@twiddle.net>
 
-Commit 1f5c00cfdb8114c ("qom/cpu: move tlb_flush to cpu_common_reset")
-moved the call to tlb_flush() from the target-specific reset handlers
-into the common code qom/cpu.c file, and protected the call with
-"#ifdef CONFIG_SOFTMMU" to avoid that it is called for linux-user
-only targets. But since qom/cpu.c is common code, CONFIG_SOFTMMU is
-*never* defined here, so the tlb_flush() was simply never executed
-anymore. Fix it by introducing a wrapper for tlb_flush() in a file
-that is re-compiled for each target, i.e. in translate-all.c.
+There does not seem to be any target specific code in this file, so
+we can put it into "common-obj" instead of "obj" to compile it only
+once for all targets.
 
-Fixes: 1f5c00cfdb8114c1e3a13426588ceb64f82c9ddb
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- include/exec/cpu-common.h | 2 ++
- qom/cpu.c                 | 5 ++---
- translate-all.c           | 8 ++++++++
- 3 files changed, 12 insertions(+), 3 deletions(-)
+ Makefile.objs   | 2 +-
+ Makefile.target | 2 +-
+ bootdevice.c    | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-index 4d45a72..74341b1 100644
---- a/include/exec/cpu-common.h
-+++ b/include/exec/cpu-common.h
-@@ -28,6 +28,8 @@ void qemu_init_cpu_list(void);
- void cpu_list_lock(void);
- void cpu_list_unlock(void);
+diff --git a/Makefile.objs b/Makefile.objs
+index 0575802..e5bdae9 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -40,7 +40,7 @@ io-obj-y = io/
  
-+void tcg_flush_softmmu_tlb(CPUState *cs);
-+
- #if !defined(CONFIG_USER_ONLY)
- 
- enum device_endian {
-diff --git a/qom/cpu.c b/qom/cpu.c
-index 5069876..303eb42 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -26,6 +26,7 @@
- #include "qemu/notify.h"
- #include "qemu/log.h"
- #include "exec/log.h"
-+#include "exec/cpu-common.h"
- #include "qemu/error-report.h"
+ ifeq ($(CONFIG_SOFTMMU),y)
+ common-obj-y = blockdev.o blockdev-nbd.o block/
+-common-obj-y += iothread.o
++common-obj-y += bootdevice.o iothread.o
+ common-obj-y += net/
+ common-obj-y += qdev-monitor.o device-hotplug.o
+ common-obj-$(CONFIG_WIN32) += os-win32.o
+diff --git a/Makefile.target b/Makefile.target
+index ce8dfe4..0759176 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -140,7 +140,7 @@ endif #CONFIG_BSD_USER
+ # System emulator target
+ ifdef CONFIG_SOFTMMU
+ obj-y += arch_init.o cpus.o monitor.o gdbstub.o balloon.o ioport.o numa.o
+-obj-y += qtest.o bootdevice.o
++obj-y += qtest.o
+ obj-y += hw/
+ obj-$(CONFIG_KVM) += kvm-all.o
+ obj-y += memory.o cputlb.o
+diff --git a/bootdevice.c b/bootdevice.c
+index 33e3029..1141009 100644
+--- a/bootdevice.c
++++ b/bootdevice.c
+@@ -27,7 +27,7 @@
  #include "sysemu/sysemu.h"
- #include "hw/qdev-properties.h"
-@@ -296,9 +297,7 @@ static void cpu_common_reset(CPUState *cpu)
-             atomic_set(&cpu->tb_jmp_cache[i], NULL);
-         }
+ #include "qapi/visitor.h"
+ #include "qemu/error-report.h"
+-#include "hw/hw.h"
++#include "sysemu/reset.h"
+ #include "hw/qdev-core.h"
  
--#ifdef CONFIG_SOFTMMU
--        tlb_flush(cpu, 0);
--#endif
-+        tcg_flush_softmmu_tlb(cpu);
-     }
- }
- 
-diff --git a/translate-all.c b/translate-all.c
-index b3ee876..a45480f 100644
---- a/translate-all.c
-+++ b/translate-all.c
-@@ -2219,3 +2219,11 @@ int page_unprotect(target_ulong address, uintptr_t pc)
-     return 0;
- }
- #endif /* CONFIG_USER_ONLY */
-+
-+/* This is a wrapper for common code that can not use CONFIG_SOFTMMU */
-+void tcg_flush_softmmu_tlb(CPUState *cs)
-+{
-+#ifdef CONFIG_SOFTMMU
-+    tlb_flush(cs);
-+#endif
-+}
+ typedef struct FWBootEntry FWBootEntry;
 -- 
 1.8.3.1
