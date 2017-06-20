@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dNIT6-0004DA-Ln
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 08:41:18 -0400
+	(envelope-from <armbru@redhat.com>) id 1dNIT6-0004DG-Oq
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 08:41:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dNIT5-00029c-LT
+	(envelope-from <armbru@redhat.com>) id 1dNIT5-00029H-8k
 	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 08:41:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58888)
+Received: from mx1.redhat.com ([209.132.183.28]:53302)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dNIT5-000299-Du
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dNIT5-000293-0N
 	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 08:41:15 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 81B4A4E4FC
+	by mx1.redhat.com (Postfix) with ESMTPS id 12128A4F8B
 	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 12:41:14 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 20 Jun 2017 14:40:31 +0200
-Message-Id: <1497962468-22936-5-git-send-email-armbru@redhat.com>
+Date: Tue, 20 Jun 2017 14:40:30 +0200
+Message-Id: <1497962468-22936-4-git-send-email-armbru@redhat.com>
 In-Reply-To: <1497962468-22936-1-git-send-email-armbru@redhat.com>
 References: <1497962468-22936-1-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 04/41] tests: add more int/number ranges
- checks
+Subject: [Qemu-devel] [PULL v2 03/41] tests: Remove test cases for
+ alternates of 'number' and 'int'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,116 +38,136 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
+Alternates with both a 'number' and an 'int' branch will become
+invalid when the next patch merges of QFloat and QInt into QNum.
+More sophisticated alternate code could keep them valid, but since
+we have no users outside tests, simply drop the tests.
+
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20170607163635.17635-5-marcandre.lureau@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
-[test_visitor_in_uint() tightened slightly]
+Message-Id: <20170607163635.17635-4-marcandre.lureau@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/test-qobject-input-visitor.c | 39 ++++++++++++++++++++++++++++++++=
-+++++-
- 1 file changed, 38 insertions(+), 1 deletion(-)
+ tests/qapi-schema/qapi-schema-test.json |  2 --
+ tests/qapi-schema/qapi-schema-test.out  |  8 --------
+ tests/test-keyval.c                     |  4 ++--
+ tests/test-qobject-input-visitor.c      | 26 --------------------------
+ 4 files changed, 2 insertions(+), 38 deletions(-)
 
+diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
+qapi-schema-test.json
+index 17649c6..91ffb26 100644
+--- a/tests/qapi-schema/qapi-schema-test.json
++++ b/tests/qapi-schema/qapi-schema-test.json
+@@ -103,8 +103,6 @@
+ { 'alternate': 'AltEnumNum', 'data': { 'e': 'EnumOne', 'n': 'number' } }
+ { 'alternate': 'AltNumEnum', 'data': { 'n': 'number', 'e': 'EnumOne' } }
+ { 'alternate': 'AltEnumInt', 'data': { 'e': 'EnumOne', 'i': 'int' } }
+-{ 'alternate': 'AltIntNum', 'data': { 'i': 'int', 'n': 'number' } }
+-{ 'alternate': 'AltNumInt', 'data': { 'n': 'number', 'i': 'int' } }
+=20
+ # for testing use of 'str' within alternates
+ { 'alternate': 'AltStrObj', 'data': { 's': 'str', 'o': 'TestStruct' } }
+diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
+api-schema-test.out
+index 9f68610..e727a5a 100644
+--- a/tests/qapi-schema/qapi-schema-test.out
++++ b/tests/qapi-schema/qapi-schema-test.out
+@@ -10,18 +10,10 @@ alternate AltEnumNum
+     tag type
+     case e: EnumOne
+     case n: number
+-alternate AltIntNum
+-    tag type
+-    case i: int
+-    case n: number
+ alternate AltNumEnum
+     tag type
+     case n: number
+     case e: EnumOne
+-alternate AltNumInt
+-    tag type
+-    case n: number
+-    case i: int
+ alternate AltStrObj
+     tag type
+     case s: str
+diff --git a/tests/test-keyval.c b/tests/test-keyval.c
+index c3be005..baf7e33 100644
+--- a/tests/test-keyval.c
++++ b/tests/test-keyval.c
+@@ -615,7 +615,7 @@ static void test_keyval_visit_alternate(void)
+     Visitor *v;
+     QDict *qdict;
+     AltStrObj *aso;
+-    AltNumInt *ani;
++    AltNumEnum *ane;
+     AltEnumBool *aeb;
+=20
+     /*
+@@ -631,7 +631,7 @@ static void test_keyval_visit_alternate(void)
+     g_assert_cmpint(aso->type, =3D=3D, QTYPE_QSTRING);
+     g_assert_cmpstr(aso->u.s, =3D=3D, "1");
+     qapi_free_AltStrObj(aso);
+-    visit_type_AltNumInt(v, "b", &ani, &err);
++    visit_type_AltNumEnum(v, "b", &ane, &err);
+     error_free_or_abort(&err);
+     visit_type_AltEnumBool(v, "c", &aeb, &err);
+     error_free_or_abort(&err);
 diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-inpu=
 t-visitor.c
-index 83d663d..4dc9c03 100644
+index 6b997a1..83d663d 100644
 --- a/tests/test-qobject-input-visitor.c
 +++ b/tests/test-qobject-input-visitor.c
-@@ -107,6 +107,7 @@ static void test_visitor_in_int(TestInputVisitorData =
-*data,
-                                 const void *unused)
- {
-     int64_t res =3D 0;
-+    double dbl;
-     int value =3D -42;
-     Visitor *v;
+@@ -592,8 +592,6 @@ static void test_visitor_in_alternate_number(TestInpu=
+tVisitorData *data,
+     AltEnumNum *aen;
+     AltNumEnum *ans;
+     AltEnumInt *asi;
+-    AltIntNum *ain;
+-    AltNumInt *ani;
 =20
-@@ -114,6 +115,9 @@ static void test_visitor_in_int(TestInputVisitorData =
-*data,
+     /* Parsing an int */
 =20
-     visit_type_int(v, NULL, &res, &error_abort);
-     g_assert_cmpint(res, =3D=3D, value);
-+
-+    visit_type_number(v, NULL, &dbl, &error_abort);
-+    g_assert_cmpfloat(dbl, =3D=3D, -42.0);
- }
+@@ -620,18 +618,6 @@ static void test_visitor_in_alternate_number(TestInp=
+utVisitorData *data,
+     g_assert_cmpint(asi->u.i, =3D=3D, 42);
+     qapi_free_AltEnumInt(asi);
 =20
- static void test_visitor_in_uint(TestInputVisitorData *data,
-@@ -121,6 +125,8 @@ static void test_visitor_in_uint(TestInputVisitorData=
- *data,
- {
-     Error *err =3D NULL;
-     uint64_t res =3D 0;
-+    int64_t i64;
-+    double dbl;
-     int value =3D 42;
-     Visitor *v;
-=20
-@@ -129,8 +135,13 @@ static void test_visitor_in_uint(TestInputVisitorDat=
-a *data,
-     visit_type_uint64(v, NULL, &res, &error_abort);
-     g_assert_cmpuint(res, =3D=3D, (uint64_t)value);
-=20
-+    visit_type_int(v, NULL, &i64, &error_abort);
-+    g_assert_cmpint(i64, =3D=3D, value);
-+
-+    visit_type_number(v, NULL, &dbl, &error_abort);
-+    g_assert_cmpfloat(dbl, =3D=3D, value);
-+
-     /* BUG: value between INT64_MIN and -1 accepted modulo 2^64 */
+-    v =3D visitor_input_test_init(data, "42");
+-    visit_type_AltIntNum(v, NULL, &ain, &error_abort);
+-    g_assert_cmpint(ain->type, =3D=3D, QTYPE_QINT);
+-    g_assert_cmpint(ain->u.i, =3D=3D, 42);
+-    qapi_free_AltIntNum(ain);
 -
-     v =3D visitor_input_test_init(data, "%d", -value);
+-    v =3D visitor_input_test_init(data, "42");
+-    visit_type_AltNumInt(v, NULL, &ani, &error_abort);
+-    g_assert_cmpint(ani->type, =3D=3D, QTYPE_QINT);
+-    g_assert_cmpint(ani->u.i, =3D=3D, 42);
+-    qapi_free_AltNumInt(ani);
+-
+     /* Parsing a double */
 =20
-     visit_type_uint64(v, NULL, &res, &error_abort);
-@@ -142,6 +153,9 @@ static void test_visitor_in_uint(TestInputVisitorData=
- *data,
-=20
-     visit_type_uint64(v, NULL, &res, &err);
+     v =3D visitor_input_test_init(data, "42.5");
+@@ -655,18 +641,6 @@ static void test_visitor_in_alternate_number(TestInp=
+utVisitorData *data,
+     visit_type_AltEnumInt(v, NULL, &asi, &err);
      error_free_or_abort(&err);
-+
-+    visit_type_number(v, NULL, &dbl, &error_abort);
-+    g_assert_cmpfloat(dbl, =3D=3D, 18446744073709552000.0);
+     qapi_free_AltEnumInt(asi);
+-
+-    v =3D visitor_input_test_init(data, "42.5");
+-    visit_type_AltIntNum(v, NULL, &ain, &error_abort);
+-    g_assert_cmpint(ain->type, =3D=3D, QTYPE_QFLOAT);
+-    g_assert_cmpfloat(ain->u.n, =3D=3D, 42.5);
+-    qapi_free_AltIntNum(ain);
+-
+-    v =3D visitor_input_test_init(data, "42.5");
+-    visit_type_AltNumInt(v, NULL, &ani, &error_abort);
+-    g_assert_cmpint(ani->type, =3D=3D, QTYPE_QFLOAT);
+-    g_assert_cmpfloat(ani->u.n, =3D=3D, 42.5);
+-    qapi_free_AltNumInt(ani);
  }
 =20
- static void test_visitor_in_int_overflow(TestInputVisitorData *data,
-@@ -260,6 +274,27 @@ static void test_visitor_in_number(TestInputVisitorD=
-ata *data,
-     g_assert_cmpfloat(res, =3D=3D, value);
- }
-=20
-+static void test_visitor_in_large_number(TestInputVisitorData *data,
-+                                         const void *unused)
-+{
-+    Error *err =3D NULL;
-+    double res =3D 0;
-+    int64_t i64;
-+    uint64_t u64;
-+    Visitor *v;
-+
-+    v =3D visitor_input_test_init(data, "-18446744073709551616"); /* -2^=
-64 */
-+
-+    visit_type_number(v, NULL, &res, &error_abort);
-+    g_assert_cmpfloat(res, =3D=3D, -18446744073709552e3);
-+
-+    visit_type_int(v, NULL, &i64, &err);
-+    error_free_or_abort(&err);
-+
-+    visit_type_uint64(v, NULL, &u64, &err);
-+    error_free_or_abort(&err);
-+}
-+
- static void test_visitor_in_number_keyval(TestInputVisitorData *data,
-                                           const void *unused)
- {
-@@ -1253,6 +1288,8 @@ int main(int argc, char **argv)
-                            NULL, test_visitor_in_bool_str_fail);
-     input_visitor_test_add("/visitor/input/number",
-                            NULL, test_visitor_in_number);
-+    input_visitor_test_add("/visitor/input/large_number",
-+                           NULL, test_visitor_in_large_number);
-     input_visitor_test_add("/visitor/input/number_keyval",
-                            NULL, test_visitor_in_number_keyval);
-     input_visitor_test_add("/visitor/input/number_str_keyval",
+ static void test_native_list_integer_helper(TestInputVisitorData *data,
 --=20
 2.7.5
