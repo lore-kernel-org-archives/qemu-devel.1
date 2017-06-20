@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dNLF2-0007yF-8y
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 11:38:57 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dNLJa-0001Gb-T7
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 11:43:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dNLEz-00078x-1J
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 11:38:56 -0400
-Resent-Message-Id: <E1dNLEz-00078x-1J@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21327)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dNLEy-00078K-KS
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 11:38:52 -0400
-In-Reply-To: <1497962468-22936-1-git-send-email-armbru@redhat.com>
-Message-ID: <149797311349.31956.3670633664487287831@4a9a010726c0>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1dNLJa-00017v-3X
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 11:43:38 -0400
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:36055)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dNLJZ-00017A-Sr
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 11:43:38 -0400
+Received: by mail-wr0-x232.google.com with SMTP id c11so40718539wrc.3
+	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 08:43:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 20 Jun 2017 08:38:34 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL v2 00/41] QAPI patches for 2017-06-09
+In-Reply-To: <87r2yeu2ew.fsf@linaro.org>
+References: <1497969886-17773-1-git-send-email-peter.maydell@linaro.org>
+	<1497969886-17773-2-git-send-email-peter.maydell@linaro.org>
+	<87r2yeu2ew.fsf@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 20 Jun 2017 16:43:16 +0100
+Message-ID: <CAFEAcA_N-7N_10ocPKag_xO93CuYPhyyTcNsr4Gc30gS9gASiw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/2] risu_reginfo_arm.c: Fix handling of
+ size values in sigframe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,122 +32,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: armbru@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE0OTc5NjI0NjgtMjI5MzYtMS1naXQtc2VuZC1lbWFpbC1hcm1icnVAcmVkaGF0
-LmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgdjIgMDAvNDFdIFFBUEkgcGF0Y2hlcyBm
-b3IgMjAxNy0wNi0wOQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFT
-RT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFp
-bGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAt
-LWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUgg
-LS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNr
-aW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgog
-ICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNo
-LnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAg
-ZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQg
-PT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3
-aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYTRlOGRhYyB0ZXN0cy9xZGljdDogY2hlY2sg
-bW9yZSBnZXRfdHJ5X2ludCgpIGNhc2VzCmYxOWU4OTkgY29uc29sZTogdXNlIGdldF91aW50KCkg
-Zm9yICJoZWFkIiBwcm9wZXJ0eQpjMjNjYmQ1IGkzODYvY3B1OiB1c2UgZ2V0X3VpbnQoKSBmb3Ig
-Im1pbi1sZXZlbCIvIm1pbi14bGV2ZWwiIHByb3BlcnRpZXMKZWU2YzY2YyBudW1hOiB1c2UgZ2V0
-X3VpbnQoKSBmb3IgInNpemUiIHByb3BlcnR5CmZjMDYwNDEgcG52LWNvcmU6IHVzZSBnZXRfdWlu
-dCgpIGZvciAiY29yZS1waXIiIHByb3BlcnR5CjU2ZDgzMDQgcHZwYW5pYzogdXNlIGdldF91aW50
-KCkgZm9yICJpb3BvcnQiIHByb3BlcnR5CjY0YWU3ODcgYXV4YnVzOiB1c2UgZ2V0X3VpbnQoKSBm
-b3IgImFkZHIiIHByb3BlcnR5CmMxMjUwODIgYXJtOiB1c2UgZ2V0X3VpbnQoKSBmb3IgIm1wLWFm
-ZmluaXR5IiBwcm9wZXJ0eQo4M2EzNDMzIHhlbjogdXNlIGdldF91aW50KCkgZm9yICJtYXgtcmFt
-LWJlbG93LTRnIiBwcm9wZXJ0eQo3ZTNiNTdkIHBjOiB1c2UgZ2V0X3VpbnQoKSBmb3IgImhwZXQt
-aW50Y2FwIiBwcm9wZXJ0eQpjMmU2Y2YzIHBjOiB1c2UgZ2V0X3VpbnQoKSBmb3IgImFwaWMtaWQi
-IHByb3BlcnR5Cjg0NTNjYzkgcGM6IHVzZSBnZXRfdWludCgpIGZvciAiaW9iYXNlIiBwcm9wZXJ0
-eQowNjc2Yjk4IGFjcGk6IHVzZSBnZXRfdWludCgpIGZvciAicGNpLWhvbGUqIiBwcm9wZXJ0aWVz
-CjJkMGJhZGQgYWNwaTogdXNlIGdldF91aW50KCkgZm9yIHZhcmlvdXMgYWNwaSBwcm9wZXJ0aWVz
-CjkzYjNkZjkgYWNwaTogdXNlIGdldF91aW50KCkgZm9yICJhY3BpLXBjaWhwLWlvKiIgcHJvcGVy
-dGllcwo2NjI1YzdjIHBsYXRmb3JtLWJ1czogdXNlIGdldF91aW50KCkgZm9yICJhZGRyIiBwcm9w
-ZXJ0eQo5NmQ2YWJhIGJjbTI4MzVfZmI6IHVzZSB7Z2V0LCBzZXR9X3VpbnQoKSBmb3IgInZjcmFt
-LXNpemUiIGFuZCAidmNyYW0tYmFzZSIKZDEwN2Y1MCBhc3BlZWQ6IHVzZSB7c2V0LCBnZXR9X3Vp
-bnQoKSBmb3IgInJhbS1zaXplIiBwcm9wZXJ0eQozZDhiNDUzIHBjaWhwOiB1c2UgZ2V0X3VpbnQo
-KSBmb3IgImJzZWwiIHByb3BlcnR5CmU2MWZmNjAgcGMtZGltbTogbWFrZSAic2l6ZSIgcHJvcGVy
-dHkgdWludDY0CjI1ZmNlNTYgcGMtZGltbTogdXNlIGdldF91aW50KCkgZm9yIGRpbW0gcHJvcGVy
-dGllcwozNTY0MWY2IGlzYTogdXNlIGdldF91aW50KCkgZm9yICJpby1iYXNlIgo1M2ZiOTJlIHFk
-ZXY6IFVzZSBhcHByb3ByaWF0ZSBnZXR0ZXIvc2V0dGVycyB0eXBlCmZjOWEzOTAgYXBpYy1jb21t
-b246IG1ha2UgImlkIiBwcm9wZXJ0eSBhIHVpbnQzMgo1OGI1ZmUxIHFkZXY6IGF2b2lkIHR5cGUg
-Y2FzdHMgYmV0d2VlbiBzaWduZWQgYW5kIHVuc2lnbmVkCmIyYTNjYmYgcWRldjogd3JhcCBkZWZh
-dWx0IHByb3BlcnR5IHZhbHVlIGluIGFuIHVuaW9uCjQ2YjE4NWIgcWRldjogUmVuYW1lIERFRklO
-RV9QUk9QX0RFRkFVTFQoKSB0byBERUZJTkVfUFJPUF9TSUdORUQoKQplZmRlZDBkIG9iamVjdDog
-dXNlIG1vcmUgc3BlY2lmaWMgcHJvcGVydHkgdHlwZSBuYW1lcwplMTNmMTc3IHEzNTogZml4IGdl
-dF9tbWNmZ19zaXplIHRvIHVzZSB1aW50NjQgdmlzaXRvcgpjMjAwMThmIG9iamVjdDogYWRkIHVp
-bnQgcHJvcGVydHkgc2V0dGVyL2dldHRlcgpkZWQ4OTZhIHFhcGk6IHVwZGF0ZSB0aGUgcW9iamVj
-dCB2aXNpdG9yIHRvIHVzZSBRTlVNX1U2NAplZjZjY2IwIGpzb246IGxlYXJuIHRvIHBhcnNlIHVp
-bnQ2NCBudW1iZXJzCmVmNWE5NzAgcW51bTogYWRkIHVpbnQgdHlwZQo3MWM0NTg5IHRlc3RzOiBy
-ZW1vdmUgL3txbnVtLCBxbGlzdCwgZGljdH0vZGVzdHJveSB0ZXN0CjNkMTdjYmEgcWFwaTogUmVt
-b3ZlIHZpc2l0X3N0YXJ0X2FsdGVybmF0ZSgpIHBhcmFtZXRlciBwcm9tb3RlX2ludAo3Zjk2MzMz
-IHFhcGk6IG1lcmdlIFFJbnQgYW5kIFFGbG9hdCBpbiBRTnVtCjIyYzY2YTEgcWFwaTogQ2xlYW4g
-dXAgcW9iamVjdF9pbnB1dF90eXBlX251bWJlcigpIGNvbnRyb2wgZmxvdwoyMjQ3ODVkIHRlc3Rz
-OiBhZGQgbW9yZSBpbnQvbnVtYmVyIHJhbmdlcyBjaGVja3MKNmVlMzhiMyB0ZXN0czogUmVtb3Zl
-IHRlc3QgY2FzZXMgZm9yIGFsdGVybmF0ZXMgb2YgJ251bWJlcicgYW5kICdpbnQnCmIyM2U5YjMg
-b2JqZWN0OiBmaXggcG90ZW50aWFsIGxlYWsgaW4gZ2V0dGVycwo0NjMyMDkwIHFkZXY6IHJlbW92
-ZSBQcm9wZXJ0eUluZm8ucXR5cGUgZmllbGQKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5n
-IFBBVENIIDEvNDE6IHFkZXY6IHJlbW92ZSBQcm9wZXJ0eUluZm8ucXR5cGUgZmllbGQuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMi80MTogb2JqZWN0OiBmaXggcG90ZW50aWFsIGxlYWsgaW4gZ2V0dGVycy4u
-LgpDaGVja2luZyBQQVRDSCAzLzQxOiB0ZXN0czogUmVtb3ZlIHRlc3QgY2FzZXMgZm9yIGFsdGVy
-bmF0ZXMgb2YgJ251bWJlcicgYW5kICdpbnQnLi4uCkNoZWNraW5nIFBBVENIIDQvNDE6IHRlc3Rz
-OiBhZGQgbW9yZSBpbnQvbnVtYmVyIHJhbmdlcyBjaGVja3MuLi4KQ2hlY2tpbmcgUEFUQ0ggNS80
-MTogcWFwaTogQ2xlYW4gdXAgcW9iamVjdF9pbnB1dF90eXBlX251bWJlcigpIGNvbnRyb2wgZmxv
-dy4uLgpDaGVja2luZyBQQVRDSCA2LzQxOiBxYXBpOiBtZXJnZSBRSW50IGFuZCBRRmxvYXQgaW4g
-UU51bS4uLgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzE5NzU6IEZJTEU6IHRl
-c3RzL2NoZWNrLXFudW0uYzozOToKKyAgICAvLyBkZXN0cm95IGRvZXNuJ3QgZXhpdCB5ZXQKCkVS
-Uk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMTk5MTogRklMRTogdGVzdHMvY2hlY2st
-cW51bS5jOjU1OgorICAgIC8vIGRlc3Ryb3kgZG9lc24ndCBleGl0IHlldAoKdG90YWw6IDIgZXJy
-b3JzLCAwIHdhcm5pbmdzLCAxODk0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
-c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
-SCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDcvNDE6IHFhcGk6IFJlbW92ZSB2aXNp
-dF9zdGFydF9hbHRlcm5hdGUoKSBwYXJhbWV0ZXIgcHJvbW90ZV9pbnQuLi4KQ2hlY2tpbmcgUEFU
-Q0ggOC80MTogdGVzdHM6IHJlbW92ZSAve3FudW0sIHFsaXN0LCBkaWN0fS9kZXN0cm95IHRlc3Qu
-Li4KQ2hlY2tpbmcgUEFUQ0ggOS80MTogcW51bTogYWRkIHVpbnQgdHlwZS4uLgpDaGVja2luZyBQ
-QVRDSCAxMC80MToganNvbjogbGVhcm4gdG8gcGFyc2UgdWludDY0IG51bWJlcnMuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMTEvNDE6IHFhcGk6IHVwZGF0ZSB0aGUgcW9iamVjdCB2aXNpdG9yIHRvIHVzZSBR
-TlVNX1U2NC4uLgpDaGVja2luZyBQQVRDSCAxMi80MTogb2JqZWN0OiBhZGQgdWludCBwcm9wZXJ0
-eSBzZXR0ZXIvZ2V0dGVyLi4uCkNoZWNraW5nIFBBVENIIDEzLzQxOiBxMzU6IGZpeCBnZXRfbW1j
-Zmdfc2l6ZSB0byB1c2UgdWludDY0IHZpc2l0b3IuLi4KQ2hlY2tpbmcgUEFUQ0ggMTQvNDE6IG9i
-amVjdDogdXNlIG1vcmUgc3BlY2lmaWMgcHJvcGVydHkgdHlwZSBuYW1lcy4uLgpDaGVja2luZyBQ
-QVRDSCAxNS80MTogcWRldjogUmVuYW1lIERFRklORV9QUk9QX0RFRkFVTFQoKSB0byBERUZJTkVf
-UFJPUF9TSUdORUQoKS4uLgpDaGVja2luZyBQQVRDSCAxNi80MTogcWRldjogd3JhcCBkZWZhdWx0
-IHByb3BlcnR5IHZhbHVlIGluIGFuIHVuaW9uLi4uCkNoZWNraW5nIFBBVENIIDE3LzQxOiBxZGV2
-OiBhdm9pZCB0eXBlIGNhc3RzIGJldHdlZW4gc2lnbmVkIGFuZCB1bnNpZ25lZC4uLgpDaGVja2lu
-ZyBQQVRDSCAxOC80MTogYXBpYy1jb21tb246IG1ha2UgImlkIiBwcm9wZXJ0eSBhIHVpbnQzMi4u
-LgpDaGVja2luZyBQQVRDSCAxOS80MTogcWRldjogVXNlIGFwcHJvcHJpYXRlIGdldHRlci9zZXR0
-ZXJzIHR5cGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMjAvNDE6IGlzYTogdXNlIGdldF91aW50KCkgZm9y
-ICJpby1iYXNlIi4uLgpDaGVja2luZyBQQVRDSCAyMS80MTogcGMtZGltbTogdXNlIGdldF91aW50
-KCkgZm9yIGRpbW0gcHJvcGVydGllcy4uLgpDaGVja2luZyBQQVRDSCAyMi80MTogcGMtZGltbTog
-bWFrZSAic2l6ZSIgcHJvcGVydHkgdWludDY0Li4uCkNoZWNraW5nIFBBVENIIDIzLzQxOiBwY2lo
-cDogdXNlIGdldF91aW50KCkgZm9yICJic2VsIiBwcm9wZXJ0eS4uLgpDaGVja2luZyBQQVRDSCAy
-NC80MTogYXNwZWVkOiB1c2Uge3NldCwgZ2V0fV91aW50KCkgZm9yICJyYW0tc2l6ZSIgcHJvcGVy
-dHkuLi4KQ2hlY2tpbmcgUEFUQ0ggMjUvNDE6IGJjbTI4MzVfZmI6IHVzZSB7Z2V0LCBzZXR9X3Vp
-bnQoKSBmb3IgInZjcmFtLXNpemUiIGFuZCAidmNyYW0tYmFzZSIuLi4KQ2hlY2tpbmcgUEFUQ0gg
-MjYvNDE6IHBsYXRmb3JtLWJ1czogdXNlIGdldF91aW50KCkgZm9yICJhZGRyIiBwcm9wZXJ0eS4u
-LgpDaGVja2luZyBQQVRDSCAyNy80MTogYWNwaTogdXNlIGdldF91aW50KCkgZm9yICJhY3BpLXBj
-aWhwLWlvKiIgcHJvcGVydGllcy4uLgpDaGVja2luZyBQQVRDSCAyOC80MTogYWNwaTogdXNlIGdl
-dF91aW50KCkgZm9yIHZhcmlvdXMgYWNwaSBwcm9wZXJ0aWVzLi4uCkNoZWNraW5nIFBBVENIIDI5
-LzQxOiBhY3BpOiB1c2UgZ2V0X3VpbnQoKSBmb3IgInBjaS1ob2xlKiIgcHJvcGVydGllcy4uLgpD
-aGVja2luZyBQQVRDSCAzMC80MTogcGM6IHVzZSBnZXRfdWludCgpIGZvciAiaW9iYXNlIiBwcm9w
-ZXJ0eS4uLgpDaGVja2luZyBQQVRDSCAzMS80MTogcGM6IHVzZSBnZXRfdWludCgpIGZvciAiYXBp
-Yy1pZCIgcHJvcGVydHkuLi4KQ2hlY2tpbmcgUEFUQ0ggMzIvNDE6IHBjOiB1c2UgZ2V0X3VpbnQo
-KSBmb3IgImhwZXQtaW50Y2FwIiBwcm9wZXJ0eS4uLgpDaGVja2luZyBQQVRDSCAzMy80MTogeGVu
-OiB1c2UgZ2V0X3VpbnQoKSBmb3IgIm1heC1yYW0tYmVsb3ctNGciIHByb3BlcnR5Li4uCkNoZWNr
-aW5nIFBBVENIIDM0LzQxOiBhcm06IHVzZSBnZXRfdWludCgpIGZvciAibXAtYWZmaW5pdHkiIHBy
-b3BlcnR5Li4uCkNoZWNraW5nIFBBVENIIDM1LzQxOiBhdXhidXM6IHVzZSBnZXRfdWludCgpIGZv
-ciAiYWRkciIgcHJvcGVydHkuLi4KQ2hlY2tpbmcgUEFUQ0ggMzYvNDE6IHB2cGFuaWM6IHVzZSBn
-ZXRfdWludCgpIGZvciAiaW9wb3J0IiBwcm9wZXJ0eS4uLgpDaGVja2luZyBQQVRDSCAzNy80MTog
-cG52LWNvcmU6IHVzZSBnZXRfdWludCgpIGZvciAiY29yZS1waXIiIHByb3BlcnR5Li4uCkNoZWNr
-aW5nIFBBVENIIDM4LzQxOiBudW1hOiB1c2UgZ2V0X3VpbnQoKSBmb3IgInNpemUiIHByb3BlcnR5
-Li4uCkNoZWNraW5nIFBBVENIIDM5LzQxOiBpMzg2L2NwdTogdXNlIGdldF91aW50KCkgZm9yICJt
-aW4tbGV2ZWwiLyJtaW4teGxldmVsIiBwcm9wZXJ0aWVzLi4uCkNoZWNraW5nIFBBVENIIDQwLzQx
-OiBjb25zb2xlOiB1c2UgZ2V0X3VpbnQoKSBmb3IgImhlYWQiIHByb3BlcnR5Li4uCkNoZWNraW5n
-IFBBVENIIDQxLzQxOiB0ZXN0cy9xZGljdDogY2hlY2sgbW9yZSBnZXRfdHJ5X2ludCgpIGNhc2Vz
-Li4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
-CgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3Bh
-dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBm
-cmVlbGlzdHMub3Jn
+On 20 June 2017 at 16:03, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+>
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>
+>> The code in reginfo_init_vfp() to parse the signal frame
+>> was mishandling the size counts:
+>>  * the size includes the bytes for the magic and size fields,
+>>    so the code to skip forward over unknown or undersize blocks
+>>    was adding 4 more than it should
+>>  * the size is in bytes but the "is this block too small"
+>>    test was checking against an expected size in words
+>>
+>> This didn't cause any problems because the kernel happens
+>> to generate signal frames with the VFP section first.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>
+> I guess this would have tripped up once the kernel started dumping SVE
+> registers in the context?
+
+Probably not if it put them after the VFP registers (where
+you'd expect them to be), though if we supported SVE regs in
+risu we'd probably have found this bug in the process of
+getting that working ;-)
+
+thanks
+-- PMM
