@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dNIyC-0008RF-TC
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 09:13:25 -0400
+	(envelope-from <peterx@redhat.com>) id 1dNJ5Q-00032b-Tg
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 09:20:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dNIyB-0004VX-Oi
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 09:13:24 -0400
-Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:33449)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dNIyB-0004V4-Hx
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 09:13:23 -0400
-Received: by mail-wr0-x229.google.com with SMTP id r103so91752643wrb.0
-	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 06:13:23 -0700 (PDT)
+	(envelope-from <peterx@redhat.com>) id 1dNJ5J-0006zB-6x
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 09:20:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54944)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dNJ5J-0006ys-0U
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 09:20:45 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 17BF3C0567B3
+	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 13:20:43 +0000 (UTC)
+Date: Tue, 20 Jun 2017 21:20:36 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170620132036.GA3662@pxdev.xzpeter.org>
+References: <1497876588-947-1-git-send-email-peterx@redhat.com>
+	<1497876588-947-5-git-send-email-peterx@redhat.com>
+	<20170619161739.GV5016@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-In-Reply-To: <20170619104655.31104-4-alex.bennee@linaro.org>
-References: <20170619104655.31104-1-alex.bennee@linaro.org>
-	<20170619104655.31104-4-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Jun 2017 14:13:02 +0100
-Message-ID: <CAFEAcA9ardEEJr-QYd7ghkqKvENiro6k-rJno9rnruZx22=4TQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RISU PATCH v5 03/13] all: fix up code consitency
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170619161739.GV5016@thinpad.lan.raisama.net>
+Subject: Re: [Qemu-devel] [PATCH v3 04/13] accel: introduce
+ AccelState.global_props
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,103 +35,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 19 June 2017 at 11:46, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
-> This is pretty much a mechanical change where I ran:
->
->   indent -kr
->
-> Across all the files and then fixed up all but a few violations of:
->
->   ../../qemu.git/scripts/checkpatch.pl -f *.c *.h > checkpatch.out
->
-> Along with heavy use of M-x untabify to make everything consistent.
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+On Mon, Jun 19, 2017 at 01:17:39PM -0300, Eduardo Habkost wrote:
+> On Mon, Jun 19, 2017 at 08:49:39PM +0800, Peter Xu wrote:
+> > Introduce this new field for the accelerator instances so that each
+> > specific accelerator in the future can register its own global
+> > properties to be used further by the system.  It works just like how the
+> > old machine compatible properties do, but only tailored for
+> > accelerators.
+> > 
+> > Use the newly exported register_compat_prop() to pass the accelerator
+> > global properties to the global_props list.
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> 
+> As noted on other patches, I believe this should be
+> AccelClass::global_props (initialized statically in class_init)
+> instead of AccelState::global_props (built at runtime).
+> Otherwise, I don't see the benefit of the new field.
 
+The reason is that there is property that can only be defined after
+user specified all the parameters (when kvm irqchip is enabled). See:
 
-> diff --git a/risu_reginfo_arm.c b/risu_reginfo_arm.c
-> index 5309f3a..8e6736b 100644
-> --- a/risu_reginfo_arm.c
-> +++ b/risu_reginfo_arm.c
-> @@ -26,173 +26,173 @@ extern int insnsize(ucontext_t *uc);
->
->  static void reginfo_init_vfp(struct reginfo *ri, ucontext_t *uc)
->  {
-> -   // Read VFP registers. These live in uc->uc_regspace, which is
-> -   // a sequence of
-> -   //   u32 magic
-> -   //   u32 size
-> -   //   data....
-> -   // blocks. We have to skip through to find the one for VFP.
-> -   unsigned long *rs =3D uc->uc_regspace;
-> -
-> -   for (;;)
-> -   {
-> -      switch (*rs++)
-> -      {
-> -         case 0:
-> -         {
-> -            /* We didn't find any VFP at all (probably a no-VFP
-> -             * kernel). Zero out all the state to avoid mismatches.
-> -             */
-> -            int j;
-> -            for (j =3D 0; j < 32; j++)
-> -               ri->fpregs[j] =3D 0;
-> -            ri->fpscr =3D 0;
-> -            return;
-> -         }
-> -         case 0x56465001: /* VFP_MAGIC */
-> -         {
-> -            /* This is the one we care about. The format (after the size=
- word)
-> -             * is 32 * 64 bit registers, then the 32 bit fpscr, then som=
-e stuff
-> -             * we don't care about.
-> -             */
-> -            int i;
-> -            /* Skip if it's smaller than we expected (should never happe=
-n!) */
-> -            if (*rs < ((32*2)+1))
-> +    /* Read VFP registers. These live in uc->uc_regspace, which is
-> +     * a sequence of
-> +     *   u32 magic
-> +     *   u32 size
-> +     *   data....
-> +     * blocks. We have to skip through to find the one for VFP.
-> +     */
-> +    unsigned long *rs =3D uc->uc_regspace;
-> +
-> +    for (;;) {
-> +        switch (*rs++) {
-> +        case 0:
->              {
-> -               rs +=3D (*rs / 4);
-> -               break;
-> +                /* We didn't find any VFP at all (probably a no-VFP
-> +                 * kernel). Zero out all the state to avoid mismatches.
-> +                 */
-> +                int j;
-> +                for (j =3D 0; j < 32; j++) {
-> +                    ri->fpregs[j] =3D 0;
-> +                }
-> +                ri->fpscr =3D 0;
-> +                return;
->              }
-> -            rs++;
-> -            for (i =3D 0; i < 32; i++)
-> +        case 0x56465001:        /* VFP_MAGIC */
->              {
-> -               ri->fpregs[i] =3D *rs++;
-> -               ri->fpregs[i] |=3D (uint64_t)(*rs++) << 32;
-> +                /* This is the one we care about. The format (after
+static void kvm_register_accel_props(KVMState *kvm)
+{
+    AccelState *accel = ACCEL(kvm);
+    AccelPropValue *entry;
 
+    for (entry = x86_kvm_default_props; entry->prop; entry++) {
+        accel_register_x86_cpu_props(accel, entry->prop, entry->value);
+    }
 
-Something seems to have gone wrong in this file -- note the extra indent
-of {} blocks after "case 0:". The others are all fine though so I'll
-just fix this locally.
+    if (!kvm_irqchip_in_kernel()) {
+        accel_register_x86_cpu_props(accel, "x2apic", "off");
+    }
+}
 
-thanks
--- PMM
+So the list is not really static when class init.  Thanks,
+
+-- 
+Peter Xu
