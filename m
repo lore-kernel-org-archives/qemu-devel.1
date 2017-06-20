@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dNJqp-0005ux-FH
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 10:09:57 -0400
+	(envelope-from <armbru@redhat.com>) id 1dNJrD-0006No-7k
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 10:10:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dNJqj-0007f5-Rp
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 10:09:51 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:36486)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dNJqj-0007ev-LT
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 10:09:45 -0400
-Received: by mail-wr0-x230.google.com with SMTP id c11so37248399wrc.3
-	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 07:09:45 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1dNJr9-0007nb-8d
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 10:10:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48979)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dNJr8-0007mI-Vi
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 10:10:11 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170613140546.28227-1-vadim.galitsyn@profitbricks.com>
+	<20170614092040.GB2687@work-vm>
+	<CAPHE7NqmDh-BKNg1-r8FNXw=qFSs9vdHPBO9gYc61js7fTkOpg@mail.gmail.com>
+	<20170614154043.GE2687@work-vm>
+Date: Tue, 20 Jun 2017 16:10:00 +0200
+In-Reply-To: <20170614154043.GE2687@work-vm> (David Alan Gilbert's message of
+	"Wed, 14 Jun 2017 16:40:43 +0100")
+Message-ID: <874lva21jb.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170619104655.31104-6-alex.bennee@linaro.org>
-References: <20170619104655.31104-1-alex.bennee@linaro.org>
-	<20170619104655.31104-6-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Jun 2017 15:09:24 +0100
-Message-ID: <CAFEAcA_jQ7V9YPHUamnbTjDYZEuLcETi71AXAGb7qv3YrushKQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RISU PATCH v5 05/13] build-all-archs: support
- cross building via docker
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2] hmp,
+ qmp: introduce "info memory" and "query-memory" commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +30,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>, imammedo@redhat.com, Mohammed Gamal <mgamal@redhat.com>, qemu-devel@nongnu.org
 
-On 19 June 2017 at 11:46, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
-> If we want to link to any other libraries we might find using simple
-> cross toolchains doesn't work so well. One way around this is to use a
-> dockerised cross-toolchain which then won't clash with your host
-> system. If the user specifies --use-docker the obvious will be done.
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+
+> * Vadim Galitsyn (vadim.galitsyn@profitbricks.com) wrote:
+>> Hi Dave,
+>> 
+>> Thank you for the feedback!
+>> 
+>> > I think you need to use the PRIu64 macros rather than 'lu' for the types
+>> > of the ints there to keep it portable.
+>> 
+>> Agree, patch v3 will include this change.
 >
-> By default we use the QEMU projects qemu:debian-FOO-cross images as
-> RISU hackers are likely to be QEMU developers too. However any docker
-> tag can be passed on the command line.
+> Thanks.
 >
-> If none of the docker images have usable compilers we fall back to
-> checking the host path.
+>> > Other than that; please add a test entry to tests/test-hmp.c
+>> > and I'm guessing you'll also need a qmp test for it.
+>> 
+>> As far as I can see in tests/test-hmp.c, it's automatically there.
+>> The routine test_info_commands() enumerates all the available "info"
+>> sub-commands with "info help" and tries to execute them, so it looks
+>> like no extra stuff needs to be done here (please correct me if I am wrong).
 >
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Ah yes you're right; I forgot the 'info' commands were automatic.
+>
+>> Regarding to QMP test, I cannot find any test under tests/ which
+>> does similar job as in tests/test-hmp.c. There is neither HMP commands
+>> iteration nor command-specific separate tests. Under tests/qapi-schema/
+>> there are set of .json's though, however, again, it looks more like general
+>> tests set (not commands-specific one).
+>> 
+>> It seems that all the HMP related tests do general checks -- targeting
+>> HMP "engine" itself. I would say, Avocado (avocado-vt) test suite can
+>> be extended with "query-memory" test, and I can certainly provide one.
+>> But this topic is for another mainling list.
+>
+> Yes hmm not sure where to put the qmp test, I just know that Markus does
+> like them (I think he's out this week).
 
-$ ./build-all-archs --use-docker
-Got permission denied while trying to connect to the Docker daemon
-socket at unix:///var/run/docker.sock: Get
-http://%2Fvar%2Frun%2Fdocker.sock/v1.27/images/json?filters=3D%7B%22referen=
-ce%22%3A%7B%22qemu%22%3Atrue%7D%7D:
-dial unix /var/run/docker.sock: connect: permission denied
+The best time to start requiring tests for new QMP commands is when the
+first command is added.  We missed that opportunity.  The second best
+time is right now[*].
 
-but maybe my local docker setup is just broken?
+The QMP equivalent to test-hmp.c's test_info_commands() would be good
+enough for query-FOOs that can't fail.  We should have that.  It's not
+fair to ask you to write it.  Not least because doing it right involves
+introspection, which is going to be a bit hairy.  I guess I'll have to
+do it myself[**].
 
-thanks
--- PMM
+However, your query-memory looks like it could fail.  Failure modes need
+to be covered by test cases.  Please either explain why it can't
+actually fail, or explain why testing the failure isn't practical, or
+write a suitable test.  A mere sketch hacked into qmp-test.c is
+perfectly okay, we can take it from there together.
+
+
+
+[*] Or rather last March:
+Message-ID: <871sugkrw5.fsf@dusky.pond.sub.org>
+https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg00296.html
+
+[**] Surprise me!  Patches welcome :)
