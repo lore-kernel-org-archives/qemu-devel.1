@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dNC5H-0002Ei-7z
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 01:52:16 -0400
+	(envelope-from <thuth@redhat.com>) id 1dNC5K-0002Q4-4g
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 01:52:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dNC5G-0003Dy-63
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 01:52:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43428)
+	(envelope-from <thuth@redhat.com>) id 1dNC5J-0003Ej-85
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 01:52:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33046)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dNC5F-0003Dt-Vu
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 01:52:14 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dNC5I-0003EX-Uz
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 01:52:17 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 20 Jun 2017 07:52:01 +0200
-Message-Id: <1497937927-19738-3-git-send-email-thuth@redhat.com>
+Date: Tue, 20 Jun 2017 07:52:03 +0200
+Message-Id: <1497937927-19738-5-git-send-email-thuth@redhat.com>
 In-Reply-To: <1497937927-19738-1-git-send-email-thuth@redhat.com>
 References: <1497937927-19738-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 2/8] include/exec/poison: Mark some CONFIG
- defines as poisoned, too
+Subject: [Qemu-devel] [PATCH v3 4/8] include/exec/poison: Mark CONFIG_KVM as
+ poisoned, too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,44 +27,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc: Richard Henderson <rth@twiddle.net>
 
-These are defined in config-target.h and thus should never be
-used in common code.
+CONFIG_KVM is only defined for target-specific code, so nobody should
+use it by accident in common code. To avoid such subtle bugs,
+CONFIG_KVM is now marked as poisoned in common code. The header
+include/sysemu/kvm.h is somewhat special since it is included
+all over the place from common code, too, so we need some extra
+logic via "#ifdef NEED_CPU_H" here to make sure that we can
+compile all files without problems.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- include/exec/poison.h | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ hw/acpi/ich9.c        |  1 -
+ include/exec/poison.h |  1 +
+ include/sysemu/kvm.h  | 18 +++++++++++++-----
+ 3 files changed, 14 insertions(+), 6 deletions(-)
 
+diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
+index 5c279bb..c5d8646 100644
+--- a/hw/acpi/ich9.c
++++ b/hw/acpi/ich9.c
+@@ -33,7 +33,6 @@
+ #include "sysemu/sysemu.h"
+ #include "hw/acpi/acpi.h"
+ #include "hw/acpi/tco.h"
+-#include "sysemu/kvm.h"
+ #include "exec/address-spaces.h"
+ 
+ #include "hw/i386/ich9.h"
 diff --git a/include/exec/poison.h b/include/exec/poison.h
-index 859bd56..7a025b2 100644
+index 7a025b2..32707cd 100644
 --- a/include/exec/poison.h
 +++ b/include/exec/poison.h
-@@ -66,5 +66,26 @@
- #pragma GCC poison CPU_INTERRUPT_TGT_INT_1
- #pragma GCC poison CPU_INTERRUPT_TGT_INT_2
+@@ -86,6 +86,7 @@
  
-+#pragma GCC poison CONFIG_ALPHA_DIS
-+#pragma GCC poison CONFIG_ARM_A64_DIS
-+#pragma GCC poison CONFIG_ARM_DIS
-+#pragma GCC poison CONFIG_CRIS_DIS
-+#pragma GCC poison CONFIG_HPPA_DIS
-+#pragma GCC poison CONFIG_I386_DIS
-+#pragma GCC poison CONFIG_LM32_DIS
-+#pragma GCC poison CONFIG_M68K_DIS
-+#pragma GCC poison CONFIG_MICROBLAZE_DIS
-+#pragma GCC poison CONFIG_MIPS_DIS
-+#pragma GCC poison CONFIG_MOXIE_DIS
-+#pragma GCC poison CONFIG_NIOS2_DIS
-+#pragma GCC poison CONFIG_PPC_DIS
-+#pragma GCC poison CONFIG_S390_DIS
-+#pragma GCC poison CONFIG_SH4_DIS
-+#pragma GCC poison CONFIG_SPARC_DIS
-+#pragma GCC poison CONFIG_XTENSA_DIS
-+
-+#pragma GCC poison CONFIG_LINUX_USER
-+#pragma GCC poison CONFIG_VHOST_NET
-+
+ #pragma GCC poison CONFIG_LINUX_USER
+ #pragma GCC poison CONFIG_VHOST_NET
++#pragma GCC poison CONFIG_KVM
+ 
  #endif
  #endif
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index ca40b6e..052e11f 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -19,11 +19,18 @@
+ #include "exec/memattrs.h"
+ #include "hw/irq.h"
+ 
+-#ifdef CONFIG_KVM
+-#include <linux/kvm.h>
+-#include <linux/kvm_para.h>
++#ifdef NEED_CPU_H
++# ifdef CONFIG_KVM
++#  include <linux/kvm.h>
++#  include <linux/kvm_para.h>
++#  define CONFIG_KVM_IS_POSSIBLE
++# endif
++#else
++# define CONFIG_KVM_IS_POSSIBLE
+ #endif
+ 
++#ifdef CONFIG_KVM_IS_POSSIBLE
++
+ extern bool kvm_allowed;
+ extern bool kvm_kernel_irqchip;
+ extern bool kvm_split_irqchip;
+@@ -40,7 +47,6 @@ extern bool kvm_direct_msi_allowed;
+ extern bool kvm_ioeventfd_any_length_allowed;
+ extern bool kvm_msi_use_devid;
+ 
+-#if defined CONFIG_KVM || !defined NEED_CPU_H
+ #define kvm_enabled()           (kvm_allowed)
+ /**
+  * kvm_irqchip_in_kernel:
+@@ -163,6 +169,7 @@ extern bool kvm_msi_use_devid;
+ #define kvm_msi_devid_required() (kvm_msi_use_devid)
+ 
+ #else
++
+ #define kvm_enabled()           (0)
+ #define kvm_irqchip_in_kernel() (false)
+ #define kvm_irqchip_is_split() (false)
+@@ -178,7 +185,8 @@ extern bool kvm_msi_use_devid;
+ #define kvm_direct_msi_enabled() (false)
+ #define kvm_ioeventfd_any_length_enabled() (false)
+ #define kvm_msi_devid_required() (false)
+-#endif
++
++#endif  /* CONFIG_KVM_IS_POSSIBLE */
+ 
+ struct kvm_run;
+ struct kvm_lapic_state;
 -- 
 1.8.3.1
