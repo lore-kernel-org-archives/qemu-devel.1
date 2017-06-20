@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dNItr-0004Tw-3k
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 09:09:00 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dNIyC-0008RF-TC
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 09:13:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dNItn-0003F0-VV
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 09:08:55 -0400
-References: <149789192064.8356.6383758991647148922.stgit@bahia.lan>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <3f9a94c6-6391-d45e-fbd9-32a8e1e8504f@redhat.com>
-Date: Tue, 20 Jun 2017 15:08:47 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1dNIyB-0004VX-Oi
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 09:13:24 -0400
+Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:33449)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dNIyB-0004V4-Hx
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 09:13:23 -0400
+Received: by mail-wr0-x229.google.com with SMTP id r103so91752643wrb.0
+	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 06:13:23 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <149789192064.8356.6383758991647148922.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] spapr/ppc: fix backward
- migration to QEMU 2.9
+In-Reply-To: <20170619104655.31104-4-alex.bennee@linaro.org>
+References: <20170619104655.31104-1-alex.bennee@linaro.org>
+	<20170619104655.31104-4-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 20 Jun 2017 14:13:02 +0100
+Message-ID: <CAFEAcA9ardEEJr-QYd7ghkqKvENiro6k-rJno9rnruZx22=4TQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RISU PATCH v5 03/13] all: fix up code consitency
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,100 +30,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 19/06/2017 19:05, Greg Kurz wrote:
-> Commit c783b0012708 ("ppc: Rework CPU compatibility testing across
-> migration") added a subsection to the vmstate description of CPUs.
-> This subsection is sent when the CPU compat_pvr field is non-zero,
-> which is likely to happen after CAS negociation (since QEMU 2.9) or
-> even before CAS negociation if the user explicitely asked for compat
-> mode.
-> 
-> This breaks backward migration of existing pseries-2.9 machine types
-> since they don't know about this "compat" subsection:
-> 
-> qemu-system-ppc64: error while loading state for instance 0x0 of
->  device 'cpu'
-> 
-> This patch reverts to the behavior of simply ignoring the PVR when
-> migrating older machines (ie, let the migration succeed if the user
-> is sure that the CPU on the destination is close enough to work).
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+On 19 June 2017 at 11:46, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+> This is pretty much a mechanical change where I ran:
+>
+>   indent -kr
+>
+> Across all the files and then fixed up all but a few violations of:
+>
+>   ../../qemu.git/scripts/checkpatch.pl -f *.c *.h > checkpatch.out
+>
+> Along with heavy use of M-x untabify to make everything consistent.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 
-but I think it should be merged with patch ("ppc: Rework CPU
-compatibility testing across migration") that is not merged and in the
-maintainer tree.
-
-thanks,
-Laurent
-
-> ---
->  hw/ppc/spapr.c              |    7 ++++++-
->  target/ppc/cpu.h            |    1 +
->  target/ppc/machine.c        |    2 +-
->  target/ppc/translate_init.c |    2 ++
->  4 files changed, 10 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index d4d781876b27..265d49bbcd7f 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -3474,7 +3474,12 @@ DEFINE_SPAPR_MACHINE(2_10, "2.10", true);
->   * pseries-2.9
->   */
->  #define SPAPR_COMPAT_2_9                                               \
-> -    HW_COMPAT_2_9
-> +    HW_COMPAT_2_9                                                      \
-> +    {                                                                  \
-> +        .driver = TYPE_POWERPC_CPU,                                    \
-> +        .property = "pre-2.10-migration",                              \
-> +        .value    = "on",                                              \
-> +    },                                                                 \
->  
->  static void spapr_machine_2_9_instance_options(MachineState *machine)
+> diff --git a/risu_reginfo_arm.c b/risu_reginfo_arm.c
+> index 5309f3a..8e6736b 100644
+> --- a/risu_reginfo_arm.c
+> +++ b/risu_reginfo_arm.c
+> @@ -26,173 +26,173 @@ extern int insnsize(ucontext_t *uc);
+>
+>  static void reginfo_init_vfp(struct reginfo *ri, ucontext_t *uc)
 >  {
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index 09393e601fd9..6ee2a26a963d 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -1211,6 +1211,7 @@ struct PowerPCCPU {
->      uint64_t mig_insns_flags;
->      uint64_t mig_insns_flags2;
->      uint32_t mig_nb_BATs;
-> +    bool pre_2_10_migration;
->  };
->  
->  static inline PowerPCCPU *ppc_env_get_cpu(CPUPPCState *env)
-> diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-> index a29aabe8f079..1b7aede579ea 100644
-> --- a/target/ppc/machine.c
-> +++ b/target/ppc/machine.c
-> @@ -608,7 +608,7 @@ static bool compat_needed(void *opaque)
->      PowerPCCPU *cpu = opaque;
->  
->      assert(!(cpu->compat_pvr && !cpu->vhyp));
-> -    return (cpu->compat_pvr != 0);
-> +    return !cpu->pre_2_10_migration && cpu->compat_pvr != 0;
->  }
->  
->  static const VMStateDescription vmstate_compat = {
-> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> index 53aff5a7b734..783bf98217cc 100644
-> --- a/target/ppc/translate_init.c
-> +++ b/target/ppc/translate_init.c
-> @@ -10610,6 +10610,8 @@ static gchar *ppc_gdb_arch_name(CPUState *cs)
->  
->  static Property ppc_cpu_properties[] = {
->      DEFINE_PROP_BOOL("pre-2.8-migration", PowerPCCPU, pre_2_8_migration, false),
-> +    DEFINE_PROP_BOOL("pre-2.10-migration", PowerPCCPU, pre_2_10_migration,
-> +                     false),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->  
-> 
-> 
+> -   // Read VFP registers. These live in uc->uc_regspace, which is
+> -   // a sequence of
+> -   //   u32 magic
+> -   //   u32 size
+> -   //   data....
+> -   // blocks. We have to skip through to find the one for VFP.
+> -   unsigned long *rs =3D uc->uc_regspace;
+> -
+> -   for (;;)
+> -   {
+> -      switch (*rs++)
+> -      {
+> -         case 0:
+> -         {
+> -            /* We didn't find any VFP at all (probably a no-VFP
+> -             * kernel). Zero out all the state to avoid mismatches.
+> -             */
+> -            int j;
+> -            for (j =3D 0; j < 32; j++)
+> -               ri->fpregs[j] =3D 0;
+> -            ri->fpscr =3D 0;
+> -            return;
+> -         }
+> -         case 0x56465001: /* VFP_MAGIC */
+> -         {
+> -            /* This is the one we care about. The format (after the size=
+ word)
+> -             * is 32 * 64 bit registers, then the 32 bit fpscr, then som=
+e stuff
+> -             * we don't care about.
+> -             */
+> -            int i;
+> -            /* Skip if it's smaller than we expected (should never happe=
+n!) */
+> -            if (*rs < ((32*2)+1))
+> +    /* Read VFP registers. These live in uc->uc_regspace, which is
+> +     * a sequence of
+> +     *   u32 magic
+> +     *   u32 size
+> +     *   data....
+> +     * blocks. We have to skip through to find the one for VFP.
+> +     */
+> +    unsigned long *rs =3D uc->uc_regspace;
+> +
+> +    for (;;) {
+> +        switch (*rs++) {
+> +        case 0:
+>              {
+> -               rs +=3D (*rs / 4);
+> -               break;
+> +                /* We didn't find any VFP at all (probably a no-VFP
+> +                 * kernel). Zero out all the state to avoid mismatches.
+> +                 */
+> +                int j;
+> +                for (j =3D 0; j < 32; j++) {
+> +                    ri->fpregs[j] =3D 0;
+> +                }
+> +                ri->fpscr =3D 0;
+> +                return;
+>              }
+> -            rs++;
+> -            for (i =3D 0; i < 32; i++)
+> +        case 0x56465001:        /* VFP_MAGIC */
+>              {
+> -               ri->fpregs[i] =3D *rs++;
+> -               ri->fpregs[i] |=3D (uint64_t)(*rs++) << 32;
+> +                /* This is the one we care about. The format (after
+
+
+Something seems to have gone wrong in this file -- note the extra indent
+of {} blocks after "case 0:". The others are all fine though so I'll
+just fix this locally.
+
+thanks
+-- PMM
