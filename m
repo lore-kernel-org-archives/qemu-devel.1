@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dNHnC-0000go-SQ
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 07:58:03 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dNHnH-0000pq-Nm
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 07:58:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dNHnB-0003Fk-Eu
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 07:57:58 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dNHnD-0003I8-4s
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 07:58:03 -0400
 Received: from [59.151.112.132] (port=47873 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dNHn8-0003AE-Uq
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 07:57:57 -0400
-Received: from G08CNEXCHPEKD02.g08.fujitsu.local (unknown [10.167.33.83])
-	by cn.fujitsu.com (Postfix) with ESMTP id 3852047C7C84
-	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 19:57:44 +0800 (CST)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dNHnC-0003AE-6n
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 07:57:59 -0400
 From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Date: Tue, 20 Jun 2017 19:57:21 +0800
-Message-ID: <f01da25bb2b74511dbdd70200e46972adf3ca69b.1497957189.git.maozy.fnst@cn.fujitsu.com>
+Date: Tue, 20 Jun 2017 19:57:23 +0800
+Message-ID: <d60b5927063e257e3414864b1ee6c569ac61b712.1497957189.git.maozy.fnst@cn.fujitsu.com>
 In-Reply-To: <cover.1497957189.git.maozy.fnst@cn.fujitsu.com>
 References: <cover.1497957189.git.maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v6 5/9] pci: Replace pci_add_capability2() with
- pci_add_capability()
+Subject: [Qemu-devel] [PATCH v6 7/9] pci: Convert shpc_init() to Error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,201 +26,211 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, marcel@redhat.com, armbru@redhat.com
 
-After the patch 'Make errp the last parameter of pci_add_capability()',
-pci_add_capability() and pci_add_capability2() now do exactly the same.
-So drop the wrapper pci_add_capability() of pci_add_capability2(), then
-replace the pci_add_capability2() with pci_add_capability() everywhere.
+In order to propagate error message better, convert shpc_init() to
+Error also convert the pci_bridge_dev_initfn() to realize.
 
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+Cc: mst@redhat.com
+Cc: marcel@redhat.com
+Cc: armbru@redhat.com
 Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 ---
- hw/i386/kvm/pci-assign.c | 14 +++++++-------
- hw/ide/ich.c             |  2 +-
- hw/pci/msi.c             |  2 +-
- hw/pci/msix.c            |  2 +-
- hw/pci/pci.c             | 20 ++------------------
- hw/vfio/pci.c            |  6 +++---
- include/hw/pci/pci.h     |  3 ---
- 7 files changed, 15 insertions(+), 34 deletions(-)
+ hw/pci-bridge/pci_bridge_dev.c | 21 ++++++++-------------
+ hw/pci/shpc.c                  | 11 +++++------
+ hw/pci/slotid_cap.c            | 11 +++++------
+ include/hw/pci/shpc.h          |  3 ++-
+ include/hw/pci/slotid_cap.h    |  3 ++-
+ 5 files changed, 22 insertions(+), 27 deletions(-)
 
-diff --git a/hw/i386/kvm/pci-assign.c b/hw/i386/kvm/pci-assign.c
-index 87dcbdd..3d60455 100644
---- a/hw/i386/kvm/pci-assign.c
-+++ b/hw/i386/kvm/pci-assign.c
-@@ -1254,7 +1254,7 @@ static int assigned_device_pci_cap_init(PCIDevice *pci_dev, Error **errp)
-         dev->dev.cap_present |= QEMU_PCI_CAP_MSI;
-         dev->cap.available |= ASSIGNED_DEVICE_CAP_MSI;
-         /* Only 32-bit/no-mask currently supported */
--        ret = pci_add_capability2(pci_dev, PCI_CAP_ID_MSI, pos, 10,
-+        ret = pci_add_capability(pci_dev, PCI_CAP_ID_MSI, pos, 10,
-                                   &local_err);
-         if (ret < 0) {
-             error_propagate(errp, local_err);
-@@ -1288,7 +1288,7 @@ static int assigned_device_pci_cap_init(PCIDevice *pci_dev, Error **errp)
+diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
+index 5dbd933..30c4186 100644
+--- a/hw/pci-bridge/pci_bridge_dev.c
++++ b/hw/pci-bridge/pci_bridge_dev.c
+@@ -49,12 +49,11 @@ struct PCIBridgeDev {
+ };
+ typedef struct PCIBridgeDev PCIBridgeDev;
+ 
+-static int pci_bridge_dev_initfn(PCIDevice *dev)
++static void pci_bridge_dev_realize(PCIDevice *dev, Error **errp)
+ {
+     PCIBridge *br = PCI_BRIDGE(dev);
+     PCIBridgeDev *bridge_dev = PCI_BRIDGE_DEV(dev);
+     int err;
+-    Error *local_err = NULL;
+ 
+     pci_bridge_initfn(dev, TYPE_PCI_BUS);
+ 
+@@ -62,7 +61,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
+         dev->config[PCI_INTERRUPT_PIN] = 0x1;
+         memory_region_init(&bridge_dev->bar, OBJECT(dev), "shpc-bar",
+                            shpc_bar_size(dev));
+-        err = shpc_init(dev, &br->sec_bus, &bridge_dev->bar, 0);
++        err = shpc_init(dev, &br->sec_bus, &bridge_dev->bar, 0, errp);
+         if (err) {
+             goto shpc_error;
          }
-         dev->dev.cap_present |= QEMU_PCI_CAP_MSIX;
-         dev->cap.available |= ASSIGNED_DEVICE_CAP_MSIX;
--        ret = pci_add_capability2(pci_dev, PCI_CAP_ID_MSIX, pos, 12,
-+        ret = pci_add_capability(pci_dev, PCI_CAP_ID_MSIX, pos, 12,
-                                   &local_err);
-         if (ret < 0) {
-             error_propagate(errp, local_err);
-@@ -1318,7 +1318,7 @@ static int assigned_device_pci_cap_init(PCIDevice *pci_dev, Error **errp)
-     if (pos) {
-         uint16_t pmc;
- 
--        ret = pci_add_capability2(pci_dev, PCI_CAP_ID_PM, pos, PCI_PM_SIZEOF,
-+        ret = pci_add_capability(pci_dev, PCI_CAP_ID_PM, pos, PCI_PM_SIZEOF,
-                                   &local_err);
-         if (ret < 0) {
-             error_propagate(errp, local_err);
-@@ -1386,7 +1386,7 @@ static int assigned_device_pci_cap_init(PCIDevice *pci_dev, Error **errp)
-             return -EINVAL;
-         }
- 
--        ret = pci_add_capability2(pci_dev, PCI_CAP_ID_EXP, pos, size,
-+        ret = pci_add_capability(pci_dev, PCI_CAP_ID_EXP, pos, size,
-                                   &local_err);
-         if (ret < 0) {
-             error_propagate(errp, local_err);
-@@ -1462,7 +1462,7 @@ static int assigned_device_pci_cap_init(PCIDevice *pci_dev, Error **errp)
-         uint32_t status;
- 
-         /* Only expose the minimum, 8 byte capability */
--        ret = pci_add_capability2(pci_dev, PCI_CAP_ID_PCIX, pos, 8,
-+        ret = pci_add_capability(pci_dev, PCI_CAP_ID_PCIX, pos, 8,
-                                   &local_err);
-         if (ret < 0) {
-             error_propagate(errp, local_err);
-@@ -1490,7 +1490,7 @@ static int assigned_device_pci_cap_init(PCIDevice *pci_dev, Error **errp)
-     pos = pci_find_cap_offset(pci_dev, PCI_CAP_ID_VPD, 0);
-     if (pos) {
-         /* Direct R/W passthrough */
--        ret = pci_add_capability2(pci_dev, PCI_CAP_ID_VPD, pos, 8,
-+        ret = pci_add_capability(pci_dev, PCI_CAP_ID_VPD, pos, 8,
-                                   &local_err);
-         if (ret < 0) {
-             error_propagate(errp, local_err);
-@@ -1508,7 +1508,7 @@ static int assigned_device_pci_cap_init(PCIDevice *pci_dev, Error **errp)
-         pos += PCI_CAP_LIST_NEXT) {
-         uint8_t len = pci_get_byte(pci_dev->config + pos + PCI_CAP_FLAGS);
-         /* Direct R/W passthrough */
--        ret = pci_add_capability2(pci_dev, PCI_CAP_ID_VNDR, pos, len,
-+        ret = pci_add_capability(pci_dev, PCI_CAP_ID_VNDR, pos, len,
-                                   &local_err);
-         if (ret < 0) {
-             error_propagate(errp, local_err);
-diff --git a/hw/ide/ich.c b/hw/ide/ich.c
-index 4599169..989fca5 100644
---- a/hw/ide/ich.c
-+++ b/hw/ide/ich.c
-@@ -130,7 +130,7 @@ static void pci_ich9_ahci_realize(PCIDevice *dev, Error **errp)
-     pci_register_bar(dev, ICH9_MEM_BAR, PCI_BASE_ADDRESS_SPACE_MEMORY,
-                      &d->ahci.mem);
- 
--    sata_cap_offset = pci_add_capability2(dev, PCI_CAP_ID_SATA,
-+    sata_cap_offset = pci_add_capability(dev, PCI_CAP_ID_SATA,
-                                           ICH9_SATA_CAP_OFFSET, SATA_CAP_SIZE,
-                                           errp);
-     if (sata_cap_offset < 0) {
-diff --git a/hw/pci/msi.c b/hw/pci/msi.c
-index a87b227..5e05ce5 100644
---- a/hw/pci/msi.c
-+++ b/hw/pci/msi.c
-@@ -216,7 +216,7 @@ int msi_init(struct PCIDevice *dev, uint8_t offset,
+@@ -71,7 +70,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
+         bridge_dev->msi = ON_OFF_AUTO_OFF;
      }
  
-     cap_size = msi_cap_sizeof(flags);
--    config_offset = pci_add_capability2(dev, PCI_CAP_ID_MSI, offset,
-+    config_offset = pci_add_capability(dev, PCI_CAP_ID_MSI, offset,
-                                         cap_size, errp);
-     if (config_offset < 0) {
-         return config_offset;
-diff --git a/hw/pci/msix.c b/hw/pci/msix.c
-index bb54e8b..d634326 100644
---- a/hw/pci/msix.c
-+++ b/hw/pci/msix.c
-@@ -294,7 +294,7 @@ int msix_init(struct PCIDevice *dev, unsigned short nentries,
-         return -EINVAL;
+-    err = slotid_cap_init(dev, 0, bridge_dev->chassis_nr, 0);
++    err = slotid_cap_init(dev, 0, bridge_dev->chassis_nr, 0, errp);
+     if (err) {
+         goto slotid_error;
+     }
+@@ -79,20 +78,18 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
+     if (bridge_dev->msi != ON_OFF_AUTO_OFF) {
+         /* it means SHPC exists, because MSI is needed by SHPC */
+ 
+-        err = msi_init(dev, 0, 1, true, true, &local_err);
++        err = msi_init(dev, 0, 1, true, true, errp);
+         /* Any error other than -ENOTSUP(board's MSI support is broken)
+          * is a programming error */
+         assert(!err || err == -ENOTSUP);
+         if (err && bridge_dev->msi == ON_OFF_AUTO_ON) {
+             /* Can't satisfy user's explicit msi=on request, fail */
+-            error_append_hint(&local_err, "You have to use msi=auto (default) "
++            error_append_hint(errp, "You have to use msi=auto (default) "
+                     "or msi=off with this machine type.\n");
+-            error_report_err(local_err);
+             goto msi_error;
+         }
+-        assert(!local_err || bridge_dev->msi == ON_OFF_AUTO_AUTO);
++        assert(bridge_dev->msi == ON_OFF_AUTO_AUTO);
+         /* With msi=auto, we fall back to MSI off silently */
+-        error_free(local_err);
      }
  
--    cap = pci_add_capability2(dev, PCI_CAP_ID_MSIX,
-+    cap = pci_add_capability(dev, PCI_CAP_ID_MSIX,
-                               cap_pos, MSIX_CAP_LENGTH, errp);
-     if (cap < 0) {
-         return cap;
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 2bba37a..283ca5e 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -2259,28 +2259,12 @@ static void pci_del_option_rom(PCIDevice *pdev)
+     if (shpc_present(dev)) {
+@@ -101,7 +98,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
+         pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
+                          PCI_BASE_ADDRESS_MEM_TYPE_64, &bridge_dev->bar);
+     }
+-    return 0;
++    return;
+ 
+ msi_error:
+     slotid_cap_cleanup(dev);
+@@ -111,8 +108,6 @@ slotid_error:
+     }
+ shpc_error:
+     pci_bridge_exitfn(dev);
+-
+-    return err;
  }
  
- /*
-- * if offset = 0,
-- * Find and reserve space and add capability to the linked list
-- * in pci config space
-- */
--int pci_add_capability(PCIDevice *pdev, uint8_t cap_id,
--                       uint8_t offset, uint8_t size,
--                       Error **errp)
--{
--    int ret;
--
--    ret = pci_add_capability2(pdev, cap_id, offset, size, errp);
--
--    return ret;
--}
--
--/*
-- * On success, pci_add_capability2() returns a positive value
-+ * On success, pci_add_capability() returns a positive value
-  * that the offset of the pci capability.
-  * On failure, it sets an error and returns a negative error
-  * code.
-  */
--int pci_add_capability2(PCIDevice *pdev, uint8_t cap_id,
-+int pci_add_capability(PCIDevice *pdev, uint8_t cap_id,
-                        uint8_t offset, uint8_t size,
-                        Error **errp)
+ static void pci_bridge_dev_exitfn(PCIDevice *dev)
+@@ -216,7 +211,7 @@ static void pci_bridge_dev_class_init(ObjectClass *klass, void *data)
+     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+     HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
+ 
+-    k->init = pci_bridge_dev_initfn;
++    k->realize = pci_bridge_dev_realize;
+     k->exit = pci_bridge_dev_exitfn;
+     k->config_write = pci_bridge_dev_write_config;
+     k->vendor_id = PCI_VENDOR_ID_REDHAT;
+diff --git a/hw/pci/shpc.c b/hw/pci/shpc.c
+index d72d5e4..69fc14b 100644
+--- a/hw/pci/shpc.c
++++ b/hw/pci/shpc.c
+@@ -446,16 +446,14 @@ static void shpc_cap_update_dword(PCIDevice *d)
+ }
+ 
+ /* Add SHPC capability to the config space for the device. */
+-static int shpc_cap_add_config(PCIDevice *d)
++static int shpc_cap_add_config(PCIDevice *d, Error **errp)
  {
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 70bfb59..8de8272 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -1837,14 +1837,14 @@ static int vfio_add_std_cap(VFIOPCIDevice *vdev, uint8_t pos, Error **errp)
-     case PCI_CAP_ID_PM:
-         vfio_check_pm_reset(vdev, pos);
-         vdev->pm_cap = pos;
--        ret = pci_add_capability2(pdev, cap_id, pos, size, errp);
-+        ret = pci_add_capability(pdev, cap_id, pos, size, errp);
-         break;
-     case PCI_CAP_ID_AF:
-         vfio_check_af_flr(vdev, pos);
--        ret = pci_add_capability2(pdev, cap_id, pos, size, errp);
-+        ret = pci_add_capability(pdev, cap_id, pos, size, errp);
-         break;
-     default:
--        ret = pci_add_capability2(pdev, cap_id, pos, size, errp);
-+        ret = pci_add_capability(pdev, cap_id, pos, size, errp);
-         break;
+     uint8_t *config;
+     int config_offset;
+-    Error *local_err = NULL;
+     config_offset = pci_add_capability(d, PCI_CAP_ID_SHPC,
+                                        0, SHPC_CAP_LENGTH,
+-                                       &local_err);
++                                       errp);
+     if (config_offset < 0) {
+-        error_report_err(local_err);
+         return config_offset;
      }
- out:
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index fe52aa8..e598b09 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -358,9 +358,6 @@ pcibus_t pci_get_bar_addr(PCIDevice *pci_dev, int region_num);
- int pci_add_capability(PCIDevice *pdev, uint8_t cap_id,
-                        uint8_t offset, uint8_t size,
-                        Error **errp);
--int pci_add_capability2(PCIDevice *pdev, uint8_t cap_id,
--                       uint8_t offset, uint8_t size,
--                       Error **errp);
+     config = d->config + config_offset;
+@@ -584,13 +582,14 @@ void shpc_device_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
+ }
  
- void pci_del_capability(PCIDevice *pci_dev, uint8_t cap_id, uint8_t cap_size);
+ /* Initialize the SHPC structure in bridge's BAR. */
+-int shpc_init(PCIDevice *d, PCIBus *sec_bus, MemoryRegion *bar, unsigned offset)
++int shpc_init(PCIDevice *d, PCIBus *sec_bus, MemoryRegion *bar,
++              unsigned offset, Error **errp)
+ {
+     int i, ret;
+     int nslots = SHPC_MAX_SLOTS; /* TODO: qdev property? */
+     SHPCDevice *shpc = d->shpc = g_malloc0(sizeof(*d->shpc));
+     shpc->sec_bus = sec_bus;
+-    ret = shpc_cap_add_config(d);
++    ret = shpc_cap_add_config(d, errp);
+     if (ret) {
+         g_free(d->shpc);
+         return ret;
+diff --git a/hw/pci/slotid_cap.c b/hw/pci/slotid_cap.c
+index bdca205..36d021b 100644
+--- a/hw/pci/slotid_cap.c
++++ b/hw/pci/slotid_cap.c
+@@ -9,14 +9,14 @@
  
+ int slotid_cap_init(PCIDevice *d, int nslots,
+                     uint8_t chassis,
+-                    unsigned offset)
++                    unsigned offset,
++                    Error **errp)
+ {
+     int cap;
+-    Error *local_err = NULL;
+ 
+     if (!chassis) {
+-        error_report("Bridge chassis not specified. Each bridge is required "
+-                     "to be assigned a unique chassis id > 0.");
++        error_setg(errp, "Bridge chassis not specified. Each bridge is required"
++                   " to be assigned a unique chassis id > 0.");
+         return -EINVAL;
+     }
+     if (nslots < 0 || nslots > (PCI_SID_ESR_NSLOTS >> SLOTID_NSLOTS_SHIFT)) {
+@@ -25,9 +25,8 @@ int slotid_cap_init(PCIDevice *d, int nslots,
+     }
+ 
+     cap = pci_add_capability(d, PCI_CAP_ID_SLOTID, offset,
+-                             SLOTID_CAP_LENGTH, &local_err);
++                             SLOTID_CAP_LENGTH, errp);
+     if (cap < 0) {
+-        error_report_err(local_err);
+         return cap;
+     }
+     /* We make each chassis unique, this way each bridge is First in Chassis */
+diff --git a/include/hw/pci/shpc.h b/include/hw/pci/shpc.h
+index 71e836b..ee19fec 100644
+--- a/include/hw/pci/shpc.h
++++ b/include/hw/pci/shpc.h
+@@ -38,7 +38,8 @@ struct SHPCDevice {
+ 
+ void shpc_reset(PCIDevice *d);
+ int shpc_bar_size(PCIDevice *dev);
+-int shpc_init(PCIDevice *dev, PCIBus *sec_bus, MemoryRegion *bar, unsigned off);
++int shpc_init(PCIDevice *dev, PCIBus *sec_bus, MemoryRegion *bar,
++              unsigned off, Error **errp);
+ void shpc_cleanup(PCIDevice *dev, MemoryRegion *bar);
+ void shpc_free(PCIDevice *dev);
+ void shpc_cap_write_config(PCIDevice *d, uint32_t addr, uint32_t val, int len);
+diff --git a/include/hw/pci/slotid_cap.h b/include/hw/pci/slotid_cap.h
+index 70db047..a777ea0 100644
+--- a/include/hw/pci/slotid_cap.h
++++ b/include/hw/pci/slotid_cap.h
+@@ -5,7 +5,8 @@
+ 
+ int slotid_cap_init(PCIDevice *dev, int nslots,
+                     uint8_t chassis,
+-                    unsigned offset);
++                    unsigned offset,
++                    Error **errp);
+ void slotid_cap_cleanup(PCIDevice *dev);
+ 
+ #endif
 -- 
 2.9.3
