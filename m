@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dNckN-0002Sq-3u
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 06:20:28 -0400
+	(envelope-from <yang.zhong@intel.com>) id 1dNckK-0002Q9-LP
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 06:20:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dNckK-000545-RN
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 06:20:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56304)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dNckK-00052x-Ji
+	(envelope-from <yang.zhong@intel.com>) id 1dNckJ-00052W-Ag
 	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 06:20:24 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AFF5333459A
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 10:20:23 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 21 Jun 2017 12:20:05 +0200
-Message-Id: <20170621102005.18701-6-quintela@redhat.com>
-In-Reply-To: <20170621102005.18701-1-quintela@redhat.com>
-References: <20170621102005.18701-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 5/5] migration: Make compression_threads use
- save/load_setup/cleanup()
+Received: from mga14.intel.com ([192.55.52.115]:6553)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1dNckI-0004zB-UY
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 06:20:23 -0400
+From: Yang Zhong <yang.zhong@intel.com>
+Date: Wed, 21 Jun 2017 18:19:49 +0800
+Message-Id: <1498040401-16361-4-git-send-email-yang.zhong@intel.com>
+In-Reply-To: <1498040401-16361-1-git-send-email-yang.zhong@intel.com>
+References: <1498040401-16361-1-git-send-email-yang.zhong@intel.com>
+Subject: [Qemu-devel] [PATCH 03/15] tcg: tcg_handle_interrupt() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,150 +24,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, kwolf@redhat.com, stefanha@redhat.com
+To: pbonzini@redhat.com
+Cc: qemu-devel@nongnu.org, a.rigo@virtualopensystems.com, anthony.xu@intel.com, Yang Zhong <yang.zhong@intel.com>
 
-Once there, be consistent and use
-compress_thread_{save,load}_{setup,cleanup}.
+Move tcg_handle_interrupt() from translate-common.c to
+translate-all.c.
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 ---
- migration/migration.c |  5 -----
- migration/ram.c       | 12 ++++++++----
- migration/ram.h       |  5 -----
- 3 files changed, 8 insertions(+), 14 deletions(-)
+ accel/tcg/Makefile.objs      |  2 +-
+ accel/tcg/translate-all.c    | 30 ++++++++++++++++++++++++
+ accel/tcg/translate-common.c | 56 --------------------------------------------
+ cpus.c                       |  1 +
+ 4 files changed, 32 insertions(+), 57 deletions(-)
+ delete mode 100644 accel/tcg/translate-common.c
 
-diff --git a/migration/migration.c b/migration/migration.c
-index aaaf7ff..f6b7404 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -284,7 +284,6 @@ static void process_incoming_migration_bh(void *opaque)
-     } else {
-         runstate_set(global_state_get_runstate());
-     }
--    migrate_decompress_threads_join();
-     /*
-      * This must happen after any state changes since as soon as an external
-      * observer sees this event they might start to prod at the VM assuming
-@@ -347,7 +346,6 @@ static void process_incoming_migration_co(void *opaque)
-         migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
-                           MIGRATION_STATUS_FAILED);
-         error_report("load of migration failed: %s", strerror(-ret));
--        migrate_decompress_threads_join();
-         exit(EXIT_FAILURE);
-     }
-     mis->bh = qemu_bh_new(process_incoming_migration_bh, mis);
-@@ -358,7 +356,6 @@ void migration_fd_process_incoming(QEMUFile *f)
- {
-     Coroutine *co = qemu_coroutine_create(process_incoming_migration_co, f);
- 
--    migrate_decompress_threads_create();
-     qemu_file_set_blocking(f, false);
-     qemu_coroutine_enter(co);
- }
-@@ -825,7 +822,6 @@ static void migrate_fd_cleanup(void *opaque)
-         }
-         qemu_mutex_lock_iothread();
- 
--        migrate_compress_threads_join();
-         qemu_fclose(s->to_dst_file);
-         s->to_dst_file = NULL;
-     }
-@@ -1978,7 +1974,6 @@ void migrate_fd_connect(MigrationState *s)
-         }
-     }
- 
--    migrate_compress_threads_create();
-     qemu_thread_create(&s->thread, "live_migration", migration_thread, s,
-                        QEMU_THREAD_JOINABLE);
-     s->migration_thread_running = true;
-diff --git a/migration/ram.c b/migration/ram.c
-index a619e0b..26393df 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -306,7 +306,7 @@ static inline void terminate_compression_threads(void)
-     }
+diff --git a/accel/tcg/Makefile.objs b/accel/tcg/Makefile.objs
+index f173cd5..70cd474 100644
+--- a/accel/tcg/Makefile.objs
++++ b/accel/tcg/Makefile.objs
+@@ -1,3 +1,3 @@
+ obj-$(CONFIG_SOFTMMU) += tcg-all.o
+ obj-$(CONFIG_SOFTMMU) += cputlb.o
+-obj-y += cpu-exec.o cpu-exec-common.o translate-all.o translate-common.o
++obj-y += cpu-exec.o cpu-exec-common.o translate-all.o
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 7b25a16..bb303e0 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -798,6 +798,33 @@ static void tb_htable_init(void)
+     qht_init(&tcg_ctx.tb_ctx.htable, CODE_GEN_HTABLE_SIZE, mode);
  }
  
--void migrate_compress_threads_join(void)
-+static void compress_threads_save_cleanup(void)
- {
-     int i, thread_count;
- 
-@@ -329,7 +329,7 @@ void migrate_compress_threads_join(void)
-     comp_param = NULL;
- }
- 
--void migrate_compress_threads_create(void)
-+static void compress_threads_save_setup(void)
- {
-     int i, thread_count;
- 
-@@ -1390,6 +1390,7 @@ static void ram_save_cleanup(void *opaque)
-     }
-     XBZRLE_cache_unlock();
-     migration_page_queue_free(*rsp);
-+    compress_threads_save_cleanup();
-     g_free(*rsp);
-     *rsp = NULL;
- }
-@@ -1923,6 +1924,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
-     }
- 
-     rcu_read_unlock();
-+    compress_threads_save_setup();
- 
-     ram_control_before_iterate(f, RAM_CONTROL_SETUP);
-     ram_control_after_iterate(f, RAM_CONTROL_SETUP);
-@@ -2231,7 +2233,7 @@ static void wait_for_decompress_done(void)
-     qemu_mutex_unlock(&decomp_done_lock);
- }
- 
--void migrate_decompress_threads_create(void)
-+static void compress_threads_load_setup(void)
- {
-     int i, thread_count;
- 
-@@ -2255,7 +2257,7 @@ void migrate_decompress_threads_create(void)
-     }
- }
- 
--void migrate_decompress_threads_join(void)
-+static void compress_threads_load_cleanup(void)
- {
-     int i, thread_count;
- 
-@@ -2321,12 +2323,14 @@ static void decompress_data_with_multi_threads(QEMUFile *f,
- static int ram_load_setup(QEMUFile *f, void *opaque)
- {
-     xbzrle_load_setup();
-+    compress_threads_load_setup();
-     return 0;
- }
- 
- static int ram_load_cleanup(void *opaque)
- {
-     xbzrle_load_cleanup();
-+    compress_threads_load_cleanup();
-     return 0;
- }
- 
-diff --git a/migration/ram.h b/migration/ram.h
-index a8b79a4..c081fde 100644
---- a/migration/ram.h
-+++ b/migration/ram.h
-@@ -39,11 +39,6 @@ int64_t xbzrle_cache_resize(int64_t new_size);
- uint64_t ram_bytes_remaining(void);
- uint64_t ram_bytes_total(void);
- 
--void migrate_compress_threads_create(void);
--void migrate_compress_threads_join(void);
--void migrate_decompress_threads_create(void);
--void migrate_decompress_threads_join(void);
++#ifndef CONFIG_USER_ONLY
++/* mask must never be zero, except for A20 change call */
++static void tcg_handle_interrupt(CPUState *cpu, int mask)
++{
++    int old_mask;
++    g_assert(qemu_mutex_iothread_locked());
++
++    old_mask = cpu->interrupt_request;
++    cpu->interrupt_request |= mask;
++
++    /*
++     * If called from iothread context, wake the target cpu in
++     * case its halted.
++     */
++    if (!qemu_cpu_is_self(cpu)) {
++        qemu_cpu_kick(cpu);
++    } else {
++        cpu->icount_decr.u16.high = -1;
++        if (use_icount &&
++            !cpu->can_do_io
++            && (mask & ~old_mask) != 0) {
++            cpu_abort(cpu, "Raised interrupt while not in I/O function");
++        }
++    }
++}
++#endif
++
+ /* Must be called before using the QEMU cpus. 'tb_size' is the size
+    (in bytes) allocated to the translation buffer. Zero means default
+    size. */
+@@ -807,6 +834,9 @@ void tcg_exec_init(unsigned long tb_size)
+     page_init();
+     tb_htable_init();
+     code_gen_alloc(tb_size);
++#ifndef CONFIG_USER_ONLY
++    cpu_interrupt_handler = tcg_handle_interrupt;
++#endif
+ #if defined(CONFIG_SOFTMMU)
+     /* There's no guest base to take into account, so go ahead and
+        initialize the prologue now.  */
+diff --git a/accel/tcg/translate-common.c b/accel/tcg/translate-common.c
+deleted file mode 100644
+index 40fe5a1..0000000
+--- a/accel/tcg/translate-common.c
++++ /dev/null
+@@ -1,56 +0,0 @@
+-/*
+- *  Host code generation common components
+- *
+- *  Copyright (c) 2015 Peter Crosthwaite <crosthwaite.peter@gmail.com>
+- *
+- * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Lesser General Public
+- * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
+- *
+- * This library is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Lesser General Public License for more details.
+- *
+- * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+- */
 -
- uint64_t ram_pagesize_summary(void);
- int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len);
- void acct_update_position(QEMUFile *f, size_t size, bool zero);
+-#include "qemu/osdep.h"
+-#include "qemu-common.h"
+-#include "qom/cpu.h"
+-#include "sysemu/cpus.h"
+-#include "qemu/main-loop.h"
+-
+-uintptr_t qemu_real_host_page_size;
+-intptr_t qemu_real_host_page_mask;
+-
+-#ifndef CONFIG_USER_ONLY
+-/* mask must never be zero, except for A20 change call */
+-static void tcg_handle_interrupt(CPUState *cpu, int mask)
+-{
+-    int old_mask;
+-    g_assert(qemu_mutex_iothread_locked());
+-
+-    old_mask = cpu->interrupt_request;
+-    cpu->interrupt_request |= mask;
+-
+-    /*
+-     * If called from iothread context, wake the target cpu in
+-     * case its halted.
+-     */
+-    if (!qemu_cpu_is_self(cpu)) {
+-        qemu_cpu_kick(cpu);
+-    } else {
+-        cpu->icount_decr.u16.high = -1;
+-        if (use_icount &&
+-            !cpu->can_do_io
+-            && (mask & ~old_mask) != 0) {
+-            cpu_abort(cpu, "Raised interrupt while not in I/O function");
+-        }
+-    }
+-}
+-
+-CPUInterruptHandler cpu_interrupt_handler = tcg_handle_interrupt;
+-#endif
+diff --git a/cpus.c b/cpus.c
+index a86ea10..6ff3e37 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -76,6 +76,7 @@ int64_t max_advance;
+ /* vcpu throttling controls */
+ static QEMUTimer *throttle_timer;
+ static unsigned int throttle_percentage;
++CPUInterruptHandler cpu_interrupt_handler;
+ 
+ #define CPU_THROTTLE_PCT_MIN 1
+ #define CPU_THROTTLE_PCT_MAX 99
 -- 
-2.9.4
+1.9.1
