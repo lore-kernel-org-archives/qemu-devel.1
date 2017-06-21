@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dNfXa-0001kK-Jk
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:19:28 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dNfbU-0005CG-R9
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:23:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dNfXX-00021v-2r
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:19:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44410)
+	(envelope-from <ehabkost@redhat.com>) id 1dNfbR-0003Ty-Hy
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:23:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:25204)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dNfXW-00021J-R0
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:19:23 -0400
-References: <1498040401-16361-1-git-send-email-yang.zhong@intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8a92a314-983c-7fe5-dc92-c18b514f32bc@redhat.com>
-Date: Wed, 21 Jun 2017 15:19:19 +0200
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dNfbR-0003TJ-99
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:23:25 -0400
+Date: Wed, 21 Jun 2017 10:23:17 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170621132317.GD3928@thinpad.lan.raisama.net>
+References: <1497877149-19253-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20170619142852.GS5016@thinpad.lan.raisama.net>
+	<7d5904ae-e66c-5594-cfff-747578d91f4b@ilande.co.uk>
+	<08da52ec-e4d2-d836-49bd-90baf21747fb@redhat.com>
+	<1d8147a6-d55c-4951-68db-4c1cf502a4f3@ilande.co.uk>
+	<9d24bf00-cf82-717a-eccd-f51e2c80dd6f@redhat.com>
+	<eaa2cd40-0d64-6843-7e39-c0f94c7e797f@ilande.co.uk>
+	<48c8f007-f388-59f5-9af8-f5eefe033e2a@redhat.com>
+	<20170621113600.GA3928@thinpad.lan.raisama.net>
+	<8135ff45-0341-1fd4-ada9-4527c6b61e5a@ilande.co.uk>
 MIME-Version: 1.0
-In-Reply-To: <1498040401-16361-1-git-send-email-yang.zhong@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 00/15] add disable-tcg option for x86 build
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8135ff45-0341-1fd4-ada9-4527c6b61e5a@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCHv6 3/5] fw_cfg: move assert() and linking of
+ fw_cfg device to the machine into instance_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,115 +36,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>
-Cc: qemu-devel@nongnu.org, a.rigo@virtualopensystems.com, anthony.xu@intel.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Laszlo Ersek <lersek@redhat.com>, peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, imammedo@redhat.com, pbonzini@redhat.com
 
+On Wed, Jun 21, 2017 at 01:17:06PM +0100, Mark Cave-Ayland wrote:
+> On 21/06/17 12:36, Eduardo Habkost wrote:
+> 
+> > On Wed, Jun 21, 2017 at 09:48:16AM +0200, Laszlo Ersek wrote:
+> >> On 06/21/17 08:58, Mark Cave-Ayland wrote:
+> >>> On 19/06/17 23:43, Laszlo Ersek wrote:
+> >>>
+> >>>> It looks good to me, but please await Eduardo's reply as well.
+> >>>>
+> >>>> In particular, it should be confirmed that object_resolve_path_type()
+> >>>> matches instances of *subclasses* as well (as I expect it would). Your
+> >>>> test results confirm that; let's make sure it is intentional behavior.
+> >>>> Eduardo (or someone else on the CC list), can you please comment on that?
+> >>>
+> >>> Thanks Laszlo. Eduardo, can you confirm this is the correct behaviour?
+> > 
+> > Sorry for taking so long to reply.  Yes, it should be the correct
+> > behavior.  It's how it's documented:
+> > 
+> > "This is similar to object_resolve_path.  However, when looking
+> > for a partial path only matches that implement the given type are
+> > considered.  This restricts the search and avoids spuriously
+> > flagging matches as ambiguous."
+> > 
+> > (Key part here is "implement the given type").
+> > 
+> > Approach used by commit f92063028a "hw/acpi/vmgenid: prevent more
+> > than one vmgenid device" looks good to me.
+> 
+> That is great news, thanks for confirming this.
+> 
+> >>>
+> >>> I now have a v7 patchset ready to go (currently hosted at
+> >>> https://github.com/mcayland/qemu/tree/fwcfg7 for the curious). Laszlo,
+> >>> I've currently left off your Tested-by tag since I'm not sure it's still
+> >>> valid for less-than-trivial changes - if you're happy for me to re-add
+> >>> it before I send the v7 patchset to the list, please let me know.
+> >>
+> >> I intend to test v7 when you post it.
+> > 
+> > I still see the instance_init assert() in that branch (commit
+> > 17d75643f880).  Is that correct?
+> 
+> Yes that was the intention. In 17d75643f880 both the assert() and
+> object_property_add_child() are moved into the instance_init() function,
+> and then in the follow-up commit eddedb5 the assert() is removed from
+> instance_init() and the object_resolve_path_type() check added into
+> fw_cfg_init1() as part of its conversion into the
+> fw_cfg_common_realize() function.
 
+We can't move assert() + linking to instance_init even if it's
+just temporary, as it makes device-list-properties crash.
 
-On 21/06/2017 12:19, Yang Zhong wrote:
-> This patchset rebased from Paolo's below patchset, which was based on
-> QEMU 2.0.50 version. 
-> https://github.com/bonzini/qemu/tree/disable-tcg
+Just linking in instance_init is also a problem, because
+instance_init should never affect global QEMU state.
 
-Patches 7/8/11 seems fine, I have already queued them (though I still
-have to test everything).
+You could move linking to realize as well, but: just like you
+already moved sysbus_add_io() calls outside realize, I believe
+linking belongs outside realize too.  I need to re-read the
+discussion threads to understand the motivation behind that.
 
-Paolo
+> 
+> One last question which might avoid a future v8 revision: does the error
+> handling in eddedb5 for the fw_cfg_*_realize() functions look correct?
 
-> Since qemu-system-x86_64 enabled kvm and TCG accelators by default, in 
-> fact, the TCG accelator is NOT useful in the system build of x86 platform. 
-> This patchset will disable TCG for x86 platform if --disable-tcg option is 
-> added into ./configure command.
+The error handling looks correct to me.
+
 > 
-> The new configure build command like below
-> (1)./configure
->    tcg is enabled by default
-> 
-> (2)./configure --disable-tcg
->    tcg is disabled in i386 and x86_64 softmmu build
->    tcg is enabled in others softmmu and all users build
-> 
-> (3)./configure --disable-tcg --target-list=x86_64-softmmu, x86_64-linux-user
->    tcg is disabled in x86_64 softmmu build
->    tcg is enabled in x86_64 linux user build 
-> 
-> How to verify disable-tcg option
-> (1)./configure
->    a)all user and softmmu build are okay.
->    b) CONFIG_TCG=y is set in $config_target_mak in all user and softmmu directory
->    c)kvm starting vm is okay
->      ./qemu-system-x86_64 -enable-kvm -cpu host -m 2G -smp cpus=4,cores=4,threads=1,\
->        sockets=1 -drive format=raw,file=eywa.img,index=0,media=disk -nographic -serial \
->        stdio -nodefaults
->    d)tcg starting vm is okay
->      ./qemu-system-x86_64 -m 2G -smp cpus=4,cores=4,threads=1,sockets=1 -drive format=raw,\
->         file=eywa.img,index=0,media=disk -nographic -serial stdio -nodefaults
-> 
-> (2) ./configure --disable-tcg  
->    a) all user and softmmu build are okay.
->    b) CONFIG_TCG=y is not set in $config_target_mak in i386_softmmu and x86_64-softmmu 
->       directory
->    c) kvm starting vm is okay
->      ./qemu-system-x86_64 -enable-kvm -cpu host -m 2G -smp cpus=4,cores=4,threads=1,\
->        sockets=1 -drive format=raw,file=eywa.img,index=0,media=disk -nographic -serial \
->        stdio -nodefaults
->    d) tcg starting vm is aborted
->       The log as below:
->       "tcg" accelerator not found.
->       No accelerator found!
-> 
-> 
-> Yang Zhong (15):
->   configure: add the disable-tcg option
->   vl: add CONFIG_TCG for tcg related code
->   tcg: tcg_handle_interrupt() function
->   tcg: change tcg_enabled()
->   tcg: move page_size_init() function
->   kvmvapic: remove tcg related code
->   tcg: move cpu_sync_bndcs_hflags() function
->   tcg: make cpu_get_fp80()/cpu_set_fp80() static
->   tcg: add the tcg-stub.c file into accel/stubs/
->   tcg: move tb related lock functions
->   tcg: split cpu_set_mxcsr()/cpu_set_fpuc()
->   tcg: remove inline definition of flush_icache_range()
->   tcg: disable tcg in CPUX86State struct
->   tcg: add the CONFIG_TCG for header
->   tcg: add the CONFIG_TCG into Makefiles
-> 
->  Makefile.target              |   4 +-
->  accel/Makefile.objs          |   2 +-
->  accel/stubs/Makefile.objs    |   1 +
->  accel/stubs/tcg-stub.c       | 129 +++++++++++++++++++++++++++++++++++++++++++
->  accel/tcg/Makefile.objs      |   2 +-
->  accel/tcg/cpu-exec.c         |   1 +
->  accel/tcg/cputlb.c           |   1 +
->  accel/tcg/tcg-all.c          |   2 +-
->  accel/tcg/translate-all.c    |  54 ++++++++++--------
->  accel/tcg/translate-all.h    |   3 +
->  accel/tcg/translate-common.c |  56 -------------------
->  bsd-user/main.c              |   1 +
->  configure                    |  28 +++++++++-
->  cpus.c                       |   4 +-
->  exec.c                       |  20 +++++++
->  hw/i386/kvmvapic.c           |  24 --------
->  include/exec/cpu-defs.h      |   4 +-
->  include/exec/cputlb.h        |   2 +-
->  include/exec/exec-all.h      |  53 +++++++++---------
->  include/exec/helper-proto.h  |   2 +
->  include/qemu-common.h        |   7 ++-
->  linux-user/main.c            |   2 +-
->  target/i386/Makefile.objs    |   7 ++-
->  target/i386/cpu.h            |  22 ++++++--
->  target/i386/fpu_helper.c     |  26 +--------
->  target/i386/helper.c         |  34 +++++++++++-
->  target/i386/machine.c        |  18 ++++++
->  target/i386/mpx_helper.c     |  30 ----------
->  tcg/i386/tcg-target.h        |   5 +-
->  tcg/i386/tcg-target.inc.c    |   4 ++
->  tcg/tcg.h                    |   4 --
->  trace/control-target.c       |   1 -
->  vl.c                         |  12 ++++
->  33 files changed, 356 insertions(+), 209 deletions(-)
->  create mode 100644 accel/stubs/tcg-stub.c
->  delete mode 100644 accel/tcg/translate-common.c
-> 
+> The existing check for fw_cfg_file_slots_allocate() uses a local_err
+> Error variable, whereas I've seen a mixture of callers using both this
+> approach and using the errp Error variable directly. Is there any reason
+> to prefer one over the other? Currently I'm also using local_err in
+> order to keep the fw_cfg_*_realize() functions consistent.
+
+You need a local_err variable if you need to handle/check for
+errors before propagating them.
+
+Quoting qapi/error.h:
+
+  Create a new error and pass it to the caller:
+      error_setg(errp, "situation normal, all fouled up");
+
+  Call a function and receive an error from it:
+      Error *err = NULL;
+      foo(arg, &err);
+      if (err) {
+          handle the error...
+      }
+
+  [...]
+
+  Receive an error and pass it on to the caller:
+      Error *err = NULL;
+      foo(arg, &err);
+      if (err) {
+          handle the error...
+          error_propagate(errp, err);
+      }
+  where Error **errp is a parameter, by convention the last one.
+
+  Do *not* "optimize" this to
+      foo(arg, errp);
+      if (*errp) { // WRONG!
+          handle the error...
+      }
+  because errp may be NULL!
+
+  But when all you do with the error is pass it on, please use
+      foo(arg, errp);
+  for readability.
+
+In fw_cfg_*_realize() you can call fw_cfg_common_realize(dev,
+errp) directly, but it won't be a problem if you use local_err
+just to keep it consistent with the other error checks in the
+function.
+
+-- 
+Eduardo
