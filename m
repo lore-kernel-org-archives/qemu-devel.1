@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dNh6H-0000hn-2D
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:59:26 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dNhQd-0002CE-E3
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:20:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dNh6D-00024r-5d
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:59:21 -0400
-From: Max Reitz <mreitz@redhat.com>
-References: <20170619173455.18805-1-berrange@redhat.com>
-	<20170619173455.18805-14-berrange@redhat.com>
-	<79345f33-2cf6-bec1-c96d-981fc7e3fedd@redhat.com>
-	<c481d014-f9f0-74c8-4011-1b81ace887be@redhat.com>
-Message-ID: <48afe1ce-e500-e7a7-18de-2ed67d808df3@redhat.com>
-Date: Wed, 21 Jun 2017 16:59:02 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1dNhQc-0001xP-Jm
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:20:23 -0400
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:34897)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dNhQc-0001wO-Cm
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:20:22 -0400
+Received: by mail-wr0-x22b.google.com with SMTP id y25so100095950wrd.2
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 08:20:20 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <c481d014-f9f0-74c8-4011-1b81ace887be@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="pG4e4BrB2c9b9eSVQQ23QwwakQbFib10O"
-Subject: Re: [Qemu-devel] [PATCH v9 13/20] qcow2: add support for LUKS
- encryption format
+In-Reply-To: <D6FAAABF-064D-49C0-B572-C73679F34052@gmail.com>
+References: <D6FAAABF-064D-49C0-B572-C73679F34052@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 21 Jun 2017 16:19:58 +0100
+Message-ID: <CAFEAcA9P0z+pgR-JWk1KiwCRd2_iNDfQyPxx+RK465n8vtMAQw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3] ui/cocoa.m: add Speed menu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,113 +28,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: Programmingkid <programmingkidx@gmail.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pG4e4BrB2c9b9eSVQQ23QwwakQbFib10O
-From: Max Reitz <mreitz@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
-Message-ID: <48afe1ce-e500-e7a7-18de-2ed67d808df3@redhat.com>
-Subject: Re: [PATCH v9 13/20] qcow2: add support for LUKS encryption format
-References: <20170619173455.18805-1-berrange@redhat.com>
- <20170619173455.18805-14-berrange@redhat.com>
- <79345f33-2cf6-bec1-c96d-981fc7e3fedd@redhat.com>
- <c481d014-f9f0-74c8-4011-1b81ace887be@redhat.com>
-In-Reply-To: <c481d014-f9f0-74c8-4011-1b81ace887be@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 14 June 2017 at 04:17, Programmingkid <programmingkidx@gmail.com> wrote:
+> Programs running inside of QEMU can sometimes use more CPU time than is really
+> needed. To solve this problem, we just need to throttle the virtual CPU. This
+> feature will stop laptops from burning up.
+>
+> This patch adds a menu called Speed that has menu items from 100% to 1% that
+> represent the speed options. 100% is full speed and 1% is slowest.
+>
+> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+> ---
+> v3 changes:
+> Changed the item deselection loop.
+> Moved speed calculation equation to main function.
+> Replaced "%c" with "%%".
+> Changed how 100% menu item is made.
+>
+> v2 changes:
+> Fixed missing space with 'if' and 'for' structures.
+> Fixed tab damage.
+> Use loop to create menu items.
+> Changed name of menu items to use percentages.
+> Use tags to determine selected menu item.
 
-On 2017-06-21 16:46, Max Reitz wrote:
-> On 2017-06-21 16:42, Max Reitz wrote:
->> On 2017-06-19 19:34, Daniel P. Berrange wrote:
->>> This adds support for using LUKS as an encryption format
->>> with the qcow2 file, using the new encrypt.format parameter
->>> to request "luks" format. e.g.
->>>
->>>   # qemu-img create --object secret,data=3D123456,id=3Dsec0 \
->>>        -f qcow2 -o encrypt.format=3Dluks,encrypt.key-secret=3Dsec0 \
->>>        test.qcow2 10G
->>>
->>> The legacy "encryption=3Don" parameter still results in
->>> creation of the old qcow2 AES format (and is equivalent
->>> to the new 'encryption-format=3Daes'). e.g. the following are
->>> equivalent:
->>>
->>>   # qemu-img create --object secret,data=3D123456,id=3Dsec0 \
->>>        -f qcow2 -o encryption=3Don,encrypt.key-secret=3Dsec0 \
->>>        test.qcow2 10G
->>>
->>>  # qemu-img create --object secret,data=3D123456,id=3Dsec0 \
->>>        -f qcow2 -o encryption-format=3Daes,encrypt.key-secret=3Dsec0 =
-\
->>>        test.qcow2 10G
->>>
->>> With the LUKS format it is necessary to store the LUKS
->>> partition header and key material in the QCow2 file. This
->>> data can be many MB in size, so cannot go into the QCow2
->>> header region directly. Thus the spec defines a FDE
->>> (Full Disk Encryption) header extension that specifies
->>> the offset of a set of clusters to hold the FDE headers,
->>> as well as the length of that region. The LUKS header is
->>> thus stored in these extra allocated clusters before the
->>> main image payload.
->>>
->>> Aside from all the cryptographic differences implied by
->>> use of the LUKS format, there is one further key difference
->>> between the use of legacy AES and LUKS encryption in qcow2.
->>> For LUKS, the initialiazation vectors are generated using
->>> the host physical sector as the input, rather than the
->>> guest virtual sector. This guarantees unique initialization
->>> vectors for all sectors when qcow2 internal snapshots are
->>> used, thus giving stronger protection against watermarking
->>> attacks.
->>>
->>> Reviewed-by: Eric Blake <eblake@redhat.com>
->>> Reviewed-by: Alberto Garcia <berto@igalia.com>
->>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
->>> ---
->>>  block/qcow2-cluster.c      |   4 +-
->>>  block/qcow2-refcount.c     |  10 ++
->>>  block/qcow2.c              | 268 +++++++++++++++++++++++++++++++++++=
-+++------
->>>  block/qcow2.h              |   9 ++
->>>  qapi/block-core.json       |   5 +-
->>>  tests/qemu-iotests/082.out | 270 +++++++++++++++++++++++++++++++++++=
-+---------
->>>  6 files changed, 478 insertions(+), 88 deletions(-)
->>
->> Reviewed-by: Max Reitz <mreitz@redhat.com>
->=20
-> (But due to the split of do_perform_cow(), this will need the same
-> changes that patch 10 and 11 will need (in this case only contextual, i=
-n
-> the cases of 10 and 11 there are also functional changes required).)
+> +    // Add the rest of the Speed menu items
+> +    int p, percentage, throttle_pct;
+> +    for (p = 10; p >= 0; p--)
+> +    {
+> +        percentage = p * 10 > 1 ? p * 10 : 1; // prevent a 0% menu item
+> +
+> +        if (percentage == 100) {
+> +            [menuItem setState: NSOnState];
+> +        }
+> +        menuItem = [[[NSMenuItem alloc]
+> +                   initWithTitle: [NSString stringWithFormat: @"%d%%", percentage] action:@selector(adjustSpeed:) keyEquivalent:@""] autorelease];
 
-(Turns out it will need a functional change, too, because
-do_perform_cow_encrypt() doesn't take the host offset yet.)
+Here you try to call setState: on the menuItem before
+you allocate it -- these lines should be the other way
+around. (The effect is that the 100% item isn't ticked
+on startup.)
 
-Max
+> +
+> +        /* Calculate the throttle percentage */
+> +        throttle_pct = -1 * percentage + 100;
+> +
+> +        [menuItem setTag: throttle_pct];
+> +        [menu addItem: menuItem];
+> +    }
 
+That's a very minor fix, so I'll just make it locally
+when I apply this patch to master.
 
---pG4e4BrB2c9b9eSVQQ23QwwakQbFib10O
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEvBAEBCAAZBQJZSom2EhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQGEn
-CACwi/U+Rg7mk8YKXY742W9Sx+UoBikDFJldqH3jXDQFsHiIWalh31MfMz67VnUE
-kc8oe7jnBOCkqXrlhXYLU0r83qDZyxNbaiSE6gCKOtKH+LPo6YqK9YRoJK7IHT4Z
-A0IzAk8R7/AeTj7HuZiaVR8YyV8NYjbam+OIxoPdSQLauHnGfw4/HgietLInt+Xn
-/iNO57E5aavHsmS0uPag1Yt4coxwe4mnLMYjA1NmVsUPH2/t3tZphqk5bG0KgANX
-6HIUzCJdB9VPM7huJp9HqQctcxUFFgdeKErcClJ5aCqBLmnedDLfkIcZqzRtnIw+
-vA756yCivYHi2w7IkErRIve9
-=PydH
------END PGP SIGNATURE-----
-
---pG4e4BrB2c9b9eSVQQ23QwwakQbFib10O--
+thanks
+-- PMM
