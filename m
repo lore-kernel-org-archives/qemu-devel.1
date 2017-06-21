@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dNf6O-0007ma-0J
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:51:21 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dNf6P-0007oN-Sq
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:51:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dNf6J-0004y1-1P
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:51:20 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dNf6P-000513-5T
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:51:21 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 21 Jun 2017 14:50:28 +0200
-Message-Id: <20170621125047.30294-7-mreitz@redhat.com>
+Date: Wed, 21 Jun 2017 14:50:30 +0200
+Message-Id: <20170621125047.30294-9-mreitz@redhat.com>
 In-Reply-To: <20170621125047.30294-1-mreitz@redhat.com>
 References: <20170621125047.30294-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 06/25] block:
- bdrv_get_full_backing_filename_from_...'s ret. val.
+Subject: [Qemu-devel] [PATCH v5 08/25] block: Add
+ bdrv_make_absolute_filename()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,125 +23,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>
 
-Make bdrv_get_full_backing_filename_from_filename() return an allocated
-string instead of placing the result in a caller-provided buffer.
+This is a general function for making a filename that is relative to a
+certain BDS absolute.
+
+It calls bdrv_get_full_backing_filename_from_filename() for now, but
+that will be changed in a follow-up patch.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- include/block/block.h |  7 +++----
- block.c               | 32 +++++++++++++++++++-------------
- block/vmdk.c          |  8 +++-----
- 3 files changed, 25 insertions(+), 22 deletions(-)
+ block.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/include/block/block.h b/include/block/block.h
-index 9f89fa7..e9df983 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -494,10 +494,9 @@ void bdrv_get_backing_filename(BlockDriverState *bs,
-                                char *filename, int filename_size);
- void bdrv_get_full_backing_filename(BlockDriverState *bs,
-                                     char *dest, size_t sz, Error **errp);
--void bdrv_get_full_backing_filename_from_filename(const char *backed,
--                                                  const char *backing,
--                                                  char *dest, size_t sz,
--                                                  Error **errp);
-+char *bdrv_get_full_backing_filename_from_filename(const char *backed,
-+                                                   const char *backing,
-+                                                   Error **errp);
- 
- int path_has_protocol(const char *path);
- int path_is_absolute(const char *path);
 diff --git a/block.c b/block.c
-index 80e4805..b70a9a8 100644
+index 14beb6b..6f19816 100644
 --- a/block.c
 +++ b/block.c
-@@ -287,20 +287,20 @@ int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
-     return 0;
- }
- 
--void bdrv_get_full_backing_filename_from_filename(const char *backed,
--                                                  const char *backing,
--                                                  char *dest, size_t sz,
--                                                  Error **errp)
-+char *bdrv_get_full_backing_filename_from_filename(const char *backed,
-+                                                   const char *backing,
-+                                                   Error **errp)
- {
-     if (backing[0] == '\0' || path_has_protocol(backing) ||
-         path_is_absolute(backing))
-     {
--        pstrcpy(dest, sz, backing);
-+        return g_strdup(backing);
-     } else if (backed[0] == '\0' || strstart(backed, "json:", NULL)) {
-         error_setg(errp, "Cannot use relative backing file names for '%s'",
-                    backed);
-+        return NULL;
-     } else {
--        path_combine_deprecated(dest, sz, backed, backing);
-+        return path_combine(backed, backing);
+@@ -304,15 +304,22 @@ char *bdrv_get_full_backing_filename_from_filename(const char *backed,
      }
  }
  
-@@ -308,9 +308,15 @@ void bdrv_get_full_backing_filename(BlockDriverState *bs, char *dest, size_t sz,
-                                     Error **errp)
+-char *bdrv_get_full_backing_filename(BlockDriverState *bs, Error **errp)
++static char *bdrv_make_absolute_filename(BlockDriverState *relative_to,
++                                         const char *filename, Error **errp)
  {
-     char *backed = bs->exact_filename[0] ? bs->exact_filename : bs->filename;
-+    char *full_name;
+-    char *backed = bs->exact_filename[0] ? bs->exact_filename : bs->filename;
++    char *bs_filename = relative_to->exact_filename[0]
++                        ? relative_to->exact_filename
++                        : relative_to->filename;
  
--    bdrv_get_full_backing_filename_from_filename(backed, bs->backing_file,
--                                                 dest, sz, errp);
-+    full_name = bdrv_get_full_backing_filename_from_filename(backed,
-+                                                             bs->backing_file,
-+                                                             errp);
-+    if (full_name) {
-+        pstrcpy(dest, sz, full_name);
-+        g_free(full_name);
-+    }
+-    return bdrv_get_full_backing_filename_from_filename(backed,
+-                                                        bs->backing_file,
++    return bdrv_get_full_backing_filename_from_filename(bs_filename, filename,
+                                                         errp);
  }
  
++char *bdrv_get_full_backing_filename(BlockDriverState *bs, Error **errp)
++{
++    return bdrv_make_absolute_filename(bs, bs->backing_file, errp);
++}
++
  void bdrv_register(BlockDriver *bdrv)
-@@ -4431,16 +4437,16 @@ void bdrv_img_create(const char *filename, const char *fmt,
-     if (size == -1) {
-         if (backing_file) {
-             BlockDriverState *bs;
--            char *full_backing = g_new0(char, PATH_MAX);
-+            char *full_backing;
-             int64_t size;
-             int back_flags;
-             QDict *backing_options = NULL;
- 
--            bdrv_get_full_backing_filename_from_filename(filename, backing_file,
--                                                         full_backing, PATH_MAX,
--                                                         &local_err);
-+            full_backing =
-+                bdrv_get_full_backing_filename_from_filename(filename,
-+                                                             backing_file,
-+                                                             &local_err);
-             if (local_err) {
--                g_free(full_backing);
-                 goto out;
-             }
- 
-diff --git a/block/vmdk.c b/block/vmdk.c
-index 4389a69..4e92ce4 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -1983,12 +1983,10 @@ static int vmdk_create(const char *filename, QemuOpts *opts, Error **errp)
-     }
-     if (backing_file) {
-         BlockBackend *blk;
--        char *full_backing = g_new0(char, PATH_MAX);
--        bdrv_get_full_backing_filename_from_filename(filename, backing_file,
--                                                     full_backing, PATH_MAX,
--                                                     &local_err);
-+        char *full_backing =
-+            bdrv_get_full_backing_filename_from_filename(filename, backing_file,
-+                                                         &local_err);
-         if (local_err) {
--            g_free(full_backing);
-             error_propagate(errp, local_err);
-             ret = -ENOENT;
-             goto exit;
+ {
+     QLIST_INSERT_HEAD(&bdrv_drivers, bdrv, list);
 -- 
 2.9.4
