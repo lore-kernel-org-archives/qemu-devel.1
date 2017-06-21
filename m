@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dNiW8-00034d-4L
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 12:30:08 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dNidE-0000uM-Vj
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 12:37:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dNiW7-0006QB-88
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 12:30:08 -0400
-In-Reply-To: <f2644920-8eda-e768-adee-71db36ea2fa3@amsat.org>
-References: <0F376E9C-2D4B-4D79-B3D4-24F73FD61446@gmail.com>
-	<20170508221304.y36owezwla7sc6ss@aurel32.net>
-	<BB3E29F1-8BBB-407B-AAC8-795E9718CF5E@gmail.com>
-	<20170508225007.2duqxlo5ab2aenpl@aurel32.net>
-	<alpine.BSF.2.20.1705091148560.78100@zero.eik.bme.hu>
-	<F3D7AC88-099F-432D-B46F-97F2A6F7B0E3@gmail.com>
-	<f2644920-8eda-e768-adee-71db36ea2fa3@amsat.org>
-Mime-Version: 1.0 (Apple Message framework v753.1)
-Content-Type: text/plain; charset=ISO-8859-1; delsp=yes; format=flowed
-Message-Id: <17FF3B1D-D639-4578-BDDD-FADB07405D87@gmail.com>
-Content-Transfer-Encoding: quoted-printable
-From: G 3 <programmingkidx@gmail.com>
-Date: Wed, 21 Jun 2017 12:29:58 -0400
-Subject: Re: [Qemu-devel] [Qemu-ppc] Floating point unit bugs
+	(envelope-from <rth7680@gmail.com>) id 1dNidA-0001bX-Te
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 12:37:29 -0400
+Received: from mail-qk0-x235.google.com ([2607:f8b0:400d:c09::235]:32966)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dNidA-0001bK-Nn
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 12:37:24 -0400
+Received: by mail-qk0-x235.google.com with SMTP id r62so87249461qkf.0
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 09:37:24 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170620205121.26515-1-laurent@vivier.eu>
+	<20170620205121.26515-4-laurent@vivier.eu>
+	<b05fb631-4ccb-39fa-adc3-6949a514b9d2@amsat.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <f43b2f92-a76e-945f-9334-2cd9cb71ec95@twiddle.net>
+Date: Wed, 21 Jun 2017 09:37:19 -0700
+MIME-Version: 1.0
+In-Reply-To: <b05fb631-4ccb-39fa-adc3-6949a514b9d2@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 3/6] target-m68k: use floatx80 internally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,52 +32,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: BALATON Zoltan <balaton@eik.bme.hu>, "qemu-ppc@nongnu.org list:PowerPC" <qemu-ppc@nongnu.org>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, Thomas Huth <huth@tuxfamily.org>, Aurelien Jarno <aurelien@aurel32.net>
+
+On 06/21/2017 09:18 AM, Philippe Mathieu-Daudé wrote:
+>> +typedef CPU_LDoubleU FPReg;
+> 
+> What an awful name... Anyway checking on "qemu/bswap.h" it seems there is some 
+> endianess issue with it if your host is little-endian.
+
+There is no endian-ness issue because we do not attempt to read that structure 
+from memory as a whole.  Instead, Laurent uses two big-endian loads (with 
+appropriate address arithmetic) and stores the result into this host structure 
+in host-endian order.  Further, the host routines use the structure members by 
+name and do not assume any particular relationship between them.
+
+> Do you have a way to run Berkeley TestFloat?
+
+As noted in Laurent's cover message, floatx80 isn't quite right -- that is the 
+x86 data type, and the proper m68k data type is slightly different.
+
+I would expect the results from using floatx80 to be Just Good Enough to 
+produce a working m68k user-land.  It will produce correct results for normal 
+numbers in arithmetic such as 1.0 + 10.0.  But I would expect many of the edge 
+conditions that TestFloat would attempt (especially de-normals and un-normals) 
+would fail.
 
 
-On Jun 21, 2017, at 12:14 PM, Philippe Mathieu-Daud=E9 wrote:
-
-> Hi John,
->
-> On 05/09/2017 10:58 AM, G 3 wrote:
->>
->> On May 9, 2017, at 5:55 AM, BALATON Zoltan wrote:
->>
->>> On Tue, 9 May 2017, Aurelien Jarno wrote:
->>>> | main.c: In function 'print_fpscr_settings':
->>>> | main.c:73:26: warning: suggest parentheses around comparison in
->>>> operand of '&' [-Wparentheses]
->>>> |          if ((fpscr >> i) & 0x1 =3D=3D 1) {
->>>> |                           ^
->>>
->>> Actually the compiler is correct here, this should be:
->>>
->>> if ((fpscr >> i & 0x1) =3D=3D 1) {
->>>
->>> or even just
->>>
->>> if (fpscr >> i & 1) {
->>>
->>> because & is lower priority than =3D=3D but the result may still be =
-the
->>> same by chance if 0x1 =3D=3D 1 is always 1 and ANDing the shifted =
-value
->>> with this is either 0 or 1 so it may give the correct result but not
->>> the way one would think looking at the expression.
->>
->> I changed it to this:
->> if (((fpscr >> i) & 0x1) =3D=3D 1)
->>
->> Thank you.
->
-> do you think you can add your test as a qtest, to run it with check-=20=
-
-> qtest?
->
-> Regards,
->
-> Phil.
-
-I would like to see floating point tests added to QEMU. Problem is =20
-they will always fail due to a ton of bugs with the floating point unit.=
+r~
