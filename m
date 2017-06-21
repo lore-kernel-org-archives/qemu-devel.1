@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39234)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dNh04-0003wd-Ad
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:52:57 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dNh05-0003xh-GB
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:52:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dNgzy-0007oP-Mb
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:52:56 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:33596)
+	(envelope-from <alex.bennee@linaro.org>) id 1dNh00-0007pL-S4
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:52:57 -0400
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:36806)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dNgzy-0007nz-Fl
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:52:50 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id r103so138306023wrb.0
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 07:52:50 -0700 (PDT)
+	id 1dNh00-0007p0-LO
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:52:52 -0400
+Received: by mail-wr0-x22d.google.com with SMTP id c11so82873896wrc.3
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 07:52:52 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed, 21 Jun 2017 15:48:07 +0100
-Message-Id: <20170621144814.15324-15-alex.bennee@linaro.org>
+Date: Wed, 21 Jun 2017 15:48:06 +0100
+Message-Id: <20170621144814.15324-14-alex.bennee@linaro.org>
 In-Reply-To: <20170621144814.15324-1-alex.bennee@linaro.org>
 References: <20170621144814.15324-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 14/21] shippable: use C locale to simplify
- console output
+Subject: [Qemu-devel] [PULL 13/21] docker: add mipsel build target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,31 +34,57 @@ Cc: qemu-devel@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsa
 
 From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-remove this noise:
-
-perl: warning: Setting locale failed.
-perl: warning: Please check that your locale settings:
-    LANGUAGE = (unset),
-    LC_ALL = "en_US.UTF-8",
-    LC_CTYPE = "en_US.UTF-8",
-    LANG = "en_US.UTF-8"
-    are supported and installed on your system.
-
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+[AJB: remove apt-fake kludge]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-diff --git a/.shippable.yml b/.shippable.yml
-index 653bd750fe..231c29b620 100644
---- a/.shippable.yml
-+++ b/.shippable.yml
-@@ -1,5 +1,7 @@
- language: c
- env:
-+  global:
-+    - LC_ALL=C
-   matrix:
-     - IMAGE=debian-armhf-cross
-       TARGET_LIST=arm-softmmu,arm-linux-user
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index 61cc0d14e2..037cb9e9e7 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -58,6 +58,7 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
+ # Enforce dependancies for composite images
+ docker-image-debian-armhf-cross: docker-image-debian
+ docker-image-debian-arm64-cross: docker-image-debian
++docker-image-debian-mipsel-cross: docker-image-debian
+ 
+ # Expand all the pre-requistes for each docker image and test combination
+ $(foreach i,$(DOCKER_IMAGES), \
+diff --git a/tests/docker/dockerfiles/debian-mipsel-cross.docker b/tests/docker/dockerfiles/debian-mipsel-cross.docker
+new file mode 100644
+index 0000000000..2156bdb28d
+--- /dev/null
++++ b/tests/docker/dockerfiles/debian-mipsel-cross.docker
+@@ -0,0 +1,29 @@
++#
++# Docker mipsel cross-compiler target
++#
++# This docker target builds on the base debian image.
++#
++FROM qemu:debian
++MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
++
++# Add the foreign architecture we want and install dependencies
++RUN dpkg --add-architecture mipsel
++RUN apt-get update
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt-get install -y --no-install-recommends \
++        crossbuild-essential-mipsel
++
++# Specify the cross prefix for this image (see tests/docker/common.rc)
++ENV QEMU_CONFIGURE_OPTS --cross-prefix=mipsel-linux-gnu-
++
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt-get build-dep -yy -a mipsel qemu
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt-get install -y --no-install-recommends \
++        glusterfs-common:mipsel \
++        libbz2-dev:mipsel \
++        liblzo2-dev:mipsel \
++        libncursesw5-dev:mipsel \
++        libnfs-dev:mipsel \
++        librdmacm-dev:mipsel \
++        libsnappy-dev:mipsel
 -- 
 2.13.0
