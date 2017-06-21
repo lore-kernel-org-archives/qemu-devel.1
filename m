@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dNbcr-0001Aj-TL
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 05:08:39 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dNdqU-0004SK-GQ
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 07:30:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dNbcn-0006ee-TM
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 05:08:37 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38624)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dNbcn-0006eL-Nl
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 05:08:33 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dNbcm-0004cP-Rs
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 09:08:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CB7DC2E8041
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 09:08:32 +0000 (UTC)
+	(envelope-from <mreitz@redhat.com>) id 1dNdqT-0001oJ-H9
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 07:30:50 -0400
+References: <20170619150002.3033-1-stefanha@redhat.com>
+	<117743be-2351-7fe0-c777-c630bb850447@redhat.com>
+	<20170621082434.GA16183@stefanha-x1.localdomain>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <150fc149-94cf-6e25-3ca1-9f083fd5ad1d@redhat.com>
+Date: Wed, 21 Jun 2017 13:30:34 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 21 Jun 2017 08:49:02 -0000
-From: kolega <mr.kolega@gmail.com>
-Reply-To: Bug 1587065 <1587065@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160530134240.21929.85128.malonedeb@wampee.canonical.com>
-Message-Id: <149803494200.21334.17464400383685846402.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1587065] Re: btrfs qemu-ga - multiple mounts
- block fsfreeze
+In-Reply-To: <20170621082434.GA16183@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="adxlXaGqcPmSHLXpEbH1eXrjjnbX9RsJ5"
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: don't shadow opts variable in
+ img_dd()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,94 +26,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Reda Sallahi <fullmanet@gmail.com>, qemu-block@nongnu.org
 
-Same problem here ! More infos : https://forum.opennebula.org/t/backup-
-live-vms-with-snapshots-quiesce-atomic/4471
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--adxlXaGqcPmSHLXpEbH1eXrjjnbX9RsJ5
+From: Max Reitz <mreitz@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Reda Sallahi <fullmanet@gmail.com>, qemu-block@nongnu.org
+Message-ID: <150fc149-94cf-6e25-3ca1-9f083fd5ad1d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: don't shadow opts variable in
+ img_dd()
+References: <20170619150002.3033-1-stefanha@redhat.com>
+ <117743be-2351-7fe0-c777-c630bb850447@redhat.com>
+ <20170621082434.GA16183@stefanha-x1.localdomain>
+In-Reply-To: <20170621082434.GA16183@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 2017-06-21 10:24, Stefan Hajnoczi wrote:
+> On Mon, Jun 19, 2017 at 05:18:18PM +0200, Max Reitz wrote:
+>> On 2017-06-19 17:00, Stefan Hajnoczi wrote:
+>>> It's confusing when two different variables have the same name in one=
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1587065
+>>> function.
+>>>
+>>> Cc: Reda Sallahi <fullmanet@gmail.com>
+>>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>>> ---
+>>>  qemu-img.c | 9 +++------
+>>>  1 file changed, 3 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/qemu-img.c b/qemu-img.c
+>>> index 0ad698d..c285c2f 100644
+>>> --- a/qemu-img.c
+>>> +++ b/qemu-img.c
+>>> @@ -4249,15 +4249,12 @@ static int img_dd(int argc, char **argv)
+>>>          case 'U':
+>>>              force_share =3D true;
+>>>              break;
+>>> -        case OPTION_OBJECT: {
+>>> -            QemuOpts *opts;
+>>> -            opts =3D qemu_opts_parse_noisily(&qemu_object_opts,
+>>> -                                           optarg, true);
+>>> -            if (!opts) {
+>>> +        case OPTION_OBJECT:
+>>> +            if (!qemu_opts_parse_noisily(&qemu_object_opts, optarg, =
+true)) {
+>>>                  ret =3D -1;
+>>>                  goto out;
+>>>              }
+>>> -        }   break;
+>>> +            break;
+>>>          case OPTION_IMAGE_OPTS:
+>>>              image_opts =3D true;
+>>>              break;
+>>
+>> Hm, I basically reverted such a style in commit
+>> 3258b91141090b05edcaab8f1d1dd355ca91b49a. I find it confusing to use t=
+he
+>> same variable for two different things.
+>=20
+> I don't follow how the commit you posted is related to this patch.  Did=
 
-Title:
-  btrfs qemu-ga - multiple mounts block fsfreeze
+> you read the patch too quickly and think it uses the outer opts
+> variable?
 
-Status in QEMU:
-  New
+Pleading guilty: Yes, I did. I just saw you dropped the inner variable
+and thus thought you were using the outer ones to resolve shadowing.
 
-Bug description:
-  Having two mounts of the same device makes fsfreeze through qemu-ga impos=
-sible.
-  root@CmsrvMTA:/# mount -l | grep /dev/vda2
-  /dev/vda2 on / type btrfs (rw,relatime,space_cache,subvolid=3D257,subvol=
-=3D/@)
-  /dev/vda2 on /home type btrfs (rw,relatime,space_cache,subvolid=3D258,sub=
-vol=3D/@home)
+> This patch doesn't use a variable at all - there is no need for one.
 
-  Having two mounts is rather common with btrfs, so the feature fsfreeze
-  is unusable on these systems.
+Good, then! :-)
 
-  =
+Sorry, and thanks, applied to my block branch:
 
-  Below more information about how we encountered this issue...
+https://github.com/XanClic/qemu/commits/block
 
-  Message send to qemu-discuss@nongnu.org:
+Max
 
-  Message 1:
-  ----------
-  I use external snapshots to backup my guests. I use the 'quiesce' option =
-to flush and frees the guest file system with the qemu guest agent.
 
-  With the exeption of one guest, this procedure works fine. On the 'unwill=
-ing' guest, I get this error message:
-  "ERROR 2016-05-25 00:51:19 | T25-bakVMSCmsrvVH2 | fout: internal error: u=
-nable to execute QEMU agent command 'guest-fsfreeze-freeze': failed to free=
-ze /: Device or resource busy"
+--adxlXaGqcPmSHLXpEbH1eXrjjnbX9RsJ5
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  I don't think this is not some sort of time-out error, because
-  activation of the fsfreeze and the error message happen immediately
-  after each other:
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-  $ grep qemu-ga syslog.1
-  May 25 00:51:19 CmsrvMTA qemu-ga: info: guest-fsfreeze called
+iQEvBAEBCAAZBQJZSljbEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQIPh
+CACim3YEyMRy9EehHakYqQMzv+azBN1jpXVJFCrg0SWxmbIryRKTxPwBniC3q5wA
+jnxTJ08i39VyCex+AZ3vB1TVOXrPnCtQxW9DtlBrEsk9urSQIPTtZNN0w1NJ7X1d
+fm8xe0jsk/r+JKbGZkmazzeu+/mAD2WS0hJPlB1cnVAiZ3THJ39rESAG0RvMFBj8
+R4THjUnlE9jwozI50bDN85oNUD/ktOQAZLKNU0/4H0opZYNT7FMhoZEMr2iH772/
+3AvOpdMOgp+GjjI0GxM4iEX7rpNq9iyGUUeUx01Gge5sAnPo38ysh65neLZqdo5n
+cLdpaaDjLD4/ixP7uplsi3ic
+=2zpQ
+-----END PGP SIGNATURE-----
 
-  This is the only entry of the qemu guest agent in syslog.
-
-  $ sudo virsh version
-  Compiled against library: libvirt 1.3.1
-  Using library: libvirt 1.3.1
-  Gebruikte API: QEMU 1.3.1
-  Draaiende hypervisor: QEMU 2.5.0
-
-  $ virsh qemu-agent-command CmsrvMTA '{"execute": "guest-info"}'
-  {"return":{"version":"2.5.0", ... ,{"enabled":true,"name":"guest-fstrim",=
-"success-response":true},{"enabled":true,"name":"guest-fsfreeze-thaw","succ=
-ess-response":true},{"enabled":true,"name":"guest-fsfreeze-status","success=
--response":true},{"enabled":true,"name":"guest-fsfreeze-freeze-list","succe=
-ss-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze","success-=
-response":true}, ... }
-
-  For making an external snapshot, I use this command:
-  $ virsh snapshot-create-as --domain CmsrvMTA sn1 --disk-only --atomic --q=
-uiesce --no-metadata --diskspec vda,file=3D/srv/poolVMS/CmsrvMTA.sn1
-
-  Piece of reply 1:
-  -----------------
-  I have encountered this before. Some operating systems
-   may have bind-mounts that let a device appear multiple times in the moun=
-t list. Unfortunately the guest agent is not smart enough to consider a dev=
-ice that has been frozen as succesfull and keep going. This causes this spe=
-cific error.
-
-  Piece of reply 2:
-  -----------------
-  Ok, that seems to be it.
-
-  I=E2=80=99ve got the =E2=80=98/=E2=80=99 and =E2=80=98/home=E2=80=99 on t=
-he same device formatted as btrfs on
-  two separate sub volumes.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1587065/+subscriptions
+--adxlXaGqcPmSHLXpEbH1eXrjjnbX9RsJ5--
