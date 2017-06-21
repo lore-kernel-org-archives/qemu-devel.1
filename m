@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dNgDP-0005JP-5M
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:02:43 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dNgDS-0005UG-U6
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:02:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dNgDJ-0004Yt-6t
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:02:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43778)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dNgDN-0004Zw-Kh
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:02:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44580)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dNgDI-0004Yk-VB
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:02:33 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	id 1dNgDN-0004Zl-CX
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:02:37 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F0CDD61B8F
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 14:02:31 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 52A7F85376
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 14:02:36 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 21 Jun 2017 16:02:18 +0200
-Message-Id: <20170621140219.4568-3-marcandre.lureau@redhat.com>
+Date: Wed, 21 Jun 2017 16:02:19 +0200
+Message-Id: <20170621140219.4568-4-marcandre.lureau@redhat.com>
 In-Reply-To: <20170621140219.4568-1-marcandre.lureau@redhat.com>
 References: <20170621140219.4568-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 2/3] Add memfd based hostmem
+Subject: [Qemu-devel] [PATCH v4 3/3] tests: use memfd in vhost-user-test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,136 +36,191 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: imammedo@redhat.com, ehabkost@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Add a new memory backend, similar to hostmem-file, except that it
-doesn't need to create files. It also enforces memory sealing.
-
-This backend is mainly useful for sharing the memory with other
-processes.
-
-Note that Linux supports transparent huge-pages of shmem/memfd memory
-since 4.8. It is relatively easier to set up THP than a dedicate
-hugepage mount point by using "madvise" in
-/sys/kernel/mm/transparent_hugepage/shmem_enabled.
-
-Usage:
--object memory-backend-memfd,id=3Dmem1,size=3D1G
+This will exercise the memfd memory backend and should generally be
+better for testing than memory-backend-file (thanks to anonymous files
+and sealing).
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- backends/hostmem-memfd.c | 67 ++++++++++++++++++++++++++++++++++++++++++=
-++++++
- backends/Makefile.objs   |  2 ++
- qemu-options.hx          | 11 ++++++++
- 3 files changed, 80 insertions(+)
- create mode 100644 backends/hostmem-memfd.c
+ tests/vhost-user-test.c | 68 ++++++++++++++++++++++++++++++++-----------=
+------
+ 1 file changed, 44 insertions(+), 24 deletions(-)
 
-diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
-new file mode 100644
-index 0000000000..13d300d9ad
---- /dev/null
-+++ b/backends/hostmem-memfd.c
-@@ -0,0 +1,67 @@
-+/*
-+ * QEMU host memfd memory backend
-+ *
-+ * Copyright (C) 2016 Red Hat Inc
-+ *
-+ * Authors:
-+ *   Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "sysemu/hostmem.h"
-+#include "sysemu/sysemu.h"
-+#include "qom/object_interfaces.h"
+diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+index b3cc045765..2b5ca1c1b0 100644
+--- a/tests/vhost-user-test.c
++++ b/tests/vhost-user-test.c
+@@ -17,6 +17,7 @@
+ #include "qemu/range.h"
+ #include "qemu/sockets.h"
+ #include "chardev/char-fe.h"
 +#include "qemu/memfd.h"
-+#include "qapi/error.h"
-+
-+#define TYPE_MEMORY_BACKEND_MEMFD "memory-backend-memfd"
-+
-+static void
-+memfd_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
+ #include "sysemu/sysemu.h"
+ #include "libqos/libqos.h"
+ #include "libqos/pci-pc.h"
+@@ -40,15 +41,14 @@
+ #define HAVE_MONOTONIC_TIME
+ #endif
+=20
+-#define QEMU_CMD_MEM    " -m %d -object memory-backend-file,id=3Dmem,siz=
+e=3D%dM,"\
++#define QEMU_CMD_MEM    " -m %d -object memory-backend-file,id=3Dmem,siz=
+e=3D%dM," \
+                         "mem-path=3D%s,share=3Don -numa node,memdev=3Dme=
+m"
++#define QEMU_CMD_MEMFD  " -m %d -object memory-backend-memfd,id=3Dmem,si=
+ze=3D%dM," \
++                        " -numa node,memdev=3Dmem"
+ #define QEMU_CMD_CHR    " -chardev socket,id=3D%s,path=3D%s%s"
+ #define QEMU_CMD_NETDEV " -netdev vhost-user,id=3Dnet0,chardev=3D%s,vhos=
+tforce"
+ #define QEMU_CMD_NET    " -device virtio-net-pci,netdev=3Dnet0"
+=20
+-#define QEMU_CMD        QEMU_CMD_MEM QEMU_CMD_CHR \
+-                        QEMU_CMD_NETDEV QEMU_CMD_NET
+-
+ #define HUGETLBFS_MAGIC       0x958458f6
+=20
+ /*********** FROM hw/virtio/vhost-user.c *******************************=
+******/
+@@ -159,6 +159,22 @@ typedef struct TestServer {
+ static const char *tmpfs;
+ static const char *root;
+=20
++static char *get_qemu_cmd(TestServer *s, int mem, const char *mem_path,
++                          const char *chr_opts, const char *extra)
 +{
-+    int fd;
-+
-+    if (!backend->size) {
-+        error_setg(errp, "can't create backend with size 0");
-+        return;
++    if (qemu_memfd_check()) {
++        return g_strdup_printf(QEMU_CMD_MEMFD QEMU_CMD_CHR
++                               QEMU_CMD_NETDEV QEMU_CMD_NET "%s", mem, m=
+em,
++                               s->chr_name, s->socket_path,
++                               chr_opts, s->chr_name, extra);
++    } else {
++        return g_strdup_printf(QEMU_CMD_MEM QEMU_CMD_CHR
++                               QEMU_CMD_NETDEV QEMU_CMD_NET "%s", mem, m=
+em,
++                               mem_path, s->chr_name, s->socket_path,
++                               chr_opts, s->chr_name, extra);
 +    }
++}
 +
-+    if (!memory_region_size(&backend->mr)) {
-+        backend->force_prealloc =3D mem_prealloc;
-+        fd =3D qemu_memfd_create(TYPE_MEMORY_BACKEND_MEMFD,
-+                               backend->size,
-+                               F_SEAL_GROW | F_SEAL_SHRINK | F_SEAL_SEAL=
-,
-+                               true);
-+        if (fd =3D=3D -1) {
-+            error_setg(errp, "can't allocate memfd backend");
-+            return;
-+        }
-+        memory_region_init_ram_from_fd(&backend->mr, OBJECT(backend),
-+            object_get_canonical_path(OBJECT(backend)),
-+            backend->size, true, fd, errp);
+ static void init_virtio_dev(TestServer *s)
+ {
+     QVirtioPCIDevice *dev;
+@@ -477,14 +493,6 @@ static inline void test_server_connect(TestServer *s=
+erver)
+     test_server_create_chr(server, ",reconnect=3D1");
+ }
+=20
+-#define GET_QEMU_CMD(s)                                         \
+-    g_strdup_printf(QEMU_CMD, 512, 512, (root), (s)->chr_name,  \
+-                    (s)->socket_path, "", (s)->chr_name)
+-
+-#define GET_QEMU_CMDE(s, mem, chr_opts, extra, ...)                     =
+\
+-    g_strdup_printf(QEMU_CMD extra, (mem), (mem), (root), (s)->chr_name,=
+ \
+-                    (s)->socket_path, (chr_opts), (s)->chr_name, ##__VA_=
+ARGS__)
+-
+ static gboolean _test_server_free(TestServer *server)
+ {
+     int i;
+@@ -628,7 +636,7 @@ static void test_migrate(void)
+     char *uri =3D g_strdup_printf("%s%s", "unix:", dest->mig_path);
+     QTestState *global =3D global_qtest, *from, *to;
+     GSource *source;
+-    gchar *cmd;
++    gchar *cmd, *tmp;
+     QDict *rsp;
+     guint8 *log;
+     guint64 size;
+@@ -636,7 +644,7 @@ static void test_migrate(void)
+     test_server_listen(s);
+     test_server_listen(dest);
+=20
+-    cmd =3D GET_QEMU_CMDE(s, 2, "", "");
++    cmd =3D get_qemu_cmd(s, 2, root, "", "");
+     from =3D qtest_start(cmd);
+     g_free(cmd);
+=20
+@@ -645,7 +653,9 @@ static void test_migrate(void)
+     size =3D get_log_size(s);
+     g_assert_cmpint(size, =3D=3D, (2 * 1024 * 1024) / (VHOST_LOG_PAGE * =
+8));
+=20
+-    cmd =3D GET_QEMU_CMDE(dest, 2, "", " -incoming %s", uri);
++    tmp =3D g_strdup_printf(" -incoming %s", uri);
++    cmd =3D get_qemu_cmd(dest, 2, root, "", tmp);
++    g_free(tmp);
+     to =3D qtest_init(cmd);
+     g_free(cmd);
+=20
+@@ -751,7 +761,7 @@ static void test_reconnect_subprocess(void)
+     char *cmd;
+=20
+     g_thread_new("connect", connect_thread, s);
+-    cmd =3D GET_QEMU_CMDE(s, 2, ",server", "");
++    cmd =3D get_qemu_cmd(s, 2, root, ",server", "");
+     qtest_start(cmd);
+     g_free(cmd);
+=20
+@@ -787,7 +797,7 @@ static void test_connect_fail_subprocess(void)
+=20
+     s->test_fail =3D true;
+     g_thread_new("connect", connect_thread, s);
+-    cmd =3D GET_QEMU_CMDE(s, 2, ",server", "");
++    cmd =3D get_qemu_cmd(s, 2, root, ",server", "");
+     qtest_start(cmd);
+     g_free(cmd);
+=20
+@@ -815,7 +825,7 @@ static void test_flags_mismatch_subprocess(void)
+=20
+     s->test_flags =3D TEST_FLAGS_DISCONNECT;
+     g_thread_new("connect", connect_thread, s);
+-    cmd =3D GET_QEMU_CMDE(s, 2, ",server", "");
++    cmd =3D get_qemu_cmd(s, 2, root, ",server", "");
+     qtest_start(cmd);
+     g_free(cmd);
+=20
+@@ -883,11 +893,21 @@ static void test_multiqueue(void)
+     s->queues =3D queues;
+     test_server_listen(s);
+=20
+-    cmd =3D g_strdup_printf(QEMU_CMD_MEM QEMU_CMD_CHR QEMU_CMD_NETDEV ",=
+queues=3D%d "
+-                          "-device virtio-net-pci,netdev=3Dnet0,mq=3Don,=
+vectors=3D%d",
+-                          512, 512, root, s->chr_name,
+-                          s->socket_path, "", s->chr_name,
+-                          queues, queues * 2 + 2);
++    if (qemu_memfd_check()) {
++        cmd =3D g_strdup_printf(
++            QEMU_CMD_MEMFD QEMU_CMD_CHR QEMU_CMD_NETDEV ",queues=3D%d "
++            "-device virtio-net-pci,netdev=3Dnet0,mq=3Don,vectors=3D%d",
++            512, 512, s->chr_name,
++            s->socket_path, "", s->chr_name,
++            queues, queues * 2 + 2);
++    } else {
++        cmd =3D g_strdup_printf(
++            QEMU_CMD_MEM QEMU_CMD_CHR QEMU_CMD_NETDEV ",queues=3D%d "
++            "-device virtio-net-pci,netdev=3Dnet0,mq=3Don,vectors=3D%d",
++            512, 512, root, s->chr_name,
++            s->socket_path, "", s->chr_name,
++            queues, queues * 2 + 2);
 +    }
-+}
-+
-+static void
-+memfd_backend_class_init(ObjectClass *oc, void *data)
-+{
-+    HostMemoryBackendClass *bc =3D MEMORY_BACKEND_CLASS(oc);
-+
-+    bc->alloc =3D memfd_backend_memory_alloc;
-+}
-+
-+static const TypeInfo memfd_backend_info =3D {
-+    .name =3D TYPE_MEMORY_BACKEND_MEMFD,
-+    .parent =3D TYPE_MEMORY_BACKEND,
-+    .class_init =3D memfd_backend_class_init,
-+};
-+
-+static void register_types(void)
-+{
-+    type_register_static(&memfd_backend_info);
-+}
-+
-+type_init(register_types);
-diff --git a/backends/Makefile.objs b/backends/Makefile.objs
-index 0400799efd..67eeeba5fc 100644
---- a/backends/Makefile.objs
-+++ b/backends/Makefile.objs
-@@ -8,3 +8,5 @@ common-obj-$(CONFIG_LINUX) +=3D hostmem-file.o
+     qtest_start(cmd);
+     g_free(cmd);
 =20
- common-obj-y +=3D cryptodev.o
- common-obj-y +=3D cryptodev-builtin.o
-+
-+common-obj-$(CONFIG_LINUX) +=3D hostmem-memfd.o
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 30c4f9850f..6db76cf54f 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3974,6 +3974,17 @@ The @option{share} boolean option determines wheth=
-er the memory
- region is marked as private to QEMU, or shared. The latter allows
- a co-operating external process to access the QEMU memory region.
+@@ -953,7 +973,7 @@ int main(int argc, char **argv)
+     /* run the main loop thread so the chardev may operate */
+     thread =3D g_thread_new(NULL, thread_function, loop);
 =20
-+@item -object memory-backend-memfd,id=3D@var{id},size=3D@var{size}
-+
-+Creates an anonymous memory file backend object, which can be used to
-+share the memory with a co-operating external process. The memory is
-+allocated with memfd and sealing. (Linux only)
-+
-+The @option{id} parameter is a unique ID that will be used to
-+reference this memory region when configuring the @option{-numa}
-+argument. The @option{size} option provides the size of the memory
-+region, and accepts common suffixes, eg @option{500M}.
-+
- @item -object rng-random,id=3D@var{id},filename=3D@var{/dev/random}
+-    qemu_cmd =3D GET_QEMU_CMD(server);
++    qemu_cmd =3D get_qemu_cmd(server, 512, root, "", "");
 =20
- Creates a random number generator backend which obtains entropy from
+     s =3D qtest_start(qemu_cmd);
+     g_free(qemu_cmd);
 --=20
 2.13.1.395.gf7b71de06
