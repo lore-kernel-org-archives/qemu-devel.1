@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60032)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <JBeulich@suse.com>) id 1dNYrD-00038n-8m
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 02:11:16 -0400
+	(envelope-from <famz@redhat.com>) id 1dNYwO-0004OP-Um
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 02:16:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <JBeulich@suse.com>) id 1dNYrA-0001m8-3b
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 02:11:15 -0400
-Received: from prv-mh.provo.novell.com ([137.65.248.74]:44868)
+	(envelope-from <famz@redhat.com>) id 1dNYwL-00034x-MR
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 02:16:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50656)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <JBeulich@suse.com>) id 1dNYr9-0001lZ-RK
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 02:11:12 -0400
-Message-Id: <594A2A1C0200007800164F2A@prv-mh.provo.novell.com>
-Date: Wed, 21 Jun 2017 00:11:08 -0600
-From: "Jan Beulich" <JBeulich@suse.com>
-References: <59492D1C0200007800164AA3@prv-mh.provo.novell.com>
-	<59492D1C0200007800164AA3@prv-mh.provo.novell.com>
-	<alpine.DEB.2.10.1706201421210.12819@sstabellini-ThinkPad-X260>
-In-Reply-To: <alpine.DEB.2.10.1706201421210.12819@sstabellini-ThinkPad-X260>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dNYwL-00034j-Gg
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 02:16:33 -0400
+Date: Wed, 21 Jun 2017 14:16:28 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170621061628.GB15212@lemon.lan>
+References: <20170602185630.5059-1-f4bug@amsat.org> <87podyu01e.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-Subject: Re: [Qemu-devel] [PATCH] xen/disk: don't leak stack data via
- response ring
+In-Reply-To: <87podyu01e.fsf@linaro.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 00/24] docker/shippable: cross-build
+ mipsel and powerpc targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,79 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Julien Grall <julien.grall@arm.com>, xen-devel <xen-devel@lists.xenproject.org>, qemu-devel@nongnu.org
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
->>> On 20.06.17 at 23:48, <sstabellini@kernel.org> wrote:
-> On Tue, 20 Jun 2017, Jan Beulich wrote:
->> @@ -36,13 +33,7 @@ struct blkif_x86_32_request_discard {
->>      blkif_sector_t sector_number;    /* start sector idx on disk (r/w =
-only)  */
->>      uint64_t       nr_sectors;       /* # of contiguous sectors to =
-discard   */
->>  };
->> -struct blkif_x86_32_response {
->> -    uint64_t        id;              /* copied from request */
->> -    uint8_t         operation;       /* copied from request */
->> -    int16_t         status;          /* BLKIF_RSP_???       */
->> -};
->>  typedef struct blkif_x86_32_request blkif_x86_32_request_t;
->> -typedef struct blkif_x86_32_response blkif_x86_32_response_t;
->>  #pragma pack(pop)
->> =20
->>  /* x86_64 protocol version */
->> @@ -62,20 +53,14 @@ struct blkif_x86_64_request_discard {
->>      blkif_sector_t sector_number;    /* start sector idx on disk (r/w =
-only)  */
->>      uint64_t       nr_sectors;       /* # of contiguous sectors to =
-discard   */
->>  };
->> -struct blkif_x86_64_response {
->> -    uint64_t       __attribute__((__aligned__(8))) id;
->> -    uint8_t         operation;       /* copied from request */
->> -    int16_t         status;          /* BLKIF_RSP_???       */
->> -};
->>
->>  typedef struct blkif_x86_64_request blkif_x86_64_request_t;
->> -typedef struct blkif_x86_64_response blkif_x86_64_response_t;
->> =20
->>  DEFINE_RING_TYPES(blkif_common, struct blkif_common_request,
->> -                  struct blkif_common_response);
->> +                  struct blkif_response);
->>  DEFINE_RING_TYPES(blkif_x86_32, struct blkif_x86_32_request,
->> -                  struct blkif_x86_32_response);
->> +                  struct blkif_response QEMU_PACKED);
+On Tue, 06/20 16:54, Alex Benn=E9e wrote:
 >=20
-> In my test, the previous sizes and alignments of the response structs
-> were (on both x86_32 and x86_64):
+> Philippe Mathieu-Daud=E9 <f4bug@amsat.org> writes:
 >=20
-> sizeof(blkif_x86_32_response)=3D12   sizeof(blkif_x86_64_response)=3D16
-> align(blkif_x86_32_response)=3D4     align(blkif_x86_64_response)=3D8
+> > This patchset add 2 more architectures to the cross-build farm.
+> >
+> > There is still some issue trying to cross-build mips64el-softmmu, it =
+seems the
+> > cross tools use the system outdated libfdt instead of the one checkou=
+ted in the
+> > dtc submodule. I disabled this target for now.
+> >
+> > The branch https://github.com/philmd/qemu/tree/docker_shippable_v5 ca=
+n be
+> > checked at Shippable:
+> >   https://app.shippable.com/github/philmd/qemu/status/dashboard
+> >
+> > Each arch builds in around ~9min. Using Shippable free open source pr=
+ojects
+> > service, the 5 jobs take ~38-44min in total.
 >=20
-> While with these changes are now, when compiled on x86_64:
-> sizeof(blkif_x86_32_response)=3D11   sizeof(blkif_x86_64_response)=3D16
-> align(blkif_x86_32_response)=3D1     align(blkif_x86_64_response)=3D8
+> Fam,
 >=20
-> when compiled on x86_32:
-> sizeof(blkif_x86_32_response)=3D11   sizeof(blkif_x86_64_response)=3D12
-> align(blkif_x86_32_response)=3D1     align(blkif_x86_64_response)=3D4
->=20
-> Did I do my tests wrong?
->=20
-> QEMU_PACKED is not the same as #pragma pack(push, 4). In fact, it is the
-> same as #pragma pack(push, 1), causing the struct to be densely packed,
-> leaving no padding whatsever.
->=20
-> In addition, without __attribute__((__aligned__(8))),
-> blkif_x86_64_response won't be 8 bytes aligned when built on x86_32.
->=20
-> Am I missing something?
+> Are you picking this up or shall I roll a pull-req?
 
-Well, you're mixing attribute application upon structure
-declaration with attribute application upon structure use. It's
-the latter here, and hence the attribute doesn't affect
-structure layout at all. All it does is avoid the _containing_
-32-bit union to become 8-byte aligned (and tail padding to be
-inserted).
+Please do, thanks! I am occupied by something else for at least the rest =
+of this
+week (and my apologies for not responding to this series for days).
 
-Jan
+Fam
