@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dNf6G-0007f9-Ni
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:51:14 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dNf6O-0007ma-0J
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:51:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dNf6F-0004vU-7b
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:51:12 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dNf6J-0004y1-1P
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:51:20 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 21 Jun 2017 14:50:26 +0200
-Message-Id: <20170621125047.30294-5-mreitz@redhat.com>
+Date: Wed, 21 Jun 2017 14:50:28 +0200
+Message-Id: <20170621125047.30294-7-mreitz@redhat.com>
 In-Reply-To: <20170621125047.30294-1-mreitz@redhat.com>
 References: <20170621125047.30294-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 04/25] block: Respect backing bs in
- bdrv_refresh_filename
+Subject: [Qemu-devel] [PATCH v5 06/25] block:
+ bdrv_get_full_backing_filename_from_...'s ret. val.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,146 +23,125 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>
 
-Basically, bdrv_refresh_filename() should respect all children of a
-BlockDriverState. However, generally those children are driver-specific,
-so this function cannot handle the general case. On the other hand,
-there are only few drivers which use other children than @file and
-@backing (that being vmdk, quorum, and blkverify).
-
-Most block drivers only use @file and/or @backing (if they use any
-children at all). Both can be implemented directly in
-bdrv_refresh_filename.
-
-The user overriding the file's filename is already handled, however, the
-user overriding the backing file is not. If this is done, opening the
-BDS with the plain filename of its file will not be correct, so we may
-not set bs->exact_filename in that case.
-
-iotest 051 contains test cases for overwriting the backing file, and so
-its output changes with this patch applied (which I consider a good
-thing).
+Make bdrv_get_full_backing_filename_from_filename() return an allocated
+string instead of placing the result in a caller-provided buffer.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block.c                       | 12 +++++++++++-
- tests/qemu-iotests/051.out    |  8 ++++----
- tests/qemu-iotests/051.pc.out |  8 ++++----
- 3 files changed, 19 insertions(+), 9 deletions(-)
+ include/block/block.h |  7 +++----
+ block.c               | 32 +++++++++++++++++++-------------
+ block/vmdk.c          |  8 +++-----
+ 3 files changed, 25 insertions(+), 22 deletions(-)
 
+diff --git a/include/block/block.h b/include/block/block.h
+index 9f89fa7..e9df983 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -494,10 +494,9 @@ void bdrv_get_backing_filename(BlockDriverState *bs,
+                                char *filename, int filename_size);
+ void bdrv_get_full_backing_filename(BlockDriverState *bs,
+                                     char *dest, size_t sz, Error **errp);
+-void bdrv_get_full_backing_filename_from_filename(const char *backed,
+-                                                  const char *backing,
+-                                                  char *dest, size_t sz,
+-                                                  Error **errp);
++char *bdrv_get_full_backing_filename_from_filename(const char *backed,
++                                                   const char *backing,
++                                                   Error **errp);
+ 
+ int path_has_protocol(const char *path);
+ int path_is_absolute(const char *path);
 diff --git a/block.c b/block.c
-index 2addec0..fd10a16 100644
+index 80e4805..b70a9a8 100644
 --- a/block.c
 +++ b/block.c
-@@ -4839,6 +4839,7 @@ void bdrv_refresh_filename(BlockDriverState *bs)
+@@ -287,20 +287,20 @@ int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
+     return 0;
+ }
  
-         opts = qdict_new();
-         has_open_options = append_open_options(opts, bs);
-+        has_open_options |= bs->backing_overridden;
+-void bdrv_get_full_backing_filename_from_filename(const char *backed,
+-                                                  const char *backing,
+-                                                  char *dest, size_t sz,
+-                                                  Error **errp)
++char *bdrv_get_full_backing_filename_from_filename(const char *backed,
++                                                   const char *backing,
++                                                   Error **errp)
+ {
+     if (backing[0] == '\0' || path_has_protocol(backing) ||
+         path_is_absolute(backing))
+     {
+-        pstrcpy(dest, sz, backing);
++        return g_strdup(backing);
+     } else if (backed[0] == '\0' || strstart(backed, "json:", NULL)) {
+         error_setg(errp, "Cannot use relative backing file names for '%s'",
+                    backed);
++        return NULL;
+     } else {
+-        path_combine_deprecated(dest, sz, backed, backing);
++        return path_combine(backed, backing);
+     }
+ }
  
-         /* If no specific options have been given for this BDS, the filename of
-          * the underlying file should suffice for this one as well */
-@@ -4850,11 +4851,20 @@ void bdrv_refresh_filename(BlockDriverState *bs)
-          * file BDS. The full options QDict of that file BDS should somehow
-          * contain a representation of the filename, therefore the following
-          * suffices without querying the (exact_)filename of this BDS. */
--        if (bs->file->bs->full_open_options) {
-+        if (bs->file->bs->full_open_options &&
-+            (!bs->backing || bs->backing->bs->full_open_options))
-+        {
-             qdict_put_str(opts, "driver", drv->format_name);
-             QINCREF(bs->file->bs->full_open_options);
-             qdict_put(opts, "file", bs->file->bs->full_open_options);
+@@ -308,9 +308,15 @@ void bdrv_get_full_backing_filename(BlockDriverState *bs, char *dest, size_t sz,
+                                     Error **errp)
+ {
+     char *backed = bs->exact_filename[0] ? bs->exact_filename : bs->filename;
++    char *full_name;
  
-+            if (bs->backing) {
-+                QINCREF(bs->backing->bs->full_open_options);
-+                qdict_put(opts, "backing", bs->backing->bs->full_open_options);
-+            } else if (bs->backing_overridden && !bs->backing) {
-+                qdict_put(opts, "backing", qstring_new());
-+            }
-+
-             bs->full_open_options = opts;
-         } else {
-             QDECREF(opts);
-diff --git a/tests/qemu-iotests/051.out b/tests/qemu-iotests/051.out
-index 4d3b1ff..d38b39f 100644
---- a/tests/qemu-iotests/051.out
-+++ b/tests/qemu-iotests/051.out
-@@ -59,7 +59,7 @@ QEMU X.Y.Z monitor - type 'help' for more information
- Testing: -drive file=TEST_DIR/t.qcow2,driver=qcow2,backing.file.filename=TEST_DIR/t.qcow2.orig,if=none,id=drive0 -nodefaults
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
--drive0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+drive0 (NODE_NAME): json:{"backing": {"driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/t.qcow2.orig"}}, "driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/t.qcow2"}} (qcow2)
-     Removable device: not locked, tray closed
-     Cache mode:       writeback
-     Backing file:     TEST_DIR/t.qcow2.orig (chain depth: 1)
-@@ -148,7 +148,7 @@ QEMU_PROG: -drive driver=null-co,cache=invalid_value: invalid cache option
- Testing: -drive file=TEST_DIR/t.qcow2,cache=writeback,backing.file.filename=TEST_DIR/t.qcow2.base,backing.cache.no-flush=on,backing.node-name=backing,backing.file.node-name=backing-file,file.node-name=file,if=none,id=drive0 -nodefaults
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
--drive0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+drive0 (NODE_NAME): json:{"backing": {"driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/t.qcow2.base"}}, "driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/t.qcow2"}} (qcow2)
-     Removable device: not locked, tray closed
-     Cache mode:       writeback
-     Backing file:     TEST_DIR/t.qcow2.base (chain depth: 1)
-@@ -168,7 +168,7 @@ backing-file: TEST_DIR/t.qcow2.base (file, read-only)
- Testing: -drive file=TEST_DIR/t.qcow2,cache=writethrough,backing.file.filename=TEST_DIR/t.qcow2.base,backing.cache.no-flush=on,backing.node-name=backing,backing.file.node-name=backing-file,file.node-name=file,if=none,id=drive0 -nodefaults
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
--drive0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+drive0 (NODE_NAME): json:{"backing": {"driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/t.qcow2.base"}}, "driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/t.qcow2"}} (qcow2)
-     Removable device: not locked, tray closed
-     Cache mode:       writethrough
-     Backing file:     TEST_DIR/t.qcow2.base (chain depth: 1)
-@@ -188,7 +188,7 @@ backing-file: TEST_DIR/t.qcow2.base (file, read-only)
- Testing: -drive file=TEST_DIR/t.qcow2,cache=unsafe,backing.file.filename=TEST_DIR/t.qcow2.base,backing.cache.no-flush=on,backing.node-name=backing,backing.file.node-name=backing-file,file.node-name=file,if=none,id=drive0 -nodefaults
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
--drive0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+drive0 (NODE_NAME): json:{"backing": {"driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/t.qcow2.base"}}, "driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/t.qcow2"}} (qcow2)
-     Removable device: not locked, tray closed
-     Cache mode:       writeback, ignore flushes
-     Backing file:     TEST_DIR/t.qcow2.base (chain depth: 1)
-diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.out
-index 76d7205..9c4b5ea 100644
---- a/tests/qemu-iotests/051.pc.out
-+++ b/tests/qemu-iotests/051.pc.out
-@@ -59,7 +59,7 @@ QEMU X.Y.Z monitor - type 'help' for more information
- Testing: -drive file=TEST_DIR/t.qcow2,driver=qcow2,backing.file.filename=TEST_DIR/t.qcow2.orig,if=none,id=drive0 -nodefaults
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
--drive0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+drive0 (NODE_NAME): json:{"backing": {"driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/t.qcow2.orig"}}, "driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/t.qcow2"}} (qcow2)
-     Removable device: not locked, tray closed
-     Cache mode:       writeback
-     Backing file:     TEST_DIR/t.qcow2.orig (chain depth: 1)
-@@ -246,7 +246,7 @@ QEMU_PROG: -drive driver=null-co,cache=invalid_value: invalid cache option
- Testing: -drive file=TEST_DIR/t.qcow2,cache=writeback,backing.file.filename=TEST_DIR/t.qcow2.base,backing.cache.no-flush=on,backing.node-name=backing,backing.file.node-name=backing-file,file.node-name=file,if=none,id=drive0 -nodefaults
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
--drive0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+drive0 (NODE_NAME): json:{"backing": {"driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/t.qcow2.base"}}, "driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/t.qcow2"}} (qcow2)
-     Removable device: not locked, tray closed
-     Cache mode:       writeback
-     Backing file:     TEST_DIR/t.qcow2.base (chain depth: 1)
-@@ -266,7 +266,7 @@ backing-file: TEST_DIR/t.qcow2.base (file, read-only)
- Testing: -drive file=TEST_DIR/t.qcow2,cache=writethrough,backing.file.filename=TEST_DIR/t.qcow2.base,backing.cache.no-flush=on,backing.node-name=backing,backing.file.node-name=backing-file,file.node-name=file,if=none,id=drive0 -nodefaults
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
--drive0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+drive0 (NODE_NAME): json:{"backing": {"driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/t.qcow2.base"}}, "driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/t.qcow2"}} (qcow2)
-     Removable device: not locked, tray closed
-     Cache mode:       writethrough
-     Backing file:     TEST_DIR/t.qcow2.base (chain depth: 1)
-@@ -286,7 +286,7 @@ backing-file: TEST_DIR/t.qcow2.base (file, read-only)
- Testing: -drive file=TEST_DIR/t.qcow2,cache=unsafe,backing.file.filename=TEST_DIR/t.qcow2.base,backing.cache.no-flush=on,backing.node-name=backing,backing.file.node-name=backing-file,file.node-name=file,if=none,id=drive0 -nodefaults
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
--drive0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+drive0 (NODE_NAME): json:{"backing": {"driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/t.qcow2.base"}}, "driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/t.qcow2"}} (qcow2)
-     Removable device: not locked, tray closed
-     Cache mode:       writeback, ignore flushes
-     Backing file:     TEST_DIR/t.qcow2.base (chain depth: 1)
+-    bdrv_get_full_backing_filename_from_filename(backed, bs->backing_file,
+-                                                 dest, sz, errp);
++    full_name = bdrv_get_full_backing_filename_from_filename(backed,
++                                                             bs->backing_file,
++                                                             errp);
++    if (full_name) {
++        pstrcpy(dest, sz, full_name);
++        g_free(full_name);
++    }
+ }
+ 
+ void bdrv_register(BlockDriver *bdrv)
+@@ -4431,16 +4437,16 @@ void bdrv_img_create(const char *filename, const char *fmt,
+     if (size == -1) {
+         if (backing_file) {
+             BlockDriverState *bs;
+-            char *full_backing = g_new0(char, PATH_MAX);
++            char *full_backing;
+             int64_t size;
+             int back_flags;
+             QDict *backing_options = NULL;
+ 
+-            bdrv_get_full_backing_filename_from_filename(filename, backing_file,
+-                                                         full_backing, PATH_MAX,
+-                                                         &local_err);
++            full_backing =
++                bdrv_get_full_backing_filename_from_filename(filename,
++                                                             backing_file,
++                                                             &local_err);
+             if (local_err) {
+-                g_free(full_backing);
+                 goto out;
+             }
+ 
+diff --git a/block/vmdk.c b/block/vmdk.c
+index 4389a69..4e92ce4 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -1983,12 +1983,10 @@ static int vmdk_create(const char *filename, QemuOpts *opts, Error **errp)
+     }
+     if (backing_file) {
+         BlockBackend *blk;
+-        char *full_backing = g_new0(char, PATH_MAX);
+-        bdrv_get_full_backing_filename_from_filename(filename, backing_file,
+-                                                     full_backing, PATH_MAX,
+-                                                     &local_err);
++        char *full_backing =
++            bdrv_get_full_backing_filename_from_filename(filename, backing_file,
++                                                         &local_err);
+         if (local_err) {
+-            g_free(full_backing);
+             error_propagate(errp, local_err);
+             ret = -ENOENT;
+             goto exit;
 -- 
 2.9.4
