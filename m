@@ -1,15 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52803)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dNfz8-0005ud-4O
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:47:55 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dNfz9-0005vv-O4
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:47:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dNfz7-0006Ki-EL
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:47:54 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dNfz8-0006LD-H4
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:47:55 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 21 Jun 2017 15:47:40 +0200
-Message-Id: <20170621134744.8047-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/4] block: Don't compare strings in
- bdrv_reopen_prepare()
+Date: Wed, 21 Jun 2017 15:47:41 +0200
+Message-Id: <20170621134744.8047-2-mreitz@redhat.com>
+In-Reply-To: <20170621134744.8047-1-mreitz@redhat.com>
+References: <20170621134744.8047-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/4] qapi/qnull: Add own header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,61 +22,119 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-bdrv_reopen_prepare() assumes that all BDS options are strings, which is
-not necessarily correct. This series introduces a new qobject_is_equal()
-function which can be used to test whether any options have changed,
-independently of their type.
-
-
-v2:
-- Add comments detailing when QDicts and QLists are considered equal
-  [Kevin]
-
-
-git-backport-diff against v1:
-
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream patch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-
-001/4:[----] [--] 'qapi/qnull: Add own header'
-002/4:[0009] [FC] 'qapi: Add qobject_is_equal()'
-003/4:[----] [--] 'block: qobject_is_equal() in bdrv_reopen_prepare()'
-004/4:[----] [--] 'iotests: Add test for non-string option reopening'
-
-
-Max Reitz (4):
-  qapi/qnull: Add own header
-  qapi: Add qobject_is_equal()
-  block: qobject_is_equal() in bdrv_reopen_prepare()
-  iotests: Add test for non-string option reopening
-
- include/qapi/qmp/qbool.h   |  1 +
- include/qapi/qmp/qdict.h   |  1 +
- include/qapi/qmp/qfloat.h  |  1 +
- include/qapi/qmp/qint.h    |  1 +
- include/qapi/qmp/qlist.h   |  1 +
- include/qapi/qmp/qnull.h   | 28 ++++++++++++++++++++++++++++
- include/qapi/qmp/qobject.h | 17 +++++++++--------
- include/qapi/qmp/qstring.h |  1 +
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ include/qapi/qmp/qnull.h   | 26 ++++++++++++++++++++++++++
+ include/qapi/qmp/qobject.h |  8 --------
  include/qapi/qmp/types.h   |  1 +
- block.c                    | 15 +++------------
- qobject/qbool.c            |  8 ++++++++
- qobject/qdict.c            | 28 ++++++++++++++++++++++++++++
- qobject/qfloat.c           |  8 ++++++++
- qobject/qint.c             |  8 ++++++++
- qobject/qlist.c            | 30 ++++++++++++++++++++++++++++++
- qobject/qnull.c            |  6 ++++++
- qobject/qobject.c          | 30 ++++++++++++++++++++++++++++++
- qobject/qstring.c          |  9 +++++++++
+ qobject/qnull.c            |  1 +
  target/i386/cpu.c          |  6 +-----
  tests/check-qnull.c        |  2 +-
- tests/qemu-iotests/133     |  9 +++++++++
- tests/qemu-iotests/133.out |  5 +++++
- 22 files changed, 190 insertions(+), 26 deletions(-)
+ 6 files changed, 30 insertions(+), 14 deletions(-)
  create mode 100644 include/qapi/qmp/qnull.h
 
+diff --git a/include/qapi/qmp/qnull.h b/include/qapi/qmp/qnull.h
+new file mode 100644
+index 0000000..69555ac
+--- /dev/null
++++ b/include/qapi/qmp/qnull.h
+@@ -0,0 +1,26 @@
++/*
++ * QNull Module
++ *
++ * Copyright (C) 2009, 2017 Red Hat Inc.
++ *
++ * Authors:
++ *  Luiz Capitulino <lcapitulino@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
++ * See the COPYING.LIB file in the top-level directory.
++ */
++
++#ifndef QNULL_H
++#define QNULL_H
++
++#include "qapi/qmp/qobject.h"
++
++extern QObject qnull_;
++
++static inline QObject *qnull(void)
++{
++    qobject_incref(&qnull_);
++    return &qnull_;
++}
++
++#endif /* QNULL_H */
+diff --git a/include/qapi/qmp/qobject.h b/include/qapi/qmp/qobject.h
+index b8ddbca..ef1d1a9 100644
+--- a/include/qapi/qmp/qobject.h
++++ b/include/qapi/qmp/qobject.h
+@@ -93,12 +93,4 @@ static inline QType qobject_type(const QObject *obj)
+     return obj->type;
+ }
+ 
+-extern QObject qnull_;
+-
+-static inline QObject *qnull(void)
+-{
+-    qobject_incref(&qnull_);
+-    return &qnull_;
+-}
+-
+ #endif /* QOBJECT_H */
+diff --git a/include/qapi/qmp/types.h b/include/qapi/qmp/types.h
+index 27cfbd8..4c87182 100644
+--- a/include/qapi/qmp/types.h
++++ b/include/qapi/qmp/types.h
+@@ -20,5 +20,6 @@
+ #include "qapi/qmp/qstring.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qlist.h"
++#include "qapi/qmp/qnull.h"
+ 
+ #endif /* QAPI_QMP_TYPES_H */
+diff --git a/qobject/qnull.c b/qobject/qnull.c
+index c124d05..b3cc85e 100644
+--- a/qobject/qnull.c
++++ b/qobject/qnull.c
+@@ -13,6 +13,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "qapi/qmp/qobject.h"
++#include "qapi/qmp/qnull.h"
+ 
+ QObject qnull_ = {
+     .type = QTYPE_QNULL,
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index b2b1d20..f118a54 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -29,11 +29,7 @@
+ #include "qemu/option.h"
+ #include "qemu/config-file.h"
+ #include "qapi/qmp/qerror.h"
+-#include "qapi/qmp/qstring.h"
+-#include "qapi/qmp/qdict.h"
+-#include "qapi/qmp/qbool.h"
+-#include "qapi/qmp/qint.h"
+-#include "qapi/qmp/qfloat.h"
++#include "qapi/qmp/types.h"
+ 
+ #include "qapi-types.h"
+ #include "qapi-visit.h"
+diff --git a/tests/check-qnull.c b/tests/check-qnull.c
+index 8dd1c96..4a67b9a 100644
+--- a/tests/check-qnull.c
++++ b/tests/check-qnull.c
+@@ -8,7 +8,7 @@
+  */
+ #include "qemu/osdep.h"
+ 
+-#include "qapi/qmp/qobject.h"
++#include "qapi/qmp/qnull.h"
+ #include "qemu-common.h"
+ #include "qapi/qobject-input-visitor.h"
+ #include "qapi/qobject-output-visitor.h"
 -- 
 2.9.4
