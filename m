@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dNheN-0007vj-H4
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:34:40 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dNhlm-0006D1-P8
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:42:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dNheI-0008Qa-GN
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:34:35 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:43174 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dNheI-0008Ow-4Y
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:34:30 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 21 Jun 2017 18:34:21 +0300
-Message-Id: <20170621153424.16690-4-vsementsov@virtuozzo.com>
-In-Reply-To: <20170621153424.16690-1-vsementsov@virtuozzo.com>
-References: <20170621153424.16690-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 3/6] nbd/server: add errp to nbd_send_reply()
+	(envelope-from <alex.bennee@linaro.org>) id 1dNhlj-0002pv-KI
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:42:14 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:33512)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dNhlj-0002pi-Cy
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:42:11 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id r103so140131180wrb.0
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 08:42:11 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Wed, 21 Jun 2017 16:42:36 +0100
+Message-Id: <20170621154244.28309-3-alex.bennee@linaro.org>
+In-Reply-To: <20170621154244.28309-1-alex.bennee@linaro.org>
+References: <20170621154244.28309-1-alex.bennee@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RISU PATCH v6 02/10] build-all-archs: support cross
+ building via docker
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,72 +30,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, eblake@redhat.com, pbonzini@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+If we want to link to any other libraries we might find using simple
+cross toolchains doesn't work so well. One way around this is to use a
+dockerised cross-toolchain which then won't clash with your host
+system. If the user specifies --use-docker the obvious will be done.
+
+By default we use the QEMU projects qemu:debian-FOO-cross images as
+RISU hackers are likely to be QEMU developers too. However any docker
+tag can be passed on the command line.
+
+If none of the docker images have usable compilers we fall back to
+checking the host path.
+
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+
 ---
- nbd/server.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+v5
+  - swapped with --static patch so this can be dropped if desired
+---
+ build-all-archs | 46 +++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 39 insertions(+), 7 deletions(-)
 
-diff --git a/nbd/server.c b/nbd/server.c
-index fa493602dd..0671ebc50a 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -693,7 +693,7 @@ static int nbd_receive_request(QIOChannel *ioc, NBDRequest *request,
-     return 0;
+diff --git a/build-all-archs b/build-all-archs
+index 581a1b4..63918e5 100755
+--- a/build-all-archs
++++ b/build-all-archs
+@@ -11,9 +11,6 @@
+ # Contributors:
+ #     Peter Maydell (Linaro) - initial implementation
+ 
+-# So we notice risugen failing even though it's in a pipeline
+-set -o pipefail
+-
+ # Simple usage
+ usage() {
+     cat <<-EOF
+@@ -21,7 +18,10 @@ usage() {
+ 
+         Options include:
+             --static               build a static binary
++            --use-docker[=tags]    use docker cross compile
+ 
++        If specifying docker the default will be to use the any
++        qemu:debian-FOO-cross targets available on your system.
+ EOF
+     exit 1
+ }
+@@ -37,6 +37,14 @@ while [[ "$1" = -* ]]; do
+         --static)
+             CONF="--static"
+             ;;
++        --use-docker)
++            if [ -z "$arg" ]; then
++                default_tags=$(docker images qemu --format "{{.Repository}}:{{.Tag}}" | grep "\(arm\|power\).*cross$")
++                docker_tags=$(echo $default_tags | sed 's/\n/\s/g' )
++            else
++                docker_tags="$arg"
++            fi
++            ;;
+         --help)
+             usage
+             ;;
+@@ -48,10 +56,24 @@ done
+ 
+ # Debian stretch and Ubuntu Xenial have cross compiler packages for
+ # all of these:
+-# gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu gcc-m68k-linux-gnu
+-# gcc-powerpc64le-linux-gnu gcc-powerpc64-linux-gnu
++#   gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu gcc-m68k-linux-gnu
++#   gcc-powerpc64le-linux-gnu gcc-powerpc64-linux-gnu
++# If docker is enabled we just brute force the various images until we
++# can set the one that has a workable cross compiler.
++
++DOCKER_RUN="docker run --rm -t -u $(id -u) -v $(pwd):$(pwd) -w $(pwd)"
+ 
+ program_exists() {
++    if [ ! -z "$docker_tags" ]; then
++        use_docker_tag=""
++        for tag in $docker_tags; do
++            if ${DOCKER_RUN} ${tag} /bin/bash -c "command -v $1 >/dev/null"; then
++                use_docker_tag=$tag
++                return
++            fi
++        done
++    fi
++
+     command -v "$1" >/dev/null 2>&1
  }
  
--static int nbd_send_reply(QIOChannel *ioc, NBDReply *reply)
-+static int nbd_send_reply(QIOChannel *ioc, NBDReply *reply, Error **errp)
- {
-     uint8_t buf[NBD_REPLY_SIZE];
+@@ -62,19 +84,29 @@ for triplet in aarch64-linux-gnu arm-linux-gnueabihf m68k-linux-gnu \
+     if ! program_exists "${triplet}-gcc"; then
+         echo "Skipping ${triplet}: no compiler found"
+         continue
++    else
++        echo "Building ${triplet} on ${use_docker_tag:-host}..."
+     fi
  
-@@ -712,7 +712,7 @@ static int nbd_send_reply(QIOChannel *ioc, NBDReply *reply)
-     stl_be_p(buf + 4, reply->error);
-     stq_be_p(buf + 8, reply->handle);
+     # Do a complete rebuild from scratch, because it's cheap enough.
+     rm -rf build/${triplet}
+     mkdir -p build/${triplet}
  
--    return nbd_write(ioc, buf, sizeof(buf), NULL);
-+    return nbd_write(ioc, buf, sizeof(buf), errp);
- }
+-    (cd build/${triplet} && CROSS_PREFIX="${triplet}-"  ../../configure ${CONF})
+-    make -C build/${triplet} EXTRA_CFLAGS=-Werror
++    CONFIGURE="cd build/${triplet} && CROSS_PREFIX="${triplet}-"  ../../configure ${CONF}"
++    MAKE="make -C build/${triplet} EXTRA_CFLAGS=-Werror"
  
- #define MAX_NBD_REQUESTS 16
-@@ -999,7 +999,8 @@ void nbd_export_close_all(void)
-     }
- }
++    if [ -z "$use_docker_tag" ]; then
++        /bin/bash -c "${CONFIGURE}"
++        ${MAKE}
++    else
++        ${DOCKER_RUN} $use_docker_tag /bin/bash -c "${CONFIGURE}"
++        ${DOCKER_RUN} $use_docker_tag /bin/bash -c "${MAKE}"
++    fi
+ done
  
--static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len)
-+static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len,
-+                             Error **errp)
- {
-     NBDClient *client = req->client;
-     int ret;
-@@ -1009,12 +1010,12 @@ static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len)
-     client->send_coroutine = qemu_coroutine_self();
+ # Now run risugen for all architectures
+ mkdir -p build/risuout
++set -o pipefail # detect failures in pipeline
  
-     if (!len) {
--        ret = nbd_send_reply(client->ioc, reply);
-+        ret = nbd_send_reply(client->ioc, reply, errp);
-     } else {
-         qio_channel_set_cork(client->ioc, true);
--        ret = nbd_send_reply(client->ioc, reply);
-+        ret = nbd_send_reply(client->ioc, reply, errp);
-         if (ret == 0) {
--            ret = nbd_write(client->ioc, req->data, len, NULL);
-+            ret = nbd_write(client->ioc, req->data, len, errp);
-             if (ret < 0) {
-                 ret = -EIO;
-             }
-@@ -1266,8 +1267,8 @@ reply:
-         local_err = NULL;
-     }
- 
--    if (nbd_co_send_reply(req, &reply, reply_data_len) < 0) {
--        error_setg(&local_err, "Failed to send reply");
-+    if (nbd_co_send_reply(req, &reply, reply_data_len, &local_err) < 0) {
-+        error_prepend(&local_err, "Failed to send reply: ");
-         goto disconnect;
-     }
- 
+ for f in *.risu; do
+     echo "Running risugen on $f..."
 -- 
-2.11.1
+2.13.0
