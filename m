@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59652)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <willx8@gmail.com>) id 1dNgWG-0004UK-Jy
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:22:09 -0400
+	(envelope-from <berto@igalia.com>) id 1dNgWd-0005Dl-6f
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:22:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <willx8@gmail.com>) id 1dNgWC-0003Wv-LM
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:22:08 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:36313)
+	(envelope-from <berto@igalia.com>) id 1dNgWZ-0003af-7o
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:22:31 -0400
+Received: from fanzine.igalia.com ([91.117.99.155]:44047)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <willx8@gmail.com>) id 1dNgWC-0003Wc-D9
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:22:04 -0400
-Received: by mail-pf0-x243.google.com with SMTP id y7so30870971pfd.3
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 07:22:02 -0700 (PDT)
-Date: Wed, 21 Jun 2017 22:21:56 +0800
-From: Wu Xiang <willx8@gmail.com>
-Message-ID: <20170621142152.GA18094@wxdeubuntu.ipads-lab.se.sjtu.edu.cn>
+	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1dNgWY-0003Te-QU
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:22:27 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170621154309.0c4ff240@bahia.lab.toulouse-stg.fr.ibm.com>
+References: <1497877896-35700-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1497877896-35700-2-git-send-email-pradeep.jagadeesh@huawei.com>
+	<w51shitmrdw.fsf@maestria.local.igalia.com>
+	<20170621154309.0c4ff240@bahia.lab.toulouse-stg.fr.ibm.com>
+Date: Wed, 21 Jun 2017 16:21:36 +0200
+Message-ID: <w51podxmnf3.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] [PATCH] target/i386: fix interrupt CPL error when
- using ist in x86-64
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 1/5] throttle: factor out duplicate code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,54 +28,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, eric blake <eblake@redhat.com>, Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-In do_interrupt64(), when interrupt stack table(ist) is enabled
-and the the target code segment is conforming(e2 & DESC_C_MASK), the
-old implementation always set new CPL to 0, and SS.RPL to 0.
+On Wed 21 Jun 2017 03:43:09 PM CEST, Greg Kurz wrote:
+> On Wed, 21 Jun 2017 14:55:55 +0200
+> Alberto Garcia <berto@igalia.com> wrote:
+>
+>> On Mon 19 Jun 2017 03:11:32 PM CEST, Pradeep Jagadeesh wrote:
+>> > This patch factor out the duplicate throttle code that was present in
+>> > block and fsdev devices.
+>> >
+>> > Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>  
+>> 
+>> Reviewed-by: Alberto Garcia <berto@igalia.com>
+>
+> Thanks ! Is it okay if this goes through my 9P tree ?
 
-This is incorrect for when CPL3 code access a CPL0 conforming code
-segment, the CPL should remain unchanged. Otherwise higher privileged
-code can be compromised.
+No problem from my side.
 
-The patch fix this for always set dpl = cpl when the target code segment
-is conforming, and modify the last parameter `flags`, which contains
-correct new CPL, in cpu_x86_load_seg_cache().
-
-Signed-off-by: Wu Xiang <willx8@gmail.com>
----
- target/i386/seg_helper.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/target/i386/seg_helper.c b/target/i386/seg_helper.c
-index 0374031..9af69c2 100644
---- a/target/i386/seg_helper.c
-+++ b/target/i386/seg_helper.c
-@@ -931,12 +931,14 @@ static void do_interrupt64(CPUX86State *env, int intno, int is_int,
-         }
-         new_stack = 0;
-         esp = env->regs[R_ESP];
--        dpl = cpl;
-     } else {
-         raise_exception_err(env, EXCP0D_GPF, selector & 0xfffc);
-         new_stack = 0; /* avoid warning */
-         esp = 0; /* avoid warning */
-     }
-+    if (e2 & DESC_C_MASK) {
-+        dpl = cpl;
-+    }
-     esp &= ~0xfLL; /* align stack */
- 
-     PUSHQ(esp, env->segs[R_SS].selector);
-@@ -956,7 +958,7 @@ static void do_interrupt64(CPUX86State *env, int intno, int is_int,
- 
-     if (new_stack) {
-         ss = 0 | dpl;
--        cpu_x86_load_seg_cache(env, R_SS, ss, 0, 0, 0);
-+        cpu_x86_load_seg_cache(env, R_SS, ss, 0, 0, dpl << DESC_DPL_SHIFT);
-     }
-     env->regs[R_ESP] = esp;
- 
--- 
-2.7.4
+Berto
