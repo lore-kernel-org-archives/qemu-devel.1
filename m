@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dNf7I-0000D8-TR
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:52:20 -0400
+	(envelope-from <prvs=338cb52eb=Paul.Durrant@citrix.com>)
+	id 1dNf7z-0000o8-9o
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:53:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dNf7D-0005Zl-VJ
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:52:16 -0400
-From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 21 Jun 2017 14:50:46 +0200
-Message-Id: <20170621125047.30294-25-mreitz@redhat.com>
-In-Reply-To: <20170621125047.30294-1-mreitz@redhat.com>
-References: <20170621125047.30294-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 24/25] block/curl: Implement
- bdrv_refresh_filename()
+	(envelope-from <prvs=338cb52eb=Paul.Durrant@citrix.com>)
+	id 1dNf7u-0005jf-Me
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:52:59 -0400
+From: Paul Durrant <paul.durrant@citrix.com>
+Date: Wed, 21 Jun 2017 08:52:47 -0400
+Message-ID: <20170621125249.8805-2-paul.durrant@citrix.com>
+In-Reply-To: <20170621125249.8805-1-paul.durrant@citrix.com>
+References: <20170621125249.8805-1-paul.durrant@citrix.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2 1/3] xen-disk: only advertize
+ feature-persistent if grant copy is not available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,70 +24,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>
+To: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
+If grant copy is available then it will always be used in preference to
+persistent maps. In this case feature-persistent should not be advertized
+to the frontend, otherwise it may needlessly copy data into persistently
+granted buffers.
+
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 ---
- block/curl.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
+---
+ hw/block/xen_disk.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/block/curl.c b/block/curl.c
-index 11318a9..fe57223 100644
---- a/block/curl.c
-+++ b/block/curl.c
-@@ -957,6 +957,20 @@ static int64_t curl_getlength(BlockDriverState *bs)
-     return s->len;
- }
+diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
+index 3a22805fbc..9b06e3aa81 100644
+--- a/hw/block/xen_disk.c
++++ b/hw/block/xen_disk.c
+@@ -1023,11 +1023,18 @@ static int blk_init(struct XenDevice *xendev)
  
-+static void curl_refresh_filename(BlockDriverState *bs)
-+{
-+    BDRVCURLState *s = bs->opaque;
+     blkdev->file_blk  = BLOCK_SIZE;
+ 
++    blkdev->feature_grant_copy =
++                (xengnttab_grant_copy(blkdev->xendev.gnttabdev, 0, NULL) == 0);
 +
-+    if (!s->sslverify || s->cookie ||
-+        s->username || s->password || s->proxyusername || s->proxypassword)
-+    {
-+        return;
-+    }
++    xen_pv_printf(&blkdev->xendev, 3, "grant copy operation %s\n",
++                  blkdev->feature_grant_copy ? "enabled" : "disabled");
 +
-+    pstrcpy(bs->exact_filename, sizeof(bs->exact_filename), s->url);
-+}
-+
-+
- static const char *const curl_sgfnt_runtime_opts[] = {
-     CURL_BLOCK_OPT_URL,
-     CURL_BLOCK_OPT_SSLVERIFY,
-@@ -985,6 +999,7 @@ static BlockDriver bdrv_http = {
-     .bdrv_detach_aio_context    = curl_detach_aio_context,
-     .bdrv_attach_aio_context    = curl_attach_aio_context,
+     /* fill info
+      * blk_connect supplies sector-size and sectors
+      */
+     xenstore_write_be_int(&blkdev->xendev, "feature-flush-cache", 1);
+-    xenstore_write_be_int(&blkdev->xendev, "feature-persistent", 1);
++    xenstore_write_be_int(&blkdev->xendev, "feature-persistent",
++                          !blkdev->feature_grant_copy);
+     xenstore_write_be_int(&blkdev->xendev, "info", info);
  
-+    .bdrv_refresh_filename      = curl_refresh_filename,
-     .sgfnt_runtime_opts         = curl_sgfnt_runtime_opts,
- };
+     blk_parse_discard(blkdev);
+@@ -1202,12 +1209,6 @@ static int blk_connect(struct XenDevice *xendev)
  
-@@ -1003,6 +1018,7 @@ static BlockDriver bdrv_https = {
-     .bdrv_detach_aio_context    = curl_detach_aio_context,
-     .bdrv_attach_aio_context    = curl_attach_aio_context,
+     xen_be_bind_evtchn(&blkdev->xendev);
  
-+    .bdrv_refresh_filename      = curl_refresh_filename,
-     .sgfnt_runtime_opts         = curl_sgfnt_runtime_opts,
- };
- 
-@@ -1021,6 +1037,7 @@ static BlockDriver bdrv_ftp = {
-     .bdrv_detach_aio_context    = curl_detach_aio_context,
-     .bdrv_attach_aio_context    = curl_attach_aio_context,
- 
-+    .bdrv_refresh_filename      = curl_refresh_filename,
-     .sgfnt_runtime_opts         = curl_sgfnt_runtime_opts,
- };
- 
-@@ -1039,6 +1056,7 @@ static BlockDriver bdrv_ftps = {
-     .bdrv_detach_aio_context    = curl_detach_aio_context,
-     .bdrv_attach_aio_context    = curl_attach_aio_context,
- 
-+    .bdrv_refresh_filename      = curl_refresh_filename,
-     .sgfnt_runtime_opts         = curl_sgfnt_runtime_opts,
- };
- 
+-    blkdev->feature_grant_copy =
+-                (xengnttab_grant_copy(blkdev->xendev.gnttabdev, 0, NULL) == 0);
+-
+-    xen_pv_printf(&blkdev->xendev, 3, "grant copy operation %s\n",
+-                  blkdev->feature_grant_copy ? "enabled" : "disabled");
+-
+     xen_pv_printf(&blkdev->xendev, 1, "ok: proto %s, ring-ref %d, "
+                   "remote port %d, local port %d\n",
+                   blkdev->xendev.protocol, blkdev->ring_ref,
 -- 
-2.9.4
+2.11.0
