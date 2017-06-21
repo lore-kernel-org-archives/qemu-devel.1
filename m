@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dNf7K-0000Fk-Hf
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:52:19 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dNf7I-0000D8-TR
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:52:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dNf7J-0005bU-UL
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:52:18 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dNf7D-0005Zl-VJ
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:52:16 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 21 Jun 2017 14:50:47 +0200
-Message-Id: <20170621125047.30294-26-mreitz@redhat.com>
+Date: Wed, 21 Jun 2017 14:50:46 +0200
+Message-Id: <20170621125047.30294-25-mreitz@redhat.com>
 In-Reply-To: <20170621125047.30294-1-mreitz@redhat.com>
 References: <20170621125047.30294-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 25/25] block/null: Generate filename even
- with latency-ns
+Subject: [Qemu-devel] [PATCH v5 24/25] block/curl: Implement
+ bdrv_refresh_filename()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,28 +23,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>
 
-While we cannot represent the latency-ns option in a filename, it is not
-a significant option so not being able to should not stop us from
-generating a filename nonetheless.
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/null.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ block/curl.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/block/null.c b/block/null.c
-index fb03fb9..f665bcf 100644
---- a/block/null.c
-+++ b/block/null.c
-@@ -231,7 +231,8 @@ static void null_refresh_filename(BlockDriverState *bs)
-     {
-         /* These options can be ignored */
-         if (strcmp(qdict_entry_key(e), "filename") &&
--            strcmp(qdict_entry_key(e), "driver"))
-+            strcmp(qdict_entry_key(e), "driver") &&
-+            strcmp(qdict_entry_key(e), NULL_OPT_LATENCY))
-         {
-             return;
-         }
+diff --git a/block/curl.c b/block/curl.c
+index 11318a9..fe57223 100644
+--- a/block/curl.c
++++ b/block/curl.c
+@@ -957,6 +957,20 @@ static int64_t curl_getlength(BlockDriverState *bs)
+     return s->len;
+ }
+ 
++static void curl_refresh_filename(BlockDriverState *bs)
++{
++    BDRVCURLState *s = bs->opaque;
++
++    if (!s->sslverify || s->cookie ||
++        s->username || s->password || s->proxyusername || s->proxypassword)
++    {
++        return;
++    }
++
++    pstrcpy(bs->exact_filename, sizeof(bs->exact_filename), s->url);
++}
++
++
+ static const char *const curl_sgfnt_runtime_opts[] = {
+     CURL_BLOCK_OPT_URL,
+     CURL_BLOCK_OPT_SSLVERIFY,
+@@ -985,6 +999,7 @@ static BlockDriver bdrv_http = {
+     .bdrv_detach_aio_context    = curl_detach_aio_context,
+     .bdrv_attach_aio_context    = curl_attach_aio_context,
+ 
++    .bdrv_refresh_filename      = curl_refresh_filename,
+     .sgfnt_runtime_opts         = curl_sgfnt_runtime_opts,
+ };
+ 
+@@ -1003,6 +1018,7 @@ static BlockDriver bdrv_https = {
+     .bdrv_detach_aio_context    = curl_detach_aio_context,
+     .bdrv_attach_aio_context    = curl_attach_aio_context,
+ 
++    .bdrv_refresh_filename      = curl_refresh_filename,
+     .sgfnt_runtime_opts         = curl_sgfnt_runtime_opts,
+ };
+ 
+@@ -1021,6 +1037,7 @@ static BlockDriver bdrv_ftp = {
+     .bdrv_detach_aio_context    = curl_detach_aio_context,
+     .bdrv_attach_aio_context    = curl_attach_aio_context,
+ 
++    .bdrv_refresh_filename      = curl_refresh_filename,
+     .sgfnt_runtime_opts         = curl_sgfnt_runtime_opts,
+ };
+ 
+@@ -1039,6 +1056,7 @@ static BlockDriver bdrv_ftps = {
+     .bdrv_detach_aio_context    = curl_detach_aio_context,
+     .bdrv_attach_aio_context    = curl_attach_aio_context,
+ 
++    .bdrv_refresh_filename      = curl_refresh_filename,
+     .sgfnt_runtime_opts         = curl_sgfnt_runtime_opts,
+ };
+ 
 -- 
 2.9.4
