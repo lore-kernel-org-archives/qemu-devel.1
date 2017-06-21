@@ -1,30 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dNbr7-0006uk-6Z
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 05:23:22 -0400
+	(envelope-from <peterx@redhat.com>) id 1dNbwB-000274-8r
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 05:28:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dNbr3-0003xn-VB
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 05:23:21 -0400
-Received: from 7.mo5.mail-out.ovh.net ([178.32.124.100]:53532)
+	(envelope-from <peterx@redhat.com>) id 1dNbw8-0005gv-0d
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 05:28:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36864)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dNbr3-0003uG-MW
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 05:23:17 -0400
-Received: from player695.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 26327108643
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 11:23:16 +0200 (CEST)
-Date: Wed, 21 Jun 2017 11:23:08 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170621112308.692ac0d4@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <149798664805.10485.16662705281385907661@loki>
-References: <20170620015332.13874-1-david@gibson.dropbear.id.au>
-	<20170620015332.13874-4-david@gibson.dropbear.id.au>
-	<20170620185145.2673e759@bahia.lab.toulouse-stg.fr.ibm.com>
-	<149798664805.10485.16662705281385907661@loki>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dNbw7-0005fc-P2
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 05:28:31 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9ECB4C04B938
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 09:28:30 +0000 (UTC)
+Date: Wed, 21 Jun 2017 17:28:24 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170621092824.GA2247@pxdev.xzpeter.org>
+References: <1496980142-8986-1-git-send-email-peterx@redhat.com>
+	<1496980142-8986-3-git-send-email-peterx@redhat.com>
+	<87lgp1i8kz.fsf@dusky.pond.sub.org>
+	<20170612044609.GE25059@pxdev.xzpeter.org>
+	<20170612161349.GL22043@thinpad.lan.raisama.net>
+	<8737awqr6h.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_//h8AR_SB36gMyFP1rKUzkx5";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH 3/5] spapr: Add DRC release method
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <8737awqr6h.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] migration: let MigrationState be a
+ qdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,141 +38,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, bharata@linux.vnet.ibm.com, sursingh@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
 
---Sig_//h8AR_SB36gMyFP1rKUzkx5
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Mon, Jun 19, 2017 at 11:09:58AM +0200, Markus Armbruster wrote:
+> Eduardo Habkost <ehabkost@redhat.com> writes:
+> 
+> > On Mon, Jun 12, 2017 at 12:46:09PM +0800, Peter Xu wrote:
+> >> On Fri, Jun 09, 2017 at 03:39:24PM +0200, Markus Armbruster wrote:
+> >> > Peter Xu <peterx@redhat.com> writes:
+> >> > 
+> >> > > Let the old man "MigrationState" join the object family. Direct benefit
+> >> > > is that we can start to use all the property features derived from
+> >> > > current QDev, like: HW_COMPAT_* bits, command line setup for migration
+> >> > > parameters (so will never need to set them up each time using HMP/QMP,
+> >> > > this is really, really attractive for test writters), etc.
+> >> > >
+> >> > > I see no reason to disallow this happen yet. So let's start from this
+> >> > > one, to see whether it would be anything good.
+> >> > >
+> >> > > No functional change at all.
+> >> > >
+> >> > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> >> > > ---
+> >> > >  include/migration/migration.h | 19 ++++++++++++++
+> >> > >  migration/migration.c         | 61 ++++++++++++++++++++++++++++---------------
+> >> > >  2 files changed, 59 insertions(+), 21 deletions(-)
+> >> > >
+> >> > > diff --git a/include/migration/migration.h b/include/migration/migration.h
+> >> > > index 79b5484..bd0186c 100644
+> >> > > --- a/include/migration/migration.h
+> >> > > +++ b/include/migration/migration.h
+> >> > > @@ -21,6 +21,7 @@
+> >> > >  #include "qapi-types.h"
+> >> > >  #include "exec/cpu-common.h"
+> >> > >  #include "qemu/coroutine_int.h"
+> >> > > +#include "hw/qdev.h"
+> >> > >  
+> >> > >  #define QEMU_VM_FILE_MAGIC           0x5145564d
+> >> > >  #define QEMU_VM_FILE_VERSION_COMPAT  0x00000002
+> >> > > @@ -49,6 +50,8 @@ enum mig_rp_message_type {
+> >> > >      MIG_RP_MSG_MAX
+> >> > >  };
+> >> > >  
+> >> > > +#define TYPE_MIGRATION "migration"
+> >> > > +
+> >> > >  /* State for the incoming migration */
+> >> > >  struct MigrationIncomingState {
+> >> > >      QEMUFile *from_src_file;
+> >> > > @@ -91,8 +94,24 @@ struct MigrationIncomingState {
+> >> > >  MigrationIncomingState *migration_incoming_get_current(void);
+> >> > >  void migration_incoming_state_destroy(void);
+> >> > >  
+> >> > > +#define MIGRATION_CLASS(klass) \
+> >> > > +    OBJECT_CLASS_CHECK(MigrationClass, (klass), TYPE_MIGRATION)
+> >> > > +#define MIGRATION_OBJ(obj) \
+> >> > > +    OBJECT_CHECK(MigrationState, (obj), TYPE_MIGRATION)
+> >> > > +#define MIGRATION_GET_CLASS(obj) \
+> >> > > +    OBJECT_GET_CLASS(MigrationClass, (obj), TYPE_MIGRATION)
+> >> > > +
+> >> > > +typedef struct MigrationClass {
+> >> > > +    /*< private >*/
+> >> > > +    DeviceClass parent_class;
+> >> > > +} MigrationClass;
+> >> > > +
+> >> > >  struct MigrationState
+> >> > >  {
+> >> > > +    /*< private >*/
+> >> > > +    DeviceState parent_obj;
+> >> > > +
+> >> > > +    /*< public >*/
+> >> > 
+> >> > Turning MigrationState into a QOM object so you can use QOM
+> >> > infrastructure makes sense.  But why turn it into a device?  It doesn't
+> >> > feel device-like to me.  Would ObjectClass and Object instead of
+> >> > DeviceClass and DeviceState do?
+> >> 
+> >> Yeah. That's the main reason for the series to be (was) RFC.
+> >> 
+> >> I was trying to use the HW_COMPAT_* bits and -global, and that's QDev
+> >> thing (IIUC you got that already :). I am just curious about why that
+> >> is not for QObject from the very beginning, then it'll be easier.
+> >> 
+> >> For now, IMHO QDev is okay as well for migration, as long as it's kept
+> >> internally inside QEMU. But sure at least I should turn user_creatable
+> >> to off. I'll investigate more to see how to make this a safer approach
+> >> in next post.
+> >
+> > We could allow non-device QOM objects use the global property
+> > system optionally.
+> >
+> > We could make qdev_prop_set_globals() work on any Object*, and
+> > let QOM classes call it on post_init if they want to be
+> > configurable by global properties too.
+> >
+> > Note that this would break qdev_prop_check_globals(), because it
+> > expects globals to work only on TYPE_DEVICE.  We could address
+> > that by introducing a new interface type to indicate the type
+> > works with -global (something like
+> > INTERFACE_CONFIGURABLE_BY_GLOBAL_PROPERTIES, but shorter?).
+> >
+> > Such a system would probably allow us to replace
+> > default_machine_opts, default_boot_order, default_display,
+> > default_ram_size (and probably many other compat fields) on
+> > MachineClass.  It could also be used to implement -machine and
+> > -accel options by simply translating them to global properties
+> > (like we already do for -cpu).
+> >
+> > (This sounds like reinventing a QemuOpts-like system on top of
+> > global properties.  Maybe that's a bad thing, maybe that's a good
+> > thing.  I'm not sure.)
+> 
+> Not sure I get the connection to QemuOpts.
+> 
+> Lifting the "adjust property default values on the command line" feature
+> from qdev / TYPE_DEVICE to QOM / TYPE_OBJECT may make sense.
+> 
+> But let's reconsider what exactly we're trying to accomplish for
+> migration.  The cover letter and commit message are too vague for me gue
+> figure it out.  Please describe how exactly you intend this series'
+> features to be used.  You mentioned -global and HW_COMPAT_* briefly;
+> make sure to cover both.  Concrete examples like "instead of
+> <inconvenient way to do FOO> we can then do <better way>" would be nice.
 
-On Tue, 20 Jun 2017 14:24:08 -0500
-Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+Hi, Markus,
 
-> Quoting Greg Kurz (2017-06-20 11:51:45)
-> > On Tue, 20 Jun 2017 09:53:30 +0800
-> > David Gibson <david@gibson.dropbear.id.au> wrote:
-> >  =20
-> > > At the moment, spapr_drc_release() has an ugly switch on the DRC type=
- to
-> > > call the right, device-specific release function.  This cleans it up =
-by
-> > > doing that via a proper QOM method.
-> > >=20
-> > > It's still arguably an abstraction violation for the DRC code to call=
- into
-> > > the specific device code, but one mess at a time.
-> > >  =20
-> >=20
-> > Maybe a second step would be to move DRC subclasses to spapr.c (CPU, LM=
-B) and
-> > spapr_pci.c (PCI) ? This would allow each device-specific release funct=
-ion to
-> > have local scope at least. =20
->=20
-> I kind of prefer the proposed approach of registering a callback
-> function via drc_new(). This would make it easier to implement
-> unit tests without needing to rely on stub functions, and keeps the
-> type-specific handling constrained to matters relating to the DRC
-> itself and not the resources associated with them.
->=20
+I added some more explaination on the cover letter in the latter
+posts (latest v4). Please see whether that'll help, and just let me
+know if there is still things unclear in that.  Thanks!
 
-Yeah, this could work too and it would address David's concern about
-abstraction violation in a clean way.
-
-> >=20
-> > Reviewed-by: Greg Kurz <groug@kaod.org>
-> >  =20
-> > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > > ---
-> > >  hw/ppc/spapr_drc.c         | 22 ++++++----------------
-> > >  include/hw/ppc/spapr_drc.h |  1 +
-> > >  2 files changed, 7 insertions(+), 16 deletions(-)
-> > >=20
-> > > diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-> > > index e5dff16..32e39f2 100644
-> > > --- a/hw/ppc/spapr_drc.c
-> > > +++ b/hw/ppc/spapr_drc.c
-> > > @@ -370,22 +370,9 @@ void spapr_drc_attach(sPAPRDRConnector *drc, Dev=
-iceState *d, void *fdt,
-> > > =20
-> > >  static void spapr_drc_release(sPAPRDRConnector *drc)
-> > >  {
-> > > -    /* Calling release callbacks based on spapr_drc_type(drc). */
-> > > -    switch (spapr_drc_type(drc)) {
-> > > -    case SPAPR_DR_CONNECTOR_TYPE_CPU:
-> > > -        spapr_core_release(drc->dev);
-> > > -        break;
-> > > -    case SPAPR_DR_CONNECTOR_TYPE_PCI:
-> > > -        spapr_phb_remove_pci_device_cb(drc->dev);
-> > > -        break;
-> > > -    case SPAPR_DR_CONNECTOR_TYPE_LMB:
-> > > -        spapr_lmb_release(drc->dev);
-> > > -        break;
-> > > -    case SPAPR_DR_CONNECTOR_TYPE_PHB:
-> > > -    case SPAPR_DR_CONNECTOR_TYPE_VIO:
-> > > -    default:
-> > > -        g_assert(false);
-> > > -    }
-> > > +    sPAPRDRConnectorClass *drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc=
-);
-> > > +
-> > > +    drck->release(drc->dev);
-> > > =20
-> > >      drc->awaiting_release =3D false;
-> > >      g_free(drc->fdt);
-> > > @@ -629,6 +616,7 @@ static void spapr_drc_cpu_class_init(ObjectClass =
-*k, void *data)
-> > >      drck->typeshift =3D SPAPR_DR_CONNECTOR_TYPE_SHIFT_CPU;
-> > >      drck->typename =3D "CPU";
-> > >      drck->drc_name_prefix =3D "CPU ";
-> > > +    drck->release =3D spapr_core_release;
-> > >  }
-> > > =20
-> > >  static void spapr_drc_pci_class_init(ObjectClass *k, void *data)
-> > > @@ -638,6 +626,7 @@ static void spapr_drc_pci_class_init(ObjectClass =
-*k, void *data)
-> > >      drck->typeshift =3D SPAPR_DR_CONNECTOR_TYPE_SHIFT_PCI;
-> > >      drck->typename =3D "28";
-> > >      drck->drc_name_prefix =3D "C";
-> > > +    drck->release =3D spapr_phb_remove_pci_device_cb;
-> > >  }
-> > > =20
-> > >  static void spapr_drc_lmb_class_init(ObjectClass *k, void *data)
-> > > @@ -647,6 +636,7 @@ static void spapr_drc_lmb_class_init(ObjectClass =
-*k, void *data)
-> > >      drck->typeshift =3D SPAPR_DR_CONNECTOR_TYPE_SHIFT_LMB;
-> > >      drck->typename =3D "MEM";
-> > >      drck->drc_name_prefix =3D "LMB ";
-> > > +    drck->release =3D spapr_lmb_release;
-> > >  }
-> > > =20
-> > >  static const TypeInfo spapr_dr_connector_info =3D {
-> > > diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-> > > index d9cacb3..6fd84d1 100644
-> > > --- a/include/hw/ppc/spapr_drc.h
-> > > +++ b/include/hw/ppc/spapr_drc.h
-> > > @@ -217,6 +217,7 @@ typedef struct sPAPRDRConnectorClass {
-> > >      sPAPRDREntitySense (*dr_entity_sense)(sPAPRDRConnector *drc);
-> > >      uint32_t (*isolate)(sPAPRDRConnector *drc);
-> > >      uint32_t (*unisolate)(sPAPRDRConnector *drc);
-> > > +    void (*release)(DeviceState *dev);
-> > > =20
-> > >      /* QEMU interfaces for managing hotplug operations */
-> > >      bool (*release_pending)(sPAPRDRConnector *drc); =20
-> >  =20
->=20
-
-
---Sig_//h8AR_SB36gMyFP1rKUzkx5
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAllKOvwACgkQAvw66wEB28Kw+ACdE3y0aj5Fv6QXUPWWQBPPFS/7
-01AAmwedQ+/FB1jgw6qjaIxLoZWfvZ2c
-=e48C
------END PGP SIGNATURE-----
-
---Sig_//h8AR_SB36gMyFP1rKUzkx5--
+-- 
+Peter Xu
