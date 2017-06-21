@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dNguv-0006jT-Sr
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:47:42 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dNguv-0006j3-DR
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:47:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dNguu-00052e-Ol
+	(envelope-from <alex.bennee@linaro.org>) id 1dNgur-00050B-7t
 	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:47:37 -0400
-Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:34967)
+Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:36402)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dNguu-000525-JM
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:47:36 -0400
-Received: by mail-wr0-x235.google.com with SMTP id y25so98881065wrd.2
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 07:47:36 -0700 (PDT)
+	id 1dNgur-0004zX-2G
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:47:33 -0400
+Received: by mail-wr0-x230.google.com with SMTP id c11so82678830wrc.3
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 07:47:32 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed, 21 Jun 2017 15:47:58 +0100
-Message-Id: <20170621144814.15324-6-alex.bennee@linaro.org>
+Date: Wed, 21 Jun 2017 15:47:54 +0100
+Message-Id: <20170621144814.15324-2-alex.bennee@linaro.org>
 In-Reply-To: <20170621144814.15324-1-alex.bennee@linaro.org>
 References: <20170621144814.15324-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 05/21] docker: install ca-certificates package
- in base image
+Subject: [Qemu-devel] [PULL 01/21] docker: update qemu:debian base following
+ stretch release
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,36 +31,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Debian has now released Stretch as its new stable. As we track
+debian:stable-slim this has a few consequences. For one thing we can
+now drop the emdebian hacks as cross compilers are part of the
+official repositories now. However we do loose the ability to build
+against powerpc (not ppc64) since that is no longer a release
+architecture.
 
-Resolve SSL verification issue at shippable container's git_sync stage:
-
-shippable logs:
---------------
-git_sync
-- ssh-agent bash -c 'ssh-add /tmp/ssh/01_deploy; git clone https://github.com/philmd/qemu.git /root/src/github.com/philmd/qemu'
-Identity added: /tmp/ssh/01_deploy (rsa w/o comment)
-Cloning into '/root/src/github.com/philmd/qemu'...
-fatal: unable to access 'https://github.com/philmd/qemu.git/': Problem with the SSL CA cert (path? access rights?)
-retrying 1 of 3 times...
-
-Suggested-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-[AJB: fixed re-base conflict following stretch updates]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
 diff --git a/tests/docker/dockerfiles/debian.docker b/tests/docker/dockerfiles/debian.docker
-index 4ca6ecaad0..e44ce2f1c0 100644
+index 52bd79938e..4ca6ecaad0 100644
 --- a/tests/docker/dockerfiles/debian.docker
 +++ b/tests/docker/dockerfiles/debian.docker
-@@ -14,4 +14,4 @@ RUN cat /etc/apt/sources.list | sed "s/deb/deb-src/" >> /etc/apt/sources.list
+@@ -9,14 +9,6 @@
+ #
+ FROM debian:stable-slim
  
- # Install common build utilities
- RUN apt update
--RUN apt install -yy build-essential clang
-+RUN apt install -yy build-essential clang ca-certificates
+-# Setup some basic tools we need
+-RUN apt update
+-RUN apt install -yy curl aptitude
+-
+-# Setup Emdebian
+-RUN echo "deb http://emdebian.org/tools/debian/ jessie main" >> /etc/apt/sources.list
+-RUN curl http://emdebian.org/tools/debian/emdebian-toolchain-archive.key | apt-key add -
+-
+ # Duplicate deb line as deb-src
+ RUN cat /etc/apt/sources.list | sed "s/deb/deb-src/" >> /etc/apt/sources.list
+ 
 -- 
 2.13.0
