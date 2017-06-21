@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34350)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=338cb52eb=Paul.Durrant@citrix.com>)
-	id 1dNd3V-0002bO-2A
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 06:40:14 -0400
+	id 1dNd5g-0003aH-Sl
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 06:42:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=338cb52eb=Paul.Durrant@citrix.com>)
-	id 1dNd3T-0005ji-LP
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 06:40:13 -0400
+	id 1dNd5c-00078j-OE
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 06:42:28 -0400
 From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Wed, 21 Jun 2017 10:40:00 +0000
-Message-ID: <1559bb95198848fca36ccc2f911b899c@AMSPEX02CL03.citrite.net>
+Date: Wed, 21 Jun 2017 10:42:22 +0000
+Message-ID: <620ed49d90a446968203ffa02d44bf95@AMSPEX02CL03.citrite.net>
 References: <20170620134756.9632-1-paul.durrant@citrix.com>
-	<20170620134756.9632-2-paul.durrant@citrix.com>
-	<alpine.DEB.2.10.1706201510490.12819@sstabellini-ThinkPad-X260>
-	<20170621091743.qyhzt52t35y5oxek@dhcp-3-128.uk.xensource.com>
-	<29402ff135ee4ce38e97d4f40a63f969@AMSPEX02CL03.citrite.net>
-In-Reply-To: <29402ff135ee4ce38e97d4f40a63f969@AMSPEX02CL03.citrite.net>
+	<20170620134756.9632-3-paul.durrant@citrix.com>
+	<alpine.DEB.2.10.1706201535040.12819@sstabellini-ThinkPad-X260>
+In-Reply-To: <alpine.DEB.2.10.1706201535040.12819@sstabellini-ThinkPad-X260>
 Content-Language: en-US
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 1/3] xen-disk: only advertize
- feature-persistent if grant copy is not available
+Subject: Re: [Qemu-devel] [PATCH 2/3] xen-disk: add support for multi-page
+ shared rings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,174 +28,376 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <Paul.Durrant@citrix.com>, Roger Pau Monne <roger.pau@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
+To: 'Stefano Stabellini' <sstabellini@kernel.org>
+Cc: "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Anthony Perard <anthony.perard@citrix.com>, Kevin
+	Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
 > -----Original Message-----
-> From: Qemu-devel [mailto:qemu-devel-
-> bounces+paul.durrant=3Dcitrix.com@nongnu.org] On Behalf Of Paul Durrant
-> Sent: 21 June 2017 10:36
-> To: Roger Pau Monne <roger.pau@citrix.com>; Stefano Stabellini
-> <sstabellini@kernel.org>
-> Cc: Kevin Wolf <kwolf@redhat.com>; qemu-block@nongnu.org; qemu-
-> devel@nongnu.org; Max Reitz <mreitz@redhat.com>; Anthony Perard
-> <anthony.perard@citrix.com>; xen-devel@lists.xenproject.org
-> Subject: Re: [Qemu-devel] [PATCH 1/3] xen-disk: only advertize feature-
-> persistent if grant copy is not available
+> From: Stefano Stabellini [mailto:sstabellini@kernel.org]
+> Sent: 20 June 2017 23:51
+> To: Paul Durrant <Paul.Durrant@citrix.com>
+> Cc: xen-devel@lists.xenproject.org; qemu-devel@nongnu.org; qemu-
+> block@nongnu.org; Stefano Stabellini <sstabellini@kernel.org>; Anthony
+> Perard <anthony.perard@citrix.com>; Kevin Wolf <kwolf@redhat.com>;
+> Max Reitz <mreitz@redhat.com>
+> Subject: Re: [PATCH 2/3] xen-disk: add support for multi-page shared ring=
+s
 >=20
-> > -----Original Message-----
-> > From: Roger Pau Monne
-> > Sent: 21 June 2017 10:18
-> > To: Stefano Stabellini <sstabellini@kernel.org>
-> > Cc: Paul Durrant <Paul.Durrant@citrix.com>; xen-
-> devel@lists.xenproject.org;
-> > qemu-devel@nongnu.org; qemu-block@nongnu.org; Anthony Perard
-> > <anthony.perard@citrix.com>; Kevin Wolf <kwolf@redhat.com>; Max
-> Reitz
-> > <mreitz@redhat.com>
-> > Subject: Re: [PATCH 1/3] xen-disk: only advertize feature-persistent if
-> grant
-> > copy is not available
+> On Tue, 20 Jun 2017, Paul Durrant wrote:
+> > The blkif protocol has had provision for negotiation of multi-page shar=
+ed
+> > rings for some time now and many guest OS have support in their fronten=
+d
+> > drivers.
 > >
-> > On Tue, Jun 20, 2017 at 03:19:33PM -0700, Stefano Stabellini wrote:
-> > > On Tue, 20 Jun 2017, Paul Durrant wrote:
-> > > > If grant copy is available then it will always be used in preferenc=
-e to
-> > > > persistent maps. In this case feature-persistent should not be
-> advertized
-> > > > to the frontend, otherwise it may needlessly copy data into persist=
-ently
-> > > > granted buffers.
-> > > >
-> > > > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-> > >
-> > > CC'ing Roger.
-> > >
-> > > It is true that using feature-persistent together with grant copies i=
-s a
-> > > a very bad idea.
-> > >
-> > > But this change enstablishes an explicit preference of
-> > > feature_grant_copy over feature-persistent in the xen_disk backend. I=
-t
-> > > is not obvious to me that it should be the case.
-> > >
-> > > Why is feature_grant_copy (without feature-persistent) better than
-> > > feature-persistent (without feature_grant_copy)? Shouldn't we simply
-> > > avoid grant copies to copy data to persistent grants?
+> > This patch makes the necessary modifications to xen-disk support a shar=
+ed
+> > ring up to order 4 (i.e. 16 pages).
 > >
-> > When using persistent grants the frontend must always copy data from
-> > the buffer to the persistent grant, there's no way to avoid this.
-> >
-> > Using grant_copy we move the copy from the frontend to the backend,
-> > which means the CPU time of the copy is accounted to the backend. This
-> > is not ideal, but IMHO it's better than persistent grants because it
-> > avoids keeping a pool of mapped grants that consume memory and make
-> > the code more complex.
-> >
-> > Do you have some performance data showing the difference between
-> > persistent grants vs grant copy?
-> >
+> > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 >=20
-> No, but I can get some :-)
+> Thanks for the patch!
 >=20
-> For a little background... I've been trying to push throughput of fio run=
-ning in
-> a debian stretch guest on my skull canyon NUC. When I started out, I was
-> getting ~100MBbs. When I finished, with this patch, the IOThreads one, th=
-e
-> multi-page ring one and a bit of hackery to turn off all the aio flushes =
-that
-> seem to occur even if the image is opened with O_DIRECT, I was getting
-> ~960Mbps... which is about line rate for the SSD in the in NUC.
+
+You're welcome.
+
+> > ---
+> > Cc: Stefano Stabellini <sstabellini@kernel.org>
+> > Cc: Anthony Perard <anthony.perard@citrix.com>
+> > Cc: Kevin Wolf <kwolf@redhat.com>
+> > Cc: Max Reitz <mreitz@redhat.com>
+> > ---
+> >  hw/block/xen_disk.c | 141
+> ++++++++++++++++++++++++++++++++++++++++------------
+> >  1 file changed, 110 insertions(+), 31 deletions(-)
+> >
+> > diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
+> > index 9b06e3aa81..a9942d32db 100644
+> > --- a/hw/block/xen_disk.c
+> > +++ b/hw/block/xen_disk.c
+> > @@ -36,8 +36,6 @@
+> >
+> >  static int batch_maps   =3D 0;
+> >
+> > -static int max_requests =3D 32;
+> > -
+> >  /* ------------------------------------------------------------- */
+> >
+> >  #define BLOCK_SIZE  512
+> > @@ -84,6 +82,8 @@ struct ioreq {
+> >      BlockAcctCookie     acct;
+> >  };
+> >
+> > +#define MAX_RING_PAGE_ORDER 4
+> > +
+> >  struct XenBlkDev {
+> >      struct XenDevice    xendev;  /* must be first */
+> >      char                *params;
+> > @@ -94,7 +94,8 @@ struct XenBlkDev {
+> >      bool                directiosafe;
+> >      const char          *fileproto;
+> >      const char          *filename;
+> > -    int                 ring_ref;
+> > +    unsigned int        ring_ref[1 << MAX_RING_PAGE_ORDER];
+> > +    unsigned int        nr_ring_ref;
+> >      void                *sring;
+> >      int64_t             file_blk;
+> >      int64_t             file_size;
+> > @@ -110,6 +111,7 @@ struct XenBlkDev {
+> >      int                 requests_total;
+> >      int                 requests_inflight;
+> >      int                 requests_finished;
+> > +    unsigned int        max_requests;
+> >
+> >      /* Persistent grants extension */
+> >      gboolean            feature_discard;
+> > @@ -199,7 +201,7 @@ static struct ioreq *ioreq_start(struct XenBlkDev
+> *blkdev)
+> >      struct ioreq *ioreq =3D NULL;
+> >
+> >      if (QLIST_EMPTY(&blkdev->freelist)) {
+> > -        if (blkdev->requests_total >=3D max_requests) {
+> > +        if (blkdev->requests_total >=3D blkdev->max_requests) {
+> >              goto out;
+> >          }
+> >          /* allocate new struct */
+> > @@ -905,7 +907,7 @@ static void blk_handle_requests(struct XenBlkDev
+> *blkdev)
+> >          ioreq_runio_qemu_aio(ioreq);
+> >      }
+> >
+> > -    if (blkdev->more_work && blkdev->requests_inflight < max_requests)=
+ {
+> > +    if (blkdev->more_work && blkdev->requests_inflight < blkdev-
+> >max_requests) {
+> >          qemu_bh_schedule(blkdev->bh);
+> >      }
+> >  }
+> > @@ -918,15 +920,6 @@ static void blk_bh(void *opaque)
+> >      blk_handle_requests(blkdev);
+> >  }
+> >
+> > -/*
+> > - * We need to account for the grant allocations requiring contiguous
+> > - * chunks; the worst case number would be
+> > - *     max_req * max_seg + (max_req - 1) * (max_seg - 1) + 1,
+> > - * but in order to keep things simple just use
+> > - *     2 * max_req * max_seg.
+> > - */
+> > -#define MAX_GRANTS(max_req, max_seg) (2 * (max_req) * (max_seg))
+> > -
+> >  static void blk_alloc(struct XenDevice *xendev)
+> >  {
+> >      struct XenBlkDev *blkdev =3D container_of(xendev, struct XenBlkDev=
+,
+> xendev);
+> > @@ -938,11 +931,6 @@ static void blk_alloc(struct XenDevice *xendev)
+> >      if (xen_mode !=3D XEN_EMULATE) {
+> >          batch_maps =3D 1;
+> >      }
+> > -    if (xengnttab_set_max_grants(xendev->gnttabdev,
+> > -            MAX_GRANTS(max_requests,
+> BLKIF_MAX_SEGMENTS_PER_REQUEST)) < 0) {
+> > -        xen_pv_printf(xendev, 0, "xengnttab_set_max_grants failed: %s\=
+n",
+> > -                      strerror(errno));
+> > -    }
+> >  }
+> >
+> >  static void blk_parse_discard(struct XenBlkDev *blkdev)
+> > @@ -1037,6 +1025,9 @@ static int blk_init(struct XenDevice *xendev)
+> >                            !blkdev->feature_grant_copy);
+> >      xenstore_write_be_int(&blkdev->xendev, "info", info);
+> >
+> > +    xenstore_write_be_int(&blkdev->xendev, "max-ring-page-order",
+> > +                          MAX_RING_PAGE_ORDER);
+> > +
+> >      blk_parse_discard(blkdev);
+> >
+> >      g_free(directiosafe);
+> > @@ -1058,12 +1049,25 @@ out_error:
+> >      return -1;
+> >  }
+> >
+> > +/*
+> > + * We need to account for the grant allocations requiring contiguous
+> > + * chunks; the worst case number would be
+> > + *     max_req * max_seg + (max_req - 1) * (max_seg - 1) + 1,
+> > + * but in order to keep things simple just use
+> > + *     2 * max_req * max_seg.
+> > + */
+> > +#define MAX_GRANTS(max_req, max_seg) (2 * (max_req) * (max_seg))
+> > +
+> >  static int blk_connect(struct XenDevice *xendev)
+> >  {
+> >      struct XenBlkDev *blkdev =3D container_of(xendev, struct XenBlkDev=
+,
+> xendev);
+> >      int pers, index, qflags;
+> >      bool readonly =3D true;
+> >      bool writethrough =3D true;
+> > +    int order, ring_ref;
+> > +    unsigned int ring_size, max_grants;
+> > +    unsigned int i;
+> > +    uint32_t *domids;
+> >
+> >      /* read-only ? */
+> >      if (blkdev->directiosafe) {
+> > @@ -1138,9 +1142,39 @@ static int blk_connect(struct XenDevice
+> *xendev)
+> >      xenstore_write_be_int64(&blkdev->xendev, "sectors",
+> >                              blkdev->file_size / blkdev->file_blk);
+> >
+> > -    if (xenstore_read_fe_int(&blkdev->xendev, "ring-ref", &blkdev-
+> >ring_ref) =3D=3D -1) {
+> > +    if (xenstore_read_fe_int(&blkdev->xendev, "ring-page-order",
+> > +                             &order) =3D=3D -1) {
+> > +        blkdev->nr_ring_ref =3D 1;
+> > +
+> > +        if (xenstore_read_fe_int(&blkdev->xendev, "ring-ref",
+> > +                                 &ring_ref) =3D=3D -1) {
+> > +            return -1;
+> > +        }
+> > +        blkdev->ring_ref[0] =3D ring_ref;
+> > +
+> > +    } else if (order >=3D 0 && order <=3D MAX_RING_PAGE_ORDER) {
+> > +        blkdev->nr_ring_ref =3D 1 << order;
+> > +
+> > +        for (i =3D 0; i < blkdev->nr_ring_ref; i++) {
+> > +            char *key;
+> > +
+> > +            key =3D g_strdup_printf("ring-ref%u", i);
+> > +            if (!key) {
+> > +                return -1;
+> > +            }
+> > +
+> > +            if (xenstore_read_fe_int(&blkdev->xendev, key,
+> > +                                     &ring_ref) =3D=3D -1) {
 >=20
-> So, I'll force use of persistent grants on and see what sort of throughpu=
-t I
-> get.
+> it looks like we are leaking key.
+>=20
 
-A quick test with grant copy forced off (causing persistent grants to be us=
-ed)... My VM is debian stretch using a 16 page shared ring from blkfront. T=
-he image backing xvdb is a fully inflated 10G qcow2.
+Indeed it does. Good spot.
 
-root@dhcp-237-70:~# fio --randrepeat=3D1 --ioengine=3Dlibaio --direct=3D0 -=
--gtod_reduce=3D1 --name=3Dtest --filename=3D/dev/xvdb --bs=3D512k --iodepth=
-=3D64 --size=3D10G --readwrite=3Drandwrite --ramp_time=3D4
-test: (g=3D0): rw=3Drandwrite, bs=3D512K-512K/512K-512K/512K-512K, ioengine=
-=3Dlibaio, iodepth=3D64
-fio-2.16
-Starting 1 process
-Jobs: 1 (f=3D1): [w(1)] [70.6% done] [0KB/539.4MB/0KB /s] [0/1078/0 iops] [=
-eta 00m:05s]
-test: (groupid=3D0, jobs=3D1): err=3D 0: pid=3D633: Wed Jun 21 06:26:06 201=
-7
-  write: io=3D6146.6MB, bw=3D795905KB/s, iops=3D1546, runt=3D  7908msec
-  cpu          : usr=3D2.07%, sys=3D34.00%, ctx=3D4490, majf=3D0, minf=3D1
-  IO depths    : 1=3D0.1%, 2=3D0.1%, 4=3D0.1%, 8=3D0.1%, 16=3D0.1%, 32=3D0.=
-3%, >=3D64=3D166.9%
-     submit    : 0=3D0.0%, 4=3D100.0%, 8=3D0.0%, 16=3D0.0%, 32=3D0.0%, 64=
-=3D0.0%, >=3D64=3D0.0%
-     complete  : 0=3D0.0%, 4=3D100.0%, 8=3D0.0%, 16=3D0.0%, 32=3D0.0%, 64=
-=3D0.1%, >=3D64=3D0.0%
-     issued    : total=3Dr=3D0/w=3D12230/d=3D0, short=3Dr=3D0/w=3D0/d=3D0, =
-drop=3Dr=3D0/w=3D0/d=3D0
-     latency   : target=3D0, window=3D0, percentile=3D100.00%, depth=3D64
+>=20
+> > +                return -1;
+> > +            }
+> > +            blkdev->ring_ref[i] =3D ring_ref;
+> > +
+> > +            g_free(key);
+> > +        }
+> > +    } else {
+> >          return -1;
+>=20
+> I would like to print warning if the requested ring size exceeds our
+> limit.
+>=20
 
-Run status group 0 (all jobs):
-  WRITE: io=3D6146.6MB, aggrb=3D795904KB/s, minb=3D795904KB/s, maxb=3D79590=
-4KB/s, mint=3D7908msec, maxt=3D7908msec
-
-Disk stats (read/write):
-  xvdb: ios=3D54/228860, merge=3D0/2230616, ticks=3D16/5403048, in_queue=3D=
-5409068, util=3D98.26%
-
-The dom0 cpu usage for the relevant IOThread was ~60%
-
-The same test with grant copy...
-
-root@dhcp-237-70:~# fio --randrepeat=3D1 --ioengine=3Dlibaio --direct=3D0 -=
--gtod_reduce=3D1 --name=3Dtest --filename=3D/dev/xvdb --bs=3D512k --iodepth=
-=3D64 --size=3D10G --readwrite=3Drandwrite --ramp_time=3D4
-test: (g=3D0): rw=3Drandwrite, bs=3D512K-512K/512K-512K/512K-512K, ioengine=
-=3Dlibaio, iodepth=3D64
-fio-2.16
-Starting 1 process
-Jobs: 1 (f=3D1): [w(1)] [70.6% done] [0KB/607.7MB/0KB /s] [0/1215/0 iops] [=
-eta 00m:05s]
-test: (groupid=3D0, jobs=3D1): err=3D 0: pid=3D483: Wed Jun 21 06:35:14 201=
-7
-  write: io=3D6232.0MB, bw=3D810976KB/s, iops=3D1575, runt=3D  7869msec
-  cpu          : usr=3D2.44%, sys=3D37.42%, ctx=3D3570, majf=3D0, minf=3D1
-  IO depths    : 1=3D0.1%, 2=3D0.1%, 4=3D0.1%, 8=3D0.1%, 16=3D0.1%, 32=3D0.=
-3%, >=3D64=3D164.6%
-     submit    : 0=3D0.0%, 4=3D100.0%, 8=3D0.0%, 16=3D0.0%, 32=3D0.0%, 64=
-=3D0.0%, >=3D64=3D0.0%
-     complete  : 0=3D0.0%, 4=3D100.0%, 8=3D0.0%, 16=3D0.0%, 32=3D0.0%, 64=
-=3D0.1%, >=3D64=3D0.0%
-     issued    : total=3Dr=3D0/w=3D12401/d=3D0, short=3Dr=3D0/w=3D0/d=3D0, =
-drop=3Dr=3D0/w=3D0/d=3D0
-     latency   : target=3D0, window=3D0, percentile=3D100.00%, depth=3D64
-
-Run status group 0 (all jobs):
-  WRITE: io=3D6232.0MB, aggrb=3D810975KB/s, minb=3D810975KB/s, maxb=3D81097=
-5KB/s, mint=3D7869msec, maxt=3D7869msec
-
-Disk stats (read/write):
-  xvdb: ios=3D54/229583, merge=3D0/2235879, ticks=3D16/5409500, in_queue=3D=
-5415080, util=3D98.27%
-
-So, higher throughput and iops. The dom0 cpu usage was running at ~70%, so =
-there is definitely more dom0 overhead by using grant copy. The usage of gr=
-ant copy could probably be improved through since the current code issues a=
-n copy ioctl per ioreq. With some batching I suspect some, if not all, of t=
-he extra overhead could be recovered.
+Sure. That's a good idea.
 
 Cheers,
 
   Paul
 
 >=20
-> Cheers,
->=20
->   Paul
->=20
-> > Roger.
+> >      }
+> > +
+> >      if (xenstore_read_fe_int(&blkdev->xendev, "event-channel",
+> >                               &blkdev->xendev.remote_port) =3D=3D -1) {
+> >          return -1;
+> > @@ -1163,41 +1197,85 @@ static int blk_connect(struct XenDevice
+> *xendev)
+> >          blkdev->protocol =3D BLKIF_PROTOCOL_NATIVE;
+> >      }
+> >
+> > -    blkdev->sring =3D xengnttab_map_grant_ref(blkdev->xendev.gnttabdev=
+,
+> > -                                            blkdev->xendev.dom,
+> > -                                            blkdev->ring_ref,
+> > -                                            PROT_READ | PROT_WRITE);
+> > +    ring_size =3D XC_PAGE_SIZE * blkdev->nr_ring_ref;
+> > +    switch (blkdev->protocol) {
+> > +    case BLKIF_PROTOCOL_NATIVE:
+> > +    {
+> > +        blkdev->max_requests =3D __CONST_RING_SIZE(blkif, ring_size);
+> > +        break;
+> > +    }
+> > +    case BLKIF_PROTOCOL_X86_32:
+> > +    {
+> > +        blkdev->max_requests =3D __CONST_RING_SIZE(blkif_x86_32,
+> ring_size);
+> > +        break;
+> > +    }
+> > +    case BLKIF_PROTOCOL_X86_64:
+> > +    {
+> > +        blkdev->max_requests =3D __CONST_RING_SIZE(blkif_x86_64,
+> ring_size);
+> > +        break;
+> > +    }
+> > +    default:
+> > +        return -1;
+> > +    }
+> > +
+> > +    /* Calculate the maximum number of grants needed by ioreqs */
+> > +    max_grants =3D MAX_GRANTS(blkdev->max_requests,
+> > +                            BLKIF_MAX_SEGMENTS_PER_REQUEST);
+> > +    /* Add on the number needed for the ring pages */
+> > +    max_grants +=3D blkdev->nr_ring_ref;
+> > +
+> > +    if (xengnttab_set_max_grants(blkdev->xendev.gnttabdev,
+> max_grants)) {
+> > +        xen_pv_printf(xendev, 0, "xengnttab_set_max_grants failed: %s\=
+n",
+> > +                      strerror(errno));
+> > +        return -1;
+> > +    }
+> > +
+> > +    domids =3D g_malloc0_n(blkdev->nr_ring_ref, sizeof(uint32_t));
+> > +    for (i =3D 0; i < blkdev->nr_ring_ref; i++) {
+> > +        domids[i] =3D blkdev->xendev.dom;
+> > +    }
+> > +
+> > +    blkdev->sring =3D xengnttab_map_grant_refs(blkdev-
+> >xendev.gnttabdev,
+> > +                                             blkdev->nr_ring_ref,
+> > +                                             domids,
+> > +                                             blkdev->ring_ref,
+> > +                                             PROT_READ | PROT_WRITE);
+> > +
+> > +    g_free(domids);
+> > +
+> >      if (!blkdev->sring) {
+> >          return -1;
+> >      }
+> > +
+> >      blkdev->cnt_map++;
+> >
+> >      switch (blkdev->protocol) {
+> >      case BLKIF_PROTOCOL_NATIVE:
+> >      {
+> >          blkif_sring_t *sring_native =3D blkdev->sring;
+> > -        BACK_RING_INIT(&blkdev->rings.native, sring_native,
+> XC_PAGE_SIZE);
+> > +        BACK_RING_INIT(&blkdev->rings.native, sring_native, ring_size)=
+;
+> >          break;
+> >      }
+> >      case BLKIF_PROTOCOL_X86_32:
+> >      {
+> >          blkif_x86_32_sring_t *sring_x86_32 =3D blkdev->sring;
+> >
+> > -        BACK_RING_INIT(&blkdev->rings.x86_32_part, sring_x86_32,
+> XC_PAGE_SIZE);
+> > +        BACK_RING_INIT(&blkdev->rings.x86_32_part, sring_x86_32,
+> ring_size);
+> >          break;
+> >      }
+> >      case BLKIF_PROTOCOL_X86_64:
+> >      {
+> >          blkif_x86_64_sring_t *sring_x86_64 =3D blkdev->sring;
+> >
+> > -        BACK_RING_INIT(&blkdev->rings.x86_64_part, sring_x86_64,
+> XC_PAGE_SIZE);
+> > +        BACK_RING_INIT(&blkdev->rings.x86_64_part, sring_x86_64,
+> ring_size);
+> >          break;
+> >      }
+> >      }
+> >
+> >      if (blkdev->feature_persistent) {
+> >          /* Init persistent grants */
+> > -        blkdev->max_grants =3D max_requests *
+> BLKIF_MAX_SEGMENTS_PER_REQUEST;
+> > +        blkdev->max_grants =3D blkdev->max_requests *
+> > +            BLKIF_MAX_SEGMENTS_PER_REQUEST;
+> >          blkdev->persistent_gnts =3D
+> g_tree_new_full((GCompareDataFunc)int_cmp,
+> >                                               NULL, NULL,
+> >                                               batch_maps ?
+> > @@ -1209,9 +1287,9 @@ static int blk_connect(struct XenDevice *xendev)
+> >
+> >      xen_be_bind_evtchn(&blkdev->xendev);
+> >
+> > -    xen_pv_printf(&blkdev->xendev, 1, "ok: proto %s, ring-ref %d, "
+> > +    xen_pv_printf(&blkdev->xendev, 1, "ok: proto %s, nr-ring-ref %u, "
+> >                    "remote port %d, local port %d\n",
+> > -                  blkdev->xendev.protocol, blkdev->ring_ref,
+> > +                  blkdev->xendev.protocol, blkdev->nr_ring_ref,
+> >                    blkdev->xendev.remote_port, blkdev->xendev.local_por=
+t);
+> >      return 0;
+> >  }
+> > @@ -1228,7 +1306,8 @@ static void blk_disconnect(struct XenDevice
+> *xendev)
+> >      xen_pv_unbind_evtchn(&blkdev->xendev);
+> >
+> >      if (blkdev->sring) {
+> > -        xengnttab_unmap(blkdev->xendev.gnttabdev, blkdev->sring, 1);
+> > +        xengnttab_unmap(blkdev->xendev.gnttabdev, blkdev->sring,
+> > +                        blkdev->nr_ring_ref);
+> >          blkdev->cnt_map--;
+> >          blkdev->sring =3D NULL;
+> >      }
+> > --
+> > 2.11.0
+> >
