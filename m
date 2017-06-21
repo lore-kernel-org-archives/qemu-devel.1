@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dNmkC-0001jT-Ax
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 17:00:57 -0400
+	(envelope-from <laurent@vivier.eu>) id 1dNmkE-0001ju-2y
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 17:00:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dNmk8-0006RM-Fx
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 17:00:56 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:62798)
+	(envelope-from <laurent@vivier.eu>) id 1dNmkA-0006SF-6u
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 17:00:58 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:63525)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dNmk8-0006Qs-4v
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 17:00:52 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dNmk9-0006Rc-Rc
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 17:00:54 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed, 21 Jun 2017 23:00:44 +0200
-Message-Id: <20170621210047.24083-3-laurent@vivier.eu>
+Date: Wed, 21 Jun 2017 23:00:46 +0200
+Message-Id: <20170621210047.24083-5-laurent@vivier.eu>
 In-Reply-To: <20170621210047.24083-1-laurent@vivier.eu>
 References: <20170621210047.24083-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 2/5] target-m68k: initialize FPU registers
+Subject: [Qemu-devel] [PULL 4/5] target-m68k: define 96bit FP registers for
+ gdb on 680x0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,41 +27,118 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <laurent@vivier.eu>
 
-on reset, set FP registers to NaN and control registers to 0
-
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
-Message-Id: <20170620205121.26515-3-laurent@vivier.eu>
+Message-Id: <20170620205121.26515-5-laurent@vivier.eu>
 ---
- target/m68k/cpu.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ configure            |  2 +-
+ gdb-xml/m68k-fp.xml  | 21 +++++++++++++++++++++
+ target/m68k/helper.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 67 insertions(+), 1 deletion(-)
+ create mode 100644 gdb-xml/m68k-fp.xml
 
-diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
-index f068922..f2e031f 100644
---- a/target/m68k/cpu.c
-+++ b/target/m68k/cpu.c
-@@ -49,6 +49,8 @@ static void m68k_cpu_reset(CPUState *s)
-     M68kCPU *cpu = M68K_CPU(s);
-     M68kCPUClass *mcc = M68K_CPU_GET_CLASS(cpu);
-     CPUM68KState *env = &cpu->env;
-+    float64 nan = float64_default_nan(NULL);
-+    int i;
- 
-     mcc->parent_reset(s);
- 
-@@ -57,7 +59,12 @@ static void m68k_cpu_reset(CPUState *s)
-     env->sr = 0x2700;
- #endif
-     m68k_switch_sp(env);
--    /* ??? FP regs should be initialized to NaN.  */
-+    for (i = 0; i < 8; i++) {
-+        env->fregs[i] = nan;
-+    }
-+    env->fpcr = 0;
-+    env->fpsr = 0;
+diff --git a/configure b/configure
+index ff0f8b9..bd0d9db 100755
+--- a/configure
++++ b/configure
+@@ -6066,7 +6066,7 @@ case "$target_name" in
+   ;;
+   m68k)
+     bflt="yes"
+-    gdb_xml_files="cf-core.xml cf-fp.xml"
++    gdb_xml_files="cf-core.xml cf-fp.xml m68k-fp.xml"
+   ;;
+   microblaze|microblazeel)
+     TARGET_ARCH=microblaze
+diff --git a/gdb-xml/m68k-fp.xml b/gdb-xml/m68k-fp.xml
+new file mode 100644
+index 0000000..64290d1
+--- /dev/null
++++ b/gdb-xml/m68k-fp.xml
+@@ -0,0 +1,21 @@
++<?xml version="1.0"?>
++<!-- Copyright (C) 2008 Free Software Foundation, Inc.
 +
-     cpu_m68k_set_ccr(env, 0);
-     /* TODO: We should set PC from the interrupt vector.  */
-     env->pc = 0;
++     Copying and distribution of this file, with or without modification,
++     are permitted in any medium without royalty provided the copyright
++     notice and this notice are preserved.  -->
++<!DOCTYPE feature SYSTEM "gdb-target.dtd">
++<feature name="org.gnu.gdb.coldfire.fp">
++  <reg name="fp0" bitsize="96" type="float" group="float"/>
++  <reg name="fp1" bitsize="96" type="float" group="float"/>
++  <reg name="fp2" bitsize="96" type="float" group="float"/>
++  <reg name="fp3" bitsize="96" type="float" group="float"/>
++  <reg name="fp4" bitsize="96" type="float" group="float"/>
++  <reg name="fp5" bitsize="96" type="float" group="float"/>
++  <reg name="fp6" bitsize="96" type="float" group="float"/>
++  <reg name="fp7" bitsize="96" type="float" group="float"/>
++
++  <reg name="fpcontrol" bitsize="32" group="float"/>
++  <reg name="fpstatus" bitsize="32" group="float"/>,
++  <reg name="fpiaddr" bitsize="32" type="code_ptr" group="float"/>
++</feature>
+diff --git a/target/m68k/helper.c b/target/m68k/helper.c
+index 8bfc881..f2de6b5 100644
+--- a/target/m68k/helper.c
++++ b/target/m68k/helper.c
+@@ -102,6 +102,48 @@ static int cf_fpu_gdb_set_reg(CPUM68KState *env, uint8_t *mem_buf, int n)
+     return 0;
+ }
+ 
++static int m68k_fpu_gdb_get_reg(CPUM68KState *env, uint8_t *mem_buf, int n)
++{
++    if (n < 8) {
++        stw_be_p(mem_buf, env->fregs[n].l.upper);
++        memset(mem_buf + 2, 0, 2);
++        stq_be_p(mem_buf + 4, env->fregs[n].l.lower);
++        return 12;
++    }
++    switch (n) {
++    case 8: /* fpcontrol */
++        stl_be_p(mem_buf, env->fpcr);
++        return 4;
++    case 9: /* fpstatus */
++        stl_be_p(mem_buf, env->fpsr);
++        return 4;
++    case 10: /* fpiar, not implemented */
++        memset(mem_buf, 0, 4);
++        return 4;
++    }
++    return 0;
++}
++
++static int m68k_fpu_gdb_set_reg(CPUM68KState *env, uint8_t *mem_buf, int n)
++{
++    if (n < 8) {
++        env->fregs[n].l.upper = lduw_be_p(mem_buf);
++        env->fregs[n].l.lower = ldq_be_p(mem_buf + 4);
++        return 12;
++    }
++    switch (n) {
++    case 8: /* fpcontrol */
++        env->fpcr = ldl_p(mem_buf);
++        return 4;
++    case 9: /* fpstatus */
++        env->fpsr = ldl_p(mem_buf);
++        return 4;
++    case 10: /* fpiar, not implemented */
++        return 4;
++    }
++    return 0;
++}
++
+ M68kCPU *cpu_m68k_init(const char *cpu_model)
+ {
+     M68kCPU *cpu;
+@@ -130,6 +172,9 @@ void m68k_cpu_init_gdb(M68kCPU *cpu)
+     if (m68k_feature(env, M68K_FEATURE_CF_FPU)) {
+         gdb_register_coprocessor(cs, cf_fpu_gdb_get_reg, cf_fpu_gdb_set_reg,
+                                  11, "cf-fp.xml", 18);
++    } else if (m68k_feature(env, M68K_FEATURE_FPU)) {
++        gdb_register_coprocessor(cs, m68k_fpu_gdb_get_reg,
++                                 m68k_fpu_gdb_set_reg, 11, "m68k-fp.xml", 18);
+     }
+     /* TODO: Add [E]MAC registers.  */
+ }
 -- 
 2.9.4
