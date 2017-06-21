@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dNhnO-0007fT-8Q
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:43:55 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dNhxj-0000xs-0a
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:54:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dNhnJ-0003d5-IF
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:43:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:2369)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dNhnJ-0003cd-Bv
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:43:49 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2560915D9
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 15:43:48 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 21 Jun 2017 17:43:46 +0200
-Message-Id: <20170621154347.32084-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 0/1] Usb 20170621 patches
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dNhxf-00089q-2g
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:54:35 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:35448)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dNhxe-00088z-Ur
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:54:31 -0400
+Received: by mail-qk0-x244.google.com with SMTP id 16so10923046qkg.2
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 08:54:29 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170620205121.26515-1-laurent@vivier.eu>
+	<20170620205121.26515-2-laurent@vivier.eu>
+	<22b78092-4929-b51e-8e57-47ccb6cefc29@twiddle.net>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c0fc1c50-6ee5-7515-2f83-762e785d32e6@amsat.org>
+Date: Wed, 21 Jun 2017 12:54:24 -0300
+MIME-Version: 1.0
+In-Reply-To: <22b78092-4929-b51e-8e57-47ccb6cefc29@twiddle.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 1/6] target-m68k: move fmove CR to a
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,30 +36,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, Thomas Huth <huth@tuxfamily.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-The following changes since commit 8dfaf23ae1f2273a9730a9b309cc8471269bb524:
+On 06/20/2017 07:50 PM, Richard Henderson wrote:
+> On 06/20/2017 01:51 PM, Laurent Vivier wrote:
+>> Move code of fmove to/from control register to a function
+>>
+>> Signed-off-by: Laurent Vivier<laurent@vivier.eu>
+>> ---
+>>   target/m68k/translate.c | 56
+>> +++++++++++++++++++++++++++----------------------
+>>   1 file changed, 31 insertions(+), 25 deletions(-)
+>
+> Reviewed-by: Richard Henderson <rth@twiddle.net>
 
-  tcg/tci: fix tcg-interpreter build (2017-06-20 18:39:15 +0100)
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-are available in the git repository at:
-
-  git://git.kraxel.org/qemu tags/usb-20170621-pull-request
-
-for you to fetch changes up to 896b6757f9c4d176ce4439238efea223a2952411:
-
-  usb-host: support devices with sparse/non-sequential USB interfaces (2017-06-21 15:30:08 +0200)
-
-----------------------------------------------------------------
-
-----------------------------------------------------------------
-
-Samuel Brian (1):
-  usb-host: support devices with sparse/non-sequential USB interfaces
-
- hw/usb/host-libusb.c | 24 ++++++++++++++----------
- 1 file changed, 14 insertions(+), 10 deletions(-)
-
--- 
-2.9.3
+>
+>
+> r~
+>
