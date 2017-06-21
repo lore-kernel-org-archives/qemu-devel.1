@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dNhlm-0006Cl-D1
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:42:15 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dNhlm-0006D4-Pd
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:42:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dNhlh-0002pU-PJ
+	(envelope-from <alex.bennee@linaro.org>) id 1dNhli-0002pe-FP
 	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:42:14 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:36591)
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:33501)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dNhlh-0002pM-GQ
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:42:09 -0400
-Received: by mail-wr0-x230.google.com with SMTP id c11so84692316wrc.3
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 08:42:09 -0700 (PDT)
+	id 1dNhli-0002pQ-9D
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:42:10 -0400
+Received: by mail-wr0-x233.google.com with SMTP id r103so140130537wrb.0
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 08:42:10 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed, 21 Jun 2017 16:42:34 +0100
-Message-Id: <20170621154244.28309-1-alex.bennee@linaro.org>
+Date: Wed, 21 Jun 2017 16:42:37 +0100
+Message-Id: <20170621154244.28309-4-alex.bennee@linaro.org>
+In-Reply-To: <20170621154244.28309-1-alex.bennee@linaro.org>
+References: <20170621154244.28309-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RISU PATCH v6 00/10] Record/replay patches
+Subject: [Qemu-devel] [RISU PATCH v6 03/10] risu: a bit more verbosity when
+ starting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +33,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Hi Peter,
+When debugging faults it is useful to know where the generated
+instructions are living.
 
-Re-based with review comments addressed and tags added where
-appropriate.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-Alex Bennée (10):
-  README: document the coding style used for risu
-  build-all-archs: support cross building via docker
-  risu: a bit more verbosity when starting
-  risu: paramterise send/receive functions
-  risu: add header to trace stream
-  risu: add simple trace and replay support
-  risu: handle trace through stdin/stdout
-  risu: add support compressed tracefiles
-  new: record_traces.sh helper script
-  new: run_risu.sh script
+---
+v6
+  - removed stray/stale declarations
+v5
+  - dropped all the status update due to signal handler contraints
+v3
+  - use portable fmt string for image_start_address
+  - include arm dumping position
+---
+ risu.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
- .dir-locals.el           |   2 +
- Makefile                 |   4 +-
- README                   |   9 +++
- build-all-archs          |  46 ++++++++++--
- configure                |  55 +++++++++++++-
- contrib/record_traces.sh |  32 +++++++++
- contrib/run_risu.sh      |  66 +++++++++++++++++
- reginfo.c                | 120 ++++++++++++++++++-------------
- risu.c                   | 181 ++++++++++++++++++++++++++++++++++++++++++-----
- risu.h                   |  23 +++++-
- risu_aarch64.c           |   5 ++
- risu_arm.c               |   5 ++
- risu_m68k.c              |   5 ++
- risu_ppc64.c             |   5 ++
- 14 files changed, 481 insertions(+), 77 deletions(-)
- create mode 100644 .dir-locals.el
- create mode 100755 contrib/record_traces.sh
- create mode 100755 contrib/run_risu.sh
-
+diff --git a/risu.c b/risu.c
+index 2cd6d22..a10422a 100644
+--- a/risu.c
++++ b/risu.c
+@@ -124,6 +124,8 @@ int master(int sock)
+     }
+     master_socket = sock;
+     set_sigill_handler(&master_sigill);
++    fprintf(stderr, "starting master image at 0x%"PRIxPTR"\n",
++            image_start_address);
+     fprintf(stderr, "starting image\n");
+     image_start();
+     fprintf(stderr, "image returned unexpectedly\n");
+@@ -134,6 +136,8 @@ int apprentice(int sock)
+ {
+     apprentice_socket = sock;
+     set_sigill_handler(&apprentice_sigill);
++    fprintf(stderr, "starting apprentice image at 0x%"PRIxPTR"\n",
++            image_start_address);
+     fprintf(stderr, "starting image\n");
+     image_start();
+     fprintf(stderr, "image returned unexpectedly\n");
 -- 
 2.13.0
