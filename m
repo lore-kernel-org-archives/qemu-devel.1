@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dNaRt-0002pn-EQ
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 03:53:19 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dNaZx-0001PS-Rk
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 04:01:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dNaRn-0003Xw-H7
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 03:53:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38638)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dNaRn-0003XH-8W
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 03:53:07 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4143E81127
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 07:53:06 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Wed, 21 Jun 2017 15:52:07 +0800
-Message-Id: <1498031528-1990-10-git-send-email-peterx@redhat.com>
-In-Reply-To: <1498031528-1990-1-git-send-email-peterx@redhat.com>
-References: <1498031528-1990-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 09/10] migration: merge
- enforce_config_section somewhat
+	(envelope-from <dgibson@ozlabs.org>) id 1dNaZw-000713-RF
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 04:01:33 -0400
+Date: Wed, 21 Jun 2017 15:26:41 +0800
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170621072641.GB12089@umbus>
+References: <20170614063607.47863-1-aik@ozlabs.ru>
+	<20170614063607.47863-3-aik@ozlabs.ru>
+	<653b598c-d838-ee69-5848-ae7ea85f5376@ozlabs.ru>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="O5XBE6gyVG5Rl6Rj"
+Content-Disposition: inline
+In-Reply-To: <653b598c-d838-ee69-5848-ae7ea85f5376@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PATCH qemu v8 2/2] memory/iommu: introduce
+ IOMMUMemoryRegionClass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,102 +26,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Peter Xu <peterx@redhat.com>
 
-These two parameters:
 
-- MachineState::enforce_config_section
-- MigrationState::send_configuration
+--O5XBE6gyVG5Rl6Rj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-are playing similar role here. This patch merges the first one into
-second, then we'll have a single place to reference whether we need to
-send the configuration section.
+On Wed, Jun 21, 2017 at 12:05:08PM +1000, Alexey Kardashevskiy wrote:
+> On 14/06/17 16:36, Alexey Kardashevskiy wrote:
+> > This finishes QOM'fication of IOMMUMemoryRegion by introducing
+> > a IOMMUMemoryRegionClass. This also provides a fastpath analog for
+> > IOMMU_MEMORY_REGION_GET_CLASS().
+>=20
+>=20
+> Ping?
 
-I didn't remove the MachineState.enforce_config_section field since when
-applying that machine property (in machine_set_property()) we haven't
-yet initialized global properties and migration object. Then, it's
-still not easy to pass that boolean to MigrationState at such an early
-time.
+Busy.. sick.. busy & sick..
 
-A natural benefit for current patch is that now we kept the meaning of
-"enforce-config-section" since it'll still have the highest
-priority (that's what "enforce" mean I guess).
+I'll get to it eventually.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- migration/migration.c | 12 ++++++++++++
- migration/savevm.c    | 12 ++----------
- 2 files changed, 14 insertions(+), 10 deletions(-)
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 96c6412..e7e6cf3 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -42,6 +42,7 @@
- #include "exec/target_page.h"
- #include "io/channel-buffer.h"
- #include "migration/colo.h"
-+#include "hw/boards.h"
- 
- #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed throttling */
- 
-@@ -102,9 +103,20 @@ static MigrationState *current_migration;
- 
- void migration_object_init(void)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+
-     /* This can only be called once. */
-     assert(!current_migration);
-     current_migration = MIGRATION_OBJ(object_new(TYPE_MIGRATION));
-+
-+    /*
-+     * We cannot really do this in migration_instance_init() since at
-+     * that time global properties are not yet applied, then this
-+     * value will be definitely replaced by something else.
-+     */
-+    if (ms->enforce_config_section) {
-+        current_migration->send_configuration = true;
-+    }
- }
- 
- /* For outgoing */
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 28fa1d5..6b1a9a5 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -943,20 +943,13 @@ bool qemu_savevm_state_blocked(Error **errp)
-     return false;
- }
- 
--static bool enforce_config_section(void)
--{
--    MachineState *machine = MACHINE(qdev_get_machine());
--    return machine->enforce_config_section;
--}
--
- void qemu_savevm_state_header(QEMUFile *f)
- {
-     trace_savevm_state_header();
-     qemu_put_be32(f, QEMU_VM_FILE_MAGIC);
-     qemu_put_be32(f, QEMU_VM_FILE_VERSION);
- 
--    if (migrate_get_current()->send_configuration ||
--        enforce_config_section()) {
-+    if (migrate_get_current()->send_configuration) {
-         qemu_put_byte(f, QEMU_VM_CONFIGURATION);
-         vmstate_save_state(f, &vmstate_configuration, &savevm_state, 0);
-     }
-@@ -1980,8 +1973,7 @@ int qemu_loadvm_state(QEMUFile *f)
-         return -ENOTSUP;
-     }
- 
--    if (migrate_get_current()->send_configuration ||
--        enforce_config_section()) {
-+    if (migrate_get_current()->send_configuration) {
-         if (qemu_get_byte(f) != QEMU_VM_CONFIGURATION) {
-             error_report("Configuration section missing");
-             return -EINVAL;
--- 
-2.7.4
+--O5XBE6gyVG5Rl6Rj
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZSh+xAAoJEGw4ysog2bOSxfsQALiPSMu9EocQdEINpruimxpp
+l7LXPZIreCb0zfiUxk0flky+81dbemvt8dJQKxP/4nLo36Whamht8dV4TKf7Hr36
+Y7TY9tunFE4M9ZzJcmGP2lsN9cCUk0/1ugWrxzyonwdZz/gtbKlCf1+B80W2LD8l
+1cCuThqmZXTNSJ3a/H98l2PEKsZpJxA2sGnLBJLFRVwbUSJHNinRaeVmOPrEoerZ
+4ieZxA3M87/MN2/KuClTdOr7MicCxhcf8bCfg+URxp2P/+Uutw+2ARWrIfkK2Xcy
+p25ZdPWkWQyOLQcL5VMUKh/seQ1wqvporFLMgoxteJabEzG5Wci9FLI0FFzhlDf4
+xVIzo1RB36VlvkzDnTux4MFEvb+7ueHNs+e/O2kfT8I82cm6mvsvXWvgFcOSFrxR
+KWsgqXcMliq6ndMuzbGiCRYUHVECfhhu8WTiSmAoMzmS786mhajMt+/n5CCJQExC
+cmJYWyrBMF5Rn0gDKDsPZjGxjpDq+m8+QnyIBDVZTTfq6/fZ19H3V/0Ap0YA2pdn
+aUgtYvDwf8XvkO/78mDWQBK5ERS8zQw0Q0cVehoJ/2V5JGGwFjTcQyrc6/9VHjqk
+MeMO6UGGjnO+/Y/L5SJliHmWODS0TcnM6V+mUXprNFsB9NydPinjzjTRiL6w+DLX
+8URmwTRM5c3VsYu8zcWv
+=5Ljt
+-----END PGP SIGNATURE-----
+
+--O5XBE6gyVG5Rl6Rj--
