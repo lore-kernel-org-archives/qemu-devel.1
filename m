@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dNaNH-0000nC-Mp
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 03:48:28 -0400
+	(envelope-from <peterx@redhat.com>) id 1dNaR6-00029k-Kq
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 03:52:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dNaND-0001XA-Ps
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 03:48:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60926)
+	(envelope-from <peterx@redhat.com>) id 1dNaR2-00035u-O7
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 03:52:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59176)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dNaND-0001Wn-Jj
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 03:48:23 -0400
-References: <1497877149-19253-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1497877149-19253-4-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<20170619142852.GS5016@thinpad.lan.raisama.net>
-	<7d5904ae-e66c-5594-cfff-747578d91f4b@ilande.co.uk>
-	<08da52ec-e4d2-d836-49bd-90baf21747fb@redhat.com>
-	<1d8147a6-d55c-4951-68db-4c1cf502a4f3@ilande.co.uk>
-	<9d24bf00-cf82-717a-eccd-f51e2c80dd6f@redhat.com>
-	<eaa2cd40-0d64-6843-7e39-c0f94c7e797f@ilande.co.uk>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <48c8f007-f388-59f5-9af8-f5eefe033e2a@redhat.com>
-Date: Wed, 21 Jun 2017 09:48:16 +0200
-MIME-Version: 1.0
-In-Reply-To: <eaa2cd40-0d64-6843-7e39-c0f94c7e797f@ilande.co.uk>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCHv6 3/5] fw_cfg: move assert() and linking of
- fw_cfg device to the machine into instance_init()
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dNaR2-00035e-FE
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 03:52:20 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1836E8047E
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 07:52:19 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Wed, 21 Jun 2017 15:51:58 +0800
+Message-Id: <1498031528-1990-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 00/10] migration: objectify MigrationState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,28 +27,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, pbonzini@redhat.com, imammedo@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-On 06/21/17 08:58, Mark Cave-Ayland wrote:
-> On 19/06/17 23:43, Laszlo Ersek wrote:
-> 
->> It looks good to me, but please await Eduardo's reply as well.
->>
->> In particular, it should be confirmed that object_resolve_path_type()
->> matches instances of *subclasses* as well (as I expect it would). Your
->> test results confirm that; let's make sure it is intentional behavior.
->> Eduardo (or someone else on the CC list), can you please comment on that?
-> 
-> Thanks Laszlo. Eduardo, can you confirm this is the correct behaviour?
-> 
-> I now have a v7 patchset ready to go (currently hosted at
-> https://github.com/mcayland/qemu/tree/fwcfg7 for the curious). Laszlo,
-> I've currently left off your Tested-by tag since I'm not sure it's still
-> valid for less-than-trivial changes - if you're happy for me to re-add
-> it before I send the v7 patchset to the list, please let me know.
+v4:
+- dropped lots of patches related to AccelState.global_props. Now I am
+  using AccelClass.global_props, and only use it in Xen codes.
+- one patch is added to clean up the global property registerations,
+  with some comment to show the ordering.
+- one patch is added to dump migration globals in "info migrate"
+  unconditionally (last patch).
+- changed all the following xen_init() patches to use
+  AccelClass.global_props.
+- (since most of the patches are either touched-up again, or threw
+  away, so no much r-b added, only one for Juan on the only_migratable
+  patch, anyway, thanks for reviewing the old codes!)
 
-I intend to test v7 when you post it.
+------------
 
-Thanks,
-Laszlo
+The main goal of this series is to let MigrationState be a QDev.
+
+It helps in many use cases.
+
+First of all, we can remove many legacy tricky functions. To name
+some: savevm_skip_section_footers(), savevm_skip_configuration(), etc.
+They didn't do much thing but setup a bool value. If MigrationState
+can be a QDev, then these things can be setup by the HW_COMPAT_* magic
+with some lines like:
+
+{
+    .driver   = "migration",
+    .property = "send-configuration",
+    .value    = "off",
+}
+
+Next, if this can be merged and okay, we can move on to convert more
+things into properties for migration. A very attractive use case of it
+is, we will be able to do this for migration:
+
+  -global migration.postcopy=on
+
+Then we don't need to use either HMP/QMP interface to enable it. It
+greatly simplifies the migration test scripts.
+
+Why QDev not QObject? The answer is simple: all the magic that we want
+for migration is bound to QDev (HW_COMPAT, "-global"). If one day we
+want to move these features from QDev to QObject, that'll be fine and
+easy for MigrationState. But before that, let's have MigrationState a
+QDev. :-)
+
+Please kindly review. Thanks.
+
+Peter Xu (10):
+  machine: export register_compat_prop()
+  accel: introduce AccelClass.global_props
+  vl: clean up global property registerations
+  migration: let MigrationState be a qdev
+  migration: move global_state.optional out
+  migration: move only_migratable to MigrationState
+  migration: move skip_configuration out
+  migration: move skip_section_footers
+  migration: merge enforce_config_section somewhat
+  migration: hmp: dump globals
+
+ accel/accel.c                    |  10 ++++
+ hmp.c                            |   3 +
+ hw/core/machine.c                |  13 -----
+ hw/core/qdev-properties.c        |  13 +++++
+ hw/i386/pc_piix.c                |   3 -
+ hw/ppc/spapr.c                   |   3 -
+ hw/xen/xen-common.c              |  25 +++++++--
+ include/hw/compat.h              |  12 ++++
+ include/hw/qdev-properties.h     |   3 +
+ include/migration/global_state.h |   1 -
+ include/migration/misc.h         |   6 +-
+ include/sysemu/accel.h           |  10 ++++
+ include/sysemu/sysemu.h          |   1 -
+ migration/global_state.c         |   9 +--
+ migration/migration.c            | 118 +++++++++++++++++++++++++++++++--------
+ migration/migration.h            |  33 +++++++++++
+ migration/savevm.c               |  32 ++---------
+ vl.c                             |  41 ++++++++++++--
+ 18 files changed, 246 insertions(+), 90 deletions(-)
+
+-- 
+2.7.4
