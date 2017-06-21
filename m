@@ -1,20 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.shirshov@gmail.com>) id 1dNYvN-0004LL-BX
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 02:15:34 -0400
+	(envelope-from <bounces@canonical.com>) id 1dNbcr-0001Aj-TL
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 05:08:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pavel.shirshov@gmail.com>) id 1dNYvM-0002yU-DN
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 02:15:33 -0400
+	(envelope-from <bounces@canonical.com>) id 1dNbcn-0006ee-TM
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 05:08:37 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38624)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dNbcn-0006eL-Nl
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 05:08:33 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dNbcm-0004cP-Rs
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 09:08:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id CB7DC2E8041
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 09:08:32 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAOE=1Z1LJr9rpaEQ9+b7D5vM3N=Wy0oGunRnzoQ79x3dWA3oaw@mail.gmail.com>
-References: <CAOE=1Z1Bbgb494m6mYRnX1-80eT0tSnF0F6zNM7efEie4rd7DA@mail.gmail.com>
-	<CAOE=1Z1LJr9rpaEQ9+b7D5vM3N=Wy0oGunRnzoQ79x3dWA3oaw@mail.gmail.com>
-From: Pavel Shirshov <pavel.shirshov@gmail.com>
-Date: Tue, 20 Jun 2017 23:15:29 -0700
-Message-ID: <CALkUq2gp+x-nkALLTLqrSGmw8nfo5FzNeDpr1Gm3qh8N9mDn0Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [dpdk-dev] Will huge page have negative effect on
- guest vm in qemu enviroment?
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 21 Jun 2017 08:49:02 -0000
+From: kolega <mr.kolega@gmail.com>
+Reply-To: Bug 1587065 <1587065@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160530134240.21929.85128.malonedeb@wampee.canonical.com>
+Message-Id: <149803494200.21334.17464400383685846402.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1587065] Re: btrfs qemu-ga - multiple mounts
+ block fsfreeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,49 +37,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sam <batmanustc@gmail.com>
-Cc: dev@dpdk.org, users@dpdk.org, qemu-devel@nongnu.org, qemu-discuss@nongnu.org
+To: qemu-devel@nongnu.org
 
-Hi Sam,
+Same problem here ! More infos : https://forum.opennebula.org/t/backup-
+live-vms-with-snapshots-quiesce-atomic/4471
 
-Below I'm saying about KVM. I don't have experience with vbox and others.
-1. I'd suggest don't use dpdk inside of VM if you want to see best
-perfomance on the box.
-2. huge pages enabled globally will not have any bad effect to guest
-OS. Except you have to enable huge pages inside of VM and provide real
-huge page for VM's huge pages from the host system. Otherwise dpdk
-will use "hugepages" inside of VM, but this "huge pages" will not real
-ones. They will be constructed from normal pages outside. Also when
-you enable huge pages OS will reserve them from start and your OS will
-not able use them for other things. Also you can't swap out huge
-pages, KSM will not work for them and so on.
-3. You can enable huge pages just for one numa node. It's impossible
-to enable them just for one core. Usually you reserve some memory for
-hugepages when the system starts and you can't use this memory in
-normal applications unless normal application knows how to use them.
+-- =
 
-Also why it didn't work inside of the docker?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1587065
 
+Title:
+  btrfs qemu-ga - multiple mounts block fsfreeze
 
-On Tue, Jun 20, 2017 at 8:35 PM, Sam <batmanustc@gmail.com> wrote:
-> BTW, we also think about use ovs-dpdk in docker enviroment, but test result
-> said it's not good idea, we don't know why.
->
-> 2017-06-21 11:32 GMT+08:00 Sam <batmanustc@gmail.com>:
->
->> Hi all,
->>
->> We plan to use DPDK on HP host machine with several core and big memory.
->> We plan to use qemu-kvm enviroment. The host will carry 4 or more guest vm
->> and 1 ovs.
->>
->> Ovs-dpdk is much faster then normal ovs, but to use ovs-dpdk, we have to
->> enable huge page globally.
->>
->> My question is, will huge page enabled globally have negative effect on
->> guest vm's memory orperate or something? If it is, how to prevent this, or
->> could I enable huge page on some core or enable huge page for a part of
->> memory?
->>
->> Thank you~
->>
+Status in QEMU:
+  New
+
+Bug description:
+  Having two mounts of the same device makes fsfreeze through qemu-ga impos=
+sible.
+  root@CmsrvMTA:/# mount -l | grep /dev/vda2
+  /dev/vda2 on / type btrfs (rw,relatime,space_cache,subvolid=3D257,subvol=
+=3D/@)
+  /dev/vda2 on /home type btrfs (rw,relatime,space_cache,subvolid=3D258,sub=
+vol=3D/@home)
+
+  Having two mounts is rather common with btrfs, so the feature fsfreeze
+  is unusable on these systems.
+
+  =
+
+  Below more information about how we encountered this issue...
+
+  Message send to qemu-discuss@nongnu.org:
+
+  Message 1:
+  ----------
+  I use external snapshots to backup my guests. I use the 'quiesce' option =
+to flush and frees the guest file system with the qemu guest agent.
+
+  With the exeption of one guest, this procedure works fine. On the 'unwill=
+ing' guest, I get this error message:
+  "ERROR 2016-05-25 00:51:19 | T25-bakVMSCmsrvVH2 | fout: internal error: u=
+nable to execute QEMU agent command 'guest-fsfreeze-freeze': failed to free=
+ze /: Device or resource busy"
+
+  I don't think this is not some sort of time-out error, because
+  activation of the fsfreeze and the error message happen immediately
+  after each other:
+
+  $ grep qemu-ga syslog.1
+  May 25 00:51:19 CmsrvMTA qemu-ga: info: guest-fsfreeze called
+
+  This is the only entry of the qemu guest agent in syslog.
+
+  $ sudo virsh version
+  Compiled against library: libvirt 1.3.1
+  Using library: libvirt 1.3.1
+  Gebruikte API: QEMU 1.3.1
+  Draaiende hypervisor: QEMU 2.5.0
+
+  $ virsh qemu-agent-command CmsrvMTA '{"execute": "guest-info"}'
+  {"return":{"version":"2.5.0", ... ,{"enabled":true,"name":"guest-fstrim",=
+"success-response":true},{"enabled":true,"name":"guest-fsfreeze-thaw","succ=
+ess-response":true},{"enabled":true,"name":"guest-fsfreeze-status","success=
+-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze-list","succe=
+ss-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze","success-=
+response":true}, ... }
+
+  For making an external snapshot, I use this command:
+  $ virsh snapshot-create-as --domain CmsrvMTA sn1 --disk-only --atomic --q=
+uiesce --no-metadata --diskspec vda,file=3D/srv/poolVMS/CmsrvMTA.sn1
+
+  Piece of reply 1:
+  -----------------
+  I have encountered this before. Some operating systems
+   may have bind-mounts that let a device appear multiple times in the moun=
+t list. Unfortunately the guest agent is not smart enough to consider a dev=
+ice that has been frozen as succesfull and keep going. This causes this spe=
+cific error.
+
+  Piece of reply 2:
+  -----------------
+  Ok, that seems to be it.
+
+  I=E2=80=99ve got the =E2=80=98/=E2=80=99 and =E2=80=98/home=E2=80=99 on t=
+he same device formatted as btrfs on
+  two separate sub volumes.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1587065/+subscriptions
