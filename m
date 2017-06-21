@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dNlCk-0003uu-7W
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 15:22:19 -0400
+	(envelope-from <Chris.Friesen@windriver.com>) id 1dNlPd-00013B-79
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 15:35:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dNlCg-0006PU-5O
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 15:22:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38422)
+	(envelope-from <Chris.Friesen@windriver.com>) id 1dNlPa-0003X9-4T
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 15:35:37 -0400
+Received: from mail5.windriver.com ([192.103.53.11]:34566 helo=mail5.wrs.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dNlCf-0006PO-Ta
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 15:22:14 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <1497640120-10729-4-git-send-email-a.perevalov@samsung.com>
-	(Alexey Perevalov's message of "Fri, 16 Jun 2017 22:08:40 +0300")
-References: <1497640120-10729-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170616190852eucas1p18bc3671b480012ede7cbd810b40a8263@eucas1p1.samsung.com>
-	<1497640120-10729-4-git-send-email-a.perevalov@samsung.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 21 Jun 2017 21:22:07 +0200
-Message-ID: <87h8z9jgdc.fsf@secure.laptop>
+	(Exim 4.71) (envelope-from <Chris.Friesen@windriver.com>)
+	id 1dNlPZ-0003WS-RK
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 15:35:34 -0400
+Received: from ALA-HCA.corp.ad.wrs.com (ala-hca.corp.ad.wrs.com
+	[147.11.189.40])
+	by mail5.wrs.com (8.15.2/8.15.2) with ESMTPS id v5LJZUwD032074
+	(version=TLSv1 cipher=AES128-SHA bits=128 verify=OK)
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 12:35:30 -0700
+Message-ID: <594ACA81.3010402@windriver.com>
+Date: Wed, 21 Jun 2017 13:35:29 -0600
+From: Chris Friesen <chris.friesen@windriver.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] migration: add bitmap for received
- page
+References: <CAOE=1Z1Bbgb494m6mYRnX1-80eT0tSnF0F6zNM7efEie4rd7DA@mail.gmail.com>	<CAOE=1Z1LJr9rpaEQ9+b7D5vM3N=Wy0oGunRnzoQ79x3dWA3oaw@mail.gmail.com>	<CALkUq2gp+x-nkALLTLqrSGmw8nfo5FzNeDpr1Gm3qh8N9mDn0Q@mail.gmail.com>	<CAOE=1Z0h+Dd=T8QKyVnTHwFjeYwm-qz_Da7HWEDk=pcrMbp9ug@mail.gmail.com>
+	<20170621191601.GB2425@work-vm>
+In-Reply-To: <20170621191601.GB2425@work-vm>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [dpdk-dev] Will huge page have negative effect on
+ guest vm in qemu enviroment?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,97 +34,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>
-Cc: qemu-devel@nongnu.org, peterx@redhat.com, i.maximets@samsung.com, dgilbert@redhat.com
+To: qemu-devel@nongnu.org
 
-Alexey Perevalov <a.perevalov@samsung.com> wrote:
-> This patch adds ability to track down already received
-> pages, it's necessary for calculation vCPU block time in
-> postcopy migration feature, maybe for restore after
-> postcopy migration failure.
-> Also it's necessary to solve shared memory issue in
-> postcopy livemigration. Information about received pages
-> will be transferred to the software virtual bridge
-> (e.g. OVS-VSWITCHD), to avoid fallocate (unmap) for
-> already received pages. fallocate syscall is required for
-> remmaped shared memory, due to remmaping itself blocks
-> ioctl(UFFDIO_COPY, ioctl in this case will end with EEXIT
-> error (struct page is exists after remmap).
+On 06/21/2017 01:16 PM, Dr. David Alan Gilbert wrote:
+> * Sam (batmanustc@gmail.com) wrote:
+>> Thank you~
+>>
+>> 1. We have a compare test on qemu-kvm enviroment with huge page and wi=
+thout
+>> huge page. Qemu start process is much longer in huge page enviromwnt. =
+And I
+>> write an email titled with '[DPDK-memory] how qemu waste such long tim=
+e
+>> under dpdk huge page envriment?'. I could resend it later.
 >
-> Bitmap is placed into RAMBlock as another postcopy/precopy
-> related bitmaps.
+>> 2. Then I have another test on qemu-kvm enviroment with huge page and
+>> without huge page, which I didn't start ovs-dpdk and vhostuser port in=
+ qemu
+>> start process. And I found Qemu start process is also much longer in h=
+uge
+>> page enviroment.
+>>
+>> So I think huge page enviroment, which grub2.cfg file is specified in
+>> =E2=80=98[DPDK-memory]
+>> how qemu waste such long time under dpdk huge page envriment?=E2=80=99=
+, will really
+>> have negative effect on qemu start up process.
+>>
+>> That's why we don't like to use ovs-dpdk. Althrough ovs-dpdk is faster=
+, but
+>> the start up process of qemu is much longer then normal ovs, and the r=
+eason
+>> is nothing with ovs but huge page. For customers, vm start up time is
+>> important then network speed.
 >
-> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-
-Hi
-
-A few commets.
-
-Happy with all the changes that you did.
-
-> @@ -60,6 +62,7 @@ static inline void *ramblock_ptr(RAMBlock *block, ram_addr_t offset)
->     return (char *)block->host + offset;
-> }
-> 
-> +unsigned long int ramblock_recv_bitmap_offset(void *host_addr, RAMBlock *rb);
->  long qemu_getrampagesize(void);
->  unsigned long last_ram_page(void);
-> RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
-
-I think we shouldn't export it at all.  But if we do, we should export
-it with the other functions.
+> How are you setting up hugepages?  What values are you putting in the
+> various /proc or cmdline options and how are you specifying them on
+> QEMU's commandline.
+>
+> I think one problem is that with hugepages qemu normally allocates them
+> all at the start;  I think there are cases where that means moving a lo=
+t
+> of memory about, especially if you lock it to particular NUMA nodes.
 
 
-> +unsigned long int ramblock_recv_bitmap_offset(void *host_addr, RAMBlock *rb)
+For what it's worth, we use something like this:
 
-I think this function can be made static, as nothing else should use it, no?
+-object=20
+memory-backend-file,id=3Dram-node0,prealloc=3Dyes,mem-path=3D/mnt/huge-20=
+48kB/libvirt/qemu,share=3Dyes,size=3D2147483648,host-nodes=3D0,policy=3Db=
+ind=20
+-numa node,nodeid=3D0,cpus=3D0-3,memdev=3Dram-node0
 
-> +{
-> +    uint64_t host_addr_offset = (uint64_t)(uintptr_t)(host_addr
-> +                                                      - (void *)rb->host);
+and I haven't noticed it taking particularly long to start up.  All our=20
+hugepages are reserved at host startup though.
 
-Intdentation is weird:
-
-uint64_t host_addr_offset =
-    (uint64_t)(uintptr_t)(host_addr - (void *)rb->host);
-
-
-> +    return host_addr_offset >> TARGET_PAGE_BITS;
-> +}
-> +
-> +int ramblock_recv_bitmap_test(void *host_addr, RAMBlock *rb)
-> +{
-> +    return test_bit(ramblock_recv_bitmap_offset(host_addr, rb),
-> +                    rb->receivedmap);
-> +}
-> +
-> +void ramblock_recv_bitmap_set(void *host_addr, RAMBlock *rb)
-> +{
-> +    set_bit_atomic(ramblock_recv_bitmap_offset(host_addr, rb),
-> rb->receivedmap);
-
-Line is too long?
-
-> +static void ramblock_recv_bitmap_clear_range(uint64_t start, size_t length,
-> +                                             RAMBlock *rb)
-> +{
-> +    int i, range_count;
-> +    range_count = length >> TARGET_PAGE_BITS;
-> +    for (i = 0; i < range_count; i++) {
-> +        ramblock_recv_bitmap_clear((void *)((uint64_t)(intptr_t)rb->host +
-> +                                            start), rb);
-> +        start += TARGET_PAGE_SIZE;
-
-bitmap_clear(dst, pos, nbits)		Clear specified bit area
-
-Looks like the right operation here, no?
-
-> +
-> +void ramblock_recv_map_init(void);
-> +int ramblock_recv_bitmap_test(void *host_addr, RAMBlock *rb);
-> +void ramblock_recv_bitmap_set(void *host_addr, RAMBlock *rb);
-> +void ramblock_recv_bitmap_clear(void *host_addr, RAMBlock *rb);
-> +
->  #endif
-
-Later, Juan.
+Chris
