@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dNgtX-0005Zj-UO
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:46:17 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dNgty-0005mZ-Ny
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:46:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dNgtT-0004LT-1w
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:46:11 -0400
-Received: from mail-wr0-f177.google.com ([209.85.128.177]:36105)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dNgtS-0004L4-Re
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:46:06 -0400
-Received: by mail-wr0-f177.google.com with SMTP id c11so82625482wrc.3
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 07:46:06 -0700 (PDT)
-References: <33C62801-DFAA-49FA-BBDE-D9622810C8EB@icloud.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0203f432-ccc4-ddca-418c-05a7df844284@redhat.com>
-Date: Wed, 21 Jun 2017 16:46:03 +0200
+	(envelope-from <mreitz@redhat.com>) id 1dNgts-0004VJ-QH
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:46:38 -0400
+From: Max Reitz <mreitz@redhat.com>
+References: <20170619173455.18805-1-berrange@redhat.com>
+	<20170619173455.18805-14-berrange@redhat.com>
+	<79345f33-2cf6-bec1-c96d-981fc7e3fedd@redhat.com>
+Message-ID: <c481d014-f9f0-74c8-4011-1b81ace887be@redhat.com>
+Date: Wed, 21 Jun 2017 16:46:16 +0200
 MIME-Version: 1.0
-In-Reply-To: <33C62801-DFAA-49FA-BBDE-D9622810C8EB@icloud.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] TLB addend field
+In-Reply-To: <79345f33-2cf6-bec1-c96d-981fc7e3fedd@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="A0mGIQrBhTIJEcLc2IOoT6s3vvD9wufhT"
+Subject: Re: [Qemu-devel] [PATCH v9 13/20] qcow2: add support for LUKS
+ encryption format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,17 +26,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Theodore Dubois <tblodt@icloud.com>, qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-On 21/06/2017 16:15, Theodore Dubois wrote:
-> Hi, I’ve got a question about the addend field in the TLB. Why use
-> this instead of a pointer to the host page? I would think the speed
-> difference would be unmeasurable.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--A0mGIQrBhTIJEcLc2IOoT6s3vvD9wufhT
+From: Max Reitz <mreitz@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
+Message-ID: <c481d014-f9f0-74c8-4011-1b81ace887be@redhat.com>
+Subject: Re: [PATCH v9 13/20] qcow2: add support for LUKS encryption format
+References: <20170619173455.18805-1-berrange@redhat.com>
+ <20170619173455.18805-14-berrange@redhat.com>
+ <79345f33-2cf6-bec1-c96d-981fc7e3fedd@redhat.com>
+In-Reply-To: <79345f33-2cf6-bec1-c96d-981fc7e3fedd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-After the TLB check you have computed "x & ~(PAGE_SIZE - 1)", but not "x
-& (PAGE_SIZE - 1)".  Without the addend field you would need an extra
-instruction for the latter and you would have more complicated register
-allocations.  It would probably be small but measurable.  If you think
-it simplifies the code and it is not measurable, do it and send a patch! :)
+On 2017-06-21 16:42, Max Reitz wrote:
+> On 2017-06-19 19:34, Daniel P. Berrange wrote:
+>> This adds support for using LUKS as an encryption format
+>> with the qcow2 file, using the new encrypt.format parameter
+>> to request "luks" format. e.g.
+>>
+>>   # qemu-img create --object secret,data=3D123456,id=3Dsec0 \
+>>        -f qcow2 -o encrypt.format=3Dluks,encrypt.key-secret=3Dsec0 \
+>>        test.qcow2 10G
+>>
+>> The legacy "encryption=3Don" parameter still results in
+>> creation of the old qcow2 AES format (and is equivalent
+>> to the new 'encryption-format=3Daes'). e.g. the following are
+>> equivalent:
+>>
+>>   # qemu-img create --object secret,data=3D123456,id=3Dsec0 \
+>>        -f qcow2 -o encryption=3Don,encrypt.key-secret=3Dsec0 \
+>>        test.qcow2 10G
+>>
+>>  # qemu-img create --object secret,data=3D123456,id=3Dsec0 \
+>>        -f qcow2 -o encryption-format=3Daes,encrypt.key-secret=3Dsec0 \=
 
-Paolo
+>>        test.qcow2 10G
+>>
+>> With the LUKS format it is necessary to store the LUKS
+>> partition header and key material in the QCow2 file. This
+>> data can be many MB in size, so cannot go into the QCow2
+>> header region directly. Thus the spec defines a FDE
+>> (Full Disk Encryption) header extension that specifies
+>> the offset of a set of clusters to hold the FDE headers,
+>> as well as the length of that region. The LUKS header is
+>> thus stored in these extra allocated clusters before the
+>> main image payload.
+>>
+>> Aside from all the cryptographic differences implied by
+>> use of the LUKS format, there is one further key difference
+>> between the use of legacy AES and LUKS encryption in qcow2.
+>> For LUKS, the initialiazation vectors are generated using
+>> the host physical sector as the input, rather than the
+>> guest virtual sector. This guarantees unique initialization
+>> vectors for all sectors when qcow2 internal snapshots are
+>> used, thus giving stronger protection against watermarking
+>> attacks.
+>>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> Reviewed-by: Alberto Garcia <berto@igalia.com>
+>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+>> ---
+>>  block/qcow2-cluster.c      |   4 +-
+>>  block/qcow2-refcount.c     |  10 ++
+>>  block/qcow2.c              | 268 ++++++++++++++++++++++++++++++++++++=
+++------
+>>  block/qcow2.h              |   9 ++
+>>  qapi/block-core.json       |   5 +-
+>>  tests/qemu-iotests/082.out | 270 ++++++++++++++++++++++++++++++++++++=
+---------
+>>  6 files changed, 478 insertions(+), 88 deletions(-)
+>=20
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+(But due to the split of do_perform_cow(), this will need the same
+changes that patch 10 and 11 will need (in this case only contextual, in
+the cases of 10 and 11 there are also functional changes required).)
+
+
+--A0mGIQrBhTIJEcLc2IOoT6s3vvD9wufhT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEvBAEBCAAZBQJZSoa4EhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQEv/
+CACdkTTe3YzQxVgf9+zzsVtf01y1U+FB8lL7ddlHTJl3SVN9ED25YLM/vhdm482j
+f0jAd/mQjtaEOvA3SAQ1yi6TfqH6n72oK/m/CuUVKA63HPRo5BQP/I3us6bn6j8C
+34P4CF+sRb/hCM8ZtRSW90F1P+QYwpM/F4TxZCR8fojmDTinLkQFdiPXEbpxfOPD
+/Ts/YSAu3mZJm96WkZ8WfCImSgoOV3ugt3zOvcETm4Rn+Tq+uvDPDGoRn4QGBbpO
+h8oSmSLdzOUwYF0tEHlp5JTo5B1eYFXZM1WHomHRkMqqKNrBiSjXwjbx2xq9Z55x
+wHfUytYhM57cqmpJ5lNtkgFN
+=ArXN
+-----END PGP SIGNATURE-----
+
+--A0mGIQrBhTIJEcLc2IOoT6s3vvD9wufhT--
