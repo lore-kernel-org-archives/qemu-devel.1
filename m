@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1dNiT7-0007wz-CF
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 12:27:04 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1dNiTN-0008Cc-Kh
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 12:27:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1dNiT4-0004x5-E4
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 12:27:01 -0400
-Received: from mail-eopbgr30107.outbound.protection.outlook.com
-	([40.107.3.107]:15136
-	helo=EUR03-AM5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1dNiT4-0004wh-2P
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 12:26:58 -0400
-From: Roman Kagan <rkagan@virtuozzo.com>
-Date: Wed, 21 Jun 2017 19:24:24 +0300
-Message-Id: <20170621162424.10462-24-rkagan@virtuozzo.com>
-In-Reply-To: <20170621162424.10462-1-rkagan@virtuozzo.com>
-References: <20170621162424.10462-1-rkagan@virtuozzo.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 23/23] hyperv: update copyright notices
+	(envelope-from <programmingkidx@gmail.com>) id 1dNiTM-00050Q-Jt
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 12:27:17 -0400
+In-Reply-To: <CAFEAcA-72bvtKsPHttUizYj8EvZJDfjUda7CeZe-tpRk73+NXw@mail.gmail.com>
+References: <0F376E9C-2D4B-4D79-B3D4-24F73FD61446@gmail.com>
+	<20170508221304.y36owezwla7sc6ss@aurel32.net>
+	<BB3E29F1-8BBB-407B-AAC8-795E9718CF5E@gmail.com>
+	<20170508225007.2duqxlo5ab2aenpl@aurel32.net>
+	<alpine.BSF.2.20.1705091148560.78100@zero.eik.bme.hu>
+	<F3D7AC88-099F-432D-B46F-97F2A6F7B0E3@gmail.com>
+	<f2644920-8eda-e768-adee-71db36ea2fa3@amsat.org>
+	<CAFEAcA-72bvtKsPHttUizYj8EvZJDfjUda7CeZe-tpRk73+NXw@mail.gmail.com>
+Mime-Version: 1.0 (Apple Message framework v753.1)
+Content-Type: text/plain; charset=ISO-8859-1; delsp=yes; format=flowed
+Message-Id: <CE257476-FBA4-4579-A558-495797786922@gmail.com>
+Content-Transfer-Encoding: quoted-printable
+From: G 3 <programmingkidx@gmail.com>
+Date: Wed, 21 Jun 2017 12:27:08 -0400
+Subject: Re: [Qemu-devel] [Qemu-ppc] Floating point unit bugs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +29,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: Evgeny Yakovlev <eyakovlev@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>, Igor Mammedov <imammedo@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?ISO-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, BALATON Zoltan <balaton@eik.bme.hu>, "qemu-ppc@nongnu.org list:PowerPC" <qemu-ppc@nongnu.org>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
----
- target/i386/hyperv.h     | 1 +
- hw/misc/hyperv_testdev.c | 1 +
- target/i386/hyperv.c     | 1 +
- 3 files changed, 3 insertions(+)
 
-diff --git a/target/i386/hyperv.h b/target/i386/hyperv.h
-index f101144..cba6cbf 100644
---- a/target/i386/hyperv.h
-+++ b/target/i386/hyperv.h
-@@ -2,6 +2,7 @@
-  * QEMU KVM Hyper-V support
-  *
-  * Copyright (C) 2015 Andrey Smetanin <asmetanin@virtuozzo.com>
-+ * Copyright (C) 2017 Parallels International GmbH
-  *
-  * Authors:
-  *  Andrey Smetanin <asmetanin@virtuozzo.com>
-diff --git a/hw/misc/hyperv_testdev.c b/hw/misc/hyperv_testdev.c
-index 4fc7787..57ee42d 100644
---- a/hw/misc/hyperv_testdev.c
-+++ b/hw/misc/hyperv_testdev.c
-@@ -2,6 +2,7 @@
-  * QEMU KVM Hyper-V test device to support Hyper-V kvm-unit-tests
-  *
-  * Copyright (C) 2015 Andrey Smetanin <asmetanin@virtuozzo.com>
-+ * Copyright (C) 2017 Parallels International GmbH
-  *
-  * Authors:
-  *  Andrey Smetanin <asmetanin@virtuozzo.com>
-diff --git a/target/i386/hyperv.c b/target/i386/hyperv.c
-index f779977..32c64af 100644
---- a/target/i386/hyperv.c
-+++ b/target/i386/hyperv.c
-@@ -2,6 +2,7 @@
-  * QEMU KVM Hyper-V support
-  *
-  * Copyright (C) 2015 Andrey Smetanin <asmetanin@virtuozzo.com>
-+ * Copyright (C) 2017 Parallels International GmbH
-  *
-  * Authors:
-  *  Andrey Smetanin <asmetanin@virtuozzo.com>
--- 
-2.9.4
+On Jun 21, 2017, at 12:20 PM, Peter Maydell wrote:
+
+> On 21 June 2017 at 17:14, Philippe Mathieu-Daud=E9 <f4bug@amsat.org> =20=
+
+> wrote:
+>> do you think you can add your test as a qtest, to run it with =20
+>> check-qtest?
+>
+> We don't yet have any mechanism for having tests that need to
+> be compiled for the target architecture, do we?
+
+I don't know about that but I do know we have image files that can be =20=
+
+booted in various guest. These image files could include tests like =20
+the floating point test.
+
+Here is the link to the test images page:
+http://wiki.qemu.org/Testing/System_Images
