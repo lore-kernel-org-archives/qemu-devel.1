@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dNbJq-0008Kp-8a
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 04:49:00 -0400
+	(envelope-from <quintela@redhat.com>) id 1dNbTH-0003uR-Nq
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 04:58:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dNbJp-0003Jw-07
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 04:48:58 -0400
-Date: Wed, 21 Jun 2017 16:18:17 +0800
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170621081817.GE12089@umbus>
-References: <20170620015332.13874-1-david@gibson.dropbear.id.au>
-	<20170620015332.13874-4-david@gibson.dropbear.id.au>
-	<20170620185145.2673e759@bahia.lab.toulouse-stg.fr.ibm.com>
-	<149798664805.10485.16662705281385907661@loki>
+	(envelope-from <quintela@redhat.com>) id 1dNbTB-0000II-Nd
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 04:58:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47592)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dNbTB-0000HN-Hn
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 04:58:37 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 562137CE17
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 08:58:36 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <1498031528-1990-5-git-send-email-peterx@redhat.com> (Peter Xu's
+	message of "Wed, 21 Jun 2017 15:52:02 +0800")
+References: <1498031528-1990-1-git-send-email-peterx@redhat.com>
+	<1498031528-1990-5-git-send-email-peterx@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 21 Jun 2017 10:58:29 +0200
+Message-ID: <87h8z9n2dm.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="0H629O+sVkh21xTi"
-Content-Disposition: inline
-In-Reply-To: <149798664805.10485.16662705281385907661@loki>
-Subject: Re: [Qemu-devel] [PATCH 3/5] spapr: Add DRC release method
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 04/10] migration: let MigrationState be
+ a qdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,77 +35,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: Greg Kurz <groug@kaod.org>, bharata@linux.vnet.ibm.com, sursingh@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
+Peter Xu <peterx@redhat.com> wrote:
+> Let the old man "MigrationState" join the object family. Direct benefit
+> is that we can start to use all the property features derived from
+> current QDev, like: HW_COMPAT_* bits, command line setup for migration
+> parameters (so will never need to set them up each time using HMP/QMP,
+> this is really, really attractive for test writters), etc.
+>
+> I see no reason to disallow this happen yet. So let's start from this
+> one, to see whether it would be anything good.
+>
+> Now we init the MigrationState struct statically in main() to make sure
+> it's initialized after global properties are applied, since we'll use
+> them during creation of the object.
+>
+> No functional change at all.
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
---0H629O+sVkh21xTi
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Jun 20, 2017 at 02:24:08PM -0500, Michael Roth wrote:
-> Quoting Greg Kurz (2017-06-20 11:51:45)
-> > On Tue, 20 Jun 2017 09:53:30 +0800
-> > David Gibson <david@gibson.dropbear.id.au> wrote:
-> >=20
-> > > At the moment, spapr_drc_release() has an ugly switch on the DRC type=
- to
-> > > call the right, device-specific release function.  This cleans it up =
-by
-> > > doing that via a proper QOM method.
-> > >=20
-> > > It's still arguably an abstraction violation for the DRC code to call=
- into
-> > > the specific device code, but one mess at a time.
-> > >=20
-> >=20
-> > Maybe a second step would be to move DRC subclasses to spapr.c (CPU, LM=
-B) and
-> > spapr_pci.c (PCI) ? This would allow each device-specific release funct=
-ion to
-> > have local scope at least.
-
-I was already thinking of doing that in a future patch :)
-
-> I kind of prefer the proposed approach of registering a callback
-> function via drc_new(). This would make it easier to implement
-> unit tests without needing to rely on stub functions, and keeps the
-> type-specific handling constrained to matters relating to the DRC
-> itself and not the resources associated with them.
-
-True.  We went from the callback to this ugly switch when we made the
-DRCs migratable (well, sort of, except for the many remaining
-migration problems these cleanups are addressing amongst other
-things).  But moving the callback registration from attach time to new
-time would do just as well.  Well I'll think about it and do one or
-the other in future.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---0H629O+sVkh21xTi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZSivIAAoJEGw4ysog2bOSJMwP/1wQCIH3SFTDQU/GXif+KNfI
-wcLnQfvLcokb+rzSWfIG111mo/xmjJKxTX1MvS/BKxPjIEOkukwiDR4oV/03paSF
-Hrm0YyOXhjpxjOfXYMMih8hO4XiK/mbBwo8CVueXObqj+GwKyPJ9ogaMWBUwhA0t
-rGS41MaID0jH7Kn2Of86jhYz41fttNoHNR0E2cWUILPNyTq6rpY1l1WRQMGCbvEW
-ZnGKBMSoGr3FFqjTHFm0cRHTrcTXKng2wJLJncKmE3XGzzeH0vAdKt3vRQHLvXdR
-RwmgEUzE9a9w3chSl9ZlBt0yczPbG26ugljJn9B5JAEBO8QjHUUjOkh26E3kFPFN
-c3Mz+Ietl2Xiif0m1ZFzhcOraIqRTChpLGhz3QBe3qtC5eLMsq5Z/scRkTeymjxX
-A5GyO20rwI6WkXiGCL5DJR4aOZ/A1JGTDVf+Z+6vD9Rnu18Muf5rLsb2I+GTa1ul
-P1vbcggbvEK22E/W9eGMaJjC87S+mttHyH8laXVL3JqT0Ntc9AGNmLzWi3Y51m+R
-uM7utx4oPKtTVbbjVub+JOTjBjDkbSaBwWf1ZnxGsJIJRjAOHXgN2T6wcsjm+P2K
-k63NS+DjtYgP9xvQNp4QlLItnCyYh49q5+cyhQrq94Jmywxbsmz+jF9AUkbVAalW
-pCYK0m5YAvjIc6AtlLG3
-=bnfa
------END PGP SIGNATURE-----
-
---0H629O+sVkh21xTi--
+Reviewed-by: Juan Quintela <quintela@redhat.com>
