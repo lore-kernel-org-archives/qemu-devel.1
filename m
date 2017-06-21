@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dNbXv-0006kU-Uh
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 05:03:32 -0400
+	(envelope-from <prvs=3382f85e5=roger.pau@citrix.com>)
+	id 1dNbm4-0002mZ-T3
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 05:18:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dNbXs-0004KU-1x
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 05:03:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59462)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dNbXr-0004K7-Sl
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 05:03:27 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E19293B73C
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 09:03:26 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <1498031528-1990-11-git-send-email-peterx@redhat.com> (Peter Xu's
-	message of "Wed, 21 Jun 2017 15:52:08 +0800")
-References: <1498031528-1990-1-git-send-email-peterx@redhat.com>
-	<1498031528-1990-11-git-send-email-peterx@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 21 Jun 2017 11:03:21 +0200
-Message-ID: <87shitlnl2.fsf@secure.laptop>
+	(envelope-from <prvs=3382f85e5=roger.pau@citrix.com>)
+	id 1dNbm1-0001dp-Mc
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 05:18:08 -0400
+Date: Wed, 21 Jun 2017 10:17:43 +0100
+From: Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>
+Message-ID: <20170621091743.qyhzt52t35y5oxek@dhcp-3-128.uk.xensource.com>
+References: <20170620134756.9632-1-paul.durrant@citrix.com>
+	<20170620134756.9632-2-paul.durrant@citrix.com>
+	<alpine.DEB.2.10.1706201510490.12819@sstabellini-ThinkPad-X260>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 10/10] migration: hmp: dump globals
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <alpine.DEB.2.10.1706201510490.12819@sstabellini-ThinkPad-X260>
+Subject: Re: [Qemu-devel] [PATCH 1/3] xen-disk: only advertize
+ feature-persistent if grant copy is not available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,16 +27,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Paul Durrant <paul.durrant@citrix.com>, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, qemu-block@nongnu.org, Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Peter Xu <peterx@redhat.com> wrote:
-> Now we have some globals that can be configured for migration. Dump them
-> in HMP info migration for better debugging.
->
-> (we can also use this to monitor whether COMPAT fields are applied
-> correctly on compatible machines)
->
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+On Tue, Jun 20, 2017 at 03:19:33PM -0700, Stefano Stabellini wrote:
+> On Tue, 20 Jun 2017, Paul Durrant wrote:
+> > If grant copy is available then it will always be used in preference to
+> > persistent maps. In this case feature-persistent should not be advertized
+> > to the frontend, otherwise it may needlessly copy data into persistently
+> > granted buffers.
+> > 
+> > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> 
+> CC'ing Roger.
+> 
+> It is true that using feature-persistent together with grant copies is a
+> a very bad idea.
+> 
+> But this change enstablishes an explicit preference of
+> feature_grant_copy over feature-persistent in the xen_disk backend. It
+> is not obvious to me that it should be the case.
+> 
+> Why is feature_grant_copy (without feature-persistent) better than
+> feature-persistent (without feature_grant_copy)? Shouldn't we simply
+> avoid grant copies to copy data to persistent grants?
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+When using persistent grants the frontend must always copy data from
+the buffer to the persistent grant, there's no way to avoid this.
+
+Using grant_copy we move the copy from the frontend to the backend,
+which means the CPU time of the copy is accounted to the backend. This
+is not ideal, but IMHO it's better than persistent grants because it
+avoids keeping a pool of mapped grants that consume memory and make
+the code more complex.
+
+Do you have some performance data showing the difference between
+persistent grants vs grant copy?
+
+Roger.
