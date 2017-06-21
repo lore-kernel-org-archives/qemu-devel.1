@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dNkdt-0002Ir-3I
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 14:46:18 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dNkoo-0004xC-VE
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 14:57:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dNkdp-0000Mo-V3
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 14:46:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46398)
+	(envelope-from <dgilbert@redhat.com>) id 1dNkol-0005H7-R1
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 14:57:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40884)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1dNkdp-0000ME-M9
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 14:46:13 -0400
-Date: Wed, 21 Jun 2017 11:46:08 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <594A2A1C0200007800164F2A@prv-mh.provo.novell.com>
-Message-ID: <alpine.DEB.2.10.1706211108530.12819@sstabellini-ThinkPad-X260>
-References: <59492D1C0200007800164AA3@prv-mh.provo.novell.com>
-	<59492D1C0200007800164AA3@prv-mh.provo.novell.com>
-	<alpine.DEB.2.10.1706201421210.12819@sstabellini-ThinkPad-X260>
-	<594A2A1C0200007800164F2A@prv-mh.provo.novell.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dNkol-0005GZ-HP
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 14:57:31 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8E77F636F
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 18:57:28 +0000 (UTC)
+Date: Wed, 21 Jun 2017 19:57:20 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170621185720.GA2099@work-vm>
+References: <20170621102005.18701-1-quintela@redhat.com>
+	<20170621102005.18701-5-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH] xen/disk: don't leak stack data via
- response ring
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170621102005.18701-5-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 4/5] migration: Convert ram to use new
+ load_setup()/load_cleanup()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,95 +34,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jan Beulich <JBeulich@suse.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, Julien Grall <julien.grall@arm.com>, xen-devel <xen-devel@lists.xenproject.org>, qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, kwolf@redhat.com, stefanha@redhat.com
 
-On Wed, 21 Jun 2017, Jan Beulich wrote:
-> >>> On 20.06.17 at 23:48, <sstabellini@kernel.org> wrote:
-> > On Tue, 20 Jun 2017, Jan Beulich wrote:
-> >> @@ -36,13 +33,7 @@ struct blkif_x86_32_request_discard {
-> >>      blkif_sector_t sector_number;    /* start sector idx on disk (r/w only)  */
-> >>      uint64_t       nr_sectors;       /* # of contiguous sectors to discard   */
-> >>  };
-> >> -struct blkif_x86_32_response {
-> >> -    uint64_t        id;              /* copied from request */
-> >> -    uint8_t         operation;       /* copied from request */
-> >> -    int16_t         status;          /* BLKIF_RSP_???       */
-> >> -};
-> >>  typedef struct blkif_x86_32_request blkif_x86_32_request_t;
-> >> -typedef struct blkif_x86_32_response blkif_x86_32_response_t;
-> >>  #pragma pack(pop)
-> >>  
-> >>  /* x86_64 protocol version */
-> >> @@ -62,20 +53,14 @@ struct blkif_x86_64_request_discard {
-> >>      blkif_sector_t sector_number;    /* start sector idx on disk (r/w only)  */
-> >>      uint64_t       nr_sectors;       /* # of contiguous sectors to discard   */
-> >>  };
-> >> -struct blkif_x86_64_response {
-> >> -    uint64_t       __attribute__((__aligned__(8))) id;
-> >> -    uint8_t         operation;       /* copied from request */
-> >> -    int16_t         status;          /* BLKIF_RSP_???       */
-> >> -};
-> >>
-> >>  typedef struct blkif_x86_64_request blkif_x86_64_request_t;
-> >> -typedef struct blkif_x86_64_response blkif_x86_64_response_t;
-> >>  
-> >>  DEFINE_RING_TYPES(blkif_common, struct blkif_common_request,
-> >> -                  struct blkif_common_response);
-> >> +                  struct blkif_response);
-> >>  DEFINE_RING_TYPES(blkif_x86_32, struct blkif_x86_32_request,
-> >> -                  struct blkif_x86_32_response);
-> >> +                  struct blkif_response QEMU_PACKED);
-> > 
-> > In my test, the previous sizes and alignments of the response structs
-> > were (on both x86_32 and x86_64):
-> > 
-> > sizeof(blkif_x86_32_response)=12   sizeof(blkif_x86_64_response)=16
-> > align(blkif_x86_32_response)=4     align(blkif_x86_64_response)=8
-> > 
-> > While with these changes are now, when compiled on x86_64:
-> > sizeof(blkif_x86_32_response)=11   sizeof(blkif_x86_64_response)=16
-> > align(blkif_x86_32_response)=1     align(blkif_x86_64_response)=8
-> > 
-> > when compiled on x86_32:
-> > sizeof(blkif_x86_32_response)=11   sizeof(blkif_x86_64_response)=12
-> > align(blkif_x86_32_response)=1     align(blkif_x86_64_response)=4
-> > 
-> > Did I do my tests wrong?
-> > 
-> > QEMU_PACKED is not the same as #pragma pack(push, 4). In fact, it is the
-> > same as #pragma pack(push, 1), causing the struct to be densely packed,
-> > leaving no padding whatsever.
-> > 
-> > In addition, without __attribute__((__aligned__(8))),
-> > blkif_x86_64_response won't be 8 bytes aligned when built on x86_32.
-> > 
-> > Am I missing something?
+* Juan Quintela (quintela@redhat.com) wrote:
+> Once there, I rename ram_migration_cleanup() to ram_save_cleanup().
+> Notice that this is the first pass, and I only passed XBZRLE to the
+> new scheme.  Moved decoded_buf to inside XBZRLE struct.
+> As a bonus, I don't have to export xbzrle functions from ram.c.
 > 
-> Well, you're mixing attribute application upon structure
-> declaration with attribute application upon structure use. It's
-> the latter here, and hence the attribute doesn't affect
-> structure layout at all. All it does is avoid the _containing_
-> 32-bit union to become 8-byte aligned (and tail padding to be
-> inserted).
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-Thanks for the explanation. I admit it's the first time I see the
-aligned attribute being used at structure usage only. I think it's the
-first time QEMU_PACKED is used this way in QEMU too.
 
-Anyway, even taking that into account, things are still not completely
-right: the alignment of struct blkif_x86_32_response QEMU_PACKED is 4
-bytes as you wrote, but the size of struct blkif_x86_32_response is
-still 16 bytes instead of 12 bytes in my test. I suspect it worked for
-you because the other member of the union (blkif_x86_32_request) is
-larger than that. However, I think is not a good idea to rely on this
-implementation detail. The implementation of DEFINE_RING_TYPES should be
-opaque from our point of view. We shouldn't have to know that there is a
-union there.
+Note a tiny comment typo below, but other than that:
 
-Moreover, the other problem is still unaddressed: the size and alignment
-of blkif_x86_64_response when built on x86_32 are 12 and 4 instead of 16
-and 8 bytes. Is that working also because it's relying on the other
-member of the union to enforce the right alignment and bigger size? I
-think it's a bad idea to rely on that, especially given that this
-obscure but important detail is not even mentioned in the commit message.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> --
+> 
+> loaded_data pointer was needed because called can change it (dave)
+> ---
+>  migration/migration.c |  3 ---
+>  migration/ram.c       | 49 ++++++++++++++++++++++++++++++++++++-------------
+>  migration/ram.h       |  1 -
+>  3 files changed, 36 insertions(+), 17 deletions(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 520d9b9..aaaf7ff 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -350,9 +350,6 @@ static void process_incoming_migration_co(void *opaque)
+>          migrate_decompress_threads_join();
+>          exit(EXIT_FAILURE);
+>      }
+> -
+> -    free_xbzrle_decoded_buf();
+> -
+>      mis->bh = qemu_bh_new(process_incoming_migration_bh, mis);
+>      qemu_bh_schedule(mis->bh);
+>  }
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 649f76c..a619e0b 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -85,11 +85,10 @@ static struct {
+>      QemuMutex lock;
+>      /* it will store a page full of zeros */
+>      uint8_t *zero_target_page;
+> +    /* buffer used for XBZRLE decoding */
+> +    uint8_t *decoded_buf;
+>  } XBZRLE;
+>  
+> -/* buffer used for XBZRLE decoding */
+> -static uint8_t *xbzrle_decoded_buf;
+> -
+>  static void XBZRLE_cache_lock(void)
+>  {
+>      if (migrate_use_xbzrle())
+> @@ -1350,13 +1349,18 @@ uint64_t ram_bytes_total(void)
+>      return total;
+>  }
+>  
+> -void free_xbzrle_decoded_buf(void)
+> +static void xbzrle_load_setup(void)
+>  {
+> -    g_free(xbzrle_decoded_buf);
+> -    xbzrle_decoded_buf = NULL;
+> +    XBZRLE.decoded_buf = g_malloc(TARGET_PAGE_SIZE);
+>  }
+>  
+> -static void ram_migration_cleanup(void *opaque)
+> +static void xbzrle_load_cleanup(void)
+> +{
+> +    g_free(XBZRLE.decoded_buf);
+> +    XBZRLE.decoded_buf = NULL;
+> +}
+> +
+> +static void ram_save_cleanup(void *opaque)
+>  {
+>      RAMState **rsp = opaque;
+>      RAMBlock *block;
+> @@ -2078,11 +2082,6 @@ static int load_xbzrle(QEMUFile *f, ram_addr_t addr, void *host)
+>      int xh_flags;
+>      uint8_t *loaded_data;
+>  
+> -    if (!xbzrle_decoded_buf) {
+> -        xbzrle_decoded_buf = g_malloc(TARGET_PAGE_SIZE);
+> -    }
+> -    loaded_data = xbzrle_decoded_buf;
+> -
+>      /* extract RLE header */
+>      xh_flags = qemu_get_byte(f);
+>      xh_len = qemu_get_be16(f);
+> @@ -2096,7 +2095,9 @@ static int load_xbzrle(QEMUFile *f, ram_addr_t addr, void *host)
+>          error_report("Failed to load XBZRLE page - len overflow!");
+>          return -1;
+>      }
+> +    loaded_data = XBZRLE.decoded_buf;
+>      /* load data and decode */
+> +    /* it can change laded_data to point to an internal buffer */
+                         ^--- o
+
+>      qemu_get_buffer_in_place(f, &loaded_data, xh_len);
+>  
+>      /* decode RLE */
+> @@ -2310,6 +2311,26 @@ static void decompress_data_with_multi_threads(QEMUFile *f,
+>  }
+>  
+>  /**
+> + * ram_load_setup: Setup RAM for migration incoming side
+> + *
+> + * Returns zero to indicate success and negative for error
+> + *
+> + * @f: QEMUFile where to receive the data
+> + * @opaque: RAMState pointer
+> + */
+> +static int ram_load_setup(QEMUFile *f, void *opaque)
+> +{
+> +    xbzrle_load_setup();
+> +    return 0;
+> +}
+> +
+> +static int ram_load_cleanup(void *opaque)
+> +{
+> +    xbzrle_load_cleanup();
+> +    return 0;
+> +}
+> +
+> +/**
+>   * ram_postcopy_incoming_init: allocate postcopy data structures
+>   *
+>   * Returns 0 for success and negative if there was one error
+> @@ -2629,7 +2650,9 @@ static SaveVMHandlers savevm_ram_handlers = {
+>      .save_live_complete_precopy = ram_save_complete,
+>      .save_live_pending = ram_save_pending,
+>      .load_state = ram_load,
+> -    .save_cleanup = ram_migration_cleanup,
+> +    .save_cleanup = ram_save_cleanup,
+> +    .load_setup = ram_load_setup,
+> +    .load_cleanup = ram_load_cleanup,
+>  };
+>  
+>  void ram_mig_init(void)
+> diff --git a/migration/ram.h b/migration/ram.h
+> index 6272eb0..a8b79a4 100644
+> --- a/migration/ram.h
+> +++ b/migration/ram.h
+> @@ -47,7 +47,6 @@ void migrate_decompress_threads_join(void);
+>  uint64_t ram_pagesize_summary(void);
+>  int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len);
+>  void acct_update_position(QEMUFile *f, size_t size, bool zero);
+> -void free_xbzrle_decoded_buf(void);
+>  void ram_debug_dump_bitmap(unsigned long *todump, bool expected,
+>                             unsigned long pages);
+>  void ram_postcopy_migrated_memory_release(MigrationState *ms);
+> -- 
+> 2.9.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
