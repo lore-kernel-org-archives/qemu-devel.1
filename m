@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dNWH8-0007lF-3y
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 23:25:50 -0400
+	(envelope-from <batmanustc@gmail.com>) id 1dNWNs-00011x-Ow
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 23:32:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dNWH4-0007XG-4n
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 23:25:50 -0400
-Received: from mga04.intel.com ([192.55.52.120]:21924)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dNWH3-0007WS-Qx
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 23:25:46 -0400
-Message-ID: <5949E7C0.3050106@intel.com>
-Date: Wed, 21 Jun 2017 11:28:00 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <batmanustc@gmail.com>) id 1dNWNs-0000WY-1r
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 23:32:48 -0400
 MIME-Version: 1.0
-References: <1497004901-30593-1-git-send-email-wei.w.wang@intel.com>
-	<1497004901-30593-7-git-send-email-wei.w.wang@intel.com>
-	<20170620190343-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20170620190343-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v11 6/6] virtio-balloon:
- VIRTIO_BALLOON_F_CMD_VQ
+From: Sam <batmanustc@gmail.com>
+Date: Wed, 21 Jun 2017 11:32:45 +0800
+Message-ID: <CAOE=1Z1Bbgb494m6mYRnX1-80eT0tSnF0F6zNM7efEie4rd7DA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] Will huge page have negative effect on guest vm in
+ qemu enviroment?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +20,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, dave.hansen@intel.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com
+To: dev@dpdk.org, users@dpdk.org, qemu-devel@nongnu.org, qemu-discuss@nongnu.org
 
-On 06/21/2017 12:18 AM, Michael S. Tsirkin wrote:
-> On Fri, Jun 09, 2017 at 06:41:41PM +0800, Wei Wang wrote:
->> -	if (!virtqueue_indirect_desc_table_add(vq, desc, num)) {
->> +	if (!virtqueue_indirect_desc_table_add(vq, desc, *num)) {
->>   		virtqueue_kick(vq);
->> -		wait_event(vb->acked, virtqueue_get_buf(vq, &len));
->> -		vb->balloon_page_chunk.chunk_num = 0;
->> +		if (busy_wait)
->> +			while (!virtqueue_get_buf(vq, &len) &&
->> +			       !virtqueue_is_broken(vq))
->> +				cpu_relax();
->> +		else
->> +			wait_event(vb->acked, virtqueue_get_buf(vq, &len));
->
-> This is something I didn't previously notice.
-> As you always keep a single buffer in flight, you do not
-> really need indirect at all. Just add all descriptors
-> in the ring directly, then kick.
->
-> E.g.
-> 	virtqueue_add_first
-> 	virtqueue_add_next
-> 	virtqueue_add_last
->
-> ?
->
-> You also want a flag to avoid allocations but there's no need to do it
-> per descriptor, set it on vq.
->
+Hi all,
 
-Without using the indirect table, I'm thinking about changing to use
-the standard sg (i.e. struct scatterlist), instead of vring_desc, so that
-we don't need to modify or add any new functions of virtqueue_add().
+We plan to use DPDK on HP host machine with several core and big memory. We
+plan to use qemu-kvm enviroment. The host will carry 4 or more guest vm and
+1 ovs.
 
-In this case, we will kmalloc an array of sgs in probe(), and we can add
-the sgs one by one to the vq, which won't trigger the allocation of an
-indirect table inside virtqueue_add(), and then kick when all are added.
+Ovs-dpdk is much faster then normal ovs, but to use ovs-dpdk, we have to
+enable huge page globally.
 
-Best,
-Wei
+My question is, will huge page enabled globally have negative effect on
+guest vm's memory orperate or something? If it is, how to prevent this, or
+could I enable huge page on some core or enable huge page for a part of
+memory?
+
+Thank you~
