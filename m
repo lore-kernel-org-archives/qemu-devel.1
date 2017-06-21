@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dNfbi-0005Ob-6J
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:23:43 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dNfbl-0005RU-0l
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:23:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dNfbh-0003b0-6m
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:23:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60182)
+	(envelope-from <kraxel@redhat.com>) id 1dNfbe-0003ZD-Qt
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:23:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41970)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dNfbg-0003ag-UP
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:23:41 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dNfbe-0003Yc-IU
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:23:38 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 06BC67DCC4
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 13:23:40 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9FAC45BED8
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 13:23:37 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 21 Jun 2017 15:23:37 +0200
-Message-Id: <20170621132340.27686-4-kraxel@redhat.com>
+Date: Wed, 21 Jun 2017 15:23:36 +0200
+Message-Id: <20170621132340.27686-3-kraxel@redhat.com>
 In-Reply-To: <20170621132340.27686-1-kraxel@redhat.com>
 References: <20170621132340.27686-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 3/6] sdl2: use framebuffer helper functions.
+Subject: [Qemu-devel] [PULL 2/6] egl-headless: use framebuffer helper
+ functions.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,120 +34,123 @@ To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20170614084149.31314-4-kraxel@redhat.com
+Message-id: 20170614084149.31314-3-kraxel@redhat.com
 ---
- include/ui/sdl2.h |  8 ++++++--
- ui/sdl2-gl.c      | 36 +++++++-----------------------------
- 2 files changed, 13 insertions(+), 31 deletions(-)
+ ui/egl-headless.c | 67 ++++++++++++++-----------------------------------------
+ 1 file changed, 17 insertions(+), 50 deletions(-)
 
-diff --git a/include/ui/sdl2.h b/include/ui/sdl2.h
-index aaf226c2c0..454367ac84 100644
---- a/include/ui/sdl2.h
-+++ b/include/ui/sdl2.h
-@@ -7,6 +7,10 @@
- #include <SDL.h>
- #include <SDL_syswm.h>
- 
-+#ifdef CONFIG_OPENGL
-+# include "ui/egl-helpers.h"
-+#endif
-+
- struct sdl2_console {
+diff --git a/ui/egl-headless.c b/ui/egl-headless.c
+index d8d800f8a6..809bfde99c 100644
+--- a/ui/egl-headless.c
++++ b/ui/egl-headless.c
+@@ -8,14 +8,13 @@
+ typedef struct egl_dpy {
      DisplayChangeListener dcl;
-     DisplaySurface *surface;
-@@ -23,8 +27,8 @@ struct sdl2_console {
-     SDL_GLContext winctx;
- #ifdef CONFIG_OPENGL
-     ConsoleGLState *gls;
--    GLuint tex_id;
--    GLuint fbo_id;
+     DisplaySurface *ds;
+-    int width, height;
+-    GLuint texture;
+-    GLuint framebuffer;
+-    GLuint blit_texture;
+-    GLuint blit_framebuffer;
 +    egl_fb guest_fb;
-+    egl_fb win_fb;
-     bool y0_top;
-     bool scanout_mode;
- #endif
-diff --git a/ui/sdl2-gl.c b/ui/sdl2-gl.c
-index 1cd77e2c16..dcad3d0d26 100644
---- a/ui/sdl2-gl.c
-+++ b/ui/sdl2-gl.c
-@@ -42,14 +42,7 @@ static void sdl2_set_scanout_mode(struct sdl2_console *scon, bool scanout)
++    egl_fb blit_fb;
+     bool y_0_top;
+ } egl_dpy;
  
-     scon->scanout_mode = scanout;
-     if (!scon->scanout_mode) {
--        if (scon->fbo_id) {
--            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
--                                      GL_COLOR_ATTACHMENT0_EXT,
--                                      GL_TEXTURE_2D, 0, 0);
--            glDeleteFramebuffers(1, &scon->fbo_id);
--            glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
--            scon->fbo_id = 0;
--        }
-+        egl_fb_destroy(&scon->guest_fb);
-         if (scon->surface) {
-             surface_gl_destroy_texture(scon->gls, scon->surface);
-             surface_gl_create_texture(scon->gls, scon->surface);
-@@ -191,7 +184,6 @@ void sdl2_gl_scanout_disable(DisplayChangeListener *dcl)
-     assert(scon->opengl);
-     scon->w = 0;
-     scon->h = 0;
--    scon->tex_id = 0;
-     sdl2_set_scanout_mode(scon, false);
- }
- 
-@@ -210,48 +202,34 @@ void sdl2_gl_scanout_texture(DisplayChangeListener *dcl,
-     scon->y = y;
-     scon->w = w;
-     scon->h = h;
--    scon->tex_id = backing_id;
-     scon->y0_top = backing_y_0_top;
- 
-     SDL_GL_MakeCurrent(scon->real_window, scon->winctx);
- 
-     sdl2_set_scanout_mode(scon, true);
--    if (!scon->fbo_id) {
--        glGenFramebuffers(1, &scon->fbo_id);
--    }
--
--    glBindFramebuffer(GL_FRAMEBUFFER_EXT, scon->fbo_id);
--    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
--                              GL_TEXTURE_2D, scon->tex_id, 0);
-+    egl_fb_create_for_tex(&scon->guest_fb, backing_width, backing_height,
-+                          backing_id);
- }
- 
- void sdl2_gl_scanout_flush(DisplayChangeListener *dcl,
-                            uint32_t x, uint32_t y, uint32_t w, uint32_t h)
++/* ------------------------------------------------------------------ */
++
+ static void egl_refresh(DisplayChangeListener *dcl)
  {
-     struct sdl2_console *scon = container_of(dcl, struct sdl2_console, dcl);
--    int ww, wh, y1, y2;
-+    int ww, wh;
+     graphic_hw_update(dcl->con);
+@@ -38,8 +37,8 @@ static void egl_scanout_disable(DisplayChangeListener *dcl)
+ {
+     egl_dpy *edpy = container_of(dcl, egl_dpy, dcl);
  
-     assert(scon->opengl);
-     if (!scon->scanout_mode) {
-         return;
-     }
--    if (!scon->fbo_id) {
-+    if (!scon->guest_fb.framebuffer) {
-         return;
-     }
- 
-     SDL_GL_MakeCurrent(scon->real_window, scon->winctx);
- 
--    glBindFramebuffer(GL_READ_FRAMEBUFFER, scon->fbo_id);
--    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
--
-     SDL_GetWindowSize(scon->real_window, &ww, &wh);
--    glViewport(0, 0, ww, wh);
--    y1 = scon->y0_top ? 0 : scon->h;
--    y2 = scon->y0_top ? scon->h : 0;
--    glBlitFramebuffer(0, y1, scon->w, y2,
--                      0, 0, ww, wh,
--                      GL_COLOR_BUFFER_BIT, GL_NEAREST);
--    glBindFramebuffer(GL_FRAMEBUFFER_EXT, scon->fbo_id);
-+    egl_fb_setup_default(&scon->win_fb, ww, wh);
-+    egl_fb_blit(&scon->win_fb, &scon->guest_fb, !scon->y0_top);
- 
-     SDL_GL_SwapWindow(scon->real_window);
+-    edpy->texture = 0;
+-    /* XXX: delete framebuffers here ??? */
++    egl_fb_destroy(&edpy->guest_fb);
++    egl_fb_destroy(&edpy->blit_fb);
  }
+ 
+ static void egl_scanout_texture(DisplayChangeListener *dcl,
+@@ -52,34 +51,17 @@ static void egl_scanout_texture(DisplayChangeListener *dcl,
+ {
+     egl_dpy *edpy = container_of(dcl, egl_dpy, dcl);
+ 
+-    edpy->texture = backing_id;
+     edpy->y_0_top = backing_y_0_top;
+ 
+     /* source framebuffer */
+-    if (!edpy->framebuffer) {
+-        glGenFramebuffers(1, &edpy->framebuffer);
+-    }
+-    glBindFramebuffer(GL_FRAMEBUFFER_EXT, edpy->framebuffer);
+-    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+-                              GL_TEXTURE_2D, edpy->texture, 0);
++    egl_fb_create_for_tex(&edpy->guest_fb,
++                          backing_width, backing_height, backing_id);
+ 
+     /* dest framebuffer */
+-    if (!edpy->blit_framebuffer) {
+-        glGenFramebuffers(1, &edpy->blit_framebuffer);
+-        glGenTextures(1, &edpy->blit_texture);
+-        edpy->width = 0;
+-        edpy->height = 0;
+-    }
+-    if (edpy->width != backing_width || edpy->height != backing_height) {
+-        edpy->width   = backing_width;
+-        edpy->height  = backing_height;
+-        glBindTexture(GL_TEXTURE_2D, edpy->blit_texture);
+-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+-                     edpy->width, edpy->height,
+-                     0, GL_BGRA, GL_UNSIGNED_BYTE, 0);
+-        glBindFramebuffer(GL_FRAMEBUFFER_EXT, edpy->blit_framebuffer);
+-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+-                                  GL_TEXTURE_2D, edpy->blit_texture, 0);
++    if (edpy->blit_fb.width  != backing_width ||
++        edpy->blit_fb.height != backing_height) {
++        egl_fb_destroy(&edpy->blit_fb);
++        egl_fb_create_new_tex(&edpy->blit_fb, backing_width, backing_height);
+     }
+ }
+ 
+@@ -88,32 +70,17 @@ static void egl_scanout_flush(DisplayChangeListener *dcl,
+                               uint32_t w, uint32_t h)
+ {
+     egl_dpy *edpy = container_of(dcl, egl_dpy, dcl);
+-    GLuint y1, y2;
+ 
+-    if (!edpy->texture || !edpy->ds) {
++    if (!edpy->guest_fb.texture || !edpy->ds) {
+         return;
+     }
+-    assert(surface_width(edpy->ds)  == edpy->width);
+-    assert(surface_height(edpy->ds) == edpy->height);
++    assert(surface_width(edpy->ds)  == edpy->guest_fb.width);
++    assert(surface_height(edpy->ds) == edpy->guest_fb.height);
+     assert(surface_format(edpy->ds) == PIXMAN_x8r8g8b8);
+ 
+-    /* blit framebuffer, flip if needed */
+-    glBindFramebuffer(GL_READ_FRAMEBUFFER, edpy->framebuffer);
+-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, edpy->blit_framebuffer);
+-    glViewport(0, 0, edpy->width, edpy->height);
+-    y1 = edpy->y_0_top ? edpy->height : 0;
+-    y2 = edpy->y_0_top ? 0 : edpy->height;
+-    glBlitFramebuffer(0, y1, edpy->width, y2,
+-                      0, 0, edpy->width, edpy->height,
+-                      GL_COLOR_BUFFER_BIT, GL_NEAREST);
++    egl_fb_blit(&edpy->blit_fb, &edpy->guest_fb, edpy->y_0_top);
++    egl_fb_read(surface_data(edpy->ds), &edpy->blit_fb);
+ 
+-    /* read pixels to surface */
+-    glBindFramebuffer(GL_READ_FRAMEBUFFER, edpy->blit_framebuffer);
+-    glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
+-    glReadPixels(0, 0, edpy->width, edpy->height,
+-                 GL_BGRA, GL_UNSIGNED_BYTE, surface_data(edpy->ds));
+-
+-    /* notify about updates */
+     dpy_gfx_update(edpy->dcl.con, x, y, w, h);
+ }
+ 
 -- 
 2.9.3
