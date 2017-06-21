@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dNilD-0001qz-Vl
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 12:45:45 -0400
+	(envelope-from <groug@kaod.org>) id 1dNjdf-0002Ol-4J
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 13:41:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dNilA-0005Ju-HC
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 12:45:44 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:57179)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dNilA-0005JJ-6E
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 12:45:40 -0400
-References: <20170620205121.26515-1-laurent@vivier.eu>
-	<20170620205121.26515-4-laurent@vivier.eu>
-	<b05fb631-4ccb-39fa-adc3-6949a514b9d2@amsat.org>
-	<f43b2f92-a76e-945f-9334-2cd9cb71ec95@twiddle.net>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <b4efd52d-ecc4-6321-45fa-e9477589ecd4@vivier.eu>
-Date: Wed, 21 Jun 2017 18:45:09 +0200
+	(envelope-from <groug@kaod.org>) id 1dNjdb-0003k9-KJ
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 13:41:59 -0400
+Received: from 14.mo5.mail-out.ovh.net ([188.165.51.82]:44346)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dNjdb-0003j7-Dr
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 13:41:55 -0400
+Received: from player695.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id B47BC1082FA
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 19:41:53 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Wed, 21 Jun 2017 19:41:43 +0200
+Message-ID: <149806690313.3840.13274158676579302242.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <f43b2f92-a76e-945f-9334-2cd9cb71ec95@twiddle.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 3/6] target-m68k: use floatx80 internally
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH v3 0/4] 9pfs: handle transport errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +27,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Thomas Huth <huth@tuxfamily.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: qemu-devel@nongnu.org
+Cc: Stefano Stabellini <sstabellini@kernel.org>, Greg Kurz <groug@kaod.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Le 21/06/2017 à 18:37, Richard Henderson a écrit :
-> On 06/21/2017 09:18 AM, Philippe Mathieu-Daudé wrote:
->>> +typedef CPU_LDoubleU FPReg;
->>
->> What an awful name... Anyway checking on "qemu/bswap.h" it seems there
->> is some endianess issue with it if your host is little-endian.
-> 
-> There is no endian-ness issue because we do not attempt to read that
-> structure from memory as a whole.  Instead, Laurent uses two big-endian
-> loads (with appropriate address arithmetic) and stores the result into
-> this host structure in host-endian order.  Further, the host routines
-> use the structure members by name and do not assume any particular
-> relationship between them.
-> 
->> Do you have a way to run Berkeley TestFloat?
-> 
-> As noted in Laurent's cover message, floatx80 isn't quite right -- that
-> is the x86 data type, and the proper m68k data type is slightly different.
-> 
-> I would expect the results from using floatx80 to be Just Good Enough to
-> produce a working m68k user-land.  It will produce correct results for
-> normal numbers in arithmetic such as 1.0 + 10.0.  But I would expect
-> many of the edge conditions that TestFloat would attempt (especially
-> de-normals and un-normals) would fail.
-> 
+The 9p protocol relies on a reliable transport, but the current code
+treats transport errors (ie, failure to marshal or unmarshal) as if
+they were coming from the backend. This doesn't make sense: if the
+transport failed, we should notify the guest that the transport is
+broken and needs to be reset, using transport specific means.
 
-Thank you Richard.
+This series only modifies the virtio transport so that it can notify
+the guest about transport failures.
 
-Yes, with floatx80, we can run m68k user-land. I'm going to post the
-missing instructions.
+Changes since v2:
+- complete rework
 
-I've also ported TestFloat and SoftFloat to m68k to check the result,
-it's not perfect but in a good shape.
+--
+Greg
 
-https://github.com/vivier/m68k-testfloat
-https://github.com/vivier/m68k-softfloat
+---
 
-I can compare result from my reference hardware (a real Quadra 800) and
-qemu-m68k chroot.
+Greg Kurz (4):
+      virtio-9p: record element after sanity checks
+      virtio-9p: message header is 7-byte long
+      virtio-9p: break device if buffers are misconfigured
+      9pfs: handle transport errors in pdu_complete()
 
-But I plan to replace the floatx80 by a floatx96 in a near future...
 
-Thanks,
-Laurent
+ hw/9pfs/9p.c               |   25 +++++++++++++-------
+ hw/9pfs/9p.h               |    7 +++++-
+ hw/9pfs/virtio-9p-device.c |   56 ++++++++++++++++++++++++++++++++++++--------
+ hw/9pfs/xen-9p-backend.c   |    3 ++
+ 4 files changed, 70 insertions(+), 21 deletions(-)
