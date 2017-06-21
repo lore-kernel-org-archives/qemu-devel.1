@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <boqun.feng@gmail.com>) id 1dNYDZ-0002jw-7d
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 01:30:18 -0400
+	(envelope-from <pavel.shirshov@gmail.com>) id 1dNYvN-0004LL-BX
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 02:15:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <boqun.feng@gmail.com>) id 1dNYDW-0003Tk-2y
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 01:30:17 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:36537)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <boqun.feng@gmail.com>)
-	id 1dNYDV-0003T4-Sc
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 01:30:14 -0400
-Received: by mail-pg0-x244.google.com with SMTP id e187so16723976pgc.3
-	for <qemu-devel@nongnu.org>; Tue, 20 Jun 2017 22:30:11 -0700 (PDT)
-From: "Boqun Feng (Intel)" <boqun.feng@gmail.com>
-Date: Wed, 21 Jun 2017 13:29:34 +0800
-Message-Id: <20170621052935.20715-1-boqun.feng@gmail.com>
-Subject: [Qemu-devel] [PATCH] target-i386: add Skylake-Server cpu model
+	(envelope-from <pavel.shirshov@gmail.com>) id 1dNYvM-0002yU-DN
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 02:15:33 -0400
+MIME-Version: 1.0
+In-Reply-To: <CAOE=1Z1LJr9rpaEQ9+b7D5vM3N=Wy0oGunRnzoQ79x3dWA3oaw@mail.gmail.com>
+References: <CAOE=1Z1Bbgb494m6mYRnX1-80eT0tSnF0F6zNM7efEie4rd7DA@mail.gmail.com>
+	<CAOE=1Z1LJr9rpaEQ9+b7D5vM3N=Wy0oGunRnzoQ79x3dWA3oaw@mail.gmail.com>
+From: Pavel Shirshov <pavel.shirshov@gmail.com>
+Date: Tue, 20 Jun 2017 23:15:29 -0700
+Message-ID: <CALkUq2gp+x-nkALLTLqrSGmw8nfo5FzNeDpr1Gm3qh8N9mDn0Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [dpdk-dev] Will huge page have negative effect on
+ guest vm in qemu enviroment?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,70 +23,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Boqun Feng (Intel)" <boqun.feng@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: Sam <batmanustc@gmail.com>
+Cc: dev@dpdk.org, users@dpdk.org, qemu-devel@nongnu.org, qemu-discuss@nongnu.org
 
-Introduce Skylake-Server cpu mode which inherits the features from
-Skylake-Client and supports some additional features that are: AVX512,
-CWLB and PGPE1GB.
+Hi Sam,
 
-Signed-off-by: Boqun Feng (Intel) <boqun.feng@gmail.com>
----
- target/i386/cpu.c | 42 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+Below I'm saying about KVM. I don't have experience with vbox and others.
+1. I'd suggest don't use dpdk inside of VM if you want to see best
+perfomance on the box.
+2. huge pages enabled globally will not have any bad effect to guest
+OS. Except you have to enable huge pages inside of VM and provide real
+huge page for VM's huge pages from the host system. Otherwise dpdk
+will use "hugepages" inside of VM, but this "huge pages" will not real
+ones. They will be constructed from normal pages outside. Also when
+you enable huge pages OS will reserve them from start and your OS will
+not able use them for other things. Also you can't swap out huge
+pages, KSM will not work for them and so on.
+3. You can enable huge pages just for one numa node. It's impossible
+to enable them just for one core. Usually you reserve some memory for
+hugepages when the system starts and you can't use this memory in
+normal applications unless normal application knows how to use them.
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index b2b1d20cee51..1bed722ac2fd 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1349,6 +1349,48 @@ static X86CPUDefinition builtin_x86_defs[] = {
-         .model_id = "Intel Core Processor (Skylake)",
-     },
-     {
-+        .name = "Skylake-Server",
-+        .level = 0xd,
-+        .vendor = CPUID_VENDOR_INTEL,
-+        .family = 6,
-+        .model = 85,
-+        .stepping = 4,
-+        .features[FEAT_1_EDX] =
-+            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
-+            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
-+            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
-+            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
-+            CPUID_DE | CPUID_FP87,
-+        .features[FEAT_1_ECX] =
-+            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
-+            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
-+            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
-+            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
-+            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOVBE |
-+            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
-+        .features[FEAT_8000_0001_EDX] =
-+            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
-+            CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
-+        .features[FEAT_8000_0001_ECX] =
-+            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
-+        .features[FEAT_7_0_EBX] =
-+            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
-+            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
-+            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
-+            CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
-+            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_MPX | CPUID_7_0_EBX_CLWB |
-+            CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
-+            CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
-+            CPUID_7_0_EBX_AVX512VL,
-+        .features[FEAT_XSAVE] =
-+            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-+            CPUID_XSAVE_XGETBV1,
-+        .features[FEAT_6_EAX] =
-+            CPUID_6_EAX_ARAT,
-+        .xlevel = 0x80000008,
-+        .model_id = "Intel Xeon Processor (Skylake)",
-+    },
-+    {
-         .name = "Opteron_G1",
-         .level = 5,
-         .vendor = CPUID_VENDOR_AMD,
--- 
-2.13.1
+Also why it didn't work inside of the docker?
+
+
+On Tue, Jun 20, 2017 at 8:35 PM, Sam <batmanustc@gmail.com> wrote:
+> BTW, we also think about use ovs-dpdk in docker enviroment, but test result
+> said it's not good idea, we don't know why.
+>
+> 2017-06-21 11:32 GMT+08:00 Sam <batmanustc@gmail.com>:
+>
+>> Hi all,
+>>
+>> We plan to use DPDK on HP host machine with several core and big memory.
+>> We plan to use qemu-kvm enviroment. The host will carry 4 or more guest vm
+>> and 1 ovs.
+>>
+>> Ovs-dpdk is much faster then normal ovs, but to use ovs-dpdk, we have to
+>> enable huge page globally.
+>>
+>> My question is, will huge page enabled globally have negative effect on
+>> guest vm's memory orperate or something? If it is, how to prevent this, or
+>> could I enable huge page on some core or enable huge page for a part of
+>> memory?
+>>
+>> Thank you~
+>>
