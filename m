@@ -1,35 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43017)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dNbwB-000274-8r
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 05:28:36 -0400
+	(envelope-from <peterx@redhat.com>) id 1dNbyv-0003UK-Ql
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 05:31:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dNbw8-0005gv-0d
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 05:28:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36864)
+	(envelope-from <peterx@redhat.com>) id 1dNbyg-0007S8-5r
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 05:31:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57648)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dNbw7-0005fc-P2
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 05:28:31 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dNbyf-0007Rb-U6
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 05:31:10 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9ECB4C04B938
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 09:28:30 +0000 (UTC)
-Date: Wed, 21 Jun 2017 17:28:24 +0800
+	by mx1.redhat.com (Postfix) with ESMTPS id DC0144E4C3
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 09:31:08 +0000 (UTC)
+Date: Wed, 21 Jun 2017 17:31:03 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170621092824.GA2247@pxdev.xzpeter.org>
-References: <1496980142-8986-1-git-send-email-peterx@redhat.com>
-	<1496980142-8986-3-git-send-email-peterx@redhat.com>
-	<87lgp1i8kz.fsf@dusky.pond.sub.org>
-	<20170612044609.GE25059@pxdev.xzpeter.org>
-	<20170612161349.GL22043@thinpad.lan.raisama.net>
-	<8737awqr6h.fsf@dusky.pond.sub.org>
+Message-ID: <20170621093103.GB2247@pxdev.xzpeter.org>
+References: <1497426958-20871-1-git-send-email-peterx@redhat.com>
+	<786c6bcf-2b85-1faa-bc70-66cbe404cbfa@redhat.com>
+	<a386f13f-2a82-b84f-b17f-ff28dcad561c@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <8737awqr6h.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] migration: let MigrationState be a
- qdev
+In-Reply-To: <a386f13f-2a82-b84f-b17f-ff28dcad561c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] migration: fix incorrect enable return path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,134 +34,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
 
-On Mon, Jun 19, 2017 at 11:09:58AM +0200, Markus Armbruster wrote:
-> Eduardo Habkost <ehabkost@redhat.com> writes:
+On Mon, Jun 19, 2017 at 01:12:36PM +0200, Laurent Vivier wrote:
+> On 15/06/2017 18:54, Laurent Vivier wrote:
+> > On 14/06/2017 09:55, Peter Xu wrote:
+> >> 0425dc9 is actually v1 of that patch, but it was accidentally
+> >> merged (while there was a v2). That will cause problem when we try to
+> >> migrate to some old QEMUs when return path is not really there. Let's
+> >> fix it, then squashing this patch with 0425dc9 will be exactly patch
+> >> content of v2.
+> >>
+> >> Fixes: 0425dc9 ("migration: isolate return path on src")
+> >> Signed-off-by: Peter Xu <peterx@redhat.com>
+> >> ---
+> >>  migration/migration.c | 6 +++++-
+> >>  1 file changed, 5 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/migration/migration.c b/migration/migration.c
+> >> index 8ef6d6c..f9053b0 100644
+> >> --- a/migration/migration.c
+> >> +++ b/migration/migration.c
+> >> @@ -1814,7 +1814,11 @@ static void *migration_thread(void *opaque)
+> >>  
+> >>      qemu_savevm_state_header(s->to_dst_file);
+> >>  
+> >> -    if (s->to_dst_file) {
+> >> +    /*
+> >> +     * If we opened the return path, we need to make sure dst has it
+> >> +     * opened as well.
+> >> +     */
+> >> +    if (s->rp_state.from_dst_file) {
+> >>          /* Now tell the dest that it should open its end so it can reply */
+> >>          qemu_savevm_send_open_return_path(s->to_dst_file);
+> >>  
+> >>
+> > 
+> > Tested-by: Laurent Vivier <lvivier@redhat.com>
+> > 
+> > This also fixes migration of pseries guest, using the same
+> > binary/machine type on both side, the error was:
+> > 
+> > qemu-system-ppc64: Failed to load spapr_iommu:mig_table
+> > qemu-system-ppc64: error while loading state for instance 0x80000001 of
+> > device 'spapr_iommu'
+> > qemu-system-ppc64: load of migration failed: Input/output error
 > 
-> > On Mon, Jun 12, 2017 at 12:46:09PM +0800, Peter Xu wrote:
-> >> On Fri, Jun 09, 2017 at 03:39:24PM +0200, Markus Armbruster wrote:
-> >> > Peter Xu <peterx@redhat.com> writes:
-> >> > 
-> >> > > Let the old man "MigrationState" join the object family. Direct benefit
-> >> > > is that we can start to use all the property features derived from
-> >> > > current QDev, like: HW_COMPAT_* bits, command line setup for migration
-> >> > > parameters (so will never need to set them up each time using HMP/QMP,
-> >> > > this is really, really attractive for test writters), etc.
-> >> > >
-> >> > > I see no reason to disallow this happen yet. So let's start from this
-> >> > > one, to see whether it would be anything good.
-> >> > >
-> >> > > No functional change at all.
-> >> > >
-> >> > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> >> > > ---
-> >> > >  include/migration/migration.h | 19 ++++++++++++++
-> >> > >  migration/migration.c         | 61 ++++++++++++++++++++++++++++---------------
-> >> > >  2 files changed, 59 insertions(+), 21 deletions(-)
-> >> > >
-> >> > > diff --git a/include/migration/migration.h b/include/migration/migration.h
-> >> > > index 79b5484..bd0186c 100644
-> >> > > --- a/include/migration/migration.h
-> >> > > +++ b/include/migration/migration.h
-> >> > > @@ -21,6 +21,7 @@
-> >> > >  #include "qapi-types.h"
-> >> > >  #include "exec/cpu-common.h"
-> >> > >  #include "qemu/coroutine_int.h"
-> >> > > +#include "hw/qdev.h"
-> >> > >  
-> >> > >  #define QEMU_VM_FILE_MAGIC           0x5145564d
-> >> > >  #define QEMU_VM_FILE_VERSION_COMPAT  0x00000002
-> >> > > @@ -49,6 +50,8 @@ enum mig_rp_message_type {
-> >> > >      MIG_RP_MSG_MAX
-> >> > >  };
-> >> > >  
-> >> > > +#define TYPE_MIGRATION "migration"
-> >> > > +
-> >> > >  /* State for the incoming migration */
-> >> > >  struct MigrationIncomingState {
-> >> > >      QEMUFile *from_src_file;
-> >> > > @@ -91,8 +94,24 @@ struct MigrationIncomingState {
-> >> > >  MigrationIncomingState *migration_incoming_get_current(void);
-> >> > >  void migration_incoming_state_destroy(void);
-> >> > >  
-> >> > > +#define MIGRATION_CLASS(klass) \
-> >> > > +    OBJECT_CLASS_CHECK(MigrationClass, (klass), TYPE_MIGRATION)
-> >> > > +#define MIGRATION_OBJ(obj) \
-> >> > > +    OBJECT_CHECK(MigrationState, (obj), TYPE_MIGRATION)
-> >> > > +#define MIGRATION_GET_CLASS(obj) \
-> >> > > +    OBJECT_GET_CLASS(MigrationClass, (obj), TYPE_MIGRATION)
-> >> > > +
-> >> > > +typedef struct MigrationClass {
-> >> > > +    /*< private >*/
-> >> > > +    DeviceClass parent_class;
-> >> > > +} MigrationClass;
-> >> > > +
-> >> > >  struct MigrationState
-> >> > >  {
-> >> > > +    /*< private >*/
-> >> > > +    DeviceState parent_obj;
-> >> > > +
-> >> > > +    /*< public >*/
-> >> > 
-> >> > Turning MigrationState into a QOM object so you can use QOM
-> >> > infrastructure makes sense.  But why turn it into a device?  It doesn't
-> >> > feel device-like to me.  Would ObjectClass and Object instead of
-> >> > DeviceClass and DeviceState do?
-> >> 
-> >> Yeah. That's the main reason for the series to be (was) RFC.
-> >> 
-> >> I was trying to use the HW_COMPAT_* bits and -global, and that's QDev
-> >> thing (IIUC you got that already :). I am just curious about why that
-> >> is not for QObject from the very beginning, then it'll be easier.
-> >> 
-> >> For now, IMHO QDev is okay as well for migration, as long as it's kept
-> >> internally inside QEMU. But sure at least I should turn user_creatable
-> >> to off. I'll investigate more to see how to make this a safer approach
-> >> in next post.
-> >
-> > We could allow non-device QOM objects use the global property
-> > system optionally.
-> >
-> > We could make qdev_prop_set_globals() work on any Object*, and
-> > let QOM classes call it on post_init if they want to be
-> > configurable by global properties too.
-> >
-> > Note that this would break qdev_prop_check_globals(), because it
-> > expects globals to work only on TYPE_DEVICE.  We could address
-> > that by introducing a new interface type to indicate the type
-> > works with -global (something like
-> > INTERFACE_CONFIGURABLE_BY_GLOBAL_PROPERTIES, but shorter?).
-> >
-> > Such a system would probably allow us to replace
-> > default_machine_opts, default_boot_order, default_display,
-> > default_ram_size (and probably many other compat fields) on
-> > MachineClass.  It could also be used to implement -machine and
-> > -accel options by simply translating them to global properties
-> > (like we already do for -cpu).
-> >
-> > (This sounds like reinventing a QemuOpts-like system on top of
-> > global properties.  Maybe that's a bad thing, maybe that's a good
-> > thing.  I'm not sure.)
-> 
-> Not sure I get the connection to QemuOpts.
-> 
-> Lifting the "adjust property default values on the command line" feature
-> from qdev / TYPE_DEVICE to QOM / TYPE_OBJECT may make sense.
-> 
-> But let's reconsider what exactly we're trying to accomplish for
-> migration.  The cover letter and commit message are too vague for me gue
-> figure it out.  Please describe how exactly you intend this series'
-> features to be used.  You mentioned -global and HW_COMPAT_* briefly;
-> make sure to cover both.  Concrete examples like "instead of
-> <inconvenient way to do FOO> we can then do <better way>" would be nice.
+> The error is an IEO because the file descriptor is closed on source. It
+> seems the source closes the stream too early without this patch.
+> For test purpose, I have disabled the qemu_fclose() on the source, and
+> the error disappears from the destination.
 
-Hi, Markus,
-
-I added some more explaination on the cover letter in the latter
-posts (latest v4). Please see whether that'll help, and just let me
-know if there is still things unclear in that.  Thanks!
+Thanks for confirming this, Laurent!
 
 -- 
 Peter Xu
