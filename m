@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dNaR6-00029k-Kq
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 03:52:25 -0400
+	(envelope-from <peterx@redhat.com>) id 1dNaRC-0002Cp-MR
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 03:52:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dNaR2-00035u-O7
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 03:52:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59176)
+	(envelope-from <peterx@redhat.com>) id 1dNaRB-00037S-Q7
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 03:52:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37612)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dNaR2-00035e-FE
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 03:52:20 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dNaRB-00037K-Hz
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 03:52:29 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1836E8047E
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 07:52:19 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 78B8481127
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 07:52:28 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Wed, 21 Jun 2017 15:51:58 +0800
-Message-Id: <1498031528-1990-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 00/10] migration: objectify MigrationState
+Date: Wed, 21 Jun 2017 15:52:00 +0800
+Message-Id: <1498031528-1990-3-git-send-email-peterx@redhat.com>
+In-Reply-To: <1498031528-1990-1-git-send-email-peterx@redhat.com>
+References: <1498031528-1990-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 02/10] accel: introduce
+ AccelClass.global_props
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +33,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-v4:
-- dropped lots of patches related to AccelState.global_props. Now I am
-  using AccelClass.global_props, and only use it in Xen codes.
-- one patch is added to clean up the global property registerations,
-  with some comment to show the ordering.
-- one patch is added to dump migration globals in "info migrate"
-  unconditionally (last patch).
-- changed all the following xen_init() patches to use
-  AccelClass.global_props.
-- (since most of the patches are either touched-up again, or threw
-  away, so no much r-b added, only one for Juan on the only_migratable
-  patch, anyway, thanks for reviewing the old codes!)
+Introduce this new field for the accelerator classes so that each
+specific accelerator in the future can register its own global
+properties to be used further by the system. It works just like how the
+old machine compatible properties do, but only tailored for
+accelerators.
 
-------------
+Use the newly exported register_compat_prop() to pass the accelerator
+global properties to the global_props list.
 
-The main goal of this series is to let MigrationState be a QDev.
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ accel/accel.c          | 10 ++++++++++
+ include/sysemu/accel.h | 10 ++++++++++
+ vl.c                   |  1 +
+ 3 files changed, 21 insertions(+)
 
-It helps in many use cases.
-
-First of all, we can remove many legacy tricky functions. To name
-some: savevm_skip_section_footers(), savevm_skip_configuration(), etc.
-They didn't do much thing but setup a bool value. If MigrationState
-can be a QDev, then these things can be setup by the HW_COMPAT_* magic
-with some lines like:
-
-{
-    .driver   = "migration",
-    .property = "send-configuration",
-    .value    = "off",
-}
-
-Next, if this can be merged and okay, we can move on to convert more
-things into properties for migration. A very attractive use case of it
-is, we will be able to do this for migration:
-
-  -global migration.postcopy=on
-
-Then we don't need to use either HMP/QMP interface to enable it. It
-greatly simplifies the migration test scripts.
-
-Why QDev not QObject? The answer is simple: all the magic that we want
-for migration is bound to QDev (HW_COMPAT, "-global"). If one day we
-want to move these features from QDev to QObject, that'll be fine and
-easy for MigrationState. But before that, let's have MigrationState a
-QDev. :-)
-
-Please kindly review. Thanks.
-
-Peter Xu (10):
-  machine: export register_compat_prop()
-  accel: introduce AccelClass.global_props
-  vl: clean up global property registerations
-  migration: let MigrationState be a qdev
-  migration: move global_state.optional out
-  migration: move only_migratable to MigrationState
-  migration: move skip_configuration out
-  migration: move skip_section_footers
-  migration: merge enforce_config_section somewhat
-  migration: hmp: dump globals
-
- accel/accel.c                    |  10 ++++
- hmp.c                            |   3 +
- hw/core/machine.c                |  13 -----
- hw/core/qdev-properties.c        |  13 +++++
- hw/i386/pc_piix.c                |   3 -
- hw/ppc/spapr.c                   |   3 -
- hw/xen/xen-common.c              |  25 +++++++--
- include/hw/compat.h              |  12 ++++
- include/hw/qdev-properties.h     |   3 +
- include/migration/global_state.h |   1 -
- include/migration/misc.h         |   6 +-
- include/sysemu/accel.h           |  10 ++++
- include/sysemu/sysemu.h          |   1 -
- migration/global_state.c         |   9 +--
- migration/migration.c            | 118 +++++++++++++++++++++++++++++++--------
- migration/migration.h            |  33 +++++++++++
- migration/savevm.c               |  32 ++---------
- vl.c                             |  41 ++++++++++++--
- 18 files changed, 246 insertions(+), 90 deletions(-)
-
+diff --git a/accel/accel.c b/accel/accel.c
+index 7c079a5..212581c 100644
+--- a/accel/accel.c
++++ b/accel/accel.c
+@@ -120,6 +120,16 @@ void configure_accelerator(MachineState *ms)
+     }
+ }
+ 
++void accel_register_compat_props(AccelState *accel)
++{
++    AccelClass *class = ACCEL_GET_CLASS(accel);
++    GlobalProperty *prop;
++
++    for (prop = class->global_props; prop && prop->driver; prop++) {
++        register_compat_prop(prop->driver, prop->property, prop->value);
++    }
++}
++
+ static void register_accel_types(void)
+ {
+     type_register_static(&accel_type);
+diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
+index 15944c1..8a01e51 100644
+--- a/include/sysemu/accel.h
++++ b/include/sysemu/accel.h
+@@ -24,6 +24,7 @@
+ #define HW_ACCEL_H
+ 
+ #include "qom/object.h"
++#include "hw/qdev-properties.h"
+ 
+ typedef struct AccelState {
+     /*< private >*/
+@@ -40,6 +41,13 @@ typedef struct AccelClass {
+     int (*available)(void);
+     int (*init_machine)(MachineState *ms);
+     bool *allowed;
++    /*
++     * Array of gobal properties that would be applied when specific
++     * accelerator is chosen. It works just like
++     * MachineClass.compat_props but it's for accelerators not
++     * machines.
++     */
++    GlobalProperty *global_props;
+ } AccelClass;
+ 
+ #define TYPE_ACCEL "accel"
+@@ -57,5 +65,7 @@ typedef struct AccelClass {
+ extern int tcg_tb_size;
+ 
+ void configure_accelerator(MachineState *ms);
++/* Register accelerator specific global properties */
++void accel_register_compat_props(AccelState *accel);
+ 
+ #endif
+diff --git a/vl.c b/vl.c
+index 59fea15..4452d7a 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4571,6 +4571,7 @@ int main(int argc, char **argv, char **envp)
+             exit (i == 1 ? 1 : 0);
+     }
+ 
++    accel_register_compat_props(current_machine->accelerator);
+     machine_register_compat_props(current_machine);
+ 
+     qemu_opts_foreach(qemu_find_opts("global"),
 -- 
 2.7.4
