@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dNf6e-00080C-VI
+	(envelope-from <mreitz@redhat.com>) id 1dNf6e-00080F-Vr
 	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:51:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dNf6e-0005Ck-26
+	(envelope-from <mreitz@redhat.com>) id 1dNf6e-0005D8-6C
 	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:51:37 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 21 Jun 2017 14:50:35 +0200
-Message-Id: <20170621125047.30294-14-mreitz@redhat.com>
+Date: Wed, 21 Jun 2017 14:50:33 +0200
+Message-Id: <20170621125047.30294-12-mreitz@redhat.com>
 In-Reply-To: <20170621125047.30294-1-mreitz@redhat.com>
 References: <20170621125047.30294-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 13/25] block/nbd: Make bdrv_dirname() return
+Subject: [Qemu-devel] [PATCH v5 11/25] blkverify: Make bdrv_dirname() return
  NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,60 +23,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>
 
-The generic bdrv_dirname() implementation would be able to generate some
-form of directory name for many NBD nodes, but it would be always wrong.
-Therefore, we have to explicitly make it an error (until NBD has some
-form of specification for export paths, if it ever will).
+blkverify's BDSs have a file BDS, but we do not want this to be
+preferred over the raw node. There is no way to decide between the two
+(and not really a reason to, either), so just return NULL in blkverify's
+implementation of bdrv_dirname().
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/nbd.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ block/blkverify.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/block/nbd.c b/block/nbd.c
-index f91ac63..f896fc4 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -558,6 +558,16 @@ static void nbd_refresh_filename(BlockDriverState *bs, QDict *options)
-     bs->full_open_options = opts;
+diff --git a/block/blkverify.c b/block/blkverify.c
+index b2ed8cd..d5233ee 100644
+--- a/block/blkverify.c
++++ b/block/blkverify.c
+@@ -309,6 +309,15 @@ static void blkverify_refresh_filename(BlockDriverState *bs, QDict *options)
+     }
  }
  
-+static char *nbd_dirname(BlockDriverState *bs, Error **errp)
++static char *blkverify_dirname(BlockDriverState *bs, Error **errp)
 +{
-+    /* The generic bdrv_dirname() implementation is able to work out some
-+     * directory name for NBD nodes, but that would be wrong. So far there is no
-+     * specification for how "export paths" would work, so NBD does not have
-+     * directory names. */
-+    error_setg(errp, "Cannot generate a base directory for NBD nodes");
++    /* In general, there are two BDSs with different dirnames below this one;
++     * so there is no unique dirname we could return (unless both are equal by
++     * chance). Therefore, to be consistent, just always return NULL. */
++    error_setg(errp, "Cannot generate a base directory for blkverify nodes");
 +    return NULL;
 +}
 +
- static BlockDriver bdrv_nbd = {
-     .format_name                = "nbd",
-     .protocol_name              = "nbd",
-@@ -575,6 +585,7 @@ static BlockDriver bdrv_nbd = {
-     .bdrv_detach_aio_context    = nbd_detach_aio_context,
-     .bdrv_attach_aio_context    = nbd_attach_aio_context,
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-+    .bdrv_dirname               = nbd_dirname,
- };
+ static BlockDriver bdrv_blkverify = {
+     .format_name                      = "blkverify",
+     .protocol_name                    = "blkverify",
+@@ -320,6 +329,7 @@ static BlockDriver bdrv_blkverify = {
+     .bdrv_child_perm                  = bdrv_filter_default_perms,
+     .bdrv_getlength                   = blkverify_getlength,
+     .bdrv_refresh_filename            = blkverify_refresh_filename,
++    .bdrv_dirname                     = blkverify_dirname,
  
- static BlockDriver bdrv_nbd_tcp = {
-@@ -594,6 +605,7 @@ static BlockDriver bdrv_nbd_tcp = {
-     .bdrv_detach_aio_context    = nbd_detach_aio_context,
-     .bdrv_attach_aio_context    = nbd_attach_aio_context,
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-+    .bdrv_dirname               = nbd_dirname,
- };
- 
- static BlockDriver bdrv_nbd_unix = {
-@@ -613,6 +625,7 @@ static BlockDriver bdrv_nbd_unix = {
-     .bdrv_detach_aio_context    = nbd_detach_aio_context,
-     .bdrv_attach_aio_context    = nbd_attach_aio_context,
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-+    .bdrv_dirname               = nbd_dirname,
- };
- 
- static void bdrv_nbd_init(void)
+     .bdrv_co_preadv                   = blkverify_co_preadv,
+     .bdrv_co_pwritev                  = blkverify_co_pwritev,
 -- 
 2.9.4
