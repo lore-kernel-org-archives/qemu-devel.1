@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1dNckL-0002RK-NY
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 06:20:26 -0400
+	(envelope-from <quintela@redhat.com>) id 1dNckJ-0002P4-Lq
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 06:20:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1dNckK-00053w-QP
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 06:20:25 -0400
-Received: from mga14.intel.com ([192.55.52.115]:6553)
+	(envelope-from <quintela@redhat.com>) id 1dNckI-00052K-KO
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 06:20:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38682)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1dNckK-0004zB-Hb
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 06:20:24 -0400
-From: Yang Zhong <yang.zhong@intel.com>
-Date: Wed, 21 Jun 2017 18:19:50 +0800
-Message-Id: <1498040401-16361-5-git-send-email-yang.zhong@intel.com>
-In-Reply-To: <1498040401-16361-1-git-send-email-yang.zhong@intel.com>
-References: <1498040401-16361-1-git-send-email-yang.zhong@intel.com>
-Subject: [Qemu-devel] [PATCH 04/15] tcg: change tcg_enabled()
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dNckI-0004zv-CN
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 06:20:22 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 810926655
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 10:20:21 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Wed, 21 Jun 2017 12:20:04 +0200
+Message-Id: <20170621102005.18701-5-quintela@redhat.com>
+In-Reply-To: <20170621102005.18701-1-quintela@redhat.com>
+References: <20170621102005.18701-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 4/5] migration: Convert ram to use new
+ load_setup()/load_cleanup()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,101 +30,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: qemu-devel@nongnu.org, a.rigo@virtualopensystems.com, anthony.xu@intel.com, Yang Zhong <yang.zhong@intel.com>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, kwolf@redhat.com, stefanha@redhat.com
 
-Change the tcg_enabled() and make sure user build still enable tcg
-even x86 softmmu disable tcg.
+Once there, I rename ram_migration_cleanup() to ram_save_cleanup().
+Notice that this is the first pass, and I only passed XBZRLE to the
+new scheme.  Moved decoded_buf to inside XBZRLE struct.
+As a bonus, I don't have to export xbzrle functions from ram.c.
 
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+
+--
+
+loaded_data pointer was needed because called can change it (dave)
 ---
- accel/tcg/tcg-all.c       | 2 +-
- accel/tcg/translate-all.c | 6 +-----
- bsd-user/main.c           | 1 +
- include/qemu-common.h     | 7 ++++++-
- linux-user/main.c         | 2 +-
- 5 files changed, 10 insertions(+), 8 deletions(-)
+ migration/migration.c |  3 ---
+ migration/ram.c       | 49 ++++++++++++++++++++++++++++++++++++-------------
+ migration/ram.h       |  1 -
+ 3 files changed, 36 insertions(+), 17 deletions(-)
 
-diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
-index dba9931..a313d14 100644
---- a/accel/tcg/tcg-all.c
-+++ b/accel/tcg/tcg-all.c
-@@ -29,7 +29,7 @@
- #include "qom/object.h"
+diff --git a/migration/migration.c b/migration/migration.c
+index 520d9b9..aaaf7ff 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -350,9 +350,6 @@ static void process_incoming_migration_co(void *opaque)
+         migrate_decompress_threads_join();
+         exit(EXIT_FAILURE);
+     }
+-
+-    free_xbzrle_decoded_buf();
+-
+     mis->bh = qemu_bh_new(process_incoming_migration_bh, mis);
+     qemu_bh_schedule(mis->bh);
+ }
+diff --git a/migration/ram.c b/migration/ram.c
+index 649f76c..a619e0b 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -85,11 +85,10 @@ static struct {
+     QemuMutex lock;
+     /* it will store a page full of zeros */
+     uint8_t *zero_target_page;
++    /* buffer used for XBZRLE decoding */
++    uint8_t *decoded_buf;
+ } XBZRLE;
  
- int tcg_tb_size;
--static bool tcg_allowed = true;
-+bool tcg_allowed;
- 
- static int tcg_init(MachineState *ms)
+-/* buffer used for XBZRLE decoding */
+-static uint8_t *xbzrle_decoded_buf;
+-
+ static void XBZRLE_cache_lock(void)
  {
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index bb303e0..4ebf7b0 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -830,6 +830,7 @@ static void tcg_handle_interrupt(CPUState *cpu, int mask)
-    size. */
- void tcg_exec_init(unsigned long tb_size)
- {
-+    tcg_allowed = true;
-     cpu_gen_init();
-     page_init();
-     tb_htable_init();
-@@ -844,11 +845,6 @@ void tcg_exec_init(unsigned long tb_size)
- #endif
+     if (migrate_use_xbzrle())
+@@ -1350,13 +1349,18 @@ uint64_t ram_bytes_total(void)
+     return total;
  }
  
--bool tcg_enabled(void)
--{
--    return tcg_ctx.code_gen_buffer != NULL;
--}
+-void free_xbzrle_decoded_buf(void)
++static void xbzrle_load_setup(void)
+ {
+-    g_free(xbzrle_decoded_buf);
+-    xbzrle_decoded_buf = NULL;
++    XBZRLE.decoded_buf = g_malloc(TARGET_PAGE_SIZE);
+ }
+ 
+-static void ram_migration_cleanup(void *opaque)
++static void xbzrle_load_cleanup(void)
++{
++    g_free(XBZRLE.decoded_buf);
++    XBZRLE.decoded_buf = NULL;
++}
++
++static void ram_save_cleanup(void *opaque)
+ {
+     RAMState **rsp = opaque;
+     RAMBlock *block;
+@@ -2078,11 +2082,6 @@ static int load_xbzrle(QEMUFile *f, ram_addr_t addr, void *host)
+     int xh_flags;
+     uint8_t *loaded_data;
+ 
+-    if (!xbzrle_decoded_buf) {
+-        xbzrle_decoded_buf = g_malloc(TARGET_PAGE_SIZE);
+-    }
+-    loaded_data = xbzrle_decoded_buf;
 -
- /*
-  * Allocate a new translation block. Flush the translation buffer if
-  * too many translation blocks or too much generated code.
-diff --git a/bsd-user/main.c b/bsd-user/main.c
-index 04f95dd..276aea7 100644
---- a/bsd-user/main.c
-+++ b/bsd-user/main.c
-@@ -35,6 +35,7 @@
- #include "trace/control.h"
- #include "glib-compat.h"
+     /* extract RLE header */
+     xh_flags = qemu_get_byte(f);
+     xh_len = qemu_get_be16(f);
+@@ -2096,7 +2095,9 @@ static int load_xbzrle(QEMUFile *f, ram_addr_t addr, void *host)
+         error_report("Failed to load XBZRLE page - len overflow!");
+         return -1;
+     }
++    loaded_data = XBZRLE.decoded_buf;
+     /* load data and decode */
++    /* it can change laded_data to point to an internal buffer */
+     qemu_get_buffer_in_place(f, &loaded_data, xh_len);
  
-+bool tcg_allowed = true;
- int singlestep;
- unsigned long mmap_min_addr;
- unsigned long guest_base;
-diff --git a/include/qemu-common.h b/include/qemu-common.h
-index 387ef52..b5adbfa 100644
---- a/include/qemu-common.h
-+++ b/include/qemu-common.h
-@@ -76,8 +76,13 @@ int qemu_openpty_raw(int *aslave, char *pty_name);
-     sendto(sockfd, buf, len, flags, destaddr, addrlen)
- #endif
+     /* decode RLE */
+@@ -2310,6 +2311,26 @@ static void decompress_data_with_multi_threads(QEMUFile *f,
+ }
  
-+extern bool tcg_allowed;
- void tcg_exec_init(unsigned long tb_size);
--bool tcg_enabled(void);
-+#ifdef CONFIG_TCG
-+#define tcg_enabled() (tcg_allowed)
-+#else
-+#define tcg_enabled() 0
-+#endif
+ /**
++ * ram_load_setup: Setup RAM for migration incoming side
++ *
++ * Returns zero to indicate success and negative for error
++ *
++ * @f: QEMUFile where to receive the data
++ * @opaque: RAMState pointer
++ */
++static int ram_load_setup(QEMUFile *f, void *opaque)
++{
++    xbzrle_load_setup();
++    return 0;
++}
++
++static int ram_load_cleanup(void *opaque)
++{
++    xbzrle_load_cleanup();
++    return 0;
++}
++
++/**
+  * ram_postcopy_incoming_init: allocate postcopy data structures
+  *
+  * Returns 0 for success and negative if there was one error
+@@ -2629,7 +2650,9 @@ static SaveVMHandlers savevm_ram_handlers = {
+     .save_live_complete_precopy = ram_save_complete,
+     .save_live_pending = ram_save_pending,
+     .load_state = ram_load,
+-    .save_cleanup = ram_migration_cleanup,
++    .save_cleanup = ram_save_cleanup,
++    .load_setup = ram_load_setup,
++    .load_cleanup = ram_load_cleanup,
+ };
  
- void cpu_exec_init_all(void);
- void cpu_exec_step_atomic(CPUState *cpu);
-diff --git a/linux-user/main.c b/linux-user/main.c
-index ad03c9e..a11508a 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -38,7 +38,7 @@
- #include "glib-compat.h"
- 
- char *exec_path;
--
-+bool tcg_allowed = true;
- int singlestep;
- static const char *filename;
- static const char *argv0;
+ void ram_mig_init(void)
+diff --git a/migration/ram.h b/migration/ram.h
+index 6272eb0..a8b79a4 100644
+--- a/migration/ram.h
++++ b/migration/ram.h
+@@ -47,7 +47,6 @@ void migrate_decompress_threads_join(void);
+ uint64_t ram_pagesize_summary(void);
+ int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len);
+ void acct_update_position(QEMUFile *f, size_t size, bool zero);
+-void free_xbzrle_decoded_buf(void);
+ void ram_debug_dump_bitmap(unsigned long *todump, bool expected,
+                            unsigned long pages);
+ void ram_postcopy_migrated_memory_release(MigrationState *ms);
 -- 
-1.9.1
+2.9.4
