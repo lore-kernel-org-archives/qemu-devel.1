@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dNhlr-0006Ii-Te
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:42:24 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dNhlw-0006O2-HB
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:42:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dNhlq-0002sX-CV
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:42:19 -0400
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:34189)
+	(envelope-from <alex.bennee@linaro.org>) id 1dNhls-0002tK-5w
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:42:24 -0400
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:36712)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dNhlq-0002s8-2k
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:42:18 -0400
-Received: by mail-wr0-x22d.google.com with SMTP id 77so140154192wrb.1
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 08:42:17 -0700 (PDT)
+	id 1dNhlr-0002t3-VB
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 11:42:20 -0400
+Received: by mail-wr0-x231.google.com with SMTP id c11so84699427wrc.3
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 08:42:19 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed, 21 Jun 2017 16:42:42 +0100
-Message-Id: <20170621154244.28309-9-alex.bennee@linaro.org>
+Date: Wed, 21 Jun 2017 16:42:43 +0100
+Message-Id: <20170621154244.28309-10-alex.bennee@linaro.org>
 In-Reply-To: <20170621154244.28309-1-alex.bennee@linaro.org>
 References: <20170621154244.28309-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RISU PATCH v6 08/10] risu: add support compressed
- tracefiles
+Subject: [Qemu-devel] [RISU PATCH v6 09/10] new: record_traces.sh helper
+ script
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,265 +33,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This uses the magic of zlib's gzread/write interface to wrap the
-tracefile in compression. The code changes are tiny. I spent more time
-messing about with the configure/linker stuff to auto-detect bits.
-
-As you need decent multi-arch support or a correctly setup cross
-toolchain we fall back if we can't compile with zlib. This
-unfortunately needs some #ifdef hackery around the zlib bits in
-risu.c.
+A simple script to run through a bunch of binaries and generate their
+trace files.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
---
-v5
-  - re-base
-  - also don't use zlib if using stdio fds
-v4
-  - removed redundant config.h output, added HAVE_ZLIB
-  - added BUILD_INC to deal with out-of-tree builds
----
- Makefile  |  4 ++--
- configure | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
- risu.c    | 48 ++++++++++++++++++++++++++++++++++++++++++++++--
- 3 files changed, 101 insertions(+), 6 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 9a29bb4..ca80eef 100644
---- a/Makefile
-+++ b/Makefile
-@@ -17,7 +17,7 @@ VPATH=$(SRCDIR)
- 
- CFLAGS ?= -g
- 
--ALL_CFLAGS = -Wall -D_GNU_SOURCE -DARCH=$(ARCH) $(CFLAGS) $(EXTRA_CFLAGS)
-+ALL_CFLAGS = -Wall -D_GNU_SOURCE -DARCH=$(ARCH) $(BUILD_INC) $(CFLAGS) $(EXTRA_CFLAGS)
- 
- PROG=risu
- SRCS=risu.c comms.c reginfo.c risu_$(ARCH).c risu_reginfo_$(ARCH).c
-@@ -35,7 +35,7 @@ all: $(PROG) $(BINS)
- dump: $(RISU_ASMS)
- 
- $(PROG): $(OBJS)
--	$(CC) $(STATIC) $(ALL_CFLAGS) -o $@ $^
-+	$(CC) $(STATIC) $(ALL_CFLAGS) -o $@ $^ $(LDFLAGS)
- 
- %.risu.asm: %.risu.bin
- 	${OBJDUMP} -b binary -m $(ARCH) -D $^ > $@
-diff --git a/configure b/configure
-index c4b5adb..1dc527b 100755
---- a/configure
-+++ b/configure
-@@ -32,6 +32,10 @@ compile() {
-     $CC $CFLAGS -c -o ${1}.o ${1}.c 2>/dev/null
- }
- 
-+link() {
-+    $LD $LDFLAGS -l${2} -o ${1} ${1}.o 2>/dev/null
-+}
+---
+v6
+  - moved into contrib/
+v5
+  - author, license and usage header
+v3
+  - allow overriding of RISU binary
+---
+ contrib/record_traces.sh | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+ create mode 100755 contrib/record_traces.sh
+
+diff --git a/contrib/record_traces.sh b/contrib/record_traces.sh
+new file mode 100755
+index 0000000..1234a61
+--- /dev/null
++++ b/contrib/record_traces.sh
+@@ -0,0 +1,32 @@
++#!/bin/sh
++#
++# A risu helper script to batch process a bunch of binaries and record their outputs
++#
++# Copyright (c) 2017 Linaro Limited
++# All rights reserved. This program and the accompanying materials
++# are made available under the terms of the Eclipse Public License v1.0
++# which accompanies this distribution, and is available at
++# http://www.eclipse.org/legal/epl-v10.html
++#
++# Contributors:
++#     Alex Bennée <alex.bennee@linaro.org> - initial implementation
++#
++# Usage:
++#   export RISU=/path/to/risu
++#   ./record_traces.sh  ./testcases.aarch64/*.bin
++#
 +
- check_define() {
-     c=${tmp_dir}/check_define_${1}
-     cat > ${c}.c <<EOF
-@@ -58,6 +62,48 @@ guess_arch() {
-     fi
- }
- 
-+check_type() {
-+    c=${tmp_dir}/check_type_${1}
-+    cat > ${c}.c <<EOF
-+#include <inttypes.h>
-+#include <stdint.h>
-+#include <sys/types.h>
-+#include <sys/socket.h>
++set -e
 +
-+int main(void) { $1 thisone; return 0; }
-+EOF
-+    compile $c
-+}
++if test -z "$RISU"; then
++    script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
++    RISU=${script_dir}/risu
++fi
 +
-+check_lib() {
-+    c=${tmp_dir}/check_lib${1}
-+    cat > ${c}.c <<EOF
-+#include <stdint.h>
-+#include <$2.h>
-+
-+int main(void) { $3; return 0; }
-+EOF
-+    compile $c && link $c $1
-+}
-+
-+generate_config() {
-+    cfg=config.h
-+    echo "generating config.h..."
-+
-+    echo "/* config.h - generated by the 'configure' script */" > $cfg
-+    echo "#ifndef CONFIG_H" >> $cfg
-+    echo "#define CONFIG_H 1" >> $cfg
-+
-+    if check_lib z zlib "zlibVersion()"; then
-+        echo "#define HAVE_ZLIB 1" >> $cfg
-+        LDFLAGS=-lz
-+    fi
-+
-+    echo "#endif /* CONFIG_H */" >> $cfg
-+
-+    echo "...done"
-+}
-+
- generate_makefilein() {
-     m=Makefile.in
-     echo "generating Makefile.in..."
-@@ -65,11 +111,13 @@ generate_makefilein() {
-     echo "# Makefile.in - generated by the 'configure' script" > $m
-     echo "ARCH:=${ARCH}" >> $m
-     echo "CC:=${CC}" >> $m
-+    echo "LDFLAGS:=${LDFLAGS}" >> $m
-     echo "AS:=${AS}" >> $m
-     echo "OBJCOPY:=${OBJCOPY}" >> $m
-     echo "OBJDUMP:=${OBJDUMP}" >> $m
-     echo "STATIC:=${STATIC}" >> $m
-     echo "SRCDIR:=${SRCDIR}" >> $m
-+    echo "BUILD_INC:=${BUILD_INC}" >> $m
- 
-     echo "...done"
- }
-@@ -118,6 +166,7 @@ done
- 
- CC="${CC-${CROSS_PREFIX}gcc}"
- AS="${AS-${CROSS_PREFIX}as}"
-+LD="${LD-${CROSS_PREFIX}ld}"
- OBJCOPY="${OBJCOPY-${CROSS_PREFIX}objcopy}"
- OBJDUMP="${OBJDUMP-${CROSS_PREFIX}objdump}"
- 
-@@ -125,15 +174,17 @@ if test "x${ARCH}" = "x"; then
-     guess_arch
- fi
- 
--generate_makefilein
--
- # Are we in a separate build tree? If so, link the Makefile
- # so that 'make' works.
- if test ! -e Makefile; then
-     echo "linking Makefile..."
-+    BUILD_INC="-I $(pwd)"
-     ln -s "${SRCDIR}/Makefile" .
- fi
- 
-+generate_config
-+generate_makefilein
-+
- rm -r "$tmp_dir"
- 
- echo "type 'make' to start the build"
-diff --git a/risu.c b/risu.c
-index 476475c..47e50ad 100644
---- a/risu.c
-+++ b/risu.c
-@@ -26,6 +26,8 @@
- #include <fcntl.h>
- #include <string.h>
- 
-+#include "config.h"
-+
- #include "risu.h"
- 
- void *memblock;
-@@ -34,6 +36,11 @@ int apprentice_fd, master_fd;
- int trace;
- size_t signal_count;
- 
-+#ifdef HAVE_ZLIB
-+#include <zlib.h>
-+gzFile gz_trace_file;
-+#endif
-+
- sigjmp_buf jmpbuf;
- 
- /* Should we test for FP exception status bits? */
-@@ -48,7 +55,17 @@ int read_sock(void *ptr, size_t bytes)
- 
- int write_trace(void *ptr, size_t bytes)
- {
--    size_t res = write(master_fd, ptr, bytes);
-+    size_t res;
-+
-+#ifdef HAVE_ZLIB
-+    if (master_fd == STDOUT_FILENO) {
-+#endif
-+        res = write(master_fd, ptr, bytes);
-+#ifdef HAVE_ZLIB
-+    } else {
-+        res = gzwrite(gz_trace_file, ptr, bytes);
-+    }
-+#endif
-     return (res == bytes) ? 0 : 1;
- }
- 
-@@ -66,7 +83,18 @@ int write_sock(void *ptr, size_t bytes)
- 
- int read_trace(void *ptr, size_t bytes)
- {
--    size_t res = read(apprentice_fd, ptr, bytes);
-+    size_t res;
-+
-+#ifdef HAVE_ZLIB
-+    if (apprentice_fd == STDIN_FILENO) {
-+#endif
-+        res = read(apprentice_fd, ptr, bytes);
-+#ifdef HAVE_ZLIB
-+    } else {
-+        res = gzread(gz_trace_file, ptr, bytes);
-+    }
-+#endif
-+
-     return (res == bytes) ? 0 : 1;
- }
- 
-@@ -189,6 +217,11 @@ void load_image(const char *imgfile)
- int master(void)
- {
-     if (sigsetjmp(jmpbuf, 1)) {
-+#ifdef HAVE_ZLIB
-+        if (trace && master_fd != STDOUT_FILENO) {
-+            gzclose(gz_trace_file);
-+        }
-+#endif
-         close(master_fd);
-         if (trace) {
-             fprintf(stderr, "trace complete after %zd checkpoints\n", signal_count);
-@@ -209,6 +242,11 @@ int master(void)
- int apprentice(void)
- {
-     if (sigsetjmp(jmpbuf, 1)) {
-+#ifdef HAVE_ZLIB
-+        if (trace && apprentice_fd != STDIN_FILENO) {
-+            gzclose(gz_trace_file);
-+        }
-+#endif
-         close(apprentice_fd);
-         fprintf(stderr, "finished early after %zd checkpoints\n", signal_count);
-         return report_match_status();
-@@ -316,6 +354,9 @@ int main(int argc, char **argv)
-                 master_fd = STDOUT_FILENO;
-             } else {
-                 master_fd = open(trace_fn, O_WRONLY|O_CREAT, S_IRWXU);
-+#ifdef HAVE_ZLIB
-+                gz_trace_file = gzdopen(master_fd, "wb9");
-+#endif
-             }
-         } else {
-             fprintf(stderr, "master port %d\n", port);
-@@ -328,6 +369,9 @@ int main(int argc, char **argv)
-                 apprentice_fd = STDIN_FILENO;
-             } else {
-                 apprentice_fd = open(trace_fn, O_RDONLY);
-+#ifdef HAVE_ZLIB
-+                gz_trace_file = gzdopen(apprentice_fd, "rb");
-+#endif
-             }
-         } else {
-             fprintf(stderr, "apprentice host %s port %d\n", hostname, port);
++for f in $@; do
++    echo "Running risu against $f"
++    t="$f.trace"
++    ${RISU} --master $f -t $t
++    echo "Checking trace file OK"
++    ${RISU} $f -t $t
++done
 -- 
 2.13.0
