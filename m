@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dNf6E-0007cl-Lp
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:51:12 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dNf6H-0007fl-8J
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:51:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dNf6D-0004td-GL
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:51:10 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dNf6G-0004wF-2A
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:51:13 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 21 Jun 2017 14:50:25 +0200
-Message-Id: <20170621125047.30294-4-mreitz@redhat.com>
+Date: Wed, 21 Jun 2017 14:50:27 +0200
+Message-Id: <20170621125047.30294-6-mreitz@redhat.com>
 In-Reply-To: <20170621125047.30294-1-mreitz@redhat.com>
 References: <20170621125047.30294-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 03/25] block: Add BDS.backing_overridden
+Subject: [Qemu-devel] [PATCH v5 05/25] block: Make path_combine() return the
+ path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,131 +23,179 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>
 
-If the backing file is overridden, this most probably does change the
-guest-visible data of a BDS. Therefore, we will need to consider this in
-bdrv_refresh_filename().
+Besides being safe for arbitrary path lengths, after some follow-up
+patches all callers will want a freshly allocated buffer anyway.
 
-Adding a new field to the BDS is not nice, but it is very simple and
-exactly keeps track of whether the backing file has been overridden.
-
-This commit adds a FIXME which will be remedied by a follow-up commit.
-Until then, the respective piece of code will not result in any behavior
-that is worse than what we currently have.
+In the meantime, path_combine_deprecated() is added which has the same
+interface as path_combine() had before this patch. All callers to that
+function will be converted in follow-up patches.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- include/block/block_int.h |  1 +
- block.c                   | 13 +++++++++++++
- block/mirror.c            |  4 ++++
- blockdev.c                | 16 ++++++++++++++++
- 4 files changed, 34 insertions(+)
+ include/block/block.h |  4 +--
+ block.c               | 85 ++++++++++++++++++++++++++++-----------------------
+ block/vmdk.c          |  3 +-
+ 3 files changed, 49 insertions(+), 43 deletions(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 6820027..bedf19b 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -547,6 +547,7 @@ struct BlockDriverState {
-     char backing_file[PATH_MAX]; /* if non zero, the image is a diff of
-                                     this file image */
-     char backing_format[16]; /* if non-zero and backing_file exists */
-+    bool backing_overridden; /* backing file has been specified by the user */
+diff --git a/include/block/block.h b/include/block/block.h
+index 5bebff4..9f89fa7 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -501,9 +501,7 @@ void bdrv_get_full_backing_filename_from_filename(const char *backed,
  
-     QDict *full_open_options;
-     char exact_filename[PATH_MAX];
+ int path_has_protocol(const char *path);
+ int path_is_absolute(const char *path);
+-void path_combine(char *dest, int dest_size,
+-                  const char *base_path,
+-                  const char *filename);
++char *path_combine(const char *base_path, const char *filename);
+ 
+ int bdrv_readv_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos);
+ int bdrv_writev_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos);
 diff --git a/block.c b/block.c
-index 2926f53..2addec0 100644
+index fd10a16..80e4805 100644
 --- a/block.c
 +++ b/block.c
-@@ -2147,6 +2147,11 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
-     reference = qdict_get_try_str(parent_options, bdref_key);
-     if (reference || qdict_haskey(options, "file.filename")) {
-         backing_filename[0] = '\0';
-+
-+        /* FIXME: Should also be set to true if @options contains other runtime
-+         *        options which control the data that is read from the backing
-+         *        BDS */
-+        bs->backing_overridden = true;
-     } else if (bs->backing_file[0] == '\0' && qdict_size(options) == 0) {
-         QDECREF(options);
-         goto free_exit;
-@@ -2346,6 +2351,9 @@ static BlockDriverState *bdrv_append_temp_snapshot(BlockDriverState *bs,
-         goto out;
-     }
- 
-+    bs_snapshot->backing_overridden = true;
-+    bdrv_refresh_filename(bs_snapshot);
-+
- out:
-     QDECREF(snapshot_options);
-     g_free(tmp_filename);
-@@ -2476,6 +2484,7 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
-     backing = qdict_get_try_str(options, "backing");
-     if (backing && *backing == '\0') {
-         flags |= BDRV_O_NO_BACKING;
-+        bs->backing_overridden = true;
-         qdict_del(options, "backing");
-     }
- 
-@@ -4799,6 +4808,10 @@ void bdrv_refresh_filename(BlockDriverState *bs)
-      * refresh those first */
-     QLIST_FOREACH(child, &bs->children, next) {
-         bdrv_refresh_filename(child->bs);
-+
-+        if (child->role == &child_backing && child->bs->backing_overridden) {
-+            bs->backing_overridden = true;
-+        }
-     }
- 
-     if (drv->bdrv_refresh_filename) {
-diff --git a/block/mirror.c b/block/mirror.c
-index df6c8bb..6ac3956 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -536,6 +536,10 @@ static void mirror_exit(BlockJob *job, void *opaque)
-             error_report_err(local_err);
-             data->ret = -EPERM;
-         }
-+
-+        /* The target image's file already has been created with the backing
-+         * file we just set, so there is no need to set backing_overridden or
-+         * call bdrv_refresh_filename(). */
-     }
- 
-     if (s->to_replace) {
-diff --git a/blockdev.c b/blockdev.c
-index 6472548..c15308a 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1787,6 +1787,8 @@ static void external_snapshot_commit(BlkActionState *common)
- {
-     ExternalSnapshotState *state =
-                              DO_UPCAST(ExternalSnapshotState, common, common);
-+    TransactionAction *action = common->action;
-+    bool image_was_existing = false;
- 
-     /* We don't need (or want) to use the transactional
-      * bdrv_reopen_multiple() across all the entries at once, because we
-@@ -1795,6 +1797,20 @@ static void external_snapshot_commit(BlkActionState *common)
-         bdrv_reopen(state->old_bs, state->old_bs->open_flags & ~BDRV_O_RDWR,
-                     NULL);
-     }
-+
-+    if (action->type == TRANSACTION_ACTION_KIND_BLOCKDEV_SNAPSHOT_SYNC) {
-+        BlockdevSnapshotSync *s = action->u.blockdev_snapshot_sync.data;
-+        if (s->has_mode && s->mode == NEW_IMAGE_MODE_EXISTING) {
-+            image_was_existing = true;
-+        }
-+    } else {
-+        image_was_existing = true;
-+    }
-+
-+    if (image_was_existing) {
-+        state->new_bs->backing_overridden = true;
-+        bdrv_refresh_filename(state->new_bs);
-+    }
+@@ -148,53 +148,62 @@ int path_is_absolute(const char *path)
+ #endif
  }
  
- static void external_snapshot_abort(BlkActionState *common)
+-/* if filename is absolute, just copy it to dest. Otherwise, build a
++/* if filename is absolute, just return its duplicate. Otherwise, build a
+    path to it by considering it is relative to base_path. URL are
+    supported. */
+-void path_combine(char *dest, int dest_size,
+-                  const char *base_path,
+-                  const char *filename)
++char *path_combine(const char *base_path, const char *filename)
+ {
++    const char *protocol_stripped = NULL;
+     const char *p, *p1;
++    char *result;
+     int len;
+ 
+-    if (dest_size <= 0)
+-        return;
+     if (path_is_absolute(filename)) {
+-        pstrcpy(dest, dest_size, filename);
+-    } else {
+-        const char *protocol_stripped = NULL;
++        return g_strdup(filename);
++    }
+ 
+-        if (path_has_protocol(base_path)) {
+-            protocol_stripped = strchr(base_path, ':');
+-            if (protocol_stripped) {
+-                protocol_stripped++;
+-            }
++    if (path_has_protocol(base_path)) {
++        protocol_stripped = strchr(base_path, ':');
++        if (protocol_stripped) {
++            protocol_stripped++;
+         }
+-        p = protocol_stripped ?: base_path;
++    }
++    p = protocol_stripped ?: base_path;
+ 
+-        p1 = strrchr(base_path, '/');
++    p1 = strrchr(base_path, '/');
+ #ifdef _WIN32
+-        {
+-            const char *p2;
+-            p2 = strrchr(base_path, '\\');
+-            if (!p1 || p2 > p1)
+-                p1 = p2;
++    {
++        const char *p2;
++        p2 = strrchr(base_path, '\\');
++        if (!p1 || p2 > p1) {
++            p1 = p2;
+         }
++    }
+ #endif
+-        if (p1)
+-            p1++;
+-        else
+-            p1 = base_path;
+-        if (p1 > p)
+-            p = p1;
+-        len = p - base_path;
+-        if (len > dest_size - 1)
+-            len = dest_size - 1;
+-        memcpy(dest, base_path, len);
+-        dest[len] = '\0';
+-        pstrcat(dest, dest_size, filename);
++    if (p1) {
++        p1++;
++    } else {
++        p1 = base_path;
++    }
++    if (p1 > p) {
++        p = p1;
+     }
++    len = p - base_path;
++
++    result = g_malloc(len + strlen(filename) + 1);
++    memcpy(result, base_path, len);
++    strcpy(result + len, filename);
++
++    return result;
++}
++
++static void path_combine_deprecated(char *dest, int dest_size,
++                                    const char *base_path,
++                                    const char *filename)
++{
++    char *combined = path_combine(base_path, filename);
++    pstrcpy(dest, dest_size, combined);
++    g_free(combined);
+ }
+ 
+ /*
+@@ -291,7 +300,7 @@ void bdrv_get_full_backing_filename_from_filename(const char *backed,
+         error_setg(errp, "Cannot use relative backing file names for '%s'",
+                    backed);
+     } else {
+-        path_combine(dest, sz, backed, backing);
++        path_combine_deprecated(dest, sz, backed, backing);
+     }
+ }
+ 
+@@ -3965,8 +3974,8 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
+         } else {
+             /* If not an absolute filename path, make it relative to the current
+              * image's filename path */
+-            path_combine(filename_tmp, PATH_MAX, curr_bs->filename,
+-                         backing_file);
++            path_combine_deprecated(filename_tmp, PATH_MAX, curr_bs->filename,
++                                    backing_file);
+ 
+             /* We are going to compare absolute pathnames */
+             if (!realpath(filename_tmp, filename_full)) {
+@@ -3975,8 +3984,8 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
+ 
+             /* We need to make sure the backing filename we are comparing against
+              * is relative to the current image filename (or absolute) */
+-            path_combine(filename_tmp, PATH_MAX, curr_bs->filename,
+-                         curr_bs->backing_file);
++            path_combine_deprecated(filename_tmp, PATH_MAX, curr_bs->filename,
++                                    curr_bs->backing_file);
+ 
+             if (!realpath(filename_tmp, backing_file_full)) {
+                 continue;
+diff --git a/block/vmdk.c b/block/vmdk.c
+index 55581b0..4389a69 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -846,8 +846,7 @@ static int vmdk_parse_extents(const char *desc, BlockDriverState *bs,
+             return -EINVAL;
+         }
+ 
+-        extent_path = g_malloc0(PATH_MAX);
+-        path_combine(extent_path, PATH_MAX, desc_file_path, fname);
++        extent_path = path_combine(desc_file_path, fname);
+ 
+         ret = snprintf(extent_opt_prefix, 32, "extents.%d", s->num_extents);
+         assert(ret < 32);
 -- 
 2.9.4
