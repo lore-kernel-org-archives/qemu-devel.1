@@ -1,34 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dNeOX-0000aJ-Dd
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:06:02 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dNeS8-0002As-Py
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:09:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dNeOS-0001PA-H9
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:06:01 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42860)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dNeOS-0001OR-Ad
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:05:56 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dNeOQ-0004aD-AS
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 12:05:54 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3E4962E80E3
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 12:05:54 +0000 (UTC)
+	(envelope-from <ehabkost@redhat.com>) id 1dNeS3-000378-Kb
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:09:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46606)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dNeS3-00036m-Cl
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:09:39 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 53CDF80C1D
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 12:09:38 +0000 (UTC)
+Date: Wed, 21 Jun 2017 09:09:35 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170621120935.GB3928@thinpad.lan.raisama.net>
+References: <1497876588-947-1-git-send-email-peterx@redhat.com>
+	<1497876588-947-7-git-send-email-peterx@redhat.com>
+	<20170619161403.GU5016@thinpad.lan.raisama.net>
+	<20170620135503.GB3662@pxdev.xzpeter.org>
+	<20170620140734.GA5016@thinpad.lan.raisama.net>
+	<20170621030054.GC3662@pxdev.xzpeter.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 21 Jun 2017 11:47:22 -0000
-From: Thomas Huth <1587065@bugs.launchpad.net>
-Reply-To: Bug 1587065 <1587065@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160530134240.21929.85128.malonedeb@wampee.canonical.com>
-Message-Id: <149804564267.4083.10369221541027246954.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1587065] Re: btrfs qemu-ga - multiple mounts
- block fsfreeze
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170621030054.GC3662@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH v3 06/13] kvm: let kvm use
+ AccelState.global_props
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,97 +38,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Was that this commit here:
-http://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Dce2eb6c4a044d809c
-?
-That was included in QEMU v2.9.0, so I think we can set the status to "Fix =
-released" now?
+On Wed, Jun 21, 2017 at 11:00:54AM +0800, Peter Xu wrote:
+> On Tue, Jun 20, 2017 at 11:07:34AM -0300, Eduardo Habkost wrote:
+> > On Tue, Jun 20, 2017 at 09:55:03PM +0800, Peter Xu wrote:
+> > > On Mon, Jun 19, 2017 at 01:14:03PM -0300, Eduardo Habkost wrote:
+[...]
+> > 
+> > > 
+> > > Another thing worries me a bit is that I may make things more
+> > > confusing if I separate this list into two (then we'll have part of
+> > > the properties in accel code, and the rest ones still in cpu.c).
+> > > 
+> > > (then I can also avoid using hard code in accel.c/kvm.c as well, which
+> > >  is something I really want to stop from doing. Maybe there can be
+> > >  some better idea, but I cannot really figure it out now...)
+> > > 
+> > > I'll just hold here to see whether you like above idea before moving
+> > > on to further comments.  Thanks,
+> > 
+> > 
+> > Agreed.
+> > 
+> > When I suggested using accel-provided global properties to
+> > replace kvm_default_props, I forgot x86_cpu_change_kvm_default()
+> > existed, and it makes things much more complex.
+> > 
+> > I really really want to make the existing x2apic/svm/kvm-pv-eoi
+> > compat stuff be based on static lists of properties.  If we make
+> > them dynamically built at runtime, we still can't introspect them
+> > and it won't be worth the extra complexity.
+> > 
+> > I believe we can still find a solution to represent the
+> > x2apic/svm/kvm-pv-eoi rules using static lists, but this
+> > shouldn't block the migration work you are doing.
+> 
+> One thing I think of is:
+> 
+> Let MachineClass::compat_props be MachCompatProp (rather than
+> GlobalProperty), then define it as:
+> 
+> struct MachCompatProp {
+>     GlobalProperty prop;
+>     bool (*prop_valid)();
+> };
+> 
+> (We may pass MigrationState *ms into prop_valid(), but for current
+>  requirements we may not need that, since what we need is basically
+>  tcg_enabled(), kvm_enabled(), or kvm_irqchip_is_split() checks)
+> 
+> Then this property will only be delivered to the global_props list
+> only if its prop_valid() check pass.  Thanks,
 
--- =
+The problem with a ->prop_valid() hook is that it's code, not
+data.  It means we can't represent it in the reply of a QMP
+introspection command, or allow equivalent behavior to be
+reproduced using command-line options.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1587065
+Device-specific rules like this can be solved by a boolean compat
+property implemented by the device itself.  e.g.: a "auto-x2apic"
+property in the x86 CPU code.
 
-Title:
-  btrfs qemu-ga - multiple mounts block fsfreeze
-
-Status in QEMU:
-  New
-
-Bug description:
-  Having two mounts of the same device makes fsfreeze through qemu-ga impos=
-sible.
-  root@CmsrvMTA:/# mount -l | grep /dev/vda2
-  /dev/vda2 on / type btrfs (rw,relatime,space_cache,subvolid=3D257,subvol=
-=3D/@)
-  /dev/vda2 on /home type btrfs (rw,relatime,space_cache,subvolid=3D258,sub=
-vol=3D/@home)
-
-  Having two mounts is rather common with btrfs, so the feature fsfreeze
-  is unusable on these systems.
-
-  =
-
-  Below more information about how we encountered this issue...
-
-  Message send to qemu-discuss@nongnu.org:
-
-  Message 1:
-  ----------
-  I use external snapshots to backup my guests. I use the 'quiesce' option =
-to flush and frees the guest file system with the qemu guest agent.
-
-  With the exeption of one guest, this procedure works fine. On the 'unwill=
-ing' guest, I get this error message:
-  "ERROR 2016-05-25 00:51:19 | T25-bakVMSCmsrvVH2 | fout: internal error: u=
-nable to execute QEMU agent command 'guest-fsfreeze-freeze': failed to free=
-ze /: Device or resource busy"
-
-  I don't think this is not some sort of time-out error, because
-  activation of the fsfreeze and the error message happen immediately
-  after each other:
-
-  $ grep qemu-ga syslog.1
-  May 25 00:51:19 CmsrvMTA qemu-ga: info: guest-fsfreeze called
-
-  This is the only entry of the qemu guest agent in syslog.
-
-  $ sudo virsh version
-  Compiled against library: libvirt 1.3.1
-  Using library: libvirt 1.3.1
-  Gebruikte API: QEMU 1.3.1
-  Draaiende hypervisor: QEMU 2.5.0
-
-  $ virsh qemu-agent-command CmsrvMTA '{"execute": "guest-info"}'
-  {"return":{"version":"2.5.0", ... ,{"enabled":true,"name":"guest-fstrim",=
-"success-response":true},{"enabled":true,"name":"guest-fsfreeze-thaw","succ=
-ess-response":true},{"enabled":true,"name":"guest-fsfreeze-status","success=
--response":true},{"enabled":true,"name":"guest-fsfreeze-freeze-list","succe=
-ss-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze","success-=
-response":true}, ... }
-
-  For making an external snapshot, I use this command:
-  $ virsh snapshot-create-as --domain CmsrvMTA sn1 --disk-only --atomic --q=
-uiesce --no-metadata --diskspec vda,file=3D/srv/poolVMS/CmsrvMTA.sn1
-
-  Piece of reply 1:
-  -----------------
-  I have encountered this before. Some operating systems
-   may have bind-mounts that let a device appear multiple times in the moun=
-t list. Unfortunately the guest agent is not smart enough to consider a dev=
-ice that has been frozen as succesfull and keep going. This causes this spe=
-cific error.
-
-  Piece of reply 2:
-  -----------------
-  Ok, that seems to be it.
-
-  I=E2=80=99ve got the =E2=80=98/=E2=80=99 and =E2=80=98/home=E2=80=99 on t=
-he same device formatted as btrfs on
-  two separate sub volumes.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1587065/+subscriptions
+-- 
+Eduardo
