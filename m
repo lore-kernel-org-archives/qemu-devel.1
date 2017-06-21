@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58843)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dNi95-0006mt-Hn
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 12:06:25 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dNiHF-0008Cu-Pu
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 12:14:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dNi94-000599-Hk
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 12:06:19 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170621134744.8047-1-mreitz@redhat.com>
-	<20170621134744.8047-4-mreitz@redhat.com>
-Date: Wed, 21 Jun 2017 18:06:09 +0200
-In-Reply-To: <20170621134744.8047-4-mreitz@redhat.com> (Max Reitz's message of
-	"Wed, 21 Jun 2017 15:47:43 +0200")
-Message-ID: <87h8z9wcjy.fsf@dusky.pond.sub.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dNiHC-0000bf-W1
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 12:14:45 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <0F376E9C-2D4B-4D79-B3D4-24F73FD61446@gmail.com>
+	<20170508221304.y36owezwla7sc6ss@aurel32.net>
+	<BB3E29F1-8BBB-407B-AAC8-795E9718CF5E@gmail.com>
+	<20170508225007.2duqxlo5ab2aenpl@aurel32.net>
+	<alpine.BSF.2.20.1705091148560.78100@zero.eik.bme.hu>
+	<F3D7AC88-099F-432D-B46F-97F2A6F7B0E3@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <f2644920-8eda-e768-adee-71db36ea2fa3@amsat.org>
+Date: Wed, 21 Jun 2017 13:14:38 -0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] block: qobject_is_equal() in
- bdrv_reopen_prepare()
+In-Reply-To: <F3D7AC88-099F-432D-B46F-97F2A6F7B0E3@gmail.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] Floating point unit bugs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +31,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: G 3 <programmingkidx@gmail.com>, BALATON Zoltan <balaton@eik.bme.hu>
+Cc: "qemu-ppc@nongnu.org list:PowerPC" <qemu-ppc@nongnu.org>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-Max Reitz <mreitz@redhat.com> writes:
+Hi John,
 
-> Currently, bdrv_reopen_prepare() assumes that all BDS options are
-> strings. However, this is not the case if the BDS has been created
-> through the json: pseudo-protocol or blockdev-add.
+On 05/09/2017 10:58 AM, G 3 wrote:
 >
-> Note that the user-invokable reopen command is an HMP command, so you
-> can only specify strings there. Therefore, specifying a non-string
-> option with the "same" value as it was when originally created will now
-> return an error because the values are supposedly similar (and there is
-> no way for the user to circumvent this but to just not specify the
-> option again -- however, this is still strictly better than just
-> crashing).
+> On May 9, 2017, at 5:55 AM, BALATON Zoltan wrote:
 >
-> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  block.c | 15 +++------------
->  1 file changed, 3 insertions(+), 12 deletions(-)
+>> On Tue, 9 May 2017, Aurelien Jarno wrote:
+>>> | main.c: In function 'print_fpscr_settings':
+>>> | main.c:73:26: warning: suggest parentheses around comparison in
+>>> operand of '&' [-Wparentheses]
+>>> |          if ((fpscr >> i) & 0x1 == 1) {
+>>> |                           ^
+>>
+>> Actually the compiler is correct here, this should be:
+>>
+>> if ((fpscr >> i & 0x1) == 1) {
+>>
+>> or even just
+>>
+>> if (fpscr >> i & 1) {
+>>
+>> because & is lower priority than == but the result may still be the
+>> same by chance if 0x1 == 1 is always 1 and ANDing the shifted value
+>> with this is either 0 or 1 so it may give the correct result but not
+>> the way one would think looking at the expression.
 >
-> diff --git a/block.c b/block.c
-> index fa1d06d..23424d5 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -2950,19 +2950,10 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
->          const QDictEntry *entry = qdict_first(reopen_state->options);
->  
->          do {
-> -            QString *new_obj = qobject_to_qstring(entry->value);
-> -            const char *new = qstring_get_str(new_obj);
-> -            /*
-> -             * Caution: while qdict_get_try_str() is fine, getting
-> -             * non-string types would require more care.  When
-> -             * bs->options come from -blockdev or blockdev_add, its
-> -             * members are typed according to the QAPI schema, but
-> -             * when they come from -drive, they're all QString.
-> -             */
+> I changed it to this:
+> if (((fpscr >> i) & 0x1) == 1)
+>
+> Thank you.
 
-Your commit message makes me suspect this comment still applies in some
-form.  Does it?
+do you think you can add your test as a qtest, to run it with check-qtest?
 
-> -            const char *old = qdict_get_try_str(reopen_state->bs->options,
-> -                                                entry->key);
-> +            QObject *new = entry->value;
-> +            QObject *old = qdict_get(reopen_state->bs->options, entry->key);
->  
-> -            if (!old || strcmp(new, old)) {
-> +            if (!qobject_is_equal(new, old)) {
->                  error_setg(errp, "Cannot change the option '%s'", entry->key);
->                  ret = -EINVAL;
->                  goto error;
+Regards,
+
+Phil.
+
+>
