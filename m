@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dNh05-0003xr-Kq
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:53:03 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dNh6H-0000hn-2D
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:59:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dNh04-0007qx-AL
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:52:57 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:36845)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dNh04-0007qB-4A
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:52:56 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id c11so82875996wrc.3
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 07:52:55 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed, 21 Jun 2017 15:48:13 +0100
-Message-Id: <20170621144814.15324-21-alex.bennee@linaro.org>
-In-Reply-To: <20170621144814.15324-1-alex.bennee@linaro.org>
-References: <20170621144814.15324-1-alex.bennee@linaro.org>
+	(envelope-from <mreitz@redhat.com>) id 1dNh6D-00024r-5d
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:59:21 -0400
+From: Max Reitz <mreitz@redhat.com>
+References: <20170619173455.18805-1-berrange@redhat.com>
+	<20170619173455.18805-14-berrange@redhat.com>
+	<79345f33-2cf6-bec1-c96d-981fc7e3fedd@redhat.com>
+	<c481d014-f9f0-74c8-4011-1b81ace887be@redhat.com>
+Message-ID: <48afe1ce-e500-e7a7-18de-2ed67d808df3@redhat.com>
+Date: Wed, 21 Jun 2017 16:59:02 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 20/21] MAINTAINERS: add Shippable automation
- platform URL
+In-Reply-To: <c481d014-f9f0-74c8-4011-1b81ace887be@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="pG4e4BrB2c9b9eSVQQ23QwwakQbFib10O"
+Subject: Re: [Qemu-devel] [PATCH v9 13/20] qcow2: add support for LUKS
+ encryption format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +27,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--pG4e4BrB2c9b9eSVQQ23QwwakQbFib10O
+From: Max Reitz <mreitz@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
+Message-ID: <48afe1ce-e500-e7a7-18de-2ed67d808df3@redhat.com>
+Subject: Re: [PATCH v9 13/20] qcow2: add support for LUKS encryption format
+References: <20170619173455.18805-1-berrange@redhat.com>
+ <20170619173455.18805-14-berrange@redhat.com>
+ <79345f33-2cf6-bec1-c96d-981fc7e3fedd@redhat.com>
+ <c481d014-f9f0-74c8-4011-1b81ace887be@redhat.com>
+In-Reply-To: <c481d014-f9f0-74c8-4011-1b81ace887be@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+On 2017-06-21 16:46, Max Reitz wrote:
+> On 2017-06-21 16:42, Max Reitz wrote:
+>> On 2017-06-19 19:34, Daniel P. Berrange wrote:
+>>> This adds support for using LUKS as an encryption format
+>>> with the qcow2 file, using the new encrypt.format parameter
+>>> to request "luks" format. e.g.
+>>>
+>>>   # qemu-img create --object secret,data=3D123456,id=3Dsec0 \
+>>>        -f qcow2 -o encrypt.format=3Dluks,encrypt.key-secret=3Dsec0 \
+>>>        test.qcow2 10G
+>>>
+>>> The legacy "encryption=3Don" parameter still results in
+>>> creation of the old qcow2 AES format (and is equivalent
+>>> to the new 'encryption-format=3Daes'). e.g. the following are
+>>> equivalent:
+>>>
+>>>   # qemu-img create --object secret,data=3D123456,id=3Dsec0 \
+>>>        -f qcow2 -o encryption=3Don,encrypt.key-secret=3Dsec0 \
+>>>        test.qcow2 10G
+>>>
+>>>  # qemu-img create --object secret,data=3D123456,id=3Dsec0 \
+>>>        -f qcow2 -o encryption-format=3Daes,encrypt.key-secret=3Dsec0 =
+\
+>>>        test.qcow2 10G
+>>>
+>>> With the LUKS format it is necessary to store the LUKS
+>>> partition header and key material in the QCow2 file. This
+>>> data can be many MB in size, so cannot go into the QCow2
+>>> header region directly. Thus the spec defines a FDE
+>>> (Full Disk Encryption) header extension that specifies
+>>> the offset of a set of clusters to hold the FDE headers,
+>>> as well as the length of that region. The LUKS header is
+>>> thus stored in these extra allocated clusters before the
+>>> main image payload.
+>>>
+>>> Aside from all the cryptographic differences implied by
+>>> use of the LUKS format, there is one further key difference
+>>> between the use of legacy AES and LUKS encryption in qcow2.
+>>> For LUKS, the initialiazation vectors are generated using
+>>> the host physical sector as the input, rather than the
+>>> guest virtual sector. This guarantees unique initialization
+>>> vectors for all sectors when qcow2 internal snapshots are
+>>> used, thus giving stronger protection against watermarking
+>>> attacks.
+>>>
+>>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>>> Reviewed-by: Alberto Garcia <berto@igalia.com>
+>>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+>>> ---
+>>>  block/qcow2-cluster.c      |   4 +-
+>>>  block/qcow2-refcount.c     |  10 ++
+>>>  block/qcow2.c              | 268 +++++++++++++++++++++++++++++++++++=
++++------
+>>>  block/qcow2.h              |   9 ++
+>>>  qapi/block-core.json       |   5 +-
+>>>  tests/qemu-iotests/082.out | 270 +++++++++++++++++++++++++++++++++++=
++---------
+>>>  6 files changed, 478 insertions(+), 88 deletions(-)
+>>
+>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>=20
+> (But due to the split of do_perform_cow(), this will need the same
+> changes that patch 10 and 11 will need (in this case only contextual, i=
+n
+> the cases of 10 and 11 there are also functional changes required).)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 120788d8fb..b2cf06265e 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1864,6 +1864,7 @@ F: .travis.yml
- F: .shippable.yml
- F: tests/docker/
- W: https://travis-ci.org/qemu/qemu
-+W: https://app.shippable.com/github/qemu/qemu
- W: http://patchew.org/QEMU/
- 
- Documentation
--- 
-2.13.0
+(Turns out it will need a functional change, too, because
+do_perform_cow_encrypt() doesn't take the host offset yet.)
+
+Max
+
+
+--pG4e4BrB2c9b9eSVQQ23QwwakQbFib10O
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEvBAEBCAAZBQJZSom2EhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQGEn
+CACwi/U+Rg7mk8YKXY742W9Sx+UoBikDFJldqH3jXDQFsHiIWalh31MfMz67VnUE
+kc8oe7jnBOCkqXrlhXYLU0r83qDZyxNbaiSE6gCKOtKH+LPo6YqK9YRoJK7IHT4Z
+A0IzAk8R7/AeTj7HuZiaVR8YyV8NYjbam+OIxoPdSQLauHnGfw4/HgietLInt+Xn
+/iNO57E5aavHsmS0uPag1Yt4coxwe4mnLMYjA1NmVsUPH2/t3tZphqk5bG0KgANX
+6HIUzCJdB9VPM7huJp9HqQctcxUFFgdeKErcClJ5aCqBLmnedDLfkIcZqzRtnIw+
+vA756yCivYHi2w7IkErRIve9
+=PydH
+-----END PGP SIGNATURE-----
+
+--pG4e4BrB2c9b9eSVQQ23QwwakQbFib10O--
