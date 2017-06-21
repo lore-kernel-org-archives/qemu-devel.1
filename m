@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dNeZk-0005FA-Hr
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:17:37 -0400
+	(envelope-from <casasfernando@hotmail.com>) id 1dNebP-0005lu-IU
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:19:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dNeZf-00065g-NO
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:17:36 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:41594
-	helo=s16892447.onlinehome-server.info)
+	(envelope-from <casasfernando@hotmail.com>) id 1dNebL-0006sK-Jc
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:19:19 -0400
+Received: from mail-oln040092069024.outbound.protection.outlook.com
+	([40.92.69.24]:44352
+	helo=EUR02-VE1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1dNeZf-00065A-GL
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:17:31 -0400
-References: <1497877149-19253-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1497877149-19253-4-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<20170619142852.GS5016@thinpad.lan.raisama.net>
-	<7d5904ae-e66c-5594-cfff-747578d91f4b@ilande.co.uk>
-	<08da52ec-e4d2-d836-49bd-90baf21747fb@redhat.com>
-	<1d8147a6-d55c-4951-68db-4c1cf502a4f3@ilande.co.uk>
-	<9d24bf00-cf82-717a-eccd-f51e2c80dd6f@redhat.com>
-	<eaa2cd40-0d64-6843-7e39-c0f94c7e797f@ilande.co.uk>
-	<48c8f007-f388-59f5-9af8-f5eefe033e2a@redhat.com>
-	<20170621113600.GA3928@thinpad.lan.raisama.net>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <8135ff45-0341-1fd4-ada9-4527c6b61e5a@ilande.co.uk>
-Date: Wed, 21 Jun 2017 13:17:06 +0100
+	(Exim 4.71) (envelope-from <casasfernando@hotmail.com>)
+	id 1dNebL-0006rr-5i
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 08:19:15 -0400
+From: =?utf-8?B?RmVybmFuZG8gQ2FzYXMgU2Now7Zzc293?= <casasfernando@hotmail.com>
+Date: Wed, 21 Jun 2017 12:19:11 +0000
+Message-ID: <VI1PR1001MB13731144A5E55914A9E414A5B7DA0@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
+References: <VI1PR1001MB137395F2FCBDE6389A9AC5FCB7C30@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
+	<CABdb7358YVXbk++Z7s+q6Z5O0Q=6CQiQvYsTdc35eqmQeUnP_Q@mail.gmail.com>
+	<VI1PR1001MB1373C8915C51F7453D41B950B7C10@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
+	<CABdb7345_Nu_kpsSDGq7OyOSuKmgtyS-DuXTafkGeaCCXzV5LQ@mail.gmail.com>
+	<VI1PR1001MB1373B1F3C97D9528166E2305B7C40@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
+	<CABdb735e_NjY47LRZ58+zvKGmCRQKAmFo-HhByhsosRzQkOgxA@mail.gmail.com>
+	<HE1PR1001MB1371F7874B487B0907C42A7EB7C50@HE1PR1001MB1371.EURPRD10.PROD.OUTLOOK.COM>
+	<CABdb7372Pv3hR4S8C0TCV19u9XAKn=y0VmreGuZavhOjqRrypQ@mail.gmail.com>
+In-Reply-To: <CABdb7372Pv3hR4S8C0TCV19u9XAKn=y0VmreGuZavhOjqRrypQ@mail.gmail.com>
+Content-Language: en-US
 MIME-Version: 1.0
-In-Reply-To: <20170621113600.GA3928@thinpad.lan.raisama.net>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCHv6 3/5] fw_cfg: move assert() and linking of
- fw_cfg device to the machine into instance_init()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] Guest unresponsive after Virtqueue size exceeded
+ error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,68 +38,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Laszlo Ersek <lersek@redhat.com>
-Cc: peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, imammedo@redhat.com, pbonzini@redhat.com
+To: Ladi Prosek <lprosek@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 21/06/17 12:36, Eduardo Habkost wrote:
-
-> On Wed, Jun 21, 2017 at 09:48:16AM +0200, Laszlo Ersek wrote:
->> On 06/21/17 08:58, Mark Cave-Ayland wrote:
->>> On 19/06/17 23:43, Laszlo Ersek wrote:
->>>
->>>> It looks good to me, but please await Eduardo's reply as well.
->>>>
->>>> In particular, it should be confirmed that object_resolve_path_type()
->>>> matches instances of *subclasses* as well (as I expect it would). Your
->>>> test results confirm that; let's make sure it is intentional behavior.
->>>> Eduardo (or someone else on the CC list), can you please comment on that?
->>>
->>> Thanks Laszlo. Eduardo, can you confirm this is the correct behaviour?
-> 
-> Sorry for taking so long to reply.  Yes, it should be the correct
-> behavior.  It's how it's documented:
-> 
-> "This is similar to object_resolve_path.  However, when looking
-> for a partial path only matches that implement the given type are
-> considered.  This restricts the search and avoids spuriously
-> flagging matches as ambiguous."
-> 
-> (Key part here is "implement the given type").
-> 
-> Approach used by commit f92063028a "hw/acpi/vmgenid: prevent more
-> than one vmgenid device" looks good to me.
-
-That is great news, thanks for confirming this.
-
->>>
->>> I now have a v7 patchset ready to go (currently hosted at
->>> https://github.com/mcayland/qemu/tree/fwcfg7 for the curious). Laszlo,
->>> I've currently left off your Tested-by tag since I'm not sure it's still
->>> valid for less-than-trivial changes - if you're happy for me to re-add
->>> it before I send the v7 patchset to the list, please let me know.
->>
->> I intend to test v7 when you post it.
-> 
-> I still see the instance_init assert() in that branch (commit
-> 17d75643f880).  Is that correct?
-
-Yes that was the intention. In 17d75643f880 both the assert() and
-object_property_add_child() are moved into the instance_init() function,
-and then in the follow-up commit eddedb5 the assert() is removed from
-instance_init() and the object_resolve_path_type() check added into
-fw_cfg_init1() as part of its conversion into the
-fw_cfg_common_realize() function.
-
-One last question which might avoid a future v8 revision: does the error
-handling in eddedb5 for the fw_cfg_*_realize() functions look correct?
-
-The existing check for fw_cfg_file_slots_allocate() uses a local_err
-Error variable, whereas I've seen a mixture of callers using both this
-approach and using the errp Error variable directly. Is there any reason
-to prefer one over the other? Currently I'm also using local_err in
-order to keep the fw_cfg_*_realize() functions consistent.
-
-
-ATB,
-
-Mark.
+SGkgTGFkaSwNCg0KU29ycnkgZm9yIHRoZSBkZWxheSBpbiBteSByZXBseS4NCkkgd2lsbCBsZWF2
+ZSB0aGUgaG9zdCBrZXJuZWwgYWxvbmUgZm9yIG5vdyB0aGVuLg0KRm9yIHRoZSBsYXN0IDE1IGhv
+dXJzIG9yIHNvIEknbSBydW5uaW5nIG1lbXRlc3Q4Nisgb24gdGhlIGhvc3QuIFNvIGZhciBzbyBn
+b29kLiBUd28gcGFzc2VzIG5vIGVycm9ycyBzbyBmYXIuIEkgd2lsbCB0cnkgdG8gbGVhdmUgaXQg
+cnVubmluZyBmb3IgYXQgbGVhc3QgYW5vdGhlciAyNGhyIGFuZCByZXBvcnQgYmFjayB0aGUgcmVz
+dWx0cy4gSG9wZWZ1bGx5IHdlIGNhbiBkaXNjYXJkIHRoZSBtZW1vcnkgaXNzdWUgYXQgaGFyZHdh
+cmUgbGV2ZWwuDQoNClJlZ2FyZGluZyBLU00sIHRoYXQgd2lsbCBiZSB0aGUgbmV4dCB0aGluZyBJ
+IHdpbGwgZGlzYWJsZSBpZiBhZnRlciByZW1vdmluZyB0aGUgYmFsbG9vbiBkZXZpY2UgZ3Vlc3Rz
+IHN0aWxsIGNyYXNoLg0KDQpBYm91dCBsZWF2aW5nIGEgZ3Vlc3QgaW4gYSBmYWlsZWQgc3RhdGUg
+Zm9yIHlvdSB0byBkZWJ1ZyBpdCByZW1vdGVseSwgdGhhdCdzIGFic29sdXRlbHkgYW4gb3B0aW9u
+LiBXZSBqdXN0IG5lZWQgdG8gY29vcmRpbmF0ZSBzbyBJIGNhbiBnaXZlIHlvdSByZW1vdGUgYWNj
+ZXNzIHRvIHRoZSBob3N0IGFuZCBzbyBvbi4gTGV0IG1lIGtub3cgaWYgYW55IHByZXBhcmF0aW9u
+IGlzIG5lZWRlZCBpbiBhZHZhbmNlIGFuZCB3aGljaCB0b29scyB5b3UgbmVlZCBpbnN0YWxsZWQg
+b24gdGhlIGhvc3QuDQoNCk9uY2UgSSBhZ2FpbiBJIHdvdWxkIGxpa2UgdG8gdGhhbmsgeW91IGZv
+ciBhbGwgeW91ciBoZWxwIGFuZCB5b3VyIGdyZWF0IGRpc3Bvc2l0aW9uIQ0KDQpDaGVlcnMsDQoN
+CkZlcg0KDQpPbiBtYXIsIGp1biAyMCwgMjAxNyBhdCA5OjUyICwgTGFkaSBQcm9zZWsgPGxwcm9z
+ZWtAcmVkaGF0LmNvbT4gd3JvdGU6DQpUaGUgaG9zdCBrZXJuZWwgaXMgbGVzcyBsaWtlbHkgdG8g
+YmUgcmVzcG9uc2libGUgZm9yIHRoaXMsIGluIG15IG9waW5pb24uIEknZCBob2xkIG9mZiBvbiB0
+aGF0IGZvciBub3cuDQpBbmQgbGFzdCBidXQgbm90IGxlYXN0IEtTTSBpcyBlbmFibGVkIG9uIHRo
+ZSBob3N0LiBTaG91bGQgSSBkaXNhYmxlIGl0Pw0KQ291bGQgYmUgd29ydGggdGhlIHRyeS4NCkZv
+bGxvd2luZyB5b3VyIGFkdmljZSBJIHdpbGwgcnVuIG1lbXRlc3Qgb24gdGhlIGhvc3QgYW5kIHJl
+cG9ydCBiYWNrLiBKdXN0IGFzIGEgc2lkZSBjb21tZW50LCB0aGUgaG9zdCBpcyBydW5uaW5nIG9u
+IEVDQyBtZW1vcnkuDQpJIHNlZS4gV291bGQgaXQgYmUgcG9zc2libGUgZm9yIHlvdSwgb25jZSBh
+IGd1ZXN0IGlzIGluIHRoZSBicm9rZW4gc3RhdGUsIHRvIG1ha2UgaXQgYXZhaWxhYmxlIGZvciBk
+ZWJ1Z2dpbmc/IEJ5IGF0dGFjaGluZyBnZGIgdG8gdGhlIFFFTVUgcHJvY2VzcyBmb3IgZXhhbXBs
+ZSBhbmQgbGV0dGluZyBtZSBwb2tlIGFyb3VuZCBpdCByZW1vdGVseT8gVGhhbmtzIQ0KDQoNCg==
