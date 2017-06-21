@@ -1,25 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dNfPW-0001H3-Hm
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:11:07 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dNfQY-0002Bf-Vx
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:12:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dNfPS-0006bd-Ca
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:11:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53108)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dNfPS-0006ax-3z
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:11:02 -0400
-References: <1498040401-16361-1-git-send-email-yang.zhong@intel.com>
-	<1498040401-16361-4-git-send-email-yang.zhong@intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d35da9df-43b0-c59b-38b4-1affd7448fcc@redhat.com>
-Date: Wed, 21 Jun 2017 15:10:55 +0200
-MIME-Version: 1.0
-In-Reply-To: <1498040401-16361-4-git-send-email-yang.zhong@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 03/15] tcg: tcg_handle_interrupt() function
+	(envelope-from <mreitz@redhat.com>) id 1dNfQU-00074Z-Uk
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:12:10 -0400
+From: Max Reitz <mreitz@redhat.com>
+Date: Wed, 21 Jun 2017 15:11:57 +0200
+Message-Id: <20170621131157.16584-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH] iotests: 181 does not work for all formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,158 +17,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>
-Cc: qemu-devel@nongnu.org, a.rigo@virtualopensystems.com, anthony.xu@intel.com
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
+Test 181 only works for formats which support live migration (naturally,
+as it is a live migration test). Disable it for all formats which do
+not.
 
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ tests/qemu-iotests/181 | 2 ++
+ 1 file changed, 2 insertions(+)
 
-On 21/06/2017 12:19, Yang Zhong wrote:
-> Move tcg_handle_interrupt() from translate-common.c to
-> translate-all.c.
-> 
-> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-
-Why?
-
-Paolo
-
-> ---
->  accel/tcg/Makefile.objs      |  2 +-
->  accel/tcg/translate-all.c    | 30 ++++++++++++++++++++++++
->  accel/tcg/translate-common.c | 56 --------------------------------------------
->  cpus.c                       |  1 +
->  4 files changed, 32 insertions(+), 57 deletions(-)
->  delete mode 100644 accel/tcg/translate-common.c
-> 
-> diff --git a/accel/tcg/Makefile.objs b/accel/tcg/Makefile.objs
-> index f173cd5..70cd474 100644
-> --- a/accel/tcg/Makefile.objs
-> +++ b/accel/tcg/Makefile.objs
-> @@ -1,3 +1,3 @@
->  obj-$(CONFIG_SOFTMMU) += tcg-all.o
->  obj-$(CONFIG_SOFTMMU) += cputlb.o
-> -obj-y += cpu-exec.o cpu-exec-common.o translate-all.o translate-common.o
-> +obj-y += cpu-exec.o cpu-exec-common.o translate-all.o
-> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-> index 7b25a16..bb303e0 100644
-> --- a/accel/tcg/translate-all.c
-> +++ b/accel/tcg/translate-all.c
-> @@ -798,6 +798,33 @@ static void tb_htable_init(void)
->      qht_init(&tcg_ctx.tb_ctx.htable, CODE_GEN_HTABLE_SIZE, mode);
->  }
->  
-> +#ifndef CONFIG_USER_ONLY
-> +/* mask must never be zero, except for A20 change call */
-> +static void tcg_handle_interrupt(CPUState *cpu, int mask)
-> +{
-> +    int old_mask;
-> +    g_assert(qemu_mutex_iothread_locked());
-> +
-> +    old_mask = cpu->interrupt_request;
-> +    cpu->interrupt_request |= mask;
-> +
-> +    /*
-> +     * If called from iothread context, wake the target cpu in
-> +     * case its halted.
-> +     */
-> +    if (!qemu_cpu_is_self(cpu)) {
-> +        qemu_cpu_kick(cpu);
-> +    } else {
-> +        cpu->icount_decr.u16.high = -1;
-> +        if (use_icount &&
-> +            !cpu->can_do_io
-> +            && (mask & ~old_mask) != 0) {
-> +            cpu_abort(cpu, "Raised interrupt while not in I/O function");
-> +        }
-> +    }
-> +}
-> +#endif
-> +
->  /* Must be called before using the QEMU cpus. 'tb_size' is the size
->     (in bytes) allocated to the translation buffer. Zero means default
->     size. */
-> @@ -807,6 +834,9 @@ void tcg_exec_init(unsigned long tb_size)
->      page_init();
->      tb_htable_init();
->      code_gen_alloc(tb_size);
-> +#ifndef CONFIG_USER_ONLY
-> +    cpu_interrupt_handler = tcg_handle_interrupt;
-> +#endif
->  #if defined(CONFIG_SOFTMMU)
->      /* There's no guest base to take into account, so go ahead and
->         initialize the prologue now.  */
-> diff --git a/accel/tcg/translate-common.c b/accel/tcg/translate-common.c
-> deleted file mode 100644
-> index 40fe5a1..0000000
-> --- a/accel/tcg/translate-common.c
-> +++ /dev/null
-> @@ -1,56 +0,0 @@
-> -/*
-> - *  Host code generation common components
-> - *
-> - *  Copyright (c) 2015 Peter Crosthwaite <crosthwaite.peter@gmail.com>
-> - *
-> - * This library is free software; you can redistribute it and/or
-> - * modify it under the terms of the GNU Lesser General Public
-> - * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> - *
-> - * This library is distributed in the hope that it will be useful,
-> - * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> - * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> - * Lesser General Public License for more details.
-> - *
-> - * You should have received a copy of the GNU Lesser General Public
-> - * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-> - */
-> -
-> -#include "qemu/osdep.h"
-> -#include "qemu-common.h"
-> -#include "qom/cpu.h"
-> -#include "sysemu/cpus.h"
-> -#include "qemu/main-loop.h"
-> -
-> -uintptr_t qemu_real_host_page_size;
-> -intptr_t qemu_real_host_page_mask;
-> -
-> -#ifndef CONFIG_USER_ONLY
-> -/* mask must never be zero, except for A20 change call */
-> -static void tcg_handle_interrupt(CPUState *cpu, int mask)
-> -{
-> -    int old_mask;
-> -    g_assert(qemu_mutex_iothread_locked());
-> -
-> -    old_mask = cpu->interrupt_request;
-> -    cpu->interrupt_request |= mask;
-> -
-> -    /*
-> -     * If called from iothread context, wake the target cpu in
-> -     * case its halted.
-> -     */
-> -    if (!qemu_cpu_is_self(cpu)) {
-> -        qemu_cpu_kick(cpu);
-> -    } else {
-> -        cpu->icount_decr.u16.high = -1;
-> -        if (use_icount &&
-> -            !cpu->can_do_io
-> -            && (mask & ~old_mask) != 0) {
-> -            cpu_abort(cpu, "Raised interrupt while not in I/O function");
-> -        }
-> -    }
-> -}
-> -
-> -CPUInterruptHandler cpu_interrupt_handler = tcg_handle_interrupt;
-> -#endif
-> diff --git a/cpus.c b/cpus.c
-> index a86ea10..6ff3e37 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -76,6 +76,7 @@ int64_t max_advance;
->  /* vcpu throttling controls */
->  static QEMUTimer *throttle_timer;
->  static unsigned int throttle_percentage;
-> +CPUInterruptHandler cpu_interrupt_handler;
->  
->  #define CPU_THROTTLE_PCT_MIN 1
->  #define CPU_THROTTLE_PCT_MAX 99
-> 
+diff --git a/tests/qemu-iotests/181 b/tests/qemu-iotests/181
+index e969a2a..f73ad5a 100755
+--- a/tests/qemu-iotests/181
++++ b/tests/qemu-iotests/181
+@@ -43,6 +43,8 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ . ./common.qemu
+ 
+ _supported_fmt generic
++# Formats that do not support live migration
++_unsupported_fmt qcow vdi vhdx vmdk vpc vvfat
+ _supported_proto generic
+ _supported_os Linux
+ 
+-- 
+2.9.4
