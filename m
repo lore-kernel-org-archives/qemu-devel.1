@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dNgty-0005mZ-Ny
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:46:44 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dNgts-0005hD-Im
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:46:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dNgts-0004VJ-QH
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:46:38 -0400
-From: Max Reitz <mreitz@redhat.com>
-References: <20170619173455.18805-1-berrange@redhat.com>
-	<20170619173455.18805-14-berrange@redhat.com>
-	<79345f33-2cf6-bec1-c96d-981fc7e3fedd@redhat.com>
-Message-ID: <c481d014-f9f0-74c8-4011-1b81ace887be@redhat.com>
-Date: Wed, 21 Jun 2017 16:46:16 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1dNgtn-0004T8-I5
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:46:32 -0400
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:36694)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dNgtn-0004SZ-BW
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 10:46:27 -0400
+Received: by mail-wr0-x236.google.com with SMTP id c11so82637957wrc.3
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 07:46:27 -0700 (PDT)
+References: <CAFd4ddwJYpLCzXViDh6MhwZyurMi_LrO-dgnSrciCNB2UDXiCQ@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFd4ddwJYpLCzXViDh6MhwZyurMi_LrO-dgnSrciCNB2UDXiCQ@mail.gmail.com>
+Date: Wed, 21 Jun 2017 15:47:09 +0100
+Message-ID: <87lgoltn2q.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <79345f33-2cf6-bec1-c96d-981fc7e3fedd@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="A0mGIQrBhTIJEcLc2IOoT6s3vvD9wufhT"
-Subject: Re: [Qemu-devel] [PATCH v9 13/20] qcow2: add support for LUKS
- encryption format
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] Instruction tracing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,105 +29,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---A0mGIQrBhTIJEcLc2IOoT6s3vvD9wufhT
-From: Max Reitz <mreitz@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
-Message-ID: <c481d014-f9f0-74c8-4011-1b81ace887be@redhat.com>
-Subject: Re: [PATCH v9 13/20] qcow2: add support for LUKS encryption format
-References: <20170619173455.18805-1-berrange@redhat.com>
- <20170619173455.18805-14-berrange@redhat.com>
- <79345f33-2cf6-bec1-c96d-981fc7e3fedd@redhat.com>
-In-Reply-To: <79345f33-2cf6-bec1-c96d-981fc7e3fedd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2017-06-21 16:42, Max Reitz wrote:
-> On 2017-06-19 19:34, Daniel P. Berrange wrote:
->> This adds support for using LUKS as an encryption format
->> with the qcow2 file, using the new encrypt.format parameter
->> to request "luks" format. e.g.
->>
->>   # qemu-img create --object secret,data=3D123456,id=3Dsec0 \
->>        -f qcow2 -o encrypt.format=3Dluks,encrypt.key-secret=3Dsec0 \
->>        test.qcow2 10G
->>
->> The legacy "encryption=3Don" parameter still results in
->> creation of the old qcow2 AES format (and is equivalent
->> to the new 'encryption-format=3Daes'). e.g. the following are
->> equivalent:
->>
->>   # qemu-img create --object secret,data=3D123456,id=3Dsec0 \
->>        -f qcow2 -o encryption=3Don,encrypt.key-secret=3Dsec0 \
->>        test.qcow2 10G
->>
->>  # qemu-img create --object secret,data=3D123456,id=3Dsec0 \
->>        -f qcow2 -o encryption-format=3Daes,encrypt.key-secret=3Dsec0 \=
-
->>        test.qcow2 10G
->>
->> With the LUKS format it is necessary to store the LUKS
->> partition header and key material in the QCow2 file. This
->> data can be many MB in size, so cannot go into the QCow2
->> header region directly. Thus the spec defines a FDE
->> (Full Disk Encryption) header extension that specifies
->> the offset of a set of clusters to hold the FDE headers,
->> as well as the length of that region. The LUKS header is
->> thus stored in these extra allocated clusters before the
->> main image payload.
->>
->> Aside from all the cryptographic differences implied by
->> use of the LUKS format, there is one further key difference
->> between the use of legacy AES and LUKS encryption in qcow2.
->> For LUKS, the initialiazation vectors are generated using
->> the host physical sector as the input, rather than the
->> guest virtual sector. This guarantees unique initialization
->> vectors for all sectors when qcow2 internal snapshots are
->> used, thus giving stronger protection against watermarking
->> attacks.
->>
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->> Reviewed-by: Alberto Garcia <berto@igalia.com>
->> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
->> ---
->>  block/qcow2-cluster.c      |   4 +-
->>  block/qcow2-refcount.c     |  10 ++
->>  block/qcow2.c              | 268 ++++++++++++++++++++++++++++++++++++=
-++------
->>  block/qcow2.h              |   9 ++
->>  qapi/block-core.json       |   5 +-
->>  tests/qemu-iotests/082.out | 270 ++++++++++++++++++++++++++++++++++++=
----------
->>  6 files changed, 478 insertions(+), 88 deletions(-)
->=20
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-(But due to the split of do_perform_cow(), this will need the same
-changes that patch 10 and 11 will need (in this case only contextual, in
-the cases of 10 and 11 there are also functional changes required).)
+To: Nayan Deshmukh <nayan26deshmukh@gmail.com>
+Cc: qemu-devel@nongnu.org
 
 
---A0mGIQrBhTIJEcLc2IOoT6s3vvD9wufhT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Nayan Deshmukh <nayan26deshmukh@gmail.com> writes:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+> Hello!
+>
+> I was wondering if its possible to get an instruction trace of the
+> process running on the guest OS in the VM including the instructions
+> executed during system calls.
+>
+> Can someone please give me some pointers regarding how this could be
+> implemented.
 
-iQEvBAEBCAAZBQJZSoa4EhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQEv/
-CACdkTTe3YzQxVgf9+zzsVtf01y1U+FB8lL7ddlHTJl3SVN9ED25YLM/vhdm482j
-f0jAd/mQjtaEOvA3SAQ1yi6TfqH6n72oK/m/CuUVKA63HPRo5BQP/I3us6bn6j8C
-34P4CF+sRb/hCM8ZtRSW90F1P+QYwpM/F4TxZCR8fojmDTinLkQFdiPXEbpxfOPD
-/Ts/YSAu3mZJm96WkZ8WfCImSgoOV3ugt3zOvcETm4Rn+Tq+uvDPDGoRn4QGBbpO
-h8oSmSLdzOUwYF0tEHlp5JTo5B1eYFXZM1WHomHRkMqqKNrBiSjXwjbx2xq9Z55x
-wHfUytYhM57cqmpJ5lNtkgFN
-=ArXN
------END PGP SIGNATURE-----
+ $QEMU -d help
 
---A0mGIQrBhTIJEcLc2IOoT6s3vvD9wufhT--
+Will list a bunch of debug options for TCG. You can get somewhat close
+to what you want with:
+
+ $QEMU $OPTS -d in_asm,exec,nochain
+
+>
+> Cheers,
+> Nayan Deshmukh
+
+
+--
+Alex Bennée
