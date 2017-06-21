@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1dNiSl-0007f6-AQ
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 12:26:42 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1dNiSq-0007ja-Lt
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 12:26:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1dNiSi-0004mU-L3
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 12:26:39 -0400
-Received: from mail-eopbgr30105.outbound.protection.outlook.com
-	([40.107.3.105]:22688
+	(envelope-from <rkagan@virtuozzo.com>) id 1dNiSo-0004pp-1e
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 12:26:44 -0400
+Received: from mail-eopbgr30102.outbound.protection.outlook.com
+	([40.107.3.102]:29592
 	helo=EUR03-AM5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1dNiSi-0004lT-5Z
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 12:26:36 -0400
+	id 1dNiSn-0004ow-Jo
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 12:26:41 -0400
 From: Roman Kagan <rkagan@virtuozzo.com>
-Date: Wed, 21 Jun 2017 19:24:20 +0300
-Message-Id: <20170621162424.10462-20-rkagan@virtuozzo.com>
+Date: Wed, 21 Jun 2017 19:24:21 +0300
+Message-Id: <20170621162424.10462-21-rkagan@virtuozzo.com>
 In-Reply-To: <20170621162424.10462-1-rkagan@virtuozzo.com>
 References: <20170621162424.10462-1-rkagan@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 19/23] hyperv: process SIGNAL_EVENT hypercall
+Subject: [Qemu-devel] [PATCH v2 20/23] hyperv: process POST_MESSAGE hypercall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,92 +31,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 Cc: Evgeny Yakovlev <eyakovlev@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>, Igor Mammedov <imammedo@redhat.com>
 
-Add handling of SIGNAL_EVENT hypercall.  For that, provide an interface
-to associate an EventNotifier with an event connection number, so that
-it's signaled when the SIGNAL_EVENT hypercall with the matching
-parameters is called by the guest.
-
-TODO: we should be able to move this to KVM and avoid expensive user
-exit just to look up an eventfd by connection number and signal it.
+Add handling of POST_MESSAGE hypercall.  For that, add an interface to
+regsiter a handler for the messages arrived from the guest on a
+particular connection id (IOW set up a message connection in Hyper-V
+speak).
 
 Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
 ---
 v1 -> v2:
  - use single mutex for evt and msg handler lists
 
- target/i386/hyperv.h |   2 +
- target/i386/hyperv.c | 113 +++++++++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 111 insertions(+), 4 deletions(-)
+ target/i386/hyperv.h |  5 +++
+ target/i386/hyperv.c | 87 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 92 insertions(+)
 
 diff --git a/target/i386/hyperv.h b/target/i386/hyperv.h
-index f171f7b..46c6836 100644
+index 46c6836..f101144 100644
 --- a/target/i386/hyperv.h
 +++ b/target/i386/hyperv.h
-@@ -43,4 +43,6 @@ int hyperv_post_msg(HvSintRoute *sint_route, struct hyperv_message *msg);
+@@ -43,6 +43,11 @@ int hyperv_post_msg(HvSintRoute *sint_route, struct hyperv_message *msg);
  
  int hyperv_set_evt_flag(HvSintRoute *sint_route, unsigned evtno);
  
-+int hyperv_set_evt_notifier(uint32_t conn_id, EventNotifier *notifier);
++struct hyperv_post_message_input;
++typedef uint64_t (*HvMsgHandler)(const struct hyperv_post_message_input *msg,
++                                 void *data);
++int hyperv_set_msg_handler(uint32_t conn_id, HvMsgHandler handler, void *data);
 +
+ int hyperv_set_evt_notifier(uint32_t conn_id, EventNotifier *notifier);
+ 
  #endif
 diff --git a/target/i386/hyperv.c b/target/i386/hyperv.c
-index a96b03b..8abb418 100644
+index 8abb418..f779977 100644
 --- a/target/i386/hyperv.c
 +++ b/target/i386/hyperv.c
-@@ -18,6 +18,9 @@
- #include "exec/address-spaces.h"
- #include "sysemu/cpus.h"
- #include "qemu/bitops.h"
-+#include "qemu/queue.h"
-+#include "qemu/rcu.h"
-+#include "qemu/rcu_queue.h"
- #include "migration/vmstate.h"
- #include "hyperv.h"
- #include "hyperv_proto.h"
-@@ -243,6 +246,106 @@ static void async_synic_update(CPUState *cs, run_on_cpu_data data)
+@@ -246,6 +246,14 @@ static void async_synic_update(CPUState *cs, run_on_cpu_data data)
      qemu_mutex_unlock_iothread();
  }
  
-+typedef struct EvtHandler {
++typedef struct MsgHandler {
 +    struct rcu_head rcu;
-+    QLIST_ENTRY(EvtHandler) le;
++    QLIST_ENTRY(MsgHandler) le;
 +    uint32_t conn_id;
-+    EventNotifier *notifier;
-+} EvtHandler;
++    HvMsgHandler handler;
++    void *data;
++} MsgHandler;
 +
-+static QLIST_HEAD(, EvtHandler) evt_handlers;
-+static QemuMutex handlers_mutex;
-+
-+static void __attribute__((constructor)) hv_init(void)
-+{
-+    QLIST_INIT(&evt_handlers);
-+    qemu_mutex_init(&handlers_mutex);
-+}
-+
-+int hyperv_set_evt_notifier(uint32_t conn_id, EventNotifier *notifier)
+ typedef struct EvtHandler {
+     struct rcu_head rcu;
+     QLIST_ENTRY(EvtHandler) le;
+@@ -253,15 +261,51 @@ typedef struct EvtHandler {
+     EventNotifier *notifier;
+ } EvtHandler;
+ 
++static QLIST_HEAD(, MsgHandler) msg_handlers;
+ static QLIST_HEAD(, EvtHandler) evt_handlers;
+ static QemuMutex handlers_mutex;
+ 
+ static void __attribute__((constructor)) hv_init(void)
+ {
++    QLIST_INIT(&msg_handlers);
+     QLIST_INIT(&evt_handlers);
+     qemu_mutex_init(&handlers_mutex);
+ }
+ 
++int hyperv_set_msg_handler(uint32_t conn_id, HvMsgHandler handler, void *data)
 +{
 +    int ret;
-+    EvtHandler *eh;
++    MsgHandler *mh;
 +
 +    qemu_mutex_lock(&handlers_mutex);
-+    QLIST_FOREACH(eh, &evt_handlers, le) {
-+        if (eh->conn_id == conn_id) {
-+            if (notifier) {
++    QLIST_FOREACH(mh, &msg_handlers, le) {
++        if (mh->conn_id == conn_id) {
++            if (handler) {
 +                ret = -EEXIST;
 +            } else {
-+                QLIST_REMOVE_RCU(eh, le);
-+                g_free_rcu(eh, rcu);
++                QLIST_REMOVE_RCU(mh, le);
++                g_free_rcu(mh, rcu);
 +                ret = 0;
 +            }
 +            goto unlock;
 +        }
 +    }
 +
-+    if (notifier) {
-+        eh = g_new(EvtHandler, 1);
-+        eh->conn_id = conn_id;
-+        eh->notifier = notifier;
-+        QLIST_INSERT_HEAD_RCU(&evt_handlers, eh, le);
++    if (handler) {
++        mh = g_new(MsgHandler, 1);
++        mh->conn_id = conn_id;
++        mh->handler = handler;
++        mh->data = data;
++        QLIST_INSERT_HEAD_RCU(&msg_handlers, mh, le);
 +        ret = 0;
 +    } else {
 +        ret = -ENOENT;
@@ -126,82 +129,65 @@ index a96b03b..8abb418 100644
 +    return ret;
 +}
 +
-+static uint64_t sigevent_params(hwaddr addr, uint32_t *conn_id)
+ int hyperv_set_evt_notifier(uint32_t conn_id, EventNotifier *notifier)
+ {
+     int ret;
+@@ -295,6 +339,46 @@ unlock:
+     return ret;
+ }
+ 
++static uint64_t hvcall_post_message(uint64_t param, bool fast)
 +{
 +    uint64_t ret;
 +    hwaddr len;
-+    struct hyperv_signal_event_input *msg;
++    struct hyperv_post_message_input *msg;
++    MsgHandler *mh;
 +
-+    if (addr & (__alignof__(*msg) - 1)) {
++    if (fast) {
++        return HV_STATUS_INVALID_HYPERCALL_CODE;
++    }
++    if (param & (__alignof__(*msg) - 1)) {
 +        return HV_STATUS_INVALID_ALIGNMENT;
 +    }
 +
 +    len = sizeof(*msg);
-+    msg = cpu_physical_memory_map(addr, &len, 0);
++    msg = cpu_physical_memory_map(param, &len, 0);
 +    if (len < sizeof(*msg)) {
 +        ret = HV_STATUS_INSUFFICIENT_MEMORY;
-+    } else {
-+        *conn_id = (msg->connection_id & HV_CONNECTION_ID_MASK) +
-+            msg->flag_number;
-+        ret = 0;
++        goto unmap;
 +    }
-+    cpu_physical_memory_unmap(msg, len, 0, 0);
-+    return ret;
-+}
-+
-+static uint64_t hvcall_signal_event(uint64_t param, bool fast)
-+{
-+    uint64_t ret;
-+    uint32_t conn_id;
-+    EvtHandler *eh;
-+
-+    if (likely(fast)) {
-+        conn_id = (param & 0xffffffff) + ((param >> 32) & 0xffff);
-+    } else {
-+        ret = sigevent_params(param, &conn_id);
-+        if (ret) {
-+            return ret;
-+        }
++    if (msg->payload_size > sizeof(msg->payload)) {
++        ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
++        goto unmap;
 +    }
 +
 +    ret = HV_STATUS_INVALID_CONNECTION_ID;
 +    rcu_read_lock();
-+    QLIST_FOREACH_RCU(eh, &evt_handlers, le) {
-+        if (eh->conn_id == conn_id) {
-+            event_notifier_set(eh->notifier);
-+            ret = 0;
++    QLIST_FOREACH_RCU(mh, &msg_handlers, le) {
++        if (mh->conn_id == (msg->connection_id & HV_CONNECTION_ID_MASK)) {
++            ret = mh->handler(msg, mh->data);
 +            break;
 +        }
 +    }
 +    rcu_read_unlock();
++
++unmap:
++    cpu_physical_memory_unmap(msg, len, 0, 0);
 +    return ret;
 +}
 +
- int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
+ static uint64_t sigevent_params(hwaddr addr, uint32_t *conn_id)
  {
-     CPUX86State *env = &cpu->env;
-@@ -275,16 +378,18 @@ int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
-                               RUN_ON_CPU_HOST_PTR(get_synic(cpu)));
-         return 0;
-     case KVM_EXIT_HYPERV_HCALL: {
--        uint16_t code;
-+        uint16_t code = exit->u.hcall.input & 0xffff;
-+        bool fast = exit->u.hcall.input & HV_HYPERCALL_FAST;
-+        uint64_t param = exit->u.hcall.params[0];
+     uint64_t ret;
+@@ -383,6 +467,9 @@ int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
+         uint64_t param = exit->u.hcall.params[0];
  
--        code  = exit->u.hcall.input & 0xffff;
          switch (code) {
--        case HV_POST_MESSAGE:
-         case HV_SIGNAL_EVENT:
-+            exit->u.hcall.result = hvcall_signal_event(param, fast);
++        case HV_POST_MESSAGE:
++            exit->u.hcall.result = hvcall_post_message(param, fast);
 +            break;
-         default:
-             exit->u.hcall.result = HV_STATUS_INVALID_HYPERCALL_CODE;
--            return 0;
-         }
-+        return 0;
-     }
-     default:
-         return -1;
+         case HV_SIGNAL_EVENT:
+             exit->u.hcall.result = hvcall_signal_event(param, fast);
+             break;
 -- 
 2.9.4
