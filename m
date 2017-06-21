@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dNdUm-0003bR-I7
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 07:08:25 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dNdV8-0003mJ-L4
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 07:08:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dNdUj-0001B2-Ag
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 07:08:24 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:33525)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dNdUj-0001Al-1O
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 07:08:21 -0400
-Received: by mail-lf0-x244.google.com with SMTP id u62so20239143lfg.0
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 04:08:20 -0700 (PDT)
-Date: Wed, 21 Jun 2017 12:08:17 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170621110817.GF16183@stefanha-x1.localdomain>
-References: <547865a9-d6c2-7140-47e2-5af01e7d761d@redhat.com>
-	<20170619100813.GB17304@stefanha-x1.localdomain>
-	<4cec825b-d92e-832e-3a76-103767032528@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dNdV4-0001OE-VZ
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 07:08:46 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:30855 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dNdV4-0001NN-It
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 07:08:42 -0400
+References: <20170606162652.112122-1-vsementsov@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <7c83caf7-ac5b-622d-41d6-c83c27d7314b@virtuozzo.com>
+Date: Wed, 21 Jun 2017 14:08:30 +0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Il7n/DHsA0sMLmDu"
-Content-Disposition: inline
-In-Reply-To: <4cec825b-d92e-832e-3a76-103767032528@redhat.com>
-Subject: Re: [Qemu-devel] [RFC] virtio-mem: paravirtualized memory
+In-Reply-To: <20170606162652.112122-1-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: [Qemu-devel] ping Re: [PATCH v3 0/3] qemu-img check: format
+ allocation info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,69 +29,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: KVM <kvm@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, Andrea Arcangeli <aarcange@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
+ping
 
---Il7n/DHsA0sMLmDu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+06.06.2017 19:26, Vladimir Sementsov-Ogievskiy wrote:
+> Hi all.
+>
+> See 01 patch for the doc.
+>
+> v3: - improve docs
+>      - rename fields
+>      - add 'zero' type of underlying file portions status. It as these
+>        areas cannot be presented as 'discarded', but they are not
+>        occupying real space, so we don't want to present them as
+>        'allocated data' too.
+>      - remove last patch. It is not needed after introducing new naming
+>        for the fields
+>
+> v2: fix build error, gcc things that some variables may be used
+>      uninitialized (actually they didn't).
+>
+> v1:
+>
+> These series is a replacement for "qemu-img check: unallocated size"
+> series.
+>
+> There was a question, should we account allocated clusters in qcow2 but
+> actually holes in underalying file as allocated or not. Instead of
+> hiding this information in one-number statistic I've decided to print
+> the whole information, 5 numbers:
+>
+> For allocated by top-level format driver (qcow2 for ex.) clusters, 3
+> numbers: number of bytes, which are:
+>   - allocated in underlying file
+>   - holes in underlying file
+>   - after end of underlying file
+>
+> To account other areas of underlying file, 2 more numbers of bytes:
+>   - unallocated by top-level driver but allocated in underlying file
+>   - unallocated by top-level driver and holes in underlying file
+>
+> Vladimir Sementsov-Ogievskiy (3):
+>    block: add bdrv_get_format_alloc_stat format interface
+>    qcow2: add .bdrv_get_format_alloc_stat
+>    qemu-img check: add format allocation info
+>
+>   block.c                   |  16 +++++
+>   block/qcow2-refcount.c    | 152 ++++++++++++++++++++++++++++++++++++++++++++++
+>   block/qcow2.c             |   2 +
+>   block/qcow2.h             |   2 +
+>   include/block/block.h     |   3 +
+>   include/block/block_int.h |   2 +
+>   qapi/block-core.json      |  61 ++++++++++++++++++-
+>   qemu-img.c                |  42 +++++++++++++
+>   8 files changed, 279 insertions(+), 1 deletion(-)
+>
 
-On Mon, Jun 19, 2017 at 12:26:52PM +0200, David Hildenbrand wrote:
-> On 19.06.2017 12:08, Stefan Hajnoczi wrote:
-> > On Fri, Jun 16, 2017 at 04:20:02PM +0200, David Hildenbrand wrote:
-> >> Important restrictions of this concept:
-> >> - Guests without a virtio-mem guest driver can't see that memory.
-> >> - We will always require some boot memory that cannot get unplugged.
-> >>   Also, virtio-mem memory (as all other hotplugged memory) cannot beco=
-me
-> >>   DMA memory under Linux. So the boot memory also defines the amount of
-> >>   DMA memory.
-> >=20
-> > I didn't know that hotplug memory cannot become DMA memory.
-> >=20
-> > Ouch.  Zero-copy disk I/O with O_DIRECT and network I/O with virtio-net
-> > won't be possible.
-> >=20
-> > When running an application that uses O_DIRECT file I/O this probably
-> > means we now have 2 copies of pages in memory: 1. in the application and
-> > 2. in the kernel page cache.
-> >=20
-> > So this increases pressure on the page cache and reduces performance :(.
-> >=20
-> > Stefan
-> >=20
->=20
-> arch/x86/mm/init_64.c:
->=20
-> /*
->  * Memory is added always to NORMAL zone. This means you will never get
->  * additional DMA/DMA32 memory.
->  */
-> int arch_add_memory(int nid, u64 start, u64 size, bool for_device)
-> {
->=20
-> The is for sure something to work on in the future. Until then, base
-> memory of 3.X GB should be sufficient, right?
-
-I'm not sure that helps because applications typically don't control
-where their buffers are located?
-
-Stefan
-
---Il7n/DHsA0sMLmDu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZSlOhAAoJEJykq7OBq3PIvj8IAIYB7fWhiMFR7qGpHgnD6tM3
-6RMqMgAoTe7NBIeh3tFbsGjp/XjzeCT7iiEhbrO7MtFrP7IxXylQFRmzBMNb6WlU
-EyhwQ4Ajyj3TP8Rey+xApJe8ZQkieWHq8ovTI/ozXXMJ+9k/XwiwVaXzPkThy1v2
-Ne6vfF/nONpRi55kOst8zGw6MzmAHK3hnoIR9KAqWXfm6jrw71m3NyL/1K9n/QH9
-YnUi6WC98xgk9CJlCnuUR6am2sr5Xly+lN9jrKQ8DJZn3KjjcvwTJTNEYrJpK2gh
-CZ+UGkmWbdWftyIB0uHnJAtyO+eDobaldJ6gD89T7ysDpuh8CdpPGpKEyzxP40w=
-=SMQf
------END PGP SIGNATURE-----
-
---Il7n/DHsA0sMLmDu--
+-- 
+Best regards,
+Vladimir
