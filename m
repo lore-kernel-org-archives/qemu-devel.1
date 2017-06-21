@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Chris.Friesen@windriver.com>) id 1dNkKI-00048P-0X
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 14:26:02 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1dNkdt-0002Ir-3I
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 14:46:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Chris.Friesen@windriver.com>) id 1dNkKD-0007oK-4N
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 14:26:02 -0400
-Received: from mail5.windriver.com ([192.103.53.11]:33834 helo=mail5.wrs.com)
+	(envelope-from <sstabellini@kernel.org>) id 1dNkdp-0000Mo-V3
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 14:46:17 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46398)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Chris.Friesen@windriver.com>)
-	id 1dNkKC-0007ng-SA
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 14:25:57 -0400
-Received: from ALA-HCA.corp.ad.wrs.com (ala-hca.corp.ad.wrs.com
-	[147.11.189.40])
-	by mail5.wrs.com (8.15.2/8.15.2) with ESMTPS id v5LIPpdB030733
-	(version=TLSv1 cipher=AES128-SHA bits=128 verify=OK)
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 11:25:51 -0700
-Message-ID: <594ABA2C.2060504@windriver.com>
-Date: Wed, 21 Jun 2017 12:25:48 -0600
-From: Chris Friesen <chris.friesen@windriver.com>
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1dNkdp-0000ME-M9
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 14:46:13 -0400
+Date: Wed, 21 Jun 2017 11:46:08 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <594A2A1C0200007800164F2A@prv-mh.provo.novell.com>
+Message-ID: <alpine.DEB.2.10.1706211108530.12819@sstabellini-ThinkPad-X260>
+References: <59492D1C0200007800164AA3@prv-mh.provo.novell.com>
+	<59492D1C0200007800164AA3@prv-mh.provo.novell.com>
+	<alpine.DEB.2.10.1706201421210.12819@sstabellini-ThinkPad-X260>
+	<594A2A1C0200007800164F2A@prv-mh.provo.novell.com>
 MIME-Version: 1.0
-References: <20131107133921.24319.20662.malonedeb@gac.canonical.com>
-	<149806671142.3407.13126852924519842175.malone@gac.canonical.com>
-In-Reply-To: <149806671142.3407.13126852924519842175.malone@gac.canonical.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Bug 1248959] Re: pdpe1gb flag is missing in guest
- running on Intel h/w
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH] xen/disk: don't leak stack data via
+ response ring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,25 +30,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Jan Beulich <JBeulich@suse.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, Julien Grall <julien.grall@arm.com>, xen-devel <xen-devel@lists.xenproject.org>, qemu-devel@nongnu.org
 
-On 06/21/2017 11:38 AM, Anatol Pomozov wrote:
-> I observe the same situation. My host CPU (Intel Xeon CPU E5-2690)
-> supports 1gb pages but qemu keeps it disabled by default. I have to use
-> either '-cpu phenom' or '-cpu host' with KVM.
->
-> It makes me wondering what is the default CPU for QEMU? Is it possible
-> to set qemu CPU featureset closer to what host CPU has?
+On Wed, 21 Jun 2017, Jan Beulich wrote:
+> >>> On 20.06.17 at 23:48, <sstabellini@kernel.org> wrote:
+> > On Tue, 20 Jun 2017, Jan Beulich wrote:
+> >> @@ -36,13 +33,7 @@ struct blkif_x86_32_request_discard {
+> >>      blkif_sector_t sector_number;    /* start sector idx on disk (r/w only)  */
+> >>      uint64_t       nr_sectors;       /* # of contiguous sectors to discard   */
+> >>  };
+> >> -struct blkif_x86_32_response {
+> >> -    uint64_t        id;              /* copied from request */
+> >> -    uint8_t         operation;       /* copied from request */
+> >> -    int16_t         status;          /* BLKIF_RSP_???       */
+> >> -};
+> >>  typedef struct blkif_x86_32_request blkif_x86_32_request_t;
+> >> -typedef struct blkif_x86_32_response blkif_x86_32_response_t;
+> >>  #pragma pack(pop)
+> >>  
+> >>  /* x86_64 protocol version */
+> >> @@ -62,20 +53,14 @@ struct blkif_x86_64_request_discard {
+> >>      blkif_sector_t sector_number;    /* start sector idx on disk (r/w only)  */
+> >>      uint64_t       nr_sectors;       /* # of contiguous sectors to discard   */
+> >>  };
+> >> -struct blkif_x86_64_response {
+> >> -    uint64_t       __attribute__((__aligned__(8))) id;
+> >> -    uint8_t         operation;       /* copied from request */
+> >> -    int16_t         status;          /* BLKIF_RSP_???       */
+> >> -};
+> >>
+> >>  typedef struct blkif_x86_64_request blkif_x86_64_request_t;
+> >> -typedef struct blkif_x86_64_response blkif_x86_64_response_t;
+> >>  
+> >>  DEFINE_RING_TYPES(blkif_common, struct blkif_common_request,
+> >> -                  struct blkif_common_response);
+> >> +                  struct blkif_response);
+> >>  DEFINE_RING_TYPES(blkif_x86_32, struct blkif_x86_32_request,
+> >> -                  struct blkif_x86_32_response);
+> >> +                  struct blkif_response QEMU_PACKED);
+> > 
+> > In my test, the previous sizes and alignments of the response structs
+> > were (on both x86_32 and x86_64):
+> > 
+> > sizeof(blkif_x86_32_response)=12   sizeof(blkif_x86_64_response)=16
+> > align(blkif_x86_32_response)=4     align(blkif_x86_64_response)=8
+> > 
+> > While with these changes are now, when compiled on x86_64:
+> > sizeof(blkif_x86_32_response)=11   sizeof(blkif_x86_64_response)=16
+> > align(blkif_x86_32_response)=1     align(blkif_x86_64_response)=8
+> > 
+> > when compiled on x86_32:
+> > sizeof(blkif_x86_32_response)=11   sizeof(blkif_x86_64_response)=12
+> > align(blkif_x86_32_response)=1     align(blkif_x86_64_response)=4
+> > 
+> > Did I do my tests wrong?
+> > 
+> > QEMU_PACKED is not the same as #pragma pack(push, 4). In fact, it is the
+> > same as #pragma pack(push, 1), causing the struct to be densely packed,
+> > leaving no padding whatsever.
+> > 
+> > In addition, without __attribute__((__aligned__(8))),
+> > blkif_x86_64_response won't be 8 bytes aligned when built on x86_32.
+> > 
+> > Am I missing something?
+> 
+> Well, you're mixing attribute application upon structure
+> declaration with attribute application upon structure use. It's
+> the latter here, and hence the attribute doesn't affect
+> structure layout at all. All it does is avoid the _containing_
+> 32-bit union to become 8-byte aligned (and tail padding to be
+> inserted).
 
-As I understand it there is no well-defined default CPU for qemu that is 
-guaranteed to be stable across versions.
+Thanks for the explanation. I admit it's the first time I see the
+aligned attribute being used at structure usage only. I think it's the
+first time QEMU_PACKED is used this way in QEMU too.
 
-Last I checked if you use the default CPU model then you get something that 
-calls itself "qemu64", but explicitly setting the "qemu64" cpu model doesn't 
-work when enabling kvm support on an Intel host CPU, because it wants the "svm" 
-CPU feature.  (Does this strike anyone else as inconsistent?)
+Anyway, even taking that into account, things are still not completely
+right: the alignment of struct blkif_x86_32_response QEMU_PACKED is 4
+bytes as you wrote, but the size of struct blkif_x86_32_response is
+still 16 bytes instead of 12 bytes in my test. I suspect it worked for
+you because the other member of the union (blkif_x86_32_request) is
+larger than that. However, I think is not a good idea to rely on this
+implementation detail. The implementation of DEFINE_RING_TYPES should be
+opaque from our point of view. We shouldn't have to know that there is a
+union there.
 
-The "kvm64" CPU model works on Intel, but doesn't provide as many CPU features 
-as what you get if you don't specify a model.
-
-Chris
+Moreover, the other problem is still unaddressed: the size and alignment
+of blkif_x86_64_response when built on x86_32 are 12 and 4 instead of 16
+and 8 bytes. Is that working also because it's relying on the other
+member of the union to enforce the right alignment and bigger size? I
+think it's a bad idea to rely on that, especially given that this
+obscure but important detail is not even mentioned in the commit message.
