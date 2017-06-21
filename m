@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dNjwH-0004tb-IQ
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 14:01:14 -0400
+	(envelope-from <Chris.Friesen@windriver.com>) id 1dNkKI-00048P-0X
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 14:26:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dNjwE-0004rQ-GN
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 14:01:13 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46048)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dNjwE-0004r0-Ap
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 14:01:10 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dNjwC-0000LU-7X
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 18:01:08 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1D10E2E8190
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 18:01:08 +0000 (UTC)
+	(envelope-from <Chris.Friesen@windriver.com>) id 1dNkKD-0007oK-4N
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 14:26:02 -0400
+Received: from mail5.windriver.com ([192.103.53.11]:33834 helo=mail5.wrs.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Chris.Friesen@windriver.com>)
+	id 1dNkKC-0007ng-SA
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 14:25:57 -0400
+Received: from ALA-HCA.corp.ad.wrs.com (ala-hca.corp.ad.wrs.com
+	[147.11.189.40])
+	by mail5.wrs.com (8.15.2/8.15.2) with ESMTPS id v5LIPpdB030733
+	(version=TLSv1 cipher=AES128-SHA bits=128 verify=OK)
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 11:25:51 -0700
+Message-ID: <594ABA2C.2060504@windriver.com>
+Date: Wed, 21 Jun 2017 12:25:48 -0600
+From: Chris Friesen <chris.friesen@windriver.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 21 Jun 2017 17:51:53 -0000
-From: Anatol Pomozov <1699567@bugs.launchpad.net>
-Reply-To: Bug 1699567 <1699567@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <149806751311.22103.16824316715266267682.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1699567] [NEW] Qemu does not force SSE data
- alignment
+References: <20131107133921.24319.20662.malonedeb@gac.canonical.com>
+	<149806671142.3407.13126852924519842175.malone@gac.canonical.com>
+In-Reply-To: <149806671142.3407.13126852924519842175.malone@gac.canonical.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Bug 1248959] Re: pdpe1gb flag is missing in guest
+ running on Intel h/w
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,64 +36,23 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Public bug reported:
+On 06/21/2017 11:38 AM, Anatol Pomozov wrote:
+> I observe the same situation. My host CPU (Intel Xeon CPU E5-2690)
+> supports 1gb pages but qemu keeps it disabled by default. I have to use
+> either '-cpu phenom' or '-cpu host' with KVM.
+>
+> It makes me wondering what is the default CPU for QEMU? Is it possible
+> to set qemu CPU featureset closer to what host CPU has?
 
-I have an OS that tries to use SSE operations. It works fine in qemu.
-But it crashes when I try to run the OS at the host cpu using KVM.
+As I understand it there is no well-defined default CPU for qemu that is 
+guaranteed to be stable across versions.
 
-The instruction that crahes with #GP(0) is
- movaps ADDR,%xmm0
+Last I checked if you use the default CPU model then you get something that 
+calls itself "qemu64", but explicitly setting the "qemu64" cpu model doesn't 
+work when enabling kvm support on an Intel host CPU, because it wants the "svm" 
+CPU feature.  (Does this strike anyone else as inconsistent?)
 
-The documentation says ADDR has to be 16-bytes alignment otherwise #GP
-is generated. And indeed the problem was with the data alignment. After
-adjusting it at my side the OS works fine both with Qemu and KVM.
+The "kvm64" CPU model works on Intel, but doesn't provide as many CPU features 
+as what you get if you don't specify a model.
 
-It would be great if QEMU followed specification more closely and forced
-SSE data alignment requirements. It will help to catch alignment issues
-early and debug it easier.
-
-
-$ qemu-system-x86_64 -version
-QEMU emulator version 2.9.50 (v2.9.0-1363-g95eef1c68b)
-Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1699567
-
-Title:
-  Qemu does not force SSE data alignment
-
-Status in QEMU:
-  New
-
-Bug description:
-  I have an OS that tries to use SSE operations. It works fine in qemu.
-  But it crashes when I try to run the OS at the host cpu using KVM.
-
-  The instruction that crahes with #GP(0) is
-   movaps ADDR,%xmm0
-
-  The documentation says ADDR has to be 16-bytes alignment otherwise #GP
-  is generated. And indeed the problem was with the data alignment.
-  After adjusting it at my side the OS works fine both with Qemu and
-  KVM.
-
-  It would be great if QEMU followed specification more closely and
-  forced SSE data alignment requirements. It will help to catch
-  alignment issues early and debug it easier.
-
-  =
-
-  $ qemu-system-x86_64 -version
-  QEMU emulator version 2.9.50 (v2.9.0-1363-g95eef1c68b)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1699567/+subscriptions
+Chris
