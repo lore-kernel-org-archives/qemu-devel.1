@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42877)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dNkoo-0004xC-VE
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 14:57:36 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dNl6p-0002C1-7n
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 15:16:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dNkol-0005H7-R1
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 14:57:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40884)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dNkol-0005GZ-HP
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 14:57:31 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8E77F636F
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 18:57:28 +0000 (UTC)
-Date: Wed, 21 Jun 2017 19:57:20 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1dNl6l-000477-6F
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 15:16:11 -0400
+Date: Wed, 21 Jun 2017 20:16:02 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170621185720.GA2099@work-vm>
-References: <20170621102005.18701-1-quintela@redhat.com>
-	<20170621102005.18701-5-quintela@redhat.com>
+Message-ID: <20170621191601.GB2425@work-vm>
+References: <CAOE=1Z1Bbgb494m6mYRnX1-80eT0tSnF0F6zNM7efEie4rd7DA@mail.gmail.com>
+	<CAOE=1Z1LJr9rpaEQ9+b7D5vM3N=Wy0oGunRnzoQ79x3dWA3oaw@mail.gmail.com>
+	<CALkUq2gp+x-nkALLTLqrSGmw8nfo5FzNeDpr1Gm3qh8N9mDn0Q@mail.gmail.com>
+	<CAOE=1Z0h+Dd=T8QKyVnTHwFjeYwm-qz_Da7HWEDk=pcrMbp9ug@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170621102005.18701-5-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 4/5] migration: Convert ram to use new
- load_setup()/load_cleanup()
+In-Reply-To: <CAOE=1Z0h+Dd=T8QKyVnTHwFjeYwm-qz_Da7HWEDk=pcrMbp9ug@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [dpdk-dev] Will huge page have negative effect on
+ guest vm in qemu enviroment?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,162 +27,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, kwolf@redhat.com, stefanha@redhat.com
+To: Sam <batmanustc@gmail.com>
+Cc: Pavel Shirshov <pavel.shirshov@gmail.com>, dev@dpdk.org, qemu-discuss@nongnu.org, users@dpdk.org, qemu-devel@nongnu.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Once there, I rename ram_migration_cleanup() to ram_save_cleanup().
-> Notice that this is the first pass, and I only passed XBZRLE to the
-> new scheme.  Moved decoded_buf to inside XBZRLE struct.
-> As a bonus, I don't have to export xbzrle functions from ram.c.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+* Sam (batmanustc@gmail.com) wrote:
+> Thank you~
+>=20
+> 1. We have a compare test on qemu-kvm enviroment with huge page and wit=
+hout
+> huge page. Qemu start process is much longer in huge page enviromwnt. A=
+nd I
+> write an email titled with '[DPDK-memory] how qemu waste such long time
+> under dpdk huge page envriment?'. I could resend it later.
 
+> 2. Then I have another test on qemu-kvm enviroment with huge page and
+> without huge page, which I didn't start ovs-dpdk and vhostuser port in =
+qemu
+> start process. And I found Qemu start process is also much longer in hu=
+ge
+> page enviroment.
+>=20
+> So I think huge page enviroment, which grub2.cfg file is specified in
+> =E2=80=98[DPDK-memory]
+> how qemu waste such long time under dpdk huge page envriment?=E2=80=99,=
+ will really
+> have negative effect on qemu start up process.
+>=20
+> That's why we don't like to use ovs-dpdk. Althrough ovs-dpdk is faster,=
+ but
+> the start up process of qemu is much longer then normal ovs, and the re=
+ason
+> is nothing with ovs but huge page. For customers, vm start up time is
+> important then network speed.
 
-Note a tiny comment typo below, but other than that:
+How are you setting up hugepages?  What values are you putting in the
+various /proc or cmdline options and how are you specifying them on
+QEMU's commandline.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+I think one problem is that with hugepages qemu normally allocates them
+all at the start;  I think there are cases where that means moving a lot
+of memory about, especially if you lock it to particular NUMA nodes.
 
-> --
-> 
-> loaded_data pointer was needed because called can change it (dave)
-> ---
->  migration/migration.c |  3 ---
->  migration/ram.c       | 49 ++++++++++++++++++++++++++++++++++++-------------
->  migration/ram.h       |  1 -
->  3 files changed, 36 insertions(+), 17 deletions(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 520d9b9..aaaf7ff 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -350,9 +350,6 @@ static void process_incoming_migration_co(void *opaque)
->          migrate_decompress_threads_join();
->          exit(EXIT_FAILURE);
->      }
-> -
-> -    free_xbzrle_decoded_buf();
-> -
->      mis->bh = qemu_bh_new(process_incoming_migration_bh, mis);
->      qemu_bh_schedule(mis->bh);
->  }
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 649f76c..a619e0b 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -85,11 +85,10 @@ static struct {
->      QemuMutex lock;
->      /* it will store a page full of zeros */
->      uint8_t *zero_target_page;
-> +    /* buffer used for XBZRLE decoding */
-> +    uint8_t *decoded_buf;
->  } XBZRLE;
->  
-> -/* buffer used for XBZRLE decoding */
-> -static uint8_t *xbzrle_decoded_buf;
-> -
->  static void XBZRLE_cache_lock(void)
->  {
->      if (migrate_use_xbzrle())
-> @@ -1350,13 +1349,18 @@ uint64_t ram_bytes_total(void)
->      return total;
->  }
->  
-> -void free_xbzrle_decoded_buf(void)
-> +static void xbzrle_load_setup(void)
->  {
-> -    g_free(xbzrle_decoded_buf);
-> -    xbzrle_decoded_buf = NULL;
-> +    XBZRLE.decoded_buf = g_malloc(TARGET_PAGE_SIZE);
->  }
->  
-> -static void ram_migration_cleanup(void *opaque)
-> +static void xbzrle_load_cleanup(void)
-> +{
-> +    g_free(XBZRLE.decoded_buf);
-> +    XBZRLE.decoded_buf = NULL;
-> +}
-> +
-> +static void ram_save_cleanup(void *opaque)
->  {
->      RAMState **rsp = opaque;
->      RAMBlock *block;
-> @@ -2078,11 +2082,6 @@ static int load_xbzrle(QEMUFile *f, ram_addr_t addr, void *host)
->      int xh_flags;
->      uint8_t *loaded_data;
->  
-> -    if (!xbzrle_decoded_buf) {
-> -        xbzrle_decoded_buf = g_malloc(TARGET_PAGE_SIZE);
-> -    }
-> -    loaded_data = xbzrle_decoded_buf;
-> -
->      /* extract RLE header */
->      xh_flags = qemu_get_byte(f);
->      xh_len = qemu_get_be16(f);
-> @@ -2096,7 +2095,9 @@ static int load_xbzrle(QEMUFile *f, ram_addr_t addr, void *host)
->          error_report("Failed to load XBZRLE page - len overflow!");
->          return -1;
->      }
-> +    loaded_data = XBZRLE.decoded_buf;
->      /* load data and decode */
-> +    /* it can change laded_data to point to an internal buffer */
-                         ^--- o
+> BTW, ovs-dpdk start up process is also longer then normal ovs. But I kn=
+ow
+> the reason, it's dpdk EAL init process with forking big continous memor=
+y
+> and zero this memory. For qemu, I don't know why, as there is no log to
+> report this.
 
->      qemu_get_buffer_in_place(f, &loaded_data, xh_len);
->  
->      /* decode RLE */
-> @@ -2310,6 +2311,26 @@ static void decompress_data_with_multi_threads(QEMUFile *f,
->  }
->  
->  /**
-> + * ram_load_setup: Setup RAM for migration incoming side
-> + *
-> + * Returns zero to indicate success and negative for error
-> + *
-> + * @f: QEMUFile where to receive the data
-> + * @opaque: RAMState pointer
-> + */
-> +static int ram_load_setup(QEMUFile *f, void *opaque)
-> +{
-> +    xbzrle_load_setup();
-> +    return 0;
-> +}
-> +
-> +static int ram_load_cleanup(void *opaque)
-> +{
-> +    xbzrle_load_cleanup();
-> +    return 0;
-> +}
-> +
-> +/**
->   * ram_postcopy_incoming_init: allocate postcopy data structures
->   *
->   * Returns 0 for success and negative if there was one error
-> @@ -2629,7 +2650,9 @@ static SaveVMHandlers savevm_ram_handlers = {
->      .save_live_complete_precopy = ram_save_complete,
->      .save_live_pending = ram_save_pending,
->      .load_state = ram_load,
-> -    .save_cleanup = ram_migration_cleanup,
-> +    .save_cleanup = ram_save_cleanup,
-> +    .load_setup = ram_load_setup,
-> +    .load_cleanup = ram_load_cleanup,
->  };
->  
->  void ram_mig_init(void)
-> diff --git a/migration/ram.h b/migration/ram.h
-> index 6272eb0..a8b79a4 100644
-> --- a/migration/ram.h
-> +++ b/migration/ram.h
-> @@ -47,7 +47,6 @@ void migrate_decompress_threads_join(void);
->  uint64_t ram_pagesize_summary(void);
->  int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len);
->  void acct_update_position(QEMUFile *f, size_t size, bool zero);
-> -void free_xbzrle_decoded_buf(void);
->  void ram_debug_dump_bitmap(unsigned long *todump, bool expected,
->                             unsigned long pages);
->  void ram_postcopy_migrated_memory_release(MigrationState *ms);
-> -- 
-> 2.9.4
-> 
+I suspect it's the mmaping and madvising of those hugepages - you should
+be able to see it with an strace of a qemu startup, or perhaps a
+'perf top'  on the host as it's in that pause.
+
+I'm told that hugepages are supposed to be especially useful with IOMMU
+performance for cards passed through to the guest, so it might still
+be worth doing.
+
+Dave
+
+> 2017-06-21 14:15 GMT+08:00 Pavel Shirshov <pavel.shirshov@gmail.com>:
+>=20
+> > Hi Sam,
+> >
+> > Below I'm saying about KVM. I don't have experience with vbox and oth=
+ers.
+> > 1. I'd suggest don't use dpdk inside of VM if you want to see best
+> > perfomance on the box.
+> > 2. huge pages enabled globally will not have any bad effect to guest
+> > OS. Except you have to enable huge pages inside of VM and provide rea=
+l
+> > huge page for VM's huge pages from the host system. Otherwise dpdk
+> > will use "hugepages" inside of VM, but this "huge pages" will not rea=
+l
+> > ones. They will be constructed from normal pages outside. Also when
+> > you enable huge pages OS will reserve them from start and your OS wil=
+l
+> > not able use them for other things. Also you can't swap out huge
+> > pages, KSM will not work for them and so on.
+> > 3. You can enable huge pages just for one numa node. It's impossible
+> > to enable them just for one core. Usually you reserve some memory for
+> > hugepages when the system starts and you can't use this memory in
+> > normal applications unless normal application knows how to use them.
+> >
+> > Also why it didn't work inside of the docker?
+> >
+> >
+> > On Tue, Jun 20, 2017 at 8:35 PM, Sam <batmanustc@gmail.com> wrote:
+> > > BTW, we also think about use ovs-dpdk in docker enviroment, but tes=
+t
+> > result
+> > > said it's not good idea, we don't know why.
+> > >
+> > > 2017-06-21 11:32 GMT+08:00 Sam <batmanustc@gmail.com>:
+> > >
+> > >> Hi all,
+> > >>
+> > >> We plan to use DPDK on HP host machine with several core and big m=
+emory.
+> > >> We plan to use qemu-kvm enviroment. The host will carry 4 or more =
+guest
+> > vm
+> > >> and 1 ovs.
+> > >>
+> > >> Ovs-dpdk is much faster then normal ovs, but to use ovs-dpdk, we h=
+ave to
+> > >> enable huge page globally.
+> > >>
+> > >> My question is, will huge page enabled globally have negative effe=
+ct on
+> > >> guest vm's memory orperate or something? If it is, how to prevent =
+this,
+> > or
+> > >> could I enable huge page on some core or enable huge page for a pa=
+rt of
+> > >> memory?
+> > >>
+> > >> Thank you~
+> > >>
+> >
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
