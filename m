@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44301)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dNfbU-0005CG-R9
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:23:30 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dNfbf-0005Le-38
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:23:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dNfbR-0003Ty-Hy
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:23:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:25204)
+	(envelope-from <kraxel@redhat.com>) id 1dNfbd-0003YE-GQ
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:23:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51492)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dNfbR-0003TJ-99
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:23:25 -0400
-Date: Wed, 21 Jun 2017 10:23:17 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170621132317.GD3928@thinpad.lan.raisama.net>
-References: <1497877149-19253-4-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<20170619142852.GS5016@thinpad.lan.raisama.net>
-	<7d5904ae-e66c-5594-cfff-747578d91f4b@ilande.co.uk>
-	<08da52ec-e4d2-d836-49bd-90baf21747fb@redhat.com>
-	<1d8147a6-d55c-4951-68db-4c1cf502a4f3@ilande.co.uk>
-	<9d24bf00-cf82-717a-eccd-f51e2c80dd6f@redhat.com>
-	<eaa2cd40-0d64-6843-7e39-c0f94c7e797f@ilande.co.uk>
-	<48c8f007-f388-59f5-9af8-f5eefe033e2a@redhat.com>
-	<20170621113600.GA3928@thinpad.lan.raisama.net>
-	<8135ff45-0341-1fd4-ada9-4527c6b61e5a@ilande.co.uk>
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dNfbd-0003Xt-AK
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 09:23:37 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 687B27F6CF
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 13:23:36 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 21 Jun 2017 15:23:34 +0200
+Message-Id: <20170621132340.27686-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8135ff45-0341-1fd4-ada9-4527c6b61e5a@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCHv6 3/5] fw_cfg: move assert() and linking of
- fw_cfg device to the machine into instance_init()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/6] Queue/ui patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,124 +30,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Laszlo Ersek <lersek@redhat.com>, peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, imammedo@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On Wed, Jun 21, 2017 at 01:17:06PM +0100, Mark Cave-Ayland wrote:
-> On 21/06/17 12:36, Eduardo Habkost wrote:
-> 
-> > On Wed, Jun 21, 2017 at 09:48:16AM +0200, Laszlo Ersek wrote:
-> >> On 06/21/17 08:58, Mark Cave-Ayland wrote:
-> >>> On 19/06/17 23:43, Laszlo Ersek wrote:
-> >>>
-> >>>> It looks good to me, but please await Eduardo's reply as well.
-> >>>>
-> >>>> In particular, it should be confirmed that object_resolve_path_type()
-> >>>> matches instances of *subclasses* as well (as I expect it would). Your
-> >>>> test results confirm that; let's make sure it is intentional behavior.
-> >>>> Eduardo (or someone else on the CC list), can you please comment on that?
-> >>>
-> >>> Thanks Laszlo. Eduardo, can you confirm this is the correct behaviour?
-> > 
-> > Sorry for taking so long to reply.  Yes, it should be the correct
-> > behavior.  It's how it's documented:
-> > 
-> > "This is similar to object_resolve_path.  However, when looking
-> > for a partial path only matches that implement the given type are
-> > considered.  This restricts the search and avoids spuriously
-> > flagging matches as ambiguous."
-> > 
-> > (Key part here is "implement the given type").
-> > 
-> > Approach used by commit f92063028a "hw/acpi/vmgenid: prevent more
-> > than one vmgenid device" looks good to me.
-> 
-> That is great news, thanks for confirming this.
-> 
-> >>>
-> >>> I now have a v7 patchset ready to go (currently hosted at
-> >>> https://github.com/mcayland/qemu/tree/fwcfg7 for the curious). Laszlo,
-> >>> I've currently left off your Tested-by tag since I'm not sure it's still
-> >>> valid for less-than-trivial changes - if you're happy for me to re-add
-> >>> it before I send the v7 patchset to the list, please let me know.
-> >>
-> >> I intend to test v7 when you post it.
-> > 
-> > I still see the instance_init assert() in that branch (commit
-> > 17d75643f880).  Is that correct?
-> 
-> Yes that was the intention. In 17d75643f880 both the assert() and
-> object_property_add_child() are moved into the instance_init() function,
-> and then in the follow-up commit eddedb5 the assert() is removed from
-> instance_init() and the object_resolve_path_type() check added into
-> fw_cfg_init1() as part of its conversion into the
-> fw_cfg_common_realize() function.
+The following changes since commit 8dfaf23ae1f2273a9730a9b309cc8471269bb5=
+24:
 
-We can't move assert() + linking to instance_init even if it's
-just temporary, as it makes device-list-properties crash.
+  tcg/tci: fix tcg-interpreter build (2017-06-20 18:39:15 +0100)
 
-Just linking in instance_init is also a problem, because
-instance_init should never affect global QEMU state.
+are available in the git repository at:
 
-You could move linking to realize as well, but: just like you
-already moved sysbus_add_io() calls outside realize, I believe
-linking belongs outside realize too.  I need to re-read the
-discussion threads to understand the motivation behind that.
+  git://git.kraxel.org/qemu tags/queue/ui-pull-request
 
-> 
-> One last question which might avoid a future v8 revision: does the error
-> handling in eddedb5 for the fw_cfg_*_realize() functions look correct?
+for you to fetch changes up to 95e92000c8b1e81fce6a7f54ef22656a94793096:
 
-The error handling looks correct to me.
+  ui: Remove inclusion of "hw/qdev.h" (2017-06-21 14:26:15 +0200)
 
-> 
-> The existing check for fw_cfg_file_slots_allocate() uses a local_err
-> Error variable, whereas I've seen a mixture of callers using both this
-> approach and using the errp Error variable directly. Is there any reason
-> to prefer one over the other? Currently I'm also using local_err in
-> order to keep the fw_cfg_*_realize() functions consistent.
+----------------------------------------------------------------
 
-You need a local_err variable if you need to handle/check for
-errors before propagating them.
+----------------------------------------------------------------
 
-Quoting qapi/error.h:
+Gerd Hoffmann (5):
+  egl-helpers: add helpers to handle opengl framebuffers
+  egl-headless: use framebuffer helper functions.
+  sdl2: use framebuffer helper functions.
+  gtk: use framebuffer helper functions.
+  console: remove do_safe_dpy_refresh
 
-  Create a new error and pass it to the caller:
-      error_setg(errp, "situation normal, all fouled up");
+Thomas Huth (1):
+  ui: Remove inclusion of "hw/qdev.h"
 
-  Call a function and receive an error from it:
-      Error *err = NULL;
-      foo(arg, &err);
-      if (err) {
-          handle the error...
-      }
+ include/ui/egl-helpers.h | 15 ++++++++++
+ include/ui/gtk.h         |  4 +--
+ include/ui/sdl2.h        |  8 +++--
+ ui/console.c             | 25 +---------------
+ ui/egl-headless.c        | 67 +++++++++++-------------------------------
+ ui/egl-helpers.c         | 76 ++++++++++++++++++++++++++++++++++++++++++=
+++++++
+ ui/gtk-egl.c             | 36 +++++------------------
+ ui/gtk-gl-area.c         | 26 +++++------------
+ ui/input.c               |  1 -
+ ui/sdl2-gl.c             | 36 +++++------------------
+ ui/vnc.c                 |  1 -
+ 11 files changed, 138 insertions(+), 157 deletions(-)
 
-  [...]
-
-  Receive an error and pass it on to the caller:
-      Error *err = NULL;
-      foo(arg, &err);
-      if (err) {
-          handle the error...
-          error_propagate(errp, err);
-      }
-  where Error **errp is a parameter, by convention the last one.
-
-  Do *not* "optimize" this to
-      foo(arg, errp);
-      if (*errp) { // WRONG!
-          handle the error...
-      }
-  because errp may be NULL!
-
-  But when all you do with the error is pass it on, please use
-      foo(arg, errp);
-  for readability.
-
-In fw_cfg_*_realize() you can call fw_cfg_common_realize(dev,
-errp) directly, but it won't be a problem if you use local_err
-just to keep it consistent with the other error checks in the
-function.
-
--- 
-Eduardo
+--=20
+2.9.3
