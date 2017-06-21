@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dNl6p-0002C1-7n
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 15:16:12 -0400
+	(envelope-from <quintela@redhat.com>) id 1dNlCk-0003uu-7W
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 15:22:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dNl6l-000477-6F
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 15:16:11 -0400
-Date: Wed, 21 Jun 2017 20:16:02 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170621191601.GB2425@work-vm>
-References: <CAOE=1Z1Bbgb494m6mYRnX1-80eT0tSnF0F6zNM7efEie4rd7DA@mail.gmail.com>
-	<CAOE=1Z1LJr9rpaEQ9+b7D5vM3N=Wy0oGunRnzoQ79x3dWA3oaw@mail.gmail.com>
-	<CALkUq2gp+x-nkALLTLqrSGmw8nfo5FzNeDpr1Gm3qh8N9mDn0Q@mail.gmail.com>
-	<CAOE=1Z0h+Dd=T8QKyVnTHwFjeYwm-qz_Da7HWEDk=pcrMbp9ug@mail.gmail.com>
+	(envelope-from <quintela@redhat.com>) id 1dNlCg-0006PU-5O
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 15:22:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38422)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dNlCf-0006PO-Ta
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 15:22:14 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <1497640120-10729-4-git-send-email-a.perevalov@samsung.com>
+	(Alexey Perevalov's message of "Fri, 16 Jun 2017 22:08:40 +0300")
+References: <1497640120-10729-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170616190852eucas1p18bc3671b480012ede7cbd810b40a8263@eucas1p1.samsung.com>
+	<1497640120-10729-4-git-send-email-a.perevalov@samsung.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 21 Jun 2017 21:22:07 +0200
+Message-ID: <87h8z9jgdc.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAOE=1Z0h+Dd=T8QKyVnTHwFjeYwm-qz_Da7HWEDk=pcrMbp9ug@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [dpdk-dev] Will huge page have negative effect on
- guest vm in qemu enviroment?
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] migration: add bitmap for received
+ page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,123 +30,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sam <batmanustc@gmail.com>
-Cc: Pavel Shirshov <pavel.shirshov@gmail.com>, dev@dpdk.org, qemu-discuss@nongnu.org, users@dpdk.org, qemu-devel@nongnu.org
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: qemu-devel@nongnu.org, peterx@redhat.com, i.maximets@samsung.com, dgilbert@redhat.com
 
-* Sam (batmanustc@gmail.com) wrote:
-> Thank you~
->=20
-> 1. We have a compare test on qemu-kvm enviroment with huge page and wit=
-hout
-> huge page. Qemu start process is much longer in huge page enviromwnt. A=
-nd I
-> write an email titled with '[DPDK-memory] how qemu waste such long time
-> under dpdk huge page envriment?'. I could resend it later.
+Alexey Perevalov <a.perevalov@samsung.com> wrote:
+> This patch adds ability to track down already received
+> pages, it's necessary for calculation vCPU block time in
+> postcopy migration feature, maybe for restore after
+> postcopy migration failure.
+> Also it's necessary to solve shared memory issue in
+> postcopy livemigration. Information about received pages
+> will be transferred to the software virtual bridge
+> (e.g. OVS-VSWITCHD), to avoid fallocate (unmap) for
+> already received pages. fallocate syscall is required for
+> remmaped shared memory, due to remmaping itself blocks
+> ioctl(UFFDIO_COPY, ioctl in this case will end with EEXIT
+> error (struct page is exists after remmap).
+>
+> Bitmap is placed into RAMBlock as another postcopy/precopy
+> related bitmaps.
+>
+> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
 
-> 2. Then I have another test on qemu-kvm enviroment with huge page and
-> without huge page, which I didn't start ovs-dpdk and vhostuser port in =
-qemu
-> start process. And I found Qemu start process is also much longer in hu=
-ge
-> page enviroment.
->=20
-> So I think huge page enviroment, which grub2.cfg file is specified in
-> =E2=80=98[DPDK-memory]
-> how qemu waste such long time under dpdk huge page envriment?=E2=80=99,=
- will really
-> have negative effect on qemu start up process.
->=20
-> That's why we don't like to use ovs-dpdk. Althrough ovs-dpdk is faster,=
- but
-> the start up process of qemu is much longer then normal ovs, and the re=
-ason
-> is nothing with ovs but huge page. For customers, vm start up time is
-> important then network speed.
+Hi
 
-How are you setting up hugepages?  What values are you putting in the
-various /proc or cmdline options and how are you specifying them on
-QEMU's commandline.
+A few commets.
 
-I think one problem is that with hugepages qemu normally allocates them
-all at the start;  I think there are cases where that means moving a lot
-of memory about, especially if you lock it to particular NUMA nodes.
+Happy with all the changes that you did.
 
-> BTW, ovs-dpdk start up process is also longer then normal ovs. But I kn=
-ow
-> the reason, it's dpdk EAL init process with forking big continous memor=
-y
-> and zero this memory. For qemu, I don't know why, as there is no log to
-> report this.
+> @@ -60,6 +62,7 @@ static inline void *ramblock_ptr(RAMBlock *block, ram_addr_t offset)
+>     return (char *)block->host + offset;
+> }
+> 
+> +unsigned long int ramblock_recv_bitmap_offset(void *host_addr, RAMBlock *rb);
+>  long qemu_getrampagesize(void);
+>  unsigned long last_ram_page(void);
+> RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
 
-I suspect it's the mmaping and madvising of those hugepages - you should
-be able to see it with an strace of a qemu startup, or perhaps a
-'perf top'  on the host as it's in that pause.
+I think we shouldn't export it at all.  But if we do, we should export
+it with the other functions.
 
-I'm told that hugepages are supposed to be especially useful with IOMMU
-performance for cards passed through to the guest, so it might still
-be worth doing.
 
-Dave
+> +unsigned long int ramblock_recv_bitmap_offset(void *host_addr, RAMBlock *rb)
 
-> 2017-06-21 14:15 GMT+08:00 Pavel Shirshov <pavel.shirshov@gmail.com>:
->=20
-> > Hi Sam,
-> >
-> > Below I'm saying about KVM. I don't have experience with vbox and oth=
-ers.
-> > 1. I'd suggest don't use dpdk inside of VM if you want to see best
-> > perfomance on the box.
-> > 2. huge pages enabled globally will not have any bad effect to guest
-> > OS. Except you have to enable huge pages inside of VM and provide rea=
-l
-> > huge page for VM's huge pages from the host system. Otherwise dpdk
-> > will use "hugepages" inside of VM, but this "huge pages" will not rea=
-l
-> > ones. They will be constructed from normal pages outside. Also when
-> > you enable huge pages OS will reserve them from start and your OS wil=
-l
-> > not able use them for other things. Also you can't swap out huge
-> > pages, KSM will not work for them and so on.
-> > 3. You can enable huge pages just for one numa node. It's impossible
-> > to enable them just for one core. Usually you reserve some memory for
-> > hugepages when the system starts and you can't use this memory in
-> > normal applications unless normal application knows how to use them.
-> >
-> > Also why it didn't work inside of the docker?
-> >
-> >
-> > On Tue, Jun 20, 2017 at 8:35 PM, Sam <batmanustc@gmail.com> wrote:
-> > > BTW, we also think about use ovs-dpdk in docker enviroment, but tes=
-t
-> > result
-> > > said it's not good idea, we don't know why.
-> > >
-> > > 2017-06-21 11:32 GMT+08:00 Sam <batmanustc@gmail.com>:
-> > >
-> > >> Hi all,
-> > >>
-> > >> We plan to use DPDK on HP host machine with several core and big m=
-emory.
-> > >> We plan to use qemu-kvm enviroment. The host will carry 4 or more =
-guest
-> > vm
-> > >> and 1 ovs.
-> > >>
-> > >> Ovs-dpdk is much faster then normal ovs, but to use ovs-dpdk, we h=
-ave to
-> > >> enable huge page globally.
-> > >>
-> > >> My question is, will huge page enabled globally have negative effe=
-ct on
-> > >> guest vm's memory orperate or something? If it is, how to prevent =
-this,
-> > or
-> > >> could I enable huge page on some core or enable huge page for a pa=
-rt of
-> > >> memory?
-> > >>
-> > >> Thank you~
-> > >>
-> >
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+I think this function can be made static, as nothing else should use it, no?
+
+> +{
+> +    uint64_t host_addr_offset = (uint64_t)(uintptr_t)(host_addr
+> +                                                      - (void *)rb->host);
+
+Intdentation is weird:
+
+uint64_t host_addr_offset =
+    (uint64_t)(uintptr_t)(host_addr - (void *)rb->host);
+
+
+> +    return host_addr_offset >> TARGET_PAGE_BITS;
+> +}
+> +
+> +int ramblock_recv_bitmap_test(void *host_addr, RAMBlock *rb)
+> +{
+> +    return test_bit(ramblock_recv_bitmap_offset(host_addr, rb),
+> +                    rb->receivedmap);
+> +}
+> +
+> +void ramblock_recv_bitmap_set(void *host_addr, RAMBlock *rb)
+> +{
+> +    set_bit_atomic(ramblock_recv_bitmap_offset(host_addr, rb),
+> rb->receivedmap);
+
+Line is too long?
+
+> +static void ramblock_recv_bitmap_clear_range(uint64_t start, size_t length,
+> +                                             RAMBlock *rb)
+> +{
+> +    int i, range_count;
+> +    range_count = length >> TARGET_PAGE_BITS;
+> +    for (i = 0; i < range_count; i++) {
+> +        ramblock_recv_bitmap_clear((void *)((uint64_t)(intptr_t)rb->host +
+> +                                            start), rb);
+> +        start += TARGET_PAGE_SIZE;
+
+bitmap_clear(dst, pos, nbits)		Clear specified bit area
+
+Looks like the right operation here, no?
+
+> +
+> +void ramblock_recv_map_init(void);
+> +int ramblock_recv_bitmap_test(void *host_addr, RAMBlock *rb);
+> +void ramblock_recv_bitmap_set(void *host_addr, RAMBlock *rb);
+> +void ramblock_recv_bitmap_clear(void *host_addr, RAMBlock *rb);
+> +
+>  #endif
+
+Later, Juan.
