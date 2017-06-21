@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41692)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batmanustc@gmail.com>) id 1dNWQw-0002is-GK
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 23:35:59 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dNWYt-0005w6-FK
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 23:44:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <batmanustc@gmail.com>) id 1dNWQv-0001C0-MP
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 23:35:58 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dNWYq-0003sq-7G
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 23:44:11 -0400
+Resent-Message-Id: <E1dNWYq-0003sq-7G@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21322)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dNWYp-0003nP-Qn
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 23:44:08 -0400
+In-Reply-To: <20170621024831.26019-1-rth@twiddle.net>
+Message-ID: <149801661786.32202.5759166714824579932@4a9a010726c0>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <CAOE=1Z1Bbgb494m6mYRnX1-80eT0tSnF0F6zNM7efEie4rd7DA@mail.gmail.com>
-References: <CAOE=1Z1Bbgb494m6mYRnX1-80eT0tSnF0F6zNM7efEie4rd7DA@mail.gmail.com>
-From: Sam <batmanustc@gmail.com>
-Date: Wed, 21 Jun 2017 11:35:56 +0800
-Message-ID: <CAOE=1Z1LJr9rpaEQ9+b7D5vM3N=Wy0oGunRnzoQ79x3dWA3oaw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Will huge page have negative effect on guest vm in
- qemu enviroment?
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 20 Jun 2017 20:43:38 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 00/16] Cleanups within TCG middle-end
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,26 +28,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: dev@dpdk.org, users@dpdk.org, qemu-devel@nongnu.org, qemu-discuss@nongnu.org
+To: rth@twiddle.net
+Cc: famz@redhat.com, qemu-devel@nongnu.org, aurelien@aurel32.net
 
-BTW, we also think about use ovs-dpdk in docker enviroment, but test result
-said it's not good idea, we don't know why.
-
-2017-06-21 11:32 GMT+08:00 Sam <batmanustc@gmail.com>:
-
-> Hi all,
->
-> We plan to use DPDK on HP host machine with several core and big memory.
-> We plan to use qemu-kvm enviroment. The host will carry 4 or more guest vm
-> and 1 ovs.
->
-> Ovs-dpdk is much faster then normal ovs, but to use ovs-dpdk, we have to
-> enable huge page globally.
->
-> My question is, will huge page enabled globally have negative effect on
-> guest vm's memory orperate or something? If it is, how to prevent this, or
-> could I enable huge page on some core or enable huge page for a part of
-> memory?
->
-> Thank you~
->
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCAwMC8xNl0gQ2xlYW51cHMgd2l0aGluIFRDRyBtaWRkbGUtZW5kClR5cGU6
+IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE3MDYyMTAyNDgzMS4yNjAxOS0xLXJ0aEB0d2lkZGxlLm5l
+dAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0
+b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRC
+QVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRu
+LyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQg
+c2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJh
+Y2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgo
+bisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGlu
+ZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9n
+aXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNo
+ZXcvMTQ5ODAxNDg4OS01MjY1OC0xLWdpdC1zZW5kLWVtYWlsLXdhbnBlbmcubGlAaG90bWFpbC5j
+b20gLT4gcGF0Y2hldy8xNDk4MDE0ODg5LTUyNjU4LTEtZ2l0LXNlbmQtZW1haWwtd2FucGVuZy5s
+aUBob3RtYWlsLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjRhM2NiODQgdGNn
+OiBTdG9yZSBwb2ludGVycyB0byB0ZW1wb3JhcmllcyBkaXJlY3RseSBpbiBUQ0dBcmcKMDJlZDI5
+YyB0Y2c6IERlZmluZSBzZXBhcmF0ZSBzdHJ1Y3R1cmVzIGZvciBUQ0d2XyoKNWNmMDY2MiB0Y2c6
+IFVzZSBwZXItdGVtcCBzdGF0ZSBkYXRhIGluIG9wdGltaXplCjVmZGJkZTIgdGNnOiBFeHBvcnQg
+dGVtcF9pZHgKMTVhMTBjZSB0Y2c6IFJlbW92ZSB1bnVzZWQgVENHX0NBTExfRFVNTVlfVENHVgo0
+ZmE4OTM4IHRjZzogQ2hhbmdlIHRlbXBfYWxsb2NhdGVfZnJhbWUgYXJnIHRvIFRDR1RlbXAKNGMx
+MWEwNSB0Y2c6IEF2b2lkIGxvb3BzIGFnYWluc3QgdmFyaWFibGUgYm91bmRzCjY5NzY4MjggdGNn
+OiBVc2UgcGVyLXRlbXAgc3RhdGUgZGF0YSBpbiBsaXZlbmVzcwoxZjY5MzgxIHRjZzogSW50cm9k
+dWNlIHRlbXBfYXJnCmFmOTQ3NjMgdGNnOiBSZXR1cm4gTlVMTCB0ZW1wIGZvciBUQ0dfQ0FMTF9E
+VU1NWV9BUkcKY2IzZTEyMyB0Y2c6IEFkZCB0ZW1wX2dsb2JhbCBiaXQgdG8gVENHVGVtcAoxMTY4
+MWU0IHRjZzogSW50cm9kdWNlIGFyZ190ZW1wCjBkODE5MTYgdGNnOiBQcm9wYWdhdGUgVENHT3Ag
+ZG93biB0byBhbGxvY2F0b3JzCmIyZGM1YjMgdGNnOiBQcm9wYWdhdGUgYXJncyB0byBvcC0+YXJn
+cyBpbiB0Y2cuYwpkMDk1NTQ4IHRjZzogUHJvcGFnYXRlIGFyZ3MgdG8gb3AtPmFyZ3MgaW4gb3B0
+aW1pemVyCjMzZTE2ZGYgdGNnOiBNZXJnZSBvcGNvZGUgYXJndW1lbnRzIGludG8gVENHT3AKCj09
+PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTY6IHRjZzogTWVyZ2Ugb3Bjb2Rl
+IGFyZ3VtZW50cyBpbnRvIFRDR09wLi4uCkVSUk9SOiBzcGFjZXMgcHJvaGliaXRlZCBhcm91bmQg
+dGhhdCAnOicgKGN0eDpXeFcpCiM0ODA6IEZJTEU6IHRjZy90Y2cuaDo2MTk6CisgICAgdW5zaWdu
+ZWQgY2FsbGkgIDogNDsgICAgICAgIC8qIDEyICovCiAgICAgICAgICAgICAgICAgICAgIF4KCkVS
+Uk9SOiBzcGFjZXMgcHJvaGliaXRlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpXeFcpCiM0ODE6IEZJ
+TEU6IHRjZy90Y2cuaDo2MjA6CisgICAgdW5zaWduZWQgY2FsbG8gIDogMjsgICAgICAgIC8qIDE0
+ICovCiAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9y
+ZSB0aGF0ICc6JyAoY3R4Old4VykKIzQ4MjogRklMRTogdGNnL3RjZy5oOjYyMToKKyAgICB1bnNp
+Z25lZCAgICAgICAgOiAyOyAgICAgICAgLyogMTYgKi8KICAgICAgICAgICAgICAgICAgICAgXgoK
+RVJST1I6IHNwYWNlcyBwcm9oaWJpdGVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4Old4VykKIzQ4Nzog
+RklMRTogdGNnL3RjZy5oOjYyNDoKKyAgICB1bnNpZ25lZCBwcmV2ICAgOiAxNjsgICAgICAgLyog
+MzIgKi8KICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyBwcm9oaWJpdGVkIGFy
+b3VuZCB0aGF0ICc6JyAoY3R4Old4VykKIzQ4ODogRklMRTogdGNnL3RjZy5oOjYyNToKKyAgICB1
+bnNpZ25lZCBuZXh0ICAgOiAxNjsgICAgICAgLyogNDggKi8KICAgICAgICAgICAgICAgICAgICAg
+XgoKdG90YWw6IDUgZXJyb3JzLCAwIHdhcm5pbmdzLCA0ODEgbGluZXMgY2hlY2tlZAoKWW91ciBw
+YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
+ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
+IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMi8xNjogdGNn
+OiBQcm9wYWdhdGUgYXJncyB0byBvcC0+YXJncyBpbiBvcHRpbWl6ZXIuLi4KRVJST1I6IHNwYWNl
+cyByZXF1aXJlZCBhcm91bmQgdGhhdCAnLScgKGN0eDpWeFYpCiM2NDQ6IEZJTEU6IHRjZy9vcHRp
+bWl6ZS5jOjExNjU6CisgICAgICAgICAgICAgICAgdGNnX29wdF9nZW5fbW92KHMsIG9wLCBvcC0+
+YXJnc1swXSwgb3AtPmFyZ3NbNC10bXBdKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdh
+cm5pbmdzLCA5MTIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMs
+IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
+ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
+QUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMy8xNjogdGNnOiBQcm9wYWdhdGUgYXJncyB0byBvcC0+
+YXJncyBpbiB0Y2cuYy4uLgpDaGVja2luZyBQQVRDSCA0LzE2OiB0Y2c6IFByb3BhZ2F0ZSBUQ0dP
+cCBkb3duIHRvIGFsbG9jYXRvcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggNS8xNjogdGNnOiBJbnRyb2R1
+Y2UgYXJnX3RlbXAuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8xNjogdGNnOiBBZGQgdGVtcF9nbG9iYWwg
+Yml0IHRvIFRDR1RlbXAuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8xNjogdGNnOiBSZXR1cm4gTlVMTCB0
+ZW1wIGZvciBUQ0dfQ0FMTF9EVU1NWV9BUkcuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xNjogdGNnOiBJ
+bnRyb2R1Y2UgdGVtcF9hcmcuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8xNjogdGNnOiBVc2UgcGVyLXRl
+bXAgc3RhdGUgZGF0YSBpbiBsaXZlbmVzcy4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
+dGVycwojMTg2OiBGSUxFOiB0Y2cvdGNnLmM6MTU3MjoKKyAgICAgICAgICAgIH0gZWxzZSBpZiAo
+YXJnX3RlbXAob3AtPmFyZ3NbMF0pLT5zdGF0ZSA9PSBUU19ERUFEICYmIGhhdmVfb3BjX25ldzIp
+IHsKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNDQyIGxpbmVzIGNoZWNrZWQKCllvdXIg
+cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMTAvMTY6IHRj
+ZzogQXZvaWQgbG9vcHMgYWdhaW5zdCB2YXJpYWJsZSBib3VuZHMuLi4KQ2hlY2tpbmcgUEFUQ0gg
+MTEvMTY6IHRjZzogQ2hhbmdlIHRlbXBfYWxsb2NhdGVfZnJhbWUgYXJnIHRvIFRDR1RlbXAuLi4K
+Q2hlY2tpbmcgUEFUQ0ggMTIvMTY6IHRjZzogUmVtb3ZlIHVudXNlZCBUQ0dfQ0FMTF9EVU1NWV9U
+Q0dWLi4uCkNoZWNraW5nIFBBVENIIDEzLzE2OiB0Y2c6IEV4cG9ydCB0ZW1wX2lkeC4uLgpDaGVj
+a2luZyBQQVRDSCAxNC8xNjogdGNnOiBVc2UgcGVyLXRlbXAgc3RhdGUgZGF0YSBpbiBvcHRpbWl6
+ZS4uLgpDaGVja2luZyBQQVRDSCAxNS8xNjogdGNnOiBEZWZpbmUgc2VwYXJhdGUgc3RydWN0dXJl
+cyBmb3IgVENHdl8qLi4uCkNoZWNraW5nIFBBVENIIDE2LzE2OiB0Y2c6IFN0b3JlIHBvaW50ZXJz
+IHRvIHRlbXBvcmFyaWVzIGRpcmVjdGx5IGluIFRDR0FyZy4uLgo9PT0gT1VUUFVUIEVORCA9PT0K
+ClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBh
+dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
+ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
