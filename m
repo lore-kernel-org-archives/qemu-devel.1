@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51531)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dNUbx-0007VE-O8
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 21:39:14 -0400
+	(envelope-from <thuth@redhat.com>) id 1dNUdK-00088Z-SS
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 21:40:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dNUbu-00048n-K2
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 21:39:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45768)
+	(envelope-from <thuth@redhat.com>) id 1dNUdH-0004SW-JY
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 21:40:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59876)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dNUbu-00048f-EF
-	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 21:39:10 -0400
-Date: Wed, 21 Jun 2017 04:39:05 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170621043236-mutt-send-email-mst@kernel.org>
-References: <ccd731e5-f128-0493-d12f-72193a39d0f9@ilande.co.uk>
-	<384e0431-5c29-dee4-a99c-19c350ebba57@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dNUdH-0004SM-EI
+	for qemu-devel@nongnu.org; Tue, 20 Jun 2017 21:40:35 -0400
+References: <1497937927-19738-1-git-send-email-thuth@redhat.com>
+	<1497937927-19738-9-git-send-email-thuth@redhat.com>
+	<d76ab927-ba90-f8d1-000d-b596edeccfcb@twiddle.net>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6639c0c3-0db4-d96e-8227-6b5bf169d232@redhat.com>
+Date: Wed, 21 Jun 2017 03:40:31 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <384e0431-5c29-dee4-a99c-19c350ebba57@redhat.com>
-Subject: Re: [Qemu-devel] pci_nic_init_nofail() only works on root PCI buses?
+In-Reply-To: <d76ab927-ba90-f8d1-000d-b596edeccfcb@twiddle.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 8/8] hw/misc/edu: Compile the edu device
+ as common object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,57 +30,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Marcel Apfelbaum <marcel@redhat.com>
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-On Wed, Jun 21, 2017 at 03:00:31AM +0200, Thomas Huth wrote:
-> On 11.06.2017 17:08, Mark Cave-Ayland wrote:
-> > Hi all,
-> > 
-> > Playing around with trying to set up PCI bridges for sun4u, I noticed
-> > that I get an assert with the following diff which simply moves the
-> > default NIC behind a PCI bridge rather than being directly on the root
-> > PCI bus:
-> > 
-> > diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-> > index 69f565d..0b17f2e 100644
-> > --- a/hw/sparc64/sun4u.c
-> > +++ b/hw/sparc64/sun4u.c
-> > @@ -465,7 +465,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
-> >      parallel_hds_isa_init(isa_bus, MAX_PARALLEL_PORTS);
-> > 
-> >      for(i = 0; i < nb_nics; i++)
-> > -        pci_nic_init_nofail(&nd_table[i], pci_bus, "ne2k_pci", NULL);
-> > +        pci_nic_init_nofail(&nd_table[i], pci_bus3, "ne2k_pci", NULL);
-> > 
-> >      ide_drive_get(hd, ARRAY_SIZE(hd));
-> > 
-> > 
-> > $ ./qemu-system-sparc64 -nographic
-> > qemu-system-sparc64: hw/pci/pci.c:682: pci_get_bus_devfn: Assertion
-> > `!root->parent_dev' failed.
-> > Aborted
-> > 
-> > Is there any particular reason why the assert() is set to fail if the
-> > NIC isn't being instantiated on the root PCI bus?
-> 
-> Sounds strange indeed. At least the patch description of the commit that
-> introduce the assert() says that using anything else seems to be an error:
-> 
-> http://git.qemu.org/?p=qemu.git;a=commitdiff;h=85c6e4fabb4c26e5cd8a0
-> 
-> Not sure whether that's still true nowadays, since that commit is
-> already 4 years old...
-> 
->  Thomas
+On 20.06.2017 20:14, Richard Henderson wrote:
+> On 06/19/2017 10:52 PM, Thomas Huth wrote:
+>> edu.c does not contain any target-specific code, so we can put
+>> it into common-obj-y to compile it only once for all targets.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>=20
+> Isn't CONFIG_EDU defined by the target, via pci.conf?
+> Would it ever be set generically?
 
-pci_get_bus_devfn is not a sensible interface. It uses bus numbers which
-are guest assigned in the machine monitor interface.
+This is about Makefiles, not #defines in C sources ... so if I
+understand our build-system correctly, the variable is set for the
+Makefiles of the targets that use pci.mak. As far as I see, it gets
+compiled correctly here.
+And we've got plenty of those common-obj-$(CONFIG_xxx) statements
+elsewhere in this file (e.g. for CONFIG_PCI_TESTDEV which is also
+declared in default-configs/pci.mak), so this is just normal, no problem
+here, as far as I can tell.
 
-We keep it around for compatibility reasons.
-
-Just avoid legacy APIs is my advice. New machine types should create
-device instances with -device or similar.
-
--- 
-MST
+ Thomas
