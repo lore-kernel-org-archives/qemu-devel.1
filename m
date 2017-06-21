@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dNnPZ-0007yT-SX
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 17:43:43 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dNnTk-0000n3-2y
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 17:48:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dNnPY-0005RJ-Q5
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 17:43:41 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dNnTi-0007Lz-7s
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 17:48:00 -0400
 References: <20170621134744.8047-1-mreitz@redhat.com>
-	<20170621134744.8047-2-mreitz@redhat.com>
-	<87d19xwbpj.fsf@dusky.pond.sub.org>
+	<20170621134744.8047-3-mreitz@redhat.com>
+	<8760fpwatr.fsf@dusky.pond.sub.org>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <4afa1020-22a7-c07e-3f73-36746644c77a@redhat.com>
-Date: Wed, 21 Jun 2017 23:43:29 +0200
+Message-ID: <665bddbf-39c4-0678-b82d-ad7dfa7f1a9e@redhat.com>
+Date: Wed, 21 Jun 2017 23:47:46 +0200
 MIME-Version: 1.0
-In-Reply-To: <87d19xwbpj.fsf@dusky.pond.sub.org>
+In-Reply-To: <8760fpwatr.fsf@dusky.pond.sub.org>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="BMRphC5cij7T96T3L9LdjODVdKi3I2HAj"
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] qapi/qnull: Add own header
+	boundary="PChrBRwvnIV4d9lXtC5xfNXgVStcmfj9w"
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] qapi: Add qobject_is_equal()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,184 +29,425 @@ To: Markus Armbruster <armbru@redhat.com>
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BMRphC5cij7T96T3L9LdjODVdKi3I2HAj
+--PChrBRwvnIV4d9lXtC5xfNXgVStcmfj9w
 From: Max Reitz <mreitz@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
  qemu-devel@nongnu.org
-Message-ID: <4afa1020-22a7-c07e-3f73-36746644c77a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] qapi/qnull: Add own header
+Message-ID: <665bddbf-39c4-0678-b82d-ad7dfa7f1a9e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] qapi: Add qobject_is_equal()
 References: <20170621134744.8047-1-mreitz@redhat.com>
- <20170621134744.8047-2-mreitz@redhat.com> <87d19xwbpj.fsf@dusky.pond.sub.org>
-In-Reply-To: <87d19xwbpj.fsf@dusky.pond.sub.org>
+ <20170621134744.8047-3-mreitz@redhat.com> <8760fpwatr.fsf@dusky.pond.sub.org>
+In-Reply-To: <8760fpwatr.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-06-21 18:24, Markus Armbruster wrote:
+On 2017-06-21 18:43, Markus Armbruster wrote:
 > Max Reitz <mreitz@redhat.com> writes:
 >=20
->> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+>> This generic function (along with its implementations for different
+>> types) determines whether two QObjects are equal.
+>>
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >> ---
->>  include/qapi/qmp/qnull.h   | 26 ++++++++++++++++++++++++++
->>  include/qapi/qmp/qobject.h |  8 --------
->>  include/qapi/qmp/types.h   |  1 +
->>  qobject/qnull.c            |  1 +
->>  target/i386/cpu.c          |  6 +-----
->>  tests/check-qnull.c        |  2 +-
->>  6 files changed, 30 insertions(+), 14 deletions(-)
->>  create mode 100644 include/qapi/qmp/qnull.h
->>
+>>  include/qapi/qmp/qbool.h   |  1 +
+>>  include/qapi/qmp/qdict.h   |  1 +
+>>  include/qapi/qmp/qfloat.h  |  1 +
+>>  include/qapi/qmp/qint.h    |  1 +
+>>  include/qapi/qmp/qlist.h   |  1 +
+>>  include/qapi/qmp/qnull.h   |  2 ++
+>>  include/qapi/qmp/qobject.h |  9 +++++++++
+>>  include/qapi/qmp/qstring.h |  1 +
+>>  qobject/qbool.c            |  8 ++++++++
+>>  qobject/qdict.c            | 28 ++++++++++++++++++++++++++++
+>>  qobject/qfloat.c           |  8 ++++++++
+>>  qobject/qint.c             |  8 ++++++++
+>>  qobject/qlist.c            | 30 ++++++++++++++++++++++++++++++
+>>  qobject/qnull.c            |  5 +++++
+>>  qobject/qobject.c          | 30 ++++++++++++++++++++++++++++++
+>>  qobject/qstring.c          |  9 +++++++++
+>>  16 files changed, 143 insertions(+)
+>=20
+> No unit test?
+
+*cough*
+
+>> diff --git a/include/qapi/qmp/qbool.h b/include/qapi/qmp/qbool.h
+>> index a41111c..f77ea86 100644
+>> --- a/include/qapi/qmp/qbool.h
+>> +++ b/include/qapi/qmp/qbool.h
+>> @@ -24,6 +24,7 @@ typedef struct QBool {
+>>  QBool *qbool_from_bool(bool value);
+>>  bool qbool_get_bool(const QBool *qb);
+>>  QBool *qobject_to_qbool(const QObject *obj);
+>> +bool qbool_is_equal(const QObject *x, const QObject *y);
+>>  void qbool_destroy_obj(QObject *obj);
+>> =20
+>>  #endif /* QBOOL_H */
+>> diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
+>> index 188440a..134a526 100644
+>> --- a/include/qapi/qmp/qdict.h
+>> +++ b/include/qapi/qmp/qdict.h
+>> @@ -41,6 +41,7 @@ void qdict_del(QDict *qdict, const char *key);
+>>  int qdict_haskey(const QDict *qdict, const char *key);
+>>  QObject *qdict_get(const QDict *qdict, const char *key);
+>>  QDict *qobject_to_qdict(const QObject *obj);
+>> +bool qdict_is_equal(const QObject *x, const QObject *y);
+>>  void qdict_iter(const QDict *qdict,
+>>                  void (*iter)(const char *key, QObject *obj, void *opa=
+que),
+>>                  void *opaque);
+>> diff --git a/include/qapi/qmp/qfloat.h b/include/qapi/qmp/qfloat.h
+>> index b5d1583..318e91e 100644
+>> --- a/include/qapi/qmp/qfloat.h
+>> +++ b/include/qapi/qmp/qfloat.h
+>> @@ -24,6 +24,7 @@ typedef struct QFloat {
+>>  QFloat *qfloat_from_double(double value);
+>>  double qfloat_get_double(const QFloat *qi);
+>>  QFloat *qobject_to_qfloat(const QObject *obj);
+>> +bool qfloat_is_equal(const QObject *x, const QObject *y);
+>>  void qfloat_destroy_obj(QObject *obj);
+>> =20
+>>  #endif /* QFLOAT_H */
+>> diff --git a/include/qapi/qmp/qint.h b/include/qapi/qmp/qint.h
+>> index 3aaff76..20975da 100644
+>> --- a/include/qapi/qmp/qint.h
+>> +++ b/include/qapi/qmp/qint.h
+>> @@ -23,6 +23,7 @@ typedef struct QInt {
+>>  QInt *qint_from_int(int64_t value);
+>>  int64_t qint_get_int(const QInt *qi);
+>>  QInt *qobject_to_qint(const QObject *obj);
+>> +bool qint_is_equal(const QObject *x, const QObject *y);
+>>  void qint_destroy_obj(QObject *obj);
+>> =20
+>>  #endif /* QINT_H */
+>> diff --git a/include/qapi/qmp/qlist.h b/include/qapi/qmp/qlist.h
+>> index 5dc4ed9..4380a5b 100644
+>> --- a/include/qapi/qmp/qlist.h
+>> +++ b/include/qapi/qmp/qlist.h
+>> @@ -57,6 +57,7 @@ QObject *qlist_peek(QList *qlist);
+>>  int qlist_empty(const QList *qlist);
+>>  size_t qlist_size(const QList *qlist);
+>>  QList *qobject_to_qlist(const QObject *obj);
+>> +bool qlist_is_equal(const QObject *x, const QObject *y);
+>>  void qlist_destroy_obj(QObject *obj);
+>> =20
+>>  static inline const QListEntry *qlist_first(const QList *qlist)
 >> diff --git a/include/qapi/qmp/qnull.h b/include/qapi/qmp/qnull.h
->> new file mode 100644
->> index 0000000..69555ac
->> --- /dev/null
+>> index 69555ac..9299683 100644
+>> --- a/include/qapi/qmp/qnull.h
 >> +++ b/include/qapi/qmp/qnull.h
->> @@ -0,0 +1,26 @@
->> +/*
->> + * QNull Module
->> + *
->> + * Copyright (C) 2009, 2017 Red Hat Inc.
->> + *
->> + * Authors:
->> + *  Luiz Capitulino <lcapitulino@redhat.com>
->> + *
->> + * This work is licensed under the terms of the GNU LGPL, version 2.1=
- or later.
->> + * See the COPYING.LIB file in the top-level directory.
->=20
-> Copy the boilerplate from qnull.c instead, factual correctness.
-
-Sorry, will do.
-
->> + */
->> +
->> +#ifndef QNULL_H
->> +#define QNULL_H
->> +
->> +#include "qapi/qmp/qobject.h"
->> +
->> +extern QObject qnull_;
->> +
->> +static inline QObject *qnull(void)
->> +{
->> +    qobject_incref(&qnull_);
->> +    return &qnull_;
->> +}
->> +
->> +#endif /* QNULL_H */
->=20
-> Meh, another tiny header.  Are our compiles too fast?
-
-For me, testing takes longer, so from my POV they're fast enough. ;-)
-
-You can always merge all the QObject types into a single header; but as
-the code is organized now, I think QNull should have its own header.
-
->> diff --git a/include/qapi/qmp/qobject.h b/include/qapi/qmp/qobject.h
->> index b8ddbca..ef1d1a9 100644
->> --- a/include/qapi/qmp/qobject.h
->> +++ b/include/qapi/qmp/qobject.h
->> @@ -93,12 +93,4 @@ static inline QType qobject_type(const QObject *obj=
-)
->>      return obj->type;
+>> @@ -23,4 +23,6 @@ static inline QObject *qnull(void)
+>>      return &qnull_;
 >>  }
 >> =20
->> -extern QObject qnull_;
->> -
->> -static inline QObject *qnull(void)
->> -{
->> -    qobject_incref(&qnull_);
->> -    return &qnull_;
->> -}
->> -
->>  #endif /* QOBJECT_H */
->> diff --git a/include/qapi/qmp/types.h b/include/qapi/qmp/types.h
->> index 27cfbd8..4c87182 100644
->> --- a/include/qapi/qmp/types.h
->> +++ b/include/qapi/qmp/types.h
->> @@ -20,5 +20,6 @@
->>  #include "qapi/qmp/qstring.h"
->>  #include "qapi/qmp/qdict.h"
->>  #include "qapi/qmp/qlist.h"
->> +#include "qapi/qmp/qnull.h"
+>> +bool qnull_is_equal(const QObject *x, const QObject *y);
+>> +
+>>  #endif /* QNULL_H */
+>> diff --git a/include/qapi/qmp/qobject.h b/include/qapi/qmp/qobject.h
+>> index ef1d1a9..cac72e3 100644
+>> --- a/include/qapi/qmp/qobject.h
+>> +++ b/include/qapi/qmp/qobject.h
+>> @@ -68,6 +68,15 @@ static inline void qobject_incref(QObject *obj)
+>>  }
 >> =20
->>  #endif /* QAPI_QMP_TYPES_H */
+>>  /**
+>> + * qobject_is_equal(): Returns whether the two objects are equal.
+>=20
+> Imperative mood, please: Return whether...
+
+OK, will do here and everywhere else.
+
+>> + *
+>> + * Any of the pointers may be NULL; will return true if both are. Wil=
+l always
+>> + * return false if only one is (therefore a QNull object is not consi=
+dered equal
+>> + * to a NULL pointer).
+>> + */
+>=20
+> Humor me: wrap comment lines around column 70, and put two spaces
+> between sentences.
+
+Do I hear "one checkpatch.pl per subsystem"?
+
+Yes, I know, there's no point to. Why should anyone not break comments
+after 70 lines and not use two spaces after full stops? O:-)
+
+> Same for the other function comments.
+
+Sure, will do.
+
+>> +bool qobject_is_equal(const QObject *x, const QObject *y);
+>> +
+>> +/**
+>>   * qobject_destroy(): Free resources used by the object
+>>   */
+>>  void qobject_destroy(QObject *obj);
+>> diff --git a/include/qapi/qmp/qstring.h b/include/qapi/qmp/qstring.h
+>> index 10076b7..65c05a9 100644
+>> --- a/include/qapi/qmp/qstring.h
+>> +++ b/include/qapi/qmp/qstring.h
+>> @@ -31,6 +31,7 @@ void qstring_append_int(QString *qstring, int64_t va=
+lue);
+>>  void qstring_append(QString *qstring, const char *str);
+>>  void qstring_append_chr(QString *qstring, int c);
+>>  QString *qobject_to_qstring(const QObject *obj);
+>> +bool qstring_is_equal(const QObject *x, const QObject *y);
+>>  void qstring_destroy_obj(QObject *obj);
+>> =20
+>>  #endif /* QSTRING_H */
+>> diff --git a/qobject/qbool.c b/qobject/qbool.c
+>> index 0606bbd..f1d1719 100644
+>> --- a/qobject/qbool.c
+>> +++ b/qobject/qbool.c
+>> @@ -52,6 +52,14 @@ QBool *qobject_to_qbool(const QObject *obj)
+>>  }
+>> =20
+>>  /**
+>> + * qbool_is_equal(): Tests whether the two QBools are equal
+>=20
+> Return whether ...
+>=20
+>> + */
+>> +bool qbool_is_equal(const QObject *x, const QObject *y)
+>> +{
+>> +    return qobject_to_qbool(x)->value =3D=3D qobject_to_qbool(y)->val=
+ue;
+>> +}
+>> +
+>> +/**
+>>   * qbool_destroy_obj(): Free all memory allocated by a
+>>   * QBool object
+>>   */
+>> diff --git a/qobject/qdict.c b/qobject/qdict.c
+>> index 88e2ecd..ca919bc 100644
+>> --- a/qobject/qdict.c
+>> +++ b/qobject/qdict.c
+>> @@ -410,6 +410,34 @@ void qdict_del(QDict *qdict, const char *key)
+>>  }
+>> =20
+>>  /**
+>> + * qdict_is_equal(): Tests whether the two QDicts are equal
+>> + *
+>> + * Here, equality means whether they contain the same keys and whethe=
+r the
+>> + * respective values are in turn equal (i.e. invoking qobject_is_equa=
+l() on them
+>> + * yields true).
+>> + */
+>> +bool qdict_is_equal(const QObject *x, const QObject *y)
+>> +{
+>> +    const QDict *dict_x =3D qobject_to_qdict(x), *dict_y =3D qobject_=
+to_qdict(y);
+>=20
+> I'm fine with multiple initializers in one declaration, but I think thi=
+s
+> one would look tidier as
+>=20
+>        const QDict *dict_x =3D qobject_to_qdict(x);
+>        const QDict *dict_y =3D qobject_to_qdict(y);
+
+I don't mind.
+
+>> +    const QDictEntry *e;
+>> +
+>> +    if (qdict_size(dict_x) !=3D qdict_size(dict_y)) {
+>> +        return false;
+>> +    }
+>> +
+>> +    for (e =3D qdict_first(dict_x); e; e =3D qdict_next(dict_x, e)) {=
+
+>> +        const QObject *obj_x =3D qdict_entry_value(e);
+>> +        const QObject *obj_y =3D qdict_get(dict_y, qdict_entry_key(e)=
+);
+>> +
+>> +        if (!qobject_is_equal(obj_x, obj_y)) {
+>> +            return false;
+>> +        }
+>> +    }
+>> +
+>> +    return true;
+>> +}
+>> +
+>> +/**
+>>   * qdict_destroy_obj(): Free all the memory allocated by a QDict
+>>   */
+>>  void qdict_destroy_obj(QObject *obj)
+>> diff --git a/qobject/qfloat.c b/qobject/qfloat.c
+>> index d5da847..291ecc4 100644
+>> --- a/qobject/qfloat.c
+>> +++ b/qobject/qfloat.c
+>> @@ -52,6 +52,14 @@ QFloat *qobject_to_qfloat(const QObject *obj)
+>>  }
+>> =20
+>>  /**
+>> + * qfloat_is_equal(): Tests whether the two QFloats are equal
+>> + */
+>> +bool qfloat_is_equal(const QObject *x, const QObject *y)
+>> +{
+>> +    return qobject_to_qfloat(x)->value =3D=3D qobject_to_qfloat(y)->v=
+alue;
+>> +}
+>> +
+>> +/**
+>>   * qfloat_destroy_obj(): Free all memory allocated by a
+>>   * QFloat object
+>>   */
+>> diff --git a/qobject/qint.c b/qobject/qint.c
+>> index d7d1b30..f638cb7 100644
+>> --- a/qobject/qint.c
+>> +++ b/qobject/qint.c
+>> @@ -51,6 +51,14 @@ QInt *qobject_to_qint(const QObject *obj)
+>>  }
+>> =20
+>>  /**
+>> + * qint_is_equal(): Tests whether the two QInts are equal
+>> + */
+>> +bool qint_is_equal(const QObject *x, const QObject *y)
+>> +{
+>> +    return qobject_to_qint(x)->value =3D=3D qobject_to_qint(y)->value=
+;
+>> +}
+>> +
+>> +/**
+>>   * qint_destroy_obj(): Free all memory allocated by a
+>>   * QInt object
+>>   */
+>> diff --git a/qobject/qlist.c b/qobject/qlist.c
+>> index 86b60cb..652fc53 100644
+>> --- a/qobject/qlist.c
+>> +++ b/qobject/qlist.c
+>> @@ -140,6 +140,36 @@ QList *qobject_to_qlist(const QObject *obj)
+>>  }
+>> =20
+>>  /**
+>> + * qlist_is_equal(): Tests whether the two QLists are equal
+>> + *
+>> + * In order to be considered equal, the respective two objects at eac=
+h index of
+>> + * the two lists have to compare equal (regarding qobject_is_equal())=
+, and both
+>> + * lists have to have the same number of elements.
+>> + * That means, both lists have to contain equal objects in equal orde=
+r.
+>> + */
+>> +bool qlist_is_equal(const QObject *x, const QObject *y)
+>> +{
+>> +    const QList *list_x =3D qobject_to_qlist(x), *list_y =3D qobject_=
+to_qlist(y);
+>> +    const QListEntry *entry_x, *entry_y;
+>> +
+>> +    entry_x =3D qlist_first(list_x);
+>> +    entry_y =3D qlist_first(list_y);
+>> +
+>> +    while (entry_x && entry_y) {
+>> +        if (!qobject_is_equal(qlist_entry_obj(entry_x),
+>> +                              qlist_entry_obj(entry_y)))
+>> +        {
+>> +            return false;
+>> +        }
+>> +
+>> +        entry_x =3D qlist_next(entry_x);
+>> +        entry_y =3D qlist_next(entry_y);
+>> +    }
+>> +
+>> +    return !entry_x && !entry_y;
+>> +}
+>> +
+>> +/**
+>>   * qlist_destroy_obj(): Free all the memory allocated by a QList
+>>   */
+>>  void qlist_destroy_obj(QObject *obj)
 >> diff --git a/qobject/qnull.c b/qobject/qnull.c
->> index c124d05..b3cc85e 100644
+>> index b3cc85e..af5453d 100644
 >> --- a/qobject/qnull.c
 >> +++ b/qobject/qnull.c
->> @@ -13,6 +13,7 @@
->>  #include "qemu/osdep.h"
->>  #include "qemu-common.h"
->>  #include "qapi/qmp/qobject.h"
->=20
-> Let's drop this include, like you do in check-qnull.c below.
-
-I don't even know why I've dropped it there, must have been an accident.
-But, well, I don't mind having more happy little accidents.
-
->> +#include "qapi/qmp/qnull.h"
->> =20
->>  QObject qnull_ =3D {
+>> @@ -19,3 +19,8 @@ QObject qnull_ =3D {
 >>      .type =3D QTYPE_QNULL,
->> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->> index b2b1d20..f118a54 100644
->> --- a/target/i386/cpu.c
->> +++ b/target/i386/cpu.c
->> @@ -29,11 +29,7 @@
->>  #include "qemu/option.h"
->>  #include "qemu/config-file.h"
->>  #include "qapi/qmp/qerror.h"
->> -#include "qapi/qmp/qstring.h"
->> -#include "qapi/qmp/qdict.h"
->> -#include "qapi/qmp/qbool.h"
->> -#include "qapi/qmp/qint.h"
->> -#include "qapi/qmp/qfloat.h"
->> +#include "qapi/qmp/types.h"
->=20
-> qapi/qmp/types.h is a lazy way to increase compile times by including
-> more than you need.  One day I'll kill it.  Until then, I tolerate it i=
-n
-> .c, but not in .h.
-
-First, I think the compiler has enough work to do on i386/cpu.c as it
-is, so it won't matter much here.
-
-Secondly, I'll gladly take a qapi/qmp/primitive-types.h; but I don't see
-the point of including six different headers and keeping track of which
-primitives type you plan to use.
-
-So if you want to merge them all into one, go for out, sounds very
-reasonable to me.
-
+>>      .refcnt =3D 1,
+>>  };
+>> +
+>> +bool qnull_is_equal(const QObject *x, const QObject *y)
+>> +{
+>> +    return true;
+>> +}
+>> diff --git a/qobject/qobject.c b/qobject/qobject.c
+>> index fe4fa10..af2869a 100644
+>> --- a/qobject/qobject.c
+>> +++ b/qobject/qobject.c
+>> @@ -28,3 +28,33 @@ void qobject_destroy(QObject *obj)
+>>      assert(QTYPE_QNULL < obj->type && obj->type < QTYPE__MAX);
+>>      qdestroy[obj->type](obj);
+>>  }
+>> +
+>> +
+>> +static bool (*qis_equal[QTYPE__MAX])(const QObject *, const QObject *=
+) =3D {
+>> +    [QTYPE_NONE] =3D NULL,               /* No such object exists */
+>> +    [QTYPE_QNULL] =3D qnull_is_equal,
+>> +    [QTYPE_QINT] =3D qint_is_equal,
+>> +    [QTYPE_QSTRING] =3D qstring_is_equal,
+>> +    [QTYPE_QDICT] =3D qdict_is_equal,
+>> +    [QTYPE_QLIST] =3D qlist_is_equal,
+>> +    [QTYPE_QFLOAT] =3D qfloat_is_equal,
+>> +    [QTYPE_QBOOL] =3D qbool_is_equal,
+>> +};
+>> +
+>> +bool qobject_is_equal(const QObject *x, const QObject *y)
+>> +{
+>> +    /* We cannot test x =3D=3D y because an object does not need to b=
+e equal to
+>> +     * itself (e.g. NaN floats are not). */
+>> +
+>> +    if (!x && !y) {
+>> +        return true;
+>> +    }
+>> +
+>> +    if (!x || !y || x->type !=3D y->type) {
+>> +        return false;
+>> +    }
+>> +
+>> +    assert(QTYPE_NONE < x->type && x->type < QTYPE__MAX);
+>> +
+>> +    return qis_equal[x->type](x, y);
+>> +}
+>> diff --git a/qobject/qstring.c b/qobject/qstring.c
+>> index 5da7b5f..a2b51fa 100644
+>> --- a/qobject/qstring.c
+>> +++ b/qobject/qstring.c
+>> @@ -129,6 +129,15 @@ const char *qstring_get_str(const QString *qstrin=
+g)
+>>  }
 >> =20
->>  #include "qapi-types.h"
->>  #include "qapi-visit.h"
->> diff --git a/tests/check-qnull.c b/tests/check-qnull.c
->> index 8dd1c96..4a67b9a 100644
->> --- a/tests/check-qnull.c
->> +++ b/tests/check-qnull.c
->> @@ -8,7 +8,7 @@
+>>  /**
+>> + * qstring_is_equal(): Tests whether the two QStrings are equal
+>> + */
+>> +bool qstring_is_equal(const QObject *x, const QObject *y)
+>> +{
+>> +    return !strcmp(qobject_to_qstring(x)->string,
+>> +                   qobject_to_qstring(y)->string);
+>> +}
+>> +
+>> +/**
+>>   * qstring_destroy_obj(): Free all memory allocated by a QString
+>>   * object
 >>   */
->>  #include "qemu/osdep.h"
->> =20
->> -#include "qapi/qmp/qobject.h"
->> +#include "qapi/qmp/qnull.h"
->>  #include "qemu-common.h"
->>  #include "qapi/qobject-input-visitor.h"
->>  #include "qapi/qobject-output-visitor.h"
 >=20
-> With the boilerplate corrected and the superfluous include in qnull.c
-> deleted
+> Address my nitpicks, and either provide a unit test or convince me it's=
+
+> not worth the trouble, and you may add
+
+Unfortunately (for me), it's always worth the trouble.
+
 > Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
-Will do, thanks!
+Thanks again!
 
 Max
 
 
---BMRphC5cij7T96T3L9LdjODVdKi3I2HAj
+--PChrBRwvnIV4d9lXtC5xfNXgVStcmfj9w
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -214,14 +455,14 @@ Content-Disposition: attachment; filename="signature.asc"
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQEvBAEBCAAZBQJZSuiBEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQOKZ
-B/9Yu8o70p0QDZgcQV2Jjmtz7k5ahoFBbQgihSb/gnMYPMvy+oE77yqPrZnNt2lu
-IDo9KrdXw497tvlt3nEEadxodb9gje4Ql0luRIVle7RebdXJIm8Sb2l29VUUcnLi
-IJRKqiA7/V8L0QecKZHmQJE56Qzp2+HjaHCSa1X9SNAwdThUD1mci+ONBMFgSYAP
-bWRn4ZAEb37hONzppf44q+IBw3I/CPfsPYo+fCUbNcWGQokyR7ZHZQLPZrMI2ADz
-nimLa4jrPhK0t4IqBZjWLD19q0yOztEzXmSkL3Y4bWZ9ouG+s0eQYclmPlwF5llL
-RktN5DBbVbApx2SRBpIcNY75
-=STsO
+iQEvBAEBCAAZBQJZSumCEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQGFk
+CACOHPJLJLjdJh/DX0VASU7DDEnyn/2ZLFdqE1mTK8ObfpFYhGEPhtDLylF8yVSh
+PKsSN05xT9tgzxa5Mo/lXmXPnQf1K3m55ksWPZVReTFRiyofoNQMeH2KliX5ylKv
++oIx98EG2r/kYyyN8rKGOJ6LZ/d8SCDRKxYSQwRM5/BDbOWMex5VGiuKs7F3V5Xl
+TAt1GDlzpg7+NYNo5HjuakrocsRsKBm3oJAnrJqA1dFXSeZjmcqxdXslQ1Ep8j5G
+jWHYyLAb6QWp8ZbUA1Iu0EvGYtuiC/G+XzMORk/TKr+F35IeiDdZdzo9jwXgjtKc
+FlXXEcbn7Ark7NlQUMV/JEw+
+=EmeX
 -----END PGP SIGNATURE-----
 
---BMRphC5cij7T96T3L9LdjODVdKi3I2HAj--
+--PChrBRwvnIV4d9lXtC5xfNXgVStcmfj9w--
