@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dNtgc-0002iX-Md
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 00:25:43 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dNunu-0000E6-Fm
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 01:37:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dNtgZ-0006wa-J6
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 00:25:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53176)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dNtgZ-0006wK-AU
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 00:25:39 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 70794FD09
-	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 04:25:37 +0000 (UTC)
-Date: Thu, 22 Jun 2017 12:25:30 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170622042530.GB3936@pxdev.xzpeter.org>
-References: <1498031528-1990-1-git-send-email-peterx@redhat.com>
-	<1498031528-1990-3-git-send-email-peterx@redhat.com>
-	<20170621122311.GC3928@thinpad.lan.raisama.net>
+	(envelope-from <vilanova@ac.upc.edu>) id 1dNunp-0002Ml-JB
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 01:37:18 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:35629)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dNunp-0002M2-6S
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 01:37:13 -0400
+From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
+References: <CADR1n+V8R1LOGzbwdBDt5axeZ0mqh=WSCsfUo0Vr2nmE6BYqTQ@mail.gmail.com>
+	<8760fqorbp.fsf@frigg.lan> <20170620172002.GA23332@flamenco>
+	<CADR1n+Uw1Yg+0PdsaPwViXUFO7gGkW6ET_oSM86YQL+HRfM=0w@mail.gmail.com>
+Date: Thu, 22 Jun 2017 08:36:53 +0300
+In-Reply-To: <CADR1n+Uw1Yg+0PdsaPwViXUFO7gGkW6ET_oSM86YQL+HRfM=0w@mail.gmail.com>
+	(Jayanto Minocha's message of "Tue, 20 Jun 2017 15:30:43 -0700")
+Message-ID: <87lgokpoqy.fsf@frigg.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170621122311.GC3928@thinpad.lan.raisama.net>
-Subject: Re: [Qemu-devel] [PATCH v4 02/10] accel: introduce
- AccelClass.global_props
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Tracing guest virtual addresses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,125 +29,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Jayanto Minocha <jayanto@gmail.com>
+Cc: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
 
-On Wed, Jun 21, 2017 at 09:23:11AM -0300, Eduardo Habkost wrote:
-> On Wed, Jun 21, 2017 at 03:52:00PM +0800, Peter Xu wrote:
-> > Introduce this new field for the accelerator classes so that each
-> > specific accelerator in the future can register its own global
-> > properties to be used further by the system. It works just like how the
-> > old machine compatible properties do, but only tailored for
-> > accelerators.
-> > 
-> > Use the newly exported register_compat_prop() to pass the accelerator
-> > global properties to the global_props list.
-> > 
-> > Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  accel/accel.c          | 10 ++++++++++
-> >  include/sysemu/accel.h | 10 ++++++++++
-> >  vl.c                   |  1 +
-> >  3 files changed, 21 insertions(+)
-> > 
-> > diff --git a/accel/accel.c b/accel/accel.c
-> > index 7c079a5..212581c 100644
-> > --- a/accel/accel.c
-> > +++ b/accel/accel.c
-> > @@ -120,6 +120,16 @@ void configure_accelerator(MachineState *ms)
-> >      }
-> >  }
-> >  
-> > +void accel_register_compat_props(AccelState *accel)
-> > +{
-> > +    AccelClass *class = ACCEL_GET_CLASS(accel);
-> > +    GlobalProperty *prop;
-> > +
-> > +    for (prop = class->global_props; prop && prop->driver; prop++) {
-> > +        register_compat_prop(prop->driver, prop->property, prop->value);
-> > +    }
-> > +}
-> 
-> I suggest adding a generic register_compat_props_array(GlobalProperty *props)
-> helper, so we can reuse it at machine_register_compat_props()
-> later (once we fix global property ordering in
-> qdev_prop_set_globals() and make the object_class_foreach() hack
-> in machine_register_compat_props() unnecessary).
+Jayanto Minocha writes:
 
-Sure.
+> Lluis,
+> My modifications were almost the same as those done by Emilio. There were
+> no memory trace events in the trace file.
 
-> 
-> > +
-> >  static void register_accel_types(void)
-> >  {
-> >      type_register_static(&accel_type);
-> > diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
-> > index 15944c1..8a01e51 100644
-> > --- a/include/sysemu/accel.h
-> > +++ b/include/sysemu/accel.h
-> > @@ -24,6 +24,7 @@
-> >  #define HW_ACCEL_H
-> >  
-> >  #include "qom/object.h"
-> > +#include "hw/qdev-properties.h"
-> >  
-> >  typedef struct AccelState {
-> >      /*< private >*/
-> > @@ -40,6 +41,13 @@ typedef struct AccelClass {
-> >      int (*available)(void);
-> >      int (*init_machine)(MachineState *ms);
-> >      bool *allowed;
-> > +    /*
-> > +     * Array of gobal properties that would be applied when specific
-> 
-> "global"
-
-Will fix.
-
-> 
-> > +     * accelerator is chosen. It works just like
-> > +     * MachineClass.compat_props but it's for accelerators not
-> > +     * machines.
-> > +     */
-> > +    GlobalProperty *global_props;
-> >  } AccelClass;
-> >  
-> >  #define TYPE_ACCEL "accel"
-> > @@ -57,5 +65,7 @@ typedef struct AccelClass {
-> >  extern int tcg_tb_size;
-> >  
-> >  void configure_accelerator(MachineState *ms);
-> > +/* Register accelerator specific global properties */
-> > +void accel_register_compat_props(AccelState *accel);
-> >  
-> >  #endif
-> > diff --git a/vl.c b/vl.c
-> > index 59fea15..4452d7a 100644
-> > --- a/vl.c
-> > +++ b/vl.c
-> > @@ -4571,6 +4571,7 @@ int main(int argc, char **argv, char **envp)
-> >              exit (i == 1 ? 1 : 0);
-> >      }
-> >  
-> 
-> I suggest a comment here warning about global property
-> registration ordering.  e.g.:
-> 
->  /*
->   * Ordering of global property registration matters:
->   * - machine compat_props should override accelerator-specific
->   *   globals.
->   * - user-provided globals (-global, and global properties
->   *   derived from other command-line options like -cpu) should
->   *   override machine compat_props and accelerator-specific
->   *   globals.
->   */
-
-I have a standalone patch (next one) to unify these three places and
-added some comment. Would that suite?
+I'll take a look at it after I finish revamping the generic translation loop
+series (hopefully today).
 
 Thanks,
+  Lluis
 
--- 
-Peter Xu
+
+> -J
+
+> On Tue, Jun 20, 2017 at 10:20 AM, Emilio G. Cota <cota@braap.org> wrote:
+
+>> On Tue, Jun 20, 2017 at 14:02:02 +0300, Llu=C3=ADs Vilanova wrote:
+>> > Jayanto Minocha writes:
+>> >
+>> > > Hi,
+>> > > I think there have been a few threads on the mailing list regarding
+>> tracing
+>> > > guest virtual addresses for load and store instructions, but I have
+>> been
+>> > > unable to get it to work. I am trying this for an AArch64 machine, a=
+nd
+>> am
+>> > > using the softmmu.
+>> >
+>> > > The tracing infrastructure provides the following event:
+>> >
+>> > > vcpu tcg guest_mem_before(...).
+>> >
+>> > > But that is only used to instrument the cpu_ld/cpu_st macros, which =
+is
+>> only
+>> > > called in the case of a tlb miss.
+>> >
+>> > > I've been going over the archives, and it looks like I need to
+>> instrument
+>> > > tcg_out_tlb_load. Am I on the right path ?
+>> >
+>> > That event should trace all guest memory accesses performed by the CPU.
+>> If you
+>> > found any case where this does not hold, it is likely a bug and I'd
+>> appreciate
+>> > it if you can point me to the smallest possible failing example.
+>>=20
+>> I'm having trouble with this as well, although I'm pretty sure I must be
+>> doing
+>> something wrong (never used the tracing infrastructure before). Here's w=
+hat
+>> I'm doing:
+>>=20
+>> $ git show --pretty=3Dshort
+>> commit e85c0d14014514a2f0faeae5b4c23fab5b234de4
+>> Merge: 65a0e3e 7f3cf2d
+>> Author: Peter Maydell <peter.maydell@linaro.org>
+>>=20
+>> Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into
+>> staging
+>>=20
+>>=20
+>> $ git diff
+>> diff --git a/accel/tcg/trace-events b/accel/tcg/trace-events
+>> index 2de8359..385a462 100644
+>> --- a/accel/tcg/trace-events
+>> +++ b/accel/tcg/trace-events
+>> @@ -2,7 +2,7 @@
+>>=20
+>> # TCG related tracing (mostly disabled by default)
+>> # cpu-exec.c
+>> -disable exec_tb(void *tb, uintptr_t pc) "tb:%p pc=3D0x%"PRIxPTR
+>> +exec_tb(void *tb, uintptr_t pc) "tb:%p pc=3D0x%"PRIxPTR
+>> disable exec_tb_nocache(void *tb, uintptr_t pc) "tb:%p pc=3D0x%"PRIxPTR
+>> disable exec_tb_exit(void *last_tb, unsigned int flags) "tb:%p flags=3D%=
+x"
+>>=20
+>> diff --git a/trace-events b/trace-events
+>> index bae63fd..7df49a3 100644
+>> --- a/trace-events
+>> +++ b/trace-events
+>> @@ -106,7 +106,7 @@ vcpu guest_cpu_reset(void)
+>> #
+>> # Mode: user, softmmu
+>> # Targets: TCG(all)
+>> -disable vcpu tcg guest_mem_before(TCGv vaddr, uint8_t info) "info=3D%d",
+>> "vaddr=3D0x%016"PRIx64" info=3D%d"
+>> +vcpu tcg guest_mem_before(TCGv vaddr, uint8_t info) "info=3D%d",
+>> "vaddr=3D0x%016"PRIx64" info=3D%d"
+>>=20
+>> # @num: System call number.
+>> # @arg*: System call argument value.
+>>=20
+>> $ mkdir build
+>> $ cd build
+>> $ ../configure --target-list=3Darm-softmmu,x86_64-linux-user
+>> --enable-trace-backends=3Dsimple && make -j 12
+>> [...]
+>>=20
+>> $ cat ../ev
+>> guest_mem_before_exec
+>> guest_mem_before_trans
+>> exec_tb
+>>=20
+>> $ x86_64-linux-user/qemu-x86_64 -trace events=3D../ev /bin/date
+>> Tue Jun 20 13:11:49 EDT 2017
+>>=20
+>> $ ls -lt | head | grep trace
+>> -rw-rw-r--  1 cota cota   169721 Jun 20 13:11 trace-2150
+>>=20
+>> $ scripts/simpletrace.py trace-events-all trace-2150
+>> exec_tb 0.000 pid=3D2150 tb=3D0x7f5896667010 pc=3D0x4000801cc0
+>> exec_tb 21.648 pid=3D2150 tb=3D0x7f5896667088 pc=3D0x4000805c00
+>> [...]
+>>=20
+>> 100% of the file is exec_tb lines, i.e. no memory references whatsoever.
+>>=20
+>> Similar results with arm-softmmu.
+>>=20
+>> Thanks,
+>>=20
+>> Emilio
+>>=20
+>>=20
