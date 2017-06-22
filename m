@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44512)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dO6Uh-0003xH-Ke
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 14:06:17 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dO6Uv-00041q-2m
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 14:06:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dO6Ue-00005d-Bg
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 14:06:15 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:45450)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dO6Ur-0000AX-Sk
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 14:06:29 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:45454)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dO6Ud-00004s-Qp
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 14:06:12 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dO6Ur-0000AP-GK
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 14:06:25 -0400
 From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <149815338558.1830.8107719559183631163.stgit@frigg.lan>
-Date: Thu, 22 Jun 2017 21:06:01 +0300
-In-Reply-To: <149815338558.1830.8107719559183631163.stgit@frigg.lan>
+References: <149815276329.32092.14209722991890170116.stgit@frigg.lan>
+Date: Thu, 22 Jun 2017 21:06:17 +0300
+In-Reply-To: <149815276329.32092.14209722991890170116.stgit@frigg.lan>
 	(=?utf-8?Q?=22Llu=C3=ADs?=
-	Vilanova"'s message of "Thu, 22 Jun 2017 20:43:05 +0300")
-Message-ID: <87efublwxi.fsf@frigg.lan>
+	Vilanova"'s message of "Thu, 22 Jun 2017 20:32:43 +0300")
+Message-ID: <87a84zlwx2.fsf@frigg.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
@@ -38,6 +38,7 @@ dropeed.
 
 Thanks,
   Lluis
+
 
 Llu=C3=ADs Vilanova writes:
 
