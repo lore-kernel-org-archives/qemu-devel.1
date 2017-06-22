@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dO2o2-0001aN-28
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 10:09:59 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dO2rF-0002Wm-CJ
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 10:13:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dO2o0-0001rt-NY
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 10:09:58 -0400
-Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:34508)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dO2o0-0001rc-FF
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 10:09:56 -0400
-Received: by mail-wr0-x22a.google.com with SMTP id 77so25204098wrb.1
-	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 07:09:56 -0700 (PDT)
+	(envelope-from <jsnow@redhat.com>) id 1dO2rE-0002Xf-Fk
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 10:13:17 -0400
+References: <1498040351-6376-2-git-send-email-kchamart@redhat.com>
+	<bdbe5523-b066-a2ef-9e46-ece40ff4060d@redhat.com>
+	<20170622085610.wasfoafo3b46iv4q@eukaryote>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <3e638f0a-49f8-6fd0-04eb-12904768d571@redhat.com>
+Date: Thu, 22 Jun 2017 10:13:03 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170621144814.15324-1-alex.bennee@linaro.org>
-References: <20170621144814.15324-1-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 22 Jun 2017 15:09:34 +0100
-Message-ID: <CAFEAcA91jcDezunfEKwB+DBdzrEAFYWHKRyFmPyCNYSs_4N4JA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/21] Docker and shippable updates
+In-Reply-To: <20170622085610.wasfoafo3b46iv4q@eukaryote>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3] live-block-ops.txt: Rename, rewrite,
+ and improve it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +26,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Kashyap Chamarthy <kchamart@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, stephen@that.guru, armbru@redhat.com, mreitz@redhat.com
 
-On 21 June 2017 at 15:47, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
-> The following changes since commit 8dfaf23ae1f2273a9730a9b309cc8471269bb5=
-24:
->
->   tcg/tci: fix tcg-interpreter build (2017-06-20 18:39:15 +0100)
->
-> are available in the git repository at:
->
->   https://github.com/stsquad/qemu.git tags/pull-ci-updates-210617-2
->
-> for you to fetch changes up to 32b9ca986855a5d56daf47fdb516743008788b71:
->
->   MAINTAINERS: self-appoint me as reviewer in build/test automation (2017=
--06-21 15:03:06 +0100)
->
-> ----------------------------------------------------------------
-> This is mostly Philippe's updates
->
-> We add the following cross-compile targets:
->   - mipsel-softmmu,mipsel-linux-user,mips64el-linux-user
->   - armeb-linux-user
->
-> While I was rolling I discovered we could also back out a bunch of the
-> emdebian hacks as the newly released stretch handles cross compilers
-> as first class citizens. Unfortunately this also meant I had to drop
-> the powerpc support as that is no longer in Debian stable.
->
 
-Applied, thanks.
 
--- PMM
+On 06/22/2017 04:56 AM, Kashyap Chamarthy wrote:
+> On Wed, Jun 21, 2017 at 06:49:02PM -0400, John Snow wrote:
+> 
+> [...]
+> 
+>>> * TODO (after feedback from John Snow):
+>>>    - Eric Blake suggested to consider documenting incremental backup
+>>>      policies as part of the section: "Live disk backup ---
+>>>      `drive-backup` and `blockdev-backup`"
+>>
+>> Perhaps it could be mentioned, but hopefully I've covered it in some
+>> sufficient detail in the (now) docs/devel/bitmaps.md file; 
+> 
+> Yes, that doc is very useful.  That was my precise thought.
+> 
+>> I'm a little wary of duplicating efforts in this area, 
+> 
+> I share your wariness.
+> 
+>> but you've covered everything *else* in good detail here, so now my
+>> file is the odd one out.
+>>
+>> I will leave this up to you, really. Perhaps it could be paid some lip
+>> service with a link to the other document? 
+> 
+> Yes, I was thinking of this, too -- just link to the 'bitmaps' document.
+> 
+> A quick side question here: Since upstream QEMU is converging onto
+> Sphinx, and rST, hope you mind if I convert docs/devel/bitmaps.md into
+> rST at somepoint, for consistency's sake.  I'll file a separate review,
+> anyway for that.  In the long term, all / most other documents would
+> also be converted.
+> 
+
+Of course not. I chose bitmaps.md so that it would be nice to view from
+the github interface while remaining nice to read in plaintext, but feel
+free to convert it if we actually do standardize on Sphinx/rST.
+
+If you can make the generated output look prettier than the github
+rendering of the markdown I'll ACK it ;)
+
+>> The detail in bitmaps.md is a little more verbose than the rest of
+>> this file, so if you include it wholesale it'd dwarf the rest of this
+>> document.
+>>
+>> What do you think?
+> 
+> Yes, I fully agree with your suggestion.  I will simply link to the
+> detailed document you wrote, which I was thinking of anyhow.
+> 
+> Thanks for your comments!
+> 
+Sure. You could perhaps mention the different sync modes, including top,
+none, full and incremental and urge readers to check out the bitmaps
+document for detailed workings of the incremental mode.
