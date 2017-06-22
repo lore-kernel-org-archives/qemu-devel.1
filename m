@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dO6Df-0002az-B2
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:48:40 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dO6EB-0003Em-NC
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:49:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dO6Db-0001Sz-Ef
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:48:39 -0400
-Received: from roura.ac.upc.edu ([147.83.33.10]:44899 helo=roura.ac.upc.es)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dO6E7-0001zL-Q0
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:49:11 -0400
+Received: from roura.ac.upc.edu ([147.83.33.10]:53772 helo=roura.ac.upc.es)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dO6Db-0001SK-1t
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:48:35 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dO6E7-0001zB-DZ
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:49:07 -0400
 From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Thu, 22 Jun 2017 20:48:26 +0300
-Message-Id: <149815370652.1830.2785403848458418562.stgit@frigg.lan>
+Date: Thu, 22 Jun 2017 20:48:58 +0300
+Message-Id: <149815373864.1830.11327265472101278016.stgit@frigg.lan>
 In-Reply-To: <149815338558.1830.8107719559183631163.stgit@frigg.lan>
 References: <149815338558.1830.8107719559183631163.stgit@frigg.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 10/26] target: [tcg,
- i386] Refactor breakpoint_check
+Subject: [Qemu-devel] [PATCH v7 11/26] target: [tcg,
+ i386] Refactor disas_insn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,92 +36,132 @@ loop.
 
 Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 ---
- target/i386/translate.c |   48 +++++++++++++++++++++++++++++++++++------=
+ target/i386/translate.c |   72 +++++++++++++++++++++++++++++++----------=
 ------
- 1 file changed, 36 insertions(+), 12 deletions(-)
+ 1 file changed, 47 insertions(+), 25 deletions(-)
 
 diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 3c7ef4af67..04d65b8416 100644
+index 04d65b8416..34e7cf6788 100644
 --- a/target/i386/translate.c
 +++ b/target/i386/translate.c
-@@ -18,6 +18,7 @@
-  */
- #include "qemu/osdep.h"
+@@ -4436,16 +4436,17 @@ static void gen_sse(CPUX86State *env, DisasContex=
+t *s, int b,
 =20
-+#include "qemu/error-report.h"
- #include "qemu/host-utils.h"
- #include "cpu.h"
- #include "disas/disas.h"
-@@ -8474,12 +8475,32 @@ static void i386_trblock_insn_start(DisasContextB=
-ase *db, CPUState *cpu)
-     tcg_gen_insn_start(db->pc_next, dc->cc_op);
+ /* convert one instruction. s->base.is_jmp is set if the translation mus=
+t
+    be stopped. Return the next pc value */
+-static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+-                               target_ulong pc_start)
++static target_ulong disas_insn(DisasContextBase *db, CPUState *cpu)
+ {
+-    DisasContextBase *db =3D &s->base;
++    DisasContext *s =3D container_of(db, DisasContext, base);
++    CPUX86State *env =3D cpu->env_ptr;
+     int b, prefixes;
+     int shift;
+     TCGMemOp ot, aflag, dflag;
+     int modrm, reg, rm, mod, op, opreg, val;
+     target_ulong next_eip, tval;
+     int rex_w, rex_r;
++    target_ulong pc_start =3D db->pc_next;
+=20
+     s->pc_start =3D s->pc =3D pc_start;
+     prefixes =3D 0;
+@@ -8494,10 +8495,50 @@ static BreakpointCheckType i386_trblock_breakpoin=
+t_check(
+     }
  }
 =20
-+static BreakpointCheckType i386_trblock_breakpoint_check(
-+    DisasContextBase *db, CPUState *cpu, const CPUBreakpoint *bp)
++static target_ulong i386_trblock_disas_insn(DisasContextBase *db, CPUSta=
+te *cpu)
 +{
 +    DisasContext *dc =3D container_of(db, DisasContext, base);
-+    /* If RF is set, suppress an internally generated breakpoint.  */
-+    int flags =3D db->tb->flags & HF_RF_MASK ? BP_GDB : BP_ANY;
-+    if (bp->flags & flags) {
-+        gen_debug(dc, db->pc_next - dc->cs_base);
-+        /* The address covered by the breakpoint must be included in
-+           [tb->pc, tb->pc + tb->size) in order to for it to be
-+           properly cleared -- thus we increment the PC here so that
-+           the logic setting tb->size below does the right thing.  */
-+        db->pc_next +=3D 1;
-+        return BC_HIT_TB;
-+    } else {
-+        return BC_MISS;
++    target_ulong pc_next =3D disas_insn(db, cpu);
++
++    if (db->is_jmp) {
++        return pc_next;
 +    }
++
++    if (dc->tf || (db->tb->flags & HF_INHIBIT_IRQ_MASK)) {
++        /* if single step mode, we generate only one instruction and
++           generate an exception */
++        /* if irq were inhibited with HF_INHIBIT_IRQ_MASK, we clear
++           the flag and abort the translation to give the irqs a
++           change to be happen */
++        gen_jmp_im(pc_next - dc->cs_base);
++        gen_eob(dc);
++        db->is_jmp =3D DJ_TOO_MANY;
++    } else if ((db->tb->cflags & CF_USE_ICOUNT)
++               && ((db->pc_next & TARGET_PAGE_MASK)
++                   !=3D ((db->pc_next + TARGET_MAX_INSN_SIZE - 1)
++                       & TARGET_PAGE_MASK)
++                   || (db->pc_next & ~TARGET_PAGE_MASK) =3D=3D 0)) {
++        /* Do not cross the boundary of the pages in icount mode,
++           it can cause an exception. Do it only when boundary is
++           crossed by the first instruction in the block.
++           If current instruction already crossed the bound - it's ok,
++           because an exception hasn't stopped this code.
++         */
++        gen_jmp_im(pc_next - dc->cs_base);
++        gen_eob(dc);
++        db->is_jmp =3D DJ_TOO_MANY;
++    } else if ((pc_next - db->pc_first) >=3D (TARGET_PAGE_SIZE - 32)) {
++        gen_jmp_im(pc_next - dc->cs_base);
++        gen_eob(dc);
++        db->is_jmp =3D DJ_TOO_MANY;
++    }
++
++    return pc_next;
 +}
 +
  /* generate intermediate code for basic block 'tb'.  */
  void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
  {
-     CPUX86State *env =3D cpu->env_ptr;
+-    CPUX86State *env =3D cpu->env_ptr;
      DisasContext dc1, *dc =3D &dc1;
      DisasContextBase *db =3D &dc1.base;
-+    CPUBreakpoint *bp;
-     int num_insns;
-     int max_insns;
-=20
-@@ -8507,18 +8528,21 @@ void gen_intermediate_code(CPUState *cpu, Transla=
+     CPUBreakpoint *bp;
+@@ -8547,39 +8588,20 @@ void gen_intermediate_code(CPUState *cpu, Transla=
 tionBlock *tb)
-         i386_trblock_insn_start(db, cpu);
-         num_insns++;
-=20
--        /* If RF is set, suppress an internally generated breakpoint.  *=
-/
--        if (unlikely(cpu_breakpoint_test(cpu, db->pc_next,
--                                         tb->flags & HF_RF_MASK
--                                         ? BP_GDB : BP_ANY))) {
--            gen_debug(dc, db->pc_next - dc->cs_base);
--            /* The address covered by the breakpoint must be included in
--               [tb->pc, tb->pc + tb->size) in order to for it to be
--               properly cleared -- thus we increment the PC here so that
--               the logic setting tb->size below does the right thing.  *=
-/
--            db->pc_next +=3D 1;
--            goto done_generating;
--        }
-+        bp =3D NULL;
-+        do {
-+            bp =3D cpu_breakpoint_get(cpu, db->pc_next, bp);
-+            if (unlikely(bp)) {
-+                BreakpointCheckType bp_check =3D i386_trblock_breakpoint=
-_check(
-+                    db, cpu, bp);
-+                if (bp_check =3D=3D BC_HIT_TB) {
-+                    goto done_generating;
-+                } else {
-+                    error_report("Unexpected BreakpointCheckType %d", bp=
-_check);
-+                    abort();
-+                }
-+            }
-+        } while (bp !=3D NULL);
-+
-         if (num_insns =3D=3D max_insns && (tb->cflags & CF_LAST_IO)) {
              gen_io_start(cpu_env);
          }
+=20
+-        db->pc_next =3D disas_insn(env, dc, db->pc_next);
++        db->pc_next =3D i386_trblock_disas_insn(db, cpu);
+         /* stop translation if indicated */
+         if (db->is_jmp) {
+             break;
+         }
+         /* if single step mode, we generate only one instruction and
+            generate an exception */
+-        /* if irq were inhibited with HF_INHIBIT_IRQ_MASK, we clear
+-           the flag and abort the translation to give the irqs a
+-           change to be happen */
+-        if (dc->tf || db->singlestep_enabled ||
+-            (db->tb->flags & HF_INHIBIT_IRQ_MASK)) {
+-            gen_jmp_im(db->pc_next - dc->cs_base);
+-            gen_eob(dc);
+-            break;
+-        }
+-        /* Do not cross the boundary of the pages in icount mode,
+-           it can cause an exception. Do it only when boundary is
+-           crossed by the first instruction in the block.
+-           If current instruction already crossed the bound - it's ok,
+-           because an exception hasn't stopped this code.
+-         */
+-        if ((tb->cflags & CF_USE_ICOUNT)
+-            && ((db->pc_next & TARGET_PAGE_MASK)
+-                !=3D ((db->pc_next + TARGET_MAX_INSN_SIZE - 1) & TARGET_=
+PAGE_MASK)
+-                || (db->pc_next & ~TARGET_PAGE_MASK) =3D=3D 0)) {
++        if (db->singlestep_enabled) {
+             gen_jmp_im(db->pc_next - dc->cs_base);
+             gen_eob(dc);
+             break;
+         }
+         /* if too long translation, stop generation too */
+         if (tcg_op_buf_full() ||
+-            (db->pc_next - db->pc_first) >=3D (TARGET_PAGE_SIZE - 32) ||
+             num_insns >=3D max_insns) {
+             gen_jmp_im(db->pc_next - dc->cs_base);
+             gen_eob(dc);
