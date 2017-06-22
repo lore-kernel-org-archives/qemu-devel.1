@@ -1,30 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dNyTt-0005CU-Ax
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:32:55 -0400
+	(envelope-from <david@redhat.com>) id 1dNyci-0000Db-IR
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:42:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dNyTq-0005kU-8B
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:32:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58166)
+	(envelope-from <david@redhat.com>) id 1dNycf-0000Vs-Gh
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:42:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41856)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dNyTq-0005kH-2n
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:32:50 -0400
-References: <1498040401-16361-1-git-send-email-yang.zhong@intel.com>
-	<1498040401-16361-2-git-send-email-yang.zhong@intel.com>
-	<2c901b45-afb8-d807-19e9-14befbfdc3fd@redhat.com>
-	<1082632418.11149315.1498112575500.JavaMail.zimbra@redhat.com>
-	<666c9b73-843f-3669-fe1d-69b5082b2757@redhat.com>
-	<8515dc9c-f632-cefa-fdf2-9fcbc8f962de@redhat.com>
-	<ae617424-4267-2a12-1379-a9779b32d315@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5eccb12a-cad3-95cb-6a6c-6f930e39f4eb@redhat.com>
-Date: Thu, 22 Jun 2017 11:32:46 +0200
-MIME-Version: 1.0
-In-Reply-To: <ae617424-4267-2a12-1379-a9779b32d315@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 01/15] configure: add the disable-tcg option
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dNycf-0000Vg-Ar
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:41:57 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Thu, 22 Jun 2017 11:41:48 +0200
+Message-Id: <20170622094151.28633-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/3] target/s390x: implement idte and
+ improve ipte
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,47 +22,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Yang Zhong <yang.zhong@intel.com>, anthony xu <anthony.xu@intel.com>, qemu-devel@nongnu.org, a rigo <a.rigo@virtualopensystems.com>
+To: qemu-devel@nongnu.org
+Cc: rth@twiddle.net, agraf@suse.de, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, david@redhat.com
 
+By adding idte, we are now able to expose the DAT-enhancement facility
+to our guest. Also, properly simulate and expose the local-tlb-clearing
+facility.
 
+To improve the TLB flushing, we will have to remember each used table (or
+at least a hash!) for each tlb entry, just like real HW does.
 
-On 22/06/2017 11:30, Thomas Huth wrote:
-> On 22.06.2017 11:26, Paolo Bonzini wrote:
->>
->>
->> On 22/06/2017 08:33, Thomas Huth wrote:
->>> On 22.06.2017 08:22, Paolo Bonzini wrote:
->>>>
->>>>> On 21.06.2017 12:19, Yang Zhong wrote:
->>>>>> Add the disable-tcg option into configure and echo CONFIG_TCG=y into
->>>>>> $config_target_mak. The default tcg is enabled for all build. If tcg
->>>>>> is disabled in the build, only i386|x86_64 softmmu option can be disabled,
->>>>>> other softmmu of tagets and users build defaultly enabled the tcg.
->>>>> Why do you want to limit this disablement to x86 only? There are also
->>>>> other architectures that support KVM (ARM, PPC, MIPS), so disabling TCG
->>>>> might be possible there, too. So I think it might be better to check
->>>>> whether KVM is possible instead.
->>>>
->>>> You need to be careful and not use any helper from e.g. KVM or migration
->>>> code.  So I would be very surprised if any other architecture compiles
->>>> with --disable-tcg.
->>>
->>> OK, fair, but we finally might want to get there, so I think we should
->>> allow the parameter in the configure script for other architectures,
->>> too, and then fix the bugs once we can try it out.
->>
->> I think it's the other way round---when someone wants to fix it, they
->> should add their architecture to the list of targets that support
->> --disable-tcg.  "./configure <anything>", as a goal, should fail
->> immediately if make won't succeed; compilation errors are always a worse
->> experience.
-> 
-> Fine for me, too, but then the configure script should exit with a
-> proper error message when the user tried to specify --disable-tcg on a
-> non-x86 architecture. If I get the current patch right, it silently
-> falls back to CONFIG_TCG=y instead, which is IMHO also a bad experience.
+This allows me to start an upstream kernel (having also the mvcos patch
+applied) compiled for z9 using:
 
-Yes, I agree.  Thanks for reviewing the patch.
+qemu-system-s390x ... -cpu qemu,mvcos=on,stfle=on,ldisp=on,ldisphp=on,\
+                           eimm=on,stckf=on,csst=on,csst2=on,ginste=on,\
+                           exrl=on,dateh=on,ltlbc=on
 
-Paolo
+Linux will detect the DAT-enhancement facility and use idte+cspg.
+
+v1 -> v2:
+- Allow to enable the DAT-enhancement facility.
+- Fix wrong register in idte.
+- Simply set m4 to zero in case local-tlb-clearing is not enabled.
+
+David Hildenbrand (3):
+  target/s390x: Indicate and check for local tlb clearing
+  target/s390x: Improve heuristic for ipte
+  target/s390x: Implement idte instruction
+
+ target/s390x/cpu_models.c  |  2 ++
+ target/s390x/helper.h      |  1 +
+ target/s390x/insn-data.def |  2 ++
+ target/s390x/mem_helper.c  | 78 +++++++++++++++++++++++++++++++++++++++-------
+ target/s390x/translate.c   | 21 ++++++++++++-
+ 5 files changed, 92 insertions(+), 12 deletions(-)
+
+-- 
+2.9.4
