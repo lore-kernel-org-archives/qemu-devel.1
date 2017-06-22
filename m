@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1dNrYV-0002GG-Ky
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 22:09:12 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1dNsGx-0002vN-BS
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 22:55:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1dNrYU-0002FU-Qh
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 22:09:11 -0400
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:33843)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1dNrYU-0002FC-M6
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 22:09:10 -0400
-Received: by mail-ot0-x242.google.com with SMTP id p48so320013otc.1
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 19:09:10 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170621162833.GA22745@potion>
-References: <1498014889-52658-1-git-send-email-wanpeng.li@hotmail.com>
-	<20170621162833.GA22745@potion>
-From: Wanpeng Li <kernellwp@gmail.com>
-Date: Thu, 22 Jun 2017 10:09:09 +0800
-Message-ID: <CANRm+Cz3BxszRnXEEUC222E6Hb6yEa63CJcHDbP0EFY=EeNDSA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] KVM: Add async pf flag to
- KVM_GET/SET_VCPU_EVENTS interface
+	(envelope-from <programmingkidx@gmail.com>) id 1dNsGw-00086c-GG
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 22:55:07 -0400
+In-Reply-To: <CAFEAcA85obZ5eD7Lpydi4vH4DVat6xpaskVumodv2u1Hzz6CCg@mail.gmail.com>
+References: <0F376E9C-2D4B-4D79-B3D4-24F73FD61446@gmail.com>
+	<20170508221304.y36owezwla7sc6ss@aurel32.net>
+	<BB3E29F1-8BBB-407B-AAC8-795E9718CF5E@gmail.com>
+	<20170508225007.2duqxlo5ab2aenpl@aurel32.net>
+	<alpine.BSF.2.20.1705091148560.78100@zero.eik.bme.hu>
+	<F3D7AC88-099F-432D-B46F-97F2A6F7B0E3@gmail.com>
+	<f2644920-8eda-e768-adee-71db36ea2fa3@amsat.org>
+	<CAFEAcA-72bvtKsPHttUizYj8EvZJDfjUda7CeZe-tpRk73+NXw@mail.gmail.com>
+	<CE257476-FBA4-4579-A558-495797786922@gmail.com>
+	<CAFEAcA85obZ5eD7Lpydi4vH4DVat6xpaskVumodv2u1Hzz6CCg@mail.gmail.com>
+Mime-Version: 1.0 (Apple Message framework v753.1)
+Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
+Message-Id: <4BD44623-AD16-4D5D-BF51-15521035E974@gmail.com>
+Content-Transfer-Encoding: 7bit
+From: G 3 <programmingkidx@gmail.com>
+Date: Wed, 21 Jun 2017 22:54:56 -0400
+Subject: Re: [Qemu-devel] [Qemu-ppc] Floating point unit bugs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +31,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Wanpeng Li <wanpeng.li@hotmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?ISO-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, BALATON Zoltan <balaton@eik.bme.hu>, "qemu-ppc@nongnu.org list:PowerPC" <qemu-ppc@nongnu.org>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-2017-06-22 0:28 GMT+08:00 Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>:
-> 2017-06-20 20:14-0700, Wanpeng Li:
->> From: Wanpeng Li <wanpeng.li@hotmail.com>
+
+On Jun 21, 2017, at 12:28 PM, Peter Maydell wrote:
+
+> On 21 June 2017 at 17:27, G 3 <programmingkidx@gmail.com> wrote:
+>> On Jun 21, 2017, at 12:20 PM, Peter Maydell wrote:
+>>> We don't yet have any mechanism for having tests that need to
+>>> be compiled for the target architecture, do we?
 >>
->> This patch adds async pf flag to KVM_GET/SET_VCPU_EVENTS interface.
 >>
->> Signed-off-by: Wanpeng Li <wanpeng.li@hotmail.com>
->> ---
->> diff --git a/linux-headers/asm-x86/kvm.h b/linux-headers/asm-x86/kvm.h
->> @@ -300,6 +301,7 @@ struct kvm_vcpu_events {
->>               __u8 has_error_code;
->>               __u8 pad;
->>               __u32 error_code;
->> +             bool async_page_fault;
->
-> Touching userspace interfaces is always a major fun ...
->
-> You must not change the layout of an existing structure.  You can try to
-> reuse the pad and hope that some userspace didn't check it for 0.
-> (I think it's a decent compromise between safety and sanity.)
-
-Thanks for pointing out. Just fixes it in v2.
-
-Regards,
-Wanpeng Li
-
->
->>       } exception;
->>       struct {
->>               __u8 injected;
->> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->> @@ -2493,6 +2493,7 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int le=
-vel)
->>      events.exception.has_error_code =3D env->has_error_code;
->>      events.exception.error_code =3D env->error_code;
->>      events.exception.pad =3D 0;
->> +    events.exception.async_page_fault =3D env->async_page_fault;
+>> I don't know about that but I do know we have image files that can  
+>> be booted
+>> in various guest. These image files could include tests like the  
+>> floating
+>> point test.
 >>
->>      events.interrupt.injected =3D (env->interrupt_injected >=3D 0);
+>> Here is the link to the test images page:
+>> http://wiki.qemu.org/Testing/System_Images
 >
-> Old QEMUs would break below this point, because interrupt.injected used
-> to be where exception.async_page_fault is.
->
->>      events.interrupt.nr =3D env->interrupt_injected;
+> Yes -- those are almost all very out of date, not reproducible
+> at all and don't cover very many of our systems, because we
+> don't have a good mechanism for writing tests that need
+> to be built for the target architecture. I'd like us to
+> have a setup so that it's easy to say "just add a new test",
+> rather than accumulating more random images on the wiki...
+
+The advantage a test image would have is the user doesn't have to  
+worry about compiling a test using a cross compiler. Everything the  
+user would need to test QEMU is already inside the image file  
+(hopefully).
+
+Is the setup you want something like running 'make test' ? I imagine  
+binary files included with QEMU would test the emulated CPU. There  
+would be no need to cross compile anything. 
