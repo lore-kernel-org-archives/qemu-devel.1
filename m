@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dNwXl-0008T9-6Z
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 03:28:45 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dNwcE-0002E5-3v
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 03:33:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dNwXk-0002np-CJ
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 03:28:45 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:35958)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dNwXk-0002mk-5m
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 03:28:44 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id c11so10919046wrc.3
-	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 00:28:44 -0700 (PDT)
-MIME-Version: 1.0
+	(envelope-from <kraxel@redhat.com>) id 1dNwcA-0004Yu-3e
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 03:33:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35840)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dNwc9-0004Yn-TY
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 03:33:18 -0400
+Message-ID: <1498116800.25651.3.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 22 Jun 2017 09:33:20 +0200
 In-Reply-To: <20170622033231.19344-22-f4bug@amsat.org>
 References: <20170622033231.19344-1-f4bug@amsat.org>
 	<20170622033231.19344-22-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 22 Jun 2017 08:28:22 +0100
-Message-ID: <CAFEAcA9Vkg7hN8nipTaMyA0r9w7=E5VjQQ2d5vZ+A6NtVT1GGQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [RFC PATCH v2 21/21] ui/vnc: silent unuseful OSX
  clang warning
@@ -31,25 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On 22 June 2017 at 04:32, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
-te:
->     ui/vnc.c:3945:20: warning: 'sasl_server_init' is deprecated: first de=
-precated in OS X 10.11 [-Wdeprecated-declarations]
->         if ((saslErr =3D sasl_server_init(NULL, "qemu")) !=3D SASL_OK) {
->                        ^
->     /usr/include/sasl/sasl.h:1016:17: note: 'sasl_server_init' has been e=
-xplicitly marked deprecated here
->     LIBSASL_API int sasl_server_init(const sasl_callback_t *callbacks,
->                     ^
+diff --git a/ui/Makefile.objs b/ui/Makefile.objs
+> index 3369451285..08fb573a48 100644
+> --- a/ui/Makefile.objs
+> +++ b/ui/Makefile.objs
+> @@ -6,6 +6,14 @@ vnc-obj-y +=3D vnc-auth-vencrypt.o
+> =C2=A0vnc-obj-$(CONFIG_VNC_SASL) +=3D vnc-auth-sasl.o
+> =C2=A0vnc-obj-y +=3D vnc-ws.o
+> =C2=A0vnc-obj-y +=3D vnc-jobs.o
+> +ifeq ($(CONFIG_VNC_SASL),y)
+> +# silent OSX SASL warnings (from https://stackoverflow.com/a/7406994
+> ):
+> +# because OpenSSL doesn=E2=80=99t offer API compatibility between vers=
+ions,
+> [...] Apple
+> +# can't provide security updates without breaking existing apps, so
+> is migrating
+> +# from OpenSSL to Common Crypto.
+> +vnc.o-cflags :=3D -Wno-deprecated-declarations
+> +vnc-auth-sasl.o-cflags :=3D -Wno-deprecated-declarations
+> +endif
 
-Mmm, I've been vaguely wondering what to do about those warnings
-for a while. The difficulty is that applying -Wno-deprecated-declarations
-silences all deprecation warnings, not just the SASL ones, so we
-lose a bit of warning coverage. Maybe that's just a hit we have
-to take, though.
+Hmm, does clang understand "#pragma GCC diagnostic" ?
 
-thanks
--- PMM
+If so, then this can be done in in the code not the makefiles, and also
+selectively for osx only.
+
+See include/ui/gtk.h for an example.
+
+cheers,
+  Gerd
