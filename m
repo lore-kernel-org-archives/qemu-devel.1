@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dO6wd-00015P-Od
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 14:35:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1dO72P-0002of-Nv
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 14:41:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dO6wZ-00019T-Ph
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 14:35:07 -0400
-Date: Thu, 22 Jun 2017 19:34:58 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170622183457.GG2100@work-vm>
-References: <149814756006.27338.8723356702388175951.stgit@bahia>
-	<CAFEAcA8yqb8ykP8nCnoVNQUZd851RhOLFf2TfkHZmL2je+pP=Q@mail.gmail.com>
-	<20170622184255.2d44e3bd@bahia.lab.toulouse-stg.fr.ibm.com>
-	<87injo6jla.fsf@secure.mitica>
-	<CAFEAcA-g-=AkH3t8jOTFY_9zA6ECS57-3MS=cHPb+Q6sePzNsw@mail.gmail.com>
-	<20170622172555.GE2100@work-vm>
-	<20170622194649.6d251753@bahia.lab.toulouse-stg.fr.ibm.com>
-	<20170622175012.GF2100@work-vm>
-	<fb2c7124-2d3f-6684-e2f2-265bfb3eb6da@redhat.com>
-	<CAFEAcA-A=UrkKjLmVOcFA_d4rMW1AJwGffE4r2Uy6fw++XFF6w@mail.gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1dO72L-0002wh-OQ
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 14:41:05 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40344)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dO72L-0002wT-I5
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 14:41:01 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dO72K-0006XL-By
+	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 18:41:00 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4433B2E8199
+	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 18:41:00 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-A=UrkKjLmVOcFA_d4rMW1AJwGffE4r2Uy6fw++XFF6w@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] Separate function types from opaque types
- in include/qemu/typedefs.h
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 22 Jun 2017 18:32:07 -0000
+From: Anatol Pomozov <1699867@bugs.launchpad.net>
+Reply-To: Bug 1699867 <1699867@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <149815632727.3205.9408286229805240743.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1699867] [NEW] x86_64 qemu crashes at far call
+ into long-mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,45 +36,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, Greg Kurz <groug@kaod.org>, QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> On 22 June 2017 at 19:08, Thomas Huth <thuth@redhat.com> wrote:
-> > On 22.06.2017 19:50, Dr. David Alan Gilbert wrote:
-> >> Could do; I'm just not finding tiny header files with one or
-> >> two entries each that useful.
-> 
-> Well, it means that the bulk of code that doesn't care about the
-> types doesn't get its compilation fractionally slowed by having
-> to parse the typedef anyway. In general I think we're drifting
-> towards "have each .c file get fewer things automatically" rather
-> than otherwise (eg more finely focused files rather than stuffing
-> everything into qemu-common.h).
+Public bug reported:
 
-At the cost of things getting fractionally slower by including lots
-more tiny headers.
+I am experimenting with this OS https://github.com/phil-opp/blog_os and
+spotted a weird behavior with qemu.
 
-I generally agree in the case where there's a useful chunk,
-but when it's down to one or two definitions I don't see the point.
+I am looking at code that does transition from 32bit mode to 64bit mode.
+Right now it does 'jmp $SELECTOR,64bitfunction'. https://github.com
+/phil-
+opp/blog_os/blob/557c6a58ea11e31685b9d014d307002d64df5c22/src/arch/x86_64/b=
+oot.asm#L32
 
-> > Do we really need these function typedefs at all? IMHO it's quite ugly
-> > to hide such things in a typedef unless it is really necessary (and in
-> > this case, it does not seem to be really necessary since it is only used
-> > in a few places). So what about simply removing the typedefs in this case?
-> 
-> I find function typedefs much more readable than having the
-> function-types inline in function arguments and the like.
-> 
-> This is all fairly rapidly heading into bikeshed territory
-> though -- in the final analysis I don't think it matters
-> much what we do.
+This code works fine with qemu/kvm/vmware.
 
-Agreed.
+To transition from 32 to 64 bit code it is possible to use 'call'
+operation. So I am trying to replace that code with 'call
+$SELECTOR,64bitfunction'. It works fine with kvm and wmware. But it
+fails with Qemu emulation. See the interrup debug log attached. qemu
+crashes at 10302c (far call mnemonic).
 
-Dave
 
-> thanks
-> -- PMM
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+  103016:       e8 18 00 00 00          callq  103033 <set_up_page_tables>
+  10301b:       e8 5c 00 00 00          callq  10307c <enable_paging>
+  103020:       e8 ec 00 00 00          callq  103111 <set_up_SSE>
+  103025:       0f 01 15 28 00 10 00    lgdt   0x100028(%rip)        # 2030=
+54 <GCC_except_table2+0xdb5f8>
+  10302c:       9a                      (bad)  =
+
+  10302d:       40 31 10                rex xor %edx,(%rax)
+  103030:       00 08                   add    %cl,(%rax)
+
+
+As the code works at hardware I expect it to work with qemu. Thus current q=
+emu behavior looks like a bug.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Attachment added: "Debug log for qemu crash at far call"
+   https://bugs.launchpad.net/bugs/1699867/+attachment/4901095/+files/debug=
+.log
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1699867
+
+Title:
+  x86_64 qemu crashes at far call into long-mode
+
+Status in QEMU:
+  New
+
+Bug description:
+  I am experimenting with this OS https://github.com/phil-opp/blog_os
+  and spotted a weird behavior with qemu.
+
+  I am looking at code that does transition from 32bit mode to 64bit
+  mode. Right now it does 'jmp $SELECTOR,64bitfunction'.
+  https://github.com/phil-
+  opp/blog_os/blob/557c6a58ea11e31685b9d014d307002d64df5c22/src/arch/x86_64=
+/boot.asm#L32
+
+  This code works fine with qemu/kvm/vmware.
+
+  To transition from 32 to 64 bit code it is possible to use 'call'
+  operation. So I am trying to replace that code with 'call
+  $SELECTOR,64bitfunction'. It works fine with kvm and wmware. But it
+  fails with Qemu emulation. See the interrup debug log attached. qemu
+  crashes at 10302c (far call mnemonic).
+
+  =
+
+    103016:       e8 18 00 00 00          callq  103033 <set_up_page_tables>
+    10301b:       e8 5c 00 00 00          callq  10307c <enable_paging>
+    103020:       e8 ec 00 00 00          callq  103111 <set_up_SSE>
+    103025:       0f 01 15 28 00 10 00    lgdt   0x100028(%rip)        # 20=
+3054 <GCC_except_table2+0xdb5f8>
+    10302c:       9a                      (bad)  =
+
+    10302d:       40 31 10                rex xor %edx,(%rax)
+    103030:       00 08                   add    %cl,(%rax)
+
+  =
+
+  As the code works at hardware I expect it to work with qemu. Thus current=
+ qemu behavior looks like a bug.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1699867/+subscriptions
