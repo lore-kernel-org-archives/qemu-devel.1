@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dNzOS-0001Mi-CK
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 06:31:21 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dNzQp-0002gR-FJ
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 06:33:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dNzOP-0000Ez-79
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 06:31:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36094)
+	(envelope-from <dgilbert@redhat.com>) id 1dNzQk-0001rp-Ff
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 06:33:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57982)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dNzOO-0000Eq-Vt
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 06:31:17 -0400
-References: <CAFEAcA90vjbr=CM9i9m7-PdN0NB=MV8W0+wsG9UrNNR+KENsmA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d947c58b-d388-c432-0f40-b019af88c60a@redhat.com>
-Date: Thu, 22 Jun 2017 12:31:11 +0200
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dNzQk-0001rT-8I
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 06:33:42 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5C2993345A3
+	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 10:33:41 +0000 (UTC)
+Date: Thu, 22 Jun 2017 11:33:34 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170622103333.GA2624@work-vm>
+References: <20170621102005.18701-1-quintela@redhat.com>
+	<20170621102005.18701-4-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA90vjbr=CM9i9m7-PdN0NB=MV8W0+wsG9UrNNR+KENsmA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] qemu_chr_fe_add_watch interaction with VM
- start/stop/migrate
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170621102005.18701-4-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] migration: Create
+ load_setup()/cleanup() methods
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,66 +34,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, kwolf@redhat.com, stefanha@redhat.com
 
+* Juan Quintela (quintela@redhat.com) wrote:
+> We need to do things at load time and at cleanup time.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> 
+> --
+> 
+> Move the printing of the error message so we can print the device
+> giving the error.
+> ---
+>  include/migration/register.h |  2 ++
+>  migration/savevm.c           | 44 ++++++++++++++++++++++++++++++++++++++++++++
+>  migration/trace-events       |  2 ++
+>  3 files changed, 48 insertions(+)
+> 
+> diff --git a/include/migration/register.h b/include/migration/register.h
+> index 938ea2b..a0f1edd 100644
+> --- a/include/migration/register.h
+> +++ b/include/migration/register.h
+> @@ -39,6 +39,8 @@ typedef struct SaveVMHandlers {
+>                                uint64_t *non_postcopiable_pending,
+>                                uint64_t *postcopiable_pending);
+>      LoadStateHandler *load_state;
+> +    int (*load_setup)(QEMUFile *f, void *opaque);
+> +    int (*load_cleanup)(void *opaque);
+>  } SaveVMHandlers;
+>  
+>  int register_savevm_live(DeviceState *dev,
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 7d273f9..a0733f9 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1923,6 +1923,44 @@ qemu_loadvm_section_part_end(QEMUFile *f, MigrationIncomingState *mis)
+>      return 0;
+>  }
+>  
+> +static int qemu_loadvm_state_setup(QEMUFile *f)
+> +{
+> +    SaveStateEntry *se;
+> +    int ret;
+> +
+> +    trace_loadvm_state_setup();
+> +    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +        if (!se->ops || !se->ops->load_setup) {
+> +            continue;
+> +        }
+> +        if (se->ops && se->ops->is_active) {
+> +            if (!se->ops->is_active(se->opaque)) {
+> +                continue;
+> +            }
+> +        }
+> +
+> +        ret = se->ops->load_setup(f, se->opaque);
+> +        if (ret < 0) {
+> +            qemu_file_set_error(f, ret);
+> +            error_report("Load state of device %s failed", se->idstr);
+> +            return ret;
+> +        }
+> +    }
+> +    return 0;
+> +}
+> +
+> +static void qemu_loadvm_state_cleanup(void)
+> +{
+> +    SaveStateEntry *se;
+> +
+> +    trace_loadvm_state_cleanup();
+> +    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +        if (se->ops && se->ops->load_cleanup) {
+> +            se->ops->load_cleanup(se->opaque);
+> +        }
+> +    }
+> +}
+> +
+>  static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
+>  {
+>      uint8_t section_type;
+> @@ -1995,6 +2033,11 @@ int qemu_loadvm_state(QEMUFile *f)
+>          return -ENOTSUP;
+>      }
+>  
+> +
+> +    if (qemu_loadvm_state_setup(f) != 0) {
+> +        return -EINVAL;
+> +    }
+> +
+>      if (!savevm_state.skip_configuration || enforce_config_section()) {
+>          if (qemu_get_byte(f) != QEMU_VM_CONFIGURATION) {
+>              error_report("Configuration section missing");
+> @@ -2058,6 +2101,7 @@ int qemu_loadvm_state(QEMUFile *f)
+>          }
+>      }
+>  
+> +    qemu_loadvm_state_cleanup();
 
+Where does the equivalent happen for postcopy?
+Do you need to add a call at the bottom of postcopy_ram_listen_thread?
 
-On 22/06/2017 12:09, Peter Maydell wrote:
-> For instance, suppose my UART tries to write to the chardev but
-> can't, so it registers a callback with qemu_chr_fe_add_watch().
-> Then the user stops the VM. Does the chardev UI guarantee that
-> my callback won't get called until the user restarts the VM,
-> or does my callback function have to do something to say "don't
-> actually update the emulation state if we're stopped"?
-> If the user then restarts the VM, do I need to do something to
-> retry the chardev write?
+Dave
 
-Currently, chardev code runs normally between stop and start.
-
-> For migration, if we're migrating in the state where I have a
-> pending character I'd like to write to the chardev, what do I need
-> to do on the destination side? Do I need to call qemu_chr_fe_add_watch
-> in the post-load function, or is this too early and I need to do
-> something to call it when the destination VM is actually restarted?
-
-Post-load is fine.  There could be interesting interactions with
-interrupts, but these are not specific to character device backends
-(real-time clocks are another example).  So boards should create
-interrupt controllers and distributors as soon as possible.
-
-On the save side, when migration is about to finish, the mig thread
-takes the I/O thread lock, so chardevs cannot run anymore at that point.
-
-> More generally, am I guaranteed that my qemu_chr_fe_add_watch()
-> callbacks are only called with the iothread mutex held (ie that
-> I don't need to worry about races between device model functions
-> called from the guest and the callbacks) ?
-
-Yes.  Chardev backends can be written to outside the iothread mutex, but
-callbacks are always protected by the iothread mutex unless mentioned
-specifically by the documentation and even then, only if you run in your
-own IOThread.
-
-> There are I think similar questions about the read handler and event
-> handler functions that every UART model registers with the
-> qemu_chr_fe_set_handlers function: are those only called when the
-> VM is actually running, or is special casing required for "called
-> when the VM is stopped?".
-
-No special casing is currently done by the other backends.  It seems to
-work fine in practice...
-
-> And one that I think is true but we don't document: is it the case
-> that the chardev layer guarantees not to call the chardev's IOReadHandl=
-er
-> unless its IOCanReadHandler has returned OK?
-
-Yes, and no more bytes than the can_read handler has told him to return.
-
-Paolo
-
-> These all seem like things it would be nice to have documented in
-> include/chardev/char-fe.h :-)  What I would like the answer to be
-> (as far as is possible) is "the chardev layer handles these issues
-> so the frontends don't need to"...
+>      cpu_synchronize_all_post_init();
+>  
+>      return ret;
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 9669e94..cb2c4b5 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -7,6 +7,8 @@ qemu_loadvm_state_section_partend(uint32_t section_id) "%u"
+>  qemu_loadvm_state_post_main(int ret) "%d"
+>  qemu_loadvm_state_section_startfull(uint32_t section_id, const char *idstr, uint32_t instance_id, uint32_t version_id) "%u(%s) %u %u"
+>  qemu_savevm_send_packaged(void) ""
+> +loadvm_state_setup(void) ""
+> +loadvm_state_cleanup(void) ""
+>  loadvm_handle_cmd_packaged(unsigned int length) "%u"
+>  loadvm_handle_cmd_packaged_main(int ret) "%d"
+>  loadvm_handle_cmd_packaged_received(int ret) "%d"
+> -- 
+> 2.9.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
