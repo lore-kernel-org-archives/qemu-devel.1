@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dNz3T-00022k-Vl
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 06:09:41 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dNz9k-0003rS-5b
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 06:16:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dNz3S-0000Ho-Ru
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 06:09:39 -0400
-Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:36128)
+	(envelope-from <alex.bennee@linaro.org>) id 1dNz9e-0002jI-23
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 06:16:08 -0400
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:35451)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dNz3S-0000Gr-LA
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 06:09:38 -0400
-Received: by mail-wr0-x22f.google.com with SMTP id c11so16469343wrc.3
-	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 03:09:38 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dNz9d-0002iy-RI
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 06:16:01 -0400
+Received: by mail-wr0-x234.google.com with SMTP id k67so16658010wrc.2
+	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 03:16:01 -0700 (PDT)
+References: <20170622033231.19344-1-f4bug@amsat.org>
+	<20170622033231.19344-10-f4bug@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170622033231.19344-10-f4bug@amsat.org>
+Date: Thu, 22 Jun 2017 11:16:44 +0100
+Message-ID: <87d19wtjhv.fsf@linaro.org>
 MIME-Version: 1.0
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 22 Jun 2017 11:09:16 +0100
-Message-ID: <CAFEAcA90vjbr=CM9i9m7-PdN0NB=MV8W0+wsG9UrNNR+KENsmA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] qemu_chr_fe_add_watch interaction with VM
- start/stop/migrate
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 09/21] travis: enable multiple caching
+ features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +31,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-Hi; I'm currently writing a UART device model, and I want to make
-it avoid using the deprecated qemu_chr_fe_write_all() (in the same
-way that the hw/char/cadence_uart.c code does, by using
-qemu_chr_fe_write() and then registering a callback with
-qemu_chr_fe_add_watch() if the write doesn't manage to send data).
 
-I have some code that seems to work, but I'm not sure about how the
-chardev frontend callbacks interact with VM start, stop and migration.
+Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
 
-For instance, suppose my UART tries to write to the chardev but
-can't, so it registers a callback with qemu_chr_fe_add_watch().
-Then the user stops the VM. Does the chardev UI guarantee that
-my callback won't get called until the user restarts the VM,
-or does my callback function have to do something to say "don't
-actually update the emulation state if we're stopped"?
-If the user then restarts the VM, do I need to do something to
-retry the chardev write?
+> (this eases git workflow)
+>
+> see
+> https://docs.travis-ci.com/user/caching#enabling-multiple-caching-features
 
-For migration, if we're migrating in the state where I have a
-pending character I'd like to write to the chardev, what do I need
-to do on the destination side? Do I need to call qemu_chr_fe_add_watch
-in the post-load function, or is this too early and I need to do
-something to call it when the destination VM is actually restarted?
+I wonder if we could replace our submodule pre-seed hack with a native
+Travis version? And now I see you do that in a later patch ;-)
 
-More generally, am I guaranteed that my qemu_chr_fe_add_watch()
-callbacks are only called with the iothread mutex held (ie that
-I don't need to worry about races between device model functions
-called from the guest and the callbacks) ?
+>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-There are I think similar questions about the read handler and event
-handler functions that every UART model registers with the
-qemu_chr_fe_set_handlers function: are those only called when the
-VM is actually running, or is special casing required for "called
-when the VM is stopped?".
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 
-And one that I think is true but we don't document: is it the case
-that the chardev layer guarantees not to call the chardev's IOReadHandler
-unless its IOCanReadHandler has returned OK?
+> ---
+>  .travis.yml | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/.travis.yml b/.travis.yml
+> index 61394b4764..be28e0642c 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -4,7 +4,8 @@ python:
+>    - "2.4"
+>  compiler:
+>    - gcc
+> -cache: ccache
+> +cache:
+> +  ccache: true
+>  addons:
+>    apt:
+>      packages:
 
-These all seem like things it would be nice to have documented in
-include/chardev/char-fe.h :-)  What I would like the answer to be
-(as far as is possible) is "the chardev layer handles these issues
-so the frontends don't need to"...
 
-thanks
--- PMM
+--
+Alex Bennée
