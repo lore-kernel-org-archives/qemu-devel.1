@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dNqBG-0000OP-I0
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 20:41:07 -0400
+	(envelope-from <xiechanglong.d@gmail.com>) id 1dNqfw-0000Dl-MP
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 21:12:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dNqBF-0002XW-Jn
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 20:41:06 -0400
-Date: Wed, 21 Jun 2017 17:40:55 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <20170621125249.8805-2-paul.durrant@citrix.com>
-Message-ID: <alpine.DEB.2.10.1706211740490.12819@sstabellini-ThinkPad-X260>
-References: <20170621125249.8805-1-paul.durrant@citrix.com>
-	<20170621125249.8805-2-paul.durrant@citrix.com>
+	(envelope-from <xiechanglong.d@gmail.com>) id 1dNqfv-00066E-Rt
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 21:12:48 -0400
+References: <7ec58051-d835-a485-7578-2022351c9712@gmail.com>
+	<20170619072727.GA6113@noname.redhat.com>
+	<6324ce25-8fa8-9204-d15b-32f20fb71e4b@gmail.com>
+	<20170619104915.GC6113@noname.redhat.com>
+From: Xie Changlong <xiechanglong.d@gmail.com>
+Message-ID: <1295c586-859f-23d5-67c5-e1d730ef63b5@gmail.com>
+Date: Thu, 22 Jun 2017 09:12:03 +0800
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] xen-disk: only advertize
- feature-persistent if grant copy is not available
+In-Reply-To: <20170619104915.GC6113@noname.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Question] How can we confirm hot-plug disk
+ succesfully?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,66 +26,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>
-Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, qemu-block@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, armbru@redhat.com
 
-On Wed, 21 Jun 2017, Paul Durrant wrote:
-> If grant copy is available then it will always be used in preference to
-> persistent maps. In this case feature-persistent should not be advertized
-> to the frontend, otherwise it may needlessly copy data into persistently
-> granted buffers.
+在 6/19/2017 6:49 PM, Kevin Wolf 写道:
+>> 'info block' shows nothing, but we can't add drive who's id
+>> is'drive-virtio-disk1' too.
+> Yes, the old BlockBackend is only fully freed when the guest actually
+> unplugs the device. Specifically, we would have to free the QemuOpts
+> in DriveInfo that keeps the ID reserved. Currently, it is only freed
+> when the BlockBackend is destroyed:
 > 
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-
-Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
-
-
-> ---
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> ---
->  hw/block/xen_disk.c | 15 ++++++++-------
->  1 file changed, 8 insertions(+), 7 deletions(-)
+>      blockdev_auto_del()
+>          blk_unref()
+>              blk_delete()
+>                  drive_info_del()
 > 
-> diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
-> index 3a22805fbc..9b06e3aa81 100644
-> --- a/hw/block/xen_disk.c
-> +++ b/hw/block/xen_disk.c
-> @@ -1023,11 +1023,18 @@ static int blk_init(struct XenDevice *xendev)
->  
->      blkdev->file_blk  = BLOCK_SIZE;
->  
-> +    blkdev->feature_grant_copy =
-> +                (xengnttab_grant_copy(blkdev->xendev.gnttabdev, 0, NULL) == 0);
-> +
-> +    xen_pv_printf(&blkdev->xendev, 3, "grant copy operation %s\n",
-> +                  blkdev->feature_grant_copy ? "enabled" : "disabled");
-> +
->      /* fill info
->       * blk_connect supplies sector-size and sectors
->       */
->      xenstore_write_be_int(&blkdev->xendev, "feature-flush-cache", 1);
-> -    xenstore_write_be_int(&blkdev->xendev, "feature-persistent", 1);
-> +    xenstore_write_be_int(&blkdev->xendev, "feature-persistent",
-> +                          !blkdev->feature_grant_copy);
->      xenstore_write_be_int(&blkdev->xendev, "info", info);
->  
->      blk_parse_discard(blkdev);
-> @@ -1202,12 +1209,6 @@ static int blk_connect(struct XenDevice *xendev)
->  
->      xen_be_bind_evtchn(&blkdev->xendev);
->  
-> -    blkdev->feature_grant_copy =
-> -                (xengnttab_grant_copy(blkdev->xendev.gnttabdev, 0, NULL) == 0);
-> -
-> -    xen_pv_printf(&blkdev->xendev, 3, "grant copy operation %s\n",
-> -                  blkdev->feature_grant_copy ? "enabled" : "disabled");
-> -
->      xen_pv_printf(&blkdev->xendev, 1, "ok: proto %s, ring-ref %d, "
->                    "remote port %d, local port %d\n",
->                    blkdev->xendev.protocol, blkdev->ring_ref,
-> -- 
-> 2.11.0
+> We can't free the DriveInfo earlier because it's still needed while the
+> guest device is still alive.
 > 
+> I'm not sure, but it may be possible to free just the QemuOpts in
+> monitor_remove_blk(), so that the ID can immediately be reused.
+> 
+> Markus, would you know?
+> 
+
+Hi, all. Any ideas?
+
+>> There is a more serious situation, we
+>> could*never*  destory device memory with 'device_del', it's memory
+>> leak to me if the guest os never support hot-plug and the user don't
+>> know this information.
+> The user sees that they never get a DEVICE_REMOVED event, so in some way
+> the do know about it.
+
+But the useless memory is always there and no way to free it, although 
+we known that.
+BTW, is it possible to force destroy the BlockBackend in this situation?
+
+-- 
+Thanks
+     -Xie
