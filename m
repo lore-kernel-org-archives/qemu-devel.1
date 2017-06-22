@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dNyRu-0003tC-Dn
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:30:51 -0400
+	(envelope-from <yang.zhong@intel.com>) id 1dNyTH-0004l9-Qs
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:32:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dNyRr-0005Uh-A4
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:30:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55356)
+	(envelope-from <yang.zhong@intel.com>) id 1dNyTE-0005e4-O6
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:32:15 -0400
+Received: from mga04.intel.com ([192.55.52.120]:1145)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dNyRr-0005UB-2t
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:30:47 -0400
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1dNyTE-0005dx-EM
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:32:12 -0400
+Date: Thu, 22 Jun 2017 17:32:01 +0800
+From: Zhong Yang <yang.zhong@intel.com>
+Message-ID: <20170622093201.GD28944@yangzhon-Virtual>
 References: <1498040401-16361-1-git-send-email-yang.zhong@intel.com>
-	<1498040401-16361-2-git-send-email-yang.zhong@intel.com>
-	<2c901b45-afb8-d807-19e9-14befbfdc3fd@redhat.com>
-	<1082632418.11149315.1498112575500.JavaMail.zimbra@redhat.com>
-	<666c9b73-843f-3669-fe1d-69b5082b2757@redhat.com>
-	<8515dc9c-f632-cefa-fdf2-9fcbc8f962de@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <ae617424-4267-2a12-1379-a9779b32d315@redhat.com>
-Date: Thu, 22 Jun 2017 11:30:43 +0200
+	<1498040401-16361-14-git-send-email-yang.zhong@intel.com>
+	<f43b3405-c7c8-a3e0-1b36-fea3e42b447f@twiddle.net>
 MIME-Version: 1.0
-In-Reply-To: <8515dc9c-f632-cefa-fdf2-9fcbc8f962de@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 01/15] configure: add the disable-tcg option
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f43b3405-c7c8-a3e0-1b36-fea3e42b447f@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH 13/15] tcg: disable tcg in CPUX86State
+ struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,42 +30,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Yang Zhong <yang.zhong@intel.com>, anthony xu <anthony.xu@intel.com>, qemu-devel@nongnu.org, a rigo <a.rigo@virtualopensystems.com>
+To: Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, anthony.xu@intel.com, a.rigo@virtualopensystems.com, Thomas Huth <thuth@redhat.com>, yang.zhong@intel.com
 
-On 22.06.2017 11:26, Paolo Bonzini wrote:
+On Wed, Jun 21, 2017 at 03:24:29PM -0700, Richard Henderson wrote:
+> On 06/21/2017 03:19 AM, Yang Zhong wrote:
+> >--- a/target/i386/cpu.h
+> >+++ b/target/i386/cpu.h
+> >@@ -52,7 +52,9 @@
+> >  #include "exec/cpu-defs.h"
+> >+#ifdef CONFIG_TCG
+> >  #include "fpu/softfloat.h"
+> >+#endif
+> >  #define R_EAX 0
+> >  #define R_ECX 1
+> >@@ -1130,8 +1132,9 @@ typedef struct CPUX86State {
+> >      /* Fields up to this point are cleared by a CPU reset */
+> >      struct {} end_reset_fields;
+> >-
+> >+#ifdef CONFIG_TCG
+> >      CPU_COMMON
+> >+#endif
+> 
+> This is at the wrong level.  If !CONFIG_TCG, then CPU_COMMON should be empty.
 > 
 > 
-> On 22/06/2017 08:33, Thomas Huth wrote:
->> On 22.06.2017 08:22, Paolo Bonzini wrote:
->>>
->>>> On 21.06.2017 12:19, Yang Zhong wrote:
->>>>> Add the disable-tcg option into configure and echo CONFIG_TCG=y into
->>>>> $config_target_mak. The default tcg is enabled for all build. If tcg
->>>>> is disabled in the build, only i386|x86_64 softmmu option can be disabled,
->>>>> other softmmu of tagets and users build defaultly enabled the tcg.
->>>> Why do you want to limit this disablement to x86 only? There are also
->>>> other architectures that support KVM (ARM, PPC, MIPS), so disabling TCG
->>>> might be possible there, too. So I think it might be better to check
->>>> whether KVM is possible instead.
->>>
->>> You need to be careful and not use any helper from e.g. KVM or migration
->>> code.  So I would be very surprised if any other architecture compiles
->>> with --disable-tcg.
->>
->> OK, fair, but we finally might want to get there, so I think we should
->> allow the parameter in the configure script for other architectures,
->> too, and then fix the bugs once we can try it out.
-> 
-> I think it's the other way round---when someone wants to fix it, they
-> should add their architecture to the list of targets that support
-> --disable-tcg.  "./configure <anything>", as a goal, should fail
-> immediately if make won't succeed; compilation errors are always a worse
-> experience.
+> r~
 
-Fine for me, too, but then the configure script should exit with a
-proper error message when the user tried to specify --disable-tcg on a
-non-x86 architecture. If I get the current patch right, it silently
-falls back to CONFIG_TCG=y instead, which is IMHO also a bad experience.
+  Hello Richard,
 
- Thomas
+  In fact, i can remove this CONFIG_TCG for CPU_COMMON in the CPUX86State struct
+
+  because there is one change in the same patch ID.
+
+  diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h index 5f4e303..bc8e7f8 100644
+  --- a/include/exec/cpu-defs.h
+  +++ b/include/exec/cpu-defs.h
+  @@ -25,7 +25,9 @@
+ 
+  #include "qemu/host-utils.h"
+  #include "qemu/queue.h"
+ +#ifdef CONFIG_TCG
+  #include "tcg-target.h"
+ +#endif
+  #ifndef CONFIG_USER_ONLY
+  #include "exec/hwaddr.h"
+  #endif
+  @@ -54,7 +56,7 @@ typedef uint64_t target_ulong;  #error TARGET_LONG_SIZE undefined  #endif
+ 
+ -#if !defined(CONFIG_USER_ONLY)
+ +#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
+  /* use a fully associative victim tlb of 8 entries */  #define CPU_VTLB_SIZE 8
+
+
+ if tcg is disabled, CPU_COMMON_TLB is NULL.
+
+ #define CPU_COMMON                                                      \
+    /* soft mmu support */                                              \
+    CPU_COMMON_TLB                                                      \
+
+ So the CPU_COMMON should be NULL if the tcg is disabled.
+
+
+ Yang
