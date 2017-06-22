@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56439)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dNssK-0006Hn-Sz
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 23:33:45 -0400
+	id 1dNssN-0006KD-Df
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 23:33:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dNssJ-0005H9-TU
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 23:33:44 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:33466)
+	id 1dNssM-0005I2-I0
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 23:33:47 -0400
+Received: from mail-qt0-x231.google.com ([2607:f8b0:400d:c0d::231]:36316)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dNssJ-0005H4-Pc
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 23:33:43 -0400
-Received: by mail-qk0-x242.google.com with SMTP id p21so616234qke.0
-	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 20:33:43 -0700 (PDT)
+	id 1dNssM-0005Hk-Dj
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 23:33:46 -0400
+Received: by mail-qt0-x231.google.com with SMTP id i2so2936289qta.3
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 20:33:46 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 22 Jun 2017 00:32:29 -0300
-Message-Id: <20170622033231.19344-20-f4bug@amsat.org>
+Date: Thu, 22 Jun 2017 00:32:30 -0300
+Message-Id: <20170622033231.19344-21-f4bug@amsat.org>
 In-Reply-To: <20170622033231.19344-1-f4bug@amsat.org>
 References: <20170622033231.19344-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 19/21] travis/osx: build using more Xcode
- versions
+Subject: [Qemu-devel] [PATCH v2 20/21] MAINTAINERS: self-appoint me as
+ reviewer in build/test automation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,46 +37,23 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-currently default builder is based on Xcode 7.3.1:
-    OS X 10.11 (darwin14.5.0)
-    Apple LLVM version 7.3.0
-
-add the oldest available Xcode (6.4):
-    OS X 10.10 (darwin14.5.0)
-    Apple LLVM 6.1.0 (based on LLVM 3.6.0svn)
-
-and the newer available Xcode (8.3.3):
-    OS X 10.12 (darwin16.6.0)
-    Apple LLVM version 8.1.0
-
-see https://docs.travis-ci.com/user/osx-ci-environment#os-x-version
-
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- .travis.yml | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/.travis.yml b/.travis.yml
-index d007fdc9fb..880a057c78 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -126,6 +126,17 @@ matrix:
-     - env: CONFIG=""
-            CCACHE_SLOPPINESS="file_macro,time_macros,include_file_ctime,include_file_mtime"
-       os: osx
-+      osx_image: xcode6.4
-+      compiler: clang
-+    - env: CONFIG=""
-+           CCACHE_SLOPPINESS="file_macro,time_macros,include_file_ctime,include_file_mtime"
-+      os: osx
-+      osx_image: xcode7.3
-+      compiler: clang
-+    - env: CONFIG=""
-+           CCACHE_SLOPPINESS="file_macro,time_macros,include_file_ctime,include_file_mtime"
-+      os: osx
-+      osx_image: xcode8.3
-       compiler: clang
-     # Plain Trusty System Build
-     - env: CONFIG="--disable-linux-user"
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 120788d8fb..e62cbc439a 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1858,6 +1858,7 @@ Build and test automation
+ -------------------------
+ M: Alex Bennée <alex.bennee@linaro.org>
+ M: Fam Zheng <famz@redhat.com>
++R: Philippe Mathieu-Daudé <f4bug@amsat.org>
+ L: qemu-devel@nongnu.org
+ S: Maintained
+ F: .travis.yml
 -- 
 2.11.0
