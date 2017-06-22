@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dNza0-0006aW-7x
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 06:43:17 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dNzoF-0005RV-R3
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 06:58:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dNzZv-0006Hz-7v
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 06:43:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60090)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dNzZu-0006Ha-Uo
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 06:43:11 -0400
-References: <CAFEAcA90vjbr=CM9i9m7-PdN0NB=MV8W0+wsG9UrNNR+KENsmA@mail.gmail.com>
-	<d947c58b-d388-c432-0f40-b019af88c60a@redhat.com>
-	<CAFEAcA8j2t+TTpqRRMxG489=gaxi_otgMKjw3TZEEhAiHz66+g@mail.gmail.com>
+	(envelope-from <pbonzini@redhat.com>) id 1dNzoB-0005sD-TH
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 06:57:59 -0400
+Received: from mail-wr0-f169.google.com ([209.85.128.169]:33260)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dNzoB-0005s3-Ng
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 06:57:55 -0400
+Received: by mail-wr0-f169.google.com with SMTP id r103so18268253wrb.0
+	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 03:57:55 -0700 (PDT)
+References: <20170622033231.19344-1-f4bug@amsat.org>
+	<20170622033231.19344-14-f4bug@amsat.org>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8f13b0ac-72db-368c-ebcb-136314eeb322@redhat.com>
-Date: Thu, 22 Jun 2017 12:43:04 +0200
+Message-ID: <8262c070-06a3-0f9f-23bc-4c497a597a0a@redhat.com>
+Date: Thu, 22 Jun 2017 12:57:52 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8j2t+TTpqRRMxG489=gaxi_otgMKjw3TZEEhAiHz66+g@mail.gmail.com>
+In-Reply-To: <20170622033231.19344-14-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] qemu_chr_fe_add_watch interaction with VM
- start/stop/migrate
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 13/21] travis: improve ccache use
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +30,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
+On 22/06/2017 05:32, Philippe Mathieu-Daudé wrote:
+> diff --git a/.travis.yml b/.travis.yml
+> index a7512f3ab0..96ddc16cfd 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -68,6 +68,8 @@ env:
+>        # be kind with Travis free plan, restrict to at most 4 cores
+>      - PARALLEL_JOBS="$(($(test ${HW_CORES} -gt ${VM_CORES} && echo ${VM_CORES} || echo ${HW_CORES}) + 1))"
+>      - HOMEBREW_MAKE_JOBS="${PARALLEL_JOBS}"
+> +    # ccache
+> +    - CCACHE_SLOPPINESS="file_macro,time_macros"
 
+Does this actually have any effect?  We should not be using time macros.
 
-On 22/06/2017 12:38, Peter Maydell wrote:
-> On 22 June 2017 at 11:31, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->>
->> On 22/06/2017 12:09, Peter Maydell wrote:
->>> For instance, suppose my UART tries to write to the chardev but
->>> can't, so it registers a callback with qemu_chr_fe_add_watch().
->>> Then the user stops the VM. Does the chardev UI guarantee that
->>> my callback won't get called until the user restarts the VM,
->>> or does my callback function have to do something to say "don't
->>> actually update the emulation state if we're stopped"?
->>> If the user then restarts the VM, do I need to do something to
->>> retry the chardev write?
->>
->> Currently, chardev code runs normally between stop and start.
-> 
-> I think that's rather counterintuitive -- as a user, if I've
-> stopped the VM I don't expect any of its device state to change.
-> Stopped should mean "simulation state doesn't change".
-> 
->>> For migration, if we're migrating in the state where I have a
->>> pending character I'd like to write to the chardev, what do I need
->>> to do on the destination side? Do I need to call qemu_chr_fe_add_watch
->>> in the post-load function, or is this too early and I need to do
->>> something to call it when the destination VM is actually restarted?
->>
->> Post-load is fine.  There could be interesting interactions with
->> interrupts, but these are not specific to character device backends
->> (real-time clocks are another example).  So boards should create
->> interrupt controllers and distributors as soon as possible.
-> 
-> This sounds wrong to me -- nobody should be asserting an
-> interrupt line during post-load, in the same way that nobody
-> should assert an interrupt line during reset. We don't have
-> any guarantees that the device on the other end of the line
-> has finished migration yet. I think we really need the
-> chardev backends to not start doing things until load has
-> finished and the VM has been restarted. (If we make "VM
-> stopped" mean "no chardev callbacks" then this would fall
-> out in the wash, though, since the callback registered in
-> post-load would only trigger on the following VM start.)
-
-I don't disagree, and if you found a way to fix all frontends at the
-same time that would be great.
-
-However, again this is not exclusive to character devices.  I mentioned
-real-time clocks, and I don't see an easy way to fix that.
+include_file_ctime/mtime makes sense though.
 
 Paolo
+
+>      # tests
+>      - TEST_CMD="make -j${PARALLEL_JOBS} check"
