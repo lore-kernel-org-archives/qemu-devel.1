@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dO6C7-0001Kr-H7
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:47:04 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dO6C8-0001LY-PI
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:47:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dO6C2-0000ng-LH
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:47:03 -0400
-Received: from 5.mo5.mail-out.ovh.net ([87.98.173.103]:46963)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dO6C2-0000nO-Eo
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:46:58 -0400
-Received: from player695.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 9C58B10C395
-	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 19:46:56 +0200 (CEST)
-Date: Thu, 22 Jun 2017 19:46:49 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170622194649.6d251753@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20170622172555.GE2100@work-vm>
-References: <149814756006.27338.8723356702388175951.stgit@bahia>
-	<CAFEAcA8yqb8ykP8nCnoVNQUZd851RhOLFf2TfkHZmL2je+pP=Q@mail.gmail.com>
-	<20170622184255.2d44e3bd@bahia.lab.toulouse-stg.fr.ibm.com>
-	<87injo6jla.fsf@secure.mitica>
-	<CAFEAcA-g-=AkH3t8jOTFY_9zA6ECS57-3MS=cHPb+Q6sePzNsw@mail.gmail.com>
-	<20170622172555.GE2100@work-vm>
+	(envelope-from <vilanova@ac.upc.edu>) id 1dO6C4-0000oG-An
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:47:04 -0400
+Received: from roura.ac.upc.edu ([147.83.33.10]:44875 helo=roura.ac.upc.es)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dO6C3-0000o5-V1
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:47:00 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Thu, 22 Jun 2017 20:46:50 +0300
+Message-Id: <149815361027.1830.12938924682989954179.stgit@frigg.lan>
+In-Reply-To: <149815338558.1830.8107719559183631163.stgit@frigg.lan>
+References: <149815338558.1830.8107719559183631163.stgit@frigg.lan>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/Ol4==XrB/U=/M=FrZCsBREQ";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH] Separate function types from opaque types
- in include/qemu/typedefs.h
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v7 07/26] target: [tcg,
+ i386] Refactor init_disas_context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,85 +27,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
---Sig_/Ol4==XrB/U=/M=FrZCsBREQ
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Incrementally paves the way towards using the generic instruction transla=
+tion
+loop.
 
-On Thu, 22 Jun 2017 18:25:55 +0100
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+ target/i386/translate.c |   43 ++++++++++++++++++++++++-----------------=
+--
+ 1 file changed, 24 insertions(+), 19 deletions(-)
 
-> * Peter Maydell (peter.maydell@linaro.org) wrote:
-> > On 22 June 2017 at 18:03, Juan Quintela <quintela@redhat.com> wrote: =20
-> > > Greg Kurz <groug@kaod.org> wrote: =20
-> > >> On Thu, 22 Jun 2017 17:14:08 +0100
-> > >> Peter Maydell <peter.maydell@linaro.org> wrote:
-> > >> =20
-> > >>> On 22 June 2017 at 17:06, Greg Kurz <groug@kaod.org> wrote: =20
-> > >>> > Function types cannot reside in the same sorted list as opaque ty=
-pes since
-> > >>> > they may depend on a type which would be defined later.
-> > >>> >
-> > >>> > Of course, the same problem could arise if a function type depend=
-s on
-> > >>> > another function type with greater alphabetical order. Hopefully =
-we
-> > >>> > don't have that at this time. =20
-> > >>>
-> > >>> The other approach would be to put function types somewhere
-> > >>> else and leave typedefs.h for the simple 'opaque types
-> > >>> for structures' that it was started as.
-> > >>>
-> > >>> For instance we have include/qemu/fprintf-fn.h as a precedent.
-> > >>> =20
-> > >>
-> > >> Indeed, and I'm not quite sure why Juan decided to put these types i=
-nto
-> > >> typedefs.h instead of a dedicated header file in include/migration..=
-. is
-> > >> it only because it was the quickest fix ? =20
-> > >
-> > > All other typedefs were defined there.  I can create a different incl=
-ude
-> > > file, but I think that is "overengineering", no?  They are typedefs,
-> > > just not of structs.  But I agree that they are the only ones. =20
-> >=20
-> > Well, the comment in the file says "opaque types so that device init
-> > declarations don't have to pull in all the real definitions", whereas
-> > the ones you've added aren't opaque types, they are the real
-> > definitions. They're also only used by a very small subset of .c
-> > files, whereas typedefs.h goes everywhere. =20
->=20
-> mv fprintf-fn.f   fn-typedefs.h
->=20
-> move those two defs into that?
->=20
-
-Wouldn't it be more appropriate to put them in a dedicated
-include/migration/handler-fn.h header included by both
-vmstate.h and register.h ?
-
-> Dave
->=20
-> > thanks
-> > -- PMM =20
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->=20
-
-
---Sig_/Ol4==XrB/U=/M=FrZCsBREQ
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAllMAokACgkQAvw66wEB28I1tACfQfSrELMjojbo/CgXMVG/KnU1
-HtAAmQEgpzV7Udkju1qAg7tYm7BmnZD1
-=XuXV
------END PGP SIGNATURE-----
-
---Sig_/Ol4==XrB/U=/M=FrZCsBREQ--
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index 5a801766e5..84ff49030b 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -8396,21 +8396,12 @@ void tcg_x86_init(void)
+     }
+ }
+=20
+-/* generate intermediate code for basic block 'tb'.  */
+-void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
++static void i386_trblock_init_disas_context(DisasContextBase *db, CPUSta=
+te *cpu)
+ {
++    DisasContext *dc =3D container_of(db, DisasContext, base);
+     CPUX86State *env =3D cpu->env_ptr;
+-    DisasContext dc1, *dc =3D &dc1;
+-    DisasContextBase *db =3D &dc1.base;
+-    uint32_t flags;
+-    target_ulong cs_base;
+-    int num_insns;
+-    int max_insns;
+-
+-    /* generate intermediate code */
+-    db->pc_first =3D tb->pc;
+-    cs_base =3D tb->cs_base;
+-    flags =3D tb->flags;
++    uint32_t flags =3D db->tb->flags;
++    target_ulong cs_base =3D db->tb->cs_base;
+=20
+     dc->pe =3D (flags >> HF_PE_SHIFT) & 1;
+     dc->code32 =3D (flags >> HF_CS32_SHIFT) & 1;
+@@ -8421,11 +8412,9 @@ void gen_intermediate_code(CPUState *cpu, Translat=
+ionBlock *tb)
+     dc->cpl =3D (flags >> HF_CPL_SHIFT) & 3;
+     dc->iopl =3D (flags >> IOPL_SHIFT) & 3;
+     dc->tf =3D (flags >> TF_SHIFT) & 1;
+-    db->singlestep_enabled =3D cpu->singlestep_enabled;
+     dc->cc_op =3D CC_OP_DYNAMIC;
+     dc->cc_op_dirty =3D false;
+     dc->cs_base =3D cs_base;
+-    db->tb =3D tb;
+     dc->popl_esp_hack =3D 0;
+     /* select memory access functions */
+     dc->mem_index =3D 0;
+@@ -8455,12 +8444,30 @@ void gen_intermediate_code(CPUState *cpu, Transla=
+tionBlock *tb)
+        record/replay modes and there will always be an
+        additional step for ecx=3D0 when icount is enabled.
+      */
+-    dc->repz_opt =3D !dc->jmp_opt && !(tb->cflags & CF_USE_ICOUNT);
++    dc->repz_opt =3D !dc->jmp_opt && !(db->tb->cflags & CF_USE_ICOUNT);
+ #if 0
+     /* check addseg logic */
+     if (!dc->addseg && (dc->vm86 || !dc->pe || !dc->code32))
+         printf("ERROR addseg\n");
+ #endif
++}
++
++/* generate intermediate code for basic block 'tb'.  */
++void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
++{
++    CPUX86State *env =3D cpu->env_ptr;
++    DisasContext dc1, *dc =3D &dc1;
++    DisasContextBase *db =3D &dc1.base;
++    int num_insns;
++    int max_insns;
++
++    /* generate intermediate code */
++    db->singlestep_enabled =3D cpu->singlestep_enabled;
++    db->tb =3D tb;
++    db->is_jmp =3D DISAS_NEXT;
++    db->pc_first =3D tb->pc;
++    db->pc_next =3D db->pc_first;
++    i386_trblock_init_disas_context(db, cpu);
+=20
+     cpu_T0 =3D tcg_temp_new();
+     cpu_T1 =3D tcg_temp_new();
+@@ -8475,8 +8482,6 @@ void gen_intermediate_code(CPUState *cpu, Translati=
+onBlock *tb)
+     cpu_ptr1 =3D tcg_temp_new_ptr();
+     cpu_cc_srcT =3D tcg_temp_local_new();
+=20
+-    db->is_jmp =3D DISAS_NEXT;
+-    db->pc_next =3D db->pc_first;
+     num_insns =3D 0;
+     max_insns =3D tb->cflags & CF_COUNT_MASK;
+     if (max_insns =3D=3D 0) {
+@@ -8518,7 +8523,7 @@ void gen_intermediate_code(CPUState *cpu, Translati=
+onBlock *tb)
+            the flag and abort the translation to give the irqs a
+            change to be happen */
+         if (dc->tf || db->singlestep_enabled ||
+-            (flags & HF_INHIBIT_IRQ_MASK)) {
++            (db->tb->flags & HF_INHIBIT_IRQ_MASK)) {
+             gen_jmp_im(db->pc_next - dc->cs_base);
+             gen_eob(dc);
+             break;
