@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dO07s-0000aN-8z
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 07:18:17 -0400
+	(envelope-from <lvivier@redhat.com>) id 1dO0GJ-0002Zo-OU
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 07:27:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dO07p-0005Hu-0H
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 07:18:16 -0400
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:36074)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dO07o-0005HA-OC
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 07:18:12 -0400
-Received: by mail-wr0-x22e.google.com with SMTP id c11so18856410wrc.3
-	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 04:18:12 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 22 Jun 2017 12:18:45 +0100
-Message-Id: <20170622111845.5296-1-alex.bennee@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] target/arm/helper: document potential CNTV
- register bear trap
+	(envelope-from <lvivier@redhat.com>) id 1dO0GG-0000H1-JW
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 07:26:59 -0400
+From: Laurent Vivier <lvivier@redhat.com>
+Date: Thu, 22 Jun 2017 13:26:48 +0200
+Message-Id: <20170622112648.24815-1-lvivier@redhat.com>
+Subject: [Qemu-devel] [PATCH] target/ppc/cpu-models: set POWER9_v1.0 as
+ POWER9 DD1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +18,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <cdall@linaro.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>
 
-The ARM KVM encodings have been inadvertently switched for
-CNTV_CVAL_EL0/CNTVCT_EL0 in the register API since its introduction.
-Fortunately this doesn't currently mater as the reset values for both
-are the same. However if this ever changes things will break in
-interesting ways.
+CPU_POWERPC_POWER9_DD1 is 0x004E0100, so this is the POWER9 v1.0.
 
-Migration is currently unaffected as we just use
-cpu->cpreg_vmstate_indexes/cpreg_vmstate_values verbatim. However this
-would break if we ever supported migration between KVM and TCG models.
+When we run qemu on a POWER9 DD1 host, we must use either
+"-cpu host" or "-cpu POWER9", but in the latter case it fails with
 
-For now we just warn future generations who may touch this code.
+    Unable to find sPAPR CPU Core definition
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Cc: Andre Przywara <andre.przywara@arm.com>
-Cc: Christoffer Dall <cdall@linaro.org>
+because POWER9 DD1 doesn't appear in the list of known CPUs.
+
+This patch fixes this by defining POWER9_v1.0 with POWER9 DD1
+PVR instead of CPU_POWERPC_POWER9_BASE.
+
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 ---
- target/arm/helper.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ target/ppc/cpu-models.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 2594faa9b8..e7a0e39583 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -211,6 +211,11 @@ static bool raw_accessors_invalid(const ARMCPRegInfo *ri)
-     return true;
- }
+diff --git a/target/ppc/cpu-models.c b/target/ppc/cpu-models.c
+index 4d3e635..a22363c 100644
+--- a/target/ppc/cpu-models.c
++++ b/target/ppc/cpu-models.c
+@@ -1144,7 +1144,7 @@
+     POWERPC_DEF("970_v2.2",      CPU_POWERPC_970_v22,                970,
+                 "PowerPC 970 v2.2")
  
-+/*
-+ * FIXME: the KVM API has switched encodings for
-+ * CNTV_CVAL_EL0/CNTVCT_EL0 which need to be fixed if we want to
-+ * change the reset values or support KVM<->TCG migration.
-+ */
- bool write_cpustate_to_list(ARMCPU *cpu)
- {
-     /* Write the coprocessor state from cpu->env to the (index,value) list. */
-@@ -234,6 +239,7 @@ bool write_cpustate_to_list(ARMCPU *cpu)
-     return ok;
- }
+-    POWERPC_DEF("POWER9_v1.0",   CPU_POWERPC_POWER9_BASE,            POWER9,
++    POWERPC_DEF("POWER9_v1.0",   CPU_POWERPC_POWER9_DD1,             POWER9,
+                 "POWER9 v1.0")
  
-+/* FIXME: see above re:CNTV_CVAL_EL0/CNTVCT_EL0 encodings */
- bool write_list_to_cpustate(ARMCPU *cpu)
- {
-     int i;
-@@ -1961,6 +1967,11 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
-                                    cp15.c14_timer[GTIMER_VIRT].ctl),
-       .writefn = gt_virt_ctl_write, .raw_writefn = raw_write,
-     },
-+    /* WARNING! For *KVM only* the switched API encoding means this
-+     * actually gets loaded in fresh VMs as CNTV_CVAL_EL0. This will
-+     * need to be fixed in write_[cpustate_to_list|list_to_cpustate]
-+     * if you want to change the reset value.
-+     */
-     { .name = "CNTV_CTL_EL0", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 3, .opc2 = 1,
-       .type = ARM_CP_IO, .access = PL1_RW | PL0_R,
-@@ -2053,6 +2064,11 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
-       .accessfn = gt_vtimer_access,
-       .writefn = gt_virt_cval_write, .raw_writefn = raw_write,
-     },
-+    /* WARNING! For *KVM only* the switched API encoding means this
-+     * actually gets loaded in fresh VMs as CNTVCT_EL0. This will need
-+     * to be fixed in write_[cpustate_to_list|list_to_cpustate] if you
-+     * want to change the reset value.
-+     */
-     { .name = "CNTV_CVAL_EL0", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 3, .opc2 = 2,
-       .access = PL1_RW | PL0_R,
+     POWERPC_DEF("970fx_v1.0",    CPU_POWERPC_970FX_v10,              970,
 -- 
-2.13.0
+2.9.4
