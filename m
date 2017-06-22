@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dO5sw-0004hz-Il
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:27:15 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dO5uk-0006Vs-GH
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:29:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dO5sv-0002Ux-Jg
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:27:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32836)
+	(envelope-from <ehabkost@redhat.com>) id 1dO5uh-0003Ex-Ba
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:29:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44584)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1dO5sv-0002Uk-DL
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:27:13 -0400
-Date: Thu, 22 Jun 2017 11:27:09 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170622112709.51bd4885@w520.home>
-In-Reply-To: <CAB995Mv3naMDu1e2zvzDn77GGNqwPXWUoJOrO0ZMs8B5YooRAQ@mail.gmail.com>
-References: <CAB995MvCYo=tWGg-tC5R-GmRqtdiaLaU_rHTprpRJ_hMJK6Rtw@mail.gmail.com>
-	<20170622105935.2dbd574d@w520.home>
-	<CAB995Mv3naMDu1e2zvzDn77GGNqwPXWUoJOrO0ZMs8B5YooRAQ@mail.gmail.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dO5uh-0003Do-5B
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:29:03 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 261DF30AF5B
+	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 17:29:02 +0000 (UTC)
+Date: Thu, 22 Jun 2017 14:28:52 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170622172852.GC20956@localhost.localdomain>
+References: <1498031528-1990-1-git-send-email-peterx@redhat.com>
+	<1498031528-1990-3-git-send-email-peterx@redhat.com>
+	<20170621122311.GC3928@thinpad.lan.raisama.net>
+	<20170622042530.GB3936@pxdev.xzpeter.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Query on VFIO in Virtual machine
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170622042530.GB3936@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH v4 02/10] accel: introduce
+ AccelClass.global_props
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +36,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nitin Saxena <nitin.lnx@gmail.com>
-Cc: linux-kernel@vger.kernel.org, qemu-devel <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Thu, 22 Jun 2017 22:42:19 +0530
-Nitin Saxena <nitin.lnx@gmail.com> wrote:
-
-> Thanks Alex.
+On Thu, Jun 22, 2017 at 12:25:30PM +0800, Peter Xu wrote:
+> On Wed, Jun 21, 2017 at 09:23:11AM -0300, Eduardo Habkost wrote:
+> > On Wed, Jun 21, 2017 at 03:52:00PM +0800, Peter Xu wrote:
+[...]
+> > > diff --git a/vl.c b/vl.c
+> > > index 59fea15..4452d7a 100644
+> > > --- a/vl.c
+> > > +++ b/vl.c
+> > > @@ -4571,6 +4571,7 @@ int main(int argc, char **argv, char **envp)
+> > >              exit (i == 1 ? 1 : 0);
+> > >      }
+> > >  
+> > 
+> > I suggest a comment here warning about global property
+> > registration ordering.  e.g.:
+> > 
+> >  /*
+> >   * Ordering of global property registration matters:
+> >   * - machine compat_props should override accelerator-specific
+> >   *   globals.
+> >   * - user-provided globals (-global, and global properties
+> >   *   derived from other command-line options like -cpu) should
+> >   *   override machine compat_props and accelerator-specific
+> >   *   globals.
+> >   */
 > 
-> >> Without an iommu in the VM, you'd be limited to no-iommu support for VM userspace,  
-> So are you trying to say VFIO NO-IOMMU should work inside VM. Does
-> that mean VFIO NO-IOMMU in VM and VFIO IOMMU in host for same device
-> is a legitimate configuration? I did tried this configuration and the
-> application (in VM) seems to get container_fd, group_fd, device_fd
-> successfully but after VFIO_DEVICE_RESET ioctl the PCI link breaks
-> from VM as well as from host. This could be specific to PCI endpoint
-> device which I can dig.
-> 
-> I will be happy if VFIO NO-IOMMU in VM and IOMMU in host for same
-> device is legitimate configuration.
+> I have a standalone patch (next one) to unify these three places and
+> added some comment. Would that suite?
 
-Using no-iommu in the guest should work in that configuration, however
-there's no isolation from the user to the rest of VM memory, so the VM
-kernel will be tainted.  Host memory does have iommu isolation.  Device
-reset from VM userspace sounds like another bug to investigate.  Thanks,
+Sorry, I didn't see that patch when I was reviewing this one.  It looks
+good to me.  Thanks!
 
-Alex
+-- 
+Eduardo
