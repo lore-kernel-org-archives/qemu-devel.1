@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dNzGp-0007GW-Uj
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 06:23:29 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dNzHE-0007Vg-5T
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 06:23:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dNzGm-00068F-PP
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 06:23:27 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:36800)
+	(envelope-from <alex.bennee@linaro.org>) id 1dNzHA-0006Qd-Vy
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 06:23:52 -0400
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:35790)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dNzGm-00066V-Is
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 06:23:24 -0400
-Received: by mail-wr0-x231.google.com with SMTP id c11so16946138wrc.3
-	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 03:23:24 -0700 (PDT)
+	id 1dNzHA-0006QP-PU
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 06:23:48 -0400
+Received: by mail-wr0-x236.google.com with SMTP id k67so16925888wrc.2
+	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 03:23:48 -0700 (PDT)
 References: <20170622033231.19344-1-f4bug@amsat.org>
-	<20170622033231.19344-16-f4bug@amsat.org>
+	<20170622033231.19344-17-f4bug@amsat.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170622033231.19344-16-f4bug@amsat.org>
-Date: Thu, 22 Jun 2017 11:24:07 +0100
-Message-ID: <874lv8tj5k.fsf@linaro.org>
+In-reply-to: <20170622033231.19344-17-f4bug@amsat.org>
+Date: Thu, 22 Jun 2017 11:24:31 +0100
+Message-ID: <8737astj4w.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 15/21] travis: retry when git submodules
- initialization fails
+Subject: Re: [Qemu-devel] [PATCH v2 16/21] travis: split the gprof/gcov job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,40 +36,31 @@ Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.may
 
 Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
 
-> example of failure: https://travis-ci.org/philmd/qemu/jobs/245612939
->
->   $ git submodule update --init --recursive
->   [...]
->   Submodule 'pixman' (git://anongit.freedesktop.org/pixman) registered for path 'pixman'
->   Cloning into 'pixman'...
->   fatal: unable to connect to anongit.freedesktop.org:
->   anongit.freedesktop.org[0: 131.252.210.161]: errno=Connection timed out
->   anongit.freedesktop.org[1: 2610:10:20:722:a800:ff:fe24:61cf]: errno=Network is unreachable
->   Clone of 'git://anongit.freedesktop.org/pixman' into submodule path 'pixman' failed
->   The command "git submodule update --init --recursive" failed and exited with 1 during .
->   Your build has been stopped.
+> gcov generates lot of output and often trigger job limit timeout
 >
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 
 > ---
->  .travis.yml | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  .travis.yml | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 >
 > diff --git a/.travis.yml b/.travis.yml
-> index bac5bea744..34391722a2 100644
+> index 34391722a2..4bb288a192 100644
 > --- a/.travis.yml
 > +++ b/.travis.yml
-> @@ -85,7 +85,7 @@ git:
->  before_install:
->    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update ; fi
->    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libffi gettext glib pixman ccache ; fi
-> -  - git submodule update --init --recursive
-> +  - travis_retry git submodule update --init --recursive
->  before_script:
->    # https://docs.travis-ci.com/user/caching#ccache-on-os-x
->    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then export PATH=/usr/local/opt/ccache/libexec:$PATH ; fi
+> @@ -105,7 +105,9 @@ matrix:
+>      - env: CONFIG=""
+>        compiler: clang
+>      # gprof/gcov are GCC features
+> -    - env: CONFIG="--enable-gprof --enable-gcov --disable-pie"
+> +    - env: CONFIG="--enable-gprof --disable-pie"
+> +      compiler: gcc
+> +    - env: CONFIG="--enable-gcov --disable-pie"
+>        compiler: gcc
+>      # We manually include builds which we disable "make check" for
+>      - env: CONFIG="--enable-debug --enable-tcg-interpreter"
 
 
 --
