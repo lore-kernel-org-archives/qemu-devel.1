@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37810)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dO64o-00047G-R5
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:39:31 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dO66H-0004qW-L8
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:41:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dO64j-0006S2-U6
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:39:30 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:33468)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dO64j-0006Rs-Pc
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:39:25 -0400
-Received: by mail-qt0-x242.google.com with SMTP id c20so2915082qte.0
-	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 10:39:25 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170622094151.28633-1-david@redhat.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <13a03d8f-6191-8716-34ed-4ab1f7bf7590@twiddle.net>
-Date: Thu, 22 Jun 2017 10:39:21 -0700
+	(envelope-from <vilanova@ac.upc.edu>) id 1dO66C-0006tV-Mv
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:41:01 -0400
+Received: from roura.ac.upc.edu ([147.83.33.10]:51377 helo=roura.ac.upc.es)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dO66C-0006tP-5g
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:40:56 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Thu, 22 Jun 2017 20:40:47 +0300
+Message-Id: <149815324718.1244.3160041743780966810.stgit@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170622094151.28633-1-david@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] target/s390x: implement idte and
- improve ipte
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [RFC PATCH v7 00/26] translate: [tcg] Generic
+ translation framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +25,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: agraf@suse.de, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 06/22/2017 02:41 AM, David Hildenbrand wrote:
-> By adding idte, we are now able to expose the DAT-enhancement facility
-> to our guest. Also, properly simulate and expose the local-tlb-clearing
-> facility.
-> 
-> To improve the TLB flushing, we will have to remember each used table (or
-> at least a hash!) for each tlb entry, just like real HW does.
-> 
-> This allows me to start an upstream kernel (having also the mvcos patch
-> applied) compiled for z9 using:
-> 
-> qemu-system-s390x ... -cpu qemu,mvcos=on,stfle=on,ldisp=on,ldisphp=on,\
->                             eimm=on,stckf=on,csst=on,csst2=on,ginste=on,\
->                             exrl=on,dateh=on,ltlbc=on
-> 
-> Linux will detect the DAT-enhancement facility and use idte+cspg.
-> 
-> v1 -> v2:
-> - Allow to enable the DAT-enhancement facility.
-> - Fix wrong register in idte.
-> - Simply set m4 to zero in case local-tlb-clearing is not enabled.
+This series proposes a generic (target-agnostic) instruction translation
+framework.
 
-Reviewed and applied to my target/s390x tree.
+It basically provides a generic main loop for instruction disassembly, wh=
+ich
+calls target-specific functions when necessary. This generalization makes
+inserting new code in the main loop easier, and helps in keeping all targ=
+ets in
+synch as to the contents of it.
+
+This series also paves the way towards adding events to trace guest code
+execution (BBLs and instructions).
+
+I've ported i386/x86-64 and arm/aarch64 as an example to see how it fits =
+in the
+current organization, but will port the rest when this series gets merged.
+
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+
+Changes in v7
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Change BreakpointHitType (BH_*) for BreakpointCheckType (BC_*).
+* Move target-specific translation functions to a struct (TranslatorOps).
+* Split target-specific changes into multiple patches.
+* Rebase on edf8bc9842.
 
 
-r~
+Changes in v6
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Rebase on upstream master (64175afc69).
+* Reorder fields in DisasContextBase to minimize padding [Richard Henders=
+on].
+
+
+Changes in v5
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Remove stray uses of "restrict" keyword.
+
+
+Changes in v4
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Document new macro QTAILQ_FOREACH_CONTINUE [Peter Maydell].
+* Fix coding style errors reported by checkpatch.
+* Remove use of "restrict" in added functions; it makes older gcc version=
+s barf
+  about compilation errors.
+
+
+Changes in v3
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Rebase on 0737f32daf.
+
+
+Changes in v2
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Port ARM and AARCH64 targets.
+* Fold single-stepping checks into "max_insns" [Richard Henderson].
+* Move instruction start marks to target code [Richard Henderson].
+* Add target hook for TB start.
+* Check for TCG temporary leaks.
+* Move instruction disassembly into a target hook.
+* Make breakpoint_hit() return an enum to accomodate target's needs (ARM).
+
+
+Llu=C3=ADs Vilanova (26):
+      Pass generic CPUState to gen_intermediate_code()
+      queue: Add macro for incremental traversal
+      cpu-exec: Avoid global variables in icount-related functions
+      target: [tcg] Add generic translation framework
+      target: [tcg] Redefine DISAS_* onto the generic translation framewo=
+rk (DJ_*)
+      target: [tcg,i386] Port to DisasContextBase
+      target: [tcg,i386] Refactor init_disas_context
+      target: [tcg,i386] Refactor init_globals
+      target: [tcg,i386] Refactor insn_start
+      target: [tcg,i386] Refactor breakpoint_check
+      target: [tcg,i386] Refactor disas_insn
+      target: [tcg,i386] Refactor tb_stop
+      target: [tcg,i386] Refactor disas_flags
+      target: [tcg,i386] Replace DISAS_* with DJ_*
+      target: [tcg,i386] Port to generic translation framework
+      target: [tcg,arm] Replace DISAS_* with DJ_*
+      target: [tcg,arm] Port to DisasContextBase
+      target: [tcg,arm] Port to init_disas_context
+      target: [tcg,arm] Port to init_globals
+      target: [tcg,arm] Port to tb_start
+      target: [tcg,arm] Port to insn_start
+      target: [tcg,arm] Port to breakpoint_check
+      target: [tcg,arm] Port to disas_insn
+      target: [tcg,arm] Port to tb_stop
+      target: [tcg,arm] Port to disas_flags
+      target: [tcg,arm] Port to generic translation framework
+
+
+ Makefile.target                |    1=20
+ include/exec/exec-all.h        |   13 +
+ include/exec/gen-icount.h      |    8 -
+ include/exec/translate-block.h |  125 ++++++++++
+ include/qemu/queue.h           |   12 +
+ include/qom/cpu.h              |   22 ++
+ target/alpha/translate.c       |   25 +-
+ target/arm/translate-a64.c     |  312 ++++++++++++-------------
+ target/arm/translate.c         |  503 ++++++++++++++++++++++------------=
+------
+ target/arm/translate.h         |   38 ++-
+ target/cris/translate.c        |   26 +-
+ target/hppa/translate.c        |    6=20
+ target/i386/translate.c        |  353 +++++++++++++++-------------
+ target/lm32/translate.c        |   36 +--
+ target/m68k/translate.c        |   24 +-
+ target/microblaze/translate.c  |   28 +-
+ target/mips/translate.c        |   41 ++-
+ target/moxie/translate.c       |   16 +
+ target/nios2/translate.c       |    6=20
+ target/openrisc/translate.c    |   25 +-
+ target/ppc/translate.c         |   21 +-
+ target/ppc/translate_init.c    |   32 +--
+ target/s390x/translate.c       |   22 +-
+ target/sh4/translate.c         |   21 +-
+ target/sparc/translate.c       |   17 +
+ target/tilegx/translate.c      |    9 -
+ target/tricore/translate.c     |   11 -
+ target/unicore32/translate.c   |   26 +-
+ target/xtensa/translate.c      |   39 ++-
+ translate-all.c                |    2=20
+ translate-block.c              |  185 +++++++++++++++
+ 31 files changed, 1212 insertions(+), 793 deletions(-)
+ create mode 100644 include/exec/translate-block.h
+ create mode 100644 translate-block.c
+
+
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
