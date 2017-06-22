@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dO2mh-000108-3v
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 10:08:35 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dO2o2-0001aN-28
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 10:09:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dO2md-0001Pi-5T
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 10:08:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40275)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dO2mc-0001O2-Uo
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 10:08:31 -0400
-Date: Thu, 22 Jun 2017 15:08:27 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170622140827.GA29936@stefanha-x1.localdomain>
+	(envelope-from <peter.maydell@linaro.org>) id 1dO2o0-0001rt-NY
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 10:09:58 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:34508)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dO2o0-0001rc-FF
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 10:09:56 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id 77so25204098wrb.1
+	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 07:09:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="2oS5YaxWCcQjTEyO"
-Content-Disposition: inline
-Subject: [Qemu-devel] NVDIMM live migration broken?
+In-Reply-To: <20170621144814.15324-1-alex.bennee@linaro.org>
+References: <20170621144814.15324-1-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 22 Jun 2017 15:09:34 +0100
+Message-ID: <CAFEAcA91jcDezunfEKwB+DBdzrEAFYWHKRyFmPyCNYSs_4N4JA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/21] Docker and shippable updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: haozhong.zhang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+On 21 June 2017 at 15:47, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+> The following changes since commit 8dfaf23ae1f2273a9730a9b309cc8471269bb5=
+24:
+>
+>   tcg/tci: fix tcg-interpreter build (2017-06-20 18:39:15 +0100)
+>
+> are available in the git repository at:
+>
+>   https://github.com/stsquad/qemu.git tags/pull-ci-updates-210617-2
+>
+> for you to fetch changes up to 32b9ca986855a5d56daf47fdb516743008788b71:
+>
+>   MAINTAINERS: self-appoint me as reviewer in build/test automation (2017=
+-06-21 15:03:06 +0100)
+>
+> ----------------------------------------------------------------
+> This is mostly Philippe's updates
+>
+> We add the following cross-compile targets:
+>   - mipsel-softmmu,mipsel-linux-user,mips64el-linux-user
+>   - armeb-linux-user
+>
+> While I was rolling I discovered we could also back out a bunch of the
+> emdebian hacks as the newly released stretch handles cross compilers
+> as first class citizens. Unfortunately this also meant I had to drop
+> the powerpc support as that is no longer in Debian stable.
+>
 
---2oS5YaxWCcQjTEyO
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Applied, thanks.
 
-I tried live migrating a guest with NVDIMM on qemu.git/master (edf8bc984):
-
-  $ qemu -M accel=kvm,nvdimm=on -m 1G,slots=4,maxmem=8G -cpu host \
-         -object memory-backend-file,id=mem1,share=on,mem-path=nvdimm.dat,size=1G \
-	 -device nvdimm,id=nvdimm1,memdev=mem1 \
-	 -drive if=virtio,file=test.img,format=raw
-
-  $ qemu -M accel=kvm,nvdimm=on -m 1G,slots=4,maxmem=8G -cpu host \
-         -object memory-backend-file,id=mem1,share=on,mem-path=nvdimm.dat,size=1G \
-	 -device nvdimm,id=nvdimm1,memdev=mem1 \
-	 -drive if=virtio,file=test.img,format=raw \
-	 -incoming tcp::1234
-
-  (qemu) migrate tcp:127.0.0.1:1234
-
-The guest kernel panics or hangs every time on the destination.  It
-happens as long as the nvdimm device is present - I didn't even mount it
-inside the guest.
-
-Is migration expected to work?
-
-If not we need a migration blocker so that users get a graceful error
-message.
-
-Stefan
-
---2oS5YaxWCcQjTEyO
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZS89bAAoJEJykq7OBq3PI9WkIAK0L0XDPYWlehBXi3FJCs3y9
-38S1YZNl9ei61UTDVYs7kfWL6zzYvu7hbF7BVQSvh0Fap5X7hZmmX5mq3eJesmo1
-Fx/Ff2y6vupNQ1HJyuEfLHOG2fPRaqqDSwFpMfX4GOaPsxn0u8MAMvHHlan6HSFe
-0BkXvtFqMzcv8pJWpl1PcN+YWP4n4ETIdGURMw2/CCmiMyZf8B2dlsOhOKTNo/vx
-tXhZlX5y/5v9nr8DCau5koniTXrOFI1v/uCPiEc76gimdbIjEPA6ZM4nwae6I/yb
-HOoX7B6uCea1tLyYB7NutxzxnU0/QgdoT+9louwaNt63LVlNb/WqDnSAAPGM5M4=
-=c558
------END PGP SIGNATURE-----
-
---2oS5YaxWCcQjTEyO--
+-- PMM
