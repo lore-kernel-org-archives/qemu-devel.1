@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46164)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alejandro.lucero@netronome.com>) id 1dNyLX-0008LS-JX
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:24:17 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dO4tp-0007up-Up
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 12:24:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alejandro.lucero@netronome.com>) id 1dNyLV-0003fs-Q3
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:24:15 -0400
-Received: from mail-ua0-x22a.google.com ([2607:f8b0:400c:c08::22a]:35926)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alejandro.lucero@netronome.com>)
-	id 1dNyLV-0003dr-Lt
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:24:13 -0400
-Received: by mail-ua0-x22a.google.com with SMTP id g40so10724236uaa.3
-	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 02:24:10 -0700 (PDT)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dO4tp-00031A-46
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 12:24:05 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAOE=1Z0h+Dd=T8QKyVnTHwFjeYwm-qz_Da7HWEDk=pcrMbp9ug@mail.gmail.com>
-References: <CAOE=1Z1Bbgb494m6mYRnX1-80eT0tSnF0F6zNM7efEie4rd7DA@mail.gmail.com>
-	<CAOE=1Z1LJr9rpaEQ9+b7D5vM3N=Wy0oGunRnzoQ79x3dWA3oaw@mail.gmail.com>
-	<CALkUq2gp+x-nkALLTLqrSGmw8nfo5FzNeDpr1Gm3qh8N9mDn0Q@mail.gmail.com>
-	<CAOE=1Z0h+Dd=T8QKyVnTHwFjeYwm-qz_Da7HWEDk=pcrMbp9ug@mail.gmail.com>
-From: Alejandro Lucero <alejandro.lucero@netronome.com>
-Date: Thu, 22 Jun 2017 10:24:09 +0100
-Message-ID: <CAD+H991GHv1mgbpri=j5ssJ__zZ0Meup5T2kUSjMvCn8evoBUg@mail.gmail.com>
+Sender: philippe.mathieu.daude@gmail.com
+In-Reply-To: <CAFEAcA_kp1tVEd3km1+S7yCLtnVsRko6TQwPZL8xjqV3PVBu5w@mail.gmail.com>
+References: <20170531120049.14111-1-n54@gmx.com>
+	<26b48c35-b6cc-708d-c4d2-b26a9382e10a@msgid.tls.msk.ru>
+	<CAFEAcA_kp1tVEd3km1+S7yCLtnVsRko6TQwPZL8xjqV3PVBu5w@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Thu, 22 Jun 2017 13:24:00 -0300
+Message-ID: <CAAdtpL72EXWFzd6cEgBk_WDdn2Ue=XVU3=2g=WUoPo6uum22fg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [dpdk-dev] Will huge page have negative effect on
- guest vm in qemu enviroment?
+Subject: Re: [Qemu-devel] [PATCH v3] ivshmem-server: ivshmem-client: Build
+ when eventfd() is available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,128 +27,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sam <batmanustc@gmail.com>
-Cc: Pavel Shirshov <pavel.shirshov@gmail.com>, dev <dev@dpdk.org>, users@dpdk.org, qemu-devel@nongnu.org, qemu-discuss@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Michael Tokarev <mjt@tls.msk.ru>, Kamil Rytarowski <n54@gmx.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, peter.maydell@redhat.com
 
-On Wed, Jun 21, 2017 at 8:22 AM, Sam <batmanustc@gmail.com> wrote:
-
-> Thank you~
+On Thu, Jun 22, 2017 at 12:54 PM, Peter Maydell
+<peter.maydell@linaro.org> wrote:
+> On 5 June 2017 at 15:29, Michael Tokarev <mjt@tls.msk.ru> wrote:
+[...]
+>> $ ../configure --disable-system --disable-linux-user --static
+>> $ make V=1
+>> ...
 >
-> 1. We have a compare test on qemu-kvm enviroment with huge page and witho=
-ut
-> huge page. Qemu start process is much longer in huge page enviromwnt. And=
- I
-> write an email titled with '[DPDK-memory] how qemu waste such long time
-> under dpdk huge page envriment?'. I could resend it later.
->
->
-DPDK vhost code does some work when configuring the VM virtio port. If
-dequeue_zero_copy is set, the work to do is heavier, but I do not think
-this could imply huge longer bootup times.
+> Why are you trying to build with both system emulation QEMU
+> and linux-user QEMU disabled anyway? That doesn't leave very
+> much left to build...
 
+Hmm the only point would be to build libqemuutil.a...
 
-> 2. Then I have another test on qemu-kvm enviroment with huge page and
-> without huge page, which I didn't start ovs-dpdk and vhostuser port in qe=
-mu
-> start process. And I found Qemu start process is also much longer in huge
-> page enviroment.
->
-
-If hugepages are available, starting a qemu VM with hugepages should not
-take too long. So in this case, I would say the hugepages need to be
-allocated before the VM can boot. The only reason I can think of is
-transparent hugepages in use, then the system needs to work for undoing
-those transparent hugepages for allocating space to the VM hugepages.
-
-Did you check how many hugepages are available just before starting the
-QEMU VM?
-
-cat /sys/kernel/mm/hugepages/hugepages-*/free_hugepages
-
-If this is the problem, easy to solve just disabling transparent hugepages:
-
-echo never > /sys/kernel/mm/transparent_hugepage/enabled
-
-
-> So I think huge page enviroment, which grub2.cfg file is specified in
-> =E2=80=98[DPDK-memory]
-> how qemu waste such long time under dpdk huge page envriment?=E2=80=99, w=
-ill really
-> have negative effect on qemu start up process.
->
-> That's why we don't like to use ovs-dpdk. Althrough ovs-dpdk is faster, b=
-ut
-> the start up process of qemu is much longer then normal ovs, and the reas=
-on
-> is nothing with ovs but huge page. For customers, vm start up time is
-> important then network speed.
->
-> BTW, ovs-dpdk start up process is also longer then normal ovs. But I know
-> the reason, it's dpdk EAL init process with forking big continous memory
-> and zero this memory. For qemu, I don't know why, as there is no log to
-> report this.
->
-
-We had also problems with DPDK apps initialization with a server using
-256GB. I guess this is something that maybe could be improved.
-
-
->
-> 2017-06-21 14:15 GMT+08:00 Pavel Shirshov <pavel.shirshov@gmail.com>:
->
-> > Hi Sam,
-> >
-> > Below I'm saying about KVM. I don't have experience with vbox and other=
-s.
-> > 1. I'd suggest don't use dpdk inside of VM if you want to see best
-> > perfomance on the box.
-> > 2. huge pages enabled globally will not have any bad effect to guest
-> > OS. Except you have to enable huge pages inside of VM and provide real
-> > huge page for VM's huge pages from the host system. Otherwise dpdk
-> > will use "hugepages" inside of VM, but this "huge pages" will not real
-> > ones. They will be constructed from normal pages outside. Also when
-> > you enable huge pages OS will reserve them from start and your OS will
-> > not able use them for other things. Also you can't swap out huge
-> > pages, KSM will not work for them and so on.
-> > 3. You can enable huge pages just for one numa node. It's impossible
-> > to enable them just for one core. Usually you reserve some memory for
-> > hugepages when the system starts and you can't use this memory in
-> > normal applications unless normal application knows how to use them.
-> >
-> > Also why it didn't work inside of the docker?
-> >
-> >
-> > On Tue, Jun 20, 2017 at 8:35 PM, Sam <batmanustc@gmail.com> wrote:
-> > > BTW, we also think about use ovs-dpdk in docker enviroment, but test
-> > result
-> > > said it's not good idea, we don't know why.
-> > >
-> > > 2017-06-21 11:32 GMT+08:00 Sam <batmanustc@gmail.com>:
-> > >
-> > >> Hi all,
-> > >>
-> > >> We plan to use DPDK on HP host machine with several core and big
-> memory.
-> > >> We plan to use qemu-kvm enviroment. The host will carry 4 or more
-> guest
-> > vm
-> > >> and 1 ovs.
-> > >>
-> > >> Ovs-dpdk is much faster then normal ovs, but to use ovs-dpdk, we hav=
-e
-> to
-> > >> enable huge page globally.
-> > >>
-> > >> My question is, will huge page enabled globally have negative effect
-> on
-> > >> guest vm's memory orperate or something? If it is, how to prevent
-> this,
-> > or
-> > >> could I enable huge page on some core or enable huge page for a part
-> of
-> > >> memory?
-> > >>
-> > >> Thank you~
-> > >>
-> >
->
+Should the ./configure script return an error if $target_list is empty?
