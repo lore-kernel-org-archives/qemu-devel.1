@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dNycs-0000Iz-7p
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:42:11 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dNyfj-0002QK-Bh
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:45:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dNycr-0000b2-2t
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:42:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42262)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dNycq-0000aX-QX
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:42:09 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Thu, 22 Jun 2017 11:41:51 +0200
-Message-Id: <20170622094151.28633-4-david@redhat.com>
-In-Reply-To: <20170622094151.28633-1-david@redhat.com>
-References: <20170622094151.28633-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/3] target/s390x: Implement idte instruction
+	(envelope-from <alex.bennee@linaro.org>) id 1dNyff-00028A-8n
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:45:07 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:34881)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dNyff-00026l-0n
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:45:03 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id k67so15584811wrc.2
+	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 02:45:02 -0700 (PDT)
+References: <1498045580087.46004@epfl.ch>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1498045580087.46004@epfl.ch>
+Date: Thu, 22 Jun 2017 10:45:45 +0100
+Message-ID: <87injotkxi.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] Looking for ideas: Single process vs multi process
+ qemu instances
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,149 +30,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: rth@twiddle.net, agraf@suse.de, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, david@redhat.com
+To: Ajallooiean Hossein <hossein.ajallooiean@epfl.ch>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Let's keep it very simple for now and flush the complete tlb,
-we currently can't find the right entries in our tlb, we would have
-to store the used tables for each element.
 
-As we now fully implement the DAT-enhancement facility, we can allow to
-enable it for the qemu CPU model.
+Ajallooiean Hossein <hossein.ajallooiean@epfl.ch> writes:
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/cpu_models.c  |  1 +
- target/s390x/helper.h      |  1 +
- target/s390x/insn-data.def |  2 ++
- target/s390x/mem_helper.c  | 51 ++++++++++++++++++++++++++++++++++++++++++++++
- target/s390x/translate.c   | 15 ++++++++++++++
- 5 files changed, 70 insertions(+)
+> Hi All,
+>
+>
+> we are trying to do server simulation and for that purpose we need to
+> have multiple Qemu instances (each can have a different spec) that are
+> part of a virtual network (ns-3 in our case).
 
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 8fce957..74e3369 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -675,6 +675,7 @@ static void check_compatibility(const S390CPUModel *max_model,
- static void add_qemu_cpu_model_features(S390FeatBitmap fbm)
- {
-     static const int feats[] = {
-+        S390_FEAT_DAT_ENH,
-         S390_FEAT_STFLE,
-         S390_FEAT_EXTENDED_IMMEDIATE,
-         S390_FEAT_EXTENDED_TRANSLATION_2,
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 69249a5..d219ae4 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -130,6 +130,7 @@ DEF_HELPER_4(mvcs, i32, env, i64, i64, i64)
- DEF_HELPER_4(mvcp, i32, env, i64, i64, i64)
- DEF_HELPER_4(sigp, i32, env, i64, i32, i64)
- DEF_HELPER_FLAGS_2(sacf, TCG_CALL_NO_WG, void, env, i64)
-+DEF_HELPER_FLAGS_4(idte, TCG_CALL_NO_RWG, void, env, i64, i64, i32)
- DEF_HELPER_FLAGS_4(ipte, TCG_CALL_NO_RWG, void, env, i64, i64, i32)
- DEF_HELPER_FLAGS_1(ptlb, TCG_CALL_NO_RWG, void, env)
- DEF_HELPER_FLAGS_1(purge, TCG_CALL_NO_RWG, void, env)
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index d089707..82c5d53 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -900,6 +900,8 @@
-     C(0x8300, DIAG,    RSI,   Z,   0, 0, 0, 0, diag, 0)
- /* INSERT STORAGE KEY EXTENDED */
-     C(0xb229, ISKE,    RRE,   Z,   0, r2_o, new, r1_8, iske, 0)
-+/* INVALIDATE DAT TABLE ENTRY */
-+    C(0xb98e, IPDE,    RRF_b, Z,   r1_o, r2_o, 0, 0, idte, 0)
- /* INVALIDATE PAGE TABLE ENTRY */
-     C(0xb221, IPTE,    RRF_a, Z,   r1_o, r2_o, 0, 0, ipte, 0)
- /* LOAD CONTROL */
-diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 1507175..6224da5 100644
---- a/target/s390x/mem_helper.c
-+++ b/target/s390x/mem_helper.c
-@@ -1539,6 +1539,57 @@ uint32_t HELPER(mvcp)(CPUS390XState *env, uint64_t l, uint64_t a1, uint64_t a2)
-     return cc;
- }
- 
-+void HELPER(idte)(CPUS390XState *env, uint64_t r1, uint64_t r2, uint32_t m4)
-+{
-+    CPUState *cs = CPU(s390_env_get_cpu(env));
-+    const uintptr_t ra = GETPC();
-+    uint64_t table, entry, raddr;
-+    uint16_t entries, i, index = 0;
-+
-+    if (r2 & 0xff000) {
-+        cpu_restore_state(cs, ra);
-+        program_interrupt(env, PGM_SPECIFICATION, 4);
-+    }
-+
-+    if (!(r2 & 0x800)) {
-+        /* invalidation-and-clearing operation */
-+        table = r1 & _ASCE_ORIGIN;
-+        entries = (r2 & 0x7ff) + 1;
-+
-+        switch (r1 & _ASCE_TYPE_MASK) {
-+        case _ASCE_TYPE_REGION1:
-+            index = (r2 >> 53) & 0x7ff;
-+            break;
-+        case _ASCE_TYPE_REGION2:
-+            index = (r2 >> 42) & 0x7ff;
-+            break;
-+        case _ASCE_TYPE_REGION3:
-+            index = (r2 >> 31) & 0x7ff;
-+            break;
-+        case _ASCE_TYPE_SEGMENT:
-+            index = (r2 >> 20) & 0x7ff;
-+            break;
-+        }
-+        for (i = 0; i < entries; i++) {
-+            /* addresses are not wrapped in 24/31bit mode but table index is */
-+            raddr = table + ((index + i) & 0x7ff) * sizeof(entry);
-+            entry = ldq_phys(cs->as, raddr);
-+            if (!(entry & _REGION_ENTRY_INV)) {
-+                /* we are allowed to not store if already invalid */
-+                entry |= _REGION_ENTRY_INV;
-+                stq_phys(cs->as, raddr, entry);
-+            }
-+        }
-+    }
-+
-+    /* We simply flush the complete tlb, therefore we can ignore r3. */
-+    if (m4 & 1) {
-+        tlb_flush(cs);
-+    } else {
-+        tlb_flush_all_cpus_synced(cs);
-+    }
-+}
-+
- /* invalidate pte */
- void HELPER(ipte)(CPUS390XState *env, uint64_t pto, uint64_t vaddr,
-                   uint32_t m4)
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 7efc10b..1be4c3a 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -2407,6 +2407,21 @@ static ExitStatus op_ipm(DisasContext *s, DisasOps *o)
- }
- 
- #ifndef CONFIG_USER_ONLY
-+static ExitStatus op_idte(DisasContext *s, DisasOps *o)
-+{
-+    TCGv_i32 m4;
-+
-+    check_privileged(s);
-+    if (s390_has_feat(S390_FEAT_LOCAL_TLB_CLEARING)) {
-+        m4 = tcg_const_i32(get_field(s->fields, m4));
-+    } else {
-+        m4 = tcg_const_i32(0);
-+    }
-+    gen_helper_idte(cpu_env, o->in1, o->in2, m4);
-+    tcg_temp_free_i32(m4);
-+    return NO_EXIT;
-+}
-+
- static ExitStatus op_ipte(DisasContext *s, DisasOps *o)
- {
-     TCGv_i32 m4;
--- 
-2.9.4
+So you are talking about using TCG for simulation rather than KVM here?
+
+>
+>
+> Now for the Qemu implementation part: would it be easier/better to
+> have all the Qemu instances under a single process or multiple
+> processes? i am assuming if one single process is used, there will be
+> a threading conflict that would probably need to be looked at.
+
+QEMU isn't really setup for multiple machine instances in the one
+binary. If you are simulating a complex set of communicating machines
+then you will need one QEMU instance per machine.
+
+TCG can now use multiple threads (one per emulated vCPU) but this has
+only been enabled for a subset of architectures so far. You don't say
+what architecture your servers machines are.
+
+>
+>
+> I am looking at this purely from a management/performance view.
+>
+>
+> Any ideas/suggestions?
+>
+>
+> Thanks
+>
+> Hoss
+
+
+--
+Alex Bennée
