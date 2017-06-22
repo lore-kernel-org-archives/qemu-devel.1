@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1dNx5Z-0004LT-FG
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 04:03:42 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dNxGC-00018z-I3
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 04:14:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1dNx5U-0002km-NI
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 04:03:41 -0400
-Received: from mga04.intel.com ([192.55.52.120]:40039)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1dNx5U-0002ka-EX
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 04:03:36 -0400
-Date: Thu, 22 Jun 2017 16:03:25 +0800
-From: Zhong Yang <yang.zhong@intel.com>
-Message-ID: <20170622080325.GC28944@yangzhon-Virtual>
-References: <1498040401-16361-1-git-send-email-yang.zhong@intel.com>
-	<1498040401-16361-12-git-send-email-yang.zhong@intel.com>
-	<8eed64c0-4ac2-1067-a9fc-ec29dcf35632@redhat.com>
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dNxG7-0005uQ-Ty
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 04:14:40 -0400
+Received: from [59.151.112.132] (port=50176 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dNxG6-0005tz-Uf
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 04:14:35 -0400
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Date: Thu, 22 Jun 2017 16:14:18 +0800
+Message-ID: <971cab75a0b4e011a18de8afb0ed4eedb7810eb6.1498116042.git.maozy.fnst@cn.fujitsu.com>
+In-Reply-To: <d60b5927063e257e3414864b1ee6c569ac61b712.1497957189.git.maozy.fnst@cn.fujitsu.com>
+References: <d60b5927063e257e3414864b1ee6c569ac61b712.1497957189.git.maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8eed64c0-4ac2-1067-a9fc-ec29dcf35632@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 11/15] tcg: split
- cpu_set_mxcsr()/cpu_set_fpuc()
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v7 7/9] pci: Convert shpc_init() to Error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,122 +25,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, anthony.xu@intel.com, a.rigo@virtualopensystems.com, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, marcel@redhat.com, armbru@redhat.com
 
-On Wed, Jun 21, 2017 at 03:15:25PM +0200, Paolo Bonzini wrote:
-> 
-> 
-> On 21/06/2017 12:19, Yang Zhong wrote:
-> > Split the cpu_set_mxcsr()/cpu_set_fpuc() with specific tcg code.
-> > tcg_update_mxcsr()/tcg_set_fpuc() need be implemented in tcg-stub.c
-> > file if tcg is disabled.
-> > 
-> > Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> > ---
-> >  accel/stubs/tcg-stub.c   |  8 ++++++++
-> >  target/i386/cpu.h        | 15 +++++++++++++--
-> >  target/i386/fpu_helper.c |  8 +++-----
-> >  3 files changed, 24 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/accel/stubs/tcg-stub.c b/accel/stubs/tcg-stub.c
-> > index dafb1d0..91625a8 100644
-> > --- a/accel/stubs/tcg-stub.c
-> > +++ b/accel/stubs/tcg-stub.c
-> > @@ -75,6 +75,14 @@ void dump_opcount_info(FILE *f, fprintf_function cpu_fprintf)
-> >  {
-> >  }
-> >  
-> > +void tcg_update_mxcsr(CPUX86State *env)
-> > +{
-> > +}
-> > +
-> > +void tcg_set_fpuc(CPUX86State *env)
-> > +{
-> > +}
-> > +
-> >  void cpu_loop_exit(CPUState *cpu)
-> >  {
-> >      abort();
-> > diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> > index 8b3b535..229b216 100644
-> > --- a/target/i386/cpu.h
-> > +++ b/target/i386/cpu.h
-> > @@ -1643,8 +1643,19 @@ static inline int32_t x86_get_a20_mask(CPUX86State *env)
-> >  }
-> >  
-> >  /* fpu_helper.c */
-> > -void cpu_set_mxcsr(CPUX86State *env, uint32_t val);
-> > -void cpu_set_fpuc(CPUX86State *env, uint16_t val);
-> > +void tcg_update_mxcsr(CPUX86State *env);
-> > +void tcg_set_fpuc(CPUX86State *env);
-> > +static inline void cpu_set_mxcsr(CPUX86State *env, uint32_t mxcsr)
-> > +{
-> > +    env->mxcsr = mxcsr;
-> > +    tcg_update_mxcsr(env);
-> 
-> Instead of having to add stubs, please guard the call with "if
-> (tcg_enabled())".  Same below.
-> 
-> Paolo
->
-  Hello Paolo,
+In order to propagate error message better, convert shpc_init() to
+Error also convert the pci_bridge_dev_initfn() to realize.
 
-  Got it! thanks!
+Cc: mst@redhat.com
+Cc: marcel@redhat.com
+Cc: armbru@redhat.com
+Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+---
+v7:
+* drop the !local_err assert is really not appropriate,
+  now revert it.            [Marcel Apfelbaum]
 
-  From your comments + Richard Henderson's comments, i got below guideline
-  (1) accel/stubs/tcg-stub.c
-      This file is target-independent file, do not add x86-specific stubs functions into this file.
+ hw/pci-bridge/pci_bridge_dev.c | 14 ++++++--------
+ hw/pci/shpc.c                  | 11 +++++------
+ hw/pci/slotid_cap.c            | 11 +++++------
+ include/hw/pci/shpc.h          |  3 ++-
+ include/hw/pci/slotid_cap.h    |  3 ++-
+ 5 files changed, 20 insertions(+), 22 deletions(-)
 
-  (2) there are three kind of methods to mask TCG relative function
-      a) if(tcg_enabled())
-      b) if CONFIG_TCG
-      c) stub function
-
-  Paolo, which one is your prefer?  a) ?  please also make sure your prefer sequence, a) > b) > c) ?
-  
-
-  Yang
-  
+diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
+index 5dbd933..4373f1d 100644
+--- a/hw/pci-bridge/pci_bridge_dev.c
++++ b/hw/pci-bridge/pci_bridge_dev.c
+@@ -49,7 +49,7 @@ struct PCIBridgeDev {
+ };
+ typedef struct PCIBridgeDev PCIBridgeDev;
  
-> > +}
-> > +
-> > +static inline void cpu_set_fpuc(CPUX86State *env, uint16_t fpuc)
-> > +{
-> > +     env->fpuc = fpuc;
-> > +     tcg_set_fpuc(env);
-> > +}
-> >  
-> >  /* mem_helper.c */
-> >  void helper_lock_init(void);
-> > diff --git a/target/i386/fpu_helper.c b/target/i386/fpu_helper.c
-> > index 34fb5fc..a7550c9 100644
-> > --- a/target/i386/fpu_helper.c
-> > +++ b/target/i386/fpu_helper.c
-> > @@ -1550,12 +1550,11 @@ void helper_xsetbv(CPUX86State *env, uint32_t ecx, uint64_t mask)
-> >  #define SSE_RC_CHOP         0x6000
-> >  #define SSE_FZ              0x8000
-> >  
-> > -void cpu_set_mxcsr(CPUX86State *env, uint32_t mxcsr)
-> > +void tcg_update_mxcsr(CPUX86State *env)
-> >  {
-> > +    uint32_t mxcsr = env->mxcsr;
-> >      int rnd_type;
-> >  
-> > -    env->mxcsr = mxcsr;
-> > -
-> >      /* set rounding mode */
-> >      switch (mxcsr & SSE_RC_MASK) {
-> >      default:
-> > @@ -1581,9 +1580,8 @@ void cpu_set_mxcsr(CPUX86State *env, uint32_t mxcsr)
-> >      set_flush_to_zero((mxcsr & SSE_FZ) ? 1 : 0, &env->fp_status);
-> >  }
-> >  
-> > -void cpu_set_fpuc(CPUX86State *env, uint16_t val)
-> > +void tcg_set_fpuc(CPUX86State *env)
-> >  {
-> > -    env->fpuc = val;
-> >      update_fp_status(env);
-> >  }
-> >  
-> > 
+-static int pci_bridge_dev_initfn(PCIDevice *dev)
++static void pci_bridge_dev_realize(PCIDevice *dev, Error **errp)
+ {
+     PCIBridge *br = PCI_BRIDGE(dev);
+     PCIBridgeDev *bridge_dev = PCI_BRIDGE_DEV(dev);
+@@ -62,7 +62,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
+         dev->config[PCI_INTERRUPT_PIN] = 0x1;
+         memory_region_init(&bridge_dev->bar, OBJECT(dev), "shpc-bar",
+                            shpc_bar_size(dev));
+-        err = shpc_init(dev, &br->sec_bus, &bridge_dev->bar, 0);
++        err = shpc_init(dev, &br->sec_bus, &bridge_dev->bar, 0, errp);
+         if (err) {
+             goto shpc_error;
+         }
+@@ -71,7 +71,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
+         bridge_dev->msi = ON_OFF_AUTO_OFF;
+     }
+ 
+-    err = slotid_cap_init(dev, 0, bridge_dev->chassis_nr, 0);
++    err = slotid_cap_init(dev, 0, bridge_dev->chassis_nr, 0, errp);
+     if (err) {
+         goto slotid_error;
+     }
+@@ -87,7 +87,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
+             /* Can't satisfy user's explicit msi=on request, fail */
+             error_append_hint(&local_err, "You have to use msi=auto (default) "
+                     "or msi=off with this machine type.\n");
+-            error_report_err(local_err);
++            error_propagate(errp, local_err);
+             goto msi_error;
+         }
+         assert(!local_err || bridge_dev->msi == ON_OFF_AUTO_AUTO);
+@@ -101,7 +101,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
+         pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
+                          PCI_BASE_ADDRESS_MEM_TYPE_64, &bridge_dev->bar);
+     }
+-    return 0;
++    return;
+ 
+ msi_error:
+     slotid_cap_cleanup(dev);
+@@ -111,8 +111,6 @@ slotid_error:
+     }
+ shpc_error:
+     pci_bridge_exitfn(dev);
+-
+-    return err;
+ }
+ 
+ static void pci_bridge_dev_exitfn(PCIDevice *dev)
+@@ -216,7 +214,7 @@ static void pci_bridge_dev_class_init(ObjectClass *klass, void *data)
+     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+     HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
+ 
+-    k->init = pci_bridge_dev_initfn;
++    k->realize = pci_bridge_dev_realize;
+     k->exit = pci_bridge_dev_exitfn;
+     k->config_write = pci_bridge_dev_write_config;
+     k->vendor_id = PCI_VENDOR_ID_REDHAT;
+diff --git a/hw/pci/shpc.c b/hw/pci/shpc.c
+index d72d5e4..69fc14b 100644
+--- a/hw/pci/shpc.c
++++ b/hw/pci/shpc.c
+@@ -446,16 +446,14 @@ static void shpc_cap_update_dword(PCIDevice *d)
+ }
+ 
+ /* Add SHPC capability to the config space for the device. */
+-static int shpc_cap_add_config(PCIDevice *d)
++static int shpc_cap_add_config(PCIDevice *d, Error **errp)
+ {
+     uint8_t *config;
+     int config_offset;
+-    Error *local_err = NULL;
+     config_offset = pci_add_capability(d, PCI_CAP_ID_SHPC,
+                                        0, SHPC_CAP_LENGTH,
+-                                       &local_err);
++                                       errp);
+     if (config_offset < 0) {
+-        error_report_err(local_err);
+         return config_offset;
+     }
+     config = d->config + config_offset;
+@@ -584,13 +582,14 @@ void shpc_device_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
+ }
+ 
+ /* Initialize the SHPC structure in bridge's BAR. */
+-int shpc_init(PCIDevice *d, PCIBus *sec_bus, MemoryRegion *bar, unsigned offset)
++int shpc_init(PCIDevice *d, PCIBus *sec_bus, MemoryRegion *bar,
++              unsigned offset, Error **errp)
+ {
+     int i, ret;
+     int nslots = SHPC_MAX_SLOTS; /* TODO: qdev property? */
+     SHPCDevice *shpc = d->shpc = g_malloc0(sizeof(*d->shpc));
+     shpc->sec_bus = sec_bus;
+-    ret = shpc_cap_add_config(d);
++    ret = shpc_cap_add_config(d, errp);
+     if (ret) {
+         g_free(d->shpc);
+         return ret;
+diff --git a/hw/pci/slotid_cap.c b/hw/pci/slotid_cap.c
+index bdca205..36d021b 100644
+--- a/hw/pci/slotid_cap.c
++++ b/hw/pci/slotid_cap.c
+@@ -9,14 +9,14 @@
+ 
+ int slotid_cap_init(PCIDevice *d, int nslots,
+                     uint8_t chassis,
+-                    unsigned offset)
++                    unsigned offset,
++                    Error **errp)
+ {
+     int cap;
+-    Error *local_err = NULL;
+ 
+     if (!chassis) {
+-        error_report("Bridge chassis not specified. Each bridge is required "
+-                     "to be assigned a unique chassis id > 0.");
++        error_setg(errp, "Bridge chassis not specified. Each bridge is required"
++                   " to be assigned a unique chassis id > 0.");
+         return -EINVAL;
+     }
+     if (nslots < 0 || nslots > (PCI_SID_ESR_NSLOTS >> SLOTID_NSLOTS_SHIFT)) {
+@@ -25,9 +25,8 @@ int slotid_cap_init(PCIDevice *d, int nslots,
+     }
+ 
+     cap = pci_add_capability(d, PCI_CAP_ID_SLOTID, offset,
+-                             SLOTID_CAP_LENGTH, &local_err);
++                             SLOTID_CAP_LENGTH, errp);
+     if (cap < 0) {
+-        error_report_err(local_err);
+         return cap;
+     }
+     /* We make each chassis unique, this way each bridge is First in Chassis */
+diff --git a/include/hw/pci/shpc.h b/include/hw/pci/shpc.h
+index 71e836b..ee19fec 100644
+--- a/include/hw/pci/shpc.h
++++ b/include/hw/pci/shpc.h
+@@ -38,7 +38,8 @@ struct SHPCDevice {
+ 
+ void shpc_reset(PCIDevice *d);
+ int shpc_bar_size(PCIDevice *dev);
+-int shpc_init(PCIDevice *dev, PCIBus *sec_bus, MemoryRegion *bar, unsigned off);
++int shpc_init(PCIDevice *dev, PCIBus *sec_bus, MemoryRegion *bar,
++              unsigned off, Error **errp);
+ void shpc_cleanup(PCIDevice *dev, MemoryRegion *bar);
+ void shpc_free(PCIDevice *dev);
+ void shpc_cap_write_config(PCIDevice *d, uint32_t addr, uint32_t val, int len);
+diff --git a/include/hw/pci/slotid_cap.h b/include/hw/pci/slotid_cap.h
+index 70db047..a777ea0 100644
+--- a/include/hw/pci/slotid_cap.h
++++ b/include/hw/pci/slotid_cap.h
+@@ -5,7 +5,8 @@
+ 
+ int slotid_cap_init(PCIDevice *dev, int nslots,
+                     uint8_t chassis,
+-                    unsigned offset);
++                    unsigned offset,
++                    Error **errp);
+ void slotid_cap_cleanup(PCIDevice *dev);
+ 
+ #endif
+-- 
+2.9.3
