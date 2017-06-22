@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dNsGx-0002vN-BS
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 22:55:08 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dNsrY-0005Ie-Cw
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 23:32:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dNsGw-00086c-GG
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 22:55:07 -0400
-In-Reply-To: <CAFEAcA85obZ5eD7Lpydi4vH4DVat6xpaskVumodv2u1Hzz6CCg@mail.gmail.com>
-References: <0F376E9C-2D4B-4D79-B3D4-24F73FD61446@gmail.com>
-	<20170508221304.y36owezwla7sc6ss@aurel32.net>
-	<BB3E29F1-8BBB-407B-AAC8-795E9718CF5E@gmail.com>
-	<20170508225007.2duqxlo5ab2aenpl@aurel32.net>
-	<alpine.BSF.2.20.1705091148560.78100@zero.eik.bme.hu>
-	<F3D7AC88-099F-432D-B46F-97F2A6F7B0E3@gmail.com>
-	<f2644920-8eda-e768-adee-71db36ea2fa3@amsat.org>
-	<CAFEAcA-72bvtKsPHttUizYj8EvZJDfjUda7CeZe-tpRk73+NXw@mail.gmail.com>
-	<CE257476-FBA4-4579-A558-495797786922@gmail.com>
-	<CAFEAcA85obZ5eD7Lpydi4vH4DVat6xpaskVumodv2u1Hzz6CCg@mail.gmail.com>
-Mime-Version: 1.0 (Apple Message framework v753.1)
-Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
-Message-Id: <4BD44623-AD16-4D5D-BF51-15521035E974@gmail.com>
-Content-Transfer-Encoding: 7bit
-From: G 3 <programmingkidx@gmail.com>
-Date: Wed, 21 Jun 2017 22:54:56 -0400
-Subject: Re: [Qemu-devel] [Qemu-ppc] Floating point unit bugs
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dNsrV-0004Vv-76
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 23:32:56 -0400
+Received: from mail-qk0-x235.google.com ([2607:f8b0:400d:c09::235]:33871)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dNsrV-0004Vj-22
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 23:32:53 -0400
+Received: by mail-qk0-x235.google.com with SMTP id d14so3029818qkb.1
+	for <qemu-devel@nongnu.org>; Wed, 21 Jun 2017 20:32:52 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Thu, 22 Jun 2017 00:32:10 -0300
+Message-Id: <20170622033231.19344-1-f4bug@amsat.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 00/21] travis: speedup to reduce failures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +31,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?ISO-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, BALATON Zoltan <balaton@eik.bme.hu>, "qemu-ppc@nongnu.org list:PowerPC" <qemu-ppc@nongnu.org>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
+These patches try to improve our Travis CI usage (quite a few failures the last
+days).
 
-On Jun 21, 2017, at 12:28 PM, Peter Maydell wrote:
+This series include Peter's "Automate coverity scan uploads via Travis"
+patches (here numbered 3 to 6). See
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg457443.html
 
-> On 21 June 2017 at 17:27, G 3 <programmingkidx@gmail.com> wrote:
->> On Jun 21, 2017, at 12:20 PM, Peter Maydell wrote:
->>> We don't yet have any mechanism for having tests that need to
->>> be compiled for the target architecture, do we?
->>
->>
->> I don't know about that but I do know we have image files that can  
->> be booted
->> in various guest. These image files could include tests like the  
->> floating
->> point test.
->>
->> Here is the link to the test images page:
->> http://wiki.qemu.org/Testing/System_Images
->
-> Yes -- those are almost all very out of date, not reproducible
-> at all and don't cover very many of our systems, because we
-> don't have a good mechanism for writing tests that need
-> to be built for the target architecture. I'd like us to
-> have a setup so that it's easy to say "just add a new test",
-> rather than accumulating more random images on the wiki...
+Patch 7 is expected to enter /master as of today.
+Travis warned few months ago:
+  "On Wednesday, June 21st 2017, we are going to update all our Ubuntu Trusty
+  14.04 images."
 
-The advantage a test image would have is the user doesn't have to  
-worry about compiling a test using a cross compiler. Everything the  
-user would need to test QEMU is already inside the image file  
-(hopefully).
+Patches 2, 10 and 15 use 'travis_retry' feature to avoid aborting a job on
+network failure, retrying 3 times (default).
 
-Is the setup you want something like running 'make test' ? I imagine  
-binary files included with QEMU would test the emulated CPU. There  
-would be no need to cross compile anything. 
+Patches 8, 19 are upgrades allowing to use recent VMs/toolchains.
+
+Patch 12 speed up builds using multicore parallelism, caring about not overkill
+Travis hardware.
+
+Patches 9, 11, 13, 17 speed up builds improving cache usage.
+
+Patches 18, 21 silent warnings.
+
+Patch 14 gives hint when ./configure fails.
+
+Patch 16 split slow gprof/gcov job.
+
+Finally patch 1 add a missing rule to build system-qemu binary before running
+qtests.
+
+time comparison:
+----------------
+
+current /master https://travis-ci.org/qemu/qemu/builds/245061137:
+ Ran for 2 hrs 4 min 17 sec
+ Total time 7 hrs 34 min 22 sec
+
+this seris with 3 more jobs https://travis-ci.org/philmd/qemu/builds/245593509:
+ Ran for 1 hr 26 min 35 sec
+ Total time 6 hrs 32 min 49 sec
+
+Regards,
+
+Phil.
+
+Peter Maydell (3):
+  travis: install more library dependencies
+  scripts/run-coverity-scan: Script to run Coverity Scan build
+  travis: Add config to do a Coverity Scan upload
+
+Philippe Mathieu-Daudé (18):
+  tests: add missing dependency to build QTEST_QEMU_BINARY
+  travis: retry if llvm.org timeouts
+  travis: install more library dependencies
+  travis: update sudo-enabled Trusty images
+  travis: use gcc-6 sanitizers
+  travis: enable multiple caching features
+  travis: increase S3 cache timeout
+  travis: cache git submodules
+  travis: build using all available cores
+  travis: improve ccache use
+  travis: dump config.log if ./configure script fails
+  travis: retry when git submodules initialization fails
+  travis: split the gprof/gcov job
+  travis/osx: don't update Homebrew cache
+  travis/osx: silent texinfo warnings
+  travis/osx: build using more Xcode versions
+  MAINTAINERS: self-appoint me as reviewer in build/test automation
+  ui/vnc: silent unuseful OSX clang warning
+
+ .travis.yml               | 135 +++++++++++++++++++++++++++++-------
+ MAINTAINERS               |   1 +
+ scripts/run-coverity-scan | 170 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/Makefile.include    |   2 +-
+ ui/Makefile.objs          |   8 +++
+ 5 files changed, 290 insertions(+), 26 deletions(-)
+ create mode 100755 scripts/run-coverity-scan
+
+-- 
+2.11.0
