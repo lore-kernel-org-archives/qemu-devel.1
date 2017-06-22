@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44653)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dO6V3-000467-9O
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 14:06:40 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dO6VC-0004Aw-Bh
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 14:06:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dO6V0-0000Br-1l
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 14:06:37 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:45458)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dO6V9-0000Fo-45
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 14:06:46 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:45464)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dO6Uz-0000Bl-Ld
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 14:06:33 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dO6V8-0000FS-O7
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 14:06:43 -0400
 From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <149815324718.1244.3160041743780966810.stgit@frigg.lan>
-Date: Thu, 22 Jun 2017 21:06:25 +0300
-In-Reply-To: <149815324718.1244.3160041743780966810.stgit@frigg.lan>
+References: <149815391105.3600.9013710785760418418.stgit@frigg.lan>
+Date: Thu, 22 Jun 2017 21:06:34 +0300
+In-Reply-To: <149815391105.3600.9013710785760418418.stgit@frigg.lan>
 	(=?utf-8?Q?=22Llu=C3=ADs?=
-	Vilanova"'s message of "Thu, 22 Jun 2017 20:40:47 +0300")
-Message-ID: <8760fnlwwu.fsf@frigg.lan>
+	Vilanova"'s message of "Thu, 22 Jun 2017 20:51:51 +0300")
+Message-ID: <871sqblwwl.fsf@frigg.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v7 00/26] translate: [tcg] Generic
+Subject: Re: [Qemu-devel] [PATCH v8 00/26] translate: [tcg] Generic
  translation framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -61,6 +61,14 @@ in the
 
 > Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 > ---
+
+> Changes in v8
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+> * Increase inter-mail sleep time during sending (list keeps refusing some=
+ emails
+>   due to an excessive send rate).
+
 
 > Changes in v7
 > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
