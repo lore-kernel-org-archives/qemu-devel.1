@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dO4xQ-0002H8-J7
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 12:27:49 -0400
+	(envelope-from <groug@kaod.org>) id 1dO5CE-00079I-BE
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 12:43:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dO4xM-0004ZF-Mo
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 12:27:48 -0400
-References: <20170613121639.17853-1-pbutsykin@virtuozzo.com>
-	<20170613121639.17853-2-pbutsykin@virtuozzo.com>
-	<b5367763-781e-0fdc-b9e7-fa6ee44ce66b@redhat.com>
-	<e0966061-964c-95c5-20b2-904d651609dc@virtuozzo.com>
-	<20170622144950.GB4353@noname.redhat.com>
-From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Message-ID: <20bfbb06-6813-5e1e-c487-63b465538d2c@virtuozzo.com>
-Date: Thu, 22 Jun 2017 19:26:46 +0300
+	(envelope-from <groug@kaod.org>) id 1dO5CB-0001VB-8D
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 12:43:06 -0400
+Received: from 4.mo5.mail-out.ovh.net ([178.33.111.247]:56954)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dO5CB-0001TS-0w
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 12:43:03 -0400
+Received: from player695.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 772A410C57D
+	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 18:43:01 +0200 (CEST)
+Date: Thu, 22 Jun 2017 18:42:55 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170622184255.2d44e3bd@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <CAFEAcA8yqb8ykP8nCnoVNQUZd851RhOLFf2TfkHZmL2je+pP=Q@mail.gmail.com>
+References: <149814756006.27338.8723356702388175951.stgit@bahia>
+	<CAFEAcA8yqb8ykP8nCnoVNQUZd851RhOLFf2TfkHZmL2je+pP=Q@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170622144950.GB4353@noname.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] qemu-img: add --shrink flag for
- resize
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/l6UDZ_XfHgpvO.GVsI_IG1d";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH] Separate function types from opaque types
+ in include/qemu/typedefs.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +32,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, eblake@redhat.com, armbru@redhat.com, den@openvz.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-On 22.06.2017 17:49, Kevin Wolf wrote:
-> Am 22.06.2017 um 15:54 hat Pavel Butsykin geschrieben:
->> On 22.06.2017 01:17, Max Reitz wrote:
->>> On 2017-06-13 14:16, Pavel Butsykin wrote:
->>>> The flag as additional precaution of data loss. Perhaps in the future the
->>>> operation shrink without this flag will be banned, but while we need to
->>>> maintain compatibility.
->>>>
->>>> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
-> 
->>> The functional changes look good to me; even though I'd rather have it
->>> an error for qcow2 now (even if that means having to check the image
->>> format in img_resize(), and being inconsistent because you wouldn't need
->>> --shrink for raw, but for qcow2 you would). But, well, I'm not going to
->>> stop this series over that.
->>>
->>
->> Why shrink for qcow2 image is dangerous, but for raw is not dangerous? I
->> think we should provide the same behavior for all formats. When --shrink
->> option will become necessary, it also should be the same for all image
->> formats.
-> 
-> It is dangerous for both, but for raw we can't enforce the flag
-> immediately without a deprecation period. With qcow2 we can (because it
-> is new functionality), so we might as well enforce it from the start.
->
+--Sig_/l6UDZ_XfHgpvO.GVsI_IG1d
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Ah, exactly. I like the offer to print the warning for raw and enforce
-the flag for other formats.
+On Thu, 22 Jun 2017 17:14:08 +0100
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-> Kevin
-> 
+> On 22 June 2017 at 17:06, Greg Kurz <groug@kaod.org> wrote:
+> > Function types cannot reside in the same sorted list as opaque types si=
+nce
+> > they may depend on a type which would be defined later.
+> >
+> > Of course, the same problem could arise if a function type depends on
+> > another function type with greater alphabetical order. Hopefully we
+> > don't have that at this time. =20
+>=20
+> The other approach would be to put function types somewhere
+> else and leave typedefs.h for the simple 'opaque types
+> for structures' that it was started as.
+>=20
+> For instance we have include/qemu/fprintf-fn.h as a precedent.
+>=20
+
+Indeed, and I'm not quite sure why Juan decided to put these types into
+typedefs.h instead of a dedicated header file in include/migration... is
+it only because it was the quickest fix ?
+
+> thanks
+> -- PMM
+
+
+--Sig_/l6UDZ_XfHgpvO.GVsI_IG1d
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAllL848ACgkQAvw66wEB28KHpACdEKMhm+2wFlTmol5zFp5iEwqk
+N+wAoJqM1m9VLLOrPoTak37EP+gCTy/E
+=X6OY
+-----END PGP SIGNATURE-----
+
+--Sig_/l6UDZ_XfHgpvO.GVsI_IG1d--
