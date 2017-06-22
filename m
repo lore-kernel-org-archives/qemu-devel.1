@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dO2b7-0001JO-HA
+	(envelope-from <armbru@redhat.com>) id 1dO2bB-0001R9-Ke
 	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 09:56:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dO2b2-0005q9-TM
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 09:56:37 -0400
-References: <20170613121639.17853-1-pbutsykin@virtuozzo.com>
-	<20170613121639.17853-3-pbutsykin@virtuozzo.com>
-	<364b26de-e7fa-1a90-ac33-2a444ca281eb@redhat.com>
-From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Message-ID: <e8efe501-49ed-17a8-775f-f436cf7f38a8@virtuozzo.com>
-Date: Thu, 22 Jun 2017 16:55:23 +0300
+	(envelope-from <armbru@redhat.com>) id 1dO2bA-0005r2-FZ
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 09:56:41 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <7ec58051-d835-a485-7578-2022351c9712@gmail.com>
+	<20170619072727.GA6113@noname.redhat.com>
+	<6324ce25-8fa8-9204-d15b-32f20fb71e4b@gmail.com>
+	<20170619104915.GC6113@noname.redhat.com>
+Date: Thu, 22 Jun 2017 15:56:23 +0200
+In-Reply-To: <20170619104915.GC6113@noname.redhat.com> (Kevin Wolf's message
+	of "Mon, 19 Jun 2017 12:49:15 +0200")
+Message-ID: <8737asjfco.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <364b26de-e7fa-1a90-ac33-2a444ca281eb@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] qcow2: add qcow2_cache_discard
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Question] How can we confirm hot-plug disk
+ succesfully?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,144 +27,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Xie Changlong <xiechanglong.d@gmail.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 22.06.2017 01:29, Max Reitz wrote:
-> On 2017-06-13 14:16, Pavel Butsykin wrote:
->> Whenever l2/refcount table clusters are discarded from the file we can
->> automatically drop unnecessary content of the cache tables. This reduces
->> the chance of eviction useful cache data and eliminates inconsistent data
->> in thecache with the data in the file.
->>
->> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
->> ---
->>   block/qcow2-cache.c    | 21 +++++++++++++++++++++
->>   block/qcow2-refcount.c |  5 +++++
->>   block/qcow2.h          |  1 +
->>   3 files changed, 27 insertions(+)
->>
->> diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
->> index 1d25147392..7931edf237 100644
->> --- a/block/qcow2-cache.c
->> +++ b/block/qcow2-cache.c
->> @@ -411,3 +411,24 @@ void qcow2_cache_entry_mark_dirty(BlockDriverState *bs, Qcow2Cache *c,
->>       assert(c->entries[i].offset != 0);
->>       c->entries[i].dirty = true;
->>   }
->> +
->> +void qcow2_cache_discard(BlockDriverState *bs, Qcow2Cache *c, uint64_t offset)
->> +{
->> +    int i;
->> +
->> +    for (i = 0; i < c->size; i++) {
->> +        if (c->entries[i].offset == offset) {
->> +            goto found; /* table offset */
->> +        }
->> +    }
->> +    return;
->> +
->> +found:
->> +    assert(c->entries[i].ref == 0);
->> +
->> +    c->entries[i].offset = 0;
->> +    c->entries[i].lru_counter = 0;
->> +    c->entries[i].dirty = false;
->> +
->> +    qcow2_cache_table_release(bs, c, i, 1);
->> +}
->> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
->> index 7c06061aae..576ab551d6 100644
->> --- a/block/qcow2-refcount.c
->> +++ b/block/qcow2-refcount.c
->> @@ -767,6 +767,11 @@ static int QEMU_WARN_UNUSED_RESULT update_refcount(BlockDriverState *bs,
->>           s->set_refcount(refcount_block, block_index, refcount);
->>   
->>           if (refcount == 0 && s->discard_passthrough[type]) {
->> +            qcow2_cache_put(bs, s->refcount_block_cache, &refcount_block);
-> 
-> I don't like this very much. It works, but it feels bad.
-> 
-> Would it be possible to store this refblock's offset somewhere and only
-> put it back if @offset is equal to that?
-> 
->> +            qcow2_cache_discard(bs, s->refcount_block_cache, offset);
->> +
->> +            qcow2_cache_discard(bs, s->l2_table_cache, offset);
->> +
-> 
-> So you're blindly calling qcow2_cache_discard() on @offset because
-> @offset may be pointing to a refblock or an L2 table? Right, that works,
-> but it still deserves a comment, I think (that we have no idea whether
-> @offset actually points to any of these refcount structures, but that we
-> also just don't have to care).
-> 
-> Looks OK to me, functionally, but I'd at least like to have that comment.
+Kevin Wolf <kwolf@redhat.com> writes:
+
+> Am 19.06.2017 um 12:27 hat Xie Changlong geschrieben:
+>> =E5=9C=A8 6/19/2017 3:27 PM, Kevin Wolf =E5=86=99=E9=81=93:
+>> >Am 18.06.2017 um 09:21 hat Xie Changlong geschrieben:
+>> >>In device hot-remove scenario, if we don't probe acpiphp module on
+>> >>the guest, 'device_del' will never emit DEVICE_DELETED event(because
+>> >>guest will not write to __EJ0) . So we can confirm that hot-remove
+>> >>failed. But IIUC, there is no event such as DEVICE_ADDED, so
+>> >>1) How can we confirm hotplug('device_add') successfully?
+>> >>2) It seems when hot-plug disk, we don't care acpiphp module status
+>> >>on the guest, am I right?
+>> >>3) Why there is no DEVICE_ADDED like event?
+>> >
+>> >device_add doesn't need guest cooperation, so it is immediately
+>> >completed when the QMP command returns success.
+>> >
+>>=20
+>> That's what i though too. But I have a question, if we don't proble
+>> acpiphp on the guest, and execute below commands:
+>>=20
+>> Hot plug:
+>> (qemu) drive_add 0
+>> file=3D/resource/changlox/test.raw,id=3Ddrive-virtio-disk1,if=3Dnone
+>> (qemu) device_add virtio-blk-pci,drive=3Ddrive-virtio-disk1,id=3Dvirtio-=
+disk1
+>>=20
+>> Hot remove:
+>> (qemu) device_del virtio-disk1
+>> (qemu) drive_del drive-virtio-disk1
+>> (qemu) qom-list /machine/peripheral
+>> type (string)
+>> virtio-disk1 (child<virtio-blk-pci>)
+>> (qemu) info block
+>> foo (#block122): suse1.qcow2 (qcow2)
+>>     Cache mode:       writeback, direct
+>>     Backing file:     suse.qcow2.orgin (chain depth: 1)
+>>=20
+>> ide1-cd0: [not inserted]
+>>     Removable device: not locked, tray closed
+>>=20
+>> floppy0: [not inserted]
+>>     Removable device: not locked, tray closed
+>>=20
+>> sd0: [not inserted]
+>>     Removable device: not locked, tray closed
+>> (qemu) drive_add 0
+>> file=3D/resource/changlox/test.raw,id=3Ddrive-virtio-disk1,if=3Dnone
+>> Duplicate ID 'drive-virtio-disk1' for drive
+>>=20
+>> 'info block' shows nothing, but we can't add drive who's id
+>> is'drive-virtio-disk1' too.
 >
+> Yes, the old BlockBackend is only fully freed when the guest actually
+> unplugs the device. Specifically, we would have to free the QemuOpts
+> in DriveInfo that keeps the ID reserved. Currently, it is only freed
+> when the BlockBackend is destroyed:
+>
+>     blockdev_auto_del()
+>         blk_unref()
+>             blk_delete()
+>                 drive_info_del()
+>
+> We can't free the DriveInfo earlier because it's still needed while the
+> guest device is still alive.
+>
+> I'm not sure, but it may be possible to free just the QemuOpts in
+> monitor_remove_blk(), so that the ID can immediately be reused.
+>
+> Markus, would you know?
 
-Hmm.. We can split qcow2_cache_discard() and kill two birds with one
-stone.
+It's complicated :)
 
-void* qcow2_cache_is_table_offset(BlockDriverState *bs, Qcow2Cache *c,
-                                   uint64_t offset)
-{
-     int i;
+=3D Abstract discussion =3D
 
-     for (i = 0; i < c->size; i++) {
-         if (c->entries[i].offset == offset) {
-             return qcow2_cache_get_table_addr(bs, c, i);
-         }
-     }
-     return NULL;
-}
+QemuOpts enforces unique IDs.
 
-void qcow2_cache_discard(BlockDriverState *bs, Qcow2Cache *c, void table)
-{
-     int i = qcow2_cache_get_table_idx(bs, c, table);
+The things configured by QemuOpts often also have unique IDs.
 
-     assert(c->entries[i].ref == 0);
+If a certain kind of thing is always created from a QemuOpts, and it
+keeps its QemuOpts alive until it dies itself, then needn't enfore
+unique IDs itself.  If it does anyway, these errors are unreachable.
 
-     c->entries[i].offset = 0;
-     c->entries[i].lru_counter = 0;
-     c->entries[i].dirty = false;
+If it can be created without QemuOpts, or its QemuOpts can die early,
+then it has to enforce unique IDs itself.  This can lead to inconsistent
+error messages: if the clash is detected by QemuOpts, QemuOpts reports
+it, but if its only detected by the thing, the thing reports it.
 
-     qcow2_cache_table_release(bs, c, i, 1);
-}
+If your thing enforces unique IDs itself, and nothing needs its
+QemuOpts, then it can destroy it at any time.  Note that -writeconfig
+needs all QemuOpts created for command line options left of it.
 
-....
+With the benefit of hindsight: QemuOpts tries to do too much.  It should
+just parse option arguments (treating "id" like any other parameter) and
+optionally accumulate parsed option arguments, so you can act on them
+later (command line works that way).
 
-if (refcount == 0 && s->discard_passthrough[type]) {
-     void *table;
+=3D Concrete discussion =3D
 
-     table = qcow2_cache_is_table_offset(bs, s->refcount_block_cache, 
-offset);
-     if (table != NULL) {
-         qcow2_cache_put(bs, s->refcount_block_cache, &refcount_block);
-         qcow2_cache_discard(bs, s->refcount_block_cache, table);
-     }
+Initially, every block backend had a unique name, but this has changed,
+and I don't know for sure whether block backends rely in QemuOpts for
+enforcing uniqueness now, and what else might need the QemuOpts.
 
-     table = qcow2_cache_is_table_offset(bs, s->l2_table_cache, offset);
-     if (table != NULL) {
-         qcow2_cache_discard(bs, s->l2_table_cache, table);
-     }
-...
+HMP drive_del has awkward semantics that require removing the name from
+the backend in some cases.  I guess the QemuOpts ID should also go away
+then, but I'm not sure, it's been too long since I messed around in that
+particular swamp.
 
-> Max
-> 
->>               update_refcount_discard(bs, cluster_offset, s->cluster_size);
->>           }
->>       }
->> diff --git a/block/qcow2.h b/block/qcow2.h
->> index 1801dc30dc..07faa6dc78 100644
->> --- a/block/qcow2.h
->> +++ b/block/qcow2.h
->> @@ -597,5 +597,6 @@ int qcow2_cache_get(BlockDriverState *bs, Qcow2Cache *c, uint64_t offset,
->>   int qcow2_cache_get_empty(BlockDriverState *bs, Qcow2Cache *c, uint64_t offset,
->>       void **table);
->>   void qcow2_cache_put(BlockDriverState *bs, Qcow2Cache *c, void **table);
->> +void qcow2_cache_discard(BlockDriverState *bs, Qcow2Cache *c, uint64_t offset);
->>   
->>   #endif
->>
-> 
-> 
+Sorry I can't give more definite answers.
+
+>> There is a more serious situation, we
+>> could *never* destory device memory with 'device_del', it's memory
+>> leak to me if the guest os never support hot-plug and the user don't
+>> know this information.
+>
+> The user sees that they never get a DEVICE_REMOVED event, so in some way
+> the do know about it.
+
+Concur.  There is no leak, we simply can't unplug.  We can't even tell
+the user that we can't unplug.  ACPI unplug is an afterthought, and it
+shows.
