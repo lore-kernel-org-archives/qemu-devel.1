@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nitin.lnx@gmail.com>) id 1dO5eZ-0008Cq-6h
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:12:24 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dO5oO-00033X-7W
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:22:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nitin.lnx@gmail.com>) id 1dO5eY-0005Fu-5b
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:12:23 -0400
-Received: from mail-yw0-x22b.google.com ([2607:f8b0:4002:c05::22b]:33389)
+	(envelope-from <peter.maydell@linaro.org>) id 1dO5oN-0000sT-7W
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:22:32 -0400
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:33643)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nitin.lnx@gmail.com>) id 1dO5eY-0005FW-1E
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:12:22 -0400
-Received: by mail-yw0-x22b.google.com with SMTP id 63so8478937ywr.0
-	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 10:12:20 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dO5oN-0000sA-1K
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:22:31 -0400
+Received: by mail-wr0-x232.google.com with SMTP id r103so32370980wrb.0
+	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 10:22:30 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170622105935.2dbd574d@w520.home>
-References: <CAB995MvCYo=tWGg-tC5R-GmRqtdiaLaU_rHTprpRJ_hMJK6Rtw@mail.gmail.com>
-	<20170622105935.2dbd574d@w520.home>
-From: Nitin Saxena <nitin.lnx@gmail.com>
-Date: Thu, 22 Jun 2017 22:42:19 +0530
-Message-ID: <CAB995Mv3naMDu1e2zvzDn77GGNqwPXWUoJOrO0ZMs8B5YooRAQ@mail.gmail.com>
+In-Reply-To: <87injo6jla.fsf@secure.mitica>
+References: <149814756006.27338.8723356702388175951.stgit@bahia>
+	<CAFEAcA8yqb8ykP8nCnoVNQUZd851RhOLFf2TfkHZmL2je+pP=Q@mail.gmail.com>
+	<20170622184255.2d44e3bd@bahia.lab.toulouse-stg.fr.ibm.com>
+	<87injo6jla.fsf@secure.mitica>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 22 Jun 2017 18:22:09 +0100
+Message-ID: <CAFEAcA-g-=AkH3t8jOTFY_9zA6ECS57-3MS=cHPb+Q6sePzNsw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Query on VFIO in Virtual machine
+Subject: Re: [Qemu-devel] [PATCH] Separate function types from opaque types
+ in include/qemu/typedefs.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,65 +32,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: linux-kernel@vger.kernel.org, qemu-devel <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: Greg Kurz <groug@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Thanks Alex.
-
->> Without an iommu in the VM, you'd be limited to no-iommu support for VM userspace,
-So are you trying to say VFIO NO-IOMMU should work inside VM. Does
-that mean VFIO NO-IOMMU in VM and VFIO IOMMU in host for same device
-is a legitimate configuration? I did tried this configuration and the
-application (in VM) seems to get container_fd, group_fd, device_fd
-successfully but after VFIO_DEVICE_RESET ioctl the PCI link breaks
-from VM as well as from host. This could be specific to PCI endpoint
-device which I can dig.
-
-I will be happy if VFIO NO-IOMMU in VM and IOMMU in host for same
-device is legitimate configuration.
-
-Thanks
-Nitin
-
-On Thu, Jun 22, 2017 at 10:29 PM, Alex Williamson
-<alex.williamson@redhat.com> wrote:
-> [cc +qemu-devel, +peterx]
->
-> On Thu, 22 Jun 2017 22:18:06 +0530
-> Nitin Saxena <nitin.lnx@gmail.com> wrote:
->
->> Hi,
+On 22 June 2017 at 18:03, Juan Quintela <quintela@redhat.com> wrote:
+> Greg Kurz <groug@kaod.org> wrote:
+>> On Thu, 22 Jun 2017 17:14:08 +0100
+>> Peter Maydell <peter.maydell@linaro.org> wrote:
 >>
->> I have a PCI device connected as an endpoint to Intel host machine.
->> The requirement is to run dpdk like user space data path application
->> in VM using PCI PF passthrough (SRIOV disabled). This application
->> works fine on host kernel and uses VFIO to get MSIX interrupts from
->> PCI device. We are trying to run this existing application in VM using
->> PCI passthrough. This application has capability to use
->> VFIO_IOMMU_TYPE1 as wells as VFIO_NOIOMMU.
+>>> On 22 June 2017 at 17:06, Greg Kurz <groug@kaod.org> wrote:
+>>> > Function types cannot reside in the same sorted list as opaque types since
+>>> > they may depend on a type which would be defined later.
+>>> >
+>>> > Of course, the same problem could arise if a function type depends on
+>>> > another function type with greater alphabetical order. Hopefully we
+>>> > don't have that at this time.
+>>>
+>>> The other approach would be to put function types somewhere
+>>> else and leave typedefs.h for the simple 'opaque types
+>>> for structures' that it was started as.
+>>>
+>>> For instance we have include/qemu/fprintf-fn.h as a precedent.
+>>>
 >>
->> On Intel host machine VT-d has been enabled and using virt-manager PCI
->> device PF is assigned to the VM. This makes virt-manager to implicitly
->> binds PCI device PF to vfio with vfio_iommu_type1. The VM LINUX kernel
->> was booted with intel_iommu=on as boot parameter.
->>
->> My question: Is it possible that vfio can coexist in host (by
->> virt-manager) as well as VM (by application)? If yes, does application
->> running inside VM needs to configure VFIO with iommu_type=IOMMU or
->> iommu_type=no-iommu.
->>
->> In VM I tried inserting vfio_iommu_type1.ko kernel module which failed
->> with "No such device error". Thats why I am confused whether my
->> requirement is legitimate or not. What could be the best solution?
+>> Indeed, and I'm not quite sure why Juan decided to put these types into
+>> typedefs.h instead of a dedicated header file in include/migration... is
+>> it only because it was the quickest fix ?
 >
-> This is really more of a QEMU question.  In order to use
-> vfio_iommu_type1 in the guest, you need an iommu in the guest.  The
-> most recent release of QEMU supports this with an emulated VT-d
-> device.  Therefore if you create a VM with emulated VT-d and a device
-> assigned through vfio-pci, you can expose it to userspace in the VM with
-> physical iommu protection.  Without an iommu in the VM, you'd be
-> limited to no-iommu support for VM userspace, the physical iommu would
-> only protect the device to the extent of VM memory, no to specific
-> userspace mappings within the VM.  Thanks,
->
-> Alex
+> All other typedefs were defined there.  I can create a different include
+> file, but I think that is "overengineering", no?  They are typedefs,
+> just not of structs.  But I agree that they are the only ones.
+
+Well, the comment in the file says "opaque types so that device init
+declarations don't have to pull in all the real definitions", whereas
+the ones you've added aren't opaque types, they are the real
+definitions. They're also only used by a very small subset of .c
+files, whereas typedefs.h goes everywhere.
+
+thanks
+-- PMM
