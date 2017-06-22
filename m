@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dO2bB-0001R9-Ke
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 09:56:42 -0400
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dO2cw-0005qY-MH
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 09:58:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dO2bA-0005r2-FZ
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 09:56:41 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <7ec58051-d835-a485-7578-2022351c9712@gmail.com>
-	<20170619072727.GA6113@noname.redhat.com>
-	<6324ce25-8fa8-9204-d15b-32f20fb71e4b@gmail.com>
-	<20170619104915.GC6113@noname.redhat.com>
-Date: Thu, 22 Jun 2017 15:56:23 +0200
-In-Reply-To: <20170619104915.GC6113@noname.redhat.com> (Kevin Wolf's message
-	of "Mon, 19 Jun 2017 12:49:15 +0200")
-Message-ID: <8737asjfco.fsf@dusky.pond.sub.org>
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dO2cr-0006Wh-O2
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 09:58:30 -0400
+References: <20170613121639.17853-1-pbutsykin@virtuozzo.com>
+	<20170613121639.17853-4-pbutsykin@virtuozzo.com>
+	<aed64e0e-61ed-12c9-8676-ad55795b6e62@redhat.com>
+From: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Message-ID: <5fb63c73-ddc7-ba42-268f-bda160aebb6e@virtuozzo.com>
+Date: Thu, 22 Jun 2017 16:57:07 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Question] How can we confirm hot-plug disk
- succesfully?
+In-Reply-To: <aed64e0e-61ed-12c9-8676-ad55795b6e62@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] qcow2: add shrink image support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,127 +25,310 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Xie Changlong <xiechanglong.d@gmail.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org
 
-Kevin Wolf <kwolf@redhat.com> writes:
 
-> Am 19.06.2017 um 12:27 hat Xie Changlong geschrieben:
->> =E5=9C=A8 6/19/2017 3:27 PM, Kevin Wolf =E5=86=99=E9=81=93:
->> >Am 18.06.2017 um 09:21 hat Xie Changlong geschrieben:
->> >>In device hot-remove scenario, if we don't probe acpiphp module on
->> >>the guest, 'device_del' will never emit DEVICE_DELETED event(because
->> >>guest will not write to __EJ0) . So we can confirm that hot-remove
->> >>failed. But IIUC, there is no event such as DEVICE_ADDED, so
->> >>1) How can we confirm hotplug('device_add') successfully?
->> >>2) It seems when hot-plug disk, we don't care acpiphp module status
->> >>on the guest, am I right?
->> >>3) Why there is no DEVICE_ADDED like event?
->> >
->> >device_add doesn't need guest cooperation, so it is immediately
->> >completed when the QMP command returns success.
->> >
->>=20
->> That's what i though too. But I have a question, if we don't proble
->> acpiphp on the guest, and execute below commands:
->>=20
->> Hot plug:
->> (qemu) drive_add 0
->> file=3D/resource/changlox/test.raw,id=3Ddrive-virtio-disk1,if=3Dnone
->> (qemu) device_add virtio-blk-pci,drive=3Ddrive-virtio-disk1,id=3Dvirtio-=
-disk1
->>=20
->> Hot remove:
->> (qemu) device_del virtio-disk1
->> (qemu) drive_del drive-virtio-disk1
->> (qemu) qom-list /machine/peripheral
->> type (string)
->> virtio-disk1 (child<virtio-blk-pci>)
->> (qemu) info block
->> foo (#block122): suse1.qcow2 (qcow2)
->>     Cache mode:       writeback, direct
->>     Backing file:     suse.qcow2.orgin (chain depth: 1)
->>=20
->> ide1-cd0: [not inserted]
->>     Removable device: not locked, tray closed
->>=20
->> floppy0: [not inserted]
->>     Removable device: not locked, tray closed
->>=20
->> sd0: [not inserted]
->>     Removable device: not locked, tray closed
->> (qemu) drive_add 0
->> file=3D/resource/changlox/test.raw,id=3Ddrive-virtio-disk1,if=3Dnone
->> Duplicate ID 'drive-virtio-disk1' for drive
->>=20
->> 'info block' shows nothing, but we can't add drive who's id
->> is'drive-virtio-disk1' too.
+On 22.06.2017 01:55, Max Reitz wrote:
+> On 2017-06-13 14:16, Pavel Butsykin wrote:
+>> This patch add shrinking of the image file for qcow2. As a result, this allows
+>> us to reduce the virtual image size and free up space on the disk without
+>> copying the image. Image can be fragmented and shrink is done by punching holes
+>> in the image file.
+>>
+>> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
+>> ---
+>>   block/qcow2-cluster.c  | 42 ++++++++++++++++++++++++++++++++
+>>   block/qcow2-refcount.c | 65 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>>   block/qcow2.c          | 40 +++++++++++++++++++++++--------
+>>   block/qcow2.h          |  2 ++
+>>   qapi/block-core.json   |  3 ++-
+>>   5 files changed, 141 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+>> index d779ea19cf..a84b7e607e 100644
+>> --- a/block/qcow2-cluster.c
+>> +++ b/block/qcow2-cluster.c
+>> @@ -32,6 +32,48 @@
+>>   #include "qemu/bswap.h"
+>>   #include "trace.h"
+>>   
+>> +int qcow2_shrink_l1_table(BlockDriverState *bs, uint64_t max_size)
+> 
+> It's not really a max_size but always an exact size. You don't want it
+> to be any smaller than this.
+> 
+>> +{
+>> +    BDRVQcow2State *s = bs->opaque;
+>> +    int new_l1_size, i, ret;
+>> +
+>> +    if (max_size >= s->l1_size) {
+>> +        return 0;
+>> +    }
+>> +
+>> +    new_l1_size = max_size;
+>> +
+>> +#ifdef DEBUG_ALLOC2
+>> +    fprintf(stderr, "shrink l1_table from %d to %" PRId64 "\n",
+>> +            s->l1_size, new_l1_size);
+> 
+> new_l1_size is of type int, not int64_t.
+> 
+>> +#endif
+>> +
+>> +    BLKDBG_EVENT(bs->file, BLKDBG_L1_SHRINK_WRITE_TABLE);
+>> +    ret = bdrv_pwrite_zeroes(bs->file, s->l1_table_offset +
+>> +                                       sizeof(uint64_t) * new_l1_size,
+>> +                             (s->l1_size - new_l1_size) * sizeof(uint64_t), 0);
+>> +    if (ret < 0) {
+>> +        return ret;
+>> +    }
+>> +
+>> +    ret = bdrv_flush(bs->file->bs);
+>> +    if (ret < 0) {
+>> +        return ret;
+>> +    }
+>> +
+>> +    BLKDBG_EVENT(bs->file, BLKDBG_L1_SHRINK_FREE_L2_CLUSTERS);
+>> +    for (i = s->l1_size - 1; i > new_l1_size - 1; i--) {
+>> +        if ((s->l1_table[i] & L1E_OFFSET_MASK) == 0) {
+>> +            continue;
+>> +        }
+>> +        qcow2_free_clusters(bs, s->l1_table[i] & L1E_OFFSET_MASK,
+>> +                            s->l2_size * sizeof(uint64_t),
+> 
+> I'm more of a fan of s->cluster_size instead of s->l2_size *
+> sizeof(uint64_t) but it's not like it matters...
+> 
+>> +                            QCOW2_DISCARD_ALWAYS);
+>> +        s->l1_table[i] = 0;
+> 
+> I'd probably clear the overhanging s->l1_table entries before
+> bdrv_flush() (before you shouldn't really use them after
+> bdrv_pwrite_zeroes() has returned, even if bdrv_flush() has failed), but
+> it's not absolutely necessary. As long as they still have a refcount of
+> at least one, writing to them will just be useless but not destroy any data.
 >
-> Yes, the old BlockBackend is only fully freed when the guest actually
-> unplugs the device. Specifically, we would have to free the QemuOpts
-> in DriveInfo that keeps the ID reserved. Currently, it is only freed
-> when the BlockBackend is destroyed:
->
->     blockdev_auto_del()
->         blk_unref()
->             blk_delete()
->                 drive_info_del()
->
-> We can't free the DriveInfo earlier because it's still needed while the
-> guest device is still alive.
->
-> I'm not sure, but it may be possible to free just the QemuOpts in
-> monitor_remove_blk(), so that the ID can immediately be reused.
->
-> Markus, would you know?
 
-It's complicated :)
+You're right, but If it's not necessary, I would prefer to leave as is..
+Just because overhanging s->l1_table entries used to release clusters :)
 
-=3D Abstract discussion =3D
+>> +    }
+>> +    return 0;
+>> +}
+>> +
+>>   int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
+>>                           bool exact_size)
+>>   {
+>> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+>> index 576ab551d6..e98306acd8 100644
+>> --- a/block/qcow2-refcount.c
+>> +++ b/block/qcow2-refcount.c
+>> @@ -29,6 +29,7 @@
+>>   #include "block/qcow2.h"
+>>   #include "qemu/range.h"
+>>   #include "qemu/bswap.h"
+>> +#include "qemu/cutils.h"
+>>   
+>>   static int64_t alloc_clusters_noref(BlockDriverState *bs, uint64_t size);
+>>   static int QEMU_WARN_UNUSED_RESULT update_refcount(BlockDriverState *bs,
+>> @@ -2936,3 +2937,67 @@ done:
+>>       qemu_vfree(new_refblock);
+>>       return ret;
+>>   }
+>> +
+>> +int qcow2_shrink_reftable(BlockDriverState *bs)
+>> +{
+>> +    BDRVQcow2State *s = bs->opaque;
+>> +    uint64_t *reftable_tmp =
+>> +        g_try_malloc(sizeof(uint64_t) * s->refcount_table_size);
+>> +    int i, ret;
+>> +
+>> +    if (s->refcount_table_size && reftable_tmp == NULL) {
+>> +        return -ENOMEM;
+>> +    }
+>> +
+>> +    for (i = 0; i < s->refcount_table_size; i++) {
+>> +        int64_t refblock_offs = s->refcount_table[i] & REFT_OFFSET_MASK;
+>> +        void *refblock;
+>> +        bool unused_block;
+>> +
+>> +        if (refblock_offs == 0) {
+>> +            reftable_tmp[i] = 0;
+>> +            continue;
+>> +        }
+>> +        ret = qcow2_cache_get(bs, s->refcount_block_cache, refblock_offs,
+>> +                              &refblock);
+>> +        if (ret < 0) {
+>> +            goto out;
+>> +        }
+>> +
+>> +        /* the refblock has own reference */
+>> +        if (i == refblock_offs >> (s->refcount_block_bits + s->cluster_bits)) {
+>> +            uint64_t blk_index = (refblock_offs >> s->cluster_bits) &
+>> +                                 (s->refcount_block_size - 1);
+>> +            uint64_t refcount = s->get_refcount(refblock, blk_index);
+>> +
+>> +            s->set_refcount(refblock, blk_index, 0);
+>> +
+>> +            unused_block = buffer_is_zero(refblock, s->refcount_block_size);
+> 
+> s/refcount_block_size/cluster_size/
+> 
+>> +
+>> +            s->set_refcount(refblock, blk_index, refcount);
+>> +        } else {
+>> +            unused_block = buffer_is_zero(refblock, s->refcount_block_size);
+> 
+> Same here.
+> 
+>> +        }
+>> +        qcow2_cache_put(bs, s->refcount_block_cache, &refblock);
+>> +
+>> +        reftable_tmp[i] = unused_block ? 0 : cpu_to_be64(s->refcount_table[i]);
+>> +    }
+>> +
+>> +    ret = bdrv_pwrite_sync(bs->file, s->refcount_table_offset, reftable_tmp,
+>> +                           sizeof(uint64_t) * s->refcount_table_size);
+>> +    if (ret < 0) {
+>> +        goto out;
+>> +    }
+>> +
+>> +    for (i = 0; i < s->refcount_table_size; i++) {
+>> +        if (s->refcount_table[i] && !reftable_tmp[i]) {
+>> +            qcow2_free_clusters(bs, s->refcount_table[i] & REFT_OFFSET_MASK,
+>> +                                s->cluster_size, QCOW2_DISCARD_ALWAYS);
+> 
+> This doesn't feel like a very good idea. The bdrv_pwrite_sync() before
+> has brought the on-disk refcount structures into a different state than
+> what we have cached.
 
-QemuOpts enforces unique IDs.
+It is for this inside qcow2_free_clusters()->update_refcount() the cache
+is discarded by qcow2_cache_discard().
 
-The things configured by QemuOpts often also have unique IDs.
+> OTOH, the bdrv_pwrite_sync() has accessed only the reftable and this
+> should only access refblocks. So I cannot think of any way this might
+> actually do something bad. But I guess it'll be better for to revisit
+> this when it's not in the middle of the night (so on Friday).
+> 
+>> +            s->refcount_table[i] = 0;
+>> +        }
+>> +    }
+>> +
+>> +out:
+>> +    g_free(reftable_tmp);
+>> +    return ret;
+>> +}
+>> diff --git a/block/qcow2.c b/block/qcow2.c
+>> index b3ba5daa93..0ad46d2776 100644
+>> --- a/block/qcow2.c
+>> +++ b/block/qcow2.c
+>> @@ -2545,6 +2545,7 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
+>>   {
+>>       BDRVQcow2State *s = bs->opaque;
+>>       int64_t new_l1_size;
+>> +    uint64_t total_size;
+>>       int ret;
+>>   
+>>       if (offset & 511) {
+>> @@ -2558,17 +2559,36 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
+>>           return -ENOTSUP;
+>>       }
+>>   
+>> -    /* shrinking is currently not supported */
+>> -    if (offset < bs->total_sectors * 512) {
+>> -        error_setg(errp, "qcow2 doesn't support shrinking images yet");
+>> -        return -ENOTSUP;
+>> -    }
+>> -
+>>       new_l1_size = size_to_l1(s, offset);
+>> -    ret = qcow2_grow_l1_table(bs, new_l1_size, true);
+>> -    if (ret < 0) {
+>> -        error_setg_errno(errp, -ret, "Failed to grow the L1 table");
+>> -        return ret;
+>> +    total_size = bs->total_sectors << BDRV_SECTOR_BITS;
+>> +
+>> +    if (offset < total_size) {
+>> +        ret = qcow2_cluster_discard(bs, ROUND_UP(offset, s->cluster_size),
+>> +                                    total_size - ROUND_UP(offset,
+>> +                                                          s->cluster_size),
+>> +                                    QCOW2_DISCARD_ALWAYS, true);
+>> +        if (ret < 0) {
+>> +            error_setg_errno(errp, -ret, "Failed to discard reduced clasters");
+> 
+> s/clasters/clusters/
+> 
+> And maybe "truncated", "stripped", or "cropped" instead of "reduced"?
+> 
+>> +            return ret;
+>> +        }
+>> +
+>> +        ret = qcow2_shrink_l1_table(bs, new_l1_size);
+>> +        if (ret < 0) {
+>> +            error_setg_errno(errp, -ret, "Failed to reduce the L1 table");
+> 
+> s/reduce/shrink/ (or "truncate"; or "reduce the L1 table size")
+> 
+> Also, to be fair, you're actually reducing the number of L2 tables, not
+> the size of the L1 table. (But that's a nit pick)
 
-If a certain kind of thing is always created from a QemuOpts, and it
-keeps its QemuOpts alive until it dies itself, then needn't enfore
-unique IDs itself.  If it does anyway, these errors are unreachable.
+In the previous patch version, there really was reducing the L1 table
+size :) I think now it's better to fix the error message.
 
-If it can be created without QemuOpts, or its QemuOpts can die early,
-then it has to enforce unique IDs itself.  This can lead to inconsistent
-error messages: if the clash is detected by QemuOpts, QemuOpts reports
-it, but if its only detected by the thing, the thing reports it.
-
-If your thing enforces unique IDs itself, and nothing needs its
-QemuOpts, then it can destroy it at any time.  Note that -writeconfig
-needs all QemuOpts created for command line options left of it.
-
-With the benefit of hindsight: QemuOpts tries to do too much.  It should
-just parse option arguments (treating "id" like any other parameter) and
-optionally accumulate parsed option arguments, so you can act on them
-later (command line works that way).
-
-=3D Concrete discussion =3D
-
-Initially, every block backend had a unique name, but this has changed,
-and I don't know for sure whether block backends rely in QemuOpts for
-enforcing uniqueness now, and what else might need the QemuOpts.
-
-HMP drive_del has awkward semantics that require removing the name from
-the backend in some cases.  I guess the QemuOpts ID should also go away
-then, but I'm not sure, it's been too long since I messed around in that
-particular swamp.
-
-Sorry I can't give more definite answers.
-
->> There is a more serious situation, we
->> could *never* destory device memory with 'device_del', it's memory
->> leak to me if the guest os never support hot-plug and the user don't
->> know this information.
->
-> The user sees that they never get a DEVICE_REMOVED event, so in some way
-> the do know about it.
-
-Concur.  There is no leak, we simply can't unplug.  We can't even tell
-the user that we can't unplug.  ACPI unplug is an afterthought, and it
-shows.
+>> +            return ret;
+>> +        }
+>> +
+>> +        ret = qcow2_shrink_reftable(bs);
+>> +        if (ret < 0) {
+>> +            error_setg_errno(errp, -ret, "Failed to shrink the refcount table");
+> 
+> And this is not really shrinking the reftable but instead discarding
+> some refblocks (potentially). (This is a nit pick, too)
+> 
+> Max
+> 
+>> +            return ret;
+>> +        }
+>> +    } else {
+>> +        ret = qcow2_grow_l1_table(bs, new_l1_size, true);
+>> +        if (ret < 0) {
+>> +            error_setg_errno(errp, -ret, "Failed to grow the L1 table");
+>> +            return ret;
+>> +        }
+>>       }
+>>   
+>>       /* write updated header.size */
+>> diff --git a/block/qcow2.h b/block/qcow2.h
+>> index 07faa6dc78..600463bf8e 100644
+>> --- a/block/qcow2.h
+>> +++ b/block/qcow2.h
+>> @@ -531,10 +531,12 @@ int qcow2_pre_write_overlap_check(BlockDriverState *bs, int ign, int64_t offset,
+>>   int qcow2_change_refcount_order(BlockDriverState *bs, int refcount_order,
+>>                                   BlockDriverAmendStatusCB *status_cb,
+>>                                   void *cb_opaque, Error **errp);
+>> +int qcow2_shrink_reftable(BlockDriverState *bs);
+>>   
+>>   /* qcow2-cluster.c functions */
+>>   int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
+>>                           bool exact_size);
+>> +int qcow2_shrink_l1_table(BlockDriverState *bs, uint64_t max_size);
+>>   int qcow2_write_l1_entry(BlockDriverState *bs, int l1_index);
+>>   int qcow2_decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset);
+>>   int qcow2_encrypt_sectors(BDRVQcow2State *s, int64_t sector_num,
+>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index f85c2235c7..bcbffa3339 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -2372,7 +2372,8 @@
+>>               'cluster_alloc_bytes', 'cluster_free', 'flush_to_os',
+>>               'flush_to_disk', 'pwritev_rmw_head', 'pwritev_rmw_after_head',
+>>               'pwritev_rmw_tail', 'pwritev_rmw_after_tail', 'pwritev',
+>> -            'pwritev_zero', 'pwritev_done', 'empty_image_prepare' ] }
+>> +            'pwritev_zero', 'pwritev_done', 'empty_image_prepare',
+>> +            'l1_shrink_write_table', 'l1_shrink_free_l2_clusters' ] }
+>>   
+>>   ##
+>>   # @BlkdebugInjectErrorOptions:
+>>
+> 
+> 
