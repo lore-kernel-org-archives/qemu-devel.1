@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54256)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dO1r1-0004KX-Ko
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 09:09:00 -0400
+	(envelope-from <sw@weilnetz.de>) id 1dO1rz-0005Lx-RQ
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 09:10:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dO1qy-00080g-VP
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 09:08:59 -0400
-Received: from 4.mo5.mail-out.ovh.net ([178.33.111.247]:36638)
+	(envelope-from <sw@weilnetz.de>) id 1dO1rx-0008Hw-4t
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 09:09:59 -0400
+Received: from mail.weilnetz.de ([37.120.169.71]:42256
+	helo=v2201612906741603.powersrv.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dO1qy-00080O-PA
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 09:08:56 -0400
-Received: from player695.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 5763810C163
-	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 15:08:55 +0200 (CEST)
-Date: Thu, 22 Jun 2017 15:08:50 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170622150850.27a0332d@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20170622124204.19407-29-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1dO1rw-0008HY-UB
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 09:09:57 -0400
 References: <20170622124204.19407-1-marcandre.lureau@redhat.com>
-	<20170622124204.19407-29-marcandre.lureau@redhat.com>
+	<20170622124204.19407-32-marcandre.lureau@redhat.com>
+From: Stefan Weil <sw@weilnetz.de>
+Message-ID: <4c3acdae-a0b6-38a3-ee74-e774ea94c56a@weilnetz.de>
+Date: Thu, 22 Jun 2017 15:09:53 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/fv_36mYZvG85vmGu=qL18um";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH 28/31] 9pfs: replace g_malloc()+memcpy()
- with g_memdup()
+In-Reply-To: <20170622124204.19407-32-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 31/31] eepro100: replace
+ g_malloc()+memcpy() with g_memdup()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,56 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: Jason Wang <jasowang@redhat.com>
 
---Sig_/fv_36mYZvG85vmGu=qL18um
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, 22 Jun 2017 14:42:01 +0200
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
-
+Am 22.06.2017 um 14:42 schrieb Marc-Andr=C3=A9 Lureau:
 > I found these pattern via grepping the source tree. I don't have a
 > coccinelle script for it!
 >=20
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
-
-Thanks! Applied to my 9p-next branch at:
-
-https://github.com/gkurz/qemu/commits/9p-next
-
->  hw/9pfs/9p-synth.c | 3 +--
+>  hw/net/eepro100.c | 3 +--
 >  1 file changed, 1 insertion(+), 2 deletions(-)
 >=20
-> diff --git a/hw/9pfs/9p-synth.c b/hw/9pfs/9p-synth.c
-> index 4b6d4e6a3f..df0a8de08a 100644
-> --- a/hw/9pfs/9p-synth.c
-> +++ b/hw/9pfs/9p-synth.c
-> @@ -494,8 +494,7 @@ static int synth_name_to_path(FsContext *ctx, V9fsPat=
-h *dir_path,
->      }
->  out:
->      /* Copy the node pointer to fid */
-> -    target->data =3D g_malloc(sizeof(void *));
-> -    memcpy(target->data, &node, sizeof(void *));
-> +    target->data =3D g_memdup(&node, sizeof(void *));
->      target->size =3D sizeof(void *);
->      return 0;
+> diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
+> index 4bf71f2d85..7d3b2e52c7 100644
+> --- a/hw/net/eepro100.c
+> +++ b/hw/net/eepro100.c
+> @@ -1894,8 +1894,7 @@ static void e100_nic_realize(PCIDevice *pci_dev, =
+Error **errp)
+> =20
+>      qemu_register_reset(nic_reset, s);
+> =20
+> -    s->vmstate =3D g_malloc(sizeof(vmstate_eepro100));
+> -    memcpy(s->vmstate, &vmstate_eepro100, sizeof(vmstate_eepro100));
+> +    s->vmstate =3D g_memdup(&vmstate_eepro100, sizeof(vmstate_eepro100=
+));
+>      s->vmstate->name =3D qemu_get_queue(s->nic)->model;
+>      vmstate_register(&pci_dev->qdev, -1, s->vmstate, s);
 >  }
+>=20
 
-
---Sig_/fv_36mYZvG85vmGu=qL18um
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAllLwWIACgkQAvw66wEB28La5gCaAon7ekBZi52DjyCgErgSZgoy
-D6QAn0rR4Kodc8Ff+QztmIVWq6xBwRbQ
-=fp1H
------END PGP SIGNATURE-----
-
---Sig_/fv_36mYZvG85vmGu=qL18um--
+Reviewed-by: Stefan Weil <sw@weilnetz.de>
