@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dNyp1-0004ro-Q1
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:54:44 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dNyqU-0005jv-NE
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:56:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dNyox-0000qS-4s
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:54:43 -0400
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:33935)
+	(envelope-from <alex.bennee@linaro.org>) id 1dNyqS-0002dv-UZ
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:56:14 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:33097)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dNyow-0000ox-U1
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:54:39 -0400
-Received: by mail-wr0-x22d.google.com with SMTP id 77so16020605wrb.1
-	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 02:54:38 -0700 (PDT)
+	id 1dNyqS-0002bo-Oa
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:56:12 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id r103so16120582wrb.0
+	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 02:56:12 -0700 (PDT)
 References: <20170622033231.19344-1-f4bug@amsat.org>
-	<20170622033231.19344-2-f4bug@amsat.org>
+	<20170622033231.19344-7-f4bug@amsat.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170622033231.19344-2-f4bug@amsat.org>
-Date: Thu, 22 Jun 2017 10:55:21 +0100
-Message-ID: <87h8z8tkhi.fsf@linaro.org>
+In-reply-to: <20170622033231.19344-7-f4bug@amsat.org>
+Date: Thu, 22 Jun 2017 10:56:55 +0100
+Message-ID: <87fuestkew.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 01/21] tests: add missing dependency to
- build QTEST_QEMU_BINARY
+Subject: Re: [Qemu-devel] [PATCH v2 06/21] travis: Add config to do a
+ Coverity Scan upload
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,38 +32,67 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, John Snow <jsnow@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
 
 Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
 
-> This allow a one liner from fresh repository clone, i.e.:
+> From: Peter Maydell <peter.maydell@linaro.org>
 >
->   ./configure && make -j check-qtest-aarch64
-
-TIL -j doesn't need a number and GNU Make has a -l option ;-)
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
+> Add config to travis to do a Coverity Scan build and upload, using
+> the new run-coverity-scan script.
 >
+> There is an official integration between Travis and Coverity Scan:
+>  https://github.com/travis-ci/travis-build/blob/master/lib/travis/build/addons/coverity_scan.rb
+> which slurps values out of the .travis.yml and downloads a build
+> script from Coverity which does the bulk of the work:
+>  https://scan.coverity.com/scripts/travisci_build_coverity_scan.sh
+>
+> However we choose to roll our own since this seems less
+> confusing and also allows us to include debug features
+> (notably the ability to do a "dry run" test which doesn't
+> actually upload anything).
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  tests/Makefile.include | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  .travis.yml | 24 ++++++++++++++++++++++++
+>  1 file changed, 24 insertions(+)
 >
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 77da9b7f4b..f7c8f3eddb 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -823,7 +823,7 @@ GCOV_OPTIONS = -n $(if $(V),-f,)
->  # gtester tests, possibly with verbose output
->
->  .PHONY: $(patsubst %, check-qtest-%, $(QTEST_TARGETS))
-> -$(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: $(check-qtest-y)
-> +$(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: subdir-%-softmmu $(check-qtest-y)
->  	$(if $(CONFIG_GCOV),@rm -f *.gcda */*.gcda */*/*.gcda */*/*/*.gcda,)
->  	$(call quiet-command,QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
->  		QTEST_QEMU_IMG=qemu-img$(EXESUF) \
+> diff --git a/.travis.yml b/.travis.yml
+> index 0220f7472e..29c9ef72a4 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -218,3 +218,27 @@ matrix:
+>          - TEST_CMD=""
+>        before_script:
+>          - ./configure ${CONFIG} --extra-cflags="-g3 -O0 -fsanitize=thread -fuse-ld=gold" || cat config.log
+> +    # Build and upload to Coverity Scan.
+> +    # We do not impose any rate limiting here, but instead rely on the
+> +    # limiting done by the coverity servers, which for a project of QEMU's
+> +    # size means one build a day. The run-coverity-scan script will exit
+> +    # early if the limiter does not permit a new upload, so the effect will
+> +    # be that the first build (only) in each 24 hour period will be scanned.
+> +    # If we needed to apply a limit at the Travis end, the simplest approach
+> +    # would be to run the scan only if the branch was 'coverity-scan', and
+> +    # use a cron job to push master to the 'coverity-scan' branch periodically.
+> +    # We run on the trusty Travis hosts so that there's a wider set of
+> +    # dependencies satisfied to improve coverage.
+> +    - dist: trusty
+> +      env:
+> +        - COVERITY=1
+> +        - COVERITY_BUILD_CMD="make -j3"
+> +        - COVERITY_EMAIL=peter.maydell@linaro.org
+> +        # This 'secure' setting sets COVERITY_TOKEN=<secret token>
+> +        # and was created with travis encrypt -r qemu/qemu COVERITY_TOKEN=...
+> +        - secure: "D3E6E5bacui53fYBQrx0wQr8ZTvo6VIBPKfg0QHj2uwa6OPFkUlcMr/EHWvdbZNAa4Q1bv1vhlED5OPRfPmQYzxQNT4SAxDZeuZnikgIymfqQXNOjKw4kRUDO9P42QanyFd+EAu2JDVClAeJPgBpa/ns4CNrGDK+Q3coGndCP8o="
+> +      before_script:
+> +        - if [ "$TRAVIS_PULL_REQUEST" = "true" ]; then echo "Skipping Coverity (pullreq)"; exit 0; fi
+> +        - if [ "$TRAVIS_BRANCH" != "master" ]; then echo "Skipping
+> Coverity (wrong branch)"; exit 0; fi
+
+I think this is waiting on a fix I mention when reviewing Peter's
+original patches.
 
 
 --
