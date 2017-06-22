@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46057)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dO1Tc-00088x-JV
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 08:44:49 -0400
+	(envelope-from <groug@kaod.org>) id 1dO1al-0006R3-3g
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 08:52:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dO1TY-00071L-LC
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 08:44:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48072)
+	(envelope-from <groug@kaod.org>) id 1dO1ah-00015T-Sc
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 08:52:11 -0400
+Received: from 1.mo5.mail-out.ovh.net ([188.165.57.91]:39153)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dO1TY-000719-FQ
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 08:44:44 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5D60E7F410
-	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 12:44:43 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 22 Jun 2017 14:42:04 +0200
-Message-Id: <20170622124204.19407-32-marcandre.lureau@redhat.com>
-In-Reply-To: <20170622124204.19407-1-marcandre.lureau@redhat.com>
-References: <20170622124204.19407-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dO1ah-000157-I9
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 08:52:07 -0400
+Received: from player695.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 3221010C7D1
+	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 14:52:00 +0200 (CEST)
+Date: Thu, 22 Jun 2017 14:51:48 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170622145148.4a3d975f@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <20170621091848.28256-4-david@gibson.dropbear.id.au>
+References: <20170621091848.28256-1-david@gibson.dropbear.id.au>
+	<20170621091848.28256-4-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 31/31] eepro100: replace g_malloc()+memcpy()
- with g_memdup()
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/F2z3Znhfx47KhZLnUAVSOCB";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH 3/5] spapr: Cleanups relating to DRC
+ awaiting_release field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,32 +32,249 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Jason Wang <jasowang@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: mdroth@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com, sursingh@redhat.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-I found these pattern via grepping the source tree. I don't have a
-coccinelle script for it!
+--Sig_/F2z3Znhfx47KhZLnUAVSOCB
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- hw/net/eepro100.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+On Wed, 21 Jun 2017 17:18:46 +0800
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
-index 4bf71f2d85..7d3b2e52c7 100644
---- a/hw/net/eepro100.c
-+++ b/hw/net/eepro100.c
-@@ -1894,8 +1894,7 @@ static void e100_nic_realize(PCIDevice *pci_dev, Er=
-ror **errp)
-=20
-     qemu_register_reset(nic_reset, s);
-=20
--    s->vmstate =3D g_malloc(sizeof(vmstate_eepro100));
--    memcpy(s->vmstate, &vmstate_eepro100, sizeof(vmstate_eepro100));
-+    s->vmstate =3D g_memdup(&vmstate_eepro100, sizeof(vmstate_eepro100))=
-;
-     s->vmstate->name =3D qemu_get_queue(s->nic)->model;
-     vmstate_register(&pci_dev->qdev, -1, s->vmstate, s);
- }
---=20
-2.13.1.395.gf7b71de06
+> 'awaiting_release' indicates that the host has requested an unplug of the
+> device attached to the DRC, but the guest has not (yet) put the device
+> into a state where it is safe to complete removal.
+>=20
+> 1. Rename it to 'unplug_requested' which to me at least is clearer
+>=20
+> 2. Remove the ->release_pending() method used to check this from outside
+> spapr_drc.c.  The method only plausibly has one implementation, so use
+> a plain function (spapr_drc_unplug_requested()) instead.
+>=20
+> 3. Remove it from the migration stream.  Attempting to migrate mid-unplug
+> is broken not just for spapr - in general management has no good way to
+> determine if the device should be present on the destination or not.  So,
+> until that's fixed, there's no point adding extra things to the stream.
+>=20
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  hw/ppc/spapr_drc.c         | 26 +++++++++-----------------
+>  hw/ppc/spapr_pci.c         |  6 ++----
+>  include/hw/ppc/spapr_drc.h | 11 ++++++-----
+>  3 files changed, 17 insertions(+), 26 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> index dae1f79..7fa9595 100644
+> --- a/hw/ppc/spapr_drc.c
+> +++ b/hw/ppc/spapr_drc.c
+> @@ -66,7 +66,7 @@ static uint32_t drc_isolate_physical(sPAPRDRConnector *=
+drc)
+>       * configured state, as suggested by the state diagram from PAPR+
+>       * 2.7, 13.4
+>       */
+> -    if (drc->awaiting_release) {
+> +    if (drc->unplug_requested) {
+>          uint32_t drc_index =3D spapr_drc_index(drc);
+>          if (drc->configured) {
+>              trace_spapr_drc_set_isolation_state_finalizing(drc_index);
+> @@ -116,7 +116,7 @@ static uint32_t drc_isolate_logical(sPAPRDRConnector =
+*drc)
+>       * actually being unplugged, fail the isolation request here.
+>       */
+>      if (spapr_drc_type(drc) =3D=3D SPAPR_DR_CONNECTOR_TYPE_LMB
+> -        && !drc->awaiting_release) {
+> +        && !drc->unplug_requested) {
+>          return RTAS_OUT_HW_ERROR;
+>      }
+> =20
+> @@ -130,7 +130,7 @@ static uint32_t drc_isolate_logical(sPAPRDRConnector =
+*drc)
+>       * configured state, as suggested by the state diagram from PAPR+
+>       * 2.7, 13.4
+>       */
+> -    if (drc->awaiting_release) {
+> +    if (drc->unplug_requested) {
+>          uint32_t drc_index =3D spapr_drc_index(drc);
+>          if (drc->configured) {
+>              trace_spapr_drc_set_isolation_state_finalizing(drc_index);
+> @@ -170,7 +170,7 @@ static uint32_t drc_set_usable(sPAPRDRConnector *drc)
+>      if (!drc->dev) {
+>          return RTAS_OUT_NO_SUCH_INDICATOR;
+>      }
+> -    if (drc->awaiting_release) {
+> +    if (drc->unplug_requested) {
+>          /* Don't allow the guest to move a device away from UNUSABLE
+>           * state when we want to unplug it */
+>          return RTAS_OUT_NO_SUCH_INDICATOR;
+> @@ -184,7 +184,7 @@ static uint32_t drc_set_usable(sPAPRDRConnector *drc)
+>  static uint32_t drc_set_unusable(sPAPRDRConnector *drc)
+>  {
+>      drc->allocation_state =3D SPAPR_DR_ALLOCATION_STATE_UNUSABLE;
+> -    if (drc->awaiting_release) {
+> +    if (drc->unplug_requested) {
+>          uint32_t drc_index =3D spapr_drc_index(drc);
+>          trace_spapr_drc_set_allocation_state_finalizing(drc_index);
+>          spapr_drc_detach(drc);
+> @@ -363,7 +363,7 @@ static void spapr_drc_release(sPAPRDRConnector *drc)
+> =20
+>      drck->release(drc->dev);
+> =20
+> -    drc->awaiting_release =3D false;
+> +    drc->unplug_requested =3D false;
+>      g_free(drc->fdt);
+>      drc->fdt =3D NULL;
+>      drc->fdt_start_offset =3D 0;
+> @@ -375,7 +375,7 @@ void spapr_drc_detach(sPAPRDRConnector *drc)
+>  {
+>      trace_spapr_drc_detach(spapr_drc_index(drc));
+> =20
+> -    drc->awaiting_release =3D true;
+> +    drc->unplug_requested =3D true;
+> =20
+>      if (drc->isolation_state !=3D SPAPR_DR_ISOLATION_STATE_ISOLATED) {
+>          trace_spapr_drc_awaiting_isolated(spapr_drc_index(drc));
+> @@ -391,11 +391,6 @@ void spapr_drc_detach(sPAPRDRConnector *drc)
+>      spapr_drc_release(drc);
+>  }
+> =20
+> -static bool release_pending(sPAPRDRConnector *drc)
+> -{
+> -    return drc->awaiting_release;
+> -}
+> -
+>  static void drc_reset(void *opaque)
+>  {
+>      sPAPRDRConnector *drc =3D SPAPR_DR_CONNECTOR(opaque);
+> @@ -408,7 +403,7 @@ static void drc_reset(void *opaque)
+>      /* immediately upon reset we can safely assume DRCs whose devices
+>       * are pending removal can be safely removed.
+>       */
+> -    if (drc->awaiting_release) {
+> +    if (drc->unplug_requested) {
+>          spapr_drc_release(drc);
+>      }
+> =20
+> @@ -453,7 +448,7 @@ static bool spapr_drc_needed(void *opaque)
+>      case SPAPR_DR_CONNECTOR_TYPE_LMB:
+>          rc =3D !((drc->isolation_state =3D=3D SPAPR_DR_ISOLATION_STATE_U=
+NISOLATED) &&
+>                 (drc->allocation_state =3D=3D SPAPR_DR_ALLOCATION_STATE_U=
+SABLE) &&
+> -               drc->configured && !drc->awaiting_release);
+> +               drc->configured);
+>          break;
+>      case SPAPR_DR_CONNECTOR_TYPE_PHB:
+>      case SPAPR_DR_CONNECTOR_TYPE_VIO:
+> @@ -473,7 +468,6 @@ static const VMStateDescription vmstate_spapr_drc =3D=
+ {
+>          VMSTATE_UINT32(allocation_state, sPAPRDRConnector),
+>          VMSTATE_UINT32(dr_indicator, sPAPRDRConnector),
+>          VMSTATE_BOOL(configured, sPAPRDRConnector),
+> -        VMSTATE_BOOL(awaiting_release, sPAPRDRConnector),
+>          VMSTATE_END_OF_LIST()
+>      }
+>  };
+> @@ -564,11 +558,9 @@ static void spapr_dr_connector_instance_init(Object =
+*obj)
+>  static void spapr_dr_connector_class_init(ObjectClass *k, void *data)
+>  {
+>      DeviceClass *dk =3D DEVICE_CLASS(k);
+> -    sPAPRDRConnectorClass *drck =3D SPAPR_DR_CONNECTOR_CLASS(k);
+> =20
+>      dk->realize =3D realize;
+>      dk->unrealize =3D unrealize;
+> -    drck->release_pending =3D release_pending;
+>      /*
+>       * Reason: it crashes FIXME find and document the real reason
+>       */
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index af925c0..3dfb77d 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -1474,7 +1474,6 @@ static void spapr_pci_unplug_request(HotplugHandler=
+ *plug_handler,
+>  {
+>      sPAPRPHBState *phb =3D SPAPR_PCI_HOST_BRIDGE(DEVICE(plug_handler));
+>      PCIDevice *pdev =3D PCI_DEVICE(plugged_dev);
+> -    sPAPRDRConnectorClass *drck;
+>      sPAPRDRConnector *drc =3D spapr_phb_get_pci_drc(phb, pdev);
+> =20
+>      if (!phb->dr_enabled) {
+> @@ -1486,8 +1485,7 @@ static void spapr_pci_unplug_request(HotplugHandler=
+ *plug_handler,
+>      g_assert(drc);
+>      g_assert(drc->dev =3D=3D plugged_dev);
+> =20
+> -    drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+> -    if (!drck->release_pending(drc)) {
+> +    if (!spapr_drc_unplug_requested(drc)) {
+>          PCIBus *bus =3D PCI_BUS(qdev_get_parent_bus(DEVICE(pdev)));
+>          uint32_t slotnr =3D PCI_SLOT(pdev->devfn);
+>          sPAPRDRConnector *func_drc;
+> @@ -1503,7 +1501,7 @@ static void spapr_pci_unplug_request(HotplugHandler=
+ *plug_handler,
+>                  func_drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(func_drc);
+>                  state =3D func_drck->dr_entity_sense(func_drc);
+>                  if (state =3D=3D SPAPR_DR_ENTITY_SENSE_PRESENT
+> -                    && !func_drck->release_pending(func_drc)) {
+> +                    && !spapr_drc_unplug_requested(func_drc)) {
+>                      error_setg(errp,
+>                                 "PCI: slot %d, function %d still present.=
+ "
+>                                 "Must unplug all non-0 functions first.",
+> diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+> index ab64235..7846cca 100644
+> --- a/include/hw/ppc/spapr_drc.h
+> +++ b/include/hw/ppc/spapr_drc.h
+> @@ -198,10 +198,9 @@ typedef struct sPAPRDRConnector {
+>      bool configured;
+>      sPAPRConfigureConnectorState *ccs;
+> =20
+> -    bool awaiting_release;
+> -
+>      /* device pointer, via link property */
+>      DeviceState *dev;
+> +    bool unplug_requested;
+>  } sPAPRDRConnector;
+> =20
+>  typedef struct sPAPRDRConnectorClass {
+> @@ -217,9 +216,6 @@ typedef struct sPAPRDRConnectorClass {
+>      uint32_t (*isolate)(sPAPRDRConnector *drc);
+>      uint32_t (*unisolate)(sPAPRDRConnector *drc);
+>      void (*release)(DeviceState *dev);
+> -
+> -    /* QEMU interfaces for managing hotplug operations */
+> -    bool (*release_pending)(sPAPRDRConnector *drc);
+>  } sPAPRDRConnectorClass;
+> =20
+>  uint32_t spapr_drc_index(sPAPRDRConnector *drc);
+> @@ -236,4 +232,9 @@ void spapr_drc_attach(sPAPRDRConnector *drc, DeviceSt=
+ate *d, void *fdt,
+>                        int fdt_start_offset, Error **errp);
+>  void spapr_drc_detach(sPAPRDRConnector *drc);
+> =20
+> +static inline bool spapr_drc_unplug_requested(sPAPRDRConnector *drc)
+> +{
+> +    return drc->unplug_requested;
+> +}
+> +
+>  #endif /* HW_SPAPR_DRC_H */
+
+
+--Sig_/F2z3Znhfx47KhZLnUAVSOCB
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAllLvWQACgkQAvw66wEB28I87gCdGRr1yIb7fmKt4seVnz5ptbPZ
+SpwAn19SwUULdBIYx2VhvG82vjNr5oPq
+=Fmby
+-----END PGP SIGNATURE-----
+
+--Sig_/F2z3Znhfx47KhZLnUAVSOCB--
