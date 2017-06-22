@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dO6Iv-0008BN-Nw
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:54:06 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dO6Qk-0002ZQ-K3
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 14:02:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dO6Iu-0003Tf-Ui
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:54:05 -0400
-Received: from roura.ac.upc.edu ([147.83.33.10]:58619 helo=roura.ac.upc.es)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dO6Iu-0003TF-IO
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:54:04 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Thu, 22 Jun 2017 20:53:55 +0300
-Message-Id: <149815403553.3600.11933031467211935766.stgit@frigg.lan>
-In-Reply-To: <149815391105.3600.9013710785760418418.stgit@frigg.lan>
-References: <149815391105.3600.9013710785760418418.stgit@frigg.lan>
+	(envelope-from <peter.maydell@linaro.org>) id 1dO6Qj-000703-Mx
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 14:02:10 -0400
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:36198)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dO6Qj-0006zt-Ek
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 14:02:09 -0400
+Received: by mail-wr0-x22d.google.com with SMTP id c11so33625116wrc.3
+	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 11:02:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v8 02/26] queue: Add macro for incremental
- traversal
+In-Reply-To: <20170621154347.32084-1-kraxel@redhat.com>
+References: <20170621154347.32084-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 22 Jun 2017 19:01:47 +0100
+Message-ID: <CAFEAcA__PkPNfKUoRBvt1CJ-Y3z8ChDreN+MkX1CfngVdydZUQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/1] Usb 20170621 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Adds macro QTAILQ_FOREACH_CONTINUE to support incremental list
-traversal.
+On 21 June 2017 at 16:43, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> The following changes since commit 8dfaf23ae1f2273a9730a9b309cc8471269bb524:
+>
+>   tcg/tci: fix tcg-interpreter build (2017-06-20 18:39:15 +0100)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/usb-20170621-pull-request
+>
+> for you to fetch changes up to 896b6757f9c4d176ce4439238efea223a2952411:
+>
+>   usb-host: support devices with sparse/non-sequential USB interfaces (2017-06-21 15:30:08 +0200)
+>
+> ----------------------------------------------------------------
+>
+> ----------------------------------------------------------------
+>
+> Samuel Brian (1):
+>   usb-host: support devices with sparse/non-sequential USB interfaces
+>
+>  hw/usb/host-libusb.c | 24 ++++++++++++++----------
+>  1 file changed, 14 insertions(+), 10 deletions(-)
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
- include/qemu/queue.h |   12 ++++++++++++
- 1 file changed, 12 insertions(+)
+Applied, thanks.
 
-diff --git a/include/qemu/queue.h b/include/qemu/queue.h
-index 35292c3155..eb2bf9cb1c 100644
---- a/include/qemu/queue.h
-+++ b/include/qemu/queue.h
-@@ -415,6 +415,18 @@ struct {                                            =
-                    \
-                 (var);                                                  =
-\
-                 (var) =3D ((var)->field.tqe_next))
-=20
-+/**
-+ * QTAILQ_FOREACH_CONTINUE:
-+ * @var: Variable to resume iteration from.
-+ * @field: Field in @var holding a QTAILQ_ENTRY for this queue.
-+ *
-+ * Resumes iteration on a queue from the element in @var.
-+ */
-+#define QTAILQ_FOREACH_CONTINUE(var, field)                             =
-\
-+        for ((var) =3D ((var)->field.tqe_next);                         =
-  \
-+                (var);                                                  =
-\
-+                (var) =3D ((var)->field.tqe_next))
-+
- #define QTAILQ_FOREACH_SAFE(var, head, field, next_var)                 =
-\
-         for ((var) =3D ((head)->tqh_first);                             =
-  \
-                 (var) && ((next_var) =3D ((var)->field.tqe_next), 1);   =
-  \
+-- PMM
