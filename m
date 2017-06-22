@@ -1,18 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1dNxYf-0005xz-9u
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 04:33:47 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1dNxdD-0007vX-4a
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 04:38:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1dNxYc-00034V-7H
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 04:33:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47796)
+	(envelope-from <wei.w.wang@intel.com>) id 1dNxdA-0004Pm-2c
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 04:38:27 -0400
+Received: from mga05.intel.com ([192.55.52.43]:10465)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1dNxYc-00033q-1Q
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 04:33:42 -0400
-From: Eduardo Otubo <otubo@redhat.com>
-Date: Thu, 22 Jun 2017 10:33:35 +0200
-Message-Id: <20170622083336.19479-1-otubo@redhat.com>
-Subject: [Qemu-devel] [PULL 00/01] seccomp branch queue
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1dNxd9-0004Nl-OF
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 04:38:23 -0400
+Message-ID: <594B8287.6000706@intel.com>
+Date: Thu, 22 Jun 2017 16:40:39 +0800
+From: Wei Wang <wei.w.wang@intel.com>
+MIME-Version: 1.0
+References: <1497004901-30593-1-git-send-email-wei.w.wang@intel.com>
+	<1497004901-30593-7-git-send-email-wei.w.wang@intel.com>
+	<20170620190343-mutt-send-email-mst@kernel.org>
+	<5949E7C0.3050106@intel.com>
+	<20170621151922-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20170621151922-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v11 6/6] virtio-balloon:
+ VIRTIO_BALLOON_F_CMD_VQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,30 +32,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "david@redhat.com" <david@redhat.com>, "Hansen, Dave" <dave.hansen@intel.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "riel@redhat.com" <riel@redhat.com>, "nilal@redhat.com" <nilal@redhat.com>
 
-The following changes since commit 8dfaf23ae1f2273a9730a9b309cc8471269bb524:
+On 06/21/2017 08:28 PM, Michael S. Tsirkin wrote:
+> On Wed, Jun 21, 2017 at 11:28:00AM +0800, Wei Wang wrote:
+>> On 06/21/2017 12:18 AM, Michael S. Tsirkin wrote:
+>>> On Fri, Jun 09, 2017 at 06:41:41PM +0800, Wei Wang wrote:
+>>>> -	if (!virtqueue_indirect_desc_table_add(vq, desc, num)) {
+>>>> +	if (!virtqueue_indirect_desc_table_add(vq, desc, *num)) {
+>>>>    		virtqueue_kick(vq);
+>>>> -		wait_event(vb->acked, virtqueue_get_buf(vq, &len));
+>>>> -		vb->balloon_page_chunk.chunk_num = 0;
+>>>> +		if (busy_wait)
+>>>> +			while (!virtqueue_get_buf(vq, &len) &&
+>>>> +			       !virtqueue_is_broken(vq))
+>>>> +				cpu_relax();
+>>>> +		else
+>>>> +			wait_event(vb->acked, virtqueue_get_buf(vq, &len));
+>>> This is something I didn't previously notice.
+>>> As you always keep a single buffer in flight, you do not
+>>> really need indirect at all. Just add all descriptors
+>>> in the ring directly, then kick.
+>>>
+>>> E.g.
+>>> 	virtqueue_add_first
+>>> 	virtqueue_add_next
+>>> 	virtqueue_add_last
+>>>
+>>> ?
+>>>
+>>> You also want a flag to avoid allocations but there's no need to do it
+>>> per descriptor, set it on vq.
+>>>
+>> Without using the indirect table, I'm thinking about changing to use
+>> the standard sg (i.e. struct scatterlist), instead of vring_desc, so that
+>> we don't need to modify or add any new functions of virtqueue_add().
+>>
+>> In this case, we will kmalloc an array of sgs in probe(), and we can add
+>> the sgs one by one to the vq, which won't trigger the allocation of an
+>> indirect table inside virtqueue_add(), and then kick when all are added.
+>>
+>> Best,
+>> Wei
+> And allocate headers too? This can work. API extensions aren't
+> necessarily a bad idea though. The API I suggest above is preferable
+> for the simple reason that it can work without INDIRECT flag
+> support in hypervisor.
 
-  tcg/tci: fix tcg-interpreter build (2017-06-20 18:39:15 +0100)
+OK, probably we don't need to add a desc to the vq - we can just use
+the vq's desc, like this:
 
-are available in the git repository at:
+int virtqueue_add_first(struct virtqueue *_vq,
+                                      uint64_t addr,
+                                      uint32_t len,
+                                      bool in,
+                                      unsigned int *idx) {
 
-  https://github.com/otubo/qemu.git tags/pull-seccomp-20170622
+     ...
+    uint16_t desc_flags = in ? VRING_DESC_F_NEXT | VRING_DESC_F_WRITE :
+                                              VRING_DESC_F_NEXT;
 
-for you to fetch changes up to 064983cb0a18c5adc4ec791c00792f74ebf50ca4:
+     vq->vring.desc[vq->free_head].addr = addr;
+     vq->vring.desc[vq->free_head].len = len;
+     vq->vring.desc[vq->free_head].flags = cpu_to_virtio16(_vq->vdev, 
+flags);
+     /* return to the caller the desc id */
+     *idx = vq->free_head;
+     ...
+}
 
-  MAINTAINERS: seccomp: change email contact for Eduardo Otubo (2017-06-22 09:58:00 +0200)
+int virtqueue_add_next(struct virtqueue *_vq,
+                                      uint64_t addr,
+                                      uint32_t len,
+                                      bool in,
+                                      bool end,
+                                      unsigned int *idx) {
+     ...
+     vq->vring.desc[*idx].next = vq->free_head;
+     vq->vring.desc[vq->free_head].addr = addr;
+     ...
+     if (end)
+         remove the VRING_DESC_F_NEXT flag
+}
 
-----------------------------------------------------------------
-seccomp branch queue
 
-----------------------------------------------------------------
-Eduardo Otubo (1):
-      MAINTAINERS: seccomp: change email contact for Eduardo Otubo
+What do you think? We can also combine the two functions into one.
 
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
--- 
-2.9.4
+
+Best,
+Wei
