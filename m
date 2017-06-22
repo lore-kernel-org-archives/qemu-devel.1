@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dO5uk-0006Vs-GH
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:29:07 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dO5yU-0007vh-Fg
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:32:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dO5uh-0003Ex-Ba
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:29:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44584)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dO5uh-0003Do-5B
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:29:03 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 261DF30AF5B
-	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 17:29:02 +0000 (UTC)
-Date: Thu, 22 Jun 2017 14:28:52 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170622172852.GC20956@localhost.localdomain>
-References: <1498031528-1990-1-git-send-email-peterx@redhat.com>
-	<1498031528-1990-3-git-send-email-peterx@redhat.com>
-	<20170621122311.GC3928@thinpad.lan.raisama.net>
-	<20170622042530.GB3936@pxdev.xzpeter.org>
+	(envelope-from <vilanova@ac.upc.edu>) id 1dO5yR-0004I3-A1
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:32:58 -0400
+Received: from roura.ac.upc.edu ([147.83.33.10]:58276 helo=roura.ac.upc.es)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dO5yQ-0004Hl-Pu
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:32:55 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Thu, 22 Jun 2017 20:32:43 +0300
+Message-Id: <149815276329.32092.14209722991890170116.stgit@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170622042530.GB3936@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH v4 02/10] accel: introduce
- AccelClass.global_props
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [RFC PATCH v7 00/26] translate: [tcg] Generic
+ translation framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,40 +25,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, Jun 22, 2017 at 12:25:30PM +0800, Peter Xu wrote:
-> On Wed, Jun 21, 2017 at 09:23:11AM -0300, Eduardo Habkost wrote:
-> > On Wed, Jun 21, 2017 at 03:52:00PM +0800, Peter Xu wrote:
-[...]
-> > > diff --git a/vl.c b/vl.c
-> > > index 59fea15..4452d7a 100644
-> > > --- a/vl.c
-> > > +++ b/vl.c
-> > > @@ -4571,6 +4571,7 @@ int main(int argc, char **argv, char **envp)
-> > >              exit (i == 1 ? 1 : 0);
-> > >      }
-> > >  
-> > 
-> > I suggest a comment here warning about global property
-> > registration ordering.  e.g.:
-> > 
-> >  /*
-> >   * Ordering of global property registration matters:
-> >   * - machine compat_props should override accelerator-specific
-> >   *   globals.
-> >   * - user-provided globals (-global, and global properties
-> >   *   derived from other command-line options like -cpu) should
-> >   *   override machine compat_props and accelerator-specific
-> >   *   globals.
-> >   */
-> 
-> I have a standalone patch (next one) to unify these three places and
-> added some comment. Would that suite?
+This series proposes a generic (target-agnostic) instruction translation
+framework.
 
-Sorry, I didn't see that patch when I was reviewing this one.  It looks
-good to me.  Thanks!
+It basically provides a generic main loop for instruction disassembly, wh=
+ich
+calls target-specific functions when necessary. This generalization makes
+inserting new code in the main loop easier, and helps in keeping all targ=
+ets in
+synch as to the contents of it.
 
--- 
-Eduardo
+This series also paves the way towards adding events to trace guest code
+execution (BBLs and instructions).
+
+I've ported i386/x86-64 and arm/aarch64 as an example to see how it fits =
+in the
+current organization, but will port the rest when this series gets merged.
+
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+
+Changes in v7
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Change BreakpointHitType (BH_*) for BreakpointCheckType (BC_*).
+* Move target-specific translation functions to a struct (TranslatorOps).
+* Split target-specific changes into multiple patches.
+* Rebase on edf8bc9842.
+
+
+Changes in v6
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Rebase on upstream master (64175afc69).
+* Reorder fields in DisasContextBase to minimize padding [Richard Henders=
+on].
+
+
+Changes in v5
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Remove stray uses of "restrict" keyword.
+
+
+Changes in v4
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Document new macro QTAILQ_FOREACH_CONTINUE [Peter Maydell].
+* Fix coding style errors reported by checkpatch.
+* Remove use of "restrict" in added functions; it makes older gcc version=
+s barf
+  about compilation errors.
+
+
+Changes in v3
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Rebase on 0737f32daf.
+
+
+Changes in v2
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Port ARM and AARCH64 targets.
+* Fold single-stepping checks into "max_insns" [Richard Henderson].
+* Move instruction start marks to target code [Richard Henderson].
+* Add target hook for TB start.
+* Check for TCG temporary leaks.
+* Move instruction disassembly into a target hook.
+* Make breakpoint_hit() return an enum to accomodate target's needs (ARM).
+
+
+Llu=C3=ADs Vilanova (26):
+      Pass generic CPUState to gen_intermediate_code()
+      queue: Add macro for incremental traversal
+      cpu-exec: Avoid global variables in icount-related functions
+      target: [tcg] Add generic translation framework
+      target: [tcg] Redefine DISAS_* onto the generic translation framewo=
+rk (DJ_*)
+      target: [tcg,i386] Port to DisasContextBase
+      target: [tcg,i386] Refactor init_disas_context
+      target: [tcg,i386] Refactor init_globals
+      target: [tcg,i386] Refactor insn_start
+      target: [tcg,i386] Refactor breakpoint_check
+      target: [tcg,i386] Refactor disas_insn
+      target: [tcg,i386] Refactor tb_stop
+      target: [tcg,i386] Refactor disas_flags
+      target: [tcg,i386] Replace DISAS_* with DJ_*
+      target: [tcg,i386] Port to generic translation framework
+      target: [tcg,arm] Replace DISAS_* with DJ_*
+      target: [tcg,arm] Port to DisasContextBase
+      target: [tcg,arm] Port to init_disas_context
+      target: [tcg,arm] Port to init_globals
+      target: [tcg,arm] Port to tb_start
+      target: [tcg,arm] Port to insn_start
+      target: [tcg,arm] Port to breakpoint_check
+      target: [tcg,arm] Port to disas_insn
+      target: [tcg,arm] Port to tb_stop
+      target: [tcg,arm] Port to disas_flags
+      target: [tcg,arm] Port to generic translation framework
+
+
+ Makefile.target                |    1=20
+ include/exec/exec-all.h        |   13 +
+ include/exec/gen-icount.h      |    8 -
+ include/exec/translate-block.h |  125 ++++++++++
+ include/qemu/queue.h           |   12 +
+ include/qom/cpu.h              |   22 ++
+ target/alpha/translate.c       |   25 +-
+ target/arm/translate-a64.c     |  312 ++++++++++++-------------
+ target/arm/translate.c         |  503 ++++++++++++++++++++++------------=
+------
+ target/arm/translate.h         |   38 ++-
+ target/cris/translate.c        |   26 +-
+ target/hppa/translate.c        |    6=20
+ target/i386/translate.c        |  353 +++++++++++++++-------------
+ target/lm32/translate.c        |   36 +--
+ target/m68k/translate.c        |   24 +-
+ target/microblaze/translate.c  |   28 +-
+ target/mips/translate.c        |   41 ++-
+ target/moxie/translate.c       |   16 +
+ target/nios2/translate.c       |    6=20
+ target/openrisc/translate.c    |   25 +-
+ target/ppc/translate.c         |   21 +-
+ target/ppc/translate_init.c    |   32 +--
+ target/s390x/translate.c       |   22 +-
+ target/sh4/translate.c         |   21 +-
+ target/sparc/translate.c       |   17 +
+ target/tilegx/translate.c      |    9 -
+ target/tricore/translate.c     |   11 -
+ target/unicore32/translate.c   |   26 +-
+ target/xtensa/translate.c      |   39 ++-
+ translate-all.c                |    2=20
+ translate-block.c              |  185 +++++++++++++++
+ 31 files changed, 1212 insertions(+), 793 deletions(-)
+ create mode 100644 include/exec/translate-block.h
+ create mode 100644 translate-block.c
+
+
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
