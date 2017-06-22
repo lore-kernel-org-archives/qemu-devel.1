@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dO6eM-0003k0-Uo
+	(envelope-from <bounces@canonical.com>) id 1dO6eM-0003k2-VA
 	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 14:16:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dO6eK-0003br-8Z
+	(envelope-from <bounces@canonical.com>) id 1dO6eJ-0003bY-Nd
 	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 14:16:14 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37720)
+Received: from indium.canonical.com ([91.189.90.7]:37664)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dO6eK-0003bU-2s
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 14:16:12 -0400
+	id 1dO6eJ-0003bE-Ho
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 14:16:11 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dO6eI-00065O-Pu
-	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 18:16:10 +0000
+	id 1dO6eF-000611-Bs
+	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 18:16:07 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9E8042E81A1
-	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 18:16:10 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 53CD42E8198
+	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 18:16:07 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 22 Jun 2017 17:58:18 -0000
+Date: Thu, 22 Jun 2017 17:54:10 -0000
 From: Michal Suchanek <hramrach@gmail.com>
 Reply-To: Bug 1037606 <1037606@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20120816144502.14385.65707.malonedeb@soybean.canonical.com>
-Message-Id: <149815429870.4197.7746965558649241512.malone@gac.canonical.com>
+Message-Id: <149815405003.29354.8610981160173223069.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1037606] Re: vmwgfx does not work with kvm vmware
  vga
@@ -39,7 +39,13 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Also http://airlied.livejournal.com/69291.html
+The kernel bugzilla response is:
+
+The vmwgfx kernel module does not support devices without the pitchlock
+capability. Sorry. In that case you need to use the xf86-video-vmware
+driver standalone without kernel modesetting.
+
+So presumably this is some capability to be added to the qemu device
 
 -- =
 
