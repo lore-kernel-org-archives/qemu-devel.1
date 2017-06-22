@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dNqBE-0000NJ-OM
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 20:41:06 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1dNqBG-0000OP-I0
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 20:41:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dNqBB-0002WZ-La
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 20:41:04 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52028)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dNqBB-0002WL-G0
-	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 20:41:01 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dNqB9-0007m4-Is
-	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 00:40:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 81FA12E8033
-	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 00:40:59 +0000 (UTC)
+	(envelope-from <sstabellini@kernel.org>) id 1dNqBF-0002XW-Jn
+	for qemu-devel@nongnu.org; Wed, 21 Jun 2017 20:41:06 -0400
+Date: Wed, 21 Jun 2017 17:40:55 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <20170621125249.8805-2-paul.durrant@citrix.com>
+Message-ID: <alpine.DEB.2.10.1706211740490.12819@sstabellini-ThinkPad-X260>
+References: <20170621125249.8805-1-paul.durrant@citrix.com>
+	<20170621125249.8805-2-paul.durrant@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 22 Jun 2017 00:32:08 -0000
-From: Chris Stevens <1699628@bugs.launchpad.net>
-Reply-To: Bug 1699628 <1699628@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <149809152821.28527.1538400923657139906.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1699628] [NEW] Direct Sound Audio does not stop
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] xen-disk: only advertize
+ feature-persistent if grant copy is not available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,88 +23,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paul Durrant <paul.durrant@citrix.com>
+Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, qemu-block@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Public bug reported:
+On Wed, 21 Jun 2017, Paul Durrant wrote:
+> If grant copy is available then it will always be used in preference to
+> persistent maps. In this case feature-persistent should not be advertized
+> to the frontend, otherwise it may needlessly copy data into persistently
+> granted buffers.
+> 
+> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 
-The Bug:
-DirectSound Audio does not stop because dsound_ctl_out does not end up call=
-ing IDirectSoundBuffer_Stop. This is due to a bug in dsound_get_status_out =
-where the status flags returned from IDirectSoundBuffer_GetStatus are compa=
-red with DSERR_BUFFERLOST (an error code) rather than DSBSTATUS_BUFFERLOST =
-(a status flag). The status is actually (DSBSTATUS_LOOPING | DSBSTATUS_PLAY=
-ING) and one of those flags happens to be set in the DSERR_BUFFERLOST value=
-. As a result, dsound_get_status_out returns -1 and dsound_ctl_out exits be=
-fore calling IDirectSoundBuffer_Stop.
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
 
-The Fix:
-A simple replacement of DSERR_BUFFERLOST with DSBSTATUS_BUFFERLOST in dsoun=
-d_get_status_out. =
 
-Should be: "if (*statusp & DSBSTATUS_BUFFERLOST) {"
-
-Version Information:
-I was able to produce this bug in Qemu 2.9.0 and with the latest source pul=
-led from git://git.qemu-project.org/qemu.git (commit 8dfaf23ae1). I was abl=
-e to verify my suggested fix with the latest source.
-
-Guest OS:
-Discovered running Minoca OS v0.4 (www.github.com/minoca/os). Images at htt=
-ps://www.minocacorp.com/download/nightlies/latest-x86. The Qemu test images=
- I tried (http://wiki.qemu.org/Testing/System_Images) didn't have an easy s=
-ound setup (was looking for 'aplay' or similar).
-
-Qemu Command Line:
-./qemu-system-x86_64.exe -m 512 -hda pc.img -smp 4 -usbdevice keyboard -dev=
-ice intel-hda -device hda-duplex
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1699628
-
-Title:
-  Direct Sound Audio does not stop
-
-Status in QEMU:
-  New
-
-Bug description:
-  The Bug:
-  DirectSound Audio does not stop because dsound_ctl_out does not end up ca=
-lling IDirectSoundBuffer_Stop. This is due to a bug in dsound_get_status_ou=
-t where the status flags returned from IDirectSoundBuffer_GetStatus are com=
-pared with DSERR_BUFFERLOST (an error code) rather than DSBSTATUS_BUFFERLOS=
-T (a status flag). The status is actually (DSBSTATUS_LOOPING | DSBSTATUS_PL=
-AYING) and one of those flags happens to be set in the DSERR_BUFFERLOST val=
-ue. As a result, dsound_get_status_out returns -1 and dsound_ctl_out exits =
-before calling IDirectSoundBuffer_Stop.
-
-  The Fix:
-  A simple replacement of DSERR_BUFFERLOST with DSBSTATUS_BUFFERLOST in dso=
-und_get_status_out. =
-
-  Should be: "if (*statusp & DSBSTATUS_BUFFERLOST) {"
-
-  Version Information:
-  I was able to produce this bug in Qemu 2.9.0 and with the latest source p=
-ulled from git://git.qemu-project.org/qemu.git (commit 8dfaf23ae1). I was a=
-ble to verify my suggested fix with the latest source.
-
-  Guest OS:
-  Discovered running Minoca OS v0.4 (www.github.com/minoca/os). Images at h=
-ttps://www.minocacorp.com/download/nightlies/latest-x86. The Qemu test imag=
-es I tried (http://wiki.qemu.org/Testing/System_Images) didn't have an easy=
- sound setup (was looking for 'aplay' or similar).
-
-  Qemu Command Line:
-  ./qemu-system-x86_64.exe -m 512 -hda pc.img -smp 4 -usbdevice keyboard -d=
-evice intel-hda -device hda-duplex
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1699628/+subscriptions
+> ---
+> Cc: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: Anthony Perard <anthony.perard@citrix.com>
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: Max Reitz <mreitz@redhat.com>
+> ---
+>  hw/block/xen_disk.c | 15 ++++++++-------
+>  1 file changed, 8 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
+> index 3a22805fbc..9b06e3aa81 100644
+> --- a/hw/block/xen_disk.c
+> +++ b/hw/block/xen_disk.c
+> @@ -1023,11 +1023,18 @@ static int blk_init(struct XenDevice *xendev)
+>  
+>      blkdev->file_blk  = BLOCK_SIZE;
+>  
+> +    blkdev->feature_grant_copy =
+> +                (xengnttab_grant_copy(blkdev->xendev.gnttabdev, 0, NULL) == 0);
+> +
+> +    xen_pv_printf(&blkdev->xendev, 3, "grant copy operation %s\n",
+> +                  blkdev->feature_grant_copy ? "enabled" : "disabled");
+> +
+>      /* fill info
+>       * blk_connect supplies sector-size and sectors
+>       */
+>      xenstore_write_be_int(&blkdev->xendev, "feature-flush-cache", 1);
+> -    xenstore_write_be_int(&blkdev->xendev, "feature-persistent", 1);
+> +    xenstore_write_be_int(&blkdev->xendev, "feature-persistent",
+> +                          !blkdev->feature_grant_copy);
+>      xenstore_write_be_int(&blkdev->xendev, "info", info);
+>  
+>      blk_parse_discard(blkdev);
+> @@ -1202,12 +1209,6 @@ static int blk_connect(struct XenDevice *xendev)
+>  
+>      xen_be_bind_evtchn(&blkdev->xendev);
+>  
+> -    blkdev->feature_grant_copy =
+> -                (xengnttab_grant_copy(blkdev->xendev.gnttabdev, 0, NULL) == 0);
+> -
+> -    xen_pv_printf(&blkdev->xendev, 3, "grant copy operation %s\n",
+> -                  blkdev->feature_grant_copy ? "enabled" : "disabled");
+> -
+>      xen_pv_printf(&blkdev->xendev, 1, "ok: proto %s, ring-ref %d, "
+>                    "remote port %d, local port %d\n",
+>                    blkdev->xendev.protocol, blkdev->ring_ref,
+> -- 
+> 2.11.0
+> 
