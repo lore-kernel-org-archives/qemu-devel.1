@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dOANL-0008Iw-1w
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 18:14:57 -0400
+	(envelope-from <david@redhat.com>) id 1dOBHE-00034E-8Q
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 19:12:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dOANJ-0007kX-Ad
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 18:14:55 -0400
-Date: Thu, 22 Jun 2017 15:14:44 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <20170621125249.8805-4-paul.durrant@citrix.com>
-Message-ID: <alpine.DEB.2.10.1706221410580.12819@sstabellini-ThinkPad-X260>
-References: <20170621125249.8805-1-paul.durrant@citrix.com>
-	<20170621125249.8805-4-paul.durrant@citrix.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] xen-disk: use an IOThread per
- instance
+	(envelope-from <david@redhat.com>) id 1dOBHA-0001Cl-1n
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 19:12:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54692)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dOBH9-0001CW-Rh
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 19:12:35 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Fri, 23 Jun 2017 01:12:28 +0200
+Message-Id: <20170622231228.1050-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1] target-s390x: fix risbg handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,267 +21,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>
-Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, qemu-block@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, afaerber@suse.de
+To: qemu-devel@nongnu.org
+Cc: rth@twiddle.net, agraf@suse.de, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, david@redhat.com
 
-CC'ing Andreas F=C3=A4rber. Could you please give a quick look below at t=
-he
-way the iothread object is instantiate and destroyed? I am no object
-model expert and would appreaciate a second opinion.
+If we have for example: r3 contains 0x00000000ffffffff
+    ec 33 3f bf 61 55       risbg   %r3,%r3,63,191,97
 
+We want to rotate 33 to the left and only keep MSB bit 63 of that. So the
+result is then exactly 1 (we're reading the sign of the 32 bit value).
 
-On Wed, 21 Jun 2017, Paul Durrant wrote:
-> This patch allocates an IOThread object for each xen_disk instance and
-> sets the AIO context appropriately on connect. This allows processing
-> of I/O to proceed in parallel.
->=20
-> The patch also adds tracepoints into xen_disk to make it possible to
-> follow the state transtions of an instance in the log.
->=20
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-> ---
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
->=20
-> v2:
->  - explicitly acquire and release AIO context in qemu_aio_complete() an=
-d
->    blk_bh()
-> ---
->  hw/block/trace-events |  7 ++++++
->  hw/block/xen_disk.c   | 69 +++++++++++++++++++++++++++++++++++++++++++=
-+-------
->  2 files changed, 67 insertions(+), 9 deletions(-)
->=20
-> diff --git a/hw/block/trace-events b/hw/block/trace-events
-> index 65e83dc258..608b24ba66 100644
-> --- a/hw/block/trace-events
-> +++ b/hw/block/trace-events
-> @@ -10,3 +10,10 @@ virtio_blk_submit_multireq(void *mrb, int start, int=
- num_reqs, uint64_t offset,
->  # hw/block/hd-geometry.c
->  hd_geometry_lchs_guess(void *blk, int cyls, int heads, int secs) "blk =
-%p LCHS %d %d %d"
->  hd_geometry_guess(void *blk, uint32_t cyls, uint32_t heads, uint32_t s=
-ecs, int trans) "blk %p CHS %u %u %u trans %d"
-> +
-> +# hw/block/xen_disk.c
-> +xen_disk_alloc(char *name) "%s"
-> +xen_disk_init(char *name) "%s"
-> +xen_disk_connect(char *name) "%s"
-> +xen_disk_disconnect(char *name) "%s"
-> +xen_disk_free(char *name) "%s"
-> diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
-> index 0e6513708e..8548195195 100644
-> --- a/hw/block/xen_disk.c
-> +++ b/hw/block/xen_disk.c
-> @@ -27,10 +27,13 @@
->  #include "hw/xen/xen_backend.h"
->  #include "xen_blkif.h"
->  #include "sysemu/blockdev.h"
-> +#include "sysemu/iothread.h"
->  #include "sysemu/block-backend.h"
->  #include "qapi/error.h"
->  #include "qapi/qmp/qdict.h"
->  #include "qapi/qmp/qstring.h"
-> +#include "qom/object_interfaces.h"
-> +#include "trace.h"
-> =20
->  /* ------------------------------------------------------------- */
-> =20
-> @@ -128,6 +131,9 @@ struct XenBlkDev {
->      DriveInfo           *dinfo;
->      BlockBackend        *blk;
->      QEMUBH              *bh;
-> +
-> +    IOThread            *iothread;
-> +    AioContext          *ctx;
->  };
-> =20
->  /* ------------------------------------------------------------- */
-> @@ -599,9 +605,12 @@ static int ioreq_runio_qemu_aio(struct ioreq *iore=
-q);
->  static void qemu_aio_complete(void *opaque, int ret)
->  {
->      struct ioreq *ioreq =3D opaque;
-> +    struct XenBlkDev *blkdev =3D ioreq->blkdev;
-> +
-> +    aio_context_acquire(blkdev->ctx);
+Current code assumes that we can do that via an extract, which is not
+true (at least not that easy) and produces a 0.
 
-I think that Paolo was right that we need a aio_context_acquire here,
-however the issue is that with the current code:
+Let's just get rid of this special handling.
 
-  blk_handle_requests -> ioreq_runio_qemu_aio -> qemu_aio_complete
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
 
-leading to aio_context_acquire being called twice on the same lock,
-which I don't think is allowed?
+This effectively allows to start a linux kernel, compiled for z10 using
+the qemu model under tcg (with other patches currently on the list):
 
-I think we need to get rid of the qemu_aio_complete call from
-ioreq_runio_qemu_aio, but to do that we need to be careful with the
-accounting of aio_inflight (today it's incremented unconditionally at
-the beginning of ioreq_runio_qemu_aio, I think we would have to change
-that to increment it only if presync).
+qemu-system-s390x ... -cpu qemu,mvcos=on,stfle=on,ldisp=on,ldisphp=on, \
+                           eimm=on,stckf=on,csst=on,csst2=on,ginste=on, \
+                           exrl=on ...
 
+I found this by compiling the kvm-unit-tests for z10 and noticing
+elementary selftests failing. The kernel would trigger weird
+BUG_ONs very early while starting up, which basically gave not really
+many hints of what was actually going wrong.
 
->      if (ret !=3D 0) {
-> -        xen_pv_printf(&ioreq->blkdev->xendev, 0, "%s I/O error\n",
-> +        xen_pv_printf(&blkdev->xendev, 0, "%s I/O error\n",
->                        ioreq->req.operation =3D=3D BLKIF_OP_READ ? "rea=
-d" : "write");
->          ioreq->aio_errors++;
->      }
-> @@ -610,13 +619,13 @@ static void qemu_aio_complete(void *opaque, int r=
-et)
->      if (ioreq->presync) {
->          ioreq->presync =3D 0;
->          ioreq_runio_qemu_aio(ioreq);
-> -        return;
-> +        goto done;
->      }
->      if (ioreq->aio_inflight > 0) {
-> -        return;
-> +        goto done;
->      }
-> =20
-> -    if (ioreq->blkdev->feature_grant_copy) {
-> +    if (blkdev->feature_grant_copy) {
->          switch (ioreq->req.operation) {
->          case BLKIF_OP_READ:
->              /* in case of failure ioreq->aio_errors is increased */
-> @@ -638,7 +647,7 @@ static void qemu_aio_complete(void *opaque, int ret=
-)
->      }
-> =20
->      ioreq->status =3D ioreq->aio_errors ? BLKIF_RSP_ERROR : BLKIF_RSP_=
-OKAY;
-> -    if (!ioreq->blkdev->feature_grant_copy) {
-> +    if (!blkdev->feature_grant_copy) {
->          ioreq_unmap(ioreq);
->      }
->      ioreq_finish(ioreq);
-> @@ -650,16 +659,19 @@ static void qemu_aio_complete(void *opaque, int r=
-et)
->          }
->      case BLKIF_OP_READ:
->          if (ioreq->status =3D=3D BLKIF_RSP_OKAY) {
-> -            block_acct_done(blk_get_stats(ioreq->blkdev->blk), &ioreq-=
->acct);
-> +            block_acct_done(blk_get_stats(blkdev->blk), &ioreq->acct);
->          } else {
-> -            block_acct_failed(blk_get_stats(ioreq->blkdev->blk), &iore=
-q->acct);
-> +            block_acct_failed(blk_get_stats(blkdev->blk), &ioreq->acct=
-);
->          }
->          break;
->      case BLKIF_OP_DISCARD:
->      default:
->          break;
->      }
-> -    qemu_bh_schedule(ioreq->blkdev->bh);
-> +    qemu_bh_schedule(blkdev->bh);
-> +
-> +done:
-> +    aio_context_release(blkdev->ctx);
->  }
-> =20
->  static bool blk_split_discard(struct ioreq *ioreq, blkif_sector_t sect=
-or_number,
-> @@ -917,17 +929,40 @@ static void blk_handle_requests(struct XenBlkDev =
-*blkdev)
->  static void blk_bh(void *opaque)
->  {
->      struct XenBlkDev *blkdev =3D opaque;
-> +
-> +    aio_context_acquire(blkdev->ctx);
->      blk_handle_requests(blkdev);
-> +    aio_context_release(blkdev->ctx);
->  }
-> =20
->  static void blk_alloc(struct XenDevice *xendev)
->  {
->      struct XenBlkDev *blkdev =3D container_of(xendev, struct XenBlkDev=
-, xendev);
-> +    Object *obj;
-> +    char *name;
-> +    Error *err =3D NULL;
-> +
-> +    trace_xen_disk_alloc(xendev->name);
-> =20
->      QLIST_INIT(&blkdev->inflight);
->      QLIST_INIT(&blkdev->finished);
->      QLIST_INIT(&blkdev->freelist);
-> -    blkdev->bh =3D qemu_bh_new(blk_bh, blkdev);
-> +
-> +    obj =3D object_new(TYPE_IOTHREAD);
-> +    name =3D g_strdup_printf("iothread-%s", xendev->name);
-> +
-> +    object_property_add_child(object_get_objects_root(), name, obj, &e=
-rr);
-> +    assert(!err);
+ target/s390x/translate.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
-Would it be enough to call object_ref?
-
-
-> +    g_free(name);
-> +
-> +    user_creatable_complete(obj, &err);
-
-Why do we need to call this?
-
-
-> +    assert(!err);
-> +
-> +    blkdev->iothread =3D (IOThread *)object_dynamic_cast(obj, TYPE_IOT=
-HREAD);
-> +    blkdev->ctx =3D iothread_get_aio_context(blkdev->iothread);
-> +    blkdev->bh =3D aio_bh_new(blkdev->ctx, blk_bh, blkdev);
-> +
->      if (xen_mode !=3D XEN_EMULATE) {
->          batch_maps =3D 1;
->      }
-> @@ -1288,6 +1327,8 @@ static int blk_connect(struct XenDevice *xendev)
->          blkdev->persistent_gnt_count =3D 0;
->      }
-> =20
-> +    blk_set_aio_context(blkdev->blk, blkdev->ctx);
-> +
->      xen_be_bind_evtchn(&blkdev->xendev);
-> =20
->      xen_pv_printf(&blkdev->xendev, 1, "ok: proto %s, nr-ring-ref %u, "
-> @@ -1301,13 +1342,20 @@ static void blk_disconnect(struct XenDevice *xe=
-ndev)
->  {
->      struct XenBlkDev *blkdev =3D container_of(xendev, struct XenBlkDev=
-, xendev);
-> =20
-> +    trace_xen_disk_disconnect(xendev->name);
-> +
-> +    aio_context_acquire(blkdev->ctx);
-> +
->      if (blkdev->blk) {
-> +        blk_set_aio_context(blkdev->blk, qemu_get_aio_context());
->          blk_detach_dev(blkdev->blk, blkdev);
->          blk_unref(blkdev->blk);
->          blkdev->blk =3D NULL;
->      }
->      xen_pv_unbind_evtchn(&blkdev->xendev);
-> =20
-> +    aio_context_release(blkdev->ctx);
-> +
->      if (blkdev->sring) {
->          xengnttab_unmap(blkdev->xendev.gnttabdev, blkdev->sring,
->                          blkdev->nr_ring_ref);
-> @@ -1358,6 +1408,7 @@ static int blk_free(struct XenDevice *xendev)
->      g_free(blkdev->dev);
->      g_free(blkdev->devtype);
->      qemu_bh_delete(blkdev->bh);
-> +    object_unparent(OBJECT(blkdev->iothread));
-
-Shouldn't this be object_unref?
-
-
->      return 0;
->  }
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 188ab8b..81419dd 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -3450,12 +3450,6 @@ static ExitStatus op_risbg(DisasContext *s, DisasOps *o)
+         pos += 32;
+     }
+ 
+-    /* In some cases we can implement this with extract.  */
+-    if (imask == 0 && pos == 0 && len > 0 && rot + len <= 64) {
+-        tcg_gen_extract_i64(o->out, o->in2, rot, len);
+-        return NO_EXIT;
+-    }
+-
+     /* In some cases we can implement this with deposit.  */
+     if (len > 0 && (imask == 0 || ~mask == imask)) {
+         /* Note that we rotate the bits to be inserted to the lsb, not to
+-- 
+2.9.4
