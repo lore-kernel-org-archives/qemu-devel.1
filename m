@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dOAEI-0005TH-G4
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 18:05:35 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1dOANL-0008Iw-1w
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 18:14:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dOAED-0002d5-CL
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 18:05:34 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49023)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dOAED-0002cr-6I
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 18:05:29 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dOAEC-0005qR-4m
-	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 22:05:28 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1DFF32E8190
-	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 22:05:28 +0000 (UTC)
+	(envelope-from <sstabellini@kernel.org>) id 1dOANJ-0007kX-Ad
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 18:14:55 -0400
+Date: Thu, 22 Jun 2017 15:14:44 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <20170621125249.8805-4-paul.durrant@citrix.com>
+Message-ID: <alpine.DEB.2.10.1706221410580.12819@sstabellini-ThinkPad-X260>
+References: <20170621125249.8805-1-paul.durrant@citrix.com>
+	<20170621125249.8805-4-paul.durrant@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: TEXT/PLAIN; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 22 Jun 2017 21:48:35 -0000
-From: Buck <1047470@bugs.launchpad.net>
-Reply-To: Bug 1047470 <1047470@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20120907154742.10241.91584.malonedeb@gac.canonical.com>
-Message-Id: <149816811527.3849.13920382017387313225.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1047470] Re: qemu/kvm hangs reading from serial
- console
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] xen-disk: use an IOThread per
+ instance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,93 +24,267 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paul Durrant <paul.durrant@citrix.com>
+Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, qemu-block@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, afaerber@suse.de
 
-i don't use kvm/qemu any more and so don't have a means
-to determine if this is still an issue or not so please
-presume fixed, i guess
+CC'ing Andreas F=C3=A4rber. Could you please give a quick look below at t=
+he
+way the iothread object is instantiate and destroyed? I am no object
+model expert and would appreaciate a second opinion.
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1047470
+On Wed, 21 Jun 2017, Paul Durrant wrote:
+> This patch allocates an IOThread object for each xen_disk instance and
+> sets the AIO context appropriately on connect. This allows processing
+> of I/O to proceed in parallel.
+>=20
+> The patch also adds tracepoints into xen_disk to make it possible to
+> follow the state transtions of an instance in the log.
+>=20
+> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> ---
+> Cc: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: Anthony Perard <anthony.perard@citrix.com>
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: Max Reitz <mreitz@redhat.com>
+>=20
+> v2:
+>  - explicitly acquire and release AIO context in qemu_aio_complete() an=
+d
+>    blk_bh()
+> ---
+>  hw/block/trace-events |  7 ++++++
+>  hw/block/xen_disk.c   | 69 +++++++++++++++++++++++++++++++++++++++++++=
++-------
+>  2 files changed, 67 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/hw/block/trace-events b/hw/block/trace-events
+> index 65e83dc258..608b24ba66 100644
+> --- a/hw/block/trace-events
+> +++ b/hw/block/trace-events
+> @@ -10,3 +10,10 @@ virtio_blk_submit_multireq(void *mrb, int start, int=
+ num_reqs, uint64_t offset,
+>  # hw/block/hd-geometry.c
+>  hd_geometry_lchs_guess(void *blk, int cyls, int heads, int secs) "blk =
+%p LCHS %d %d %d"
+>  hd_geometry_guess(void *blk, uint32_t cyls, uint32_t heads, uint32_t s=
+ecs, int trans) "blk %p CHS %u %u %u trans %d"
+> +
+> +# hw/block/xen_disk.c
+> +xen_disk_alloc(char *name) "%s"
+> +xen_disk_init(char *name) "%s"
+> +xen_disk_connect(char *name) "%s"
+> +xen_disk_disconnect(char *name) "%s"
+> +xen_disk_free(char *name) "%s"
+> diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
+> index 0e6513708e..8548195195 100644
+> --- a/hw/block/xen_disk.c
+> +++ b/hw/block/xen_disk.c
+> @@ -27,10 +27,13 @@
+>  #include "hw/xen/xen_backend.h"
+>  #include "xen_blkif.h"
+>  #include "sysemu/blockdev.h"
+> +#include "sysemu/iothread.h"
+>  #include "sysemu/block-backend.h"
+>  #include "qapi/error.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qapi/qmp/qstring.h"
+> +#include "qom/object_interfaces.h"
+> +#include "trace.h"
+> =20
+>  /* ------------------------------------------------------------- */
+> =20
+> @@ -128,6 +131,9 @@ struct XenBlkDev {
+>      DriveInfo           *dinfo;
+>      BlockBackend        *blk;
+>      QEMUBH              *bh;
+> +
+> +    IOThread            *iothread;
+> +    AioContext          *ctx;
+>  };
+> =20
+>  /* ------------------------------------------------------------- */
+> @@ -599,9 +605,12 @@ static int ioreq_runio_qemu_aio(struct ioreq *iore=
+q);
+>  static void qemu_aio_complete(void *opaque, int ret)
+>  {
+>      struct ioreq *ioreq =3D opaque;
+> +    struct XenBlkDev *blkdev =3D ioreq->blkdev;
+> +
+> +    aio_context_acquire(blkdev->ctx);
 
-Title:
-  qemu/kvm hangs reading from serial console
+I think that Paolo was right that we need a aio_context_acquire here,
+however the issue is that with the current code:
 
-Status in QEMU:
-  Incomplete
+  blk_handle_requests -> ioreq_runio_qemu_aio -> qemu_aio_complete
 
-Bug description:
-  This is for a qemu-kvm running on RHEL 5, so it's pretty old,
-  but i think the problem still exists in 1.2
+leading to aio_context_acquire being called twice on the same lock,
+which I don't think is allowed?
 
-  We have conman running on our hosts, connecting to the
-  kvm/qemu's using
-  =C2=A0=C2=A0=C2=A0=C2=A0virsh console
-  which just opens up the console /dev/pts/slave that qemu
-  opens up when run with options
-  =C2=A0=C2=A0=C2=A0=C2=A0-nographic
-  =C2=A0=C2=A0=C2=A0=C2=A0-serial mon:pty
+I think we need to get rid of the qemu_aio_complete call from
+ioreq_runio_qemu_aio, but to do that we need to be careful with the
+accounting of aio_inflight (today it's incremented unconditionally at
+the beginning of ioreq_runio_qemu_aio, I think we would have to change
+that to increment it only if presync).
 
-  Sometimes virsh console exits and then qemu locks up[*].
-  My guess is that something like this happens:
 
-  virsh console exits
-  qemu does a select() on /dev/ptmx (and other FDs)
-  select() returns the FD of /dev/ptmx in the read-fdset
-  qemu does a read()
-  read() returns -1 (EIO)
-  qemu does other stuff for a while
-  select() ... /dev/ptmx
-  read() .. EIO
-  other stuff
-  select() ... read() ... select() ... read() ... select()
-  conman starts a new virsh console that connects
-  qemu does a read()
-  read() blocks b/c there is now a writer on the tty slave
+>      if (ret !=3D 0) {
+> -        xen_pv_printf(&ioreq->blkdev->xendev, 0, "%s I/O error\n",
+> +        xen_pv_printf(&blkdev->xendev, 0, "%s I/O error\n",
+>                        ioreq->req.operation =3D=3D BLKIF_OP_READ ? "rea=
+d" : "write");
+>          ioreq->aio_errors++;
+>      }
+> @@ -610,13 +619,13 @@ static void qemu_aio_complete(void *opaque, int r=
+et)
+>      if (ioreq->presync) {
+>          ioreq->presync =3D 0;
+>          ioreq_runio_qemu_aio(ioreq);
+> -        return;
+> +        goto done;
+>      }
+>      if (ioreq->aio_inflight > 0) {
+> -        return;
+> +        goto done;
+>      }
+> =20
+> -    if (ioreq->blkdev->feature_grant_copy) {
+> +    if (blkdev->feature_grant_copy) {
+>          switch (ioreq->req.operation) {
+>          case BLKIF_OP_READ:
+>              /* in case of failure ioreq->aio_errors is increased */
+> @@ -638,7 +647,7 @@ static void qemu_aio_complete(void *opaque, int ret=
+)
+>      }
+> =20
+>      ioreq->status =3D ioreq->aio_errors ? BLKIF_RSP_ERROR : BLKIF_RSP_=
+OKAY;
+> -    if (!ioreq->blkdev->feature_grant_copy) {
+> +    if (!blkdev->feature_grant_copy) {
+>          ioreq_unmap(ioreq);
+>      }
+>      ioreq_finish(ioreq);
+> @@ -650,16 +659,19 @@ static void qemu_aio_complete(void *opaque, int r=
+et)
+>          }
+>      case BLKIF_OP_READ:
+>          if (ioreq->status =3D=3D BLKIF_RSP_OKAY) {
+> -            block_acct_done(blk_get_stats(ioreq->blkdev->blk), &ioreq-=
+>acct);
+> +            block_acct_done(blk_get_stats(blkdev->blk), &ioreq->acct);
+>          } else {
+> -            block_acct_failed(blk_get_stats(ioreq->blkdev->blk), &iore=
+q->acct);
+> +            block_acct_failed(blk_get_stats(blkdev->blk), &ioreq->acct=
+);
+>          }
+>          break;
+>      case BLKIF_OP_DISCARD:
+>      default:
+>          break;
+>      }
+> -    qemu_bh_schedule(ioreq->blkdev->bh);
+> +    qemu_bh_schedule(blkdev->bh);
+> +
+> +done:
+> +    aio_context_release(blkdev->ctx);
+>  }
+> =20
+>  static bool blk_split_discard(struct ioreq *ioreq, blkif_sector_t sect=
+or_number,
+> @@ -917,17 +929,40 @@ static void blk_handle_requests(struct XenBlkDev =
+*blkdev)
+>  static void blk_bh(void *opaque)
+>  {
+>      struct XenBlkDev *blkdev =3D opaque;
+> +
+> +    aio_context_acquire(blkdev->ctx);
+>      blk_handle_requests(blkdev);
+> +    aio_context_release(blkdev->ctx);
+>  }
+> =20
+>  static void blk_alloc(struct XenDevice *xendev)
+>  {
+>      struct XenBlkDev *blkdev =3D container_of(xendev, struct XenBlkDev=
+, xendev);
+> +    Object *obj;
+> +    char *name;
+> +    Error *err =3D NULL;
+> +
+> +    trace_xen_disk_alloc(xendev->name);
+> =20
+>      QLIST_INIT(&blkdev->inflight);
+>      QLIST_INIT(&blkdev->finished);
+>      QLIST_INIT(&blkdev->freelist);
+> -    blkdev->bh =3D qemu_bh_new(blk_bh, blkdev);
+> +
+> +    obj =3D object_new(TYPE_IOTHREAD);
+> +    name =3D g_strdup_printf("iothread-%s", xendev->name);
+> +
+> +    object_property_add_child(object_get_objects_root(), name, obj, &e=
+rr);
+> +    assert(!err);
 
-  So i don't see any way around this, given the sorta rudi-
-  mentary semantics of TTY IO on Linux (not that i know of
-  any platform that does it better ... ?), except ...
+Would it be enough to call object_ref?
 
-  maybe qemu should
-  =C2=A0=C2=A0=C2=A0=C2=A0fcntl(master_fd, F_SETFL, flags | O_NONBLOCK)
-  in qemu-char.c:qemu_char_open_pty()
-  and be prepared to handle E_WOULDBLOCK|E_AGAIN in
-  qemu-char.c:fd_chr_read() ... ?
 
-  --buck
+> +    g_free(name);
+> +
+> +    user_creatable_complete(obj, &err);
 
-  [*] i think, b/c in the old version we are running, sometimes
-  =C2=A0=C2=A0=C2=A0=C2=A0the guest spits out the
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^]
-  =C2=A0=C2=A0=C2=A0=C2=A0character to its console, and virsh console reads=
- it and
-  =C2=A0=C2=A0=C2=A0=C2=A0doesn't check to see if its from stdin or the pty=
- and exits,
-  =C2=A0=C2=A0=C2=A0=C2=A0which, i think, can be fixed like this:
+Why do we need to call this?
 
-  --- libvirt-0.8.2/tools/console.c.ctrl_close_bracket_handling_fix       2=
-012-09-06 10:30:43.606997191 -0400
-  +++ libvirt-0.8.2/tools/console.c       2012-09-06 10:34:52.154000464 -04=
-00
-  @@ -155,6 +155,7 @@ int vshRunConsole(const char *tty) {
 
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* Quit if end of file, or we got the Ctrl-] =
-key */
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!got ||
-  +                    fds[i].fd =3D=3D STDIN_FILENO &&
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(got =3D=3D 1 &&
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0buf[0] =3D=3D C=
-TRL_CLOSE_BRACKET))
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0goto done;
+> +    assert(!err);
+> +
+> +    blkdev->iothread =3D (IOThread *)object_dynamic_cast(obj, TYPE_IOT=
+HREAD);
+> +    blkdev->ctx =3D iothread_get_aio_context(blkdev->iothread);
+> +    blkdev->bh =3D aio_bh_new(blkdev->ctx, blk_bh, blkdev);
+> +
+>      if (xen_mode !=3D XEN_EMULATE) {
+>          batch_maps =3D 1;
+>      }
+> @@ -1288,6 +1327,8 @@ static int blk_connect(struct XenDevice *xendev)
+>          blkdev->persistent_gnt_count =3D 0;
+>      }
+> =20
+> +    blk_set_aio_context(blkdev->blk, blkdev->ctx);
+> +
+>      xen_be_bind_evtchn(&blkdev->xendev);
+> =20
+>      xen_pv_printf(&blkdev->xendev, 1, "ok: proto %s, nr-ring-ref %u, "
+> @@ -1301,13 +1342,20 @@ static void blk_disconnect(struct XenDevice *xe=
+ndev)
+>  {
+>      struct XenBlkDev *blkdev =3D container_of(xendev, struct XenBlkDev=
+, xendev);
+> =20
+> +    trace_xen_disk_disconnect(xendev->name);
+> +
+> +    aio_context_acquire(blkdev->ctx);
+> +
+>      if (blkdev->blk) {
+> +        blk_set_aio_context(blkdev->blk, qemu_get_aio_context());
+>          blk_detach_dev(blkdev->blk, blkdev);
+>          blk_unref(blkdev->blk);
+>          blkdev->blk =3D NULL;
+>      }
+>      xen_pv_unbind_evtchn(&blkdev->xendev);
+> =20
+> +    aio_context_release(blkdev->ctx);
+> +
+>      if (blkdev->sring) {
+>          xengnttab_unmap(blkdev->xendev.gnttabdev, blkdev->sring,
+>                          blkdev->nr_ring_ref);
+> @@ -1358,6 +1408,7 @@ static int blk_free(struct XenDevice *xendev)
+>      g_free(blkdev->dev);
+>      g_free(blkdev->devtype);
+>      qemu_bh_delete(blkdev->bh);
+> +    object_unparent(OBJECT(blkdev->iothread));
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1047470/+subscriptions
+Shouldn't this be object_unref?
+
+
+>      return 0;
+>  }
