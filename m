@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51097)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1dNxub-00071U-HQ
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 04:56:26 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dNyMM-0008O9-GI
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:25:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1dNxua-0003AA-RB
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 04:56:25 -0400
-Date: Thu, 22 Jun 2017 10:56:10 +0200
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20170622085610.wasfoafo3b46iv4q@eukaryote>
-References: <1498040351-6376-2-git-send-email-kchamart@redhat.com>
-	<bdbe5523-b066-a2ef-9e46-ece40ff4060d@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dNyML-0003r5-Jo
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:25:06 -0400
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:34092)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dNyML-0003qn-Cr
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 05:25:05 -0400
+Received: by mail-wr0-x22b.google.com with SMTP id 77so15003904wrb.1
+	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 02:25:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bdbe5523-b066-a2ef-9e46-ece40ff4060d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] live-block-ops.txt: Rename, rewrite,
- and improve it
+In-Reply-To: <1497628168-30489-1-git-send-email-mst@redhat.com>
+References: <1497628168-30489-1-git-send-email-mst@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 22 Jun 2017 10:24:43 +0100
+Message-ID: <CAFEAcA8gLKyrZZFfDBHUk4ROeuahaJmS+jne6pMwAtZ678uzmw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/7] pc: fixes, cleanups, features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,51 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, stephen@that.guru, armbru@redhat.com, mreitz@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, Jun 21, 2017 at 06:49:02PM -0400, John Snow wrote:
+On 16 June 2017 at 16:49, Michael S. Tsirkin <mst@redhat.com> wrote:
+> The following changes since commit edf8bc98424d62035d5e4c0f39542722d72d7979:
+>
+>   Merge remote-tracking branch 'remotes/rth/tags/pull-s390-20170613' into staging (2017-06-15 13:45:15 +0100)
+>
+> are available in the git repository at:
+>
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+>
+> for you to fetch changes up to 7f3cf2d6e7d1231d854902c9016823961e59d1f4:
+>
+>   hw/i386: fix nvdimm check error path (2017-06-16 18:44:56 +0300)
+>
+> ----------------------------------------------------------------
+> pc: fixes, cleanups, features
+>
+> Some fixes and cleanups. Extended TSEG sizes.
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>
+> ----------------------------------------------------------------
 
-[...]
+Applied, thanks.
 
-> > * TODO (after feedback from John Snow):
-> >    - Eric Blake suggested to consider documenting incremental backup
-> >      policies as part of the section: "Live disk backup ---
-> >      `drive-backup` and `blockdev-backup`"
-> 
-> Perhaps it could be mentioned, but hopefully I've covered it in some
-> sufficient detail in the (now) docs/devel/bitmaps.md file; 
-
-Yes, that doc is very useful.  That was my precise thought.
-
-> I'm a little wary of duplicating efforts in this area, 
-
-I share your wariness.
-
-> but you've covered everything *else* in good detail here, so now my
-> file is the odd one out.
-> 
-> I will leave this up to you, really. Perhaps it could be paid some lip
-> service with a link to the other document? 
-
-Yes, I was thinking of this, too -- just link to the 'bitmaps' document.
-
-A quick side question here: Since upstream QEMU is converging onto
-Sphinx, and rST, hope you mind if I convert docs/devel/bitmaps.md into
-rST at somepoint, for consistency's sake.  I'll file a separate review,
-anyway for that.  In the long term, all / most other documents would
-also be converted.
-
-> The detail in bitmaps.md is a little more verbose than the rest of
-> this file, so if you include it wholesale it'd dwarf the rest of this
-> document.
-> 
-> What do you think?
-
-Yes, I fully agree with your suggestion.  I will simply link to the
-detailed document you wrote, which I was thinking of anyhow.
-
-Thanks for your comments!
-
--- 
-/kashyap
+-- PMM
