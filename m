@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dO6Ep-0004CG-05
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:49:52 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dO6FL-0004jE-0O
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:50:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dO6El-0002AB-2v
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:49:51 -0400
-Received: from roura.ac.upc.edu ([147.83.33.10]:53779 helo=roura.ac.upc.es)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dO6Ek-00029y-N2
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:49:47 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Thu, 22 Jun 2017 20:49:31 +0300
-Message-Id: <149815377083.1830.11276135502606087693.stgit@frigg.lan>
-In-Reply-To: <149815338558.1830.8107719559183631163.stgit@frigg.lan>
-References: <149815338558.1830.8107719559183631163.stgit@frigg.lan>
+	(envelope-from <dgilbert@redhat.com>) id 1dO6FG-0002Nd-U8
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 13:50:22 -0400
+Date: Thu, 22 Jun 2017 18:50:13 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170622175012.GF2100@work-vm>
+References: <149814756006.27338.8723356702388175951.stgit@bahia>
+	<CAFEAcA8yqb8ykP8nCnoVNQUZd851RhOLFf2TfkHZmL2je+pP=Q@mail.gmail.com>
+	<20170622184255.2d44e3bd@bahia.lab.toulouse-stg.fr.ibm.com>
+	<87injo6jla.fsf@secure.mitica>
+	<CAFEAcA-g-=AkH3t8jOTFY_9zA6ECS57-3MS=cHPb+Q6sePzNsw@mail.gmail.com>
+	<20170622172555.GE2100@work-vm>
+	<20170622194649.6d251753@bahia.lab.toulouse-stg.fr.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 12/26] target: [tcg,i386] Refactor tb_stop
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170622194649.6d251753@bahia.lab.toulouse-stg.fr.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] Separate function types from opaque types
+ in include/qemu/typedefs.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,88 +29,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Juan Quintela <quintela@redhat.com>
 
-Incrementally paves the way towards using the generic instruction transla=
-tion
-loop.
+* Greg Kurz (groug@kaod.org) wrote:
+> On Thu, 22 Jun 2017 18:25:55 +0100
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> 
+> > * Peter Maydell (peter.maydell@linaro.org) wrote:
+> > > On 22 June 2017 at 18:03, Juan Quintela <quintela@redhat.com> wrote:  
+> > > > Greg Kurz <groug@kaod.org> wrote:  
+> > > >> On Thu, 22 Jun 2017 17:14:08 +0100
+> > > >> Peter Maydell <peter.maydell@linaro.org> wrote:
+> > > >>  
+> > > >>> On 22 June 2017 at 17:06, Greg Kurz <groug@kaod.org> wrote:  
+> > > >>> > Function types cannot reside in the same sorted list as opaque types since
+> > > >>> > they may depend on a type which would be defined later.
+> > > >>> >
+> > > >>> > Of course, the same problem could arise if a function type depends on
+> > > >>> > another function type with greater alphabetical order. Hopefully we
+> > > >>> > don't have that at this time.  
+> > > >>>
+> > > >>> The other approach would be to put function types somewhere
+> > > >>> else and leave typedefs.h for the simple 'opaque types
+> > > >>> for structures' that it was started as.
+> > > >>>
+> > > >>> For instance we have include/qemu/fprintf-fn.h as a precedent.
+> > > >>>  
+> > > >>
+> > > >> Indeed, and I'm not quite sure why Juan decided to put these types into
+> > > >> typedefs.h instead of a dedicated header file in include/migration... is
+> > > >> it only because it was the quickest fix ?  
+> > > >
+> > > > All other typedefs were defined there.  I can create a different include
+> > > > file, but I think that is "overengineering", no?  They are typedefs,
+> > > > just not of structs.  But I agree that they are the only ones.  
+> > > 
+> > > Well, the comment in the file says "opaque types so that device init
+> > > declarations don't have to pull in all the real definitions", whereas
+> > > the ones you've added aren't opaque types, they are the real
+> > > definitions. They're also only used by a very small subset of .c
+> > > files, whereas typedefs.h goes everywhere.  
+> > 
+> > mv fprintf-fn.f   fn-typedefs.h
+> > 
+> > move those two defs into that?
+> > 
+> 
+> Wouldn't it be more appropriate to put them in a dedicated
+> include/migration/handler-fn.h header included by both
+> vmstate.h and register.h ?
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
- target/i386/translate.c |   26 ++++++++++++++------------
- 1 file changed, 14 insertions(+), 12 deletions(-)
+Could do; I'm just not finding tiny header files with one or
+two entries each that useful.
 
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 34e7cf6788..e7b46d282a 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -8510,8 +8510,6 @@ static target_ulong i386_trblock_disas_insn(DisasCo=
-ntextBase *db, CPUState *cpu)
-         /* if irq were inhibited with HF_INHIBIT_IRQ_MASK, we clear
-            the flag and abort the translation to give the irqs a
-            change to be happen */
--        gen_jmp_im(pc_next - dc->cs_base);
--        gen_eob(dc);
-         db->is_jmp =3D DJ_TOO_MANY;
-     } else if ((db->tb->cflags & CF_USE_ICOUNT)
-                && ((db->pc_next & TARGET_PAGE_MASK)
-@@ -8524,18 +8522,24 @@ static target_ulong i386_trblock_disas_insn(Disas=
-ContextBase *db, CPUState *cpu)
-            If current instruction already crossed the bound - it's ok,
-            because an exception hasn't stopped this code.
-          */
--        gen_jmp_im(pc_next - dc->cs_base);
--        gen_eob(dc);
-         db->is_jmp =3D DJ_TOO_MANY;
-     } else if ((pc_next - db->pc_first) >=3D (TARGET_PAGE_SIZE - 32)) {
--        gen_jmp_im(pc_next - dc->cs_base);
--        gen_eob(dc);
-         db->is_jmp =3D DJ_TOO_MANY;
-     }
-=20
-     return pc_next;
- }
-=20
-+static void i386_trblock_tb_stop(DisasContextBase *db, CPUState *cpu)
-+{
-+    DisasContext *dc =3D container_of(db, DisasContext, base);
-+
-+    if (db->is_jmp =3D=3D DJ_TOO_MANY) {
-+        gen_jmp_im(db->pc_next - dc->cs_base);
-+        gen_eob(dc);
-+    }
-+}
-+
- /* generate intermediate code for basic block 'tb'.  */
- void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
- {
-@@ -8596,23 +8600,21 @@ void gen_intermediate_code(CPUState *cpu, Transla=
-tionBlock *tb)
-         /* if single step mode, we generate only one instruction and
-            generate an exception */
-         if (db->singlestep_enabled) {
--            gen_jmp_im(db->pc_next - dc->cs_base);
--            gen_eob(dc);
-+            db->is_jmp =3D DJ_TOO_MANY;
-             break;
-         }
-         /* if too long translation, stop generation too */
-         if (tcg_op_buf_full() ||
-             num_insns >=3D max_insns) {
--            gen_jmp_im(db->pc_next - dc->cs_base);
--            gen_eob(dc);
-+            db->is_jmp =3D DJ_TOO_MANY;
-             break;
-         }
-         if (singlestep) {
--            gen_jmp_im(db->pc_next - dc->cs_base);
--            gen_eob(dc);
-+            db->is_jmp =3D DJ_TOO_MANY;
-             break;
-         }
-     }
-+    i386_trblock_tb_stop(db, cpu);
-     if (tb->cflags & CF_LAST_IO)
-         gen_io_end(cpu_env);
- done_generating:
+Dave
+
+> > Dave
+> > 
+> > > thanks
+> > > -- PMM  
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
+> 
+
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
