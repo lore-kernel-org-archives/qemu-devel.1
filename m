@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dO1Qw-0005Cb-Ib
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 08:42:03 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dO1R9-0005I6-43
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 08:42:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dO1Qs-0005aE-G6
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 08:42:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:14380)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dO1R5-0005dF-4X
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 08:42:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43576)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dO1Qs-0005Zw-9W
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 08:41:58 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1dO1R4-0005cM-SP
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 08:42:11 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 051751F580
-	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 12:41:56 +0000 (UTC)
-Date: Thu, 22 Jun 2017 09:41:48 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170622124148.GA20956@localhost.localdomain>
-References: <20170614203000.19984-1-ehabkost@redhat.com>
-	<20170614203000.19984-5-ehabkost@redhat.com>
-	<20170622122649.GD2624@work-vm>
+	by mx1.redhat.com (Postfix) with ESMTPS id CDA1B61963
+	for <qemu-devel@nongnu.org>; Thu, 22 Jun 2017 12:42:09 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Thu, 22 Jun 2017 14:41:33 +0200
+Message-Id: <20170622124204.19407-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170622122649.GD2624@work-vm>
-Subject: Re: [Qemu-devel] [PATCH 4/5] memory: Add 'persistent' parameter to
- memory_region_init_ram_from_file()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 00/31] Refactoring with clang-tidy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,29 +31,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On Thu, Jun 22, 2017 at 01:26:49PM +0100, Dr. David Alan Gilbert wrote:
-> * Eduardo Habkost (ehabkost@redhat.com) wrote:
-> > Make it possible to set the RAM_NONPERSISTENT flag on the RAMBlock when
-> > mapping a file.
-> > 
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> 
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> 
-> A little confusing having a persistent flag passed in but setting a
-> NONPERSISTENT flag.
-> 
-> One thing to watch out for is the other effect, for example I think
-> doing an MADV_REMOVE will zero the file;  if that's a ROM file that
-> would probably be bad; but your description of persistent=false
-> might make sense for a ROM file since it wont be changed.
+Hi,
 
-Good point.  Sounds like a good idea to reword the documentation to
-mentiuon that in addition to making data not written back, contents
-might be destroyed.
+Various refactring questions on previously sent series prompted me to
+look at coccinelle to automate some changes again. Alas, semantic
+patches are not so easy to express for me, cocci doesn't catch all
+cases, is quite slow, and it doesn't seem possible to evaluate
+expressions to check if E =3D=3D E-1 or if E is pow2 for example.
 
--- 
-Eduardo
+I started looking at clang-tidy
+(http://clang.llvm.org/extra/clang-tidy/) as an alternative to do some
+refactoring.
+
+Our build-system doesn't generate compile_commands.json, which is
+pretty much required to use clang refactoring tools. But it is as easy
+as running "bear make" to make one, using https://github.com/rizsotto/Bea=
+r.
+
+Then, you can run checks and automate fixes (here only "qemu-round")
+over the code base with:
+run-clang-tidy.py -header-filter=3D'.*' -checks=3D'-*,qemu-round' -fix
+
+There are some path bugs that can easily be solved, see
+https://bugs.llvm.org/show_bug.cgi?id=3D33440 for details.
+
+I ran 'qemu-round' check in this series, and added a few other manual
+refactoring I had pending. (I'll submit other series for the rest of
+the checks later)
+
+My WIP qemu checks are here:
+https://github.com/elmarco/clang-tools-extra/tree/master/clang-tidy/qemu
+
+The "round-check" is:
+https://github.com/elmarco/clang-tools-extra/blob/master/clang-tidy/qemu/=
+RoundCheck.cpp
+
+I don't know if you can express a semantic patch that would be as
+powerful. The code remains easy to write & read imho, and quite fast
+to apply. I like the tool, it's probably a good complement to
+coccinelle overall.
+
+Thanks
+
+Marc-Andr=C3=A9 Lureau (31):
+  i386: use ROUND_UP macro
+  vnc: use QEMU_ALIGN_DOWN
+  vhdx: use QEMU_ALIGN_DOWN
+  vhost: use QEMU_ALIGN_DOWN
+  i8254: use QEMU_ALIGN_DOWN
+  pcspk: use QEMU_ALIGN_DOWN
+  dmg: use DIV_ROUND_UP
+  qcow2: use DIV_ROUND_UP
+  vpc: use DIV_ROUND_UP
+  vvfat: use DIV_ROUND_UP
+  vnc: use DIV_ROUND_UP
+  slirp: use DIV_ROUND_UP
+  ui: use DIV_ROUND_UP
+  vga: use DIV_ROUND_UP
+  virtio-gpu: use DIV_ROUND_UP
+  monitor: use DIV_ROUND_UP
+  console: use DIV_ROUND_UP
+  virtio-serial: use DIV_ROUND_UP
+  piix: use DIV_ROUND_UP
+  q35: use DIV_ROUND_UP
+  usb-hub: use DIV_ROUND_UP
+  msix: use DIV_ROUND_UP
+  ppc: use DIV_ROUND_UP
+  i386/dump: use DIV_ROUND_UP
+  kvm: use DIV_ROUND_UP
+  decnumber: use DIV_ROUND_UP
+  i386: introduce ELF_NOTE_SIZE macro
+  9pfs: replace g_malloc()+memcpy() with g_memdup()
+  i386: replace g_malloc()+memcpy() with g_memdup()
+  test-iov: replace g_malloc()+memcpy() with g_memdup()
+  eepro100: replace g_malloc()+memcpy() with g_memdup()
+
+ include/ui/console.h        |  2 +-
+ linux-headers/asm-x86/kvm.h |  2 +-
+ slirp/ip6.h                 |  6 +++---
+ block/dmg.c                 |  2 +-
+ block/qcow2-cluster.c       |  2 +-
+ block/qcow2-refcount.c      |  2 +-
+ block/vhdx-log.c            |  2 +-
+ block/vpc.c                 |  4 ++--
+ block/vvfat.c               |  4 ++--
+ hw/9pfs/9p-synth.c          |  3 +--
+ hw/audio/pcspk.c            |  2 +-
+ hw/char/virtio-serial-bus.c |  8 ++++----
+ hw/display/vga.c            |  2 +-
+ hw/display/virtio-gpu.c     |  4 ++--
+ hw/i386/multiboot.c         |  3 +--
+ hw/net/eepro100.c           |  3 +--
+ hw/pci-host/piix.c          |  2 +-
+ hw/pci-host/q35.c           |  2 +-
+ hw/pci/msix.c               |  4 ++--
+ hw/timer/i8254_common.c     |  4 ++--
+ hw/usb/dev-hub.c            |  8 ++++----
+ hw/virtio/vhost.c           |  2 +-
+ libdecnumber/decNumber.c    |  2 +-
+ monitor.c                   |  4 ++--
+ target/i386/arch_dump.c     | 40 ++++++++++++++++++++-------------------=
+-
+ target/ppc/mem_helper.c     |  2 +-
+ target/ppc/translate.c      |  2 +-
+ tests/test-iov.c            |  3 +--
+ ui/cursor.c                 |  2 +-
+ ui/vnc-enc-tight.c          |  2 +-
+ ui/vnc.c                    | 10 +++++-----
+ 31 files changed, 68 insertions(+), 72 deletions(-)
+
+--=20
+2.13.1.395.gf7b71de06
