@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1dOLtG-00074Q-VS
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 06:32:39 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dOM0F-0002ni-RY
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 06:39:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1dOLtD-0001hb-S0
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 06:32:38 -0400
-Received: from aserp1040.oracle.com ([141.146.126.69]:49419)
+	(envelope-from <kraxel@redhat.com>) id 1dOM0D-00055x-AT
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 06:39:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57004)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
-	id 1dOLtD-0001Qm-J1
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 06:32:35 -0400
-From: Knut Omang <knut.omang@oracle.com>
-Date: Fri, 23 Jun 2017 12:31:04 +0200
-Message-Id: <cover.050aaed1de4cecd4ba9a4dc6576d1d148a8a9004.1498213152.git-series.knut.omang@oracle.com>
-Subject: [Qemu-devel] [PATCH v4 0/4] Unit test+fix for problem with QEMU
- handling of multiple bind()s to the same port
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dOM0D-00055a-4c
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 06:39:49 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 141E243A29
+	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 10:39:48 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri, 23 Jun 2017 12:39:44 +0200
+Message-Id: <20170623103945.7014-7-kraxel@redhat.com>
+In-Reply-To: <20170623103945.7014-1-kraxel@redhat.com>
+References: <20170623103945.7014-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 6/7] ps2: add ps2_reset_queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,48 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P . Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Knut Omang <knut.omang@oracle.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-This series contains:
-* a unit test that exposes a race condition which causes QEMU to fail
-  to find a port even when there is plenty of available ports.
-* a refactor of the qemu-sockets inet_listen_saddr() function
-  to better handle this situation.
+Factor out ps2 queue reset to a separate function.
+No functional change.
 
-Changes from v3:
-* Test changes: Add missing license
-  Add subtests for ipv4, ipv6 and both
-  Various g_* usage improvements
-* Split patch into 3 patches with two refactoring patches ahead
-  of the actual fix.
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-id: 20170606112105.13331-3-kraxel@redhat.com
+---
+ hw/input/ps2.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-Changes from v2:
-* Non-trivial rebase + further abstraction
-  on top of 7ad9af343c7f1c70c8015c7c519c312d8c5f9fa1
-  'tests: add functional test validating ipv4/ipv6 address flag handling'
-
-Changes from v1:
-* Fix potential uninitialized variable only detected by optimize.
-* Improve unexpected error detection in test-listen to give more
-  details about why the test fails unexpectedly.
-* Fix some line length style issues.
-
-Thanks,
-Knut
-
-Knut Omang (4):
-  tests: Add test-listen - a stress test for QEMU socket listen
-  sockets: factor out create_fast_reuse_socket
-  sockets: factor out a new try_bind() function
-  sockets: Handle race condition between binds to the same port
-
- tests/Makefile.include |   2 +-
- tests/test-listen.c    | 253 ++++++++++++++++++++++++++++++++++++++++++-
- util/qemu-sockets.c    | 159 +++++++++++++++++---------
- 3 files changed, 362 insertions(+), 52 deletions(-)
- create mode 100644 tests/test-listen.c
-
-base-commit: 7ad9af343c7f1c70c8015c7c519c312d8c5f9fa1
+diff --git a/hw/input/ps2.c b/hw/input/ps2.c
+index 37f8cb842e..2416b58cc0 100644
+--- a/hw/input/ps2.c
++++ b/hw/input/ps2.c
+@@ -551,6 +551,15 @@ static uint8_t translate_table[256] = {
+     0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff,
+ };
+ 
++static void ps2_reset_queue(PS2State *s)
++{
++    PS2Queue *q = &s->queue;
++
++    q->rptr = 0;
++    q->wptr = 0;
++    q->count = 0;
++}
++
+ void ps2_queue(PS2State *s, int b)
+ {
+     PS2Queue *q = &s->queue;
+@@ -1079,12 +1088,8 @@ void ps2_write_mouse(void *opaque, int val)
+ 
+ static void ps2_common_reset(PS2State *s)
+ {
+-    PS2Queue *q;
+     s->write_cmd = -1;
+-    q = &s->queue;
+-    q->rptr = 0;
+-    q->wptr = 0;
+-    q->count = 0;
++    ps2_reset_queue(s);
+     s->update_irq(s->update_arg, 0);
+ }
+ 
 -- 
-git-series 0.9.1
+2.9.3
