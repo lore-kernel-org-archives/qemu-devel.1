@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORLx-0001CQ-Po
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:39 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dORM1-0001EX-0g
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORLt-0007f5-L9
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:37 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dORM0-0007hW-3S
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:40 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 23 Jun 2017 18:21:19 +0200
-Message-Id: <1498234919-27316-22-git-send-email-kwolf@redhat.com>
+Date: Fri, 23 Jun 2017 18:21:22 +0200
+Message-Id: <1498234919-27316-25-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
 References: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 21/61] qcow2: Allow reading both COW regions
- with only one request
+Subject: [Qemu-devel] [PULL 24/61] qcow2: Use offset_into_cluster() and
+ offset_to_l2_index()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,99 +25,51 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Alberto Garcia <berto@igalia.com>
 
-Reading both COW regions requires two separate requests, but it's
-perfectly possible to merge them and perform only one. This generally
-improves performance, particularly on rotating disk drives. The
-downside is that the data in the middle region is read but discarded.
-
-This patch takes a conservative approach and only merges reads when
-the size of the middle region is <= 16KB.
+We already have functions for doing these calculations, so let's use
+them instead of doing everything by hand. This makes the code a bit
+more readable.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/qcow2-cluster.c | 51 ++++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 38 insertions(+), 13 deletions(-)
+ block/qcow2-cluster.c | 4 ++--
+ block/qcow2.c         | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 3c9ace8..20fb531 100644
+index 01f2101..3d341fd 100644
 --- a/block/qcow2-cluster.c
 +++ b/block/qcow2-cluster.c
-@@ -777,20 +777,38 @@ static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
-     Qcow2COWRegion *start = &m->cow_start;
-     Qcow2COWRegion *end = &m->cow_end;
-     unsigned buffer_size;
-+    unsigned data_bytes = end->offset - (start->offset + start->nb_bytes);
-+    bool merge_reads;
-     uint8_t *start_buffer, *end_buffer;
-     int ret;
+@@ -556,7 +556,7 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
  
-     assert(start->nb_bytes <= UINT_MAX - end->nb_bytes);
-+    assert(start->nb_bytes + end->nb_bytes <= UINT_MAX - data_bytes);
-+    assert(start->offset + start->nb_bytes <= end->offset);
+     /* find the cluster offset for the given disk offset */
  
-     if (start->nb_bytes == 0 && end->nb_bytes == 0) {
-         return 0;
+-    l2_index = (offset >> s->cluster_bits) & (s->l2_size - 1);
++    l2_index = offset_to_l2_index(s, offset);
+     *cluster_offset = be64_to_cpu(l2_table[l2_index]);
+ 
+     nb_clusters = size_to_clusters(s, bytes_needed);
+@@ -693,7 +693,7 @@ static int get_cluster_table(BlockDriverState *bs, uint64_t offset,
+ 
+     /* find the cluster offset for the given disk offset */
+ 
+-    l2_index = (offset >> s->cluster_bits) & (s->l2_size - 1);
++    l2_index = offset_to_l2_index(s, offset);
+ 
+     *new_l2_table = l2_table;
+     *new_l2_index = l2_index;
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 328b1d4..088ffe1 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -356,7 +356,7 @@ static int validate_table_offset(BlockDriverState *bs, uint64_t offset,
      }
  
--    /* Reserve a buffer large enough to store the data from both the
--     * start and end COW regions. Add some padding in the middle if
--     * necessary to make sure that the end region is optimally aligned */
--    buffer_size = QEMU_ALIGN_UP(start->nb_bytes, bdrv_opt_mem_align(bs)) +
--        end->nb_bytes;
-+    /* If we have to read both the start and end COW regions and the
-+     * middle region is not too large then perform just one read
-+     * operation */
-+    merge_reads = start->nb_bytes && end->nb_bytes && data_bytes <= 16384;
-+    if (merge_reads) {
-+        buffer_size = start->nb_bytes + data_bytes + end->nb_bytes;
-+    } else {
-+        /* If we have to do two reads, add some padding in the middle
-+         * if necessary to make sure that the end region is optimally
-+         * aligned. */
-+        size_t align = bdrv_opt_mem_align(bs);
-+        assert(align > 0 && align <= UINT_MAX);
-+        assert(QEMU_ALIGN_UP(start->nb_bytes, align) <=
-+               UINT_MAX - end->nb_bytes);
-+        buffer_size = QEMU_ALIGN_UP(start->nb_bytes, align) + end->nb_bytes;
-+    }
-+
-+    /* Reserve a buffer large enough to store all the data that we're
-+     * going to read */
-     start_buffer = qemu_try_blockalign(bs, buffer_size);
-     if (start_buffer == NULL) {
-         return -ENOMEM;
-@@ -799,15 +817,22 @@ static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
-     end_buffer = start_buffer + buffer_size - end->nb_bytes;
- 
-     qemu_co_mutex_unlock(&s->lock);
--    /* First we read the existing data from both COW regions */
--    ret = do_perform_cow_read(bs, m->offset, start->offset,
--                              start_buffer, start->nb_bytes);
--    if (ret < 0) {
--        goto fail;
--    }
-+    /* First we read the existing data from both COW regions. We
-+     * either read the whole region in one go, or the start and end
-+     * regions separately. */
-+    if (merge_reads) {
-+        ret = do_perform_cow_read(bs, m->offset, start->offset,
-+                                  start_buffer, buffer_size);
-+    } else {
-+        ret = do_perform_cow_read(bs, m->offset, start->offset,
-+                                  start_buffer, start->nb_bytes);
-+        if (ret < 0) {
-+            goto fail;
-+        }
- 
--    ret = do_perform_cow_read(bs, m->offset, end->offset,
--                              end_buffer, end->nb_bytes);
-+        ret = do_perform_cow_read(bs, m->offset, end->offset,
-+                                  end_buffer, end->nb_bytes);
-+    }
-     if (ret < 0) {
-         goto fail;
+     /* Tables must be cluster aligned */
+-    if (offset & (s->cluster_size - 1)) {
++    if (offset_into_cluster(s, offset) != 0) {
+         return -EINVAL;
      }
+ 
 -- 
 1.8.3.1
