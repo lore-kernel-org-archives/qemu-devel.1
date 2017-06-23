@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORM1-0001Ev-4i
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:42 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dORM3-0001IK-Uu
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORM0-0007hd-5g
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:41 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dORM2-0007j4-Oo
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:43 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 23 Jun 2017 18:21:24 +0200
-Message-Id: <1498234919-27316-27-git-send-email-kwolf@redhat.com>
+Date: Fri, 23 Jun 2017 18:21:26 +0200
+Message-Id: <1498234919-27316-29-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
 References: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 26/61] qed: Make qed_read_table() synchronous
+Subject: [Qemu-devel] [PULL 28/61] qed: Remove callback from
+ qed_read_l2_table()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,98 +23,191 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-Note that this code is generally not running in coroutine context, so
-this is an actual blocking synchronous operation. We'll fix this in a
-moment.
-
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/qed-table.c | 56 ++++++++++++++++++-------------------------------------
- 1 file changed, 18 insertions(+), 38 deletions(-)
+ block/qed-cluster.c | 94 ++++++++++++++++++-----------------------------------
+ block/qed-table.c   | 15 +++------
+ block/qed.h         |  3 +-
+ 3 files changed, 36 insertions(+), 76 deletions(-)
 
-diff --git a/block/qed-table.c b/block/qed-table.c
-index b12c298..f330538 100644
---- a/block/qed-table.c
-+++ b/block/qed-table.c
-@@ -18,59 +18,39 @@
- #include "qed.h"
- #include "qemu/bswap.h"
+diff --git a/block/qed-cluster.c b/block/qed-cluster.c
+index 8f5da74..d279944 100644
+--- a/block/qed-cluster.c
++++ b/block/qed-cluster.c
+@@ -61,59 +61,6 @@ static unsigned int qed_count_contiguous_clusters(BDRVQEDState *s,
+     return i - index;
+ }
  
 -typedef struct {
--    GenericCB gencb;
 -    BDRVQEDState *s;
--    QEDTable *table;
+-    uint64_t pos;
+-    size_t len;
 -
--    struct iovec iov;
-+static void qed_read_table(BDRVQEDState *s, uint64_t offset, QEDTable *table,
-+                           BlockCompletionFunc *cb, void *opaque)
-+{
-     QEMUIOVector qiov;
--} QEDReadTableCB;
-+    int noffsets;
-+    int i, ret;
- 
--static void qed_read_table_cb(void *opaque, int ret)
+-    QEDRequest *request;
+-
+-    /* User callback */
+-    QEDFindClusterFunc *cb;
+-    void *opaque;
+-} QEDFindClusterCB;
+-
+-static void qed_find_cluster_cb(void *opaque, int ret)
 -{
--    QEDReadTableCB *read_table_cb = opaque;
--    QEDTable *table = read_table_cb->table;
--    BDRVQEDState *s = read_table_cb->s;
--    int noffsets = read_table_cb->qiov.size / sizeof(uint64_t);
--    int i;
-+    struct iovec iov = {
-+        .iov_base = table->offsets,
-+        .iov_len = s->header.cluster_size * s->header.table_size,
-+    };
-+    qemu_iovec_init_external(&qiov, &iov, 1);
- 
--    /* Handle I/O error */
+-    QEDFindClusterCB *find_cluster_cb = opaque;
+-    BDRVQEDState *s = find_cluster_cb->s;
+-    QEDRequest *request = find_cluster_cb->request;
+-    uint64_t offset = 0;
+-    size_t len = 0;
+-    unsigned int index;
+-    unsigned int n;
+-
+-    qed_acquire(s);
 -    if (ret) {
-+    trace_qed_read_table(s, offset, table);
-+
-+    ret = bdrv_preadv(s->bs->file, offset, &qiov);
-+    if (ret < 0) {
-         goto out;
+-        goto out;
+-    }
+-
+-    index = qed_l2_index(s, find_cluster_cb->pos);
+-    n = qed_bytes_to_clusters(s,
+-                              qed_offset_into_cluster(s, find_cluster_cb->pos) +
+-                              find_cluster_cb->len);
+-    n = qed_count_contiguous_clusters(s, request->l2_table->table,
+-                                      index, n, &offset);
+-
+-    if (qed_offset_is_unalloc_cluster(offset)) {
+-        ret = QED_CLUSTER_L2;
+-    } else if (qed_offset_is_zero_cluster(offset)) {
+-        ret = QED_CLUSTER_ZERO;
+-    } else if (qed_check_cluster_offset(s, offset)) {
+-        ret = QED_CLUSTER_FOUND;
+-    } else {
+-        ret = -EINVAL;
+-    }
+-
+-    len = MIN(find_cluster_cb->len, n * s->header.cluster_size -
+-              qed_offset_into_cluster(s, find_cluster_cb->pos));
+-
+-out:
+-    find_cluster_cb->cb(find_cluster_cb->opaque, ret, offset, len);
+-    qed_release(s);
+-    g_free(find_cluster_cb);
+-}
+-
+ /**
+  * Find the offset of a data cluster
+  *
+@@ -137,8 +84,11 @@ out:
+ void qed_find_cluster(BDRVQEDState *s, QEDRequest *request, uint64_t pos,
+                       size_t len, QEDFindClusterFunc *cb, void *opaque)
+ {
+-    QEDFindClusterCB *find_cluster_cb;
+     uint64_t l2_offset;
++    uint64_t offset = 0;
++    unsigned int index;
++    unsigned int n;
++    int ret;
+ 
+     /* Limit length to L2 boundary.  Requests are broken up at the L2 boundary
+      * so that a request acts on one L2 table at a time.
+@@ -155,14 +105,32 @@ void qed_find_cluster(BDRVQEDState *s, QEDRequest *request, uint64_t pos,
+         return;
      }
  
-     /* Byteswap offsets */
-     qed_acquire(s);
-+    noffsets = qiov.size / sizeof(uint64_t);
-     for (i = 0; i < noffsets; i++) {
-         table->offsets[i] = le64_to_cpu(table->offsets[i]);
+-    find_cluster_cb = g_malloc(sizeof(*find_cluster_cb));
+-    find_cluster_cb->s = s;
+-    find_cluster_cb->pos = pos;
+-    find_cluster_cb->len = len;
+-    find_cluster_cb->cb = cb;
+-    find_cluster_cb->opaque = opaque;
+-    find_cluster_cb->request = request;
++    ret = qed_read_l2_table(s, request, l2_offset);
++    qed_acquire(s);
++    if (ret) {
++        goto out;
++    }
++
++    index = qed_l2_index(s, pos);
++    n = qed_bytes_to_clusters(s,
++                              qed_offset_into_cluster(s, pos) + len);
++    n = qed_count_contiguous_clusters(s, request->l2_table->table,
++                                      index, n, &offset);
++
++    if (qed_offset_is_unalloc_cluster(offset)) {
++        ret = QED_CLUSTER_L2;
++    } else if (qed_offset_is_zero_cluster(offset)) {
++        ret = QED_CLUSTER_ZERO;
++    } else if (qed_check_cluster_offset(s, offset)) {
++        ret = QED_CLUSTER_FOUND;
++    } else {
++        ret = -EINVAL;
++    }
++
++    len = MIN(len,
++              n * s->header.cluster_size - qed_offset_into_cluster(s, pos));
+ 
+-    qed_read_l2_table(s, request, l2_offset,
+-                      qed_find_cluster_cb, find_cluster_cb);
++out:
++    cb(opaque, ret, offset, len);
++    qed_release(s);
+ }
+diff --git a/block/qed-table.c b/block/qed-table.c
+index 4270003..ffecbea 100644
+--- a/block/qed-table.c
++++ b/block/qed-table.c
+@@ -177,8 +177,7 @@ int qed_write_l1_table_sync(BDRVQEDState *s, unsigned int index,
+     return ret;
+ }
+ 
+-void qed_read_l2_table(BDRVQEDState *s, QEDRequest *request, uint64_t offset,
+-                       BlockCompletionFunc *cb, void *opaque)
++int qed_read_l2_table(BDRVQEDState *s, QEDRequest *request, uint64_t offset)
+ {
+     int ret;
+ 
+@@ -187,8 +186,7 @@ void qed_read_l2_table(BDRVQEDState *s, QEDRequest *request, uint64_t offset,
+     /* Check for cached L2 entry */
+     request->l2_table = qed_find_l2_cache_entry(&s->l2_cache, offset);
+     if (request->l2_table) {
+-        cb(opaque, 0);
+-        return;
++        return 0;
+     }
+ 
+     request->l2_table = qed_alloc_l2_cache_entry(&s->l2_cache);
+@@ -215,17 +213,12 @@ void qed_read_l2_table(BDRVQEDState *s, QEDRequest *request, uint64_t offset,
      }
      qed_release(s);
  
-+    ret = 0;
- out:
-     /* Completion */
--    trace_qed_read_table_cb(s, read_table_cb->table, ret);
--    gencb_complete(&read_table_cb->gencb, ret);
--}
--
--static void qed_read_table(BDRVQEDState *s, uint64_t offset, QEDTable *table,
--                           BlockCompletionFunc *cb, void *opaque)
--{
--    QEDReadTableCB *read_table_cb = gencb_alloc(sizeof(*read_table_cb),
--                                                cb, opaque);
--    QEMUIOVector *qiov = &read_table_cb->qiov;
--
--    trace_qed_read_table(s, offset, table);
--
--    read_table_cb->s = s;
--    read_table_cb->table = table;
--    read_table_cb->iov.iov_base = table->offsets,
--    read_table_cb->iov.iov_len = s->header.cluster_size * s->header.table_size,
--
--    qemu_iovec_init_external(qiov, &read_table_cb->iov, 1);
--    bdrv_aio_readv(s->bs->file, offset / BDRV_SECTOR_SIZE, qiov,
--                   qiov->size / BDRV_SECTOR_SIZE,
--                   qed_read_table_cb, read_table_cb);
-+    trace_qed_read_table_cb(s, table, ret);
-+    cb(opaque, ret);
+-    cb(opaque, ret);
++    return ret;
  }
  
- typedef struct {
+ int qed_read_l2_table_sync(BDRVQEDState *s, QEDRequest *request, uint64_t offset)
+ {
+-    int ret = -EINPROGRESS;
+-
+-    qed_read_l2_table(s, request, offset, qed_sync_cb, &ret);
+-    BDRV_POLL_WHILE(s->bs, ret == -EINPROGRESS);
+-
+-    return ret;
++    return qed_read_l2_table(s, request, offset);
+ }
+ 
+ void qed_write_l2_table(BDRVQEDState *s, QEDRequest *request,
+diff --git a/block/qed.h b/block/qed.h
+index ce8c314..c715058 100644
+--- a/block/qed.h
++++ b/block/qed.h
+@@ -237,8 +237,7 @@ int qed_write_l1_table_sync(BDRVQEDState *s, unsigned int index,
+                             unsigned int n);
+ int qed_read_l2_table_sync(BDRVQEDState *s, QEDRequest *request,
+                            uint64_t offset);
+-void qed_read_l2_table(BDRVQEDState *s, QEDRequest *request, uint64_t offset,
+-                       BlockCompletionFunc *cb, void *opaque);
++int qed_read_l2_table(BDRVQEDState *s, QEDRequest *request, uint64_t offset);
+ void qed_write_l2_table(BDRVQEDState *s, QEDRequest *request,
+                         unsigned int index, unsigned int n, bool flush,
+                         BlockCompletionFunc *cb, void *opaque);
 -- 
 1.8.3.1
