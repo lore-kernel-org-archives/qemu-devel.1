@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dOPEo-0000w5-D5
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 10:07:07 -0400
+	(envelope-from <armbru@redhat.com>) id 1dOPHE-00024R-36
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 10:09:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dOPEj-0007Bm-C7
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 10:07:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52918)
+	(envelope-from <armbru@redhat.com>) id 1dOPH9-00007N-EC
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 10:09:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60516)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dOPEj-0007BJ-2i
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 10:07:01 -0400
-References: <20170621052935.20715-1-boqun.feng@gmail.com>
-	<20170623133814.GE11773@localhost.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c766613f-b84a-a7a8-5dd5-d886fbf50cf6@redhat.com>
-Date: Fri, 23 Jun 2017 16:06:57 +0200
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dOPH9-000075-4n
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 10:09:31 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1497276062.git.maozy.fnst@cn.fujitsu.com>
+	<debfee582acd0e32a08a812c710abbdeb11e90d1.1497276062.git.maozy.fnst@cn.fujitsu.com>
+Date: Fri, 23 Jun 2017 16:09:24 +0200
+In-Reply-To: <debfee582acd0e32a08a812c710abbdeb11e90d1.1497276062.git.maozy.fnst@cn.fujitsu.com>
+	(Mao Zhongyi's message of "Mon, 12 Jun 2017 22:15:03 +0800")
+Message-ID: <87bmpe4wyz.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170623133814.GE11773@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target-i386: add Skylake-Server cpu model
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 2/4] net/net: Convert parse_host_port()
+ to Error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,73 +28,257 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, "Boqun Feng (Intel)" <boqun.feng@gmail.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, jasowang@redhat.com, kraxel@redhat.com
 
+Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
 
+> Cc: berrange@redhat.com
+> Cc: kraxel@redhat.com
+> Cc: pbonzini@redhat.com
+> Cc: jasowang@redhat.com
+> Cc: armbru@redhat.com
+> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+> ---
+>  include/qemu/sockets.h |  2 +-
+>  net/net.c              | 21 ++++++++++++++++-----
+>  net/socket.c           | 37 ++++++++++++++++++++++---------------
+>  3 files changed, 39 insertions(+), 21 deletions(-)
+>
+> diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
+> index 5c326db..7abffc4 100644
+> --- a/include/qemu/sockets.h
+> +++ b/include/qemu/sockets.h
+> @@ -53,7 +53,7 @@ void socket_listen_cleanup(int fd, Error **errp);
+>  int socket_dgram(SocketAddress *remote, SocketAddress *local, Error **errp);
+>  
+>  /* Old, ipv4 only bits.  Don't use for new code. */
+> -int parse_host_port(struct sockaddr_in *saddr, const char *str);
+> +int parse_host_port(struct sockaddr_in *saddr, const char *str, Error **errp);
+>  int socket_init(void);
+>  
+>  /**
+> diff --git a/net/net.c b/net/net.c
+> index 6235aab..e55869a 100644
+> --- a/net/net.c
+> +++ b/net/net.c
+> @@ -100,7 +100,7 @@ static int get_str_sep(char *buf, int buf_size, const char **pp, int sep)
+>      return 0;
+>  }
+>  
+> -int parse_host_port(struct sockaddr_in *saddr, const char *str)
+> +int parse_host_port(struct sockaddr_in *saddr, const char *str, Error **errp)
+>  {
+>      char buf[512];
+>      struct hostent *he;
+> @@ -108,24 +108,35 @@ int parse_host_port(struct sockaddr_in *saddr, const char *str)
+>      int port;
+>  
+>      p = str;
+> -    if (get_str_sep(buf, sizeof(buf), &p, ':') < 0)
+> +    if (get_str_sep(buf, sizeof(buf), &p, ':') < 0) {
+> +        error_setg(errp, "The address should contain ':', for example: "
+> +                   "xxxx=230.0.0.1:1234");
+>          return -1;
+> +    }
+>      saddr->sin_family = AF_INET;
+>      if (buf[0] == '\0') {
+>          saddr->sin_addr.s_addr = 0;
+>      } else {
+>          if (qemu_isdigit(buf[0])) {
+> -            if (!inet_aton(buf, &saddr->sin_addr))
+> +            if (!inet_aton(buf, &saddr->sin_addr)) {
+> +                error_setg(errp, "Host address '%s' is not a valid "
+> +                           "IPv4 address", buf);
+>                  return -1;
+> +            }
+>          } else {
+> -            if ((he = gethostbyname(buf)) == NULL)
+> +            he = gethostbyname(buf);
+> +            if (he == NULL) {
+> +                error_setg(errp, "Specified hostname is error.");
+>                  return - 1;
+> +            }
+>              saddr->sin_addr = *(struct in_addr *)he->h_addr;
+>          }
+>      }
+>      port = strtol(p, (char **)&r, 0);
+> -    if (r == p)
+> +    if (r == p) {
+> +        error_setg(errp, "The port number is illegal");
+>          return -1;
+> +    }
+>      saddr->sin_port = htons(port);
+>      return 0;
+>  }
+> diff --git a/net/socket.c b/net/socket.c
+> index 53765bd..66016c8 100644
+> --- a/net/socket.c
+> +++ b/net/socket.c
+> @@ -485,15 +485,17 @@ static void net_socket_accept(void *opaque)
+>  static int net_socket_listen_init(NetClientState *peer,
+>                                    const char *model,
+>                                    const char *name,
+> -                                  const char *host_str)
+> +                                  const char *host_str,
+> +                                  Error **errp)
 
-On 23/06/2017 15:38, Eduardo Habkost wrote:
-> On Wed, Jun 21, 2017 at 01:29:34PM +0800, Boqun Feng (Intel) wrote:
->> Introduce Skylake-Server cpu mode which inherits the features from
->> Skylake-Client and supports some additional features that are: AVX512,
->> CWLB and PGPE1GB.
-> 
-> I will fix this to "CLWB" when applying the patch.
-> 
->>
->> Signed-off-by: Boqun Feng (Intel) <boqun.feng@gmail.com>
->> ---
->>  target/i386/cpu.c | 42 ++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 42 insertions(+)
->>
->> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->> index b2b1d20cee51..1bed722ac2fd 100644
->> --- a/target/i386/cpu.c
->> +++ b/target/i386/cpu.c
->> @@ -1349,6 +1349,48 @@ static X86CPUDefinition builtin_x86_defs[] = {
->>          .model_id = "Intel Core Processor (Skylake)",
->>      },
->>      {
->> +        .name = "Skylake-Server",
->> +        .level = 0xd,
->> +        .vendor = CPUID_VENDOR_INTEL,
->> +        .family = 6,
->> +        .model = 85,
->> +        .stepping = 4,
->> +        .features[FEAT_1_EDX] =
->> +            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
->> +            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
->> +            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
->> +            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
->> +            CPUID_DE | CPUID_FP87,
->> +        .features[FEAT_1_ECX] =
->> +            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
->> +            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
->> +            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
->> +            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
->> +            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOVBE |
->> +            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
->> +        .features[FEAT_8000_0001_EDX] =
->> +            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
->> +            CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
->> +        .features[FEAT_8000_0001_ECX] =
->> +            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
->> +        .features[FEAT_7_0_EBX] =
->> +            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
->> +            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
->> +            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
->> +            CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
->> +            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_MPX | CPUID_7_0_EBX_CLWB |
->> +            CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
->> +            CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
->> +            CPUID_7_0_EBX_AVX512VL,
-> 
-> I believe we should add the same comment about XSAVES from
-> Skylake-Cliente here, for consistency:
-> 
->         /* Missing: XSAVES (not supported by some Linux versions,
->          * including v4.1 to v4.6).
+You convert net_socket_listen_init() to Error.  This means you have to
+make it set an error on failure.  You do ...
 
-It's up to 4.12. :)
+>  {
+>      NetClientState *nc;
+>      NetSocketState *s;
+>      struct sockaddr_in saddr;
+>      int fd, ret;
+>  
+> -    if (parse_host_port(&saddr, host_str) < 0)
+> +    if (parse_host_port(&saddr, host_str, errp) < 0) {
+>          return -1;
+> +    }
 
-Paolo
+... here, ...
+
+>  
+>      fd = qemu_socket(PF_INET, SOCK_STREAM, 0);
+>      if (fd < 0) {
+           perror("socket");
+           return -1;
+       }
+
+... but not here.  Two more error returns follow.
+
+Preexisting bug: net_socket_listen_init() reports to stderr for three
+out of four failures.  Functions should either report on no failure or
+on all.  Conversion to Error should fix that, but yours isn't complete.
+When it is, the fix should be mentioned in the commit message.
+
+> @@ -531,14 +533,16 @@ static int net_socket_listen_init(NetClientState *peer,
+>  static int net_socket_connect_init(NetClientState *peer,
+>                                     const char *model,
+>                                     const char *name,
+> -                                   const char *host_str)
+> +                                   const char *host_str,
+> +                                   Error **errp)
+>  {
+>      NetSocketState *s;
+>      int fd, connected, ret;
+>      struct sockaddr_in saddr;
+>  
+> -    if (parse_host_port(&saddr, host_str) < 0)
+> +    if (parse_host_port(&saddr, host_str, errp) < 0) {
+>          return -1;
+> +    }
+>  
+>      fd = qemu_socket(PF_INET, SOCK_STREAM, 0);
+>      if (fd < 0) {
+
+Again, you have to make the function set an error on all failures, not
+just this one.
+
+Additionally:
+
+       s = net_socket_fd_init(peer, model, name, fd, connected);
+       if (!s)
+           return -1;
+
+net_socket_fd_init() still prints to stderr.  Please convert it to
+Error.
+
+> @@ -580,14 +584,15 @@ static int net_socket_mcast_init(NetClientState *peer,
+>                                   const char *model,
+>                                   const char *name,
+>                                   const char *host_str,
+> -                                 const char *localaddr_str)
+> +                                 const char *localaddr_str,
+> +                                 Error **errp)
+>  {
+>      NetSocketState *s;
+>      int fd;
+>      struct sockaddr_in saddr;
+>      struct in_addr localaddr, *param_localaddr;
+>  
+> -    if (parse_host_port(&saddr, host_str) < 0)
+> +    if (parse_host_port(&saddr, host_str, errp) < 0)
+>          return -1;
+>  
+>      if (localaddr_str != NULL) {
+
+Again, you have to make the function set an error on all failures.
+
+Additionally, convert net_socket_mcast_create() to Error.
+
+> @@ -619,17 +624,18 @@ static int net_socket_udp_init(NetClientState *peer,
+>                                   const char *model,
+>                                   const char *name,
+>                                   const char *rhost,
+> -                                 const char *lhost)
+> +                                 const char *lhost,
+> +                                 Error **errp)
+>  {
+>      NetSocketState *s;
+>      int fd, ret;
+>      struct sockaddr_in laddr, raddr;
+>  
+> -    if (parse_host_port(&laddr, lhost) < 0) {
+> +    if (parse_host_port(&laddr, lhost, errp) < 0) {
+>          return -1;
+>      }
+>  
+> -    if (parse_host_port(&raddr, rhost) < 0) {
+> +    if (parse_host_port(&raddr, rhost, errp) < 0) {
+>          return -1;
+>      }
+>  
+
+Again, you have make the function set an error on all failures.
+
+> @@ -703,15 +709,16 @@ int net_init_socket(const Netdev *netdev, const char *name,
+>      }
+>  
+>      if (sock->has_listen) {
+> -        if (net_socket_listen_init(peer, "socket", name, sock->listen) == -1) {
+> +        if (net_socket_listen_init(peer, "socket", name, sock->listen,
+> +            errp) == -1) {
+>              return -1;
+>          }
+>          return 0;
+>      }
+>  
+>      if (sock->has_connect) {
+> -        if (net_socket_connect_init(peer, "socket", name, sock->connect) ==
+> -            -1) {
+> +        if (net_socket_connect_init(peer, "socket", name, sock->connect,
+> +            errp) == -1) {
+>              return -1;
+>          }
+>          return 0;
+> @@ -721,7 +728,7 @@ int net_init_socket(const Netdev *netdev, const char *name,
+>          /* if sock->localaddr is missing, it has been initialized to "all bits
+>           * zero" */
+>          if (net_socket_mcast_init(peer, "socket", name, sock->mcast,
+> -            sock->localaddr) == -1) {
+> +            sock->localaddr, errp) == -1) {
+>              return -1;
+>          }
+>          return 0;
+> @@ -732,8 +739,8 @@ int net_init_socket(const Netdev *netdev, const char *name,
+>          error_report("localaddr= is mandatory with udp=");
+>          return -1;
+>      }
+> -    if (net_socket_udp_init(peer, "socket", name, sock->udp, sock->localaddr) ==
+> -        -1) {
+> +    if (net_socket_udp_init(peer, "socket", name, sock->udp, sock->localaddr,
+> +        errp) == -1) {
+>          return -1;
+>      }
+>      return 0;
+
+This is a partial fix for net_init_socket()'s
+    /* FIXME error_setg(errp, ...) on failure */
+
+Can you fix it completely?  Not required to get the patch accepted, as
+far as I'm concerned.
+
+Your commit message claims "Convert parse_host_port() to Error".  You do
+more than that.  Please rephrase the commit message.
