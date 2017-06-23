@@ -1,16 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORMW-0001qK-NA
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:16 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORMV-00085r-Fp
+	(envelope-from <rth7680@gmail.com>) id 1dORMS-0001mG-9k
 	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:12 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 23 Jun 2017 18:21:47 +0200
-Message-Id: <1498234919-27316-50-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
-References: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 49/61] qed: Implement .bdrv_co_readv/writev
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <rth7680@gmail.com>) id 1dORMQ-00080o-Uo
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:08 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:34642)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dORMQ-00080Z-PC
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:06 -0400
+Received: by mail-qt0-x242.google.com with SMTP id w6so5861208qtg.1
+	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 09:23:06 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Date: Fri, 23 Jun 2017 09:22:41 -0700
+Message-Id: <20170623162241.8964-16-rth@twiddle.net>
+In-Reply-To: <20170623162241.8964-1-rth@twiddle.net>
+References: <20170623162241.8964-1-rth@twiddle.net>
+Subject: [Qemu-devel] [PULL 15/15] target/s390x: Implement idte instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,172 +26,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, David Hildenbrand <david@redhat.com>
 
-Most of the qed code is now synchronous and matches the coroutine model.
-One notable exception is the serialisation between requests which can
-still schedule a callback. Before we can replace this with coroutine
-locks, let's convert the driver's external interfaces to the coroutine
-versions.
+From: David Hildenbrand <david@redhat.com>
 
-We need to be careful to handle both requests that call the completion
-callback directly from the calling coroutine (i.e. fully synchronous
-code) and requests that involve some callback, so that we need to yield
-and wait for the completion callback coming from outside the coroutine.
+Let's keep it very simple for now and flush the complete tlb,
+we currently can't find the right entries in our tlb, we would have
+to store the used tables for each element.
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+As we now fully implement the DAT-enhancement facility, we can allow to
+enable it for the qemu CPU model.
+
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20170622094151.28633-4-david@redhat.com>
+Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- block/qed.c | 97 ++++++++++++++++++++++++++-----------------------------------
- 1 file changed, 42 insertions(+), 55 deletions(-)
+ target/s390x/cpu_models.c  |  1 +
+ target/s390x/helper.h      |  1 +
+ target/s390x/insn-data.def |  2 ++
+ target/s390x/mem_helper.c  | 51 ++++++++++++++++++++++++++++++++++++++++++++++
+ target/s390x/translate.c   | 15 ++++++++++++++
+ 5 files changed, 70 insertions(+)
 
-diff --git a/block/qed.c b/block/qed.c
-index e762169..a5111fd 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -1322,16 +1322,32 @@ static void qed_aio_next_io(QEDAIOCB *acb)
-     }
+diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+index 51b17b9..63903c2 100644
+--- a/target/s390x/cpu_models.c
++++ b/target/s390x/cpu_models.c
+@@ -675,6 +675,7 @@ static void check_compatibility(const S390CPUModel *max_model,
+ static void add_qemu_cpu_model_features(S390FeatBitmap fbm)
+ {
+     static const int feats[] = {
++        S390_FEAT_DAT_ENH,
+         S390_FEAT_STFLE,
+         S390_FEAT_EXTENDED_IMMEDIATE,
+         S390_FEAT_EXTENDED_TRANSLATION_2,
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index b268367..964097b 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -131,6 +131,7 @@ DEF_HELPER_4(mvcs, i32, env, i64, i64, i64)
+ DEF_HELPER_4(mvcp, i32, env, i64, i64, i64)
+ DEF_HELPER_4(sigp, i32, env, i64, i32, i64)
+ DEF_HELPER_FLAGS_2(sacf, TCG_CALL_NO_WG, void, env, i64)
++DEF_HELPER_FLAGS_4(idte, TCG_CALL_NO_RWG, void, env, i64, i64, i32)
+ DEF_HELPER_FLAGS_4(ipte, TCG_CALL_NO_RWG, void, env, i64, i64, i32)
+ DEF_HELPER_FLAGS_1(ptlb, TCG_CALL_NO_RWG, void, env)
+ DEF_HELPER_FLAGS_1(purge, TCG_CALL_NO_RWG, void, env)
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 5ba7822..d3bb851 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -928,6 +928,8 @@
+     C(0x8300, DIAG,    RSI,   Z,   0, 0, 0, 0, diag, 0)
+ /* INSERT STORAGE KEY EXTENDED */
+     C(0xb229, ISKE,    RRE,   Z,   0, r2_o, new, r1_8, iske, 0)
++/* INVALIDATE DAT TABLE ENTRY */
++    C(0xb98e, IPDE,    RRF_b, Z,   r1_o, r2_o, 0, 0, idte, 0)
+ /* INVALIDATE PAGE TABLE ENTRY */
+     C(0xb221, IPTE,    RRF_a, Z,   r1_o, r2_o, 0, 0, ipte, 0)
+ /* LOAD CONTROL */
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index 20cef9a..ede8471 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -1610,6 +1610,57 @@ uint32_t HELPER(mvcp)(CPUS390XState *env, uint64_t l, uint64_t a1, uint64_t a2)
+     return cc;
  }
  
--static BlockAIOCB *qed_aio_setup(BlockDriverState *bs,
--                                 int64_t sector_num,
--                                 QEMUIOVector *qiov, int nb_sectors,
--                                 BlockCompletionFunc *cb,
--                                 void *opaque, int flags)
-+typedef struct QEDRequestCo {
-+    Coroutine *co;
-+    bool done;
-+    int ret;
-+} QEDRequestCo;
-+
-+static void qed_co_request_cb(void *opaque, int ret)
- {
--    QEDAIOCB *acb = qemu_aio_get(&qed_aiocb_info, bs, cb, opaque);
-+    QEDRequestCo *co = opaque;
- 
--    trace_qed_aio_setup(bs->opaque, acb, sector_num, nb_sectors,
--                        opaque, flags);
-+    co->done = true;
-+    co->ret = ret;
-+    qemu_coroutine_enter_if_inactive(co->co);
-+}
-+
-+static int coroutine_fn qed_co_request(BlockDriverState *bs, int64_t sector_num,
-+                                       QEMUIOVector *qiov, int nb_sectors,
-+                                       int flags)
++void HELPER(idte)(CPUS390XState *env, uint64_t r1, uint64_t r2, uint32_t m4)
 +{
-+    QEDRequestCo co = {
-+        .co     = qemu_coroutine_self(),
-+        .done   = false,
-+    };
-+    QEDAIOCB *acb = qemu_aio_get(&qed_aiocb_info, bs, qed_co_request_cb, &co);
++    CPUState *cs = CPU(s390_env_get_cpu(env));
++    const uintptr_t ra = GETPC();
++    uint64_t table, entry, raddr;
++    uint16_t entries, i, index = 0;
 +
-+    trace_qed_aio_setup(bs->opaque, acb, sector_num, nb_sectors, &co, flags);
- 
-     acb->flags = flags;
-     acb->qiov = qiov;
-@@ -1344,43 +1360,26 @@ static BlockAIOCB *qed_aio_setup(BlockDriverState *bs,
- 
-     /* Start request */
-     qed_aio_start_io(acb);
--    return &acb->common;
--}
- 
--static BlockAIOCB *bdrv_qed_aio_readv(BlockDriverState *bs,
--                                      int64_t sector_num,
--                                      QEMUIOVector *qiov, int nb_sectors,
--                                      BlockCompletionFunc *cb,
--                                      void *opaque)
--{
--    return qed_aio_setup(bs, sector_num, qiov, nb_sectors, cb, opaque, 0);
-+    if (!co.done) {
-+        qemu_coroutine_yield();
++    if (r2 & 0xff000) {
++        cpu_restore_state(cs, ra);
++        program_interrupt(env, PGM_SPECIFICATION, 4);
 +    }
 +
-+    return co.ret;
++    if (!(r2 & 0x800)) {
++        /* invalidation-and-clearing operation */
++        table = r1 & _ASCE_ORIGIN;
++        entries = (r2 & 0x7ff) + 1;
++
++        switch (r1 & _ASCE_TYPE_MASK) {
++        case _ASCE_TYPE_REGION1:
++            index = (r2 >> 53) & 0x7ff;
++            break;
++        case _ASCE_TYPE_REGION2:
++            index = (r2 >> 42) & 0x7ff;
++            break;
++        case _ASCE_TYPE_REGION3:
++            index = (r2 >> 31) & 0x7ff;
++            break;
++        case _ASCE_TYPE_SEGMENT:
++            index = (r2 >> 20) & 0x7ff;
++            break;
++        }
++        for (i = 0; i < entries; i++) {
++            /* addresses are not wrapped in 24/31bit mode but table index is */
++            raddr = table + ((index + i) & 0x7ff) * sizeof(entry);
++            entry = ldq_phys(cs->as, raddr);
++            if (!(entry & _REGION_ENTRY_INV)) {
++                /* we are allowed to not store if already invalid */
++                entry |= _REGION_ENTRY_INV;
++                stq_phys(cs->as, raddr, entry);
++            }
++        }
++    }
++
++    /* We simply flush the complete tlb, therefore we can ignore r3. */
++    if (m4 & 1) {
++        tlb_flush(cs);
++    } else {
++        tlb_flush_all_cpus_synced(cs);
++    }
++}
++
+ /* invalidate pte */
+ void HELPER(ipte)(CPUS390XState *env, uint64_t pto, uint64_t vaddr,
+                   uint32_t m4)
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 1db5f2d..592d6b0 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -2380,6 +2380,21 @@ static ExitStatus op_ipm(DisasContext *s, DisasOps *o)
  }
  
--static BlockAIOCB *bdrv_qed_aio_writev(BlockDriverState *bs,
--                                       int64_t sector_num,
--                                       QEMUIOVector *qiov, int nb_sectors,
--                                       BlockCompletionFunc *cb,
--                                       void *opaque)
-+static int coroutine_fn bdrv_qed_co_readv(BlockDriverState *bs,
-+                                          int64_t sector_num, int nb_sectors,
-+                                          QEMUIOVector *qiov)
+ #ifndef CONFIG_USER_ONLY
++static ExitStatus op_idte(DisasContext *s, DisasOps *o)
++{
++    TCGv_i32 m4;
++
++    check_privileged(s);
++    if (s390_has_feat(S390_FEAT_LOCAL_TLB_CLEARING)) {
++        m4 = tcg_const_i32(get_field(s->fields, m4));
++    } else {
++        m4 = tcg_const_i32(0);
++    }
++    gen_helper_idte(cpu_env, o->in1, o->in2, m4);
++    tcg_temp_free_i32(m4);
++    return NO_EXIT;
++}
++
+ static ExitStatus op_ipte(DisasContext *s, DisasOps *o)
  {
--    return qed_aio_setup(bs, sector_num, qiov, nb_sectors, cb,
--                         opaque, QED_AIOCB_WRITE);
-+    return qed_co_request(bs, sector_num, qiov, nb_sectors, 0);
- }
- 
--typedef struct {
--    Coroutine *co;
--    int ret;
--    bool done;
--} QEDWriteZeroesCB;
--
--static void coroutine_fn qed_co_pwrite_zeroes_cb(void *opaque, int ret)
-+static int coroutine_fn bdrv_qed_co_writev(BlockDriverState *bs,
-+                                           int64_t sector_num, int nb_sectors,
-+                                           QEMUIOVector *qiov)
- {
--    QEDWriteZeroesCB *cb = opaque;
--
--    cb->done = true;
--    cb->ret = ret;
--    if (cb->co) {
--        aio_co_wake(cb->co);
--    }
-+    return qed_co_request(bs, sector_num, qiov, nb_sectors, QED_AIOCB_WRITE);
- }
- 
- static int coroutine_fn bdrv_qed_co_pwrite_zeroes(BlockDriverState *bs,
-@@ -1388,9 +1387,7 @@ static int coroutine_fn bdrv_qed_co_pwrite_zeroes(BlockDriverState *bs,
-                                                   int count,
-                                                   BdrvRequestFlags flags)
- {
--    BlockAIOCB *blockacb;
-     BDRVQEDState *s = bs->opaque;
--    QEDWriteZeroesCB cb = { .done = false };
-     QEMUIOVector qiov;
-     struct iovec iov;
- 
-@@ -1407,19 +1404,9 @@ static int coroutine_fn bdrv_qed_co_pwrite_zeroes(BlockDriverState *bs,
-     iov.iov_len = count;
- 
-     qemu_iovec_init_external(&qiov, &iov, 1);
--    blockacb = qed_aio_setup(bs, offset >> BDRV_SECTOR_BITS, &qiov,
--                             count >> BDRV_SECTOR_BITS,
--                             qed_co_pwrite_zeroes_cb, &cb,
--                             QED_AIOCB_WRITE | QED_AIOCB_ZERO);
--    if (!blockacb) {
--        return -EIO;
--    }
--    if (!cb.done) {
--        cb.co = qemu_coroutine_self();
--        qemu_coroutine_yield();
--    }
--    assert(cb.done);
--    return cb.ret;
-+    return qed_co_request(bs, offset >> BDRV_SECTOR_BITS, &qiov,
-+                          count >> BDRV_SECTOR_BITS,
-+                          QED_AIOCB_WRITE | QED_AIOCB_ZERO);
- }
- 
- static int bdrv_qed_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
-@@ -1615,8 +1602,8 @@ static BlockDriver bdrv_qed = {
-     .bdrv_create              = bdrv_qed_create,
-     .bdrv_has_zero_init       = bdrv_has_zero_init_1,
-     .bdrv_co_get_block_status = bdrv_qed_co_get_block_status,
--    .bdrv_aio_readv           = bdrv_qed_aio_readv,
--    .bdrv_aio_writev          = bdrv_qed_aio_writev,
-+    .bdrv_co_readv            = bdrv_qed_co_readv,
-+    .bdrv_co_writev           = bdrv_qed_co_writev,
-     .bdrv_co_pwrite_zeroes    = bdrv_qed_co_pwrite_zeroes,
-     .bdrv_truncate            = bdrv_qed_truncate,
-     .bdrv_getlength           = bdrv_qed_getlength,
+     TCGv_i32 m4;
 -- 
-1.8.3.1
+2.9.4
