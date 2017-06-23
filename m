@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dOILf-0002CM-P5
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 02:45:48 -0400
+	(envelope-from <armbru@redhat.com>) id 1dOIeC-0000PG-UK
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 03:04:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dOILb-0008AU-Ap
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 02:45:43 -0400
-Received: from 14.mo5.mail-out.ovh.net ([188.165.51.82]:35897)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dOILb-00089f-2N
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 02:45:39 -0400
-Received: from player695.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 9D0A2107B7A
-	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 08:45:37 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Fri, 23 Jun 2017 08:45:34 +0200
-Message-ID: <149820033413.7187.1250602964263131431.stgit@bahia.lan>
-In-Reply-To: <149820029273.7187.14110849422638329192.stgit@bahia.lan>
-References: <149820029273.7187.14110849422638329192.stgit@bahia.lan>
+	(envelope-from <armbru@redhat.com>) id 1dOIe8-0008BY-Rr
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 03:04:52 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <149814756006.27338.8723356702388175951.stgit@bahia>
+	<CAFEAcA8yqb8ykP8nCnoVNQUZd851RhOLFf2TfkHZmL2je+pP=Q@mail.gmail.com>
+	<20170622184255.2d44e3bd@bahia.lab.toulouse-stg.fr.ibm.com>
+	<87injo6jla.fsf@secure.mitica>
+	<CAFEAcA-g-=AkH3t8jOTFY_9zA6ECS57-3MS=cHPb+Q6sePzNsw@mail.gmail.com>
+Date: Fri, 23 Jun 2017 09:04:44 +0200
+In-Reply-To: <CAFEAcA-g-=AkH3t8jOTFY_9zA6ECS57-3MS=cHPb+Q6sePzNsw@mail.gmail.com>
+	(Peter Maydell's message of "Thu, 22 Jun 2017 18:22:09 +0100")
+Message-ID: <87vann5gmr.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v4 4/4] 9pfs: handle transport errors in
- pdu_complete()
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] Separate function types from opaque types
+ in include/qemu/typedefs.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,78 +27,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stefano Stabellini <sstabellini@kernel.org>, Greg Kurz <groug@kaod.org>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Juan Quintela <quintela@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Greg Kurz <groug@kaod.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-Contrary to what is written in the comment, a buggy guest can misconfigure
-the transport buffers and pdu_marshal() may return an error.  If this ever
-happens, it is up to the transport layer to handle the situation (9P is
-transport agnostic).
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-This fixes Coverity issue CID1348518.
+> On 22 June 2017 at 18:03, Juan Quintela <quintela@redhat.com> wrote:
+>> Greg Kurz <groug@kaod.org> wrote:
+>>> On Thu, 22 Jun 2017 17:14:08 +0100
+>>> Peter Maydell <peter.maydell@linaro.org> wrote:
+>>>
+>>>> On 22 June 2017 at 17:06, Greg Kurz <groug@kaod.org> wrote:
+>>>> > Function types cannot reside in the same sorted list as opaque types since
+>>>> > they may depend on a type which would be defined later.
+>>>> >
+>>>> > Of course, the same problem could arise if a function type depends on
+>>>> > another function type with greater alphabetical order. Hopefully we
+>>>> > don't have that at this time.
+>>>>
+>>>> The other approach would be to put function types somewhere
+>>>> else and leave typedefs.h for the simple 'opaque types
+>>>> for structures' that it was started as.
+>>>>
+>>>> For instance we have include/qemu/fprintf-fn.h as a precedent.
+>>>>
+>>>
+>>> Indeed, and I'm not quite sure why Juan decided to put these types into
+>>> typedefs.h instead of a dedicated header file in include/migration... is
+>>> it only because it was the quickest fix ?
+>>
+>> All other typedefs were defined there.  I can create a different include
+>> file, but I think that is "overengineering", no?  They are typedefs,
+>> just not of structs.  But I agree that they are the only ones.
+>
+> Well, the comment in the file says "opaque types so that device init
+> declarations don't have to pull in all the real definitions", whereas
+> the ones you've added aren't opaque types, they are the real
+> definitions.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/9pfs/9p.c |   23 +++++++++++++++--------
- 1 file changed, 15 insertions(+), 8 deletions(-)
+The comment is out of date.  The header declares many opaque types that
+have nothing to do with "device init declarations".  Suggest to simply
+delete the comment.  The technique to declare opaque types in one place
+and define them elsewhere is common enough not to require justification.
 
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index 8e5cac71eb60..6c92bad5b3b4 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -624,15 +624,11 @@ void pdu_free(V9fsPDU *pdu)
-     QLIST_INSERT_HEAD(&s->free_list, pdu, next);
- }
- 
--/*
-- * We don't do error checking for pdu_marshal/unmarshal here
-- * because we always expect to have enough space to encode
-- * error details
-- */
- static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
- {
-     int8_t id = pdu->id + 1; /* Response */
-     V9fsState *s = pdu->s;
-+    int ret;
- 
-     if (len < 0) {
-         int err = -len;
-@@ -644,11 +640,19 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
-             str.data = strerror(err);
-             str.size = strlen(str.data);
- 
--            len += pdu_marshal(pdu, len, "s", &str);
-+            ret = pdu_marshal(pdu, len, "s", &str);
-+            if (ret < 0) {
-+                goto out_notify;
-+            }
-+            len += ret;
-             id = P9_RERROR;
-         }
- 
--        len += pdu_marshal(pdu, len, "d", err);
-+        ret = pdu_marshal(pdu, len, "d", err);
-+        if (ret < 0) {
-+            goto out_notify;
-+        }
-+        len += ret;
- 
-         if (s->proto_version == V9FS_PROTO_2000L) {
-             id = P9_RLERROR;
-@@ -657,12 +661,15 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
-     }
- 
-     /* fill out the header */
--    pdu_marshal(pdu, 0, "dbw", (int32_t)len, id, pdu->tag);
-+    if (pdu_marshal(pdu, 0, "dbw", (int32_t)len, id, pdu->tag) < 0) {
-+        goto out_notify;
-+    }
- 
-     /* keep these in sync */
-     pdu->size = len;
-     pdu->id = id;
- 
-+out_notify:
-     pdu->s->transport->push_and_notify(pdu);
- 
-     /* Now wakeup anybody waiting in flush for this request */
+>              They're also only used by a very small subset of .c
+> files, whereas typedefs.h goes everywhere.
+
+Yes.  Can we find a suitable migration header for them?
+
+I don't like tiny header files such as qemu/fnprintf-fn.h.
