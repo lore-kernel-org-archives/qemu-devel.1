@@ -1,36 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dOJhd-0006fS-RS
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 04:12:31 -0400
+	(envelope-from <kchamart@redhat.com>) id 1dOJkt-0007ZV-3w
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 04:15:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dOJhY-0003F6-Ls
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 04:12:29 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:48154
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1dOJhY-0003Du-EJ
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 04:12:24 -0400
-References: <1497877149-19253-4-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<20170619142852.GS5016@thinpad.lan.raisama.net>
-	<7d5904ae-e66c-5594-cfff-747578d91f4b@ilande.co.uk>
-	<08da52ec-e4d2-d836-49bd-90baf21747fb@redhat.com>
-	<1d8147a6-d55c-4951-68db-4c1cf502a4f3@ilande.co.uk>
-	<9d24bf00-cf82-717a-eccd-f51e2c80dd6f@redhat.com>
-	<eaa2cd40-0d64-6843-7e39-c0f94c7e797f@ilande.co.uk>
-	<48c8f007-f388-59f5-9af8-f5eefe033e2a@redhat.com>
-	<20170621113600.GA3928@thinpad.lan.raisama.net>
-	<8135ff45-0341-1fd4-ada9-4527c6b61e5a@ilande.co.uk>
-	<20170621132317.GD3928@thinpad.lan.raisama.net>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <7b431646-019e-dce2-6345-bdbaba7ce821@ilande.co.uk>
-Date: Fri, 23 Jun 2017 09:12:01 +0100
+	(envelope-from <kchamart@redhat.com>) id 1dOJkr-0004We-VF
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 04:15:51 -0400
+Date: Fri, 23 Jun 2017 10:15:38 +0200
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20170623081538.nqaxrylinzgg37il@eukaryote>
+References: <1498040351-6376-2-git-send-email-kchamart@redhat.com>
+	<bdbe5523-b066-a2ef-9e46-ece40ff4060d@redhat.com>
+	<20170622085610.wasfoafo3b46iv4q@eukaryote>
+	<3e638f0a-49f8-6fd0-04eb-12904768d571@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170621132317.GD3928@thinpad.lan.raisama.net>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCHv6 3/5] fw_cfg: move assert() and linking of
- fw_cfg device to the machine into instance_init()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3e638f0a-49f8-6fd0-04eb-12904768d571@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] live-block-ops.txt: Rename, rewrite,
+ and improve it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,84 +26,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, pbonzini@redhat.com, imammedo@redhat.com, Laszlo Ersek <lersek@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, stephen@that.guru, armbru@redhat.com, mreitz@redhat.com
 
-On 21/06/17 14:23, Eduardo Habkost wrote:
+On Thu, Jun 22, 2017 at 10:13:03AM -0400, John Snow wrote:
+> On 06/22/2017 04:56 AM, Kashyap Chamarthy wrote:
+> > On Wed, Jun 21, 2017 at 06:49:02PM -0400, John Snow wrote:
 
->>>>> I now have a v7 patchset ready to go (currently hosted at
->>>>> https://github.com/mcayland/qemu/tree/fwcfg7 for the curious). Laszlo,
->>>>> I've currently left off your Tested-by tag since I'm not sure it's still
->>>>> valid for less-than-trivial changes - if you're happy for me to re-add
->>>>> it before I send the v7 patchset to the list, please let me know.
->>>>
->>>> I intend to test v7 when you post it.
->>>
->>> I still see the instance_init assert() in that branch (commit
->>> 17d75643f880).  Is that correct?
->>
->> Yes that was the intention. In 17d75643f880 both the assert() and
->> object_property_add_child() are moved into the instance_init() function,
->> and then in the follow-up commit eddedb5 the assert() is removed from
->> instance_init() and the object_resolve_path_type() check added into
->> fw_cfg_init1() as part of its conversion into the
->> fw_cfg_common_realize() function.
+[...]
+
+> > Yes, I was thinking of this, too -- just link to the 'bitmaps' document.
+> > 
+> > A quick side question here: Since upstream QEMU is converging onto
+> > Sphinx, and rST, hope you mind if I convert docs/devel/bitmaps.md into
+> > rST at somepoint, for consistency's sake.  I'll file a separate review,
+> > anyway for that.  In the long term, all / most other documents would
+> > also be converted.
+> > 
 > 
-> We can't move assert() + linking to instance_init even if it's
-> just temporary, as it makes device-list-properties crash.
+> Of course not. I chose bitmaps.md so that it would be nice to view from
+> the github interface while remaining nice to read in plaintext, but feel
+> free to convert it if we actually do standardize on Sphinx/rST.
 > 
-> Just linking in instance_init is also a problem, because
-> instance_init should never affect global QEMU state.
-> 
-> You could move linking to realize as well, but: just like you
-> already moved sysbus_add_io() calls outside realize, I believe
-> linking belongs outside realize too.  I need to re-read the
-> discussion threads to understand the motivation behind that.
+> If you can make the generated output look prettier than the github
+> rendering of the markdown I'll ACK it ;)
 
-Ultimately the question we're trying to answer is "has someone
-instantiated another fw_cfg device for this machine?" and the way it
-works currently is that fw_cfg_init_io() and fw_cfg_init_mem() attach
-the fw_cfg device to the /machine object and then check after realize
-whether a /machine/fw_cfg device already exists, aborting if it does.
+:-) Here's a sneak-peak (don't miss the index to your left hand side):
 
-So in the current implementation we're not actually concerned with the
-placement of fw_cfg within the model itself, and indeed with a fixed
-location in the QOM tree it's already completely wrong. If you take a
-look at the QOM tree for the sparc/sparc64/ppc machines you'll see that
-they really are very far from reality.
+    https://kashyapc.fedorapeople.org/v3-QEMU-Docs/_build/html/docs/bitmaps.html
 
-For me the use of object_resolve_path_type() during realize is a good
-solution since regardless of the location of the fw_cfg we can always
-detect whether we have more than one device instance.
+Compare that with the GitHub rendering:
 
-However what seems unappealing about this is that while all existing
-users which use fw_cfg_init_io() and fw_cfg_init_mem() are fine, in the
-case where I am wiring up the device myself then for my sun4u example
-the code looks like this:
+    https://github.com/qemu/qemu/blob/master/docs/devel/bitmaps.md
 
-dev = qdev_create(NULL, TYPE_FW_CFG_IO);
-...
-qdev_init_nofail(dev);
-memory_region_add_subregion(pci_address_space_io(ebus), BIOS_CFG_IOPORT,
-                            &FW_CFG_IO(dev)->comb_iomem);
+And, here's the source (in reStructuredText, despite the ".txt"
+extension) for the 'bitmaps' doc (I made tiny styling changes):
 
-Here you can see that the device is active because it is mapped into the
-correct IO address space, but notice I have forgotten to link it to the
-QOM /machine object myself. Hence I can instantiate and map as many
-instances as I like and never trigger the duplicate instance check which
-makes the check fairly ineffective.
+    https://kashyapc.fedorapeople.org/v3-QEMU-Docs/_build/html/_sources/docs/bitmaps.txt
+    
+> > Yes, I fully agree with your suggestion.  I will simply link to the
+> > detailed document you wrote, which I was thinking of anyhow.
+> > 
+> > Thanks for your comments!
+> > 
+> Sure. You could perhaps mention the different sync modes, including top,
+> none, full and incremental and urge readers to check out the bitmaps
+> document for detailed workings of the incremental mode.
 
-This makes me think that I'm still misunderstanding something, so I'd be
-grateful for any further suggestions.
+Yeah, good point.  I'll make that edit in v2.
 
->> One last question which might avoid a future v8 revision: does the error
->> handling in eddedb5 for the fw_cfg_*_realize() functions look correct?
-> 
-> The error handling looks correct to me.
-
-Thanks for the review, in that case I will leave it in its current form.
-
-
-ATB,
-
-Mark.
+-- 
+/kashyap
