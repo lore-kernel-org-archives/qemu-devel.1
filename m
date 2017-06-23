@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORMa-0001tt-N2
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:18 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORMW-00087X-Ht
+	(envelope-from <kwolf@redhat.com>) id 1dORMW-0001qK-NA
 	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:16 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <kwolf@redhat.com>) id 1dORMV-00085r-Fp
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:12 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 23 Jun 2017 18:21:48 +0200
-Message-Id: <1498234919-27316-51-git-send-email-kwolf@redhat.com>
+Date: Fri, 23 Jun 2017 18:21:47 +0200
+Message-Id: <1498234919-27316-50-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
 References: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 50/61] qed: Use CoQueue for serialising
- allocations
+Subject: [Qemu-devel] [PULL 49/61] qed: Implement .bdrv_co_readv/writev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,142 +22,169 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-Now that we're running in coroutine context, the ad-hoc serialisation
-code (which drops a request that has to wait out of coroutine context)
-can be replaced by a CoQueue.
+Most of the qed code is now synchronous and matches the coroutine model.
+One notable exception is the serialisation between requests which can
+still schedule a callback. Before we can replace this with coroutine
+locks, let's convert the driver's external interfaces to the coroutine
+versions.
 
-This means that when we resume a serialised request, it is running in
-coroutine context again and its I/O isn't blocking any more.
+We need to be careful to handle both requests that call the completion
+callback directly from the calling coroutine (i.e. fully synchronous
+code) and requests that involve some callback, so that we need to yield
+and wait for the completion callback coming from outside the coroutine.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/qed.c | 49 +++++++++++++++++--------------------------------
- block/qed.h |  3 ++-
- 2 files changed, 19 insertions(+), 33 deletions(-)
+ block/qed.c | 97 ++++++++++++++++++++++++++-----------------------------------
+ 1 file changed, 42 insertions(+), 55 deletions(-)
 
 diff --git a/block/qed.c b/block/qed.c
-index a5111fd..cd3ef55 100644
+index e762169..a5111fd 100644
 --- a/block/qed.c
 +++ b/block/qed.c
-@@ -269,16 +269,10 @@ static void qed_plug_allocating_write_reqs(BDRVQEDState *s)
+@@ -1322,16 +1322,32 @@ static void qed_aio_next_io(QEDAIOCB *acb)
+     }
+ }
  
- static void qed_unplug_allocating_write_reqs(BDRVQEDState *s)
+-static BlockAIOCB *qed_aio_setup(BlockDriverState *bs,
+-                                 int64_t sector_num,
+-                                 QEMUIOVector *qiov, int nb_sectors,
+-                                 BlockCompletionFunc *cb,
+-                                 void *opaque, int flags)
++typedef struct QEDRequestCo {
++    Coroutine *co;
++    bool done;
++    int ret;
++} QEDRequestCo;
++
++static void qed_co_request_cb(void *opaque, int ret)
  {
--    QEDAIOCB *acb;
--
-     assert(s->allocating_write_reqs_plugged);
+-    QEDAIOCB *acb = qemu_aio_get(&qed_aiocb_info, bs, cb, opaque);
++    QEDRequestCo *co = opaque;
  
-     s->allocating_write_reqs_plugged = false;
--
--    acb = QSIMPLEQ_FIRST(&s->allocating_write_reqs);
--    if (acb) {
--        qed_aio_start_io(acb);
--    }
-+    qemu_co_enter_next(&s->allocating_write_reqs);
- }
+-    trace_qed_aio_setup(bs->opaque, acb, sector_num, nb_sectors,
+-                        opaque, flags);
++    co->done = true;
++    co->ret = ret;
++    qemu_coroutine_enter_if_inactive(co->co);
++}
++
++static int coroutine_fn qed_co_request(BlockDriverState *bs, int64_t sector_num,
++                                       QEMUIOVector *qiov, int nb_sectors,
++                                       int flags)
++{
++    QEDRequestCo co = {
++        .co     = qemu_coroutine_self(),
++        .done   = false,
++    };
++    QEDAIOCB *acb = qemu_aio_get(&qed_aiocb_info, bs, qed_co_request_cb, &co);
++
++    trace_qed_aio_setup(bs->opaque, acb, sector_num, nb_sectors, &co, flags);
  
- static void qed_clear_need_check(void *opaque, int ret)
-@@ -305,7 +299,7 @@ static void qed_need_check_timer_cb(void *opaque)
-     BDRVQEDState *s = opaque;
+     acb->flags = flags;
+     acb->qiov = qiov;
+@@ -1344,43 +1360,26 @@ static BlockAIOCB *qed_aio_setup(BlockDriverState *bs,
  
-     /* The timer should only fire when allocating writes have drained */
--    assert(!QSIMPLEQ_FIRST(&s->allocating_write_reqs));
-+    assert(!s->allocating_acb);
- 
-     trace_qed_need_check_timer_cb(s);
- 
-@@ -388,7 +382,7 @@ static int bdrv_qed_do_open(BlockDriverState *bs, QDict *options, int flags,
-     int ret;
- 
-     s->bs = bs;
--    QSIMPLEQ_INIT(&s->allocating_write_reqs);
-+    qemu_co_queue_init(&s->allocating_write_reqs);
- 
-     ret = bdrv_pread(bs->file, 0, &le_header, sizeof(le_header));
-     if (ret < 0) {
-@@ -910,11 +904,6 @@ static void qed_aio_complete_bh(void *opaque)
-     qed_release(s);
- }
- 
--static void qed_resume_alloc_bh(void *opaque)
--{
--    qed_aio_start_io(opaque);
+     /* Start request */
+     qed_aio_start_io(acb);
+-    return &acb->common;
 -}
--
- static void qed_aio_complete(QEDAIOCB *acb, int ret)
+ 
+-static BlockAIOCB *bdrv_qed_aio_readv(BlockDriverState *bs,
+-                                      int64_t sector_num,
+-                                      QEMUIOVector *qiov, int nb_sectors,
+-                                      BlockCompletionFunc *cb,
+-                                      void *opaque)
+-{
+-    return qed_aio_setup(bs, sector_num, qiov, nb_sectors, cb, opaque, 0);
++    if (!co.done) {
++        qemu_coroutine_yield();
++    }
++
++    return co.ret;
+ }
+ 
+-static BlockAIOCB *bdrv_qed_aio_writev(BlockDriverState *bs,
+-                                       int64_t sector_num,
+-                                       QEMUIOVector *qiov, int nb_sectors,
+-                                       BlockCompletionFunc *cb,
+-                                       void *opaque)
++static int coroutine_fn bdrv_qed_co_readv(BlockDriverState *bs,
++                                          int64_t sector_num, int nb_sectors,
++                                          QEMUIOVector *qiov)
  {
-     BDRVQEDState *s = acb_to_s(acb);
-@@ -942,13 +931,10 @@ static void qed_aio_complete(QEDAIOCB *acb, int ret)
-      * next request in the queue.  This ensures that we don't cycle through
-      * requests multiple times but rather finish one at a time completely.
-      */
--    if (acb == QSIMPLEQ_FIRST(&s->allocating_write_reqs)) {
--        QEDAIOCB *next_acb;
--        QSIMPLEQ_REMOVE_HEAD(&s->allocating_write_reqs, next);
--        next_acb = QSIMPLEQ_FIRST(&s->allocating_write_reqs);
--        if (next_acb) {
--            aio_bh_schedule_oneshot(bdrv_get_aio_context(acb->common.bs),
--                                    qed_resume_alloc_bh, next_acb);
-+    if (acb == s->allocating_acb) {
-+        s->allocating_acb = NULL;
-+        if (!qemu_co_queue_empty(&s->allocating_write_reqs)) {
-+            qemu_co_enter_next(&s->allocating_write_reqs);
-         } else if (s->header.features & QED_F_NEED_CHECK) {
-             qed_start_need_check_timer(s);
-         }
-@@ -1124,17 +1110,18 @@ static int qed_aio_write_alloc(QEDAIOCB *acb, size_t len)
-     int ret;
+-    return qed_aio_setup(bs, sector_num, qiov, nb_sectors, cb,
+-                         opaque, QED_AIOCB_WRITE);
++    return qed_co_request(bs, sector_num, qiov, nb_sectors, 0);
+ }
  
-     /* Cancel timer when the first allocating request comes in */
--    if (QSIMPLEQ_EMPTY(&s->allocating_write_reqs)) {
-+    if (s->allocating_acb == NULL) {
-         qed_cancel_need_check_timer(s);
-     }
- 
-     /* Freeze this request if another allocating write is in progress */
--    if (acb != QSIMPLEQ_FIRST(&s->allocating_write_reqs)) {
--        QSIMPLEQ_INSERT_TAIL(&s->allocating_write_reqs, acb, next);
+-typedef struct {
+-    Coroutine *co;
+-    int ret;
+-    bool done;
+-} QEDWriteZeroesCB;
+-
+-static void coroutine_fn qed_co_pwrite_zeroes_cb(void *opaque, int ret)
++static int coroutine_fn bdrv_qed_co_writev(BlockDriverState *bs,
++                                           int64_t sector_num, int nb_sectors,
++                                           QEMUIOVector *qiov)
+ {
+-    QEDWriteZeroesCB *cb = opaque;
+-
+-    cb->done = true;
+-    cb->ret = ret;
+-    if (cb->co) {
+-        aio_co_wake(cb->co);
 -    }
--    if (acb != QSIMPLEQ_FIRST(&s->allocating_write_reqs) ||
--        s->allocating_write_reqs_plugged) {
--        return -EINPROGRESS; /* wait for existing request to finish */
-+    if (s->allocating_acb != acb || s->allocating_write_reqs_plugged) {
-+        if (s->allocating_acb != NULL) {
-+            qemu_co_queue_wait(&s->allocating_write_reqs, NULL);
-+            assert(s->allocating_acb == NULL);
-+        }
-+        s->allocating_acb = acb;
-+        return -EAGAIN; /* start over with looking up table entries */
-     }
++    return qed_co_request(bs, sector_num, qiov, nb_sectors, QED_AIOCB_WRITE);
+ }
  
-     acb->cur_nclusters = qed_bytes_to_clusters(s,
-@@ -1313,10 +1300,8 @@ static void qed_aio_next_io(QEDAIOCB *acb)
-             ret = qed_aio_read_data(acb, ret, offset, len);
-         }
+ static int coroutine_fn bdrv_qed_co_pwrite_zeroes(BlockDriverState *bs,
+@@ -1388,9 +1387,7 @@ static int coroutine_fn bdrv_qed_co_pwrite_zeroes(BlockDriverState *bs,
+                                                   int count,
+                                                   BdrvRequestFlags flags)
+ {
+-    BlockAIOCB *blockacb;
+     BDRVQEDState *s = bs->opaque;
+-    QEDWriteZeroesCB cb = { .done = false };
+     QEMUIOVector qiov;
+     struct iovec iov;
  
--        if (ret < 0) {
--            if (ret != -EINPROGRESS) {
--                qed_aio_complete(acb, ret);
--            }
-+        if (ret < 0 && ret != -EAGAIN) {
-+            qed_aio_complete(acb, ret);
-             return;
-         }
-     }
-diff --git a/block/qed.h b/block/qed.h
-index 8644fed..37558e4 100644
---- a/block/qed.h
-+++ b/block/qed.h
-@@ -163,7 +163,8 @@ typedef struct {
-     uint32_t l2_mask;
+@@ -1407,19 +1404,9 @@ static int coroutine_fn bdrv_qed_co_pwrite_zeroes(BlockDriverState *bs,
+     iov.iov_len = count;
  
-     /* Allocating write request queue */
--    QSIMPLEQ_HEAD(, QEDAIOCB) allocating_write_reqs;
-+    QEDAIOCB *allocating_acb;
-+    CoQueue allocating_write_reqs;
-     bool allocating_write_reqs_plugged;
+     qemu_iovec_init_external(&qiov, &iov, 1);
+-    blockacb = qed_aio_setup(bs, offset >> BDRV_SECTOR_BITS, &qiov,
+-                             count >> BDRV_SECTOR_BITS,
+-                             qed_co_pwrite_zeroes_cb, &cb,
+-                             QED_AIOCB_WRITE | QED_AIOCB_ZERO);
+-    if (!blockacb) {
+-        return -EIO;
+-    }
+-    if (!cb.done) {
+-        cb.co = qemu_coroutine_self();
+-        qemu_coroutine_yield();
+-    }
+-    assert(cb.done);
+-    return cb.ret;
++    return qed_co_request(bs, offset >> BDRV_SECTOR_BITS, &qiov,
++                          count >> BDRV_SECTOR_BITS,
++                          QED_AIOCB_WRITE | QED_AIOCB_ZERO);
+ }
  
-     /* Periodic flush and clear need check flag */
+ static int bdrv_qed_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
+@@ -1615,8 +1602,8 @@ static BlockDriver bdrv_qed = {
+     .bdrv_create              = bdrv_qed_create,
+     .bdrv_has_zero_init       = bdrv_has_zero_init_1,
+     .bdrv_co_get_block_status = bdrv_qed_co_get_block_status,
+-    .bdrv_aio_readv           = bdrv_qed_aio_readv,
+-    .bdrv_aio_writev          = bdrv_qed_aio_writev,
++    .bdrv_co_readv            = bdrv_qed_co_readv,
++    .bdrv_co_writev           = bdrv_qed_co_writev,
+     .bdrv_co_pwrite_zeroes    = bdrv_qed_co_pwrite_zeroes,
+     .bdrv_truncate            = bdrv_qed_truncate,
+     .bdrv_getlength           = bdrv_qed_getlength,
 -- 
 1.8.3.1
