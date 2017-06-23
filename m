@@ -1,18 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dOBHE-00034E-8Q
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 19:12:41 -0400
+	(envelope-from <haozhong.zhang@intel.com>) id 1dOCE2-0000E4-2Y
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 20:13:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dOBHA-0001Cl-1n
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 19:12:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54692)
+	(envelope-from <haozhong.zhang@intel.com>) id 1dOCDx-0007Li-3w
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 20:13:26 -0400
+Received: from mga06.intel.com ([134.134.136.31]:60542)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dOBH9-0001CW-Rh
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 19:12:35 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Fri, 23 Jun 2017 01:12:28 +0200
-Message-Id: <20170622231228.1050-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1] target-s390x: fix risbg handling
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1dOCDw-0007Cs-S0
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 20:13:21 -0400
+Date: Fri, 23 Jun 2017 08:13:13 +0800
+From: <haozhong.zhang@intel.com>
+Message-ID: <20170623001313.n6cms5sunwuqnf4h@hz-desktop>
+References: <20170622140827.GA29936@stefanha-x1.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170622140827.GA29936@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] NVDIMM live migration broken?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,54 +27,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: rth@twiddle.net, agraf@suse.de, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, david@redhat.com
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-If we have for example: r3 contains 0x00000000ffffffff
-    ec 33 3f bf 61 55       risbg   %r3,%r3,63,191,97
+On 06/22/17 15:08 +0100, Stefan Hajnoczi wrote:
+> I tried live migrating a guest with NVDIMM on qemu.git/master (edf8bc984):
+> 
+>   $ qemu -M accel=kvm,nvdimm=on -m 1G,slots=4,maxmem=8G -cpu host \
+>          -object memory-backend-file,id=mem1,share=on,mem-path=nvdimm.dat,size=1G \
+> 	 -device nvdimm,id=nvdimm1,memdev=mem1 \
+> 	 -drive if=virtio,file=test.img,format=raw
+> 
+>   $ qemu -M accel=kvm,nvdimm=on -m 1G,slots=4,maxmem=8G -cpu host \
+>          -object memory-backend-file,id=mem1,share=on,mem-path=nvdimm.dat,size=1G \
+> 	 -device nvdimm,id=nvdimm1,memdev=mem1 \
+> 	 -drive if=virtio,file=test.img,format=raw \
+> 	 -incoming tcp::1234
+> 
+>   (qemu) migrate tcp:127.0.0.1:1234
+> 
+> The guest kernel panics or hangs every time on the destination.  It
+> happens as long as the nvdimm device is present - I didn't even mount it
+> inside the guest.
+> 
+> Is migration expected to work?
 
-We want to rotate 33 to the left and only keep MSB bit 63 of that. So the
-result is then exactly 1 (we're reading the sign of the 32 bit value).
+Yes, I tested on QEMU 2.8.0 several months ago and it worked. I'll
+have a look at this issue.
 
-Current code assumes that we can do that via an extract, which is not
-true (at least not that easy) and produces a 0.
+Haozhong
 
-Let's just get rid of this special handling.
-
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
-
-This effectively allows to start a linux kernel, compiled for z10 using
-the qemu model under tcg (with other patches currently on the list):
-
-qemu-system-s390x ... -cpu qemu,mvcos=on,stfle=on,ldisp=on,ldisphp=on, \
-                           eimm=on,stckf=on,csst=on,csst2=on,ginste=on, \
-                           exrl=on ...
-
-I found this by compiling the kvm-unit-tests for z10 and noticing
-elementary selftests failing. The kernel would trigger weird
-BUG_ONs very early while starting up, which basically gave not really
-many hints of what was actually going wrong.
-
- target/s390x/translate.c | 6 ------
- 1 file changed, 6 deletions(-)
-
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 188ab8b..81419dd 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -3450,12 +3450,6 @@ static ExitStatus op_risbg(DisasContext *s, DisasOps *o)
-         pos += 32;
-     }
- 
--    /* In some cases we can implement this with extract.  */
--    if (imask == 0 && pos == 0 && len > 0 && rot + len <= 64) {
--        tcg_gen_extract_i64(o->out, o->in2, rot, len);
--        return NO_EXIT;
--    }
--
-     /* In some cases we can implement this with deposit.  */
-     if (len > 0 && (imask == 0 || ~mask == imask)) {
-         /* Note that we rotate the bits to be inserted to the lsb, not to
--- 
-2.9.4
+> 
+> If not we need a migration blocker so that users get a graceful error
+> message.
+> 
+> Stefan
