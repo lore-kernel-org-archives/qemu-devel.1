@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dOQoI-0005jk-EH
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 11:47:51 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dOQsX-0007Ao-Ie
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 11:52:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dOQoH-0008NZ-Oc
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 11:47:50 -0400
-References: <20170613121639.17853-1-pbutsykin@virtuozzo.com>
-	<20170613121639.17853-5-pbutsykin@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <1f6f2cd3-f4f8-1e3c-09d0-4f56c770828b@redhat.com>
-Date: Fri, 23 Jun 2017 17:47:39 +0200
+	(envelope-from <aurelien@aurel32.net>) id 1dOQsW-00022u-Nz
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 11:52:13 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:38038)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+	id 1dOQsW-00022R-HG
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 11:52:12 -0400
+Date: Fri, 23 Jun 2017 17:52:07 +0200
+From: Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <20170623155207.jj6aakw36qmwqvow@aurel32.net>
+References: <20170620000405.3391-1-rth@twiddle.net>
+	<20170620000405.3391-14-rth@twiddle.net>
 MIME-Version: 1.0
-In-Reply-To: <20170613121639.17853-5-pbutsykin@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="LMmeex6P5gRLAh7WSCChq7N5X6VTINQVI"
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] qemu-iotests: add shrinking image
- test
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170620000405.3391-14-rth@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH v3 13/18] target/s390x: Implement CONVERT
+ UNICODE insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +29,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, thuth@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---LMmeex6P5gRLAh7WSCChq7N5X6VTINQVI
-From: Max Reitz <mreitz@redhat.com>
-To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org
-Message-ID: <1f6f2cd3-f4f8-1e3c-09d0-4f56c770828b@redhat.com>
-Subject: Re: [PATCH v2 4/4] qemu-iotests: add shrinking image test
-References: <20170613121639.17853-1-pbutsykin@virtuozzo.com>
- <20170613121639.17853-5-pbutsykin@virtuozzo.com>
-In-Reply-To: <20170613121639.17853-5-pbutsykin@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 2017-06-19 17:04, Richard Henderson wrote:
+> diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+> index 9c8f184..634ef98 100644
+> --- a/target/s390x/insn-data.def
+> +++ b/target/s390x/insn-data.def
+> @@ -313,6 +313,19 @@
+>      C(0xb3a1, CDLGBR,  RRF_e, FPE, 0, r2_o, f1, 0, cdlgb, 0)
+>      C(0xb3a2, CXLGBR,  RRF_e, FPE, 0, r2_o, x1, 0, cxlgb, 0)
+>  
+> +/* CONVERT UTF-8 TO UTF-16 */
+> +    D(0xb2a7, CU12,    RRF_c, Z,   0, 0, 0, 0, cuXX, 0, 12)
+> +/* CONVERT UTF-8 TO UTF-32 */
+> +    D(0xb9b0, CU14,    RRF_c, ETF3, 0, 0, 0, 0, cuXX, 0, 14)
+> +/* CONVERT UTF-16 to UTF-8 */
+> +    D(0xb2a6, CU21,    RRF_c, Z,   0, 0, 0, 0, cuXX, 0, 21)
+> +/* CONVERT UTF-16 to UTF-32 */
+> +    D(0xb9b1, CU24,    RRF_c, ETF3, 0, 0, 0, 0, cuXX, 0, 24)
+> +/* CONVERT UTF-32 to UTF-8 */
+> +    D(0xb9b3, CU41,    RRF_c, ETF3, 0, 0, 0, 0, cuXX, 0, 41)
+> +/* CONVERT UTF-32 to UTF-16 */
+> +    D(0xb9b2, CU42,    RRF_c, ETF3, 0, 0, 0, 0, cuXX, 0, 42)
+> +
 
-On 2017-06-13 14:16, Pavel Butsykin wrote:
-> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
-> ---
->  tests/qemu-iotests/163     | 113 +++++++++++++++++++++++++++++++++++++=
-++++++++
->  tests/qemu-iotests/163.out |   5 ++
->  tests/qemu-iotests/group   |   1 +
->  3 files changed, 119 insertions(+)
->  create mode 100644 tests/qemu-iotests/163
->  create mode 100644 tests/qemu-iotests/163.out
+CU41 and CU42 are inverted here. CU41 has the 0xb9b2 opcode and CU42 the
+0xb9b3 opcode.
 
-Ideally this test should contain tests for how the L1 and refcount table
-shrinking functions actually behave (like what we have for growing
-images). Right now we don't know whether they do anything in these test
-cases at all.
+> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+> index 4376c72..df082f5 100644
+> --- a/target/s390x/mem_helper.c
+> +++ b/target/s390x/mem_helper.c
 
-Max
+...
+
+> +static int encode_utf8(CPUS390XState *env, uint64_t addr, uint64_t ilen,
+> +                       uintptr_t ra, uint32_t c, uint32_t *olen)
+> +{
+> +    uint8_t d[4];
+> +    uint32_t l, i;
+> +
+> +    if (c <= 0x7f) {
+> +        /* one byte character */
+> +        l = 1;
+> +        d[0] = c;
+> +    } else if (c <= 0x7ff) {
+> +        /* two byte character */
+> +        l = 2;
+> +        d[1] = 0x80 | extract32(c, 0, 6);
+> +        d[0] = 0xc0 | extract32(c, 6, 5);
+> +    } else if (c <= 0xffff) {
+> +        /* three byte character */
+> +        l = 3;
+> +        d[2] = 0x80 | extract32(c, 0, 6);
+> +        d[1] = 0x80 | extract32(c, 6, 6);
+> +        d[0] = 0xe0 | extract32(c, 12, 4);
+> +    } else {
+> +        /* four byte character */
+> +        l = 4;
+> +        d[3] = 0x80 | extract32(c, 0, 6);
+> +        d[2] = 0x80 | extract32(c, 6, 6);
+> +        d[1] = 0x80 | extract32(c, 12, 6);
+> +        d[0] = 0xe0 | extract32(c, 18, 3);
+
+This should be 0xf0 instead of 0xe0.
+
+> +static int encode_utf16(CPUS390XState *env, uint64_t addr, uint64_t ilen,
+> +                        uintptr_t ra, uint32_t c, uint32_t *olen)
+> +{
+> +    uint16_t d0, d1;
+> +
+> +    if (c <= 0xffff) {
+> +        /* one word character */
+> +        if (ilen < 2) {
+> +            return 1;
+> +        }
+> +        cpu_stw_data_ra(env, addr, c, ra);
+> +        *olen = 2;
+> +    } else {
+> +        /* two word character */
+> +        if (ilen < 4) {
+> +            return 1;
+> +        }
+> +        d1 = 0xbc00 | extract32(c, 0, 10);
+> +        d0 = 0xb800 | extract32(c, 10, 6);
+
+This should be 0xdc00 and 0xd800;
 
 
---LMmeex6P5gRLAh7WSCChq7N5X6VTINQVI
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Otherwise the patch looks fine to me.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEvBAEBCAAZBQJZTTgbEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQOiV
-B/0ff1bGfaj+9ewyQvplkYHidI/M2e30T5nidAA6A7u2YtGxM9JY+2YI1fg+Ytxr
-IJE7nyggXYKl6ymV8c85hkh641TRQ7JbJ7X6rKukPSVjKDO+5uNt4gCIE/W1/4Mb
-pf2n7UPVs5ETidqU/XJYrxEzFM9nlD0uTTx2lex32FFbvcc/RQLTlVcLLrXimaWd
-G1no/qpG/oyXq97eXo1lDvtx+RR+HsQrxN43YBh9akTj2MF05o/rRe/1LbPSAOIf
-qwpBGcS5Wvv8G0WjtlXXpqHa4BkQC5AjjasC1+0w0tnxyeFaSyUxpN7N9Bb536kL
-ZtzEfP8b8pTqAkLsRBzIqNbE
-=zjVR
------END PGP SIGNATURE-----
-
---LMmeex6P5gRLAh7WSCChq7N5X6VTINQVI--
+-- 
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
