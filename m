@@ -1,34 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dOHtm-0003GA-V0
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 02:16:56 -0400
+	(envelope-from <casasfernando@hotmail.com>) id 1dOI5o-0006AM-Dz
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 02:29:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dOHti-0001iD-Te
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 02:16:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53608)
+	(envelope-from <casasfernando@hotmail.com>) id 1dOI5l-0008N2-8o
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 02:29:20 -0400
+Received: from mail-oln040092070077.outbound.protection.outlook.com
+	([40.92.70.77]:19925
+	helo=EUR03-AM5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dOHti-0001hv-NL
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 02:16:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dOHth-0007rg-H0
-	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 06:16:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7B2962E8193
-	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 06:16:49 +0000 (UTC)
+	(Exim 4.71) (envelope-from <casasfernando@hotmail.com>)
+	id 1dOI5k-0008Lq-Nm
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 02:29:17 -0400
+From: =?utf-8?B?RmVybmFuZG8gQ2FzYXMgU2Now7Zzc293?= <casasfernando@hotmail.com>
+Date: Fri, 23 Jun 2017 06:29:14 +0000
+Message-ID: <VI1PR1001MB13734FC8376C43217F82862CB7D80@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
+References: <VI1PR1001MB137395F2FCBDE6389A9AC5FCB7C30@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
+	<CABdb7358YVXbk++Z7s+q6Z5O0Q=6CQiQvYsTdc35eqmQeUnP_Q@mail.gmail.com>
+	<VI1PR1001MB1373C8915C51F7453D41B950B7C10@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
+	<CABdb7345_Nu_kpsSDGq7OyOSuKmgtyS-DuXTafkGeaCCXzV5LQ@mail.gmail.com>
+	<VI1PR1001MB1373B1F3C97D9528166E2305B7C40@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
+	<CABdb735e_NjY47LRZ58+zvKGmCRQKAmFo-HhByhsosRzQkOgxA@mail.gmail.com>
+	<HE1PR1001MB1371F7874B487B0907C42A7EB7C50@HE1PR1001MB1371.EURPRD10.PROD.OUTLOOK.COM>
+	<CABdb7372Pv3hR4S8C0TCV19u9XAKn=y0VmreGuZavhOjqRrypQ@mail.gmail.com>
+	<VI1PR1001MB13731144A5E55914A9E414A5B7DA0@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
+	<CABdb7377U9SpZno1kU6+TuARUmqfMMcC2uuwXTHqSZpLsqB7Gw@mail.gmail.com>
+In-Reply-To: <CABdb7377U9SpZno1kU6+TuARUmqfMMcC2uuwXTHqSZpLsqB7Gw@mail.gmail.com>
+Content-Language: en-US
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 23 Jun 2017 05:57:30 -0000
-From: Thomas Huth <1047470@bugs.launchpad.net>
-Reply-To: Bug 1047470 <1047470@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20120907154742.10241.91584.malonedeb@gac.canonical.com>
-Message-Id: <149819745029.4265.9425836430704543105.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1047470] Re: qemu/kvm hangs reading from serial
- console
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] Guest unresponsive after Virtqueue size exceeded
+ error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,94 +40,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Ladi Prosek <lprosek@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-OK, thanks for your answer!
-
-** Changed in: qemu
-       Status: Incomplete =3D> Won't Fix
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1047470
-
-Title:
-  qemu/kvm hangs reading from serial console
-
-Status in QEMU:
-  Won't Fix
-
-Bug description:
-  This is for a qemu-kvm running on RHEL 5, so it's pretty old,
-  but i think the problem still exists in 1.2
-
-  We have conman running on our hosts, connecting to the
-  kvm/qemu's using
-  =C2=A0=C2=A0=C2=A0=C2=A0virsh console
-  which just opens up the console /dev/pts/slave that qemu
-  opens up when run with options
-  =C2=A0=C2=A0=C2=A0=C2=A0-nographic
-  =C2=A0=C2=A0=C2=A0=C2=A0-serial mon:pty
-
-  Sometimes virsh console exits and then qemu locks up[*].
-  My guess is that something like this happens:
-
-  virsh console exits
-  qemu does a select() on /dev/ptmx (and other FDs)
-  select() returns the FD of /dev/ptmx in the read-fdset
-  qemu does a read()
-  read() returns -1 (EIO)
-  qemu does other stuff for a while
-  select() ... /dev/ptmx
-  read() .. EIO
-  other stuff
-  select() ... read() ... select() ... read() ... select()
-  conman starts a new virsh console that connects
-  qemu does a read()
-  read() blocks b/c there is now a writer on the tty slave
-
-  So i don't see any way around this, given the sorta rudi-
-  mentary semantics of TTY IO on Linux (not that i know of
-  any platform that does it better ... ?), except ...
-
-  maybe qemu should
-  =C2=A0=C2=A0=C2=A0=C2=A0fcntl(master_fd, F_SETFL, flags | O_NONBLOCK)
-  in qemu-char.c:qemu_char_open_pty()
-  and be prepared to handle E_WOULDBLOCK|E_AGAIN in
-  qemu-char.c:fd_chr_read() ... ?
-
-  --buck
-
-  [*] i think, b/c in the old version we are running, sometimes
-  =C2=A0=C2=A0=C2=A0=C2=A0the guest spits out the
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^]
-  =C2=A0=C2=A0=C2=A0=C2=A0character to its console, and virsh console reads=
- it and
-  =C2=A0=C2=A0=C2=A0=C2=A0doesn't check to see if its from stdin or the pty=
- and exits,
-  =C2=A0=C2=A0=C2=A0=C2=A0which, i think, can be fixed like this:
-
-  --- libvirt-0.8.2/tools/console.c.ctrl_close_bracket_handling_fix       2=
-012-09-06 10:30:43.606997191 -0400
-  +++ libvirt-0.8.2/tools/console.c       2012-09-06 10:34:52.154000464 -04=
-00
-  @@ -155,6 +155,7 @@ int vshRunConsole(const char *tty) {
-
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* Quit if end of file, or we got the Ctrl-] =
-key */
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!got ||
-  +                    fds[i].fd =3D=3D STDIN_FILENO &&
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(got =3D=3D 1 &&
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0buf[0] =3D=3D C=
-TRL_CLOSE_BRACKET))
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0goto done;
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1047470/+subscriptions
+SGkgTGFkaSwNCg0KU21hbGwgdXBkYXRlLiBNZW10ZXN0ODYrIHdhcyBydW5uaW5nIG9uIHRoZSBo
+b3N0IGZvciBtb3JlIHRoYW4gNTQgaG91cnMuIDggcGFzc2VzIHdlcmUgY29tcGxldGVkIGFuZCBu
+byBtZW1vcnkgZXJyb3JzIGZvdW5kLiBGb3Igbm93IEkgdGhpbmsgd2UgY2FuIGFzc3VtZSB0aGF0
+IHRoZSBob3N0IG1lbW9yeSBpcyBvay4NCg0KSSBqdXN0IHN0YXJ0ZWQgYWxsIHRoZSBndWVzdHMg
+b25lIGhvdXIgYWdvLiBJIHdpbGwgbW9uaXRvciB0aGVtIGFuZCBvbmNlIG9uZSBmYWlscyBJIHdp
+bGwgYXR0YWNoIHRoZSBkZWJ1Z2dlciBhbmQgbGV0IHlvdSBrbm93Lg0KDQpUaGFua3MuDQoNCkZl
+cg0KDQpPbiBqdWUsIGp1biAyMiwgMjAxNyBhdCA5OjQzICwgTGFkaSBQcm9zZWsgPGxwcm9zZWtA
+cmVkaGF0LmNvbT4gd3JvdGU6DQpIaSBGZXJuYW5kbywgT24gV2VkLCBKdW4gMjEsIDIwMTcgYXQg
+MjoxOSBQTSwgRmVybmFuZG8gQ2FzYXMgU2Now7Zzc293IDxjYXNhc2Zlcm5hbmRvQGhvdG1haWwu
+Y29tPG1haWx0bzpjYXNhc2Zlcm5hbmRvQGhvdG1haWwuY29tPj4gd3JvdGU6DQpIaSBMYWRpLCBT
+b3JyeSBmb3IgdGhlIGRlbGF5IGluIG15IHJlcGx5LiBJIHdpbGwgbGVhdmUgdGhlIGhvc3Qga2Vy
+bmVsIGFsb25lIGZvciBub3cgdGhlbi4gRm9yIHRoZSBsYXN0IDE1IGhvdXJzIG9yIHNvIEknbSBy
+dW5uaW5nIG1lbXRlc3Q4Nisgb24gdGhlIGhvc3QuIFNvIGZhciBzbyBnb29kLiBUd28gcGFzc2Vz
+IG5vIGVycm9ycyBzbyBmYXIuIEkgd2lsbCB0cnkgdG8gbGVhdmUgaXQgcnVubmluZyBmb3IgYXQg
+bGVhc3QgYW5vdGhlciAyNGhyIGFuZCByZXBvcnQgYmFjayB0aGUgcmVzdWx0cy4gSG9wZWZ1bGx5
+IHdlIGNhbiBkaXNjYXJkIHRoZSBtZW1vcnkgaXNzdWUgYXQgaGFyZHdhcmUgbGV2ZWwuIFJlZ2Fy
+ZGluZyBLU00sIHRoYXQgd2lsbCBiZSB0aGUgbmV4dCB0aGluZyBJIHdpbGwgZGlzYWJsZSBpZiBh
+ZnRlciByZW1vdmluZyB0aGUgYmFsbG9vbiBkZXZpY2UgZ3Vlc3RzIHN0aWxsIGNyYXNoLiBBYm91
+dCBsZWF2aW5nIGEgZ3Vlc3QgaW4gYSBmYWlsZWQgc3RhdGUgZm9yIHlvdSB0byBkZWJ1ZyBpdCBy
+ZW1vdGVseSwgdGhhdCdzIGFic29sdXRlbHkgYW4gb3B0aW9uLiBXZSBqdXN0IG5lZWQgdG8gY29v
+cmRpbmF0ZSBzbyBJIGNhbiBnaXZlIHlvdSByZW1vdGUgYWNjZXNzIHRvIHRoZSBob3N0IGFuZCBz
+byBvbi4gTGV0IG1lIGtub3cgaWYgYW55IHByZXBhcmF0aW9uIGlzIG5lZWRlZCBpbiBhZHZhbmNl
+IGFuZCB3aGljaCB0b29scyB5b3UgbmVlZCBpbnN0YWxsZWQgb24gdGhlIGhvc3QuDQpJIHRoaW5r
+IHRoYXQgZ2Ric2VydmVyIGF0dGFjaGVkIHRvIHRoZSBRRU1VIHByb2Nlc3Mgc2hvdWxkIGJlIGVu
+b3VnaC4gV2hlbiB0aGUgVk0gZ2V0cyBpbnRvIHRoZSBicm9rZW4gc3RhdGUgcGxlYXNlIGRvIHNv
+bWV0aGluZyBsaWtlOiBnZGJzZXJ2ZXIgLS1hdHRhY2ggaG9zdDoxMjM0NSA8UUVNVSBwaWQ+IGFu
+ZCBsZXQgbWUga25vdyB0aGUgaG9zdCBuYW1lIGFuZCBwb3J0ICgxMjM0NSBpbiB0aGUgYWJvdmUg
+ZXhhbXBsZSkuDQpPbmNlIEkgYWdhaW4gSSB3b3VsZCBsaWtlIHRvIHRoYW5rIHlvdSBmb3IgYWxs
+IHlvdXIgaGVscCBhbmQgeW91ciBncmVhdCBkaXNwb3NpdGlvbiENCllvdSdyZSBhYnNvbHV0ZWx5
+IHdlbGNvbWUsIEkgZG9uJ3QgdGhpbmsgSSd2ZSBkb25lIGFueXRoaW5nIGhlbHBmdWwgc28gZmFy
+IDopDQpDaGVlcnMsIEZlciBPbiBtYXIsIGp1biAyMCwgMjAxNyBhdCA5OjUyICwgTGFkaSBQcm9z
+ZWsgPGxwcm9zZWtAcmVkaGF0LmNvbTxtYWlsdG86bHByb3Nla0ByZWRoYXQuY29tPj4gd3JvdGU6
+IFRoZSBob3N0IGtlcm5lbCBpcyBsZXNzIGxpa2VseSB0byBiZSByZXNwb25zaWJsZSBmb3IgdGhp
+cywgaW4gbXkgb3Bpbmlvbi4gSSdkIGhvbGQgb2ZmIG9uIHRoYXQgZm9yIG5vdy4gQW5kIGxhc3Qg
+YnV0IG5vdCBsZWFzdCBLU00gaXMgZW5hYmxlZCBvbiB0aGUgaG9zdC4gU2hvdWxkIEkgZGlzYWJs
+ZSBpdD8gQ291bGQgYmUgd29ydGggdGhlIHRyeS4gRm9sbG93aW5nIHlvdXIgYWR2aWNlIEkgd2ls
+bCBydW4gbWVtdGVzdCBvbiB0aGUgaG9zdCBhbmQgcmVwb3J0IGJhY2suIEp1c3QgYXMgYSBzaWRl
+IGNvbW1lbnQsIHRoZSBob3N0IGlzIHJ1bm5pbmcgb24gRUNDIG1lbW9yeS4gSSBzZWUuIFdvdWxk
+IGl0IGJlIHBvc3NpYmxlIGZvciB5b3UsIG9uY2UgYSBndWVzdCBpcyBpbiB0aGUgYnJva2VuIHN0
+YXRlLCB0byBtYWtlIGl0IGF2YWlsYWJsZSBmb3IgZGVidWdnaW5nPyBCeSBhdHRhY2hpbmcgZ2Ri
+IHRvIHRoZSBRRU1VIHByb2Nlc3MgZm9yIGV4YW1wbGUgYW5kIGxldHRpbmcgbWUgcG9rZSBhcm91
+bmQgaXQgcmVtb3RlbHk/IFRoYW5rcyENCg0KDQo=
