@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORM2-0001G9-7G
+	(envelope-from <kwolf@redhat.com>) id 1dORM1-0001FU-NT
 	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORM1-0007iB-3b
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:42 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dORM0-0007hl-67
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:41 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 23 Jun 2017 18:21:25 +0200
-Message-Id: <1498234919-27316-28-git-send-email-kwolf@redhat.com>
+Date: Fri, 23 Jun 2017 18:21:21 +0200
+Message-Id: <1498234919-27316-24-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
 References: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 27/61] qed: Remove callback from qed_read_table()
+Subject: [Qemu-devel] [PULL 23/61] qcow2: Merge the writing of the COW
+ regions with the guest data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,137 +23,192 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-Instead of passing the return value to a callback, return it to the
-caller so that the callback can be inlined there.
+From: Alberto Garcia <berto@igalia.com>
 
+If the guest tries to write data that results on the allocation of a
+new cluster, instead of writing the guest data first and then the data
+from the COW regions, write everything together using one single I/O
+operation.
+
+This can improve the write performance by 25% or more, depending on
+several factors such as the media type, the cluster size and the I/O
+request size.
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/qed-table.c | 79 ++++++++++++++++++-------------------------------------
- 1 file changed, 25 insertions(+), 54 deletions(-)
+ block/qcow2-cluster.c | 40 ++++++++++++++++++++++++--------
+ block/qcow2.c         | 64 +++++++++++++++++++++++++++++++++++++++++++--------
+ block/qcow2.h         |  7 ++++++
+ 3 files changed, 91 insertions(+), 20 deletions(-)
 
-diff --git a/block/qed-table.c b/block/qed-table.c
-index f330538..4270003 100644
---- a/block/qed-table.c
-+++ b/block/qed-table.c
-@@ -18,8 +18,7 @@
- #include "qed.h"
- #include "qemu/bswap.h"
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 3ac26d6..01f2101 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -776,6 +776,7 @@ static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
+     assert(start->nb_bytes <= UINT_MAX - end->nb_bytes);
+     assert(start->nb_bytes + end->nb_bytes <= UINT_MAX - data_bytes);
+     assert(start->offset + start->nb_bytes <= end->offset);
++    assert(!m->data_qiov || m->data_qiov->size == data_bytes);
  
--static void qed_read_table(BDRVQEDState *s, uint64_t offset, QEDTable *table,
--                           BlockCompletionFunc *cb, void *opaque)
-+static int qed_read_table(BDRVQEDState *s, uint64_t offset, QEDTable *table)
- {
-     QEMUIOVector qiov;
-     int noffsets;
-@@ -50,7 +49,7 @@ static void qed_read_table(BDRVQEDState *s, uint64_t offset, QEDTable *table,
- out:
-     /* Completion */
-     trace_qed_read_table_cb(s, table, ret);
--    cb(opaque, ret);
-+    return ret;
- }
+     if (start->nb_bytes == 0 && end->nb_bytes == 0) {
+         return 0;
+@@ -807,7 +808,7 @@ static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
+     /* The part of the buffer where the end region is located */
+     end_buffer = start_buffer + buffer_size - end->nb_bytes;
  
- typedef struct {
-@@ -156,13 +155,7 @@ static void qed_sync_cb(void *opaque, int ret)
+-    qemu_iovec_init(&qiov, 1);
++    qemu_iovec_init(&qiov, 2 + (m->data_qiov ? m->data_qiov->niov : 0));
  
- int qed_read_l1_table_sync(BDRVQEDState *s)
- {
--    int ret = -EINPROGRESS;
--
--    qed_read_table(s, s->header.l1_table_offset,
--                   s->l1_table, qed_sync_cb, &ret);
--    BDRV_POLL_WHILE(s->bs, ret == -EINPROGRESS);
--
--    return ret;
-+    return qed_read_table(s, s->header.l1_table_offset, s->l1_table);
- }
+     qemu_co_mutex_unlock(&s->lock);
+     /* First we read the existing data from both COW regions. We
+@@ -842,17 +843,36 @@ static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
+         }
+     }
  
- void qed_write_l1_table(BDRVQEDState *s, unsigned int index, unsigned int n,
-@@ -184,46 +177,10 @@ int qed_write_l1_table_sync(BDRVQEDState *s, unsigned int index,
+-    /* And now we can write everything */
+-    qemu_iovec_reset(&qiov);
+-    qemu_iovec_add(&qiov, start_buffer, start->nb_bytes);
+-    ret = do_perform_cow_write(bs, m->alloc_offset, start->offset, &qiov);
+-    if (ret < 0) {
+-        goto fail;
++    /* And now we can write everything. If we have the guest data we
++     * can write everything in one single operation */
++    if (m->data_qiov) {
++        qemu_iovec_reset(&qiov);
++        if (start->nb_bytes) {
++            qemu_iovec_add(&qiov, start_buffer, start->nb_bytes);
++        }
++        qemu_iovec_concat(&qiov, m->data_qiov, 0, data_bytes);
++        if (end->nb_bytes) {
++            qemu_iovec_add(&qiov, end_buffer, end->nb_bytes);
++        }
++        /* NOTE: we have a write_aio blkdebug event here followed by
++         * a cow_write one in do_perform_cow_write(), but there's only
++         * one single I/O operation */
++        BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
++        ret = do_perform_cow_write(bs, m->alloc_offset, start->offset, &qiov);
++    } else {
++        /* If there's no guest data then write both COW regions separately */
++        qemu_iovec_reset(&qiov);
++        qemu_iovec_add(&qiov, start_buffer, start->nb_bytes);
++        ret = do_perform_cow_write(bs, m->alloc_offset, start->offset, &qiov);
++        if (ret < 0) {
++            goto fail;
++        }
++
++        qemu_iovec_reset(&qiov);
++        qemu_iovec_add(&qiov, end_buffer, end->nb_bytes);
++        ret = do_perform_cow_write(bs, m->alloc_offset, end->offset, &qiov);
+     }
+ 
+-    qemu_iovec_reset(&qiov);
+-    qemu_iovec_add(&qiov, end_buffer, end->nb_bytes);
+-    ret = do_perform_cow_write(bs, m->alloc_offset, end->offset, &qiov);
+ fail:
+     qemu_co_mutex_lock(&s->lock);
+ 
+diff --git a/block/qcow2.c b/block/qcow2.c
+index b3ba5da..328b1d4 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1575,6 +1575,44 @@ fail:
      return ret;
  }
  
--typedef struct {
--    GenericCB gencb;
--    BDRVQEDState *s;
--    uint64_t l2_offset;
--    QEDRequest *request;
--} QEDReadL2TableCB;
--
--static void qed_read_l2_table_cb(void *opaque, int ret)
--{
--    QEDReadL2TableCB *read_l2_table_cb = opaque;
--    QEDRequest *request = read_l2_table_cb->request;
--    BDRVQEDState *s = read_l2_table_cb->s;
--    CachedL2Table *l2_table = request->l2_table;
--    uint64_t l2_offset = read_l2_table_cb->l2_offset;
--
--    qed_acquire(s);
--    if (ret) {
--        /* can't trust loaded L2 table anymore */
--        qed_unref_l2_cache_entry(l2_table);
--        request->l2_table = NULL;
--    } else {
--        l2_table->offset = l2_offset;
--
--        qed_commit_l2_cache_entry(&s->l2_cache, l2_table);
--
--        /* This is guaranteed to succeed because we just committed the entry
--         * to the cache.
--         */
--        request->l2_table = qed_find_l2_cache_entry(&s->l2_cache, l2_offset);
--        assert(request->l2_table != NULL);
--    }
--    qed_release(s);
--
--    gencb_complete(&read_l2_table_cb->gencb, ret);
--}
--
- void qed_read_l2_table(BDRVQEDState *s, QEDRequest *request, uint64_t offset,
-                        BlockCompletionFunc *cb, void *opaque)
- {
--    QEDReadL2TableCB *read_l2_table_cb;
-+    int ret;
- 
-     qed_unref_l2_cache_entry(request->l2_table);
- 
-@@ -237,14 +194,28 @@ void qed_read_l2_table(BDRVQEDState *s, QEDRequest *request, uint64_t offset,
-     request->l2_table = qed_alloc_l2_cache_entry(&s->l2_cache);
-     request->l2_table->table = qed_alloc_table(s);
- 
--    read_l2_table_cb = gencb_alloc(sizeof(*read_l2_table_cb), cb, opaque);
--    read_l2_table_cb->s = s;
--    read_l2_table_cb->l2_offset = offset;
--    read_l2_table_cb->request = request;
--
-     BLKDBG_EVENT(s->bs->file, BLKDBG_L2_LOAD);
--    qed_read_table(s, offset, request->l2_table->table,
--                   qed_read_l2_table_cb, read_l2_table_cb);
-+    ret = qed_read_table(s, offset, request->l2_table->table);
++/* Check if it's possible to merge a write request with the writing of
++ * the data from the COW regions */
++static bool merge_cow(uint64_t offset, unsigned bytes,
++                      QEMUIOVector *hd_qiov, QCowL2Meta *l2meta)
++{
++    QCowL2Meta *m;
 +
-+    qed_acquire(s);
-+    if (ret) {
-+        /* can't trust loaded L2 table anymore */
-+        qed_unref_l2_cache_entry(request->l2_table);
-+        request->l2_table = NULL;
-+    } else {
-+        request->l2_table->offset = offset;
++    for (m = l2meta; m != NULL; m = m->next) {
++        /* If both COW regions are empty then there's nothing to merge */
++        if (m->cow_start.nb_bytes == 0 && m->cow_end.nb_bytes == 0) {
++            continue;
++        }
 +
-+        qed_commit_l2_cache_entry(&s->l2_cache, request->l2_table);
++        /* The data (middle) region must be immediately after the
++         * start region */
++        if (l2meta_cow_start(m) + m->cow_start.nb_bytes != offset) {
++            continue;
++        }
 +
-+        /* This is guaranteed to succeed because we just committed the entry
-+         * to the cache.
-+         */
-+        request->l2_table = qed_find_l2_cache_entry(&s->l2_cache, offset);
-+        assert(request->l2_table != NULL);
++        /* The end region must be immediately after the data (middle)
++         * region */
++        if (m->offset + m->cow_end.offset != offset + bytes) {
++            continue;
++        }
++
++        /* Make sure that adding both COW regions to the QEMUIOVector
++         * does not exceed IOV_MAX */
++        if (hd_qiov->niov > IOV_MAX - 2) {
++            continue;
++        }
++
++        m->data_qiov = hd_qiov;
++        return true;
 +    }
-+    qed_release(s);
 +
-+    cb(opaque, ret);
- }
++    return false;
++}
++
+ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+                                          uint64_t bytes, QEMUIOVector *qiov,
+                                          int flags)
+@@ -1657,16 +1695,22 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+             goto fail;
+         }
  
- int qed_read_l2_table_sync(BDRVQEDState *s, QEDRequest *request, uint64_t offset)
+-        qemu_co_mutex_unlock(&s->lock);
+-        BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
+-        trace_qcow2_writev_data(qemu_coroutine_self(),
+-                                cluster_offset + offset_in_cluster);
+-        ret = bdrv_co_pwritev(bs->file,
+-                              cluster_offset + offset_in_cluster,
+-                              cur_bytes, &hd_qiov, 0);
+-        qemu_co_mutex_lock(&s->lock);
+-        if (ret < 0) {
+-            goto fail;
++        /* If we need to do COW, check if it's possible to merge the
++         * writing of the guest data together with that of the COW regions.
++         * If it's not possible (or not necessary) then write the
++         * guest data now. */
++        if (!merge_cow(offset, cur_bytes, &hd_qiov, l2meta)) {
++            qemu_co_mutex_unlock(&s->lock);
++            BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
++            trace_qcow2_writev_data(qemu_coroutine_self(),
++                                    cluster_offset + offset_in_cluster);
++            ret = bdrv_co_pwritev(bs->file,
++                                  cluster_offset + offset_in_cluster,
++                                  cur_bytes, &hd_qiov, 0);
++            qemu_co_mutex_lock(&s->lock);
++            if (ret < 0) {
++                goto fail;
++            }
+         }
+ 
+         while (l2meta != NULL) {
+diff --git a/block/qcow2.h b/block/qcow2.h
+index c26ee0a..87b15eb 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -343,6 +343,13 @@ typedef struct QCowL2Meta
+      */
+     Qcow2COWRegion cow_end;
+ 
++    /**
++     * The I/O vector with the data from the actual guest write request.
++     * If non-NULL, this is meant to be merged together with the data
++     * from @cow_start and @cow_end into one single write operation.
++     */
++    QEMUIOVector *data_qiov;
++
+     /** Pointer to next L2Meta of the same write request */
+     struct QCowL2Meta *next;
+ 
 -- 
 1.8.3.1
