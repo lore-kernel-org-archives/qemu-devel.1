@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORLZ-0000LR-O0
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:15 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORLX-0007Rq-Tv
+	(envelope-from <kwolf@redhat.com>) id 1dORLX-0000JO-Kd
 	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:13 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <kwolf@redhat.com>) id 1dORLW-0007Qv-Gi
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:11 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 23 Jun 2017 18:21:01 +0200
-Message-Id: <1498234919-27316-4-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
-References: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 03/61] qemu-iotests: Test exiting qemu with
- running job
+Date: Fri, 23 Jun 2017 18:20:58 +0200
+Message-Id: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL 00/61] Block layer patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,305 +20,147 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-When qemu is exited, all running jobs should be cancelled successfully.
-This adds a test for this for all types of block jobs that currently
-exist in qemu.
+The following changes since commit 4c8c1cc544dbd5e2564868e61c5037258e393832:
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- tests/qemu-iotests/185     | 206 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/185.out |  59 +++++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 266 insertions(+)
+  Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-2.10-pull-request' into staging (2017-06-22 19:01:58 +0100)
+
+are available in the git repository at:
+
+
+  git://repo.or.cz/qemu/kevin.git tags/for-upstream
+
+for you to fetch changes up to 1512008812410ca4054506a7c44343088abdd977:
+
+  Merge remote-tracking branch 'mreitz/tags/pull-block-2017-06-23' into queue-block (2017-06-23 14:09:12 +0200)
+
+----------------------------------------------------------------
+
+Block layer patches
+
+----------------------------------------------------------------
+Alberto Garcia (9):
+      throttle: Update throttle-groups.c documentation
+      qcow2: Remove unused Error variable in do_perform_cow()
+      qcow2: Use unsigned int for both members of Qcow2COWRegion
+      qcow2: Make perform_cow() call do_perform_cow() twice
+      qcow2: Split do_perform_cow() into _read(), _encrypt() and _write()
+      qcow2: Allow reading both COW regions with only one request
+      qcow2: Pass a QEMUIOVector to do_perform_cow_{read,write}()
+      qcow2: Merge the writing of the COW regions with the guest data
+      qcow2: Use offset_into_cluster() and offset_to_l2_index()
+
+Kevin Wolf (37):
+      commit: Fix completion with extra reference
+      qemu-iotests: Allow starting new qemu after cleanup
+      qemu-iotests: Test exiting qemu with running job
+      doc: Document generic -blockdev options
+      doc: Document driver-specific -blockdev options
+      qed: Use bottom half to resume waiting requests
+      qed: Make qed_read_table() synchronous
+      qed: Remove callback from qed_read_table()
+      qed: Remove callback from qed_read_l2_table()
+      qed: Remove callback from qed_find_cluster()
+      qed: Make qed_read_backing_file() synchronous
+      qed: Make qed_copy_from_backing_file() synchronous
+      qed: Remove callback from qed_copy_from_backing_file()
+      qed: Make qed_write_header() synchronous
+      qed: Remove callback from qed_write_header()
+      qed: Make qed_write_table() synchronous
+      qed: Remove GenericCB
+      qed: Remove callback from qed_write_table()
+      qed: Make qed_aio_read_data() synchronous
+      qed: Make qed_aio_write_main() synchronous
+      qed: Inline qed_commit_l2_update()
+      qed: Add return value to qed_aio_write_l1_update()
+      qed: Add return value to qed_aio_write_l2_update()
+      qed: Add return value to qed_aio_write_main()
+      qed: Add return value to qed_aio_write_cow()
+      qed: Add return value to qed_aio_write_inplace/alloc()
+      qed: Add return value to qed_aio_read/write_data()
+      qed: Remove ret argument from qed_aio_next_io()
+      qed: Remove recursion in qed_aio_next_io()
+      qed: Implement .bdrv_co_readv/writev
+      qed: Use CoQueue for serialising allocations
+      qed: Simplify request handling
+      qed: Use a coroutine for need_check_timer
+      qed: Add coroutine_fn to I/O path functions
+      qed: Use bdrv_co_* for coroutine_fns
+      block: Remove bdrv_aio_readv/writev/flush()
+      Merge remote-tracking branch 'mreitz/tags/pull-block-2017-06-23' into queue-block
+
+Manos Pitsidianakis (1):
+      block: change variable names in BlockDriverState
+
+Max Reitz (3):
+      blkdebug: Catch bs->exact_filename overflow
+      blkverify: Catch bs->exact_filename overflow
+      block: Do not strcmp() with NULL uri->scheme
+
+Stefan Hajnoczi (10):
+      block: count bdrv_co_rw_vmstate() requests
+      block: use BDRV_POLL_WHILE() in bdrv_rw_vmstate()
+      migration: avoid recursive AioContext locking in save_vmstate()
+      migration: use bdrv_drain_all_begin/end() instead bdrv_drain_all()
+      virtio-pci: use ioeventfd even when KVM is disabled
+      migration: hold AioContext lock for loadvm qemu_fclose()
+      qemu-iotests: 068: extract _qemu() function
+      qemu-iotests: 068: use -drive/-device instead of -hda
+      qemu-iotests: 068: test iothread mode
+      qemu-img: don't shadow opts variable in img_dd()
+
+Stephen Bates (1):
+      nvme: Add support for Read Data and Write Data in CMBs.
+
+sochin.jiang (1):
+      fix: avoid an infinite loop or a dangling pointer problem in img_commit
+
+ block/Makefile.objs            |   2 +-
+ block/blkdebug.c               |  46 +--
+ block/blkreplay.c              |   8 +-
+ block/blkverify.c              |  12 +-
+ block/block-backend.c          |  22 +-
+ block/commit.c                 |   7 +
+ block/file-posix.c             |  34 +-
+ block/io.c                     | 240 ++-----------
+ block/iscsi.c                  |  20 +-
+ block/mirror.c                 |   8 +-
+ block/nbd-client.c             |   8 +-
+ block/nbd-client.h             |   4 +-
+ block/nbd.c                    |   6 +-
+ block/nfs.c                    |   2 +-
+ block/qcow2-cluster.c          | 201 ++++++++---
+ block/qcow2.c                  |  94 +++--
+ block/qcow2.h                  |  11 +-
+ block/qed-cluster.c            | 124 +++----
+ block/qed-gencb.c              |  33 --
+ block/qed-table.c              | 261 +++++---------
+ block/qed.c                    | 779 ++++++++++++++++-------------------------
+ block/qed.h                    |  54 +--
+ block/raw-format.c             |   8 +-
+ block/rbd.c                    |   4 +-
+ block/sheepdog.c               |  12 +-
+ block/ssh.c                    |   2 +-
+ block/throttle-groups.c        |   2 +-
+ block/trace-events             |   3 -
+ blockjob.c                     |   4 +-
+ hw/block/nvme.c                |  83 +++--
+ hw/block/nvme.h                |   1 +
+ hw/virtio/virtio-pci.c         |   2 +-
+ include/block/block.h          |  16 +-
+ include/block/block_int.h      |   6 +-
+ include/block/blockjob.h       |  18 +
+ include/sysemu/block-backend.h |  20 +-
+ migration/savevm.c             |  32 +-
+ qemu-img.c                     |  29 +-
+ qemu-io-cmds.c                 |  46 +--
+ qemu-options.hx                | 221 ++++++++++--
+ tests/qemu-iotests/068         |  37 +-
+ tests/qemu-iotests/068.out     |  11 +-
+ tests/qemu-iotests/185         | 206 +++++++++++
+ tests/qemu-iotests/185.out     |  59 ++++
+ tests/qemu-iotests/common.qemu |   3 +
+ tests/qemu-iotests/group       |   1 +
+ 46 files changed, 1477 insertions(+), 1325 deletions(-)
+ delete mode 100644 block/qed-gencb.c
  create mode 100755 tests/qemu-iotests/185
  create mode 100644 tests/qemu-iotests/185.out
-
-diff --git a/tests/qemu-iotests/185 b/tests/qemu-iotests/185
-new file mode 100755
-index 0000000..0eda371
---- /dev/null
-+++ b/tests/qemu-iotests/185
-@@ -0,0 +1,206 @@
-+#!/bin/bash
-+#
-+# Test exiting qemu while jobs are still running
-+#
-+# Copyright (C) 2017 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=kwolf@redhat.com
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+status=1 # failure is the default!
-+
-+MIG_SOCKET="${TEST_DIR}/migrate"
-+
-+_cleanup()
-+{
-+    rm -f "${TEST_IMG}.mid"
-+    rm -f "${TEST_IMG}.copy"
-+    _cleanup_test_img
-+    _cleanup_qemu
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+. ./common.qemu
-+
-+_supported_fmt qcow2
-+_supported_proto file
-+_supported_os Linux
-+
-+size=64M
-+TEST_IMG="${TEST_IMG}.base" _make_test_img $size
-+
-+echo
-+echo === Starting VM ===
-+echo
-+
-+qemu_comm_method="qmp"
-+
-+_launch_qemu \
-+    -drive file="${TEST_IMG}.base",cache=$CACHEMODE,driver=$IMGFMT,id=disk
-+h=$QEMU_HANDLE
-+_send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" 'return'
-+
-+echo
-+echo === Creating backing chain ===
-+echo
-+
-+_send_qemu_cmd $h \
-+    "{ 'execute': 'blockdev-snapshot-sync',
-+       'arguments': { 'device': 'disk',
-+                      'snapshot-file': '$TEST_IMG.mid',
-+                      'format': '$IMGFMT',
-+                      'mode': 'absolute-paths' } }" \
-+    "return"
-+
-+_send_qemu_cmd $h \
-+    "{ 'execute': 'human-monitor-command',
-+       'arguments': { 'command-line':
-+                      'qemu-io disk \"write 0 4M\"' } }" \
-+    "return"
-+
-+_send_qemu_cmd $h \
-+    "{ 'execute': 'blockdev-snapshot-sync',
-+       'arguments': { 'device': 'disk',
-+                      'snapshot-file': '$TEST_IMG',
-+                      'format': '$IMGFMT',
-+                      'mode': 'absolute-paths' } }" \
-+    "return"
-+
-+echo
-+echo === Start commit job and exit qemu ===
-+echo
-+
-+# Note that the reference output intentionally includes the 'offset' field in
-+# BLOCK_JOB_CANCELLED events for all of the following block jobs. They are
-+# predictable and any change in the offsets would hint at a bug in the job
-+# throttling code.
-+#
-+# In order to achieve these predictable offsets, all of the following tests
-+# use speed=65536. Each job will perform exactly one iteration before it has
-+# to sleep at least for a second, which is plenty of time for the 'quit' QMP
-+# command to be received (after receiving the command, the rest runs
-+# synchronously, so jobs can arbitrarily continue or complete).
-+#
-+# The buffer size for commit and streaming is 512k (waiting for 8 seconds after
-+# the first request), for active commit and mirror it's large enough to cover
-+# the full 4M, and for backup it's the qcow2 cluster size, which we know is
-+# 64k. As all of these are at least as large as the speed, we are sure that the
-+# offset doesn't advance after the first iteration before qemu exits.
-+
-+_send_qemu_cmd $h \
-+    "{ 'execute': 'block-commit',
-+       'arguments': { 'device': 'disk',
-+                      'base':'$TEST_IMG.base',
-+                      'top': '$TEST_IMG.mid',
-+                      'speed': 65536 } }" \
-+    "return"
-+
-+_send_qemu_cmd $h "{ 'execute': 'quit' }" "return"
-+wait=1 _cleanup_qemu
-+
-+echo
-+echo === Start active commit job and exit qemu ===
-+echo
-+
-+_launch_qemu \
-+    -drive file="${TEST_IMG}",cache=$CACHEMODE,driver=$IMGFMT,id=disk
-+h=$QEMU_HANDLE
-+_send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" 'return'
-+
-+_send_qemu_cmd $h \
-+    "{ 'execute': 'block-commit',
-+       'arguments': { 'device': 'disk',
-+                      'base':'$TEST_IMG.base',
-+                      'speed': 65536 } }" \
-+    "return"
-+
-+_send_qemu_cmd $h "{ 'execute': 'quit' }" "return"
-+wait=1 _cleanup_qemu
-+
-+echo
-+echo === Start mirror job and exit qemu ===
-+echo
-+
-+_launch_qemu \
-+    -drive file="${TEST_IMG}",cache=$CACHEMODE,driver=$IMGFMT,id=disk
-+h=$QEMU_HANDLE
-+_send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" 'return'
-+
-+_send_qemu_cmd $h \
-+    "{ 'execute': 'drive-mirror',
-+       'arguments': { 'device': 'disk',
-+                      'target': '$TEST_IMG.copy',
-+                      'format': '$IMGFMT',
-+                      'sync': 'full',
-+                      'speed': 65536 } }" \
-+    "return"
-+
-+_send_qemu_cmd $h "{ 'execute': 'quit' }" "return"
-+wait=1 _cleanup_qemu
-+
-+echo
-+echo === Start backup job and exit qemu ===
-+echo
-+
-+_launch_qemu \
-+    -drive file="${TEST_IMG}",cache=$CACHEMODE,driver=$IMGFMT,id=disk
-+h=$QEMU_HANDLE
-+_send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" 'return'
-+
-+_send_qemu_cmd $h \
-+    "{ 'execute': 'drive-backup',
-+       'arguments': { 'device': 'disk',
-+                      'target': '$TEST_IMG.copy',
-+                      'format': '$IMGFMT',
-+                      'sync': 'full',
-+                      'speed': 65536 } }" \
-+    "return"
-+
-+_send_qemu_cmd $h "{ 'execute': 'quit' }" "return"
-+wait=1 _cleanup_qemu
-+
-+echo
-+echo === Start streaming job and exit qemu ===
-+echo
-+
-+_launch_qemu \
-+    -drive file="${TEST_IMG}",cache=$CACHEMODE,driver=$IMGFMT,id=disk
-+h=$QEMU_HANDLE
-+_send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" 'return'
-+
-+_send_qemu_cmd $h \
-+    "{ 'execute': 'block-stream',
-+       'arguments': { 'device': 'disk',
-+                      'speed': 65536 } }" \
-+    "return"
-+
-+_send_qemu_cmd $h "{ 'execute': 'quit' }" "return"
-+wait=1 _cleanup_qemu
-+
-+_check_test_img
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/185.out b/tests/qemu-iotests/185.out
-new file mode 100644
-index 0000000..45bc7cb
---- /dev/null
-+++ b/tests/qemu-iotests/185.out
-@@ -0,0 +1,59 @@
-+QA output created by 185
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=67108864
-+
-+=== Starting VM ===
-+
-+{"return": {}}
-+
-+=== Creating backing chain ===
-+
-+Formatting 'TEST_DIR/t.qcow2.mid', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.qcow2.base backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+{"return": {}}
-+wrote 4194304/4194304 bytes at offset 0
-+4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+{"return": ""}
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.qcow2.mid backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+{"return": {}}
-+
-+=== Start commit job and exit qemu ===
-+
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 67108864, "offset": 524288, "speed": 65536, "type": "commit"}}
-+
-+=== Start active commit job and exit qemu ===
-+
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "commit"}}
-+
-+=== Start mirror job and exit qemu ===
-+
-+{"return": {}}
-+Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "mirror"}}
-+
-+=== Start backup job and exit qemu ===
-+
-+{"return": {}}
-+Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 67108864, "offset": 65536, "speed": 65536, "type": "backup"}}
-+
-+=== Start streaming job and exit qemu ===
-+
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 67108864, "offset": 524288, "speed": 65536, "type": "stream"}}
-+No errors were found on the image.
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index a6acaff..318ae74 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -175,3 +175,4 @@
- 181 rw auto migration
- 182 rw auto quick
- 183 rw auto migration
-+185 rw auto
--- 
-1.8.3.1
