@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dOEVi-0005ZF-4o
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 22:39:51 -0400
+	(envelope-from <li.ping288@zte.com.cn>) id 1dOFAE-00058w-T1
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 23:21:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dOEVe-0008Pn-5x
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 22:39:50 -0400
-Received: from mga05.intel.com ([192.55.52.43]:46340)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dOEVd-0008Kq-Sb
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 22:39:46 -0400
-From: Wei Wang <wei.w.wang@intel.com>
-Date: Fri, 23 Jun 2017 10:32:34 +0800
-Message-Id: <1498185154-29015-2-git-send-email-wei.w.wang@intel.com>
-In-Reply-To: <1498185154-29015-1-git-send-email-wei.w.wang@intel.com>
-References: <1498185154-29015-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v3 2/2] virtio-net: code cleanup
+	(envelope-from <li.ping288@zte.com.cn>) id 1dOFAA-0004y5-5m
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 23:21:42 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:39172)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <li.ping288@zte.com.cn>) id 1dOFA9-0004jO-JF
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 23:21:38 -0400
+From: Li Ping <li.ping288@zte.com.cn>
+Date: Fri, 23 Jun 2017 11:17:43 +0800
+Message-Id: <1498187863-4937-1-git-send-email-li.ping288@zte.com.cn>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH RESEND] QEMU Guest Agent: Fix memory leak of
+ device information set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,40 +25,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, jasowang@redhat.com, eblake@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com, jan.scheurich@ericsson.com, marcandre.lureau@gmail.com, stefanha@gmail.com, Wei Wang <wei.w.wang@intel.com>
+To: mdroth@linux.vnet.ibm.com
+Cc: marcandre.lureau@redhat.com, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Li Ping <li.ping288@zte.com.cn>
 
-Use is_power_of_2(), and remove trailing "." from error_setg().
+The caller of SetupDiGetClassDevs must delete the returned device informati=
+on
+ set when it is no longer needed by calling SetupDiDestroyDeviceInfoList.
 
-Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+Signed-off-by: Li Ping <li.ping288@zte.com.cn>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- hw/net/virtio-net.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ qga/commands-win32.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index d13ca60..b42423c 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -1924,9 +1924,9 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
-      */
-     if (n->net_conf.rx_queue_size < VIRTIO_NET_RX_QUEUE_MIN_SIZE ||
-         n->net_conf.rx_queue_size > VIRTQUEUE_MAX_SIZE ||
--        (n->net_conf.rx_queue_size & (n->net_conf.rx_queue_size - 1))) {
-+        !is_power_of_2(n->net_conf.rx_queue_size)) {
-         error_setg(errp, "Invalid rx_queue_size (= %" PRIu16 "), "
--                   "must be a power of 2 between %d and %d.",
-+                   "must be a power of 2 between %d and %d",
-                    n->net_conf.rx_queue_size, VIRTIO_NET_RX_QUEUE_MIN_SIZE,
-                    VIRTQUEUE_MAX_SIZE);
-         virtio_cleanup(vdev);
-@@ -1947,7 +1947,7 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
-     n->max_queues = MAX(n->nic_conf.peers.queues, 1);
-     if (n->max_queues * 2 + 1 > VIRTIO_QUEUE_MAX) {
-         error_setg(errp, "Invalid number of queues (= %" PRIu32 "), "
--                   "must be a positive integer less than %d.",
-+                   "must be a positive integer less than %d",
-                    n->max_queues, (VIRTIO_QUEUE_MAX - 1) / 2);
-         virtio_cleanup(vdev);
-         return;
--- 
-2.7.4
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index 439d229..6f16457 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -512,7 +512,7 @@ static GuestPCIAddress *get=5Fpci=5Finfo(char *guid, Er=
+ror **errp)
+             } else {
+                 error=5Fsetg=5Fwin32(errp, GetLastError(),
+                         "failed to get device name");
+-                goto out;
++                goto free=5Fdev=5Finfo;
+             }
+         }
+=20
+@@ -560,6 +560,9 @@ static GuestPCIAddress *get=5Fpci=5Finfo(char *guid, Er=
+ror **errp)
+         pci->bus =3D bus;
+         break;
+     }
++
++free=5Fdev=5Finfo:
++    SetupDiDestroyDeviceInfoList(dev=5Finfo);
+ out:
+     g=5Ffree(buffer);
+     g=5Ffree(name);
+--=20
+1.8.3.1
