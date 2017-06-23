@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dOROo-00047W-0T
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:25:37 -0400
+	(envelope-from <berrange@redhat.com>) id 1dOROt-0004CL-70
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:25:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dOROm-0001W0-KJ
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:25:33 -0400
+	(envelope-from <berrange@redhat.com>) id 1dOROr-0001Zp-Jf
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:25:39 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Fri, 23 Jun 2017 17:24:18 +0100
-Message-Id: <20170623162419.26068-20-berrange@redhat.com>
+Date: Fri, 23 Jun 2017 17:24:19 +0100
+Message-Id: <20170623162419.26068-21-berrange@redhat.com>
 In-Reply-To: <20170623162419.26068-1-berrange@redhat.com>
 References: <20170623162419.26068-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v10 19/20] qcow2: report encryption specific
- image information
+Subject: [Qemu-devel] [PATCH v10 20/20] docs: document encryption options
+ for qcow, qcow2 and luks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,209 +23,164 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Currently 'qemu-img info' reports a simple "encrypted: yes"
-field. This is not very useful now that qcow2 can support
-multiple encryption formats. Users want to know which format
-is in use and some data related to it.
-
-Wire up usage of the qcrypto_block_get_info() method so that
-'qemu-img info' can report about the encryption format
-and parameters in use
-
-  $ qemu-img create \
-      --object secret,id=sec0,data=123456 \
-      -o encrypt.format=luks,encrypt.key-secret=sec0 \
-      -f qcow2 demo.qcow2 1G
-  Formatting 'demo.qcow2', fmt=qcow2 size=1073741824 \
-  encryption=off encrypt.format=luks encrypt.key-secret=sec0 \
-  cluster_size=65536 lazy_refcounts=off refcount_bits=16
-
-  $ qemu-img info demo.qcow2
-  image: demo.qcow2
-  file format: qcow2
-  virtual size: 1.0G (1073741824 bytes)
-  disk size: 480K
-  encrypted: yes
-  cluster_size: 65536
-  Format specific information:
-      compat: 1.1
-      lazy refcounts: false
-      refcount bits: 16
-      encrypt:
-          ivgen alg: plain64
-          hash alg: sha256
-          cipher alg: aes-256
-          uuid: 3fa930c4-58c8-4ef7-b3c5-314bb5af21f3
-          format: luks
-          cipher mode: xts
-          slots:
-              [0]:
-                  active: true
-                  iters: 1839058
-                  key offset: 4096
-                  stripes: 4000
-              [1]:
-                  active: false
-                  key offset: 262144
-              [2]:
-                  active: false
-                  key offset: 520192
-              [3]:
-                  active: false
-                  key offset: 778240
-              [4]:
-                  active: false
-                  key offset: 1036288
-              [5]:
-                  active: false
-                  key offset: 1294336
-              [6]:
-                  active: false
-                  key offset: 1552384
-              [7]:
-                  active: false
-                  key offset: 1810432
-          payload offset: 2068480
-          master key iters: 438487
-      corrupt: false
-
-With the legacy "AES" encryption we just report the format
-name
-
-  $ qemu-img create \
-      --object secret,id=sec0,data=123456 \
-      -o encrypt.format=aes,encrypt.key-secret=sec0 \
-      -f qcow2 demo.qcow2 1G
-  Formatting 'demo.qcow2', fmt=qcow2 size=1073741824 \
-  encryption=off encrypt.format=aes encrypt.key-secret=sec0 \
-  cluster_size=65536 lazy_refcounts=off refcount_bits=16
-
-  $ ./qemu-img info demo.qcow2
-  image: demo.qcow2
-  file format: qcow2
-  virtual size: 1.0G (1073741824 bytes)
-  disk size: 196K
-  encrypted: yes
-  cluster_size: 65536
-  Format specific information:
-      compat: 1.1
-      lazy refcounts: false
-      refcount bits: 16
-      encrypt:
-          format: aes
-      corrupt: false
+Expand the image format docs to cover the new options for
+the qcow, qcow2 and luks disk image formats
 
 Reviewed-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- block/qcow2.c        | 32 +++++++++++++++++++++++++++++++-
- qapi/block-core.json | 27 ++++++++++++++++++++++++++-
- 2 files changed, 57 insertions(+), 2 deletions(-)
+ qemu-doc.texi | 123 ++++++++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 115 insertions(+), 8 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index b3836d5..6a590a5 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3241,8 +3241,14 @@ static int qcow2_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
- static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs)
- {
-     BDRVQcow2State *s = bs->opaque;
--    ImageInfoSpecific *spec_info = g_new(ImageInfoSpecific, 1);
-+    ImageInfoSpecific *spec_info;
-+    QCryptoBlockInfo *encrypt_info = NULL;
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 965ba59..3c3081f 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -541,10 +541,20 @@ File name of a base image (see @option{create} subcommand)
+ @item backing_fmt
+ Image format of the base image
+ @item encryption
+-If this option is set to @code{on}, the image is encrypted with 128-bit AES-CBC.
++This option is deprecated and equivalent to @code{encrypt.format=aes}
  
-+    if (s->crypto != NULL) {
-+        encrypt_info = qcrypto_block_get_info(s->crypto, &error_abort);
-+    }
+-The use of encryption in qcow and qcow2 images is considered to be flawed by
+-modern cryptography standards, suffering from a number of design problems:
++@item encrypt.format
 +
-+    spec_info = g_new(ImageInfoSpecific, 1);
-     *spec_info = (ImageInfoSpecific){
-         .type  = IMAGE_INFO_SPECIFIC_KIND_QCOW2,
-         .u.qcow2.data = g_new(ImageInfoSpecificQCow2, 1),
-@@ -3269,6 +3275,30 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs)
-         assert(false);
-     }
++If this is set to @code{luks}, it requests that the qcow2 payload (not
++qcow2 header) be encrypted using the LUKS format. The passphrase to
++use to unlock the LUKS key slot is given by the @code{encrypt.key-secret}
++parameter. LUKS encryption parameters can be tuned with the other
++@code{encrypt.*} parameters.
++
++If this is set to @code{aes}, the image is encrypted with 128-bit AES-CBC.
++The encryption key is given by the @code{encrypt.key-secret} parameter.
++This encryption format is considered to be flawed by modern cryptography
++standards, suffering from a number of design problems:
  
-+    if (encrypt_info) {
-+        ImageInfoSpecificQCow2Encryption *qencrypt =
-+            g_new(ImageInfoSpecificQCow2Encryption, 1);
-+        switch (encrypt_info->format) {
-+        case Q_CRYPTO_BLOCK_FORMAT_QCOW:
-+            qencrypt->format = BLOCKDEV_QCOW2_ENCRYPTION_FORMAT_AES;
-+            qencrypt->u.aes = encrypt_info->u.qcow;
-+            break;
-+        case Q_CRYPTO_BLOCK_FORMAT_LUKS:
-+            qencrypt->format = BLOCKDEV_QCOW2_ENCRYPTION_FORMAT_LUKS;
-+            qencrypt->u.luks = encrypt_info->u.luks;
-+            break;
-+        default:
-+            abort();
-+        }
-+        /* Since we did shallow copy above, erase any pointers
-+         * in the original info */
-+        memset(&encrypt_info->u, 0, sizeof(encrypt_info->u));
-+        qapi_free_QCryptoBlockInfo(encrypt_info);
-+
-+        spec_info->u.qcow2.data->has_encrypt = true;
-+        spec_info->u.qcow2.data->encrypt = qencrypt;
-+    }
-+
-     return spec_info;
- }
+ @itemize @minus
+ @item The AES-CBC cipher is used with predictable initialization vectors based
+@@ -559,10 +569,45 @@ original file must then be securely erased using a program like shred,
+ though even this is ineffective with many modern storage technologies.
+ @end itemize
  
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index d04d277..9570963 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -33,6 +33,27 @@
-             'vm-clock-sec': 'int', 'vm-clock-nsec': 'int' } }
- 
- ##
-+# @ImageInfoSpecificQCow2EncryptionBase:
-+#
-+# @format: The encryption format
-+#
-+# Since: 2.10
-+##
-+{ 'struct': 'ImageInfoSpecificQCow2EncryptionBase',
-+  'data': { 'format': 'BlockdevQcow2EncryptionFormat'}}
+-Use of qcow / qcow2 encryption with QEMU is deprecated, and support for
+-it will go away in a future release.  Users are recommended to use an
+-alternative encryption technology such as the Linux dm-crypt / LUKS
+-system.
++The use of this is no longer supported in system emulators. Support only
++remains in the command line utilities, for the purposes of data liberation
++and interoperability with old versions of QEMU. The @code{luks} format
++should be used instead.
 +
-+##
-+# @ImageInfoSpecificQCow2Encryption:
-+#
-+# Since: 2.10
-+##
-+{ 'union': 'ImageInfoSpecificQCow2Encryption',
-+  'base': 'ImageInfoSpecificQCow2EncryptionBase',
-+  'discriminator': 'format',
-+  'data': { 'aes': 'QCryptoBlockInfoQCow',
-+            'luks': 'QCryptoBlockInfoLUKS' } }
++@item encrypt.key-secret
 +
-+##
- # @ImageInfoSpecificQCow2:
- #
- # @compat: compatibility level
-@@ -44,6 +65,9 @@
- #
- # @refcount-bits: width of a refcount entry in bits (since 2.3)
- #
-+# @encrypt: details about encryption parameters; only set if image
-+#           is encrypted (since 2.10)
-+#
- # Since: 1.7
- ##
- { 'struct': 'ImageInfoSpecificQCow2',
-@@ -51,7 +75,8 @@
-       'compat': 'str',
-       '*lazy-refcounts': 'bool',
-       '*corrupt': 'bool',
--      'refcount-bits': 'int'
-+      'refcount-bits': 'int',
-+      '*encrypt': 'ImageInfoSpecificQCow2Encryption'
-   } }
++Provides the ID of a @code{secret} object that contains the passphrase
++(@code{encrypt.format=luks}) or encryption key (@code{encrypt.format=aes}).
++
++@item encrypt.cipher-alg
++
++Name of the cipher algorithm and key length. Currently defaults
++to @code{aes-256}. Only used when @code{encrypt.format=luks}.
++
++@item encrypt.cipher-mode
++
++Name of the encryption mode to use. Currently defaults to @code{xts}.
++Only used when @code{encrypt.format=luks}.
++
++@item encrypt.ivgen-alg
++
++Name of the initialization vector generator algorithm. Currently defaults
++to @code{plain64}. Only used when @code{encrypt.format=luks}.
++
++@item encrypt.ivgen-hash-alg
++
++Name of the hash algorithm to use with the initialization vector generator
++(if required). Defaults to @code{sha256}. Only used when @code{encrypt.format=luks}.
++
++@item encrypt.hash-alg
++
++Name of the hash algorithm to use for PBKDF algorithm
++Defaults to @code{sha256}. Only used when @code{encrypt.format=luks}.
++
++@item encrypt.iter-time
++
++Amount of time, in milliseconds, to use for PBKDF algorithm per key slot.
++Defaults to @code{2000}. Only used when @code{encrypt.format=luks}.
  
- ##
+ @item cluster_size
+ Changes the qcow2 cluster size (must be between 512 and 2M). Smaller cluster
+@@ -637,7 +682,69 @@ Supported options:
+ @item backing_file
+ File name of a base image (see @option{create} subcommand)
+ @item encryption
+-If this option is set to @code{on}, the image is encrypted.
++This option is deprecated and equivalent to @code{encrypt.format=aes}
++
++@item encrypt.format
++If this is set to @code{aes}, the image is encrypted with 128-bit AES-CBC.
++The encryption key is given by the @code{encrypt.key-secret} parameter.
++This encryption format is considered to be flawed by modern cryptography
++standards, suffering from a number of design problems enumerated previously
++against the @code{qcow2} image format.
++
++The use of this is no longer supported in system emulators. Support only
++remains in the command line utilities, for the purposes of data liberation
++and interoperability with old versions of QEMU.
++
++Users requiring native encryption should use the @code{qcow2} format
++instead with @code{encrypt.format=luks}.
++
++@item encrypt.key-secret
++
++Provides the ID of a @code{secret} object that contains the encryption
++key (@code{encrypt.format=aes}).
++
++@end table
++
++@item luks
++
++LUKS v1 encryption format, compatible with Linux dm-crypt/cryptsetup
++
++Supported options:
++@table @code
++
++@item key-secret
++
++Provides the ID of a @code{secret} object that contains the passphrase.
++
++@item cipher-alg
++
++Name of the cipher algorithm and key length. Currently defaults
++to @code{aes-256}.
++
++@item cipher-mode
++
++Name of the encryption mode to use. Currently defaults to @code{xts}.
++
++@item ivgen-alg
++
++Name of the initialization vector generator algorithm. Currently defaults
++to @code{plain64}.
++
++@item ivgen-hash-alg
++
++Name of the hash algorithm to use with the initialization vector generator
++(if required). Defaults to @code{sha256}.
++
++@item hash-alg
++
++Name of the hash algorithm to use for PBKDF algorithm
++Defaults to @code{sha256}.
++
++@item iter-time
++
++Amount of time, in milliseconds, to use for PBKDF algorithm per key slot.
++Defaults to @code{2000}.
++
+ @end table
+ 
+ @item vdi
 -- 
 2.9.3
