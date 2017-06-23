@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dOOko-00077P-5E
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 09:36:10 -0400
+	(envelope-from <armbru@redhat.com>) id 1dOOlS-0007PY-F1
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 09:36:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dOOkj-0000dQ-OJ
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 09:36:06 -0400
-Received: from mail-qt0-x229.google.com ([2607:f8b0:400d:c0d::229]:33401)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dOOkj-0000dF-JE
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 09:36:01 -0400
-Received: by mail-qt0-x229.google.com with SMTP id u12so34578999qth.0
-	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 06:36:01 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170622033231.19344-1-f4bug@amsat.org>
-	<20170622033231.19344-8-f4bug@amsat.org> <87efuctkbw.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <bd9c08ba-80d2-eee9-e2ce-070077e5f9aa@amsat.org>
-Date: Fri, 23 Jun 2017 10:35:57 -0300
+	(envelope-from <armbru@redhat.com>) id 1dOOlO-0000sM-Hg
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 09:36:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32826)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dOOlO-0000ru-8K
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 09:36:42 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1497276062.git.maozy.fnst@cn.fujitsu.com>
+	<9f8cd98603274c9f6c14b72212b51f26cf0c8fb5.1497276062.git.maozy.fnst@cn.fujitsu.com>
+Date: Fri, 23 Jun 2017 15:36:39 +0200
+In-Reply-To: <9f8cd98603274c9f6c14b72212b51f26cf0c8fb5.1497276062.git.maozy.fnst@cn.fujitsu.com>
+	(Mao Zhongyi's message of "Mon, 12 Jun 2017 22:15:02 +0800")
+Message-ID: <87mv8y4yhk.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <87efuctkbw.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 07/21] travis: update sudo-enabled
- Trusty images
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 1/4] net/socket: Drop the odd 'default'
+ case and comment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,24 +28,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, jasowang@redhat.com
 
-On 06/22/2017 06:58 AM, Alex Bennée wrote:
-> 
-> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
-> 
->> see https://blog.travis-ci.com/2017-06-19-trusty-updates-2017-Q2
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> 
-> The way I read that blog post is group: edge is for testing things still
-> work but you probably don't want to merge that into your master branch.
-> Otherwise we'll automatically be running the bleeding edge.
+Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
 
-Ok I misunderstood this part, good you noticed.
+> In the net_socket_fd_init(), the 'default' case and comment is odd.
+> If @fd really was a pty, getsockopt() would fail with ENOTSOCK. If
+> @fd was a socket, but neither SOCK_DGRAM nor SOCK_STREAM. It should
+> not be treated as if it was SOCK_STREAM.
+>
+> If there is a genuine reason to support something like SOCK_RAW, it
+> should be explicitly handled.
+>
+> So, drop the 'default' case since it is broken already.
+>
+> Cc: jasowang@redhat.com
+> Cc: armbru@redhat.com
+> Cc: berrange@redhat.com
+> Cc: armbru@redhat.com
+> Suggested-by: Markus Armbruster <armbru@redhat.com>
+> Suggested-by: Daniel P. Berrange <berrange@redhat.com>
+> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+> ---
+>  net/socket.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/net/socket.c b/net/socket.c
+> index dcae1ae..53765bd 100644
+> --- a/net/socket.c
+> +++ b/net/socket.c
+> @@ -449,9 +449,9 @@ static NetSocketState *net_socket_fd_init(NetClientState *peer,
+>      case SOCK_STREAM:
+>          return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
+>      default:
+> -        /* who knows ... this could be a eg. a pty, do warn and continue as stream */
+> -        fprintf(stderr, "qemu: warning: socket type=%d for fd=%d is not SOCK_DGRAM or SOCK_STREAM\n", so_type, fd);
+> -        return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
+> +        error_report("qemu: error: socket type=%d for fd=%d is not"
+> +                " SOCK_DGRAM or SOCK_STREAM", so_type, fd);
+> +        closesocket(fd);
+>      }
+>      return NULL;
+>  }
 
-Travis team posted a new entry after which is clearer:
-https://blog.travis-ci.com/2017-06-21-trusty-updates-2017-Q2-launch
+You don't actually "drop the 'default' case", as your commit message
+claims.  Perhaps:
 
-I'm now using "group: deprecated-2017Q2" instead of "edge".
+    net/socket: Don't treat odd socket type as SOCK_STREAM
+
+    In net_socket_fd_init(), the 'default' case is odd: it warns, then
+    continues as if the socket type was SOCK_STREAM.  The comment
+    explains "this could be a eg. a pty", but that makes no sense.  If
+    @fd really was a pty, getsockopt() would fail with ENOTSOCK.  If @fd
+    was a socket, but neither SOCK_DGRAM nor SOCK_STREAM, it should not
+    be treated as if it was SOCK_STREAM.
+
+    Turn this case into an error.  If there is a genuine reason to
+    support something like SOCK_RAW, it should be handled explicitly.
+
+With something like that:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
