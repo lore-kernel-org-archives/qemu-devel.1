@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <li.ping288@zte.com.cn>) id 1dOFAE-00058w-T1
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 23:21:43 -0400
+	(envelope-from <peterx@redhat.com>) id 1dOG2b-00075u-KZ
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 00:17:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <li.ping288@zte.com.cn>) id 1dOFAA-0004y5-5m
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 23:21:42 -0400
-Received: from mxhk.zte.com.cn ([63.217.80.70]:39172)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <li.ping288@zte.com.cn>) id 1dOFA9-0004jO-JF
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 23:21:38 -0400
-From: Li Ping <li.ping288@zte.com.cn>
-Date: Fri, 23 Jun 2017 11:17:43 +0800
-Message-Id: <1498187863-4937-1-git-send-email-li.ping288@zte.com.cn>
+	(envelope-from <peterx@redhat.com>) id 1dOG2Y-0006HK-GJ
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 00:17:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48300)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dOG2Y-0006Gt-9H
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 00:17:50 -0400
+Date: Fri, 23 Jun 2017 12:17:43 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170623041743.GC3936@pxdev.xzpeter.org>
+References: <CAB995MvCYo=tWGg-tC5R-GmRqtdiaLaU_rHTprpRJ_hMJK6Rtw@mail.gmail.com>
+	<20170622105935.2dbd574d@w520.home>
+	<CAB995Mv3naMDu1e2zvzDn77GGNqwPXWUoJOrO0ZMs8B5YooRAQ@mail.gmail.com>
+	<20170622112709.51bd4885@w520.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH RESEND] QEMU Guest Agent: Fix memory leak of
- device information set
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170622112709.51bd4885@w520.home>
+Subject: Re: [Qemu-devel] Query on VFIO in Virtual machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,43 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mdroth@linux.vnet.ibm.com
-Cc: marcandre.lureau@redhat.com, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Li Ping <li.ping288@zte.com.cn>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Nitin Saxena <nitin.lnx@gmail.com>, linux-kernel@vger.kernel.org, qemu-devel <qemu-devel@nongnu.org>
 
-The caller of SetupDiGetClassDevs must delete the returned device informati=
-on
- set when it is no longer needed by calling SetupDiDestroyDeviceInfoList.
+On Thu, Jun 22, 2017 at 11:27:09AM -0600, Alex Williamson wrote:
+> On Thu, 22 Jun 2017 22:42:19 +0530
+> Nitin Saxena <nitin.lnx@gmail.com> wrote:
+> 
+> > Thanks Alex.
+> > 
+> > >> Without an iommu in the VM, you'd be limited to no-iommu support for VM userspace,  
+> > So are you trying to say VFIO NO-IOMMU should work inside VM. Does
+> > that mean VFIO NO-IOMMU in VM and VFIO IOMMU in host for same device
+> > is a legitimate configuration? I did tried this configuration and the
+> > application (in VM) seems to get container_fd, group_fd, device_fd
+> > successfully but after VFIO_DEVICE_RESET ioctl the PCI link breaks
+> > from VM as well as from host. This could be specific to PCI endpoint
+> > device which I can dig.
+> > 
+> > I will be happy if VFIO NO-IOMMU in VM and IOMMU in host for same
+> > device is legitimate configuration.
+> 
+> Using no-iommu in the guest should work in that configuration, however
+> there's no isolation from the user to the rest of VM memory, so the VM
+> kernel will be tainted.  Host memory does have iommu isolation.  Device
+> reset from VM userspace sounds like another bug to investigate.  Thanks,
+> 
+> Alex
 
-Signed-off-by: Li Ping <li.ping288@zte.com.cn>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- qga/commands-win32.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Besides what Alex has mentioned, there is a wiki page for the usage.
+The command line will be slightly different on QEMU side comparing to
+without vIOMMU:
 
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 439d229..6f16457 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -512,7 +512,7 @@ static GuestPCIAddress *get=5Fpci=5Finfo(char *guid, Er=
-ror **errp)
-             } else {
-                 error=5Fsetg=5Fwin32(errp, GetLastError(),
-                         "failed to get device name");
--                goto out;
-+                goto free=5Fdev=5Finfo;
-             }
-         }
-=20
-@@ -560,6 +560,9 @@ static GuestPCIAddress *get=5Fpci=5Finfo(char *guid, Er=
-ror **errp)
-         pci->bus =3D bus;
-         break;
-     }
-+
-+free=5Fdev=5Finfo:
-+    SetupDiDestroyDeviceInfoList(dev=5Finfo);
- out:
-     g=5Ffree(buffer);
-     g=5Ffree(name);
---=20
-1.8.3.1
+  http://wiki.qemu.org/Features/VT-d#With_Assigned_Devices
+
+One more thing to mention is that, when vfio-pci devices in the guest
+are used with emulated VT-d, huge performance degradation will be
+expected for dynamic allocations at least for now. While for mostly
+static allocations (like DPDK) the performance should be merely the
+same as no-IOMMU mode. It's just a hint on performance, and I believe
+for your own case it should mostly depend on how the application is
+managing DMA map/unmaps.
+
+Thanks,
+
+-- 
+Peter Xu
