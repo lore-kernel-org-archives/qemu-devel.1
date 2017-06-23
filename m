@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59442)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORLp-0000zz-4M
+	(envelope-from <kwolf@redhat.com>) id 1dORLq-00010v-11
 	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORLo-0007br-5B
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:29 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dORLp-0007cc-4I
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:30 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 23 Jun 2017 18:21:13 +0200
-Message-Id: <1498234919-27316-16-git-send-email-kwolf@redhat.com>
+Date: Fri, 23 Jun 2017 18:21:15 +0200
+Message-Id: <1498234919-27316-18-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
 References: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 15/61] qemu-iotests: 068: test iothread mode
+Subject: [Qemu-devel] [PULL 17/61] qcow2: Remove unused Error variable in
+ do_perform_cow()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,79 +23,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+From: Alberto Garcia <berto@igalia.com>
 
-Perform the savevm/loadvm test with both iothread on and off.  This
-covers the recently found savevm/loadvm hang when iothread is enabled.
+We are using the return value of qcow2_encrypt_sectors() to detect
+problems but we are throwing away the returned Error since we have no
+way to report it to the user. Therefore we can simply get rid of the
+local Error variable and pass NULL instead.
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Alternatively we could try to figure out a way to pass the original
+error instead of simply returning -EIO, but that would be more
+invasive, so let's keep the current approach.
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/068     | 23 ++++++++++++++---------
- tests/qemu-iotests/068.out | 11 ++++++++++-
- 2 files changed, 24 insertions(+), 10 deletions(-)
+ block/qcow2-cluster.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/tests/qemu-iotests/068 b/tests/qemu-iotests/068
-index 7292643..3801b65 100755
---- a/tests/qemu-iotests/068
-+++ b/tests/qemu-iotests/068
-@@ -45,11 +45,6 @@ _supported_os Linux
- IMGOPTS="compat=1.1"
- IMG_SIZE=128K
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index d779ea1..d1c419f 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -440,16 +440,14 @@ static int coroutine_fn do_perform_cow(BlockDriverState *bs,
+     }
  
--echo
--echo "=== Saving and reloading a VM state to/from a qcow2 image ==="
--echo
--_make_test_img $IMG_SIZE
--
- case "$QEMU_DEFAULT_MACHINE" in
-   s390-ccw-virtio)
-       platform_parm="-no-shutdown"
-@@ -71,10 +66,20 @@ _qemu()
-     _filter_qemu | _filter_hmp
- }
- 
--# Give qemu some time to boot before saving the VM state
--bash -c 'sleep 1; echo -e "savevm 0\nquit"' | _qemu
--# Now try to continue from that VM state (this should just work)
--echo quit | _qemu -loadvm 0
-+for extra_args in \
-+    "" \
-+    "-object iothread,id=iothread0 -set device.hba0.iothread=iothread0"; do
-+    echo
-+    echo "=== Saving and reloading a VM state to/from a qcow2 image ($extra_args) ==="
-+    echo
-+
-+    _make_test_img $IMG_SIZE
-+
-+    # Give qemu some time to boot before saving the VM state
-+    bash -c 'sleep 1; echo -e "savevm 0\nquit"' | _qemu $extra_args
-+    # Now try to continue from that VM state (this should just work)
-+    echo quit | _qemu $extra_args -loadvm 0
-+done
- 
- # success, all done
- echo "*** done"
-diff --git a/tests/qemu-iotests/068.out b/tests/qemu-iotests/068.out
-index 0fa5340..aa063cf 100644
---- a/tests/qemu-iotests/068.out
-+++ b/tests/qemu-iotests/068.out
-@@ -1,6 +1,15 @@
- QA output created by 068
- 
--=== Saving and reloading a VM state to/from a qcow2 image ===
-+=== Saving and reloading a VM state to/from a qcow2 image () ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072
-+QEMU X.Y.Z monitor - type 'help' for more information
-+(qemu) savevm 0
-+(qemu) quit
-+QEMU X.Y.Z monitor - type 'help' for more information
-+(qemu) quit
-+
-+=== Saving and reloading a VM state to/from a qcow2 image (-object iothread,id=iothread0 -set device.hba0.iothread=iothread0) ===
- 
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072
- QEMU X.Y.Z monitor - type 'help' for more information
+     if (bs->encrypted) {
+-        Error *err = NULL;
+         int64_t sector = (src_cluster_offset + offset_in_cluster)
+                          >> BDRV_SECTOR_BITS;
+         assert(s->cipher);
+         assert((offset_in_cluster & ~BDRV_SECTOR_MASK) == 0);
+         assert((bytes & ~BDRV_SECTOR_MASK) == 0);
+         if (qcow2_encrypt_sectors(s, sector, iov.iov_base, iov.iov_base,
+-                                  bytes >> BDRV_SECTOR_BITS, true, &err) < 0) {
++                                  bytes >> BDRV_SECTOR_BITS, true, NULL) < 0) {
+             ret = -EIO;
+-            error_free(err);
+             goto out;
+         }
+     }
 -- 
 1.8.3.1
