@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dOPBR-0000Da-Gy
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 10:03:38 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dOPEo-0000w5-D5
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 10:07:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dOPBN-0005vw-Hm
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 10:03:37 -0400
-Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:34621)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dOPBN-0005sv-AP
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 10:03:33 -0400
-Received: by mail-wr0-x232.google.com with SMTP id 77so67297407wrb.1
-	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 07:03:32 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1dOPEj-0007Bm-C7
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 10:07:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52918)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dOPEj-0007BJ-2i
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 10:07:01 -0400
+References: <20170621052935.20715-1-boqun.feng@gmail.com>
+	<20170623133814.GE11773@localhost.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c766613f-b84a-a7a8-5dd5-d886fbf50cf6@redhat.com>
+Date: Fri, 23 Jun 2017 16:06:57 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9P0z+pgR-JWk1KiwCRd2_iNDfQyPxx+RK465n8vtMAQw@mail.gmail.com>
-References: <D6FAAABF-064D-49C0-B572-C73679F34052@gmail.com>
-	<CAFEAcA9P0z+pgR-JWk1KiwCRd2_iNDfQyPxx+RK465n8vtMAQw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 23 Jun 2017 15:03:11 +0100
-Message-ID: <CAFEAcA9f-SE0s9W5tzNgrSvTEUJ=1X94NJmW5WX3HXp6SoVwbQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3] ui/cocoa.m: add Speed menu
+In-Reply-To: <20170623133814.GE11773@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target-i386: add Skylake-Server cpu model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +28,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: Eduardo Habkost <ehabkost@redhat.com>, "Boqun Feng (Intel)" <boqun.feng@gmail.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On 21 June 2017 at 16:19, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 14 June 2017 at 04:17, Programmingkid <programmingkidx@gmail.com> wrote:
->> Programs running inside of QEMU can sometimes use more CPU time than is really
->> needed. To solve this problem, we just need to throttle the virtual CPU. This
->> feature will stop laptops from burning up.
+
+
+On 23/06/2017 15:38, Eduardo Habkost wrote:
+> On Wed, Jun 21, 2017 at 01:29:34PM +0800, Boqun Feng (Intel) wrote:
+>> Introduce Skylake-Server cpu mode which inherits the features from
+>> Skylake-Client and supports some additional features that are: AVX512,
+>> CWLB and PGPE1GB.
+> 
+> I will fix this to "CLWB" when applying the patch.
+> 
 >>
->> This patch adds a menu called Speed that has menu items from 100% to 1% that
->> represent the speed options. 100% is full speed and 1% is slowest.
->>
->> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+>> Signed-off-by: Boqun Feng (Intel) <boqun.feng@gmail.com>
 >> ---
->> v3 changes:
->> Changed the item deselection loop.
->> Moved speed calculation equation to main function.
->> Replaced "%c" with "%%".
->> Changed how 100% menu item is made.
+>>  target/i386/cpu.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 42 insertions(+)
 >>
->> v2 changes:
->> Fixed missing space with 'if' and 'for' structures.
->> Fixed tab damage.
->> Use loop to create menu items.
->> Changed name of menu items to use percentages.
->> Use tags to determine selected menu item.
->
->> +    // Add the rest of the Speed menu items
->> +    int p, percentage, throttle_pct;
->> +    for (p = 10; p >= 0; p--)
->> +    {
->> +        percentage = p * 10 > 1 ? p * 10 : 1; // prevent a 0% menu item
->> +
->> +        if (percentage == 100) {
->> +            [menuItem setState: NSOnState];
->> +        }
->> +        menuItem = [[[NSMenuItem alloc]
->> +                   initWithTitle: [NSString stringWithFormat: @"%d%%", percentage] action:@selector(adjustSpeed:) keyEquivalent:@""] autorelease];
->
-> Here you try to call setState: on the menuItem before
-> you allocate it -- these lines should be the other way
-> around. (The effect is that the 100% item isn't ticked
-> on startup.)
->
->> +
->> +        /* Calculate the throttle percentage */
->> +        throttle_pct = -1 * percentage + 100;
->> +
->> +        [menuItem setTag: throttle_pct];
->> +        [menu addItem: menuItem];
->> +    }
->
-> That's a very minor fix, so I'll just make it locally
-> when I apply this patch to master.
+>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>> index b2b1d20cee51..1bed722ac2fd 100644
+>> --- a/target/i386/cpu.c
+>> +++ b/target/i386/cpu.c
+>> @@ -1349,6 +1349,48 @@ static X86CPUDefinition builtin_x86_defs[] = {
+>>          .model_id = "Intel Core Processor (Skylake)",
+>>      },
+>>      {
+>> +        .name = "Skylake-Server",
+>> +        .level = 0xd,
+>> +        .vendor = CPUID_VENDOR_INTEL,
+>> +        .family = 6,
+>> +        .model = 85,
+>> +        .stepping = 4,
+>> +        .features[FEAT_1_EDX] =
+>> +            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
+>> +            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
+>> +            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
+>> +            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
+>> +            CPUID_DE | CPUID_FP87,
+>> +        .features[FEAT_1_ECX] =
+>> +            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
+>> +            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
+>> +            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
+>> +            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
+>> +            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOVBE |
+>> +            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
+>> +        .features[FEAT_8000_0001_EDX] =
+>> +            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
+>> +            CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
+>> +        .features[FEAT_8000_0001_ECX] =
+>> +            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
+>> +        .features[FEAT_7_0_EBX] =
+>> +            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
+>> +            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
+>> +            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
+>> +            CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
+>> +            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_MPX | CPUID_7_0_EBX_CLWB |
+>> +            CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
+>> +            CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
+>> +            CPUID_7_0_EBX_AVX512VL,
+> 
+> I believe we should add the same comment about XSAVES from
+> Skylake-Cliente here, for consistency:
+> 
+>         /* Missing: XSAVES (not supported by some Linux versions,
+>          * including v4.1 to v4.6).
 
-...now applied to master, thanks.
+It's up to 4.12. :)
 
--- PMM
+Paolo
