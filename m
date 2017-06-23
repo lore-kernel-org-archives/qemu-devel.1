@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORMl-00029u-9a
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:28 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dORMm-0002Aw-81
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORMk-0008Ln-BF
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:27 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dORMl-0008N5-FM
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:28 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 23 Jun 2017 18:21:56 +0200
-Message-Id: <1498234919-27316-59-git-send-email-kwolf@redhat.com>
+Date: Fri, 23 Jun 2017 18:21:59 +0200
+Message-Id: <1498234919-27316-62-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
 References: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 58/61] blkdebug: Catch bs->exact_filename
- overflow
+Subject: [Qemu-devel] [PULL 61/61] qemu-img: don't shadow opts variable in
+ img_dd()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,43 +23,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Max Reitz <mreitz@redhat.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-The bs->exact_filename field may not be sufficient to store the full
-blkdebug node filename. In this case, we should not generate a filename
-at all instead of an unusable one.
+It's confusing when two different variables have the same name in one
+function.
 
-Cc: qemu-stable@nongnu.org
-Reported-by: Qu Wenruo <quwenruo@cn.fujitsu.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20170613172006.19685-2-mreitz@redhat.com
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Reda Sallahi <fullmanet@gmail.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-id: 20170619150002.3033-1-stefanha@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/blkdebug.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ qemu-img.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index 6431962..a1b24b9 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -839,9 +839,13 @@ static void blkdebug_refresh_filename(BlockDriverState *bs, QDict *options)
-     }
- 
-     if (!force_json && bs->file->bs->exact_filename[0]) {
--        snprintf(bs->exact_filename, sizeof(bs->exact_filename),
--                 "blkdebug:%s:%s", s->config_file ?: "",
--                 bs->file->bs->exact_filename);
-+        int ret = snprintf(bs->exact_filename, sizeof(bs->exact_filename),
-+                           "blkdebug:%s:%s", s->config_file ?: "",
-+                           bs->file->bs->exact_filename);
-+        if (ret >= sizeof(bs->exact_filename)) {
-+            /* An overflow makes the filename unusable, so do not report any */
-+            bs->exact_filename[0] = 0;
-+        }
-     }
- 
-     opts = qdict_new();
+diff --git a/qemu-img.c b/qemu-img.c
+index e70d515..91ad6be 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -4255,15 +4255,12 @@ static int img_dd(int argc, char **argv)
+         case 'U':
+             force_share = true;
+             break;
+-        case OPTION_OBJECT: {
+-            QemuOpts *opts;
+-            opts = qemu_opts_parse_noisily(&qemu_object_opts,
+-                                           optarg, true);
+-            if (!opts) {
++        case OPTION_OBJECT:
++            if (!qemu_opts_parse_noisily(&qemu_object_opts, optarg, true)) {
+                 ret = -1;
+                 goto out;
+             }
+-        }   break;
++            break;
+         case OPTION_IMAGE_OPTS:
+             image_opts = true;
+             break;
 -- 
 1.8.3.1
