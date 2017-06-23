@@ -1,16 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34424)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dOM0F-0002nm-S7
+	(envelope-from <kraxel@redhat.com>) id 1dOM0F-0002nf-Kx
 	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 06:39:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dOM0C-00055J-3B
+	(envelope-from <kraxel@redhat.com>) id 1dOM0A-00054W-Tl
 	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 06:39:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54850)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dOM0A-000544-NO
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 06:39:46 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8B6FF7DCC9
+	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 10:39:44 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 23 Jun 2017 12:39:40 +0200
-Message-Id: <20170623103945.7014-3-kraxel@redhat.com>
-In-Reply-To: <20170623103945.7014-1-kraxel@redhat.com>
-References: <20170623103945.7014-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 2/7] input: Decrement queue count on kbd delay
+Date: Fri, 23 Jun 2017 12:39:38 +0200
+Message-Id: <20170623103945.7014-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 0/7] Ui and input 20170623 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,35 +28,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alexander Graf <agraf@suse.de>, qemu-stable@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-From: Alexander Graf <agraf@suse.de>
+The following changes since commit e18a639164e162b3a4f078ab60606cd2f163d934:
 
-Delays in the input layer are special cased input events. Every input
-event is accounted for in a global intput queue count. The special cased
-delays however did not get removed from the queue, leading to queue overruns
-and thus silent key drops after typing quite a few characters.
+  Merge remote-tracking branch 'remotes/kraxel/tags/usb-20170621-pull-request' into staging (2017-06-22 15:09:48 +0100)
 
-Signed-off-by: Alexander Graf <agraf@suse.de>
-Message-id: 1498117318-162102-1-git-send-email-agraf@suse.de
-Fixes: be1a7176 ("input: add support for kbd delays")
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- ui/input.c | 1 +
- 1 file changed, 1 insertion(+)
+are available in the git repository at:
 
-diff --git a/ui/input.c b/ui/input.c
-index 2abd46de93..af05f06368 100644
---- a/ui/input.c
-+++ b/ui/input.c
-@@ -256,6 +256,7 @@ static void qemu_input_queue_process(void *opaque)
-     item = QTAILQ_FIRST(queue);
-     g_assert(item->type == QEMU_INPUT_QUEUE_DELAY);
-     QTAILQ_REMOVE(queue, item, node);
-+    queue_count--;
-     g_free(item);
- 
-     while (!QTAILQ_EMPTY(queue)) {
+  git://git.kraxel.org/qemu tags/ui-and-input-20170623-pull-request
+
+for you to fetch changes up to 6e24ee0c1e4b6c0c9c748acab77ecd113c942a4d:
+
+  ps2: reset queue in ps2_reset_keyboard (2017-06-23 11:51:50 +0200)
+
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+
+Alexander Graf (2):
+  input: Decrement queue count on kbd delay
+  hid: Reset kbd modifiers on reset
+
+Gerd Hoffmann (5):
+  keymaps: add tracing
+  sdl2: add assert to make coverity happy
+  ps2: add and use PS2State typedef
+  ps2: add ps2_reset_queue
+  ps2: reset queue in ps2_reset_keyboard
+
+ include/hw/input/ps2.h  |  4 ++--
+ include/qemu/typedefs.h |  1 +
+ hw/input/hid.c          |  1 +
+ hw/input/ps2.c          | 28 ++++++++++++++++------------
+ ui/input.c              |  1 +
+ ui/keymaps.c            | 33 ++++++++++++++++++---------------
+ ui/sdl2.c               |  1 +
+ ui/trace-events         |  5 +++++
+ 8 files changed, 45 insertions(+), 29 deletions(-)
+
 -- 
 2.9.3
