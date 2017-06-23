@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dOM0F-0002nj-Ra
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 06:39:53 -0400
+	(envelope-from <phil@philjordan.eu>) id 1dOM3T-0005xQ-La
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 06:43:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dOM0B-00054y-O9
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 06:39:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56956)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dOM0B-00054T-GP
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 06:39:47 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 799A343A22
-	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 10:39:46 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 23 Jun 2017 12:39:39 +0200
-Message-Id: <20170623103945.7014-2-kraxel@redhat.com>
-In-Reply-To: <20170623103945.7014-1-kraxel@redhat.com>
-References: <20170623103945.7014-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 1/7] keymaps: add tracing
+	(envelope-from <phil@philjordan.eu>) id 1dOM3S-00060k-LZ
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 06:43:11 -0400
+Received: from mail-oi0-x232.google.com ([2607:f8b0:4003:c06::232]:33451)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <phil@philjordan.eu>) id 1dOM3S-00060H-EX
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 06:43:10 -0400
+Received: by mail-oi0-x232.google.com with SMTP id p66so23224424oia.0
+	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 03:43:08 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <alpine.BSF.2.21.1706200028170.64612@zero.eik.bme.hu>
+References: <alpine.BSF.2.21.1706182319020.18505@zero.eik.bme.hu>
+	<20170619115834.GA2242@HEDWIG.INI.CMU.EDU>
+	<alpine.BSF.2.21.1706200028170.64612@zero.eik.bme.hu>
+From: Phil Dennis-Jordan <phil@philjordan.eu>
+Date: Fri, 23 Jun 2017 12:42:47 +0200
+Message-ID: <CAAibmn3mz=QvsNDg_T6JAcbH-H4qiacush_-E=dXUtkc9XaQ8w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Commit 77af8a2b9 breaks (mac)OS X 10.11.6
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,129 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: "Gabriel L. Somlo" <gsomlo@gmail.com>, qemu-devel@nongnu.org
 
-Drop commented debug logging, add trace points instead.
+Hi,
 
-Also cleanup parser code a bit, the key name is copied into a new
-variable instead of patching the input line, that way we can log
-the unmodified line.
+Apologies for the late reply, I've been away.
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20170606134736.26080-1-kraxel@redhat.com
----
- ui/keymaps.c    | 33 ++++++++++++++++++---------------
- ui/trace-events |  5 +++++
- 2 files changed, 23 insertions(+), 15 deletions(-)
+On 20 June 2017 at 01:06, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+>> I can (still) boot off my 10.11.0 installer iso image, and
+>> successfully upgraded from 10.11.4 to 10.11.6, with the latter
+>> continuing to boot without problems.
+>
+> I had Clover with unpatched OVMF which worked before but hangs after
+> "AppleKeyStore starting" and before "IOAPIC: Version..." messages since the
+> above patch. Maybe it's a problem in Clover and I should try a newer
+> version.
 
-diff --git a/ui/keymaps.c b/ui/keymaps.c
-index 8899a0b31e..fa00b82027 100644
---- a/ui/keymaps.c
-+++ b/ui/keymaps.c
-@@ -25,6 +25,7 @@
- #include "qemu/osdep.h"
- #include "keymaps.h"
- #include "sysemu/sysemu.h"
-+#include "trace.h"
- 
- static int get_keysym(const name2keysym_t *table,
-                       const char *name)
-@@ -71,18 +72,14 @@ static void add_to_key_range(struct key_range **krp, int code) {
- 
- static void add_keysym(char *line, int keysym, int keycode, kbd_layout_t *k) {
-     if (keysym < MAX_NORMAL_KEYCODE) {
--        /* fprintf(stderr,"Setting keysym %s (%d) to %d\n",
--                   line, keysym, keycode); */
-+        trace_keymap_add("normal", keysym, keycode, line);
-         k->keysym2keycode[keysym] = keycode;
-     } else {
-         if (k->extra_count >= MAX_EXTRA_COUNT) {
-             fprintf(stderr, "Warning: Could not assign keysym %s (0x%x)"
-                     " because of memory constraints.\n", line, keysym);
-         } else {
--#if 0
--            fprintf(stderr, "Setting %d: %d,%d\n",
--                    k->extra_count, keysym, keycode);
--#endif
-+            trace_keymap_add("extra", keysym, keycode, line);
-             k->keysym2keycode_extra[k->extra_count].
-             keysym = keysym;
-             k->keysym2keycode_extra[k->extra_count].
-@@ -99,9 +96,11 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
-     FILE *f;
-     char * filename;
-     char line[1024];
-+    char keyname[64];
-     int len;
- 
-     filename = qemu_find_file(QEMU_FILE_TYPE_KEYMAP, language);
-+    trace_keymap_parse(filename);
-     f = filename ? fopen(filename, "r") : NULL;
-     g_free(filename);
-     if (!f) {
-@@ -130,18 +129,21 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
-         if (!strncmp(line, "include ", 8)) {
-             parse_keyboard_layout(table, line + 8, k);
-         } else {
--            char *end_of_keysym = line;
--            while (*end_of_keysym != 0 && *end_of_keysym != ' ') {
--                end_of_keysym++;
-+            int offset = 0;
-+            while (line[offset] != 0 &&
-+                   line[offset] != ' ' &&
-+                   offset < sizeof(keyname) - 1) {
-+                keyname[offset] = line[offset];
-+                offset++;
-             }
--            if (*end_of_keysym) {
-+            keyname[offset] = 0;
-+            if (strlen(keyname)) {
-                 int keysym;
--                *end_of_keysym = 0;
--                keysym = get_keysym(table, line);
-+                keysym = get_keysym(table, keyname);
-                 if (keysym == 0) {
-                     /* fprintf(stderr, "Warning: unknown keysym %s\n", line);*/
-                 } else {
--                    const char *rest = end_of_keysym + 1;
-+                    const char *rest = line + offset + 1;
-                     int keycode = strtol(rest, NULL, 0);
- 
-                     if (strstr(rest, "numlock")) {
-@@ -165,10 +167,10 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
- 
-                     if (strstr(rest, "addupper")) {
-                         char *c;
--                        for (c = line; *c; c++) {
-+                        for (c = keyname; *c; c++) {
-                             *c = qemu_toupper(*c);
-                         }
--                        keysym = get_keysym(table, line);
-+                        keysym = get_keysym(table, keyname);
-                         if (keysym) {
-                             add_keysym(line, keysym,
-                                        keycode | SCANCODE_SHIFT, k);
-@@ -194,6 +196,7 @@ int keysym2scancode(void *kbd_layout, int keysym)
-     kbd_layout_t *k = kbd_layout;
-     if (keysym < MAX_NORMAL_KEYCODE) {
-         if (k->keysym2keycode[keysym] == 0) {
-+            trace_keymap_unmapped(keysym);
-             fprintf(stderr, "Warning: no scancode found for keysym %d\n",
-                     keysym);
-         }
-diff --git a/ui/trace-events b/ui/trace-events
-index 93fe5482e6..19ce5f85f6 100644
---- a/ui/trace-events
-+++ b/ui/trace-events
-@@ -46,3 +46,8 @@ qemu_spice_create_primary_surface(int qid, uint32_t sid, void *surface, int asyn
- qemu_spice_destroy_primary_surface(int qid, uint32_t sid, int async) "%d sid=%u async=%d"
- qemu_spice_wakeup(uint32_t qid) "%d"
- qemu_spice_create_update(uint32_t left, uint32_t right, uint32_t top, uint32_t bottom) "lr %d -> %d,  tb -> %d -> %d"
-+
-+# ui/keymaps.c
-+keymap_parse(const char *file) "file %s"
-+keymap_add(const char *type, int sym, int code, const char *line) "%-6s sym=0x%04x code=0x%04x (line: %s)"
-+keymap_unmapped(int sym) "sym=0x%04x"
--- 
-2.9.3
+I never tested with Clover I'm afraid, so it's entirely possible that
+it's broken something in there. Maybe it detects Qemu/KVM based on
+FADT somehow, or has a FADT rewrite rule that falls over with the new
+FADT. Either way, it's probably not too hard to fix on the Clover side
+if nobody has done so yet.
+
+>> This is with qemu master (patched for applesmc with the latest v3
+>> pending series that's also on the mailing list), and OVMF master
+>> (patched for HFS+).
+>
+> It boots with your patched OVMF so now I'm using that instead. (No boot menu
+> but it's faster.)
+
+I don't know if it'll work in Qemu/KVM with macOS, but if you really
+need a boot menu you could try rEFInd.
+
+HTH
+
+Phil
