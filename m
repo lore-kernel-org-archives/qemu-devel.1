@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48766)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dOTi6-0006kJ-Qi
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 14:53:40 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dOUAJ-0003op-Kb
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 15:22:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dOTi5-0007MT-SI
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 14:53:38 -0400
-References: <1498040351-6376-2-git-send-email-kchamart@redhat.com>
-	<bdbe5523-b066-a2ef-9e46-ece40ff4060d@redhat.com>
-	<20170622085610.wasfoafo3b46iv4q@eukaryote>
-	<3e638f0a-49f8-6fd0-04eb-12904768d571@redhat.com>
-	<20170623081538.nqaxrylinzgg37il@eukaryote>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <187bf584-3d27-323b-4ee9-a395d521669a@redhat.com>
-Date: Fri, 23 Jun 2017 14:53:30 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dOUAI-0004LA-CR
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 15:22:47 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:39558)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+	id 1dOUAI-0004Kn-6F
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 15:22:46 -0400
+Date: Fri, 23 Jun 2017 21:22:43 +0200
+From: Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <20170623192243.eb5bnfy2qqy3dqa4@aurel32.net>
+References: <CAEz5UgEp8wRBxeg4nAAd9GVeihcXQv__jfrjQtnVNT8eTNCLOw@mail.gmail.com>
+	<20170513182814.ydpkjeekvvjf5rzo@aurel32.net>
+	<ecb7491d-6446-a9fa-49d1-f4aaade16470@amsat.org>
+	<CAEz5UgGWxLNg+3Qg02H9Mpzkpy=MwP8YFYamZ8LdxK1gMuWq=g@mail.gmail.com>
+	<CAEz5UgEQ1=RM2+v8ocUsZxA88jdk5Z+A0eo-G6=iD_CGoZQ2Sw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170623081538.nqaxrylinzgg37il@eukaryote>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] live-block-ops.txt: Rename, rewrite,
- and improve it
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAEz5UgEQ1=RM2+v8ocUsZxA88jdk5Z+A0eo-G6=iD_CGoZQ2Sw@mail.gmail.com>
+Subject: Re: [Qemu-devel] MIPS little endian - Bug when decoding physaddr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,80 +31,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kashyap Chamarthy <kchamart@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, stephen@that.guru, armbru@redhat.com, mreitz@redhat.com
+To: Vinicius Maciel <viniciusfre@gmail.com>
+Cc: Philippe =?iso-8859-15?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+
+On 2017-06-23 15:14, Vinicius Maciel wrote:
+> Hi everyone,
+> 
+> I'm having a problem similar to the reported in this email, but now I'm
+> trying to emulate a MIPS 24KEc,
+> ralink RT5350F.
+> 
+> Assembly Code:
+> 0x802006a0 <reset+672>: lui t5,0xb011
+> 0x802006a4 <reset+676>: ori t5,t5,0x168
+> 0x802006a8 <reset+680>: li t6,23
+> 0x802006ac <reset+684>: nop
+> 0x802006b0 <reset+688>: sw t6,0(t5) <---
+> 
+> The instruction "sw t6,0(t5)" try to write to address 0xb0110168 (0x10110168),
+> but Qemu decodes
+> this address to 2952790112 (0xb0000060). Is this address right?
+
+sw is a write instruction...
+
+> Qemu Debug:
+> #0  io_readx (env=0x5555566e4a78, iotlbentry=0x5555566ec348,
+> addr=2952790112,
+>     retaddr=140737129226144, size=4)
+>     at /home/vini/projs/emuladores/qemu-routers/cputlb.c:786
+> #1  0x00005555557c9a02 in io_readl (env=0x5555566e4a78, mmu_idx=0, index=0,
+>     addr=2952790112, retaddr=140737129226144)
+>     at /home/vini/projs/emuladores/qemu-routers/softmmu_template.h:104
+> #2  0x00005555557c9b89 in helper_le_ldul_mmu (env=0x5555566e4a78,
+> addr=2952790112, <----
+>     oi=32, retaddr=140737129226144)
+>     at /home/vini/projs/emuladores/qemu-routers/softmmu_template.h:141
+> #3  0x00007fffea982108 in code_gen_buffer ()
+
+... while helper_le_ldul_mmu and io_readl are read functions. The
+assembly code and the backtrace do not match. We can not conclude
+anything.
+
+Aurelien
 
 
-
-On 06/23/2017 04:15 AM, Kashyap Chamarthy wrote:
-> On Thu, Jun 22, 2017 at 10:13:03AM -0400, John Snow wrote:
->> On 06/22/2017 04:56 AM, Kashyap Chamarthy wrote:
->>> On Wed, Jun 21, 2017 at 06:49:02PM -0400, John Snow wrote:
->=20
-> [...]
->=20
->>> Yes, I was thinking of this, too -- just link to the 'bitmaps' docume=
-nt.
->>>
->>> A quick side question here: Since upstream QEMU is converging onto
->>> Sphinx, and rST, hope you mind if I convert docs/devel/bitmaps.md int=
-o
->>> rST at somepoint, for consistency's sake.  I'll file a separate revie=
-w,
->>> anyway for that.  In the long term, all / most other documents would
->>> also be converted.
->>>
->>
->> Of course not. I chose bitmaps.md so that it would be nice to view fro=
-m
->> the github interface while remaining nice to read in plaintext, but fe=
-el
->> free to convert it if we actually do standardize on Sphinx/rST.
->>
->> If you can make the generated output look prettier than the github
->> rendering of the markdown I'll ACK it ;)
->=20
-> :-) Here's a sneak-peak (don't miss the index to your left hand side):
->=20
->     https://kashyapc.fedorapeople.org/v3-QEMU-Docs/_build/html/docs/bit=
-maps.html
->=20
-
-Looking good, you've got an errant backslash:
-
-'Let=E2=80=99s assume the full backup is named full\_backup.img.'
-
-I also think we should change
-
-"Let=E2=80=99s assume it is named incremental.0.img."
-
-to
-
-"Let's assume the new incremental image is named incremental.0.img"
-
-so as to avoid "it" when dealing with two images.
-
-Otherwise, LGTM.
-
-> Compare that with the GitHub rendering:
->=20
->     https://github.com/qemu/qemu/blob/master/docs/devel/bitmaps.md
->=20
-> And, here's the source (in reStructuredText, despite the ".txt"
-> extension) for the 'bitmaps' doc (I made tiny styling changes):
->=20
->     https://kashyapc.fedorapeople.org/v3-QEMU-Docs/_build/html/_sources=
-/docs/bitmaps.txt
->    =20
->>> Yes, I fully agree with your suggestion.  I will simply link to the
->>> detailed document you wrote, which I was thinking of anyhow.
->>>
->>> Thanks for your comments!
->>>
->> Sure. You could perhaps mention the different sync modes, including to=
-p,
->> none, full and incremental and urge readers to check out the bitmaps
->> document for detailed workings of the incremental mode.
->=20
-> Yeah, good point.  I'll make that edit in v2.
->=20
+-- 
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
