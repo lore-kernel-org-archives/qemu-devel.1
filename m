@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dOPSd-0006vz-Sy
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 10:21:25 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dOPlO-0003lk-LA
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 10:40:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dOPSZ-0005Pb-96
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 10:21:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35874)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dOPSZ-0005P9-0e
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 10:21:19 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <cover.1497276062.git.maozy.fnst@cn.fujitsu.com>
-	<debfee582acd0e32a08a812c710abbdeb11e90d1.1497276062.git.maozy.fnst@cn.fujitsu.com>
-	<87bmpe4wyz.fsf@dusky.pond.sub.org>
-Date: Fri, 23 Jun 2017 16:21:12 +0200
-In-Reply-To: <87bmpe4wyz.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Fri, 23 Jun 2017 16:09:24 +0200")
-Message-ID: <871sqa3huv.fsf@dusky.pond.sub.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1dOPlK-0006dr-Lp
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 10:40:46 -0400
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:34053)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dOPlK-0006db-BV
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 10:40:42 -0400
+Received: by mail-wr0-x231.google.com with SMTP id 77so68680614wrb.1
+	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 07:40:42 -0700 (PDT)
+References: <CAGKXQydF6Y6xpfHGb3neVC-x72o+FEnvHBis87A3JbWRAmoGYA@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAGKXQydF6Y6xpfHGb3neVC-x72o+FEnvHBis87A3JbWRAmoGYA@mail.gmail.com>
+Date: Fri, 23 Jun 2017 15:41:26 +0100
+Message-ID: <87tw36sr55.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 2/4] net/net: Convert parse_host_port()
- to Error
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] TARGET_PAGE_BITS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,286 +29,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, jasowang@redhat.com, kraxel@redhat.com
+To: ali saeedi <ali.saeedi56@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-Markus Armbruster <armbru@redhat.com> writes:
 
-> Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
->
->> Cc: berrange@redhat.com
->> Cc: kraxel@redhat.com
->> Cc: pbonzini@redhat.com
->> Cc: jasowang@redhat.com
->> Cc: armbru@redhat.com
->> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
->> ---
->>  include/qemu/sockets.h |  2 +-
->>  net/net.c              | 21 ++++++++++++++++-----
->>  net/socket.c           | 37 ++++++++++++++++++++++---------------
->>  3 files changed, 39 insertions(+), 21 deletions(-)
->>
->> diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
->> index 5c326db..7abffc4 100644
->> --- a/include/qemu/sockets.h
->> +++ b/include/qemu/sockets.h
->> @@ -53,7 +53,7 @@ void socket_listen_cleanup(int fd, Error **errp);
->>  int socket_dgram(SocketAddress *remote, SocketAddress *local, Error **errp);
->>  
->>  /* Old, ipv4 only bits.  Don't use for new code. */
->> -int parse_host_port(struct sockaddr_in *saddr, const char *str);
->> +int parse_host_port(struct sockaddr_in *saddr, const char *str, Error **errp);
->>  int socket_init(void);
->>  
->>  /**
->> diff --git a/net/net.c b/net/net.c
->> index 6235aab..e55869a 100644
->> --- a/net/net.c
->> +++ b/net/net.c
->> @@ -100,7 +100,7 @@ static int get_str_sep(char *buf, int buf_size, const char **pp, int sep)
->>      return 0;
->>  }
->>  
->> -int parse_host_port(struct sockaddr_in *saddr, const char *str)
->> +int parse_host_port(struct sockaddr_in *saddr, const char *str, Error **errp)
->>  {
->>      char buf[512];
->>      struct hostent *he;
->> @@ -108,24 +108,35 @@ int parse_host_port(struct sockaddr_in *saddr, const char *str)
->>      int port;
->>  
->>      p = str;
->> -    if (get_str_sep(buf, sizeof(buf), &p, ':') < 0)
->> +    if (get_str_sep(buf, sizeof(buf), &p, ':') < 0) {
->> +        error_setg(errp, "The address should contain ':', for example: "
->> +                   "xxxx=230.0.0.1:1234");
->>          return -1;
->> +    }
->>      saddr->sin_family = AF_INET;
->>      if (buf[0] == '\0') {
->>          saddr->sin_addr.s_addr = 0;
->>      } else {
->>          if (qemu_isdigit(buf[0])) {
->> -            if (!inet_aton(buf, &saddr->sin_addr))
->> +            if (!inet_aton(buf, &saddr->sin_addr)) {
->> +                error_setg(errp, "Host address '%s' is not a valid "
->> +                           "IPv4 address", buf);
->>                  return -1;
->> +            }
->>          } else {
->> -            if ((he = gethostbyname(buf)) == NULL)
->> +            he = gethostbyname(buf);
->> +            if (he == NULL) {
->> +                error_setg(errp, "Specified hostname is error.");
->>                  return - 1;
->> +            }
->>              saddr->sin_addr = *(struct in_addr *)he->h_addr;
->>          }
->>      }
->>      port = strtol(p, (char **)&r, 0);
->> -    if (r == p)
->> +    if (r == p) {
->> +        error_setg(errp, "The port number is illegal");
->>          return -1;
->> +    }
->>      saddr->sin_port = htons(port);
->>      return 0;
->>  }
->> diff --git a/net/socket.c b/net/socket.c
->> index 53765bd..66016c8 100644
->> --- a/net/socket.c
->> +++ b/net/socket.c
->> @@ -485,15 +485,17 @@ static void net_socket_accept(void *opaque)
->>  static int net_socket_listen_init(NetClientState *peer,
->>                                    const char *model,
->>                                    const char *name,
->> -                                  const char *host_str)
->> +                                  const char *host_str,
->> +                                  Error **errp)
->
-> You convert net_socket_listen_init() to Error.  This means you have to
-> make it set an error on failure.  You do ...
->
->>  {
->>      NetClientState *nc;
->>      NetSocketState *s;
->>      struct sockaddr_in saddr;
->>      int fd, ret;
->>  
->> -    if (parse_host_port(&saddr, host_str) < 0)
->> +    if (parse_host_port(&saddr, host_str, errp) < 0) {
->>          return -1;
->> +    }
->
-> ... here, ...
->
->>  
->>      fd = qemu_socket(PF_INET, SOCK_STREAM, 0);
->>      if (fd < 0) {
->            perror("socket");
->            return -1;
->        }
->
-> ... but not here.  Two more error returns follow.
->
-> Preexisting bug: net_socket_listen_init() reports to stderr for three
-> out of four failures.  Functions should either report on no failure or
-> on all.  Conversion to Error should fix that, but yours isn't complete.
-> When it is, the fix should be mentioned in the commit message.
->
->> @@ -531,14 +533,16 @@ static int net_socket_listen_init(NetClientState *peer,
->>  static int net_socket_connect_init(NetClientState *peer,
->>                                     const char *model,
->>                                     const char *name,
->> -                                   const char *host_str)
->> +                                   const char *host_str,
->> +                                   Error **errp)
->>  {
->>      NetSocketState *s;
->>      int fd, connected, ret;
->>      struct sockaddr_in saddr;
->>  
->> -    if (parse_host_port(&saddr, host_str) < 0)
->> +    if (parse_host_port(&saddr, host_str, errp) < 0) {
->>          return -1;
->> +    }
->>  
->>      fd = qemu_socket(PF_INET, SOCK_STREAM, 0);
->>      if (fd < 0) {
->
-> Again, you have to make the function set an error on all failures, not
-> just this one.
->
-> Additionally:
->
->        s = net_socket_fd_init(peer, model, name, fd, connected);
->        if (!s)
->            return -1;
->
-> net_socket_fd_init() still prints to stderr.  Please convert it to
-> Error.
->
->> @@ -580,14 +584,15 @@ static int net_socket_mcast_init(NetClientState *peer,
->>                                   const char *model,
->>                                   const char *name,
->>                                   const char *host_str,
->> -                                 const char *localaddr_str)
->> +                                 const char *localaddr_str,
->> +                                 Error **errp)
->>  {
->>      NetSocketState *s;
->>      int fd;
->>      struct sockaddr_in saddr;
->>      struct in_addr localaddr, *param_localaddr;
->>  
->> -    if (parse_host_port(&saddr, host_str) < 0)
->> +    if (parse_host_port(&saddr, host_str, errp) < 0)
->>          return -1;
->>  
->>      if (localaddr_str != NULL) {
->
-> Again, you have to make the function set an error on all failures.
->
-> Additionally, convert net_socket_mcast_create() to Error.
+ali saeedi <ali.saeedi56@gmail.com> writes:
 
-Actually, you do in the next patch.  So, you first do an incorrect
-conversion in PATCH 2, then fix it in PATCH 3.  Not horrible, but
-avoiding the broken intermediate state is easy enough: convert
-net_socket_mcast_create() to Error before PATCH 2, changing its callers
-from
+> Hello
+> What does TARGET_PAGE_BITS mean in qemu code?
 
-    fd = net_socket_mcast_create(&saddr, param_localaddr);
-    if (fd < 0) {
-        // error already reported
-        take the error exit
-    }
+It's the page size of the target. e.g.
 
-to
+  TARGET_PAGE_BITS 12
 
-    fd = net_socket_mcast_create(&saddr, param_localaddr, &err);
-    if (fd < 0) {
-        error_report_err(err);
-        take the error exit
-    }
+  1 << 12 = 4096 = 4k pages
 
-The error_report_err() goes away when the function containing it gets
-converted to Error.  Any questions?
 
->> @@ -619,17 +624,18 @@ static int net_socket_udp_init(NetClientState *peer,
->>                                   const char *model,
->>                                   const char *name,
->>                                   const char *rhost,
->> -                                 const char *lhost)
->> +                                 const char *lhost,
->> +                                 Error **errp)
->>  {
->>      NetSocketState *s;
->>      int fd, ret;
->>      struct sockaddr_in laddr, raddr;
->>  
->> -    if (parse_host_port(&laddr, lhost) < 0) {
->> +    if (parse_host_port(&laddr, lhost, errp) < 0) {
->>          return -1;
->>      }
->>  
->> -    if (parse_host_port(&raddr, rhost) < 0) {
->> +    if (parse_host_port(&raddr, rhost, errp) < 0) {
->>          return -1;
->>      }
->>  
->
-> Again, you have make the function set an error on all failures.
->
->> @@ -703,15 +709,16 @@ int net_init_socket(const Netdev *netdev, const char *name,
->>      }
->>  
->>      if (sock->has_listen) {
->> -        if (net_socket_listen_init(peer, "socket", name, sock->listen) == -1) {
->> +        if (net_socket_listen_init(peer, "socket", name, sock->listen,
->> +            errp) == -1) {
->>              return -1;
->>          }
->>          return 0;
->>      }
->>  
->>      if (sock->has_connect) {
->> -        if (net_socket_connect_init(peer, "socket", name, sock->connect) ==
->> -            -1) {
->> +        if (net_socket_connect_init(peer, "socket", name, sock->connect,
->> +            errp) == -1) {
->>              return -1;
->>          }
->>          return 0;
->> @@ -721,7 +728,7 @@ int net_init_socket(const Netdev *netdev, const char *name,
->>          /* if sock->localaddr is missing, it has been initialized to "all bits
->>           * zero" */
->>          if (net_socket_mcast_init(peer, "socket", name, sock->mcast,
->> -            sock->localaddr) == -1) {
->> +            sock->localaddr, errp) == -1) {
->>              return -1;
->>          }
->>          return 0;
->> @@ -732,8 +739,8 @@ int net_init_socket(const Netdev *netdev, const char *name,
->>          error_report("localaddr= is mandatory with udp=");
->>          return -1;
->>      }
->> -    if (net_socket_udp_init(peer, "socket", name, sock->udp, sock->localaddr) ==
->> -        -1) {
->> +    if (net_socket_udp_init(peer, "socket", name, sock->udp, sock->localaddr,
->> +        errp) == -1) {
->>          return -1;
->>      }
->>      return 0;
->
-> This is a partial fix for net_init_socket()'s
->     /* FIXME error_setg(errp, ...) on failure */
->
-> Can you fix it completely?  Not required to get the patch accepted, as
-> far as I'm concerned.
+> thanks a lot
 
-Ah, you do in PATCH 4.  Suggest to explain in your commit message that
-this is a partial fix, which will be completed in the following
-commit(s).
 
-> Your commit message claims "Convert parse_host_port() to Error".  You do
-> more than that.  Please rephrase the commit message.
+--
+Alex Bennée
