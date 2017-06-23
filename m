@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dOQKb-0005Ac-Ts
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 11:17:10 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dOQLS-00067j-Nb
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 11:18:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dOQKY-0004o8-Qu
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 11:17:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56284)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dOQKY-0004nw-Kg
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 11:17:06 -0400
-Date: Fri, 23 Jun 2017 12:16:57 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170623151657.GA5002@localhost.localdomain>
-References: <20170621052935.20715-1-boqun.feng@gmail.com>
-	<20170623133814.GE11773@localhost.localdomain>
-	<c766613f-b84a-a7a8-5dd5-d886fbf50cf6@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dOQLR-00058m-QJ
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 11:18:02 -0400
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:34299)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dOQLR-00058B-KB
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 11:18:01 -0400
+Received: by mail-wr0-x22e.google.com with SMTP id 77so70064338wrb.1
+	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 08:18:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c766613f-b84a-a7a8-5dd5-d886fbf50cf6@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] target-i386: add Skylake-Server cpu model
+In-Reply-To: <20170623124829.24260-1-kraxel@redhat.com>
+References: <20170623124829.24260-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 23 Jun 2017 16:17:39 +0100
+Message-ID: <CAFEAcA8nnK4h=Gb-Vp3awDRw-D53ohKVBWH37H56XNhEcDXWAg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/3] Queue/misc patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,20 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Boqun Feng (Intel)" <boqun.feng@gmail.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, Jun 23, 2017 at 04:06:57PM +0200, Paolo Bonzini wrote:
-[...]
-> > I believe we should add the same comment about XSAVES from
-> > Skylake-Cliente here, for consistency:
-> > 
-> >         /* Missing: XSAVES (not supported by some Linux versions,
-> >          * including v4.1 to v4.6).
-> 
-> It's up to 4.12. :)
+On 23 June 2017 at 13:48, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> The following changes since commit 4c8c1cc544dbd5e2564868e61c5037258e393832:
+>
+>   Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-2.10-pull-request' into staging (2017-06-22 19:01:58 +0100)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/queue/misc-pull-request
+>
+> for you to fetch changes up to 1b8274d4f926836a4c773c310318e6039c4794a1:
+>
+>   applesmc: fix port i/o access width (2017-06-23 13:35:01 +0200)
+>
+> ----------------------------------------------------------------
+>
+> ----------------------------------------------------------------
+>
+> Gabriel L. Somlo (3):
+>   applesmc: cosmetic whitespace and indentation cleanup
+>   applesmc: implement error status port
+>   applesmc: fix port i/o access width
+>
+>  hw/misc/applesmc.c | 219 +++++++++++++++++++++++++++++++++++++----------------
+>  1 file changed, 155 insertions(+), 64 deletions(-)
 
-Thanks for the tip, I will update the comment.  :)
+Applied, thanks.
 
--- 
-Eduardo
+-- PMM
