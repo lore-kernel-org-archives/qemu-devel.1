@@ -1,17 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORM9-0001PL-VF
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:51 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dORMC-0001SY-Ji
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORM8-0007lU-Qt
+	(envelope-from <rth7680@gmail.com>) id 1dORM9-0007mI-SD
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:52 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:35811)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dORM9-0007l3-Nn
 	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:49 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 23 Jun 2017 18:21:29 +0200
-Message-Id: <1498234919-27316-32-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
-References: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 31/61] qed: Make qed_copy_from_backing_file()
- synchronous
+Received: by mail-qk0-x241.google.com with SMTP id 16so6823290qkg.2
+	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 09:22:48 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Date: Fri, 23 Jun 2017 09:22:27 -0700
+Message-Id: <20170623162241.8964-2-rth@twiddle.net>
+In-Reply-To: <20170623162241.8964-1-rth@twiddle.net>
+References: <20170623162241.8964-1-rth@twiddle.net>
+Subject: [Qemu-devel] [PULL 01/15] target/s390x: Map existing FAC_* names to
+ S390_FEAT_* names
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,123 +27,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-Note that this code is generally not running in coroutine context, so
-this is an actual blocking synchronous operation. We'll fix this in a
-moment.
+The FAC_ names were placeholders prior to the introduction
+of the current facility modeling.
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
+Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- block/qed.c | 78 +++++++++++++++++++++++--------------------------------------
- 1 file changed, 29 insertions(+), 49 deletions(-)
+ target/s390x/translate.c | 59 ++++++++++++++++++++++++------------------------
+ 1 file changed, 29 insertions(+), 30 deletions(-)
 
-diff --git a/block/qed.c b/block/qed.c
-index 1105f19..af53b8f 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -854,44 +854,6 @@ static int qed_read_backing_file(BDRVQEDState *s, uint64_t pos,
-     return 0;
- }
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 6403542..5a00279 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -1180,39 +1180,10 @@ typedef enum {
+     EXIT_NORETURN,
+ } ExitStatus;
  
--typedef struct {
--    GenericCB gencb;
--    BDRVQEDState *s;
--    QEMUIOVector qiov;
--    QEMUIOVector *backing_qiov;
--    struct iovec iov;
--    uint64_t offset;
--} CopyFromBackingFileCB;
+-typedef enum DisasFacility {
+-    FAC_Z,                  /* zarch (default) */
+-    FAC_CASS,               /* compare and swap and store */
+-    FAC_CASS2,              /* compare and swap and store 2*/
+-    FAC_DFP,                /* decimal floating point */
+-    FAC_DFPR,               /* decimal floating point rounding */
+-    FAC_DO,                 /* distinct operands */
+-    FAC_EE,                 /* execute extensions */
+-    FAC_EI,                 /* extended immediate */
+-    FAC_FPE,                /* floating point extension */
+-    FAC_FPSSH,              /* floating point support sign handling */
+-    FAC_FPRGR,              /* FPR-GR transfer */
+-    FAC_GIE,                /* general instructions extension */
+-    FAC_HFP_MA,             /* HFP multiply-and-add/subtract */
+-    FAC_HW,                 /* high-word */
+-    FAC_IEEEE_SIM,          /* IEEE exception sumilation */
+-    FAC_MIE,                /* miscellaneous-instruction-extensions */
+-    FAC_LAT,                /* load-and-trap */
+-    FAC_LOC,                /* load/store on condition */
+-    FAC_LD,                 /* long displacement */
+-    FAC_PC,                 /* population count */
+-    FAC_SCF,                /* store clock fast */
+-    FAC_SFLE,               /* store facility list extended */
+-    FAC_ILA,                /* interlocked access facility 1 */
+-    FAC_LPP,                /* load-program-parameter */
+-    FAC_DAT_ENH,            /* DAT-enhancement */
+-    FAC_E2,                 /* extended-translation facility 2 */
+-} DisasFacility;
 -
--static void qed_copy_from_backing_file_cb(void *opaque, int ret)
--{
--    CopyFromBackingFileCB *copy_cb = opaque;
--    qemu_vfree(copy_cb->iov.iov_base);
--    gencb_complete(&copy_cb->gencb, ret);
--}
--
--static void qed_copy_from_backing_file_write(void *opaque, int ret)
--{
--    CopyFromBackingFileCB *copy_cb = opaque;
--    BDRVQEDState *s = copy_cb->s;
--
--    if (copy_cb->backing_qiov) {
--        qemu_iovec_destroy(copy_cb->backing_qiov);
--        g_free(copy_cb->backing_qiov);
--        copy_cb->backing_qiov = NULL;
--    }
--
--    if (ret) {
--        qed_copy_from_backing_file_cb(copy_cb, ret);
--        return;
--    }
--
--    BLKDBG_EVENT(s->bs->file, BLKDBG_COW_WRITE);
--    bdrv_aio_writev(s->bs->file, copy_cb->offset / BDRV_SECTOR_SIZE,
--                    &copy_cb->qiov, copy_cb->qiov.size / BDRV_SECTOR_SIZE,
--                    qed_copy_from_backing_file_cb, copy_cb);
--}
--
- /**
-  * Copy data from backing file into the image
-  *
-@@ -907,7 +869,9 @@ static void qed_copy_from_backing_file(BDRVQEDState *s, uint64_t pos,
-                                        BlockCompletionFunc *cb,
-                                        void *opaque)
- {
--    CopyFromBackingFileCB *copy_cb;
-+    QEMUIOVector qiov;
-+    QEMUIOVector *backing_qiov = NULL;
-+    struct iovec iov;
-     int ret;
+ struct DisasInsn {
+     unsigned opc:16;
+     DisasFormat fmt:8;
+-    DisasFacility fac:8;
++    unsigned fac:8;
+     unsigned spec:8;
  
-     /* Skip copy entirely if there is no work to do */
-@@ -916,17 +880,33 @@ static void qed_copy_from_backing_file(BDRVQEDState *s, uint64_t pos,
-         return;
-     }
+     const char *name;
+@@ -5418,6 +5389,34 @@ enum DisasInsnEnum {
+ #define SPEC_prep_0 0
+ #define SPEC_wout_0 0
  
--    copy_cb = gencb_alloc(sizeof(*copy_cb), cb, opaque);
--    copy_cb->s = s;
--    copy_cb->offset = offset;
--    copy_cb->backing_qiov = NULL;
--    copy_cb->iov.iov_base = qemu_blockalign(s->bs, len);
--    copy_cb->iov.iov_len = len;
--    qemu_iovec_init_external(&copy_cb->qiov, &copy_cb->iov, 1);
-+    iov = (struct iovec) {
-+        .iov_base = qemu_blockalign(s->bs, len),
-+        .iov_len = len,
-+    };
-+    qemu_iovec_init_external(&qiov, &iov, 1);
++/* Give smaller names to the various facilities.  */
++#define FAC_Z           S390_FEAT_ZARCH
++#define FAC_CASS        S390_FEAT_COMPARE_AND_SWAP_AND_STORE
++#define FAC_CASS2       S390_FEAT_COMPARE_AND_SWAP_AND_STORE_2
++#define FAC_DFP         S390_FEAT_DFP
++#define FAC_DFPR        S390_FEAT_FLOATING_POINT_SUPPPORT_ENH /* DFP-rounding */
++#define FAC_DO          S390_FEAT_STFLE_45 /* distinct-operands */
++#define FAC_EE          S390_FEAT_EXECUTE_EXT
++#define FAC_EI          S390_FEAT_EXTENDED_IMMEDIATE
++#define FAC_FPE         S390_FEAT_FLOATING_POINT_EXT
++#define FAC_FPSSH       S390_FEAT_FLOATING_POINT_SUPPPORT_ENH /* FPS-sign-handling */
++#define FAC_FPRGR       S390_FEAT_FLOATING_POINT_SUPPPORT_ENH /* FPR-GR-transfer */
++#define FAC_GIE         S390_FEAT_GENERAL_INSTRUCTIONS_EXT
++#define FAC_HFP_MA      S390_FEAT_HFP_MADDSUB
++#define FAC_HW          S390_FEAT_STFLE_45 /* high-word */
++#define FAC_IEEEE_SIM   S390_FEAT_FLOATING_POINT_SUPPPORT_ENH /* IEEE-exception-simulation */
++#define FAC_MIE         S390_FEAT_STFLE_49 /* misc-instruction-extensions */
++#define FAC_LAT         S390_FEAT_STFLE_49 /* load-and-trap */
++#define FAC_LOC         S390_FEAT_STFLE_45 /* load/store on condition 1 */
++#define FAC_LD          S390_FEAT_LONG_DISPLACEMENT
++#define FAC_PC          S390_FEAT_STFLE_45 /* population count */
++#define FAC_SCF         S390_FEAT_STORE_CLOCK_FAST
++#define FAC_SFLE        S390_FEAT_STFLE
++#define FAC_ILA         S390_FEAT_STFLE_45 /* interlocked-access-facility 1 */
++#define FAC_LPP         S390_FEAT_SET_PROGRAM_PARAMETERS /* load-program-parameter */
++#define FAC_DAT_ENH     S390_FEAT_DAT_ENH
++#define FAC_E2          S390_FEAT_EXTENDED_TRANSLATION_2
 +
-+    ret = qed_read_backing_file(s, pos, &qiov, &backing_qiov);
-+
-+    if (backing_qiov) {
-+        qemu_iovec_destroy(backing_qiov);
-+        g_free(backing_qiov);
-+        backing_qiov = NULL;
-+    }
-+
-+    if (ret) {
-+        goto out;
-+    }
- 
--    ret = qed_read_backing_file(s, pos, &copy_cb->qiov,
--                                &copy_cb->backing_qiov);
--    qed_copy_from_backing_file_write(copy_cb, ret);
-+    BLKDBG_EVENT(s->bs->file, BLKDBG_COW_WRITE);
-+    ret = bdrv_pwritev(s->bs->file, offset, &qiov);
-+    if (ret < 0) {
-+        goto out;
-+    }
-+    ret = 0;
-+out:
-+    qemu_vfree(iov.iov_base);
-+    cb(opaque, ret);
- }
- 
- /**
+ static const DisasInsn insn_info[] = {
+ #include "insn-data.def"
+ };
 -- 
-1.8.3.1
+2.9.4
