@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dOROf-0003ur-7Q
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:25:27 -0400
+	(envelope-from <berrange@redhat.com>) id 1dOROg-0003xb-Ck
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:25:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dOROZ-0001O0-Ns
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:25:20 -0400
+	(envelope-from <berrange@redhat.com>) id 1dOROa-0001OX-De
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:25:22 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Fri, 23 Jun 2017 17:24:14 +0100
-Message-Id: <20170623162419.26068-16-berrange@redhat.com>
+Date: Fri, 23 Jun 2017 17:24:13 +0100
+Message-Id: <20170623162419.26068-15-berrange@redhat.com>
 In-Reply-To: <20170623162419.26068-1-berrange@redhat.com>
 References: <20170623162419.26068-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v10 15/20] iotests: enable tests 134 and 158 to
- work with qcow (v1)
+Subject: [Qemu-devel] [PATCH v10 14/20] qcow2: add iotests to cover LUKS
+ encryption support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +23,353 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-The 138 and 158 iotests exercise the legacy qcow2 aes encryption
-code path and they work fine with qcow v1 too.
+This extends the 087 iotest to cover LUKS encryption when doing
+blockdev-add.
+
+Two further tests are added to validate read/write of LUKS
+encrypted images with a single file and with a backing file.
 
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- tests/qemu-iotests/134 | 2 +-
- tests/qemu-iotests/158 | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/087     | 35 ++++++++++++++++++-
+ tests/qemu-iotests/087.out | 14 +++++++-
+ tests/qemu-iotests/188     | 76 ++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/188.out | 18 ++++++++++
+ tests/qemu-iotests/189     | 86 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/189.out | 26 ++++++++++++++
+ tests/qemu-iotests/group   |  2 ++
+ 7 files changed, 255 insertions(+), 2 deletions(-)
+ create mode 100755 tests/qemu-iotests/188
+ create mode 100644 tests/qemu-iotests/188.out
+ create mode 100755 tests/qemu-iotests/189
+ create mode 100644 tests/qemu-iotests/189.out
 
-diff --git a/tests/qemu-iotests/134 b/tests/qemu-iotests/134
-index f851d92..9914415 100755
---- a/tests/qemu-iotests/134
-+++ b/tests/qemu-iotests/134
-@@ -37,7 +37,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
- . ./common.rc
- . ./common.filter
+diff --git a/tests/qemu-iotests/087 b/tests/qemu-iotests/087
+index 1d595b2..f8e4903 100755
+--- a/tests/qemu-iotests/087
++++ b/tests/qemu-iotests/087
+@@ -119,7 +119,7 @@ run_qemu <<EOF
+ EOF
  
--_supported_fmt qcow2
-+_supported_fmt qcow qcow2
- _supported_proto generic
- _unsupported_proto vxhs
- _supported_os Linux
-diff --git a/tests/qemu-iotests/158 b/tests/qemu-iotests/158
-index e280b79..823c120 100755
---- a/tests/qemu-iotests/158
-+++ b/tests/qemu-iotests/158
-@@ -37,7 +37,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
- . ./common.rc
- . ./common.filter
+ echo
+-echo === Encrypted image ===
++echo === Encrypted image QCow ===
+ echo
  
--_supported_fmt qcow2
-+_supported_fmt qcow qcow2
- _supported_proto generic
- _unsupported_proto vxhs
- _supported_os Linux
+ _make_test_img --object secret,id=sec0,data=123456 -o encryption=on,encrypt.key-secret=sec0 $size
+@@ -152,6 +152,39 @@ run_qemu <<EOF
+ EOF
+ 
+ echo
++echo === Encrypted image LUKS ===
++echo
++
++_make_test_img --object secret,id=sec0,data=123456 -o encrypt.format=luks,encrypt.key-secret=sec0 $size
++run_qemu <<EOF
++{ "execute": "qmp_capabilities" }
++{ "execute": "object-add",
++  "arguments": {
++      "qom-type": "secret",
++      "id": "sec0",
++      "props": {
++          "data": "123456"
++      }
++  }
++}
++{ "execute": "blockdev-add",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "node-name": "disk",
++      "file": {
++          "driver": "file",
++          "filename": "$TEST_IMG"
++      },
++      "encrypt": {
++        "format": "luks",
++        "key-secret": "sec0"
++      }
++    }
++  }
++{ "execute": "quit" }
++EOF
++
++echo
+ echo === Missing driver ===
+ echo
+ 
+diff --git a/tests/qemu-iotests/087.out b/tests/qemu-iotests/087.out
+index 69e4c3b..b1318c6 100644
+--- a/tests/qemu-iotests/087.out
++++ b/tests/qemu-iotests/087.out
+@@ -32,7 +32,7 @@ QMP_VERSION
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ 
+ 
+-=== Encrypted image ===
++=== Encrypted image QCow ===
+ 
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on encrypt.key-secret=sec0
+ Testing:
+@@ -44,6 +44,18 @@ QMP_VERSION
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ 
+ 
++=== Encrypted image LUKS ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encrypt.format=luks encrypt.key-secret=sec0
++Testing:
++QMP_VERSION
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++
++
+ === Missing driver ===
+ 
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on encrypt.key-secret=sec0
+diff --git a/tests/qemu-iotests/188 b/tests/qemu-iotests/188
+new file mode 100755
+index 0000000..83ed03e
+--- /dev/null
++++ b/tests/qemu-iotests/188
+@@ -0,0 +1,76 @@
++#!/bin/bash
++#
++# Test encrypted read/write using plain bdrv_read/bdrv_write
++#
++# Copyright (C) 2017 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=berrange@redhat.com
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++here=`pwd`
++status=1	# failure is the default!
++
++_cleanup()
++{
++	_cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
++_supported_fmt qcow2
++_supported_proto generic
++_supported_os Linux
++
++
++size=16M
++
++SECRET="secret,id=sec0,data=astrochicken"
++SECRETALT="secret,id=sec0,data=platypus"
++
++_make_test_img --object $SECRET -o "encrypt.format=luks,encrypt.key-secret=sec0,encrypt.iter-time=10" $size
++
++IMGSPEC="driver=$IMGFMT,file.filename=$TEST_IMG,encrypt.key-secret=sec0"
++
++QEMU_IO_OPTIONS=$QEMU_IO_OPTIONS_NO_FMT
++
++echo
++echo "== reading whole image =="
++$QEMU_IO --object $SECRET -c "read -P 0 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
++
++echo
++echo "== rewriting whole image =="
++$QEMU_IO --object $SECRET -c "write -P 0xa 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
++
++echo
++echo "== verify pattern =="
++$QEMU_IO --object $SECRET -c "read -P 0xa 0 $size"  --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
++
++echo
++echo "== verify open failure with wrong password =="
++$QEMU_IO --object $SECRETALT -c "read -P 0xa 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
++
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/188.out b/tests/qemu-iotests/188.out
+new file mode 100644
+index 0000000..8af24e5
+--- /dev/null
++++ b/tests/qemu-iotests/188.out
+@@ -0,0 +1,18 @@
++QA output created by 188
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216 encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10
++
++== reading whole image ==
++read 16777216/16777216 bytes at offset 0
++16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== rewriting whole image ==
++wrote 16777216/16777216 bytes at offset 0
++16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== verify pattern ==
++read 16777216/16777216 bytes at offset 0
++16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== verify open failure with wrong password ==
++can't open: Invalid password, cannot unlock any keyslot
++*** done
+diff --git a/tests/qemu-iotests/189 b/tests/qemu-iotests/189
+new file mode 100755
+index 0000000..54ad980
+--- /dev/null
++++ b/tests/qemu-iotests/189
+@@ -0,0 +1,86 @@
++#!/bin/bash
++#
++# Test encrypted read/write using backing files
++#
++# Copyright (C) 2017 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=berrange@redhat.com
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++here=`pwd`
++status=1	# failure is the default!
++
++_cleanup()
++{
++	_cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
++_supported_fmt qcow2
++_supported_proto generic
++_supported_os Linux
++
++
++size=16M
++TEST_IMG_BASE=$TEST_IMG.base
++SECRET0="secret,id=sec0,data=astrochicken"
++SECRET1="secret,id=sec1,data=furby"
++
++TEST_IMG_SAVE=$TEST_IMG
++TEST_IMG=$TEST_IMG_BASE
++echo "== create base =="
++_make_test_img --object $SECRET0 -o "encrypt.format=luks,encrypt.key-secret=sec0,encrypt.iter-time=10" $size
++TEST_IMG=$TEST_IMG_SAVE
++
++IMGSPECBASE="driver=$IMGFMT,file.filename=$TEST_IMG_BASE,encrypt.key-secret=sec0"
++IMGSPEC="driver=$IMGFMT,file.filename=$TEST_IMG,backing.driver=$IMGFMT,backing.file.filename=$TEST_IMG_BASE,backing.encrypt.key-secret=sec0,encrypt.key-secret=sec1"
++QEMU_IO_OPTIONS=$QEMU_IO_OPTIONS_NO_FMT
++
++echo
++echo "== writing whole image =="
++$QEMU_IO --object $SECRET0 -c "write -P 0xa 0 $size" --image-opts $IMGSPECBASE | _filter_qemu_io | _filter_testdir
++
++echo
++echo "== verify pattern =="
++$QEMU_IO --object $SECRET0 -c "read -P 0xa 0 $size" --image-opts $IMGSPECBASE | _filter_qemu_io | _filter_testdir
++
++echo "== create overlay =="
++_make_test_img --object $SECRET1 -o "encrypt.format=luks,encrypt.key-secret=sec1,encrypt.iter-time=10" -b "$TEST_IMG_BASE" $size
++
++echo
++echo "== writing part of a cluster =="
++$QEMU_IO --object $SECRET0 --object $SECRET1 -c "write -P 0xe 0 1024" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
++
++echo
++echo "== verify pattern =="
++$QEMU_IO --object $SECRET0 --object $SECRET1 -c "read -P 0xe 0 1024" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
++echo
++echo "== verify pattern =="
++$QEMU_IO --object $SECRET0 --object $SECRET1 -c "read -P 0xa 1024 64512" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
++
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/189.out b/tests/qemu-iotests/189.out
+new file mode 100644
+index 0000000..a0b7c9c
+--- /dev/null
++++ b/tests/qemu-iotests/189.out
+@@ -0,0 +1,26 @@
++QA output created by 189
++== create base ==
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=16777216 encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10
++
++== writing whole image ==
++wrote 16777216/16777216 bytes at offset 0
++16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== verify pattern ==
++read 16777216/16777216 bytes at offset 0
++16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++== create overlay ==
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216 backing_file=TEST_DIR/t.IMGFMT.base encrypt.format=luks encrypt.key-secret=sec1 encrypt.iter-time=10
++
++== writing part of a cluster ==
++wrote 1024/1024 bytes at offset 0
++1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== verify pattern ==
++read 1024/1024 bytes at offset 0
++1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== verify pattern ==
++read 64512/64512 bytes at offset 1024
++63 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 318ae74..613d596 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -176,3 +176,5 @@
+ 182 rw auto quick
+ 183 rw auto migration
+ 185 rw auto
++188 rw auto quick
++189 rw auto quick
 -- 
 2.9.3
