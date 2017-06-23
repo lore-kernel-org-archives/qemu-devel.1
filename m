@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1dOOEa-0003Tw-HW
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 09:02:49 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dOOIb-0005gZ-Hk
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 09:06:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1dOOEW-0001m2-Di
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 09:02:48 -0400
-Received: from mail-wr0-f170.google.com ([209.85.128.170]:33650)
+	(envelope-from <stefanha@gmail.com>) id 1dOOIY-0003ZC-Ed
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 09:06:57 -0400
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:35890)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1dOOEW-0001lo-7r
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 09:02:44 -0400
-Received: by mail-wr0-f170.google.com with SMTP id r103so65098022wrb.0
-	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 06:02:44 -0700 (PDT)
-From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
-Date: Fri, 23 Jun 2017 15:02:37 +0200
-Message-Id: <56b491683542b03a5d4b6c1bf805eda8e06404ec.1498222907.git.tgolembi@redhat.com>
-In-Reply-To: <cover.1498222907.git.tgolembi@redhat.com>
-References: <cover.1498222907.git.tgolembi@redhat.com>
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dOOIY-0003Yt-5q
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 09:06:54 -0400
+Received: by mail-wr0-x231.google.com with SMTP id c11so65115853wrc.3
+	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 06:06:54 -0700 (PDT)
+Date: Fri, 23 Jun 2017 14:06:50 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170623130650.GD14304@stefanha-x1.localdomain>
+References: <20170621122234.12751-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC 3/3] qemu-ga: add support for periodic command
- runner
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="4zI0WCX1RcnW9Hbu"
+Content-Disposition: inline
+In-Reply-To: <20170621122234.12751-1-kraxel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] sdl2: add assert to make coverity happy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-This adds a support for periodicaly triggering arbitrary command
-reporting its output.
 
-Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
----
- qga/main.c          | 26 ++++++++++++++++++++++++++
- qga/qapi-event.json | 17 +++++++++++++++++
- 2 files changed, 43 insertions(+)
+--4zI0WCX1RcnW9Hbu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/qga/main.c b/qga/main.c
-index a9586e7513..612a6646e4 100644
---- a/qga/main.c
-+++ b/qga/main.c
-@@ -715,6 +715,32 @@ static gboolean monitoring_cb(gpointer data)
-             g_warning("error sending event: %s", strerror(-ret));
-         }
-     }
-+
-+    /* Run arbitrary command */
-+    const char *command = "guest-get-users";
-+    QDict *args = qdict_new();
-+
-+    QmpCommand *cmd = qmp_find_command(&ga_commands, command);
-+    g_assert(cmd);
-+    g_assert(cmd->fn);
-+    QObject *ret;
-+    qmp_marshal_guest_get_users(args, &ret, &err);
-+    QDECREF(args);
-+    if (err) {
-+        goto fail;
-+    }
-+    qapi_event_send_guest_monitor_command(command, ret, &err);
-+
-+    if (queued_event) {
-+        int ret;
-+        ret = send_response(s, QOBJECT(queued_event));
-+        QDECREF(queued_event);
-+        queued_event = NULL;
-+        if (ret < 0) {
-+            g_warning("error sending event: %s", strerror(-ret));
-+        }
-+    }
-+
-     goto ok;
- 
- fail:
-diff --git a/qga/qapi-event.json b/qga/qapi-event.json
-index 3d48ddb214..e31ea0f0e9 100644
---- a/qga/qapi-event.json
-+++ b/qga/qapi-event.json
-@@ -16,3 +16,20 @@
- #
- ##
- { 'event': 'GUEST_HEARTBEAT', 'data': { 'free-ram': 'size' } }
-+
-+##
-+# @GUEST_MONITOR_COMMAND:
-+#
-+# Run periodicaly arbitrary command and return it's result.
-+#
-+# @command: The executed command.
-+# @return: Returned value.
-+#
-+# Since: 2.10
-+#
-+# Example:
-+#
-+# TODO
-+#
-+##
-+{ 'event': 'GUEST_MONITOR_COMMAND', 'data': { 'command': 'str', 'return': 'any' } }
--- 
-2.13.1
+On Wed, Jun 21, 2017 at 02:22:34PM +0200, Gerd Hoffmann wrote:
+> There is a loop a few lines up counting consoles and setting
+> sdl2_num_outputs accordingly, so con ptr can't be NULL there.
+>=20
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  ui/sdl2.c | 1 +
+>  1 file changed, 1 insertion(+)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--4zI0WCX1RcnW9Hbu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZTRJqAAoJEJykq7OBq3PIJ4kIAKhhrCCnJiwhT4VFGOLh/tI1
+FnTHDkuAJCLuJcy+oQn7CJLlmsm2FEUDZY35hkfy3+ylvyzNvfwTqeQJHVHHeuXq
+jvj5c1aPIaUfGmBiZj4rOjwGde6J/nJpkXYaYL0bZYu0npneU5JP1jj1UbZznVyk
+tajazEgb3+2GpybTFlivXq5gs9tUjDNiCHUAcIk01wlbRK7K1KbjTxw0pUlXCmPV
++Cu/rnMa4tF+lkhw+Dz7+0rg3myrAZB//GiJuU5tRoPPMrlbHK9J7FK1i/+d4XW0
+jQfADqkDbhvu2JeCntLJrpomCDwCLUSNW6eS/GhSb6UA/p7+PRNyTXAWdY5Th0U=
+=Y+e4
+-----END PGP SIGNATURE-----
+
+--4zI0WCX1RcnW9Hbu--
