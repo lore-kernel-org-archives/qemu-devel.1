@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dONmv-0003m6-9D
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 08:34:14 -0400
+	(envelope-from <frederic.konrad@adacore.com>) id 1dONni-00048v-Ni
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 08:35:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dONmu-0006xw-D6
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 08:34:13 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:35723)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dONmu-0006wU-5x
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 08:34:12 -0400
-Received: by mail-wr0-x231.google.com with SMTP id k67so63639167wrc.2
-	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 05:34:12 -0700 (PDT)
+	(envelope-from <frederic.konrad@adacore.com>) id 1dONnf-0007Lj-K4
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 08:35:02 -0400
+Received: from mel.act-europe.fr ([194.98.77.210]:35963
+	helo=smtp.eu.adacore.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+	id 1dONnf-0007LL-An
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 08:34:59 -0400
+References: <1497462353-3432-1-git-send-email-edgar.iglesias@gmail.com>
+	<CAFEAcA9OibH=kz7iTc95YBgHM1WGOdHRYSsudx=OfaBHHZbJrg@mail.gmail.com>
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-ID: <2126be25-144e-f4a6-ef50-a053f905ab62@adacore.com>
+Date: Fri, 23 Jun 2017 14:34:52 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170623103945.7014-1-kraxel@redhat.com>
-References: <20170623103945.7014-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 23 Jun 2017 13:33:50 +0100
-Message-ID: <CAFEAcA-EQLykP6pAd4r=ZW=z1AEkXsgDr2gSFyx1i6Kt+2m_pA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/7] Ui and input 20170623 patches
+In-Reply-To: <CAFEAcA9OibH=kz7iTc95YBgHM1WGOdHRYSsudx=OfaBHHZbJrg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: fr
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v1 0/7] MMIO Exec pull request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +30,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: Edgar Iglesias <edgar.iglesias@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?S09OUkFEIEZyw6lkw6lyaWM=?= <fred.konrad@greensocs.com>
 
-On 23 June 2017 at 11:39, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> The following changes since commit e18a639164e162b3a4f078ab60606cd2f163d934:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20170621-pull-request' into staging (2017-06-22 15:09:48 +0100)
->
-> are available in the git repository at:
->
->   git://git.kraxel.org/qemu tags/ui-and-input-20170623-pull-request
->
-> for you to fetch changes up to 6e24ee0c1e4b6c0c9c748acab77ecd113c942a4d:
->
->   ps2: reset queue in ps2_reset_keyboard (2017-06-23 11:51:50 +0200)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
 
-Applied, thanks.
 
--- PMM
+Le 06/23/2017 =C3=A0 12:54 PM, Peter Maydell a =C3=A9crit :
+> On 14 June 2017 at 18:45, Edgar E. Iglesias <edgar.iglesias@gmail.com> =
+wrote:
+>> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+>>
+>> Hi,
+>>
+>> Paolo suggested offline that we send a pull request for this series.
+>> Here it is, I've run it through my testsuite + tested the LQSPI testca=
+se
+>> on Zynq.
+>>
+>> Cheers,
+>> Edgar
+>>
+>> The following changes since commit 3f0602927b120a480b35dcf58cf6f95435b=
+3ae91:
+>>
+>>    Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm=
+-20170613' into staging (2017-06-13 15:49:07 +0100)
+>>
+>> are available in the git repository at:
+>>
+>>    git@github.com:edgarigl/qemu.git tags/edgar/mmio-exec.for-upstream
+>>
+>> for you to fetch changes up to 63ef40dd6bc6cfdae5fa67ccac1cb11e7a5161b=
+0:
+>>
+>>    xilinx_spips: allow mmio execution (2017-06-14 17:31:08 +0200)
+>>
+>> ----------------------------------------------------------------
+>> mmio-exec.for-upstream
+>>
+>> ----------------------------------------------------------------
+>> KONRAD Frederic (7):
+>>        cputlb: cleanup get_page_addr_code to use VICTIM_TLB_HIT
+>>        cputlb: move get_page_addr_code
+>>        cputlb: fix the way get_page_addr_code fills the tlb
+>>        qdev: add MemoryRegion property
+>>        introduce mmio_interface
+>>        exec: allow to get a pointer for some mmio memory region
+>>        xilinx_spips: allow mmio execution
+>=20
+> Hi Edgar -- since these patches have come via your tree they should
+> have your signed-off-by line, not just Fred's. They also seem to
+> still have all the V1->V2->V3 revision notes in the commit logs.
+>=20
+> I'd be happier with a reviewed-by: from somebody for the exec:
+> patch, if possible...
+>=20
+> thanks
+> -- PMM
+>=20
+
+Hi Peter,
+
+Actually if I remember right Edgar reviewed them but put the
+review-by tag in the cover letter.
+
+Thanks,
+Fred
