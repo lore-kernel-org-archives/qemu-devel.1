@@ -1,16 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORMA-0001PO-1M
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:51 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dORMC-0001Sa-KB
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORM9-0007lm-2k
+	(envelope-from <rth7680@gmail.com>) id 1dORM9-0007m7-NH
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:52 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:36262)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dORM9-0007m0-It
 	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:49 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 23 Jun 2017 18:21:31 +0200
-Message-Id: <1498234919-27316-34-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
-References: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 33/61] qed: Make qed_write_header() synchronous
+Received: by mail-qk0-x243.google.com with SMTP id r62so6800203qkf.3
+	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 09:22:49 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Date: Fri, 23 Jun 2017 09:22:28 -0700
+Message-Id: <20170623162241.8964-3-rth@twiddle.net>
+In-Reply-To: <20170623162241.8964-1-rth@twiddle.net>
+References: <20170623162241.8964-1-rth@twiddle.net>
+Subject: [Qemu-devel] [PULL 02/15] target/s390x: change PSW_SHIFT_KEY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,113 +26,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, David Hildenbrand <david@redhat.com>
 
-Note that this code is generally not running in coroutine context, so
-this is an actual blocking synchronous operation. We'll fix this in a
-moment.
+From: David Hildenbrand <david@redhat.com>
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Such shifts are usually used to easily extract the PSW KEY from the PSW
+mask, so let's avoid the confusing offset of 4.
+
+Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20170614133819.18480-2-david@redhat.com>
+Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- block/qed.c | 76 +++++++++++++++++++++++--------------------------------------
- 1 file changed, 29 insertions(+), 47 deletions(-)
+ target/s390x/cpu.h       | 2 +-
+ target/s390x/translate.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/qed.c b/block/qed.c
-index 658b31b..2665efc 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -92,41 +92,6 @@ int qed_write_header_sync(BDRVQEDState *s)
-     return 0;
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index a4028fb..532a4a0 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -315,7 +315,7 @@ void s390x_cpu_debug_excp_handler(CPUState *cs);
+ #define PSW_MASK_IO             0x0200000000000000ULL
+ #define PSW_MASK_EXT            0x0100000000000000ULL
+ #define PSW_MASK_KEY            0x00F0000000000000ULL
+-#define PSW_SHIFT_KEY           56
++#define PSW_SHIFT_KEY           52
+ #define PSW_MASK_MCHECK         0x0004000000000000ULL
+ #define PSW_MASK_WAIT           0x0002000000000000ULL
+ #define PSW_MASK_PSTATE         0x0001000000000000ULL
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 5a00279..6ebfb97 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -3753,7 +3753,7 @@ static ExitStatus op_spka(DisasContext *s, DisasOps *o)
+ {
+     check_privileged(s);
+     tcg_gen_shri_i64(o->in2, o->in2, 4);
+-    tcg_gen_deposit_i64(psw_mask, psw_mask, o->in2, PSW_SHIFT_KEY - 4, 4);
++    tcg_gen_deposit_i64(psw_mask, psw_mask, o->in2, PSW_SHIFT_KEY, 4);
+     return NO_EXIT;
  }
  
--typedef struct {
--    GenericCB gencb;
--    BDRVQEDState *s;
--    struct iovec iov;
--    QEMUIOVector qiov;
--    int nsectors;
--    uint8_t *buf;
--} QEDWriteHeaderCB;
--
--static void qed_write_header_cb(void *opaque, int ret)
--{
--    QEDWriteHeaderCB *write_header_cb = opaque;
--
--    qemu_vfree(write_header_cb->buf);
--    gencb_complete(write_header_cb, ret);
--}
--
--static void qed_write_header_read_cb(void *opaque, int ret)
--{
--    QEDWriteHeaderCB *write_header_cb = opaque;
--    BDRVQEDState *s = write_header_cb->s;
--
--    if (ret) {
--        qed_write_header_cb(write_header_cb, ret);
--        return;
--    }
--
--    /* Update header */
--    qed_header_cpu_to_le(&s->header, (QEDHeader *)write_header_cb->buf);
--
--    bdrv_aio_writev(s->bs->file, 0, &write_header_cb->qiov,
--                    write_header_cb->nsectors, qed_write_header_cb,
--                    write_header_cb);
--}
--
- /**
-  * Update header in-place (does not rewrite backing filename or other strings)
-  *
-@@ -144,18 +109,35 @@ static void qed_write_header(BDRVQEDState *s, BlockCompletionFunc cb,
- 
-     int nsectors = DIV_ROUND_UP(sizeof(QEDHeader), BDRV_SECTOR_SIZE);
-     size_t len = nsectors * BDRV_SECTOR_SIZE;
--    QEDWriteHeaderCB *write_header_cb = gencb_alloc(sizeof(*write_header_cb),
--                                                    cb, opaque);
--
--    write_header_cb->s = s;
--    write_header_cb->nsectors = nsectors;
--    write_header_cb->buf = qemu_blockalign(s->bs, len);
--    write_header_cb->iov.iov_base = write_header_cb->buf;
--    write_header_cb->iov.iov_len = len;
--    qemu_iovec_init_external(&write_header_cb->qiov, &write_header_cb->iov, 1);
--
--    bdrv_aio_readv(s->bs->file, 0, &write_header_cb->qiov, nsectors,
--                   qed_write_header_read_cb, write_header_cb);
-+    uint8_t *buf;
-+    struct iovec iov;
-+    QEMUIOVector qiov;
-+    int ret;
-+
-+    buf = qemu_blockalign(s->bs, len);
-+    iov = (struct iovec) {
-+        .iov_base = buf,
-+        .iov_len = len,
-+    };
-+    qemu_iovec_init_external(&qiov, &iov, 1);
-+
-+    ret = bdrv_preadv(s->bs->file, 0, &qiov);
-+    if (ret < 0) {
-+        goto out;
-+    }
-+
-+    /* Update header */
-+    qed_header_cpu_to_le(&s->header, (QEDHeader *) buf);
-+
-+    ret = bdrv_pwritev(s->bs->file, 0, &qiov);
-+    if (ret < 0) {
-+        goto out;
-+    }
-+
-+    ret = 0;
-+out:
-+    qemu_vfree(buf);
-+    cb(opaque, ret);
- }
- 
- static uint64_t qed_max_image_size(uint32_t cluster_size, uint32_t table_size)
 -- 
-1.8.3.1
+2.9.4
