@@ -1,23 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dORMQ-0001jm-0E
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:06 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dORMT-0001nR-5a
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dORMP-0007zV-6m
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:05 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:34577)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dORMP-0007zF-2p
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:05 -0400
-Received: by mail-qk0-x241.google.com with SMTP id 91so969772qkq.1
-	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 09:23:05 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 23 Jun 2017 09:22:40 -0700
-Message-Id: <20170623162241.8964-15-rth@twiddle.net>
-In-Reply-To: <20170623162241.8964-1-rth@twiddle.net>
-References: <20170623162241.8964-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 14/15] target/s390x: Improve heuristic for ipte
+	(envelope-from <kwolf@redhat.com>) id 1dORMS-00081T-1E
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:09 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Fri, 23 Jun 2017 18:21:42 +0200
+Message-Id: <1498234919-27316-45-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
+References: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL 44/61] qed: Add return value to
+ qed_aio_write_cow()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,57 +20,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, David Hildenbrand <david@redhat.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: David Hildenbrand <david@redhat.com>
+Don't recurse into qed_aio_next_io() and qed_aio_complete() here, but
+just return an error code and let the caller handle it.
 
-If only the page index is set, most likely we don't have a valid
-virtual address. Let's do a full tlb flush for that case.
+While refactoring qed_aio_write_alloc() to accomodate the change,
+qed_aio_write_zero_cluster() ended up with a single line, so I chose to
+inline that line and remove the function completely.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20170622094151.28633-3-david@redhat.com>
-Signed-off-by: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- target/s390x/mem_helper.c | 25 ++++++++++++++++---------
- 1 file changed, 16 insertions(+), 9 deletions(-)
+ block/qed.c | 58 +++++++++++++++++++++-------------------------------------
+ 1 file changed, 21 insertions(+), 37 deletions(-)
 
-diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 182c46f..20cef9a 100644
---- a/target/s390x/mem_helper.c
-+++ b/target/s390x/mem_helper.c
-@@ -1630,16 +1630,23 @@ void HELPER(ipte)(CPUS390XState *env, uint64_t pto, uint64_t vaddr,
-     /* XXX we exploit the fact that Linux passes the exact virtual
-        address here - it's not obliged to! */
-     if (m4 & 1) {
--        tlb_flush_page(cs, page);
--    } else {
--        tlb_flush_page_all_cpus_synced(cs, page);
+diff --git a/block/qed.c b/block/qed.c
+index a4b13f8..84864e0 100644
+--- a/block/qed.c
++++ b/block/qed.c
+@@ -1065,11 +1065,11 @@ static int qed_aio_write_main(QEDAIOCB *acb)
+ /**
+  * Populate untouched regions of new data cluster
+  */
+-static void qed_aio_write_cow(void *opaque, int ret)
++static int qed_aio_write_cow(QEDAIOCB *acb)
+ {
+-    QEDAIOCB *acb = opaque;
+     BDRVQEDState *s = acb_to_s(acb);
+     uint64_t start, len, offset;
++    int ret;
+ 
+     /* Populate front untouched region of new data cluster */
+     start = qed_start_of_cluster(s, acb->cur_pos);
+@@ -1077,9 +1077,8 @@ static void qed_aio_write_cow(void *opaque, int ret)
+ 
+     trace_qed_aio_write_prefill(s, acb, start, len, acb->cur_cluster);
+     ret = qed_copy_from_backing_file(s, start, len, acb->cur_cluster);
+-    if (ret) {
+-        qed_aio_complete(acb, ret);
+-        return;
++    if (ret < 0) {
++        return ret;
+     }
+ 
+     /* Populate back untouched region of new data cluster */
+@@ -1091,17 +1090,11 @@ static void qed_aio_write_cow(void *opaque, int ret)
+ 
+     trace_qed_aio_write_postfill(s, acb, start, len, offset);
+     ret = qed_copy_from_backing_file(s, start, len, offset);
+-    if (ret) {
+-        qed_aio_complete(acb, ret);
+-        return;
 -    }
 -
--    /* XXX 31-bit hack */
--    if (m4 & 1) {
--        tlb_flush_page(cs, page ^ 0x80000000);
-+        if (vaddr & ~VADDR_PX) {
-+            tlb_flush_page(cs, page);
-+            /* XXX 31-bit hack */
-+            tlb_flush_page(cs, page ^ 0x80000000);
-+        } else {
-+            /* looks like we don't have a valid virtual address */
-+            tlb_flush(cs);
-+        }
-     } else {
--        tlb_flush_page_all_cpus_synced(cs, page ^ 0x80000000);
-+        if (vaddr & ~VADDR_PX) {
-+            tlb_flush_page_all_cpus_synced(cs, page);
-+            /* XXX 31-bit hack */
-+            tlb_flush_page_all_cpus_synced(cs, page ^ 0x80000000);
-+        } else {
-+            /* looks like we don't have a valid virtual address */
-+            tlb_flush_all_cpus_synced(cs);
-+        }
+-    ret = qed_aio_write_main(acb);
+     if (ret < 0) {
+-        qed_aio_complete(acb, ret);
+-        return;
++        return ret;
      }
+-    qed_aio_next_io(acb, 0);
++
++    return qed_aio_write_main(acb);
  }
  
+ /**
+@@ -1117,23 +1110,6 @@ static bool qed_should_set_need_check(BDRVQEDState *s)
+     return !(s->header.features & QED_F_NEED_CHECK);
+ }
+ 
+-static void qed_aio_write_zero_cluster(void *opaque, int ret)
+-{
+-    QEDAIOCB *acb = opaque;
+-
+-    if (ret) {
+-        qed_aio_complete(acb, ret);
+-        return;
+-    }
+-
+-    ret = qed_aio_write_l2_update(acb, 1);
+-    if (ret < 0) {
+-        qed_aio_complete(acb, ret);
+-        return;
+-    }
+-    qed_aio_next_io(acb, 0);
+-}
+-
+ /**
+  * Write new data cluster
+  *
+@@ -1145,7 +1121,6 @@ static void qed_aio_write_zero_cluster(void *opaque, int ret)
+ static void qed_aio_write_alloc(QEDAIOCB *acb, size_t len)
+ {
+     BDRVQEDState *s = acb_to_s(acb);
+-    BlockCompletionFunc *cb;
+     int ret;
+ 
+     /* Cancel timer when the first allocating request comes in */
+@@ -1172,20 +1147,29 @@ static void qed_aio_write_alloc(QEDAIOCB *acb, size_t len)
+             qed_aio_start_io(acb);
+             return;
+         }
+-
+-        cb = qed_aio_write_zero_cluster;
+     } else {
+-        cb = qed_aio_write_cow;
+         acb->cur_cluster = qed_alloc_clusters(s, acb->cur_nclusters);
+     }
+ 
+     if (qed_should_set_need_check(s)) {
+         s->header.features |= QED_F_NEED_CHECK;
+         ret = qed_write_header(s);
+-        cb(acb, ret);
++        if (ret < 0) {
++            qed_aio_complete(acb, ret);
++            return;
++        }
++    }
++
++    if (acb->flags & QED_AIOCB_ZERO) {
++        ret = qed_aio_write_l2_update(acb, 1);
+     } else {
+-        cb(acb, 0);
++        ret = qed_aio_write_cow(acb);
+     }
++    if (ret < 0) {
++        qed_aio_complete(acb, ret);
++        return;
++    }
++    qed_aio_next_io(acb, 0);
+ }
+ 
+ /**
 -- 
-2.9.4
+1.8.3.1
