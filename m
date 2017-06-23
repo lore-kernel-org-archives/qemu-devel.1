@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dOGVP-0006Dp-JF
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 00:47:40 -0400
+	(envelope-from <peterx@redhat.com>) id 1dOGVS-0006Ga-L3
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 00:47:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dOGVO-0001Ne-BD
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 00:47:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50120)
+	(envelope-from <peterx@redhat.com>) id 1dOGVR-0001P7-PL
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 00:47:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56756)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dOGVO-0001N9-2Q
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 00:47:38 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dOGVR-0001Oq-GF
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 00:47:41 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 03FCF3DEE4
-	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 04:47:37 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6BD04723B8
+	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 04:47:40 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Fri, 23 Jun 2017 12:46:45 +0800
-Message-Id: <1498193206-18007-10-git-send-email-peterx@redhat.com>
+Date: Fri, 23 Jun 2017 12:46:46 +0800
+Message-Id: <1498193206-18007-11-git-send-email-peterx@redhat.com>
 In-Reply-To: <1498193206-18007-1-git-send-email-peterx@redhat.com>
 References: <1498193206-18007-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 09/10] migration: merge
- enforce_config_section somewhat
+Subject: [Qemu-devel] [PATCH v5 10/10] migration: hmp: dump globals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,100 +32,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-These two parameters:
+Now we have some globals that can be configured for migration. Dump them
+in HMP info migration for better debugging.
 
-- MachineState::enforce_config_section
-- MigrationState::send_configuration
-
-are playing similar role here. This patch merges the first one into
-second, then we'll have a single place to reference whether we need to
-send the configuration section.
-
-I didn't remove the MachineState.enforce_config_section field since when
-applying that machine property (in machine_set_property()) we haven't
-yet initialized global properties and migration object. Then, it's
-still not easy to pass that boolean to MigrationState at such an early
-time.
-
-A natural benefit for current patch is that now we kept the meaning of
-"enforce-config-section" since it'll still have the highest
-priority (that's what "enforce" mean I guess).
+(we can also use this to monitor whether COMPAT fields are applied
+correctly on compatible machines)
 
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/migration.c | 12 ++++++++++++
- migration/savevm.c    | 12 ++----------
- 2 files changed, 14 insertions(+), 10 deletions(-)
+ hmp.c                    |  3 +++
+ include/migration/misc.h |  1 +
+ migration/migration.c    | 11 +++++++++++
+ 3 files changed, 15 insertions(+)
 
+diff --git a/hmp.c b/hmp.c
+index 8c72c58..4c41cac 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -43,6 +43,7 @@
+ #include "exec/ramlist.h"
+ #include "hw/intc/intc.h"
+ #include "migration/snapshot.h"
++#include "migration/misc.h"
+ 
+ #ifdef CONFIG_SPICE
+ #include <spice/enums.h>
+@@ -164,6 +165,8 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+     info = qmp_query_migrate(NULL);
+     caps = qmp_query_migrate_capabilities(NULL);
+ 
++    migration_global_dump(mon);
++
+     /* do not display parameters during setup */
+     if (info->has_status && caps) {
+         monitor_printf(mon, "capabilities: ");
+diff --git a/include/migration/misc.h b/include/migration/misc.h
+index 854c28d..2255121 100644
+--- a/include/migration/misc.h
++++ b/include/migration/misc.h
+@@ -54,5 +54,6 @@ bool migration_has_failed(MigrationState *);
+ /* ...and after the device transmission */
+ bool migration_in_postcopy_after_devices(MigrationState *);
+ void migration_only_migratable_set(void);
++void migration_global_dump(Monitor *mon);
+ 
+ #endif
 diff --git a/migration/migration.c b/migration/migration.c
-index 96c6412..e7e6cf3 100644
+index e7e6cf3..b1b0825 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -42,6 +42,7 @@
- #include "exec/target_page.h"
+@@ -43,6 +43,7 @@
  #include "io/channel-buffer.h"
  #include "migration/colo.h"
-+#include "hw/boards.h"
+ #include "hw/boards.h"
++#include "monitor/monitor.h"
  
  #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed throttling */
  
-@@ -102,9 +103,20 @@ static MigrationState *current_migration;
- 
- void migration_object_init(void)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+
-     /* This can only be called once. */
-     assert(!current_migration);
-     current_migration = MIGRATION_OBJ(object_new(TYPE_MIGRATION));
-+
-+    /*
-+     * We cannot really do this in migration_instance_init() since at
-+     * that time global properties are not yet applied, then this
-+     * value will be definitely replaced by something else.
-+     */
-+    if (ms->enforce_config_section) {
-+        current_migration->send_configuration = true;
-+    }
+@@ -1993,6 +1994,16 @@ void migrate_fd_connect(MigrationState *s)
+     s->migration_thread_running = true;
  }
  
- /* For outgoing */
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 28fa1d5..6b1a9a5 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -943,20 +943,13 @@ bool qemu_savevm_state_blocked(Error **errp)
-     return false;
- }
- 
--static bool enforce_config_section(void)
--{
--    MachineState *machine = MACHINE(qdev_get_machine());
--    return machine->enforce_config_section;
--}
--
- void qemu_savevm_state_header(QEMUFile *f)
- {
-     trace_savevm_state_header();
-     qemu_put_be32(f, QEMU_VM_FILE_MAGIC);
-     qemu_put_be32(f, QEMU_VM_FILE_VERSION);
- 
--    if (migrate_get_current()->send_configuration ||
--        enforce_config_section()) {
-+    if (migrate_get_current()->send_configuration) {
-         qemu_put_byte(f, QEMU_VM_CONFIGURATION);
-         vmstate_save_state(f, &vmstate_configuration, &savevm_state, 0);
-     }
-@@ -1980,8 +1973,7 @@ int qemu_loadvm_state(QEMUFile *f)
-         return -ENOTSUP;
-     }
- 
--    if (migrate_get_current()->send_configuration ||
--        enforce_config_section()) {
-+    if (migrate_get_current()->send_configuration) {
-         if (qemu_get_byte(f) != QEMU_VM_CONFIGURATION) {
-             error_report("Configuration section missing");
-             return -EINVAL;
++void migration_global_dump(Monitor *mon)
++{
++    MigrationState *ms = migrate_get_current();
++
++    monitor_printf(mon, "globals: store-global-state=%d, only_migratable=%d, "
++                   "send-configuration=%d, send-section-footer=%d\n",
++                   ms->store_global_state, ms->only_migratable,
++                   ms->send_configuration, ms->send_section_footer);
++}
++
+ static Property migration_properties[] = {
+     DEFINE_PROP_BOOL("store-global-state", MigrationState,
+                      store_global_state, true),
 -- 
 2.7.4
