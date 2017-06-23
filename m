@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dOXmx-0007SD-KM
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 19:14:56 -0400
+	(envelope-from <xiyou.wangcong@gmail.com>) id 1dOX8Q-0007Ct-7E
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 18:33:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dOXmu-0002da-FT
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 19:14:55 -0400
-Resent-Message-Id: <E1dOXmu-0002da-FT@eggs.gnu.org>
-In-Reply-To: <20170623220926.11479-1-jsnow@redhat.com>
-Message-ID: <149825968049.8353.1370758997886637898@4a9a010726c0>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <xiyou.wangcong@gmail.com>) id 1dOX8P-0000yI-BE
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 18:33:02 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:33776)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <xiyou.wangcong@gmail.com>)
+	id 1dOX8P-0000vC-5S
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 18:33:01 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id r103so83091782wrb.0
+	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 15:32:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 23 Jun 2017 16:14:41 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/3] AHCI: re-privatize ahci headers
+In-Reply-To: <4f6d4342-8476-882e-e7a8-b3f0ebd20d95@redhat.com>
+References: <d2e8cf65-ea3d-7db2-9382-a063daf1168a@gmail.com>
+	<20170605050423-mutt-send-email-mst@kernel.org>
+	<20170606024211-mutt-send-email-mst@kernel.org>
+	<CAOTcU=u_HSMQiwDF3Snv5P8mT-b_Aepeb=Z9gbLd1j=2P+Yy+A@mail.gmail.com>
+	<20170622215125-mutt-send-email-mst@kernel.org>
+	<4f6d4342-8476-882e-e7a8-b3f0ebd20d95@redhat.com>
+From: Cong Wang <xiyou.wangcong@gmail.com>
+Date: Fri, 23 Jun 2017 15:32:37 -0700
+Message-ID: <CAM_iQpXhW___-iP3kdv9MJcW=hroyp2SuMzAZdx3KCpc9-W76g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] BUG: KASAN: use-after-free in free_old_xmit_skbs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,43 +34,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jsnow@redhat.com
-Cc: famz@redhat.com, qemu-block@nongnu.org, f4bug@amsat.org, qemu-devel@nongnu.org
+To: Jason Wang <jasowang@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, jean-philippe menil <jpmenil@gmail.com>, Linux Kernel Network Developers <netdev@vger.kernel.org>, John Fastabend <john.fastabend@gmail.com>, virtualization@lists.linux-foundation.org, qemu-devel Developers <qemu-devel@nongnu.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC8zXSBBSENJOiByZS1wcml2YXRpemUgYWhjaSBo
-ZWFkZXJzCk1lc3NhZ2UtaWQ6IDIwMTcwNjIzMjIwOTI2LjExNDc5LTEtanNub3dAcmVkaGF0LmNv
-bQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0
-b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBj
-b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-cmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRC
-QVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRu
-LyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQg
-c2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJh
-Y2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgo
-bisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGlu
-ZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEg
-bmV3IGJyYW5jaCAndGVzdCcKZGNiNTAwNyBhaGNpOiBzcGxpdCBwdWJsaWMgYW5kIHByaXZhdGUg
-aW50ZXJmYWNlCmNhYmQxMTYgYWhjaTogSXNvbGF0ZSBwdWJsaWMgQUhDSSBpbnRlcmZhY2UKZDcy
-M2RhOCBhaGNpOiBhZGQgYWhjaV9nZXRfbnVtX3BvcnRzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpD
-aGVja2luZyBQQVRDSCAxLzM6IGFoY2k6IGFkZCBhaGNpX2dldF9udW1fcG9ydHMuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMi8zOiBhaGNpOiBJc29sYXRlIHB1YmxpYyBBSENJIGludGVyZmFjZS4uLgpFUlJP
-Ujogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcvJyAoY3R4OlZ4VikKIzIxNDogRklMRTog
-aW5jbHVkZS9ody9pZGUvYWhjaV9wdWJsaWMuaDo4ODoKKyAgICB1aW50MzJfdCByZWdzW0FMTFdJ
-Tk5FUl9BSENJX01NSU9fU0laRS80XTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIF4KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTg5IGxpbmVzIGNoZWNr
-ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENI
-IDMvMzogYWhjaTogc3BsaXQgcHVibGljIGFuZCBwcml2YXRlIGludGVyZmFjZS4uLgpFUlJPUjog
-c3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcvJyAoY3R4OlZ4VikKIzc5MzogRklMRTogaW5j
-bHVkZS9ody9pZGUvYWhjaS5oOjg4OgorICAgIHVpbnQzMl90IHJlZ3NbQUxMV0lOTkVSX0FIQ0lf
-TU1JT19TSVpFLzRdOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-XgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA3NjAgbGluZXMgY2hlY2tlZAoKWW91ciBw
-YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
-ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
-IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
-IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On Fri, Jun 23, 2017 at 1:43 AM, Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> On 2017=E5=B9=B406=E6=9C=8823=E6=97=A5 02:53, Michael S. Tsirkin wrote:
+>>
+>> On Thu, Jun 22, 2017 at 08:15:58AM +0200, jean-philippe menil wrote:
+>>>
+>>> Hi Michael,
+>>>
+>>> from what i see, the race appear when we hit virtnet_reset in
+>>> virtnet_xdp_set.
+>>> virtnet_reset
+>>>    _remove_vq_common
+>>>      virtnet_del_vqs
+>>>        virtnet_free_queues
+>>>          kfree(vi->sq)
+>>> when the xdp program (with two instances of the program to trigger it
+>>> faster)
+>>> is added or removed.
+>>>
+>>> It's easily repeatable, with 2 cpus and 4 queues on the qemu command
+>>> line,
+>>> running the xdp_ttl tool from Jesper.
+>>>
+>>> For now, i'm able to continue my qualification, testing if xdp_qp is no=
+t
+>>> null,
+>>> but do not seem to be a sustainable trick.
+>>> if (xdp_qp && vi->xdp_queues_pairs !=3D xdp_qp)
+>>>
+>>> Maybe it will be more clear to you with theses informations.
+>>>
+>>> Best regards.
+>>>
+>>> Jean-Philippe
+>>
+>>
+>> I'm pretty clear about the issue here, I was trying to figure out a fix.
+>> Jason, any thoughts?
+>>
+>>
+>
+> Hi Jean:
+>
+> Does the following fix this issue? (I can't reproduce it locally through
+> xdp_ttl)
+
+It is tricky here.
+
+>From my understanding of the code base, the tx_lock is not sufficient
+here, because in virtnet_del_vqs() all vqs are deleted and one vp
+maps to one txq.
+
+I am afraid you have to add a spinlock somewhere to serialized
+free_old_xmit_skbs() vs. vring_del_virtqueue(). As you can see
+they are in different layers, so it is hard to figure out where to add
+it...
+
+Also, make sure we don't sleep inside the spinlock, I see a
+synchronize_net().
