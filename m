@@ -1,24 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dORMF-0001Vj-B9
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:56 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dORM8-0001Nu-Ut
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dORME-0007op-30
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:55 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:36268)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dORMD-0007ob-VD
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:54 -0400
-Received: by mail-qk0-x244.google.com with SMTP id r62so6800429qkf.3
-	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 09:22:53 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 23 Jun 2017 09:22:31 -0700
-Message-Id: <20170623162241.8964-6-rth@twiddle.net>
-In-Reply-To: <20170623162241.8964-1-rth@twiddle.net>
-References: <20170623162241.8964-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 05/15] target/s390x: Implement
- load-on-condition-2 insns
+	(envelope-from <kwolf@redhat.com>) id 1dORM7-0007ku-PL
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:48 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Fri, 23 Jun 2017 18:21:28 +0200
+Message-Id: <1498234919-27316-31-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
+References: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL 30/61] qed: Make qed_read_backing_file()
+ synchronous
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,100 +20,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
-Signed-off-by: Richard Henderson <rth@twiddle.net>
+Note that this code is generally not running in coroutine context, so
+this is an actual blocking synchronous operation. We'll fix this in a
+moment.
+
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- target/s390x/insn-data.def   |  9 +++++++++
- target/s390x/insn-format.def |  1 +
- target/s390x/translate.c     | 18 +++++++++++++++---
- 3 files changed, 25 insertions(+), 3 deletions(-)
+ block/qed.c | 32 ++++++++++++++++++--------------
+ 1 file changed, 18 insertions(+), 14 deletions(-)
 
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index aa4c5b2..c8ad4da 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -514,6 +514,13 @@
-     C(0xb9e2, LOCGR,   RRF_c, LOC, r1, r2, r1, 0, loc, 0)
-     C(0xebf2, LOC,     RSY_b, LOC, r1, m2_32u, new, r1_32, loc, 0)
-     C(0xebe2, LOCG,    RSY_b, LOC, r1, m2_64, r1, 0, loc, 0)
-+/* LOAD HALFWORD IMMEDIATE ON CONDITION */
-+    C(0xec42, LOCHI,   RIE_g, LOC2, r1, i2, new, r1_32, loc, 0)
-+    C(0xec46, LOCGHI,  RIE_g, LOC2, r1, i2, r1, 0, loc, 0)
-+    C(0xec4e, LOCHHI,  RIE_g, LOC2, r1_sr32, i2, new, r1_32h, loc, 0)
-+/* LOAD HIGH ON CONDITION */
-+    C(0xb9e0, LOCFHR,  RRF_c, LOC2, r1_sr32, r2, new, r1_32h, loc, 0)
-+    C(0xebe0, LOCFH,   RSY_b, LOC2, r1_sr32, m2_32u, new, r1_32h, loc, 0)
- /* LOAD PAIR DISJOINT */
-     D(0xc804, LPD,     SSF,   ILA, 0, 0, new_P, r3_P32, lpd, 0, MO_TEUL)
-     D(0xc805, LPDG,    SSF,   ILA, 0, 0, new_P, r3_P64, lpd, 0, MO_TEQ)
-@@ -779,6 +786,8 @@
- /* STORE ON CONDITION */
-     D(0xebf3, STOC,    RSY_b, LOC, 0, 0, 0, 0, soc, 0, 0)
-     D(0xebe3, STOCG,   RSY_b, LOC, 0, 0, 0, 0, soc, 0, 1)
-+/* STORE HIGH ON CONDITION */
-+    D(0xebe1, STOCFH,  RSY_b, LOC2, 0, 0, 0, 0, soc, 0, 2)
- /* STORE REVERSED */
-     C(0xe33f, STRVH,   RXY_a, Z,   la2, r1_16u, new, m1_16, rev16, 0)
-     C(0xe33e, STRV,    RXY_a, Z,   la2, r1_32u, new, m1_32, rev32, 0)
-diff --git a/target/s390x/insn-format.def b/target/s390x/insn-format.def
-index 0e898b9..a412d90 100644
---- a/target/s390x/insn-format.def
-+++ b/target/s390x/insn-format.def
-@@ -11,6 +11,7 @@ F4(RIE_c, R(1, 8),     I(2,32, 8),  M(3,12),   I(4,16,16))
- F3(RIE_d, R(1, 8),     I(2,16,16),  R(3,12))
- F3(RIE_e, R(1, 8),     I(2,16,16),  R(3,12))
- F5(RIE_f, R(1, 8),     R(2,12),     I(3,16,8), I(4,24,8),  I(5,32,8))
-+F3(RIE_g, R(1, 8),     I(2,16,16),  M(3,12))
- F2(RIL_a, R(1, 8),     I(2,16,32))
- F2(RIL_b, R(1, 8),     I(2,16,32))
- F2(RIL_c, M(1, 8),     I(2,16,32))
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 802ccd9..9932afb 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -3641,7 +3641,7 @@ static ExitStatus op_sigp(DisasContext *s, DisasOps *o)
- static ExitStatus op_soc(DisasContext *s, DisasOps *o)
+diff --git a/block/qed.c b/block/qed.c
+index 290cbcd..1105f19 100644
+--- a/block/qed.c
++++ b/block/qed.c
+@@ -808,13 +808,13 @@ static BDRVQEDState *acb_to_s(QEDAIOCB *acb)
+  * This function reads qiov->size bytes starting at pos from the backing file.
+  * If there is no backing file then zeroes are read.
+  */
+-static void qed_read_backing_file(BDRVQEDState *s, uint64_t pos,
+-                                  QEMUIOVector *qiov,
+-                                  QEMUIOVector **backing_qiov,
+-                                  BlockCompletionFunc *cb, void *opaque)
++static int qed_read_backing_file(BDRVQEDState *s, uint64_t pos,
++                                 QEMUIOVector *qiov,
++                                 QEMUIOVector **backing_qiov)
  {
-     DisasCompare c;
--    TCGv_i64 a;
-+    TCGv_i64 a, h;
-     TCGLabel *lab;
-     int r1;
+     uint64_t backing_length = 0;
+     size_t size;
++    int ret;
  
-@@ -3661,10 +3661,21 @@ static ExitStatus op_soc(DisasContext *s, DisasOps *o)
- 
-     r1 = get_field(s->fields, r1);
-     a = get_address(s, 0, get_field(s->fields, b2), get_field(s->fields, d2));
--    if (s->insn->data) {
-+    switch (s->insn->data) {
-+    case 1: /* STOCG */
-         tcg_gen_qemu_st64(regs[r1], a, get_mem_index(s));
--    } else {
-+        break;
-+    case 0: /* STOC */
-         tcg_gen_qemu_st32(regs[r1], a, get_mem_index(s));
-+        break;
-+    case 2: /* STOCFH */
-+        h = tcg_temp_new_i64();
-+        tcg_gen_shri_i64(h, regs[r1], 32);
-+        tcg_gen_qemu_st32(h, a, get_mem_index(s));
-+        tcg_temp_free_i64(h);
-+        break;
-+    default:
-+        g_assert_not_reached();
+     /* If there is a backing file, get its length.  Treat the absence of a
+      * backing file like a zero length backing file.
+@@ -822,8 +822,7 @@ static void qed_read_backing_file(BDRVQEDState *s, uint64_t pos,
+     if (s->bs->backing) {
+         int64_t l = bdrv_getlength(s->bs->backing->bs);
+         if (l < 0) {
+-            cb(opaque, l);
+-            return;
++            return l;
+         }
+         backing_length = l;
      }
-     tcg_temp_free_i64(a);
+@@ -836,8 +835,7 @@ static void qed_read_backing_file(BDRVQEDState *s, uint64_t pos,
  
-@@ -5416,6 +5427,7 @@ enum DisasInsnEnum {
- #define FAC_MIE         S390_FEAT_STFLE_49 /* misc-instruction-extensions */
- #define FAC_LAT         S390_FEAT_STFLE_49 /* load-and-trap */
- #define FAC_LOC         S390_FEAT_STFLE_45 /* load/store on condition 1 */
-+#define FAC_LOC2        S390_FEAT_STFLE_53 /* load/store on condition 2 */
- #define FAC_LD          S390_FEAT_LONG_DISPLACEMENT
- #define FAC_PC          S390_FEAT_STFLE_45 /* population count */
- #define FAC_SCF         S390_FEAT_STORE_CLOCK_FAST
+     /* Complete now if there are no backing file sectors to read */
+     if (pos >= backing_length) {
+-        cb(opaque, 0);
+-        return;
++        return 0;
+     }
+ 
+     /* If the read straddles the end of the backing file, shorten it */
+@@ -849,8 +847,11 @@ static void qed_read_backing_file(BDRVQEDState *s, uint64_t pos,
+     qemu_iovec_concat(*backing_qiov, qiov, 0, size);
+ 
+     BLKDBG_EVENT(s->bs->file, BLKDBG_READ_BACKING_AIO);
+-    bdrv_aio_readv(s->bs->backing, pos / BDRV_SECTOR_SIZE,
+-                   *backing_qiov, size / BDRV_SECTOR_SIZE, cb, opaque);
++    ret = bdrv_preadv(s->bs->backing, pos, *backing_qiov);
++    if (ret < 0) {
++        return ret;
++    }
++    return 0;
+ }
+ 
+ typedef struct {
+@@ -907,6 +908,7 @@ static void qed_copy_from_backing_file(BDRVQEDState *s, uint64_t pos,
+                                        void *opaque)
+ {
+     CopyFromBackingFileCB *copy_cb;
++    int ret;
+ 
+     /* Skip copy entirely if there is no work to do */
+     if (len == 0) {
+@@ -922,8 +924,9 @@ static void qed_copy_from_backing_file(BDRVQEDState *s, uint64_t pos,
+     copy_cb->iov.iov_len = len;
+     qemu_iovec_init_external(&copy_cb->qiov, &copy_cb->iov, 1);
+ 
+-    qed_read_backing_file(s, pos, &copy_cb->qiov, &copy_cb->backing_qiov,
+-                          qed_copy_from_backing_file_write, copy_cb);
++    ret = qed_read_backing_file(s, pos, &copy_cb->qiov,
++                                &copy_cb->backing_qiov);
++    qed_copy_from_backing_file_write(copy_cb, ret);
+ }
+ 
+ /**
+@@ -1366,8 +1369,9 @@ static void qed_aio_read_data(void *opaque, int ret,
+         qed_aio_start_io(acb);
+         return;
+     } else if (ret != QED_CLUSTER_FOUND) {
+-        qed_read_backing_file(s, acb->cur_pos, &acb->cur_qiov,
+-                              &acb->backing_qiov, qed_aio_next_io_cb, acb);
++        ret = qed_read_backing_file(s, acb->cur_pos, &acb->cur_qiov,
++                                    &acb->backing_qiov);
++        qed_aio_next_io(acb, ret);
+         return;
+     }
+ 
 -- 
-2.9.4
+1.8.3.1
