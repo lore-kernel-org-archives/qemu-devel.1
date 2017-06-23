@@ -1,26 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37489)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dOOIb-0005gZ-Hk
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 09:06:58 -0400
+	(envelope-from <frederic.konrad@adacore.com>) id 1dOOJH-0006aK-2N
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 09:07:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dOOIY-0003ZC-Ed
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 09:06:57 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:35890)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dOOIY-0003Yt-5q
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 09:06:54 -0400
-Received: by mail-wr0-x231.google.com with SMTP id c11so65115853wrc.3
-	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 06:06:54 -0700 (PDT)
-Date: Fri, 23 Jun 2017 14:06:50 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170623130650.GD14304@stefanha-x1.localdomain>
-References: <20170621122234.12751-1-kraxel@redhat.com>
+	(envelope-from <frederic.konrad@adacore.com>) id 1dOOJD-0003vz-SV
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 09:07:39 -0400
+Received: from mel.act-europe.fr ([194.98.77.210]:39007
+	helo=smtp.eu.adacore.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+	id 1dOOJD-0003vO-J4
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 09:07:35 -0400
+References: <1488276185-31168-1-git-send-email-fred.konrad@greensocs.com>
+	<b690a50d-4ab3-830c-93a3-5f2b4b027448@greensocs.com>
+	<CAFEAcA94RykH0U33F0aGEYRs_FXF_NNuwQAX_mOf4wVde0s9BQ@mail.gmail.com>
+	<1db78209-e426-03b5-9a19-592da96adaee@greensocs.com>
+	<CAFEAcA-pmVW-fnu6ZT=PeRcSf-U5UVsyYsJkzh2c_BFKDTU5kg@mail.gmail.com>
+	<d0a7ebb7-9f3d-5b3c-692e-344f4a980c05@redhat.com>
+	<CAFEAcA_BkOaRCs1tm2dv+mYZj4yaNTg7VhR2C-NAQGAhw1wazA@mail.gmail.com>
+	<20170615145742.GF4859@toto>
+	<CAFEAcA-zhur3vO8G_CPQuyEU3p7e81cixiZ58sFs96e+av4Mbg@mail.gmail.com>
+	<20170615151530.GC12347@toto>
+	<CAFEAcA-ZzVGJ+ueZXLuhtkMk=42QGhpJiu5PNZ7DAGXJf3hvXA@mail.gmail.com>
+	<209d2c8f-fd46-0a6f-17ac-b4f53f47c43e@adacore.com>
+	<CAFEAcA9VtPd72=HW3uMvdc5xzv+zLj_KS=WDBjau563iT9UHNA@mail.gmail.com>
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-ID: <3871c989-d00e-c2fb-4e62-18624114ada4@adacore.com>
+Date: Fri, 23 Jun 2017 15:07:31 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="4zI0WCX1RcnW9Hbu"
-Content-Disposition: inline
-In-Reply-To: <20170621122234.12751-1-kraxel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] sdl2: add assert to make coverity happy
+In-Reply-To: <CAFEAcA9VtPd72=HW3uMvdc5xzv+zLj_KS=WDBjau563iT9UHNA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: fr
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 00/10] Clock framework API.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +41,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Mark Burton <mark.burton@greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, KONRAD Frederic <fred.konrad@greensocs.com>
 
 
---4zI0WCX1RcnW9Hbu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 21, 2017 at 02:22:34PM +0200, Gerd Hoffmann wrote:
-> There is a loop a few lines up counting consoles and setting
-> sdl2_num_outputs accordingly, so con ptr can't be NULL there.
+Le 06/23/2017 =C3=A0 02:47 PM, Peter Maydell a =C3=A9crit :
+> On 23 June 2017 at 13:38, KONRAD Frederic <frederic.konrad@adacore.com>=
+ wrote:
+>> Le 06/23/2017 =C3=A0 11:51 AM, Peter Maydell a =C3=A9crit :
+>>> As an aside, I still find it very odd that you get a clock
+>>> object for both an input clock and an output clock. I feel
+>>> like we should have one end owns the clock object and the
+>>> other just has a reference to it of some kind.
+>>
+>>
+>> The point is beeing able to bind/unbind clocks inside the device
+>> to model a clock selector for example. So you just bind/unbind
+>> the input and output clocks.
 >=20
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  ui/sdl2.c | 1 +
->  1 file changed, 1 insertion(+)
+> I don't see why this needs both 'input clock' and 'output
+> clock' to be separate objects. What I have in mind is:
+>=20
+> Device A:
+>    has-a clock C1
+>=20
+> Device B:
+>    has-a clock C2
+>=20
+> Device C: (a clock selector)
+>    clock inputs CI1, CI2
+>    has-a clock C3
+>=20
+> Each device "owns" its output clock objects, but input
+> clocks are just pointers to the clock object owned by the
+> device at the other end. In the board you wire up CI1 to C1,
+> and CI2 to C2 (using link properties I guess).
+> Then in device C you can implement the clock switching by
+> some kind of bind(s->CI1, &s->C3) call because you have
+> pointers to all the relevant clock objects.
+>=20
+> As I understand it your current implementation makes not
+> just the output clocks C1 C2 C2 be clock objects, but also
+> the inputs CI1 CI2, so effectively each link from a clock
+> source to a clock sink has two objects involved.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Yes that makes sense but you won't have the name.
 
---4zI0WCX1RcnW9Hbu
-Content-Type: application/pgp-signature; name="signature.asc"
+And one other thing I wanted to have is beeing able to refresh
+the clock tree without refreshing everything. If you start a
+refresh from the "pointer" and it is bind to other things you
+will refresh the other devices as well. Maybe we don't care or we
+can workaround that but..
 
------BEGIN PGP SIGNATURE-----
+Fred
 
-iQEcBAEBAgAGBQJZTRJqAAoJEJykq7OBq3PIJ4kIAKhhrCCnJiwhT4VFGOLh/tI1
-FnTHDkuAJCLuJcy+oQn7CJLlmsm2FEUDZY35hkfy3+ylvyzNvfwTqeQJHVHHeuXq
-jvj5c1aPIaUfGmBiZj4rOjwGde6J/nJpkXYaYL0bZYu0npneU5JP1jj1UbZznVyk
-tajazEgb3+2GpybTFlivXq5gs9tUjDNiCHUAcIk01wlbRK7K1KbjTxw0pUlXCmPV
-+Cu/rnMa4tF+lkhw+Dz7+0rg3myrAZB//GiJuU5tRoPPMrlbHK9J7FK1i/+d4XW0
-jQfADqkDbhvu2JeCntLJrpomCDwCLUSNW6eS/GhSb6UA/p7+PRNyTXAWdY5Th0U=
-=Y+e4
------END PGP SIGNATURE-----
-
---4zI0WCX1RcnW9Hbu--
+>=20
+> thanks
+> -- PMM
+>=20
