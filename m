@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORMT-0001nw-KJ
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:11 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dORMJ-0001az-GM
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORMS-00081y-EK
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:09 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dORMI-0007rx-EQ
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:59 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 23 Jun 2017 18:21:44 +0200
-Message-Id: <1498234919-27316-47-git-send-email-kwolf@redhat.com>
+Date: Fri, 23 Jun 2017 18:21:37 +0200
+Message-Id: <1498234919-27316-40-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
 References: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 46/61] qed: Add return value to
- qed_aio_read/write_data()
+Subject: [Qemu-devel] [PULL 39/61] qed: Make qed_aio_write_main() synchronous
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,189 +22,113 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-Don't recurse into qed_aio_next_io() and qed_aio_complete() here, but
-just return an error code and let the caller handle it.
+Note that this code is generally not running in coroutine context, so
+this is an actual blocking synchronous operation. We'll fix this in a
+moment.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/qed.c | 72 ++++++++++++++++++++++++++-----------------------------------
- block/qed.h | 21 ------------------
- 2 files changed, 31 insertions(+), 62 deletions(-)
+ block/qed.c | 61 +++++++++++++++++++------------------------------------------
+ 1 file changed, 19 insertions(+), 42 deletions(-)
 
 diff --git a/block/qed.c b/block/qed.c
-index 4c8ba4a..6f83831 100644
+index cfebbae..d164b0e 100644
 --- a/block/qed.c
 +++ b/block/qed.c
-@@ -1205,13 +1205,12 @@ static int qed_aio_write_inplace(QEDAIOCB *acb, uint64_t offset, size_t len)
-  * Write data cluster
-  *
-  * @opaque:     Write request
-- * @ret:        QED_CLUSTER_FOUND, QED_CLUSTER_L2, QED_CLUSTER_L1,
-- *              or -errno
-+ * @ret:        QED_CLUSTER_FOUND, QED_CLUSTER_L2 or QED_CLUSTER_L1
-  * @offset:     Cluster offset in bytes
-  * @len:        Length in bytes
-  */
--static void qed_aio_write_data(void *opaque, int ret,
--                               uint64_t offset, size_t len)
-+static int qed_aio_write_data(void *opaque, int ret,
-+                              uint64_t offset, size_t len)
- {
-     QEDAIOCB *acb = opaque;
- 
-@@ -1221,40 +1220,27 @@ static void qed_aio_write_data(void *opaque, int ret,
- 
-     switch (ret) {
-     case QED_CLUSTER_FOUND:
--        ret = qed_aio_write_inplace(acb, offset, len);
--        break;
-+        return qed_aio_write_inplace(acb, offset, len);
- 
-     case QED_CLUSTER_L2:
-     case QED_CLUSTER_L1:
-     case QED_CLUSTER_ZERO:
--        ret = qed_aio_write_alloc(acb, len);
--        break;
-+        return qed_aio_write_alloc(acb, len);
- 
-     default:
--        assert(ret < 0);
--        break;
--    }
--
--    if (ret < 0) {
--        if (ret != -EINPROGRESS) {
--            qed_aio_complete(acb, ret);
--        }
--        return;
-+        g_assert_not_reached();
-     }
--    qed_aio_next_io(acb, 0);
+@@ -260,13 +260,6 @@ static void qed_aio_start_io(QEDAIOCB *acb)
+     qed_aio_next_io(acb, 0);
  }
  
- /**
-  * Read data cluster
-  *
-  * @opaque:     Read request
-- * @ret:        QED_CLUSTER_FOUND, QED_CLUSTER_L2, QED_CLUSTER_L1,
-- *              or -errno
-+ * @ret:        QED_CLUSTER_FOUND, QED_CLUSTER_L2 or QED_CLUSTER_L1
-  * @offset:     Cluster offset in bytes
-  * @len:        Length in bytes
-  */
--static void qed_aio_read_data(void *opaque, int ret,
--                              uint64_t offset, size_t len)
-+static int qed_aio_read_data(void *opaque, int ret, uint64_t offset, size_t len)
+-static void qed_aio_next_io_cb(void *opaque, int ret)
+-{
+-    QEDAIOCB *acb = opaque;
+-
+-    qed_aio_next_io(acb, ret);
+-}
+-
+ static void qed_plug_allocating_write_reqs(BDRVQEDState *s)
  {
-     QEDAIOCB *acb = opaque;
-     BDRVQEDState *s = acb_to_s(acb);
-@@ -1265,34 +1251,23 @@ static void qed_aio_read_data(void *opaque, int ret,
- 
-     trace_qed_aio_read_data(s, acb, ret, offset, len);
- 
--    if (ret < 0) {
--        goto err;
--    }
--
-     qemu_iovec_concat(&acb->cur_qiov, acb->qiov, acb->qiov_offset, len);
- 
-     /* Handle zero cluster and backing file reads */
-     if (ret == QED_CLUSTER_ZERO) {
-         qemu_iovec_memset(&acb->cur_qiov, 0, 0, acb->cur_qiov.size);
--        qed_aio_start_io(acb);
--        return;
-+        return 0;
-     } else if (ret != QED_CLUSTER_FOUND) {
--        ret = qed_read_backing_file(s, acb->cur_pos, &acb->cur_qiov,
--                                    &acb->backing_qiov);
--        qed_aio_next_io(acb, ret);
--        return;
-+        return qed_read_backing_file(s, acb->cur_pos, &acb->cur_qiov,
-+                                     &acb->backing_qiov);
-     }
- 
-     BLKDBG_EVENT(bs->file, BLKDBG_READ_AIO);
-     ret = bdrv_preadv(bs->file, offset, &acb->cur_qiov);
-     if (ret < 0) {
--        goto err;
-+        return ret;
-     }
--    qed_aio_next_io(acb, 0);
--    return;
--
--err:
--    qed_aio_complete(acb, ret);
-+    return 0;
+     assert(!s->allocating_write_reqs_plugged);
+@@ -1042,31 +1035,6 @@ err:
+     qed_aio_complete(acb, ret);
  }
  
- /**
-@@ -1301,8 +1276,6 @@ err:
- static void qed_aio_next_io(QEDAIOCB *acb, int ret)
- {
-     BDRVQEDState *s = acb_to_s(acb);
--    QEDFindClusterFunc *io_fn = (acb->flags & QED_AIOCB_WRITE) ?
--                                qed_aio_write_data : qed_aio_read_data;
-     uint64_t offset;
-     size_t len;
- 
-@@ -1333,7 +1306,24 @@ static void qed_aio_next_io(QEDAIOCB *acb, int ret)
-     /* Find next cluster and start I/O */
-     len = acb->end_pos - acb->cur_pos;
-     ret = qed_find_cluster(s, &acb->request, acb->cur_pos, &len, &offset);
--    io_fn(acb, ret, offset, len);
-+    if (ret < 0) {
-+        qed_aio_complete(acb, ret);
-+        return;
-+    }
-+
-+    if (acb->flags & QED_AIOCB_WRITE) {
-+        ret = qed_aio_write_data(acb, ret, offset, len);
-+    } else {
-+        ret = qed_aio_read_data(acb, ret, offset, len);
-+    }
-+
-+    if (ret < 0) {
-+        if (ret != -EINPROGRESS) {
-+            qed_aio_complete(acb, ret);
-+        }
-+        return;
-+    }
-+    qed_aio_next_io(acb, 0);
- }
- 
- static BlockAIOCB *qed_aio_setup(BlockDriverState *bs,
-diff --git a/block/qed.h b/block/qed.h
-index 51443fa..8644fed 100644
---- a/block/qed.h
-+++ b/block/qed.h
-@@ -177,27 +177,6 @@ enum {
-     QED_CLUSTER_L1,            /* cluster missing in L1 */
- };
- 
+-static void qed_aio_write_l2_update_cb(void *opaque, int ret)
+-{
+-    QEDAIOCB *acb = opaque;
+-    qed_aio_write_l2_update(acb, ret, acb->cur_cluster);
+-}
+-
 -/**
-- * qed_find_cluster() completion callback
+- * Flush new data clusters before updating the L2 table
 - *
-- * @opaque:     User data for completion callback
-- * @ret:        QED_CLUSTER_FOUND   Success
-- *              QED_CLUSTER_L2      Data cluster unallocated in L2
-- *              QED_CLUSTER_L1      L2 unallocated in L1
-- *              -errno              POSIX error occurred
-- * @offset:     Data cluster offset
-- * @len:        Contiguous bytes starting from cluster offset
-- *
-- * This function is invoked when qed_find_cluster() completes.
-- *
-- * On success ret is QED_CLUSTER_FOUND and offset/len are a contiguous range
-- * in the image file.
-- *
-- * On failure ret is QED_CLUSTER_L2 or QED_CLUSTER_L1 for missing L2 or L1
-- * table offset, respectively.  len is number of contiguous unallocated bytes.
+- * This flush is necessary when a backing file is in use.  A crash during an
+- * allocating write could result in empty clusters in the image.  If the write
+- * only touched a subregion of the cluster, then backing image sectors have
+- * been lost in the untouched region.  The solution is to flush after writing a
+- * new data cluster and before updating the L2 table.
 - */
--typedef void QEDFindClusterFunc(void *opaque, int ret, uint64_t offset, size_t len);
+-static void qed_aio_write_flush_before_l2_update(void *opaque, int ret)
+-{
+-    QEDAIOCB *acb = opaque;
+-    BDRVQEDState *s = acb_to_s(acb);
 -
- void qed_acquire(BDRVQEDState *s);
- void qed_release(BDRVQEDState *s);
+-    if (!bdrv_aio_flush(s->bs->file->bs, qed_aio_write_l2_update_cb, opaque)) {
+-        qed_aio_complete(acb, -EIO);
+-    }
+-}
+-
+ /**
+  * Write data to the image file
+  */
+@@ -1076,7 +1044,6 @@ static void qed_aio_write_main(void *opaque, int ret)
+     BDRVQEDState *s = acb_to_s(acb);
+     uint64_t offset = acb->cur_cluster +
+                       qed_offset_into_cluster(s, acb->cur_pos);
+-    BlockCompletionFunc *next_fn;
  
+     trace_qed_aio_write_main(s, acb, ret, offset, acb->cur_qiov.size);
+ 
+@@ -1085,20 +1052,30 @@ static void qed_aio_write_main(void *opaque, int ret)
+         return;
+     }
+ 
++    BLKDBG_EVENT(s->bs->file, BLKDBG_WRITE_AIO);
++    ret = bdrv_pwritev(s->bs->file, offset, &acb->cur_qiov);
++    if (ret >= 0) {
++        ret = 0;
++    }
++
+     if (acb->find_cluster_ret == QED_CLUSTER_FOUND) {
+-        next_fn = qed_aio_next_io_cb;
++        qed_aio_next_io(acb, ret);
+     } else {
+         if (s->bs->backing) {
+-            next_fn = qed_aio_write_flush_before_l2_update;
+-        } else {
+-            next_fn = qed_aio_write_l2_update_cb;
++            /*
++             * Flush new data clusters before updating the L2 table
++             *
++             * This flush is necessary when a backing file is in use.  A crash
++             * during an allocating write could result in empty clusters in the
++             * image.  If the write only touched a subregion of the cluster,
++             * then backing image sectors have been lost in the untouched
++             * region.  The solution is to flush after writing a new data
++             * cluster and before updating the L2 table.
++             */
++            ret = bdrv_flush(s->bs->file->bs);
+         }
++        qed_aio_write_l2_update(acb, ret, acb->cur_cluster);
+     }
+-
+-    BLKDBG_EVENT(s->bs->file, BLKDBG_WRITE_AIO);
+-    bdrv_aio_writev(s->bs->file, offset / BDRV_SECTOR_SIZE,
+-                    &acb->cur_qiov, acb->cur_qiov.size / BDRV_SECTOR_SIZE,
+-                    next_fn, acb);
+ }
+ 
+ /**
 -- 
 1.8.3.1
