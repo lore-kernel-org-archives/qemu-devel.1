@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dOSzN-0001Ia-NR
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 14:07:27 -0400
+	(envelope-from <viniciusfre@gmail.com>) id 1dOT6g-0003MT-5g
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 14:14:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dOSzK-0003Yz-F5
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 14:07:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34444)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1dOSzK-0003Ya-5X
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 14:07:22 -0400
-References: <1498155182-27351-1-git-send-email-chugh.ishani@research.iiit.ac.in>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <9509537b-2984-db02-e8eb-084ec53e29a4@redhat.com>
-Date: Fri, 23 Jun 2017 14:07:17 -0400
+	(envelope-from <viniciusfre@gmail.com>) id 1dOT6e-0006kj-MH
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 14:14:58 -0400
+Received: from mail-vk0-x230.google.com ([2607:f8b0:400c:c05::230]:34828)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <viniciusfre@gmail.com>)
+	id 1dOT6e-0006kL-Gg
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 14:14:56 -0400
+Received: by mail-vk0-x230.google.com with SMTP id 191so17472382vko.2
+	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 11:14:55 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1498155182-27351-1-git-send-email-chugh.ishani@research.iiit.ac.in>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <CAEz5UgGWxLNg+3Qg02H9Mpzkpy=MwP8YFYamZ8LdxK1gMuWq=g@mail.gmail.com>
+References: <CAEz5UgEp8wRBxeg4nAAd9GVeihcXQv__jfrjQtnVNT8eTNCLOw@mail.gmail.com>
+	<20170513182814.ydpkjeekvvjf5rzo@aurel32.net>
+	<ecb7491d-6446-a9fa-49d1-f4aaade16470@amsat.org>
+	<CAEz5UgGWxLNg+3Qg02H9Mpzkpy=MwP8YFYamZ8LdxK1gMuWq=g@mail.gmail.com>
+From: Vinicius Maciel <viniciusfre@gmail.com>
+Date: Fri, 23 Jun 2017 15:14:53 -0300
+Message-ID: <CAEz5UgEQ1=RM2+v8ocUsZxA88jdk5Z+A0eo-G6=iD_CGoZQ2Sw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4] Add manpage for QEMU Backup Tool
+Subject: Re: [Qemu-devel] MIPS little endian - Bug when decoding physaddr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,237 +32,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ishani Chugh <chugh.ishani@research.iiit.ac.in>, qemu-devel@nongnu.org
-Cc: stefanha@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Aurelien Jarno <aurelien@aurel32.net>, qemu-devel@nongnu.org
+
+Hi everyone,
+
+I'm having a problem similar to the reported in this email, but now I'm
+trying to emulate a MIPS 24KEc,
+ralink RT5350F.
+
+Assembly Code:
+0x802006a0 <reset+672>: lui t5,0xb011
+0x802006a4 <reset+676>: ori t5,t5,0x168
+0x802006a8 <reset+680>: li t6,23
+0x802006ac <reset+684>: nop
+0x802006b0 <reset+688>: sw t6,0(t5) <---
+
+The instruction "sw t6,0(t5)" try to write to address 0xb0110168 (0x1011016=
+8),
+but Qemu decodes
+this address to 2952790112 (0xb0000060). Is this address right?
+
+Qemu Debug:
+#0  io_readx (env=3D0x5555566e4a78, iotlbentry=3D0x5555566ec348,
+addr=3D2952790112,
+    retaddr=3D140737129226144, size=3D4)
+    at /home/vini/projs/emuladores/qemu-routers/cputlb.c:786
+#1  0x00005555557c9a02 in io_readl (env=3D0x5555566e4a78, mmu_idx=3D0, inde=
+x=3D0,
+    addr=3D2952790112, retaddr=3D140737129226144)
+    at /home/vini/projs/emuladores/qemu-routers/softmmu_template.h:104
+#2  0x00005555557c9b89 in helper_le_ldul_mmu (env=3D0x5555566e4a78,
+addr=3D2952790112, <----
+    oi=3D32, retaddr=3D140737129226144)
+    at /home/vini/projs/emuladores/qemu-routers/softmmu_template.h:141
+#3  0x00007fffea982108 in code_gen_buffer ()
+
+Thanks.
 
 
+2017-05-13 19:10 GMT-03:00 Vinicius Maciel <viniciusfre@gmail.com>:
 
-On 06/22/2017 02:13 PM, Ishani Chugh wrote:
-> qemu-backup will be a command-line tool for performing full and increme=
-ntal disk backups on running VMs.  It is intended as a reference implemen=
-tation for management stack and backup developers to see QEMU's backup fe=
-atures in action. The following commit is an initial implementation of ma=
-npage listing the commands which the backup tool will support.
->=20
-
-Try wrapping your commit messages to about 72-73 columns or so.
-
-> Signed-off-by: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
-> ---
->  Makefile                        |   2 +-
->  contrib/backup/qemu-backup.texi | 132 ++++++++++++++++++++++++++++++++=
-++++++++
->  2 files changed, 133 insertions(+), 1 deletion(-)
->  create mode 100644 contrib/backup/qemu-backup.texi
->=20
-> diff --git a/Makefile b/Makefile
-> index c830d7a..094f291 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -504,7 +504,7 @@ clean:
->  VERSION ?=3D $(shell cat VERSION)
-> =20
->  dist: qemu-$(VERSION).tar.bz2
-> -
-
-It's OK to leave the newline in here.
-
-> +qemu-backup.8: contrib/backup/qemu-backup.texi
-
-What command do I need to invoke to actually build this? I guess it
-doesn't get build unless I type "make qemu-backup.8" explicitly. Maybe
-this should build with other manpage documents? (Unless Stefan told you
-not to?)
-
->  qemu-%.tar.bz2:
->  	$(SRC_PATH)/scripts/make-release "$(SRC_PATH)" "$(patsubst qemu-%.tar=
-.bz2,%,$@)"
-> =20
-> diff --git a/contrib/backup/qemu-backup.texi b/contrib/backup/qemu-back=
-up.texi
-> new file mode 100644
-> index 0000000..cdfad82
-> --- /dev/null
-> +++ b/contrib/backup/qemu-backup.texi
-> @@ -0,0 +1,132 @@
-> +\input texinfo
-> +@setfilename qemu-backup
-> +
-> +@documentlanguage en
-> +@documentencoding UTF-8
-> +
-> +@settitle QEMU Backup Tool
-
-The file I am seeing generated includes this line and nothing else
-afterwards.
-
-I am doing this:
-
-cd ~/src/qemu
-mkdir -p bin/git
-cd bin/git
-../../configure --enable-docs --target-list=3Dx86_64-softmmu
-make qemu-backup.8
-
-Then I am attempting to view the manual:
-man ./qemu-backup.8
-
-but it appears mostly blank, so I think we probably have the wrong
-syntax below. You can look at the intermediate file "qemu-backup.8.pod"
-and see that it is mostly empty.
-
-Am I doing this wrong?
-
-
-As an aside, a question for the list:
-
-Why are we using a perl script to convert texi->pod->man instead of just
-using something like pandoc directly?
-
-> +@copying
-> +
-> +Copyright @copyright{} 2017 The QEMU Project developers
-> +@end copying
-> +@ifinfo
-> +@direntry
-> +* QEMU: (QEMU-backup).    Man page for QEMU Backup Tool.
-> +@end direntry
-> +@end ifinfo
-> +@iftex
-> +@titlepage
-> +@sp 7
-> +@center @titlefont{QEMU Backup Tool}
-> +@sp 1
-> +@sp 3
-> +@end titlepage
-> +@end iftex
-> +@ifnottex
-> +@node Top
-> +@top Short Sample
-> +
-> +@menu
-> +* Name::
-> +* Synopsis::
-> +* list of Commands::
-> +* Command Parameters::
-> +* Command Descriptions::
-> +* License::
-> +@end menu
-> +
-> +@end ifnottex
-> +
-> +@node Name
-> +@chapter Name
-> +
-> +QEMU disk backup tool.
-> +
-> +@node Synopsis
-> +@chapter Synopsis
-> +
-> +qemu-backup command [ command options].
-> +
-> +@node  List of Commands
-> +@chapter  List of Commands
-> +@itemize
-> +@item qemu-backup guest add --guest guestname --qmp socketpath
-> +@item qemu-backup guest list
-> +@item qemu-backup drive add --id driveid --guest guestname --target ta=
-rget
-> +@item qemu-backup drive add --all --guest guestname --target target
-> +@item qemu-backup drive list --guest guestname
-> +@item qemu-backup backup [--inc] --guest guestname
-> +@item qemu-backup restore --guest guestname
-> +@item qemu-backup drive remove --guest guestname --id driveid
-> +@item qemu-backup guest remove --guest guestname
-> +@end itemize
-> +@node  Command Parameters
-> +@chapter  Command Parameters
-> +@itemize
-> +@item --guest: Name of the guest.
-> +@item --id: id of guest or drive.
-> +@item --target: Destination path on which you want your backup to be m=
-ade.
-> +@item --all: Add all the drives present in a guest which are suitable =
-for backup.
-> +@item --inc: For incremental backup.
-> +@item --qmp: Path of qmp socket.
-> +@end itemize
-> +
-> +@node  Command Descriptions
-> +@chapter  Command Descriptions
-> +@itemize
-> +@item qemu-backup guest add --guest guestname --qmp socketpath
-> +This command adds a guest to the configuration file given its path to =
-qmp socket.
-> +
-> +example:
-> +qemu-backup guest add --id=3Dfedora =E2=80=93qmp=3D/var/run/qemu/fedor=
-a.sock
-> +
-> +@item qemu-backup guest list
-> +This commands lists the names of guests which are added to configurati=
-on file.
-> +
-> +@item qemu-backup drive add --guest guestname --id driveid --target ta=
-rget
-> +This command adds different drives for backup in a particular guest by=
- giving the name of drive to be backed up and target imagefile in which w=
-e want to store the drive backup.
-> +
-> +example:qemu-backup drive add --guest=3Dfedora --id=3Droot
-> +--target=3D/backup/root.img
-> +
-> +@item qemu-backup drive add --all --guest guestname --destination dest=
-ination
-> +This command adds all the drives of the guest for backup other than CD=
-ROM drive. Here all the backup drives will have the same names as origina=
-l drives and target will be the destination folder.
-> +
-> +example: qemu-backup drive add --all --guest fedora --destination =3D/=
-backup/fedora/
-> +
-> +@item qemu-backup drive list --guest guestname
-> +This commands gives the names of the drive present in a guest which ar=
-e added for backup.
-> +
-> +example: qemu-backup drive list --guest=3Dfedora
-> +
-> +@item qemu-backup backup --guest guestname
-> +
-> +This command makes the backup of the drives, in their respective given=
- destinations. The ids of drive and their destinations are taken from the=
- configuration file.
-> +
-> +example: qemu-backup backup --guest=3Dfedora
-> +
-> +@item qemu-backup restore --guest guestname
-> +This command is needed if we want to restore the backup. It will list =
-the commands to be run for performing the same but will not perform any a=
-ction.
-> +
-> +example: qemu-backup restore --guest=3Dfedora
-> +
-> +@item qemu-backup drive remove --guest guestname --id driveid
-> +This command helps remove a drive which is set for backup in configura=
-tion of given host.
-> +
-> +example: drive remove --guest=3Dfedora --id=3Droot
-> +
-> +@item qemu-backup guest remove --guest guestname
-> +This command removes the guest from the configuration file.
-> +
-> +example: qemu-backup guest remove --guest=3Dfedora
-> +
-> +@end itemize
-> +
-> +@node License
-> +@appendix License
-> +QEMU is a trademark of Fabrice Bellard.
-> +QEMU is released under the
-> +@url{https://www.gnu.org/licenses/gpl-2.0.txt,GNU General Public Licen=
-se},
-> +version 2. Parts of QEMU have specific licenses, see file
-> +@url{http://git.qemu.org/?p=3Dqemu.git;a=3Dblob_plain;f=3DLICENSE,LICE=
-NSE}.
-> +@bye
->=20
+> Hi Philippe and Aurelien,
+>
+> You are right. I have created a simple SYSBUS using sysbus_create_simple
+> at 0x18000000 and now my read function works!
+>
+> Thanks for help. I am attaching my code if you are interested.
+>
+> Vinicius
+>
+> 2017-05-13 18:57 GMT-03:00 Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>:
+>
+>> Hi Vinicius,
+>>
+>> On 2017-05-12 19:52, Vinicius Maciel wrote:
+>>>
+>>>> Hi all,
+>>>>
+>>>> I'm trying to emulate a MIPS 74Kc using a custom machine in order to
+>>>> run a
+>>>> CFE bootloader from broadcom. The CPU is Broadcom BCM5357. The problem
+>>>>
+>>>
+>> Here is your problem, there is no such model in QEMU.
+>>
+>> happens when Qemu calculates physaddr inside io_readx(), cputlb.c:line 7=
+84
+>>>>
+>>>> physaddr =3D (physaddr & TARGET_PAGE_MASK) + addr;
+>>>>
+>>>> After run this line the the value is 0x18000000, which is clearly wron=
+g.
+>>>>
+>>>
+>> The Broadcom BCM5357 is a WiSoc (Wireless System-On-Chip).
+>>
+>> A SoC (System-On-Chip) is not limited to a MIPS CPU but has a large set
+>> of embedded peripherals.
+>>
+>> QEMU does models the MIPS 74Kf cpu, but not the BCM5357 peripherals.
+>>
+>> At this physical address this SoC family maps a bus called
+>> SiliconBackplane (BP).
+>> The first peripheral mapped in the BP region is the ChipCommon (CC).
+>> Common meaning this core registers intend to be consistent between
+>> different models/releases using this BP bus, so a firmware can check it =
+is
+>> running the correct hardware or check if peripherals/features are
+>> available/enabled to configure/use them.
+>>
+>> My guess is your CFE function board_earlyinit() is trying to determine
+>> the chip model by reading the ChipID from the CC it supposed is physical=
+ly
+>> mapped at 0x18000000, which is not modeled in QEMU.
+>>
+>> Phil.
+>>
+>>
+>>
+>>> I don't think it's wrong, see below:
+>>>
+>>> More informations:
+>>>>
+>>>> BUG function: io_readx
+>>>> Assembly instruction: lw t1,0(a2)
+>>>> Machine code: 0x8cc90000 (Little endian)
+>>>> Access address: 0xb8000000
+>>>>
+>>>> Assembly code:
+>>>> 80702f30 <board_earlyinit>:
+>>>> 80702f30: 3c06b800 lui a2,0xb800
+>>>>
+>>>
+>>> This load 0xb8000000 in a2
+>>>
+>>> 80702f34: 24075350 li a3,21328
+>>>> 80702f38: 8cc90000 lw t1,0(a2) <----
+>>>>
+>>>
+>>> Now this try to load a value from the virtual address 0xb8000000. This
+>>> address corresponds to kseg1 (Kernel Unmapped Uncached) and is mapped
+>>> to the physical address 0x18000000. See the MIPS32 Privileged Resource
+>>> Architecture Manual for more details how the virtual to physical mappin=
+g
+>>> works.
+>>>
+>>> Aurelien
+>>>
+>>>
+>
