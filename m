@@ -1,23 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dORMS-0001mG-9k
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:12 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dORMc-0001x7-S0
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dORMQ-00080o-Uo
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:08 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:34642)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dORMQ-00080Z-PC
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:06 -0400
-Received: by mail-qt0-x242.google.com with SMTP id w6so5861208qtg.1
-	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 09:23:06 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 23 Jun 2017 09:22:41 -0700
-Message-Id: <20170623162241.8964-16-rth@twiddle.net>
-In-Reply-To: <20170623162241.8964-1-rth@twiddle.net>
-References: <20170623162241.8964-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 15/15] target/s390x: Implement idte instruction
+	(envelope-from <kwolf@redhat.com>) id 1dORMa-0008DG-Ps
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:18 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Fri, 23 Jun 2017 18:21:49 +0200
+Message-Id: <1498234919-27316-52-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
+References: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL 51/61] qed: Simplify request handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,153 +19,232 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, David Hildenbrand <david@redhat.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: David Hildenbrand <david@redhat.com>
+Now that we process a request in the same coroutine from beginning to
+end and don't drop out of it any more, we can look like a proper
+coroutine-based driver and simply call qed_aio_next_io() and get a
+return value from it instead of spawning an additional coroutine that
+reenters the parent when it's done.
 
-Let's keep it very simple for now and flush the complete tlb,
-we currently can't find the right entries in our tlb, we would have
-to store the used tables for each element.
-
-As we now fully implement the DAT-enhancement facility, we can allow to
-enable it for the qemu CPU model.
-
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20170622094151.28633-4-david@redhat.com>
-Signed-off-by: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- target/s390x/cpu_models.c  |  1 +
- target/s390x/helper.h      |  1 +
- target/s390x/insn-data.def |  2 ++
- target/s390x/mem_helper.c  | 51 ++++++++++++++++++++++++++++++++++++++++++++++
- target/s390x/translate.c   | 15 ++++++++++++++
- 5 files changed, 70 insertions(+)
+ block/qed.c | 101 +++++++++++++-----------------------------------------------
+ block/qed.h |   3 +-
+ 2 files changed, 22 insertions(+), 82 deletions(-)
 
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 51b17b9..63903c2 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -675,6 +675,7 @@ static void check_compatibility(const S390CPUModel *max_model,
- static void add_qemu_cpu_model_features(S390FeatBitmap fbm)
+diff --git a/block/qed.c b/block/qed.c
+index cd3ef55..e53f6b5 100644
+--- a/block/qed.c
++++ b/block/qed.c
+@@ -21,10 +21,6 @@
+ #include "qapi/qmp/qerror.h"
+ #include "sysemu/block-backend.h"
+ 
+-static const AIOCBInfo qed_aiocb_info = {
+-    .aiocb_size         = sizeof(QEDAIOCB),
+-};
+-
+ static int bdrv_qed_probe(const uint8_t *buf, int buf_size,
+                           const char *filename)
  {
-     static const int feats[] = {
-+        S390_FEAT_DAT_ENH,
-         S390_FEAT_STFLE,
-         S390_FEAT_EXTENDED_IMMEDIATE,
-         S390_FEAT_EXTENDED_TRANSLATION_2,
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index b268367..964097b 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -131,6 +131,7 @@ DEF_HELPER_4(mvcs, i32, env, i64, i64, i64)
- DEF_HELPER_4(mvcp, i32, env, i64, i64, i64)
- DEF_HELPER_4(sigp, i32, env, i64, i32, i64)
- DEF_HELPER_FLAGS_2(sacf, TCG_CALL_NO_WG, void, env, i64)
-+DEF_HELPER_FLAGS_4(idte, TCG_CALL_NO_RWG, void, env, i64, i64, i32)
- DEF_HELPER_FLAGS_4(ipte, TCG_CALL_NO_RWG, void, env, i64, i64, i32)
- DEF_HELPER_FLAGS_1(ptlb, TCG_CALL_NO_RWG, void, env)
- DEF_HELPER_FLAGS_1(purge, TCG_CALL_NO_RWG, void, env)
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 5ba7822..d3bb851 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -928,6 +928,8 @@
-     C(0x8300, DIAG,    RSI,   Z,   0, 0, 0, 0, diag, 0)
- /* INSERT STORAGE KEY EXTENDED */
-     C(0xb229, ISKE,    RRE,   Z,   0, r2_o, new, r1_8, iske, 0)
-+/* INVALIDATE DAT TABLE ENTRY */
-+    C(0xb98e, IPDE,    RRF_b, Z,   r1_o, r2_o, 0, 0, idte, 0)
- /* INVALIDATE PAGE TABLE ENTRY */
-     C(0xb221, IPTE,    RRF_a, Z,   r1_o, r2_o, 0, 0, ipte, 0)
- /* LOAD CONTROL */
-diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 20cef9a..ede8471 100644
---- a/target/s390x/mem_helper.c
-+++ b/target/s390x/mem_helper.c
-@@ -1610,6 +1610,57 @@ uint32_t HELPER(mvcp)(CPUS390XState *env, uint64_t l, uint64_t a1, uint64_t a2)
-     return cc;
+@@ -253,13 +249,6 @@ static CachedL2Table *qed_new_l2_table(BDRVQEDState *s)
+     return l2_table;
  }
  
-+void HELPER(idte)(CPUS390XState *env, uint64_t r1, uint64_t r2, uint32_t m4)
-+{
-+    CPUState *cs = CPU(s390_env_get_cpu(env));
-+    const uintptr_t ra = GETPC();
-+    uint64_t table, entry, raddr;
-+    uint16_t entries, i, index = 0;
-+
-+    if (r2 & 0xff000) {
-+        cpu_restore_state(cs, ra);
-+        program_interrupt(env, PGM_SPECIFICATION, 4);
-+    }
-+
-+    if (!(r2 & 0x800)) {
-+        /* invalidation-and-clearing operation */
-+        table = r1 & _ASCE_ORIGIN;
-+        entries = (r2 & 0x7ff) + 1;
-+
-+        switch (r1 & _ASCE_TYPE_MASK) {
-+        case _ASCE_TYPE_REGION1:
-+            index = (r2 >> 53) & 0x7ff;
-+            break;
-+        case _ASCE_TYPE_REGION2:
-+            index = (r2 >> 42) & 0x7ff;
-+            break;
-+        case _ASCE_TYPE_REGION3:
-+            index = (r2 >> 31) & 0x7ff;
-+            break;
-+        case _ASCE_TYPE_SEGMENT:
-+            index = (r2 >> 20) & 0x7ff;
-+            break;
-+        }
-+        for (i = 0; i < entries; i++) {
-+            /* addresses are not wrapped in 24/31bit mode but table index is */
-+            raddr = table + ((index + i) & 0x7ff) * sizeof(entry);
-+            entry = ldq_phys(cs->as, raddr);
-+            if (!(entry & _REGION_ENTRY_INV)) {
-+                /* we are allowed to not store if already invalid */
-+                entry |= _REGION_ENTRY_INV;
-+                stq_phys(cs->as, raddr, entry);
-+            }
-+        }
-+    }
-+
-+    /* We simply flush the complete tlb, therefore we can ignore r3. */
-+    if (m4 & 1) {
-+        tlb_flush(cs);
-+    } else {
-+        tlb_flush_all_cpus_synced(cs);
-+    }
-+}
-+
- /* invalidate pte */
- void HELPER(ipte)(CPUS390XState *env, uint64_t pto, uint64_t vaddr,
-                   uint32_t m4)
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 1db5f2d..592d6b0 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -2380,6 +2380,21 @@ static ExitStatus op_ipm(DisasContext *s, DisasOps *o)
+-static void qed_aio_next_io(QEDAIOCB *acb);
+-
+-static void qed_aio_start_io(QEDAIOCB *acb)
+-{
+-    qed_aio_next_io(acb);
+-}
+-
+ static void qed_plug_allocating_write_reqs(BDRVQEDState *s)
+ {
+     assert(!s->allocating_write_reqs_plugged);
+@@ -751,7 +740,7 @@ static int64_t coroutine_fn bdrv_qed_co_get_block_status(BlockDriverState *bs,
+ 
+ static BDRVQEDState *acb_to_s(QEDAIOCB *acb)
+ {
+-    return acb->common.bs->opaque;
++    return acb->bs->opaque;
  }
  
- #ifndef CONFIG_USER_ONLY
-+static ExitStatus op_idte(DisasContext *s, DisasOps *o)
-+{
-+    TCGv_i32 m4;
-+
-+    check_privileged(s);
-+    if (s390_has_feat(S390_FEAT_LOCAL_TLB_CLEARING)) {
-+        m4 = tcg_const_i32(get_field(s->fields, m4));
-+    } else {
-+        m4 = tcg_const_i32(0);
-+    }
-+    gen_helper_idte(cpu_env, o->in1, o->in2, m4);
-+    tcg_temp_free_i32(m4);
-+    return NO_EXIT;
-+}
-+
- static ExitStatus op_ipte(DisasContext *s, DisasOps *o)
+ /**
+@@ -888,28 +877,10 @@ static void qed_update_l2_table(BDRVQEDState *s, QEDTable *table, int index,
+     }
+ }
+ 
+-static void qed_aio_complete_bh(void *opaque)
+-{
+-    QEDAIOCB *acb = opaque;
+-    BDRVQEDState *s = acb_to_s(acb);
+-    BlockCompletionFunc *cb = acb->common.cb;
+-    void *user_opaque = acb->common.opaque;
+-    int ret = acb->bh_ret;
+-
+-    qemu_aio_unref(acb);
+-
+-    /* Invoke callback */
+-    qed_acquire(s);
+-    cb(user_opaque, ret);
+-    qed_release(s);
+-}
+-
+-static void qed_aio_complete(QEDAIOCB *acb, int ret)
++static void qed_aio_complete(QEDAIOCB *acb)
  {
-     TCGv_i32 m4;
+     BDRVQEDState *s = acb_to_s(acb);
+ 
+-    trace_qed_aio_complete(s, acb, ret);
+-
+     /* Free resources */
+     qemu_iovec_destroy(&acb->cur_qiov);
+     qed_unref_l2_cache_entry(acb->request.l2_table);
+@@ -920,11 +891,6 @@ static void qed_aio_complete(QEDAIOCB *acb, int ret)
+         acb->qiov->iov[0].iov_base = NULL;
+     }
+ 
+-    /* Arrange for a bh to invoke the completion function */
+-    acb->bh_ret = ret;
+-    aio_bh_schedule_oneshot(bdrv_get_aio_context(acb->common.bs),
+-                            qed_aio_complete_bh, acb);
+-
+     /* Start next allocating write request waiting behind this one.  Note that
+      * requests enqueue themselves when they first hit an unallocated cluster
+      * but they wait until the entire request is finished before waking up the
+@@ -1172,7 +1138,7 @@ static int qed_aio_write_inplace(QEDAIOCB *acb, uint64_t offset, size_t len)
+         struct iovec *iov = acb->qiov->iov;
+ 
+         if (!iov->iov_base) {
+-            iov->iov_base = qemu_try_blockalign(acb->common.bs, iov->iov_len);
++            iov->iov_base = qemu_try_blockalign(acb->bs, iov->iov_len);
+             if (iov->iov_base == NULL) {
+                 return -ENOMEM;
+             }
+@@ -1231,7 +1197,7 @@ static int qed_aio_read_data(void *opaque, int ret, uint64_t offset, size_t len)
+ {
+     QEDAIOCB *acb = opaque;
+     BDRVQEDState *s = acb_to_s(acb);
+-    BlockDriverState *bs = acb->common.bs;
++    BlockDriverState *bs = acb->bs;
+ 
+     /* Adjust offset into cluster */
+     offset += qed_offset_into_cluster(s, acb->cur_pos);
+@@ -1260,7 +1226,7 @@ static int qed_aio_read_data(void *opaque, int ret, uint64_t offset, size_t len)
+ /**
+  * Begin next I/O or complete the request
+  */
+-static void qed_aio_next_io(QEDAIOCB *acb)
++static int qed_aio_next_io(QEDAIOCB *acb)
+ {
+     BDRVQEDState *s = acb_to_s(acb);
+     uint64_t offset;
+@@ -1282,16 +1248,15 @@ static void qed_aio_next_io(QEDAIOCB *acb)
+ 
+         /* Complete request */
+         if (acb->cur_pos >= acb->end_pos) {
+-            qed_aio_complete(acb, 0);
+-            return;
++            ret = 0;
++            break;
+         }
+ 
+         /* Find next cluster and start I/O */
+         len = acb->end_pos - acb->cur_pos;
+         ret = qed_find_cluster(s, &acb->request, acb->cur_pos, &len, &offset);
+         if (ret < 0) {
+-            qed_aio_complete(acb, ret);
+-            return;
++            break;
+         }
+ 
+         if (acb->flags & QED_AIOCB_WRITE) {
+@@ -1301,56 +1266,32 @@ static void qed_aio_next_io(QEDAIOCB *acb)
+         }
+ 
+         if (ret < 0 && ret != -EAGAIN) {
+-            qed_aio_complete(acb, ret);
+-            return;
++            break;
+         }
+     }
+-}
+ 
+-typedef struct QEDRequestCo {
+-    Coroutine *co;
+-    bool done;
+-    int ret;
+-} QEDRequestCo;
+-
+-static void qed_co_request_cb(void *opaque, int ret)
+-{
+-    QEDRequestCo *co = opaque;
+-
+-    co->done = true;
+-    co->ret = ret;
+-    qemu_coroutine_enter_if_inactive(co->co);
++    trace_qed_aio_complete(s, acb, ret);
++    qed_aio_complete(acb);
++    return ret;
+ }
+ 
+ static int coroutine_fn qed_co_request(BlockDriverState *bs, int64_t sector_num,
+                                        QEMUIOVector *qiov, int nb_sectors,
+                                        int flags)
+ {
+-    QEDRequestCo co = {
+-        .co     = qemu_coroutine_self(),
+-        .done   = false,
++    QEDAIOCB acb = {
++        .bs         = bs,
++        .cur_pos    = (uint64_t) sector_num * BDRV_SECTOR_SIZE,
++        .end_pos    = (sector_num + nb_sectors) * BDRV_SECTOR_SIZE,
++        .qiov       = qiov,
++        .flags      = flags,
+     };
+-    QEDAIOCB *acb = qemu_aio_get(&qed_aiocb_info, bs, qed_co_request_cb, &co);
+-
+-    trace_qed_aio_setup(bs->opaque, acb, sector_num, nb_sectors, &co, flags);
++    qemu_iovec_init(&acb.cur_qiov, qiov->niov);
+ 
+-    acb->flags = flags;
+-    acb->qiov = qiov;
+-    acb->qiov_offset = 0;
+-    acb->cur_pos = (uint64_t)sector_num * BDRV_SECTOR_SIZE;
+-    acb->end_pos = acb->cur_pos + nb_sectors * BDRV_SECTOR_SIZE;
+-    acb->backing_qiov = NULL;
+-    acb->request.l2_table = NULL;
+-    qemu_iovec_init(&acb->cur_qiov, qiov->niov);
++    trace_qed_aio_setup(bs->opaque, &acb, sector_num, nb_sectors, NULL, flags);
+ 
+     /* Start request */
+-    qed_aio_start_io(acb);
+-
+-    if (!co.done) {
+-        qemu_coroutine_yield();
+-    }
+-
+-    return co.ret;
++    return qed_aio_next_io(&acb);
+ }
+ 
+ static int coroutine_fn bdrv_qed_co_readv(BlockDriverState *bs,
+diff --git a/block/qed.h b/block/qed.h
+index 37558e4..fb80943 100644
+--- a/block/qed.h
++++ b/block/qed.h
+@@ -129,8 +129,7 @@ enum {
+ };
+ 
+ typedef struct QEDAIOCB {
+-    BlockAIOCB common;
+-    int bh_ret;                     /* final return status for completion bh */
++    BlockDriverState *bs;
+     QSIMPLEQ_ENTRY(QEDAIOCB) next;  /* next request */
+     int flags;                      /* QED_AIOCB_* bits ORed together */
+     uint64_t end_pos;               /* request end on block device, in bytes */
 -- 
-2.9.4
+1.8.3.1
