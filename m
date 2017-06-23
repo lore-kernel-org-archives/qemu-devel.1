@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORLe-0000VB-4c
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:19 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dORLf-0000WT-96
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORLa-0007TE-1I
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:18 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dORLe-0007V6-71
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:19 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 23 Jun 2017 18:21:04 +0200
-Message-Id: <1498234919-27316-7-git-send-email-kwolf@redhat.com>
+Date: Fri, 23 Jun 2017 18:21:05 +0200
+Message-Id: <1498234919-27316-8-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
 References: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 06/61] migration: avoid recursive AioContext
- locking in save_vmstate()
+Subject: [Qemu-devel] [PULL 07/61] migration: use bdrv_drain_all_begin/end()
+ instead bdrv_drain_all()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,64 +25,97 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Stefan Hajnoczi <stefanha@redhat.com>
 
-AioContext was designed to allow nested acquire/release calls.  It uses
-a recursive mutex so callers don't need to worry about nesting...or so
-we thought.
+blk/bdrv_drain_all() only takes effect for a single instant and then
+resumes block jobs, guest devices, and other external clients like the
+NBD server.  This can be handy when performing a synchronous drain
+before terminating the program, for example.
 
-BDRV_POLL_WHILE() is used to wait for block I/O requests.  It releases
-the AioContext temporarily around aio_poll().  This gives IOThreads a
-chance to acquire the AioContext to process I/O completions.
+Monitor commands usually need to quiesce I/O across an entire code
+region so blk/bdrv_drain_all() is not suitable.  They must use
+bdrv_drain_all_begin/end() to mark the region.  This prevents new I/O
+requests from slipping in or worse - block jobs completing and modifying
+the graph.
 
-It turns out that recursive locking and BDRV_POLL_WHILE() don't mix.
-BDRV_POLL_WHILE() only releases the AioContext once, so the IOThread
-will not be able to acquire the AioContext if it was acquired
-multiple times.
+I audited other blk/bdrv_drain_all() callers but did not find anything
+that needs a similar fix.  This patch fixes the savevm/loadvm commands.
+Although I haven't encountered a read world issue this makes the code
+safer.
 
-Instead of trying to release AioContext n times in BDRV_POLL_WHILE(),
-this patch simply avoids nested locking in save_vmstate().  It's the
-simplest fix and we should step back to consider the big picture with
-all the recent changes to block layer threading.
-
-This patch is the final fix to solve 'savevm' hanging with -object
-iothread.
-
+Suggested-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- migration/savevm.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ migration/savevm.c | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
 
 diff --git a/migration/savevm.c b/migration/savevm.c
-index 6bfd489..5846d9c 100644
+index 5846d9c..b08df04 100644
 --- a/migration/savevm.c
 +++ b/migration/savevm.c
-@@ -2144,6 +2144,14 @@ int save_snapshot(const char *name, Error **errp)
-         goto the_end;
+@@ -2107,6 +2107,8 @@ int save_snapshot(const char *name, Error **errp)
      }
+     vm_stop(RUN_STATE_SAVE_VM);
  
-+    /* The bdrv_all_create_snapshot() call that follows acquires the AioContext
-+     * for itself.  BDRV_POLL_WHILE() does not support nested locking because
-+     * it only releases the lock once.  Therefore synchronous I/O will deadlock
-+     * unless we release the AioContext before bdrv_all_create_snapshot().
-+     */
-+    aio_context_release(aio_context);
-+    aio_context = NULL;
++    bdrv_drain_all_begin();
 +
-     ret = bdrv_all_create_snapshot(sn, bs, vm_state_size, &bs);
-     if (ret < 0) {
-         error_setg(errp, "Error while creating snapshot on '%s'",
-@@ -2154,7 +2162,9 @@ int save_snapshot(const char *name, Error **errp)
-     ret = 0;
+     aio_context_acquire(aio_context);
  
-  the_end:
--    aio_context_release(aio_context);
-+    if (aio_context) {
-+        aio_context_release(aio_context);
-+    }
+     memset(sn, 0, sizeof(*sn));
+@@ -2165,6 +2167,9 @@ int save_snapshot(const char *name, Error **errp)
+     if (aio_context) {
+         aio_context_release(aio_context);
+     }
++
++    bdrv_drain_all_end();
++
      if (saved_vm_running) {
          vm_start();
      }
+@@ -2273,20 +2278,21 @@ int load_snapshot(const char *name, Error **errp)
+     }
+ 
+     /* Flush all IO requests so they don't interfere with the new state.  */
+-    bdrv_drain_all();
++    bdrv_drain_all_begin();
+ 
+     ret = bdrv_all_goto_snapshot(name, &bs);
+     if (ret < 0) {
+         error_setg(errp, "Error %d while activating snapshot '%s' on '%s'",
+                      ret, name, bdrv_get_device_name(bs));
+-        return ret;
++        goto err_drain;
+     }
+ 
+     /* restore the VM state */
+     f = qemu_fopen_bdrv(bs_vm_state, 0);
+     if (!f) {
+         error_setg(errp, "Could not open VM state file");
+-        return -EINVAL;
++        ret = -EINVAL;
++        goto err_drain;
+     }
+ 
+     qemu_system_reset(SHUTDOWN_CAUSE_NONE);
+@@ -2296,6 +2302,8 @@ int load_snapshot(const char *name, Error **errp)
+     ret = qemu_loadvm_state(f);
+     aio_context_release(aio_context);
+ 
++    bdrv_drain_all_end();
++
+     migration_incoming_state_destroy();
+     if (ret < 0) {
+         error_setg(errp, "Error %d while loading VM state", ret);
+@@ -2303,6 +2311,10 @@ int load_snapshot(const char *name, Error **errp)
+     }
+ 
+     return 0;
++
++err_drain:
++    bdrv_drain_all_end();
++    return ret;
+ }
+ 
+ void vmstate_register_ram(MemoryRegion *mr, DeviceState *dev)
 -- 
 1.8.3.1
