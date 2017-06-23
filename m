@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORLr-00014l-LL
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:33 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORLp-0007d6-T7
+	(envelope-from <kwolf@redhat.com>) id 1dORLq-00010w-FO
 	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:31 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <kwolf@redhat.com>) id 1dORLp-0007cp-GB
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:30 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 23 Jun 2017 18:21:14 +0200
-Message-Id: <1498234919-27316-17-git-send-email-kwolf@redhat.com>
+Date: Fri, 23 Jun 2017 18:21:16 +0200
+Message-Id: <1498234919-27316-19-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
 References: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 16/61] nvme: Add support for Read Data and Write
- Data in CMBs.
+Subject: [Qemu-devel] [PULL 18/61] qcow2: Use unsigned int for both members
+ of Qcow2COWRegion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,212 +23,65 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Stephen Bates <sbates@raithlin.com>
+From: Alberto Garcia <berto@igalia.com>
 
-Add the ability for the NVMe model to support both the RDS and WDS
-modes in the Controller Memory Buffer.
+Qcow2COWRegion has two attributes:
 
-Although not currently supported in the upstreamed Linux kernel a fork
-with support exists [1] and user-space test programs that build on
-this also exist [2].
+- The offset of the COW region from the start of the first cluster
+  touched by the I/O request. Since it's always going to be positive
+  and the maximum request size is at most INT_MAX, we can use a
+  regular unsigned int to store this offset.
 
-Useful for testing CMB functionality in preperation for real CMB
-enabled NVMe devices (coming soon).
+- The size of the COW region in bytes. This is guaranteed to be >= 0,
+  so we should use an unsigned type instead.
 
-[1] https://github.com/sbates130272/linux-p2pmem
-[2] https://github.com/sbates130272/p2pmem-test
+In x86_64 this reduces the size of Qcow2COWRegion from 16 to 8 bytes.
+It will also help keep some assertions simpler now that we know that
+there are no negative numbers.
 
-Signed-off-by: Stephen Bates <sbates@raithlin.com>
-Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Keith Busch <keith.busch@intel.com>
+The prototype of do_perform_cow() is also updated to reflect these
+changes.
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- hw/block/nvme.c | 83 +++++++++++++++++++++++++++++++++++++++------------------
- hw/block/nvme.h |  1 +
- 2 files changed, 58 insertions(+), 26 deletions(-)
+ block/qcow2-cluster.c | 4 ++--
+ block/qcow2.h         | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 381dc7c..6071dc1 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -21,7 +21,7 @@
-  *              cmb_size_mb=<cmb_size_mb[optional]>
-  *
-  * Note cmb_size_mb denotes size of CMB in MB. CMB is assumed to be at
-- * offset 0 in BAR2 and supports SQS only for now.
-+ * offset 0 in BAR2 and supports only WDS, RDS and SQS for now.
-  */
- 
- #include "qemu/osdep.h"
-@@ -93,8 +93,8 @@ static void nvme_isr_notify(NvmeCtrl *n, NvmeCQueue *cq)
-     }
- }
- 
--static uint16_t nvme_map_prp(QEMUSGList *qsg, uint64_t prp1, uint64_t prp2,
--    uint32_t len, NvmeCtrl *n)
-+static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOVector *iov, uint64_t prp1,
-+                             uint64_t prp2, uint32_t len, NvmeCtrl *n)
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index d1c419f..a86c5a7 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -406,8 +406,8 @@ int qcow2_encrypt_sectors(BDRVQcow2State *s, int64_t sector_num,
+ static int coroutine_fn do_perform_cow(BlockDriverState *bs,
+                                        uint64_t src_cluster_offset,
+                                        uint64_t cluster_offset,
+-                                       int offset_in_cluster,
+-                                       int bytes)
++                                       unsigned offset_in_cluster,
++                                       unsigned bytes)
  {
-     hwaddr trans_len = n->page_size - (prp1 % n->page_size);
-     trans_len = MIN(len, trans_len);
-@@ -102,10 +102,15 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, uint64_t prp1, uint64_t prp2,
+     BDRVQcow2State *s = bs->opaque;
+     QEMUIOVector qiov;
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 1801dc3..c26ee0a 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -301,10 +301,10 @@ typedef struct Qcow2COWRegion {
+      * Offset of the COW region in bytes from the start of the first cluster
+      * touched by the request.
+      */
+-    uint64_t    offset;
++    unsigned    offset;
  
-     if (!prp1) {
-         return NVME_INVALID_FIELD | NVME_DNR;
-+    } else if (n->cmbsz && prp1 >= n->ctrl_mem.addr &&
-+               prp1 < n->ctrl_mem.addr + int128_get64(n->ctrl_mem.size)) {
-+        qsg->nsg = 0;
-+        qemu_iovec_init(iov, num_prps);
-+        qemu_iovec_add(iov, (void *)&n->cmbuf[prp1 - n->ctrl_mem.addr], trans_len);
-+    } else {
-+        pci_dma_sglist_init(qsg, &n->parent_obj, num_prps);
-+        qemu_sglist_add(qsg, prp1, trans_len);
-     }
--
--    pci_dma_sglist_init(qsg, &n->parent_obj, num_prps);
--    qemu_sglist_add(qsg, prp1, trans_len);
-     len -= trans_len;
-     if (len) {
-         if (!prp2) {
-@@ -118,7 +123,7 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, uint64_t prp1, uint64_t prp2,
+     /** Number of bytes to copy */
+-    int         nb_bytes;
++    unsigned    nb_bytes;
+ } Qcow2COWRegion;
  
-             nents = (len + n->page_size - 1) >> n->page_bits;
-             prp_trans = MIN(n->max_prp_ents, nents) * sizeof(uint64_t);
--            pci_dma_read(&n->parent_obj, prp2, (void *)prp_list, prp_trans);
-+            nvme_addr_read(n, prp2, (void *)prp_list, prp_trans);
-             while (len != 0) {
-                 uint64_t prp_ent = le64_to_cpu(prp_list[i]);
- 
-@@ -130,7 +135,7 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, uint64_t prp1, uint64_t prp2,
-                     i = 0;
-                     nents = (len + n->page_size - 1) >> n->page_bits;
-                     prp_trans = MIN(n->max_prp_ents, nents) * sizeof(uint64_t);
--                    pci_dma_read(&n->parent_obj, prp_ent, (void *)prp_list,
-+                    nvme_addr_read(n, prp_ent, (void *)prp_list,
-                         prp_trans);
-                     prp_ent = le64_to_cpu(prp_list[i]);
-                 }
-@@ -140,7 +145,11 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, uint64_t prp1, uint64_t prp2,
-                 }
- 
-                 trans_len = MIN(len, n->page_size);
--                qemu_sglist_add(qsg, prp_ent, trans_len);
-+                if (qsg->nsg){
-+                    qemu_sglist_add(qsg, prp_ent, trans_len);
-+                } else {
-+                    qemu_iovec_add(iov, (void *)&n->cmbuf[prp_ent - n->ctrl_mem.addr], trans_len);
-+                }
-                 len -= trans_len;
-                 i++;
-             }
-@@ -148,7 +157,11 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, uint64_t prp1, uint64_t prp2,
-             if (prp2 & (n->page_size - 1)) {
-                 goto unmap;
-             }
--            qemu_sglist_add(qsg, prp2, len);
-+            if (qsg->nsg) {
-+                qemu_sglist_add(qsg, prp2, len);
-+            } else {
-+                qemu_iovec_add(iov, (void *)&n->cmbuf[prp2 - n->ctrl_mem.addr], trans_len);
-+            }
-         }
-     }
-     return NVME_SUCCESS;
-@@ -162,16 +175,24 @@ static uint16_t nvme_dma_read_prp(NvmeCtrl *n, uint8_t *ptr, uint32_t len,
-     uint64_t prp1, uint64_t prp2)
- {
-     QEMUSGList qsg;
-+    QEMUIOVector iov;
-+    uint16_t status = NVME_SUCCESS;
- 
--    if (nvme_map_prp(&qsg, prp1, prp2, len, n)) {
-+    if (nvme_map_prp(&qsg, &iov, prp1, prp2, len, n)) {
-         return NVME_INVALID_FIELD | NVME_DNR;
-     }
--    if (dma_buf_read(ptr, len, &qsg)) {
-+    if (qsg.nsg > 0) {
-+        if (dma_buf_read(ptr, len, &qsg)) {
-+            status = NVME_INVALID_FIELD | NVME_DNR;
-+        }
-         qemu_sglist_destroy(&qsg);
--        return NVME_INVALID_FIELD | NVME_DNR;
-+    } else {
-+        if (qemu_iovec_to_buf(&iov, 0, ptr, len) != len) {
-+            status = NVME_INVALID_FIELD | NVME_DNR;
-+        }
-+        qemu_iovec_destroy(&iov);
-     }
--    qemu_sglist_destroy(&qsg);
--    return NVME_SUCCESS;
-+    return status;
- }
- 
- static void nvme_post_cqes(void *opaque)
-@@ -285,20 +306,27 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
-         return NVME_LBA_RANGE | NVME_DNR;
-     }
- 
--    if (nvme_map_prp(&req->qsg, prp1, prp2, data_size, n)) {
-+    if (nvme_map_prp(&req->qsg, &req->iov, prp1, prp2, data_size, n)) {
-         block_acct_invalid(blk_get_stats(n->conf.blk), acct);
-         return NVME_INVALID_FIELD | NVME_DNR;
-     }
- 
--    assert((nlb << data_shift) == req->qsg.size);
--
--    req->has_sg = true;
-     dma_acct_start(n->conf.blk, &req->acct, &req->qsg, acct);
--    req->aiocb = is_write ?
--        dma_blk_write(n->conf.blk, &req->qsg, data_offset, BDRV_SECTOR_SIZE,
--                      nvme_rw_cb, req) :
--        dma_blk_read(n->conf.blk, &req->qsg, data_offset, BDRV_SECTOR_SIZE,
--                     nvme_rw_cb, req);
-+    if (req->qsg.nsg > 0) {
-+        req->has_sg = true;
-+        req->aiocb = is_write ?
-+            dma_blk_write(n->conf.blk, &req->qsg, data_offset, BDRV_SECTOR_SIZE,
-+                          nvme_rw_cb, req) :
-+            dma_blk_read(n->conf.blk, &req->qsg, data_offset, BDRV_SECTOR_SIZE,
-+                         nvme_rw_cb, req);
-+    } else {
-+        req->has_sg = false;
-+        req->aiocb = is_write ?
-+            blk_aio_pwritev(n->conf.blk, data_offset, &req->iov, 0, nvme_rw_cb,
-+                            req) :
-+            blk_aio_preadv(n->conf.blk, data_offset, &req->iov, 0, nvme_rw_cb,
-+                           req);
-+    }
- 
-     return NVME_NO_COMPLETE;
- }
-@@ -987,11 +1015,14 @@ static int nvme_init(PCIDevice *pci_dev)
-         NVME_CMBSZ_SET_SQS(n->bar.cmbsz, 1);
-         NVME_CMBSZ_SET_CQS(n->bar.cmbsz, 0);
-         NVME_CMBSZ_SET_LISTS(n->bar.cmbsz, 0);
--        NVME_CMBSZ_SET_RDS(n->bar.cmbsz, 0);
--        NVME_CMBSZ_SET_WDS(n->bar.cmbsz, 0);
-+        NVME_CMBSZ_SET_RDS(n->bar.cmbsz, 1);
-+        NVME_CMBSZ_SET_WDS(n->bar.cmbsz, 1);
-         NVME_CMBSZ_SET_SZU(n->bar.cmbsz, 2); /* MBs */
-         NVME_CMBSZ_SET_SZ(n->bar.cmbsz, n->cmb_size_mb);
- 
-+        n->cmbloc = n->bar.cmbloc;
-+        n->cmbsz = n->bar.cmbsz;
-+
-         n->cmbuf = g_malloc0(NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
-         memory_region_init_io(&n->ctrl_mem, OBJECT(n), &nvme_cmb_ops, n,
-                               "nvme-cmb", NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
-diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-index b4961d2..6aab338 100644
---- a/hw/block/nvme.h
-+++ b/hw/block/nvme.h
-@@ -712,6 +712,7 @@ typedef struct NvmeRequest {
-     NvmeCqe                 cqe;
-     BlockAcctCookie         acct;
-     QEMUSGList              qsg;
-+    QEMUIOVector            iov;
-     QTAILQ_ENTRY(NvmeRequest)entry;
- } NvmeRequest;
- 
+ /**
 -- 
 1.8.3.1
