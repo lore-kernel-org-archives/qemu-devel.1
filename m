@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORM8-0001Nu-Ut
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:49 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dORMD-0001U9-SY
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORM7-0007ku-PL
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:48 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dORMC-0007nu-Of
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:53 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 23 Jun 2017 18:21:28 +0200
-Message-Id: <1498234919-27316-31-git-send-email-kwolf@redhat.com>
+Date: Fri, 23 Jun 2017 18:21:34 +0200
+Message-Id: <1498234919-27316-37-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
 References: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 30/61] qed: Make qed_read_backing_file()
- synchronous
+Subject: [Qemu-devel] [PULL 36/61] qed: Remove GenericCB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,104 +22,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-Note that this code is generally not running in coroutine context, so
-this is an actual blocking synchronous operation. We'll fix this in a
-moment.
+The GenericCB infrastructure isn't used any more. Remove it.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/qed.c | 32 ++++++++++++++++++--------------
- 1 file changed, 18 insertions(+), 14 deletions(-)
+ block/Makefile.objs |  2 +-
+ block/qed-gencb.c   | 33 ---------------------------------
+ block/qed.h         | 11 -----------
+ 3 files changed, 1 insertion(+), 45 deletions(-)
+ delete mode 100644 block/qed-gencb.c
 
-diff --git a/block/qed.c b/block/qed.c
-index 290cbcd..1105f19 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -808,13 +808,13 @@ static BDRVQEDState *acb_to_s(QEDAIOCB *acb)
-  * This function reads qiov->size bytes starting at pos from the backing file.
-  * If there is no backing file then zeroes are read.
-  */
--static void qed_read_backing_file(BDRVQEDState *s, uint64_t pos,
--                                  QEMUIOVector *qiov,
--                                  QEMUIOVector **backing_qiov,
--                                  BlockCompletionFunc *cb, void *opaque)
-+static int qed_read_backing_file(BDRVQEDState *s, uint64_t pos,
-+                                 QEMUIOVector *qiov,
-+                                 QEMUIOVector **backing_qiov)
- {
-     uint64_t backing_length = 0;
-     size_t size;
-+    int ret;
- 
-     /* If there is a backing file, get its length.  Treat the absence of a
-      * backing file like a zero length backing file.
-@@ -822,8 +822,7 @@ static void qed_read_backing_file(BDRVQEDState *s, uint64_t pos,
-     if (s->bs->backing) {
-         int64_t l = bdrv_getlength(s->bs->backing->bs);
-         if (l < 0) {
--            cb(opaque, l);
--            return;
-+            return l;
-         }
-         backing_length = l;
-     }
-@@ -836,8 +835,7 @@ static void qed_read_backing_file(BDRVQEDState *s, uint64_t pos,
- 
-     /* Complete now if there are no backing file sectors to read */
-     if (pos >= backing_length) {
--        cb(opaque, 0);
--        return;
-+        return 0;
-     }
- 
-     /* If the read straddles the end of the backing file, shorten it */
-@@ -849,8 +847,11 @@ static void qed_read_backing_file(BDRVQEDState *s, uint64_t pos,
-     qemu_iovec_concat(*backing_qiov, qiov, 0, size);
- 
-     BLKDBG_EVENT(s->bs->file, BLKDBG_READ_BACKING_AIO);
--    bdrv_aio_readv(s->bs->backing, pos / BDRV_SECTOR_SIZE,
--                   *backing_qiov, size / BDRV_SECTOR_SIZE, cb, opaque);
-+    ret = bdrv_preadv(s->bs->backing, pos, *backing_qiov);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+    return 0;
- }
- 
- typedef struct {
-@@ -907,6 +908,7 @@ static void qed_copy_from_backing_file(BDRVQEDState *s, uint64_t pos,
-                                        void *opaque)
- {
-     CopyFromBackingFileCB *copy_cb;
-+    int ret;
- 
-     /* Skip copy entirely if there is no work to do */
-     if (len == 0) {
-@@ -922,8 +924,9 @@ static void qed_copy_from_backing_file(BDRVQEDState *s, uint64_t pos,
-     copy_cb->iov.iov_len = len;
-     qemu_iovec_init_external(&copy_cb->qiov, &copy_cb->iov, 1);
- 
--    qed_read_backing_file(s, pos, &copy_cb->qiov, &copy_cb->backing_qiov,
--                          qed_copy_from_backing_file_write, copy_cb);
-+    ret = qed_read_backing_file(s, pos, &copy_cb->qiov,
-+                                &copy_cb->backing_qiov);
-+    qed_copy_from_backing_file_write(copy_cb, ret);
- }
+diff --git a/block/Makefile.objs b/block/Makefile.objs
+index ea95530..f9368b5 100644
+--- a/block/Makefile.objs
++++ b/block/Makefile.objs
+@@ -1,6 +1,6 @@
+ block-obj-y += raw-format.o qcow.o vdi.o vmdk.o cloop.o bochs.o vpc.o vvfat.o dmg.o
+ block-obj-y += qcow2.o qcow2-refcount.o qcow2-cluster.o qcow2-snapshot.o qcow2-cache.o
+-block-obj-y += qed.o qed-gencb.o qed-l2-cache.o qed-table.o qed-cluster.o
++block-obj-y += qed.o qed-l2-cache.o qed-table.o qed-cluster.o
+ block-obj-y += qed-check.o
+ block-obj-y += vhdx.o vhdx-endian.o vhdx-log.o
+ block-obj-y += quorum.o
+diff --git a/block/qed-gencb.c b/block/qed-gencb.c
+deleted file mode 100644
+index faf8ecc..0000000
+--- a/block/qed-gencb.c
++++ /dev/null
+@@ -1,33 +0,0 @@
+-/*
+- * QEMU Enhanced Disk Format
+- *
+- * Copyright IBM, Corp. 2010
+- *
+- * Authors:
+- *  Stefan Hajnoczi   <stefanha@linux.vnet.ibm.com>
+- *
+- * This work is licensed under the terms of the GNU LGPL, version 2 or later.
+- * See the COPYING.LIB file in the top-level directory.
+- *
+- */
+-
+-#include "qemu/osdep.h"
+-#include "qed.h"
+-
+-void *gencb_alloc(size_t len, BlockCompletionFunc *cb, void *opaque)
+-{
+-    GenericCB *gencb = g_malloc(len);
+-    gencb->cb = cb;
+-    gencb->opaque = opaque;
+-    return gencb;
+-}
+-
+-void gencb_complete(void *opaque, int ret)
+-{
+-    GenericCB *gencb = opaque;
+-    BlockCompletionFunc *cb = gencb->cb;
+-    void *user_opaque = gencb->opaque;
+-
+-    g_free(gencb);
+-    cb(user_opaque, ret);
+-}
+diff --git a/block/qed.h b/block/qed.h
+index 6ab5702..46843c4 100644
+--- a/block/qed.h
++++ b/block/qed.h
+@@ -202,17 +202,6 @@ void qed_acquire(BDRVQEDState *s);
+ void qed_release(BDRVQEDState *s);
  
  /**
-@@ -1366,8 +1369,9 @@ static void qed_aio_read_data(void *opaque, int ret,
-         qed_aio_start_io(acb);
-         return;
-     } else if (ret != QED_CLUSTER_FOUND) {
--        qed_read_backing_file(s, acb->cur_pos, &acb->cur_qiov,
--                              &acb->backing_qiov, qed_aio_next_io_cb, acb);
-+        ret = qed_read_backing_file(s, acb->cur_pos, &acb->cur_qiov,
-+                                    &acb->backing_qiov);
-+        qed_aio_next_io(acb, ret);
-         return;
-     }
- 
+- * Generic callback for chaining async callbacks
+- */
+-typedef struct {
+-    BlockCompletionFunc *cb;
+-    void *opaque;
+-} GenericCB;
+-
+-void *gencb_alloc(size_t len, BlockCompletionFunc *cb, void *opaque);
+-void gencb_complete(void *opaque, int ret);
+-
+-/**
+  * Header functions
+  */
+ int qed_write_header_sync(BDRVQEDState *s);
 -- 
 1.8.3.1
