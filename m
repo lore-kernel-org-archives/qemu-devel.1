@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dORO4-0003Jt-1e
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:24:48 -0400
+	(envelope-from <berrange@redhat.com>) id 1dORO4-0003KJ-Cm
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:24:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dORO3-0000sG-8I
+	(envelope-from <berrange@redhat.com>) id 1dORO3-0000sm-JP
 	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:24:48 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Fri, 23 Jun 2017 17:24:04 +0100
-Message-Id: <20170623162419.26068-6-berrange@redhat.com>
+Date: Fri, 23 Jun 2017 17:24:05 +0100
+Message-Id: <20170623162419.26068-7-berrange@redhat.com>
 In-Reply-To: <20170623162419.26068-1-berrange@redhat.com>
 References: <20170623162419.26068-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v10 05/20] iotests: skip 042 with qcow which
- dosn't support zero sized images
+Subject: [Qemu-devel] [PATCH v10 06/20] iotests: skip 048 with qcow which
+ doesn't support resize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,27 +23,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Test 042 is designed to verify operation with zero sized images.
-Such images are not supported with qcow (v1), so this test has
-always failed.
+Test 048 is designed to verify data preservation during an
+image resize. The qcow (v1) format impl has never supported
+resize so always fails.
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- tests/qemu-iotests/042 | 2 +-
+ tests/qemu-iotests/048 | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/042 b/tests/qemu-iotests/042
-index 351b283..a53e7cb 100755
---- a/tests/qemu-iotests/042
-+++ b/tests/qemu-iotests/042
-@@ -37,7 +37,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
- . ./common.rc
+diff --git a/tests/qemu-iotests/048 b/tests/qemu-iotests/048
+index 203c04f..9ed04a0 100755
+--- a/tests/qemu-iotests/048
++++ b/tests/qemu-iotests/048
+@@ -46,7 +46,7 @@ _compare()
  . ./common.filter
+ . ./common.pattern
  
--_supported_fmt qcow2 qcow qed
-+_supported_fmt qcow2 qed
+-_supported_fmt raw qcow qcow2 qed luks
++_supported_fmt raw qcow2 qed luks
  _supported_proto file
  _supported_os Linux
  
