@@ -1,37 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45554)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <casasfernando@hotmail.com>) id 1dOI5o-0006AM-Dz
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 02:29:21 -0400
+	(envelope-from <armbru@redhat.com>) id 1dOIKo-0001WU-EV
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 02:44:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <casasfernando@hotmail.com>) id 1dOI5l-0008N2-8o
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 02:29:20 -0400
-Received: from mail-oln040092070077.outbound.protection.outlook.com
-	([40.92.70.77]:19925
-	helo=EUR03-AM5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <casasfernando@hotmail.com>)
-	id 1dOI5k-0008Lq-Nm
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 02:29:17 -0400
-From: =?utf-8?B?RmVybmFuZG8gQ2FzYXMgU2Now7Zzc293?= <casasfernando@hotmail.com>
-Date: Fri, 23 Jun 2017 06:29:14 +0000
-Message-ID: <VI1PR1001MB13734FC8376C43217F82862CB7D80@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
-References: <VI1PR1001MB137395F2FCBDE6389A9AC5FCB7C30@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
-	<CABdb7358YVXbk++Z7s+q6Z5O0Q=6CQiQvYsTdc35eqmQeUnP_Q@mail.gmail.com>
-	<VI1PR1001MB1373C8915C51F7453D41B950B7C10@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
-	<CABdb7345_Nu_kpsSDGq7OyOSuKmgtyS-DuXTafkGeaCCXzV5LQ@mail.gmail.com>
-	<VI1PR1001MB1373B1F3C97D9528166E2305B7C40@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
-	<CABdb735e_NjY47LRZ58+zvKGmCRQKAmFo-HhByhsosRzQkOgxA@mail.gmail.com>
-	<HE1PR1001MB1371F7874B487B0907C42A7EB7C50@HE1PR1001MB1371.EURPRD10.PROD.OUTLOOK.COM>
-	<CABdb7372Pv3hR4S8C0TCV19u9XAKn=y0VmreGuZavhOjqRrypQ@mail.gmail.com>
-	<VI1PR1001MB13731144A5E55914A9E414A5B7DA0@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
-	<CABdb7377U9SpZno1kU6+TuARUmqfMMcC2uuwXTHqSZpLsqB7Gw@mail.gmail.com>
-In-Reply-To: <CABdb7377U9SpZno1kU6+TuARUmqfMMcC2uuwXTHqSZpLsqB7Gw@mail.gmail.com>
-Content-Language: en-US
+	(envelope-from <armbru@redhat.com>) id 1dOIKk-0007iO-5i
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 02:44:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46534)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dOIKj-0007hj-VR
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 02:44:46 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170613140546.28227-1-vadim.galitsyn@profitbricks.com>
+	<20170614092040.GB2687@work-vm>
+	<CAPHE7NqmDh-BKNg1-r8FNXw=qFSs9vdHPBO9gYc61js7fTkOpg@mail.gmail.com>
+	<20170614154043.GE2687@work-vm> <874lva21jb.fsf@dusky.pond.sub.org>
+	<CAPHE7NppPyGfe=29twDOUdWT=CXcJ8M935AbmtvPNS3-KorYzA@mail.gmail.com>
+Date: Fri, 23 Jun 2017 08:44:39 +0200
+In-Reply-To: <CAPHE7NppPyGfe=29twDOUdWT=CXcJ8M935AbmtvPNS3-KorYzA@mail.gmail.com>
+	(Vadim Galitsyn's message of "Thu, 22 Jun 2017 17:02:03 +0200")
+Message-ID: <87zicz5hk8.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] Guest unresponsive after Virtqueue size exceeded
- error
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2] hmp,
+ qmp: introduce "info memory" and "query-memory" commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,48 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
+Cc: imammedo@redhat.com, Mohammed Gamal <mgamal@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
 
-SGkgTGFkaSwNCg0KU21hbGwgdXBkYXRlLiBNZW10ZXN0ODYrIHdhcyBydW5uaW5nIG9uIHRoZSBo
-b3N0IGZvciBtb3JlIHRoYW4gNTQgaG91cnMuIDggcGFzc2VzIHdlcmUgY29tcGxldGVkIGFuZCBu
-byBtZW1vcnkgZXJyb3JzIGZvdW5kLiBGb3Igbm93IEkgdGhpbmsgd2UgY2FuIGFzc3VtZSB0aGF0
-IHRoZSBob3N0IG1lbW9yeSBpcyBvay4NCg0KSSBqdXN0IHN0YXJ0ZWQgYWxsIHRoZSBndWVzdHMg
-b25lIGhvdXIgYWdvLiBJIHdpbGwgbW9uaXRvciB0aGVtIGFuZCBvbmNlIG9uZSBmYWlscyBJIHdp
-bGwgYXR0YWNoIHRoZSBkZWJ1Z2dlciBhbmQgbGV0IHlvdSBrbm93Lg0KDQpUaGFua3MuDQoNCkZl
-cg0KDQpPbiBqdWUsIGp1biAyMiwgMjAxNyBhdCA5OjQzICwgTGFkaSBQcm9zZWsgPGxwcm9zZWtA
-cmVkaGF0LmNvbT4gd3JvdGU6DQpIaSBGZXJuYW5kbywgT24gV2VkLCBKdW4gMjEsIDIwMTcgYXQg
-MjoxOSBQTSwgRmVybmFuZG8gQ2FzYXMgU2Now7Zzc293IDxjYXNhc2Zlcm5hbmRvQGhvdG1haWwu
-Y29tPG1haWx0bzpjYXNhc2Zlcm5hbmRvQGhvdG1haWwuY29tPj4gd3JvdGU6DQpIaSBMYWRpLCBT
-b3JyeSBmb3IgdGhlIGRlbGF5IGluIG15IHJlcGx5LiBJIHdpbGwgbGVhdmUgdGhlIGhvc3Qga2Vy
-bmVsIGFsb25lIGZvciBub3cgdGhlbi4gRm9yIHRoZSBsYXN0IDE1IGhvdXJzIG9yIHNvIEknbSBy
-dW5uaW5nIG1lbXRlc3Q4Nisgb24gdGhlIGhvc3QuIFNvIGZhciBzbyBnb29kLiBUd28gcGFzc2Vz
-IG5vIGVycm9ycyBzbyBmYXIuIEkgd2lsbCB0cnkgdG8gbGVhdmUgaXQgcnVubmluZyBmb3IgYXQg
-bGVhc3QgYW5vdGhlciAyNGhyIGFuZCByZXBvcnQgYmFjayB0aGUgcmVzdWx0cy4gSG9wZWZ1bGx5
-IHdlIGNhbiBkaXNjYXJkIHRoZSBtZW1vcnkgaXNzdWUgYXQgaGFyZHdhcmUgbGV2ZWwuIFJlZ2Fy
-ZGluZyBLU00sIHRoYXQgd2lsbCBiZSB0aGUgbmV4dCB0aGluZyBJIHdpbGwgZGlzYWJsZSBpZiBh
-ZnRlciByZW1vdmluZyB0aGUgYmFsbG9vbiBkZXZpY2UgZ3Vlc3RzIHN0aWxsIGNyYXNoLiBBYm91
-dCBsZWF2aW5nIGEgZ3Vlc3QgaW4gYSBmYWlsZWQgc3RhdGUgZm9yIHlvdSB0byBkZWJ1ZyBpdCBy
-ZW1vdGVseSwgdGhhdCdzIGFic29sdXRlbHkgYW4gb3B0aW9uLiBXZSBqdXN0IG5lZWQgdG8gY29v
-cmRpbmF0ZSBzbyBJIGNhbiBnaXZlIHlvdSByZW1vdGUgYWNjZXNzIHRvIHRoZSBob3N0IGFuZCBz
-byBvbi4gTGV0IG1lIGtub3cgaWYgYW55IHByZXBhcmF0aW9uIGlzIG5lZWRlZCBpbiBhZHZhbmNl
-IGFuZCB3aGljaCB0b29scyB5b3UgbmVlZCBpbnN0YWxsZWQgb24gdGhlIGhvc3QuDQpJIHRoaW5r
-IHRoYXQgZ2Ric2VydmVyIGF0dGFjaGVkIHRvIHRoZSBRRU1VIHByb2Nlc3Mgc2hvdWxkIGJlIGVu
-b3VnaC4gV2hlbiB0aGUgVk0gZ2V0cyBpbnRvIHRoZSBicm9rZW4gc3RhdGUgcGxlYXNlIGRvIHNv
-bWV0aGluZyBsaWtlOiBnZGJzZXJ2ZXIgLS1hdHRhY2ggaG9zdDoxMjM0NSA8UUVNVSBwaWQ+IGFu
-ZCBsZXQgbWUga25vdyB0aGUgaG9zdCBuYW1lIGFuZCBwb3J0ICgxMjM0NSBpbiB0aGUgYWJvdmUg
-ZXhhbXBsZSkuDQpPbmNlIEkgYWdhaW4gSSB3b3VsZCBsaWtlIHRvIHRoYW5rIHlvdSBmb3IgYWxs
-IHlvdXIgaGVscCBhbmQgeW91ciBncmVhdCBkaXNwb3NpdGlvbiENCllvdSdyZSBhYnNvbHV0ZWx5
-IHdlbGNvbWUsIEkgZG9uJ3QgdGhpbmsgSSd2ZSBkb25lIGFueXRoaW5nIGhlbHBmdWwgc28gZmFy
-IDopDQpDaGVlcnMsIEZlciBPbiBtYXIsIGp1biAyMCwgMjAxNyBhdCA5OjUyICwgTGFkaSBQcm9z
-ZWsgPGxwcm9zZWtAcmVkaGF0LmNvbTxtYWlsdG86bHByb3Nla0ByZWRoYXQuY29tPj4gd3JvdGU6
-IFRoZSBob3N0IGtlcm5lbCBpcyBsZXNzIGxpa2VseSB0byBiZSByZXNwb25zaWJsZSBmb3IgdGhp
-cywgaW4gbXkgb3Bpbmlvbi4gSSdkIGhvbGQgb2ZmIG9uIHRoYXQgZm9yIG5vdy4gQW5kIGxhc3Qg
-YnV0IG5vdCBsZWFzdCBLU00gaXMgZW5hYmxlZCBvbiB0aGUgaG9zdC4gU2hvdWxkIEkgZGlzYWJs
-ZSBpdD8gQ291bGQgYmUgd29ydGggdGhlIHRyeS4gRm9sbG93aW5nIHlvdXIgYWR2aWNlIEkgd2ls
-bCBydW4gbWVtdGVzdCBvbiB0aGUgaG9zdCBhbmQgcmVwb3J0IGJhY2suIEp1c3QgYXMgYSBzaWRl
-IGNvbW1lbnQsIHRoZSBob3N0IGlzIHJ1bm5pbmcgb24gRUNDIG1lbW9yeS4gSSBzZWUuIFdvdWxk
-IGl0IGJlIHBvc3NpYmxlIGZvciB5b3UsIG9uY2UgYSBndWVzdCBpcyBpbiB0aGUgYnJva2VuIHN0
-YXRlLCB0byBtYWtlIGl0IGF2YWlsYWJsZSBmb3IgZGVidWdnaW5nPyBCeSBhdHRhY2hpbmcgZ2Ri
-IHRvIHRoZSBRRU1VIHByb2Nlc3MgZm9yIGV4YW1wbGUgYW5kIGxldHRpbmcgbWUgcG9rZSBhcm91
-bmQgaXQgcmVtb3RlbHk/IFRoYW5rcyENCg0KDQo=
+Vadim Galitsyn <vadim.galitsyn@profitbricks.com> writes:
+
+> Hi Markus,
+>
+> Thank you for the input.
+>
+>> However, your query-memory looks like it could fail.
+>
+> With the latest version of a patch (
+> http://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg03475.html)
+> "query-memory" can fail only in two cases:
+>
+> a) if in QOM there is an object of type of TYPE_PC_DIMM which has no
+> property of type PC_DIMM_SIZE_PROP, or
+> b) PC_DIMM_SIZE_PROP is not represented as an integer.
+>
+> As far as I understand both (a) and (b) can happen only in case if QOM
+> somehow corrupted which is not a normal case
+> (please correct me if I am wrong).
+
+These feel like programming errors.  They are impossible to test without
+screwing up the program.  Untestable error recovery is commonly wrong.
+I recommend to assert instead.  Igor, what do you think?
+
+> Please also note, this is not the last version of the patch since new
+> functionality was suggested
+> to be included (NUMA information).
+>
+> If patch will be accepted, I think we would need a test case for it since
+> command output differs once memory
+> was hot-added/removed per given NUMA node. When final functionality will be
+> negotiated, I will come up
+> with test scenario and test case itself.
+
+Thanks!
