@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dON4s-0006sK-N7
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 07:48:47 -0400
+	(envelope-from <berrange@redhat.com>) id 1dON5d-0007D2-VW
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 07:49:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dON4p-0005nO-JQ
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 07:48:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46178)
+	(envelope-from <berrange@redhat.com>) id 1dON5b-0005yq-Pw
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 07:49:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46568)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dON4p-0005nC-Ak
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 07:48:39 -0400
-From: Markus Armbruster <armbru@redhat.com>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dON5b-0005yH-GD
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 07:49:27 -0400
+Date: Fri, 23 Jun 2017 12:49:17 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170623114917.GG28635@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <20170606110556.12922-1-berrange@redhat.com>
-	<20170606110556.12922-3-berrange@redhat.com>
-Date: Fri, 23 Jun 2017 13:48:34 +0200
-In-Reply-To: <20170606110556.12922-3-berrange@redhat.com> (Daniel
-	P. Berrange's message of "Tue, 6 Jun 2017 12:05:56 +0100")
-Message-ID: <874lv6gc19.fsf@dusky.pond.sub.org>
+	<20170606110556.12922-2-berrange@redhat.com>
+	<878tkjexn5.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] docs: document support lifetime for
- features
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <878tkjexn5.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] docs: document deprecated features
+ in appendix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,84 +30,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
 Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-"Daniel P. Berrange" <berrange@redhat.com> writes:
+On Fri, Jun 23, 2017 at 01:44:46PM +0200, Markus Armbruster wrote:
+> "Daniel P. Berrange" <berrange@redhat.com> writes:
+> 
+> > The deprecation of features in QEMU is totally adhoc currently,
+> > with no way for the user to get a list of what is deprecated
+> > in each release. This adds an appendix to the doc that records
+> > when each deprecation[1] was made and provides text explaining
+> > what to use instead.
+> >
+> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> >
+> > [1] This is a lie. I've only listed one deprecated feature. Once
+> >     we agree on the general concept, we can fill out the doc
+> >     with the rest of the currently deprecated features.
+> 
+> As written, this is PATCH RFC.  We can either collect the currently
+> deprecated features before we commit (with the footnote dropped), or
+> collect later (but then we should note the incompleteness in
+> qemu-doc.texi, not just the commit message).
 
-> There is currently no explicit guidance on the duration of support
-> for features such as versioned machine types, which have a finite
-> useful lifespan. Thus apps / users cannot predict how much time
-> they might be able to use a feature for, before it is removed (if
-> ever).
->
-> This adds a new appendix that lists items which have finite lifecycles,
-> such as machine types. For items which are generally expected to be
-> supported indefinitely, it sets out the policy around deprecation
-> and removal, should it be needed.
->
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  qemu-doc.texi | 34 ++++++++++++++++++++++++++++++++++
->  1 file changed, 34 insertions(+)
->
-> diff --git a/qemu-doc.texi b/qemu-doc.texi
-> index 29f89d8..e3c6400 100644
-> --- a/qemu-doc.texi
-> +++ b/qemu-doc.texi
-> @@ -37,6 +37,7 @@
->  * QEMU Guest Agent::
->  * QEMU User space emulator::
->  * Implementation notes::
-> +* Support lifetime::
->  * Deprecations::
->  * License::
->  * Index::
-> @@ -3017,6 +3018,39 @@ Run the emulation in single step mode.
->  
->  @include qemu-tech.texi
->  
-> +@node Support lifetime
-> +@appendix Support lifetime
-> +
-> +Features provided by QEMU are subject to varying support lifetimes.
-> +
-> +In general features are intended to be supported indefinitely once
-> +introduced. In the event that a feature needs to be removed, there
-> +will be some period in which it will be marked as deprecated before
-> +eventual removal. All deprecated features will be listed in the
-> +``Deprecations'' appendix of this document. They may also generate
-> +warnings on the console when QEMU starts up, or if activated via
-> +a monitor command.
-> +
-> +Certain features will have an inherently finite lifetime, and thus
-> +will be removed on a fixed schedule.
-> +
-> +@node Machine types
-> +@section Machine types
-> +
-> +For architectures which aim to support live migration compatibility
-> +across releases, each release will introduce a new versioned machine
-> +type. For example, the 2.8.0 release introduced machine types
-> +``pc-i440fx-2.8'' and ``pc-q35-2.8' 'for the x86_64/i686 architectures.
-> +
-> +To allow live migration of a guest running on a 2.8.0 release to a
-> +2.9.0, the QEMU 2.9.0 version must support the ``pc-i440fx-2.8'' and
-> +``pc-q35-2.8''.  To allow users live migrating VMs to skip multiple
+Assuming this patches continues to get favourable feedback, my
+intention was/is to grep the source code for the word "deprecated"
+to identify the "full" set, and then send a non-RFC version.
 
-"the ``pc-i440fx-2.8'' and ``pc-q35-2.8'' machine types".
 
-> +intermediate releases when upgrading, new releases of QEMU will
-> +support machine types from many previous versions.
+> > @@ -3016,6 +3017,19 @@ Run the emulation in single step mode.
+> >  
+> >  @include qemu-tech.texi
+> >  
+> > +@node Deprecations
+> 
+> Perhaps "Deprecated Features"?  Not a native speaker...
 
-Suggest s/many/several/
+Yep, sounds better.
 
-> +
-> +The supported lifetime for machine types is 12 releases, which is
-> +equivalent to 4 years worth of previous QEMU releases.
-> +
+> 
+> > +@appendix Deprecations
+> > +
+> > +The following is a list of features which have been marked as deprecated,
+> > +pending removal in a future release:
+> > +
+> > +@section -drive boot=on|off (since v1.3.0)
+> > +Since release 1.3.0, the ``boot=on|off'' parameter to ``-drive''
+> 
+> I wouldn't repeat "since v1.3.0".  It'll get old quickly when the list
+> grows.
 
-Do we have consensus on this?  Peter?
+Agreed.
 
->  @node Deprecations
->  @appendix Deprecations
+> 
+> > +is no longer honoured. It is currently ignored, but a future verson
+> > +will reject this parameter with an error. Applications should use
+> > +the ``bootindex=N'' parameter to set an absolute ordering between
+> > +devices instead.
+> > +
+> >  @node License
+> >  @appendix License
+> 
+> I like it.
+> 
+> Of course, new deprecations need to be in release notes, too.  If the
+> duplication bothers us, we could perhaps just point to release notes.
+> We'd have to check and amend old release notes to make sure all
+> currently deprecated features are covered.
+
+Since the texi is fairly well structured, we could extract the list
+of new deprecations from this doc in an automated manner, to populate
+the per-release notes.  I'd like to keep the combined list as the
+canonical location of the info, so app developers have a single
+place to look to find the list, rather than searching multiple
+release notes.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
