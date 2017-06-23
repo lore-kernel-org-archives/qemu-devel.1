@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORMI-0001aF-Nc
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:00 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dORMM-0001fS-Rx
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dORMH-0007qf-Aw
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:22:58 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dORML-0007vX-PP
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:23:02 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 23 Jun 2017 18:21:35 +0200
-Message-Id: <1498234919-27316-38-git-send-email-kwolf@redhat.com>
+Date: Fri, 23 Jun 2017 18:21:41 +0200
+Message-Id: <1498234919-27316-44-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
 References: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 37/61] qed: Remove callback from
- qed_write_table()
+Subject: [Qemu-devel] [PULL 43/61] qed: Add return value to
+ qed_aio_write_main()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,161 +23,123 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
+Don't recurse into qed_aio_next_io() and qed_aio_complete() here, but
+just return an error code and let the caller handle it.
+
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/qed-table.c | 47 ++++++++++++-----------------------------------
- block/qed.c       | 12 +++++++-----
- block/qed.h       |  8 +++-----
- 3 files changed, 22 insertions(+), 45 deletions(-)
+ block/qed.c | 55 ++++++++++++++++++++++++++++++-------------------------
+ 1 file changed, 30 insertions(+), 25 deletions(-)
 
-diff --git a/block/qed-table.c b/block/qed-table.c
-index 0cc93a7..ebee2c5 100644
---- a/block/qed-table.c
-+++ b/block/qed-table.c
-@@ -61,12 +61,9 @@ out:
-  * @index:      Index of first element
-  * @n:          Number of elements
-  * @flush:      Whether or not to sync to disk
-- * @cb:         Completion function
-- * @opaque:     Argument for completion function
-  */
--static void qed_write_table(BDRVQEDState *s, uint64_t offset, QEDTable *table,
--                            unsigned int index, unsigned int n, bool flush,
--                            BlockCompletionFunc *cb, void *opaque)
-+static int qed_write_table(BDRVQEDState *s, uint64_t offset, QEDTable *table,
-+                           unsigned int index, unsigned int n, bool flush)
- {
-     unsigned int sector_mask = BDRV_SECTOR_SIZE / sizeof(uint64_t) - 1;
-     unsigned int start, end, i;
-@@ -118,15 +115,7 @@ static void qed_write_table(BDRVQEDState *s, uint64_t offset, QEDTable *table,
-     ret = 0;
- out:
-     qemu_vfree(new_table);
--    cb(opaque, ret);
--}
--
--/**
-- * Propagate return value from async callback
-- */
--static void qed_sync_cb(void *opaque, int ret)
--{
--    *(int *)opaque = ret;
-+    return ret;
- }
- 
- int qed_read_l1_table_sync(BDRVQEDState *s)
-@@ -134,23 +123,17 @@ int qed_read_l1_table_sync(BDRVQEDState *s)
-     return qed_read_table(s, s->header.l1_table_offset, s->l1_table);
- }
- 
--void qed_write_l1_table(BDRVQEDState *s, unsigned int index, unsigned int n,
--                        BlockCompletionFunc *cb, void *opaque)
-+int qed_write_l1_table(BDRVQEDState *s, unsigned int index, unsigned int n)
- {
-     BLKDBG_EVENT(s->bs->file, BLKDBG_L1_UPDATE);
--    qed_write_table(s, s->header.l1_table_offset,
--                    s->l1_table, index, n, false, cb, opaque);
-+    return qed_write_table(s, s->header.l1_table_offset,
-+                           s->l1_table, index, n, false);
- }
- 
- int qed_write_l1_table_sync(BDRVQEDState *s, unsigned int index,
-                             unsigned int n)
- {
--    int ret = -EINPROGRESS;
--
--    qed_write_l1_table(s, index, n, qed_sync_cb, &ret);
--    BDRV_POLL_WHILE(s->bs, ret == -EINPROGRESS);
--
--    return ret;
-+    return qed_write_l1_table(s, index, n);
- }
- 
- int qed_read_l2_table(BDRVQEDState *s, QEDRequest *request, uint64_t offset)
-@@ -197,22 +180,16 @@ int qed_read_l2_table_sync(BDRVQEDState *s, QEDRequest *request, uint64_t offset
-     return qed_read_l2_table(s, request, offset);
- }
- 
--void qed_write_l2_table(BDRVQEDState *s, QEDRequest *request,
--                        unsigned int index, unsigned int n, bool flush,
--                        BlockCompletionFunc *cb, void *opaque)
-+int qed_write_l2_table(BDRVQEDState *s, QEDRequest *request,
-+                       unsigned int index, unsigned int n, bool flush)
- {
-     BLKDBG_EVENT(s->bs->file, BLKDBG_L2_UPDATE);
--    qed_write_table(s, request->l2_table->offset,
--                    request->l2_table->table, index, n, flush, cb, opaque);
-+    return qed_write_table(s, request->l2_table->offset,
-+                           request->l2_table->table, index, n, flush);
- }
- 
- int qed_write_l2_table_sync(BDRVQEDState *s, QEDRequest *request,
-                             unsigned int index, unsigned int n, bool flush)
- {
--    int ret = -EINPROGRESS;
--
--    qed_write_l2_table(s, request, index, n, flush, qed_sync_cb, &ret);
--    BDRV_POLL_WHILE(s->bs, ret == -EINPROGRESS);
--
--    return ret;
-+    return qed_write_l2_table(s, request, index, n, flush);
- }
 diff --git a/block/qed.c b/block/qed.c
-index 95f1050..8c493bb 100644
+index 3cda01f..a4b13f8 100644
 --- a/block/qed.c
 +++ b/block/qed.c
-@@ -1000,7 +1000,8 @@ static void qed_aio_write_l1_update(void *opaque, int ret)
-     index = qed_l1_index(s, acb->cur_pos);
-     s->l1_table->offsets[index] = acb->request.l2_table->offset;
+@@ -1022,29 +1022,22 @@ static int qed_aio_write_l2_update(QEDAIOCB *acb, uint64_t offset)
+ /**
+  * Write data to the image file
+  */
+-static void qed_aio_write_main(void *opaque, int ret)
++static int qed_aio_write_main(QEDAIOCB *acb)
+ {
+-    QEDAIOCB *acb = opaque;
+     BDRVQEDState *s = acb_to_s(acb);
+     uint64_t offset = acb->cur_cluster +
+                       qed_offset_into_cluster(s, acb->cur_pos);
++    int ret;
  
--    qed_write_l1_table(s, index, 1, qed_commit_l2_update, acb);
-+    ret = qed_write_l1_table(s, index, 1);
-+    qed_commit_l2_update(acb, ret);
+-    trace_qed_aio_write_main(s, acb, ret, offset, acb->cur_qiov.size);
+-
+-    if (ret) {
+-        qed_aio_complete(acb, ret);
+-        return;
+-    }
++    trace_qed_aio_write_main(s, acb, 0, offset, acb->cur_qiov.size);
+ 
+     BLKDBG_EVENT(s->bs->file, BLKDBG_WRITE_AIO);
+     ret = bdrv_pwritev(s->bs->file, offset, &acb->cur_qiov);
+-    if (ret >= 0) {
+-        ret = 0;
++    if (ret < 0) {
++        return ret;
+     }
+ 
+-    if (acb->find_cluster_ret == QED_CLUSTER_FOUND) {
+-        qed_aio_next_io(acb, ret);
+-    } else {
++    if (acb->find_cluster_ret != QED_CLUSTER_FOUND) {
+         if (s->bs->backing) {
+             /*
+              * Flush new data clusters before updating the L2 table
+@@ -1057,20 +1050,16 @@ static void qed_aio_write_main(void *opaque, int ret)
+              * cluster and before updating the L2 table.
+              */
+             ret = bdrv_flush(s->bs->file->bs);
+-        }
+-        if (ret) {
+-            goto err;
++            if (ret < 0) {
++                return ret;
++            }
+         }
+         ret = qed_aio_write_l2_update(acb, acb->cur_cluster);
+-        if (ret) {
+-            goto err;
++        if (ret < 0) {
++            return ret;
+         }
+-        qed_aio_next_io(acb, 0);
+     }
+-    return;
+-
+-err:
+-    qed_aio_complete(acb, ret);
++    return 0;
  }
  
  /**
-@@ -1027,12 +1028,13 @@ static void qed_aio_write_l2_update(QEDAIOCB *acb, int ret, uint64_t offset)
+@@ -1102,8 +1091,17 @@ static void qed_aio_write_cow(void *opaque, int ret)
  
-     if (need_alloc) {
-         /* Write out the whole new L2 table */
--        qed_write_l2_table(s, &acb->request, 0, s->table_nelems, true,
--                           qed_aio_write_l1_update, acb);
-+        ret = qed_write_l2_table(s, &acb->request, 0, s->table_nelems, true);
-+        qed_aio_write_l1_update(acb, ret);
-     } else {
-         /* Write out only the updated part of the L2 table */
--        qed_write_l2_table(s, &acb->request, index, acb->cur_nclusters, false,
--                           qed_aio_next_io_cb, acb);
-+        ret = qed_write_l2_table(s, &acb->request, index, acb->cur_nclusters,
-+                                 false);
-+        qed_aio_next_io(acb, ret);
-     }
-     return;
+     trace_qed_aio_write_postfill(s, acb, start, len, offset);
+     ret = qed_copy_from_backing_file(s, start, len, offset);
++    if (ret) {
++        qed_aio_complete(acb, ret);
++        return;
++    }
  
-diff --git a/block/qed.h b/block/qed.h
-index 46843c4..51443fa 100644
---- a/block/qed.h
-+++ b/block/qed.h
-@@ -220,16 +220,14 @@ void qed_commit_l2_cache_entry(L2TableCache *l2_cache, CachedL2Table *l2_table);
-  * Table I/O functions
+-    qed_aio_write_main(acb, ret);
++    ret = qed_aio_write_main(acb);
++    if (ret < 0) {
++        qed_aio_complete(acb, ret);
++        return;
++    }
++    qed_aio_next_io(acb, 0);
+ }
+ 
+ /**
+@@ -1201,6 +1199,8 @@ static void qed_aio_write_alloc(QEDAIOCB *acb, size_t len)
   */
- int qed_read_l1_table_sync(BDRVQEDState *s);
--void qed_write_l1_table(BDRVQEDState *s, unsigned int index, unsigned int n,
--                        BlockCompletionFunc *cb, void *opaque);
-+int qed_write_l1_table(BDRVQEDState *s, unsigned int index, unsigned int n);
- int qed_write_l1_table_sync(BDRVQEDState *s, unsigned int index,
-                             unsigned int n);
- int qed_read_l2_table_sync(BDRVQEDState *s, QEDRequest *request,
-                            uint64_t offset);
- int qed_read_l2_table(BDRVQEDState *s, QEDRequest *request, uint64_t offset);
--void qed_write_l2_table(BDRVQEDState *s, QEDRequest *request,
--                        unsigned int index, unsigned int n, bool flush,
--                        BlockCompletionFunc *cb, void *opaque);
-+int qed_write_l2_table(BDRVQEDState *s, QEDRequest *request,
-+                       unsigned int index, unsigned int n, bool flush);
- int qed_write_l2_table_sync(BDRVQEDState *s, QEDRequest *request,
-                             unsigned int index, unsigned int n, bool flush);
+ static void qed_aio_write_inplace(QEDAIOCB *acb, uint64_t offset, size_t len)
+ {
++    int ret;
++
+     /* Allocate buffer for zero writes */
+     if (acb->flags & QED_AIOCB_ZERO) {
+         struct iovec *iov = acb->qiov->iov;
+@@ -1220,7 +1220,12 @@ static void qed_aio_write_inplace(QEDAIOCB *acb, uint64_t offset, size_t len)
+     qemu_iovec_concat(&acb->cur_qiov, acb->qiov, acb->qiov_offset, len);
  
+     /* Do the actual write */
+-    qed_aio_write_main(acb, 0);
++    ret = qed_aio_write_main(acb);
++    if (ret < 0) {
++        qed_aio_complete(acb, ret);
++        return;
++    }
++    qed_aio_next_io(acb, 0);
+ }
+ 
+ /**
 -- 
 1.8.3.1
