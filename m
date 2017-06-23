@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dOCKN-0001bC-F2
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 20:20:00 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1dOChN-0007OR-M6
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 20:43:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dOCKM-0001aL-LM
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 20:19:59 -0400
-Received: from hera.aquilenet.fr ([2a01:474::1]:55638)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dOCKM-0001aF-Eo
-	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 20:19:58 -0400
-Date: Fri, 23 Jun 2017 02:19:55 +0200
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20170623001955.2g6iqiqg2qkhcbus@var.youpi.perso.aquilenet.fr>
-References: <20170622124204.19407-1-marcandre.lureau@redhat.com>
-	<20170622124204.19407-13-marcandre.lureau@redhat.com>
+	(envelope-from <wei.w.wang@intel.com>) id 1dOChK-0001zY-Ii
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 20:43:45 -0400
+Received: from mga02.intel.com ([134.134.136.20]:13887)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1dOChK-0001yd-9v
+	for qemu-devel@nongnu.org; Thu, 22 Jun 2017 20:43:42 -0400
+Message-ID: <594C64CA.5030703@intel.com>
+Date: Fri, 23 Jun 2017 08:46:02 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170622124204.19407-13-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 12/31] slirp: use DIV_ROUND_UP
+References: <1497610119-45041-1-git-send-email-wei.w.wang@intel.com>
+	<20170616172531-mutt-send-email-mst@kernel.org>
+	<5944EA6B.2080606@intel.com>
+	<20170622170016-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20170622170016-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v2 1/2] virtio-net: enable
+ configurable tx queue size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +31,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Jan Kiszka <jan.kiszka@siemens.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: jasowang@redhat.com, marcandre.lureau@gmail.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, stefanha@gmail.com, pbonzini@redhat.com, armbru@redhat.com, jan.scheurich@ericsson.com
 
-Marc-Andr=C3=A9 Lureau, on jeu. 22 juin 2017 14:41:45 +0200, wrote:
-> I used the clang-tidy qemu-round check to generate the fix:
-> https://github.com/elmarco/clang-tools-extra
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On 06/22/2017 10:00 PM, Michael S. Tsirkin wrote:
+> On Sat, Jun 17, 2017 at 04:38:03PM +0800, Wei Wang wrote:
+>> On 06/16/2017 10:31 PM, Michael S. Tsirkin wrote:
+>>> On Fri, Jun 16, 2017 at 06:48:38PM +0800, Wei Wang wrote:
+>>>> This patch enables the virtio-net tx queue size to be configurable
+>>>> between 256 (the default queue size) and 1024 by the user when the
+>>>> vhost-user backend is used.
+>>>>
+>>>> Currently, the maximum tx queue size for other backends is 512 due
+>>>> to the following limitations:
+>>>> - QEMU backend: the QEMU backend implementation in some cases may
+>>>> send 1024+1 iovs to writev.
+>>>> - Vhost_net backend: there are possibilities that the guest sends
+>>>> a vring_desc of memory which corsses a MemoryRegion thereby
+>>>> generating more than 1024 iovs in total after translattion from
+>>>> guest-physical address in the backend.
+>>>>
+>>>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+>>>> ---
+>>>>    hw/net/virtio-net.c            | 46 ++++++++++++++++++++++++++++++++++--------
+>>>>    include/hw/virtio/virtio-net.h |  1 +
+>>>>    2 files changed, 39 insertions(+), 8 deletions(-)
+>>>>
+>>>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+>>>> index 7d091c9..e1a08fd 100644
+>>>> --- a/hw/net/virtio-net.c
+>>>> +++ b/hw/net/virtio-net.c
+>>>> @@ -33,8 +33,11 @@
+>>>>    /* previously fixed value */
+>>>>    #define VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE 256
+>>>> +#define VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE 256
+>>>> +
+>>>>    /* for now, only allow larger queues; with virtio-1, guest can downsize */
+>>>>    #define VIRTIO_NET_RX_QUEUE_MIN_SIZE VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE
+>>>> +#define VIRTIO_NET_TX_QUEUE_MIN_SIZE VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE
+>>>>    /*
+>>>>     * Calculate the number of bytes up to and including the given 'field' of
+>>>> @@ -1491,18 +1494,33 @@ static void virtio_net_tx_bh(void *opaque)
+>>>>    static void virtio_net_add_queue(VirtIONet *n, int index)
+>>>>    {
+>>>>        VirtIODevice *vdev = VIRTIO_DEVICE(n);
+>>>> +    NetClientState *nc = qemu_get_queue(n->nic);
+>>>>        n->vqs[index].rx_vq = virtio_add_queue(vdev, n->net_conf.rx_queue_size,
+>>>>                                               virtio_net_handle_rx);
+>>>> +
+>>>> +    /*
+>>>> +     * Currently, backends other than vhost-user don't support 1024 queue
+>>>> +     * size.
+>>>> +     */
+>>>> +    if (n->net_conf.tx_queue_size == VIRTQUEUE_MAX_SIZE &&
+>>>> +        nc->peer->info->type != NET_CLIENT_DRIVER_VHOST_USER) {
+>>>> +        fprintf(stderr, "warning: %s: queue size %d not supported\n",
+>>>> +                __func__, n->net_conf.tx_queue_size);
+>>>> +        n->net_conf.tx_queue_size = VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE;
+>>>> +    }
+>>>> +
+>>> Also, I suspect we can get here with no peer, and above will crash.
+>>> It seems ugly to do this on each virtio_net_add_queue.
+>>> How about moving this to realize?
+>> The code has been re-arranged to make sure nc->peer is ready before
+>> it's used, but I agree that it looks better to move the above to realize().
+>>
+>> Best,
+>> Wei
+> ping
+>
+> The issues left are minor, let's make progress and merge this asap
+>
 
-Applied to my tree, thanks!
+OK. I'll send out the new version soon.
 
-> ---
->  slirp/ip6.h | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->=20
-> diff --git a/slirp/ip6.h b/slirp/ip6.h
-> index 0908855f0f..b1bea43b3c 100644
-> --- a/slirp/ip6.h
-> +++ b/slirp/ip6.h
-> @@ -57,9 +57,9 @@ static inline bool in6_equal_mach(const struct in6_ad=
-dr *a,
->                                    const struct in6_addr *b,
->                                    int prefix_len)
->  {
-> -    if (memcmp(&(a->s6_addr[(prefix_len + 7) / 8]),
-> -               &(b->s6_addr[(prefix_len + 7) / 8]),
-> -               16 - (prefix_len + 7) / 8) !=3D 0) {
-> +    if (memcmp(&(a->s6_addr[DIV_ROUND_UP(prefix_len, 8)]),
-> +               &(b->s6_addr[DIV_ROUND_UP(prefix_len, 8)]),
-> +               16 - DIV_ROUND_UP(prefix_len, 8)) !=3D 0) {
->          return 0;
->      }
-> =20
-> --=20
-> 2.13.1.395.gf7b71de06
->=20
 
---=20
-Samuel
-<D> N: j'aime bien Cut d'un truc enorme... ca montre de quel cote de l'ec=
-ran sont les gonades :)))
- -+- #ens-mim et la peufeupeu -+-
+Best,
+Wei
