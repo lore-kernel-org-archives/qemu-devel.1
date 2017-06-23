@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dOROl-00044t-6C
+	(envelope-from <berrange@redhat.com>) id 1dOROm-00045Z-2Z
 	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:25:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dOROj-0001Tg-4L
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:25:31 -0400
+	(envelope-from <berrange@redhat.com>) id 1dOROk-0001UN-Aa
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 12:25:32 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Fri, 23 Jun 2017 17:24:15 +0100
-Message-Id: <20170623162419.26068-17-berrange@redhat.com>
+Date: Fri, 23 Jun 2017 17:24:17 +0100
+Message-Id: <20170623162419.26068-19-berrange@redhat.com>
 In-Reply-To: <20170623162419.26068-1-berrange@redhat.com>
 References: <20170623162419.26068-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v10 16/20] block: rip out all traces of
- password prompting
+Subject: [Qemu-devel] [PATCH v10 18/20] block: pass option prefix down to
+ crypto layer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,466 +23,322 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Now that qcow & qcow2 are wired up to get encryption keys
-via the QCryptoSecret object, nothing is relying on the
-interactive prompting for passwords. All the code related
-to password prompting can thus be ripped out.
+While the crypto layer uses a fixed option name "key-secret",
+the upper block layer may have a prefix on the options. e.g.
+"encrypt.key-secret", in order to avoid clashes between crypto
+option names & other block option names. To ensure the crypto
+layer can report accurate error messages, we must tell it what
+option name prefix was used.
 
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- hmp.c                     | 31 ---------------------
- include/monitor/monitor.h |  7 -----
- include/qemu/osdep.h      |  2 --
- monitor.c                 | 68 -----------------------------------------------
- qapi-schema.json          | 10 +------
- qemu-img.c                | 31 ---------------------
- qemu-io.c                 | 20 --------------
- qmp.c                     | 12 +--------
- util/oslib-posix.c        | 66 ---------------------------------------------
- util/oslib-win32.c        | 24 -----------------
- 10 files changed, 2 insertions(+), 269 deletions(-)
+ block/crypto.c            | 4 ++--
+ block/qcow.c              | 7 ++++---
+ block/qcow2.c             | 8 ++++----
+ crypto/block-luks.c       | 8 ++++++--
+ crypto/block-qcow.c       | 8 ++++++--
+ crypto/block.c            | 6 ++++--
+ crypto/blockpriv.h        | 2 ++
+ include/crypto/block.h    | 6 +++++-
+ tests/test-crypto-block.c | 8 ++++----
+ 9 files changed, 37 insertions(+), 20 deletions(-)
 
-diff --git a/hmp.c b/hmp.c
-index 8c72c58..435cb31 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1085,37 +1085,12 @@ void hmp_ringbuf_read(Monitor *mon, const QDict *qdict)
-     g_free(data);
- }
- 
--static void hmp_cont_cb(void *opaque, int err)
--{
--    if (!err) {
--        qmp_cont(NULL);
--    }
--}
--
--static bool key_is_missing(const BlockInfo *bdev)
--{
--    return (bdev->inserted && bdev->inserted->encryption_key_missing);
--}
--
- void hmp_cont(Monitor *mon, const QDict *qdict)
- {
--    BlockInfoList *bdev_list, *bdev;
-     Error *err = NULL;
- 
--    bdev_list = qmp_query_block(NULL);
--    for (bdev = bdev_list; bdev; bdev = bdev->next) {
--        if (key_is_missing(bdev->value)) {
--            monitor_read_block_device_key(mon, bdev->value->device,
--                                          hmp_cont_cb, NULL);
--            goto out;
--        }
--    }
--
-     qmp_cont(&err);
-     hmp_handle_error(mon, &err);
--
--out:
--    qapi_free_BlockInfoList(bdev_list);
- }
- 
- void hmp_system_wakeup(Monitor *mon, const QDict *qdict)
-@@ -1738,12 +1713,6 @@ void hmp_change(Monitor *mon, const QDict *qdict)
-         qmp_blockdev_change_medium(true, device, false, NULL, target,
-                                    !!arg, arg, !!read_only, read_only_mode,
-                                    &err);
--        if (err &&
--            error_get_class(err) == ERROR_CLASS_DEVICE_ENCRYPTED) {
--            error_free(err);
--            monitor_read_block_device_key(mon, device, NULL, NULL);
--            return;
--        }
+diff --git a/block/crypto.c b/block/crypto.c
+index 3ad4b20..c561cba 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -296,7 +296,7 @@ static int block_crypto_open_generic(QCryptoBlockFormat format,
+     if (flags & BDRV_O_NO_IO) {
+         cflags |= QCRYPTO_BLOCK_OPEN_NO_IO;
+     }
+-    crypto->block = qcrypto_block_open(open_opts,
++    crypto->block = qcrypto_block_open(open_opts, NULL,
+                                        block_crypto_read_func,
+                                        bs,
+                                        cflags,
+@@ -340,7 +340,7 @@ static int block_crypto_create_generic(QCryptoBlockFormat format,
+         return -1;
      }
  
-     hmp_handle_error(mon, &err);
-diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
-index d2b3aaf..83ea4a1 100644
---- a/include/monitor/monitor.h
-+++ b/include/monitor/monitor.h
-@@ -23,13 +23,6 @@ void monitor_cleanup(void);
- int monitor_suspend(Monitor *mon);
- void monitor_resume(Monitor *mon);
+-    crypto = qcrypto_block_create(create_opts,
++    crypto = qcrypto_block_create(create_opts, NULL,
+                                   block_crypto_init_func,
+                                   block_crypto_write_func,
+                                   &data,
+diff --git a/block/qcow.c b/block/qcow.c
+index 8a24930..2002c16 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -208,8 +208,8 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
+             if (flags & BDRV_O_NO_IO) {
+                 cflags |= QCRYPTO_BLOCK_OPEN_NO_IO;
+             }
+-            s->crypto = qcrypto_block_open(crypto_opts, NULL, NULL,
+-                                           cflags, errp);
++            s->crypto = qcrypto_block_open(crypto_opts, "encrypt.",
++                                           NULL, NULL, cflags, errp);
+             if (!s->crypto) {
+                 ret = -EINVAL;
+                 goto fail;
+@@ -866,7 +866,8 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
+             goto exit;
+         }
  
--int monitor_read_bdrv_key_start(Monitor *mon, BlockDriverState *bs,
--                                BlockCompletionFunc *completion_cb,
--                                void *opaque);
--int monitor_read_block_device_key(Monitor *mon, const char *device,
--                                  BlockCompletionFunc *completion_cb,
--                                  void *opaque);
--
- int monitor_get_fd(Monitor *mon, const char *fdname, Error **errp);
- int monitor_fd_param(Monitor *mon, const char *fdname, Error **errp);
+-        crypto = qcrypto_block_create(crypto_opts, NULL, NULL, NULL, errp);
++        crypto = qcrypto_block_create(crypto_opts, "encrypt.",
++                                      NULL, NULL, NULL, errp);
+         if (!crypto) {
+             ret = -EINVAL;
+             goto exit;
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 765220e..b3836d5 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -279,7 +279,7 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
+             if (flags & BDRV_O_NO_IO) {
+                 cflags |= QCRYPTO_BLOCK_OPEN_NO_IO;
+             }
+-            s->crypto = qcrypto_block_open(s->crypto_opts,
++            s->crypto = qcrypto_block_open(s->crypto_opts, "encrypt.",
+                                            qcow2_crypto_hdr_read_func,
+                                            bs, cflags, errp);
+             if (!s->crypto) {
+@@ -1313,8 +1313,8 @@ static int qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
+             if (flags & BDRV_O_NO_IO) {
+                 cflags |= QCRYPTO_BLOCK_OPEN_NO_IO;
+             }
+-            s->crypto = qcrypto_block_open(s->crypto_opts, NULL, NULL,
+-                                           cflags, errp);
++            s->crypto = qcrypto_block_open(s->crypto_opts, "encrypt.",
++                                           NULL, NULL, cflags, errp);
+             if (!s->crypto) {
+                 ret = -EINVAL;
+                 goto fail;
+@@ -2318,7 +2318,7 @@ static int qcow2_set_up_encryption(BlockDriverState *bs, const char *encryptfmt,
+     }
+     s->crypt_method_header = fmt;
  
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index fb008a2..a5982ef 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -457,8 +457,6 @@ void qemu_set_tty_echo(int fd, bool echo);
- void os_mem_prealloc(int fd, char *area, size_t sz, int smp_cpus,
-                      Error **errp);
+-    crypto = qcrypto_block_create(cryptoopts,
++    crypto = qcrypto_block_create(cryptoopts, "encrypt.",
+                                   qcow2_crypto_hdr_init_func,
+                                   qcow2_crypto_hdr_write_func,
+                                   bs, errp);
+diff --git a/crypto/block-luks.c b/crypto/block-luks.c
+index 2b97d89..afb8543 100644
+--- a/crypto/block-luks.c
++++ b/crypto/block-luks.c
+@@ -638,6 +638,7 @@ qcrypto_block_luks_find_key(QCryptoBlock *block,
+ static int
+ qcrypto_block_luks_open(QCryptoBlock *block,
+                         QCryptoBlockOpenOptions *options,
++                        const char *optprefix,
+                         QCryptoBlockReadFunc readfunc,
+                         void *opaque,
+                         unsigned int flags,
+@@ -661,7 +662,8 @@ qcrypto_block_luks_open(QCryptoBlock *block,
  
--int qemu_read_password(char *buf, int buf_size);
--
+     if (!(flags & QCRYPTO_BLOCK_OPEN_NO_IO)) {
+         if (!options->u.luks.key_secret) {
+-            error_setg(errp, "Parameter 'key-secret' is required for cipher");
++            error_setg(errp, "Parameter '%skey-secret' is required for cipher",
++                       optprefix ? optprefix : "");
+             return -1;
+         }
+         password = qcrypto_secret_lookup_as_utf8(
+@@ -885,6 +887,7 @@ qcrypto_block_luks_uuid_gen(uint8_t *uuidstr)
+ static int
+ qcrypto_block_luks_create(QCryptoBlock *block,
+                           QCryptoBlockCreateOptions *options,
++                          const char *optprefix,
+                           QCryptoBlockInitFunc initfunc,
+                           QCryptoBlockWriteFunc writefunc,
+                           void *opaque,
+@@ -937,7 +940,8 @@ qcrypto_block_luks_create(QCryptoBlock *block,
+      * be silently ignored, for compatibility with dm-crypt */
+ 
+     if (!options->u.luks.key_secret) {
+-        error_setg(errp, "Parameter 'key-secret' is required for cipher");
++        error_setg(errp, "Parameter '%skey-secret' is required for cipher",
++                   optprefix ? optprefix : "");
+         return -1;
+     }
+     password = qcrypto_secret_lookup_as_utf8(luks_opts.key_secret, errp);
+diff --git a/crypto/block-qcow.c b/crypto/block-qcow.c
+index be88c6f..a456fe3 100644
+--- a/crypto/block-qcow.c
++++ b/crypto/block-qcow.c
+@@ -94,6 +94,7 @@ qcrypto_block_qcow_init(QCryptoBlock *block,
+ static int
+ qcrypto_block_qcow_open(QCryptoBlock *block,
+                         QCryptoBlockOpenOptions *options,
++                        const char *optprefix,
+                         QCryptoBlockReadFunc readfunc G_GNUC_UNUSED,
+                         void *opaque G_GNUC_UNUSED,
+                         unsigned int flags,
+@@ -104,7 +105,8 @@ qcrypto_block_qcow_open(QCryptoBlock *block,
+     } else {
+         if (!options->u.qcow.key_secret) {
+             error_setg(errp,
+-                       "Parameter 'key-secret' is required for cipher");
++                       "Parameter '%skey-secret' is required for cipher",
++                       optprefix ? optprefix : "");
+             return -1;
+         }
+         return qcrypto_block_qcow_init(block,
+@@ -116,13 +118,15 @@ qcrypto_block_qcow_open(QCryptoBlock *block,
+ static int
+ qcrypto_block_qcow_create(QCryptoBlock *block,
+                           QCryptoBlockCreateOptions *options,
++                          const char *optprefix,
+                           QCryptoBlockInitFunc initfunc G_GNUC_UNUSED,
+                           QCryptoBlockWriteFunc writefunc G_GNUC_UNUSED,
+                           void *opaque G_GNUC_UNUSED,
+                           Error **errp)
+ {
+     if (!options->u.qcow.key_secret) {
+-        error_setg(errp, "Parameter 'key-secret' is required for cipher");
++        error_setg(errp, "Parameter '%skey-secret' is required for cipher",
++                   optprefix ? optprefix : "");
+         return -1;
+     }
+     /* QCow2 has no special header, since everything is hardwired */
+diff --git a/crypto/block.c b/crypto/block.c
+index 64c8420..b097d45 100644
+--- a/crypto/block.c
++++ b/crypto/block.c
+@@ -48,6 +48,7 @@ bool qcrypto_block_has_format(QCryptoBlockFormat format,
+ 
+ 
+ QCryptoBlock *qcrypto_block_open(QCryptoBlockOpenOptions *options,
++                                 const char *optprefix,
+                                  QCryptoBlockReadFunc readfunc,
+                                  void *opaque,
+                                  unsigned int flags,
+@@ -67,7 +68,7 @@ QCryptoBlock *qcrypto_block_open(QCryptoBlockOpenOptions *options,
+ 
+     block->driver = qcrypto_block_drivers[options->format];
+ 
+-    if (block->driver->open(block, options,
++    if (block->driver->open(block, options, optprefix,
+                             readfunc, opaque, flags, errp) < 0) {
+         g_free(block);
+         return NULL;
+@@ -78,6 +79,7 @@ QCryptoBlock *qcrypto_block_open(QCryptoBlockOpenOptions *options,
+ 
+ 
+ QCryptoBlock *qcrypto_block_create(QCryptoBlockCreateOptions *options,
++                                   const char *optprefix,
+                                    QCryptoBlockInitFunc initfunc,
+                                    QCryptoBlockWriteFunc writefunc,
+                                    void *opaque,
+@@ -97,7 +99,7 @@ QCryptoBlock *qcrypto_block_create(QCryptoBlockCreateOptions *options,
+ 
+     block->driver = qcrypto_block_drivers[options->format];
+ 
+-    if (block->driver->create(block, options, initfunc,
++    if (block->driver->create(block, options, optprefix, initfunc,
+                               writefunc, opaque, errp) < 0) {
+         g_free(block);
+         return NULL;
+diff --git a/crypto/blockpriv.h b/crypto/blockpriv.h
+index 68f0f06..0edb810 100644
+--- a/crypto/blockpriv.h
++++ b/crypto/blockpriv.h
+@@ -41,6 +41,7 @@ struct QCryptoBlock {
+ struct QCryptoBlockDriver {
+     int (*open)(QCryptoBlock *block,
+                 QCryptoBlockOpenOptions *options,
++                const char *optprefix,
+                 QCryptoBlockReadFunc readfunc,
+                 void *opaque,
+                 unsigned int flags,
+@@ -48,6 +49,7 @@ struct QCryptoBlockDriver {
+ 
+     int (*create)(QCryptoBlock *block,
+                   QCryptoBlockCreateOptions *options,
++                  const char *optprefix,
+                   QCryptoBlockInitFunc initfunc,
+                   QCryptoBlockWriteFunc writefunc,
+                   void *opaque,
+diff --git a/include/crypto/block.h b/include/crypto/block.h
+index 013a435..f0e543b 100644
+--- a/include/crypto/block.h
++++ b/include/crypto/block.h
+@@ -71,6 +71,7 @@ typedef enum {
  /**
-  * qemu_get_pid_name:
-  * @pid: pid of a process
-diff --git a/monitor.c b/monitor.c
-index fcf4fad..7647291 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -4123,74 +4123,6 @@ void monitor_cleanup(void)
-     qemu_mutex_unlock(&monitor_lock);
- }
+  * qcrypto_block_open:
+  * @options: the encryption options
++ * @optprefix: name prefix for options
+  * @readfunc: callback for reading data from the volume
+  * @opaque: data to pass to @readfunc
+  * @flags: bitmask of QCryptoBlockOpenFlags values
+@@ -102,6 +103,7 @@ typedef enum {
+  * Returns: a block encryption format, or NULL on error
+  */
+ QCryptoBlock *qcrypto_block_open(QCryptoBlockOpenOptions *options,
++                                 const char *optprefix,
+                                  QCryptoBlockReadFunc readfunc,
+                                  void *opaque,
+                                  unsigned int flags,
+@@ -109,7 +111,8 @@ QCryptoBlock *qcrypto_block_open(QCryptoBlockOpenOptions *options,
  
--static void bdrv_password_cb(void *opaque, const char *password,
--                             void *readline_opaque)
--{
--    Monitor *mon = opaque;
--    BlockDriverState *bs = readline_opaque;
--    int ret = 0;
--    Error *local_err = NULL;
--
--    bdrv_add_key(bs, password, &local_err);
--    if (local_err) {
--        error_report_err(local_err);
--        ret = -EPERM;
--    }
--    if (mon->password_completion_cb)
--        mon->password_completion_cb(mon->password_opaque, ret);
--
--    monitor_read_command(mon, 1);
--}
--
--int monitor_read_bdrv_key_start(Monitor *mon, BlockDriverState *bs,
--                                BlockCompletionFunc *completion_cb,
--                                void *opaque)
--{
--    int err;
--
--    monitor_printf(mon, "%s (%s) is encrypted.\n", bdrv_get_device_name(bs),
--                   bdrv_get_encrypted_filename(bs));
--
--    mon->password_completion_cb = completion_cb;
--    mon->password_opaque = opaque;
--
--    err = monitor_read_password(mon, bdrv_password_cb, bs);
--
--    if (err && completion_cb)
--        completion_cb(opaque, err);
--
--    return err;
--}
--
--int monitor_read_block_device_key(Monitor *mon, const char *device,
--                                  BlockCompletionFunc *completion_cb,
--                                  void *opaque)
--{
--    Error *err = NULL;
--    BlockBackend *blk;
--
--    blk = blk_by_name(device);
--    if (!blk) {
--        monitor_printf(mon, "Device not found %s\n", device);
--        return -1;
--    }
--    if (!blk_bs(blk)) {
--        monitor_printf(mon, "Device '%s' has no medium\n", device);
--        return -1;
--    }
--
--    bdrv_add_key(blk_bs(blk), NULL, &err);
--    if (err) {
--        error_free(err);
--        return monitor_read_bdrv_key_start(mon, blk_bs(blk), completion_cb, opaque);
--    }
--
--    if (completion_cb) {
--        completion_cb(opaque, 0);
--    }
--    return 0;
--}
--
- QemuOptsList qemu_mon_opts = {
-     .name = "mon",
-     .implied_opt_name = "chardev",
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 4b50b65..2a352c3 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -2428,8 +2428,6 @@
- # Since:  0.14.0
- #
- # Returns:  If successful, nothing
--#           If QEMU was started with an encrypted block device and a key has
--#              not yet been set, DeviceEncrypted.
- #
- # Notes:  This command will succeed if the guest is currently running.  It
- #         will also succeed if the guest is in the "inmigrate" state; in
-@@ -2710,8 +2708,7 @@
- #        * This command is stateless, this means that commands that depend
- #          on state information (such as getfd) might not work
- #
--#        * Commands that prompt the user for data (eg. 'cont' when the block
--#          device is encrypted) don't currently work
-+#        * Commands that prompt the user for data don't currently work
- #
- # Example:
- #
-@@ -3016,11 +3013,6 @@
- #
- # Returns: Nothing on success.
- #          If @device is not a valid block device, DeviceNotFound
--#          If the new block device is encrypted, DeviceEncrypted.  Note that
--#          if this error is returned, the device has been opened successfully
--#          and an additional call to @block_passwd is required to set the
--#          device's password.  The behavior of reads and writes to the block
--#          device between when these calls are executed is undefined.
- #
- # Notes:  This interface is deprecated, and it is strongly recommended that you
- #         avoid using it.  For changing block devices, use
-diff --git a/qemu-img.c b/qemu-img.c
-index 31dd0cc..ed84bb1 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -260,29 +260,6 @@ static int print_block_option_help(const char *filename, const char *fmt)
- }
+ /**
+  * qcrypto_block_create:
+- * @format: the encryption format
++ * @options: the encryption options
++ * @optprefix: name prefix for options
+  * @initfunc: callback for initializing volume header
+  * @writefunc: callback for writing data to the volume header
+  * @opaque: data to pass to @initfunc and @writefunc
+@@ -133,6 +136,7 @@ QCryptoBlock *qcrypto_block_open(QCryptoBlockOpenOptions *options,
+  * Returns: a block encryption format, or NULL on error
+  */
+ QCryptoBlock *qcrypto_block_create(QCryptoBlockCreateOptions *options,
++                                   const char *optprefix,
+                                    QCryptoBlockInitFunc initfunc,
+                                    QCryptoBlockWriteFunc writefunc,
+                                    void *opaque,
+diff --git a/tests/test-crypto-block.c b/tests/test-crypto-block.c
+index 95c4bd5..bd7fe59 100644
+--- a/tests/test-crypto-block.c
++++ b/tests/test-crypto-block.c
+@@ -281,7 +281,7 @@ static void test_block(gconstpointer opaque)
+     memset(&header, 0, sizeof(header));
+     buffer_init(&header, "header");
  
+-    blk = qcrypto_block_create(data->create_opts,
++    blk = qcrypto_block_create(data->create_opts, NULL,
+                                test_block_init_func,
+                                test_block_write_func,
+                                &header,
+@@ -300,7 +300,7 @@ static void test_block(gconstpointer opaque)
+     object_unparent(sec);
  
--static int img_open_password(BlockBackend *blk, const char *filename,
--                             int flags, bool quiet)
--{
--    BlockDriverState *bs;
--    char password[256];
--
--    bs = blk_bs(blk);
--    if (bdrv_is_encrypted(bs) && bdrv_key_required(bs) &&
--        !(flags & BDRV_O_NO_IO)) {
--        qprintf(quiet, "Disk image '%s' is encrypted.\n", filename);
--        if (qemu_read_password(password, sizeof(password)) < 0) {
--            error_report("No password given");
--            return -1;
--        }
--        if (bdrv_set_key(bs, password) < 0) {
--            error_report("invalid password");
--            return -1;
--        }
--    }
--    return 0;
--}
--
--
- static BlockBackend *img_open_opts(const char *optstr,
-                                    QemuOpts *opts, int flags, bool writethrough,
-                                    bool quiet, bool force_share)
-@@ -307,10 +284,6 @@ static BlockBackend *img_open_opts(const char *optstr,
-     }
-     blk_set_enable_write_cache(blk, !writethrough);
+     /* Ensure we can't open without the secret */
+-    blk = qcrypto_block_open(data->open_opts,
++    blk = qcrypto_block_open(data->open_opts, NULL,
+                              test_block_read_func,
+                              &header,
+                              0,
+@@ -308,7 +308,7 @@ static void test_block(gconstpointer opaque)
+     g_assert(blk == NULL);
  
--    if (img_open_password(blk, optstr, flags, quiet) < 0) {
--        blk_unref(blk);
--        return NULL;
--    }
-     return blk;
- }
+     /* Ensure we can't open without the secret, unless NO_IO */
+-    blk = qcrypto_block_open(data->open_opts,
++    blk = qcrypto_block_open(data->open_opts, NULL,
+                              test_block_read_func,
+                              &header,
+                              QCRYPTO_BLOCK_OPEN_NO_IO,
+@@ -322,7 +322,7 @@ static void test_block(gconstpointer opaque)
  
-@@ -340,10 +313,6 @@ static BlockBackend *img_open_file(const char *filename,
-     }
-     blk_set_enable_write_cache(blk, !writethrough);
- 
--    if (img_open_password(blk, filename, flags, quiet) < 0) {
--        blk_unref(blk);
--        return NULL;
--    }
-     return blk;
- }
- 
-diff --git a/qemu-io.c b/qemu-io.c
-index 8e38b28..affe7de 100644
---- a/qemu-io.c
-+++ b/qemu-io.c
-@@ -58,7 +58,6 @@ static int openfile(char *name, int flags, bool writethrough, bool force_share,
-                     QDict *opts)
- {
-     Error *local_err = NULL;
--    BlockDriverState *bs;
- 
-     if (qemuio_blk) {
-         error_report("file open already, try 'help close'");
-@@ -85,28 +84,9 @@ static int openfile(char *name, int flags, bool writethrough, bool force_share,
-         return 1;
-     }
- 
--    bs = blk_bs(qemuio_blk);
--    if (bdrv_is_encrypted(bs) && bdrv_key_required(bs)) {
--        char password[256];
--        printf("Disk image '%s' is encrypted.\n", name);
--        if (qemu_read_password(password, sizeof(password)) < 0) {
--            error_report("No password given");
--            goto error;
--        }
--        if (bdrv_set_key(bs, password) < 0) {
--            error_report("invalid password");
--            goto error;
--        }
--    }
--
-     blk_set_enable_write_cache(qemuio_blk, !writethrough);
- 
-     return 0;
--
-- error:
--    blk_unref(qemuio_blk);
--    qemuio_blk = NULL;
--    return 1;
- }
- 
- static void open_help(void)
-diff --git a/qmp.c b/qmp.c
-index 7ee9bcf..84a4f29 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -164,10 +164,8 @@ SpiceInfo *qmp_query_spice(Error **errp)
- 
- void qmp_cont(Error **errp)
- {
--    Error *local_err = NULL;
-     BlockBackend *blk;
--    BlockDriverState *bs;
--    BdrvNextIterator it;
-+    Error *local_err = NULL;
- 
-     /* if there is a dump in background, we should wait until the dump
-      * finished */
-@@ -187,14 +185,6 @@ void qmp_cont(Error **errp)
-         blk_iostatus_reset(blk);
-     }
- 
--    for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
--        bdrv_add_key(bs, NULL, &local_err);
--        if (local_err) {
--            error_propagate(errp, local_err);
--            return;
--        }
--    }
--
-     /* Continuing after completed migration. Images have been inactivated to
-      * allow the destination to take control. Need to get control back now.
-      *
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index 5e8b4b3..b2dea48 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -414,72 +414,6 @@ void os_mem_prealloc(int fd, char *area, size_t memory, int smp_cpus,
- }
- 
- 
--static struct termios oldtty;
--
--static void term_exit(void)
--{
--    tcsetattr(0, TCSANOW, &oldtty);
--}
--
--static void term_init(void)
--{
--    struct termios tty;
--
--    tcgetattr(0, &tty);
--    oldtty = tty;
--
--    tty.c_iflag &= ~(IGNBRK|BRKINT|PARMRK|ISTRIP
--                          |INLCR|IGNCR|ICRNL|IXON);
--    tty.c_oflag |= OPOST;
--    tty.c_lflag &= ~(ECHO|ECHONL|ICANON|IEXTEN);
--    tty.c_cflag &= ~(CSIZE|PARENB);
--    tty.c_cflag |= CS8;
--    tty.c_cc[VMIN] = 1;
--    tty.c_cc[VTIME] = 0;
--
--    tcsetattr(0, TCSANOW, &tty);
--
--    atexit(term_exit);
--}
--
--int qemu_read_password(char *buf, int buf_size)
--{
--    uint8_t ch;
--    int i, ret;
--
--    printf("password: ");
--    fflush(stdout);
--    term_init();
--    i = 0;
--    for (;;) {
--        ret = read(0, &ch, 1);
--        if (ret == -1) {
--            if (errno == EAGAIN || errno == EINTR) {
--                continue;
--            } else {
--                break;
--            }
--        } else if (ret == 0) {
--            ret = -1;
--            break;
--        } else {
--            if (ch == '\r' ||
--                ch == '\n') {
--                ret = 0;
--                break;
--            }
--            if (i < (buf_size - 1)) {
--                buf[i++] = ch;
--            }
--        }
--    }
--    term_exit();
--    buf[i] = '\0';
--    printf("\n");
--    return ret;
--}
--
--
- char *qemu_get_pid_name(pid_t pid)
- {
-     char *name = NULL;
-diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-index 80e4668..aacdaed 100644
---- a/util/oslib-win32.c
-+++ b/util/oslib-win32.c
-@@ -554,30 +554,6 @@ void os_mem_prealloc(int fd, char *area, size_t memory, int smp_cpus,
- }
- 
- 
--/* XXX: put correct support for win32 */
--int qemu_read_password(char *buf, int buf_size)
--{
--    int c, i;
--
--    printf("Password: ");
--    fflush(stdout);
--    i = 0;
--    for (;;) {
--        c = getchar();
--        if (c < 0) {
--            buf[i] = '\0';
--            return -1;
--        } else if (c == '\n') {
--            break;
--        } else if (i < (buf_size - 1)) {
--            buf[i++] = c;
--        }
--    }
--    buf[i] = '\0';
--    return 0;
--}
--
--
- char *qemu_get_pid_name(pid_t pid)
- {
-     /* XXX Implement me */
+     /* Now open for real with secret */
+     sec = test_block_secret();
+-    blk = qcrypto_block_open(data->open_opts,
++    blk = qcrypto_block_open(data->open_opts, NULL,
+                              test_block_read_func,
+                              &header,
+                              0,
 -- 
 2.9.3
