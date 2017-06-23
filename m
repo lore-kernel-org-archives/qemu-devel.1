@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dPdzP-000168-4z
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 20:04:20 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dPdzb-0001HB-VW
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 20:04:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dPdzO-0008JW-9u
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 20:04:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44124)
+	(envelope-from <ehabkost@redhat.com>) id 1dPdzb-0008Os-4P
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 20:04:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53056)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dPdzO-0008JI-3o
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 20:04:18 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dPdza-0008Ni-UQ
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 20:04:31 -0400
 From: "Eduardo Habkost" <ehabkost@redhat.com>
-Date: Fri, 23 Jun 2017 16:25:00 -0300
-Message-ID: <20170623192500.GC3038@localhost.localdomain>
+Date: Fri, 23 Jun 2017 16:47:22 -0300
+Message-ID: <20170623194722.GE3038@localhost.localdomain>
 References: <20170623164557.11636-1-f4bug@amsat.org>
 	<20170623164557.11636-4-f4bug@amsat.org>
 MIME-Version: 1.0
@@ -34,10 +34,6 @@ Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eric Blake 
 
 On Fri, Jun 23, 2017 at 01:45:57PM -0300, Philippe Mathieu-Daud=E9 wrote:
 > then abort calling error_setg()
-
-I don't understand the reasons for this.  This commit message says
-"what" and "how", but not "why".
-
 >=20
 > Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
 > ---
@@ -59,20 +55,13 @@ const char *name, int n)
 > +        error_setg(&error_abort, "Invalid gpio #%d (of %d) for %s",
 > +                   n, gpio_list->num_in, name ? name : "device");
 
-Why exactly assert() is ok for (n < 0), but not for
-(n >=3D gpio_list->num_io)?
+I just noticed error_setg() documentation explicitly discourages this.
 
-If you have reasons to believe (n >=3D gpio_list->num_in) can be triggere=
-d
-by user input, then abort() isn't an appropriate way to handle it.
-
-> +    }
->      return gpio_list->in[n];
->  }
-> =20
-> --=20
-> 2.13.1
->=20
+"""
+  Please don't error_setg(&error_fatal, ...), use error_report() and
+  exit(), because that's more obvious.
+  Likewise, don't error_setg(&error_abort, ...), use assert().
+"""
 
 --=20
 Eduardo
