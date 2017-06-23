@@ -1,37 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dOO05-00015x-QE
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 08:47:50 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dOO0p-0001aI-1k
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 08:48:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dOO04-0003uZ-S8
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 08:47:49 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:34643)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dOO04-0003uO-K0
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 08:47:48 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id 77so64493138wrb.1
-	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 05:47:48 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <209d2c8f-fd46-0a6f-17ac-b4f53f47c43e@adacore.com>
-References: <1488276185-31168-1-git-send-email-fred.konrad@greensocs.com>
-	<b690a50d-4ab3-830c-93a3-5f2b4b027448@greensocs.com>
-	<CAFEAcA94RykH0U33F0aGEYRs_FXF_NNuwQAX_mOf4wVde0s9BQ@mail.gmail.com>
-	<1db78209-e426-03b5-9a19-592da96adaee@greensocs.com>
-	<CAFEAcA-pmVW-fnu6ZT=PeRcSf-U5UVsyYsJkzh2c_BFKDTU5kg@mail.gmail.com>
-	<d0a7ebb7-9f3d-5b3c-692e-344f4a980c05@redhat.com>
-	<CAFEAcA_BkOaRCs1tm2dv+mYZj4yaNTg7VhR2C-NAQGAhw1wazA@mail.gmail.com>
-	<20170615145742.GF4859@toto>
-	<CAFEAcA-zhur3vO8G_CPQuyEU3p7e81cixiZ58sFs96e+av4Mbg@mail.gmail.com>
-	<20170615151530.GC12347@toto>
-	<CAFEAcA-ZzVGJ+ueZXLuhtkMk=42QGhpJiu5PNZ7DAGXJf3hvXA@mail.gmail.com>
-	<209d2c8f-fd46-0a6f-17ac-b4f53f47c43e@adacore.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 23 Jun 2017 13:47:26 +0100
-Message-ID: <CAFEAcA9VtPd72=HW3uMvdc5xzv+zLj_KS=WDBjau563iT9UHNA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 00/10] Clock framework API.
+	(envelope-from <el13635@mail.ntua.gr>) id 1dOO0n-0004SE-50
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 08:48:35 -0400
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Date: Fri, 23 Jun 2017 15:46:58 +0300
+Message-Id: <20170623124700.1389-7-el13635@mail.ntua.gr>
+In-Reply-To: <20170623124700.1389-1-el13635@mail.ntua.gr>
+References: <20170623124700.1389-1-el13635@mail.ntua.gr>
+Subject: [Qemu-devel] [PATCH RFC v3 6/8] block: add options parameter to
+ bdrv_new_open_driver()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,47 +20,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: KONRAD Frederic <frederic.konrad@adacore.com>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Mark Burton <mark.burton@greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, KONRAD Frederic <fred.konrad@greensocs.com>
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-On 23 June 2017 at 13:38, KONRAD Frederic <frederic.konrad@adacore.com> wro=
-te:
-> Le 06/23/2017 =C3=A0 11:51 AM, Peter Maydell a =C3=A9crit :
->> As an aside, I still find it very odd that you get a clock
->> object for both an input clock and an output clock. I feel
->> like we should have one end owns the clock object and the
->> other just has a reference to it of some kind.
->
->
-> The point is beeing able to bind/unbind clocks inside the device
-> to model a clock selector for example. So you just bind/unbind
-> the input and output clocks.
+Allow passing a QDict *options parameter to bdrv_new_open_driver() so
+that it can be used if a driver needs it upon creation. The previous
+behaviour (empty bs->options and bs->explicit_options) remains when
+options is NULL.
 
-I don't see why this needs both 'input clock' and 'output
-clock' to be separate objects. What I have in mind is:
+Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+---
+ block.c               | 13 +++++++++----
+ block/commit.c        |  4 ++--
+ block/mirror.c        |  2 +-
+ block/vvfat.c         |  2 +-
+ include/block/block.h |  2 +-
+ 5 files changed, 14 insertions(+), 9 deletions(-)
 
-Device A:
-  has-a clock C1
-
-Device B:
-  has-a clock C2
-
-Device C: (a clock selector)
-  clock inputs CI1, CI2
-  has-a clock C3
-
-Each device "owns" its output clock objects, but input
-clocks are just pointers to the clock object owned by the
-device at the other end. In the board you wire up CI1 to C1,
-and CI2 to C2 (using link properties I guess).
-Then in device C you can implement the clock switching by
-some kind of bind(s->CI1, &s->C3) call because you have
-pointers to all the relevant clock objects.
-
-As I understand it your current implementation makes not
-just the output clocks C1 C2 C2 be clock objects, but also
-the inputs CI1 CI2, so effectively each link from a clock
-source to a clock sink has two objects involved.
-
-thanks
--- PMM
+diff --git a/block.c b/block.c
+index 694396281b..c7d9f8959a 100644
+--- a/block.c
++++ b/block.c
+@@ -1150,20 +1150,25 @@ free_and_fail:
+ }
+ 
+ BlockDriverState *bdrv_new_open_driver(BlockDriver *drv, const char *node_name,
+-                                       int flags, Error **errp)
++                                       int flags, QDict *options, Error **errp)
+ {
+     BlockDriverState *bs;
+     int ret;
+ 
+     bs = bdrv_new();
+     bs->open_flags = flags;
+-    bs->explicit_options = qdict_new();
+-    bs->options = qdict_new();
++    if (options) {
++        bs->explicit_options = qdict_clone_shallow(options);
++        bs->options = qdict_clone_shallow(options);
++    } else {
++        bs->explicit_options = qdict_new();
++        bs->options = qdict_new();
++    }
+     bs->opaque = NULL;
+ 
+     update_options_from_flags(bs->options, flags);
+ 
+-    ret = bdrv_open_driver(bs, drv, node_name, bs->options, flags, errp);
++    ret = bdrv_open_driver(bs, drv, node_name, options, flags, errp);
+     if (ret < 0) {
+         QDECREF(bs->explicit_options);
+         QDECREF(bs->options);
+diff --git a/block/commit.c b/block/commit.c
+index af6fa68cf3..e855f20d7f 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -338,7 +338,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+     /* Insert commit_top block node above top, so we can block consistent read
+      * on the backing chain below it */
+     commit_top_bs = bdrv_new_open_driver(&bdrv_commit_top, filter_node_name, 0,
+-                                         errp);
++                                         NULL, errp);
+     if (commit_top_bs == NULL) {
+         goto fail;
+     }
+@@ -486,7 +486,7 @@ int bdrv_commit(BlockDriverState *bs)
+     backing_file_bs = backing_bs(bs);
+ 
+     commit_top_bs = bdrv_new_open_driver(&bdrv_commit_top, NULL, BDRV_O_RDWR,
+-                                         &local_err);
++                                         NULL, &local_err);
+     if (commit_top_bs == NULL) {
+         error_report_err(local_err);
+         goto ro_cleanup;
+diff --git a/block/mirror.c b/block/mirror.c
+index 19afcc6f1a..3ebe953f18 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1155,7 +1155,7 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
+      * reads on the top, while disabling it in the intermediate nodes, and make
+      * the backing chain writable. */
+     mirror_top_bs = bdrv_new_open_driver(&bdrv_mirror_top, filter_node_name,
+-                                         BDRV_O_RDWR, errp);
++                                         BDRV_O_RDWR, NULL, errp);
+     if (mirror_top_bs == NULL) {
+         return;
+     }
+diff --git a/block/vvfat.c b/block/vvfat.c
+index 8ab647c0c6..c8e8944947 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -3064,7 +3064,7 @@ static int enable_write_target(BlockDriverState *bs, Error **errp)
+ #endif
+ 
+     backing = bdrv_new_open_driver(&vvfat_write_target, NULL, BDRV_O_ALLOW_RDWR,
+-                                   &error_abort);
++                                   NULL, &error_abort);
+     *(void**) backing->opaque = s;
+ 
+     bdrv_set_backing_hd(s->bs, backing, &error_abort);
+diff --git a/include/block/block.h b/include/block/block.h
+index a4f09df95a..e7db67c059 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -261,7 +261,7 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
+ BlockDriverState *bdrv_open(const char *filename, const char *reference,
+                             QDict *options, int flags, Error **errp);
+ BlockDriverState *bdrv_new_open_driver(BlockDriver *drv, const char *node_name,
+-                                       int flags, Error **errp);
++                                       int flags, QDict *options, Error **errp);
+ BlockReopenQueue *bdrv_reopen_queue(BlockReopenQueue *bs_queue,
+                                     BlockDriverState *bs,
+                                     QDict *options, int flags);
+-- 
+2.11.0
