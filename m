@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dONAo-0001Ld-6V
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 07:54:51 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dONYZ-0000Jv-6x
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 08:19:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dONAk-0008Gj-9Z
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 07:54:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42762)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dONAk-0008Gc-0C
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 07:54:46 -0400
-Date: Fri, 23 Jun 2017 12:54:38 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170623115438.GH28635@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dONYY-0000wN-6F
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 08:19:23 -0400
+Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:32872)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dONYX-0000vw-VL
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 08:19:22 -0400
+Received: by mail-wr0-x230.google.com with SMTP id r103so63524454wrb.0
+	for <qemu-devel@nongnu.org>; Fri, 23 Jun 2017 05:19:21 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <874lv6gc19.fsf@dusky.pond.sub.org>
 References: <20170606110556.12922-1-berrange@redhat.com>
 	<20170606110556.12922-3-berrange@redhat.com>
 	<874lv6gc19.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <874lv6gc19.fsf@dusky.pond.sub.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 23 Jun 2017 13:19:00 +0100
+Message-ID: <CAFEAcA_HSAaxFUcWA=Uc1wY61=tPZMSsFD=ZKCYcsiy-9Wc7xQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [PATCH v2 2/2] docs: document support lifetime for
  features
 List-Id: <qemu-devel.nongnu.org>
@@ -31,100 +32,27 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Fri, Jun 23, 2017 at 01:48:34PM +0200, Markus Armbruster wrote:
+On 23 June 2017 at 12:48, Markus Armbruster <armbru@redhat.com> wrote:
 > "Daniel P. Berrange" <berrange@redhat.com> writes:
-> 
-> > There is currently no explicit guidance on the duration of support
-> > for features such as versioned machine types, which have a finite
-> > useful lifespan. Thus apps / users cannot predict how much time
-> > they might be able to use a feature for, before it is removed (if
-> > ever).
-> >
-> > This adds a new appendix that lists items which have finite lifecycles,
-> > such as machine types. For items which are generally expected to be
-> > supported indefinitely, it sets out the policy around deprecation
-> > and removal, should it be needed.
-> >
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> > ---
-> >  qemu-doc.texi | 34 ++++++++++++++++++++++++++++++++++
-> >  1 file changed, 34 insertions(+)
-> >
-> > diff --git a/qemu-doc.texi b/qemu-doc.texi
-> > index 29f89d8..e3c6400 100644
-> > --- a/qemu-doc.texi
-> > +++ b/qemu-doc.texi
-> > @@ -37,6 +37,7 @@
-> >  * QEMU Guest Agent::
-> >  * QEMU User space emulator::
-> >  * Implementation notes::
-> > +* Support lifetime::
-> >  * Deprecations::
-> >  * License::
-> >  * Index::
-> > @@ -3017,6 +3018,39 @@ Run the emulation in single step mode.
-> >  
-> >  @include qemu-tech.texi
-> >  
-> > +@node Support lifetime
-> > +@appendix Support lifetime
-> > +
-> > +Features provided by QEMU are subject to varying support lifetimes.
-> > +
-> > +In general features are intended to be supported indefinitely once
-> > +introduced. In the event that a feature needs to be removed, there
-> > +will be some period in which it will be marked as deprecated before
-> > +eventual removal. All deprecated features will be listed in the
-> > +``Deprecations'' appendix of this document. They may also generate
-> > +warnings on the console when QEMU starts up, or if activated via
-> > +a monitor command.
-> > +
-> > +Certain features will have an inherently finite lifetime, and thus
-> > +will be removed on a fixed schedule.
-> > +
-> > +@node Machine types
-> > +@section Machine types
-> > +
-> > +For architectures which aim to support live migration compatibility
-> > +across releases, each release will introduce a new versioned machine
-> > +type. For example, the 2.8.0 release introduced machine types
-> > +``pc-i440fx-2.8'' and ``pc-q35-2.8' 'for the x86_64/i686 architectures.
-> > +
-> > +To allow live migration of a guest running on a 2.8.0 release to a
-> > +2.9.0, the QEMU 2.9.0 version must support the ``pc-i440fx-2.8'' and
-> > +``pc-q35-2.8''.  To allow users live migrating VMs to skip multiple
-> 
-> "the ``pc-i440fx-2.8'' and ``pc-q35-2.8'' machine types".
-> 
-> > +intermediate releases when upgrading, new releases of QEMU will
-> > +support machine types from many previous versions.
-> 
-> Suggest s/many/several/
-> 
-> > +
-> > +The supported lifetime for machine types is 12 releases, which is
-> > +equivalent to 4 years worth of previous QEMU releases.
-> > +
-> 
+>> +The supported lifetime for machine types is 12 releases, which is
+>> +equivalent to 4 years worth of previous QEMU releases.
+>> +
+>
 > Do we have consensus on this?  Peter?
 
-FWIW, this was a fairly arbitrary time frame I picked, to stimulate
-discussion. 4 years is long time for community supported distros, but
-for enterprise distros like RHEL, where there's a long gap between
-major versions, 4 years is probably close to the minimum practical
-to enable upgrades. eg RHEL7.0 shipped 1.5.3 version (date 2013/08)
-wanted to enable machine type compat with RHEL6's 0.12 version
-(date 2009/12).
+I don't have an opinion personally because I don't care
+about backcompat for what I use QEMU for. From a pure
+upstream perspective, given that we don't support anything
+beyond the previous stable branch for security fixes we
+already don't really expect people to be doing production
+work on old upstream releases. So this is a distro
+question really and we need input from the people who
+package QEMU. Given that for instance Ubuntu LTSes get
+5 years of support I would guess that 4 years might be
+a little low, but really we should ask the people with
+a more informed opinion.
 
-The flip side though is that enterprise distros don't typically use
-the machine types "as is", then define custom downstream only versions.
-They just need the underlying features to still exist.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+thanks
+-- PMM
