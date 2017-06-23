@@ -1,26 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dOQsX-0007Ao-Ie
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 11:52:14 -0400
+	(envelope-from <lersek@redhat.com>) id 1dOQsZ-0007Av-1Q
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 11:52:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dOQsW-00022u-Nz
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 11:52:13 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:38038)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dOQsW-00022R-HG
-	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 11:52:12 -0400
-Date: Fri, 23 Jun 2017 17:52:07 +0200
-From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170623155207.jj6aakw36qmwqvow@aurel32.net>
-References: <20170620000405.3391-1-rth@twiddle.net>
-	<20170620000405.3391-14-rth@twiddle.net>
+	(envelope-from <lersek@redhat.com>) id 1dOQsV-00022H-IV
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 11:52:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58730)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dOQsV-00021G-96
+	for qemu-devel@nongnu.org; Fri, 23 Jun 2017 11:52:11 -0400
+References: <7d5904ae-e66c-5594-cfff-747578d91f4b@ilande.co.uk>
+	<08da52ec-e4d2-d836-49bd-90baf21747fb@redhat.com>
+	<1d8147a6-d55c-4951-68db-4c1cf502a4f3@ilande.co.uk>
+	<9d24bf00-cf82-717a-eccd-f51e2c80dd6f@redhat.com>
+	<eaa2cd40-0d64-6843-7e39-c0f94c7e797f@ilande.co.uk>
+	<48c8f007-f388-59f5-9af8-f5eefe033e2a@redhat.com>
+	<20170621113600.GA3928@thinpad.lan.raisama.net>
+	<8135ff45-0341-1fd4-ada9-4527c6b61e5a@ilande.co.uk>
+	<20170621132317.GD3928@thinpad.lan.raisama.net>
+	<7b431646-019e-dce2-6345-bdbaba7ce821@ilande.co.uk>
+	<20170623115051.GE20956@localhost.localdomain>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <a5f86c32-c89b-98ff-dbdb-7457a2074f1a@redhat.com>
+Date: Fri, 23 Jun 2017 17:52:03 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170620000405.3391-14-rth@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH v3 13/18] target/s390x: Implement CONVERT
- UNICODE insns
+In-Reply-To: <20170623115051.GE20956@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCHv6 3/5] fw_cfg: move assert() and linking of
+ fw_cfg device to the machine into instance_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,98 +38,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, thuth@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, pbonzini@redhat.com, imammedo@redhat.com
 
-On 2017-06-19 17:04, Richard Henderson wrote:
-> diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-> index 9c8f184..634ef98 100644
-> --- a/target/s390x/insn-data.def
-> +++ b/target/s390x/insn-data.def
-> @@ -313,6 +313,19 @@
->      C(0xb3a1, CDLGBR,  RRF_e, FPE, 0, r2_o, f1, 0, cdlgb, 0)
->      C(0xb3a2, CXLGBR,  RRF_e, FPE, 0, r2_o, x1, 0, cxlgb, 0)
->  
-> +/* CONVERT UTF-8 TO UTF-16 */
-> +    D(0xb2a7, CU12,    RRF_c, Z,   0, 0, 0, 0, cuXX, 0, 12)
-> +/* CONVERT UTF-8 TO UTF-32 */
-> +    D(0xb9b0, CU14,    RRF_c, ETF3, 0, 0, 0, 0, cuXX, 0, 14)
-> +/* CONVERT UTF-16 to UTF-8 */
-> +    D(0xb2a6, CU21,    RRF_c, Z,   0, 0, 0, 0, cuXX, 0, 21)
-> +/* CONVERT UTF-16 to UTF-32 */
-> +    D(0xb9b1, CU24,    RRF_c, ETF3, 0, 0, 0, 0, cuXX, 0, 24)
-> +/* CONVERT UTF-32 to UTF-8 */
-> +    D(0xb9b3, CU41,    RRF_c, ETF3, 0, 0, 0, 0, cuXX, 0, 41)
-> +/* CONVERT UTF-32 to UTF-16 */
-> +    D(0xb9b2, CU42,    RRF_c, ETF3, 0, 0, 0, 0, cuXX, 0, 42)
-> +
+On 06/23/17 13:50, Eduardo Habkost wrote:
+> On Fri, Jun 23, 2017 at 09:12:01AM +0100, Mark Cave-Ayland wrote:
+>> On 21/06/17 14:23, Eduardo Habkost wrote:
+>>
+>>>>>>> I now have a v7 patchset ready to go (currently hosted at
+>>>>>>> https://github.com/mcayland/qemu/tree/fwcfg7 for the curious). Laszlo,
+>>>>>>> I've currently left off your Tested-by tag since I'm not sure it's still
+>>>>>>> valid for less-than-trivial changes - if you're happy for me to re-add
+>>>>>>> it before I send the v7 patchset to the list, please let me know.
+>>>>>>
+>>>>>> I intend to test v7 when you post it.
+>>>>>
+>>>>> I still see the instance_init assert() in that branch (commit
+>>>>> 17d75643f880).  Is that correct?
+>>>>
+>>>> Yes that was the intention. In 17d75643f880 both the assert() and
+>>>> object_property_add_child() are moved into the instance_init() function,
+>>>> and then in the follow-up commit eddedb5 the assert() is removed from
+>>>> instance_init() and the object_resolve_path_type() check added into
+>>>> fw_cfg_init1() as part of its conversion into the
+>>>> fw_cfg_common_realize() function.
+>>>
+>>> We can't move assert() + linking to instance_init even if it's
+>>> just temporary, as it makes device-list-properties crash.
+>>>
+>>> Just linking in instance_init is also a problem, because
+>>> instance_init should never affect global QEMU state.
+>>>
+>>> You could move linking to realize as well, but: just like you
+>>> already moved sysbus_add_io() calls outside realize, I believe
+>>> linking belongs outside realize too.  I need to re-read the
+>>> discussion threads to understand the motivation behind that.
+>>
+>> Ultimately the question we're trying to answer is "has someone
+>> instantiated another fw_cfg device for this machine?" and the way it
+>> works currently is that fw_cfg_init_io() and fw_cfg_init_mem() attach
+>> the fw_cfg device to the /machine object and then check after realize
+>> whether a /machine/fw_cfg device already exists, aborting if it does.
+>>
+>> So in the current implementation we're not actually concerned with the
+>> placement of fw_cfg within the model itself, and indeed with a fixed
+>> location in the QOM tree it's already completely wrong. If you take a
+>> look at the QOM tree for the sparc/sparc64/ppc machines you'll see that
+>> they really are very far from reality.
+>>
+>> For me the use of object_resolve_path_type() during realize is a good
+>> solution since regardless of the location of the fw_cfg we can always
+>> detect whether we have more than one device instance.
+>>
+>> However what seems unappealing about this is that while all existing
+>> users which use fw_cfg_init_io() and fw_cfg_init_mem() are fine, in the
+>> case where I am wiring up the device myself then for my sun4u example
+>> the code looks like this:
+>>
+>> dev = qdev_create(NULL, TYPE_FW_CFG_IO);
+>> ...
+>> qdev_init_nofail(dev);
+>> memory_region_add_subregion(pci_address_space_io(ebus), BIOS_CFG_IOPORT,
+>>                             &FW_CFG_IO(dev)->comb_iomem);
+>>
+>> Here you can see that the device is active because it is mapped into the
+>> correct IO address space, but notice I have forgotten to link it to the
+>> QOM /machine object myself. Hence I can instantiate and map as many
+>> instances as I like and never trigger the duplicate instance check which
+>> makes the check fairly ineffective.
+> 
+> This is a good point, but I have a question about that: will something
+> break if a machine decides to create two fw_cfg objects and map them to
+> different addresses?  If it won't break, I see no reason to try to
+> enforce a single instance in the device code.  If it will break, then a
+> check in realize is still a hack, but might be a good enough solution.
+> 
 
-CU41 and CU42 are inverted here. CU41 has the 0xb9b2 opcode and CU42 the
-0xb9b3 opcode.
+(1) For the guest, it makes no sense to encounter two fw_cfg devices.
+Also, a lot of the existent code in QEMU assumes at most one fw_cfg
+device (for example, there is some related ACPI generation).
 
-> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-> index 4376c72..df082f5 100644
-> --- a/target/s390x/mem_helper.c
-> +++ b/target/s390x/mem_helper.c
+(2) Relatedly, the fw_cfg_find() helper function is used quite widely,
+and it shouldn't break -- either due to more-than-one device instances,
+or due to the one fw_cfg device being linked under a path that is
+different from FW_CFG_PATH.
 
-...
-
-> +static int encode_utf8(CPUS390XState *env, uint64_t addr, uint64_t ilen,
-> +                       uintptr_t ra, uint32_t c, uint32_t *olen)
-> +{
-> +    uint8_t d[4];
-> +    uint32_t l, i;
-> +
-> +    if (c <= 0x7f) {
-> +        /* one byte character */
-> +        l = 1;
-> +        d[0] = c;
-> +    } else if (c <= 0x7ff) {
-> +        /* two byte character */
-> +        l = 2;
-> +        d[1] = 0x80 | extract32(c, 0, 6);
-> +        d[0] = 0xc0 | extract32(c, 6, 5);
-> +    } else if (c <= 0xffff) {
-> +        /* three byte character */
-> +        l = 3;
-> +        d[2] = 0x80 | extract32(c, 0, 6);
-> +        d[1] = 0x80 | extract32(c, 6, 6);
-> +        d[0] = 0xe0 | extract32(c, 12, 4);
-> +    } else {
-> +        /* four byte character */
-> +        l = 4;
-> +        d[3] = 0x80 | extract32(c, 0, 6);
-> +        d[2] = 0x80 | extract32(c, 6, 6);
-> +        d[1] = 0x80 | extract32(c, 12, 6);
-> +        d[0] = 0xe0 | extract32(c, 18, 3);
-
-This should be 0xf0 instead of 0xe0.
-
-> +static int encode_utf16(CPUS390XState *env, uint64_t addr, uint64_t ilen,
-> +                        uintptr_t ra, uint32_t c, uint32_t *olen)
-> +{
-> +    uint16_t d0, d1;
-> +
-> +    if (c <= 0xffff) {
-> +        /* one word character */
-> +        if (ilen < 2) {
-> +            return 1;
-> +        }
-> +        cpu_stw_data_ra(env, addr, c, ra);
-> +        *olen = 2;
-> +    } else {
-> +        /* two word character */
-> +        if (ilen < 4) {
-> +            return 1;
-> +        }
-> +        d1 = 0xbc00 | extract32(c, 0, 10);
-> +        d0 = 0xb800 | extract32(c, 10, 6);
-
-This should be 0xdc00 and 0xd800;
-
-
-Otherwise the patch looks fine to me.
-
--- 
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+Thanks
+Laszlo
