@@ -1,38 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38718)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <casasfernando@hotmail.com>) id 1dOgWo-0006So-BS
-	for qemu-devel@nongnu.org; Sat, 24 Jun 2017 04:34:52 -0400
+	(envelope-from <hossein.ajallooiean@epfl.ch>) id 1dOhob-0006V9-5H
+	for qemu-devel@nongnu.org; Sat, 24 Jun 2017 05:57:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <casasfernando@hotmail.com>) id 1dOgWl-0007qw-5f
-	for qemu-devel@nongnu.org; Sat, 24 Jun 2017 04:34:50 -0400
-Received: from mail-oln040092064037.outbound.protection.outlook.com
-	([40.92.64.37]:9109
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <casasfernando@hotmail.com>)
-	id 1dOgWk-0007qk-Iv
-	for qemu-devel@nongnu.org; Sat, 24 Jun 2017 04:34:47 -0400
-From: =?utf-8?B?RmVybmFuZG8gQ2FzYXMgU2Now7Zzc293?= <casasfernando@hotmail.com>
-Date: Sat, 24 Jun 2017 08:34:44 +0000
-Message-ID: <VI1PR1001MB13731EF256C1E7380E1D657AB7D90@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
-References: <VI1PR1001MB137395F2FCBDE6389A9AC5FCB7C30@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
-	<CABdb7358YVXbk++Z7s+q6Z5O0Q=6CQiQvYsTdc35eqmQeUnP_Q@mail.gmail.com>
-	<VI1PR1001MB1373C8915C51F7453D41B950B7C10@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
-	<CABdb7345_Nu_kpsSDGq7OyOSuKmgtyS-DuXTafkGeaCCXzV5LQ@mail.gmail.com>
-	<VI1PR1001MB1373B1F3C97D9528166E2305B7C40@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
-	<CABdb735e_NjY47LRZ58+zvKGmCRQKAmFo-HhByhsosRzQkOgxA@mail.gmail.com>
-	<HE1PR1001MB1371F7874B487B0907C42A7EB7C50@HE1PR1001MB1371.EURPRD10.PROD.OUTLOOK.COM>
-	<CABdb7372Pv3hR4S8C0TCV19u9XAKn=y0VmreGuZavhOjqRrypQ@mail.gmail.com>
-	<VI1PR1001MB13731144A5E55914A9E414A5B7DA0@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
-	<CABdb7377U9SpZno1kU6+TuARUmqfMMcC2uuwXTHqSZpLsqB7Gw@mail.gmail.com>
-	<1498199343.2815.0@smtp-mail.outlook.com>
-In-Reply-To: <1498199343.2815.0@smtp-mail.outlook.com>
+	(envelope-from <hossein.ajallooiean@epfl.ch>) id 1dOhoX-0005i6-9C
+	for qemu-devel@nongnu.org; Sat, 24 Jun 2017 05:57:17 -0400
+Received: from smtp0.epfl.ch ([2001:620:618:1e0:1:80b2:e058:1]:40778)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <hossein.ajallooiean@epfl.ch>)
+	id 1dOhoW-0005hY-VZ
+	for qemu-devel@nongnu.org; Sat, 24 Jun 2017 05:57:13 -0400
+From: Ajallooiean Hossein <hossein.ajallooiean@epfl.ch>
+Date: Sat, 24 Jun 2017 09:57:03 +0000
+Message-ID: <1498298223332.65648@epfl.ch>
+References: <1498045580087.46004@epfl.ch>,<87injotkxi.fsf@linaro.org>
+In-Reply-To: <87injotkxi.fsf@linaro.org>
 Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] Guest unresponsive after Virtqueue size exceeded
- error
+Subject: Re: [Qemu-devel] Looking for ideas: Single process vs multi process
+ qemu instances
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,66 +29,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>
+To: =?iso-8859-1?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>
 Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-SGkgTGFkaSwNCg0KQWZ0ZXIgcnVubmluZyBmb3IgYWJvdXQgMTVocnMgdHdvIGRpZmZlcmVudCBn
-dWVzdHMgKG9uZSBXaW5kb3dzLCBvbmUgTGludXgpIGNyYXNoZWQgd2l0aCBhcm91bmQgMSBob3Vy
-IGRpZmZlcmVuY2UgYW5kIHRoZSBzYW1lIGVycm9yIGluIHFlbXUgbG9nICJWaXJxdWV1ZSBzaXpl
-IGV4Y2VlZGVkIi4NCg0KVGhlIExpbnV4IGd1ZXN0IHdhcyBhbHJlYWR5IHJ1bm5pbmcgb24gdmly
-dGlvX3Njc2kgYW5kIHdpdGhvdXQgdmlydGlvX2JhbGxvb24uIDooDQpJIGNvbXBpbGVkIGFuZCBh
-dHRhY2hlZCBnZGJzZXJ2ZXIgdG8gdGhlIHFlbXUgcHJvY2VzcyBmb3IgdGhpcyBndWVzdCBidXQg
-d2hlbiBJIGRpZCB0aGlzIEkgZ290IHRoZSBmb2xsb3dpbmcgd2FybmluZyBpbiBnZGJzZXJ2ZXI6
-DQoNCndhcm5pbmc6IENhbm5vdCBjYWxsIGluZmVyaW9yIGZ1bmN0aW9ucywgTGludXgga2VybmVs
-IFBhWCBwcm90ZWN0aW9uIGZvcmJpZHMgcmV0dXJuIHRvIG5vbi1leGVjdXRhYmxlIHBhZ2VzIQ0K
-DQpUaGUgZGVmYXVsdCBBbHBpbmUga2VybmVsIGlzIGEgZ3JzZWMga2VybmVsLiBOb3Qgc3VyZSBp
-ZiB0aGlzIHdpbGwgaW50ZXJmZXJlIHdpdGggZGVidWdnaW5nIG9yIG5vdCBidXQgSSBzdXNwZWN0
-IHllcy4NCklmIHlvdSBuZWVkIG1lIHRvIHJlcGxhY2UgdGhlIGdyc2VjIGtlcm5lbCB3aXRoIGEg
-dmFuaWxsYSBvbmUgKGFsc28gYXZhaWxhYmxlIGFzIGFuIG9wdGlvbiBpbiBBbHBpbmUpIGxldCBt
-ZSBrbm93IGFuZCBJIHdpbGwgZG8gc28uDQpPdGhlcndpc2Ugc2VuZCBtZSBhbiBlbWFpbCBkaXJl
-Y3RseSBzbyBJIGNhbiBzaGFyZSB3aXRoIHlvdSB0aGUgaG9zdDpwb3J0IGRldGFpbHMgc28geW91
-IGNhbiBjb25uZWN0IHRvIGdkYnNlcnZlci4NCg0KVGhhbmtzLA0KDQpGZXINCg0KT24gdmllLCBq
-dW4gMjMsIDIwMTcgYXQgODoyOSAsIEZlcm5hbmRvIENhc2FzIFNjaMO2c3NvdyA8Y2FzYXNmZXJu
-YW5kb0Bob3RtYWlsLmNvbT4gd3JvdGU6DQpIaSBMYWRpLA0KDQpTbWFsbCB1cGRhdGUuIE1lbXRl
-c3Q4Nisgd2FzIHJ1bm5pbmcgb24gdGhlIGhvc3QgZm9yIG1vcmUgdGhhbiA1NCBob3Vycy4gOCBw
-YXNzZXMgd2VyZSBjb21wbGV0ZWQgYW5kIG5vIG1lbW9yeSBlcnJvcnMgZm91bmQuIEZvciBub3cg
-SSB0aGluayB3ZSBjYW4gYXNzdW1lIHRoYXQgdGhlIGhvc3QgbWVtb3J5IGlzIG9rLg0KDQpJIGp1
-c3Qgc3RhcnRlZCBhbGwgdGhlIGd1ZXN0cyBvbmUgaG91ciBhZ28uIEkgd2lsbCBtb25pdG9yIHRo
-ZW0gYW5kIG9uY2Ugb25lIGZhaWxzIEkgd2lsbCBhdHRhY2ggdGhlIGRlYnVnZ2VyIGFuZCBsZXQg
-eW91IGtub3cuDQoNClRoYW5rcy4NCg0KRmVyDQoNCk9uIGp1ZSwganVuIDIyLCAyMDE3IGF0IDk6
-NDMgLCBMYWRpIFByb3NlayA8bHByb3Nla0ByZWRoYXQuY29tPiB3cm90ZToNCkhpIEZlcm5hbmRv
-LCBPbiBXZWQsIEp1biAyMSwgMjAxNyBhdCAyOjE5IFBNLCBGZXJuYW5kbyBDYXNhcyBTY2jDtnNz
-b3cgPGNhc2FzZmVybmFuZG9AaG90bWFpbC5jb208bWFpbHRvOmNhc2FzZmVybmFuZG9AaG90bWFp
-bC5jb20+PiB3cm90ZToNCkhpIExhZGksIFNvcnJ5IGZvciB0aGUgZGVsYXkgaW4gbXkgcmVwbHku
-IEkgd2lsbCBsZWF2ZSB0aGUgaG9zdCBrZXJuZWwgYWxvbmUgZm9yIG5vdyB0aGVuLiBGb3IgdGhl
-IGxhc3QgMTUgaG91cnMgb3Igc28gSSdtIHJ1bm5pbmcgbWVtdGVzdDg2KyBvbiB0aGUgaG9zdC4g
-U28gZmFyIHNvIGdvb2QuIFR3byBwYXNzZXMgbm8gZXJyb3JzIHNvIGZhci4gSSB3aWxsIHRyeSB0
-byBsZWF2ZSBpdCBydW5uaW5nIGZvciBhdCBsZWFzdCBhbm90aGVyIDI0aHIgYW5kIHJlcG9ydCBi
-YWNrIHRoZSByZXN1bHRzLiBIb3BlZnVsbHkgd2UgY2FuIGRpc2NhcmQgdGhlIG1lbW9yeSBpc3N1
-ZSBhdCBoYXJkd2FyZSBsZXZlbC4gUmVnYXJkaW5nIEtTTSwgdGhhdCB3aWxsIGJlIHRoZSBuZXh0
-IHRoaW5nIEkgd2lsbCBkaXNhYmxlIGlmIGFmdGVyIHJlbW92aW5nIHRoZSBiYWxsb29uIGRldmlj
-ZSBndWVzdHMgc3RpbGwgY3Jhc2guIEFib3V0IGxlYXZpbmcgYSBndWVzdCBpbiBhIGZhaWxlZCBz
-dGF0ZSBmb3IgeW91IHRvIGRlYnVnIGl0IHJlbW90ZWx5LCB0aGF0J3MgYWJzb2x1dGVseSBhbiBv
-cHRpb24uIFdlIGp1c3QgbmVlZCB0byBjb29yZGluYXRlIHNvIEkgY2FuIGdpdmUgeW91IHJlbW90
-ZSBhY2Nlc3MgdG8gdGhlIGhvc3QgYW5kIHNvIG9uLiBMZXQgbWUga25vdyBpZiBhbnkgcHJlcGFy
-YXRpb24gaXMgbmVlZGVkIGluIGFkdmFuY2UgYW5kIHdoaWNoIHRvb2xzIHlvdSBuZWVkIGluc3Rh
-bGxlZCBvbiB0aGUgaG9zdC4NCkkgdGhpbmsgdGhhdCBnZGJzZXJ2ZXIgYXR0YWNoZWQgdG8gdGhl
-IFFFTVUgcHJvY2VzcyBzaG91bGQgYmUgZW5vdWdoLiBXaGVuIHRoZSBWTSBnZXRzIGludG8gdGhl
-IGJyb2tlbiBzdGF0ZSBwbGVhc2UgZG8gc29tZXRoaW5nIGxpa2U6IGdkYnNlcnZlciAtLWF0dGFj
-aCBob3N0OjEyMzQ1IDxRRU1VIHBpZD4gYW5kIGxldCBtZSBrbm93IHRoZSBob3N0IG5hbWUgYW5k
-IHBvcnQgKDEyMzQ1IGluIHRoZSBhYm92ZSBleGFtcGxlKS4NCk9uY2UgSSBhZ2FpbiBJIHdvdWxk
-IGxpa2UgdG8gdGhhbmsgeW91IGZvciBhbGwgeW91ciBoZWxwIGFuZCB5b3VyIGdyZWF0IGRpc3Bv
-c2l0aW9uIQ0KWW91J3JlIGFic29sdXRlbHkgd2VsY29tZSwgSSBkb24ndCB0aGluayBJJ3ZlIGRv
-bmUgYW55dGhpbmcgaGVscGZ1bCBzbyBmYXIgOikNCkNoZWVycywgRmVyIE9uIG1hciwganVuIDIw
-LCAyMDE3IGF0IDk6NTIgLCBMYWRpIFByb3NlayA8bHByb3Nla0ByZWRoYXQuY29tPG1haWx0bzps
-cHJvc2VrQHJlZGhhdC5jb20+PiB3cm90ZTogVGhlIGhvc3Qga2VybmVsIGlzIGxlc3MgbGlrZWx5
-IHRvIGJlIHJlc3BvbnNpYmxlIGZvciB0aGlzLCBpbiBteSBvcGluaW9uLiBJJ2QgaG9sZCBvZmYg
-b24gdGhhdCBmb3Igbm93LiBBbmQgbGFzdCBidXQgbm90IGxlYXN0IEtTTSBpcyBlbmFibGVkIG9u
-IHRoZSBob3N0LiBTaG91bGQgSSBkaXNhYmxlIGl0PyBDb3VsZCBiZSB3b3J0aCB0aGUgdHJ5LiBG
-b2xsb3dpbmcgeW91ciBhZHZpY2UgSSB3aWxsIHJ1biBtZW10ZXN0IG9uIHRoZSBob3N0IGFuZCBy
-ZXBvcnQgYmFjay4gSnVzdCBhcyBhIHNpZGUgY29tbWVudCwgdGhlIGhvc3QgaXMgcnVubmluZyBv
-biBFQ0MgbWVtb3J5LiBJIHNlZS4gV291bGQgaXQgYmUgcG9zc2libGUgZm9yIHlvdSwgb25jZSBh
-IGd1ZXN0IGlzIGluIHRoZSBicm9rZW4gc3RhdGUsIHRvIG1ha2UgaXQgYXZhaWxhYmxlIGZvciBk
-ZWJ1Z2dpbmc/IEJ5IGF0dGFjaGluZyBnZGIgdG8gdGhlIFFFTVUgcHJvY2VzcyBmb3IgZXhhbXBs
-ZSBhbmQgbGV0dGluZyBtZSBwb2tlIGFyb3VuZCBpdCByZW1vdGVseT8gVGhhbmtzIQ0KDQoNCg0K
-DQo=
+Hi Alex,=0A=
+=0A=
+Thanks for you email.=0A=
+=0A=
+I'm on x86-64 and am emulating ARM64 using TCG - QEMU 2.9.=0A=
+=0A=
+Well I was hoping to see if I can use a single process to have all the mach=
+ines within it to do a simple lockstep execution among the emulating machin=
+es. =0A=
+=0A=
+Im assuming the biggest issue is the thread conflicts the machines would ha=
+ve? other than that do you see any other obstacles?=0A=
+=0A=
+Thanks=0A=
+Hoss=0A=
+=0A=
+________________________________________=0A=
+From: Alex Benn=E9e <alex.bennee@linaro.org>=0A=
+Sent: Thursday, June 22, 2017 11:45 AM=0A=
+To: Ajallooiean Hossein=0A=
+Cc: qemu-devel@nongnu.org=0A=
+Subject: Re: [Qemu-devel] Looking for ideas: Single process vs multi proces=
+s qemu instances=0A=
+=0A=
+Ajallooiean Hossein <hossein.ajallooiean@epfl.ch> writes:=0A=
+=0A=
+> Hi All,=0A=
+>=0A=
+>=0A=
+> we are trying to do server simulation and for that purpose we need to=0A=
+> have multiple Qemu instances (each can have a different spec) that are=0A=
+> part of a virtual network (ns-3 in our case).=0A=
+=0A=
+So you are talking about using TCG for simulation rather than KVM here?=0A=
+=0A=
+>=0A=
+>=0A=
+> Now for the Qemu implementation part: would it be easier/better to=0A=
+> have all the Qemu instances under a single process or multiple=0A=
+> processes? i am assuming if one single process is used, there will be=0A=
+> a threading conflict that would probably need to be looked at.=0A=
+=0A=
+QEMU isn't really setup for multiple machine instances in the one=0A=
+binary. If you are simulating a complex set of communicating machines=0A=
+then you will need one QEMU instance per machine.=0A=
+=0A=
+TCG can now use multiple threads (one per emulated vCPU) but this has=0A=
+only been enabled for a subset of architectures so far. You don't say=0A=
+what architecture your servers machines are.=0A=
+=0A=
+>=0A=
+>=0A=
+> I am looking at this purely from a management/performance view.=0A=
+>=0A=
+>=0A=
+> Any ideas/suggestions?=0A=
+>=0A=
+>=0A=
+> Thanks=0A=
+>=0A=
+> Hoss=0A=
+=0A=
+=0A=
+--=0A=
+Alex Benn=E9e=0A=
