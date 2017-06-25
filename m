@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51118)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dPDEl-0004C4-Rb
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 15:30:25 -0400
+	id 1dPDSE-0001Yi-Pv
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 15:44:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dPDEk-0006wL-KF
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 15:30:23 -0400
-Received: from mail-qt0-x231.google.com ([2607:f8b0:400d:c0d::231]:36141)
+	id 1dPDSB-0003B8-Ms
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 15:44:18 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33866)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dPDEk-0006w8-Ez
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 15:30:22 -0400
-Received: by mail-qt0-x231.google.com with SMTP id i2so63314142qta.3
-	for <qemu-devel@nongnu.org>; Sun, 25 Jun 2017 12:30:22 -0700 (PDT)
+	id 1dPDSB-0003AO-IB
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 15:44:15 -0400
+Received: by mail-qk0-x244.google.com with SMTP id 91so6570420qkq.1
+	for <qemu-devel@nongnu.org>; Sun, 25 Jun 2017 12:44:15 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sun, 25 Jun 2017 16:29:50 -0300
-Message-Id: <20170625192950.17677-5-f4bug@amsat.org>
-In-Reply-To: <20170625192950.17677-1-f4bug@amsat.org>
-References: <20170625192950.17677-1-f4bug@amsat.org>
+References: <20170625192125.9992-1-laurent@vivier.eu>
+	<20170625192125.9992-4-laurent@vivier.eu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <d792cbf9-454a-1237-6c1a-02336a020d25@amsat.org>
+Date: Sun, 25 Jun 2017 16:44:11 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH 4/4] travis: add job to run coccinelle
- scripts
+In-Reply-To: <20170625192125.9992-4-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/7] target/m68k: add fsglmul and fsgldiv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,98 +35,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 
-result pushed to my gh repo via ssh deploy key
+Hi Laurent,
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- .travis.sshkey | Bin 0 -> 1296 bytes
- .travis.yml    |  26 ++++++++++++++++++++------
- 2 files changed, 20 insertions(+), 6 deletions(-)
- create mode 100644 .travis.sshkey
+On 06/25/2017 04:21 PM, Laurent Vivier wrote:
+> fsglmul and fsgldiv truncate data to single precision before computing
+> results.
+> 
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>   target/m68k/fpu_helper.c | 22 ++++++++++++++++++++++
+>   target/m68k/helper.h     |  2 ++
+>   target/m68k/translate.c  |  6 ++++++
+>   3 files changed, 30 insertions(+)
+> 
+> diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
+> index 912c0b7..0d83925 100644
+> --- a/target/m68k/fpu_helper.c
+> +++ b/target/m68k/fpu_helper.c
+> @@ -183,11 +183,33 @@ void HELPER(fmul)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
+>       res->d = floatx80_mul(val0->d, val1->d, &env->fp_status);
+>   }
+>   
+> +void HELPER(fsglmul)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
+> +{
+> +    float32 a, b, c;
+> +
+> +    a = floatx80_to_float32(val0->d, &env->fp_status);
+> +    b = floatx80_to_float32(val1->d, &env->fp_status);
+> +    c = float32_mul(a, b, &env->fp_status);
 
-diff --git a/.travis.sshkey b/.travis.sshkey
-new file mode 100644
-index 0000000000000000000000000000000000000000..5921e953c8d91461ae193c15922d658834f8d6c5
-GIT binary patch
-literal 1296
-zcmV+r1@HPCoP~Uo`}Gc5AacL0i>ciVZGDC=x67D__o=U=ig02!0StKv2oE-TL@8$>
-zU0$F^xr)f=@8?MPI@}e&`i8?|`SXQ<@(;6hZnSBYT!2m}p#!07TN{#iIdPyKQH>(O
-z66UEPdqEDb%~tpi+Wxb^jo$Z$8V9xkj&Zf#;-Em>m@d<_%#}N$?$af5jn}TO^)Vlf
-zv~Wb!S$UnnnwWL0duGIR)=(GR15y%p)Twy93gpSGUnb!u&lx@E3~(dg5R~~?^OObe
-zl>p3F$Wk~ik$4);k?zOq%6LU@vd$}DY@%-TIBpF^@?;3!jJIsNPFFjay`~et1EgI_
-zMpprT%uH4i;`<##f$cFhAh<wU5Kf0DrZ;jhjDau4Ok2*)RZJBH)bRa;n>k$2#|jPI
-zwFds#72`WsQ;CX*$iOAWaBaq(yR_<(-4OyZ)W8r7tdsTF)tQm5Qm`^JN5YD<v3%dA
-z39F9&$!*C)dlcP(>L*JlT~`LrPzh9I_~Tjf$99HM${l=EjEK6KQ{9GBvA~8p(*N%B
-zJjX9tqMli6nykS@*a;;AVjl4dK$JliASAv_9zckAQ(;U=eB6m4R>^&EcZlFAo)OTn
-zhPz5?A<|tKZVuhRnfQaTkv2h_>sWH#oVnH&eV29jt8gH>IZRo%g<pmQf9WvMp12)6
-zzA&ePL%Ck<UKBYINIZ*5qkCBtNi{J7u<6j}s6K9rOC}*{+k>Y?A3HSG`Ale19DS3X
-z$iXSp$>v;MD2S0N6g53BQ(RU;;@E5r{H8kkSs{|&8&eF%15L|}>u8)}p({!79kYTk
-z;$4d%3*h6V@-)s;l4i{7st?~{!Z}gK+`j*^jc?cPZ#Qr|g~^Be+DW&OJr@k<JSjM>
-z%MDv7<M<zh$f)GeGy}`Kwq5SPVza#L(|G@Z(XwF21&kdU60#^UvH$YVgT+|me;CMi
-z^3F;XGd4zXp$Qh+(?gqjjL3mA$fXW&Bovhv+tnR5`^JMBY^bmI?bZ}y7nYvBRRL2O
-zukxxyZ*U`RJk6v1{R=Hbo}EJoOFL-|66Qz`0x|&j?U`N4MRmaGQWszs$;fdKYAyju
-zQ8D-=%A0(bknuH?Cu{4a-*2urJW)WgAcZV}`x?0ul&7X#DRkSomZVz7DDrt}{v+ip
-zuJuF{_^15DstUbL3=~JQ_w;^A3)B^-dkpmq+1w-Zu)&IU=sgX()?49tUO=nG7*p6R
-zTMhvNqAu(q=y~FbeR=HuajRX-sm$AUVa;~0e0KQuR18f-HxE~>*PmucM^qRj*rK36
-zfqH&%?QJB>cjUoZwq;2=%@5{=((`nIe_+#`n{ivY53v36@`pdZdyiN3iDy^T1ltVW
-zYXJh3g4aNoPZQNn7a$l}6B;&sWe8n=CCj>F>s;W!(Dd-BcWFcnhHn?XZ|&RY7MUC=
-z=!4=WHQ==S-C?Ms3cH)W^?%>IHJ>ZD*0le4eX5_T4Rs&?k;0~OG5Ludm-uuHi-{vX
-zWKVyW?2=Uy6RCl8gNjW+e|AfO^6EJ}=upJqIUHpXNd(-E*ZgN%A0-L4r<`IbRB?4y
-z)w%*$FPwBYRmfJ7U}7|Wpd2&o+nj#Dk9Dk=w`L}&Y@Zs4DKinczsaDO&ifLs6YnIA
-zAcKDL;g+m+!<gE4a)^z;MR0~o0S^@`D9OA*FH)N64kN$7>ByZV67En&W{lNMy7g?{
-GW~j`fDT25F
+Why not use floatx80_mul() directly?
 
-literal 0
-HcmV?d00001
+> +
+> +    res->d = float32_to_floatx80(c, &env->fp_status);
+> +}
+> +
+>   void HELPER(fdiv)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
+>   {
+>       res->d = floatx80_div(val1->d, val0->d, &env->fp_status);
+>   }
+>   
+> +void HELPER(fsgldiv)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
+> +{
+> +    float32 a, b, c;
+> +
+> +    a = floatx80_to_float32(val1->d, &env->fp_status);
+> +    b = floatx80_to_float32(val0->d, &env->fp_status);
+> +    c = float32_div(a, b, &env->fp_status);
 
-diff --git a/.travis.yml b/.travis.yml
-index 4761569183..52665273ba 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -51,6 +51,9 @@ env:
- git:
-   # we want to do this ourselves
-   submodules: false
-+branches:
-+  except:
-+  - /^autogenerated-.*/
- before_install:
-   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update ; fi
-   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libffi gettext glib pixman ; fi
-@@ -62,14 +65,25 @@ script:
-   - make -j3 && ${TEST_CMD}
- matrix:
-   include:
--    # Plain Trusty Linux User Build
--    - env: CONFIG="--disable-system"
-+    # Coccinelle using Trusty
-+    - env: TEST_CMD=""
-+           GIT_AUTHOR_EMAIL="coccinelle@travis-ci"
-+           GIT_COMMITTER_EMAIL="f4bug@amsat.org"
-       sudo: required
--      addons:
-+      services:
-+      - docker
-       dist: trusty
-+      group: deprecated-2017Q2
-       compiler: gcc
-       before_install:
--        - sudo apt-get update -qq
-         - sudo apt-get build-dep -qq qemu
--        - wget -O - http://people.linaro.org/~alex.bennee/qemu-submodule-git-seed.tar.xz | tar -xvJ
--        - git submodule update --init --recursive
-+        - git submodule update --init dtc
-+      script:
-+        - ORIGIN=$(git rev-parse HEAD)
-+        - scripts/check-cocci-scripts.sh
-+      after_success:
-+        - if [ ${ORIGIN} = $(git rev-parse HEAD) ]; then exit; fi
-+        - eval "$(ssh-agent -s)"
-+        - openssl aes-256-cbc -K $encrypted_8b1bab3b4d04_key -iv $encrypted_8b1bab3b4d04_iv -in .travis.sshkey -d | ssh-add -
-+        - BRANCH=autogenerated-coccinelle-`date +%Y%m%d`-${TRAVIS_BUILD_NUMBER}
-+        - git checkout -b ${BRANCH} && git remote add deploy git@github.com:${TRAVIS_REPO_SLUG}.git && git push -f deploy ${BRANCH}
--- 
-2.13.1
+floatx80_div()?
+
+> +
+> +    res->d = float32_to_floatx80(c, &env->fp_status);
+> +}
+> +
+>   static int float_comp_to_cc(int float_compare)
+>   {
+>       switch (float_compare) {
+> diff --git a/target/m68k/helper.h b/target/m68k/helper.h
+> index d6e80e4..5a006de 100644
+> --- a/target/m68k/helper.h
+> +++ b/target/m68k/helper.h
+> @@ -31,7 +31,9 @@ DEF_HELPER_3(fchs, void, env, fp, fp)
+>   DEF_HELPER_4(fadd, void, env, fp, fp, fp)
+>   DEF_HELPER_4(fsub, void, env, fp, fp, fp)
+>   DEF_HELPER_4(fmul, void, env, fp, fp, fp)
+> +DEF_HELPER_4(fsglmul, void, env, fp, fp, fp)
+>   DEF_HELPER_4(fdiv, void, env, fp, fp, fp)
+> +DEF_HELPER_4(fsgldiv, void, env, fp, fp, fp)
+>   DEF_HELPER_FLAGS_3(fcmp, TCG_CALL_NO_RWG, void, env, fp, fp)
+>   DEF_HELPER_FLAGS_2(set_fpcr, TCG_CALL_NO_RWG, void, env, i32)
+>   DEF_HELPER_FLAGS_2(ftst, TCG_CALL_NO_RWG, void, env, fp)
+> diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+> index a54da87..a50bf5f 100644
+> --- a/target/m68k/translate.c
+> +++ b/target/m68k/translate.c
+> @@ -4622,6 +4622,12 @@ DISAS_INSN(fpu)
+>       case 0x23: case 0x63: case 0x67: /* fmul */
+>           gen_helper_fmul(cpu_env, cpu_dest, cpu_src, cpu_dest);
+>           break;
+> +    case 0x24: /* fsgldiv */
+> +        gen_helper_fsgldiv(cpu_env, cpu_dest, cpu_src, cpu_dest);
+> +        break;
+> +    case 0x27: /* fsglmul */
+> +        gen_helper_fsglmul(cpu_env, cpu_dest, cpu_src, cpu_dest);
+> +        break;
+>       case 0x28: case 0x68: case 0x6c: /* fsub */
+>           gen_helper_fsub(cpu_env, cpu_dest, cpu_src, cpu_dest);
+>           break;
+> 
