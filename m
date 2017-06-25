@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dP6We-0005T2-IL
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 08:20:25 -0400
+	(envelope-from <bounces@canonical.com>) id 1dPACR-0002Ag-HP
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 12:15:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dP6Wa-0002Es-GE
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 08:20:24 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:52372)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dP6Wa-0002E2-4U
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 08:20:20 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <CADR1n+V8R1LOGzbwdBDt5axeZ0mqh=WSCsfUo0Vr2nmE6BYqTQ@mail.gmail.com>
-	<8760fqorbp.fsf@frigg.lan>
-	<CAFEAcA-434=WhBxC=KB2HBhrPG9b+z1i3jqeFgiE=H8ceZJYzg@mail.gmail.com>
-	<87mv91tn7d.fsf@linaro.org>
-Date: Sun, 25 Jun 2017 15:20:06 +0300
-In-Reply-To: <87mv91tn7d.fsf@linaro.org> ("Alex =?utf-8?Q?Benn=C3=A9e=22's?=
-	message of "Wed, 21 Jun 2017 15:44:22 +0100")
-Message-ID: <87r2y8gsy1.fsf@frigg.lan>
+	(envelope-from <bounces@canonical.com>) id 1dPACO-0000QK-9l
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 12:15:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46299)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dPACO-0000Py-4M
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 12:15:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dPACN-0007cW-5m
+	for <qemu-devel@nongnu.org>; Sun, 25 Jun 2017 16:15:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 294912E80E6
+	for <qemu-devel@nongnu.org>; Sun, 25 Jun 2017 16:15:43 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Tracing guest virtual addresses
+Date: Sun, 25 Jun 2017 16:09:27 -0000
+From: jiangyd <1700380@bugs.launchpad.net>
+Reply-To: Bug 1700380 <1700380@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <149840696740.3624.10086547691536237734.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1700380] [NEW] commit snapshot image got
+ Permission denied error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +36,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jayanto Minocha <jayanto@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-Alex Benn=C3=A9e writes:
+Public bug reported:
 
-> Peter Maydell <peter.maydell@linaro.org> writes:
+qemu 2.9.0, adm64, start image with -snapshot param, make some changes
+in the image, then:
 
->> On 20 June 2017 at 12:02, Llu=C3=ADs Vilanova <vilanova@ac.upc.edu> wrot=
-e:
->>> Jayanto Minocha writes:
->>>> But that is only used to instrument the cpu_ld/cpu_st macros, which is=
- only
->>>> called in the case of a tlb miss.
->>>=20
->>>> I've been going over the archives, and it looks like I need to instrum=
-ent
->>>> tcg_out_tlb_load. Am I on the right path ?
->>>=20
->>> That event should trace all guest memory accesses performed by the CPU.=
- If you
->>> found any case where this does not hold, it is likely a bug and I'd app=
-reciate
->>> it if you can point me to the smallest possible failing example.
->>=20
->> Does it catch memory accesses that are performed via helper functions,
->> or only ones done by inline TCG code?
+$telnet localhost 7000
 
-> AFAICT it inserts a helper call on the TCG ld/st ops. I wonder why not
-> just ensure we always take the slow path and put the helpers in the
-> access functions there? You could even apply an address mask if you only
-> want to look at certain address ranges.
+(qemu) commit virtio0
+'commit' error for 'virtio0': Permission denied
 
-It also catches accesses performed by helpers.
+Nerver met this problem before, commit is ok. I recently compiled
+v2.9.0, so is there some new param in qemu-qemu-system-x86_64 to avoid
+commit Permission denied?
 
+Regards.
 
-Cheers,
-  Lluis
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1700380
+
+Title:
+  commit snapshot image got Permission denied error
+
+Status in QEMU:
+  New
+
+Bug description:
+  qemu 2.9.0, adm64, start image with -snapshot param, make some changes
+  in the image, then:
+
+  $telnet localhost 7000
+
+  (qemu) commit virtio0
+  'commit' error for 'virtio0': Permission denied
+
+  Nerver met this problem before, commit is ok. I recently compiled
+  v2.9.0, so is there some new param in qemu-qemu-system-x86_64 to avoid
+  commit Permission denied?
+
+  Regards.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1700380/+subscriptions
