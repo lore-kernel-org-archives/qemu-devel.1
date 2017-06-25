@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dP3eU-0002ro-Ja
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 05:16:19 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dP3iN-00049z-N6
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 05:20:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dP3eP-0004MO-M7
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 05:16:18 -0400
-Received: from roura.ac.upc.edu ([147.83.33.10]:36043 helo=roura.ac.upc.es)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dP3iH-0007B1-Ce
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 05:20:19 -0400
+Received: from roura.ac.upc.edu ([147.83.33.10]:46116 helo=roura.ac.upc.es)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dP3eP-0004M2-AC
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 05:16:13 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dP3iH-0007AF-0r
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 05:20:13 -0400
 From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Sun, 25 Jun 2017 12:16:02 +0300
-Message-Id: <149838216212.6497.525465762648907622.stgit@frigg.lan>
+Date: Sun, 25 Jun 2017 12:20:04 +0300
+Message-Id: <149838240417.6497.17254324769778894023.stgit@frigg.lan>
 In-Reply-To: <149838022308.6497.2104916050645246693.stgit@frigg.lan>
 References: <149838022308.6497.2104916050645246693.stgit@frigg.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v9 08/26] target: [tcg,
- i386] Refactor init_globals
+Subject: [Qemu-devel] [PATCH v9 09/26] target: [tcg,
+ i386] Refactor insn_start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,56 +36,35 @@ loop.
 
 Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 ---
- target/i386/translate.c |   29 +++++++++++++++++------------
- 1 file changed, 17 insertions(+), 12 deletions(-)
+ target/i386/translate.c |    8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 84ff49030b..f0d12a3d13 100644
+index f0d12a3d13..3c7ef4af67 100644
 --- a/target/i386/translate.c
 +++ b/target/i386/translate.c
-@@ -8452,6 +8452,22 @@ static void i386_trblock_init_disas_context(DisasC=
-ontextBase *db, CPUState *cpu)
- #endif
+@@ -8468,6 +8468,12 @@ static void i386_trblock_init_globals(DisasContext=
+Base *db, CPUState *cpu)
+     cpu_cc_srcT =3D tcg_temp_local_new();
  }
 =20
-+static void i386_trblock_init_globals(DisasContextBase *db, CPUState *cp=
-u)
++static void i386_trblock_insn_start(DisasContextBase *db, CPUState *cpu)
 +{
-+    cpu_T0 =3D tcg_temp_new();
-+    cpu_T1 =3D tcg_temp_new();
-+    cpu_A0 =3D tcg_temp_new();
-+
-+    cpu_tmp0 =3D tcg_temp_new();
-+    cpu_tmp1_i64 =3D tcg_temp_new_i64();
-+    cpu_tmp2_i32 =3D tcg_temp_new_i32();
-+    cpu_tmp3_i32 =3D tcg_temp_new_i32();
-+    cpu_tmp4 =3D tcg_temp_new();
-+    cpu_ptr0 =3D tcg_temp_new_ptr();
-+    cpu_ptr1 =3D tcg_temp_new_ptr();
-+    cpu_cc_srcT =3D tcg_temp_local_new();
++    DisasContext *dc =3D container_of(db, DisasContext, base);
++    tcg_gen_insn_start(db->pc_next, dc->cc_op);
 +}
 +
  /* generate intermediate code for basic block 'tb'.  */
  void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
  {
-@@ -8469,18 +8485,7 @@ void gen_intermediate_code(CPUState *cpu, Translat=
-ionBlock *tb)
-     db->pc_next =3D db->pc_first;
-     i386_trblock_init_disas_context(db, cpu);
+@@ -8498,7 +8504,7 @@ void gen_intermediate_code(CPUState *cpu, Translati=
+onBlock *tb)
 =20
--    cpu_T0 =3D tcg_temp_new();
--    cpu_T1 =3D tcg_temp_new();
--    cpu_A0 =3D tcg_temp_new();
--
--    cpu_tmp0 =3D tcg_temp_new();
--    cpu_tmp1_i64 =3D tcg_temp_new_i64();
--    cpu_tmp2_i32 =3D tcg_temp_new_i32();
--    cpu_tmp3_i32 =3D tcg_temp_new_i32();
--    cpu_tmp4 =3D tcg_temp_new();
--    cpu_ptr0 =3D tcg_temp_new_ptr();
--    cpu_ptr1 =3D tcg_temp_new_ptr();
--    cpu_cc_srcT =3D tcg_temp_local_new();
-+    i386_trblock_init_globals(db, cpu);
+     gen_tb_start(tb, cpu_env);
+     for(;;) {
+-        tcg_gen_insn_start(db->pc_next, dc->cc_op);
++        i386_trblock_insn_start(db, cpu);
+         num_insns++;
 =20
-     num_insns =3D 0;
-     max_insns =3D tb->cflags & CF_COUNT_MASK;
+         /* If RF is set, suppress an internally generated breakpoint.  *=
+/
