@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dOzCL-000311-0Q
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 00:30:58 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dP39J-00085i-AO
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 04:44:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dOzCH-0001LZ-RO
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 00:30:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39081)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dOzCH-0001L2-Kj
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 00:30:53 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dOzCE-0006R6-CT
-	for <qemu-devel@nongnu.org>; Sun, 25 Jun 2017 04:30:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4BFA72E80E3
-	for <qemu-devel@nongnu.org>; Sun, 25 Jun 2017 04:30:50 +0000 (UTC)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dP39G-0003vG-6k
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 04:44:05 -0400
+Received: from roura.ac.upc.edu ([147.83.33.10]:41643 helo=roura.ac.upc.es)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dP39F-0003sO-Mq
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 04:44:02 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Sun, 25 Jun 2017 11:43:43 +0300
+Message-Id: <149838022308.6497.2104916050645246693.stgit@frigg.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 25 Jun 2017 04:17:28 -0000
-From: Launchpad Bug Tracker <1288620@bugs.launchpad.net>
-Reply-To: Bug 1288620 <1288620@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140306085506.13520.47301.malonedeb@gac.canonical.com>
-Message-Id: <149836424865.21670.765656899158797916.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1288620] Re: memory leak with config file
+Subject: [Qemu-devel] [RFC PATCH v9 00/26] translate: [tcg] Generic
+ translation framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,62 +26,162 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+This series proposes a generic (target-agnostic) instruction translation
+framework.
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+It basically provides a generic main loop for instruction disassembly, wh=
+ich
+calls target-specific functions when necessary. This generalization makes
+inserting new code in the main loop easier, and helps in keeping all targ=
+ets in
+synch as to the contents of it.
 
--- =
+This series also paves the way towards adding events to trace guest code
+execution (BBLs and instructions).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1288620
+I've ported i386/x86-64 and arm/aarch64 as an example to see how it fits =
+in the
+current organization, but will port the rest when this series gets merged.
 
-Title:
-  memory leak with config file
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
 
-Status in QEMU:
-  Expired
+Changes in v9
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-Bug description:
-  I have a Windows 7 SP1 Professional 64-bit installation on a QCOW2
-  image with compat=3D1.1, which I launch via
+* Further increase inter-mail sleep time during sending.
 
-  qemu-system-x86_64 -drive file=3Dwindows_base_HDD.img,index=3D0,media=3Dd=
-isk
-  -enable-kvm -m 512M -vga std -net nic,vlan=3D0 -net user,vlan=3D0
 
-  As soon as I start using the network in any application =E2=80=94 for exa=
-mple,
-  visiting www.google.com in Internet Explorer =E2=80=94 QEMU starts gobbli=
-ng
-  memory until the (host) kernel kills it because of an OOM condition.
-  If I run the QEMU with the same options, but with model=3De1000 option
-  set for the NIC (i.e. -net -nic,vlan=3D0,model=3De1000), I can use the
-  network from the guest OS without any noticeable effect on QEMU's
-  memory consumption.
+Changes in v8
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-  I do not have this problem when running QEMU with the exact same options =
-(as above, without model=3De1000) but with a Debian wheezy installation (on=
- a QCOW image of the same format).  My host system in Ubuntu 13.10 x86_64, =
-kernel image 3.11.0-17-generic, but with the QEMU packages from trusty (the=
- codename for the next release):
-  Output of `dpkg -l \*qemu\* | grep '^ii'`:
-  ii  ipxe-qemu                             1.0.0+git-20130710.936134e-0ubu=
-ntu1        all          Virtual package to support use of kvm-ipxe with qe=
-mu
-  ii  qemu-keymaps                          1.7.0+dfsg-3ubuntu2            =
-            all          QEMU keyboard maps
-  ii  qemu-system-common                    1.7.0+dfsg-3ubuntu2            =
-            amd64        QEMU full system emulation binaries (common files)
-  ii  qemu-system-x86                       1.7.0+dfsg-3ubuntu2            =
-            amd64        QEMU full system emulation binaries (x86)
-  ii  qemu-utils                            1.7.0+dfsg-3ubuntu2            =
-            amd64        QEMU utilities
+* Increase inter-mail sleep time during sending (list keeps refusing some=
+ emails
+  due to an excessive send rate).
 
-  (If necessary, I can try to reproduce this with QEMU built from the
-  upstream source or the latest source from version control.)
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1288620/+subscriptions
+Changes in v7
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Change BreakpointHitType (BH_*) for BreakpointCheckType (BC_*).
+* Move target-specific translation functions to a struct (TranslatorOps).
+* Split target-specific changes into multiple patches.
+* Rebase on edf8bc9842.
+
+
+Changes in v6
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Rebase on upstream master (64175afc69).
+* Reorder fields in DisasContextBase to minimize padding [Richard Henders=
+on].
+
+
+Changes in v5
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Remove stray uses of "restrict" keyword.
+
+
+Changes in v4
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Document new macro QTAILQ_FOREACH_CONTINUE [Peter Maydell].
+* Fix coding style errors reported by checkpatch.
+* Remove use of "restrict" in added functions; it makes older gcc version=
+s barf
+  about compilation errors.
+
+
+Changes in v3
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Rebase on 0737f32daf.
+
+
+Changes in v2
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Port ARM and AARCH64 targets.
+* Fold single-stepping checks into "max_insns" [Richard Henderson].
+* Move instruction start marks to target code [Richard Henderson].
+* Add target hook for TB start.
+* Check for TCG temporary leaks.
+* Move instruction disassembly into a target hook.
+* Make breakpoint_hit() return an enum to accomodate target's needs (ARM).
+
+
+Llu=C3=ADs Vilanova (26):
+      Pass generic CPUState to gen_intermediate_code()
+      queue: Add macro for incremental traversal
+      cpu-exec: Avoid global variables in icount-related functions
+      target: [tcg] Add generic translation framework
+      target: [tcg] Redefine DISAS_* onto the generic translation framewo=
+rk (DJ_*)
+      target: [tcg,i386] Port to DisasContextBase
+      target: [tcg,i386] Refactor init_disas_context
+      target: [tcg,i386] Refactor init_globals
+      target: [tcg,i386] Refactor insn_start
+      target: [tcg,i386] Refactor breakpoint_check
+      target: [tcg,i386] Refactor disas_insn
+      target: [tcg,i386] Refactor tb_stop
+      target: [tcg,i386] Refactor disas_flags
+      target: [tcg,i386] Replace DISAS_* with DJ_*
+      target: [tcg,i386] Port to generic translation framework
+      target: [tcg,arm] Replace DISAS_* with DJ_*
+      target: [tcg,arm] Port to DisasContextBase
+      target: [tcg,arm] Port to init_disas_context
+      target: [tcg,arm] Port to init_globals
+      target: [tcg,arm] Port to tb_start
+      target: [tcg,arm] Port to insn_start
+      target: [tcg,arm] Port to breakpoint_check
+      target: [tcg,arm] Port to disas_insn
+      target: [tcg,arm] Port to tb_stop
+      target: [tcg,arm] Port to disas_flags
+      target: [tcg,arm] Port to generic translation framework
+
+
+ Makefile.target                |    1=20
+ include/exec/exec-all.h        |   13 +
+ include/exec/gen-icount.h      |    8 -
+ include/exec/translate-block.h |  125 ++++++++++
+ include/qemu/queue.h           |   12 +
+ include/qom/cpu.h              |   22 ++
+ target/alpha/translate.c       |   25 +-
+ target/arm/translate-a64.c     |  312 ++++++++++++-------------
+ target/arm/translate.c         |  503 ++++++++++++++++++++++------------=
+------
+ target/arm/translate.h         |   38 ++-
+ target/cris/translate.c        |   26 +-
+ target/hppa/translate.c        |    6=20
+ target/i386/translate.c        |  353 +++++++++++++++-------------
+ target/lm32/translate.c        |   36 +--
+ target/m68k/translate.c        |   24 +-
+ target/microblaze/translate.c  |   28 +-
+ target/mips/translate.c        |   41 ++-
+ target/moxie/translate.c       |   16 +
+ target/nios2/translate.c       |    6=20
+ target/openrisc/translate.c    |   25 +-
+ target/ppc/translate.c         |   21 +-
+ target/ppc/translate_init.c    |   32 +--
+ target/s390x/translate.c       |   22 +-
+ target/sh4/translate.c         |   21 +-
+ target/sparc/translate.c       |   17 +
+ target/tilegx/translate.c      |    9 -
+ target/tricore/translate.c     |   11 -
+ target/unicore32/translate.c   |   26 +-
+ target/xtensa/translate.c      |   39 ++-
+ translate-all.c                |    2=20
+ translate-block.c              |  185 +++++++++++++++
+ 31 files changed, 1212 insertions(+), 793 deletions(-)
+ create mode 100644 include/exec/translate-block.h
+ create mode 100644 translate-block.c
+
+
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
