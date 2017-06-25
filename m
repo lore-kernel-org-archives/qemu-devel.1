@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dPDSE-0001Yi-Pv
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 15:44:19 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dPEMR-0007Me-UK
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 16:42:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dPDSB-0003B8-Ms
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 15:44:18 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33866)
+	(envelope-from <rth7680@gmail.com>) id 1dPEMN-0006aA-1D
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 16:42:23 -0400
+Received: from mail-pf0-x229.google.com ([2607:f8b0:400e:c00::229]:34396)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dPDSB-0003AO-IB
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 15:44:15 -0400
-Received: by mail-qk0-x244.google.com with SMTP id 91so6570420qkq.1
-	for <qemu-devel@nongnu.org>; Sun, 25 Jun 2017 12:44:15 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dPEMM-0006Zn-Rg
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 16:42:18 -0400
+Received: by mail-pf0-x229.google.com with SMTP id s66so45859262pfs.1
+	for <qemu-devel@nongnu.org>; Sun, 25 Jun 2017 13:42:17 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
 References: <20170625192125.9992-1-laurent@vivier.eu>
-	<20170625192125.9992-4-laurent@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <d792cbf9-454a-1237-6c1a-02336a020d25@amsat.org>
-Date: Sun, 25 Jun 2017 16:44:11 -0300
+	<20170625192125.9992-2-laurent@vivier.eu>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <3c22490c-58ed-054c-9ac5-40acea5e0cef@twiddle.net>
+Date: Sun, 25 Jun 2017 13:42:12 -0700
 MIME-Version: 1.0
-In-Reply-To: <20170625192125.9992-4-laurent@vivier.eu>
+In-Reply-To: <20170625192125.9992-2-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/7] target/m68k: add fsglmul and fsgldiv
+Subject: Re: [Qemu-devel] [PATCH 1/7] target/m68k: add fscc.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,94 +32,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: Aurelien Jarno <aurelien@aurel32.net>
 
-Hi Laurent,
-
-On 06/25/2017 04:21 PM, Laurent Vivier wrote:
-> fsglmul and fsgldiv truncate data to single precision before computing
-> results.
-> 
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->   target/m68k/fpu_helper.c | 22 ++++++++++++++++++++++
->   target/m68k/helper.h     |  2 ++
->   target/m68k/translate.c  |  6 ++++++
->   3 files changed, 30 insertions(+)
-> 
-> diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
-> index 912c0b7..0d83925 100644
-> --- a/target/m68k/fpu_helper.c
-> +++ b/target/m68k/fpu_helper.c
-> @@ -183,11 +183,33 @@ void HELPER(fmul)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
->       res->d = floatx80_mul(val0->d, val1->d, &env->fp_status);
->   }
->   
-> +void HELPER(fsglmul)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
-> +{
-> +    float32 a, b, c;
-> +
-> +    a = floatx80_to_float32(val0->d, &env->fp_status);
-> +    b = floatx80_to_float32(val1->d, &env->fp_status);
-> +    c = float32_mul(a, b, &env->fp_status);
-
-Why not use floatx80_mul() directly?
-
-> +
-> +    res->d = float32_to_floatx80(c, &env->fp_status);
-> +}
-> +
->   void HELPER(fdiv)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
->   {
->       res->d = floatx80_div(val1->d, val0->d, &env->fp_status);
->   }
->   
-> +void HELPER(fsgldiv)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
-> +{
-> +    float32 a, b, c;
-> +
-> +    a = floatx80_to_float32(val1->d, &env->fp_status);
-> +    b = floatx80_to_float32(val0->d, &env->fp_status);
-> +    c = float32_div(a, b, &env->fp_status);
-
-floatx80_div()?
-
-> +
-> +    res->d = float32_to_floatx80(c, &env->fp_status);
-> +}
-> +
->   static int float_comp_to_cc(int float_compare)
->   {
->       switch (float_compare) {
-> diff --git a/target/m68k/helper.h b/target/m68k/helper.h
-> index d6e80e4..5a006de 100644
-> --- a/target/m68k/helper.h
-> +++ b/target/m68k/helper.h
-> @@ -31,7 +31,9 @@ DEF_HELPER_3(fchs, void, env, fp, fp)
->   DEF_HELPER_4(fadd, void, env, fp, fp, fp)
->   DEF_HELPER_4(fsub, void, env, fp, fp, fp)
->   DEF_HELPER_4(fmul, void, env, fp, fp, fp)
-> +DEF_HELPER_4(fsglmul, void, env, fp, fp, fp)
->   DEF_HELPER_4(fdiv, void, env, fp, fp, fp)
-> +DEF_HELPER_4(fsgldiv, void, env, fp, fp, fp)
->   DEF_HELPER_FLAGS_3(fcmp, TCG_CALL_NO_RWG, void, env, fp, fp)
->   DEF_HELPER_FLAGS_2(set_fpcr, TCG_CALL_NO_RWG, void, env, i32)
->   DEF_HELPER_FLAGS_2(ftst, TCG_CALL_NO_RWG, void, env, fp)
-> diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-> index a54da87..a50bf5f 100644
-> --- a/target/m68k/translate.c
-> +++ b/target/m68k/translate.c
-> @@ -4622,6 +4622,12 @@ DISAS_INSN(fpu)
->       case 0x23: case 0x63: case 0x67: /* fmul */
->           gen_helper_fmul(cpu_env, cpu_dest, cpu_src, cpu_dest);
+On 06/25/2017 12:21 PM, Laurent Vivier wrote:
+> +    c->g1 = 0;
+> +    c->v2 = tcg_const_i32(0);
+> +    c->g2 = 1;
+> +    /* TODO: Raise BSUN exception.  */
+>       fpsr = tcg_temp_new();
+>       gen_load_fcr(s, fpsr, M68K_FPSR);
+> -    l1 = gen_new_label();
+> -    /* TODO: Raise BSUN exception.  */
+> -    /* Jump to l1 if condition is true.  */
+> -    switch (insn & 0x3f)  {
+> +    switch (cond) {
+>       case 0:  /* False */
+>       case 16: /* Signaling False */
+> +        c->v1 = c->v2;
+> +        c->tcond = TCG_COND_NEVER;
 >           break;
-> +    case 0x24: /* fsgldiv */
-> +        gen_helper_fsgldiv(cpu_env, cpu_dest, cpu_src, cpu_dest);
-> +        break;
-> +    case 0x27: /* fsglmul */
-> +        gen_helper_fsglmul(cpu_env, cpu_dest, cpu_src, cpu_dest);
-> +        break;
->       case 0x28: case 0x68: case 0x6c: /* fsub */
->           gen_helper_fsub(cpu_env, cpu_dest, cpu_src, cpu_dest);
->           break;
-> 
+>       case 1:  /* EQual Z */
+>       case 17: /* Signaling EQual Z */
+> -        tmp = tcg_temp_new();
+> -        tcg_gen_andi_i32(tmp, fpsr, FPSR_CC_Z);
+> -        tcg_gen_brcondi_i32(TCG_COND_NE, tmp, 0, l1);
+> +        c->v1 = tcg_temp_new();
+> +        c->g1 = 1;
+
+g[12] means "global", i.e. don't free the temp in free_cond.
+Which is not true of any of the temps that you allocate here.
+
+
+r~
