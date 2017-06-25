@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dPACR-0002Ag-HP
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 12:15:48 -0400
+	(envelope-from <zuban32s@gmail.com>) id 1dPB4Q-0008OT-Ku
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 13:11:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dPACO-0000QK-9l
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 12:15:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46299)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dPACO-0000Py-4M
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 12:15:44 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dPACN-0007cW-5m
-	for <qemu-devel@nongnu.org>; Sun, 25 Jun 2017 16:15:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 294912E80E6
-	for <qemu-devel@nongnu.org>; Sun, 25 Jun 2017 16:15:43 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 25 Jun 2017 16:09:27 -0000
-From: jiangyd <1700380@bugs.launchpad.net>
-Reply-To: Bug 1700380 <1700380@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <149840696740.3624.10086547691536237734.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1700380] [NEW] commit snapshot image got
- Permission denied error
+	(envelope-from <zuban32s@gmail.com>) id 1dPB4N-0007pc-G4
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 13:11:34 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:34649)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dPB4N-0007oa-8X
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 13:11:31 -0400
+Received: by mail-lf0-x243.google.com with SMTP id g21so5697250lfk.1
+	for <qemu-devel@nongnu.org>; Sun, 25 Jun 2017 10:11:29 -0700 (PDT)
+From: Aleksandr Bezzubikov <zuban32s@gmail.com>
+Date: Sun, 25 Jun 2017 20:10:59 +0300
+Message-Id: <1498410660-15762-1-git-send-email-zuban32s@gmail.com>
+Subject: [Qemu-devel] [PATCH RFC] Generic PCIE-to-PCI Bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,53 +24,29 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, marcel@redhat.com, imammedo@redhat.com, Aleksandr Bezzubikov <zuban32s@gmail.com>
 
-Public bug reported:
+This patch introduces a new device - generic PCI Express to PCI bridge.
 
-qemu 2.9.0, adm64, start image with -snapshot param, make some changes
-in the image, then:
+Now only x86-specific DMI-to-PCI bridge can be used to enable 
+usage of legacy PCI devices on Q35 machine. But this bridge isn't cross-platform 
+and doesn't support hotplugging.
+That's why we need a new generic cross-platform bridge device, which supports hotplugging.
 
-$telnet localhost 7000
+This patch creates device only for static CLI usage, 
+the next goal is to add ACPI hotplug support.  It will utilize 
+in some way past Marcel's RFC series for Q35 ACPI PCI hotplug support 
+https://lists.gnu.org/archive/html/qemu-devel/2016-05/msg05681.html, 
+but will require dynamic ACPI code emission in case when the bridge was hotplugged itself.
 
-(qemu) commit virtio0
-'commit' error for 'virtio0': Permission denied
+Aleksandr Bezzubikov (1):
+  hw/pci-bridge: implement pcie-pci-bridge device
 
-Nerver met this problem before, commit is ok. I recently compiled
-v2.9.0, so is there some new param in qemu-qemu-system-x86_64 to avoid
-commit Permission denied?
+ hw/pci-bridge/Makefile.objs     |   2 +-
+ hw/pci-bridge/pcie_pci_bridge.c | 152 ++++++++++++++++++++++++++++++++++++++++
+ include/hw/pci/pci.h            |   1 +
+ 3 files changed, 154 insertions(+), 1 deletion(-)
+ create mode 100644 hw/pci-bridge/pcie_pci_bridge.c
 
-Regards.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1700380
-
-Title:
-  commit snapshot image got Permission denied error
-
-Status in QEMU:
-  New
-
-Bug description:
-  qemu 2.9.0, adm64, start image with -snapshot param, make some changes
-  in the image, then:
-
-  $telnet localhost 7000
-
-  (qemu) commit virtio0
-  'commit' error for 'virtio0': Permission denied
-
-  Nerver met this problem before, commit is ok. I recently compiled
-  v2.9.0, so is there some new param in qemu-qemu-system-x86_64 to avoid
-  commit Permission denied?
-
-  Regards.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1700380/+subscriptions
+-- 
+2.7.4
