@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dPD6k-0005vu-31
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 15:22:06 -0400
+	(envelope-from <laurent@vivier.eu>) id 1dPD6n-0005xA-3L
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 15:22:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dPD6f-0003n2-E0
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 15:22:06 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:64682)
+	(envelope-from <laurent@vivier.eu>) id 1dPD6i-0003ni-6v
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 15:22:09 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:51082)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dPD6f-0003mq-3k
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 15:22:01 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dPD6h-0003nQ-RB
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 15:22:04 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Sun, 25 Jun 2017 21:21:23 +0200
-Message-Id: <20170625192125.9992-6-laurent@vivier.eu>
+Date: Sun, 25 Jun 2017 21:21:20 +0200
+Message-Id: <20170625192125.9992-3-laurent@vivier.eu>
 In-Reply-To: <20170625192125.9992-1-laurent@vivier.eu>
 References: <20170625192125.9992-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH 5/7] softfloat: define floatx80_round()
+Subject: [Qemu-devel] [PATCH 2/7] target/m68k: add fmovecr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,52 +26,106 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
 
-Add a function to round a floatx80 to the defined precision
-(floatx80_rounding_precision)
+fmovecr moves a floating point constant from the
+FPU ROM to a floating point register.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- fpu/softfloat.c         | 15 +++++++++++++++
- include/fpu/softfloat.h |  1 +
- 2 files changed, 16 insertions(+)
+ target/m68k/fpu_helper.c | 30 ++++++++++++++++++++++++++++++
+ target/m68k/helper.h     |  1 +
+ target/m68k/translate.c  | 13 ++++++++++++-
+ 3 files changed, 43 insertions(+), 1 deletion(-)
 
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 7af14e2..e9bf359 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -5086,6 +5086,21 @@ float128 floatx80_to_float128(floatx80 a, float_status *status)
- }
+diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
+index a9e17f5..912c0b7 100644
+--- a/target/m68k/fpu_helper.c
++++ b/target/m68k/fpu_helper.c
+@@ -23,6 +23,31 @@
+ #include "exec/helper-proto.h"
+ #include "exec/exec-all.h"
  
- /*----------------------------------------------------------------------------
-+| Rounds the extended double-precision floating-point value `a'
-+| and returns the result as an extended double-precision floating-point
-+| value.  The operation is performed according to the IEC/IEEE Standard for
-+| Binary Floating-Point Arithmetic.
-+*----------------------------------------------------------------------------*/
++static const floatx80 fpu_rom[128] = {
++    [0x00] = floatx80_pi,                                   /* Pi */
++    [0x0b] = make_floatx80(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
++    [0x0c] = make_floatx80(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
++    [0x0d] = make_floatx80(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
++    [0x0e] = make_floatx80(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
++    [0x0f] = floatx80_zero,                                 /* Zero     */
++    [0x30] = floatx80_ln2,                                  /* ln(2)    */
++    [0x31] = make_floatx80(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
++    [0x32] = floatx80_one,                                  /* 10^0     */
++    [0x33] = make_floatx80(0x4002, 0xa000000000000000ULL),  /* 10^1     */
++    [0x34] = make_floatx80(0x4005, 0xc800000000000000ULL),  /* 10^2     */
++    [0x35] = make_floatx80(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
++    [0x36] = make_floatx80(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
++    [0x37] = make_floatx80(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
++    [0x38] = make_floatx80(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
++    [0x39] = make_floatx80(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
++    [0x3a] = make_floatx80(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
++    [0x3b] = make_floatx80(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
++    [0x3c] = make_floatx80(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
++    [0x3d] = make_floatx80(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
++    [0x3e] = make_floatx80(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
++    [0x3f] = make_floatx80(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
++};
 +
-+floatx80 floatx80_round(floatx80 a, float_status *status)
+ int32_t HELPER(reds32)(CPUM68KState *env, FPReg *val)
+ {
+     return floatx80_to_int32(val->d, &env->fp_status);
+@@ -204,3 +229,8 @@ void HELPER(ftst)(CPUM68KState *env, FPReg *val)
+     }
+     env->fpsr = (env->fpsr & ~FPSR_CC_MASK) | cc;
+ }
++
++void HELPER(fconst)(CPUM68KState *env, FPReg *val, uint32_t offset)
 +{
-+    return roundAndPackFloatx80(status->floatx80_rounding_precision,
-+                                extractFloatx80Sign(a),
-+                                extractFloatx80Exp(a),
-+                                extractFloatx80Frac(a), 0, status);
++    val->d = fpu_rom[offset];
 +}
-+
-+/*----------------------------------------------------------------------------
- | Rounds the extended double-precision floating-point value `a' to an integer,
- | and returns the result as an extended quadruple-precision floating-point
- | value.  The operation is performed according to the IEC/IEEE Standard for
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index f1288ef..d9689ec 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -621,6 +621,7 @@ float128 floatx80_to_float128(floatx80, float_status *status);
- /*----------------------------------------------------------------------------
- | Software IEC/IEEE extended double-precision operations.
- *----------------------------------------------------------------------------*/
-+floatx80 floatx80_round(floatx80 a, float_status *status);
- floatx80 floatx80_round_to_int(floatx80, float_status *status);
- floatx80 floatx80_add(floatx80, floatx80, float_status *status);
- floatx80 floatx80_sub(floatx80, floatx80, float_status *status);
+diff --git a/target/m68k/helper.h b/target/m68k/helper.h
+index 98cbf18..d6e80e4 100644
+--- a/target/m68k/helper.h
++++ b/target/m68k/helper.h
+@@ -35,6 +35,7 @@ DEF_HELPER_4(fdiv, void, env, fp, fp, fp)
+ DEF_HELPER_FLAGS_3(fcmp, TCG_CALL_NO_RWG, void, env, fp, fp)
+ DEF_HELPER_FLAGS_2(set_fpcr, TCG_CALL_NO_RWG, void, env, i32)
+ DEF_HELPER_FLAGS_2(ftst, TCG_CALL_NO_RWG, void, env, fp)
++DEF_HELPER_3(fconst, void, env, fp, i32)
+ 
+ DEF_HELPER_3(mac_move, void, env, i32, i32)
+ DEF_HELPER_3(macmulf, i64, env, i32, i32)
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index 099cb69..a54da87 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -4510,6 +4510,7 @@ static void gen_op_fmove_fcr(CPUM68KState *env, DisasContext *s,
+ DISAS_INSN(fpu)
+ {
+     uint16_t ext;
++    uint8_t rom_offset;
+     int opmode;
+     TCGv tmp32;
+     int opsize;
+@@ -4518,10 +4519,20 @@ DISAS_INSN(fpu)
+     ext = read_im16(env, s);
+     opmode = ext & 0x7f;
+     switch ((ext >> 13) & 7) {
+-    case 0: case 2:
++    case 0:
+         break;
+     case 1:
+         goto undef;
++    case 2:
++        if (insn == 0xf200 && (ext & 0xfc00) == 0x5c00) {
++            /* fmovecr */
++            rom_offset = ext & 0x7f;
++            cpu_dest = gen_fp_ptr(REG(ext, 7));
++            gen_helper_fconst(cpu_env, cpu_dest, tcg_const_i32(rom_offset));
++            tcg_temp_free_ptr(cpu_dest);
++            return;
++        }
++        break;
+     case 3: /* fmove out */
+         cpu_src = gen_fp_ptr(REG(ext, 7));
+         opsize = ext_opsize(ext, 10);
 -- 
 2.9.4
