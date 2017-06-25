@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dP3xy-00018O-Cd
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 05:36:27 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dP41q-0002Ul-6i
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 05:40:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dP3xv-0000Nh-BT
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 05:36:26 -0400
-Received: from roura.ac.upc.edu ([147.83.33.10]:55098 helo=roura.ac.upc.es)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dP41n-0001YI-4u
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 05:40:26 -0400
+Received: from roura.ac.upc.edu ([147.83.33.10]:40628 helo=roura.ac.upc.es)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dP3xu-0000NX-Vj
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 05:36:23 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dP41m-0001Y5-Kv
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 05:40:23 -0400
 From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Sun, 25 Jun 2017 12:36:12 +0300
-Message-Id: <149838337207.6497.2684491711424225877.stgit@frigg.lan>
+Date: Sun, 25 Jun 2017 12:40:14 +0300
+Message-Id: <149838361402.6497.4595687907654582323.stgit@frigg.lan>
 In-Reply-To: <149838022308.6497.2104916050645246693.stgit@frigg.lan>
 References: <149838022308.6497.2104916050645246693.stgit@frigg.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v9 13/26] target: [tcg,
- i386] Refactor disas_flags
+Subject: [Qemu-devel] [PATCH v9 14/26] target: [tcg,
+ i386] Replace DISAS_* with DJ_*
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,56 +36,136 @@ loop.
 
 Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 ---
- target/i386/translate.c |   25 +++++++++++++++++--------
- 1 file changed, 17 insertions(+), 8 deletions(-)
+ target/i386/translate.c |   27 +++++++++++++++------------
+ 1 file changed, 15 insertions(+), 12 deletions(-)
 
 diff --git a/target/i386/translate.c b/target/i386/translate.c
-index e7b46d282a..5e426de947 100644
+index 5e426de947..c7bb6efbf5 100644
 --- a/target/i386/translate.c
 +++ b/target/i386/translate.c
-@@ -8540,10 +8540,25 @@ static void i386_trblock_tb_stop(DisasContextBase=
- *db, CPUState *cpu)
+@@ -71,6 +71,9 @@
+     case (2 << 6) | (OP << 3) | 0 ... (2 << 6) | (OP << 3) | 7: \
+     case (3 << 6) | (OP << 3) | 0 ... (3 << 6) | (OP << 3) | 7
+=20
++#define DJ_JUMP (DJ_TARGET + 0)         /* end of block due to call/jump=
+ */
++#define DJ_MISC (DJ_TARGET + 1)         /* some other reason */
++
+ //#define MACRO_TEST   1
+=20
+ /* global register indexes */
+@@ -2180,7 +2183,7 @@ static inline void gen_jcc(DisasContext *s, int b,
+=20
+         gen_set_label(l1);
+         gen_goto_tb(s, 1, val);
+-        s->base.is_jmp =3D DISAS_TB_JUMP;
++        s->base.is_jmp =3D DJ_JUMP;
+     } else {
+         l1 =3D gen_new_label();
+         l2 =3D gen_new_label();
+@@ -2253,11 +2256,11 @@ static void gen_movl_seg_T0(DisasContext *s, int =
+seg_reg)
+            stop as a special handling must be done to disable hardware
+            interrupts for the next instruction */
+         if (seg_reg =3D=3D R_SS || (s->code32 && seg_reg < R_FS))
+-            b->is_jmp =3D DISAS_TB_JUMP;
++            b->is_jmp =3D DJ_JUMP;
+     } else {
+         gen_op_movl_seg_T0_vm(seg_reg);
+         if (seg_reg =3D=3D R_SS)
+-            b->is_jmp =3D DISAS_TB_JUMP;
++            b->is_jmp =3D DJ_JUMP;
      }
  }
 =20
-+static int i386_trblock_disas_flags(const DisasContextBase *db)
-+{
-+    DisasContext *dc =3D container_of(db, DisasContext, base);
-+
-+#ifdef TARGET_X86_64
-+    if (dc->code64) {
-+        return 2;
-+    } else {
-+        return !dc->code32;
-+    }
-+#else
-+    return !dc->code32;
-+#endif
-+}
-+
- /* generate intermediate code for basic block 'tb'.  */
- void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
- {
--    DisasContext dc1, *dc =3D &dc1;
-+    DisasContext dc1;
-     DisasContextBase *db =3D &dc1.base;
-     CPUBreakpoint *bp;
-     int num_insns;
-@@ -8623,16 +8638,10 @@ done_generating:
- #ifdef DEBUG_DISAS
-     if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
-         && qemu_log_in_addr_range(db->pc_first)) {
--        int disas_flags;
-+        int disas_flags =3D i386_trblock_disas_flags(db);
-         qemu_log_lock();
-         qemu_log("----------------\n");
-         qemu_log("IN: %s\n", lookup_symbol(db->pc_first));
--#ifdef TARGET_X86_64
--        if (dc->code64)
--            disas_flags =3D 2;
--        else
--#endif
--            disas_flags =3D !dc->code32;
-         log_target_disas(cpu, db->pc_first, db->pc_next - db->pc_first,
-                          disas_flags);
-         qemu_log("\n");
+@@ -2431,7 +2434,7 @@ static void gen_exception(DisasContext *s, int trap=
+no, target_ulong cur_eip)
+     gen_update_cc_op(s);
+     gen_jmp_im(cur_eip);
+     gen_helper_raise_exception(cpu_env, tcg_const_i32(trapno));
+-    b->is_jmp =3D DISAS_TB_JUMP;
++    b->is_jmp =3D DJ_JUMP;
+ }
+=20
+ /* Generate #UD for the current instruction.  The assumption here is tha=
+t
+@@ -2471,7 +2474,7 @@ static void gen_interrupt(DisasContext *s, int intn=
+o,
+     gen_jmp_im(cur_eip);
+     gen_helper_raise_interrupt(cpu_env, tcg_const_i32(intno),
+                                tcg_const_i32(next_eip - cur_eip));
+-    b->is_jmp =3D DISAS_TB_JUMP;
++    b->is_jmp =3D DJ_JUMP;
+ }
+=20
+ static void gen_debug(DisasContext *s, target_ulong cur_eip)
+@@ -2481,7 +2484,7 @@ static void gen_debug(DisasContext *s, target_ulong=
+ cur_eip)
+     gen_update_cc_op(s);
+     gen_jmp_im(cur_eip);
+     gen_helper_debug(cpu_env);
+-    b->is_jmp =3D DISAS_TB_JUMP;
++    b->is_jmp =3D DJ_JUMP;
+ }
+=20
+ static void gen_set_hflag(DisasContext *s, uint32_t mask)
+@@ -2558,7 +2561,7 @@ do_gen_eob_worker(DisasContext *s, bool inhibit, bo=
+ol recheck_tf, TCGv jr)
+     } else {
+         tcg_gen_exit_tb(0);
+     }
+-    b->is_jmp =3D DISAS_TB_JUMP;
++    b->is_jmp =3D DJ_JUMP;
+ }
+=20
+ static inline void
+@@ -2599,7 +2602,7 @@ static void gen_jmp_tb(DisasContext *s, target_ulon=
+g eip, int tb_num)
+     set_cc_op(s, CC_OP_DYNAMIC);
+     if (s->jmp_opt) {
+         gen_goto_tb(s, tb_num, eip);
+-        b->is_jmp =3D DISAS_TB_JUMP;
++        b->is_jmp =3D DJ_JUMP;
+     } else {
+         gen_jmp_im(eip);
+         gen_eob(s);
+@@ -6963,7 +6966,7 @@ static target_ulong disas_insn(DisasContextBase *db=
+, CPUState *cpu)
+             gen_update_cc_op(s);
+             gen_jmp_im(pc_start - s->cs_base);
+             gen_helper_pause(cpu_env, tcg_const_i32(s->pc - pc_start));
+-            db->is_jmp =3D DISAS_TB_JUMP;
++            db->is_jmp =3D DJ_JUMP;
+         }
+         break;
+     case 0x9b: /* fwait */
+@@ -7208,7 +7211,7 @@ static target_ulong disas_insn(DisasContextBase *db=
+, CPUState *cpu)
+             gen_update_cc_op(s);
+             gen_jmp_im(pc_start - s->cs_base);
+             gen_helper_hlt(cpu_env, tcg_const_i32(s->pc - pc_start));
+-            db->is_jmp =3D DISAS_TB_JUMP;
++            db->is_jmp =3D DJ_JUMP;
+         }
+         break;
+     case 0x100:
+@@ -7391,7 +7394,7 @@ static target_ulong disas_insn(DisasContextBase *db=
+, CPUState *cpu)
+             gen_helper_vmrun(cpu_env, tcg_const_i32(s->aflag - 1),
+                              tcg_const_i32(s->pc - pc_start));
+             tcg_gen_exit_tb(0);
+-            db->is_jmp =3D DISAS_TB_JUMP;
++            db->is_jmp =3D DJ_JUMP;
+             break;
+=20
+         case 0xd9: /* VMMCALL */
+@@ -8567,7 +8570,7 @@ void gen_intermediate_code(CPUState *cpu, Translati=
+onBlock *tb)
+     /* generate intermediate code */
+     db->singlestep_enabled =3D cpu->singlestep_enabled;
+     db->tb =3D tb;
+-    db->is_jmp =3D DISAS_NEXT;
++    db->is_jmp =3D DJ_NEXT;
+     db->pc_first =3D tb->pc;
+     db->pc_next =3D db->pc_first;
+     i386_trblock_init_disas_context(db, cpu);
