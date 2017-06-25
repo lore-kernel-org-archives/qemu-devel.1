@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48670)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48693)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dPDEh-000489-37
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 15:30:20 -0400
+	id 1dPDEl-0004C4-Rb
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 15:30:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dPDEd-0006uT-WB
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 15:30:19 -0400
-Received: from mail-qk0-x235.google.com ([2607:f8b0:400d:c09::235]:36422)
+	id 1dPDEk-0006wL-KF
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 15:30:23 -0400
+Received: from mail-qt0-x231.google.com ([2607:f8b0:400d:c0d::231]:36141)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dPDEd-0006td-S1
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 15:30:15 -0400
-Received: by mail-qk0-x235.google.com with SMTP id p21so65333476qke.3
-	for <qemu-devel@nongnu.org>; Sun, 25 Jun 2017 12:30:15 -0700 (PDT)
+	id 1dPDEk-0006w8-Ez
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 15:30:22 -0400
+Received: by mail-qt0-x231.google.com with SMTP id i2so63314142qta.3
+	for <qemu-devel@nongnu.org>; Sun, 25 Jun 2017 12:30:22 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sun, 25 Jun 2017 16:29:49 -0300
-Message-Id: <20170625192950.17677-4-f4bug@amsat.org>
+Date: Sun, 25 Jun 2017 16:29:50 -0300
+Message-Id: <20170625192950.17677-5-f4bug@amsat.org>
 In-Reply-To: <20170625192950.17677-1-f4bug@amsat.org>
 References: <20170625192950.17677-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH 3/4] coccinelle: script to run them all
+Subject: [Qemu-devel] [RFC PATCH 4/4] travis: add job to run coccinelle
+ scripts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,64 +37,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
+result pushed to my gh repo via ssh deploy key
+
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- scripts/check-cocci-scripts.sh | 47 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 47 insertions(+)
- create mode 100755 scripts/check-cocci-scripts.sh
+ .travis.sshkey | Bin 0 -> 1296 bytes
+ .travis.yml    |  26 ++++++++++++++++++++------
+ 2 files changed, 20 insertions(+), 6 deletions(-)
+ create mode 100644 .travis.sshkey
 
-diff --git a/scripts/check-cocci-scripts.sh b/scripts/check-cocci-scripts.sh
-new file mode 100755
-index 0000000000..ec3a8b39ef
---- /dev/null
-+++ b/scripts/check-cocci-scripts.sh
-@@ -0,0 +1,47 @@
-+#! /usr/bin/env bash
-+
-+test -d scripts/coccinelle || exit 1
-+
-+SPATCH_IMAGE="philmd/coccinelle:1.0.4"
-+
-+GIT_AUTHOR_NAME="Coccinelle Spatch"
-+GIT_COMMITTER_NAME="Coccinelle Spatch"
-+
-+if [ -n "$TRAVIS" ]; then
-+	# avoid stalling builds: https://docs.travis-ci.com/user/common-build-problems/#Build-times-out-because-no-output-was-received
-+	TIMEOUT_S=530
-+	TIMEOUT_CMD="timeout -k 550 500"
-+	EXTRA_ARGS="--timeout ${TIMEOUT_S}"
-+else
-+	TIMEOUT_S=0
-+fi
-+
-+HEAD=19 #`echo -n scripts/coccinelle/ | wc -c`
-+TAIL=6 #`echo -n .cocci | wc -c`
-+
-+test -z "$(${SUDO} docker images -q ${SPATCH_IMAGE})" && ${SUDO} docker pull ${SPATCH_IMAGE}
-+
-+LOG=/tmp/cocci-spatch-$$
-+for script in scripts/coccinelle/*.cocci; do
-+	desc=${script:$HEAD:-$TAIL}
-+	echo -e "\nRunning ${script}...\n"
-+	echo -e "coccinelle: committing changes after running \"$desc\" script\n" > ${LOG}.topic
-+	${TIMEOUT_CMD} ${SUDO} \
-+	docker run --rm -v `pwd`:`pwd` -w `pwd` -u `id -u` \
-+		${SPATCH_IMAGE} --use-cache --use-gitgrep --keep-comments \
-+			--very-quiet ${EXTRA_ARGS} \
-+			--sp-file ${script} \
-+			--macro-file scripts/cocci-macro-file.h \
-+			--dir . \
-+			--in-place | tee ${LOG}.content
-+	git add -u
-+	git diff --cached --exit-code -s
-+	if [ $? -ne 0 ]; then
-+		:> ${LOG}.content
-+	else
-+		test -s ${LOG}.content || continue
-+	fi
-+	cat ${LOG}.{topic,content} | git commit --allow-empty -F -
-+done
-+
-+rm -f ${LOG}.{topic,content}
+diff --git a/.travis.sshkey b/.travis.sshkey
+new file mode 100644
+index 0000000000000000000000000000000000000000..5921e953c8d91461ae193c15922d658834f8d6c5
+GIT binary patch
+literal 1296
+zcmV+r1@HPCoP~Uo`}Gc5AacL0i>ciVZGDC=x67D__o=U=ig02!0StKv2oE-TL@8$>
+zU0$F^xr)f=@8?MPI@}e&`i8?|`SXQ<@(;6hZnSBYT!2m}p#!07TN{#iIdPyKQH>(O
+z66UEPdqEDb%~tpi+Wxb^jo$Z$8V9xkj&Zf#;-Em>m@d<_%#}N$?$af5jn}TO^)Vlf
+zv~Wb!S$UnnnwWL0duGIR)=(GR15y%p)Twy93gpSGUnb!u&lx@E3~(dg5R~~?^OObe
+zl>p3F$Wk~ik$4);k?zOq%6LU@vd$}DY@%-TIBpF^@?;3!jJIsNPFFjay`~et1EgI_
+zMpprT%uH4i;`<##f$cFhAh<wU5Kf0DrZ;jhjDau4Ok2*)RZJBH)bRa;n>k$2#|jPI
+zwFds#72`WsQ;CX*$iOAWaBaq(yR_<(-4OyZ)W8r7tdsTF)tQm5Qm`^JN5YD<v3%dA
+z39F9&$!*C)dlcP(>L*JlT~`LrPzh9I_~Tjf$99HM${l=EjEK6KQ{9GBvA~8p(*N%B
+zJjX9tqMli6nykS@*a;;AVjl4dK$JliASAv_9zckAQ(;U=eB6m4R>^&EcZlFAo)OTn
+zhPz5?A<|tKZVuhRnfQaTkv2h_>sWH#oVnH&eV29jt8gH>IZRo%g<pmQf9WvMp12)6
+zzA&ePL%Ck<UKBYINIZ*5qkCBtNi{J7u<6j}s6K9rOC}*{+k>Y?A3HSG`Ale19DS3X
+z$iXSp$>v;MD2S0N6g53BQ(RU;;@E5r{H8kkSs{|&8&eF%15L|}>u8)}p({!79kYTk
+z;$4d%3*h6V@-)s;l4i{7st?~{!Z}gK+`j*^jc?cPZ#Qr|g~^Be+DW&OJr@k<JSjM>
+z%MDv7<M<zh$f)GeGy}`Kwq5SPVza#L(|G@Z(XwF21&kdU60#^UvH$YVgT+|me;CMi
+z^3F;XGd4zXp$Qh+(?gqjjL3mA$fXW&Bovhv+tnR5`^JMBY^bmI?bZ}y7nYvBRRL2O
+zukxxyZ*U`RJk6v1{R=Hbo}EJoOFL-|66Qz`0x|&j?U`N4MRmaGQWszs$;fdKYAyju
+zQ8D-=%A0(bknuH?Cu{4a-*2urJW)WgAcZV}`x?0ul&7X#DRkSomZVz7DDrt}{v+ip
+zuJuF{_^15DstUbL3=~JQ_w;^A3)B^-dkpmq+1w-Zu)&IU=sgX()?49tUO=nG7*p6R
+zTMhvNqAu(q=y~FbeR=HuajRX-sm$AUVa;~0e0KQuR18f-HxE~>*PmucM^qRj*rK36
+zfqH&%?QJB>cjUoZwq;2=%@5{=((`nIe_+#`n{ivY53v36@`pdZdyiN3iDy^T1ltVW
+zYXJh3g4aNoPZQNn7a$l}6B;&sWe8n=CCj>F>s;W!(Dd-BcWFcnhHn?XZ|&RY7MUC=
+z=!4=WHQ==S-C?Ms3cH)W^?%>IHJ>ZD*0le4eX5_T4Rs&?k;0~OG5Ludm-uuHi-{vX
+zWKVyW?2=Uy6RCl8gNjW+e|AfO^6EJ}=upJqIUHpXNd(-E*ZgN%A0-L4r<`IbRB?4y
+z)w%*$FPwBYRmfJ7U}7|Wpd2&o+nj#Dk9Dk=w`L}&Y@Zs4DKinczsaDO&ifLs6YnIA
+zAcKDL;g+m+!<gE4a)^z;MR0~o0S^@`D9OA*FH)N64kN$7>ByZV67En&W{lNMy7g?{
+GW~j`fDT25F
+
+literal 0
+HcmV?d00001
+
+diff --git a/.travis.yml b/.travis.yml
+index 4761569183..52665273ba 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -51,6 +51,9 @@ env:
+ git:
+   # we want to do this ourselves
+   submodules: false
++branches:
++  except:
++  - /^autogenerated-.*/
+ before_install:
+   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update ; fi
+   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libffi gettext glib pixman ; fi
+@@ -62,14 +65,25 @@ script:
+   - make -j3 && ${TEST_CMD}
+ matrix:
+   include:
+-    # Plain Trusty Linux User Build
+-    - env: CONFIG="--disable-system"
++    # Coccinelle using Trusty
++    - env: TEST_CMD=""
++           GIT_AUTHOR_EMAIL="coccinelle@travis-ci"
++           GIT_COMMITTER_EMAIL="f4bug@amsat.org"
+       sudo: required
+-      addons:
++      services:
++      - docker
+       dist: trusty
++      group: deprecated-2017Q2
+       compiler: gcc
+       before_install:
+-        - sudo apt-get update -qq
+         - sudo apt-get build-dep -qq qemu
+-        - wget -O - http://people.linaro.org/~alex.bennee/qemu-submodule-git-seed.tar.xz | tar -xvJ
+-        - git submodule update --init --recursive
++        - git submodule update --init dtc
++      script:
++        - ORIGIN=$(git rev-parse HEAD)
++        - scripts/check-cocci-scripts.sh
++      after_success:
++        - if [ ${ORIGIN} = $(git rev-parse HEAD) ]; then exit; fi
++        - eval "$(ssh-agent -s)"
++        - openssl aes-256-cbc -K $encrypted_8b1bab3b4d04_key -iv $encrypted_8b1bab3b4d04_iv -in .travis.sshkey -d | ssh-add -
++        - BRANCH=autogenerated-coccinelle-`date +%Y%m%d`-${TRAVIS_BUILD_NUMBER}
++        - git checkout -b ${BRANCH} && git remote add deploy git@github.com:${TRAVIS_REPO_SLUG}.git && git push -f deploy ${BRANCH}
 -- 
 2.13.1
