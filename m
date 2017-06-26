@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1dPaJd-0001Ba-MH
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 16:08:59 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1dPaTZ-0005Bp-Pd
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 16:19:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1dPaJY-0001XN-Lp
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 16:08:57 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:36767)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sergio.g.delreal@gmail.com>)
-	id 1dPaJY-0001Us-DE
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 16:08:52 -0400
-Received: by mail-pf0-x241.google.com with SMTP id z6so1585098pfk.3
-	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 13:08:50 -0700 (PDT)
-From: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
-Date: Mon, 26 Jun 2017 15:08:32 -0500
-Message-Id: <20170626200832.11058-1-Sergio.G.DelReal@gmail.com>
-Subject: [Qemu-devel] [PATCH] xsave_helper: pull xsave and xrstor out of
- kvm.c into helper function
+	(envelope-from <alex.williamson@redhat.com>) id 1dPaTV-0007T3-OE
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 16:19:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38030)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1dPaTV-0007So-Ft
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 16:19:09 -0400
+Date: Mon, 26 Jun 2017 14:19:06 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170626141906.6e38b235@w520.home>
+In-Reply-To: <1491301684-24367-1-git-send-email-yulei.zhang@intel.com>
+References: <1491301684-24367-1-git-send-email-yulei.zhang@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 5/5] vifo: introduce new VFIO ioctl
+ VFIO_DEVICE_PCI_GET_DIRTY_BITMAP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,286 +28,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>, "open list:X86" <kvm@vger.kernel.org>
+To: Yulei Zhang <yulei.zhang@intel.com>
+Cc: qemu-devel@nongnu.org, kevin.tian@intel.com, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, xiao.zheng@intel.com, zhi.a.wang@intel.com
 
-This patch pulls out of kvm.c and into the new files the implementation
-for the xsave and xrstor instructions. This so they can be shared by
-kvm and hvf.
+On Tue,  4 Apr 2017 18:28:04 +0800
+Yulei Zhang <yulei.zhang@intel.com> wrote:
 
-Signed-off-by: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
----
- target/i386/Makefile.objs  |   1 +
- target/i386/cpu.h          |   2 +
- target/i386/kvm.c          |  91 ++----------------------------------
- target/i386/xsave_helper.c | 114 +++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 120 insertions(+), 88 deletions(-)
- create mode 100644 target/i386/xsave_helper.c
+> New VFIO ioctl VFIO_DEVICE_PCI_GET_DIRTY_BITMAP is used to sync the
+> pci device dirty pages during the migration.
 
-diff --git a/target/i386/Makefile.objs b/target/i386/Makefile.objs
-index 4fcb7f3df0..ca3bd21cfc 100644
---- a/target/i386/Makefile.objs
-+++ b/target/i386/Makefile.objs
-@@ -1,6 +1,7 @@
- obj-y += translate.o helper.o cpu.o bpt_helper.o
- obj-y += excp_helper.o fpu_helper.o cc_helper.o int_helper.o svm_helper.o
- obj-y += smm_helper.o misc_helper.o mem_helper.o seg_helper.o mpx_helper.o
-+obj-y += xsave_helper.o
- obj-y += gdbstub.o
- obj-$(CONFIG_SOFTMMU) += machine.o arch_memory_mapping.o arch_dump.o monitor.o
- obj-$(CONFIG_KVM) += kvm.o hyperv.o
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index de0551f775..c5e143e8ef 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1697,4 +1697,6 @@ void x86_cpu_dump_local_apic_state(CPUState *cs, FILE *f,
- /* cpu.c */
- bool cpu_is_bsp(X86CPU *cpu);
- 
-+void x86_cpu_xrstor_all_areas(X86CPU *cpu, const X86XSaveArea *buf);
-+void x86_cpu_xsave_all_areas(X86CPU *cpu, X86XSaveArea *buf);
- #endif /* I386_CPU_H */
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index ee36502789..f84a49d366 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1433,56 +1433,12 @@ static int kvm_put_xsave(X86CPU *cpu)
- {
-     CPUX86State *env = &cpu->env;
-     X86XSaveArea *xsave = env->kvm_xsave_buf;
--    uint16_t cwd, swd, twd;
--    int i;
- 
-     if (!has_xsave) {
-         return kvm_put_fpu(cpu);
-     }
-+    x86_cpu_xsave_all_areas(cpu, xsave);
- 
--    memset(xsave, 0, sizeof(struct kvm_xsave));
--    twd = 0;
--    swd = env->fpus & ~(7 << 11);
--    swd |= (env->fpstt & 7) << 11;
--    cwd = env->fpuc;
--    for (i = 0; i < 8; ++i) {
--        twd |= (!env->fptags[i]) << i;
--    }
--    xsave->legacy.fcw = cwd;
--    xsave->legacy.fsw = swd;
--    xsave->legacy.ftw = twd;
--    xsave->legacy.fpop = env->fpop;
--    xsave->legacy.fpip = env->fpip;
--    xsave->legacy.fpdp = env->fpdp;
--    memcpy(&xsave->legacy.fpregs, env->fpregs,
--            sizeof env->fpregs);
--    xsave->legacy.mxcsr = env->mxcsr;
--    xsave->header.xstate_bv = env->xstate_bv;
--    memcpy(&xsave->bndreg_state.bnd_regs, env->bnd_regs,
--            sizeof env->bnd_regs);
--    xsave->bndcsr_state.bndcsr = env->bndcs_regs;
--    memcpy(&xsave->opmask_state.opmask_regs, env->opmask_regs,
--            sizeof env->opmask_regs);
--
--    for (i = 0; i < CPU_NB_REGS; i++) {
--        uint8_t *xmm = xsave->legacy.xmm_regs[i];
--        uint8_t *ymmh = xsave->avx_state.ymmh[i];
--        uint8_t *zmmh = xsave->zmm_hi256_state.zmm_hi256[i];
--        stq_p(xmm,     env->xmm_regs[i].ZMM_Q(0));
--        stq_p(xmm+8,   env->xmm_regs[i].ZMM_Q(1));
--        stq_p(ymmh,    env->xmm_regs[i].ZMM_Q(2));
--        stq_p(ymmh+8,  env->xmm_regs[i].ZMM_Q(3));
--        stq_p(zmmh,    env->xmm_regs[i].ZMM_Q(4));
--        stq_p(zmmh+8,  env->xmm_regs[i].ZMM_Q(5));
--        stq_p(zmmh+16, env->xmm_regs[i].ZMM_Q(6));
--        stq_p(zmmh+24, env->xmm_regs[i].ZMM_Q(7));
--    }
--
--#ifdef TARGET_X86_64
--    memcpy(&xsave->hi16_zmm_state.hi16_zmm, &env->xmm_regs[16],
--            16 * sizeof env->xmm_regs[16]);
--    memcpy(&xsave->pkru_state, &env->pkru, sizeof env->pkru);
--#endif
-     return kvm_vcpu_ioctl(CPU(cpu), KVM_SET_XSAVE, xsave);
- }
- 
-@@ -1868,8 +1824,7 @@ static int kvm_get_xsave(X86CPU *cpu)
- {
-     CPUX86State *env = &cpu->env;
-     X86XSaveArea *xsave = env->kvm_xsave_buf;
--    int ret, i;
--    uint16_t cwd, swd, twd;
-+    int ret;
- 
-     if (!has_xsave) {
-         return kvm_get_fpu(cpu);
-@@ -1879,48 +1834,8 @@ static int kvm_get_xsave(X86CPU *cpu)
-     if (ret < 0) {
-         return ret;
-     }
-+    x86_cpu_xrstor_all_areas(cpu, xsave);
- 
--    cwd = xsave->legacy.fcw;
--    swd = xsave->legacy.fsw;
--    twd = xsave->legacy.ftw;
--    env->fpop = xsave->legacy.fpop;
--    env->fpstt = (swd >> 11) & 7;
--    env->fpus = swd;
--    env->fpuc = cwd;
--    for (i = 0; i < 8; ++i) {
--        env->fptags[i] = !((twd >> i) & 1);
--    }
--    env->fpip = xsave->legacy.fpip;
--    env->fpdp = xsave->legacy.fpdp;
--    env->mxcsr = xsave->legacy.mxcsr;
--    memcpy(env->fpregs, &xsave->legacy.fpregs,
--            sizeof env->fpregs);
--    env->xstate_bv = xsave->header.xstate_bv;
--    memcpy(env->bnd_regs, &xsave->bndreg_state.bnd_regs,
--            sizeof env->bnd_regs);
--    env->bndcs_regs = xsave->bndcsr_state.bndcsr;
--    memcpy(env->opmask_regs, &xsave->opmask_state.opmask_regs,
--            sizeof env->opmask_regs);
--
--    for (i = 0; i < CPU_NB_REGS; i++) {
--        uint8_t *xmm = xsave->legacy.xmm_regs[i];
--        uint8_t *ymmh = xsave->avx_state.ymmh[i];
--        uint8_t *zmmh = xsave->zmm_hi256_state.zmm_hi256[i];
--        env->xmm_regs[i].ZMM_Q(0) = ldq_p(xmm);
--        env->xmm_regs[i].ZMM_Q(1) = ldq_p(xmm+8);
--        env->xmm_regs[i].ZMM_Q(2) = ldq_p(ymmh);
--        env->xmm_regs[i].ZMM_Q(3) = ldq_p(ymmh+8);
--        env->xmm_regs[i].ZMM_Q(4) = ldq_p(zmmh);
--        env->xmm_regs[i].ZMM_Q(5) = ldq_p(zmmh+8);
--        env->xmm_regs[i].ZMM_Q(6) = ldq_p(zmmh+16);
--        env->xmm_regs[i].ZMM_Q(7) = ldq_p(zmmh+24);
--    }
--
--#ifdef TARGET_X86_64
--    memcpy(&env->xmm_regs[16], &xsave->hi16_zmm_state.hi16_zmm,
--           16 * sizeof env->xmm_regs[16]);
--    memcpy(&env->pkru, &xsave->pkru_state, sizeof env->pkru);
--#endif
-     return 0;
- }
- 
-diff --git a/target/i386/xsave_helper.c b/target/i386/xsave_helper.c
-new file mode 100644
-index 0000000000..ca735eee77
---- /dev/null
-+++ b/target/i386/xsave_helper.c
-@@ -0,0 +1,114 @@
-+/*
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+
-+#include "qemu-common.h"
-+#include "cpu.h"
-+
-+void x86_cpu_xsave_all_areas(X86CPU *cpu, X86XSaveArea *buf)
-+{
-+    CPUX86State *env = &cpu->env;
-+    X86XSaveArea *xsave = buf;
-+
-+    uint16_t cwd, swd, twd;
-+    int i;
-+    memset(xsave, 0, sizeof(X86XSaveArea));
-+    twd = 0;
-+    swd = env->fpus & ~(7 << 11);
-+    swd |= (env->fpstt & 7) << 11;
-+    cwd = env->fpuc;
-+    for (i = 0; i < 8; ++i) {
-+        twd |= (!env->fptags[i]) << i;
-+    }
-+    xsave->legacy.fcw = cwd;
-+    xsave->legacy.fsw = swd;
-+    xsave->legacy.ftw = twd;
-+    xsave->legacy.fpop = env->fpop;
-+    xsave->legacy.fpip = env->fpip;
-+    xsave->legacy.fpdp = env->fpdp;
-+    memcpy(&xsave->legacy.fpregs, env->fpregs,
-+            sizeof env->fpregs);
-+    xsave->legacy.mxcsr = env->mxcsr;
-+    xsave->header.xstate_bv = env->xstate_bv;
-+    memcpy(&xsave->bndreg_state.bnd_regs, env->bnd_regs,
-+            sizeof env->bnd_regs);
-+    xsave->bndcsr_state.bndcsr = env->bndcs_regs;
-+    memcpy(&xsave->opmask_state.opmask_regs, env->opmask_regs,
-+            sizeof env->opmask_regs);
-+
-+    for (i = 0; i < CPU_NB_REGS; i++) {
-+        uint8_t *xmm = xsave->legacy.xmm_regs[i];
-+        uint8_t *ymmh = xsave->avx_state.ymmh[i];
-+        uint8_t *zmmh = xsave->zmm_hi256_state.zmm_hi256[i];
-+        stq_p(xmm,     env->xmm_regs[i].ZMM_Q(0));
-+        stq_p(xmm+8,   env->xmm_regs[i].ZMM_Q(1));
-+        stq_p(ymmh,    env->xmm_regs[i].ZMM_Q(2));
-+        stq_p(ymmh+8,  env->xmm_regs[i].ZMM_Q(3));
-+        stq_p(zmmh,    env->xmm_regs[i].ZMM_Q(4));
-+        stq_p(zmmh+8,  env->xmm_regs[i].ZMM_Q(5));
-+        stq_p(zmmh+16, env->xmm_regs[i].ZMM_Q(6));
-+        stq_p(zmmh+24, env->xmm_regs[i].ZMM_Q(7));
-+    }
-+
-+#ifdef TARGET_X86_64
-+    memcpy(&xsave->hi16_zmm_state.hi16_zmm, &env->xmm_regs[16],
-+            16 * sizeof env->xmm_regs[16]);
-+    memcpy(&xsave->pkru_state, &env->pkru, sizeof env->pkru);
-+#endif
-+
-+}
-+
-+void x86_cpu_xrstor_all_areas(X86CPU *cpu, const X86XSaveArea *buf)
-+{
-+
-+    CPUX86State *env = &cpu->env;
-+    const X86XSaveArea *xsave = buf;
-+
-+    int i;
-+    uint16_t cwd, swd, twd;
-+    cwd = xsave->legacy.fcw;
-+    swd = xsave->legacy.fsw;
-+    twd = xsave->legacy.ftw;
-+    env->fpop = xsave->legacy.fpop;
-+    env->fpstt = (swd >> 11) & 7;
-+    env->fpus = swd;
-+    env->fpuc = cwd;
-+    for (i = 0; i < 8; ++i) {
-+        env->fptags[i] = !((twd >> i) & 1);
-+    }
-+    env->fpip = xsave->legacy.fpip;
-+    env->fpdp = xsave->legacy.fpdp;
-+    env->mxcsr = xsave->legacy.mxcsr;
-+    memcpy(env->fpregs, &xsave->legacy.fpregs,
-+            sizeof env->fpregs);
-+    env->xstate_bv = xsave->header.xstate_bv;
-+    memcpy(env->bnd_regs, &xsave->bndreg_state.bnd_regs,
-+            sizeof env->bnd_regs);
-+    env->bndcs_regs = xsave->bndcsr_state.bndcsr;
-+    memcpy(env->opmask_regs, &xsave->opmask_state.opmask_regs,
-+            sizeof env->opmask_regs);
-+
-+    for (i = 0; i < CPU_NB_REGS; i++) {
-+        const uint8_t *xmm = xsave->legacy.xmm_regs[i];
-+        const uint8_t *ymmh = xsave->avx_state.ymmh[i];
-+        const uint8_t *zmmh = xsave->zmm_hi256_state.zmm_hi256[i];
-+        env->xmm_regs[i].ZMM_Q(0) = ldq_p(xmm);
-+        env->xmm_regs[i].ZMM_Q(1) = ldq_p(xmm+8);
-+        env->xmm_regs[i].ZMM_Q(2) = ldq_p(ymmh);
-+        env->xmm_regs[i].ZMM_Q(3) = ldq_p(ymmh+8);
-+        env->xmm_regs[i].ZMM_Q(4) = ldq_p(zmmh);
-+        env->xmm_regs[i].ZMM_Q(5) = ldq_p(zmmh+8);
-+        env->xmm_regs[i].ZMM_Q(6) = ldq_p(zmmh+16);
-+        env->xmm_regs[i].ZMM_Q(7) = ldq_p(zmmh+24);
-+    }
-+
-+#ifdef TARGET_X86_64
-+    memcpy(&env->xmm_regs[16], &xsave->hi16_zmm_state.hi16_zmm,
-+           16 * sizeof env->xmm_regs[16]);
-+    memcpy(&env->pkru, &xsave->pkru_state, sizeof env->pkru);
-+#endif
-+
-+}
--- 
-2.13.0
+If this needs to exist, it needs a lot more documentation.  Why is this
+a PCI specific device ioctl?  Couldn't any vfio device need this?  
+
+> Signed-off-by: Yulei Zhang <yulei.zhang@intel.com>
+> ---
+>  hw/vfio/pci.c              | 32 ++++++++++++++++++++++++++++++++
+>  hw/vfio/pci.h              |  2 ++
+>  linux-headers/linux/vfio.h | 14 ++++++++++++++
+>  3 files changed, 48 insertions(+)
+> 
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 833cd90..64c851f 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -32,6 +32,7 @@
+>  #include "pci.h"
+>  #include "trace.h"
+>  #include "qapi/error.h"
+> +#include "exec/ram_addr.h"
+>  
+>  #define MSIX_CAP_LENGTH 12
+>  
+> @@ -39,6 +40,7 @@ static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
+>  static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
+>  static VMStateDescription vfio_pci_vmstate;
+>  static void vfio_vm_change_state_handler(void *pv, int running, RunState state);
+> +static void vfio_log_sync(MemoryListener *listener, MemoryRegionSection *section);
+>  
+>  /*
+>   * Disabling BAR mmaping can be slow, but toggling it around INTx can
+> @@ -2869,6 +2871,11 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+>      vfio_setup_resetfn_quirk(vdev);
+>      qemu_add_vm_change_state_handler(vfio_vm_change_state_handler, vdev);
+>  
+> +    vdev->vfio_memory_listener = (MemoryListener) {
+> +	    .log_sync = vfio_log_sync,
+> +    };
+> +    memory_listener_register(&vdev->vfio_memory_listener, &address_space_memory);
+> +
+>      return;
+>  
+>  out_teardown:
+> @@ -2964,6 +2971,7 @@ static void vfio_vm_change_state_handler(void *pv, int running, RunState state)
+>      if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_PCI_STATUS_SET, vfio_status)) {
+>          error_report("vfio: Failed to %s device\n", running ? "start" : "stop");
+>      }
+> +    vdev->device_stop = running ? false : true;
+>      g_free(vfio_status);
+>  }
+>  
+> @@ -3079,6 +3087,30 @@ static int vfio_device_get(QEMUFile *f, void *pv, size_t size, VMStateField *fie
+>      return 0;
+>  }
+>  
+> +static void vfio_log_sync(MemoryListener *listener, MemoryRegionSection *section)
+> +{
+> +    VFIOPCIDevice *vdev = container_of(listener, struct VFIOPCIDevice, vfio_memory_listener);
+> +
+> +    if (vdev->device_stop) {
+> +        struct vfio_pci_get_dirty_bitmap *d;
+> +        ram_addr_t size = int128_get64(section->size);
+> +        unsigned long page_nr = size >> TARGET_PAGE_BITS;
+> +        unsigned long bitmap_size = (BITS_TO_LONGS(page_nr) + 1) * sizeof(unsigned long);
+> +        d = g_malloc0(sizeof(*d) + bitmap_size);
+> +        d->start_addr = section->offset_within_address_space;
+> +        d->page_nr = page_nr;
+> +
+> +        if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_PCI_GET_DIRTY_BITMAP, d)) {
+> +            error_report("vfio: Failed to fetch dirty pages for migration\n");
+> +            goto exit;
+> +        }
+> +        cpu_physical_memory_set_dirty_lebitmap((unsigned long*)&d->dirty_bitmap, d->start_addr, d->page_nr);
+> +
+> +exit:
+> +        g_free(d);
+> +    }
+> +}
+> +
+>  static void vfio_instance_init(Object *obj)
+>  {
+>      PCIDevice *pci_dev = PCI_DEVICE(obj);
+> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+> index bd98618..984391d 100644
+> --- a/hw/vfio/pci.h
+> +++ b/hw/vfio/pci.h
+> @@ -144,6 +144,8 @@ typedef struct VFIOPCIDevice {
+>      bool no_kvm_intx;
+>      bool no_kvm_msi;
+>      bool no_kvm_msix;
+> +    bool device_stop;
+> +    MemoryListener vfio_memory_listener;
+>  } VFIOPCIDevice;
+>  
+>  uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len);
+> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+> index fa17848..aa73ee1 100644
+> --- a/linux-headers/linux/vfio.h
+> +++ b/linux-headers/linux/vfio.h
+> @@ -502,6 +502,20 @@ struct vfio_pci_status_set{
+>  
+>  #define VFIO_DEVICE_PCI_STATUS_SET	_IO(VFIO_TYPE, VFIO_BASE + 14)
+>  
+> +/**
+> + * VFIO_DEVICE_PCI_GET_DIRTY_BITMAP - _IOW(VFIO_TYPE, VFIO_BASE + 15,
+> + *				    struct vfio_pci_get_dirty_bitmap)
+> + *
+> + * Return: 0 on success, -errno on failure.
+> + */
+> +struct vfio_pci_get_dirty_bitmap{
+> +	__u64	       start_addr;
+> +	__u64	       page_nr;
+> +	__u8           dirty_bitmap[];
+> +};
+> +
+> +#define VFIO_DEVICE_PCI_GET_DIRTY_BITMAP _IO(VFIO_TYPE, VFIO_BASE + 15)
+> +
+
+Dirty since when?  Since the last time we asked?  Since the device was
+stopped?  Why is anything dirtied after the device is stopped?  Is this
+any pages the device has ever touched?  Thanks,
+
+Alex
+
+>  /* -------- API for Type1 VFIO IOMMU -------- */
+>  
+>  /**
