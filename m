@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dPc7E-0007GR-1S
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 18:04:19 -0400
+	(envelope-from <cota@braap.org>) id 1dPc7k-0007hG-ID
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 18:04:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dPc7A-0005Di-U3
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 18:04:16 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:64884)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dPc7A-0005DE-IL
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 18:04:12 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 27 Jun 2017 00:03:28 +0200
-Message-Id: <20170626220330.6785-6-laurent@vivier.eu>
-In-Reply-To: <20170626220330.6785-1-laurent@vivier.eu>
-References: <20170626220330.6785-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v2 5/7] target/m68k: add fsglmul and fsgldiv
+	(envelope-from <cota@braap.org>) id 1dPc7h-0005NB-Bt
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 18:04:48 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:41763)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dPc7g-0005M6-Vv
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 18:04:45 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Date: Mon, 26 Jun 2017 18:04:35 -0400
+Message-Id: <1498514681-3059-2-git-send-email-cota@braap.org>
+In-Reply-To: <1498514681-3059-1-git-send-email-cota@braap.org>
+References: <1498514681-3059-1-git-send-email-cota@braap.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 1/7] exec: [tcg] Refactor flush of per-CPU
+ virtual TB cache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,90 +28,83 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
+Cc: "Daniel P . Berrange" <berrange@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Stefan Hajnoczi <stefanha@redhat.com>, Richard Henderson <rth@twiddle.net>, Laurent Desnogues <laurent.desnogues@gmail.com>
 
-fsglmul and fsgldiv truncate data to single precision before computing
-results.
+From: Lluís Vilanova <vilanova@ac.upc.edu>
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+The function is reused in later patches.
+
+Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/m68k/fpu_helper.c | 22 ++++++++++++++++++++++
- target/m68k/helper.h     |  2 ++
- target/m68k/translate.c  |  6 ++++++
- 3 files changed, 30 insertions(+)
+ accel/tcg/cputlb.c        |  2 +-
+ accel/tcg/translate-all.c | 15 ++++++++++-----
+ include/exec/exec-all.h   |  6 ++++++
+ 3 files changed, 17 insertions(+), 6 deletions(-)
 
-diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
-index f6b6788..888abf6 100644
---- a/target/m68k/fpu_helper.c
-+++ b/target/m68k/fpu_helper.c
-@@ -249,6 +249,17 @@ void HELPER(fdmul)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
-     PREC_END();
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index 743776a..6a2b762 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -118,7 +118,7 @@ static void tlb_flush_nocheck(CPUState *cpu)
+ 
+     memset(env->tlb_table, -1, sizeof(env->tlb_table));
+     memset(env->tlb_v_table, -1, sizeof(env->tlb_v_table));
+-    memset(cpu->tb_jmp_cache, 0, sizeof(cpu->tb_jmp_cache));
++    tb_flush_jmp_cache_all(cpu);
+ 
+     env->vtlb_index = 0;
+     env->tlb_flush_addr = -1;
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index f6ad46b..8888dad 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -928,11 +928,7 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
+     }
+ 
+     CPU_FOREACH(cpu) {
+-        int i;
+-
+-        for (i = 0; i < TB_JMP_CACHE_SIZE; ++i) {
+-            atomic_set(&cpu->tb_jmp_cache[i], NULL);
+-        }
++        tb_flush_jmp_cache_all(cpu);
+     }
+ 
+     tcg_ctx.tb_ctx.nb_tbs = 0;
+@@ -1732,6 +1728,15 @@ void tb_check_watchpoint(CPUState *cpu)
+     }
  }
  
-+void HELPER(fsglmul)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
++void tb_flush_jmp_cache_all(CPUState *cpu)
 +{
-+    floatx80 a, b;
++    int i;
 +
-+    PREC_BEGIN(32);
-+    a = floatx80_round(val0->d, &env->fp_status);
-+    b = floatx80_round(val1->d, &env->fp_status);
-+    res->d = floatx80_mul(a, b, &env->fp_status);
-+    PREC_END();
++    for (i = 0; i < TB_JMP_CACHE_SIZE; ++i) {
++        atomic_set(&cpu->tb_jmp_cache[i], NULL);
++    }
 +}
 +
- void HELPER(fdiv)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
- {
-     res->d = floatx80_div(val1->d, val0->d, &env->fp_status);
-@@ -268,6 +279,17 @@ void HELPER(fddiv)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
-     PREC_END();
- }
+ #ifndef CONFIG_USER_ONLY
+ /* in deterministic execution mode, instructions doing device I/Os
+  * must be at the end of the TB.
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index 724ec73..b0281b0 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -366,6 +366,12 @@ struct TranslationBlock {
+ };
  
-+void HELPER(fsgldiv)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
-+{
-+    floatx80 a, b;
-+
-+    PREC_BEGIN(32);
-+    a = floatx80_round(val1->d, &env->fp_status);
-+    b = floatx80_round(val0->d, &env->fp_status);
-+    res->d = floatx80_div(a, b, &env->fp_status);
-+    PREC_END();
-+}
-+
- static int float_comp_to_cc(int float_compare)
- {
-     switch (float_compare) {
-diff --git a/target/m68k/helper.h b/target/m68k/helper.h
-index 0c7f06f..f05191b 100644
---- a/target/m68k/helper.h
-+++ b/target/m68k/helper.h
-@@ -39,9 +39,11 @@ DEF_HELPER_4(fdsub, void, env, fp, fp, fp)
- DEF_HELPER_4(fmul, void, env, fp, fp, fp)
- DEF_HELPER_4(fsmul, void, env, fp, fp, fp)
- DEF_HELPER_4(fdmul, void, env, fp, fp, fp)
-+DEF_HELPER_4(fsglmul, void, env, fp, fp, fp)
- DEF_HELPER_4(fdiv, void, env, fp, fp, fp)
- DEF_HELPER_4(fsdiv, void, env, fp, fp, fp)
- DEF_HELPER_4(fddiv, void, env, fp, fp, fp)
-+DEF_HELPER_4(fsgldiv, void, env, fp, fp, fp)
- DEF_HELPER_FLAGS_3(fcmp, TCG_CALL_NO_RWG, void, env, fp, fp)
- DEF_HELPER_FLAGS_2(set_fpcr, TCG_CALL_NO_RWG, void, env, i32)
- DEF_HELPER_FLAGS_2(ftst, TCG_CALL_NO_RWG, void, env, fp)
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index df79653..253b8cc 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -4646,6 +4646,12 @@ DISAS_INSN(fpu)
-     case 0x67: /* fdmul */
-         gen_helper_fdmul(cpu_env, cpu_dest, cpu_src, cpu_dest);
-         break;
-+    case 0x24: /* fsgldiv */
-+        gen_helper_fsgldiv(cpu_env, cpu_dest, cpu_src, cpu_dest);
-+        break;
-+    case 0x27: /* fsglmul */
-+        gen_helper_fsglmul(cpu_env, cpu_dest, cpu_src, cpu_dest);
-+        break;
-     case 0x28: /* fsub */
-         gen_helper_fsub(cpu_env, cpu_dest, cpu_src, cpu_dest);
-         break;
+ void tb_free(TranslationBlock *tb);
++/**
++ * tb_flush_jmp_cache_all:
++ *
++ * Flush the virtual translation block cache.
++ */
++void tb_flush_jmp_cache_all(CPUState *env);
+ void tb_flush(CPUState *cpu);
+ void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr);
+ TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
 -- 
-2.9.4
+2.7.4
