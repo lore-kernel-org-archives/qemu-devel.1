@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dPMUO-0004VO-QD
+	(envelope-from <thuth@redhat.com>) id 1dPMUO-0004VL-Ak
 	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 01:23:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dPMUN-00063E-Sa
+	(envelope-from <thuth@redhat.com>) id 1dPMUJ-0005zB-9n
 	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 01:23:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41450)
+Received: from mx1.redhat.com ([209.132.183.28]:33236)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dPMUN-000635-M1
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 01:23:07 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dPMUJ-0005wL-3K
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 01:23:03 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B168E80C0C
-	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 05:23:06 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C0A7159
+	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 05:23:00 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 26 Jun 2017 07:22:55 +0200
-Message-Id: <1498454578-18709-5-git-send-email-thuth@redhat.com>
-In-Reply-To: <1498454578-18709-1-git-send-email-thuth@redhat.com>
-References: <1498454578-18709-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 4/7] cpu: Introduce a wrapper for
- tlb_flush() that can be used in common code
+Date: Mon, 26 Jun 2017 07:22:51 +0200
+Message-Id: <1498454578-18709-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/7] Poison some more target-specific defines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,75 +29,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-Commit 1f5c00cfdb8114c ("qom/cpu: move tlb_flush to cpu_common_reset")
-moved the call to tlb_flush() from the target-specific reset handlers
-into the common code qom/cpu.c file, and protected the call with
-"#ifdef CONFIG_SOFTMMU" to avoid that it is called for linux-user
-only targets. But since qom/cpu.c is common code, CONFIG_SOFTMMU is
-*never* defined here, so the tlb_flush() was simply never executed
-anymore. Fix it by introducing a wrapper for tlb_flush() in a file
-that is re-compiled for each target, i.e. in translate-all.c.
+This series marks some more #defines as poisoned, which are
+target-specific (declared in config-target.h) and thus must
+not be used in common code.
 
-Fixes: 1f5c00cfdb8114c1e3a13426588ceb64f82c9ddb
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- accel/tcg/translate-all.c | 8 ++++++++
- include/exec/cpu-common.h | 2 ++
- qom/cpu.c                 | 5 ++---
- 3 files changed, 12 insertions(+), 3 deletions(-)
+v4:
+- Rebased to master since the v2 versions of the first two patches
+  have already been merged. The diff between v2 and v3 can now be
+  found in the first patch of this series.
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index f6ad46b..a3f374e 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -2225,3 +2225,11 @@ int page_unprotect(target_ulong address, uintptr_t pc)
-     return 0;
- }
- #endif /* CONFIG_USER_ONLY */
-+
-+/* This is a wrapper for common code that can not use CONFIG_SOFTMMU */
-+void tcg_flush_softmmu_tlb(CPUState *cs)
-+{
-+#ifdef CONFIG_SOFTMMU
-+    tlb_flush(cs);
-+#endif
-+}
-diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-index 4d45a72..74341b1 100644
---- a/include/exec/cpu-common.h
-+++ b/include/exec/cpu-common.h
-@@ -28,6 +28,8 @@ void qemu_init_cpu_list(void);
- void cpu_list_lock(void);
- void cpu_list_unlock(void);
- 
-+void tcg_flush_softmmu_tlb(CPUState *cs);
-+
- #if !defined(CONFIG_USER_ONLY)
- 
- enum device_endian {
-diff --git a/qom/cpu.c b/qom/cpu.c
-index 5069876..303eb42 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -26,6 +26,7 @@
- #include "qemu/notify.h"
- #include "qemu/log.h"
- #include "exec/log.h"
-+#include "exec/cpu-common.h"
- #include "qemu/error-report.h"
- #include "sysemu/sysemu.h"
- #include "hw/qdev-properties.h"
-@@ -296,9 +297,7 @@ static void cpu_common_reset(CPUState *cpu)
-             atomic_set(&cpu->tb_jmp_cache[i], NULL);
-         }
- 
--#ifdef CONFIG_SOFTMMU
--        tlb_flush(cpu, 0);
--#endif
-+        tcg_flush_softmmu_tlb(cpu);
-     }
- }
- 
+v3:
+- Mark some more TARGET_xxx and CONFIG_xxx defines as poisoned in
+  the first two patches (as requested by Richard)
+- Added the final patch to move the edu device to common-obj-y
+
+v2:
+- First two patches are the same as in v1
+- Reworked the CONFIG_KVM patches according to Paolo's review feedback
+- Added two new patches to finally poison CONFIG_SOFTMMU, too
+- Added a final patch to move bootdevice.o to common-obj now
+  (based on an earlier patch where I also tried to move numa.o and
+  balloon.o, too - but these files are indirectly target-dependent as
+  I now know, so they can't be moved)
+
+Thomas Huth (7):
+  include/exec/poison: Add some more missing TARGET and CONFIG defines
+  Move CONFIG_KVM related definitions to kvm_i386.h
+  include/exec/poison: Mark CONFIG_KVM as poisoned, too
+  cpu: Introduce a wrapper for tlb_flush() that can be used in common
+    code
+  include/exec/poison: Mark CONFIG_SOFTMMU as poisoned
+  Makefile: Move bootdevice.o to common-obj-y
+  hw/misc/edu: Compile the edu device as common object
+
+ Makefile.objs             |  2 +-
+ Makefile.target           |  2 +-
+ accel/tcg/translate-all.c |  8 ++++++++
+ bootdevice.c              |  2 +-
+ hw/acpi/ich9.c            |  1 -
+ hw/i386/pc_q35.c          |  1 +
+ hw/misc/Makefile.objs     |  2 +-
+ include/exec/cpu-common.h |  2 ++
+ include/exec/poison.h     |  8 ++++++++
+ include/hw/i386/pc.h      | 13 -------------
+ include/qom/cpu.h         |  8 ++++++++
+ include/sysemu/kvm.h      | 31 ++++++++++++-------------------
+ qom/cpu.c                 |  5 ++---
+ target/i386/kvm_i386.h    | 23 +++++++++++++++++++++++
+ 14 files changed, 68 insertions(+), 40 deletions(-)
+
 -- 
 1.8.3.1
