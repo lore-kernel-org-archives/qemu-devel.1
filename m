@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47967)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dPYO8-0004Pe-75
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 14:05:29 -0400
+	(envelope-from <bounces@canonical.com>) id 1dPYO9-0004Q2-2C
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 14:05:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dPYO7-0000YJ-5w
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 14:05:28 -0400
-Date: Mon, 26 Jun 2017 14:05:18 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170626180518.GE17935@flamenco>
-References: <149838022308.6497.2104916050645246693.stgit@frigg.lan>
-	<149838143590.6497.11184953059640962891.stgit@frigg.lan>
+	(envelope-from <bounces@canonical.com>) id 1dPYO5-0000WI-SD
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 14:05:29 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43117)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dPYO5-0000Tz-LW
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 14:05:25 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dPYO3-0001me-C7
+	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 18:05:23 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5512F2E80E3
+	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 18:05:23 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <149838143590.6497.11184953059640962891.stgit@frigg.lan>
-Subject: Re: [Qemu-devel] [PATCH v9 05/26] target: [tcg] Redefine DISAS_*
- onto the generic translation framework (DJ_*)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 26 Jun 2017 17:52:40 -0000
+From: Alexandre <1587065@bugs.launchpad.net>
+Reply-To: Bug 1587065 <1587065@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160530134240.21929.85128.malonedeb@wampee.canonical.com>
+Message-Id: <149849956094.28789.7902400134861952468.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1587065] Re: btrfs qemu-ga - multiple mounts
+ block fsfreeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,26 +37,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Alexander Graf <agraf@suse.de>, "open list:ARM" <qemu-arm@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-On Sun, Jun 25, 2017 at 12:03:56 +0300, Lluís Vilanova wrote:
-> Temporarily redefine DISAS_* values based on DJ_TARGET. They should
-> disappear as targets get ported to the generic framework.
-> 
-> Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
-> Acked-by: David Gibson <david@gibson.dropbear.id.au> (ppc)
-> Acked-by: Eduardo Habkost <ehabkost@redhat.com>
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com> (i386)
-> Acked-by: Laurent Vivier <laurent@vivier.eu> (m68k)
-> Reviewed-by: Alex Benée <alex.benee@linaro.org> (arm)
+Any chance this will ever get backported to 2.5 on Xenial?
+cheers!
 
-Why don't we just keep DISAS_* instead? That will simplify diffs (i.e.
-no need to eventually convert anything to DJ_*), and really DISAS_NEXT
-makes more sense than DJ_NEXT. You can define a few generic DISAS_foo's,
-plus DISAS_TARGET that the existing DISAS_* can build from.
+-- =
 
-Also, IMO DJ is a poor choice for an acronym. Am I the only one
-immediately thinking of 'disc jockey'? =)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1587065
 
-		E.
+Title:
+  btrfs qemu-ga - multiple mounts block fsfreeze
+
+Status in QEMU:
+  New
+
+Bug description:
+  Having two mounts of the same device makes fsfreeze through qemu-ga impos=
+sible.
+  root@CmsrvMTA:/# mount -l | grep /dev/vda2
+  /dev/vda2 on / type btrfs (rw,relatime,space_cache,subvolid=3D257,subvol=
+=3D/@)
+  /dev/vda2 on /home type btrfs (rw,relatime,space_cache,subvolid=3D258,sub=
+vol=3D/@home)
+
+  Having two mounts is rather common with btrfs, so the feature fsfreeze
+  is unusable on these systems.
+
+  =
+
+  Below more information about how we encountered this issue...
+
+  Message send to qemu-discuss@nongnu.org:
+
+  Message 1:
+  ----------
+  I use external snapshots to backup my guests. I use the 'quiesce' option =
+to flush and frees the guest file system with the qemu guest agent.
+
+  With the exeption of one guest, this procedure works fine. On the 'unwill=
+ing' guest, I get this error message:
+  "ERROR 2016-05-25 00:51:19 | T25-bakVMSCmsrvVH2 | fout: internal error: u=
+nable to execute QEMU agent command 'guest-fsfreeze-freeze': failed to free=
+ze /: Device or resource busy"
+
+  I don't think this is not some sort of time-out error, because
+  activation of the fsfreeze and the error message happen immediately
+  after each other:
+
+  $ grep qemu-ga syslog.1
+  May 25 00:51:19 CmsrvMTA qemu-ga: info: guest-fsfreeze called
+
+  This is the only entry of the qemu guest agent in syslog.
+
+  $ sudo virsh version
+  Compiled against library: libvirt 1.3.1
+  Using library: libvirt 1.3.1
+  Gebruikte API: QEMU 1.3.1
+  Draaiende hypervisor: QEMU 2.5.0
+
+  $ virsh qemu-agent-command CmsrvMTA '{"execute": "guest-info"}'
+  {"return":{"version":"2.5.0", ... ,{"enabled":true,"name":"guest-fstrim",=
+"success-response":true},{"enabled":true,"name":"guest-fsfreeze-thaw","succ=
+ess-response":true},{"enabled":true,"name":"guest-fsfreeze-status","success=
+-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze-list","succe=
+ss-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze","success-=
+response":true}, ... }
+
+  For making an external snapshot, I use this command:
+  $ virsh snapshot-create-as --domain CmsrvMTA sn1 --disk-only --atomic --q=
+uiesce --no-metadata --diskspec vda,file=3D/srv/poolVMS/CmsrvMTA.sn1
+
+  Piece of reply 1:
+  -----------------
+  I have encountered this before. Some operating systems
+   may have bind-mounts that let a device appear multiple times in the moun=
+t list. Unfortunately the guest agent is not smart enough to consider a dev=
+ice that has been frozen as succesfull and keep going. This causes this spe=
+cific error.
+
+  Piece of reply 2:
+  -----------------
+  Ok, that seems to be it.
+
+  I=E2=80=99ve got the =E2=80=98/=E2=80=99 and =E2=80=98/home=E2=80=99 on t=
+he same device formatted as btrfs on
+  two separate sub volumes.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1587065/+subscriptions
