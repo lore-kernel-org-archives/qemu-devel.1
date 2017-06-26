@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38327)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dPR7X-0007JF-3k
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:19:52 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38504)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1dPR8A-0007n7-8S
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:20:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dPR7T-0004ti-VR
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:19:51 -0400
-References: <20170626101159.19676-1-berrange@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <c4381bd8-a417-0c3b-f3c2-1292ca9f6dfc@redhat.com>
-Date: Mon, 26 Jun 2017 12:19:40 +0200
+	(envelope-from <pl@kamp.de>) id 1dPR87-0005JY-3b
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:20:30 -0400
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:53617 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dPR86-0005IG-Qr
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:20:27 -0400
+References: <0f83a15d-66b0-36aa-e5a4-d03cd37757c9@kamp.de>
+	<20170626082838.GA4348@noname.redhat.com>
+	<0e6586f9-85eb-efcd-4825-20066a7c869a@kamp.de>
+	<20170626095719.GB4348@noname.redhat.com>
+	<b82ab934-ddc3-2d50-09cf-764f2165f2c8@kamp.de>
+	<20170626101204.GF495@redhat.com>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <b498b622-2aa8-3cfc-112d-a8f931d2f08f@kamp.de>
+Date: Mon, 26 Jun 2017 12:20:23 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170626101159.19676-1-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20170626101204.GF495@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] sockets: avoid formatting buffer that may
- not be NULL terminated
+Subject: Re: [Qemu-devel] QCOW2 support for LZO compression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,46 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, den@openvz.org, Laszlo Ersek <lersek@redhat.com>
 
-On 26.06.2017 12:11, Daniel P. Berrange wrote:
-> The 'sun_path' field in the sockaddr_un struct is not required
-> to be NULL termianted, so when reporting an error, we must use
+Am 26.06.2017 um 12:12 schrieb Daniel P. Berrange:
+> On Mon, Jun 26, 2017 at 12:08:01PM +0200, Peter Lieven wrote:
+>> Am 26.06.2017 um 11:57 schrieb Kevin Wolf:
+>>> Am 26.06.2017 um 11:20 hat Peter Lieven geschrieben:
+>>>>> So he chose a different algorithm (zstd). When I asked, he posted a
+>>>>> comparison of algorithms (however a generic one and not measured in the
+>>>>> context of qemu) that suggests that LZO would be slightly faster, but
+>>>>> have a considerable worse compression ratio with the settings that were
+>>>>> benchmarked.
+>>>> My idea to choose LZO was that it is widely available and available in
+>>>> any distro you can think of. We already have probing for it in configure.
+>>>> My concern with ZSTD would be that it seems there are no packages
+>>>> available for most distros and that it seems to be multi-threaded. I don't
+>>>> know if this will cause any trouble?
+>>> The availability and that we already link against LZO is a good point. I
+>>> think we want to avoid a situation where compressed qcow2 files can't be
+>>> read by binaries of popular distributions - after all, downloadable
+>>> images are an important use case for compressed images.
+>> As long as the default remains gzip I don't see any issues. If you choose
+>> a different algorithm, you should know what you are doing.
+> The problem comes if Debian were to choose to only link in ZSTD, and RHEL
+> were choose to only link LZO. Images distributed by one distro, with this
+> new compression would be unusuable on other distros. So whatever compression
+> format we choose to add should be something we are confident that all distros
+> will be happy enabling by default. This favours libraries are already widely
+> included in distros, especially if QEMU already links to them indirectly.
 
-s/NULL/NUL/
+This is very strong argument for LZO. I checked with Debian 9 and Ubuntu 16.04
+they have liblzo installed in the base system. I think maybe for btrfs compression support.
 
-NULL is a pointer, NUL is the '\0' character.
-
-> the separate 'path' variable which is guaranteed terminated.
-> 
-> Fixes a bug spotted by coverity that was introduced in
-> 
->   commit ad9579aaa16d5b385922d49edac2c96c79bcfb62
->   Author: Daniel P. Berrange <berrange@redhat.com>
->   Date:   Thu May 25 16:53:00 2017 +0100
-> 
->     sockets: improve error reporting if UNIX socket path is too long
-> 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  util/qemu-sockets.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-> index 51bf279..37d386f 100644
-> --- a/util/qemu-sockets.c
-> +++ b/util/qemu-sockets.c
-> @@ -930,7 +930,7 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
->      strncpy(un.sun_path, path, sizeof(un.sun_path));
->  
->      if (bind(sock, (struct sockaddr*) &un, sizeof(un)) < 0) {
-> -        error_setg_errno(errp, errno, "Failed to bind socket to %s", un.sun_path);
-> +        error_setg_errno(errp, errno, "Failed to bind socket to %s", path);
->          goto err;
->      }
->      if (listen(sock, 1) < 0) {
-
-Apart from the nit in the comment, the patch looks right to me:
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Peter
