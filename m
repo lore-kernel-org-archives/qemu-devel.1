@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dPLvb-0005UZ-36
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 00:47:11 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1dPM16-0007IQ-HA
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 00:52:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dPLva-0000iX-4p
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 00:47:11 -0400
-Received: from mail-it0-x22a.google.com ([2607:f8b0:4001:c0b::22a]:37918)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dPLvZ-0000iH-W3
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 00:47:10 -0400
-Received: by mail-it0-x22a.google.com with SMTP id b205so33453564itg.1
-	for <qemu-devel@nongnu.org>; Sun, 25 Jun 2017 21:47:09 -0700 (PDT)
+	(envelope-from <wei.w.wang@intel.com>) id 1dPM13-0003GS-Gj
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 00:52:52 -0400
+Received: from mga05.intel.com ([192.55.52.43]:21297)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1dPM13-0003ES-7k
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 00:52:49 -0400
+Message-ID: <595093A8.1080902@intel.com>
+Date: Mon, 26 Jun 2017 12:55:04 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Sender: philippe.mathieu.daude@gmail.com
-In-Reply-To: <f43b2f92-a76e-945f-9334-2cd9cb71ec95@twiddle.net>
-References: <20170620205121.26515-1-laurent@vivier.eu>
-	<20170620205121.26515-4-laurent@vivier.eu>
-	<b05fb631-4ccb-39fa-adc3-6949a514b9d2@amsat.org>
-	<f43b2f92-a76e-945f-9334-2cd9cb71ec95@twiddle.net>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 26 Jun 2017 01:47:08 -0300
-Message-ID: <CAAdtpL7OkD+xU2gttK4LzzHB5umFUiye=LAnF7yCoBqQGDuOVQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 3/6] target-m68k: use floatx80 internally
+References: <1498185154-29015-1-git-send-email-wei.w.wang@intel.com>
+	<9c3402b1-961d-b953-ca6c-188b03ed756b@redhat.com>
+In-Reply-To: <9c3402b1-961d-b953-ca6c-188b03ed756b@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] virtio-net: enable configurable tx
+ queue size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,47 +29,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: Laurent Vivier <laurent@vivier.eu>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Thomas Huth <huth@tuxfamily.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: Jason Wang <jasowang@redhat.com>, mst@redhat.com, eblake@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+Cc: stefanha@gmail.com, armbru@redhat.com, jan.scheurich@ericsson.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 
-On Wed, Jun 21, 2017 at 1:37 PM, Richard Henderson <rth@twiddle.net> wrote:
-> On 06/21/2017 09:18 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->> What an awful name... Anyway checking on "qemu/bswap.h" it seems there i=
-s
->> some endianess issue with it if your host is little-endian.
+On 06/26/2017 11:18 AM, Jason Wang wrote:
 >
+> On 2017年06月23日 10:32, Wei Wang wrote:
+>> This patch enables the virtio-net tx queue size to be configurable
+>> between 256 (the default queue size) and 1024 by the user when the
+>> vhost-user backend is used.
+>>
+>> Currently, the maximum tx queue size for other backends is 512 due
+>> to the following limitations:
+>> - QEMU backend: the QEMU backend implementation in some cases may
+>> send 1024+1 iovs to writev.
+>> - Vhost_net backend: there are possibilities that the guest sends
+>> a vring_desc of memory which corsses a MemoryRegion thereby
+>> generating more than 1024 iovs after translattion from guest-physical
+>> address in the backend.
+>>
+>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+>> ---
+>>   hw/net/virtio-net.c            | 45 
+>> +++++++++++++++++++++++++++++++++---------
+>>   include/hw/virtio/virtio-net.h |  1 +
+>>   2 files changed, 37 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+>> index 91eddaf..d13ca60 100644
+>> --- a/hw/net/virtio-net.c
+>> +++ b/hw/net/virtio-net.c
+>> @@ -34,8 +34,11 @@
+>>     /* previously fixed value */
+>>   #define VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE 256
+>> +
+>> +    /*
+>> +     * Currently, backends other than vhost-user don't support 1024 
+>> queue
+>> +     * size.
+>> +     */
+>> +    if (n->net_conf.tx_queue_size == VIRTQUEUE_MAX_SIZE &&
+>> +        nc->peer->info->type != NET_CLIENT_DRIVER_VHOST_USER) {
+>> +        n->net_conf.tx_queue_size = VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE;
 >
-> There is no endian-ness issue because we do not attempt to read that
-> structure from memory as a whole.  Instead, Laurent uses two big-endian
-> loads (with appropriate address arithmetic) and stores the result into th=
-is
-> host structure in host-endian order.  Further, the host routines use the
-> structure members by name and do not assume any particular relationship
-> between them.
+> Do we really want assume all vhost-user backend support 1024 queue size?
+>
 
-Ok, thank your Richard for this clear explanation.
-("Endian-ness" ok, Peter also corrected me, I'll give a try to some speller=
-...)
+  Do you know any vhost-user backend implementation that doesn't support
+1024 tx queue size?
 
->
->> Do you have a way to run Berkeley TestFloat?
->
->
-> As noted in Laurent's cover message, floatx80 isn't quite right -- that i=
-s
-> the x86 data type, and the proper m68k data type is slightly different.
->
-> I would expect the results from using floatx80 to be Just Good Enough to
-> produce a working m68k user-land.  It will produce correct results for
-> normal numbers in arithmetic such as 1.0 + 10.0.  But I would expect many=
- of
-> the edge conditions that TestFloat would attempt (especially de-normals a=
-nd
-> un-normals) would fail.
 
-Ok. I'm asking thinking about cross unit-tests I can add to our
-continuous integration system, this might be a candidate.
 
-Regards,
+>> +    }
+>> +
+>> +    for (i = 0; i < n->max_queues; i++) {
+>> +        virtio_net_add_queue(n, i);
+>> +    }
+>
+> Any reason to move virtio_net_add_queue() here?
+>
 
-Phil.
+Please check the whole init steps.  It was moved here (after qemu_new_nic())
+to make sure nc->peer is not NULL.
+
+Best,
+Wei
