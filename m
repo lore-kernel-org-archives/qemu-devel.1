@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dPM16-0007IQ-HA
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 00:52:53 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dPM6P-000063-5W
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 00:58:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dPM13-0003GS-Gj
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 00:52:52 -0400
-Received: from mga05.intel.com ([192.55.52.43]:21297)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dPM13-0003ES-7k
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 00:52:49 -0400
-Message-ID: <595093A8.1080902@intel.com>
-Date: Mon, 26 Jun 2017 12:55:04 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dPM6O-0005Zy-9o
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 00:58:21 -0400
+Received: from mail-it0-x231.google.com ([2607:f8b0:4001:c0b::231]:37193)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dPM6O-0005Yc-4n
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 00:58:20 -0400
+Received: by mail-it0-x231.google.com with SMTP id m84so17743766ita.0
+	for <qemu-devel@nongnu.org>; Sun, 25 Jun 2017 21:58:19 -0700 (PDT)
 MIME-Version: 1.0
-References: <1498185154-29015-1-git-send-email-wei.w.wang@intel.com>
-	<9c3402b1-961d-b953-ca6c-188b03ed756b@redhat.com>
-In-Reply-To: <9c3402b1-961d-b953-ca6c-188b03ed756b@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] virtio-net: enable configurable tx
- queue size
+Sender: philippe.mathieu.daude@gmail.com
+In-Reply-To: <20170625192950.17677-1-f4bug@amsat.org>
+References: <20170625192950.17677-1-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Mon, 26 Jun 2017 01:58:18 -0300
+Message-ID: <CAAdtpL6gKuirET7zo2xv=qO+yONgjPcV4jp2tK=LRQ8RruUwLw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 0/4] travis: run all coccinelle scripts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,68 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, mst@redhat.com, eblake@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
-Cc: stefanha@gmail.com, armbru@redhat.com, jan.scheurich@ericsson.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
+To: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-On 06/26/2017 11:18 AM, Jason Wang wrote:
->
-> On 2017年06月23日 10:32, Wei Wang wrote:
->> This patch enables the virtio-net tx queue size to be configurable
->> between 256 (the default queue size) and 1024 by the user when the
->> vhost-user backend is used.
->>
->> Currently, the maximum tx queue size for other backends is 512 due
->> to the following limitations:
->> - QEMU backend: the QEMU backend implementation in some cases may
->> send 1024+1 iovs to writev.
->> - Vhost_net backend: there are possibilities that the guest sends
->> a vring_desc of memory which corsses a MemoryRegion thereby
->> generating more than 1024 iovs after translattion from guest-physical
->> address in the backend.
->>
->> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
->> ---
->>   hw/net/virtio-net.c            | 45 
->> +++++++++++++++++++++++++++++++++---------
->>   include/hw/virtio/virtio-net.h |  1 +
->>   2 files changed, 37 insertions(+), 9 deletions(-)
->>
->> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
->> index 91eddaf..d13ca60 100644
->> --- a/hw/net/virtio-net.c
->> +++ b/hw/net/virtio-net.c
->> @@ -34,8 +34,11 @@
->>     /* previously fixed value */
->>   #define VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE 256
->> +
->> +    /*
->> +     * Currently, backends other than vhost-user don't support 1024 
->> queue
->> +     * size.
->> +     */
->> +    if (n->net_conf.tx_queue_size == VIRTQUEUE_MAX_SIZE &&
->> +        nc->peer->info->type != NET_CLIENT_DRIVER_VHOST_USER) {
->> +        n->net_conf.tx_queue_size = VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE;
->
-> Do we really want assume all vhost-user backend support 1024 queue size?
->
+> Patch 4 is the travis job: it calls the previous script. To respect travi=
+s time
+> limit timeout, each script is limited to <10min. If any commit were
+> generated, they are pushed to my gh-repo
 
-  Do you know any vhost-user backend implementation that doesn't support
-1024 tx queue size?
+Initially I wanted to use git format-patch/send-email to send to the
+list as a series but it seems too verbose and Travis doesn't seem to
+allow to send mails. Another possibility is to send to a S3 bucket or
+gh-page. The push-to-repo way involves deploy ssh key but is easier to
+manage with regular git commands, I can fetch this repo and
+cherry-pick/rework/amend commits.
 
-
-
->> +    }
->> +
->> +    for (i = 0; i < n->max_queues; i++) {
->> +        virtio_net_add_queue(n, i);
->> +    }
->
-> Any reason to move virtio_net_add_queue() here?
->
-
-Please check the whole init steps.  It was moved here (after qemu_new_nic())
-to make sure nc->peer is not NULL.
-
-Best,
-Wei
+I also plan to add Marc-Andr=C3=A9 Lureau clang-tidy work:
+http://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg05034.html
