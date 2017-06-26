@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dPK6w-0005Zi-Eh
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 22:50:47 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dPK7H-0005hg-Hb
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 22:51:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dPK6r-00074n-Ja
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 22:50:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57028)
+	(envelope-from <jasowang@redhat.com>) id 1dPK7C-00076s-MR
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 22:51:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58428)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dPK6r-00074j-AF
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 22:50:41 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E1F6988E60
-	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 02:50:39 +0000 (UTC)
-Date: Mon, 26 Jun 2017 10:50:35 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170626025035.GH3936@pxdev.xzpeter.org>
-References: <1498193206-18007-1-git-send-email-peterx@redhat.com>
-	<1498193206-18007-5-git-send-email-peterx@redhat.com>
-	<20170623221819.GE10776@localhost.localdomain>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dPK7C-00076Q-Dd
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 22:51:02 -0400
+References: <d2e8cf65-ea3d-7db2-9382-a063daf1168a@gmail.com>
+	<20170605050423-mutt-send-email-mst@kernel.org>
+	<20170606024211-mutt-send-email-mst@kernel.org>
+	<CAOTcU=u_HSMQiwDF3Snv5P8mT-b_Aepeb=Z9gbLd1j=2P+Yy+A@mail.gmail.com>
+	<20170622215125-mutt-send-email-mst@kernel.org>
+	<4f6d4342-8476-882e-e7a8-b3f0ebd20d95@redhat.com>
+	<CAM_iQpXhW___-iP3kdv9MJcW=hroyp2SuMzAZdx3KCpc9-W76g@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <9327ebf9-59db-f34e-b945-ef381ee95315@redhat.com>
+Date: Mon, 26 Jun 2017 10:50:53 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170623221819.GE10776@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v5 04/10] migration: let MigrationState be
- a qdev
+In-Reply-To: <CAM_iQpXhW___-iP3kdv9MJcW=hroyp2SuMzAZdx3KCpc9-W76g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] BUG: KASAN: use-after-free in free_old_xmit_skbs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,75 +33,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, jean-philippe menil <jpmenil@gmail.com>, Linux Kernel Network Developers <netdev@vger.kernel.org>, John Fastabend <john.fastabend@gmail.com>, virtualization@lists.linux-foundation.org, qemu-devel Developers <qemu-devel@nongnu.org>
 
-On Fri, Jun 23, 2017 at 07:18:19PM -0300, Eduardo Habkost wrote:
-> On Fri, Jun 23, 2017 at 12:46:40PM +0800, Peter Xu wrote:
-> > Let the old man "MigrationState" join the object family. Direct benefit
-> > is that we can start to use all the property features derived from
-> > current QDev, like: HW_COMPAT_* bits, command line setup for migration
-> > parameters (so will never need to set them up each time using HMP/QMP,
-> > this is really, really attractive for test writters), etc.
-> > 
-> > I see no reason to disallow this happen yet. So let's start from this
-> > one, to see whether it would be anything good.
-> > 
-> > Now we init the MigrationState struct statically in main() to make sure
-> > it's initialized after global properties are applied, since we'll use
-> > them during creation of the object.
-> > 
-> > No functional change at all.
-> > 
-> > Reviewed-by: Juan Quintela <quintela@redhat.com>
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  include/migration/misc.h |  1 +
-> >  migration/migration.c    | 78 ++++++++++++++++++++++++++++++++++--------------
-> >  migration/migration.h    | 19 ++++++++++++
-> >  vl.c                     |  6 ++++
-> >  4 files changed, 81 insertions(+), 23 deletions(-)
-> > 
-> [...]
-> > diff --git a/vl.c b/vl.c
-> > index cdd2ec8..9b04ba7 100644
-> > --- a/vl.c
-> > +++ b/vl.c
-> > @@ -4596,6 +4596,12 @@ int main(int argc, char **argv, char **envp)
-> >       */
-> >      register_global_properties(current_machine);
-> >  
-> > +    /*
-> > +     * Migration object can only be created after global properties
-> > +     * are applied correctly.
-> > +     */
-> > +    migration_object_init();
-> > +
-> 
-> Do we really need this? Can't be we just do:
-> 
->     if (!current_migration) {
->         current_migration = MIGRATION_OBJ(object_new(TYPE_MIGRATION));
->     }
-> 
-> inside migration_get_current()?
 
-I did this change on purpose (after AccelClass.global_props is
-introduced). The comment above tried to explain it but looks like it's
-still not clear enough... The reason is that currently the creation of
-migration object is depending on the global properties, so we need to
-create the object after register_global_properties(), while the old
-migrate_get_current() cannot really be sure of this ordering: it just
-creates the object on the first call of the function, but the first
-call can be even before register_global_properties(). If so, we'll
-have a problem (e.g. Xen compat properties will be missing).
 
-Now this restriction is strictly followed if we create the migrate
-object here. If anyone calls migrate_get_current() before
-register_global_properties(), there will be an assert, and that should
-be treated as a programming error.
+On 2017=E5=B9=B406=E6=9C=8824=E6=97=A5 06:32, Cong Wang wrote:
+> On Fri, Jun 23, 2017 at 1:43 AM, Jason Wang <jasowang@redhat.com> wrote=
+:
+>>
+>> On 2017=E5=B9=B406=E6=9C=8823=E6=97=A5 02:53, Michael S. Tsirkin wrote=
+:
+>>> On Thu, Jun 22, 2017 at 08:15:58AM +0200, jean-philippe menil wrote:
+>>>> Hi Michael,
+>>>>
+>>>> from what i see, the race appear when we hit virtnet_reset in
+>>>> virtnet_xdp_set.
+>>>> virtnet_reset
+>>>>     _remove_vq_common
+>>>>       virtnet_del_vqs
+>>>>         virtnet_free_queues
+>>>>           kfree(vi->sq)
+>>>> when the xdp program (with two instances of the program to trigger i=
+t
+>>>> faster)
+>>>> is added or removed.
+>>>>
+>>>> It's easily repeatable, with 2 cpus and 4 queues on the qemu command
+>>>> line,
+>>>> running the xdp_ttl tool from Jesper.
+>>>>
+>>>> For now, i'm able to continue my qualification, testing if xdp_qp is=
+ not
+>>>> null,
+>>>> but do not seem to be a sustainable trick.
+>>>> if (xdp_qp && vi->xdp_queues_pairs !=3D xdp_qp)
+>>>>
+>>>> Maybe it will be more clear to you with theses informations.
+>>>>
+>>>> Best regards.
+>>>>
+>>>> Jean-Philippe
+>>>
+>>> I'm pretty clear about the issue here, I was trying to figure out a f=
+ix.
+>>> Jason, any thoughts?
+>>>
+>>>
+>> Hi Jean:
+>>
+>> Does the following fix this issue? (I can't reproduce it locally throu=
+gh
+>> xdp_ttl)
+> It is tricky here.
+>
+>  From my understanding of the code base, the tx_lock is not sufficient
+> here, because in virtnet_del_vqs() all vqs are deleted and one vp
+> maps to one txq.
+>
+> I am afraid you have to add a spinlock somewhere to serialized
+> free_old_xmit_skbs() vs. vring_del_virtqueue(). As you can see
+> they are in different layers, so it is hard to figure out where to add
+> it...
+>
+> Also, make sure we don't sleep inside the spinlock, I see a
+> synchronize_net().
 
-Thanks,
+Looks like I miss something. I thought free_old_xmit_skbs() were=20
+serialized in this case since we disable all tx queues after=20
+netif_tx_unlock_bh()?
 
--- 
-Peter Xu
+Jean:
+
+I thought this could be easily reproduced by e.g produce some traffic=20
+and in the same time try to attach an xdp program. But looks not. How do=20
+you trigger this? What's your qemu command line for this?
+
+Thanks
