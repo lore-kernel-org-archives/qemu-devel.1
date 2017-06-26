@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34455)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dPQsY-00064b-AB
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:04:23 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35131)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1dPQwE-0000Bn-N7
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:08:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dPQsX-0006ax-3Q
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:04:22 -0400
-Date: Mon, 26 Jun 2017 11:04:07 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170626100407.GE495@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+	(envelope-from <pl@kamp.de>) id 1dPQw9-0007fe-NY
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:08:10 -0400
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:46325 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dPQw9-0007ew-EH
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:08:05 -0400
 References: <0f83a15d-66b0-36aa-e5a4-d03cd37757c9@kamp.de>
 	<20170626082838.GA4348@noname.redhat.com>
 	<0e6586f9-85eb-efcd-4825-20066a7c869a@kamp.de>
+	<20170626095719.GB4348@noname.redhat.com>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <b82ab934-ddc3-2d50-09cf-764f2165f2c8@kamp.de>
+Date: Mon, 26 Jun 2017 12:08:01 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <0e6586f9-85eb-efcd-4825-20066a7c869a@kamp.de>
+In-Reply-To: <20170626095719.GB4348@noname.redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] QCOW2 support for LZO compression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,75 +29,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, den@openvz.org, Laszlo Ersek <lersek@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Laszlo Ersek <lersek@redhat.com>, qemu block <qemu-block@nongnu.org>, den@openvz.org, qemu-devel@nongnu.org
 
-On Mon, Jun 26, 2017 at 11:20:33AM +0200, Peter Lieven wrote:
-> 
-> Am 26.06.2017 um 10:28 schrieb Kevin Wolf:
-> > [ Cc: qemu-devel; don't post to qemu-block only! ]
-> > 
-> > Am 26.06.2017 um 09:57 hat Peter Lieven geschrieben:
-> > > Hi,
-> > > 
-> > > I am currently working on optimizing speed for compressed QCOW2
-> > > images. We use them for templates and would also like to use them for
-> > > backups, but the latter is almost infeasible because using gzip for
-> > > compression is horribly slow. I tried to experiment with different
-> > > options to deflate, but in the end I think its better to use a
-> > > different compression algorithm for cases where speed matters. As we
-> > > already have probing for it in configure and as it is widely used I
-> > > would like to use LZO for that purpose. I think it would be best to
-> > > have a flag to indicate that compressed blocks use LZO compression,
-> > > but I would need a little explaination which of the feature fields I
-> > > have to use to prevent an older (incompatible) Qemu opening LZO
-> > > compressed QCOW2 images.
-> > > 
-> > > I also have already some numbers. I converted a fresh Debian 9 Install
-> > > which has an uncomressed QCOW2 size of 1158 MB with qemu-img to a
-> > > compressed QCOW2.  With GZIP compression the result is 356MB whereas
-> > > the LZO version is 452MB. However, the current GZIP variant uses 35
-> > > seconds for this operation where LZO only needs 4 seconds. I think is
-> > > is a good trade in especially when its optional so the user can
-> > > choose.
-> > > 
-> > > What are your thoughts?
-> > We had a related RFC patch by Den earlier this year, which never
-> > received many comment and never got out of RFC:
-> > 
-> > https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg04682.html
-> 
-> I was not aware of that one. Thanks for pointing out.
-> 
-> > 
-> > So he chose a different algorithm (zstd). When I asked, he posted a
-> > comparison of algorithms (however a generic one and not measured in the
-> > context of qemu) that suggests that LZO would be slightly faster, but
-> > have a considerable worse compression ratio with the settings that were
-> > benchmarked.
-> 
-> My idea to choose LZO was that it is widely available and available in
-> any distro you can think of. We already have probing for it in configure.
-> My concern with ZSTD would be that it seems there are no packages
-> available for most distros and that it seems to be multi-threaded. I don't
-> know if this will cause any trouble?
+Am 26.06.2017 um 11:57 schrieb Kevin Wolf:
+> Am 26.06.2017 um 11:20 hat Peter Lieven geschrieben:
+>>> So he chose a different algorithm (zstd). When I asked, he posted a
+>>> comparison of algorithms (however a generic one and not measured in the
+>>> context of qemu) that suggests that LZO would be slightly faster, but
+>>> have a considerable worse compression ratio with the settings that were
+>>> benchmarked.
+>> My idea to choose LZO was that it is widely available and available in
+>> any distro you can think of. We already have probing for it in configure.
+>> My concern with ZSTD would be that it seems there are no packages
+>> available for most distros and that it seems to be multi-threaded. I don't
+>> know if this will cause any trouble?
+> The availability and that we already link against LZO is a good point. I
+> think we want to avoid a situation where compressed qcow2 files can't be
+> read by binaries of popular distributions - after all, downloadable
+> images are an important use case for compressed images.
 
-As a distro maintainer I'd always prefer option to use a library that is
-already widely available. While ZSTD could certainly be added to distros,
-it means the QEMU maintainer will end up having to package it & become
-the defacto long term maintainer of it long term, which is an extra burden.
+As long as the default remains gzip I don't see any issues. If you choose
+a different algorithm, you should know what you are doing.
 
-WRT to making compression algorithms configurable, I think it is important
-to ensure we don't add lots of optional algorithms. An important factor is
-portability of images - we don't want to end up with each distro's build
-of QEMU enabling a different sub-set of compression algorithms, as that is
-going to harm interoperability for distributed images. This again makes me
-prefer a compression format whose library is widely available, as that makes
-it highly likely that the distro will choose to enable it during build.
+>
+>>> I think it's clear that if there is any serious interest in compression,
+>>> we'll want to support at least one more algorithm. What we still need to
+>>> evaluate is which one(s) to take, and whether a simple incompatible flag
+>>> in the header like in Den's patch is enough or whether we should add a
+>>> whole new header field for the compression algorithm (like we already
+>>> have for encryption).
+>>  From my side there clearly is interest in optimizing the compression. Its
+>> even possible to speed up zlib by 3-4x times by choosing other parameters
+>> for deflate which unfortunately are not compatible with our inflate settings.
+>>
+>> I don't know if its worth creating a new header field. Even if we spent to bits
+>> in the end (one for LZO and one for ZSDT). I think this wouldn't hurt. However,
+>> there are likely to pop up new compression algorithms in the future and
+>> a header would be more flexible.
+> That we could just use different parameters is an important hint that
+> maybe we don't just need bits to select an algorithm, but also some
+> space for parameters for the selected algorithm. In this case I think we
+> need a header change anyway.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+The issue is, you don't know in advance how much space will be needed for the paramters.
+Maybe it would be simpler to have different settings for a compression algorithm threated
+as different algorithms. Like zstd-fast, zstd, zstd-slow, gzip, lzo, lzo-slow etc.
+
+>
+>> I just don't want to make it too complicated and as you pointed out
+>> compression is not that interesting for most people - maybe due to its
+>> speed.
+> In fact, I think it could be the poor integration in qemu. Compressed
+> images might be more appealing if you couldn't only write compressed
+> data with special-case operations like 'qemu-img convert', but just give
+> an option that you want all writes to be compressed and then use it like
+> any other image.
+
+Then we should start to improve that.
+
+Peter
