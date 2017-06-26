@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51268)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dPQAD-0004Ii-LD
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 05:18:34 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51743)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1dPQCG-0005vl-U7
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 05:20:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dPQA8-0004NC-2f
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 05:18:33 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:54130)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dPQA7-0004He-Mm
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 05:18:27 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <1496975122-16999-1-git-send-email-cota@braap.org>
-	<1496975122-16999-8-git-send-email-cota@braap.org>
-	<20170626082844.GA4181@redhat.com>
-Date: Mon, 26 Jun 2017 12:18:14 +0300
-In-Reply-To: <20170626082844.GA4181@redhat.com> (Daniel P. Berrange's message
-	of "Mon, 26 Jun 2017 09:28:44 +0100")
-Message-ID: <87d19rf6p5.fsf@frigg.lan>
+	(envelope-from <pl@kamp.de>) id 1dPQCD-0005DF-O3
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 05:20:40 -0400
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:55292 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dPQCD-0005Cr-En
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 05:20:37 -0400
+References: <0f83a15d-66b0-36aa-e5a4-d03cd37757c9@kamp.de>
+	<20170626082838.GA4348@noname.redhat.com>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <0e6586f9-85eb-efcd-4825-20066a7c869a@kamp.de>
+Date: Mon, 26 Jun 2017 11:20:33 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 7/7] trace: [trivial] Statically enable
- all guest events
+In-Reply-To: <20170626082838.GA4348@noname.redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] QCOW2 support for LZO compression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +27,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Richard Henderson <rth@twiddle.net>
-
-Daniel P Berrange writes:
-
-> On Thu, Jun 08, 2017 at 10:25:22PM -0400, Emilio G. Cota wrote:
->> From: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
->>=20
->> The optimizations of this series makes it feasible to have them
->> available on all builds.
-
-> I'm not saying you're wrong, but where is the data to backup this
-> assertion ?
-
-> IMHO, this commit message should be describing how performance was
-> tested and what the results were.
-
-I can submit a new series with the performance measurements now that you've
-informally OK'ed Emilio's new patch.
-
-Is there some public script to automate that or do I have to cook my own?
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Laszlo Ersek <lersek@redhat.com>, qemu block <qemu-block@nongnu.org>, den@openvz.org, qemu-devel@nongnu.org
 
 
-Thanks,
-  Lluis
+Am 26.06.2017 um 10:28 schrieb Kevin Wolf:
+> [ Cc: qemu-devel; don't post to qemu-block only! ]
+>
+> Am 26.06.2017 um 09:57 hat Peter Lieven geschrieben:
+>> Hi,
+>>
+>> I am currently working on optimizing speed for compressed QCOW2
+>> images. We use them for templates and would also like to use them for
+>> backups, but the latter is almost infeasible because using gzip for
+>> compression is horribly slow. I tried to experiment with different
+>> options to deflate, but in the end I think its better to use a
+>> different compression algorithm for cases where speed matters. As we
+>> already have probing for it in configure and as it is widely used I
+>> would like to use LZO for that purpose. I think it would be best to
+>> have a flag to indicate that compressed blocks use LZO compression,
+>> but I would need a little explaination which of the feature fields I
+>> have to use to prevent an older (incompatible) Qemu opening LZO
+>> compressed QCOW2 images.
+>>
+>> I also have already some numbers. I converted a fresh Debian 9 Install
+>> which has an uncomressed QCOW2 size of 1158 MB with qemu-img to a
+>> compressed QCOW2.  With GZIP compression the result is 356MB whereas
+>> the LZO version is 452MB. However, the current GZIP variant uses 35
+>> seconds for this operation where LZO only needs 4 seconds. I think is
+>> is a good trade in especially when its optional so the user can
+>> choose.
+>>
+>> What are your thoughts?
+> We had a related RFC patch by Den earlier this year, which never
+> received many comment and never got out of RFC:
+>
+> https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg04682.html
+
+I was not aware of that one. Thanks for pointing out.
+
+>
+> So he chose a different algorithm (zstd). When I asked, he posted a
+> comparison of algorithms (however a generic one and not measured in the
+> context of qemu) that suggests that LZO would be slightly faster, but
+> have a considerable worse compression ratio with the settings that were
+> benchmarked.
+
+My idea to choose LZO was that it is widely available and available in
+any distro you can think of. We already have probing for it in configure.
+My concern with ZSTD would be that it seems there are no packages
+available for most distros and that it seems to be multi-threaded. I don't
+know if this will cause any trouble?
+
+>
+> I think it's clear that if there is any serious interest in compression,
+> we'll want to support at least one more algorithm. What we still need to
+> evaluate is which one(s) to take, and whether a simple incompatible flag
+> in the header like in Den's patch is enough or whether we should add a
+> whole new header field for the compression algorithm (like we already
+> have for encryption).
+
+ From my side there clearly is interest in optimizing the compression. Its
+even possible to speed up zlib by 3-4x times by choosing other parameters
+for deflate which unfortunately are not compatible with our inflate settings.
+
+I don't know if its worth creating a new header field. Even if we spent to bits
+in the end (one for LZO and one for ZSDT). I think this wouldn't hurt. However,
+there are likely to pop up new compression algorithms in the future and
+a header would be more flexible.
+
+I just don't want to make it too complicated and as you pointed out compression is
+not that interesting for most people - maybe due to its speed.
+
+Peter
