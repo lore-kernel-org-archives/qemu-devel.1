@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dPclX-0001wJ-59
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 18:45:56 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dPcpC-000412-BV
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 18:49:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dPclV-0006fr-T6
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 18:45:55 -0400
-Date: Tue, 27 Jun 2017 01:45:07 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170626224507.ep2hqzpxknfimf55@postretch>
-References: <20170623124700.1389-1-el13635@mail.ntua.gr>
-	<20170623124700.1389-8-el13635@mail.ntua.gr>
-	<20170626154444.GH29664@stefanha-x1.localdomain>
+	(envelope-from <alistair23@gmail.com>) id 1dPcpB-0000cJ-5z
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 18:49:42 -0400
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="m2b43yy3q4txuigf"
-Content-Disposition: inline
-In-Reply-To: <20170626154444.GH29664@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC v3 7/8] block: remove
- legacy I/O throttling
+In-Reply-To: <CALHRZurUtRV+3=L0PCADuj2BLbu2i1=MQomx2vbEiJSt1TNb+Q@mail.gmail.com>
+References: <1494949133-2202-1-git-send-email-sundeep.lkml@gmail.com>
+	<1494949133-2202-6-git-send-email-sundeep.lkml@gmail.com>
+	<CAKmqyKPwRaXsgcuGC28x_pA9CYA-tcCnSBGNX1Qv3d3cXX8rsg@mail.gmail.com>
+	<CALHRZupvtuE7oVdPa+kpaxP+ZrkHNzdJJV+fJq9nW1nHKX=5OA@mail.gmail.com>
+	<CAKmqyKNA9VUV311XACwpt15PKas5HbBNM0Vdi5Z60q_HGhioTA@mail.gmail.com>
+	<CALHRZurUtRV+3=L0PCADuj2BLbu2i1=MQomx2vbEiJSt1TNb+Q@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 26 Jun 2017 15:49:08 -0700
+Message-ID: <CAKmqyKOcWFNKusosunD=MF3x0B=8=n2q9MLZmx5QzXrMxeH-FQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu devel v5 PATCH 5/5] msf2: Add Emcraft's
+ Smartfusion2 SOM kit.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,100 +27,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>
+To: sundeep subbaraya <sundeep.lkml@gmail.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-
---m2b43yy3q4txuigf
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Jun 26, 2017 at 04:44:44PM +0100, Stefan Hajnoczi wrote:
->On Fri, Jun 23, 2017 at 03:46:59PM +0300, Manos Pitsidianakis wrote:
->> -void blk_io_limits_disable(BlockBackend *blk)
->> +void blk_io_limits_disable(BlockBackend *blk, Error **errp)
->>  {
->> -    assert(blk->public.throttle_group_member.throttle_state);
->> -    bdrv_drained_begin(blk_bs(blk));
->> -    throttle_group_unregister_tgm(&blk->public.throttle_group_member);
->> -    bdrv_drained_end(blk_bs(blk));
->> +    Error *local_err =3D NULL;
->> +    BlockDriverState *bs, *throttle_node;
->> +
->> +    throttle_node =3D blk_get_public(blk)->throttle_node;
->> +
->> +    assert(throttle_node && throttle_node->refcnt =3D=3D 1);
+On Mon, Jun 26, 2017 at 9:01 AM, sundeep subbaraya
+<sundeep.lkml@gmail.com> wrote:
+> Hi Alistair,
 >
->I'm not sure if we can enforce refcnt =3D=3D 1.  What stops other graph
->manipulation operations from inserting a node above or a BB that uses
->throttle_node as the root?
-
-Is this possible unless the user explicitly does this? I suppose going=20
-down the path and removing it from any place is okay. If the=20
-throttle_node has more than one parent then the result would be invalid=20
-anyway. I don't see anything in the code doing this (removing a BDS from=20
-a BB->leaf path) or wrapping it in some way, is that what should be=20
-done?
-
+> On Wed, May 31, 2017 at 4:02 AM, Alistair Francis <alistair23@gmail.com>
+> wrote:
+>>
+>> On Sun, May 28, 2017 at 10:26 PM, sundeep subbaraya
+>> <sundeep.lkml@gmail.com> wrote:
+>> > Hi Alistair,
+>> >
+>> > On Sat, May 27, 2017 at 5:30 AM, Alistair Francis <alistair23@gmail.com>
+>> > wrote:
+>> >>
+>> >> On Tue, May 16, 2017 at 8:38 AM, Subbaraya Sundeep
+>> >> <sundeep.lkml@gmail.com> wrote:
+>> >> > Emulated Emcraft's Smartfusion2 System On Module starter
+>> >> > kit.
+>> >> >
+>> >> > Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+>> >> > ---
+>> >> >  hw/arm/Makefile.objs |  1 +
+>> >> >  hw/arm/msf2-som.c    | 89
+>> >> > ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>> >> >  2 files changed, 90 insertions(+)
+>> >> >  create mode 100644 hw/arm/msf2-som.c
+>> >> >
+>> >> > diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+>> >> > index c828061..4b02093 100644
+>> >> > --- a/hw/arm/Makefile.objs
+>> >> > +++ b/hw/arm/Makefile.objs
+>> >> > @@ -5,6 +5,7 @@ obj-y += omap_sx1.o palm.o realview.o spitz.o
+>> >> > stellaris.o
+>> >> >  obj-y += tosa.o versatilepb.o vexpress.o virt.o xilinx_zynq.o z2.o
+>> >> >  obj-$(CONFIG_ACPI) += virt-acpi-build.o
+>> >> >  obj-y += netduino2.o
+>> >> > +obj-y += msf2-som.o
+>> >>
+>> >> This should be obj-$(CONFIG_MSF2).
+>> >
+>> >
+>> > Ok will change it.
+>> >>
+>> >>
+>> >> >  obj-y += sysbus-fdt.o
+>> >> >
+>> >> >  obj-y += armv7m.o exynos4210.o pxa2xx.o pxa2xx_gpio.o pxa2xx_pic.o
+>> >> > diff --git a/hw/arm/msf2-som.c b/hw/arm/msf2-som.c
+>> >> > new file mode 100644
+>> >> > index 0000000..cd2b759
+>> >> > --- /dev/null
+>> >> > +++ b/hw/arm/msf2-som.c
+>> >> > @@ -0,0 +1,89 @@
+>> >> > +/*
+>> >> > + * SmartFusion2 SOM starter kit(from Emcraft) emulation.
+>> >> > + *
+>> >> > + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
+>> >> > + *
+>> >> > + * Permission is hereby granted, free of charge, to any person
+>> >> > obtaining a copy
+>> >> > + * of this software and associated documentation files (the
+>> >> > "Software"), to deal
+>> >> > + * in the Software without restriction, including without limitation
+>> >> > the rights
+>> >> > + * to use, copy, modify, merge, publish, distribute, sublicense,
+>> >> > and/or
+>> >> > sell
+>> >> > + * copies of the Software, and to permit persons to whom the
+>> >> > Software
+>> >> > is
+>> >> > + * furnished to do so, subject to the following conditions:
+>> >> > + *
+>> >> > + * The above copyright notice and this permission notice shall be
+>> >> > included in
+>> >> > + * all copies or substantial portions of the Software.
+>> >> > + *
+>> >> > + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+>> >> > EXPRESS OR
+>> >> > + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+>> >> > MERCHANTABILITY,
+>> >> > + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+>> >> > SHALL
+>> >> > + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+>> >> > OR
+>> >> > OTHER
+>> >> > + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+>> >> > ARISING FROM,
+>> >> > + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+>> >> > DEALINGS IN
+>> >> > + * THE SOFTWARE.
+>> >> > + */
+>> >> > +
+>> >> > +#include "qemu/osdep.h"
+>> >> > +#include "qapi/error.h"
+>> >> > +#include "hw/boards.h"
+>> >> > +#include "hw/arm/msf2-soc.h"
+>> >> > +#include "hw/arm/arm.h"
+>> >> > +#include "exec/address-spaces.h"
+>> >> > +
+>> >> > +#define DDR_BASE_ADDRESS      0xA0000000
+>> >> > +#define DDR_SIZE              (64 * M_BYTE)
+>> >> > +
+>> >> > +static void emcraft_sf2_init(MachineState *machine)
+>> >> > +{
+>> >> > +    DeviceState *dev;
+>> >> > +    DeviceState *spi_flash;
+>> >> > +    MSF2State *soc;
+>> >> > +    DriveInfo *dinfo = drive_get_next(IF_MTD);
+>> >> > +    qemu_irq cs_line;
+>> >> > +    SSIBus *spi_bus;
+>> >> > +    MemoryRegion *sysmem = get_system_memory();
+>> >> > +    MemoryRegion *ddr = g_new(MemoryRegion, 1);
+>> >> > +
+>> >> > +    memory_region_init_ram(ddr, NULL, "ddr-ram", DDR_SIZE,
+>> >> > +                           &error_fatal);
+>> >> > +    vmstate_register_ram_global(ddr);
+>> >> > +    memory_region_add_subregion(sysmem, DDR_BASE_ADDRESS, ddr);
+>> >>
+>> >> The user can use -m to specify the amount of RAM to create in the
+>> >> machine. Unless this board only ever includes 64MB of RAM you should
+>> >> use that option (you will need to sanity check it though). If the
+>> >> board only ever has 64MB it might be worth printing a warning to the
+>> >> user if they specify an something. Although there might be a default
+>> >> if they don't use -m, which makes it hard to print out a warning
+>> >> message.
+>> >
+>> >
+>> > This -m confuses me. Why is it necessary for an embedded board? RAM chip
+>> > is fixed and not extendable. Whereas normal PC may have extra RAM slots.
+>> > If another board has more RAM then we would instantiate another machine
+>> > for
+>> > it
+>> > with that RAM size. Please explain. Maybe I am thinking in wrong
+>> > direction.
+>>
+>> I agree with you, it doesn't make sense for every board. For some
+>> embedded boards it does make sense (ZynqMP can have a customisable
+>> amount of memory) but for most it doesn't make too much sense.
+>>
+>> In saying that it is a commonly used QEMU option, if you can find a
+>> way to report a warning if the user tries to specify a custom amount
+>> of memory I think that would be beneficial as QEMU will just ignore
+>> their input. I have a feeling that the ram_size variable will be set
+>> even if the user doesn't specify anything, which we don't want to
+>> report a warning on.
 >
->> +
->> +    /* ref throttle_node's child bs so that it isn't lost when throttle=
-_node is
->> +     * destroyed */
->> +    bdrv_ref(bs);
->> +
->> +    /* this destroys throttle_node */
->> +    blk_remove_bs(blk);
 >
->This assumes that throttle_node is the top node.  How is this=20
->constraint enforced?
+> Do we need to report and exit if user specifies custom amount of memory?
 
+I had a quick look at other ARM machines and it looks like a lot of
+them use the ram_size variable from the machine to set the size of the
+memory, but some have just hard coded values.
 
-Kevin had said in a previous discussion:
-> The throttle node affects only the backing file now, but not the new
-> top-level node. With manually created filter nodes we may need to
-> provide a way so that the QMP command tells where in the tree the
-> snapshot is actually taken. With automatically created ones, we need to
-> make sure that they always stay on top.
->=20
-> Similar problems arise when block jobs manipulate the graph. For
-> example, think of a commit block job, which will remove the topmost node
-> from the backing file chain. We don't want it to remove the throttling
-> filter together with the qcow2 node. (Or do we? It might be something
-> that needs to be configurable.)
->=20
-> We also have several QMP that currently default to working on the
-> topmost image of the chain. Some of them may actually want to work on
-> the topmost node that isn't an automatically inserted filter.
->=20
->=20
-> I hope this helps you understand why I keep saying that automatic
-> insertion/removal of filter nodes is tricky and we should do it as
-> little as we possibly can.
+I'm not sure if there is an accepted "right" way to do this. If the
+board only ever has 64MB of memory then it's probably ok to just hard
+code it. Like you said, I don't think user have a high expectation of
+adjusting the memory in embedded boards.
 
-Yes, this constraint isn't enforced. The automatically inserted filter=20
-is not a very clean concept. I'll have to think about it a little more,=20
-unless there are some ideas.
-
---m2b43yy3q4txuigf
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAllRjnMACgkQc2J8L2kN
-9xCaFg/8CdWwUEV8v2x5KpQvIcfoKD/njnQlce1SIp82aF1AOzJAYeLoBtFB+Nhw
-/Gi3rKHEJFcaBlEMl+uFft9spp6/UtOXIEKMjwrG3pv5Ip7qncrq6xQ3hPbb+X+c
-GBmHcQxjOO0YRKupeTDFFY31Jb4aUQwEgkHsPnq1XsHfJZdHF0pP+DzucG3kBGBe
-zYB4GUIWl2oN7Ht5MbD606C4e7ZTSL2rYDy56bCFJCbmXfR9hT/gUsjtDVTJa25N
-zaSIaKDNGXoF96W4bb+TxieaA2uKWK4a4dttypvQppjrjRWZ6DAXi+t3DjEiTE57
-tq/P+2wB+x+87llN9CtbUcPSwa6vP7lPLIpedvwC7Azt2ePb+gvPrlBolHlIwVPz
-Kx2quGAF70De7go8OaQCefvMfOUfFXyEMM4ms2OrPBU4LCTp283UrH+NTMm91wUu
-OgLdR65A98g2NRr6YQF0Mu39TM9elshlFaVrgowJ8eS9bp4F9/MosJa3sX7HmfZh
-c3rMXQ1K3dzNLpTReXjntZVzxbebkzf8fqrWW2Wc1oJPrDJD2uU3HKb6hFNxc/nu
-l61juC+XWgaDXl1Y5M54n1+PJh/At/jch0RSzNHA5KPVckOOH7hNsL3uLtp/al5q
-mhu61EK5GHmvUewYgsQzt7QJwNDIwBWh+IBcdSTkwi8KrL2egV8=
-=2QS7
------END PGP SIGNATURE-----
-
---m2b43yy3q4txuigf--
+Thanks,
+Alistair
