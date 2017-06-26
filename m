@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jbeulich@suse.com>) id 1dPNSr-0003i8-2h
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 02:25:38 -0400
+	(envelope-from <jpmenil@gmail.com>) id 1dPOYs-0001vt-Eu
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 03:35:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jbeulich@suse.com>) id 1dPNSn-0000zq-45
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 02:25:37 -0400
-Received: from prv-mh.provo.novell.com ([137.65.248.74]:53242)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jbeulich@suse.com>) id 1dPNSm-0000yr-S5
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 02:25:33 -0400
-Message-Id: <5950A8D802000078001012A1@prv-mh.provo.novell.com>
-Date: Mon, 26 Jun 2017 00:25:28 -0600
-From: "Jan Beulich" <jbeulich@suse.com>
-References: <59492D1C0200007800164AA3@prv-mh.provo.novell.com>
-	<59492D1C0200007800164AA3@prv-mh.provo.novell.com>
-	<alpine.DEB.2.10.1706201421210.12819@sstabellini-ThinkPad-X260>
-	<594A2A1C0200007800164F2A@prv-mh.provo.novell.com>
-	<alpine.DEB.2.10.1706211108530.12819@sstabellini-ThinkPad-X260>
-	<594B8493020000780016595C@prv-mh.provo.novell.com>
-	<alpine.DEB.2.10.1706221146320.12819@sstabellini-ThinkPad-X260>
-	<594CEBEF0200007800166189@prv-mh.provo.novell.com>
-	<alpine.DEB.2.10.1706231131570.12819@sstabellini-ThinkPad-X260>
-In-Reply-To: <alpine.DEB.2.10.1706231131570.12819@sstabellini-ThinkPad-X260>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Subject: Re: [Qemu-devel] [PATCH] xen/disk: don't leak stack data via
- response ring
+	(envelope-from <jpmenil@gmail.com>) id 1dPOYo-00043b-Am
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 03:35:54 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:36300)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jpmenil@gmail.com>) id 1dPOYn-00041e-Ud
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 03:35:50 -0400
+Received: by mail-wr0-x242.google.com with SMTP id 77so28471849wrb.3
+	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 00:35:47 -0700 (PDT)
+Reply-To: jpmenil@gmail.com
+References: <d2e8cf65-ea3d-7db2-9382-a063daf1168a@gmail.com>
+	<20170605050423-mutt-send-email-mst@kernel.org>
+	<20170606024211-mutt-send-email-mst@kernel.org>
+	<CAOTcU=u_HSMQiwDF3Snv5P8mT-b_Aepeb=Z9gbLd1j=2P+Yy+A@mail.gmail.com>
+	<20170622215125-mutt-send-email-mst@kernel.org>
+	<4f6d4342-8476-882e-e7a8-b3f0ebd20d95@redhat.com>
+	<CAM_iQpXhW___-iP3kdv9MJcW=hroyp2SuMzAZdx3KCpc9-W76g@mail.gmail.com>
+	<9327ebf9-59db-f34e-b945-ef381ee95315@redhat.com>
+From: Jean-Philippe Menil <jpmenil@gmail.com>
+Message-ID: <f91048e7-5567-cdf8-fd98-3077ca7ac9a3@gmail.com>
+Date: Mon, 26 Jun 2017 09:35:42 +0200
+MIME-Version: 1.0
+In-Reply-To: <9327ebf9-59db-f34e-b945-ef381ee95315@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] BUG: KASAN: use-after-free in free_old_xmit_skbs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,48 +37,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sstabellini@kernel.org
-Cc: julien.grall@arm.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
+To: Jason Wang <jasowang@redhat.com>, Cong Wang <xiyou.wangcong@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Linux Kernel Network Developers <netdev@vger.kernel.org>, John Fastabend <john.fastabend@gmail.com>, virtualization@lists.linux-foundation.org, qemu-devel Developers <qemu-devel@nongnu.org>
 
->>> Stefano Stabellini <sstabellini@kernel.org> 06/23/17 8:43 PM >>>
->On Fri, 23 Jun 2017, Jan Beulich wrote:
->> >>> On 22.06.17 at 20:52, <sstabellini@kernel.org> wrote:
->> > I am happy to write the code and/or the commit message. Would a =
-simple
->> > cast like below work to fix the security issue?
->>=20
->> I suppose so, but you do realize that this is _exactly_ what
->> my patch does, except you use dangerous casts while I play
->> type-safe?
->
->Why is the cast dangerous?
+On 06/26/2017 04:50 AM, Jason Wang wrote:
+> 
+> 
+> On 2017年06月24日 06:32, Cong Wang wrote:
+>> On Fri, Jun 23, 2017 at 1:43 AM, Jason Wang <jasowang@redhat.com> wrote:
+>>>
+>>> On 2017年06月23日 02:53, Michael S. Tsirkin wrote:
+>>>> On Thu, Jun 22, 2017 at 08:15:58AM +0200, jean-philippe menil wrote:
+>>>>> Hi Michael,
+>>>>>
+>>>>> from what i see, the race appear when we hit virtnet_reset in
+>>>>> virtnet_xdp_set.
+>>>>> virtnet_reset
+>>>>>     _remove_vq_common
+>>>>>       virtnet_del_vqs
+>>>>>         virtnet_free_queues
+>>>>>           kfree(vi->sq)
+>>>>> when the xdp program (with two instances of the program to trigger it
+>>>>> faster)
+>>>>> is added or removed.
+>>>>>
+>>>>> It's easily repeatable, with 2 cpus and 4 queues on the qemu command
+>>>>> line,
+>>>>> running the xdp_ttl tool from Jesper.
+>>>>>
+>>>>> For now, i'm able to continue my qualification, testing if xdp_qp 
+>>>>> is not
+>>>>> null,
+>>>>> but do not seem to be a sustainable trick.
+>>>>> if (xdp_qp && vi->xdp_queues_pairs != xdp_qp)
+>>>>>
+>>>>> Maybe it will be more clear to you with theses informations.
+>>>>>
+>>>>> Best regards.
+>>>>>
+>>>>> Jean-Philippe
+>>>>
+>>>> I'm pretty clear about the issue here, I was trying to figure out a 
+>>>> fix.
+>>>> Jason, any thoughts?
+>>>>
+>>>>
+>>> Hi Jean:
+>>>
+>>> Does the following fix this issue? (I can't reproduce it locally through
+>>> xdp_ttl)
+>> It is tricky here.
+>>
+>>  From my understanding of the code base, the tx_lock is not sufficient
+>> here, because in virtnet_del_vqs() all vqs are deleted and one vp
+>> maps to one txq.
+>>
+>> I am afraid you have to add a spinlock somewhere to serialized
+>> free_old_xmit_skbs() vs. vring_del_virtqueue(). As you can see
+>> they are in different layers, so it is hard to figure out where to add
+>> it...
+>>
+>> Also, make sure we don't sleep inside the spinlock, I see a
+>> synchronize_net().
+> 
+> Looks like I miss something. I thought free_old_xmit_skbs() were 
+> serialized in this case since we disable all tx queues after 
+> netif_tx_unlock_bh()?
+> 
+> Jean:
+> 
+> I thought this could be easily reproduced by e.g produce some traffic 
+> and in the same time try to attach an xdp program. But looks not. How do 
+> you trigger this? What's your qemu command line for this?
+> 
+> Thanks
 
-Casts, and especially pointer ones) are always dangerous, as they have
-the potential of type changes elsewhere going unnoticed. You may have
-noticed that in reviews I'm often picking at casts, because in a majority
-of cases people use them they're not needed and hence their use is a
-(latent) risk.
+Hi Jason,
 
-> Both your patch and my version of it rely on
->inner knowledge of the way the rings are laid out in memory, but at
->least my patch doesn't introduce the risk of instantiating broken
->structs. Besides, type safety checks don't add much value, given that we
->rely on the way the ring.h macros have been written, which weren't even
->imported in the QEMU project until March this year.
+this is how i trigger the bug:
+- on the guest, tcpdump on on the interface
+- on the guest, run iperf against the host
+- on the guest, cat /sys/kernel/debug/tracing/trace_pipe
+- on the guest, run one or two instances of xdp_ttl compiled with DEBUG 
+uncommented, that i start stop, until i trigger the bug.
 
-That's said, as it seems to imply backporting of the change to older
-qemu may then be problematic. Otoh I don't recall having had problems
-with using the patch with only minor adjustments on older trees of ours.
+qemu command line is as follow:
 
->These are the reasons why I prefer my version, but I would consider your
->version with clear in-code comments that warn users to avoid
->instantiating the structs because they are not ABI compliant.
->
->How do you want to proceed?
+qemu-system-x86_64 -name ubuntu --enable-kvm -machine pc,accel=kvm -smp 
+2 -drive file=/dev/LocalDisk/ubuntu,if=virtio,format=raw -m 2048 -rtc 
+base=localtime,clock=host -usbdevice tablet --balloon virtio -netdev 
+tap,id=ubuntu-0,ifname=ubuntu-0,script=/home/jenfi/WORK/jp/qemu/if-up,downscript=/home/jenfi/WORK/jp/qemu/if-down,vhost=on,queues=4 
+-device 
+virtio-net-pci,netdev=ubuntu-0,mac=de:ad:be:ef:01:03,mq=on,guest_tso4=off,guest_tso6=off,guest_ecn=off,guest_ufo=off,vectors=2 
+-vnc 127.0.0.1:3 -nographic -serial 
+file:/home/jenfi/WORK/jp/qemu/ubuntu.out -monitor 
+unix:/home/jenfi/WORK/jp/qemu/ubuntu.sock,server,nowait
 
-I can provide a version with comments added, but only next week. If you
-feel like you want to go with your variant, I won't stand in the way, but =
-I
-also wouldn't give it my ack or alike (which you don't depend on anyway).
+Notice, the smp 2, queues to 4 and vectors to 2.
+Seem that if fogot to mention that in the beginning of this thread, 
+sorry for that.
 
-Jan
+Best regards.
+
+Jean-Philippe
