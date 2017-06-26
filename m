@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41209)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dPRGW-0004vN-I3
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:29:09 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1dPRJQ-0006pS-UT
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:32:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dPRGQ-0002gI-Lr
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:29:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42694)
+	(envelope-from <wei.w.wang@intel.com>) id 1dPRJM-00054p-35
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:32:08 -0400
+Received: from mga01.intel.com ([192.55.52.88]:8156)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dPRGQ-0002fy-CX
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:29:02 -0400
-Date: Mon, 26 Jun 2017 11:28:52 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170626102852.GH495@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <cover.050aaed1de4cecd4ba9a4dc6576d1d148a8a9004.1498213152.git-series.knut.omang@oracle.com>
-	<b107bc13f30e0b4a8ca8de1db178aef3fade9164.1498213152.git-series.knut.omang@oracle.com>
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1dPRJL-000542-QJ
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:32:04 -0400
+Message-ID: <5950E331.6050409@intel.com>
+Date: Mon, 26 Jun 2017 18:34:25 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <b107bc13f30e0b4a8ca8de1db178aef3fade9164.1498213152.git-series.knut.omang@oracle.com>
-Subject: Re: [Qemu-devel] [PATCH v4 2/4] sockets: factor out
- create_fast_reuse_socket
+References: <1498185154-29015-1-git-send-email-wei.w.wang@intel.com>
+	<9c3402b1-961d-b953-ca6c-188b03ed756b@redhat.com>
+	<595093A8.1080902@intel.com>
+	<c4aac325-3775-ab86-eb5f-b951339eafd7@redhat.com>
+In-Reply-To: <c4aac325-3775-ab86-eb5f-b951339eafd7@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v3 1/2] virtio-net: enable
+ configurable tx queue size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,92 +31,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Knut Omang <knut.omang@oracle.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Jason Wang <jasowang@redhat.com>, mst@redhat.com, eblake@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+Cc: stefanha@gmail.com, armbru@redhat.com, jan.scheurich@ericsson.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 
-On Fri, Jun 23, 2017 at 12:31:06PM +0200, Knut Omang wrote:
-> First refactoring step to prepare for fixing the problem
-> exposed with the test-listen test in the previous commit
-> 
-> Signed-off-by: Knut Omang <knut.omang@oracle.com>
-> ---
->  util/qemu-sockets.c | 24 +++++++++++++++++-------
->  1 file changed, 17 insertions(+), 7 deletions(-)
-> 
-> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-> index 852773d..699e36c 100644
-> --- a/util/qemu-sockets.c
-> +++ b/util/qemu-sockets.c
-> @@ -149,6 +149,20 @@ int inet_ai_family_from_address(InetSocketAddress *addr,
->      return PF_UNSPEC;
->  }
->  
-> +static int create_fast_reuse_socket(struct addrinfo *e, Error **errp)
-> +{
-> +    int slisten = qemu_socket(e->ai_family, e->ai_socktype, e->ai_protocol);
-> +    if (slisten < 0) {
-> +        if (!e->ai_next) {
-> +            error_setg_errno(errp, errno, "Failed to create socket");
-> +        }
+On 06/26/2017 04:05 PM, Jason Wang wrote:
+>
+>
+> On 2017年06月26日 12:55, Wei Wang wrote:
+>> On 06/26/2017 11:18 AM, Jason Wang wrote:
+>>>
+>>> On 2017年06月23日 10:32, Wei Wang wrote:
+>>>> This patch enables the virtio-net tx queue size to be configurable
+>>>> between 256 (the default queue size) and 1024 by the user when the
+>>>> vhost-user backend is used.
+>>>>
+>>>> Currently, the maximum tx queue size for other backends is 512 due
+>>>> to the following limitations:
+>>>> - QEMU backend: the QEMU backend implementation in some cases may
+>>>> send 1024+1 iovs to writev.
+>>>> - Vhost_net backend: there are possibilities that the guest sends
+>>>> a vring_desc of memory which corsses a MemoryRegion thereby
+>>>> generating more than 1024 iovs after translattion from guest-physical
+>>>> address in the backend.
+>>>>
+>>>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+>>>> ---
+>>>>   hw/net/virtio-net.c            | 45 
+>>>> +++++++++++++++++++++++++++++++++---------
+>>>>   include/hw/virtio/virtio-net.h |  1 +
+>>>>   2 files changed, 37 insertions(+), 9 deletions(-)
+>>>>
+>>>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+>>>> index 91eddaf..d13ca60 100644
+>>>> --- a/hw/net/virtio-net.c
+>>>> +++ b/hw/net/virtio-net.c
+>>>> @@ -34,8 +34,11 @@
+>>>>     /* previously fixed value */
+>>>>   #define VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE 256
+>>>> +
+>>>> +    /*
+>>>> +     * Currently, backends other than vhost-user don't support 
+>>>> 1024 queue
+>>>> +     * size.
+>>>> +     */
+>>>> +    if (n->net_conf.tx_queue_size == VIRTQUEUE_MAX_SIZE &&
+>>>> +        nc->peer->info->type != NET_CLIENT_DRIVER_VHOST_USER) {
+>>>> +        n->net_conf.tx_queue_size = VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE;
+>>>
+>>> Do we really want assume all vhost-user backend support 1024 queue 
+>>> size?
+>>>
+>>
+>>  Do you know any vhost-user backend implementation that doesn't support
+>> 1024 tx queue size?
+>>
+>>
+>
+> I don't but the issue is vhost-user uditis an open protocol, there 
+> could be even closed source implementation on this. So we can't audit 
+> all kinds of backends.
+>
 
-I think that having this method sometimes report an error message, and
-sometimes not report an error message, depending on state of a variable
-used by the caller is rather unpleasant. I'd much rather see this
-error message reporting remain in the caller.
+This is the discussion left before. Here is my thought:
 
-> +        return -1;
-> +    }
-> +
-> +    socket_set_fast_reuse(slisten);
-> +    return slisten;
-> +}
-> +
->  static int inet_listen_saddr(InetSocketAddress *saddr,
->                               int port_offset,
->                               bool update_addr,
-> @@ -210,21 +224,17 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
->          return -1;
->      }
->  
-> -    /* create socket + bind */
-> +    /* create socket + bind/listen */
->      for (e = res; e != NULL; e = e->ai_next) {
->          getnameinfo((struct sockaddr*)e->ai_addr,e->ai_addrlen,
->  		        uaddr,INET6_ADDRSTRLEN,uport,32,
->  		        NI_NUMERICHOST | NI_NUMERICSERV);
-> -        slisten = qemu_socket(e->ai_family, e->ai_socktype, e->ai_protocol);
-> +
-> +        slisten = create_fast_reuse_socket(e, &err);
->          if (slisten < 0) {
-> -            if (!e->ai_next) {
-> -                error_setg_errno(errp, errno, "Failed to create socket");
-> -            }
->              continue;
+Until now, nobody is officially using 1024 tx queue size, including the 
+unknown
+vhost-user backend implementation. So, applying this patch won't affect any
+already deployed products.
 
-It isn't shown in this diff context, but at the end of the outer
-loop we have
+If someday, people whose products are based on the unknown vhost-user
+implementation change to try with 1024 tx queue size and apply this patch,
+and find 1024 doesn't work for them, they can simply set the value to 
+512 (which
+is better than the 256 size they were using) or apply the 2nd patch entitled
+"VIRTIO_F_MAX_CHAIN_SIZE" to use 1024 queue size.
 
-   error_setg_errno(errp, errno, "Failed to find available port");
+I didn't see any big issue here. Would you see any issues?
 
-so IIUC, even this pre-existing code is wrong. If 'e->ai_next' is
-NULL, we report an error message here. Then, we continue to the
-next loop iteration, which causes use to terminate the loop
-entirely. At which point we'll report another error message
-over the top of the one we already have. So I think the error
-reporting does still need refactoring, but not in the way it
-is done here.
+@Michael, what is your opinion?
 
->          }
->  
-> -        socket_set_fast_reuse(slisten);
-> -
->          port_min = inet_getport(e);
->          port_max = saddr->has_to ? saddr->to + port_offset : port_min;
->          for (p = port_min; p <= port_max; p++) {
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+>>
+>>>> +    }
+>>>> +
+>>>> +    for (i = 0; i < n->max_queues; i++) {
+>>>> +        virtio_net_add_queue(n, i);
+>>>> +    }
+>>>
+>>> Any reason to move virtio_net_add_queue() here?
+>>>
+>>
+>> Please check the whole init steps.  It was moved here (after 
+>> qemu_new_nic())
+>> to make sure nc->peer is not NULL.
+>
+> I don't get here, can't you get peer just from nic_conf.peers?
+>
+
+Correct, nic_conf.peers also works. Thanks.
+
+Best,
+Wei
