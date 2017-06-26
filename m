@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dPJwZ-0001t5-Ao
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 22:40:04 -0400
+	(envelope-from <peterx@redhat.com>) id 1dPJxL-0002OE-Ro
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 22:40:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dPJwU-000275-E6
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 22:40:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48918)
+	(envelope-from <peterx@redhat.com>) id 1dPJxG-0002bk-Vs
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 22:40:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52076)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dPJwU-00026d-5f
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 22:39:58 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dPJxG-0002bA-Pg
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 22:40:46 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 258AF8123D
-	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 02:39:57 +0000 (UTC)
-Date: Mon, 26 Jun 2017 10:39:53 +0800
+	by mx1.redhat.com (Postfix) with ESMTPS id BE0914E4C4
+	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 02:40:45 +0000 (UTC)
+Date: Mon, 26 Jun 2017 10:40:41 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170626023953.GF3936@pxdev.xzpeter.org>
+Message-ID: <20170626024041.GG3936@pxdev.xzpeter.org>
 References: <1498193206-18007-1-git-send-email-peterx@redhat.com>
-	<1498193206-18007-3-git-send-email-peterx@redhat.com>
-	<20170623213127.GC10776@localhost.localdomain>
+	<1498193206-18007-4-git-send-email-peterx@redhat.com>
+	<20170623213529.GD10776@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170623213127.GC10776@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v5 02/10] accel: introduce
- AccelClass.global_props
+In-Reply-To: <20170623213529.GD10776@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v5 03/10] vl: clean up global property
+ registerations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,132 +38,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Eduardo Habkost <ehabkost@redhat.com>
 Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Fri, Jun 23, 2017 at 06:31:27PM -0300, Eduardo Habkost wrote:
-> On Fri, Jun 23, 2017 at 12:46:38PM +0800, Peter Xu wrote:
-> > Introduce this new field for the accelerator classes so that each
-> > specific accelerator in the future can register its own global
-> > properties to be used further by the system. It works just like how the
-> > old machine compatible properties do, but only tailored for
-> > accelerators.
+On Fri, Jun 23, 2017 at 06:35:29PM -0300, Eduardo Habkost wrote:
+> On Fri, Jun 23, 2017 at 12:46:39PM +0800, Peter Xu wrote:
+> > It's not that clear on how the global properties are registered to
+> > global_props (and also its priority relationship). Let's provide a
+> > single function to be called in main() for that, with comment to explain
+> > it a bit.
 > > 
-> > Introduce register_compat_props_array() for it. Export it so that it may
-> > be used in other codes as well in the future.
-> > 
-> > Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
 > > Signed-off-by: Peter Xu <peterx@redhat.com>
 > > ---
-> >  accel/accel.c                |  6 ++++++
-> >  hw/core/qdev-properties.c    |  7 +++++++
-> >  include/hw/qdev-properties.h |  1 +
-> >  include/sysemu/accel.h       | 10 ++++++++++
-> >  vl.c                         |  1 +
-> >  5 files changed, 25 insertions(+)
+> >  vl.c | 29 ++++++++++++++++++++++++-----
+> >  1 file changed, 24 insertions(+), 5 deletions(-)
 > > 
-> > diff --git a/accel/accel.c b/accel/accel.c
-> > index 7c079a5..fa85844 100644
-> > --- a/accel/accel.c
-> > +++ b/accel/accel.c
-> > @@ -120,6 +120,12 @@ void configure_accelerator(MachineState *ms)
-> >      }
+> > diff --git a/vl.c b/vl.c
+> > index 4452d7a..cdd2ec8 100644
+> > --- a/vl.c
+> > +++ b/vl.c
+> > @@ -2969,6 +2969,25 @@ static int qemu_read_default_config_file(void)
+> >      return 0;
 > >  }
 > >  
-> > +void accel_register_compat_props(AccelState *accel)
+> > +static void user_register_compat_props(void)
 > > +{
-> > +    AccelClass *class = ACCEL_GET_CLASS(accel);
-> > +    register_compat_props_array(class->global_props);
-> > +}
-> > +
-> >  static void register_accel_types(void)
-> >  {
-> >      type_register_static(&accel_type);
-> > diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-> > index 6ff1ac3..19fa335 100644
-> > --- a/hw/core/qdev-properties.c
-> > +++ b/hw/core/qdev-properties.c
-> > @@ -1060,6 +1060,13 @@ void register_compat_prop(const char *driver,
-> >      qdev_prop_register_global(p);
-> >  }
-> >  
-> > +void register_compat_props_array(GlobalProperty *prop)
+> > +    qemu_opts_foreach(qemu_find_opts("global"),
+> > +                      global_init_func, NULL, NULL);
 > 
-> Note for a later: we need to stop reusing struct GlobalProperty here,
-> because the 'user_provided', 'used', and 'errp' fields are ignored by
-> register_compat_prop(), but people may believe the are not.
-> 
-> I suggest defining:
-> 
->   struct GlobalPropertyValue {
->       const char *driver, *property, *value;
->   };
-> 
-> and use it instead of GlobalProperty for MachineClass::compat_props,
-> AccelClass::global_props, and register_compat_prop().
+> I suggest using "compat props" only when referring to global properties
+> registered for internal use (because they help us ensure command-line
+> compatibility).  User-provided global properties are just "global
+> properties", not "compat props".
 
-Yeah maybe another definition would be nicer.
-
-Do you mind I skip this change in this series? After all it can be
-done on top, and can be separated from current work.
-
-> 
-> > +{
-> > +    for (; prop && prop->driver; prop++) {
-> > +        register_compat_prop(prop->driver, prop->property, prop->value);
-> > +    }
-> > +}
-> > +
-> >  void qdev_prop_register_global_list(GlobalProperty *props)
-> >  {
-> >      int i;
-> > diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-> > index 1722ca4..2bac6a0 100644
-> > --- a/include/hw/qdev-properties.h
-> > +++ b/include/hw/qdev-properties.h
-> > @@ -203,6 +203,7 @@ void error_set_from_qdev_prop_error(Error **errp, int ret, DeviceState *dev,
-> >  
-> >  void register_compat_prop(const char *driver, const char *property,
-> >                            const char *value);
-> 
-> I suggest documenting here that this function will call
-> register_compat_prop(), so it will register internal (not user-provided)
-> global properties.
-
-Will do.
-
-> 
-> > +void register_compat_props_array(GlobalProperty *prop);
-> >  
-> >  /**
-> >   * qdev_property_add_static:
-> > diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
-> > index 15944c1..effcd7f 100644
-> > --- a/include/sysemu/accel.h
-> > +++ b/include/sysemu/accel.h
-> > @@ -24,6 +24,7 @@
-> >  #define HW_ACCEL_H
-> >  
-> >  #include "qom/object.h"
-> > +#include "hw/qdev-properties.h"
-> >  
-> >  typedef struct AccelState {
-> >      /*< private >*/
-> > @@ -40,6 +41,13 @@ typedef struct AccelClass {
-> >      int (*available)(void);
-> >      int (*init_machine)(MachineState *ms);
-> >      bool *allowed;
-> > +    /*
-> > +     * Array of global properties that would be applied when specific
-> > +     * accelerator is chosen. It works just like
-> > +     * MachineClass.compat_props but it's for accelerators not
-> > +     * machines.
-> 
-> I suggest adding this:
-> 
-> "Accelerator-provided global properties may be overridden by
-> machine-type compat_props or user-provided global properties."
-
-Will do.
-
-Thanks,
+Agree. Fixing up. Thanks,
 
 -- 
 Peter Xu
