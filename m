@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dPXAY-0002bv-9v
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 12:47:23 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dPXAd-0002uI-1V
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 12:47:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dPXAV-00039I-7T
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 12:47:22 -0400
-Received: from mail-eopbgr50107.outbound.protection.outlook.com
-	([40.107.5.107]:45334
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dPXAZ-0003BS-R2
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 12:47:26 -0400
+Received: from mail-eopbgr50131.outbound.protection.outlook.com
+	([40.107.5.131]:8588
 	helo=EUR03-VE1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
-	id 1dPXAU-00037E-Mv
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 12:47:19 -0400
+	id 1dPXAZ-0003AV-C1
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 12:47:23 -0400
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Mon, 26 Jun 2017 19:45:47 +0300
-Message-Id: <1498495550-72357-11-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Mon, 26 Jun 2017 19:45:48 +0300
+Message-Id: <1498495550-72357-12-git-send-email-anton.nefedov@virtuozzo.com>
 In-Reply-To: <1498495550-72357-1-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1498495550-72357-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 10/13] hmp: add hmp analogue for
- qmp-chardev-change
+Subject: [Qemu-devel] [PATCH v4 11/13] virtio-console: chardev hotswap
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,151 +30,89 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: den@virtuozzo.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: den@virtuozzo.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>, Amit Shah <amit@kernel.org>
 
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+CC: Amit Shah <amit@kernel.org>
 ---
- include/chardev/char.h | 10 ++++++++++
- hmp.h                  |  1 +
- chardev/char.c         |  2 +-
- hmp-commands.hx        | 18 +++++++++++++++++-
- hmp.c                  | 34 ++++++++++++++++++++++++++++++++++
- tests/test-hmp.c       |  1 +
- 6 files changed, 64 insertions(+), 2 deletions(-)
+ hw/char/virtio-console.c | 35 ++++++++++++++++++++++++++++++-----
+ 1 file changed, 30 insertions(+), 5 deletions(-)
 
-diff --git a/include/chardev/char.h b/include/chardev/char.h
-index 22fd734..1604ea9 100644
---- a/include/chardev/char.h
-+++ b/include/chardev/char.h
-@@ -81,6 +81,16 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
- void qemu_chr_parse_common(QemuOpts *opts, ChardevCommon *backend);
+diff --git a/hw/char/virtio-console.c b/hw/char/virtio-console.c
+index afb4949..198b2a8 100644
+--- a/hw/char/virtio-console.c
++++ b/hw/char/virtio-console.c
+@@ -49,7 +49,7 @@ static ssize_t flush_buf(VirtIOSerialPort *port,
+     VirtConsole *vcon = VIRTIO_CONSOLE(port);
+     ssize_t ret;
  
- /**
-+ * @qemu_chr_parse_opts:
-+ *
-+ * Parse the options to the ChardevBackend struct.
-+ *
-+ * Returns: a new backend or NULL on error
-+ */
-+ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts,
-+                                    Error **errp);
-+
-+/**
-  * @qemu_chr_new:
-  *
-  * Create a new character backend from a URI.
-diff --git a/hmp.h b/hmp.h
-index d8b94ce..23e035c 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -102,6 +102,7 @@ void hmp_nbd_server_start(Monitor *mon, const QDict *qdict);
- void hmp_nbd_server_add(Monitor *mon, const QDict *qdict);
- void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict);
- void hmp_chardev_add(Monitor *mon, const QDict *qdict);
-+void hmp_chardev_change(Monitor *mon, const QDict *qdict);
- void hmp_chardev_remove(Monitor *mon, const QDict *qdict);
- void hmp_qemu_io(Monitor *mon, const QDict *qdict);
- void hmp_cpu_add(Monitor *mon, const QDict *qdict);
-diff --git a/chardev/char.c b/chardev/char.c
-index 6b2cb7b..8e8b881 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -567,7 +567,7 @@ static const char *chardev_alias_translate(const char *name)
-     return name;
+-    if (!qemu_chr_fe_get_driver(&vcon->chr)) {
++    if (!qemu_chr_fe_backend_connected(&vcon->chr)) {
+         /* If there's no backend, we can just say we consumed all data. */
+         return len;
+     }
+@@ -163,12 +163,35 @@ static void chr_event(void *opaque, int event)
+     }
  }
  
--static ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts, Error **errp)
-+ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts, Error **errp)
- {
-     Error *local_err = NULL;
-     const ChardevClass *cc;
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index e763606..2cad758 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1724,7 +1724,23 @@ ETEXI
- STEXI
- @item chardev-add args
- @findex chardev-add
--chardev_add accepts the same parameters as the -chardev command line switch.
-+chardev-add accepts the same parameters as the -chardev command line switch.
-+
-+ETEXI
-+
-+    {
-+        .name       = "chardev-change",
-+        .args_type  = "id:s,args:s",
-+        .params     = "id args",
-+        .help       = "change chardev",
-+        .cmd        = hmp_chardev_change,
-+    },
-+
-+STEXI
-+@item chardev-change args
-+@findex chardev-change
-+chardev-change accepts existing chardev @var{id} and then the same arguments
-+as the -chardev command line switch (except for "id").
- 
- ETEXI
- 
-diff --git a/hmp.c b/hmp.c
-index 8c72c58..91e4317 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -2225,6 +2225,40 @@ void hmp_chardev_add(Monitor *mon, const QDict *qdict)
-     hmp_handle_error(mon, &err);
- }
- 
-+void hmp_chardev_change(Monitor *mon, const QDict *qdict)
++static int chr_be_change(void *opaque)
 +{
-+    const char *args = qdict_get_str(qdict, "args");
-+    const char *id;
-+    Error *err = NULL;
-+    ChardevBackend *backend = NULL;
-+    ChardevReturn *ret = NULL;
-+    QemuOpts *opts = qemu_opts_parse_noisily(qemu_find_opts("chardev"), args,
-+                                             true);
-+    if (!opts) {
-+        error_setg(&err, "Parsing chardev args failed");
-+        goto end;
++    VirtConsole *vcon = opaque;
++    VirtIOSerialPort *port = VIRTIO_SERIAL_PORT(vcon);
++    VirtIOSerialPortClass *k = VIRTIO_SERIAL_PORT_GET_CLASS(port);
++
++    if (k->is_console) {
++        qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
++                                 NULL, chr_be_change, vcon, NULL, true);
++    } else {
++        qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
++                                 chr_event, chr_be_change, vcon, NULL, false);
 +    }
 +
-+    id = qdict_get_str(qdict, "id");
-+    if (qemu_opts_id(opts)) {
-+        error_setg(&err, "Unexpected 'id' parameter");
-+        goto end;
++    if (vcon->watch) {
++        g_source_remove(vcon->watch);
++        vcon->watch = qemu_chr_fe_add_watch(&vcon->chr,
++                                            G_IO_OUT | G_IO_HUP,
++                                            chr_write_unblocked, vcon);
 +    }
 +
-+    backend = qemu_chr_parse_opts(opts, &err);
-+    if (!backend) {
-+        goto end;
-+    }
-+
-+    ret = qmp_chardev_change(id, backend, &err);
-+
-+end:
-+    qapi_free_ChardevReturn(ret);
-+    qapi_free_ChardevBackend(backend);
-+    qemu_opts_del(opts);
-+    hmp_handle_error(mon, &err);
++    return 0;
 +}
 +
- void hmp_chardev_remove(Monitor *mon, const QDict *qdict)
+ static void virtconsole_realize(DeviceState *dev, Error **errp)
  {
-     Error *local_err = NULL;
-diff --git a/tests/test-hmp.c b/tests/test-hmp.c
-index 99e35ec..299df19 100644
---- a/tests/test-hmp.c
-+++ b/tests/test-hmp.c
-@@ -22,6 +22,7 @@ static int verbose;
- static const char *hmp_cmds[] = {
-     "boot_set ndc",
-     "chardev-add null,id=testchardev1",
-+    "chardev-change testchardev1 ringbuf",
-     "chardev-remove testchardev1",
-     "commit all",
-     "cpu-add 1",
+     VirtIOSerialPort *port = VIRTIO_SERIAL_PORT(dev);
+     VirtConsole *vcon = VIRTIO_CONSOLE(dev);
+     VirtIOSerialPortClass *k = VIRTIO_SERIAL_PORT_GET_CLASS(dev);
+-    Chardev *chr = qemu_chr_fe_get_driver(&vcon->chr);
+ 
+     if (port->id == 0 && !k->is_console) {
+         error_setg(errp, "Port number 0 on virtio-serial devices reserved "
+@@ -176,7 +199,7 @@ static void virtconsole_realize(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
+-    if (chr) {
++    if (qemu_chr_fe_backend_connected(&vcon->chr)) {
+         /*
+          * For consoles we don't block guest data transfer just
+          * because nothing is connected - we'll just let it go
+@@ -188,11 +211,13 @@ static void virtconsole_realize(DeviceState *dev, Error **errp)
+          */
+         if (k->is_console) {
+             qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
+-                                     NULL, NULL, vcon, NULL, true);
++                                     NULL, chr_be_change,
++                                     vcon, NULL, true);
+             virtio_serial_open(port);
+         } else {
+             qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
+-                                     chr_event, NULL, vcon, NULL, false);
++                                     chr_event, chr_be_change,
++                                     vcon, NULL, false);
+         }
+     }
+ }
 -- 
 2.7.4
