@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1dPPmG-0007Zw-2J
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 04:53:49 -0400
+	(envelope-from <yulei.zhang@intel.com>) id 1dPPrT-0001vQ-L7
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 04:59:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1dPPmB-0002l6-CE
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 04:53:48 -0400
-Received: from mga14.intel.com ([192.55.52.115]:5921)
+	(envelope-from <yulei.zhang@intel.com>) id 1dPPrQ-0004Pq-Mh
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 04:59:11 -0400
+Received: from mga11.intel.com ([192.55.52.93]:49171)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yulei.zhang@intel.com>)
-	id 1dPPmB-0002kc-2N
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 04:53:43 -0400
+	id 1dPPrQ-0004Oi-D3
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 04:59:08 -0400
 From: Yulei Zhang <yulei.zhang@intel.com>
-Message-Id: <1491301684-24367-1-git-send-email-yulei.zhang@intel.com>
-Subject: [Qemu-devel] [RFC 5/5] vifo: introduce new VFIO ioctl
- VFIO_DEVICE_PCI_GET_DIRTY_BITMAP
+Message-Id: <1491301977-24481-3-git-send-email-yulei.zhang@intel.com>
+In-Reply-To: <1491301977-24481-1-git-send-email-yulei.zhang@intel.com>
+References: <1491301977-24481-1-git-send-email-yulei.zhang@intel.com>
+Subject: [Qemu-devel] [Intel-gfx][RFC 2/9] drm/i915/gvt: Apply g2h
+ adjustment during fence mmio access
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,128 +24,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Date: Mon, 26 Jun 2017 08:53:49 -0000
+Date: Mon, 26 Jun 2017 08:59:12 -0000
 To: qemu-devel@nongnu.org
 Cc: zhenyuw@linux.intel.com, zhi.a.wang@intel.com, joonas.lahtinen@linux.intel.com, kevin.tian@intel.com, xiao.zheng@intel.com, Yulei Zhang <yulei.zhang@intel.com>
 
-New VFIO ioctl VFIO_DEVICE_PCI_GET_DIRTY_BITMAP is used to sync the
-pci device dirty pages during the migration.
+Apply the guest to host gma conversion while guest config the
+fence mmio registers due to the host gma change after the migration.
 
 Signed-off-by: Yulei Zhang <yulei.zhang@intel.com>
 ---
- hw/vfio/pci.c              | 32 ++++++++++++++++++++++++++++++++
- hw/vfio/pci.h              |  2 ++
- linux-headers/linux/vfio.h | 14 ++++++++++++++
- 3 files changed, 48 insertions(+)
+ drivers/gpu/drm/i915/gvt/aperture_gm.c |  6 ++++--
+ drivers/gpu/drm/i915/gvt/gvt.h         | 14 ++++++++++++++
+ 2 files changed, 18 insertions(+), 2 deletions(-)
 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 833cd90..64c851f 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -32,6 +32,7 @@
- #include "pci.h"
- #include "trace.h"
- #include "qapi/error.h"
-+#include "exec/ram_addr.h"
+diff --git a/drivers/gpu/drm/i915/gvt/aperture_gm.c b/drivers/gpu/drm/i915/gvt/aperture_gm.c
+index ca3d192..cd68ec6 100644
+--- a/drivers/gpu/drm/i915/gvt/aperture_gm.c
++++ b/drivers/gpu/drm/i915/gvt/aperture_gm.c
+@@ -144,8 +144,10 @@ void intel_vgpu_write_fence(struct intel_vgpu *vgpu,
+ 	I915_WRITE(fence_reg_lo, 0);
+ 	POSTING_READ(fence_reg_lo);
  
- #define MSIX_CAP_LENGTH 12
- 
-@@ -39,6 +40,7 @@ static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
- static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
- static VMStateDescription vfio_pci_vmstate;
- static void vfio_vm_change_state_handler(void *pv, int running, RunState state);
-+static void vfio_log_sync(MemoryListener *listener, MemoryRegionSection *section);
- 
- /*
-  * Disabling BAR mmaping can be slow, but toggling it around INTx can
-@@ -2869,6 +2871,11 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
-     vfio_setup_resetfn_quirk(vdev);
-     qemu_add_vm_change_state_handler(vfio_vm_change_state_handler, vdev);
- 
-+    vdev->vfio_memory_listener = (MemoryListener) {
-+	    .log_sync = vfio_log_sync,
-+    };
-+    memory_listener_register(&vdev->vfio_memory_listener, &address_space_memory);
-+
-     return;
- 
- out_teardown:
-@@ -2964,6 +2971,7 @@ static void vfio_vm_change_state_handler(void *pv, int running, RunState state)
-     if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_PCI_STATUS_SET, vfio_status)) {
-         error_report("vfio: Failed to %s device\n", running ? "start" : "stop");
-     }
-+    vdev->device_stop = running ? false : true;
-     g_free(vfio_status);
+-	I915_WRITE(fence_reg_hi, upper_32_bits(value));
+-	I915_WRITE(fence_reg_lo, lower_32_bits(value));
++	I915_WRITE(fence_reg_hi,
++			intel_gvt_reg_g2h(vgpu, upper_32_bits(value), 0xFFFFF000));
++	I915_WRITE(fence_reg_lo,
++			intel_gvt_reg_g2h(vgpu, lower_32_bits(value), 0xFFFFF000));
+ 	POSTING_READ(fence_reg_lo);
  }
  
-@@ -3079,6 +3087,30 @@ static int vfio_device_get(QEMUFile *f, void *pv, size_t size, VMStateField *fie
-     return 0;
- }
+diff --git a/drivers/gpu/drm/i915/gvt/gvt.h b/drivers/gpu/drm/i915/gvt/gvt.h
+index 3a74e79..71c00b2 100644
+--- a/drivers/gpu/drm/i915/gvt/gvt.h
++++ b/drivers/gpu/drm/i915/gvt/gvt.h
+@@ -451,6 +451,20 @@ int intel_gvt_ggtt_index_g2h(struct intel_vgpu *vgpu, unsigned long g_index,
+ int intel_gvt_ggtt_h2g_index(struct intel_vgpu *vgpu, unsigned long h_index,
+ 			     unsigned long *g_index);
  
-+static void vfio_log_sync(MemoryListener *listener, MemoryRegionSection *section)
++/* apply guest to host gma convertion in GM registers setting */
++static inline u64 intel_gvt_reg_g2h(struct intel_vgpu *vgpu,
++		u32 addr, u32 mask)
 +{
-+    VFIOPCIDevice *vdev = container_of(listener, struct VFIOPCIDevice, vfio_memory_listener);
++	u64 gma;
 +
-+    if (vdev->device_stop) {
-+        struct vfio_pci_get_dirty_bitmap *d;
-+        ram_addr_t size = int128_get64(section->size);
-+        unsigned long page_nr = size >> TARGET_PAGE_BITS;
-+        unsigned long bitmap_size = (BITS_TO_LONGS(page_nr) + 1) * sizeof(unsigned long);
-+        d = g_malloc0(sizeof(*d) + bitmap_size);
-+        d->start_addr = section->offset_within_address_space;
-+        d->page_nr = page_nr;
-+
-+        if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_PCI_GET_DIRTY_BITMAP, d)) {
-+            error_report("vfio: Failed to fetch dirty pages for migration\n");
-+            goto exit;
-+        }
-+        cpu_physical_memory_set_dirty_lebitmap((unsigned long*)&d->dirty_bitmap, d->start_addr, d->page_nr);
-+
-+exit:
-+        g_free(d);
-+    }
++	if (addr) {
++		intel_gvt_ggtt_gmadr_g2h(vgpu,
++				addr & mask, &gma);
++		addr = gma | (addr & (~mask));
++	}
++	return addr;
 +}
 +
- static void vfio_instance_init(Object *obj)
- {
-     PCIDevice *pci_dev = PCI_DEVICE(obj);
-diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-index bd98618..984391d 100644
---- a/hw/vfio/pci.h
-+++ b/hw/vfio/pci.h
-@@ -144,6 +144,8 @@ typedef struct VFIOPCIDevice {
-     bool no_kvm_intx;
-     bool no_kvm_msi;
-     bool no_kvm_msix;
-+    bool device_stop;
-+    MemoryListener vfio_memory_listener;
- } VFIOPCIDevice;
- 
- uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len);
-diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-index fa17848..aa73ee1 100644
---- a/linux-headers/linux/vfio.h
-+++ b/linux-headers/linux/vfio.h
-@@ -502,6 +502,20 @@ struct vfio_pci_status_set{
- 
- #define VFIO_DEVICE_PCI_STATUS_SET	_IO(VFIO_TYPE, VFIO_BASE + 14)
- 
-+/**
-+ * VFIO_DEVICE_PCI_GET_DIRTY_BITMAP - _IOW(VFIO_TYPE, VFIO_BASE + 15,
-+ *				    struct vfio_pci_get_dirty_bitmap)
-+ *
-+ * Return: 0 on success, -errno on failure.
-+ */
-+struct vfio_pci_get_dirty_bitmap{
-+	__u64	       start_addr;
-+	__u64	       page_nr;
-+	__u8           dirty_bitmap[];
-+};
-+
-+#define VFIO_DEVICE_PCI_GET_DIRTY_BITMAP _IO(VFIO_TYPE, VFIO_BASE + 15)
-+
- /* -------- API for Type1 VFIO IOMMU -------- */
- 
- /**
+ void intel_vgpu_init_cfg_space(struct intel_vgpu *vgpu,
+ 		bool primary);
+ void intel_vgpu_reset_cfg_space(struct intel_vgpu *vgpu);
 -- 
 2.7.4
