@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44789)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1dPWcD-0002uk-B2
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 12:11:55 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dPWdR-0004Wh-0T
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 12:13:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1dPWcB-0003nr-18
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 12:11:53 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dPWdP-0004PA-SL
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 12:13:08 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:36368)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dPWdP-0004Od-Kj
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 12:13:07 -0400
+Received: by mail-wm0-x236.google.com with SMTP id 62so2004424wmw.1
+	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 09:13:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CALHRZuoihb2Oiu9adm=2gPUf-LFdkBR9qw1iV+ohL6kp0t5d=A@mail.gmail.com>
-References: <1494949133-2202-1-git-send-email-sundeep.lkml@gmail.com>
-	<d403f33f-647e-a142-4265-7d856d8be6aa@amsat.org>
-	<CALHRZur8Uh0JCnOoY-_mUU_fyzbUgxbmWKtfOoB-GTYR5UcEnQ@mail.gmail.com>
-	<CALHRZuoVHFOYV345JmvSkfJHsVjS7Wv_ySzAUtwo1D7eyoS_XQ@mail.gmail.com>
-	<648515bf-ba1e-3d7f-d5bd-51b243f8c29f@amsat.org>
-	<CALHRZuoihb2Oiu9adm=2gPUf-LFdkBR9qw1iV+ohL6kp0t5d=A@mail.gmail.com>
-From: sundeep subbaraya <sundeep.lkml@gmail.com>
-Date: Mon, 26 Jun 2017 21:41:49 +0530
-Message-ID: <CALHRZuoFU6vmnEBobVEqesApB6qm6cmNQfm9oVMG2RaooNEh7Q@mail.gmail.com>
+In-Reply-To: <745bc99a-9768-8dc7-ec17-843ad39d354d@amsat.org>
+References: <1498487280-17836-1-git-send-email-peter.maydell@linaro.org>
+	<745bc99a-9768-8dc7-ec17-843ad39d354d@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 26 Jun 2017 17:12:45 +0100
+Message-ID: <CAFEAcA_ijfVzxGS2cdUKg-P+pyvHux_KXEAr6_xW6moYAuAykg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu devel v5 PATCH 0/5] Add support for
- Smartfusion2 SoC
+Subject: Re: [Qemu-devel] [PATCH v2] main_loop: Make main_loop_wait() return
+ void
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,254 +32,91 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair23@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "patches@linaro.org" <patches@linaro.org>
 
-Hi Philippe,
+On 26 June 2017 at 16:54, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
+te:
+> On 06/26/2017 11:28 AM, Peter Maydell wrote:
+>>
+>> In commit e330c118f2a5a the last usage of main_loop_wait() that cared
+>> about the return value was changed to no longer use it. Drop the
+>> now-useless return value and make the function return void.
+>>
+>> We avoid the awkwardness of ifdeffery to handle the 'ret'
+>> variable in main_loop_wait() only being wanted if CONFIG_SLIRP
+>> by simply dropping all the ifdefs. There are stub implementations
+>> of slirp_pollfds_poll() and slirp_pollfds_fill() already in
+>> stubs/slirp.c which do nothing, as required.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>
+>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>
+>
+>> ---
+>> This will coincidentally satisfy Coverity, which currently complains
+>> in CID 1372464 that we call main_loop_wait() in vl.c and ignore the
+>> return value which may be reporting a poll() syscall failure.
+>> Essentially we don't expect poll() to fail, except perhaps with
+>> a transient EINTR -- if it ever did we'd spin retrying endlessly
+>> I think.
+>> ---
+>>   include/qemu/main-loop.h | 2 +-
+>>   util/main-loop.c         | 8 ++------
+>>   2 files changed, 3 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/include/qemu/main-loop.h b/include/qemu/main-loop.h
+>> index d7e24af..6b4b60b 100644
+>> --- a/include/qemu/main-loop.h
+>> +++ b/include/qemu/main-loop.h
+>> @@ -79,7 +79,7 @@ int qemu_init_main_loop(Error **errp);
+>>    *
+>>    * @nonblocking: Whether the caller should block until an event occurs=
+.
+>>    */
+>> -int main_loop_wait(int nonblocking);
+>> +void main_loop_wait(int nonblocking);
+>>     /**
+>>    * qemu_get_aio_context: Return the main loop's AioContext
+>> diff --git a/util/main-loop.c b/util/main-loop.c
+>> index 19cad6b..0b25405 100644
+>> --- a/util/main-loop.c
+>> +++ b/util/main-loop.c
+>> @@ -487,7 +487,7 @@ static int os_host_main_loop_wait(int64_t timeout)
+>>   }
+>>   #endif
+>>   -int main_loop_wait(int nonblocking)
+>> +void main_loop_wait(int nonblocking)
+>>   {
+>>       int ret;
+>>       uint32_t timeout =3D UINT32_MAX;
+>> @@ -500,9 +500,7 @@ int main_loop_wait(int nonblocking)
+>>       /* poll any events */
+>>       g_array_set_size(gpollfds, 0); /* reset for new iteration */
+>>       /* XXX: separate device handlers from system ones */
+>> -#ifdef CONFIG_SLIRP
+>>       slirp_pollfds_fill(gpollfds, &timeout);
+>> -#endif
+>>         if (timeout =3D=3D UINT32_MAX) {
+>>           timeout_ns =3D -1;
+>> @@ -515,16 +513,14 @@ int main_loop_wait(int nonblocking)
+>>                                             &main_loop_tlg));
+>>         ret =3D os_host_main_loop_wait(timeout_ns);
+>> -#ifdef CONFIG_SLIRP
+>>       slirp_pollfds_poll(gpollfds, (ret < 0));
+>> -#endif
+>>         /* CPU thread can infinitely wait for event after
+>>          missing the warp */
+>>       qemu_start_warp_timer();
+>>       qemu_clock_run_all_timers();
+>>   -    return ret;
+>> +    return;
+>
+>
+> drop this return?
 
-On Fri, Jun 9, 2017 at 12:51 PM, sundeep subbaraya <sundeep.lkml@gmail.com>
-wrote:
+Oops, yes, Eric suggested that in v1 and I forgot :-(
 
-> Hi Philippe,
->
-> On Wed, May 31, 2017 at 11:06 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsa=
-t.org>
-> wrote:
->
->> Hi Sundeep,
->>
->> On 05/29/2017 02:28 AM, sundeep subbaraya wrote:
->>
->>> Hi Philippe,
->>>
->>> Any update on this? I will wait for your comments too
->>> and send next iteration fixing Alistair comments.
->>>
->>
->> Sorry I'm supposed to be in holidays ;)
->>
->
-> Ohh sorry currently am in vacation :)
->
->>
->>
->>> Thanks,
->>> Sundeep
->>>
->>> On Wed, May 17, 2017 at 3:09 PM, sundeep subbaraya
->>> <sundeep.lkml@gmail.com <mailto:sundeep.lkml@gmail.com>> wrote:
->>>
->>>     Hi Philippe,
->>>
->>>     On Wed, May 17, 2017 at 9:57 AM, Philippe Mathieu-Daud=C3=A9
->>>     <f4bug@amsat.org <mailto:f4bug@amsat.org>> wrote:
->>>
->>>         Hi Sundeep,
->>>
->>>         This patchset is way cleaner!
->>>         I had a fast look and I like it, I'll try to make some time soo=
-n
->>>         to review details and test it.
->>>
->>>
->>>     Thank you
->>>
->>>
->>>
->>>
->>>         Is your work interested on U-Boot or more focused in Linux
->>> kernel?
->>>
->>>
->>>     I am interested more in kernel. I had to look into u-boot for first
->>>     time for Qemu only.
->>>     I worked only on FPGAs(load kernel with debugger) till now so never
->>>     got a chance to look into u-boot.
->>>
->>>
->>>         If you compile QEMU with libfdt support you can use the -dtb
->>>         option to pass the blob to the kernel directly, bypassing the
->>>         bootloader.
->>>
->>>     Yeah for armv7m I could not find any thing like that in tree.
->>>
->>>
->>>         If you need a bootloader you may give a look at coreboot which
->>>         supports dts well, see how Vladimir Serbinenko used Linux's dt
->>>         to boot a QEMU Versatile Express board:
->>>         https://mail.coreboot.org/pipermail/coreboot-gerrit/2016-Feb
->>> ruary/040899.html
->>>         <https://mail.coreboot.org/pipermail/coreboot-gerrit/2016-Fe
->>> bruary/040899.html>
->>>
->>>     Cool. I will look into it.
->>>
->>>     Thanks,
->>>     Sundeep
->>>
->>>
->>>         Regards,
->>>
->>>         Phil.
->>>
->>>
->>>         On 05/16/2017 12:38 PM, Subbaraya Sundeep wrote:
->>>
->>>             Hi Qemu-devel,
->>>
->>>             I am trying to add Smartfusion2 SoC.
->>>             SoC is from Microsemi and System on Module(SOM)
->>>             board is from Emcraft systems. Smartfusion2 has hardened
->>>             Microcontroller(Cortex-M3)based Sub System and FPGA fabric.
->>>             At the moment only system timer, sysreg and SPI
->>>             controller are modelled.
->>>
->>>             Testing:
->>>             ./arm-softmmu/qemu-system-arm -M smartfusion2-som -serial
->>>             mon:stdio \
->>>             -kernel u-boot.bin -display none -drive
->>>             file=3Dspi.bin,if=3Dmtd,format=3Draw
->>>
->>
->> I'm not sure the timer is working correctly, U-Boot loops with this
->> pattern:
->>
->> msf2_sysreg_read: addr: 0x00000048 data: 0x00000220
->> msf2_sysreg_write: addr: 0x00000048 data: 0x00000220
->> msf2_sysreg_read: addr: 0x00000048 data: 0x00000220
->> msf2_sysreg_write: addr: 0x00000048 data: 0x00000020
->> msf2_sysreg_read: addr: 0x00000048 data: 0x00000020
->> msf2_sysreg_write: addr: 0x00000048 data: 0x00000000
->> msf2_sysreg_read: addr: 0x00000048 data: 0x00000000
->> msf2_sysreg_write: addr: 0x00000048 data: 0x00000020
->> msf2_sysreg_read: addr: 0x00000048 data: 0x00000020
->> msf2_sysreg_write: addr: 0x00000048 data: 0x00000220
->>
->> I checked the images and Linux is booting. But as you mentioned I change=
-d
-u-boot
-for boot delay and have seen this issue. Actually it is taking too long for
-a second.
-Smartfusion2 timer is working fine(Linux) whereas u-boot is using Systick
-for auto-boot
-timer. I did not understand quite correctly about ARM Systick in Qemu. How
-do we
-specify frequency of the Systick timer? How Systick is configured to use
-CPU frequency
-since qemu cpu speed is not constant? How frequency has to be specified for
-using external clock as Systick input?
-
-Please help me understand this.
-
-Thanks,
-Sundeep
-
-
->
->>>             Binaries u-boot.bin and spi.bin are at:
->>>
->>
->> you can compress spi.bin!
->>
->> can you share u-boot.elf with debug symbols too?
->>
->
-> Sure. I have tested binaries before pushing. Did you compile the u-boot
-> again?
-> Please wait for a few days I will check and provide once am back.
->
-> Thanks,
-> Sundeep
->
->>
->> Regards,
->>
->> Phil.
->>
->>             https://github.com/Subbaraya-Sundeep/qemu-test-binaries.git
->>>
->>>             <https://github.com/Subbaraya-Sundeep/qemu-test-binaries.gi=
-t
->>> >
->>>
->>>             U-boot is from Emcraft with modified
->>>                 - SPI driver not to use PDMA.
->>>                 - ugly hack to pass dtb to kernel in r1.
->>>             @
->>>             https://github.com/Subbaraya-Sundeep/emcraft-uboot-sf2.git
->>>             <https://github.com/Subbaraya-Sundeep/emcraft-uboot-sf2.git=
->
->>>
->>>             Linux is 4.5 linux with Smartfusion2 SoC dts and clocksourc=
-e
->>>             driver added by myself @
->>>             https://github.com/Subbaraya-Sundeep/linux.git
->>>             <https://github.com/Subbaraya-Sundeep/linux.git>
->>>
->>>             v5
->>>                 As per Philippe comments:
->>>                     Added abort in Sysreg if guest tries to remap memor=
-y
->>>                     other than default mapping.
->>>                     Use of CONFIG_MSF2 in Makefile for soc.c
->>>                     Fixed incorrect logic in timer model.
->>>                     Renamed msf2-timer.c -> mss-timer.c
->>>                             msf2-spi.c -> mss-spi.c also type names
->>>                     Renamed function msf2_init->emcraft_sf2_init in
->>>             msf2-som.c
->>>                     Added part-name,eNVM-size,eSRAM-size,pclk0 and pclk=
-1
->>>                         properties to soc.
->>>                     Pass soc part-name,memory size and clock rate
->>>             properties from som.
->>>             v4:
->>>                 Fixed build failure by using PRIx macros.
->>>             v3:
->>>                 Added SoC file and board file as per Alistair comments.
->>>             v2:
->>>                 Added SPI controller so that u-boot loads kernel from
->>>             spi flash.
->>>             v1:
->>>                 Initial patch set with timer and sysreg
->>>
->>>             Thanks,
->>>             Sundeep
->>>
->>>             Subbaraya Sundeep (5):
->>>               msf2: Add Smartfusion2 System timer
->>>               msf2: Microsemi Smartfusion2 System Register block.
->>>               msf2: Add Smartfusion2 SPI controller
->>>               msf2: Add Smartfusion2 SoC.
->>>               msf2: Add Emcraft's Smartfusion2 SOM kit.
->>>
->>>              default-configs/arm-softmmu.mak |   1 +
->>>              hw/arm/Makefile.objs            |   2 +
->>>              hw/arm/msf2-soc.c               | 201 ++++++++++++++++++++=
-+
->>>              hw/arm/msf2-som.c               |  89 ++++++++++
->>>              hw/misc/Makefile.objs           |   1 +
->>>              hw/misc/msf2-sysreg.c           | 161 +++++++++++++++++
->>>              hw/ssi/Makefile.objs            |   1 +
->>>              hw/ssi/mss-spi.c                | 378
->>>             ++++++++++++++++++++++++++++++++++++++++
->>>              hw/timer/Makefile.objs          |   1 +
->>>              hw/timer/mss-timer.c            | 249
->>>             ++++++++++++++++++++++++++
->>>              include/hw/arm/msf2-soc.h       |  69 ++++++++
->>>              include/hw/misc/msf2-sysreg.h   |  80 +++++++++
->>>              include/hw/ssi/mss-spi.h        | 104 +++++++++++
->>>              include/hw/timer/mss-timer.h    |  80 +++++++++
->>>              14 files changed, 1417 insertions(+)
->>>              create mode 100644 hw/arm/msf2-soc.c
->>>              create mode 100644 hw/arm/msf2-som.c
->>>              create mode 100644 hw/misc/msf2-sysreg.c
->>>              create mode 100644 hw/ssi/mss-spi.c
->>>              create mode 100644 hw/timer/mss-timer.c
->>>              create mode 100644 include/hw/arm/msf2-soc.h
->>>              create mode 100644 include/hw/misc/msf2-sysreg.h
->>>              create mode 100644 include/hw/ssi/mss-spi.h
->>>              create mode 100644 include/hw/timer/mss-timer.h
->>>
->>>
->>>
->>>
->
+thanks
+-- PMM
