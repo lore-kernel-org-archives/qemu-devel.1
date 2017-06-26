@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37861)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dPbEi-0002Lf-6g
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 17:07:57 -0400
+	(envelope-from <mst@redhat.com>) id 1dPbSF-00073M-ED
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 17:21:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dPbEh-0007Cq-AL
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 17:07:56 -0400
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1497639397-19453-1-git-send-email-cota@braap.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <ee142dc2-9d34-169a-af1e-f24d2e211286@twiddle.net>
-Date: Mon, 26 Jun 2017 14:07:40 -0700
+	(envelope-from <mst@redhat.com>) id 1dPbSC-0007eA-52
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 17:21:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:61899)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dPbSB-0007dR-SN
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 17:21:52 -0400
+Date: Tue, 27 Jun 2017 00:21:47 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170627002016-mutt-send-email-mst@kernel.org>
+References: <1498185154-29015-1-git-send-email-wei.w.wang@intel.com>
+	<9c3402b1-961d-b953-ca6c-188b03ed756b@redhat.com>
+	<595093A8.1080902@intel.com>
+	<c4aac325-3775-ab86-eb5f-b951339eafd7@redhat.com>
+	<5950E331.6050409@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1497639397-19453-1-git-send-email-cota@braap.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] cpu_env in gen-icount
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <5950E331.6050409@intel.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v3 1/2] virtio-net: enable
+ configurable tx queue size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,19 +32,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Michael Walle <michael@walle.cc>, Laurent Vivier <laurent@vivier.eu>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Anthony Green <green@moxielogic.com>, Chris Wulff <crwulff@gmail.com>, Marek Vasut <marex@denx.de>, Stafford Horne <shorne@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Max Filippov <jcmvbkbc@gmail.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, =?UTF-8?Q?Llu=c3=ads_Vilanova?= <vilanova@ac.upc.edu>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: Jason Wang <jasowang@redhat.com>, eblake@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, stefanha@gmail.com, armbru@redhat.com, jan.scheurich@ericsson.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 
-On 06/16/2017 11:56 AM, Emilio G. Cota wrote:
-> v1: https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg03771.html
-> 
-> Changes from v1:
-> 
-> - Use tcg_ctx.tcg_env instead of passing cpu_env around as suggested
->    by Richard.
-> - Added Richard's R-b tag to patch 1.
+On Mon, Jun 26, 2017 at 06:34:25PM +0800, Wei Wang wrote:
+> On 06/26/2017 04:05 PM, Jason Wang wrote:
+> >=20
+> >=20
+> > On 2017=E5=B9=B406=E6=9C=8826=E6=97=A5 12:55, Wei Wang wrote:
+> > > On 06/26/2017 11:18 AM, Jason Wang wrote:
+> > > >=20
+> > > > On 2017=E5=B9=B406=E6=9C=8823=E6=97=A5 10:32, Wei Wang wrote:
+> > > > > This patch enables the virtio-net tx queue size to be configura=
+ble
+> > > > > between 256 (the default queue size) and 1024 by the user when =
+the
+> > > > > vhost-user backend is used.
+> > > > >=20
+> > > > > Currently, the maximum tx queue size for other backends is 512 =
+due
+> > > > > to the following limitations:
+> > > > > - QEMU backend: the QEMU backend implementation in some cases m=
+ay
+> > > > > send 1024+1 iovs to writev.
+> > > > > - Vhost_net backend: there are possibilities that the guest sen=
+ds
+> > > > > a vring_desc of memory which corsses a MemoryRegion thereby
+> > > > > generating more than 1024 iovs after translattion from guest-ph=
+ysical
+> > > > > address in the backend.
+> > > > >=20
+> > > > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> > > > > ---
+> > > > >   hw/net/virtio-net.c            | 45
+> > > > > +++++++++++++++++++++++++++++++++---------
+> > > > >   include/hw/virtio/virtio-net.h |  1 +
+> > > > >   2 files changed, 37 insertions(+), 9 deletions(-)
+> > > > >=20
+> > > > > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> > > > > index 91eddaf..d13ca60 100644
+> > > > > --- a/hw/net/virtio-net.c
+> > > > > +++ b/hw/net/virtio-net.c
+> > > > > @@ -34,8 +34,11 @@
+> > > > >     /* previously fixed value */
+> > > > >   #define VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE 256
+> > > > > +
+> > > > > +    /*
+> > > > > +     * Currently, backends other than vhost-user don't
+> > > > > support 1024 queue
+> > > > > +     * size.
+> > > > > +     */
+> > > > > +    if (n->net_conf.tx_queue_size =3D=3D VIRTQUEUE_MAX_SIZE &&
+> > > > > +        nc->peer->info->type !=3D NET_CLIENT_DRIVER_VHOST_USER=
+) {
+> > > > > +        n->net_conf.tx_queue_size =3D VIRTIO_NET_TX_QUEUE_DEFA=
+ULT_SIZE;
+> > > >=20
+> > > > Do we really want assume all vhost-user backend support 1024
+> > > > queue size?
+> > > >=20
+> > >=20
+> > >  Do you know any vhost-user backend implementation that doesn't sup=
+port
+> > > 1024 tx queue size?
+> > >=20
+> > >=20
+> >=20
+> > I don't but the issue is vhost-user uditis an open protocol, there co=
+uld
+> > be even closed source implementation on this. So we can't audit all
+> > kinds of backends.
+> >=20
+>=20
+> This is the discussion left before. Here is my thought:
+>=20
+> Until now, nobody is officially using 1024 tx queue size, including the
+> unknown
+> vhost-user backend implementation. So, applying this patch won't affect=
+ any
+> already deployed products.
+>=20
+> If someday, people whose products are based on the unknown vhost-user
+> implementation change to try with 1024 tx queue size and apply this pat=
+ch,
+> and find 1024 doesn't work for them, they can simply set the value to 5=
+12
+> (which
+> is better than the 256 size they were using) or apply the 2nd patch ent=
+itled
+> "VIRTIO_F_MAX_CHAIN_SIZE" to use 1024 queue size.
+>=20
+> I didn't see any big issue here. Would you see any issues?
+>=20
+> @Michael, what is your opinion?
 
-Applied to the tcg queue.
+Since the default does not change, I think it's fine.
+You need to both have a non-default value and be using
+a backend that does not support the 1024 size.
+Seems unlikely to me.
 
 
-r~
+>=20
+> > >=20
+> > > > > +    }
+> > > > > +
+> > > > > +    for (i =3D 0; i < n->max_queues; i++) {
+> > > > > +        virtio_net_add_queue(n, i);
+> > > > > +    }
+> > > >=20
+> > > > Any reason to move virtio_net_add_queue() here?
+> > > >=20
+> > >=20
+> > > Please check the whole init steps.  It was moved here (after
+> > > qemu_new_nic())
+> > > to make sure nc->peer is not NULL.
+> >=20
+> > I don't get here, can't you get peer just from nic_conf.peers?
+> >=20
+>=20
+> Correct, nic_conf.peers also works. Thanks.
+>=20
+> Best,
+> Wei
+>=20
+>=20
+>=20
