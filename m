@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dPQlr-0003Fo-3Z
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 05:57:28 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dPQrw-0005nU-FI
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:03:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dPQlq-00044X-29
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 05:57:27 -0400
-Date: Mon, 26 Jun 2017 11:57:19 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170626095719.GB4348@noname.redhat.com>
-References: <0f83a15d-66b0-36aa-e5a4-d03cd37757c9@kamp.de>
-	<20170626082838.GA4348@noname.redhat.com>
-	<0e6586f9-85eb-efcd-4825-20066a7c869a@kamp.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0e6586f9-85eb-efcd-4825-20066a7c869a@kamp.de>
-Subject: Re: [Qemu-devel] QCOW2 support for LZO compression
+	(envelope-from <alex.bennee@linaro.org>) id 1dPQrr-0006MP-Hf
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:03:44 -0400
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:36677)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dPQrr-0006M4-AY
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:03:39 -0400
+Received: by mail-wm0-x22a.google.com with SMTP id 62so2976373wmw.1
+	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 03:03:39 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Mon, 26 Jun 2017 11:04:22 +0100
+Message-Id: <20170626100422.6390-1-alex.bennee@linaro.org>
+In-Reply-To: <149838046604.6497.6648018844505723967.stgit@frigg.lan>
+References: <149838046604.6497.6648018844505723967.stgit@frigg.lan>
+Subject: [Qemu-devel] [PATCH] fixup! Pass generic CPUState to
+ gen_intermediate_code()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,56 +27,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Laszlo Ersek <lersek@redhat.com>, qemu block <qemu-block@nongnu.org>, den@openvz.org, qemu-devel@nongnu.org
+To: vilanova@ac.upc.edu
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Chris Wulff <crwulff@gmail.com>, Marek Vasut <marex@denx.de>, Stafford Horne <shorne@gmail.com>
 
-Am 26.06.2017 um 11:20 hat Peter Lieven geschrieben:
-> >So he chose a different algorithm (zstd). When I asked, he posted a
-> >comparison of algorithms (however a generic one and not measured in the
-> >context of qemu) that suggests that LZO would be slightly faster, but
-> >have a considerable worse compression ratio with the settings that were
-> >benchmarked.
-> 
-> My idea to choose LZO was that it is widely available and available in
-> any distro you can think of. We already have probing for it in configure.
-> My concern with ZSTD would be that it seems there are no packages
-> available for most distros and that it seems to be multi-threaded. I don't
-> know if this will cause any trouble?
+---
+ target/hppa/translate.c     | 5 ++---
+ target/nios2/translate.c    | 5 ++---
+ target/openrisc/translate.c | 3 +--
+ 3 files changed, 5 insertions(+), 8 deletions(-)
 
-The availability and that we already link against LZO is a good point. I
-think we want to avoid a situation where compressed qcow2 files can't be
-read by binaries of popular distributions - after all, downloadable
-images are an important use case for compressed images.
-
-> >I think it's clear that if there is any serious interest in compression,
-> >we'll want to support at least one more algorithm. What we still need to
-> >evaluate is which one(s) to take, and whether a simple incompatible flag
-> >in the header like in Den's patch is enough or whether we should add a
-> >whole new header field for the compression algorithm (like we already
-> >have for encryption).
-> 
-> From my side there clearly is interest in optimizing the compression. Its
-> even possible to speed up zlib by 3-4x times by choosing other parameters
-> for deflate which unfortunately are not compatible with our inflate settings.
-> 
-> I don't know if its worth creating a new header field. Even if we spent to bits
-> in the end (one for LZO and one for ZSDT). I think this wouldn't hurt. However,
-> there are likely to pop up new compression algorithms in the future and
-> a header would be more flexible.
-
-That we could just use different parameters is an important hint that
-maybe we don't just need bits to select an algorithm, but also some
-space for parameters for the selected algorithm. In this case I think we
-need a header change anyway.
-
-> I just don't want to make it too complicated and as you pointed out
-> compression is not that interesting for most people - maybe due to its
-> speed.
-
-In fact, I think it could be the poor integration in qemu. Compressed
-images might be more appealing if you couldn't only write compressed
-data with special-case operations like 'qemu-img convert', but just give
-an option that you want all writes to be compressed and then use it like
-any other image.
-
-Kevin
+diff --git a/target/hppa/translate.c b/target/hppa/translate.c
+index e10abc5e04..900870cd5a 100644
+--- a/target/hppa/translate.c
++++ b/target/hppa/translate.c
+@@ -3740,10 +3740,9 @@ static ExitStatus translate_one(DisasContext *ctx, uint32_t insn)
+     return gen_illegal(ctx);
+ }
+ 
+-void gen_intermediate_code(CPUHPPAState *env, struct TranslationBlock *tb)
++void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
+ {
+-    HPPACPU *cpu = hppa_env_get_cpu(env);
+-    CPUState *cs = CPU(cpu);
++    CPUHPPAState *env = cs->env_ptr;
+     DisasContext ctx;
+     ExitStatus ret;
+     int num_insns, max_insns, i;
+diff --git a/target/nios2/translate.c b/target/nios2/translate.c
+index 2f3c2e5dfb..8b97d6585f 100644
+--- a/target/nios2/translate.c
++++ b/target/nios2/translate.c
+@@ -799,10 +799,9 @@ static void gen_exception(DisasContext *dc, uint32_t excp)
+ }
+ 
+ /* generate intermediate code for basic block 'tb'.  */
+-void gen_intermediate_code(CPUNios2State *env, TranslationBlock *tb)
++void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+ {
+-    Nios2CPU *cpu = nios2_env_get_cpu(env);
+-    CPUState *cs = CPU(cpu);
++    CPUNios2State *env = cs->env_ptr;
+     DisasContext dc1, *dc = &dc1;
+     int num_insns;
+     int max_insns;
+diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
+index aaac359d5b..4a28c96e53 100644
+--- a/target/openrisc/translate.c
++++ b/target/openrisc/translate.c
+@@ -1520,9 +1520,8 @@ static void disas_openrisc_insn(DisasContext *dc, OpenRISCCPU *cpu)
+ 
+ void gen_intermediate_code(CPUState *cpu, struct TranslationBlock *tb)
+ {
+-    OpenRISCState *env = cpu->env_ptr;
++    CPUOpenRISCState *env = cpu->env_ptr;
+     OpenRISCCPU *or_cpu = openrisc_env_get_cpu(env);
+-    CPUState *cs = CPU(cpu);
+     struct DisasContext ctx, *dc = &ctx;
+     uint32_t pc_start;
+     uint32_t next_page_start;
+-- 
+2.13.0
