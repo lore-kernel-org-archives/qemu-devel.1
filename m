@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1dPWSa-0005Vm-Sk
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 12:01:58 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dPWSk-0005dE-6K
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 12:02:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1dPWSY-00084n-J6
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 12:01:56 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dPWSj-0008Bw-FC
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 12:02:06 -0400
+Date: Mon, 26 Jun 2017 19:01:18 +0300
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20170626160118.ig22l4rkswq7lfhy@postretch>
+References: <20170623124700.1389-1-el13635@mail.ntua.gr>
+	<20170623124700.1389-4-el13635@mail.ntua.gr>
+	<20170626143055.GC29664@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKNA9VUV311XACwpt15PKas5HbBNM0Vdi5Z60q_HGhioTA@mail.gmail.com>
-References: <1494949133-2202-1-git-send-email-sundeep.lkml@gmail.com>
-	<1494949133-2202-6-git-send-email-sundeep.lkml@gmail.com>
-	<CAKmqyKPwRaXsgcuGC28x_pA9CYA-tcCnSBGNX1Qv3d3cXX8rsg@mail.gmail.com>
-	<CALHRZupvtuE7oVdPa+kpaxP+ZrkHNzdJJV+fJq9nW1nHKX=5OA@mail.gmail.com>
-	<CAKmqyKNA9VUV311XACwpt15PKas5HbBNM0Vdi5Z60q_HGhioTA@mail.gmail.com>
-From: sundeep subbaraya <sundeep.lkml@gmail.com>
-Date: Mon, 26 Jun 2017 21:31:49 +0530
-Message-ID: <CALHRZurUtRV+3=L0PCADuj2BLbu2i1=MQomx2vbEiJSt1TNb+Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu devel v5 PATCH 5/5] msf2: Add Emcraft's
- Smartfusion2 SOM kit.
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="4umyjnjwf7cyhbgr"
+Content-Disposition: inline
+In-Reply-To: <20170626143055.GC29664@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC v3 3/8] block: add
+ throttle block filter driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,163 +26,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>
 
-Hi Alistair,
 
-On Wed, May 31, 2017 at 4:02 AM, Alistair Francis <alistair23@gmail.com>
-wrote:
+--4umyjnjwf7cyhbgr
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> On Sun, May 28, 2017 at 10:26 PM, sundeep subbaraya
-> <sundeep.lkml@gmail.com> wrote:
-> > Hi Alistair,
-> >
-> > On Sat, May 27, 2017 at 5:30 AM, Alistair Francis <alistair23@gmail.com>
-> > wrote:
-> >>
-> >> On Tue, May 16, 2017 at 8:38 AM, Subbaraya Sundeep
-> >> <sundeep.lkml@gmail.com> wrote:
-> >> > Emulated Emcraft's Smartfusion2 System On Module starter
-> >> > kit.
-> >> >
-> >> > Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-> >> > ---
-> >> >  hw/arm/Makefile.objs |  1 +
-> >> >  hw/arm/msf2-som.c    | 89
-> >> > ++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >> >  2 files changed, 90 insertions(+)
-> >> >  create mode 100644 hw/arm/msf2-som.c
-> >> >
-> >> > diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-> >> > index c828061..4b02093 100644
-> >> > --- a/hw/arm/Makefile.objs
-> >> > +++ b/hw/arm/Makefile.objs
-> >> > @@ -5,6 +5,7 @@ obj-y += omap_sx1.o palm.o realview.o spitz.o
-> >> > stellaris.o
-> >> >  obj-y += tosa.o versatilepb.o vexpress.o virt.o xilinx_zynq.o z2.o
-> >> >  obj-$(CONFIG_ACPI) += virt-acpi-build.o
-> >> >  obj-y += netduino2.o
-> >> > +obj-y += msf2-som.o
-> >>
-> >> This should be obj-$(CONFIG_MSF2).
-> >
-> >
-> > Ok will change it.
-> >>
-> >>
-> >> >  obj-y += sysbus-fdt.o
-> >> >
-> >> >  obj-y += armv7m.o exynos4210.o pxa2xx.o pxa2xx_gpio.o pxa2xx_pic.o
-> >> > diff --git a/hw/arm/msf2-som.c b/hw/arm/msf2-som.c
-> >> > new file mode 100644
-> >> > index 0000000..cd2b759
-> >> > --- /dev/null
-> >> > +++ b/hw/arm/msf2-som.c
-> >> > @@ -0,0 +1,89 @@
-> >> > +/*
-> >> > + * SmartFusion2 SOM starter kit(from Emcraft) emulation.
-> >> > + *
-> >> > + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
-> >> > + *
-> >> > + * Permission is hereby granted, free of charge, to any person
-> >> > obtaining a copy
-> >> > + * of this software and associated documentation files (the
-> >> > "Software"), to deal
-> >> > + * in the Software without restriction, including without limitation
-> >> > the rights
-> >> > + * to use, copy, modify, merge, publish, distribute, sublicense,
-> and/or
-> >> > sell
-> >> > + * copies of the Software, and to permit persons to whom the Software
-> >> > is
-> >> > + * furnished to do so, subject to the following conditions:
-> >> > + *
-> >> > + * The above copyright notice and this permission notice shall be
-> >> > included in
-> >> > + * all copies or substantial portions of the Software.
-> >> > + *
-> >> > + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-> >> > EXPRESS OR
-> >> > + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-> >> > MERCHANTABILITY,
-> >> > + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
-> >> > SHALL
-> >> > + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
-> OR
-> >> > OTHER
-> >> > + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-> >> > ARISING FROM,
-> >> > + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-> >> > DEALINGS IN
-> >> > + * THE SOFTWARE.
-> >> > + */
-> >> > +
-> >> > +#include "qemu/osdep.h"
-> >> > +#include "qapi/error.h"
-> >> > +#include "hw/boards.h"
-> >> > +#include "hw/arm/msf2-soc.h"
-> >> > +#include "hw/arm/arm.h"
-> >> > +#include "exec/address-spaces.h"
-> >> > +
-> >> > +#define DDR_BASE_ADDRESS      0xA0000000
-> >> > +#define DDR_SIZE              (64 * M_BYTE)
-> >> > +
-> >> > +static void emcraft_sf2_init(MachineState *machine)
-> >> > +{
-> >> > +    DeviceState *dev;
-> >> > +    DeviceState *spi_flash;
-> >> > +    MSF2State *soc;
-> >> > +    DriveInfo *dinfo = drive_get_next(IF_MTD);
-> >> > +    qemu_irq cs_line;
-> >> > +    SSIBus *spi_bus;
-> >> > +    MemoryRegion *sysmem = get_system_memory();
-> >> > +    MemoryRegion *ddr = g_new(MemoryRegion, 1);
-> >> > +
-> >> > +    memory_region_init_ram(ddr, NULL, "ddr-ram", DDR_SIZE,
-> >> > +                           &error_fatal);
-> >> > +    vmstate_register_ram_global(ddr);
-> >> > +    memory_region_add_subregion(sysmem, DDR_BASE_ADDRESS, ddr);
-> >>
-> >> The user can use -m to specify the amount of RAM to create in the
-> >> machine. Unless this board only ever includes 64MB of RAM you should
-> >> use that option (you will need to sanity check it though). If the
-> >> board only ever has 64MB it might be worth printing a warning to the
-> >> user if they specify an something. Although there might be a default
-> >> if they don't use -m, which makes it hard to print out a warning
-> >> message.
-> >
-> >
-> > This -m confuses me. Why is it necessary for an embedded board? RAM chip
-> > is fixed and not extendable. Whereas normal PC may have extra RAM slots.
-> > If another board has more RAM then we would instantiate another machine
-> for
-> > it
-> > with that RAM size. Please explain. Maybe I am thinking in wrong
-> direction.
+On Mon, Jun 26, 2017 at 03:30:55PM +0100, Stefan Hajnoczi wrote:
+>> +static BlockDriver bdrv_throttle =3D {
+>> +    .format_name                        =3D   "throttle",
+>> +    .protocol_name                      =3D   "throttle",
+>> +    .instance_size                      =3D   sizeof(ThrottleGroupMembe=
+r),
+>> +
+>> +    .bdrv_file_open                     =3D   throttle_open,
+>> +    .bdrv_close                         =3D   throttle_close,
+>> +    .bdrv_co_flush                      =3D   throttle_co_flush,
+>> +
+>> +    .bdrv_child_perm                    =3D   bdrv_filter_default_perms,
+>> +
+>> +    .bdrv_getlength                     =3D   throttle_getlength,
+>> +
+>> +    .bdrv_co_preadv                     =3D   throttle_co_preadv,
+>> +    .bdrv_co_pwritev                    =3D   throttle_co_pwritev,
+>> +
+>> +    .bdrv_co_pwrite_zeroes              =3D   throttle_co_pwrite_zeroes,
+>> +    .bdrv_co_pdiscard                   =3D   throttle_co_pdiscard,
+>> +
+>> +    .bdrv_recurse_is_first_non_filter   =3D   bdrv_recurse_is_first_non=
+_filter,
+>> +
+>> +    .bdrv_attach_aio_context            =3D   throttle_attach_aio_conte=
+xt,
+>> +    .bdrv_detach_aio_context            =3D   throttle_detach_aio_conte=
+xt,
+>> +
+>> +    .bdrv_reopen_prepare                =3D   throttle_reopen_prepare,
+>> +    .bdrv_reopen_commit                 =3D   throttle_reopen_commit,
+>> +    .bdrv_reopen_abort                  =3D   throttle_reopen_abort,
+>> +
+>> +    .is_filter                          =3D   true,
+>> +};
 >
-> I agree with you, it doesn't make sense for every board. For some
-> embedded boards it does make sense (ZynqMP can have a customisable
-> amount of memory) but for most it doesn't make too much sense.
+>Missing:
+>bdrv_co_get_block_status()
+>bdrv_truncate()
+>bdrv_get_info()
+>bdrv_probe_blocksizes()
+>bdrv_probe_geometry()
+>bdrv_media_changed()
+>bdrv_eject()
+>bdrv_lock_medium()
+>bdrv_co_ioctl()
 >
-> In saying that it is a commonly used QEMU option, if you can find a
-> way to report a warning if the user tries to specify a custom amount
-> of memory I think that would be beneficial as QEMU will just ignore
-> their input. I have a feeling that the ram_size variable will be set
-> even if the user doesn't specify anything, which we don't want to
-> report a warning on.
+>See block/raw-format.c.
 >
+>I think most of these could be modified in block.c or block/io.c to
+>automatically call bs->file's function if drv doesn't implement them.
+>This way all block drivers would transparently pass them through by
+>default and block/raw-format.c code could be eliminated.
 
-Do we need to report and exit if user specifies custom amount of memory?
+Are these truly necessary? Because other filter drivers (ie quorum,=20
+blkverify) don't implement them.
 
-Thanks,
-Sundeep
+--4umyjnjwf7cyhbgr
+Content-Type: application/pgp-signature; name="signature.asc"
 
->
-> Thanks,
-> Alistair
->
-> >
-> > Thanks,
-> > Sundeep
->
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAllRL84ACgkQc2J8L2kN
+9xB4cg//ZBHl/MXqFEYX8x+CT/5IHbtvz4LgBiGxUBLlV4k+m0hS1R2xNO75kO4H
+eY1OfSJCkDX8NpvABNDPpdUkq9L7FA9pACevZG5QG9t6lZvOU74FqAdwkAJEaS5B
+qttOLJKT7knQiAcUZSYq0+beoPbMxQmEBaIhX27LuCvJ3m3iTG6myAaGN1XyYgbC
+GOKSItXoWtQLghINNDqVAcI1prNqUHmhkol3ZvIPLICbX0SmXU4cfo0iicUx8hqt
+QugaAc/3dLCsV2MQRyj3cxP9TCza3+6mQShI4u+fBpXjAMHFRHcCJrVWYNsuLknA
+s1Ovm/C7lLswbnWk4FsoWGoYw81vnMoscRM9+lJA/cp8koHFRYdYMeyFCsC0EImS
+MokvRFzZD07pfdGoyGqs7R/vCqDv56+0Ha1uBWCrfQlNYEuiKbQWhms+83/5EowF
+jE2QGyxGG2qvi4fw4iLUvaQRmruP1z+Szw48SV3/w66w2lnVu3WSJmaiL62ZD/kN
+eqSvXMZoL1qzDUHFdNoycEOgJetzOzHqYlN+FmcE7u0xIo7WPkkIYFjEu8FCNToh
+7p0tE4ElJIlsqdgLjOZpalQ25izqSXgdOPeit4PiVlSVp0iaUBJzKPhSy/ds0OYO
+xd5LuJWq3appjf9UF2MhiM8P5pTdyYRb90TX52yULmkBTloBxPo=
+=VNiD
+-----END PGP SIGNATURE-----
+
+--4umyjnjwf7cyhbgr--
