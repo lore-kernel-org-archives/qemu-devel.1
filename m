@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40761)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dPWNu-0000dm-2E
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 11:57:06 -0400
+	(envelope-from <sundeep.lkml@gmail.com>) id 1dPWSa-0005Vm-Sk
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 12:01:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dPWNq-0005uH-4k
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 11:57:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34210)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dPWNp-0005tJ-VP
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 11:57:02 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C86E87D4E0
-	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 15:56:59 +0000 (UTC)
-Date: Mon, 26 Jun 2017 16:56:56 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170626155656.GJ29664@stefanha-x1.localdomain>
-References: <20170624181008.25497-1-eblake@redhat.com>
+	(envelope-from <sundeep.lkml@gmail.com>) id 1dPWSY-00084n-J6
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 12:01:56 -0400
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="5me2qT3T17SWzdxI"
-Content-Disposition: inline
-In-Reply-To: <20170624181008.25497-1-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] qobject coccinelle followups
+In-Reply-To: <CAKmqyKNA9VUV311XACwpt15PKas5HbBNM0Vdi5Z60q_HGhioTA@mail.gmail.com>
+References: <1494949133-2202-1-git-send-email-sundeep.lkml@gmail.com>
+	<1494949133-2202-6-git-send-email-sundeep.lkml@gmail.com>
+	<CAKmqyKPwRaXsgcuGC28x_pA9CYA-tcCnSBGNX1Qv3d3cXX8rsg@mail.gmail.com>
+	<CALHRZupvtuE7oVdPa+kpaxP+ZrkHNzdJJV+fJq9nW1nHKX=5OA@mail.gmail.com>
+	<CAKmqyKNA9VUV311XACwpt15PKas5HbBNM0Vdi5Z60q_HGhioTA@mail.gmail.com>
+From: sundeep subbaraya <sundeep.lkml@gmail.com>
+Date: Mon, 26 Jun 2017 21:31:49 +0530
+Message-ID: <CALHRZurUtRV+3=L0PCADuj2BLbu2i1=MQomx2vbEiJSt1TNb+Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu devel v5 PATCH 5/5] msf2: Add Emcraft's
+ Smartfusion2 SOM kit.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,51 +26,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, marcandre.lureau@redhat.com
+To: Alistair Francis <alistair23@gmail.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
+Hi Alistair,
 
---5me2qT3T17SWzdxI
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Wed, May 31, 2017 at 4:02 AM, Alistair Francis <alistair23@gmail.com>
+wrote:
 
-On Sat, Jun 24, 2017 at 12:10:06PM -0600, Eric Blake wrote:
-> v1 was here:
-> https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg02589.html
->=20
-> Since then:
-> - reorder the series
-> - add R-b on patch 1
-> - patch 2 updated to catch recent introduction of longhand usage
->=20
-> Eric Blake (2):
->   qobject: Catch another straggler for use of qdict_put_str()
->   qobject: Update coccinelle script to catch Q{INC,DEC}REF
->=20
->  monitor.c                        | 2 +-
->  qemu-img.c                       | 2 +-
->  scripts/coccinelle/qobject.cocci | 6 ++++++
->  3 files changed, 8 insertions(+), 2 deletions(-)
->=20
-> --=20
-> 2.9.4
->=20
+> On Sun, May 28, 2017 at 10:26 PM, sundeep subbaraya
+> <sundeep.lkml@gmail.com> wrote:
+> > Hi Alistair,
+> >
+> > On Sat, May 27, 2017 at 5:30 AM, Alistair Francis <alistair23@gmail.com>
+> > wrote:
+> >>
+> >> On Tue, May 16, 2017 at 8:38 AM, Subbaraya Sundeep
+> >> <sundeep.lkml@gmail.com> wrote:
+> >> > Emulated Emcraft's Smartfusion2 System On Module starter
+> >> > kit.
+> >> >
+> >> > Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> >> > ---
+> >> >  hw/arm/Makefile.objs |  1 +
+> >> >  hw/arm/msf2-som.c    | 89
+> >> > ++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >> >  2 files changed, 90 insertions(+)
+> >> >  create mode 100644 hw/arm/msf2-som.c
+> >> >
+> >> > diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+> >> > index c828061..4b02093 100644
+> >> > --- a/hw/arm/Makefile.objs
+> >> > +++ b/hw/arm/Makefile.objs
+> >> > @@ -5,6 +5,7 @@ obj-y += omap_sx1.o palm.o realview.o spitz.o
+> >> > stellaris.o
+> >> >  obj-y += tosa.o versatilepb.o vexpress.o virt.o xilinx_zynq.o z2.o
+> >> >  obj-$(CONFIG_ACPI) += virt-acpi-build.o
+> >> >  obj-y += netduino2.o
+> >> > +obj-y += msf2-som.o
+> >>
+> >> This should be obj-$(CONFIG_MSF2).
+> >
+> >
+> > Ok will change it.
+> >>
+> >>
+> >> >  obj-y += sysbus-fdt.o
+> >> >
+> >> >  obj-y += armv7m.o exynos4210.o pxa2xx.o pxa2xx_gpio.o pxa2xx_pic.o
+> >> > diff --git a/hw/arm/msf2-som.c b/hw/arm/msf2-som.c
+> >> > new file mode 100644
+> >> > index 0000000..cd2b759
+> >> > --- /dev/null
+> >> > +++ b/hw/arm/msf2-som.c
+> >> > @@ -0,0 +1,89 @@
+> >> > +/*
+> >> > + * SmartFusion2 SOM starter kit(from Emcraft) emulation.
+> >> > + *
+> >> > + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> >> > + *
+> >> > + * Permission is hereby granted, free of charge, to any person
+> >> > obtaining a copy
+> >> > + * of this software and associated documentation files (the
+> >> > "Software"), to deal
+> >> > + * in the Software without restriction, including without limitation
+> >> > the rights
+> >> > + * to use, copy, modify, merge, publish, distribute, sublicense,
+> and/or
+> >> > sell
+> >> > + * copies of the Software, and to permit persons to whom the Software
+> >> > is
+> >> > + * furnished to do so, subject to the following conditions:
+> >> > + *
+> >> > + * The above copyright notice and this permission notice shall be
+> >> > included in
+> >> > + * all copies or substantial portions of the Software.
+> >> > + *
+> >> > + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+> >> > EXPRESS OR
+> >> > + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+> >> > MERCHANTABILITY,
+> >> > + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+> >> > SHALL
+> >> > + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+> OR
+> >> > OTHER
+> >> > + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+> >> > ARISING FROM,
+> >> > + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+> >> > DEALINGS IN
+> >> > + * THE SOFTWARE.
+> >> > + */
+> >> > +
+> >> > +#include "qemu/osdep.h"
+> >> > +#include "qapi/error.h"
+> >> > +#include "hw/boards.h"
+> >> > +#include "hw/arm/msf2-soc.h"
+> >> > +#include "hw/arm/arm.h"
+> >> > +#include "exec/address-spaces.h"
+> >> > +
+> >> > +#define DDR_BASE_ADDRESS      0xA0000000
+> >> > +#define DDR_SIZE              (64 * M_BYTE)
+> >> > +
+> >> > +static void emcraft_sf2_init(MachineState *machine)
+> >> > +{
+> >> > +    DeviceState *dev;
+> >> > +    DeviceState *spi_flash;
+> >> > +    MSF2State *soc;
+> >> > +    DriveInfo *dinfo = drive_get_next(IF_MTD);
+> >> > +    qemu_irq cs_line;
+> >> > +    SSIBus *spi_bus;
+> >> > +    MemoryRegion *sysmem = get_system_memory();
+> >> > +    MemoryRegion *ddr = g_new(MemoryRegion, 1);
+> >> > +
+> >> > +    memory_region_init_ram(ddr, NULL, "ddr-ram", DDR_SIZE,
+> >> > +                           &error_fatal);
+> >> > +    vmstate_register_ram_global(ddr);
+> >> > +    memory_region_add_subregion(sysmem, DDR_BASE_ADDRESS, ddr);
+> >>
+> >> The user can use -m to specify the amount of RAM to create in the
+> >> machine. Unless this board only ever includes 64MB of RAM you should
+> >> use that option (you will need to sanity check it though). If the
+> >> board only ever has 64MB it might be worth printing a warning to the
+> >> user if they specify an something. Although there might be a default
+> >> if they don't use -m, which makes it hard to print out a warning
+> >> message.
+> >
+> >
+> > This -m confuses me. Why is it necessary for an embedded board? RAM chip
+> > is fixed and not extendable. Whereas normal PC may have extra RAM slots.
+> > If another board has more RAM then we would instantiate another machine
+> for
+> > it
+> > with that RAM size. Please explain. Maybe I am thinking in wrong
+> direction.
+>
+> I agree with you, it doesn't make sense for every board. For some
+> embedded boards it does make sense (ZynqMP can have a customisable
+> amount of memory) but for most it doesn't make too much sense.
+>
+> In saying that it is a commonly used QEMU option, if you can find a
+> way to report a warning if the user tries to specify a custom amount
+> of memory I think that would be beneficial as QEMU will just ignore
+> their input. I have a feeling that the ram_size variable will be set
+> even if the user doesn't specify anything, which we don't want to
+> report a warning on.
+>
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Do we need to report and exit if user specifies custom amount of memory?
 
---5me2qT3T17SWzdxI
-Content-Type: application/pgp-signature; name="signature.asc"
+Thanks,
+Sundeep
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZUS7IAAoJEJykq7OBq3PIkGkH/3S1eoVZFfpPM7aonrXi6anU
-TqjnvVg2lot7sPbmy1bvZNY6/C4ldHeLfzVGk0J6CgfYlwnQksH4I8bx/E1JfDIm
-hIM9Ib8Tp2F6e1e+DNernlsHANKtPihjxGgsiBldpMf+KlWPV2yphEb166mysYNz
-APpVYLkk5hHa05f+uwX9E1yrKllG8uMpb8ItOOidvr3yNnbNz5j7LOi90xJzKEXP
-1dYFVsehc64TLzL6qX8MKHBTfetItxt0eMY3M6uBxYr4cv1ZNhx6qGSAb7mjN9sO
-ukYN2QkFkXTO9sN1VoidXkDbc/ePcCvkFMwxZzPoINtRAkXgEUPAIYIKiIhJsIk=
-=qumj
------END PGP SIGNATURE-----
-
---5me2qT3T17SWzdxI--
+>
+> Thanks,
+> Alistair
+>
+> >
+> > Thanks,
+> > Sundeep
+>
