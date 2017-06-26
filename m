@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49442)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dPRwJ-0002Jl-C4
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 07:12:20 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dPRwe-0002yr-TN
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 07:12:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dPRwH-0001NC-Uf
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 07:12:19 -0400
-Date: Mon, 26 Jun 2017 12:12:05 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170626111205.GK495@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <0f83a15d-66b0-36aa-e5a4-d03cd37757c9@kamp.de>
-	<20170626082838.GA4348@noname.redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dPRwb-0001VB-OP
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 07:12:40 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:34749)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dPRwb-0001V1-J7
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 07:12:37 -0400
+Received: by mail-qk0-x241.google.com with SMTP id 91so8097386qkq.1
+	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 04:12:37 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1498454578-18709-1-git-send-email-thuth@redhat.com>
+	<1498454578-18709-3-git-send-email-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c05f2d52-0358-4e64-43be-c3e52684fa55@amsat.org>
+Date: Mon, 26 Jun 2017 08:12:34 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170626082838.GA4348@noname.redhat.com>
-Subject: Re: [Qemu-devel] QCOW2 support for LZO compression
+In-Reply-To: <1498454578-18709-3-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 2/7] Move CONFIG_KVM related definitions
+ to kvm_i386.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,76 +36,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Peter Lieven <pl@kamp.de>, qemu block <qemu-block@nongnu.org>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, den@openvz.org, Laszlo Ersek <lersek@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, Jun 26, 2017 at 10:28:38AM +0200, Kevin Wolf wrote:
-> [ Cc: qemu-devel; don't post to qemu-block only! ]
+On 06/26/2017 02:22 AM, Thomas Huth wrote:
+> pc.h and sysemu/kvm.h are also included from common code (where
+> CONFIG_KVM is not available), so the #defines that depend on CONFIG_KVM
+> should not be declared here to avoid that anybody is using them in a
+> wrong way. Since we're also going to poison CONFIG_KVM for common code,
+> let's move them to kvm_i386.h instead. Most of the dummy definitions
+> from sysemu/kvm.h are also unused since the code that uses them is
+> only compiled for CONFIG_KVM (e.g. target/i386/kvm.c), so the unused
+> defines are also simply dropped here instead of being moved.
 > 
-> Am 26.06.2017 um 09:57 hat Peter Lieven geschrieben:
-> > Hi,
-> > 
-> > I am currently working on optimizing speed for compressed QCOW2
-> > images. We use them for templates and would also like to use them for
-> > backups, but the latter is almost infeasible because using gzip for
-> > compression is horribly slow. I tried to experiment with different
-> > options to deflate, but in the end I think its better to use a
-> > different compression algorithm for cases where speed matters. As we
-> > already have probing for it in configure and as it is widely used I
-> > would like to use LZO for that purpose. I think it would be best to
-> > have a flag to indicate that compressed blocks use LZO compression,
-> > but I would need a little explaination which of the feature fields I
-> > have to use to prevent an older (incompatible) Qemu opening LZO
-> > compressed QCOW2 images.
-> > 
-> > I also have already some numbers. I converted a fresh Debian 9 Install
-> > which has an uncomressed QCOW2 size of 1158 MB with qemu-img to a
-> > compressed QCOW2.  With GZIP compression the result is 356MB whereas
-> > the LZO version is 452MB. However, the current GZIP variant uses 35
-> > seconds for this operation where LZO only needs 4 seconds. I think is
-> > is a good trade in especially when its optional so the user can
-> > choose.
-> > 
-> > What are your thoughts?
-> 
-> We had a related RFC patch by Den earlier this year, which never
-> received many comment and never got out of RFC:
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg04682.html
-> 
-> So he chose a different algorithm (zstd). When I asked, he posted a
-> comparison of algorithms (however a generic one and not measured in the
-> context of qemu) that suggests that LZO would be slightly faster, but
-> have a considerable worse compression ratio with the settings that were
-> benchmarked.
-> 
-> I think it's clear that if there is any serious interest in compression,
-> we'll want to support at least one more algorithm. What we still need to
-> evaluate is which one(s) to take, and whether a simple incompatible flag
-> in the header like in Den's patch is enough or whether we should add a
-> whole new header field for the compression algorithm (like we already
-> have for encryption).
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-We might also want to consider whether doing compression on individual
-qcow2 clusters is the best approach for desired usage scenarios, as
-compared to adding a general purpose compression block driver in between
-the qcow2 driver and the file driver. eg akin to just running 'gzip' over
-the entire qcow2 file. The relatively small size of qcow2 clusters limits
-the effectiveness of all compression algorithms we might choose between.
-By adding a separate compression driver below qcow2, we can choose a much
-larger compression block size, independant of qcow2 cluster size.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Taking a random disk image I have with 1 GB of data. If I tell 'xz' to
-compress using 65 KB block sizes (to simulate compression attained if
-compressing individual qcow2 clusters in isolation), then I get a file
-124 MB in size, which is barely better than that attained with qcow2's
-built-in gzip compression. If I tell 'xz' to compress with 16 MB block
-sizes though, the output is 114 MB in size, which is a massive win over
-gzip.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> ---
+>   hw/i386/pc_q35.c       |  1 +
+>   include/hw/i386/pc.h   | 13 -------------
+>   include/sysemu/kvm.h   | 15 ---------------
+>   target/i386/kvm_i386.h | 23 +++++++++++++++++++++++
+>   4 files changed, 24 insertions(+), 28 deletions(-)
+> 
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index 1523ef3..8f696b7 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -36,6 +36,7 @@
+>   #include "hw/timer/mc146818rtc.h"
+>   #include "hw/xen/xen.h"
+>   #include "sysemu/kvm.h"
+> +#include "kvm_i386.h"
+>   #include "hw/kvm/clock.h"
+>   #include "hw/pci-host/q35.h"
+>   #include "exec/address-spaces.h"
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index 233216a..f48d167 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -20,19 +20,6 @@
+>   
+>   #define HPET_INTCAP "hpet-intcap"
+>   
+> -#ifdef CONFIG_KVM
+> -#define kvm_pit_in_kernel() \
+> -    (kvm_irqchip_in_kernel() && !kvm_irqchip_is_split())
+> -#define kvm_pic_in_kernel()  \
+> -    (kvm_irqchip_in_kernel() && !kvm_irqchip_is_split())
+> -#define kvm_ioapic_in_kernel() \
+> -    (kvm_irqchip_in_kernel() && !kvm_irqchip_is_split())
+> -#else
+> -#define kvm_pit_in_kernel()      0
+> -#define kvm_pic_in_kernel()      0
+> -#define kvm_ioapic_in_kernel()   0
+> -#endif
+> -
+>   /**
+>    * PCMachineState:
+>    * @acpi_dev: link to ACPI PM device that performs ACPI hotplug handling
+> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+> index 1e91613..ca40b6e 100644
+> --- a/include/sysemu/kvm.h
+> +++ b/include/sysemu/kvm.h
+> @@ -22,21 +22,6 @@
+>   #ifdef CONFIG_KVM
+>   #include <linux/kvm.h>
+>   #include <linux/kvm_para.h>
+> -#else
+> -/* These constants must never be used at runtime if kvm_enabled() is false.
+> - * They exist so we don't need #ifdefs around KVM-specific code that already
+> - * checks kvm_enabled() properly.
+> - */
+> -#define KVM_CPUID_SIGNATURE      0
+> -#define KVM_CPUID_FEATURES       0
+> -#define KVM_FEATURE_CLOCKSOURCE  0
+> -#define KVM_FEATURE_NOP_IO_DELAY 0
+> -#define KVM_FEATURE_MMU_OP       0
+> -#define KVM_FEATURE_CLOCKSOURCE2 0
+> -#define KVM_FEATURE_ASYNC_PF     0
+> -#define KVM_FEATURE_STEAL_TIME   0
+> -#define KVM_FEATURE_PV_EOI       0
+> -#define KVM_FEATURE_CLOCKSOURCE_STABLE_BIT 0
+>   #endif
+>   
+>   extern bool kvm_allowed;
+> diff --git a/target/i386/kvm_i386.h b/target/i386/kvm_i386.h
+> index bfce427..1de9876 100644
+> --- a/target/i386/kvm_i386.h
+> +++ b/target/i386/kvm_i386.h
+> @@ -15,6 +15,29 @@
+>   
+>   #define kvm_apic_in_kernel() (kvm_irqchip_in_kernel())
+>   
+> +#ifdef CONFIG_KVM
+> +
+> +#define kvm_pit_in_kernel() \
+> +    (kvm_irqchip_in_kernel() && !kvm_irqchip_is_split())
+> +#define kvm_pic_in_kernel()  \
+> +    (kvm_irqchip_in_kernel() && !kvm_irqchip_is_split())
+> +#define kvm_ioapic_in_kernel() \
+> +    (kvm_irqchip_in_kernel() && !kvm_irqchip_is_split())
+> +
+> +#else
+> +
+> +#define kvm_pit_in_kernel()      0
+> +#define kvm_pic_in_kernel()      0
+> +#define kvm_ioapic_in_kernel()   0
+> +
+> +/* These constants must never be used at runtime if kvm_enabled() is false.
+> + * They exist so we don't need #ifdefs around KVM-specific code that already
+> + * checks kvm_enabled() properly.
+> + */
+> +#define KVM_CPUID_FEATURES       0
+> +
+> +#endif  /* CONFIG_KVM */
+> +
+>   bool kvm_allows_irq0_override(void);
+>   bool kvm_has_smm(void);
+>   bool kvm_has_adjust_clock_stable(void);
+> 
