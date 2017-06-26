@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jpmenil@gmail.com>) id 1dPOYs-0001vt-Eu
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 03:35:55 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dPOrJ-0006GG-Aw
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 03:54:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jpmenil@gmail.com>) id 1dPOYo-00043b-Am
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 03:35:54 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:36300)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jpmenil@gmail.com>) id 1dPOYn-00041e-Ud
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 03:35:50 -0400
-Received: by mail-wr0-x242.google.com with SMTP id 77so28471849wrb.3
-	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 00:35:47 -0700 (PDT)
-Reply-To: jpmenil@gmail.com
-References: <d2e8cf65-ea3d-7db2-9382-a063daf1168a@gmail.com>
-	<20170605050423-mutt-send-email-mst@kernel.org>
-	<20170606024211-mutt-send-email-mst@kernel.org>
-	<CAOTcU=u_HSMQiwDF3Snv5P8mT-b_Aepeb=Z9gbLd1j=2P+Yy+A@mail.gmail.com>
-	<20170622215125-mutt-send-email-mst@kernel.org>
-	<4f6d4342-8476-882e-e7a8-b3f0ebd20d95@redhat.com>
-	<CAM_iQpXhW___-iP3kdv9MJcW=hroyp2SuMzAZdx3KCpc9-W76g@mail.gmail.com>
-	<9327ebf9-59db-f34e-b945-ef381ee95315@redhat.com>
-From: Jean-Philippe Menil <jpmenil@gmail.com>
-Message-ID: <f91048e7-5567-cdf8-fd98-3077ca7ac9a3@gmail.com>
-Date: Mon, 26 Jun 2017 09:35:42 +0200
+	(envelope-from <eric.auger@redhat.com>) id 1dPOrH-0004ir-R7
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 03:54:57 -0400
+References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
+	<AM5PR0401MB2545AFD256A96420ACC44CD89ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<14c83c14-1e7e-f142-77b0-fa8c873e2d41@redhat.com>
+	<AM5PR0401MB2545C0E76C4BE6F82FE376D09ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<6f22079e-4b4b-6476-77be-51ec83104c0d@redhat.com>
+	<AM5PR0401MB25459FDAA8C9AFA52503AAE99AC40@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <c80977c4-1955-4e9d-3fc8-4d884562fd28@redhat.com>
+Date: Mon, 26 Jun 2017 09:54:35 +0200
 MIME-Version: 1.0
-In-Reply-To: <9327ebf9-59db-f34e-b945-ef381ee95315@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] BUG: KASAN: use-after-free in free_old_xmit_skbs
+In-Reply-To: <AM5PR0401MB25459FDAA8C9AFA52503AAE99AC40@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v2 0/8] VIRTIO-IOMMU device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,106 +27,224 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, Cong Wang <xiyou.wangcong@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Linux Kernel Network Developers <netdev@vger.kernel.org>, John Fastabend <john.fastabend@gmail.com>, virtualization@lists.linux-foundation.org, qemu-devel Developers <qemu-devel@nongnu.org>
+To: Bharat Bhushan <bharat.bhushan@nxp.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>
+Cc: "wei@redhat.com" <wei@redhat.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
 
-On 06/26/2017 04:50 AM, Jason Wang wrote:
+Hi Bharat,
+
+On 19/06/2017 09:54, Bharat Bhushan wrote:
+> Hi Eric,
 > 
+> I started added replay in virtio-iommu and came across how MSI interrupts with work with VFIO. 
+> I understand that on intel this works differently but vsmmu will have same requirement. 
+> kvm-msi-irq-route are added using the msi-address to be translated by viommu and not the final translated address.
+> While currently the irqfd framework does not know about emulated iommus (virtio-iommu, vsmmuv3/vintel-iommu).
+> So in my view we have following options:
+> - Programming with translated address when setting up kvm-msi-irq-route
+> - Route the interrupts via QEMU, which is bad from performance
+> - vhost-virtio-iommu may solve the problem in long term
+
+Sorry for the delay. With regard to the vsmmuv3/vfio integration I think
+we need to use the guest physical address otherwise the MSI address will
+not be recognized as an MSI doorbell.
+
+Also the fact on ARM we map the MSI doorbell causes an assert in
+vfio_get_vaddr() as the vITS doorbell is not a RAM region. We will need
+to handle this specifically.
+
+Besides I have not looked specifically at the virtio-iommu/vfio
+integration yet.
+
+Thanks
+
+Eric
 > 
-> On 2017年06月24日 06:32, Cong Wang wrote:
->> On Fri, Jun 23, 2017 at 1:43 AM, Jason Wang <jasowang@redhat.com> wrote:
->>>
->>> On 2017年06月23日 02:53, Michael S. Tsirkin wrote:
->>>> On Thu, Jun 22, 2017 at 08:15:58AM +0200, jean-philippe menil wrote:
->>>>> Hi Michael,
->>>>>
->>>>> from what i see, the race appear when we hit virtnet_reset in
->>>>> virtnet_xdp_set.
->>>>> virtnet_reset
->>>>>     _remove_vq_common
->>>>>       virtnet_del_vqs
->>>>>         virtnet_free_queues
->>>>>           kfree(vi->sq)
->>>>> when the xdp program (with two instances of the program to trigger it
->>>>> faster)
->>>>> is added or removed.
->>>>>
->>>>> It's easily repeatable, with 2 cpus and 4 queues on the qemu command
->>>>> line,
->>>>> running the xdp_ttl tool from Jesper.
->>>>>
->>>>> For now, i'm able to continue my qualification, testing if xdp_qp 
->>>>> is not
->>>>> null,
->>>>> but do not seem to be a sustainable trick.
->>>>> if (xdp_qp && vi->xdp_queues_pairs != xdp_qp)
->>>>>
->>>>> Maybe it will be more clear to you with theses informations.
->>>>>
->>>>> Best regards.
->>>>>
->>>>> Jean-Philippe
->>>>
->>>> I'm pretty clear about the issue here, I was trying to figure out a 
->>>> fix.
->>>> Jason, any thoughts?
->>>>
->>>>
->>> Hi Jean:
->>>
->>> Does the following fix this issue? (I can't reproduce it locally through
->>> xdp_ttl)
->> It is tricky here.
->>
->>  From my understanding of the code base, the tx_lock is not sufficient
->> here, because in virtnet_del_vqs() all vqs are deleted and one vp
->> maps to one txq.
->>
->> I am afraid you have to add a spinlock somewhere to serialized
->> free_old_xmit_skbs() vs. vring_del_virtqueue(). As you can see
->> they are in different layers, so it is hard to figure out where to add
->> it...
->>
->> Also, make sure we don't sleep inside the spinlock, I see a
->> synchronize_net().
-> 
-> Looks like I miss something. I thought free_old_xmit_skbs() were 
-> serialized in this case since we disable all tx queues after 
-> netif_tx_unlock_bh()?
-> 
-> Jean:
-> 
-> I thought this could be easily reproduced by e.g produce some traffic 
-> and in the same time try to attach an xdp program. But looks not. How do 
-> you trigger this? What's your qemu command line for this?
+> Is there any other better option I am missing?
 > 
 > Thanks
-
-Hi Jason,
-
-this is how i trigger the bug:
-- on the guest, tcpdump on on the interface
-- on the guest, run iperf against the host
-- on the guest, cat /sys/kernel/debug/tracing/trace_pipe
-- on the guest, run one or two instances of xdp_ttl compiled with DEBUG 
-uncommented, that i start stop, until i trigger the bug.
-
-qemu command line is as follow:
-
-qemu-system-x86_64 -name ubuntu --enable-kvm -machine pc,accel=kvm -smp 
-2 -drive file=/dev/LocalDisk/ubuntu,if=virtio,format=raw -m 2048 -rtc 
-base=localtime,clock=host -usbdevice tablet --balloon virtio -netdev 
-tap,id=ubuntu-0,ifname=ubuntu-0,script=/home/jenfi/WORK/jp/qemu/if-up,downscript=/home/jenfi/WORK/jp/qemu/if-down,vhost=on,queues=4 
--device 
-virtio-net-pci,netdev=ubuntu-0,mac=de:ad:be:ef:01:03,mq=on,guest_tso4=off,guest_tso6=off,guest_ecn=off,guest_ufo=off,vectors=2 
--vnc 127.0.0.1:3 -nographic -serial 
-file:/home/jenfi/WORK/jp/qemu/ubuntu.out -monitor 
-unix:/home/jenfi/WORK/jp/qemu/ubuntu.sock,server,nowait
-
-Notice, the smp 2, queues to 4 and vectors to 2.
-Seem that if fogot to mention that in the beginning of this thread, 
-sorry for that.
-
-Best regards.
-
-Jean-Philippe
+> -Bharat
+> 
+>> -----Original Message-----
+>> From: Auger Eric [mailto:eric.auger@redhat.com]
+>> Sent: Friday, June 09, 2017 5:24 PM
+>> To: Bharat Bhushan <bharat.bhushan@nxp.com>;
+>> eric.auger.pro@gmail.com; peter.maydell@linaro.org;
+>> alex.williamson@redhat.com; mst@redhat.com; qemu-arm@nongnu.org;
+>> qemu-devel@nongnu.org; jean-philippe.brucker@arm.com
+>> Cc: wei@redhat.com; kevin.tian@intel.com; marc.zyngier@arm.com;
+>> tn@semihalf.com; will.deacon@arm.com; drjones@redhat.com;
+>> robin.murphy@arm.com; christoffer.dall@linaro.org
+>> Subject: Re: [Qemu-devel] [RFC v2 0/8] VIRTIO-IOMMU device
+>>
+>> Hi Bharat,
+>>
+>> On 09/06/2017 13:30, Bharat Bhushan wrote:
+>>> Hi Eric,
+>>>
+>>>> -----Original Message-----
+>>>> From: Auger Eric [mailto:eric.auger@redhat.com]
+>>>> Sent: Friday, June 09, 2017 12:14 PM
+>>>> To: Bharat Bhushan <bharat.bhushan@nxp.com>;
+>>>> eric.auger.pro@gmail.com; peter.maydell@linaro.org;
+>>>> alex.williamson@redhat.com; mst@redhat.com; qemu-arm@nongnu.org;
+>>>> qemu-devel@nongnu.org; jean-philippe.brucker@arm.com
+>>>> Cc: will.deacon@arm.com; robin.murphy@arm.com;
+>> kevin.tian@intel.com;
+>>>> marc.zyngier@arm.com; christoffer.dall@linaro.org;
+>>>> drjones@redhat.com; wei@redhat.com; tn@semihalf.com
+>>>> Subject: Re: [RFC v2 0/8] VIRTIO-IOMMU device
+>>>>
+>>>> Hi Bharat,
+>>>>
+>>>> On 09/06/2017 08:16, Bharat Bhushan wrote:
+>>>>> Hi Eric,
+>>>>>
+>>>>>> -----Original Message-----
+>>>>>> From: Eric Auger [mailto:eric.auger@redhat.com]
+>>>>>> Sent: Wednesday, June 07, 2017 9:31 PM
+>>>>>> To: eric.auger.pro@gmail.com; eric.auger@redhat.com;
+>>>>>> peter.maydell@linaro.org; alex.williamson@redhat.com;
+>>>> mst@redhat.com;
+>>>>>> qemu-arm@nongnu.org; qemu-devel@nongnu.org; jean-
+>>>>>> philippe.brucker@arm.com
+>>>>>> Cc: will.deacon@arm.com; robin.murphy@arm.com;
+>>>> kevin.tian@intel.com;
+>>>>>> marc.zyngier@arm.com; christoffer.dall@linaro.org;
+>>>>>> drjones@redhat.com; wei@redhat.com; tn@semihalf.com; Bharat
+>>>> Bhushan
+>>>>>> <bharat.bhushan@nxp.com>
+>>>>>> Subject: [RFC v2 0/8] VIRTIO-IOMMU device
+>>>>>>
+>>>>>> This series implements the virtio-iommu device. This is a proof of
+>>>>>> concept based on the virtio-iommu specification written by
+>>>>>> Jean-Philippe
+>>>> Brucker [1].
+>>>>>> This was tested with a guest using the virtio-iommu driver [2] and
+>>>>>> exposed with a virtio-net-pci using dma ops.
+>>>>>>
+>>>>>> The device gets instantiated using the "-device virtio-iommu-device"
+>>>>>> option. It currently works with ARM virt machine only as the
+>>>>>> machine must handle the dt binding between the virtio-mmio "iommu"
+>>>>>> node and the PCI host bridge node. ACPI booting is not yet supported.
+>>>>>>
+>>>>>> This should allow to start some benchmarking activities against
+>>>>>> pure emulated IOMMU (especially ARM SMMU).
+>>>>>
+>>>>> I am testing this on ARM64 and see below continuous error prints:
+>>>>>
+>>>>> 	virtio_iommu_translate sid=8 is not known!!
+>>>>> 	virtio_iommu_translate sid=8 is not known!!
+>>>>> 	virtio_iommu_translate sid=8 is not known!!
+>>>>> 	virtio_iommu_translate sid=8 is not known!!
+>>>>> 	virtio_iommu_translate sid=8 is not known!!
+>>>>> 	virtio_iommu_translate sid=8 is not known!!
+>>>>> 	virtio_iommu_translate sid=8 is not known!!
+>>>>> 	virtio_iommu_translate sid=8 is not known!!
+>>>>> 	virtio_iommu_translate sid=8 is not known!!
+>>>>> 	virtio_iommu_translate sid=8 is not known!!
+>>>>>
+>>>>>
+>>>>> Also in guest I do not see device-tree node with virtio-iommu.
+>>>> do you mean the virtio-mmio with #iommu-cells property?
+>>>>
+>>>> This one is created statically by virt machine. I would be surprised
+>>>> if it were not there. Are you using the virt = virt2.10 machine.
+>>>> Machines before do not support its instantiation.
+>>>>
+>>>> Please can you add a printf in hw/arm/virt.c create_virtio_mmio() at
+>>>> the moment when this node is created. Also you can add a printf in
+>>>> bind_virtio_iommu_device() to make sure the binding with the PCI host
+>>>> bridge is added on machine init done.
+>>>>
+>>>> Also worth to check, CONFIG_VIRTIO_IOMMU=y on guest side.
+>>>
+>>> It works on my side.
+>> Great.
+>>
+>>  The driver config was disabled and also I was using guest kernel which was
+>> not have deferred-probing.
+>> Yes I did not mention in my cover letter the guest I have been using is based
+>> on Jean-Philippe's branch, featuring deferred IOMMU probing. I I have not
+>> tried yet with an upstream guest.
+>>  Now after fixing it works on my side
+>>> I placed some prints to see dma-map are mapping regions in virtio-iommu,
+>> it uses emulated iommu.
+>>>
+>>> I will continue to add VFIO support now on this and more testing !!
+>>
+>> OK. I will do the VFIO integration first on the vsmmuv3 device as I already
+>> prepared the VFIO replay and hopefully we will sync ;-)
+>>
+>> Thanks
+>>
+>> Eric
+>>>
+>>> Thanks
+>>> -Bharat
+>>>
+>>>>
+>>>> Thanks
+>>>>
+>>>> Eric
+>>>>
+>>>>> I am using qemu-tree you mentioned below and iommu-driver patches
+>>>> published by Jean-P.
+>>>>> Qemu command line have additional ""-device virtio-iommu-device".
+>>>>> What
+>>>> I am missing ?
+>>>>
+>>>>
+>>>>>
+>>>>> Thanks
+>>>>> -Bharat
+>>>>>
+>>>>>>
+>>>>>> Best Regards
+>>>>>>
+>>>>>> Eric
+>>>>>>
+>>>>>> This series can be found at:
+>>>>>> https://github.com/eauger/qemu/tree/virtio-iommu-rfcv2
+>>>>>>
+>>>>>> References:
+>>>>>> [1] [RFC 0/3] virtio-iommu: a paravirtualized IOMMU, [2] [RFC PATCH
+>>>>>> linux]
+>>>>>> iommu: Add virtio-iommu driver [3] [RFC PATCH kvmtool 00/15] Add
+>>>>>> virtio- iommu
+>>>>>>
+>>>>>> History:
+>>>>>> v1 -> v2:
+>>>>>> - fix redifinition of viommu_as typedef
+>>>>>>
+>>>>>> Eric Auger (8):
+>>>>>>   update-linux-headers: import virtio_iommu.h
+>>>>>>   linux-headers: Update for virtio-iommu
+>>>>>>   virtio_iommu: add skeleton
+>>>>>>   virtio-iommu: Decode the command payload
+>>>>>>   virtio_iommu: Add the iommu regions
+>>>>>>   virtio-iommu: Implement the translation and commands
+>>>>>>   hw/arm/virt: Add 2.10 machine type
+>>>>>>   hw/arm/virt: Add virtio-iommu the virt board
+>>>>>>
+>>>>>>  hw/arm/virt.c                                 | 116 ++++-
+>>>>>>  hw/virtio/Makefile.objs                       |   1 +
+>>>>>>  hw/virtio/trace-events                        |  14 +
+>>>>>>  hw/virtio/virtio-iommu.c                      | 623
+>>>> ++++++++++++++++++++++++++
+>>>>>>  include/hw/arm/virt.h                         |   5 +
+>>>>>>  include/hw/virtio/virtio-iommu.h              |  60 +++
+>>>>>>  include/standard-headers/linux/virtio_ids.h   |   1 +
+>>>>>>  include/standard-headers/linux/virtio_iommu.h | 142 ++++++
+>>>>>>  linux-headers/linux/virtio_iommu.h            |   1 +
+>>>>>>  scripts/update-linux-headers.sh               |   3 +
+>>>>>>  10 files changed, 957 insertions(+), 9 deletions(-)  create mode
+>>>>>> 100644 hw/virtio/virtio-iommu.c  create mode 100644
+>>>>>> include/hw/virtio/virtio- iommu.h  create mode 100644
+>>>>>> include/standard- headers/linux/virtio_iommu.h  create mode 100644
+>>>>>> linux-headers/linux/virtio_iommu.h
+>>>>>>
+>>>>>> --
+>>>>>> 2.5.5
+>>>>>
+>>>
+> 
