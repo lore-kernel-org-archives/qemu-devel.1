@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50201)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dPRxY-0003c8-Hy
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 07:13:37 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dPS53-0005jA-VM
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 07:21:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dPRxV-00027p-Ey
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 07:13:36 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:35791)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dPRxV-00027V-B4
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 07:13:33 -0400
-Received: by mail-qk0-x243.google.com with SMTP id 16so13977592qkg.2
-	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 04:13:33 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1498454578-18709-1-git-send-email-thuth@redhat.com>
-	<1498454578-18709-8-git-send-email-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <25f0004b-fab9-c510-759a-bf9180f6f0fd@amsat.org>
-Date: Mon, 26 Jun 2017 08:13:30 -0300
+	(envelope-from <kwolf@redhat.com>) id 1dPS52-0008DH-VD
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 07:21:21 -0400
+Date: Mon, 26 Jun 2017 13:21:12 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170626112112.GC4348@noname.redhat.com>
+References: <0f83a15d-66b0-36aa-e5a4-d03cd37757c9@kamp.de>
+	<20170626082838.GA4348@noname.redhat.com>
+	<0e6586f9-85eb-efcd-4825-20066a7c869a@kamp.de>
+	<20170626095719.GB4348@noname.redhat.com>
+	<b82ab934-ddc3-2d50-09cf-764f2165f2c8@kamp.de>
 MIME-Version: 1.0
-In-Reply-To: <1498454578-18709-8-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 7/7] hw/misc/edu: Compile the edu device
- as common object
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b82ab934-ddc3-2d50-09cf-764f2165f2c8@kamp.de>
+Subject: Re: [Qemu-devel] QCOW2 support for LZO compression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,38 +26,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Lieven <pl@kamp.de>
+Cc: Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Laszlo Ersek <lersek@redhat.com>, qemu block <qemu-block@nongnu.org>, den@openvz.org, qemu-devel@nongnu.org
 
-On 06/26/2017 02:22 AM, Thomas Huth wrote:
-> edu.c does not contain any target-specific code, so we can put
-> it into common-obj-y to compile it only once for all targets.
+Am 26.06.2017 um 12:08 hat Peter Lieven geschrieben:
+> Am 26.06.2017 um 11:57 schrieb Kevin Wolf:
+> >Am 26.06.2017 um 11:20 hat Peter Lieven geschrieben:
+> >>>So he chose a different algorithm (zstd). When I asked, he posted a
+> >>>comparison of algorithms (however a generic one and not measured in the
+> >>>context of qemu) that suggests that LZO would be slightly faster, but
+> >>>have a considerable worse compression ratio with the settings that were
+> >>>benchmarked.
+> >>My idea to choose LZO was that it is widely available and available in
+> >>any distro you can think of. We already have probing for it in configure.
+> >>My concern with ZSTD would be that it seems there are no packages
+> >>available for most distros and that it seems to be multi-threaded. I don't
+> >>know if this will cause any trouble?
+> >The availability and that we already link against LZO is a good point. I
+> >think we want to avoid a situation where compressed qcow2 files can't be
+> >read by binaries of popular distributions - after all, downloadable
+> >images are an important use case for compressed images.
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> As long as the default remains gzip I don't see any issues. If you choose
+> a different algorithm, you should know what you are doing.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+If we add a better compression algorithm, then it's clear to me that the
+goal is to make it the default in a year or two.
 
-> ---
->   hw/misc/Makefile.objs | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+> >>>I think it's clear that if there is any serious interest in compression,
+> >>>we'll want to support at least one more algorithm. What we still need to
+> >>>evaluate is which one(s) to take, and whether a simple incompatible flag
+> >>>in the header like in Den's patch is enough or whether we should add a
+> >>>whole new header field for the compression algorithm (like we already
+> >>>have for encryption).
+> >> From my side there clearly is interest in optimizing the compression. Its
+> >>even possible to speed up zlib by 3-4x times by choosing other parameters
+> >>for deflate which unfortunately are not compatible with our inflate settings.
+> >>
+> >>I don't know if its worth creating a new header field. Even if we spent to bits
+> >>in the end (one for LZO and one for ZSDT). I think this wouldn't hurt. However,
+> >>there are likely to pop up new compression algorithms in the future and
+> >>a header would be more flexible.
+> >That we could just use different parameters is an important hint that
+> >maybe we don't just need bits to select an algorithm, but also some
+> >space for parameters for the selected algorithm. In this case I think we
+> >need a header change anyway.
 > 
-> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-> index 2019846..7fc4e41 100644
-> --- a/hw/misc/Makefile.objs
-> +++ b/hw/misc/Makefile.objs
-> @@ -6,6 +6,7 @@ common-obj-$(CONFIG_ISA_DEBUG) += debugexit.o
->   common-obj-$(CONFIG_SGA) += sga.o
->   common-obj-$(CONFIG_ISA_TESTDEV) += pc-testdev.o
->   common-obj-$(CONFIG_PCI_TESTDEV) += pci-testdev.o
-> +common-obj-$(CONFIG_EDU) += edu.o
->   
->   common-obj-y += unimp.o
->   
-> @@ -53,7 +54,6 @@ obj-$(CONFIG_MIPS_CPS) += mips_cpc.o
->   obj-$(CONFIG_MIPS_ITU) += mips_itu.o
->   
->   obj-$(CONFIG_PVPANIC) += pvpanic.o
-> -obj-$(CONFIG_EDU) += edu.o
->   obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
->   obj-$(CONFIG_AUX) += auxbus.o
->   obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
+> The issue is, you don't know in advance how much space will be needed
+> for the paramters.  Maybe it would be simpler to have different
+> settings for a compression algorithm threated as different algorithms.
+> Like zstd-fast, zstd, zstd-slow, gzip, lzo, lzo-slow etc.
+
+Yes, how much space is needed for parameters depends on the algorithm.
+Normally, when adding an incompatible feature, you would put the new
+options inside the main header. However, nothing stops us from using a
+header extension instead like we would with compatible features.
+
+So I think this is what we could do:
+
+ * Add a header extension type per algorithm that contains the
+   parameters that are needed for this parameter
+
+ * Add a header field that selects the compression algorithm (e.g. a
+   32 bit field containing the matching header extension ID). Images
+   that contain compression header extensions that don't match this
+   header field (or images containing the same compression header
+   extension type more than once) are rejected
+
+ * Add an incompatible feature flag that indicates presence of the
+   header field + header extension
+
+> >>I just don't want to make it too complicated and as you pointed out
+> >>compression is not that interesting for most people - maybe due to its
+> >>speed.
+> >In fact, I think it could be the poor integration in qemu. Compressed
+> >images might be more appealing if you couldn't only write compressed
+> >data with special-case operations like 'qemu-img convert', but just give
+> >an option that you want all writes to be compressed and then use it like
+> >any other image.
 > 
+> Then we should start to improve that.
+
+Thanks for volunteering. ;-)
+
+Kevin
