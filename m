@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dPK7e-0005xA-CB
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 22:51:33 -0400
+	(envelope-from <bounces@canonical.com>) id 1dPKGo-0000G2-Lq
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 23:00:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dPK7Z-0007C7-I4
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 22:51:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44740)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dPK7Z-0007As-Bg
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 22:51:25 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 514E180F7B
-	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 02:51:24 +0000 (UTC)
-Date: Mon, 26 Jun 2017 10:51:19 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170626025119.GI3936@pxdev.xzpeter.org>
-References: <1498193206-18007-1-git-send-email-peterx@redhat.com>
-	<1498193206-18007-6-git-send-email-peterx@redhat.com>
-	<20170623221901.GF10776@localhost.localdomain>
+	(envelope-from <bounces@canonical.com>) id 1dPKGl-000194-Lm
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 23:00:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54216)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dPKGl-00018u-FV
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 23:00:55 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dPKGj-0007s4-KG
+	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 03:00:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 646832E8193
+	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 03:00:53 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170623221901.GF10776@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v5 05/10] migration: move
- global_state.optional out
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 26 Jun 2017 02:54:28 -0000
+From: jiangyd <1700380@bugs.launchpad.net>
+Reply-To: Bug 1700380 <1700380@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <149840696740.3624.10086547691536237734.malonedeb@gac.canonical.com>
+Message-Id: <149844566805.2674.11406229740111690730.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1700380] Re: commit snapshot image got Permission
+ denied error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,74 +37,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Fri, Jun 23, 2017 at 07:19:01PM -0300, Eduardo Habkost wrote:
-> On Fri, Jun 23, 2017 at 12:46:41PM +0800, Peter Xu wrote:
-> > Put it into MigrationState then we can use the properties to specify
-> > whether to enable storing global state.
-> > 
-> > Removing global_state_set_optional() since now we can use HW_COMPAT_2_3
-> > for x86/power, and AccelClass.global_props for Xen.
-> > 
-> > Reviewed-by: Juan Quintela <quintela@redhat.com>
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  hw/i386/pc_piix.c                |  1 -
-> >  hw/ppc/spapr.c                   |  1 -
-> >  hw/xen/xen-common.c              | 11 ++++++++++-
-> >  include/hw/compat.h              |  4 ++++
-> >  include/migration/global_state.h |  1 -
-> >  migration/global_state.c         |  9 ++-------
-> >  migration/migration.c            |  7 +++++++
-> >  migration/migration.h            |  6 ++++++
-> >  8 files changed, 29 insertions(+), 11 deletions(-)
-> > 
-> [...]
-> > diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
-> > index d3fa705..9163a0a 100644
-> > --- a/hw/xen/xen-common.c
-> > +++ b/hw/xen/xen-common.c
-> > @@ -139,19 +139,28 @@ static int xen_init(MachineState *ms)
-> >      }
-> >      qemu_add_vm_change_state_handler(xen_change_state_handler, NULL);
-> >  
-> > -    global_state_set_optional();
-> >      savevm_skip_configuration();
-> >      savevm_skip_section_footers();
-> >  
-> >      return 0;
-> >  }
-> >  
-> > +GlobalProperty xen_compat_props[] = {
-> 
-> This can be static.
+v2.9.0 must start the image with full path can commit the snapshot
+changes, <v2.3 no need to.
 
-Yep.
+close this report.
 
-> 
-> > +    {
-> > +        .driver = "migration",
-> > +        .property = "store-global-state",
-> > +        .value = "off",
-> > +    },
-> > +    { .driver = NULL, .property = NULL, .value = NULL },
-> 
-> Normally this is written as:
-> 
->        { /* end of list */ },
+-- =
 
-Let me switch.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1700380
 
-> 
-> > +};
-> > +
-> [...]
-> 
-> I didn't review the rest yet, but it seems to be good.
+Title:
+  commit snapshot image got Permission denied error
 
-Thanks!
+Status in QEMU:
+  New
 
--- 
-Peter Xu
+Bug description:
+  qemu 2.9.0, adm64, start image with -snapshot param, make some changes
+  in the image, then:
+
+  $telnet localhost 7000
+
+  (qemu) commit virtio0
+  'commit' error for 'virtio0': Permission denied
+
+  Nerver met this problem before, commit is ok. I recently compiled
+  v2.9.0, so is there some new param in qemu-qemu-system-x86_64 to avoid
+  commit Permission denied?
+
+  Regards.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1700380/+subscriptions
