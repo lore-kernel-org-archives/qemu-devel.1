@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dPbSF-00073M-ED
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 17:21:56 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dPbY6-0001cY-Qg
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 17:27:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dPbSC-0007eA-52
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 17:21:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:61899)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dPbSB-0007dR-SN
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 17:21:52 -0400
-Date: Tue, 27 Jun 2017 00:21:47 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170627002016-mutt-send-email-mst@kernel.org>
-References: <1498185154-29015-1-git-send-email-wei.w.wang@intel.com>
-	<9c3402b1-961d-b953-ca6c-188b03ed756b@redhat.com>
-	<595093A8.1080902@intel.com>
-	<c4aac325-3775-ab86-eb5f-b951339eafd7@redhat.com>
-	<5950E331.6050409@intel.com>
+	(envelope-from <rth7680@gmail.com>) id 1dPbY4-0002Zq-2m
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 17:27:58 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:35581)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dPbY3-0002Yu-QK
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 17:27:55 -0400
+Received: by mail-qt0-x243.google.com with SMTP id w12so1719836qta.2
+	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 14:27:55 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1497486973-25845-1-git-send-email-cota@braap.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <0b5a4803-350b-b6e1-62a5-dfc500d03df3@twiddle.net>
+Date: Mon, 26 Jun 2017 14:27:51 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <5950E331.6050409@intel.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v3 1/2] virtio-net: enable
- configurable tx queue size
+In-Reply-To: <1497486973-25845-1-git-send-email-cota@braap.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] tcg: consistently access cpu->tb_jmp_cache
+ atomically
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,128 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: Jason Wang <jasowang@redhat.com>, eblake@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, stefanha@gmail.com, armbru@redhat.com, jan.scheurich@ericsson.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, Jun 26, 2017 at 06:34:25PM +0800, Wei Wang wrote:
-> On 06/26/2017 04:05 PM, Jason Wang wrote:
-> >=20
-> >=20
-> > On 2017=E5=B9=B406=E6=9C=8826=E6=97=A5 12:55, Wei Wang wrote:
-> > > On 06/26/2017 11:18 AM, Jason Wang wrote:
-> > > >=20
-> > > > On 2017=E5=B9=B406=E6=9C=8823=E6=97=A5 10:32, Wei Wang wrote:
-> > > > > This patch enables the virtio-net tx queue size to be configura=
-ble
-> > > > > between 256 (the default queue size) and 1024 by the user when =
-the
-> > > > > vhost-user backend is used.
-> > > > >=20
-> > > > > Currently, the maximum tx queue size for other backends is 512 =
-due
-> > > > > to the following limitations:
-> > > > > - QEMU backend: the QEMU backend implementation in some cases m=
-ay
-> > > > > send 1024+1 iovs to writev.
-> > > > > - Vhost_net backend: there are possibilities that the guest sen=
-ds
-> > > > > a vring_desc of memory which corsses a MemoryRegion thereby
-> > > > > generating more than 1024 iovs after translattion from guest-ph=
-ysical
-> > > > > address in the backend.
-> > > > >=20
-> > > > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> > > > > ---
-> > > > >   hw/net/virtio-net.c            | 45
-> > > > > +++++++++++++++++++++++++++++++++---------
-> > > > >   include/hw/virtio/virtio-net.h |  1 +
-> > > > >   2 files changed, 37 insertions(+), 9 deletions(-)
-> > > > >=20
-> > > > > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> > > > > index 91eddaf..d13ca60 100644
-> > > > > --- a/hw/net/virtio-net.c
-> > > > > +++ b/hw/net/virtio-net.c
-> > > > > @@ -34,8 +34,11 @@
-> > > > >     /* previously fixed value */
-> > > > >   #define VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE 256
-> > > > > +
-> > > > > +    /*
-> > > > > +     * Currently, backends other than vhost-user don't
-> > > > > support 1024 queue
-> > > > > +     * size.
-> > > > > +     */
-> > > > > +    if (n->net_conf.tx_queue_size =3D=3D VIRTQUEUE_MAX_SIZE &&
-> > > > > +        nc->peer->info->type !=3D NET_CLIENT_DRIVER_VHOST_USER=
-) {
-> > > > > +        n->net_conf.tx_queue_size =3D VIRTIO_NET_TX_QUEUE_DEFA=
-ULT_SIZE;
-> > > >=20
-> > > > Do we really want assume all vhost-user backend support 1024
-> > > > queue size?
-> > > >=20
-> > >=20
-> > >  Do you know any vhost-user backend implementation that doesn't sup=
-port
-> > > 1024 tx queue size?
-> > >=20
-> > >=20
-> >=20
-> > I don't but the issue is vhost-user uditis an open protocol, there co=
-uld
-> > be even closed source implementation on this. So we can't audit all
-> > kinds of backends.
-> >=20
->=20
-> This is the discussion left before. Here is my thought:
->=20
-> Until now, nobody is officially using 1024 tx queue size, including the
-> unknown
-> vhost-user backend implementation. So, applying this patch won't affect=
- any
-> already deployed products.
->=20
-> If someday, people whose products are based on the unknown vhost-user
-> implementation change to try with 1024 tx queue size and apply this pat=
-ch,
-> and find 1024 doesn't work for them, they can simply set the value to 5=
-12
-> (which
-> is better than the 256 size they were using) or apply the 2nd patch ent=
-itled
-> "VIRTIO_F_MAX_CHAIN_SIZE" to use 1024 queue size.
->=20
-> I didn't see any big issue here. Would you see any issues?
->=20
-> @Michael, what is your opinion?
+On 06/14/2017 05:36 PM, Emilio G. Cota wrote:
+> Some code paths can lead to atomic accesses racing with memset()
+> on cpu->tb_jmp_cache, which can result in torn reads/writes
+> and is undefined behaviour in C11.
+> 
+> These torn accesses are unlikely to show up as bugs, but from code
+> inspection they seem possible. For example, tb_phys_invalidate does:
+>      /* remove the TB from the hash list */
+>      h = tb_jmp_cache_hash_func(tb->pc);
+>      CPU_FOREACH(cpu) {
+>          if (atomic_read(&cpu->tb_jmp_cache[h]) == tb) {
+>              atomic_set(&cpu->tb_jmp_cache[h], NULL);
+>          }
+>      }
+> Here atomic_set might race with a concurrent memset (such as the
+> ones scheduled via "unsafe" async work, e.g. tlb_flush_page) and
+> therefore we might end up with a torn pointer (or who knows what,
+> because we are under undefined behaviour).
+> 
+> This patch converts parallel accesses to cpu->tb_jmp_cache to use
+> atomic primitives, thereby bringing these accesses back to defined
+> behaviour. The price to pay is to potentially execute more instructions
+> when clearing cpu->tb_jmp_cache, but given how infrequently they happen
+> and the small size of the cache, the performance impact I have measured
+> is within noise range when booting debian-arm.
+> 
+> Note that under "safe async" work (e.g. do_tb_flush) we could use memset
+> because no other vcpus are running. However I'm keeping these accesses
+> atomic as well to keep things simple and to avoid confusing analysis
+> tools such as ThreadSanitizer.
+> 
+> Signed-off-by: Emilio G. Cota<cota@braap.org>
+> ---
+>   cputlb.c          |  4 ++--
+>   include/qom/cpu.h | 11 ++++++++++-
+>   qom/cpu.c         |  5 +----
+>   translate-all.c   | 25 ++++++++++++-------------
+>   4 files changed, 25 insertions(+), 20 deletions(-)
 
-Since the default does not change, I think it's fine.
-You need to both have a non-default value and be using
-a backend that does not support the 1024 size.
-Seems unlikely to me.
+Applied, thanks.
 
 
->=20
-> > >=20
-> > > > > +    }
-> > > > > +
-> > > > > +    for (i =3D 0; i < n->max_queues; i++) {
-> > > > > +        virtio_net_add_queue(n, i);
-> > > > > +    }
-> > > >=20
-> > > > Any reason to move virtio_net_add_queue() here?
-> > > >=20
-> > >=20
-> > > Please check the whole init steps.  It was moved here (after
-> > > qemu_new_nic())
-> > > to make sure nc->peer is not NULL.
-> >=20
-> > I don't get here, can't you get peer just from nic_conf.peers?
-> >=20
->=20
-> Correct, nic_conf.peers also works. Thanks.
->=20
-> Best,
-> Wei
->=20
->=20
->=20
+r~
