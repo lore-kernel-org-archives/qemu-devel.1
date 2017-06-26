@@ -1,26 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dPTfS-0004LI-Pr
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 09:03:04 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dPTm9-0007J1-E2
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 09:09:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dPTfN-0003KC-Oj
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 09:03:02 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:52298)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dPTfN-0003Jh-82
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 09:02:57 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <149838022308.6497.2104916050645246693.stgit@frigg.lan>
-	<87bmpbx9r9.fsf@linaro.org>
-Date: Mon, 26 Jun 2017 16:02:47 +0300
-In-Reply-To: <87bmpbx9r9.fsf@linaro.org> ("Alex =?utf-8?Q?Benn=C3=A9e=22's?=
-	message of "Mon, 26 Jun 2017 12:34:50 +0100")
-Message-ID: <8737am9a14.fsf@frigg.lan>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v9 00/26] translate: [tcg] Generic
- translation framework
+	(envelope-from <kwolf@redhat.com>) id 1dPTm8-0006H1-Au
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 09:09:57 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Mon, 26 Jun 2017 15:09:44 +0200
+Message-Id: <1498482584-15826-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL v2 00/60] Block layer patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,195 +17,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-Alex Benn=C3=A9e writes:
+The following changes since commit 931892e8a691a8a4151cc5fe1e13c14294bb28fb:
 
-> Llu=C3=ADs Vilanova <vilanova@ac.upc.edu> writes:
+  Merge remote-tracking branch 'remotes/rth/tags/pull-s390-20170623' into staging (2017-06-23 18:11:48 +0100)
 
->> This series proposes a generic (target-agnostic) instruction translation
->> framework.
->>=20
->> It basically provides a generic main loop for instruction disassembly, w=
-hich
->> calls target-specific functions when necessary. This generalization makes
->> inserting new code in the main loop easier, and helps in keeping all tar=
-gets in
->> synch as to the contents of it.
->>=20
->> This series also paves the way towards adding events to trace guest code
->> execution (BBLs and instructions).
->>=20
->> I've ported i386/x86-64 and arm/aarch64 as an example to see how it fits=
- in the
->> current organization, but will port the rest when this series gets
->> merged.
-
-> I started going through this but I found a number of problems. There are
-> some merge failures against master due to recent changes (moving tcg
-> into accel, the UPDATE/JUMP lockup fixes in ARM). I also ran into a
-> number of compile failures which I've sent some fixup patches to.
-
-> However the series does need to complete a clean compile on all arches
-> (SoftMMU & linux-user) even though the porting to the new framework is
-> partial.
-
-> FWIW you can find my tree with fixups and other attempts to fixup
-> compilation @ :
-
->   https://github.com/stsquad/qemu/tree/review/generic-tcg-v9
-
-I've integrated them and I'm now compiling for all targets to make sure it
-passes.
-
-Thanks a lot,
-  Lluis
+are available in the git repository at:
 
 
->>=20
->> Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
->> ---
->>=20
->> Changes in v9
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>=20
->> * Further increase inter-mail sleep time during sending.
->>=20
->>=20
->> Changes in v8
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>=20
->> * Increase inter-mail sleep time during sending (list keeps refusing som=
-e emails
->> due to an excessive send rate).
->>=20
->>=20
->> Changes in v7
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>=20
->> * Change BreakpointHitType (BH_*) for BreakpointCheckType (BC_*).
->> * Move target-specific translation functions to a struct (TranslatorOps).
->> * Split target-specific changes into multiple patches.
->> * Rebase on edf8bc9842.
->>=20
->>=20
->> Changes in v6
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>=20
->> * Rebase on upstream master (64175afc69).
->> * Reorder fields in DisasContextBase to minimize padding [Richard Hender=
-son].
->>=20
->>=20
->> Changes in v5
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>=20
->> * Remove stray uses of "restrict" keyword.
->>=20
->>=20
->> Changes in v4
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>=20
->> * Document new macro QTAILQ_FOREACH_CONTINUE [Peter Maydell].
->> * Fix coding style errors reported by checkpatch.
->> * Remove use of "restrict" in added functions; it makes older gcc versio=
-ns barf
->> about compilation errors.
->>=20
->>=20
->> Changes in v3
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>=20
->> * Rebase on 0737f32daf.
->>=20
->>=20
->> Changes in v2
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>=20
->> * Port ARM and AARCH64 targets.
->> * Fold single-stepping checks into "max_insns" [Richard Henderson].
->> * Move instruction start marks to target code [Richard Henderson].
->> * Add target hook for TB start.
->> * Check for TCG temporary leaks.
->> * Move instruction disassembly into a target hook.
->> * Make breakpoint_hit() return an enum to accomodate target's needs (ARM=
-).
->>=20
->>=20
->> Llu=C3=ADs Vilanova (26):
->> Pass generic CPUState to gen_intermediate_code()
->> queue: Add macro for incremental traversal
->> cpu-exec: Avoid global variables in icount-related functions
->> target: [tcg] Add generic translation framework
->> target: [tcg] Redefine DISAS_* onto the generic translation framework (D=
-J_*)
->> target: [tcg,i386] Port to DisasContextBase
->> target: [tcg,i386] Refactor init_disas_context
->> target: [tcg,i386] Refactor init_globals
->> target: [tcg,i386] Refactor insn_start
->> target: [tcg,i386] Refactor breakpoint_check
->> target: [tcg,i386] Refactor disas_insn
->> target: [tcg,i386] Refactor tb_stop
->> target: [tcg,i386] Refactor disas_flags
->> target: [tcg,i386] Replace DISAS_* with DJ_*
->> target: [tcg,i386] Port to generic translation framework
->> target: [tcg,arm] Replace DISAS_* with DJ_*
->> target: [tcg,arm] Port to DisasContextBase
->> target: [tcg,arm] Port to init_disas_context
->> target: [tcg,arm] Port to init_globals
->> target: [tcg,arm] Port to tb_start
->> target: [tcg,arm] Port to insn_start
->> target: [tcg,arm] Port to breakpoint_check
->> target: [tcg,arm] Port to disas_insn
->> target: [tcg,arm] Port to tb_stop
->> target: [tcg,arm] Port to disas_flags
->> target: [tcg,arm] Port to generic translation framework
->>=20
->>=20
->> Makefile.target                |    1
->> include/exec/exec-all.h        |   13 +
->> include/exec/gen-icount.h      |    8 -
->> include/exec/translate-block.h |  125 ++++++++++
->> include/qemu/queue.h           |   12 +
->> include/qom/cpu.h              |   22 ++
->> target/alpha/translate.c       |   25 +-
->> target/arm/translate-a64.c     |  312 ++++++++++++-------------
->> target/arm/translate.c         |  503 ++++++++++++++++++++++------------=
-------
->> target/arm/translate.h         |   38 ++-
->> target/cris/translate.c        |   26 +-
->> target/hppa/translate.c        |    6
->> target/i386/translate.c        |  353 +++++++++++++++-------------
->> target/lm32/translate.c        |   36 +--
->> target/m68k/translate.c        |   24 +-
->> target/microblaze/translate.c  |   28 +-
->> target/mips/translate.c        |   41 ++-
->> target/moxie/translate.c       |   16 +
->> target/nios2/translate.c       |    6
->> target/openrisc/translate.c    |   25 +-
->> target/ppc/translate.c         |   21 +-
->> target/ppc/translate_init.c    |   32 +--
->> target/s390x/translate.c       |   22 +-
->> target/sh4/translate.c         |   21 +-
->> target/sparc/translate.c       |   17 +
->> target/tilegx/translate.c      |    9 -
->> target/tricore/translate.c     |   11 -
->> target/unicore32/translate.c   |   26 +-
->> target/xtensa/translate.c      |   39 ++-
->> translate-all.c                |    2
->> translate-block.c              |  185 +++++++++++++++
->> 31 files changed, 1212 insertions(+), 793 deletions(-)
->> create mode 100644 include/exec/translate-block.h
->> create mode 100644 translate-block.c
->>=20
->>=20
->> To: qemu-devel@nongnu.org
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
->> Cc: Richard Henderson <rth@twiddle.net>
->> Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+  git://repo.or.cz/qemu/kevin.git tags/for-upstream
 
+for you to fetch changes up to 704e41ba789ad88158f051eee648d7087beffac7:
 
-> --
-> Alex Benn=C3=A9e
+  Merge remote-tracking branch 'mreitz/tags/pull-block-2017-06-26' into queue-block (2017-06-26 14:57:27 +0200)
+
+v2:
+- Dropped "virtio-pci: use ioeventfd even when KVM is disabled"
+
+----------------------------------------------------------------
+
+Block layer patches
+
+----------------------------------------------------------------
+Alberto Garcia (9):
+      throttle: Update throttle-groups.c documentation
+      qcow2: Remove unused Error variable in do_perform_cow()
+      qcow2: Use unsigned int for both members of Qcow2COWRegion
+      qcow2: Make perform_cow() call do_perform_cow() twice
+      qcow2: Split do_perform_cow() into _read(), _encrypt() and _write()
+      qcow2: Allow reading both COW regions with only one request
+      qcow2: Pass a QEMUIOVector to do_perform_cow_{read,write}()
+      qcow2: Merge the writing of the COW regions with the guest data
+      qcow2: Use offset_into_cluster() and offset_to_l2_index()
+
+Kevin Wolf (37):
+      commit: Fix completion with extra reference
+      qemu-iotests: Allow starting new qemu after cleanup
+      qemu-iotests: Test exiting qemu with running job
+      doc: Document generic -blockdev options
+      doc: Document driver-specific -blockdev options
+      qed: Use bottom half to resume waiting requests
+      qed: Make qed_read_table() synchronous
+      qed: Remove callback from qed_read_table()
+      qed: Remove callback from qed_read_l2_table()
+      qed: Remove callback from qed_find_cluster()
+      qed: Make qed_read_backing_file() synchronous
+      qed: Make qed_copy_from_backing_file() synchronous
+      qed: Remove callback from qed_copy_from_backing_file()
+      qed: Make qed_write_header() synchronous
+      qed: Remove callback from qed_write_header()
+      qed: Make qed_write_table() synchronous
+      qed: Remove GenericCB
+      qed: Remove callback from qed_write_table()
+      qed: Make qed_aio_read_data() synchronous
+      qed: Make qed_aio_write_main() synchronous
+      qed: Inline qed_commit_l2_update()
+      qed: Add return value to qed_aio_write_l1_update()
+      qed: Add return value to qed_aio_write_l2_update()
+      qed: Add return value to qed_aio_write_main()
+      qed: Add return value to qed_aio_write_cow()
+      qed: Add return value to qed_aio_write_inplace/alloc()
+      qed: Add return value to qed_aio_read/write_data()
+      qed: Remove ret argument from qed_aio_next_io()
+      qed: Remove recursion in qed_aio_next_io()
+      qed: Implement .bdrv_co_readv/writev
+      qed: Use CoQueue for serialising allocations
+      qed: Simplify request handling
+      qed: Use a coroutine for need_check_timer
+      qed: Add coroutine_fn to I/O path functions
+      qed: Use bdrv_co_* for coroutine_fns
+      block: Remove bdrv_aio_readv/writev/flush()
+      Merge remote-tracking branch 'mreitz/tags/pull-block-2017-06-26' into queue-block
+
+Manos Pitsidianakis (1):
+      block: change variable names in BlockDriverState
+
+Max Reitz (3):
+      blkdebug: Catch bs->exact_filename overflow
+      blkverify: Catch bs->exact_filename overflow
+      block: Do not strcmp() with NULL uri->scheme
+
+Stefan Hajnoczi (9):
+      block: count bdrv_co_rw_vmstate() requests
+      block: use BDRV_POLL_WHILE() in bdrv_rw_vmstate()
+      migration: avoid recursive AioContext locking in save_vmstate()
+      migration: use bdrv_drain_all_begin/end() instead bdrv_drain_all()
+      migration: hold AioContext lock for loadvm qemu_fclose()
+      qemu-iotests: 068: extract _qemu() function
+      qemu-iotests: 068: use -drive/-device instead of -hda
+      qemu-iotests: 068: test iothread mode
+      qemu-img: don't shadow opts variable in img_dd()
+
+Stephen Bates (1):
+      nvme: Add support for Read Data and Write Data in CMBs.
+
+sochin.jiang (1):
+      fix: avoid an infinite loop or a dangling pointer problem in img_commit
+
+ block/Makefile.objs            |   2 +-
+ block/blkdebug.c               |  46 +--
+ block/blkreplay.c              |   8 +-
+ block/blkverify.c              |  12 +-
+ block/block-backend.c          |  22 +-
+ block/commit.c                 |   7 +
+ block/file-posix.c             |  34 +-
+ block/io.c                     | 240 ++-----------
+ block/iscsi.c                  |  20 +-
+ block/mirror.c                 |   8 +-
+ block/nbd-client.c             |   8 +-
+ block/nbd-client.h             |   4 +-
+ block/nbd.c                    |   6 +-
+ block/nfs.c                    |   2 +-
+ block/qcow2-cluster.c          | 201 ++++++++---
+ block/qcow2.c                  |  94 +++--
+ block/qcow2.h                  |  11 +-
+ block/qed-cluster.c            | 124 +++----
+ block/qed-gencb.c              |  33 --
+ block/qed-table.c              | 261 +++++---------
+ block/qed.c                    | 779 ++++++++++++++++-------------------------
+ block/qed.h                    |  54 +--
+ block/raw-format.c             |   8 +-
+ block/rbd.c                    |   4 +-
+ block/sheepdog.c               |  12 +-
+ block/ssh.c                    |   2 +-
+ block/throttle-groups.c        |   2 +-
+ block/trace-events             |   3 -
+ blockjob.c                     |   4 +-
+ hw/block/nvme.c                |  83 +++--
+ hw/block/nvme.h                |   1 +
+ include/block/block.h          |  16 +-
+ include/block/block_int.h      |   6 +-
+ include/block/blockjob.h       |  18 +
+ include/sysemu/block-backend.h |  20 +-
+ migration/savevm.c             |  32 +-
+ qemu-img.c                     |  29 +-
+ qemu-io-cmds.c                 |  46 +--
+ qemu-options.hx                | 221 ++++++++++--
+ tests/qemu-iotests/068         |  37 +-
+ tests/qemu-iotests/068.out     |  11 +-
+ tests/qemu-iotests/185         | 206 +++++++++++
+ tests/qemu-iotests/185.out     |  59 ++++
+ tests/qemu-iotests/common.qemu |   3 +
+ tests/qemu-iotests/group       |   1 +
+ 45 files changed, 1476 insertions(+), 1324 deletions(-)
+ delete mode 100644 block/qed-gencb.c
+ create mode 100755 tests/qemu-iotests/185
+ create mode 100644 tests/qemu-iotests/185.out
