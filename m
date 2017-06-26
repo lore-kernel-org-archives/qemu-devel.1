@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dPTzu-0002ot-4d
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 09:24:16 -0400
+	(envelope-from <eblake@redhat.com>) id 1dPU06-0002ty-No
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 09:24:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dPTzn-0003A5-My
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 09:24:10 -0400
-Date: Mon, 26 Jun 2017 14:23:59 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170626132359.GA29664@stefanha-x1.localdomain>
-References: <20170623124700.1389-1-el13635@mail.ntua.gr>
-	<20170623124700.1389-2-el13635@mail.ntua.gr>
+	(envelope-from <eblake@redhat.com>) id 1dPU02-0003EH-3J
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 09:24:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43482)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dPU01-0003DF-Pt
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 09:24:18 -0400
+References: <20170615141715.17708-1-sferdjao@redhat.com>
+	<20170615141715.17708-2-sferdjao@redhat.com>
+	<2bb5a8a3-37c9-3dd2-4483-c8a2fed5bb4d@redhat.com>
+	<20170618031516.GN22043@thinpad.lan.raisama.net>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8965c06b-0859-0819-1fc4-d09dd287fec8@redhat.com>
+Date: Mon, 26 Jun 2017 07:23:50 -0600
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="yrj/dFKFPuw6o+aM"
-Content-Disposition: inline
-In-Reply-To: <20170623124700.1389-2-el13635@mail.ntua.gr>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC v3 1/8] block: move
- ThrottleGroup membership to ThrottleGroupMember
+In-Reply-To: <20170618031516.GN22043@thinpad.lan.raisama.net>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="OnpItpkugMiSBUDIiHlS5N0OwTI0M995X"
+Subject: Re: [Qemu-devel] [PATCH 1/3] qemu: add capability for vhost-net
+ busy polling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +31,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>
+To: Eduardo Habkost <ehabkost@redhat.com>, Laine Stump <laine@redhat.com>
+Cc: libvir-list@redhat.com, sferdjao@redhat.com, berrange@redhat.com, Sahid Orentino Ferdjaoui <sahid.ferdjaoui@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--OnpItpkugMiSBUDIiHlS5N0OwTI0M995X
+From: Eric Blake <eblake@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, Laine Stump <laine@redhat.com>
+Cc: libvir-list@redhat.com, sferdjao@redhat.com, berrange@redhat.com,
+ Sahid Orentino Ferdjaoui <sahid.ferdjaoui@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Message-ID: <8965c06b-0859-0819-1fc4-d09dd287fec8@redhat.com>
+Subject: Re: [PATCH 1/3] qemu: add capability for vhost-net busy polling
+References: <20170615141715.17708-1-sferdjao@redhat.com>
+ <20170615141715.17708-2-sferdjao@redhat.com>
+ <2bb5a8a3-37c9-3dd2-4483-c8a2fed5bb4d@redhat.com>
+ <20170618031516.GN22043@thinpad.lan.raisama.net>
+In-Reply-To: <20170618031516.GN22043@thinpad.lan.raisama.net>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 06/17/2017 09:15 PM, Eduardo Habkost wrote:
+> (CCing qemu-devel and the QAPI maintainers.  I have a question
+> about introspection below.)
+>=20
+
+>=20
+> Fortunately, netdev options are modelled in the QAPI schema as
+> union Netdev.  However, 'query-qmp-schema' doesn't seem to
+> include union Netdev because it is not referenced by any QMP
+> command or event.
+
+I've posted patches in the past (qemu 2.6 timeframe, if I recall) that
+changed netdev_add into a fully-advertised interface, but we didn't take
+it then because we weren't sure how to handle the fact that netdev_add
+can currently accept both an integer (1) and a string ("1") as
+identical, and we didn't want to risk breaking clients that passed a
+string when the promoted command would only accept integers.  I guess we
+should revive that.
+
+>=20
+> Markus, Eric, Michael: is there any way libvirt can query the
+> definition of union Netdev from the schema with current QEMU?
+
+Really, we need to promote netdev_add to a full-fledged QMP command.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
---yrj/dFKFPuw6o+aM
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Fri, Jun 23, 2017 at 03:46:53PM +0300, Manos Pitsidianakis wrote:
-> This commit gathers ThrottleGroup membership details from
-> BlockBackendPublic into ThrottleGroupMember and refactors existing code
-> to use the structure.
-
-This summarizes the code change but doesn't explain why it's necessary.
-
-I suggest something like this:
-
-  This patch eliminates the 1:1 relationship between BlockBackend and
-  throttle group state.  Users will be able to create multiple throttle
-  nodes, each with its own throttle group state, in the future.  The
-  throttle group state cannot be per-BlockBackend anymore, it must be
-  per-throttle node.
-
-> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
-> ---
->  block/block-backend.c           |  66 +++++----
->  block/qapi.c                    |   8 +-
->  block/throttle-groups.c         | 304 ++++++++++++++++++++--------------------
->  blockdev.c                      |   4 +-
->  include/block/throttle-groups.h |  15 +-
->  include/qemu/throttle.h         |  26 ++++
->  include/sysemu/block-backend.h  |  20 +--
->  tests/test-throttle.c           |  53 +++----
->  8 files changed, 260 insertions(+), 236 deletions(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---yrj/dFKFPuw6o+aM
+--OnpItpkugMiSBUDIiHlS5N0OwTI0M995X
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBAgAGBQJZUQrvAAoJEJykq7OBq3PI6cIIAIRQ5wn7/NQUwfngpejN6mII
-KRH1gRZjaDzCOcdX6NXaWls0Azm9oBMpcZwGun7x349/6TN7a8FI/BfNR5ju8ePX
-P/LYVsT8WsI2Cu52Vh4RxVZOZFsAiAUZqzsDy1ytiwaHvEB1cRtM2Y+hgE6h6i57
-NTVg2bapVy+0a5R2NXf6RbUD5cd1UazqqLQEr4g01ZnfOGIs1ioLeYJM/MkPz1VE
-G+7aDbwI2J8aLRRTLjYd5EG5sYMlR2sWXdlPQpX32G0u1PTvSFuPHePHhRncG7lu
-bW+u9X0KTDZmEdYbdF5mqUDsXltcbKlnXAdpq3J5Q1gYZL1DHUs6npOYx6pRCyg=
-=Sg0x
+iQEcBAEBCAAGBQJZUQrmAAoJEKeha0olJ0NqAqkIAIUGcjHLnulR+Jh/2MKSLcoy
+pWKo2cG4x//Wju0iFvctF196nj3tppUoJXKBGnBXLokwFVhEqRZQIchWRyMvX6w4
+jAOWiJ0XH5U27MKLoc3CAlQBhJKCfjBGdK+SK4S7HN3RiGYqIOM89EpDKWTEUfKU
+8yq2YHfnHZ+l2H3P87DRKuxs2W13m8inpzlIi5WazcLqAen0qQLo/+ng3uavS3gz
+F0/UsA4zH5/MB6NMGt34EPR6jbj2sG7ZLakiemf1VYXdvaV6VLGi/aam2DWWE8j7
+slI0ix/ZKfrc5CmXhFajEaPkxUk2z4Xl4k7eaJWR4QTGVsB/0gMQX8/wLJeyneo=
+=M01j
 -----END PGP SIGNATURE-----
 
---yrj/dFKFPuw6o+aM--
+--OnpItpkugMiSBUDIiHlS5N0OwTI0M995X--
