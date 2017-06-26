@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <boqun.feng@gmail.com>) id 1dPIiJ-0003op-MG
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 21:21:16 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dPIru-0005sz-OW
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 21:31:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <boqun.feng@gmail.com>) id 1dPIiG-00066t-Fs
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 21:21:15 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:33763)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <boqun.feng@gmail.com>)
-	id 1dPIiG-00066A-7h
-	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 21:21:12 -0400
-Received: by mail-pf0-x243.google.com with SMTP id e199so5358119pfh.0
-	for <qemu-devel@nongnu.org>; Sun, 25 Jun 2017 18:21:10 -0700 (PDT)
-Date: Mon, 26 Jun 2017 09:23:00 +0800
-From: Boqun Feng <boqun.feng@gmail.com>
-Message-ID: <20170626012144.3ucwsxfcchyba3wv@tardis>
-References: <20170621052935.20715-1-boqun.feng@gmail.com>
-	<20170623133814.GE11773@localhost.localdomain>
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dPIrq-0001WV-4K
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 21:31:10 -0400
+Received: from [59.151.112.132] (port=25284 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dPIrp-0001Pp-6R
+	for qemu-devel@nongnu.org; Sun, 25 Jun 2017 21:31:06 -0400
+References: <d60b5927063e257e3414864b1ee6c569ac61b712.1497957189.git.maozy.fnst@cn.fujitsu.com>
+	<971cab75a0b4e011a18de8afb0ed4eedb7810eb6.1498116042.git.maozy.fnst@cn.fujitsu.com>
+	<d2663895-14c6-759b-930f-9f7a295723a7@redhat.com>
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Message-ID: <5224fb14-0b9e-4ec0-6038-1b42b3d725a2@cn.fujitsu.com>
+Date: Mon, 26 Jun 2017 09:30:42 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="imvdfk3gbmm47i6v"
-Content-Disposition: inline
-In-Reply-To: <20170623133814.GE11773@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH] target-i386: add Skylake-Server cpu model
+In-Reply-To: <d2663895-14c6-759b-930f-9f7a295723a7@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 7/9] pci: Convert shpc_init() to Error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,137 +28,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, armbru@redhat.com
 
 
---imvdfk3gbmm47i6v
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 23, 2017 at 10:38:14AM -0300, Eduardo Habkost wrote:
-> On Wed, Jun 21, 2017 at 01:29:34PM +0800, Boqun Feng (Intel) wrote:
-> > Introduce Skylake-Server cpu mode which inherits the features from
-> > Skylake-Client and supports some additional features that are: AVX512,
-> > CWLB and PGPE1GB.
->=20
-> I will fix this to "CLWB" when applying the patch.
->=20
+On 06/23/2017 05:56 PM, Marcel Apfelbaum wrote:
+> On 22/06/2017 11:14, Mao Zhongyi wrote:
+>> In order to propagate error message better, convert shpc_init() to
+>> Error also convert the pci_bridge_dev_initfn() to realize.
+>>
+>> Cc: mst@redhat.com
+>> Cc: marcel@redhat.com
+>> Cc: armbru@redhat.com
+>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+>> ---
+>> v7:
+>> * drop the !local_err assert is really not appropriate,
+>>    now revert it.            [Marcel Apfelbaum]
+>>
+>>   hw/pci-bridge/pci_bridge_dev.c | 14 ++++++--------
+>>   hw/pci/shpc.c                  | 11 +++++------
+>>   hw/pci/slotid_cap.c            | 11 +++++------
+>>   include/hw/pci/shpc.h          |  3 ++-
+>>   include/hw/pci/slotid_cap.h    |  3 ++-
+>>   5 files changed, 20 insertions(+), 22 deletions(-)
+>>
+>> diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
+>> index 5dbd933..4373f1d 100644
+>> --- a/hw/pci-bridge/pci_bridge_dev.c
+>> +++ b/hw/pci-bridge/pci_bridge_dev.c
+>> @@ -49,7 +49,7 @@ struct PCIBridgeDev {
+>>   };
+>>   typedef struct PCIBridgeDev PCIBridgeDev;
+>>   -static int pci_bridge_dev_initfn(PCIDevice *dev)
+>> +static void pci_bridge_dev_realize(PCIDevice *dev, Error **errp)
+>>   {
+>>       PCIBridge *br = PCI_BRIDGE(dev);
+>>       PCIBridgeDev *bridge_dev = PCI_BRIDGE_DEV(dev);
+>> @@ -62,7 +62,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
+>>           dev->config[PCI_INTERRUPT_PIN] = 0x1;
+>>           memory_region_init(&bridge_dev->bar, OBJECT(dev), "shpc-bar",
+>>                              shpc_bar_size(dev));
+>> -        err = shpc_init(dev, &br->sec_bus, &bridge_dev->bar, 0);
+>> +        err = shpc_init(dev, &br->sec_bus, &bridge_dev->bar, 0, errp);
+>>           if (err) {
+>>               goto shpc_error;
+>>           }
+>> @@ -71,7 +71,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
+>>           bridge_dev->msi = ON_OFF_AUTO_OFF;
+>>       }
+>>   -    err = slotid_cap_init(dev, 0, bridge_dev->chassis_nr, 0);
+>> +    err = slotid_cap_init(dev, 0, bridge_dev->chassis_nr, 0, errp);
+>>       if (err) {
+>>           goto slotid_error;
+>>       }
+>> @@ -87,7 +87,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
+>>               /* Can't satisfy user's explicit msi=on request, fail */
+>>               error_append_hint(&local_err, "You have to use msi=auto (default) "
+>>                       "or msi=off with this machine type.\n");
+>> -            error_report_err(local_err);
+>> +            error_propagate(errp, local_err);
+>>               goto msi_error;
+>>           }
+>>           assert(!local_err || bridge_dev->msi == ON_OFF_AUTO_AUTO);
+>> @@ -101,7 +101,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
+>>           pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
+>>                            PCI_BASE_ADDRESS_MEM_TYPE_64, &bridge_dev->bar);
+>>       }
+>> -    return 0;
+>> +    return;
+>>     msi_error:
+>>       slotid_cap_cleanup(dev);
+>> @@ -111,8 +111,6 @@ slotid_error:
+>>       }
+>>   shpc_error:
+>>       pci_bridge_exitfn(dev);
+>> -
+>> -    return err;
+>>   }
+>>     static void pci_bridge_dev_exitfn(PCIDevice *dev)
+>> @@ -216,7 +214,7 @@ static void pci_bridge_dev_class_init(ObjectClass *klass, void *data)
+>>       PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+>>       HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
+>>   -    k->init = pci_bridge_dev_initfn;
+>> +    k->realize = pci_bridge_dev_realize;
+>>       k->exit = pci_bridge_dev_exitfn;
+>>       k->config_write = pci_bridge_dev_write_config;
+>>       k->vendor_id = PCI_VENDOR_ID_REDHAT;
+>> diff --git a/hw/pci/shpc.c b/hw/pci/shpc.c
+>> index d72d5e4..69fc14b 100644
+>> --- a/hw/pci/shpc.c
+>> +++ b/hw/pci/shpc.c
+>> @@ -446,16 +446,14 @@ static void shpc_cap_update_dword(PCIDevice *d)
+>>   }
+>>     /* Add SHPC capability to the config space for the device. */
+>> -static int shpc_cap_add_config(PCIDevice *d)
+>> +static int shpc_cap_add_config(PCIDevice *d, Error **errp)
+>>   {
+>>       uint8_t *config;
+>>       int config_offset;
+>> -    Error *local_err = NULL;
+>>       config_offset = pci_add_capability(d, PCI_CAP_ID_SHPC,
+>>                                          0, SHPC_CAP_LENGTH,
+>> -                                       &local_err);
+>> +                                       errp);
+>>       if (config_offset < 0) {
+>> -        error_report_err(local_err);
+>>           return config_offset;
+>>       }
+>>       config = d->config + config_offset;
+>> @@ -584,13 +582,14 @@ void shpc_device_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
+>>   }
+>>     /* Initialize the SHPC structure in bridge's BAR. */
+>> -int shpc_init(PCIDevice *d, PCIBus *sec_bus, MemoryRegion *bar, unsigned offset)
+>> +int shpc_init(PCIDevice *d, PCIBus *sec_bus, MemoryRegion *bar,
+>> +              unsigned offset, Error **errp)
+>>   {
+>>       int i, ret;
+>>       int nslots = SHPC_MAX_SLOTS; /* TODO: qdev property? */
+>>       SHPCDevice *shpc = d->shpc = g_malloc0(sizeof(*d->shpc));
+>>       shpc->sec_bus = sec_bus;
+>> -    ret = shpc_cap_add_config(d);
+>> +    ret = shpc_cap_add_config(d, errp);
+>>       if (ret) {
+>>           g_free(d->shpc);
+>>           return ret;
+>> diff --git a/hw/pci/slotid_cap.c b/hw/pci/slotid_cap.c
+>> index bdca205..36d021b 100644
+>> --- a/hw/pci/slotid_cap.c
+>> +++ b/hw/pci/slotid_cap.c
+>> @@ -9,14 +9,14 @@
+>>     int slotid_cap_init(PCIDevice *d, int nslots,
+>>                       uint8_t chassis,
+>> -                    unsigned offset)
+>> +                    unsigned offset,
+>> +                    Error **errp)
+>>   {
+>>       int cap;
+>> -    Error *local_err = NULL;
+>>         if (!chassis) {
+>> -        error_report("Bridge chassis not specified. Each bridge is required "
+>> -                     "to be assigned a unique chassis id > 0.");
+>> +        error_setg(errp, "Bridge chassis not specified. Each bridge is required"
+>> +                   " to be assigned a unique chassis id > 0.");
+>>           return -EINVAL;
+>>       }
+>>       if (nslots < 0 || nslots > (PCI_SID_ESR_NSLOTS >> SLOTID_NSLOTS_SHIFT)) {
+>> @@ -25,9 +25,8 @@ int slotid_cap_init(PCIDevice *d, int nslots,
+>>       }
+>>         cap = pci_add_capability(d, PCI_CAP_ID_SLOTID, offset,
+>> -                             SLOTID_CAP_LENGTH, &local_err);
+>> +                             SLOTID_CAP_LENGTH, errp);
+>>       if (cap < 0) {
+>> -        error_report_err(local_err);
+>>           return cap;
+>>       }
+>>       /* We make each chassis unique, this way each bridge is First in Chassis */
+>> diff --git a/include/hw/pci/shpc.h b/include/hw/pci/shpc.h
+>> index 71e836b..ee19fec 100644
+>> --- a/include/hw/pci/shpc.h
+>> +++ b/include/hw/pci/shpc.h
+>> @@ -38,7 +38,8 @@ struct SHPCDevice {
+>>     void shpc_reset(PCIDevice *d);
+>>   int shpc_bar_size(PCIDevice *dev);
+>> -int shpc_init(PCIDevice *dev, PCIBus *sec_bus, MemoryRegion *bar, unsigned off);
+>> +int shpc_init(PCIDevice *dev, PCIBus *sec_bus, MemoryRegion *bar,
+>> +              unsigned off, Error **errp);
+>>   void shpc_cleanup(PCIDevice *dev, MemoryRegion *bar);
+>>   void shpc_free(PCIDevice *dev);
+>>   void shpc_cap_write_config(PCIDevice *d, uint32_t addr, uint32_t val, int len);
+>> diff --git a/include/hw/pci/slotid_cap.h b/include/hw/pci/slotid_cap.h
+>> index 70db047..a777ea0 100644
+>> --- a/include/hw/pci/slotid_cap.h
+>> +++ b/include/hw/pci/slotid_cap.h
+>> @@ -5,7 +5,8 @@
+>>     int slotid_cap_init(PCIDevice *dev, int nslots,
+>>                       uint8_t chassis,
+>> -                    unsigned offset);
+>> +                    unsigned offset,
+>> +                    Error **errp);
+>>   void slotid_cap_cleanup(PCIDevice *dev);
+>>     #endif
+>>
+>
+>
+> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+>
+> Michael might ask you to re-post the whole series.
 
-Oops.. thank you for pointing this out.
+OK, I will. :)
 
-> >=20
-> > Signed-off-by: Boqun Feng (Intel) <boqun.feng@gmail.com>
-> > ---
-> >  target/i386/cpu.c | 42 ++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 42 insertions(+)
-> >=20
-> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > index b2b1d20cee51..1bed722ac2fd 100644
-> > --- a/target/i386/cpu.c
-> > +++ b/target/i386/cpu.c
-> > @@ -1349,6 +1349,48 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
-> >          .model_id =3D "Intel Core Processor (Skylake)",
-> >      },
-> >      {
-> > +        .name =3D "Skylake-Server",
-> > +        .level =3D 0xd,
-> > +        .vendor =3D CPUID_VENDOR_INTEL,
-> > +        .family =3D 6,
-> > +        .model =3D 85,
-> > +        .stepping =3D 4,
-> > +        .features[FEAT_1_EDX] =3D
-> > +            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MM=
-X |
-> > +            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPU=
-ID_MCA |
-> > +            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX=
-8 |
-> > +            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
-> > +            CPUID_DE | CPUID_FP87,
-> > +        .features[FEAT_1_ECX] =3D
-> > +            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
-> > +            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
-> > +            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
-> > +            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
-> > +            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_M=
-OVBE |
-> > +            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
-> > +        .features[FEAT_8000_0001_EDX] =3D
-> > +            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
-> > +            CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
-> > +        .features[FEAT_8000_0001_ECX] =3D
-> > +            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREF=
-ETCH,
-> > +        .features[FEAT_7_0_EBX] =3D
-> > +            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
-> > +            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SME=
-P |
-> > +            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_IN=
-VPCID |
-> > +            CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_A=
-DX |
-> > +            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_MPX | CPUID_7_0_EBX_CLW=
-B |
-> > +            CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
-> > +            CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
-> > +            CPUID_7_0_EBX_AVX512VL,
->=20
-> I believe we should add the same comment about XSAVES from
-> Skylake-Cliente here, for consistency:
->=20
->         /* Missing: XSAVES (not supported by some Linux versions,
->          * including v4.1 to v4.6).
->          * KVM doesn't yet expose any XSAVES state save component,
->          * and the only one defined in Skylake (processor tracing)
->          * probably will block migration anyway.
->          */
->=20
+Thanks,
+Mao
 
-Make sense.
 
-> I can add it when applying the patch.
->=20
-
-Please do, thanks! Or you prefer that I send out a V2 with typo fixed
-and comment added?
-
-Regards,
-Boqun
-
-> > +        .features[FEAT_XSAVE] =3D
-> > +            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-> > +            CPUID_XSAVE_XGETBV1,
-> > +        .features[FEAT_6_EAX] =3D
-> > +            CPUID_6_EAX_ARAT,
-> > +        .xlevel =3D 0x80000008,
-> > +        .model_id =3D "Intel Xeon Processor (Skylake)",
-> > +    },
-> > +    {
-> >          .name =3D "Opteron_G1",
-> >          .level =3D 5,
-> >          .vendor =3D CPUID_VENDOR_AMD,
-> > --=20
-> > 2.13.1
-> >=20
->=20
-> --=20
-> Eduardo
-
---imvdfk3gbmm47i6v
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEj5IosQTPz8XU1wRHSXnow7UH+rgFAllQYfEACgkQSXnow7UH
-+rhFJQf/aJT9LVXGPL6XX7Dz4W3q9pNnsSJ0Dd/VMGU2ezFMoOMJvrrVcbta9RFl
-KzHPU6fL0HypTE+kokCKJDnZHuBaXUP0eHIRwjg4XdW/ZtkcSv0tvF1p498ZvGSF
-BaBMhhpkAv60addrWtAZVfLFZJ9lN9ZZvzvZB+dFjQVc1X0YhyzE9MKyDr1MxRDT
-GmdS3KzsSGxZi14LKJxE2mT4gMhM/5ysPCFuXT2JyGZl3LNL9EweKtM4luq5WI3Z
-nqAxdnqssLCn3iztlcZjeFarHVpu5tVzqDoRzm2U+my+itNB+8tWAsbcsffTytL8
-YKmChJ4P6xPPcwgKJyt7s+8QxN3XQg==
-=+8gj
------END PGP SIGNATURE-----
-
---imvdfk3gbmm47i6v--
+> Thanks,
+> Marcel
+>
+>
+>
