@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dPT7j-0003cg-E1
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 08:28:12 -0400
+	(envelope-from <knut.omang@oracle.com>) id 1dPTCR-0005VZ-G0
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 08:33:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dPT7i-0007Mz-1I
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 08:28:11 -0400
-Received: from mail-lf0-x235.google.com ([2a00:1450:4010:c07::235]:34557)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dPT7h-0007Mb-LQ
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 08:28:09 -0400
-Received: by mail-lf0-x235.google.com with SMTP id l13so59270667lfl.1
-	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 05:28:09 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1496836915.git.tgolembi@redhat.com>
-In-Reply-To: <cover.1496836915.git.tgolembi@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 26 Jun 2017 12:27:57 +0000
-Message-ID: <CAJ+F1C+2QiQMxzMQvaMDV8gmU95+Q46-QbA1gPOZ-NCJSLTX5Q@mail.gmail.com>
+	(envelope-from <knut.omang@oracle.com>) id 1dPTCM-0000YZ-Ha
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 08:33:03 -0400
+Received: from aserp1040.oracle.com ([141.146.126.69]:29686)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
+	id 1dPTCM-0000YD-3W
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 08:32:58 -0400
+Message-ID: <1498480368.3341.43.camel@oracle.com>
+From: Knut Omang <knut.omang@oracle.com>
+Date: Mon, 26 Jun 2017 14:32:48 +0200
+In-Reply-To: <20170626102254.GG495@redhat.com>
+References: <cover.050aaed1de4cecd4ba9a4dc6576d1d148a8a9004.1498213152.git-series.knut.omang@oracle.com>
+	<51d7f54d100e9dedecf6dc65691ca65adfc8394f.1498213152.git-series.knut.omang@oracle.com>
+	<20170626102254.GG495@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 0/1] qemu-ga: add guest-get-osinfo
- command
+Subject: Re: [Qemu-devel] [PATCH v4 4/4] sockets: Handle race condition
+ between binds to the same port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,102 +30,235 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>, Eric Blake <eblake@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-Hi
+On Mon, 2017-06-26 at 11:22 +0100, Daniel P. Berrange wrote:
+> On Fri, Jun 23, 2017 at 12:31:08PM +0200, Knut Omang wrote:
+> > If an offset of ports is specified to the inet_listen_saddr function(),
+> > and two or more processes tries to bind from these ports at the same ti=
+me,
+> > occasionally more than one process may be able to bind to the same
+> > port. The condition is detected by listen() but too late to avoid a fai=
+lure.
+> >=C2=A0
+> > This function is called by socket_listen() and used
+> > by all socket listening code in QEMU, so all cases where any form of dy=
+namic
+> > port selection is used should be subject to this issue.
+> >=C2=A0
+> > Add code to close and re-establish the socket when this
+> > condition is observed, hiding the race condition from the user.
+> >=C2=A0
+> > This has been developed and tested by means of the
+> > test-listen unit test in the previous commit.
+> > Enable the test for make check now that it passes.
+> >=C2=A0
+> > Signed-off-by: Knut Omang <knut.omang@oracle.com>
+> > Reviewed-by: Bhavesh Davda <bhavesh.davda@oracle.com>
+> > Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
+> > Reviewed-by: Girish Moodalbail <girish.moodalbail@oracle.com>
+> > ---
+> >=C2=A0=C2=A0tests/Makefile.include |=C2=A0=C2=A02 +-
+> >=C2=A0=C2=A0util/qemu-sockets.c=C2=A0=C2=A0=C2=A0=C2=A0| 68 ++++++++++++=
+++++++++++++++++++++-----------
+> >=C2=A0=C2=A02 files changed, 53 insertions(+), 17 deletions(-)
+> >=C2=A0
+> > diff --git a/tests/Makefile.include b/tests/Makefile.include
+> > index 22bb97e..c38f94e 100644
+> > --- a/tests/Makefile.include
+> > +++ b/tests/Makefile.include
+> > @@ -127,7 +127,7 @@ check-unit-y +=3D tests/test-bufferiszero$(EXESUF)
+> >=C2=A0=C2=A0gcov-files-check-bufferiszero-y =3D util/bufferiszero.c
+> >=C2=A0=C2=A0check-unit-y +=3D tests/test-uuid$(EXESUF)
+> >=C2=A0=C2=A0check-unit-y +=3D tests/ptimer-test$(EXESUF)
+> > -#check-unit-y +=3D tests/test-listen$(EXESUF)
+> > +check-unit-y +=3D tests/test-listen$(EXESUF)
+> >=C2=A0=C2=A0gcov-files-ptimer-test-y =3D hw/core/ptimer.c
+> >=C2=A0=C2=A0check-unit-y +=3D tests/test-qapi-util$(EXESUF)
+> >=C2=A0=C2=A0gcov-files-test-qapi-util-y =3D qapi/qapi-util.c
+> > diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+> > index 48b9319..7b118b4 100644
+> > --- a/util/qemu-sockets.c
+> > +++ b/util/qemu-sockets.c
+> > @@ -201,6 +201,42 @@ static int try_bind(int socket, InetSocketAddress =
+*saddr, struct
+> addrinfo *e)
+> >=C2=A0=C2=A0#endif
+> >=C2=A0=C2=A0}
+> >=C2=A0=C2=A0
+> > +static int try_bind_listen(int *socket, InetSocketAddress *saddr,
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0struct addrinfo *e, int port, Error **errp)
+> > +{
+> > +=C2=A0=C2=A0=C2=A0=C2=A0int s =3D *socket;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0int ret;
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0inet_setport(e, port);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0ret =3D try_bind(s, saddr, e);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0if (ret) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (errno !=3D EADDRIN=
+USE) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0error_setg_errno(errp, errno, "Failed to bind socket");
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return errno;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0}
+> > +=C2=A0=C2=A0=C2=A0=C2=A0if (listen(s, 1) =3D=3D 0) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0return 0;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0}
+> > +=C2=A0=C2=A0=C2=A0=C2=A0if (errno =3D=3D EADDRINUSE) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* We got to bind the =
+socket to a port but someone else managed
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* to bind to the=
+ same port and beat us to listen on it!
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* Recreate the s=
+ocket and return EADDRINUSE to preserve the
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* expected state=
+ by the caller:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0*/
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0closesocket(s);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0s =3D create_fast_reus=
+e_socket(e, errp);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (s < 0) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0return errno;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0*socket =3D s;
+>=20
+> I don't really like this at all - if we need to close + recreate the
+> socket, IMHO that should remain the job of the caller, since it owns
+> the socket FD ultimately.
 
-On Wed, Jun 7, 2017 at 2:02 PM Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@=
-redhat.com>
-wrote:
+Normally I would agree, but this is a very unlikely situation.=C2=A0I consi=
+dered moving the
+complexity out to the caller, even to recreate for every call, but found th=
+ose solutions
+to be inferior as they do not in any way confine the problem, and cause the=
+ handling of
+the common cases to be much less readable. It's going to be some trade-offs=
+ here.
 
-> v5:
-> - fixed build failure with older glib
-> - fixed coding style issues
-> - fixed one log string
->
-> This is a continuation of the work started by Vinzenz Feenstra in the
-> threads:
->
-> https://lists.nongnu.org/archive/html/qemu-devel/2017-03/msg04154.html
-> https://lists.nongnu.org/archive/html/qemu-devel/2017-03/msg04302.html
-> https://lists.nongnu.org/archive/html/qemu-devel/2017-03/msg06262.html
->
-> The idea is to report some basic information from uname and from
-> os-release file, if it is present. On MS Windows, where neither uname
-> nor os-release exist we fill the values based on the information we can
-> get from the OS.
->
-> The example output on Fedora is:
->
-> {
->   "return": {
->     "kernel-version": "#1 SMP Mon May 8 18:46:06 UTC 2017",
->     "kernel-release": "4.10.15-200.fc25.x86_64",
->     "machine-hardware": "x86_64",
->     "id": "fedora",
->     "name": "Fedora",
->     "pretty-name": "Fedora 25 (Server Edition)",
->     "version": "25 (Server Edition)",
->     "variant": "Server Edition",
->     "version-id": "25",
->     "variant-id": "server"
->   }
-> }
->
-> The example output on MS Windows 10 is:
->
-> {
->   "return": {
->     "kernel-version": "10.0",
->     "kernel-release": "10240",
->     "machine-hardware": "x86_64",
->     "id": "mswindows",
->     "name": "Microsoft Windows",
->     "pretty-name": "Windows 10 Enterprise",
->     "version": "Microsoft Windows 10",
->     "version-id": "10",
->     "variant": "client",
->     "variant-id": "client"
->   }
-> }
->
-> One issue I see with the current implementation is that one is not able
-> to distinguish between various (non-linux) POSIX systems from the
-> returned values. That's because without os-release file (which I assume
-> is not common on non-linux platforms) only kernel-version,
-> kernel-release and machine-hardware are returned and telling what OS is
-> running there is a guessing game. Is this a problem?
->
->
-I don't know, but I would rather solve this problem at OS & os-release
-level. Raise your concerns on the XDG/osrelease mailing list?
+As long as the caller is aware of (by the reference call) that the socket i=
+n use may
+change, this is in my view a clean (as clean as possible) abstraction that =
+simplifies the
+logic at the next level. My intention is to make the common, good case as r=
+eadable as
+possible and hide some of the complexity of these=20
+unlikely error scenarios inside the new functions - divide and conquer..
 
+>=20
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0errno =3D EADDRINUSE;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return errno;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0}
+> > +=C2=A0=C2=A0=C2=A0=C2=A0error_setg_errno(errp, errno, "Failed to liste=
+n on socket");
+> > +=C2=A0=C2=A0=C2=A0=C2=A0return errno;
+> > +}
+> > +
+> >=C2=A0=C2=A0static int inet_listen_saddr(InetSocketAddress *saddr,
+> >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int port_offset,
+> >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bool update_addr,
+> > @@ -210,7 +246,9 @@ static int inet_listen_saddr(InetSocketAddress *sad=
+dr,
+> >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0char port[33];
+> >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0char uaddr[INET6_ADDRSTRLEN+1];
+> >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0char uport[33];
+> > -=C2=A0=C2=A0=C2=A0=C2=A0int slisten, rc, port_min, port_max, p;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0int rc, port_min, port_max, p;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0int slisten =3D 0;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0int saved_errno =3D 0;
+> >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Error *err =3D NULL;
+> >=C2=A0=C2=A0
+> >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0memset(&ai,0, sizeof(ai));
+> > @@ -276,28 +314,26 @@ static int inet_listen_saddr(InetSocketAddress *s=
+addr,
+>=20
+> Just above this line is the original 'create_fast_reuse_socket' call.
+>=20
+> I'd suggest that we push that call down into the body of the loop
+> below:
+>=20
+> >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0port_min =3D=
+ inet_getport(e);
+> >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0port_max =3D=
+ saddr->has_to ? saddr->to + port_offset : port_min;
+> >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0for (p =3D p=
+ort_min; p <=3D port_max; p++) {
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0inet_setport(e, p);
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0if (try_bind(slisten, saddr, e) >=3D 0) {
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0goto listen;
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0}
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0if (p =3D=3D port_max) {
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!e->ai_next) {
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0error_setg_errno(errp, e=
+rrno, "Failed to bind socket");
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0int eno =3D try_bind_listen(&slisten, saddr, e, p, &err);
+>=20
+> Which would mean try_bind_listen no longer needs the magic to close +
+> recreate the socket.
+>=20
+> The only cost of doing this is that you end up closing + recreating the
+> socket after bind hits EADDRINUSE, as well as after listen() hits it.
 
-> Also the qapi documentiaton probably need some polishing. Unfortunately,
-> so far I was unable to get qapi parser satisfied and still include all
-> the important information.
->
+The problem with this approach in my opinion is that one has to understand =
+the
+fix for the problem I am trying to solve here in order to read the main cod=
+e,=C2=A0
+even though this is a very special case. Everyone reading the code would as=
+k themselves
+the question 'why do they recreate the socket here?' and then be forced to =
+ready the
+details of try_bind_listen anyway, or we would need additional comments.
 
-You mean the doc parser? What's the issue?
+The idea behind the abstractions I have used here is to hide the details in=
+side functions,
+but leave them with an as clean as possible (although not ideal) interface =
+that=20
+makes the overall logic more readable.
 
+> I think that's acceptable tradeoff for simpler code, since this is not
+> a performance critical operation.
 
->
->     Tomas Golembiovsky
->
-> Tom=C3=A1=C5=A1 Golembiovsk=C3=BD (1):
->   qemu-ga: add guest-get-osinfo command
->
->  configure            |   2 +-
->  qga/commands-posix.c | 160
-> ++++++++++++++++++++++++++++++++++++++++++++++++
->  qga/commands-win32.c | 170
-> +++++++++++++++++++++++++++++++++++++++++++++++++++
->  qga/qapi-schema.json |  57 +++++++++++++++++
->  4 files changed, 388 insertions(+), 1 deletion(-)
->
-> --
-> 2.13.0
->
-> --
-Marc-Andr=C3=A9 Lureau
+Also should we perhaps worry about any side effects of creating and closing=
+ a lot of
+sockets unnecessary?
+
+Thanks,
+Knut
+
+>=20
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0if (!eno) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0goto listen_ok;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0} else if (eno !=3D EADDRINUSE) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0goto listen_failed;
+> >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0}
+> >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> > +=C2=A0=C2=A0=C2=A0=C2=A0}
+> > +=C2=A0=C2=A0=C2=A0=C2=A0error_setg_errno(errp, errno, "Failed to find =
+available port");
+>=20
+> Regards,
+> Daniel
