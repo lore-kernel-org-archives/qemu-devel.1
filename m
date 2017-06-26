@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dPTTC-0006uP-12
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 08:50:22 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dPTTs-0007Kz-Ed
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 08:51:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dPTTB-0007G8-7h
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 08:50:22 -0400
-Date: Mon, 26 Jun 2017 14:50:09 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170626125009.GD4348@noname.redhat.com>
-References: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
-	<CAFEAcA9dam54FXEK+7RjnxfO=zBuTat7sMe8yUgZD3AEbAtigg@mail.gmail.com>
+	(envelope-from <vilanova@ac.upc.edu>) id 1dPTTo-0007Uc-BI
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 08:51:04 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:57360)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dPTTn-0007UF-HA
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 08:51:00 -0400
+From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
+References: <149838022308.6497.2104916050645246693.stgit@frigg.lan>
+	<149838119390.6497.17430428991952287717.stgit@frigg.lan>
+	<87fuenxdh2.fsf@linaro.org>
+Date: Mon, 26 Jun 2017 15:50:45 +0300
+In-Reply-To: <87fuenxdh2.fsf@linaro.org> ("Alex =?utf-8?Q?Benn=C3=A9e=22's?=
+	message of "Mon, 26 Jun 2017 11:14:33 +0100")
+Message-ID: <878tke9al6.fsf@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9dam54FXEK+7RjnxfO=zBuTat7sMe8yUgZD3AEbAtigg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 00/61] Block layer patches
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v9 04/26] target: [tcg] Add generic
+ translation framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,50 +30,473 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-Am 26.06.2017 um 12:23 hat Peter Maydell geschrieben:
-> On 23 June 2017 at 17:20, Kevin Wolf <kwolf@redhat.com> wrote:
-> > The following changes since commit 4c8c1cc544dbd5e2564868e61c5037258e393832:
-> >
-> >   Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-2.10-pull-request' into staging (2017-06-22 19:01:58 +0100)
-> >
-> > are available in the git repository at:
-> >
-> >
-> >   git://repo.or.cz/qemu/kevin.git tags/for-upstream
-> >
-> > for you to fetch changes up to 1512008812410ca4054506a7c44343088abdd977:
-> >
-> >   Merge remote-tracking branch 'mreitz/tags/pull-block-2017-06-23' into queue-block (2017-06-23 14:09:12 +0200)
-> >
-> > ----------------------------------------------------------------
-> >
-> > Block layer patches
-> >
-> 
-> This fails 'make check' on ppc64be Linux, x86-64 FreeBSD, aarch64 Linux:
-> 
-> TEST: tests/virtio-scsi-test... (pid=63911)
->   /i386/virtio/scsi/pci/nop:                                           OK
->   /i386/virtio/scsi/pci/hotplug:                                       OK
->   /i386/virtio/scsi/pci/scsi-disk/unaligned-write-same:                **
-> ERROR:/home/pm215/qemu/tests/virtio-scsi-test.c:243:test_unaligned_write_same:
-> assertion failed (0 == vi
-> rtio_scsi_do_command(vs, write_same_cdb_2, NULL, 0, buf2, 512, NULL)):
-> (0x00000000 == 0x000000ff)
-> FAIL
-> GTester: last random seed: R02Sb24e7d8beec7f0a53a97a610aa09a2b0
-> (pid=63934)
-> FAIL: tests/virtio-scsi-test
+Alex Benn=C3=A9e writes:
 
-Stefan, this seems to be caused by your patch "virtio-pci: use ioeventfd
-even when KVM is disabled". I can reproduce it on x86_64 under valgrind.
+> Llu=C3=ADs Vilanova <vilanova@ac.upc.edu> writes:
 
-QTEST_QEMU_BINARY="valgrind x86_64-softmmu/qemu-system-x86_64" \
-tests/virtio-scsi-test -p /x86_64/virtio/scsi/pci/scsi-disk/unaligned-write-same
+>> Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+>> ---
+>> Makefile.target                |    1
+>> include/exec/gen-icount.h      |    2
+>> include/exec/translate-block.h |  125 +++++++++++++++++++++++++++
+>> include/qom/cpu.h              |   22 +++++
+>> translate-block.c              |  185 ++++++++++++++++++++++++++++++++++=
+++++++
+>> 5 files changed, 334 insertions(+), 1 deletion(-)
+>> create mode 100644 include/exec/translate-block.h
+>> create mode 100644 translate-block.c
+>>=20
+>> diff --git a/Makefile.target b/Makefile.target
+>> index ce8dfe44a8..253c6e7999 100644
+>> --- a/Makefile.target
+>> +++ b/Makefile.target
+>> @@ -90,6 +90,7 @@ all: $(PROGS) stap
+>> # cpu emulator library
+>> obj-y =3D exec.o translate-all.o cpu-exec.o
+>> obj-y +=3D translate-common.o
+>> +obj-y +=3D translate-block.o
 
-I'll drop the patch from my queue for a v2 pull request.
+> This clases with the changes now in master to move tcg functions into
+> accel/tcg/
 
-Kevin
+I see. I'll rebase again and move the new code there.
+
+
+>> obj-y +=3D cpu-exec-common.o
+>> obj-y +=3D tcg/tcg.o tcg/tcg-op.o tcg/optimize.o
+>> obj-$(CONFIG_TCG_INTERPRETER) +=3D tci.o
+>> diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
+>> index 9b26c7da5f..f4ad61014b 100644
+>> --- a/include/exec/gen-icount.h
+>> +++ b/include/exec/gen-icount.h
+>> @@ -44,7 +44,7 @@ static inline void gen_tb_start(TranslationBlock *tb, =
+TCGv_env cpu_env)
+>> tcg_temp_free_i32(count);
+>> }
+>>=20
+>> -static void gen_tb_end(TranslationBlock *tb, int num_insns)
+>> +static inline void gen_tb_end(TranslationBlock *tb, int num_insns)
+>> {
+>> if (tb->cflags & CF_USE_ICOUNT) {
+>> /* Update the num_insn immediate parameter now that we know
+>> diff --git a/include/exec/translate-block.h b/include/exec/translate-blo=
+ck.h
+>> new file mode 100644
+>> index 0000000000..d14d23f2cb
+>> --- /dev/null
+>> +++ b/include/exec/translate-block.h
+>> @@ -0,0 +1,125 @@
+>> +/*
+>> + * Generic intermediate code generation.
+>> + *
+>> + * Copyright (C) 2016-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or l=
+ater.
+>> + * See the COPYING file in the top-level directory.
+>> + */
+>> +
+>> +#ifndef EXEC__TRANSLATE_BLOCK_H
+>> +#define EXEC__TRANSLATE_BLOCK_H
+>> +
+>> +/*
+>> + * Include this header from a target-specific file, and add a
+>> + *
+>> + *     DisasContextBase base;
+>> + *
+>> + * member in your target-specific DisasContext.
+>> + */
+>> +
+>> +
+>> +#include "exec/exec-all.h"
+>> +#include "tcg/tcg.h"
+>> +
+>> +
+>> +/**
+>> + * BreakpointCheckType:
+>> + * @BC_MISS: No hit
+>> + * @BC_HIT_INSN: Hit, but continue translating TB
+>> + * @BC_HIT_TB: Hit, stop translating TB
+>> + *
+>> + * How to react to a breakpoint. A hit means no more breakpoints will b=
+e checked
+>> + * for the current instruction.
+>> + *
+>> + * Not all breakpoints associated to an address are necessarily raised =
+by
+>> + * targets (e.g., due to conditions encoded in their flags), so tey can=
+ decide
+>> + * that a breakpoint missed the address (@BP_MISS).
+>> + */
+>> +typedef enum BreakpointCheckType {
+>> +    BC_MISS,
+>> +    BC_HIT_INSN,
+>> +    BC_HIT_TB,
+>> +} BreakpointCheckType;
+>> +
+>> +/**
+>> + * DisasJumpType:
+>> + * @DJ_NEXT: Next instruction in program order.
+>> + * @DJ_TOO_MANY: Too many instructions translated.
+>> + * @DJ_TARGET: Start of target-specific conditions.
+>> + *
+>> + * What instruction to disassemble next.
+>> + */
+>> +typedef enum DisasJumpType {
+>> +    DJ_NEXT,
+>> +    DJ_TOO_MANY,
+>> +    DJ_TARGET,
+>> +} DisasJumpType;
+>> +
+>> +/**
+>> + * DisasContextBase:
+>> + * @tb: Translation block for this disassembly.
+>> + * @pc_first: Address of first guest instruction in this TB.
+>> + * @pc_next: Address of next guest instruction in this TB (current duri=
+ng
+>> + *           disassembly).
+>> + * @is_jmp: What instruction to disassemble next.
+>> + * @num_insns: Number of translated instructions (including current).
+>> + * @singlestep_enabled: "Hardware" single stepping enabled.
+>> + *
+>> + * Architecture-agnostic disassembly context.
+>> + */
+>> +typedef struct DisasContextBase {
+>> +    TranslationBlock *tb;
+>> +    target_ulong pc_first;
+>> +    target_ulong pc_next;
+>> +    DisasJumpType is_jmp;
+>> +    unsigned int num_insns;
+>> +    bool singlestep_enabled;
+>> +} DisasContextBase;
+>> +
+>> +/**
+>> + * TranslatorOps:
+>> + * @init_disas_context: Initialize a DisasContext struct (DisasContextB=
+ase has
+>> + *                      already been initialized).
+>> + * @init_globals: Initialize global variables.
+>> + * @tb_start: Start translating a new TB.
+>> + * @insn_start: Start translating a new instruction.
+>> + * @breakpoint_check: Check if a breakpoint did hit. When called, the b=
+reakpoint
+>> + *                    has already been checked to match the PC.
+>> + * @disas_insn: Disassemble one instruction an return the PC for the ne=
+xt
+>> + *              one. Can set db->is_jmp to DJ_TARGET or above to stop
+>> + *              translation.
+>> + * @tb_stop: Stop translating a TB.
+>> + * @disas_flags: Get flags argument for log_target_disas().
+>> + *
+>> + * Target-specific operations for the generic translator loop.
+>> + *
+>> + * All operations but disas_insn() are optional, and ignored when not s=
+et.
+>> + * A missing breakpoint_check() will ignore breakpoints. A missing disa=
+s_flags()
+>> + * will pass no flags.
+>> + */
+>> +typedef struct TranslatorOps {
+>> +    void (*init_disas_context)(DisasContextBase *db, CPUState *cpu);
+>> +    void (*init_globals)(DisasContextBase *db, CPUState *cpu);
+>> +    void (*tb_start)(DisasContextBase *db, CPUState *cpu);
+>> +    void (*insn_start)(DisasContextBase *db, CPUState *cpu);
+>> +    BreakpointCheckType (*breakpoint_check)(DisasContextBase *db, CPUSt=
+ate *cpu,
+>> +                                            const CPUBreakpoint *bp);
+>> +    target_ulong (*disas_insn)(DisasContextBase *db, CPUState *cpu);
+>> +    void (*tb_stop)(DisasContextBase *db, CPUState *cpu);
+>> +    int (*disas_flags)(const DisasContextBase *db);
+>> +} TranslatorOps;
+>> +
+>> +/**
+>> + * translate_block:
+>> + * @ops: Target-specific operations.
+>> + * @db:
+>> + * @cpu:
+>> + * @tb:
+>> + *
+>> + * Generic translator loop.
+>> + */
+>> +void translate_block(const TranslatorOps *ops, DisasContextBase *db,
+>> +                     CPUState *cpu, TCGv_env *tcg_cpu, TranslationBlock=
+ *tb);
+>> +
+>> +#endif  /* EXEC__TRANSLATE_BLOCK_H */
+>> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+>> index 89ddb686fb..d46e8df756 100644
+>> --- a/include/qom/cpu.h
+>> +++ b/include/qom/cpu.h
+>> @@ -982,6 +982,28 @@ static inline bool cpu_breakpoint_test(CPUState *cp=
+u, vaddr pc, int mask)
+>> return false;
+>> }
+>>=20
+>> +/* Get first breakpoint matching a PC */
+>> +static inline CPUBreakpoint *cpu_breakpoint_get(CPUState *cpu, vaddr pc,
+>> +                                                CPUBreakpoint *bp)
+>> +{
+>> +    if (likely(bp =3D=3D NULL)) {
+>> +        if (unlikely(!QTAILQ_EMPTY(&cpu->breakpoints))) {
+>> +            QTAILQ_FOREACH(bp, &cpu->breakpoints, entry) {
+>> +                if (bp->pc =3D=3D pc) {
+>> +                    return bp;
+>> +                }
+>> +            }
+>> +        }
+>> +    } else {
+>> +        QTAILQ_FOREACH_CONTINUE(bp, entry) {
+>> +            if (bp->pc =3D=3D pc) {
+>> +                return bp;
+>> +            }
+>> +        }
+>> +    }
+>> +    return NULL;
+>> +}
+>> +
+>> int cpu_watchpoint_insert(CPUState *cpu, vaddr addr, vaddr len,
+>> int flags, CPUWatchpoint **watchpoint);
+>> int cpu_watchpoint_remove(CPUState *cpu, vaddr addr,
+>> diff --git a/translate-block.c b/translate-block.c
+>> new file mode 100644
+>> index 0000000000..1aac80560e
+>> --- /dev/null
+>> +++ b/translate-block.c
+>> @@ -0,0 +1,185 @@
+>> +/*
+>> + * Generic intermediate code generation.
+>> + *
+>> + * Copyright (C) 2016-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or l=
+ater.
+>> + * See the COPYING file in the top-level directory.
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "qemu-common.h"
+>> +#include "qemu/error-report.h"
+>> +#include "cpu.h"
+>> +#include "tcg/tcg.h"
+>> +#include "tcg/tcg-op.h"
+>> +#include "exec/exec-all.h"
+>> +#include "exec/gen-icount.h"
+>> +#include "exec/log.h"
+>> +#include "exec/translate-block.h"
+>> +
+>> +
+>> +static inline void translate_block_tcg_check(const DisasContextBase *db)
+>> +{
+>> +    if (tcg_check_temp_count()) {
+>> +        error_report("warning: TCG temporary leaks before "TARGET_FMT_l=
+x,
+>> +                     db->pc_next);
+>> +    }
+>> +}
+>> +
+>> +void translate_block(const TranslatorOps *ops, DisasContextBase *db,
+>> +                     CPUState *cpu, TCGv_env *tcg_cpu, TranslationBlock=
+ *tb)
+>> +{
+>> +    int max_insns;
+>> +
+>> +    /* Sanity-check ops */
+>> +    if (ops->disas_insn =3D=3D NULL) {
+>> +        error_report("Missing ops->disas_insn");
+>> +        abort();
+>> +    }
+>> +
+>> +    /* Initialize DisasContext */
+>> +    db->tb =3D tb;
+>> +    db->pc_first =3D tb->pc;
+>> +    db->pc_next =3D db->pc_first;
+>> +    db->is_jmp =3D DJ_NEXT;
+>> +    db->num_insns =3D 0;
+>> +    db->singlestep_enabled =3D cpu->singlestep_enabled;
+>> +    if (ops->init_disas_context) {
+>> +        ops->init_disas_context(db, cpu);
+>> +    }
+>> +
+>> +    /* Initialize globals */
+>> +    if (ops->init_globals) {
+>> +        ops->init_globals(db, cpu);
+>> +    }
+>> +    tcg_clear_temp_count();
+>> +
+>> +    /* Instruction counting */
+>> +    max_insns =3D db->tb->cflags & CF_COUNT_MASK;
+>> +    if (max_insns =3D=3D 0) {
+>> +        max_insns =3D CF_COUNT_MASK;
+>> +    }
+>> +    if (max_insns > TCG_MAX_INSNS) {
+>> +        max_insns =3D TCG_MAX_INSNS;
+>> +    }
+>> +    if (db->singlestep_enabled || singlestep) {
+>> +        max_insns =3D 1;
+>> +    }
+>> +
+>> +    /* Start translating */
+>> +    gen_tb_start(db->tb, *tcg_cpu);
+>> +    if (ops->tb_start) {
+>> +        ops->tb_start(db, cpu);
+>> +    }
+>> +
+>> +    while (true) {
+>> +        CPUBreakpoint *bp;
+>> +
+>> +        db->num_insns++;
+>> +        if (ops->insn_start) {
+>> +            ops->insn_start(db, cpu);
+>> +        }
+>> +
+>> +        /* Early exit before breakpoint checks */
+>> +        if (unlikely(db->is_jmp !=3D DJ_NEXT)) {
+>> +            break;
+>> +        }
+>> +
+>> +        /* Pass breakpoint hits to target for further processing */
+>> +        bp =3D NULL;
+>> +        do {
+>> +            bp =3D cpu_breakpoint_get(cpu, db->pc_next, bp);
+>> +            if (unlikely(bp) && ops->breakpoint_check) {
+>> +                BreakpointCheckType bp_check =3D ops->breakpoint_check(
+>> +                    db, cpu, bp);
+>> +                if (bp_check =3D=3D BC_HIT_INSN) {
+>> +                    /* Hit, keep translating */
+>> +                    /*
+>> +                     * TODO: if we're never going to have more than one=
+ BP in a
+>> +                     *       single address, we can simply use a bool h=
+ere.
+>> +                     */
+>> +                    break;
+>> +                } else if (bp_check =3D=3D BC_HIT_TB) {
+>> +                    goto done_generating;
+>> +                } else {
+>> +                    error_report("Unexpected BreakpointCheckType %d", b=
+p_check);
+>> +                    abort();
+>> +                }
+>> +            }
+>> +        } while (bp !=3D NULL);
+>> +
+>> +        /* Accept I/O on last instruction */
+>> +        if (db->num_insns =3D=3D max_insns && (db->tb->cflags & CF_LAST=
+_IO)) {
+>> +            gen_io_start(*tcg_cpu);
+>> +        }
+>> +
+>> +        /* Disassemble one instruction */
+>> +        db->pc_next =3D ops->disas_insn(db, cpu);
+>> +
+>> +        /**************************************************/
+>> +        /* Conditions to stop translation                 */
+>> +        /**************************************************/
+>> +
+>> +        /* Target-specific conditions set by disassembly */
+>> +        if (db->is_jmp !=3D DJ_NEXT) {
+>> +            break;
+>> +        }
+>> +
+>> +        /* Too many instructions */
+>> +        if (tcg_op_buf_full() || db->num_insns >=3D max_insns) {
+>> +            db->is_jmp =3D DJ_TOO_MANY;
+>> +            break;
+>> +        }
+>> +
+>> +        /*
+>> +         * Check if next instruction is on next page, which can cause an
+>> +         * exception.
+>> +         *
+>> +         * NOTE: Target-specific code must check a single instruction d=
+oes not
+>> +         *       cross page boundaries; the first in the TB is always a=
+llowed to
+>> +         *       cross pages (never goes through this check).
+>> +         */
+>> +        if ((db->pc_first & TARGET_PAGE_MASK)
+>> +            !=3D (db->pc_next & TARGET_PAGE_MASK)) {
+>> +            db->is_jmp =3D DJ_TOO_MANY;
+>> +            break;
+>> +        }
+
+> How does the first insn avoid this check? And if it does is that right?
+
+All translation loops I've seen put the page crossing check at the end of t=
+he
+loop, when the first instruction has already been translated.
+
+
+> I mean I understand you can construct weird multi-byte instructions
+> (especially on x86) that cross the boundary but even if it is the first
+> in a TB shouldn't it error if there are no contiguous pages?
+
+Honestly, I've coded it in a way that reproduces the existing behavior, but=
+ have
+not checked if it makes sense to change or try to simplify it.
+
+
+> Also isn't the page crossing issue different for SoftMMU and linux-user?
+
+Not that I've seen (at the level of the translation loop). Now I wonder if =
+QEMU
+w/ TCG has a bug that lets it successfully execute instructions that cross =
+page
+boundaries, one of them with invalid permissions (haven't checked).
+
+
+What I can say is that this check is a very weak one (but common to all
+targets), and that targets like i386 and arm need to refine it further in t=
+he
+target-specific code. In fact, now I suspect all targets will need to refin=
+e it,
+so it probably makes sense to simply drop this generic check and burden all
+targets with handling it.
+
+
+>> +
+>> +        translate_block_tcg_check(db);
+>> +    }
+>> +
+>> +    if (ops->tb_stop) {
+>> +        ops->tb_stop(db, cpu);
+>> +    }
+>> +
+>> +    if (db->tb->cflags & CF_LAST_IO) {
+>> +        gen_io_end(*tcg_cpu);
+>> +    }
+>> +
+>> +done_generating:
+>> +    gen_tb_end(db->tb, db->num_insns);
+>> +
+>> +    translate_block_tcg_check(db);
+>> +
+>> +#ifdef DEBUG_DISAS
+>> +    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM) &&
+>> +        qemu_log_in_addr_range(db->pc_first)) {
+>> +        int flags;
+>> +        if (ops->disas_flags) {
+>> +            flags =3D ops->disas_flags(db);
+>> +        } else {
+>> +            flags =3D 0;
+>> +        }
+>> +        qemu_log_lock();
+>> +        qemu_log("----------------\n");
+>> +        qemu_log("IN: %s\n", lookup_symbol(db->pc_first));
+>> +        log_target_disas(cpu, db->pc_first, db->pc_next - db->pc_first,=
+ flags);
+>> +        qemu_log("\n");
+>> +        qemu_log_unlock();
+>> +    }
+>> +#endif
+>> +
+>> +    db->tb->size =3D db->pc_next - db->pc_first;
+>> +    db->tb->icount =3D db->num_insns;
+>> +}
+
+
+Thanks,
+  Lluis
