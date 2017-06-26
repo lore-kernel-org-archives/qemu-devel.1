@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1dPPlS-0006yI-9a
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 04:52:59 -0400
+	(envelope-from <yulei.zhang@intel.com>) id 1dPPli-00077w-Fb
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 04:53:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1dPPlN-00027V-Ig
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 04:52:58 -0400
-Received: from mga09.intel.com ([134.134.136.24]:30767)
+	(envelope-from <yulei.zhang@intel.com>) id 1dPPld-0002P3-PZ
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 04:53:14 -0400
+Received: from mga04.intel.com ([192.55.52.120]:35909)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yulei.zhang@intel.com>)
-	id 1dPPlN-00026t-9J
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 04:52:53 -0400
+	id 1dPPld-0002N7-GT
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 04:53:09 -0400
 From: Yulei Zhang <yulei.zhang@intel.com>
-Message-Id: <1491301634-24228-1-git-send-email-yulei.zhang@intel.com>
-Subject: [Qemu-devel] [RFC 2/5] vfio: Add struct vfio_vmstate_info to
- introduce vfio device put/get funtion
+Message-Id: <1491301650-24275-1-git-send-email-yulei.zhang@intel.com>
+Subject: [Qemu-devel] [RFC 3/5] vfio: introduce new VFIO ioctl
+ VFIO_DEVICE_PCI_STATUS_SET
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,87 +22,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Date: Mon, 26 Jun 2017 08:52:59 -0000
+Date: Mon, 26 Jun 2017 08:53:15 -0000
 To: qemu-devel@nongnu.org
 Cc: zhenyuw@linux.intel.com, zhi.a.wang@intel.com, joonas.lahtinen@linux.intel.com, kevin.tian@intel.com, xiao.zheng@intel.com, Yulei Zhang <yulei.zhang@intel.com>
 
-Introduce vfio_device_put/vfio_device_get funtion for vfio device state
-save/restore usage. And vfio device unmigratable flag will be set to false
-during initialization if device flag VFIO_DEVICE_FLAGS_MIGRATABLE is set.
+New VFIO ioctl VFIO_DEVICE_PCI_STATUS_SET is added to change the
+vfio pci device status during the migration, stop the device on
+the source side before fetch its status and start the deivce on
+the target side after restore its status.
 
 Signed-off-by: Yulei Zhang <yulei.zhang@intel.com>
 ---
- hw/vfio/pci.c | 35 ++++++++++++++++++++++++++++++++++-
- 1 file changed, 34 insertions(+), 1 deletion(-)
+ hw/vfio/pci.c              | 17 +++++++++++++++++
+ linux-headers/linux/vfio.h | 15 +++++++++++++++
+ 2 files changed, 32 insertions(+)
 
 diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index bf2e0ff..7de4eb4 100644
+index 7de4eb4..605a473 100644
 --- a/hw/vfio/pci.c
 +++ b/hw/vfio/pci.c
-@@ -37,6 +37,7 @@
- 
+@@ -38,6 +38,7 @@
  static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
  static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
-+static VMStateDescription vfio_pci_vmstate;
+ static VMStateDescription vfio_pci_vmstate;
++static void vfio_vm_change_state_handler(void *pv, int running, RunState state);
  
  /*
   * Disabling BAR mmaping can be slow, but toggling it around INTx can
-@@ -2375,6 +2376,7 @@ static void vfio_populate_device(VFIOPCIDevice *vdev, Error **errp)
-         }
+@@ -2866,6 +2867,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+     vfio_register_err_notifier(vdev);
+     vfio_register_req_notifier(vdev);
+     vfio_setup_resetfn_quirk(vdev);
++    qemu_add_vm_change_state_handler(vfio_vm_change_state_handler, vdev);
  
-         QLIST_INIT(&vdev->device_state.quirks);
-+        vfio_pci_vmstate.unmigratable = 0;
-     }
+     return;
  
-     ret = vfio_get_region_info(vbasedev,
-@@ -2946,6 +2948,17 @@ post_reset:
+@@ -2948,6 +2950,21 @@ post_reset:
      vfio_pci_post_reset(vdev);
  }
  
-+static int vfio_device_put(QEMUFile *f, void *pv, size_t size, VMStateField *field,
-+                            QJSON *vmdesc)
++static void vfio_vm_change_state_handler(void *pv, int running, RunState state)
 +{
-+    return 0;
++    VFIOPCIDevice *vdev = pv;
++    struct vfio_pci_status_set *vfio_status;
++    int argsz = sizeof(*vfio_status);
++
++    vfio_status = g_malloc0(argsz);
++    vfio_status->argsz = argsz;
++    vfio_status->flags = running ? VFIO_DEVICE_PCI_START :
++				  VFIO_DEVICE_PCI_STOP;
++
++    ioctl(vdev->vbasedev.fd, VFIO_DEVICE_PCI_STATUS_SET, vfio_status);
++    g_free(vfio_status);
 +}
 +
-+static int vfio_device_get(QEMUFile *f, void *pv, size_t size, VMStateField *field)
-+{
-+    return 0;
-+}
-+
- static void vfio_instance_init(Object *obj)
+ static int vfio_device_put(QEMUFile *f, void *pv, size_t size, VMStateField *field,
+                             QJSON *vmdesc)
  {
-     PCIDevice *pci_dev = PCI_DEVICE(obj);
-@@ -2990,9 +3003,29 @@ static Property vfio_pci_dev_properties[] = {
-     DEFINE_PROP_END_OF_LIST(),
- };
+diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+index c87d05c..fa17848 100644
+--- a/linux-headers/linux/vfio.h
++++ b/linux-headers/linux/vfio.h
+@@ -487,6 +487,21 @@ struct vfio_pci_hot_reset {
  
--static const VMStateDescription vfio_pci_vmstate = {
-+static VMStateInfo vfio_vmstate_info = {
-+    .name = "vfio-state",
-+    .get = vfio_device_get,
-+    .put = vfio_device_put,
+ #define VFIO_DEVICE_PCI_HOT_RESET	_IO(VFIO_TYPE, VFIO_BASE + 13)
+ 
++/**
++ * VFIO_DEVICE_PCI_STATUS_SET - _IOW(VFIO_TYPE, VFIO_BASE + 14,
++ *				    struct vfio_pci_status_set)
++ *
++ * Return: 0 on success, -errno on failure.
++ */
++struct vfio_pci_status_set{
++	__u32	argsz;
++	__u32	flags;
++#define VFIO_DEVICE_PCI_STOP  (1 << 0)
++#define VFIO_DEVICE_PCI_START (1 << 1)
 +};
 +
-+static VMStateDescription vfio_pci_vmstate = {
-     .name = "vfio-pci",
-     .unmigratable = 1,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        {
-+            .name         = "vfio dev",
-+            .version_id   = 0,
-+            .field_exists = NULL,
-+            .size         = 0,
-+            .info         = &vfio_vmstate_info,
-+            .flags        = VMS_SINGLE,
-+            .offset       = 0,
-+         },
-+        VMSTATE_END_OF_LIST()
-+    },
- };
++#define VFIO_DEVICE_PCI_STATUS_SET	_IO(VFIO_TYPE, VFIO_BASE + 14)
++
+ /* -------- API for Type1 VFIO IOMMU -------- */
  
- static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
+ /**
 -- 
 2.7.4
