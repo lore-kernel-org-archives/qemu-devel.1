@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dPNLW-0001oP-0T
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 02:18:06 -0400
+	(envelope-from <jbeulich@suse.com>) id 1dPNSr-0003i8-2h
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 02:25:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dPNLR-0006eV-AT
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 02:18:01 -0400
-Received: from [59.151.112.132] (port=12819 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dPNLQ-0006dx-B5
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 02:17:57 -0400
-References: <cover.1497276062.git.maozy.fnst@cn.fujitsu.com>
-	<debfee582acd0e32a08a812c710abbdeb11e90d1.1497276062.git.maozy.fnst@cn.fujitsu.com>
-	<87bmpe4wyz.fsf@dusky.pond.sub.org> <871sqa3huv.fsf@dusky.pond.sub.org>
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Message-ID: <d5d8eba7-040a-b74b-7849-78c8eb348ec0@cn.fujitsu.com>
-Date: Mon, 26 Jun 2017 14:17:46 +0800
-MIME-Version: 1.0
-In-Reply-To: <871sqa3huv.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 2/4] net/net: Convert parse_host_port()
- to Error
+	(envelope-from <jbeulich@suse.com>) id 1dPNSn-0000zq-45
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 02:25:37 -0400
+Received: from prv-mh.provo.novell.com ([137.65.248.74]:53242)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jbeulich@suse.com>) id 1dPNSm-0000yr-S5
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 02:25:33 -0400
+Message-Id: <5950A8D802000078001012A1@prv-mh.provo.novell.com>
+Date: Mon, 26 Jun 2017 00:25:28 -0600
+From: "Jan Beulich" <jbeulich@suse.com>
+References: <59492D1C0200007800164AA3@prv-mh.provo.novell.com>
+	<59492D1C0200007800164AA3@prv-mh.provo.novell.com>
+	<alpine.DEB.2.10.1706201421210.12819@sstabellini-ThinkPad-X260>
+	<594A2A1C0200007800164F2A@prv-mh.provo.novell.com>
+	<alpine.DEB.2.10.1706211108530.12819@sstabellini-ThinkPad-X260>
+	<594B8493020000780016595C@prv-mh.provo.novell.com>
+	<alpine.DEB.2.10.1706221146320.12819@sstabellini-ThinkPad-X260>
+	<594CEBEF0200007800166189@prv-mh.provo.novell.com>
+	<alpine.DEB.2.10.1706231131570.12819@sstabellini-ThinkPad-X260>
+In-Reply-To: <alpine.DEB.2.10.1706231131570.12819@sstabellini-ThinkPad-X260>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Subject: Re: [Qemu-devel] [PATCH] xen/disk: don't leak stack data via
+ response ring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,304 +36,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, jasowang@redhat.com, kraxel@redhat.com
+To: sstabellini@kernel.org
+Cc: julien.grall@arm.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
 
-Hi, Markus
+>>> Stefano Stabellini <sstabellini@kernel.org> 06/23/17 8:43 PM >>>
+>On Fri, 23 Jun 2017, Jan Beulich wrote:
+>> >>> On 22.06.17 at 20:52, <sstabellini@kernel.org> wrote:
+>> > I am happy to write the code and/or the commit message. Would a =
+simple
+>> > cast like below work to fix the security issue?
+>>=20
+>> I suppose so, but you do realize that this is _exactly_ what
+>> my patch does, except you use dangerous casts while I play
+>> type-safe?
+>
+>Why is the cast dangerous?
 
+Casts, and especially pointer ones) are always dangerous, as they have
+the potential of type changes elsewhere going unnoticed. You may have
+noticed that in reviews I'm often picking at casts, because in a majority
+of cases people use them they're not needed and hence their use is a
+(latent) risk.
 
-On 06/23/2017 10:21 PM, Markus Armbruster wrote:
-> Markus Armbruster <armbru@redhat.com> writes:
->
->> Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
->>
->>> Cc: berrange@redhat.com
->>> Cc: kraxel@redhat.com
->>> Cc: pbonzini@redhat.com
->>> Cc: jasowang@redhat.com
->>> Cc: armbru@redhat.com
->>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
->>> ---
->>>  include/qemu/sockets.h |  2 +-
->>>  net/net.c              | 21 ++++++++++++++++-----
->>>  net/socket.c           | 37 ++++++++++++++++++++++---------------
->>>  3 files changed, 39 insertions(+), 21 deletions(-)
->>>
->>> diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
->>> index 5c326db..7abffc4 100644
->>> --- a/include/qemu/sockets.h
->>> +++ b/include/qemu/sockets.h
->>> @@ -53,7 +53,7 @@ void socket_listen_cleanup(int fd, Error **errp);
->>>  int socket_dgram(SocketAddress *remote, SocketAddress *local, Error **errp);
->>>
->>>  /* Old, ipv4 only bits.  Don't use for new code. */
->>> -int parse_host_port(struct sockaddr_in *saddr, const char *str);
->>> +int parse_host_port(struct sockaddr_in *saddr, const char *str, Error **errp);
->>>  int socket_init(void);
->>>
->>>  /**
->>> diff --git a/net/net.c b/net/net.c
->>> index 6235aab..e55869a 100644
->>> --- a/net/net.c
->>> +++ b/net/net.c
->>> @@ -100,7 +100,7 @@ static int get_str_sep(char *buf, int buf_size, const char **pp, int sep)
->>>      return 0;
->>>  }
->>>
->>> -int parse_host_port(struct sockaddr_in *saddr, const char *str)
->>> +int parse_host_port(struct sockaddr_in *saddr, const char *str, Error **errp)
->>>  {
->>>      char buf[512];
->>>      struct hostent *he;
->>> @@ -108,24 +108,35 @@ int parse_host_port(struct sockaddr_in *saddr, const char *str)
->>>      int port;
->>>
->>>      p = str;
->>> -    if (get_str_sep(buf, sizeof(buf), &p, ':') < 0)
->>> +    if (get_str_sep(buf, sizeof(buf), &p, ':') < 0) {
->>> +        error_setg(errp, "The address should contain ':', for example: "
->>> +                   "xxxx=230.0.0.1:1234");
->>>          return -1;
->>> +    }
->>>      saddr->sin_family = AF_INET;
->>>      if (buf[0] == '\0') {
->>>          saddr->sin_addr.s_addr = 0;
->>>      } else {
->>>          if (qemu_isdigit(buf[0])) {
->>> -            if (!inet_aton(buf, &saddr->sin_addr))
->>> +            if (!inet_aton(buf, &saddr->sin_addr)) {
->>> +                error_setg(errp, "Host address '%s' is not a valid "
->>> +                           "IPv4 address", buf);
->>>                  return -1;
->>> +            }
->>>          } else {
->>> -            if ((he = gethostbyname(buf)) == NULL)
->>> +            he = gethostbyname(buf);
->>> +            if (he == NULL) {
->>> +                error_setg(errp, "Specified hostname is error.");
->>>                  return - 1;
->>> +            }
->>>              saddr->sin_addr = *(struct in_addr *)he->h_addr;
->>>          }
->>>      }
->>>      port = strtol(p, (char **)&r, 0);
->>> -    if (r == p)
->>> +    if (r == p) {
->>> +        error_setg(errp, "The port number is illegal");
->>>          return -1;
->>> +    }
->>>      saddr->sin_port = htons(port);
->>>      return 0;
->>>  }
->>> diff --git a/net/socket.c b/net/socket.c
->>> index 53765bd..66016c8 100644
->>> --- a/net/socket.c
->>> +++ b/net/socket.c
->>> @@ -485,15 +485,17 @@ static void net_socket_accept(void *opaque)
->>>  static int net_socket_listen_init(NetClientState *peer,
->>>                                    const char *model,
->>>                                    const char *name,
->>> -                                  const char *host_str)
->>> +                                  const char *host_str,
->>> +                                  Error **errp)
->>
->> You convert net_socket_listen_init() to Error.  This means you have to
->> make it set an error on failure.  You do ...
->>
->>>  {
->>>      NetClientState *nc;
->>>      NetSocketState *s;
->>>      struct sockaddr_in saddr;
->>>      int fd, ret;
->>>
->>> -    if (parse_host_port(&saddr, host_str) < 0)
->>> +    if (parse_host_port(&saddr, host_str, errp) < 0) {
->>>          return -1;
->>> +    }
->>
->> ... here, ...
->>
->>>
->>>      fd = qemu_socket(PF_INET, SOCK_STREAM, 0);
->>>      if (fd < 0) {
->>            perror("socket");
->>            return -1;
->>        }
->>
->> ... but not here.  Two more error returns follow.
->>
->> Preexisting bug: net_socket_listen_init() reports to stderr for three
->> out of four failures.  Functions should either report on no failure or
->> on all.  Conversion to Error should fix that, but yours isn't complete.
->> When it is, the fix should be mentioned in the commit message.
->>
->>> @@ -531,14 +533,16 @@ static int net_socket_listen_init(NetClientState *peer,
->>>  static int net_socket_connect_init(NetClientState *peer,
->>>                                     const char *model,
->>>                                     const char *name,
->>> -                                   const char *host_str)
->>> +                                   const char *host_str,
->>> +                                   Error **errp)
->>>  {
->>>      NetSocketState *s;
->>>      int fd, connected, ret;
->>>      struct sockaddr_in saddr;
->>>
->>> -    if (parse_host_port(&saddr, host_str) < 0)
->>> +    if (parse_host_port(&saddr, host_str, errp) < 0) {
->>>          return -1;
->>> +    }
->>>
->>>      fd = qemu_socket(PF_INET, SOCK_STREAM, 0);
->>>      if (fd < 0) {
->>
->> Again, you have to make the function set an error on all failures, not
->> just this one.
->>
->> Additionally:
->>
->>        s = net_socket_fd_init(peer, model, name, fd, connected);
->>        if (!s)
->>            return -1;
->>
->> net_socket_fd_init() still prints to stderr.  Please convert it to
->> Error.
->>
->>> @@ -580,14 +584,15 @@ static int net_socket_mcast_init(NetClientState *peer,
->>>                                   const char *model,
->>>                                   const char *name,
->>>                                   const char *host_str,
->>> -                                 const char *localaddr_str)
->>> +                                 const char *localaddr_str,
->>> +                                 Error **errp)
->>>  {
->>>      NetSocketState *s;
->>>      int fd;
->>>      struct sockaddr_in saddr;
->>>      struct in_addr localaddr, *param_localaddr;
->>>
->>> -    if (parse_host_port(&saddr, host_str) < 0)
->>> +    if (parse_host_port(&saddr, host_str, errp) < 0)
->>>          return -1;
->>>
->>>      if (localaddr_str != NULL) {
->>
->> Again, you have to make the function set an error on all failures.
->>
->> Additionally, convert net_socket_mcast_create() to Error.
->
-> Actually, you do in the next patch.  So, you first do an incorrect
-> conversion in PATCH 2, then fix it in PATCH 3.  Not horrible, but
-> avoiding the broken intermediate state is easy enough: convert
-> net_socket_mcast_create() to Error before PATCH 2, changing its callers
-> from
->
->     fd = net_socket_mcast_create(&saddr, param_localaddr);
->     if (fd < 0) {
->         // error already reported
->         take the error exit
->     }
->
-> to
->
->     fd = net_socket_mcast_create(&saddr, param_localaddr, &err);
->     if (fd < 0) {
->         error_report_err(err);
->         take the error exit
->     }
->
-> The error_report_err() goes away when the function containing it gets
-> converted to Error.  Any questions?
+> Both your patch and my version of it rely on
+>inner knowledge of the way the rings are laid out in memory, but at
+>least my patch doesn't introduce the risk of instantiating broken
+>structs. Besides, type safety checks don't add much value, given that we
+>rely on the way the ring.h macros have been written, which weren't even
+>imported in the QEMU project until March this year.
 
+That's said, as it seems to imply backporting of the change to older
+qemu may then be problematic. Otoh I don't recall having had problems
+with using the patch with only minor adjustments on older trees of ours.
 
-Thanks for your detailed explanation, it inspired me. :)
+>These are the reasons why I prefer my version, but I would consider your
+>version with clear in-code comments that warn users to avoid
+>instantiating the structs because they are not ABI compliant.
+>
+>How do you want to proceed?
 
-This patchset looks a bit confusing because it doesn't have a correct order
-and error path,  I'll rearrange to avoid it.
+I can provide a version with comments added, but only next week. If you
+feel like you want to go with your variant, I won't stand in the way, but =
+I
+also wouldn't give it my ack or alike (which you don't depend on anyway).
 
-Thank you very much.
-Mao
-
-
->
->>> @@ -619,17 +624,18 @@ static int net_socket_udp_init(NetClientState *peer,
->>>                                   const char *model,
->>>                                   const char *name,
->>>                                   const char *rhost,
->>> -                                 const char *lhost)
->>> +                                 const char *lhost,
->>> +                                 Error **errp)
->>>  {
->>>      NetSocketState *s;
->>>      int fd, ret;
->>>      struct sockaddr_in laddr, raddr;
->>>
->>> -    if (parse_host_port(&laddr, lhost) < 0) {
->>> +    if (parse_host_port(&laddr, lhost, errp) < 0) {
->>>          return -1;
->>>      }
->>>
->>> -    if (parse_host_port(&raddr, rhost) < 0) {
->>> +    if (parse_host_port(&raddr, rhost, errp) < 0) {
->>>          return -1;
->>>      }
->>>
->>
->> Again, you have make the function set an error on all failures.
->>
->>> @@ -703,15 +709,16 @@ int net_init_socket(const Netdev *netdev, const char *name,
->>>      }
->>>
->>>      if (sock->has_listen) {
->>> -        if (net_socket_listen_init(peer, "socket", name, sock->listen) == -1) {
->>> +        if (net_socket_listen_init(peer, "socket", name, sock->listen,
->>> +            errp) == -1) {
->>>              return -1;
->>>          }
->>>          return 0;
->>>      }
->>>
->>>      if (sock->has_connect) {
->>> -        if (net_socket_connect_init(peer, "socket", name, sock->connect) ==
->>> -            -1) {
->>> +        if (net_socket_connect_init(peer, "socket", name, sock->connect,
->>> +            errp) == -1) {
->>>              return -1;
->>>          }
->>>          return 0;
->>> @@ -721,7 +728,7 @@ int net_init_socket(const Netdev *netdev, const char *name,
->>>          /* if sock->localaddr is missing, it has been initialized to "all bits
->>>           * zero" */
->>>          if (net_socket_mcast_init(peer, "socket", name, sock->mcast,
->>> -            sock->localaddr) == -1) {
->>> +            sock->localaddr, errp) == -1) {
->>>              return -1;
->>>          }
->>>          return 0;
->>> @@ -732,8 +739,8 @@ int net_init_socket(const Netdev *netdev, const char *name,
->>>          error_report("localaddr= is mandatory with udp=");
->>>          return -1;
->>>      }
->>> -    if (net_socket_udp_init(peer, "socket", name, sock->udp, sock->localaddr) ==
->>> -        -1) {
->>> +    if (net_socket_udp_init(peer, "socket", name, sock->udp, sock->localaddr,
->>> +        errp) == -1) {
->>>          return -1;
->>>      }
->>>      return 0;
->>
->> This is a partial fix for net_init_socket()'s
->>     /* FIXME error_setg(errp, ...) on failure */
->>
->> Can you fix it completely?  Not required to get the patch accepted, as
->> far as I'm concerned.
->
-> Ah, you do in PATCH 4.  Suggest to explain in your commit message that
-> this is a partial fix, which will be completed in the following
-> commit(s).
->
->> Your commit message claims "Convert parse_host_port() to Error".  You do
->> more than that.  Please rephrase the commit message.
->
->
->
+Jan
