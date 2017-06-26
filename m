@@ -1,14 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dPTm9-0007J1-E2
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 09:09:58 -0400
+	(envelope-from <berto@igalia.com>) id 1dPTuF-0001KE-BC
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 09:18:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dPTm8-0006H1-Au
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 09:09:57 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 26 Jun 2017 15:09:44 +0200
-Message-Id: <1498482584-15826-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL v2 00/60] Block layer patches
+	(envelope-from <berto@igalia.com>) id 1dPTuA-0001Ec-9M
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 09:18:19 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170623162419.26068-8-berrange@redhat.com>
+References: <20170623162419.26068-1-berrange@redhat.com>
+	<20170623162419.26068-8-berrange@redhat.com>
+Date: Mon, 26 Jun 2017 15:18:11 +0200
+Message-ID: <w51mv8udh0s.fsf@maestria.local.igalia.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v10 07/20] block: deprecate "encryption=on"
+ in favor of "encrypt.format=aes"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,151 +23,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-The following changes since commit 931892e8a691a8a4151cc5fe1e13c14294bb28fb:
+On Fri 23 Jun 2017 06:24:06 PM CEST, Daniel P. Berrange wrote:
+> Historically the qcow & qcow2 image formats supported a property
+> "encryption=on" to enable their built-in AES encryption. We'll
+> soon be supporting LUKS for qcow2, so need a more general purpose
+> way to enable encryption, with a choice of formats.
+>
+> This introduces an "encrypt.format" option, which will later be
+> joined by a number of other "encrypt.XXX" options. The use of
+> a "encrypt." prefix instead of "encrypt-" is done to facilitate
+> mapping to a nested QAPI schema at later date.
+>
+> e.g. the preferred syntax is now
+>
+>   qemu-img create -f qcow2 -o encrypt.format=aes demo.qcow2
+>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 
-  Merge remote-tracking branch 'remotes/rth/tags/pull-s390-20170623' into staging (2017-06-23 18:11:48 +0100)
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
-are available in the git repository at:
-
-
-  git://repo.or.cz/qemu/kevin.git tags/for-upstream
-
-for you to fetch changes up to 704e41ba789ad88158f051eee648d7087beffac7:
-
-  Merge remote-tracking branch 'mreitz/tags/pull-block-2017-06-26' into queue-block (2017-06-26 14:57:27 +0200)
-
-v2:
-- Dropped "virtio-pci: use ioeventfd even when KVM is disabled"
-
-----------------------------------------------------------------
-
-Block layer patches
-
-----------------------------------------------------------------
-Alberto Garcia (9):
-      throttle: Update throttle-groups.c documentation
-      qcow2: Remove unused Error variable in do_perform_cow()
-      qcow2: Use unsigned int for both members of Qcow2COWRegion
-      qcow2: Make perform_cow() call do_perform_cow() twice
-      qcow2: Split do_perform_cow() into _read(), _encrypt() and _write()
-      qcow2: Allow reading both COW regions with only one request
-      qcow2: Pass a QEMUIOVector to do_perform_cow_{read,write}()
-      qcow2: Merge the writing of the COW regions with the guest data
-      qcow2: Use offset_into_cluster() and offset_to_l2_index()
-
-Kevin Wolf (37):
-      commit: Fix completion with extra reference
-      qemu-iotests: Allow starting new qemu after cleanup
-      qemu-iotests: Test exiting qemu with running job
-      doc: Document generic -blockdev options
-      doc: Document driver-specific -blockdev options
-      qed: Use bottom half to resume waiting requests
-      qed: Make qed_read_table() synchronous
-      qed: Remove callback from qed_read_table()
-      qed: Remove callback from qed_read_l2_table()
-      qed: Remove callback from qed_find_cluster()
-      qed: Make qed_read_backing_file() synchronous
-      qed: Make qed_copy_from_backing_file() synchronous
-      qed: Remove callback from qed_copy_from_backing_file()
-      qed: Make qed_write_header() synchronous
-      qed: Remove callback from qed_write_header()
-      qed: Make qed_write_table() synchronous
-      qed: Remove GenericCB
-      qed: Remove callback from qed_write_table()
-      qed: Make qed_aio_read_data() synchronous
-      qed: Make qed_aio_write_main() synchronous
-      qed: Inline qed_commit_l2_update()
-      qed: Add return value to qed_aio_write_l1_update()
-      qed: Add return value to qed_aio_write_l2_update()
-      qed: Add return value to qed_aio_write_main()
-      qed: Add return value to qed_aio_write_cow()
-      qed: Add return value to qed_aio_write_inplace/alloc()
-      qed: Add return value to qed_aio_read/write_data()
-      qed: Remove ret argument from qed_aio_next_io()
-      qed: Remove recursion in qed_aio_next_io()
-      qed: Implement .bdrv_co_readv/writev
-      qed: Use CoQueue for serialising allocations
-      qed: Simplify request handling
-      qed: Use a coroutine for need_check_timer
-      qed: Add coroutine_fn to I/O path functions
-      qed: Use bdrv_co_* for coroutine_fns
-      block: Remove bdrv_aio_readv/writev/flush()
-      Merge remote-tracking branch 'mreitz/tags/pull-block-2017-06-26' into queue-block
-
-Manos Pitsidianakis (1):
-      block: change variable names in BlockDriverState
-
-Max Reitz (3):
-      blkdebug: Catch bs->exact_filename overflow
-      blkverify: Catch bs->exact_filename overflow
-      block: Do not strcmp() with NULL uri->scheme
-
-Stefan Hajnoczi (9):
-      block: count bdrv_co_rw_vmstate() requests
-      block: use BDRV_POLL_WHILE() in bdrv_rw_vmstate()
-      migration: avoid recursive AioContext locking in save_vmstate()
-      migration: use bdrv_drain_all_begin/end() instead bdrv_drain_all()
-      migration: hold AioContext lock for loadvm qemu_fclose()
-      qemu-iotests: 068: extract _qemu() function
-      qemu-iotests: 068: use -drive/-device instead of -hda
-      qemu-iotests: 068: test iothread mode
-      qemu-img: don't shadow opts variable in img_dd()
-
-Stephen Bates (1):
-      nvme: Add support for Read Data and Write Data in CMBs.
-
-sochin.jiang (1):
-      fix: avoid an infinite loop or a dangling pointer problem in img_commit
-
- block/Makefile.objs            |   2 +-
- block/blkdebug.c               |  46 +--
- block/blkreplay.c              |   8 +-
- block/blkverify.c              |  12 +-
- block/block-backend.c          |  22 +-
- block/commit.c                 |   7 +
- block/file-posix.c             |  34 +-
- block/io.c                     | 240 ++-----------
- block/iscsi.c                  |  20 +-
- block/mirror.c                 |   8 +-
- block/nbd-client.c             |   8 +-
- block/nbd-client.h             |   4 +-
- block/nbd.c                    |   6 +-
- block/nfs.c                    |   2 +-
- block/qcow2-cluster.c          | 201 ++++++++---
- block/qcow2.c                  |  94 +++--
- block/qcow2.h                  |  11 +-
- block/qed-cluster.c            | 124 +++----
- block/qed-gencb.c              |  33 --
- block/qed-table.c              | 261 +++++---------
- block/qed.c                    | 779 ++++++++++++++++-------------------------
- block/qed.h                    |  54 +--
- block/raw-format.c             |   8 +-
- block/rbd.c                    |   4 +-
- block/sheepdog.c               |  12 +-
- block/ssh.c                    |   2 +-
- block/throttle-groups.c        |   2 +-
- block/trace-events             |   3 -
- blockjob.c                     |   4 +-
- hw/block/nvme.c                |  83 +++--
- hw/block/nvme.h                |   1 +
- include/block/block.h          |  16 +-
- include/block/block_int.h      |   6 +-
- include/block/blockjob.h       |  18 +
- include/sysemu/block-backend.h |  20 +-
- migration/savevm.c             |  32 +-
- qemu-img.c                     |  29 +-
- qemu-io-cmds.c                 |  46 +--
- qemu-options.hx                | 221 ++++++++++--
- tests/qemu-iotests/068         |  37 +-
- tests/qemu-iotests/068.out     |  11 +-
- tests/qemu-iotests/185         | 206 +++++++++++
- tests/qemu-iotests/185.out     |  59 ++++
- tests/qemu-iotests/common.qemu |   3 +
- tests/qemu-iotests/group       |   1 +
- 45 files changed, 1476 insertions(+), 1324 deletions(-)
- delete mode 100644 block/qed-gencb.c
- create mode 100755 tests/qemu-iotests/185
- create mode 100644 tests/qemu-iotests/185.out
+Berto
