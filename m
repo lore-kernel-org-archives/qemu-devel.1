@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35554)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dPcfa-0000CN-2g
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 18:39:46 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dPclX-0001wJ-59
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 18:45:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dPcfZ-0002XC-E0
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 18:39:46 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:33162)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1dPcfZ-0002Wu-7W
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 18:39:45 -0400
-Received: by mail-wr0-x242.google.com with SMTP id x23so30510365wrb.0
-	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 15:39:45 -0700 (PDT)
+	(envelope-from <el13635@mail.ntua.gr>) id 1dPclV-0006fr-T6
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 18:45:55 -0400
+Date: Tue, 27 Jun 2017 01:45:07 +0300
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20170626224507.ep2hqzpxknfimf55@postretch>
+References: <20170623124700.1389-1-el13635@mail.ntua.gr>
+	<20170623124700.1389-8-el13635@mail.ntua.gr>
+	<20170626154444.GH29664@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20170623164557.11636-4-f4bug@amsat.org>
-References: <20170623164557.11636-1-f4bug@amsat.org>
-	<20170623164557.11636-4-f4bug@amsat.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 26 Jun 2017 15:39:13 -0700
-Message-ID: <CAKmqyKM_eWW2jps6Xw2JsjjrCoX_aLZdjYwYGWRq6FbF+WZkCA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] hw/core: report an error if invalid
- gpio is used
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="m2b43yy3q4txuigf"
+Content-Disposition: inline
+In-Reply-To: <20170626154444.GH29664@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC v3 7/8] block: remove
+ legacy I/O throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,47 +26,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>
 
-On Fri, Jun 23, 2017 at 9:45 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
-> then abort calling error_setg()
 
-The commit message should be able to be read separately from the title.
+--m2b43yy3q4txuigf
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Once you fix up the message:
+On Mon, Jun 26, 2017 at 04:44:44PM +0100, Stefan Hajnoczi wrote:
+>On Fri, Jun 23, 2017 at 03:46:59PM +0300, Manos Pitsidianakis wrote:
+>> -void blk_io_limits_disable(BlockBackend *blk)
+>> +void blk_io_limits_disable(BlockBackend *blk, Error **errp)
+>>  {
+>> -    assert(blk->public.throttle_group_member.throttle_state);
+>> -    bdrv_drained_begin(blk_bs(blk));
+>> -    throttle_group_unregister_tgm(&blk->public.throttle_group_member);
+>> -    bdrv_drained_end(blk_bs(blk));
+>> +    Error *local_err =3D NULL;
+>> +    BlockDriverState *bs, *throttle_node;
+>> +
+>> +    throttle_node =3D blk_get_public(blk)->throttle_node;
+>> +
+>> +    assert(throttle_node && throttle_node->refcnt =3D=3D 1);
+>
+>I'm not sure if we can enforce refcnt =3D=3D 1.  What stops other graph
+>manipulation operations from inserting a node above or a BB that uses
+>throttle_node as the root?
 
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-
-Thanks,
-Alistair
+Is this possible unless the user explicitly does this? I suppose going=20
+down the path and removing it from any place is okay. If the=20
+throttle_node has more than one parent then the result would be invalid=20
+anyway. I don't see anything in the code doing this (removing a BDS from=20
+a BB->leaf path) or wrapping it in some way, is that what should be=20
+done?
 
 >
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  hw/core/qdev.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+>> +
+>> +    /* ref throttle_node's child bs so that it isn't lost when throttle=
+_node is
+>> +     * destroyed */
+>> +    bdrv_ref(bs);
+>> +
+>> +    /* this destroys throttle_node */
+>> +    blk_remove_bs(blk);
 >
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 849952a8d4..05aaa67cb8 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -448,7 +448,11 @@ qemu_irq qdev_get_gpio_in_named(DeviceState *dev, co=
-nst char *name, int n)
->  {
->      NamedGPIOList *gpio_list =3D qdev_get_named_gpio_list(dev, name);
->
-> -    assert(n >=3D 0 && n < gpio_list->num_in);
-> +    assert(n >=3D 0);
-> +    if (n >=3D gpio_list->num_in) {
-> +        error_setg(&error_abort, "Invalid gpio #%d (of %d) for %s",
-> +                   n, gpio_list->num_in, name ? name : "device");
-> +    }
->      return gpio_list->in[n];
->  }
->
-> --
-> 2.13.1
->
->
+>This assumes that throttle_node is the top node.  How is this=20
+>constraint enforced?
+
+
+Kevin had said in a previous discussion:
+> The throttle node affects only the backing file now, but not the new
+> top-level node. With manually created filter nodes we may need to
+> provide a way so that the QMP command tells where in the tree the
+> snapshot is actually taken. With automatically created ones, we need to
+> make sure that they always stay on top.
+>=20
+> Similar problems arise when block jobs manipulate the graph. For
+> example, think of a commit block job, which will remove the topmost node
+> from the backing file chain. We don't want it to remove the throttling
+> filter together with the qcow2 node. (Or do we? It might be something
+> that needs to be configurable.)
+>=20
+> We also have several QMP that currently default to working on the
+> topmost image of the chain. Some of them may actually want to work on
+> the topmost node that isn't an automatically inserted filter.
+>=20
+>=20
+> I hope this helps you understand why I keep saying that automatic
+> insertion/removal of filter nodes is tricky and we should do it as
+> little as we possibly can.
+
+Yes, this constraint isn't enforced. The automatically inserted filter=20
+is not a very clean concept. I'll have to think about it a little more,=20
+unless there are some ideas.
+
+--m2b43yy3q4txuigf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAllRjnMACgkQc2J8L2kN
+9xCaFg/8CdWwUEV8v2x5KpQvIcfoKD/njnQlce1SIp82aF1AOzJAYeLoBtFB+Nhw
+/Gi3rKHEJFcaBlEMl+uFft9spp6/UtOXIEKMjwrG3pv5Ip7qncrq6xQ3hPbb+X+c
+GBmHcQxjOO0YRKupeTDFFY31Jb4aUQwEgkHsPnq1XsHfJZdHF0pP+DzucG3kBGBe
+zYB4GUIWl2oN7Ht5MbD606C4e7ZTSL2rYDy56bCFJCbmXfR9hT/gUsjtDVTJa25N
+zaSIaKDNGXoF96W4bb+TxieaA2uKWK4a4dttypvQppjrjRWZ6DAXi+t3DjEiTE57
+tq/P+2wB+x+87llN9CtbUcPSwa6vP7lPLIpedvwC7Azt2ePb+gvPrlBolHlIwVPz
+Kx2quGAF70De7go8OaQCefvMfOUfFXyEMM4ms2OrPBU4LCTp283UrH+NTMm91wUu
+OgLdR65A98g2NRr6YQF0Mu39TM9elshlFaVrgowJ8eS9bp4F9/MosJa3sX7HmfZh
+c3rMXQ1K3dzNLpTReXjntZVzxbebkzf8fqrWW2Wc1oJPrDJD2uU3HKb6hFNxc/nu
+l61juC+XWgaDXl1Y5M54n1+PJh/At/jch0RSzNHA5KPVckOOH7hNsL3uLtp/al5q
+mhu61EK5GHmvUewYgsQzt7QJwNDIwBWh+IBcdSTkwi8KrL2egV8=
+=2QS7
+-----END PGP SIGNATURE-----
+
+--m2b43yy3q4txuigf--
