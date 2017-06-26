@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dPWLZ-0007bU-T4
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 11:54:42 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dPWNu-0000dm-2E
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 11:57:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dPWLV-00053h-84
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 11:54:41 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:34543)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dPWLV-00053U-3R
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 11:54:37 -0400
-Received: by mail-qt0-x244.google.com with SMTP id w6so685238qtg.1
-	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 08:54:36 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1498487280-17836-1-git-send-email-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <745bc99a-9768-8dc7-ec17-843ad39d354d@amsat.org>
-Date: Mon, 26 Jun 2017 12:54:33 -0300
+	(envelope-from <stefanha@redhat.com>) id 1dPWNq-0005uH-4k
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 11:57:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34210)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dPWNp-0005tJ-VP
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 11:57:02 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C86E87D4E0
+	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 15:56:59 +0000 (UTC)
+Date: Mon, 26 Jun 2017 16:56:56 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170626155656.GJ29664@stefanha-x1.localdomain>
+References: <20170624181008.25497-1-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1498487280-17836-1-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] main_loop: Make main_loop_wait() return
- void
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="5me2qT3T17SWzdxI"
+Content-Disposition: inline
+In-Reply-To: <20170624181008.25497-1-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] qobject coccinelle followups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,91 +33,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, patches@linaro.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, marcandre.lureau@redhat.com
 
-On 06/26/2017 11:28 AM, Peter Maydell wrote:
-> In commit e330c118f2a5a the last usage of main_loop_wait() that cared
-> about the return value was changed to no longer use it. Drop the
-> now-useless return value and make the function return void.
-> 
-> We avoid the awkwardness of ifdeffery to handle the 'ret'
-> variable in main_loop_wait() only being wanted if CONFIG_SLIRP
-> by simply dropping all the ifdefs. There are stub implementations
-> of slirp_pollfds_poll() and slirp_pollfds_fill() already in
-> stubs/slirp.c which do nothing, as required.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+--5me2qT3T17SWzdxI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> ---
-> This will coincidentally satisfy Coverity, which currently complains
-> in CID 1372464 that we call main_loop_wait() in vl.c and ignore the
-> return value which may be reporting a poll() syscall failure.
-> Essentially we don't expect poll() to fail, except perhaps with
-> a transient EINTR -- if it ever did we'd spin retrying endlessly
-> I think.
-> ---
->   include/qemu/main-loop.h | 2 +-
->   util/main-loop.c         | 8 ++------
->   2 files changed, 3 insertions(+), 7 deletions(-)
-> 
-> diff --git a/include/qemu/main-loop.h b/include/qemu/main-loop.h
-> index d7e24af..6b4b60b 100644
-> --- a/include/qemu/main-loop.h
-> +++ b/include/qemu/main-loop.h
-> @@ -79,7 +79,7 @@ int qemu_init_main_loop(Error **errp);
->    *
->    * @nonblocking: Whether the caller should block until an event occurs.
->    */
-> -int main_loop_wait(int nonblocking);
-> +void main_loop_wait(int nonblocking);
->   
->   /**
->    * qemu_get_aio_context: Return the main loop's AioContext
-> diff --git a/util/main-loop.c b/util/main-loop.c
-> index 19cad6b..0b25405 100644
-> --- a/util/main-loop.c
-> +++ b/util/main-loop.c
-> @@ -487,7 +487,7 @@ static int os_host_main_loop_wait(int64_t timeout)
->   }
->   #endif
->   
-> -int main_loop_wait(int nonblocking)
-> +void main_loop_wait(int nonblocking)
->   {
->       int ret;
->       uint32_t timeout = UINT32_MAX;
-> @@ -500,9 +500,7 @@ int main_loop_wait(int nonblocking)
->       /* poll any events */
->       g_array_set_size(gpollfds, 0); /* reset for new iteration */
->       /* XXX: separate device handlers from system ones */
-> -#ifdef CONFIG_SLIRP
->       slirp_pollfds_fill(gpollfds, &timeout);
-> -#endif
->   
->       if (timeout == UINT32_MAX) {
->           timeout_ns = -1;
-> @@ -515,16 +513,14 @@ int main_loop_wait(int nonblocking)
->                                             &main_loop_tlg));
->   
->       ret = os_host_main_loop_wait(timeout_ns);
-> -#ifdef CONFIG_SLIRP
->       slirp_pollfds_poll(gpollfds, (ret < 0));
-> -#endif
->   
->       /* CPU thread can infinitely wait for event after
->          missing the warp */
->       qemu_start_warp_timer();
->       qemu_clock_run_all_timers();
->   
-> -    return ret;
-> +    return;
+On Sat, Jun 24, 2017 at 12:10:06PM -0600, Eric Blake wrote:
+> v1 was here:
+> https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg02589.html
+>=20
+> Since then:
+> - reorder the series
+> - add R-b on patch 1
+> - patch 2 updated to catch recent introduction of longhand usage
+>=20
+> Eric Blake (2):
+>   qobject: Catch another straggler for use of qdict_put_str()
+>   qobject: Update coccinelle script to catch Q{INC,DEC}REF
+>=20
+>  monitor.c                        | 2 +-
+>  qemu-img.c                       | 2 +-
+>  scripts/coccinelle/qobject.cocci | 6 ++++++
+>  3 files changed, 8 insertions(+), 2 deletions(-)
+>=20
+> --=20
+> 2.9.4
+>=20
 
-drop this return?
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
->   }
->   
->   /* Functions to operate on the main QEMU AioContext.  */
-> 
+--5me2qT3T17SWzdxI
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZUS7IAAoJEJykq7OBq3PIkGkH/3S1eoVZFfpPM7aonrXi6anU
+TqjnvVg2lot7sPbmy1bvZNY6/C4ldHeLfzVGk0J6CgfYlwnQksH4I8bx/E1JfDIm
+hIM9Ib8Tp2F6e1e+DNernlsHANKtPihjxGgsiBldpMf+KlWPV2yphEb166mysYNz
+APpVYLkk5hHa05f+uwX9E1yrKllG8uMpb8ItOOidvr3yNnbNz5j7LOi90xJzKEXP
+1dYFVsehc64TLzL6qX8MKHBTfetItxt0eMY3M6uBxYr4cv1ZNhx6qGSAb7mjN9sO
+ukYN2QkFkXTO9sN1VoidXkDbc/ePcCvkFMwxZzPoINtRAkXgEUPAIYIKiIhJsIk=
+=qumj
+-----END PGP SIGNATURE-----
+
+--5me2qT3T17SWzdxI--
