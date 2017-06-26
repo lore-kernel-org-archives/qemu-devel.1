@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35131)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1dPQwE-0000Bn-N7
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:08:11 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35166)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <berto@igalia.com>) id 1dPQwJ-0000Ex-4F
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:08:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1dPQw9-0007fe-NY
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:08:10 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:46325 helo=mx01.kamp.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dPQw9-0007ew-EH
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:08:05 -0400
-References: <0f83a15d-66b0-36aa-e5a4-d03cd37757c9@kamp.de>
-	<20170626082838.GA4348@noname.redhat.com>
-	<0e6586f9-85eb-efcd-4825-20066a7c869a@kamp.de>
-	<20170626095719.GB4348@noname.redhat.com>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <b82ab934-ddc3-2d50-09cf-764f2165f2c8@kamp.de>
-Date: Mon, 26 Jun 2017 12:08:01 +0200
+	(envelope-from <berto@igalia.com>) id 1dPQwE-0007hD-BD
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:08:15 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170623162419.26068-10-berrange@redhat.com>
+References: <20170623162419.26068-1-berrange@redhat.com>
+	<20170623162419.26068-10-berrange@redhat.com>
+Date: Mon, 26 Jun 2017 12:07:31 +0200
+Message-ID: <w51r2y7cba4.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20170626095719.GB4348@noname.redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] QCOW2 support for LZO compression
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v10 09/20] qcow: convert QCow to use
+ QCryptoBlock for encryption
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,63 +23,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Laszlo Ersek <lersek@redhat.com>, qemu block <qemu-block@nongnu.org>, den@openvz.org, qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Am 26.06.2017 um 11:57 schrieb Kevin Wolf:
-> Am 26.06.2017 um 11:20 hat Peter Lieven geschrieben:
->>> So he chose a different algorithm (zstd). When I asked, he posted a
->>> comparison of algorithms (however a generic one and not measured in the
->>> context of qemu) that suggests that LZO would be slightly faster, but
->>> have a considerable worse compression ratio with the settings that were
->>> benchmarked.
->> My idea to choose LZO was that it is widely available and available in
->> any distro you can think of. We already have probing for it in configure.
->> My concern with ZSTD would be that it seems there are no packages
->> available for most distros and that it seems to be multi-threaded. I don't
->> know if this will cause any trouble?
-> The availability and that we already link against LZO is a good point. I
-> think we want to avoid a situation where compressed qcow2 files can't be
-> read by binaries of popular distributions - after all, downloadable
-> images are an important use case for compressed images.
-
-As long as the default remains gzip I don't see any issues. If you choose
-a different algorithm, you should know what you are doing.
-
+On Fri 23 Jun 2017 06:24:08 PM CEST, Daniel P. Berrange wrote:
+> This converts the qcow driver to make use of the QCryptoBlock
+> APIs for encrypting image content. This is only wired up to
+> permit use of the legacy QCow encryption format. Users who wish
+> to have the strong LUKS format should switch to qcow2 instead.
 >
->>> I think it's clear that if there is any serious interest in compression,
->>> we'll want to support at least one more algorithm. What we still need to
->>> evaluate is which one(s) to take, and whether a simple incompatible flag
->>> in the header like in Den's patch is enough or whether we should add a
->>> whole new header field for the compression algorithm (like we already
->>> have for encryption).
->>  From my side there clearly is interest in optimizing the compression. Its
->> even possible to speed up zlib by 3-4x times by choosing other parameters
->> for deflate which unfortunately are not compatible with our inflate settings.
->>
->> I don't know if its worth creating a new header field. Even if we spent to bits
->> in the end (one for LZO and one for ZSDT). I think this wouldn't hurt. However,
->> there are likely to pop up new compression algorithms in the future and
->> a header would be more flexible.
-> That we could just use different parameters is an important hint that
-> maybe we don't just need bits to select an algorithm, but also some
-> space for parameters for the selected algorithm. In this case I think we
-> need a header change anyway.
-
-The issue is, you don't know in advance how much space will be needed for the paramters.
-Maybe it would be simpler to have different settings for a compression algorithm threated
-as different algorithms. Like zstd-fast, zstd, zstd-slow, gzip, lzo, lzo-slow etc.
-
+> With this change it is now required to use the QCryptoSecret
+> object for providing passwords, instead of the current block
+> password APIs / interactive prompting.
 >
->> I just don't want to make it too complicated and as you pointed out
->> compression is not that interesting for most people - maybe due to its
->> speed.
-> In fact, I think it could be the poor integration in qemu. Compressed
-> images might be more appealing if you couldn't only write compressed
-> data with special-case operations like 'qemu-img convert', but just give
-> an option that you want all writes to be compressed and then use it like
-> any other image.
+>   $QEMU \
+>     -object secret,id=sec0,filename=/home/berrange/encrypted.pw \
+>     -drive file=/home/berrange/encrypted.qcow,encrypt.format=aes,\
+>            encrypt.key-secret=sec0
 
-Then we should start to improve that.
+I just realized that the property in the 'secret' object is called
+'file', not 'filename'.
 
-Peter
+You can of course keep my R-b if you fix that.
+
+Berto
