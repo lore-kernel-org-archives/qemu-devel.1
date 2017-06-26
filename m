@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35424)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dPUcG-000303-LG
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 10:03:49 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dPUzs-0001aD-3H
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 10:28:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dPUcF-0004er-MF
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 10:03:48 -0400
-Date: Mon, 26 Jun 2017 17:03:06 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170626140306.doogwehvvdtkmzxh@postretch>
-References: <20170623124700.1389-1-el13635@mail.ntua.gr>
-	<20170623124700.1389-3-el13635@mail.ntua.gr>
-	<20170626133611.GB29664@stefanha-x1.localdomain>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="it2nupntbix6xibk"
-Content-Disposition: inline
-In-Reply-To: <20170626133611.GB29664@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC v3 2/8] block: Add
- aio_context field in ThrottleGroupMember
+	(envelope-from <pm215@archaic.org.uk>) id 1dPUzr-0007NM-5i
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 10:28:12 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37343)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1dPUzq-0007Ko-Up
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 10:28:11 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 26 Jun 2017 15:28:00 +0100
+Message-Id: <1498487280-17836-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH v2] main_loop: Make main_loop_wait() return void
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,85 +22,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>
 
+In commit e330c118f2a5a the last usage of main_loop_wait() that cared
+about the return value was changed to no longer use it. Drop the
+now-useless return value and make the function return void.
 
---it2nupntbix6xibk
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
+We avoid the awkwardness of ifdeffery to handle the 'ret'
+variable in main_loop_wait() only being wanted if CONFIG_SLIRP
+by simply dropping all the ifdefs. There are stub implementations
+of slirp_pollfds_poll() and slirp_pollfds_fill() already in
+stubs/slirp.c which do nothing, as required.
 
-On Mon, Jun 26, 2017 at 02:36:11PM +0100, Stefan Hajnoczi wrote:
->On Fri, Jun 23, 2017 at 03:46:54PM +0300, Manos Pitsidianakis wrote:
->> timer_cb() needs to know about the current Aio context of the throttle
->> request that is woken up. In order to make ThrottleGroupMember backend
->> agnostic, this information is stored in an aio_context field instead of
->> accessing it from BlockBackend.
->>
->> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
->> ---
->>  block/block-backend.c   |  1 +
->>  block/throttle-groups.c | 19 +++++----------
->>  include/qemu/throttle.h |  1 +
->>  tests/test-throttle.c   | 65 +++++++++++++++++++++++++++----------------------
->>  util/throttle.c         |  4 +++
->>  5 files changed, 48 insertions(+), 42 deletions(-)
->>
->> diff --git a/block/block-backend.c b/block/block-backend.c
->> index 90a7abaa53..1d501ec973 100644
->> --- a/block/block-backend.c
->> +++ b/block/block-backend.c
->> @@ -1928,6 +1928,7 @@ void blk_io_limits_disable(BlockBackend *blk)
->>  /* should be called before blk_set_io_limits if a limit is set */
->>  void blk_io_limits_enable(BlockBackend *blk, const char *group)
->>  {
->> +    blk->public.throttle_group_member.aio_context = blk_get_aio_context(blk);
->>      assert(!blk->public.throttle_group_member.throttle_state);
->>      throttle_group_register_tgm(&blk->public.throttle_group_member, group);
->
->Or throttle_group_register_tgm() could take an AioContext* argument, I
->think that's a little cleaner than modifying throttle_group_member
->fields in multiple source files.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+This will coincidentally satisfy Coverity, which currently complains
+in CID 1372464 that we call main_loop_wait() in vl.c and ignore the
+return value which may be reporting a poll() syscall failure.
+Essentially we don't expect poll() to fail, except perhaps with
+a transient EINTR -- if it ever did we'd spin retrying endlessly
+I think.
+---
+ include/qemu/main-loop.h | 2 +-
+ util/main-loop.c         | 8 ++------
+ 2 files changed, 3 insertions(+), 7 deletions(-)
 
-Indeed that is cleaner.
-
->
->> diff --git a/block/throttle-groups.c b/block/throttle-groups.c
->> index 5e9d8fb4d6..7883cbb511 100644
->> --- a/block/throttle-groups.c
->> +++ b/block/throttle-groups.c
->> @@ -71,6 +71,7 @@ static QemuMutex throttle_groups_lock;
->>  static QTAILQ_HEAD(, ThrottleGroup) throttle_groups =
->>      QTAILQ_HEAD_INITIALIZER(throttle_groups);
->>
->> +
->>  /* Increments the reference count of a ThrottleGroup given its name.
->>   *
->>   * If no ThrottleGroup is found with the given name a new one is
->
->Spurious whitespace change.  Please do not change whitespace in random
->places.
-
-I noticed it too late unfortunately.
-
---it2nupntbix6xibk
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAllRFBoACgkQc2J8L2kN
-9xCIuw//awTpRTUMAS1qhV9lATU3dJ8tpLhEDBa8GvYNllSIGAN/+YdnmMUqg7y7
-QpO7IceBTsjmICLg0YVnABFw06ZQP/PU0mYzsro1sASKTAvQ0mD4m+IYynPo3T/s
-aMUOW4SNMNmm3qVAhiPJR5q4hrg2S7JscoaboaSLGxRRXiI+0/KXRqv60KdjXpr7
-q7N4OhaFCrhycSFyW0IM4NQ36dFNkHIQo0aJvd+quW6Jj1c8pRxvpZYjX59RuLul
-c+fLgnS4Mv4s+c9lYC+4oMcGOhZPjzmEF49PhIdp41H3MNFYSMVQCuN2acEXKInm
-zSHstvd8oEFrwtzHndZVZ4RT/YVPlwwdXsyyhajbvJkrvJuRupXknuqW1kkJ+wor
-vLDb++pPHQ7sG1wicZ6nF6VfZ8HiFlpGvf/VFt7DMytkHkNI5VWOD/+yzsi1XBTn
-5ETzTF9gG61PK0iLnwpWonEnA3vJim20vNmd165fBaxeTAVbfJEuZ5+4T29ovON5
-gsMLp06R+vyPrKo1axK5MJ5RoY1ARH39w0/Pyz7iHIYXTq2rsr6HExJtvt8Cqa9d
-CXpWYjJptwwJ/Qe2ZgGvbnLFX0hHfu4uxFymLSHgKok8rTDbEHitDxcsl02MNwdb
-+t2bn+wkJPb3crhupPA2/0l6vvYJYvgnba+cr0pgMDioRSbXvYE=
-=38GK
------END PGP SIGNATURE-----
-
---it2nupntbix6xibk--
+diff --git a/include/qemu/main-loop.h b/include/qemu/main-loop.h
+index d7e24af..6b4b60b 100644
+--- a/include/qemu/main-loop.h
++++ b/include/qemu/main-loop.h
+@@ -79,7 +79,7 @@ int qemu_init_main_loop(Error **errp);
+  *
+  * @nonblocking: Whether the caller should block until an event occurs.
+  */
+-int main_loop_wait(int nonblocking);
++void main_loop_wait(int nonblocking);
+ 
+ /**
+  * qemu_get_aio_context: Return the main loop's AioContext
+diff --git a/util/main-loop.c b/util/main-loop.c
+index 19cad6b..0b25405 100644
+--- a/util/main-loop.c
++++ b/util/main-loop.c
+@@ -487,7 +487,7 @@ static int os_host_main_loop_wait(int64_t timeout)
+ }
+ #endif
+ 
+-int main_loop_wait(int nonblocking)
++void main_loop_wait(int nonblocking)
+ {
+     int ret;
+     uint32_t timeout = UINT32_MAX;
+@@ -500,9 +500,7 @@ int main_loop_wait(int nonblocking)
+     /* poll any events */
+     g_array_set_size(gpollfds, 0); /* reset for new iteration */
+     /* XXX: separate device handlers from system ones */
+-#ifdef CONFIG_SLIRP
+     slirp_pollfds_fill(gpollfds, &timeout);
+-#endif
+ 
+     if (timeout == UINT32_MAX) {
+         timeout_ns = -1;
+@@ -515,16 +513,14 @@ int main_loop_wait(int nonblocking)
+                                           &main_loop_tlg));
+ 
+     ret = os_host_main_loop_wait(timeout_ns);
+-#ifdef CONFIG_SLIRP
+     slirp_pollfds_poll(gpollfds, (ret < 0));
+-#endif
+ 
+     /* CPU thread can infinitely wait for event after
+        missing the warp */
+     qemu_start_warp_timer();
+     qemu_clock_run_all_timers();
+ 
+-    return ret;
++    return;
+ }
+ 
+ /* Functions to operate on the main QEMU AioContext.  */
+-- 
+2.7.4
