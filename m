@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dPY1k-0001V8-SV
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 13:42:21 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dPY6k-0004S7-Th
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 13:47:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dPY1d-00071S-9m
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 13:42:17 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:51275)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dPY1c-00070n-OH
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 13:42:13 -0400
-Date: Mon, 26 Jun 2017 13:42:08 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170626174208.GA17935@flamenco>
-References: <CADR1n+V8R1LOGzbwdBDt5axeZ0mqh=WSCsfUo0Vr2nmE6BYqTQ@mail.gmail.com>
-	<8760fqorbp.fsf@frigg.lan> <20170620172002.GA23332@flamenco>
-	<CADR1n+Uw1Yg+0PdsaPwViXUFO7gGkW6ET_oSM86YQL+HRfM=0w@mail.gmail.com>
-	<87lgokpoqy.fsf@frigg.lan> <87zicwgt3l.fsf@frigg.lan>
+	(envelope-from <rth7680@gmail.com>) id 1dPY6g-0000v4-3M
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 13:47:30 -0400
+Received: from mail-qk0-x22b.google.com ([2607:f8b0:400d:c09::22b]:33852)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dPY6f-0000uQ-Uu
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 13:47:26 -0400
+Received: by mail-qk0-x22b.google.com with SMTP id d78so7205653qkb.1
+	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 10:47:23 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170621024831.26019-1-rth@twiddle.net>
+	<871sq6y9qh.fsf@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <27cf9824-ee96-3a42-eefc-5a082267d708@twiddle.net>
+Date: Mon, 26 Jun 2017 10:47:19 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <871sq6y9qh.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <87zicwgt3l.fsf@frigg.lan>
-Subject: Re: [Qemu-devel] Tracing guest virtual addresses
+Subject: Re: [Qemu-devel] [PATCH 00/16] Cleanups within TCG middle-end
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,32 +31,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jayanto Minocha <jayanto@gmail.com>, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, aurelien@aurel32.net
 
-On Sun, Jun 25, 2017 at 15:16:46 +0300, Lluís Vilanova wrote:
-> Lluís Vilanova writes:
+On 06/26/2017 09:49 AM, Alex BennÃ©e wrote:
+> Hmm it compile tested fine on mine but:
 > 
-> > Jayanto Minocha writes:
-> >> Lluis,
-> >> My modifications were almost the same as those done by Emilio. There were
-> >> no memory trace events in the trace file.
+> qemu-system-sparc: /home/alex/lsrc/qemu/qemu.git/tcg/tcg.h:725: temp_arg: Assertion `n < tcg_ctx.nb_temps' failed.
+
+Bah.  I fixed this, and then lost it while rebasing.
+It's an uninitialized structure member.
+
+> And also Travis is quite un-happy:
 > 
-> > I'll take a look at it after I finish revamping the generic translation loop
-> > series (hopefully today).
-> 
-> I just sent a patch that should fix it:
-> 
->   https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg05491.html
+>    https://travis-ci.org/stsquad/qemu/builds/247099991
 
-Yay! That fixes the problem for me:
+The only real failure I see in here is also GTESTER for sparc.
+Or am I missing something?
 
-$ ../scripts/simpletrace.py trace-events-all trace-17579 | head -5
-guest_mem_before_exec 0.000 pid=17579 __cpu=0x563780e726a0 vaddr=0x4000a2a030 info=0x4
-guest_mem_before_exec 0.368 pid=17579 __cpu=0x563780e726a0 vaddr=0x4000a2a034 info=0x4
-guest_mem_before_exec 0.162 pid=17579 __cpu=0x563780e726a0 vaddr=0x4000a2a034 info=0x14
-guest_mem_before_exec 0.163 pid=17579 __cpu=0x563780e726a0 vaddr=0x4000a2a028 info=0x4
-guest_mem_before_exec 0.109 pid=17579 __cpu=0x563780e726a0 vaddr=0x4000a2a02c info=0x4
 
-Thanks,
-
-		Emilio
+r~
