@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41882)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dPUzs-0001aD-3H
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 10:28:13 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dPV2h-0003Eh-AA
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 10:31:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dPUzr-0007NM-5i
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 10:28:12 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37343)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dPUzq-0007Ko-Up
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 10:28:11 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 26 Jun 2017 15:28:00 +0100
-Message-Id: <1498487280-17836-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH v2] main_loop: Make main_loop_wait() return void
+	(envelope-from <stefanha@gmail.com>) id 1dPV2e-0000Ex-5r
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 10:31:07 -0400
+Date: Mon, 26 Jun 2017 15:30:55 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170626143055.GC29664@stefanha-x1.localdomain>
+References: <20170623124700.1389-1-el13635@mail.ntua.gr>
+	<20170623124700.1389-4-el13635@mail.ntua.gr>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="ALfTUftag+2gvp1h"
+Content-Disposition: inline
+In-Reply-To: <20170623124700.1389-4-el13635@mail.ntua.gr>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC v3 3/8] block: add
+ throttle block filter driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,85 +25,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>
 
-In commit e330c118f2a5a the last usage of main_loop_wait() that cared
-about the return value was changed to no longer use it. Drop the
-now-useless return value and make the function return void.
 
-We avoid the awkwardness of ifdeffery to handle the 'ret'
-variable in main_loop_wait() only being wanted if CONFIG_SLIRP
-by simply dropping all the ifdefs. There are stub implementations
-of slirp_pollfds_poll() and slirp_pollfds_fill() already in
-stubs/slirp.c which do nothing, as required.
+--ALfTUftag+2gvp1h
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-This will coincidentally satisfy Coverity, which currently complains
-in CID 1372464 that we call main_loop_wait() in vl.c and ignore the
-return value which may be reporting a poll() syscall failure.
-Essentially we don't expect poll() to fail, except perhaps with
-a transient EINTR -- if it ever did we'd spin retrying endlessly
-I think.
----
- include/qemu/main-loop.h | 2 +-
- util/main-loop.c         | 8 ++------
- 2 files changed, 3 insertions(+), 7 deletions(-)
+On Fri, Jun 23, 2017 at 03:46:55PM +0300, Manos Pitsidianakis wrote:
+> +static int throttle_configure_tgm(BlockDriverState *bs, ThrottleGroupMember *tgm,
+> +                                                    QDict *options, Error **errp)
+> +{
+> +    int ret = 0;
+> +    ThrottleState *ts;
+> +    ThrottleTimers *tt;
+> +    ThrottleConfig cfg;
+> +    QemuOpts *opts = NULL;
+> +    const char *group_name = NULL;
+> +    Error *local_err = NULL;
+> +
+> +    opts = qemu_opts_create(&throttle_opts, NULL, 0, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return -EINVAL;
+> +    }
+> +    qemu_opts_absorb_qdict(opts, options, &local_err);
+> +    if (local_err) {
+> +        goto err;
+> +    }
+> +
+> +    group_name = qemu_opt_get(opts, QEMU_OPT_THROTTLE_GROUP_NAME);
+> +    if (!group_name) {
+> +        group_name = bdrv_get_device_or_node_name(bs);
+> +        if (!strlen(group_name)) {
+> +            error_setg(&local_err,
+> +                       "A group name must be specified for this device.");
 
-diff --git a/include/qemu/main-loop.h b/include/qemu/main-loop.h
-index d7e24af..6b4b60b 100644
---- a/include/qemu/main-loop.h
-+++ b/include/qemu/main-loop.h
-@@ -79,7 +79,7 @@ int qemu_init_main_loop(Error **errp);
-  *
-  * @nonblocking: Whether the caller should block until an event occurs.
-  */
--int main_loop_wait(int nonblocking);
-+void main_loop_wait(int nonblocking);
- 
- /**
-  * qemu_get_aio_context: Return the main loop's AioContext
-diff --git a/util/main-loop.c b/util/main-loop.c
-index 19cad6b..0b25405 100644
---- a/util/main-loop.c
-+++ b/util/main-loop.c
-@@ -487,7 +487,7 @@ static int os_host_main_loop_wait(int64_t timeout)
- }
- #endif
- 
--int main_loop_wait(int nonblocking)
-+void main_loop_wait(int nonblocking)
- {
-     int ret;
-     uint32_t timeout = UINT32_MAX;
-@@ -500,9 +500,7 @@ int main_loop_wait(int nonblocking)
-     /* poll any events */
-     g_array_set_size(gpollfds, 0); /* reset for new iteration */
-     /* XXX: separate device handlers from system ones */
--#ifdef CONFIG_SLIRP
-     slirp_pollfds_fill(gpollfds, &timeout);
--#endif
- 
-     if (timeout == UINT32_MAX) {
-         timeout_ns = -1;
-@@ -515,16 +513,14 @@ int main_loop_wait(int nonblocking)
-                                           &main_loop_tlg));
- 
-     ret = os_host_main_loop_wait(timeout_ns);
--#ifdef CONFIG_SLIRP
-     slirp_pollfds_poll(gpollfds, (ret < 0));
--#endif
- 
-     /* CPU thread can infinitely wait for event after
-        missing the warp */
-     qemu_start_warp_timer();
-     qemu_clock_run_all_timers();
- 
--    return ret;
-+    return;
- }
- 
- /* Functions to operate on the main QEMU AioContext.  */
--- 
-2.7.4
+To make the error message clearer:
+s/A group name/A throttle group name/
+
+> +static int throttle_open(BlockDriverState *bs, QDict *options,
+> +                            int flags, Error **errp)
+> +{
+> +    ThrottleGroupMember *tgm = bs->opaque;
+> +    Error *local_err = NULL;
+> +
+> +    bs->open_flags = flags;
+
+Why is this necessary?  The other block drivers don't do it.  It should
+be taken care of in block.c.
+
+> +    bs->file = bdrv_open_child(NULL, options, "file",
+> +                                    bs, &child_file, false, &local_err);
+> +
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return -EINVAL;
+> +    }
+> +
+> +    qdict_flatten(options);
+> +    return throttle_configure_tgm(bs, tgm, options, errp);
+
+Who destroys bs->file on error?
+
+> +}
+> +
+> +static void throttle_close(BlockDriverState *bs)
+> +{
+> +    ThrottleGroupMember *tgm = bs->opaque;
+> +    bdrv_drained_begin(bs);
+
+Why is this necessary?  bdrv_close() already encloses drv->bdrv_close()
+in a bdrv_drained_begin/end region.
+
+> +    throttle_group_unregister_tgm(tgm);
+> +    bdrv_drained_end(bs);
+> +    return;
+
+Please omit return at the end of a void function.  They are a
+distraction.
+
+> +static void throttle_reopen_commit(BDRVReopenState *state)
+> +{
+> +    ThrottleGroupMember *tgm = state->bs->opaque;
+> +    BlockDriverState *bs = state->bs;
+> +
+> +    bdrv_drained_begin(bs);
+
+Why is this necessary?  bdrv_reopen_multiple() calls
+bdrv_reopen_commit() from within a bdrv_drain_all_begin()/end() region.
+
+> +static BlockDriver bdrv_throttle = {
+> +    .format_name                        =   "throttle",
+> +    .protocol_name                      =   "throttle",
+> +    .instance_size                      =   sizeof(ThrottleGroupMember),
+> +
+> +    .bdrv_file_open                     =   throttle_open,
+> +    .bdrv_close                         =   throttle_close,
+> +    .bdrv_co_flush                      =   throttle_co_flush,
+> +
+> +    .bdrv_child_perm                    =   bdrv_filter_default_perms,
+> +
+> +    .bdrv_getlength                     =   throttle_getlength,
+> +
+> +    .bdrv_co_preadv                     =   throttle_co_preadv,
+> +    .bdrv_co_pwritev                    =   throttle_co_pwritev,
+> +
+> +    .bdrv_co_pwrite_zeroes              =   throttle_co_pwrite_zeroes,
+> +    .bdrv_co_pdiscard                   =   throttle_co_pdiscard,
+> +
+> +    .bdrv_recurse_is_first_non_filter   =   bdrv_recurse_is_first_non_filter,
+> +
+> +    .bdrv_attach_aio_context            =   throttle_attach_aio_context,
+> +    .bdrv_detach_aio_context            =   throttle_detach_aio_context,
+> +
+> +    .bdrv_reopen_prepare                =   throttle_reopen_prepare,
+> +    .bdrv_reopen_commit                 =   throttle_reopen_commit,
+> +    .bdrv_reopen_abort                  =   throttle_reopen_abort,
+> +
+> +    .is_filter                          =   true,
+> +};
+
+Missing:
+bdrv_co_get_block_status()
+bdrv_truncate()
+bdrv_get_info()
+bdrv_probe_blocksizes()
+bdrv_probe_geometry()
+bdrv_media_changed()
+bdrv_eject()
+bdrv_lock_medium()
+bdrv_co_ioctl()
+
+See block/raw-format.c.
+
+I think most of these could be modified in block.c or block/io.c to
+automatically call bs->file's function if drv doesn't implement them.
+This way all block drivers would transparently pass them through by
+default and block/raw-format.c code could be eliminated.
+
+--ALfTUftag+2gvp1h
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZURqfAAoJEJykq7OBq3PIpWcH/3c6SMdgOwKXty0LldJ0bicm
+1VIuA6cPj23ur95cU93os4Cj0w3MXQx4zhC8qH7xsFbQKQNdpfxEvnjoS+Z/jLns
+MhC8Dw3WUgV+b5NdKWRg0HbumDOXXyknwxdS/aLLZ6gT3g5XB9i7kxhH5v3V7/sg
+gGgWsvJo7Zb3aqaMeZ34IgIdotTKcF4T6afTcNdV5z54KqCGpG8B7opu4sz3erxQ
+N/FBoDOSBQC/Ko2KUmTkEicTHR2wMnQPCj54tCCsbvZsCzanRSS90cBndRUt+axE
+tHeZBSf2JsEYMBzlLtm/sDbUBsowwrofWEcBuDGd98Mz8V7k5i6TssmhB60+u6E=
+=CxMt
+-----END PGP SIGNATURE-----
+
+--ALfTUftag+2gvp1h--
