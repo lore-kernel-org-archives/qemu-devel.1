@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38504)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1dPR8A-0007n7-8S
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:20:31 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39145)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <berrange@redhat.com>) id 1dPRAj-00017V-Ba
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:23:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1dPR87-0005JY-3b
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:20:30 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:53617 helo=mx01.kamp.de)
+	(envelope-from <berrange@redhat.com>) id 1dPRAg-0006mF-5T
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:23:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53614)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dPR86-0005IG-Qr
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:20:27 -0400
-References: <0f83a15d-66b0-36aa-e5a4-d03cd37757c9@kamp.de>
-	<20170626082838.GA4348@noname.redhat.com>
-	<0e6586f9-85eb-efcd-4825-20066a7c869a@kamp.de>
-	<20170626095719.GB4348@noname.redhat.com>
-	<b82ab934-ddc3-2d50-09cf-764f2165f2c8@kamp.de>
-	<20170626101204.GF495@redhat.com>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <b498b622-2aa8-3cfc-112d-a8f931d2f08f@kamp.de>
-Date: Mon, 26 Jun 2017 12:20:23 +0200
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dPRAf-0006lg-SR
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:23:06 -0400
+Date: Mon, 26 Jun 2017 11:22:54 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170626102254.GG495@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <cover.050aaed1de4cecd4ba9a4dc6576d1d148a8a9004.1498213152.git-series.knut.omang@oracle.com>
+	<51d7f54d100e9dedecf6dc65691ca65adfc8394f.1498213152.git-series.knut.omang@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20170626101204.GF495@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] QCOW2 support for LZO compression
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <51d7f54d100e9dedecf6dc65691ca65adfc8394f.1498213152.git-series.knut.omang@oracle.com>
+Subject: Re: [Qemu-devel] [PATCH v4 4/4] sockets: Handle race condition
+ between binds to the same port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +29,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, den@openvz.org, Laszlo Ersek <lersek@redhat.com>
+To: Knut Omang <knut.omang@oracle.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-Am 26.06.2017 um 12:12 schrieb Daniel P. Berrange:
-> On Mon, Jun 26, 2017 at 12:08:01PM +0200, Peter Lieven wrote:
->> Am 26.06.2017 um 11:57 schrieb Kevin Wolf:
->>> Am 26.06.2017 um 11:20 hat Peter Lieven geschrieben:
->>>>> So he chose a different algorithm (zstd). When I asked, he posted a
->>>>> comparison of algorithms (however a generic one and not measured in the
->>>>> context of qemu) that suggests that LZO would be slightly faster, but
->>>>> have a considerable worse compression ratio with the settings that were
->>>>> benchmarked.
->>>> My idea to choose LZO was that it is widely available and available in
->>>> any distro you can think of. We already have probing for it in configure.
->>>> My concern with ZSTD would be that it seems there are no packages
->>>> available for most distros and that it seems to be multi-threaded. I don't
->>>> know if this will cause any trouble?
->>> The availability and that we already link against LZO is a good point. I
->>> think we want to avoid a situation where compressed qcow2 files can't be
->>> read by binaries of popular distributions - after all, downloadable
->>> images are an important use case for compressed images.
->> As long as the default remains gzip I don't see any issues. If you choose
->> a different algorithm, you should know what you are doing.
-> The problem comes if Debian were to choose to only link in ZSTD, and RHEL
-> were choose to only link LZO. Images distributed by one distro, with this
-> new compression would be unusuable on other distros. So whatever compression
-> format we choose to add should be something we are confident that all distros
-> will be happy enabling by default. This favours libraries are already widely
-> included in distros, especially if QEMU already links to them indirectly.
+On Fri, Jun 23, 2017 at 12:31:08PM +0200, Knut Omang wrote:
+> If an offset of ports is specified to the inet_listen_saddr function(),
+> and two or more processes tries to bind from these ports at the same time,
+> occasionally more than one process may be able to bind to the same
+> port. The condition is detected by listen() but too late to avoid a failure.
+> 
+> This function is called by socket_listen() and used
+> by all socket listening code in QEMU, so all cases where any form of dynamic
+> port selection is used should be subject to this issue.
+> 
+> Add code to close and re-establish the socket when this
+> condition is observed, hiding the race condition from the user.
+> 
+> This has been developed and tested by means of the
+> test-listen unit test in the previous commit.
+> Enable the test for make check now that it passes.
+> 
+> Signed-off-by: Knut Omang <knut.omang@oracle.com>
+> Reviewed-by: Bhavesh Davda <bhavesh.davda@oracle.com>
+> Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
+> Reviewed-by: Girish Moodalbail <girish.moodalbail@oracle.com>
+> ---
+>  tests/Makefile.include |  2 +-
+>  util/qemu-sockets.c    | 68 ++++++++++++++++++++++++++++++++-----------
+>  2 files changed, 53 insertions(+), 17 deletions(-)
+> 
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 22bb97e..c38f94e 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -127,7 +127,7 @@ check-unit-y += tests/test-bufferiszero$(EXESUF)
+>  gcov-files-check-bufferiszero-y = util/bufferiszero.c
+>  check-unit-y += tests/test-uuid$(EXESUF)
+>  check-unit-y += tests/ptimer-test$(EXESUF)
+> -#check-unit-y += tests/test-listen$(EXESUF)
+> +check-unit-y += tests/test-listen$(EXESUF)
+>  gcov-files-ptimer-test-y = hw/core/ptimer.c
+>  check-unit-y += tests/test-qapi-util$(EXESUF)
+>  gcov-files-test-qapi-util-y = qapi/qapi-util.c
+> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+> index 48b9319..7b118b4 100644
+> --- a/util/qemu-sockets.c
+> +++ b/util/qemu-sockets.c
+> @@ -201,6 +201,42 @@ static int try_bind(int socket, InetSocketAddress *saddr, struct addrinfo *e)
+>  #endif
+>  }
+>  
+> +static int try_bind_listen(int *socket, InetSocketAddress *saddr,
+> +                           struct addrinfo *e, int port, Error **errp)
+> +{
+> +    int s = *socket;
+> +    int ret;
+> +
+> +    inet_setport(e, port);
+> +    ret = try_bind(s, saddr, e);
+> +    if (ret) {
+> +        if (errno != EADDRINUSE) {
+> +            error_setg_errno(errp, errno, "Failed to bind socket");
+> +        }
+> +        return errno;
+> +    }
+> +    if (listen(s, 1) == 0) {
+> +            return 0;
+> +    }
+> +    if (errno == EADDRINUSE) {
+> +        /* We got to bind the socket to a port but someone else managed
+> +         * to bind to the same port and beat us to listen on it!
+> +         * Recreate the socket and return EADDRINUSE to preserve the
+> +         * expected state by the caller:
+> +         */
+> +        closesocket(s);
+> +        s = create_fast_reuse_socket(e, errp);
+> +        if (s < 0) {
+> +            return errno;
+> +        }
+> +        *socket = s;
 
-This is very strong argument for LZO. I checked with Debian 9 and Ubuntu 16.04
-they have liblzo installed in the base system. I think maybe for btrfs compression support.
+I don't really like this at all - if we need to close + recreate the
+socket, IMHO that should remain the job of the caller, since it owns
+the socket FD ultimately.
 
-Peter
+> +        errno = EADDRINUSE;
+> +        return errno;
+> +    }
+> +    error_setg_errno(errp, errno, "Failed to listen on socket");
+> +    return errno;
+> +}
+> +
+>  static int inet_listen_saddr(InetSocketAddress *saddr,
+>                               int port_offset,
+>                               bool update_addr,
+> @@ -210,7 +246,9 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
+>      char port[33];
+>      char uaddr[INET6_ADDRSTRLEN+1];
+>      char uport[33];
+> -    int slisten, rc, port_min, port_max, p;
+> +    int rc, port_min, port_max, p;
+> +    int slisten = 0;
+> +    int saved_errno = 0;
+>      Error *err = NULL;
+>  
+>      memset(&ai,0, sizeof(ai));
+> @@ -276,28 +314,26 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
+
+Just above this line is the original 'create_fast_reuse_socket' call.
+
+I'd suggest that we push that call down into the body of the loop
+below:
+
+>          port_min = inet_getport(e);
+>          port_max = saddr->has_to ? saddr->to + port_offset : port_min;
+>          for (p = port_min; p <= port_max; p++) {
+> -            inet_setport(e, p);
+> -            if (try_bind(slisten, saddr, e) >= 0) {
+> -                goto listen;
+> -            }
+> -            if (p == port_max) {
+> -                if (!e->ai_next) {
+> -                    error_setg_errno(errp, errno, "Failed to bind socket");
+> -                }
+> +            int eno = try_bind_listen(&slisten, saddr, e, p, &err);
+
+Which would mean try_bind_listen no longer needs the magic to close +
+recreate the socket.
+
+The only cost of doing this is that you end up closing + recreating the
+socket after bind hits EADDRINUSE, as well as after listen() hits it.
+
+I think that's acceptable tradeoff for simpler code, since this is not
+a performance critical operation.
+
+> +            if (!eno) {
+> +                goto listen_ok;
+> +            } else if (eno != EADDRINUSE) {
+> +                goto listen_failed;
+>              }
+>          }
+> +    }
+> +    error_setg_errno(errp, errno, "Failed to find available port");
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
