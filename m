@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dPQrw-0005nU-FI
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:03:45 -0400
+	(envelope-from <berrange@redhat.com>) id 1dPQsY-00064b-AB
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:04:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dPQrr-0006MP-Hf
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:03:44 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:36677)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dPQrr-0006M4-AY
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:03:39 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id 62so2976373wmw.1
-	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 03:03:39 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 26 Jun 2017 11:04:22 +0100
-Message-Id: <20170626100422.6390-1-alex.bennee@linaro.org>
-In-Reply-To: <149838046604.6497.6648018844505723967.stgit@frigg.lan>
-References: <149838046604.6497.6648018844505723967.stgit@frigg.lan>
-Subject: [Qemu-devel] [PATCH] fixup! Pass generic CPUState to
- gen_intermediate_code()
+	(envelope-from <berrange@redhat.com>) id 1dPQsX-0006ax-3Q
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 06:04:22 -0400
+Date: Mon, 26 Jun 2017 11:04:07 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170626100407.GE495@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <0f83a15d-66b0-36aa-e5a4-d03cd37757c9@kamp.de>
+	<20170626082838.GA4348@noname.redhat.com>
+	<0e6586f9-85eb-efcd-4825-20066a7c869a@kamp.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <0e6586f9-85eb-efcd-4825-20066a7c869a@kamp.de>
+Subject: Re: [Qemu-devel] QCOW2 support for LZO compression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,63 +25,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: vilanova@ac.upc.edu
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Chris Wulff <crwulff@gmail.com>, Marek Vasut <marex@denx.de>, Stafford Horne <shorne@gmail.com>
+To: Peter Lieven <pl@kamp.de>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, den@openvz.org, Laszlo Ersek <lersek@redhat.com>
 
----
- target/hppa/translate.c     | 5 ++---
- target/nios2/translate.c    | 5 ++---
- target/openrisc/translate.c | 3 +--
- 3 files changed, 5 insertions(+), 8 deletions(-)
+On Mon, Jun 26, 2017 at 11:20:33AM +0200, Peter Lieven wrote:
+> 
+> Am 26.06.2017 um 10:28 schrieb Kevin Wolf:
+> > [ Cc: qemu-devel; don't post to qemu-block only! ]
+> > 
+> > Am 26.06.2017 um 09:57 hat Peter Lieven geschrieben:
+> > > Hi,
+> > > 
+> > > I am currently working on optimizing speed for compressed QCOW2
+> > > images. We use them for templates and would also like to use them for
+> > > backups, but the latter is almost infeasible because using gzip for
+> > > compression is horribly slow. I tried to experiment with different
+> > > options to deflate, but in the end I think its better to use a
+> > > different compression algorithm for cases where speed matters. As we
+> > > already have probing for it in configure and as it is widely used I
+> > > would like to use LZO for that purpose. I think it would be best to
+> > > have a flag to indicate that compressed blocks use LZO compression,
+> > > but I would need a little explaination which of the feature fields I
+> > > have to use to prevent an older (incompatible) Qemu opening LZO
+> > > compressed QCOW2 images.
+> > > 
+> > > I also have already some numbers. I converted a fresh Debian 9 Install
+> > > which has an uncomressed QCOW2 size of 1158 MB with qemu-img to a
+> > > compressed QCOW2.  With GZIP compression the result is 356MB whereas
+> > > the LZO version is 452MB. However, the current GZIP variant uses 35
+> > > seconds for this operation where LZO only needs 4 seconds. I think is
+> > > is a good trade in especially when its optional so the user can
+> > > choose.
+> > > 
+> > > What are your thoughts?
+> > We had a related RFC patch by Den earlier this year, which never
+> > received many comment and never got out of RFC:
+> > 
+> > https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg04682.html
+> 
+> I was not aware of that one. Thanks for pointing out.
+> 
+> > 
+> > So he chose a different algorithm (zstd). When I asked, he posted a
+> > comparison of algorithms (however a generic one and not measured in the
+> > context of qemu) that suggests that LZO would be slightly faster, but
+> > have a considerable worse compression ratio with the settings that were
+> > benchmarked.
+> 
+> My idea to choose LZO was that it is widely available and available in
+> any distro you can think of. We already have probing for it in configure.
+> My concern with ZSTD would be that it seems there are no packages
+> available for most distros and that it seems to be multi-threaded. I don't
+> know if this will cause any trouble?
 
-diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index e10abc5e04..900870cd5a 100644
---- a/target/hppa/translate.c
-+++ b/target/hppa/translate.c
-@@ -3740,10 +3740,9 @@ static ExitStatus translate_one(DisasContext *ctx, uint32_t insn)
-     return gen_illegal(ctx);
- }
- 
--void gen_intermediate_code(CPUHPPAState *env, struct TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
- {
--    HPPACPU *cpu = hppa_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    CPUHPPAState *env = cs->env_ptr;
-     DisasContext ctx;
-     ExitStatus ret;
-     int num_insns, max_insns, i;
-diff --git a/target/nios2/translate.c b/target/nios2/translate.c
-index 2f3c2e5dfb..8b97d6585f 100644
---- a/target/nios2/translate.c
-+++ b/target/nios2/translate.c
-@@ -799,10 +799,9 @@ static void gen_exception(DisasContext *dc, uint32_t excp)
- }
- 
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUNios2State *env, TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
- {
--    Nios2CPU *cpu = nios2_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    CPUNios2State *env = cs->env_ptr;
-     DisasContext dc1, *dc = &dc1;
-     int num_insns;
-     int max_insns;
-diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index aaac359d5b..4a28c96e53 100644
---- a/target/openrisc/translate.c
-+++ b/target/openrisc/translate.c
-@@ -1520,9 +1520,8 @@ static void disas_openrisc_insn(DisasContext *dc, OpenRISCCPU *cpu)
- 
- void gen_intermediate_code(CPUState *cpu, struct TranslationBlock *tb)
- {
--    OpenRISCState *env = cpu->env_ptr;
-+    CPUOpenRISCState *env = cpu->env_ptr;
-     OpenRISCCPU *or_cpu = openrisc_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-     struct DisasContext ctx, *dc = &ctx;
-     uint32_t pc_start;
-     uint32_t next_page_start;
+As a distro maintainer I'd always prefer option to use a library that is
+already widely available. While ZSTD could certainly be added to distros,
+it means the QEMU maintainer will end up having to package it & become
+the defacto long term maintainer of it long term, which is an extra burden.
+
+WRT to making compression algorithms configurable, I think it is important
+to ensure we don't add lots of optional algorithms. An important factor is
+portability of images - we don't want to end up with each distro's build
+of QEMU enabling a different sub-set of compression algorithms, as that is
+going to harm interoperability for distributed images. This again makes me
+prefer a compression format whose library is widely available, as that makes
+it highly likely that the distro will choose to enable it during build.
+
+Regards,
+Daniel
 -- 
-2.13.0
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
