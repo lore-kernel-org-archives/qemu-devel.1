@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dPVEr-0008Sd-Dg
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 10:43:42 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dPVNZ-0003Qd-OQ
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 10:52:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dPVEo-0006og-BN
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 10:43:41 -0400
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:36428)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dPVEo-0006oO-2H
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 10:43:38 -0400
-Received: by mail-wr0-x22d.google.com with SMTP id c11so145799786wrc.3
-	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 07:43:37 -0700 (PDT)
-References: <20170621024831.26019-1-rth@twiddle.net>
-	<20170621024831.26019-2-rth@twiddle.net>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170621024831.26019-2-rth@twiddle.net>
-Date: Mon, 26 Jun 2017 15:44:26 +0100
-Message-ID: <878tkeyfjp.fsf@linaro.org>
+	(envelope-from <stefanha@gmail.com>) id 1dPVNW-00023Z-NX
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 10:52:41 -0400
+Date: Mon, 26 Jun 2017 15:52:34 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170626145234.GE29664@stefanha-x1.localdomain>
+References: <20170623124700.1389-1-el13635@mail.ntua.gr>
+	<20170623124700.1389-5-el13635@mail.ntua.gr>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 01/16] tcg: Merge opcode arguments into
- TCGOp
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="OZkY3AIuv2LYvjdk"
+Content-Disposition: inline
+In-Reply-To: <20170623124700.1389-5-el13635@mail.ntua.gr>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC v3 4/8] block: convert
+ ThrottleGroup to object with QOM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,123 +25,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, aurelien@aurel32.net
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>
 
 
-Richard Henderson <rth@twiddle.net> writes:
+--OZkY3AIuv2LYvjdk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> Rather than have a separate buffer of 10*max_ops entries,
-> give each opcode 10 entries.  The result is actually a bit
-> smaller and should have slightly more cache locality.
->
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
-> ---
-<snip>
-
-The changes look fine, some questions bellow:
-
-> index 9e37722..720e04e 100644
-> --- a/tcg/tcg.h
-> +++ b/tcg/tcg.h
-> @@ -51,8 +51,6 @@
->  #define OPC_BUF_SIZE 640
->  #define OPC_MAX_SIZE (OPC_BUF_SIZE - MAX_OP_PER_INSTR)
->
-> -#define OPPARAM_BUF_SIZE (OPC_BUF_SIZE * MAX_OPC_PARAM)
-> -
->  #define CPU_TEMP_BUF_NLONGS 128
->
->  /* Default target word size to pointer size.  */
-> @@ -613,33 +611,29 @@ typedef struct TCGTempSet {
->  #define SYNC_ARG  1
->  typedef uint16_t TCGLifeData;
->
-> -/* The layout here is designed to avoid crossing of a 32-bit boundary.
-> -   If we do so, gcc adds padding, expanding the size to 12.  */
-> +/* The layout here is designed to avoid crossing of a 32-bit
-> boundary.  */
-
-This isn't correct now? Do we mean we now aim to be cache line aligned?
-
->  typedef struct TCGOp {
->      TCGOpcode opc   : 8;        /*  8 */
->
-> -    /* Index of the prev/next op, or 0 for the end of the list.  */
-> -    unsigned prev   : 10;       /* 18 */
-> -    unsigned next   : 10;       /* 28 */
-> -
->      /* The number of out and in parameter for a call.  */
-> -    unsigned calli  : 4;        /* 32 */
-> -    unsigned callo  : 2;        /* 34 */
-> +    unsigned calli  : 4;        /* 12 */
-> +    unsigned callo  : 2;        /* 14 */
-> +    unsigned        : 2;        /* 16 */
->
-> -    /* Index of the arguments for this op, or 0 for zero-operand ops.  */
-> -    unsigned args   : 14;       /* 48 */
-> +    /* Index of the prev/next op, or 0 for the end of the list.  */
-> +    unsigned prev   : 16;       /* 32 */
-> +    unsigned next   : 16;       /* 48 */
->
->      /* Lifetime data of the operands.  */
->      unsigned life   : 16;       /* 64 */
+On Fri, Jun 23, 2017 at 03:46:56PM +0300, Manos Pitsidianakis wrote:
+> +static bool throttle_group_exists(const char *name)
+> +{
+> +    ThrottleGroup *iter;
+> +    bool ret = false;
 > +
-> +    /* Arguments for the opcode.  */
-> +    TCGArg args[MAX_OPC_PARAM];
->  } TCGOp;
->
->  /* Make sure operands fit in the bitfields above.  */
->  QEMU_BUILD_BUG_ON(NB_OPS > (1 << 8));
-> -QEMU_BUILD_BUG_ON(OPC_BUF_SIZE > (1 << 10));
-> -QEMU_BUILD_BUG_ON(OPPARAM_BUF_SIZE > (1 << 14));
-> -
-> -/* Make sure that we don't overflow 64 bits without noticing.  */
-> -QEMU_BUILD_BUG_ON(sizeof(TCGOp) > 8);
-> +QEMU_BUILD_BUG_ON(OPC_BUF_SIZE > (1 << 16));
+> +    qemu_mutex_lock(&throttle_groups_lock);
 
-OPC_BUF_SIZE is statically assigned, we don't seem to be taking notice
-of sizeof(TCGOp) anymore here. In fact OPC_BUF_SIZE is really
-MAX_TCG_OPS right?
+Not sure if this lock or the throttle_groups list are necessary.
 
-I see TCGArg is currently target_ulong. Is this because we never leak
-the host size details into generated code safe for the statically
-assigned env_ptr?
+Have you seen iothread.c:qmp_query_iothreads()?  All objects are put
+into a container (the parent object), so you can just iterate over its
+children.  There's no need for a separate list because QOM already has
+all the objects.
 
-I mention this because in looking at modelling SIMD registers I'm going
-to need to carry a host ptr around in TCG registers that can be passed
-to helpers and the like.
+> +typedef struct ThrottleGroupClass {
+> +    /* private */
+> +    ObjectClass parent_class;
+> +    /* public */
+> +} ThrottleGroupClass;
 
->
->  struct TCGContext {
->      uint8_t *pool_cur, *pool_end;
-> @@ -691,7 +685,6 @@ struct TCGContext {
->  #endif
->
->      int gen_next_op_idx;
-> -    int gen_next_parm_idx;
->
->      /* Code generation.  Note that we specifically do not use tcg_insn_unit
->         here, because there's too much arithmetic throughout that relies
-> @@ -723,7 +716,6 @@ struct TCGContext {
->      TCGTemp *reg_to_temp[TCG_TARGET_NB_REGS];
->
->      TCGOp gen_op_buf[OPC_BUF_SIZE];
-> -    TCGArg gen_opparam_buf[OPPARAM_BUF_SIZE];
->
->      uint16_t gen_insn_end_off[TCG_MAX_INSNS];
->      target_ulong gen_insn_data[TCG_MAX_INSNS][TARGET_INSN_START_WORDS];
-> @@ -734,8 +726,7 @@ extern bool parallel_cpus;
->
->  static inline void tcg_set_insn_param(int op_idx, int arg, TCGArg v)
->  {
-> -    int op_argi = tcg_ctx.gen_op_buf[op_idx].args;
-> -    tcg_ctx.gen_opparam_buf[op_argi + arg] = v;
-> +    tcg_ctx.gen_op_buf[op_idx].args[arg] = v;
->  }
->
->  /* The number of opcodes emitted so far.  */
+This is unused?
 
+> +
+> +
+> +#define DOUBLE 0
+> +#define UINT64 1
+> +#define UNSIGNED 2
+> +
+> +typedef struct {
+> +    BucketType type;
+> +    int size; /* field size */
 
---
-Alex Bennée
+sizeof(double) == sizeof(uint64_t) == 8.
+
+This is a datatype field, not a size.
+
+> +static void throttle_group_obj_complete(UserCreatable *obj, Error **errp)
+> +{
+> +    char *name = NULL;
+> +    Error *local_error = NULL;
+> +    ThrottleGroup *tg = THROTTLE_GROUP(obj);
+> +
+> +    name = object_get_canonical_path_component(OBJECT(obj));
+> +    if (throttle_group_exists(name)) {
+> +        error_setg(&local_error, "A throttle group with this name already \
+> +                                  exists.");
+> +        goto ret;
+> +    }
+
+QOM should enforce unique id=<ID>.  I don't think this is necessary.
+
+> +
+> +    qemu_mutex_lock(&throttle_groups_lock);
+> +    tg->name = name;
+> +    qemu_mutex_init(&tg->lock);
+> +    QLIST_INIT(&tg->head);
+> +    QTAILQ_INSERT_TAIL(&throttle_groups, tg, list);
+> +    tg->refcount++;
+> +    qemu_mutex_unlock(&throttle_groups_lock);
+> +
+> +ret:
+> +    error_propagate(errp, local_error);
+> +    return;
+> +
+> +}
+> +
+> +static void throttle_group_set(Object *obj, Visitor *v, const char * name,
+> +        void *opaque, Error **errp)
+> +
+> +{
+> +    ThrottleGroup *tg = THROTTLE_GROUP(obj);
+> +    ThrottleConfig cfg = tg->ts.cfg;
+> +    Error *local_err = NULL;
+> +    ThrottleParamInfo *info = opaque;
+> +    int64_t value;
+
+What happens if this property is set while QEMU is already running?
+
+> +
+> +    visit_type_int64(v, name, &value, &local_err);
+> +
+> +    if (local_err) {
+> +        goto out;
+> +    }
+> +    if (value < 0) {
+> +        error_setg(&local_err, "%s value must be in range [0, %"PRId64"]",
+> +                "iops-total", INT64_MAX); /* change option string */
+
+iops-total? :)
+
+> +        goto out;
+> +    }
+
+This doesn't validate inputs properly for non int64_t types.
+
+I'm also worried that the command-line bps=,iops=,... options do not
+have unsigned or double types.  Input ranges and validation should match
+the QEMU command-line (I know this is a bit of a pain with QOM since the
+property types are different from QEMU option types).
+
+--OZkY3AIuv2LYvjdk
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZUR+xAAoJEJykq7OBq3PItzEH/2bQJJSYHDW4RxX86q7slpiF
+cC730FEGXyEQP2uiWtGpf1c3XekOfxPM/KZONJo4Jbutt1rYL9dPTGS5VfpE0M/0
+XZD0WKCz/3NWXAd6iwWPOv+O6nZqDTk99WXvs0ITY02V9ItJ8W0mf7Gg4TTGqYRM
+wfKEKFw1FXhAmjPLUgBACyqJ5/DVA1FGPiLKB0rsRPZ2ue4RrvLlCKzW94ozCPDe
+R3hBMruWTFfwmatc2SQe+UTN1FvnDOW7Pg0v9X1kIRb1cD1CDS2C7fJw5ftkrKYj
+yY9+t4FkORVgMAMwem87bkD5HhDh/yzT+amjg31SrhR5BQBrc2YCXQKrkF8YDGE=
+=JNzx
+-----END PGP SIGNATURE-----
+
+--OZkY3AIuv2LYvjdk--
