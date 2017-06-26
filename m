@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dPNHM-0000Xp-O3
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 02:13:45 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dPNLW-0001oP-0T
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 02:18:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dPNHI-0004uO-3W
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 02:13:44 -0400
-Received: from [59.151.112.132] (port=37892 helo=heian.cn.fujitsu.com)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dPNLR-0006eV-AT
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 02:18:01 -0400
+Received: from [59.151.112.132] (port=12819 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dPNHH-0004sR-N1
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 02:13:40 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dPNLQ-0006dx-B5
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 02:17:57 -0400
 References: <cover.1497276062.git.maozy.fnst@cn.fujitsu.com>
-	<9f8cd98603274c9f6c14b72212b51f26cf0c8fb5.1497276062.git.maozy.fnst@cn.fujitsu.com>
-	<87mv8y4yhk.fsf@dusky.pond.sub.org>
+	<debfee582acd0e32a08a812c710abbdeb11e90d1.1497276062.git.maozy.fnst@cn.fujitsu.com>
+	<87bmpe4wyz.fsf@dusky.pond.sub.org> <871sqa3huv.fsf@dusky.pond.sub.org>
 From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Message-ID: <8c8b85cb-739f-2354-7687-c9773a3a12e7@cn.fujitsu.com>
-Date: Mon, 26 Jun 2017 14:13:19 +0800
+Message-ID: <d5d8eba7-040a-b74b-7849-78c8eb348ec0@cn.fujitsu.com>
+Date: Mon, 26 Jun 2017 14:17:46 +0800
 MIME-Version: 1.0
-In-Reply-To: <87mv8y4yhk.fsf@dusky.pond.sub.org>
+In-Reply-To: <871sqa3huv.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 1/4] net/socket: Drop the odd 'default'
- case and comment
+Subject: Re: [Qemu-devel] [PATCH v4 2/4] net/net: Convert parse_host_port()
+ to Error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,75 +30,303 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, jasowang@redhat.com
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, jasowang@redhat.com, kraxel@redhat.com
 
 Hi, Markus
 
 
-On 06/23/2017 09:36 PM, Markus Armbruster wrote:
-> Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
+On 06/23/2017 10:21 PM, Markus Armbruster wrote:
+> Markus Armbruster <armbru@redhat.com> writes:
 >
->> In the net_socket_fd_init(), the 'default' case and comment is odd.
->> If @fd really was a pty, getsockopt() would fail with ENOTSOCK. If
->> @fd was a socket, but neither SOCK_DGRAM nor SOCK_STREAM. It should
->> not be treated as if it was SOCK_STREAM.
+>> Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
 >>
->> If there is a genuine reason to support something like SOCK_RAW, it
->> should be explicitly handled.
+>>> Cc: berrange@redhat.com
+>>> Cc: kraxel@redhat.com
+>>> Cc: pbonzini@redhat.com
+>>> Cc: jasowang@redhat.com
+>>> Cc: armbru@redhat.com
+>>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+>>> ---
+>>>  include/qemu/sockets.h |  2 +-
+>>>  net/net.c              | 21 ++++++++++++++++-----
+>>>  net/socket.c           | 37 ++++++++++++++++++++++---------------
+>>>  3 files changed, 39 insertions(+), 21 deletions(-)
+>>>
+>>> diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
+>>> index 5c326db..7abffc4 100644
+>>> --- a/include/qemu/sockets.h
+>>> +++ b/include/qemu/sockets.h
+>>> @@ -53,7 +53,7 @@ void socket_listen_cleanup(int fd, Error **errp);
+>>>  int socket_dgram(SocketAddress *remote, SocketAddress *local, Error **errp);
+>>>
+>>>  /* Old, ipv4 only bits.  Don't use for new code. */
+>>> -int parse_host_port(struct sockaddr_in *saddr, const char *str);
+>>> +int parse_host_port(struct sockaddr_in *saddr, const char *str, Error **errp);
+>>>  int socket_init(void);
+>>>
+>>>  /**
+>>> diff --git a/net/net.c b/net/net.c
+>>> index 6235aab..e55869a 100644
+>>> --- a/net/net.c
+>>> +++ b/net/net.c
+>>> @@ -100,7 +100,7 @@ static int get_str_sep(char *buf, int buf_size, const char **pp, int sep)
+>>>      return 0;
+>>>  }
+>>>
+>>> -int parse_host_port(struct sockaddr_in *saddr, const char *str)
+>>> +int parse_host_port(struct sockaddr_in *saddr, const char *str, Error **errp)
+>>>  {
+>>>      char buf[512];
+>>>      struct hostent *he;
+>>> @@ -108,24 +108,35 @@ int parse_host_port(struct sockaddr_in *saddr, const char *str)
+>>>      int port;
+>>>
+>>>      p = str;
+>>> -    if (get_str_sep(buf, sizeof(buf), &p, ':') < 0)
+>>> +    if (get_str_sep(buf, sizeof(buf), &p, ':') < 0) {
+>>> +        error_setg(errp, "The address should contain ':', for example: "
+>>> +                   "xxxx=230.0.0.1:1234");
+>>>          return -1;
+>>> +    }
+>>>      saddr->sin_family = AF_INET;
+>>>      if (buf[0] == '\0') {
+>>>          saddr->sin_addr.s_addr = 0;
+>>>      } else {
+>>>          if (qemu_isdigit(buf[0])) {
+>>> -            if (!inet_aton(buf, &saddr->sin_addr))
+>>> +            if (!inet_aton(buf, &saddr->sin_addr)) {
+>>> +                error_setg(errp, "Host address '%s' is not a valid "
+>>> +                           "IPv4 address", buf);
+>>>                  return -1;
+>>> +            }
+>>>          } else {
+>>> -            if ((he = gethostbyname(buf)) == NULL)
+>>> +            he = gethostbyname(buf);
+>>> +            if (he == NULL) {
+>>> +                error_setg(errp, "Specified hostname is error.");
+>>>                  return - 1;
+>>> +            }
+>>>              saddr->sin_addr = *(struct in_addr *)he->h_addr;
+>>>          }
+>>>      }
+>>>      port = strtol(p, (char **)&r, 0);
+>>> -    if (r == p)
+>>> +    if (r == p) {
+>>> +        error_setg(errp, "The port number is illegal");
+>>>          return -1;
+>>> +    }
+>>>      saddr->sin_port = htons(port);
+>>>      return 0;
+>>>  }
+>>> diff --git a/net/socket.c b/net/socket.c
+>>> index 53765bd..66016c8 100644
+>>> --- a/net/socket.c
+>>> +++ b/net/socket.c
+>>> @@ -485,15 +485,17 @@ static void net_socket_accept(void *opaque)
+>>>  static int net_socket_listen_init(NetClientState *peer,
+>>>                                    const char *model,
+>>>                                    const char *name,
+>>> -                                  const char *host_str)
+>>> +                                  const char *host_str,
+>>> +                                  Error **errp)
 >>
->> So, drop the 'default' case since it is broken already.
+>> You convert net_socket_listen_init() to Error.  This means you have to
+>> make it set an error on failure.  You do ...
 >>
->> Cc: jasowang@redhat.com
->> Cc: armbru@redhat.com
->> Cc: berrange@redhat.com
->> Cc: armbru@redhat.com
->> Suggested-by: Markus Armbruster <armbru@redhat.com>
->> Suggested-by: Daniel P. Berrange <berrange@redhat.com>
->> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
->> ---
->>  net/socket.c | 6 +++---
->>  1 file changed, 3 insertions(+), 3 deletions(-)
+>>>  {
+>>>      NetClientState *nc;
+>>>      NetSocketState *s;
+>>>      struct sockaddr_in saddr;
+>>>      int fd, ret;
+>>>
+>>> -    if (parse_host_port(&saddr, host_str) < 0)
+>>> +    if (parse_host_port(&saddr, host_str, errp) < 0) {
+>>>          return -1;
+>>> +    }
 >>
->> diff --git a/net/socket.c b/net/socket.c
->> index dcae1ae..53765bd 100644
->> --- a/net/socket.c
->> +++ b/net/socket.c
->> @@ -449,9 +449,9 @@ static NetSocketState *net_socket_fd_init(NetClientState *peer,
->>      case SOCK_STREAM:
->>          return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
->>      default:
->> -        /* who knows ... this could be a eg. a pty, do warn and continue as stream */
->> -        fprintf(stderr, "qemu: warning: socket type=%d for fd=%d is not SOCK_DGRAM or SOCK_STREAM\n", so_type, fd);
->> -        return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
->> +        error_report("qemu: error: socket type=%d for fd=%d is not"
->> +                " SOCK_DGRAM or SOCK_STREAM", so_type, fd);
->> +        closesocket(fd);
->>      }
->>      return NULL;
->>  }
+>> ... here, ...
+>>
+>>>
+>>>      fd = qemu_socket(PF_INET, SOCK_STREAM, 0);
+>>>      if (fd < 0) {
+>>            perror("socket");
+>>            return -1;
+>>        }
+>>
+>> ... but not here.  Two more error returns follow.
+>>
+>> Preexisting bug: net_socket_listen_init() reports to stderr for three
+>> out of four failures.  Functions should either report on no failure or
+>> on all.  Conversion to Error should fix that, but yours isn't complete.
+>> When it is, the fix should be mentioned in the commit message.
+>>
+>>> @@ -531,14 +533,16 @@ static int net_socket_listen_init(NetClientState *peer,
+>>>  static int net_socket_connect_init(NetClientState *peer,
+>>>                                     const char *model,
+>>>                                     const char *name,
+>>> -                                   const char *host_str)
+>>> +                                   const char *host_str,
+>>> +                                   Error **errp)
+>>>  {
+>>>      NetSocketState *s;
+>>>      int fd, connected, ret;
+>>>      struct sockaddr_in saddr;
+>>>
+>>> -    if (parse_host_port(&saddr, host_str) < 0)
+>>> +    if (parse_host_port(&saddr, host_str, errp) < 0) {
+>>>          return -1;
+>>> +    }
+>>>
+>>>      fd = qemu_socket(PF_INET, SOCK_STREAM, 0);
+>>>      if (fd < 0) {
+>>
+>> Again, you have to make the function set an error on all failures, not
+>> just this one.
+>>
+>> Additionally:
+>>
+>>        s = net_socket_fd_init(peer, model, name, fd, connected);
+>>        if (!s)
+>>            return -1;
+>>
+>> net_socket_fd_init() still prints to stderr.  Please convert it to
+>> Error.
+>>
+>>> @@ -580,14 +584,15 @@ static int net_socket_mcast_init(NetClientState *peer,
+>>>                                   const char *model,
+>>>                                   const char *name,
+>>>                                   const char *host_str,
+>>> -                                 const char *localaddr_str)
+>>> +                                 const char *localaddr_str,
+>>> +                                 Error **errp)
+>>>  {
+>>>      NetSocketState *s;
+>>>      int fd;
+>>>      struct sockaddr_in saddr;
+>>>      struct in_addr localaddr, *param_localaddr;
+>>>
+>>> -    if (parse_host_port(&saddr, host_str) < 0)
+>>> +    if (parse_host_port(&saddr, host_str, errp) < 0)
+>>>          return -1;
+>>>
+>>>      if (localaddr_str != NULL) {
+>>
+>> Again, you have to make the function set an error on all failures.
+>>
+>> Additionally, convert net_socket_mcast_create() to Error.
 >
-> You don't actually "drop the 'default' case", as your commit message
-> claims.  Perhaps:
+> Actually, you do in the next patch.  So, you first do an incorrect
+> conversion in PATCH 2, then fix it in PATCH 3.  Not horrible, but
+> avoiding the broken intermediate state is easy enough: convert
+> net_socket_mcast_create() to Error before PATCH 2, changing its callers
+> from
 >
->     net/socket: Don't treat odd socket type as SOCK_STREAM
+>     fd = net_socket_mcast_create(&saddr, param_localaddr);
+>     if (fd < 0) {
+>         // error already reported
+>         take the error exit
+>     }
 >
->     In net_socket_fd_init(), the 'default' case is odd: it warns, then
->     continues as if the socket type was SOCK_STREAM.  The comment
->     explains "this could be a eg. a pty", but that makes no sense.  If
->     @fd really was a pty, getsockopt() would fail with ENOTSOCK.  If @fd
->     was a socket, but neither SOCK_DGRAM nor SOCK_STREAM, it should not
->     be treated as if it was SOCK_STREAM.
+> to
 >
->     Turn this case into an error.  If there is a genuine reason to
->     support something like SOCK_RAW, it should be handled explicitly.
+>     fd = net_socket_mcast_create(&saddr, param_localaddr, &err);
+>     if (fd < 0) {
+>         error_report_err(err);
+>         take the error exit
+>     }
 >
-> With something like that:
+> The error_report_err() goes away when the function containing it gets
+> converted to Error.  Any questions?
 
 
-Yes, I have noticed that the commit message is really not very match this
-patch after read your exact description. I will fix it in the next version.
+Thanks for your detailed explanation, it inspired me. :)
 
-Thank you very much. :)
+This patchset looks a bit confusing because it doesn't have a correct order
+and error path,  I'll rearrange to avoid it.
+
+Thank you very much.
 Mao
 
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+
+>
+>>> @@ -619,17 +624,18 @@ static int net_socket_udp_init(NetClientState *peer,
+>>>                                   const char *model,
+>>>                                   const char *name,
+>>>                                   const char *rhost,
+>>> -                                 const char *lhost)
+>>> +                                 const char *lhost,
+>>> +                                 Error **errp)
+>>>  {
+>>>      NetSocketState *s;
+>>>      int fd, ret;
+>>>      struct sockaddr_in laddr, raddr;
+>>>
+>>> -    if (parse_host_port(&laddr, lhost) < 0) {
+>>> +    if (parse_host_port(&laddr, lhost, errp) < 0) {
+>>>          return -1;
+>>>      }
+>>>
+>>> -    if (parse_host_port(&raddr, rhost) < 0) {
+>>> +    if (parse_host_port(&raddr, rhost, errp) < 0) {
+>>>          return -1;
+>>>      }
+>>>
+>>
+>> Again, you have make the function set an error on all failures.
+>>
+>>> @@ -703,15 +709,16 @@ int net_init_socket(const Netdev *netdev, const char *name,
+>>>      }
+>>>
+>>>      if (sock->has_listen) {
+>>> -        if (net_socket_listen_init(peer, "socket", name, sock->listen) == -1) {
+>>> +        if (net_socket_listen_init(peer, "socket", name, sock->listen,
+>>> +            errp) == -1) {
+>>>              return -1;
+>>>          }
+>>>          return 0;
+>>>      }
+>>>
+>>>      if (sock->has_connect) {
+>>> -        if (net_socket_connect_init(peer, "socket", name, sock->connect) ==
+>>> -            -1) {
+>>> +        if (net_socket_connect_init(peer, "socket", name, sock->connect,
+>>> +            errp) == -1) {
+>>>              return -1;
+>>>          }
+>>>          return 0;
+>>> @@ -721,7 +728,7 @@ int net_init_socket(const Netdev *netdev, const char *name,
+>>>          /* if sock->localaddr is missing, it has been initialized to "all bits
+>>>           * zero" */
+>>>          if (net_socket_mcast_init(peer, "socket", name, sock->mcast,
+>>> -            sock->localaddr) == -1) {
+>>> +            sock->localaddr, errp) == -1) {
+>>>              return -1;
+>>>          }
+>>>          return 0;
+>>> @@ -732,8 +739,8 @@ int net_init_socket(const Netdev *netdev, const char *name,
+>>>          error_report("localaddr= is mandatory with udp=");
+>>>          return -1;
+>>>      }
+>>> -    if (net_socket_udp_init(peer, "socket", name, sock->udp, sock->localaddr) ==
+>>> -        -1) {
+>>> +    if (net_socket_udp_init(peer, "socket", name, sock->udp, sock->localaddr,
+>>> +        errp) == -1) {
+>>>          return -1;
+>>>      }
+>>>      return 0;
+>>
+>> This is a partial fix for net_init_socket()'s
+>>     /* FIXME error_setg(errp, ...) on failure */
+>>
+>> Can you fix it completely?  Not required to get the patch accepted, as
+>> far as I'm concerned.
+>
+> Ah, you do in PATCH 4.  Suggest to explain in your commit message that
+> this is a partial fix, which will be completed in the following
+> commit(s).
+>
+>> Your commit message claims "Convert parse_host_port() to Error".  You do
+>> more than that.  Please rephrase the commit message.
+>
+>
+>
