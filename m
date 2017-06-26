@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53929)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dPS53-0005jA-VM
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 07:21:23 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dPSAx-0007LD-LT
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 07:27:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dPS52-0008DH-VD
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 07:21:21 -0400
-Date: Mon, 26 Jun 2017 13:21:12 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170626112112.GC4348@noname.redhat.com>
-References: <0f83a15d-66b0-36aa-e5a4-d03cd37757c9@kamp.de>
-	<20170626082838.GA4348@noname.redhat.com>
-	<0e6586f9-85eb-efcd-4825-20066a7c869a@kamp.de>
-	<20170626095719.GB4348@noname.redhat.com>
-	<b82ab934-ddc3-2d50-09cf-764f2165f2c8@kamp.de>
+	(envelope-from <alex.bennee@linaro.org>) id 1dPSAu-0002W6-IS
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 07:27:27 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:37439)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dPSAu-0002VV-BE
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 07:27:24 -0400
+Received: by mail-wm0-x236.google.com with SMTP id i127so4896078wma.0
+	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 04:27:24 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Mon, 26 Jun 2017 12:28:09 +0100
+Message-Id: <20170626112809.15020-1-alex.bennee@linaro.org>
+In-Reply-To: <149838143590.6497.11184953059640962891.stgit@frigg.lan>
+References: <149838143590.6497.11184953059640962891.stgit@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b82ab934-ddc3-2d50-09cf-764f2165f2c8@kamp.de>
-Subject: Re: [Qemu-devel] QCOW2 support for LZO compression
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] maybe fixup! target: [tcg] Redefine DISAS_*
+ onto the generic translation framework (DJ_*)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,87 +30,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Laszlo Ersek <lersek@redhat.com>, qemu block <qemu-block@nongnu.org>, den@openvz.org, qemu-devel@nongnu.org
+To: vilanova@ac.upc.edu
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Chris Wulff <crwulff@gmail.com>, Marek Vasut <marex@denx.de>
 
-Am 26.06.2017 um 12:08 hat Peter Lieven geschrieben:
-> Am 26.06.2017 um 11:57 schrieb Kevin Wolf:
-> >Am 26.06.2017 um 11:20 hat Peter Lieven geschrieben:
-> >>>So he chose a different algorithm (zstd). When I asked, he posted a
-> >>>comparison of algorithms (however a generic one and not measured in the
-> >>>context of qemu) that suggests that LZO would be slightly faster, but
-> >>>have a considerable worse compression ratio with the settings that were
-> >>>benchmarked.
-> >>My idea to choose LZO was that it is widely available and available in
-> >>any distro you can think of. We already have probing for it in configure.
-> >>My concern with ZSTD would be that it seems there are no packages
-> >>available for most distros and that it seems to be multi-threaded. I don't
-> >>know if this will cause any trouble?
-> >The availability and that we already link against LZO is a good point. I
-> >think we want to avoid a situation where compressed qcow2 files can't be
-> >read by binaries of popular distributions - after all, downloadable
-> >images are an important use case for compressed images.
-> 
-> As long as the default remains gzip I don't see any issues. If you choose
-> a different algorithm, you should know what you are doing.
+Arguably these should be applied to nios2 before these changes.
 
-If we add a better compression algorithm, then it's clear to me that the
-goal is to make it the default in a year or two.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ target/nios2/cpu.h       | 2 --
+ target/nios2/op_helper.c | 1 +
+ 2 files changed, 1 insertion(+), 2 deletions(-)
 
-> >>>I think it's clear that if there is any serious interest in compression,
-> >>>we'll want to support at least one more algorithm. What we still need to
-> >>>evaluate is which one(s) to take, and whether a simple incompatible flag
-> >>>in the header like in Den's patch is enough or whether we should add a
-> >>>whole new header field for the compression algorithm (like we already
-> >>>have for encryption).
-> >> From my side there clearly is interest in optimizing the compression. Its
-> >>even possible to speed up zlib by 3-4x times by choosing other parameters
-> >>for deflate which unfortunately are not compatible with our inflate settings.
-> >>
-> >>I don't know if its worth creating a new header field. Even if we spent to bits
-> >>in the end (one for LZO and one for ZSDT). I think this wouldn't hurt. However,
-> >>there are likely to pop up new compression algorithms in the future and
-> >>a header would be more flexible.
-> >That we could just use different parameters is an important hint that
-> >maybe we don't just need bits to select an algorithm, but also some
-> >space for parameters for the selected algorithm. In this case I think we
-> >need a header change anyway.
-> 
-> The issue is, you don't know in advance how much space will be needed
-> for the paramters.  Maybe it would be simpler to have different
-> settings for a compression algorithm threated as different algorithms.
-> Like zstd-fast, zstd, zstd-slow, gzip, lzo, lzo-slow etc.
-
-Yes, how much space is needed for parameters depends on the algorithm.
-Normally, when adding an incompatible feature, you would put the new
-options inside the main header. However, nothing stops us from using a
-header extension instead like we would with compatible features.
-
-So I think this is what we could do:
-
- * Add a header extension type per algorithm that contains the
-   parameters that are needed for this parameter
-
- * Add a header field that selects the compression algorithm (e.g. a
-   32 bit field containing the matching header extension ID). Images
-   that contain compression header extensions that don't match this
-   header field (or images containing the same compression header
-   extension type more than once) are rejected
-
- * Add an incompatible feature flag that indicates presence of the
-   header field + header extension
-
-> >>I just don't want to make it too complicated and as you pointed out
-> >>compression is not that interesting for most people - maybe due to its
-> >>speed.
-> >In fact, I think it could be the poor integration in qemu. Compressed
-> >images might be more appealing if you couldn't only write compressed
-> >data with special-case operations like 'qemu-img convert', but just give
-> >an option that you want all writes to be compressed and then use it like
-> >any other image.
-> 
-> Then we should start to improve that.
-
-Thanks for volunteering. ;-)
-
-Kevin
+diff --git a/target/nios2/cpu.h b/target/nios2/cpu.h
+index 13931f3f0b..b6a97c131e 100644
+--- a/target/nios2/cpu.h
++++ b/target/nios2/cpu.h
+@@ -259,8 +259,6 @@ static inline int cpu_interrupts_enabled(CPUNios2State *env)
+ }
+ 
+ #include "exec/cpu-all.h"
+-#include "exec/exec-all.h"
+-
+ static inline void cpu_get_tb_cpu_state(CPUNios2State *env, target_ulong *pc,
+                                         target_ulong *cs_base, uint32_t *flags)
+ {
+diff --git a/target/nios2/op_helper.c b/target/nios2/op_helper.c
+index efb1c489c9..04c16e8701 100644
+--- a/target/nios2/op_helper.c
++++ b/target/nios2/op_helper.c
+@@ -21,6 +21,7 @@
+ #include "cpu.h"
+ #include "exec/helper-proto.h"
+ #include "exec/cpu_ldst.h"
++#include "exec/exec-all.h"
+ #include "qemu/main-loop.h"
+ 
+ #if !defined(CONFIG_USER_ONLY)
+-- 
+2.13.0
