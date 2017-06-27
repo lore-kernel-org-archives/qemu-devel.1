@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dPtm0-0007PJ-1t
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:55:36 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dPtly-0006uy-EO
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:55:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dPsKw-0003Gk-6c
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:23:31 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dPsL8-0004Ag-Jz
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:23:45 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 27 Jun 2017 17:22:42 +0200
-Message-Id: <20170627152248.10446-5-pbonzini@redhat.com>
+Date: Tue, 27 Jun 2017 17:22:44 +0200
+Message-Id: <20170627152248.10446-7-pbonzini@redhat.com>
 In-Reply-To: <20170627152248.10446-1-pbonzini@redhat.com>
 References: <20170627152248.10446-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 04/10] vpc: make it thread-safe
+Subject: [Qemu-devel] [PATCH 06/10] qed: move tail of qed_aio_write_main to
+ qed_aio_write_{cow, alloc}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,73 +23,121 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: stefanha@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+This part is never called for in-place writes, move it away to avoid
+the "backwards" coding style typical of callback-based code.
+
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block/vpc.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ block/qed.c | 69 +++++++++++++++++++++++++++----------------------------------
+ 1 file changed, 31 insertions(+), 38 deletions(-)
 
-diff --git a/block/vpc.c b/block/vpc.c
-index 4240ba9d1c..0ff686540a 100644
---- a/block/vpc.c
-+++ b/block/vpc.c
-@@ -496,12 +496,6 @@ static inline int64_t get_image_offset(BlockDriverState *bs, uint64_t offset,
-     return block_offset;
+diff --git a/block/qed.c b/block/qed.c
+index 385381a78a..3ffdc1716d 100644
+--- a/block/qed.c
++++ b/block/qed.c
+@@ -982,40 +982,11 @@ static int coroutine_fn qed_aio_write_main(QEDAIOCB *acb)
+     BDRVQEDState *s = acb_to_s(acb);
+     uint64_t offset = acb->cur_cluster +
+                       qed_offset_into_cluster(s, acb->cur_pos);
+-    int ret;
+ 
+     trace_qed_aio_write_main(s, acb, 0, offset, acb->cur_qiov.size);
+ 
+     BLKDBG_EVENT(s->bs->file, BLKDBG_WRITE_AIO);
+-    ret = bdrv_co_pwritev(s->bs->file, offset, acb->cur_qiov.size,
+-                          &acb->cur_qiov, 0);
+-    if (ret < 0) {
+-        return ret;
+-    }
+-
+-    if (acb->find_cluster_ret != QED_CLUSTER_FOUND) {
+-        if (s->bs->backing) {
+-            /*
+-             * Flush new data clusters before updating the L2 table
+-             *
+-             * This flush is necessary when a backing file is in use.  A crash
+-             * during an allocating write could result in empty clusters in the
+-             * image.  If the write only touched a subregion of the cluster,
+-             * then backing image sectors have been lost in the untouched
+-             * region.  The solution is to flush after writing a new data
+-             * cluster and before updating the L2 table.
+-             */
+-            ret = bdrv_co_flush(s->bs->file->bs);
+-            if (ret < 0) {
+-                return ret;
+-            }
+-        }
+-        ret = qed_aio_write_l2_update(acb, acb->cur_cluster);
+-        if (ret < 0) {
+-            return ret;
+-        }
+-    }
+-    return 0;
++    return bdrv_co_pwritev(s->bs->file, offset, &acb->cur_qiov);
  }
  
--static inline int64_t get_sector_offset(BlockDriverState *bs,
--                                        int64_t sector_num, bool write)
--{
--    return get_image_offset(bs, sector_num * BDRV_SECTOR_SIZE, write);
--}
--
- /*
-  * Writes the footer to the end of the image file. This is needed when the
-  * file grows as it overwrites the old footer
-@@ -696,6 +690,7 @@ static int64_t coroutine_fn vpc_co_get_block_status(BlockDriverState *bs,
-     VHDFooter *footer = (VHDFooter*) s->footer_buf;
-     int64_t start, offset;
-     bool allocated;
-+    int64_t ret;
-     int n;
- 
-     if (be32_to_cpu(footer->type) == VHD_FIXED) {
-@@ -705,10 +700,13 @@ static int64_t coroutine_fn vpc_co_get_block_status(BlockDriverState *bs,
-                (sector_num << BDRV_SECTOR_BITS);
+ /**
+@@ -1050,7 +1021,29 @@ static int coroutine_fn qed_aio_write_cow(QEDAIOCB *acb)
+         return ret;
      }
  
--    offset = get_sector_offset(bs, sector_num, 0);
-+    qemu_co_mutex_lock(&s->lock);
+-    return qed_aio_write_main(acb);
++    ret = qed_aio_write_main(acb);
++    if (ret < 0) {
++        return ret;
++    }
 +
-+    offset = get_image_offset(bs, sector_num << BDRV_SECTOR_BITS, false);
-     start = offset;
-     allocated = (offset != -1);
-     *pnum = 0;
-+    ret = 0;
- 
-     do {
-         /* All sectors in a block are contiguous (without using the bitmap) */
-@@ -723,15 +721,17 @@ static int64_t coroutine_fn vpc_co_get_block_status(BlockDriverState *bs,
-          * sectors since there is always a bitmap in between. */
-         if (allocated) {
-             *file = bs->file->bs;
--            return BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID | start;
-+            ret = BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID | start;
-+            break;
-         }
-         if (nb_sectors == 0) {
-             break;
-         }
--        offset = get_sector_offset(bs, sector_num, 0);
-+        offset = get_image_offset(bs, sector_num << BDRV_SECTOR_BITS, false);
-     } while (offset == -1);
- 
--    return 0;
-+    qemu_co_mutex_unlock(&s->lock);
-+    return ret;
++    if (s->bs->backing) {
++        /*
++         * Flush new data clusters before updating the L2 table
++         *
++         * This flush is necessary when a backing file is in use.  A crash
++         * during an allocating write could result in empty clusters in the
++         * image.  If the write only touched a subregion of the cluster,
++         * then backing image sectors have been lost in the untouched
++         * region.  The solution is to flush after writing a new data
++         * cluster and before updating the L2 table.
++         */
++        ret = bdrv_co_flush(s->bs->file->bs);
++        if (ret < 0) {
++            return ret;
++        }
++    }
++
++    return 0;
  }
  
- /*
+ /**
+@@ -1103,6 +1096,7 @@ static int coroutine_fn qed_aio_write_alloc(QEDAIOCB *acb, size_t len)
+         if (acb->find_cluster_ret == QED_CLUSTER_ZERO) {
+             return 0;
+         }
++        acb->cur_cluster = 1;
+     } else {
+         acb->cur_cluster = qed_alloc_clusters(s, acb->cur_nclusters);
+     }
+@@ -1115,15 +1109,14 @@ static int coroutine_fn qed_aio_write_alloc(QEDAIOCB *acb, size_t len)
+         }
+     }
+ 
+-    if (acb->flags & QED_AIOCB_ZERO) {
+-        ret = qed_aio_write_l2_update(acb, 1);
+-    } else {
++    if (!(acb->flags & QED_AIOCB_ZERO)) {
+         ret = qed_aio_write_cow(acb);
++        if (ret < 0) {
++            return ret;
++        }
+     }
+-    if (ret < 0) {
+-        return ret;
+-    }
+-    return 0;
++
++    return qed_aio_write_l2_update(acb, acb->cur_cluster);
+ }
+ 
+ /**
 -- 
 2.13.0
