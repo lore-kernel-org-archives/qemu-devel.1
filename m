@@ -1,40 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1dPtlQ-00082r-PQ
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:55:01 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dPtlW-00077i-Ga
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:55:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1dPskw-0000xe-7d
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:50:27 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59974
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
-	id 1dPskw-0000tQ-0I
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:50:22 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v5RFmqpN099730
-	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 11:50:20 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bbfskwkhc-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 11:50:19 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
-	Tue, 27 Jun 2017 16:50:18 +0100
-References: <1498564100-10045-1-git-send-email-thuth@redhat.com>
-From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Date: Tue, 27 Jun 2017 17:50:14 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dPsgm-0005oB-5S
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:46:07 -0400
+Received: from mail-qt0-x22a.google.com ([2607:f8b0:400d:c0d::22a]:36098)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dPsgl-0005mY-W9
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:46:04 -0400
+Received: by mail-qt0-x22a.google.com with SMTP id i2so27741747qta.3
+	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 08:46:03 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+Date: Tue, 27 Jun 2017 12:45:41 -0300
+From: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Message-ID: <20170627124541.2ab44983@x1.local>
+In-Reply-To: <20170626220330.6785-3-laurent@vivier.eu>
+References: <20170626220330.6785-1-laurent@vivier.eu>
+	<20170626220330.6785-3-laurent@vivier.eu>
 MIME-Version: 1.0
-In-Reply-To: <1498564100-10045-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Message-Id: <23ec1642-053c-a15a-c03f-d9e48d1447e7@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 00/14] Implement network booting
- directly into the s390-ccw BIOS
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/7] target/m68k: add fmovecr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,82 +34,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Eric Farman <farman@linux.vnet.ibm.com>, Farhan Ali <alifm@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Jens Freimann <jfreiman@redhat.com>, David Hildenbrand <david@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 
-On 27.06.2017 13:48, Thomas Huth wrote:
-> It's already possible to do a network boot of an s390x guest with an
-> external netboot image (based on a Linux installation), but it would
-> be much more convenient if the s390-ccw firmware supported network
-> booting right out of the box, without the need to assemble such an
-> external image first.
->=20
-> This patch series now introduces network booting via DHCP and TFTP
-> directly into the s390-ccw firmware by re-using the networking stack
-> from the SLOF firmware (see https://github.com/aik/SLOF/ for details),
-> and adds a driver for virtio-net-ccw devices.Neat :)
->=20
-> Once the patches have been applied, you can download an .INS file
-> via TFTP which contains the information about the further files
-> that have to be loaded - kernel, initrd, etc. For example, you can
-> use the built-in TFTP and DHCP server of QEMU for this by starting
-> QEMU with:
->=20
->  qemu-system-s390x ... -device virtio-net,netdev=3Dn1,bootindex=3D1 \
->        -netdev user,id=3Dn1,tftp=3D/path/to/tftp,bootfile=3Dgeneric.ins
->=20
-or the dnsmasq tftp server configured by libvirt (SCNR)
-> The .INS file has to use the same syntax as the .INS files that can
-> already be found on s390x Linux distribution installation CD-ROMs.
->=20
-> The patches are still in a rough shape, but before I continue here,
-> I though I'd get some feedback first. Specifically:
->=20
-> - This adds a lot of additional code to the s390-ccw firmware (and
->   the binary is afterwards three times as big as before, 75k instead
->   of 25k) ... is that still acceptable?
-The size may be less of an issue than the general overhead for
-initialization. Since the current approach of the s390-ccw firmware of
-lazy loading (only if a network boot is requested) takes care of that,
-would it be conceivable that you build a standalone network boot
-firmware image instead of incorporating that into the base firmware?
->=20
-> - Is it OK to require loading an .INS file first? Or does anybody
->   have a better idea how to load multiple files (kernel, initrd,
->   etc. ...)?
-It would be nice to support PXE-style boot, because the majority of boot
-servers is set up that way. A straightforward way would be to do a PXE
-emulation by attempting to download a pxelinux.cfg from the well-known
-locations, parsing the content (menu) and finally load the kernel,
-initrd and set the kernel command line as specified there. (I know, but
-you're already parsing the INS-File).
-Alternatively, one could load a single boot image (consisting of kernel
-and initrd concatenated, i.e. the bootable ISO format). This could serve
-as a more potent "stage 2" boot loader.
->=20
-> - The code from SLOF uses a different coding style (TABs instead
->   of space) ... is it OK to keep that coding style here so we
->   can share patches between SLOF and s390-ccw more easil>
-> - The code only supports TFTP (via UDP) ... I think that is OK for
->   most use-cases, but if we ever want to support network booting
->   via HTTP or something else that is based on TCP, we would need to
->   use something else instead... Should we maybe rather head towards
->   grub2, petitboot or something different instead?
-I don't have an opinion on whether HTTP, FTP, etc is needed, but at some
-point in time it would definitely be cool to have IPv6 support. Not sure
-whether SLOF has that included.
->=20
->  Thomas
->=20
->=20
-[...]
---=20
+I find this patch aesthetically very nice :)
 
-Mit freundlichen Gr=C3=BC=C3=9Fen/Kind Regards
-   Viktor Mihajlovski
+On Tue, 27 Jun 2017 00:03:25 +0200
+Laurent Vivier <laurent@vivier.eu> wrote:
+> fmovecr moves a floating point constant from the
+> FPU ROM to a floating point register.
+> 
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> Reviewed-by: Richard Henderson <rth@twiddle.net>
+> ---
+>  target/m68k/fpu_helper.c | 30 ++++++++++++++++++++++++++++++
+>  target/m68k/helper.h     |  1 +
+>  target/m68k/translate.c  | 13 ++++++++++++-
+>  3 files changed, 43 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
+> index a9e17f5..912c0b7 100644
+> --- a/target/m68k/fpu_helper.c
+> +++ b/target/m68k/fpu_helper.c
+> @@ -23,6 +23,31 @@
+>  #include "exec/helper-proto.h"
+>  #include "exec/exec-all.h"
+>  
+> +static const floatx80 fpu_rom[128] = {
+> +    [0x00] = floatx80_pi,                                   /* Pi */
+> +    [0x0b] = make_floatx80(0x3ffd, 0x9a209a84fbcff798ULL),  /*
+> Log10(2) */
+> +    [0x0c] = make_floatx80(0x4000, 0xadf85458a2bb4a9aULL),  /*
+> e        */
+> +    [0x0d] = make_floatx80(0x3fff, 0xb8aa3b295c17f0bcULL),  /*
+> Log2(e)  */
+> +    [0x0e] = make_floatx80(0x3ffd, 0xde5bd8a937287195ULL),  /*
+> Log10(e) */
+> +    [0x0f] = floatx80_zero,                                 /*
+> Zero     */
+> +    [0x30] = floatx80_ln2,                                  /*
+> ln(2)    */
+> +    [0x31] = make_floatx80(0x4000, 0x935d8dddaaa8ac17ULL),  /*
+> ln(10)   */
+> +    [0x32] = floatx80_one,                                  /*
+> 10^0     */
+> +    [0x33] = make_floatx80(0x4002, 0xa000000000000000ULL),  /*
+> 10^1     */
+> +    [0x34] = make_floatx80(0x4005, 0xc800000000000000ULL),  /*
+> 10^2     */
+> +    [0x35] = make_floatx80(0x400c, 0x9c40000000000000ULL),  /*
+> 10^4     */
+> +    [0x36] = make_floatx80(0x4019, 0xbebc200000000000ULL),  /*
+> 10^8     */
+> +    [0x37] = make_floatx80(0x4034, 0x8e1bc9bf04000000ULL),  /*
+> 10^16    */
+> +    [0x38] = make_floatx80(0x4069, 0x9dc5ada82b70b59eULL),  /*
+> 10^32    */
+> +    [0x39] = make_floatx80(0x40d3, 0xc2781f49ffcfa6d5ULL),  /*
+> 10^64    */
+> +    [0x3a] = make_floatx80(0x41a8, 0x93ba47c980e98ce0ULL),  /*
+> 10^128   */
+> +    [0x3b] = make_floatx80(0x4351, 0xaa7eebfb9df9de8eULL),  /*
+> 10^256   */
+> +    [0x3c] = make_floatx80(0x46a3, 0xe319a0aea60e91c7ULL),  /*
+> 10^512   */
+> +    [0x3d] = make_floatx80(0x4d48, 0xc976758681750c17ULL),  /*
+> 10^1024  */
+> +    [0x3e] = make_floatx80(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /*
+> 10^2048  */
+> +    [0x3f] = make_floatx80(0x7525, 0xc46052028a20979bULL),  /*
+> 10^4096  */ +};
+> +
+>  int32_t HELPER(reds32)(CPUM68KState *env, FPReg *val)
+>  {
+>      return floatx80_to_int32(val->d, &env->fp_status);
+> @@ -204,3 +229,8 @@ void HELPER(ftst)(CPUM68KState *env, FPReg *val)
+>      }
+>      env->fpsr = (env->fpsr & ~FPSR_CC_MASK) | cc;
+>  }
+> +
+> +void HELPER(fconst)(CPUM68KState *env, FPReg *val, uint32_t offset)
+> +{
+> +    val->d = fpu_rom[offset];
 
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Martina K=C3=B6deritz
-Gesch=C3=A4ftsf=C3=BChrung: Dirk Wittkopp
-Sitz der Gesellschaft: B=C3=B6blingen
-Registergericht: Amtsgericht Stuttgart, HRB 243294
+For offset not declared in fpu_rom (0x1..0xa, 0x10..0x2f, 0x40..0x7f),
+this will return floatx80_zero, is this correct?
+
+> +}
+> diff --git a/target/m68k/helper.h b/target/m68k/helper.h
+> index 98cbf18..d6e80e4 100644
+> --- a/target/m68k/helper.h
+> +++ b/target/m68k/helper.h
+> @@ -35,6 +35,7 @@ DEF_HELPER_4(fdiv, void, env, fp, fp, fp)
+>  DEF_HELPER_FLAGS_3(fcmp, TCG_CALL_NO_RWG, void, env, fp, fp)
+>  DEF_HELPER_FLAGS_2(set_fpcr, TCG_CALL_NO_RWG, void, env, i32)
+>  DEF_HELPER_FLAGS_2(ftst, TCG_CALL_NO_RWG, void, env, fp)
+> +DEF_HELPER_3(fconst, void, env, fp, i32)
+>  
+>  DEF_HELPER_3(mac_move, void, env, i32, i32)
+>  DEF_HELPER_3(macmulf, i64, env, i32, i32)
+> diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+> index 8824f81..ab2fe50 100644
+> --- a/target/m68k/translate.c
+> +++ b/target/m68k/translate.c
+> @@ -4510,6 +4510,7 @@ static void gen_op_fmove_fcr(CPUM68KState *env,
+> DisasContext *s, DISAS_INSN(fpu)
+>  {
+>      uint16_t ext;
+> +    uint8_t rom_offset;
+>      int opmode;
+>      TCGv tmp32;
+>      int opsize;
+> @@ -4518,10 +4519,20 @@ DISAS_INSN(fpu)
+>      ext = read_im16(env, s);
+>      opmode = ext & 0x7f;
+>      switch ((ext >> 13) & 7) {
+> -    case 0: case 2:
+> +    case 0:
+>          break;
+>      case 1:
+>          goto undef;
+> +    case 2:
+> +        if (insn == 0xf200 && (ext & 0xfc00) == 0x5c00) {
+> +            /* fmovecr */
+> +            rom_offset = ext & 0x7f;
+
+you can use opmode directly.
+
+> +            cpu_dest = gen_fp_ptr(REG(ext, 7));
+> +            gen_helper_fconst(cpu_env, cpu_dest,
+> tcg_const_i32(rom_offset));
+> +            tcg_temp_free_ptr(cpu_dest);
+> +            return;
+> +        }
+> +        break;
+>      case 3: /* fmove out */
+>          cpu_src = gen_fp_ptr(REG(ext, 7));
+>          opsize = ext_opsize(ext, 10);
