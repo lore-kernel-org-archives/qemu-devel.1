@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dPlU1-0006ZT-Rr
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:04:27 -0400
+	(envelope-from <famz@redhat.com>) id 1dPlUW-0006t5-Ep
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:04:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dPlTx-00085W-9p
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:04:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34052)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dPlTx-00085K-1a
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:04:21 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <cover.1498530543.git.maozy.fnst@cn.fujitsu.com>
-	<c5ea94f976cb60151fb14a4e25867d73027c5d96.1498530543.git.maozy.fnst@cn.fujitsu.com>
-Date: Tue, 27 Jun 2017 10:04:16 +0200
-In-Reply-To: <c5ea94f976cb60151fb14a4e25867d73027c5d96.1498530543.git.maozy.fnst@cn.fujitsu.com>
-	(Mao Zhongyi's message of "Tue, 27 Jun 2017 11:24:41 +0800")
-Message-ID: <87tw31luv3.fsf@dusky.pond.sub.org>
+	(envelope-from <famz@redhat.com>) id 1dPlUV-0008C3-M4
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:04:56 -0400
+Date: Tue, 27 Jun 2017 16:04:43 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170627080443.GC14166@lemon.lan>
+References: <1496649172-26982-1-git-send-email-ashijeetacharya@gmail.com>
+	<1496649172-26982-8-git-send-email-ashijeetacharya@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v5 3/4] net/net: Convert parse_host_port()
- to Error
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1496649172-26982-8-git-send-email-ashijeetacharya@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v6 7/8] vmdk: Update metadata for multiple
+ clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,168 +24,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, jasowang@redhat.com, kraxel@redhat.com
+To: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Cc: kwolf@redhat.com, jsnow@redhat.com, mreitz@redhat.com, stefanha@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
-
-> Cc: berrange@redhat.com
-> Cc: kraxel@redhat.com
-> Cc: pbonzini@redhat.com
-> Cc: jasowang@redhat.com
-> Cc: armbru@redhat.com
-> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-> ---
->  include/qemu/sockets.h |  3 ++-
->  net/net.c              | 22 +++++++++++++++++-----
->  net/socket.c           | 19 ++++++++++++++-----
->  3 files changed, 33 insertions(+), 11 deletions(-)
->
-> diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
-> index 5c326db..78e2b30 100644
-> --- a/include/qemu/sockets.h
-> +++ b/include/qemu/sockets.h
-> @@ -53,7 +53,8 @@ void socket_listen_cleanup(int fd, Error **errp);
->  int socket_dgram(SocketAddress *remote, SocketAddress *local, Error **errp);
+On Mon, 06/05 13:22, Ashijeet Acharya wrote:
+> @@ -1876,6 +1942,13 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+>          offset += n_bytes;
+>          bytes_done += n_bytes;
 >  
->  /* Old, ipv4 only bits.  Don't use for new code. */
-> -int parse_host_port(struct sockaddr_in *saddr, const char *str);
-> +int parse_host_port(struct sockaddr_in *saddr, const char *str,
-> +                    Error **errp);
->  int socket_init(void);
->  
->  /**
-> diff --git a/net/net.c b/net/net.c
-> index 6235aab..884e3ac 100644
-> --- a/net/net.c
-> +++ b/net/net.c
-> @@ -100,7 +100,8 @@ static int get_str_sep(char *buf, int buf_size, const char **pp, int sep)
->      return 0;
->  }
->  
-> -int parse_host_port(struct sockaddr_in *saddr, const char *str)
-> +int parse_host_port(struct sockaddr_in *saddr, const char *str,
-> +                    Error **errp)
->  {
->      char buf[512];
->      struct hostent *he;
-> @@ -108,24 +109,35 @@ int parse_host_port(struct sockaddr_in *saddr, const char *str)
->      int port;
->  
->      p = str;
-> -    if (get_str_sep(buf, sizeof(buf), &p, ':') < 0)
-> +    if (get_str_sep(buf, sizeof(buf), &p, ':') < 0) {
-> +        error_setg(errp, "The address should contain ':', for example: "
-> +                   "xxxx=230.0.0.1:1234");
+> +        while (m_data->next != NULL) {
 
-Suggest "Host address '%s' should ..." like you do in the next error message.
+If you do
 
-The xxxx= is confusing.  Do we need an example here?  The other error
-messages in this function apparently don't.
+           while (m_data) {
 
-What about "host address '%s' doesn't contain ':' separating host from
-port" or "can't find ':' separating host from port in host address
-'%s'"?
-
-
->          return -1;
-> +    }
->      saddr->sin_family = AF_INET;
->      if (buf[0] == '\0') {
->          saddr->sin_addr.s_addr = 0;
->      } else {
->          if (qemu_isdigit(buf[0])) {
-> -            if (!inet_aton(buf, &saddr->sin_addr))
-> +            if (!inet_aton(buf, &saddr->sin_addr)) {
-> +                error_setg(errp, "Host address '%s' is not a valid "
-> +                           "IPv4 address", buf);
->                  return -1;
-> +            }
->          } else {
-> -            if ((he = gethostbyname(buf)) == NULL)
-> +            he = gethostbyname(buf);
-> +            if (he == NULL) {
-> +                error_setg(errp, "Specified hostname is error.");
-
-No.  Suggest "can't resolve host address '%s'.  This error message still
-lacks detail, but I'm not sure hstrerror() is sufficiently portable.
-
-Outside this patch's scope: gethostbyname() is obsolete.  Applications
-should use getaddrinfo() instead.  Comes with gai_strerror().
-
->                  return - 1;
-> +            }
->              saddr->sin_addr = *(struct in_addr *)he->h_addr;
+> +            VmdkMetaData *next;
+> +            next = m_data->next;
+> +            g_free(m_data);
+> +            m_data = next;
+> +        }
+> +
+>          /* update CID on the first write every time the virtual disk is
+>           * opened */
+>          if (!s->cid_updated) {
+> @@ -1886,6 +1959,7 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+>              s->cid_updated = true;
 >          }
 >      }
->      port = strtol(p, (char **)&r, 0);
-> -    if (r == p)
-> +    if (r == p) {
-> +        error_setg(errp, "The port number is illegal");
+> +    g_free(m_data);
 
-Suggest "Port number '%s' is invalid".
+then you can remove this line.
 
->          return -1;
-> +    }
->      saddr->sin_port = htons(port);
 >      return 0;
 >  }
-> diff --git a/net/socket.c b/net/socket.c
-> index e136f87..a875205 100644
-> --- a/net/socket.c
-> +++ b/net/socket.c
-> @@ -501,9 +501,12 @@ static int net_socket_listen_init(NetClientState *peer,
->      NetSocketState *s;
->      struct sockaddr_in saddr;
->      int fd, ret;
-> +    Error *err = NULL;
 >  
-> -    if (parse_host_port(&saddr, host_str) < 0)
-> +    if (parse_host_port(&saddr, host_str, &err) < 0) {
-> +        error_report_err(err);
->          return -1;
-> +    }
->  
->      fd = qemu_socket(PF_INET, SOCK_STREAM, 0);
->      if (fd < 0) {
-> @@ -548,8 +551,10 @@ static int net_socket_connect_init(NetClientState *peer,
->      struct sockaddr_in saddr;
->      Error *err = NULL;
->  
-> -    if (parse_host_port(&saddr, host_str) < 0)
-> +    if (parse_host_port(&saddr, host_str, &err) < 0) {
-> +        error_report_err(err);
->          return -1;
-> +    }
->  
->      fd = qemu_socket(PF_INET, SOCK_STREAM, 0);
->      if (fd < 0) {
-> @@ -601,8 +606,10 @@ static int net_socket_mcast_init(NetClientState *peer,
->      struct in_addr localaddr, *param_localaddr;
->      Error *err = NULL;
->  
-> -    if (parse_host_port(&saddr, host_str) < 0)
-> +    if (parse_host_port(&saddr, host_str, &err) < 0) {
-> +        error_report_err(err);
->          return -1;
-> +    }
->  
->      if (localaddr_str != NULL) {
->          if (inet_aton(localaddr_str, &localaddr) == 0)
-> @@ -644,11 +651,13 @@ static int net_socket_udp_init(NetClientState *peer,
->      struct sockaddr_in laddr, raddr;
->      Error *err = NULL;
->  
-> -    if (parse_host_port(&laddr, lhost) < 0) {
-> +    if (parse_host_port(&laddr, lhost, &err) < 0) {
-> +        error_report_err(err);
->          return -1;
->      }
->  
-> -    if (parse_host_port(&raddr, rhost) < 0) {
-> +    if (parse_host_port(&raddr, rhost, &err) < 0) {
-> +        error_report_err(err);
->          return -1;
->      }
-
-Looks good otherwise.
+> -- 
+> 2.6.2
+> 
