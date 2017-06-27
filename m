@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dPozU-0008S0-D7
+	(envelope-from <thuth@redhat.com>) id 1dPozU-0008S1-DF
 	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 07:49:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dPozP-0003zU-JF
+	(envelope-from <thuth@redhat.com>) id 1dPozR-00040s-TQ
 	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 07:49:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37558)
+Received: from mx1.redhat.com ([209.132.183.28]:47152)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dPozP-0003zG-D5
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 07:49:03 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dPozR-00040L-Lj
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 07:49:05 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 27 Jun 2017 13:48:19 +0200
-Message-Id: <1498564100-10045-14-git-send-email-thuth@redhat.com>
+Date: Tue, 27 Jun 2017 13:48:20 +0200
+Message-Id: <1498564100-10045-15-git-send-email-thuth@redhat.com>
 In-Reply-To: <1498564100-10045-1-git-send-email-thuth@redhat.com>
 References: <1498564100-10045-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 13/14] pc-bios/s390-ccw: Allow loading to
- address 0
+Subject: [Qemu-devel] [RFC PATCH 14/14] pc-bios/s390-ccw: Wire up the
+ netload code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,63 +27,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
 Cc: Alexander Graf <agraf@suse.de>, Farhan Ali <alifm@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Jens Freimann <jfreiman@redhat.com>, Eric Farman <farman@linux.vnet.ibm.com>
 
-Kernels are normally loaded to address 0, so the check for NULL
-in the TFTP code has to be replaced.
+Link the libnet.a to the s390-ccw.elf file, call netload() instead of
+the external network boot image, and jump to loaded kernel at address 0,
+so that we can finally do a full network boot with the s390-ccw firmware
+now.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/libnet/tftp.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ pc-bios/s390-ccw/Makefile  |  2 +-
+ pc-bios/s390-ccw/bootmap.c | 10 +++++++++-
+ pc-bios/s390-ccw/main.c    |  3 +--
+ 3 files changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/libnet/tftp.c b/pc-bios/s390-ccw/libnet/tftp.c
-index 34f448c..108092b 100644
---- a/pc-bios/s390-ccw/libnet/tftp.c
-+++ b/pc-bios/s390-ccw/libnet/tftp.c
-@@ -26,6 +26,7 @@
+diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
+index 369bd65..827d7be 100644
+--- a/pc-bios/s390-ccw/Makefile
++++ b/pc-bios/s390-ccw/Makefile
+@@ -10,7 +10,7 @@ $(call set-vpath, $(SRC_PATH)/pc-bios/s390-ccw)
+ .PHONY : all clean build-all libc.a libnet.a
  
- #define MAX_BLOCKSIZE 1428
- #define BUFFER_LEN 256
-+#define INVALID_BUFFER ((void *)-1L)
+ OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-net.o
+-OBJECTS += libc.a sbrk.o
++OBJECTS += libnet.a libc.a sbrk.o
+ QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS))
+ QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
+ QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
+diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+index 523fa78..32befda 100644
+--- a/pc-bios/s390-ccw/bootmap.c
++++ b/pc-bios/s390-ccw/bootmap.c
+@@ -11,6 +11,7 @@
+ #include "s390-ccw.h"
+ #include "bootmap.h"
+ #include "virtio.h"
++#include "libnet/netapps.h"
  
- #define ENOTFOUND 1
- #define EACCESS   2
-@@ -45,7 +46,7 @@
+ #ifdef DEBUG
+ /* #define DEBUG_FALLBACK */
+@@ -744,7 +745,14 @@ void zipl_load(void)
+     }
  
- /* Local variables */
- static unsigned char packet[BUFFER_LEN];
--static unsigned char  *buffer = NULL;
-+static unsigned char  *buffer = INVALID_BUFFER;
- static unsigned short block;
- static unsigned short blocksize;
- static char blocksize_str[6];    /* Blocksize string for read request */
-@@ -337,7 +338,7 @@ int32_t handle_tftp(int fd, uint8_t *pkt, int32_t packetsize)
- 	struct tftphdr *tftp;
+     if (virtio_get_device_type() == VIRTIO_ID_NET) {
+-        jump_to_IPL_code(vdev->netboot_start_addr);
++        long len;
++
++        len = netload();
++        if (len < 0) {
++            panic("Network loading failed");
++        }
++        sclp_print("Netload done, starting kernel...\n");
++        asm volatile (" lpsw 0(%0) " : : "r"(0) : "memory");
+     }
  
- 	/* buffer is only set if we are handling TFTP */
--	if (buffer == NULL )
-+	if (buffer == INVALID_BUFFER)
- 		return 0;
+     ipl_scsi();
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index 1cacc1b..b058e1b 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -150,12 +150,11 @@ static void virtio_setup(void)
  
- #ifndef __DEBUG__
-@@ -536,7 +537,7 @@ int tftp(filename_ip_t * _fn_ip, unsigned char *_buffer, int _len,
- 	printf("  Receiving data:  ");
- 	print_progress(-1, 0);
+     IPL_assert(found, "No virtio device found");
  
--	// Setting buffer to a non-zero address enabled handling of received TFTP packets.
-+	/* Set buffer to a valid address, enables handling of received packets */
- 	buffer = _buffer;
- 
- 	set_timer(TICKS_SEC);
-@@ -579,8 +580,8 @@ int tftp(filename_ip_t * _fn_ip, unsigned char *_buffer, int _len,
- 		}
- 	}
- 
--	// Setting buffer to NULL disables handling of received TFTP packets.
--	buffer = NULL;
-+	/* Setting buffer invalid to disable handling of received packets */
-+	buffer = INVALID_BUFFER;
- 
- 	if (tftp_errno)
- 		return tftp_errno;
++    virtio_setup_device(blk_schid);
+     if (virtio_get_device_type() == VIRTIO_ID_NET) {
+         sclp_print("Network boot device detected\n");
+         vdev->netboot_start_addr = iplb.ccw.netboot_start_addr;
+     } else {
+-        virtio_setup_device(blk_schid);
+-
+         IPL_assert(virtio_ipl_disk_is_valid(), "No valid IPL device detected");
+     }
+ }
 -- 
 1.8.3.1
