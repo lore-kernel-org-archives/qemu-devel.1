@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dPhij-0007pf-E6
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 00:03:22 -0400
+	(envelope-from <peterx@redhat.com>) id 1dPhph-0000xG-DA
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 00:10:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dPhig-00007K-8y
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 00:03:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43888)
+	(envelope-from <peterx@redhat.com>) id 1dPhpe-0002Tj-7I
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 00:10:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41414)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dPhif-00006P-W8
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 00:03:18 -0400
-Date: Tue, 27 Jun 2017 12:03:10 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dPhpd-0002Ta-V5
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 00:10:30 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E122180F9F
+	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 04:10:28 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170627040310.GL3936@pxdev.xzpeter.org>
-References: <1498466120-5836-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170626083552eucas1p2db6a8bd9188a95d72aad188d6b633dd9@eucas1p2.samsung.com>
-	<1498466120-5836-4-git-send-email-a.perevalov@samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1498466120-5836-4-git-send-email-a.perevalov@samsung.com>
-Subject: Re: [Qemu-devel] [PATCH v4 3/3] migration: add bitmap for received
- page
+Date: Tue, 27 Jun 2017 12:10:09 +0800
+Message-Id: <1498536619-14548-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v6 00/10] migration: objectify MigrationState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,149 +27,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>
-Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, quintela@redhat.com, dgilbert@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-On Mon, Jun 26, 2017 at 11:35:20AM +0300, Alexey Perevalov wrote:
-> This patch adds ability to track down already received
-> pages, it's necessary for calculation vCPU block time in
-> postcopy migration feature, maybe for restore after
-> postcopy migration failure.
-> Also it's necessary to solve shared memory issue in
-> postcopy livemigration. Information about received pages
-> will be transferred to the software virtual bridge
-> (e.g. OVS-VSWITCHD), to avoid fallocate (unmap) for
-> already received pages. fallocate syscall is required for
-> remmaped shared memory, due to remmaping itself blocks
-> ioctl(UFFDIO_COPY, ioctl in this case will end with EEXIT
-> error (struct page is exists after remmap).
-> 
-> Bitmap is placed into RAMBlock as another postcopy/precopy
-> related bitmaps.
-> 
-> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+v6:
+- patch 1: fix comment, and add more comment for
+  register_compat_props() [Eduardo]
+- patch 2: add more comments for register_compat_props_array() and the
+  new AccelClass.global_props [Eduardo]
+- patch 3: rename user_register_compat_props() into
+  user_register_global_props, and some update on comments [Eduardo]
+- patch 5: let xen_compat_props be static, and use a better "end of
+  list" for it [Eduardo] (since the change is trivial, I didn't remove
+  Juan's r-b)
 
-Mostly good to me, some minor nits only...
+v5:
+- add r-b for Juan on patch 4,5,7-10
+- patch 2: introduce register_compat_props_array() that may be further
+  used by machine codes [Eduardo]
+- patch 2: fix english error [Eduardo]
 
-[...]
+v4:
+- dropped lots of patches related to AccelState.global_props. Now I am
+  using AccelClass.global_props, and only use it in Xen codes.
+- one patch is added to clean up the global property registerations,
+  with some comment to show the ordering.
+- one patch is added to dump migration globals in "info migrate"
+  unconditionally (last patch).
+- changed all the following xen_init() patches to use
+  AccelClass.global_props.
+- (since most of the patches are either touched-up again, or threw
+  away, so no much r-b added, only one for Juan on the only_migratable
+  patch, anyway, thanks for reviewing the old codes!)
 
->  static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
-> -        void *from_addr, uint64_t pagesize)
-> +                               void *from_addr, uint64_t pagesize, RAMBlock *rb)
->  {
-> +    int ret;
->      if (from_addr) {
->          struct uffdio_copy copy_struct;
->          copy_struct.dst = (uint64_t)(uintptr_t)host_addr;
->          copy_struct.src = (uint64_t)(uintptr_t)from_addr;
->          copy_struct.len = pagesize;
->          copy_struct.mode = 0;
-> -        return ioctl(userfault_fd, UFFDIO_COPY, &copy_struct);
-> +        ret = ioctl(userfault_fd, UFFDIO_COPY, &copy_struct);
->      } else {
->          struct uffdio_zeropage zero_struct;
->          zero_struct.range.start = (uint64_t)(uintptr_t)host_addr;
->          zero_struct.range.len = pagesize;
->          zero_struct.mode = 0;
-> -        return ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
-> +        ret = ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
-> +    }
-> +    /* received page isn't feature of blocktime calculation,
-> +     * it's more general entity, so keep it here,
-> +     * but gup betwean two following operation could be high,
-> +     * and in this case blocktime for such small interval will be lost */
+------------
 
-I would drop this comment for this patch. It didn't help me to be
-clearer on the code but a bit more messy... Maybe it suites for some
-place in the blocktime series? Not sure.
+The main goal of this series is to let MigrationState be a QDev.
 
-[...]
+It helps in many use cases.
 
-> +void ramblock_recv_map_init(void)
-> +{
-> +    RAMBlock *rb;
-> +
-> +    RAMBLOCK_FOREACH(rb) {
-> +        unsigned long pages;
-> +        pages = rb->max_length >> TARGET_PAGE_BITS;
-> +        assert(!rb->receivedmap);
-> +        rb->receivedmap = bitmap_new(pages);
+First of all, we can remove many legacy tricky functions. To name
+some: savevm_skip_section_footers(), savevm_skip_configuration(), etc.
+They didn't do much thing but setup a bool value. If MigrationState
+can be a QDev, then these things can be setup by the HW_COMPAT_* magic
+with some lines like:
 
-I'll prefer removing pages variable since used only once.
+{
+    .driver   = "migration",
+    .property = "send-configuration",
+    .value    = "off",
+}
 
-[...]
+Next, if this can be merged and okay, we can move on to convert more
+things into properties for migration. A very attractive use case of it
+is, we will be able to do this for migration:
 
-> +static void ramblock_recv_bitmap_clear_range(uint64_t start, size_t length,
-> +                                             RAMBlock *rb)
-> +{
-> +    int i, range_count;
-> +    long nr_bit = start >> TARGET_PAGE_BITS;
-> +    range_count = length >> TARGET_PAGE_BITS;
-> +    for (i = 0; i < range_count; i++) {
-> +        clear_bit(nr_bit, rb->receivedmap);
-> +        nr_bit += 1;
+  -global migration.postcopy=on
 
-(Dave commented this one)
+Then we don't need to use either HMP/QMP interface to enable it. It
+greatly simplifies the migration test scripts.
 
-[...]
+Why QDev not QObject? The answer is simple: all the magic that we want
+for migration is bound to QDev (HW_COMPAT, "-global"). If one day we
+want to move these features from QDev to QObject, that'll be fine and
+easy for MigrationState. But before that, let's have MigrationState a
+QDev. :-)
 
-> @@ -2513,6 +2560,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->          ram_addr_t addr, total_ram_bytes;
->          void *host = NULL;
->          uint8_t ch;
-> +        RAMBlock *rb = NULL;
->  
->          addr = qemu_get_be64(f);
->          flags = addr & ~TARGET_PAGE_MASK;
-> @@ -2520,15 +2568,15 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->  
->          if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
->                       RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE)) {
-> -            RAMBlock *block = ram_block_from_stream(f, flags);
-> +            rb = ram_block_from_stream(f, flags);
->  
-> -            host = host_from_ram_block_offset(block, addr);
-> +            host = host_from_ram_block_offset(rb, addr);
->              if (!host) {
->                  error_report("Illegal RAM offset " RAM_ADDR_FMT, addr);
->                  ret = -EINVAL;
->                  break;
->              }
+Please kindly review. Thanks.
 
-IMHO it's ok to set the bit once here.  Thanks,
+Peter Xu (10):
+  machine: export register_compat_prop()
+  accel: introduce AccelClass.global_props
+  vl: clean up global property registerations
+  migration: let MigrationState be a qdev
+  migration: move global_state.optional out
+  migration: move only_migratable to MigrationState
+  migration: move skip_configuration out
+  migration: move skip_section_footers
+  migration: merge enforce_config_section somewhat
+  migration: hmp: dump globals
 
-> -            trace_ram_load_loop(block->idstr, (uint64_t)addr, flags, host);
-> +            trace_ram_load_loop(rb->idstr, (uint64_t)addr, flags, host);
->          }
->  
->          switch (flags & ~RAM_SAVE_FLAG_CONTINUE) {
-> @@ -2582,10 +2630,12 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->  
->          case RAM_SAVE_FLAG_ZERO:
->              ch = qemu_get_byte(f);
-> +            ramblock_recv_bitmap_set(host, rb);
->              ram_handle_compressed(host, ch, TARGET_PAGE_SIZE);
->              break;
->  
->          case RAM_SAVE_FLAG_PAGE:
-> +            ramblock_recv_bitmap_set(host, rb);
->              qemu_get_buffer(f, host, TARGET_PAGE_SIZE);
->              break;
->  
-> @@ -2596,10 +2646,13 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->                  ret = -EINVAL;
->                  break;
->              }
-> +
-> +            ramblock_recv_bitmap_set(host, rb);
->              decompress_data_with_multi_threads(f, host, len);
->              break;
->  
->          case RAM_SAVE_FLAG_XBZRLE:
-> +            ramblock_recv_bitmap_set(host, rb);
->              if (load_xbzrle(f, addr, host) < 0) {
->                  error_report("Failed to decompress XBZRLE page at "
->                               RAM_ADDR_FMT, addr);
+ accel/accel.c                    |   6 ++
+ hmp.c                            |   3 +
+ hw/core/machine.c                |  13 -----
+ hw/core/qdev-properties.c        |  21 +++++++
+ hw/i386/pc_piix.c                |   3 -
+ hw/ppc/spapr.c                   |   3 -
+ hw/xen/xen-common.c              |  25 +++++++--
+ include/hw/compat.h              |  12 ++++
+ include/hw/qdev-properties.h     |  29 ++++++++++
+ include/migration/global_state.h |   1 -
+ include/migration/misc.h         |   6 +-
+ include/sysemu/accel.h           |  11 ++++
+ include/sysemu/sysemu.h          |   1 -
+ migration/global_state.c         |   9 +--
+ migration/migration.c            | 118 +++++++++++++++++++++++++++++++--------
+ migration/migration.h            |  33 +++++++++++
+ migration/savevm.c               |  32 ++---------
+ vl.c                             |  41 ++++++++++++--
+ 18 files changed, 277 insertions(+), 90 deletions(-)
 
 -- 
-Peter Xu
+2.7.4
