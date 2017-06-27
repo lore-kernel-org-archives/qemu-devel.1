@@ -1,24 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dPtlj-0007u9-DZ
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:55:19 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dPtlo-00082p-Sv
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:55:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dPsYL-00068I-1Z
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:37:22 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:36214)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1dPsYK-000649-QC
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:37:20 -0400
-Received: by mail-lf0-x244.google.com with SMTP id f28so3050947lfi.3
-	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 08:37:20 -0700 (PDT)
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Tue, 27 Jun 2017 17:37:10 +0200
-Message-Id: <1498577836-25883-2-git-send-email-edgar.iglesias@gmail.com>
-In-Reply-To: <1498577836-25883-1-git-send-email-edgar.iglesias@gmail.com>
-References: <1498577836-25883-1-git-send-email-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PULL v2 1/7] cputlb: cleanup get_page_addr_code to
- use VICTIM_TLB_HIT
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dPsU0-0005UZ-3g
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:32:55 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:31994 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dPsTz-0005Nx-PG
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:32:52 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20170605123908.18777-1-pbonzini@redhat.com>
+	<20170605123908.18777-17-pbonzini@redhat.com>
+	<e138c191-5f28-ff50-1b86-d4d1a416eadc@virtuozzo.com>
+	<37960694-8f25-8201-5f17-e59c3ee67e90@redhat.com>
+	<eb056c7c-2bd7-e9b2-cebb-30f716386d00@virtuozzo.com>
+	<c9855403-a641-31a7-f6e9-db0388c4b73a@redhat.com>
+	<5ed4c5a0-11f3-14e7-77e6-47fa01a07d75@virtuozzo.com>
+	<af36087e-de08-4a30-53f7-0a9fafb56a88@redhat.com>
+	<3a438db2-2c6d-e07b-94eb-b7c08073b9ae@virtuozzo.com>
+	<e2816225-b5a7-6d60-9772-bff478b10a92@redhat.com>
+	<13257113-2f2b-ccf5-93d1-66b2b963efce@virtuozzo.com>
+	<5458c8fb-f73b-6651-b418-87bab8d3d143@redhat.com>
+	<38cee5dc-4051-28b0-5258-015f7fa61979@virtuozzo.com>
+Message-ID: <81e85700-241a-c078-bb90-6ca756aceaeb@virtuozzo.com>
+Date: Tue, 27 Jun 2017 18:32:50 +0300
+MIME-Version: 1.0
+In-Reply-To: <38cee5dc-4051-28b0-5258-015f7fa61979@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 16/19] block: protect modification of dirty
+ bitmaps with a mutex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,64 +41,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: frederic.konrad@adacore.com, pbonzini@redhat.com, rth@twiddle.net, edgar.iglesias@xilinx.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: famz@redhat.com
 
-From: KONRAD Frederic <fred.konrad@greensocs.com>
+27.06.2017 18:31, Vladimir Sementsov-Ogievskiy wrote:
+> 27.06.2017 17:26, Paolo Bonzini wrote:
+>>
+>> On 27/06/2017 16:20, Vladimir Sementsov-Ogievskiy wrote:
+>>> I'm likely not right, but for me introducing this mutex looks like 
+>>> dirty
+>>> bitmaps may be accessed from concurrent threads. So for me it looks
+>>> strange that only accessors are protected by the mutex and not the 
+>>> whole
+>>> transactions.
+>> There must be something else protecting the whole transaction.
+>>
+>>> One example I've wrote above, other examples from code: are
+>>> qmp_block_dirty_bitmap** functions:
+>>>
+>>> bdrv_create_dirty_bitmap() {
+>>>
+>>>     bdrv_find_dirty_bitmap()
+>>>
+>>>     ....
+>>>
+>>> bdrv_dirty_bitmaps_lock(bs);
+>>>     QLIST_INSERT_HEAD(&bs->dirty_bitmaps, bitmap, list);
+>>>     bdrv_dirty_bitmaps_unlock(bs);
+>>>
+>>> }
+>>>
+>>> - we protect inserting into list from other threads, but what prevent
+>>> creating bitmap with the same name from other thread after
+>>> bdrv_find_dirty_bitmap() and before bdrv_dirty_bitmaps_lock() ?
+>> It's like a read-write lock.
+>
+> Ok, finally I understand (not all, but the main idea=), sorry for 
+> annoying.
 
-This replaces env1 and page_index variables by env and index
-so we can use VICTIM_TLB_HIT macro later.
+Is there any example of accessing dirty bitmaps for read not under BQL 
+but only under dirty bitmap lock?
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
----
- accel/tcg/cputlb.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+>
+>>
+>> The write side is invoked under the 'big QEMU lock' so there cannot be
+>> two concurrent writes.
+>>
+>> A bitmap can be written to after bdrv_find_dirty_bitmap returns, but
+>> only if _you_ tell another thread about the bitmap you've just created.
+>> If that doesn't happen, the bitmap cannot change.  And it can also
+>> disappear because _your_ thread is the one with the big QEMU lock.
+>>
+>> Paolo
+>
+>
 
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index 743776a..1cc382d 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -751,21 +751,21 @@ static inline ram_addr_t qemu_ram_addr_from_host_nofail(void *ptr)
-  * is actually a ram_addr_t (in system mode; the user mode emulation
-  * version of this function returns a guest virtual address).
-  */
--tb_page_addr_t get_page_addr_code(CPUArchState *env1, target_ulong addr)
-+tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
- {
--    int mmu_idx, page_index, pd;
-+    int mmu_idx, index, pd;
-     void *p;
-     MemoryRegion *mr;
--    CPUState *cpu = ENV_GET_CPU(env1);
-+    CPUState *cpu = ENV_GET_CPU(env);
-     CPUIOTLBEntry *iotlbentry;
- 
--    page_index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
--    mmu_idx = cpu_mmu_index(env1, true);
--    if (unlikely(env1->tlb_table[mmu_idx][page_index].addr_code !=
-+    index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
-+    mmu_idx = cpu_mmu_index(env, true);
-+    if (unlikely(env->tlb_table[mmu_idx][index].addr_code !=
-                  (addr & TARGET_PAGE_MASK))) {
--        cpu_ldub_code(env1, addr);
-+        cpu_ldub_code(env, addr);
-     }
--    iotlbentry = &env1->iotlb[mmu_idx][page_index];
-+    iotlbentry = &env->iotlb[mmu_idx][index];
-     pd = iotlbentry->addr & ~TARGET_PAGE_MASK;
-     mr = iotlb_to_region(cpu, pd, iotlbentry->attrs);
-     if (memory_region_is_unassigned(mr)) {
-@@ -777,7 +777,7 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env1, target_ulong addr)
-         report_bad_exec(cpu, addr);
-         exit(1);
-     }
--    p = (void *)((uintptr_t)addr + env1->tlb_table[mmu_idx][page_index].addend);
-+    p = (void *)((uintptr_t)addr + env->tlb_table[mmu_idx][index].addend);
-     return qemu_ram_addr_from_host_nofail(p);
- }
- 
 -- 
-2.7.4
+Best regards,
+Vladimir
