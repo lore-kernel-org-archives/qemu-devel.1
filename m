@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dPuMC-0000Vc-1f
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 13:32:57 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dPuMK-0000bk-0x
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 13:33:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dPuMB-0002SD-Aa
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 13:32:56 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37361)
+	(envelope-from <pm215@archaic.org.uk>) id 1dPuMJ-0002Za-82
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 13:33:04 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37367)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dPuMB-0002R8-3m
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 13:32:55 -0400
+	id 1dPuMJ-0002VF-10
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 13:33:03 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Jun 2017 18:32:48 +0100
-Message-Id: <1498584769-12439-2-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1498584769-12439-1-git-send-email-peter.maydell@linaro.org>
-References: <1498584769-12439-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 1/2] tests/test-char.c: Don't use
- main_loop_wait()'s return value
+Date: Tue, 27 Jun 2017 18:32:47 +0100
+Message-Id: <1498584769-12439-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH v3 0/2] main_loop: Make main_loop_wait() return
+ void
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +26,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@linaro.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-In QEMU's main_loop() we used to check whether we should do
-a nonblocking call to main_loop(); this was deleted in commit e330c118f2a5,
-because now that vCPUs always drop the I/O thread lock it is an unnecessary
-optimization.
+This patchset removes the useless return value from
+main_loop_wait().
 
-The loop in test-char.c copied the old QEMU main_loop() code, but
-here the nonblocking check has never been necessary because this
-standalone test case doesn't hold the I/O lock anyway. Remove it,
-so we can drop the main_loop_wait() return value.
+Changes v2->v3:
+ * add initial patch which removes the use of the return value
+   from the version of main_loop in test-char.c -- it didn't
+   really need it anyway.
+ * removed unnecessary 'return;' at end of function
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- tests/test-char.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+NB: I've just also noticed that there is exactly one use in the
+tree of the argument to main_loop_wait() now which doesn't
+pass 'false' -- that is in a function in hw/display/xenfb.c
+that was added 8 years ago with a comment claiming it was
+strictly temporary ;-)
 
-diff --git a/tests/test-char.c b/tests/test-char.c
-index 9e361c8..94ef708 100644
---- a/tests/test-char.c
-+++ b/tests/test-char.c
-@@ -20,13 +20,9 @@ typedef struct FeHandler {
- 
- static void main_loop(void)
- {
--    bool nonblocking;
--    int last_io = 0;
--
-     quit = false;
-     do {
--        nonblocking = last_io > 0;
--        last_io = main_loop_wait(nonblocking);
-+        main_loop_wait(false);
-     } while (!quit);
- }
- 
+
+Peter Maydell (2):
+  tests/test-char.c: Don't use main_loop_wait()'s return value
+  main_loop: Make main_loop_wait() return void
+
+ include/qemu/main-loop.h | 2 +-
+ tests/test-char.c        | 6 +-----
+ util/main-loop.c         | 8 +-------
+ 3 files changed, 3 insertions(+), 13 deletions(-)
+
 -- 
 2.7.4
