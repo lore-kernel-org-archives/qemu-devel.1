@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60322)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dPgXF-0001KH-7t
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 22:47:26 -0400
+	(envelope-from <famz@redhat.com>) id 1dPgYh-0002J9-Au
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 22:48:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dPgXC-0006qy-70
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 22:47:25 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:34541)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dPgXC-0006qc-2B
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 22:47:22 -0400
-Received: by mail-qk0-x242.google.com with SMTP id 91so2444233qkq.1
-	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 19:47:21 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <149838022308.6497.2104916050645246693.stgit@frigg.lan>
-	<149838119390.6497.17430428991952287717.stgit@frigg.lan>
-	<87fuenxdh2.fsf@linaro.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <2147a050-3242-29bc-e99f-63a7a04411d2@twiddle.net>
-Date: Mon, 26 Jun 2017 19:47:18 -0700
+	(envelope-from <famz@redhat.com>) id 1dPgYe-0007m2-4f
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 22:48:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53090)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dPgYd-0007lX-SK
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 22:48:52 -0400
+Date: Tue, 27 Jun 2017 10:48:45 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170627024845.GA14166@lemon.lan>
+References: <20170625192950.17677-1-f4bug@amsat.org>
+	<20170625192950.17677-4-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <87fuenxdh2.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v9 04/26] target: [tcg] Add generic
- translation framework
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20170625192950.17677-4-f4bug@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 3/4] coccinelle: script to run them all
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,29 +28,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Llu=c3=ads_Vilanova?= <vilanova@ac.upc.edu>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 
-On 06/26/2017 03:14 AM, Alex Bennée wrote:
->> +        if ((db->pc_first & TARGET_PAGE_MASK)
->> +            != (db->pc_next & TARGET_PAGE_MASK)) {
->> +            db->is_jmp = DJ_TOO_MANY;
->> +            break;
->> +        }
-> 
-> How does the first insn avoid this check? And if it does is that right?
-> 
-> I mean I understand you can construct weird multi-byte instructions
-> (especially on x86) that cross the boundary but even if it is the first
-> in a TB shouldn't it error if there are no contiguous pages?
-> 
-> Also isn't the page crossing issue different for SoftMMU and linux-user?
+On Sun, 06/25 16:29, Philippe Mathieu-Daud=E9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> ---
+>  scripts/check-cocci-scripts.sh | 47 ++++++++++++++++++++++++++++++++++=
+++++++++
+>  1 file changed, 47 insertions(+)
+>  create mode 100755 scripts/check-cocci-scripts.sh
+>=20
+> diff --git a/scripts/check-cocci-scripts.sh b/scripts/check-cocci-scrip=
+ts.sh
+> new file mode 100755
+> index 0000000000..ec3a8b39ef
+> --- /dev/null
+> +++ b/scripts/check-cocci-scripts.sh
+> @@ -0,0 +1,47 @@
+> +#! /usr/bin/env bash
+> +
+> +test -d scripts/coccinelle || exit 1
+> +
+> +SPATCH_IMAGE=3D"philmd/coccinelle:1.0.4"
+> +
+> +GIT_AUTHOR_NAME=3D"Coccinelle Spatch"
+> +GIT_COMMITTER_NAME=3D"Coccinelle Spatch"
+> +
+> +if [ -n "$TRAVIS" ]; then
+> +	# avoid stalling builds: https://docs.travis-ci.com/user/common-build=
+-problems/#Build-times-out-because-no-output-was-received
+> +	TIMEOUT_S=3D530
+> +	TIMEOUT_CMD=3D"timeout -k 550 500"
+> +	EXTRA_ARGS=3D"--timeout ${TIMEOUT_S}"
+> +else
+> +	TIMEOUT_S=3D0
+> +fi
+> +
+> +HEAD=3D19 #`echo -n scripts/coccinelle/ | wc -c`
+> +TAIL=3D6 #`echo -n .cocci | wc -c`
+> +
+> +test -z "$(${SUDO} docker images -q ${SPATCH_IMAGE})" && ${SUDO} docke=
+r pull ${SPATCH_IMAGE}
+> +
+> +LOG=3D/tmp/cocci-spatch-$$
+> +for script in scripts/coccinelle/*.cocci; do
+> +	desc=3D${script:$HEAD:-$TAIL}
+> +	echo -e "\nRunning ${script}...\n"
+> +	echo -e "coccinelle: committing changes after running \"$desc\" scrip=
+t\n" > ${LOG}.topic
+> +	${TIMEOUT_CMD} ${SUDO} \
+> +	docker run --rm -v `pwd`:`pwd` -w `pwd` -u `id -u` \
+> +		${SPATCH_IMAGE} --use-cache --use-gitgrep --keep-comments \
+> +			--very-quiet ${EXTRA_ARGS} \
+> +			--sp-file ${script} \
+> +			--macro-file scripts/cocci-macro-file.h \
+> +			--dir . \
+> +			--in-place | tee ${LOG}.content
 
-It could be, though I don't believe that many front-ends take advantage.  I 
-don't think it makes *that* much difference.
+Is it possible to do an "incremental" run of coccinelle to only process a=
+ffected
+files by a series (maybe on those files that are updated by an incrementa=
+l make
+invocation)? That way we can save much time.
 
-But if it comes to that, there are other edge conditions that can be used, e.g. 
-the KSEG non-paged addressing segment for Alpha or MIPS kernel mode.
+BTW I think you should use whitespaces instead of tabs for indentation.
 
-
-r~
+Fam
