@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dPm8q-0005fp-9f
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:46:37 -0400
+	(envelope-from <will.deacon@arm.com>) id 1dPm95-0005oT-Fi
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:46:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dPm8n-00083n-8n
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:46:36 -0400
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:34442)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dPm8n-00083B-1a
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:46:33 -0400
-Received: by mail-wm0-x236.google.com with SMTP id t129so4143376wmt.1
-	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 01:46:32 -0700 (PDT)
-References: <20170621024831.26019-1-rth@twiddle.net>
-	<20170621024831.26019-8-rth@twiddle.net>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170621024831.26019-8-rth@twiddle.net>
-Date: Tue, 27 Jun 2017 09:47:22 +0100
-Message-ID: <87wp7xx1et.fsf@linaro.org>
+	(envelope-from <will.deacon@arm.com>) id 1dPm94-0008Lw-F5
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:46:51 -0400
+Date: Tue, 27 Jun 2017 09:46:42 +0100
+From: Will Deacon <will.deacon@arm.com>
+Message-ID: <20170627084641.GC5759@arm.com>
+References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
+	<AM5PR0401MB2545AFD256A96420ACC44CD89ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<14c83c14-1e7e-f142-77b0-fa8c873e2d41@redhat.com>
+	<AM5PR0401MB2545C0E76C4BE6F82FE376D09ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<6f22079e-4b4b-6476-77be-51ec83104c0d@redhat.com>
+	<AM5PR0401MB25459FDAA8C9AFA52503AAE99AC40@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<589f1642-775c-4805-74ac-bf67eb504733@arm.com>
+	<5f47e723-1d3e-433b-cdaf-a56d16ba377e@redhat.com>
+	<d4277d93-d29d-7150-7962-bdfdd1c2a275@arm.com>
+	<6070f02d-20d3-98fb-e31a-e7dbf5010419@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 07/16] tcg: Return NULL temp for
- TCG_CALL_DUMMY_ARG
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6070f02d-20d3-98fb-e31a-e7dbf5010419@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 0/8] VIRTIO-IOMMU device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,36 +31,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, aurelien@aurel32.net
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wei@redhat.com" <wei@redhat.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "drjones@redhat.com" <drjones@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
 
+Hi Eric,
 
-Richard Henderson <rth@twiddle.net> writes:
+On Tue, Jun 27, 2017 at 08:38:48AM +0200, Auger Eric wrote:
+> On 26/06/2017 18:13, Jean-Philippe Brucker wrote:
+> > On 26/06/17 09:22, Auger Eric wrote:
+> >> On 19/06/2017 12:15, Jean-Philippe Brucker wrote:
+> >>> On 19/06/17 08:54, Bharat Bhushan wrote:
+> >>>> I started added replay in virtio-iommu and came across how MSI interrupts with work with VFIO. 
+> >>>> I understand that on intel this works differently but vsmmu will have same requirement. 
+> >>>> kvm-msi-irq-route are added using the msi-address to be translated by viommu and not the final translated address.
+> >>>> While currently the irqfd framework does not know about emulated iommus (virtio-iommu, vsmmuv3/vintel-iommu).
+> >>>> So in my view we have following options:
+> >>>> - Programming with translated address when setting up kvm-msi-irq-route
+> >>>> - Route the interrupts via QEMU, which is bad from performance
+> >>>> - vhost-virtio-iommu may solve the problem in long term
+> >>>>
+> >>>> Is there any other better option I am missing?
+> >>>
+> >>> Since we're on the topic of MSIs... I'm currently trying to figure out how
+> >>> we'll handle MSIs in the nested translation mode, where the guest manages
+> >>> S1 page tables and the host doesn't know about GVA->GPA translation.
+> >>
+> >> I have a question about the "nested translation mode" terminology. Do
+> >> you mean in that case you use stage 1 + stage 2 of the physical IOMMU
+> >> (which the ARM spec normally advises or was meant for) or do you mean
+> >> stage 1 implemented in vIOMMU and stage 2 implemented in pIOMMU. At the
+> >> moment my understanding is for VFIO integration the pIOMMU uses a single
+> >> stage combining both the stage 1 and stage2 mappings but the host is not
+> >> aware of those 2 stages.
+> > 
+> > Yes at the moment the VMM merges stage-1 (GVA->GPA) from the guest with
+> > its stage-2 mappings (GPA->HPA) and creates a stage-2 mapping (GVA->HPA)
+> > in the pIOMMU via VFIO_IOMMU_MAP_DMA. stage-1 is disabled in the pIOMMU.
+> > 
+> > What I mean by "nested mode" is stage 1 + stage 2 in the physical IOMMU.
+> > I'm referring to the "Page Table Sharing" bit of the Future Work in the
+> > initial RFC for virtio-iommu [1], and also PASID table binding [2] in the
+> > case of vSMMU. In that mode, stage-1 page tables in the pIOMMU are managed
+> > by the guest, and the VMM only maps GPA->HPA.
+> 
+> OK I need to read that part more thoroughly. I was told in the past
+> handling nested stages at pIOMMU was considered too complex and
+> difficult to maintain. But definitively The SMMU architecture is devised
+> for that. Michael asked why we did not use that already for vsmmu
+> (nested stages are used on AMD IOMMU I think).
 
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
-> ---
->  tcg/tcg.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/tcg/tcg.h b/tcg/tcg.h
-> index 3b35344..6c357e7 100644
-> --- a/tcg/tcg.h
-> +++ b/tcg/tcg.h
-> @@ -730,7 +730,7 @@ extern bool parallel_cpus;
->
->  static inline TCGTemp *arg_temp(TCGArg a)
->  {
-> -    return &tcg_ctx.temps[a];
-> +    return a == TCG_CALL_DUMMY_ARG ? NULL : &tcg_ctx.temps[a];
->  }
+Curious -- but what gave you that idea? I worry that something I might have
+said wasn't clear or has been misunderstood.
 
-It doesn't look like a lot of calls to arg_temp are able to deal with a
-NULL return and may well immediately deref the value. Are we sure the
-cases the TCG_CALL_DUMMY arg is involved are narrowly defined?
-
->
->  static inline void tcg_set_insn_param(int op_idx, int arg, TCGArg v)
-
-
---
-Alex Bennée
+Will
