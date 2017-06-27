@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53703)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dPmZJ-0003Xc-E3
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 05:13:58 -0400
+	(envelope-from <peterx@redhat.com>) id 1dPmhz-00059a-4h
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 05:22:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dPmZE-0000H4-EV
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 05:13:57 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:52945)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dPmZE-0000GM-2a
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 05:13:52 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <149727922719.28532.11985025310576184920.stgit@frigg.lan>
-	<149727924253.28532.2681638904562623104.stgit@frigg.lan>
-	<ca41d7c2-b009-46b9-1f76-3e45c0f91ecf@twiddle.net>
-	<877ezzapyu.fsf@frigg.lan>
-	<11b802c6-253c-1aaf-75d1-1f73e23c4d64@twiddle.net>
-Date: Tue, 27 Jun 2017 12:13:42 +0300
-In-Reply-To: <11b802c6-253c-1aaf-75d1-1f73e23c4d64@twiddle.net> (Richard
-	Henderson's message of "Mon, 26 Jun 2017 18:10:14 -0700")
-Message-ID: <87a84tlrnd.fsf@frigg.lan>
+	(envelope-from <peterx@redhat.com>) id 1dPmhv-0002la-6N
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 05:22:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41933)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dPmhu-0002lW-TI
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 05:22:51 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C9A8EC04D28D
+	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 09:22:49 +0000 (UTC)
+Date: Tue, 27 Jun 2017 17:22:44 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170627092244.GA14652@pxdev.xzpeter.org>
+References: <1498554219-4942-1-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 2/6] queue: Add macro for incremental
- traversal
+Content-Disposition: inline
+In-Reply-To: <1498554219-4942-1-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/8] VT-d: some enhancements on iotlb and
+ tools
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,65 +33,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
-Richard Henderson writes:
+On Tue, Jun 27, 2017 at 05:03:31PM +0800, Peter Xu wrote:
+> Patch 1: fixes a very rare PT path issue on iova value. It didn't
+> break anything since it's merely not touched (only if when IOMMU
+> enabled, then set one device to PT), but still better fix it.
+> 
+> Patch 2-5: added "info iommu" hmp command, and implemented for VT-d.
+> Meanwhile, added some statistics for iotlb.
 
-> On 06/26/2017 05:33 AM, Llu=C3=ADs Vilanova wrote:
->> Richard Henderson writes:
->>=20
->>> On 06/12/2017 07:54 AM, Llu=C3=ADs Vilanova wrote:
->>>> Adds macro QTAILQ_FOREACH_CONTINUE to support incremental list
->>>> traversal.
->>>>=20
->>>> Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
->>>> ---
->>>> include/qemu/queue.h |   12 ++++++++++++
->>>> 1 file changed, 12 insertions(+)
->>>>=20
->>>> diff --git a/include/qemu/queue.h b/include/qemu/queue.h
->>>> index 35292c3155..eb2bf9cb1c 100644
->>>> --- a/include/qemu/queue.h
->>>> +++ b/include/qemu/queue.h
->>>> @@ -415,6 +415,18 @@ struct {                                         =
-                       \
->>>> (var);                                                  \
->>>> (var) =3D ((var)->field.tqe_next))
->>>> +/**
->>>> + * QTAILQ_FOREACH_CONTINUE:
->>>> + * @var: Variable to resume iteration from.
->>>> + * @field: Field in @var holding a QTAILQ_ENTRY for this queue.
->>>> + *
->>>> + * Resumes iteration on a queue from the element in @var.
->>>> + */
->>>> +#define QTAILQ_FOREACH_CONTINUE(var, field)                          =
-   \
->>>> +        for ((var) =3D ((var)->field.tqe_next);                      =
-     \
->>>> +                (var);                                               =
-   \
->>>> +                (var) =3D ((var)->field.tqe_next))
->>>> +
->>>> #define QTAILQ_FOREACH_SAFE(var, head, field, next_var)               =
-  \
->>>> for ((var) =3D ((head)->tqh_first);                               \
->>>> (var) && ((next_var) =3D ((var)->field.tqe_next), 1);     \
->>>>=20
->>>>=20
->>=20
->>> I still say this isn't required if the breakpoint loop is better struct=
-ured.
->>=20
->> I can embed the use of QTAILQ into translate-block.c, but I wanted to ke=
-ep the
->> implementation of breakpoint lists hidden behind the cpu_breakpoint API.
+For patch 2,3,5 I should CC Dave. Sorry to have forgotten.
 
-> I think using QTAILQ in the common main loop is better than twisting the =
-logic
-> so that the loop is unnaturally split into a subroutine.
+> 
+> Patch 6: introduce "x-iotlb-size" to tune iotlb size, or to turn it
+> off (e.g., when we want to measure how iotlb affects one payload).
+> 
+> Patch 7: some refine on iotlb entry.
+> 
+> Patch 8: implemented MRU list algorithm for iotlb.
+> 
+> For the last patch, it's logically making more sense than the old
+> algo, however the performance is merely the same as before (as far as
+> I tested with simple netperf payloads, in either streaming, rr,
+> reverse, etc.) since in most normal cases we cannot really let iotlb
+> overflow especially when size is 1024 by default, e.g., guest kernel
+> driver will release buffer when after used, and unstrict
+> intel_iommu=on parameter will also send periodic global iotlb flush
+> which will reset the whole cache. If anyone has suggestion on specific
+> workload, please shoot. Anyway, I'm posting this out for review to see
+> any possible comments/suggestions.
+> 
+> Thanks,
+> 
+> Peter Xu (8):
+>   intel_iommu: fix VTD_PAGE_MASK
+>   hmp: add info iommu
+>   intel_iommu: support "info iommu"
+>   intel_iommu: add iotlb/context cache statistics
+>   intel_iommu: hmp: allow "-c" for "info iommu"
+>   intel_iommu: let iotlb size tunable
+>   intel_iommu: use access_flags for iotlb
+>   intel_iommu: implement mru list for iotlb
+> 
+>  hmp-commands-info.hx           |  14 ++++
+>  hmp.c                          |   6 ++
+>  hmp.h                          |   1 +
+>  hw/i386/intel_iommu.c          | 169 +++++++++++++++++++++++++++++++----------
+>  hw/i386/intel_iommu_internal.h |  11 +--
+>  hw/i386/trace-events           |   1 -
+>  hw/i386/x86-iommu.c            |  17 +++++
+>  include/hw/i386/intel_iommu.h  |  20 ++++-
+>  include/hw/i386/x86-iommu.h    |   5 ++
+>  include/hw/iommu.h             |   9 +++
+>  stubs/Makefile.objs            |   1 +
+>  stubs/iommu.c                  |   9 +++
+>  12 files changed, 209 insertions(+), 54 deletions(-)
+>  create mode 100644 include/hw/iommu.h
+>  create mode 100644 stubs/iommu.c
+> 
+> -- 
+> 2.7.4
+> 
+> 
 
-Ok, then I'll integrate that into the new series.
-
-Thanks,
-  Lluis
+-- 
+Peter Xu
