@@ -1,26 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53013)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dPtln-0007wp-Ic
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:55:25 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dPtlx-0007bW-4c
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:55:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dPsU5-0005or-6w
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:33:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43250)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dPsU5-0005iE-0k
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:32:57 -0400
-References: <1498564100-10045-1-git-send-email-thuth@redhat.com>
-	<1498564100-10045-2-git-send-email-thuth@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <9526df82-1ad5-8947-0643-7c99e215ed5a@redhat.com>
-Date: Tue, 27 Jun 2017 17:32:52 +0200
-MIME-Version: 1.0
-In-Reply-To: <1498564100-10045-2-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 01/14] pc-bios/s390-ccw: Add the libc
- from the SLOF firmware
+	(envelope-from <pbonzini@redhat.com>) id 1dPsLP-0005JQ-SL
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:24:01 -0400
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 27 Jun 2017 17:22:48 +0200
+Message-Id: <20170627152248.10446-11-pbonzini@redhat.com>
+In-Reply-To: <20170627152248.10446-1-pbonzini@redhat.com>
+References: <20170627152248.10446-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 10/10] ssh: support I/O from any AioContext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +19,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Alexander Graf <agraf@suse.de>, Farhan Ali <alifm@linux.vnet.ibm.com>, Jens Freimann <jfreiman@redhat.com>, Eric Farman <farman@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com
 
-On 27.06.2017 13:48, Thomas Huth wrote:
-> To be able to use some more advanced libc functions in the s390-ccw
-> firmware, like printf() and malloc(), we need a better libc here.
-> This patch adds the C library from the SLOF firmware (taken from
-> the SLOF commit ID 62674aabe20612a9786fa03e87cf6916ba97a99a). The
-> files are copied without modifications here and will be adapted for
-> the s390-ccw firmware by the next patch. I just removed the getopt()
-> and scanf()-like functions from the libc since we likely do not need
-> them in the s390-ccw firmware.
-> 
+The coroutine may run in a different AioContext, causing the
+fd handler to busy wait.  Fix this by resetting the handler
+in restart_coroutine, before the coroutine is restarted.
 
-We have SLOF as a git submodule in roms/SLOF.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ block/ssh.c | 24 +++++++++++++++++-------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
 
-I wonder if there would a way to avoid duplicating files.
-
-E.g. build s390x-ccw.img only if roms/SLOF is checked out and link/copy
-the right folder.
-
-Then, also the question regarding coding style is gone.
-
-Would something like that work?
-
-
+diff --git a/block/ssh.c b/block/ssh.c
+index 52964416da..e6a5b08de3 100644
+--- a/block/ssh.c
++++ b/block/ssh.c
+@@ -888,13 +888,22 @@ static int ssh_has_zero_init(BlockDriverState *bs)
+     return has_zero_init;
+ }
+ 
++typedef struct BDRVSSHRestart {
++    BlockDriverState *bs;
++    Coroutine *co;
++} BDRVSSHRestart;
++
+ static void restart_coroutine(void *opaque)
+ {
+-    Coroutine *co = opaque;
++    BDRVSSHRestart *restart = opaque;
++    BlockDriverState *bs = restart->bs;
++    BDRVSSHState *s = bs->opaque;
++    AioContext *ctx = bdrv_get_aio_context(bs);
+ 
+-    DPRINTF("co=%p", co);
++    DPRINTF("co=%p", restart->co);
++    aio_set_fd_handler(ctx, s->sock, false, NULL, NULL, NULL, NULL);
+ 
+-    aio_co_wake(co);
++    aio_co_wake(restart->co);
+ }
+ 
+ /* A non-blocking call returned EAGAIN, so yield, ensuring the
+@@ -905,7 +914,10 @@ static coroutine_fn void co_yield(BDRVSSHState *s, BlockDriverState *bs)
+ {
+     int r;
+     IOHandler *rd_handler = NULL, *wr_handler = NULL;
+-    Coroutine *co = qemu_coroutine_self();
++    BDRVSSHRestart restart = {
++        .bs = bs,
++        .co = qemu_coroutine_self()
++    };
+ 
+     r = libssh2_session_block_directions(s->session);
+ 
+@@ -920,11 +932,9 @@ static coroutine_fn void co_yield(BDRVSSHState *s, BlockDriverState *bs)
+             rd_handler, wr_handler);
+ 
+     aio_set_fd_handler(bdrv_get_aio_context(bs), s->sock,
+-                       false, rd_handler, wr_handler, NULL, co);
++                       false, rd_handler, wr_handler, NULL, &restart);
+     qemu_coroutine_yield();
+     DPRINTF("s->sock=%d - back", s->sock);
+-    aio_set_fd_handler(bdrv_get_aio_context(bs), s->sock, false,
+-                       NULL, NULL, NULL, NULL);
+ }
+ 
+ /* SFTP has a function `libssh2_sftp_seek64' which seeks to a position
 -- 
-
-Thanks,
-
-David
+2.13.0
