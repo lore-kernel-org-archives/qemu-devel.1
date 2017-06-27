@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dPw6q-0005oT-PZ
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 15:25:13 -0400
+	(envelope-from <eblake@redhat.com>) id 1dPw6r-0005p5-5d
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 15:25:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dPw6p-0006h4-Na
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 15:25:12 -0400
+	(envelope-from <eblake@redhat.com>) id 1dPw6p-0006h2-Ns
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 15:25:13 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Tue, 27 Jun 2017 14:24:38 -0500
-Message-Id: <20170627192458.15519-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 00/20] make bdrv_is_allocated[_above]
- byte-based
+Date: Tue, 27 Jun 2017 14:24:39 -0500
+Message-Id: <20170627192458.15519-2-eblake@redhat.com>
+In-Reply-To: <20170627192458.15519-1-eblake@redhat.com>
+References: <20170627192458.15519-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 01/20] blockjob: Track job ratelimits via
+ bytes, not sectors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,93 +21,167 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, jsnow@redhat.com
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, jsnow@redhat.com, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-There are patches floating around to add NBD_CMD_BLOCK_STATUS,
-but NBD wants to report status on byte granularity (even if the
-reporting will probably be naturally aligned to sectors or even
-much higher levels).  I've therefore started the task of
-converting our block status code to report at a byte granularity
-rather than sectors.
+The user interface specifies job rate limits in bytes/second.
+It's pointless to have our internal representation track things
+in sectors/second, particularly since we want to move away from
+sector-based interfaces.
 
-This is part one of that conversion: bdrv_is_allocated().
-Other parts still need a v3, but here's the link to their most
-recent posting:
-tracking dirty bitmaps by bytes:
-https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg03859.html
-replacing bdrv_get_block_status() with a byte based callback
-in all the drivers:
-https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg02642.html
+Fix up a doc typo found while verifying that the ratelimit
+code handles the scaling difference.
 
-Available as a tag at:
-git fetch git://repo.or.cz/qemu/ericb.git nbd-byte-allocated-v3
+Repetition of expressions like 'n * BDRV_SECTOR_SIZE' will be
+cleaned up later when functions are converted to iterate over
+images by bytes rather than by sectors.
 
-Depends on Kevin's block branch
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 
-Changes since v2 are limited to rebase artifacts (Paolo's conversion
-to thread-safety being the biggest cause of context conflicts, and
-also affecting patch 12 - but where I think the resolution is sane
-enough to keep R-b).  Added R-b on patches where it has been given,
-leaving 19/20 as the only unreviewed patch.
+---
+v2: adjust commit message based on review; no code change
+---
+ include/qemu/ratelimit.h |  3 ++-
+ block/backup.c           |  5 +++--
+ block/commit.c           |  5 +++--
+ block/mirror.c           | 13 +++++++------
+ block/stream.c           |  5 +++--
+ 5 files changed, 18 insertions(+), 13 deletions(-)
 
-001/20:[----] [--] 'blockjob: Track job ratelimits via bytes, not sectors'
-002/20:[----] [-C] 'trace: Show blockjob actions via bytes, not sectors'
-003/20:[----] [--] 'stream: Switch stream_populate() to byte-based'
-004/20:[----] [--] 'stream: Switch stream_run() to byte-based'
-005/20:[----] [--] 'commit: Switch commit_populate() to byte-based'
-006/20:[----] [--] 'commit: Switch commit_run() to byte-based'
-007/20:[----] [-C] 'mirror: Switch MirrorBlockJob to byte-based'
-008/20:[----] [--] 'mirror: Switch mirror_do_zero_or_discard() to byte-based'
-009/20:[----] [--] 'mirror: Update signature of mirror_clip_sectors()'
-010/20:[----] [--] 'mirror: Switch mirror_cow_align() to byte-based'
-011/20:[----] [--] 'mirror: Switch mirror_do_read() to byte-based'
-012/20:[0012] [FC] 'mirror: Switch mirror_iteration() to byte-based'
-013/20:[----] [--] 'block: Drop unused bdrv_round_sectors_to_clusters()'
-014/20:[----] [--] 'backup: Switch BackupBlockJob to byte-based'
-015/20:[----] [--] 'backup: Switch block_backup.h to byte-based'
-016/20:[----] [--] 'backup: Switch backup_do_cow() to byte-based'
-017/20:[----] [--] 'backup: Switch backup_run() to byte-based'
-018/20:[----] [--] 'block: Make bdrv_is_allocated() byte-based'
-019/20:[----] [--] 'block: Minimize raw use of bds->total_sectors'
-020/20:[----] [-C] 'block: Make bdrv_is_allocated_above() byte-based'
+diff --git a/include/qemu/ratelimit.h b/include/qemu/ratelimit.h
+index 8da1232..8dece48 100644
+--- a/include/qemu/ratelimit.h
++++ b/include/qemu/ratelimit.h
+@@ -24,7 +24,8 @@ typedef struct {
 
-Eric Blake (20):
-  blockjob: Track job ratelimits via bytes, not sectors
-  trace: Show blockjob actions via bytes, not sectors
-  stream: Switch stream_populate() to byte-based
-  stream: Switch stream_run() to byte-based
-  commit: Switch commit_populate() to byte-based
-  commit: Switch commit_run() to byte-based
-  mirror: Switch MirrorBlockJob to byte-based
-  mirror: Switch mirror_do_zero_or_discard() to byte-based
-  mirror: Update signature of mirror_clip_sectors()
-  mirror: Switch mirror_cow_align() to byte-based
-  mirror: Switch mirror_do_read() to byte-based
-  mirror: Switch mirror_iteration() to byte-based
-  block: Drop unused bdrv_round_sectors_to_clusters()
-  backup: Switch BackupBlockJob to byte-based
-  backup: Switch block_backup.h to byte-based
-  backup: Switch backup_do_cow() to byte-based
-  backup: Switch backup_run() to byte-based
-  block: Make bdrv_is_allocated() byte-based
-  block: Minimize raw use of bds->total_sectors
-  block: Make bdrv_is_allocated_above() byte-based
+ /** Calculate and return delay for next request in ns
+  *
+- * Record that we sent @p n data units. If we may send more data units
++ * Record that we sent @n data units (where @n matches the scale chosen
++ * during ratelimit_set_speed). If we may send more data units
+  * in the current time slice, return 0 (i.e. no delay). Otherwise
+  * return the amount of time (in ns) until the start of the next time
+  * slice that will permit sending the next chunk of data.
+diff --git a/block/backup.c b/block/backup.c
+index 5387fbd..9ca1d8e 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -208,7 +208,7 @@ static void backup_set_speed(BlockJob *job, int64_t speed, Error **errp)
+         error_setg(errp, QERR_INVALID_PARAMETER, "speed");
+         return;
+     }
+-    ratelimit_set_speed(&s->limit, speed / BDRV_SECTOR_SIZE, SLICE_TIME);
++    ratelimit_set_speed(&s->limit, speed, SLICE_TIME);
+ }
 
- include/block/block.h        |  10 +-
- include/block/block_backup.h |  11 +-
- include/qemu/ratelimit.h     |   3 +-
- block/backup.c               | 130 ++++++++-----------
- block/commit.c               |  54 ++++----
- block/io.c                   |  92 +++++++------
- block/mirror.c               | 302 ++++++++++++++++++++++---------------------
- block/replication.c          |  29 +++--
- block/stream.c               |  35 +++--
- block/vvfat.c                |  34 +++--
- migration/block.c            |   9 +-
- qemu-img.c                   |  15 ++-
- qemu-io-cmds.c               |  70 +++++-----
- block/trace-events           |  14 +-
- 14 files changed, 397 insertions(+), 411 deletions(-)
+ static void backup_cleanup_sync_bitmap(BackupBlockJob *job, int ret)
+@@ -359,7 +359,8 @@ static bool coroutine_fn yield_and_check(BackupBlockJob *job)
+      */
+     if (job->common.speed) {
+         uint64_t delay_ns = ratelimit_calculate_delay(&job->limit,
+-                                                      job->sectors_read);
++                                                      job->sectors_read *
++                                                      BDRV_SECTOR_SIZE);
+         job->sectors_read = 0;
+         block_job_sleep_ns(&job->common, QEMU_CLOCK_REALTIME, delay_ns);
+     } else {
+diff --git a/block/commit.c b/block/commit.c
+index 524bd54..6993994 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -209,7 +209,8 @@ static void coroutine_fn commit_run(void *opaque)
+         s->common.offset += n * BDRV_SECTOR_SIZE;
 
+         if (copy && s->common.speed) {
+-            delay_ns = ratelimit_calculate_delay(&s->limit, n);
++            delay_ns = ratelimit_calculate_delay(&s->limit,
++                                                 n * BDRV_SECTOR_SIZE);
+         }
+     }
+
+@@ -231,7 +232,7 @@ static void commit_set_speed(BlockJob *job, int64_t speed, Error **errp)
+         error_setg(errp, QERR_INVALID_PARAMETER, "speed");
+         return;
+     }
+-    ratelimit_set_speed(&s->limit, speed / BDRV_SECTOR_SIZE, SLICE_TIME);
++    ratelimit_set_speed(&s->limit, speed, SLICE_TIME);
+ }
+
+ static const BlockJobDriver commit_job_driver = {
+diff --git a/block/mirror.c b/block/mirror.c
+index 61a862d..eb27efc 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -396,7 +396,8 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+     bitmap_set(s->in_flight_bitmap, sector_num / sectors_per_chunk, nb_chunks);
+     while (nb_chunks > 0 && sector_num < end) {
+         int64_t ret;
+-        int io_sectors, io_sectors_acct;
++        int io_sectors;
++        int64_t io_bytes_acct;
+         BlockDriverState *file;
+         enum MirrorMethod {
+             MIRROR_METHOD_COPY,
+@@ -444,16 +445,16 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+         switch (mirror_method) {
+         case MIRROR_METHOD_COPY:
+             io_sectors = mirror_do_read(s, sector_num, io_sectors);
+-            io_sectors_acct = io_sectors;
++            io_bytes_acct = io_sectors * BDRV_SECTOR_SIZE;
+             break;
+         case MIRROR_METHOD_ZERO:
+         case MIRROR_METHOD_DISCARD:
+             mirror_do_zero_or_discard(s, sector_num, io_sectors,
+                                       mirror_method == MIRROR_METHOD_DISCARD);
+             if (write_zeroes_ok) {
+-                io_sectors_acct = 0;
++                io_bytes_acct = 0;
+             } else {
+-                io_sectors_acct = io_sectors;
++                io_bytes_acct = io_sectors * BDRV_SECTOR_SIZE;
+             }
+             break;
+         default:
+@@ -463,7 +464,7 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+         sector_num += io_sectors;
+         nb_chunks -= DIV_ROUND_UP(io_sectors, sectors_per_chunk);
+         if (s->common.speed) {
+-            delay_ns = ratelimit_calculate_delay(&s->limit, io_sectors_acct);
++            delay_ns = ratelimit_calculate_delay(&s->limit, io_bytes_acct);
+         }
+     }
+     return delay_ns;
+@@ -929,7 +930,7 @@ static void mirror_set_speed(BlockJob *job, int64_t speed, Error **errp)
+         error_setg(errp, QERR_INVALID_PARAMETER, "speed");
+         return;
+     }
+-    ratelimit_set_speed(&s->limit, speed / BDRV_SECTOR_SIZE, SLICE_TIME);
++    ratelimit_set_speed(&s->limit, speed, SLICE_TIME);
+ }
+
+ static void mirror_complete(BlockJob *job, Error **errp)
+diff --git a/block/stream.c b/block/stream.c
+index 52d329f..29273a5 100644
+--- a/block/stream.c
++++ b/block/stream.c
+@@ -191,7 +191,8 @@ static void coroutine_fn stream_run(void *opaque)
+         /* Publish progress */
+         s->common.offset += n * BDRV_SECTOR_SIZE;
+         if (copy && s->common.speed) {
+-            delay_ns = ratelimit_calculate_delay(&s->limit, n);
++            delay_ns = ratelimit_calculate_delay(&s->limit,
++                                                 n * BDRV_SECTOR_SIZE);
+         }
+     }
+
+@@ -220,7 +221,7 @@ static void stream_set_speed(BlockJob *job, int64_t speed, Error **errp)
+         error_setg(errp, QERR_INVALID_PARAMETER, "speed");
+         return;
+     }
+-    ratelimit_set_speed(&s->limit, speed / BDRV_SECTOR_SIZE, SLICE_TIME);
++    ratelimit_set_speed(&s->limit, speed, SLICE_TIME);
+ }
+
+ static const BlockJobDriver stream_job_driver = {
 -- 
 2.9.4
