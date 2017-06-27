@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dPjoP-0000CY-Un
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 02:17:23 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dPjoO-0000A5-Q7
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 02:17:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dPjoO-0006E5-CY
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 02:17:21 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dPjoN-0006DR-79
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 02:17:20 -0400
 Received: from [59.151.112.132] (port=42139 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dPjoO-0006Cd-05
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 02:17:20 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dPjoM-0006Cd-Fb
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 02:17:19 -0400
 From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Date: Tue, 27 Jun 2017 14:16:54 +0800
-Message-ID: <240d691ecf3b1c42c326b4ddde97e0e5a3509efa.1498542538.git.maozy.fnst@cn.fujitsu.com>
+Date: Tue, 27 Jun 2017 14:16:53 +0800
+Message-ID: <971cab75a0b4e011a18de8afb0ed4eedb7810eb6.1498542538.git.maozy.fnst@cn.fujitsu.com>
 In-Reply-To: <cover.1498542538.git.maozy.fnst@cn.fujitsu.com>
 References: <cover.1498542538.git.maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v7 8/9] i386/kvm/pci-assign: Fix return type of
- verify_irqchip_kernel()
+Subject: [Qemu-devel] [PATCH v7 7/9] pci: Convert shpc_init() to Error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,87 +26,192 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, armbru@redhat.com, marcel@redhat.com
+Cc: mst@redhat.com, marcel@redhat.com, armbru@redhat.com
 
-When the function no success value to transmit, it usually make the
-function return void. It has turned out not to be a success, because
-it means that the extra local_err variable and error_propagate() will
-be needed. It leads to cumbersome code, therefore, transmit success/
-failure in the return value is worth. So fix the return type to avoid
-it.
+In order to propagate error message better, convert shpc_init() to
+Error also convert the pci_bridge_dev_initfn() to realize.
 
-Cc: pbonzini@redhat.com
-Cc: rth@twiddle.net
-Cc: ehabkost@redhat.com
 Cc: mst@redhat.com
-Cc: armbru@redhat.com
 Cc: marcel@redhat.com
+Cc: armbru@redhat.com
 Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
 Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 ---
- hw/i386/kvm/pci-assign.c | 18 ++++++------------
- 1 file changed, 6 insertions(+), 12 deletions(-)
+ hw/pci-bridge/pci_bridge_dev.c | 14 ++++++--------
+ hw/pci/shpc.c                  | 11 +++++------
+ hw/pci/slotid_cap.c            | 11 +++++------
+ include/hw/pci/shpc.h          |  3 ++-
+ include/hw/pci/slotid_cap.h    |  3 ++-
+ 5 files changed, 20 insertions(+), 22 deletions(-)
 
-diff --git a/hw/i386/kvm/pci-assign.c b/hw/i386/kvm/pci-assign.c
-index 3d60455..b7fdb47 100644
---- a/hw/i386/kvm/pci-assign.c
-+++ b/hw/i386/kvm/pci-assign.c
-@@ -824,12 +824,13 @@ static void assign_device(AssignedDevice *dev, Error **errp)
-     }
- }
+diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
+index 5dbd933..4373f1d 100644
+--- a/hw/pci-bridge/pci_bridge_dev.c
++++ b/hw/pci-bridge/pci_bridge_dev.c
+@@ -49,7 +49,7 @@ struct PCIBridgeDev {
+ };
+ typedef struct PCIBridgeDev PCIBridgeDev;
  
--static void verify_irqchip_in_kernel(Error **errp)
-+static int verify_irqchip_in_kernel(Error **errp)
+-static int pci_bridge_dev_initfn(PCIDevice *dev)
++static void pci_bridge_dev_realize(PCIDevice *dev, Error **errp)
  {
-     if (kvm_irqchip_in_kernel()) {
--        return;
-+        return -1;
+     PCIBridge *br = PCI_BRIDGE(dev);
+     PCIBridgeDev *bridge_dev = PCI_BRIDGE_DEV(dev);
+@@ -62,7 +62,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
+         dev->config[PCI_INTERRUPT_PIN] = 0x1;
+         memory_region_init(&bridge_dev->bar, OBJECT(dev), "shpc-bar",
+                            shpc_bar_size(dev));
+-        err = shpc_init(dev, &br->sec_bus, &bridge_dev->bar, 0);
++        err = shpc_init(dev, &br->sec_bus, &bridge_dev->bar, 0, errp);
+         if (err) {
+             goto shpc_error;
+         }
+@@ -71,7 +71,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
+         bridge_dev->msi = ON_OFF_AUTO_OFF;
      }
-     error_setg(errp, "pci-assign requires KVM with in-kernel irqchip enabled");
-+    return 0;
+ 
+-    err = slotid_cap_init(dev, 0, bridge_dev->chassis_nr, 0);
++    err = slotid_cap_init(dev, 0, bridge_dev->chassis_nr, 0, errp);
+     if (err) {
+         goto slotid_error;
+     }
+@@ -87,7 +87,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
+             /* Can't satisfy user's explicit msi=on request, fail */
+             error_append_hint(&local_err, "You have to use msi=auto (default) "
+                     "or msi=off with this machine type.\n");
+-            error_report_err(local_err);
++            error_propagate(errp, local_err);
+             goto msi_error;
+         }
+         assert(!local_err || bridge_dev->msi == ON_OFF_AUTO_AUTO);
+@@ -101,7 +101,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
+         pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
+                          PCI_BASE_ADDRESS_MEM_TYPE_64, &bridge_dev->bar);
+     }
+-    return 0;
++    return;
+ 
+ msi_error:
+     slotid_cap_cleanup(dev);
+@@ -111,8 +111,6 @@ slotid_error:
+     }
+ shpc_error:
+     pci_bridge_exitfn(dev);
+-
+-    return err;
  }
  
- static int assign_intx(AssignedDevice *dev, Error **errp)
-@@ -838,7 +839,6 @@ static int assign_intx(AssignedDevice *dev, Error **errp)
-     PCIINTxRoute intx_route;
-     bool intx_host_msi;
-     int r;
+ static void pci_bridge_dev_exitfn(PCIDevice *dev)
+@@ -216,7 +214,7 @@ static void pci_bridge_dev_class_init(ObjectClass *klass, void *data)
+     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+     HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
+ 
+-    k->init = pci_bridge_dev_initfn;
++    k->realize = pci_bridge_dev_realize;
+     k->exit = pci_bridge_dev_exitfn;
+     k->config_write = pci_bridge_dev_write_config;
+     k->vendor_id = PCI_VENDOR_ID_REDHAT;
+diff --git a/hw/pci/shpc.c b/hw/pci/shpc.c
+index d72d5e4..69fc14b 100644
+--- a/hw/pci/shpc.c
++++ b/hw/pci/shpc.c
+@@ -446,16 +446,14 @@ static void shpc_cap_update_dword(PCIDevice *d)
+ }
+ 
+ /* Add SHPC capability to the config space for the device. */
+-static int shpc_cap_add_config(PCIDevice *d)
++static int shpc_cap_add_config(PCIDevice *d, Error **errp)
+ {
+     uint8_t *config;
+     int config_offset;
+-    Error *local_err = NULL;
+     config_offset = pci_add_capability(d, PCI_CAP_ID_SHPC,
+                                        0, SHPC_CAP_LENGTH,
+-                                       &local_err);
++                                       errp);
+     if (config_offset < 0) {
+-        error_report_err(local_err);
+         return config_offset;
+     }
+     config = d->config + config_offset;
+@@ -584,13 +582,14 @@ void shpc_device_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
+ }
+ 
+ /* Initialize the SHPC structure in bridge's BAR. */
+-int shpc_init(PCIDevice *d, PCIBus *sec_bus, MemoryRegion *bar, unsigned offset)
++int shpc_init(PCIDevice *d, PCIBus *sec_bus, MemoryRegion *bar,
++              unsigned offset, Error **errp)
+ {
+     int i, ret;
+     int nslots = SHPC_MAX_SLOTS; /* TODO: qdev property? */
+     SHPCDevice *shpc = d->shpc = g_malloc0(sizeof(*d->shpc));
+     shpc->sec_bus = sec_bus;
+-    ret = shpc_cap_add_config(d);
++    ret = shpc_cap_add_config(d, errp);
+     if (ret) {
+         g_free(d->shpc);
+         return ret;
+diff --git a/hw/pci/slotid_cap.c b/hw/pci/slotid_cap.c
+index bdca205..36d021b 100644
+--- a/hw/pci/slotid_cap.c
++++ b/hw/pci/slotid_cap.c
+@@ -9,14 +9,14 @@
+ 
+ int slotid_cap_init(PCIDevice *d, int nslots,
+                     uint8_t chassis,
+-                    unsigned offset)
++                    unsigned offset,
++                    Error **errp)
+ {
+     int cap;
 -    Error *local_err = NULL;
  
-     /* Interrupt PIN 0 means don't use INTx */
-     if (assigned_dev_pci_read_byte(&dev->dev, PCI_INTERRUPT_PIN) == 0) {
-@@ -846,9 +846,7 @@ static int assign_intx(AssignedDevice *dev, Error **errp)
-         return 0;
+     if (!chassis) {
+-        error_report("Bridge chassis not specified. Each bridge is required "
+-                     "to be assigned a unique chassis id > 0.");
++        error_setg(errp, "Bridge chassis not specified. Each bridge is required"
++                   " to be assigned a unique chassis id > 0.");
+         return -EINVAL;
+     }
+     if (nslots < 0 || nslots > (PCI_SID_ESR_NSLOTS >> SLOTID_NSLOTS_SHIFT)) {
+@@ -25,9 +25,8 @@ int slotid_cap_init(PCIDevice *d, int nslots,
      }
  
--    verify_irqchip_in_kernel(&local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (verify_irqchip_in_kernel(errp) < 0) {
-         return -ENOTSUP;
+     cap = pci_add_capability(d, PCI_CAP_ID_SLOTID, offset,
+-                             SLOTID_CAP_LENGTH, &local_err);
++                             SLOTID_CAP_LENGTH, errp);
+     if (cap < 0) {
+-        error_report_err(local_err);
+         return cap;
      }
+     /* We make each chassis unique, this way each bridge is First in Chassis */
+diff --git a/include/hw/pci/shpc.h b/include/hw/pci/shpc.h
+index 71e836b..ee19fec 100644
+--- a/include/hw/pci/shpc.h
++++ b/include/hw/pci/shpc.h
+@@ -38,7 +38,8 @@ struct SHPCDevice {
  
-@@ -1246,9 +1244,7 @@ static int assigned_device_pci_cap_init(PCIDevice *pci_dev, Error **errp)
-      * MSI capability is the 1st capability in capability config */
-     pos = pci_find_cap_offset(pci_dev, PCI_CAP_ID_MSI, 0);
-     if (pos != 0 && kvm_check_extension(kvm_state, KVM_CAP_ASSIGN_DEV_IRQ)) {
--        verify_irqchip_in_kernel(&local_err);
--        if (local_err) {
--            error_propagate(errp, local_err);
-+        if (verify_irqchip_in_kernel(errp) < 0) {
-             return -ENOTSUP;
-         }
-         dev->dev.cap_present |= QEMU_PCI_CAP_MSI;
-@@ -1281,9 +1277,7 @@ static int assigned_device_pci_cap_init(PCIDevice *pci_dev, Error **errp)
-         uint32_t msix_table_entry;
-         uint16_t msix_max;
+ void shpc_reset(PCIDevice *d);
+ int shpc_bar_size(PCIDevice *dev);
+-int shpc_init(PCIDevice *dev, PCIBus *sec_bus, MemoryRegion *bar, unsigned off);
++int shpc_init(PCIDevice *dev, PCIBus *sec_bus, MemoryRegion *bar,
++              unsigned off, Error **errp);
+ void shpc_cleanup(PCIDevice *dev, MemoryRegion *bar);
+ void shpc_free(PCIDevice *dev);
+ void shpc_cap_write_config(PCIDevice *d, uint32_t addr, uint32_t val, int len);
+diff --git a/include/hw/pci/slotid_cap.h b/include/hw/pci/slotid_cap.h
+index 70db047..a777ea0 100644
+--- a/include/hw/pci/slotid_cap.h
++++ b/include/hw/pci/slotid_cap.h
+@@ -5,7 +5,8 @@
  
--        verify_irqchip_in_kernel(&local_err);
--        if (local_err) {
--            error_propagate(errp, local_err);
-+        if (verify_irqchip_in_kernel(errp) < 0) {
-             return -ENOTSUP;
-         }
-         dev->dev.cap_present |= QEMU_PCI_CAP_MSIX;
+ int slotid_cap_init(PCIDevice *dev, int nslots,
+                     uint8_t chassis,
+-                    unsigned offset);
++                    unsigned offset,
++                    Error **errp);
+ void slotid_cap_cleanup(PCIDevice *dev);
+ 
+ #endif
 -- 
 2.9.4
