@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dPwXR-0000Un-GU
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 15:52:42 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dPwfA-0003Ns-HZ
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 16:00:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dPwXQ-0000xK-Gl
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 15:52:41 -0400
-References: <20170616135847.17726-1-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0bed1851-9298-0ba5-0604-9686ca5cf569@redhat.com>
-Date: Tue, 27 Jun 2017 14:52:32 -0500
+	(envelope-from <rth7680@gmail.com>) id 1dPwf6-0003wP-Jc
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 16:00:40 -0400
+Received: from mail-qk0-x22b.google.com ([2607:f8b0:400d:c09::22b]:35952)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dPwf6-0003wH-Ds
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 16:00:36 -0400
+Received: by mail-qk0-x22b.google.com with SMTP id p21so34668623qke.3
+	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 13:00:36 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170627191221.31650-1-laurent@vivier.eu>
+	<20170627191221.31650-2-laurent@vivier.eu>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <0d870134-fd3e-67ca-9112-94672cf7e742@twiddle.net>
+Date: Tue, 27 Jun 2017 13:00:31 -0700
 MIME-Version: 1.0
-In-Reply-To: <20170616135847.17726-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="jxTvrSM7dwF2v7bg3s4a1TAcEOBh56RCr"
-Subject: Re: [Qemu-devel] [PATCH] iotests: Add test for failing qemu-img
- commit
+In-Reply-To: <20170627191221.31650-2-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/7] target/m68k: add fscc.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,113 +31,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---jxTvrSM7dwF2v7bg3s4a1TAcEOBh56RCr
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <0bed1851-9298-0ba5-0604-9686ca5cf569@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] iotests: Add test for failing qemu-img
- commit
-References: <20170616135847.17726-1-mreitz@redhat.com>
-In-Reply-To: <20170616135847.17726-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 06/27/2017 12:12 PM, Laurent Vivier wrote:
+>       case 3:  /* Ordered Greater than or Equal Z || !(A || N) */
+>       case 19: /* Greater than or Equal Z || !(A || N) */
+> +        g_assert(FPSR_CC_A == (FPSR_CC_N >> 3));
+> +        c->v1 = tcg_temp_new();
+> +        c->g1 = 0;
+> +        tcg_gen_shli_i32(c->v1, fpsr, 3);
+> +        tcg_gen_or_i32(c->v1, c->v1, fpsr);
+> +        tcg_gen_xori_i32(c->v1, c->v1, FPSR_CC_N);
+> +        tcg_gen_andi_i32(c->v1, c->v1, FPSR_CC_N | FPSR_CC_Z);
+> +        c->tcond = TCG_COND_NE;
 
-On 06/16/2017 08:58 AM, Max Reitz wrote:
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
-> In order to pass, this depends on "fix: avoid an infinite loop or a
-> dangling pointer problem in img_commit"
-> (http://lists.nongnu.org/archive/html/qemu-block/2017-06/msg00443.html)=
+Still with the unmasked shift.
 
-
-Looks like that is now 4172a003
-
-> and on the "block: Don't compare strings in bdrv_reopen_prepare()"
-> series
-> (http://lists.nongnu.org/archive/html/qemu-block/2017-06/msg00424.html)=
-=2E
-
-Still pending.
-
-> ---
->  tests/qemu-iotests/020     | 27 +++++++++++++++++++++++++++
->  tests/qemu-iotests/020.out | 17 +++++++++++++++++
->  2 files changed, 44 insertions(+)
->=20
-> diff --git a/tests/qemu-iotests/020 b/tests/qemu-iotests/020
-> index 7a11110..83d5ef0 100755
-> --- a/tests/qemu-iotests/020
-> +++ b/tests/qemu-iotests/020
-> @@ -110,6 +110,33 @@ for offset in $TEST_OFFSETS; do
->      io_zero readv $(( offset + 64 * 1024 + 65536 * 4 )) 65536 65536 1
->  done
->  _check_test_img
-> +_cleanup
-> +TEST_IMG=3D$TEST_IMG_SAVE
-> +
-> +echo
-> +echo 'Testing failing commit'
-> +echo
-> +
-> +# Create an image with a null backing file to which committing will fa=
-il (with
-> +# ENOSPC so we can distinguish the result from some generic EIO which =
-may be
-> +# generated anywhere in the block layer)
-> +_make_test_img -b "json:{'driver': 'raw',
-> +                         'file': {
-> +                             'driver': 'blkdebug',
-> +                             'inject-error': [{
-> +                                 'event': 'write_aio',
-> +                                 'errno': 28,
-
-Still nasty that we encoded an errno value rather than using a
-stringified enum, but that's not your problem.
-
-> +                                 'once': true
-> +                             }],
-> +                             'image': {
-> +                                 'driver': 'null-co'
-> +                             }}}"
-
-The comment does wonders for explaining how it all works!
-
-> +
-> +# Just write anything so comitting will not be a no-op
-
-s/comitting/committing/
-
-With the typo fix,
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+	tcg_gen_not_i32(c->v1, fpsr);
+	tcg_gen_andi_i32(c->v1, c->v1, FPSR_CC_A | FPSR_CC_N);
+	tcg_gen_andi_i32(fpsr, fpsr, FPSR_CC_Z);
+	tcg_gen_or_i32(c->v1, c->v1, fpsr);
 
 
---jxTvrSM7dwF2v7bg3s4a1TAcEOBh56RCr
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+>       case 5:  /* Ordered Less than or Equal Z || (N && !A) */
+>       case 21: /* Less than or Equal Z || (N && !A) */
+> +        g_assert(FPSR_CC_A == (FPSR_CC_N >> 3));
+> +        c->v1 = tcg_temp_new();
+> +        c->g1 = 0;
+> +        tcg_gen_xori_i32(c->v1, fpsr, FPSR_CC_A);
+> +        tcg_gen_shli_i32(c->v1, c->v1, 3);
+> +        tcg_gen_ori_i32(c->v1, c->v1, FPSR_CC_Z);
+> +        tcg_gen_and_i32(c->v1, c->v1, fpsr);
+> +        c->tcond = TCG_COND_NE;
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Likewise.
 
-iQEcBAEBCAAGBQJZUreAAAoJEKeha0olJ0NqmiAH/j5Re/CvDeQHdoUQvQhiA0RU
-CWU+QcWt0cwDMpehNBiISSm6UDEeS4PR1dOYrYDksbg11Ne5/xDmGFXPUhc7+HIF
-Mv9Ucc0A+TVh02lZArcHDD52Y8p8yiclYaE/B48cGXWDVpFsGitZK2ydbU5jUmdB
-YY78a/pUKRFp1PwxEmLIWStAzNgv2mvPkFFvwqwhLZvFTxnX1WtRfoxrC0Zk7YEL
-ygY+01Agy4ybDgmnpGspuWpr65nOKsXmnbCULUEkebFnrAtGd8p77tCInuVv/Kiq
-DxXDBJtrahf3gEt/nluWhSXOx9YIJlGlqj842Lf3BPY139qckGNkGPPMQJassjo=
-=LjJx
------END PGP SIGNATURE-----
+	tcg_gen_andi_i32(c->v1, fpsr, FPSR_CC_A);
+	tcg_gen_shli_i32(c->v1, c->v1, ctz32(FPSR_CC_N) - ctz32(FPSR_CC_A));
+	tcg_gen_andc_i32(c->v1, fpsr, c->v1);
+	tcg_gen_andi_i32(c->v1, c->v1, FPSR_CC_Z | FPSR_CC_N);
 
---jxTvrSM7dwF2v7bg3s4a1TAcEOBh56RCr--
+
+>       case 10: /* Unordered or Greater Than A || !(N || Z)) */
+>       case 26: /* Not Less or Equal A || !(N || Z)) */
+> +        g_assert(FPSR_CC_Z == (FPSR_CC_N >> 1));
+> +        c->v1 = tcg_temp_new();
+> +        c->g1 = 0;
+> +        tcg_gen_shli_i32(c->v1, fpsr, 1);
+> +        tcg_gen_or_i32(c->v1, c->v1, fpsr);
+> +        tcg_gen_xori_i32(c->v1, c->v1, FPSR_CC_N);
+> +        tcg_gen_andi_i32(c->v1, c->v1, FPSR_CC_N | FPSR_CC_A);
+> +        c->tcond = TCG_COND_NE;
+
+Likewise.
+
+	tcg_gen_not_i32(c->v1, fpsr);
+	tcg_gen_andi_i32(c->v1, c->v1, FPSR_CC_Z | FPSR_CC_N);
+	tcg_gen_andi_i32(fpsr, fpsr, FPSR_CC_A);
+	tcg_gen_or_i32(c->v1, c->v1, fpsr);
+
+
+>       case 12: /* Unordered or Less Than A || (N && !Z) */
+>       case 28: /* Not Greater than or Equal A || (N && !Z) */
+> +        c->v1 = tcg_temp_new();
+> +        c->g1 = 0;
+> +        tcg_gen_andi_i32(c->v1, fpsr, FPSR_CC_Z);
+> +        tcg_gen_shli_i32(c->v1, c->v1, ctz32(FPSR_CC_N) - ctz32(FPSR_CC_Z));
+> +        tcg_gen_andc_i32(c->v1, fpsr, c->v1);
+> +        tcg_gen_andi_i32(c->v1, c->v1, FPSR_CC_A | FPSR_CC_N);
+> +        c->tcond = TCG_COND_NE;
+
+I hadn't meant that this was the only one to fix.
+
+
+r~
