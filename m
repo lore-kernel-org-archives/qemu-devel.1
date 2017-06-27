@@ -1,15 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1dPqEH-0007kI-Be
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 09:08:30 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dPqEJ-0007lX-7e
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 09:08:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1dPqEF-0005Oq-TL
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 09:08:29 -0400
-From: Alexander Graf <agraf@suse.de>
-Date: Tue, 27 Jun 2017 15:08:43 +0200
-Message-Id: <1498568923-115764-1-git-send-email-agraf@suse.de>
-Subject: [Qemu-devel] [PATCH v2] ARM: KVM: Enable in-kernel timers with user
- space gic
+	(envelope-from <stefanha@redhat.com>) id 1dPqEE-0005Nt-91
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 09:08:31 -0400
+Date: Tue, 27 Jun 2017 14:08:12 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170627130812.GI8555@stefanha-x1.localdomain>
+References: <20170623124700.1389-1-el13635@mail.ntua.gr>
+	<20170623124700.1389-8-el13635@mail.ntua.gr>
+	<20170626154444.GH29664@stefanha-x1.localdomain>
+	<20170626224507.ep2hqzpxknfimf55@postretch>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="MPkR1dXiUZqK+927"
+Content-Disposition: inline
+In-Reply-To: <20170626224507.ep2hqzpxknfimf55@postretch>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC v3 7/8] block: remove
+ legacy I/O throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,196 +27,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, cdall@linaro.org, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Andrew Jones <drjones@redhat.com>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>
 
-When running with KVM enabled, you can choose between emulating the
-gic in kernel or user space. If the kernel supports in-kernel virtualization
-of the interrupt controller, it will default to that. If not, if will
-default to user space emulation.
 
-Unfortunately when running in user mode gic emulation, we miss out on
-interrupt events which are only available from kernel space, such as the timer.
-This patch leverages the new kernel/user space pending line synchronization for
-timer events. It does not handle PMU events yet.
+--MPkR1dXiUZqK+927
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Alexander Graf <agraf@suse.de>
+On Tue, Jun 27, 2017 at 01:45:07AM +0300, Manos Pitsidianakis wrote:
+> On Mon, Jun 26, 2017 at 04:44:44PM +0100, Stefan Hajnoczi wrote:
+> > On Fri, Jun 23, 2017 at 03:46:59PM +0300, Manos Pitsidianakis wrote:
+> > > -void blk_io_limits_disable(BlockBackend *blk)
+> > > +void blk_io_limits_disable(BlockBackend *blk, Error **errp)
+> > >  {
+> > > -    assert(blk->public.throttle_group_member.throttle_state);
+> > > -    bdrv_drained_begin(blk_bs(blk));
+> > > -    throttle_group_unregister_tgm(&blk->public.throttle_group_member=
+);
+> > > -    bdrv_drained_end(blk_bs(blk));
+> > > +    Error *local_err =3D NULL;
+> > > +    BlockDriverState *bs, *throttle_node;
+> > > +
+> > > +    throttle_node =3D blk_get_public(blk)->throttle_node;
+> > > +
+> > > +    assert(throttle_node && throttle_node->refcnt =3D=3D 1);
+> >=20
+> > I'm not sure if we can enforce refcnt =3D=3D 1.  What stops other graph
+> > manipulation operations from inserting a node above or a BB that uses
+> > throttle_node as the root?
+>=20
+> Is this possible unless the user explicitly does this? I suppose going do=
+wn
+> the path and removing it from any place is okay. If the throttle_node has
+> more than one parent then the result would be invalid anyway. I don't see
+> anything in the code doing this (removing a BDS from a BB->leaf path) or
+> wrapping it in some way, is that what should be done?
 
----
+We cannot assume the user will keep their hands off the graph :).
 
-v1 -> v2:
+In general, QEMU cannot assume that external interfaces (e.g.
+command-line, monitor, VNC, ...) are only called in convenient and safe
+ways.
 
-  - whitespace fixes
-  - use !! to determine whether bit is set
-  - call in-kernel device IRQs out by their name everywhere
----
- accel/kvm/kvm-all.c    |  5 +++++
- accel/stubs/kvm-stub.c |  5 +++++
- hw/intc/arm_gic.c      |  7 +++++++
- include/sysemu/kvm.h   | 11 +++++++++++
- target/arm/cpu.h       |  3 +++
- target/arm/kvm.c       | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 6 files changed, 82 insertions(+)
+The code must handle all possible situations.  Usually the simplest
+solution is to reject requests that would put QEMU into an invalid
+state.
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 75feffa..ade32ea 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -2285,6 +2285,11 @@ int kvm_has_intx_set_mask(void)
-     return kvm_state->intx_set_mask;
- }
- 
-+bool kvm_arm_supports_user_irq(void)
-+{
-+    return kvm_check_extension(kvm_state, KVM_CAP_ARM_USER_IRQ);
-+}
-+
- #ifdef KVM_CAP_SET_GUEST_DEBUG
- struct kvm_sw_breakpoint *kvm_find_sw_breakpoint(CPUState *cpu,
-                                                  target_ulong pc)
-diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
-index ef0c734..3965c52 100644
---- a/accel/stubs/kvm-stub.c
-+++ b/accel/stubs/kvm-stub.c
-@@ -155,4 +155,9 @@ void kvm_init_cpu_signals(CPUState *cpu)
- {
-     abort();
- }
-+
-+bool kvm_arm_supports_user_irq(void)
-+{
-+    return false;
-+}
- #endif
-diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-index b305d90..5a0e2a3 100644
---- a/hw/intc/arm_gic.c
-+++ b/hw/intc/arm_gic.c
-@@ -25,6 +25,7 @@
- #include "qom/cpu.h"
- #include "qemu/log.h"
- #include "trace.h"
-+#include "sysemu/kvm.h"
- 
- /* #define DEBUG_GIC */
- 
-@@ -1412,6 +1413,12 @@ static void arm_gic_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
-+    if (kvm_enabled() && !kvm_arm_supports_user_irq()) {
-+        error_setg(errp, "KVM with user space irqchip only works when the "
-+                         "host kernel supports KVM_CAP_ARM_USER_IRQ");
-+        return;
-+    }
-+
-     /* This creates distributor and main CPU interface (s->cpuiomem[0]) */
-     gic_init_irqs_and_mmio(s, gic_set_irq, gic_ops);
- 
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 1e91613..9f11fc0 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -227,6 +227,17 @@ int kvm_init_vcpu(CPUState *cpu);
- int kvm_cpu_exec(CPUState *cpu);
- int kvm_destroy_vcpu(CPUState *cpu);
- 
-+/**
-+ * kvm_arm_supports_user_irq
-+ *
-+ * Not all KVM implementations support notifications for kernel generated
-+ * interrupt events to user space. This function indicates whether the current
-+ * KVM implementation does support them.
-+ *
-+ * Returns: true if KVM supports using kernel generated IRQs from user space
-+ */
-+bool kvm_arm_supports_user_irq(void);
-+
- #ifdef NEED_CPU_H
- #include "cpu.h"
- 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 16a1e59..102c58a 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -706,6 +706,9 @@ struct ARMCPU {
-     void *el_change_hook_opaque;
- 
-     int32_t node_id; /* NUMA node this CPU belongs to */
-+
-+    /* Used to synchronize KVM and QEMU in-kernel device levels */
-+    uint8_t device_irq_level;
- };
- 
- static inline ARMCPU *arm_env_get_cpu(CPUARMState *env)
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 4555468..f750f94 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -174,6 +174,12 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-      */
-     kvm_async_interrupts_allowed = true;
- 
-+    /*
-+     * PSCI wakes up secondary cores, so we always need to
-+     * have vCPUs waiting in kernel space
-+     */
-+    kvm_halt_in_kernel_allowed = true;
-+
-     cap_has_mp_state = kvm_check_extension(s, KVM_CAP_MP_STATE);
- 
-     type_register_static(&host_arm_cpu_type_info);
-@@ -528,6 +534,51 @@ void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
- 
- MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
- {
-+    ARMCPU *cpu;
-+    uint32_t switched_level;
-+
-+    if (kvm_irqchip_in_kernel()) {
-+        /*
-+         * We only need to sync timer states with user-space interrupt
-+         * controllers, so return early and save cycles if we don't.
-+         */
-+        return MEMTXATTRS_UNSPECIFIED;
-+    }
-+
-+    cpu = ARM_CPU(cs);
-+
-+    /* Synchronize our internal timer irq lines with the kvm ones */
-+    if (run->s.regs.device_irq_level != cpu->device_irq_level) {
-+        switched_level = cpu->device_irq_level ^ run->s.regs.device_irq_level;
-+
-+        qemu_mutex_lock_iothread();
-+
-+        if (switched_level & KVM_ARM_DEV_EL1_VTIMER) {
-+            qemu_set_irq(cpu->gt_timer_outputs[GTIMER_VIRT],
-+                         !!(run->s.regs.device_irq_level &
-+                            KVM_ARM_DEV_EL1_VTIMER));
-+            switched_level &= ~KVM_ARM_DEV_EL1_VTIMER;
-+        }
-+
-+        if (switched_level & KVM_ARM_DEV_EL1_PTIMER) {
-+            qemu_set_irq(cpu->gt_timer_outputs[GTIMER_PHYS],
-+                         !!(run->s.regs.device_irq_level &
-+                            KVM_ARM_DEV_EL1_PTIMER));
-+            switched_level &= ~KVM_ARM_DEV_EL1_PTIMER;
-+        }
-+
-+        /* XXX PMU IRQ is missing */
-+
-+        if (switched_level) {
-+            qemu_log_mask(LOG_UNIMP, "%s: unhandled in-kernel device IRQ %x\n",
-+                          __func__, switched_level);
-+        }
-+
-+        /* We also mark unknown levels as processed to not waste cycles */
-+        cpu->device_irq_level = run->s.regs.device_irq_level;
-+        qemu_mutex_unlock_iothread();
-+    }
-+
-     return MEMTXATTRS_UNSPECIFIED;
- }
- 
--- 
-1.8.5.6
+> >=20
+> > > +
+> > > +    /* ref throttle_node's child bs so that it isn't lost when throt=
+tle_node is
+> > > +     * destroyed */
+> > > +    bdrv_ref(bs);
+> > > +
+> > > +    /* this destroys throttle_node */
+> > > +    blk_remove_bs(blk);
+> >=20
+> > This assumes that throttle_node is the top node.  How is this constraint
+> > enforced?
+>=20
+>=20
+> Kevin had said in a previous discussion:
+> > The throttle node affects only the backing file now, but not the new
+> > top-level node. With manually created filter nodes we may need to
+> > provide a way so that the QMP command tells where in the tree the
+> > snapshot is actually taken. With automatically created ones, we need to
+> > make sure that they always stay on top.
+> >=20
+> > Similar problems arise when block jobs manipulate the graph. For
+> > example, think of a commit block job, which will remove the topmost node
+> > from the backing file chain. We don't want it to remove the throttling
+> > filter together with the qcow2 node. (Or do we? It might be something
+> > that needs to be configurable.)
+> >=20
+> > We also have several QMP that currently default to working on the
+> > topmost image of the chain. Some of them may actually want to work on
+> > the topmost node that isn't an automatically inserted filter.
+> >=20
+> >=20
+> > I hope this helps you understand why I keep saying that automatic
+> > insertion/removal of filter nodes is tricky and we should do it as
+> > little as we possibly can.
+>=20
+> Yes, this constraint isn't enforced. The automatically inserted filter is
+> not a very clean concept. I'll have to think about it a little more, unle=
+ss
+> there are some ideas.
+
+The block layer has an "op blockers" and permissions API to reject
+operations that would violate the graph constraints.  Kevin has recently
+worked on it and I hope he can give you some advice in this area.
+
+Stefan
+
+--MPkR1dXiUZqK+927
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZUli8AAoJEJykq7OBq3PI+LcIAMTzCOuDdkz7NMCnb00RjWeT
+WTfj4G/h5nvmD4rqEVwnnZuSRQGuIekO0FGA2xmbzDqrkjbXJpkfkJmn0zPpnNTf
+bup6ouEik9h6nthpV/EO71sl2ldv+/dOFfmsf7NVVtbMmszhXdOVu7vcoPCRzw5p
+mst2OufHz1OAC4fMjP1ZaOgoCf1EO3QTNH/sYUYTu5RhI8RFjIzy8MEZ9VN9F6YD
+bRdhCoPKIJLylZQIUFtX5QBSEH6JhEY1YpNPMEXc75S4Gf2Sa3zgcjnFMLAdsYdI
+Neihq76gs9Bc9BlCPEAwKJN36kRMaQX6vqFWySUYrz8ITaMLm7fBGhsASB9vIC8=
+=Fr8P
+-----END PGP SIGNATURE-----
+
+--MPkR1dXiUZqK+927--
