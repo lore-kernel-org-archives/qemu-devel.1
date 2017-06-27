@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dPtlz-000719-DE
+	(envelope-from <pbonzini@redhat.com>) id 1dPtm1-00077i-73
 	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:55:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dPsL3-0003mJ-0c
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:23:37 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dPsKf-00029i-55
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:23:14 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 27 Jun 2017 17:22:43 +0200
-Message-Id: <20170627152248.10446-6-pbonzini@redhat.com>
+Date: Tue, 27 Jun 2017 17:22:39 +0200
+Message-Id: <20170627152248.10446-2-pbonzini@redhat.com>
 In-Reply-To: <20170627152248.10446-1-pbonzini@redhat.com>
 References: <20170627152248.10446-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 05/10] vvfat: make it thread-safe
+Subject: [Qemu-devel] [PATCH 01/10] qcow2: call CoQueue APIs under CoMutex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,28 +26,30 @@ Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block/vvfat.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ block/qcow2.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/vvfat.c b/block/vvfat.c
-index 8ab647c0c6..d2679c2ff5 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -2982,8 +2982,14 @@ static int coroutine_fn
- write_target_commit(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
-                     QEMUIOVector *qiov, int flags)
- {
-+    int ret;
-+
-     BDRVVVFATState* s = *((BDRVVVFATState**) bs->opaque);
--    return try_commit(s);
-+    qemu_co_mutex_lock(&s->lock);
-+    ret = try_commit(s);
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 2f94f0326e..70d3f4a18e 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1741,8 +1741,6 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+     ret = 0;
+ 
+ fail:
+-    qemu_co_mutex_unlock(&s->lock);
+-
+     while (l2meta != NULL) {
+         QCowL2Meta *next;
+ 
+@@ -1756,6 +1754,8 @@ fail:
+         l2meta = next;
+     }
+ 
 +    qemu_co_mutex_unlock(&s->lock);
 +
-+    return ret;
- }
- 
- static void write_target_close(BlockDriverState *bs) {
+     qemu_iovec_destroy(&hd_qiov);
+     qemu_vfree(cluster_data);
+     trace_qcow2_writev_done_req(qemu_coroutine_self(), ret);
 -- 
 2.13.0
