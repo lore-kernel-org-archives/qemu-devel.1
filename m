@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dPhph-0000xI-OC
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 00:10:34 -0400
+	(envelope-from <peterx@redhat.com>) id 1dPhpk-0000yG-N1
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 00:10:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dPhpg-0002UE-O2
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 00:10:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53328)
+	(envelope-from <peterx@redhat.com>) id 1dPhpj-0002Uu-Mt
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 00:10:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42366)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dPhpg-0002U7-Ey
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 00:10:32 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dPhpj-0002Ui-EI
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 00:10:35 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 71D563D945
-	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 04:10:31 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7D4072E97CC
+	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 04:10:34 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Tue, 27 Jun 2017 12:10:10 +0800
-Message-Id: <1498536619-14548-2-git-send-email-peterx@redhat.com>
+Date: Tue, 27 Jun 2017 12:10:11 +0800
+Message-Id: <1498536619-14548-3-git-send-email-peterx@redhat.com>
 In-Reply-To: <1498536619-14548-1-git-send-email-peterx@redhat.com>
 References: <1498536619-14548-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 01/10] machine: export register_compat_prop()
+Subject: [Qemu-devel] [PATCH v6 02/10] accel: introduce
+ AccelClass.global_props
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,103 +33,123 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-We have HW_COMPAT_*, however that's only bound to machines, not other
-things (like accelerators).  Behind it, it was register_compat_prop()
-that played the trick.  Let's export the function for further use
-outside HW_COMPAT_* magic.
+Introduce this new field for the accelerator classes so that each
+specific accelerator in the future can register its own global
+properties to be used further by the system. It works just like how the
+old machine compatible properties do, but only tailored for
+accelerators.
 
-Meanwhile, move it to qdev-properties.c where seems more proper (since
-it'll be used not only in machine codes).
+Introduce register_compat_props_array() for it. Export it so that it may
+be used in other codes as well in the future.
 
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- hw/core/machine.c            | 13 -------------
- hw/core/qdev-properties.c    | 14 ++++++++++++++
- include/hw/qdev-properties.h | 23 +++++++++++++++++++++++
- 3 files changed, 37 insertions(+), 13 deletions(-)
+ accel/accel.c                |  6 ++++++
+ hw/core/qdev-properties.c    |  7 +++++++
+ include/hw/qdev-properties.h |  6 ++++++
+ include/sysemu/accel.h       | 11 +++++++++++
+ vl.c                         |  1 +
+ 5 files changed, 31 insertions(+)
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 2e7e977..ecb5552 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -770,19 +770,6 @@ static void machine_class_finalize(ObjectClass *klass, void *data)
-     g_free(mc->name);
+diff --git a/accel/accel.c b/accel/accel.c
+index 7c079a5..fa85844 100644
+--- a/accel/accel.c
++++ b/accel/accel.c
+@@ -120,6 +120,12 @@ void configure_accelerator(MachineState *ms)
+     }
  }
  
--static void register_compat_prop(const char *driver,
--                                 const char *property,
--                                 const char *value)
--{
--    GlobalProperty *p = g_new0(GlobalProperty, 1);
--    /* Machine compat_props must never cause errors: */
--    p->errp = &error_abort;
--    p->driver = driver;
--    p->property = property;
--    p->value = value;
--    qdev_prop_register_global(p);
--}
--
- static void machine_register_compat_for_subclass(ObjectClass *oc, void *opaque)
++void accel_register_compat_props(AccelState *accel)
++{
++    AccelClass *class = ACCEL_GET_CLASS(accel);
++    register_compat_props_array(class->global_props);
++}
++
+ static void register_accel_types(void)
  {
-     GlobalProperty *p = opaque;
+     type_register_static(&accel_type);
 diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index 68cd653..adf62ad 100644
+index adf62ad..f11d578 100644
 --- a/hw/core/qdev-properties.c
 +++ b/hw/core/qdev-properties.c
-@@ -1084,6 +1084,20 @@ void qdev_prop_register_global(GlobalProperty *prop)
-     global_props = g_list_append(global_props, prop);
+@@ -1098,6 +1098,13 @@ void register_compat_prop(const char *driver,
+     qdev_prop_register_global(p);
  }
  
-+void register_compat_prop(const char *driver,
-+                          const char *property,
-+                          const char *value)
++void register_compat_props_array(GlobalProperty *prop)
 +{
-+    GlobalProperty *p = g_new0(GlobalProperty, 1);
-+
-+    /* Any compat_props must never cause error */
-+    p->errp = &error_abort;
-+    p->driver = driver;
-+    p->property = property;
-+    p->value = value;
-+    qdev_prop_register_global(p);
++    for (; prop && prop->driver; prop++) {
++        register_compat_prop(prop->driver, prop->property, prop->value);
++    }
 +}
 +
  void qdev_prop_register_global_list(GlobalProperty *props)
  {
      int i;
 diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-index 1e5c928..4ab4359 100644
+index 4ab4359..0ef7b21 100644
 --- a/include/hw/qdev-properties.h
 +++ b/include/hw/qdev-properties.h
-@@ -208,6 +208,29 @@ void error_set_from_qdev_prop_error(Error **errp, int ret, DeviceState *dev,
-                                     Property *prop, const char *value);
+@@ -229,6 +229,12 @@ void error_set_from_qdev_prop_error(Error **errp, int ret, DeviceState *dev,
+  */
+ void register_compat_prop(const char *driver, const char *property,
+                           const char *value);
++/*
++ * register_compat_props_array(): using register_compat_prop(), which
++ * only registers internal global properties (which has lower priority
++ * than user-provided global properties)
++ */
++void register_compat_props_array(GlobalProperty *prop);
  
  /**
-+ * register_compat_prop:
-+ *
-+ * Register internal (not user-provided) global property, changing the
-+ * default value of a given property in a device type.  This can be used
-+ * for enabling machine-type compatibility or for enabling
-+ * accelerator-specific defaults in devices.
-+ *
-+ * The property values set using this function must be always valid and
-+ * never report setter errors, as they property have
-+ * GlobalProperty::errp set to &error_abort.
-+ *
-+ * User-provided global properties should override internal global
-+ * properties, so callers of this function should ensure that it is
-+ * called before user-provided global properties are registered.
-+ *
-+ * @driver: Device type to be affected
-+ * @property: Property whose default value is going to be changed
-+ * @value: New default value for the property
-+ */
-+void register_compat_prop(const char *driver, const char *property,
-+                          const char *value);
-+
-+/**
   * qdev_property_add_static:
-  * @dev: Device to add the property to.
-  * @prop: The qdev property definition.
+diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
+index 15944c1..ecc5c84 100644
+--- a/include/sysemu/accel.h
++++ b/include/sysemu/accel.h
+@@ -24,6 +24,7 @@
+ #define HW_ACCEL_H
+ 
+ #include "qom/object.h"
++#include "hw/qdev-properties.h"
+ 
+ typedef struct AccelState {
+     /*< private >*/
+@@ -40,6 +41,14 @@ typedef struct AccelClass {
+     int (*available)(void);
+     int (*init_machine)(MachineState *ms);
+     bool *allowed;
++    /*
++     * Array of global properties that would be applied when specific
++     * accelerator is chosen. It works like MachineClass.compat_props
++     * but it's for accelerators not machines. Accelerator-provided
++     * global properties may be overridden by machine-type
++     * compat_props or user-provided global properties.
++     */
++    GlobalProperty *global_props;
+ } AccelClass;
+ 
+ #define TYPE_ACCEL "accel"
+@@ -57,5 +66,7 @@ typedef struct AccelClass {
+ extern int tcg_tb_size;
+ 
+ void configure_accelerator(MachineState *ms);
++/* Register accelerator specific global properties */
++void accel_register_compat_props(AccelState *accel);
+ 
+ #endif
+diff --git a/vl.c b/vl.c
+index 59fea15..4452d7a 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4571,6 +4571,7 @@ int main(int argc, char **argv, char **envp)
+             exit (i == 1 ? 1 : 0);
+     }
+ 
++    accel_register_compat_props(current_machine->accelerator);
+     machine_register_compat_props(current_machine);
+ 
+     qemu_opts_foreach(qemu_find_opts("global"),
 -- 
 2.7.4
