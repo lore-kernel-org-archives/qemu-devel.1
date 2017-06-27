@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dPn3x-0003wS-Ht
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 05:45:39 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dPn4O-00049a-Nz
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 05:46:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dPn3t-0004xo-K8
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 05:45:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43812)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dPn3t-0004wY-Ej
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 05:45:33 -0400
-Date: Tue, 27 Jun 2017 10:45:26 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170627094526.GA13634@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170616101246.1550-1-berrange@redhat.com>
-	<20170616101246.1550-6-berrange@redhat.com>
-	<a9cce9f7-27eb-34dd-bb9a-efc9049c00b1@redhat.com>
-	<af6452ce-af71-1f92-e744-a370d35ac8dc@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1dPn4L-0005Fd-KJ
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 05:46:04 -0400
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:34283)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dPn4L-0005Dr-DE
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 05:46:01 -0400
+Received: by mail-wr0-x236.google.com with SMTP id 77so156408914wrb.1
+	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 02:45:59 -0700 (PDT)
+References: <20170621024831.26019-1-rth@twiddle.net>
+	<20170621024831.26019-14-rth@twiddle.net>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170621024831.26019-14-rth@twiddle.net>
+Date: Tue, 27 Jun 2017 10:46:48 +0100
+Message-ID: <87r2y5wynr.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <af6452ce-af71-1f92-e744-a370d35ac8dc@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 5/5] tests: add functional test
- validating ipv4/ipv6 address flag handling
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 13/16] tcg: Export temp_idx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +30,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@gmail.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, aurelien@aurel32.net
 
-On Mon, Jun 26, 2017 at 09:30:38PM -0500, Eric Blake wrote:
-> On 06/26/2017 09:10 PM, Eric Blake wrote:
-> > On 06/16/2017 05:12 AM, Daniel P. Berrange wrote:
-> >> The semantics around handling ipv4=on|off & ipv6=on|off are quite
-> >> subtle to understand in combination with the various hostname addresses
-> >> and backend types. Introduce a massive test matrix that launches QEMU
-> >> and validates the ability to connect a client on each protocol as
-> >> appropriate.
-> >>
-> >> The test requires that the host has ability to bind to both :: and
-> >> 0.0.0.0, on port 9000. If either protocol is not available, or if
-> >> something is already listening on that port the test will skip.
-> >>
-> >> Although it isn't using the QTest APIs, it expects the
-> >> QTEST_QEMU_BINARY env variable to be set.
-> > 
-> > I note that on failure, v3 created test-sockets-proto.pid in the current
-> > working directory (the top level, if I ran 'make check-qtest') rather
-> > than under the tests/ subdirectory or even better under a scratch
-> > location that gets automatically cleaned up regardless of failure mode.
-> > 
-> > Since v3 failed for me, but v4 passes (and cleans up on success), I
-> > can't say if that is still a problem in v4.
-> 
-> Scratch that - I just confirmed that 'test-sockets-proto.pid' is still
-> created and now listed by 'git status' as a stray file after my in-tree
-> build 'make check', even though the test passed.
 
-Yep, I notice that I completely forgot to delete the pid file after
-reading it.
+Richard Henderson <rth@twiddle.net> writes:
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> At the same time, drop the TCGContext argument and use tcg_ctx instead.
+>
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
+> ---
+>  tcg/tcg.c | 15 ++++-----------
+>  tcg/tcg.h |  7 ++++++-
+>  2 files changed, 10 insertions(+), 12 deletions(-)
+>
+> diff --git a/tcg/tcg.c b/tcg/tcg.c
+> index f8d96fa..26931a7 100644
+> --- a/tcg/tcg.c
+> +++ b/tcg/tcg.c
+> @@ -473,13 +473,6 @@ void tcg_func_start(TCGContext *s)
+>      s->be = tcg_malloc(sizeof(TCGBackendData));
+>  }
+>
+> -static inline int temp_idx(TCGContext *s, TCGTemp *ts)
+> -{
+> -    ptrdiff_t n = ts - s->temps;
+> -    tcg_debug_assert(n >= 0 && n < s->nb_temps);
+> -    return n;
+> -}
+> -
+>  static inline TCGTemp *tcg_temp_alloc(TCGContext *s)
+>  {
+>      int n = s->nb_temps++;
+> @@ -516,7 +509,7 @@ static int tcg_global_reg_new_internal(TCGContext *s, TCGType type,
+>      ts->name = name;
+>      tcg_regset_set_reg(s->reserved_regs, reg);
+>
+> -    return temp_idx(s, ts);
+> +    return temp_idx(ts);
+>  }
+>
+>  void tcg_set_frame(TCGContext *s, TCGReg reg, intptr_t start, intptr_t size)
+> @@ -605,7 +598,7 @@ int tcg_global_mem_new_internal(TCGType type, TCGv_ptr base,
+>          ts->mem_offset = offset;
+>          ts->name = name;
+>      }
+> -    return temp_idx(s, ts);
+> +    return temp_idx(ts);
+>  }
+>
+>  static int tcg_temp_new_internal(TCGType type, int temp_local)
+> @@ -645,7 +638,7 @@ static int tcg_temp_new_internal(TCGType type, int temp_local)
+>              ts->temp_allocated = 1;
+>              ts->temp_local = temp_local;
+>          }
+> -        idx = temp_idx(s, ts);
+> +        idx = temp_idx(ts);
+>      }
+>
+>  #if defined(CONFIG_DEBUG_TCG)
+> @@ -963,7 +956,7 @@ static void tcg_reg_alloc_start(TCGContext *s)
+>  static char *tcg_get_arg_str_ptr(TCGContext *s, char *buf, int buf_size,
+>                                   TCGTemp *ts)
+>  {
+> -    int idx = temp_idx(s, ts);
+> +    int idx = temp_idx(ts);
+>
+>      if (ts->temp_global) {
+>          pstrcpy(buf, buf_size, ts->name);
+> diff --git a/tcg/tcg.h b/tcg/tcg.h
+> index 4f69d0c..b75a745 100644
+> --- a/tcg/tcg.h
+> +++ b/tcg/tcg.h
+> @@ -733,13 +733,18 @@ struct TCGContext {
+>  extern TCGContext tcg_ctx;
+>  extern bool parallel_cpus;
+>
+> -static inline TCGArg temp_arg(TCGTemp *ts)
+> +static inline size_t temp_idx(TCGTemp *ts)
+>  {
+>      ptrdiff_t n = ts - tcg_ctx.temps;
+>      tcg_debug_assert(n >= 0 && n < tcg_ctx.nb_temps);
+>      return n;
+>  }
+>
+> +static inline TCGArg temp_arg(TCGTemp *ts)
+> +{
+> +    return temp_idx(ts);
+> +}
+
+I'm confused at the dropping of TCGArg in favour of size_t only for
+temp_arg to implicitly cast it back. Was this meant to be part of
+another patch?
+
+> +
+>  static inline TCGTemp *arg_temp(TCGArg a)
+>  {
+>      return a == TCG_CALL_DUMMY_ARG ? NULL : &tcg_ctx.temps[a];
+
+
+--
+Alex Bennée
