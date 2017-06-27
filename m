@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35506)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dPvaf-0002CC-HO
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 14:51:58 -0400
+	(envelope-from <laurent@vivier.eu>) id 1dPvuv-0006KM-01
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 15:12:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dPvac-0001X6-GD
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 14:51:57 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:51571)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dPvac-0001WN-2g
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 14:51:54 -0400
-Date: Tue, 27 Jun 2017 14:51:52 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170627185152.GA20939@flamenco>
-References: <20161202210152.6880-1-lersek@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161202210152.6880-1-lersek@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] scripts: add "git.orderfile" for
- ordering diff hunks by pathname patterns
+	(envelope-from <laurent@vivier.eu>) id 1dPvur-0001Mr-QO
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 15:12:52 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:50871)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dPvur-0001LH-Gf
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 15:12:49 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Tue, 27 Jun 2017 21:12:18 +0200
+Message-Id: <20170627191221.31650-5-laurent@vivier.eu>
+In-Reply-To: <20170627191221.31650-1-laurent@vivier.eu>
+References: <20170627191221.31650-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH v3 4/7] softfloat: define floatx80_round()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,38 +23,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu devel list <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
 
-On Fri, Dec 02, 2016 at 22:01:52 +0100, Laszlo Ersek wrote:
-> When passed to git-diff (and to every other git command producing diffs
-> and/or diffstats) with "-O" or "diff.orderFile", this list of patterns
-> will place the more declarative / abstract hunks first, while changes to
-> imperative code / details will be near the end of the patches. This saves
-> on scrolling / searching and makes for easier reviewing.
-> 
-> We intend to advise contributors in the Wiki to run
-> 
->   git config diff.orderFile scripts/git.orderfile
-> 
-> once, as part of their initial setup, before formatting their first (or,
-> for repeat contributors, next) patches.
-> 
-> See the "-O" option and the "diff.orderFile" configuration variable in
-> git-diff(1) and git-config(1).
-> 
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Eric Blake <eblake@redhat.com>
-> Cc: Fam Zheng <famz@redhat.com>
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Cc: John Snow <jsnow@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: Stefan Hajnoczi <stefanha@gmail.com>
-> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-> ---
+Add a function to round a floatx80 to the defined precision
+(floatx80_rounding_precision)
 
-Refloating 6+ months later, but..
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+---
+ fpu/softfloat.c         | 15 +++++++++++++++
+ include/fpu/softfloat.h |  1 +
+ 2 files changed, 16 insertions(+)
 
-Someone please merge this! :-)
-
-		E.
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index 7af14e2..e9bf359 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -5086,6 +5086,21 @@ float128 floatx80_to_float128(floatx80 a, float_status *status)
+ }
+ 
+ /*----------------------------------------------------------------------------
++| Rounds the extended double-precision floating-point value `a'
++| and returns the result as an extended double-precision floating-point
++| value.  The operation is performed according to the IEC/IEEE Standard for
++| Binary Floating-Point Arithmetic.
++*----------------------------------------------------------------------------*/
++
++floatx80 floatx80_round(floatx80 a, float_status *status)
++{
++    return roundAndPackFloatx80(status->floatx80_rounding_precision,
++                                extractFloatx80Sign(a),
++                                extractFloatx80Exp(a),
++                                extractFloatx80Frac(a), 0, status);
++}
++
++/*----------------------------------------------------------------------------
+ | Rounds the extended double-precision floating-point value `a' to an integer,
+ | and returns the result as an extended quadruple-precision floating-point
+ | value.  The operation is performed according to the IEC/IEEE Standard for
+diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+index f1288ef..d9689ec 100644
+--- a/include/fpu/softfloat.h
++++ b/include/fpu/softfloat.h
+@@ -621,6 +621,7 @@ float128 floatx80_to_float128(floatx80, float_status *status);
+ /*----------------------------------------------------------------------------
+ | Software IEC/IEEE extended double-precision operations.
+ *----------------------------------------------------------------------------*/
++floatx80 floatx80_round(floatx80 a, float_status *status);
+ floatx80 floatx80_round_to_int(floatx80, float_status *status);
+ floatx80 floatx80_add(floatx80, floatx80, float_status *status);
+ floatx80 floatx80_sub(floatx80, floatx80, float_status *status);
+-- 
+2.9.4
