@@ -1,26 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dPrGZ-0000OQ-63
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 10:14:56 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dPrLg-0002W2-Ig
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 10:20:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dPrGV-0000rB-2n
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 10:14:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38088)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dPrLd-0006Na-A4
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 10:20:12 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:9386 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dPrGU-0000hx-Pa
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 10:14:50 -0400
-References: <20170614152106.25533-1-vadim.galitsyn@profitbricks.com>
-	<20170627160512.705f6d8e@nial.brq.redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <4a4aa9ac-39d2-c549-4955-0d18fa30fd14@redhat.com>
-Date: Tue, 27 Jun 2017 09:14:44 -0500
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dPrLc-0006E3-Tv
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 10:20:09 -0400
+References: <20170605123908.18777-1-pbonzini@redhat.com>
+	<20170605123908.18777-17-pbonzini@redhat.com>
+	<e138c191-5f28-ff50-1b86-d4d1a416eadc@virtuozzo.com>
+	<37960694-8f25-8201-5f17-e59c3ee67e90@redhat.com>
+	<eb056c7c-2bd7-e9b2-cebb-30f716386d00@virtuozzo.com>
+	<c9855403-a641-31a7-f6e9-db0388c4b73a@redhat.com>
+	<5ed4c5a0-11f3-14e7-77e6-47fa01a07d75@virtuozzo.com>
+	<af36087e-de08-4a30-53f7-0a9fafb56a88@redhat.com>
+	<3a438db2-2c6d-e07b-94eb-b7c08073b9ae@virtuozzo.com>
+	<e2816225-b5a7-6d60-9772-bff478b10a92@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <13257113-2f2b-ccf5-93d1-66b2b963efce@virtuozzo.com>
+Date: Tue, 27 Jun 2017 17:20:04 +0300
 MIME-Version: 1.0
-In-Reply-To: <20170627160512.705f6d8e@nial.brq.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Dd3HHjB1Mp1il9BDMF6VCuJD5MsT15MqG"
-Subject: Re: [Qemu-devel] [PATCH v3] hmp,
- qmp: introduce "info memory" and "query-memory" commands
+In-Reply-To: <e2816225-b5a7-6d60-9772-bff478b10a92@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 16/19] block: protect modification of dirty
+ bitmaps with a mutex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,104 +38,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
-Cc: Mohammed Gamal <mohammed.gamal@profitbricks.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Vasilis Liaskovitis <vasilis.liaskovitis@profitbricks.com>, Eduardo Otubo <eduardo.otubo@profitbricks.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: famz@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Dd3HHjB1Mp1il9BDMF6VCuJD5MsT15MqG
-From: Eric Blake <eblake@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>,
- Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
-Cc: Mohammed Gamal <mohammed.gamal@profitbricks.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Vasilis Liaskovitis <vasilis.liaskovitis@profitbricks.com>,
- Eduardo Otubo <eduardo.otubo@profitbricks.com>
-Message-ID: <4a4aa9ac-39d2-c549-4955-0d18fa30fd14@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] hmp, qmp: introduce "info memory" and
- "query-memory" commands
-References: <20170614152106.25533-1-vadim.galitsyn@profitbricks.com>
- <20170627160512.705f6d8e@nial.brq.redhat.com>
-In-Reply-To: <20170627160512.705f6d8e@nial.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 06/27/2017 09:05 AM, Igor Mammedov wrote:
-> On Wed, 14 Jun 2017 17:21:06 +0200
-> Vadim Galitsyn <vadim.galitsyn@profitbricks.com> wrote:
->=20
-
->> +void hmp_info_memory(Monitor *mon, const QDict *qdict)
->> +{
->> +    Error *err =3D NULL;
->> +    MemoryInfo *info =3D qmp_query_memory(&err);
->> +    if (info) {
->> +        monitor_printf(mon, "base-memory: %" PRIu64 "\n",
->> +                       info->base_memory);
->> +        monitor_printf(mon, "hot-plug-memory: %" PRIu64 "\n",
->> +                       info->hot_plug_memory);
-> it shouldn't be printed if hotplug is not enabled
-
-In which case, the QAPI change in the .json file should mark it as
-'*hot-plug-memory', to make it an optional field, and you'll need to
-check/set info->has_hot_plug_memory as appropriate.
-
->=20
->> +        monitor_printf(mon, "ballooned-actual-memory: %" PRIu64 "\n",=
-
->> +                       info->ballooned_actual_memory);
->> +        g_free(info);
->=20
-> probably there is autogenerated qapi_free_FOO() for MemInfo type
-
-Yes, there is.
-
-> since it's QAPI type, it should be used here instead of g_free() if it =
-exists.
-
-Yes, that is correct.
+27.06.2017 16:58, Paolo Bonzini wrote:
+>
+> On 27/06/2017 15:51, Vladimir Sementsov-Ogievskiy wrote:
+>>>> bdrv_create_dirty_bitmap(...)
+>>>>
+>>>> bdrv_dirty_bitmaps_lock(bs)
+>>>>
+>>>> bitmap  = bdrv_find_dirty_bitmap(bs, name)
+>>>>
+>>>> <some changes>
+>>>>
+>>>> bdrv_dirty_bitmaps_unlock(bs)
+>>>>
+>>>> - because we can't now trust the pointer returned by
+>>>> bdrv_create_dirty_bitmap, as it releases bitmap lock before return.
+>>> If you have the big QEMU lock (you do if you are in the QEMU monitor),
+>>> you are protected from changes to the list of bitmaps.
+>>>
+>>> Paolo
+>> but you wrote "Writing to the list requires the BQL _and_ the
+>> dirty_bitmap_mutex".
+>>
+>> should it be BQL only?
+> bdrv_dirty_bitmaps_lock/unlock is (should be) called by the functions
+> that write to the list.  I hope I can post the patch today already.
+>
+> Paolo
 
 
->> +#
->> +# @ballooned-actual-memory: amount of guest memory available after ba=
-llooning.
->> +#
->> +# Since: 2.10.0
->> +##
->> +{ 'struct': 'MemoryInfo',
->> +  'data'  : { 'base-memory': 'int',
->> 'hot-plug-memory': 'int',
-> should be optional and shown only if hotplug is actually enabled
->=20
->> +              'ballooned-actual-memory': 'int' } }
-> maybe the same for ballooning
+I'm likely not right, but for me introducing this mutex looks like dirty 
+bitmaps may be accessed from concurrent threads. So for me it looks 
+strange that only accessors are protected by the mutex and not the whole 
+transactions.
 
-Yes, that makes sense to have both of those stats be optional, since
-they are opt-in configurations.
+One example I've wrote above, other examples from code: are 
+qmp_block_dirty_bitmap** functions:
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+bdrv_create_dirty_bitmap() {
+
+    bdrv_find_dirty_bitmap()
+
+    ....
+
+bdrv_dirty_bitmaps_lock(bs);
+    QLIST_INSERT_HEAD(&bs->dirty_bitmaps, bitmap, list);
+    bdrv_dirty_bitmaps_unlock(bs);
+
+}
+
+- we protect inserting into list from other threads, but what prevent 
+creating bitmap with the same name from other thread after 
+bdrv_find_dirty_bitmap() and before bdrv_dirty_bitmaps_lock() ?
 
 
---Dd3HHjB1Mp1il9BDMF6VCuJD5MsT15MqG
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+-----
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+qmp_block_dirty_bitmap_clear() {
 
-iQEcBAEBCAAGBQJZUmhUAAoJEKeha0olJ0NqaKIH+wRvzT0XRvDgpk88vDETJKTh
-qu8D6za7o5xPQh4kc03ZPIDxDv3PgyTt9zlgFgb0FwIMFM2du2xK1NH5swWL/Uqq
-XvmwMBG4zkFPpaa28opn1VNxnTG1+UE1wDLWMmPDYAGZ6+e8hcKACyj9lKKhRb4i
-YRwpBgjZhrH1pWgFTwoijUX7bDyiS/iLKaugSNft2Lt0NUf3ASKLtTKr0O0ZSzav
-cY7FbLWXC6cw+vhLSyARS3Pu+MrXAu9KpEvdx4teay52T2XwHJMlEdJlsq+jqLbm
-38h6LpQq+PWMrJUOb9OFIvqa2vpLwODdu1yPw/888BGprPPS67dS31lAL0KZyKM=
-=rx/E
------END PGP SIGNATURE-----
+     bitmap = block_dirty_bitmap_lookup()
 
---Dd3HHjB1Mp1il9BDMF6VCuJD5MsT15MqG--
+....
+
+     bdrv_clear_dirty_bitmap()
+
+}
+
+- bdrv_clear_dirty_bitmap is protected by lock, but what prevent 
+deleting this bitmap by other thread between block_dirty_bitmap_lookup() 
+and bdrv_clear_dirty_bitmap() ?
+
+
+--- it is not the whole list ---
+
+-- 
+Best regards,
+Vladimir
