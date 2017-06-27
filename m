@@ -1,20 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dPpJJ-0004Bf-Hw
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 08:09:42 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dPpPn-00060q-1f
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 08:16:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dPpJG-0000Kx-Cg
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 08:09:37 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20170623124700.1389-2-el13635@mail.ntua.gr>
-References: <20170623124700.1389-1-el13635@mail.ntua.gr>
-	<20170623124700.1389-2-el13635@mail.ntua.gr>
-Date: Tue, 27 Jun 2017 14:08:54 +0200
-Message-ID: <w51bmp9zl7t.fsf@maestria.local.igalia.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dPpPj-0004Mt-UV
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 08:16:19 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:33774)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dPpPj-0004Mf-P3
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 08:16:15 -0400
+Received: by mail-qt0-x244.google.com with SMTP id c20so3487239qte.0
+	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 05:16:15 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170623164557.11636-1-f4bug@amsat.org>
+	<20170623194557.GD3038@localhost.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <149191aa-efce-fcc2-71f6-a029bfbbc042@amsat.org>
+Date: Tue, 27 Jun 2017 09:16:10 -0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH RFC v3 1/8] block: move ThrottleGroup
- membership to ThrottleGroupMember
+In-Reply-To: <20170623194557.GD3038@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/3] hw/core: minor fixups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,84 +35,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>
-Cc: qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Alistair Francis <alistair.francis@xilinx.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-On Fri 23 Jun 2017 02:46:53 PM CEST, Manos Pitsidianakis wrote:
-> This commit gathers ThrottleGroup membership details from
-> BlockBackendPublic into ThrottleGroupMember and refactors existing code
-> to use the structure.
->
-> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Hi Eduardo,
 
-Hey Manos, thanks for the patch. It looks good to me in general, I only
-have a couple of comments:
+On 06/23/2017 04:45 PM, Eduardo Habkost wrote:
+> Do you have a simple way to trigger the error paths addressed by patches 1/3
+> and 2/3?
 
->      /* If no IO are queued for scheduling on the next round robin token
-> -     * then decide the token is the current bs because chances are
-> -     * the current bs get the current request queued.
-> +     * then decide the token is the current tgm because chances are
-> +     * the current tgm get the current request queued.
+For 1/3 "elf-loader: warn about invalid endianess":
 
-I wonder if it's not better to use 'member' instead of 'tgm' in general.
-My impression is that the former is clearer and not too long, but I
-don't have a very strong opinion so you can keep it like this if you
-want.
+$ wget -q 
+https://people.debian.org/~aurel32/qemu/mips/vmlinux-3.2.0-4-4kc-malta
 
-> -/* Check if an I/O request needs to be throttled, wait and set a timer
-> - * if necessary, and schedule the next request using a round robin
-> - * algorithm.
-> +/* Check if an I/O request needs to be throttled, wait and set a timer if
-> + * necessary, and schedule the next request using a round robin algorithm.
->   *
+$ file vmlinux-3.2.0-4-4kc-malta
+vmlinux-3.2.0-4-4kc-malta: ELF 32-bit MSB executable, MIPS, MIPS32 
+version 1 (SYSV), statically linked, 
+BuildID[sha1]=66b8748075269e8aedb91d363050f74af8a0ebdd, not stripped
 
-There's a few cases like this when you reformat a paragraph but don't
-actually change the text. I think it just adds unnecessary noise to the
-diff...
+$ qemu-system-mipsel -version
+QEMU emulator version 2.8.1(Debian 1:2.8+dfsg-6)
+Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
 
-> --- a/include/qemu/throttle.h
-> +++ b/include/qemu/throttle.h
-> @@ -27,6 +27,7 @@
->  
->  #include "qemu-common.h"
->  #include "qemu/timer.h"
-> +#include "qemu/coroutine.h"
->  
->  #define THROTTLE_VALUE_MAX 1000000000000000LL
->  
-> @@ -153,4 +154,29 @@ bool throttle_schedule_timer(ThrottleState *ts,
->  
->  void throttle_account(ThrottleState *ts, bool is_write, uint64_t size);
->  
-> +
-> +/* The ThrottleGroupMember structure indicates membership in a ThrottleGroup
-> + * and holds related data.
-> + */
-> +
-> +typedef struct ThrottleGroupMember {
-> +    /* throttled_reqs_lock protects the CoQueues for throttled requests.  */
-> +    CoMutex      throttled_reqs_lock;
-> +    CoQueue      throttled_reqs[2];
-> +
-> +    /* Nonzero if the I/O limits are currently being ignored; generally
-> +     * it is zero.  Accessed with atomic operations.
-> +     */
-> +    unsigned int io_limits_disabled;
-> +
-> +    /* The following fields are protected by the ThrottleGroup lock.
-> +     * See the ThrottleGroup documentation for details.
-> +     * throttle_state tells us if I/O limits are configured. */
-> +    ThrottleState *throttle_state;
-> +    ThrottleTimers throttle_timers;
-> +    unsigned       pending_reqs[2];
-> +    QLIST_ENTRY(ThrottleGroupMember) round_robin;
-> +
-> +} ThrottleGroupMember;
-> +
+$ qemu-system-mipsel -kernel vmlinux-3.2.0-4-4kc-malta
+qemu: could not load kernel 'vmlinux-3.2.0-4-4kc-malta'
 
-Any reason why you add this to throttle.h (which is generic throttling
-code independent from the block layer) and not to throttle-groups.h?
+Once applied:
 
-Otherwise it all looks good to me, thanks!
+$ mipsel-softmmu/qemu-system-mipsel -kernel vmlinux-3.2.0-4-4kc-malta
+vmlinux-3.2.0-4-4kc-malta: wrong endianess
+qemu: could not load kernel 'vmlinux-3.2.0-4-4kc-malta'
 
-Berto
+It could be more verbose/nicer.
+
+I'm doing some dual endianness tests and sometimes it happened I only 
+notice I'm stupid enough to load the wrong elf once stepping in gdb...
+
+
+For 2/3 "fix missing return value in load_image_targphys_as()" I 
+extracted it from a WiP branch "unify-arm-mips-loaders" think that if I 
+never finish it, at least this one can still be useful for others.
+No commits in this branch since 4months so I don't really remember how 
+it happens, but looking at rom_add_file() I see:
+
+         fprintf(stderr, "Could not open option rom '%s': %s\n",
+                 rom->path, strerror(errno));
+         goto err;
+...
+         fprintf(stderr, "rom: file %-20s: get size error: %s\n",
+                 rom->name, strerror(errno));
+         goto err;
+...
+         fprintf(stderr, "rom: file %-20s: read error: rc=%d (expected 
+%zd)\n",
+                 rom->name, rc, rom->datasize);
+         goto err;
+
+So my guess is again I missed something in the command line I used (used 
+unfinished bash auto-complete which lead to a directory? use zipped 
+rom?) and QEMU was still booting without using the specified rom.
+
+I do remember single stepping there at least 2 times before realize 
+again how stupid I was :)
+
+Regards,
+
+Phil.
