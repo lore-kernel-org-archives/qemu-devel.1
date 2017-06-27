@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dPlbo-0001YA-Ql
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:12:29 -0400
+	(envelope-from <famz@redhat.com>) id 1dPldV-0002uW-R8
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:14:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dPlbj-0001mS-KG
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:12:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33274)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dPlbj-0001mD-DN
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:12:23 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170625192950.17677-1-f4bug@amsat.org>
-Date: Tue, 27 Jun 2017 10:12:16 +0200
-In-Reply-To: <20170625192950.17677-1-f4bug@amsat.org> ("Philippe
-	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Sun,
-	25 Jun 2017 16:29:46 -0300")
-Message-ID: <87podpluhr.fsf@dusky.pond.sub.org>
+	(envelope-from <famz@redhat.com>) id 1dPldQ-0002I9-QN
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:14:13 -0400
+Date: Tue, 27 Jun 2017 16:14:00 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170627081400.GD14166@lemon.lan>
+References: <1496649172-26982-1-git-send-email-ashijeetacharya@gmail.com>
+	<1496649172-26982-8-git-send-email-ashijeetacharya@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 0/4] travis: run all coccinelle scripts
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1496649172-26982-8-git-send-email-ashijeetacharya@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v6 7/8] vmdk: Update metadata for multiple
+ clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +24,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
+To: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Cc: kwolf@redhat.com, jsnow@redhat.com, mreitz@redhat.com, stefanha@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+On Mon, 06/05 13:22, Ashijeet Acharya wrote:
+> Include a next pointer in VmdkMetaData struct to point to the previous
+> allocated L2 table. Modify vmdk_L2update to start updating metadata for
+> allocation of multiple clusters at once.
+> 
+> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+> ---
+>  block/vmdk.c | 128 ++++++++++++++++++++++++++++++++++++++++++++++-------------
+>  1 file changed, 101 insertions(+), 27 deletions(-)
+> 
+> diff --git a/block/vmdk.c b/block/vmdk.c
+> index b671dc9..9fa2414 100644
+> --- a/block/vmdk.c
+> +++ b/block/vmdk.c
+> @@ -137,6 +137,8 @@ typedef struct VmdkMetaData {
+>      int valid;
+>      uint32_t *l2_cache_entry;
+>      uint32_t nb_clusters;
+> +    uint32_t offset;
+> +    struct VmdkMetaData *next;
+>  } VmdkMetaData;
+>  
+>  typedef struct VmdkGrainMarker {
+> @@ -1116,34 +1118,87 @@ exit:
+>      return ret;
+>  }
+>  
+> -static int vmdk_L2update(VmdkExtent *extent, VmdkMetaData *m_data,
+> -                         uint32_t offset)
+> +static int vmdk_alloc_cluster_link_l2(VmdkExtent *extent,
+> +                                      VmdkMetaData *m_data, bool zeroed)
+>  {
+> -    offset = cpu_to_le32(offset);
+> +    int i;
+> +    uint32_t offset, temp_offset;
+> +    int *l2_table_array;
+> +    int l2_array_size;
+> +
+> +    if (zeroed) {
+> +        temp_offset = VMDK_GTE_ZEROED;
+> +    } else {
+> +        temp_offset = m_data->offset;
+> +    }
+> +
+> +    l2_array_size = sizeof(uint32_t) * m_data->nb_clusters;
+> +    l2_table_array = qemu_try_blockalign(extent->file->bs,
+> +                                         QEMU_ALIGN_UP(l2_array_size,
+> +                                                       BDRV_SECTOR_SIZE));
+> +    if (l2_table_array == NULL) {
+> +        return VMDK_ERROR;
+> +    }
+> +    memset(l2_table_array, 0, QEMU_ALIGN_UP(l2_array_size, BDRV_SECTOR_SIZE));
+>      /* update L2 table */
+> +    offset = temp_offset;
+> +    for (i = 0; i < m_data->nb_clusters; i++) {
+> +        l2_table_array[i] = cpu_to_le32(offset);
+> +        if (!zeroed) {
+> +            offset += 128;
 
-> Another item from my 'automated testing' list: use travis-ci to run cocci=
-nelle
-> scripts. This series is more of a PoC. The idea would be to run it once a=
- day
-> only on /master.
->
-> Patch 1 is here only to speedup travis testing.
->
-> Patch 3 add a script which run each cocci script sequencially. If the scr=
-ipt
-> modified any file from the repo, changes are commited. If the script gene=
-rated
-> some output (i.e. using python), this output is logged in an empty commit.
-> Spatch is run thru a debian-based Docker image.
->
-> Patch 4 is the travis job: it calls the previous script. To respect travi=
-s time
-> limit timeout, each script is limited to <10min. If any commit were
-> generated, they are pushed to my gh-repo:
->
-> https://github.com/philmd/qemu/compare/travis-cocci_v1...philmd:autogener=
-ated-coccinelle-20170625-126
->
-> Build output (Ran for 23 min 7 sec):
-> https://travis-ci.org/philmd/qemu/builds/246848085
->
-> Any idea is welcome :)
+s/128/extent->cluster_sectors/?
 
-Are we sure all the Coccinelle scripts always produce desirable and
-correct results?  I often use Coccinelle to do the tedious 95% of the
-job, followed by a bit of manual cleanup.  What if manual cleanup is
-required to make things compile cleanly?  Say because the transformation
-leaves unused variables behind.  What if the transformation is wanted in
-19 out of 20 cases?  Say because it replaces a bulky expression by the
-helper call created for this purpose (good), including in the helper
-function (bad)?
+> +        }
+> +    }
+>      if (bdrv_pwrite_sync(extent->file,
+> -                ((int64_t)m_data->l2_offset * 512)
+> -                    + (m_data->l2_index * sizeof(offset)),
+> -                &offset, sizeof(offset)) < 0) {
+> +                         ((int64_t)m_data->l2_offset * 512)
+> +                         + ((m_data->l2_index) * sizeof(offset)),
+> +                         l2_table_array, l2_array_size) < 0) {
+>          return VMDK_ERROR;
+>      }
+>      /* update backup L2 table */
+>      if (extent->l1_backup_table_offset != 0) {
+>          m_data->l2_offset = extent->l1_backup_table[m_data->l1_index];
+>          if (bdrv_pwrite_sync(extent->file,
+> -                    ((int64_t)m_data->l2_offset * 512)
+> -                        + (m_data->l2_index * sizeof(offset)),
+> -                    &offset, sizeof(offset)) < 0) {
+> +                             ((int64_t)m_data->l2_offset * 512)
+> +                             + ((m_data->l2_index) * sizeof(offset)),
+> +                             l2_table_array, l2_array_size) < 0) {
+>              return VMDK_ERROR;
+>          }
+>      }
+> +
+> +    offset = temp_offset;
+>      if (m_data->l2_cache_entry) {
+> -        *m_data->l2_cache_entry = offset;
+> +        for (i = 0; i < m_data->nb_clusters; i++) {
+> +            *m_data->l2_cache_entry = cpu_to_le32(offset);
+> +            m_data->l2_cache_entry++;
+> +
+> +            if (!zeroed) {
+> +                offset += 128;
+
+Ditto.
+
+> +            }
+> +        }
+>      }
+>  
+> +    qemu_vfree(l2_table_array);
+>      return VMDK_OK;
+>  }
+>  
+> +static int vmdk_L2update(VmdkExtent *extent, VmdkMetaData *m_data,
+> +                         bool zeroed)
+> +{
+> +    int ret;
+> +
+> +    while (m_data->next != NULL) {
+> +
+> +        ret = vmdk_alloc_cluster_link_l2(extent, m_data, zeroed);
+> +        if (ret < 0) {
+> +            return ret;
+> +        }
+> +
+> +        m_data = m_data->next;
+> +     }
+> +
+> +     return VMDK_OK;
+> +}
+> +
+>  /*
+>   * vmdk_l2load
+>   *
+> @@ -1261,9 +1316,10 @@ static int get_cluster_table(VmdkExtent *extent, uint64_t offset,
+>   *
+>   *   VMDK_ERROR:    in error cases
+>   */
+> +
+>  static int vmdk_handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
+>                               uint64_t offset, uint64_t *cluster_offset,
+> -                             int64_t *bytes, VmdkMetaData *m_data,
+> +                             int64_t *bytes, VmdkMetaData **m_data,
+>                               bool allocate, uint32_t *alloc_clusters_counter)
+>  {
+>      int l1_index, l2_offset, l2_index;
+> @@ -1272,6 +1328,7 @@ static int vmdk_handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
+>      uint32_t nb_clusters;
+>      bool zeroed = false;
+>      uint64_t skip_start_bytes, skip_end_bytes;
+> +    VmdkMetaData *old_m_data;
+>      int ret;
+>  
+>      ret = get_cluster_table(extent, offset, &l1_index, &l2_offset,
+> @@ -1323,13 +1380,21 @@ static int vmdk_handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
+>          if (ret < 0) {
+>              return ret;
+>          }
+> -        if (m_data) {
+> -            m_data->valid = 1;
+> -            m_data->l1_index = l1_index;
+> -            m_data->l2_index = l2_index;
+> -            m_data->l2_offset = l2_offset;
+> -            m_data->l2_cache_entry = &l2_table[l2_index];
+> -            m_data->nb_clusters = nb_clusters;
+> +
+> +        if (*m_data) {
+
+Please check m_data != NULL if it's possible, otherwise assert it.
+
+> +            old_m_data = *m_data;
+> +            *m_data = g_malloc0(sizeof(**m_data));
+> +
+> +            **m_data = (VmdkMetaData) {
+> +                .valid            =    1,
+> +                .l1_index         =    l1_index,
+> +                .l2_index         =    l2_index,
+> +                .l2_offset        =    l2_offset,
+> +                .l2_cache_entry   =    &l2_table[l2_index],
+> +                .nb_clusters      =    nb_clusters,
+> +                .offset           =    cluster_sector,
+> +                .next             =    old_m_data,
+> +            };
+>          }
+>      }
+>      *cluster_offset = cluster_sector << BDRV_SECTOR_BITS;
+> @@ -1792,10 +1857,12 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+>      int64_t offset_in_cluster, n_bytes;
+>      uint64_t cluster_offset;
+>      uint64_t bytes_done = 0;
+> -    VmdkMetaData m_data;
+>      uint64_t extent_end;
+> +    VmdkMetaData *m_data;
+>      uint32_t total_alloc_clusters = 0;
+>  
+> +    m_data = g_malloc0(sizeof(*m_data));
+
+You can use "g_new0(VmdkMetaData, 1)" which is more readable.
+
+> +
+>      if (DIV_ROUND_UP(offset, BDRV_SECTOR_SIZE) > bs->total_sectors) {
+>          error_report("Wrong offset: offset=0x%" PRIx64
+>                       " total_sectors=0x%" PRIx64,
+
+Fam
