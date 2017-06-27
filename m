@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dPtkx-0007MS-FD
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:54:30 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dPtkx-0007u9-N8
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:54:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dPtPv-0005kM-Gy
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:32:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49654)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dPtPv-0005jN-84
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:32:43 -0400
-References: <7f0b8d00-236d-37e8-5c1f-e7ea8e4b9146@redhat.com>
-	<e24f5884-5c1a-593d-6ae6-c8c4667a07d5@linux.vnet.ibm.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <6fc5cb94-2cbe-e8ec-7ad7-1aa64cd3a0d1@redhat.com>
-Date: Tue, 27 Jun 2017 18:32:34 +0200
+	(envelope-from <no-reply@patchew.org>) id 1dPtO9-000518-Jc
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:30:56 -0400
+Resent-Message-Id: <E1dPtO9-000518-Jc@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21318)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dPtO9-00050I-Bv
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:30:53 -0400
+Message-ID: <149858104414.186.7439663766588695606@4f20b1c0f442>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <1498554219-4942-1-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <e24f5884-5c1a-593d-6ae6-c8c4667a07d5@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] TPM status
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 27 Jun 2017 09:30:45 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/8] VT-d: some enhancements on iotlb and
+ tools
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,168 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: Amarnath Valluri <amarnath.valluri@intel.com>, qemu devel list <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Jones <pjones@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Javier Martinez Canillas <javierm@redhat.com>
+To: peterx@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, jasowang@redhat.com, mst@redhat.com
 
-On 06/27/17 18:12, Stefan Berger wrote:
-> On 06/14/2017 09:51 AM, Laszlo Ersek wrote:
->> Hi Stefan,
->>
->> the MAINTAINERS file doesn't seem to cover any of the TPM-related files
->> in the tree:
->>
->>    backends/tpm.c
->>    hw/tpm/
->>    include/hw/acpi/tpm.h
->>    include/sysemu/tpm*
->>    tpm.c
->>
->> but I have a gut feeling that you are semi-officially maintaining TPM
->> anyway, so I'm going to ask you. :)
->>
->> Can you please write a document, to be placed under docs/specs/, that
->> describes the TPM device from a guest perspective, also explaining how
->> the guest-visible bits are connected to (current) TPM backend(s)?
->>
->> The document wouldn't have to be very long; I think all standardized
->> interfaces could be mentioned by reference only (by spec names and
->> locations). The document should however describe any QEMU specifics, and
->> how the relevant specs are brought together in the implementation.
->>
->> Some text files I'm familiar with and can recommend as examples:
->> - docs/specs/fw_cfg.txt
->> - docs/specs/pvpanic.txt
->> - docs/specs/vmgenid.txt
->>
->> (There may be more and/or better examples of course.)
->>
->> This document should be the starting point for developers that want to
->> support QEMU's TPM(s) in guest firmware that is different from SeaBIOS.
->> (You've been maintaining the related SeaBIOS feature.)
->>
->> Would you be willing to author such a design document?
-> 
-> Here's what I have so far with pointers to TCG specs. Does that go in
-> the right direction?
-> 
-> 
-> QEMU TPM Device
-> ===============
-> 
-> = Guest-side Hardware Interface =
-> 
-> The QEMU TPM emulation implements a TPM TIS hardware interface following
-> the Trusted Computing Group's specification "TCG PC Client Specific TPM
-> Interface Specification (TIS)", Specifcation Version 1.3, 21 March 2013.
-> This specification, or a later version of it, can be accessed from the
-> following URL:
-> 
-> https://trustedcomputinggroup.org/pc-client-work-group-pc-client-specific-tpm-interface-specification-tis/
-> 
-> 
-> The TIS interface makes a memory mapped IO region in the area 0xfed40000 -
-> 0xfed44fff available to the guest operating system.
-> 
-> = ACPI Interface =
-> 
-> The TPM device is defined with ACPI ID "PNP0C31". QEMU builds a SSDT and
-> passes
-> it into the guest through the fw_cfg device. The device description
-> contains
-> the base address of the TIS interface  0xfed40000 and the size of the
-
-Double space before "0xfed40000".
-
-> MMIO area
-> (0x5000). In case a TPM2 is used by QEMU, a TPM2 ACPI table is also
-> provided. The
-> device is described to be used in polling mode rather than interrupt
-> mode primarily
-> because no unused IRQ could be found.
-> 
-> To support measurements logs to be written by the firmware, e.g.
-> SeaBIOS, a TCPA
-> table is implemented. This table provides a 64kb buffer where the
-> firmware can
-> write its log into.
-
-Does the TCPA table depend on TPM1 vs. TPM2?
-
-> 
-> The TCPA and TPM2 ACPI tables follow the Trusted Computing Group
-> specification
-> "TCG ACPI Specification" Family "1.2" and "2.0", Level 00 Revision
-> 00.37. This
-> specification, or a later version of it, can be accessed from the following
-> URL:
-> 
-> https://trustedcomputinggroup.org/tcg-acpi-specification/
-> 
-> 
-> = TPM backend devices =
-> 
-> The TPM implementation is split into two parts. The one part is the
-> hardware
-> interface, such as the TPM TIS interface described earlier, and the TPM
-> backend
-> interface.
-
-The last sentence here is a bit hard to understand. Can we use
-frontend/backend language? (Already used below, so that's great.)
-
-> The backend interfaces implement the interaction with a TPM
-> device,
-> which may be a physical or an emulated device. The split between the front-
-> and backend devices allows a frontend to be connected with any available
-> backend. This enables the TIS interface to be used with the passthrough
-> backend
-> or the (future) swtpm backend.
-> 
-> 
-> == The QEMU TPM passthrough device ==
-> 
-> In case QEMU is run on Linux as the host operating system it is possible to
-> make the hardware TPM device available to a single QEMU guest. In this
-> case the
-> user must make sure that no other program is using the device, e.g.,
-> /dev/tpm0,
-> before trying to start QEMU with it.
-> 
-> The passthrough driver uses the host's TPM device for sending TPM commands
-> and receiving responses from. Besides that it accesses the TPM device's
-> sysfs
-> entry for support of command cancellation. Since none of the state of a
-> hardware
-> TPM can be migrated between hosts, virtual machine migration is disabled
-> when
-> the TPM passthrough driver is used.
-> 
-> Since the host's TPM device will already be initialize by the host's
-> firmware, certain
-
-I think this line is too long (87 chars) -- I think we should wrap at 79
-chars or so.
-
-> commands, e.g. TPM_Startup(), sent by the virtual firmware for device
-> initialization
-> will fail. In this case the firmware should simply not use the TPM.
-> 
-> Sharing the device with the host is generally not a recommended usage
-> scenario
-> for a TPM device. The primary reason for this is that two operating
-> systems can then
-> access the device's single set of resources, such as platform configuration
-> registers (PCRs), that applications are not expecting to share.
-
-Looks great to me, thank you!
-
-Two requests in addition to the above remarks:
-- can you provide command line options / examples wherever appropriate?
-- can you list the pathnames of the source files that currently
-  implement frontend / backend / ACPI / passthrough, as appropriate?
-
-(I think the next version should be posted as a first class PATCH, for
-wider review.)
-
-Thank you!
-Laszlo
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ5
+ODU1NDIxOS00OTQyLTEtZ2l0LXNlbmQtZW1haWwtcGV0ZXJ4QHJlZGhhdC5jb20KU3ViamVjdDog
+W1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzhdIFZULWQ6IHNvbWUgZW5oYW5jZW1lbnRzIG9uIGlvdGxi
+IGFuZCB0b29scwpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
+L2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwg
+d2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
+dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0t
+Zm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBl
+Y2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVz
+ICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMv
+Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAg
+IGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBT
+Q1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
+ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjFjZjRmNTMgaW50ZWxfaW9t
+bXU6IGltcGxlbWVudCBtcnUgbGlzdCBmb3IgaW90bGIKMWFlMWRkZiBpbnRlbF9pb21tdTogdXNl
+IGFjY2Vzc19mbGFncyBmb3IgaW90bGIKYmFkM2Y3NCBpbnRlbF9pb21tdTogbGV0IGlvdGxiIHNp
+emUgdHVuYWJsZQo3ZGE5NDY0IGludGVsX2lvbW11OiBobXA6IGFsbG93ICItYyIgZm9yICJpbmZv
+IGlvbW11IgpmMmM4YjEwIGludGVsX2lvbW11OiBhZGQgaW90bGIvY29udGV4dCBjYWNoZSBzdGF0
+aXN0aWNzCmUzYTE3NjUgaW50ZWxfaW9tbXU6IHN1cHBvcnQgImluZm8gaW9tbXUiCjdiYjgzNGYg
+aG1wOiBhZGQgaW5mbyBpb21tdQowOTZhODE3IGludGVsX2lvbW11OiBmaXggVlREX1BBR0VfTUFT
+SwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS84OiBpbnRlbF9pb21tdTog
+Zml4IFZURF9QQUdFX01BU0suLi4KRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNo
+b3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMzg6IEZJTEU6IGh3L2kzODYvaW50ZWxf
+aW9tbXVfaW50ZXJuYWwuaDozODc6CisjZGVmaW5lIFZURF9QQUdFX01BU0sgICAgICAgICAgICAg
+ICB+KFZURF9QQUdFX1NJWkUgLSAxKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNiBs
+aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
+dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
+bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVj
+a2luZyBQQVRDSCAyLzg6IGhtcDogYWRkIGluZm8gaW9tbXUuLi4KV0FSTklORzogYXJjaGl0ZWN0
+dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzc5OiBGSUxFOiBpbmNsdWRl
+L2h3L2lvbW11Lmg6MToKKyNpZm5kZWYgX19IV19JT01NVV9IX18KCnRvdGFsOiAwIGVycm9ycywg
+MSB3YXJuaW5ncywgNjMgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
+bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
+dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
+SU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAzLzg6IGludGVsX2lvbW11OiBzdXBwb3J0ICJpbmZv
+IGlvbW11Ii4uLgpDaGVja2luZyBQQVRDSCA0Lzg6IGludGVsX2lvbW11OiBhZGQgaW90bGIvY29u
+dGV4dCBjYWNoZSBzdGF0aXN0aWNzLi4uCkNoZWNraW5nIFBBVENIIDUvODogaW50ZWxfaW9tbXU6
+IGhtcDogYWxsb3cgIi1jIiBmb3IgImluZm8gaW9tbXUiLi4uCkNoZWNraW5nIFBBVENIIDYvODog
+aW50ZWxfaW9tbXU6IGxldCBpb3RsYiBzaXplIHR1bmFibGUuLi4KQ2hlY2tpbmcgUEFUQ0ggNy84
+OiBpbnRlbF9pb21tdTogdXNlIGFjY2Vzc19mbGFncyBmb3IgaW90bGIuLi4KQ2hlY2tpbmcgUEFU
+Q0ggOC84OiBpbnRlbF9pb21tdTogaW1wbGVtZW50IG1ydSBsaXN0IGZvciBpb3RsYi4uLgo9PT0g
+T1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVt
+YWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9y
+Zy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3Rz
+Lm9yZw==
