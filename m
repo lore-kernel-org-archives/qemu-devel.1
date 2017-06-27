@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dPv7a-0002lM-LG
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 14:21:55 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dPv9y-0003zD-Eb
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 14:24:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dPv7Z-0006Zv-Ne
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 14:21:54 -0400
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-References: <20170627152248.10446-1-pbonzini@redhat.com>
-Message-ID: <cfacf2a9-6b98-fc45-ee3a-14ce7deb3932@redhat.com>
-Date: Tue, 27 Jun 2017 20:21:42 +0200
+	(envelope-from <jsnow@redhat.com>) id 1dPv9x-0007Ma-IE
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 14:24:22 -0400
+References: <20170627163145.GC4792@noname.redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <612358d1-4be0-7118-0e88-d5fce2b19d18@redhat.com>
+Date: Tue, 27 Jun 2017 14:24:12 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170627152248.10446-1-pbonzini@redhat.com>
+In-Reply-To: <20170627163145.GC4792@noname.redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 00/10] Block layer thread-safety, part 2
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC] QMP design: Fixing query-block
+ and friends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,70 +24,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: armbru@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
 
 
 
-On 27/06/2017 17:22, Paolo Bonzini wrote:
-> This part takes care of drivers and devices, making sure that they can
-> accept concurrent I/O from multiple AioContext.
+On 06/27/2017 12:31 PM, Kevin Wolf wrote:
+> Hi,
 > 
-> The following drivers are thread-safe without using any QemuMutex/CoMutex:
-> crypto, gluster, null, rbd, win32-aio.  NBD has already been fixed,
-> because the patch fixed an unrelated testcase.
+> I haven't really liked query-block for a long time, but now that
+> blockdev-add and -blockdev have settled, it might finally be the time to
+> actually do something about it. In fact, if used together with these
+> modern interfaces, our query commands are simply broken, so we have to
+> fix something.
 > 
-> The following drivers already use mutexes for everything except possibly
-> snapshots, which do not (yet?) need protection: bochs, cloop, dmg, qcow,
-> parallels, vhdx, vmdk, curl, iscsi, nfs.
-> 
-> The following drivers already use mutexes for _almost_ everything: vpc
-> (missing get_block_status), vdi (missing bitmap access), vvfat (missing
-> commit), not protected), qcow2 (must call CoQueue APIs under CoMutex).
-> They are fixed by patches 1-5.
-> 
-> The following drivers must be changed to use CoMutex to protect internal
-> data: qed (patches 6-8), sheepdog (patch 9).
-> 
-> The following driver must be changed to support I/O from any AioContext:
-> ssh.  It is fixed by patch 10.
-> 
-> Paolo
 
-Nevermind---my tests were confused by some pre-existing failures in
-qemu-iotests (068 for qcow2, caused by the patch dropped in v2 of the
-pull request; 181 for vmdk and vpc).  This series is no good.
+[...words...]
 
-Paolo
-
-> Paolo Bonzini (10):
->   qcow2: call CoQueue APIs under CoMutex
->   coroutine-lock: add qemu_co_rwlock_downgrade and
->     qemu_co_rwlock_upgrade
->   vdi: make it thread-safe
->   vpc: make it thread-safe
->   vvfat: make it thread-safe
->   qed: move tail of qed_aio_write_main to qed_aio_write_{cow,alloc}
->   block: invoke .bdrv_drain callback in coroutine context and from
->     AioContext
->   qed: protect table cache with CoMutex
->   sheepdog: add queue_lock
->   ssh: support I/O from any AioContext
 > 
->  block/io.c                 |  42 +++++++---
->  block/qcow2.c              |   4 +-
->  block/qed-cluster.c        |   4 +-
->  block/qed-l2-cache.c       |   6 ++
->  block/qed-table.c          |  24 ++++--
->  block/qed.c                | 195 +++++++++++++++++++++++++++------------------
->  block/qed.h                |  11 ++-
->  block/sheepdog.c           |  21 ++++-
->  block/ssh.c                |  24 ++++--
->  block/vdi.c                |  48 +++++------
->  block/vpc.c                |  20 ++---
->  block/vvfat.c              |   8 +-
->  include/block/block_int.h  |   2 +-
->  include/qemu/coroutine.h   |  18 +++++
->  util/qemu-coroutine-lock.c |  35 ++++++++
->  15 files changed, 316 insertions(+), 146 deletions(-)
+> So how do we go forward from here?
+> 
+> I guess we could add a few hacks o fix the really urgent things, and
+> just adding more information is always possible (at the cost of even
+> more duplication).
+> 
+
+I think you've included this suggestion so that you can summarily
+dismiss it as foolish.
+
+> However, it appears to me that I dislike so many thing about our current
+> query commands that I'm tempted to say: Throw it all away and start
+> over.
+> 
+
+Inclined to agree. The structure of the block layer has changed so much
+in the past few years and this is easily seen by the gap you've outlined
+here.
+
+We have to keep the old query commands around for a while as Eric says,
+but I worry that they are so wrong and misleading as to be actively harmful.
+
+Maybe there's some hair trigger somewhere that if $NEW_FEATURE_X is used
+to configure QEMU in some way, that the old commands can be deprecated
+at runtime, such that we can more aggressively force their retirement.
+
+> If that's what we're going to do, I think I can figure out something
+> nice for block nodes. That shouldn't be too hard. The only question
+> would be whether we want a command to query one node or whether we would
+> keep returning all of them.
+> 
+
+Personally in favor of allowing filtering, as an option. I don't see why
+we couldn't, or why it would be a problem, or worse in any way.
+
+> I am, however, a bit less confident about BBs. As I said above, I
+> consider them part of the qdev devices. As far as I know, there is no
+> high-level infrastructure to query runtime state of devices and qdev
+> properties are supposed to be read-only. Maybe non-qdev QOM properties
+> can be used somehow? But QOM isn't really nice to use as you need to
+> query each property individually.
+> 
+> Another option would be to have a QMP command that takes a qdev ID of a
+> block device and queries its BB. Or maybe it should stay like
+> query-block and return an array of all of them, but include the qdev
+> device name. Actually, maybe query-block can stay as it contains only
+> two fields that are useless in the new world.
+> 
+> 
+> I think this has become long enough now, so any opinions? On anything I
+> said above, but preferably also about what a new interface should look
+> like?
+> 
+
+Sadly (for you, if you want advice) you're probably in the best shape to
+decide such a thing. I like the idea of being able to query parts of the
+tree on a per-device basis, as I think this likely reflects real world
+usage the most.
+
+"I want to do a thing to /dev/sda... what are the backends I am dealing
+with for that?"
+
+I think that's probably most along the "QMP command that takes a qdev
+ID" option that you proposed.
+
+> Kevin
 > 
