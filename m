@@ -1,27 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dPtm2-0006q3-Ua
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:55:39 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dPtm0-0006m9-5K
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:55:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dPsIe-0002pF-Of
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:21:11 -0400
-Received: from mail-lf0-x22e.google.com ([2a00:1450:4010:c07::22e]:33046)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1dPsIe-0002fk-Gv
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:21:08 -0400
-Received: by mail-lf0-x22e.google.com with SMTP id m77so19192536lfe.0
-	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 08:21:06 -0700 (PDT)
-Date: Tue, 27 Jun 2017 17:21:04 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20170627152104.GK4859@toto>
-References: <1497462353-3432-1-git-send-email-edgar.iglesias@gmail.com>
-	<CAFEAcA9OibH=kz7iTc95YBgHM1WGOdHRYSsudx=OfaBHHZbJrg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9OibH=kz7iTc95YBgHM1WGOdHRYSsudx=OfaBHHZbJrg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL v1 0/7] MMIO Exec pull request
+	(envelope-from <pbonzini@redhat.com>) id 1dPsKt-00031e-0f
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:23:28 -0400
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 27 Jun 2017 17:22:41 +0200
+Message-Id: <20170627152248.10446-4-pbonzini@redhat.com>
+In-Reply-To: <20170627152248.10446-1-pbonzini@redhat.com>
+References: <20170627152248.10446-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 03/10] vdi: make it thread-safe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +19,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, KONRAD =?iso-8859-1?Q?Fr=E9d=E9ric?= <fred.konrad@greensocs.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Edgar Iglesias <edgar.iglesias@xilinx.com>
+To: qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com
 
-On Fri, Jun 23, 2017 at 11:54:52AM +0100, Peter Maydell wrote:
-> On 14 June 2017 at 18:45, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
-> > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-> >
-> > Hi,
-> >
-> > Paolo suggested offline that we send a pull request for this series.
-> > Here it is, I've run it through my testsuite + tested the LQSPI testcase
-> > on Zynq.
-> >
-> > Cheers,
-> > Edgar
-> >
-> > The following changes since commit 3f0602927b120a480b35dcf58cf6f95435b3ae91:
-> >
-> >   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20170613' into staging (2017-06-13 15:49:07 +0100)
-> >
-> > are available in the git repository at:
-> >
-> >   git@github.com:edgarigl/qemu.git tags/edgar/mmio-exec.for-upstream
-> >
-> > for you to fetch changes up to 63ef40dd6bc6cfdae5fa67ccac1cb11e7a5161b0:
-> >
-> >   xilinx_spips: allow mmio execution (2017-06-14 17:31:08 +0200)
-> >
-> > ----------------------------------------------------------------
-> > mmio-exec.for-upstream
-> >
-> > ----------------------------------------------------------------
-> > KONRAD Frederic (7):
-> >       cputlb: cleanup get_page_addr_code to use VICTIM_TLB_HIT
-> >       cputlb: move get_page_addr_code
-> >       cputlb: fix the way get_page_addr_code fills the tlb
-> >       qdev: add MemoryRegion property
-> >       introduce mmio_interface
-> >       exec: allow to get a pointer for some mmio memory region
-> >       xilinx_spips: allow mmio execution
-> 
-> Hi Edgar -- since these patches have come via your tree they should
-> have your signed-off-by line, not just Fred's. They also seem to
-> still have all the V1->V2->V3 revision notes in the commit logs.
+The VirtualBox driver is using a mutex to order all allocating writes,
+but it is not protecting accesses to the bitmap because they implicitly
+happen under the AioContext mutex.  Change this to use a CoRwlock
+explicitly.
 
-OK thanks, I'll fix both things for v2.
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ block/vdi.c | 48 ++++++++++++++++++++++++------------------------
+ 1 file changed, 24 insertions(+), 24 deletions(-)
 
-
-> 
-> I'd be happier with a reviewed-by: from somebody for the exec:
-> patch, if possible...
-
-We must have lost mine. Anyway, I've had another review and it looks
-good to me. Of course the more eyes the better...
-
-I'll post a v2 in a moment.
-
-Best regards,
-Edgar
+diff --git a/block/vdi.c b/block/vdi.c
+index 79af47763b..080e1562e3 100644
+--- a/block/vdi.c
++++ b/block/vdi.c
+@@ -172,7 +172,7 @@ typedef struct {
+     /* VDI header (converted to host endianness). */
+     VdiHeader header;
+ 
+-    CoMutex write_lock;
++    CoRwlock bmap_lock;
+ 
+     Error *migration_blocker;
+ } BDRVVdiState;
+@@ -485,7 +485,7 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
+         goto fail_free_bmap;
+     }
+ 
+-    qemu_co_mutex_init(&s->write_lock);
++    qemu_co_rwlock_init(&s->bmap_lock);
+ 
+     return 0;
+ 
+@@ -557,7 +557,9 @@ vdi_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+                n_bytes, offset);
+ 
+         /* prepare next AIO request */
++        qemu_co_rwlock_rdlock(&s->bmap_lock);
+         bmap_entry = le32_to_cpu(s->bmap[block_index]);
++        qemu_co_rwlock_unlock(&s->bmap_lock);
+         if (!VDI_IS_ALLOCATED(bmap_entry)) {
+             /* Block not allocated, return zeros, no need to wait. */
+             qemu_iovec_memset(qiov, bytes_done, 0, n_bytes);
+@@ -595,6 +597,7 @@ vdi_co_pwritev(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+     uint32_t block_index;
+     uint32_t offset_in_block;
+     uint32_t n_bytes;
++    uint64_t data_offset;
+     uint32_t bmap_first = VDI_UNALLOCATED;
+     uint32_t bmap_last = VDI_UNALLOCATED;
+     uint8_t *block = NULL;
+@@ -614,10 +617,19 @@ vdi_co_pwritev(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+                n_bytes, offset);
+ 
+         /* prepare next AIO request */
++        qemu_co_rwlock_rdlock(&s->bmap_lock);
+         bmap_entry = le32_to_cpu(s->bmap[block_index]);
+         if (!VDI_IS_ALLOCATED(bmap_entry)) {
+             /* Allocate new block and write to it. */
+             uint64_t data_offset;
++            qemu_co_rwlock_upgrade(&s->bmap_lock);
++            bmap_entry = le32_to_cpu(s->bmap[block_index]);
++            if (VDI_IS_ALLOCATED(bmap_entry)) {
++                /* A concurrent allocation did the work for us.  */
++                qemu_co_rwlock_downgrade(&s->bmap_lock);
++                goto nonallocating_write;
++            }
++
+             bmap_entry = s->header.blocks_allocated;
+             s->bmap[block_index] = cpu_to_le32(bmap_entry);
+             s->header.blocks_allocated++;
+@@ -635,30 +647,18 @@ vdi_co_pwritev(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+             memset(block + offset_in_block + n_bytes, 0,
+                    s->block_size - n_bytes - offset_in_block);
+ 
+-            /* Note that this coroutine does not yield anywhere from reading the
+-             * bmap entry until here, so in regards to all the coroutines trying
+-             * to write to this cluster, the one doing the allocation will
+-             * always be the first to try to acquire the lock.
+-             * Therefore, it is also the first that will actually be able to
+-             * acquire the lock and thus the padded cluster is written before
+-             * the other coroutines can write to the affected area. */
+-            qemu_co_mutex_lock(&s->write_lock);
++            /* Write the new block under CoRwLock write-side protection,
++             * so this full-cluster write does not overlap a partial write
++             * of the same cluster, issued from the "else" branch.
++             */
+             ret = bdrv_pwrite(bs->file, data_offset, block, s->block_size);
+-            qemu_co_mutex_unlock(&s->write_lock);
++            qemu_co_rwlock_unlock(&s->bmap_lock);
+         } else {
+-            uint64_t data_offset = s->header.offset_data +
+-                                   (uint64_t)bmap_entry * s->block_size +
+-                                   offset_in_block;
+-            qemu_co_mutex_lock(&s->write_lock);
+-            /* This lock is only used to make sure the following write operation
+-             * is executed after the write issued by the coroutine allocating
+-             * this cluster, therefore we do not need to keep it locked.
+-             * As stated above, the allocating coroutine will always try to lock
+-             * the mutex before all the other concurrent accesses to that
+-             * cluster, therefore at this point we can be absolutely certain
+-             * that that write operation has returned (there may be other writes
+-             * in flight, but they do not concern this very operation). */
+-            qemu_co_mutex_unlock(&s->write_lock);
++nonallocating_write:
++            data_offset = s->header.offset_data +
++                           (uint64_t)bmap_entry * s->block_size +
++                           offset_in_block;
++            qemu_co_rwlock_unlock(&s->bmap_lock);
+ 
+             qemu_iovec_reset(&local_qiov);
+             qemu_iovec_concat(&local_qiov, qiov, bytes_done, n_bytes);
+-- 
+2.13.0
