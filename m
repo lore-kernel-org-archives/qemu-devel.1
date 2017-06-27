@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dPtkx-0007wp-IK
+	(envelope-from <lersek@redhat.com>) id 1dPtkx-0007MS-FD
 	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:54:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dPtP9-0005SR-8y
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:31:56 -0400
-Date: Tue, 27 Jun 2017 18:31:45 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170627163145.GC4792@noname.redhat.com>
+	(envelope-from <lersek@redhat.com>) id 1dPtPv-0005kM-Gy
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:32:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49654)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dPtPv-0005jN-84
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:32:43 -0400
+References: <7f0b8d00-236d-37e8-5c1f-e7ea8e4b9146@redhat.com>
+	<e24f5884-5c1a-593d-6ae6-c8c4667a07d5@linux.vnet.ibm.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <6fc5cb94-2cbe-e8ec-7ad7-1aa64cd3a0d1@redhat.com>
+Date: Tue, 27 Jun 2017 18:32:34 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] [RFC] QMP design: Fixing query-block and friends
+In-Reply-To: <e24f5884-5c1a-593d-6ae6-c8c4667a07d5@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] TPM status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,174 +28,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, mreitz@redhat.com, armbru@redhat.com, stefanha@redhat.com, eblake@redhat.com
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: Amarnath Valluri <amarnath.valluri@intel.com>, qemu devel list <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Jones <pjones@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Javier Martinez Canillas <javierm@redhat.com>
 
-Hi,
-
-I haven't really liked query-block for a long time, but now that
-blockdev-add and -blockdev have settled, it might finally be the time to
-actually do something about it. In fact, if used together with these
-modern interfaces, our query commands are simply broken, so we have to
-fix something.
-
-Just for reference, I'll start with a copy of the most important part of
-the schema of our current QMP commands here:
-
-> { 'command': 'query-block', 'returns': ['BlockInfo'] }
+On 06/27/17 18:12, Stefan Berger wrote:
+> On 06/14/2017 09:51 AM, Laszlo Ersek wrote:
+>> Hi Stefan,
+>>
+>> the MAINTAINERS file doesn't seem to cover any of the TPM-related files
+>> in the tree:
+>>
+>>    backends/tpm.c
+>>    hw/tpm/
+>>    include/hw/acpi/tpm.h
+>>    include/sysemu/tpm*
+>>    tpm.c
+>>
+>> but I have a gut feeling that you are semi-officially maintaining TPM
+>> anyway, so I'm going to ask you. :)
+>>
+>> Can you please write a document, to be placed under docs/specs/, that
+>> describes the TPM device from a guest perspective, also explaining how
+>> the guest-visible bits are connected to (current) TPM backend(s)?
+>>
+>> The document wouldn't have to be very long; I think all standardized
+>> interfaces could be mentioned by reference only (by spec names and
+>> locations). The document should however describe any QEMU specifics, and
+>> how the relevant specs are brought together in the implementation.
+>>
+>> Some text files I'm familiar with and can recommend as examples:
+>> - docs/specs/fw_cfg.txt
+>> - docs/specs/pvpanic.txt
+>> - docs/specs/vmgenid.txt
+>>
+>> (There may be more and/or better examples of course.)
+>>
+>> This document should be the starting point for developers that want to
+>> support QEMU's TPM(s) in guest firmware that is different from SeaBIOS.
+>> (You've been maintaining the related SeaBIOS feature.)
+>>
+>> Would you be willing to author such a design document?
 > 
-> { 'command': 'query-named-block-nodes', 'returns': [ 'BlockDeviceInfo' ] }
+> Here's what I have so far with pointers to TCG specs. Does that go in
+> the right direction?
 > 
-> { 'struct': 'BlockInfo',
->   'data': {'device': 'str', 'type': 'str', 'removable': 'bool',
->            'locked': 'bool', '*inserted': 'BlockDeviceInfo',
->            '*tray_open': 'bool', '*io-status': 'BlockDeviceIoStatus',
->            '*dirty-bitmaps': ['BlockDirtyInfo'] } }
 > 
-> { 'struct': 'BlockDeviceInfo',
->   'data': { 'file': 'str', '*node-name': 'str', 'ro': 'bool', 'drv': 'str',
->             '*backing_file': 'str', 'backing_file_depth': 'int',
->             'encrypted': 'bool', 'encryption_key_missing': 'bool',
->             'detect_zeroes': 'BlockdevDetectZeroesOptions',
->             'bps': 'int', 'bps_rd': 'int', 'bps_wr': 'int',
->             'iops': 'int', 'iops_rd': 'int', 'iops_wr': 'int',
->             'image': 'ImageInfo',
->             '*bps_max': 'int', '*bps_rd_max': 'int',
->             '*bps_wr_max': 'int', '*iops_max': 'int',
->             '*iops_rd_max': 'int', '*iops_wr_max': 'int',
->             '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
->             '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
->             '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
->             '*iops_size': 'int', '*group': 'str', 'cache': 'BlockdevCacheInfo',
->             'write_threshold': 'int' } }
+> QEMU TPM Device
+> ===============
 > 
-> { 'struct': 'ImageInfo',
->   'data': {'filename': 'str', 'format': 'str', '*dirty-flag': 'bool',
->            '*actual-size': 'int', 'virtual-size': 'int',
->            '*cluster-size': 'int', '*encrypted': 'bool', '*compressed': 'bool',
->            '*backing-filename': 'str', '*full-backing-filename': 'str',
->            '*backing-filename-format': 'str', '*snapshots': ['SnapshotInfo'],
->            '*backing-image': 'ImageInfo',
->            '*format-specific': 'ImageInfoSpecific' } }
+> = Guest-side Hardware Interface =
 > 
-> { 'union': 'ImageInfoSpecific',
->   'data': {
->       'qcow2': 'ImageInfoSpecificQCow2',
->       'vmdk': 'ImageInfoSpecificVmdk',
->       # If we need to add block driver specific parameters for
->       # LUKS in future, then we'll subclass QCryptoBlockInfoLUKS
->       # to define a ImageInfoSpecificLUKS
->       'luks': 'QCryptoBlockInfoLUKS'
->   } }
+> The QEMU TPM emulation implements a TPM TIS hardware interface following
+> the Trusted Computing Group's specification "TCG PC Client Specific TPM
+> Interface Specification (TIS)", Specifcation Version 1.3, 21 March 2013.
+> This specification, or a later version of it, can be accessed from the
+> following URL:
+> 
+> https://trustedcomputinggroup.org/pc-client-work-group-pc-client-specific-tpm-interface-specification-tis/
+> 
+> 
+> The TIS interface makes a memory mapped IO region in the area 0xfed40000 -
+> 0xfed44fff available to the guest operating system.
+> 
+> = ACPI Interface =
+> 
+> The TPM device is defined with ACPI ID "PNP0C31". QEMU builds a SSDT and
+> passes
+> it into the guest through the fw_cfg device. The device description
+> contains
+> the base address of the TIS interface  0xfed40000 and the size of the
 
-So what's wrong with this? Quite a few things, let's do a quick review
-of the commands:
+Double space before "0xfed40000".
 
-* query-block only returns BlockBackends that are owned by the monitor
-  (i.e. they have a name). This used to be true for all BlockBackends
-  that were attached to a guest device, but it's not the case any more:
-  We want to use -blockdev/-device only with node names, which means
-  that the devices create the BB internally - and they aren't visible in
-  query-block any more.
+> MMIO area
+> (0x5000). In case a TPM2 is used by QEMU, a TPM2 ACPI table is also
+> provided. The
+> device is described to be used in polling mode rather than interrupt
+> mode primarily
+> because no unused IRQ could be found.
+> 
+> To support measurements logs to be written by the firmware, e.g.
+> SeaBIOS, a TCPA
+> table is implemented. This table provides a 64kb buffer where the
+> firmware can
+> write its log into.
 
-* Even if we included those BBs in query-block, they would be missing
-  the connection to their qdev device. The BB should really be
-  considered part of the device, and if we had a way to query the state
-  of a device, query-block would ideally be included there.
+Does the TCPA table depend on TPM1 vs. TPM2?
 
-* query-named-block-nodes is a bad name. All block nodes are named these
-  days. Which also means that it returns all block nodes, so its output
-  becomes rather large and includes a lot of redundant information (as
-  you'll see below).
+> 
+> The TCPA and TPM2 ACPI tables follow the Trusted Computing Group
+> specification
+> "TCG ACPI Specification" Family "1.2" and "2.0", Level 00 Revision
+> 00.37. This
+> specification, or a later version of it, can be accessed from the following
+> URL:
+> 
+> https://trustedcomputinggroup.org/tcg-acpi-specification/
+> 
+> 
+> = TPM backend devices =
+> 
+> The TPM implementation is split into two parts. The one part is the
+> hardware
+> interface, such as the TPM TIS interface described earlier, and the TPM
+> backend
+> interface.
 
-* The good news: BlockInfo contains only fields that actually belong to
-  BlockBackends, apart from a @type attribute that always contains the
-  string "unknown".
+The last sentence here is a bit hard to understand. Can we use
+frontend/backend language? (Already used below, so that's great.)
 
-  The bad news: A BlockBackend has a lot more information attached, this
-  is by far not a full query command for BlockBackends.
+> The backend interfaces implement the interaction with a TPM
+> device,
+> which may be a physical or an emulated device. The split between the front-
+> and backend devices allows a frontend to be connected with any available
+> backend. This enables the TIS interface to be used with the passthrough
+> backend
+> or the (future) swtpm backend.
+> 
+> 
+> == The QEMU TPM passthrough device ==
+> 
+> In case QEMU is run on Linux as the host operating system it is possible to
+> make the hardware TPM device available to a single QEMU guest. In this
+> case the
+> user must make sure that no other program is using the device, e.g.,
+> /dev/tpm0,
+> before trying to start QEMU with it.
+> 
+> The passthrough driver uses the host's TPM device for sending TPM commands
+> and receiving responses from. Besides that it accesses the TPM device's
+> sysfs
+> entry for support of command cancellation. Since none of the state of a
+> hardware
+> TPM can be migrated between hosts, virtual machine migration is disabled
+> when
+> the TPM passthrough driver is used.
+> 
+> Since the host's TPM device will already be initialize by the host's
+> firmware, certain
 
-* What is BlockDeviceInfo supposed to be? query-named-block-nodes
-  returns it, so you would expect that it's a description of a
-  BlockDriverState. But it's not. It's a mix of BB and BDS descriptions.
-  The BB part just stays zeroed in query-named-block-nodes.
+I think this line is too long (87 chars) -- I think we should wrap at 79
+chars or so.
 
-  In other words, if you do query-block, you'll see I/O limits and
-  whether a writeback mode is used. But do query-named-block-nodes and
-  look at the root node of the same device and it will always tell you
-  that the limits are 0 and writeback is on.
+> commands, e.g. TPM_Startup(), sent by the virtual firmware for device
+> initialization
+> will fail. In this case the firmware should simply not use the TPM.
+> 
+> Sharing the device with the host is generally not a recommended usage
+> scenario
+> for a TPM device. The primary reason for this is that two operating
+> systems can then
+> access the device's single set of resources, such as platform configuration
+> registers (PCRs), that applications are not expecting to share.
 
-  So BlockDeviceInfo contains many things that should really be in
-  BlockInfo. Both together appear to be relatively complete for BBs.
+Looks great to me, thank you!
 
-* BlockDeviceInfo doesn't really describe the graph. It gives you the
-  backing file name as a special case, but it won't tell you anything
-  about other child nodes, and even for backing files it doesn't tell
-  you which node is actually used.
+Two requests in addition to the above remarks:
+- can you provide command line options / examples wherever appropriate?
+- can you list the pathnames of the source files that currently
+  implement frontend / backend / ACPI / passthrough, as appropriate?
 
-  Instead, we should have a description of all attached children with
-  the link name, the child node name and probably also the permissions
-  attached to it (in other words, a description of BdrvChild).
+(I think the next version should be posted as a first class PATCH, for
+wider review.)
 
-* BlockDeviceInfo misses important information about nodes. For example,
-  I often see a query-block output in bug reports and can't decide from
-  it if we were using Linux AIO.
-
-  Ideally it should include the currently active set of options
-  (BlockdevOptions) that would result in the same block node. References
-  would always be by name, so that this doesn't become recursive.
-
-* Speaking of recursion: ImageInfo recursively includes information
-  about all images in the backing chain. This is what makes the output
-  of query-named-block-nodes so redundant. It is also inconsistent
-  because the runtime information (BlockInfo/BlockDeviceInfo) isn't
-  recursive.
-
-* I'm also not quite sure if getting ImageInfo for an image shouldn't be
-  a separate operation. It doesn't really seem related to getting the
-  runtime state of a block device.
-
-* ImageInfoSpecific exists only for a few drivers and doesn't contain
-  all the information it could contain. Similar to what I said about
-  BlockDeviceInfo, I think it should contain all the create options that
-  you need to create the same image, apart from the data stored in it.
-
-  'qemu-img create' still needs to improve its option handling, too, but
-  I imagine that in the end it could be using the same QAPI struct that
-  ImageInfo should contain.
-
-
-So how do we go forward from here?
-
-I guess we could add a few hacks o fix the really urgent things, and
-just adding more information is always possible (at the cost of even
-more duplication).
-
-However, it appears to me that I dislike so many thing about our current
-query commands that I'm tempted to say: Throw it all away and start
-over.
-
-If that's what we're going to do, I think I can figure out something
-nice for block nodes. That shouldn't be too hard. The only question
-would be whether we want a command to query one node or whether we would
-keep returning all of them.
-
-I am, however, a bit less confident about BBs. As I said above, I
-consider them part of the qdev devices. As far as I know, there is no
-high-level infrastructure to query runtime state of devices and qdev
-properties are supposed to be read-only. Maybe non-qdev QOM properties
-can be used somehow? But QOM isn't really nice to use as you need to
-query each property individually.
-
-Another option would be to have a QMP command that takes a qdev ID of a
-block device and queries its BB. Or maybe it should stay like
-query-block and return an array of all of them, but include the qdev
-device name. Actually, maybe query-block can stay as it contains only
-two fields that are useless in the new world.
-
-
-I think this has become long enough now, so any opinions? On anything I
-said above, but preferably also about what a new interface should look
-like?
-
-Kevin
+Thank you!
+Laszlo
