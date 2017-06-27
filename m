@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dPlez-0003Zk-Cr
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:15:46 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dPlmG-0005I1-8u
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:23:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dPley-0002pE-9D
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:15:45 -0400
-Date: Tue, 27 Jun 2017 16:15:33 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170627081533.GE14166@lemon.lan>
-References: <1496649172-26982-1-git-send-email-ashijeetacharya@gmail.com>
-	<1496649172-26982-9-git-send-email-ashijeetacharya@gmail.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dPlmF-0005BX-6r
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:23:16 -0400
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:35525)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dPlmE-000594-Us
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:23:15 -0400
+Received: by mail-lf0-x242.google.com with SMTP id n136so2105147lfn.2
+	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 01:23:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1496649172-26982-9-git-send-email-ashijeetacharya@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v6 8/8] vmdk: Make
- vmdk_get_cluster_offset() return cluster offset only
+References: <20170621140219.4568-1-marcandre.lureau@redhat.com>
+	<20170621140219.4568-3-marcandre.lureau@redhat.com>
+	<20170623210845.GA10776@localhost.localdomain>
+In-Reply-To: <20170623210845.GA10776@localhost.localdomain>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 27 Jun 2017 08:23:03 +0000
+Message-ID: <CAJ+F1CLUHM2+hMQqCmN04nwWEMDDDK8104=vK9rnoTsetw9JVg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 2/3] Add memfd based hostmem
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,131 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Cc: kwolf@redhat.com, jsnow@redhat.com, mreitz@redhat.com, stefanha@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: imammedo@redhat.com, qemu-devel@nongnu.org
 
-On Mon, 06/05 13:22, Ashijeet Acharya wrote:
-> vmdk_alloc_clusters() introduced earlier now handles the task of
-> allocating clusters and performing COW when needed. Thus we can change
-> vmdk_get_cluster_offset() to stick to the sole purpose of returning
-> cluster offset using sector number. Update the changes at all call
-> sites.
-> 
-> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
-> ---
->  block/vmdk.c | 56 ++++++++++++--------------------------------------------
->  1 file changed, 12 insertions(+), 44 deletions(-)
-> 
-> diff --git a/block/vmdk.c b/block/vmdk.c
-> index 9fa2414..accf1c3 100644
-> --- a/block/vmdk.c
-> +++ b/block/vmdk.c
-> @@ -1485,25 +1485,16 @@ static int vmdk_alloc_clusters(BlockDriverState *bs,
->   * For flat extents, the start offset as parsed from the description file is
->   * returned.
->   *
-> - * For sparse extents, look up in L1, L2 table. If allocate is true, return an
-> - * offset for a new cluster and update L2 cache. If there is a backing file,
-> - * COW is done before returning; otherwise, zeroes are written to the allocated
-> - * cluster. Both COW and zero writing skips the sector range
-> - * [@skip_start_sector, @skip_end_sector) passed in by caller, because caller
-> - * has new data to write there.
-> + * For sparse extents, look up the L1, L2 table.
->   *
->   * Returns: VMDK_OK if cluster exists and mapped in the image.
-> - *          VMDK_UNALLOC if cluster is not mapped and @allocate is false.
-> - *          VMDK_ERROR if failed.
-> + *          VMDK_UNALLOC if cluster is not mapped.
-> + *          VMDK_ERROR if failed
->   */
->  static int vmdk_get_cluster_offset(BlockDriverState *bs,
->                                     VmdkExtent *extent,
-> -                                   VmdkMetaData *m_data,
->                                     uint64_t offset,
-> -                                   bool allocate,
-> -                                   uint64_t *cluster_offset,
-> -                                   uint64_t skip_start_bytes,
-> -                                   uint64_t skip_end_bytes)
-> +                                   uint64_t *cluster_offset)
->  {
->      int l1_index, l2_offset, l2_index;
->      uint32_t *l2_table;
-> @@ -1528,31 +1519,9 @@ static int vmdk_get_cluster_offset(BlockDriverState *bs,
->      }
->  
->      if (!cluster_sector || zeroed) {
-> -        if (!allocate) {
-> -            return zeroed ? VMDK_ZEROED : VMDK_UNALLOC;
-> -        }
-> -
-> -        cluster_sector = extent->next_cluster_sector;
-> -        extent->next_cluster_sector += extent->cluster_sectors;
-> -
-> -        /* First of all we write grain itself, to avoid race condition
-> -         * that may to corrupt the image.
-> -         * This problem may occur because of insufficient space on host disk
-> -         * or inappropriate VM shutdown.
-> -         */
-> -        ret = vmdk_perform_cow(bs, extent, cluster_sector * BDRV_SECTOR_SIZE,
-> -                                offset, skip_start_bytes, skip_end_bytes);
-> -        if (ret) {
-> -            return ret;
-> -        }
-> -        if (m_data) {
-> -            m_data->valid = 1;
-> -            m_data->l1_index = l1_index;
-> -            m_data->l2_index = l2_index;
-> -            m_data->l2_offset = l2_offset;
-> -            m_data->l2_cache_entry = &l2_table[l2_index];
-> -        }
-> +        return zeroed ? VMDK_ZEROED : VMDK_UNALLOC;
->      }
-> +
->      *cluster_offset = cluster_sector << BDRV_SECTOR_BITS;
->      return VMDK_OK;
->  }
-> @@ -1595,9 +1564,7 @@ static int64_t coroutine_fn vmdk_co_get_block_status(BlockDriverState *bs,
->          return 0;
->      }
->      qemu_co_mutex_lock(&s->lock);
-> -    ret = vmdk_get_cluster_offset(bs, extent, NULL,
-> -                                  sector_num * 512, false, &offset,
-> -                                  0, 0);
-> +    ret = vmdk_get_cluster_offset(bs, extent, sector_num * 512, &offset);
->      qemu_co_mutex_unlock(&s->lock);
->  
->      index_in_cluster = vmdk_find_index_in_cluster(extent, sector_num);
-> @@ -1788,13 +1755,14 @@ vmdk_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
->              ret = -EIO;
->              goto fail;
->          }
-> -        ret = vmdk_get_cluster_offset(bs, extent, NULL,
-> -                                      offset, false, &cluster_offset, 0, 0);
-> +
->          offset_in_cluster = vmdk_find_offset_in_cluster(extent, offset);
->  
->          n_bytes = MIN(bytes, extent->cluster_sectors * BDRV_SECTOR_SIZE
->                               - offset_in_cluster);
->  
-> +        ret = vmdk_get_cluster_offset(bs, extent, offset, &cluster_offset);
-> +
->          if (ret != VMDK_OK) {
->              /* if not allocated, try to read from parent image, if exist */
->              if (bs->backing && ret != VMDK_ZEROED) {
-> @@ -2541,9 +2509,9 @@ static int vmdk_check(BlockDriverState *bs, BdrvCheckResult *result,
->                      sector_num);
->              break;
->          }
-> -        ret = vmdk_get_cluster_offset(bs, extent, NULL,
-> +        ret = vmdk_get_cluster_offset(bs, extent,
->                                        sector_num << BDRV_SECTOR_BITS,
-> -                                      false, &cluster_offset, 0, 0);
-> +                                      &cluster_offset);
->          if (ret == VMDK_ERROR) {
->              fprintf(stderr,
->                      "ERROR: could not get cluster_offset for sector %"
-> -- 
-> 2.6.2
-> 
+Hi Eduardo
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+On Fri, Jun 23, 2017 at 11:09 PM Eduardo Habkost <ehabkost@redhat.com>
+wrote:
+
+> On Wed, Jun 21, 2017 at 04:02:18PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> > Add a new memory backend, similar to hostmem-file, except that it
+> > doesn't need to create files. It also enforces memory sealing.
+> >
+> > This backend is mainly useful for sharing the memory with other
+> > processes.
+>
+> How exactly can the memfd be used to share memory?  Is there an existing
+> mechanism for sharing the memfd file descriptor with another process
+
+
+
+Since there is no backing file, the traditional mechanism is by passing fd,
+via socket ancillary data or forking etc.. Both ivshmem and vhost-user have
+such messages, with eventually details for the memory map usage.
+
+
+> >
+> > Note that Linux supports transparent huge-pages of shmem/memfd memory
+> > since 4.8. It is relatively easier to set up THP than a dedicate
+> > hugepage mount point by using "madvise" in
+> > /sys/kernel/mm/transparent_hugepage/shmem_enabled.
+> >
+> > Usage:
+> > -object memory-backend-memfd,id=3Dmem1,size=3D1G
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  backends/hostmem-memfd.c | 67
+> ++++++++++++++++++++++++++++++++++++++++++++++++
+> >  backends/Makefile.objs   |  2 ++
+> >  qemu-options.hx          | 11 ++++++++
+> >  3 files changed, 80 insertions(+)
+> >  create mode 100644 backends/hostmem-memfd.c
+> >
+> [...]
+>
+> --
+> Eduardo
+>
+> --
+Marc-Andr=C3=A9 Lureau
