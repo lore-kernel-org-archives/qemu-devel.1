@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54476)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dPtlx-0007u9-TX
+	(envelope-from <pbonzini@redhat.com>) id 1dPtlx-0000HQ-B3
 	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:55:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dPsLE-0004gN-St
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:23:49 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dPsLM-00056v-A7
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:23:57 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 27 Jun 2017 17:22:45 +0200
-Message-Id: <20170627152248.10446-8-pbonzini@redhat.com>
+Date: Tue, 27 Jun 2017 17:22:47 +0200
+Message-Id: <20170627152248.10446-10-pbonzini@redhat.com>
 In-Reply-To: <20170627152248.10446-1-pbonzini@redhat.com>
 References: <20170627152248.10446-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 07/10] block: invoke .bdrv_drain callback in
- coroutine context and from AioContext
+Subject: [Qemu-devel] [PATCH 09/10] sheepdog: add queue_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,126 +22,110 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: stefanha@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com
 
-This will let the callback take a CoMutex in the next patch.
-
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block/io.c                | 42 +++++++++++++++++++++++++++++++++---------
- block/qed.c               |  6 +++---
- include/block/block_int.h |  2 +-
- 3 files changed, 37 insertions(+), 13 deletions(-)
+ block/sheepdog.c | 21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
 
-diff --git a/block/io.c b/block/io.c
-index 9bba730a7e..68f19bbe69 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -149,6 +149,37 @@ bool bdrv_requests_pending(BlockDriverState *bs)
-     return false;
- }
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index 08d7b11e9d..a6013f0f17 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -390,6 +390,7 @@ struct BDRVSheepdogState {
+     QLIST_HEAD(inflight_aio_head, AIOReq) inflight_aio_head;
+     QLIST_HEAD(failed_aio_head, AIOReq) failed_aio_head;
  
-+typedef struct {
-+    Coroutine *co;
-+    BlockDriverState *bs;
-+    bool done;
-+} BdrvCoDrainData;
-+
-+static void coroutine_fn bdrv_drain_invoke_entry(void *opaque)
-+{
-+    BdrvCoDrainData *data = opaque;
-+    BlockDriverState *bs = data->bs;
-+
-+    bs->drv->bdrv_co_drain(bs);
-+
-+    /* Set data->done before reading bs->wakeup.  */
-+    atomic_mb_set(&data->done, true);
-+    bdrv_wakeup(bs);
-+}
-+
-+static void bdrv_drain_invoke(BlockDriverState *bs)
-+{
-+    BdrvCoDrainData data = { .bs = bs, .done = false };
-+
-+    if (!bs->drv || !bs->drv->bdrv_co_drain) {
-+        return;
-+    }
-+
-+    data.co = qemu_coroutine_create(bdrv_drain_invoke_entry, &data);
-+    bdrv_coroutine_enter(bs, data.co);
-+    BDRV_POLL_WHILE(bs, !data.done);
-+}
-+
- static bool bdrv_drain_recurse(BlockDriverState *bs)
- {
-     BdrvChild *child, *tmp;
-@@ -156,9 +187,8 @@ static bool bdrv_drain_recurse(BlockDriverState *bs)
- 
-     waited = BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
- 
--    if (bs->drv && bs->drv->bdrv_drain) {
--        bs->drv->bdrv_drain(bs);
--    }
-+    /* Ensure any pending metadata writes are submitted to bs->file.  */
-+    bdrv_drain_invoke(bs);
- 
-     QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
-         BlockDriverState *bs = child->bs;
-@@ -184,12 +214,6 @@ static bool bdrv_drain_recurse(BlockDriverState *bs)
-     return waited;
- }
- 
--typedef struct {
--    Coroutine *co;
--    BlockDriverState *bs;
--    bool done;
--} BdrvCoDrainData;
--
- static void bdrv_co_drain_bh_cb(void *opaque)
- {
-     BdrvCoDrainData *data = opaque;
-diff --git a/block/qed.c b/block/qed.c
-index 3ffdc1716d..454b7f0f2b 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -350,7 +350,7 @@ static void bdrv_qed_attach_aio_context(BlockDriverState *bs,
-     }
- }
- 
--static void bdrv_qed_drain(BlockDriverState *bs)
-+static void coroutine_fn bdrv_qed_co_drain(BlockDriverState *bs)
- {
-     BDRVQEDState *s = bs->opaque;
- 
-@@ -359,7 +359,7 @@ static void bdrv_qed_drain(BlockDriverState *bs)
-      */
-     if (s->need_check_timer && timer_pending(s->need_check_timer)) {
-         qed_cancel_need_check_timer(s);
--        qed_need_check_timer_cb(s);
-+        qed_need_check_timer_entry(s);
-     }
- }
- 
-@@ -1540,7 +1540,7 @@ static BlockDriver bdrv_qed = {
-     .bdrv_check               = bdrv_qed_check,
-     .bdrv_detach_aio_context  = bdrv_qed_detach_aio_context,
-     .bdrv_attach_aio_context  = bdrv_qed_attach_aio_context,
--    .bdrv_drain               = bdrv_qed_drain,
-+    .bdrv_co_drain            = bdrv_qed_co_drain,
++    CoMutex queue_lock;
+     CoQueue overlapping_queue;
+     QLIST_HEAD(inflight_aiocb_head, SheepdogAIOCB) inflight_aiocb_head;
  };
+@@ -488,7 +489,7 @@ static void wait_for_overlapping_aiocb(BDRVSheepdogState *s, SheepdogAIOCB *acb)
+ retry:
+     QLIST_FOREACH(cb, &s->inflight_aiocb_head, aiocb_siblings) {
+         if (AIOCBOverlapping(acb, cb)) {
+-            qemu_co_queue_wait(&s->overlapping_queue, NULL);
++            qemu_co_queue_wait(&s->overlapping_queue, &s->queue_lock);
+             goto retry;
+         }
+     }
+@@ -525,8 +526,10 @@ static void sd_aio_setup(SheepdogAIOCB *acb, BDRVSheepdogState *s,
+         return;
+     }
  
- static void bdrv_qed_init(void)
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 15fa602150..6d3fbbfc1e 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -321,7 +321,7 @@ struct BlockDriver {
-      * Drain and stop any internal sources of requests in the driver, and
-      * remain so until next I/O callback (e.g. bdrv_co_writev) is called.
++    qemu_co_mutex_lock(&s->queue_lock);
+     wait_for_overlapping_aiocb(s, acb);
+     QLIST_INSERT_HEAD(&s->inflight_aiocb_head, acb, aiocb_siblings);
++    qemu_co_mutex_unlock(&s->queue_lock);
+ }
+ 
+ static SocketAddress *sd_socket_address(const char *path,
+@@ -785,6 +788,7 @@ static coroutine_fn void reconnect_to_sdog(void *opaque)
+      * have to move all the inflight requests to the failed queue before
+      * resend_aioreq() is called.
       */
--    void (*bdrv_drain)(BlockDriverState *bs);
-+    void coroutine_fn (*bdrv_co_drain)(BlockDriverState *bs);
++    qemu_co_mutex_lock(&s->queue_lock);
+     QLIST_FOREACH_SAFE(aio_req, &s->inflight_aio_head, aio_siblings, next) {
+         QLIST_REMOVE(aio_req, aio_siblings);
+         QLIST_INSERT_HEAD(&s->failed_aio_head, aio_req, aio_siblings);
+@@ -794,8 +798,11 @@ static coroutine_fn void reconnect_to_sdog(void *opaque)
+     while (!QLIST_EMPTY(&s->failed_aio_head)) {
+         aio_req = QLIST_FIRST(&s->failed_aio_head);
+         QLIST_REMOVE(aio_req, aio_siblings);
++        qemu_co_mutex_unlock(&s->queue_lock);
+         resend_aioreq(s, aio_req);
++        qemu_co_mutex_lock(&s->queue_lock);
+     }
++    qemu_co_mutex_unlock(&s->queue_lock);
+ }
  
-     void (*bdrv_add_child)(BlockDriverState *parent, BlockDriverState *child,
-                            Error **errp);
+ /*
+@@ -887,7 +894,10 @@ static void coroutine_fn aio_read_response(void *opaque)
+     */
+     s->co_recv = NULL;
+ 
++    qemu_co_mutex_lock(&s->queue_lock);
+     QLIST_REMOVE(aio_req, aio_siblings);
++    qemu_co_mutex_unlock(&s->queue_lock);
++
+     switch (rsp.result) {
+     case SD_RES_SUCCESS:
+         break;
+@@ -1307,7 +1317,9 @@ static void coroutine_fn add_aio_request(BDRVSheepdogState *s, AIOReq *aio_req,
+     uint64_t old_oid = aio_req->base_oid;
+     bool create = aio_req->create;
+ 
++    qemu_co_mutex_lock(&s->queue_lock);
+     QLIST_INSERT_HEAD(&s->inflight_aio_head, aio_req, aio_siblings);
++    qemu_co_mutex_unlock(&s->queue_lock);
+ 
+     if (!nr_copies) {
+         error_report("bug");
+@@ -1678,6 +1690,7 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
+     bs->total_sectors = s->inode.vdi_size / BDRV_SECTOR_SIZE;
+     pstrcpy(s->name, sizeof(s->name), vdi);
+     qemu_co_mutex_init(&s->lock);
++    qemu_co_mutex_init(&s->queue_lock);
+     qemu_co_queue_init(&s->overlapping_queue);
+     qemu_opts_del(opts);
+     g_free(buf);
+@@ -2431,12 +2444,16 @@ static void coroutine_fn sd_co_rw_vector(SheepdogAIOCB *acb)
+ 
+ static void sd_aio_complete(SheepdogAIOCB *acb)
+ {
++    BDRVSheepdogState *s;
+     if (acb->aiocb_type == AIOCB_FLUSH_CACHE) {
+         return;
+     }
+ 
++    s = acb->s;
++    qemu_co_mutex_lock(&s->queue_lock);
+     QLIST_REMOVE(acb, aiocb_siblings);
+-    qemu_co_queue_restart_all(&acb->s->overlapping_queue);
++    qemu_co_queue_restart_all(&s->overlapping_queue);
++    qemu_co_mutex_unlock(&s->queue_lock);
+ }
+ 
+ static coroutine_fn int sd_co_writev(BlockDriverState *bs, int64_t sector_num,
 -- 
 2.13.0
