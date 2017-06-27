@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47172)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dPwKs-0001ZI-Im
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 15:39:43 -0400
+	(envelope-from <eblake@redhat.com>) id 1dPwLs-0002HU-Pq
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 15:40:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dPwKn-0004aP-LE
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 15:39:42 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:34463)
+	(envelope-from <eblake@redhat.com>) id 1dPwLo-00051w-GV
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 15:40:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56056)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dPwKn-0004Zi-9v
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 15:39:37 -0400
-Date: Tue, 27 Jun 2017 15:39:35 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170627193935.GA25367@flamenco>
-References: <20161202210152.6880-1-lersek@redhat.com>
-	<20170627185152.GA20939@flamenco>
-	<20170627221515-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dPwLo-00051b-7q
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 15:40:40 -0400
+References: <20170611074817.13621-1-sf@sfritsch.de>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d95a3198-3ad0-4a75-dda2-a3b7502ede28@redhat.com>
+Date: Tue, 27 Jun 2017 14:40:34 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170627221515-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v2] scripts: add "git.orderfile" for
- ordering diff hunks by pathname patterns
+In-Reply-To: <20170611074817.13621-1-sf@sfritsch.de>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="7srgJPxcMajUf52FdDKTDNcSuUPAf6kUr"
+Subject: Re: [Qemu-devel] [PATCH v2] Add chardev-send-break monitor command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +27,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, John Snow <jsnow@redhat.com>
+To: Stefan Fritsch <sf@sfritsch.de>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Tue, Jun 27, 2017 at 22:16:39 +0300, Michael S. Tsirkin wrote:
-> On Tue, Jun 27, 2017 at 02:51:52PM -0400, Emilio G. Cota wrote:
-> > On Fri, Dec 02, 2016 at 22:01:52 +0100, Laszlo Ersek wrote:
-> > > When passed to git-diff (and to every other git command producing diffs
-> > > and/or diffstats) with "-O" or "diff.orderFile", this list of patterns
-> > > will place the more declarative / abstract hunks first, while changes to
-> > > imperative code / details will be near the end of the patches. This saves
-> > > on scrolling / searching and makes for easier reviewing.
-> > > 
-> > > We intend to advise contributors in the Wiki to run
-> > > 
-> > >   git config diff.orderFile scripts/git.orderfile
-> > > 
-> > > once, as part of their initial setup, before formatting their first (or,
-> > > for repeat contributors, next) patches.
-> > > 
-> > > See the "-O" option and the "diff.orderFile" configuration variable in
-> > > git-diff(1) and git-config(1).
-> > > 
-> > > Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > > Cc: Eric Blake <eblake@redhat.com>
-> > > Cc: Fam Zheng <famz@redhat.com>
-> > > Cc: Gerd Hoffmann <kraxel@redhat.com>
-> > > Cc: John Snow <jsnow@redhat.com>
-> > > Cc: Max Reitz <mreitz@redhat.com>
-> > > Cc: Stefan Hajnoczi <stefanha@gmail.com>
-> > > Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-> > > ---
-> > 
-> > Refloating 6+ months later, but..
-> > 
-> > Someone please merge this! :-)
-> > 
-> > 		E.
-> 
-> Users should be aware that if they do this, the need to
-> supply -O /dev/null to git pull-request. Otherwise the
-> diffstat is all scrambled and you can't figure out
-> what's included.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--7srgJPxcMajUf52FdDKTDNcSuUPAf6kUr
+From: Eric Blake <eblake@redhat.com>
+To: Stefan Fritsch <sf@sfritsch.de>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
+Message-ID: <d95a3198-3ad0-4a75-dda2-a3b7502ede28@redhat.com>
+Subject: Re: [PATCH v2] Add chardev-send-break monitor command
+References: <20170611074817.13621-1-sf@sfritsch.de>
+In-Reply-To: <20170611074817.13621-1-sf@sfritsch.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I'd do the opposite: recommend passing '-O scripts/git.orderfile' to
-git-format patch, and leave the default for all other commands.
+On 06/11/2017 02:48 AM, Stefan Fritsch wrote:
+> Sending a break on a serial console can be useful for debugging the
+> guest. But not all chardev backends support sending breaks (only telnet=
 
-		E.
+> and mux do). The chardev-send-break command allows to send a break even=
+
+> if using other backends.
+>=20
+> Signed-off-by: Stefan Fritsch <sf@sfritsch.de>
+> Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+> v2: added tests and Acked-by line
+>=20
+
+> +++ b/hmp-commands.hx
+> @@ -1745,6 +1745,22 @@ Removes the chardev @var{id}.
+>  ETEXI
+> =20
+>      {
+> +        .name       =3D "chardev-send-break",
+> +        .args_type  =3D "id:s",
+> +        .params     =3D "id",
+> +        .help       =3D "send break on chardev",
+
+Compare this wording,...
+
+> +STEXI
+> +@item chardev-send-break id
+> +@findex chardev-send-break
+> +Sends break on the chardev @var{id}.
+
+repeated here,
+
+> +++ b/qapi-schema.json
+> @@ -5114,6 +5114,26 @@
+>  { 'command': 'chardev-remove', 'data': {'id': 'str'} }
+> =20
+>  ##
+> +# @chardev-send-break:
+> +#
+> +# Send a break to a character device
+
+=2E..with this wording.  I like 'send a break' better than 'send break',
+but even better might be 'send a break sequence' or even 'emulate a
+break sequence' (by definition, a break is NOT a character, but on bare
+metal character devices it IS a defined electrical sequence distinct
+from characters to make the recipient aware that the sender is trying to
+get attention).
+
+Otherwise, the patch looks fine to me.  If all that changes is some
+word-smithing (and the maintainer may be willing to do that), you can add=
+:
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--7srgJPxcMajUf52FdDKTDNcSuUPAf6kUr
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZUrSyAAoJEKeha0olJ0Nqe60IAK5wPJw2c5Y46cr2vuKhAIqI
+Hem5Lr7z6206tAoomtyK5jwHq4pece+ET/0tzQIa2/LNmBwWbeYEGrUe54EmHwCJ
+NUpWwPbul9ovXCqUuhHKcvdEsx+nAXwdbcSjNZZEfFCFL96OZ7PEEtVBdV5UAttv
+86+ltZeMbhTJQjFaCohVt5NZkqHt+jhvSyl1i/QluwUv0FVbwFx7fs6JB2uenMYq
+Tv89mXrOSL9X4jfGRr0k6Pxsvc8gus35La4xe8r0+mxCZbo2JNawQjq1h/NdaNkA
+M4B2vrO0Tsuz9p+O8iBKbKq39cxbJpY3e7rDu3HPGl7Ygo6MQ/Xt906yMvWKUSI=
+=X1sA
+-----END PGP SIGNATURE-----
+
+--7srgJPxcMajUf52FdDKTDNcSuUPAf6kUr--
