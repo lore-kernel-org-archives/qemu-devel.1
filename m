@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34409)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dPl9U-0000Ot-BS
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 03:43:14 -0400
+	(envelope-from <famz@redhat.com>) id 1dPlS6-0005Hs-F1
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:02:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dPl9Q-00072Y-9U
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 03:43:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46084)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dPl9Q-00072D-04
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 03:43:08 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <cover.1498530543.git.maozy.fnst@cn.fujitsu.com>
-	<598314a0acefb6df093882fc61074dbf39c66a7f.1498530543.git.maozy.fnst@cn.fujitsu.com>
-Date: Tue, 27 Jun 2017 09:43:02 +0200
-In-Reply-To: <598314a0acefb6df093882fc61074dbf39c66a7f.1498530543.git.maozy.fnst@cn.fujitsu.com>
-	(Mao Zhongyi's message of "Tue, 27 Jun 2017 11:24:40 +0800")
-Message-ID: <8760fhnaex.fsf@dusky.pond.sub.org>
+	(envelope-from <famz@redhat.com>) id 1dPlS5-0007Fi-4c
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:02:26 -0400
+Date: Tue, 27 Jun 2017 16:02:10 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170627080210.GB14166@lemon.lan>
+References: <1496649172-26982-1-git-send-email-ashijeetacharya@gmail.com>
+	<1496649172-26982-7-git-send-email-ashijeetacharya@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v5 2/4] net/socket: Convert error message
- to Error
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1496649172-26982-7-git-send-email-ashijeetacharya@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v6 6/8] vmdk: New functions to assist
+ allocating multiple clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,278 +24,246 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, jasowang@redhat.com
+To: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Cc: kwolf@redhat.com, jsnow@redhat.com, mreitz@redhat.com, stefanha@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-Suggest "net/socket: Convert several helper functions to Error".
+On Mon, 06/05 13:22, Ashijeet Acharya wrote:
+> +/*
+> + * vmdk_handle_alloc
+> + *
+> + * Allocate new clusters for an area that either is yet unallocated or needs a
+> + * copy on write. If *cluster_offset is non_zero, clusters are only allocated if
+> + * the new allocation can match the specified host offset.
 
-Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
+I don't think this matches the function body, the passed in *cluster_offset
+value is ignored.
 
-> Currently, net_socket_mcast_create(), net_socket_fd_init_dgram() and
-> net_socket_fd_init() use the function such as fprintf(), perror() to
-> report an error message.
->
-> Now, convert these functions to Error.
->
-> Cc: jasowang@redhat.com
-> Cc: armbru@redhat.com
-> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-> ---
->  net/socket.c | 76 ++++++++++++++++++++++++++++++++++++++----------------------
->  1 file changed, 48 insertions(+), 28 deletions(-)
->
-> diff --git a/net/socket.c b/net/socket.c
-> index 53765bd..e136f87 100644
-> --- a/net/socket.c
-> +++ b/net/socket.c
-> @@ -209,7 +209,9 @@ static void net_socket_send_dgram(void *opaque)
->      }
->  }
+> + *
+> + * Returns:
+> + *   VMDK_OK:       if new clusters were allocated, *bytes may be decreased if
+> + *                  the new allocation doesn't cover all of the requested area.
+> + *                  *cluster_offset is updated to contain the offset of the
+> + *                  first newly allocated cluster.
+> + *
+> + *   VMDK_UNALLOC:  if no clusters could be allocated. *cluster_offset is left
+> + *                  unchanged.
+> + *
+> + *   VMDK_ERROR:    in error cases
+> + */
+> +static int vmdk_handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
+> +                             uint64_t offset, uint64_t *cluster_offset,
+> +                             int64_t *bytes, VmdkMetaData *m_data,
+> +                             bool allocate, uint32_t *alloc_clusters_counter)
+> +{
+> +    int l1_index, l2_offset, l2_index;
+> +    uint32_t *l2_table;
+> +    uint32_t cluster_sector;
+> +    uint32_t nb_clusters;
+> +    bool zeroed = false;
+> +    uint64_t skip_start_bytes, skip_end_bytes;
+> +    int ret;
+> +
+> +    ret = get_cluster_table(extent, offset, &l1_index, &l2_offset,
+> +                            &l2_index, &l2_table);
+> +    if (ret < 0) {
+> +        return ret;
+> +    }
+> +
+> +    cluster_sector = le32_to_cpu(l2_table[l2_index]);
+> +
+> +    skip_start_bytes = vmdk_find_offset_in_cluster(extent, offset);
+> +    /* Calculate the number of clusters to look for. Here we truncate the last
+> +     * cluster, i.e. 1 less than the actual value calculated as we may need to
+> +     * perform COW for the last one. */
+> +    nb_clusters = DIV_ROUND_UP(skip_start_bytes + *bytes,
+> +                               extent->cluster_sectors << BDRV_SECTOR_BITS) - 1;
+> +
+> +    nb_clusters = MIN(nb_clusters, extent->l2_size - l2_index);
+> +    assert(nb_clusters <= INT_MAX);
+> +
+> +    /* update bytes according to final nb_clusters value */
+> +    if (nb_clusters != 0) {
+> +        *bytes = ((nb_clusters * extent->cluster_sectors) << BDRV_SECTOR_BITS)
+> +                 - skip_start_bytes;
+> +    } else {
+> +        nb_clusters = 1;
+> +    }
+> +    *alloc_clusters_counter += nb_clusters;
+> +    skip_end_bytes = skip_start_bytes + MIN(*bytes,
+> +                     extent->cluster_sectors * BDRV_SECTOR_SIZE
+> +                                    - skip_start_bytes);
+
+I don't understand the MIN part, shouldn't skip_end_bytes simply be
+skip_start_bytes + *bytes?
+
+> +
+> +    if (extent->has_zero_grain && cluster_sector == VMDK_GTE_ZEROED) {
+> +        zeroed = true;
+> +    }
+> +
+> +    if (!cluster_sector || zeroed) {
+> +        if (!allocate) {
+> +            return zeroed ? VMDK_ZEROED : VMDK_UNALLOC;
+> +        }
+> +
+> +        cluster_sector = extent->next_cluster_sector;
+> +        extent->next_cluster_sector += extent->cluster_sectors
+> +                                                * nb_clusters;
+> +
+> +        ret = vmdk_perform_cow(bs, extent, cluster_sector * BDRV_SECTOR_SIZE,
+> +                               offset, skip_start_bytes,
+> +                               skip_end_bytes);
+> +        if (ret < 0) {
+> +            return ret;
+> +        }
+> +        if (m_data) {
+> +            m_data->valid = 1;
+> +            m_data->l1_index = l1_index;
+> +            m_data->l2_index = l2_index;
+> +            m_data->l2_offset = l2_offset;
+> +            m_data->l2_cache_entry = &l2_table[l2_index];
+> +            m_data->nb_clusters = nb_clusters;
+> +        }
+> +    }
+> +    *cluster_offset = cluster_sector << BDRV_SECTOR_BITS;
+> +    return VMDK_OK;
+> +}
+> +
+> +/*
+> + * vmdk_alloc_clusters
+> + *
+> + * For a given offset on the virtual disk, find the cluster offset in vmdk
+> + * file. If the offset is not found, allocate a new cluster.
+> + *
+> + * If the cluster is newly allocated, m_data->nb_clusters is set to the number
+> + * of contiguous clusters that have been allocated. In this case, the other
+> + * fields of m_data are valid and contain information about the first allocated
+> + * cluster.
+> + *
+> + * Returns:
+> + *
+> + *   VMDK_OK:           on success and @cluster_offset was set
+> + *
+> + *   VMDK_UNALLOC:      if no clusters were allocated and @cluster_offset is
+> + *                      set to zero
+> + *
+> + *   VMDK_ERROR:        in error cases
+> + */
+> +static int vmdk_alloc_clusters(BlockDriverState *bs,
+> +                               VmdkExtent *extent,
+> +                               VmdkMetaData *m_data, uint64_t offset,
+> +                               bool allocate, uint64_t *cluster_offset,
+> +                               int64_t bytes,
+> +                               uint32_t *total_alloc_clusters)
+> +{
+> +    uint64_t start, remaining;
+> +    uint64_t new_cluster_offset;
+> +    int64_t n_bytes;
+> +    int ret;
+> +
+> +    if (extent->flat) {
+> +        *cluster_offset = extent->flat_start_offset;
+> +        return VMDK_OK;
+> +    }
+> +
+> +    start = offset;
+> +    remaining = bytes;
+> +    new_cluster_offset = 0;
+> +    *cluster_offset = 0;
+> +    n_bytes = 0;
+> +    if (m_data) {
+> +        m_data->valid = 0;
+> +    }
+> +
+> +    /* due to L2 table margins all bytes may not get allocated at once */
+> +    while (true) {
+> +
+> +        if (!*cluster_offset) {
+> +            *cluster_offset = new_cluster_offset;
+> +        }
+> +
+> +        start              += n_bytes;
+> +        remaining          -= n_bytes;
+> +        new_cluster_offset += n_bytes;
+
+Like said above, even though you increment new_cluster_offset by n_bytes, it has
+no effect inside vmdk_handle_alloc. Is this intended?
+
+> +
+> +        if (remaining == 0) {
+> +            break;
+> +        }
+> +
+> +        n_bytes = remaining;
+> +
+> +        ret = vmdk_handle_alloc(bs, extent, start, &new_cluster_offset, &n_bytes,
+> +                                m_data, allocate, total_alloc_clusters);
+> +
+> +        if (ret < 0) {
+> +            return ret;
+> +
+> +        }
+> +    }
+> +
+> +    return VMDK_OK;
+> +}
+> +
+>  /**
+>   * vmdk_get_cluster_offset
+>   *
+> @@ -1625,6 +1794,7 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+>      uint64_t bytes_done = 0;
+>      VmdkMetaData m_data;
+>      uint64_t extent_end;
+> +    uint32_t total_alloc_clusters = 0;
 >  
-> -static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr *localaddr)
-> +static int net_socket_mcast_create(struct sockaddr_in *mcastaddr,
-> +                                   struct in_addr *localaddr,
-> +                                   Error **errp)
->  {
->      struct ip_mreq imr;
->      int fd;
-> @@ -221,8 +223,8 @@ static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr
->  #endif
->  
->      if (!IN_MULTICAST(ntohl(mcastaddr->sin_addr.s_addr))) {
-> -        fprintf(stderr, "qemu: error: specified mcastaddr \"%s\" (0x%08x) "
-> -                "does not contain a multicast address\n",
-> +        error_setg(errp, "qemu: error: specified mcastaddr %s (0x%08x) "
-> +                "does not contain a multicast address",
-
-Please drop the "qemu: error: " prefix.  More of the same below.
-
->                  inet_ntoa(mcastaddr->sin_addr),
->                  (int)ntohl(mcastaddr->sin_addr.s_addr));
->          return -1;
-> @@ -230,7 +232,8 @@ static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr
->      }
->      fd = qemu_socket(PF_INET, SOCK_DGRAM, 0);
->      if (fd < 0) {
-> -        perror("socket(PF_INET, SOCK_DGRAM)");
-> +        error_setg_errno(errp, errno, "Create socket(PF_INET, SOCK_DGRAM)"
-> +                         " failed");
-
-I'm not a native speaker, but "Create FOO failed" doesn't feel right to
-me.  Where's the subject?  "Create" is a verb.  "Creation of FOO failed"
-has a subject, but doesn't feel right.  What about "can't create
-datagram socket"?
-
-Same for many of the other new error messages.
-
->          return -1;
->      }
->  
-> @@ -242,13 +245,15 @@ static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr
->      val = 1;
->      ret = qemu_setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
->      if (ret < 0) {
-> -        perror("setsockopt(SOL_SOCKET, SO_REUSEADDR)");
-> +        error_setg_errno(errp, errno, "Set the socket fd=%d attribute"
-> +                         " SO_REUSEADDR failed", fd);
-
-Why would the user want to know the value of @fd here?
-
-Same for many of the other new error messages.
-
->          goto fail;
->      }
->  
->      ret = bind(fd, (struct sockaddr *)mcastaddr, sizeof(*mcastaddr));
->      if (ret < 0) {
-> -        perror("bind");
-> +        error_setg_errno(errp, errno, "Bind ip=%s to fd=%d failed",
-> +                         inet_ntoa(mcastaddr->sin_addr), fd);
->          goto fail;
->      }
->  
-> @@ -263,7 +268,8 @@ static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr
->      ret = qemu_setsockopt(fd, IPPROTO_IP, IP_ADD_MEMBERSHIP,
->                            &imr, sizeof(struct ip_mreq));
->      if (ret < 0) {
-> -        perror("setsockopt(IP_ADD_MEMBERSHIP)");
-> +        error_setg_errno(errp, errno, "Add socket fd=%d to multicast group %s"
-> +                         " failed", fd, inet_ntoa(imr.imr_multiaddr));
->          goto fail;
->      }
->  
-> @@ -272,7 +278,8 @@ static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr
->      ret = qemu_setsockopt(fd, IPPROTO_IP, IP_MULTICAST_LOOP,
->                            &loop, sizeof(loop));
->      if (ret < 0) {
-> -        perror("setsockopt(SOL_IP, IP_MULTICAST_LOOP)");
-> +        error_setg_errno(errp, errno, "Force multicast message to loopback"
-> +                         " failed");
->          goto fail;
->      }
->  
-> @@ -281,7 +288,8 @@ static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr
->          ret = qemu_setsockopt(fd, IPPROTO_IP, IP_MULTICAST_IF,
->                                localaddr, sizeof(*localaddr));
->          if (ret < 0) {
-> -            perror("setsockopt(IP_MULTICAST_IF)");
-> +            error_setg_errno(errp, errno, "Set the default network send "
-> +                             "interfaec failed");
-
-s/interfaec/interface/
-
->              goto fail;
+>      if (DIV_ROUND_UP(offset, BDRV_SECTOR_SIZE) > bs->total_sectors) {
+>          error_report("Wrong offset: offset=0x%" PRIx64
+> @@ -1650,10 +1820,10 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+>              n_bytes = MIN(bytes, extent_end - offset);
 >          }
->      }
-> @@ -320,7 +328,8 @@ static NetClientInfo net_dgram_socket_info = {
->  static NetSocketState *net_socket_fd_init_dgram(NetClientState *peer,
->                                                  const char *model,
->                                                  const char *name,
-> -                                                int fd, int is_connected)
-> +                                                int fd, int is_connected,
-> +                                                Error **errp)
->  {
->      struct sockaddr_in saddr;
->      int newfd;
-> @@ -337,14 +346,13 @@ static NetSocketState *net_socket_fd_init_dgram(NetClientState *peer,
->          if (getsockname(fd, (struct sockaddr *) &saddr, &saddr_len) == 0) {
->              /* must be bound */
->              if (saddr.sin_addr.s_addr == 0) {
-> -                fprintf(stderr, "qemu: error: init_dgram: fd=%d unbound, "
-> -                        "cannot setup multicast dst addr\n", fd);
-> +                error_setg(errp, "qemu: error: init_dgram: fd=%d unbound, "
-> +                        "cannot setup multicast dst addr", fd);
->                  goto err;
+>  
+> -        ret = vmdk_get_cluster_offset(bs, extent, &m_data, offset,
+> -                                      !(extent->compressed || zeroed),
+> -                                      &cluster_offset, offset_in_cluster,
+> -                                      offset_in_cluster + n_bytes);
+> +        ret = vmdk_alloc_clusters(bs, extent, &m_data, offset,
+> +                                  !(extent->compressed || zeroed),
+> +                                  &cluster_offset, n_bytes,
+> +                                  &total_alloc_clusters);
+>          if (extent->compressed) {
+>              if (ret == VMDK_OK) {
+>                  /* Refuse write to allocated cluster for streamOptimized */
+> @@ -1662,8 +1832,9 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+>                  return -EIO;
+>              } else {
+>                  /* allocate */
+> -                ret = vmdk_get_cluster_offset(bs, extent, &m_data, offset,
+> -                                              true, &cluster_offset, 0, 0);
+> +                ret = vmdk_alloc_clusters(bs, extent, &m_data, offset,
+> +                                          true, &cluster_offset, n_bytes,
+> +                                          &total_alloc_clusters);
 >              }
->              /* clone dgram socket */
-> -            newfd = net_socket_mcast_create(&saddr, NULL);
-> +            newfd = net_socket_mcast_create(&saddr, NULL, errp);
->              if (newfd < 0) {
-> -                /* error already reported by net_socket_mcast_create() */
->                  goto err;
->              }
->              /* clone newfd to fd, close newfd */
-> @@ -352,8 +360,8 @@ static NetSocketState *net_socket_fd_init_dgram(NetClientState *peer,
->              close(newfd);
->  
->          } else {
-> -            fprintf(stderr,
-> -                    "qemu: error: init_dgram: fd=%d failed getsockname(): %s\n",
-> +            error_setg(errp,
-> +                    "qemu: error: init_dgram: fd=%d failed getsockname(): %s",
->                      fd, strerror(errno));
->              goto err;
 >          }
-> @@ -432,24 +440,26 @@ static NetSocketState *net_socket_fd_init_stream(NetClientState *peer,
->  
->  static NetSocketState *net_socket_fd_init(NetClientState *peer,
->                                            const char *model, const char *name,
-> -                                          int fd, int is_connected)
-> +                                          int fd, int is_connected,
-> +                                          Error **errp)
->  {
->      int so_type = -1, optlen=sizeof(so_type);
->  
->      if(getsockopt(fd, SOL_SOCKET, SO_TYPE, (char *)&so_type,
->          (socklen_t *)&optlen)< 0) {
-> -        fprintf(stderr, "qemu: error: getsockopt(SO_TYPE) for fd=%d failed\n",
-> +        error_setg(errp, "qemu: error: getsockopt(SO_TYPE) for fd=%d failed",
->                  fd);
->          closesocket(fd);
->          return NULL;
->      }
->      switch(so_type) {
->      case SOCK_DGRAM:
-> -        return net_socket_fd_init_dgram(peer, model, name, fd, is_connected);
-> +        return net_socket_fd_init_dgram(peer, model, name, fd, is_connected,
-> +                                        errp);
->      case SOCK_STREAM:
->          return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
->      default:
-> -        error_report("qemu: error: socket type=%d for fd=%d is not"
-> +        error_setg(errp, "qemu: error: socket type=%d for fd=%d is not"
->                  " SOCK_DGRAM or SOCK_STREAM", so_type, fd);
->          closesocket(fd);
->      }
-> @@ -536,6 +546,7 @@ static int net_socket_connect_init(NetClientState *peer,
->      NetSocketState *s;
->      int fd, connected, ret;
->      struct sockaddr_in saddr;
-> +    Error *err = NULL;
->  
->      if (parse_host_port(&saddr, host_str) < 0)
->          return -1;
-> @@ -567,9 +578,11 @@ static int net_socket_connect_init(NetClientState *peer,
->              break;
+>          if (ret == VMDK_ERROR) {
+> @@ -1671,10 +1842,11 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
 >          }
->      }
-> -    s = net_socket_fd_init(peer, model, name, fd, connected);
-> -    if (!s)
-> +    s = net_socket_fd_init(peer, model, name, fd, connected, &err);
-> +    if (!s) {
-> +        error_report_err(err);
->          return -1;
-> +    }
->      snprintf(s->nc.info_str, sizeof(s->nc.info_str),
->               "socket: connect to %s:%d",
->               inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
-> @@ -586,6 +599,7 @@ static int net_socket_mcast_init(NetClientState *peer,
->      int fd;
->      struct sockaddr_in saddr;
->      struct in_addr localaddr, *param_localaddr;
-> +    Error *err = NULL;
->  
->      if (parse_host_port(&saddr, host_str) < 0)
->          return -1;
-> @@ -598,13 +612,17 @@ static int net_socket_mcast_init(NetClientState *peer,
->          param_localaddr = NULL;
->      }
->  
-> -    fd = net_socket_mcast_create(&saddr, param_localaddr);
-> -    if (fd < 0)
-> +    fd = net_socket_mcast_create(&saddr, param_localaddr, &err);
-> +    if (fd < 0) {
-> +        error_report_err(err);
->          return -1;
-> +    }
->  
-> -    s = net_socket_fd_init(peer, model, name, fd, 0);
-> -    if (!s)
-> +    s = net_socket_fd_init(peer, model, name, fd, 0, &err);
-> +    if (!s) {
-> +        error_report_err(err);
->          return -1;
-> +    }
->  
->      s->dgram_dst = saddr;
->  
-> @@ -624,6 +642,7 @@ static int net_socket_udp_init(NetClientState *peer,
->      NetSocketState *s;
->      int fd, ret;
->      struct sockaddr_in laddr, raddr;
-> +    Error *err = NULL;
->  
->      if (parse_host_port(&laddr, lhost) < 0) {
->          return -1;
-> @@ -652,8 +671,9 @@ static int net_socket_udp_init(NetClientState *peer,
->      }
->      qemu_set_nonblock(fd);
->  
-> -    s = net_socket_fd_init(peer, model, name, fd, 0);
-> +    s = net_socket_fd_init(peer, model, name, fd, 0, &err);
->      if (!s) {
-> +        error_report_err(err);
->          return -1;
->      }
->  
-> @@ -696,7 +716,7 @@ int net_init_socket(const Netdev *netdev, const char *name,
->              return -1;
->          }
->          qemu_set_nonblock(fd);
-> -        if (!net_socket_fd_init(peer, "socket", name, fd, 1)) {
-> +        if (!net_socket_fd_init(peer, "socket", name, fd, 1, errp)) {
->              return -1;
->          }
->          return 0;
+>          if (zeroed) {
+>              /* Do zeroed write, buf is ignored */
+> -            if (extent->has_zero_grain &&
+> -                    offset_in_cluster == 0 &&
+> -                    n_bytes >= extent->cluster_sectors * BDRV_SECTOR_SIZE) {
+> -                n_bytes = extent->cluster_sectors * BDRV_SECTOR_SIZE;
+> +            if (extent->has_zero_grain && offset_in_cluster == 0 &&
+> +                    n_bytes >= extent->cluster_sectors * BDRV_SECTOR_SIZE *
+> +                        total_alloc_clusters) {
+> +                n_bytes = extent->cluster_sectors * BDRV_SECTOR_SIZE *
+> +                                        total_alloc_clusters;
+>                  if (!zero_dry_run) {
+>                      /* update L2 tables */
+>                      if (vmdk_L2update(extent, &m_data, VMDK_GTE_ZEROED)
+> -- 
+> 2.6.2
+> 
 
-Looks good to me otherwise.
+Fam
