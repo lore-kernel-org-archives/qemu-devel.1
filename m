@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53013)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52896)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dPtlx-0007bW-4c
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:55:34 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dPtm0-0007PJ-1t
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:55:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dPsLP-0005JQ-SL
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:24:01 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dPsKw-0003Gk-6c
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:23:31 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 27 Jun 2017 17:22:48 +0200
-Message-Id: <20170627152248.10446-11-pbonzini@redhat.com>
+Date: Tue, 27 Jun 2017 17:22:42 +0200
+Message-Id: <20170627152248.10446-5-pbonzini@redhat.com>
 In-Reply-To: <20170627152248.10446-1-pbonzini@redhat.com>
 References: <20170627152248.10446-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 10/10] ssh: support I/O from any AioContext
+Subject: [Qemu-devel] [PATCH 04/10] vpc: make it thread-safe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,70 +22,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: stefanha@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com
 
-The coroutine may run in a different AioContext, causing the
-fd handler to busy wait.  Fix this by resetting the handler
-in restart_coroutine, before the coroutine is restarted.
-
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block/ssh.c | 24 +++++++++++++++++-------
- 1 file changed, 17 insertions(+), 7 deletions(-)
+ block/vpc.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/block/ssh.c b/block/ssh.c
-index 52964416da..e6a5b08de3 100644
---- a/block/ssh.c
-+++ b/block/ssh.c
-@@ -888,13 +888,22 @@ static int ssh_has_zero_init(BlockDriverState *bs)
-     return has_zero_init;
+diff --git a/block/vpc.c b/block/vpc.c
+index 4240ba9d1c..0ff686540a 100644
+--- a/block/vpc.c
++++ b/block/vpc.c
+@@ -496,12 +496,6 @@ static inline int64_t get_image_offset(BlockDriverState *bs, uint64_t offset,
+     return block_offset;
  }
  
-+typedef struct BDRVSSHRestart {
-+    BlockDriverState *bs;
-+    Coroutine *co;
-+} BDRVSSHRestart;
+-static inline int64_t get_sector_offset(BlockDriverState *bs,
+-                                        int64_t sector_num, bool write)
+-{
+-    return get_image_offset(bs, sector_num * BDRV_SECTOR_SIZE, write);
+-}
+-
+ /*
+  * Writes the footer to the end of the image file. This is needed when the
+  * file grows as it overwrites the old footer
+@@ -696,6 +690,7 @@ static int64_t coroutine_fn vpc_co_get_block_status(BlockDriverState *bs,
+     VHDFooter *footer = (VHDFooter*) s->footer_buf;
+     int64_t start, offset;
+     bool allocated;
++    int64_t ret;
+     int n;
+ 
+     if (be32_to_cpu(footer->type) == VHD_FIXED) {
+@@ -705,10 +700,13 @@ static int64_t coroutine_fn vpc_co_get_block_status(BlockDriverState *bs,
+                (sector_num << BDRV_SECTOR_BITS);
+     }
+ 
+-    offset = get_sector_offset(bs, sector_num, 0);
++    qemu_co_mutex_lock(&s->lock);
 +
- static void restart_coroutine(void *opaque)
- {
--    Coroutine *co = opaque;
-+    BDRVSSHRestart *restart = opaque;
-+    BlockDriverState *bs = restart->bs;
-+    BDRVSSHState *s = bs->opaque;
-+    AioContext *ctx = bdrv_get_aio_context(bs);
++    offset = get_image_offset(bs, sector_num << BDRV_SECTOR_BITS, false);
+     start = offset;
+     allocated = (offset != -1);
+     *pnum = 0;
++    ret = 0;
  
--    DPRINTF("co=%p", co);
-+    DPRINTF("co=%p", restart->co);
-+    aio_set_fd_handler(ctx, s->sock, false, NULL, NULL, NULL, NULL);
+     do {
+         /* All sectors in a block are contiguous (without using the bitmap) */
+@@ -723,15 +721,17 @@ static int64_t coroutine_fn vpc_co_get_block_status(BlockDriverState *bs,
+          * sectors since there is always a bitmap in between. */
+         if (allocated) {
+             *file = bs->file->bs;
+-            return BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID | start;
++            ret = BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID | start;
++            break;
+         }
+         if (nb_sectors == 0) {
+             break;
+         }
+-        offset = get_sector_offset(bs, sector_num, 0);
++        offset = get_image_offset(bs, sector_num << BDRV_SECTOR_BITS, false);
+     } while (offset == -1);
  
--    aio_co_wake(co);
-+    aio_co_wake(restart->co);
+-    return 0;
++    qemu_co_mutex_unlock(&s->lock);
++    return ret;
  }
  
- /* A non-blocking call returned EAGAIN, so yield, ensuring the
-@@ -905,7 +914,10 @@ static coroutine_fn void co_yield(BDRVSSHState *s, BlockDriverState *bs)
- {
-     int r;
-     IOHandler *rd_handler = NULL, *wr_handler = NULL;
--    Coroutine *co = qemu_coroutine_self();
-+    BDRVSSHRestart restart = {
-+        .bs = bs,
-+        .co = qemu_coroutine_self()
-+    };
- 
-     r = libssh2_session_block_directions(s->session);
- 
-@@ -920,11 +932,9 @@ static coroutine_fn void co_yield(BDRVSSHState *s, BlockDriverState *bs)
-             rd_handler, wr_handler);
- 
-     aio_set_fd_handler(bdrv_get_aio_context(bs), s->sock,
--                       false, rd_handler, wr_handler, NULL, co);
-+                       false, rd_handler, wr_handler, NULL, &restart);
-     qemu_coroutine_yield();
-     DPRINTF("s->sock=%d - back", s->sock);
--    aio_set_fd_handler(bdrv_get_aio_context(bs), s->sock, false,
--                       NULL, NULL, NULL, NULL);
- }
- 
- /* SFTP has a function `libssh2_sftp_seek64' which seeks to a position
+ /*
 -- 
 2.13.0
