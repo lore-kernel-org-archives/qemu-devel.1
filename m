@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52593)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dPtkX-0007Cb-0p
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:54:04 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dPtkb-0006lo-CD
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:54:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dPtd5-0004df-0m
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:46:20 -0400
-References: <20170627163145.GC4792@noname.redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <71a641e8-4701-58bf-29c5-090f30d59d91@redhat.com>
-Date: Tue, 27 Jun 2017 11:46:10 -0500
+	(envelope-from <rth7680@gmail.com>) id 1dPtaV-0003gm-7L
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:43:42 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:34280)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dPtaV-0003fs-1S
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:43:39 -0400
+Received: by mail-qk0-x243.google.com with SMTP id 91so4567667qkq.1
+	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 09:43:38 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170621024831.26019-1-rth@twiddle.net>
+	<20170621024831.26019-14-rth@twiddle.net> <87r2y5wynr.fsf@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <027116e0-750a-dfcd-c48f-cd01c9bdfcef@twiddle.net>
+Date: Tue, 27 Jun 2017 09:43:35 -0700
 MIME-Version: 1.0
-In-Reply-To: <20170627163145.GC4792@noname.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="lakpal7WdcOFKAVHJm8JrX7J5pc0FRlgG"
-Subject: Re: [Qemu-devel] [RFC] QMP design: Fixing query-block and friends
+In-Reply-To: <87r2y5wynr.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 13/16] tcg: Export temp_idx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,117 +31,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, mreitz@redhat.com, armbru@redhat.com, stefanha@redhat.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, aurelien@aurel32.net
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lakpal7WdcOFKAVHJm8JrX7J5pc0FRlgG
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, mreitz@redhat.com, armbru@redhat.com,
- stefanha@redhat.com
-Message-ID: <71a641e8-4701-58bf-29c5-090f30d59d91@redhat.com>
-Subject: Re: [RFC] QMP design: Fixing query-block and friends
-References: <20170627163145.GC4792@noname.redhat.com>
-In-Reply-To: <20170627163145.GC4792@noname.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 06/27/2017 02:46 AM, Alex Bennée wrote:
+> 
+> Richard Henderson <rth@twiddle.net> writes:
+> 
+>> At the same time, drop the TCGContext argument and use tcg_ctx instead.
+>>
+>> Signed-off-by: Richard Henderson <rth@twiddle.net>
+>> ---
+>>   tcg/tcg.c | 15 ++++-----------
+>>   tcg/tcg.h |  7 ++++++-
+>>   2 files changed, 10 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/tcg/tcg.c b/tcg/tcg.c
+>> index f8d96fa..26931a7 100644
+>> --- a/tcg/tcg.c
+>> +++ b/tcg/tcg.c
+>> @@ -473,13 +473,6 @@ void tcg_func_start(TCGContext *s)
+>>       s->be = tcg_malloc(sizeof(TCGBackendData));
+>>   }
+>>
+>> -static inline int temp_idx(TCGContext *s, TCGTemp *ts)
+>> -{
+>> -    ptrdiff_t n = ts - s->temps;
+>> -    tcg_debug_assert(n >= 0 && n < s->nb_temps);
+>> -    return n;
+>> -}
+>> -
+>>   static inline TCGTemp *tcg_temp_alloc(TCGContext *s)
+>>   {
+>>       int n = s->nb_temps++;
+>> @@ -516,7 +509,7 @@ static int tcg_global_reg_new_internal(TCGContext *s, TCGType type,
+>>       ts->name = name;
+>>       tcg_regset_set_reg(s->reserved_regs, reg);
+>>
+>> -    return temp_idx(s, ts);
+>> +    return temp_idx(ts);
+>>   }
+>>
+>>   void tcg_set_frame(TCGContext *s, TCGReg reg, intptr_t start, intptr_t size)
+>> @@ -605,7 +598,7 @@ int tcg_global_mem_new_internal(TCGType type, TCGv_ptr base,
+>>           ts->mem_offset = offset;
+>>           ts->name = name;
+>>       }
+>> -    return temp_idx(s, ts);
+>> +    return temp_idx(ts);
+>>   }
+>>
+>>   static int tcg_temp_new_internal(TCGType type, int temp_local)
+>> @@ -645,7 +638,7 @@ static int tcg_temp_new_internal(TCGType type, int temp_local)
+>>               ts->temp_allocated = 1;
+>>               ts->temp_local = temp_local;
+>>           }
+>> -        idx = temp_idx(s, ts);
+>> +        idx = temp_idx(ts);
+>>       }
+>>
+>>   #if defined(CONFIG_DEBUG_TCG)
+>> @@ -963,7 +956,7 @@ static void tcg_reg_alloc_start(TCGContext *s)
+>>   static char *tcg_get_arg_str_ptr(TCGContext *s, char *buf, int buf_size,
+>>                                    TCGTemp *ts)
+>>   {
+>> -    int idx = temp_idx(s, ts);
+>> +    int idx = temp_idx(ts);
+>>
+>>       if (ts->temp_global) {
+>>           pstrcpy(buf, buf_size, ts->name);
+>> diff --git a/tcg/tcg.h b/tcg/tcg.h
+>> index 4f69d0c..b75a745 100644
+>> --- a/tcg/tcg.h
+>> +++ b/tcg/tcg.h
+>> @@ -733,13 +733,18 @@ struct TCGContext {
+>>   extern TCGContext tcg_ctx;
+>>   extern bool parallel_cpus;
+>>
+>> -static inline TCGArg temp_arg(TCGTemp *ts)
+>> +static inline size_t temp_idx(TCGTemp *ts)
+>>   {
+>>       ptrdiff_t n = ts - tcg_ctx.temps;
+>>       tcg_debug_assert(n >= 0 && n < tcg_ctx.nb_temps);
+>>       return n;
+>>   }
+>>
+>> +static inline TCGArg temp_arg(TCGTemp *ts)
+>> +{
+>> +    return temp_idx(ts);
+>> +}
+> 
+> I'm confused at the dropping of TCGArg in favour of size_t only for
+> temp_arg to implicitly cast it back. Was this meant to be part of
+> another patch?
 
-On 06/27/2017 11:31 AM, Kevin Wolf wrote:
-> Hi,
->=20
-> I haven't really liked query-block for a long time, but now that
-> blockdev-add and -blockdev have settled, it might finally be the time t=
-o
-> actually do something about it. In fact, if used together with these
-> modern interfaces, our query commands are simply broken, so we have to
-> fix something.
+It was meant to keep the types logical.  When talking about an "arg" use 
+TCGArg; when talking about an index (or idx) use size_t (or quite often int, 
+where this hasn't been cleaned up).
 
-Agreed.
-
->=20
-> However, it appears to me that I dislike so many thing about our curren=
-t
-> query commands that I'm tempted to say: Throw it all away and start
-> over.
-
-I'm somewhat leaning this direction as well. We have to keep the old
-commands for a while longer (if we don't want to break existing
-clients), but libvirt has definitely felt some of the pain of how many
-commands and parsing are required in tandem to reconstruct which BDS
-node name to use for setting threshold events.
-
->=20
-> If that's what we're going to do, I think I can figure out something
-> nice for block nodes. That shouldn't be too hard. The only question
-> would be whether we want a command to query one node or whether we woul=
-d
-> keep returning all of them.
-
-The age-old filtering question. It's also plausible to have a single
-command, with an optional argument, and which always returns an array:
-the full array if the argument was omitted, or an array of one matching
-the argument when one was provided.  Adding filtering is an easy patch
-on top once it is proven to make life easier for a client, and I'm okay
-with a first approach that does not filter.
-
->=20
-> I am, however, a bit less confident about BBs. As I said above, I
-> consider them part of the qdev devices. As far as I know, there is no
-> high-level infrastructure to query runtime state of devices and qdev
-> properties are supposed to be read-only. Maybe non-qdev QOM properties
-> can be used somehow? But QOM isn't really nice to use as you need to
-> query each property individually.
->=20
-> Another option would be to have a QMP command that takes a qdev ID of a=
-
-> block device and queries its BB. Or maybe it should stay like
-> query-block and return an array of all of them, but include the qdev
-> device name. Actually, maybe query-block can stay as it contains only
-> two fields that are useless in the new world.
-
-Being able to query all the devices (with their BB's, and only a name
-reference to the top-level BDS in use by the BB), separately from being
-able to query all BDS, seems like a reasonable thing.  After all,
-sometimes you care about what the guest sees (what devices have a BB),
-and sometimes you care about what the host is exposing (what BDS are in
-use).
-
-> I think this has become long enough now, so any opinions? On anything I=
-
-> said above, but preferably also about what a new interface should look
-> like?
-
-Our existing interface is definitely awkward, with lots of redundancy in
-some places and missing information in others, and a new interface does
-seem like we can do better at designing it right up front rather than
-bolting on yet more information to the existing queries (which results
-in that much more noise to churn through to get to the desired informatio=
-n).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+You'll see from the last patch that temp_arg no longer calls temp_idx.
 
 
---lakpal7WdcOFKAVHJm8JrX7J5pc0FRlgG
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZUovSAAoJEKeha0olJ0NqF6oH/A2I3NjArOWzclNfgG16nrUw
-5JV+hjFzUfVCKx+cX7Ndc5mliUOH/di151sR6uVgJfkbIJaea2HCsi+SR/zjO6eq
-dddKTLcBwaltyRm8Cwc5dVEBAPJLm6o4h3q026hMMqlQrEc9PO/DDv8Sfvqq9Hiu
-AvRobwaIQEhR1mtYHWtpDRFQ8g8RK6sP9FVS+kHCOQaSsFpUOeJYSS/0e21ZkeEQ
-39P4XTPaAZwKfYVGRzNOUsBuyzKFfU3wDnAODMxxrwDTTAYKxGk9HuRFsGrymbDf
-ZAFkOpv39ugjyp+HPAgkc5MouuWBd21gdMtrGaq9SVV/9RXbNf/MV5eunX9aEq4=
-=33m9
------END PGP SIGNATURE-----
-
---lakpal7WdcOFKAVHJm8JrX7J5pc0FRlgG--
+r~
