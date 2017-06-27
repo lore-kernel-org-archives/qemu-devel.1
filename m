@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dPr0g-0003In-GV
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 09:58:31 -0400
+	(envelope-from <drjones@redhat.com>) id 1dPr2L-00042E-5W
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 10:00:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dPr0b-0002mb-Hm
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 09:58:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40386)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dPr0b-0002hq-8o
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 09:58:25 -0400
-References: <20170605123908.18777-1-pbonzini@redhat.com>
-	<20170605123908.18777-17-pbonzini@redhat.com>
-	<e138c191-5f28-ff50-1b86-d4d1a416eadc@virtuozzo.com>
-	<37960694-8f25-8201-5f17-e59c3ee67e90@redhat.com>
-	<eb056c7c-2bd7-e9b2-cebb-30f716386d00@virtuozzo.com>
-	<c9855403-a641-31a7-f6e9-db0388c4b73a@redhat.com>
-	<5ed4c5a0-11f3-14e7-77e6-47fa01a07d75@virtuozzo.com>
-	<af36087e-de08-4a30-53f7-0a9fafb56a88@redhat.com>
-	<3a438db2-2c6d-e07b-94eb-b7c08073b9ae@virtuozzo.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e2816225-b5a7-6d60-9772-bff478b10a92@redhat.com>
-Date: Tue, 27 Jun 2017 15:58:15 +0200
+	(envelope-from <drjones@redhat.com>) id 1dPr2G-0006yX-85
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 10:00:13 -0400
+Date: Tue, 27 Jun 2017 15:59:51 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20170627135951.ztukjadpnervqoly@kamzik.brq.redhat.com>
+References: <1498512656-75289-1-git-send-email-agraf@suse.de>
+	<20170627123718.mdfn3o7heu6v7x6n@kamzik.brq.redhat.com>
+	<b627df63-9ac1-49ff-931d-74c88d9d7ed5@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <3a438db2-2c6d-e07b-94eb-b7c08073b9ae@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 16/19] block: protect modification of dirty
- bitmaps with a mutex
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b627df63-9ac1-49ff-931d-74c88d9d7ed5@suse.de>
+Subject: Re: [Qemu-devel] [PATCH] ARM: KVM: Enable in-kernel timers with
+ user space gic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,36 +25,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: famz@redhat.com
+To: Alexander Graf <agraf@suse.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, cdall@linaro.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-
-
-On 27/06/2017 15:51, Vladimir Sementsov-Ogievskiy wrote:
->>>
->>> bdrv_create_dirty_bitmap(...)
->>>
->>> bdrv_dirty_bitmaps_lock(bs)
->>>
->>> bitmap  = bdrv_find_dirty_bitmap(bs, name)
->>>
->>> <some changes>
->>>
->>> bdrv_dirty_bitmaps_unlock(bs)
->>>
->>> - because we can't now trust the pointer returned by
->>> bdrv_create_dirty_bitmap, as it releases bitmap lock before return.
->> If you have the big QEMU lock (you do if you are in the QEMU monitor),
->> you are protected from changes to the list of bitmaps.
->>
->> Paolo
+On Tue, Jun 27, 2017 at 03:00:10PM +0200, Alexander Graf wrote:
+> > > +        /* XXX PMU IRQ is missing */
+> > 
+> > So I was wondering why you chose not to wire up the PMU in order to finish
 > 
-> but you wrote "Writing to the list requires the BQL _and_ the
-> dirty_bitmap_mutex".
+> Because the PMU IRQ is only available from the machine file, so it'll need
+> some more plumbing to get the qemu_irq object available from kvm.c.
+
+OK, I just wrote a patch based on this patch for the PMU and will post it
+in a second.
+
 > 
-> should it be BQL only?
+> > this off, since I knew KVM has commit 3dbbdf78636e "KVM: arm/arm64: Report
+> > PMU overflow interrupts to userspace irqchip", which I presume should
+> > allow the PMU to work too. However, attempting to start a guest with
+> > -machine virt,accel=kvm,kernel-irqchip=off -cpu host,pmu=on doesn't provide
+> > it a PMU. AFAICT, that's only because KVM still has
+> > 
+> >          /*
+> >           * We currently require an in-kernel VGIC to use the PMU emulation,
+> >           * because we do not support forwarding PMU overflow interrupts to
+> >           * userspace yet.
+> >           */
+> >          if (!irqchip_in_kernel(vcpu->kvm) || !vgic_initialized(vcpu->kvm))
+> >                  return -ENODEV;
+> > 
+> > in kvm_arm_pmu_v3_init(). Anyone know why that wasn't removed with
+> > 3dbbdf78636e?
+> 
+> I guess it should get removed when the PMU sync works?
 
-bdrv_dirty_bitmaps_lock/unlock is (should be) called by the functions
-that write to the list.  I hope I can post the patch today already.
+OK, I'll post the KVM patch at the same time.
 
-Paolo
+
+I noticed another thing while testing with a virtio-scsi disk; I get
+this on output when booting with userspace irqchip
+
+ virtio-scsi: Failed to set guest notifiers (-11), ensure -enable-kvm is set
+ qemu-system-aarch64: virtio_bus_start_ioeventfd: failed. Fallback to userspace (slower).
+
+Just a warning, but I guess it should be removed, at least when the
+user has explicitly asked for a userspace irqchip with kernel-irqchip=no.
+
+Thanks,
+drew
