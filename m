@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dPtkx-0007u9-N8
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:54:31 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dPtl9-00084h-QB
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:54:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dPtO9-000518-Jc
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:30:56 -0400
-Resent-Message-Id: <E1dPtO9-000518-Jc@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21318)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dPtO9-00050I-Bv
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:30:53 -0400
-Message-ID: <149858104414.186.7439663766588695606@4f20b1c0f442>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <1498554219-4942-1-git-send-email-peterx@redhat.com>
+	(envelope-from <rth7680@gmail.com>) id 1dPtBX-000754-5x
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:17:54 -0400
+Received: from mail-qk0-x22e.google.com ([2607:f8b0:400d:c09::22e]:36594)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dPtBX-00074u-11
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:17:51 -0400
+Received: by mail-qk0-x22e.google.com with SMTP id p21so29376101qke.3
+	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 09:17:50 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170621024831.26019-1-rth@twiddle.net>
+	<20170621024831.26019-7-rth@twiddle.net> <87y3sdx1rr.fsf@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <5554273c-7858-9048-5c2c-4677884baff5@twiddle.net>
+Date: Tue, 27 Jun 2017 09:17:46 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 27 Jun 2017 09:30:45 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/8] VT-d: some enhancements on iotlb and
- tools
+In-Reply-To: <87y3sdx1rr.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 06/16] tcg: Add temp_global bit to TCGTemp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +31,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peterx@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, jasowang@redhat.com, mst@redhat.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, aurelien@aurel32.net
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ5
-ODU1NDIxOS00OTQyLTEtZ2l0LXNlbmQtZW1haWwtcGV0ZXJ4QHJlZGhhdC5jb20KU3ViamVjdDog
-W1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzhdIFZULWQ6IHNvbWUgZW5oYW5jZW1lbnRzIG9uIGlvdGxi
-IGFuZCB0b29scwpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
-L2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwg
-d2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0t
-Zm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBl
-Y2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVz
-ICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMv
-Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAg
-IGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBT
-Q1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
-ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjFjZjRmNTMgaW50ZWxfaW9t
-bXU6IGltcGxlbWVudCBtcnUgbGlzdCBmb3IgaW90bGIKMWFlMWRkZiBpbnRlbF9pb21tdTogdXNl
-IGFjY2Vzc19mbGFncyBmb3IgaW90bGIKYmFkM2Y3NCBpbnRlbF9pb21tdTogbGV0IGlvdGxiIHNp
-emUgdHVuYWJsZQo3ZGE5NDY0IGludGVsX2lvbW11OiBobXA6IGFsbG93ICItYyIgZm9yICJpbmZv
-IGlvbW11IgpmMmM4YjEwIGludGVsX2lvbW11OiBhZGQgaW90bGIvY29udGV4dCBjYWNoZSBzdGF0
-aXN0aWNzCmUzYTE3NjUgaW50ZWxfaW9tbXU6IHN1cHBvcnQgImluZm8gaW9tbXUiCjdiYjgzNGYg
-aG1wOiBhZGQgaW5mbyBpb21tdQowOTZhODE3IGludGVsX2lvbW11OiBmaXggVlREX1BBR0VfTUFT
-SwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS84OiBpbnRlbF9pb21tdTog
-Zml4IFZURF9QQUdFX01BU0suLi4KRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNo
-b3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMzg6IEZJTEU6IGh3L2kzODYvaW50ZWxf
-aW9tbXVfaW50ZXJuYWwuaDozODc6CisjZGVmaW5lIFZURF9QQUdFX01BU0sgICAgICAgICAgICAg
-ICB+KFZURF9QQUdFX1NJWkUgLSAxKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNiBs
-aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
-dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
-bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVj
-a2luZyBQQVRDSCAyLzg6IGhtcDogYWRkIGluZm8gaW9tbXUuLi4KV0FSTklORzogYXJjaGl0ZWN0
-dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzc5OiBGSUxFOiBpbmNsdWRl
-L2h3L2lvbW11Lmg6MToKKyNpZm5kZWYgX19IV19JT01NVV9IX18KCnRvdGFsOiAwIGVycm9ycywg
-MSB3YXJuaW5ncywgNjMgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAzLzg6IGludGVsX2lvbW11OiBzdXBwb3J0ICJpbmZv
-IGlvbW11Ii4uLgpDaGVja2luZyBQQVRDSCA0Lzg6IGludGVsX2lvbW11OiBhZGQgaW90bGIvY29u
-dGV4dCBjYWNoZSBzdGF0aXN0aWNzLi4uCkNoZWNraW5nIFBBVENIIDUvODogaW50ZWxfaW9tbXU6
-IGhtcDogYWxsb3cgIi1jIiBmb3IgImluZm8gaW9tbXUiLi4uCkNoZWNraW5nIFBBVENIIDYvODog
-aW50ZWxfaW9tbXU6IGxldCBpb3RsYiBzaXplIHR1bmFibGUuLi4KQ2hlY2tpbmcgUEFUQ0ggNy84
-OiBpbnRlbF9pb21tdTogdXNlIGFjY2Vzc19mbGFncyBmb3IgaW90bGIuLi4KQ2hlY2tpbmcgUEFU
-Q0ggOC84OiBpbnRlbF9pb21tdTogaW1wbGVtZW50IG1ydSBsaXN0IGZvciBpb3RsYi4uLgo9PT0g
-T1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVt
-YWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9y
-Zy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3Rz
-Lm9yZw==
+On 06/27/2017 01:39 AM, Alex Bennée wrote:
+>> +    /* If true, the temp is saved across both basic blocks and
+>> +       translation blocks.  */
+>> +    unsigned int temp_global:1;
+>> +    /* If true, the temp is saved across basic blocks but dead
+>> +       at the end of translation blocks.  If false, the temp is
+>> +       dead at the end of basic blocks.  */
+>> +    unsigned int temp_local:1;
+>> +    unsigned int temp_allocated:1;
+> 
+> This is where my knowledge of the TCG internals gets slightly confused.
+> As far as I'm aware all our TranslationBlocks are Basic Blocks - they
+> don't have any branches until the end of the block. What is the
+> distinction here?
+> 
+> Is a temp_global truly global? I thought the guest state was fully
+> rectified by the time we leave the basic block.
+
+TranslationBlocks are not basic blocks.  They normally stop at branches in the 
+target instruction stream, but they certainly may have many branches in the tcg 
+opcode stream (brcond and the like).  Consider, for instance, our 
+implementation of arm32's conditional instructions.
+
+Beyond that, I agree the language is confusing.
+
+A temp_global is created by tcg_global_mem_new_*, generally represents a cpu 
+register, and is synced back to a slot in ENV.
+
+A temp_local is created by tcg_temp_local_new_*, and is synced to a slot in the 
+local stack frame.
+
+Something without either is simply declared dead at the end of a basic block, 
+and is a source of confusion to those writing new front-ends.
+
+Anyway, we already have all of these concepts.  The change is that before the 
+patch the only way to tell a temp_global is to compare the index against 
+tcg_ctx.nb_global.
+
+
+r~
