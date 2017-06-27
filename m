@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dPm1K-0002nJ-70
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:38:51 -0400
+	(envelope-from <famz@redhat.com>) id 1dPm6I-0004Ia-LY
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:43:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dPm1H-0004EK-0q
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:38:50 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:35610)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dPm1G-0004EC-LS
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:38:46 -0400
-Received: by mail-wm0-x231.google.com with SMTP id w126so17831306wme.0
-	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 01:38:46 -0700 (PDT)
-References: <20170621024831.26019-1-rth@twiddle.net>
-	<20170621024831.26019-7-rth@twiddle.net>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170621024831.26019-7-rth@twiddle.net>
-Date: Tue, 27 Jun 2017 09:39:36 +0100
-Message-ID: <87y3sdx1rr.fsf@linaro.org>
+	(envelope-from <famz@redhat.com>) id 1dPm6F-0006Sy-Dy
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:43:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47786)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dPm6F-0006SY-82
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:43:55 -0400
+Date: Tue, 27 Jun 2017 16:43:48 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170627084348.GG14166@lemon.lan>
+References: <20170615163813.7255-1-stefanha@redhat.com>
+	<20170615163813.7255-2-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 06/16] tcg: Add temp_global bit to TCGTemp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170615163813.7255-2-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/5] virtio-pci: use ioeventfd even when
+ KVM is disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,138 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, aurelien@aurel32.net
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Pavel Butsykin <pbutsykin@virtuozzo.com>
 
+On Thu, 06/15 17:38, Stefan Hajnoczi wrote:
+> Old kvm.ko versions only supported a tiny number of ioeventfds so
+> virtio-pci avoids ioeventfds when kvm_has_many_ioeventfds() returns 0.
+> 
+> Do not check kvm_has_many_ioeventfds() when KVM is disabled since it
+> always returns 0.  Since commit 8c56c1a592b5092d91da8d8943c17777d6462a6f
+> ("memory: emulate ioeventfd") it has been possible to use ioeventfds in
+> qtest or TCG mode.
+> 
+> This patch makes -device virtio-blk-pci,iothread=iothread0 work even
+> when KVM is disabled.
+> 
+> I have tested that virtio-blk-pci works under TCG both with and without
+> iothread.
+> 
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Richard Henderson <rth@twiddle.net> writes:
+This one was dropped out from Kevin's pull request but the iotest case update on
+068 which depends on it is merged. Now the test fails for me:
 
-> This avoids needing to test the index of a temp against nb_globals.
->
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
-> ---
->  tcg/optimize.c | 15 ++++++++-------
->  tcg/tcg.c      | 11 ++++++++---
->  tcg/tcg.h      | 12 ++++++++----
->  3 files changed, 24 insertions(+), 14 deletions(-)
->
-> diff --git a/tcg/optimize.c b/tcg/optimize.c
-> index d8c3a7e..55f9e83 100644
-> --- a/tcg/optimize.c
-> +++ b/tcg/optimize.c
-> @@ -116,25 +116,26 @@ static TCGOpcode op_to_movi(TCGOpcode op)
->      }
->  }
->
-> -static TCGArg find_better_copy(TCGContext *s, TCGArg temp)
-> +static TCGArg find_better_copy(TCGContext *s, TCGArg arg)
->  {
-> +    TCGTemp *ts = arg_temp(arg);
->      TCGArg i;
->
->      /* If this is already a global, we can't do better. */
-> -    if (temp < s->nb_globals) {
-> -        return temp;
-> +    if (ts->temp_global) {
-> +        return arg;
->      }
->
->      /* Search for a global first. */
-> -    for (i = temps[temp].next_copy ; i != temp ; i = temps[i].next_copy) {
-> +    for (i = temps[arg].next_copy ; i != arg; i = temps[i].next_copy) {
->          if (i < s->nb_globals) {
->              return i;
->          }
->      }
->
->      /* If it is a temp, search for a temp local. */
-> -    if (!arg_temp(temp)->temp_local) {
-> -        for (i = temps[temp].next_copy ; i != temp ; i = temps[i].next_copy) {
-> +    if (!ts->temp_local) {
-> +        for (i = temps[arg].next_copy ; i != arg; i = temps[i].next_copy) {
->              if (s->temps[i].temp_local) {
->                  return i;
->              }
-> @@ -142,7 +143,7 @@ static TCGArg find_better_copy(TCGContext *s, TCGArg temp)
->      }
->
->      /* Failure to find a better representation, return the same temp. */
-> -    return temp;
-> +    return arg;
->  }
->
->  static bool temps_are_copies(TCGArg arg1, TCGArg arg2)
-> diff --git a/tcg/tcg.c b/tcg/tcg.c
-> index 068ac51..0bb88b1 100644
-> --- a/tcg/tcg.c
-> +++ b/tcg/tcg.c
-> @@ -489,9 +489,14 @@ static inline TCGTemp *tcg_temp_alloc(TCGContext *s)
->
->  static inline TCGTemp *tcg_global_alloc(TCGContext *s)
->  {
-> +    TCGTemp *ts;
-> +
->      tcg_debug_assert(s->nb_globals == s->nb_temps);
->      s->nb_globals++;
-> -    return tcg_temp_alloc(s);
-> +    ts = tcg_temp_alloc(s);
-> +    ts->temp_global = 1;
-> +
-> +    return ts;
->  }
->
->  static int tcg_global_reg_new_internal(TCGContext *s, TCGType type,
-> @@ -967,7 +972,7 @@ static char *tcg_get_arg_str_ptr(TCGContext *s, char *buf, int buf_size,
->  {
->      int idx = temp_idx(s, ts);
->
-> -    if (idx < s->nb_globals) {
-> +    if (ts->temp_global) {
->          pstrcpy(buf, buf_size, ts->name);
->      } else if (ts->temp_local) {
->          snprintf(buf, buf_size, "loc%d", idx - s->nb_globals);
-> @@ -1905,7 +1910,7 @@ static void temp_free_or_dead(TCGContext *s, TCGTemp *ts, int free_or_dead)
->      }
->      ts->val_type = (free_or_dead < 0
->                      || ts->temp_local
-> -                    || temp_idx(s, ts) < s->nb_globals
-> +                    || ts->temp_global
->                      ? TEMP_VAL_MEM : TEMP_VAL_DEAD);
->  }
->
-> diff --git a/tcg/tcg.h b/tcg/tcg.h
-> index 70d9fda..3b35344 100644
-> --- a/tcg/tcg.h
-> +++ b/tcg/tcg.h
-> @@ -586,10 +586,14 @@ typedef struct TCGTemp {
->      unsigned int indirect_base:1;
->      unsigned int mem_coherent:1;
->      unsigned int mem_allocated:1;
-> -    unsigned int temp_local:1; /* If true, the temp is saved across
-> -                                  basic blocks. Otherwise, it is not
-> -                                  preserved across basic blocks. */
-> -    unsigned int temp_allocated:1; /* never used for code gen */
-> +    /* If true, the temp is saved across both basic blocks and
-> +       translation blocks.  */
-> +    unsigned int temp_global:1;
-> +    /* If true, the temp is saved across basic blocks but dead
-> +       at the end of translation blocks.  If false, the temp is
-> +       dead at the end of basic blocks.  */
-> +    unsigned int temp_local:1;
-> +    unsigned int temp_allocated:1;
+068 2s ... - output mismatch (see 068.out.bad)
+--- /stor/work/qemu/tests/qemu-iotests/068.out	2017-06-27 16:22:55.003815188 +0800
++++ 068.out.bad	2017-06-27 16:41:37.903626275 +0800
+@@ -12,9 +12,8 @@
+ === Saving and reloading a VM state to/from a qcow2 image (-object iothread,id=iothread0 -set device.hba0.iothread=iothread0) ===
+ 
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072
++qemu-system-x86_64: -device virtio-scsi-pci,id=hba0: ioeventfd is required for iothread
+ QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) savevm 0
+-(qemu) quit
++(qemu) qemu-system-x86_64: -device virtio-scsi-pci,id=hba0: ioeventfd is required for iothread
+ QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) quit
+-*** done
++(qemu) *** done
+Failures: 068
+Failed 1 of 1 tests
 
-This is where my knowledge of the TCG internals gets slightly confused.
-As far as I'm aware all our TranslationBlocks are Basic Blocks - they
-don't have any branches until the end of the block. What is the
-distinction here?
-
-Is a temp_global truly global? I thought the guest state was fully
-rectified by the time we leave the basic block.
-
->
->      tcg_target_long val;
->      struct TCGTemp *mem_base;
-
-
---
-Alex Bennée
+Fam
