@@ -1,16 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dPtlo-00082p-Sv
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dPtlp-0006m9-Jc
 	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:55:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dPsU0-0005UZ-3g
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:32:55 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:31994 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dPsSR-0007cm-Cp
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:31:21 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:41019 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dPsTz-0005Nx-PG
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:32:52 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+	id 1dPsSR-0007Qz-0r
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:31:15 -0400
 References: <20170605123908.18777-1-pbonzini@redhat.com>
 	<20170605123908.18777-17-pbonzini@redhat.com>
 	<e138c191-5f28-ff50-1b86-d4d1a416eadc@virtuozzo.com>
@@ -23,11 +22,11 @@ References: <20170605123908.18777-1-pbonzini@redhat.com>
 	<e2816225-b5a7-6d60-9772-bff478b10a92@redhat.com>
 	<13257113-2f2b-ccf5-93d1-66b2b963efce@virtuozzo.com>
 	<5458c8fb-f73b-6651-b418-87bab8d3d143@redhat.com>
-	<38cee5dc-4051-28b0-5258-015f7fa61979@virtuozzo.com>
-Message-ID: <81e85700-241a-c078-bb90-6ca756aceaeb@virtuozzo.com>
-Date: Tue, 27 Jun 2017 18:32:50 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <38cee5dc-4051-28b0-5258-015f7fa61979@virtuozzo.com>
+Date: Tue, 27 Jun 2017 18:31:11 +0300
 MIME-Version: 1.0
-In-Reply-To: <38cee5dc-4051-28b0-5258-015f7fa61979@virtuozzo.com>
+In-Reply-To: <5458c8fb-f73b-6651-b418-87bab8d3d143@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
@@ -44,57 +43,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Cc: famz@redhat.com
 
-27.06.2017 18:31, Vladimir Sementsov-Ogievskiy wrote:
-> 27.06.2017 17:26, Paolo Bonzini wrote:
->>
->> On 27/06/2017 16:20, Vladimir Sementsov-Ogievskiy wrote:
->>> I'm likely not right, but for me introducing this mutex looks like 
->>> dirty
->>> bitmaps may be accessed from concurrent threads. So for me it looks
->>> strange that only accessors are protected by the mutex and not the 
->>> whole
->>> transactions.
->> There must be something else protecting the whole transaction.
->>
->>> One example I've wrote above, other examples from code: are
->>> qmp_block_dirty_bitmap** functions:
->>>
->>> bdrv_create_dirty_bitmap() {
->>>
->>>     bdrv_find_dirty_bitmap()
->>>
->>>     ....
->>>
->>> bdrv_dirty_bitmaps_lock(bs);
->>>     QLIST_INSERT_HEAD(&bs->dirty_bitmaps, bitmap, list);
->>>     bdrv_dirty_bitmaps_unlock(bs);
->>>
->>> }
->>>
->>> - we protect inserting into list from other threads, but what prevent
->>> creating bitmap with the same name from other thread after
->>> bdrv_find_dirty_bitmap() and before bdrv_dirty_bitmaps_lock() ?
->> It's like a read-write lock.
+27.06.2017 17:26, Paolo Bonzini wrote:
 >
-> Ok, finally I understand (not all, but the main idea=), sorry for 
-> annoying.
+> On 27/06/2017 16:20, Vladimir Sementsov-Ogievskiy wrote:
+>> I'm likely not right, but for me introducing this mutex looks like dirty
+>> bitmaps may be accessed from concurrent threads. So for me it looks
+>> strange that only accessors are protected by the mutex and not the whole
+>> transactions.
+> There must be something else protecting the whole transaction.
+>
+>> One example I've wrote above, other examples from code: are
+>> qmp_block_dirty_bitmap** functions:
+>>
+>> bdrv_create_dirty_bitmap() {
+>>
+>>     bdrv_find_dirty_bitmap()
+>>
+>>     ....
+>>
+>> bdrv_dirty_bitmaps_lock(bs);
+>>     QLIST_INSERT_HEAD(&bs->dirty_bitmaps, bitmap, list);
+>>     bdrv_dirty_bitmaps_unlock(bs);
+>>
+>> }
+>>
+>> - we protect inserting into list from other threads, but what prevent
+>> creating bitmap with the same name from other thread after
+>> bdrv_find_dirty_bitmap() and before bdrv_dirty_bitmaps_lock() ?
+> It's like a read-write lock.
 
-Is there any example of accessing dirty bitmaps for read not under BQL 
-but only under dirty bitmap lock?
+Ok, finally I understand (not all, but the main idea=), sorry for annoying.
 
 >
->>
->> The write side is invoked under the 'big QEMU lock' so there cannot be
->> two concurrent writes.
->>
->> A bitmap can be written to after bdrv_find_dirty_bitmap returns, but
->> only if _you_ tell another thread about the bitmap you've just created.
->> If that doesn't happen, the bitmap cannot change.  And it can also
->> disappear because _your_ thread is the one with the big QEMU lock.
->>
->> Paolo
+> The write side is invoked under the 'big QEMU lock' so there cannot be
+> two concurrent writes.
 >
+> A bitmap can be written to after bdrv_find_dirty_bitmap returns, but
+> only if _you_ tell another thread about the bitmap you've just created.
+> If that doesn't happen, the bitmap cannot change.  And it can also
+> disappear because _your_ thread is the one with the big QEMU lock.
 >
+> Paolo
+
 
 -- 
 Best regards,
