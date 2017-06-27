@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dPemG-0006v8-Ae
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 20:54:49 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1dPeuz-0000eV-Qw
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 21:03:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dPemD-0003pT-7l
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 20:54:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49114)
+	(envelope-from <wei.w.wang@intel.com>) id 1dPeuw-0000YM-Nt
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 21:03:49 -0400
+Received: from mga04.intel.com ([192.55.52.120]:40018)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dPemC-0003oa-Vl
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 20:54:45 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 992D1C04B303
-	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 00:54:43 +0000 (UTC)
-From: "Eduardo Habkost" <ehabkost@redhat.com>
-Date: Mon, 26 Jun 2017 21:54:37 -0300
-Message-ID: <20170627005437.GK12152@localhost.localdomain>
-References: <1498193206-18007-1-git-send-email-peterx@redhat.com>
-	<1498193206-18007-5-git-send-email-peterx@redhat.com>
-	<20170623221819.GE10776@localhost.localdomain>
-	<20170626025035.GH3936@pxdev.xzpeter.org>
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1dPeuw-0000XE-EJ
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 21:03:46 -0400
+Message-ID: <5951AF7F.3010603@intel.com>
+Date: Tue, 27 Jun 2017 09:06:07 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170626025035.GH3936@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH v5 04/10] migration: let MigrationState be
- a qdev
+References: <1498185154-29015-1-git-send-email-wei.w.wang@intel.com>
+	<9c3402b1-961d-b953-ca6c-188b03ed756b@redhat.com>
+	<595093A8.1080902@intel.com>
+	<c4aac325-3775-ab86-eb5f-b951339eafd7@redhat.com>
+	<5950E331.6050409@intel.com>
+	<20170627002016-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20170627002016-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v3 1/2] virtio-net: enable
+ configurable tx queue size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,76 +33,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, eblake@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, stefanha@gmail.com, armbru@redhat.com, jan.scheurich@ericsson.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 
-On Mon, Jun 26, 2017 at 10:50:35AM +0800, Peter Xu wrote:
-> On Fri, Jun 23, 2017 at 07:18:19PM -0300, Eduardo Habkost wrote:
-> > On Fri, Jun 23, 2017 at 12:46:40PM +0800, Peter Xu wrote:
-> > > Let the old man "MigrationState" join the object family. Direct benefit
-> > > is that we can start to use all the property features derived from
-> > > current QDev, like: HW_COMPAT_* bits, command line setup for migration
-> > > parameters (so will never need to set them up each time using HMP/QMP,
-> > > this is really, really attractive for test writters), etc.
-> > > 
-> > > I see no reason to disallow this happen yet. So let's start from this
-> > > one, to see whether it would be anything good.
-> > > 
-> > > Now we init the MigrationState struct statically in main() to make sure
-> > > it's initialized after global properties are applied, since we'll use
-> > > them during creation of the object.
-> > > 
-> > > No functional change at all.
-> > > 
-> > > Reviewed-by: Juan Quintela <quintela@redhat.com>
-> > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > ---
-> > >  include/migration/misc.h |  1 +
-> > >  migration/migration.c    | 78 ++++++++++++++++++++++++++++++++++--------------
-> > >  migration/migration.h    | 19 ++++++++++++
-> > >  vl.c                     |  6 ++++
-> > >  4 files changed, 81 insertions(+), 23 deletions(-)
-> > > 
-> > [...]
-> > > diff --git a/vl.c b/vl.c
-> > > index cdd2ec8..9b04ba7 100644
-> > > --- a/vl.c
-> > > +++ b/vl.c
-> > > @@ -4596,6 +4596,12 @@ int main(int argc, char **argv, char **envp)
-> > >       */
-> > >      register_global_properties(current_machine);
-> > >  
-> > > +    /*
-> > > +     * Migration object can only be created after global properties
-> > > +     * are applied correctly.
-> > > +     */
-> > > +    migration_object_init();
-> > > +
-> > 
-> > Do we really need this? Can't be we just do:
-> > 
-> >     if (!current_migration) {
-> >         current_migration = MIGRATION_OBJ(object_new(TYPE_MIGRATION));
-> >     }
-> > 
-> > inside migration_get_current()?
-> 
-> I did this change on purpose (after AccelClass.global_props is
-> introduced). The comment above tried to explain it but looks like it's
-> still not clear enough... The reason is that currently the creation of
-> migration object is depending on the global properties, so we need to
-> create the object after register_global_properties(), while the old
-> migrate_get_current() cannot really be sure of this ordering: it just
-> creates the object on the first call of the function, but the first
-> call can be even before register_global_properties(). If so, we'll
-> have a problem (e.g. Xen compat properties will be missing).
-> 
-> Now this restriction is strictly followed if we create the migrate
-> object here. If anyone calls migrate_get_current() before
-> register_global_properties(), there will be an assert, and that should
-> be treated as a programming error.
+On 06/27/2017 05:21 AM, Michael S. Tsirkin wrote:
+> On Mon, Jun 26, 2017 at 06:34:25PM +0800, Wei Wang wrote:
+>> On 06/26/2017 04:05 PM, Jason Wang wrote:
+>>>
+>>> On 2017年06月26日 12:55, Wei Wang wrote:
+>>>> On 06/26/2017 11:18 AM, Jason Wang wrote:
+>>>>> On 2017年06月23日 10:32, Wei Wang wrote:
+>>>>>> This patch enables the virtio-net tx queue size to be configurable
+>>>>>> between 256 (the default queue size) and 1024 by the user when the
+>>>>>> vhost-user backend is used.
+>>>>>>
+>>>>>> Currently, the maximum tx queue size for other backends is 512 due
+>>>>>> to the following limitations:
+>>>>>> - QEMU backend: the QEMU backend implementation in some cases may
+>>>>>> send 1024+1 iovs to writev.
+>>>>>> - Vhost_net backend: there are possibilities that the guest sends
+>>>>>> a vring_desc of memory which corsses a MemoryRegion thereby
+>>>>>> generating more than 1024 iovs after translattion from guest-physical
+>>>>>> address in the backend.
+>>>>>>
+>>>>>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+>>>>>> ---
+>>>>>>    hw/net/virtio-net.c            | 45
+>>>>>> +++++++++++++++++++++++++++++++++---------
+>>>>>>    include/hw/virtio/virtio-net.h |  1 +
+>>>>>>    2 files changed, 37 insertions(+), 9 deletions(-)
+>>>>>>
+>>>>>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+>>>>>> index 91eddaf..d13ca60 100644
+>>>>>> --- a/hw/net/virtio-net.c
+>>>>>> +++ b/hw/net/virtio-net.c
+>>>>>> @@ -34,8 +34,11 @@
+>>>>>>      /* previously fixed value */
+>>>>>>    #define VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE 256
+>>>>>> +
+>>>>>> +    /*
+>>>>>> +     * Currently, backends other than vhost-user don't
+>>>>>> support 1024 queue
+>>>>>> +     * size.
+>>>>>> +     */
+>>>>>> +    if (n->net_conf.tx_queue_size == VIRTQUEUE_MAX_SIZE &&
+>>>>>> +        nc->peer->info->type != NET_CLIENT_DRIVER_VHOST_USER) {
+>>>>>> +        n->net_conf.tx_queue_size = VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE;
+>>>>> Do we really want assume all vhost-user backend support 1024
+>>>>> queue size?
+>>>>>
+>>>>   Do you know any vhost-user backend implementation that doesn't support
+>>>> 1024 tx queue size?
+>>>>
+>>>>
+>>> I don't but the issue is vhost-user uditis an open protocol, there could
+>>> be even closed source implementation on this. So we can't audit all
+>>> kinds of backends.
+>>>
+>> This is the discussion left before. Here is my thought:
+>>
+>> Until now, nobody is officially using 1024 tx queue size, including the
+>> unknown
+>> vhost-user backend implementation. So, applying this patch won't affect any
+>> already deployed products.
+>>
+>> If someday, people whose products are based on the unknown vhost-user
+>> implementation change to try with 1024 tx queue size and apply this patch,
+>> and find 1024 doesn't work for them, they can simply set the value to 512
+>> (which
+>> is better than the 256 size they were using) or apply the 2nd patch entitled
+>> "VIRTIO_F_MAX_CHAIN_SIZE" to use 1024 queue size.
+>>
+>> I didn't see any big issue here. Would you see any issues?
+>>
+>> @Michael, what is your opinion?
+> Since the default does not change, I think it's fine.
+> You need to both have a non-default value and be using
+> a backend that does not support the 1024 size.
+> Seems unlikely to me.
+>
 
-Makes sense to me.  Thanks!
+Were you referring to the use of 512 queue size? I think that's already 
+supported
+for all the backends.
 
--- 
-Eduardo
+The above code only makes a non-vhost-user backend, which doesn't 
+support 1024,
+use the default value when the user specified 1024 queue size. It won't 
+make any
+change if 512 was given.
+
+Now, we treat all vhost-user backends as the ones that support 1024. If 
+a user got an
+unknown issue due to their special vhost-user backend 
+implementation(maybe bugs
+generated by their own) with 1024 queue size, they'll need to re-start 
+with 512, and
+the code will work with 512.
+
+Best,
+Wei
