@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dPpsK-0004jJ-El
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 08:45:49 -0400
+	(envelope-from <eblake@redhat.com>) id 1dPpvr-0006Hj-Of
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 08:49:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dPpsJ-00017N-N4
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 08:45:48 -0400
-Date: Tue, 27 Jun 2017 13:45:40 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170627124540.GF8555@stefanha-x1.localdomain>
-References: <20170623124700.1389-1-el13635@mail.ntua.gr>
-	<20170623124700.1389-4-el13635@mail.ntua.gr>
-	<20170626143055.GC29664@stefanha-x1.localdomain>
-	<20170626162641.cavidsn7d67absxb@postretch>
+	(envelope-from <eblake@redhat.com>) id 1dPpvq-0002kT-Hl
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 08:49:27 -0400
+References: <1498566850-7934-1-git-send-email-pl@kamp.de>
+	<1498566850-7934-2-git-send-email-pl@kamp.de>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <cfd60a29-6b27-7065-0fc7-30a82b01eadb@redhat.com>
+Date: Tue, 27 Jun 2017 07:49:17 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="fwqqG+mf3f7vyBCB"
-Content-Disposition: inline
-In-Reply-To: <20170626162641.cavidsn7d67absxb@postretch>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC v3 3/8] block: add
- throttle block filter driver
+In-Reply-To: <1498566850-7934-2-git-send-email-pl@kamp.de>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="LHKqEtGgqepH14VKWJCBNAmqV9leWXDPG"
+Subject: Re: [Qemu-devel] [PATCH 1/4] block/qcow2: add compression_algorithm
+ create option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,54 +25,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>
+To: Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, lersek@redhat.com, den@openvz.org, mreitz@redhat.com
 
-
---fwqqG+mf3f7vyBCB
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--LHKqEtGgqepH14VKWJCBNAmqV9leWXDPG
+From: Eric Blake <eblake@redhat.com>
+To: Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, lersek@redhat.com,
+ den@openvz.org, mreitz@redhat.com
+Message-ID: <cfd60a29-6b27-7065-0fc7-30a82b01eadb@redhat.com>
+Subject: Re: [PATCH 1/4] block/qcow2: add compression_algorithm create option
+References: <1498566850-7934-1-git-send-email-pl@kamp.de>
+ <1498566850-7934-2-git-send-email-pl@kamp.de>
+In-Reply-To: <1498566850-7934-2-git-send-email-pl@kamp.de>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 26, 2017 at 07:26:41PM +0300, Manos Pitsidianakis wrote:
-> On Mon, Jun 26, 2017 at 03:30:55PM +0100, Stefan Hajnoczi wrote:
-> > > +    bs->file =3D bdrv_open_child(NULL, options, "file",
-> > > +                                    bs, &child_file, false, &local_e=
-rr);
-> > > +
-> > > +    if (local_err) {
-> > > +        error_propagate(errp, local_err);
-> > > +        return -EINVAL;
-> > > +    }
-> > > +
-> > > +    qdict_flatten(options);
-> > > +    return throttle_configure_tgm(bs, tgm, options, errp);
-> >=20
-> > Who destroys bs->file on error?
+On 06/27/2017 07:34 AM, Peter Lieven wrote:
+> this patch adds a new compression_algorithm option when creating qcow2 =
+images.
+> The current default for the compresison algorithm is zlib and zlib will=
+ be
+
+s/compresison/compression/
+
+> used when this option is omitted (like before).
 >=20
-> It is reaped by bdrv_open_inherit() on failure, if I'm not mistaken.
-> That's how other drivers handle this as well. Some (eg block/qcow2.c)
-> check if bs->file is NULL instead of the error pointer they pass, so
-> this is not not very consistent.
+> If the option is specified e.g. with:
+>=20
+>  qemu-img create -f qcow2 -o compression_algorithm=3Dzlib image.qcow2 1=
+G
+>=20
+> then a new compression algorithm header extension is added and an incom=
+patible
+> feature bit is set. This means that if the header is present it must be=
+ parsed
+> by Qemu on qcow2_open and it must be validated if the specified compres=
+sion
+> algorithm is supported by the current build of Qemu.
+>=20
+> This means if the compression_algorithm option is specified Qemu prior =
+to this
+> commit will not be able to open the created image.
+>=20
+> Signed-off-by: Peter Lieven <pl@kamp.de>
+> ---
+>  block/qcow2.c             | 93 +++++++++++++++++++++++++++++++++++++++=
++++++---
+>  block/qcow2.h             | 20 +++++++---
+>  docs/interop/qcow2.txt    |  8 +++-
 
-Maybe I'm missing it but I don't see relevant bs->file cleanup in
-bdrv_open_inherit() or bdrv_open_common().
+Focusing on just the spec change first:
 
-Please post the exact line where it happens.
+> +++ b/docs/interop/qcow2.txt
+> @@ -85,7 +85,11 @@ in the description of a field.
+>                                  be written to (unless for regaining
+>                                  consistency).
+> =20
+> -                    Bits 2-63:  Reserved (set to 0)
+> +                    Bit 2:      Compress algorithm bit.  If this bit i=
+s set then
+> +                                the compress algorithm extension must =
+be parsed
+> +                                and checked for compatiblity.
 
-Stefan
+s/compatiblity/compatibility/
 
---fwqqG+mf3f7vyBCB
+> +
+> +                    Bits 3-63:  Reserved (set to 0)
+> =20
+>           80 -  87:  compatible_features
+>                      Bitmask of compatible features. An implementation =
+can
+> @@ -135,6 +139,8 @@ be stored. Each extension has a structure like the =
+following:
+>                          0xE2792ACA - Backing file format name
+>                          0x6803f857 - Feature name table
+>                          0x23852875 - Bitmaps extension
+> +                        0xC0318300 - Compression Algorithm
+> +                        0xC03183xx - Reserved for compression algorith=
+m params
+
+s/params/parameters/
+
+You have now introduced 256 different reserved headers, without
+documenting any of their formats.  You absolutely MUST include a
+documentation of how the new 0xC0318300 header is laid out (see, for
+example, our section on "Bitmaps extension"), along with text mentioning
+that the new header MUST be present if incompatible-feature bit is set
+and MUST be absent otherwise.  But I also think that with a bit of
+proper design work, you only need ONE header for all possible algorithm
+parameters, rather than burning an additional 255 unspecified
+reservations.  That is, make sure your new header includes a common
+prefix including a length field and the algorightm in use, and then the
+length covers a variable-length suffix that can be parsed in a
+per-algorithm-specific manner for whatever additional parameters are
+needed for that algorithm.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--LHKqEtGgqepH14VKWJCBNAmqV9leWXDPG
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBAgAGBQJZUlN0AAoJEJykq7OBq3PIxZ0IAMltxfiII9bkedIxaLtPfBP5
-LnYLN9KX3RZ67YmhLe4WDr8kjLRyzAn3v9xtpdj4DTalfkg7HdStiXiqRw3Nxokm
-kV0z8sVZKPQwXjGdPoK1mtP1COoOHym0D4LfoUU0a8uUeP2uKLvQuOLehlHqbmsP
-j4vRA1a1TcPKq3xzE0nnri7g8gHYP5uUeKnG1vIkpIgiMgquCFnhkBHR7WQ8OhpM
-05kS//6uC/pvV6hqw92sd7qhlFvb41kto/TBaB5vf0NOG1fx6KKmMxgUZQepwu6n
-ezAfFTo0wS2tNdV9+gbv+ixcH+bF8q9o9TJM1XeL2MqNy++LAkBhryO/NNlDe80=
-=wMWD
+iQEcBAEBCAAGBQJZUlRNAAoJEKeha0olJ0NqiOgH+gI8CCaWl0xRSLCp1zXxRDqL
+GiGff7Vs+/WcwVRMu523m16uOkNThiMrUyFZ1/Gp7hdkbmVzxPJ3eOp11Lt4gdoI
+FDLO0h9Igx6GQCfoF+h2K+xKeBwVXbc1SFPmlD8wUKN9sgWDliUjK1u0A5397Mz+
+9Epu7YyFefGRLhIkXtZFAmLL6hR1KjpzRN0KBKy7Cwp7l3h9i/pQEJ2D8J67Qqz1
+ydq4CRe3N2VZL/QLkvbpfVD5uYP/alPPjVHMEWP7uYCbY4AWgaHAUwB7q7gKsC+W
+Vf1U8ukd0/T43f0dLi6VTasiMi7hraWxMl4Jcf8Dh3M0lgT4dPoehJxCri+hYd8=
+=sZ96
 -----END PGP SIGNATURE-----
 
---fwqqG+mf3f7vyBCB--
+--LHKqEtGgqepH14VKWJCBNAmqV9leWXDPG--
