@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dPvvA-0006Ql-U4
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 15:13:12 -0400
+	(envelope-from <mst@redhat.com>) id 1dPvyu-0001Bc-8O
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 15:17:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dPvv7-0001UN-Cq
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 15:13:08 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:51423)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dPvv7-0001Tl-2a
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 15:13:05 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 27 Jun 2017 21:12:14 +0200
-Message-Id: <20170627191221.31650-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v3 0/7] target/m68k: implement 680x0 FPU (part
- 2)
+	(envelope-from <mst@redhat.com>) id 1dPvyq-0003FX-Ug
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 15:17:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41854)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dPvyq-0003FL-Oq
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 15:16:56 -0400
+Date: Tue, 27 Jun 2017 22:16:39 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170627221515-mutt-send-email-mst@kernel.org>
+References: <20161202210152.6880-1-lersek@redhat.com>
+	<20170627185152.GA20939@flamenco>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170627185152.GA20939@flamenco>
+Subject: Re: [Qemu-devel] [PATCH v2] scripts: add "git.orderfile" for
+ ordering diff hunks by pathname patterns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,55 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: Laszlo Ersek <lersek@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, John Snow <jsnow@redhat.com>
 
-Second part of patches submitted in the v3.
+On Tue, Jun 27, 2017 at 02:51:52PM -0400, Emilio G. Cota wrote:
+> On Fri, Dec 02, 2016 at 22:01:52 +0100, Laszlo Ersek wrote:
+> > When passed to git-diff (and to every other git command producing diffs
+> > and/or diffstats) with "-O" or "diff.orderFile", this list of patterns
+> > will place the more declarative / abstract hunks first, while changes to
+> > imperative code / details will be near the end of the patches. This saves
+> > on scrolling / searching and makes for easier reviewing.
+> > 
+> > We intend to advise contributors in the Wiki to run
+> > 
+> >   git config diff.orderFile scripts/git.orderfile
+> > 
+> > once, as part of their initial setup, before formatting their first (or,
+> > for repeat contributors, next) patches.
+> > 
+> > See the "-O" option and the "diff.orderFile" configuration variable in
+> > git-diff(1) and git-config(1).
+> > 
+> > Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> > Cc: Eric Blake <eblake@redhat.com>
+> > Cc: Fam Zheng <famz@redhat.com>
+> > Cc: Gerd Hoffmann <kraxel@redhat.com>
+> > Cc: John Snow <jsnow@redhat.com>
+> > Cc: Max Reitz <mreitz@redhat.com>
+> > Cc: Stefan Hajnoczi <stefanha@gmail.com>
+> > Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+> > ---
+> 
+> Refloating 6+ months later, but..
+> 
+> Someone please merge this! :-)
+> 
+> 		E.
 
-This series adds a subset of single precision and
-double precision instructions using
-set_floatx80_rounding_precision() to round the result.
 
-For some other instructions, we introduce a new
-function, floatx80_round(), to round them manually.
-
-It also adds instructions fsglmul, fsgldiv,
-fmovecr and fscc (since v3, use tcg_gen_setcond())
-
-fmovem manages static and dynamic register list,
-all the code has been moved to an helper.
-
-v3:
-  Remove extra space in fmovem patch
-  truncate operands of fsglmul and fslgdiv
-  update gen_fcc_cond() as suggested by Richard
-  fmoverc: use opmode instead of rom_offset,
-  define and free the tcg constant
-
-v2:
-  Fix gen_fcc_cond(): g[12] mark global variables,
-  not variables to free.
-  add 2 patches to compute trigonometric functions
-  and fmod
-  use floatx80_round() to compute fsglmul and fsgldiv
-  split fmovem helper into 6 helpers
-
-Laurent Vivier (7):
-  target/m68k: add fscc.
-  target/m68k: add fmovecr
-  target/m68k: add explicit single and double precision operations
-  softfloat: define floatx80_round()
-  target/m68k: add fsglmul and fsgldiv
-  target/m68k: add explicit single and double precision operations (part
-    2)
-  target/m68k: add fmovem
-
- fpu/softfloat.c          |  15 ++
- include/fpu/softfloat.h  |   1 +
- target/m68k/fpu_helper.c | 306 ++++++++++++++++++++++++++++++++++++-
- target/m68k/helper.h     |  27 +++-
- target/m68k/translate.c  | 389 ++++++++++++++++++++++++++++++++---------------
- 5 files changed, 615 insertions(+), 123 deletions(-)
+Users should be aware that if they do this, the need to
+supply -O /dev/null to git pull-request. Otherwise the
+diffstat is all scrambled and you can't figure out
+what's included.
 
 -- 
-2.9.4
+MST
