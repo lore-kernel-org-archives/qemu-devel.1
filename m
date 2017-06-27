@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52896)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dPtlE-0007wp-IC
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:54:48 -0400
+	(envelope-from <berto@igalia.com>) id 1dPtlH-0007PJ-9L
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:54:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dPt4i-0003jw-NR
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:10:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43488)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dPt4i-0003jZ-I2
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:10:48 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Tue, 27 Jun 2017 18:10:32 +0200
-Message-Id: <20170627161032.5014-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1] s390x/cpumodel: allow to enable "idtes"
- feature for TCG
+	(envelope-from <berto@igalia.com>) id 1dPt05-00008b-JD
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:06:05 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170626165832.32mzemh4jiwpquo4@postretch>
+References: <20170623124700.1389-1-el13635@mail.ntua.gr>
+	<20170623124700.1389-5-el13635@mail.ntua.gr>
+	<20170626145234.GE29664@stefanha-x1.localdomain>
+	<20170626165832.32mzemh4jiwpquo4@postretch>
+Date: Tue, 27 Jun 2017 18:05:55 +0200
+Message-ID: <w5160fhza8s.fsf@maestria.local.igalia.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC v3 4/8] block: convert
+ ThrottleGroup to object with QOM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,45 +25,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: rth@twiddle.net, agraf@suse.de, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, david@redhat.com
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>
 
-STFL bit 4 and 5 are just indications to the guest, which TLB entries an
-IDTE call will clear. These are performance indicators for the guest.
+On Mon 26 Jun 2017 06:58:32 PM CEST, Manos Pitsidianakis wrote:
+> On Mon, Jun 26, 2017 at 03:52:34PM +0100, Stefan Hajnoczi wrote:
+>>On Fri, Jun 23, 2017 at 03:46:56PM +0300, Manos Pitsidianakis wrote:
+>>> +static bool throttle_group_exists(const char *name)
+>>> +{
+>>> +    ThrottleGroup *iter;
+>>> +    bool ret = false;
+>>> +
+>>> +    qemu_mutex_lock(&throttle_groups_lock);
+>>
+>>Not sure if this lock or the throttle_groups list are necessary.
 
-STFL bit 4:
-    INVALIDATE DAT TABLE ENTRY (IDTE) performs
-    the invalidation-and-clearing operation by
-    selectively clearing TLB segment-table entries
-    when a segment-table entry or entries are
-    invalidated. IDTE also performs the clearing-by-
-    ASCE operation. Unless bit 4 is one, IDTE simply
-    purges all TLBs. Bit 3 is one if bit 4 is one.
+As Manos says accesses to the throttle_groups list need to be locked.
 
-We can simply set STFL bit 4 ("idtes") and still purge the complete TLB.
-Purging more than advertised is never bad. E.g. Linux doesn't even care
-about this bit. We can optimized this later.
-This is helpful, as the z9 base model contains this facility.
+What I don't like at first sight is the code duplication in
+throttle_group_incref() and throttle_group_obj_complete().
 
-STFL bit 5 (clearing TLB region-table-entries) was never implemented on
-real HW, therefore we can simply ignore it for now.
+>>Have you seen iothread.c:qmp_query_iothreads()?  All objects are put
+>>into a container (the parent object), so you can just iterate over its
+>>children.  There's no need for a separate list because QOM already has
+>>all the objects.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/cpu_models.c | 1 +
- 1 file changed, 1 insertion(+)
+I haven't looked into this yet but it could be a solution.
 
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 63903c2..f056357 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -676,6 +676,7 @@ static void add_qemu_cpu_model_features(S390FeatBitmap fbm)
- {
-     static const int feats[] = {
-         S390_FEAT_DAT_ENH,
-+        S390_FEAT_IDTE_SEGMENT,
-         S390_FEAT_STFLE,
-         S390_FEAT_EXTENDED_IMMEDIATE,
-         S390_FEAT_EXTENDED_TRANSLATION_2,
--- 
-2.9.4
+Berto
