@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dPk9V-0001Y3-Tn
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 02:39:11 -0400
+	(envelope-from <groug@kaod.org>) id 1dPkOM-0004zn-Ha
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 02:54:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dPk9U-0005J0-Bo
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 02:39:09 -0400
-References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
-	<AM5PR0401MB2545AFD256A96420ACC44CD89ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<14c83c14-1e7e-f142-77b0-fa8c873e2d41@redhat.com>
-	<AM5PR0401MB2545C0E76C4BE6F82FE376D09ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<6f22079e-4b4b-6476-77be-51ec83104c0d@redhat.com>
-	<AM5PR0401MB25459FDAA8C9AFA52503AAE99AC40@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<589f1642-775c-4805-74ac-bf67eb504733@arm.com>
-	<5f47e723-1d3e-433b-cdaf-a56d16ba377e@redhat.com>
-	<d4277d93-d29d-7150-7962-bdfdd1c2a275@arm.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <6070f02d-20d3-98fb-e31a-e7dbf5010419@redhat.com>
-Date: Tue, 27 Jun 2017 08:38:48 +0200
+	(envelope-from <groug@kaod.org>) id 1dPkOH-0004Td-Kh
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 02:54:30 -0400
+Received: from 2.mo5.mail-out.ovh.net ([178.33.109.111]:36042)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dPkOH-0004R2-Au
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 02:54:25 -0400
+Received: from player695.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id D8AD210D032
+	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 08:54:22 +0200 (CEST)
+Date: Tue, 27 Jun 2017 08:54:18 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170627085418.38a58b9e@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <alpine.DEB.2.10.1706261553370.12819@sstabellini-ThinkPad-X260>
+References: <149820029273.7187.14110849422638329192.stgit@bahia.lan>
+	<149820032558.7187.9574922678907797880.stgit@bahia.lan>
+	<alpine.DEB.2.10.1706261553370.12819@sstabellini-ThinkPad-X260>
 MIME-Version: 1.0
-In-Reply-To: <d4277d93-d29d-7150-7962-bdfdd1c2a275@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 0/8] VIRTIO-IOMMU device
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/aVdYO5y1oCclPyq6ENeaCpT";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v4 3/4] virtio-9p: break device if buffers
+ are misconfigured
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,168 +33,313 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "wei@redhat.com" <wei@redhat.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-Hi Jean-Philippe,
+--Sig_/aVdYO5y1oCclPyq6ENeaCpT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On 26/06/2017 18:13, Jean-Philippe Brucker wrote:
-> On 26/06/17 09:22, Auger Eric wrote:
->> Hi Jean-Philippe,
->>
->> On 19/06/2017 12:15, Jean-Philippe Brucker wrote:
->>> On 19/06/17 08:54, Bharat Bhushan wrote:
->>>> Hi Eric,
->>>>
->>>> I started added replay in virtio-iommu and came across how MSI interrupts with work with VFIO. 
->>>> I understand that on intel this works differently but vsmmu will have same requirement. 
->>>> kvm-msi-irq-route are added using the msi-address to be translated by viommu and not the final translated address.
->>>> While currently the irqfd framework does not know about emulated iommus (virtio-iommu, vsmmuv3/vintel-iommu).
->>>> So in my view we have following options:
->>>> - Programming with translated address when setting up kvm-msi-irq-route
->>>> - Route the interrupts via QEMU, which is bad from performance
->>>> - vhost-virtio-iommu may solve the problem in long term
->>>>
->>>> Is there any other better option I am missing?
->>>
->>> Since we're on the topic of MSIs... I'm currently trying to figure out how
->>> we'll handle MSIs in the nested translation mode, where the guest manages
->>> S1 page tables and the host doesn't know about GVA->GPA translation.
->>
->> I have a question about the "nested translation mode" terminology. Do
->> you mean in that case you use stage 1 + stage 2 of the physical IOMMU
->> (which the ARM spec normally advises or was meant for) or do you mean
->> stage 1 implemented in vIOMMU and stage 2 implemented in pIOMMU. At the
->> moment my understanding is for VFIO integration the pIOMMU uses a single
->> stage combining both the stage 1 and stage2 mappings but the host is not
->> aware of those 2 stages.
-> 
-> Yes at the moment the VMM merges stage-1 (GVA->GPA) from the guest with
-> its stage-2 mappings (GPA->HPA) and creates a stage-2 mapping (GVA->HPA)
-> in the pIOMMU via VFIO_IOMMU_MAP_DMA. stage-1 is disabled in the pIOMMU.
-> 
-> What I mean by "nested mode" is stage 1 + stage 2 in the physical IOMMU.
-> I'm referring to the "Page Table Sharing" bit of the Future Work in the
-> initial RFC for virtio-iommu [1], and also PASID table binding [2] in the
-> case of vSMMU. In that mode, stage-1 page tables in the pIOMMU are managed
-> by the guest, and the VMM only maps GPA->HPA.
+On Mon, 26 Jun 2017 16:22:23 -0700 (PDT)
+Stefano Stabellini <sstabellini@kernel.org> wrote:
 
-OK I need to read that part more thoroughly. I was told in the past
-handling nested stages at pIOMMU was considered too complex and
-difficult to maintain. But definitively The SMMU architecture is devised
-for that. Michael asked why we did not use that already for vsmmu
-(nested stages are used on AMD IOMMU I think).
-> 
-> Since both s1 and s2 are then enabled in the pIOMMU, MSIs reaching the
-> pIOMMU will be translated at s1 then s2. To create nested translation for
-> MSIs, I see two solutions:
-> 
-> A. The GPA of the doorbell that is exposed to the guest is mapped by the
-> VMM at S2. This mapping is GPA->(PA of the doorbell) with Dev-nGnRE memory
-> attributes. The guest creates a GVA->GPA mapping, then writes GVA in the
-> MSI-X tables.
-> - If the MSI-X table is emulated (as we currently do), VMM has to force
->   the host to rewrite the physical MSIX entry with the GVA.
-> - If the MSI-X table is mapped (see [3]), then the guest writes
->   the GVA into the physical MSI-X entry. (How does this work with lazy MSI
->   routing setup, that is based on trapping MSIX table?)
-> 
-> B. The VMM exposes a fake doorbell. Hardware MSI vectors are programmed
-> upfront by the host. Since TTB0 is assigned to the guest, then host must
-> use TTB1 to create the GVA->GPA mapping.
-> 
-> Solution B was my proposal (2) below, but I didn't take vSMMU into account
-> at the time. I think that for virtual SVM with the vSMMU, the VMM has to
-> hand the whole PASID table over to the guest. This is what Intel seems to
-> do [2]. Even if we emulated the PASID table instead of handing it over, we
-> wouldn't have a way to hide TTB1 from the guest. So with vSMMU we loose
-> control over TTB1 and (2) doesn't work.
-> 
-> I don't really like A, but it might be the only way with vSMMU:
-> - Guest maps doorbell at S1,
-> - Guest writes the GVA in its virtual MSI-X tables,
-> - Host handles the GVA write and reprograms the hardware MSI-X tables,
-> - Device issues an MSI, which gets translated at S1+S2, then hits the
->   doorbell,
-> - VFIO handles the IRQ, which is forwarded to KVM via IRQFD, finds the
->   corresponding irqchip by GPA, then injects the MSI.
+> On Fri, 23 Jun 2017, Greg Kurz wrote:
+> > The 9P protocol is transport agnostic: if the guest misconfigured the
+> > buffers, the best we can do is to set the broken flag on the device.
+> >=20
+> > Since virtio_pdu_vmarshal() may be called by several active PDUs, we
+> > check if the transport isn't broken already to avoid printing extra
+> > error messages.
+> >=20
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> > v4: - update changelog and add comment to explain why we check vdev->br=
+oken
+> >       in virtio_pdu_vmarshal()
+> >     - dropped uneeded vdev->broken check in virtio_pdu_vunmarshal()
+> > ---
+> >  hw/9pfs/9p.c               |    2 +-
+> >  hw/9pfs/9p.h               |    2 +-
+> >  hw/9pfs/virtio-9p-device.c |   48 ++++++++++++++++++++++++++++++++++++=
++++-----
+> >  hw/9pfs/xen-9p-backend.c   |    3 ++-
+> >  4 files changed, 47 insertions(+), 8 deletions(-)
+> >=20
+> > diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> > index a0ae98f7ca6f..8e5cac71eb60 100644
+> > --- a/hw/9pfs/9p.c
+> > +++ b/hw/9pfs/9p.c
+> > @@ -1664,7 +1664,7 @@ static void v9fs_init_qiov_from_pdu(QEMUIOVector =
+*qiov, V9fsPDU *pdu,
+> >      unsigned int niov;
+> > =20
+> >      if (is_write) {
+> > -        pdu->s->transport->init_out_iov_from_pdu(pdu, &iov, &niov);
+> > +        pdu->s->transport->init_out_iov_from_pdu(pdu, &iov, &niov, siz=
+e + skip);
+> >      } else {
+> >          pdu->s->transport->init_in_iov_from_pdu(pdu, &iov, &niov, size=
+ + skip);
+> >      }
+> > diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
+> > index aac1b0b2ce3d..d1cfeaf10e4f 100644
+> > --- a/hw/9pfs/9p.h
+> > +++ b/hw/9pfs/9p.h
+> > @@ -363,7 +363,7 @@ struct V9fsTransport {
+> >      void        (*init_in_iov_from_pdu)(V9fsPDU *pdu, struct iovec **p=
+iov,
+> >                                          unsigned int *pniov, size_t si=
+ze);
+> >      void        (*init_out_iov_from_pdu)(V9fsPDU *pdu, struct iovec **=
+piov,
+> > -                                         unsigned int *pniov);
+> > +                                         unsigned int *pniov, size_t s=
+ize);
+> >      void        (*push_and_notify)(V9fsPDU *pdu);
+> >  };
+> > =20
+> > diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
+> > index 1a68c1622d3a..ed9e4817a26c 100644
+> > --- a/hw/9pfs/virtio-9p-device.c
+> > +++ b/hw/9pfs/virtio-9p-device.c
+> > @@ -146,8 +146,22 @@ static ssize_t virtio_pdu_vmarshal(V9fsPDU *pdu, s=
+ize_t offset,
+> >      V9fsState *s =3D pdu->s;
+> >      V9fsVirtioState *v =3D container_of(s, V9fsVirtioState, state);
+> >      VirtQueueElement *elem =3D v->elems[pdu->idx];
+> > -
+> > -    return v9fs_iov_vmarshal(elem->in_sg, elem->in_num, offset, 1, fmt=
+, ap);
+> > +    int ret; =20
+>=20
+> I think ret should be ssize_t
+>=20
 
-I am about to experience A) with vsmmu/VFIO. Please let me few days
-before I answer accurately to this part.
-> 
->>> I'm also wondering about the benefits of having SW-mapped MSIs in the
->>> guest. It seems unavoidable for vSMMU since that's what a physical system
->>> would do. But in a paravirtualized solution there doesn't seem to be any
->>> compelling reason for having the guest map MSI doorbells.
->>
->> If I understand correctly the virtio-iommu would not expose MSI reserved
->> regions (saying it does not translates MSIs). In that case he VFIO
->> kernel code will not check the irq_domain_check_msi_remap() but will
->> check iommu_capable(bus, IOMMU_CAP_INTR_REMAP) instead. Would the
->> virtio-iommu expose this capability? How would it isolate MSI
->> transactions from different devices?
-> 
-> Yes, the virtio-iommu would expose IOMMU_CAP_INTR_REMAP to keep VFIO
-> happy. But the virtio-iommu device wouldn't do any MSI isolation. We have
-> software-mapped doorbell on ARM because MSI transactions are translated by
-> the SMMU before reaching the GIC, which then performs device isolation.
-> With virtio-iommu on ARM, the address translation stage seems unnecessary
-> if you already have a vGIC handling device isolation. So maybe MSIs could
-> bypass the vIOMMU in that case.
-only vITS performs device isolation. In case we have a vGICv2M there is
-no irq translation. So yes MSI isolation also needs to be handled in x86
-and GICv2m cases.
+Yes, you're right. I'll change that.
 
-Thanks
+>=20
+> > +    ret =3D v9fs_iov_vmarshal(elem->in_sg, elem->in_num, offset, 1, fm=
+t, ap);
+> > +    if (ret < 0) {
+> > +        VirtIODevice *vdev =3D VIRTIO_DEVICE(v);
+> > +
+> > +        /* Any active PDU may try to send something back to the client=
+ without
+> > +         * knowing if the transport is broken or not. This could resul=
+t in
+> > +         * MAX_REQ - 1 (ie, 127) extra error messages being printed.
+> > +         */
+> > +        if (!vdev->broken) {
+> > +            virtio_error(vdev, "Failed to encode VirtFS reply type %d",
+> > +                         pdu->id + 1);
+> > +        }
+> > +    }
+> > +    return ret;
+> >  }
+> > =20
+> >  static ssize_t virtio_pdu_vunmarshal(V9fsPDU *pdu, size_t offset,
+> > @@ -156,28 +170,52 @@ static ssize_t virtio_pdu_vunmarshal(V9fsPDU *pdu=
+, size_t offset,
+> >      V9fsState *s =3D pdu->s;
+> >      V9fsVirtioState *v =3D container_of(s, V9fsVirtioState, state);
+> >      VirtQueueElement *elem =3D v->elems[pdu->idx];
+> > +    int ret; =20
+>=20
+> same here
+>=20
 
-Eric
-> 
-> However on x86, I think we will need to handle MSI remapping in the
-> virtio-iommu itself, since that's what x86 platforms expect. In this case
-> the guest doesn't have to create an IOMMU mapping for doorbell addresses
-> either, but might need to manage some form of IRQ remapping table (on
-> which I still have a tonne of research to do.)
-> 
-> Thanks,
-> Jean
-> 
-> [1] https://www.spinics.net/lists/kvm/msg147993.html
-> [2] https://www.spinics.net/lists/kvm/msg148798.html
-> [3] https://lkml.org/lkml/2017/6/15/34
-> 
->> Thanks
->>
->> Eric
->>
->>
->>  These addresses
->>> are never accessed directly, they are only used for setting up IRQ routing
->>> (at least on kvmtool). So here's what I'd like to have. Note that I
->>> haven't investigated the feasibility in Qemu yet, I don't know how it
->>> deals with MSIs.
->>>
->>> (1) Guest uses the guest-physical MSI doorbell when setting up MSIs. For
->>> ARM with GICv3 this would be GITS_TRANSLATER, for x86 it would be the
->>> fixed MSI doorbell. This way the host wouldn't need to inspect IOMMU
->>> mappings when handling writes to PCI MSI-X tables.
->>>
->>> (2) In nested mode (with VFIO) on ARM, the pSMMU will still translate MSIs
->>> via S1+S2. Therefore the host needs to map MSIs at stage-1, and I'd like
->>> to use the (currently unused) TTB1 tables in that case. In addition, using
->>> TTB1 would be useful for SVM, when endpoints write MSIs with PASIDs and we
->>> don't want to map them in user address space.
->>>
->>> This means that the host needs to use different doorbell addresses in
->>> nested mode, since it would be unable to map at S1 the same IOVA as S2
->>> (TTB1 manages negative addresses - 0xffff............, which are not
->>> representable as GPAs.) It also requires to use 32-bit page tables for
->>> endpoints that are not capable of using 64-bit MSI addresses.
->>>
->>>
->>> Now (2) is entirely handled in the host kernel, so it's more a Linux
->>> question. But does (1) seem acceptable for virtio-iommu in Qemu?
->>>
->>> Thanks,
->>> Jean
->>>
-> 
+Ditto.
+
+>=20
+> > -    return v9fs_iov_vunmarshal(elem->out_sg, elem->out_num, offset, 1,=
+ fmt, ap);
+> > +    ret =3D v9fs_iov_vunmarshal(elem->out_sg, elem->out_num, offset, 1=
+, fmt, ap);
+> > +    if (ret < 0) {
+> > +        VirtIODevice *vdev =3D VIRTIO_DEVICE(v);
+> > +
+> > +        virtio_error(vdev, "Failed to decode VirtFS request type %d", =
+pdu->id);
+> > +    }
+> > +    return ret;
+> >  }
+> > =20
+> > -/* The size parameter is used by other transports. Do not drop it. */
+> >  static void virtio_init_in_iov_from_pdu(V9fsPDU *pdu, struct iovec **p=
+iov,
+> >                                          unsigned int *pniov, size_t si=
+ze)
+> >  {
+> >      V9fsState *s =3D pdu->s;
+> >      V9fsVirtioState *v =3D container_of(s, V9fsVirtioState, state);
+> >      VirtQueueElement *elem =3D v->elems[pdu->idx];
+> > +    size_t buf_size =3D iov_size(elem->in_sg, elem->in_num);
+> > +
+> > +    if (buf_size < size) {
+> > +        VirtIODevice *vdev =3D VIRTIO_DEVICE(v);
+> > +
+> > +        virtio_error(vdev,
+> > +                     "VirtFS reply type %d needs %zu bytes, buffer has=
+ %zu",
+> > +                     pdu->id + 1, size, buf_size);
+> > +    }
+> > =20
+> >      *piov =3D elem->in_sg;
+> >      *pniov =3D elem->in_num;
+> >  }
+> > =20
+> >  static void virtio_init_out_iov_from_pdu(V9fsPDU *pdu, struct iovec **=
+piov,
+> > -                                         unsigned int *pniov)
+> > +                                         unsigned int *pniov, size_t s=
+ize)
+> >  {
+> >      V9fsState *s =3D pdu->s;
+> >      V9fsVirtioState *v =3D container_of(s, V9fsVirtioState, state);
+> >      VirtQueueElement *elem =3D v->elems[pdu->idx];
+> > +    size_t buf_size =3D iov_size(elem->out_sg, elem->out_num);
+> > +
+> > +    if (buf_size < size) {
+> > +        VirtIODevice *vdev =3D VIRTIO_DEVICE(v);
+> > +
+> > +        virtio_error(vdev,
+> > +                     "VirtFS request type %d needs %zu bytes, buffer h=
+as %zu",
+> > +                     pdu->id, size, buf_size);
+> > +    }
+> > =20
+> >      *piov =3D elem->out_sg;
+> >      *pniov =3D elem->out_num;
+> > diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+> > index 922cc967be63..a82cf817fe45 100644
+> > --- a/hw/9pfs/xen-9p-backend.c
+> > +++ b/hw/9pfs/xen-9p-backend.c
+> > @@ -147,7 +147,8 @@ static ssize_t xen_9pfs_pdu_vunmarshal(V9fsPDU *pdu,
+> > =20
+> >  static void xen_9pfs_init_out_iov_from_pdu(V9fsPDU *pdu,
+> >                                             struct iovec **piov,
+> > -                                           unsigned int *pniov)
+> > +                                           unsigned int *pniov,
+> > +                                           size_t size)
+> >  {
+> >      Xen9pfsDev *xen_9pfs =3D container_of(pdu->s, Xen9pfsDev, state);
+> >      Xen9pfsRing *ring =3D &xen_9pfs->rings[pdu->tag % xen_9pfs->num_ri=
+ngs]; =20
+>=20
+> Maybe you could include the same changes you made for xen, see below
+>=20
+
+Sure, I'd be glad to do so. I just have one concern. In the virtio case, we=
+ call
+virtio_error() which does two things: print an error message AND set the de=
+vice
+broken flag (no more I/O until device is reset). Is there something similar=
+ with
+the xen transport ?
+
+>=20
+> diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+> index a82cf81..83a2bfe 100644
+> --- a/hw/9pfs/xen-9p-backend.c
+> +++ b/hw/9pfs/xen-9p-backend.c
+> @@ -125,10 +125,17 @@ static ssize_t xen_9pfs_pdu_vmarshal(V9fsPDU *pdu,
+>      Xen9pfsDev *xen_9pfs =3D container_of(pdu->s, Xen9pfsDev, state);
+>      struct iovec in_sg[2];
+>      int num;
+> +    ssize_t ret;
+> =20
+>      xen_9pfs_in_sg(&xen_9pfs->rings[pdu->tag % xen_9pfs->num_rings],
+>                     in_sg, &num, pdu->idx, ROUND_UP(offset + 128, 512));
+> -    return v9fs_iov_vmarshal(in_sg, num, offset, 0, fmt, ap);
+> +   =20
+> +    ret =3D v9fs_iov_vmarshal(in_sg, num, offset, 0, fmt, ap);
+> +    if (ret < 0) {
+> +        xen_pv_printf(&xen_9pfs->xendev, 0,
+> +                      "Failed to encode VirtFS request type %d", pdu->id=
+ + 1);
+> +    }
+> +    return ret;
+>  }
+> =20
+>  static ssize_t xen_9pfs_pdu_vunmarshal(V9fsPDU *pdu,
+> @@ -139,10 +146,17 @@ static ssize_t xen_9pfs_pdu_vunmarshal(V9fsPDU *pdu,
+>      Xen9pfsDev *xen_9pfs =3D container_of(pdu->s, Xen9pfsDev, state);
+>      struct iovec out_sg[2];
+>      int num;
+> +    ssize_t ret;
+> =20
+>      xen_9pfs_out_sg(&xen_9pfs->rings[pdu->tag % xen_9pfs->num_rings],
+>                      out_sg, &num, pdu->idx);
+> -    return v9fs_iov_vunmarshal(out_sg, num, offset, 0, fmt, ap);
+> +   =20
+> +    ret =3D v9fs_iov_vunmarshal(out_sg, num, offset, 0, fmt, ap);
+> +    if (ret < 0) {
+> +        xen_pv_printf(&xen_9pfs->xendev, 0,
+> +                      "Failed to decode VirtFS request type %d", pdu->id=
+);
+> +    }
+> +    return ret;
+>  }
+> =20
+>  static void xen_9pfs_init_out_iov_from_pdu(V9fsPDU *pdu,
+> @@ -153,11 +167,20 @@ static void xen_9pfs_init_out_iov_from_pdu(V9fsPDU =
+*pdu,
+>      Xen9pfsDev *xen_9pfs =3D container_of(pdu->s, Xen9pfsDev, state);
+>      Xen9pfsRing *ring =3D &xen_9pfs->rings[pdu->tag % xen_9pfs->num_ring=
+s];
+>      int num;
+> +    size_t buf_size;
+> =20
+>      g_free(ring->sg);
+> =20
+>      ring->sg =3D g_malloc0(sizeof(*ring->sg) * 2);
+>      xen_9pfs_out_sg(ring, ring->sg, &num, pdu->idx);
+> +
+> +    buf_size =3D iov_size(ring->sg, num);
+> +    if (buf_size  < size) {
+> +        xen_pv_printf(&xen_9pfs->xendev, 0, "Xen 9pfs request type %d"
+> +                "needs %zu bytes, buffer has %zu", pdu->id, size,
+> +                buf_size);
+> +    }
+> +
+>      *piov =3D ring->sg;
+>      *pniov =3D num;
+>  }
+> @@ -170,11 +193,20 @@ static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *=
+pdu,
+>      Xen9pfsDev *xen_9pfs =3D container_of(pdu->s, Xen9pfsDev, state);
+>      Xen9pfsRing *ring =3D &xen_9pfs->rings[pdu->tag % xen_9pfs->num_ring=
+s];
+>      int num;
+> +    size_t buf_size;
+> =20
+>      g_free(ring->sg);
+> =20
+>      ring->sg =3D g_malloc0(sizeof(*ring->sg) * 2);
+>      xen_9pfs_in_sg(ring, ring->sg, &num, pdu->idx, size);
+> +
+> +    buf_size =3D iov_size(ring->sg, num);
+> +    if (buf_size  < size) {
+> +        xen_pv_printf(&xen_9pfs->xendev, 0, "Xen 9pfs request type %d"
+> +                "needs %zu bytes, buffer has %zu", pdu->id, size,
+> +                buf_size);
+> +    }
+> +
+>      *piov =3D ring->sg;
+>      *pniov =3D num;
+>  }
+
+
+--Sig_/aVdYO5y1oCclPyq6ENeaCpT
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAllSARoACgkQAvw66wEB28KqtQCeK322rW36Vllipr/20DhStGRh
+WlEAoJ3C7wYuMPminVJy5+Q/uGFUvuFm
+=Q91U
+-----END PGP SIGNATURE-----
+
+--Sig_/aVdYO5y1oCclPyq6ENeaCpT--
