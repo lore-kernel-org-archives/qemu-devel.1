@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dPizs-0006Aj-T7
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 01:25:09 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dPjf0-0006Rv-9A
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 02:07:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dPizn-0004nz-WA
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 01:25:08 -0400
-Received: from mga03.intel.com ([134.134.136.65]:22882)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dPizn-0004np-N5
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 01:25:03 -0400
-From: "Wang, Wei W" <wei.w.wang@intel.com>
-Date: Tue, 27 Jun 2017 05:24:31 +0000
-Message-ID: <286AC319A985734F985F78AFA26841F73926AF68@shsmsx102.ccr.corp.intel.com>
-References: <1498185154-29015-1-git-send-email-wei.w.wang@intel.com>
-	<031ae7b1-9e6a-955e-2d6a-13ed62eb9bd9@redhat.com>
-In-Reply-To: <031ae7b1-9e6a-955e-2d6a-13ed62eb9bd9@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <vilanova@ac.upc.edu>) id 1dPjev-00028k-B8
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 02:07:38 -0400
+Received: from roura.ac.upc.edu ([147.83.33.10]:57581 helo=roura.ac.upc.es)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dPjeu-00027f-VH
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 02:07:33 -0400
+From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
+References: <149838022308.6497.2104916050645246693.stgit@frigg.lan>
+	<149838191990.6497.6153382313093413628.stgit@frigg.lan>
+	<895e8e6e-05ef-a673-96c1-f5c231137b0a@twiddle.net>
+Date: Tue, 27 Jun 2017 09:07:21 +0300
+In-Reply-To: <895e8e6e-05ef-a673-96c1-f5c231137b0a@twiddle.net> (Richard
+	Henderson's message of "Mon, 26 Jun 2017 19:57:48 -0700")
+Message-ID: <87k23y3qw6.fsf@frigg.lan>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] virtio-net: enable configurable tx
- queue size
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v9 07/26] target: [tcg,
+ i386] Refactor init_disas_context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,14 +30,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "armbru@redhat.com" <armbru@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "jan.scheurich@ericsson.com" <jan.scheurich@ericsson.com>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>, "stefanha@gmail.com" <stefanha@gmail.com>
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>
 
-T24gVHVlc2RheSwgSnVuZSAyNywgMjAxNyA5OjUxIEFNLCBFcmljIEJsYWtlIHdyb3RlOg0KPiBP
-biAwNi8yMi8yMDE3IDA5OjMyIFBNLCBXZWkgV2FuZyB3cm90ZToNCj4gPiBUaGlzIHBhdGNoIGVu
-YWJsZXMgdGhlIHZpcnRpby1uZXQgdHggcXVldWUgc2l6ZSB0byBiZSBjb25maWd1cmFibGUgDQo+
-ID4gYmV0d2VlbiAyNTYgKHRoZSBkZWZhdWx0IHF1ZXVlIHNpemUpIGFuZCAxMDI0IGJ5IHRoZSB1
-c2VyIHdoZW4gdGhlIA0KPiA+IHZob3N0LXVzZXIgYmFja2VuZCBpcyB1c2VkLg0KPiANCj4gV2hl
-biBzZW5kaW5nIGEgbXVsdGktcGF0Y2ggc2VyaWVzLCBkb24ndCBmb3JnZXQgdGhlIDAvMiBjb3Zl
-ciBsZXR0ZXIuDQo+IA0KDQpUaGFua3MgZm9yIHRoZSByZW1pbmRlciwgYW5kIEknbGwgZG8gaXQg
-aW4gdGhlIG5leHQgdmVyc2lvbi4NCg0KQmVzdCwNCldlaSANCg==
+Richard Henderson writes:
+
+> On 06/25/2017 02:12 AM, Llu=C3=ADs Vilanova wrote:
+>> +    DisasContext *dc =3D container_of(db, DisasContext, base);
+>> CPUX86State *env =3D cpu->env_ptr;
+>> -    DisasContext dc1, *dc =3D &dc1;
+>> -    DisasContextBase *db =3D &dc1.base;
+>> -    uint32_t flags;
+>> -    target_ulong cs_base;
+>> -    int num_insns;
+>> -    int max_insns;
+>> -
+>> -    /* generate intermediate code */
+>> -    db->pc_first =3D tb->pc;
+>> -    cs_base =3D tb->cs_base;
+>> -    flags =3D tb->flags;
+>> +    uint32_t flags =3D db->tb->flags;
+>> +    target_ulong cs_base =3D db->tb->cs_base;
+
+> As a nit, it would be better for the compiler if you keep only one of the=
+ two
+> pointers {dc,db} live.  That is, once you've used container_of, always use
+> dc-> base instead of db.
+
+That's what the previous version did, but Emilio proposed to use both to ke=
+ep
+diffs more readable.
+
+Still, if using both dc/db will confuse the compiler's alias analysis, I can
+revert it back to dc->base.
+
+Thanks,
+  Lluis
