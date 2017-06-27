@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dPs5b-0006FC-QW
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:07:40 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dPtkK-0006q3-5h
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:53:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dPs5Y-0002Kp-EA
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:07:39 -0400
-References: <20170613121639.17853-1-pbutsykin@virtuozzo.com>
-	<20170613121639.17853-4-pbutsykin@virtuozzo.com>
-	<aed64e0e-61ed-12c9-8676-ad55795b6e62@redhat.com>
-	<5fb63c73-ddc7-ba42-268f-bda160aebb6e@virtuozzo.com>
-	<d3c0c0c2-da7e-bfff-e3c6-2d419c1126b9@redhat.com>
-	<3b1b1a7e-ab9f-1376-fc3c-0853fb12987b@virtuozzo.com>
-	<67df3935-2ef1-b664-11aa-bb6bdf91013b@redhat.com>
-From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Message-ID: <9bbacbbf-e9c2-f3b2-d81f-eba03e6ff7fc@virtuozzo.com>
-Date: Tue, 27 Jun 2017 18:06:28 +0300
-MIME-Version: 1.0
-In-Reply-To: <67df3935-2ef1-b664-11aa-bb6bdf91013b@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] qcow2: add shrink image support
+	(envelope-from <pm215@archaic.org.uk>) id 1dPtgn-0006CB-Jg
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:50:12 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37355)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1dPtgn-00066m-Ax
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:50:09 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Jun 2017 17:49:58 +0100
+Message-Id: <1498582198-6649-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] linux-user: Put PPC AT_IGNOREPPC auxv entries
+ in the right place
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +23,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Laurent Vivier <laurent@vivier.eu>, Richard Henderson <rth@twiddle.net>, Riku Voipio <riku.voipio@iki.fi>
 
-On 26.06.2017 20:47, Max Reitz wrote:
-> On 2017-06-26 17:23, Pavel Butsykin wrote:
-[]
->>
->> Is there any guarantee that in the future this will not change? Because
->> in this case it can be a potential danger.
-> 
-> Since this behavior is not documented anywhere, there is no guarantee.
-> 
->> I can add a comment... Or add a new variable with the size of
->> reftable_tmp, and every time count min(s->refcount_table_size,
->> reftable_tmp_size)
->> before accessing to s->refcount_table[]/reftable_tmp[]
-> 
-> Or (1) you add an assertion that refcount_table_size doesn't change
-> along with a comment why that is the case, which also explains in detail
-> why the call to qcow2_free_clusters() should be safe: The on-disk
-> reftable differs from the one in memory. qcow2_free_clusters()and
-> update_refcount() themselves do not access the reftable, so they are
-> safe. However, update_refcount() calls alloc_refcount_block(), and that
-> function does access the reftable: Now, as long as
-> s->refcount_table_size does not shrink (which I can't see why it would),
-> refcount_table_index should always be smaller. Now we're accessing
-> s->refcount_table: This will always return an existing refblock because
-> this will either be the refblock itself (for self-referencing refblocks)
-> or another one that is not going to be freed by qcow2_shrink_reftable()
-> because this function will not free refblocks which cover other clusters
-> than themselves.
-> We will then proceed to update the refblock which is either right (if it
-> is not the refblock to be freed) or won't do anything (if it is the one
-> to be freed).
-> In any case, we will never write to the reftable and reading from the
-> basically outdated cached version will never do anything bad.
+The 32-bit PPC auxv is a bit complicated because in the
+mists of time it used to be 16-aligned rather than directly
+after the environment. Older glibc versions had code to
+try to probe for whether it needed alignment or not:
+https://sourceware.org/git/?p=glibc.git;a=blob;f=sysdeps/unix/sysv/linux/powerpc/dl-sysdep.c;hb=e84eabb3871c9b39e59323bf3f6b98c2ca9d1cd0
+and the kernel has code which puts some magic entries at
+the bottom to ensure that the alignment probe fails:
+http://elixir.free-electrons.com/linux/latest/source/arch/powerpc/include/asm/elf.h#L158
 
-OK, SGTM.
+QEMU has similar code too, but it was broken by commit
+7c4ee5bcc82e64, which changed elfload.c from filling in
+the auxv starting at the highest address and working down
+to starting at the lowest address and working up. This
+means that the ARCH_DLINFO hook must now be invoked first
+rather than last, and the entries in it for PPC must
+be reversed so that the magic AT_IGNOREPPC entries come
+at the lowest address in the auxv as they should.
 
-> Or (2) you copy reftable_tmp into s->refcount_table[] *before* any call
-> to qcow2_free_clusters(). To make this work, you would need to also
-> discard all refblocks from the cache in this function here (and not in
-> update_refcount()) and then only call qcow2_free_clusters() on refblocks
-> which were not self-referencing. An alternative hack would be to simply
-> mark the image dirty and just not do any qcow2_free_clusters() call...
+The effect of this was that if running a guest binary that
+used an old glibc with the alignment probing the guest ld.so
+code would segfault if the size of the guest environment and
+argv happened to put the auxv at an address that triggered
+the alignment code in the guest glibc.
 
-The main purpose of qcow2_reftable_shrink() function is discard all
-unnecessary refblocks from the file. If we do only rewrite
-refcount_table and discard non-self-referencing refblocks (which are
-actually very rare), then the meaning of the function is lost.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ linux-user/elfload.c | 23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)
 
-> Or (3) of course it would be possible to not clean up refcount
-> structures at all...
-
-Nice solution :)
-
-> Max
-> 
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index ce77317..2a902f7 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -802,14 +802,15 @@ static uint32_t get_elf_hwcap2(void)
+ #define ARCH_DLINFO                                     \
+     do {                                                \
+         PowerPCCPU *cpu = POWERPC_CPU(thread_cpu);              \
+-        NEW_AUX_ENT(AT_DCACHEBSIZE, cpu->env.dcache_line_size); \
+-        NEW_AUX_ENT(AT_ICACHEBSIZE, cpu->env.icache_line_size); \
+-        NEW_AUX_ENT(AT_UCACHEBSIZE, 0);                 \
+         /*                                              \
+-         * Now handle glibc compatibility.              \
++         * Handle glibc compatibility: these magic entries must \
++         * be at the lowest addresses in the final auxv.        \
+          */                                             \
+         NEW_AUX_ENT(AT_IGNOREPPC, AT_IGNOREPPC);        \
+         NEW_AUX_ENT(AT_IGNOREPPC, AT_IGNOREPPC);        \
++        NEW_AUX_ENT(AT_DCACHEBSIZE, cpu->env.dcache_line_size); \
++        NEW_AUX_ENT(AT_ICACHEBSIZE, cpu->env.icache_line_size); \
++        NEW_AUX_ENT(AT_UCACHEBSIZE, 0);                 \
+     } while (0)
+ 
+ static inline void init_thread(struct target_pt_regs *_regs, struct image_info *infop)
+@@ -1760,6 +1761,13 @@ static abi_ulong create_elf_tables(abi_ulong p, int argc, int envc,
+     } while(0)
+ 
+     /* There must be exactly DLINFO_ITEMS entries here.  */
++#ifdef ARCH_DLINFO
++    /*
++     * ARCH_DLINFO must come first so platform specific code can enforce
++     * special alignment requirements on the AUXV if necessary (eg. PPC).
++     */
++    ARCH_DLINFO;
++#endif
+     NEW_AUX_ENT(AT_PHDR, (abi_ulong)(info->load_addr + exec->e_phoff));
+     NEW_AUX_ENT(AT_PHENT, (abi_ulong)(sizeof (struct elf_phdr)));
+     NEW_AUX_ENT(AT_PHNUM, (abi_ulong)(exec->e_phnum));
+@@ -1782,13 +1790,6 @@ static abi_ulong create_elf_tables(abi_ulong p, int argc, int envc,
+     if (u_platform) {
+         NEW_AUX_ENT(AT_PLATFORM, u_platform);
+     }
+-#ifdef ARCH_DLINFO
+-    /*
+-     * ARCH_DLINFO must come last so platform specific code can enforce
+-     * special alignment requirements on the AUXV if necessary (eg. PPC).
+-     */
+-    ARCH_DLINFO;
+-#endif
+     NEW_AUX_ENT (AT_NULL, 0);
+ #undef NEW_AUX_ENT
+ 
+-- 
+2.7.4
