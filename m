@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dPehK-000562-0m
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 20:49:42 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dPeiL-0005ci-0D
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 20:50:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dPehG-0000Ko-VZ
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 20:49:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43350)
+	(envelope-from <ehabkost@redhat.com>) id 1dPeiJ-0001AH-Qx
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 20:50:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40976)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dPehG-0000K7-NB
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 20:49:38 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dPeiJ-00019S-Hh
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 20:50:43 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C97DD7486C
+	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 00:50:41 +0000 (UTC)
 From: "Eduardo Habkost" <ehabkost@redhat.com>
-Date: Mon, 26 Jun 2017 21:49:30 -0300
-Message-ID: <20170627004930.GI12152@localhost.localdomain>
-References: <20170621113600.GA3928@thinpad.lan.raisama.net>
-	<8135ff45-0341-1fd4-ada9-4527c6b61e5a@ilande.co.uk>
-	<20170621132317.GD3928@thinpad.lan.raisama.net>
-	<7b431646-019e-dce2-6345-bdbaba7ce821@ilande.co.uk>
-	<20170623115051.GE20956@localhost.localdomain>
-	<a5f86c32-c89b-98ff-dbdb-7457a2074f1a@redhat.com>
-	<20170623161043.GA10204@localhost.localdomain>
-	<60e57713-c9ce-2bf4-db6e-23686fcc955b@redhat.com>
-	<20170623185000.GA3038@localhost.localdomain>
-	<120b9dac-982b-1e3b-662f-e60110b3d730@ilande.co.uk>
+Date: Mon, 26 Jun 2017 21:50:36 -0300
+Message-ID: <20170627005036.GJ12152@localhost.localdomain>
+References: <1498193206-18007-1-git-send-email-peterx@redhat.com>
+	<1498193206-18007-3-git-send-email-peterx@redhat.com>
+	<20170623213127.GC10776@localhost.localdomain>
+	<20170626023953.GF3936@pxdev.xzpeter.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <120b9dac-982b-1e3b-662f-e60110b3d730@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCHv6 3/5] fw_cfg: move assert() and linking of
- fw_cfg device to the machine into instance_init()
+In-Reply-To: <20170626023953.GF3936@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH v5 02/10] accel: introduce
+ AccelClass.global_props
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,72 +36,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Laszlo Ersek <lersek@redhat.com>, peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, imammedo@redhat.com, pbonzini@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Sun, Jun 25, 2017 at 07:58:04PM +0100, Mark Cave-Ayland wrote:
-> On 23/06/17 19:50, Eduardo Habkost wrote:
-> 
-> >> Really, please go back to the earlier discussion around fw_cfg_init1()
-> >> and you'll see my original point (which matches what you just voiced).
+On Mon, Jun 26, 2017 at 10:39:53AM +0800, Peter Xu wrote:
+> On Fri, Jun 23, 2017 at 06:31:27PM -0300, Eduardo Habkost wrote:
+> > On Fri, Jun 23, 2017 at 12:46:38PM +0800, Peter Xu wrote:
+> > > Introduce this new field for the accelerator classes so that each
+> > > specific accelerator in the future can register its own global
+> > > properties to be used further by the system. It works just like how the
+> > > old machine compatible properties do, but only tailored for
+> > > accelerators.
+> > > 
+> > > Introduce register_compat_props_array() for it. Export it so that it may
+> > > be used in other codes as well in the future.
+> > > 
+> > > Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+> > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > ---
+> > >  accel/accel.c                |  6 ++++++
+> > >  hw/core/qdev-properties.c    |  7 +++++++
+> > >  include/hw/qdev-properties.h |  1 +
+> > >  include/sysemu/accel.h       | 10 ++++++++++
+> > >  vl.c                         |  1 +
+> > >  5 files changed, 25 insertions(+)
+> > > 
+> > > diff --git a/accel/accel.c b/accel/accel.c
+> > > index 7c079a5..fa85844 100644
+> > > --- a/accel/accel.c
+> > > +++ b/accel/accel.c
+> > > @@ -120,6 +120,12 @@ void configure_accelerator(MachineState *ms)
+> > >      }
+> > >  }
+> > >  
+> > > +void accel_register_compat_props(AccelState *accel)
+> > > +{
+> > > +    AccelClass *class = ACCEL_GET_CLASS(accel);
+> > > +    register_compat_props_array(class->global_props);
+> > > +}
+> > > +
+> > >  static void register_accel_types(void)
+> > >  {
+> > >      type_register_static(&accel_type);
+> > > diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> > > index 6ff1ac3..19fa335 100644
+> > > --- a/hw/core/qdev-properties.c
+> > > +++ b/hw/core/qdev-properties.c
+> > > @@ -1060,6 +1060,13 @@ void register_compat_prop(const char *driver,
+> > >      qdev_prop_register_global(p);
+> > >  }
+> > >  
+> > > +void register_compat_props_array(GlobalProperty *prop)
 > > 
-> > Yep.  I was just not sure validation on realize was necessary or
-> > convenient.  It looks like we agree it is just convenient.
+> > Note for a later: we need to stop reusing struct GlobalProperty here,
+> > because the 'user_provided', 'used', and 'errp' fields are ignored by
+> > register_compat_prop(), but people may believe the are not.
 > > 
+> > I suggest defining:
 > > 
-> >>
-> >>> All that said, I don't have a strong argument against doing it on
-> >>> realize, except my gut feeling that this is not how qdev was
-> >>> designed[1].  If doing it on realize is the simplest way to do it, I
-> >>> won't be the one complaining.
-> >>>
-> >>> [1] I believe the original intent was to make every single device
-> >>>     user-creatable and define boards in a declarative way in config
-> >>>     files.  We are very far from that goal.
-> >>
-> >> I'm fine either way, I just wanted to accommodate Mark's preference,
-> >> because he seemed to strongly dislike having to call any helper
-> >> functions from board code, beyond initing and realizing the device.
-> >>
-> >> This is my recollection of the earlier discussion anyway.
+> >   struct GlobalPropertyValue {
+> >       const char *driver, *property, *value;
+> >   };
 > > 
-> > I think we are in agreement, then.  If there are no objections from
-> > others against doing object_property_add_child() on realize, I'm also OK
-> > with that.
+> > and use it instead of GlobalProperty for MachineClass::compat_props,
+> > AccelClass::global_props, and register_compat_prop().
 > 
-> Just to clarify here that my objection wasn't so much about calling
-> helper functions from board code, it was that as the current patch
-> exposes the MemoryRegions in TYPE_FW_CFG_IO and TYPE_FW_CFG_MEM then as
-> per my example where the machine link is omitted then the check becomes
-> useless.
-
-I don't understand this part.  When and why would the check become
-useless?
-
+> Yeah maybe another definition would be nicer.
 > 
-> I can see that device_set_realized() will always set the device parent
-> to /machine/unattached before calling the realize function if the device
-> doesn't have a parent. So is it even possible to add the device via
-> object_property_add_child() to the machine during realize? Or could it
-> be done by making /machine/fw_cfg an alias to its real location in the
-> QOM tree at realize time without breaking the object_resolve_path_type()
-> check?
-
-Well, if we can't do object_property_add_child() on ->instance_init()
-and doing it on ->realize() would require a more complex solution
-involving QOM links, I believe the simplest solution is to provide a
-helper function.
-
+> Do you mind I skip this change in this series? After all it can be
+> done on top, and can be separated from current work.
 > 
-> The other interesting option to explore is that since fw_cfg already has
-> a machine_ready notifier, the check could be moved there similar to as
-> done in hw/core/machine.c's error_on_sysbus_device() if the check
-> shouldn't be present in realize. That still doesn't answer the question
-> as to how to enforce that the device is correctly linked to the machine
-> though.
 
-I think both manually mapping+linking from board code or calling a
-helper function from board code would be acceptable.
+No problem.  This was just a suggestion for later.
 
 -- 
 Eduardo
