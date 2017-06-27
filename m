@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52898)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dPqEJ-0007lX-7e
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 09:08:32 -0400
+	(envelope-from <eblake@redhat.com>) id 1dPqIL-000114-7G
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 09:12:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dPqEE-0005Nt-91
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 09:08:31 -0400
-Date: Tue, 27 Jun 2017 14:08:12 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170627130812.GI8555@stefanha-x1.localdomain>
+	(envelope-from <eblake@redhat.com>) id 1dPqIK-0008Aa-6S
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 09:12:41 -0400
 References: <20170623124700.1389-1-el13635@mail.ntua.gr>
-	<20170623124700.1389-8-el13635@mail.ntua.gr>
-	<20170626154444.GH29664@stefanha-x1.localdomain>
-	<20170626224507.ep2hqzpxknfimf55@postretch>
+	<20170623124700.1389-6-el13635@mail.ntua.gr>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6a7e5169-1070-9888-1311-cf03ad5e11f5@redhat.com>
+Date: Tue, 27 Jun 2017 08:12:29 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="MPkR1dXiUZqK+927"
-Content-Disposition: inline
-In-Reply-To: <20170626224507.ep2hqzpxknfimf55@postretch>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC v3 7/8] block: remove
- legacy I/O throttling
+In-Reply-To: <20170623124700.1389-6-el13635@mail.ntua.gr>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="pHBOSCfXgjPAk8iQJpkuVBgfrCkrI0AS1"
+Subject: Re: [Qemu-devel] [PATCH RFC v3 5/8] block: add
+ BlockDevOptionsThrottle to QAPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,112 +25,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>
 
-
---MPkR1dXiUZqK+927
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--pHBOSCfXgjPAk8iQJpkuVBgfrCkrI0AS1
+From: Eric Blake <eblake@redhat.com>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>,
+ qemu-devel <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>
+Message-ID: <6a7e5169-1070-9888-1311-cf03ad5e11f5@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v3 5/8] block: add
+ BlockDevOptionsThrottle to QAPI
+References: <20170623124700.1389-1-el13635@mail.ntua.gr>
+ <20170623124700.1389-6-el13635@mail.ntua.gr>
+In-Reply-To: <20170623124700.1389-6-el13635@mail.ntua.gr>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 27, 2017 at 01:45:07AM +0300, Manos Pitsidianakis wrote:
-> On Mon, Jun 26, 2017 at 04:44:44PM +0100, Stefan Hajnoczi wrote:
-> > On Fri, Jun 23, 2017 at 03:46:59PM +0300, Manos Pitsidianakis wrote:
-> > > -void blk_io_limits_disable(BlockBackend *blk)
-> > > +void blk_io_limits_disable(BlockBackend *blk, Error **errp)
-> > >  {
-> > > -    assert(blk->public.throttle_group_member.throttle_state);
-> > > -    bdrv_drained_begin(blk_bs(blk));
-> > > -    throttle_group_unregister_tgm(&blk->public.throttle_group_member=
-);
-> > > -    bdrv_drained_end(blk_bs(blk));
-> > > +    Error *local_err =3D NULL;
-> > > +    BlockDriverState *bs, *throttle_node;
-> > > +
-> > > +    throttle_node =3D blk_get_public(blk)->throttle_node;
-> > > +
-> > > +    assert(throttle_node && throttle_node->refcnt =3D=3D 1);
-> >=20
-> > I'm not sure if we can enforce refcnt =3D=3D 1.  What stops other graph
-> > manipulation operations from inserting a node above or a BB that uses
-> > throttle_node as the root?
+On 06/23/2017 07:46 AM, Manos Pitsidianakis wrote:
+> This is needed to configure throttle filter driver nodes with QAPI.
 >=20
-> Is this possible unless the user explicitly does this? I suppose going do=
-wn
-> the path and removing it from any place is okay. If the throttle_node has
-> more than one parent then the result would be invalid anyway. I don't see
-> anything in the code doing this (removing a BDS from a BB->leaf path) or
-> wrapping it in some way, is that what should be done?
-
-We cannot assume the user will keep their hands off the graph :).
-
-In general, QEMU cannot assume that external interfaces (e.g.
-command-line, monitor, VNC, ...) are only called in convenient and safe
-ways.
-
-The code must handle all possible situations.  Usually the simplest
-solution is to reject requests that would put QEMU into an invalid
-state.
-
-> >=20
-> > > +
-> > > +    /* ref throttle_node's child bs so that it isn't lost when throt=
-tle_node is
-> > > +     * destroyed */
-> > > +    bdrv_ref(bs);
-> > > +
-> > > +    /* this destroys throttle_node */
-> > > +    blk_remove_bs(blk);
-> >=20
-> > This assumes that throttle_node is the top node.  How is this constraint
-> > enforced?
+> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+> ---
+>  qapi/block-core.json | 19 ++++++++++++++++++-
+>  1 file changed, 18 insertions(+), 1 deletion(-)
 >=20
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index f85c2235c7..1d4afafe8c 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -2119,7 +2119,7 @@
+>              'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', 'n=
+fs',
+>              'null-aio', 'null-co', 'parallels', 'qcow', 'qcow2', 'qed'=
+,
+>              'quorum', 'raw', 'rbd', 'replication', 'sheepdog', 'ssh',
+> -            'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs' ] }
+> +            'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs' =
+] }
+
+We already have a '@vxhs: Since 2.10' comment, you should add a similar
+one for @throttle.
+
+
+> +
+> +##
+> +# @BlockdevOptionsThrottle:
+> +#
+> +# Driver specific block device options for Throttle
+> +#
+> +# @throttling-group: the name of the throttling group to use
+> +#
+> +# @options:        BlockIOThrottle options
+> +# Since: 2.9
+
+You missed 2.9; this should be 2.10.
+
+> +##
+> +{ 'struct': 'BlockdevOptionsThrottle',
+> +  'data': { 'throttling-group': 'str',
+> +            'file' : 'BlockdevRef',
+
+Missing documentation for 'file'.
+
+> +            '*options' : 'BlockIOThrottle'
+> +             } }
 >=20
-> Kevin had said in a previous discussion:
-> > The throttle node affects only the backing file now, but not the new
-> > top-level node. With manually created filter nodes we may need to
-> > provide a way so that the QMP command tells where in the tree the
-> > snapshot is actually taken. With automatically created ones, we need to
-> > make sure that they always stay on top.
-> >=20
-> > Similar problems arise when block jobs manipulate the graph. For
-> > example, think of a commit block job, which will remove the topmost node
-> > from the backing file chain. We don't want it to remove the throttling
-> > filter together with the qcow2 node. (Or do we? It might be something
-> > that needs to be configurable.)
-> >=20
-> > We also have several QMP that currently default to working on the
-> > topmost image of the chain. Some of them may actually want to work on
-> > the topmost node that isn't an automatically inserted filter.
-> >=20
-> >=20
-> > I hope this helps you understand why I keep saying that automatic
-> > insertion/removal of filter nodes is tricky and we should do it as
-> > little as we possibly can.
->=20
-> Yes, this constraint isn't enforced. The automatically inserted filter is
-> not a very clean concept. I'll have to think about it a little more, unle=
-ss
-> there are some ideas.
 
-The block layer has an "op blockers" and permissions API to reject
-operations that would violate the graph constraints.  Kevin has recently
-worked on it and I hope he can give you some advice in this area.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Stefan
 
---MPkR1dXiUZqK+927
+--pHBOSCfXgjPAk8iQJpkuVBgfrCkrI0AS1
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBAgAGBQJZUli8AAoJEJykq7OBq3PI+LcIAMTzCOuDdkz7NMCnb00RjWeT
-WTfj4G/h5nvmD4rqEVwnnZuSRQGuIekO0FGA2xmbzDqrkjbXJpkfkJmn0zPpnNTf
-bup6ouEik9h6nthpV/EO71sl2ldv+/dOFfmsf7NVVtbMmszhXdOVu7vcoPCRzw5p
-mst2OufHz1OAC4fMjP1ZaOgoCf1EO3QTNH/sYUYTu5RhI8RFjIzy8MEZ9VN9F6YD
-bRdhCoPKIJLylZQIUFtX5QBSEH6JhEY1YpNPMEXc75S4Gf2Sa3zgcjnFMLAdsYdI
-Neihq76gs9Bc9BlCPEAwKJN36kRMaQX6vqFWySUYrz8ITaMLm7fBGhsASB9vIC8=
-=Fr8P
+iQEcBAEBCAAGBQJZUlm9AAoJEKeha0olJ0NqDJgIAJw7t+l1k7w6WrIX6i2fQQbf
+1d4H22w2TgXnj3foETfsxEDUpyUb5tYGz5Cbbvnrgjkh5q5z9yXjDYl8p+5QZOAk
+1MEPedpNyMs9VDv9AxmlLRtEFyy43tqByW2R9P24OLrIWLsWcxTt5f6CJuoMKc8V
+ZuNN1XlCIuuo39B+2D1zdbqxsbtbJaylk6qwcU1OuR/RSx73d6OD9wAdAt0zMvYF
+/TkM3LRYivpgZRUeJ/9LFXuvhnMoTAyYRTb+KbDK/JuBb5QUlquStBAj6Uiwrgjv
+rdasdauIHU8I//CJwdOxpVAJ8009Y/Mmvfvg7EeeW5bXGtLHTV8WAfTYoi35fhw=
+=isQj
 -----END PGP SIGNATURE-----
 
---MPkR1dXiUZqK+927--
+--pHBOSCfXgjPAk8iQJpkuVBgfrCkrI0AS1--
