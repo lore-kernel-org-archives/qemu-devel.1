@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dPtli-0006q3-Kr
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:55:18 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1dPtlh-00084h-Jk
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:55:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dPsYJ-00062q-IH
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:37:22 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:33327)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1dPsYQ-0006T8-6j
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:37:27 -0400
+Received: from mail-lf0-x232.google.com ([2a00:1450:4010:c07::232]:35548)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1dPsYJ-0005yM-Au
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:37:19 -0400
-Received: by mail-lf0-x241.google.com with SMTP id t72so3072987lff.0
-	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 08:37:19 -0700 (PDT)
+	id 1dPsYP-0006OM-Qr
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:37:26 -0400
+Received: by mail-lf0-x232.google.com with SMTP id b207so19458468lfg.2
+	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 08:37:25 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Tue, 27 Jun 2017 17:37:09 +0200
-Message-Id: <1498577836-25883-1-git-send-email-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PULL v2 0/7] MMIO Exec pull request
+Date: Tue, 27 Jun 2017 17:37:14 +0200
+Message-Id: <1498577836-25883-6-git-send-email-edgar.iglesias@gmail.com>
+In-Reply-To: <1498577836-25883-1-git-send-email-edgar.iglesias@gmail.com>
+References: <1498577836-25883-1-git-send-email-edgar.iglesias@gmail.com>
+Subject: [Qemu-devel] [PULL v2 5/7] introduce mmio_interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +29,219 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org
 Cc: frederic.konrad@adacore.com, pbonzini@redhat.com, rth@twiddle.net, edgar.iglesias@xilinx.com
 
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+From: KONRAD Frederic <fred.konrad@greensocs.com>
 
-Hi,
+This introduces mmio_interface object which contains a MemoryRegion
+and can be hotplugged/hotunplugged.
 
-Paolo suggested offline that we send a pull request for this series.
-Here it is, I've run it through my testsuite + tested the LQSPI testcase
-on Zynq.
-
-Cheers,
-Edgar
-
-ChangeLog:
-
-v1 -> v2:
-* Add EI RB line to patch #6
-* Remove changelogs from commit messages
-* Add EI SoB lines to all patches
-
-
-The following changes since commit 054914f6461ce9d3427af6527ef3e5b07311c86b:
-
-  Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2017-06-26 15:38:29 +0100)
-
-are available in the git repository at:
-
-  git@github.com:edgarigl/qemu.git tags/edgar/mmio-exec-v2.for-upstream
-
-for you to fetch changes up to 252b99baeb9e7e86cc0ece8efcaddebf11d284f5:
-
-  xilinx_spips: allow mmio execution (2017-06-27 15:09:15 +0200)
-
-----------------------------------------------------------------
-edgar/mmio-exec-v2.for-upstream
-
-----------------------------------------------------------------
-KONRAD Frederic (7):
-      cputlb: cleanup get_page_addr_code to use VICTIM_TLB_HIT
-      cputlb: move get_page_addr_code
-      cputlb: fix the way get_page_addr_code fills the tlb
-      qdev: add MemoryRegion property
-      introduce mmio_interface
-      exec: allow to get a pointer for some mmio memory region
-      xilinx_spips: allow mmio execution
-
- accel/tcg/cputlb.c               |  82 ++++++++++++++-----------
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+---
  hw/misc/Makefile.objs            |   1 +
  hw/misc/mmio_interface.c         | 128 +++++++++++++++++++++++++++++++++++++++
- hw/ssi/xilinx_spips.c            |  74 ++++++++++++++++------
- include/exec/memory.h            |  35 +++++++++++
  include/hw/misc/mmio_interface.h |  49 +++++++++++++++
- include/hw/qdev-properties.h     |   2 +
- memory.c                         | 111 +++++++++++++++++++++++++++++++++
- 8 files changed, 428 insertions(+), 54 deletions(-)
+ 3 files changed, 178 insertions(+)
  create mode 100644 hw/misc/mmio_interface.c
  create mode 100644 include/hw/misc/mmio_interface.h
+
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index 2019846..08a79c3 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -57,3 +57,4 @@ obj-$(CONFIG_EDU) += edu.o
+ obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
+ obj-$(CONFIG_AUX) += auxbus.o
+ obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
++obj-y += mmio_interface.o
+diff --git a/hw/misc/mmio_interface.c b/hw/misc/mmio_interface.c
+new file mode 100644
+index 0000000..6f004d2
+--- /dev/null
++++ b/hw/misc/mmio_interface.c
+@@ -0,0 +1,128 @@
++/*
++ * mmio_interface.c
++ *
++ *  Copyright (C) 2017 : GreenSocs
++ *      http://www.greensocs.com/ , email: info@greensocs.com
++ *
++ *  Developed by :
++ *  Frederic Konrad   <fred.konrad@greensocs.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation, either version 2 of the License, or
++ * (at your option)any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "trace.h"
++#include "hw/qdev-properties.h"
++#include "hw/misc/mmio_interface.h"
++#include "qapi/error.h"
++
++#ifndef DEBUG_MMIO_INTERFACE
++#define DEBUG_MMIO_INTERFACE 0
++#endif
++
++static uint64_t mmio_interface_counter;
++
++#define DPRINTF(fmt, ...) do {                                                 \
++    if (DEBUG_MMIO_INTERFACE) {                                                \
++        qemu_log("mmio_interface: 0x%" PRIX64 ": " fmt, s->id, ## __VA_ARGS__);\
++    }                                                                          \
++} while (0);
++
++static void mmio_interface_init(Object *obj)
++{
++    MMIOInterface *s = MMIO_INTERFACE(obj);
++
++    if (DEBUG_MMIO_INTERFACE) {
++        s->id = mmio_interface_counter++;
++    }
++
++    DPRINTF("interface created\n");
++    s->host_ptr = 0;
++    s->subregion = 0;
++}
++
++static void mmio_interface_realize(DeviceState *dev, Error **errp)
++{
++    MMIOInterface *s = MMIO_INTERFACE(dev);
++
++    DPRINTF("realize from 0x%" PRIX64 " to 0x%" PRIX64 " map host pointer"
++            " %p\n", s->start, s->end, s->host_ptr);
++
++    if (!s->host_ptr) {
++        error_setg(errp, "host_ptr property must be set");
++    }
++
++    if (!s->subregion) {
++        error_setg(errp, "subregion property must be set");
++    }
++
++    memory_region_init_ram_ptr(&s->ram_mem, OBJECT(s), "ram",
++                               s->end - s->start + 1, s->host_ptr);
++    memory_region_set_readonly(&s->ram_mem, s->ro);
++    memory_region_add_subregion(s->subregion, s->start, &s->ram_mem);
++}
++
++static void mmio_interface_unrealize(DeviceState *dev, Error **errp)
++{
++    MMIOInterface *s = MMIO_INTERFACE(dev);
++
++    DPRINTF("unrealize from 0x%" PRIX64 " to 0x%" PRIX64 " map host pointer"
++            " %p\n", s->start, s->end, s->host_ptr);
++    memory_region_del_subregion(s->subregion, &s->ram_mem);
++}
++
++static void mmio_interface_finalize(Object *obj)
++{
++    MMIOInterface *s = MMIO_INTERFACE(obj);
++
++    DPRINTF("finalize from 0x%" PRIX64 " to 0x%" PRIX64 " map host pointer"
++            " %p\n", s->start, s->end, s->host_ptr);
++    object_unparent(OBJECT(&s->ram_mem));
++}
++
++static Property mmio_interface_properties[] = {
++    DEFINE_PROP_UINT64("start", MMIOInterface, start, 0),
++    DEFINE_PROP_UINT64("end", MMIOInterface, end, 0),
++    DEFINE_PROP_PTR("host_ptr", MMIOInterface, host_ptr),
++    DEFINE_PROP_BOOL("ro", MMIOInterface, ro, false),
++    DEFINE_PROP_MEMORY_REGION("subregion", MMIOInterface, subregion),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void mmio_interface_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(oc);
++
++    dc->realize = mmio_interface_realize;
++    dc->unrealize = mmio_interface_unrealize;
++    dc->props = mmio_interface_properties;
++}
++
++static const TypeInfo mmio_interface_info = {
++    .name          = TYPE_MMIO_INTERFACE,
++    .parent        = TYPE_DEVICE,
++    .instance_size = sizeof(MMIOInterface),
++    .instance_init = mmio_interface_init,
++    .instance_finalize = mmio_interface_finalize,
++    .class_init    = mmio_interface_class_init,
++};
++
++static void mmio_interface_register_types(void)
++{
++    type_register_static(&mmio_interface_info);
++}
++
++type_init(mmio_interface_register_types)
+diff --git a/include/hw/misc/mmio_interface.h b/include/hw/misc/mmio_interface.h
+new file mode 100644
+index 0000000..90d34fb
+--- /dev/null
++++ b/include/hw/misc/mmio_interface.h
+@@ -0,0 +1,49 @@
++/*
++ * mmio_interface.h
++ *
++ *  Copyright (C) 2017 : GreenSocs
++ *      http://www.greensocs.com/ , email: info@greensocs.com
++ *
++ *  Developed by :
++ *  Frederic Konrad   <fred.konrad@greensocs.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation, either version 2 of the License, or
++ * (at your option)any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#ifndef MMIO_INTERFACE_H
++#define MMIO_INTERFACE_H
++
++#include "exec/memory.h"
++
++#define TYPE_MMIO_INTERFACE "mmio_interface"
++#define MMIO_INTERFACE(obj) OBJECT_CHECK(MMIOInterface, (obj),                 \
++                                         TYPE_MMIO_INTERFACE)
++
++typedef struct MMIOInterface {
++    DeviceState parent_obj;
++
++    MemoryRegion *subregion;
++    MemoryRegion ram_mem;
++    uint64_t start;
++    uint64_t end;
++    bool ro;
++    uint64_t id;
++    void *host_ptr;
++} MMIOInterface;
++
++void mmio_interface_map(MMIOInterface *s);
++void mmio_interface_unmap(MMIOInterface *s);
++
++#endif /* MMIO_INTERFACE_H */
+-- 
+2.7.4
