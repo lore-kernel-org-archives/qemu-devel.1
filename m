@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <will.deacon@arm.com>) id 1dPm95-0005oT-Fi
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:46:52 -0400
+	(envelope-from <yulei.zhang@intel.com>) id 1dPmI8-0000il-Ig
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:56:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <will.deacon@arm.com>) id 1dPm94-0008Lw-F5
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:46:51 -0400
-Date: Tue, 27 Jun 2017 09:46:42 +0100
-From: Will Deacon <will.deacon@arm.com>
-Message-ID: <20170627084641.GC5759@arm.com>
-References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
-	<AM5PR0401MB2545AFD256A96420ACC44CD89ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<14c83c14-1e7e-f142-77b0-fa8c873e2d41@redhat.com>
-	<AM5PR0401MB2545C0E76C4BE6F82FE376D09ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<6f22079e-4b4b-6476-77be-51ec83104c0d@redhat.com>
-	<AM5PR0401MB25459FDAA8C9AFA52503AAE99AC40@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<589f1642-775c-4805-74ac-bf67eb504733@arm.com>
-	<5f47e723-1d3e-433b-cdaf-a56d16ba377e@redhat.com>
-	<d4277d93-d29d-7150-7962-bdfdd1c2a275@arm.com>
-	<6070f02d-20d3-98fb-e31a-e7dbf5010419@redhat.com>
+	(envelope-from <yulei.zhang@intel.com>) id 1dPmI5-00065o-G1
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:56:12 -0400
+Received: from mga11.intel.com ([192.55.52.93]:11932)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yulei.zhang@intel.com>)
+	id 1dPmI5-00063D-5f
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 04:56:09 -0400
+From: "Zhang, Yulei" <yulei.zhang@intel.com>
+Date: Tue, 27 Jun 2017 08:56:01 +0000
+Message-ID: <01FDBDDE256B79498DC57789713132D469DCC1EE@SHSMSX101.ccr.corp.intel.com>
+References: <1491301684-24367-1-git-send-email-yulei.zhang@intel.com>
+	<20170626141906.6e38b235@w520.home>
+In-Reply-To: <20170626141906.6e38b235@w520.home>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6070f02d-20d3-98fb-e31a-e7dbf5010419@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2 0/8] VIRTIO-IOMMU device
+Subject: Re: [Qemu-devel] [RFC 5/5] vifo: introduce new VFIO ioctl
+ VFIO_DEVICE_PCI_GET_DIRTY_BITMAP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +30,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wei@redhat.com" <wei@redhat.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "drjones@redhat.com" <drjones@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>, "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "Zheng, Xiao" <xiao.zheng@intel.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>
 
-Hi Eric,
 
-On Tue, Jun 27, 2017 at 08:38:48AM +0200, Auger Eric wrote:
-> On 26/06/2017 18:13, Jean-Philippe Brucker wrote:
-> > On 26/06/17 09:22, Auger Eric wrote:
-> >> On 19/06/2017 12:15, Jean-Philippe Brucker wrote:
-> >>> On 19/06/17 08:54, Bharat Bhushan wrote:
-> >>>> I started added replay in virtio-iommu and came across how MSI interrupts with work with VFIO. 
-> >>>> I understand that on intel this works differently but vsmmu will have same requirement. 
-> >>>> kvm-msi-irq-route are added using the msi-address to be translated by viommu and not the final translated address.
-> >>>> While currently the irqfd framework does not know about emulated iommus (virtio-iommu, vsmmuv3/vintel-iommu).
-> >>>> So in my view we have following options:
-> >>>> - Programming with translated address when setting up kvm-msi-irq-route
-> >>>> - Route the interrupts via QEMU, which is bad from performance
-> >>>> - vhost-virtio-iommu may solve the problem in long term
-> >>>>
-> >>>> Is there any other better option I am missing?
-> >>>
-> >>> Since we're on the topic of MSIs... I'm currently trying to figure out how
-> >>> we'll handle MSIs in the nested translation mode, where the guest manages
-> >>> S1 page tables and the host doesn't know about GVA->GPA translation.
-> >>
-> >> I have a question about the "nested translation mode" terminology. Do
-> >> you mean in that case you use stage 1 + stage 2 of the physical IOMMU
-> >> (which the ARM spec normally advises or was meant for) or do you mean
-> >> stage 1 implemented in vIOMMU and stage 2 implemented in pIOMMU. At the
-> >> moment my understanding is for VFIO integration the pIOMMU uses a single
-> >> stage combining both the stage 1 and stage2 mappings but the host is not
-> >> aware of those 2 stages.
-> > 
-> > Yes at the moment the VMM merges stage-1 (GVA->GPA) from the guest with
-> > its stage-2 mappings (GPA->HPA) and creates a stage-2 mapping (GVA->HPA)
-> > in the pIOMMU via VFIO_IOMMU_MAP_DMA. stage-1 is disabled in the pIOMMU.
-> > 
-> > What I mean by "nested mode" is stage 1 + stage 2 in the physical IOMMU.
-> > I'm referring to the "Page Table Sharing" bit of the Future Work in the
-> > initial RFC for virtio-iommu [1], and also PASID table binding [2] in the
-> > case of vSMMU. In that mode, stage-1 page tables in the pIOMMU are managed
-> > by the guest, and the VMM only maps GPA->HPA.
-> 
-> OK I need to read that part more thoroughly. I was told in the past
-> handling nested stages at pIOMMU was considered too complex and
-> difficult to maintain. But definitively The SMMU architecture is devised
-> for that. Michael asked why we did not use that already for vsmmu
-> (nested stages are used on AMD IOMMU I think).
 
-Curious -- but what gave you that idea? I worry that something I might have
-said wasn't clear or has been misunderstood.
+> -----Original Message-----
+> From: Qemu-devel [mailto:qemu-devel-
+> bounces+yulei.zhang=3Dintel.com@nongnu.org] On Behalf Of Alex Williamson
+> Sent: Tuesday, June 27, 2017 4:19 AM
+> To: Zhang, Yulei <yulei.zhang@intel.com>
+> Cc: Tian, Kevin <kevin.tian@intel.com>; joonas.lahtinen@linux.intel.com;
+> qemu-devel@nongnu.org; zhenyuw@linux.intel.com; Zheng, Xiao
+> <xiao.zheng@intel.com>; Wang, Zhi A <zhi.a.wang@intel.com>
+> Subject: Re: [Qemu-devel] [RFC 5/5] vifo: introduce new VFIO ioctl
+> VFIO_DEVICE_PCI_GET_DIRTY_BITMAP
+>=20
+> On Tue,  4 Apr 2017 18:28:04 +0800
+> Yulei Zhang <yulei.zhang@intel.com> wrote:
+>=20
+> > New VFIO ioctl VFIO_DEVICE_PCI_GET_DIRTY_BITMAP is used to sync the
+> > pci device dirty pages during the migration.
+>=20
+> If this needs to exist, it needs a lot more documentation.  Why is this
+> a PCI specific device ioctl?  Couldn't any vfio device need this?
+>
+> > Signed-off-by: Yulei Zhang <yulei.zhang@intel.com>
+> > ---
+> >  hw/vfio/pci.c              | 32 ++++++++++++++++++++++++++++++++
+> >  hw/vfio/pci.h              |  2 ++
+> >  linux-headers/linux/vfio.h | 14 ++++++++++++++
+> >  3 files changed, 48 insertions(+)
+> >
+> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> > index 833cd90..64c851f 100644
+> > --- a/hw/vfio/pci.c
+> > +++ b/hw/vfio/pci.c
+> > @@ -32,6 +32,7 @@
+> >  #include "pci.h"
+> >  #include "trace.h"
+> >  #include "qapi/error.h"
+> > +#include "exec/ram_addr.h"
+> >
+> >  #define MSIX_CAP_LENGTH 12
+> >
+> > @@ -39,6 +40,7 @@ static void vfio_disable_interrupts(VFIOPCIDevice
+> *vdev);
+> >  static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
+> >  static VMStateDescription vfio_pci_vmstate;
+> >  static void vfio_vm_change_state_handler(void *pv, int running, RunSta=
+te
+> state);
+> > +static void vfio_log_sync(MemoryListener *listener,
+> MemoryRegionSection *section);
+> >
+> >  /*
+> >   * Disabling BAR mmaping can be slow, but toggling it around INTx can
+> > @@ -2869,6 +2871,11 @@ static void vfio_realize(PCIDevice *pdev, Error
+> **errp)
+> >      vfio_setup_resetfn_quirk(vdev);
+> >      qemu_add_vm_change_state_handler(vfio_vm_change_state_handler,
+> vdev);
+> >
+> > +    vdev->vfio_memory_listener =3D (MemoryListener) {
+> > +	    .log_sync =3D vfio_log_sync,
+> > +    };
+> > +    memory_listener_register(&vdev->vfio_memory_listener,
+> &address_space_memory);
+> > +
+> >      return;
+> >
+> >  out_teardown:
+> > @@ -2964,6 +2971,7 @@ static void vfio_vm_change_state_handler(void
+> *pv, int running, RunState state)
+> >      if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_PCI_STATUS_SET, vfio_stat=
+us))
+> {
+> >          error_report("vfio: Failed to %s device\n", running ? "start" =
+: "stop");
+> >      }
+> > +    vdev->device_stop =3D running ? false : true;
+> >      g_free(vfio_status);
+> >  }
+> >
+> > @@ -3079,6 +3087,30 @@ static int vfio_device_get(QEMUFile *f, void *pv=
+,
+> size_t size, VMStateField *fie
+> >      return 0;
+> >  }
+> >
+> > +static void vfio_log_sync(MemoryListener *listener,
+> MemoryRegionSection *section)
+> > +{
+> > +    VFIOPCIDevice *vdev =3D container_of(listener, struct VFIOPCIDevic=
+e,
+> vfio_memory_listener);
+> > +
+> > +    if (vdev->device_stop) {
+> > +        struct vfio_pci_get_dirty_bitmap *d;
+> > +        ram_addr_t size =3D int128_get64(section->size);
+> > +        unsigned long page_nr =3D size >> TARGET_PAGE_BITS;
+> > +        unsigned long bitmap_size =3D (BITS_TO_LONGS(page_nr) + 1) *
+> sizeof(unsigned long);
+> > +        d =3D g_malloc0(sizeof(*d) + bitmap_size);
+> > +        d->start_addr =3D section->offset_within_address_space;
+> > +        d->page_nr =3D page_nr;
+> > +
+> > +        if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_PCI_GET_DIRTY_BITMAP,=
+ d))
+> {
+> > +            error_report("vfio: Failed to fetch dirty pages for migrat=
+ion\n");
+> > +            goto exit;
+> > +        }
+> > +        cpu_physical_memory_set_dirty_lebitmap((unsigned long*)&d-
+> >dirty_bitmap, d->start_addr, d->page_nr);
+> > +
+> > +exit:
+> > +        g_free(d);
+> > +    }
+> > +}
+> > +
+> >  static void vfio_instance_init(Object *obj)
+> >  {
+> >      PCIDevice *pci_dev =3D PCI_DEVICE(obj);
+> > diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+> > index bd98618..984391d 100644
+> > --- a/hw/vfio/pci.h
+> > +++ b/hw/vfio/pci.h
+> > @@ -144,6 +144,8 @@ typedef struct VFIOPCIDevice {
+> >      bool no_kvm_intx;
+> >      bool no_kvm_msi;
+> >      bool no_kvm_msix;
+> > +    bool device_stop;
+> > +    MemoryListener vfio_memory_listener;
+> >  } VFIOPCIDevice;
+> >
+> >  uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len)=
+;
+> > diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+> > index fa17848..aa73ee1 100644
+> > --- a/linux-headers/linux/vfio.h
+> > +++ b/linux-headers/linux/vfio.h
+> > @@ -502,6 +502,20 @@ struct vfio_pci_status_set{
+> >
+> >  #define VFIO_DEVICE_PCI_STATUS_SET	_IO(VFIO_TYPE, VFIO_BASE + 14)
+> >
+> > +/**
+> > + * VFIO_DEVICE_PCI_GET_DIRTY_BITMAP - _IOW(VFIO_TYPE, VFIO_BASE +
+> 15,
+> > + *				    struct vfio_pci_get_dirty_bitmap)
+> > + *
+> > + * Return: 0 on success, -errno on failure.
+> > + */
+> > +struct vfio_pci_get_dirty_bitmap{
+> > +	__u64	       start_addr;
+> > +	__u64	       page_nr;
+> > +	__u8           dirty_bitmap[];
+> > +};
+> > +
+> > +#define VFIO_DEVICE_PCI_GET_DIRTY_BITMAP _IO(VFIO_TYPE, VFIO_BASE
+> + 15)
+> > +
+>=20
+> Dirty since when?  Since the last time we asked?  Since the device was
+> stopped?  Why is anything dirtied after the device is stopped?  Is this
+> any pages the device has ever touched?  Thanks,
+>=20
+> Alex
+Dirty since the device start operation and before it was stopped. We track
+down all the guest pages that device was using before it was stopped, and
+leverage this dirty bitmap for page sync during migration.
 
-Will
+>=20
+> >  /* -------- API for Type1 VFIO IOMMU -------- */
+> >
+> >  /**
+>=20
