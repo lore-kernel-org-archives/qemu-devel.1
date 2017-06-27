@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57196)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dPqNL-0004Pv-CO
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 09:17:52 -0400
+	(envelope-from <berrange@redhat.com>) id 1dPqQU-0005CJ-VT
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 09:21:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dPqNH-0002Sf-DN
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 09:17:51 -0400
-References: <1497891926-25299-1-git-send-email-thuth@redhat.com>
-From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <9f77789d-076a-079e-6f34-4d7832adbd65@msgid.tls.msk.ru>
-Date: Tue, 27 Jun 2017 16:17:45 +0300
+	(envelope-from <berrange@redhat.com>) id 1dPqQU-0004I8-1b
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 09:21:06 -0400
+Date: Tue, 27 Jun 2017 14:20:40 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170627132040.GH13634@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1498566850-7934-1-git-send-email-pl@kamp.de>
+	<1498566850-7934-2-git-send-email-pl@kamp.de>
 MIME-Version: 1.0
-In-Reply-To: <1497891926-25299-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=windows-1251
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/misc/edu: Compile the edu device as
- common object
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1498566850-7934-2-git-send-email-pl@kamp.de>
+Subject: Re: [Qemu-devel] [PATCH 1/4] block/qcow2: add compression_algorithm
+ create option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,9 +25,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Jiri Slaby <jslaby@suse.cz>
-Cc: qemu-trivial@nongnu.org
+To: Peter Lieven <pl@kamp.de>
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, den@openvz.org, lersek@redhat.com
 
-Applied to -trivial, thanks!
+On Tue, Jun 27, 2017 at 02:34:07PM +0200, Peter Lieven wrote:
+> this patch adds a new compression_algorithm option when creating qcow2 images.
+> The current default for the compresison algorithm is zlib and zlib will be
+> used when this option is omitted (like before).
+> 
+> If the option is specified e.g. with:
+> 
+>  qemu-img create -f qcow2 -o compression_algorithm=zlib image.qcow2 1G
 
-/mjt
+IMHO we should introduce a nested struct "compress" struct to hold the format
+name, and any other format specific arguments, in a way that maps nicely to
+any future QAPI representmatch of create options. eg
+
+{ 'enum': 'BlockdevQcow2CompressFormat',
+  'data': [ 'zlib', 'lzo' ] }
+
+{ 'union': 'BlockdevQcow2Compress',
+  'base': { 'format': 'BlockdevQcow2CompressFormat' },
+  'discriminator': 'format',
+  'data': { 'zlib': 'BlockdevQcow2CompressZLib',
+            'lzo': 'BlockdevQcow2CompressLZO'} }
+
+so it would map to
+
+ qemu-img create -f qcow2 -o compress.format=zlib image.qcow2 1G
+
+and let us have other compress.XXXX options specific to each format
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
