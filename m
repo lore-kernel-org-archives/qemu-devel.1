@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dPhq0-0001Ad-8G
+	(envelope-from <peterx@redhat.com>) id 1dPhq0-0001B2-Os
 	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 00:10:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dPhpw-0002Y1-KG
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 00:10:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42558)
+	(envelope-from <peterx@redhat.com>) id 1dPhpz-0002YK-FH
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 00:10:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41714)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dPhpw-0002Xt-BP
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 00:10:48 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dPhpy-0002YE-Vv
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 00:10:51 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5BDCE4DAF8
-	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 04:10:47 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0F6B580F99
+	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 04:10:50 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Tue, 27 Jun 2017 12:10:14 +0800
-Message-Id: <1498536619-14548-6-git-send-email-peterx@redhat.com>
+Date: Tue, 27 Jun 2017 12:10:15 +0800
+Message-Id: <1498536619-14548-7-git-send-email-peterx@redhat.com>
 In-Reply-To: <1498536619-14548-1-git-send-email-peterx@redhat.com>
 References: <1498536619-14548-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 05/10] migration: move global_state.optional
- out
+Subject: [Qemu-devel] [PATCH v6 06/10] migration: move only_migratable to
+ MigrationState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,188 +33,137 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Put it into MigrationState then we can use the properties to specify
-whether to enable storing global state.
+One less global variable, and it does only matter with migration.
 
-Removing global_state_set_optional() since now we can use HW_COMPAT_2_3
-for x86/power, and AccelClass.global_props for Xen.
+We keep the old "--only-migratable" option, but also now we support:
+
+  -global migration.only-migratable=true
+
+Currently still keep the old interface.
+
+Hmm, now vl.c has no way to access migrate_get_current(). Export a
+function for it to setup only_migratable.
 
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- hw/i386/pc_piix.c                |  1 -
- hw/ppc/spapr.c                   |  1 -
- hw/xen/xen-common.c              | 11 ++++++++++-
- include/hw/compat.h              |  4 ++++
- include/migration/global_state.h |  1 -
- migration/global_state.c         |  9 ++-------
- migration/migration.c            |  7 +++++++
- migration/migration.h            |  6 ++++++
- 8 files changed, 29 insertions(+), 11 deletions(-)
+ include/migration/misc.h | 2 ++
+ include/sysemu/sysemu.h  | 1 -
+ migration/migration.c    | 8 +++++++-
+ migration/migration.h    | 3 +++
+ migration/savevm.c       | 2 +-
+ vl.c                     | 9 +++++++--
+ 6 files changed, 20 insertions(+), 5 deletions(-)
 
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 46a2bc4..3b51297 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -318,7 +318,6 @@ static void pc_compat_2_3(MachineState *machine)
-     if (kvm_enabled()) {
-         pcms->smm = ON_OFF_AUTO_OFF;
-     }
--    global_state_set_optional();
-     savevm_skip_configuration();
- }
- 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index ede5167..f07d40a 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3581,7 +3581,6 @@ static void spapr_machine_2_3_instance_options(MachineState *machine)
- {
-     spapr_machine_2_4_instance_options(machine);
-     savevm_skip_section_footers();
--    global_state_set_optional();
-     savevm_skip_configuration();
- }
- 
-diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
-index d3fa705..459e6ab 100644
---- a/hw/xen/xen-common.c
-+++ b/hw/xen/xen-common.c
-@@ -139,19 +139,28 @@ static int xen_init(MachineState *ms)
-     }
-     qemu_add_vm_change_state_handler(xen_change_state_handler, NULL);
- 
--    global_state_set_optional();
-     savevm_skip_configuration();
-     savevm_skip_section_footers();
- 
-     return 0;
- }
- 
-+static GlobalProperty xen_compat_props[] = {
-+    {
-+        .driver = "migration",
-+        .property = "store-global-state",
-+        .value = "off",
-+    },
-+    { /* end of list */ },
-+};
+diff --git a/include/migration/misc.h b/include/migration/misc.h
+index 2d36cf5..6ac3307 100644
+--- a/include/migration/misc.h
++++ b/include/migration/misc.h
+@@ -55,4 +55,6 @@ bool migration_has_finished(MigrationState *);
+ bool migration_has_failed(MigrationState *);
+ /* ...and after the device transmission */
+ bool migration_in_postcopy_after_devices(MigrationState *);
++void migration_only_migratable_set(void);
 +
- static void xen_accel_class_init(ObjectClass *oc, void *data)
- {
-     AccelClass *ac = ACCEL_CLASS(oc);
-     ac->name = "Xen";
-     ac->init_machine = xen_init;
-     ac->allowed = &xen_allowed;
-+    ac->global_props = xen_compat_props;
- }
+ #endif
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 9841a52..b213696 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -15,7 +15,6 @@
+ /* vl.c */
  
- #define TYPE_XEN_ACCEL ACCEL_CLASS_NAME("xen")
-diff --git a/include/hw/compat.h b/include/hw/compat.h
-index 26cd585..a506a74 100644
---- a/include/hw/compat.h
-+++ b/include/hw/compat.h
-@@ -181,6 +181,10 @@
-         .driver   = TYPE_PCI_DEVICE,\
-         .property = "x-pcie-lnksta-dllla",\
-         .value    = "off",\
-+    },{\
-+        .driver   = "migration",\
-+        .property = "store-global-state",\
-+        .value    = "off",\
-     },
- 
- #define HW_COMPAT_2_2 \
-diff --git a/include/migration/global_state.h b/include/migration/global_state.h
-index 90faea7..d307de8 100644
---- a/include/migration/global_state.h
-+++ b/include/migration/global_state.h
-@@ -16,7 +16,6 @@
- #include "sysemu/sysemu.h"
- 
- void register_global_state(void);
--void global_state_set_optional(void);
- int global_state_store(void);
- void global_state_store_running(void);
- bool global_state_received(void);
-diff --git a/migration/global_state.c b/migration/global_state.c
-index f792cf5..dcbbcb2 100644
---- a/migration/global_state.c
-+++ b/migration/global_state.c
-@@ -15,12 +15,12 @@
- #include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "qapi/util.h"
-+#include "migration.h"
- #include "migration/global_state.h"
- #include "migration/vmstate.h"
- #include "trace.h"
- 
- typedef struct {
--    bool optional;
-     uint32_t size;
-     uint8_t runstate[100];
-     RunState state;
-@@ -57,11 +57,6 @@ RunState global_state_get_runstate(void)
-     return global_state.state;
- }
- 
--void global_state_set_optional(void)
--{
--    global_state.optional = true;
--}
--
- static bool global_state_needed(void *opaque)
- {
-     GlobalState *s = opaque;
-@@ -69,7 +64,7 @@ static bool global_state_needed(void *opaque)
- 
-     /* If it is not optional, it is mandatory */
- 
--    if (s->optional == false) {
-+    if (migrate_get_current()->store_global_state) {
-         return true;
-     }
- 
+ extern const char *bios_name;
+-extern int only_migratable;
+ extern const char *qemu_name;
+ extern QemuUUID qemu_uuid;
+ extern bool qemu_uuid_set;
 diff --git a/migration/migration.c b/migration/migration.c
-index 2c25927..221b22c 100644
+index 221b22c..67f9e68 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -1976,11 +1976,18 @@ void migrate_fd_connect(MigrationState *s)
-     s->migration_thread_running = true;
+@@ -115,6 +115,11 @@ MigrationState *migrate_get_current(void)
+     return current_migration;
  }
  
-+static Property migration_properties[] = {
-+    DEFINE_PROP_BOOL("store-global-state", MigrationState,
-+                     store_global_state, true),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
++void migration_only_migratable_set(void)
++{
++    migrate_get_current()->only_migratable = true;
++}
 +
- static void migration_class_init(ObjectClass *klass, void *data)
+ MigrationIncomingState *migration_incoming_get_current(void)
  {
-     DeviceClass *dc = DEVICE_CLASS(klass);
+     static bool once;
+@@ -986,7 +991,7 @@ static GSList *migration_blockers;
  
-     dc->user_creatable = false;
-+    dc->props = migration_properties;
- }
+ int migrate_add_blocker(Error *reason, Error **errp)
+ {
+-    if (only_migratable) {
++    if (migrate_get_current()->only_migratable) {
+         error_propagate(errp, error_copy(reason));
+         error_prepend(errp, "disallowing migration blocker "
+                           "(--only_migratable) for: ");
+@@ -1979,6 +1984,7 @@ void migrate_fd_connect(MigrationState *s)
+ static Property migration_properties[] = {
+     DEFINE_PROP_BOOL("store-global-state", MigrationState,
+                      store_global_state, true),
++    DEFINE_PROP_BOOL("only-migratable", MigrationState, only_migratable, false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
  
- static void migration_instance_init(Object *obj)
 diff --git a/migration/migration.h b/migration/migration.h
-index 3fca364..4b898e9 100644
+index 4b898e9..34377dd 100644
 --- a/migration/migration.h
 +++ b/migration/migration.h
-@@ -133,6 +133,12 @@ struct MigrationState
-     /* Do we have to clean up -b/-i from old migrate parameters */
-     /* This feature is deprecated and will be removed */
-     bool must_remove_block_options;
+@@ -139,6 +139,9 @@ struct MigrationState
+      * during migration.
+      */
+     bool store_global_state;
 +
-+    /*
-+     * Global switch on whether we need to store the global state
-+     * during migration.
-+     */
-+    bool store_global_state;
++    /* Whether the VM is only allowing for migratable devices */
++    bool only_migratable;
  };
  
  void migrate_set_state(int *state, int old_state, int new_state);
+diff --git a/migration/savevm.c b/migration/savevm.c
+index c7a49c9..1499cd3 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2336,7 +2336,7 @@ void vmstate_register_ram_global(MemoryRegion *mr)
+ bool vmstate_check_only_migratable(const VMStateDescription *vmsd)
+ {
+     /* check needed if --only-migratable is specified */
+-    if (!only_migratable) {
++    if (!migrate_get_current()->only_migratable) {
+         return true;
+     }
+ 
+diff --git a/vl.c b/vl.c
+index f0a0515..36ff3f4 100644
+--- a/vl.c
++++ b/vl.c
+@@ -188,7 +188,6 @@ bool boot_strict;
+ uint8_t *boot_splash_filedata;
+ size_t boot_splash_filedata_size;
+ uint8_t qemu_extra_params_fw[2];
+-int only_migratable; /* turn it off unless user states otherwise */
+ 
+ int icount_align_option;
+ 
+@@ -3953,7 +3952,13 @@ int main(int argc, char **argv, char **envp)
+                 incoming = optarg;
+                 break;
+             case QEMU_OPTION_only_migratable:
+-                only_migratable = 1;
++                /*
++                 * TODO: we can remove this option one day, and we
++                 * should all use:
++                 *
++                 * "-global migration.only-migratable=true"
++                 */
++                migration_only_migratable_set();
+                 break;
+             case QEMU_OPTION_nodefaults:
+                 has_defaults = 0;
 -- 
 2.7.4
