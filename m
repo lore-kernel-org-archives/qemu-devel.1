@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53652)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dPrpY-0005a1-O4
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 10:51:06 -0400
+	(envelope-from <famz@redhat.com>) id 1dPrrP-00074x-PH
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 10:53:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dPrpU-0004T9-Hn
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 10:51:04 -0400
-Resent-Message-Id: <E1dPrpU-0004T9-Hn@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21384)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dPrpU-0004QL-7s
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 10:51:00 -0400
-Message-ID: <149857504698.60.8071319339962951109@4f20b1c0f442>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20170626200832.11058-1-Sergio.G.DelReal@gmail.com>
+	(envelope-from <famz@redhat.com>) id 1dPrrP-0001Py-0D
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 10:52:59 -0400
+Date: Tue, 27 Jun 2017 22:52:48 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170627145248.GH14166@lemon.lan>
+References: <20170626123510.20134-1-berrange@redhat.com>
+	<149857461892.29731.17688834718600195927@lemon.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 27 Jun 2017 07:50:48 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] xsave_helper: pull xsave and xrstor out of
- kvm.c into helper function
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <149857461892.29731.17688834718600195927@lemon.lan>
+Subject: Re: [Qemu-devel] [PATCH v6 0/5] Improve I/O tests coverage of LUKS
+ driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,63 +24,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sergio.g.delreal@gmail.com
-Cc: famz@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, kvm@vger.kernel.org, mtosatti@redhat.com, qemu-devel@nongnu.org, Sergio.G.DelReal@gmail.com, rth@twiddle.net
+To: qemu-devel@nongnu.org
+Cc: berrange@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSF0geHNhdmVfaGVscGVyOiBwdWxsIHhzYXZlIGFuZCB4cnN0b3Igb3V0IG9m
-IGt2bS5jIGludG8gaGVscGVyIGZ1bmN0aW9uClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE3
-MDYyNjIwMDgzMi4xMTA1OC0xLVNlcmdpby5HLkRlbFJlYWxAZ21haWwuY29tCgo9PT0gVEVTVCBT
-Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxv
-ZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUK
-CmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBj
-IGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdp
-dCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9y
-bWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAg
-ICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpl
-eGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIx
-ZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
-ZXN0JwowYTZlZDRiIHhzYXZlX2hlbHBlcjogcHVsbCB4c2F2ZSBhbmQgeHJzdG9yIG91dCBvZiBr
-dm0uYyBpbnRvIGhlbHBlciBmdW5jdGlvbgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcg
-UEFUQ0ggMS8xOiB4c2F2ZV9oZWxwZXI6IHB1bGwgeHNhdmUgYW5kIHhyc3RvciBvdXQgb2Yga3Zt
-LmMgaW50byBoZWxwZXIgZnVuY3Rpb24uLi4KRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQg
-dGhhdCAnKycgKGN0eDpWeFYpCiMyMTE6IEZJTEU6IHRhcmdldC9pMzg2L3hzYXZlX2hlbHBlci5j
-OjQ3OgorICAgICAgICBzdHFfcCh4bW0rOCwgICBlbnYtPnhtbV9yZWdzW2ldLlpNTV9RKDEpKTsK
-ICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAn
-KycgKGN0eDpWeFYpCiMyMTM6IEZJTEU6IHRhcmdldC9pMzg2L3hzYXZlX2hlbHBlci5jOjQ5Ogor
-ICAgICAgICBzdHFfcCh5bW1oKzgsICBlbnYtPnhtbV9yZWdzW2ldLlpNTV9RKDMpKTsKICAgICAg
-ICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJysnIChj
-dHg6VnhWKQojMjE1OiBGSUxFOiB0YXJnZXQvaTM4Ni94c2F2ZV9oZWxwZXIuYzo1MToKKyAgICAg
-ICAgc3RxX3Aoem1taCs4LCAgZW52LT54bW1fcmVnc1tpXS5aTU1fUSg1KSk7CiAgICAgICAgICAg
-ICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcrJyAoY3R4OlZ4
-VikKIzIxNjogRklMRTogdGFyZ2V0L2kzODYveHNhdmVfaGVscGVyLmM6NTI6CisgICAgICAgIHN0
-cV9wKHptbWgrMTYsIGVudi0+eG1tX3JlZ3NbaV0uWk1NX1EoNikpOwogICAgICAgICAgICAgICAg
-ICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKycgKGN0eDpWeFYpCiMy
-MTc6IEZJTEU6IHRhcmdldC9pMzg2L3hzYXZlX2hlbHBlci5jOjUzOgorICAgICAgICBzdHFfcCh6
-bW1oKzI0LCBlbnYtPnhtbV9yZWdzW2ldLlpNTV9RKDcpKTsKICAgICAgICAgICAgICAgICAgIF4K
-CkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJysnIChjdHg6VnhWKQojMjYzOiBG
-SUxFOiB0YXJnZXQvaTM4Ni94c2F2ZV9oZWxwZXIuYzo5OToKKyAgICAgICAgZW52LT54bW1fcmVn
-c1tpXS5aTU1fUSgxKSA9IGxkcV9wKHhtbSs4KTsKICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQg
-JysnIChjdHg6VnhWKQojMjY1OiBGSUxFOiB0YXJnZXQvaTM4Ni94c2F2ZV9oZWxwZXIuYzoxMDE6
-CisgICAgICAgIGVudi0+eG1tX3JlZ3NbaV0uWk1NX1EoMykgPSBsZHFfcCh5bW1oKzgpOwogICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFj
-ZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJysnIChjdHg6VnhWKQojMjY3OiBGSUxFOiB0YXJnZXQv
-aTM4Ni94c2F2ZV9oZWxwZXIuYzoxMDM6CisgICAgICAgIGVudi0+eG1tX3JlZ3NbaV0uWk1NX1Eo
-NSkgPSBsZHFfcCh6bW1oKzgpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJysnIChjdHg6
-VnhWKQojMjY4OiBGSUxFOiB0YXJnZXQvaTM4Ni94c2F2ZV9oZWxwZXIuYzoxMDQ6CisgICAgICAg
-IGVudi0+eG1tX3JlZ3NbaV0uWk1NX1EoNikgPSBsZHFfcCh6bW1oKzE2KTsKICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVp
-cmVkIGFyb3VuZCB0aGF0ICcrJyAoY3R4OlZ4VikKIzI2OTogRklMRTogdGFyZ2V0L2kzODYveHNh
-dmVfaGVscGVyLmM6MTA1OgorICAgICAgICBlbnYtPnhtbV9yZWdzW2ldLlpNTV9RKDcpID0gbGRx
-X3Aoem1taCsyNCk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgXgoKdG90YWw6IDEwIGVycm9ycywgMCB3YXJuaW5ncywgMjQyIGxpbmVzIGNoZWNrZWQKCllv
-dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoK
-VGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
-dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
-IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On Tue, 06/27 07:43, no-reply@patchew.org wrote:
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> Traceback (most recent call last):
+>   File "./patchew-cli", line 430, in test_one
+>     git_clone_repo(clone, r["repo"], r["head"], logf)
+>   File "./patchew-cli", line 48, in git_clone_repo
+>     stdout=logf, stderr=logf)
+>   File "/usr/lib64/python3.5/subprocess.py", line 266, in check_call
+>     retcode = call(*popenargs, **kwargs)
+>   File "/usr/lib64/python3.5/subprocess.py", line 249, in call
+>     return p.wait(timeout=timeout)
+>   File "/usr/lib64/python3.5/subprocess.py", line 1389, in wait
+>     (pid, sts) = self._try_wait(0)
+>   File "/usr/lib64/python3.5/subprocess.py", line 1339, in _try_wait
+>     (pid, sts) = os.waitpid(self.pid, wait_flags)
+> KeyboardInterrupt
+
+My mistake, sorry for the noise.
+
+Fam
