@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dPvLd-0006Or-9h
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 14:36:26 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dPvQa-0007jw-Gk
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 14:41:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dPvLa-0003kY-MT
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 14:36:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:64572)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dPvLa-0003kF-E2
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 14:36:22 -0400
-References: <20170618191101.3457-1-Sergio.G.DelReal@gmail.com>
-	<b5df4ca0-a337-1385-58e3-5217ee00cbfb@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <79be8ef3-de2e-b498-4b1d-628bfcc71154@redhat.com>
-Date: Tue, 27 Jun 2017 13:36:16 -0500
+	(envelope-from <kwolf@redhat.com>) id 1dPvQZ-000663-MW
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 14:41:32 -0400
+Date: Tue, 27 Jun 2017 20:41:23 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170627184123.GD4792@noname.redhat.com>
+References: <20170605203845.24351-1-eblake@redhat.com>
+	<20170606122645.GC5448@noname.redhat.com>
+	<fffc2bff-063b-4e0e-c90d-e5a77857ab1c@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <b5df4ca0-a337-1385-58e3-5217ee00cbfb@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="wvxSJLnpUxVkLMOXtVahv0Ao5aFof1s42"
-Subject: Re: [Qemu-devel] [PATCH] vcpu_dirty: share the same field in
- CPUState for all accelerators
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="KsGdsel6WgEHnImy"
+Content-Disposition: inline
+In-Reply-To: <fffc2bff-063b-4e0e-c90d-e5a77857ab1c@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v4 0/4] more blkdebug tweaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +25,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
-Cc: James Hogan <james.hogan@imgtec.com>, Eduardo Habkost <ehabkost@redhat.com>, "open list:Overall" <kvm@vger.kernel.org>, "open list:CPU" <qemu-devel@nongnu.org>, Yongbok Kim <yongbok.kim@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wvxSJLnpUxVkLMOXtVahv0Ao5aFof1s42
-From: Eric Blake <eblake@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
- Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
-Cc: James Hogan <james.hogan@imgtec.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- "open list:Overall" <kvm@vger.kernel.org>,
- "open list:CPU" <qemu-devel@nongnu.org>, Yongbok Kim
- <yongbok.kim@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>,
- Richard Henderson <rth@twiddle.net>
-Message-ID: <79be8ef3-de2e-b498-4b1d-628bfcc71154@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] vcpu_dirty: share the same field in CPUState
- for all accelerators
-References: <20170618191101.3457-1-Sergio.G.DelReal@gmail.com>
- <b5df4ca0-a337-1385-58e3-5217ee00cbfb@redhat.com>
-In-Reply-To: <b5df4ca0-a337-1385-58e3-5217ee00cbfb@redhat.com>
-Content-Type: text/plain; charset=utf-8
+
+--KsGdsel6WgEHnImy
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 06/19/2017 11:35 AM, Paolo Bonzini wrote:
+Am 27.06.2017 um 18:01 hat Eric Blake geschrieben:
+> On 06/06/2017 07:26 AM, Kevin Wolf wrote:
+> > Am 05.06.2017 um 22:38 hat Eric Blake geschrieben:
+> >> I found a crasher and some odd behavior while rebasing my
+> >> bdrv_get_block_status series, so I figured I'd get these things
+> >> fixed first.  This is based on top of Max's block branch.
+> >>
+> >> Available as a tag at:
+> >> git fetch git://repo.or.cz/qemu/ericb.git nbd-blkdebug-status-v4
+> >>
+> >> Since v3:
+> >> - check all qemu-iotests (patch 1)
+> >=20
+> > Whoops, somehow I ended up applying and reviewing v4 while looking at
+> > the v3 thread... Looks like there really aren't any missing test case
+> > updates any more.
+> >=20
+> > Thanks, applied to the block branch.
 >=20
->=20
-> On 18/06/2017 21:11, Sergio Andres Gomez Del Real wrote:
->> This patch simply replaces the separate boolean field in CPUState that=
+> Did this get lost somehow?
 
->> kvm, hax (and upcoming hvf) have for keeping track of vcpu dirtiness
->> with a single shared field.
->>
->> Signed-off-by: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.co=
-m>
->> ---
+No idea what happened there, but it looks like it. It's queued now.
 
->>
->=20
-> Thanks, I queued this patch for 2.9.
+Kevin
 
-As in qemu-stable 2.9.1, or did you mean 2.10 mainline?
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---wvxSJLnpUxVkLMOXtVahv0Ao5aFof1s42
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+--KsGdsel6WgEHnImy
+Content-Type: application/pgp-signature
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Version: GnuPG v2.0.22 (GNU/Linux)
 
-iQEcBAEBCAAGBQJZUqWhAAoJEKeha0olJ0Nq2NgH/3cXlSFHY66lZU+LN3Zoet6R
-vBaEzvXhzU5KSBr7mhIMSo/wYWH2449aY4qmq+53esUikRWdPs++AFeMWjvCAnXG
-GR1emjmB+6gZS4QQsLRFBQKljjjlgRDQbVgC1AT8j+2ttnt/FBiLLOvZf1Dy4WYg
-JqauLk7mber25McLcAuzb0xCskKExoZQyfrcq24g5i7/3//kaUBY3PoMArpgLK/O
-ejqumT+/ca+/UZdGzkZBjqcco007InghQSe9nrqQvKHEoC5BoxuwFkCJpJR5IxG3
-FME2XotLeWfkwNgh/ze6+684eKsCFJ69tVEz/QJpq3NyyzfCFgXbAwnrTm0HqlY=
-=uC0S
+iQIcBAEBAgAGBQJZUqbTAAoJEH8JsnLIjy/WEPUQAIN7pXvwL5FSGwlWjsMyl8X/
+0GGoxLMKJN0bCul9cYGnLBzwKYET6TzyfSkll1qzqpy5BAyyC0j4h7lo4w8ewfjY
+sE7+AAfgZVTSyGetXFfXLhcf3TagjNM81TIoHTqQqypeJzITBcf6Pq7c28NJjnNZ
+1DhaMhBXaBlGvoLFLHJXeOQYAWgkL2946meT3mdj0g0ef6Q3lFpWTZ9/AWyiQvlJ
+Lv1bJ+m8QdOVHKJgR4H7RifvutfJdTXcSGEyuyMZSlZf8gbC02UB7VSryv+B/W0k
+jDNjeyyu5lWV99/4VY4gLfyiF4IZD58qYi+17yla5f0zQKFHKb/iuPsbuMeyoe9z
+2t3RJ6FJhc716475602HsoabfaQzCU7pGkm79IGEB9e2jt58lxgIZvD1P6Ro5a1i
+g+61xTTm8BcoNTM+mqLnRPe0vJGiRNUqot0eYOrcU8y/h4FaeMqkGmkUkmNQjP+5
+ldOv/gGcp4jHseLG19UPZUcOzrCjfoQ1qJyB5x/qgZP6BkiwVmLzNaq4yo/1S4Nw
+NQL5MS5M3AmSsYk6cnndqkw/gOGiK7qtJ5R5HZpzzQmAecZy1JYLGkdekjx7qg5U
+bLDM33hzMgllhmSC/EdRcoyJ5Wat0u3He0Zy3JT1x2NNOmvU/RW/o1g1myesY79+
+wTCpcMlauf62IdPm+Wya
+=iMoX
 -----END PGP SIGNATURE-----
 
---wvxSJLnpUxVkLMOXtVahv0Ao5aFof1s42--
+--KsGdsel6WgEHnImy--
