@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42391)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dPw6w-0005vB-8o
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 15:25:19 -0400
+	(envelope-from <eblake@redhat.com>) id 1dPw6y-0005xe-Ei
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 15:25:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dPw6t-0006k4-2m
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 15:25:18 -0400
+	(envelope-from <eblake@redhat.com>) id 1dPw6x-0006le-JR
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 15:25:20 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Tue, 27 Jun 2017 14:24:42 -0500
-Message-Id: <20170627192458.15519-5-eblake@redhat.com>
+Date: Tue, 27 Jun 2017 14:24:44 -0500
+Message-Id: <20170627192458.15519-7-eblake@redhat.com>
 In-Reply-To: <20170627192458.15519-1-eblake@redhat.com>
 References: <20170627192458.15519-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 04/20] stream: Switch stream_run() to
+Subject: [Qemu-devel] [PATCH v3 06/20] commit: Switch commit_run() to
  byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,7 +25,7 @@ Cc: kwolf@redhat.com, qemu-block@nongnu.org, jsnow@redhat.com, Jeff Cody <jcody@
 
 We are gradually converting to byte-based interfaces, as they are
 easier to reason about than sector-based.  Change the internal
-loop iteration of streaming to track by bytes instead of sectors
+loop iteration of committing to track by bytes instead of sectors
 (although we are still guaranteed that we iterate by steps that
 are sector-aligned).
 
@@ -35,88 +35,63 @@ Reviewed-by: John Snow <jsnow@redhat.com>
 ---
 v2: no change
 ---
- block/stream.c | 24 ++++++++++--------------
- 1 file changed, 10 insertions(+), 14 deletions(-)
+ block/commit.c | 16 ++++++----------
+ 1 file changed, 6 insertions(+), 10 deletions(-)
 
-diff --git a/block/stream.c b/block/stream.c
-index 746d525..2f9618b 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -108,12 +108,11 @@ static void coroutine_fn stream_run(void *opaque)
-     BlockBackend *blk = s->common.blk;
-     BlockDriverState *bs = blk_bs(blk);
-     BlockDriverState *base = s->base;
--    int64_t sector_num = 0;
--    int64_t end = -1;
-+    int64_t offset = 0;
+diff --git a/block/commit.c b/block/commit.c
+index 6f67d78..c3a7bca 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -143,17 +143,16 @@ static void coroutine_fn commit_run(void *opaque)
+ {
+     CommitBlockJob *s = opaque;
+     CommitCompleteData *data;
+-    int64_t sector_num, end;
++    int64_t offset;
      uint64_t delay_ns = 0;
-     int error = 0;
      int ret = 0;
 -    int n = 0;
 +    int n = 0; /* sectors */
-     void *buf;
+     void *buf = NULL;
+     int bytes_written = 0;
+     int64_t base_len;
 
-     if (!bs->backing) {
-@@ -126,7 +125,6 @@ static void coroutine_fn stream_run(void *opaque)
+     ret = s->common.len = blk_getlength(s->top);
+
+-
+     if (s->common.len < 0) {
          goto out;
+     }
+@@ -170,10 +169,9 @@ static void coroutine_fn commit_run(void *opaque)
+         }
      }
 
 -    end = s->common.len >> BDRV_SECTOR_BITS;
-     buf = qemu_blockalign(bs, STREAM_BUFFER_SIZE);
-
-     /* Turn on copy-on-read for the whole block device so that guest read
-@@ -138,7 +136,7 @@ static void coroutine_fn stream_run(void *opaque)
-         bdrv_enable_copy_on_read(bs);
-     }
+     buf = blk_blockalign(s->top, COMMIT_BUFFER_SIZE);
 
 -    for (sector_num = 0; sector_num < end; sector_num += n) {
-+    for ( ; offset < s->common.len; offset += n * BDRV_SECTOR_SIZE) {
++    for (offset = 0; offset < s->common.len; offset += n * BDRV_SECTOR_SIZE) {
          bool copy;
 
          /* Note that even when no rate limit is applied we need to yield
-@@ -151,28 +149,26 @@ static void coroutine_fn stream_run(void *opaque)
-
-         copy = false;
-
--        ret = bdrv_is_allocated(bs, sector_num,
-+        ret = bdrv_is_allocated(bs, offset / BDRV_SECTOR_SIZE,
-                                 STREAM_BUFFER_SIZE / BDRV_SECTOR_SIZE, &n);
-         if (ret == 1) {
-             /* Allocated in the top, no need to copy.  */
-         } else if (ret >= 0) {
-             /* Copy if allocated in the intermediate images.  Limit to the
--             * known-unallocated area [sector_num, sector_num+n).  */
-+             * known-unallocated area [offset, offset+n*BDRV_SECTOR_SIZE).  */
-             ret = bdrv_is_allocated_above(backing_bs(bs), base,
--                                          sector_num, n, &n);
-+                                          offset / BDRV_SECTOR_SIZE, n, &n);
-
-             /* Finish early if end of backing file has been reached */
-             if (ret == 0 && n == 0) {
--                n = end - sector_num;
-+                n = (s->common.len - offset) / BDRV_SECTOR_SIZE;
-             }
-
-             copy = (ret == 1);
+@@ -185,15 +183,13 @@ static void coroutine_fn commit_run(void *opaque)
          }
--        trace_stream_one_iteration(s, sector_num * BDRV_SECTOR_SIZE,
+         /* Copy if allocated above the base */
+         ret = bdrv_is_allocated_above(blk_bs(s->top), blk_bs(s->base),
+-                                      sector_num,
++                                      offset / BDRV_SECTOR_SIZE,
+                                       COMMIT_BUFFER_SIZE / BDRV_SECTOR_SIZE,
+                                       &n);
+         copy = (ret == 1);
+-        trace_commit_one_iteration(s, sector_num * BDRV_SECTOR_SIZE,
 -                                   n * BDRV_SECTOR_SIZE, ret);
-+        trace_stream_one_iteration(s, offset, n * BDRV_SECTOR_SIZE, ret);
++        trace_commit_one_iteration(s, offset, n * BDRV_SECTOR_SIZE, ret);
          if (copy) {
--            ret = stream_populate(blk, sector_num * BDRV_SECTOR_SIZE,
--                                  n * BDRV_SECTOR_SIZE, buf);
-+            ret = stream_populate(blk, offset, n * BDRV_SECTOR_SIZE, buf);
+-            ret = commit_populate(s->top, s->base,
+-                                  sector_num * BDRV_SECTOR_SIZE,
++            ret = commit_populate(s->top, s->base, offset,
+                                   n * BDRV_SECTOR_SIZE, buf);
+             bytes_written += n * BDRV_SECTOR_SIZE;
          }
-         if (ret < 0) {
-             BlockErrorAction action =
-@@ -211,7 +207,7 @@ out:
-     /* Modify backing chain and close BDSes in main loop */
-     data = g_malloc(sizeof(*data));
-     data->ret = ret;
--    data->reached_end = sector_num == end;
-+    data->reached_end = offset == s->common.len;
-     block_job_defer_to_main_loop(&s->common, stream_complete, data);
- }
-
 -- 
 2.9.4
