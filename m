@@ -1,22 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dPvQa-0007jw-Gk
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 14:41:33 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dPvYv-0001Gi-4D
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 14:50:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dPvQZ-000663-MW
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 14:41:32 -0400
-Date: Tue, 27 Jun 2017 20:41:23 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170627184123.GD4792@noname.redhat.com>
-References: <20170605203845.24351-1-eblake@redhat.com>
-	<20170606122645.GC5448@noname.redhat.com>
-	<fffc2bff-063b-4e0e-c90d-e5a77857ab1c@redhat.com>
+	(envelope-from <alistair23@gmail.com>) id 1dPvYu-0000y1-6y
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 14:50:09 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:35147)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1dPvYt-0000wm-UR
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 14:50:08 -0400
+Received: by mail-wm0-x229.google.com with SMTP id w126so32853114wme.0
+	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 11:50:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="KsGdsel6WgEHnImy"
-Content-Disposition: inline
-In-Reply-To: <fffc2bff-063b-4e0e-c90d-e5a77857ab1c@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v4 0/4] more blkdebug tweaks
+Sender: alistair23@gmail.com
+In-Reply-To: <87efutd9lj.fsf@dusky.pond.sub.org>
+References: <2b2311b1b070a0b03973e39deccf4682de4a6cd4.1496686997.git.alistair.francis@xilinx.com>
+	<CAJ+F1CLuPkWjG3Hn8hfaxTApn6+ouqh5nJZNWSQYX1C3_HRFqA@mail.gmail.com>
+	<e340cdb9-3c97-8624-81d9-f7888f819a68@amsat.org>
+	<CAKmqyKOOhu7iKuW4naNi0+7cwayLaftkPf=gS7uBakMvKavxVQ@mail.gmail.com>
+	<270686d0-1ca8-965f-a14a-397f45616deb@redhat.com>
+	<87shjc2rkb.fsf@dusky.pond.sub.org>
+	<CAKmqyKMJ8ZgTPtEj73pBDU+mf578tubKPUPsP4mTD8veX90K-w@mail.gmail.com>
+	<878tl3kodm.fsf@dusky.pond.sub.org>
+	<CAKmqyKP3S7mBwQzC0yV4MpQddcKvGXtXrPyY68X7t62YwLqy3g@mail.gmail.com>
+	<871squz7l8.fsf@dusky.pond.sub.org>
+	<CAKmqyKMQyYObpsFd6hGe3zjPSJRKyWZqMGfuFSMJULzmvoD_eA@mail.gmail.com>
+	<87efutd9lj.fsf@dusky.pond.sub.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Tue, 27 Jun 2017 11:49:35 -0700
+Message-ID: <CAKmqyKPF6ynpByifMApNrUh+LsMBpSh-WNWSGBFv9VgNvXytZA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] char-socket: Don't report TCP
+ socket waiting as an error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +41,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
+On Thu, Jun 8, 2017 at 10:16 PM, Markus Armbruster <armbru@redhat.com> wrote:
+> Alistair Francis <alistair.francis@xilinx.com> writes:
+>
+>> On Thu, Jun 8, 2017 at 10:56 AM, Markus Armbruster <armbru@redhat.com> wrote:
+>>> Alistair Francis <alistair.francis@xilinx.com> writes:
+>>>
+>>>> On Wed, Jun 7, 2017 at 11:03 PM, Markus Armbruster <armbru@redhat.com> wrote:
+>>>>> Alistair Francis <alistair.francis@xilinx.com> writes:
+>>>>>
+>>>>>> On Wed, Jun 7, 2017 at 12:19 AM, Markus Armbruster <armbru@redhat.com> wrote:
+>>>>>>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>>>>>>>
+>>>>>>>> On 06/06/2017 18:30, Alistair Francis wrote:
+>>>>>>>>>>
+>>>>>>>>>> This is somehow confusing. I don't think it is worth having another
+>>>>>>>>>> qemu_log_stderr() function rather than using error_report() but this very
+>>>>>>>>>> call might deserve a comment explaining this unusual use. What do you think?
+>>>>>>>>>
+>>>>>>>>> The problem with stderr is that this isn't an error. Some uses of QEMU
+>>>>>>>>> (inside Eclipse for example) flag everything printed on stderr as red
+>>>>>>>>> which confuses users that they are seeing an error when they really
+>>>>>>>>> aren't.
+>>>>>>>>
+>>>>>>>> But they are wrong.
+>>>>>>>
+>>>>>>> Concur.  We also print warnings and informational messages to stderr.
+>>>>>>>
+>>>>>>> We should make errors easy to recognize.  Fortunately, error_report()
+>>>>>>> prints errors to stderr in a rigid format.  Unfortunately, error
+>>>>>>> messages bypassing error_report() still exist in places.  We suck.
+>>>>>>>
+>>>>>>> The format is
+>>>>>>>
+>>>>>>>     timestamp-if-enabled progname ':' location message
+>>>>>>>
+>>>>>>> timestamp-if-enabled is normally empty.  With -msg timestamp=on, it's
+>>>>>>> the current time in ISO 8601 format, followed by a space.
+>>>>>>>
+>>>>>>> progname is the program name (main()'s argv[0]).
+>>>>>>>
+>>>>>>> location is either empty, or a reference to the command line or a
+>>>>>>> configuration file.
+>>>>>>>
+>>>>>>> See error_vreport() for details.
+>>>>>>
+>>>>>> Ok, but this isn't an error, it's more information. So it sounds like
+>>>>>> we should still print to stderr but not print in the format described
+>>>>>> above?
+>>>>>
+>>>>> Yes.
+>>>>>
+>>>>> I explained the error message format to show how to distinguish actual
+>>>>> errors from other stuff.
+>>>>
+>>>> Sorry, I should have been more clear. I meant we should not use the
+>>>> error_report() function here. I don't think we have any
+>>>> warning_report() function though, is that something worth having?
+>>>
+>>> So far we simply use error_printf() for such things.
+>>>
+>>> A function to report a warning would let us report them more uniformly,
+>>> but only if we actually use it uniformly.  In other words, adding one
+>>> without also converting the existing warnings to use it would create yet
+>>> another open-ended incremental conversion job.  Are we up to it?
+>>
+>> Yeah! Why not. I am happy to give it a shot changing some errors to warnings.
+>>
+>> First thing though, what is the format for printing warnings?
+>
+> We make one up.
+>
+> For what it's worth, gcc uses the same format as for errors with the
+> message prefixed either by "warning: " or by "error: ".  Also common is
+> prefixing warnings, but not errors.
 
---KsGdsel6WgEHnImy
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Ok, I think that is what I'm going to do. I will send a patch series
+out soon that basically copies the error_report() format but prefixes
+it with warning.
 
-Am 27.06.2017 um 18:01 hat Eric Blake geschrieben:
-> On 06/06/2017 07:26 AM, Kevin Wolf wrote:
-> > Am 05.06.2017 um 22:38 hat Eric Blake geschrieben:
-> >> I found a crasher and some odd behavior while rebasing my
-> >> bdrv_get_block_status series, so I figured I'd get these things
-> >> fixed first.  This is based on top of Max's block branch.
-> >>
-> >> Available as a tag at:
-> >> git fetch git://repo.or.cz/qemu/ericb.git nbd-blkdebug-status-v4
-> >>
-> >> Since v3:
-> >> - check all qemu-iotests (patch 1)
-> >=20
-> > Whoops, somehow I ended up applying and reviewing v4 while looking at
-> > the v3 thread... Looks like there really aren't any missing test case
-> > updates any more.
-> >=20
-> > Thanks, applied to the block branch.
->=20
-> Did this get lost somehow?
+I also removed the timestamp for the warning, although I'm not sure if
+that is what we want to do. I'll CC you when I send it out.
 
-No idea what happened there, but it looks like it. It's queued now.
+Thanks,
+Alistair
 
-Kevin
-
---KsGdsel6WgEHnImy
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJZUqbTAAoJEH8JsnLIjy/WEPUQAIN7pXvwL5FSGwlWjsMyl8X/
-0GGoxLMKJN0bCul9cYGnLBzwKYET6TzyfSkll1qzqpy5BAyyC0j4h7lo4w8ewfjY
-sE7+AAfgZVTSyGetXFfXLhcf3TagjNM81TIoHTqQqypeJzITBcf6Pq7c28NJjnNZ
-1DhaMhBXaBlGvoLFLHJXeOQYAWgkL2946meT3mdj0g0ef6Q3lFpWTZ9/AWyiQvlJ
-Lv1bJ+m8QdOVHKJgR4H7RifvutfJdTXcSGEyuyMZSlZf8gbC02UB7VSryv+B/W0k
-jDNjeyyu5lWV99/4VY4gLfyiF4IZD58qYi+17yla5f0zQKFHKb/iuPsbuMeyoe9z
-2t3RJ6FJhc716475602HsoabfaQzCU7pGkm79IGEB9e2jt58lxgIZvD1P6Ro5a1i
-g+61xTTm8BcoNTM+mqLnRPe0vJGiRNUqot0eYOrcU8y/h4FaeMqkGmkUkmNQjP+5
-ldOv/gGcp4jHseLG19UPZUcOzrCjfoQ1qJyB5x/qgZP6BkiwVmLzNaq4yo/1S4Nw
-NQL5MS5M3AmSsYk6cnndqkw/gOGiK7qtJ5R5HZpzzQmAecZy1JYLGkdekjx7qg5U
-bLDM33hzMgllhmSC/EdRcoyJ5Wat0u3He0Zy3JT1x2NNOmvU/RW/o1g1myesY79+
-wTCpcMlauf62IdPm+Wya
-=iMoX
------END PGP SIGNATURE-----
-
---KsGdsel6WgEHnImy--
+>
+> We already have several error_report() calls with messages that start
+> with (a variation of) "warning: ".
+>
