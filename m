@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dPtm5-0007wO-8X
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:55:38 -0400
+	(envelope-from <laurent@vivier.eu>) id 1dPtm5-0007Cb-OA
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:55:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dPsIM-0001oB-Ow
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:20:52 -0400
-References: <20170622121713.27601-1-stefanha@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1e102164-43ce-126f-29f3-228c407391a6@redhat.com>
-Date: Tue, 27 Jun 2017 10:20:10 -0500
+	(envelope-from <laurent@vivier.eu>) id 1dPsC1-0006Av-6l
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:14:20 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:52632)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dPsC0-000669-Qr
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:14:17 -0400
+References: <20170626220330.6785-1-laurent@vivier.eu>
+	<20170626220330.6785-5-laurent@vivier.eu>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <65e8a6ec-60cf-f626-1db9-4ffa225fd45d@vivier.eu>
+Date: Tue, 27 Jun 2017 17:13:55 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170622121713.27601-1-stefanha@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="hfHEQeDObjTjGClIQ8ch6RfNPU79L5O4n"
-Subject: Re: [Qemu-devel] [PATCH] docs: add qemu-block-drivers(7) man page
+In-Reply-To: <20170626220330.6785-5-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 4/7] softfloat: define floatx80_round()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,115 +28,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, el13635@mail.ntua.gr
+To: qemu-devel@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hfHEQeDObjTjGClIQ8ch6RfNPU79L5O4n
-From: Eric Blake <eblake@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, el13635@mail.ntua.gr
-Message-ID: <1e102164-43ce-126f-29f3-228c407391a6@redhat.com>
-Subject: Re: [PATCH] docs: add qemu-block-drivers(7) man page
-References: <20170622121713.27601-1-stefanha@redhat.com>
-In-Reply-To: <20170622121713.27601-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Aurélien or Peter, could you ACK this one?
 
-On 06/22/2017 07:17 AM, Stefan Hajnoczi wrote:
-> Block driver documentation is available in qemu-doc.html.  It would be
-> convenient to have documentation for formats, protocols, and filter
-> drivers in a man page.
->=20
-> Extract the relevant part of qemu-doc.html into a new file called
-> docs/qemu-block-drivers.texi.  This file can also be built as a
-> stand-alone document (man, html, etc).
->=20
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Thanks,
+Laurent
+
+Le 27/06/2017 à 00:03, Laurent Vivier a écrit :
+> Add a function to round a floatx80 to the defined precision
+> (floatx80_rounding_precision)
+> 
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> Reviewed-by: Richard Henderson <rth@twiddle.net>
 > ---
-
+>  fpu/softfloat.c         | 15 +++++++++++++++
+>  include/fpu/softfloat.h |  1 +
+>  2 files changed, 16 insertions(+)
+> 
+> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+> index 7af14e2..e9bf359 100644
+> --- a/fpu/softfloat.c
+> +++ b/fpu/softfloat.c
+> @@ -5086,6 +5086,21 @@ float128 floatx80_to_float128(floatx80 a, float_status *status)
+>  }
+>  
+>  /*----------------------------------------------------------------------------
+> +| Rounds the extended double-precision floating-point value `a'
+> +| and returns the result as an extended double-precision floating-point
+> +| value.  The operation is performed according to the IEC/IEEE Standard for
+> +| Binary Floating-Point Arithmetic.
+> +*----------------------------------------------------------------------------*/
 > +
-> +@table @option
-> +@item raw
+> +floatx80 floatx80_round(floatx80 a, float_status *status)
+> +{
+> +    return roundAndPackFloatx80(status->floatx80_rounding_precision,
+> +                                extractFloatx80Sign(a),
+> +                                extractFloatx80Exp(a),
+> +                                extractFloatx80Frac(a), 0, status);
+> +}
 > +
-> +Raw disk image format. This format has the advantage of
-> +being simple and easily exportable to all other emulators. If your
-> +file system supports @emph{holes} (for example in ext2 or ext3 on
-> +Linux or NTFS on Windows), then only the written sectors will reserve
-> +space. Use @code{qemu-img info} to know the real size used by the
-> +image or @code{ls -ls} on Unix/Linux.
-
-Worth mentioning the security risk of using raw images under probing
-without explicitly calling them out as raw, because then a guest can
-impersonate other type of images?
-
-> +
-> +Supported options:
-> +@table @code
-> +@item preallocation
-> +Preallocation mode (allowed values: @code{off}, @code{falloc}, @code{f=
-ull}).
-> +@code{falloc} mode preallocates space for image by calling posix_fallo=
-cate().
-> +@code{full} mode preallocates space for image by writing zeros to unde=
-rlying
-> +storage.
-> +@end table
-> +
-> +@item qcow2
-> +QEMU image format, the most versatile format. Use it to have smaller
-> +images (useful if your filesystem does not supports holes, for example=
-
-
-s/supports/support/
-
-> +on Windows),
-
-Odd, since you just stated above for raw that Windows DOES support holes
-(on NTFS).  Better might be "on FAT filesystems".
-
-> zlib based compression and support of multiple VM
-> +snapshots.
-> +
-> +Supported options:
-> +@table @code
-> +@item compat
-> +Determines the qcow2 version to use. @code{compat=3D0.10} uses the
-> +traditional image format that can be read by any QEMU since 0.10.
-> +@code{compat=3D1.1} enables image format extensions that only QEMU 1.1=
- and
-> +newer understand (this is the default). Amongst others, this includes
-
-I don't have any strong opinion on US vs. UK spelling, but do like to
-point out that this is user-facing, if we are trying to consistently
-prefer one flavo[u]r of among[st] in our docs.
-
-Then again, much of your patch is just code motion, rather than new
-documentation.  So my comments are probably worth separate patches.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---hfHEQeDObjTjGClIQ8ch6RfNPU79L5O4n
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZUneqAAoJEKeha0olJ0NqbPIH/R9G2jmQn4xXMib/33FPxspC
-6KxSluzJVxyDsxPT9A6qLPcp71xM5yVahoAdM4UUX1h/q/q3mWccGUa7aprbEQNd
-KIUyXiIEIA6B8ZiLE4HudLPD9Y0600WZV40JM86jhmCMHVLkO10kNH7VCQsc0ZnV
-efTfw/GwScojxGwBGwxlZdTpUbtSz4xuZWBUfl1M+65JZMc/9h9fuIgn2zyGy/3X
-j4Q8EcPwV6eJNaI4NrHObZ/otQLx+er40H6cYzE9Vl/fkQLWryy0p5LKaNSCNUkQ
-uHdk86xNO0cTaEmYhgBvNzgCSfmO614aI4mf3dDVT+JWRMt+WLFbDu9VJ5yBKjg=
-=1d5b
------END PGP SIGNATURE-----
-
---hfHEQeDObjTjGClIQ8ch6RfNPU79L5O4n--
+> +/*----------------------------------------------------------------------------
+>  | Rounds the extended double-precision floating-point value `a' to an integer,
+>  | and returns the result as an extended quadruple-precision floating-point
+>  | value.  The operation is performed according to the IEC/IEEE Standard for
+> diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+> index f1288ef..d9689ec 100644
+> --- a/include/fpu/softfloat.h
+> +++ b/include/fpu/softfloat.h
+> @@ -621,6 +621,7 @@ float128 floatx80_to_float128(floatx80, float_status *status);
+>  /*----------------------------------------------------------------------------
+>  | Software IEC/IEEE extended double-precision operations.
+>  *----------------------------------------------------------------------------*/
+> +floatx80 floatx80_round(floatx80 a, float_status *status);
+>  floatx80 floatx80_round_to_int(floatx80, float_status *status);
+>  floatx80 floatx80_add(floatx80, floatx80, float_status *status);
+>  floatx80 floatx80_sub(floatx80, floatx80, float_status *status);
+> 
