@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dPqZe-0001tC-MD
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 09:30:35 -0400
+	(envelope-from <mjt@tls.msk.ru>) id 1dPqdt-0003DF-69
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 09:34:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dPqZa-00014A-Nb
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 09:30:34 -0400
-References: <20170623164557.11636-1-f4bug@amsat.org>
-	<20170623164557.11636-3-f4bug@amsat.org>
+	(envelope-from <mjt@tls.msk.ru>) id 1dPqdq-0005hW-1l
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 09:34:57 -0400
+References: <20170609150622.4720-1-f4bug@amsat.org>
+	<20170609150622.4720-2-f4bug@amsat.org>
 From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <804d50a0-b0b2-d9de-9fd9-a2e2d7140870@msgid.tls.msk.ru>
-Date: Tue, 27 Jun 2017 16:30:29 +0300
+Message-ID: <48ba0732-0806-320c-e173-ebaf417d8de0@msgid.tls.msk.ru>
+Date: Tue, 27 Jun 2017 16:25:01 +0300
 MIME-Version: 1.0
-In-Reply-To: <20170623164557.11636-3-f4bug@amsat.org>
+In-Reply-To: <20170609150622.4720-2-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] hw/core: fix missing return value in
- load_image_targphys_as()
+Subject: Re: [Qemu-devel] [PATCH v2] hw/pci: define msi_nonbroken in pci-stub
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,7 +23,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org, Eric Blake <eblake@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Thomas Huth <thuth@redhat.com>
 
 Applied to -trivial, thanks!
 
