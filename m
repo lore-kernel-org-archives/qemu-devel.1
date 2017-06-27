@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dPyT8-0005RK-RO
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 17:56:23 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1dPybD-00084Z-Hm
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 18:04:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dPyT5-0005Cm-OP
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 17:56:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53974)
+	(envelope-from <sstabellini@kernel.org>) id 1dPyb8-0000HO-L0
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 18:04:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40076)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dPyT5-0005CM-Ji
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 17:56:19 -0400
-References: <1498564100-10045-1-git-send-email-thuth@redhat.com>
-	<589b8e71-b025-a0ad-0621-d6827e31c90d@suse.de>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b4bba4e4-0d69-095e-5fe2-0042bc414093@redhat.com>
-Date: Tue, 27 Jun 2017 23:56:12 +0200
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1dPyb8-0000Gf-Er
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 18:04:38 -0400
+Date: Tue, 27 Jun 2017 15:04:34 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+Message-ID: <alpine.DEB.2.10.1706271456310.24648@sstabellini-ThinkPad-X260>
 MIME-Version: 1.0
-In-Reply-To: <589b8e71-b025-a0ad-0621-d6827e31c90d@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 00/14] Implement network booting
- directly into the s390-ccw BIOS
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Qemu-devel] [PATCH 0/3] please pull xen-20170627-tag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +24,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Farhan Ali <alifm@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Jens Freimann <jfreiman@redhat.com>, Eric Farman <farman@linux.vnet.ibm.com>
+To: peter.maydell@linaro.org, stefanha@gmail.com
+Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
 
-On 27.06.2017 23:15, Alexander Graf wrote:
->=20
-> On 27.06.17 13:48, Thomas Huth wrote:
-[...]
->> - The code only supports TFTP (via UDP) ... I think that is OK for
->>    most use-cases, but if we ever want to support network booting
->>    via HTTP or something else that is based on TCP, we would need to
->>    use something else instead... Should we maybe rather head towards
->>    grub2, petitboot or something different instead?
->=20
-> IMHO the only viable next step would be to support UEFI and build on to=
-p
-> of that - either by porting edk2 or U-Boot to s390x.
+The following changes since commit 577caa2672ccde7352fda3ef17e44993de862f0e:
 
-I can't speak of U-Boot, but you certainly don't want to port edk2 to a
-big endian machine. Been there, seen that.
+  Merge remote-tracking branch 'remotes/edgar/tags/edgar/mmio-exec-v2.for-upstream' into staging (2017-06-27 16:56:55 +0100)
 
-> The problem with solutions like petitboot or home grown grub2 targets i=
-s
-> that it becomes a documentation and knowledge sharing nightmare down th=
-e
-> road. The less we're different from everyone else, the easier it become=
-s
-> to maintain s390x.
+are available in the git repository at:
 
-petitboot is basically a Linux system (with a shell, too). And grub2 is
-also a common boot loader on x86 nowadays ... so not sure whether they
-would really be a knowledge sharing nightmare? I think they would be
-more common for "server" people than the U-Boot loader, which is likely
-only familiar to "embedded" folks.
 
- Thomas
+  git://xenbits.xen.org/people/sstabellini/qemu-dm.git tags/xen-20170627-tag
+
+for you to fetch changes up to 3284fad7283596033cb810b4788fd1bb43312dbd:
+
+  xen-disk: add support for multi-page shared rings (2017-06-27 15:01:56 -0700)
+
+----------------------------------------------------------------
+Xen 2017/06/27
+
+----------------------------------------------------------------
+Paul Durrant (2):
+      xen-disk: only advertize feature-persistent if grant copy is not available
+      xen-disk: add support for multi-page shared rings
+
+Stefano Stabellini (1):
+      xen/disk: don't leak stack data via response ring
+
+ hw/block/xen_disk.c | 184 +++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 133 insertions(+), 51 deletions(-)
