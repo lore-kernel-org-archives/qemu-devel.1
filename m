@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dPxPr-0002BK-Pc
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 16:48:56 -0400
+	(envelope-from <alistai@xilinx.com>) id 1dPxPy-0002Eq-L4
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 16:49:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dPxPo-00036C-NT
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 16:48:55 -0400
-Received: from mail-dm3nam03on0066.outbound.protection.outlook.com
-	([104.47.41.66]:18433
-	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
+	(envelope-from <alistai@xilinx.com>) id 1dPxPv-00038t-JN
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 16:49:02 -0400
+Received: from mail-cys01nam02on0058.outbound.protection.outlook.com
+	([104.47.37.58]:61023
+	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dPxPo-00035Z-BJ
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 16:48:52 -0400
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dPxPv-00038I-8h
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 16:48:59 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 27 Jun 2017 13:45:41 -0700
-Message-ID: <cover.1498596157.git.alistair.francis@xilinx.com>
+Date: Tue, 27 Jun 2017 13:45:43 -0700
+Message-ID: <c0a2b62c80ddf46f99885b43215899a51a81ebc3.1498596157.git.alistair.francis@xilinx.com>
+In-Reply-To: <cover.1498596157.git.alistair.francis@xilinx.com>
+References: <cover.1498596157.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [RFC v1 0/3]  Implement a warning_report function
+Subject: [Qemu-devel] [RFC v1 1/3] util/qemu-error: Rename error_print_loc()
+ to be more generic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +31,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, armbru@redhat.com
 Cc: alistair.francis@xilinx.com, alistair23@gmail.com
 
-QEMU currently has a standard method to report errors with
-error_repot(). This ensure a sane and standard format when printing
-errors. This series is attempting to add the same functionality for
-warnings.
+Rename the error_print_loc() function in preperation for using it to
+print warnings as well.
 
-At the moment only one error is being converted, I wanted to get the
-implementation nailed down a little bit before I started converting
-others.
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+---
 
-This patch renames error_print_loc() function to be more clear, but I
-didn't bother renaming the others. It seems silly to change
-error_printf() to error_warning_printf() and printf is already taken so
-I just left it as is.
+ util/qemu-error.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-I also didn't change the current error output as that would probably
-break backwards compatibilty for anyone who is parsing logs.
-
-Alistair Francis (3):
-  util/qemu-error: Rename error_print_loc() to be more generic
-  util/qemu-error: Add a warning_report() function
-  char-socket: Report TCP socket waiting as a warning
-
- chardev/char-socket.c       |  2 +-
- include/qemu/error-report.h |  2 ++
- util/qemu-error.c           | 36 ++++++++++++++++++++++++++++++++++--
- 3 files changed, 37 insertions(+), 3 deletions(-)
-
+diff --git a/util/qemu-error.c b/util/qemu-error.c
+index b331f8f4a4..1c5e35ecdb 100644
+--- a/util/qemu-error.c
++++ b/util/qemu-error.c
+@@ -146,7 +146,7 @@ const char *error_get_progname(void)
+ /*
+  * Print current location to current monitor if we have one, else to stderr.
+  */
+-static void error_print_loc(void)
++static void print_loc(void)
+ {
+     const char *sep = "";
+     int i;
+@@ -197,7 +197,7 @@ void error_vreport(const char *fmt, va_list ap)
+         g_free(timestr);
+     }
+ 
+-    error_print_loc();
++    print_loc();
+     error_vprintf(fmt, ap);
+     error_printf("\n");
+ }
 -- 
 2.11.0
