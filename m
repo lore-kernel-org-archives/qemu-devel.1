@@ -1,40 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1dPkY4-0007Jq-K7
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 03:04:33 -0400
+	(envelope-from <armbru@redhat.com>) id 1dPl9U-0000Ot-BS
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 03:43:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1dPkY1-0007lG-FW
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 03:04:32 -0400
-Received: from mel.act-europe.fr ([194.98.77.210]:43952
-	helo=smtp.eu.adacore.com)
+	(envelope-from <armbru@redhat.com>) id 1dPl9Q-00072Y-9U
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 03:43:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46084)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
-	id 1dPkY1-0007l0-5M
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 03:04:29 -0400
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-References: <1488276185-31168-1-git-send-email-fred.konrad@greensocs.com>
-	<b690a50d-4ab3-830c-93a3-5f2b4b027448@greensocs.com>
-	<CAFEAcA94RykH0U33F0aGEYRs_FXF_NNuwQAX_mOf4wVde0s9BQ@mail.gmail.com>
-	<1db78209-e426-03b5-9a19-592da96adaee@greensocs.com>
-	<CAFEAcA-pmVW-fnu6ZT=PeRcSf-U5UVsyYsJkzh2c_BFKDTU5kg@mail.gmail.com>
-	<d0a7ebb7-9f3d-5b3c-692e-344f4a980c05@redhat.com>
-	<CAFEAcA_BkOaRCs1tm2dv+mYZj4yaNTg7VhR2C-NAQGAhw1wazA@mail.gmail.com>
-	<20170615145742.GF4859@toto>
-	<CAFEAcA-zhur3vO8G_CPQuyEU3p7e81cixiZ58sFs96e+av4Mbg@mail.gmail.com>
-	<20170615151530.GC12347@toto>
-	<CAFEAcA-ZzVGJ+ueZXLuhtkMk=42QGhpJiu5PNZ7DAGXJf3hvXA@mail.gmail.com>
-	<209d2c8f-fd46-0a6f-17ac-b4f53f47c43e@adacore.com>
-	<CAFEAcA9VtPd72=HW3uMvdc5xzv+zLj_KS=WDBjau563iT9UHNA@mail.gmail.com>
-	<3871c989-d00e-c2fb-4e62-18624114ada4@adacore.com>
-	<CAFEAcA86P19ur+MUDMEYheZziKoYmnayOcn-5LmPFRXvR=aZvg@mail.gmail.com>
-Message-ID: <530511c2-072c-8c1f-3944-cc724fc6e4a4@adacore.com>
-Date: Tue, 27 Jun 2017 09:04:19 +0200
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dPl9Q-00072D-04
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 03:43:08 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1498530543.git.maozy.fnst@cn.fujitsu.com>
+	<598314a0acefb6df093882fc61074dbf39c66a7f.1498530543.git.maozy.fnst@cn.fujitsu.com>
+Date: Tue, 27 Jun 2017 09:43:02 +0200
+In-Reply-To: <598314a0acefb6df093882fc61074dbf39c66a7f.1498530543.git.maozy.fnst@cn.fujitsu.com>
+	(Mao Zhongyi's message of "Tue, 27 Jun 2017 11:24:40 +0800")
+Message-ID: <8760fhnaex.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA86P19ur+MUDMEYheZziKoYmnayOcn-5LmPFRXvR=aZvg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: fr
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 00/10] Clock framework API.
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 2/4] net/socket: Convert error message
+ to Error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,99 +28,278 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Mark Burton <mark.burton@greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, KONRAD Frederic <fred.konrad@greensocs.com>
+To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, jasowang@redhat.com
 
+Suggest "net/socket: Convert several helper functions to Error".
 
+Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
 
-Le 06/23/2017 =C3=A0 03:58 PM, Peter Maydell a =C3=A9crit :
-> On 23 June 2017 at 14:07, KONRAD Frederic <frederic.konrad@adacore.com>=
- wrote:
->> Le 06/23/2017 =C3=A0 02:47 PM, Peter Maydell a =C3=A9crit :
->>> Each device "owns" its output clock objects, but input
->>> clocks are just pointers to the clock object owned by the
->>> device at the other end. In the board you wire up CI1 to C1,
->>> and CI2 to C2 (using link properties I guess).
->>> Then in device C you can implement the clock switching by
->>> some kind of bind(s->CI1, &s->C3) call because you have
->>> pointers to all the relevant clock objects.
->>>
->>> As I understand it your current implementation makes not
->>> just the output clocks C1 C2 C2 be clock objects, but also
->>> the inputs CI1 CI2, so effectively each link from a clock
->>> source to a clock sink has two objects involved.
->=20
->> Yes that makes sense but you won't have the name.
->=20
-> I don't think that's a big deal.
->=20
->> And one other thing I wanted to have is beeing able to refresh
->> the clock tree without refreshing everything. If you start a
->> refresh from the "pointer" and it is bind to other things you
->> will refresh the other devices as well. Maybe we don't care or we
->> can workaround that but..
->=20
-> The pointer is for your clock inputs -- when would you
-> want to start a refresh from that? I would expect
-> refreshes to only ever go downstream -- you update
-> the config of your clock outputs and things downstream
-> of them will update in turn.
+> Currently, net_socket_mcast_create(), net_socket_fd_init_dgram() and
+> net_socket_fd_init() use the function such as fprintf(), perror() to
+> report an error message.
+>
+> Now, convert these functions to Error.
+>
+> Cc: jasowang@redhat.com
+> Cc: armbru@redhat.com
+> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+> ---
+>  net/socket.c | 76 ++++++++++++++++++++++++++++++++++++++----------------------
+>  1 file changed, 48 insertions(+), 28 deletions(-)
+>
+> diff --git a/net/socket.c b/net/socket.c
+> index 53765bd..e136f87 100644
+> --- a/net/socket.c
+> +++ b/net/socket.c
+> @@ -209,7 +209,9 @@ static void net_socket_send_dgram(void *opaque)
+>      }
+>  }
+>  
+> -static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr *localaddr)
+> +static int net_socket_mcast_create(struct sockaddr_in *mcastaddr,
+> +                                   struct in_addr *localaddr,
+> +                                   Error **errp)
+>  {
+>      struct ip_mreq imr;
+>      int fd;
+> @@ -221,8 +223,8 @@ static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr
+>  #endif
+>  
+>      if (!IN_MULTICAST(ntohl(mcastaddr->sin_addr.s_addr))) {
+> -        fprintf(stderr, "qemu: error: specified mcastaddr \"%s\" (0x%08x) "
+> -                "does not contain a multicast address\n",
+> +        error_setg(errp, "qemu: error: specified mcastaddr %s (0x%08x) "
+> +                "does not contain a multicast address",
 
-I started with the goal in mind that the binding + the callback
-can refresh themself without user intervention.
+Please drop the "qemu: error: " prefix.  More of the same below.
 
-So actually the user only have to change the binding in case of a
-clock selector.. Everything else is done by the framework.
+>                  inet_ntoa(mcastaddr->sin_addr),
+>                  (int)ntohl(mcastaddr->sin_addr.s_addr));
+>          return -1;
+> @@ -230,7 +232,8 @@ static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr
+>      }
+>      fd = qemu_socket(PF_INET, SOCK_DGRAM, 0);
+>      if (fd < 0) {
+> -        perror("socket(PF_INET, SOCK_DGRAM)");
+> +        error_setg_errno(errp, errno, "Create socket(PF_INET, SOCK_DGRAM)"
+> +                         " failed");
 
-For example if we want to change a multiplier through a register:
+I'm not a native speaker, but "Create FOO failed" doesn't feel right to
+me.  Where's the subject?  "Create" is a verb.  "Creation of FOO failed"
+has a subject, but doesn't feel right.  What about "can't create
+datagram socket"?
 
-void register_write(..)
-{
-   /* Refresh related clock input. */
-}
+Same for many of the other new error messages.
 
-void clock_cb(..)
-{
-   return register_value * rate_in;
-}
+>          return -1;
+>      }
+>  
+> @@ -242,13 +245,15 @@ static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr
+>      val = 1;
+>      ret = qemu_setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
+>      if (ret < 0) {
+> -        perror("setsockopt(SOL_SOCKET, SO_REUSEADDR)");
+> +        error_setg_errno(errp, errno, "Set the socket fd=%d attribute"
+> +                         " SO_REUSEADDR failed", fd);
 
-If we drop the clock first possibility:
+Why would the user want to know the value of @fd here?
 
-void register_write(..)
-{
-   /* refresh all depending clock with
-    * rate_in * register value.
-    * Either this can be tricky as we need to know exactly which
-    * clock need to be refreshed or we need to refresh everybody.
-    * On the device example in the patch-set this can become a
-    * mess.
-    */
-}
+Same for many of the other new error messages.
 
-void clock_cb(..)
-{
-   return register_value * rate_in;
-}
+>          goto fail;
+>      }
+>  
+>      ret = bind(fd, (struct sockaddr *)mcastaddr, sizeof(*mcastaddr));
+>      if (ret < 0) {
+> -        perror("bind");
+> +        error_setg_errno(errp, errno, "Bind ip=%s to fd=%d failed",
+> +                         inet_ntoa(mcastaddr->sin_addr), fd);
+>          goto fail;
+>      }
+>  
+> @@ -263,7 +268,8 @@ static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr
+>      ret = qemu_setsockopt(fd, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+>                            &imr, sizeof(struct ip_mreq));
+>      if (ret < 0) {
+> -        perror("setsockopt(IP_ADD_MEMBERSHIP)");
+> +        error_setg_errno(errp, errno, "Add socket fd=%d to multicast group %s"
+> +                         " failed", fd, inet_ntoa(imr.imr_multiaddr));
+>          goto fail;
+>      }
+>  
+> @@ -272,7 +278,8 @@ static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr
+>      ret = qemu_setsockopt(fd, IPPROTO_IP, IP_MULTICAST_LOOP,
+>                            &loop, sizeof(loop));
+>      if (ret < 0) {
+> -        perror("setsockopt(SOL_IP, IP_MULTICAST_LOOP)");
+> +        error_setg_errno(errp, errno, "Force multicast message to loopback"
+> +                         " failed");
+>          goto fail;
+>      }
+>  
+> @@ -281,7 +288,8 @@ static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr
+>          ret = qemu_setsockopt(fd, IPPROTO_IP, IP_MULTICAST_IF,
+>                                localaddr, sizeof(*localaddr));
+>          if (ret < 0) {
+> -            perror("setsockopt(IP_MULTICAST_IF)");
+> +            error_setg_errno(errp, errno, "Set the default network send "
+> +                             "interfaec failed");
 
-Second possibility:
+s/interfaec/interface/
 
-void register_write(..)
-{
-   /* refresh the clock which is referenced as input.
-    * This is easy BUT it will refresh all other devices bound to
-    * this clock.
-    */
-}
+>              goto fail;
+>          }
+>      }
+> @@ -320,7 +328,8 @@ static NetClientInfo net_dgram_socket_info = {
+>  static NetSocketState *net_socket_fd_init_dgram(NetClientState *peer,
+>                                                  const char *model,
+>                                                  const char *name,
+> -                                                int fd, int is_connected)
+> +                                                int fd, int is_connected,
+> +                                                Error **errp)
+>  {
+>      struct sockaddr_in saddr;
+>      int newfd;
+> @@ -337,14 +346,13 @@ static NetSocketState *net_socket_fd_init_dgram(NetClientState *peer,
+>          if (getsockname(fd, (struct sockaddr *) &saddr, &saddr_len) == 0) {
+>              /* must be bound */
+>              if (saddr.sin_addr.s_addr == 0) {
+> -                fprintf(stderr, "qemu: error: init_dgram: fd=%d unbound, "
+> -                        "cannot setup multicast dst addr\n", fd);
+> +                error_setg(errp, "qemu: error: init_dgram: fd=%d unbound, "
+> +                        "cannot setup multicast dst addr", fd);
+>                  goto err;
+>              }
+>              /* clone dgram socket */
+> -            newfd = net_socket_mcast_create(&saddr, NULL);
+> +            newfd = net_socket_mcast_create(&saddr, NULL, errp);
+>              if (newfd < 0) {
+> -                /* error already reported by net_socket_mcast_create() */
+>                  goto err;
+>              }
+>              /* clone newfd to fd, close newfd */
+> @@ -352,8 +360,8 @@ static NetSocketState *net_socket_fd_init_dgram(NetClientState *peer,
+>              close(newfd);
+>  
+>          } else {
+> -            fprintf(stderr,
+> -                    "qemu: error: init_dgram: fd=%d failed getsockname(): %s\n",
+> +            error_setg(errp,
+> +                    "qemu: error: init_dgram: fd=%d failed getsockname(): %s",
+>                      fd, strerror(errno));
+>              goto err;
+>          }
+> @@ -432,24 +440,26 @@ static NetSocketState *net_socket_fd_init_stream(NetClientState *peer,
+>  
+>  static NetSocketState *net_socket_fd_init(NetClientState *peer,
+>                                            const char *model, const char *name,
+> -                                          int fd, int is_connected)
+> +                                          int fd, int is_connected,
+> +                                          Error **errp)
+>  {
+>      int so_type = -1, optlen=sizeof(so_type);
+>  
+>      if(getsockopt(fd, SOL_SOCKET, SO_TYPE, (char *)&so_type,
+>          (socklen_t *)&optlen)< 0) {
+> -        fprintf(stderr, "qemu: error: getsockopt(SO_TYPE) for fd=%d failed\n",
+> +        error_setg(errp, "qemu: error: getsockopt(SO_TYPE) for fd=%d failed",
+>                  fd);
+>          closesocket(fd);
+>          return NULL;
+>      }
+>      switch(so_type) {
+>      case SOCK_DGRAM:
+> -        return net_socket_fd_init_dgram(peer, model, name, fd, is_connected);
+> +        return net_socket_fd_init_dgram(peer, model, name, fd, is_connected,
+> +                                        errp);
+>      case SOCK_STREAM:
+>          return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
+>      default:
+> -        error_report("qemu: error: socket type=%d for fd=%d is not"
+> +        error_setg(errp, "qemu: error: socket type=%d for fd=%d is not"
+>                  " SOCK_DGRAM or SOCK_STREAM", so_type, fd);
+>          closesocket(fd);
+>      }
+> @@ -536,6 +546,7 @@ static int net_socket_connect_init(NetClientState *peer,
+>      NetSocketState *s;
+>      int fd, connected, ret;
+>      struct sockaddr_in saddr;
+> +    Error *err = NULL;
+>  
+>      if (parse_host_port(&saddr, host_str) < 0)
+>          return -1;
+> @@ -567,9 +578,11 @@ static int net_socket_connect_init(NetClientState *peer,
+>              break;
+>          }
+>      }
+> -    s = net_socket_fd_init(peer, model, name, fd, connected);
+> -    if (!s)
+> +    s = net_socket_fd_init(peer, model, name, fd, connected, &err);
+> +    if (!s) {
+> +        error_report_err(err);
+>          return -1;
+> +    }
+>      snprintf(s->nc.info_str, sizeof(s->nc.info_str),
+>               "socket: connect to %s:%d",
+>               inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
+> @@ -586,6 +599,7 @@ static int net_socket_mcast_init(NetClientState *peer,
+>      int fd;
+>      struct sockaddr_in saddr;
+>      struct in_addr localaddr, *param_localaddr;
+> +    Error *err = NULL;
+>  
+>      if (parse_host_port(&saddr, host_str) < 0)
+>          return -1;
+> @@ -598,13 +612,17 @@ static int net_socket_mcast_init(NetClientState *peer,
+>          param_localaddr = NULL;
+>      }
+>  
+> -    fd = net_socket_mcast_create(&saddr, param_localaddr);
+> -    if (fd < 0)
+> +    fd = net_socket_mcast_create(&saddr, param_localaddr, &err);
+> +    if (fd < 0) {
+> +        error_report_err(err);
+>          return -1;
+> +    }
+>  
+> -    s = net_socket_fd_init(peer, model, name, fd, 0);
+> -    if (!s)
+> +    s = net_socket_fd_init(peer, model, name, fd, 0, &err);
+> +    if (!s) {
+> +        error_report_err(err);
+>          return -1;
+> +    }
+>  
+>      s->dgram_dst = saddr;
+>  
+> @@ -624,6 +642,7 @@ static int net_socket_udp_init(NetClientState *peer,
+>      NetSocketState *s;
+>      int fd, ret;
+>      struct sockaddr_in laddr, raddr;
+> +    Error *err = NULL;
+>  
+>      if (parse_host_port(&laddr, lhost) < 0) {
+>          return -1;
+> @@ -652,8 +671,9 @@ static int net_socket_udp_init(NetClientState *peer,
+>      }
+>      qemu_set_nonblock(fd);
+>  
+> -    s = net_socket_fd_init(peer, model, name, fd, 0);
+> +    s = net_socket_fd_init(peer, model, name, fd, 0, &err);
+>      if (!s) {
+> +        error_report_err(err);
+>          return -1;
+>      }
+>  
+> @@ -696,7 +716,7 @@ int net_init_socket(const Netdev *netdev, const char *name,
+>              return -1;
+>          }
+>          qemu_set_nonblock(fd);
+> -        if (!net_socket_fd_init(peer, "socket", name, fd, 1)) {
+> +        if (!net_socket_fd_init(peer, "socket", name, fd, 1, errp)) {
+>              return -1;
+>          }
+>          return 0;
 
-void clock_cb(..)
-{
-   return register_value * rate_in;
-}
-
-Thanks,
-Fred
-
->=20
-> thanks
-> -- PMM
->=20
+Looks good to me otherwise.
