@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36675)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41052)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dPf1J-0001j3-Gb
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 21:10:22 -0400
+	(envelope-from <eblake@redhat.com>) id 1dPfNY-0006aB-N5
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 21:33:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dPf1G-0003cj-BF
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 21:10:21 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:36347)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dPf1G-0003cS-5e
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 21:10:18 -0400
-Received: by mail-qk0-x242.google.com with SMTP id r62so2235396qkf.3
-	for <qemu-devel@nongnu.org>; Mon, 26 Jun 2017 18:10:18 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <149727922719.28532.11985025310576184920.stgit@frigg.lan>
-	<149727924253.28532.2681638904562623104.stgit@frigg.lan>
-	<ca41d7c2-b009-46b9-1f76-3e45c0f91ecf@twiddle.net>
-	<877ezzapyu.fsf@frigg.lan>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <11b802c6-253c-1aaf-75d1-1f73e23c4d64@twiddle.net>
-Date: Mon, 26 Jun 2017 18:10:14 -0700
+	(envelope-from <eblake@redhat.com>) id 1dPfNV-0002eF-Jy
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 21:33:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56028)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dPfNV-0002e3-B8
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 21:33:17 -0400
+References: <20170623164557.11636-1-f4bug@amsat.org>
+	<20170623164557.11636-4-f4bug@amsat.org>
+	<20170623192500.GC3038@localhost.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <05b3e29e-6b5a-9834-c638-6beb2f13cf83@redhat.com>
+Date: Mon, 26 Jun 2017 20:33:09 -0500
 MIME-Version: 1.0
-In-Reply-To: <877ezzapyu.fsf@frigg.lan>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v6 2/6] queue: Add macro for incremental
- traversal
+In-Reply-To: <20170623192500.GC3038@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="FAsig8eNeltsxD1uCcaWbC73tIiqPBIba"
+Subject: Re: [Qemu-devel] [PATCH 3/3] hw/core: report an error if invalid
+ gpio is used
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,52 +30,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
 
-On 06/26/2017 05:33 AM, Lluís Vilanova wrote:
-> Richard Henderson writes:
-> 
->> On 06/12/2017 07:54 AM, Lluís Vilanova wrote:
->>> Adds macro QTAILQ_FOREACH_CONTINUE to support incremental list
->>> traversal.
->>>
->>> Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
->>> ---
->>> include/qemu/queue.h |   12 ++++++++++++
->>> 1 file changed, 12 insertions(+)
->>>
->>> diff --git a/include/qemu/queue.h b/include/qemu/queue.h
->>> index 35292c3155..eb2bf9cb1c 100644
->>> --- a/include/qemu/queue.h
->>> +++ b/include/qemu/queue.h
->>> @@ -415,6 +415,18 @@ struct {                                                                \
->>> (var);                                                  \
->>> (var) = ((var)->field.tqe_next))
->>> +/**
->>> + * QTAILQ_FOREACH_CONTINUE:
->>> + * @var: Variable to resume iteration from.
->>> + * @field: Field in @var holding a QTAILQ_ENTRY for this queue.
->>> + *
->>> + * Resumes iteration on a queue from the element in @var.
->>> + */
->>> +#define QTAILQ_FOREACH_CONTINUE(var, field)                             \
->>> +        for ((var) = ((var)->field.tqe_next);                           \
->>> +                (var);                                                  \
->>> +                (var) = ((var)->field.tqe_next))
->>> +
->>> #define QTAILQ_FOREACH_SAFE(var, head, field, next_var)                 \
->>> for ((var) = ((head)->tqh_first);                               \
->>> (var) && ((next_var) = ((var)->field.tqe_next), 1);     \
->>>
->>>
-> 
->> I still say this isn't required if the breakpoint loop is better structured.
-> 
-> I can embed the use of QTAILQ into translate-block.c, but I wanted to keep the
-> implementation of breakpoint lists hidden behind the cpu_breakpoint API.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--FAsig8eNeltsxD1uCcaWbC73tIiqPBIba
+From: Eric Blake <eblake@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+ Peter Crosthwaite <crosthwaite.peter@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <05b3e29e-6b5a-9834-c638-6beb2f13cf83@redhat.com>
+Subject: Re: [PATCH 3/3] hw/core: report an error if invalid gpio is used
+References: <20170623164557.11636-1-f4bug@amsat.org>
+ <20170623164557.11636-4-f4bug@amsat.org>
+ <20170623192500.GC3038@localhost.localdomain>
+In-Reply-To: <20170623192500.GC3038@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I think using QTAILQ in the common main loop is better than twisting the logic 
-so that the loop is unnaturally split into a subroutine.
+On 06/23/2017 02:25 PM, Eduardo Habkost wrote:
+> On Fri, Jun 23, 2017 at 01:45:57PM -0300, Philippe Mathieu-Daud=C3=A9 w=
+rote:
+>> then abort calling error_setg()
+>=20
+> I don't understand the reasons for this.  This commit message says
+> "what" and "how", but not "why".
+>=20
+
+>> -    assert(n >=3D 0 && n < gpio_list->num_in);
+>> +    assert(n >=3D 0);
+>> +    if (n >=3D gpio_list->num_in) {
+>> +        error_setg(&error_abort, "Invalid gpio #%d (of %d) for %s",
+>> +                   n, gpio_list->num_in, name ? name : "device");
+>=20
+> Why exactly assert() is ok for (n < 0), but not for
+> (n >=3D gpio_list->num_io)?
+>=20
+> If you have reasons to believe (n >=3D gpio_list->num_in) can be trigge=
+red
+> by user input, then abort() isn't an appropriate way to handle it.
+
+What's more, error_setg(&error_abort) should not be used.  Yes, a quick
+grep for 'error_setg.*error_abort' shows that we have a couple of bad
+examples in the tree that should be patched, but it also finds that
+include/qapi/error.h states:
+
+ * Please don't error_setg(&error_fatal, ...), use error_report() and
+ * exit(), because that's more obvious.
+ * Likewise, don't error_setg(&error_abort, ...), use assert().
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-r~
+--FAsig8eNeltsxD1uCcaWbC73tIiqPBIba
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZUbXVAAoJEKeha0olJ0NqTsMH/jaBko8Q5YkMfBuc8bXrxXnW
+gpc+izYDSAh9z6GLKDCYUKe2FPh2rW0nI4qcIo6NM8BMjRMPMg20wzz+KRDT4X9f
+AeDpzryafojKj5VB9PO43UK1yRqYMTqONLNekW4vUrFCnF3BTW5BoiES/JPyX+Dx
+ibC6huXbBXWqPiFPcuoH3/6+svqtl0kvHN+L2iN15DpIQ5k1ZjdkhZZyiukHMtxC
+GxaISypLqNDg0Wa4n4GhkdSmfgRpEzqKvC4Jy+RgisGAv6C3Kpntf4KIGgTt6zIV
+yJsiOxTRyJvxubv+RshbNz2c1tbWV0FnsfOU1q9DiHzxhzlDeW7UBjMpjAjPLpQ=
+=mp8m
+-----END PGP SIGNATURE-----
+
+--FAsig8eNeltsxD1uCcaWbC73tIiqPBIba--
