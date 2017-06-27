@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51846)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dPurh-00069k-QI
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 14:05:31 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dPutq-000701-OU
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 14:07:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dPurd-0008AW-OK
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 14:05:29 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:34415)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dPutp-0000fp-N6
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 14:07:42 -0400
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:32955)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dPurd-0008AI-IL
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 14:05:25 -0400
-Received: by mail-qt0-x242.google.com with SMTP id m54so2193890qtb.1
-	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 11:05:25 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1498582198-6649-1-git-send-email-peter.maydell@linaro.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <b17a6dac-f3b8-b874-f64c-77e4279923eb@twiddle.net>
-Date: Tue, 27 Jun 2017 11:05:20 -0700
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dPutp-0000eU-Eo
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 14:07:41 -0400
+Received: by mail-lf0-x241.google.com with SMTP id t72so3395448lff.0
+	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 11:07:38 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1498582198-6649-1-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: Put PPC AT_IGNOREPPC auxv
- entries in the right place
+References: <1498584769-12439-1-git-send-email-peter.maydell@linaro.org>
+	<1498584769-12439-2-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1498584769-12439-2-git-send-email-peter.maydell@linaro.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 27 Jun 2017 18:07:25 +0000
+Message-ID: <CAJ+F1CJt0S3HCwLQoK7YC+oFiiHxuy2pL9YKC+SziEopG1wJiw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] tests/test-char.c: Don't use
+ main_loop_wait()'s return value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,40 +32,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Stefan Hajnoczi <stefanha@redhat.com>, patches@linaro.org
 
-On 06/27/2017 09:49 AM, Peter Maydell wrote:
-> The 32-bit PPC auxv is a bit complicated because in the
-> mists of time it used to be 16-aligned rather than directly
-> after the environment. Older glibc versions had code to
-> try to probe for whether it needed alignment or not:
-> https://sourceware.org/git/?p=glibc.git;a=blob;f=sysdeps/unix/sysv/linux/powerpc/dl-sysdep.c;hb=e84eabb3871c9b39e59323bf3f6b98c2ca9d1cd0
-> and the kernel has code which puts some magic entries at
-> the bottom to ensure that the alignment probe fails:
-> http://elixir.free-electrons.com/linux/latest/source/arch/powerpc/include/asm/elf.h#L158
-> 
-> QEMU has similar code too, but it was broken by commit
-> 7c4ee5bcc82e64, which changed elfload.c from filling in
-> the auxv starting at the highest address and working down
-> to starting at the lowest address and working up. This
-> means that the ARCH_DLINFO hook must now be invoked first
-> rather than last, and the entries in it for PPC must
-> be reversed so that the magic AT_IGNOREPPC entries come
-> at the lowest address in the auxv as they should.
-> 
-> The effect of this was that if running a guest binary that
-> used an old glibc with the alignment probing the guest ld.so
-> code would segfault if the size of the guest environment and
-> argv happened to put the auxv at an address that triggered
-> the alignment code in the guest glibc.
-> 
-> Signed-off-by: Peter Maydell<peter.maydell@linaro.org>
+On Tue, Jun 27, 2017 at 7:57 PM Peter Maydell <peter.maydell@linaro.org>
+wrote:
+
+> In QEMU's main_loop() we used to check whether we should do
+> a nonblocking call to main_loop(); this was deleted in commit e330c118f2a=
+5,
+> because now that vCPUs always drop the I/O thread lock it is an unnecessa=
+ry
+> optimization.
+>
+> The loop in test-char.c copied the old QEMU main_loop() code, but
+> here the nonblocking check has never been necessary because this
+> standalone test case doesn't hold the I/O lock anyway. Remove it,
+> so we can drop the main_loop_wait() return value.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+
+
 > ---
->   linux-user/elfload.c | 23 ++++++++++++-----------
->   1 file changed, 12 insertions(+), 11 deletions(-)
-
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Tested-by:  Richard Henderson <rth@twiddle.net>
-
-
-r~
+>  tests/test-char.c | 6 +-----
+>  1 file changed, 1 insertion(+), 5 deletions(-)
+>
+> diff --git a/tests/test-char.c b/tests/test-char.c
+> index 9e361c8..94ef708 100644
+> --- a/tests/test-char.c
+> +++ b/tests/test-char.c
+> @@ -20,13 +20,9 @@ typedef struct FeHandler {
+>
+>  static void main_loop(void)
+>  {
+> -    bool nonblocking;
+> -    int last_io =3D 0;
+> -
+>      quit =3D false;
+>      do {
+> -        nonblocking =3D last_io > 0;
+> -        last_io =3D main_loop_wait(nonblocking);
+> +        main_loop_wait(false);
+>      } while (!quit);
+>  }
+>
+> --
+> 2.7.4
+>
+>
+> --
+Marc-Andr=C3=A9 Lureau
