@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dPnjE-0004nJ-EA
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 06:28:17 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1dPnvg-0007O3-Lv
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 06:41:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dPnjA-0001iy-GK
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 06:28:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32584)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dPnjA-0001gc-7f
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 06:28:12 -0400
-Date: Tue, 27 Jun 2017 11:28:06 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170627102806.GB2123@work-vm>
-References: <1491301529-24125-1-git-send-email-yulei.zhang@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1491301529-24125-1-git-send-email-yulei.zhang@intel.com>
-Subject: Re: [Qemu-devel] [RFC 0/5] vfio: Introduce Live migration
- capability to vfio_mdev device
+	(envelope-from <a.perevalov@samsung.com>) id 1dPnvd-0002h5-GD
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 06:41:08 -0400
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:22109)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1dPnvd-0002gH-7Z
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 06:41:05 -0400
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout1.w1.samsung.com
+	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
+	2014)) with ESMTP id <0OS700040CCC4G00@mailout1.w1.samsung.com> for
+	qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:41:00 +0100 (BST)
+Date: Tue, 27 Jun 2017 13:40:58 +0300
+From: Alexey <a.perevalov@samsung.com>
+Message-id: <20170627104057.GB4827@aperevalov-ubuntu>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+Content-disposition: inline
+In-reply-to: <20170627101740.GB14652@pxdev.xzpeter.org>
+References: <1498557027-18143-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170627095333eucas1p28a2d86104f8df64c05758cd08f1a48df@eucas1p2.samsung.com>
+	<1498557027-18143-4-git-send-email-a.perevalov@samsung.com>
+	<20170627101740.GB14652@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH v5 3/3] migration: add bitmap for received
+ page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,87 +36,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yulei Zhang <yulei.zhang@intel.com>
-Cc: qemu-devel@nongnu.org, kevin.tian@intel.com, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, xiao.zheng@intel.com, zhi.a.wang@intel.com
+To: Peter Xu <peterx@redhat.com>
+Cc: i.maximets@samsung.com, qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com
 
-* Yulei Zhang (yulei.zhang@intel.com) wrote:
-> Summary
+On Tue, Jun 27, 2017 at 06:17:40PM +0800, Peter Xu wrote:
+> On Tue, Jun 27, 2017 at 05:50:27AM -0400, Alexey Perevalov wrote:
 > 
-> This series RFC would like to introduce the live migration capability
-> to vfio_mdev device. 
+> [...]
 > 
-> As currently vfio_mdev device don't support migration, we introduce a
-> device flag VFIO_DEVICE_FLAGS_MIGRATABLE to help determine whether the
-> mdev device can be migrate or not, it will check the flag during the 
-> device initialization and decide to init the new vfio region 
-> VFIO_PCI_DEVICE_STATE_REGION_INDEX. 
+> > @@ -60,6 +62,14 @@ static inline void *ramblock_ptr(RAMBlock *block, ram_addr_t offset)
+> >      return (char *)block->host + offset;
+> >  }
+> >  
+> > +static inline unsigned long int ramblock_recv_bitmap_offset(void *host_addr,
+> > +                                                            RAMBlock *rb)
+> > +{
+> > +    uint64_t host_addr_offset =
+> > +            (uint64_t)(uintptr_t)(host_addr - (void *)rb->host);
+> > +    return host_addr_offset >> TARGET_PAGE_BITS;
+> > +}
+> > +
+> >  long qemu_getrampagesize(void);
+> >  unsigned long last_ram_page(void);
+> >  RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index 71e38bc..53fbd41 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -143,6 +143,7 @@ MigrationIncomingState *migration_incoming_get_current(void)
+> >          qemu_mutex_init(&mis_current.rp_mutex);
+> >          qemu_event_init(&mis_current.main_thread_load_event, false);
+> >          once = true;
+> > +        ramblock_recv_map_init();
 > 
-> The intention to add the new region is using it for vfio_mdev device
-> status save and restore during the migration. The access to this region
-> will be trapped and forward to the vfio_mdev device driver. There is 
-> an alternative way to achieve it is to add a new vfio ioctl to help fetch
-> and save the device status.
+> One tiny more comment: shall we init this at the beginning of incoming
+> migration? Maybe into migration_fd_process_incoming(), before entering
+> the coroutine?
+maybe this function (migration_incoming_get_current) is not best place
+to initialize something in ramblock list from point of
+view maintainability.
 > 
-> Also this series include two new vfio ioctl 
-> #define VFIO_DEVICE_PCI_STATUS_SET	_IO(VFIO_TYPE, VFIO_BASE + 14)
-> #define VFIO_DEVICE_PCI_GET_DIRTY_BITMAP _IO(VFIO_TYPE, VFIO_BASE + 15)
+> Then, for the destruction of it below...
 > 
-> The first one is used to contorl the device running status, we want to
-> stop the mdev device before quary the status from its device driver and
-> restart the device after migration.
-> The second one is used to do the mdev device dirty page synchronization.
+> [...]
 > 
-> So the vfio_mdev device migration sequence would be
-> Source VM side:
-> 			start migration
-> 				|
-> 				V
->         	 get the cpu state change callback
->         	use status set ioctl to stop the mdev device
-> 				|
-> 				V
-> 		 save the deivce status into Qemufile which is 
->                  read from the new vfio device status region
-> 				|
-> 				V
-> 		   quary the dirty page bitmap from deivce
-> 		    and add into qemu dirty list for sync
+> > @@ -2324,8 +2352,14 @@ static int ram_load_setup(QEMUFile *f, void *opaque)
+> >  
+> >  static int ram_load_cleanup(void *opaque)
+> >  {
+> > +    RAMBlock *rb;
+> >      xbzrle_load_cleanup();
+> >      compress_threads_load_cleanup();
+> > +
+> > +    RAMBLOCK_FOREACH(rb) {
+> > +        g_free(rb->receivedmap);
+> > +        rb->receivedmap = NULL;
+> > +    }
+> 
+> ... maybe move to migration_incoming_state_destroy()?
+I'll think about it, because ram_load_cleanup in current Juan's
+patch set is not calling in postcopy scenario.
 
-That ordering is interesting; I think the main migration flow
-is normally to complete migration of RAM and then migrate the
-devices; so I worry about that order.
-
-Dave
-
-> Target VM side:
-> 		   restore the mdev device after get the
-> 		     saved status context from Qemufile
-> 				|
-> 				V
-> 		     get the cpu state change callback
->  		     use status set ioctl to start the mdev 
-> 		     device to put it in running status
-> 				|
-> 				V
-> 			finish migration
 > 
-> Yulei Zhang (5):
->   vfio: introduce a new VFIO region for migration support
->   vfio: Add struct vfio_vmstate_info to introduce vfio device put/get
->     funtion
->   vfio: introduce new VFIO ioctl VFIO_DEVICE_PCI_STATUS_SET
->   vfio: use vfio_device_put/vfio_device_get for device status
->     save/restore
->   vifo: introduce new VFIO ioctl VFIO_DEVICE_PCI_GET_DIRTY_BITMAP
+> And, I didn't really find ram_load_cleanup() in my repo. Am I missing
+> something?
+you need Juan's [PATCH v2 0/5] Create setup/cleanup methods for
+migration incoming side
+
 > 
->  hw/vfio/pci.c              | 204 ++++++++++++++++++++++++++++++++++++++++++++-
->  hw/vfio/pci.h              |   3 +
->  linux-headers/linux/vfio.h |  34 +++++++-
->  3 files changed, 239 insertions(+), 2 deletions(-)
+> Other than above, this patch looks good to me.  Thanks,
 > 
 > -- 
-> 2.7.4
+> Peter Xu
 > 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+-- 
+
+BR
+Alexey
