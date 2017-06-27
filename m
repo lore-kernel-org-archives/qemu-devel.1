@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dPwfA-0003Ns-HZ
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 16:00:42 -0400
+	(envelope-from <eblake@redhat.com>) id 1dPwgP-0003zt-Vu
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 16:01:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dPwf6-0003wP-Jc
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 16:00:40 -0400
-Received: from mail-qk0-x22b.google.com ([2607:f8b0:400d:c09::22b]:35952)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dPwf6-0003wH-Ds
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 16:00:36 -0400
-Received: by mail-qk0-x22b.google.com with SMTP id p21so34668623qke.3
-	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 13:00:36 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170627191221.31650-1-laurent@vivier.eu>
-	<20170627191221.31650-2-laurent@vivier.eu>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <0d870134-fd3e-67ca-9112-94672cf7e742@twiddle.net>
-Date: Tue, 27 Jun 2017 13:00:31 -0700
+	(envelope-from <eblake@redhat.com>) id 1dPwgL-0004Ke-EO
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 16:01:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39736)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dPwgL-0004KB-64
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 16:01:53 -0400
+References: <20170618082813.8091-1-tobleminer@gmail.com>
+	<20170618082813.8091-2-tobleminer@gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e5601e86-7601-b79a-f1eb-9b2a623081c4@redhat.com>
+Date: Tue, 27 Jun 2017 15:01:44 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170627191221.31650-2-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/7] target/m68k: add fscc.
+In-Reply-To: <20170618082813.8091-2-tobleminer@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="T4WtIG1e4Gu1kdiqvp4nUtIcEXWeI4bFe"
+Subject: Re: [Qemu-devel] [PATCH 1/1] Add support for custom fmasks/dmasks
+ in 9ps mapped mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,78 +29,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Tobias Schramm <tobleminer@gmail.com>, qemu-devel@nongnu.org
 
-On 06/27/2017 12:12 PM, Laurent Vivier wrote:
->       case 3:  /* Ordered Greater than or Equal Z || !(A || N) */
->       case 19: /* Greater than or Equal Z || !(A || N) */
-> +        g_assert(FPSR_CC_A == (FPSR_CC_N >> 3));
-> +        c->v1 = tcg_temp_new();
-> +        c->g1 = 0;
-> +        tcg_gen_shli_i32(c->v1, fpsr, 3);
-> +        tcg_gen_or_i32(c->v1, c->v1, fpsr);
-> +        tcg_gen_xori_i32(c->v1, c->v1, FPSR_CC_N);
-> +        tcg_gen_andi_i32(c->v1, c->v1, FPSR_CC_N | FPSR_CC_Z);
-> +        c->tcond = TCG_COND_NE;
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--T4WtIG1e4Gu1kdiqvp4nUtIcEXWeI4bFe
+From: Eric Blake <eblake@redhat.com>
+To: Tobias Schramm <tobleminer@gmail.com>, qemu-devel@nongnu.org
+Message-ID: <e5601e86-7601-b79a-f1eb-9b2a623081c4@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] Add support for custom fmasks/dmasks in
+ 9ps mapped mode
+References: <20170618082813.8091-1-tobleminer@gmail.com>
+ <20170618082813.8091-2-tobleminer@gmail.com>
+In-Reply-To: <20170618082813.8091-2-tobleminer@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Still with the unmasked shift.
+On 06/18/2017 03:28 AM, Tobias Schramm wrote:
+> Signed-off-by: Tobias Schramm <tobleminer@gmail.com>
+> ---
+>  fsdev/file-op-9p.h      |  4 ++++
+>  fsdev/qemu-fsdev-opts.c | 12 ++++++++++++
+>  hw/9pfs/9p-local.c      | 33 +++++++++++++++++++++++++++++----
+>  hw/9pfs/9p.c            |  3 +++
+>  4 files changed, 48 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/fsdev/file-op-9p.h b/fsdev/file-op-9p.h
+> index 0844a403dc..0ecb1d392b 100644
+> --- a/fsdev/file-op-9p.h
+> +++ b/fsdev/file-op-9p.h
+> @@ -76,6 +76,8 @@ typedef struct FsDriverEntry {
+>      int export_flags;
+>      FileOperations *ops;
+>      FsThrottle fst;
+> +    mode_t fmask;
+> +    mode_t dmask;
+>  } FsDriverEntry;
+> =20
 
-	tcg_gen_not_i32(c->v1, fpsr);
-	tcg_gen_andi_i32(c->v1, c->v1, FPSR_CC_A | FPSR_CC_N);
-	tcg_gen_andi_i32(fpsr, fpsr, FPSR_CC_Z);
-	tcg_gen_or_i32(c->v1, c->v1, fpsr);
+> +++ b/fsdev/qemu-fsdev-opts.c
+> @@ -38,6 +38,12 @@ static QemuOptsList qemu_fsdev_opts =3D {
+>          }, {
+>              .name =3D "sock_fd",
+>              .type =3D QEMU_OPT_NUMBER,
+> +        }, {
+> +            .name =3D "fmask",
+> +            .type =3D QEMU_OPT_STRING,
+> +        }, {
+> +            .name =3D "dmask",
+> +            .type =3D QEMU_OPT_STRING,
 
+No documentation of what these represent (other than the cover letter).
+I'd at least expect a comment of 'default creation mask for files' and
+'default creation mask for directories'; it would also be nice to state
+if the mask is positive or negative logic (compare the third argument
+passed to open() which specifies bits to set, vs. the argument to umask
+which specifies bits to keep clear).
 
->       case 5:  /* Ordered Less than or Equal Z || (N && !A) */
->       case 21: /* Less than or Equal Z || (N && !A) */
-> +        g_assert(FPSR_CC_A == (FPSR_CC_N >> 3));
-> +        c->v1 = tcg_temp_new();
-> +        c->g1 = 0;
-> +        tcg_gen_xori_i32(c->v1, fpsr, FPSR_CC_A);
-> +        tcg_gen_shli_i32(c->v1, c->v1, 3);
-> +        tcg_gen_ori_i32(c->v1, c->v1, FPSR_CC_Z);
-> +        tcg_gen_and_i32(c->v1, c->v1, fpsr);
-> +        c->tcond = TCG_COND_NE;
+Also, does this need a QAPI counterpart (or can you even create a 9pfs
+device through QMP)?
 
-Likewise.
-
-	tcg_gen_andi_i32(c->v1, fpsr, FPSR_CC_A);
-	tcg_gen_shli_i32(c->v1, c->v1, ctz32(FPSR_CC_N) - ctz32(FPSR_CC_A));
-	tcg_gen_andc_i32(c->v1, fpsr, c->v1);
-	tcg_gen_andi_i32(c->v1, c->v1, FPSR_CC_Z | FPSR_CC_N);
-
-
->       case 10: /* Unordered or Greater Than A || !(N || Z)) */
->       case 26: /* Not Less or Equal A || !(N || Z)) */
-> +        g_assert(FPSR_CC_Z == (FPSR_CC_N >> 1));
-> +        c->v1 = tcg_temp_new();
-> +        c->g1 = 0;
-> +        tcg_gen_shli_i32(c->v1, fpsr, 1);
-> +        tcg_gen_or_i32(c->v1, c->v1, fpsr);
-> +        tcg_gen_xori_i32(c->v1, c->v1, FPSR_CC_N);
-> +        tcg_gen_andi_i32(c->v1, c->v1, FPSR_CC_N | FPSR_CC_A);
-> +        c->tcond = TCG_COND_NE;
-
-Likewise.
-
-	tcg_gen_not_i32(c->v1, fpsr);
-	tcg_gen_andi_i32(c->v1, c->v1, FPSR_CC_Z | FPSR_CC_N);
-	tcg_gen_andi_i32(fpsr, fpsr, FPSR_CC_A);
-	tcg_gen_or_i32(c->v1, c->v1, fpsr);
-
-
->       case 12: /* Unordered or Less Than A || (N && !Z) */
->       case 28: /* Not Greater than or Equal A || (N && !Z) */
-> +        c->v1 = tcg_temp_new();
-> +        c->g1 = 0;
-> +        tcg_gen_andi_i32(c->v1, fpsr, FPSR_CC_Z);
-> +        tcg_gen_shli_i32(c->v1, c->v1, ctz32(FPSR_CC_N) - ctz32(FPSR_CC_Z));
-> +        tcg_gen_andc_i32(c->v1, fpsr, c->v1);
-> +        tcg_gen_andi_i32(c->v1, c->v1, FPSR_CC_A | FPSR_CC_N);
-> +        c->tcond = TCG_COND_NE;
-
-I hadn't meant that this was the only one to fix.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-r~
+--T4WtIG1e4Gu1kdiqvp4nUtIcEXWeI4bFe
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZUrmoAAoJEKeha0olJ0NqB64H/AjFOxxhbN5aq1wIBsL2kZZz
+N8kvhmGaHAWUQQPhNfW7Ex+dXFXxa6gyhLn25NfWVW1qb27vjoTA/hzgmvXyyhp4
+ZQm64LlMXT0vELsF000H3+Z1PU3oTHSkeTpIgBR/lfSv9E0nJMYNg76kxt8glDw8
+r0KlyPm6SYjXl7QsV4f6PR3vulNyOhbuv5YIJkD+szVbSYQa00WOaS3dn/7qPje8
+N0unXM1Ewjg5/6bGqz9h3onnZ2qPW8NRX7odxuBqbZg6srHxHmmLsGetNZnDJoDi
+n+E62QCLsVt+jyFA4LchfruVkksRgKCrguYHWyrilgSK0B7RTfv9CHPrFjmYeQ4=
+=Ml2J
+-----END PGP SIGNATURE-----
+
+--T4WtIG1e4Gu1kdiqvp4nUtIcEXWeI4bFe--
