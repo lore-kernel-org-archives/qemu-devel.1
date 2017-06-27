@@ -1,30 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dPrhv-0000jM-9W
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 10:43:12 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dPriE-00010d-T8
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 10:43:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dPrhs-0007ff-N4
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 10:43:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60396)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dPriC-0008Vl-8w
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 10:43:30 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:33469 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dPrhs-0007Wh-EG
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 10:43:08 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0413540F09
-	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 14:43:05 +0000 (UTC)
-Date: Tue, 27 Jun 2017 17:42:59 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170627174019-mutt-send-email-mst@kernel.org>
-References: <1498554219-4942-1-git-send-email-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dPriB-0008PO-U2
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 10:43:28 -0400
+References: <20170605123908.18777-1-pbonzini@redhat.com>
+	<20170605123908.18777-17-pbonzini@redhat.com>
+	<e138c191-5f28-ff50-1b86-d4d1a416eadc@virtuozzo.com>
+	<37960694-8f25-8201-5f17-e59c3ee67e90@redhat.com>
+	<eb056c7c-2bd7-e9b2-cebb-30f716386d00@virtuozzo.com>
+	<c9855403-a641-31a7-f6e9-db0388c4b73a@redhat.com>
+	<5ed4c5a0-11f3-14e7-77e6-47fa01a07d75@virtuozzo.com>
+	<af36087e-de08-4a30-53f7-0a9fafb56a88@redhat.com>
+	<3a438db2-2c6d-e07b-94eb-b7c08073b9ae@virtuozzo.com>
+	<e2816225-b5a7-6d60-9772-bff478b10a92@redhat.com>
+	<13257113-2f2b-ccf5-93d1-66b2b963efce@virtuozzo.com>
+	<5458c8fb-f73b-6651-b418-87bab8d3d143@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <54703f2c-46ea-15b5-5c46-7520728bdd1c@virtuozzo.com>
+Date: Tue, 27 Jun 2017 17:43:25 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1498554219-4942-1-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/8] VT-d: some enhancements on iotlb and
- tools
+In-Reply-To: <5458c8fb-f73b-6651-b418-87bab8d3d143@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 16/19] block: protect modification of dirty
+ bitmaps with a mutex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,70 +40,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: famz@redhat.com
 
-On Tue, Jun 27, 2017 at 05:03:31PM +0800, Peter Xu wrote:
-> Patch 1: fixes a very rare PT path issue on iova value. It didn't
-> break anything since it's merely not touched (only if when IOMMU
-> enabled, then set one device to PT), but still better fix it.
+27.06.2017 17:26, Paolo Bonzini wrote:
+>
+> On 27/06/2017 16:20, Vladimir Sementsov-Ogievskiy wrote:
+>> I'm likely not right, but for me introducing this mutex looks like dirty
+>> bitmaps may be accessed from concurrent threads. So for me it looks
+>> strange that only accessors are protected by the mutex and not the whole
+>> transactions.
+> There must be something else protecting the whole transaction.
 
-Pls Cc HMP/QMP maintainers on interface patches.
+But it doesn't? Before it (qmp_block_dirty_bitmap*) was protected by aio 
+context acquire/release...
 
-Adding hmp interface only seems questionable to me.
+>
+>> One example I've wrote above, other examples from code: are
+>> qmp_block_dirty_bitmap** functions:
+>>
+>> bdrv_create_dirty_bitmap() {
+>>
+>>     bdrv_find_dirty_bitmap()
+>>
+>>     ....
+>>
+>> bdrv_dirty_bitmaps_lock(bs);
+>>     QLIST_INSERT_HEAD(&bs->dirty_bitmaps, bitmap, list);
+>>     bdrv_dirty_bitmaps_unlock(bs);
+>>
+>> }
+>>
+>> - we protect inserting into list from other threads, but what prevent
+>> creating bitmap with the same name from other thread after
+>> bdrv_find_dirty_bitmap() and before bdrv_dirty_bitmaps_lock() ?
+> It's like a read-write lock.
+>
+> The write side is invoked under the 'big QEMU lock' so there cannot be
+> two concurrent writes.
+>
+> A bitmap can be written to after bdrv_find_dirty_bitmap returns, but
+> only if _you_ tell another thread about the bitmap you've just created.
 
-Let's split this out - functionality and performance
-can be separate from debugging and info.
+no, I'm not about touching just created bitmap. I'm about creating 
+bitmap with the same name by other thread (unlikely case, but possible).
+
+> If that doesn't happen, the bitmap cannot change.  And it can also
+> disappear because _your_ thread is the one with the big QEMU lock.
 
 
-> Patch 2-5: added "info iommu" hmp command, and implemented for VT-d.
-> Meanwhile, added some statistics for iotlb.
-> 
-> Patch 6: introduce "x-iotlb-size" to tune iotlb size, or to turn it
-> off (e.g., when we want to measure how iotlb affects one payload).
-> 
-> Patch 7: some refine on iotlb entry.
-> 
-> Patch 8: implemented MRU list algorithm for iotlb.
-> 
-> For the last patch, it's logically making more sense than the old
-> algo, however the performance is merely the same as before (as far as
-> I tested with simple netperf payloads, in either streaming, rr,
-> reverse, etc.) since in most normal cases we cannot really let iotlb
-> overflow especially when size is 1024 by default, e.g., guest kernel
-> driver will release buffer when after used, and unstrict
-> intel_iommu=on parameter will also send periodic global iotlb flush
-> which will reset the whole cache. If anyone has suggestion on specific
-> workload, please shoot. Anyway, I'm posting this out for review to see
-> any possible comments/suggestions.
-> 
-> Thanks,
-> 
-> Peter Xu (8):
->   intel_iommu: fix VTD_PAGE_MASK
->   hmp: add info iommu
->   intel_iommu: support "info iommu"
->   intel_iommu: add iotlb/context cache statistics
->   intel_iommu: hmp: allow "-c" for "info iommu"
->   intel_iommu: let iotlb size tunable
->   intel_iommu: use access_flags for iotlb
->   intel_iommu: implement mru list for iotlb
-> 
->  hmp-commands-info.hx           |  14 ++++
->  hmp.c                          |   6 ++
->  hmp.h                          |   1 +
->  hw/i386/intel_iommu.c          | 169 +++++++++++++++++++++++++++++++----------
->  hw/i386/intel_iommu_internal.h |  11 +--
->  hw/i386/trace-events           |   1 -
->  hw/i386/x86-iommu.c            |  17 +++++
->  include/hw/i386/intel_iommu.h  |  20 ++++-
->  include/hw/i386/x86-iommu.h    |   5 ++
->  include/hw/iommu.h             |   9 +++
->  stubs/Makefile.objs            |   1 +
->  stubs/iommu.c                  |   9 +++
->  12 files changed, 209 insertions(+), 54 deletions(-)
->  create mode 100644 include/hw/iommu.h
->  create mode 100644 stubs/iommu.c
-> 
-> -- 
-> 2.7.4
+So, if I under BQL, I don't need dirty_bitmap_lock?
+
+>
+> Paolo
+
+
+-- 
+Best regards,
+Vladimir
