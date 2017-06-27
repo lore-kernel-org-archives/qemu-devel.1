@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51915)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dPfxT-0006Ns-NX
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 22:10:28 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dPg0p-0007Yk-Q6
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 22:13:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dPfxO-0005JW-Su
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 22:10:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37312)
+	(envelope-from <jasowang@redhat.com>) id 1dPg0l-0008I0-PF
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 22:13:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40772)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dPfxO-0005Id-Jj
-	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 22:10:22 -0400
-References: <20170616101246.1550-1-berrange@redhat.com>
-	<20170616101246.1550-6-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a9cce9f7-27eb-34dd-bb9a-efc9049c00b1@redhat.com>
-Date: Mon, 26 Jun 2017 21:10:19 -0500
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dPg0l-0008He-Fs
+	for qemu-devel@nongnu.org; Mon, 26 Jun 2017 22:13:51 -0400
+References: <d2e8cf65-ea3d-7db2-9382-a063daf1168a@gmail.com>
+	<20170605050423-mutt-send-email-mst@kernel.org>
+	<20170606024211-mutt-send-email-mst@kernel.org>
+	<CAOTcU=u_HSMQiwDF3Snv5P8mT-b_Aepeb=Z9gbLd1j=2P+Yy+A@mail.gmail.com>
+	<20170622215125-mutt-send-email-mst@kernel.org>
+	<4f6d4342-8476-882e-e7a8-b3f0ebd20d95@redhat.com>
+	<CAM_iQpXhW___-iP3kdv9MJcW=hroyp2SuMzAZdx3KCpc9-W76g@mail.gmail.com>
+	<9327ebf9-59db-f34e-b945-ef381ee95315@redhat.com>
+	<f91048e7-5567-cdf8-fd98-3077ca7ac9a3@gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <56868f1a-b4d9-50ca-873b-8fe4f70846d6@redhat.com>
+Date: Tue, 27 Jun 2017 10:13:41 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170616101246.1550-6-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="m6mAQgjCp7LQqlvFRwDAfHIJbHopWvL9D"
-Subject: Re: [Qemu-devel] [PATCH v4 5/5] tests: add functional test
- validating ipv4/ipv6 address flag handling
+In-Reply-To: <f91048e7-5567-cdf8-fd98-3077ca7ac9a3@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] BUG: KASAN: use-after-free in free_old_xmit_skbs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,76 +35,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Gerd Hoffmann <kraxel@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---m6mAQgjCp7LQqlvFRwDAfHIJbHopWvL9D
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Gerd Hoffmann <kraxel@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a9cce9f7-27eb-34dd-bb9a-efc9049c00b1@redhat.com>
-Subject: Re: [PATCH v4 5/5] tests: add functional test validating ipv4/ipv6
- address flag handling
-References: <20170616101246.1550-1-berrange@redhat.com>
- <20170616101246.1550-6-berrange@redhat.com>
-In-Reply-To: <20170616101246.1550-6-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 06/16/2017 05:12 AM, Daniel P. Berrange wrote:
-> The semantics around handling ipv4=3Don|off & ipv6=3Don|off are quite
-> subtle to understand in combination with the various hostname addresses=
-
-> and backend types. Introduce a massive test matrix that launches QEMU
-> and validates the ability to connect a client on each protocol as
-> appropriate.
->=20
-> The test requires that the host has ability to bind to both :: and
-> 0.0.0.0, on port 9000. If either protocol is not available, or if
-> something is already listening on that port the test will skip.
->=20
-> Although it isn't using the QTest APIs, it expects the
-> QTEST_QEMU_BINARY env variable to be set.
-
-I note that on failure, v3 created test-sockets-proto.pid in the current
-working directory (the top level, if I ran 'make check-qtest') rather
-than under the tests/ subdirectory or even better under a scratch
-location that gets automatically cleaned up regardless of failure mode.
-
-Since v3 failed for me, but v4 passes (and cleans up on success), I
-can't say if that is still a problem in v4.
-
-Otherwise, the diff between v3 and v4 looks sane, and it passes my
-tests, so you can add:
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Tested-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+To: jpmenil@gmail.com, Cong Wang <xiyou.wangcong@gmail.com>
+Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>, virtualization@lists.linux-foundation.org, John Fastabend <john.fastabend@gmail.com>, qemu-devel Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
 
---m6mAQgjCp7LQqlvFRwDAfHIJbHopWvL9D
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+On 2017=E5=B9=B406=E6=9C=8826=E6=97=A5 15:35, Jean-Philippe Menil wrote:
+> On 06/26/2017 04:50 AM, Jason Wang wrote:
+>>
+>>
+>> On 2017=E5=B9=B406=E6=9C=8824=E6=97=A5 06:32, Cong Wang wrote:
+>>> On Fri, Jun 23, 2017 at 1:43 AM, Jason Wang <jasowang@redhat.com>=20
+>>> wrote:
+>>>>
+>>>> On 2017=E5=B9=B406=E6=9C=8823=E6=97=A5 02:53, Michael S. Tsirkin wro=
+te:
+>>>>> On Thu, Jun 22, 2017 at 08:15:58AM +0200, jean-philippe menil wrote=
+:
+>>>>>> Hi Michael,
+>>>>>>
+>>>>>> from what i see, the race appear when we hit virtnet_reset in
+>>>>>> virtnet_xdp_set.
+>>>>>> virtnet_reset
+>>>>>>     _remove_vq_common
+>>>>>>       virtnet_del_vqs
+>>>>>>         virtnet_free_queues
+>>>>>>           kfree(vi->sq)
+>>>>>> when the xdp program (with two instances of the program to=20
+>>>>>> trigger it
+>>>>>> faster)
+>>>>>> is added or removed.
+>>>>>>
+>>>>>> It's easily repeatable, with 2 cpus and 4 queues on the qemu comma=
+nd
+>>>>>> line,
+>>>>>> running the xdp_ttl tool from Jesper.
+>>>>>>
+>>>>>> For now, i'm able to continue my qualification, testing if xdp_qp=20
+>>>>>> is not
+>>>>>> null,
+>>>>>> but do not seem to be a sustainable trick.
+>>>>>> if (xdp_qp && vi->xdp_queues_pairs !=3D xdp_qp)
+>>>>>>
+>>>>>> Maybe it will be more clear to you with theses informations.
+>>>>>>
+>>>>>> Best regards.
+>>>>>>
+>>>>>> Jean-Philippe
+>>>>>
+>>>>> I'm pretty clear about the issue here, I was trying to figure out=20
+>>>>> a fix.
+>>>>> Jason, any thoughts?
+>>>>>
+>>>>>
+>>>> Hi Jean:
+>>>>
+>>>> Does the following fix this issue? (I can't reproduce it locally=20
+>>>> through
+>>>> xdp_ttl)
+>>> It is tricky here.
+>>>
+>>>  From my understanding of the code base, the tx_lock is not sufficien=
+t
+>>> here, because in virtnet_del_vqs() all vqs are deleted and one vp
+>>> maps to one txq.
+>>>
+>>> I am afraid you have to add a spinlock somewhere to serialized
+>>> free_old_xmit_skbs() vs. vring_del_virtqueue(). As you can see
+>>> they are in different layers, so it is hard to figure out where to ad=
+d
+>>> it...
+>>>
+>>> Also, make sure we don't sleep inside the spinlock, I see a
+>>> synchronize_net().
+>>
+>> Looks like I miss something. I thought free_old_xmit_skbs() were=20
+>> serialized in this case since we disable all tx queues after=20
+>> netif_tx_unlock_bh()?
+>>
+>> Jean:
+>>
+>> I thought this could be easily reproduced by e.g produce some traffic=20
+>> and in the same time try to attach an xdp program. But looks not. How=20
+>> do you trigger this? What's your qemu command line for this?
+>>
+>> Thanks
+>
+> Hi Jason,
+>
+> this is how i trigger the bug:
+> - on the guest, tcpdump on on the interface
+> - on the guest, run iperf against the host
+> - on the guest, cat /sys/kernel/debug/tracing/trace_pipe
+> - on the guest, run one or two instances of xdp_ttl compiled with=20
+> DEBUG uncommented, that i start stop, until i trigger the bug.
+>
+> qemu command line is as follow:
+>
+> qemu-system-x86_64 -name ubuntu --enable-kvm -machine pc,accel=3Dkvm=20
+> -smp 2 -drive file=3D/dev/LocalDisk/ubuntu,if=3Dvirtio,format=3Draw -m =
+2048=20
+> -rtc base=3Dlocaltime,clock=3Dhost -usbdevice tablet --balloon virtio=20
+> -netdev=20
+> tap,id=3Dubuntu-0,ifname=3Dubuntu-0,script=3D/home/jenfi/WORK/jp/qemu/i=
+f-up,downscript=3D/home/jenfi/WORK/jp/qemu/if-down,vhost=3Don,queues=3D4=20
+> -device=20
+> virtio-net-pci,netdev=3Dubuntu-0,mac=3Dde:ad:be:ef:01:03,mq=3Don,guest_=
+tso4=3Doff,guest_tso6=3Doff,guest_ecn=3Doff,guest_ufo=3Doff,vectors=3D2=20
+> -vnc 127.0.0.1:3 -nographic -serial=20
+> file:/home/jenfi/WORK/jp/qemu/ubuntu.out -monitor=20
+> unix:/home/jenfi/WORK/jp/qemu/ubuntu.sock,server,nowait
+>
+> Notice, the smp 2, queues to 4 and vectors to 2.
+> Seem that if fogot to mention that in the beginning of this thread,=20
+> sorry for that.
+>
+> Best regards.
+>
+> Jean-Philippe
+>
 
-iQEcBAEBCAAGBQJZUb6LAAoJEKeha0olJ0Nq/UgH/jPnD55oqF5z7cdhLvt9pUbP
-qzSGALK0WMFulk4a8VD76V3PjMSC9PWyU9zmHcC+LXadBPXdKGPVNdTmjxDkoT//
-VMF1qDdzaVr/fJcAXpCHpEQxcC3ZJ7lIVQhcSTwWmfM21OH+srtLoXb/90W3mnz8
-8gALMpM3Qn6fOpvqMhcCif2DTsphkTCNn7uslsWQgNjdcy27Q4vBeQBVn25LY78m
-S2BZz2I9gtdX/lk50Pk+aZr638hykIuunoXxAa2NqbdsRdRKc9MPOuSFD9OvB3Bb
-mcRjfX8r9xsCEm0RBwwbK5DNJzVNM0hWuHm0XCG56rc9MN6Kmyt7LhbgSFhel8c=
-=OHhY
------END PGP SIGNATURE-----
+Thanks Jean, I manage to reproduce the issue.
 
---m6mAQgjCp7LQqlvFRwDAfHIJbHopWvL9D--
+I thought netif_tx_unlock_bh() will do tx lock but looks not, that's why=20
+previous patch doesn't work.
+
+Could you please this this patch? (At least it can't trigger the warning=20
+after more than 20 times of xdp start/stop).
+
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 1f8c15c..a18f859 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -1802,6 +1802,7 @@ static void virtnet_freeze_down(struct=20
+virtio_device *vdev)
+         flush_work(&vi->config_work);
+
+         netif_device_detach(vi->dev);
++       netif_tx_disable(vi->dev);
+         cancel_delayed_work_sync(&vi->refill);
+
+         if (netif_running(vi->dev)) {
