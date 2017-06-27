@@ -1,38 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dPtlZ-0008WN-VB
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:55:11 -0400
+	(envelope-from <david@redhat.com>) id 1dPtlf-000719-IH
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:55:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dPsdq-0002zC-SO
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:43:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57908)
+	(envelope-from <david@redhat.com>) id 1dPscc-0006gW-M5
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:41:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33724)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dPsdq-0002uO-LH
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:43:02 -0400
-References: <20170605123908.18777-1-pbonzini@redhat.com>
-	<20170605123908.18777-17-pbonzini@redhat.com>
-	<e138c191-5f28-ff50-1b86-d4d1a416eadc@virtuozzo.com>
-	<37960694-8f25-8201-5f17-e59c3ee67e90@redhat.com>
-	<eb056c7c-2bd7-e9b2-cebb-30f716386d00@virtuozzo.com>
-	<c9855403-a641-31a7-f6e9-db0388c4b73a@redhat.com>
-	<5ed4c5a0-11f3-14e7-77e6-47fa01a07d75@virtuozzo.com>
-	<af36087e-de08-4a30-53f7-0a9fafb56a88@redhat.com>
-	<3a438db2-2c6d-e07b-94eb-b7c08073b9ae@virtuozzo.com>
-	<e2816225-b5a7-6d60-9772-bff478b10a92@redhat.com>
-	<13257113-2f2b-ccf5-93d1-66b2b963efce@virtuozzo.com>
-	<5458c8fb-f73b-6651-b418-87bab8d3d143@redhat.com>
-	<38cee5dc-4051-28b0-5258-015f7fa61979@virtuozzo.com>
-	<81e85700-241a-c078-bb90-6ca756aceaeb@virtuozzo.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a34bc905-41b0-777c-b720-17667538077a@redhat.com>
-Date: Tue, 27 Jun 2017 17:42:49 +0200
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dPscc-0006bg-E0
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 11:41:46 -0400
+References: <1498564100-10045-1-git-send-email-thuth@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <66164146-5351-e8da-ae9f-85002dfe1064@redhat.com>
+Date: Tue, 27 Jun 2017 17:41:31 +0200
 MIME-Version: 1.0
-In-Reply-To: <81e85700-241a-c078-bb90-6ca756aceaeb@virtuozzo.com>
+In-Reply-To: <1498564100-10045-1-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 16/19] block: protect modification of dirty
- bitmaps with a mutex
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 00/14] Implement network booting
+ directly into the s390-ccw BIOS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,27 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: famz@redhat.com
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Alexander Graf <agraf@suse.de>, Farhan Ali <alifm@linux.vnet.ibm.com>, Jens Freimann <jfreiman@redhat.com>, Eric Farman <farman@linux.vnet.ibm.com>
 
+On 27.06.2017 13:48, Thomas Huth wrote:
+> It's already possible to do a network boot of an s390x guest with an
+> external netboot image (based on a Linux installation), but it would
+> be much more convenient if the s390-ccw firmware supported network
+> booting right out of the box, without the need to assemble such an
+> external image first.
+> 
+> This patch series now introduces network booting via DHCP and TFTP
+> directly into the s390-ccw firmware by re-using the networking stack
+> from the SLOF firmware (see https://github.com/aik/SLOF/ for details),
+> and adds a driver for virtio-net-ccw devices.
+> 
+> Once the patches have been applied, you can download an .INS file
+> via TFTP which contains the information about the further files
+> that have to be loaded - kernel, initrd, etc. For example, you can
+> use the built-in TFTP and DHCP server of QEMU for this by starting
+> QEMU with:
 
+Pretty cool stuff!
 
-On 27/06/2017 17:32, Vladimir Sementsov-Ogievskiy wrote:
->>>>
->>>>
->>>> - we protect inserting into list from other threads, but what preven=
-t
->>>> creating bitmap with the same name from other thread after
->>>> bdrv_find_dirty_bitmap() and before bdrv_dirty_bitmaps_lock() ?
->>> It's like a read-write lock.
->>
->> Ok, finally I understand (not all, but the main idea=3D), sorry for
->> annoying.
->=20
-> Is there any example of accessing dirty bitmaps for read not under BQL
-> but only under dirty bitmap lock?
+> 
+>  qemu-system-s390x ... -device virtio-net,netdev=n1,bootindex=1 \
+>        -netdev user,id=n1,tftp=/path/to/tftp,bootfile=generic.ins
+> 
+> The .INS file has to use the same syntax as the .INS files that can
+> already be found on s390x Linux distribution installation CD-ROMs.
+> 
+> The patches are still in a rough shape, but before I continue here,
+> I though I'd get some feedback first. Specifically:
+> 
+> - This adds a lot of additional code to the s390-ccw firmware (and
+>   the binary is afterwards three times as big as before, 75k instead
+>   of 25k) ... is that still acceptable?
 
-Yes, search for bdrv_dirty_bitmap_lock...unlock in block/mirror.c.
-There is also block/backup.c, which operates on a frozen bitmap.
+As mentioned in patch #1, would it somehow be able to include code
+rather than copying it and maintaining it separately?
 
-Paolo
+> 
+> - Is it OK to require loading an .INS file first? Or does anybody
+>   have a better idea how to load multiple files (kernel, initrd,
+>   etc. ...)?
+
+Guess this is the way to go for now.
+
+> 
+> - The code from SLOF uses a different coding style (TABs instead
+>   of space) ... is it OK to keep that coding style here so we
+>   can share patches between SLOF and s390-ccw more easily?
+> 
+> - The code only supports TFTP (via UDP) ... I think that is OK for
+>   most use-cases, but if we ever want to support network booting
+>   via HTTP or something else that is based on TCP, we would need to
+>   use something else instead... Should we maybe rather head towards
+>   grub2, petitboot or something different instead?
+
+Good question, I think all these solutions will require way more effort.
+
+> 
+>  Thomas
+
+-- 
+
+Thanks,
+
+David
