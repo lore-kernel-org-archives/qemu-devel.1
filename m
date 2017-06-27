@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dPjoO-0000A5-Q7
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 02:17:22 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dPjoR-0000JJ-U0
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 02:17:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dPjoN-0006DR-79
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 02:17:20 -0400
-Received: from [59.151.112.132] (port=42139 helo=heian.cn.fujitsu.com)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dPjoQ-0006Eo-51
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 02:17:23 -0400
+Received: from [59.151.112.132] (port=5937 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dPjoM-0006Cd-Fb
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 02:17:19 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dPjoO-0006CK-Cs
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 02:17:22 -0400
 From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Date: Tue, 27 Jun 2017 14:16:53 +0800
-Message-ID: <971cab75a0b4e011a18de8afb0ed4eedb7810eb6.1498542538.git.maozy.fnst@cn.fujitsu.com>
+Date: Tue, 27 Jun 2017 14:16:52 +0800
+Message-ID: <6a2e2d4c3be70be65bcd35f58261de7916ce9e10.1498542538.git.maozy.fnst@cn.fujitsu.com>
 In-Reply-To: <cover.1498542538.git.maozy.fnst@cn.fujitsu.com>
 References: <cover.1498542538.git.maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v7 7/9] pci: Convert shpc_init() to Error
+Subject: [Qemu-devel] [PATCH v7 6/9] pci: Convert to realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,8 +28,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mst@redhat.com, marcel@redhat.com, armbru@redhat.com
 
-In order to propagate error message better, convert shpc_init() to
-Error also convert the pci_bridge_dev_initfn() to realize.
+Convert i82801b11, io3130_upstream, io3130_downstream and
+pcie_root_port devices to realize.
 
 Cc: mst@redhat.com
 Cc: marcel@redhat.com
@@ -37,181 +37,372 @@ Cc: armbru@redhat.com
 Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
 Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 ---
- hw/pci-bridge/pci_bridge_dev.c | 14 ++++++--------
- hw/pci/shpc.c                  | 11 +++++------
- hw/pci/slotid_cap.c            | 11 +++++------
- include/hw/pci/shpc.h          |  3 ++-
- include/hw/pci/slotid_cap.h    |  3 ++-
- 5 files changed, 20 insertions(+), 22 deletions(-)
+ hw/pci-bridge/i82801b11.c          | 11 +++++------
+ hw/pci-bridge/pcie_root_port.c     | 18 +++++++++---------
+ hw/pci-bridge/xio3130_downstream.c | 20 +++++++++-----------
+ hw/pci-bridge/xio3130_upstream.c   | 20 +++++++++-----------
+ hw/pci/pci_bridge.c                |  7 +++----
+ hw/pci/pcie.c                      | 24 +++++++++++++++++-------
+ include/hw/pci/pci_bridge.h        |  3 ++-
+ include/hw/pci/pcie.h              |  3 ++-
+ 8 files changed, 56 insertions(+), 50 deletions(-)
 
-diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
-index 5dbd933..4373f1d 100644
---- a/hw/pci-bridge/pci_bridge_dev.c
-+++ b/hw/pci-bridge/pci_bridge_dev.c
-@@ -49,7 +49,7 @@ struct PCIBridgeDev {
- };
- typedef struct PCIBridgeDev PCIBridgeDev;
+diff --git a/hw/pci-bridge/i82801b11.c b/hw/pci-bridge/i82801b11.c
+index 2c065c3..2c1b747 100644
+--- a/hw/pci-bridge/i82801b11.c
++++ b/hw/pci-bridge/i82801b11.c
+@@ -59,24 +59,23 @@ typedef struct I82801b11Bridge {
+     /*< public >*/
+ } I82801b11Bridge;
  
--static int pci_bridge_dev_initfn(PCIDevice *dev)
-+static void pci_bridge_dev_realize(PCIDevice *dev, Error **errp)
+-static int i82801b11_bridge_initfn(PCIDevice *d)
++static void i82801b11_bridge_realize(PCIDevice *d, Error **errp)
  {
-     PCIBridge *br = PCI_BRIDGE(dev);
-     PCIBridgeDev *bridge_dev = PCI_BRIDGE_DEV(dev);
-@@ -62,7 +62,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
-         dev->config[PCI_INTERRUPT_PIN] = 0x1;
-         memory_region_init(&bridge_dev->bar, OBJECT(dev), "shpc-bar",
-                            shpc_bar_size(dev));
--        err = shpc_init(dev, &br->sec_bus, &bridge_dev->bar, 0);
-+        err = shpc_init(dev, &br->sec_bus, &bridge_dev->bar, 0, errp);
-         if (err) {
-             goto shpc_error;
-         }
-@@ -71,7 +71,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
-         bridge_dev->msi = ON_OFF_AUTO_OFF;
-     }
+     int rc;
  
--    err = slotid_cap_init(dev, 0, bridge_dev->chassis_nr, 0);
-+    err = slotid_cap_init(dev, 0, bridge_dev->chassis_nr, 0, errp);
-     if (err) {
-         goto slotid_error;
+     pci_bridge_initfn(d, TYPE_PCI_BUS);
+ 
+     rc = pci_bridge_ssvid_init(d, I82801ba_SSVID_OFFSET,
+-                               I82801ba_SSVID_SVID, I82801ba_SSVID_SSID);
++                               I82801ba_SSVID_SVID, I82801ba_SSVID_SSID,
++                               errp);
+     if (rc < 0) {
+         goto err_bridge;
      }
-@@ -87,7 +87,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
-             /* Can't satisfy user's explicit msi=on request, fail */
-             error_append_hint(&local_err, "You have to use msi=auto (default) "
-                     "or msi=off with this machine type.\n");
--            error_report_err(local_err);
-+            error_propagate(errp, local_err);
-             goto msi_error;
-         }
-         assert(!local_err || bridge_dev->msi == ON_OFF_AUTO_AUTO);
-@@ -101,7 +101,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
-         pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
-                          PCI_BASE_ADDRESS_MEM_TYPE_64, &bridge_dev->bar);
-     }
+     pci_config_set_prog_interface(d->config, PCI_CLASS_BRIDGE_PCI_INF_SUB);
 -    return 0;
 +    return;
  
- msi_error:
-     slotid_cap_cleanup(dev);
-@@ -111,8 +111,6 @@ slotid_error:
-     }
- shpc_error:
-     pci_bridge_exitfn(dev);
+ err_bridge:
+     pci_bridge_exitfn(d);
 -
--    return err;
+-    return rc;
  }
  
- static void pci_bridge_dev_exitfn(PCIDevice *dev)
-@@ -216,7 +214,7 @@ static void pci_bridge_dev_class_init(ObjectClass *klass, void *data)
-     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-     HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
- 
--    k->init = pci_bridge_dev_initfn;
-+    k->realize = pci_bridge_dev_realize;
-     k->exit = pci_bridge_dev_exitfn;
-     k->config_write = pci_bridge_dev_write_config;
-     k->vendor_id = PCI_VENDOR_ID_REDHAT;
-diff --git a/hw/pci/shpc.c b/hw/pci/shpc.c
-index d72d5e4..69fc14b 100644
---- a/hw/pci/shpc.c
-+++ b/hw/pci/shpc.c
-@@ -446,16 +446,14 @@ static void shpc_cap_update_dword(PCIDevice *d)
- }
- 
- /* Add SHPC capability to the config space for the device. */
--static int shpc_cap_add_config(PCIDevice *d)
-+static int shpc_cap_add_config(PCIDevice *d, Error **errp)
- {
-     uint8_t *config;
-     int config_offset;
--    Error *local_err = NULL;
-     config_offset = pci_add_capability(d, PCI_CAP_ID_SHPC,
-                                        0, SHPC_CAP_LENGTH,
--                                       &local_err);
-+                                       errp);
-     if (config_offset < 0) {
--        error_report_err(local_err);
-         return config_offset;
-     }
-     config = d->config + config_offset;
-@@ -584,13 +582,14 @@ void shpc_device_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
- }
- 
- /* Initialize the SHPC structure in bridge's BAR. */
--int shpc_init(PCIDevice *d, PCIBus *sec_bus, MemoryRegion *bar, unsigned offset)
-+int shpc_init(PCIDevice *d, PCIBus *sec_bus, MemoryRegion *bar,
-+              unsigned offset, Error **errp)
- {
-     int i, ret;
-     int nslots = SHPC_MAX_SLOTS; /* TODO: qdev property? */
-     SHPCDevice *shpc = d->shpc = g_malloc0(sizeof(*d->shpc));
-     shpc->sec_bus = sec_bus;
--    ret = shpc_cap_add_config(d);
-+    ret = shpc_cap_add_config(d, errp);
-     if (ret) {
-         g_free(d->shpc);
-         return ret;
-diff --git a/hw/pci/slotid_cap.c b/hw/pci/slotid_cap.c
-index bdca205..36d021b 100644
---- a/hw/pci/slotid_cap.c
-+++ b/hw/pci/slotid_cap.c
-@@ -9,14 +9,14 @@
- 
- int slotid_cap_init(PCIDevice *d, int nslots,
-                     uint8_t chassis,
--                    unsigned offset)
-+                    unsigned offset,
-+                    Error **errp)
- {
-     int cap;
+ static const VMStateDescription i82801b11_bridge_dev_vmstate = {
+@@ -96,7 +95,7 @@ static void i82801b11_bridge_class_init(ObjectClass *klass, void *data)
+     k->vendor_id = PCI_VENDOR_ID_INTEL;
+     k->device_id = PCI_DEVICE_ID_INTEL_82801BA_11;
+     k->revision = ICH9_D2P_A2_REVISION;
+-    k->init = i82801b11_bridge_initfn;
++    k->realize = i82801b11_bridge_realize;
+     k->config_write = pci_bridge_write_config;
+     dc->vmsd = &i82801b11_bridge_dev_vmstate;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+index cf36318..4d588cb 100644
+--- a/hw/pci-bridge/pcie_root_port.c
++++ b/hw/pci-bridge/pcie_root_port.c
+@@ -59,29 +59,30 @@ static void rp_realize(PCIDevice *d, Error **errp)
+     PCIDeviceClass *dc = PCI_DEVICE_GET_CLASS(d);
+     PCIERootPortClass *rpc = PCIE_ROOT_PORT_GET_CLASS(d);
+     int rc;
 -    Error *local_err = NULL;
  
-     if (!chassis) {
--        error_report("Bridge chassis not specified. Each bridge is required "
--                     "to be assigned a unique chassis id > 0.");
-+        error_setg(errp, "Bridge chassis not specified. Each bridge is required"
-+                   " to be assigned a unique chassis id > 0.");
-         return -EINVAL;
-     }
-     if (nslots < 0 || nslots > (PCI_SID_ESR_NSLOTS >> SLOTID_NSLOTS_SHIFT)) {
-@@ -25,9 +25,8 @@ int slotid_cap_init(PCIDevice *d, int nslots,
+     pci_config_set_interrupt_pin(d->config, 1);
+     pci_bridge_initfn(d, TYPE_PCIE_BUS);
+     pcie_port_init_reg(d);
+ 
+-    rc = pci_bridge_ssvid_init(d, rpc->ssvid_offset, dc->vendor_id, rpc->ssid);
++    rc = pci_bridge_ssvid_init(d, rpc->ssvid_offset, dc->vendor_id,
++                               rpc->ssid, errp);
+     if (rc < 0) {
+-        error_setg(errp, "Can't init SSV ID, error %d", rc);
++        error_append_hint(errp, "Can't init SSV ID, error %d\n", rc);
+         goto err_bridge;
      }
  
-     cap = pci_add_capability(d, PCI_CAP_ID_SLOTID, offset,
--                             SLOTID_CAP_LENGTH, &local_err);
-+                             SLOTID_CAP_LENGTH, errp);
-     if (cap < 0) {
+     if (rpc->interrupts_init) {
+-        rc = rpc->interrupts_init(d, &local_err);
++        rc = rpc->interrupts_init(d, errp);
+         if (rc < 0) {
+-            error_propagate(errp, local_err);
+             goto err_bridge;
+         }
+     }
+ 
+-    rc = pcie_cap_init(d, rpc->exp_offset, PCI_EXP_TYPE_ROOT_PORT, p->port);
++    rc = pcie_cap_init(d, rpc->exp_offset, PCI_EXP_TYPE_ROOT_PORT,
++                       p->port, errp);
+     if (rc < 0) {
+-        error_setg(errp, "Can't add Root Port capability, error %d", rc);
++        error_append_hint(errp, "Can't add Root Port capability, "
++                          "error %d\n", rc);
+         goto err_int;
+     }
+ 
+@@ -98,9 +99,8 @@ static void rp_realize(PCIDevice *d, Error **errp)
+     }
+ 
+     rc = pcie_aer_init(d, PCI_ERR_VER, rpc->aer_offset,
+-                       PCI_ERR_SIZEOF, &local_err);
++                       PCI_ERR_SIZEOF, errp);
+     if (rc < 0) {
+-        error_propagate(errp, local_err);
+         goto err;
+     }
+     pcie_aer_root_init(d);
+diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_downstream.c
+index cfe8a36..e706f36 100644
+--- a/hw/pci-bridge/xio3130_downstream.c
++++ b/hw/pci-bridge/xio3130_downstream.c
+@@ -56,33 +56,33 @@ static void xio3130_downstream_reset(DeviceState *qdev)
+     pci_bridge_reset(qdev);
+ }
+ 
+-static int xio3130_downstream_initfn(PCIDevice *d)
++static void xio3130_downstream_realize(PCIDevice *d, Error **errp)
+ {
+     PCIEPort *p = PCIE_PORT(d);
+     PCIESlot *s = PCIE_SLOT(d);
+     int rc;
+-    Error *err = NULL;
+ 
+     pci_bridge_initfn(d, TYPE_PCIE_BUS);
+     pcie_port_init_reg(d);
+ 
+     rc = msi_init(d, XIO3130_MSI_OFFSET, XIO3130_MSI_NR_VECTOR,
+                   XIO3130_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_64BIT,
+-                  XIO3130_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_MASKBIT, &err);
++                  XIO3130_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_MASKBIT,
++                  errp);
+     if (rc < 0) {
+         assert(rc == -ENOTSUP);
+-        error_report_err(err);
+         goto err_bridge;
+     }
+ 
+     rc = pci_bridge_ssvid_init(d, XIO3130_SSVID_OFFSET,
+-                               XIO3130_SSVID_SVID, XIO3130_SSVID_SSID);
++                               XIO3130_SSVID_SVID, XIO3130_SSVID_SSID,
++                               errp);
+     if (rc < 0) {
+         goto err_bridge;
+     }
+ 
+     rc = pcie_cap_init(d, XIO3130_EXP_OFFSET, PCI_EXP_TYPE_DOWNSTREAM,
+-                       p->port);
++                       p->port, errp);
+     if (rc < 0) {
+         goto err_msi;
+     }
+@@ -98,13 +98,12 @@ static int xio3130_downstream_initfn(PCIDevice *d)
+     }
+ 
+     rc = pcie_aer_init(d, PCI_ERR_VER, XIO3130_AER_OFFSET,
+-                       PCI_ERR_SIZEOF, &err);
++                       PCI_ERR_SIZEOF, errp);
+     if (rc < 0) {
+-        error_report_err(err);
+         goto err;
+     }
+ 
+-    return 0;
++    return;
+ 
+ err:
+     pcie_chassis_del_slot(s);
+@@ -114,7 +113,6 @@ err_msi:
+     msi_uninit(d);
+ err_bridge:
+     pci_bridge_exitfn(d);
+-    return rc;
+ }
+ 
+ static void xio3130_downstream_exitfn(PCIDevice *d)
+@@ -181,7 +179,7 @@ static void xio3130_downstream_class_init(ObjectClass *klass, void *data)
+     k->is_express = 1;
+     k->is_bridge = 1;
+     k->config_write = xio3130_downstream_write_config;
+-    k->init = xio3130_downstream_initfn;
++    k->realize = xio3130_downstream_realize;
+     k->exit = xio3130_downstream_exitfn;
+     k->vendor_id = PCI_VENDOR_ID_TI;
+     k->device_id = PCI_DEVICE_ID_TI_XIO3130D;
+diff --git a/hw/pci-bridge/xio3130_upstream.c b/hw/pci-bridge/xio3130_upstream.c
+index 401c784..a052224 100644
+--- a/hw/pci-bridge/xio3130_upstream.c
++++ b/hw/pci-bridge/xio3130_upstream.c
+@@ -53,32 +53,32 @@ static void xio3130_upstream_reset(DeviceState *qdev)
+     pcie_cap_deverr_reset(d);
+ }
+ 
+-static int xio3130_upstream_initfn(PCIDevice *d)
++static void xio3130_upstream_realize(PCIDevice *d, Error **errp)
+ {
+     PCIEPort *p = PCIE_PORT(d);
+     int rc;
+-    Error *err = NULL;
+ 
+     pci_bridge_initfn(d, TYPE_PCIE_BUS);
+     pcie_port_init_reg(d);
+ 
+     rc = msi_init(d, XIO3130_MSI_OFFSET, XIO3130_MSI_NR_VECTOR,
+                   XIO3130_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_64BIT,
+-                  XIO3130_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_MASKBIT, &err);
++                  XIO3130_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_MASKBIT,
++                  errp);
+     if (rc < 0) {
+         assert(rc == -ENOTSUP);
+-        error_report_err(err);
+         goto err_bridge;
+     }
+ 
+     rc = pci_bridge_ssvid_init(d, XIO3130_SSVID_OFFSET,
+-                               XIO3130_SSVID_SVID, XIO3130_SSVID_SSID);
++                               XIO3130_SSVID_SVID, XIO3130_SSVID_SSID,
++                               errp);
+     if (rc < 0) {
+         goto err_bridge;
+     }
+ 
+     rc = pcie_cap_init(d, XIO3130_EXP_OFFSET, PCI_EXP_TYPE_UPSTREAM,
+-                       p->port);
++                       p->port, errp);
+     if (rc < 0) {
+         goto err_msi;
+     }
+@@ -86,13 +86,12 @@ static int xio3130_upstream_initfn(PCIDevice *d)
+     pcie_cap_deverr_init(d);
+ 
+     rc = pcie_aer_init(d, PCI_ERR_VER, XIO3130_AER_OFFSET,
+-                       PCI_ERR_SIZEOF, &err);
++                       PCI_ERR_SIZEOF, errp);
+     if (rc < 0) {
+-        error_report_err(err);
+         goto err;
+     }
+ 
+-    return 0;
++    return;
+ 
+ err:
+     pcie_cap_exit(d);
+@@ -100,7 +99,6 @@ err_msi:
+     msi_uninit(d);
+ err_bridge:
+     pci_bridge_exitfn(d);
+-    return rc;
+ }
+ 
+ static void xio3130_upstream_exitfn(PCIDevice *d)
+@@ -153,7 +151,7 @@ static void xio3130_upstream_class_init(ObjectClass *klass, void *data)
+     k->is_express = 1;
+     k->is_bridge = 1;
+     k->config_write = xio3130_upstream_write_config;
+-    k->init = xio3130_upstream_initfn;
++    k->realize = xio3130_upstream_realize;
+     k->exit = xio3130_upstream_exitfn;
+     k->vendor_id = PCI_VENDOR_ID_TI;
+     k->device_id = PCI_DEVICE_ID_TI_XIO3130U;
+diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
+index bb0f3a3..720119b 100644
+--- a/hw/pci/pci_bridge.c
++++ b/hw/pci/pci_bridge.c
+@@ -41,15 +41,14 @@
+ #define PCI_SSVID_SSID          6
+ 
+ int pci_bridge_ssvid_init(PCIDevice *dev, uint8_t offset,
+-                          uint16_t svid, uint16_t ssid)
++                          uint16_t svid, uint16_t ssid,
++                          Error **errp)
+ {
+     int pos;
+-    Error *local_err = NULL;
+ 
+     pos = pci_add_capability(dev, PCI_CAP_ID_SSVID, offset,
+-                             PCI_SSVID_SIZEOF, &local_err);
++                             PCI_SSVID_SIZEOF, errp);
+     if (pos < 0) {
 -        error_report_err(local_err);
-         return cap;
+         return pos;
      }
-     /* We make each chassis unique, this way each bridge is First in Chassis */
-diff --git a/include/hw/pci/shpc.h b/include/hw/pci/shpc.h
-index 71e836b..ee19fec 100644
---- a/include/hw/pci/shpc.h
-+++ b/include/hw/pci/shpc.h
-@@ -38,7 +38,8 @@ struct SHPCDevice {
  
- void shpc_reset(PCIDevice *d);
- int shpc_bar_size(PCIDevice *dev);
--int shpc_init(PCIDevice *dev, PCIBus *sec_bus, MemoryRegion *bar, unsigned off);
-+int shpc_init(PCIDevice *dev, PCIBus *sec_bus, MemoryRegion *bar,
-+              unsigned off, Error **errp);
- void shpc_cleanup(PCIDevice *dev, MemoryRegion *bar);
- void shpc_free(PCIDevice *dev);
- void shpc_cap_write_config(PCIDevice *d, uint32_t addr, uint32_t val, int len);
-diff --git a/include/hw/pci/slotid_cap.h b/include/hw/pci/slotid_cap.h
-index 70db047..a777ea0 100644
---- a/include/hw/pci/slotid_cap.h
-+++ b/include/hw/pci/slotid_cap.h
-@@ -5,7 +5,8 @@
+diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+index f187512..32191f2 100644
+--- a/hw/pci/pcie.c
++++ b/hw/pci/pcie.c
+@@ -86,19 +86,19 @@ pcie_cap_v1_fill(PCIDevice *dev, uint8_t port, uint8_t type, uint8_t version)
+     pci_set_word(cmask + PCI_EXP_LNKSTA, 0);
+ }
  
- int slotid_cap_init(PCIDevice *dev, int nslots,
-                     uint8_t chassis,
--                    unsigned offset);
-+                    unsigned offset,
-+                    Error **errp);
- void slotid_cap_cleanup(PCIDevice *dev);
+-int pcie_cap_init(PCIDevice *dev, uint8_t offset, uint8_t type, uint8_t port)
++int pcie_cap_init(PCIDevice *dev, uint8_t offset,
++                  uint8_t type, uint8_t port,
++                  Error **errp)
+ {
+     /* PCIe cap v2 init */
+     int pos;
+     uint8_t *exp_cap;
+-    Error *local_err = NULL;
  
- #endif
+     assert(pci_is_express(dev));
+ 
+     pos = pci_add_capability(dev, PCI_CAP_ID_EXP, offset,
+-                             PCI_EXP_VER2_SIZEOF, &local_err);
++                             PCI_EXP_VER2_SIZEOF, errp);
+     if (pos < 0) {
+-        error_report_err(local_err);
+         return pos;
+     }
+     dev->exp.exp_cap = pos;
+@@ -147,6 +147,8 @@ static int
+ pcie_endpoint_cap_common_init(PCIDevice *dev, uint8_t offset, uint8_t cap_size)
+ {
+     uint8_t type = PCI_EXP_TYPE_ENDPOINT;
++    Error *local_err = NULL;
++    int ret;
+ 
+     /*
+      * Windows guests will report Code 10, device cannot start, if
+@@ -157,9 +159,17 @@ pcie_endpoint_cap_common_init(PCIDevice *dev, uint8_t offset, uint8_t cap_size)
+         type = PCI_EXP_TYPE_RC_END;
+     }
+ 
+-    return (cap_size == PCI_EXP_VER1_SIZEOF)
+-        ? pcie_cap_v1_init(dev, offset, type, 0)
+-        : pcie_cap_init(dev, offset, type, 0);
++    if (cap_size == PCI_EXP_VER1_SIZEOF) {
++        return pcie_cap_v1_init(dev, offset, type, 0);
++    } else {
++        ret = pcie_cap_init(dev, offset, type, 0, &local_err);
++
++        if (ret < 0) {
++            error_report_err(local_err);
++        }
++
++        return ret;
++    }
+ }
+ 
+ int pcie_endpoint_cap_init(PCIDevice *dev, uint8_t offset)
+diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
+index d5891cd..ff7cbaa 100644
+--- a/include/hw/pci/pci_bridge.h
++++ b/include/hw/pci/pci_bridge.h
+@@ -33,7 +33,8 @@
+ #define PCI_BRIDGE_DEV_PROP_SHPC       "shpc"
+ 
+ int pci_bridge_ssvid_init(PCIDevice *dev, uint8_t offset,
+-                          uint16_t svid, uint16_t ssid);
++                          uint16_t svid, uint16_t ssid,
++                          Error **errp);
+ 
+ PCIDevice *pci_bridge_get_device(PCIBus *bus);
+ PCIBus *pci_bridge_get_sec_bus(PCIBridge *br);
+diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
+index 3d8f24b..b71e369 100644
+--- a/include/hw/pci/pcie.h
++++ b/include/hw/pci/pcie.h
+@@ -84,7 +84,8 @@ struct PCIExpressDevice {
+ #define COMPAT_PROP_PCP "power_controller_present"
+ 
+ /* PCI express capability helper functions */
+-int pcie_cap_init(PCIDevice *dev, uint8_t offset, uint8_t type, uint8_t port);
++int pcie_cap_init(PCIDevice *dev, uint8_t offset, uint8_t type,
++                  uint8_t port, Error **errp);
+ int pcie_cap_v1_init(PCIDevice *dev, uint8_t offset,
+                      uint8_t type, uint8_t port);
+ int pcie_endpoint_cap_init(PCIDevice *dev, uint8_t offset);
 -- 
 2.9.4
