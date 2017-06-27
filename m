@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38079)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dPxTM-0004mK-Pq
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 16:52:33 -0400
+	id 1dPxep-0000Q3-P5
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 17:04:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dPxTJ-0004Ud-Pf
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 16:52:32 -0400
-Received: from mail-qt0-x234.google.com ([2607:f8b0:400d:c0d::234]:33154)
+	id 1dPxel-0005rN-AB
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 17:04:23 -0400
+Received: from mail-qt0-x232.google.com ([2607:f8b0:400d:c0d::232]:32875)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dPxTJ-0004UR-Jt
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 16:52:29 -0400
-Received: by mail-qt0-x234.google.com with SMTP id r30so34994284qtc.0
-	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 13:52:29 -0700 (PDT)
+	id 1dPxel-0005r7-4D
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 17:04:19 -0400
+Received: by mail-qt0-x232.google.com with SMTP id r30so35243522qtc.0
+	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 14:04:18 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20170626220330.6785-1-laurent@vivier.eu>
-	<20170626220330.6785-3-laurent@vivier.eu>
-	<20170627124541.2ab44983@x1.local>
-	<283fac39-6f22-c3a2-50e5-1a434404e483@vivier.eu>
+References: <20170627191221.31650-1-laurent@vivier.eu>
+	<20170627191221.31650-3-laurent@vivier.eu>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6728212e-9d8a-953b-d745-841bc3550691@amsat.org>
-Date: Tue, 27 Jun 2017 17:52:25 -0300
+Message-ID: <9fa0ca46-7751-bad7-a18a-c74d9b33c996@amsat.org>
+Date: Tue, 27 Jun 2017 18:04:15 -0300
 MIME-Version: 1.0
-In-Reply-To: <283fac39-6f22-c3a2-50e5-1a434404e483@vivier.eu>
+In-Reply-To: <20170627191221.31650-3-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/7] target/m68k: add fmovecr
+Subject: Re: [Qemu-devel] [PATCH v3 2/7] target/m68k: add fmovecr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,76 +35,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 
-On 06/27/2017 02:58 PM, Laurent Vivier wrote:
-> Le 27/06/2017 à 17:45, Philippe Mathieu-Daudé a écrit :
->>> +static const floatx80 fpu_rom[128] = {
->>> +    [0x00] = floatx80_pi,                                   /* Pi */
->>> +    [0x0b] = make_floatx80(0x3ffd, 0x9a209a84fbcff798ULL),  /*
->>> Log10(2) */
->>> +    [0x0c] = make_floatx80(0x4000, 0xadf85458a2bb4a9aULL),  /*
->>> e        */
->>> +    [0x0d] = make_floatx80(0x3fff, 0xb8aa3b295c17f0bcULL),  /*
->>> Log2(e)  */
->>> +    [0x0e] = make_floatx80(0x3ffd, 0xde5bd8a937287195ULL),  /*
->>> Log10(e) */
->>> +    [0x0f] = floatx80_zero,                                 /*
->>> Zero     */
->>> +    [0x30] = floatx80_ln2,                                  /*
->>> ln(2)    */
->>> +    [0x31] = make_floatx80(0x4000, 0x935d8dddaaa8ac17ULL),  /*
->>> ln(10)   */
->>> +    [0x32] = floatx80_one,                                  /*
->>> 10^0     */
->>> +    [0x33] = make_floatx80(0x4002, 0xa000000000000000ULL),  /*
->>> 10^1     */
->>> +    [0x34] = make_floatx80(0x4005, 0xc800000000000000ULL),  /*
->>> 10^2     */
->>> +    [0x35] = make_floatx80(0x400c, 0x9c40000000000000ULL),  /*
->>> 10^4     */
->>> +    [0x36] = make_floatx80(0x4019, 0xbebc200000000000ULL),  /*
->>> 10^8     */
->>> +    [0x37] = make_floatx80(0x4034, 0x8e1bc9bf04000000ULL),  /*
->>> 10^16    */
->>> +    [0x38] = make_floatx80(0x4069, 0x9dc5ada82b70b59eULL),  /*
->>> 10^32    */
->>> +    [0x39] = make_floatx80(0x40d3, 0xc2781f49ffcfa6d5ULL),  /*
->>> 10^64    */
->>> +    [0x3a] = make_floatx80(0x41a8, 0x93ba47c980e98ce0ULL),  /*
->>> 10^128   */
->>> +    [0x3b] = make_floatx80(0x4351, 0xaa7eebfb9df9de8eULL),  /*
->>> 10^256   */
->>> +    [0x3c] = make_floatx80(0x46a3, 0xe319a0aea60e91c7ULL),  /*
->>> 10^512   */
->>> +    [0x3d] = make_floatx80(0x4d48, 0xc976758681750c17ULL),  /*
->>> 10^1024  */
->>> +    [0x3e] = make_floatx80(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /*
->>> 10^2048  */
->>> +    [0x3f] = make_floatx80(0x7525, 0xc46052028a20979bULL),  /*
->>> 10^4096  */ +};
->>> +
->>>   int32_t HELPER(reds32)(CPUM68KState *env, FPReg *val)
->>>   {
->>>       return floatx80_to_int32(val->d, &env->fp_status);
->>> @@ -204,3 +229,8 @@ void HELPER(ftst)(CPUM68KState *env, FPReg *val)
->>>       }
->>>       env->fpsr = (env->fpsr & ~FPSR_CC_MASK) | cc;
->>>   }
->>> +
->>> +void HELPER(fconst)(CPUM68KState *env, FPReg *val, uint32_t offset)
->>> +{
->>> +    val->d = fpu_rom[offset];
->>
->> For offset not declared in fpu_rom (0x1..0xa, 0x10..0x2f, 0x40..0x7f),
->> this will return floatx80_zero, is this correct?
+On 06/27/2017 04:12 PM, Laurent Vivier wrote:
+> fmovecr moves a floating point constant from the
+> FPU ROM to a floating point register.
 > 
-> yes, according to the doc:
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> Reviewed-by: Richard Henderson <rth@twiddle.net>
+> ---
+>   target/m68k/fpu_helper.c | 30 ++++++++++++++++++++++++++++++
+>   target/m68k/helper.h     |  1 +
+>   target/m68k/translate.c  | 13 ++++++++++++-
+>   3 files changed, 43 insertions(+), 1 deletion(-)
 > 
-> The values contained at offsets other than those defined above are
-> reserved for the use of Motorola and may be different on various mask
-> sets of the floating-point coprocessor. These undefined values yield the
-> value 0.0 in the M68040FPSP
+> diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
+> index a9e17f5..912c0b7 100644
+> --- a/target/m68k/fpu_helper.c
+> +++ b/target/m68k/fpu_helper.c
+> @@ -23,6 +23,31 @@
+>   #include "exec/helper-proto.h"
+>   #include "exec/exec-all.h"
+>   
+> +static const floatx80 fpu_rom[128] = {
 
-can you add this comment before/in the fpu_rom array please?
+"The values contained at offsets other than those defined above are
+reserved for the use of Motorola and may be different on various mask
+sets of the floating-point coprocessor. These undefined values yield the
+value 0.0 [ floatx80_zero ] in the M68040FPSP."
+
+^ with a such comment around:
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> +    [0x00] = floatx80_pi,                                   /* Pi */
+> +    [0x0b] = make_floatx80(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
+> +    [0x0c] = make_floatx80(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
+> +    [0x0d] = make_floatx80(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
+> +    [0x0e] = make_floatx80(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
+> +    [0x0f] = floatx80_zero,                                 /* Zero     */
+> +    [0x30] = floatx80_ln2,                                  /* ln(2)    */
+> +    [0x31] = make_floatx80(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
+> +    [0x32] = floatx80_one,                                  /* 10^0     */
+> +    [0x33] = make_floatx80(0x4002, 0xa000000000000000ULL),  /* 10^1     */
+> +    [0x34] = make_floatx80(0x4005, 0xc800000000000000ULL),  /* 10^2     */
+> +    [0x35] = make_floatx80(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
+> +    [0x36] = make_floatx80(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
+> +    [0x37] = make_floatx80(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
+> +    [0x38] = make_floatx80(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
+> +    [0x39] = make_floatx80(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
+> +    [0x3a] = make_floatx80(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
+> +    [0x3b] = make_floatx80(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
+> +    [0x3c] = make_floatx80(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
+> +    [0x3d] = make_floatx80(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
+> +    [0x3e] = make_floatx80(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
+> +    [0x3f] = make_floatx80(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
+> +};
+> +
+>   int32_t HELPER(reds32)(CPUM68KState *env, FPReg *val)
+>   {
+>       return floatx80_to_int32(val->d, &env->fp_status);
+> @@ -204,3 +229,8 @@ void HELPER(ftst)(CPUM68KState *env, FPReg *val)
+>       }
+>       env->fpsr = (env->fpsr & ~FPSR_CC_MASK) | cc;
+>   }
+> +
+> +void HELPER(fconst)(CPUM68KState *env, FPReg *val, uint32_t offset)
+> +{
+> +    val->d = fpu_rom[offset];
+> +}
+> diff --git a/target/m68k/helper.h b/target/m68k/helper.h
+> index 98cbf18..d6e80e4 100644
+> --- a/target/m68k/helper.h
+> +++ b/target/m68k/helper.h
+> @@ -35,6 +35,7 @@ DEF_HELPER_4(fdiv, void, env, fp, fp, fp)
+>   DEF_HELPER_FLAGS_3(fcmp, TCG_CALL_NO_RWG, void, env, fp, fp)
+>   DEF_HELPER_FLAGS_2(set_fpcr, TCG_CALL_NO_RWG, void, env, i32)
+>   DEF_HELPER_FLAGS_2(ftst, TCG_CALL_NO_RWG, void, env, fp)
+> +DEF_HELPER_3(fconst, void, env, fp, i32)
+>   
+>   DEF_HELPER_3(mac_move, void, env, i32, i32)
+>   DEF_HELPER_3(macmulf, i64, env, i32, i32)
+> diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+> index dff604c..0bb3300 100644
+> --- a/target/m68k/translate.c
+> +++ b/target/m68k/translate.c
+> @@ -4518,10 +4518,21 @@ DISAS_INSN(fpu)
+>       ext = read_im16(env, s);
+>       opmode = ext & 0x7f;
+>       switch ((ext >> 13) & 7) {
+> -    case 0: case 2:
+> +    case 0:
+>           break;
+>       case 1:
+>           goto undef;
+> +    case 2:
+> +        if (insn == 0xf200 && (ext & 0xfc00) == 0x5c00) {
+> +            /* fmovecr */
+> +            TCGv rom_offset = tcg_const_i32(opmode);
+
+you could reuse tmp32:
+
+tmp32 = tcg_const_i32(opmode); /* rom offset */
+
+but it's good like that ;)
+
+> +            cpu_dest = gen_fp_ptr(REG(ext, 7));
+> +            gen_helper_fconst(cpu_env, cpu_dest, rom_offset);
+> +            tcg_temp_free_ptr(cpu_dest);
+> +            tcg_temp_free(rom_offset);
+
+Oh this was a leak in v2? I didn't notice.
+
+> +            return;
+> +        }
+> +        break;
+>       case 3: /* fmove out */
+>           cpu_src = gen_fp_ptr(REG(ext, 7));
+>           opsize = ext_opsize(ext, 10);
+> 
