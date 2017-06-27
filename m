@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dPoyw-0007s5-Kg
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 07:48:35 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dPoyv-0003g3-S0
+	(envelope-from <thuth@redhat.com>) id 1dPoyu-0007rP-IL
 	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 07:48:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33606)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <thuth@redhat.com>) id 1dPoyq-0003d9-4l
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 07:48:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36424)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dPoyv-0003eT-M9
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 07:48:33 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dPoyp-0003cf-Sj
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 07:48:28 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 27 Jun 2017 13:48:09 +0200
-Message-Id: <1498564100-10045-4-git-send-email-thuth@redhat.com>
-In-Reply-To: <1498564100-10045-1-git-send-email-thuth@redhat.com>
-References: <1498564100-10045-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 03/14] pc-bios/s390-ccw: Add a write()
- function for stdio
+Date: Tue, 27 Jun 2017 13:48:06 +0200
+Message-Id: <1498564100-10045-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [RFC PATCH 00/14] Implement network booting directly
+ into the s390-ccw BIOS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,74 +25,268 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
 Cc: Alexander Graf <agraf@suse.de>, Farhan Ali <alifm@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Jens Freimann <jfreiman@redhat.com>, Eric Farman <farman@linux.vnet.ibm.com>
 
-The stdio functions from the SLOF libc need a write() function for
-printing text to stdout/stderr. Let's implement this function by
-refactoring the code from sclp_print().
+It's already possible to do a network boot of an s390x guest with an
+external netboot image (based on a Linux installation), but it would
+be much more convenient if the s390-ccw firmware supported network
+booting right out of the box, without the need to assemble such an
+external image first.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- pc-bios/s390-ccw/sclp.c | 32 ++++++++++++++------------------
- 1 file changed, 14 insertions(+), 18 deletions(-)
+This patch series now introduces network booting via DHCP and TFTP
+directly into the s390-ccw firmware by re-using the networking stack
+from the SLOF firmware (see https://github.com/aik/SLOF/ for details),
+and adds a driver for virtio-net-ccw devices.
 
-diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
-index a1639ba..a23bdd3 100644
---- a/pc-bios/s390-ccw/sclp.c
-+++ b/pc-bios/s390-ccw/sclp.c
-@@ -8,6 +8,7 @@
-  * directory.
-  */
- 
-+#include <unistd.h>
- #include "s390-ccw.h"
- #include "sclp.h"
- 
-@@ -51,34 +52,29 @@ void sclp_setup(void)
-     sclp_set_write_mask();
- }
- 
--static int _strlen(const char *str)
-+ssize_t write(int fd, const void *buf, size_t len)
- {
--    int i;
--    for (i = 0; *str; i++)
--        str++;
--    return i;
--}
--
--static void _memcpy(char *dest, const char *src, int len)
--{
--    int i;
--    for (i = 0; i < len; i++)
--        dest[i] = src[i];
--}
--
--void sclp_print(const char *str)
--{
--    int len = _strlen(str);
-     WriteEventData *sccb = (void *)_sccb;
- 
-+    if (fd != 1 && fd != 2) {
-+        return -EIO;
-+    }
-+
-     sccb->h.length = sizeof(WriteEventData) + len;
-     sccb->h.function_code = SCLP_FC_NORMAL_WRITE;
-     sccb->ebh.length = sizeof(EventBufferHeader) + len;
-     sccb->ebh.type = SCLP_EVENT_ASCII_CONSOLE_DATA;
-     sccb->ebh.flags = 0;
--    _memcpy(sccb->data, str, len);
-+    memcpy(sccb->data, buf, len);
- 
-     sclp_service_call(SCLP_CMD_WRITE_EVENT_DATA, sccb);
-+
-+    return len;
-+}
-+
-+void sclp_print(const char *str)
-+{
-+    write(1, str, strlen(str));
- }
- 
- void sclp_get_loadparm_ascii(char *loadparm)
+Once the patches have been applied, you can download an .INS file
+via TFTP which contains the information about the further files
+that have to be loaded - kernel, initrd, etc. For example, you can
+use the built-in TFTP and DHCP server of QEMU for this by starting
+QEMU with:
+
+ qemu-system-s390x ... -device virtio-net,netdev=n1,bootindex=1 \
+       -netdev user,id=n1,tftp=/path/to/tftp,bootfile=generic.ins
+
+The .INS file has to use the same syntax as the .INS files that can
+already be found on s390x Linux distribution installation CD-ROMs.
+
+The patches are still in a rough shape, but before I continue here,
+I though I'd get some feedback first. Specifically:
+
+- This adds a lot of additional code to the s390-ccw firmware (and
+  the binary is afterwards three times as big as before, 75k instead
+  of 25k) ... is that still acceptable?
+
+- Is it OK to require loading an .INS file first? Or does anybody
+  have a better idea how to load multiple files (kernel, initrd,
+  etc. ...)?
+
+- The code from SLOF uses a different coding style (TABs instead
+  of space) ... is it OK to keep that coding style here so we
+  can share patches between SLOF and s390-ccw more easily?
+
+- The code only supports TFTP (via UDP) ... I think that is OK for
+  most use-cases, but if we ever want to support network booting
+  via HTTP or something else that is based on TCP, we would need to
+  use something else instead... Should we maybe rather head towards
+  grub2, petitboot or something different instead?
+
+ Thomas
+
+
+Thomas Huth (14):
+  pc-bios/s390-ccw: Add the libc from the SLOF firmware
+  pc-bios/s390-ccw: Start using the libc from SLOF
+  pc-bios/s390-ccw: Add a write() function for stdio
+  pc-bios/s390-ccw: Add implementation of sbrk()
+  pc-bios/s390-ccw: Add the TFTP network loading stack from SLOF
+  libnet: Remove remainders of netsave code
+  libnet: Rework error message printing
+  libnet: Refactor some code of netload() into a separate function
+  pc-bios/s390-ccw: Make the basic libnet code compilable
+  pc-bios/s390-ccw: Add timer code for the libnet
+  pc-bios/s390-ccw: Add virtio-net driver code
+  pc-bios/s390-ccw: Load file via an intermediate .INS file
+  pc-bios/s390-ccw: Allow loading to address 0
+  pc-bios/s390-ccw: Wire up the netload code
+
+ configure                                  |   6 +-
+ hw/s390x/ipl.c                             |   2 +-
+ pc-bios/s390-ccw/Makefile                  |  14 +-
+ pc-bios/s390-ccw/bootmap.c                 |  10 +-
+ pc-bios/s390-ccw/bootmap.h                 |   1 +
+ pc-bios/s390-ccw/libc/Makefile             |  47 ++
+ pc-bios/s390-ccw/libc/README.txt           |  49 ++
+ pc-bios/s390-ccw/libc/ctype/Makefile.inc   |  21 +
+ pc-bios/s390-ccw/libc/ctype/isdigit.c      |  25 +
+ pc-bios/s390-ccw/libc/ctype/isprint.c      |  18 +
+ pc-bios/s390-ccw/libc/ctype/isspace.c      |  29 +
+ pc-bios/s390-ccw/libc/ctype/isxdigit.c     |  21 +
+ pc-bios/s390-ccw/libc/ctype/tolower.c      |  18 +
+ pc-bios/s390-ccw/libc/ctype/toupper.c      |  21 +
+ pc-bios/s390-ccw/libc/include/ctype.h      |  24 +
+ pc-bios/s390-ccw/libc/include/errno.h      |  34 +
+ pc-bios/s390-ccw/libc/include/limits.h     |  32 +
+ pc-bios/s390-ccw/libc/include/stdarg.h     |  22 +
+ pc-bios/s390-ccw/libc/include/stdbool.h    |  20 +
+ pc-bios/s390-ccw/libc/include/stddef.h     |  25 +
+ pc-bios/s390-ccw/libc/include/stdint.h     |  28 +
+ pc-bios/s390-ccw/libc/include/stdio.h      |  63 ++
+ pc-bios/s390-ccw/libc/include/stdlib.h     |  34 +
+ pc-bios/s390-ccw/libc/include/string.h     |  37 ++
+ pc-bios/s390-ccw/libc/include/sys/socket.h |  53 ++
+ pc-bios/s390-ccw/libc/include/unistd.h     |  28 +
+ pc-bios/s390-ccw/libc/stdio/Makefile.inc   |  24 +
+ pc-bios/s390-ccw/libc/stdio/fileno.c       |  19 +
+ pc-bios/s390-ccw/libc/stdio/fprintf.c      |  26 +
+ pc-bios/s390-ccw/libc/stdio/printf.c       |  27 +
+ pc-bios/s390-ccw/libc/stdio/putc.c         |  25 +
+ pc-bios/s390-ccw/libc/stdio/putchar.c      |  21 +
+ pc-bios/s390-ccw/libc/stdio/puts.c         |  28 +
+ pc-bios/s390-ccw/libc/stdio/setvbuf.c      |  28 +
+ pc-bios/s390-ccw/libc/stdio/sprintf.c      |  30 +
+ pc-bios/s390-ccw/libc/stdio/stdchnls.c     |  23 +
+ pc-bios/s390-ccw/libc/stdio/vfprintf.c     |  27 +
+ pc-bios/s390-ccw/libc/stdio/vsnprintf.c    | 298 +++++++++
+ pc-bios/s390-ccw/libc/stdio/vsprintf.c     |  19 +
+ pc-bios/s390-ccw/libc/stdlib/Makefile.inc  |  23 +
+ pc-bios/s390-ccw/libc/stdlib/atoi.c        |  18 +
+ pc-bios/s390-ccw/libc/stdlib/atol.c        |  18 +
+ pc-bios/s390-ccw/libc/stdlib/error.c       |  15 +
+ pc-bios/s390-ccw/libc/stdlib/free.c        |  26 +
+ pc-bios/s390-ccw/libc/stdlib/malloc.c      | 157 +++++
+ pc-bios/s390-ccw/libc/stdlib/malloc_defs.h |  16 +
+ pc-bios/s390-ccw/libc/stdlib/memalign.c    |  26 +
+ pc-bios/s390-ccw/libc/stdlib/rand.c        |  29 +
+ pc-bios/s390-ccw/libc/stdlib/realloc.c     |  40 ++
+ pc-bios/s390-ccw/libc/stdlib/strtol.c      | 115 ++++
+ pc-bios/s390-ccw/libc/stdlib/strtoul.c     | 105 ++++
+ pc-bios/s390-ccw/libc/string/Makefile.inc  |  23 +
+ pc-bios/s390-ccw/libc/string/memchr.c      |  29 +
+ pc-bios/s390-ccw/libc/string/memcmp.c      |  30 +
+ pc-bios/s390-ccw/libc/string/memcpy.c      |  27 +
+ pc-bios/s390-ccw/libc/string/memmove.c     |  42 ++
+ pc-bios/s390-ccw/libc/string/memset.c      |  25 +
+ pc-bios/s390-ccw/libc/string/strcasecmp.c  |  28 +
+ pc-bios/s390-ccw/libc/string/strcat.c      |  24 +
+ pc-bios/s390-ccw/libc/string/strchr.c      |  28 +
+ pc-bios/s390-ccw/libc/string/strcmp.c      |  28 +
+ pc-bios/s390-ccw/libc/string/strcpy.c      |  25 +
+ pc-bios/s390-ccw/libc/string/strlen.c      |  27 +
+ pc-bios/s390-ccw/libc/string/strncasecmp.c |  32 +
+ pc-bios/s390-ccw/libc/string/strncmp.c     |  31 +
+ pc-bios/s390-ccw/libc/string/strncpy.c     |  33 +
+ pc-bios/s390-ccw/libc/string/strstr.c      |  37 ++
+ pc-bios/s390-ccw/libc/string/strtok.c      |  45 ++
+ pc-bios/s390-ccw/libnet/Makefile           |  42 ++
+ pc-bios/s390-ccw/libnet/args.c             | 179 ++++++
+ pc-bios/s390-ccw/libnet/args.h             |  23 +
+ pc-bios/s390-ccw/libnet/dhcp.c             | 955 +++++++++++++++++++++++++++++
+ pc-bios/s390-ccw/libnet/dhcp.h             |  49 ++
+ pc-bios/s390-ccw/libnet/dhcpv6.c           | 212 +++++++
+ pc-bios/s390-ccw/libnet/dhcpv6.h           | 154 +++++
+ pc-bios/s390-ccw/libnet/dns.c              | 526 ++++++++++++++++
+ pc-bios/s390-ccw/libnet/dns.h              |  28 +
+ pc-bios/s390-ccw/libnet/ethernet.c         | 189 ++++++
+ pc-bios/s390-ccw/libnet/ethernet.h         |  47 ++
+ pc-bios/s390-ccw/libnet/icmpv6.c           | 409 ++++++++++++
+ pc-bios/s390-ccw/libnet/icmpv6.h           | 135 ++++
+ pc-bios/s390-ccw/libnet/ipv4.c             | 898 +++++++++++++++++++++++++++
+ pc-bios/s390-ccw/libnet/ipv4.h             |  97 +++
+ pc-bios/s390-ccw/libnet/ipv6.c             | 774 +++++++++++++++++++++++
+ pc-bios/s390-ccw/libnet/ipv6.h             | 188 ++++++
+ pc-bios/s390-ccw/libnet/ndp.c              | 184 ++++++
+ pc-bios/s390-ccw/libnet/ndp.h              |  72 +++
+ pc-bios/s390-ccw/libnet/netapps.h          |  25 +
+ pc-bios/s390-ccw/libnet/netload.c          | 600 ++++++++++++++++++
+ pc-bios/s390-ccw/libnet/tcp.c              |  46 ++
+ pc-bios/s390-ccw/libnet/tcp.h              |  27 +
+ pc-bios/s390-ccw/libnet/tftp.c             | 595 ++++++++++++++++++
+ pc-bios/s390-ccw/libnet/tftp.h             |  50 ++
+ pc-bios/s390-ccw/libnet/time.h             |   6 +
+ pc-bios/s390-ccw/libnet/timer.c            |  40 ++
+ pc-bios/s390-ccw/libnet/udp.c              | 115 ++++
+ pc-bios/s390-ccw/libnet/udp.h              |  53 ++
+ pc-bios/s390-ccw/main.c                    |   3 +-
+ pc-bios/s390-ccw/s390-ccw.h                |  30 +-
+ pc-bios/s390-ccw/sbrk.c                    |  39 ++
+ pc-bios/s390-ccw/sclp.c                    |  32 +-
+ pc-bios/s390-ccw/virtio-net.c              | 125 ++++
+ pc-bios/s390-ccw/virtio.c                  |  16 +-
+ pc-bios/s390-ccw/virtio.h                  |  11 +
+ 104 files changed, 9296 insertions(+), 57 deletions(-)
+ create mode 100644 pc-bios/s390-ccw/libc/Makefile
+ create mode 100644 pc-bios/s390-ccw/libc/README.txt
+ create mode 100644 pc-bios/s390-ccw/libc/ctype/Makefile.inc
+ create mode 100644 pc-bios/s390-ccw/libc/ctype/isdigit.c
+ create mode 100644 pc-bios/s390-ccw/libc/ctype/isprint.c
+ create mode 100644 pc-bios/s390-ccw/libc/ctype/isspace.c
+ create mode 100644 pc-bios/s390-ccw/libc/ctype/isxdigit.c
+ create mode 100644 pc-bios/s390-ccw/libc/ctype/tolower.c
+ create mode 100644 pc-bios/s390-ccw/libc/ctype/toupper.c
+ create mode 100644 pc-bios/s390-ccw/libc/include/ctype.h
+ create mode 100644 pc-bios/s390-ccw/libc/include/errno.h
+ create mode 100644 pc-bios/s390-ccw/libc/include/limits.h
+ create mode 100644 pc-bios/s390-ccw/libc/include/stdarg.h
+ create mode 100644 pc-bios/s390-ccw/libc/include/stdbool.h
+ create mode 100644 pc-bios/s390-ccw/libc/include/stddef.h
+ create mode 100644 pc-bios/s390-ccw/libc/include/stdint.h
+ create mode 100644 pc-bios/s390-ccw/libc/include/stdio.h
+ create mode 100644 pc-bios/s390-ccw/libc/include/stdlib.h
+ create mode 100644 pc-bios/s390-ccw/libc/include/string.h
+ create mode 100644 pc-bios/s390-ccw/libc/include/sys/socket.h
+ create mode 100644 pc-bios/s390-ccw/libc/include/unistd.h
+ create mode 100644 pc-bios/s390-ccw/libc/stdio/Makefile.inc
+ create mode 100644 pc-bios/s390-ccw/libc/stdio/fileno.c
+ create mode 100644 pc-bios/s390-ccw/libc/stdio/fprintf.c
+ create mode 100644 pc-bios/s390-ccw/libc/stdio/printf.c
+ create mode 100644 pc-bios/s390-ccw/libc/stdio/putc.c
+ create mode 100644 pc-bios/s390-ccw/libc/stdio/putchar.c
+ create mode 100644 pc-bios/s390-ccw/libc/stdio/puts.c
+ create mode 100644 pc-bios/s390-ccw/libc/stdio/setvbuf.c
+ create mode 100644 pc-bios/s390-ccw/libc/stdio/sprintf.c
+ create mode 100644 pc-bios/s390-ccw/libc/stdio/stdchnls.c
+ create mode 100644 pc-bios/s390-ccw/libc/stdio/vfprintf.c
+ create mode 100644 pc-bios/s390-ccw/libc/stdio/vsnprintf.c
+ create mode 100644 pc-bios/s390-ccw/libc/stdio/vsprintf.c
+ create mode 100644 pc-bios/s390-ccw/libc/stdlib/Makefile.inc
+ create mode 100644 pc-bios/s390-ccw/libc/stdlib/atoi.c
+ create mode 100644 pc-bios/s390-ccw/libc/stdlib/atol.c
+ create mode 100644 pc-bios/s390-ccw/libc/stdlib/error.c
+ create mode 100644 pc-bios/s390-ccw/libc/stdlib/free.c
+ create mode 100644 pc-bios/s390-ccw/libc/stdlib/malloc.c
+ create mode 100644 pc-bios/s390-ccw/libc/stdlib/malloc_defs.h
+ create mode 100644 pc-bios/s390-ccw/libc/stdlib/memalign.c
+ create mode 100644 pc-bios/s390-ccw/libc/stdlib/rand.c
+ create mode 100644 pc-bios/s390-ccw/libc/stdlib/realloc.c
+ create mode 100644 pc-bios/s390-ccw/libc/stdlib/strtol.c
+ create mode 100644 pc-bios/s390-ccw/libc/stdlib/strtoul.c
+ create mode 100644 pc-bios/s390-ccw/libc/string/Makefile.inc
+ create mode 100644 pc-bios/s390-ccw/libc/string/memchr.c
+ create mode 100644 pc-bios/s390-ccw/libc/string/memcmp.c
+ create mode 100644 pc-bios/s390-ccw/libc/string/memcpy.c
+ create mode 100644 pc-bios/s390-ccw/libc/string/memmove.c
+ create mode 100644 pc-bios/s390-ccw/libc/string/memset.c
+ create mode 100644 pc-bios/s390-ccw/libc/string/strcasecmp.c
+ create mode 100644 pc-bios/s390-ccw/libc/string/strcat.c
+ create mode 100644 pc-bios/s390-ccw/libc/string/strchr.c
+ create mode 100644 pc-bios/s390-ccw/libc/string/strcmp.c
+ create mode 100644 pc-bios/s390-ccw/libc/string/strcpy.c
+ create mode 100644 pc-bios/s390-ccw/libc/string/strlen.c
+ create mode 100644 pc-bios/s390-ccw/libc/string/strncasecmp.c
+ create mode 100644 pc-bios/s390-ccw/libc/string/strncmp.c
+ create mode 100644 pc-bios/s390-ccw/libc/string/strncpy.c
+ create mode 100644 pc-bios/s390-ccw/libc/string/strstr.c
+ create mode 100644 pc-bios/s390-ccw/libc/string/strtok.c
+ create mode 100644 pc-bios/s390-ccw/libnet/Makefile
+ create mode 100644 pc-bios/s390-ccw/libnet/args.c
+ create mode 100644 pc-bios/s390-ccw/libnet/args.h
+ create mode 100644 pc-bios/s390-ccw/libnet/dhcp.c
+ create mode 100644 pc-bios/s390-ccw/libnet/dhcp.h
+ create mode 100644 pc-bios/s390-ccw/libnet/dhcpv6.c
+ create mode 100644 pc-bios/s390-ccw/libnet/dhcpv6.h
+ create mode 100644 pc-bios/s390-ccw/libnet/dns.c
+ create mode 100644 pc-bios/s390-ccw/libnet/dns.h
+ create mode 100644 pc-bios/s390-ccw/libnet/ethernet.c
+ create mode 100644 pc-bios/s390-ccw/libnet/ethernet.h
+ create mode 100644 pc-bios/s390-ccw/libnet/icmpv6.c
+ create mode 100644 pc-bios/s390-ccw/libnet/icmpv6.h
+ create mode 100644 pc-bios/s390-ccw/libnet/ipv4.c
+ create mode 100644 pc-bios/s390-ccw/libnet/ipv4.h
+ create mode 100644 pc-bios/s390-ccw/libnet/ipv6.c
+ create mode 100644 pc-bios/s390-ccw/libnet/ipv6.h
+ create mode 100644 pc-bios/s390-ccw/libnet/ndp.c
+ create mode 100644 pc-bios/s390-ccw/libnet/ndp.h
+ create mode 100644 pc-bios/s390-ccw/libnet/netapps.h
+ create mode 100644 pc-bios/s390-ccw/libnet/netload.c
+ create mode 100644 pc-bios/s390-ccw/libnet/tcp.c
+ create mode 100644 pc-bios/s390-ccw/libnet/tcp.h
+ create mode 100644 pc-bios/s390-ccw/libnet/tftp.c
+ create mode 100644 pc-bios/s390-ccw/libnet/tftp.h
+ create mode 100644 pc-bios/s390-ccw/libnet/time.h
+ create mode 100644 pc-bios/s390-ccw/libnet/timer.c
+ create mode 100644 pc-bios/s390-ccw/libnet/udp.c
+ create mode 100644 pc-bios/s390-ccw/libnet/udp.h
+ create mode 100644 pc-bios/s390-ccw/sbrk.c
+ create mode 100644 pc-bios/s390-ccw/virtio-net.c
+
 -- 
 1.8.3.1
