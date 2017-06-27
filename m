@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52896)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dPtkm-000719-Kk
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:54:19 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dPtku-0007PJ-Au
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:54:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dPtTo-0008MR-2C
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:36:47 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:33670)
+	(envelope-from <peter.maydell@linaro.org>) id 1dPtQV-00069m-If
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:33:20 -0400
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:38673)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dPtTn-0008MA-UU
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:36:43 -0400
-Received: by mail-qt0-x241.google.com with SMTP id c20so4421313qte.0
-	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 09:36:43 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170621024831.26019-1-rth@twiddle.net>
-	<20170621024831.26019-8-rth@twiddle.net> <87wp7xx1et.fsf@linaro.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <6225c2e2-d3a6-403e-fd99-cd053a859c1b@twiddle.net>
-Date: Tue, 27 Jun 2017 09:36:40 -0700
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dPtQV-00069H-Br
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 12:33:19 -0400
+Received: by mail-wm0-x22b.google.com with SMTP id b184so32502953wme.1
+	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 09:33:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87wp7xx1et.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 07/16] tcg: Return NULL temp for
- TCG_CALL_DUMMY_ARG
+In-Reply-To: <20170123021748.13170-3-rth@twiddle.net>
+References: <20170123021748.13170-1-rth@twiddle.net>
+	<20170123021748.13170-3-rth@twiddle.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Jun 2017 17:32:57 +0100
+Message-ID: <CAFEAcA8d-MkJhjGHa=sfdWSD2VgAwfhZyNikWruba9JAmruh=A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 02/26] linux-user: Support stack-grows-up in
+ elfload.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,35 +30,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, aurelien@aurel32.net
+To: Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 06/27/2017 01:47 AM, Alex Bennée wrote:
-> 
-> Richard Henderson <rth@twiddle.net> writes:
-> 
->> Signed-off-by: Richard Henderson <rth@twiddle.net>
->> ---
->>   tcg/tcg.h | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/tcg/tcg.h b/tcg/tcg.h
->> index 3b35344..6c357e7 100644
->> --- a/tcg/tcg.h
->> +++ b/tcg/tcg.h
->> @@ -730,7 +730,7 @@ extern bool parallel_cpus;
->>
->>   static inline TCGTemp *arg_temp(TCGArg a)
->>   {
->> -    return &tcg_ctx.temps[a];
->> +    return a == TCG_CALL_DUMMY_ARG ? NULL : &tcg_ctx.temps[a];
->>   }
-> 
-> It doesn't look like a lot of calls to arg_temp are able to deal with a
-> NULL return and may well immediately deref the value. Are we sure the
-> cases the TCG_CALL_DUMMY arg is involved are narrowly defined?
+On 23 January 2017 at 02:17, Richard Henderson <rth@twiddle.net> wrote:
+> HPPA is a (the) stack-grows-up target, and supporting that requires
+> rearranging how we compute addresses while laying out the initial
+> program stack.  In addition, hppa32 requires 64-byte stack alignment
+> so parameterize that as well.
 
-They only appear as arguments to a call opcode.
+>  #define NEW_AUX_ENT(id, val) do {               \
+> -        sp -= n; put_user_ual(val, sp);         \
+> -        sp -= n; put_user_ual(id, sp);          \
+> +        put_user_ual(id, u_auxv);  u_auxv += n; \
+> +        put_user_ual(val, u_auxv); u_auxv += n; \
+>      } while(0)
 
+I've just noticed that this change breaks powerpc32, because now
+we fill in the auxv starting at the lowest address and working
+up, rather than starting at the highest address and working down.
+powerpc32 needs some magic values at the lowest address, which
+we deal with in ARCH_DLINFO. So now we need to invoke ARCH_DLINFO
+first, rather than last (the kernel also fills auxv in from
+low to high and invokes ARCH_DLINFO first). The PPC ARCH_DLINFO
+also needs to have its entries reversed so the AT_IGNOREPPC
+entries come first (lowest address).
 
-r~
+The effect of this bug is that my ppc test program
+(which is one of the ones in the ancient collection on the
+wiki: http://wiki.qemu.org/download/linux-user-test-0.3.tar.gz )
+segfaults on startup if the environment is the wrong size:
+
+e104462:xenial:linux-user-test-0.3$ X=1
+/home/petmay01/linaro/qemu-for-merges/build/all-linux-static/ppc-linux-user/qemu-ppc
+-L ./gnemul/qemu-ppc ppc/ls -l dummyfile
+-rw-r--r--    1 petmay01 petmay01        0 Nov 12  2007 dummyfile
+e104462:xenial:linux-user-test-0.3$ X=1 Y=1
+/home/petmay01/linaro/qemu-for-merges/build/all-linux-static/ppc-linux-user/qemu-ppc
+-L ./gnemul/qemu-ppc ppc/ls -l dummyfile
+-rw-r--r--    1 petmay01 petmay01        0 Nov 12  2007 dummyfile
+e104462:xenial:linux-user-test-0.3$ X=1 Y=1 Z=1
+/home/petmay01/linaro/qemu-for-merges/build/all-linux-static/ppc-linux-user/qemu-ppc
+-L ./gnemul/qemu-ppc ppc/ls -l dummyfile
+-rw-r--r--    1 petmay01 petmay01        0 Nov 12  2007 dummyfile
+e104462:xenial:linux-user-test-0.3$ X=1 Y=1 Z=1 A=1
+/home/petmay01/linaro/qemu-for-merges/build/all-linux-static/ppc-linux-user/qemu-ppc
+-L ./gnemul/qemu-ppc ppc/ls -l dummyfile
+qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+Segmentation fault (core dumped)
+e104462:xenial:linux-user-test-0.3$ X=1 Y=1 Z=1 A=1 B=1
+/home/petmay01/linaro/qemu-for-merges/build/all-linux-static/ppc-linux-user/qemu-ppc
+-L ./gnemul/qemu-ppc ppc/ls -l dummyfile
+-rw-r--r--    1 petmay01 petmay01        0 Nov 12  2007 dummyfile
+
+(exactly which 1 out of 4 will fail for you will depend
+on the size of your environment, etc, obviously.)
+
+Newer ppc binaries which have glibc versions that dropped
+that attempt to handle alignment won't trip over this,
+only older ones.
+
+thanks
+-- PMM
