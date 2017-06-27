@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dPoTC-0007y7-LO
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 07:15:48 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dPojP-0002qn-1V
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 07:32:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dPoT8-0007Dr-4f
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 07:15:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47832)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dPoT7-0007DZ-RX
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 07:15:42 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CE3E9C045772
-	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 11:15:40 +0000 (UTC)
-References: <1498536619-14548-1-git-send-email-peterx@redhat.com>
-	<1498536619-14548-7-git-send-email-peterx@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9f1a393d-9cef-e18a-3336-91ded86f6afa@redhat.com>
-Date: Tue, 27 Jun 2017 06:15:37 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1dPojL-0005OR-U2
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 07:32:31 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:56337)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dPojL-0005Mr-Hc
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 07:32:27 -0400
+From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
+References: <149838022308.6497.2104916050645246693.stgit@frigg.lan>
+	<149838119390.6497.17430428991952287717.stgit@frigg.lan>
+	<20170626181226.GG17935@flamenco>
+Date: Tue, 27 Jun 2017 14:32:12 +0300
+In-Reply-To: <20170626181226.GG17935@flamenco> (Emilio G. Cota's message of
+	"Mon, 26 Jun 2017 14:12:26 -0400")
+Message-ID: <878tkdk6o3.fsf@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <1498536619-14548-7-git-send-email-peterx@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="wNRmtqJnRHIhtQcbUtiGHnUoC8DBr0eVg"
-Subject: Re: [Qemu-devel] [PATCH v6 06/10] migration: move only_migratable
- to MigrationState
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v9 04/26] target: [tcg] Add generic
+ translation framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,60 +30,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wNRmtqJnRHIhtQcbUtiGHnUoC8DBr0eVg
-From: Eric Blake <eblake@redhat.com>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier
- <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Juan Quintela <quintela@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <9f1a393d-9cef-e18a-3336-91ded86f6afa@redhat.com>
-Subject: Re: [PATCH v6 06/10] migration: move only_migratable to
- MigrationState
-References: <1498536619-14548-1-git-send-email-peterx@redhat.com>
- <1498536619-14548-7-git-send-email-peterx@redhat.com>
-In-Reply-To: <1498536619-14548-7-git-send-email-peterx@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Emilio G Cota writes:
 
-On 06/26/2017 11:10 PM, Peter Xu wrote:
-> One less global variable, and it does only matter with migration.
->=20
-> We keep the old "--only-migratable" option, but also now we support:
->=20
->   -global migration.only-migratable=3Dtrue
+> On Sun, Jun 25, 2017 at 11:59:54 +0300, Llu=C3=ADs Vilanova wrote:
+>> Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+>> ---
+>> Makefile.target                |    1=20
+>> include/exec/gen-icount.h      |    2=20
+>> include/exec/translate-block.h |  125 +++++++++++++++++++++++++++
+>> include/qom/cpu.h              |   22 +++++
+>> translate-block.c              |  185 ++++++++++++++++++++++++++++++++++=
+++++++
+>> 5 files changed, 334 insertions(+), 1 deletion(-)
+>> create mode 100644 include/exec/translate-block.h
+>> create mode 100644 translate-block.c
+> (snip)
+>> diff --git a/include/exec/translate-block.h b/include/exec/translate-blo=
+ck.h
+>> new file mode 100644
+>> index 0000000000..d14d23f2cb
+>> --- /dev/null
+>> +++ b/include/exec/translate-block.h
+> (snip)
+>> +/**
+>> + * DisasJumpType:
+>> + * @DJ_NEXT: Next instruction in program order.
+>> + * @DJ_TOO_MANY: Too many instructions translated.
+>> + * @DJ_TARGET: Start of target-specific conditions.
+>> + *
+>> + * What instruction to disassemble next.
+>> + */
+>> +typedef enum DisasJumpType {
+>> +    DJ_NEXT,
+>> +    DJ_TOO_MANY,
+>> +    DJ_TARGET,
+>> +} DisasJumpType;
 
-Does command line introspection work to see that this new spelling is
-available?  If not, what else can we do to let libvirt learn that the
-new form is preferred?
+> I'd give up on the enum to avoid unnecessary casts. Just define DJ_TARGET
+> (or rather, DISAS_TARGET :>) and let the architecture code add more defin=
+e's
+> using it.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+I'm all for restoring the original name (haven't checked if it will produce=
+ any
+redefine errors).
+
+But using an enum makes the API more explicit about the intended values. St=
+ill,
+if the churn of casting outweighs the API clarity, I can revert this.
+
+Another option previously suggested on the list is defining DISAS_TARGET_[0=
+..N]
+on the enum, and letting targets simply define their own name when mapped to
+those. I'll try that one before completely dropping the enum. That is, unle=
+ss
+someone is strongly for going back to defines.
 
 
---wNRmtqJnRHIhtQcbUtiGHnUoC8DBr0eVg
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZUj5ZAAoJEKeha0olJ0Nq6KwH/3Kc23vw3PR2P8CQu2Pe7150
-LjKpUjmwTJJrg80ZKAy2is5S1w2d8r765mkAwrNUvy55maUd0bd8o1ah3NRBtcyM
-vYsPKP65ppR0WH3hKLS/vkFd7RZrgXL2fKLm0Fq/cDVUe7hVaWYSzCr9PrMkoD+X
-qpvjcqtynTACDBnvRznp07bU0I1OXc7cGbMo/XxxmTKQu+5y3+P9xD8s3ckE47u0
-Vnb2rduIFM/f3JiKuw06hWQjZthuK507xHrp+G5/q1AuujycRh+JFBtuKndPvl+m
-iiJ2FBRF5xcDB5R7/qT+TzQuCSmwFUEHEkMfJ7GCOQzLUygWC5+gAVuCs27NjR4=
-=e6iv
------END PGP SIGNATURE-----
-
---wNRmtqJnRHIhtQcbUtiGHnUoC8DBr0eVg--
+Cheers,
+  Lluis
