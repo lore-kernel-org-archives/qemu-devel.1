@@ -1,22 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dPtx5-0003bW-Tv
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 13:07:01 -0400
+	(envelope-from <prvs=3441c70c0=anthony.perard@citrix.com>)
+	id 1dPtxh-000447-T5
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 13:07:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dPtx4-0006et-C5
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 13:06:59 -0400
-References: <20170608222617.20376-1-eblake@redhat.com>
-	<004dc59b-f1b0-548e-70af-3e1db1c749fa@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <37a05656-453b-1e2f-7fd2-18941aeedbf7@redhat.com>
-Date: Tue, 27 Jun 2017 12:06:47 -0500
+	(envelope-from <prvs=3441c70c0=anthony.perard@citrix.com>)
+	id 1dPtxd-0006na-LQ
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 13:07:37 -0400
+Received: from smtp.citrix.com ([66.165.176.89]:57773)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=3441c70c0=anthony.perard@citrix.com>)
+	id 1dPtxd-0006nL-Bg
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 13:07:33 -0400
+Date: Tue, 27 Jun 2017 17:07:59 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20170627160759.GA1598@perard.uk.xensource.com>
+References: <59492D1C0200007800164AA3@prv-mh.provo.novell.com>
+	<alpine.DEB.2.10.1706201421210.12819@sstabellini-ThinkPad-X260>
+	<594A2A1C0200007800164F2A@prv-mh.provo.novell.com>
+	<alpine.DEB.2.10.1706211108530.12819@sstabellini-ThinkPad-X260>
+	<594B8493020000780016595C@prv-mh.provo.novell.com>
+	<alpine.DEB.2.10.1706221146320.12819@sstabellini-ThinkPad-X260>
+	<594CEBEF0200007800166189@prv-mh.provo.novell.com>
+	<alpine.DEB.2.10.1706231131570.12819@sstabellini-ThinkPad-X260>
+	<5950A8D802000078001012A1@prv-mh.provo.novell.com>
+	<alpine.DEB.2.10.1706261206370.12819@sstabellini-ThinkPad-X260>
 MIME-Version: 1.0
-In-Reply-To: <004dc59b-f1b0-548e-70af-3e1db1c749fa@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Q4mor5nF2LCC6eI686ibkAMjFe4ebmWK5"
-Subject: Re: [Qemu-devel] [PATCH] nbd: Fix regression on resiliency to port
- scan
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <alpine.DEB.2.10.1706261206370.12819@sstabellini-ThinkPad-X260>
+Subject: Re: [Qemu-devel] [PATCH] xen/disk: don't leak stack data via
+ response ring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,207 +39,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, Kevin Wolf <kwolf@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, P J P <ppandit@redhat.com>
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Jan Beulich <jbeulich@suse.com>, julien.grall@arm.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Q4mor5nF2LCC6eI686ibkAMjFe4ebmWK5
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, Kevin Wolf <kwolf@redhat.com>,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- P J P <ppandit@redhat.com>
-Message-ID: <37a05656-453b-1e2f-7fd2-18941aeedbf7@redhat.com>
-Subject: Re: [PATCH] nbd: Fix regression on resiliency to port scan
-References: <20170608222617.20376-1-eblake@redhat.com>
- <004dc59b-f1b0-548e-70af-3e1db1c749fa@redhat.com>
-In-Reply-To: <004dc59b-f1b0-548e-70af-3e1db1c749fa@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, Jun 26, 2017 at 12:12:18PM -0700, Stefano Stabellini wrote:
+> On Mon, 26 Jun 2017, Jan Beulich wrote:
+> > >>> Stefano Stabellini <sstabellini@kernel.org> 06/23/17 8:43 PM >>>
+> > >On Fri, 23 Jun 2017, Jan Beulich wrote:
+> > >> >>> On 22.06.17 at 20:52, <sstabellini@kernel.org> wrote:
+> > >> > I am happy to write the code and/or the commit message. Would a simple
+> > >> > cast like below work to fix the security issue?
+> > >> 
+> > >> I suppose so, but you do realize that this is _exactly_ what
+> > >> my patch does, except you use dangerous casts while I play
+> > >> type-safe?
+> > >
+> > >Why is the cast dangerous?
+> > 
+> > Casts, and especially pointer ones) are always dangerous, as they have
+> > the potential of type changes elsewhere going unnoticed. You may have
+> > noticed that in reviews I'm often picking at casts, because in a majority
+> > of cases people use them they're not needed and hence their use is a
+> > (latent) risk.
+> > 
+> > > Both your patch and my version of it rely on
+> > >inner knowledge of the way the rings are laid out in memory, but at
+> > >least my patch doesn't introduce the risk of instantiating broken
+> > >structs. Besides, type safety checks don't add much value, given that we
+> > >rely on the way the ring.h macros have been written, which weren't even
+> > >imported in the QEMU project until March this year.
+> > 
+> > That's said, as it seems to imply backporting of the change to older
+> > qemu may then be problematic. Otoh I don't recall having had problems
+> > with using the patch with only minor adjustments on older trees of ours.
+> > 
+> > >These are the reasons why I prefer my version, but I would consider your
+> > >version with clear in-code comments that warn users to avoid
+> > >instantiating the structs because they are not ABI compliant.
+> > >
+> > >How do you want to proceed?
+> > 
+> > I can provide a version with comments added, but only next week. If you
+> > feel like you want to go with your variant, I won't stand in the way, but I
+> > also wouldn't give it my ack or alike (which you don't depend on anyway).
+> 
+> After careful consideration, I think I'll submit my version of the
+> patch, assuming that Anthony is OK with it. (FYI I had to keep your
+> signed-off-by line for copyright reasons: you own the copyright on some
+> of the changes.)
+> 
+> Anthony, what do you think of the following:
 
-On 06/11/2017 06:50 AM, Max Reitz wrote:
-> On 2017-06-09 00:26, Eric Blake wrote:
->> Back in qemu 2.5, qemu-nbd was immune to port probes (a transient
->> server would not quit, regardless of how many probe connections
->> came and went, until a connection actually negotiated).  But we
->> broke that in commit ee7d7aa
+I do prefare the version without cast, but this is fine too. It is much
+easier to understand that nothing changes beside the fact that field are
+filled directly on the shared ring rather than from the stack. So I'm
+fine with it.
 
->> Simple test across two terminals:
->> $ qemu-nbd -f raw -p 30001 file
->=20
-> Maybe this command line should contain a -t, because otherwise I don't
-> find it very CVE-worthy.
+You can add my
+Acked-by: Anthony PERARD <anthony.perard@citrix.com>
 
-I was on vacation when this patch got merged, so it's too late to modify
-the commit message now.  However, I'm following up now; first to point
-out that we now have the actual CVE number (it was not yet assigned when
-I originally posted - and if we hadn't merged yet, I would also have
-tweaked the commit message to call the id out): CVE-2017-9524
+> ---
+> 
+> xen/disk: don't leak stack data via response ring
+> 
+> Rather than constructing a local structure instance on the stack, fill
+> the fields directly on the shared ring, just like other (Linux)
+> backends do. Build on the fact that all response structure flavors are
+> actually identical (aside from alignment and padding at the end).
+> 
+> This is XSA-216.
+> 
+> Reported by: Anthony Perard <anthony.perard@citrix.com>
+> Signed-off-by: Jan Beulich <jbeulich@suse.com>
+> Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
+> 
+> diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
+> index 3a22805..9200511 100644
+> --- a/hw/block/xen_disk.c
+> +++ b/hw/block/xen_disk.c
+> @@ -769,31 +769,30 @@ static int blk_send_response_one(struct ioreq *ioreq)
+>      struct XenBlkDev  *blkdev = ioreq->blkdev;
+>      int               send_notify   = 0;
+>      int               have_requests = 0;
+> -    blkif_response_t  resp;
+> -    void              *dst;
+> -
+> -    resp.id        = ioreq->req.id;
+> -    resp.operation = ioreq->req.operation;
+> -    resp.status    = ioreq->status;
+> +    blkif_response_t  *resp;
+>  
+>      /* Place on the response ring for the relevant domain. */
+>      switch (blkdev->protocol) {
+>      case BLKIF_PROTOCOL_NATIVE:
+> -        dst = RING_GET_RESPONSE(&blkdev->rings.native, blkdev->rings.native.rsp_prod_pvt);
+> +        resp = (blkif_response_t *) RING_GET_RESPONSE(&blkdev->rings.native,
+> +                                 blkdev->rings.native.rsp_prod_pvt);
+>          break;
+>      case BLKIF_PROTOCOL_X86_32:
+> -        dst = RING_GET_RESPONSE(&blkdev->rings.x86_32_part,
+> -                                blkdev->rings.x86_32_part.rsp_prod_pvt);
+> +        resp = (blkif_response_t *) RING_GET_RESPONSE(&blkdev->rings.x86_32_part,
+> +                                 blkdev->rings.x86_32_part.rsp_prod_pvt);
+>          break;
+>      case BLKIF_PROTOCOL_X86_64:
+> -        dst = RING_GET_RESPONSE(&blkdev->rings.x86_64_part,
+> -                                blkdev->rings.x86_64_part.rsp_prod_pvt);
+> +        resp = (blkif_response_t *) RING_GET_RESPONSE(&blkdev->rings.x86_64_part,
+> +                                 blkdev->rings.x86_64_part.rsp_prod_pvt);
+>          break;
+>      default:
+> -        dst = NULL;
+>          return 0;
+>      }
+> -    memcpy(dst, &resp, sizeof(resp));
+> +
+> +    resp->id        = ioreq->req.id;
+> +    resp->operation = ioreq->req.operation;
+> +    resp->status    = ioreq->status;
+> +
+>      blkdev->rings.common.rsp_prod_pvt++;
+>  
+>      RING_PUSH_RESPONSES_AND_CHECK_NOTIFY(&blkdev->rings.common, send_notify);
 
->=20
-> First, sure, you can kill this NBD server with the below nmap
-> invocation, or with an "ncat localhost 30001". But you can also do so
-> with a plain "qemu-io -c quit nbd://localhost:30001".
-
-But in that case, without -t, you specifically wanted the server to go
-away after the first successful client, and that was indeed a successful
-client.
-
->=20
-> With -t you actually cannot kill it using ncat or qemu-io, but you can
-> with nmap. So this is what the actual issue is.
-
-You do make a point, though.  The command line example I gave is the
-old-style NBD, where there is no named export, and where any client is
-first in line for the given export - which is rather weak, and why
-upstream NBD discourages the old protocol in favor of the new where the
-client has to specify WHICH named export it wants.  And in the new
-protocol, if you are not using -t, then you want the server to ignore
-clients that aren't requesting the export that the server is willing to
-serve, rather than hanging up on the first random client that requests
-the wrong name.  And you properly investigated that scenario below...
-
->=20
-> And secondly, note that even after this patch you can make the NBD
-> server quit with "ncat localhost 30001" (just like with qemu-io).
->=20
->> $ nmap 127.0.0.1 -p 30001 && \
->>   qemu-io -c 'r 0 512' -f raw nbd://localhost:30001
->>
->> Note that this patch does not change what constitutes successful
->> negotiation (thus, a client must enter transmission phase before
->> that client can be considered as a reason to terminate the server
->> when the connection ends).
->=20
-> Well, the thing is that transmission phase starts immediately for the
-> old-style protocol:
->=20
-> $ ./qemu-nbd -f raw null-co:// &
-> [1] 24581
-> $ ncat --send-only localhost 10809 < /dev/null
-> nbd/server.c:nbd_receive_request():L706: read failed
-> [1]  + 24581 done       ./qemu-nbd -f raw null-co://
->=20
-> I'm not sure whether this is intended, but then again I'm not sure
-> whether we can or have to do anything about this (as I said above, you
-> can easily make the server quit with a qemu-io invocation if you're so
-> inclined.
-
-Old-style negotiation is not as important these days as new-style where
-a handshake occurs (in fact, upstream NBD documents but no longer
-implements old-style negotiation, so it has definitely moved into
-deprecated usage).
-
->=20
-> But the thing is that this really shows there should be a -t in the
-> qemu-nbd invocation in this commit message. The merit of this patch is
-> that it fixes a *crash* in qemu-nbd if someone closes the connection
-> immediately after opening it, not that it allows qemu-nbd to continue t=
-o
-> run when someone connects who is not an NBD client -- because it really=
-
-> doesn't.
-
-So yes, your arguments are good that the REAL denial-of-service is not
-against a server that expects only one client (or, with new-style, one
-client that knows about the specific export), but against a server
-running with -t that is supposed to be persistent regardless of how many
-clients consecutively connect to it.
-
->=20
-> (With the new style, option negotiation fails so we do not go to
-> transmission phase and the server stays alive:
->=20
-> $ ./qemu-nbd -x foo -f raw null-co:// &
-> [1] 24609
-> $ ncat --send-only localhost 10809 < /dev/null
-> nbd/server.c:nbd_negotiate_options():L442: read failed
-> nbd/server.c:nbd_negotiate():L673: option negotiation failed
-> $ kill %1
-> [1]  + 24609 done       ./qemu-nbd -x foo -f raw null-co://
->=20
-> )
->=20
->>                             Perhaps we may want to tweak things
->> in a later patch to also treat a client that uses NBD_OPT_ABORT
->> as being a 'successful' negotiation (the client correctly talked
->> the NBD protocol, and informed us it was not going to use our
->> export after all), but that's a discussion for another day.
->=20
-> Well, about that...
->=20
-> $ ./qemu-nbd -x foo -f raw null-co:// &
-> [1] 24389
-> $ ./qemu-io -c quit nbd://localhost/bar
-> can't open device nbd://localhost/bar: No export with name 'bar' availa=
-ble
-> [1]  + 24389 broken pipe  ./qemu-nbd -x foo -f raw null-co://
->=20
-> Even worse, the same happens with -t, both before and after this patch.=
-
-
-You later submitted the fix for this (ignoring SIGPIPE); what I'm now
-trying to figure out is whether your later patch is part of the same
-CVE-2017-9524 fix, or whether we need a second CVE assigned for this
-second denial-of-service scenario.
-
->=20
-> Having spent probably too much time for investigating, this happens
-> because the client just closes the pipe which results in a SIGPIPE sent=
-
-> to qemu-nbd when it tries to sendmsg() (in qio_channel_socket_writev())=
-
-> the ACK.
->=20
-> qemu-io and qemu-img use signal(SIGPIPE, SIG_IGN) (and os-posix.c has a=
-
-> sigaction() call for the same). qemu-nbd should probably, too.
-> ...Considering you're on vacation next week, maybe I should just write
-> that patch.
-
-Thanks for your investigations and followup patch.  Now, the task at
-hand is to figure out how important your followup patch is to the CVE
-question.
-
->=20
->> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1451614
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->> ---
->>  include/block/nbd.h |  2 +-
->>  blockdev-nbd.c      |  6 +++++-
->>  nbd/server.c        | 24 +++++++++++++++---------
->>  qemu-nbd.c          |  4 ++--
->>  4 files changed, 23 insertions(+), 13 deletions(-)
->=20
-> With a -t in the qemu-nbd command line:
->=20
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---Q4mor5nF2LCC6eI686ibkAMjFe4ebmWK5
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZUpCnAAoJEKeha0olJ0NqmNcIAJvfFjh7838+l44LTdHO0S3U
-KNDtFSEVtS4jkY6BQ9XMcU8r+mcO/sAipXS9myY1dIzQxBpkUrwvVL5oxoLHF2Pr
-qrmu2dR6obe1KuKMEIYcY19UllCYb8Swpzh8bXjvSiy4HN72nF9dd3YzQyX4X7C0
-XnYR/LFZOq9HyumecRDk8OiLgyoSkwUAPBHw2n7RQ8T8nH+cicHKyi5rc7YpSCD+
-qvGzcWXuFwOwxXPq50vPNQgUwM5f+41XclFDTLoW7iyG4qden4nGGE+wku9tqg02
-Sp1KsNJXKAoEDSN3qSy9XyZVr5XDxPkIyq5H99YlE14aX/DemnYWd+Sn5knCnro=
-=RACw
------END PGP SIGNATURE-----
-
---Q4mor5nF2LCC6eI686ibkAMjFe4ebmWK5--
+-- 
+Anthony PERARD
