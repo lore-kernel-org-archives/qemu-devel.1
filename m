@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dQIEv-0005ee-QR
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:03:07 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dQIFC-0005rQ-If
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:03:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dQIEu-0000Ha-PL
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:03:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58132)
+	(envelope-from <dgilbert@redhat.com>) id 1dQIF7-0000Lh-MI
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:03:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55742)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dQIEu-0000HH-HN
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:03:00 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dQIF7-0000LO-Fp
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:03:13 -0400
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 28 Jun 2017 20:00:45 +0100
-Message-Id: <20170628190047.26159-28-dgilbert@redhat.com>
+Date: Wed, 28 Jun 2017 20:00:47 +0100
+Message-Id: <20170628190047.26159-30-dgilbert@redhat.com>
 In-Reply-To: <20170628190047.26159-1-dgilbert@redhat.com>
 References: <20170628190047.26159-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [RFC 27/29] vhost+postcopy: Wire up POSTCOPY_END notify
+Subject: [Qemu-devel] [RFC 29/29] vhost-user: Claim support for postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,106 +27,26 @@ To: qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com,
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Wire up a call to VHOST_USER_POSTCOPY_END message to the vhost clients
-right before we ask the listener thread to shutdown.
+Tell QEMU we understand the protocol features needed for postcopy.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/virtio/trace-events   |  2 ++
- hw/virtio/vhost-user.c   | 30 ++++++++++++++++++++++++++++++
- migration/postcopy-ram.c |  5 +++++
- migration/postcopy-ram.h |  1 +
- 4 files changed, 38 insertions(+)
+ contrib/libvhost-user/libvhost-user.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index e320a90941..f18b67a1f2 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -1,6 +1,8 @@
- # See docs/tracing.txt for syntax documentation.
- 
- # hw/virtio/vhost-user.c
-+vhost_user_postcopy_end_entry(void) ""
-+vhost_user_postcopy_end_exit(void) ""
- vhost_user_postcopy_fault_handler(const char *name, uint64_t fault_address, int nregions) "%s: @%"PRIx64" nregions:%d"
- vhost_user_postcopy_fault_handler_loop(int i, uint64_t client_base, uint64_t size) "%d: client%"PRIx64" +%"PRIx64
- vhost_user_postcopy_fault_handler_found(int i, uint64_t region_offset, uint64_t rb_offset) "%d: region_offset: %"PRIx64" rb_offset:%"PRIx64
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index b29a141703..4388ce7c69 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -921,6 +921,33 @@ static int vhost_user_postcopy_listen(struct vhost_dev *dev, Error **errp)
-     return 0;
- }
- 
-+/*
-+ * Called at the end of postcopy
-+ */
-+static int vhost_user_postcopy_end(struct vhost_dev *dev, Error **errp)
-+{
-+    VhostUserMsg msg = {
-+        .request = VHOST_USER_POSTCOPY_END,
-+        .flags = VHOST_USER_VERSION | VHOST_USER_NEED_REPLY_MASK,
-+    };
-+    int ret;
-+
-+    trace_vhost_user_postcopy_end_entry();
-+    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-+        error_setg(errp, "Failed to send postcopy_end to vhost");
-+        return -1;
-+    }
-+
-+    ret = process_message_reply(dev, &msg);
-+    if (ret) {
-+        error_setg(errp, "Failed to receive reply to postcopy_end");
-+        return ret;
-+    }
-+    trace_vhost_user_postcopy_end_exit();
-+
-+    return 0;
-+}
-+
- static int vhost_user_postcopy_notifier(NotifierWithReturn *notifier,
-                                         void *opaque)
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+index c1716d1a62..1c46aecfb3 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -797,7 +797,8 @@ vu_set_vring_err_exec(VuDev *dev, VhostUserMsg *vmsg)
+ static bool
+ vu_get_protocol_features_exec(VuDev *dev, VhostUserMsg *vmsg)
  {
-@@ -946,6 +973,9 @@ static int vhost_user_postcopy_notifier(NotifierWithReturn *notifier,
-     case POSTCOPY_NOTIFY_INBOUND_LISTEN:
-         return vhost_user_postcopy_listen(dev, pnd->errp);
+-    uint64_t features = 1ULL << VHOST_USER_PROTOCOL_F_LOG_SHMFD;
++    uint64_t features = 1ULL << VHOST_USER_PROTOCOL_F_LOG_SHMFD |
++                        1ULL << VHOST_USER_PROTOCOL_F_POSTCOPY;
  
-+    case POSTCOPY_NOTIFY_INBOUND_END:
-+        return vhost_user_postcopy_end(dev, pnd->errp);
-+
-     default:
-         /* We ignore notifications we don't know */
-         break;
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index b97fc9398b..fdd53cdf1e 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -337,7 +337,12 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
- 
-     if (mis->have_fault_thread) {
-         uint64_t tmp64;
-+        Error *local_err = NULL;
- 
-+        if (postcopy_notify(POSTCOPY_NOTIFY_INBOUND_END, &local_err)) {
-+            error_report_err(local_err);
-+            return -1;
-+        }
-         if (qemu_ram_foreach_block(cleanup_range, mis)) {
-             return -1;
-         }
-diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
-index ecf731c689..d0dc838001 100644
---- a/migration/postcopy-ram.h
-+++ b/migration/postcopy-ram.h
-@@ -130,6 +130,7 @@ enum PostcopyNotifyReason {
-     POSTCOPY_NOTIFY_PROBE = 0,
-     POSTCOPY_NOTIFY_INBOUND_ADVISE,
-     POSTCOPY_NOTIFY_INBOUND_LISTEN,
-+    POSTCOPY_NOTIFY_INBOUND_END,
- };
- 
- struct PostcopyNotifyData {
+     if (dev->iface->get_protocol_features) {
+         features |= dev->iface->get_protocol_features(dev);
 -- 
 2.13.0
