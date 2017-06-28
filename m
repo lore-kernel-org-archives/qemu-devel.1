@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dQBC1-00033n-K5
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:31:34 -0400
+	(envelope-from <quintela@redhat.com>) id 1dQBBx-0002zc-97
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:31:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dQBC0-0004nE-ML
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:31:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44372)
+	(envelope-from <quintela@redhat.com>) id 1dQBBt-0004j1-V2
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:31:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58878)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dQBC0-0004n0-ES
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:31:32 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dQBBt-0004iF-KZ
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:31:25 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 82D6E7F6BA
-	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 11:31:31 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8B43F4E048
+	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 11:31:24 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 28 Jun 2017 13:31:01 +0200
-Message-Id: <20170628113106.5248-10-quintela@redhat.com>
+Date: Wed, 28 Jun 2017 13:30:58 +0200
+Message-Id: <20170628113106.5248-7-quintela@redhat.com>
 In-Reply-To: <20170628113106.5248-1-quintela@redhat.com>
 References: <20170628113106.5248-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 09/14] migration: merge enforce_config_section
- somewhat
+Subject: [Qemu-devel] [PULL 06/14] migration: move only_migratable to
+ MigrationState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,102 +35,139 @@ Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
 From: Peter Xu <peterx@redhat.com>
 
-These two parameters:
+One less global variable, and it does only matter with migration.
 
-- MachineState::enforce_config_section
-- MigrationState::send_configuration
+We keep the old "--only-migratable" option, but also now we support:
 
-are playing similar role here. This patch merges the first one into
-second, then we'll have a single place to reference whether we need to
-send the configuration section.
+  -global migration.only-migratable=true
 
-I didn't remove the MachineState.enforce_config_section field since when
-applying that machine property (in machine_set_property()) we haven't
-yet initialized global properties and migration object. Then, it's
-still not easy to pass that boolean to MigrationState at such an early
-time.
+Currently still keep the old interface.
 
-A natural benefit for current patch is that now we kept the meaning of
-"enforce-config-section" since it'll still have the highest
-priority (that's what "enforce" mean I guess).
+Hmm, now vl.c has no way to access migrate_get_current(). Export a
+function for it to setup only_migratable.
 
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <1498536619-14548-10-git-send-email-peterx@redhat.com>
+Message-Id: <1498536619-14548-7-git-send-email-peterx@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/migration.c | 12 ++++++++++++
- migration/savevm.c    | 12 ++----------
- 2 files changed, 14 insertions(+), 10 deletions(-)
+ include/migration/misc.h | 2 ++
+ include/sysemu/sysemu.h  | 1 -
+ migration/migration.c    | 8 +++++++-
+ migration/migration.h    | 3 +++
+ migration/savevm.c       | 2 +-
+ vl.c                     | 9 +++++++--
+ 6 files changed, 20 insertions(+), 5 deletions(-)
 
+diff --git a/include/migration/misc.h b/include/migration/misc.h
+index 2d36cf5..6ac3307 100644
+--- a/include/migration/misc.h
++++ b/include/migration/misc.h
+@@ -55,4 +55,6 @@ bool migration_has_finished(MigrationState *);
+ bool migration_has_failed(MigrationState *);
+ /* ...and after the device transmission */
+ bool migration_in_postcopy_after_devices(MigrationState *);
++void migration_only_migratable_set(void);
++
+ #endif
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 9841a52..b213696 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -15,7 +15,6 @@
+ /* vl.c */
+ 
+ extern const char *bios_name;
+-extern int only_migratable;
+ extern const char *qemu_name;
+ extern QemuUUID qemu_uuid;
+ extern bool qemu_uuid_set;
 diff --git a/migration/migration.c b/migration/migration.c
-index 96c6412..e7e6cf3 100644
+index 221b22c..67f9e68 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -42,6 +42,7 @@
- #include "exec/target_page.h"
- #include "io/channel-buffer.h"
- #include "migration/colo.h"
-+#include "hw/boards.h"
- 
- #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed throttling */
- 
-@@ -102,9 +103,20 @@ static MigrationState *current_migration;
- 
- void migration_object_init(void)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+
-     /* This can only be called once. */
-     assert(!current_migration);
-     current_migration = MIGRATION_OBJ(object_new(TYPE_MIGRATION));
-+
-+    /*
-+     * We cannot really do this in migration_instance_init() since at
-+     * that time global properties are not yet applied, then this
-+     * value will be definitely replaced by something else.
-+     */
-+    if (ms->enforce_config_section) {
-+        current_migration->send_configuration = true;
-+    }
+@@ -115,6 +115,11 @@ MigrationState *migrate_get_current(void)
+     return current_migration;
  }
  
- /* For outgoing */
++void migration_only_migratable_set(void)
++{
++    migrate_get_current()->only_migratable = true;
++}
++
+ MigrationIncomingState *migration_incoming_get_current(void)
+ {
+     static bool once;
+@@ -986,7 +991,7 @@ static GSList *migration_blockers;
+ 
+ int migrate_add_blocker(Error *reason, Error **errp)
+ {
+-    if (only_migratable) {
++    if (migrate_get_current()->only_migratable) {
+         error_propagate(errp, error_copy(reason));
+         error_prepend(errp, "disallowing migration blocker "
+                           "(--only_migratable) for: ");
+@@ -1979,6 +1984,7 @@ void migrate_fd_connect(MigrationState *s)
+ static Property migration_properties[] = {
+     DEFINE_PROP_BOOL("store-global-state", MigrationState,
+                      store_global_state, true),
++    DEFINE_PROP_BOOL("only-migratable", MigrationState, only_migratable, false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/migration/migration.h b/migration/migration.h
+index 4b898e9..34377dd 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -139,6 +139,9 @@ struct MigrationState
+      * during migration.
+      */
+     bool store_global_state;
++
++    /* Whether the VM is only allowing for migratable devices */
++    bool only_migratable;
+ };
+ 
+ void migrate_set_state(int *state, int old_state, int new_state);
 diff --git a/migration/savevm.c b/migration/savevm.c
-index 7b39fb9..be3f885 100644
+index c7a49c9..1499cd3 100644
 --- a/migration/savevm.c
 +++ b/migration/savevm.c
-@@ -943,20 +943,13 @@ bool qemu_savevm_state_blocked(Error **errp)
-     return false;
- }
- 
--static bool enforce_config_section(void)
--{
--    MachineState *machine = MACHINE(qdev_get_machine());
--    return machine->enforce_config_section;
--}
--
- void qemu_savevm_state_header(QEMUFile *f)
+@@ -2336,7 +2336,7 @@ void vmstate_register_ram_global(MemoryRegion *mr)
+ bool vmstate_check_only_migratable(const VMStateDescription *vmsd)
  {
-     trace_savevm_state_header();
-     qemu_put_be32(f, QEMU_VM_FILE_MAGIC);
-     qemu_put_be32(f, QEMU_VM_FILE_VERSION);
- 
--    if (migrate_get_current()->send_configuration ||
--        enforce_config_section()) {
-+    if (migrate_get_current()->send_configuration) {
-         qemu_put_byte(f, QEMU_VM_CONFIGURATION);
-         vmstate_save_state(f, &vmstate_configuration, &savevm_state, 0);
-     }
-@@ -1980,8 +1973,7 @@ int qemu_loadvm_state(QEMUFile *f)
-         return -ENOTSUP;
+     /* check needed if --only-migratable is specified */
+-    if (!only_migratable) {
++    if (!migrate_get_current()->only_migratable) {
+         return true;
      }
  
--    if (migrate_get_current()->send_configuration ||
--        enforce_config_section()) {
-+    if (migrate_get_current()->send_configuration) {
-         if (qemu_get_byte(f) != QEMU_VM_CONFIGURATION) {
-             error_report("Configuration section missing");
-             return -EINVAL;
+diff --git a/vl.c b/vl.c
+index f0a0515..36ff3f4 100644
+--- a/vl.c
++++ b/vl.c
+@@ -188,7 +188,6 @@ bool boot_strict;
+ uint8_t *boot_splash_filedata;
+ size_t boot_splash_filedata_size;
+ uint8_t qemu_extra_params_fw[2];
+-int only_migratable; /* turn it off unless user states otherwise */
+ 
+ int icount_align_option;
+ 
+@@ -3953,7 +3952,13 @@ int main(int argc, char **argv, char **envp)
+                 incoming = optarg;
+                 break;
+             case QEMU_OPTION_only_migratable:
+-                only_migratable = 1;
++                /*
++                 * TODO: we can remove this option one day, and we
++                 * should all use:
++                 *
++                 * "-global migration.only-migratable=true"
++                 */
++                migration_only_migratable_set();
+                 break;
+             case QEMU_OPTION_nodefaults:
+                 has_defaults = 0;
 -- 
 2.9.4
