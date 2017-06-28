@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dQJo0-0005Vn-M9
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 16:43:21 -0400
+	(envelope-from <laurent@vivier.eu>) id 1dQJo1-0005WF-FF
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 16:43:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dQJnz-0003Ve-Ji
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 16:43:20 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:52684)
+	(envelope-from <laurent@vivier.eu>) id 1dQJo0-0003W2-9n
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 16:43:21 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:64570)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dQJnz-0003VA-7Y
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 16:43:19 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dQJnz-0003VM-TI
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 16:43:20 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed, 28 Jun 2017 22:42:39 +0200
-Message-Id: <20170628204241.32106-6-laurent@vivier.eu>
+Date: Wed, 28 Jun 2017 22:42:40 +0200
+Message-Id: <20170628204241.32106-7-laurent@vivier.eu>
 In-Reply-To: <20170628204241.32106-1-laurent@vivier.eu>
 References: <20170628204241.32106-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v4 5/7] target/m68k: add fsglmul and fsgldiv
+Subject: [Qemu-devel] [PATCH v4 6/7] target/m68k: add explicit single and
+ double precision operations (part 2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,95 +27,159 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
 
-fsglmul and fsgldiv truncate data to single precision before computing
-results.
+Add fsabs, fdabs, fsneg, fdneg, fsmove and fdmove.
+
+The value is converted using the new floatx80_round() function.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
- target/m68k/fpu_helper.c | 28 ++++++++++++++++++++++++++++
- target/m68k/helper.h     |  2 ++
- target/m68k/translate.c  |  6 ++++++
- 3 files changed, 36 insertions(+)
+ target/m68k/fpu_helper.c | 48 +++++++++++++++++++++++++++++++++++++++++++++---
+ target/m68k/helper.h     |  8 +++++++-
+ target/m68k/translate.c  | 26 ++++++++++++++++++++++----
+ 3 files changed, 74 insertions(+), 8 deletions(-)
 
 diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
-index 3b53554..600ae8a 100644
+index 600ae8a..382fbc1 100644
 --- a/target/m68k/fpu_helper.c
 +++ b/target/m68k/fpu_helper.c
-@@ -253,6 +253,20 @@ void HELPER(fdmul)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
-     PREC_END();
- }
+@@ -167,6 +167,20 @@ void HELPER(set_fpcr)(CPUM68KState *env, uint32_t val)
+         set_floatx80_rounding_precision(old, &env->fp_status);  \
+     } while (0)
  
-+void HELPER(fsglmul)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
++void HELPER(fsround)(CPUM68KState *env, FPReg *res, FPReg *val)
 +{
-+    int rounding_mode = get_float_rounding_mode(&env->fp_status);
-+    floatx80 a, b;
-+
 +    PREC_BEGIN(32);
-+    set_float_rounding_mode(float_round_to_zero, &env->fp_status);
-+    a = floatx80_round(val0->d, &env->fp_status);
-+    b = floatx80_round(val1->d, &env->fp_status);
-+    set_float_rounding_mode(rounding_mode, &env->fp_status);
-+    res->d = floatx80_mul(a, b, &env->fp_status);
++    res->d = floatx80_round(val->d, &env->fp_status);
 +    PREC_END();
 +}
 +
- void HELPER(fdiv)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
- {
-     res->d = floatx80_div(val1->d, val0->d, &env->fp_status);
-@@ -272,6 +286,20 @@ void HELPER(fddiv)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
-     PREC_END();
- }
- 
-+void HELPER(fsgldiv)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
++void HELPER(fdround)(CPUM68KState *env, FPReg *res, FPReg *val)
 +{
-+    int rounding_mode = get_float_rounding_mode(&env->fp_status);
-+    floatx80 a, b;
-+
-+    PREC_BEGIN(32);
-+    set_float_rounding_mode(float_round_to_zero, &env->fp_status);
-+    a = floatx80_round(val1->d, &env->fp_status);
-+    b = floatx80_round(val0->d, &env->fp_status);
-+    set_float_rounding_mode(rounding_mode, &env->fp_status);
-+    res->d = floatx80_div(a, b, &env->fp_status);
++    PREC_BEGIN(64);
++    res->d = floatx80_round(val->d, &env->fp_status);
 +    PREC_END();
 +}
 +
- static int float_comp_to_cc(int float_compare)
+ void HELPER(fsqrt)(CPUM68KState *env, FPReg *res, FPReg *val)
  {
-     switch (float_compare) {
+     res->d = floatx80_sqrt(val->d, &env->fp_status);
+@@ -188,12 +202,40 @@ void HELPER(fdsqrt)(CPUM68KState *env, FPReg *res, FPReg *val)
+ 
+ void HELPER(fabs)(CPUM68KState *env, FPReg *res, FPReg *val)
+ {
+-    res->d = floatx80_abs(val->d);
++    res->d = floatx80_round(floatx80_abs(val->d), &env->fp_status);
++}
++
++void HELPER(fsabs)(CPUM68KState *env, FPReg *res, FPReg *val)
++{
++    PREC_BEGIN(32);
++    res->d = floatx80_round(floatx80_abs(val->d), &env->fp_status);
++    PREC_END();
++}
++
++void HELPER(fdabs)(CPUM68KState *env, FPReg *res, FPReg *val)
++{
++    PREC_BEGIN(64);
++    res->d = floatx80_round(floatx80_abs(val->d), &env->fp_status);
++    PREC_END();
++}
++
++void HELPER(fneg)(CPUM68KState *env, FPReg *res, FPReg *val)
++{
++    res->d = floatx80_round(floatx80_chs(val->d), &env->fp_status);
+ }
+ 
+-void HELPER(fchs)(CPUM68KState *env, FPReg *res, FPReg *val)
++void HELPER(fsneg)(CPUM68KState *env, FPReg *res, FPReg *val)
+ {
+-    res->d = floatx80_chs(val->d);
++    PREC_BEGIN(32);
++    res->d = floatx80_round(floatx80_chs(val->d), &env->fp_status);
++    PREC_END();
++}
++
++void HELPER(fdneg)(CPUM68KState *env, FPReg *res, FPReg *val)
++{
++    PREC_BEGIN(64);
++    res->d = floatx80_round(floatx80_chs(val->d), &env->fp_status);
++    PREC_END();
+ }
+ 
+ void HELPER(fadd)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
 diff --git a/target/m68k/helper.h b/target/m68k/helper.h
-index 0c7f06f..f05191b 100644
+index f05191b..b396899 100644
 --- a/target/m68k/helper.h
 +++ b/target/m68k/helper.h
-@@ -39,9 +39,11 @@ DEF_HELPER_4(fdsub, void, env, fp, fp, fp)
- DEF_HELPER_4(fmul, void, env, fp, fp, fp)
- DEF_HELPER_4(fsmul, void, env, fp, fp, fp)
- DEF_HELPER_4(fdmul, void, env, fp, fp, fp)
-+DEF_HELPER_4(fsglmul, void, env, fp, fp, fp)
- DEF_HELPER_4(fdiv, void, env, fp, fp, fp)
- DEF_HELPER_4(fsdiv, void, env, fp, fp, fp)
- DEF_HELPER_4(fddiv, void, env, fp, fp, fp)
-+DEF_HELPER_4(fsgldiv, void, env, fp, fp, fp)
- DEF_HELPER_FLAGS_3(fcmp, TCG_CALL_NO_RWG, void, env, fp, fp)
- DEF_HELPER_FLAGS_2(set_fpcr, TCG_CALL_NO_RWG, void, env, i32)
- DEF_HELPER_FLAGS_2(ftst, TCG_CALL_NO_RWG, void, env, fp)
+@@ -23,13 +23,19 @@ DEF_HELPER_2(redf32, f32, env, fp)
+ DEF_HELPER_2(redf64, f64, env, fp)
+ DEF_HELPER_2(reds32, s32, env, fp)
+ 
++DEF_HELPER_3(fsround, void, env, fp, fp)
++DEF_HELPER_3(fdround, void, env, fp, fp)
+ DEF_HELPER_3(firound, void, env, fp, fp)
+ DEF_HELPER_3(fitrunc, void, env, fp, fp)
+ DEF_HELPER_3(fsqrt, void, env, fp, fp)
+ DEF_HELPER_3(fssqrt, void, env, fp, fp)
+ DEF_HELPER_3(fdsqrt, void, env, fp, fp)
+ DEF_HELPER_3(fabs, void, env, fp, fp)
+-DEF_HELPER_3(fchs, void, env, fp, fp)
++DEF_HELPER_3(fsabs, void, env, fp, fp)
++DEF_HELPER_3(fdabs, void, env, fp, fp)
++DEF_HELPER_3(fneg, void, env, fp, fp)
++DEF_HELPER_3(fsneg, void, env, fp, fp)
++DEF_HELPER_3(fdneg, void, env, fp, fp)
+ DEF_HELPER_4(fadd, void, env, fp, fp, fp)
+ DEF_HELPER_4(fsadd, void, env, fp, fp, fp)
+ DEF_HELPER_4(fdadd, void, env, fp, fp, fp)
 diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 618abf6..72c45de 100644
+index 72c45de..89ac2c7 100644
 --- a/target/m68k/translate.c
 +++ b/target/m68k/translate.c
-@@ -4646,6 +4646,12 @@ DISAS_INSN(fpu)
-     case 0x67: /* fdmul */
-         gen_helper_fdmul(cpu_env, cpu_dest, cpu_src, cpu_dest);
+@@ -4595,9 +4595,15 @@ DISAS_INSN(fpu)
+     }
+     cpu_dest = gen_fp_ptr(REG(ext, 7));
+     switch (opmode) {
+-    case 0: case 0x40: case 0x44: /* fmove */
++    case 0: /* fmove */
+         gen_fp_move(cpu_dest, cpu_src);
          break;
-+    case 0x24: /* fsgldiv */
-+        gen_helper_fsgldiv(cpu_env, cpu_dest, cpu_src, cpu_dest);
++    case 0x40: /* fsmove */
++        gen_helper_fsround(cpu_env, cpu_dest, cpu_src);
 +        break;
-+    case 0x27: /* fsglmul */
-+        gen_helper_fsglmul(cpu_env, cpu_dest, cpu_src, cpu_dest);
++    case 0x44: /* fdmove */
++        gen_helper_fdround(cpu_env, cpu_dest, cpu_src);
 +        break;
-     case 0x28: /* fsub */
-         gen_helper_fsub(cpu_env, cpu_dest, cpu_src, cpu_dest);
+     case 1: /* fint */
+         gen_helper_firound(cpu_env, cpu_dest, cpu_src);
          break;
+@@ -4613,11 +4619,23 @@ DISAS_INSN(fpu)
+     case 0x45: /* fdsqrt */
+         gen_helper_fdsqrt(cpu_env, cpu_dest, cpu_src);
+         break;
+-    case 0x18: case 0x58: case 0x5c: /* fabs */
++    case 0x18: /* fabs */
+         gen_helper_fabs(cpu_env, cpu_dest, cpu_src);
+         break;
+-    case 0x1a: case 0x5a: case 0x5e: /* fneg */
+-        gen_helper_fchs(cpu_env, cpu_dest, cpu_src);
++    case 0x58: /* fsabs */
++        gen_helper_fsabs(cpu_env, cpu_dest, cpu_src);
++        break;
++    case 0x5c: /* fdabs */
++        gen_helper_fdabs(cpu_env, cpu_dest, cpu_src);
++        break;
++    case 0x1a: /* fneg */
++        gen_helper_fneg(cpu_env, cpu_dest, cpu_src);
++        break;
++    case 0x5a: /* fsneg */
++        gen_helper_fsneg(cpu_env, cpu_dest, cpu_src);
++        break;
++    case 0x5e: /* fdneg */
++        gen_helper_fdneg(cpu_env, cpu_dest, cpu_src);
+         break;
+     case 0x20: /* fdiv */
+         gen_helper_fdiv(cpu_env, cpu_dest, cpu_src, cpu_dest);
 -- 
 2.9.4
