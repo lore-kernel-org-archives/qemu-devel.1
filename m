@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57443)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dQ55b-0002bw-Uk
+	(envelope-from <bobby.prani@gmail.com>) id 1dQ55b-0002bv-Ua
 	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 01:00:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dQ55Y-0004jb-Hv
+	(envelope-from <bobby.prani@gmail.com>) id 1dQ55X-0004ip-6G
 	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 01:00:32 -0400
-Received: from mail-yw0-x243.google.com ([2607:f8b0:4002:c05::243]:35172)
+Received: from mail-yw0-x242.google.com ([2607:f8b0:4002:c05::242]:35172)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1dQ55Y-0004iU-CH
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 01:00:28 -0400
-Received: by mail-yw0-x243.google.com with SMTP id z21so2779545ywz.2
-	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 22:00:26 -0700 (PDT)
+	id 1dQ55X-0004iG-2G
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 01:00:27 -0400
+Received: by mail-yw0-x242.google.com with SMTP id z21so2779536ywz.2
+	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 22:00:25 -0700 (PDT)
 From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Wed, 28 Jun 2017 01:00:03 -0400
-Message-Id: <20170628050003.1809-3-bobby.prani@gmail.com>
+Date: Wed, 28 Jun 2017 01:00:02 -0400
+Message-Id: <20170628050003.1809-2-bobby.prani@gmail.com>
 In-Reply-To: <20170628050003.1809-1-bobby.prani@gmail.com>
 References: <20170628050003.1809-1-bobby.prani@gmail.com>
-Subject: [Qemu-devel] [PATCH 2/2] [TEST] Collect TLB and victim TLB hit/miss
- stats
+Subject: [Qemu-devel] [PATCH 1/2] [TEST] aarch64: Use pmuserenr_el0 register
+ for instrumentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,211 +30,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: alex.bennee@linaro.org
 Cc: qemu-devel@nongnu.org, rth@twiddle.net
 
-I used the following patch to collect hit/miss TLB ratios for a few
-benchmarks. The results can be found here: http://imgur.com/a/gee1o
+We need a way for the benchmark running in the guest to indicate us to
+start/stop our instrumentation. On x86, we could use the 'cpuid'
+instruction along with an appropriately populated 'eax'
+register. However, no such dummy instruction exists for aarch64. So
+we modify the permission bits for 'pmuserenr_el0' register and tap
+that to instrument the guest code.
 
-Please note that these results also include boot/shutdown as the
-per-region instrumentation patch came later.
+You can use the following annotations on your region-of-interest to
+instrument the code.
+
+#define magic_enable() \
+  asm volatile ("msr pmuserenr_el0, %0" :: "r" (0xaaaaaaaa));
+#define magic_disable() \
+  asm volatile ("msr pmuserenr_el0, %0" :: "r" (0xfa11dead));
 
 Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
 ---
- accel/tcg/cputlb.c        | 12 ++++++++++++
- cpus.c                    | 26 ++++++++++++++++++++++++++
- include/exec/cpu-defs.h   |  4 ++++
- include/sysemu/cpus.h     |  2 ++
- target/arm/helper.c       |  6 +++++-
- tcg/i386/tcg-target.inc.c | 16 ++++++++++++++--
- vl.c                      |  3 +++
- 7 files changed, 66 insertions(+), 3 deletions(-)
+ target/arm/helper.c | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
 
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index ef52a7e5e0..2ac2397431 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -864,12 +864,19 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
-     }
- }
- 
-+extern bool enable_instrumentation;
-+
- /* Return true if ADDR is present in the victim tlb, and has been copied
-    back to the main tlb.  */
- static bool victim_tlb_hit(CPUArchState *env, size_t mmu_idx, size_t index,
-                            size_t elt_ofs, target_ulong page)
- {
-     size_t vidx;
-+
-+    if (enable_instrumentation) {
-+        env->tlb_access_victim++;
-+    }
-+
-     for (vidx = 0; vidx < CPU_VTLB_SIZE; ++vidx) {
-         CPUTLBEntry *vtlb = &env->tlb_v_table[mmu_idx][vidx];
-         target_ulong cmp = *(target_ulong *)((uintptr_t)vtlb + elt_ofs);
-@@ -885,6 +892,11 @@ static bool victim_tlb_hit(CPUArchState *env, size_t mmu_idx, size_t index,
-             CPUIOTLBEntry tmpio, *io = &env->iotlb[mmu_idx][index];
-             CPUIOTLBEntry *vio = &env->iotlb_v[mmu_idx][vidx];
-             tmpio = *io; *io = *vio; *vio = tmpio;
-+
-+            if (enable_instrumentation) {
-+                env->tlb_access_victim_hit++;
-+            }
-+
-             return true;
-         }
-     }
-diff --git a/cpus.c b/cpus.c
-index 14bb8d552e..14669b3469 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1602,6 +1602,32 @@ static bool all_vcpus_paused(void)
-     return true;
- }
- 
-+void print_tlb_stats(void)
-+{
-+    CPUState *cpu;
-+    CPU_FOREACH(cpu) {
-+        CPUArchState *cs = cpu->env_ptr;
-+
-+        fprintf(stderr, "TLB accesses %lu, hits %lu, victim accesses %lu, hits %lu\n",
-+                cs->tlb_access_total, cs->tlb_access_hit, cs->tlb_access_victim,
-+                cs->tlb_access_victim_hit);
-+    }
-+}
-+
-+void clear_tlb_stats(void)
-+{
-+    CPUState *cpu;
-+    CPU_FOREACH(cpu) {
-+        CPUArchState *cs = cpu->env_ptr;
-+
-+        cs->tlb_access_total        = 0;
-+        cs->tlb_access_hit          = 0;
-+        cs->tlb_access_victim       = 0;
-+        cs->tlb_access_victim       = 0;
-+        cs->tlb_access_victim_hit   = 0;
-+    }
-+}
-+
- void pause_all_vcpus(void)
- {
-     CPUState *cpu;
-diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
-index 5f4e303635..29b3c2ada8 100644
---- a/include/exec/cpu-defs.h
-+++ b/include/exec/cpu-defs.h
-@@ -138,6 +138,10 @@ typedef struct CPUIOTLBEntry {
-     target_ulong tlb_flush_addr;                                        \
-     target_ulong tlb_flush_mask;                                        \
-     target_ulong vtlb_index;                                            \
-+    target_ulong tlb_access_hit;                                        \
-+    target_ulong tlb_access_total;                                      \
-+    target_ulong tlb_access_victim;                                     \
-+    target_ulong tlb_access_victim_hit;                                 \
- 
- #else
- 
-diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
-index 731756d948..7d8d92646c 100644
---- a/include/sysemu/cpus.h
-+++ b/include/sysemu/cpus.h
-@@ -10,6 +10,8 @@ void resume_all_vcpus(void);
- void pause_all_vcpus(void);
- void cpu_stop_current(void);
- void cpu_ticks_init(void);
-+void print_tlb_stats(void);
-+void clear_tlb_stats(void);
- 
- void configure_icount(QemuOpts *opts, Error **errp);
- extern int use_icount;
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index dfbf03676c..d2e75b0f20 100644
+index 2594faa9b8..dfbf03676c 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -1124,7 +1124,9 @@ static uint64_t pmxevtyper_read(CPUARMState *env, const ARMCPRegInfo *ri)
+@@ -1124,9 +1124,24 @@ static uint64_t pmxevtyper_read(CPUARMState *env, const ARMCPRegInfo *ri)
      }
  }
- 
--bool enable_instrumentation;
-+extern bool enable_instrumentation;
-+extern void print_tlb_stats(void);
-+extern void clear_tlb_stats(void);
- 
- static void pmuserenr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                             uint64_t value)
-@@ -1139,6 +1141,8 @@ static void pmuserenr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-     } else if (value == 0xfa11dead) {
-         printf("Disabling instrumentation\n");
-         enable_instrumentation = false;
-+        print_tlb_stats();
-+        clear_tlb_stats();
-         tb_flush(cs);
-     }
- 
-diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index 9d7d25c017..b75bd54c35 100644
---- a/tcg/i386/tcg-target.inc.c
-+++ b/tcg/i386/tcg-target.inc.c
-@@ -1250,6 +1250,8 @@ static void * const qemu_st_helpers[16] = {
-     [MO_BEQ]  = helper_be_stq_mmu,
- };
- 
-+extern bool enable_instrumentation;
-+
- /* Perform the TLB load and compare.
- 
-    Inputs:
-@@ -1300,6 +1302,12 @@ static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
-         }
-     }
- 
-+    if (enable_instrumentation) {
-+        tcg_out_ld(s, TCG_TYPE_I64, r0, TCG_AREG0, offsetof(CPUArchState, tlb_access_total));
-+        tcg_out_addi(s, r0, 1);
-+        tcg_out_st(s, TCG_TYPE_I64, r0, TCG_AREG0, offsetof(CPUArchState, tlb_access_total));
-+    }
-+
-     tcg_out_mov(s, tlbtype, r0, addrlo);
-     tlb_mask = (target_ulong)TARGET_PAGE_MASK | a_mask;
- 
-@@ -1348,11 +1356,15 @@ static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
-         s->code_ptr += 4;
-     }
- 
--    /* TLB Hit.  */
--
-     /* add addend(r0), r1 */
-     tcg_out_modrm_offset(s, OPC_ADD_GvEv + hrexw, r1, r0,
-                          offsetof(CPUTLBEntry, addend) - which);
-+
-+    if (enable_instrumentation) {
-+        tcg_out_ld(s, TCG_TYPE_I64, r0, TCG_AREG0, offsetof(CPUArchState, tlb_access_hit));
-+        tcg_out_addi(s, r0, 1);
-+        tcg_out_st(s, TCG_TYPE_I64, r0, TCG_AREG0, offsetof(CPUArchState, tlb_access_hit));
-+    }
- }
- 
- /*
-diff --git a/vl.c b/vl.c
-index 59fea15488..7fa392c79e 100644
---- a/vl.c
-+++ b/vl.c
-@@ -192,6 +192,8 @@ int only_migratable; /* turn it off unless user states otherwise */
- 
- int icount_align_option;
  
 +bool enable_instrumentation;
 +
- /* The bytes in qemu_uuid are in the order specified by RFC4122, _not_ in the
-  * little-endian "wire format" described in the SMBIOS 2.6 specification.
-  */
-@@ -4761,5 +4763,6 @@ int main(int argc, char **argv, char **envp)
-     qemu_chr_cleanup();
-     /* TODO: unref root container, check all devices are ok */
- 
-+    print_tlb_stats();
-     return 0;
- }
+ static void pmuserenr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                             uint64_t value)
+ {
++    ARMCPU *cpu = arm_env_get_cpu(env);
++    CPUState *cs = CPU(cpu);
++
++    if (value == 0xaaaaaaaa) {
++        printf("Enabling instrumentation\n");
++        enable_instrumentation = true;
++        tb_flush(cs);
++    } else if (value == 0xfa11dead) {
++        printf("Disabling instrumentation\n");
++        enable_instrumentation = false;
++        tb_flush(cs);
++    }
++
+     if (arm_feature(env, ARM_FEATURE_V8)) {
+         env->cp15.c9_pmuserenr = value & 0xf;
+     } else {
+@@ -1316,13 +1331,13 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
+       .access = PL0_RW, .type = ARM_CP_CONST, .resetvalue = 0,
+       .accessfn = pmreg_access_xevcntr },
+     { .name = "PMUSERENR", .cp = 15, .crn = 9, .crm = 14, .opc1 = 0, .opc2 = 0,
+-      .access = PL0_R | PL1_RW, .accessfn = access_tpm,
++      .access = PL0_RW | PL1_RW, .accessfn = access_tpm,
+       .fieldoffset = offsetof(CPUARMState, cp15.c9_pmuserenr),
+       .resetvalue = 0,
+       .writefn = pmuserenr_write, .raw_writefn = raw_write },
+     { .name = "PMUSERENR_EL0", .state = ARM_CP_STATE_AA64,
+       .opc0 = 3, .opc1 = 3, .crn = 9, .crm = 14, .opc2 = 0,
+-      .access = PL0_R | PL1_RW, .accessfn = access_tpm, .type = ARM_CP_ALIAS,
++      .access = PL0_RW | PL1_RW, .accessfn = access_tpm, .type = ARM_CP_ALIAS,
+       .fieldoffset = offsetof(CPUARMState, cp15.c9_pmuserenr),
+       .resetvalue = 0,
+       .writefn = pmuserenr_write, .raw_writefn = raw_write },
 -- 
 2.13.0
