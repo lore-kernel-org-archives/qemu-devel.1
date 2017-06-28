@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dQBu1-0000IB-R8
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:17:03 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dQBug-0000pa-M4
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:17:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dQBtx-0008T5-1m
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:17:01 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:58870)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dQBtw-0008S7-FF
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:16:56 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed, 28 Jun 2017 15:16:40 +0300
-Message-Id: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
+	(envelope-from <stefanha@redhat.com>) id 1dQBub-0000NW-Oy
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:17:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37729)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dQBub-0000NI-GF
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:17:37 -0400
+Date: Wed, 28 Jun 2017 13:17:30 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170628121730.GD7538@stefanha-x1.localdomain>
+References: <20170615163813.7255-1-stefanha@redhat.com>
+	<20170615163813.7255-2-stefanha@redhat.com>
+	<20170627084348.GG14166@lemon.lan>
+	<20170627110735.GB4792@noname.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v11 00/29] translate: [tcg] Generic translation
- framework
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="bjuZg6miEcdLYP6q"
+Content-Disposition: inline
+In-Reply-To: <20170627110735.GB4792@noname.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/5] virtio-pci: use ioeventfd even when
+ KVM is disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,202 +31,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
-
-This series proposes a generic (target-agnostic) instruction translation
-framework.
-
-It basically provides a generic main loop for instruction disassembly, wh=
-ich
-calls target-specific functions when necessary. This generalization makes
-inserting new code in the main loop easier, and helps in keeping all targ=
-ets in
-synch as to the contents of it.
-
-This series also paves the way towards adding events to trace guest code
-execution (BBLs and instructions).
-
-I've ported i386/x86-64 and arm/aarch64 as an example to see how it fits =
-in the
-current organization, but will port the rest when this series gets merged.
-
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
-
-Changes in v11
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Convert gen_intermediate_code_a64 [Emilio G. Cota].
-* Replace "cpu_env" argument in icount functions with "tcg_ctx.cpu_env"
-  [Emilio G. Cota].
-* Drop QTAILQ_FOREACH_CONTINUE and cpu_breakpoint_get in favour of an exp=
-licit
-  breakpoint traversal [Richard Henderson].
-* Rename translate-block.[ch] into translator.[ch] [Emilio G. Cota].
-* Revert DJ_* names into DISAS_*, and provide generic DISAS_TARGET_* enum=
- values
-  instead of defining them as integers on each target.
-* Do not use DisasContextBase directly in target code (helps the compiler=
-'s
-  alias analysis) [Richard Henderson].
-* Make all generic translator hooks mandatory [Richard Henderson].
-* Rename TranslatorOps::disas_insn as TranslatorOps::translate_insn
-  [Richard Henderson].
-* Generalize TranslatorOps::disas_flags into TranslatorOps::disas_log to =
-support
-  future targets [Richard Henderson].
-* Split arm and aarch64 changes in different patches [Emilio G. Cota].
-* Make translator op structs constant [Richard Henderson].
-* Write a single entry point for both arm and aarch64 translation
-  [Richard Henderson].
-* Change format of commit titles [Emilio G. Cota].
-* Remove cross-page check from generic code (it's already embedded in mor=
-e
-  complex, and mandatory, checks in most targets).
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Pavel Butsykin <pbutsykin@virtuozzo.com>
 
 
-Changes in v10
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+--bjuZg6miEcdLYP6q
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-* Rebase on 931892e8a6.
-* Fix build errors for hppa, nios2 and openrisc.
+On Tue, Jun 27, 2017 at 01:07:35PM +0200, Kevin Wolf wrote:
+> Am 27.06.2017 um 10:43 hat Fam Zheng geschrieben:
+> > On Thu, 06/15 17:38, Stefan Hajnoczi wrote:
+> > > Old kvm.ko versions only supported a tiny number of ioeventfds so
+> > > virtio-pci avoids ioeventfds when kvm_has_many_ioeventfds() returns 0.
+> > >=20
+> > > Do not check kvm_has_many_ioeventfds() when KVM is disabled since it
+> > > always returns 0.  Since commit 8c56c1a592b5092d91da8d8943c17777d6462=
+a6f
+> > > ("memory: emulate ioeventfd") it has been possible to use ioeventfds =
+in
+> > > qtest or TCG mode.
+> > >=20
+> > > This patch makes -device virtio-blk-pci,iothread=3Diothread0 work even
+> > > when KVM is disabled.
+> > >=20
+> > > I have tested that virtio-blk-pci works under TCG both with and witho=
+ut
+> > > iothread.
+> > >=20
+> > > Cc: Michael S. Tsirkin <mst@redhat.com>
+> > > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> >=20
+> > This one was dropped out from Kevin's pull request but the iotest case
+> > update on 068 which depends on it is merged. Now the test fails for
+> > me:
+>=20
+> Whoops, sorry about that. Anyway, I think if we can, the way to fix it
+> is to find out why this patch is failing qtest, and merge a fixed v2,
+> rather than reverting the test cases.
+>=20
+> Stefan, can you reproduce the failure?
 
+I will merge this patch via my tree and send a pull request today.
 
-Changes in v9
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+The purpose of this patch is to make -device virtio-blk-pci,iothread=3DID
+work under TCG/qtest.  This is necessary because qemu-iotests isn't
+allowed to depend on KVM.
 
-* Further increase inter-mail sleep time during sending.
+--bjuZg6miEcdLYP6q
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
-Changes in v8
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+iQEcBAEBAgAGBQJZU55aAAoJEJykq7OBq3PIlNAIAMMNlduoYdArhIo5+lmcNwAZ
+5cTClX9Z+FYsYJuEpaGXE8a1qOphlFNMLvf2M4JcXQRlqxQO+Ki5pt2x/CYoh+eX
+EXtrf6sS6bWukdC55109seplGTtvYorApcZlGYDIaRegVMhB9fT2TPjseK6V1eft
+9gfXjkEoIlwxqhANwWtshOy+H9YM9GLDTXgdbMaQB02m/+Vo7Dz/P3cvkv+ZwyjX
+UKlLxl8K4ASDwaD76jcmKywE+gAxiinxcf7OQAIb5UZ/eFti3Pckwpw/m9Vt9LD5
+IloWXf0zbFSZ07YrqnDO0nQWQ7ZhWBVBHdgrCpqv3piF+lwqREjxOBK5cKAQwYA=
+=qc4n
+-----END PGP SIGNATURE-----
 
-* Increase inter-mail sleep time during sending (list keeps refusing some=
- emails
-  due to an excessive send rate).
-
-
-Changes in v7
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Change BreakpointHitType (BH_*) for BreakpointCheckType (BC_*).
-* Move target-specific translation functions to a struct (TranslatorOps).
-* Split target-specific changes into multiple patches.
-* Rebase on edf8bc9842.
-
-
-Changes in v6
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Rebase on upstream master (64175afc69).
-* Reorder fields in DisasContextBase to minimize padding [Richard Henders=
-on].
-
-
-Changes in v5
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Remove stray uses of "restrict" keyword.
-
-
-Changes in v4
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Document new macro QTAILQ_FOREACH_CONTINUE [Peter Maydell].
-* Fix coding style errors reported by checkpatch.
-* Remove use of "restrict" in added functions; it makes older gcc version=
-s barf
-  about compilation errors.
-
-
-Changes in v3
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Rebase on 0737f32daf.
-
-
-Changes in v2
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Port ARM and AARCH64 targets.
-* Fold single-stepping checks into "max_insns" [Richard Henderson].
-* Move instruction start marks to target code [Richard Henderson].
-* Add target hook for TB start.
-* Check for TCG temporary leaks.
-* Move instruction disassembly into a target hook.
-* Make breakpoint_hit() return an enum to accomodate target's needs (ARM).
-
-
-Llu=C3=ADs Vilanova (29):
-      Pass generic CPUState to gen_intermediate_code()
-      cpu-exec: Avoid global variables in icount-related functions
-      target: [tcg] Use a generic enum for DISAS_ values
-      target: [tcg] Add generic translation framework
-      target/i386: [tcg] Port to DisasContextBase
-      target/i386: [tcg] Refactor init_disas_context
-      target/i386: [tcg] Refactor init_globals
-      target/i386: [tcg] Refactor insn_start
-      target/i386: [tcg] Refactor breakpoint_check
-      target/i386: [tcg] Refactor translate_insn
-      target/i386: [tcg] Refactor tb_stop
-      target/i386: [tcg] Refactor disas_log
-      target/i386: [tcg] Port to generic translation framework
-      target/arm: [tcg] Port to DisasContextBase
-      target/arm: [tcg] Port to init_disas_context
-      target/arm: [tcg,a64] Port to init_disas_context
-      target/arm: [tcg] Port to init_globals
-      target/arm: [tcg] Port to tb_start
-      target/arm: [tcg] Port to insn_start
-      target/arm: [tcg,a64] Port to insn_start
-      target/arm: [tcg] Port to breakpoint_check
-      target/arm: [tcg,a64] Port to breakpoint_check
-      target/arm: [tcg] Port to translate_insn
-      target/arm: [tcg,a64] Port to translate_insn
-      target/arm: [tcg] Port to tb_stop
-      target/arm: [tcg,a64] Port to tb_stop
-      target/arm: [tcg] Port to disas_log
-      target/arm: [tcg,a64] Port to disas_log
-      target/arm: [tcg] Port to generic translation framework
-
-
- accel/tcg/Makefile.objs       |    1=20
- accel/tcg/translate-all.c     |    2=20
- accel/tcg/translator.c        |  153 +++++++++++++++
- include/exec/exec-all.h       |    8 -
- include/exec/gen-icount.h     |   10 -
- include/exec/translator.h     |  142 ++++++++++++++
- target/alpha/translate.c      |   11 -
- target/arm/translate-a64.c    |  280 +++++++++++++--------------
- target/arm/translate.c        |  419 +++++++++++++++++++++--------------=
-------
- target/arm/translate.h        |   41 ++--
- target/cris/translate.c       |   24 +-
- target/hppa/translate.c       |    5=20
- target/i386/translate.c       |  306 +++++++++++++++---------------
- target/lm32/translate.c       |   28 ++-
- target/m68k/translate.c       |   22 +-
- target/microblaze/translate.c |   28 ++-
- target/mips/translate.c       |   15 +
- target/moxie/translate.c      |   14 +
- target/nios2/translate.c      |   11 +
- target/openrisc/translate.c   |   26 ++-
- target/ppc/translate.c        |   15 +
- target/s390x/translate.c      |   16 +-
- target/sh4/translate.c        |   15 +
- target/sparc/translate.c      |   11 -
- target/tilegx/translate.c     |    7 -
- target/tricore/translate.c    |    9 -
- target/unicore32/translate.c  |   24 +-
- target/xtensa/translate.c     |   17 +-
- 28 files changed, 996 insertions(+), 664 deletions(-)
- create mode 100644 accel/tcg/translator.c
- create mode 100644 include/exec/translator.h
-
-
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Cc: Emilio G. Cota <cota@braap.org>
+--bjuZg6miEcdLYP6q--
