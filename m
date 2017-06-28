@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dQFNh-0002om-3c
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 11:59:55 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dQFNh-0002oo-Dv
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 11:59:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dQFNX-0003XH-4z
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dQFNY-0003Xb-4w
 	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 11:59:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41070)
+Received: from mailhub.sw.ru ([195.214.232.25]:45263 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1dQFNW-0003VZ-Qe
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 11:59:43 -0400
-Date: Wed, 28 Jun 2017 09:59:38 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170628095938.1329c358@w520.home>
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D190D1956B@SHSMSX101.ccr.corp.intel.com>
-References: <1491301684-24367-1-git-send-email-yulei.zhang@intel.com>
-	<20170626141906.6e38b235@w520.home>
-	<01FDBDDE256B79498DC57789713132D469DCC1EE@SHSMSX101.ccr.corp.intel.com>
-	<20170627134431.5947c771@w520.home>
-	<AADFC41AFE54684AB9EE6CBC0274A5D190D1956B@SHSMSX101.ccr.corp.intel.com>
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dQFNX-0003Vl-Hd
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 11:59:44 -0400
+References: <20170606162652.112122-1-vsementsov@virtuozzo.com>
+	<20170606162652.112122-2-vsementsov@virtuozzo.com>
+	<33cfc00b-1f19-6938-44a2-e2e08ea150e1@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <5aa5283a-0a2a-7069-ec2a-3bb7f213c106@virtuozzo.com>
+Date: Wed, 28 Jun 2017 18:59:32 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <33cfc00b-1f19-6938-44a2-e2e08ea150e1@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 5/5] vifo: introduce new VFIO ioctl
- VFIO_DEVICE_PCI_GET_DIRTY_BITMAP
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 1/3] block: add
+ bdrv_get_format_alloc_stat format interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,133 +31,251 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: "Zhang, Yulei" <yulei.zhang@intel.com>, "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "Zheng, Xiao" <xiao.zheng@intel.com>, "Wang, Zhi
-	A" <zhi.a.wang@intel.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
 
-On Wed, 28 Jun 2017 06:04:10 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
+27.06.2017 02:19, John Snow wrote:
+>
+> On 06/06/2017 12:26 PM, Vladimir Sementsov-Ogievskiy wrote:
+>> The function should collect statistics, about used/unused by top-level
+>> format driver space (in its .file) and allocation status
+>> (data/zero/discarded/after-eof) of corresponding areas in this .file.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   block.c                   | 16 ++++++++++++++
+>>   include/block/block.h     |  3 +++
+>>   include/block/block_int.h |  2 ++
+>>   qapi/block-core.json      | 55 +++++++++++++++++++++++++++++++++++++++++++++++
+>>   4 files changed, 76 insertions(+)
+>>
+>> diff --git a/block.c b/block.c
+>> index 50ba264143..7d720ae0c2 100644
+>> --- a/block.c
+>> +++ b/block.c
+>> @@ -3407,6 +3407,22 @@ int64_t bdrv_get_allocated_file_size(BlockDriverState *bs)
+>>   }
+>>   
+>>   /**
+>> + * Collect format allocation info. See BlockFormatAllocInfo definition in
+>> + * qapi/block-core.json.
+>> + */
+>> +int bdrv_get_format_alloc_stat(BlockDriverState *bs, BlockFormatAllocInfo *bfai)
+>> +{
+>> +    BlockDriver *drv = bs->drv;
+>> +    if (!drv) {
+>> +        return -ENOMEDIUM;
+>> +    }
+>> +    if (drv->bdrv_get_format_alloc_stat) {
+>> +        return drv->bdrv_get_format_alloc_stat(bs, bfai);
+>> +    }
+>> +    return -ENOTSUP;
+>> +}
+>> +
+>> +/**
+>>    * Return number of sectors on success, -errno on error.
+>>    */
+>>   int64_t bdrv_nb_sectors(BlockDriverState *bs)
+>> diff --git a/include/block/block.h b/include/block/block.h
+>> index 9b355e92d8..646376a772 100644
+>> --- a/include/block/block.h
+>> +++ b/include/block/block.h
+>> @@ -335,6 +335,9 @@ typedef enum {
+>>   
+>>   int bdrv_check(BlockDriverState *bs, BdrvCheckResult *res, BdrvCheckMode fix);
+>>   
+>> +int bdrv_get_format_alloc_stat(BlockDriverState *bs,
+>> +                               BlockFormatAllocInfo *bfai);
+>> +
+>>   /* The units of offset and total_work_size may be chosen arbitrarily by the
+>>    * block driver; total_work_size may change during the course of the amendment
+>>    * operation */
+>> diff --git a/include/block/block_int.h b/include/block/block_int.h
+>> index 8d3724cce6..458c715e99 100644
+>> --- a/include/block/block_int.h
+>> +++ b/include/block/block_int.h
+>> @@ -208,6 +208,8 @@ struct BlockDriver {
+>>       int64_t (*bdrv_getlength)(BlockDriverState *bs);
+>>       bool has_variable_length;
+>>       int64_t (*bdrv_get_allocated_file_size)(BlockDriverState *bs);
+>> +    int (*bdrv_get_format_alloc_stat)(BlockDriverState *bs,
+>> +                                      BlockFormatAllocInfo *bfai);
+>>   
+>>       int coroutine_fn (*bdrv_co_pwritev_compressed)(BlockDriverState *bs,
+>>           uint64_t offset, uint64_t bytes, QEMUIOVector *qiov);
+>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index ea0b3e8b13..fd7b52bd69 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -139,6 +139,61 @@
+>>              '*format-specific': 'ImageInfoSpecific' } }
+>>   
+>>   ##
+>> +# @BlockFormatAllocInfo:
+>> +#
+> I apologize in advance, but I don't understand this patch very well. Let
+> me ask some questions to get patch review rolling again, since you've
+> been waiting a bit.
+>
+>> +#
+>> +# Allocation relations between format file and underlying protocol file.
+>> +# All fields are in bytes.
+>> +#
+> The format file in this case would be ... what, the virtual file
+> represented by the qcow2? and the underlying protocol file is the raw
+> file that is the qcow2 itself?
 
-> > From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> > Sent: Wednesday, June 28, 2017 3:45 AM
-> > 
-> > On Tue, 27 Jun 2017 08:56:01 +0000
-> > "Zhang, Yulei" <yulei.zhang@intel.com> wrote:
-> > > > > diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-> > > > > index fa17848..aa73ee1 100644
-> > > > > --- a/linux-headers/linux/vfio.h
-> > > > > +++ b/linux-headers/linux/vfio.h
-> > > > > @@ -502,6 +502,20 @@ struct vfio_pci_status_set{
-> > > > >
-> > > > >  #define VFIO_DEVICE_PCI_STATUS_SET	_IO(VFIO_TYPE, VFIO_BASE +  
-> > 14)  
-> > > > >
-> > > > > +/**
-> > > > > + * VFIO_DEVICE_PCI_GET_DIRTY_BITMAP - _IOW(VFIO_TYPE,  
-> > VFIO_BASE +  
-> > > > 15,  
-> > > > > + *				    struct vfio_pci_get_dirty_bitmap)
-> > > > > + *
-> > > > > + * Return: 0 on success, -errno on failure.
-> > > > > + */
-> > > > > +struct vfio_pci_get_dirty_bitmap{
-> > > > > +	__u64	       start_addr;
-> > > > > +	__u64	       page_nr;
-> > > > > +	__u8           dirty_bitmap[];
-> > > > > +};
-> > > > > +
-> > > > > +#define VFIO_DEVICE_PCI_GET_DIRTY_BITMAP _IO(VFIO_TYPE,  
-> > VFIO_BASE  
-> > > > + 15)  
-> > > > > +  
-> > > >
-> > > > Dirty since when?  Since the last time we asked?  Since the device was
-> > > > stopped?  Why is anything dirtied after the device is stopped?  Is this
-> > > > any pages the device has ever touched?  Thanks,
-> > > >
-> > > > Alex  
-> > > Dirty since the device start operation and before it was stopped. We track
-> > > down all the guest pages that device was using before it was stopped, and
-> > > leverage this dirty bitmap for page sync during migration.  
-> > 
-> > I don't understand how this is useful or efficient.  This implies that
-> > the device is always tracking dirtied pages even when we don't care
-> > about migration.  Don't we want to enable dirty logging at some point
-> > and track dirty pages since then?  Otherwise we can just assume the
-> > device dirties all pages and get rid of this ioctl.  Thanks,
-> >   
-> 
-> Agree. Regarding to interface definition we'd better follow general
-> dirty logging scheme as Alex pointed out, possibly through another
-> ioctl cmd to enable/disable logging. However vendor specific 
-> implementation may choose to ignore the cmd while always tracking 
-> dirty pages, as on Intel Processor Graphics. Below is some background.
-> 
-> CPU dirty logging is done through either CPU page fault or HW dirty
-> bit logging (e.g. Intel PML). However there is a gap in DMA side today. 
-> DMA page fault requires both IOMMU and device support (through 
-> PCI ATS/PRS), which is not widely available today and mostly for 
-> special types of workloads (e.g. Shared Virtual Memory). Regarding
-> to dirty bit, at least VTd doesn't support it today.
-> 
-> So the alternative option is to rely on mediation layer to track the
-> dirty pages, since workload submissions on vGPU are mediated. It's
-> feasible for simple devices such as NIC, which has a clear definition
-> of descriptors so it's easy to scan and capture which pages will be
-> dirtied. However doing same thing for complex GPU (meaning
-> to scan all GPU commands, shader instructions, indirect structures, 
-> etc.) is weigh too complex and insufficient. Today we only scan
-> privileged commands for security purpose which is only a very 
-> small portion of all possible cmd set.
-> 
-> Then in reality we choose a simplified approach. instead of tracking
-> incrementally dirtied pages since last query, we treat all pages which
-> are currently mapped in GPU page tables as dirtied. To avoid overhead
-> of walking global page table (GGTT) and all active per-process page
-> tables (PPGTTs) upon query, we choose to always maintain a bitmap 
-> which is updated when mediating guest updates to those GTT entries. 
-> It adds negligible overhead at run-time since those operations are 
-> already mediated.
-> 
-> Every time when Qemu tries to query dirty map, it likely will get
-> a similar large dirty bitmap (not exactly same since GPU page tables
-> are being changed) then will exit iterative memory copy very soon,
-> which will ends up like below:
-> 
-> 1st round: Qemu copies all the memory (say 4GB) to another machine
-> 2nd round: Qemu queries vGPU dirty map (usually in several hundreds
-> of MBs) and combine with CPU dirty map to copy
-> 3rd round: Qemu will get similar size of dirty pages then exit the 
-> pre-copy phase since dirty set doesn't converge
-> 
-> Although it's not that efficient, no need to stop service for whole 4GB
-> memory copy still saves a lot. In our measurement the service 
-> shutdown time is ~300ms over 10Gb link when running 3D benchmarks
-> (e.g. 3DMark, Heaven, etc.) and media transcoding workloads, while
-> copying whole system memory may easily take seconds to trigger TDR.
-> though service shutdown time is bigger than usual server-based scenario,
-> it's somehow OK for interactive usages (e.g. VDI) or offline transcoding 
-> usages. You may take a look at our demo at:
-> 
-> https://www.youtube.com/watch?v=y2SkU5JODIY
-> 
-> In a nutshell, our current dirty logging implementation is a bit
-> awkward due to arch limitation, but it does work well for some 
-> scenarios. Most importantly I agree we should design interface 
-> in a more general way to enable/disable dirty logging as stated
-> earlier.
-> 
-> Hope above makes the whole background clearer. :-)
+yes
 
-Thanks Kevin.  So really it's not really a dirty bitmap, it's just a
-bitmap of pages that the device has access to and may have dirtied.
-Don't we have this more generally in the vfio type1 IOMMU backend?  For
-a mediated device, we know all the pages that the vendor driver has
-asked to be pinned.  Should we perhaps make this interface on the vfio
-container rather than the device?  Any mediated device can provide this
-level of detail without specific vendor support.  If we had DMA page
-faulting, this would be the natural place to put it as well, so maybe
-we should design the interface there to support everything similarly.
-Thanks,
+>
+>> +# There are two types of the format file portions: 'used' and 'unused'. It's up
+>> +# to the format how to interpret these types. For now the only format supporting
+>> +# the feature is Qcow2 and for this case 'used' are clusters with positive
+>> +# refcount and unused a clusters with zero refcount. Described portions include
+>> +# all format file allocations, not only virtual disk data (metadata, internal
+>> +# snapshots, etc. are included).
+> I guess the semantic differentiation between "used" and "unused" is left
+> to the individual fields, below.
 
-Alex
+hmm, I don't understand. differentiation is up to the format, and for 
+qcow2 it is described above
+
+>
+>> +#
+>> +# For the underlying file there are native block-status types of the portions:
+>> +#  - data: allocated data
+>> +#  - zero: read-as-zero holes
+>> +#  - discarded: not allocated
+>> +# 4th additional type is 'overrun', which is for the format file portions beyond
+>> +# the end of the underlying file.
+>> +#
+>> +# So, the fields are:
+>> +#
+>> +# @used-data: used by the format file and backed by data in the underlying file
+>> +#
+> I assume this is "defined and addressable data".
+>
+>> +# @used-zero: used by the format file and backed by a hole in the underlying
+>> +#             file
+>> +#
+> By a hole? Can you give me an example? Do you mean like a filesystem
+> hole ala falloc()?
+
+-zero, -data and -discarded are the block status of corresponding area 
+in underlying file.
+
+so, if underlying file is raw, yes, it should be a filesystem hole.
+
+example:
+-------------------------
+# ./qemu-img create -f qcow2 x 1G
+Formatting 'x', fmt=qcow2 size=1073741824 encryption=off 
+cluster_size=65536 lazy_refcounts=off refcount_bits=16
+# ./qemu-img check x
+No errors were found on the image.
+Image end offset: 262144
+Format allocation info (including metadata):
+                data        zero   discarded   after-eof
+used        192 KiB         0 B         0 B    63.5 KiB
+unused          0 B         0 B         0 B
+# ./qemu-io -c 'write 0 100M' x
+wrote 104857600/104857600 bytes at offset 0
+100 MiB, 1 ops; 0.7448 sec (134.263 MiB/sec and 1.3426 ops/sec)
+# ./qemu-img check x
+No errors were found on the image.
+1600/16384 = 9.77% allocated, 0.00% fragmented, 0.00% compressed clusters
+Image end offset: 105185280
+Format allocation info (including metadata):
+                data        zero   discarded   after-eof
+used        100 MiB      60 KiB         0 B         0 B
+unused          0 B         0 B         0 B
+# ./qemu-io -c 'discard 0 1M' x
+discard 1048576/1048576 bytes at offset 0
+1 MiB, 1 ops; 0.0002 sec (3.970 GiB/sec and 4065.0407 ops/sec)
+# ./qemu-img check x
+No errors were found on the image.
+1584/16384 = 9.67% allocated, 0.00% fragmented, 0.00% compressed clusters
+Image end offset: 105185280
+Format allocation info (including metadata):
+                data        zero   discarded   after-eof
+used       99.3 MiB      60 KiB         0 B         0 B
+unused          0 B       1 MiB         0 B
+-------------------------
+
+- hmm, 60 KiB, don't know what is it. some preallocation may be..
+
+
+>
+>> +# @used-discarded: used by the format file but actually unallocated in the
+>> +#                  underlying file
+>> +#
+> In what case do we have used data that is discarded/undefined, but not
+> zero? Shouldn't discarded data be zero...?
+
+may be discarded is bad name.. this if for unallocated block status of 
+underlying file.
+
+>
+>> +# @used-overrun: used by the format file beyond the end of the underlying file
+>> +#
+> When does this occur?
+
+I think it shoud be some kind of corruption.
+
+>
+>> +# @unused-data: allocated data in the underlying file not used by the format
+>> +#
+> I assume this is an allocation gap in qcow2. Unused, but non-zero. Right?
+
+or it may be some kind of error or due to underlying fs doesn't maintain 
+holes.
+
+>
+>> +# @unused-zero: holes in the underlying file not used by the format file
+>> +#
+> I assume this is similar to the above -- Unused, but zero.
+
+Unused and underlying block status is ZERO. It is a "good" case for 
+unused areas.
+
+>
+>> +# @unused-discarded: unallocated areas in the underlying file not used by the
+>> +#                    format file
+>> +#
+> Again I am unsure of what discarded but non-zero might mean.
+
+looks like for raw format discarded is impossible, but to make a generic 
+tool, let's consider block status = unallocated too.
+
+>
+>> +# Note: sum of 6 fields {used,unused}-{data,zero,discarded} is equal to the
+>> +#       length of the underlying file.
+>> +#
+>> +# Since: 2.10
+>> +#
+>> +##
+>> +{ 'struct': 'BlockFormatAllocInfo',
+>> +  'data': {'used-data':        'uint64',
+>> +           'used-zero':        'uint64',
+>> +           'used-discarded':   'uint64',
+>> +           'used-overrun':     'uint64',
+>> +           'unused-data':      'uint64',
+>> +           'unused-zero':      'uint64',
+>> +           'unused-discarded': 'uint64' } }
+>> +
+>> +##
+>>   # @ImageCheck:
+>>   #
+>>   # Information about a QEMU image file check
+>>
+> Sorry for the dumb questions.
+
+Don't worry)
+
+>
+> --John
+
+
+-- 
+Best regards,
+Vladimir
