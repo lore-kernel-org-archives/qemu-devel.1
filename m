@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40949)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dQLho-0004bF-3a
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 18:45:05 -0400
+	(envelope-from <cota@braap.org>) id 1dQM3Y-0000aY-Qs
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 19:07:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dQLhl-0007p3-1r
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 18:45:04 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59318)
+	(envelope-from <cota@braap.org>) id 1dQM3U-0008DB-2j
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 19:07:32 -0400
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:37363)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1dQLhk-0007os-SE
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 18:45:00 -0400
-Date: Wed, 28 Jun 2017 15:44:58 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <149868268758.23385.1547307280569014820.stgit@bahia.lan>
-Message-ID: <alpine.DEB.2.10.1706281544400.2919@sstabellini-ThinkPad-X260>
-References: <149868263738.23385.16723444264552987199.stgit@bahia.lan>
-	<149868268758.23385.1547307280569014820.stgit@bahia.lan>
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dQM3T-0008Cr-Sd
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 19:07:28 -0400
+Date: Wed, 28 Jun 2017 19:07:25 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170628230725.GA9893@flamenco>
+References: <149855711979.4578.11884555663631849051.stgit@frigg.lan>
+	<20170627175815.GA17639@flamenco> <878tkce4sm.fsf@frigg.lan>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v5 5/5] 9pfs: handle transport errors in
- pdu_complete()
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <878tkce4sm.fsf@frigg.lan>
+Subject: Re: [Qemu-devel] [PATCH v9 0/7] trace: [tcg] Optimize per-vCPU
+ tracing states with separate TB caches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,84 +29,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Wed, 28 Jun 2017, Greg Kurz wrote:
-> Contrary to what is written in the comment, a buggy guest can misconfigure
-> the transport buffers and pdu_marshal() may return an error.  If this ever
-> happens, it is up to the transport layer to handle the situation (9P is
-> transport agnostic).
+On Wed, Jun 28, 2017 at 14:21:29 +0300, Lluís Vilanova wrote:
+> Emilio G Cota writes:
+> > I wanted to save you some time and sent a v9 yesterday with these
+> > same changes -- although I see some changes in my v8 didn't make it
+> > to your v9. For this iteration I only added more perf numbers to the
+> > last patch, see here:
+> >   https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg05764.html
 > 
-> This fixes Coverity issue CID1348518.
+> Woops, sorry about the duplicate effort.
 > 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> I just dropped the rename of variable trace_ds, since I prefer names whose
+> purpose can be more easily understood.
 
-Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+- I think trace_vcpu_dstate is way too long (IMO a short name + a comment
+  in the struct is better).
 
+- You missed a change I made to patch 3:
+> [cota: use CPU_TRACE_DSTATE_MAX_EVENTS instead of trace_get_vcpu_event_count()]
+  Was that intentional?
 
-> ---
->  hw/9pfs/9p.c |   23 +++++++++++++++--------
->  1 file changed, 15 insertions(+), 8 deletions(-)
-> 
-> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> index da0d6da65b45..f7871e6f3e5a 100644
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -624,15 +624,11 @@ void pdu_free(V9fsPDU *pdu)
->      QLIST_INSERT_HEAD(&s->free_list, pdu, next);
->  }
->  
-> -/*
-> - * We don't do error checking for pdu_marshal/unmarshal here
-> - * because we always expect to have enough space to encode
-> - * error details
-> - */
->  static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
->  {
->      int8_t id = pdu->id + 1; /* Response */
->      V9fsState *s = pdu->s;
-> +    int ret;
->  
->      if (len < 0) {
->          int err = -len;
-> @@ -644,11 +640,19 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
->              str.data = strerror(err);
->              str.size = strlen(str.data);
->  
-> -            len += pdu_marshal(pdu, len, "s", &str);
-> +            ret = pdu_marshal(pdu, len, "s", &str);
-> +            if (ret < 0) {
-> +                goto out_notify;
-> +            }
-> +            len += ret;
->              id = P9_RERROR;
->          }
->  
-> -        len += pdu_marshal(pdu, len, "d", err);
-> +        ret = pdu_marshal(pdu, len, "d", err);
-> +        if (ret < 0) {
-> +            goto out_notify;
-> +        }
-> +        len += ret;
->  
->          if (s->proto_version == V9FS_PROTO_2000L) {
->              id = P9_RLERROR;
-> @@ -657,12 +661,15 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
->      }
->  
->      /* fill out the header */
-> -    pdu_marshal(pdu, 0, "dbw", (int32_t)len, id, pdu->tag);
-> +    if (pdu_marshal(pdu, 0, "dbw", (int32_t)len, id, pdu->tag) < 0) {
-> +        goto out_notify;
-> +    }
->  
->      /* keep these in sync */
->      pdu->size = len;
->      pdu->id = id;
->  
-> +out_notify:
->      pdu->s->transport->push_and_notify(pdu);
->  
->      /* Now wakeup anybody waiting in flush for this request */
-> 
+- Would be nice to include the perf numbers I got, along with yours.
+
+		E.
