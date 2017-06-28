@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dQCQi-0004JO-5X
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:50:49 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1dQCSM-0005gr-4o
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:52:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dQCQf-0001rR-3F
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:50:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56488)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dQCQe-0001pm-Qb
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:50:45 -0400
-References: <20170615163813.7255-1-stefanha@redhat.com>
-	<20170615163813.7255-4-stefanha@redhat.com>
-	<b1a33e94-b32b-c6ca-c526-6dbb201a25b1@redhat.com>
-	<20170628121352.GC7538@stefanha-x1.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ed8b7d78-a28b-b3df-1bd9-0ad3cd12a35c@redhat.com>
-Date: Wed, 28 Jun 2017 07:50:38 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170628121352.GC7538@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="mdojKg2bIUuE5NCNvNRjJpUNmOUxBCn5a"
-Subject: Re: [Qemu-devel] [PATCH 3/5] qemu-iotests: 068: extract _qemu()
- function
+	(envelope-from <a.perevalov@samsung.com>) id 1dQCSH-0002uk-AF
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:52:30 -0400
+Received: from mailout3.w1.samsung.com ([210.118.77.13]:21542)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1dQCSG-0002sa-W4
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:52:25 -0400
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout3.w1.samsung.com
+	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
+	2014)) with ESMTP id <0OS900CITD36NS00@mailout3.w1.samsung.com> for
+	qemu-devel@nongnu.org; Wed, 28 Jun 2017 13:52:18 +0100 (BST)
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Date: Wed, 28 Jun 2017 08:49:29 -0400
+Message-id: <1498654172-26570-1-git-send-email-a.perevalov@samsung.com>
+References: <CGME20170628125217eucas1p1c69600c8c254afe9dfc50c72224de551@eucas1p1.samsung.com>
+Subject: [Qemu-devel] [PATCH v6 0/3] Add bitmap for received pages in
+ postcopy migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,86 +29,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Pavel Butsykin <pbutsykin@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Cc: Alexey Perevalov <a.perevalov@samsung.com>, peterx@redhat.com, i.maximets@samsung.com, quintela@redhat.com, dgilbert@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mdojKg2bIUuE5NCNvNRjJpUNmOUxBCn5a
-From: Eric Blake <eblake@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Pavel Butsykin <pbutsykin@virtuozzo.com>
-Message-ID: <ed8b7d78-a28b-b3df-1bd9-0ad3cd12a35c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/5] qemu-iotests: 068: extract _qemu()
- function
-References: <20170615163813.7255-1-stefanha@redhat.com>
- <20170615163813.7255-4-stefanha@redhat.com>
- <b1a33e94-b32b-c6ca-c526-6dbb201a25b1@redhat.com>
- <20170628121352.GC7538@stefanha-x1.localdomain>
-In-Reply-To: <20170628121352.GC7538@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This is 6th version of
+[PATCH v1 0/2] Add bitmap for copied pages in postcopy migration
+cover message from there
 
-On 06/28/2017 07:13 AM, Stefan Hajnoczi wrote:
-> On Tue, Jun 27, 2017 at 06:40:04AM -0500, Eric Blake wrote:
->> On 06/15/2017 11:38 AM, Stefan Hajnoczi wrote:
->>> Avoid duplicating the QEMU command-line.
->>>
->>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->>> ---
->>>  tests/qemu-iotests/068 | 13 ++++++++-----
->>>  1 file changed, 8 insertions(+), 5 deletions(-)
->>>
->>
->>> +# Give qemu some time to boot before saving the VM state
->>> +bash -c 'sleep 1; echo -e "savevm 0\nquit"' | _qemu
->>
->> Are we sure that 'bash' on PATH is the same as the /bin/bash running t=
-he
->> script?
->>
->> Also, while bash has more deterministic behavior for 'echo -e' (it is
->> non-portable if you are porting a script to other shells), it is still=
+This is a separate patch set, it derived from
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg456004.html
 
->> possible to set bash to a mode where it does not work (see xhopt
->> xpg_echo).  I'd much prefer you use 'printf' instead of 'set -e'.
+There are several possible use cases:
+1. solve issue with postcopy live migration and shared memory.
+OVS-VSWITCH requires information about copied pages, to fallocate
+newly allocated pages.
+2. calculation vCPU blocktime
+for more details see
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg456004.html
+3. Recovery after fail in the middle of postcopy migration 
 
-instead of 'echo -e'
+Declaration is placed in two places include/migration/migration.h and into
+migration/postcopy-ram.h, because some functions are required in virtio and
+into public function include/exec/ram_addr.h.
 
->=20
-> Do you want to send a separate patch?
+----------------------------------------------------------------
+V5 -> V6
+    - call ramblock_recv_map_init from migration_fd_process_incoming (Peter suggested)But finalization is still in ram_load_cleanup as Juan suggested.    
 
-Sure.
+V4 -> V5
+    - remove ramblock_recv_bitmap_clear_range in favor to bitmap_clear (comment from David)
+    - single invocation place for ramblock_recv_bitmap_set (comment from Peter)
+    - minor changes like removing comment from qemu_ufd_copy_ioctl and local variable from
+ramblock_recv_map_init (comment from Peter)
 
->=20
-> The purpose of this patch was just to move this code.
+V3 -> V4
+    - clear_bit instead of ramblock_recv_bitmap_clear in ramblock_recv_bitmap_clear_range,
+it reduced number of operation (comment from Juan)
+    - for postcopy ramblock_recv_bitmap_set is calling after page was copied,
+only in case of success (comment from David)
+    - indentation fixes (comment from Juan)
 
-Fair enough. Besides, more than just 068 use 'echo -e' where 'printf'
-would be better.
+V2 -> V3
+    - ramblock_recv_map_init call is placed into migration_incoming_get_current,
+looks like it's general place for both precopy and postcopy case.
+    - received bitmap memory releasing is placed into ram_load_cleanup,
+unfortunatelly, it calls only in case of precopy.
+    - precopy case and discard ram block case
+    - function renaming, and another minor cleanups
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+V1 -> V2
+    - change in terminology s/copied/received/g
+    - granularity became TARGET_PAGE_SIZE, but not actual page size of the
+ramblock
+    - movecopiedmap & get_copiedmap_size were removed, until patch set where
+it will be necessary
+    - releasing memory of receivedmap was added into ram_load_cleanup
+    - new patch "migration: introduce qemu_ufd_copy_ioctl helper"
 
+Patchset is based on Juan's patchset:
+[PATCH v2 0/5] Create setup/cleanup methods for migration incoming side
 
---mdojKg2bIUuE5NCNvNRjJpUNmOUxBCn5a
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Alexey Perevalov (3):
+  migration: postcopy_place_page factoring out
+  migration: introduce qemu_ufd_copy_ioctl helper
+  migration: add bitmap for received page
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+ include/exec/ram_addr.h  | 10 +++++++++
+ migration/migration.c    |  1 +
+ migration/postcopy-ram.c | 53 +++++++++++++++++++++++++++++++-----------------
+ migration/postcopy-ram.h |  4 ++--
+ migration/ram.c          | 46 ++++++++++++++++++++++++++++++++++++-----
+ migration/ram.h          |  6 ++++++
+ 6 files changed, 94 insertions(+), 26 deletions(-)
 
-iQEcBAEBCAAGBQJZU6YeAAoJEKeha0olJ0Nq4V4H/jZOGoXtMHMQKoSbpeKYHFRD
-lHvDTspDXLsmDIopCOnVHlNPfI2gtxImSZwt6KBzeX3JxepRwIGjxQHydXJOvNHA
-d3lzeEZc1W8UtIg7N4sMkISOxGHMVfG3ziHsgnk8/i4I+o9t+ZVKFtDE84bpt+9u
-WrlfbLYVV2Nk1YR8ibT+8zO2bqC8igOIjpWbPmefw3JgkNSKyq7IUN8rRF5HL/VZ
-NauDWVF5Q7mjCC+43p5x8N3MWQxMeCpxZev78P7ZUM2g0Xz1/+eppNT4oCyzPmwH
-rTDlAV20Yfo8VkmhNbXKM1cv7xb6uU8UvirGwv7Dui0xw6NsilgUeh30PwFQfAg=
-=bUX6
------END PGP SIGNATURE-----
-
---mdojKg2bIUuE5NCNvNRjJpUNmOUxBCn5a--
+-- 
+1.8.3.1
