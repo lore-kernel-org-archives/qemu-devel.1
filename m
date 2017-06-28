@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dQBBt-0002vq-NB
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:31:29 -0400
+	(envelope-from <quintela@redhat.com>) id 1dQBBy-00030k-J8
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:31:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dQBBp-0004bn-UH
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:31:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43850)
+	(envelope-from <quintela@redhat.com>) id 1dQBBx-0004ln-BJ
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:31:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36096)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dQBBp-0004a0-GG
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:31:21 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dQBBx-0004lV-2h
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:31:29 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 77689C057EC9
-	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 11:31:20 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 25C94C04B333
+	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 11:31:28 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 28 Jun 2017 13:30:56 +0200
-Message-Id: <20170628113106.5248-5-quintela@redhat.com>
+Date: Wed, 28 Jun 2017 13:30:59 +0200
+Message-Id: <20170628113106.5248-8-quintela@redhat.com>
 In-Reply-To: <20170628113106.5248-1-quintela@redhat.com>
 References: <20170628113106.5248-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 04/14] migration: let MigrationState be a qdev
+Subject: [Qemu-devel] [PULL 07/14] migration: move skip_configuration out
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,196 +34,181 @@ Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
 From: Peter Xu <peterx@redhat.com>
 
-Let the old man "MigrationState" join the object family. Direct benefit
-is that we can start to use all the property features derived from
-current QDev, like: HW_COMPAT_* bits, command line setup for migration
-parameters (so will never need to set them up each time using HMP/QMP,
-this is really, really attractive for test writters), etc.
+It was in SaveState but now moved to MigrationState altogether, reverted
+its meaning, then renamed to "send_configuration". Again, using
+HW_COMPAT_2_3 for old PC/SPAPR machines, and accel_register_prop() for
+xen_init().
 
-I see no reason to disallow this happen yet. So let's start from this
-one, to see whether it would be anything good.
-
-Now we init the MigrationState struct statically in main() to make sure
-it's initialized after global properties are applied, since we'll use
-them during creation of the object.
-
-No functional change at all.
+Removing savevm_skip_configuration().
 
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <1498536619-14548-5-git-send-email-peterx@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <1498536619-14548-8-git-send-email-peterx@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- include/migration/misc.h |  1 +
- migration/migration.c    | 78 ++++++++++++++++++++++++++++++++++--------------
- migration/migration.h    | 19 ++++++++++++
- vl.c                     |  6 ++++
- 4 files changed, 81 insertions(+), 23 deletions(-)
+ hw/i386/pc_piix.c        |  1 -
+ hw/ppc/spapr.c           |  1 -
+ hw/xen/xen-common.c      |  6 +++++-
+ include/hw/compat.h      |  4 ++++
+ include/migration/misc.h |  1 -
+ migration/migration.c    |  2 ++
+ migration/migration.h    |  3 +++
+ migration/savevm.c       | 15 ++++-----------
+ 8 files changed, 18 insertions(+), 15 deletions(-)
 
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 3b51297..488fc0a 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -318,7 +318,6 @@ static void pc_compat_2_3(MachineState *machine)
+     if (kvm_enabled()) {
+         pcms->smm = ON_OFF_AUTO_OFF;
+     }
+-    savevm_skip_configuration();
+ }
+ 
+ static void pc_compat_2_2(MachineState *machine)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index f07d40a..8429187 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3581,7 +3581,6 @@ static void spapr_machine_2_3_instance_options(MachineState *machine)
+ {
+     spapr_machine_2_4_instance_options(machine);
+     savevm_skip_section_footers();
+-    savevm_skip_configuration();
+ }
+ 
+ static void spapr_machine_2_3_class_options(MachineClass *mc)
+diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
+index 459e6ab..1f3688d 100644
+--- a/hw/xen/xen-common.c
++++ b/hw/xen/xen-common.c
+@@ -139,7 +139,6 @@ static int xen_init(MachineState *ms)
+     }
+     qemu_add_vm_change_state_handler(xen_change_state_handler, NULL);
+ 
+-    savevm_skip_configuration();
+     savevm_skip_section_footers();
+ 
+     return 0;
+@@ -151,6 +150,11 @@ static GlobalProperty xen_compat_props[] = {
+         .property = "store-global-state",
+         .value = "off",
+     },
++    {
++        .driver = "migration",
++        .property = "send-configuration",
++        .value = "off",
++    },
+     { /* end of list */ },
+ };
+ 
+diff --git a/include/hw/compat.h b/include/hw/compat.h
+index a506a74..1a3fd94 100644
+--- a/include/hw/compat.h
++++ b/include/hw/compat.h
+@@ -183,6 +183,10 @@
+         .value    = "off",\
+     },{\
+         .driver   = "migration",\
++        .property = "send-configuration",\
++        .value    = "off",\
++    },{\
++        .driver   = "migration",\
+         .property = "store-global-state",\
+         .value    = "off",\
+     },
 diff --git a/include/migration/misc.h b/include/migration/misc.h
-index 65c7070..2d36cf5 100644
+index 6ac3307..f30db4d 100644
 --- a/include/migration/misc.h
 +++ b/include/migration/misc.h
-@@ -45,6 +45,7 @@ void savevm_skip_section_footers(void);
- void savevm_skip_configuration(void);
+@@ -42,7 +42,6 @@ int64_t self_announce_delay(int round)
+ 
+ void dump_vmstate_json_to_file(FILE *out_fp);
+ void savevm_skip_section_footers(void);
+-void savevm_skip_configuration(void);
  
  /* migration/migration.c */
-+void migration_object_init(void);
- void qemu_start_incoming_migration(const char *uri, Error **errp);
- bool migration_is_idle(void);
- void add_migration_state_change_notifier(Notifier *notify);
+ void migration_object_init(void);
 diff --git a/migration/migration.c b/migration/migration.c
-index f588329..2c25927 100644
+index 67f9e68..414e14d 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -98,32 +98,21 @@ enum mig_rp_message_type {
-    migrations at once.  For now we don't need to add
-    dynamic creation of migration */
+@@ -1985,6 +1985,8 @@ static Property migration_properties[] = {
+     DEFINE_PROP_BOOL("store-global-state", MigrationState,
+                      store_global_state, true),
+     DEFINE_PROP_BOOL("only-migratable", MigrationState, only_migratable, false),
++    DEFINE_PROP_BOOL("send-configuration", MigrationState,
++                     send_configuration, true),
+     DEFINE_PROP_END_OF_LIST(),
+ };
  
-+static MigrationState *current_migration;
-+
-+void migration_object_init(void)
-+{
-+    /* This can only be called once. */
-+    assert(!current_migration);
-+    current_migration = MIGRATION_OBJ(object_new(TYPE_MIGRATION));
-+}
-+
- /* For outgoing */
- MigrationState *migrate_get_current(void)
- {
--    static bool once;
--    static MigrationState current_migration = {
--        .state = MIGRATION_STATUS_NONE,
--        .xbzrle_cache_size = DEFAULT_MIGRATE_CACHE_SIZE,
--        .mbps = -1,
--        .parameters = {
--            .compress_level = DEFAULT_MIGRATE_COMPRESS_LEVEL,
--            .compress_threads = DEFAULT_MIGRATE_COMPRESS_THREAD_COUNT,
--            .decompress_threads = DEFAULT_MIGRATE_DECOMPRESS_THREAD_COUNT,
--            .cpu_throttle_initial = DEFAULT_MIGRATE_CPU_THROTTLE_INITIAL,
--            .cpu_throttle_increment = DEFAULT_MIGRATE_CPU_THROTTLE_INCREMENT,
--            .max_bandwidth = MAX_THROTTLE,
--            .downtime_limit = DEFAULT_MIGRATE_SET_DOWNTIME,
--            .x_checkpoint_delay = DEFAULT_MIGRATE_X_CHECKPOINT_DELAY,
--        },
--    };
--
--    if (!once) {
--        current_migration.parameters.tls_creds = g_strdup("");
--        current_migration.parameters.tls_hostname = g_strdup("");
--        once = true;
--    }
--    return &current_migration;
-+    /* This can only be called after the object created. */
-+    assert(current_migration);
-+    return current_migration;
- }
- 
- MigrationIncomingState *migration_incoming_get_current(void)
-@@ -1987,3 +1976,46 @@ void migrate_fd_connect(MigrationState *s)
-     s->migration_thread_running = true;
- }
- 
-+static void migration_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->user_creatable = false;
-+}
-+
-+static void migration_instance_init(Object *obj)
-+{
-+    MigrationState *ms = MIGRATION_OBJ(obj);
-+
-+    ms->state = MIGRATION_STATUS_NONE;
-+    ms->xbzrle_cache_size = DEFAULT_MIGRATE_CACHE_SIZE;
-+    ms->mbps = -1;
-+    ms->parameters = (MigrationParameters) {
-+        .compress_level = DEFAULT_MIGRATE_COMPRESS_LEVEL,
-+        .compress_threads = DEFAULT_MIGRATE_COMPRESS_THREAD_COUNT,
-+        .decompress_threads = DEFAULT_MIGRATE_DECOMPRESS_THREAD_COUNT,
-+        .cpu_throttle_initial = DEFAULT_MIGRATE_CPU_THROTTLE_INITIAL,
-+        .cpu_throttle_increment = DEFAULT_MIGRATE_CPU_THROTTLE_INCREMENT,
-+        .max_bandwidth = MAX_THROTTLE,
-+        .downtime_limit = DEFAULT_MIGRATE_SET_DOWNTIME,
-+        .x_checkpoint_delay = DEFAULT_MIGRATE_X_CHECKPOINT_DELAY,
-+    };
-+    ms->parameters.tls_creds = g_strdup("");
-+    ms->parameters.tls_hostname = g_strdup("");
-+}
-+
-+static const TypeInfo migration_type = {
-+    .name = TYPE_MIGRATION,
-+    .parent = TYPE_DEVICE,
-+    .class_init = migration_class_init,
-+    .class_size = sizeof(MigrationClass),
-+    .instance_size = sizeof(MigrationState),
-+    .instance_init = migration_instance_init,
-+};
-+
-+static void register_migration_types(void)
-+{
-+    type_register_static(&migration_type);
-+}
-+
-+type_init(register_migration_types);
 diff --git a/migration/migration.h b/migration/migration.h
-index d9a268a..3fca364 100644
+index 34377dd..4d4ea0d 100644
 --- a/migration/migration.h
 +++ b/migration/migration.h
-@@ -19,6 +19,7 @@
- #include "qapi-types.h"
- #include "exec/cpu-common.h"
- #include "qemu/coroutine_int.h"
-+#include "hw/qdev.h"
+@@ -142,6 +142,9 @@ struct MigrationState
  
- /* State for the incoming migration */
- struct MigrationIncomingState {
-@@ -62,8 +63,26 @@ struct MigrationIncomingState {
- MigrationIncomingState *migration_incoming_get_current(void);
- void migration_incoming_state_destroy(void);
+     /* Whether the VM is only allowing for migratable devices */
+     bool only_migratable;
++
++    /* Whether we send QEMU_VM_CONFIGURATION during migration */
++    bool send_configuration;
+ };
  
-+#define TYPE_MIGRATION "migration"
-+
-+#define MIGRATION_CLASS(klass) \
-+    OBJECT_CLASS_CHECK(MigrationClass, (klass), TYPE_MIGRATION)
-+#define MIGRATION_OBJ(obj) \
-+    OBJECT_CHECK(MigrationState, (obj), TYPE_MIGRATION)
-+#define MIGRATION_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(MigrationClass, (obj), TYPE_MIGRATION)
-+
-+typedef struct MigrationClass {
-+    /*< private >*/
-+    DeviceClass parent_class;
-+} MigrationClass;
-+
- struct MigrationState
+ void migrate_set_state(int *state, int old_state, int new_state);
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 1499cd3..0a8c61f 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -287,7 +287,6 @@ typedef struct SaveStateEntry {
+ typedef struct SaveState {
+     QTAILQ_HEAD(, SaveStateEntry) handlers;
+     int global_section_id;
+-    bool skip_configuration;
+     uint32_t len;
+     const char *name;
+     uint32_t target_page_bits;
+@@ -296,15 +295,8 @@ typedef struct SaveState {
+ static SaveState savevm_state = {
+     .handlers = QTAILQ_HEAD_INITIALIZER(savevm_state.handlers),
+     .global_section_id = 0,
+-    .skip_configuration = false,
+ };
+ 
+-void savevm_skip_configuration(void)
+-{
+-    savevm_state.skip_configuration = true;
+-}
+-
+-
+ static void configuration_pre_save(void *opaque)
  {
-+    /*< private >*/
-+    DeviceState parent_obj;
-+
-+    /*< public >*/
-     size_t bytes_xfer;
-     size_t xfer_limit;
-     QemuThread thread;
-diff --git a/vl.c b/vl.c
-index c0cdb17..f0a0515 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4596,6 +4596,12 @@ int main(int argc, char **argv, char **envp)
-      */
-     register_global_properties(current_machine);
+     SaveState *state = opaque;
+@@ -970,11 +962,11 @@ void qemu_savevm_state_header(QEMUFile *f)
+     qemu_put_be32(f, QEMU_VM_FILE_MAGIC);
+     qemu_put_be32(f, QEMU_VM_FILE_VERSION);
  
-+    /*
-+     * Migration object can only be created after global properties
-+     * are applied correctly.
-+     */
-+    migration_object_init();
-+
-     /* This checkpoint is required by replay to separate prior clock
-        reading from the other reads, because timer polling functions query
-        clock values from the log. */
+-    if (!savevm_state.skip_configuration || enforce_config_section()) {
++    if (migrate_get_current()->send_configuration ||
++        enforce_config_section()) {
+         qemu_put_byte(f, QEMU_VM_CONFIGURATION);
+         vmstate_save_state(f, &vmstate_configuration, &savevm_state, 0);
+     }
+-
+ }
+ 
+ void qemu_savevm_state_begin(QEMUFile *f)
+@@ -1995,7 +1987,8 @@ int qemu_loadvm_state(QEMUFile *f)
+         return -ENOTSUP;
+     }
+ 
+-    if (!savevm_state.skip_configuration || enforce_config_section()) {
++    if (migrate_get_current()->send_configuration ||
++        enforce_config_section()) {
+         if (qemu_get_byte(f) != QEMU_VM_CONFIGURATION) {
+             error_report("Configuration section missing");
+             return -EINVAL;
 -- 
 2.9.4
