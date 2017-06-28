@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dQCHK-0005H6-MJ
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:41:07 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dQCLB-0008AJ-Kv
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:45:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dQCHH-0005kf-Jo
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:41:06 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:57809)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dQCHH-0005jc-5I
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:41:03 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed, 28 Jun 2017 15:40:52 +0300
-Message-Id: <149865365245.17063.7830070270971603805.stgit@frigg.lan>
-In-Reply-To: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
-References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
+	(envelope-from <kwolf@redhat.com>) id 1dQCLA-0007KV-MI
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:45:05 -0400
+Date: Wed, 28 Jun 2017 14:44:54 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170628124454.GE5378@noname.redhat.com>
+References: <20170623124700.1389-1-el13635@mail.ntua.gr>
+	<20170623124700.1389-3-el13635@mail.ntua.gr>
+	<20170628112736.GD5378@noname.redhat.com>
+	<20170628121530.zdhob4iq37x3qv4i@postretch>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v11 06/29] target/i386: [tcg] Refactor
- init_disas_context
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="KsGdsel6WgEHnImy"
+Content-Disposition: inline
+In-Reply-To: <20170628121530.zdhob4iq37x3qv4i@postretch>
+Subject: Re: [Qemu-devel] [PATCH RFC v3 2/8] block: Add aio_context field in
+ ThrottleGroupMember
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,122 +27,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-Incrementally paves the way towards using the generic instruction transla=
-tion
-loop.
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
- target/i386/translate.c |   43 ++++++++++++++++++++++++-----------------=
---
- 1 file changed, 24 insertions(+), 19 deletions(-)
+--KsGdsel6WgEHnImy
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 8cf2485e2c..04453ce48a 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -8379,20 +8379,12 @@ void tcg_x86_init(void)
-     }
- }
-=20
--/* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
-+static void i386_trblock_init_disas_context(DisasContextBase *dcbase, CP=
-UState *cpu)
- {
-+    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
-     CPUX86State *env =3D cpu->env_ptr;
--    DisasContext dc1, *dc =3D &dc1;
--    uint32_t flags;
--    target_ulong cs_base;
--    int num_insns;
--    int max_insns;
--
--    /* generate intermediate code */
--    dc->base.pc_first =3D tb->pc;
--    cs_base =3D tb->cs_base;
--    flags =3D tb->flags;
-+    uint32_t flags =3D dc->base.tb->flags;
-+    target_ulong cs_base =3D dc->base.tb->cs_base;
-=20
-     dc->pe =3D (flags >> HF_PE_SHIFT) & 1;
-     dc->code32 =3D (flags >> HF_CS32_SHIFT) & 1;
-@@ -8403,11 +8395,9 @@ void gen_intermediate_code(CPUState *cpu, Translat=
-ionBlock *tb)
-     dc->cpl =3D (flags >> HF_CPL_SHIFT) & 3;
-     dc->iopl =3D (flags >> IOPL_SHIFT) & 3;
-     dc->tf =3D (flags >> TF_SHIFT) & 1;
--    dc->base.singlestep_enabled =3D cpu->singlestep_enabled;
-     dc->cc_op =3D CC_OP_DYNAMIC;
-     dc->cc_op_dirty =3D false;
-     dc->cs_base =3D cs_base;
--    dc->base.tb =3D tb;
-     dc->popl_esp_hack =3D 0;
-     /* select memory access functions */
-     dc->mem_index =3D 0;
-@@ -8425,7 +8415,7 @@ void gen_intermediate_code(CPUState *cpu, Translati=
-onBlock *tb)
-     dc->code64 =3D (flags >> HF_CS64_SHIFT) & 1;
- #endif
-     dc->flags =3D flags;
--    dc->jmp_opt =3D !(dc->tf || cpu->singlestep_enabled ||
-+    dc->jmp_opt =3D !(dc->tf || dc->base.singlestep_enabled ||
-                     (flags & HF_INHIBIT_IRQ_MASK));
-     /* Do not optimize repz jumps at all in icount mode, because
-        rep movsS instructions are execured with different paths
-@@ -8437,12 +8427,29 @@ void gen_intermediate_code(CPUState *cpu, Transla=
-tionBlock *tb)
-        record/replay modes and there will always be an
-        additional step for ecx=3D0 when icount is enabled.
-      */
--    dc->repz_opt =3D !dc->jmp_opt && !(tb->cflags & CF_USE_ICOUNT);
-+    dc->repz_opt =3D !dc->jmp_opt && !(dc->base.tb->cflags & CF_USE_ICOU=
-NT);
- #if 0
-     /* check addseg logic */
-     if (!dc->addseg && (dc->vm86 || !dc->pe || !dc->code32))
-         printf("ERROR addseg\n");
- #endif
-+}
-+
-+/* generate intermediate code for basic block 'tb'.  */
-+void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
-+{
-+    CPUX86State *env =3D cpu->env_ptr;
-+    DisasContext dc1, *dc =3D &dc1;
-+    int num_insns;
-+    int max_insns;
-+
-+    /* generate intermediate code */
-+    dc->base.singlestep_enabled =3D cpu->singlestep_enabled;
-+    dc->base.tb =3D tb;
-+    dc->base.is_jmp =3D DISAS_NEXT;
-+    dc->base.pc_first =3D tb->pc;
-+    dc->base.pc_next =3D dc->base.pc_first;
-+    i386_trblock_init_disas_context(&dc->base, cpu);
-=20
-     cpu_T0 =3D tcg_temp_new();
-     cpu_T1 =3D tcg_temp_new();
-@@ -8457,8 +8464,6 @@ void gen_intermediate_code(CPUState *cpu, Translati=
-onBlock *tb)
-     cpu_ptr1 =3D tcg_temp_new_ptr();
-     cpu_cc_srcT =3D tcg_temp_local_new();
-=20
--    dc->base.is_jmp =3D DISAS_NEXT;
--    dc->base.pc_next =3D dc->base.pc_first;
-     num_insns =3D 0;
-     max_insns =3D tb->cflags & CF_COUNT_MASK;
-     if (max_insns =3D=3D 0) {
-@@ -8500,7 +8505,7 @@ void gen_intermediate_code(CPUState *cpu, Translati=
-onBlock *tb)
-            the flag and abort the translation to give the irqs a
-            change to be happen */
-         if (dc->tf || dc->base.singlestep_enabled ||
--            (flags & HF_INHIBIT_IRQ_MASK)) {
-+            (dc->base.tb->flags & HF_INHIBIT_IRQ_MASK)) {
-             gen_jmp_im(dc->base.pc_next - dc->cs_base);
-             gen_eob(dc);
-             break;
+Am 28.06.2017 um 14:15 hat Manos Pitsidianakis geschrieben:
+> On Wed, Jun 28, 2017 at 01:27:36PM +0200, Kevin Wolf wrote:
+> >Am 23.06.2017 um 14:46 hat Manos Pitsidianakis geschrieben:
+> >>timer_cb() needs to know about the current Aio context of the throttle
+> >>request that is woken up. In order to make ThrottleGroupMember backend
+> >>agnostic, this information is stored in an aio_context field instead of
+> >>accessing it from BlockBackend.
+> >>
+> >>Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+> >
+> >You're copying the AioContext when the BlockBackend is registered for
+> >the throttle group, but what keeps both sides in sync when the context
+> >is changed later on? Don't we need to update the ThrottleGroupMember in
+> >blk_set_aio_context?
+>=20
+> blk_set_aio_context calls throttle_timers_attach_aio_context which
+> updates this. Though as Alberto said util/throttle.c should not know
+> about ThrottleGroupMember. This is not needed in the later patches
+> because the ThrottleGroupMember's aio_context gets updated as a node
+> in the driver's bdrv_attach_aio_context
+>=20
+> We can add a new function in block/throttle.c that updates a
+> member's aio context but I'm not sure if it's really needed if
+> members are only used in throttle nodes.
+
+Oh, I looked at the final state after the series instead of this very
+commit, so I missed the existing calls in blk_set_aio_context().
+
+My bad, sorry for the noise.
+
+Kevin
+
+--KsGdsel6WgEHnImy
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJZU6TGAAoJEH8JsnLIjy/WYnQQAL/HMWkPcoRkicQaMCZ/ZXcF
+Hr6VZbn/NFdM8/wmw22Dne1e7qbRlYip6RffBcE0pW61dG4ggP1TI0sbmUJX09Hf
+lmW0KI719GvQN/PZaBkwZd1/RvM/ORMCJsZfVKWF5r/9CrQe4o3myE6pagRmt4PU
+s+IUGGE2ETcHo703thIub+6GTKCDaUOVCq5o0ATfz6xcho0/3J90L3+BiEPyPpSj
+7FMFl/IyO66bJ364ruQwqMjaoQaClVr7agJupioIiMtwDejTIB7L/8EqIEPGf9oY
+hFj3r+CmDwlMEP6OYWmPWK0VFgDiD+r38Qyzi2XikchiN5Qw10j+4QuekJhnDoVR
+Cw5sJ3xzOZ0Bp+YqFUGlXm5gPUKTLwzFhCs4m3xTqnVyU8saQ+Sue9/wgcWAsOn9
+0c125JR1gnLQh2bAFRTLNghKTeyUwIRud+Tv4/goEk5AtX4uyrZFpZEltg8igdqS
+yLfJaabU0SawJ+jzKrtQJ0brqG98wAoER2a73imE2zhZAt3ZqMryp+g9wQgJaWUp
+zWnPh6WELEDlfvByYJv6s/kNTS3dyDyQKytXn0w2oGRiw16BVvvuTfWRfqUsQm1F
+WuS277heU2l6awm31OGiGCJBs005l5AgrA654k5FrlktbuP8aHvSGnrsYTnpmktO
+KsAEZsxPXO1SzxKKXcAM
+=uTDa
+-----END PGP SIGNATURE-----
+
+--KsGdsel6WgEHnImy--
