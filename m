@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dQC02-0005zd-9u
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:23:15 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dQC1n-0008Ae-Ic
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:25:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dQBzy-0002v3-CZ
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:23:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32974)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dQBzy-0002ul-6B
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:23:10 -0400
-References: <1498629200-35463-1-git-send-email-wei.w.wang@intel.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <35650f4c-8852-2dcd-94f9-13f0105b76cd@redhat.com>
-Date: Wed, 28 Jun 2017 07:22:52 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1dQC1j-0003V8-Hk
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:25:03 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:40190)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dQC1j-0003Uu-5U
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:24:59 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Wed, 28 Jun 2017 15:24:44 +0300
+Message-Id: <149865268422.17063.3930054464827416476.stgit@frigg.lan>
+In-Reply-To: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
+References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <1498629200-35463-1-git-send-email-wei.w.wang@intel.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="pjpMvwGnNSGoe1gwwK0ONve5EA5kXbq4e"
-Subject: Re: [Qemu-devel] [PATCH v1] virtio-net: code cleanup
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v11 02/29] cpu-exec: Avoid global variables in
+ icount-related functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,53 +27,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>, mst@redhat.com, jasowang@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pjpMvwGnNSGoe1gwwK0ONve5EA5kXbq4e
-From: Eric Blake <eblake@redhat.com>
-To: Wei Wang <wei.w.wang@intel.com>, mst@redhat.com, jasowang@redhat.com,
- virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
-Message-ID: <35650f4c-8852-2dcd-94f9-13f0105b76cd@redhat.com>
-Subject: Re: [PATCH v1] virtio-net: code cleanup
-References: <1498629200-35463-1-git-send-email-wei.w.wang@intel.com>
-In-Reply-To: <1498629200-35463-1-git-send-email-wei.w.wang@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+ include/exec/gen-icount.h |    8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-On 06/28/2017 12:53 AM, Wei Wang wrote:
-> Use is_power_of_2(), and remove trailing "." from error_setg().
->=20
-> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> ---
->  hw/net/virtio-net.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---pjpMvwGnNSGoe1gwwK0ONve5EA5kXbq4e
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZU5+cAAoJEKeha0olJ0NqyPkH/3MfL9hmmaLZgU7Nzb6o1RdA
-EW9qh11ihgjPGnUlfg1RUBUQ7O8L1K7OuD9VBQfXmYVPSEP4F9TrORCqW0e3RP06
-0QzmLRwExecOmHrG0G1Pgas10qtWW3Ha0t2S/PZgyTWzRx7J/IZEhVO2WaMeU4Ps
-f1ab/WVjEhFBQkmqmO2Yv2gz4oXpehgLLyEI7rLadHY+NyOPlOCN/l4e12bwvINy
-xhj9S3W8raDrtZH1bUFx6KRbScWrnkLDuNjGiSuyWDnMpGl/7cnnsdJsLadHCBiS
-omqV2MXIBOQPSHvTTIJRiedlQcXMM/KQfJsC9Q30YccTgJka8O+t6ViY1Kc20YM=
-=Yayq
------END PGP SIGNATURE-----
-
---pjpMvwGnNSGoe1gwwK0ONve5EA5kXbq4e--
+diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
+index 62d462e494..3fb17d435a 100644
+--- a/include/exec/gen-icount.h
++++ b/include/exec/gen-icount.h
+@@ -19,7 +19,7 @@ static inline void gen_tb_start(TranslationBlock *tb)
+         count =3D tcg_temp_new_i32();
+     }
+=20
+-    tcg_gen_ld_i32(count, cpu_env,
++    tcg_gen_ld_i32(count, tcg_ctx.tcg_env,
+                    -ENV_OFFSET + offsetof(CPUState, icount_decr.u32));
+=20
+     if (tb->cflags & CF_USE_ICOUNT) {
+@@ -37,7 +37,7 @@ static inline void gen_tb_start(TranslationBlock *tb)
+     tcg_gen_brcondi_i32(TCG_COND_LT, count, 0, exitreq_label);
+=20
+     if (tb->cflags & CF_USE_ICOUNT) {
+-        tcg_gen_st16_i32(count, cpu_env,
++        tcg_gen_st16_i32(count, tcg_ctx.tcg_env,
+                          -ENV_OFFSET + offsetof(CPUState, icount_decr.u1=
+6.low));
+     }
+=20
+@@ -62,14 +62,14 @@ static void gen_tb_end(TranslationBlock *tb, int num_=
+insns)
+ static inline void gen_io_start(void)
+ {
+     TCGv_i32 tmp =3D tcg_const_i32(1);
+-    tcg_gen_st_i32(tmp, cpu_env, -ENV_OFFSET + offsetof(CPUState, can_do=
+_io));
++    tcg_gen_st_i32(tmp, tcg_ctx.tcg_env, -ENV_OFFSET + offsetof(CPUState=
+, can_do_io));
+     tcg_temp_free_i32(tmp);
+ }
+=20
+ static inline void gen_io_end(void)
+ {
+     TCGv_i32 tmp =3D tcg_const_i32(0);
+-    tcg_gen_st_i32(tmp, cpu_env, -ENV_OFFSET + offsetof(CPUState, can_do=
+_io));
++    tcg_gen_st_i32(tmp, tcg_ctx.tcg_env, -ENV_OFFSET + offsetof(CPUState=
+, can_do_io));
+     tcg_temp_free_i32(tmp);
+ }
+=20
