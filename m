@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dQDHq-0007Cc-Og
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:45:43 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dQDKF-0007tP-3H
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:48:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dQDHm-0002K2-RZ
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:45:42 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed, 28 Jun 2017 16:45:27 +0300
-Message-Id: <149865752773.17063.5160701222440538985.stgit@frigg.lan>
-In-Reply-To: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
-References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
+	(envelope-from <el13635@mail.ntua.gr>) id 1dQDKE-0003mM-DP
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:48:11 -0400
+Date: Wed, 28 Jun 2017 16:47:24 +0300
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20170628134724.hubz7bd6es35kqwm@postretch>
+References: <20170623124700.1389-1-el13635@mail.ntua.gr>
+	<20170623124700.1389-7-el13635@mail.ntua.gr>
+	<w51efu41b5a.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v11 22/29] target/arm: [tcg,
- a64] Port to breakpoint_check
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="jof2sn43pty5k3sh"
+Content-Disposition: inline
+In-Reply-To: <w51efu41b5a.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v3 6/8] block: add options parameter to
+ bdrv_new_open_driver()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,107 +26,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Incrementally paves the way towards using the generic instruction transla=
-tion
-loop.
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
- target/arm/translate-a64.c |   58 +++++++++++++++++++++++++++++++++-----=
-------
- 1 file changed, 43 insertions(+), 15 deletions(-)
+--jof2sn43pty5k3sh
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 5784620642..9c870f6d07 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -11255,6 +11255,29 @@ static void aarch64_trblock_insn_start(DisasCont=
-extBase *dcbase, CPUState *cpu)
-     tcg_gen_insn_start(dc->pc, 0, 0);
- }
-=20
-+static BreakpointCheckType aarch64_trblock_breakpoint_check(
-+    DisasContextBase *dcbase, CPUState *cpu, const CPUBreakpoint *bp)
-+{
-+    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
-+
-+    if (bp->flags & BP_CPU) {
-+        gen_a64_set_pc_im(dc->pc);
-+        gen_helper_check_breakpoints(cpu_env);
-+        /* End the TB early; it likely won't be executed */
-+        dc->base.is_jmp =3D DISAS_UPDATE;
-+        return BC_HIT_INSN;
-+    } else {
-+        gen_exception_internal_insn(dc, 0, EXCP_DEBUG);
-+        /* The address covered by the breakpoint must be
-+           included in [tb->pc, tb->pc + tb->size) in order
-+           to for it to be properly cleared -- thus we
-+           increment the PC here so that the logic setting
-+           tb->size below does the right thing.  */
-+        dc->pc +=3D 4;
-+        return BC_HIT_TB;
-+    }
-+}
-+
- void gen_intermediate_code_a64(DisasContextBase *dcbase, CPUState *cs,
-                                TranslationBlock *tb)
- {
-@@ -11291,26 +11314,31 @@ void gen_intermediate_code_a64(DisasContextBase=
- *dcbase, CPUState *cs,
-         if (unlikely(!QTAILQ_EMPTY(&cs->breakpoints))) {
-             CPUBreakpoint *bp;
-             QTAILQ_FOREACH(bp, &cs->breakpoints, entry) {
--                if (bp->pc =3D=3D dc->pc) {
--                    if (bp->flags & BP_CPU) {
--                        gen_a64_set_pc_im(dc->pc);
--                        gen_helper_check_breakpoints(cpu_env);
--                        /* End the TB early; it likely won't be executed=
- */
--                        dc->base.is_jmp =3D DISAS_UPDATE;
--                    } else {
--                        gen_exception_internal_insn(dc, 0, EXCP_DEBUG);
--                        /* The address covered by the breakpoint must be
--                           included in [dc->base.tb->pc, dc->base.tb->pc=
- + dc->base.tb->size) in order
--                           to for it to be properly cleared -- thus we
--                           increment the PC here so that the logic setti=
-ng
--                           dc->base.tb->size below does the right thing.=
-  */
--                        dc->pc +=3D 4;
-+                if (bp->pc =3D=3D dc->base.pc_next) {
-+                    BreakpointCheckType bp_check =3D
-+                        aarch64_trblock_breakpoint_check(&dc->base, cs, =
-bp);
-+                    switch (bp_check) {
-+                    case BC_MISS:
-+                        /* Target ignored this breakpoint, go to next */
-+                        break;
-+                    case BC_HIT_INSN:
-+                        /* Hit, keep translating */
-+                        /*
-+                         * TODO: if we're never going to have more than =
-one
-+                         *       BP in a single address, we can simply u=
-se a
-+                         *       bool here.
-+                         */
-+                        goto done_breakpoints;
-+                    case BC_HIT_TB:
-+                        /* Hit, end TB */
-                         goto done_generating;
-+                    default:
-+                        g_assert_not_reached();
-                     }
--                    break;
-                 }
-             }
-         }
-+    done_breakpoints:
-=20
-         if (dc->base.num_insns =3D=3D max_insns && (dc->base.tb->cflags =
-& CF_LAST_IO)) {
-             gen_io_start();
+On Wed, Jun 28, 2017 at 03:42:41PM +0200, Alberto Garcia wrote:
+>On Fri 23 Jun 2017 02:46:58 PM CEST, Manos Pitsidianakis wrote:
+>>  BlockDriverState *bdrv_new_open_driver(BlockDriver *drv, const char *node_name,
+>> -                                       int flags, Error **errp)
+>> +                                       int flags, QDict *options, Error **errp)
+>>  {
+>>      BlockDriverState *bs;
+>>      int ret;
+>>
+>>      bs = bdrv_new();
+>>      bs->open_flags = flags;
+>> -    bs->explicit_options = qdict_new();
+>> -    bs->options = qdict_new();
+>> +    if (options) {
+>> +        bs->explicit_options = qdict_clone_shallow(options);
+>> +        bs->options = qdict_clone_shallow(options);
+>> +    } else {
+>> +        bs->explicit_options = qdict_new();
+>> +        bs->options = qdict_new();
+>> +    }
+>>      bs->opaque = NULL;
+>>
+>>      update_options_from_flags(bs->options, flags);
+>>
+>> -    ret = bdrv_open_driver(bs, drv, node_name, bs->options, flags, errp);
+>> +    ret = bdrv_open_driver(bs, drv, node_name, options, flags, errp);
+>
+>Why this last change? In the default case you're now passing NULL
+>instead of the QDict created with qdict_new().
+
+Duh, nice catch!
+
+--jof2sn43pty5k3sh
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAllTs2wACgkQc2J8L2kN
+9xDE7RAAplwtGGSh1/X+i8XZBmuuXS9XtRsaF1BMKPLxoA3v74t7DudFmfDq6Fga
+Y6vm7BpY8cjUM4PBCrzkzMMDsqkw0LUuJ2ubhKfB3xDzY99HYeUDUdjvEO4g2FzJ
+I0lSbS/gn3QvW2TPEGl85EpqVu0uQ3v2RAoqdVF/eIwUQxfzV+kp+k3ORdaR1jKi
+Dmybv9peJYx3YGbCoPq8zC2e7aXUzEUFv3LeOQbbvq/uuVUZszteotlQh6XScJLI
+z0BN7muaZ5pD6HUtFcMNdrp7jQ+5XyxYMWoJT6va0gI5H4cMx027mVNBdJmHaD+y
+huq4oHUNp42AsvrQ1ORkxEPksHqeLFzo3l618nMzU5efhY7BF+e8m+oNvRiMSOFu
+1r13MGRi0bXzRBPfy+qzmHB1H+fgELh/EI77O8JpMPis3tbIoNLecthVHGuQ5Hkd
+rvRRcPp/o3ckzcpFw/kAnRKji1UwgEx4+4wFuWmfa4xDNvk2kYjivUSx+ZGatUxQ
+KyH0o8mauAHfb7ALNkKzGtdWc8sI+/ddQRQusx1zOFUvktzf4/Yu1yMCjw264nrw
+gRiiZNeS1rRKkL2xvuQlzrYn++NKbwfIHvvbHyp7B5UtlMUT8MW5fQlw6SE3khbR
+GrgFO9nrVU8Fq13Ltw00kchKdsXbP+7Ooaa5KurJH7bC2nBGddI=
+=n54n
+-----END PGP SIGNATURE-----
+
+--jof2sn43pty5k3sh--
