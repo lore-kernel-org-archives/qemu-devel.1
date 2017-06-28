@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dQIPe-0007sU-9n
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:14:09 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1dQImD-0003IX-Mj
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:37:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dQIPa-00065e-9x
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:14:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49570)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dQIPa-000656-3W
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:14:02 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0C2F85D5E9
-	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 19:14:01 +0000 (UTC)
-Date: Wed, 28 Jun 2017 16:13:57 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170628191357.GO12152@localhost.localdomain>
-References: <1498536619-14548-1-git-send-email-peterx@redhat.com>
-	<1498536619-14548-7-git-send-email-peterx@redhat.com>
-MIME-Version: 1.0
+	(envelope-from <programmingkidx@gmail.com>) id 1dQIm8-0000Bu-Po
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:37:25 -0400
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:35762)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1dQIm8-0000BP-Kl
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:37:20 -0400
+Received: by mail-it0-x244.google.com with SMTP id v193so5547920itc.2
+	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 12:37:18 -0700 (PDT)
+From: Programmingkid <programmingkidx@gmail.com>
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1498536619-14548-7-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 06/10] migration: move only_migratable
- to MigrationState
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 28 Jun 2017 15:37:16 -0400
+Message-Id: <F6C36C1A-4661-48F4-BEA6-3994889927D0@gmail.com>
+Mime-Version: 1.0 (Apple Message framework v1084)
+Subject: [Qemu-devel] [PATCH] ui/cocoa.m: Fix compatibility issue with Mac
+ OS 10.9 and under
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,59 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
-On Tue, Jun 27, 2017 at 12:10:15PM +0800, Peter Xu wrote:
-> One less global variable, and it does only matter with migration.
-> 
-> We keep the old "--only-migratable" option, but also now we support:
-> 
->   -global migration.only-migratable=true
-> 
-> Currently still keep the old interface.
-> 
-> Hmm, now vl.c has no way to access migrate_get_current(). Export a
-> function for it to setup only_migratable.
-> 
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-[...]
-> +void migration_only_migratable_set(void)
-> +{
-> +    migrate_get_current()->only_migratable = true;
-> +}
-> +
-[...]
-> @@ -3953,7 +3952,13 @@ int main(int argc, char **argv, char **envp)
->                  incoming = optarg;
->                  break;
->              case QEMU_OPTION_only_migratable:
-> -                only_migratable = 1;
-> +                /*
-> +                 * TODO: we can remove this option one day, and we
-> +                 * should all use:
-> +                 *
-> +                 * "-global migration.only-migratable=true"
-> +                 */
-> +                migration_only_migratable_set();
+The [NSEvent modifierFlags] method returns an NSEventModifierFlags type =
+value in Mac OS 10.10. It use to be of type NSUInteger. Replacing =
+NSEventModifierFlags with NSUInteger allows for the cooca.m file to be =
+compiled on older versions of Mac OS. This patch was been tested on Mac =
+OS 10.6 and Mac OS 10.12 without problem.
 
-This triggers a premature call to migrate_get_current():
+Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+---
+ ui/cocoa.m | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  $ qemu-system-x86_64 -only-migratable
-  qemu-system-x86_64: /home/ehabkost/rh/proj/virt/qemu/migration/migration.c:127: migrate_get_current: Assertion `current_migration' failed.
-  Aborted (core dumped)
-
-What about just doing:
-
-    qemu_global_option("migration.only-migratable=true");
-
->                  break;
->              case QEMU_OPTION_nodefaults:
->                  has_defaults = 0;
-> -- 
-> 2.7.4
-> 
-
--- 
-Eduardo
+diff --git a/ui/cocoa.m b/ui/cocoa.m
+index 9e81285..93e56d0 100644
+--- a/ui/cocoa.m
++++ b/ui/cocoa.m
+@@ -571,7 +571,7 @@ QemuCocoaView *cocoaView;
+                 // bitmask.
+=20
+                 if (qemu_console_is_graphic(NULL)) {
+-                    NSEventModifierFlags modifiers =3D [event =
+modifierFlags];
++                    NSUInteger modifiers =3D [event modifierFlags];
+=20
+                     if (!!(modifiers & NSEventModifierFlagCapsLock) !=3D =
+!!modifiers_state[Q_KEY_CODE_CAPS_LOCK]) {
+                         [self =
+toggleStatefulModifier:Q_KEY_CODE_CAPS_LOCK];
+--=20
+2.7.2
