@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dQ0fJ-0003bN-T2
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 20:17:07 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dQ0gg-0004VU-VE
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 20:18:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dQ0fJ-0003wL-2q
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 20:17:05 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:36711)
+	(envelope-from <alistair23@gmail.com>) id 1dQ0gg-0004b3-0W
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 20:18:30 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:34808)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1dQ0fI-0003vr-SW
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 20:17:05 -0400
-Received: by mail-wm0-x234.google.com with SMTP id 62so38653912wmw.1
-	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 17:17:03 -0700 (PDT)
+	id 1dQ0gf-0004an-Qf
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 20:18:29 -0400
+Received: by mail-wr0-x244.google.com with SMTP id k67so33007123wrc.1
+	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 17:18:29 -0700 (PDT)
 MIME-Version: 1.0
 Sender: alistair23@gmail.com
-In-Reply-To: <df67b0cd-0b49-c0c1-fa7b-3928204e7c0b@redhat.com>
+In-Reply-To: <20170627211037.GE2201@toto>
 References: <cover.1498596157.git.alistair.francis@xilinx.com>
-	<4e1eded5cda7b182a8a4cb133b40b2915817b7d1.1498596157.git.alistair.francis@xilinx.com>
-	<df67b0cd-0b49-c0c1-fa7b-3928204e7c0b@redhat.com>
+	<55b6931c368b67ece2f0bd7d8e83092727df1e3c.1498596157.git.alistair.francis@xilinx.com>
+	<20170627211037.GE2201@toto>
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 27 Jun 2017 17:16:31 -0700
-Message-ID: <CAKmqyKMbJ1R3T0cq2j8uCUKx2jYhrW5uCEm-V6DufDW=NYb=WQ@mail.gmail.com>
+Date: Tue, 27 Jun 2017 17:17:58 -0700
+Message-ID: <CAKmqyKN9znxH=1y1ZVT86Hk9815JXukdK8c=UPYc5CES7y=juQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC v1 2/3] util/qemu-error: Add a
- warning_report() function
+Subject: Re: [Qemu-devel] [RFC v1 3/3] char-socket: Report TCP socket
+ waiting as a warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,30 +32,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
-On Tue, Jun 27, 2017 at 3:21 PM, Thomas Huth <thuth@redhat.com> wrote:
-> On 27.06.2017 22:45, Alistair Francis wrote:
->> Add a functino which can be used similarly to error_report() execpt to
->> inform the users about warnings instead of errors.
+On Tue, Jun 27, 2017 at 2:10 PM, Edgar E. Iglesias
+<edgar.iglesias@gmail.com> wrote:
+> On Tue, Jun 27, 2017 at 01:45:48PM -0700, Alistair Francis wrote:
+>> When QEMU is waiting for a TCP socket connection it reports that message as
+>> an error. This isn't an error it is a warnign so let's change the report to
+>> use warning_report() instead.
 >
-> s/functino/function/
-> s/execpt/except/
-
-Thanks, I'll fix these two in the next version.
-
+> Hi Alistair,
 >
-> And could we maybe call the function "warn_report" or something else
-> instead? I often already have trouble with error_report() to fit the
-> string into one line of the scarce 80 columns space ... so the shorter
-> the name of the function, the more characters can be squeezed into the
-> string in one line later ;-)
+> Isn't this more like an informational message rather than a warning?
+>
+> A warning would indicate to me that something unexpected and perhaps wrong happened.
+> In this case, there's nothing wrong going on.
+>
+> We may need more classes, like 'info:' and/or maybe others...
 
-Good idea, I'll change it to warn_report().
+Hey Edgar,
+
+That is a good point. I can add a info_report() as well then that
+copies the warning_report() function but prefixes with 'info: '.
 
 Thanks,
 Alistair
 
 >
->  Thomas
+> Cheers,
+> Edgar
+>
+>
+>
+>>
+>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>> ---
+>>
+>>  chardev/char-socket.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+>> index ccc499cfa1..5a56628e74 100644
+>> --- a/chardev/char-socket.c
+>> +++ b/chardev/char-socket.c
+>> @@ -765,7 +765,7 @@ static int tcp_chr_wait_connected(Chardev *chr, Error **errp)
+>>       * in TLS and telnet cases, only wait for an accepted socket */
+>>      while (!s->ioc) {
+>>          if (s->is_listen) {
+>> -            error_report("QEMU waiting for connection on: %s",
+>> +            warning_report("QEMU waiting for connection on: %s",
+>>                           chr->filename);
+>>              qio_channel_set_blocking(QIO_CHANNEL(s->listen_ioc), true, NULL);
+>>              tcp_chr_accept(QIO_CHANNEL(s->listen_ioc), G_IO_IN, chr);
+>> --
+>> 2.11.0
+>>
+>>
