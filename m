@@ -1,19 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dQD6C-0000ks-KV
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:33:41 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dQD7M-0001Jf-1U
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:34:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dQD67-0004Nl-Ng
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:33:40 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed, 28 Jun 2017 16:33:22 +0300
-Message-Id: <149865680190.17063.16072451312204148936.stgit@frigg.lan>
-In-Reply-To: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
-References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dQD7K-00052A-TZ
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:34:52 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:10999 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dQD7K-00050y-IJ
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:34:50 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
+	<20170628120530.31251-14-vsementsov@virtuozzo.com>
+	<f5957047-c69c-ebe6-6640-08bacc3244ea@virtuozzo.com>
+	<da795837-2945-d3b1-bd92-e6ced22817bc@redhat.com>
+	<6e99d1ce-a7e9-af1b-ec84-baae97f348df@virtuozzo.com>
+	<22469eec-5a74-ee90-e530-744fabc50c4f@virtuozzo.com>
+Message-ID: <1ef5fa08-3053-ad36-5212-9a7a826725c4@virtuozzo.com>
+Date: Wed, 28 Jun 2017 16:34:35 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v11 19/29] target/arm: [tcg] Port to insn_start
+In-Reply-To: <22469eec-5a74-ee90-e530-744fabc50c4f@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v22 13/30] block: new
+ bdrv_reopen_bitmaps_rw interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,75 +34,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
-Incrementally paves the way towards using the generic instruction transla=
-tion
-loop.
+Finally, it looks like thunderbird bug
+https://bugzilla.mozilla.org/show_bug.cgi?id=1160880
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
- target/arm/translate.c |   34 ++++++++++++++++++++++------------
- 1 file changed, 22 insertions(+), 12 deletions(-)
+[sorry for so much offtopic]
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 029c4d3550..c7e188b50e 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -11898,6 +11898,26 @@ static void arm_trblock_tb_start(DisasContextBas=
-e *dcbase, CPUState *cpu)
-     }
- }
-=20
-+static void arm_trblock_insn_start(DisasContextBase *dcbase, CPUState *c=
-pu)
-+{
-+    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
-+
-+    dc->insn_start_idx =3D tcg_op_buf_count();
-+    tcg_gen_insn_start(dc->pc,
-+                       (dc->condexec_cond << 4) | (dc->condexec_mask >> =
-1),
-+                       0);
-+
-+#ifdef CONFIG_USER_ONLY
-+    /* Intercept jump to the magic kernel page.  */
-+    if (dc->pc >=3D 0xffff0000) {
-+        /* We always get here via a jump, so know we are not in a
-+           conditional execution block.  */
-+        gen_exception_internal(EXCP_KERNEL_TRAP);
-+        dc->base.is_jmp =3D DISAS_EXC;
-+    }
-+#endif
-+}
-+
- /* generate intermediate code for basic block 'tb'.  */
- void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
- {
-@@ -11943,21 +11963,11 @@ void gen_intermediate_code(CPUState *cpu, Trans=
-lationBlock *tb)
-=20
-     do {
-         dc->base.num_insns++;
--        dc->insn_start_idx =3D tcg_op_buf_count();
--        tcg_gen_insn_start(dc->pc,
--                           (dc->condexec_cond << 4) | (dc->condexec_mask=
- >> 1),
--                           0);
-+        arm_trblock_insn_start(&dc->base, cpu);
-=20
--#ifdef CONFIG_USER_ONLY
--        /* Intercept jump to the magic kernel page.  */
--        if (dc->pc >=3D 0xffff0000) {
--            /* We always get here via a jump, so know we are not in a
--               conditional execution block.  */
--            gen_exception_internal(EXCP_KERNEL_TRAP);
--            dc->base.is_jmp =3D DISAS_EXC;
-+        if (unlikely(dc->base.is_jmp > DISAS_NEXT)) {
-             break;
-         }
--#endif
-=20
-         if (unlikely(!QTAILQ_EMPTY(&cpu->breakpoints))) {
-             CPUBreakpoint *bp;
+28.06.2017 16:13, Vladimir Sementsov-Ogievskiy wrote:
+> 28.06.2017 16:02, Vladimir Sementsov-Ogievskiy wrote:
+>> It is interesting, but I see this problem only in your answers, in my 
+>> letters I see this white-space on its place.
+> 
+> In outgoing letter I see this white-space, but in letter from 
+> mailing-list it is absent.
+> 
+>>
+>> 28.06.2017 15:36, Eric Blake wrote:
+>>> [meta-comment]
+>>>
+>>> On 06/28/2017 07:10 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>>> 28.06.2017 15:05, Vladimir Sementsov-Ogievskiy wrote:
+>>>>> Add format driver handler, which should mark loaded read-only
+>>>>> bitmaps as 'IN_USE' in the image and unset read_only field in
+>>>>> corresponding BdrvDirtyBitmap's.
+>>>>>
+>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy<vsementsov@virtuozzo.com>
+>>>>> Reviewed-by: John Snow<jsnow@redhat.com>
+>>> Your original message had spaces before '<' in the email addresses, but
+>>> it got lost here...
+>>>
+>>>>
+>>>> Forgot to add:
+>>>>
+>>>> Reviewed-by: Max Reitz<mreitz@redhat.com>
+>>> ...this one also lacks the space.  I'm not sure if git cares, but it may
+>>> be worth investigating why your mailer eats the space when you reply
+>>> manually rather than sending via git; and for consistency, it is worth
+>>> keeping the space (for example, we like to grep 'git log' for learning
+>>> how active various contributors are, and having a consistent usage of
+>>> space before < in an email address can make the task easier).
+>>>
+>>
+> 
+
+
+-- 
+Best regards,
+Vladimir
