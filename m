@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dQ9qc-0002MJ-F5
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 06:05:24 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dQ9rr-00033D-0V
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 06:06:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dQ9qZ-0002Lm-BB
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 06:05:22 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:38066)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dQ9qZ-0002LP-1h
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 06:05:19 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id b184so53033422wme.1
-	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 03:05:18 -0700 (PDT)
-Date: Wed, 28 Jun 2017 11:05:15 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170628100515.GB29104@stefanha-x1.localdomain>
-References: <20170622140827.GA29936@stefanha-x1.localdomain>
-	<20170623001313.n6cms5sunwuqnf4h@hz-desktop>
-	<20170623095522.GB12689@stefanha-x1.localdomain>
-	<20170626020501.xq54xlnqmhika3zw@hz-desktop>
-	<20170626125651.GA7776@stefanha-x1.localdomain>
-	<20170627143001.jsfmxqnaig7nfawx@hz-desktop>
+	(envelope-from <kwolf@redhat.com>) id 1dQ9rp-0002yu-Lm
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 06:06:39 -0400
+Date: Wed, 28 Jun 2017 12:06:21 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170628100621.GA5378@noname.redhat.com>
+References: <20170627163145.GC4792@noname.redhat.com>
+	<71a641e8-4701-58bf-29c5-090f30d59d91@redhat.com>
+	<87mv8sd1tt.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="DKU6Jbt7q3WqK7+M"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170627143001.jsfmxqnaig7nfawx@hz-desktop>
-Subject: Re: [Qemu-devel] NVDIMM live migration broken?
+In-Reply-To: <87mv8sd1tt.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [RFC] QMP design: Fixing query-block and friends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,124 +24,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
 
+Am 28.06.2017 um 09:10 hat Markus Armbruster geschrieben:
+> Eric Blake <eblake@redhat.com> writes:
+> > On 06/27/2017 11:31 AM, Kevin Wolf wrote:
+> >> If that's what we're going to do, I think I can figure out something
+> >> nice for block nodes. That shouldn't be too hard. The only question
+> >> would be whether we want a command to query one node or whether we would
+> >> keep returning all of them.
+> >
+> > The age-old filtering question. It's also plausible to have a single
+> > command, with an optional argument, and which always returns an array:
+> > the full array if the argument was omitted, or an array of one matching
+> > the argument when one was provided.  Adding filtering is an easy patch
+> > on top once it is proven to make life easier for a client, and I'm okay
+> > with a first approach that does not filter.
+> 
+> The graph may change.  Querying node by node would have to cope with
+> changes somehow, which I'd expect to be complex and fragile.  I think we
+> really need a way to get a complete, consistent graph.  So let's
+> implement that first.  If we still want server-side filtering once
+> that's done, we can add some on top.
+> 
+> As usual, I doubt we really need server-side filtering, and I dislike
+> the interface complexity it brings.
 
---DKU6Jbt7q3WqK7+M
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I didn't really think of it as filtering. Every other operation is done
+on a single object, so querying a single object would be the natural
+extension. I mean, we also don't consider it "filtering" that we have
+many separate query commands instead of a 'query-qemu-state'.
 
-On Tue, Jun 27, 2017 at 10:30:01PM +0800, Haozhong Zhang wrote:
-> On 06/26/17 13:56 +0100, Stefan Hajnoczi wrote:
-> > On Mon, Jun 26, 2017 at 10:05:01AM +0800, Haozhong Zhang wrote:
-> > > On 06/23/17 10:55 +0100, Stefan Hajnoczi wrote:
-> > > > On Fri, Jun 23, 2017 at 08:13:13AM +0800, haozhong.zhang@intel.com =
-wrote:
-> > > > > On 06/22/17 15:08 +0100, Stefan Hajnoczi wrote:
-> > > > > > I tried live migrating a guest with NVDIMM on qemu.git/master (=
-edf8bc984):
-> > > > > >=20
-> > > > > >   $ qemu -M accel=3Dkvm,nvdimm=3Don -m 1G,slots=3D4,maxmem=3D8G=
- -cpu host \
-> > > > > >          -object memory-backend-file,id=3Dmem1,share=3Don,mem-p=
-ath=3Dnvdimm.dat,size=3D1G \
-> > > > > > 	 -device nvdimm,id=3Dnvdimm1,memdev=3Dmem1 \
-> > > > > > 	 -drive if=3Dvirtio,file=3Dtest.img,format=3Draw
-> > > > > >=20
-> > > > > >   $ qemu -M accel=3Dkvm,nvdimm=3Don -m 1G,slots=3D4,maxmem=3D8G=
- -cpu host \
-> > > > > >          -object memory-backend-file,id=3Dmem1,share=3Don,mem-p=
-ath=3Dnvdimm.dat,size=3D1G \
-> > > > > > 	 -device nvdimm,id=3Dnvdimm1,memdev=3Dmem1 \
-> > > > > > 	 -drive if=3Dvirtio,file=3Dtest.img,format=3Draw \
-> > > > > > 	 -incoming tcp::1234
-> > > > > >=20
-> > > > > >   (qemu) migrate tcp:127.0.0.1:1234
-> > > > > >=20
-> > > > > > The guest kernel panics or hangs every time on the destination.=
-  It
-> > > > > > happens as long as the nvdimm device is present - I didn't even=
- mount it
-> > > > > > inside the guest.
-> > > > > >=20
-> > > > > > Is migration expected to work?
-> > > > >=20
-> > > > > Yes, I tested on QEMU 2.8.0 several months ago and it worked. I'll
-> > > > > have a look at this issue.
-> > > >=20
-> > > > Great, thanks!
-> > > >=20
-> > > > David Gilbert suggested the following on IRC, it sounds like a good
-> > > > starting point for debugging:
-> > > >=20
-> > > > Launch the destination QEMU with -S (vcpus will be paused) and after
-> > > > migration has completed, compare the NVDIMM contents on source and
-> > > > destination.
-> > > >=20
-> > >=20
-> > > Which host and guest kernel are you testing? Is any workload running
-> > > in guest when migration?
-> > >=20
-> > > I just tested QEMU commit edf8bc984 with host/guest kernel 4.8.0, and
-> > > could not reproduce the issue.
-> >=20
-> > I can still reproduce the problem on qemu.git edf8bc984.
-> >=20
-> > My guest kernel is fairly close to yours.  The host kernel is newer.
-> >=20
-> > Host kernel: 4.11.6-201.fc25.x86_64
-> > Guest kernel: 4.8.8-300.fc25.x86_64
-> >=20
-> > Command-line:
-> >=20
-> >   qemu-system-x86_64 \
-> >       -enable-kvm \
-> >       -cpu host \
-> >       -machine pc,nvdimm \
-> >       -m 1G,slots=3D4,maxmem=3D8G \
-> >       -object memory-backend-file,id=3Dmem1,share=3Don,mem-path=3Dnvdim=
-m.dat,size=3D1G \
-> >       -device nvdimm,id=3Dnvdimm1,memdev=3Dmem1 \
-> >       -drive if=3Dvirtio,file=3Dtest.img,format=3Draw \
-> >       -display none \
-> >       -serial stdio \
-> >       -monitor unix:/tmp/monitor.sock,server,nowait
-> >=20
-> > Start migration at the guest login prompt.  You don't need to log in or
-> > do anything inside the guest.
-> >=20
-> > There seems to be a guest RAM corruption because I get different
-> > backtraces inside the guest every time.
-> >=20
-> > The problem goes away if I remove -device nvdimm.
-> >=20
->=20
-> I managed to reproduce this bug. After bisect between good v2.8.0 and
-> bad edf8bc984, it looks a regression introduced by
->     6b6712efccd "ram: Split dirty bitmap by RAMBlock"
-> This commit may result in guest crash after migration if any host
-> memory backend is used.
->=20
-> Could you test whether the attached draft patch fixes this bug? If yes,
-> I will make a formal patch later.
+But you have a good point with the necessary atomicity, so we'll return
+everything at once.
 
-Thanks for the fix!  I tested and replied to your v2 patch.
+> >> I am, however, a bit less confident about BBs. As I said above, I
+> >> consider them part of the qdev devices.
+> 
+> They weren't meant to be when I created them, but I guess it's what they
+> evolved to be.
+> 
+> >>                                         As far as I know, there is no
+> >> high-level infrastructure to query runtime state of devices and qdev
+> >> properties are supposed to be read-only. Maybe non-qdev QOM properties
+> >> can be used somehow?
+> 
+> Since qdev properties are implemented as QOM property, there are no
+> non-qdev QOM properties.
 
-Stefan
+You got the logic wrong here: "All qdev properties are QOM properties"
+doesn't imply "All QOM properties are qdev properties". Now I don't say
+that it's not true anyway, I don't know enough about QOM and qdev to say
+much about it.
 
---DKU6Jbt7q3WqK7+M
-Content-Type: application/pgp-signature; name="signature.asc"
+I always had the impression that qdev provided some wrappers around QOM
+that add magic that makes properties configurable in -device and things
+like that, which you wouldn't want for these properties. I also know
+that devices aren't supposed to change qdev properties at runtime
+(whereas I remember QOM not to have trouble with that), but I'm not sure
+if there is a technical reason for this.
 
------BEGIN PGP SIGNATURE-----
+> >>                      But QOM isn't really nice to use as you need to
+> >> query each property individually.
+> 
+> qom-get returns 'any'.  A read-only property with a complex value is
+> already possible.  But it's awkward when you also want to get or set
+> parts of the complex value.
+> 
+> Perhaps we could provide a way to get whole containers in addition to
+> single properties.  Would that do?
 
-iQEcBAEBAgAGBQJZU39bAAoJEJykq7OBq3PIUOYH/iBizDzwzz2isn6VADMyvrao
-gBfdYg8VcL31urczZHEsEQBvigy6ut1oXniwDDw+q6mcfKEQ2UV05ZBFG/+0y20v
-L3MFqMj3G4g6QS33m0jmsAv43VDu6RmFivVKMruenyEx36sfIATrAWXVcT90410b
-Pk6ESReADVCImGAa/dxEybx8xdElo6tNhVgYl9frHMK5UAvj7qVcyjQ+aI8mOl2g
-ExJ7NWhvoa9l965pvtfFbVuKsrfDolBlSApUlMSG7vEYX+o2dw0iSyjIyF5bIvh+
-Kd9P5DnTdg6QmsbHiloV1cwTjruZTMqglDjhSnqgIdnvOgnlc14O+CAu2yq7jRg=
-=tM5A
------END PGP SIGNATURE-----
+You could query a device with a single command then, sounds much nicer.
+Actually, your argument from above applies here, too: You want the
+returned data to be consistent, so querying needs to be atomic. This
+means that getting whole containers isn't only more convenient, but
+actually more correct.
 
---DKU6Jbt7q3WqK7+M--
+Another thought I have when comparing this with querying block nodes:
+Wouldn't you still consider querying just a single device filtering?
+
+> >> Another option would be to have a QMP command that takes a qdev ID of a
+> >> block device and queries its BB. Or maybe it should stay like
+> >> query-block and return an array of all of them, but include the qdev
+> >> device name. Actually, maybe query-block can stay as it contains only
+> >> two fields that are useless in the new world.
+> >
+> > Being able to query all the devices (with their BB's, and only a name
+> > reference to the top-level BDS in use by the BB), separately from being
+> > able to query all BDS, seems like a reasonable thing.  After all,
+> > sometimes you care about what the guest sees (what devices have a BB),
+> > and sometimes you care about what the host is exposing (what BDS are in
+> > use).
+> 
+> No argument.  But let's not focus narrowly on block devices, or even
+> devices.  If QOM "isn't really nice" for block devices, it probably
+> isn't nice for lots of other things.  If we can address that at the QOM
+> level, we should.
+
+That's exactly what I think. Unfortunately, my knowledge about QOM is
+seriously lacking. Even more unfortunately, everyone else seems to have
+the same problem.
+
+> >> I think this has become long enough now, so any opinions? On anything I
+> >> said above, but preferably also about what a new interface should look
+> >> like?
+> >
+> > Our existing interface is definitely awkward, with lots of redundancy in
+> > some places and missing information in others, and a new interface does
+> > seem like we can do better at designing it right up front rather than
+> > bolting on yet more information to the existing queries (which results
+> > in that much more noise to churn through to get to the desired information).
+> 
+> Replacing an interface that could be evolved to serve is a mistake.
+> 
+> Not replacing an interface when it has reached its design limits is also
+> a mistake.
+> 
+> I normally advise against the first mistake.  But in this case, I think
+> we have to avoid the second.  The interface has evolved into a confusing
+> mess.  The gap between how the interface presents the block layer and
+> how it actually works has become too large.  Sufficiently sophisticated
+> clients have to bridge the gap somehow, and that's painful.
+
+Thanks, the feedback so far is already very helpful in that everyone
+agreed that we need something completely new. Now we just need to figure
+out what it should look like. :-)
+
+Kevin
