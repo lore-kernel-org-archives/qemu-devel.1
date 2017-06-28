@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dQLX5-0000MP-9o
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 18:34:00 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1dQLcY-0002KE-HL
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 18:39:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dQLX4-0003dk-6z
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 18:33:59 -0400
-References: <1498475064-39816-1-git-send-email-sochin.jiang@huawei.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <d2c26bda-b166-cc2b-8596-ad48783e7e7c@redhat.com>
-Date: Thu, 29 Jun 2017 00:33:47 +0200
+	(envelope-from <sstabellini@kernel.org>) id 1dQLcV-0005cr-Eb
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 18:39:38 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59072)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1dQLcV-0005cO-84
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 18:39:35 -0400
+Date: Wed, 28 Jun 2017 15:39:31 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <149868266150.23385.2902323487462062636.stgit@bahia.lan>
+Message-ID: <alpine.DEB.2.10.1706281539240.2919@sstabellini-ThinkPad-X260>
+References: <149868263738.23385.16723444264552987199.stgit@bahia.lan>
+	<149868266150.23385.2902323487462062636.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <1498475064-39816-1-git-send-email-sochin.jiang@huawei.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="xcIQbVVmhUhAfex6s46l1M9L92lNj5oP6"
-Subject: Re: [Qemu-devel] [PATCH] mirror: fix the inconsistent AioContext
- problem in the backing BDSs during mirroring.
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v5 2/5] virtio-9p: message header is 7-byte
+ long
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,96 +28,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "sochin.jiang" <sochin.jiang@huawei.com>, kwolf@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, eric.fangyi@huawei.com, subo7@huawei.com, xieyingtai@huawei.com, lina.lulina@huawei.com, zhangshuai13@huawei.com, lizhengui@huawei.com
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---xcIQbVVmhUhAfex6s46l1M9L92lNj5oP6
-From: Max Reitz <mreitz@redhat.com>
-To: "sochin.jiang" <sochin.jiang@huawei.com>, kwolf@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, eric.fangyi@huawei.com,
- subo7@huawei.com, xieyingtai@huawei.com, lina.lulina@huawei.com,
- zhangshuai13@huawei.com, lizhengui@huawei.com
-Message-ID: <d2c26bda-b166-cc2b-8596-ad48783e7e7c@redhat.com>
-Subject: Re: [PATCH] mirror: fix the inconsistent AioContext problem in the
- backing BDSs during mirroring.
-References: <1498475064-39816-1-git-send-email-sochin.jiang@huawei.com>
-In-Reply-To: <1498475064-39816-1-git-send-email-sochin.jiang@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, 28 Jun 2017, Greg Kurz wrote:
+> The 9p spec at http://man.cat-v.org/plan_9/5/intro reads:
+> 
+>  "Each 9P message begins with a four-byte size field specify-
+>   ing the length in bytes of the complete message including
+>   the four bytes of the size field itself.  The next byte is
+>   the message type, one of the constants in the enumeration in
+>   the include file <fcall.h>.  The next two bytes are an iden-
+>   tifying tag, described below."
+> 
+> ie, each message starts with a 7-byte long header.
+> 
+> The core 9P code already assumes this pretty much everywhere. This patch
+> does the following:
+> - makes the assumption explicit in the common 9p.h header, since it isn't
+>   related to the transport
+> - open codes the header size in handle_9p_output() and hardens the sanity
+>   check on the space needed for the reply message
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-On 2017-06-26 13:04, sochin.jiang wrote:
-> From: "sochin.jiang" <sochin.jiang@huawei.com>
->=20
->  mirror_complete opens the backings, BDSs of the new open backings shou=
-ld have a
->  same AioContext with the top when using iothreads, fix the code to gua=
-rantee this,
->  also avoiding unexpected qemu exit(assert fails in bdrv_attach_child).=
+Acked-by: Stefano Stabellini <sstabellini@kernel.org>
 
 
-Thanks! The functional change looks good to me. I'll see to add an
-iotest to cover this case.
-
-Some notes: There shouldn't be any spaces at the front of these lines,
-and every line should be limited to 72 characters.
-
-Also, the commit message should not end in a full stop (and it's good to
-keep it short).
-
-I've reworded a bit of the commit message (and shortened the title*) and
-applied it to my block branch:
-
-https://github.com/XanClic/qemu/commits/block
-
-Max
-
-[1] I've shortened it to "mirror: Fix inconsistent backing AioContext
-for after mirroring". I usually try to fit the title into 50 characters
-(because that's what the default vim highlighting is proposing...), so
-for reference, I would have made it something like "block: Align backing
-BDS's AioContext with overlay" -- if it had been my patch. Since it was
-yours, I'm fine with commit titles longer than 50 characters (although
-they really should not exceed 72).
-
-> Signed-off-by: sochin.jiang <sochin.jiang@huawei.com>
 > ---
->  block.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/block.c b/block.c
-> index 6943962..b312fe6 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -2185,6 +2185,7 @@ int bdrv_open_backing_file(BlockDriverState *bs, =
-QDict *parent_options,
->          ret =3D -EINVAL;
->          goto free_exit;
->      }
-> +    bdrv_set_aio_context(backing_hd, bdrv_get_aio_context(bs));
-> =20
->      /* Hook up the backing file link; drop our reference, bs owns the
->       * backing_hd reference now */
->=20
-
-
-
---xcIQbVVmhUhAfex6s46l1M9L92lNj5oP6
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEvBAEBCAAZBQJZVC7LEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQBJF
-CACtGvs/yfInj5Hg9gtH0i9tztlOvDlok1nEXlRxvQ43DdnWzYqj5tc9D5cftFyp
-IuDk+EgkhEcYkydTAFNzXewo8oo+4UV48fpc+o+HAijdLBW7qt0hzvhmQvM1lL+b
-Pdu/lzzbO/RWEjPmB3s64YBgUNBS35Sp79syxSoiS4UeT5wmnbJyV/RWezdiMpLS
-6K4XOBTmykoVt397gqOmUvRjh8Y/MF80dK080S1aEGIvPpUZPDKf7pJcxMEK+lI7
-8/Lu4MTj9bt+uvj39JJIvgBrrn0s3enXJ5xoXyO9xGnzbl5zBuGn8XumgYUIN7Ug
-f8hDeI8cGX0UvXe/SWwJ5TyM
-=xW4p
------END PGP SIGNATURE-----
-
---xcIQbVVmhUhAfex6s46l1M9L92lNj5oP6--
+>  hw/9pfs/9p.h               |    5 +++++
+>  hw/9pfs/virtio-9p-device.c |    8 +++-----
+>  2 files changed, 8 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
+> index c886ba78d2ee..aac1b0b2ce3d 100644
+> --- a/hw/9pfs/9p.h
+> +++ b/hw/9pfs/9p.h
+> @@ -124,6 +124,11 @@ typedef struct {
+>      uint8_t id;
+>      uint16_t tag_le;
+>  } QEMU_PACKED P9MsgHeader;
+> +/* According to the specification, 9p messages start with a 7-byte header.
+> + * Since most of the code uses this header size in literal form, we must be
+> + * sure this is indeed the case.
+> + */
+> +QEMU_BUILD_BUG_ON(sizeof(P9MsgHeader) != 7);
+>  
+>  struct V9fsPDU
+>  {
+> diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
+> index 3380bfc0c551..1a68c1622d3a 100644
+> --- a/hw/9pfs/virtio-9p-device.c
+> +++ b/hw/9pfs/virtio-9p-device.c
+> @@ -53,17 +53,15 @@ static void handle_9p_output(VirtIODevice *vdev, VirtQueue *vq)
+>              goto out_free_pdu;
+>          }
+>  
+> -        if (elem->in_num == 0) {
+> +        if (iov_size(elem->in_sg, elem->in_num) < 7) {
+>              virtio_error(vdev,
+>                           "The guest sent a VirtFS request without space for "
+>                           "the reply");
+>              goto out_free_req;
+>          }
+> -        QEMU_BUILD_BUG_ON(sizeof(out) != 7);
+>  
+> -        len = iov_to_buf(elem->out_sg, elem->out_num, 0,
+> -                         &out, sizeof(out));
+> -        if (len != sizeof(out)) {
+> +        len = iov_to_buf(elem->out_sg, elem->out_num, 0, &out, 7);
+> +        if (len != 7) {
+>              virtio_error(vdev, "The guest sent a malformed VirtFS request: "
+>                           "header size is %zd, should be 7", len);
+>              goto out_free_req;
+> 
