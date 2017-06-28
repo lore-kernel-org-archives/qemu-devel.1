@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dQCc5-0006xH-Oy
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:02:34 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dQCew-00019A-F7
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:05:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dQCc4-0008Sb-UA
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:02:33 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:2606 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dQCc4-0008SA-JG
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:02:32 -0400
-References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
-	<20170628120530.31251-14-vsementsov@virtuozzo.com>
-	<f5957047-c69c-ebe6-6640-08bacc3244ea@virtuozzo.com>
-	<da795837-2945-d3b1-bd92-e6ced22817bc@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <6e99d1ce-a7e9-af1b-ec84-baae97f348df@virtuozzo.com>
-Date: Wed, 28 Jun 2017 16:02:17 +0300
+	(envelope-from <vilanova@ac.upc.edu>) id 1dQCer-0001tv-EK
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:05:30 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:49431)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dQCer-0001qs-2M
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:05:25 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Wed, 28 Jun 2017 16:05:04 +0300
+Message-Id: <149865510456.17063.14029858939919926288.stgit@frigg.lan>
+In-Reply-To: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
+References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <da795837-2945-d3b1-bd92-e6ced22817bc@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v22 13/30] block: new
- bdrv_reopen_bitmaps_rw interface
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v11 12/29] target/i386: [tcg] Refactor disas_log
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,38 +26,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-It is interesting, but I see this problem only in your answers, in my 
-letters I see this white-space on its place.
+Incrementally paves the way towards using the generic instruction transla=
+tion
+loop.
 
-28.06.2017 15:36, Eric Blake wrote:
-> [meta-comment]
->
-> On 06/28/2017 07:10 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 28.06.2017 15:05, Vladimir Sementsov-Ogievskiy wrote:
->>> Add format driver handler, which should mark loaded read-only
->>> bitmaps as 'IN_USE' in the image and unset read_only field in
->>> corresponding BdrvDirtyBitmap's.
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy<vsementsov@virtuozzo.com>
->>> Reviewed-by: John Snow<jsnow@redhat.com>
-> Your original message had spaces before '<' in the email addresses, but
-> it got lost here...
->
->>
->> Forgot to add:
->>
->> Reviewed-by: Max Reitz<mreitz@redhat.com>
-> ...this one also lacks the space.  I'm not sure if git cares, but it may
-> be worth investigating why your mailer eats the space when you reply
-> manually rather than sending via git; and for consistency, it is worth
-> keeping the space (for example, we like to grep 'git log' for learning
-> how active various contributors are, and having a consistent usage of
-> space before < in an email address can make the task easier).
->
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+ target/i386/translate.c |   29 +++++++++++++++++++----------
+ 1 file changed, 19 insertions(+), 10 deletions(-)
 
--- 
-Best regards,
-Vladimir
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index 1ca40c2fe4..3950fe95a4 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -8526,6 +8526,24 @@ static void i386_trblock_tb_stop(DisasContextBase =
+*dcbase, CPUState *cpu)
+     }
+ }
+=20
++static void i386_trblock_disas_log(const DisasContextBase *dcbase,
++                                   CPUState *cpu)
++{
++    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
++    int disas_flags;
++
++    qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
++#ifdef TARGET_X86_64
++    if (dc->code64)
++        disas_flags =3D 2;
++    else
++#endif
++        disas_flags =3D !dc->code32;
++    log_target_disas(cpu, dc->base.pc_first, dc->base.pc_next - dc->base=
+.pc_first,
++                     disas_flags);
++
++}
++
+ /* generate intermediate code for basic block 'tb'.  */
+ void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
+ {
+@@ -8621,18 +8639,9 @@ done_generating:
+ #ifdef DEBUG_DISAS
+     if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
+         && qemu_log_in_addr_range(dc->base.pc_first)) {
+-        int disas_flags;
+         qemu_log_lock();
+         qemu_log("----------------\n");
+-        qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
+-#ifdef TARGET_X86_64
+-        if (dc->code64)
+-            disas_flags =3D 2;
+-        else
+-#endif
+-            disas_flags =3D !dc->code32;
+-        log_target_disas(cpu, dc->base.pc_first, dc->base.pc_next - dc->=
+base.pc_first,
+-                         disas_flags);
++        i386_trblock_disas_log(&dc->base, cpu);
+         qemu_log("\n");
+         qemu_log_unlock();
+     }
