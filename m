@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dQBC6-00039h-Qt
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:31:39 -0400
+	(envelope-from <quintela@redhat.com>) id 1dQBCC-0003Er-4G
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:31:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dQBC3-0004oc-Jl
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:31:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35720)
+	(envelope-from <quintela@redhat.com>) id 1dQBCB-0004tK-4g
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:31:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:61167)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dQBC3-0004o5-B0
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:31:35 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dQBCA-0004sq-SR
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:31:43 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 50A5785A05
-	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 11:31:34 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E51F280F6C
+	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 11:31:40 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 28 Jun 2017 13:31:02 +0200
-Message-Id: <20170628113106.5248-11-quintela@redhat.com>
+Date: Wed, 28 Jun 2017 13:31:05 +0200
+Message-Id: <20170628113106.5248-14-quintela@redhat.com>
 In-Reply-To: <20170628113106.5248-1-quintela@redhat.com>
 References: <20170628113106.5248-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 10/14] migration: hmp: dump globals
+Subject: [Qemu-devel] [PULL 13/14] migration: add "return-path" capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,82 +34,94 @@ Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
 From: Peter Xu <peterx@redhat.com>
 
-Now we have some globals that can be configured for migration. Dump them
-in HMP info migration for better debugging.
+When this capability is enabled, QEMU will use the return path even for
+precopy migration. This is helpful at least in one case when destination
+failed to load the image while source quited without confirmation. With
+return path, source will wait for the last response from destination,
+and if destination fails, it'll fail the migration on source, then the
+guest can be run again on the source (rather than assuming to be good,
+then the guest will be lost after source quits).
 
-(we can also use this to monitor whether COMPAT fields are applied
-correctly on compatible machines)
+It needs to be enabled explicitly on source, otherwise disabled.
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <1498536619-14548-11-git-send-email-peterx@redhat.com>
+Message-Id: <1498472935-14461-1-git-send-email-peterx@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- hmp.c                    |  3 +++
- include/migration/misc.h |  1 +
- migration/migration.c    | 11 +++++++++++
- 3 files changed, 15 insertions(+)
+ migration/migration.c | 16 +++++++++++++---
+ migration/migration.h |  1 +
+ qapi-schema.json      |  5 ++++-
+ 3 files changed, 18 insertions(+), 4 deletions(-)
 
-diff --git a/hmp.c b/hmp.c
-index 8c72c58..4c41cac 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -43,6 +43,7 @@
- #include "exec/ramlist.h"
- #include "hw/intc/intc.h"
- #include "migration/snapshot.h"
-+#include "migration/misc.h"
- 
- #ifdef CONFIG_SPICE
- #include <spice/enums.h>
-@@ -164,6 +165,8 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
-     info = qmp_query_migrate(NULL);
-     caps = qmp_query_migrate_capabilities(NULL);
- 
-+    migration_global_dump(mon);
-+
-     /* do not display parameters during setup */
-     if (info->has_status && caps) {
-         monitor_printf(mon, "capabilities: ");
-diff --git a/include/migration/misc.h b/include/migration/misc.h
-index 854c28d..2255121 100644
---- a/include/migration/misc.h
-+++ b/include/migration/misc.h
-@@ -54,5 +54,6 @@ bool migration_has_failed(MigrationState *);
- /* ...and after the device transmission */
- bool migration_in_postcopy_after_devices(MigrationState *);
- void migration_only_migratable_set(void);
-+void migration_global_dump(Monitor *mon);
- 
- #endif
 diff --git a/migration/migration.c b/migration/migration.c
-index e7e6cf3..b1b0825 100644
+index 2398a9d..51ccd1a 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -43,6 +43,7 @@
- #include "io/channel-buffer.h"
- #include "migration/colo.h"
- #include "hw/boards.h"
-+#include "monitor/monitor.h"
- 
- #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed throttling */
- 
-@@ -1993,6 +1994,16 @@ void migrate_fd_connect(MigrationState *s)
-     s->migration_thread_running = true;
+@@ -1311,6 +1311,15 @@ bool migrate_use_block(void)
+     return s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK];
  }
  
-+void migration_global_dump(Monitor *mon)
++bool migrate_use_return_path(void)
 +{
-+    MigrationState *ms = migrate_get_current();
++    MigrationState *s;
 +
-+    monitor_printf(mon, "globals: store-global-state=%d, only_migratable=%d, "
-+                   "send-configuration=%d, send-section-footer=%d\n",
-+                   ms->store_global_state, ms->only_migratable,
-+                   ms->send_configuration, ms->send_section_footer);
++    s = migrate_get_current();
++
++    return s->enabled_capabilities[MIGRATION_CAPABILITY_RETURN_PATH];
 +}
 +
- static Property migration_properties[] = {
-     DEFINE_PROP_BOOL("store-global-state", MigrationState,
-                      store_global_state, true),
+ bool migrate_use_block_incremental(void)
+ {
+     MigrationState *s;
+@@ -1975,10 +1984,11 @@ void migrate_fd_connect(MigrationState *s)
+     notifier_list_notify(&migration_state_notifiers, s);
+ 
+     /*
+-     * Open the return path; currently for postcopy but other things might
+-     * also want it.
++     * Open the return path. For postcopy, it is used exclusively. For
++     * precopy, only if user specified "return-path" capability would
++     * QEMU uses the return path.
+      */
+-    if (migrate_postcopy_ram()) {
++    if (migrate_postcopy_ram() || migrate_use_return_path()) {
+         if (open_return_path_on_source(s)) {
+             error_report("Unable to open return-path for postcopy");
+             migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
+diff --git a/migration/migration.h b/migration/migration.h
+index 994b017..148c9fa 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -177,6 +177,7 @@ bool migrate_colo_enabled(void);
+ 
+ bool migrate_use_block(void);
+ bool migrate_use_block_incremental(void);
++bool migrate_use_return_path(void);
+ 
+ bool migrate_use_compression(void);
+ int migrate_compress_level(void);
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 4b50b65..9e34cf7 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -900,12 +900,15 @@
+ #          offers more flexibility.
+ #          (Since 2.10)
+ #
++# @return-path: If enabled, migration will use the return path even
++#               for precopy. (since 2.10)
++#
+ # Since: 1.2
+ ##
+ { 'enum': 'MigrationCapability',
+   'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
+            'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram',
+-           'block' ] }
++           'block', 'return-path' ] }
+ 
+ ##
+ # @MigrationCapabilityStatus:
 -- 
 2.9.4
