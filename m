@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dQBug-0000pa-M4
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:17:46 -0400
+	(envelope-from <indiffpig@126.com>) id 1dQBvs-0002RD-MK
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:18:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dQBub-0000NW-Oy
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:17:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37729)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dQBub-0000NI-GF
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:17:37 -0400
-Date: Wed, 28 Jun 2017 13:17:30 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170628121730.GD7538@stefanha-x1.localdomain>
-References: <20170615163813.7255-1-stefanha@redhat.com>
-	<20170615163813.7255-2-stefanha@redhat.com>
-	<20170627084348.GG14166@lemon.lan>
-	<20170627110735.GB4792@noname.redhat.com>
+	(envelope-from <indiffpig@126.com>) id 1dQBvn-0000pX-PV
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:18:56 -0400
+Received: from mproxygzt1.163.com ([113.108.225.5]:46393)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <indiffpig@126.com>) id 1dQBvm-0000o5-PY
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:18:51 -0400
+Date: Wed, 28 Jun 2017 20:16:07 +0800 (CST)
+From: indiffpig  <indiffpig@126.com>
+In-Reply-To: <07f317b7-906e-dc8b-feb0-62e4788b637f@redhat.com>
+References: <1498282754-2573-1-git-send-email-indiffPig@126.com>
+	<07f317b7-906e-dc8b-feb0-62e4788b637f@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="bjuZg6miEcdLYP6q"
-Content-Disposition: inline
-In-Reply-To: <20170627110735.GB4792@noname.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/5] virtio-pci: use ioeventfd even when
- KVM is disabled
+Message-ID: <10695441.cf07.15ceea14c66.Coremail.indiffpig@126.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] [PATCH] qga:windows os lost ip when network nic
+ change pic order
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,66 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Pavel Butsykin <pbutsykin@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org
 
-
---bjuZg6miEcdLYP6q
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Jun 27, 2017 at 01:07:35PM +0200, Kevin Wolf wrote:
-> Am 27.06.2017 um 10:43 hat Fam Zheng geschrieben:
-> > On Thu, 06/15 17:38, Stefan Hajnoczi wrote:
-> > > Old kvm.ko versions only supported a tiny number of ioeventfds so
-> > > virtio-pci avoids ioeventfds when kvm_has_many_ioeventfds() returns 0.
-> > >=20
-> > > Do not check kvm_has_many_ioeventfds() when KVM is disabled since it
-> > > always returns 0.  Since commit 8c56c1a592b5092d91da8d8943c17777d6462=
-a6f
-> > > ("memory: emulate ioeventfd") it has been possible to use ioeventfds =
-in
-> > > qtest or TCG mode.
-> > >=20
-> > > This patch makes -device virtio-blk-pci,iothread=3Diothread0 work even
-> > > when KVM is disabled.
-> > >=20
-> > > I have tested that virtio-blk-pci works under TCG both with and witho=
-ut
-> > > iothread.
-> > >=20
-> > > Cc: Michael S. Tsirkin <mst@redhat.com>
-> > > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> >=20
-> > This one was dropped out from Kevin's pull request but the iotest case
-> > update on 068 which depends on it is merged. Now the test fails for
-> > me:
->=20
-> Whoops, sorry about that. Anyway, I think if we can, the way to fix it
-> is to find out why this patch is failing qtest, and merge a fixed v2,
-> rather than reverting the test cases.
->=20
-> Stefan, can you reproduce the failure?
-
-I will merge this patch via my tree and send a pull request today.
-
-The purpose of this patch is to make -device virtio-blk-pci,iothread=3DID
-work under TCG/qtest.  This is necessary because qemu-iotests isn't
-allowed to depend on KVM.
-
---bjuZg6miEcdLYP6q
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZU55aAAoJEJykq7OBq3PIlNAIAMMNlduoYdArhIo5+lmcNwAZ
-5cTClX9Z+FYsYJuEpaGXE8a1qOphlFNMLvf2M4JcXQRlqxQO+Ki5pt2x/CYoh+eX
-EXtrf6sS6bWukdC55109seplGTtvYorApcZlGYDIaRegVMhB9fT2TPjseK6V1eft
-9gfXjkEoIlwxqhANwWtshOy+H9YM9GLDTXgdbMaQB02m/+Vo7Dz/P3cvkv+ZwyjX
-UKlLxl8K4ASDwaD76jcmKywE+gAxiinxcf7OQAIb5UZ/eFti3Pckwpw/m9Vt9LD5
-IloWXf0zbFSZ07YrqnDO0nQWQ7ZhWBVBHdgrCpqv3piF+lwqREjxOBK5cKAQwYA=
-=qc4n
------END PGP SIGNATURE-----
-
---bjuZg6miEcdLYP6q--
+VGhhdCdzIHRydWUuIExldCBtZSBjb25maXJtIHRvIHlvdSB3aGV0aGVyIHRoaXMgcHJvYmxlbSBl
+eGlzdHMgb3Igd2hldGhlciB0aGVyZSBhcmUgYW55IHNvbHV0aW9ucyBhbHJlYWR5IGF2YWlsYWJs
+ZS4gSWYgc28sIEkgd291bGQgbGlrZSB5b3UgdG8gdGVsbCBtZSB0aGUgZXhpc3Rpbmcgc29sdXRp
+b24uIE15IHBhdGNoIGNvbWVzIGZyb20gdGhlIGNvbXBhbnkgY29kZSwgYW5kIHRoZSBjb2RlIGlz
+IGxvbmcuVGhlIG5vdGVzIGFyZSB3cml0dGVuIGluIENoaW5lc2UuIFdlIHdvcmsgdG9vIG11Y2gg
+YW5kIGRvbid0IGhhdmUgbXVjaCBzcGFyZSB0aW1lLiBJZiB5b3UgYXJlIHN1cmUgdGhlcmUgaXMg
+YSBwcm9ibGVtIGFuZCBuZWVkIHRvIGJlIHJlc29sdmVkLCBJIHdvdWxkIGxpa2UgdG8gdGFrZSB0
+aGUgdGltZSB0byByZWZpbmUgdGhlIGNvZGUuCgoKCgoKCgoKQXQgMjAxNy0wNi0yOCAwNToxNDo1
+NywgIkVyaWMgQmxha2UiIDxlYmxha2VAcmVkaGF0LmNvbT4gd3JvdGU6Cj5PbiAwNi8yNC8yMDE3
+IDEyOjM5IEFNLCBpbmRpZmZQaWdAMTI2LmNvbSB3cm90ZToKPj4gRnJvbTogInlpbi56dW93ZWki
+IDxpbmRpZmZQaWdAMTI2LmNvbT4KPj4gCj4+IFNpZ25lZC1vZmYtYnk6IHlpbi56dW93ZWkgPGlu
+ZGlmZlBpZ0AxMjYuY29tPgo+PiAKPj4gYnVnIGRlc2NyaXB0aW9uOiBJbiB0aGUgd2luZG93cyB2
+aXJ0dWFsIG1hY2hpbmUsIGlmIHRoZXJlIGFyZSBtdWx0aXBsZSBuZXR3b3JrIGNhcmRzLCB0aGUg
+aHlwb3RoZXNpcyBpcyB0aGF0IEEvQi9DIGlzIGVxdWlwcGVkIHdpdGggYSBkaWZmZXJlbnQgSVAg
+YWRkcmVzcy4gT25jZSB5b3UgZGVsZXRlIGEgQiBjYXJkIGluIHRoZSBtaWRkbGUgYW5kIHJlc3Rh
+cnQgdGhlIHZpcnR1YWwgbWFjaGluZSwgeW91IHdpbGwgZmluZCB0aGF0IHRoZSBBL0Mgb2YgdGhl
+IG5ldHdvcmsgY2FyZCBJUCBoYXMgYmVlbiBjb25mdXNlZCwgYW5kIHRoZSBJUCBvZiB0aGUgQyBu
+ZXR3b3JrIGNhcmQgaGFzIGJlY29tZSB0aGUgYWRkcmVzcyBvZiBCLCBhbmQgdGhlIHNlcnZpY2Ug
+aGFzIGJlZW4gaW50ZXJydXB0ZWQuIFNvIHdlIGRpZCBhIElQIHJlY292ZXJ5IGZ1bmN0aW9uIGlu
+IHFnYS5UaGlzIGlzIGEgc2VyaW91cyBwcm9ibGVtIHRoYXQgY2FuIGxlYWQgdG8gYnVzaW5lc3Mg
+ZGlzcnVwdGlvbi4gSWYgeW91IGhhdmUgYSBiZXR0ZXIgcGxhbiwgd2Ugd291bGQgbGlrZSB0byBv
+ZmZlciBpdCB0byB5b3UuCj4+IC0tLQo+PiAgcWdhL3Jlc3RvcmVJcC5jcHAgfCAxODQ4ICsrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrCj4+ICAxIGZp
+bGUgY2hhbmdlZCwgMTg0OCBpbnNlcnRpb25zKCspCj4+ICBjcmVhdGUgbW9kZSAxMDA3NTUgcWdh
+L3Jlc3RvcmVJcC5jcHAKPj4gCj4+IGRpZmYgLS1naXQgYS9xZ2EvcmVzdG9yZUlwLmNwcCBiL3Fn
+YS9yZXN0b3JlSXAuY3BwCj4+IG5ldyBmaWxlIG1vZGUgMTAwNzU1Cj4+IGluZGV4IDAwMDAwMDAu
+LjIzODIxMzYKPj4gLS0tIC9kZXYvbnVsbAo+PiArKysgYi9xZ2EvcmVzdG9yZUlwLmNwcAo+PiBA
+QCAtMCwwICsxLDE4NDggQEAKPj4gKy8vIHJlc3RvcmVJcC5jcHAgOiDvv73vv73vv73vv73vv73v
+v73vv73MqNOm77+9w7Pvv73vv73vv73vv73vv73vv73ateOhowo+Cj5Zb3VyIG1haWwgaGVhZGVy
+IHNhaWQ6Cj4KPj4gQ29udGVudC1UeXBlOiB0ZXh0L3BsYWluOyBjaGFyc2V0PXllcwo+Cj53aGlj
+aCBsb29rcyBsaWtlIGEgYnVnIHdpdGggeW91ciBnaXQgc2V0dGluZ3MgKHR5cGljYWxseSwgaXQg
+c2hvdWxkIGJlCj5jaGFyc2V0PVVURi04KS4gIE11Y2ggb2YgdGhlIG1lc3NhZ2UgZGlkbid0IHJl
+bmRlciBmb3IgbWUgKG5vdCBzdXJlIGlmCj5pdCBsYWNrIG9mIGZvbnRzIG9uIG15IGVuZCwgb3Ig
+aWYgaXQgcmVhbGx5IHdhcyBnYXJibGVkIGVuIHJvdXRlIHJhdGhlcgo+dGhhbiBiZWluZyB2YWxp
+ZCBVVEYtOCByb3VuZC10cmlwKS4gIEJ1dCB3ZSBtdWNoIHByZWZlciAvKiAqLyBjb21tZW50cwo+
+b3ZlciAvLyAoZXZlbiBpbiBDKysgY29kZSksIGFuZCBwcmVmZXIgdGhvc2UgY29tbWVudHMgdG8g
+YmUgaW4gRW5nbGlzaC4KPgo+PiArLy8jcHJhZ21hIGNvbW1lbnQobGliLCJpcGhscGFwaS5saWIi
+KQo+Cj5EZWFkIGNvZGU/Cj4KPj4gKwo+PiArLyrSqtei77+94qOs77+977+977+977+9dW5pY29k
+Ze+/ve+/vSBtZW1jcHnvv73vv73vv73vv73vv73vv73vv73vv73vv73vv73Sqsq577+977+9WFhY
+X0xFTiAqIHNpemVvZihUQ0hBUikqLwo+Cj5Nb3JlIGVuY29kaW5nIGF3a3dhcmRuZXNzLgo+Cj5J
+dCdzIGhhcmQgdG8gcmV2aWV3IHRoZSBwYXRjaCB3aGVuIHRoZSBjb250ZW50IGlzIGRpZmZpY3Vs
+dCB0byByZWFkLgo+Cj4tLSAKPkVyaWMgQmxha2UsIFByaW5jaXBhbCBTb2Z0d2FyZSBFbmdpbmVl
+cgo+UmVkIEhhdCwgSW5jLiAgICAgICAgICAgKzEtOTE5LTMwMS0zMjY2Cj5WaXJ0dWFsaXphdGlv
+bjogIHFlbXUub3JnIHwgbGlidmlydC5vcmcKPgo=
