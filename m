@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dQFfp-0004ks-Ti
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 12:18:38 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dQFfs-0004nI-77
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 12:18:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dQFfo-000304-W7
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 12:18:37 -0400
-Date: Wed, 28 Jun 2017 18:18:25 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170628161825.GL5378@noname.redhat.com>
-References: <20170623124700.1389-1-el13635@mail.ntua.gr>
-	<20170623124700.1389-6-el13635@mail.ntua.gr>
-	<20170628155042.GJ5378@noname.redhat.com>
-	<61521682-b70e-0690-0005-4e05cce821fd@redhat.com>
+	(envelope-from <alistair23@gmail.com>) id 1dQFfr-00030V-C3
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 12:18:40 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:36629)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1dQFfr-00030M-6J
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 12:18:39 -0400
+Received: by mail-wm0-x241.google.com with SMTP id y5so12432619wmh.3
+	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 09:18:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="pyE8wggRBhVBcj8z"
-Content-Disposition: inline
-In-Reply-To: <61521682-b70e-0690-0005-4e05cce821fd@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v3 5/8] block: add
- BlockDevOptionsThrottle to QAPI
+Sender: alistair23@gmail.com
+In-Reply-To: <20170628061540.GL4859@toto>
+References: <cover.1498596157.git.alistair.francis@xilinx.com>
+	<55b6931c368b67ece2f0bd7d8e83092727df1e3c.1498596157.git.alistair.francis@xilinx.com>
+	<20170627211037.GE2201@toto>
+	<CAKmqyKN9znxH=1y1ZVT86Hk9815JXukdK8c=UPYc5CES7y=juQ@mail.gmail.com>
+	<20170628061540.GL4859@toto>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Wed, 28 Jun 2017 09:18:07 -0700
+Message-ID: <CAKmqyKPw0F=SgBhd_a-rpQ566RSivMHw3Xiyb0GXY5EY3yy4jg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC v1 3/3] char-socket: Report TCP socket
+ waiting as a warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,91 +34,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Manos Pitsidianakis <el13635@mail.ntua.gr>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
+On Tue, Jun 27, 2017 at 11:15 PM, Edgar E. Iglesias
+<edgar.iglesias@gmail.com> wrote:
+> On Tue, Jun 27, 2017 at 05:17:58PM -0700, Alistair Francis wrote:
+>> On Tue, Jun 27, 2017 at 2:10 PM, Edgar E. Iglesias
+>> <edgar.iglesias@gmail.com> wrote:
+>> > On Tue, Jun 27, 2017 at 01:45:48PM -0700, Alistair Francis wrote:
+>> >> When QEMU is waiting for a TCP socket connection it reports that message as
+>> >> an error. This isn't an error it is a warnign so let's change the report to
+>> >> use warning_report() instead.
+>> >
+>> > Hi Alistair,
+>> >
+>> > Isn't this more like an informational message rather than a warning?
+>> >
+>> > A warning would indicate to me that something unexpected and perhaps wrong happened.
+>> > In this case, there's nothing wrong going on.
+>> >
+>> > We may need more classes, like 'info:' and/or maybe others...
+>>
+>> Hey Edgar,
+>>
+>> That is a good point. I can add a info_report() as well then that
+>> copies the warning_report() function but prefixes with 'info: '.
+>
+>
+> Hi,
+>
+> Yes, or another way is to pass the class of message as an argument,
+> e.g like qemu_log_mask does it.
 
---pyE8wggRBhVBcj8z
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Ah! That is a good idea.
 
-Am 28.06.2017 um 18:02 hat Eric Blake geschrieben:
-> On 06/28/2017 10:50 AM, Kevin Wolf wrote:
-> > Am 23.06.2017 um 14:46 hat Manos Pitsidianakis geschrieben:
-> >> This is needed to configure throttle filter driver nodes with QAPI.
-> >>
-> >> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
-> >> ---
-> >>  qapi/block-core.json | 19 ++++++++++++++++++-
-> >>  1 file changed, 18 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> >> index f85c2235c7..1d4afafe8c 100644
-> >> --- a/qapi/block-core.json
-> >> +++ b/qapi/block-core.json
-> >> @@ -2119,7 +2119,7 @@
-> >>              'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', '=
-nfs',
-> >>              'null-aio', 'null-co', 'parallels', 'qcow', 'qcow2', 'qed=
-',
-> >>              'quorum', 'raw', 'rbd', 'replication', 'sheepdog', 'ssh',
-> >> -            'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs' ] }
-> >> +            'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs'=
- ] }
-> >> =20
-> >>  ##
-> >>  # @BlockdevOptionsFile:
-> >> @@ -2984,6 +2984,7 @@
-> >>        'replication':'BlockdevOptionsReplication',
-> >>        'sheepdog':   'BlockdevOptionsSheepdog',
-> >>        'ssh':        'BlockdevOptionsSsh',
-> >> +      'throttle':   'BlockdevOptionsThrottle',
-> >>        'vdi':        'BlockdevOptionsGenericFormat',
-> >>        'vhdx':       'BlockdevOptionsGenericFormat',
-> >>        'vmdk':       'BlockdevOptionsGenericCOWFormat',
-> >> @@ -3723,3 +3724,19 @@
-> >>    'data' : { 'parent': 'str',
-> >>               '*child': 'str',
-> >>               '*node': 'str' } }
-> >> +
-> >> +##
-> >> +# @BlockdevOptionsThrottle:
-> >> +#
-> >> +# Driver specific block device options for Throttle
-> >> +#
-> >> +# @throttling-group: the name of the throttling group to use
-> >> +#
-> >> +# @options:        BlockIOThrottle options
-> >=20
-> > Missing #optional marker.
->=20
-> The marker is now auto-generated based solely on the '*options' below,
-> so we don't need a redundant thing here.
+Something like this:
+    report(ERROR, "message, ...)
+    report(WARN, "message, ...)
+    report(INFO, "message, ...)
 
-Oh nice, progress!
+which gets converted to adding prefixes to the message.
 
-Kevin
+Thanks,
+Alistair
 
---pyE8wggRBhVBcj8z
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJZU9bRAAoJEH8JsnLIjy/W0t8QAMUgxnR4fc5XrVkWs1Z1e24C
-3x770ihO7RXvNpMAaQEtOgOR3R1s0Bgv0RQGyr69bKKE7Jvn79DhtyPhPkAiDOQb
-KDnBkztY8a7UH30wOK2IzczR5p3WiCdlnAxguvyxWUV2BAAdQoRICZhoKl/1YODw
-jdgxYo4kxDIB7s+f5qo3WEMsUWnsQQTj9rOCgLcpLrUkqVIRN2Ol3L1DdQyBGnkB
-thWZZxVzNdbU8RjLPuWf9f0vIvkyuAzf9q3VGV3r+74YxKUpZfmzwqPpT8FupV3M
-dhpnrDwXWlrDoQs3i0VgypharWxiak7H70KtejmzwE7lwSGBT0SWfSiAKX+MThsi
-K609uNsapSDa8Y3I1BgHWmtHRTwhQXNaUJk6knlqsPi9jCuIaiudZEpOhUTypoRb
-En9C8wxdpdQPC/8ZEDGOtNG1xyD85kfPQrg+YrNpXsIiTpaakxUdGa5YpQDKyNq3
-zk5Xb7gVZp+OunSqFtInCdypbTtWDKd9O/69EVQ+WFAahaNN4gtEuGiO5A28nWHf
-1gj4RtIBUZJ9FoyAY5bqMX92h+D06cZl0MPVZhID20lHJjNADSsodzvzV5uS0KvR
-d+icA4CfGgRo68J7rvXS2J8m6pR9t8mQQRuvAKneorZnW/Rknu4EGN1N+zC22Avc
-ojdmWCnP5I6BaJ1sCWDt
-=IsdK
------END PGP SIGNATURE-----
-
---pyE8wggRBhVBcj8z--
+>
+> Best regards,
+> Edgar
+>
+>
+>
+>
+>>
+>> Thanks,
+>> Alistair
+>>
+>> >
+>> > Cheers,
+>> > Edgar
+>> >
+>> >
+>> >
+>> >>
+>> >> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>> >> ---
+>> >>
+>> >>  chardev/char-socket.c | 2 +-
+>> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+>> >>
+>> >> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+>> >> index ccc499cfa1..5a56628e74 100644
+>> >> --- a/chardev/char-socket.c
+>> >> +++ b/chardev/char-socket.c
+>> >> @@ -765,7 +765,7 @@ static int tcp_chr_wait_connected(Chardev *chr, Error **errp)
+>> >>       * in TLS and telnet cases, only wait for an accepted socket */
+>> >>      while (!s->ioc) {
+>> >>          if (s->is_listen) {
+>> >> -            error_report("QEMU waiting for connection on: %s",
+>> >> +            warning_report("QEMU waiting for connection on: %s",
+>> >>                           chr->filename);
+>> >>              qio_channel_set_blocking(QIO_CHANNEL(s->listen_ioc), true, NULL);
+>> >>              tcp_chr_accept(QIO_CHANNEL(s->listen_ioc), G_IO_IN, chr);
+>> >> --
+>> >> 2.11.0
+>> >>
+>> >>
+>
