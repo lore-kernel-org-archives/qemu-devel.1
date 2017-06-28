@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36086)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dQI0J-0004dB-Hn
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 14:47:56 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dQI0U-0004lo-SJ
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 14:48:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dQI0I-0000qf-Sg
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 14:47:55 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dQI0S-00010C-Hc
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 14:48:06 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed, 28 Jun 2017 19:47:21 +0100
-Message-Id: <20170628184724.21378-4-stefanha@redhat.com>
+Date: Wed, 28 Jun 2017 19:47:22 +0100
+Message-Id: <20170628184724.21378-5-stefanha@redhat.com>
 In-Reply-To: <20170628184724.21378-1-stefanha@redhat.com>
 References: <20170628184724.21378-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/6] tests: fix virtio-scsi-test ISR dependence
+Subject: [Qemu-devel] [PATCH 4/6] tests: fix virtio-blk-test ISR dependence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,21 +27,124 @@ request has completed.
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- tests/virtio-scsi-test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/virtio-blk-test.c | 27 +++++++++++++++++----------
+ 1 file changed, 17 insertions(+), 10 deletions(-)
 
-diff --git a/tests/virtio-scsi-test.c b/tests/virtio-scsi-test.c
-index eff71df..87a3b6e 100644
---- a/tests/virtio-scsi-test.c
-+++ b/tests/virtio-scsi-test.c
-@@ -121,7 +121,7 @@ static uint8_t virtio_scsi_do_command(QVirtIOSCSI *vs, const uint8_t *cdb,
-     }
+diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+index fd2078c..0576cb1 100644
+--- a/tests/virtio-blk-test.c
++++ b/tests/virtio-blk-test.c
+@@ -196,7 +196,7 @@ static void test_basic(QVirtioDevice *dev, QGuestAllocator *alloc,
  
-     qvirtqueue_kick(vs->dev, vq, free_head);
--    qvirtio_wait_queue_isr(vs->dev, vq, QVIRTIO_SCSI_TIMEOUT_US);
-+    qvirtio_wait_used_elem(vs->dev, vq, free_head, QVIRTIO_SCSI_TIMEOUT_US);
+     qvirtqueue_kick(dev, vq, free_head);
  
-     response = readb(resp_addr +
-                      offsetof(struct virtio_scsi_cmd_resp, response));
+-    qvirtio_wait_queue_isr(dev, vq, QVIRTIO_BLK_TIMEOUT_US);
++    qvirtio_wait_used_elem(dev, vq, free_head, QVIRTIO_BLK_TIMEOUT_US);
+     status = readb(req_addr + 528);
+     g_assert_cmpint(status, ==, 0);
+ 
+@@ -218,7 +218,7 @@ static void test_basic(QVirtioDevice *dev, QGuestAllocator *alloc,
+ 
+     qvirtqueue_kick(dev, vq, free_head);
+ 
+-    qvirtio_wait_queue_isr(dev, vq, QVIRTIO_BLK_TIMEOUT_US);
++    qvirtio_wait_used_elem(dev, vq, free_head, QVIRTIO_BLK_TIMEOUT_US);
+     status = readb(req_addr + 528);
+     g_assert_cmpint(status, ==, 0);
+ 
+@@ -246,7 +246,7 @@ static void test_basic(QVirtioDevice *dev, QGuestAllocator *alloc,
+         qvirtqueue_add(vq, req_addr + 528, 1, true, false);
+         qvirtqueue_kick(dev, vq, free_head);
+ 
+-        qvirtio_wait_queue_isr(dev, vq, QVIRTIO_BLK_TIMEOUT_US);
++        qvirtio_wait_used_elem(dev, vq, free_head, QVIRTIO_BLK_TIMEOUT_US);
+         status = readb(req_addr + 528);
+         g_assert_cmpint(status, ==, 0);
+ 
+@@ -267,7 +267,7 @@ static void test_basic(QVirtioDevice *dev, QGuestAllocator *alloc,
+ 
+         qvirtqueue_kick(dev, vq, free_head);
+ 
+-        qvirtio_wait_queue_isr(dev, vq, QVIRTIO_BLK_TIMEOUT_US);
++        qvirtio_wait_used_elem(dev, vq, free_head, QVIRTIO_BLK_TIMEOUT_US);
+         status = readb(req_addr + 528);
+         g_assert_cmpint(status, ==, 0);
+ 
+@@ -348,7 +348,7 @@ static void pci_indirect(void)
+     free_head = qvirtqueue_add_indirect(&vqpci->vq, indirect);
+     qvirtqueue_kick(&dev->vdev, &vqpci->vq, free_head);
+ 
+-    qvirtio_wait_queue_isr(&dev->vdev, &vqpci->vq,
++    qvirtio_wait_used_elem(&dev->vdev, &vqpci->vq, free_head,
+                            QVIRTIO_BLK_TIMEOUT_US);
+     status = readb(req_addr + 528);
+     g_assert_cmpint(status, ==, 0);
+@@ -373,7 +373,7 @@ static void pci_indirect(void)
+     free_head = qvirtqueue_add_indirect(&vqpci->vq, indirect);
+     qvirtqueue_kick(&dev->vdev, &vqpci->vq, free_head);
+ 
+-    qvirtio_wait_queue_isr(&dev->vdev, &vqpci->vq,
++    qvirtio_wait_used_elem(&dev->vdev, &vqpci->vq, free_head,
+                            QVIRTIO_BLK_TIMEOUT_US);
+     status = readb(req_addr + 528);
+     g_assert_cmpint(status, ==, 0);
+@@ -484,7 +484,7 @@ static void pci_msix(void)
+     qvirtqueue_add(&vqpci->vq, req_addr + 528, 1, true, false);
+     qvirtqueue_kick(&dev->vdev, &vqpci->vq, free_head);
+ 
+-    qvirtio_wait_queue_isr(&dev->vdev, &vqpci->vq,
++    qvirtio_wait_used_elem(&dev->vdev, &vqpci->vq, free_head,
+                            QVIRTIO_BLK_TIMEOUT_US);
+ 
+     status = readb(req_addr + 528);
+@@ -509,7 +509,7 @@ static void pci_msix(void)
+     qvirtqueue_kick(&dev->vdev, &vqpci->vq, free_head);
+ 
+ 
+-    qvirtio_wait_queue_isr(&dev->vdev, &vqpci->vq,
++    qvirtio_wait_used_elem(&dev->vdev, &vqpci->vq, free_head,
+                            QVIRTIO_BLK_TIMEOUT_US);
+ 
+     status = readb(req_addr + 528);
+@@ -540,6 +540,8 @@ static void pci_idx(void)
+     uint64_t capacity;
+     uint32_t features;
+     uint32_t free_head;
++    uint32_t write_head;
++    uint32_t desc_idx;
+     uint8_t status;
+     char *data;
+ 
+@@ -581,7 +583,8 @@ static void pci_idx(void)
+     qvirtqueue_add(&vqpci->vq, req_addr + 528, 1, true, false);
+     qvirtqueue_kick(&dev->vdev, &vqpci->vq, free_head);
+ 
+-    qvirtio_wait_queue_isr(&dev->vdev, &vqpci->vq, QVIRTIO_BLK_TIMEOUT_US);
++    qvirtio_wait_used_elem(&dev->vdev, &vqpci->vq, free_head,
++                           QVIRTIO_BLK_TIMEOUT_US);
+ 
+     /* Write request */
+     req.type = VIRTIO_BLK_T_OUT;
+@@ -600,6 +603,7 @@ static void pci_idx(void)
+     qvirtqueue_add(&vqpci->vq, req_addr + 16, 512, false, true);
+     qvirtqueue_add(&vqpci->vq, req_addr + 528, 1, true, false);
+     qvirtqueue_kick(&dev->vdev, &vqpci->vq, free_head);
++    write_head = free_head;
+ 
+     /* No notification expected */
+     status = qvirtio_wait_status_byte_no_isr(&dev->vdev,
+@@ -625,8 +629,11 @@ static void pci_idx(void)
+ 
+     qvirtqueue_kick(&dev->vdev, &vqpci->vq, free_head);
+ 
+-    qvirtio_wait_queue_isr(&dev->vdev, &vqpci->vq,
++    /* We get just one notification for both requests */
++    qvirtio_wait_used_elem(&dev->vdev, &vqpci->vq, write_head,
+                            QVIRTIO_BLK_TIMEOUT_US);
++    g_assert(qvirtqueue_get_buf(&vqpci->vq, &desc_idx));
++    g_assert_cmpint(desc_idx, ==, free_head);
+ 
+     status = readb(req_addr + 528);
+     g_assert_cmpint(status, ==, 0);
 -- 
 2.9.4
