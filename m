@@ -1,14 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dQMIw-0003gK-Nz
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 19:23:28 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dQMVV-0006kl-4G
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 19:36:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dQMIv-0000B4-An
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 19:23:26 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dQMVU-0007Jh-51
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 19:36:25 -0400
+References: <20170613121639.17853-1-pbutsykin@virtuozzo.com>
+	<20170613121639.17853-4-pbutsykin@virtuozzo.com>
+	<aed64e0e-61ed-12c9-8676-ad55795b6e62@redhat.com>
+	<5fb63c73-ddc7-ba42-268f-bda160aebb6e@virtuozzo.com>
+	<d3c0c0c2-da7e-bfff-e3c6-2d419c1126b9@redhat.com>
+	<3b1b1a7e-ab9f-1376-fc3c-0853fb12987b@virtuozzo.com>
+	<67df3935-2ef1-b664-11aa-bb6bdf91013b@redhat.com>
+	<9bbacbbf-e9c2-f3b2-d81f-eba03e6ff7fc@virtuozzo.com>
+	<dbbc524c-97db-2a37-26e3-fd0eea328f7c@redhat.com>
+	<5116fc0f-8249-a075-e86d-6986560a39fd@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
-Date: Thu, 29 Jun 2017 01:23:15 +0200
-Message-Id: <20170628232315.22777-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH] iotests: Add test for dataplane mirroring
+Message-ID: <28a54177-5f32-f98a-5642-0ee5fae8e998@redhat.com>
+Date: Thu, 29 Jun 2017 01:36:12 +0200
+MIME-Version: 1.0
+In-Reply-To: <5116fc0f-8249-a075-e86d-6986560a39fd@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="BIsrw8CpWCWcXHRfIlX8KtRFVft0vU3kO"
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] qcow2: add shrink image support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,156 +32,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
-Depends on Stefan's "virtio: use ioeventfd in TCG and qtest mode" series
-to work at all, and on "mirror: Fix inconsistent backing AioContext for
-after mirroring" (in my block branch) so it does not fail.
----
- tests/qemu-iotests/106     | 97 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/106.out | 14 +++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 112 insertions(+)
- create mode 100755 tests/qemu-iotests/106
- create mode 100644 tests/qemu-iotests/106.out
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--BIsrw8CpWCWcXHRfIlX8KtRFVft0vU3kO
+From: Max Reitz <mreitz@redhat.com>
+To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org
+Message-ID: <28a54177-5f32-f98a-5642-0ee5fae8e998@redhat.com>
+Subject: Re: [PATCH v2 3/4] qcow2: add shrink image support
+References: <20170613121639.17853-1-pbutsykin@virtuozzo.com>
+ <20170613121639.17853-4-pbutsykin@virtuozzo.com>
+ <aed64e0e-61ed-12c9-8676-ad55795b6e62@redhat.com>
+ <5fb63c73-ddc7-ba42-268f-bda160aebb6e@virtuozzo.com>
+ <d3c0c0c2-da7e-bfff-e3c6-2d419c1126b9@redhat.com>
+ <3b1b1a7e-ab9f-1376-fc3c-0853fb12987b@virtuozzo.com>
+ <67df3935-2ef1-b664-11aa-bb6bdf91013b@redhat.com>
+ <9bbacbbf-e9c2-f3b2-d81f-eba03e6ff7fc@virtuozzo.com>
+ <dbbc524c-97db-2a37-26e3-fd0eea328f7c@redhat.com>
+ <5116fc0f-8249-a075-e86d-6986560a39fd@virtuozzo.com>
+In-Reply-To: <5116fc0f-8249-a075-e86d-6986560a39fd@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/tests/qemu-iotests/106 b/tests/qemu-iotests/106
-new file mode 100755
-index 0000000..ad438b5
---- /dev/null
-+++ b/tests/qemu-iotests/106
-@@ -0,0 +1,97 @@
-+#!/bin/bash
-+#
-+# Test case for mirroring with dataplane
-+#
-+# Copyright (C) 2017 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=mreitz@redhat.com
-+
-+seq=$(basename $0)
-+echo "QA output created by $seq"
-+
-+here=$PWD
-+status=1    # failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_qemu
-+    _cleanup_test_img
-+    _rm_test_img "$TEST_IMG.overlay0"
-+    _rm_test_img "$TEST_IMG.overlay1"
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and qemu instance handling
-+. ./common.rc
-+. ./common.filter
-+. ./common.qemu
-+
-+_supported_fmt qcow2
-+_supported_proto file
-+_supported_os Linux
-+
-+IMG_SIZE=64K
-+
-+_make_test_img $IMG_SIZE
-+TEST_IMG="$TEST_IMG.overlay0" _make_test_img -b "$TEST_IMG" $IMG_SIZE
-+TEST_IMG="$TEST_IMG.overlay1" _make_test_img -b "$TEST_IMG" $IMG_SIZE
-+
-+# So that we actually have something to mirror and the job does not return
-+# immediately (which may be bad because then we cannot know whether the
-+# 'return' or the 'BLOCK_JOB_READY' comes first).
-+$QEMU_IO -c 'write 0 64' "$TEST_IMG.overlay0" | _filter_qemu_io
-+
-+# We cannot use virtio-blk here because that does not actually set the attached
-+# BB's AioContext in qtest mode
-+_launch_qemu \
-+    -object iothread,id=iothr \
-+    -blockdev node-name=source,driver=$IMGFMT,file.driver=file,file.filename="$TEST_IMG.overlay0" \
-+    -device virtio-scsi,id=scsi-bus,iothread=iothr \
-+    -device scsi-hd,bus=scsi-bus.0,drive=source
-+
-+_send_qemu_cmd $QEMU_HANDLE \
-+    "{ 'execute': 'qmp_capabilities' }" \
-+    'return'
-+
-+_send_qemu_cmd $QEMU_HANDLE \
-+    "{ 'execute': 'drive-mirror',
-+       'arguments': {
-+           'job-id': 'mirror',
-+           'device': 'source',
-+           'target': '$TEST_IMG.overlay1',
-+           'mode':   'existing',
-+           'sync':   'top'
-+       } }" \
-+    'BLOCK_JOB_READY'
-+
-+# The backing BDS should be assigned the overlay's AioContext
-+_send_qemu_cmd $QEMU_HANDLE \
-+    "{ 'execute': 'block-job-complete',
-+       'arguments': { 'device': 'mirror' } }" \
-+    'BLOCK_JOB_COMPLETED'
-+
-+_send_qemu_cmd $QEMU_HANDLE \
-+    "{ 'execute': 'quit' }" \
-+    'return'
-+
-+wait=yes _cleanup_qemu
-+
-+# success, all done
-+echo '*** done'
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/106.out b/tests/qemu-iotests/106.out
-new file mode 100644
-index 0000000..d1b83f1
---- /dev/null
-+++ b/tests/qemu-iotests/106.out
-@@ -0,0 +1,14 @@
-+QA output created by 106
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=65536
-+Formatting 'TEST_DIR/t.IMGFMT.overlay0', fmt=IMGFMT size=65536 backing_file=TEST_DIR/t.IMGFMT
-+Formatting 'TEST_DIR/t.IMGFMT.overlay1', fmt=IMGFMT size=65536 backing_file=TEST_DIR/t.IMGFMT
-+wrote 64/64 bytes at offset 0
-+64 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "mirror", "len": 65536, "offset": 65536, "speed": 0, "type": "mirror"}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "mirror", "len": 65536, "offset": 65536, "speed": 0, "type": "mirror"}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 613d596..8da3e2b 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -112,6 +112,7 @@
- 103 rw auto quick
- 104 rw auto
- 105 rw auto quick
-+106 rw auto backing
- 107 rw auto quick
- 108 rw auto quick
- 109 rw auto
--- 
-2.9.4
+On 2017-06-28 17:31, Pavel Butsykin wrote:
+> On 28.06.2017 16:59, Max Reitz wrote:
+>> On 2017-06-27 17:06, Pavel Butsykin wrote:
+>>> On 26.06.2017 20:47, Max Reitz wrote:
+>>>> On 2017-06-26 17:23, Pavel Butsykin wrote:
+>>> []
+>>>>>
+>>>>> Is there any guarantee that in the future this will not change?
+>>>>> Because
+>>>>> in this case it can be a potential danger.
+>>>>
+>>>> Since this behavior is not documented anywhere, there is no guarante=
+e.
+>>>>
+>>>>> I can add a comment... Or add a new variable with the size of
+>>>>> reftable_tmp, and every time count min(s->refcount_table_size,
+>>>>> reftable_tmp_size)
+>>>>> before accessing to s->refcount_table[]/reftable_tmp[]
+>>>>
+>>>> Or (1) you add an assertion that refcount_table_size doesn't change
+>>>> along with a comment why that is the case, which also explains in
+>>>> detail
+>>>> why the call to qcow2_free_clusters() should be safe: The on-disk
+>>>> reftable differs from the one in memory. qcow2_free_clusters()and
+>>>> update_refcount() themselves do not access the reftable, so they are=
+
+>>>> safe. However, update_refcount() calls alloc_refcount_block(), and t=
+hat
+>>>> function does access the reftable: Now, as long as
+>>>> s->refcount_table_size does not shrink (which I can't see why it
+>>>> would),
+>>>> refcount_table_index should always be smaller. Now we're accessing
+>>>> s->refcount_table: This will always return an existing refblock beca=
+use
+>>>> this will either be the refblock itself (for self-referencing
+>>>> refblocks)
+>>>> or another one that is not going to be freed by qcow2_shrink_reftabl=
+e()
+>>>> because this function will not free refblocks which cover other
+>>>> clusters
+>>>> than themselves.
+>>>> We will then proceed to update the refblock which is either right
+>>>> (if it
+>>>> is not the refblock to be freed) or won't do anything (if it is the =
+one
+>>>> to be freed).
+>>>> In any case, we will never write to the reftable and reading from th=
+e
+>>>> basically outdated cached version will never do anything bad.
+>>>
+>>> OK, SGTM.
+>>>
+>>>> Or (2) you copy reftable_tmp into s->refcount_table[] *before* any c=
+all
+>>>> to qcow2_free_clusters(). To make this work, you would need to also
+>>>> discard all refblocks from the cache in this function here (and not =
+in
+>>>> update_refcount()) and then only call qcow2_free_clusters() on
+>>>> refblocks
+>>>> which were not self-referencing. An alternative hack would be to sim=
+ply
+>>>> mark the image dirty and just not do any qcow2_free_clusters() call.=
+=2E.
+>>>
+>>> The main purpose of qcow2_reftable_shrink() function is discard all
+>>> unnecessary refblocks from the file. If we do only rewrite
+>>> refcount_table and discard non-self-referencing refblocks (which are
+>>> actually very rare), then the meaning of the function is lost.
+>>
+>> It would do exactly the same. The idea is that you do not need to call=
+
+>> qcow2_free_clusters() on self-referencing refblocks at all, since they=
+
+>> are freed automatically when their reftable entry is overwritten with =
+0.
+>=20
+> Not sure.. For self-referencing refblocks, we also need to do:
+> 1. check if refcount > 1
+
+Yes, if that wasn't an error flagged by qemu-img check. :-)
+
+(http://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dblock/qcow2-refcount.c;h=3D=
+7c06061aae90eb4f091f51df995a9e099178c0ed;hb=3DHEAD#l1787)
+
+> 2. update s->free_cluster_index
+> 3. call update_refcount_discard() (to in the end the fallocate
+> PUNCH_HOLE was called on refblock offset)
+
+These, yes, you'd have to do here.
+
+> It will be practically a copy-paste from qcow2_free_clusters(), so it i=
+s
+> better to avoid it. I think that if it makes sense to do
+> qcow2_reftable_shrink(), it is only because we can slightly reduce imag=
+e
+> size.
+
+But it would be a small copy-paste (although I may very well be wrong)
+and it would help me sleep better because I could actually understand it.=
+
+
+Max
+
+>>>> Or (3) of course it would be possible to not clean up refcount
+>>>> structures at all...
+>>>
+>>> Nice solution :)
+>>
+>> It is, because as I said refcount structures only have a small overhea=
+d.
+>=20
+> Yes, I agree.
+
+
+--BIsrw8CpWCWcXHRfIlX8KtRFVft0vU3kO
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEvBAEBCAAZBQJZVD1sEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQGeW
+CACgssvuO6icwcgIFnxwJ5vfp4ciBw2KpRxm2VHjBrpYmdgxDcokrAlg4Mw1za+R
+nd4ELclAolF6lfqdlKklyuW9vyXqfKpWiaRYK+ZlqXTOfbyvaQYxZupwCDO2HBTz
+AermiOWsZj92Nh4D502tWKRKJS5yfEfggpd0gXqdzF/bz7+ZPYu3vPLqLFp6QmJN
+V5Qm/PetHmWPkoz+0cs1J3VnaEJj6jq7SKI3V0AX2Jap1geFCjiktPodJM/c2ZUC
+osWAvYM9f/xhvP2zvjpM2GYFXvTp5LExc5OM07oPByOVelGkxRNBg1lGIiPyZ8R4
+BiHfHrdH3qxfRnYg4/8j7Iyv
+=hWKC
+-----END PGP SIGNATURE-----
+
+--BIsrw8CpWCWcXHRfIlX8KtRFVft0vU3kO--
