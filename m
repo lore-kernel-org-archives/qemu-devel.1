@@ -1,37 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dQBcy-0003I3-O2
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:59:26 -0400
+	(envelope-from <armbru@redhat.com>) id 1dQBdE-0003QL-Dc
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:59:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dQBcv-0007Kr-Le
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:59:24 -0400
-Received: from 19.mo5.mail-out.ovh.net ([46.105.35.78]:51400)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dQBcv-0007K9-Cn
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:59:21 -0400
-Received: from player799.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id B67C210DE4C
-	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 13:59:19 +0200 (CEST)
-Date: Wed, 28 Jun 2017 13:59:08 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170628135908.4501f0a0@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <baf1e0b1-178b-28ae-f2a2-caadaaf9d213@kaod.org>
-References: <20170622112648.24815-1-lvivier@redhat.com>
-	<caa25331-5005-78e8-fba2-19bf67116d92@redhat.com>
-	<20170623092124.GG12089@umbus>
-	<c0a0667e-8c60-a8e7-a041-caddac8c8b88@redhat.com>
-	<20170628014231.GA791@pacoca>
-	<a34435df-8944-ddac-e881-0a2338e4aad4@redhat.com>
-	<20170628081850.GJ12089@umbus>
-	<668938c1-f93e-86d1-4e4e-5715d5074587@kaod.org>
-	<e0f76eb1-2388-e512-3763-26e7232b1129@redhat.com>
-	<baf1e0b1-178b-28ae-f2a2-caadaaf9d213@kaod.org>
+	(envelope-from <armbru@redhat.com>) id 1dQBdC-0007S9-Me
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:59:40 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170627163145.GC4792@noname.redhat.com>
+	<71a641e8-4701-58bf-29c5-090f30d59d91@redhat.com>
+	<87mv8sd1tt.fsf@dusky.pond.sub.org>
+	<20170628100621.GA5378@noname.redhat.com>
+Date: Wed, 28 Jun 2017 13:59:27 +0200
+In-Reply-To: <20170628100621.GA5378@noname.redhat.com> (Kevin Wolf's message
+	of "Wed, 28 Jun 2017 12:06:21 +0200")
+Message-ID: <87mv8s7274.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/RbY9uhFymc_HoNgc7MWrxbF";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc/cpu-models: set
- POWER9_v1.0 as POWER9 DD1
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC] QMP design: Fixing query-block and friends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,149 +25,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc: Laurent Vivier <lvivier@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, sursingh@redhat.com, joserz@linux.vnet.ibm.com, qemu-devel@nongnu.org, sbobroff@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: stefanha@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
---Sig_/RbY9uhFymc_HoNgc7MWrxbF
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Kevin Wolf <kwolf@redhat.com> writes:
 
-On Wed, 28 Jun 2017 12:23:06 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> Am 28.06.2017 um 09:10 hat Markus Armbruster geschrieben:
+>> Eric Blake <eblake@redhat.com> writes:
+>> > On 06/27/2017 11:31 AM, Kevin Wolf wrote:
+>> >> If that's what we're going to do, I think I can figure out something
+>> >> nice for block nodes. That shouldn't be too hard. The only question
+>> >> would be whether we want a command to query one node or whether we would
+>> >> keep returning all of them.
+>> >
+>> > The age-old filtering question. It's also plausible to have a single
+>> > command, with an optional argument, and which always returns an array:
+>> > the full array if the argument was omitted, or an array of one matching
+>> > the argument when one was provided.  Adding filtering is an easy patch
+>> > on top once it is proven to make life easier for a client, and I'm okay
+>> > with a first approach that does not filter.
+>> 
+>> The graph may change.  Querying node by node would have to cope with
+>> changes somehow, which I'd expect to be complex and fragile.  I think we
+>> really need a way to get a complete, consistent graph.  So let's
+>> implement that first.  If we still want server-side filtering once
+>> that's done, we can add some on top.
+>> 
+>> As usual, I doubt we really need server-side filtering, and I dislike
+>> the interface complexity it brings.
+>
+> I didn't really think of it as filtering. Every other operation is done
+> on a single object, so querying a single object would be the natural
+> extension. I mean, we also don't consider it "filtering" that we have
+> many separate query commands instead of a 'query-qemu-state'.
 
-> On 06/28/2017 11:18 AM, Laurent Vivier wrote:
-> > On 28/06/2017 11:11, C=C3=A9dric Le Goater wrote: =20
-> >> On 06/28/2017 10:18 AM, David Gibson wrote: =20
-> >>> On Wed, Jun 28, 2017 at 09:09:24AM +0200, Thomas Huth wrote: =20
-> >>>> On 28.06.2017 03:42, joserz@linux.vnet.ibm.com wrote: =20
-> >>>>> On Fri, Jun 23, 2017 at 04:10:55PM +0200, Laurent Vivier wrote: =20
-> >>>>>> On 23/06/2017 11:21, David Gibson wrote: =20
-> >>>>>>> On Thu, Jun 22, 2017 at 01:31:24PM +0200, Thomas Huth wrote: =20
-> >>>>>>>> On 22.06.2017 13:26, Laurent Vivier wrote: =20
-> >>>>>>>>> CPU_POWERPC_POWER9_DD1 is 0x004E0100, so this is the POWER9 v1.=
-0.
-> >>>>>>>>>
-> >>>>>>>>> When we run qemu on a POWER9 DD1 host, we must use either
-> >>>>>>>>> "-cpu host" or "-cpu POWER9", but in the latter case it fails w=
-ith
-> >>>>>>>>>
-> >>>>>>>>>     Unable to find sPAPR CPU Core definition
-> >>>>>>>>>
-> >>>>>>>>> because POWER9 DD1 doesn't appear in the list of known CPUs.
-> >>>>>>>>>
-> >>>>>>>>> This patch fixes this by defining POWER9_v1.0 with POWER9 DD1
-> >>>>>>>>> PVR instead of CPU_POWERPC_POWER9_BASE.
-> >>>>>>>>>
-> >>>>>>>>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> >>>>>>>>> ---
-> >>>>>>>>>  target/ppc/cpu-models.c | 2 +-
-> >>>>>>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
-> >>>>>>>>>
-> >>>>>>>>> diff --git a/target/ppc/cpu-models.c b/target/ppc/cpu-models.c
-> >>>>>>>>> index 4d3e635..a22363c 100644
-> >>>>>>>>> --- a/target/ppc/cpu-models.c
-> >>>>>>>>> +++ b/target/ppc/cpu-models.c
-> >>>>>>>>> @@ -1144,7 +1144,7 @@
-> >>>>>>>>>      POWERPC_DEF("970_v2.2",      CPU_POWERPC_970_v22,         =
-       970,
-> >>>>>>>>>                  "PowerPC 970 v2.2")
-> >>>>>>>>> =20
-> >>>>>>>>> -    POWERPC_DEF("POWER9_v1.0",   CPU_POWERPC_POWER9_BASE,     =
-       POWER9,
-> >>>>>>>>> +    POWERPC_DEF("POWER9_v1.0",   CPU_POWERPC_POWER9_DD1,      =
-       POWER9,
-> >>>>>>>>>                  "POWER9 v1.0")
-> >>>>>>>>> =20
-> >>>>>>>>>      POWERPC_DEF("970fx_v1.0",    CPU_POWERPC_970FX_v10,       =
-       970,
-> >>>>>>>>> =20
-> >>>>>>>>
-> >>>>>>>> I think this also makes sense for running in TCG mode to get a v=
-alid
-> >>>>>>>> real PVR there. =20
-> >>>>>>>
-> >>>>>>> I'm not so convinced.
-> >>>>>>>
-> >>>>>>> IIUC, this will make TCG default (for now) to a DD1 POWER9.  That=
-'s a)
-> >>>>>>> probably not what anyone wants - who'd select a buggy prototype a=
-nd b)
-> >>>>>>> not accurate - TCG does not implement DD1's bugs. =20
-> >>>>>>
-> >>>>>> According to the POWER8 user manual (I didn't fine the POWER9 one):
-> >>>>>>
-> >>>>>> "3.6.3.1 Processor Version Register (PVR)
-> >>>>>>
-> >>>>>> The processor revision level (PVR[16:31]) starts at x=E2=80=980100=
-=E2=80=99, indicating
-> >>>>>> revision =E2=80=981.0=E2=80=99. As revisions are made, bits [29:31=
-] will indicate minor
-> >>>>>> revisions. Similarly, bits [20:23] indicate major changes."
-> >>>>>>
-> >>>>>> POWER9 DD1 PVR is 0x004E0100, so this is really version 1.0 of the=
- POWER9.
-> >>>>>>
-> >>>>>> Perhaps we can define POWER9_v1.0 as CPU_POWERPC_POWER9_DD1, and
-> >>>>>> introduce a POWER9_v0.0 set to CPU_POWERPC_POWER9_BASE and define =
-it as
-> >>>>>> the default one? =20
-> >>>>>
-> >>>>> I like the suggestion to set a v0.0 to CPU_POWERPC_POWER9_BASE. But=
-, I
-> >>>>> think we could have only that option, removing the
-> >>>>> CPU_POWERPC_POWER9_DD1 entry. =20
-> >>>> I really dislike the idea of having a CPU called "v0.0" ... we do not
-> >>>> have this for any other CPU generation, and it sounds like it could =
-be
-> >>>> very confusing for the users (you'd need to document somewhere what =
-the
-> >>>> v0.0 exactly means). If we really want to go this way, I think we sh=
-ould
-> >>>> name it "POWER9-generic" or "PowerISA-3.0" or something similar inst=
-ead.
-> >>>>
-> >>>> Or does somebody already know the exact PVR for DD2? If so, we could
-> >>>> simply add a POWER9_v2.0 CPU already and let the POWER9 alias point =
-to
-> >>>> that version instead. =20
-> >>>
-> >>> Yes, I think that's a better idea.  I don't know the DD2 PVR, but I'm
-> >>> pretty sure we should be able to find out from someone at IBM.
-> >>>
-> >>> I've CCed Sam & Suraj - can you ask Mikey or someone what the PVR
-> >>> value for DD2.0 will be? =20
-> >>
-> >> I would expect something like :
-> >>
-> >>  0x200D104980000000UL; /* P9 Nimbus DD2.0 */ =20
-> >=20
-> >=20
-> > I would expect something like 0x004Exxxx. =20
->=20
-> ah yes, I am mistaking the PVR and the CFAM ID.=20
->=20
-> C.=20
-> =20
+Let me try to be more precise.
 
-According to https://patchwork.ozlabs.org/patch/776052/
+Once you have a command to return "full" data, I doubt the need to add
+filtering to it so it can optionally return partial data.
 
-POWER9 DD2's PVR is expected to be 0x004e1200
+I put "full" in quotes, because it's a design decision.  If you design a
+command to query information about a node, then "full" is information
+about just that node.  If you design one for the entire node graph, then
+"full" is about all nodes that exist.  If you design one for the
+sub-graph rooted at a certain node, then "full" is about all the nodes
+in that sub-graph.
 
-Cheers,
+The design will depend on considerations like the desire let clients
+gain a consistent view more easily.  That's not what I meant by
+"filtering".
 
---
-Greg
+If the chosen design returns information on multiple nodes, then adding
+optional parameters to make it return less is "filtering".  This kind of
+filtering can easily be done in the client.  Doing it in the server
+increases interface complexity, and that needs justification.
 
---Sig_/RbY9uhFymc_HoNgc7MWrxbF
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Here's a justification I could accept: we can show certain clients need
+partial information frequently enough to make saving bandwidth
+worthwhile.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+Here's a justification I refuse to accept: because we can.
 
-iEYEARECAAYFAllTmgwACgkQAvw66wEB28J0nwCdHEMFqo+C/FgpwUZzEjLQBxpl
-g84An0DCT6LU9bgUAJYPd7qUK7bppa+O
-=izzg
------END PGP SIGNATURE-----
+Is my stance clearer now?
 
---Sig_/RbY9uhFymc_HoNgc7MWrxbF--
+> But you have a good point with the necessary atomicity, so we'll return
+> everything at once.
+>
+>> >> I am, however, a bit less confident about BBs. As I said above, I
+>> >> consider them part of the qdev devices.
+>> 
+>> They weren't meant to be when I created them, but I guess it's what they
+>> evolved to be.
+>> 
+>> >>                                         As far as I know, there is no
+>> >> high-level infrastructure to query runtime state of devices and qdev
+>> >> properties are supposed to be read-only. Maybe non-qdev QOM properties
+>> >> can be used somehow?
+>> 
+>> Since qdev properties are implemented as QOM property, there are no
+>> non-qdev QOM properties.
+>
+> You got the logic wrong here: "All qdev properties are QOM properties"
+> doesn't imply "All QOM properties are qdev properties". Now I don't say
+> that it's not true anyway, I don't know enough about QOM and qdev to say
+> much about it.
+
+I got it backwards.  There are no non-QOM qdev properties.  Sorry for
+the confusion.
+
+QOM isn't the only way to interact with QEMU objects (objects in the
+widest possible sense).  But it's a generic way that already exists.
+Let's consider whether we can use it before we invent new ways.
+
+Read/write QOM properties is how we configure and control QOM objects,
+including devices.  Read-only QOM properties is how we inspect them.
+
+> I always had the impression that qdev provided some wrappers around QOM
+> that add magic that makes properties configurable in -device and things
+> like that, which you wouldn't want for these properties. I also know
+> that devices aren't supposed to change qdev properties at runtime
+> (whereas I remember QOM not to have trouble with that), but I'm not sure
+> if there is a technical reason for this.
+
+Historically, qdev properties are for configuring devices.  But nothing
+stops you from using (abusing?) qdev properties for something else.  You
+could, for instance, ignore a property's initial value (making it *not*
+configuration), then have its value track some interesting bit of device
+state, so the user can inspect it with info qtree.
+
+However, arguing about this has become rather pointless, because qdev is
+less and less separate from QOM.  We've acquired non-qdev QOM properties
+for configuring devices.  We may generalize features qdev now provides
+over QOM, because they're useful for non-devices as well, such as
+defining properties in data rather than code, or the machinery for
+machine-type-specific defaults.
+
+My point is: don't get sidetracked into qdev.
+
+>> >>                      But QOM isn't really nice to use as you need to
+>> >> query each property individually.
+>> 
+>> qom-get returns 'any'.  A read-only property with a complex value is
+>> already possible.  But it's awkward when you also want to get or set
+>> parts of the complex value.
+>> 
+>> Perhaps we could provide a way to get whole containers in addition to
+>> single properties.  Would that do?
+>
+> You could query a device with a single command then, sounds much nicer.
+> Actually, your argument from above applies here, too: You want the
+> returned data to be consistent, so querying needs to be atomic. This
+> means that getting whole containers isn't only more convenient, but
+> actually more correct.
+
+Point.
+
+Related: transaction to set multiple properties.  Different topic,
+though.
+
+> Another thought I have when comparing this with querying block nodes:
+> Wouldn't you still consider querying just a single device filtering?
+
+I hope I answered this above.
+
+>> >> Another option would be to have a QMP command that takes a qdev ID of a
+>> >> block device and queries its BB. Or maybe it should stay like
+>> >> query-block and return an array of all of them, but include the qdev
+>> >> device name. Actually, maybe query-block can stay as it contains only
+>> >> two fields that are useless in the new world.
+>> >
+>> > Being able to query all the devices (with their BB's, and only a name
+>> > reference to the top-level BDS in use by the BB), separately from being
+>> > able to query all BDS, seems like a reasonable thing.  After all,
+>> > sometimes you care about what the guest sees (what devices have a BB),
+>> > and sometimes you care about what the host is exposing (what BDS are in
+>> > use).
+>> 
+>> No argument.  But let's not focus narrowly on block devices, or even
+>> devices.  If QOM "isn't really nice" for block devices, it probably
+>> isn't nice for lots of other things.  If we can address that at the QOM
+>> level, we should.
+>
+> That's exactly what I think. Unfortunately, my knowledge about QOM is
+> seriously lacking. Even more unfortunately, everyone else seems to have
+> the same problem.
+
+QOM is documented, but the documentation is seriously lacking on the
+*why*.  It's obvious to me that a lot of thought and love has been
+poured into QOM.  Sadly, the people how used to drive QOM aren't as
+active as they used to be, or have since moved on to other adventures
+entirely.  This leaves us with a complex, ambitious piece of
+infrastructure we don't quite know how to put to use.
+
+>> >> I think this has become long enough now, so any opinions? On anything I
+>> >> said above, but preferably also about what a new interface should look
+>> >> like?
+>> >
+>> > Our existing interface is definitely awkward, with lots of redundancy in
+>> > some places and missing information in others, and a new interface does
+>> > seem like we can do better at designing it right up front rather than
+>> > bolting on yet more information to the existing queries (which results
+>> > in that much more noise to churn through to get to the desired information).
+>> 
+>> Replacing an interface that could be evolved to serve is a mistake.
+>> 
+>> Not replacing an interface when it has reached its design limits is also
+>> a mistake.
+>> 
+>> I normally advise against the first mistake.  But in this case, I think
+>> we have to avoid the second.  The interface has evolved into a confusing
+>> mess.  The gap between how the interface presents the block layer and
+>> how it actually works has become too large.  Sufficiently sophisticated
+>> clients have to bridge the gap somehow, and that's painful.
+>
+> Thanks, the feedback so far is already very helpful in that everyone
+> agreed that we need something completely new. Now we just need to figure
+> out what it should look like. :-)
+
+"just" :)
