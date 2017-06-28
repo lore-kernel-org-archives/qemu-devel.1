@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dQFFX-0007Bk-DY
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 11:51:28 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dQFJO-0001Rw-Uf
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 11:55:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dQFFW-0007pU-M9
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 11:51:27 -0400
-Date: Wed, 28 Jun 2017 18:50:43 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170628155043.ig363hyuzta2jxoz@postretch>
+	(envelope-from <kwolf@redhat.com>) id 1dQFJO-0001K7-8m
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 11:55:27 -0400
+Date: Wed, 28 Jun 2017 17:55:14 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170628155514.GK5378@noname.redhat.com>
 References: <20170623124700.1389-1-el13635@mail.ntua.gr>
-	<20170623124700.1389-4-el13635@mail.ntua.gr>
-	<20170628144012.GH5378@noname.redhat.com>
-	<20170628152209.hf6iqosa24b3nocc@postretch>
-	<20170628153654.GI5378@noname.redhat.com>
+	<20170623124700.1389-7-el13635@mail.ntua.gr>
+	<20170626151154.GG29664@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="lyv3z7pjvs32q3pl"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="maH1Gajj2nflutpK"
 Content-Disposition: inline
-In-Reply-To: <20170628153654.GI5378@noname.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v3 3/8] block: add throttle block
- filter driver
+In-Reply-To: <20170626151154.GG29664@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC v3 6/8] block: add options
+ parameter to bdrv_new_open_driver()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +26,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>
 
 
---lyv3z7pjvs32q3pl
-Content-Type: text/plain; charset=utf-8; format=flowed
+--maH1Gajj2nflutpK
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 28, 2017 at 05:36:54PM +0200, Kevin Wolf wrote:
->Am 28.06.2017 um 17:22 hat Manos Pitsidianakis geschrieben:
->> Since we're moving groups to QOM we will need ids for each group.
->> Can objects be anonymous?
->
->Hm, that's a good question. But object_new() doesn't take an ID, so I
->think they can be anonymous.
->
->Looking a bit closer, strcut Object doesn't even have a field for the
->ID. It seems that what the ID really is is the name of a property in a
->parent object that points to the new object. So as long as you don't
->want to have another QOM object point to it, there is no such thing as
->an ID.
->
->Anyway, I followed the call chain from throttle_group_register_tgm() and
->it ends in throttle_group_incref() where we simply have this:
->
->    tg =3D g_new0(ThrottleGroup, 1);
->    tg->name =3D g_strdup(name);
->
->Shouldn't this be using something a little more QOMy now?
+Am 26.06.2017 um 17:11 hat Stefan Hajnoczi geschrieben:
+> On Fri, Jun 23, 2017 at 03:46:58PM +0300, Manos Pitsidianakis wrote:
+> > diff --git a/block.c b/block.c
+> > index 694396281b..c7d9f8959a 100644
+> > --- a/block.c
+> > +++ b/block.c
+> > @@ -1150,20 +1150,25 @@ free_and_fail:
+> >  }
+> > =20
+> >  BlockDriverState *bdrv_new_open_driver(BlockDriver *drv, const char *n=
+ode_name,
+> > -                                       int flags, Error **errp)
+> > +                                       int flags, QDict *options, Erro=
+r **errp)
+>=20
+> Please add a doc comment that explains the QDict ownership when options
+> !=3D NULL.  Users need to understand whether the options QDict still
+> belongs to them after the call or bdrv_new_open_driver() takes over
+> ownership.
+>=20
+> See bdrv_open_inherit() for an example.
 
-Yes, like it was mentioned in the QOM patch's thread=20
-block/throttle-groups.c should use QOM internally. I will change this=20
-for the next revision and also look into anonymity.
+I think we might not only want to document it, but probably also change
+this function. bdrv_open_inherit() and friends take ownership of the
+QDict, so doing the same here would probably avoid bugs in the future.
 
---lyv3z7pjvs32q3pl
-Content-Type: application/pgp-signature; name="signature.asc"
+It also seems more practical, because the only user that is added in
+patch 8 already does QDECREF() after calling bdrv_new_open_driver().
+
+Kevin
+
+--maH1Gajj2nflutpK
+Content-Type: application/pgp-signature
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
 
-iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAllT0FMACgkQc2J8L2kN
-9xAQvBAAl1Lp99bchAX2IVPy1xU3abZ7tq17+KTT/vcppdXMy8lcmrbJpgLPK42w
-ctXJcCKxxccWkp+kZU2DbkSdmvc3AiZV73eDdlpe2LNpuAiXc751LlNK56i33OOI
-EExtWbVwVkobMIjY4uXLCUMaBPHy4t6eA4pMZnZCW8+8Fx10xpDNc09t65R0/AMy
-rhLLyoTH1XwLrzTpUj60W11C54xkTA5xHS6spXbI7AIFnDcIyyTFmyCRu4/47myU
-sJufkBIOLx56SpiALZXmOqvkQUFeNcTwQJUUJIY1OiRRTC4T2Y+d1T9933SZ9OMN
-jis7r4blbcqYiUYmCNEbifK8rkzXo4X6g8LaMuWXv/ngE1ZM5Dv86LrgcmaVy1NZ
-NS/2Q0sVp+2pz4q+UjiDrptdzoN6K6ABUzLG73n/fZ6N+8I3dS6Od1DtnrWpdciY
-JlXmFfWp6z4gnxLCZeoGLaI7srUa9HtuuJJNR4mHyPxjYsFAjtcq+jZhhYV8/anm
-pEnzHKgdMPkqpP8S9HemRzsA7olf0vDEzPeUqn5B04ZTiB9ODoDWAjqf3jBctRkx
-RZlcmmDZ0l+/0EQOwUwewtUidoIaVBv01uT6ZRF+D52oo4zoSraq9o53/E+zeeT3
-zth26dHqP0DJbyqqVKEb0VwPQOxdhKAz/9tDEr1JU5YIGm5H/Qs=
-=Fe0N
+iQIcBAEBAgAGBQJZU9FiAAoJEH8JsnLIjy/WHNgQAMY5OV9vBkd7qAiwPcHiY9yA
+wnYIh66JIsYqbxcPcnwZZrFMZroWI4ed9QhCbeAUbHi26mtZnvAAigY4WC8GDBmM
+smp3eqS4HGNBiRjLB98siBpuEhGhzdxyU3vxYLV89vNUNJsANN1EleXpAcBVmsr8
+sKun+WH0L/MN5XoxMTgmQCARZwvCIVqYuSPho/v4ZNViJBARkCDw+xqcM2BMBdUK
+bP1raNTlCGfX9UCYeej4v8HS7LKvqTxy+M7AwiRTr52QxUdx8gdGs/5OADaPCUuI
+kSp9bfxMPZTuE83F8OrnOJjIk27k26NuHOXOTAbEx14dJwFRzgKfVGDAt86OUSxe
+NNhDbZfTI/rSzrslvvGDkqq5XZbwQFvqhCEJC8vx1gvyLSH+vb/LaJNvU8jcgP44
+yVzs6dobDgNtoIUe2fXduewhwpM/VDHksQKw5dqO/5vGmYJn3Htb0AR0K/eTi+mZ
+NVSr2dSGUVONy6mtMRp3bIvqGXszIIuqFpbGfXySuQ7p24mLIpAcD8cbf4QAzPu8
+VUbEHGJxFcTz0HApuyDlLUv5i8G2+8Olulq31P5+bLmTs3m2KbGVmDhxAZehjkFW
+qdBWWL2nRfvooXqTESadOIvrnhXXsOU4jGKUEELhZy3gUK7QCKmIYZSsUAQuXEHM
+GFklmzTeUJMlOTYCvPsO
+=KJjW
 -----END PGP SIGNATURE-----
 
---lyv3z7pjvs32q3pl--
+--maH1Gajj2nflutpK--
