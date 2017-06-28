@@ -1,27 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dQDeU-0002Mg-Ol
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 10:09:07 -0400
+	(envelope-from <lvivier@redhat.com>) id 1dQDeo-0002aA-CU
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 10:09:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dQDeT-00088F-SY
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 10:09:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40604)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dQDeT-000883-MN
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 10:09:05 -0400
-Date: Wed, 28 Jun 2017 22:09:01 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170628140901.GJ14166@lemon.lan>
-References: <20170628124850.12821-1-famz@redhat.com>
-	<20170628124850.12821-2-famz@redhat.com>
-	<538088ce-7515-f8a0-e4d7-21ec02bd45c9@redhat.com>
-	<a9272af6-d6fa-89b0-3e30-35d85f5d3489@suse.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <a9272af6-d6fa-89b0-3e30-35d85f5d3489@suse.de>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/7] qom: Make link property API public
+	(envelope-from <lvivier@redhat.com>) id 1dQDel-0008Dn-7N
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 10:09:26 -0400
+From: Laurent Vivier <lvivier@redhat.com>
+Date: Wed, 28 Jun 2017 16:09:19 +0200
+Message-Id: <20170628140919.27167-1-lvivier@redhat.com>
+Subject: [Qemu-devel] [PATCH] spapr: fix migration to pseries machine < 2.8
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,22 +17,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>
 
-On Wed, 06/28 15:36, Andreas F=E4rber wrote:
-> The alternative would be moving info qom-tree forward and finally
-> deprecating info qtree. There was a patch of mine to make it list
-> properties with -v or so, but there were StringOutputVisitor
-> dependencies where it got stuck in review.
+since commit 5c4537bd ("spapr: Fix 2.7<->2.8 migration of PCI host bridge"),
+some migration fields are forged from the new ones in spapr_pci_pre_save().
 
-No objection to enhancing info qom-tree, but also no idea how to help. :)
+It works well, except when the number of MSI devices is 0,
+because in this case the function exits immediately.
 
-BTW, will it print much more information than "info qtree"? If so depreca=
-ting it
-sounds like a bad idea for me. "info qtree" output is already lengthy. As=
- HMP is
-for human, it would be nice if the output is easy to extract interesting
-information with eyeball, rather than dumping everything.
+This fix moves the migration code before the exit code.
 
-Fam
+The problem can be reproduced with these commands:
+
+source qemu-2.9:
+
+    qemu-system-ppc64 -monitor stdio -M pseries-2.6 -nodefaults -S
+
+destination qemu-2.6:
+
+    qemu-system-ppc64 -monitor stdio -M pseries-2.6 -nodefaults \
+                      -incoming tcp:0:4444
+
+on the source:
+
+    migrate tcp:localhost:4444
+
+Destination fails with the following error:
+
+    qemu-system-ppc64: error while loading state for
+                       instance 0x0 of device 'spapr_pci'
+    qemu-system-ppc64: load of migration failed: Invalid argument
+
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+---
+ hw/ppc/spapr_pci.c | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index 0b447f2..bd30b4f 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1873,20 +1873,6 @@ static void spapr_pci_pre_save(void *opaque)
+     gpointer key, value;
+     int i;
+ 
+-    g_free(sphb->msi_devs);
+-    sphb->msi_devs = NULL;
+-    sphb->msi_devs_num = g_hash_table_size(sphb->msi);
+-    if (!sphb->msi_devs_num) {
+-        return;
+-    }
+-    sphb->msi_devs = g_malloc(sphb->msi_devs_num * sizeof(spapr_pci_msi_mig));
+-
+-    g_hash_table_iter_init(&iter, sphb->msi);
+-    for (i = 0; g_hash_table_iter_next(&iter, &key, &value); ++i) {
+-        sphb->msi_devs[i].key = *(uint32_t *) key;
+-        sphb->msi_devs[i].value = *(spapr_pci_msi *) value;
+-    }
+-
+     if (sphb->pre_2_8_migration) {
+         sphb->mig_liobn = sphb->dma_liobn[0];
+         sphb->mig_mem_win_addr = sphb->mem_win_addr;
+@@ -1900,6 +1886,20 @@ static void spapr_pci_pre_save(void *opaque)
+             sphb->mig_mem_win_size += sphb->mem64_win_size;
+         }
+     }
++
++    g_free(sphb->msi_devs);
++    sphb->msi_devs = NULL;
++    sphb->msi_devs_num = g_hash_table_size(sphb->msi);
++    if (!sphb->msi_devs_num) {
++        return;
++    }
++    sphb->msi_devs = g_malloc(sphb->msi_devs_num * sizeof(spapr_pci_msi_mig));
++
++    g_hash_table_iter_init(&iter, sphb->msi);
++    for (i = 0; g_hash_table_iter_next(&iter, &key, &value); ++i) {
++        sphb->msi_devs[i].key = *(uint32_t *) key;
++        sphb->msi_devs[i].value = *(spapr_pci_msi *) value;
++    }
+ }
+ 
+ static int spapr_pci_post_load(void *opaque, int version_id)
+-- 
+2.9.4
