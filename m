@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dQInP-0004Sc-OX
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:38:40 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dQIwO-0007R2-1U
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:47:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dQInO-0000cI-UP
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:38:39 -0400
-References: <20170628184724.21378-1-stefanha@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c8f3d355-8b45-3891-3eee-994059b0f045@redhat.com>
-Date: Wed, 28 Jun 2017 14:38:26 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170628184724.21378-1-stefanha@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="kuEuVxbf4hbfW494gkkSD2Kvjfm7GxSp9"
-Subject: Re: [Qemu-devel] [PATCH 0/6] virtio: use ioeventfd in TCG and qtest
- mode
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dQIwJ-0003jH-42
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:47:56 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35848
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1dQIwI-0003ir-TV
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:47:51 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v5SJj0UG018238
+	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 15:47:48 -0400
+Received: from e24smtp01.br.ibm.com (e24smtp01.br.ibm.com [32.104.18.85])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2bcj0cadhm-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 15:47:48 -0400
+Received: from localhost
+	by e24smtp01.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Wed, 28 Jun 2017 16:47:46 -0300
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Wed, 28 Jun 2017 16:47:31 -0300
+Message-Id: <20170628194731.15742-1-danielhb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH] hw/ppc/spapr.c: do not adjust rma_size with
+ KVM RADIX in ppc_spapr_init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,85 +37,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, mdroth@linux.vnet.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kuEuVxbf4hbfW494gkkSD2Kvjfm7GxSp9
-From: Eric Blake <eblake@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <c8f3d355-8b45-3891-3eee-994059b0f045@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/6] virtio: use ioeventfd in TCG and qtest
- mode
-References: <20170628184724.21378-1-stefanha@redhat.com>
-In-Reply-To: <20170628184724.21378-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+In ppc_spapr_init when setting rma_size we have the following verification:
 
-On 06/28/2017 01:47 PM, Stefan Hajnoczi wrote:
-> This patch series fixes qemu-iotests 068.  Since commit
-> ea4f3cebc4e0224605ab9dd9724aa4e7768fe372 ("qemu-iotests: 068: test ioth=
-read
-> mode") the test case has attempted to use dataplane without -M accel=3D=
-kvm.
-> Although QEMU is capable of running TCG or qtest with emulated ioeventf=
-d/irqfd
-> we haven't enabled it yet.
->=20
-> Unfortunately the virtio test cases fail when ioeventfd is enabled in q=
-test
-> mode.  This is because they make assumptions about virtqueue ISR signal=
-ling.
-> They assume that a request is completed when ISR becomes 1.  However, t=
-he ISR
-> can be set to 1 even though no new request has completed since commit
-> 83d768b5640946b7da55ce8335509df297e2c7cd "virtio: set ISR on dataplane
-> notifications".
->=20
-> This issue is solved by introducing a proper qvirtqueue_get_buf() API (=
-similar
-> to the Linux guest drivers) instead of making assumptions about the ISR=
-=2E  Most
-> of the patches update the test cases to use the new API.
->=20
-> Stefan Hajnoczi (6):
->   libqos: fix typo in virtio.h QVirtQueue->used comment
->   libqos: add virtio used ring support
->   tests: fix virtio-scsi-test ISR dependence
->   tests: fix virtio-blk-test ISR dependence
->   tests: fix virtio-net-test ISR dependence
->   virtio-pci: use ioeventfd even when KVM is disabled
+    if (rma_alloc_size && (rma_alloc_size < node0_size)) {
+        spapr->rma_size = rma_alloc_size;
+    } else {
+        spapr->rma_size = node0_size;
 
-I'm less familiar with the code in question, so I'll let others review,
-but it did fix the failure of 068 for me.
+        /* With KVM, we don't actually know whether KVM supports an
+         * unbounded RMA (PR KVM) or is limited by the hash table size
+         * (HV KVM using VRMA), so we always assume the latter
+         *
+         * In that case, we also limit the initial allocations for RTAS
+         * etc... to 256M since we have no way to know what the VRMA size
+         * is going to be as it depends on the size of the hash table
+         * isn't determined yet.
+         */
+        if (kvm_enabled()) {
+            spapr->vrma_adjust = 1;
+            spapr->rma_size = MIN(spapr->rma_size, 0x10000000);
+        }
 
-Tested-by: Eric Blake <eblake@redhat.com>
+This code (and the comment that precedes it) is taking constraints and conditions
+related to KVM HPT guests and filtering them with "if (kvm_enabled())". Note that
+this also means that, for KVM RADIX guests, we'll change rma_size and set the
+vrma_adjust flag as well.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+The flag vrma_adjust is used inside 'spapr_setup_hpt_and_vrma', which in turn is
+called from ppc_spapr_reset as follows:
 
+    if (kvm_enabled() && kvmppc_has_cap_mmu_radix()) {
+        /* If using KVM with radix mode available, VCPUs can be started
+         * without a HPT because KVM will start them in radix mode.
+         * Set the GR bit in PATB so that we know there is no HPT. */
+        spapr->patb_entry = PATBE1_GR;
+    } else {
+        spapr_setup_hpt_and_vrma(spapr);
+    }
 
---kuEuVxbf4hbfW494gkkSD2Kvjfm7GxSp9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+In short, when running a KVM HPT guest, rma_size is shrinked, the flag vrma_adjust
+is set and later on spapr_setup_hpt_and_vrma() is called to make the proper
+adjustments. When running a KVM RADIX guest no post adjustment is made, leaving
+rma_size with the value MIN(spapr->rma_size, 0x10000000).
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+This changed rma_size value is causing the code to populate more memory nodes
+in 'spapr_populate_memory', which in turn results in differences in the memory
+layout at SLOF init (alloc_top and rmo_top). At first this isn't causing bugs or
+guest misbehavior in case of KVM RADIX - the problem is that this is happening
+due to KVM HPT code.
 
-iQEcBAEBCAAGBQJZVAWyAAoJEKeha0olJ0Nq9lcH/0vXKnuBMMaZwU2H7OIEI7QW
-DmZeiYGIAg1lMI6E9zflQR2O25D+kZQ9wQOfdcVwkCm8Mc1yU92gjAbYPqM7SYxH
-gzW9eqLHKhQYAmcKCnAjOH4mK8jFtKPWmbEMRKyMk2iNGIIX4UfRi44/FOrJbJJC
-wrd5JfxDQojHwlaD7flxUqz8r51FiwGTv4DwrXSef1epZxvNrYkwxlXE4do3BS5E
-idCFvalPwlchWNHk0OuQzAQH8d/7WQTzAMECR2PYZ3Hl39oq+NCbsbOwgvdMXkWi
-RNTKH+R30H9zFbJjq3cxA8YPB5lEgyjnQurdQeXxlthUm7Q6fgCaKKPEyiL6zWE=
-=KjjL
------END PGP SIGNATURE-----
+This patch changes the if conditional inside ppc_spapr_init to:
 
---kuEuVxbf4hbfW494gkkSD2Kvjfm7GxSp9--
+        if (kvm_enabled() && !kvmppc_has_cap_mmu_radix()) {
+            spapr->vrma_adjust = 1;
+            spapr->rma_size = MIN(spapr->rma_size, 0x10000000);
+        }
+
+To restrict the rma changes only to KVM HPT guests. If we need to do
+adjustments for RADIX we should either do it explicitly in its own code
+or make it clearer that a common code applies to both HPT and RADIX.
+
+Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+---
+ hw/ppc/spapr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 7d9af75..117ea9d 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2164,7 +2164,7 @@ static void ppc_spapr_init(MachineState *machine)
+          * is going to be as it depends on the size of the hash table
+          * isn't determined yet.
+          */
+-        if (kvm_enabled()) {
++        if (kvm_enabled() && !kvmppc_has_cap_mmu_radix()) {
+             spapr->vrma_adjust = 1;
+             spapr->rma_size = MIN(spapr->rma_size, 0x10000000);
+         }
+-- 
+2.9.4
