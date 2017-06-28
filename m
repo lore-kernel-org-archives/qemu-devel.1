@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dQImD-0003IX-Mj
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:37:26 -0400
+	(envelope-from <eblake@redhat.com>) id 1dQInP-0004Sc-OX
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:38:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dQIm8-0000Bu-Po
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:37:25 -0400
-Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:35762)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1dQIm8-0000BP-Kl
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:37:20 -0400
-Received: by mail-it0-x244.google.com with SMTP id v193so5547920itc.2
-	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 12:37:18 -0700 (PDT)
-From: Programmingkid <programmingkidx@gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 28 Jun 2017 15:37:16 -0400
-Message-Id: <F6C36C1A-4661-48F4-BEA6-3994889927D0@gmail.com>
-Mime-Version: 1.0 (Apple Message framework v1084)
-Subject: [Qemu-devel] [PATCH] ui/cocoa.m: Fix compatibility issue with Mac
- OS 10.9 and under
+	(envelope-from <eblake@redhat.com>) id 1dQInO-0000cI-UP
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:38:39 -0400
+References: <20170628184724.21378-1-stefanha@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c8f3d355-8b45-3891-3eee-994059b0f045@redhat.com>
+Date: Wed, 28 Jun 2017 14:38:26 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170628184724.21378-1-stefanha@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="kuEuVxbf4hbfW494gkkSD2Kvjfm7GxSp9"
+Subject: Re: [Qemu-devel] [PATCH 0/6] virtio: use ioeventfd in TCG and qtest
+ mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +24,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-The [NSEvent modifierFlags] method returns an NSEventModifierFlags type =
-value in Mac OS 10.10. It use to be of type NSUInteger. Replacing =
-NSEventModifierFlags with NSUInteger allows for the cooca.m file to be =
-compiled on older versions of Mac OS. This patch was been tested on Mac =
-OS 10.6 and Mac OS 10.12 without problem.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--kuEuVxbf4hbfW494gkkSD2Kvjfm7GxSp9
+From: Eric Blake <eblake@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <c8f3d355-8b45-3891-3eee-994059b0f045@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/6] virtio: use ioeventfd in TCG and qtest
+ mode
+References: <20170628184724.21378-1-stefanha@redhat.com>
+In-Reply-To: <20170628184724.21378-1-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
----
- ui/cocoa.m | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 06/28/2017 01:47 PM, Stefan Hajnoczi wrote:
+> This patch series fixes qemu-iotests 068.  Since commit
+> ea4f3cebc4e0224605ab9dd9724aa4e7768fe372 ("qemu-iotests: 068: test ioth=
+read
+> mode") the test case has attempted to use dataplane without -M accel=3D=
+kvm.
+> Although QEMU is capable of running TCG or qtest with emulated ioeventf=
+d/irqfd
+> we haven't enabled it yet.
+>=20
+> Unfortunately the virtio test cases fail when ioeventfd is enabled in q=
+test
+> mode.  This is because they make assumptions about virtqueue ISR signal=
+ling.
+> They assume that a request is completed when ISR becomes 1.  However, t=
+he ISR
+> can be set to 1 even though no new request has completed since commit
+> 83d768b5640946b7da55ce8335509df297e2c7cd "virtio: set ISR on dataplane
+> notifications".
+>=20
+> This issue is solved by introducing a proper qvirtqueue_get_buf() API (=
+similar
+> to the Linux guest drivers) instead of making assumptions about the ISR=
+=2E  Most
+> of the patches update the test cases to use the new API.
+>=20
+> Stefan Hajnoczi (6):
+>   libqos: fix typo in virtio.h QVirtQueue->used comment
+>   libqos: add virtio used ring support
+>   tests: fix virtio-scsi-test ISR dependence
+>   tests: fix virtio-blk-test ISR dependence
+>   tests: fix virtio-net-test ISR dependence
+>   virtio-pci: use ioeventfd even when KVM is disabled
 
-diff --git a/ui/cocoa.m b/ui/cocoa.m
-index 9e81285..93e56d0 100644
---- a/ui/cocoa.m
-+++ b/ui/cocoa.m
-@@ -571,7 +571,7 @@ QemuCocoaView *cocoaView;
-                 // bitmask.
-=20
-                 if (qemu_console_is_graphic(NULL)) {
--                    NSEventModifierFlags modifiers =3D [event =
-modifierFlags];
-+                    NSUInteger modifiers =3D [event modifierFlags];
-=20
-                     if (!!(modifiers & NSEventModifierFlagCapsLock) !=3D =
-!!modifiers_state[Q_KEY_CODE_CAPS_LOCK]) {
-                         [self =
-toggleStatefulModifier:Q_KEY_CODE_CAPS_LOCK];
+I'm less familiar with the code in question, so I'll let others review,
+but it did fix the failure of 068 for me.
+
+Tested-by: Eric Blake <eblake@redhat.com>
+
 --=20
-2.7.2
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--kuEuVxbf4hbfW494gkkSD2Kvjfm7GxSp9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZVAWyAAoJEKeha0olJ0Nq9lcH/0vXKnuBMMaZwU2H7OIEI7QW
+DmZeiYGIAg1lMI6E9zflQR2O25D+kZQ9wQOfdcVwkCm8Mc1yU92gjAbYPqM7SYxH
+gzW9eqLHKhQYAmcKCnAjOH4mK8jFtKPWmbEMRKyMk2iNGIIX4UfRi44/FOrJbJJC
+wrd5JfxDQojHwlaD7flxUqz8r51FiwGTv4DwrXSef1epZxvNrYkwxlXE4do3BS5E
+idCFvalPwlchWNHk0OuQzAQH8d/7WQTzAMECR2PYZ3Hl39oq+NCbsbOwgvdMXkWi
+RNTKH+R30H9zFbJjq3cxA8YPB5lEgyjnQurdQeXxlthUm7Q6fgCaKKPEyiL6zWE=
+=KjjL
+-----END PGP SIGNATURE-----
+
+--kuEuVxbf4hbfW494gkkSD2Kvjfm7GxSp9--
