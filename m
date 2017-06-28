@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dQLfr-0003ME-TZ
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 18:43:04 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1dQLho-0004bF-3a
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 18:45:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dQLfo-0007Ek-TK
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 18:43:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42470)
+	(envelope-from <sstabellini@kernel.org>) id 1dQLhl-0007p3-1r
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 18:45:04 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59318)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dQLfo-0007ET-Mn
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 18:43:00 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 733EDC0587F1
-	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 22:42:59 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170628190616.GN12152@localhost.localdomain> (Eduardo Habkost's
-	message of "Wed, 28 Jun 2017 16:06:16 -0300")
-References: <1498536619-14548-1-git-send-email-peterx@redhat.com>
-	<1498536619-14548-10-git-send-email-peterx@redhat.com>
-	<20170628190616.GN12152@localhost.localdomain>
-Reply-To: quintela@redhat.com
-Date: Thu, 29 Jun 2017 00:42:56 +0200
-Message-ID: <878tkb68en.fsf@secure.mitica>
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1dQLhk-0007os-SE
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 18:45:00 -0400
+Date: Wed, 28 Jun 2017 15:44:58 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <149868268758.23385.1547307280569014820.stgit@bahia.lan>
+Message-ID: <alpine.DEB.2.10.1706281544400.2919@sstabellini-ThinkPad-X260>
+References: <149868263738.23385.16723444264552987199.stgit@bahia.lan>
+	<149868268758.23385.1547307280569014820.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 09/10] migration: merge
- enforce_config_section somewhat
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v5 5/5] 9pfs: handle transport errors in
+ pdu_complete()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,47 +28,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+On Wed, 28 Jun 2017, Greg Kurz wrote:
+> Contrary to what is written in the comment, a buggy guest can misconfigure
+> the transport buffers and pdu_marshal() may return an error.  If this ever
+> happens, it is up to the transport layer to handle the situation (9P is
+> transport agnostic).
+> 
+> This fixes Coverity issue CID1348518.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
->
-> So, this is a case where a user-provided config option (-machine
-> enforce-config-section) should trigger a different default in another
-> class (migration.send-configuration).
->
-> Also, the new default triggered by -machine has a very specific
-> priority:
->
-> * AccelClass::global_props must not override "-machine enforce-config-section=on"
-> * MachineClass::compat_props must not override
->   "-machine enforce-config-section=on"
->
-> We must also decide in advance what should be result of:
-> * "-machine enforce-config-section=on -global migration.send-configuration=off"
-> * "-machine enforce-config-section=off -global migration.send-configuration=on"
-> * "-global migration.send-configuration=off -machine enforce-config-section=off"
-> * "-global migration.send-configuration=on -machine enforce-config-section=on"
-
-BOOM!!!!!
-
-We use old configuration or new one.
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
 
 
->
-> I'm not sure what we should decide about these 4 cases above, but I
-> believe it would be safer to encode that decision at the same place we
-> handle the priority between accel/machine/user globals:
-> register_global_properties() at vl.c.
->
->
-> Or maybe this extra complexity is a sign that we shouldn't try to add
-> extra magic to make -machine affect the "migration" object properties,
-> and keep the existing machine->enforce_config_section check in the
-> migration code?  I'm not sure.
-
-Not sure there either.  I preffer doing it in a single place, but I am
-not the expert here.
-
-Later, Juan.
+> ---
+>  hw/9pfs/9p.c |   23 +++++++++++++++--------
+>  1 file changed, 15 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> index da0d6da65b45..f7871e6f3e5a 100644
+> --- a/hw/9pfs/9p.c
+> +++ b/hw/9pfs/9p.c
+> @@ -624,15 +624,11 @@ void pdu_free(V9fsPDU *pdu)
+>      QLIST_INSERT_HEAD(&s->free_list, pdu, next);
+>  }
+>  
+> -/*
+> - * We don't do error checking for pdu_marshal/unmarshal here
+> - * because we always expect to have enough space to encode
+> - * error details
+> - */
+>  static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
+>  {
+>      int8_t id = pdu->id + 1; /* Response */
+>      V9fsState *s = pdu->s;
+> +    int ret;
+>  
+>      if (len < 0) {
+>          int err = -len;
+> @@ -644,11 +640,19 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
+>              str.data = strerror(err);
+>              str.size = strlen(str.data);
+>  
+> -            len += pdu_marshal(pdu, len, "s", &str);
+> +            ret = pdu_marshal(pdu, len, "s", &str);
+> +            if (ret < 0) {
+> +                goto out_notify;
+> +            }
+> +            len += ret;
+>              id = P9_RERROR;
+>          }
+>  
+> -        len += pdu_marshal(pdu, len, "d", err);
+> +        ret = pdu_marshal(pdu, len, "d", err);
+> +        if (ret < 0) {
+> +            goto out_notify;
+> +        }
+> +        len += ret;
+>  
+>          if (s->proto_version == V9FS_PROTO_2000L) {
+>              id = P9_RLERROR;
+> @@ -657,12 +661,15 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
+>      }
+>  
+>      /* fill out the header */
+> -    pdu_marshal(pdu, 0, "dbw", (int32_t)len, id, pdu->tag);
+> +    if (pdu_marshal(pdu, 0, "dbw", (int32_t)len, id, pdu->tag) < 0) {
+> +        goto out_notify;
+> +    }
+>  
+>      /* keep these in sync */
+>      pdu->size = len;
+>      pdu->id = id;
+>  
+> +out_notify:
+>      pdu->s->transport->push_and_notify(pdu);
+>  
+>      /* Now wakeup anybody waiting in flush for this request */
+> 
