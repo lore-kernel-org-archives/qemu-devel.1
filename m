@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dQE5Q-00079O-4b
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 10:36:57 -0400
+	(envelope-from <mst@redhat.com>) id 1dQE88-0000Pp-Bl
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 10:39:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dQE5L-0006DR-98
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 10:36:56 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:35518 helo=relay.sw.ru)
+	(envelope-from <mst@redhat.com>) id 1dQE86-00073Y-LP
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 10:39:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54774)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dQE5K-0006Cp-TL
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 10:36:51 -0400
-References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
-	<20170628120530.31251-14-vsementsov@virtuozzo.com>
-	<f5957047-c69c-ebe6-6640-08bacc3244ea@virtuozzo.com>
-	<da795837-2945-d3b1-bd92-e6ced22817bc@redhat.com>
-	<6e99d1ce-a7e9-af1b-ec84-baae97f348df@virtuozzo.com>
-	<4191c73e-a7d5-2dc2-c359-88e0eb00465c@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <28106fa1-8e66-d23f-a11c-d6b6ba7f18ca@virtuozzo.com>
-Date: Wed, 28 Jun 2017 17:36:09 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dQE86-00073H-Ep
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 10:39:42 -0400
+Date: Wed, 28 Jun 2017 17:39:36 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170628171823-mutt-send-email-mst@kernel.org>
+References: <1498629200-35463-1-git-send-email-wei.w.wang@intel.com>
+	<35650f4c-8852-2dcd-94f9-13f0105b76cd@redhat.com>
+	<865858b6-1e3b-b421-617e-f8656ca36b5b@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <4191c73e-a7d5-2dc2-c359-88e0eb00465c@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v22 13/30] block: new
- bdrv_reopen_bitmaps_rw interface
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <865858b6-1e3b-b421-617e-f8656ca36b5b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1] virtio-net: code cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,40 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: Wei Wang <wei.w.wang@intel.com>, jasowang@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, virtio-dev-owner@lists.oasis-open.org
 
-28.06.2017 16:31, Paolo Bonzini wrote:
->
-> On 28/06/2017 15:02, Vladimir Sementsov-Ogievskiy wrote:
->> It is interesting, but I see this problem only in your answers, in my
->> letters I see this white-space on its place.
-> That's the good old Thunderbird "format=flowed" bug.
->
-> Vladimir, download
-> http://people.redhat.com/pbonzini/format-flawed.tar.gz and place it into
-> ~/.thunderbird/<profile name>/extensions.  It works around the bug.
+On Wed, Jun 28, 2017 at 08:02:06AM -0500, Eric Blake wrote:
+> [meta-comment, replacing virtio-dev with virtio-dev-owner in cc]
+> 
+> On 06/28/2017 07:22 AM, Eric Blake wrote:
+> > On 06/28/2017 12:53 AM, Wei Wang wrote:
+> >> Use is_power_of_2(), and remove trailing "." from error_setg().
+> >>
+> >> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> >> ---
+> >>  hw/net/virtio-net.c | 6 +++---
+> >>  1 file changed, 3 insertions(+), 3 deletions(-)
+> > 
+> > Reviewed-by: Eric Blake <eblake@redhat.com>
+> > 
+> 
+> I got this rejection letter:
+> 
+> > 
+> >                    The mail system
+> > 
+> > <virtio-dev@lists.oasis-open.org>: permission denied. Command output: Sorry,
+> >     only subscribers may post. If you are a subscriber, please forward this
+> >     message to virtio-dev-owner@lists.oasis-open.org to get your new address
+> >     included (#5.7.2) ERROR: postqmail-local Error #77
+> 
+> It's generally considered poor netiquette to cc both an open list and a
+> closed list that rejects emails from non-subscribers (note that you do
+> NOT have to subscribe to qemu-devel to post to it, although a moderation
+> delay may be involved).  It's not necessarily my place to tell the
+> virtio-dev list what to do (since I don't subscribe), but it may be
+> worth considereing relaxing the list posting policies there to allow
+> moderated posts from non-subscribers, especially if it is going to be
+> common-place that people want to cc virtio-dev at the same time as
+> another open list.
 
-unfortunately, with this buttons 'reply' and 'reply to all' do nothing..
+Unfortunately OASIS policies require you to subscribe to post.  I wish
+there was a way to request post rights without actually subscribing. It
+doesn't look like OASIS mailing list software supports that.  In this
+case I'm guessing you can just ignore this, it should not matter that
+this specific email did not make it to virtio-dev.
 
->
-> Paolo
->
->> 28.06.2017 15:36, Eric Blake wrote:
->>> [meta-comment]
->>>
->>> On 06/28/2017 07:10 AM, Vladimir Sementsov-Ogievskiy wrote:
->>>> 28.06.2017 15:05, Vladimir Sementsov-Ogievskiy wrote:
->>>>> Add format driver handler, which should mark loaded read-only
->>>>> bitmaps as 'IN_USE' in the image and unset read_only field in
->>>>> corresponding BdrvDirtyBitmap's.
->>>>>
->>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy<vsementsov@virtuozzo.com>
->>>>> Reviewed-by: John Snow<jsnow@redhat.com>
->>> Your original message had spaces before '<' in the email addresses, but
->>> it got lost here...
->>>
 
--- 
-Best regards,
-Vladimir
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+> 
