@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40058)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dQ6GS-0002fH-Qt
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 02:15:49 -0400
+	(envelope-from <peterx@redhat.com>) id 1dQ6s8-0001IG-Ty
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 02:54:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dQ6GN-0000mH-RS
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 02:15:48 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:35465)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1dQ6GN-0000m1-J5
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 02:15:43 -0400
-Received: by mail-lf0-x241.google.com with SMTP id n136so4376461lfn.2
-	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 23:15:43 -0700 (PDT)
-Date: Wed, 28 Jun 2017 08:15:40 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20170628061540.GL4859@toto>
-References: <cover.1498596157.git.alistair.francis@xilinx.com>
-	<55b6931c368b67ece2f0bd7d8e83092727df1e3c.1498596157.git.alistair.francis@xilinx.com>
-	<20170627211037.GE2201@toto>
-	<CAKmqyKN9znxH=1y1ZVT86Hk9815JXukdK8c=UPYc5CES7y=juQ@mail.gmail.com>
+	(envelope-from <peterx@redhat.com>) id 1dQ6s5-0001VT-U5
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 02:54:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54470)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dQ6s5-0001VH-O9
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 02:54:41 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E77B37EBDB
+	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 06:54:39 +0000 (UTC)
+Date: Wed, 28 Jun 2017 14:54:34 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170628065434.GF14652@pxdev.xzpeter.org>
+References: <1498536619-14548-1-git-send-email-peterx@redhat.com>
+	<1498536619-14548-7-git-send-email-peterx@redhat.com>
+	<9f1a393d-9cef-e18a-3336-91ded86f6afa@redhat.com>
+	<20170627133644.GW12152@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAKmqyKN9znxH=1y1ZVT86Hk9815JXukdK8c=UPYc5CES7y=juQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [RFC v1 3/3] char-socket: Report TCP socket
- waiting as a warning
+In-Reply-To: <20170627133644.GW12152@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v6 06/10] migration: move only_migratable
+ to MigrationState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,74 +36,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Tue, Jun 27, 2017 at 05:17:58PM -0700, Alistair Francis wrote:
-> On Tue, Jun 27, 2017 at 2:10 PM, Edgar E. Iglesias
-> <edgar.iglesias@gmail.com> wrote:
-> > On Tue, Jun 27, 2017 at 01:45:48PM -0700, Alistair Francis wrote:
-> >> When QEMU is waiting for a TCP socket connection it reports that message as
-> >> an error. This isn't an error it is a warnign so let's change the report to
-> >> use warning_report() instead.
-> >
-> > Hi Alistair,
-> >
-> > Isn't this more like an informational message rather than a warning?
-> >
-> > A warning would indicate to me that something unexpected and perhaps wrong happened.
-> > In this case, there's nothing wrong going on.
-> >
-> > We may need more classes, like 'info:' and/or maybe others...
+On Tue, Jun 27, 2017 at 10:36:44AM -0300, Eduardo Habkost wrote:
+> On Tue, Jun 27, 2017 at 06:15:37AM -0500, Eric Blake wrote:
+> > On 06/26/2017 11:10 PM, Peter Xu wrote:
+> > > One less global variable, and it does only matter with migration.
+> > > 
+> > > We keep the old "--only-migratable" option, but also now we support:
+> > > 
+> > >   -global migration.only-migratable=true
+> > 
+> > Does command line introspection work to see that this new spelling is
+> > available?  If not, what else can we do to let libvirt learn that the
+> > new form is preferred?
 > 
-> Hey Edgar,
-> 
-> That is a good point. I can add a info_report() as well then that
-> copies the warning_report() function but prefixes with 'info: '.
+> "only-migratable" will appear on the output of
+> "device-list-properties typename=migration".  But although I think
+> implementing this using global properties internally is nice, I'm unsure
+> about making -global the recommended interface to configure this.
 
+Could I ask why it may not good to use "-global" to configure it?
 
-Hi,
+Actually if we can merge this series, there is planned work to expose
+more migration parameters to the user, like: migration.postcopy,
+migration.compression, migration.speed, etc. So before I post similar
+patches like this to export more things, I would like to know whether
+there is possible issue with it in general.  Thanks,
 
-Yes, or another way is to pass the class of message as an argument,
-e.g like qemu_log_mask does it.
-
-Best regards,
-Edgar
-
-
-
-
-> 
-> Thanks,
-> Alistair
-> 
-> >
-> > Cheers,
-> > Edgar
-> >
-> >
-> >
-> >>
-> >> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> >> ---
-> >>
-> >>  chardev/char-socket.c | 2 +-
-> >>  1 file changed, 1 insertion(+), 1 deletion(-)
-> >>
-> >> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> >> index ccc499cfa1..5a56628e74 100644
-> >> --- a/chardev/char-socket.c
-> >> +++ b/chardev/char-socket.c
-> >> @@ -765,7 +765,7 @@ static int tcp_chr_wait_connected(Chardev *chr, Error **errp)
-> >>       * in TLS and telnet cases, only wait for an accepted socket */
-> >>      while (!s->ioc) {
-> >>          if (s->is_listen) {
-> >> -            error_report("QEMU waiting for connection on: %s",
-> >> +            warning_report("QEMU waiting for connection on: %s",
-> >>                           chr->filename);
-> >>              qio_channel_set_blocking(QIO_CHANNEL(s->listen_ioc), true, NULL);
-> >>              tcp_chr_accept(QIO_CHANNEL(s->listen_ioc), G_IO_IN, chr);
-> >> --
-> >> 2.11.0
-> >>
-> >>
+-- 
+Peter Xu
