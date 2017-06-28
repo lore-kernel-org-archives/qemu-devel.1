@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52951)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dQ7Xf-00077l-7h
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 03:37:40 -0400
+	(envelope-from <quintela@redhat.com>) id 1dQ7cs-0008Pw-3N
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 03:43:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dQ7Xe-0007QI-GP
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 03:37:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51466)
+	(envelope-from <quintela@redhat.com>) id 1dQ7co-0000OF-Oe
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 03:43:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45138)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dQ7Xe-0007QA-B2
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 03:37:38 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 57BA37CE02
-	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 07:37:37 +0000 (UTC)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dQ7co-0000O7-Iq
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 03:42:58 -0400
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <1498634144-26508-1-git-send-email-peterx@redhat.com> (Peter Xu's
-	message of "Wed, 28 Jun 2017 15:15:44 +0800")
-References: <1498634144-26508-1-git-send-email-peterx@redhat.com>
+In-Reply-To: <20170623144823.42936-1-pasic@linux.vnet.ibm.com> (Halil Pasic's
+	message of "Fri, 23 Jun 2017 16:48:23 +0200")
+References: <20170623144823.42936-1-pasic@linux.vnet.ibm.com>
 Reply-To: quintela@redhat.com
-Date: Wed, 28 Jun 2017 09:37:34 +0200
-Message-ID: <87r2y47ebl.fsf@secure.mitica>
+Date: Wed, 28 Jun 2017 09:42:52 +0200
+Message-ID: <87mv8s7e2r.fsf@secure.mitica>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 11/10] migration: add comment for
- TYPE_MIGRATE
+Subject: Re: [Qemu-devel] [PATCH 1/1] vmstate: error hint for failed equal
+ checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,36 +28,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, lvivier@redhat.com, eblake@redhat.com, armbru@redhat.com, dgilbert@redhat.com
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-Peter Xu <peterx@redhat.com> wrote:
-> It'll be strange that the migration object inherits TYPE_DEVICE. Add
-> some explanations to it.
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> In some cases a failing VMSTATE_*_EQUAL does not mean we detected a bug,
+> but it's actually the best we can do. Especially in these cases a verbose
+> error message is required.
 >
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  migration/migration.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
+> Let's introduce infrastructure for specifying a error hint to be used if
+> equal check fails. Let's do this by adding a parameter to the _EQUAL
+> macros called _err_hint. Also change all current users to pass NULL as
+> last parameter so nothing changes for them.
 >
-> diff --git a/migration/migration.c b/migration/migration.c
-> index b1b0825..2398a9d 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -2046,6 +2046,14 @@ static void migration_instance_init(Object *obj)
->  
->  static const TypeInfo migration_type = {
->      .name = TYPE_MIGRATION,
-> +    /*
-> +     * NOTE: "migration" itself is not really a device. We used
-> +     * TYPE_DEVICE here only to leverage some existing QDev features
-> +     * like "-global" properties, and HW_COMPAT_* fields (which are
-> +     * finally applied as global properties as well). If one day the
-> +     * global property feature can be migrated from QDev to QObject in
-> +     * general, then we can switch to QObject as well.
-> +     */
->      .parent = TYPE_DEVICE,
->      .class_init = migration_class_init,
->      .class_size = sizeof(MigrationClass),
+> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
 
 Reviewed-by: Juan Quintela <quintela@redhat.com>
+
+Thanks.
