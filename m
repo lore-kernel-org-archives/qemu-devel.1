@@ -1,34 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dQH2l-0006if-5w
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 13:46:24 -0400
+	(envelope-from <eblake@redhat.com>) id 1dQHBt-0000Uq-1r
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 13:55:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dQH2g-0006r5-AI
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 13:46:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51482)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dQH2g-0006qh-3m
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 13:46:18 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E655681226
-	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 17:46:16 +0000 (UTC)
-Date: Wed, 28 Jun 2017 14:46:15 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170628174615.GH12152@localhost.localdomain>
-References: <1498536619-14548-1-git-send-email-peterx@redhat.com>
-	<1498536619-14548-7-git-send-email-peterx@redhat.com>
-	<9f1a393d-9cef-e18a-3336-91ded86f6afa@redhat.com>
-	<20170627133644.GW12152@localhost.localdomain>
-	<20170628065434.GF14652@pxdev.xzpeter.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170628065434.GF14652@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH v6 06/10] migration: move only_migratable
- to MigrationState
+	(envelope-from <eblake@redhat.com>) id 1dQHBs-0002Gb-54
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 13:55:49 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Wed, 28 Jun 2017 12:55:24 -0500
+Message-Id: <20170628175534.14295-2-eblake@redhat.com>
+In-Reply-To: <20170628175534.14295-1-eblake@redhat.com>
+References: <20170628175534.14295-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 01/11] dirty-bitmap: Report
+ BlockDirtyInfo.count in bytes, as documented
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,40 +20,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com, qemu-stable@nongnu.org, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Wed, Jun 28, 2017 at 02:54:34PM +0800, Peter Xu wrote:
-> On Tue, Jun 27, 2017 at 10:36:44AM -0300, Eduardo Habkost wrote:
-> > On Tue, Jun 27, 2017 at 06:15:37AM -0500, Eric Blake wrote:
-> > > On 06/26/2017 11:10 PM, Peter Xu wrote:
-> > > > One less global variable, and it does only matter with migration.
-> > > > 
-> > > > We keep the old "--only-migratable" option, but also now we support:
-> > > > 
-> > > >   -global migration.only-migratable=true
-> > > 
-> > > Does command line introspection work to see that this new spelling is
-> > > available?  If not, what else can we do to let libvirt learn that the
-> > > new form is preferred?
-> > 
-> > "only-migratable" will appear on the output of
-> > "device-list-properties typename=migration".  But although I think
-> > implementing this using global properties internally is nice, I'm unsure
-> > about making -global the recommended interface to configure this.
-> 
-> Could I ask why it may not good to use "-global" to configure it?
-> 
-> Actually if we can merge this series, there is planned work to expose
-> more migration parameters to the user, like: migration.postcopy,
-> migration.compression, migration.speed, etc. So before I post similar
-> patches like this to export more things, I would like to know whether
-> there is possible issue with it in general.  Thanks,
+We've been documenting the value in bytes since its introduction
+in commit b9a9b3a4 (v1.3), where it was actually reported in bytes.
 
-I don't see any obvious issue with "-global migration.FOO=BAR", but I
-just want to be 100% sure before making it the recommended interface to
-configure migration options.  If there are no objections, I'm OK with
-that.
+Commit e4654d2 (v2.0) then removed things from block/qapi.c, in
+preparation for a rewrite to a list of dirty sectors in the next
+commit 21b5683 in block.c, but the new code mistakenly started
+reporting in sectors.
 
+Fixes: https://bugzilla.redhat.com/1441460
+
+CC: qemu-stable@nongnu.org
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+
+---
+Too late for 2.9, since the regression has been unnoticed for
+nine releases. But worth putting in 2.9.1.
+
+v2: no change
+---
+ block/dirty-bitmap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index a04c6e4..f17fc14 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -410,7 +410,7 @@ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs)
+     QLIST_FOREACH(bm, &bs->dirty_bitmaps, list) {
+         BlockDirtyInfo *info = g_new0(BlockDirtyInfo, 1);
+         BlockDirtyInfoList *entry = g_new0(BlockDirtyInfoList, 1);
+-        info->count = bdrv_get_dirty_count(bm);
++        info->count = bdrv_get_dirty_count(bm) << BDRV_SECTOR_BITS;
+         info->granularity = bdrv_dirty_bitmap_granularity(bm);
+         info->has_name = !!bm->name;
+         info->name = g_strdup(bm->name);
 -- 
-Eduardo
+2.9.4
