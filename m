@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46616)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dQ6yg-0003JV-ED
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 03:01:31 -0400
+	(envelope-from <peterx@redhat.com>) id 1dQ70R-0003tW-AV
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 03:03:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dQ6yb-0003NO-UM
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 03:01:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39912)
+	(envelope-from <peterx@redhat.com>) id 1dQ70O-0003xC-7R
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 03:03:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43052)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dQ6yb-0003NG-Op
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 03:01:25 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dQ70O-0003x6-1Z
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 03:03:16 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8306D3B74D
-	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 07:01:24 +0000 (UTC)
-Date: Wed, 28 Jun 2017 15:01:17 +0800
+	by mx1.redhat.com (Postfix) with ESMTPS id 134174ACD0
+	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 07:03:15 +0000 (UTC)
+Date: Wed, 28 Jun 2017 15:03:08 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170628070117.GH14652@pxdev.xzpeter.org>
-References: <1498536619-14548-1-git-send-email-peterx@redhat.com>
-	<1498536619-14548-5-git-send-email-peterx@redhat.com>
-	<20170627144718.GX12152@localhost.localdomain>
+Message-ID: <20170628070308.GI14652@pxdev.xzpeter.org>
+References: <1498554219-4942-1-git-send-email-peterx@redhat.com>
+	<20170627174019-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170627144718.GX12152@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v6 04/10] migration: let MigrationState be
- a qdev
+In-Reply-To: <20170627174019-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH 0/8] VT-d: some enhancements on iotlb and
+ tools
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,29 +34,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
 
-On Tue, Jun 27, 2017 at 11:47:18AM -0300, Eduardo Habkost wrote:
-> On Tue, Jun 27, 2017 at 12:10:13PM +0800, Peter Xu wrote:
-> [...]
-> > +
-> > +static const TypeInfo migration_type = {
-> > +    .name = TYPE_MIGRATION,
-> > +    .parent = TYPE_DEVICE,
+On Tue, Jun 27, 2017 at 05:42:59PM +0300, Michael S. Tsirkin wrote:
+> On Tue, Jun 27, 2017 at 05:03:31PM +0800, Peter Xu wrote:
+> > Patch 1: fixes a very rare PT path issue on iova value. It didn't
+> > break anything since it's merely not touched (only if when IOMMU
+> > enabled, then set one device to PT), but still better fix it.
 > 
-> As TYPE_MIGRATION isn't really a device and we're using TYPE_DEVICE just
-> to reuse the global property system, maybe we should add a comment here
-> explaining that?
+> Pls Cc HMP/QMP maintainers on interface patches.
 > 
-> It would also be interesting to explain the TYPE_DEVICE features we do
-> not use.  e.g.: the device is not created using qdev_create(), it is
-> never attached to any bus, and it is never realized.
+> Adding hmp interface only seems questionable to me.
 > 
-> (But I don't think this should require a series respin.  The comment may
-> be sent as a follow-up patch.)
+> Let's split this out - functionality and performance
+> can be separate from debugging and info.
 
-Sure. Let me prepare another patch for it upon the series. Thanks,
+Ok. I'll prepare separated series next time, and cc both QMP/HMP
+maintainers for the interface series. Thanks,
 
 -- 
 Peter Xu
