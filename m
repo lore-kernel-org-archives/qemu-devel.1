@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dQ0gg-0004VU-VE
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 20:18:32 -0400
+	(envelope-from <xiechanglong.d@gmail.com>) id 1dQ106-0000VS-Tg
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 20:38:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dQ0gg-0004b3-0W
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 20:18:30 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:34808)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1dQ0gf-0004an-Qf
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 20:18:29 -0400
-Received: by mail-wr0-x244.google.com with SMTP id k67so33007123wrc.1
-	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 17:18:29 -0700 (PDT)
+	(envelope-from <xiechanglong.d@gmail.com>) id 1dQ105-00039Z-MX
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 20:38:34 -0400
+References: <20170627192458.15519-1-eblake@redhat.com>
+	<20170627192458.15519-16-eblake@redhat.com>
+From: Xie Changlong <xiechanglong.d@gmail.com>
+Message-ID: <a4b01297-0fa1-37e6-04e0-f1111a0142ea@gmail.com>
+Date: Wed, 28 Jun 2017 08:38:17 +0800
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <20170627211037.GE2201@toto>
-References: <cover.1498596157.git.alistair.francis@xilinx.com>
-	<55b6931c368b67ece2f0bd7d8e83092727df1e3c.1498596157.git.alistair.francis@xilinx.com>
-	<20170627211037.GE2201@toto>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 27 Jun 2017 17:17:58 -0700
-Message-ID: <CAKmqyKN9znxH=1y1ZVT86Hk9815JXukdK8c=UPYc5CES7y=juQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC v1 3/3] char-socket: Report TCP socket
- waiting as a warning
+In-Reply-To: <20170627192458.15519-16-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 15/20] backup: Switch block_backup.h to
+ byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,60 +24,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, jsnow@redhat.com, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, Wen Congyang <wencongyang2@huawei.com>
 
-On Tue, Jun 27, 2017 at 2:10 PM, Edgar E. Iglesias
-<edgar.iglesias@gmail.com> wrote:
-> On Tue, Jun 27, 2017 at 01:45:48PM -0700, Alistair Francis wrote:
->> When QEMU is waiting for a TCP socket connection it reports that message as
->> an error. This isn't an error it is a warnign so let's change the report to
->> use warning_report() instead.
->
-> Hi Alistair,
->
-> Isn't this more like an informational message rather than a warning?
->
-> A warning would indicate to me that something unexpected and perhaps wrong happened.
-> In this case, there's nothing wrong going on.
->
-> We may need more classes, like 'info:' and/or maybe others...
+在 6/28/2017 3:24 AM, Eric Blake 写道:
+> We are gradually converting to byte-based interfaces, as they are
+> easier to reason about than sector-based.  Continue by converting
+> the public interface to backup jobs (no semantic change), including
+> a change to CowRequest to track by bytes instead of cluster indices.
+> 
+> Note that this does not change the difference between the public
+> interface (starting point, and size of the subsequent range) and
+> the internal interface (starting and end points).
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: John Snow <jsnow@redhat.com>
+> 
+> ---
+> v2: change a couple more parameter names
+> ---
+>   include/block/block_backup.h | 11 +++++------
+>   block/backup.c               | 33 ++++++++++++++++-----------------
+>   block/replication.c          | 12 ++++++++----
 
-Hey Edgar,
+Reviewed-by: Xie Changlong <xiechanglong@cmss.chinamobile.com>
 
-That is a good point. I can add a info_report() as well then that
-copies the warning_report() function but prefixes with 'info: '.
+>   3 files changed, 29 insertions(+), 27 deletions(-)
+> 
+> diff --git a/include/block/block_backup.h b/include/block/block_backup.h
+> index 8a75947..994a3bd 100644
+> --- a/include/block/block_backup.h
+> +++ b/include/block/block_backup.h
+> @@ -21,17 +21,16 @@
+>   #include "block/block_int.h"
+> 
+>   typedef struct CowRequest {
+> -    int64_t start;
+> -    int64_t end;
+> +    int64_t start_byte;
+> +    int64_t end_byte;
+>       QLIST_ENTRY(CowRequest) list;
+>       CoQueue wait_queue; /* coroutines blocked on this request */
+>   } CowRequest;
+> 
+> -void backup_wait_for_overlapping_requests(BlockJob *job, int64_t sector_num,
+> -                                          int nb_sectors);
+> +void backup_wait_for_overlapping_requests(BlockJob *job, int64_t offset,
+> +                                          uint64_t bytes);
+>   void backup_cow_request_begin(CowRequest *req, BlockJob *job,
+> -                              int64_t sector_num,
+> -                              int nb_sectors);
+> +                              int64_t offset, uint64_t bytes);
+>   void backup_cow_request_end(CowRequest *req);
+> 
+>   void backup_do_checkpoint(BlockJob *job, Error **errp);
+> diff --git a/block/backup.c b/block/backup.c
+> index 4e64710..cfbd921 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -55,7 +55,7 @@ static inline int64_t cluster_size_sectors(BackupBlockJob *job)
+> 
+>   /* See if in-flight requests overlap and wait for them to complete */
+>   static void coroutine_fn wait_for_overlapping_requests(BackupBlockJob *job,
+> -                                                       int64_t start,
+> +                                                       int64_t offset,
+>                                                          int64_t end)
+>   {
+>       CowRequest *req;
+> @@ -64,7 +64,7 @@ static void coroutine_fn wait_for_overlapping_requests(BackupBlockJob *job,
+>       do {
+>           retry = false;
+>           QLIST_FOREACH(req, &job->inflight_reqs, list) {
+> -            if (end > req->start && start < req->end) {
+> +            if (end > req->start_byte && offset < req->end_byte) {
+>                   qemu_co_queue_wait(&req->wait_queue, NULL);
+>                   retry = true;
+>                   break;
+> @@ -75,10 +75,10 @@ static void coroutine_fn wait_for_overlapping_requests(BackupBlockJob *job,
+> 
+>   /* Keep track of an in-flight request */
+>   static void cow_request_begin(CowRequest *req, BackupBlockJob *job,
+> -                                     int64_t start, int64_t end)
+> +                              int64_t offset, int64_t end)
+>   {
+> -    req->start = start;
+> -    req->end = end;
+> +    req->start_byte = offset;
+> +    req->end_byte = end;
+>       qemu_co_queue_init(&req->wait_queue);
+>       QLIST_INSERT_HEAD(&job->inflight_reqs, req, list);
+>   }
+> @@ -114,8 +114,10 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+>                                 sector_num * BDRV_SECTOR_SIZE,
+>                                 nb_sectors * BDRV_SECTOR_SIZE);
+> 
+> -    wait_for_overlapping_requests(job, start, end);
+> -    cow_request_begin(&cow_request, job, start, end);
+> +    wait_for_overlapping_requests(job, start * job->cluster_size,
+> +                                  end * job->cluster_size);
+> +    cow_request_begin(&cow_request, job, start * job->cluster_size,
+> +                      end * job->cluster_size);
+> 
+>       for (; start < end; start++) {
+>           if (test_bit(start, job->done_bitmap)) {
+> @@ -277,32 +279,29 @@ void backup_do_checkpoint(BlockJob *job, Error **errp)
+>       bitmap_zero(backup_job->done_bitmap, len);
+>   }
+> 
+> -void backup_wait_for_overlapping_requests(BlockJob *job, int64_t sector_num,
+> -                                          int nb_sectors)
+> +void backup_wait_for_overlapping_requests(BlockJob *job, int64_t offset,
+> +                                          uint64_t bytes)
+>   {
+>       BackupBlockJob *backup_job = container_of(job, BackupBlockJob, common);
+> -    int64_t sectors_per_cluster = cluster_size_sectors(backup_job);
+>       int64_t start, end;
+> 
+>       assert(job->driver->job_type == BLOCK_JOB_TYPE_BACKUP);
+> 
+> -    start = sector_num / sectors_per_cluster;
+> -    end = DIV_ROUND_UP(sector_num + nb_sectors, sectors_per_cluster);
+> +    start = QEMU_ALIGN_DOWN(offset, backup_job->cluster_size);
+> +    end = QEMU_ALIGN_UP(offset + bytes, backup_job->cluster_size);
+>       wait_for_overlapping_requests(backup_job, start, end);
+>   }
+> 
+>   void backup_cow_request_begin(CowRequest *req, BlockJob *job,
+> -                              int64_t sector_num,
+> -                              int nb_sectors)
+> +                              int64_t offset, uint64_t bytes)
+>   {
+>       BackupBlockJob *backup_job = container_of(job, BackupBlockJob, common);
+> -    int64_t sectors_per_cluster = cluster_size_sectors(backup_job);
+>       int64_t start, end;
+> 
+>       assert(job->driver->job_type == BLOCK_JOB_TYPE_BACKUP);
+> 
+> -    start = sector_num / sectors_per_cluster;
+> -    end = DIV_ROUND_UP(sector_num + nb_sectors, sectors_per_cluster);
+> +    start = QEMU_ALIGN_DOWN(offset, backup_job->cluster_size);
+> +    end = QEMU_ALIGN_UP(offset + bytes, backup_job->cluster_size);
+>       cow_request_begin(req, backup_job, start, end);
+>   }
+> 
+> diff --git a/block/replication.c b/block/replication.c
+> index 3885f04..8f3aba7 100644
+> --- a/block/replication.c
+> +++ b/block/replication.c
+> @@ -234,10 +234,14 @@ static coroutine_fn int replication_co_readv(BlockDriverState *bs,
+>       }
+> 
+>       if (job) {
+> -        backup_wait_for_overlapping_requests(child->bs->job, sector_num,
+> -                                             remaining_sectors);
+> -        backup_cow_request_begin(&req, child->bs->job, sector_num,
+> -                                 remaining_sectors);
+> +        uint64_t remaining_bytes = remaining_sectors * BDRV_SECTOR_SIZE;
+> +
+> +        backup_wait_for_overlapping_requests(child->bs->job,
+> +                                             sector_num * BDRV_SECTOR_SIZE,
+> +                                             remaining_bytes);
+> +        backup_cow_request_begin(&req, child->bs->job,
+> +                                 sector_num * BDRV_SECTOR_SIZE,
+> +                                 remaining_bytes);
+>           ret = bdrv_co_readv(bs->file, sector_num, remaining_sectors,
+>                               qiov);
+>           backup_cow_request_end(&req);
+> 
 
-Thanks,
-Alistair
-
->
-> Cheers,
-> Edgar
->
->
->
->>
->> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
->> ---
->>
->>  chardev/char-socket.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
->> index ccc499cfa1..5a56628e74 100644
->> --- a/chardev/char-socket.c
->> +++ b/chardev/char-socket.c
->> @@ -765,7 +765,7 @@ static int tcp_chr_wait_connected(Chardev *chr, Error **errp)
->>       * in TLS and telnet cases, only wait for an accepted socket */
->>      while (!s->ioc) {
->>          if (s->is_listen) {
->> -            error_report("QEMU waiting for connection on: %s",
->> +            warning_report("QEMU waiting for connection on: %s",
->>                           chr->filename);
->>              qio_channel_set_blocking(QIO_CHANNEL(s->listen_ioc), true, NULL);
->>              tcp_chr_accept(QIO_CHANNEL(s->listen_ioc), G_IO_IN, chr);
->> --
->> 2.11.0
->>
->>
+-- 
+Thanks
+     -Xie
