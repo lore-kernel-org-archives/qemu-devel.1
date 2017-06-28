@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dQBBx-0002zc-97
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:31:35 -0400
+	(envelope-from <quintela@redhat.com>) id 1dQBC6-00039i-RR
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:31:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dQBBt-0004j1-V2
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:31:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58878)
+	(envelope-from <quintela@redhat.com>) id 1dQBC5-0004pg-QW
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:31:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53536)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dQBBt-0004iF-KZ
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:31:25 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dQBC5-0004pH-KA
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:31:37 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8B43F4E048
-	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 11:31:24 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A57C67DCF0
+	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 11:31:36 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 28 Jun 2017 13:30:58 +0200
-Message-Id: <20170628113106.5248-7-quintela@redhat.com>
+Date: Wed, 28 Jun 2017 13:31:03 +0200
+Message-Id: <20170628113106.5248-12-quintela@redhat.com>
 In-Reply-To: <20170628113106.5248-1-quintela@redhat.com>
 References: <20170628113106.5248-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 06/14] migration: move only_migratable to
- MigrationState
+Subject: [Qemu-devel] [PULL 11/14] migration: add comment for TYPE_MIGRATE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,139 +34,35 @@ Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
 From: Peter Xu <peterx@redhat.com>
 
-One less global variable, and it does only matter with migration.
+It'll be strange that the migration object inherits TYPE_DEVICE. Add
+some explanations to it.
 
-We keep the old "--only-migratable" option, but also now we support:
-
-  -global migration.only-migratable=true
-
-Currently still keep the old interface.
-
-Hmm, now vl.c has no way to access migrate_get_current(). Export a
-function for it to setup only_migratable.
-
-Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <1498536619-14548-7-git-send-email-peterx@redhat.com>
+Message-Id: <1498634144-26508-1-git-send-email-peterx@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- include/migration/misc.h | 2 ++
- include/sysemu/sysemu.h  | 1 -
- migration/migration.c    | 8 +++++++-
- migration/migration.h    | 3 +++
- migration/savevm.c       | 2 +-
- vl.c                     | 9 +++++++--
- 6 files changed, 20 insertions(+), 5 deletions(-)
+ migration/migration.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/include/migration/misc.h b/include/migration/misc.h
-index 2d36cf5..6ac3307 100644
---- a/include/migration/misc.h
-+++ b/include/migration/misc.h
-@@ -55,4 +55,6 @@ bool migration_has_finished(MigrationState *);
- bool migration_has_failed(MigrationState *);
- /* ...and after the device transmission */
- bool migration_in_postcopy_after_devices(MigrationState *);
-+void migration_only_migratable_set(void);
-+
- #endif
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 9841a52..b213696 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -15,7 +15,6 @@
- /* vl.c */
- 
- extern const char *bios_name;
--extern int only_migratable;
- extern const char *qemu_name;
- extern QemuUUID qemu_uuid;
- extern bool qemu_uuid_set;
 diff --git a/migration/migration.c b/migration/migration.c
-index 221b22c..67f9e68 100644
+index b1b0825..2398a9d 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -115,6 +115,11 @@ MigrationState *migrate_get_current(void)
-     return current_migration;
- }
+@@ -2046,6 +2046,14 @@ static void migration_instance_init(Object *obj)
  
-+void migration_only_migratable_set(void)
-+{
-+    migrate_get_current()->only_migratable = true;
-+}
-+
- MigrationIncomingState *migration_incoming_get_current(void)
- {
-     static bool once;
-@@ -986,7 +991,7 @@ static GSList *migration_blockers;
- 
- int migrate_add_blocker(Error *reason, Error **errp)
- {
--    if (only_migratable) {
-+    if (migrate_get_current()->only_migratable) {
-         error_propagate(errp, error_copy(reason));
-         error_prepend(errp, "disallowing migration blocker "
-                           "(--only_migratable) for: ");
-@@ -1979,6 +1984,7 @@ void migrate_fd_connect(MigrationState *s)
- static Property migration_properties[] = {
-     DEFINE_PROP_BOOL("store-global-state", MigrationState,
-                      store_global_state, true),
-+    DEFINE_PROP_BOOL("only-migratable", MigrationState, only_migratable, false),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/migration/migration.h b/migration/migration.h
-index 4b898e9..34377dd 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -139,6 +139,9 @@ struct MigrationState
-      * during migration.
-      */
-     bool store_global_state;
-+
-+    /* Whether the VM is only allowing for migratable devices */
-+    bool only_migratable;
- };
- 
- void migrate_set_state(int *state, int old_state, int new_state);
-diff --git a/migration/savevm.c b/migration/savevm.c
-index c7a49c9..1499cd3 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -2336,7 +2336,7 @@ void vmstate_register_ram_global(MemoryRegion *mr)
- bool vmstate_check_only_migratable(const VMStateDescription *vmsd)
- {
-     /* check needed if --only-migratable is specified */
--    if (!only_migratable) {
-+    if (!migrate_get_current()->only_migratable) {
-         return true;
-     }
- 
-diff --git a/vl.c b/vl.c
-index f0a0515..36ff3f4 100644
---- a/vl.c
-+++ b/vl.c
-@@ -188,7 +188,6 @@ bool boot_strict;
- uint8_t *boot_splash_filedata;
- size_t boot_splash_filedata_size;
- uint8_t qemu_extra_params_fw[2];
--int only_migratable; /* turn it off unless user states otherwise */
- 
- int icount_align_option;
- 
-@@ -3953,7 +3952,13 @@ int main(int argc, char **argv, char **envp)
-                 incoming = optarg;
-                 break;
-             case QEMU_OPTION_only_migratable:
--                only_migratable = 1;
-+                /*
-+                 * TODO: we can remove this option one day, and we
-+                 * should all use:
-+                 *
-+                 * "-global migration.only-migratable=true"
-+                 */
-+                migration_only_migratable_set();
-                 break;
-             case QEMU_OPTION_nodefaults:
-                 has_defaults = 0;
+ static const TypeInfo migration_type = {
+     .name = TYPE_MIGRATION,
++    /*
++     * NOTE: "migration" itself is not really a device. We used
++     * TYPE_DEVICE here only to leverage some existing QDev features
++     * like "-global" properties, and HW_COMPAT_* fields (which are
++     * finally applied as global properties as well). If one day the
++     * global property feature can be migrated from QDev to QObject in
++     * general, then we can switch to QObject as well.
++     */
+     .parent = TYPE_DEVICE,
+     .class_init = migration_class_init,
+     .class_size = sizeof(MigrationClass),
 -- 
 2.9.4
