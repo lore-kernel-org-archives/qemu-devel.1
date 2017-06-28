@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dQCn8-0008Vc-QD
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:13:59 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dQCqX-00023e-Bj
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:17:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dQCn5-0000OX-Lo
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:13:58 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:32854 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dQCn5-0000NK-97
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:13:55 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
-	<20170628120530.31251-14-vsementsov@virtuozzo.com>
-	<f5957047-c69c-ebe6-6640-08bacc3244ea@virtuozzo.com>
-	<da795837-2945-d3b1-bd92-e6ced22817bc@redhat.com>
-	<6e99d1ce-a7e9-af1b-ec84-baae97f348df@virtuozzo.com>
-Message-ID: <22469eec-5a74-ee90-e530-744fabc50c4f@virtuozzo.com>
-Date: Wed, 28 Jun 2017 16:13:37 +0300
+	(envelope-from <vilanova@ac.upc.edu>) id 1dQCqU-0003wa-7n
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:17:29 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Wed, 28 Jun 2017 16:17:10 +0300
+Message-Id: <149865583044.17063.6916936084139965036.stgit@frigg.lan>
+In-Reply-To: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
+References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <6e99d1ce-a7e9-af1b-ec84-baae97f348df@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v22 13/30] block: new
- bdrv_reopen_bitmaps_rw interface
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v11 15/29] target/arm: [tcg] Port to
+ init_disas_context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,44 +23,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-28.06.2017 16:02, Vladimir Sementsov-Ogievskiy wrote:
-> It is interesting, but I see this problem only in your answers, in my 
-> letters I see this white-space on its place.
+Incrementally paves the way towards using the generic instruction transla=
+tion
+loop.
 
-In outgoing letter I see this white-space, but in letter from 
-mailing-list it is absent.
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+ target/arm/translate.c |   85 +++++++++++++++++++++++++++---------------=
+------
+ 1 file changed, 47 insertions(+), 38 deletions(-)
 
->
-> 28.06.2017 15:36, Eric Blake wrote:
->> [meta-comment]
->>
->> On 06/28/2017 07:10 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> 28.06.2017 15:05, Vladimir Sementsov-Ogievskiy wrote:
->>>> Add format driver handler, which should mark loaded read-only
->>>> bitmaps as 'IN_USE' in the image and unset read_only field in
->>>> corresponding BdrvDirtyBitmap's.
->>>>
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy<vsementsov@virtuozzo.com>
->>>> Reviewed-by: John Snow<jsnow@redhat.com>
->> Your original message had spaces before '<' in the email addresses, but
->> it got lost here...
->>
->>>
->>> Forgot to add:
->>>
->>> Reviewed-by: Max Reitz<mreitz@redhat.com>
->> ...this one also lacks the space.  I'm not sure if git cares, but it may
->> be worth investigating why your mailer eats the space when you reply
->> manually rather than sending via git; and for consistency, it is worth
->> keeping the space (for example, we like to grep 'git log' for learning
->> how active various contributors are, and having a consistent usage of
->> space before < in an email address can make the task easier).
->>
->
-
--- 
-Best regards,
-Vladimir
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 17bc9687b7..23a07fc2c6 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -11786,32 +11786,12 @@ static bool insn_crosses_page(CPUARMState *env,=
+ DisasContext *s)
+     return false;
+ }
+=20
+-/* generate intermediate code for basic block 'tb'.  */
+-void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
++static void arm_trblock_init_disas_context(DisasContextBase *dcbase,
++                                           CPUState *cpu)
+ {
++    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
+     CPUARMState *env =3D cpu->env_ptr;
+     ARMCPU *arm_cpu =3D arm_env_get_cpu(env);
+-    DisasContext dc1, *dc =3D &dc1;
+-    target_ulong next_page_start;
+-    int max_insns;
+-    bool end_of_page;
+-
+-    /* generate intermediate code */
+-
+-    /* The A64 decoder has its own top level loop, because it doesn't ne=
+ed
+-     * the A32/T32 complexity to do with conditional execution/IT blocks=
+/etc.
+-     */
+-    if (ARM_TBFLAG_AARCH64_STATE(tb->flags)) {
+-        gen_intermediate_code_a64(&dc->base, cpu, tb);
+-        return;
+-    }
+-
+-    dc->base.tb =3D tb;
+-    dc->base.pc_first =3D tb->pc;
+-    dc->base.pc_next =3D dc->base.pc_first;
+-    dc->base.is_jmp =3D DISAS_NEXT;
+-    dc->base.num_insns =3D 0;
+-    dc->base.singlestep_enabled =3D cpu->singlestep_enabled;
+=20
+     dc->pc =3D dc->base.pc_first;
+     dc->condjmp =3D 0;
+@@ -11822,23 +11802,23 @@ void gen_intermediate_code(CPUState *cpu, Trans=
+lationBlock *tb)
+      */
+     dc->secure_routed_to_el3 =3D arm_feature(env, ARM_FEATURE_EL3) &&
+                                !arm_el_is_aa64(env, 3);
+-    dc->thumb =3D ARM_TBFLAG_THUMB(tb->flags);
+-    dc->sctlr_b =3D ARM_TBFLAG_SCTLR_B(tb->flags);
+-    dc->be_data =3D ARM_TBFLAG_BE_DATA(tb->flags) ? MO_BE : MO_LE;
+-    dc->condexec_mask =3D (ARM_TBFLAG_CONDEXEC(tb->flags) & 0xf) << 1;
+-    dc->condexec_cond =3D ARM_TBFLAG_CONDEXEC(tb->flags) >> 4;
+-    dc->mmu_idx =3D core_to_arm_mmu_idx(env, ARM_TBFLAG_MMUIDX(tb->flags=
+));
++    dc->thumb =3D ARM_TBFLAG_THUMB(dc->base.tb->flags);
++    dc->sctlr_b =3D ARM_TBFLAG_SCTLR_B(dc->base.tb->flags);
++    dc->be_data =3D ARM_TBFLAG_BE_DATA(dc->base.tb->flags) ? MO_BE : MO_=
+LE;
++    dc->condexec_mask =3D (ARM_TBFLAG_CONDEXEC(dc->base.tb->flags) & 0xf=
+) << 1;
++    dc->condexec_cond =3D ARM_TBFLAG_CONDEXEC(dc->base.tb->flags) >> 4;
++    dc->mmu_idx =3D core_to_arm_mmu_idx(env, ARM_TBFLAG_MMUIDX(dc->base.=
+tb->flags));
+     dc->current_el =3D arm_mmu_idx_to_el(dc->mmu_idx);
+ #if !defined(CONFIG_USER_ONLY)
+     dc->user =3D (dc->current_el =3D=3D 0);
+ #endif
+-    dc->ns =3D ARM_TBFLAG_NS(tb->flags);
+-    dc->fp_excp_el =3D ARM_TBFLAG_FPEXC_EL(tb->flags);
+-    dc->vfp_enabled =3D ARM_TBFLAG_VFPEN(tb->flags);
+-    dc->vec_len =3D ARM_TBFLAG_VECLEN(tb->flags);
+-    dc->vec_stride =3D ARM_TBFLAG_VECSTRIDE(tb->flags);
+-    dc->c15_cpar =3D ARM_TBFLAG_XSCALE_CPAR(tb->flags);
+-    dc->v7m_handler_mode =3D ARM_TBFLAG_HANDLER(tb->flags);
++    dc->ns =3D ARM_TBFLAG_NS(dc->base.tb->flags);
++    dc->fp_excp_el =3D ARM_TBFLAG_FPEXC_EL(dc->base.tb->flags);
++    dc->vfp_enabled =3D ARM_TBFLAG_VFPEN(dc->base.tb->flags);
++    dc->vec_len =3D ARM_TBFLAG_VECLEN(dc->base.tb->flags);
++    dc->vec_stride =3D ARM_TBFLAG_VECSTRIDE(dc->base.tb->flags);
++    dc->c15_cpar =3D ARM_TBFLAG_XSCALE_CPAR(dc->base.tb->flags);
++    dc->v7m_handler_mode =3D ARM_TBFLAG_HANDLER(dc->base.tb->flags);
+     dc->cp_regs =3D arm_cpu->cp_regs;
+     dc->features =3D env->features;
+=20
+@@ -11857,10 +11837,39 @@ void gen_intermediate_code(CPUState *cpu, Trans=
+lationBlock *tb)
+      *   emit code to generate a software step exception
+      *   end the TB
+      */
+-    dc->ss_active =3D ARM_TBFLAG_SS_ACTIVE(tb->flags);
+-    dc->pstate_ss =3D ARM_TBFLAG_PSTATE_SS(tb->flags);
++    dc->ss_active =3D ARM_TBFLAG_SS_ACTIVE(dc->base.tb->flags);
++    dc->pstate_ss =3D ARM_TBFLAG_PSTATE_SS(dc->base.tb->flags);
+     dc->is_ldex =3D false;
+     dc->ss_same_el =3D false; /* Can't be true since EL_d must be AArch6=
+4 */
++}
++
++/* generate intermediate code for basic block 'tb'.  */
++void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
++{
++    CPUARMState *env =3D cpu->env_ptr;
++    DisasContext dc1, *dc =3D &dc1;
++    target_ulong next_page_start;
++    int max_insns;
++    bool end_of_page;
++
++    /* generate intermediate code */
++
++    /* The A64 decoder has its own top level loop, because it doesn't ne=
+ed
++     * the A32/T32 complexity to do with conditional execution/IT blocks=
+/etc.
++     */
++    if (ARM_TBFLAG_AARCH64_STATE(tb->flags)) {
++        gen_intermediate_code_a64(&dc->base, cpu, tb);
++        return;
++    }
++
++    dc->base.tb =3D tb;
++    dc->base.pc_first =3D dc->base.tb->pc;
++    dc->base.pc_next =3D dc->base.pc_first;
++    dc->base.is_jmp =3D DISAS_NEXT;
++    dc->base.num_insns =3D 0;
++    dc->base.singlestep_enabled =3D cpu->singlestep_enabled;
++    arm_trblock_init_disas_context(&dc->base, cpu);
++
+=20
+     cpu_F0s =3D tcg_temp_new_i32();
+     cpu_F1s =3D tcg_temp_new_i32();
