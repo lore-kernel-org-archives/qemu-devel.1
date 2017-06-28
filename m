@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dQIDc-0004Vk-BG
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:01:41 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dQIDM-0004Iq-QO
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:01:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dQIDb-00086K-Fc
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:01:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45058)
+	(envelope-from <dgilbert@redhat.com>) id 1dQIDH-0007yE-Uj
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:01:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45556)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dQIDb-00085x-69
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:01:39 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dQIDH-0007y0-LX
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:01:19 -0400
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 28 Jun 2017 20:00:25 +0100
-Message-Id: <20170628190047.26159-8-dgilbert@redhat.com>
+Date: Wed, 28 Jun 2017 20:00:20 +0100
+Message-Id: <20170628190047.26159-3-dgilbert@redhat.com>
 In-Reply-To: <20170628190047.26159-1-dgilbert@redhat.com>
 References: <20170628190047.26159-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [RFC 07/29] postcopy: Add vhost-user flag for postcopy
- and check it
+Subject: [Qemu-devel] [RFC 02/29] migrate: Update ram_block_discard_range
+ for shared
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,125 +28,84 @@ To: qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com,
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Add a vhost feature flag for postcopy support, and
-use the postcopy notifier to check it before allowing postcopy.
+The choice of call to discard a block is getting more complicated
+for other cases.   We use fallocate PUNCH_HOLE in any file cases;
+it works for both hugepage and for tmpfs.
+We use the DONTNEED for non-hugepage cases either where they're
+anonymous or where they're private.
+
+Care should be taken when trying other backing files.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- contrib/libvhost-user/libvhost-user.h |  1 +
- hw/virtio/vhost-user.c                | 39 ++++++++++++++++++++++++++++++++++-
- 2 files changed, 39 insertions(+), 1 deletion(-)
+ exec.c       | 28 ++++++++++++++++------------
+ trace-events |  3 +++
+ 2 files changed, 19 insertions(+), 12 deletions(-)
 
-diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
-index 53ef222c0b..82a6bf4549 100644
---- a/contrib/libvhost-user/libvhost-user.h
-+++ b/contrib/libvhost-user/libvhost-user.h
-@@ -34,6 +34,7 @@ enum VhostUserProtocolFeature {
-     VHOST_USER_PROTOCOL_F_MQ = 0,
-     VHOST_USER_PROTOCOL_F_LOG_SHMFD = 1,
-     VHOST_USER_PROTOCOL_F_RARP = 2,
-+    VHOST_USER_PROTOCOL_F_POSTCOPY = 6,
+diff --git a/exec.c b/exec.c
+index 69fc5c9b07..4e61226a16 100644
+--- a/exec.c
++++ b/exec.c
+@@ -3557,6 +3557,7 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
+     }
  
-     VHOST_USER_PROTOCOL_F_MAX
- };
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 958ee09bcb..78eaf9b022 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -17,6 +17,8 @@
- #include "sysemu/kvm.h"
- #include "qemu/error-report.h"
- #include "qemu/sockets.h"
-+#include "migration/migration.h"
-+#include "migration/postcopy-ram.h"
+     if ((start + length) <= rb->used_length) {
++        bool need_madvise, need_fallocate;
+         uint8_t *host_endaddr = host_startaddr + length;
+         if ((uintptr_t)host_endaddr & (rb->page_size - 1)) {
+             error_report("ram_block_discard_range: Unaligned end address: %p",
+@@ -3566,23 +3567,26 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
  
- #include <sys/ioctl.h>
- #include <sys/socket.h>
-@@ -33,7 +35,7 @@ enum VhostUserProtocolFeature {
-     VHOST_USER_PROTOCOL_F_REPLY_ACK = 3,
-     VHOST_USER_PROTOCOL_F_NET_MTU = 4,
-     VHOST_USER_PROTOCOL_F_SLAVE_REQ = 5,
--
-+    VHOST_USER_PROTOCOL_F_POSTCOPY = 6,
-     VHOST_USER_PROTOCOL_F_MAX
- };
+         errno = ENOTSUP; /* If we are missing MADVISE etc */
  
-@@ -121,8 +123,10 @@ static VhostUserMsg m __attribute__ ((unused));
- #define VHOST_USER_VERSION    (0x1)
- 
- struct vhost_user {
-+    struct vhost_dev *dev;
-     CharBackend *chr;
-     int slave_fd;
-+    NotifierWithReturn postcopy_notifier;
- };
- 
- static bool ioeventfd_enabled(void)
-@@ -701,6 +705,33 @@ out:
-     return ret;
- }
- 
-+static int vhost_user_postcopy_notifier(NotifierWithReturn *notifier,
-+                                        void *opaque)
-+{
-+    struct PostcopyNotifyData *pnd = opaque;
-+    struct vhost_user *u = container_of(notifier, struct vhost_user,
-+                                         postcopy_notifier);
-+    struct vhost_dev *dev = u->dev;
-+
-+    switch (pnd->reason) {
-+    case POSTCOPY_NOTIFY_PROBE:
-+        if (!virtio_has_feature(dev->protocol_features,
-+                                VHOST_USER_PROTOCOL_F_POSTCOPY)) {
-+            /* TODO: Get the device name into this error somehow */
-+            error_setg(pnd->errp,
-+                       "vhost-user backend not capable of postcopy");
-+            return -ENOENT;
+-        if (rb->page_size == qemu_host_page_size) {
+-#if defined(CONFIG_MADVISE)
+-            /* Note: We need the madvise MADV_DONTNEED behaviour of definitely
+-             * freeing the page.
+-             */
+-            ret = madvise(host_startaddr, length, MADV_DONTNEED);
+-#endif
+-        } else {
+-            /* Huge page case  - unfortunately it can't do DONTNEED, but
+-             * it can do the equivalent by FALLOC_FL_PUNCH_HOLE in the
+-             * huge page file.
+-             */
++        /* The logic here is messy;
++         *    madvise DONTNEED fails for hugepages
++         *    fallocate works on hugepages and shmem
++         */
++        need_madvise = (rb->page_size == qemu_host_page_size) &&
++                       (rb->fd == -1 || !(rb->flags & RAM_SHARED));
++        need_fallocate = rb->fd != -1;
++        if (ret == -1 && need_fallocate) {
+ #ifdef CONFIG_FALLOCATE_PUNCH_HOLE
+             ret = fallocate(rb->fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
+                             start, length);
+ #endif
+         }
++        if (need_madvise && (!need_fallocate || (ret == 0))) {
++#if defined(CONFIG_MADVISE)
++            ret =  madvise(host_startaddr, length, MADV_DONTNEED);
++#endif
 +        }
-+        break;
-+
-+    default:
-+        /* We ignore notifications we don't know */
-+        break;
-+    }
-+
-+    return 0;
-+}
-+
- static int vhost_user_init(struct vhost_dev *dev, void *opaque)
- {
-     uint64_t features, protocol_features;
-@@ -712,6 +743,7 @@ static int vhost_user_init(struct vhost_dev *dev, void *opaque)
-     u = g_new0(struct vhost_user, 1);
-     u->chr = opaque;
-     u->slave_fd = -1;
-+    u->dev = dev;
-     dev->opaque = u;
++        trace_ram_block_discard_range(rb->idstr, host_startaddr,
++                                      need_madvise, need_fallocate, ret);
+         if (ret) {
+             ret = -errno;
+             error_report("ram_block_discard_range: Failed to discard range "
+diff --git a/trace-events b/trace-events
+index bae63fdb1d..2c6e8d2160 100644
+--- a/trace-events
++++ b/trace-events
+@@ -55,6 +55,9 @@ dma_complete(void *dbs, int ret, void *cb) "dbs=%p ret=%d cb=%p"
+ dma_blk_cb(void *dbs, int ret) "dbs=%p ret=%d"
+ dma_map_wait(void *dbs) "dbs=%p"
  
-     err = vhost_user_get_features(dev, &features);
-@@ -763,11 +795,15 @@ static int vhost_user_init(struct vhost_dev *dev, void *opaque)
-                    "VHOST_USER_PROTOCOL_F_LOG_SHMFD feature.");
-     }
- 
-+    u->postcopy_notifier.notify = vhost_user_postcopy_notifier;
++# exec.c
++ram_block_discard_range(const char *rbname, void *hva, bool need_madvise, bool need_fallocate, int ret) "%s@%p: madvise: %d fallocate: %d ret: %d"
 +
-     err = vhost_setup_slave_channel(dev);
-     if (err < 0) {
-         return err;
-     }
- 
-+    postcopy_add_notifier(&u->postcopy_notifier);
-+
-     return 0;
- }
- 
-@@ -778,6 +814,7 @@ static int vhost_user_cleanup(struct vhost_dev *dev)
-     assert(dev->vhost_ops->backend_type == VHOST_BACKEND_TYPE_USER);
- 
-     u = dev->opaque;
-+    postcopy_remove_notifier(&u->postcopy_notifier);
-     if (u->slave_fd >= 0) {
-         close(u->slave_fd);
-         u->slave_fd = -1;
+ # memory.c
+ memory_region_ops_read(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr %#"PRIx64" value %#"PRIx64" size %u"
+ memory_region_ops_write(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr %#"PRIx64" value %#"PRIx64" size %u"
 -- 
 2.13.0
