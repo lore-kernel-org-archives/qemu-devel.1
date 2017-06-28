@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45765)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dQDsu-0007sV-UU
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 10:24:02 -0400
+	(envelope-from <eblake@redhat.com>) id 1dQDuF-0000RF-0m
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 10:25:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dQDsr-0007Sk-QM
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 10:24:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58609)
+	(envelope-from <eblake@redhat.com>) id 1dQDuB-00086z-Sd
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 10:25:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:22938)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dQDsr-0007SN-Hn
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 10:23:57 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dQDuB-00086g-FS
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 10:25:19 -0400
 References: <cover.1498654240.git.maozy.fnst@cn.fujitsu.com>
-	<d9660b46628b52aa8c63c21fe20618b5bc33bb4c.1498654240.git.maozy.fnst@cn.fujitsu.com>
-	<20170628131852.GH29134@redhat.com>
+	<d7c1b8ff9247a09e54110abe6abe93543d59b8b6.1498654240.git.maozy.fnst@cn.fujitsu.com>
+	<20170628132329.GJ29134@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <66fab3ea-5033-851c-ec8e-5740c7108ab7@redhat.com>
-Date: Wed, 28 Jun 2017 09:23:53 -0500
+Message-ID: <c25da728-d3cf-2b24-19e8-0a67e69fd65c@redhat.com>
+Date: Wed, 28 Jun 2017 09:24:58 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170628131852.GH29134@redhat.com>
+In-Reply-To: <20170628132329.GJ29134@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="EHIEHrGSJBnivobjI9HJISQsdaIKnMJSC"
-Subject: Re: [Qemu-devel] [PATCH v6 1/4] net/socket: Don't treat odd socket
- type as SOCK_STREAM
+	boundary="gAPPsmtPhcnANCIqQ5TKRdRjFGoiauhf2"
+Subject: Re: [Qemu-devel] [PATCH v6 3/4] net/net: Convert parse_host_port()
+ to Error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,59 +31,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Daniel P. Berrange" <berrange@redhat.com>, Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Cc: jasowang@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
+Cc: pbonzini@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, kraxel@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---EHIEHrGSJBnivobjI9HJISQsdaIKnMJSC
+--gAPPsmtPhcnANCIqQ5TKRdRjFGoiauhf2
 From: Eric Blake <eblake@redhat.com>
 To: "Daniel P. Berrange" <berrange@redhat.com>,
  Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Cc: jasowang@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
-Message-ID: <66fab3ea-5033-851c-ec8e-5740c7108ab7@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 1/4] net/socket: Don't treat odd socket
- type as SOCK_STREAM
+Cc: pbonzini@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org,
+ armbru@redhat.com, kraxel@redhat.com
+Message-ID: <c25da728-d3cf-2b24-19e8-0a67e69fd65c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 3/4] net/net: Convert parse_host_port() to
+ Error
 References: <cover.1498654240.git.maozy.fnst@cn.fujitsu.com>
- <d9660b46628b52aa8c63c21fe20618b5bc33bb4c.1498654240.git.maozy.fnst@cn.fujitsu.com>
- <20170628131852.GH29134@redhat.com>
-In-Reply-To: <20170628131852.GH29134@redhat.com>
+ <d7c1b8ff9247a09e54110abe6abe93543d59b8b6.1498654240.git.maozy.fnst@cn.fujitsu.com>
+ <20170628132329.GJ29134@redhat.com>
+In-Reply-To: <20170628132329.GJ29134@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 06/28/2017 08:18 AM, Daniel P. Berrange wrote:
-> On Wed, Jun 28, 2017 at 09:08:47PM +0800, Mao Zhongyi wrote:
->> In net_socket_fd_init(), the 'default' case is odd: it warns,
->> then continues as if the socket type was SOCK_STREAM. The
->> comment explains "this could be a eg. a pty", but that makes
->> no sense. If @fd really was a pty, getsockopt() would fail
->> with ENOTSOCK. If @fd was a socket, but neither SOCK_DGRAM nor
->> SOCK_STREAM. It should not be treated as if it was SOCK_STREAM.
->>
->> Turn this case into an Error. If there is a genuine reason to
->> support something like SOCK_RAW, it should be explicitly
->> handled.
->>
-
->>      default:
->> -        /* who knows ... this could be a eg. a pty, do warn and conti=
-nue as stream */
->> -        fprintf(stderr, "qemu: warning: socket type=3D%d for fd=3D%d =
-is not SOCK_DGRAM or SOCK_STREAM\n", so_type, fd);
->> -        return net_socket_fd_init_stream(peer, model, name, fd, is_co=
-nnected);
->> +        error_report("qemu: error: socket type=3D%d for fd=3D%d is no=
-t"
->> +                " SOCK_DGRAM or SOCK_STREAM", so_type, fd);
+On 06/28/2017 08:23 AM, Daniel P. Berrange wrote:
+> On Wed, Jun 28, 2017 at 09:08:49PM +0800, Mao Zhongyi wrote:
+>> diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
+>> index 5c326db..78e2b30 100644
+>> --- a/include/qemu/sockets.h
+>> +++ b/include/qemu/sockets.h
 >=20
-> Please drop the 'qemu: error: ' prefix on the message
+>>          if (qemu_isdigit(buf[0])) {
+>> -            if (!inet_aton(buf, &saddr->sin_addr))
+>> +            if (!inet_aton(buf, &saddr->sin_addr)) {
+>> +                error_setg(errp, "host address '%s' is not a valid "
+>> +                           "IPv4 address", buf);
+>>                  return -1;
+>> +            }
+>>          } else {
+>> -            if ((he =3D gethostbyname(buf)) =3D=3D NULL)
+>> +            he =3D gethostbyname(buf);
+>> +            if (he =3D=3D NULL) {
+>> +                error_setg(errp, "can't resolve host address '%s': "
+>> +                           "unknown host", buf);
+>>                  return - 1;
+>> +            }
 >=20
-> Also, rather than 'is not' I suggest 'must be either'
+> gethostbyname sets  'h_errno' on failure, so you should pass that
+> into error_setg_errno, instead of hardcoding 'unknown host' as a
+> message
 
-Indentation is also off; we prefer that the second line starts right
-after the ( of the first line, as in:
-
-error_report("part 1"
-             "part 2")
-
+'man gethostbyname' says it is deprecated, and that applications should
+use getaddrinfo/getnameinfo instead.  What's our story here?
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -91,7 +86,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---EHIEHrGSJBnivobjI9HJISQsdaIKnMJSC
+--gAPPsmtPhcnANCIqQ5TKRdRjFGoiauhf2
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -101,13 +96,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZU7v5AAoJEKeha0olJ0NqQqcIAILqrwRTLSx7SSYMYLunnwfX
-c6QCzeoF0+PYjndJa5NmmzDICgJwsJYu7vNFFqQxwm9TQkB9nh3+qBb6mp1j1kPb
-XrShLgiNEicjZ6t6klxkTyVfWQO7HREkdJh5yBjWfJbRpZ1s+PmfFNQyvT9z/fxM
-Wv98cg65R9OaDxGOKiaIvxHc/WfdKdkuQi2RXcAAPrwURBcaBIp82ClOTTAJQTzj
-yXXMdJRiyZkK+zs6xtHMKvfKAf/KfjN1ZmtjusdrcoqgHBHIWBPYQQGBjPbVlfLq
-7jNa6E5AGB0Kppy+0Pg5L4xqUTPdrbyjgM/Zi2aK37q8SspJa1VG9JAY37xOVbw=
-=ARTp
+iQEcBAEBCAAGBQJZU7w7AAoJEKeha0olJ0NqgU4IAJ0sb+LboNnoZsghlK1KsKUc
+EVojqDQSeotIG86ITQcZYWzLlZqP/o9wyz59E6kTkLwni2mJfTpnTSl3o5WbFSnL
+TcL5tLdTYDFgxekxXwlXG6SFnv/7KOf2yL1hndayEKISwaRNn09TjOgV143XT63m
+PJD/1MoZDkptQ+MOEBfcYqejDDFGVrSDNBuz6SSHqI6TXiVCnW3hcxKuT5TZdF5s
+uzXreE6PsN1oUfwczBF6zjlBiHY0VZOtgVkVzaIXPRL3DO48lOgfDd0EcJqAH74w
+Q1UmllMsJaXtdY6mCwc1ZT1J17Od9SngdNeBAXN+D0l/tsaf40mXBoisvoVtxXo=
+=xBg2
 -----END PGP SIGNATURE-----
 
---EHIEHrGSJBnivobjI9HJISQsdaIKnMJSC--
+--gAPPsmtPhcnANCIqQ5TKRdRjFGoiauhf2--
