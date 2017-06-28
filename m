@@ -1,25 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44823)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dQDqX-0006ML-1U
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 10:21:33 -0400
+	(envelope-from <lersek@redhat.com>) id 1dQDqp-0006St-CP
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 10:21:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dQDqT-0005jI-Te
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 10:21:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43474)
+	(envelope-from <lersek@redhat.com>) id 1dQDqm-0005xH-8Q
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 10:21:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43836)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dQDqT-0005hx-OU
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 10:21:29 -0400
-References: <20170627161032.5014-1-david@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <251b8047-7df4-50a5-cce7-b66858c781a1@redhat.com>
-Date: Wed, 28 Jun 2017 16:21:20 +0200
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dQDqm-0005wc-3O
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 10:21:48 -0400
+References: <20170621113600.GA3928@thinpad.lan.raisama.net>
+	<8135ff45-0341-1fd4-ada9-4527c6b61e5a@ilande.co.uk>
+	<20170621132317.GD3928@thinpad.lan.raisama.net>
+	<7b431646-019e-dce2-6345-bdbaba7ce821@ilande.co.uk>
+	<20170623115051.GE20956@localhost.localdomain>
+	<a5f86c32-c89b-98ff-dbdb-7457a2074f1a@redhat.com>
+	<20170623161043.GA10204@localhost.localdomain>
+	<60e57713-c9ce-2bf4-db6e-23686fcc955b@redhat.com>
+	<20170623185000.GA3038@localhost.localdomain>
+	<120b9dac-982b-1e3b-662f-e60110b3d730@ilande.co.uk>
+	<20170627004930.GI12152@localhost.localdomain>
+	<f6a0bc2b-bf91-4c49-aa41-7816da70252c@ilande.co.uk>
+	<20170628161247.168c4acb@nial.brq.redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <a5dba6ac-2c13-0a69-4cdb-504fe01b5866@redhat.com>
+Date: Wed, 28 Jun 2017 16:21:40 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170627161032.5014-1-david@redhat.com>
+In-Reply-To: <20170628161247.168c4acb@nial.brq.redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/cpumodel: allow to enable "idtes"
- feature for TCG
+Subject: Re: [Qemu-devel] [PATCHv6 3/5] fw_cfg: move assert() and linking of
+ fw_cfg device to the machine into instance_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +40,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: rth@twiddle.net, agraf@suse.de, Aurelien Jarno <aurelien@aurel32.net>
+To: Igor Mammedov <imammedo@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, pbonzini@redhat.com
 
-On 27.06.2017 18:10, David Hildenbrand wrote:
-> STFL bit 4 and 5 are just indications to the guest, which TLB entries an
-> IDTE call will clear. These are performance indicators for the guest.
-> 
-> STFL bit 4:
->     INVALIDATE DAT TABLE ENTRY (IDTE) performs
->     the invalidation-and-clearing operation by
->     selectively clearing TLB segment-table entries
->     when a segment-table entry or entries are
->     invalidated. IDTE also performs the clearing-by-
->     ASCE operation. Unless bit 4 is one, IDTE simply
->     purges all TLBs. Bit 3 is one if bit 4 is one.
-> 
-> We can simply set STFL bit 4 ("idtes") and still purge the complete TLB.
-> Purging more than advertised is never bad. E.g. Linux doesn't even care
-> about this bit. We can optimized this later.
+On 06/28/17 16:12, Igor Mammedov wrote:
+> On Wed, 28 Jun 2017 08:09:35 +0100
+> Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> wrote:
 
-Not sure, but why do we need this bit in add_qemu_cpu_model_features()
-if Linux does not care about it? We will get it automatically once we
-support the z9 in TCG...
+>> 1) Alter fw_cfg_find() to use object_resolve_path_type("", TYPE_FW_CFG,
+>> NULL)
+> I'd make use of the 3rd argument &ambiguous and assert on it
 
- Thomas
+I vaguely recall playing with "ambiguous" in find_vmgenid_dev(), but it
+didn't work as I expected (or, it wasn't necessary to use). Not sure
+about the details, I only remember that, when calling
+object_resolve_path_type() like above, from within a realize function,
+the object under realization is already considered existent, so if we're
+realizing the second (or later) instance of the class,
+object_resolve_path_type() will return NULL (regardless of "ambiguous").
+If we're realizing the very first instance, then
+object_resolve_path_type() will return non-NULL.
+
+I don't mind "ambiguous" if it can be made work fine, just thought that
+I'd add this tidbit.
+
+Thanks,
+Laszlo
