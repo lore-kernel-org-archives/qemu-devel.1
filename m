@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dQCqX-00023e-Bj
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:17:30 -0400
+	(envelope-from <berrange@redhat.com>) id 1dQCs1-0002ll-SE
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:19:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dQCqU-0003wa-7n
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:17:29 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed, 28 Jun 2017 16:17:10 +0300
-Message-Id: <149865583044.17063.6916936084139965036.stgit@frigg.lan>
-In-Reply-To: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
-References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
+	(envelope-from <berrange@redhat.com>) id 1dQCry-0004XD-NW
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:19:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39953)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dQCry-0004Wq-GL
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:18:58 -0400
+Date: Wed, 28 Jun 2017 14:18:52 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170628131852.GH29134@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <cover.1498654240.git.maozy.fnst@cn.fujitsu.com>
+	<d9660b46628b52aa8c63c21fe20618b5bc33bb4c.1498654240.git.maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v11 15/29] target/arm: [tcg] Port to
- init_disas_context
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <d9660b46628b52aa8c63c21fe20618b5bc33bb4c.1498654240.git.maozy.fnst@cn.fujitsu.com>
+Subject: Re: [Qemu-devel] [PATCH v6 1/4] net/socket: Don't treat odd socket
+ type as SOCK_STREAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,147 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, jasowang@redhat.com, armbru@redhat.com
 
-Incrementally paves the way towards using the generic instruction transla=
-tion
-loop.
+On Wed, Jun 28, 2017 at 09:08:47PM +0800, Mao Zhongyi wrote:
+> In net_socket_fd_init(), the 'default' case is odd: it warns,
+> then continues as if the socket type was SOCK_STREAM. The
+> comment explains "this could be a eg. a pty", but that makes
+> no sense. If @fd really was a pty, getsockopt() would fail
+> with ENOTSOCK. If @fd was a socket, but neither SOCK_DGRAM nor
+> SOCK_STREAM. It should not be treated as if it was SOCK_STREAM.
+> 
+> Turn this case into an Error. If there is a genuine reason to
+> support something like SOCK_RAW, it should be explicitly
+> handled.
+> 
+> Cc: jasowang@redhat.com
+> Cc: armbru@redhat.com
+> Cc: berrange@redhat.com
+> Cc: armbru@redhat.com
+> Suggested-by: Markus Armbruster <armbru@redhat.com>
+> Suggested-by: Daniel P. Berrange <berrange@redhat.com>
+> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  net/socket.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/socket.c b/net/socket.c
+> index dcae1ae..53765bd 100644
+> --- a/net/socket.c
+> +++ b/net/socket.c
+> @@ -449,9 +449,9 @@ static NetSocketState *net_socket_fd_init(NetClientState *peer,
+>      case SOCK_STREAM:
+>          return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
+>      default:
+> -        /* who knows ... this could be a eg. a pty, do warn and continue as stream */
+> -        fprintf(stderr, "qemu: warning: socket type=%d for fd=%d is not SOCK_DGRAM or SOCK_STREAM\n", so_type, fd);
+> -        return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
+> +        error_report("qemu: error: socket type=%d for fd=%d is not"
+> +                " SOCK_DGRAM or SOCK_STREAM", so_type, fd);
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
- target/arm/translate.c |   85 +++++++++++++++++++++++++++---------------=
-------
- 1 file changed, 47 insertions(+), 38 deletions(-)
+Please drop the 'qemu: error: ' prefix on the message
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 17bc9687b7..23a07fc2c6 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -11786,32 +11786,12 @@ static bool insn_crosses_page(CPUARMState *env,=
- DisasContext *s)
-     return false;
- }
-=20
--/* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
-+static void arm_trblock_init_disas_context(DisasContextBase *dcbase,
-+                                           CPUState *cpu)
- {
-+    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
-     CPUARMState *env =3D cpu->env_ptr;
-     ARMCPU *arm_cpu =3D arm_env_get_cpu(env);
--    DisasContext dc1, *dc =3D &dc1;
--    target_ulong next_page_start;
--    int max_insns;
--    bool end_of_page;
--
--    /* generate intermediate code */
--
--    /* The A64 decoder has its own top level loop, because it doesn't ne=
-ed
--     * the A32/T32 complexity to do with conditional execution/IT blocks=
-/etc.
--     */
--    if (ARM_TBFLAG_AARCH64_STATE(tb->flags)) {
--        gen_intermediate_code_a64(&dc->base, cpu, tb);
--        return;
--    }
--
--    dc->base.tb =3D tb;
--    dc->base.pc_first =3D tb->pc;
--    dc->base.pc_next =3D dc->base.pc_first;
--    dc->base.is_jmp =3D DISAS_NEXT;
--    dc->base.num_insns =3D 0;
--    dc->base.singlestep_enabled =3D cpu->singlestep_enabled;
-=20
-     dc->pc =3D dc->base.pc_first;
-     dc->condjmp =3D 0;
-@@ -11822,23 +11802,23 @@ void gen_intermediate_code(CPUState *cpu, Trans=
-lationBlock *tb)
-      */
-     dc->secure_routed_to_el3 =3D arm_feature(env, ARM_FEATURE_EL3) &&
-                                !arm_el_is_aa64(env, 3);
--    dc->thumb =3D ARM_TBFLAG_THUMB(tb->flags);
--    dc->sctlr_b =3D ARM_TBFLAG_SCTLR_B(tb->flags);
--    dc->be_data =3D ARM_TBFLAG_BE_DATA(tb->flags) ? MO_BE : MO_LE;
--    dc->condexec_mask =3D (ARM_TBFLAG_CONDEXEC(tb->flags) & 0xf) << 1;
--    dc->condexec_cond =3D ARM_TBFLAG_CONDEXEC(tb->flags) >> 4;
--    dc->mmu_idx =3D core_to_arm_mmu_idx(env, ARM_TBFLAG_MMUIDX(tb->flags=
-));
-+    dc->thumb =3D ARM_TBFLAG_THUMB(dc->base.tb->flags);
-+    dc->sctlr_b =3D ARM_TBFLAG_SCTLR_B(dc->base.tb->flags);
-+    dc->be_data =3D ARM_TBFLAG_BE_DATA(dc->base.tb->flags) ? MO_BE : MO_=
-LE;
-+    dc->condexec_mask =3D (ARM_TBFLAG_CONDEXEC(dc->base.tb->flags) & 0xf=
-) << 1;
-+    dc->condexec_cond =3D ARM_TBFLAG_CONDEXEC(dc->base.tb->flags) >> 4;
-+    dc->mmu_idx =3D core_to_arm_mmu_idx(env, ARM_TBFLAG_MMUIDX(dc->base.=
-tb->flags));
-     dc->current_el =3D arm_mmu_idx_to_el(dc->mmu_idx);
- #if !defined(CONFIG_USER_ONLY)
-     dc->user =3D (dc->current_el =3D=3D 0);
- #endif
--    dc->ns =3D ARM_TBFLAG_NS(tb->flags);
--    dc->fp_excp_el =3D ARM_TBFLAG_FPEXC_EL(tb->flags);
--    dc->vfp_enabled =3D ARM_TBFLAG_VFPEN(tb->flags);
--    dc->vec_len =3D ARM_TBFLAG_VECLEN(tb->flags);
--    dc->vec_stride =3D ARM_TBFLAG_VECSTRIDE(tb->flags);
--    dc->c15_cpar =3D ARM_TBFLAG_XSCALE_CPAR(tb->flags);
--    dc->v7m_handler_mode =3D ARM_TBFLAG_HANDLER(tb->flags);
-+    dc->ns =3D ARM_TBFLAG_NS(dc->base.tb->flags);
-+    dc->fp_excp_el =3D ARM_TBFLAG_FPEXC_EL(dc->base.tb->flags);
-+    dc->vfp_enabled =3D ARM_TBFLAG_VFPEN(dc->base.tb->flags);
-+    dc->vec_len =3D ARM_TBFLAG_VECLEN(dc->base.tb->flags);
-+    dc->vec_stride =3D ARM_TBFLAG_VECSTRIDE(dc->base.tb->flags);
-+    dc->c15_cpar =3D ARM_TBFLAG_XSCALE_CPAR(dc->base.tb->flags);
-+    dc->v7m_handler_mode =3D ARM_TBFLAG_HANDLER(dc->base.tb->flags);
-     dc->cp_regs =3D arm_cpu->cp_regs;
-     dc->features =3D env->features;
-=20
-@@ -11857,10 +11837,39 @@ void gen_intermediate_code(CPUState *cpu, Trans=
-lationBlock *tb)
-      *   emit code to generate a software step exception
-      *   end the TB
-      */
--    dc->ss_active =3D ARM_TBFLAG_SS_ACTIVE(tb->flags);
--    dc->pstate_ss =3D ARM_TBFLAG_PSTATE_SS(tb->flags);
-+    dc->ss_active =3D ARM_TBFLAG_SS_ACTIVE(dc->base.tb->flags);
-+    dc->pstate_ss =3D ARM_TBFLAG_PSTATE_SS(dc->base.tb->flags);
-     dc->is_ldex =3D false;
-     dc->ss_same_el =3D false; /* Can't be true since EL_d must be AArch6=
-4 */
-+}
-+
-+/* generate intermediate code for basic block 'tb'.  */
-+void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
-+{
-+    CPUARMState *env =3D cpu->env_ptr;
-+    DisasContext dc1, *dc =3D &dc1;
-+    target_ulong next_page_start;
-+    int max_insns;
-+    bool end_of_page;
-+
-+    /* generate intermediate code */
-+
-+    /* The A64 decoder has its own top level loop, because it doesn't ne=
-ed
-+     * the A32/T32 complexity to do with conditional execution/IT blocks=
-/etc.
-+     */
-+    if (ARM_TBFLAG_AARCH64_STATE(tb->flags)) {
-+        gen_intermediate_code_a64(&dc->base, cpu, tb);
-+        return;
-+    }
-+
-+    dc->base.tb =3D tb;
-+    dc->base.pc_first =3D dc->base.tb->pc;
-+    dc->base.pc_next =3D dc->base.pc_first;
-+    dc->base.is_jmp =3D DISAS_NEXT;
-+    dc->base.num_insns =3D 0;
-+    dc->base.singlestep_enabled =3D cpu->singlestep_enabled;
-+    arm_trblock_init_disas_context(&dc->base, cpu);
-+
-=20
-     cpu_F0s =3D tcg_temp_new_i32();
-     cpu_F1s =3D tcg_temp_new_i32();
+Also, rather than 'is not' I suggest 'must be either'
+
+
+> +        closesocket(fd);
+>      }
+>      return NULL;
+>  }
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
