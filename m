@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dQAgi-0000Ps-Gd
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 06:59:13 -0400
+	(envelope-from <haozhong.zhang@intel.com>) id 1dQAtT-0003Xg-CF
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:12:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dQAgd-0005qa-NC
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 06:59:12 -0400
-References: <20170622112648.24815-1-lvivier@redhat.com>
-	<caa25331-5005-78e8-fba2-19bf67116d92@redhat.com>
-	<20170623092124.GG12089@umbus>
-	<c0a0667e-8c60-a8e7-a041-caddac8c8b88@redhat.com>
-	<20170628014231.GA791@pacoca>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <d9632cc5-f2de-1118-8942-9a9be3835ab7@redhat.com>
-Date: Wed, 28 Jun 2017 12:59:03 +0200
+	(envelope-from <haozhong.zhang@intel.com>) id 1dQAtP-00035T-8X
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:12:23 -0400
+Received: from mga11.intel.com ([192.55.52.93]:54139)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1dQAtO-00034j-SC
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 07:12:19 -0400
+Date: Wed, 28 Jun 2017 19:12:14 +0800
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Message-ID: <20170628111214.4ycvgzy4a53gt4tl@hz-desktop>
+References: <20170628024358.29956-1-haozhong.zhang@intel.com>
+	<87h8z07a2b.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <20170628014231.GA791@pacoca>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc/cpu-models: set
- POWER9_v1.0 as POWER9 DD1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87h8z07a2b.fsf@secure.mitica>
+Subject: Re: [Qemu-devel] [PATCH] exec: fix access to ram_list.dirty_memory
+ when sync dirty bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,99 +29,295 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: joserz@linux.vnet.ibm.com
-Cc: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On 28/06/2017 03:42, joserz@linux.vnet.ibm.com wrote:
-> On Fri, Jun 23, 2017 at 04:10:55PM +0200, Laurent Vivier wrote:
->> On 23/06/2017 11:21, David Gibson wrote:
->>> On Thu, Jun 22, 2017 at 01:31:24PM +0200, Thomas Huth wrote:
->>>> On 22.06.2017 13:26, Laurent Vivier wrote:
->>>>> CPU_POWERPC_POWER9_DD1 is 0x004E0100, so this is the POWER9 v1.0.
->>>>>
->>>>> When we run qemu on a POWER9 DD1 host, we must use either
->>>>> "-cpu host" or "-cpu POWER9", but in the latter case it fails with
->>>>>
->>>>>     Unable to find sPAPR CPU Core definition
->>>>>
->>>>> because POWER9 DD1 doesn't appear in the list of known CPUs.
->>>>>
->>>>> This patch fixes this by defining POWER9_v1.0 with POWER9 DD1
->>>>> PVR instead of CPU_POWERPC_POWER9_BASE.
->>>>>
->>>>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
->>>>> ---
->>>>>  target/ppc/cpu-models.c | 2 +-
->>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/target/ppc/cpu-models.c b/target/ppc/cpu-models.c
->>>>> index 4d3e635..a22363c 100644
->>>>> --- a/target/ppc/cpu-models.c
->>>>> +++ b/target/ppc/cpu-models.c
->>>>> @@ -1144,7 +1144,7 @@
->>>>>      POWERPC_DEF("970_v2.2",      CPU_POWERPC_970_v22,             =
-   970,
->>>>>                  "PowerPC 970 v2.2")
->>>>> =20
->>>>> -    POWERPC_DEF("POWER9_v1.0",   CPU_POWERPC_POWER9_BASE,         =
-   POWER9,
->>>>> +    POWERPC_DEF("POWER9_v1.0",   CPU_POWERPC_POWER9_DD1,          =
-   POWER9,
->>>>>                  "POWER9 v1.0")
->>>>> =20
->>>>>      POWERPC_DEF("970fx_v1.0",    CPU_POWERPC_970FX_v10,           =
-   970,
->>>>>
->>>>
->>>> I think this also makes sense for running in TCG mode to get a valid
->>>> real PVR there.
->>>
->>> I'm not so convinced.
->>>
->>> IIUC, this will make TCG default (for now) to a DD1 POWER9.  That's a=
-)
->>> probably not what anyone wants - who'd select a buggy prototype and b=
-)
->>> not accurate - TCG does not implement DD1's bugs.
->>
->> According to the POWER8 user manual (I didn't fine the POWER9 one):
->>
->> "3.6.3.1 Processor Version Register (PVR)
->>
->> The processor revision level (PVR[16:31]) starts at x=E2=80=980100=E2=80=
-=99, indicating
->> revision =E2=80=981.0=E2=80=99. As revisions are made, bits [29:31] wi=
-ll indicate minor
->> revisions. Similarly, bits [20:23] indicate major changes."
->>
->> POWER9 DD1 PVR is 0x004E0100, so this is really version 1.0 of the POW=
-ER9.
->>
->> Perhaps we can define POWER9_v1.0 as CPU_POWERPC_POWER9_DD1, and
->> introduce a POWER9_v0.0 set to CPU_POWERPC_POWER9_BASE and define it a=
-s
->> the default one?
->=20
-> I like the suggestion to set a v0.0 to CPU_POWERPC_POWER9_BASE. But, I
-> think we could have only that option, removing the
-> CPU_POWERPC_POWER9_DD1 entry. Then, we add the v2.0 (when ready) as the=
- CPU
-> emulated by TCG.
->=20
-> To TCG, DD1 wouldn't be listed because it cannot be emulated today.
->=20
-> What do you think?
+On 06/28/17 11:09 +0200, Juan Quintela wrote:
+> Haozhong Zhang <haozhong.zhang@intel.com> wrote:
+> > In cpu_physical_memory_sync_dirty_bitmap(rb, start, ...), the 2nd
+> > argument 'start' is relative to the start of the ramblock 'rb'. When
+> > it's used to access the dirty memory bitmap of ram_list (i.e.
+> > ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION]->blocks[]), an offset to
+> > the start of all RAM (i.e. rb->offset) should be added to it, which has
+> > however been missed since c/s 6b6712efcc. For a ramblock of host memory
+> > backend whose offset is not zero, cpu_physical_memory_sync_dirty_bitmap()
+> > synchronizes the incorrect part of the dirty memory bitmap of ram_list
+> > to the per ramblock dirty bitmap. As a result, a guest with host
+> > memory backend may crash after migration.
+> >
+> > Fix it by adding the offset of ramblock when accessing the dirty memory
+> > bitmap of ram_list in cpu_physical_memory_sync_dirty_bitmap().
+> >
+> > Reported-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> 
+> 
+> Hi
+> 
+> I need to add this patch to make it compile for me with all
+> architectures enabled.
+> 
+> I am adding that to you patch, are you ok?
+>
 
-We need the POWER9 DD1 in the list to be able to start QEMU on DD1 host
-with "-cpu POWER9" (it works with "-cpu host"). The real question is to
-what we should set the default CPU when it is not provided on the CLI.
-
-I agree that using POWER9 DD1 to boot a kernel with TCG will confuse the
-kernel.
-
-we could set POWER9 DD1 PVR to define the "POWER9_v1.0", and add a
-"POWER9_tcg" (?) set to CPU_POWERPC_POWER9_BASE to use with tcg until we
-have the PVR of a public release of POWER9?
+Remind me why your following patch is related to mine? My patch does
+not touch any vmstate.
 
 Thanks,
-Laurent
+Haozhong
+
+> Thanks, Juan.
+> 
+> From 74573a4190af8a357054493d5451e2b51c553498 Mon Sep 17 00:00:00 2001
+> From: Juan Quintela <quintela@redhat.com>
+> Date: Wed, 28 Jun 2017 10:19:25 +0200
+> Subject: [PATCH] fix missing Macro applications
+> 
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  hw/block/fdc.c          | 2 +-
+>  hw/display/qxl.c        | 4 ++--
+>  hw/display/vga.c        | 2 +-
+>  hw/display/vmware_vga.c | 2 +-
+>  hw/ide/ahci.c           | 2 +-
+>  hw/input/vmmouse.c      | 2 +-
+>  hw/intc/openpic.c       | 2 +-
+>  hw/intc/xics.c          | 2 +-
+>  hw/misc/max111x.c       | 2 +-
+>  hw/ppc/spapr_iommu.c    | 2 +-
+>  hw/ppc/spapr_pci.c      | 4 ++--
+>  hw/ppc/spapr_vio.c      | 4 ++--
+>  hw/usb/hcd-uhci.c       | 2 +-
+>  target/ppc/machine.c    | 8 ++++----
+>  14 files changed, 20 insertions(+), 20 deletions(-)
+> 
+> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+> index 28f6b6e..4011290 100644
+> --- a/hw/block/fdc.c
+> +++ b/hw/block/fdc.c
+> @@ -1217,7 +1217,7 @@ static const VMStateDescription vmstate_fdc = {
+>          VMSTATE_UINT8(config, FDCtrl),
+>          VMSTATE_UINT8(lock, FDCtrl),
+>          VMSTATE_UINT8(pwrd, FDCtrl),
+> -        VMSTATE_UINT8_EQUAL(num_floppies, FDCtrl),
+> +        VMSTATE_UINT8_EQUAL(num_floppies, FDCtrl, NULL),
+>          VMSTATE_STRUCT_ARRAY(drives, FDCtrl, MAX_FD, 1,
+>                               vmstate_fdrive, FDrive),
+>          VMSTATE_END_OF_LIST()
+> diff --git a/hw/display/qxl.c b/hw/display/qxl.c
+> index ad09bb9..3c1688e 100644
+> --- a/hw/display/qxl.c
+> +++ b/hw/display/qxl.c
+> @@ -2373,12 +2373,12 @@ static VMStateDescription qxl_vmstate = {
+>          VMSTATE_UINT32(last_release_offset, PCIQXLDevice),
+>          VMSTATE_UINT32(mode, PCIQXLDevice),
+>          VMSTATE_UINT32(ssd.unique, PCIQXLDevice),
+> -        VMSTATE_INT32_EQUAL(num_memslots, PCIQXLDevice),
+> +        VMSTATE_INT32_EQUAL(num_memslots, PCIQXLDevice, NULL),
+>          VMSTATE_STRUCT_ARRAY(guest_slots, PCIQXLDevice, NUM_MEMSLOTS, 0,
+>                               qxl_memslot, struct guest_slots),
+>          VMSTATE_STRUCT(guest_primary.surface, PCIQXLDevice, 0,
+>                         qxl_surface, QXLSurfaceCreate),
+> -        VMSTATE_INT32_EQUAL(ssd.num_surfaces, PCIQXLDevice),
+> +        VMSTATE_INT32_EQUAL(ssd.num_surfaces, PCIQXLDevice, NULL),
+>          VMSTATE_VARRAY_INT32(guest_surfaces.cmds, PCIQXLDevice,
+>                               ssd.num_surfaces, 0,
+>                               vmstate_info_uint64, uint64_t),
+> diff --git a/hw/display/vga.c b/hw/display/vga.c
+> index dcc95f8..80508b8 100644
+> --- a/hw/display/vga.c
+> +++ b/hw/display/vga.c
+> @@ -2099,7 +2099,7 @@ const VMStateDescription vmstate_vga_common = {
+>          VMSTATE_BUFFER(palette, VGACommonState),
+>  
+>          VMSTATE_INT32(bank_offset, VGACommonState),
+> -        VMSTATE_UINT8_EQUAL(is_vbe_vmstate, VGACommonState),
+> +        VMSTATE_UINT8_EQUAL(is_vbe_vmstate, VGACommonState, NULL),
+>          VMSTATE_UINT16(vbe_index, VGACommonState),
+>          VMSTATE_UINT16_ARRAY(vbe_regs, VGACommonState, VBE_DISPI_INDEX_NB),
+>          VMSTATE_UINT32(vbe_start_addr, VGACommonState),
+> diff --git a/hw/display/vmware_vga.c b/hw/display/vmware_vga.c
+> index ec5f27d..c989cef 100644
+> --- a/hw/display/vmware_vga.c
+> +++ b/hw/display/vmware_vga.c
+> @@ -1192,7 +1192,7 @@ static const VMStateDescription vmstate_vmware_vga_internal = {
+>      .minimum_version_id = 0,
+>      .post_load = vmsvga_post_load,
+>      .fields = (VMStateField[]) {
+> -        VMSTATE_INT32_EQUAL(new_depth, struct vmsvga_state_s),
+> +        VMSTATE_INT32_EQUAL(new_depth, struct vmsvga_state_s, NULL),
+>          VMSTATE_INT32(enable, struct vmsvga_state_s),
+>          VMSTATE_INT32(config, struct vmsvga_state_s),
+>          VMSTATE_INT32(cursor.id, struct vmsvga_state_s),
+> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+> index f60826d..874d3fe 100644
+> --- a/hw/ide/ahci.c
+> +++ b/hw/ide/ahci.c
+> @@ -1669,7 +1669,7 @@ const VMStateDescription vmstate_ahci = {
+>          VMSTATE_UINT32(control_regs.impl, AHCIState),
+>          VMSTATE_UINT32(control_regs.version, AHCIState),
+>          VMSTATE_UINT32(idp_index, AHCIState),
+> -        VMSTATE_INT32_EQUAL(ports, AHCIState),
+> +        VMSTATE_INT32_EQUAL(ports, AHCIState, NULL),
+>          VMSTATE_END_OF_LIST()
+>      },
+>  };
+> diff --git a/hw/input/vmmouse.c b/hw/input/vmmouse.c
+> index 4747da9..b6d2208 100644
+> --- a/hw/input/vmmouse.c
+> +++ b/hw/input/vmmouse.c
+> @@ -243,7 +243,7 @@ static const VMStateDescription vmstate_vmmouse = {
+>      .minimum_version_id = 0,
+>      .post_load = vmmouse_post_load,
+>      .fields = (VMStateField[]) {
+> -        VMSTATE_INT32_EQUAL(queue_size, VMMouseState),
+> +        VMSTATE_INT32_EQUAL(queue_size, VMMouseState, NULL),
+>          VMSTATE_UINT32_ARRAY(queue, VMMouseState, VMMOUSE_QUEUE_SIZE),
+>          VMSTATE_UINT16(nb_queue, VMMouseState),
+>          VMSTATE_UINT16(status, VMMouseState),
+> diff --git a/hw/intc/openpic.c b/hw/intc/openpic.c
+> index f966d06..5595bb2 100644
+> --- a/hw/intc/openpic.c
+> +++ b/hw/intc/openpic.c
+> @@ -1499,7 +1499,7 @@ static const VMStateDescription vmstate_openpic = {
+>          VMSTATE_UINT32(max_irq, OpenPICState),
+>          VMSTATE_STRUCT_VARRAY_UINT32(src, OpenPICState, max_irq, 0,
+>                                       vmstate_openpic_irqsource, IRQSource),
+> -        VMSTATE_UINT32_EQUAL(nb_cpus, OpenPICState),
+> +        VMSTATE_UINT32_EQUAL(nb_cpus, OpenPICState, NULL),
+>          VMSTATE_STRUCT_VARRAY_UINT32(dst, OpenPICState, nb_cpus, 0,
+>                                       vmstate_openpic_irqdest, IRQDest),
+>          VMSTATE_STRUCT_ARRAY(timers, OpenPICState, OPENPIC_MAX_TMR, 0,
+> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+> index 7ccfb53..d4194d6 100644
+> --- a/hw/intc/xics.c
+> +++ b/hw/intc/xics.c
+> @@ -574,7 +574,7 @@ static const VMStateDescription vmstate_ics_simple = {
+>      .post_load = ics_simple_dispatch_post_load,
+>      .fields = (VMStateField[]) {
+>          /* Sanity check */
+> -        VMSTATE_UINT32_EQUAL(nr_irqs, ICSState),
+> +        VMSTATE_UINT32_EQUAL(nr_irqs, ICSState, NULL),
+>  
+>          VMSTATE_STRUCT_VARRAY_POINTER_UINT32(irqs, ICSState, nr_irqs,
+>                                               vmstate_ics_simple_irq,
+> diff --git a/hw/misc/max111x.c b/hw/misc/max111x.c
+> index 2a277bd..6dbdc03 100644
+> --- a/hw/misc/max111x.c
+> +++ b/hw/misc/max111x.c
+> @@ -116,7 +116,7 @@ static const VMStateDescription vmstate_max111x = {
+>          VMSTATE_UINT8(tb1, MAX111xState),
+>          VMSTATE_UINT8(rb2, MAX111xState),
+>          VMSTATE_UINT8(rb3, MAX111xState),
+> -        VMSTATE_INT32_EQUAL(inputs, MAX111xState),
+> +        VMSTATE_INT32_EQUAL(inputs, MAX111xState, NULL),
+>          VMSTATE_INT32(com, MAX111xState),
+>          VMSTATE_ARRAY_INT32_UNSAFE(input, MAX111xState, inputs,
+>                                     vmstate_info_uint8, uint8_t),
+> diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
+> index 0341bc0..8656a54 100644
+> --- a/hw/ppc/spapr_iommu.c
+> +++ b/hw/ppc/spapr_iommu.c
+> @@ -231,7 +231,7 @@ static const VMStateDescription vmstate_spapr_tce_table = {
+>      .post_load = spapr_tce_table_post_load,
+>      .fields      = (VMStateField []) {
+>          /* Sanity check */
+> -        VMSTATE_UINT32_EQUAL(liobn, sPAPRTCETable),
+> +        VMSTATE_UINT32_EQUAL(liobn, sPAPRTCETable, NULL),
+>  
+>          /* IOMMU state */
+>          VMSTATE_UINT32(mig_nb_table, sPAPRTCETable),
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index 0b447f2..3b37dcd 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -1848,7 +1848,7 @@ static const VMStateDescription vmstate_spapr_pci_lsi = {
+>      .version_id = 1,
+>      .minimum_version_id = 1,
+>      .fields = (VMStateField[]) {
+> -        VMSTATE_UINT32_EQUAL(irq, struct spapr_pci_lsi),
+> +        VMSTATE_UINT32_EQUAL(irq, struct spapr_pci_lsi, NULL),
+>  
+>          VMSTATE_END_OF_LIST()
+>      },
+> @@ -1936,7 +1936,7 @@ static const VMStateDescription vmstate_spapr_pci = {
+>      .pre_save = spapr_pci_pre_save,
+>      .post_load = spapr_pci_post_load,
+>      .fields = (VMStateField[]) {
+> -        VMSTATE_UINT64_EQUAL(buid, sPAPRPHBState),
+> +        VMSTATE_UINT64_EQUAL(buid, sPAPRPHBState, NULL),
+>          VMSTATE_UINT32_TEST(mig_liobn, sPAPRPHBState, pre_2_8_migration),
+>          VMSTATE_UINT64_TEST(mig_mem_win_addr, sPAPRPHBState, pre_2_8_migration),
+>          VMSTATE_UINT64_TEST(mig_mem_win_size, sPAPRPHBState, pre_2_8_migration),
+> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
+> index a0ee4fd..ea3bc8b 100644
+> --- a/hw/ppc/spapr_vio.c
+> +++ b/hw/ppc/spapr_vio.c
+> @@ -557,8 +557,8 @@ const VMStateDescription vmstate_spapr_vio = {
+>      .minimum_version_id = 1,
+>      .fields = (VMStateField[]) {
+>          /* Sanity check */
+> -        VMSTATE_UINT32_EQUAL(reg, VIOsPAPRDevice),
+> -        VMSTATE_UINT32_EQUAL(irq, VIOsPAPRDevice),
+> +        VMSTATE_UINT32_EQUAL(reg, VIOsPAPRDevice, NULL),
+> +        VMSTATE_UINT32_EQUAL(irq, VIOsPAPRDevice, NULL),
+>  
+>          /* General VIO device state */
+>          VMSTATE_UINT64(signal_state, VIOsPAPRDevice),
+> diff --git a/hw/usb/hcd-uhci.c b/hw/usb/hcd-uhci.c
+> index ca72a80..e3562a4 100644
+> --- a/hw/usb/hcd-uhci.c
+> +++ b/hw/usb/hcd-uhci.c
+> @@ -415,7 +415,7 @@ static const VMStateDescription vmstate_uhci = {
+>      .post_load = uhci_post_load,
+>      .fields = (VMStateField[]) {
+>          VMSTATE_PCI_DEVICE(dev, UHCIState),
+> -        VMSTATE_UINT8_EQUAL(num_ports_vmstate, UHCIState),
+> +        VMSTATE_UINT8_EQUAL(num_ports_vmstate, UHCIState, NULL),
+>          VMSTATE_STRUCT_ARRAY(ports, UHCIState, NB_PORTS, 1,
+>                               vmstate_uhci_port, UHCIPort),
+>          VMSTATE_UINT16(cmd, UHCIState),
+> diff --git a/target/ppc/machine.c b/target/ppc/machine.c
+> index 6cb3a48..445f489 100644
+> --- a/target/ppc/machine.c
+> +++ b/target/ppc/machine.c
+> @@ -419,7 +419,7 @@ static const VMStateDescription vmstate_slb = {
+>      .needed = slb_needed,
+>      .post_load = slb_post_load,
+>      .fields = (VMStateField[]) {
+> -        VMSTATE_INT32_EQUAL(env.slb_nr, PowerPCCPU),
+> +        VMSTATE_INT32_EQUAL(env.slb_nr, PowerPCCPU, NULL),
+>          VMSTATE_SLB_ARRAY(env.slb, PowerPCCPU, MAX_SLB_ENTRIES),
+>          VMSTATE_END_OF_LIST()
+>      }
+> @@ -452,7 +452,7 @@ static const VMStateDescription vmstate_tlb6xx = {
+>      .minimum_version_id = 1,
+>      .needed = tlb6xx_needed,
+>      .fields = (VMStateField[]) {
+> -        VMSTATE_INT32_EQUAL(env.nb_tlb, PowerPCCPU),
+> +        VMSTATE_INT32_EQUAL(env.nb_tlb, PowerPCCPU, NULL),
+>          VMSTATE_STRUCT_VARRAY_POINTER_INT32(env.tlb.tlb6, PowerPCCPU,
+>                                              env.nb_tlb,
+>                                              vmstate_tlb6xx_entry,
+> @@ -510,7 +510,7 @@ static const VMStateDescription vmstate_tlbemb = {
+>      .minimum_version_id = 1,
+>      .needed = tlbemb_needed,
+>      .fields = (VMStateField[]) {
+> -        VMSTATE_INT32_EQUAL(env.nb_tlb, PowerPCCPU),
+> +        VMSTATE_INT32_EQUAL(env.nb_tlb, PowerPCCPU, NULL),
+>          VMSTATE_STRUCT_VARRAY_POINTER_INT32(env.tlb.tlbe, PowerPCCPU,
+>                                              env.nb_tlb,
+>                                              vmstate_tlbemb_entry,
+> @@ -551,7 +551,7 @@ static const VMStateDescription vmstate_tlbmas = {
+>      .minimum_version_id = 1,
+>      .needed = tlbmas_needed,
+>      .fields = (VMStateField[]) {
+> -        VMSTATE_INT32_EQUAL(env.nb_tlb, PowerPCCPU),
+> +        VMSTATE_INT32_EQUAL(env.nb_tlb, PowerPCCPU, NULL),
+>          VMSTATE_STRUCT_VARRAY_POINTER_INT32(env.tlb.tlbm, PowerPCCPU,
+>                                              env.nb_tlb,
+>                                              vmstate_tlbmas_entry,
+> -- 
+> 2.9.4
+> 
