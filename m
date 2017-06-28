@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dQD5i-0000Tf-Bs
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:33:11 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dQD6C-0000ks-KV
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:33:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dQD5d-0004A3-FF
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:33:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48426)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dQD5d-00049c-6y
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:33:05 -0400
-References: <20170628124850.12821-1-famz@redhat.com>
-	<20170628124850.12821-2-famz@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <538088ce-7515-f8a0-e4d7-21ec02bd45c9@redhat.com>
-Date: Wed, 28 Jun 2017 15:32:59 +0200
+	(envelope-from <vilanova@ac.upc.edu>) id 1dQD67-0004Nl-Ng
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:33:40 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Wed, 28 Jun 2017 16:33:22 +0300
+Message-Id: <149865680190.17063.16072451312204148936.stgit@frigg.lan>
+In-Reply-To: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
+References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170628124850.12821-2-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/7] qom: Make link property API public
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v11 19/29] target/arm: [tcg] Port to insn_start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,82 +22,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
+Incrementally paves the way towards using the generic instruction transla=
+tion
+loop.
 
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+ target/arm/translate.c |   34 ++++++++++++++++++++++------------
+ 1 file changed, 22 insertions(+), 12 deletions(-)
 
-On 28/06/2017 14:48, Fam Zheng wrote:
-> The get/set pair and the struct will be reused by qdev link prop, make
-> them public.
-> 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-
-Maybe it's better to make it a separate header file.  No other objections.
-
-Paolo
-
-> ---
->  include/qom/object.h | 13 +++++++++++++
->  qom/object.c         | 18 ++++++------------
->  2 files changed, 19 insertions(+), 12 deletions(-)
-> 
-> diff --git a/include/qom/object.h b/include/qom/object.h
-> index abaeb8c..4659e6a 100644
-> --- a/include/qom/object.h
-> +++ b/include/qom/object.h
-> @@ -1613,4 +1613,17 @@ Object *container_get(Object *root, const char *path);
->   * Returns the instance_size of the given @typename.
->   */
->  size_t object_type_get_instance_size(const char *typename);
-> +
-> +typedef struct {
-> +    Object **child;
-> +    void (*check)(Object *, const char *, Object *, Error **);
-> +    ObjectPropertyLinkFlags flags;
-> +} LinkProperty;
-> +
-> +void object_get_link_property(Object *obj, Visitor *v,
-> +                              const char *name, void *opaque,
-> +                              Error **errp);
-> +void object_set_link_property(Object *obj, Visitor *v,
-> +                              const char *name, void *opaque,
-> +                              Error **errp);
->  #endif
-> diff --git a/qom/object.c b/qom/object.c
-> index 5f6fdfa..3868370 100644
-> --- a/qom/object.c
-> +++ b/qom/object.c
-> @@ -1434,15 +1434,9 @@ void object_property_allow_set_link(Object *obj, const char *name,
->      /* Allow the link to be set, always */
->  }
->  
-> -typedef struct {
-> -    Object **child;
-> -    void (*check)(Object *, const char *, Object *, Error **);
-> -    ObjectPropertyLinkFlags flags;
-> -} LinkProperty;
-> -
-> -static void object_get_link_property(Object *obj, Visitor *v,
-> -                                     const char *name, void *opaque,
-> -                                     Error **errp)
-> +void object_get_link_property(Object *obj, Visitor *v,
-> +                              const char *name, void *opaque,
-> +                              Error **errp)
->  {
->      LinkProperty *lprop = opaque;
->      Object **child = lprop->child;
-> @@ -1498,9 +1492,9 @@ static Object *object_resolve_link(Object *obj, const char *name,
->      return target;
->  }
->  
-> -static void object_set_link_property(Object *obj, Visitor *v,
-> -                                     const char *name, void *opaque,
-> -                                     Error **errp)
-> +void object_set_link_property(Object *obj, Visitor *v,
-> +                              const char *name, void *opaque,
-> +                              Error **errp)
->  {
->      Error *local_err = NULL;
->      LinkProperty *prop = opaque;
-> 
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 029c4d3550..c7e188b50e 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -11898,6 +11898,26 @@ static void arm_trblock_tb_start(DisasContextBas=
+e *dcbase, CPUState *cpu)
+     }
+ }
+=20
++static void arm_trblock_insn_start(DisasContextBase *dcbase, CPUState *c=
+pu)
++{
++    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
++
++    dc->insn_start_idx =3D tcg_op_buf_count();
++    tcg_gen_insn_start(dc->pc,
++                       (dc->condexec_cond << 4) | (dc->condexec_mask >> =
+1),
++                       0);
++
++#ifdef CONFIG_USER_ONLY
++    /* Intercept jump to the magic kernel page.  */
++    if (dc->pc >=3D 0xffff0000) {
++        /* We always get here via a jump, so know we are not in a
++           conditional execution block.  */
++        gen_exception_internal(EXCP_KERNEL_TRAP);
++        dc->base.is_jmp =3D DISAS_EXC;
++    }
++#endif
++}
++
+ /* generate intermediate code for basic block 'tb'.  */
+ void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
+ {
+@@ -11943,21 +11963,11 @@ void gen_intermediate_code(CPUState *cpu, Trans=
+lationBlock *tb)
+=20
+     do {
+         dc->base.num_insns++;
+-        dc->insn_start_idx =3D tcg_op_buf_count();
+-        tcg_gen_insn_start(dc->pc,
+-                           (dc->condexec_cond << 4) | (dc->condexec_mask=
+ >> 1),
+-                           0);
++        arm_trblock_insn_start(&dc->base, cpu);
+=20
+-#ifdef CONFIG_USER_ONLY
+-        /* Intercept jump to the magic kernel page.  */
+-        if (dc->pc >=3D 0xffff0000) {
+-            /* We always get here via a jump, so know we are not in a
+-               conditional execution block.  */
+-            gen_exception_internal(EXCP_KERNEL_TRAP);
+-            dc->base.is_jmp =3D DISAS_EXC;
++        if (unlikely(dc->base.is_jmp > DISAS_NEXT)) {
+             break;
+         }
+-#endif
+=20
+         if (unlikely(!QTAILQ_EMPTY(&cpu->breakpoints))) {
+             CPUBreakpoint *bp;
