@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dQFQh-0005FT-T9
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 12:03:01 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dQFeY-0003rR-Dz
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 12:17:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dQFQg-0005Pf-Mq
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 12:02:59 -0400
-References: <20170623124700.1389-1-el13635@mail.ntua.gr>
-	<20170623124700.1389-6-el13635@mail.ntua.gr>
-	<20170628155042.GJ5378@noname.redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <61521682-b70e-0690-0005-4e05cce821fd@redhat.com>
-Date: Wed, 28 Jun 2017 11:02:45 -0500
+	(envelope-from <alistair23@gmail.com>) id 1dQFeX-0002gK-BL
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 12:17:18 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:34384)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1dQFeX-0002g0-54
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 12:17:17 -0400
+Received: by mail-wm0-x244.google.com with SMTP id p204so7605820wmg.1
+	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 09:17:17 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170628155042.GJ5378@noname.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Gbj460WrdXEb7SiRUbJgKWmnpxpkFw2qa"
-Subject: Re: [Qemu-devel] [PATCH RFC v3 5/8] block: add
- BlockDevOptionsThrottle to QAPI
+Sender: alistair23@gmail.com
+In-Reply-To: <20170628090448.GE29134@redhat.com>
+References: <cover.1498596157.git.alistair.francis@xilinx.com>
+	<4e1eded5cda7b182a8a4cb133b40b2915817b7d1.1498596157.git.alistair.francis@xilinx.com>
+	<20170628090448.GE29134@redhat.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Wed, 28 Jun 2017 09:16:45 -0700
+Message-ID: <CAKmqyKNEgZPMdS5B4J09XVpDQt0LXw0YFbMdBa_fnBXmnndftA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC v1 2/3] util/qemu-error: Add a
+ warning_report() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,120 +32,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>
-Cc: Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Gbj460WrdXEb7SiRUbJgKWmnpxpkFw2qa
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>
-Cc: Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>
-Message-ID: <61521682-b70e-0690-0005-4e05cce821fd@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v3 5/8] block: add
- BlockDevOptionsThrottle to QAPI
-References: <20170623124700.1389-1-el13635@mail.ntua.gr>
- <20170623124700.1389-6-el13635@mail.ntua.gr>
- <20170628155042.GJ5378@noname.redhat.com>
-In-Reply-To: <20170628155042.GJ5378@noname.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 06/28/2017 10:50 AM, Kevin Wolf wrote:
-> Am 23.06.2017 um 14:46 hat Manos Pitsidianakis geschrieben:
->> This is needed to configure throttle filter driver nodes with QAPI.
+On Wed, Jun 28, 2017 at 2:04 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
+> On Tue, Jun 27, 2017 at 01:45:45PM -0700, Alistair Francis wrote:
+>> Add a functino which can be used similarly to error_report() execpt to
+>> inform the users about warnings instead of errors.
 >>
->> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
->> ---
->>  qapi/block-core.json | 19 ++++++++++++++++++-
->>  1 file changed, 18 insertions(+), 1 deletion(-)
->>
->> diff --git a/qapi/block-core.json b/qapi/block-core.json
->> index f85c2235c7..1d4afafe8c 100644
->> --- a/qapi/block-core.json
->> +++ b/qapi/block-core.json
->> @@ -2119,7 +2119,7 @@
->>              'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', '=
-nfs',
->>              'null-aio', 'null-co', 'parallels', 'qcow', 'qcow2', 'qed=
-',
->>              'quorum', 'raw', 'rbd', 'replication', 'sheepdog', 'ssh',=
+>> The warning print does not include the timestamp and instead will
+>> preface the messages with a 'warning: '.
+>
+> Not including the timestamp is a bug IMHO. If I've turned on timestamps,
+> I expect all messages to have the timestamp.
 
->> -            'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs' ] }
->> +            'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs'=
- ] }
->> =20
->>  ##
->>  # @BlockdevOptionsFile:
->> @@ -2984,6 +2984,7 @@
->>        'replication':'BlockdevOptionsReplication',
->>        'sheepdog':   'BlockdevOptionsSheepdog',
->>        'ssh':        'BlockdevOptionsSsh',
->> +      'throttle':   'BlockdevOptionsThrottle',
->>        'vdi':        'BlockdevOptionsGenericFormat',
->>        'vhdx':       'BlockdevOptionsGenericFormat',
->>        'vmdk':       'BlockdevOptionsGenericCOWFormat',
->> @@ -3723,3 +3724,19 @@
->>    'data' : { 'parent': 'str',
->>               '*child': 'str',
->>               '*node': 'str' } }
->> +
->> +##
->> +# @BlockdevOptionsThrottle:
->> +#
->> +# Driver specific block device options for Throttle
->> +#
->> +# @throttling-group: the name of the throttling group to use
->> +#
->> +# @options:        BlockIOThrottle options
->=20
-> Missing #optional marker.
+That's fine, I'm happy to add it back in. I just wasn't sure.
 
-The marker is now auto-generated based solely on the '*options' below,
-so we don't need a redundant thing here.
+>
+> I'm not particularly convinced by adding the 'warning: ' prefix either,
+> particularly given the scenario you are using this in, is not actually
+> a warning - its just a informative message.
 
->=20
->> +# Since: 2.9
->> +##
->> +{ 'struct': 'BlockdevOptionsThrottle',
->> +  'data': { 'throttling-group': 'str',
->> +            'file' : 'BlockdevRef',
->> +            '*options' : 'BlockIOThrottle'
->> +             } }
->=20
-> Didn't we intend to make 'throttling-group' optional, too?
->=20
-> If we don't, then the question of anonymous ThrottleGroup objects is
-> kind of moot (not completely because -drive isn't bound to the schema,
-> but in that case we should just error out there too if it's missing).
->=20
-> Kevin
->=20
->=20
+Maybe it makes more sense to add an extra argument to error_report()
+that can be used to specify error, warning or information. The same
+way qemu_log_mask() works. That was Edgar's idea in reply to one of
+the other patches.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Does that sound more useful?
 
+Thanks,
+Alistair
 
---Gbj460WrdXEb7SiRUbJgKWmnpxpkFw2qa
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZU9MlAAoJEKeha0olJ0NqF8kH/0Zt8oHTmb/1Y561UXwmjzyW
-exgU4zlSlP9r/VYkih4x2Y2gbowiFQUhQ1a7IzTiCwffVBuOgPIUgbN9UkG27W2K
-fVqsdju/L8GO5a+u/6YIVihb7Trn5G084baVIPmMxuvz3K+ZCvOXcEPHn3T4Q7SZ
-28mBhPwAPi9AuPs5tYbuT4WusMvbxavOid7Ufq2ddDD6WJn39ORVskx7Y2iePBZc
-WhRGR+CMat/OlU26UhkEX3LC+/VHpSShB0ejfppUkwxH1SW9jmfTsbm+3A1tPHdN
-EyF1cTirBXuN+bbNdIxq1U4a6kWXe1JMHHD7PwCmjMijQrNxB0Ut1R9cXydFAuc=
-=xAUu
------END PGP SIGNATURE-----
-
---Gbj460WrdXEb7SiRUbJgKWmnpxpkFw2qa--
+>
+>
+> Regards,
+> Daniel
+> --
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
