@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dQDPe-0001B5-Tu
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:53:48 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dQDQ2-0001Oh-8r
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:54:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dQDPb-0006qn-OQ
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:53:46 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed, 28 Jun 2017 16:53:31 +0300
-Message-Id: <149865801156.17063.15618379976159104550.stgit@frigg.lan>
-In-Reply-To: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
-References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dQDPx-00070i-KA
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:54:10 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:9342 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dQDPx-0006zw-82
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:54:05 -0400
+References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
+	<969a2b68-c6ec-dee7-15cb-2a2bd9bfc0fd@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <354bbe28-4357-6f9f-801f-10bb02ee7e18@virtuozzo.com>
+Date: Wed, 28 Jun 2017 16:53:49 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v11 24/29] target/arm: [tcg,
- a64] Port to translate_insn
+In-Reply-To: <969a2b68-c6ec-dee7-15cb-2a2bd9bfc0fd@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v22 00/30] qcow2: persistent dirty bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,161 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com
 
-Incrementally paves the way towards using the generic instruction transla=
-tion
-loop.
+28.06.2017 16:01, Paolo Bonzini wrote:
+> 
+> 
+> On 28/06/2017 14:05, Vladimir Sementsov-Ogievskiy wrote:
+>> Rebase on master, so changes, mostly related to new dirty bitmaps mutex:
+>>
+>> 10: - asserts now in bdrv_{re,}set_dirty_bitmap_locked functions.
+>>      - also add assert into bdrv_undo_clear_dirty_bitmap (the only change, not related to rebase)
+>>      - add mutex lock into bdrv_dirty_bitmap_set_readonly (as it changes bitmap list,
+>>        so the lock should be taken)
+>>      - return instead of go-to in qmp_block_dirty_bitmap_clear
+>>      - in dirty-bitmaps.h, move bdrv_dirty_bitmap_set_readonly before block
+>>        "Functions that require manual locking", move
+>>        bdrv_dirty_bitmap_readonly and bdrv_has_readonly_bitmaps into this block
+>> 15: - add mutex lock/unlock into bdrv_dirty_bitmap_set_autoload
+>>      - in dirty-bitmaps.h, move bdrv_dirty_bitmap_set_autoload before block
+>>        "Functions that require manual locking", move
+>>        bdrv_dirty_bitmap_get_autoload into this block
+>> 17: - add mutex lock/unlock into bdrv_dirty_bitmap_set_persistance
+>>      - in dirty-bitmaps.h, move bdrv_dirty_bitmap_set_persistance before block
+>>        "Functions that require manual locking", move
+>>        bdrv_dirty_bitmap_get_persistance and
+>>        bdrv_has_changed_persistent_bitmaps into this block
+>> 18: in dirty-bitmaps.h, move bdrv_dirty_bitmap_next into block
+>>      "Functions that require manual locking". (do not remove r-b, as it is
+>>      just one empty line removed before function declaration)
+>> 23: return instead of go-to in qmp_block_dirty_bitmap_add
+>> 24: return instead of go-to in qmp_block_dirty_bitmap_add
+>> 25: - return instead of go-to
+>>      - remove aio_context_acquire/release calls
+>>      - no aio_context parameter for block_dirty_bitmap_lookup
+>>      - in dirty-bitmaps.h, move bdrv_dirty_bitmap_sha256 into block
+>>          "Functions that require manual locking".
+>> 29: - return instead of go-to in qmp_block_dirty_bitmap_remove
+> 
+> All looks good, thanks.  I'll rebase my own fixes on top of these
+> patches, no need to have you respin them.
+> 
+> Paolo
+> 
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
- target/arm/translate-a64.c |   74 +++++++++++++++++++++++++++-----------=
-------
- 1 file changed, 46 insertions(+), 28 deletions(-)
+Thank you! And for thunderbird-work-around too!
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 9c870f6d07..586a01a2de 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -11244,6 +11244,9 @@ static void aarch64_trblock_init_disas_context(Di=
-sasContextBase *dcbase,
-     dc->is_ldex =3D false;
-     dc->ss_same_el =3D (arm_debug_target_el(env) =3D=3D dc->current_el);
-=20
-+    dc->next_page_start =3D
-+        (dc->base.pc_first & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
-+
-     init_tmp_a64_array(dc);
- }
-=20
-@@ -11278,12 +11281,45 @@ static BreakpointCheckType aarch64_trblock_brea=
-kpoint_check(
-     }
- }
-=20
-+static target_ulong aarch64_trblock_translate_insn(DisasContextBase *dcb=
-ase,
-+                                                   CPUState *cpu)
-+{
-+    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
-+    CPUARMState *env =3D cpu->env_ptr;
-+
-+
-+    if (dc->ss_active && !dc->pstate_ss) {
-+        /* Singlestep state is Active-pending.
-+         * If we're in this state at the start of a TB then either
-+         *  a) we just took an exception to an EL which is being debugge=
-d
-+         *     and this is the first insn in the exception handler
-+         *  b) debug exceptions were masked and we just unmasked them
-+         *     without changing EL (eg by clearing PSTATE.D)
-+         * In either case we're going to take a swstep exception in the
-+         * "did not step an insn" case, and so the syndrome ISV and EX
-+         * bits should be zero.
-+         */
-+        assert(dc->base.num_insns =3D=3D 1);
-+        gen_exception(EXCP_UDEF, syn_swstep(dc->ss_same_el, 0, 0),
-+                      default_exception_el(dc));
-+        dc->base.is_jmp =3D DISAS_EXC;
-+    } else {
-+        disas_a64_insn(env, dc);
-+    }
-+
-+    if (dc->ss_active) {
-+        dc->base.is_jmp =3D DISAS_SS;
-+    } else if (dc->pc >=3D dc->next_page_start) {
-+        dc->base.is_jmp =3D DISAS_PAGE_CROSS;
-+    }
-+
-+    return dc->pc;
-+}
-+
- void gen_intermediate_code_a64(DisasContextBase *dcbase, CPUState *cs,
-                                TranslationBlock *tb)
- {
--    CPUARMState *env =3D cs->env_ptr;
-     DisasContext *dc =3D container_of(dcbase, DisasContext, base);
--    target_ulong next_page_start;
-     int max_insns;
-=20
-     dc->base.tb =3D tb;
-@@ -11294,7 +11330,6 @@ void gen_intermediate_code_a64(DisasContextBase *=
-dcbase, CPUState *cs,
-     dc->base.singlestep_enabled =3D cs->singlestep_enabled;
-     aarch64_trblock_init_disas_context(&dc->base, cs);
-=20
--    next_page_start =3D (dc->base.pc_first & TARGET_PAGE_MASK) + TARGET_=
-PAGE_SIZE;
-     max_insns =3D dc->base.tb->cflags & CF_COUNT_MASK;
-     if (max_insns =3D=3D 0) {
-         max_insns =3D CF_COUNT_MASK;
-@@ -11344,42 +11379,24 @@ void gen_intermediate_code_a64(DisasContextBase=
- *dcbase, CPUState *cs,
-             gen_io_start();
-         }
-=20
--        if (dc->ss_active && !dc->pstate_ss) {
--            /* Singlestep state is Active-pending.
--             * If we're in this state at the start of a TB then either
--             *  a) we just took an exception to an EL which is being deb=
-ugged
--             *     and this is the first insn in the exception handler
--             *  b) debug exceptions were masked and we just unmasked the=
-m
--             *     without changing EL (eg by clearing PSTATE.D)
--             * In either case we're going to take a swstep exception in =
-the
--             * "did not step an insn" case, and so the syndrome ISV and =
-EX
--             * bits should be zero.
--             */
--            assert(dc->base.num_insns =3D=3D 1);
--            gen_exception(EXCP_UDEF, syn_swstep(dc->ss_same_el, 0, 0),
--                          default_exception_el(dc));
--            dc->base.is_jmp =3D DISAS_EXC;
--            break;
--        }
--
--        disas_a64_insn(env, dc);
-+        dc->base.pc_next =3D aarch64_trblock_translate_insn(&dc->base, c=
-s);
-=20
-         if (tcg_check_temp_count()) {
-             fprintf(stderr, "TCG temporary leak before "TARGET_FMT_lx"\n=
-",
-                     dc->pc);
-         }
-=20
-+        if (!dc->base.is_jmp && (tcg_op_buf_full() || cs->singlestep_ena=
-bled ||
-+                            singlestep || dc->base.num_insns >=3D max_in=
-sns)) {
-+            dc->base.is_jmp =3D DISAS_TOO_MANY;
-+        }
-+
-         /* Translation stops when a conditional branch is encountered.
-          * Otherwise the subsequent code could get translated several ti=
-mes.
-          * Also stop translation when a page boundary is reached.  This
-          * ensures prefetch aborts occur at the right place.
-          */
--    } while (!dc->base.is_jmp && !tcg_op_buf_full() &&
--             !cs->singlestep_enabled &&
--             !singlestep &&
--             !dc->ss_active &&
--             dc->pc < next_page_start &&
--             dc->base.num_insns < max_insns);
-+    } while (!dc->base.is_jmp);
-=20
-     if (dc->base.tb->cflags & CF_LAST_IO) {
-         gen_io_end();
-@@ -11404,6 +11421,7 @@ void gen_intermediate_code_a64(DisasContextBase *=
-dcbase, CPUState *cs,
-     } else {
-         switch (dc->base.is_jmp) {
-         case DISAS_NEXT:
-+        case DISAS_TOO_MANY:
-             gen_goto_tb(dc, 1, dc->pc);
-             break;
-         default:
+-- 
+Best regards,
+Vladimir
