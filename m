@@ -1,17 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1dQEQa-0001pk-0u
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 10:58:51 -0400
+	(envelope-from <mst@redhat.com>) id 1dQETx-0004jA-Ch
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 11:02:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1dQEQW-0006Nk-6l
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 10:58:48 -0400
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Date: Wed, 28 Jun 2017 16:58:01 +0200
-Message-Id: <1498661881-9605-3-git-send-email-kchamart@redhat.com>
-In-Reply-To: <1498661881-9605-1-git-send-email-kchamart@redhat.com>
-References: <1498661881-9605-1-git-send-email-kchamart@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 2/2] bitmaps.md: Convert to rST;
- move it into 'interop' dir
+	(envelope-from <mst@redhat.com>) id 1dQETt-0008Pu-Fa
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 11:02:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45824)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dQETt-0008PL-6E
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 11:02:13 -0400
+Date: Wed, 28 Jun 2017 18:01:58 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170628175956-mutt-send-email-mst@kernel.org>
+References: <1497004901-30593-1-git-send-email-wei.w.wang@intel.com>
+	<1497004901-30593-7-git-send-email-wei.w.wang@intel.com>
+	<20170620190343-mutt-send-email-mst@kernel.org>
+	<5949E7C0.3050106@intel.com>
+	<20170621151922-mutt-send-email-mst@kernel.org>
+	<594B8287.6000706@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <594B8287.6000706@intel.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v11 6/6] virtio-balloon:
+ VIRTIO_BALLOON_F_CMD_VQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,1108 +32,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: eblake@redhat.com, armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, stephen@that.guru, qemu-block@nongnu.org, Kashyap Chamarthy <kchamart@redhat.com>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "david@redhat.com" <david@redhat.com>, "Hansen, Dave" <dave.hansen@intel.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "riel@redhat.com" <riel@redhat.com>, "nilal@redhat.com" <nilal@redhat.com>
 
-This is part of the on-going effort to convert QEMU upstream
-documentation syntax to reStructuredText (rST).
+On Thu, Jun 22, 2017 at 04:40:39PM +0800, Wei Wang wrote:
+> On 06/21/2017 08:28 PM, Michael S. Tsirkin wrote:
+> > On Wed, Jun 21, 2017 at 11:28:00AM +0800, Wei Wang wrote:
+> > > On 06/21/2017 12:18 AM, Michael S. Tsirkin wrote:
+> > > > On Fri, Jun 09, 2017 at 06:41:41PM +0800, Wei Wang wrote:
+> > > > > -	if (!virtqueue_indirect_desc_table_add(vq, desc, num)) {
+> > > > > +	if (!virtqueue_indirect_desc_table_add(vq, desc, *num)) {
+> > > > >    		virtqueue_kick(vq);
+> > > > > -		wait_event(vb->acked, virtqueue_get_buf(vq, &len));
+> > > > > -		vb->balloon_page_chunk.chunk_num = 0;
+> > > > > +		if (busy_wait)
+> > > > > +			while (!virtqueue_get_buf(vq, &len) &&
+> > > > > +			       !virtqueue_is_broken(vq))
+> > > > > +				cpu_relax();
+> > > > > +		else
+> > > > > +			wait_event(vb->acked, virtqueue_get_buf(vq, &len));
+> > > > This is something I didn't previously notice.
+> > > > As you always keep a single buffer in flight, you do not
+> > > > really need indirect at all. Just add all descriptors
+> > > > in the ring directly, then kick.
+> > > > 
+> > > > E.g.
+> > > > 	virtqueue_add_first
+> > > > 	virtqueue_add_next
+> > > > 	virtqueue_add_last
+> > > > 
+> > > > ?
+> > > > 
+> > > > You also want a flag to avoid allocations but there's no need to do it
+> > > > per descriptor, set it on vq.
+> > > > 
+> > > Without using the indirect table, I'm thinking about changing to use
+> > > the standard sg (i.e. struct scatterlist), instead of vring_desc, so that
+> > > we don't need to modify or add any new functions of virtqueue_add().
+> > > 
+> > > In this case, we will kmalloc an array of sgs in probe(), and we can add
+> > > the sgs one by one to the vq, which won't trigger the allocation of an
+> > > indirect table inside virtqueue_add(), and then kick when all are added.
+> > > 
+> > > Best,
+> > > Wei
+> > And allocate headers too? This can work. API extensions aren't
+> > necessarily a bad idea though. The API I suggest above is preferable
+> > for the simple reason that it can work without INDIRECT flag
+> > support in hypervisor.
+> 
+> OK, probably we don't need to add a desc to the vq - we can just use
+> the vq's desc, like this:
+> 
+> int virtqueue_add_first(struct virtqueue *_vq,
+>                                      uint64_t addr,
+>                                      uint32_t len,
+>                                      bool in,
+>                                      unsigned int *idx) {
+> 
+>     ...
+>    uint16_t desc_flags = in ? VRING_DESC_F_NEXT | VRING_DESC_F_WRITE :
+>                                              VRING_DESC_F_NEXT;
+> 
+>     vq->vring.desc[vq->free_head].addr = addr;
+>     vq->vring.desc[vq->free_head].len = len;
+>     vq->vring.desc[vq->free_head].flags = cpu_to_virtio16(_vq->vdev, flags);
+>     /* return to the caller the desc id */
+>     *idx = vq->free_head;
+>     ...
+> }
+> 
+> int virtqueue_add_next(struct virtqueue *_vq,
+>                                      uint64_t addr,
+>                                      uint32_t len,
+>                                      bool in,
+>                                      bool end,
+>                                      unsigned int *idx) {
+>     ...
+>     vq->vring.desc[*idx].next = vq->free_head;
+>     vq->vring.desc[vq->free_head].addr = addr;
+>     ...
+>     if (end)
+>         remove the VRING_DESC_F_NEXT flag
+> }
+> 
 
-The conversion to rST was done using:
+Add I would say add-last.
 
-    $ pandoc -f markdown -t rst bitmaps.md -o bitmaps.rst
+> 
+> What do you think? We can also combine the two functions into one.
+> 
+> 
+> 
+> Best,
+> Wei
 
-Then, make a couple of small syntactical adjustments.  While at it,
-reword a statement to avoid ambiguity.  Addressing the feedback from
-this thread:
+With an enum? Yes that's also an option.
 
-    https://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg05428.html
-
-Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
----
-* A Sphinx-rendered HTML version is here:
-  https://kashyapc.fedorapeople.org/v4-QEMU-Docs/_build/html/docs/bitmaps.html
-
-* The patch has "v4" subject prefix because I rolled this in along with
-  the other document (live-block-operations.rst) that is in review,
-  which is actually at v4.
----
- docs/devel/bitmaps.md    | 505 ------------------------------------------
- docs/interop/bitmaps.rst | 555 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 555 insertions(+), 505 deletions(-)
- delete mode 100644 docs/devel/bitmaps.md
- create mode 100644 docs/interop/bitmaps.rst
-
-diff --git a/docs/devel/bitmaps.md b/docs/devel/bitmaps.md
-deleted file mode 100644
-index a2e8d51..0000000
---- a/docs/devel/bitmaps.md
-+++ /dev/null
-@@ -1,505 +0,0 @@
--<!--
--Copyright 2015 John Snow <jsnow@redhat.com> and Red Hat, Inc.
--All rights reserved.
--
--This file is licensed via The FreeBSD Documentation License, the full text of
--which is included at the end of this document.
---->
--
--# Dirty Bitmaps and Incremental Backup
--
--* Dirty Bitmaps are objects that track which data needs to be backed up for the
--  next incremental backup.
--
--* Dirty bitmaps can be created at any time and attached to any node
--  (not just complete drives.)
--
--## Dirty Bitmap Names
--
--* A dirty bitmap's name is unique to the node, but bitmaps attached to different
--  nodes can share the same name.
--
--* Dirty bitmaps created for internal use by QEMU may be anonymous and have no
--  name, but any user-created bitmaps may not be. There can be any number of
--  anonymous bitmaps per node.
--
--* The name of a user-created bitmap must not be empty ("").
--
--## Bitmap Modes
--
--* A Bitmap can be "frozen," which means that it is currently in-use by a backup
--  operation and cannot be deleted, renamed, written to, reset,
--  etc.
--
--* The normal operating mode for a bitmap is "active."
--
--## Basic QMP Usage
--
--### Supported Commands ###
--
--* block-dirty-bitmap-add
--* block-dirty-bitmap-remove
--* block-dirty-bitmap-clear
--
--### Creation
--
--* To create a new bitmap, enabled, on the drive with id=drive0:
--
--```json
--{ "execute": "block-dirty-bitmap-add",
--  "arguments": {
--    "node": "drive0",
--    "name": "bitmap0"
--  }
--}
--```
--
--* This bitmap will have a default granularity that matches the cluster size of
--  its associated drive, if available, clamped to between [4KiB, 64KiB].
--  The current default for qcow2 is 64KiB.
--
--* To create a new bitmap that tracks changes in 32KiB segments:
--
--```json
--{ "execute": "block-dirty-bitmap-add",
--  "arguments": {
--    "node": "drive0",
--    "name": "bitmap0",
--    "granularity": 32768
--  }
--}
--```
--
--### Deletion
--
--* Bitmaps that are frozen cannot be deleted.
--
--* Deleting the bitmap does not impact any other bitmaps attached to the same
--  node, nor does it affect any backups already created from this node.
--
--* Because bitmaps are only unique to the node to which they are attached,
--  you must specify the node/drive name here, too.
--
--```json
--{ "execute": "block-dirty-bitmap-remove",
--  "arguments": {
--    "node": "drive0",
--    "name": "bitmap0"
--  }
--}
--```
--
--### Resetting
--
--* Resetting a bitmap will clear all information it holds.
--
--* An incremental backup created from an empty bitmap will copy no data,
--  as if nothing has changed.
--
--```json
--{ "execute": "block-dirty-bitmap-clear",
--  "arguments": {
--    "node": "drive0",
--    "name": "bitmap0"
--  }
--}
--```
--
--## Transactions
--
--### Justification
--
--Bitmaps can be safely modified when the VM is paused or halted by using
--the basic QMP commands. For instance, you might perform the following actions:
--
--1. Boot the VM in a paused state.
--2. Create a full drive backup of drive0.
--3. Create a new bitmap attached to drive0.
--4. Resume execution of the VM.
--5. Incremental backups are ready to be created.
--
--At this point, the bitmap and drive backup would be correctly in sync,
--and incremental backups made from this point forward would be correctly aligned
--to the full drive backup.
--
--This is not particularly useful if we decide we want to start incremental
--backups after the VM has been running for a while, for which we will need to
--perform actions such as the following:
--
--1. Boot the VM and begin execution.
--2. Using a single transaction, perform the following operations:
--    * Create bitmap0.
--    * Create a full drive backup of drive0.
--3. Incremental backups are now ready to be created.
--
--### Supported Bitmap Transactions
--
--* block-dirty-bitmap-add
--* block-dirty-bitmap-clear
--
--The usages are identical to their respective QMP commands, but see below
--for examples.
--
--### Example: New Incremental Backup
--
--As outlined in the justification, perhaps we want to create a new incremental
--backup chain attached to a drive.
--
--```json
--{ "execute": "transaction",
--  "arguments": {
--    "actions": [
--      {"type": "block-dirty-bitmap-add",
--       "data": {"node": "drive0", "name": "bitmap0"} },
--      {"type": "drive-backup",
--       "data": {"device": "drive0", "target": "/path/to/full_backup.img",
--                "sync": "full", "format": "qcow2"} }
--    ]
--  }
--}
--```
--
--### Example: New Incremental Backup Anchor Point
--
--Maybe we just want to create a new full backup with an existing bitmap and
--want to reset the bitmap to track the new chain.
--
--```json
--{ "execute": "transaction",
--  "arguments": {
--    "actions": [
--      {"type": "block-dirty-bitmap-clear",
--       "data": {"node": "drive0", "name": "bitmap0"} },
--      {"type": "drive-backup",
--       "data": {"device": "drive0", "target": "/path/to/new_full_backup.img",
--                "sync": "full", "format": "qcow2"} }
--    ]
--  }
--}
--```
--
--## Incremental Backups
--
--The star of the show.
--
--**Nota Bene!** Only incremental backups of entire drives are supported for now.
--So despite the fact that you can attach a bitmap to any arbitrary node, they are
--only currently useful when attached to the root node. This is because
--drive-backup only supports drives/devices instead of arbitrary nodes.
--
--### Example: First Incremental Backup
--
--1. Create a full backup and sync it to the dirty bitmap, as in the transactional
--examples above; or with the VM offline, manually create a full copy and then
--create a new bitmap before the VM begins execution.
--
--    * Let's assume the full backup is named 'full_backup.img'.
--    * Let's assume the bitmap you created is 'bitmap0' attached to 'drive0'.
--
--2. Create a destination image for the incremental backup that utilizes the
--full backup as a backing image.
--
--    * Let's assume it is named 'incremental.0.img'.
--
--    ```sh
--    # qemu-img create -f qcow2 incremental.0.img -b full_backup.img -F qcow2
--    ```
--
--3. Issue the incremental backup command:
--
--    ```json
--    { "execute": "drive-backup",
--      "arguments": {
--        "device": "drive0",
--        "bitmap": "bitmap0",
--        "target": "incremental.0.img",
--        "format": "qcow2",
--        "sync": "incremental",
--        "mode": "existing"
--      }
--    }
--    ```
--
--### Example: Second Incremental Backup
--
--1. Create a new destination image for the incremental backup that points to the
--   previous one, e.g.: 'incremental.1.img'
--
--    ```sh
--    # qemu-img create -f qcow2 incremental.1.img -b incremental.0.img -F qcow2
--    ```
--
--2. Issue a new incremental backup command. The only difference here is that we
--   have changed the target image below.
--
--    ```json
--    { "execute": "drive-backup",
--      "arguments": {
--        "device": "drive0",
--        "bitmap": "bitmap0",
--        "target": "incremental.1.img",
--        "format": "qcow2",
--        "sync": "incremental",
--        "mode": "existing"
--      }
--    }
--    ```
--
--## Errors
--
--* In the event of an error that occurs after a backup job is successfully
--  launched, either by a direct QMP command or a QMP transaction, the user
--  will receive a BLOCK_JOB_COMPLETE event with a failure message, accompanied
--  by a BLOCK_JOB_ERROR event.
--
--* In the case of an event being cancelled, the user will receive a
--  BLOCK_JOB_CANCELLED event instead of a pair of COMPLETE and ERROR events.
--
--* In either case, the incremental backup data contained within the bitmap is
--  safely rolled back, and the data within the bitmap is not lost. The image
--  file created for the failed attempt can be safely deleted.
--
--* Once the underlying problem is fixed (e.g. more storage space is freed up),
--  you can simply retry the incremental backup command with the same bitmap.
--
--### Example
--
--1. Create a target image:
--
--    ```sh
--    # qemu-img create -f qcow2 incremental.0.img -b full_backup.img -F qcow2
--    ```
--
--2. Attempt to create an incremental backup via QMP:
--
--    ```json
--    { "execute": "drive-backup",
--      "arguments": {
--        "device": "drive0",
--        "bitmap": "bitmap0",
--        "target": "incremental.0.img",
--        "format": "qcow2",
--        "sync": "incremental",
--        "mode": "existing"
--      }
--    }
--    ```
--
--3. Receive an event notifying us of failure:
--
--    ```json
--    { "timestamp": { "seconds": 1424709442, "microseconds": 844524 },
--      "data": { "speed": 0, "offset": 0, "len": 67108864,
--                "error": "No space left on device",
--                "device": "drive1", "type": "backup" },
--      "event": "BLOCK_JOB_COMPLETED" }
--    ```
--
--4. Delete the failed incremental, and re-create the image.
--
--    ```sh
--    # rm incremental.0.img
--    # qemu-img create -f qcow2 incremental.0.img -b full_backup.img -F qcow2
--    ```
--
--5. Retry the command after fixing the underlying problem,
--   such as freeing up space on the backup volume:
--
--    ```json
--    { "execute": "drive-backup",
--      "arguments": {
--        "device": "drive0",
--        "bitmap": "bitmap0",
--        "target": "incremental.0.img",
--        "format": "qcow2",
--        "sync": "incremental",
--        "mode": "existing"
--      }
--    }
--    ```
--
--6. Receive confirmation that the job completed successfully:
--
--    ```json
--    { "timestamp": { "seconds": 1424709668, "microseconds": 526525 },
--      "data": { "device": "drive1", "type": "backup",
--                "speed": 0, "len": 67108864, "offset": 67108864},
--      "event": "BLOCK_JOB_COMPLETED" }
--    ```
--
--### Partial Transactional Failures
--
--* Sometimes, a transaction will succeed in launching and return success,
--  but then later the backup jobs themselves may fail. It is possible that
--  a management application may have to deal with a partial backup failure
--  after a successful transaction.
--
--* If multiple backup jobs are specified in a single transaction, when one of
--  them fails, it will not interact with the other backup jobs in any way.
--
--* The job(s) that succeeded will clear the dirty bitmap associated with the
--  operation, but the job(s) that failed will not. It is not "safe" to delete
--  any incremental backups that were created successfully in this scenario,
--  even though others failed.
--
--#### Example
--
--* QMP example highlighting two backup jobs:
--
--    ```json
--    { "execute": "transaction",
--      "arguments": {
--        "actions": [
--          { "type": "drive-backup",
--            "data": { "device": "drive0", "bitmap": "bitmap0",
--                      "format": "qcow2", "mode": "existing",
--                      "sync": "incremental", "target": "d0-incr-1.qcow2" } },
--          { "type": "drive-backup",
--            "data": { "device": "drive1", "bitmap": "bitmap1",
--                      "format": "qcow2", "mode": "existing",
--                      "sync": "incremental", "target": "d1-incr-1.qcow2" } },
--        ]
--      }
--    }
--    ```
--
--* QMP example response, highlighting one success and one failure:
--    * Acknowledgement that the Transaction was accepted and jobs were launched:
--        ```json
--        { "return": {} }
--        ```
--
--    * Later, QEMU sends notice that the first job was completed:
--        ```json
--        { "timestamp": { "seconds": 1447192343, "microseconds": 615698 },
--          "data": { "device": "drive0", "type": "backup",
--                     "speed": 0, "len": 67108864, "offset": 67108864 },
--          "event": "BLOCK_JOB_COMPLETED"
--        }
--        ```
--
--    * Later yet, QEMU sends notice that the second job has failed:
--        ```json
--        { "timestamp": { "seconds": 1447192399, "microseconds": 683015 },
--          "data": { "device": "drive1", "action": "report",
--                    "operation": "read" },
--          "event": "BLOCK_JOB_ERROR" }
--        ```
--
--        ```json
--        { "timestamp": { "seconds": 1447192399, "microseconds": 685853 },
--          "data": { "speed": 0, "offset": 0, "len": 67108864,
--                    "error": "Input/output error",
--                    "device": "drive1", "type": "backup" },
--          "event": "BLOCK_JOB_COMPLETED" }
--
--* In the above example, "d0-incr-1.qcow2" is valid and must be kept,
--  but "d1-incr-1.qcow2" is invalid and should be deleted. If a VM-wide
--  incremental backup of all drives at a point-in-time is to be made,
--  new backups for both drives will need to be made, taking into account
--  that a new incremental backup for drive0 needs to be based on top of
--  "d0-incr-1.qcow2."
--
--### Grouped Completion Mode
--
--* While jobs launched by transactions normally complete or fail on their own,
--  it is possible to instruct them to complete or fail together as a group.
--
--* QMP transactions take an optional properties structure that can affect
--  the semantics of the transaction.
--
--* The "completion-mode" transaction property can be either "individual"
--  which is the default, legacy behavior described above, or "grouped,"
--  a new behavior detailed below.
--
--* Delayed Completion: In grouped completion mode, no jobs will report
--  success until all jobs are ready to report success.
--
--* Grouped failure: If any job fails in grouped completion mode, all remaining
--  jobs will be cancelled. Any incremental backups will restore their dirty
--  bitmap objects as if no backup command was ever issued.
--
--    * Regardless of if QEMU reports a particular incremental backup job as
--      CANCELLED or as an ERROR, the in-memory bitmap will be restored.
--
--#### Example
--
--* Here's the same example scenario from above with the new property:
--
--    ```json
--    { "execute": "transaction",
--      "arguments": {
--        "actions": [
--          { "type": "drive-backup",
--            "data": { "device": "drive0", "bitmap": "bitmap0",
--                      "format": "qcow2", "mode": "existing",
--                      "sync": "incremental", "target": "d0-incr-1.qcow2" } },
--          { "type": "drive-backup",
--            "data": { "device": "drive1", "bitmap": "bitmap1",
--                      "format": "qcow2", "mode": "existing",
--                      "sync": "incremental", "target": "d1-incr-1.qcow2" } },
--        ],
--        "properties": {
--          "completion-mode": "grouped"
--        }
--      }
--    }
--    ```
--
--* QMP example response, highlighting a failure for drive2:
--    * Acknowledgement that the Transaction was accepted and jobs were launched:
--        ```json
--        { "return": {} }
--        ```
--
--    * Later, QEMU sends notice that the second job has errored out,
--      but that the first job was also cancelled:
--        ```json
--        { "timestamp": { "seconds": 1447193702, "microseconds": 632377 },
--          "data": { "device": "drive1", "action": "report",
--                    "operation": "read" },
--          "event": "BLOCK_JOB_ERROR" }
--        ```
--
--        ```json
--        { "timestamp": { "seconds": 1447193702, "microseconds": 640074 },
--          "data": { "speed": 0, "offset": 0, "len": 67108864,
--                    "error": "Input/output error",
--                    "device": "drive1", "type": "backup" },
--          "event": "BLOCK_JOB_COMPLETED" }
--        ```
--
--        ```json
--        { "timestamp": { "seconds": 1447193702, "microseconds": 640163 },
--          "data": { "device": "drive0", "type": "backup", "speed": 0,
--                    "len": 67108864, "offset": 16777216 },
--          "event": "BLOCK_JOB_CANCELLED" }
--        ```
--
--<!--
--The FreeBSD Documentation License
--
--Redistribution and use in source (Markdown) and 'compiled' forms (SGML, HTML,
--PDF, PostScript, RTF and so forth) with or without modification, are permitted
--provided that the following conditions are met:
--
--Redistributions of source code (Markdown) must retain the above copyright
--notice, this list of conditions and the following disclaimer of this file
--unmodified.
--
--Redistributions in compiled form (transformed to other DTDs, converted to PDF,
--PostScript, RTF and other formats) must reproduce the above copyright notice,
--this list of conditions and the following disclaimer in the documentation and/or
--other materials provided with the distribution.
--
--THIS DOCUMENTATION IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
--AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
--IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR  PURPOSE ARE
--DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS  BE LIABLE
--FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
--DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
--SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
--CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
--OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
--THIS DOCUMENTATION, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
---->
-diff --git a/docs/interop/bitmaps.rst b/docs/interop/bitmaps.rst
-new file mode 100644
-index 0000000..b154d54
---- /dev/null
-+++ b/docs/interop/bitmaps.rst
-@@ -0,0 +1,555 @@
-+..
-+   Copyright 2015 John Snow <jsnow@redhat.com> and Red Hat, Inc.
-+   All rights reserved.
-+
-+   This file is licensed via The FreeBSD Documentation License, the full
-+   text of which is included at the end of this document.
-+
-+====================================
-+Dirty Bitmaps and Incremental Backup
-+====================================
-+
-+-  Dirty Bitmaps are objects that track which data needs to be backed up
-+   for the next incremental backup.
-+
-+-  Dirty bitmaps can be created at any time and attached to any node
-+   (not just complete drives.)
-+
-+.. contents::
-+
-+Dirty Bitmap Names
-+------------------
-+
-+-  A dirty bitmap's name is unique to the node, but bitmaps attached to
-+   different nodes can share the same name.
-+
-+-  Dirty bitmaps created for internal use by QEMU may be anonymous and
-+   have no name, but any user-created bitmaps may not be. There can be
-+   any number of anonymous bitmaps per node.
-+
-+-  The name of a user-created bitmap must not be empty ("").
-+
-+Bitmap Modes
-+------------
-+
-+-  A bitmap can be "frozen," which means that it is currently in-use by
-+   a backup operation and cannot be deleted, renamed, written to, reset,
-+   etc.
-+
-+-  The normal operating mode for a bitmap is "active."
-+
-+Basic QMP Usage
-+---------------
-+
-+Supported Commands
-+~~~~~~~~~~~~~~~~~~
-+
-+- ``block-dirty-bitmap-add``
-+- ``block-dirty-bitmap-remove``
-+- ``block-dirty-bitmap-clear``
-+
-+Creation
-+~~~~~~~~
-+
-+-  To create a new bitmap, enabled, on the drive with id=drive0:
-+
-+.. code:: json
-+
-+    { "execute": "block-dirty-bitmap-add",
-+      "arguments": {
-+        "node": "drive0",
-+        "name": "bitmap0"
-+      }
-+    }
-+
-+-  This bitmap will have a default granularity that matches the cluster
-+   size of its associated drive, if available, clamped to between [4KiB,
-+   64KiB]. The current default for qcow2 is 64KiB.
-+
-+-  To create a new bitmap that tracks changes in 32KiB segments:
-+
-+.. code:: json
-+
-+    { "execute": "block-dirty-bitmap-add",
-+      "arguments": {
-+        "node": "drive0",
-+        "name": "bitmap0",
-+        "granularity": 32768
-+      }
-+    }
-+
-+Deletion
-+~~~~~~~~
-+
-+-  Bitmaps that are frozen cannot be deleted.
-+
-+-  Deleting the bitmap does not impact any other bitmaps attached to the
-+   same node, nor does it affect any backups already created from this
-+   node.
-+
-+-  Because bitmaps are only unique to the node to which they are
-+   attached, you must specify the node/drive name here, too.
-+
-+.. code:: json
-+
-+    { "execute": "block-dirty-bitmap-remove",
-+      "arguments": {
-+        "node": "drive0",
-+        "name": "bitmap0"
-+      }
-+    }
-+
-+Resetting
-+~~~~~~~~~
-+
-+-  Resetting a bitmap will clear all information it holds.
-+
-+-  An incremental backup created from an empty bitmap will copy no data,
-+   as if nothing has changed.
-+
-+.. code:: json
-+
-+    { "execute": "block-dirty-bitmap-clear",
-+      "arguments": {
-+        "node": "drive0",
-+        "name": "bitmap0"
-+      }
-+    }
-+
-+Transactions
-+------------
-+
-+Justification
-+~~~~~~~~~~~~~
-+
-+Bitmaps can be safely modified when the VM is paused or halted by using
-+the basic QMP commands. For instance, you might perform the following
-+actions:
-+
-+1. Boot the VM in a paused state.
-+2. Create a full drive backup of drive0.
-+3. Create a new bitmap attached to drive0.
-+4. Resume execution of the VM.
-+5. Incremental backups are ready to be created.
-+
-+At this point, the bitmap and drive backup would be correctly in sync,
-+and incremental backups made from this point forward would be correctly
-+aligned to the full drive backup.
-+
-+This is not particularly useful if we decide we want to start
-+incremental backups after the VM has been running for a while, for which
-+we will need to perform actions such as the following:
-+
-+1. Boot the VM and begin execution.
-+2. Using a single transaction, perform the following operations:
-+
-+   -  Create ``bitmap0``.
-+   -  Create a full drive backup of ``drive0``.
-+
-+3. Incremental backups are now ready to be created.
-+
-+Supported Bitmap Transactions
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+-  ``block-dirty-bitmap-add``
-+-  ``block-dirty-bitmap-clear``
-+
-+The usages are identical to their respective QMP commands, but see below
-+for examples.
-+
-+Example: New Incremental Backup
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+As outlined in the justification, perhaps we want to create a new
-+incremental backup chain attached to a drive.
-+
-+.. code:: json
-+
-+    { "execute": "transaction",
-+      "arguments": {
-+        "actions": [
-+          {"type": "block-dirty-bitmap-add",
-+           "data": {"node": "drive0", "name": "bitmap0"} },
-+          {"type": "drive-backup",
-+           "data": {"device": "drive0", "target": "/path/to/full_backup.img",
-+                    "sync": "full", "format": "qcow2"} }
-+        ]
-+      }
-+    }
-+
-+Example: New Incremental Backup Anchor Point
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+Maybe we just want to create a new full backup with an existing bitmap
-+and want to reset the bitmap to track the new chain.
-+
-+.. code:: json
-+
-+    { "execute": "transaction",
-+      "arguments": {
-+        "actions": [
-+          {"type": "block-dirty-bitmap-clear",
-+           "data": {"node": "drive0", "name": "bitmap0"} },
-+          {"type": "drive-backup",
-+           "data": {"device": "drive0", "target": "/path/to/new_full_backup.img",
-+                    "sync": "full", "format": "qcow2"} }
-+        ]
-+      }
-+    }
-+
-+Incremental Backups
-+-------------------
-+
-+The star of the show.
-+
-+**Nota Bene!** Only incremental backups of entire drives are supported
-+for now. So despite the fact that you can attach a bitmap to any
-+arbitrary node, they are only currently useful when attached to the root
-+node. This is because drive-backup only supports drives/devices instead
-+of arbitrary nodes.
-+
-+Example: First Incremental Backup
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+1. Create a full backup and sync it to the dirty bitmap, as in the
-+   transactional examples above; or with the VM offline, manually create
-+   a full copy and then create a new bitmap before the VM begins
-+   execution.
-+
-+   -  Let's assume the full backup is named ``full_backup.img``.
-+   -  Let's assume the bitmap you created is ``bitmap0`` attached to
-+      ``drive0``.
-+
-+2. Create a destination image for the incremental backup that utilizes
-+   the full backup as a backing image.
-+
-+   -  Let's assume the new incremental image is named
-+      ``incremental.0.img``.
-+
-+   .. code:: bash
-+
-+       $ qemu-img create -f qcow2 incremental.0.img -b full_backup.img -F qcow2
-+
-+3. Issue the incremental backup command:
-+
-+   .. code:: json
-+
-+       { "execute": "drive-backup",
-+         "arguments": {
-+           "device": "drive0",
-+           "bitmap": "bitmap0",
-+           "target": "incremental.0.img",
-+           "format": "qcow2",
-+           "sync": "incremental",
-+           "mode": "existing"
-+         }
-+       }
-+
-+Example: Second Incremental Backup
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+1. Create a new destination image for the incremental backup that points
-+   to the previous one, e.g.: ``incremental.1.img``
-+
-+   .. code:: bash
-+
-+       $ qemu-img create -f qcow2 incremental.1.img -b incremental.0.img -F qcow2
-+
-+2. Issue a new incremental backup command. The only difference here is
-+   that we have changed the target image below.
-+
-+   .. code:: json
-+
-+       { "execute": "drive-backup",
-+         "arguments": {
-+           "device": "drive0",
-+           "bitmap": "bitmap0",
-+           "target": "incremental.1.img",
-+           "format": "qcow2",
-+           "sync": "incremental",
-+           "mode": "existing"
-+         }
-+       }
-+
-+Errors
-+------
-+
-+-  In the event of an error that occurs after a backup job is
-+   successfully launched, either by a direct QMP command or a QMP
-+   transaction, the user will receive a ``BLOCK_JOB_COMPLETE`` event with
-+   a failure message, accompanied by a ``BLOCK_JOB_ERROR`` event.
-+
-+-  In the case of an event being cancelled, the user will receive a
-+   ``BLOCK_JOB_CANCELLED`` event instead of a pair of COMPLETE and ERROR
-+   events.
-+
-+-  In either case, the incremental backup data contained within the
-+   bitmap is safely rolled back, and the data within the bitmap is not
-+   lost. The image file created for the failed attempt can be safely
-+   deleted.
-+
-+-  Once the underlying problem is fixed (e.g. more storage space is
-+   freed up), you can simply retry the incremental backup command with
-+   the same bitmap.
-+
-+Example
-+~~~~~~~
-+
-+1. Create a target image:
-+
-+   .. code:: bash
-+
-+       $ qemu-img create -f qcow2 incremental.0.img -b full_backup.img -F qcow2
-+
-+2. Attempt to create an incremental backup via QMP:
-+
-+   .. code:: json
-+
-+       { "execute": "drive-backup",
-+         "arguments": {
-+           "device": "drive0",
-+           "bitmap": "bitmap0",
-+           "target": "incremental.0.img",
-+           "format": "qcow2",
-+           "sync": "incremental",
-+           "mode": "existing"
-+         }
-+       }
-+
-+3. Receive an event notifying us of failure:
-+
-+   .. code:: json
-+
-+       { "timestamp": { "seconds": 1424709442, "microseconds": 844524 },
-+         "data": { "speed": 0, "offset": 0, "len": 67108864,
-+                   "error": "No space left on device",
-+                   "device": "drive1", "type": "backup" },
-+         "event": "BLOCK_JOB_COMPLETED" }
-+
-+4. Delete the failed incremental, and re-create the image.
-+
-+   .. code:: bash
-+
-+       $ rm incremental.0.img
-+       $ qemu-img create -f qcow2 incremental.0.img -b full_backup.img -F qcow2
-+
-+5. Retry the command after fixing the underlying problem, such as
-+   freeing up space on the backup volume:
-+
-+   .. code:: json
-+
-+       { "execute": "drive-backup",
-+         "arguments": {
-+           "device": "drive0",
-+           "bitmap": "bitmap0",
-+           "target": "incremental.0.img",
-+           "format": "qcow2",
-+           "sync": "incremental",
-+           "mode": "existing"
-+         }
-+       }
-+
-+6. Receive confirmation that the job completed successfully:
-+
-+   .. code:: json
-+
-+       { "timestamp": { "seconds": 1424709668, "microseconds": 526525 },
-+         "data": { "device": "drive1", "type": "backup",
-+                   "speed": 0, "len": 67108864, "offset": 67108864},
-+         "event": "BLOCK_JOB_COMPLETED" }
-+
-+Partial Transactional Failures
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+-  Sometimes, a transaction will succeed in launching and return
-+   success, but then later the backup jobs themselves may fail. It is
-+   possible that a management application may have to deal with a
-+   partial backup failure after a successful transaction.
-+
-+-  If multiple backup jobs are specified in a single transaction, when
-+   one of them fails, it will not interact with the other backup jobs in
-+   any way.
-+
-+-  The job(s) that succeeded will clear the dirty bitmap associated with
-+   the operation, but the job(s) that failed will not. It is not "safe"
-+   to delete any incremental backups that were created successfully in
-+   this scenario, even though others failed.
-+
-+Example
-+^^^^^^^
-+
-+-  QMP example highlighting two backup jobs:
-+
-+   .. code:: json
-+
-+       { "execute": "transaction",
-+         "arguments": {
-+           "actions": [
-+             { "type": "drive-backup",
-+               "data": { "device": "drive0", "bitmap": "bitmap0",
-+                         "format": "qcow2", "mode": "existing",
-+                         "sync": "incremental", "target": "d0-incr-1.qcow2" } },
-+             { "type": "drive-backup",
-+               "data": { "device": "drive1", "bitmap": "bitmap1",
-+                         "format": "qcow2", "mode": "existing",
-+                         "sync": "incremental", "target": "d1-incr-1.qcow2" } },
-+           ]
-+         }
-+       }
-+
-+-  QMP example response, highlighting one success and one failure:
-+
-+   -  Acknowledgement that the Transaction was accepted and jobs were
-+      launched:
-+
-+      .. code:: json
-+
-+          { "return": {} }
-+
-+   -  Later, QEMU sends notice that the first job was completed:
-+
-+      .. code:: json
-+
-+          { "timestamp": { "seconds": 1447192343, "microseconds": 615698 },
-+            "data": { "device": "drive0", "type": "backup",
-+                       "speed": 0, "len": 67108864, "offset": 67108864 },
-+            "event": "BLOCK_JOB_COMPLETED"
-+          }
-+
-+   -  Later yet, QEMU sends notice that the second job has failed:
-+
-+      .. code:: json
-+
-+          { "timestamp": { "seconds": 1447192399, "microseconds": 683015 },
-+            "data": { "device": "drive1", "action": "report",
-+                      "operation": "read" },
-+            "event": "BLOCK_JOB_ERROR" }
-+
-+      .. code:: json
-+
-+          { "timestamp": { "seconds": 1447192399, "microseconds":
-+          685853 }, "data": { "speed": 0, "offset": 0, "len": 67108864,
-+          "error": "Input/output error", "device": "drive1", "type":
-+          "backup" }, "event": "BLOCK_JOB_COMPLETED" }
-+
-+-  In the above example, ``d0-incr-1.qcow2`` is valid and must be kept,
-+   but ``d1-incr-1.qcow2`` is invalid and should be deleted. If a VM-wide
-+   incremental backup of all drives at a point-in-time is to be made,
-+   new backups for both drives will need to be made, taking into account
-+   that a new incremental backup for drive0 needs to be based on top of
-+   ``d0-incr-1.qcow2``.
-+
-+Grouped Completion Mode
-+~~~~~~~~~~~~~~~~~~~~~~~
-+
-+-  While jobs launched by transactions normally complete or fail on
-+   their own, it is possible to instruct them to complete or fail
-+   together as a group.
-+
-+-  QMP transactions take an optional properties structure that can
-+   affect the semantics of the transaction.
-+
-+-  The "completion-mode" transaction property can be either "individual"
-+   which is the default, legacy behavior described above, or "grouped,"
-+   a new behavior detailed below.
-+
-+-  Delayed Completion: In grouped completion mode, no jobs will report
-+   success until all jobs are ready to report success.
-+
-+-  Grouped failure: If any job fails in grouped completion mode, all
-+   remaining jobs will be cancelled. Any incremental backups will
-+   restore their dirty bitmap objects as if no backup command was ever
-+   issued.
-+
-+   -  Regardless of if QEMU reports a particular incremental backup job
-+      as CANCELLED or as an ERROR, the in-memory bitmap will be
-+      restored.
-+
-+Example
-+^^^^^^^
-+
-+-  Here's the same example scenario from above with the new property:
-+
-+   .. code:: json
-+
-+       { "execute": "transaction",
-+         "arguments": {
-+           "actions": [
-+             { "type": "drive-backup",
-+               "data": { "device": "drive0", "bitmap": "bitmap0",
-+                         "format": "qcow2", "mode": "existing",
-+                         "sync": "incremental", "target": "d0-incr-1.qcow2" } },
-+             { "type": "drive-backup",
-+               "data": { "device": "drive1", "bitmap": "bitmap1",
-+                         "format": "qcow2", "mode": "existing",
-+                         "sync": "incremental", "target": "d1-incr-1.qcow2" } },
-+           ],
-+           "properties": {
-+             "completion-mode": "grouped"
-+           }
-+         }
-+       }
-+
-+-  QMP example response, highlighting a failure for ``drive2``:
-+
-+   -  Acknowledgement that the Transaction was accepted and jobs were
-+      launched:
-+
-+      .. code:: json
-+
-+          { "return": {} }
-+
-+   -  Later, QEMU sends notice that the second job has errored out, but
-+      that the first job was also cancelled:
-+
-+      .. code:: json
-+
-+          { "timestamp": { "seconds": 1447193702, "microseconds": 632377 },
-+            "data": { "device": "drive1", "action": "report",
-+                      "operation": "read" },
-+            "event": "BLOCK_JOB_ERROR" }
-+
-+      .. code:: json
-+
-+          { "timestamp": { "seconds": 1447193702, "microseconds": 640074 },
-+            "data": { "speed": 0, "offset": 0, "len": 67108864,
-+                      "error": "Input/output error",
-+                      "device": "drive1", "type": "backup" },
-+            "event": "BLOCK_JOB_COMPLETED" }
-+
-+      .. code:: json
-+
-+          { "timestamp": { "seconds": 1447193702, "microseconds": 640163 },
-+            "data": { "device": "drive0", "type": "backup", "speed": 0,
-+                      "len": 67108864, "offset": 16777216 },
-+            "event": "BLOCK_JOB_CANCELLED" }
-+
-+.. raw:: html
-+
-+   <!--
-+   The FreeBSD Documentation License
-+
-+   Redistribution and use in source (Markdown) and 'compiled' forms (SGML, HTML,
-+   PDF, PostScript, RTF and so forth) with or without modification, are permitted
-+   provided that the following conditions are met:
-+
-+   Redistributions of source code (Markdown) must retain the above copyright
-+   notice, this list of conditions and the following disclaimer of this file
-+   unmodified.
-+
-+   Redistributions in compiled form (transformed to other DTDs, converted to PDF,
-+   PostScript, RTF and other formats) must reproduce the above copyright notice,
-+   this list of conditions and the following disclaimer in the documentation and/or
-+   other materials provided with the distribution.
-+
-+   THIS DOCUMENTATION IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-+   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-+   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR  PURPOSE ARE
-+   DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS  BE LIABLE
-+   FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-+   DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-+   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-+   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-+   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-+   THIS DOCUMENTATION, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-+   -->
 -- 
-2.7.5
+MST
