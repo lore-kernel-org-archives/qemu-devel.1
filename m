@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dQLcY-0002KE-HL
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 18:39:39 -0400
+	(envelope-from <quintela@redhat.com>) id 1dQLfr-0003ME-TZ
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 18:43:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dQLcV-0005cr-Eb
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 18:39:38 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59072)
+	(envelope-from <quintela@redhat.com>) id 1dQLfo-0007Ek-TK
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 18:43:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42470)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1dQLcV-0005cO-84
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 18:39:35 -0400
-Date: Wed, 28 Jun 2017 15:39:31 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <149868266150.23385.2902323487462062636.stgit@bahia.lan>
-Message-ID: <alpine.DEB.2.10.1706281539240.2919@sstabellini-ThinkPad-X260>
-References: <149868263738.23385.16723444264552987199.stgit@bahia.lan>
-	<149868266150.23385.2902323487462062636.stgit@bahia.lan>
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dQLfo-0007ET-Mn
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 18:43:00 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 733EDC0587F1
+	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 22:42:59 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170628190616.GN12152@localhost.localdomain> (Eduardo Habkost's
+	message of "Wed, 28 Jun 2017 16:06:16 -0300")
+References: <1498536619-14548-1-git-send-email-peterx@redhat.com>
+	<1498536619-14548-10-git-send-email-peterx@redhat.com>
+	<20170628190616.GN12152@localhost.localdomain>
+Reply-To: quintela@redhat.com
+Date: Thu, 29 Jun 2017 00:42:56 +0200
+Message-ID: <878tkb68en.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v5 2/5] virtio-9p: message header is 7-byte
- long
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v6 09/10] migration: merge
+ enforce_config_section somewhat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,77 +36,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Wed, 28 Jun 2017, Greg Kurz wrote:
-> The 9p spec at http://man.cat-v.org/plan_9/5/intro reads:
-> 
->  "Each 9P message begins with a four-byte size field specify-
->   ing the length in bytes of the complete message including
->   the four bytes of the size field itself.  The next byte is
->   the message type, one of the constants in the enumeration in
->   the include file <fcall.h>.  The next two bytes are an iden-
->   tifying tag, described below."
-> 
-> ie, each message starts with a 7-byte long header.
-> 
-> The core 9P code already assumes this pretty much everywhere. This patch
-> does the following:
-> - makes the assumption explicit in the common 9p.h header, since it isn't
->   related to the transport
-> - open codes the header size in handle_9p_output() and hardens the sanity
->   check on the space needed for the reply message
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-Acked-by: Stefano Stabellini <sstabellini@kernel.org>
+>
+> So, this is a case where a user-provided config option (-machine
+> enforce-config-section) should trigger a different default in another
+> class (migration.send-configuration).
+>
+> Also, the new default triggered by -machine has a very specific
+> priority:
+>
+> * AccelClass::global_props must not override "-machine enforce-config-section=on"
+> * MachineClass::compat_props must not override
+>   "-machine enforce-config-section=on"
+>
+> We must also decide in advance what should be result of:
+> * "-machine enforce-config-section=on -global migration.send-configuration=off"
+> * "-machine enforce-config-section=off -global migration.send-configuration=on"
+> * "-global migration.send-configuration=off -machine enforce-config-section=off"
+> * "-global migration.send-configuration=on -machine enforce-config-section=on"
+
+BOOM!!!!!
+
+We use old configuration or new one.
 
 
-> ---
->  hw/9pfs/9p.h               |    5 +++++
->  hw/9pfs/virtio-9p-device.c |    8 +++-----
->  2 files changed, 8 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-> index c886ba78d2ee..aac1b0b2ce3d 100644
-> --- a/hw/9pfs/9p.h
-> +++ b/hw/9pfs/9p.h
-> @@ -124,6 +124,11 @@ typedef struct {
->      uint8_t id;
->      uint16_t tag_le;
->  } QEMU_PACKED P9MsgHeader;
-> +/* According to the specification, 9p messages start with a 7-byte header.
-> + * Since most of the code uses this header size in literal form, we must be
-> + * sure this is indeed the case.
-> + */
-> +QEMU_BUILD_BUG_ON(sizeof(P9MsgHeader) != 7);
->  
->  struct V9fsPDU
->  {
-> diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
-> index 3380bfc0c551..1a68c1622d3a 100644
-> --- a/hw/9pfs/virtio-9p-device.c
-> +++ b/hw/9pfs/virtio-9p-device.c
-> @@ -53,17 +53,15 @@ static void handle_9p_output(VirtIODevice *vdev, VirtQueue *vq)
->              goto out_free_pdu;
->          }
->  
-> -        if (elem->in_num == 0) {
-> +        if (iov_size(elem->in_sg, elem->in_num) < 7) {
->              virtio_error(vdev,
->                           "The guest sent a VirtFS request without space for "
->                           "the reply");
->              goto out_free_req;
->          }
-> -        QEMU_BUILD_BUG_ON(sizeof(out) != 7);
->  
-> -        len = iov_to_buf(elem->out_sg, elem->out_num, 0,
-> -                         &out, sizeof(out));
-> -        if (len != sizeof(out)) {
-> +        len = iov_to_buf(elem->out_sg, elem->out_num, 0, &out, 7);
-> +        if (len != 7) {
->              virtio_error(vdev, "The guest sent a malformed VirtFS request: "
->                           "header size is %zd, should be 7", len);
->              goto out_free_req;
-> 
+>
+> I'm not sure what we should decide about these 4 cases above, but I
+> believe it would be safer to encode that decision at the same place we
+> handle the priority between accel/machine/user globals:
+> register_global_properties() at vl.c.
+>
+>
+> Or maybe this extra complexity is a sign that we shouldn't try to add
+> extra magic to make -machine affect the "migration" object properties,
+> and keep the existing machine->enforce_config_section check in the
+> migration code?  I'm not sure.
+
+Not sure there either.  I preffer doing it in a single place, but I am
+not the expert here.
+
+Later, Juan.
