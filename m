@@ -1,35 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dQA86-0007W8-PI
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 06:23:28 -0400
+	(envelope-from <thuth@redhat.com>) id 1dQAe8-00074a-Kb
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 06:56:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dQA83-00009G-8R
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 06:23:26 -0400
-Received: from 1.mo4.mail-out.ovh.net ([178.33.248.196]:52247)
+	(envelope-from <thuth@redhat.com>) id 1dQAe4-00055V-7j
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 06:56:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33438)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dQA82-00008c-V1
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 06:23:23 -0400
-Received: from player759.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 5D1DC7CB75
-	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 12:23:21 +0200 (CEST)
-References: <20170622112648.24815-1-lvivier@redhat.com>
-	<caa25331-5005-78e8-fba2-19bf67116d92@redhat.com>
-	<20170623092124.GG12089@umbus>
-	<c0a0667e-8c60-a8e7-a041-caddac8c8b88@redhat.com>
-	<20170628014231.GA791@pacoca>
-	<a34435df-8944-ddac-e881-0a2338e4aad4@redhat.com>
-	<20170628081850.GJ12089@umbus>
-	<668938c1-f93e-86d1-4e4e-5715d5074587@kaod.org>
-	<e0f76eb1-2388-e512-3763-26e7232b1129@redhat.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <baf1e0b1-178b-28ae-f2a2-caadaaf9d213@kaod.org>
-Date: Wed, 28 Jun 2017 12:23:06 +0200
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dQAe3-00054f-VA
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 06:56:28 -0400
+From: Thomas Huth <thuth@redhat.com>
+References: <1498564100-10045-1-git-send-email-thuth@redhat.com>
+	<23ec1642-053c-a15a-c03f-d9e48d1447e7@linux.vnet.ibm.com>
+	<c664ff99-e98d-459d-2b07-306e0d00c5b7@redhat.com>
+	<29018087-c00b-abb2-47e6-4ebfc954ff1f@linux.vnet.ibm.com>
+	<b1bf85e6-20b8-a77c-d20b-ffc6fe570e9b@redhat.com>
+Message-ID: <0ead8e59-be76-f80a-3266-2df20ebb5581@redhat.com>
+Date: Wed, 28 Jun 2017 12:56:18 +0200
 MIME-Version: 1.0
-In-Reply-To: <e0f76eb1-2388-e512-3763-26e7232b1129@redhat.com>
+In-Reply-To: <b1bf85e6-20b8-a77c-d20b-ffc6fe570e9b@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc/cpu-models: set
- POWER9_v1.0 as POWER9 DD1
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 00/14] Implement network booting
+ directly into the s390-ccw BIOS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,121 +32,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>
-Cc: sursingh@redhat.com, joserz@linux.vnet.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, sbobroff@redhat.com
+To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Eric Farman <farman@linux.vnet.ibm.com>, Farhan Ali <alifm@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Jens Freimann <jfreiman@redhat.com>, David Hildenbrand <david@redhat.com>
 
-On 06/28/2017 11:18 AM, Laurent Vivier wrote:
-> On 28/06/2017 11:11, C=C3=A9dric Le Goater wrote:
->> On 06/28/2017 10:18 AM, David Gibson wrote:
->>> On Wed, Jun 28, 2017 at 09:09:24AM +0200, Thomas Huth wrote:
->>>> On 28.06.2017 03:42, joserz@linux.vnet.ibm.com wrote:
->>>>> On Fri, Jun 23, 2017 at 04:10:55PM +0200, Laurent Vivier wrote:
->>>>>> On 23/06/2017 11:21, David Gibson wrote:
->>>>>>> On Thu, Jun 22, 2017 at 01:31:24PM +0200, Thomas Huth wrote:
->>>>>>>> On 22.06.2017 13:26, Laurent Vivier wrote:
->>>>>>>>> CPU_POWERPC_POWER9_DD1 is 0x004E0100, so this is the POWER9 v1.=
-0.
->>>>>>>>>
->>>>>>>>> When we run qemu on a POWER9 DD1 host, we must use either
->>>>>>>>> "-cpu host" or "-cpu POWER9", but in the latter case it fails w=
-ith
->>>>>>>>>
->>>>>>>>>     Unable to find sPAPR CPU Core definition
->>>>>>>>>
->>>>>>>>> because POWER9 DD1 doesn't appear in the list of known CPUs.
->>>>>>>>>
->>>>>>>>> This patch fixes this by defining POWER9_v1.0 with POWER9 DD1
->>>>>>>>> PVR instead of CPU_POWERPC_POWER9_BASE.
->>>>>>>>>
->>>>>>>>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
->>>>>>>>> ---
->>>>>>>>>  target/ppc/cpu-models.c | 2 +-
->>>>>>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>>>>>>>
->>>>>>>>> diff --git a/target/ppc/cpu-models.c b/target/ppc/cpu-models.c
->>>>>>>>> index 4d3e635..a22363c 100644
->>>>>>>>> --- a/target/ppc/cpu-models.c
->>>>>>>>> +++ b/target/ppc/cpu-models.c
->>>>>>>>> @@ -1144,7 +1144,7 @@
->>>>>>>>>      POWERPC_DEF("970_v2.2",      CPU_POWERPC_970_v22,         =
-       970,
->>>>>>>>>                  "PowerPC 970 v2.2")
->>>>>>>>> =20
->>>>>>>>> -    POWERPC_DEF("POWER9_v1.0",   CPU_POWERPC_POWER9_BASE,     =
-       POWER9,
->>>>>>>>> +    POWERPC_DEF("POWER9_v1.0",   CPU_POWERPC_POWER9_DD1,      =
-       POWER9,
->>>>>>>>>                  "POWER9 v1.0")
->>>>>>>>> =20
->>>>>>>>>      POWERPC_DEF("970fx_v1.0",    CPU_POWERPC_970FX_v10,       =
-       970,
->>>>>>>>>
->>>>>>>>
->>>>>>>> I think this also makes sense for running in TCG mode to get a v=
-alid
->>>>>>>> real PVR there.
->>>>>>>
->>>>>>> I'm not so convinced.
->>>>>>>
->>>>>>> IIUC, this will make TCG default (for now) to a DD1 POWER9.  That=
-'s a)
->>>>>>> probably not what anyone wants - who'd select a buggy prototype a=
-nd b)
->>>>>>> not accurate - TCG does not implement DD1's bugs.
->>>>>>
->>>>>> According to the POWER8 user manual (I didn't fine the POWER9 one)=
-:
->>>>>>
->>>>>> "3.6.3.1 Processor Version Register (PVR)
->>>>>>
->>>>>> The processor revision level (PVR[16:31]) starts at x=E2=80=980100=
-=E2=80=99, indicating
->>>>>> revision =E2=80=981.0=E2=80=99. As revisions are made, bits [29:31=
-] will indicate minor
->>>>>> revisions. Similarly, bits [20:23] indicate major changes."
->>>>>>
->>>>>> POWER9 DD1 PVR is 0x004E0100, so this is really version 1.0 of the=
- POWER9.
->>>>>>
->>>>>> Perhaps we can define POWER9_v1.0 as CPU_POWERPC_POWER9_DD1, and
->>>>>> introduce a POWER9_v0.0 set to CPU_POWERPC_POWER9_BASE and define =
-it as
->>>>>> the default one?
->>>>>
->>>>> I like the suggestion to set a v0.0 to CPU_POWERPC_POWER9_BASE. But=
-, I
->>>>> think we could have only that option, removing the
->>>>> CPU_POWERPC_POWER9_DD1 entry.
->>>> I really dislike the idea of having a CPU called "v0.0" ... we do no=
-t
->>>> have this for any other CPU generation, and it sounds like it could =
-be
->>>> very confusing for the users (you'd need to document somewhere what =
-the
->>>> v0.0 exactly means). If we really want to go this way, I think we sh=
-ould
->>>> name it "POWER9-generic" or "PowerISA-3.0" or something similar inst=
-ead.
->>>>
->>>> Or does somebody already know the exact PVR for DD2? If so, we could
->>>> simply add a POWER9_v2.0 CPU already and let the POWER9 alias point =
-to
->>>> that version instead.
+On 28.06.2017 10:02, Thomas Huth wrote:
+> On 28.06.2017 09:28, Viktor Mihajlovski wrote:
+>> On 27.06.2017 23:40, Thomas Huth wrote:
+>> [...]
+>>>>> - Is it OK to require loading an .INS file first? Or does anybody
+>>>>>   have a better idea how to load multiple files (kernel, initrd,
+>>>>>   etc. ...)?
+>>>> It would be nice to support PXE-style boot, because the majority of boot
+>>>> servers is set up that way. A straightforward way would be to do a PXE
+>>>> emulation by attempting to download a pxelinux.cfg from the well-known
+>>>> locations, parsing the content (menu) and finally load the kernel,
+>>>> initrd and set the kernel command line as specified there. (I know, but
+>>>> you're already parsing the INS-File).
 >>>
->>> Yes, I think that's a better idea.  I don't know the DD2 PVR, but I'm
->>> pretty sure we should be able to find out from someone at IBM.
+>>> Please, don't mix up PXE and pxelinux (since you've used both terms in
+>>> above paragraph). Assuming that you're only talking about pxlinux config
+>>> files... are they that common on s390x already? Using the pxelinux
+>>> config file syntax sounds like we would be completely bound to only
+>>> loading Linux guests to me, since the boot loader has to know where to
+>>> load the initrd and how to patch the kernel so that it can find the initrd.
+>>> Using .INS files sounds more flexible to me instead, since you can also
+>>> specify the addresses here - so you can theoretically also load other
+>>> guest kernels, and that's IMHO the better approach since a firmware
+>>> should stay as generic as possible.
 >>>
->>> I've CCed Sam & Suraj - can you ask Mikey or someone what the PVR
->>> value for DD2.0 will be?
->>
->> I would expect something like :
->>
->>  0x200D104980000000UL; /* P9 Nimbus DD2.0 */
->=20
->=20
-> I would expect something like 0x004Exxxx.
+>> In order to be consumable, the network boot should support the most
+>> common configurations. I would think that most network boot servers are
+>> setup as PXE boot servers using pxelinux configs.
+> 
+> Are you really sure about the popularity of pxelinux? It's just one
+> flavor of secondary stage network boot loaders - which also only exist
+> on x86 so far, as far as I know.
 
-ah yes, I am mistaking the PVR and the CFAM ID.=20
+And it seems like it also only works with legacy BIOSes, i.e. you can
+not use it on EFI-only systems, if I've got that right:
 
-C.=20
-=20
+https://github.com/openSUSE/kiwi/wiki/Setup-PXE-boot-with-EFI-Using-GRUB2
+
+So I guess the significance of pxelinux will very likely decrease in
+the next years...
+
+ Thomas
