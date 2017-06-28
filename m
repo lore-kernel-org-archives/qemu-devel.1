@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dQFfs-0004nI-77
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 12:18:41 -0400
+	(envelope-from <berrange@redhat.com>) id 1dQFgo-0005XH-LZ
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 12:19:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dQFfr-00030V-C3
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 12:18:40 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:36629)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1dQFfr-00030M-6J
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 12:18:39 -0400
-Received: by mail-wm0-x241.google.com with SMTP id y5so12432619wmh.3
-	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 09:18:39 -0700 (PDT)
-MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <20170628061540.GL4859@toto>
+	(envelope-from <berrange@redhat.com>) id 1dQFgi-0003Bq-Ty
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 12:19:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38704)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dQFgi-0003Bj-Nc
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 12:19:32 -0400
+Date: Wed, 28 Jun 2017 17:19:27 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170628161927.GQ29134@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <cover.1498596157.git.alistair.francis@xilinx.com>
-	<55b6931c368b67ece2f0bd7d8e83092727df1e3c.1498596157.git.alistair.francis@xilinx.com>
-	<20170627211037.GE2201@toto>
-	<CAKmqyKN9znxH=1y1ZVT86Hk9815JXukdK8c=UPYc5CES7y=juQ@mail.gmail.com>
-	<20170628061540.GL4859@toto>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Wed, 28 Jun 2017 09:18:07 -0700
-Message-ID: <CAKmqyKPw0F=SgBhd_a-rpQ566RSivMHw3Xiyb0GXY5EY3yy4jg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC v1 3/3] char-socket: Report TCP socket
- waiting as a warning
+	<4e1eded5cda7b182a8a4cb133b40b2915817b7d1.1498596157.git.alistair.francis@xilinx.com>
+	<20170628090448.GE29134@redhat.com>
+	<CAKmqyKNEgZPMdS5B4J09XVpDQt0LXw0YFbMdBa_fnBXmnndftA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAKmqyKNEgZPMdS5B4J09XVpDQt0LXw0YFbMdBa_fnBXmnndftA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [RFC v1 2/3] util/qemu-error: Add a
+ warning_report() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,90 +31,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
-On Tue, Jun 27, 2017 at 11:15 PM, Edgar E. Iglesias
-<edgar.iglesias@gmail.com> wrote:
-> On Tue, Jun 27, 2017 at 05:17:58PM -0700, Alistair Francis wrote:
->> On Tue, Jun 27, 2017 at 2:10 PM, Edgar E. Iglesias
->> <edgar.iglesias@gmail.com> wrote:
->> > On Tue, Jun 27, 2017 at 01:45:48PM -0700, Alistair Francis wrote:
->> >> When QEMU is waiting for a TCP socket connection it reports that message as
->> >> an error. This isn't an error it is a warnign so let's change the report to
->> >> use warning_report() instead.
->> >
->> > Hi Alistair,
->> >
->> > Isn't this more like an informational message rather than a warning?
->> >
->> > A warning would indicate to me that something unexpected and perhaps wrong happened.
->> > In this case, there's nothing wrong going on.
->> >
->> > We may need more classes, like 'info:' and/or maybe others...
->>
->> Hey Edgar,
->>
->> That is a good point. I can add a info_report() as well then that
->> copies the warning_report() function but prefixes with 'info: '.
->
->
-> Hi,
->
-> Yes, or another way is to pass the class of message as an argument,
-> e.g like qemu_log_mask does it.
+On Wed, Jun 28, 2017 at 09:16:45AM -0700, Alistair Francis wrote:
+> On Wed, Jun 28, 2017 at 2:04 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
+> > On Tue, Jun 27, 2017 at 01:45:45PM -0700, Alistair Francis wrote:
+> >> Add a functino which can be used similarly to error_report() execpt to
+> >> inform the users about warnings instead of errors.
+> >>
+> >> The warning print does not include the timestamp and instead will
+> >> preface the messages with a 'warning: '.
+> >
+> > Not including the timestamp is a bug IMHO. If I've turned on timestamps,
+> > I expect all messages to have the timestamp.
+> 
+> That's fine, I'm happy to add it back in. I just wasn't sure.
+> 
+> >
+> > I'm not particularly convinced by adding the 'warning: ' prefix either,
+> > particularly given the scenario you are using this in, is not actually
+> > a warning - its just a informative message.
+> 
+> Maybe it makes more sense to add an extra argument to error_report()
+> that can be used to specify error, warning or information. The same
+> way qemu_log_mask() works. That was Edgar's idea in reply to one of
+> the other patches.
+> 
+> Does that sound more useful?
 
-Ah! That is a good idea.
+I'd suggest renaming the current 'error_report' to 'message_report' and
+making it take an extra arg that accepts a enum flag INFO | WARNING | ERROR.
+Then add macros for  error_report, warning_report, info_report that call
+message_report with the right enum.  That way you don't have to update any
+of the existing code that calls error_report.
 
-Something like this:
-    report(ERROR, "message, ...)
-    report(WARN, "message, ...)
-    report(INFO, "message, ...)
-
-which gets converted to adding prefixes to the message.
-
-Thanks,
-Alistair
-
->
-> Best regards,
-> Edgar
->
->
->
->
->>
->> Thanks,
->> Alistair
->>
->> >
->> > Cheers,
->> > Edgar
->> >
->> >
->> >
->> >>
->> >> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
->> >> ---
->> >>
->> >>  chardev/char-socket.c | 2 +-
->> >>  1 file changed, 1 insertion(+), 1 deletion(-)
->> >>
->> >> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
->> >> index ccc499cfa1..5a56628e74 100644
->> >> --- a/chardev/char-socket.c
->> >> +++ b/chardev/char-socket.c
->> >> @@ -765,7 +765,7 @@ static int tcp_chr_wait_connected(Chardev *chr, Error **errp)
->> >>       * in TLS and telnet cases, only wait for an accepted socket */
->> >>      while (!s->ioc) {
->> >>          if (s->is_listen) {
->> >> -            error_report("QEMU waiting for connection on: %s",
->> >> +            warning_report("QEMU waiting for connection on: %s",
->> >>                           chr->filename);
->> >>              qio_channel_set_blocking(QIO_CHANNEL(s->listen_ioc), true, NULL);
->> >>              tcp_chr_accept(QIO_CHANNEL(s->listen_ioc), G_IO_IN, chr);
->> >> --
->> >> 2.11.0
->> >>
->> >>
->
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
