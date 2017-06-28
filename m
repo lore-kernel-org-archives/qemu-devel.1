@@ -1,24 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dQCOL-0001ti-SP
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:48:22 -0400
+	(envelope-from <famz@redhat.com>) id 1dQCP0-0002on-15
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:49:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dQCOL-0000kq-21
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:48:21 -0400
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:37185)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dQCOK-0000jJ-RZ
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:48:20 -0400
-Received: by mail-wm0-x235.google.com with SMTP id i127so57669895wma.0
-	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 05:48:20 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170628122041.13558-1-stefanha@redhat.com>
-References: <20170628122041.13558-1-stefanha@redhat.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Wed, 28 Jun 2017 13:48:18 +0100
-Message-ID: <CAJSP0QV7SMOZNAEtXFvqx6XTE0Kvcf-mz-Z=89qOszD67wJzpw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/2] Block patches
+	(envelope-from <famz@redhat.com>) id 1dQCOx-00015X-06
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:49:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33238)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dQCOw-00014z-Qr
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:48:58 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Wed, 28 Jun 2017 20:48:43 +0800
+Message-Id: <20170628124850.12821-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/7] qdev: Introduce DEFINE_PROP_LINK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,33 +21,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Wed, Jun 28, 2017 at 1:20 PM, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> The following changes since commit 577caa2672ccde7352fda3ef17e44993de862f0e:
->
->   Merge remote-tracking branch 'remotes/edgar/tags/edgar/mmio-exec-v2.for-upstream' into staging (2017-06-27 16:56:55 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/stefanha/qemu.git tags/block-pull-request
->
-> for you to fetch changes up to 439778e6b4a20c8fe6a6a92a17013b09c4ae55d0:
->
->   virtio-pci: use ioeventfd even when KVM is disabled (2017-06-28 13:18:53 +0100)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
->
-> Stefan Hajnoczi (2):
->   virtio-blk: trace vdev so devices can be distinguished
->   virtio-pci: use ioeventfd even when KVM is disabled
+Link properties of devices created with object_property_add_link() are not
+reflected in HMP "info qtree". For example, whether a virtio-blk device has an
+iothread (i.e. has enabled data plane) can not be introspected easily.
 
-NACK
+Introduce a new type of qdev property to fix that.
 
-I missed the mail discussing the virtio-scsi-test assertion failure
-caused by "virtio-pci: use ioeventfd even when KVM is disabled".
+Because QOM is not my most familiar area, only virtio devices are converted in
+this version. If the new API is okay, other devices can be worked on either in
+v2 or in a follow up series.
 
-Stefan
+Fam Zheng (7):
+  qom: Make link property API public
+  qom: Handle property lookup failure in object_resolve_link
+  qom: Save type name in LinkProperty
+  qdev: Introduce DEFINE_PROP_LINK
+  virtio-blk: Use DEFINE_PROP_LINK
+  virtio-scsi: Use DEFINE_PROP_LINK
+  virtio-rng: Use DEFINE_PROP_LINK
+
+ hw/block/dataplane/virtio-blk.c |  2 +-
+ hw/block/virtio-blk.c           |  7 ++--
+ hw/core/qdev-properties.c       | 81 +++++++++++++++++++++++++++++++++++++++++
+ hw/scsi/virtio-scsi-dataplane.c |  2 +-
+ hw/scsi/virtio-scsi.c           | 15 ++------
+ hw/virtio/virtio-pci.c          |  6 ---
+ hw/virtio/virtio-rng.c          | 16 ++------
+ include/hw/qdev-core.h          |  3 ++
+ include/hw/qdev-properties.h    | 11 ++++++
+ include/hw/virtio/virtio-blk.h  |  2 +-
+ include/hw/virtio/virtio-rng.h  |  2 +-
+ include/hw/virtio/virtio-scsi.h |  2 +-
+ include/qom/object.h            | 14 +++++++
+ qom/object.c                    | 24 ++++++------
+ 14 files changed, 136 insertions(+), 51 deletions(-)
+
+-- 
+2.9.4
