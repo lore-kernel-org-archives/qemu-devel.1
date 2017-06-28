@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dQD7M-0001Jf-1U
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:34:53 -0400
+	(envelope-from <berto@igalia.com>) id 1dQD8w-0002Kq-6W
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:36:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dQD7K-00052A-TZ
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:34:52 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:10999 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dQD7K-00050y-IJ
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:34:50 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
-	<20170628120530.31251-14-vsementsov@virtuozzo.com>
-	<f5957047-c69c-ebe6-6640-08bacc3244ea@virtuozzo.com>
-	<da795837-2945-d3b1-bd92-e6ced22817bc@redhat.com>
-	<6e99d1ce-a7e9-af1b-ec84-baae97f348df@virtuozzo.com>
-	<22469eec-5a74-ee90-e530-744fabc50c4f@virtuozzo.com>
-Message-ID: <1ef5fa08-3053-ad36-5212-9a7a826725c4@virtuozzo.com>
-Date: Wed, 28 Jun 2017 16:34:35 +0300
+	(envelope-from <berto@igalia.com>) id 1dQD8s-0006n2-9X
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:36:30 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170623124700.1389-6-el13635@mail.ntua.gr>
+References: <20170623124700.1389-1-el13635@mail.ntua.gr>
+	<20170623124700.1389-6-el13635@mail.ntua.gr>
+Date: Wed, 28 Jun 2017 15:35:48 +0200
+Message-ID: <w51h8z01bgr.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <22469eec-5a74-ee90-e530-744fabc50c4f@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v22 13/30] block: new
- bdrv_reopen_bitmaps_rw interface
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH RFC v3 5/8] block: add
+ BlockDevOptionsThrottle to QAPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,52 +23,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>
+Cc: qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Finally, it looks like thunderbird bug
-https://bugzilla.mozilla.org/show_bug.cgi?id=1160880
+On Fri 23 Jun 2017 02:46:57 PM CEST, Manos Pitsidianakis wrote:
 
-[sorry for so much offtopic]
+> +# @BlockdevOptionsThrottle:
+> +#
+> +# Driver specific block device options for Throttle
+> +#
 
-28.06.2017 16:13, Vladimir Sementsov-Ogievskiy wrote:
-> 28.06.2017 16:02, Vladimir Sementsov-Ogievskiy wrote:
->> It is interesting, but I see this problem only in your answers, in my 
->> letters I see this white-space on its place.
-> 
-> In outgoing letter I see this white-space, but in letter from 
-> mailing-list it is absent.
-> 
->>
->> 28.06.2017 15:36, Eric Blake wrote:
->>> [meta-comment]
->>>
->>> On 06/28/2017 07:10 AM, Vladimir Sementsov-Ogievskiy wrote:
->>>> 28.06.2017 15:05, Vladimir Sementsov-Ogievskiy wrote:
->>>>> Add format driver handler, which should mark loaded read-only
->>>>> bitmaps as 'IN_USE' in the image and unset read_only field in
->>>>> corresponding BdrvDirtyBitmap's.
->>>>>
->>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy<vsementsov@virtuozzo.com>
->>>>> Reviewed-by: John Snow<jsnow@redhat.com>
->>> Your original message had spaces before '<' in the email addresses, but
->>> it got lost here...
->>>
->>>>
->>>> Forgot to add:
->>>>
->>>> Reviewed-by: Max Reitz<mreitz@redhat.com>
->>> ...this one also lacks the space.  I'm not sure if git cares, but it may
->>> be worth investigating why your mailer eats the space when you reply
->>> manually rather than sending via git; and for consistency, it is worth
->>> keeping the space (for example, we like to grep 'git log' for learning
->>> how active various contributors are, and having a consistent usage of
->>> space before < in an email address can make the task easier).
->>>
->>
-> 
+I would put this earlier in the json file, together with the rest of the
+BlockdevOptions* structs.
 
+> +# @throttling-group: the name of the throttling group to use
 
--- 
-Best regards,
-Vladimir
+Why not call it simply "group" ?
+
+> +#
+> +# @options:        BlockIOThrottle options
+> +# Since: 2.9
+> +##
+> +{ 'struct': 'BlockdevOptionsThrottle',
+> +  'data': { 'throttling-group': 'str',
+> +            'file' : 'BlockdevRef',
+> +            '*options' : 'BlockIOThrottle'
+> +             } }
+
+Not sure if 'file' is the best name for the field ("child"?), but I'm
+fine with it.
+
+Berto
