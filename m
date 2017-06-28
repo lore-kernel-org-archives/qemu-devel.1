@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56372)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dQCuR-0003ir-GO
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:21:33 -0400
+	(envelope-from <berrange@redhat.com>) id 1dQCwW-00055j-Nu
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:23:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dQCuM-0005TG-JM
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:21:31 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed, 28 Jun 2017 16:21:12 +0300
-Message-Id: <149865607253.17063.18194249796068858104.stgit@frigg.lan>
-In-Reply-To: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
-References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
+	(envelope-from <berrange@redhat.com>) id 1dQCwS-0006fB-OK
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:23:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32774)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dQCwS-0006er-Hy
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 09:23:36 -0400
+Date: Wed, 28 Jun 2017 14:23:29 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170628132329.GJ29134@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <cover.1498654240.git.maozy.fnst@cn.fujitsu.com>
+	<d7c1b8ff9247a09e54110abe6abe93543d59b8b6.1498654240.git.maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v11 16/29] target/arm: [tcg,
- a64] Port to init_disas_context
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <d7c1b8ff9247a09e54110abe6abe93543d59b8b6.1498654240.git.maozy.fnst@cn.fujitsu.com>
+Subject: Re: [Qemu-devel] [PATCH v6 3/4] net/net: Convert parse_host_port()
+ to Error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,82 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, kraxel@redhat.com, pbonzini@redhat.com, jasowang@redhat.com, armbru@redhat.com
 
-Incrementally paves the way towards using the generic instruction transla=
-tion
-loop.
+On Wed, Jun 28, 2017 at 09:08:49PM +0800, Mao Zhongyi wrote:
+> diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
+> index 5c326db..78e2b30 100644
+> --- a/include/qemu/sockets.h
+> +++ b/include/qemu/sockets.h
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
- target/arm/translate-a64.c |   36 ++++++++++++++++++++++--------------
- 1 file changed, 22 insertions(+), 14 deletions(-)
+>          if (qemu_isdigit(buf[0])) {
+> -            if (!inet_aton(buf, &saddr->sin_addr))
+> +            if (!inet_aton(buf, &saddr->sin_addr)) {
+> +                error_setg(errp, "host address '%s' is not a valid "
+> +                           "IPv4 address", buf);
+>                  return -1;
+> +            }
+>          } else {
+> -            if ((he = gethostbyname(buf)) == NULL)
+> +            he = gethostbyname(buf);
+> +            if (he == NULL) {
+> +                error_setg(errp, "can't resolve host address '%s': "
+> +                           "unknown host", buf);
+>                  return - 1;
+> +            }
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 4270ac3847..88624a726d 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -11190,21 +11190,12 @@ static void disas_a64_insn(CPUARMState *env, Di=
-sasContext *s)
-     free_tmp_a64(s);
- }
-=20
--void gen_intermediate_code_a64(DisasContextBase *dcbase, CPUState *cs,
--                               TranslationBlock *tb)
-+static void aarch64_trblock_init_disas_context(DisasContextBase *dcbase,
-+                                               CPUState *cpu)
- {
--    CPUARMState *env =3D cs->env_ptr;
--    ARMCPU *cpu =3D arm_env_get_cpu(env);
-     DisasContext *dc =3D container_of(dcbase, DisasContext, base);
--    target_ulong next_page_start;
--    int max_insns;
--
--    dc->base.tb =3D tb;
--    dc->base.pc_first =3D dc->base.tb->pc;
--    dc->base.pc_next =3D dc->base.pc_first;
--    dc->base.is_jmp =3D DISAS_NEXT;
--    dc->base.num_insns =3D 0;
--    dc->base.singlestep_enabled =3D cs->singlestep_enabled;
-+    CPUARMState *env =3D cpu->env_ptr;
-+    ARMCPU *arm_cpu =3D arm_env_get_cpu(env);
-=20
-     dc->pc =3D dc->base.pc_first;
-     dc->condjmp =3D 0;
-@@ -11230,7 +11221,7 @@ void gen_intermediate_code_a64(DisasContextBase *=
-dcbase, CPUState *cs,
-     dc->fp_excp_el =3D ARM_TBFLAG_FPEXC_EL(dc->base.tb->flags);
-     dc->vec_len =3D 0;
-     dc->vec_stride =3D 0;
--    dc->cp_regs =3D cpu->cp_regs;
-+    dc->cp_regs =3D arm_cpu->cp_regs;
-     dc->features =3D env->features;
-=20
-     /* Single step state. The code-generation logic here is:
-@@ -11254,6 +11245,23 @@ void gen_intermediate_code_a64(DisasContextBase =
-*dcbase, CPUState *cs,
-     dc->ss_same_el =3D (arm_debug_target_el(env) =3D=3D dc->current_el);
-=20
-     init_tmp_a64_array(dc);
-+}
-+
-+void gen_intermediate_code_a64(DisasContextBase *dcbase, CPUState *cs,
-+                               TranslationBlock *tb)
-+{
-+    CPUARMState *env =3D cs->env_ptr;
-+    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
-+    target_ulong next_page_start;
-+    int max_insns;
-+
-+    dc->base.tb =3D tb;
-+    dc->base.pc_first =3D dc->base.tb->pc;
-+    dc->base.pc_next =3D dc->base.pc_first;
-+    dc->base.is_jmp =3D DISAS_NEXT;
-+    dc->base.num_insns =3D 0;
-+    dc->base.singlestep_enabled =3D cs->singlestep_enabled;
-+    aarch64_trblock_init_disas_context(&dc->base, cs);
-=20
-     next_page_start =3D (dc->base.pc_first & TARGET_PAGE_MASK) + TARGET_=
-PAGE_SIZE;
-     max_insns =3D dc->base.tb->cflags & CF_COUNT_MASK;
+gethostbyname sets  'h_errno' on failure, so you should pass that
+into error_setg_errno, instead of hardcoding 'unknown host' as a
+message
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
