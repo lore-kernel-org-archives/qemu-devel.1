@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dQGMr-0003HY-IK
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 13:03:06 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dQGWM-0006Dh-4w
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 13:12:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dQGMo-0003Kq-FC
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 13:03:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50264)
+	(envelope-from <ehabkost@redhat.com>) id 1dQGWH-00015k-6X
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 13:12:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52677)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dQGMo-0003Jk-9s
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 13:03:02 -0400
-References: <20170627161032.5014-1-david@redhat.com>
-	<251b8047-7df4-50a5-cce7-b66858c781a1@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <4c7a78bc-ec7f-9873-0bda-f3c8e76c844b@redhat.com>
-Date: Wed, 28 Jun 2017 19:02:58 +0200
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dQGWG-00014y-U4
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 13:12:49 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 04ECD81127
+	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 17:12:48 +0000 (UTC)
+Date: Wed, 28 Jun 2017 14:12:44 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170628171244.GA5167@localhost.localdomain>
+References: <1498536619-14548-1-git-send-email-peterx@redhat.com>
+	<1498536619-14548-11-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <251b8047-7df4-50a5-cce7-b66858c781a1@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/cpumodel: allow to enable "idtes"
- feature for TCG
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1498536619-14548-11-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 10/10] migration: hmp: dump globals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +33,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: rth@twiddle.net, agraf@suse.de, Aurelien Jarno <aurelien@aurel32.net>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 28.06.2017 16:21, Thomas Huth wrote:
-> On 27.06.2017 18:10, David Hildenbrand wrote:
->> STFL bit 4 and 5 are just indications to the guest, which TLB entries an
->> IDTE call will clear. These are performance indicators for the guest.
->>
->> STFL bit 4:
->>     INVALIDATE DAT TABLE ENTRY (IDTE) performs
->>     the invalidation-and-clearing operation by
->>     selectively clearing TLB segment-table entries
->>     when a segment-table entry or entries are
->>     invalidated. IDTE also performs the clearing-by-
->>     ASCE operation. Unless bit 4 is one, IDTE simply
->>     purges all TLBs. Bit 3 is one if bit 4 is one.
->>
->> We can simply set STFL bit 4 ("idtes") and still purge the complete TLB.
->> Purging more than advertised is never bad. E.g. Linux doesn't even care
->> about this bit. We can optimized this later.
+On Tue, Jun 27, 2017 at 12:10:19PM +0800, Peter Xu wrote:
+> Now we have some globals that can be configured for migration. Dump them
+> in HMP info migration for better debugging.
 > 
-> Not sure, but why do we need this bit in add_qemu_cpu_model_features()
-> if Linux does not care about it? We will get it automatically once we
-> support the z9 in TCG...
-
-The idea is to use this as a list we support in addition to the z900
-features. This is later helpful when actually switching to a new model
-(z9 might still take some time). Nobody has to do go over all features
-again and see if they are implemented.
-
-The commit subject also contains a description then why we can simply
-enable it.
-
+> (we can also use this to monitor whether COMPAT fields are applied
+> correctly on compatible machines)
 > 
->  Thomas
-> 
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+[...]
+> +void migration_global_dump(Monitor *mon)
+> +{
+> +    MigrationState *ms = migrate_get_current();
+> +
+> +    monitor_printf(mon, "globals: store-global-state=%d, only_migratable=%d, "
+> +                   "send-configuration=%d, send-section-footer=%d\n",
+> +                   ms->store_global_state, ms->only_migratable,
+> +                   ms->send_configuration, ms->send_section_footer);
 
+I wouldn't call them "globals", I would just call them "properties" (or
+maybe just "settings").  They happen to be affected by global properties
+if the accel/machine/user sets them, but they are just plain old QOM
+properties.
+
+
+> +}
+> +
+>  static Property migration_properties[] = {
+>      DEFINE_PROP_BOOL("store-global-state", MigrationState,
+>                       store_global_state, true),
+> -- 
+> 2.7.4
+> 
 
 -- 
-
-Thanks,
-
-David
+Eduardo
