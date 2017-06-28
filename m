@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xiechanglong.d@gmail.com>) id 1dQ10U-0000j2-NU
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 20:39:00 -0400
+	(envelope-from <sjitindarsingh@gmail.com>) id 1dQ1Ju-00064O-WC
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 20:59:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xiechanglong.d@gmail.com>) id 1dQ10S-0003DM-QD
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 20:38:58 -0400
-References: <20170627192458.15519-1-eblake@redhat.com>
-	<20170627192458.15519-21-eblake@redhat.com>
-From: Xie Changlong <xiechanglong.d@gmail.com>
-Message-ID: <14e6ad27-bcb5-0039-3a01-edeecea585fb@gmail.com>
-Date: Wed, 28 Jun 2017 08:38:42 +0800
-MIME-Version: 1.0
-In-Reply-To: <20170627192458.15519-21-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(envelope-from <sjitindarsingh@gmail.com>) id 1dQ1Ju-0002O2-1V
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 20:59:03 -0400
+Message-ID: <1498611529.655.1.camel@gmail.com>
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Date: Wed, 28 Jun 2017 10:58:49 +1000
+In-Reply-To: <0ccd9fbf-cf3f-cd98-540c-e7bbae36ff88@redhat.com>
+References: <20170622112648.24815-1-lvivier@redhat.com>
+	<caa25331-5005-78e8-fba2-19bf67116d92@redhat.com>
+	<20170623092124.GG12089@umbus>
+	<0ccd9fbf-cf3f-cd98-540c-e7bbae36ff88@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 20/20] block: Make
- bdrv_is_allocated_above() byte-based
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc/cpu-models: set
+ POWER9_v1.0 as POWER9 DD1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,372 +26,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, jsnow@redhat.com, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Wen Congyang <wencongyang2@huawei.com>
+To: Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-在 6/28/2017 3:24 AM, Eric Blake 写道:
-> We are gradually moving away from sector-based interfaces, towards
-> byte-based.  In the common case, allocation is unlikely to ever use
-> values that are not naturally sector-aligned, but it is possible
-> that byte-based values will let us be more precise about allocation
-> at the end of an unaligned file that can do byte-based access.
+On Fri, 2017-06-23 at 18:05 +0200, Thomas Huth wrote:
+> On 23.06.2017 11:21, David Gibson wrote:
+> > On Thu, Jun 22, 2017 at 01:31:24PM +0200, Thomas Huth wrote:
+> > > On 22.06.2017 13:26, Laurent Vivier wrote:
+> > > > CPU_POWERPC_POWER9_DD1 is 0x004E0100, so this is the POWER9
+> > > > v1.0.
+> > > > 
+> > > > When we run qemu on a POWER9 DD1 host, we must use either
+> > > > "-cpu host" or "-cpu POWER9", but in the latter case it fails
+> > > > with
+> > > > 
+> > > >     Unable to find sPAPR CPU Core definition
+> > > > 
+> > > > because POWER9 DD1 doesn't appear in the list of known CPUs.
+> > > > 
+> > > > This patch fixes this by defining POWER9_v1.0 with POWER9 DD1
+> > > > PVR instead of CPU_POWERPC_POWER9_BASE.
+> > > > 
+> > > > Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> > > > ---
+> > > >  target/ppc/cpu-models.c | 2 +-
+> > > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > 
+> > > > diff --git a/target/ppc/cpu-models.c b/target/ppc/cpu-models.c
+> > > > index 4d3e635..a22363c 100644
+> > > > --- a/target/ppc/cpu-models.c
+> > > > +++ b/target/ppc/cpu-models.c
+> > > > @@ -1144,7 +1144,7 @@
+> > > >      POWERPC_DEF("970_v2.2",      CPU_POWERPC_970_v22,         
+> > > >        970,
+> > > >                  "PowerPC 970 v2.2")
+> > > >  
+> > > > -    POWERPC_DEF("POWER9_v1.0",   CPU_POWERPC_POWER9_BASE,     
+> > > >        POWER9,
+> > > > +    POWERPC_DEF("POWER9_v1.0",   CPU_POWERPC_POWER9_DD1,      
+> > > >        POWER9,
+> > > >                  "POWER9 v1.0")
+> > > >  
+> > > >      POWERPC_DEF("970fx_v1.0",    CPU_POWERPC_970FX_v10,       
+> > > >        970,
+> > > > 
+> > > 
+> > > I think this also makes sense for running in TCG mode to get a
+> > > valid
+> > > real PVR there.
+> > 
+> > I'm not so convinced.
+> > 
+> > IIUC, this will make TCG default (for now) to a DD1 POWER9.  That's
+> > a)
+> > probably not what anyone wants - who'd select a buggy prototype and
+> > b)
+> > not accurate - TCG does not implement DD1's bugs.
 > 
-> Changing the signature of the function to use int64_t *pnum ensures
-> that the compiler enforces that all callers are updated.  For now,
-> the io.c layer still assert()s that all callers are sector-aligned,
-> but that can be relaxed when a later patch implements byte-based
-> block status.  Therefore, for the most part this patch is just the
-> addition of scaling at the callers followed by inverse scaling at
-> bdrv_is_allocated().  But some code, particularly stream_run(),
-> gets a lot simpler because it no longer has to mess with sectors.
-> 
-> For ease of review, bdrv_is_allocated() was tackled separately.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: John Snow <jsnow@redhat.com>
-> 
-> ---
-> v2: tweak function comments, favor bdrv_getlength() over ->total_sectors
-> ---
->   include/block/block.h |  2 +-
->   block/commit.c        | 20 ++++++++------------
->   block/io.c            | 42 ++++++++++++++++++++----------------------
->   block/mirror.c        |  5 ++++-
->   block/replication.c   | 17 ++++++++++++-----
-
-For replication part:
-
-Reviewed-by: Xie Changlong <xiechanglong@cmss.chinamobile.com>
-
->   block/stream.c        | 21 +++++++++------------
->   qemu-img.c            | 10 +++++++---
->   7 files changed, 61 insertions(+), 56 deletions(-)
-> 
-> diff --git a/include/block/block.h b/include/block/block.h
-> index 9b9d87b..13022d5 100644
-> --- a/include/block/block.h
-> +++ b/include/block/block.h
-> @@ -428,7 +428,7 @@ int64_t bdrv_get_block_status_above(BlockDriverState *bs,
->   int bdrv_is_allocated(BlockDriverState *bs, int64_t offset, int64_t bytes,
->                         int64_t *pnum);
->   int bdrv_is_allocated_above(BlockDriverState *top, BlockDriverState *base,
-> -                            int64_t sector_num, int nb_sectors, int *pnum);
-> +                            int64_t offset, int64_t bytes, int64_t *pnum);
-> 
->   bool bdrv_is_read_only(BlockDriverState *bs);
->   bool bdrv_is_writable(BlockDriverState *bs);
-> diff --git a/block/commit.c b/block/commit.c
-> index 241aa95..774a8a5 100644
-> --- a/block/commit.c
-> +++ b/block/commit.c
-> @@ -146,7 +146,7 @@ static void coroutine_fn commit_run(void *opaque)
->       int64_t offset;
->       uint64_t delay_ns = 0;
->       int ret = 0;
-> -    int n = 0; /* sectors */
-> +    int64_t n = 0; /* bytes */
->       void *buf = NULL;
->       int bytes_written = 0;
->       int64_t base_len;
-> @@ -171,7 +171,7 @@ static void coroutine_fn commit_run(void *opaque)
-> 
->       buf = blk_blockalign(s->top, COMMIT_BUFFER_SIZE);
-> 
-> -    for (offset = 0; offset < s->common.len; offset += n * BDRV_SECTOR_SIZE) {
-> +    for (offset = 0; offset < s->common.len; offset += n) {
->           bool copy;
-> 
->           /* Note that even when no rate limit is applied we need to yield
-> @@ -183,15 +183,12 @@ static void coroutine_fn commit_run(void *opaque)
->           }
->           /* Copy if allocated above the base */
->           ret = bdrv_is_allocated_above(blk_bs(s->top), blk_bs(s->base),
-> -                                      offset / BDRV_SECTOR_SIZE,
-> -                                      COMMIT_BUFFER_SIZE / BDRV_SECTOR_SIZE,
-> -                                      &n);
-> +                                      offset, COMMIT_BUFFER_SIZE, &n);
->           copy = (ret == 1);
-> -        trace_commit_one_iteration(s, offset, n * BDRV_SECTOR_SIZE, ret);
-> +        trace_commit_one_iteration(s, offset, n, ret);
->           if (copy) {
-> -            ret = commit_populate(s->top, s->base, offset,
-> -                                  n * BDRV_SECTOR_SIZE, buf);
-> -            bytes_written += n * BDRV_SECTOR_SIZE;
-> +            ret = commit_populate(s->top, s->base, offset, n, buf);
-> +            bytes_written += n;
->           }
->           if (ret < 0) {
->               BlockErrorAction action =
-> @@ -204,11 +201,10 @@ static void coroutine_fn commit_run(void *opaque)
->               }
->           }
->           /* Publish progress */
-> -        s->common.offset += n * BDRV_SECTOR_SIZE;
-> +        s->common.offset += n;
-> 
->           if (copy && s->common.speed) {
-> -            delay_ns = ratelimit_calculate_delay(&s->limit,
-> -                                                 n * BDRV_SECTOR_SIZE);
-> +            delay_ns = ratelimit_calculate_delay(&s->limit, n);
->           }
->       }
-> 
-> diff --git a/block/io.c b/block/io.c
-> index 5bbf153..061a162 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -1903,54 +1903,52 @@ int coroutine_fn bdrv_is_allocated(BlockDriverState *bs, int64_t offset,
->   /*
->    * Given an image chain: ... -> [BASE] -> [INTER1] -> [INTER2] -> [TOP]
->    *
-> - * Return true if the given sector is allocated in any image between
-> - * BASE and TOP (inclusive).  BASE can be NULL to check if the given
-> - * sector is allocated in any image of the chain.  Return false otherwise,
-> + * Return true if the (prefix of the) given range is allocated in any image
-> + * between BASE and TOP (inclusive).  BASE can be NULL to check if the given
-> + * offset is allocated in any image of the chain.  Return false otherwise,
->    * or negative errno on failure.
->    *
-> - * 'pnum' is set to the number of sectors (including and immediately following
-> - *  the specified sector) that are known to be in the same
-> - *  allocated/unallocated state.
-> + * 'pnum' is set to the number of bytes (including and immediately
-> + * following the specified offset) that are known to be in the same
-> + * allocated/unallocated state.  Note that a subsequent call starting
-> + * at 'offset + *pnum' may return the same allocation status (in other
-> + * words, the result is not necessarily the maximum possible range);
-> + * but 'pnum' will only be 0 when end of file is reached.
->    *
->    */
->   int bdrv_is_allocated_above(BlockDriverState *top,
->                               BlockDriverState *base,
-> -                            int64_t sector_num,
-> -                            int nb_sectors, int *pnum)
-> +                            int64_t offset, int64_t bytes, int64_t *pnum)
->   {
->       BlockDriverState *intermediate;
-> -    int ret, n = nb_sectors;
-> +    int ret;
-> +    int64_t n = bytes;
-> 
->       intermediate = top;
->       while (intermediate && intermediate != base) {
->           int64_t pnum_inter;
->           int64_t size_inter;
-> -        int psectors_inter;
-> 
-> -        ret = bdrv_is_allocated(intermediate, sector_num * BDRV_SECTOR_SIZE,
-> -                                nb_sectors * BDRV_SECTOR_SIZE,
-> -                                &pnum_inter);
-> +        ret = bdrv_is_allocated(intermediate, offset, bytes, &pnum_inter);
->           if (ret < 0) {
->               return ret;
->           }
-> -        assert(pnum_inter < INT_MAX * BDRV_SECTOR_SIZE);
-> -        psectors_inter = pnum_inter >> BDRV_SECTOR_BITS;
->           if (ret) {
-> -            *pnum = psectors_inter;
-> +            *pnum = pnum_inter;
->               return 1;
->           }
-> 
->           /*
-> -         * [sector_num, nb_sectors] is unallocated on top but intermediate
-> -         * might have [sector_num+x, nb_sectors-x] allocated.
-> +         * [offset, bytes] is unallocated on top but intermediate
-> +         * might have [offset+x, bytes-x] allocated.
->            */
-> -        size_inter = bdrv_nb_sectors(intermediate);
-> +        size_inter = bdrv_getlength(intermediate);
->           if (size_inter < 0) {
->               return size_inter;
->           }
-> -        if (n > psectors_inter &&
-> -            (intermediate == top || sector_num + psectors_inter < size_inter)) {
-> -            n = psectors_inter;
-> +        if (n > pnum_inter &&
-> +            (intermediate == top || offset + pnum_inter < size_inter)) {
-> +            n = pnum_inter;
->           }
-> 
->           intermediate = backing_bs(intermediate);
-> diff --git a/block/mirror.c b/block/mirror.c
-> index 0eb2af4..8c3752b 100644
-> --- a/block/mirror.c
-> +++ b/block/mirror.c
-> @@ -621,6 +621,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
->       BlockDriverState *bs = s->source;
->       BlockDriverState *target_bs = blk_bs(s->target);
->       int ret, n;
-> +    int64_t count;
-> 
->       end = s->bdev_length / BDRV_SECTOR_SIZE;
-> 
-> @@ -670,11 +671,13 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
->               return 0;
->           }
-> 
-> -        ret = bdrv_is_allocated_above(bs, base, sector_num, nb_sectors, &n);
-> +        ret = bdrv_is_allocated_above(bs, base, sector_num * BDRV_SECTOR_SIZE,
-> +                                      nb_sectors * BDRV_SECTOR_SIZE, &count);
->           if (ret < 0) {
->               return ret;
->           }
-> 
-> +        n = DIV_ROUND_UP(count, BDRV_SECTOR_SIZE);
->           assert(n > 0);
->           if (ret == 1) {
->               bdrv_set_dirty_bitmap(s->dirty_bitmap, sector_num, n);
-> diff --git a/block/replication.c b/block/replication.c
-> index 8f3aba7..bf4462c 100644
-> --- a/block/replication.c
-> +++ b/block/replication.c
-> @@ -264,7 +264,8 @@ static coroutine_fn int replication_co_writev(BlockDriverState *bs,
->       BdrvChild *top = bs->file;
->       BdrvChild *base = s->secondary_disk;
->       BdrvChild *target;
-> -    int ret, n;
-> +    int ret;
-> +    int64_t n;
-> 
->       ret = replication_get_io_status(s);
->       if (ret < 0) {
-> @@ -283,14 +284,20 @@ static coroutine_fn int replication_co_writev(BlockDriverState *bs,
->        */
->       qemu_iovec_init(&hd_qiov, qiov->niov);
->       while (remaining_sectors > 0) {
-> -        ret = bdrv_is_allocated_above(top->bs, base->bs, sector_num,
-> -                                      remaining_sectors, &n);
-> +        int64_t count;
-> +
-> +        ret = bdrv_is_allocated_above(top->bs, base->bs,
-> +                                      sector_num * BDRV_SECTOR_SIZE,
-> +                                      remaining_sectors * BDRV_SECTOR_SIZE,
-> +                                      &count);
->           if (ret < 0) {
->               goto out1;
->           }
-> 
-> +        assert(QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE));
-> +        n = count >> BDRV_SECTOR_BITS;
->           qemu_iovec_reset(&hd_qiov);
-> -        qemu_iovec_concat(&hd_qiov, qiov, bytes_done, n * BDRV_SECTOR_SIZE);
-> +        qemu_iovec_concat(&hd_qiov, qiov, bytes_done, count);
-> 
->           target = ret ? top : base;
->           ret = bdrv_co_writev(target, sector_num, n, &hd_qiov);
-> @@ -300,7 +307,7 @@ static coroutine_fn int replication_co_writev(BlockDriverState *bs,
-> 
->           remaining_sectors -= n;
->           sector_num += n;
-> -        bytes_done += n * BDRV_SECTOR_SIZE;
-> +        bytes_done += count;
->       }
-> 
->   out1:
-> diff --git a/block/stream.c b/block/stream.c
-> index 0a56c29..eb18557 100644
-> --- a/block/stream.c
-> +++ b/block/stream.c
-> @@ -112,7 +112,7 @@ static void coroutine_fn stream_run(void *opaque)
->       uint64_t delay_ns = 0;
->       int error = 0;
->       int ret = 0;
-> -    int n = 0; /* sectors */
-> +    int64_t n = 0; /* bytes */
->       void *buf;
-> 
->       if (!bs->backing) {
-> @@ -136,9 +136,8 @@ static void coroutine_fn stream_run(void *opaque)
->           bdrv_enable_copy_on_read(bs);
->       }
-> 
-> -    for ( ; offset < s->common.len; offset += n * BDRV_SECTOR_SIZE) {
-> +    for ( ; offset < s->common.len; offset += n) {
->           bool copy;
-> -        int64_t count = 0;
-> 
->           /* Note that even when no rate limit is applied we need to yield
->            * with no pending I/O here so that bdrv_drain_all() returns.
-> @@ -150,26 +149,25 @@ static void coroutine_fn stream_run(void *opaque)
-> 
->           copy = false;
-> 
-> -        ret = bdrv_is_allocated(bs, offset, STREAM_BUFFER_SIZE, &count);
-> -        n = DIV_ROUND_UP(count, BDRV_SECTOR_SIZE);
-> +        ret = bdrv_is_allocated(bs, offset, STREAM_BUFFER_SIZE, &n);
->           if (ret == 1) {
->               /* Allocated in the top, no need to copy.  */
->           } else if (ret >= 0) {
->               /* Copy if allocated in the intermediate images.  Limit to the
->                * known-unallocated area [offset, offset+n*BDRV_SECTOR_SIZE).  */
->               ret = bdrv_is_allocated_above(backing_bs(bs), base,
-> -                                          offset / BDRV_SECTOR_SIZE, n, &n);
-> +                                          offset, n, &n);
-> 
->               /* Finish early if end of backing file has been reached */
->               if (ret == 0 && n == 0) {
-> -                n = (s->common.len - offset) / BDRV_SECTOR_SIZE;
-> +                n = s->common.len - offset;
->               }
-> 
->               copy = (ret == 1);
->           }
-> -        trace_stream_one_iteration(s, offset, n * BDRV_SECTOR_SIZE, ret);
-> +        trace_stream_one_iteration(s, offset, n, ret);
->           if (copy) {
-> -            ret = stream_populate(blk, offset, n * BDRV_SECTOR_SIZE, buf);
-> +            ret = stream_populate(blk, offset, n, buf);
->           }
->           if (ret < 0) {
->               BlockErrorAction action =
-> @@ -188,10 +186,9 @@ static void coroutine_fn stream_run(void *opaque)
->           ret = 0;
-> 
->           /* Publish progress */
-> -        s->common.offset += n * BDRV_SECTOR_SIZE;
-> +        s->common.offset += n;
->           if (copy && s->common.speed) {
-> -            delay_ns = ratelimit_calculate_delay(&s->limit,
-> -                                                 n * BDRV_SECTOR_SIZE);
-> +            delay_ns = ratelimit_calculate_delay(&s->limit, n);
->           }
->       }
-> 
-> diff --git a/qemu-img.c b/qemu-img.c
-> index c5709bf..ca984e1 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -1516,12 +1516,16 @@ static int img_compare(int argc, char **argv)
->           }
-> 
->           for (;;) {
-> +            int64_t count;
-> +
->               nb_sectors = sectors_to_process(total_sectors_over, sector_num);
->               if (nb_sectors <= 0) {
->                   break;
->               }
-> -            ret = bdrv_is_allocated_above(blk_bs(blk_over), NULL, sector_num,
-> -                                          nb_sectors, &pnum);
-> +            ret = bdrv_is_allocated_above(blk_bs(blk_over), NULL,
-> +                                          sector_num * BDRV_SECTOR_SIZE,
-> +                                          nb_sectors * BDRV_SECTOR_SIZE,
-> +                                          &count);
->               if (ret < 0) {
->                   ret = 3;
->                   error_report("Sector allocation test failed for %s",
-> @@ -1529,7 +1533,7 @@ static int img_compare(int argc, char **argv)
->                   goto out;
-> 
->               }
-> -            nb_sectors = pnum;
-> +            nb_sectors = DIV_ROUND_UP(count, BDRV_SECTOR_SIZE);
->               if (ret) {
->                   ret = check_empty_sectors(blk_over, sector_num, nb_sectors,
->                                             filename_over, buf1, quiet);
+> But DD1 = v1.0. There is no real chip which is using
+> CPU_POWERPC_POWER9_BASE as PVR ... so using that is also not
+> accurate,
+> and also likely not what users expect when the select "POWER9_v1.0",
+> and
+> it just does not work as soon as KVM is enabled. So I think Laurent's
+> patch is the right way to go. Or do you have a better suggestion?
 > 
 
--- 
-Thanks
-     -Xie
+I guess we have do decide what we want to be the primary behaviour when
+someone puts -cpu POWER9 on the command line. Does that mean that they
+want an ISAv3.0 compliant cpu or do they want a POWER9 cpu...
+
+FWIW: Currently POWER8 is aliased to POWER8_v2.0 which afaik is the
+last POWER8 revision. Should POWER9 just alias to the most recent
+POWER9 cpu (currently DD1)? Then how would you specify an ISAv3.0
+compliant processor?
+
+TCG only implements a ISAv3 compliant POWER9 cpu so it doesn't make
+sense, and should even refuse to boot with POWER9_DD1 since I think it
+will fail to boot if we let it.
+
+My personal preference would be to have POWER9 alias to the base and
+the user have to explicitly select if they want a DD* version. But that
+might frustrate/confuse people. Maybe we should have some table in
+KVM_HV of allowable processor combinations so that if the user is on
+ISA compliant hardware then they can specify any such cpu on the
+command line and KVM_HV still start successfully.
+
+>  Thomas
+> 
