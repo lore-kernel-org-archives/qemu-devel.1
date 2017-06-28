@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34917)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dQBr6-0005YF-88
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:14:01 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dQBtK-00089s-AU
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:16:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dQBr1-0006vH-4w
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:14:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58624)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dQBr0-0006us-Um
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:13:55 -0400
-Date: Wed, 28 Jun 2017 13:13:52 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170628121352.GC7538@stefanha-x1.localdomain>
-References: <20170615163813.7255-1-stefanha@redhat.com>
-	<20170615163813.7255-4-stefanha@redhat.com>
-	<b1a33e94-b32b-c6ca-c526-6dbb201a25b1@redhat.com>
+	(envelope-from <el13635@mail.ntua.gr>) id 1dQBtJ-000800-Dc
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:16:18 -0400
+Date: Wed, 28 Jun 2017 15:15:30 +0300
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20170628121530.zdhob4iq37x3qv4i@postretch>
+References: <20170623124700.1389-1-el13635@mail.ntua.gr>
+	<20170623124700.1389-3-el13635@mail.ntua.gr>
+	<20170628112736.GD5378@noname.redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="7gGkHNMELEOhSGF6"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="7al5muedogfcc3pt"
 Content-Disposition: inline
-In-Reply-To: <b1a33e94-b32b-c6ca-c526-6dbb201a25b1@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/5] qemu-iotests: 068: extract _qemu()
- function
+In-Reply-To: <20170628112736.GD5378@noname.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v3 2/8] block: Add aio_context field in
+ ThrottleGroupMember
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +26,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Pavel Butsykin <pbutsykin@virtuozzo.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>
 
 
---7gGkHNMELEOhSGF6
-Content-Type: text/plain; charset=us-ascii
+--7al5muedogfcc3pt
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 27, 2017 at 06:40:04AM -0500, Eric Blake wrote:
-> On 06/15/2017 11:38 AM, Stefan Hajnoczi wrote:
-> > Avoid duplicating the QEMU command-line.
-> >=20
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > ---
-> >  tests/qemu-iotests/068 | 13 ++++++++-----
-> >  1 file changed, 8 insertions(+), 5 deletions(-)
-> >=20
->=20
-> > +# Give qemu some time to boot before saving the VM state
-> > +bash -c 'sleep 1; echo -e "savevm 0\nquit"' | _qemu
->=20
-> Are we sure that 'bash' on PATH is the same as the /bin/bash running the
-> script?
->=20
-> Also, while bash has more deterministic behavior for 'echo -e' (it is
-> non-portable if you are porting a script to other shells), it is still
-> possible to set bash to a mode where it does not work (see xhopt
-> xpg_echo).  I'd much prefer you use 'printf' instead of 'set -e'.
+On Wed, Jun 28, 2017 at 01:27:36PM +0200, Kevin Wolf wrote:
+>Am 23.06.2017 um 14:46 hat Manos Pitsidianakis geschrieben:
+>> timer_cb() needs to know about the current Aio context of the throttle
+>> request that is woken up. In order to make ThrottleGroupMember backend
+>> agnostic, this information is stored in an aio_context field instead of
+>> accessing it from BlockBackend.
+>>
+>> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+>
+>You're copying the AioContext when the BlockBackend is registered for
+>the throttle group, but what keeps both sides in sync when the context
+>is changed later on? Don't we need to update the ThrottleGroupMember in
+>blk_set_aio_context?
 
-Do you want to send a separate patch?
+blk_set_aio_context calls throttle_timers_attach_aio_context which=20
+updates this. Though as Alberto said util/throttle.c should not know=20
+about ThrottleGroupMember. This is not needed in the later patches=20
+because the ThrottleGroupMember's aio_context gets updated as a node in=20
+the driver's bdrv_attach_aio_context
 
-The purpose of this patch was just to move this code.
+We can add a new function in block/throttle.c that updates a member's=20
+aio context but I'm not sure if it's really needed if members are only=20
+used in throttle nodes.
 
-Stefan
-
---7gGkHNMELEOhSGF6
+--7al5muedogfcc3pt
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJZU52AAAoJEJykq7OBq3PIQSMH/1+MUhOphgKNCSEqqCr8Y83O
-Q59YaPSbtXbG7oPr5i+JaZPEXU2l9UQp4cKxc1vc7K8yDa93uri2fzdxukBgY/aG
-saJilCK4SmeIZcL01wl4AAY1MLuD3IhUST8wXkckvg9+dtuTv7CVrhSeSE6X80hH
-iaIoLhC4zMUOeIi/2zwvT+UCrCpJx1o0+qOdPtCYsZ0ni6mX77EUFWW0vBRT9BEG
-3M24cxKY9Fh5par+D/kqEhV017lmf3IzmHvyrW2KliPXjvGAk2RFqIK1rQpw5neK
-ouXxM/l0kQ9hY/lPTbLIFP2N4+SNDIb6a0+MUPmcFQJpUUj/e/YxEvW3lGmaCFI=
-=6bpZ
+iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAllTneIACgkQc2J8L2kN
+9xDX8g//VozmMZe5L4LdCmH7ygtcDqgmPXtpDiBTDhdutWnKhVEsCmb3dMW2p7M3
+nU4tL14hNiWBHvEcCSUkBfdjHgrAX46gg5imrkwWUbVQ+gLRHkEIIOh0CL9hP7/L
+TzU5GRRYLEu3lkY3MWseUU8cUw+s7HzDeRjKaSVvVvaNvOK0nn/iVAN+/obyuehy
+XvsL32ZTEURBiDtb5acLU+SVtTRcIz4s94ccuB4NDIKDdwGK80ukQbWjHcmVfHXF
+/JDxKeT3OyXxLaqmtVkIGjmvAEqT/EFuYtSEeNrwZcgJ7UnvESdG8KERGR06nTWB
+DnNh7FB0b2e3AEe4vGxda0RYr/FVFZsgF3AOz6FIno5ddU+4j010T+WExIOb849n
+HNeyoUiiXtUu+F4uB2ipKSAdWMDwZ1Z2hGM0dTE/rQ828MmmzcuzJHQnUC3lY5SX
+FaJk5RL30MImolHO+U14icVnMkWqgwMXOd58J5yHRZbx/d9VB4tvgRDlEuh4+Bzc
+1fnir4YU3EAymvVDcdNFbTRvmAXoGyYJ83Y7bCGCtR8vUWm6bImXfHh6+2JFjb3S
+PAmmCjRwQPK9KNrf531XVr3BS9OnKsaoL12fMZcWkiB1OdgVSlHYwg5GOo/U1AVH
+uSonobUm9+fZBgOcQbxZq70NDoIcqlAZhpGSqUden+eEBhmVrco=
+=DkkH
 -----END PGP SIGNATURE-----
 
---7gGkHNMELEOhSGF6--
+--7al5muedogfcc3pt--
