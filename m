@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dQBtK-00089s-AU
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:16:19 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dQBu1-0000IB-R8
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:17:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dQBtJ-000800-Dc
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:16:18 -0400
-Date: Wed, 28 Jun 2017 15:15:30 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170628121530.zdhob4iq37x3qv4i@postretch>
-References: <20170623124700.1389-1-el13635@mail.ntua.gr>
-	<20170623124700.1389-3-el13635@mail.ntua.gr>
-	<20170628112736.GD5378@noname.redhat.com>
+	(envelope-from <vilanova@ac.upc.edu>) id 1dQBtx-0008T5-1m
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:17:01 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:58870)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dQBtw-0008S7-FF
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:16:56 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Wed, 28 Jun 2017 15:16:40 +0300
+Message-Id: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="7al5muedogfcc3pt"
-Content-Disposition: inline
-In-Reply-To: <20170628112736.GD5378@noname.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v3 2/8] block: Add aio_context field in
- ThrottleGroupMember
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v11 00/29] translate: [tcg] Generic translation
+ framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,57 +25,202 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: qemu-devel@nongnu.org
+Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+
+This series proposes a generic (target-agnostic) instruction translation
+framework.
+
+It basically provides a generic main loop for instruction disassembly, wh=
+ich
+calls target-specific functions when necessary. This generalization makes
+inserting new code in the main loop easier, and helps in keeping all targ=
+ets in
+synch as to the contents of it.
+
+This series also paves the way towards adding events to trace guest code
+execution (BBLs and instructions).
+
+I've ported i386/x86-64 and arm/aarch64 as an example to see how it fits =
+in the
+current organization, but will port the rest when this series gets merged.
+
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+
+Changes in v11
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Convert gen_intermediate_code_a64 [Emilio G. Cota].
+* Replace "cpu_env" argument in icount functions with "tcg_ctx.cpu_env"
+  [Emilio G. Cota].
+* Drop QTAILQ_FOREACH_CONTINUE and cpu_breakpoint_get in favour of an exp=
+licit
+  breakpoint traversal [Richard Henderson].
+* Rename translate-block.[ch] into translator.[ch] [Emilio G. Cota].
+* Revert DJ_* names into DISAS_*, and provide generic DISAS_TARGET_* enum=
+ values
+  instead of defining them as integers on each target.
+* Do not use DisasContextBase directly in target code (helps the compiler=
+'s
+  alias analysis) [Richard Henderson].
+* Make all generic translator hooks mandatory [Richard Henderson].
+* Rename TranslatorOps::disas_insn as TranslatorOps::translate_insn
+  [Richard Henderson].
+* Generalize TranslatorOps::disas_flags into TranslatorOps::disas_log to =
+support
+  future targets [Richard Henderson].
+* Split arm and aarch64 changes in different patches [Emilio G. Cota].
+* Make translator op structs constant [Richard Henderson].
+* Write a single entry point for both arm and aarch64 translation
+  [Richard Henderson].
+* Change format of commit titles [Emilio G. Cota].
+* Remove cross-page check from generic code (it's already embedded in mor=
+e
+  complex, and mandatory, checks in most targets).
 
 
---7al5muedogfcc3pt
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Changes in v10
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-On Wed, Jun 28, 2017 at 01:27:36PM +0200, Kevin Wolf wrote:
->Am 23.06.2017 um 14:46 hat Manos Pitsidianakis geschrieben:
->> timer_cb() needs to know about the current Aio context of the throttle
->> request that is woken up. In order to make ThrottleGroupMember backend
->> agnostic, this information is stored in an aio_context field instead of
->> accessing it from BlockBackend.
->>
->> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
->
->You're copying the AioContext when the BlockBackend is registered for
->the throttle group, but what keeps both sides in sync when the context
->is changed later on? Don't we need to update the ThrottleGroupMember in
->blk_set_aio_context?
+* Rebase on 931892e8a6.
+* Fix build errors for hppa, nios2 and openrisc.
 
-blk_set_aio_context calls throttle_timers_attach_aio_context which=20
-updates this. Though as Alberto said util/throttle.c should not know=20
-about ThrottleGroupMember. This is not needed in the later patches=20
-because the ThrottleGroupMember's aio_context gets updated as a node in=20
-the driver's bdrv_attach_aio_context
 
-We can add a new function in block/throttle.c that updates a member's=20
-aio context but I'm not sure if it's really needed if members are only=20
-used in throttle nodes.
+Changes in v9
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
---7al5muedogfcc3pt
-Content-Type: application/pgp-signature; name="signature.asc"
+* Further increase inter-mail sleep time during sending.
 
------BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAllTneIACgkQc2J8L2kN
-9xDX8g//VozmMZe5L4LdCmH7ygtcDqgmPXtpDiBTDhdutWnKhVEsCmb3dMW2p7M3
-nU4tL14hNiWBHvEcCSUkBfdjHgrAX46gg5imrkwWUbVQ+gLRHkEIIOh0CL9hP7/L
-TzU5GRRYLEu3lkY3MWseUU8cUw+s7HzDeRjKaSVvVvaNvOK0nn/iVAN+/obyuehy
-XvsL32ZTEURBiDtb5acLU+SVtTRcIz4s94ccuB4NDIKDdwGK80ukQbWjHcmVfHXF
-/JDxKeT3OyXxLaqmtVkIGjmvAEqT/EFuYtSEeNrwZcgJ7UnvESdG8KERGR06nTWB
-DnNh7FB0b2e3AEe4vGxda0RYr/FVFZsgF3AOz6FIno5ddU+4j010T+WExIOb849n
-HNeyoUiiXtUu+F4uB2ipKSAdWMDwZ1Z2hGM0dTE/rQ828MmmzcuzJHQnUC3lY5SX
-FaJk5RL30MImolHO+U14icVnMkWqgwMXOd58J5yHRZbx/d9VB4tvgRDlEuh4+Bzc
-1fnir4YU3EAymvVDcdNFbTRvmAXoGyYJ83Y7bCGCtR8vUWm6bImXfHh6+2JFjb3S
-PAmmCjRwQPK9KNrf531XVr3BS9OnKsaoL12fMZcWkiB1OdgVSlHYwg5GOo/U1AVH
-uSonobUm9+fZBgOcQbxZq70NDoIcqlAZhpGSqUden+eEBhmVrco=
-=DkkH
------END PGP SIGNATURE-----
+Changes in v8
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
---7al5muedogfcc3pt--
+* Increase inter-mail sleep time during sending (list keeps refusing some=
+ emails
+  due to an excessive send rate).
+
+
+Changes in v7
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Change BreakpointHitType (BH_*) for BreakpointCheckType (BC_*).
+* Move target-specific translation functions to a struct (TranslatorOps).
+* Split target-specific changes into multiple patches.
+* Rebase on edf8bc9842.
+
+
+Changes in v6
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Rebase on upstream master (64175afc69).
+* Reorder fields in DisasContextBase to minimize padding [Richard Henders=
+on].
+
+
+Changes in v5
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Remove stray uses of "restrict" keyword.
+
+
+Changes in v4
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Document new macro QTAILQ_FOREACH_CONTINUE [Peter Maydell].
+* Fix coding style errors reported by checkpatch.
+* Remove use of "restrict" in added functions; it makes older gcc version=
+s barf
+  about compilation errors.
+
+
+Changes in v3
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Rebase on 0737f32daf.
+
+
+Changes in v2
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Port ARM and AARCH64 targets.
+* Fold single-stepping checks into "max_insns" [Richard Henderson].
+* Move instruction start marks to target code [Richard Henderson].
+* Add target hook for TB start.
+* Check for TCG temporary leaks.
+* Move instruction disassembly into a target hook.
+* Make breakpoint_hit() return an enum to accomodate target's needs (ARM).
+
+
+Llu=C3=ADs Vilanova (29):
+      Pass generic CPUState to gen_intermediate_code()
+      cpu-exec: Avoid global variables in icount-related functions
+      target: [tcg] Use a generic enum for DISAS_ values
+      target: [tcg] Add generic translation framework
+      target/i386: [tcg] Port to DisasContextBase
+      target/i386: [tcg] Refactor init_disas_context
+      target/i386: [tcg] Refactor init_globals
+      target/i386: [tcg] Refactor insn_start
+      target/i386: [tcg] Refactor breakpoint_check
+      target/i386: [tcg] Refactor translate_insn
+      target/i386: [tcg] Refactor tb_stop
+      target/i386: [tcg] Refactor disas_log
+      target/i386: [tcg] Port to generic translation framework
+      target/arm: [tcg] Port to DisasContextBase
+      target/arm: [tcg] Port to init_disas_context
+      target/arm: [tcg,a64] Port to init_disas_context
+      target/arm: [tcg] Port to init_globals
+      target/arm: [tcg] Port to tb_start
+      target/arm: [tcg] Port to insn_start
+      target/arm: [tcg,a64] Port to insn_start
+      target/arm: [tcg] Port to breakpoint_check
+      target/arm: [tcg,a64] Port to breakpoint_check
+      target/arm: [tcg] Port to translate_insn
+      target/arm: [tcg,a64] Port to translate_insn
+      target/arm: [tcg] Port to tb_stop
+      target/arm: [tcg,a64] Port to tb_stop
+      target/arm: [tcg] Port to disas_log
+      target/arm: [tcg,a64] Port to disas_log
+      target/arm: [tcg] Port to generic translation framework
+
+
+ accel/tcg/Makefile.objs       |    1=20
+ accel/tcg/translate-all.c     |    2=20
+ accel/tcg/translator.c        |  153 +++++++++++++++
+ include/exec/exec-all.h       |    8 -
+ include/exec/gen-icount.h     |   10 -
+ include/exec/translator.h     |  142 ++++++++++++++
+ target/alpha/translate.c      |   11 -
+ target/arm/translate-a64.c    |  280 +++++++++++++--------------
+ target/arm/translate.c        |  419 +++++++++++++++++++++--------------=
+------
+ target/arm/translate.h        |   41 ++--
+ target/cris/translate.c       |   24 +-
+ target/hppa/translate.c       |    5=20
+ target/i386/translate.c       |  306 +++++++++++++++---------------
+ target/lm32/translate.c       |   28 ++-
+ target/m68k/translate.c       |   22 +-
+ target/microblaze/translate.c |   28 ++-
+ target/mips/translate.c       |   15 +
+ target/moxie/translate.c      |   14 +
+ target/nios2/translate.c      |   11 +
+ target/openrisc/translate.c   |   26 ++-
+ target/ppc/translate.c        |   15 +
+ target/s390x/translate.c      |   16 +-
+ target/sh4/translate.c        |   15 +
+ target/sparc/translate.c      |   11 -
+ target/tilegx/translate.c     |    7 -
+ target/tricore/translate.c    |    9 -
+ target/unicore32/translate.c  |   24 +-
+ target/xtensa/translate.c     |   17 +-
+ 28 files changed, 996 insertions(+), 664 deletions(-)
+ create mode 100644 accel/tcg/translator.c
+ create mode 100644 include/exec/translator.h
+
+
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Cc: Emilio G. Cota <cota@braap.org>
