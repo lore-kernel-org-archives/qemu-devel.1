@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49490)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dQ7Cc-00005c-Ft
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 03:15:55 -0400
+	(envelope-from <armbru@redhat.com>) id 1dQ7Cd-00005l-LB
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 03:15:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dQ7Cb-0000Ux-NE
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 03:15:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50724)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dQ7Cb-0000UU-8u
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 03:15:53 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4DEB1C0587FA
-	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 07:15:52 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Wed, 28 Jun 2017 15:15:44 +0800
-Message-Id: <1498634144-26508-1-git-send-email-peterx@redhat.com>
-In-Reply-To: <1498536619-14548-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 11/10] migration: add comment for
- TYPE_MIGRATE
+	(envelope-from <armbru@redhat.com>) id 1dQ7Cc-0000Vd-Mb
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 03:15:55 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170627163145.GC4792@noname.redhat.com>
+	<612358d1-4be0-7118-0e88-d5fce2b19d18@redhat.com>
+Date: Wed, 28 Jun 2017 09:15:41 +0200
+In-Reply-To: <612358d1-4be0-7118-0e88-d5fce2b19d18@redhat.com> (John Snow's
+	message of "Tue, 27 Jun 2017 14:24:12 -0400")
+Message-ID: <87injgd1lu.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC] QMP design: Fixing query-block
+ and friends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +24,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, lvivier@redhat.com, eblake@redhat.com, armbru@redhat.com, quintela@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: John Snow <jsnow@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
 
-It'll be strange that the migration object inherits TYPE_DEVICE. Add
-some explanations to it.
+John Snow <jsnow@redhat.com> writes:
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- migration/migration.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+> On 06/27/2017 12:31 PM, Kevin Wolf wrote:
+>> Hi,
+>> 
+>> I haven't really liked query-block for a long time, but now that
+>> blockdev-add and -blockdev have settled, it might finally be the time to
+>> actually do something about it. In fact, if used together with these
+>> modern interfaces, our query commands are simply broken, so we have to
+>> fix something.
+>> 
+>
+> [...words...]
+>
+>> 
+>> So how do we go forward from here?
+>> 
+>> I guess we could add a few hacks o fix the really urgent things, and
+>> just adding more information is always possible (at the cost of even
+>> more duplication).
+>> 
+>
+> I think you've included this suggestion so that you can summarily
+> dismiss it as foolish.
+>
+>> However, it appears to me that I dislike so many thing about our current
+>> query commands that I'm tempted to say: Throw it all away and start
+>> over.
+>> 
+>
+> Inclined to agree. The structure of the block layer has changed so much
+> in the past few years and this is easily seen by the gap you've outlined
+> here.
+>
+> We have to keep the old query commands around for a while as Eric says,
+> but I worry that they are so wrong and misleading as to be actively harmful.
+>
+> Maybe there's some hair trigger somewhere that if $NEW_FEATURE_X is used
+> to configure QEMU in some way, that the old commands can be deprecated
+> at runtime, such that we can more aggressively force their retirement.
 
-diff --git a/migration/migration.c b/migration/migration.c
-index b1b0825..2398a9d 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -2046,6 +2046,14 @@ static void migration_instance_init(Object *obj)
- 
- static const TypeInfo migration_type = {
-     .name = TYPE_MIGRATION,
-+    /*
-+     * NOTE: "migration" itself is not really a device. We used
-+     * TYPE_DEVICE here only to leverage some existing QDev features
-+     * like "-global" properties, and HW_COMPAT_* fields (which are
-+     * finally applied as global properties as well). If one day the
-+     * global property feature can be migrated from QDev to QObject in
-+     * general, then we can switch to QObject as well.
-+     */
-     .parent = TYPE_DEVICE,
-     .class_init = migration_class_init,
-     .class_size = sizeof(MigrationClass),
--- 
-2.7.4
+We warn on use of deprecated command line and HMP features.  I think we
+want the same for QMP, within QMP.
+
+[...]
