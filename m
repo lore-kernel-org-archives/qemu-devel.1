@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dQ55b-0002bv-Ua
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 01:00:33 -0400
+	(envelope-from <armbru@redhat.com>) id 1dQ5tU-00041t-7c
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 01:52:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dQ55X-0004ip-6G
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 01:00:32 -0400
-Received: from mail-yw0-x242.google.com ([2607:f8b0:4002:c05::242]:35172)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1dQ55X-0004iG-2G
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 01:00:27 -0400
-Received: by mail-yw0-x242.google.com with SMTP id z21so2779536ywz.2
-	for <qemu-devel@nongnu.org>; Tue, 27 Jun 2017 22:00:25 -0700 (PDT)
-From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Wed, 28 Jun 2017 01:00:02 -0400
-Message-Id: <20170628050003.1809-2-bobby.prani@gmail.com>
-In-Reply-To: <20170628050003.1809-1-bobby.prani@gmail.com>
-References: <20170628050003.1809-1-bobby.prani@gmail.com>
-Subject: [Qemu-devel] [PATCH 1/2] [TEST] aarch64: Use pmuserenr_el0 register
- for instrumentation
+	(envelope-from <armbru@redhat.com>) id 1dQ5tR-0001Qn-2W
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 01:52:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35632)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dQ5tQ-0001QD-Px
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 01:52:00 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1498530543.git.maozy.fnst@cn.fujitsu.com>
+	<c5ea94f976cb60151fb14a4e25867d73027c5d96.1498530543.git.maozy.fnst@cn.fujitsu.com>
+	<87tw31luv3.fsf@dusky.pond.sub.org>
+	<fe570119-ce7f-9427-99b7-0b83786ada28@cn.fujitsu.com>
+Date: Wed, 28 Jun 2017 07:51:54 +0200
+In-Reply-To: <fe570119-ce7f-9427-99b7-0b83786ada28@cn.fujitsu.com> (Mao
+	Zhongyi's message of "Wed, 28 Jun 2017 12:08:29 +0800")
+Message-ID: <87vangd5hh.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 3/4] net/net: Convert parse_host_port()
+ to Error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,73 +30,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alex.bennee@linaro.org
-Cc: qemu-devel@nongnu.org, rth@twiddle.net
+To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Cc: pbonzini@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com
 
-We need a way for the benchmark running in the guest to indicate us to
-start/stop our instrumentation. On x86, we could use the 'cpuid'
-instruction along with an appropriately populated 'eax'
-register. However, no such dummy instruction exists for aarch64. So
-we modify the permission bits for 'pmuserenr_el0' register and tap
-that to instrument the guest code.
+Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
 
-You can use the following annotations on your region-of-interest to
-instrument the code.
+> Hi, Markus
+>
+> On 06/27/2017 04:04 PM, Markus Armbruster wrote:
+>> Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
+>>
+>>> Cc: berrange@redhat.com
+>>> Cc: kraxel@redhat.com
+>>> Cc: pbonzini@redhat.com
+>>> Cc: jasowang@redhat.com
+>>> Cc: armbru@redhat.com
+>>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+>>> ---
+>>>  include/qemu/sockets.h |  3 ++-
+>>>  net/net.c              | 22 +++++++++++++++++-----
+>>>  net/socket.c           | 19 ++++++++++++++-----
+>>>  3 files changed, 33 insertions(+), 11 deletions(-)
+>>>
+>>> diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
+>>> index 5c326db..78e2b30 100644
+>>> --- a/include/qemu/sockets.h
+>>> +++ b/include/qemu/sockets.h
+>>> @@ -53,7 +53,8 @@ void socket_listen_cleanup(int fd, Error **errp);
+>>>  int socket_dgram(SocketAddress *remote, SocketAddress *local, Error **errp);
+>>>
+>>>  /* Old, ipv4 only bits.  Don't use for new code. */
+>>> -int parse_host_port(struct sockaddr_in *saddr, const char *str);
+>>> +int parse_host_port(struct sockaddr_in *saddr, const char *str,
+>>> +                    Error **errp);
+>>>  int socket_init(void);
+>>>
+>>>  /**
+>>> diff --git a/net/net.c b/net/net.c
+>>> index 6235aab..884e3ac 100644
+>>> --- a/net/net.c
+>>> +++ b/net/net.c
+>>> @@ -100,7 +100,8 @@ static int get_str_sep(char *buf, int buf_size, const char **pp, int sep)
+>>>      return 0;
+>>>  }
+>>>
+>>> -int parse_host_port(struct sockaddr_in *saddr, const char *str)
+>>> +int parse_host_port(struct sockaddr_in *saddr, const char *str,
+>>> +                    Error **errp)
+>>>  {
+>>>      char buf[512];
+>>>      struct hostent *he;
+>>> @@ -108,24 +109,35 @@ int parse_host_port(struct sockaddr_in *saddr, const char *str)
+>>>      int port;
+>>>
+>>>      p = str;
+>>> -    if (get_str_sep(buf, sizeof(buf), &p, ':') < 0)
+>>> +    if (get_str_sep(buf, sizeof(buf), &p, ':') < 0) {
+>>> +        error_setg(errp, "The address should contain ':', for example: "
+>>> +                   "xxxx=230.0.0.1:1234");
+>>
+>> Suggest "Host address '%s' should ..." like you do in the next error message.
+>>
+>> The xxxx= is confusing.  Do we need an example here?  The other error
+>> messages in this function apparently don't.
+>>
+>> What about "host address '%s' doesn't contain ':' separating host from
+>> port" or "can't find ':' separating host from port in host address
+>> '%s'"?
+>>
+>
+> Yes, my description message is really confusing.
+> Both of your prompt message are well understood.
+>
+> Thank you very much.
+>
+>>
+>>>          return -1;
+>>> +    }
+>>>      saddr->sin_family = AF_INET;
+>>>      if (buf[0] == '\0') {
+>>>          saddr->sin_addr.s_addr = 0;
+>>>      } else {
+>>>          if (qemu_isdigit(buf[0])) {
+>>> -            if (!inet_aton(buf, &saddr->sin_addr))
+>>> +            if (!inet_aton(buf, &saddr->sin_addr)) {
+>>> +                error_setg(errp, "Host address '%s' is not a valid "
+>>> +                           "IPv4 address", buf);
+>>>                  return -1;
+>>> +            }
+>>>          } else {
+>>> -            if ((he = gethostbyname(buf)) == NULL)
+>>> +            he = gethostbyname(buf);
+>>> +            if (he == NULL) {
+>>> +                error_setg(errp, "Specified hostname is error.");
+>>
+>> No.  Suggest "can't resolve host address '%s'.  This error message still
+>> lacks detail, but I'm not sure hstrerror() is sufficiently portable.
+>>
+>
+> The gethostbyname() return a null pointer if an error occurs, and the h_errno
+> variable holds an error number. herror() and hstrerror() can prints the error
+> message associated with the current value of h_errno, but hstrerror() returns
+> the string type is good for passing the error message to Error. So I'd prefer
+> the hstrerror.
+>
+> As for the portability of hstrerror(), sorry, I'm also not sure, but in this
+> case I tested, it's OK. so I want to use hstrerror() for a while, if there are
+> any problem that can be fixed later. Do you think it can be done?
 
-#define magic_enable() \
-  asm volatile ("msr pmuserenr_el0, %0" :: "r" (0xaaaaaaaa));
-#define magic_disable() \
-  asm volatile ("msr pmuserenr_el0, %0" :: "r" (0xfa11dead));
+Standard first portability question: does Windows provide it?
 
-Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
----
- target/arm/helper.c | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+>> Outside this patch's scope: gethostbyname() is obsolete.  Applications
+>> should use getaddrinfo() instead.  Comes with gai_strerror().
+>
+> Can I try to fix it later?
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 2594faa9b8..dfbf03676c 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -1124,9 +1124,24 @@ static uint64_t pmxevtyper_read(CPUARMState *env, const ARMCPRegInfo *ri)
-     }
- }
- 
-+bool enable_instrumentation;
-+
- static void pmuserenr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                             uint64_t value)
- {
-+    ARMCPU *cpu = arm_env_get_cpu(env);
-+    CPUState *cs = CPU(cpu);
-+
-+    if (value == 0xaaaaaaaa) {
-+        printf("Enabling instrumentation\n");
-+        enable_instrumentation = true;
-+        tb_flush(cs);
-+    } else if (value == 0xfa11dead) {
-+        printf("Disabling instrumentation\n");
-+        enable_instrumentation = false;
-+        tb_flush(cs);
-+    }
-+
-     if (arm_feature(env, ARM_FEATURE_V8)) {
-         env->cp15.c9_pmuserenr = value & 0xf;
-     } else {
-@@ -1316,13 +1331,13 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
-       .access = PL0_RW, .type = ARM_CP_CONST, .resetvalue = 0,
-       .accessfn = pmreg_access_xevcntr },
-     { .name = "PMUSERENR", .cp = 15, .crn = 9, .crm = 14, .opc1 = 0, .opc2 = 0,
--      .access = PL0_R | PL1_RW, .accessfn = access_tpm,
-+      .access = PL0_RW | PL1_RW, .accessfn = access_tpm,
-       .fieldoffset = offsetof(CPUARMState, cp15.c9_pmuserenr),
-       .resetvalue = 0,
-       .writefn = pmuserenr_write, .raw_writefn = raw_write },
-     { .name = "PMUSERENR_EL0", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 3, .crn = 9, .crm = 14, .opc2 = 0,
--      .access = PL0_R | PL1_RW, .accessfn = access_tpm, .type = ARM_CP_ALIAS,
-+      .access = PL0_RW | PL1_RW, .accessfn = access_tpm, .type = ARM_CP_ALIAS,
-       .fieldoffset = offsetof(CPUARMState, cp15.c9_pmuserenr),
-       .resetvalue = 0,
-       .writefn = pmuserenr_write, .raw_writefn = raw_write },
--- 
-2.13.0
+Sure.  By "outside this patch's scope" I mean it's a separate matter
+that clearly doesn't have to be addressed to get this patch accepted.
