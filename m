@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <indiffpig@126.com>) id 1dQBvs-0002RD-MK
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:18:57 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dQBxi-00042w-LV
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:20:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <indiffpig@126.com>) id 1dQBvn-0000pX-PV
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:18:56 -0400
-Received: from mproxygzt1.163.com ([113.108.225.5]:46393)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <indiffpig@126.com>) id 1dQBvm-0000o5-PY
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:18:51 -0400
-Date: Wed, 28 Jun 2017 20:16:07 +0800 (CST)
-From: indiffpig  <indiffpig@126.com>
-In-Reply-To: <07f317b7-906e-dc8b-feb0-62e4788b637f@redhat.com>
-References: <1498282754-2573-1-git-send-email-indiffPig@126.com>
-	<07f317b7-906e-dc8b-feb0-62e4788b637f@redhat.com>
-MIME-Version: 1.0
-Message-ID: <10695441.cf07.15ceea14c66.Coremail.indiffpig@126.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH] qga:windows os lost ip when network nic
- change pic order
+	(envelope-from <stefanha@redhat.com>) id 1dQBxe-0001om-95
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:20:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48856)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dQBxe-0001nZ-24
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 08:20:46 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Wed, 28 Jun 2017 13:20:39 +0100
+Message-Id: <20170628122041.13558-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PULL 0/2] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +21,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-VGhhdCdzIHRydWUuIExldCBtZSBjb25maXJtIHRvIHlvdSB3aGV0aGVyIHRoaXMgcHJvYmxlbSBl
-eGlzdHMgb3Igd2hldGhlciB0aGVyZSBhcmUgYW55IHNvbHV0aW9ucyBhbHJlYWR5IGF2YWlsYWJs
-ZS4gSWYgc28sIEkgd291bGQgbGlrZSB5b3UgdG8gdGVsbCBtZSB0aGUgZXhpc3Rpbmcgc29sdXRp
-b24uIE15IHBhdGNoIGNvbWVzIGZyb20gdGhlIGNvbXBhbnkgY29kZSwgYW5kIHRoZSBjb2RlIGlz
-IGxvbmcuVGhlIG5vdGVzIGFyZSB3cml0dGVuIGluIENoaW5lc2UuIFdlIHdvcmsgdG9vIG11Y2gg
-YW5kIGRvbid0IGhhdmUgbXVjaCBzcGFyZSB0aW1lLiBJZiB5b3UgYXJlIHN1cmUgdGhlcmUgaXMg
-YSBwcm9ibGVtIGFuZCBuZWVkIHRvIGJlIHJlc29sdmVkLCBJIHdvdWxkIGxpa2UgdG8gdGFrZSB0
-aGUgdGltZSB0byByZWZpbmUgdGhlIGNvZGUuCgoKCgoKCgoKQXQgMjAxNy0wNi0yOCAwNToxNDo1
-NywgIkVyaWMgQmxha2UiIDxlYmxha2VAcmVkaGF0LmNvbT4gd3JvdGU6Cj5PbiAwNi8yNC8yMDE3
-IDEyOjM5IEFNLCBpbmRpZmZQaWdAMTI2LmNvbSB3cm90ZToKPj4gRnJvbTogInlpbi56dW93ZWki
-IDxpbmRpZmZQaWdAMTI2LmNvbT4KPj4gCj4+IFNpZ25lZC1vZmYtYnk6IHlpbi56dW93ZWkgPGlu
-ZGlmZlBpZ0AxMjYuY29tPgo+PiAKPj4gYnVnIGRlc2NyaXB0aW9uOiBJbiB0aGUgd2luZG93cyB2
-aXJ0dWFsIG1hY2hpbmUsIGlmIHRoZXJlIGFyZSBtdWx0aXBsZSBuZXR3b3JrIGNhcmRzLCB0aGUg
-aHlwb3RoZXNpcyBpcyB0aGF0IEEvQi9DIGlzIGVxdWlwcGVkIHdpdGggYSBkaWZmZXJlbnQgSVAg
-YWRkcmVzcy4gT25jZSB5b3UgZGVsZXRlIGEgQiBjYXJkIGluIHRoZSBtaWRkbGUgYW5kIHJlc3Rh
-cnQgdGhlIHZpcnR1YWwgbWFjaGluZSwgeW91IHdpbGwgZmluZCB0aGF0IHRoZSBBL0Mgb2YgdGhl
-IG5ldHdvcmsgY2FyZCBJUCBoYXMgYmVlbiBjb25mdXNlZCwgYW5kIHRoZSBJUCBvZiB0aGUgQyBu
-ZXR3b3JrIGNhcmQgaGFzIGJlY29tZSB0aGUgYWRkcmVzcyBvZiBCLCBhbmQgdGhlIHNlcnZpY2Ug
-aGFzIGJlZW4gaW50ZXJydXB0ZWQuIFNvIHdlIGRpZCBhIElQIHJlY292ZXJ5IGZ1bmN0aW9uIGlu
-IHFnYS5UaGlzIGlzIGEgc2VyaW91cyBwcm9ibGVtIHRoYXQgY2FuIGxlYWQgdG8gYnVzaW5lc3Mg
-ZGlzcnVwdGlvbi4gSWYgeW91IGhhdmUgYSBiZXR0ZXIgcGxhbiwgd2Ugd291bGQgbGlrZSB0byBv
-ZmZlciBpdCB0byB5b3UuCj4+IC0tLQo+PiAgcWdhL3Jlc3RvcmVJcC5jcHAgfCAxODQ4ICsrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrCj4+ICAxIGZp
-bGUgY2hhbmdlZCwgMTg0OCBpbnNlcnRpb25zKCspCj4+ICBjcmVhdGUgbW9kZSAxMDA3NTUgcWdh
-L3Jlc3RvcmVJcC5jcHAKPj4gCj4+IGRpZmYgLS1naXQgYS9xZ2EvcmVzdG9yZUlwLmNwcCBiL3Fn
-YS9yZXN0b3JlSXAuY3BwCj4+IG5ldyBmaWxlIG1vZGUgMTAwNzU1Cj4+IGluZGV4IDAwMDAwMDAu
-LjIzODIxMzYKPj4gLS0tIC9kZXYvbnVsbAo+PiArKysgYi9xZ2EvcmVzdG9yZUlwLmNwcAo+PiBA
-QCAtMCwwICsxLDE4NDggQEAKPj4gKy8vIHJlc3RvcmVJcC5jcHAgOiDvv73vv73vv73vv73vv73v
-v73vv73MqNOm77+9w7Pvv73vv73vv73vv73vv73vv73ateOhowo+Cj5Zb3VyIG1haWwgaGVhZGVy
-IHNhaWQ6Cj4KPj4gQ29udGVudC1UeXBlOiB0ZXh0L3BsYWluOyBjaGFyc2V0PXllcwo+Cj53aGlj
-aCBsb29rcyBsaWtlIGEgYnVnIHdpdGggeW91ciBnaXQgc2V0dGluZ3MgKHR5cGljYWxseSwgaXQg
-c2hvdWxkIGJlCj5jaGFyc2V0PVVURi04KS4gIE11Y2ggb2YgdGhlIG1lc3NhZ2UgZGlkbid0IHJl
-bmRlciBmb3IgbWUgKG5vdCBzdXJlIGlmCj5pdCBsYWNrIG9mIGZvbnRzIG9uIG15IGVuZCwgb3Ig
-aWYgaXQgcmVhbGx5IHdhcyBnYXJibGVkIGVuIHJvdXRlIHJhdGhlcgo+dGhhbiBiZWluZyB2YWxp
-ZCBVVEYtOCByb3VuZC10cmlwKS4gIEJ1dCB3ZSBtdWNoIHByZWZlciAvKiAqLyBjb21tZW50cwo+
-b3ZlciAvLyAoZXZlbiBpbiBDKysgY29kZSksIGFuZCBwcmVmZXIgdGhvc2UgY29tbWVudHMgdG8g
-YmUgaW4gRW5nbGlzaC4KPgo+PiArLy8jcHJhZ21hIGNvbW1lbnQobGliLCJpcGhscGFwaS5saWIi
-KQo+Cj5EZWFkIGNvZGU/Cj4KPj4gKwo+PiArLyrSqtei77+94qOs77+977+977+977+9dW5pY29k
-Ze+/ve+/vSBtZW1jcHnvv73vv73vv73vv73vv73vv73vv73vv73vv73vv73Sqsq577+977+9WFhY
-X0xFTiAqIHNpemVvZihUQ0hBUikqLwo+Cj5Nb3JlIGVuY29kaW5nIGF3a3dhcmRuZXNzLgo+Cj5J
-dCdzIGhhcmQgdG8gcmV2aWV3IHRoZSBwYXRjaCB3aGVuIHRoZSBjb250ZW50IGlzIGRpZmZpY3Vs
-dCB0byByZWFkLgo+Cj4tLSAKPkVyaWMgQmxha2UsIFByaW5jaXBhbCBTb2Z0d2FyZSBFbmdpbmVl
-cgo+UmVkIEhhdCwgSW5jLiAgICAgICAgICAgKzEtOTE5LTMwMS0zMjY2Cj5WaXJ0dWFsaXphdGlv
-bjogIHFlbXUub3JnIHwgbGlidmlydC5vcmcKPgo=
+The following changes since commit 577caa2672ccde7352fda3ef17e44993de862f0e:
+
+  Merge remote-tracking branch 'remotes/edgar/tags/edgar/mmio-exec-v2.for-upstream' into staging (2017-06-27 16:56:55 +0100)
+
+are available in the git repository at:
+
+  git://github.com/stefanha/qemu.git tags/block-pull-request
+
+for you to fetch changes up to 439778e6b4a20c8fe6a6a92a17013b09c4ae55d0:
+
+  virtio-pci: use ioeventfd even when KVM is disabled (2017-06-28 13:18:53 +0100)
+
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+
+Stefan Hajnoczi (2):
+  virtio-blk: trace vdev so devices can be distinguished
+  virtio-pci: use ioeventfd even when KVM is disabled
+
+ hw/block/virtio-blk.c  | 12 +++++++-----
+ hw/virtio/virtio-pci.c |  2 +-
+ hw/block/trace-events  | 10 +++++-----
+ 3 files changed, 13 insertions(+), 11 deletions(-)
+
+-- 
+2.9.4
