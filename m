@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dQIDj-0004d2-DZ
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:01:48 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dQIDp-0004iV-HX
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:01:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dQIDe-000880-Hl
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:01:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44052)
+	(envelope-from <dgilbert@redhat.com>) id 1dQIDn-0008DZ-Vx
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:01:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41078)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dQIDe-00087L-9T
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:01:42 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dQIDn-0008D1-NC
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:01:51 -0400
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 28 Jun 2017 20:00:26 +0100
-Message-Id: <20170628190047.26159-9-dgilbert@redhat.com>
+Date: Wed, 28 Jun 2017 20:00:29 +0100
+Message-Id: <20170628190047.26159-12-dgilbert@redhat.com>
 In-Reply-To: <20170628190047.26159-1-dgilbert@redhat.com>
 References: <20170628190047.26159-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [RFC 08/29] vhost-user: Add
- 'VHOST_USER_POSTCOPY_ADVISE' message
+Subject: [Qemu-devel] [RFC 11/29] postcopy: Allow registering of fd handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,180 +27,348 @@ To: qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com,
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Wire up a notifier to send a VHOST_USER_POSTCOPY_ADVISE
-message on an incoming advise.
-
-Later patches will fill in the behaviour/contents of the
-message.
+Allow other userfaultfd's to be registered into the fault thread
+so that handlers for shared memory can get responses.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- contrib/libvhost-user/libvhost-user.c | 14 ++++++++++
- contrib/libvhost-user/libvhost-user.h |  1 +
- hw/virtio/vhost-user.c                | 48 +++++++++++++++++++++++++++++++++++
- migration/postcopy-ram.h              |  1 +
- migration/savevm.c                    |  6 +++++
- 5 files changed, 70 insertions(+)
+ migration/migration.c    |   3 +
+ migration/migration.h    |   2 +
+ migration/postcopy-ram.c | 212 +++++++++++++++++++++++++++++++++++------------
+ migration/postcopy-ram.h |  21 +++++
+ migration/trace-events   |   2 +
+ 5 files changed, 186 insertions(+), 54 deletions(-)
 
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-index 9efb9dac0e..ca7af5453a 100644
---- a/contrib/libvhost-user/libvhost-user.c
-+++ b/contrib/libvhost-user/libvhost-user.c
-@@ -63,6 +63,7 @@ vu_request_to_string(int req)
-         REQ(VHOST_USER_SET_VRING_ENABLE),
-         REQ(VHOST_USER_SEND_RARP),
-         REQ(VHOST_USER_INPUT_GET_CONFIG),
-+        REQ(VHOST_USER_POSTCOPY_ADVISE),
-         REQ(VHOST_USER_MAX),
-     };
- #undef REQ
-@@ -744,6 +745,17 @@ vu_set_vring_enable_exec(VuDev *dev, VhostUserMsg *vmsg)
+diff --git a/migration/migration.c b/migration/migration.c
+index 89df832625..a88b007a8b 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -134,6 +134,8 @@ MigrationIncomingState *migration_incoming_get_current(void)
+     if (!once) {
+         mis_current.state = MIGRATION_STATUS_NONE;
+         memset(&mis_current, 0, sizeof(MigrationIncomingState));
++        mis_current.postcopy_remote_fds = g_array_new(FALSE, TRUE,
++                                                   sizeof(struct PostCopyFD));
+         qemu_mutex_init(&mis_current.rp_mutex);
+         qemu_event_init(&mis_current.main_thread_load_event, false);
+         once = true;
+@@ -157,6 +159,7 @@ void migration_incoming_state_destroy(void)
+         qemu_fclose(mis->from_src_file);
+         mis->from_src_file = NULL;
+     }
++    g_array_free(mis->postcopy_remote_fds, TRUE);
+ 
+     qemu_event_destroy(&mis->main_thread_load_event);
  }
+diff --git a/migration/migration.h b/migration/migration.h
+index d109635d08..1210b217a1 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -51,6 +51,8 @@ struct MigrationIncomingState {
+     QemuMutex rp_mutex;    /* We send replies from multiple threads */
+     void     *postcopy_tmp_page;
+     void     *postcopy_tmp_zero_page;
++    /* PostCopyFD's for external userfaultfds & handlers of shared memory */
++    GArray   *postcopy_remote_fds;
  
- static bool
-+vu_set_postcopy_advise(VuDev *dev, VhostUserMsg *vmsg)
-+{
-+    /* TODO: Open ufd, pass it back in the request
-+    /* TODO: Add addresses 
-+     */
-+    vmsg->payload.u64 = 0xcafe;
-+    vmsg->size = sizeof(vmsg->payload.u64);
-+    return true; /* = send a reply */
-+}
-+
-+static bool
- vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
- {
-     int do_reply = 0;
-@@ -806,6 +818,8 @@ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
-         return vu_get_queue_num_exec(dev, vmsg);
-     case VHOST_USER_SET_VRING_ENABLE:
-         return vu_set_vring_enable_exec(dev, vmsg);
-+    case VHOST_USER_POSTCOPY_ADVISE:
-+        return vu_set_postcopy_advise(dev, vmsg);
-     default:
-         vmsg_close_fds(vmsg);
-         vu_panic(dev, "Unhandled request: %d", vmsg->request);
-diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
-index 82a6bf4549..8bb35582ea 100644
---- a/contrib/libvhost-user/libvhost-user.h
-+++ b/contrib/libvhost-user/libvhost-user.h
-@@ -63,6 +63,7 @@ typedef enum VhostUserRequest {
-     VHOST_USER_SET_VRING_ENABLE = 18,
-     VHOST_USER_SEND_RARP = 19,
-     VHOST_USER_INPUT_GET_CONFIG = 20,
-+    VHOST_USER_POSTCOPY_ADVISE  = 23,
-     VHOST_USER_MAX
- } VhostUserRequest;
+     QEMUBH *bh;
  
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 78eaf9b022..ee9a1ac8a3 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -65,6 +65,7 @@ typedef enum VhostUserRequest {
-     VHOST_USER_NET_SET_MTU = 20,
-     VHOST_USER_SET_SLAVE_REQ_FD = 21,
-     VHOST_USER_IOTLB_MSG = 22,
-+    VHOST_USER_POSTCOPY_ADVISE  = 23,
-     VHOST_USER_MAX
- } VhostUserRequest;
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index 64f5a8b003..d43a73c108 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -467,29 +467,43 @@ static void *postcopy_ram_fault_thread(void *opaque)
+     MigrationIncomingState *mis = opaque;
+     struct uffd_msg msg;
+     int ret;
++    size_t index;
+     RAMBlock *rb = NULL;
+     RAMBlock *last_rb = NULL; /* last RAMBlock we sent part of */
  
-@@ -705,6 +706,50 @@ out:
-     return ret;
- }
+     trace_postcopy_ram_fault_thread_entry();
+     qemu_sem_post(&mis->fault_thread_sem);
  
-+/*
-+ * Called at the start of an inbound postcopy on reception of the
-+ * 'advise' command.
-+ */
-+static int vhost_user_postcopy_advise(struct vhost_dev *dev, Error **errp)
-+{
-+    struct vhost_user *u = dev->opaque;
-+    CharBackend *chr = u->chr;
-+    int ufd;
-+    VhostUserMsg msg = {
-+        .request = VHOST_USER_POSTCOPY_ADVISE,
-+        .flags = VHOST_USER_VERSION,
-+    };
++    struct pollfd *pfd;
++    size_t pfd_len = 2 + mis->postcopy_remote_fds->len;
 +
-+    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-+        error_setg(errp, "Failed to send postcopy_advise to vhost");
-+        return -1;
++    pfd = g_new0(struct pollfd, pfd_len);
++
++    pfd[0].fd = mis->userfault_fd;
++    pfd[0].events = POLLIN;
++    pfd[1].fd = mis->userfault_quit_fd;
++    pfd[1].events = POLLIN; /* Waiting for eventfd to go positive */
++    trace_postcopy_ram_fault_thread_fds_core(pfd[0].fd, pfd[1].fd);
++    for (index = 0; index < mis->postcopy_remote_fds->len; index++) {
++        struct PostCopyFD *pcfd = &g_array_index(mis->postcopy_remote_fds,
++                                                 struct PostCopyFD, index);
++        pfd[2 + index].fd = pcfd->fd;
++        pfd[2 + index].events = POLLIN;
++        trace_postcopy_ram_fault_thread_fds_extra(2 + index, pcfd->idstr,
++                                                  pcfd->fd);
 +    }
 +
-+    if (vhost_user_read(dev, &msg) < 0) {
-+        error_setg(errp, "Failed to get postcopy_advise reply from vhost");
-+        return -1;
-+    }
-+
-+    if (msg.request != VHOST_USER_POSTCOPY_ADVISE) {
-+        error_setg(errp, "Unexpected msg type. Expected %d received %d",
-+                     VHOST_USER_POSTCOPY_ADVISE, msg.request);
-+        return -1;
-+    }
-+
-+    if (msg.size != sizeof(msg.payload.u64)) {
-+        error_setg(errp, "Received bad msg size.");
-+        return -1;
-+    }
-+    ufd = qemu_chr_fe_get_msgfd(chr);
-+    if (ufd < 0) {
-+        error_setg(errp, "%s: Failed to get ufd", __func__);
-+        return -1;
-+    }
-+
-+    /* TODO: register ufd with userfault thread */
-+    return 0;
-+}
-+
- static int vhost_user_postcopy_notifier(NotifierWithReturn *notifier,
-                                         void *opaque)
- {
-@@ -724,6 +769,9 @@ static int vhost_user_postcopy_notifier(NotifierWithReturn *notifier,
+     while (true) {
+         ram_addr_t rb_offset;
+-        struct pollfd pfd[2];
++        int poll_result;
+ 
+         /*
+          * We're mainly waiting for the kernel to give us a faulting HVA,
+          * however we can be told to quit via userfault_quit_fd which is
+          * an eventfd
+          */
+-        pfd[0].fd = mis->userfault_fd;
+-        pfd[0].events = POLLIN;
+-        pfd[0].revents = 0;
+-        pfd[1].fd = mis->userfault_quit_fd;
+-        pfd[1].events = POLLIN; /* Waiting for eventfd to go positive */
+-        pfd[1].revents = 0;
+-
+-        if (poll(pfd, 2, -1 /* Wait forever */) == -1) {
++        poll_result = poll(pfd, pfd_len, -1 /* Wait forever */);
++        if (poll_result == -1) {
+             error_report("%s: userfault poll: %s", __func__, strerror(errno));
+             break;
          }
-         break;
+@@ -499,57 +513,118 @@ static void *postcopy_ram_fault_thread(void *opaque)
+             break;
+         }
  
-+    case POSTCOPY_NOTIFY_INBOUND_ADVISE:
-+        return vhost_user_postcopy_advise(dev, pnd->errp);
+-        ret = read(mis->userfault_fd, &msg, sizeof(msg));
+-        if (ret != sizeof(msg)) {
+-            if (errno == EAGAIN) {
+-                /*
+-                 * if a wake up happens on the other thread just after
+-                 * the poll, there is nothing to read.
+-                 */
+-                continue;
++        if (pfd[0].revents) {
++            poll_result--;
++            ret = read(mis->userfault_fd, &msg, sizeof(msg));
++            if (ret != sizeof(msg)) {
++                if (errno == EAGAIN) {
++                    /*
++                     * if a wake up happens on the other thread just after
++                     * the poll, there is nothing to read.
++                     */
++                    continue;
++                }
++                if (ret < 0) {
++                    error_report("%s: Failed to read full userfault "
++                                 "message: %s",
++                                 __func__, strerror(errno));
++                    break;
++                } else {
++                    error_report("%s: Read %d bytes from userfaultfd "
++                                 "expected %zd",
++                                 __func__, ret, sizeof(msg));
++                    break; /* Lost alignment, don't know what we'd read next */
++                }
++            }
++            if (msg.event != UFFD_EVENT_PAGEFAULT) {
++                error_report("%s: Read unexpected event %ud from userfaultfd",
++                             __func__, msg.event);
++                continue; /* It's not a page fault, shouldn't happen */
+             }
+-            if (ret < 0) {
+-                error_report("%s: Failed to read full userfault message: %s",
+-                             __func__, strerror(errno));
 +
-     default:
-         /* We ignore notifications we don't know */
-         break;
++            rb = qemu_ram_block_from_host(
++                     (void *)(uintptr_t)msg.arg.pagefault.address,
++                     true, &rb_offset);
++            if (!rb) {
++                error_report("postcopy_ram_fault_thread: Fault outside guest: %"
++                             PRIx64, (uint64_t)msg.arg.pagefault.address);
+                 break;
+-            } else {
+-                error_report("%s: Read %d bytes from userfaultfd expected %zd",
+-                             __func__, ret, sizeof(msg));
+-                break; /* Lost alignment, don't know what we'd read next */
+             }
+-        }
+-        if (msg.event != UFFD_EVENT_PAGEFAULT) {
+-            error_report("%s: Read unexpected event %ud from userfaultfd",
+-                         __func__, msg.event);
+-            continue; /* It's not a page fault, shouldn't happen */
+-        }
+ 
+-        rb = qemu_ram_block_from_host(
+-                 (void *)(uintptr_t)msg.arg.pagefault.address,
+-                 true, &rb_offset);
+-        if (!rb) {
+-            error_report("postcopy_ram_fault_thread: Fault outside guest: %"
+-                         PRIx64, (uint64_t)msg.arg.pagefault.address);
+-            break;
+-        }
++            rb_offset &= ~(qemu_ram_pagesize(rb) - 1);
++            trace_postcopy_ram_fault_thread_request(msg.arg.pagefault.address,
++                                                    qemu_ram_get_idstr(rb),
++                                                    rb_offset);
+ 
+-        rb_offset &= ~(qemu_ram_pagesize(rb) - 1);
+-        trace_postcopy_ram_fault_thread_request(msg.arg.pagefault.address,
+-                                                qemu_ram_get_idstr(rb),
+-                                                rb_offset);
++            /*
++             * Send the request to the source - we want to request one
++             * of our host page sizes (which is >= TPS)
++             */
++            if (rb != last_rb) {
++                last_rb = rb;
++                migrate_send_rp_req_pages(mis, qemu_ram_get_idstr(rb),
++                                         rb_offset, qemu_ram_pagesize(rb));
++            } else {
++                /* Save some space */
++                migrate_send_rp_req_pages(mis, NULL,
++                                         rb_offset, qemu_ram_pagesize(rb));
++            }
++        }
+ 
+-        /*
+-         * Send the request to the source - we want to request one
+-         * of our host page sizes (which is >= TPS)
+-         */
+-        if (rb != last_rb) {
+-            last_rb = rb;
+-            migrate_send_rp_req_pages(mis, qemu_ram_get_idstr(rb),
+-                                     rb_offset, qemu_ram_pagesize(rb));
+-        } else {
+-            /* Save some space */
+-            migrate_send_rp_req_pages(mis, NULL,
+-                                     rb_offset, qemu_ram_pagesize(rb));
++        /* Now handle any requests from external processes on shared memory */
++        /* TODO: May need to handle devices deregistering during postcopy */
++        for (index = 2; index < pfd_len && poll_result; index++) {
++            if (pfd[index].revents) {
++                struct PostCopyFD *pcfd =
++                    &g_array_index(mis->postcopy_remote_fds,
++                                   struct PostCopyFD, index - 2);
++
++                poll_result--;
++                if (pfd[index].revents & POLLERR) {
++                    error_report("%s: POLLERR on poll %zd fd=%d",
++                                 __func__, index, pcfd->fd);
++                    pfd[index].events = 0;
++                    continue;
++                }
++
++                ret = read(pcfd->fd, &msg, sizeof(msg));
++                if (ret != sizeof(msg)) {
++                    if (errno == EAGAIN) {
++                        /*
++                         * if a wake up happens on the other thread just after
++                         * the poll, there is nothing to read.
++                         */
++                        continue;
++                    }
++                    if (ret < 0) {
++                        error_report("%s: Failed to read full userfault "
++                                     "message: %s (shared) revents=%d",
++                                     __func__, strerror(errno),
++                                     pfd[index].revents);
++                        /*TODO: Could just disable this sharer */
++                        break;
++                    } else {
++                        error_report("%s: Read %d bytes from userfaultfd "
++                                     "expected %zd (shared)",
++                                     __func__, ret, sizeof(msg));
++                        /*TODO: Could just disable this sharer */
++                        break; /*Lost alignment,don't know what we'd read next*/
++                    }
++                }
++                if (msg.event != UFFD_EVENT_PAGEFAULT) {
++                    error_report("%s: Read unexpected event %ud "
++                                 "from userfaultfd (shared)",
++                                 __func__, msg.event);
++                    continue; /* It's not a page fault, shouldn't happen */
++                }
++                /* Call the device handler registered with us */
++                ret = pcfd->handler(pcfd, &msg);
++                if (ret) {
++                    error_report("%s: Failed to resolve shared fault on %zd/%s",
++                                 __func__, index, pcfd->idstr);
++                    /* TODO: Fail? Disable this sharer? */
++                }
++            }
+         }
+     }
+     trace_postcopy_ram_fault_thread_exit();
+@@ -879,3 +954,32 @@ PostcopyState postcopy_state_set(PostcopyState new_state)
+ {
+     return atomic_xchg(&incoming_postcopy_state, new_state);
+ }
++
++/* Register a handler for external shared memory postcopy
++ * called on the destination.
++ */
++void postcopy_register_shared_ufd(struct PostCopyFD *pcfd)
++{
++    MigrationIncomingState *mis = migration_incoming_get_current();
++
++    mis->postcopy_remote_fds = g_array_append_val(mis->postcopy_remote_fds,
++                                                  *pcfd);
++}
++
++/* Unregister a handler for external shared memory postcopy
++ */
++void postcopy_unregister_shared_ufd(struct PostCopyFD *pcfd)
++{
++    guint i;
++    MigrationIncomingState *mis = migration_incoming_get_current();
++    GArray *pcrfds = mis->postcopy_remote_fds;
++
++    for (i = 0; i < pcrfds->len; i++) {
++        struct PostCopyFD *cur = &g_array_index(pcrfds, struct PostCopyFD, i);
++        if (cur->fd == pcfd->fd) {
++            mis->postcopy_remote_fds = g_array_remove_index(pcrfds, i);
++            return;
++        }
++    }
++}
++
 diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
-index d688411674..70d4b09659 100644
+index 70d4b09659..ba8a8ffec5 100644
 --- a/migration/postcopy-ram.h
 +++ b/migration/postcopy-ram.h
-@@ -128,6 +128,7 @@ void postcopy_infrastructure_init(void);
-  */
- enum PostcopyNotifyReason {
-     POSTCOPY_NOTIFY_PROBE = 0,
-+    POSTCOPY_NOTIFY_INBOUND_ADVISE,
- };
+@@ -141,4 +141,25 @@ void postcopy_remove_notifier(NotifierWithReturn *n);
+ /* Call the notifier list set by postcopy_add_start_notifier */
+ int postcopy_notify(enum PostcopyNotifyReason reason, Error **errp);
  
- struct PostcopyNotifyData {
-diff --git a/migration/savevm.c b/migration/savevm.c
-index a12637ef76..4977baf9b7 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1365,6 +1365,7 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
- {
-     PostcopyState ps = postcopy_state_set(POSTCOPY_INCOMING_ADVISE);
-     uint64_t remote_pagesize_summary, local_pagesize_summary, remote_tps;
-+    Error *local_err = NULL;
- 
-     trace_loadvm_postcopy_handle_advise();
-     if (ps != POSTCOPY_INCOMING_NONE) {
-@@ -1412,6 +1413,11 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
-         return -1;
-     }
- 
-+    if (postcopy_notify(POSTCOPY_NOTIFY_INBOUND_ADVISE, &local_err)) {
-+        error_report_err(local_err);
-+        return -1;
-+    }
++struct PostCopyFD;
 +
-     if (ram_postcopy_incoming_init(mis)) {
-         return -1;
-     }
++/* ufd is a pointer to the struct uffd_msg *TODO: more Portable! */
++typedef int (*pcfdhandler)(struct PostCopyFD *pcfd, void *ufd);
++
++struct PostCopyFD {
++    int fd;
++    /* Data to pass to handler */
++    void *data;
++    /* Handler to be called whenever we get a poll event */
++    pcfdhandler handler;
++    /* A string to use in error messages */
++    char *idstr;
++};
++
++/* Register a userfaultfd owned by an external process for
++ * shared memory.
++ */
++void postcopy_register_shared_ufd(struct PostCopyFD *pcfd);
++void postcopy_unregister_shared_ufd(struct PostCopyFD *pcfd);
++
+ #endif
+diff --git a/migration/trace-events b/migration/trace-events
+index cb2c4b5b40..522cfa170d 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -189,6 +189,8 @@ postcopy_place_page_zero(void *host_addr) "host=%p"
+ postcopy_ram_enable_notify(void) ""
+ postcopy_ram_fault_thread_entry(void) ""
+ postcopy_ram_fault_thread_exit(void) ""
++postcopy_ram_fault_thread_fds_core(int baseufd, int quitfd) "ufd: %d quitfd: %d"
++postcopy_ram_fault_thread_fds_extra(size_t index, const char *name, int fd) "%zd/%s: %d"
+ postcopy_ram_fault_thread_quit(void) ""
+ postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset) "Request for HVA=%" PRIx64 " rb=%s offset=%zx"
+ postcopy_ram_incoming_cleanup_closeuf(void) ""
 -- 
 2.13.0
