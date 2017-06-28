@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46166)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dQ97b-00020Q-TM
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 05:18:56 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dQ9DG-000352-Ov
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 05:24:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dQ97X-00011v-5p
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 05:18:51 -0400
-References: <20170622112648.24815-1-lvivier@redhat.com>
-	<caa25331-5005-78e8-fba2-19bf67116d92@redhat.com>
-	<20170623092124.GG12089@umbus>
-	<c0a0667e-8c60-a8e7-a041-caddac8c8b88@redhat.com>
-	<20170628014231.GA791@pacoca>
-	<a34435df-8944-ddac-e881-0a2338e4aad4@redhat.com>
-	<20170628081850.GJ12089@umbus>
-	<668938c1-f93e-86d1-4e4e-5715d5074587@kaod.org>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <e0f76eb1-2388-e512-3763-26e7232b1129@redhat.com>
-Date: Wed, 28 Jun 2017 11:18:41 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1dQ9DF-00034R-SU
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 05:24:42 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:34988)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dQ9DF-00033c-Kc
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 05:24:41 -0400
+Received: by mail-wm0-x229.google.com with SMTP id w126so47243399wme.0
+	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 02:24:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <668938c1-f93e-86d1-4e4e-5715d5074587@kaod.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc/cpu-models: set
- POWER9_v1.0 as POWER9 DD1
+In-Reply-To: <alpine.DEB.2.10.1706271438090.24648@sstabellini-ThinkPad-X260>
+References: <CAFEAcA-wYgWeYdFRAcW-DhqsFRsy_iKF+WU6qt7UbUKZ+EK1eg@mail.gmail.com>
+	<alpine.DEB.2.10.1706271438090.24648@sstabellini-ThinkPad-X260>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 28 Jun 2017 10:24:18 +0100
+Message-ID: <CAFEAcA8yUHuBj2SUhL++7-NiBvHrcxRCH=Yq6TsNGrN4NXVV-w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Getting rid of xen_init_display() (and its dubious
+ call into main_loop_wait())
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,115 +30,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>
-Cc: sursingh@redhat.com, joserz@linux.vnet.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, sbobroff@redhat.com
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Anthony PERARD <anthony.perard@citrix.com>, Gerd Hoffmann <kraxel@redhat.com>, Paul Durrant <paul.durrant@citrix.com>, xen-devel@lists.xenproject.org
 
-On 28/06/2017 11:11, C=C3=A9dric Le Goater wrote:
-> On 06/28/2017 10:18 AM, David Gibson wrote:
->> On Wed, Jun 28, 2017 at 09:09:24AM +0200, Thomas Huth wrote:
->>> On 28.06.2017 03:42, joserz@linux.vnet.ibm.com wrote:
->>>> On Fri, Jun 23, 2017 at 04:10:55PM +0200, Laurent Vivier wrote:
->>>>> On 23/06/2017 11:21, David Gibson wrote:
->>>>>> On Thu, Jun 22, 2017 at 01:31:24PM +0200, Thomas Huth wrote:
->>>>>>> On 22.06.2017 13:26, Laurent Vivier wrote:
->>>>>>>> CPU_POWERPC_POWER9_DD1 is 0x004E0100, so this is the POWER9 v1.0=
-.
->>>>>>>>
->>>>>>>> When we run qemu on a POWER9 DD1 host, we must use either
->>>>>>>> "-cpu host" or "-cpu POWER9", but in the latter case it fails wi=
-th
->>>>>>>>
->>>>>>>>     Unable to find sPAPR CPU Core definition
->>>>>>>>
->>>>>>>> because POWER9 DD1 doesn't appear in the list of known CPUs.
->>>>>>>>
->>>>>>>> This patch fixes this by defining POWER9_v1.0 with POWER9 DD1
->>>>>>>> PVR instead of CPU_POWERPC_POWER9_BASE.
->>>>>>>>
->>>>>>>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
->>>>>>>> ---
->>>>>>>>  target/ppc/cpu-models.c | 2 +-
->>>>>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>>>>>>
->>>>>>>> diff --git a/target/ppc/cpu-models.c b/target/ppc/cpu-models.c
->>>>>>>> index 4d3e635..a22363c 100644
->>>>>>>> --- a/target/ppc/cpu-models.c
->>>>>>>> +++ b/target/ppc/cpu-models.c
->>>>>>>> @@ -1144,7 +1144,7 @@
->>>>>>>>      POWERPC_DEF("970_v2.2",      CPU_POWERPC_970_v22,          =
-      970,
->>>>>>>>                  "PowerPC 970 v2.2")
->>>>>>>> =20
->>>>>>>> -    POWERPC_DEF("POWER9_v1.0",   CPU_POWERPC_POWER9_BASE,      =
-      POWER9,
->>>>>>>> +    POWERPC_DEF("POWER9_v1.0",   CPU_POWERPC_POWER9_DD1,       =
-      POWER9,
->>>>>>>>                  "POWER9 v1.0")
->>>>>>>> =20
->>>>>>>>      POWERPC_DEF("970fx_v1.0",    CPU_POWERPC_970FX_v10,        =
-      970,
->>>>>>>>
->>>>>>>
->>>>>>> I think this also makes sense for running in TCG mode to get a va=
-lid
->>>>>>> real PVR there.
->>>>>>
->>>>>> I'm not so convinced.
->>>>>>
->>>>>> IIUC, this will make TCG default (for now) to a DD1 POWER9.  That'=
-s a)
->>>>>> probably not what anyone wants - who'd select a buggy prototype an=
-d b)
->>>>>> not accurate - TCG does not implement DD1's bugs.
->>>>>
->>>>> According to the POWER8 user manual (I didn't fine the POWER9 one):
->>>>>
->>>>> "3.6.3.1 Processor Version Register (PVR)
->>>>>
->>>>> The processor revision level (PVR[16:31]) starts at x=E2=80=980100=E2=
-=80=99, indicating
->>>>> revision =E2=80=981.0=E2=80=99. As revisions are made, bits [29:31]=
- will indicate minor
->>>>> revisions. Similarly, bits [20:23] indicate major changes."
->>>>>
->>>>> POWER9 DD1 PVR is 0x004E0100, so this is really version 1.0 of the =
-POWER9.
->>>>>
->>>>> Perhaps we can define POWER9_v1.0 as CPU_POWERPC_POWER9_DD1, and
->>>>> introduce a POWER9_v0.0 set to CPU_POWERPC_POWER9_BASE and define i=
-t as
->>>>> the default one?
->>>>
->>>> I like the suggestion to set a v0.0 to CPU_POWERPC_POWER9_BASE. But,=
- I
->>>> think we could have only that option, removing the
->>>> CPU_POWERPC_POWER9_DD1 entry.
->>> I really dislike the idea of having a CPU called "v0.0" ... we do not
->>> have this for any other CPU generation, and it sounds like it could b=
-e
->>> very confusing for the users (you'd need to document somewhere what t=
-he
->>> v0.0 exactly means). If we really want to go this way, I think we sho=
-uld
->>> name it "POWER9-generic" or "PowerISA-3.0" or something similar inste=
-ad.
->>>
->>> Or does somebody already know the exact PVR for DD2? If so, we could
->>> simply add a POWER9_v2.0 CPU already and let the POWER9 alias point t=
-o
->>> that version instead.
+On 28 June 2017 at 01:06, Stefano Stabellini <sstabellini@kernel.org> wrote:
+> On Tue, 27 Jun 2017, Peter Maydell wrote:
+>> So, there is exactly one caller of main_loop_wait() in the tree that
+>> passes it 'true' as an argument. That caller is in xen_init_display()
+>> in hw/dispaly/xenfb.c. The function was added in 2009 with the comment
+>> "FIXME/TODO: Kill this. Temporary needed while DisplayState
+>> reorganization is in flight."
 >>
->> Yes, I think that's a better idea.  I don't know the DD2 PVR, but I'm
->> pretty sure we should be able to find out from someone at IBM.
->>
->> I've CCed Sam & Suraj - can you ask Mikey or someone what the PVR
->> value for DD2.0 will be?
->=20
-> I would expect something like :
->=20
->  0x200D104980000000UL; /* P9 Nimbus DD2.0 */
+>> I'd like to think that we've now completed whatever reorg that was,
+>> 8 years on, so can we now get rid of this function? It definitely
+>> seems very dubious to have a display init function with a busy loop
+>> and a call into main_loop_wait()...
+>
+> LOL, you gotta love "temporary fixes". I am happy to see it wasn't me
+> that added it ;-)
+>
+> I think the following should do the trick.
 
+Thanks!
 
-I would expect something like 0x004Exxxx.
+> ---
+>
+> xenfb: remove xen_init_display "temporary" hack
+>
+> Initialize xenfb properly, as all other backends, from its own
+> "initialise" function.
+>
+> Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
+>
+> diff --git a/hw/display/xenfb.c b/hw/display/xenfb.c
+> index e76c0d8..873e51f 100644
+> --- a/hw/display/xenfb.c
+> +++ b/hw/display/xenfb.c
+> @@ -71,7 +71,6 @@ struct XenFB {
+>      int               fbpages;
+>      int               feature_update;
+>      int               bug_trigger;
+> -    int               have_console;
+>      int               do_resize;
+>
+>      struct {
+> @@ -80,6 +79,7 @@ struct XenFB {
+>      int               up_count;
+>      int               up_fullscreen;
+>  };
+> +static const GraphicHwOps xenfb_ops;
+>
+>  /* -------------------------------------------------------------------- */
+>
+> @@ -855,6 +855,8 @@ static int fb_init(struct XenDevice *xendev)
+>  static int fb_initialise(struct XenDevice *xendev)
+>  {
+>      struct XenFB *fb = container_of(xendev, struct XenFB, c.xendev);
+> +    struct XenDevice *xin;
+> +    struct XenInput *in;
+>      struct xenfb_page *fb_page;
+>      int videoram;
+>      int rc;
+> @@ -877,16 +879,12 @@ static int fb_initialise(struct XenDevice *xendev)
+>      if (rc != 0)
+>         return rc;
+>
+> -#if 0  /* handled in xen_init_display() for now */
+> -    if (!fb->have_console) {
+> -        fb->c.ds = graphic_console_init(xenfb_update,
+> -                                        xenfb_invalidate,
+> -                                        NULL,
+> -                                        NULL,
+> -                                        fb);
+> -        fb->have_console = 1;
+> -    }
+> -#endif
+> +    fb->c.con = graphic_console_init(NULL, 0, &xenfb_ops, fb);
+> +
+> +    xin = xen_pv_find_xendev("vkbd", xen_domid, 0);
+> +    in = container_of(xin, struct XenInput, c.xendev);
+> +    in->c.con = fb->c.con;
 
-Laurent
+Won't this crash if xen_pv_find_xendev() returned NULL?
+Or are we guaranteed that that can't happen here?
+
+thanks
+-- PMM
