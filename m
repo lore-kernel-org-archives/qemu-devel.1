@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dQ0Sh-0006wo-6q
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 20:04:10 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1dQ0V1-00006F-EJ
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 20:06:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dQ0Sd-00059L-5V
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 20:04:03 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:60866)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dQ0Sc-00055I-Qq
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 20:03:59 -0400
-References: <20170627191221.31650-1-laurent@vivier.eu>
-	<20170627191221.31650-2-laurent@vivier.eu>
-	<0d870134-fd3e-67ca-9112-94672cf7e742@twiddle.net>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <e7296c14-1b4b-9508-aaaf-c1bc3ad49409@vivier.eu>
-Date: Wed, 28 Jun 2017 02:03:33 +0200
+	(envelope-from <sstabellini@kernel.org>) id 1dQ0Ux-0006aL-AV
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 20:06:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48332)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1dQ0Ux-0006Zh-1C
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 20:06:23 -0400
+Date: Tue, 27 Jun 2017 17:06:18 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <CAFEAcA-wYgWeYdFRAcW-DhqsFRsy_iKF+WU6qt7UbUKZ+EK1eg@mail.gmail.com>
+Message-ID: <alpine.DEB.2.10.1706271438090.24648@sstabellini-ThinkPad-X260>
+References: <CAFEAcA-wYgWeYdFRAcW-DhqsFRsy_iKF+WU6qt7UbUKZ+EK1eg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <0d870134-fd3e-67ca-9112-94672cf7e742@twiddle.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/7] target/m68k: add fscc.
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] Getting rid of xen_init_display() (and its dubious
+ call into main_loop_wait())
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,84 +27,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefano Stabellini <sstabellini@kernel.org>, Anthony PERARD <anthony.perard@citrix.com>, Gerd Hoffmann <kraxel@redhat.com>, paul.durrant@citrix.com, xen-devel@lists.xenproject.org
 
-Le 27/06/2017 à 22:00, Richard Henderson a écrit :
-> On 06/27/2017 12:12 PM, Laurent Vivier wrote:
->>       case 3:  /* Ordered Greater than or Equal Z || !(A || N) */
->>       case 19: /* Greater than or Equal Z || !(A || N) */
->> +        g_assert(FPSR_CC_A == (FPSR_CC_N >> 3));
->> +        c->v1 = tcg_temp_new();
->> +        c->g1 = 0;
->> +        tcg_gen_shli_i32(c->v1, fpsr, 3);
->> +        tcg_gen_or_i32(c->v1, c->v1, fpsr);
->> +        tcg_gen_xori_i32(c->v1, c->v1, FPSR_CC_N);
->> +        tcg_gen_andi_i32(c->v1, c->v1, FPSR_CC_N | FPSR_CC_Z);
->> +        c->tcond = TCG_COND_NE;
+On Tue, 27 Jun 2017, Peter Maydell wrote:
+> So, there is exactly one caller of main_loop_wait() in the tree that
+> passes it 'true' as an argument. That caller is in xen_init_display()
+> in hw/dispaly/xenfb.c. The function was added in 2009 with the comment
+> "FIXME/TODO: Kill this. Temporary needed while DisplayState
+> reorganization is in flight."
 > 
-> Still with the unmasked shift.
-> 
->     tcg_gen_not_i32(c->v1, fpsr);
->     tcg_gen_andi_i32(c->v1, c->v1, FPSR_CC_A | FPSR_CC_N);
->     tcg_gen_andi_i32(fpsr, fpsr, FPSR_CC_Z);
->     tcg_gen_or_i32(c->v1, c->v1, fpsr);
-> 
-> 
->>       case 5:  /* Ordered Less than or Equal Z || (N && !A) */
->>       case 21: /* Less than or Equal Z || (N && !A) */
->> +        g_assert(FPSR_CC_A == (FPSR_CC_N >> 3));
->> +        c->v1 = tcg_temp_new();
->> +        c->g1 = 0;
->> +        tcg_gen_xori_i32(c->v1, fpsr, FPSR_CC_A);
->> +        tcg_gen_shli_i32(c->v1, c->v1, 3);
->> +        tcg_gen_ori_i32(c->v1, c->v1, FPSR_CC_Z);
->> +        tcg_gen_and_i32(c->v1, c->v1, fpsr);
->> +        c->tcond = TCG_COND_NE;
-> 
-> Likewise.
-> 
->     tcg_gen_andi_i32(c->v1, fpsr, FPSR_CC_A);
->     tcg_gen_shli_i32(c->v1, c->v1, ctz32(FPSR_CC_N) - ctz32(FPSR_CC_A));
->     tcg_gen_andc_i32(c->v1, fpsr, c->v1);
->     tcg_gen_andi_i32(c->v1, c->v1, FPSR_CC_Z | FPSR_CC_N);
-> 
-> 
->>       case 10: /* Unordered or Greater Than A || !(N || Z)) */
->>       case 26: /* Not Less or Equal A || !(N || Z)) */
->> +        g_assert(FPSR_CC_Z == (FPSR_CC_N >> 1));
->> +        c->v1 = tcg_temp_new();
->> +        c->g1 = 0;
->> +        tcg_gen_shli_i32(c->v1, fpsr, 1);
->> +        tcg_gen_or_i32(c->v1, c->v1, fpsr);
->> +        tcg_gen_xori_i32(c->v1, c->v1, FPSR_CC_N);
->> +        tcg_gen_andi_i32(c->v1, c->v1, FPSR_CC_N | FPSR_CC_A);
->> +        c->tcond = TCG_COND_NE;
-> 
-> Likewise.
-> 
->     tcg_gen_not_i32(c->v1, fpsr);
->     tcg_gen_andi_i32(c->v1, c->v1, FPSR_CC_Z | FPSR_CC_N);
->     tcg_gen_andi_i32(fpsr, fpsr, FPSR_CC_A);
->     tcg_gen_or_i32(c->v1, c->v1, fpsr);
-> 
-> 
->>       case 12: /* Unordered or Less Than A || (N && !Z) */
->>       case 28: /* Not Greater than or Equal A || (N && !Z) */
->> +        c->v1 = tcg_temp_new();
->> +        c->g1 = 0;
->> +        tcg_gen_andi_i32(c->v1, fpsr, FPSR_CC_Z);
->> +        tcg_gen_shli_i32(c->v1, c->v1, ctz32(FPSR_CC_N) -
->> ctz32(FPSR_CC_Z));
->> +        tcg_gen_andc_i32(c->v1, fpsr, c->v1);
->> +        tcg_gen_andi_i32(c->v1, c->v1, FPSR_CC_A | FPSR_CC_N);
->> +        c->tcond = TCG_COND_NE;
-> 
-> I hadn't meant that this was the only one to fix.
-> 
+> I'd like to think that we've now completed whatever reorg that was,
+> 8 years on, so can we now get rid of this function? It definitely
+> seems very dubious to have a display init function with a busy loop
+> and a call into main_loop_wait()...
 
-Thank you Richard, but all these changes break something somewhere, I'm
-searching why.
+LOL, you gotta love "temporary fixes". I am happy to see it wasn't me
+that added it ;-)
 
-Thanks,
-Laurent
+I think the following should do the trick.
+
+---
+
+xenfb: remove xen_init_display "temporary" hack
+
+Initialize xenfb properly, as all other backends, from its own
+"initialise" function.
+
+Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
+
+diff --git a/hw/display/xenfb.c b/hw/display/xenfb.c
+index e76c0d8..873e51f 100644
+--- a/hw/display/xenfb.c
++++ b/hw/display/xenfb.c
+@@ -71,7 +71,6 @@ struct XenFB {
+     int               fbpages;
+     int               feature_update;
+     int               bug_trigger;
+-    int               have_console;
+     int               do_resize;
+ 
+     struct {
+@@ -80,6 +79,7 @@ struct XenFB {
+     int               up_count;
+     int               up_fullscreen;
+ };
++static const GraphicHwOps xenfb_ops;
+ 
+ /* -------------------------------------------------------------------- */
+ 
+@@ -855,6 +855,8 @@ static int fb_init(struct XenDevice *xendev)
+ static int fb_initialise(struct XenDevice *xendev)
+ {
+     struct XenFB *fb = container_of(xendev, struct XenFB, c.xendev);
++    struct XenDevice *xin;
++    struct XenInput *in;
+     struct xenfb_page *fb_page;
+     int videoram;
+     int rc;
+@@ -877,16 +879,12 @@ static int fb_initialise(struct XenDevice *xendev)
+     if (rc != 0)
+ 	return rc;
+ 
+-#if 0  /* handled in xen_init_display() for now */
+-    if (!fb->have_console) {
+-        fb->c.ds = graphic_console_init(xenfb_update,
+-                                        xenfb_invalidate,
+-                                        NULL,
+-                                        NULL,
+-                                        fb);
+-        fb->have_console = 1;
+-    }
+-#endif
++    fb->c.con = graphic_console_init(NULL, 0, &xenfb_ops, fb);
++
++    xin = xen_pv_find_xendev("vkbd", xen_domid, 0);
++    in = container_of(xin, struct XenInput, c.xendev);
++    in->c.con = fb->c.con;
++    xen_be_check_state(xin);
+ 
+     if (xenstore_read_fe_int(xendev, "feature-update", &fb->feature_update) == -1)
+ 	fb->feature_update = 0;
+@@ -972,42 +970,3 @@ static const GraphicHwOps xenfb_ops = {
+     .gfx_update  = xenfb_update,
+     .update_interval = xenfb_update_interval,
+ };
+-
+-/*
+- * FIXME/TODO: Kill this.
+- * Temporary needed while DisplayState reorganization is in flight.
+- */
+-void xen_init_display(int domid)
+-{
+-    struct XenDevice *xfb, *xin;
+-    struct XenFB *fb;
+-    struct XenInput *in;
+-    int i = 0;
+-
+-wait_more:
+-    i++;
+-    main_loop_wait(true);
+-    xfb = xen_pv_find_xendev("vfb", domid, 0);
+-    xin = xen_pv_find_xendev("vkbd", domid, 0);
+-    if (!xfb || !xin) {
+-        if (i < 256) {
+-            usleep(10000);
+-            goto wait_more;
+-        }
+-        xen_pv_printf(NULL, 1, "displaystate setup failed\n");
+-        return;
+-    }
+-
+-    /* vfb */
+-    fb = container_of(xfb, struct XenFB, c.xendev);
+-    fb->c.con = graphic_console_init(NULL, 0, &xenfb_ops, fb);
+-    fb->have_console = 1;
+-
+-    /* vkbd */
+-    in = container_of(xin, struct XenInput, c.xendev);
+-    in->c.con = fb->c.con;
+-
+-    /* retry ->init() */
+-    xen_be_check_state(xin);
+-    xen_be_check_state(xfb);
+-}
+diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
+index 79aef4e..31d2f25 100644
+--- a/hw/xenpv/xen_machine_pv.c
++++ b/hw/xenpv/xen_machine_pv.c
+@@ -94,9 +94,6 @@ static void xen_init_pv(MachineState *machine)
+ 
+     /* config cleanup hook */
+     atexit(xen_config_cleanup);
+-
+-    /* setup framebuffer */
+-    xen_init_display(xen_domid);
+ }
+ 
+ static void xenpv_machine_init(MachineClass *mc)
