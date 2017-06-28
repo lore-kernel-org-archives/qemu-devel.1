@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dQIEJ-000555-0S
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:02:24 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dQIEK-000568-31
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:02:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dQIEG-0008NC-IZ
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:02:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46314)
+	(envelope-from <dgilbert@redhat.com>) id 1dQIEJ-0008O7-50
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:02:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45598)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dQIEG-0008N2-9V
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:02:20 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dQIEI-0008Nk-Sq
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 15:02:23 -0400
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 28 Jun 2017 20:00:35 +0100
-Message-Id: <20170628190047.26159-18-dgilbert@redhat.com>
+Date: Wed, 28 Jun 2017 20:00:36 +0100
+Message-Id: <20170628190047.26159-19-dgilbert@redhat.com>
 In-Reply-To: <20170628190047.26159-1-dgilbert@redhat.com>
 References: <20170628190047.26159-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [RFC 17/29] vhost+postcopy: Send requests to source
- for shared pages
+Subject: [Qemu-devel] [RFC 18/29] vhost+postcopy: Resolve client address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,112 +27,69 @@ To: qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com,
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Send requests back to the source for shared page requests.
+Resolve fault addresses read off the clients UFD into RAMBlock
+and offset, and call back to the postcopy code to ask for the page.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/migration.h    |  2 ++
- migration/postcopy-ram.c | 31 ++++++++++++++++++++++++++++---
- migration/postcopy-ram.h |  3 +++
- migration/trace-events   |  2 ++
- 4 files changed, 35 insertions(+), 3 deletions(-)
+ hw/virtio/trace-events |  3 +++
+ hw/virtio/vhost-user.c | 28 +++++++++++++++++++++++++++-
+ 2 files changed, 30 insertions(+), 1 deletion(-)
 
-diff --git a/migration/migration.h b/migration/migration.h
-index 1210b217a1..5fa0bb7b53 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -49,6 +49,8 @@ struct MigrationIncomingState {
-     int       userfault_quit_fd;
-     QEMUFile *to_src_file;
-     QemuMutex rp_mutex;    /* We send replies from multiple threads */
-+    /* RAMBlock of last request sent to source */
-+    RAMBlock *last_rb;
-     void     *postcopy_tmp_page;
-     void     *postcopy_tmp_zero_page;
-     /* PostCopyFD's for external userfaultfds & handlers of shared memory */
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index d43a73c108..cbf10236f0 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -460,6 +460,31 @@ static int ram_block_enable_notify(const char *block_name, void *host_addr,
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index 1fd194363a..3cec81bb1e 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -1,6 +1,9 @@
+ # See docs/tracing.txt for syntax documentation.
+ 
+ # hw/virtio/vhost-user.c
++vhost_user_postcopy_fault_handler(const char *name, uint64_t fault_address, int nregions) "%s: @%"PRIx64" nregions:%d"
++vhost_user_postcopy_fault_handler_loop(int i, uint64_t client_base, uint64_t size) "%d: client%"PRIx64" +%"PRIx64
++vhost_user_postcopy_fault_handler_found(int i, uint64_t region_offset, uint64_t rb_offset) "%d: region_offset: %"PRIx64" rb_offset:%"PRIx64
+ vhost_user_postcopy_listen(void) ""
+ vhost_user_set_mem_table_postcopy(uint64_t client_addr, uint64_t qhva, int reply_i, int region_i) "client:%"PRIx64" for hva: %"PRIx64" reply %d region %d"
+ vhost_user_set_mem_table_withfd(int index, const char *name, uint64_t memory_size, uint64_t guest_phys_addr, uint64_t userspace_addr, uint64_t offset) "%d:%s: size:%"PRIx64" GPA:%"PRIx64" QVA/userspace:%"PRIx64" RB offset:%"PRIx64
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 3185af7a45..92620830e4 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -782,9 +782,35 @@ out:
+ static int vhost_user_postcopy_fault_handler(struct PostCopyFD *pcfd,
+                                              void *ufd)
+ {
++    struct vhost_dev *dev = pcfd->data;
++    struct vhost_user *u = dev->opaque;
+     struct uffd_msg *msg = ufd;
++    uint64_t faultaddr = msg->arg.pagefault.address;
++    RAMBlock *rb = NULL;
++    uint64_t rb_offset;
++    int i;
+ 
+-    return 0;
++    trace_vhost_user_postcopy_fault_handler(pcfd->idstr, faultaddr,
++                                            dev->mem->nregions);
++    for (i = 0; i < dev->mem->nregions; i++) {
++        trace_vhost_user_postcopy_fault_handler_loop(i,
++                u->postcopy_client_bases[i], dev->mem->regions[i].memory_size);
++        if (faultaddr >= u->postcopy_client_bases[i]) {
++            /* Ofset of the fault address in the vhost region */
++            uint64_t region_offset = faultaddr - u->postcopy_client_bases[i];
++            if (region_offset <= dev->mem->regions[i].memory_size) {
++                rb_offset = region_offset + u->region_rb_offset[i];
++                trace_vhost_user_postcopy_fault_handler_found(i,
++                        region_offset, rb_offset);
++                rb = u->region_rb[i];
++                return postcopy_request_shared_page(pcfd, rb, faultaddr,
++                                                    rb_offset);
++            }
++        }
++    }
++    error_report("%s: Failed to find region for fault %" PRIx64,
++                 __func__, faultaddr);
++    return -1;
  }
  
  /*
-+ * Callback from shared fault handlers to ask for a page,
-+ * the page must be specified by a RAMBlock and an offset in that rb
-+ */
-+int postcopy_request_shared_page(struct PostCopyFD *pcfd, RAMBlock *rb,
-+                                 uint64_t client_addr, uint64_t rb_offset)
-+{
-+    size_t pagesize = qemu_ram_pagesize(rb);
-+    uint64_t aligned_rbo = rb_offset & ~(pagesize - 1);
-+    MigrationIncomingState *mis = migration_incoming_get_current();
-+
-+    trace_postcopy_request_shared_page(pcfd->idstr, qemu_ram_get_idstr(rb),
-+                                       rb_offset);
-+    /* TODO: Check bitmap to see if we already have the page */
-+    if (rb != mis->last_rb) {
-+        mis->last_rb = rb;
-+        migrate_send_rp_req_pages(mis, qemu_ram_get_idstr(rb),
-+                                  aligned_rbo, pagesize);
-+    } else {
-+        /* Save some space */
-+        migrate_send_rp_req_pages(mis, NULL, aligned_rbo, pagesize);
-+    }
-+    return 0;
-+}
-+
-+/*
-  * Handle faults detected by the USERFAULT markings
-  */
- static void *postcopy_ram_fault_thread(void *opaque)
-@@ -469,9 +494,9 @@ static void *postcopy_ram_fault_thread(void *opaque)
-     int ret;
-     size_t index;
-     RAMBlock *rb = NULL;
--    RAMBlock *last_rb = NULL; /* last RAMBlock we sent part of */
- 
-     trace_postcopy_ram_fault_thread_entry();
-+    mis->last_rb = NULL; /* last RAMBlock we sent part of */
-     qemu_sem_post(&mis->fault_thread_sem);
- 
-     struct pollfd *pfd;
-@@ -560,8 +585,8 @@ static void *postcopy_ram_fault_thread(void *opaque)
-              * Send the request to the source - we want to request one
-              * of our host page sizes (which is >= TPS)
-              */
--            if (rb != last_rb) {
--                last_rb = rb;
-+            if (rb != mis->last_rb) {
-+                mis->last_rb = rb;
-                 migrate_send_rp_req_pages(mis, qemu_ram_get_idstr(rb),
-                                          rb_offset, qemu_ram_pagesize(rb));
-             } else {
-diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
-index 873c147b68..69e88b0174 100644
---- a/migration/postcopy-ram.h
-+++ b/migration/postcopy-ram.h
-@@ -162,5 +162,8 @@ struct PostCopyFD {
-  */
- void postcopy_register_shared_ufd(struct PostCopyFD *pcfd);
- void postcopy_unregister_shared_ufd(struct PostCopyFD *pcfd);
-+/* Callback from shared fault handlers to ask for a page */
-+int postcopy_request_shared_page(struct PostCopyFD *pcfd, RAMBlock *rb,
-+                                 uint64_t client_addr, uint64_t offset);
- 
- #endif
-diff --git a/migration/trace-events b/migration/trace-events
-index 522cfa170d..7ac8f9cf41 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -197,6 +197,8 @@ postcopy_ram_incoming_cleanup_closeuf(void) ""
- postcopy_ram_incoming_cleanup_entry(void) ""
- postcopy_ram_incoming_cleanup_exit(void) ""
- postcopy_ram_incoming_cleanup_join(void) ""
-+postcopy_request_shared_page(const char *sharer, const char *rb, uint64_t rb_offset) "for %s in %s offset %"PRIx64
-+
- save_xbzrle_page_skipping(void) ""
- save_xbzrle_page_overflow(void) ""
- ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wait: %" PRIu64 " milliseconds, %d iterations"
 -- 
 2.13.0
