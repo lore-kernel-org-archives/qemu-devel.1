@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <raj.khem@gmail.com>) id 1dQJpo-0007en-Lk
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 16:45:14 -0400
+	(envelope-from <laurent@vivier.eu>) id 1dQJqF-00083B-MX
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 16:45:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <raj.khem@gmail.com>) id 1dQJpn-0004OI-3q
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 16:45:12 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:33315)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <raj.khem@gmail.com>) id 1dQJpm-0004M2-Qp
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 16:45:11 -0400
-Received: by mail-pf0-x241.google.com with SMTP id e199so10343125pfh.0
-	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 13:45:09 -0700 (PDT)
-From: Khem Raj <raj.khem@gmail.com>
-Date: Wed, 28 Jun 2017 13:44:52 -0700
-Message-Id: <20170628204452.41230-1-raj.khem@gmail.com>
-Subject: [Qemu-devel] [PATCH] replace struct ucontext with ucontext_t type
+	(envelope-from <laurent@vivier.eu>) id 1dQJqC-0004ZV-KW
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 16:45:39 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:64722)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dQJqC-0004Yr-9E
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 16:45:36 -0400
+References: <20170620205121.26515-1-laurent@vivier.eu>
+	<20170620205121.26515-7-laurent@vivier.eu>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <e94af6f2-8869-b9e7-b2b8-b3f16713b345@vivier.eu>
+Date: Wed, 28 Jun 2017 22:44:57 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170620205121.26515-7-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 6/6] target-m68k,
+ linux-user: manage FP registers in ucontext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,263 +29,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Khem Raj <raj.khem@gmail.com>, Kamil Rytarowski <kamil@netbsd.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>
+To: Riku Voipio <riku.voipio@iki.fi>
+Cc: qemu-devel@nongnu.org, Thomas Huth <huth@tuxfamily.org>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Richard Henderson <rth@twiddle.net>
 
-The ucontext_t type had a tag struct ucontext until now
-but newer glibc will drop it so we need to adjust and use
-the exposed type instead
+Riku,
 
-Signed-off-by: Khem Raj <raj.khem@gmail.com>
-Cc: Kamil Rytarowski <kamil@netbsd.org>
-Cc: Riku Voipio <riku.voipio@iki.fi>
-Cc: Laurent Vivier <laurent@vivier.eu>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
----
- linux-user/host/aarch64/hostdep.h |  2 +-
- linux-user/host/arm/hostdep.h     |  2 +-
- linux-user/host/i386/hostdep.h    |  2 +-
- linux-user/host/ppc64/hostdep.h   |  2 +-
- linux-user/host/s390x/hostdep.h   |  2 +-
- linux-user/host/x86_64/hostdep.h  |  2 +-
- linux-user/signal.c               | 10 +++++-----
- tests/tcg/test-i386.c             |  4 ++--
- user-exec.c                       | 18 +++++++++---------
- 9 files changed, 22 insertions(+), 22 deletions(-)
+could you ACK this patch, so I will add it in my next pull request for m68k?
 
-diff --git a/linux-user/host/aarch64/hostdep.h b/linux-user/host/aarch64/hostdep.h
-index 64f75cef49..a8d41a21ad 100644
---- a/linux-user/host/aarch64/hostdep.h
-+++ b/linux-user/host/aarch64/hostdep.h
-@@ -24,7 +24,7 @@ extern char safe_syscall_end[];
- /* Adjust the signal context to rewind out of safe-syscall if we're in it */
- static inline void rewind_if_in_safe_syscall(void *puc)
- {
--    struct ucontext *uc = puc;
-+    ucontext_t *uc = puc;
-     __u64 *pcreg = &uc->uc_mcontext.pc;
- 
-     if (*pcreg > (uintptr_t)safe_syscall_start
-diff --git a/linux-user/host/arm/hostdep.h b/linux-user/host/arm/hostdep.h
-index 5c1ae60120..9276fe6ceb 100644
---- a/linux-user/host/arm/hostdep.h
-+++ b/linux-user/host/arm/hostdep.h
-@@ -24,7 +24,7 @@ extern char safe_syscall_end[];
- /* Adjust the signal context to rewind out of safe-syscall if we're in it */
- static inline void rewind_if_in_safe_syscall(void *puc)
- {
--    struct ucontext *uc = puc;
-+    ucontext_t *uc = puc;
-     unsigned long *pcreg = &uc->uc_mcontext.arm_pc;
- 
-     if (*pcreg > (uintptr_t)safe_syscall_start
-diff --git a/linux-user/host/i386/hostdep.h b/linux-user/host/i386/hostdep.h
-index d834bd80ea..073be74d87 100644
---- a/linux-user/host/i386/hostdep.h
-+++ b/linux-user/host/i386/hostdep.h
-@@ -24,7 +24,7 @@ extern char safe_syscall_end[];
- /* Adjust the signal context to rewind out of safe-syscall if we're in it */
- static inline void rewind_if_in_safe_syscall(void *puc)
- {
--    struct ucontext *uc = puc;
-+    ucontext_t *uc = puc;
-     greg_t *pcreg = &uc->uc_mcontext.gregs[REG_EIP];
- 
-     if (*pcreg > (uintptr_t)safe_syscall_start
-diff --git a/linux-user/host/ppc64/hostdep.h b/linux-user/host/ppc64/hostdep.h
-index 0b0f5f7821..98979ad917 100644
---- a/linux-user/host/ppc64/hostdep.h
-+++ b/linux-user/host/ppc64/hostdep.h
-@@ -24,7 +24,7 @@ extern char safe_syscall_end[];
- /* Adjust the signal context to rewind out of safe-syscall if we're in it */
- static inline void rewind_if_in_safe_syscall(void *puc)
- {
--    struct ucontext *uc = puc;
-+    ucontext_t *uc = puc;
-     unsigned long *pcreg = &uc->uc_mcontext.gp_regs[PT_NIP];
- 
-     if (*pcreg > (uintptr_t)safe_syscall_start
-diff --git a/linux-user/host/s390x/hostdep.h b/linux-user/host/s390x/hostdep.h
-index 6f9da9c608..4f0171f36f 100644
---- a/linux-user/host/s390x/hostdep.h
-+++ b/linux-user/host/s390x/hostdep.h
-@@ -24,7 +24,7 @@ extern char safe_syscall_end[];
- /* Adjust the signal context to rewind out of safe-syscall if we're in it */
- static inline void rewind_if_in_safe_syscall(void *puc)
- {
--    struct ucontext *uc = puc;
-+    ucontext_t *uc = puc;
-     unsigned long *pcreg = &uc->uc_mcontext.psw.addr;
- 
-     if (*pcreg > (uintptr_t)safe_syscall_start
-diff --git a/linux-user/host/x86_64/hostdep.h b/linux-user/host/x86_64/hostdep.h
-index 3b4259633e..a4fefb5114 100644
---- a/linux-user/host/x86_64/hostdep.h
-+++ b/linux-user/host/x86_64/hostdep.h
-@@ -24,7 +24,7 @@ extern char safe_syscall_end[];
- /* Adjust the signal context to rewind out of safe-syscall if we're in it */
- static inline void rewind_if_in_safe_syscall(void *puc)
- {
--    struct ucontext *uc = puc;
-+    ucontext_t *uc = puc;
-     greg_t *pcreg = &uc->uc_mcontext.gregs[REG_RIP];
- 
-     if (*pcreg > (uintptr_t)safe_syscall_start
-diff --git a/linux-user/signal.c b/linux-user/signal.c
-index 3d18d1b3ee..2c55a4f600 100644
---- a/linux-user/signal.c
-+++ b/linux-user/signal.c
-@@ -3346,7 +3346,7 @@ static void setup_rt_frame(int sig, struct target_sigaction *ka,
-     *
-     *   a0 = signal number
-     *   a1 = pointer to siginfo_t
--    *   a2 = pointer to struct ucontext
-+    *   a2 = pointer to ucontext_t
-     *
-     * $25 and PC point to the signal handler, $29 points to the
-     * struct sigframe.
-@@ -3733,7 +3733,7 @@ struct target_signal_frame {
- 
- struct rt_signal_frame {
-     siginfo_t info;
--    struct ucontext uc;
-+    ucontext_t uc;
-     uint32_t tramp[2];
- };
- 
-@@ -3949,7 +3949,7 @@ struct rt_signal_frame {
-     siginfo_t *pinfo;
-     void *puc;
-     siginfo_t info;
--    struct ucontext uc;
-+    ucontext_t uc;
-     uint16_t retcode[4];      /* Trampoline code. */
- };
- 
-@@ -4484,7 +4484,7 @@ static void setup_rt_frame(int sig, struct target_sigaction *ka,
-         tswap_siginfo(&frame->info, info);
-     }
- 
--    /*err |= __clear_user(&frame->uc, offsetof(struct ucontext, uc_mcontext));*/
-+    /*err |= __clear_user(&frame->uc, offsetof(ucontext_t, uc_mcontext));*/
-     __put_user(0, &frame->uc.tuc_flags);
-     __put_user(0, &frame->uc.tuc_link);
-     __put_user(target_sigaltstack_used.ss_sp,
-@@ -4976,7 +4976,7 @@ enum {
- 
- struct target_ucontext {
-     target_ulong tuc_flags;
--    target_ulong tuc_link;    /* struct ucontext __user * */
-+    target_ulong tuc_link;    /* ucontext_t __user * */
-     struct target_sigaltstack tuc_stack;
- #if !defined(TARGET_PPC64)
-     int32_t tuc_pad[7];
-diff --git a/tests/tcg/test-i386.c b/tests/tcg/test-i386.c
-index 0f7b943b0c..9599204895 100644
---- a/tests/tcg/test-i386.c
-+++ b/tests/tcg/test-i386.c
-@@ -1720,7 +1720,7 @@ int tab[2];
- 
- void sig_handler(int sig, siginfo_t *info, void *puc)
- {
--    struct ucontext *uc = puc;
-+    ucontext_t *uc = puc;
- 
-     printf("si_signo=%d si_errno=%d si_code=%d",
-            info->si_signo, info->si_errno, info->si_code);
-@@ -1912,7 +1912,7 @@ void test_exceptions(void)
- /* specific precise single step test */
- void sig_trap_handler(int sig, siginfo_t *info, void *puc)
- {
--    struct ucontext *uc = puc;
-+    ucontext_t *uc = puc;
-     printf("EIP=" FMTLX "\n", (long)uc->uc_mcontext.gregs[REG_EIP]);
- }
- 
-diff --git a/user-exec.c b/user-exec.c
-index a8f95fa1e1..2a975eaf69 100644
---- a/user-exec.c
-+++ b/user-exec.c
-@@ -167,7 +167,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
- #elif defined(__OpenBSD__)
-     struct sigcontext *uc = puc;
- #else
--    struct ucontext *uc = puc;
-+    ucontext_t *uc = puc;
- #endif
-     unsigned long pc;
-     int trapno;
-@@ -222,7 +222,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
- #elif defined(__OpenBSD__)
-     struct sigcontext *uc = puc;
- #else
--    struct ucontext *uc = puc;
-+    ucontext_t *uc = puc;
- #endif
- 
-     pc = PC_sig(uc);
-@@ -289,7 +289,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
- #if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-     ucontext_t *uc = puc;
- #else
--    struct ucontext *uc = puc;
-+    ucontext_t *uc = puc;
- #endif
-     unsigned long pc;
-     int is_write;
-@@ -316,7 +316,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
-                            void *puc)
- {
-     siginfo_t *info = pinfo;
--    struct ucontext *uc = puc;
-+    ucontext_t *uc = puc;
-     uint32_t *pc = uc->uc_mcontext.sc_pc;
-     uint32_t insn = *pc;
-     int is_write = 0;
-@@ -414,7 +414,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
- #if defined(__NetBSD__)
-     ucontext_t *uc = puc;
- #else
--    struct ucontext *uc = puc;
-+    ucontext_t *uc = puc;
- #endif
-     unsigned long pc;
-     int is_write;
-@@ -441,7 +441,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
- int cpu_signal_handler(int host_signum, void *pinfo, void *puc)
- {
-     siginfo_t *info = pinfo;
--    struct ucontext *uc = puc;
-+    ucontext_t *uc = puc;
-     uintptr_t pc = uc->uc_mcontext.pc;
-     uint32_t insn = *(uint32_t *)pc;
-     bool is_write;
-@@ -474,7 +474,7 @@ int cpu_signal_handler(int host_signum, void *pinfo, void *puc)
- int cpu_signal_handler(int host_signum, void *pinfo, void *puc)
- {
-     siginfo_t *info = pinfo;
--    struct ucontext *uc = puc;
-+    ucontext_t *uc = puc;
-     unsigned long ip;
-     int is_write = 0;
- 
-@@ -505,7 +505,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
-                        void *puc)
- {
-     siginfo_t *info = pinfo;
--    struct ucontext *uc = puc;
-+    ucontext_t *uc = puc;
-     unsigned long pc;
-     uint16_t *pinsn;
-     int is_write = 0;
-@@ -558,7 +558,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
-                        void *puc)
- {
-     siginfo_t *info = pinfo;
--    struct ucontext *uc = puc;
-+    ucontext_t *uc = puc;
-     greg_t pc = uc->uc_mcontext.pc;
-     int is_write;
- 
--- 
-2.13.2
+Thanks,
+Laurent
+
+Le 20/06/2017 à 22:51, Laurent Vivier a écrit :
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>  linux-user/signal.c | 41 +++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 41 insertions(+)
+> 
+> diff --git a/linux-user/signal.c b/linux-user/signal.c
+> index 3d18d1b..d3753e4 100644
+> --- a/linux-user/signal.c
+> +++ b/linux-user/signal.c
+> @@ -5673,6 +5673,24 @@ give_sigsegv:
+>      force_sigsegv(sig);
+>  }
+>  
+> +static inline void target_rt_save_fpu_state(struct target_ucontext *uc,
+> +                                           CPUM68KState *env)
+> +{
+> +    int i;
+> +    target_fpregset_t *fpregs = &uc->tuc_mcontext.fpregs;
+> +
+> +    __put_user(env->fpcr, &fpregs->f_fpcntl[0]);
+> +    __put_user(env->fpsr, &fpregs->f_fpcntl[1]);
+> +    /* fpiar is not emulated */
+> +
+> +    for (i = 0; i < 8; i++) {
+> +        uint32_t high = env->fregs[i].d.high << 16;
+> +        __put_user(high, &fpregs->f_fpregs[i * 3]);
+> +        __put_user(env->fregs[i].d.low,
+> +                   (uint64_t *)&fpregs->f_fpregs[i * 3 + 1]);
+> +    }
+> +}
+> +
+>  static inline int target_rt_setup_ucontext(struct target_ucontext *uc,
+>                                             CPUM68KState *env)
+>  {
+> @@ -5699,9 +5717,30 @@ static inline int target_rt_setup_ucontext(struct target_ucontext *uc,
+>      __put_user(env->pc, &gregs[16]);
+>      __put_user(sr, &gregs[17]);
+>  
+> +    target_rt_save_fpu_state(uc, env);
+> +
+>      return 0;
+>  }
+>  
+> +static inline void target_rt_restore_fpu_state(CPUM68KState *env,
+> +                                               struct target_ucontext *uc)
+> +{
+> +    int i;
+> +    target_fpregset_t *fpregs = &uc->tuc_mcontext.fpregs;
+> +
+> +    __get_user(env->fpcr, &fpregs->f_fpcntl[0]);
+> +    __get_user(env->fpsr, &fpregs->f_fpcntl[1]);
+> +    /* fpiar is not emulated */
+> +
+> +    for (i = 0; i < 8; i++) {
+> +        uint32_t high;
+> +        __get_user(high, &fpregs->f_fpregs[i * 3]);
+> +        env->fregs[i].d.high = high >> 16;
+> +        __get_user(env->fregs[i].d.low,
+> +                   (uint64_t *)&fpregs->f_fpregs[i * 3 + 1]);
+> +    }
+> +}
+> +
+>  static inline int target_rt_restore_ucontext(CPUM68KState *env,
+>                                               struct target_ucontext *uc)
+>  {
+> @@ -5733,6 +5772,8 @@ static inline int target_rt_restore_ucontext(CPUM68KState *env,
+>      __get_user(temp, &gregs[17]);
+>      cpu_m68k_set_ccr(env, temp);
+>  
+> +    target_rt_restore_fpu_state(env, uc);
+> +
+>      return 0;
+>  
+>  badframe:
+> 
