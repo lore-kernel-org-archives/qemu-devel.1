@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1dQ2yF-0001UL-Vl
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 22:44:49 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1dQ2ye-0001i2-8f
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 22:45:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1dQ2yB-00089f-9D
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 22:44:48 -0400
-Received: from mga03.intel.com ([134.134.136.65]:24340)
+	(envelope-from <wei.w.wang@intel.com>) id 1dQ2yZ-0008H0-Hg
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 22:45:12 -0400
+Received: from mga07.intel.com ([134.134.136.100]:32618)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1dQ2yB-00089O-01
-	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 22:44:43 -0400
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Date: Wed, 28 Jun 2017 10:43:58 +0800
-Message-Id: <20170628024358.29956-1-haozhong.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH] exec: fix access to ram_list.dirty_memory when
- sync dirty bitmap
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1dQ2yZ-0008FI-84
+	for qemu-devel@nongnu.org; Tue, 27 Jun 2017 22:45:07 -0400
+From: Wei Wang <wei.w.wang@intel.com>
+Date: Wed, 28 Jun 2017 10:37:59 +0800
+Message-Id: <1498617479-5809-1-git-send-email-wei.w.wang@intel.com>
+Subject: [Qemu-devel] [PATCH v4] virtio-net: enable configurable tx queue
+ size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,61 +23,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>, Xiao Guangrong <xiaoguangrong@tencent.com>, Haozhong Zhang <haozhong.zhang@intel.com>
+To: mst@redhat.com, jasowang@redhat.com, eblake@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, stefanha@gmail.com, marcandre.lureau@gmail.com, pbonzini@redhat.com, Wei Wang <wei.w.wang@intel.com>
 
-In cpu_physical_memory_sync_dirty_bitmap(rb, start, ...), the 2nd
-argument 'start' is relative to the start of the ramblock 'rb'. When
-it's used to access the dirty memory bitmap of ram_list (i.e.
-ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION]->blocks[]), an offset to
-the start of all RAM (i.e. rb->offset) should be added to it, which has
-however been missed since c/s 6b6712efcc. For a ramblock of host memory
-backend whose offset is not zero, cpu_physical_memory_sync_dirty_bitmap()
-synchronizes the incorrect part of the dirty memory bitmap of ram_list
-to the per ramblock dirty bitmap. As a result, a guest with host
-memory backend may crash after migration.
+This patch enables the virtio-net tx queue size to be configurable
+between 256 (the default queue size) and 1024 by the user when the
+vhost-user backend is used.
 
-Fix it by adding the offset of ramblock when accessing the dirty memory
-bitmap of ram_list in cpu_physical_memory_sync_dirty_bitmap().
+Currently, the maximum tx queue size for other backends is 512 due
+to the following limitations:
+- QEMU backend: the QEMU backend implementation in some cases may
+send 1024+1 iovs to writev.
+- Vhost_net backend: there are possibilities that the guest sends
+a vring_desc of memory which crosses a MemoryRegion thereby
+generating more than 1024 iovs after translation from guest-physical
+address in the backend.
 
-Reported-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+Signed-off-by: Wei Wang <wei.w.wang@intel.com>
 ---
- include/exec/ram_addr.h | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ hw/net/virtio-net.c            | 32 ++++++++++++++++++++++++++++++--
+ include/hw/virtio/virtio-net.h |  1 +
+ 2 files changed, 31 insertions(+), 2 deletions(-)
 
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 73d1bea8b6..cbc797ed05 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -377,6 +377,7 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
-                                                uint64_t *real_dirty_pages)
- {
-     ram_addr_t addr;
-+    ram_addr_t offset = rb->offset;
-     unsigned long page = BIT_WORD(start >> TARGET_PAGE_BITS);
-     uint64_t num_dirty = 0;
-     unsigned long *dest = rb->bmap;
-@@ -386,8 +387,9 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
-         int k;
-         int nr = BITS_TO_LONGS(length >> TARGET_PAGE_BITS);
-         unsigned long * const *src;
--        unsigned long idx = (page * BITS_PER_LONG) / DIRTY_MEMORY_BLOCK_SIZE;
--        unsigned long offset = BIT_WORD((page * BITS_PER_LONG) %
-+        unsigned long word = BIT_WORD((start + offset) >> TARGET_PAGE_BITS);
-+        unsigned long idx = (word * BITS_PER_LONG) / DIRTY_MEMORY_BLOCK_SIZE;
-+        unsigned long offset = BIT_WORD((word * BITS_PER_LONG) %
-                                         DIRTY_MEMORY_BLOCK_SIZE);
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 91eddaf..a1fc0db 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -34,8 +34,11 @@
  
-         rcu_read_lock();
-@@ -416,7 +418,7 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+ /* previously fixed value */
+ #define VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE 256
++#define VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE 256
++
+ /* for now, only allow larger queues; with virtio-1, guest can downsize */
+ #define VIRTIO_NET_RX_QUEUE_MIN_SIZE VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE
++#define VIRTIO_NET_TX_QUEUE_MIN_SIZE VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE
+ 
+ /*
+  * Calculate the number of bytes up to and including the given 'field' of
+@@ -1508,15 +1511,18 @@ static void virtio_net_add_queue(VirtIONet *n, int index)
+ 
+     n->vqs[index].rx_vq = virtio_add_queue(vdev, n->net_conf.rx_queue_size,
+                                            virtio_net_handle_rx);
++
+     if (n->net_conf.tx && !strcmp(n->net_conf.tx, "timer")) {
+         n->vqs[index].tx_vq =
+-            virtio_add_queue(vdev, 256, virtio_net_handle_tx_timer);
++            virtio_add_queue(vdev, n->net_conf.tx_queue_size,
++                             virtio_net_handle_tx_timer);
+         n->vqs[index].tx_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
+                                               virtio_net_tx_timer,
+                                               &n->vqs[index]);
      } else {
-         for (addr = 0; addr < length; addr += TARGET_PAGE_SIZE) {
-             if (cpu_physical_memory_test_and_clear_dirty(
--                        start + addr,
-+                        start + addr + offset,
-                         TARGET_PAGE_SIZE,
-                         DIRTY_MEMORY_MIGRATION)) {
-                 *real_dirty_pages += 1;
+         n->vqs[index].tx_vq =
+-            virtio_add_queue(vdev, 256, virtio_net_handle_tx_bh);
++            virtio_add_queue(vdev, n->net_conf.tx_queue_size,
++                             virtio_net_handle_tx_bh);
+         n->vqs[index].tx_bh = qemu_bh_new(virtio_net_tx_bh, &n->vqs[index]);
+     }
+ 
+@@ -1927,6 +1933,17 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
++    if (n->net_conf.tx_queue_size < VIRTIO_NET_TX_QUEUE_MIN_SIZE ||
++        n->net_conf.tx_queue_size > VIRTQUEUE_MAX_SIZE ||
++        !is_power_of_2(n->net_conf.tx_queue_size)) {
++        error_setg(errp, "Invalid tx_queue_size (= %" PRIu16 "), "
++                   "must be a power of 2 between %d and %d",
++                   n->net_conf.tx_queue_size, VIRTIO_NET_TX_QUEUE_MIN_SIZE,
++                   VIRTQUEUE_MAX_SIZE);
++        virtio_cleanup(vdev);
++        return;
++    }
++
+     n->max_queues = MAX(n->nic_conf.peers.queues, 1);
+     if (n->max_queues * 2 + 1 > VIRTIO_QUEUE_MAX) {
+         error_setg(errp, "Invalid number of queues (= %" PRIu32 "), "
+@@ -1947,6 +1964,15 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
+         error_report("Defaulting to \"bh\"");
+     }
+ 
++    /*
++     * Currently, backends other than vhost-user don't support 1024 queue
++     * size.
++     */
++    if (n->net_conf.tx_queue_size == VIRTQUEUE_MAX_SIZE &&
++        n->nic_conf.peers.ncs[0]->info->type != NET_CLIENT_DRIVER_VHOST_USER) {
++        n->net_conf.tx_queue_size = VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE;
++    }
++
+     for (i = 0; i < n->max_queues; i++) {
+         virtio_net_add_queue(n, i);
+     }
+@@ -2106,6 +2132,8 @@ static Property virtio_net_properties[] = {
+     DEFINE_PROP_STRING("tx", VirtIONet, net_conf.tx),
+     DEFINE_PROP_UINT16("rx_queue_size", VirtIONet, net_conf.rx_queue_size,
+                        VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE),
++    DEFINE_PROP_UINT16("tx_queue_size", VirtIONet, net_conf.tx_queue_size,
++                       VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE),
+     DEFINE_PROP_UINT16("host_mtu", VirtIONet, net_conf.mtu, 0),
+     DEFINE_PROP_BOOL("x-mtu-bypass-backend", VirtIONet, mtu_bypass_backend,
+                      true),
+diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
+index 602b486..b81b6a4 100644
+--- a/include/hw/virtio/virtio-net.h
++++ b/include/hw/virtio/virtio-net.h
+@@ -36,6 +36,7 @@ typedef struct virtio_net_conf
+     int32_t txburst;
+     char *tx;
+     uint16_t rx_queue_size;
++    uint16_t tx_queue_size;
+     uint16_t mtu;
+ } virtio_net_conf;
+ 
 -- 
-2.11.0
+2.7.4
