@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dQeQQ-0002dN-Qc
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 14:44:23 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dQeQX-0002kh-DM
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 14:44:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dQeQP-0005Qg-QD
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 14:44:22 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dQeQW-0005Ta-Jy
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 14:44:29 -0400
 From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Date: Thu, 29 Jun 2017 21:43:18 +0300
-Message-Id: <20170629184320.7151-2-el13635@mail.ntua.gr>
+Date: Thu, 29 Jun 2017 21:43:19 +0300
+Message-Id: <20170629184320.7151-3-el13635@mail.ntua.gr>
 In-Reply-To: <20170629184320.7151-1-el13635@mail.ntua.gr>
 References: <20170629184320.7151-1-el13635@mail.ntua.gr>
-Subject: [Qemu-devel] [PATCH v2 1/3] block: pass bdrv_* methods to bs->file
- by default
+Subject: [Qemu-devel] [PATCH v2 2/3] block: use defaults of bdrv_* callbacks
+ in raw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,136 +23,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel <qemu-devel@nongnu.org>
 Cc: qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-The following functions fail if bs->drv does not implement them:
-
-bdrv_probe_blocksizes
-bdrv_probe_geometry
-bdrv_truncate
-bdrv_has_zero_init
-bdrv_get_info
-bdrv_media_changed
-bdrv_eject
-bdrv_lock_medium
-bdrv_co_ioctl
-
-Instead, the call should be passed to bs->file if it exists, to allow
-filter drivers to support those methods without implementing them.
+Now that passing the call to bs->file is the default for some bdrv_*
+callbacks, remove the duplicate implementations in block/raw-format.c
 
 Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
 ---
- block.c    | 27 +++++++++++++++++++++++++--
- block/io.c |  5 +++++
- 2 files changed, 30 insertions(+), 2 deletions(-)
+ block/raw-format.c | 32 +-------------------------------
+ 1 file changed, 1 insertion(+), 31 deletions(-)
 
-diff --git a/block.c b/block.c
-index 69439628..9e8d34ad 100644
---- a/block.c
-+++ b/block.c
-@@ -494,6 +494,8 @@ int bdrv_probe_blocksizes(BlockDriverState *bs, BlockSizes *bsz)
+diff --git a/block/raw-format.c b/block/raw-format.c
+index 1ea8c2d7..ff9b4359 100644
+--- a/block/raw-format.c
++++ b/block/raw-format.c
+@@ -312,11 +312,6 @@ static int64_t raw_getlength(BlockDriverState *bs)
+     return s->size;
+ }
  
-     if (drv && drv->bdrv_probe_blocksizes) {
-         return drv->bdrv_probe_blocksizes(bs, bsz);
-+    } else if (drv && bs->file && bs->file->bs) {
-+        return bdrv_probe_blocksizes(bs->file->bs, bsz);
-     }
- 
-     return -ENOTSUP;
-@@ -511,6 +513,8 @@ int bdrv_probe_geometry(BlockDriverState *bs, HDGeometry *geo)
- 
-     if (drv && drv->bdrv_probe_geometry) {
-         return drv->bdrv_probe_geometry(bs, geo);
-+    } else if (drv && bs->file && bs->file->bs) {
-+        return bdrv_probe_geometry(bs->file->bs, geo);
-     }
- 
-     return -ENOTSUP;
-@@ -3406,11 +3410,15 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, Error **errp)
- 
-     assert(child->perm & BLK_PERM_RESIZE);
- 
-+    /* if bs->drv == NULL, bs is closed, so there's nothing to do here */
-     if (!drv) {
-         error_setg(errp, "No medium inserted");
-         return -ENOMEDIUM;
-     }
-     if (!drv->bdrv_truncate) {
-+        if (bs->file && bs->file->bs) {
-+            return bdrv_truncate(bs->file, offset, errp);
-+        }
-         error_setg(errp, "Image format driver does not support resize");
-         return -ENOTSUP;
-     }
-@@ -3778,6 +3786,9 @@ int bdrv_has_zero_init(BlockDriverState *bs)
-     if (bs->drv->bdrv_has_zero_init) {
-         return bs->drv->bdrv_has_zero_init(bs);
-     }
-+    if (bs->file && bs->file->bs) {
-+        return bdrv_has_zero_init(bs->file->bs);
-+    }
- 
-     /* safe default */
-     return 0;
-@@ -3832,10 +3843,16 @@ void bdrv_get_backing_filename(BlockDriverState *bs,
- int bdrv_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
+-static int raw_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
+-{
+-    return bdrv_get_info(bs->file->bs, bdi);
+-}
+-
+ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
  {
-     BlockDriver *drv = bs->drv;
--    if (!drv)
-+    /* if bs->drv == NULL, bs is closed, so there's nothing to do here */
-+    if (!drv) {
-         return -ENOMEDIUM;
--    if (!drv->bdrv_get_info)
-+    }
-+    if (!drv->bdrv_get_info) {
-+        if (bs->file && bs->file->bs) {
-+            return bdrv_get_info(bs->file->bs, bdi);
-+        }
-         return -ENOTSUP;
-+    }
-     memset(bdi, 0, sizeof(*bdi));
-     return drv->bdrv_get_info(bs, bdi);
- }
-@@ -4205,6 +4222,8 @@ int bdrv_media_changed(BlockDriverState *bs)
- 
-     if (drv && drv->bdrv_media_changed) {
-         return drv->bdrv_media_changed(bs);
-+    } else if (drv && bs->file && bs->file->bs) {
-+        bdrv_media_changed(bs->file->bs);
-     }
-     return -ENOTSUP;
- }
-@@ -4218,6 +4237,8 @@ void bdrv_eject(BlockDriverState *bs, bool eject_flag)
- 
-     if (drv && drv->bdrv_eject) {
-         drv->bdrv_eject(bs, eject_flag);
-+    } else if (drv && bs->file && bs->file->bs) {
-+        bdrv_eject(bs->file->bs, eject_flag);
-     }
+     if (bs->probed) {
+@@ -346,21 +341,6 @@ static int raw_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
+     return bdrv_truncate(bs->file, offset, errp);
  }
  
-@@ -4233,6 +4254,8 @@ void bdrv_lock_medium(BlockDriverState *bs, bool locked)
- 
-     if (drv && drv->bdrv_lock_medium) {
-         drv->bdrv_lock_medium(bs, locked);
-+    } else if (drv && bs->file && bs->file->bs) {
-+        bdrv_lock_medium(bs->file->bs, locked);
-     }
+-static int raw_media_changed(BlockDriverState *bs)
+-{
+-    return bdrv_media_changed(bs->file->bs);
+-}
+-
+-static void raw_eject(BlockDriverState *bs, bool eject_flag)
+-{
+-    bdrv_eject(bs->file->bs, eject_flag);
+-}
+-
+-static void raw_lock_medium(BlockDriverState *bs, bool locked)
+-{
+-    bdrv_lock_medium(bs->file->bs, locked);
+-}
+-
+ static int raw_co_ioctl(BlockDriverState *bs, unsigned long int req, void *buf)
+ {
+     BDRVRawState *s = bs->opaque;
+@@ -370,11 +350,6 @@ static int raw_co_ioctl(BlockDriverState *bs, unsigned long int req, void *buf)
+     return bdrv_co_ioctl(bs->file->bs, req, buf);
  }
  
-diff --git a/block/io.c b/block/io.c
-index c72d7015..a1aee01d 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2401,6 +2401,11 @@ int bdrv_co_ioctl(BlockDriverState *bs, int req, void *buf)
-     };
-     BlockAIOCB *acb;
+-static int raw_has_zero_init(BlockDriverState *bs)
+-{
+-    return bdrv_has_zero_init(bs->file->bs);
+-}
+-
+ static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
+ {
+     return bdrv_create_file(filename, opts, errp);
+@@ -479,16 +454,11 @@ BlockDriver bdrv_raw = {
+     .bdrv_truncate        = &raw_truncate,
+     .bdrv_getlength       = &raw_getlength,
+     .has_variable_length  = true,
+-    .bdrv_get_info        = &raw_get_info,
+     .bdrv_refresh_limits  = &raw_refresh_limits,
+     .bdrv_probe_blocksizes = &raw_probe_blocksizes,
+     .bdrv_probe_geometry  = &raw_probe_geometry,
+-    .bdrv_media_changed   = &raw_media_changed,
+-    .bdrv_eject           = &raw_eject,
+-    .bdrv_lock_medium     = &raw_lock_medium,
+     .bdrv_co_ioctl        = &raw_co_ioctl,
+-    .create_opts          = &raw_create_opts,
+-    .bdrv_has_zero_init   = &raw_has_zero_init
++    .create_opts          = &raw_create_opts
+ };
  
-+    if (drv && !drv->bdrv_aio_ioctl && !drv->bdrv_co_ioctl &&
-+        bs->file && bs->file->bs) {
-+        return bdrv_co_ioctl(bs->file->bs, req, buf);
-+    }
-+
-     bdrv_inc_in_flight(bs);
-     if (!drv || (!drv->bdrv_aio_ioctl && !drv->bdrv_co_ioctl)) {
-         co.ret = -ENOTSUP;
+ static void bdrv_raw_init(void)
 -- 
 2.11.0
