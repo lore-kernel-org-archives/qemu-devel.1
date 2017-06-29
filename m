@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dQd6g-0003of-Rq
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 13:19:55 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dQdGY-0000f3-Ax
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 13:30:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dQd6f-0000BV-UW
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 13:19:54 -0400
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Thu, 29 Jun 2017 10:16:32 -0700
-Message-ID: <199bd37fe51c4b240da9834673c065ea042b9897.1498756113.git.alistair.francis@xilinx.com>
-In-Reply-To: <cover.1498756113.git.alistair.francis@xilinx.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dQdGX-0004wt-Gy
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 13:30:06 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
 References: <cover.1498756113.git.alistair.francis@xilinx.com>
+	<ec037b86d3144d26ebdbb943515d2da02725d465.1498756113.git.alistair.francis@xilinx.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <cbdfef36-9f44-dcb9-a2e6-cf2fd65b0365@amsat.org>
+Date: Thu, 29 Jun 2017 14:29:54 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v1 2/3] util/oslib-win32: Remove invalid check
+In-Reply-To: <ec037b86d3144d26ebdbb943515d2da02725d465.1498756113.git.alistair.francis@xilinx.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 1/3] util/aio-win32: Only select on what
+ we are actually waiting for
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,35 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, stefanha@redhat.com, famz@redhat.com
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, edgar.iglesias@xilinx.com, qemu-block@nongnu.org, philippe@mathieu-daude.net, pbonzini@redhat.com
+To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, stefanha@redhat.com, famz@redhat.com
+Cc: alistair23@gmail.com, edgar.iglesias@xilinx.com, qemu-block@nongnu.org, philippe@mathieu-daude.net, pbonzini@redhat.com
 
-There is no way nhandles can be zero in this section so that part of the
-if statement will always be false. Let's just remove it to make the code
-easier to read.
+On 06/29/2017 02:16 PM, Alistair Francis wrote:
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Acked-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Acked-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Fam Zheng <famz@redhat.com>
----
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
- util/oslib-win32.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-index 80e4668935..7ec0f8e083 100644
---- a/util/oslib-win32.c
-+++ b/util/oslib-win32.c
-@@ -414,7 +414,7 @@ static int poll_rest(gboolean poll_msgs, HANDLE *handle=
-s, gint nhandles,
-         /* If we have a timeout, or no handles to poll, be satisfied
-          * with just noticing we have messages waiting.
-          */
--        if (timeout !=3D 0 || nhandles =3D=3D 0) {
-+        if (timeout !=3D 0) {
-             return 1;
-         }
-=20
---=20
-2.11.0
+> ---
+> Changes since RFC:
+>   - Include more bitmasks for the select call
+> 
+>   util/aio-win32.c | 13 ++++++++++---
+>   1 file changed, 10 insertions(+), 3 deletions(-)
+> 
+> diff --git a/util/aio-win32.c b/util/aio-win32.c
+> index bca496a47a..d6d5e02f00 100644
+> --- a/util/aio-win32.c
+> +++ b/util/aio-win32.c
+> @@ -71,6 +71,7 @@ void aio_set_fd_handler(AioContext *ctx,
+>           }
+>       } else {
+>           HANDLE event;
+> +        long bitmask = 0;
+>   
+>           if (node == NULL) {
+>               /* Alloc and insert if it's not already there */
+> @@ -95,10 +96,16 @@ void aio_set_fd_handler(AioContext *ctx,
+>           node->io_write = io_write;
+>           node->is_external = is_external;
+>   
+> +        if (io_read) {
+> +            bitmask |= FD_READ | FD_ACCEPT | FD_CLOSE;
+> +        }
+> +
+> +        if (io_write) {
+> +            bitmask |= FD_WRITE | FD_CONNECT;
+> +        }
+> +
+>           event = event_notifier_get_handle(&ctx->notifier);
+> -        WSAEventSelect(node->pfd.fd, event,
+> -                       FD_READ | FD_ACCEPT | FD_CLOSE |
+> -                       FD_CONNECT | FD_WRITE | FD_OOB);
+> +        WSAEventSelect(node->pfd.fd, event, bitmask);
+>       }
+>   
+>       qemu_lockcnt_unlock(&ctx->list_lock);
+> 
