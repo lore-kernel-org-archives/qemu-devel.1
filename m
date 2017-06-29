@@ -1,30 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40166)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dQe3S-00026J-Ok
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 14:20:40 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dQe5j-0002qI-RX
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 14:23:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dQe3P-0002cY-Kl
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 14:20:38 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:33665)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dQe3P-0002c3-D1
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 14:20:35 -0400
-Received: by mail-qt0-x241.google.com with SMTP id c20so12282894qte.0
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 11:20:35 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <57ad91ad-7cc4-913f-7f45-c5906779bedf@amsat.org>
-Date: Thu, 29 Jun 2017 15:20:31 -0300
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dQe5g-0003nm-KQ
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 14:22:59 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36464
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1dQe5g-0003nM-De
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 14:22:56 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v5TIIjjL007094
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 14:22:55 -0400
+Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bd4aqppkr-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 14:22:55 -0400
+Received: from localhost
+	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Thu, 29 Jun 2017 12:22:53 -0600
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] disas: Disassembler disagrees with translator over
- instruction decoding
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20170629083319.GA19941@redhat.com>
+References: <1498695900-1648-1-git-send-email-mdroth@linux.vnet.ibm.com>
+	<20170629083319.GA19941@redhat.com>
+Date: Thu, 29 Jun 2017 13:22:44 -0500
+Message-Id: <149876056453.10485.3122787367160530626@loki>
+Subject: Re: [Qemu-devel] [RFC PATCH 0/5] hotplug: fix premature rebinding
+ of VFIO devices to host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,153 +43,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: libvir-list@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, aik@ozlabs.ru, alex.williamson@redhat.com, abologna@redhat.com, laine@laine.org, pkrempa@redhat.com, mprivozn@redhat.com, sbhat@linux.vnet.ibm.com
 
-I got this "Disassembler disagrees with translator over instruction 
-decoding" message asking to get reported here.
+Quoting Daniel P. Berrange (2017-06-29 03:33:19)
+> On Wed, Jun 28, 2017 at 07:24:55PM -0500, Michael Roth wrote:
+> > Hi everyone. Hoping to get some feedback on this approach, or some
+> > alternatives proposed below, to the following issue:
+> > =
 
-What happens here is coreboot incorrectly emits a Pentium2 instruction 
-while I'm running qemu with a Pentium cpu. I didn't know what to expect 
-but got this error message, then qemu keep looping using 100% cpu.
+> > Currently libvirt immediately attempts to rebind a managed device back =
+to the
+> > host driver when it receives a DEVICE_DELETED event from QEMU. This is
+> > problematic for 2 reasons:
+> > =
 
---
+> > 1) If multiple devices from a group are attached to a guest, this can m=
+ove
+> >    the group into a "non-viable" state where some devices are assigned =
+to
+> >    the host and some to the guest.
+> > =
 
-Use coreboot commit 08bb837268fb6d5ce84d07c8d9fe0ef4d56ac479, build 
-default config which is QEMU:
+> > 2) When QEMU emits the DEVICE_DELETED event, there's still a "finalize"=
+ phase
+> >    where additional cleanup occurs. In most cases libvirt can ignore th=
+is
+> >    cleanup, but in the case of VFIO devices this is where closing of a =
+VFIO
+> >    group FD occurs, and failing to wait before rebinding the device to =
+the
+> >    host driver can result in unexpected behavior. In the case of powernv
+> >    hosts at least, this can lead to a host driver crashing due to the d=
+efault
+> >    DMA windows not having been fully-restored yet. The window between t=
+his is
+> >    and the initial DEVICE_DELETED seems to be ~6 seconds in practice. W=
+e've
+> >    seen host dumps with Mellanox CX4 VFs being rebound to host driver d=
+uring
+> >    this period (on powernv hosts).
+> =
 
-coreboot$ make
-     ...
-     CBFS       coreboot.rom
-Built emulation/qemu-i440fx (QEMU x86 i440fx/piix4)
+> Why on earth does QEMU's device finalization take 6 seconds to complete.
+> That feels very broken to me, unless QEMU is not being schedled due to
+> host being overcomitted. If that's not the case, then we have a bug to
+> investigate in QEMU to find out why cleanup is delayed so long.
 
-Run this BIOS with a Pentium cpu, enabling in_asm debugging:
+In this particular case QEMU starts finalization almost immediately
+after the DEVICE_DELETED, but it looks like most of the time between that a=
+nd
+closing of the group FD is spent in the kernel. Here's what it looks
+like from QEMU with vfio*/monitor* traces enabled (in this case
+unplugging a Mellanox CX3 PF):
 
-coreboot$ qemu-system-i386 -nographic \
-	-cpu pentium -d in_asm,cpu_reset \
-	-bios build/coreboot.rom
-[...]
+# device_del called
+...
+# vfio device's device_unparent() called:
+  # unrealize->exit->vfio_exitfn called:
+61948@1498759308.951038:vfio_intx_disable  (0002:01:00.0)
+61948@1498759308.953657:vfio_region_exit Device 0002:01:00.0, region 0
+61948@1498759308.954532:vfio_region_exit Device 0002:01:00.0, region 2
+  # unrealize->exit->vfio_exitfn returns, DEVICE_DELETED sent:
+61948@1498759308.954633:monitor_protocol_event_queue event=3D9 data=3D0x3ff=
+f6c508690 rate=3D0
+61948@1498759308.954669:monitor_protocol_event_emit event=3D9 data=3D0x3fff=
+6c508690
+  # last unref of vfio device, vfio_instance_finalize() called:
+61948@1498759308.955660:vfio_region_finalize Device 0002:01:00.0, region 0
+61948@1498759308.955742:vfio_region_finalize Device 0002:01:00.0, region 2
+61948@1498759308.955751:vfio_put_base_device close vdev->fd=3D30
 
-IN:
-0x00000000fffc1728:  push   %ebx
-0x00000000fffc1729:  sub    $0x8,%esp
-0x00000000fffc172c:  cmpl   $0x0,0xd0d00
-0x00000000fffc1733:  mov    0x10(%esp),%ebx
-0x00000000fffc1737:  je     0xfffc1785
+    # close(VFIODevice.fd) <- 5 SECOND DELAY
 
-----------------
-IN:
-0x00000000fffc1785:  add    $0x8,%esp
-0x00000000fffc1788:  mov    %ebx,%eax
-0x00000000fffc178a:  pop    %ebx
-0x00000000fffc178b:  ret
+61948@1498759313.140515:vfio_put_base_device_completed close completed vdev=
+->fd=3D30
+61948@1498759313.181124:vfio_disconnect_container close container->fd=3D102
+61948@1498759313.181152:vfio_put_group close group->fd=3D101
+    # close(VFIOGroup.fd)
+61948@1498759313.181157:vfio_put_group_completed close completed group->fd=
+=3D101
+  # vfio_instance_finalize() returns
+# vfio device's device_unparent() returns
 
-----------------
-IN:
-0x00000000fffc1c08:  mov    %ebx,(%eax)
-0x00000000fffc1c0a:  add    $0x10,%esp
-0x00000000fffc1c0d:  add    $0x8,%esp
-0x00000000fffc1c10:  pop    %ebx
-0x00000000fffc1c11:  ret
+I poked around in the VFIO group close path and figured restoring ownership
+of IOMMU to the host via vfio_iommu_driver_ops.release() (via
+close(groupfd) was where all the time was spent, but didn't expect it to
+be the close(VFIODevice.fd). Maybe Alexey/Alex have a better idea. I'll
+look into it more as well.
 
-----------------
-IN:
-0x00000000fffc0e88:  call   0xfffc17dc
+But suffice to say there's not much QEMU can do about the delay other
+than moving deferring the DEVICE_DELETED event or adding a later-stage
+event.
 
-----------------
-IN:
-0x00000000fffc17dc:  sub    $0x28,%esp
-0x00000000fffc17df:  mov    $0x402,%edx
-0x00000000fffc17e4:  in     (%dx),%al
-0x00000000fffc17e5:  mov    %al,0x1b(%esp)
-0x00000000fffc17e9:  push   $0xd0d04
-0x00000000fffc17ee:  call   0xfffc1728
+> =
 
-----------------
-IN:
-0x00000000fffc17f3:  add    $0x10,%esp
-0x00000000fffc17f6:  xor    %edx,%edx
-0x00000000fffc17f8:  cmpb   $0xe9,0xf(%esp)
-0x00000000fffc17fd:  sete   %dl
-0x00000000fffc1800:  mov    %edx,(%eax)
-0x00000000fffc1802:  mov    $0xfffc365f,%edx
-0x00000000fffc1807:  mov    $0xfffc3656,%eax
-0x00000000fffc180c:  push   $0x402
-0x00000000fffc1811:  cmovne %edx,%eax
-Disassembler disagrees with translator over instruction decoding
-Please report this to qemu-devel@nongnu.org
+> =
 
-Triple fault
-CPU Reset (CPU 0)
-EAX=fffc3656 EBX=00000000 ECX=00000000 EDX=fffc365f
-ESI=fffffe52 EDI=fffc01e4 EBP=000a0000 ESP=0009ff98
-EIP=fffc1811 EFL=00000002 [-------] CPL=0 II=0 A20=1 SMM=0 HLT=0
-ES =0010 00000000 ffffffff 00cf9300 DPL=0 DS   [-WA]
-CS =0008 00000000 ffffffff 00cf9b00 DPL=0 CS32 [-RA]
-SS =0010 00000000 ffffffff 00cf9300 DPL=0 DS   [-WA]
-DS =0010 00000000 ffffffff 00cf9300 DPL=0 DS   [-WA]
-FS =0010 00000000 ffffffff 00cf9300 DPL=0 DS   [-WA]
-GS =0010 00000000 ffffffff 00cf9300 DPL=0 DS   [-WA]
-LDT=0000 00000000 0000ffff 00008200 DPL=0 LDT
-TR =0000 00000000 0000ffff 00008b00 DPL=0 TSS32-busy
-GDT=     fffc0200 0000001f
-IDT=     00000000 00000000
-CR0=60000011 CR2=00000000 CR3=00000000 CR4=00000000
-DR0=0000000000000000 DR1=0000000000000000 DR2=0000000000000000 
-DR3=0000000000000000
-DR6=00000000ffff0ff0 DR7=0000000000000400
-CCS=000000e9 CCD=00000016 CCO=SUBB
-EFER=0000000000000000
-FCW=037f FSW=0000 [ST=0] FTW=00 MXCSR=00001f80
-FPR0=0000000000000000 0000 FPR1=0000000000000000 0000
-FPR2=0000000000000000 0000 FPR3=0000000000000000 0000
-FPR4=0000000000000000 0000 FPR5=0000000000000000 0000
-FPR6=0000000000000000 0000 FPR7=0000000000000000 0000
-XMM00=00000000000000000000000000000000 
-XMM01=00000000000000000000000000000000
-XMM02=00000000000000000000000000000000 
-XMM03=00000000000000000000000000000000
-XMM04=00000000000000000000000000000000 
-XMM05=00000000000000000000000000000000
-XMM06=00000000000000000000000000000000 
-XMM07=00000000000000000000000000000000
-----------------
-IN:
-0x00000000fffc1bf0:  cmp    $0x10000000,%eax
-0x00000000fffc1bf5:  ja     0xfffc1c12
+> From libvirt's POV, we consider 'DEVICE_DELETED' as meaning both that the
+> frontend has gone *and* the corresponding backend has gone. Aside from
+> cleaning the VFIO group, we use this as a trigger for all other device
+> related cleanup like SELinux labelling, cgroup device ACLs, etc. If the
+> backend is not guaranteed to be closed in QEMU when this emit is emitted
+> then either QEMU needs to delay the event until it is really cleaned up,
+> or QEMU needs to add a further event to emit when the backend is clean.
+> =
 
-----------------
-IN:
-0x00000000fffc1bf7:  cmp    %edx,%eax
-0x00000000fffc1bf9:  jne    0xfffc1c12
+> =
 
-QEMU 2.8.1 monitor - type 'help' for more information
-(qemu) q
+> > Patches 1-4 address 1) by deferring rebinding of a hostdev to the host =
+driver
+> > until all the devices in the group have been detached, at which point a=
+ll
+> > the hostdevs are rebound as a group. Until that point, the devices are =
+traced
+> > by the drvManager's inactiveList in a similar manner to hostdevs that a=
+re
+> > assigned to VFIO via the nodedev-detach interface.
+> > =
 
-also same with today's master 454d7dc9bc13e46084e0612076e6952c40f4afeb:
+> > Patch 5 addresses 2) by adding an additional check that, when the last =
+device
+> > from a group is detached, polls /proc for open FDs referencing the VFIO=
+ group
+> > path in /dev/vfio/<iommu_group> and waiting for the FD to be closed. If=
+ we
+> > time out, we abandon rebinding the hostdevs back to the host.
+> =
 
-QEMU 2.9.50 monitor - type 'help' for more information
-(qemu) q
+> That is just gross - it is tieing libvirt to details of the QEMU internal
+> implementation. I really don't think we should be doing that. So NACK to
+> this from my POV.
+> =
 
-in disas.c:
+> > There are a couple alternatives to Patch 5 that might be worth consider=
+ing:
+> > =
 
-254     if (count < 0)
-255         break;
-256         if (size < count) {
-257             fprintf(out,
-258                     "Disassembler disagrees with translator over 
-instruction "
-259                     "decoding\n"
-260                     "Please report this to qemu-devel@nongnu.org\n");
-261             break;
-262         }
-263     }
+> > a) Add a DEVICE_FINALIZED event to QEMU and wait for that instead of
+> >    DEVICE_DELETED. Paired with patches 1-4 this would let us drop patch=
+ 5 in
+> >    favor of minimal changes to libvirt's event handlers.
+> > =
 
-This was added in commit 754d00ae3a1bfabb6069b59f72cdec1dee99ea0b from 
-2009 with svn message:
+> >    The downsides are:
+> >     - that we'd incur some latency for all device-detach calls, but it'=
+s not
+> >       apparent to me whether this delay is significant for anything out=
+side
+> >       of VFIO.
+> >     - there may be cases where finalization after DEVICE_DELETE/unparen=
+t are
+> >       is not guaranteed, and I'm not sure QOM would encourage such
+> >       expectations even if that's currently the case.
+> > =
 
-"Safety net for the cases where disassembler/translator disagree over 
-instruction decoding"
+> > b) Add a GROUP_DELETED event to VFIO's finalize callback. This is the m=
+ost
+> >    direct solution. With this we could completely separate out the hand=
+ling
+> >    of rebinding to host driver based on receival of this event.
+> > =
 
-Regards,
+> >    The downsides are:
+> >     - this would only work for newer versions of QEMU, though we could =
+use
+> >       the poll-wait in patch 5 as a fallback.
+> >     - synchronizing sync/async device-detach threads with sync/async
+> >       handlers for this would be a bit hairy, but I have a WIP in progr=
+ess
+> >       that seems *fairly reasonable*
+> > =
 
-Phil.
+> > c) Take the approach in Patch 5, either as a precursor to implementing =
+b) or
+> >    something else, or just sticking with that for now.
+> > =
+
+> > d) ???
+> =
+
+> Fix DEVICE_DELETE so its only emitted when the backend associated with
+> the device is fully cleaned up.
+
+Need to explore same concerns I had WRT to DEVICE_FINALIZED above, but
+assuming those aren't an issue this would indeed makes things even
+simpler. Will look into this more.
+
+Would patch 5 be out of the question even as a fallback for downlevel
+QEMUs? Or is that scenario too unlikely to warrant it?
+
+Thanks!
+
+> =
+
+> =
+
+> Regards,
+> Daniel
+> -- =
+
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
+>=20
