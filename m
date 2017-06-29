@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dQURw-00043s-2h
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 04:05:20 -0400
+	(envelope-from <famz@redhat.com>) id 1dQURy-00044n-2C
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 04:05:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dQURu-0003QX-GW
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 04:05:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58342)
+	(envelope-from <famz@redhat.com>) id 1dQURw-0003RV-M1
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 04:05:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60280)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dQURu-0003QD-7w
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 04:05:14 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dQURw-0003R9-E7
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 04:05:16 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Thu, 29 Jun 2017 16:04:50 +0800
-Message-Id: <20170629080452.26470-6-famz@redhat.com>
+Date: Thu, 29 Jun 2017 16:04:51 +0800
+Message-Id: <20170629080452.26470-7-famz@redhat.com>
 In-Reply-To: <20170629080452.26470-1-famz@redhat.com>
 References: <20170629080452.26470-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 5/7] virtio-blk: Use DEFINE_PROP_LINK
+Subject: [Qemu-devel] [PATCH v2 6/7] virtio-scsi: Use DEFINE_PROP_LINK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +28,90 @@ Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@red
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- hw/block/dataplane/virtio-blk.c | 2 +-
- hw/block/virtio-blk.c           | 7 +++----
- hw/virtio/virtio-pci.c          | 2 --
- include/hw/virtio/virtio-blk.h  | 2 +-
- 4 files changed, 5 insertions(+), 8 deletions(-)
+ hw/scsi/virtio-scsi-dataplane.c |  2 +-
+ hw/scsi/virtio-scsi.c           | 15 ++++-----------
+ hw/virtio/virtio-pci.c          |  2 --
+ include/hw/virtio/virtio-scsi.h |  2 +-
+ 4 files changed, 6 insertions(+), 15 deletions(-)
 
-diff --git a/hw/block/dataplane/virtio-blk.c b/hw/block/dataplane/virtio-blk.c
-index 5556f0e..6fdc6f6 100644
---- a/hw/block/dataplane/virtio-blk.c
-+++ b/hw/block/dataplane/virtio-blk.c
-@@ -116,7 +116,7 @@ void virtio_blk_data_plane_create(VirtIODevice *vdev, VirtIOBlkConf *conf,
-     s->conf = conf;
- 
-     if (conf->iothread) {
--        s->iothread = conf->iothread;
-+        s->iothread = IOTHREAD(conf->iothread);
-         object_ref(OBJECT(s->iothread));
-         s->ctx = iothread_get_aio_context(s->iothread);
+diff --git a/hw/scsi/virtio-scsi-dataplane.c b/hw/scsi/virtio-scsi-dataplane.c
+index 944ea4e..887c100 100644
+--- a/hw/scsi/virtio-scsi-dataplane.c
++++ b/hw/scsi/virtio-scsi-dataplane.c
+@@ -40,7 +40,7 @@ void virtio_scsi_dataplane_setup(VirtIOSCSI *s, Error **errp)
+             error_setg(errp, "ioeventfd is required for iothread");
+             return;
+         }
+-        s->ctx = iothread_get_aio_context(vs->conf.iothread);
++        s->ctx = iothread_get_aio_context(IOTHREAD(vs->conf.iothread));
      } else {
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index 604d37d..aa2c38c 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -981,10 +981,6 @@ static void virtio_blk_instance_init(Object *obj)
- {
-     VirtIOBlock *s = VIRTIO_BLK(obj);
+         if (!virtio_device_ioeventfd_enabled(vdev)) {
+             return;
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index f46f06d..afe4389 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -897,16 +897,6 @@ static void virtio_scsi_device_realize(DeviceState *dev, Error **errp)
+     virtio_scsi_dataplane_setup(s, errp);
+ }
  
+-static void virtio_scsi_instance_init(Object *obj)
+-{
+-    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(obj);
+-
 -    object_property_add_link(obj, "iothread", TYPE_IOTHREAD,
--                             (Object **)&s->conf.iothread,
+-                             (Object **)&vs->conf.iothread,
 -                             qdev_prop_allow_set_link_before_realize,
--                             OBJ_PROP_LINK_UNREF_ON_RELEASE, NULL);
-     device_add_bootindex_property(obj, &s->conf.conf.bootindex,
-                                   "bootindex", "/disk@0,0",
-                                   DEVICE(obj), NULL);
-@@ -1012,6 +1008,9 @@ static Property virtio_blk_properties[] = {
-     DEFINE_PROP_BIT("request-merging", VirtIOBlock, conf.request_merging, 0,
-                     true),
-     DEFINE_PROP_UINT16("num-queues", VirtIOBlock, conf.num_queues, 1),
-+    DEFINE_PROP_LINK("iothread", VirtIOBlock, conf.iothread, TYPE_IOTHREAD,
+-                             OBJ_PROP_LINK_UNREF_ON_RELEASE, &error_abort);
+-}
+-
+ void virtio_scsi_common_unrealize(DeviceState *dev, Error **errp)
+ {
+     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+@@ -934,6 +924,10 @@ static Property virtio_scsi_properties[] = {
+                                            VIRTIO_SCSI_F_HOTPLUG, true),
+     DEFINE_PROP_BIT("param_change", VirtIOSCSI, host_features,
+                                                 VIRTIO_SCSI_F_CHANGE, true),
++    DEFINE_PROP_LINK("iothread", VirtIOSCSI, parent_obj.conf.iothread,
++                     TYPE_IOTHREAD,
 +                     qdev_prop_allow_set_link_before_realize,
 +                     OBJ_PROP_LINK_UNREF_ON_RELEASE),
      DEFINE_PROP_END_OF_LIST(),
  };
  
+@@ -988,7 +982,6 @@ static const TypeInfo virtio_scsi_info = {
+     .name = TYPE_VIRTIO_SCSI,
+     .parent = TYPE_VIRTIO_SCSI_COMMON,
+     .instance_size = sizeof(VirtIOSCSI),
+-    .instance_init = virtio_scsi_instance_init,
+     .class_init = virtio_scsi_class_init,
+     .interfaces = (InterfaceInfo[]) {
+         { TYPE_HOTPLUG_HANDLER },
 diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 20d6a08..e6960ae 100644
+index e6960ae..eb03ba5 100644
 --- a/hw/virtio/virtio-pci.c
 +++ b/hw/virtio/virtio-pci.c
-@@ -1996,8 +1996,6 @@ static void virtio_blk_pci_instance_init(Object *obj)
+@@ -2065,8 +2065,6 @@ static void virtio_scsi_pci_instance_init(Object *obj)
  
      virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-                                 TYPE_VIRTIO_BLK);
--    object_property_add_alias(obj, "iothread", OBJECT(&dev->vdev),"iothread",
+                                 TYPE_VIRTIO_SCSI);
+-    object_property_add_alias(obj, "iothread", OBJECT(&dev->vdev), "iothread",
 -                              &error_abort);
-     object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
-                               "bootindex", &error_abort);
  }
-diff --git a/include/hw/virtio/virtio-blk.h b/include/hw/virtio/virtio-blk.h
-index d3c8a6f..94a9f0c 100644
---- a/include/hw/virtio/virtio-blk.h
-+++ b/include/hw/virtio/virtio-blk.h
-@@ -33,7 +33,7 @@ struct virtio_blk_inhdr
- struct VirtIOBlkConf
- {
-     BlockConf conf;
+ 
+ static const TypeInfo virtio_scsi_pci_info = {
+diff --git a/include/hw/virtio/virtio-scsi.h b/include/hw/virtio/virtio-scsi.h
+index de6ae5a..1decc40 100644
+--- a/include/hw/virtio/virtio-scsi.h
++++ b/include/hw/virtio/virtio-scsi.h
+@@ -56,7 +56,7 @@ struct VirtIOSCSIConf {
+ #endif
+     CharBackend chardev;
+     uint32_t boot_tpgt;
 -    IOThread *iothread;
 +    Object *iothread;
-     char *serial;
-     uint32_t scsi;
-     uint32_t config_wce;
+ };
+ 
+ struct VirtIOSCSI;
 -- 
 2.9.4
