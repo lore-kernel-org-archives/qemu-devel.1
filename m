@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33355)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dQQ4e-0005AN-Qt
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:24:57 -0400
+	(envelope-from <peterx@redhat.com>) id 1dQQ7o-0005qq-7z
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:28:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dQQ4b-0005WH-Lp
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:24:56 -0400
-Received: from [59.151.112.132] (port=10917 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dQQ4b-0005VC-91
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:24:53 -0400
-References: <cover.1498654240.git.maozy.fnst@cn.fujitsu.com>
-	<d9660b46628b52aa8c63c21fe20618b5bc33bb4c.1498654240.git.maozy.fnst@cn.fujitsu.com>
-	<20170628131852.GH29134@redhat.com>
-	<66fab3ea-5033-851c-ec8e-5740c7108ab7@redhat.com>
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Message-ID: <5183dcbe-9320-f03b-0e45-97e1b6799997@cn.fujitsu.com>
-Date: Thu, 29 Jun 2017 11:24:39 +0800
+	(envelope-from <peterx@redhat.com>) id 1dQQ7l-0007gz-3J
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:28:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48326)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dQQ7k-0007gQ-TX
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:28:09 -0400
+Date: Thu, 29 Jun 2017 11:28:02 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170629032802.GD32268@pxdev.xzpeter.org>
+References: <1498654172-26570-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170628125232eucas1p1af5a7b0d734c7af25a20981e25812ee2@eucas1p1.samsung.com>
+	<1498654172-26570-4-git-send-email-a.perevalov@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <66fab3ea-5033-851c-ec8e-5740c7108ab7@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 1/4] net/socket: Don't treat odd socket
- type as SOCK_STREAM
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1498654172-26570-4-git-send-email-a.perevalov@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH v6 3/3] migration: add bitmap for received
+ page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: jasowang@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, quintela@redhat.com, dgilbert@redhat.com
 
-Hi, Eric
+On Wed, Jun 28, 2017 at 08:49:32AM -0400, Alexey Perevalov wrote:
 
-On 06/28/2017 10:23 PM, Eric Blake wrote:
-> On 06/28/2017 08:18 AM, Daniel P. Berrange wrote:
->> On Wed, Jun 28, 2017 at 09:08:47PM +0800, Mao Zhongyi wrote:
->>> In net_socket_fd_init(), the 'default' case is odd: it warns,
->>> then continues as if the socket type was SOCK_STREAM. The
->>> comment explains "this could be a eg. a pty", but that makes
->>> no sense. If @fd really was a pty, getsockopt() would fail
->>> with ENOTSOCK. If @fd was a socket, but neither SOCK_DGRAM nor
->>> SOCK_STREAM. It should not be treated as if it was SOCK_STREAM.
->>>
->>> Turn this case into an Error. If there is a genuine reason to
->>> support something like SOCK_RAW, it should be explicitly
->>> handled.
->>>
->
->>>      default:
->>> -        /* who knows ... this could be a eg. a pty, do warn and continue as stream */
->>> -        fprintf(stderr, "qemu: warning: socket type=%d for fd=%d is not SOCK_DGRAM or SOCK_STREAM\n", so_type, fd);
->>> -        return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
->>> +        error_report("qemu: error: socket type=%d for fd=%d is not"
->>> +                " SOCK_DGRAM or SOCK_STREAM", so_type, fd);
->>
->> Please drop the 'qemu: error: ' prefix on the message
->>
->> Also, rather than 'is not' I suggest 'must be either'
->
-> Indentation is also off; we prefer that the second line starts right
-> after the ( of the first line, as in:
->
-> error_report("part 1"
->              "part 2")
+[...]
 
-OK, I will. :)
+> @@ -2324,8 +2352,14 @@ static int ram_load_setup(QEMUFile *f, void *opaque)
 
-Thanks,
-Mao
+[1]
 
->
->
+>  
+>  static int ram_load_cleanup(void *opaque)
+>  {
+> +    RAMBlock *rb;
+>      xbzrle_load_cleanup();
+>      compress_threads_load_cleanup();
+> +
+> +    RAMBLOCK_FOREACH(rb) {
+> +        g_free(rb->receivedmap);
+> +        rb->receivedmap = NULL;
+> +    }
+>      return 0;
+>  }
+
+Can we put init into ram_load_setup()? (I don't have the codes, but I
+see this function above at [1], I suppose it'll be called on dest side
+before migration really starts?)
+
+Sorry for my harshness, but this just looks weird. I am not asking
+that we _must_ put it somewhere outside RAM codes, but at least I
+think they should be paired. If you cleanup the bitmap in RAM code,
+why not you init it in RAM code as well? Did I miss anything again?
+
+-- 
+Peter Xu
