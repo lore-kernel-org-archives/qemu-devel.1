@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46013)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dQaQV-0002xB-Ui
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:28:13 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dQaWK-0005vn-0K
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:34:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dQaQP-0003LP-W8
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:28:11 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:32854)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dQaQP-0003Ku-Iv
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:28:05 -0400
-Received: by mail-lf0-x242.google.com with SMTP id t72so7866649lff.0
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 07:28:05 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1dQaWE-0006jx-IA
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:34:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42344)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dQaWE-0006iS-8a
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:34:06 -0400
+Date: Thu, 29 Jun 2017 15:34:01 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170629143401.GA22733@work-vm>
+References: <20170608054116.17203-1-sjitindarsingh@gmail.com>
 MIME-Version: 1.0
-References: <20170611074817.13621-1-sf@sfritsch.de>
-	<d95a3198-3ad0-4a75-dda2-a3b7502ede28@redhat.com>
-In-Reply-To: <d95a3198-3ad0-4a75-dda2-a3b7502ede28@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 29 Jun 2017 14:27:52 +0000
-Message-ID: <CAJ+F1CKs+Q7Z2mkbGK3GFaM9xJ=rTp9A-Gz+9um5pgpA2ef=Hg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] Add chardev-send-break monitor command
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170608054116.17203-1-sjitindarsingh@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH V2] monitor: Add -a (all) option to info
+ registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,72 +27,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Stefan Fritsch <sf@sfritsch.de>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com
 
-On Tue, Jun 27, 2017 at 9:46 PM Eric Blake <eblake@redhat.com> wrote:
+* Suraj Jitindar Singh (sjitindarsingh@gmail.com) wrote:
+> The info registers command in the qemu monitor is used to dump register
+> values.
+> 
+> Currently this command uses the monitor cpu (which can be set by the
+> user) as the cpu for whose registers will be dumped. Sometimes it is
+> useful to see the registers for all cpus and currently this requires
+> setting the monitor cpu and the re-running the command for each cpu
+> in the system. I would be nice if there was an easier way to do this.
+> 
+> Add the "-a" option to the info registers command to dump the register
+> values for all cpus.
+> 
+> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-> On 06/11/2017 02:48 AM, Stefan Fritsch wrote:
-> > Sending a break on a serial console can be useful for debugging the
-> > guest. But not all chardev backends support sending breaks (only telnet
-> > and mux do). The chardev-send-break command allows to send a break even
-> > if using other backends.
-> >
-> > Signed-off-by: Stefan Fritsch <sf@sfritsch.de>
-> > Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->
-
-Looks good to me,
- Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
+Queued.
 
 > ---
-> > v2: added tests and Acked-by line
-> >
->
-> > +++ b/hmp-commands.hx
-> > @@ -1745,6 +1745,22 @@ Removes the chardev @var{id}.
-> >  ETEXI
-> >
-> >      {
-> > +        .name       =3D "chardev-send-break",
-> > +        .args_type  =3D "id:s",
-> > +        .params     =3D "id",
-> > +        .help       =3D "send break on chardev",
->
-> Compare this wording,...
->
-> > +STEXI
-> > +@item chardev-send-break id
-> > +@findex chardev-send-break
-> > +Sends break on the chardev @var{id}.
->
-> repeated here,
->
-> > +++ b/qapi-schema.json
-> > @@ -5114,6 +5114,26 @@
-> >  { 'command': 'chardev-remove', 'data': {'id': 'str'} }
-> >
-> >  ##
-> > +# @chardev-send-break:
-> > +#
-> > +# Send a break to a character device
->
-> ...with this wording.  I like 'send a break' better than 'send break',
-> but even better might be 'send a break sequence' or even 'emulate a
-> break sequence' (by definition, a break is NOT a character, but on bare
-> metal character devices it IS a defined electrical sequence distinct
-> from characters to make the recipient aware that the sender is trying to
-> get attention).
->
-> Otherwise, the patch looks fine to me.  If all that changes is some
-> word-smithing (and the maintainer may be willing to do that), you can add=
-:
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->
-
-Paolo would you take it (perhaps on the next iteration)?
-
-thanks
---=20
-Marc-Andr=C3=A9 Lureau
+> 
+> Change Log:
+> 
+> V1 -> V2:
+>  - Add CPU number to beginning of register dump
+> ---
+>  hmp-commands-info.hx |  6 +++---
+>  monitor.c            | 21 ++++++++++++++++-----
+>  2 files changed, 19 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+> index ae16901..ba98e58 100644
+> --- a/hmp-commands-info.hx
+> +++ b/hmp-commands-info.hx
+> @@ -100,9 +100,9 @@ ETEXI
+>  
+>      {
+>          .name       = "registers",
+> -        .args_type  = "",
+> -        .params     = "",
+> -        .help       = "show the cpu registers",
+> +        .args_type  = "cpustate_all:-a",
+> +        .params     = "[-a]",
+> +        .help       = "show the cpu registers (-a: all - show register info for all cpus)",
+>          .cmd        = hmp_info_registers,
+>      },
+>  
+> diff --git a/monitor.c b/monitor.c
+> index baa73c9..1629ad1 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -1078,13 +1078,24 @@ int monitor_get_cpu_index(void)
+>  
+>  static void hmp_info_registers(Monitor *mon, const QDict *qdict)
+>  {
+> -    CPUState *cs = mon_get_cpu();
+> +    bool all_cpus = qdict_get_try_bool(qdict, "cpustate_all", false);
+> +    CPUState *cs;
+>  
+> -    if (!cs) {
+> -        monitor_printf(mon, "No CPU available\n");
+> -        return;
+> +    if (all_cpus) {
+> +        CPU_FOREACH(cs) {
+> +            monitor_printf(mon, "\nCPU#%d\n", cs->cpu_index);
+> +            cpu_dump_state(cs, (FILE *)mon, monitor_fprintf, CPU_DUMP_FPU);
+> +        }
+> +    } else {
+> +        cs = mon_get_cpu();
+> +
+> +        if (!cs) {
+> +            monitor_printf(mon, "No CPU available\n");
+> +            return;
+> +        }
+> +
+> +        cpu_dump_state(cs, (FILE *)mon, monitor_fprintf, CPU_DUMP_FPU);
+>      }
+> -    cpu_dump_state(cs, (FILE *)mon, monitor_fprintf, CPU_DUMP_FPU);
+>  }
+>  
+>  static void hmp_info_jit(Monitor *mon, const QDict *qdict)
+> -- 
+> 2.9.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
