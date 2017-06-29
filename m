@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32970)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dQhKd-000470-3n
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 17:50:35 -0400
+	(envelope-from <zuban32s@gmail.com>) id 1dQhQJ-0005kc-LB
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 17:56:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dQhKa-0005yh-2j
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 17:50:35 -0400
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:60077)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dQhKZ-0005wv-M7
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 17:50:31 -0400
-Date: Thu, 29 Jun 2017 17:50:28 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170629215028.GA9797@flamenco>
-References: <149838022308.6497.2104916050645246693.stgit@frigg.lan>
-	<149838167780.6497.10644158789800844637.stgit@frigg.lan>
-	<20170626181451.GH17935@flamenco> <87vangcq5g.fsf@frigg.lan>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87vangcq5g.fsf@frigg.lan>
-Subject: Re: [Qemu-devel] [PATCH v9 06/26] target: [tcg,
- i386] Port to DisasContextBase
+	(envelope-from <zuban32s@gmail.com>) id 1dQhQI-0000Rc-Un
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 17:56:27 -0400
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:34990)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dQhQI-0000R7-NI
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 17:56:26 -0400
+Received: by mail-lf0-x241.google.com with SMTP id n136so8680247lfn.2
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 14:56:26 -0700 (PDT)
+From: Aleksandr Bezzubikov <zuban32s@gmail.com>
+Date: Fri, 30 Jun 2017 00:56:00 +0300
+Message-Id: <1498773362-18675-5-git-send-email-zuban32s@gmail.com>
+In-Reply-To: <1498773362-18675-1-git-send-email-zuban32s@gmail.com>
+References: <1498773362-18675-1-git-send-email-zuban32s@gmail.com>
+Subject: [Qemu-devel] [PATCH RFC 4/6] hw/acpi: prepare pci hotplug IO for
+ ich9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +26,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: marcel@redhat.com, mst@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, Aleksandr Bezzubikov <zuban32s@gmail.com>
 
-On Wed, Jun 28, 2017 at 14:23:07 +0300, Lluís Vilanova wrote:
-> Emilio G Cota writes:
-> 
-> > On Sun, Jun 25, 2017 at 12:07:57 +0300, Lluís Vilanova wrote:
-> >> Incrementally paves the way towards using the generic instruction translation
-> >> loop.
-> >> 
-> >> Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
-> 
-> > Just a minor nit: the commit titles are a little strange to me.
-> > I'd rather do: "target/arch: foo" than "target: [tcg, arch]: foo" --
-> > it's less characters ("tcg" is redundant) and seems more in line with
-> > qemu's idioms.
-> 
-> Is tcg redundant? I thought it was necessary for differentiating it from the kvm
-> target-specific parts.
+Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+---
+ hw/i386/acpi-build.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-In most cases it is redundant -- anyway my point is that "targer/foo"
-will be enough to get the right eyes on the patch.
-
-Cheers,
-
-		E.
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index c99dbcc..e434efe 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -135,12 +135,6 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
+     if (piix) {
+         obj = piix;
+         pm->cpu_hp_io_base = PIIX4_CPU_HOTPLUG_IO_BASE;
+-        pcihp_io_base =
+-            object_property_get_int(obj, ACPI_PCIHP_IO_BASE_PROP, NULL);
+-        pcihp_io_len =
+-            object_property_get_int(obj, ACPI_PCIHP_IO_LEN_PROP, NULL);
+-        pm->pcihp_io_base = (pcihp_io_base == -1) ? 0 : pcihp_io_base;
+-        pm->pcihp_io_len = (pcihp_io_len == -1) ? 0 : pcihp_io_len;
+     }
+     if (lpc) {
+         obj = lpc;
+@@ -148,6 +142,13 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
+     }
+     assert(obj);
+ 
++    pcihp_io_base =
++        object_property_get_int(obj, ACPI_PCIHP_IO_BASE_PROP, NULL);
++    pcihp_io_len =
++        object_property_get_int(obj, ACPI_PCIHP_IO_LEN_PROP, NULL);
++    pm->pcihp_io_base = (pcihp_io_base == -1) ? 0 : pcihp_io_base;
++    pm->pcihp_io_len = (pcihp_io_len == -1) ? 0 : pcihp_io_len;
++
+     /* Fill in optional s3/s4 related properties */
+     o = object_property_get_qobject(obj, ACPI_PM_PROP_S3_DISABLED, NULL);
+     if (o) {
+-- 
+2.7.4
