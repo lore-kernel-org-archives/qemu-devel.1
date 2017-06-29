@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42692)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dQbWP-0006it-At
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:38:24 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dQbdX-0000hK-T4
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:45:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dQbWN-0006CO-TZ
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:38:21 -0400
-Date: Thu, 29 Jun 2017 17:38:02 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170629173802.09ff23a0@nial.brq.redhat.com>
-In-Reply-To: <b6193c2f-a358-b871-34f7-7f8d6784f4b8@redhat.com>
-References: <1498734863-164338-1-git-send-email-imammedo@redhat.com>
-	<b6193c2f-a358-b871-34f7-7f8d6784f4b8@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1dQbcx-00011m-K5
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:45:43 -0400
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:33396)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dQbcx-00010k-6Q
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:45:07 -0400
+Received: by mail-wr0-x232.google.com with SMTP id r103so191775948wrb.0
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 08:45:06 -0700 (PDT)
+References: <20170619104655.31104-1-alex.bennee@linaro.org>
+	<20170619104655.31104-8-alex.bennee@linaro.org>
+	<CAFEAcA_-tsYN5FMeyE4_XuJMoR=UKQgD4EAoju6+nHcWA6NySA@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA_-tsYN5FMeyE4_XuJMoR=UKQgD4EAoju6+nHcWA6NySA@mail.gmail.com>
+Date: Thu, 29 Jun 2017 16:45:59 +0100
+Message-ID: <87k23ux0eg.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qom: enforce readonly nature of link's
- check callback
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RISU PATCH v5 07/13] risu: paramterise
+ send/receive functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,199 +32,225 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, mst@redhat.com, alistair.francis@xilinx.com, qemu-arm@nongnu.org, edgar.iglesias@gmail.com, afaerber@suse.de
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, 29 Jun 2017 15:45:04 +0200
-Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-> On 29/06/2017 13:14, Igor Mammedov wrote:
-> > link's check callback is supposed to verify/permit setting it,
-> > however currently nothing restricts it from misusing it
-> > and modifying target object from within.
-> > Make sure that readonly semantics are checked by compiler
-> > to prevent callback's misuse.
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> > Fam,
-> >  it probably conflicts with yours DEFINE_PROP_LINK series,
-> >  feel free to include this patch if you'll have to respin
-> > 
-> > ---
-> >  include/hw/qdev-properties.h | 3 ++-
-> >  include/qom/object.h         | 6 +++---
-> >  hw/core/qdev-properties.c    | 3 ++-
-> >  hw/display/xlnx_dp.c         | 2 +-
-> >  hw/ipmi/ipmi.c               | 2 +-
-> >  hw/mem/pc-dimm.c             | 2 +-
-> >  hw/misc/ivshmem.c            | 2 +-
-> >  qom/object.c                 | 8 ++++----
-> >  8 files changed, 15 insertions(+), 13 deletions(-)
-> > 
-> > diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-> > index 306bbab..6dfe16e 100644
-> > --- a/include/hw/qdev-properties.h
-> > +++ b/include/hw/qdev-properties.h
-> > @@ -234,7 +234,8 @@ void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
-> >   * This function should be used as the check() argument to
-> >   * object_property_add_link().
-> >   */
-> > -void qdev_prop_allow_set_link_before_realize(Object *obj, const char *name,
-> > +void qdev_prop_allow_set_link_before_realize(const Object *obj,
-> > +                                             const char *name,
-> >                                               Object *val, Error **errp);
-> >  
-> >  #endif
-> > diff --git a/include/qom/object.h b/include/qom/object.h
-> > index 5ecc2d1..5223692 100644
-> > --- a/include/qom/object.h
-> > +++ b/include/qom/object.h
-> > @@ -788,7 +788,7 @@ ObjectClass *object_get_class(Object *obj);
-> >   *
-> >   * Returns: The QOM typename of @obj.
-> >   */
-> > -const char *object_get_typename(Object *obj);
-> > +const char *object_get_typename(const Object *obj);
-> >  
-> >  /**
-> >   * type_register_static:
-> > @@ -1320,7 +1320,7 @@ typedef enum {
-> >   * callback function.  It allows the link property to be set and never returns
-> >   * an error.
-> >   */
-> > -void object_property_allow_set_link(Object *, const char *,
-> > +void object_property_allow_set_link(const Object *, const char *,
-> >                                      Object *, Error **);
-> >  
-> >  /**
-> > @@ -1353,7 +1353,7 @@ void object_property_allow_set_link(Object *, const char *,
-> >   */
-> >  void object_property_add_link(Object *obj, const char *name,
-> >                                const char *type, Object **child,
-> > -                              void (*check)(Object *obj, const char *name,
-> > +                              void (*check)(const Object *obj, const char *name,
-> >                                              Object *val, Error **errp),
-> >                                ObjectPropertyLinkFlags flags,
-> >                                Error **errp);
-> > diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-> > index 2a82768..95e5fdb 100644
-> > --- a/hw/core/qdev-properties.c
-> > +++ b/hw/core/qdev-properties.c
-> > @@ -25,7 +25,8 @@ void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
-> >      }
-> >  }
-> >  
-> > -void qdev_prop_allow_set_link_before_realize(Object *obj, const char *name,
-> > +void qdev_prop_allow_set_link_before_realize(const Object *obj,
-> > +                                             const char *name,
-> >                                               Object *val, Error **errp)
-> >  {
-> >      DeviceState *dev = DEVICE(obj);
-> > diff --git a/hw/display/xlnx_dp.c b/hw/display/xlnx_dp.c
-> > index f43eb09..3ed81ff 100644
-> > --- a/hw/display/xlnx_dp.c
-> > +++ b/hw/display/xlnx_dp.c
-> > @@ -515,7 +515,7 @@ static void xlnx_dp_aux_set_command(XlnxDPState *s, uint32_t value)
-> >      s->core_registers[DP_INTERRUPT_SIGNAL_STATE] |= 0x04;
-> >  }
-> >  
-> > -static void xlnx_dp_set_dpdma(Object *obj, const char *name, Object *val,
-> > +static void xlnx_dp_set_dpdma(const Object *obj, const char *name, Object *val,
-> >                                Error **errp)
-> >  {
-> >      XlnxDPState *s = XLNX_DP(obj);
-> > diff --git a/hw/ipmi/ipmi.c b/hw/ipmi/ipmi.c
-> > index 5cf1caa..a2fd1eb 100644
-> > --- a/hw/ipmi/ipmi.c
-> > +++ b/hw/ipmi/ipmi.c
-> > @@ -90,7 +90,7 @@ static TypeInfo ipmi_interface_type_info = {
-> >      .class_init = ipmi_interface_class_init,
-> >  };
-> >  
-> > -static void isa_ipmi_bmc_check(Object *obj, const char *name,
-> > +static void isa_ipmi_bmc_check(const Object *obj, const char *name,
-> >                                 Object *val, Error **errp)
-> >  {
-> >      IPMIBmc *bmc = IPMI_BMC(val);
-> > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> > index 9e8dab0..380cb30 100644
-> > --- a/hw/mem/pc-dimm.c
-> > +++ b/hw/mem/pc-dimm.c
-> > @@ -366,7 +366,7 @@ static void pc_dimm_get_size(Object *obj, Visitor *v, const char *name,
-> >      visit_type_int(v, name, &value, errp);
-> >  }
-> >  
-> > -static void pc_dimm_check_memdev_is_busy(Object *obj, const char *name,
-> > +static void pc_dimm_check_memdev_is_busy(const Object *obj, const char *name,
-> >                                        Object *val, Error **errp)
-> >  {
-> >      Error *local_err = NULL;
-> > diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-> > index abeaf3d..e25016c 100644
-> > --- a/hw/misc/ivshmem.c
-> > +++ b/hw/misc/ivshmem.c
-> > @@ -1005,7 +1005,7 @@ static const TypeInfo ivshmem_common_info = {
-> >      .class_init    = ivshmem_common_class_init,
-> >  };
-> >  
-> > -static void ivshmem_check_memdev_is_busy(Object *obj, const char *name,
-> > +static void ivshmem_check_memdev_is_busy(const Object *obj, const char *name,
-> >                                           Object *val, Error **errp)
-> >  {
-> >      if (host_memory_backend_is_mapped(MEMORY_BACKEND(val))) {
-> > diff --git a/qom/object.c b/qom/object.c
-> > index 7a05e35..a429e64 100644
-> > --- a/qom/object.c
-> > +++ b/qom/object.c
-> > @@ -735,7 +735,7 @@ out:
-> >      return ret;
-> >  }
-> >  
-> > -const char *object_get_typename(Object *obj)
-> > +const char *object_get_typename(const Object *obj)
-> >  {
-> >      return obj->class->type->name;
-> >  }
-> > @@ -1395,7 +1395,7 @@ out:
-> >      g_free(type);
-> >  }
-> >  
-> > -void object_property_allow_set_link(Object *obj, const char *name,
-> > +void object_property_allow_set_link(const Object *obj, const char *name,
-> >                                      Object *val, Error **errp)
-> >  {
-> >      /* Allow the link to be set, always */
-> > @@ -1403,7 +1403,7 @@ void object_property_allow_set_link(Object *obj, const char *name,
-> >  
-> >  typedef struct {
-> >      Object **child;
-> > -    void (*check)(Object *, const char *, Object *, Error **);
-> > +    void (*check)(const Object *, const char *, Object *, Error **);
-> >      ObjectPropertyLinkFlags flags;
-> >  } LinkProperty;
-> >  
-> > @@ -1519,7 +1519,7 @@ static void object_release_link_property(Object *obj, const char *name,
-> >  
-> >  void object_property_add_link(Object *obj, const char *name,
-> >                                const char *type, Object **child,
-> > -                              void (*check)(Object *, const char *,
-> > +                              void (*check)(const Object *, const char *,
-> >                                              Object *, Error **),
-> >                                ObjectPropertyLinkFlags flags,
-> >                                Error **errp)
-> >   
-> 
-> 
-> Good idea.  I think it's okay to wait for Fam's series.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-yep, there is only one checker that's with does something suspicious:
- xlnx_dp_set_dpdma() which is with side-effects that modify source (val)
- argument but making target const is fine there (patch compiles :))
+> On 19 June 2017 at 11:46, Alex Bennée <alex.bennee@linaro.org> wrote:
+>> This is a precursor to record/playback support. Instead of passing the
+>> socket fd we now pass helper functions for reading/writing and
+>> responding. This will allow us to do the rest of the record/playback
+>> cleanly outside of the main worker function.
+>>
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>>
+>> ---
+>> v5
+>>   - re-base without tab/format cleanps
+>> v4
+>>   - split header code
+>>   - fix formatting foo-bar's
+>> v3
+>>   - new for v3
+>>   - arm, aarch64, ppc64
+>> ---
+>>  reginfo.c | 39 +++++++++++++++++++--------------------
+>>  risu.c    | 23 +++++++++++++++++++++--
+>>  risu.h    | 11 +++++++++--
+>>  3 files changed, 49 insertions(+), 24 deletions(-)
+>>
+>> diff --git a/reginfo.c b/reginfo.c
+>> index 31bb99f..90cea8f 100644
+>> --- a/reginfo.c
+>> +++ b/reginfo.c
+>> @@ -21,7 +21,7 @@ uint8_t apprentice_memblock[MEMBLOCKLEN];
+>>  static int mem_used;
+>>  static int packet_mismatch;
+>>
+>> -int send_register_info(int sock, void *uc)
+>> +int send_register_info(write_fn write_fn, void *uc)
+>>  {
+>>      struct reginfo ri;
+>>      int op;
+>> @@ -29,24 +29,25 @@ int send_register_info(int sock, void *uc)
+>>      op = get_risuop(&ri);
+>>
+>>      switch (op) {
+>> -    case OP_COMPARE:
+>>      case OP_TESTEND:
+>> -    default:
+>> -        /* Do a simple register compare on (a) explicit request
+>> -         * (b) end of test (c) a non-risuop UNDEF
+>> -         */
+>> -        return send_data_pkt(sock, &ri, sizeof(ri));
+>> +        write_fn(&ri, sizeof(ri));
+>> +        return 1;
+>
+> Why the change from "return write function's return value"
+> to "ignore return value and always return 1" for OP_TESTEND ?
 
-not sure what to do with it, checker shouldn't be used this way even for source,
-as it creates bad precedent that could be copied later.
+And now I remember why ;-)
 
-> 
-> Paolo
-> 
+As write_fn may no longer return a ack code from the apprentice we need
+to ensure we always respond here. There is a bit of discrepancy here
+between send_data_pkt which returns a result from afar and write_trace
+which returns 0 when bytes_written == what we wanted to write.
+
+>
+>>      case OP_COMPAREMEM:
+>> -        return send_data_pkt(sock, memblock, MEMBLOCKLEN);
+>> +        return write_fn(memblock, MEMBLOCKLEN);
+>>          break;
+>
+> ...here we still just pass the return value through, for instance.
+>
+>> +    case OP_COMPARE:
+>> +    default:
+>> +        /* Do a simple register compare on (a) explicit request
+>> +         * (b) end of test (c) a non-risuop UNDEF
+>> +         */
+>> +        return write_fn(&ri, sizeof(ri));
+>>      }
+>>      return 0;
+>>  }
+>> @@ -59,7 +60,7 @@ int send_register_info(int sock, void *uc)
+>>   * that says whether it is register or memory data, so if the two
+>>   * sides get out of sync then we will fail obscurely.
+>>   */
+>> -int recv_and_compare_register_info(int sock, void *uc)
+>> +int recv_and_compare_register_info(read_fn read_fn, respond_fn resp_fn, void *uc)
+>>  {
+>>      int resp = 0, op;
+>>
+>> @@ -73,36 +74,34 @@ int recv_and_compare_register_info(int sock, void *uc)
+>>          /* Do a simple register compare on (a) explicit request
+>>           * (b) end of test (c) a non-risuop UNDEF
+>>           */
+>> -        if (recv_data_pkt(sock, &apprentice_ri, sizeof(apprentice_ri))) {
+>> +        if (read_fn(&apprentice_ri, sizeof(apprentice_ri))) {
+>>              packet_mismatch = 1;
+>>              resp = 2;
+>> -
+>>          } else if (!reginfo_is_eq(&master_ri, &apprentice_ri)) {
+>>              /* register mismatch */
+>>              resp = 2;
+>> -
+>>          } else if (op == OP_TESTEND) {
+>>              resp = 1;
+>>          }
+>> -        send_response_byte(sock, resp);
+>> +        resp_fn(resp);
+>>          break;
+>>      case OP_SETMEMBLOCK:
+>> -        memblock = (void *) (uintptr_t) get_reginfo_paramreg(&master_ri);
+>> +        memblock = (void *)(uintptr_t)get_reginfo_paramreg(&master_ri);
+>>          break;
+>>      case OP_GETMEMBLOCK:
+>>          set_ucontext_paramreg(uc, get_reginfo_paramreg(&master_ri) +
+>> -                              (uintptr_t) memblock);
+>> +                              (uintptr_t)memblock);
+>>          break;
+>>      case OP_COMPAREMEM:
+>>          mem_used = 1;
+>> -        if (recv_data_pkt(sock, apprentice_memblock, MEMBLOCKLEN)) {
+>> +        if (read_fn(apprentice_memblock, MEMBLOCKLEN)) {
+>>              packet_mismatch = 1;
+>>              resp = 2;
+>>          } else if (memcmp(memblock, apprentice_memblock, MEMBLOCKLEN) != 0) {
+>>              /* memory mismatch */
+>>              resp = 2;
+>>          }
+>> -        send_response_byte(sock, resp);
+>> +        resp_fn(resp);
+>>          break;
+>>      }
+>>
+>> diff --git a/risu.c b/risu.c
+>> index a10422a..88e586c 100644
+>> --- a/risu.c
+>> +++ b/risu.c
+>> @@ -37,9 +37,28 @@ sigjmp_buf jmpbuf;
+>>  /* Should we test for FP exception status bits? */
+>>  int test_fp_exc;
+>>
+>> +/* Master functions */
+>> +
+>> +int read_sock(void *ptr, size_t bytes)
+>> +{
+>> +    return recv_data_pkt(master_socket, ptr, bytes);
+>> +}
+>> +
+>> +void respond_sock(int r)
+>> +{
+>> +    send_response_byte(master_socket, r);
+>> +}
+>> +
+>> +/* Apprentice function */
+>> +
+>> +int write_sock(void *ptr, size_t bytes)
+>> +{
+>> +    return send_data_pkt(apprentice_socket, ptr, bytes);
+>> +}
+>> +
+>>  void master_sigill(int sig, siginfo_t *si, void *uc)
+>>  {
+>> -    switch (recv_and_compare_register_info(master_socket, uc)) {
+>> +    switch (recv_and_compare_register_info(read_sock, respond_sock, uc)) {
+>>      case 0:
+>>          /* match OK */
+>>          advance_pc(uc);
+>> @@ -52,7 +71,7 @@ void master_sigill(int sig, siginfo_t *si, void *uc)
+>>
+>>  void apprentice_sigill(int sig, siginfo_t *si, void *uc)
+>>  {
+>> -    switch (send_register_info(apprentice_socket, uc)) {
+>> +    switch (send_register_info(write_sock, uc)) {
+>>      case 0:
+>>          /* match OK */
+>>          advance_pc(uc);
+>> diff --git a/risu.h b/risu.h
+>> index 78a7313..32241bc 100644
+>> --- a/risu.h
+>> +++ b/risu.h
+>> @@ -53,17 +53,24 @@ struct reginfo;
+>>
+>>  /* Functions operating on reginfo */
+>>
+>> +/* To keep the read/write logic from multiplying across all arches
+>> + * we wrap up the function here to keep all the changes in one place
+>> + */
+>
+> Stale comment? The calling code is not per-arch any more.
+>
+>> +typedef int (*write_fn) (void *ptr, size_t bytes);
+>> +typedef int (*read_fn) (void *ptr, size_t bytes);
+>> +typedef void (*respond_fn) (int response);
+>> +
+>>  /* Send the register information from the struct ucontext down the socket.
+>>   * Return the response code from the master.
+>>   * NB: called from a signal handler.
+>>   */
+>> -int send_register_info(int sock, void *uc);
+>> +int send_register_info(write_fn write_fn, void *uc);
+>>
+>>  /* Read register info from the socket and compare it with that from the
+>>   * ucontext. Return 0 for match, 1 for end-of-test, 2 for mismatch.
+>>   * NB: called from a signal handler.
+>>   */
+>> -int recv_and_compare_register_info(int sock, void *uc);
+>> +int recv_and_compare_register_info(read_fn read_fn, respond_fn respond, void *uc);
+>>
+>>  /* Print a useful report on the status of the last comparison
+>>   * done in recv_and_compare_register_info(). This is called on
+>> --
+>> 2.13.0
+>>
+>
+> thanks
+> -- PMM
+
+
+--
+Alex Bennée
