@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1dQZDZ-0001zc-Id
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:10:46 -0400
+	(envelope-from <raj.khem@gmail.com>) id 1dQZFL-00039L-NF
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:12:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1dQZDW-0006wn-Pq
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:10:45 -0400
-Received: from mail-he1eur01on0130.outbound.protection.outlook.com
-	([104.47.0.130]:13920
-	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1dQZDV-0006uI-W8
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:10:42 -0400
-Date: Thu, 29 Jun 2017 16:10:20 +0300
-From: Roman Kagan <rkagan@virtuozzo.com>
-Message-ID: <20170629131019.GC2973@rkaganb.sw.ru>
-References: <20170621162424.10462-1-rkagan@virtuozzo.com>
-	<20170621162424.10462-8-rkagan@virtuozzo.com>
-	<20170628164743.0df730a0@nial.brq.redhat.com>
-	<20170629095326.GA2973@rkaganb.sw.ru>
-	<20170629135329.0c2dcd70@nial.brq.redhat.com>
+	(envelope-from <raj.khem@gmail.com>) id 1dQZFK-0000ck-0o
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:12:35 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36697)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <raj.khem@gmail.com>) id 1dQZFJ-0000bz-Nb
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:12:33 -0400
+Received: by mail-wm0-x243.google.com with SMTP id y5so2498877wmh.3
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 06:12:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170629135329.0c2dcd70@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 07/23] hyperv: ensure VP index equal to
- QEMU cpu_index
+In-Reply-To: <927f7df8-7956-45b9-eb5e-0ea5f71779ea@vivier.eu>
+References: <20170628204452.41230-1-raj.khem@gmail.com>
+	<927f7df8-7956-45b9-eb5e-0ea5f71779ea@vivier.eu>
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 29 Jun 2017 06:12:02 -0700
+Message-ID: <CAMKF1sqdJ0yyC2aG7wHipdGHZfXmL_kJrkd8-rCwQtuhr4hrJw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] replace struct ucontext with ucontext_t
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,122 +30,297 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, Kamil Rytarowski <kamil@netbsd.org>, Riku Voipio <riku.voipio@iki.fi>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, Jun 29, 2017 at 01:53:29PM +0200, Igor Mammedov wrote:
-> On Thu, 29 Jun 2017 12:53:27 +0300
-> Roman Kagan <rkagan@virtuozzo.com> wrote:
-> 
-> > On Wed, Jun 28, 2017 at 04:47:43PM +0200, Igor Mammedov wrote:
-> > > On Wed, 21 Jun 2017 19:24:08 +0300
-> > > Roman Kagan <rkagan@virtuozzo.com> wrote:
-> > >   
-> > > > Hyper-V identifies vCPUs by Virtual Processor (VP) index which can be
-> > > > queried by the guest via HV_X64_MSR_VP_INDEX msr.  It is defined by the
-> > > > spec as a sequential number which can't exceed the maximum number of
-> > > > vCPUs per VM.
-> > > > 
-> > > > It has to be owned by QEMU in order to preserve it across migration.
-> > > > 
-> > > > However, the initial implementation in KVM didn't allow to set this
-> > > > msr, and KVM used its own notion of VP index.  Fortunately, the way
-> > > > vCPUs are created in QEMU/KVM makes it likely that the KVM value is
-> > > > equal to QEMU cpu_index.
-> > > > 
-> > > > So choose cpu_index as the value for vp_index, and push that to KVM on
-> > > > kernels that support setting the msr.  On older ones that don't, query
-> > > > the kernel value and assert that it's in sync with QEMU.
-> > > > 
-> > > > Besides, since handling errors from vCPU init at hotplug time is
-> > > > impossible, disable vCPU hotplug.  
-> > > proper place to check if cpu might be created is at 
-> > > pc_cpu_pre_plug() where you can gracefully abort cpu creation process.   
-> > 
-> > Thanks for the suggestion, I'll rework it this way.
-> > 
-> > > Also it's possible to create cold-plugged CPUs in out of order
-> > > sequence using
-> > >  -device cpu-foo on CLI
-> > > will be hyperv kvm/guest side ok with it?  
-> > 
-> > On kernels that support setting HV_X64_MSR_VP_INDEX QEMU will
-> > synchronize all sides.  On kernels that don't, if out-of-order creation
-> > results in vp_index mismatch between the kernel and QEMU, vcpu creation
-> > will fail.
-> 
-> And additional question,
-> what would happen if VM is started on host supporting VP index setting
-> and then migrated to a host without it?
+On Thu, Jun 29, 2017 at 1:02 AM, Laurent Vivier <laurent@vivier.eu> wrote:
+> Le 28/06/2017 =C3=A0 22:44, Khem Raj a =C3=A9crit :
+>> The ucontext_t type had a tag struct ucontext until now
+>> but newer glibc will drop it so we need to adjust and use
+>> the exposed type instead
+>
+> I didn't find in glib git tree the commit dropping the struct tags for
+> ucontext. Could you point it out?
+>
 
-The destination QEMU will attempt to initialize vCPUs, and if that
-fails (e.g. due to vp_index mismatch), the migration will be aborted and
-the source VM will continue running.
+see https://sourceware.org/git/?p=3Dglibc.git;a=3Dcommit;h=3D251287734e89a5=
+2da3db682a8241eb6bccc050c9
 
-If the destination QEMU is old, too, there's a chance that vp_index will
-change.  Then we just keep the fingers crossed that the guest doesn't
-notice (this is the behavior we have now).
+its also documented in (upcoming ) release notes
 
-> > > > +X86CPU *hyperv_find_vcpu(uint32_t vp_index)
-> > > > +{
-> > > > +    return X86_CPU(qemu_get_cpu(vp_index));
-> > > > +}  
-> > > this helper isn't used in this patch, add it in the patch that would actually use it  
-> > 
-> > I thought I would put the only two functions that encapsulate the
-> > knowledge of how vp_index is realted to cpu_index, in a single patch.
-> > 
-> > I'm now thinking of open-coding the iteration over cpus here and
-> > directly look for cpu whose hyperv_vp_index() matches.  Then that
-> > knowledge will become encapsulated in a single place, and indeed, this
-> > helper can go into another patch where it's used.
-> > 
-> > > also if  qemu_get_cpu() were called from each CPU init,
-> > > it would incur O(N^2) complexity, could you do without it?  
-> > 
-> > It isn't called on hot paths (ATM it's called only when SINT routes are
-> > created, which is at most one per cpu).  I don't see a problem here.
-> For what/where do you need this lookup?
+https://sourceware.org/glibc/wiki/Release/2.26#Removal_of_.27struct_ucontex=
+t.27
 
-The guest configures devices to signal their events with synthetic
-interrupts on specific cpus, identified by vp_index.  When we receive
-such a request we look up the cpu and set up a SINT route to be able to
-deliver interrupts to its synic.
-
-Or did I misunderstand the question perhaps?
-
-> > > maybe split all renaming into separate patch ...  
-> > 
-> > Part of the renaming will disappear eventually in the followup patches,
-> > so I'm sure it's a good idea...  Opinions?
-> I'd still spit. not to distract reviewers from
-> what this patch is actually tries to accomplish at least
-
-OK, makes sense.
-
-> > > > +        ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, &msr_data);
-> > > > +        if (ret < 0) {  
-> > > when this can fail?  
-> > 
-> > Dunno, but not checking for errors doesn't look good.
-> Point of asking is to confirm that call shouldn't fail normally and
-> if it fails it's we can't recover and should die.
-> 
-> Looking at condition above !is_hv_vpindex_settable it looks like
-> call wouldn't fail. (i.e. it makes sure that qemu is running on
-> supported kernel)
-
-No, I do KVM_GET_MSRS here, which is supported since this msr was
-introduced.
-
-But actually you've spot a bug which I meant to fix but forgot: the code
-in hyperv_handle_properties should fail if a particular hyperv feature
-is requested but the corresponding msr isn't found among reported via
-KVM_GET_MSR_INDEX_LIST.  ATM this is only done for some features but not
-all.
-
-I'll try to fix that; once done, cpu->hyperv_vpindex here will make sure
-this msr is gettable.
-
-Thanks,
-Roman.
+> Thanks,
+> Laurent
+>
+>> Signed-off-by: Khem Raj <raj.khem@gmail.com>
+>> Cc: Kamil Rytarowski <kamil@netbsd.org>
+>> Cc: Riku Voipio <riku.voipio@iki.fi>
+>> Cc: Laurent Vivier <laurent@vivier.eu>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>>  linux-user/host/aarch64/hostdep.h |  2 +-
+>>  linux-user/host/arm/hostdep.h     |  2 +-
+>>  linux-user/host/i386/hostdep.h    |  2 +-
+>>  linux-user/host/ppc64/hostdep.h   |  2 +-
+>>  linux-user/host/s390x/hostdep.h   |  2 +-
+>>  linux-user/host/x86_64/hostdep.h  |  2 +-
+>>  linux-user/signal.c               | 10 +++++-----
+>>  tests/tcg/test-i386.c             |  4 ++--
+>>  user-exec.c                       | 18 +++++++++---------
+>>  9 files changed, 22 insertions(+), 22 deletions(-)
+>>
+>> diff --git a/linux-user/host/aarch64/hostdep.h b/linux-user/host/aarch64=
+/hostdep.h
+>> index 64f75cef49..a8d41a21ad 100644
+>> --- a/linux-user/host/aarch64/hostdep.h
+>> +++ b/linux-user/host/aarch64/hostdep.h
+>> @@ -24,7 +24,7 @@ extern char safe_syscall_end[];
+>>  /* Adjust the signal context to rewind out of safe-syscall if we're in =
+it */
+>>  static inline void rewind_if_in_safe_syscall(void *puc)
+>>  {
+>> -    struct ucontext *uc =3D puc;
+>> +    ucontext_t *uc =3D puc;
+>>      __u64 *pcreg =3D &uc->uc_mcontext.pc;
+>>
+>>      if (*pcreg > (uintptr_t)safe_syscall_start
+>> diff --git a/linux-user/host/arm/hostdep.h b/linux-user/host/arm/hostdep=
+.h
+>> index 5c1ae60120..9276fe6ceb 100644
+>> --- a/linux-user/host/arm/hostdep.h
+>> +++ b/linux-user/host/arm/hostdep.h
+>> @@ -24,7 +24,7 @@ extern char safe_syscall_end[];
+>>  /* Adjust the signal context to rewind out of safe-syscall if we're in =
+it */
+>>  static inline void rewind_if_in_safe_syscall(void *puc)
+>>  {
+>> -    struct ucontext *uc =3D puc;
+>> +    ucontext_t *uc =3D puc;
+>>      unsigned long *pcreg =3D &uc->uc_mcontext.arm_pc;
+>>
+>>      if (*pcreg > (uintptr_t)safe_syscall_start
+>> diff --git a/linux-user/host/i386/hostdep.h b/linux-user/host/i386/hostd=
+ep.h
+>> index d834bd80ea..073be74d87 100644
+>> --- a/linux-user/host/i386/hostdep.h
+>> +++ b/linux-user/host/i386/hostdep.h
+>> @@ -24,7 +24,7 @@ extern char safe_syscall_end[];
+>>  /* Adjust the signal context to rewind out of safe-syscall if we're in =
+it */
+>>  static inline void rewind_if_in_safe_syscall(void *puc)
+>>  {
+>> -    struct ucontext *uc =3D puc;
+>> +    ucontext_t *uc =3D puc;
+>>      greg_t *pcreg =3D &uc->uc_mcontext.gregs[REG_EIP];
+>>
+>>      if (*pcreg > (uintptr_t)safe_syscall_start
+>> diff --git a/linux-user/host/ppc64/hostdep.h b/linux-user/host/ppc64/hos=
+tdep.h
+>> index 0b0f5f7821..98979ad917 100644
+>> --- a/linux-user/host/ppc64/hostdep.h
+>> +++ b/linux-user/host/ppc64/hostdep.h
+>> @@ -24,7 +24,7 @@ extern char safe_syscall_end[];
+>>  /* Adjust the signal context to rewind out of safe-syscall if we're in =
+it */
+>>  static inline void rewind_if_in_safe_syscall(void *puc)
+>>  {
+>> -    struct ucontext *uc =3D puc;
+>> +    ucontext_t *uc =3D puc;
+>>      unsigned long *pcreg =3D &uc->uc_mcontext.gp_regs[PT_NIP];
+>>
+>>      if (*pcreg > (uintptr_t)safe_syscall_start
+>> diff --git a/linux-user/host/s390x/hostdep.h b/linux-user/host/s390x/hos=
+tdep.h
+>> index 6f9da9c608..4f0171f36f 100644
+>> --- a/linux-user/host/s390x/hostdep.h
+>> +++ b/linux-user/host/s390x/hostdep.h
+>> @@ -24,7 +24,7 @@ extern char safe_syscall_end[];
+>>  /* Adjust the signal context to rewind out of safe-syscall if we're in =
+it */
+>>  static inline void rewind_if_in_safe_syscall(void *puc)
+>>  {
+>> -    struct ucontext *uc =3D puc;
+>> +    ucontext_t *uc =3D puc;
+>>      unsigned long *pcreg =3D &uc->uc_mcontext.psw.addr;
+>>
+>>      if (*pcreg > (uintptr_t)safe_syscall_start
+>> diff --git a/linux-user/host/x86_64/hostdep.h b/linux-user/host/x86_64/h=
+ostdep.h
+>> index 3b4259633e..a4fefb5114 100644
+>> --- a/linux-user/host/x86_64/hostdep.h
+>> +++ b/linux-user/host/x86_64/hostdep.h
+>> @@ -24,7 +24,7 @@ extern char safe_syscall_end[];
+>>  /* Adjust the signal context to rewind out of safe-syscall if we're in =
+it */
+>>  static inline void rewind_if_in_safe_syscall(void *puc)
+>>  {
+>> -    struct ucontext *uc =3D puc;
+>> +    ucontext_t *uc =3D puc;
+>>      greg_t *pcreg =3D &uc->uc_mcontext.gregs[REG_RIP];
+>>
+>>      if (*pcreg > (uintptr_t)safe_syscall_start
+>> diff --git a/linux-user/signal.c b/linux-user/signal.c
+>> index 3d18d1b3ee..2c55a4f600 100644
+>> --- a/linux-user/signal.c
+>> +++ b/linux-user/signal.c
+>> @@ -3346,7 +3346,7 @@ static void setup_rt_frame(int sig, struct target_=
+sigaction *ka,
+>>      *
+>>      *   a0 =3D signal number
+>>      *   a1 =3D pointer to siginfo_t
+>> -    *   a2 =3D pointer to struct ucontext
+>> +    *   a2 =3D pointer to ucontext_t
+>>      *
+>>      * $25 and PC point to the signal handler, $29 points to the
+>>      * struct sigframe.
+>> @@ -3733,7 +3733,7 @@ struct target_signal_frame {
+>>
+>>  struct rt_signal_frame {
+>>      siginfo_t info;
+>> -    struct ucontext uc;
+>> +    ucontext_t uc;
+>>      uint32_t tramp[2];
+>>  };
+>>
+>> @@ -3949,7 +3949,7 @@ struct rt_signal_frame {
+>>      siginfo_t *pinfo;
+>>      void *puc;
+>>      siginfo_t info;
+>> -    struct ucontext uc;
+>> +    ucontext_t uc;
+>>      uint16_t retcode[4];      /* Trampoline code. */
+>>  };
+>>
+>> @@ -4484,7 +4484,7 @@ static void setup_rt_frame(int sig, struct target_=
+sigaction *ka,
+>>          tswap_siginfo(&frame->info, info);
+>>      }
+>>
+>> -    /*err |=3D __clear_user(&frame->uc, offsetof(struct ucontext, uc_mc=
+ontext));*/
+>> +    /*err |=3D __clear_user(&frame->uc, offsetof(ucontext_t, uc_mcontex=
+t));*/
+>>      __put_user(0, &frame->uc.tuc_flags);
+>>      __put_user(0, &frame->uc.tuc_link);
+>>      __put_user(target_sigaltstack_used.ss_sp,
+>> @@ -4976,7 +4976,7 @@ enum {
+>>
+>>  struct target_ucontext {
+>>      target_ulong tuc_flags;
+>> -    target_ulong tuc_link;    /* struct ucontext __user * */
+>> +    target_ulong tuc_link;    /* ucontext_t __user * */
+>>      struct target_sigaltstack tuc_stack;
+>>  #if !defined(TARGET_PPC64)
+>>      int32_t tuc_pad[7];
+>> diff --git a/tests/tcg/test-i386.c b/tests/tcg/test-i386.c
+>> index 0f7b943b0c..9599204895 100644
+>> --- a/tests/tcg/test-i386.c
+>> +++ b/tests/tcg/test-i386.c
+>> @@ -1720,7 +1720,7 @@ int tab[2];
+>>
+>>  void sig_handler(int sig, siginfo_t *info, void *puc)
+>>  {
+>> -    struct ucontext *uc =3D puc;
+>> +    ucontext_t *uc =3D puc;
+>>
+>>      printf("si_signo=3D%d si_errno=3D%d si_code=3D%d",
+>>             info->si_signo, info->si_errno, info->si_code);
+>> @@ -1912,7 +1912,7 @@ void test_exceptions(void)
+>>  /* specific precise single step test */
+>>  void sig_trap_handler(int sig, siginfo_t *info, void *puc)
+>>  {
+>> -    struct ucontext *uc =3D puc;
+>> +    ucontext_t *uc =3D puc;
+>>      printf("EIP=3D" FMTLX "\n", (long)uc->uc_mcontext.gregs[REG_EIP]);
+>>  }
+>>
+>> diff --git a/user-exec.c b/user-exec.c
+>> index a8f95fa1e1..2a975eaf69 100644
+>> --- a/user-exec.c
+>> +++ b/user-exec.c
+>> @@ -167,7 +167,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+>>  #elif defined(__OpenBSD__)
+>>      struct sigcontext *uc =3D puc;
+>>  #else
+>> -    struct ucontext *uc =3D puc;
+>> +    ucontext_t *uc =3D puc;
+>>  #endif
+>>      unsigned long pc;
+>>      int trapno;
+>> @@ -222,7 +222,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+>>  #elif defined(__OpenBSD__)
+>>      struct sigcontext *uc =3D puc;
+>>  #else
+>> -    struct ucontext *uc =3D puc;
+>> +    ucontext_t *uc =3D puc;
+>>  #endif
+>>
+>>      pc =3D PC_sig(uc);
+>> @@ -289,7 +289,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+>>  #if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+>>      ucontext_t *uc =3D puc;
+>>  #else
+>> -    struct ucontext *uc =3D puc;
+>> +    ucontext_t *uc =3D puc;
+>>  #endif
+>>      unsigned long pc;
+>>      int is_write;
+>> @@ -316,7 +316,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+>>                             void *puc)
+>>  {
+>>      siginfo_t *info =3D pinfo;
+>> -    struct ucontext *uc =3D puc;
+>> +    ucontext_t *uc =3D puc;
+>>      uint32_t *pc =3D uc->uc_mcontext.sc_pc;
+>>      uint32_t insn =3D *pc;
+>>      int is_write =3D 0;
+>> @@ -414,7 +414,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+>>  #if defined(__NetBSD__)
+>>      ucontext_t *uc =3D puc;
+>>  #else
+>> -    struct ucontext *uc =3D puc;
+>> +    ucontext_t *uc =3D puc;
+>>  #endif
+>>      unsigned long pc;
+>>      int is_write;
+>> @@ -441,7 +441,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+>>  int cpu_signal_handler(int host_signum, void *pinfo, void *puc)
+>>  {
+>>      siginfo_t *info =3D pinfo;
+>> -    struct ucontext *uc =3D puc;
+>> +    ucontext_t *uc =3D puc;
+>>      uintptr_t pc =3D uc->uc_mcontext.pc;
+>>      uint32_t insn =3D *(uint32_t *)pc;
+>>      bool is_write;
+>> @@ -474,7 +474,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,=
+ void *puc)
+>>  int cpu_signal_handler(int host_signum, void *pinfo, void *puc)
+>>  {
+>>      siginfo_t *info =3D pinfo;
+>> -    struct ucontext *uc =3D puc;
+>> +    ucontext_t *uc =3D puc;
+>>      unsigned long ip;
+>>      int is_write =3D 0;
+>>
+>> @@ -505,7 +505,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+>>                         void *puc)
+>>  {
+>>      siginfo_t *info =3D pinfo;
+>> -    struct ucontext *uc =3D puc;
+>> +    ucontext_t *uc =3D puc;
+>>      unsigned long pc;
+>>      uint16_t *pinsn;
+>>      int is_write =3D 0;
+>> @@ -558,7 +558,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+>>                         void *puc)
+>>  {
+>>      siginfo_t *info =3D pinfo;
+>> -    struct ucontext *uc =3D puc;
+>> +    ucontext_t *uc =3D puc;
+>>      greg_t pc =3D uc->uc_mcontext.pc;
+>>      int is_write;
+>>
+>>
+>
