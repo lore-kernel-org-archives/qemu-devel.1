@@ -1,27 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48914)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dQWwa-0003GN-P2
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 06:45:05 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51638)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1dQX8d-00071k-Ki
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 06:57:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dQWwZ-00034F-TV
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 06:45:04 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:38863)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dQWwZ-00030f-MQ
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 06:45:03 -0400
-Received: by mail-wm0-x233.google.com with SMTP id b184so9899095wme.1
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 03:45:01 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <b17a6dac-f3b8-b874-f64c-77e4279923eb@twiddle.net>
-References: <1498582198-6649-1-git-send-email-peter.maydell@linaro.org>
-	<b17a6dac-f3b8-b874-f64c-77e4279923eb@twiddle.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 29 Jun 2017 11:44:39 +0100
-Message-ID: <CAFEAcA_3QLkR4Zk=RGwH=gUU72FSU+8-2zwB+aQSyE+w76+sEQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] linux-user: Put PPC AT_IGNOREPPC auxv
- entries in the right place
+	(envelope-from <pl@kamp.de>) id 1dQX8V-0007up-Sw
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 06:57:28 -0400
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:40724 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dQX8V-0007qd-Jw
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 06:57:23 -0400
+From: Peter Lieven <pl@kamp.de>
+Date: Thu, 29 Jun 2017 12:57:03 +0200
+Message-Id: <1498733831-15254-1-git-send-email-pl@kamp.de>
+Subject: [Qemu-devel] [PATCH V2 0/8] add Qcow2 compress format extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +21,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com, berrange@redhat.com, Peter Lieven <pl@kamp.de>
 
-On 27 June 2017 at 19:05, Richard Henderson <rth@twiddle.net> wrote:
-> On 06/27/2017 09:49 AM, Peter Maydell wrote:
->>
->> The 32-bit PPC auxv is a bit complicated because in the
->> mists of time it used to be 16-aligned rather than directly
->> after the environment. Older glibc versions had code to
->> try to probe for whether it needed alignment or not:
->>
->> https://sourceware.org/git/?p=glibc.git;a=blob;f=sysdeps/unix/sysv/linux/powerpc/dl-sysdep.c;hb=e84eabb3871c9b39e59323bf3f6b98c2ca9d1cd0
->> and the kernel has code which puts some magic entries at
->> the bottom to ensure that the alignment probe fails:
->>
->> http://elixir.free-electrons.com/linux/latest/source/arch/powerpc/include/asm/elf.h#L158
->>
->> QEMU has similar code too, but it was broken by commit
->> 7c4ee5bcc82e64, which changed elfload.c from filling in
->> the auxv starting at the highest address and working down
->> to starting at the lowest address and working up. This
->> means that the ARCH_DLINFO hook must now be invoked first
->> rather than last, and the entries in it for PPC must
->> be reversed so that the magic AT_IGNOREPPC entries come
->> at the lowest address in the auxv as they should.
->>
->> The effect of this was that if running a guest binary that
->> used an old glibc with the alignment probing the guest ld.so
->> code would segfault if the size of the guest environment and
->> argv happened to put the auxv at an address that triggered
->> the alignment code in the guest glibc.
->>
->> Signed-off-by: Peter Maydell<peter.maydell@linaro.org>
->> ---
->>   linux-user/elfload.c | 23 ++++++++++++-----------
->>   1 file changed, 12 insertions(+), 11 deletions(-)
->
->
-> Reviewed-by: Richard Henderson <rth@twiddle.net>
-> Tested-by:  Richard Henderson <rth@twiddle.net>
+this adds a create option for Qcow2 images to specify the compression format
+and level for compressed clusters. The series adds 2 algorithms to choose from:
+zlib and lzo. zlib is the current default, but with unoptimal settings.
+If no compress.format option is specified the old zlib with the old parameters
+is used and the created images are backwards compatible with older QEMU version.
+As soon as a compression format is specified a new compress format header extension
+is written and the Qcow2 images are incompatible with older QEMU versions.
 
-Thanks; applied directly to master since this has been
-causing my mergebuild tests to fail (some recent environment
-change result in it triggering this week...)
+Some numbers for an uncompressed Debian 9 QCOW2 image (size 1148MB):
 
-thanks
--- PMM
+compress.format     compress time    compressed size   decompress time
+none                35.7s            339MB             3.4s
+zlib (default)      30.5s            320MB             3.2s
+zlib (level 1)      12.8s            348MB             3.2s
+lzo                  4.2s            429MB             1.6s
+
+Changes V1->V2:
+  - split the series into more patches
+  - added an qapi scheme for the compression settings
+  - renamed compression_algorithm to compress.format and added compress.level+
+  - updated the header extension to carry a variable extra payload and compress
+    level.
+  - removed extra reservations for header extensions
+  - added missing lzo_init and fixed compress overhead for lzo
+
+Peter Lieven (8):
+  docs: add compress format extension to qcow2 spec
+  qapi: add compress parameters to Qcow2 Blockdev options
+  block/qcow2: parse compress create options
+  qemu-img: add documentation for compress settings
+  block/qcow2: read and write the compress format extension
+  block/qcow2: optimize qcow2_co_pwritev_compressed
+  block/qcow2: start using the compress format extension
+  block/qcow2: add lzo compress format
+
+ block/qcow2-cluster.c     |  73 +++++++++++-----
+ block/qcow2.c             | 219 +++++++++++++++++++++++++++++++++++++++-------
+ block/qcow2.h             |  33 +++++--
+ configure                 |   2 +-
+ docs/interop/qcow2.txt    |  43 ++++++++-
+ include/block/block_int.h |   2 +
+ qapi/block-core.json      |  54 +++++++++++-
+ qemu-img.texi             |  22 +++++
+ 8 files changed, 384 insertions(+), 64 deletions(-)
+
+-- 
+1.9.1
