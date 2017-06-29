@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dQiwB-0005W4-S9
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 19:33:30 -0400
+	(envelope-from <mst@redhat.com>) id 1dQixO-0007BV-W0
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 19:34:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dQiw8-00020K-Og
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 19:33:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49010)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dQiw8-0001zl-Ep
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 19:33:24 -0400
-Date: Fri, 30 Jun 2017 02:33:22 +0300
+	(envelope-from <mst@redhat.com>) id 1dQixO-0002n6-48
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 19:34:43 -0400
+Date: Fri, 30 Jun 2017 02:34:33 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170630023317-mutt-send-email-mst@kernel.org>
-References: <149868263738.23385.16723444264552987199.stgit@bahia.lan>
-	<149868267036.23385.17703911111121496563.stgit@bahia.lan>
+Message-ID: <20170630023423-mutt-send-email-mst@kernel.org>
+References: <20170628184724.21378-1-stefanha@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <149868267036.23385.17703911111121496563.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH v5 3/5] virtio-9p: break device if buffers
- are misconfigured
+In-Reply-To: <20170628184724.21378-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/6] virtio: use ioeventfd in TCG and qtest
+ mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,147 +23,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-On Wed, Jun 28, 2017 at 10:44:30PM +0200, Greg Kurz wrote:
-> The 9P protocol is transport agnostic: if the guest misconfigured the
-> buffers, the best we can do is to set the broken flag on the device.
+On Wed, Jun 28, 2017 at 07:47:18PM +0100, Stefan Hajnoczi wrote:
+> This patch series fixes qemu-iotests 068.  Since commit
+> ea4f3cebc4e0224605ab9dd9724aa4e7768fe372 ("qemu-iotests: 068: test iothread
+> mode") the test case has attempted to use dataplane without -M accel=kvm.
+> Although QEMU is capable of running TCG or qtest with emulated ioeventfd/irqfd
+> we haven't enabled it yet.
 > 
-> Since virtio_pdu_vmarshal() may be called by several active PDUs, we
-> check if the transport isn't broken already to avoid printing extra
-> error messages.
+> Unfortunately the virtio test cases fail when ioeventfd is enabled in qtest
+> mode.  This is because they make assumptions about virtqueue ISR signalling.
+> They assume that a request is completed when ISR becomes 1.  However, the ISR
+> can be set to 1 even though no new request has completed since commit
+> 83d768b5640946b7da55ce8335509df297e2c7cd "virtio: set ISR on dataplane
+> notifications".
 > 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> This issue is solved by introducing a proper qvirtqueue_get_buf() API (similar
+> to the Linux guest drivers) instead of making assumptions about the ISR.  Most
+> of the patches update the test cases to use the new API.
+> 
+> Stefan Hajnoczi (6):
+>   libqos: fix typo in virtio.h QVirtQueue->used comment
+>   libqos: add virtio used ring support
+>   tests: fix virtio-scsi-test ISR dependence
+>   tests: fix virtio-blk-test ISR dependence
+>   tests: fix virtio-net-test ISR dependence
+>   virtio-pci: use ioeventfd even when KVM is disabled
+
 
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-> ---
-> v5: - use ssize_t variable in virtio_pdu_v[un]marshal()
->     - drop remaining vdev->broken check (MST suggested to discuss calling
->       virtio_error() when the device is already broken to a separate thread)
-> ---
->  hw/9pfs/9p.c               |    2 +-
->  hw/9pfs/9p.h               |    2 +-
->  hw/9pfs/virtio-9p-device.c |   40 ++++++++++++++++++++++++++++++++++++----
->  hw/9pfs/xen-9p-backend.c   |    3 ++-
->  4 files changed, 40 insertions(+), 7 deletions(-)
+Feel free to merge.
+
+>  tests/libqos/virtio.h    |  8 ++++++-
+>  hw/virtio/virtio-pci.c   |  2 +-
+>  tests/libqos/virtio.c    | 60 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  tests/virtio-blk-test.c  | 27 ++++++++++++++--------
+>  tests/virtio-net-test.c  |  6 ++---
+>  tests/virtio-scsi-test.c |  2 +-
+>  6 files changed, 89 insertions(+), 16 deletions(-)
 > 
-> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> index 96d268334865..da0d6da65b45 100644
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -1664,7 +1664,7 @@ static void v9fs_init_qiov_from_pdu(QEMUIOVector *qiov, V9fsPDU *pdu,
->      unsigned int niov;
->  
->      if (is_write) {
-> -        pdu->s->transport->init_out_iov_from_pdu(pdu, &iov, &niov);
-> +        pdu->s->transport->init_out_iov_from_pdu(pdu, &iov, &niov, size + skip);
->      } else {
->          pdu->s->transport->init_in_iov_from_pdu(pdu, &iov, &niov, size + skip);
->      }
-> diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-> index aac1b0b2ce3d..d1cfeaf10e4f 100644
-> --- a/hw/9pfs/9p.h
-> +++ b/hw/9pfs/9p.h
-> @@ -363,7 +363,7 @@ struct V9fsTransport {
->      void        (*init_in_iov_from_pdu)(V9fsPDU *pdu, struct iovec **piov,
->                                          unsigned int *pniov, size_t size);
->      void        (*init_out_iov_from_pdu)(V9fsPDU *pdu, struct iovec **piov,
-> -                                         unsigned int *pniov);
-> +                                         unsigned int *pniov, size_t size);
->      void        (*push_and_notify)(V9fsPDU *pdu);
->  };
->  
-> diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
-> index 1a68c1622d3a..62650b0a6b99 100644
-> --- a/hw/9pfs/virtio-9p-device.c
-> +++ b/hw/9pfs/virtio-9p-device.c
-> @@ -146,8 +146,16 @@ static ssize_t virtio_pdu_vmarshal(V9fsPDU *pdu, size_t offset,
->      V9fsState *s = pdu->s;
->      V9fsVirtioState *v = container_of(s, V9fsVirtioState, state);
->      VirtQueueElement *elem = v->elems[pdu->idx];
-> +    ssize_t ret;
->  
-> -    return v9fs_iov_vmarshal(elem->in_sg, elem->in_num, offset, 1, fmt, ap);
-> +    ret = v9fs_iov_vmarshal(elem->in_sg, elem->in_num, offset, 1, fmt, ap);
-> +    if (ret < 0) {
-> +        VirtIODevice *vdev = VIRTIO_DEVICE(v);
-> +
-> +        virtio_error(vdev, "Failed to encode VirtFS reply type %d",
-> +                     pdu->id + 1);
-> +    }
-> +    return ret;
->  }
->  
->  static ssize_t virtio_pdu_vunmarshal(V9fsPDU *pdu, size_t offset,
-> @@ -156,28 +164,52 @@ static ssize_t virtio_pdu_vunmarshal(V9fsPDU *pdu, size_t offset,
->      V9fsState *s = pdu->s;
->      V9fsVirtioState *v = container_of(s, V9fsVirtioState, state);
->      VirtQueueElement *elem = v->elems[pdu->idx];
-> +    ssize_t ret;
-> +
-> +    ret = v9fs_iov_vunmarshal(elem->out_sg, elem->out_num, offset, 1, fmt, ap);
-> +    if (ret < 0) {
-> +        VirtIODevice *vdev = VIRTIO_DEVICE(v);
->  
-> -    return v9fs_iov_vunmarshal(elem->out_sg, elem->out_num, offset, 1, fmt, ap);
-> +        virtio_error(vdev, "Failed to decode VirtFS request type %d", pdu->id);
-> +    }
-> +    return ret;
->  }
->  
-> -/* The size parameter is used by other transports. Do not drop it. */
->  static void virtio_init_in_iov_from_pdu(V9fsPDU *pdu, struct iovec **piov,
->                                          unsigned int *pniov, size_t size)
->  {
->      V9fsState *s = pdu->s;
->      V9fsVirtioState *v = container_of(s, V9fsVirtioState, state);
->      VirtQueueElement *elem = v->elems[pdu->idx];
-> +    size_t buf_size = iov_size(elem->in_sg, elem->in_num);
-> +
-> +    if (buf_size < size) {
-> +        VirtIODevice *vdev = VIRTIO_DEVICE(v);
-> +
-> +        virtio_error(vdev,
-> +                     "VirtFS reply type %d needs %zu bytes, buffer has %zu",
-> +                     pdu->id + 1, size, buf_size);
-> +    }
->  
->      *piov = elem->in_sg;
->      *pniov = elem->in_num;
->  }
->  
->  static void virtio_init_out_iov_from_pdu(V9fsPDU *pdu, struct iovec **piov,
-> -                                         unsigned int *pniov)
-> +                                         unsigned int *pniov, size_t size)
->  {
->      V9fsState *s = pdu->s;
->      V9fsVirtioState *v = container_of(s, V9fsVirtioState, state);
->      VirtQueueElement *elem = v->elems[pdu->idx];
-> +    size_t buf_size = iov_size(elem->out_sg, elem->out_num);
-> +
-> +    if (buf_size < size) {
-> +        VirtIODevice *vdev = VIRTIO_DEVICE(v);
-> +
-> +        virtio_error(vdev,
-> +                     "VirtFS request type %d needs %zu bytes, buffer has %zu",
-> +                     pdu->id, size, buf_size);
-> +    }
->  
->      *piov = elem->out_sg;
->      *pniov = elem->out_num;
-> diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
-> index 922cc967be63..a82cf817fe45 100644
-> --- a/hw/9pfs/xen-9p-backend.c
-> +++ b/hw/9pfs/xen-9p-backend.c
-> @@ -147,7 +147,8 @@ static ssize_t xen_9pfs_pdu_vunmarshal(V9fsPDU *pdu,
->  
->  static void xen_9pfs_init_out_iov_from_pdu(V9fsPDU *pdu,
->                                             struct iovec **piov,
-> -                                           unsigned int *pniov)
-> +                                           unsigned int *pniov,
-> +                                           size_t size)
->  {
->      Xen9pfsDev *xen_9pfs = container_of(pdu->s, Xen9pfsDev, state);
->      Xen9pfsRing *ring = &xen_9pfs->rings[pdu->tag % xen_9pfs->num_rings];
+> -- 
+> 2.9.4
