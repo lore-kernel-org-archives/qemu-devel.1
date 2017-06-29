@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dQaDH-0004yP-CG
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:14:32 -0400
+	(envelope-from <laurent@vivier.eu>) id 1dQaGo-0007bB-A7
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:18:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dQaDD-0003Y2-SR
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:14:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53644)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dQaDD-0003XO-Ki
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:14:27 -0400
-Date: Thu, 29 Jun 2017 15:14:21 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170629141421.GF32167@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170613165313.20954-1-ehabkost@redhat.com>
-	<87o9t8qy7d.fsf@dusky.pond.sub.org>
+	(envelope-from <laurent@vivier.eu>) id 1dQaGi-0005m9-Fs
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:18:10 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:57572)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dQaGi-0005kV-4k
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:18:04 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+References: <20170620205121.26515-1-laurent@vivier.eu>
+	<20170620205121.26515-7-laurent@vivier.eu>
+	<e94af6f2-8869-b9e7-b2b8-b3f16713b345@vivier.eu>
+	<20170629134601.GA9921@kos.to>
+	<65f1d63d-45b2-2b9c-b00e-0c3ac808e425@vivier.eu>
+Message-ID: <32916024-a8e9-987a-59ad-df09f7d8ef71@vivier.eu>
+Date: Thu, 29 Jun 2017 16:17:32 +0200
 MIME-Version: 1.0
+In-Reply-To: <65f1d63d-45b2-2b9c-b00e-0c3ac808e425@vivier.eu>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87o9t8qy7d.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [RFC 00/15] Error API: Flag errors in *errp even
- if errors are being ignored
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 6/6] target-m68k,
+ linux-user: manage FP registers in ucontext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +32,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Riku Voipio <riku.voipio@iki.fi>
+Cc: Thomas Huth <huth@tuxfamily.org>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On Wed, Jun 28, 2017 at 11:05:26AM +0200, Markus Armbruster wrote:
-> Eduardo Habkost <ehabkost@redhat.com> writes:
+Le 29/06/2017 à 16:11, Laurent Vivier a écrit :
+> Le 29/06/2017 à 15:46, Riku Voipio a écrit :
+>> On Wed, Jun 28, 2017 at 10:44:57PM +0200, Laurent Vivier wrote:
+>>> Riku,
+>>>
+>>> could you ACK this patch, so I will add it in my next pull request for m68k?
+>>
+>> Whatabout Richard's comment about using cpu_m68k_set_fpcr ?
 > 
-> > Rationale
-> > ---------
-> >
-> > I'm often bothered by the fact that we can't write the following:
-> >
-> >     foo(arg, errp);
-> >     if (*errp) {
-> >         handle the error...
-> >         error_propagate(errp, err);
-> >     }
-> >
-> > because errp can be NULL.
+> You're right. I've fixed it my tree and forgotten to send it.
 > 
-> If foo() additionally returned an indication of success, you could write
-> 
->       if (!foo(arg, errp)) {    // assuming foo() returns a bool
->           handle the error...
->       }
-> 
-> Nicely concise.
-> 
-> For what it's worth, this is how GLib wants GError to be used.  We
-> deviated from it, and it has turned out to be a self-inflicted wound.
+> I'm going to resend it.
 
-FWIW, I took that approach for the io & crypto layers - except
-returning 0 vs -1, rather than true/false, precisely because
-it lead to simpler code by not having to use local errors and
-propagation.
 
-For added benefit you can potentially then also annotate the
-method as  __attribute__(return_check)  to force the caller
-to include a check for error conditions, which is often a
-useful compile time protection to have.
+In fact the patch has been re-sent out of the series:
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg04911.html
+
+Thanks,
+Laurent
