@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dQYW8-0004Os-T7
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 08:25:53 -0400
+	(envelope-from <berto@igalia.com>) id 1dQYZA-0006BG-SU
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 08:29:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dQYW7-0003PW-Sc
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 08:25:52 -0400
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <cover.1498607452.git.alistair.francis@xilinx.com>
-	<2c339ec0264c85f9c8a4884ffb8ebe059b3b9e4b.1498607452.git.alistair.francis@xilinx.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <188253dd-dc0f-17b8-8c0d-4a3d14a6a94f@redhat.com>
-Date: Thu, 29 Jun 2017 14:25:32 +0200
+	(envelope-from <berto@igalia.com>) id 1dQYZ8-0006TB-8T
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 08:29:00 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <1498661881-9605-2-git-send-email-kchamart@redhat.com>
+References: <1498661881-9605-1-git-send-email-kchamart@redhat.com>
+	<1498661881-9605-2-git-send-email-kchamart@redhat.com>
+Date: Thu, 29 Jun 2017 14:28:55 +0200
+Message-ID: <w51k23v5660.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <2c339ec0264c85f9c8a4884ffb8ebe059b3b9e4b.1498607452.git.alistair.francis@xilinx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v1 3/4] util/oslib-win32: Fix up if
- conditional
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v4 1/2] live-block-ops.txt:
+ Rename, rewrite, and improve it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,38 +23,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, stefanha@redhat.com, famz@redhat.com
-Cc: edgar.iglesias@xilinx.com, alistair23@gmail.com, qemu-block@nongnu.org
+To: Kashyap Chamarthy <kchamart@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, stephen@that.guru, armbru@redhat.com, mreitz@redhat.com
 
+On Wed 28 Jun 2017 04:58:00 PM CEST, Kashyap Chamarthy wrote:
+> +Once a 'mirror' job has started, there are two possible actions when a
+> +``drive-mirror`` job is active:
+> +
+> +1. Issuing the command ``block-job-cancel``: will, after completing
+> +   synchronization of the content from the disk image chain to the
+> +   target image, [E] -- create a point-in-time (which is at the time of
+> +   *triggering* the cancel command) copy, contained in image [E], of the
+> +   backing file.
 
+A point-in-time [...] copy [...] of the backing file ? That would be a
+copy of the whole chain or the topmost image (depending on the sync
+mode).
 
-On 28/06/2017 01:57, Alistair Francis wrote:
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Acked-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> ---
-> 
->  util/oslib-win32.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-> index 7ec0f8e083..a015e1ac96 100644
-> --- a/util/oslib-win32.c
-> +++ b/util/oslib-win32.c
-> @@ -438,7 +438,7 @@ static int poll_rest(gboolean poll_msgs, HANDLE *handles, gint nhandles,
->          if (timeout == 0 && nhandles > 1) {
->              /* Remove the handle that fired */
->              int i;
-> -            if (ready < nhandles - 1) {
-> +            if ((ready - WAIT_OBJECT_0) < nhandles - 1) {
->                  for (i = ready - WAIT_OBJECT_0 + 1; i < nhandles; i++) {
->                      handles[i-1] = handles[i];
->                  }
-> 
+> +The ``"sync": "full"``, from the above, means: copy the *entire* chain
+> +to the destination.
 
-WAIT_OBJECT_0 is zero, but I agree it's better to add it.
+I think it's in general a good idea to describe the different sync modes
+before doing this, because they're not completely obvious when you first
+try to use these commands.
 
-However, the condition can be rewritten as ready - WAIT_OBJECT_0 + 1 <
-nhandles, which is the same as the first iteration's "i < nhandles".  So
-I'd just remove the "if" and "unindent" the for loop.
+> +Notes on ``blockdev-mirror``
+> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  [...]
+> +(1) Create the target image (using ``qemu-img``), say, backup.qcow2
 
-Paolo
+If we're doing a mirror here, backup.qcow2 is probably not the best
+name :-)
+
+> +Live disk backup --- ``drive-backup`` and ``blockdev-backup``
+> +-------------------------------------------------------------
+> +
+> +The ``drive-backup`` (and its newer equivalent ``blockdev-backup``) allows
+> +you to create a point-in-time snapshot.
+> +
+> +In this case, the point-in-time is when you *start* the ``drive-backup``
+> +(or its newer equivalent ``blockdev-backup``) command.
+> +
+> +Currently, there are four different types of synchronization modes:
+> +
+> +(1) ``full`` -- Synchronize the content of entire disk image chain to
+> +    the target
+> +(2) ``top`` -- Synchronize only the contents of the top-most disk image
+> +    in the chain to the target
+> +(3) ``none`` -- Synchronize only the new writes from this point on
+> +(4) ``incremental`` -- Synchronize content that is described by the
+> +    dirty bitmap
+
+Here's the kind of summary of the different sync modes that I was
+talking about earlier.
+
+One note about sync=none, though. If I'm not wrong drive-backup makes a
+point-in-time copy of the data at the moment when the command is issued
+(that's one difference from drive-mirror). Therefore drive-backup never
+synchronizes "new writes from this point on".
+
+I don't think that drive-backup sync=none copies any data then, can
+anyone clarify?
+
+The rest of the document looks good to me, thanks!
+
+Berto
