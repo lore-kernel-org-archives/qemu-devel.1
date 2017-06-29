@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=346f73eb6=Paul.Durrant@citrix.com>)
-	id 1dQV2v-0004N3-8s
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 04:43:30 -0400
+	(envelope-from <thuth@redhat.com>) id 1dQV5e-0005e0-Em
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 04:46:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=346f73eb6=Paul.Durrant@citrix.com>)
-	id 1dQV2s-0004H6-1H
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 04:43:29 -0400
-Received: from smtp.eu.citrix.com ([185.25.65.24]:57827)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=346f73eb6=Paul.Durrant@citrix.com>)
-	id 1dQV2r-0004GK-M0
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 04:43:25 -0400
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Thu, 29 Jun 2017 08:43:22 +0000
-Message-ID: <3f4d040dbf344b9db3e007484a8062f4@AMSPEX02CL03.citrite.net>
-References: <CAFEAcA-wYgWeYdFRAcW-DhqsFRsy_iKF+WU6qt7UbUKZ+EK1eg@mail.gmail.com>
-	<alpine.DEB.2.10.1706271438090.24648@sstabellini-ThinkPad-X260>
-	<CAFEAcA8yUHuBj2SUhL++7-NiBvHrcxRCH=Yq6TsNGrN4NXVV-w@mail.gmail.com>
-	<alpine.DEB.2.10.1706281109340.2919@sstabellini-ThinkPad-X260>
-In-Reply-To: <alpine.DEB.2.10.1706281109340.2919@sstabellini-ThinkPad-X260>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <thuth@redhat.com>) id 1dQV5b-0006Gu-9u
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 04:46:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:2052)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dQV5b-0006GW-3K
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 04:46:15 -0400
+References: <20170629010300.2848-1-f4bug@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <0e0d7ae6-5c1e-5c54-9d09-ef03e600b87e@redhat.com>
+Date: Thu, 29 Jun 2017 10:46:08 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Getting rid of xen_init_display() (and its dubious
- call into main_loop_wait())
+In-Reply-To: <20170629010300.2848-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 0/8] removal of tci (tcg interpreter)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,116 +27,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Stefano Stabellini' <sstabellini@kernel.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Anthony Perard <anthony.perard@citrix.com>, Gerd Hoffmann <kraxel@redhat.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, "Emilio G . Cota" <cota@braap.org>, Stefan Weil <sw@weilnetz.de>, Peter Maydell <peter.maydell@linaro.org>
 
-> -----Original Message-----
-> From: Stefano Stabellini [mailto:sstabellini@kernel.org]
-> Sent: 28 June 2017 19:20
-> To: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Stefano Stabellini <sstabellini@kernel.org>; QEMU Developers <qemu-
-> devel@nongnu.org>; Anthony Perard <anthony.perard@citrix.com>; Gerd
-> Hoffmann <kraxel@redhat.com>; Paul Durrant <Paul.Durrant@citrix.com>;
-> xen-devel@lists.xenproject.org
-> Subject: Re: Getting rid of xen_init_display() (and its dubious call into
-> main_loop_wait())
->=20
-> On Wed, 28 Jun 2017, Peter Maydell wrote:
-> > On 28 June 2017 at 01:06, Stefano Stabellini <sstabellini@kernel.org>
-> wrote:
-> > > On Tue, 27 Jun 2017, Peter Maydell wrote:
-> > >> So, there is exactly one caller of main_loop_wait() in the tree that
-> > >> passes it 'true' as an argument. That caller is in xen_init_display(=
-)
-> > >> in hw/dispaly/xenfb.c. The function was added in 2009 with the
-> comment
-> > >> "FIXME/TODO: Kill this. Temporary needed while DisplayState
-> > >> reorganization is in flight."
-> > >>
-> > >> I'd like to think that we've now completed whatever reorg that was,
-> > >> 8 years on, so can we now get rid of this function? It definitely
-> > >> seems very dubious to have a display init function with a busy loop
-> > >> and a call into main_loop_wait()...
-> > >
-> > > LOL, you gotta love "temporary fixes". I am happy to see it wasn't me
-> > > that added it ;-)
-> > >
-> > > I think the following should do the trick.
-> >
-> > Thanks!
-> >
-> > > ---
-> > >
-> > > xenfb: remove xen_init_display "temporary" hack
-> > >
-> > > Initialize xenfb properly, as all other backends, from its own
-> > > "initialise" function.
-> > >
-> > > Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
-> > >
-> > > diff --git a/hw/display/xenfb.c b/hw/display/xenfb.c
-> > > index e76c0d8..873e51f 100644
-> > > --- a/hw/display/xenfb.c
-> > > +++ b/hw/display/xenfb.c
-> > > @@ -71,7 +71,6 @@ struct XenFB {
-> > >      int               fbpages;
-> > >      int               feature_update;
-> > >      int               bug_trigger;
-> > > -    int               have_console;
-> > >      int               do_resize;
-> > >
-> > >      struct {
-> > > @@ -80,6 +79,7 @@ struct XenFB {
-> > >      int               up_count;
-> > >      int               up_fullscreen;
-> > >  };
-> > > +static const GraphicHwOps xenfb_ops;
-> > >
-> > >  /* -----------------------------------------------------------------=
---- */
-> > >
-> > > @@ -855,6 +855,8 @@ static int fb_init(struct XenDevice *xendev)
-> > >  static int fb_initialise(struct XenDevice *xendev)
-> > >  {
-> > >      struct XenFB *fb =3D container_of(xendev, struct XenFB, c.xendev=
-);
-> > > +    struct XenDevice *xin;
-> > > +    struct XenInput *in;
-> > >      struct xenfb_page *fb_page;
-> > >      int videoram;
-> > >      int rc;
-> > > @@ -877,16 +879,12 @@ static int fb_initialise(struct XenDevice
-> *xendev)
-> > >      if (rc !=3D 0)
-> > >         return rc;
-> > >
-> > > -#if 0  /* handled in xen_init_display() for now */
-> > > -    if (!fb->have_console) {
-> > > -        fb->c.ds =3D graphic_console_init(xenfb_update,
-> > > -                                        xenfb_invalidate,
-> > > -                                        NULL,
-> > > -                                        NULL,
-> > > -                                        fb);
-> > > -        fb->have_console =3D 1;
-> > > -    }
-> > > -#endif
-> > > +    fb->c.con =3D graphic_console_init(NULL, 0, &xenfb_ops, fb);
-> > > +
-> > > +    xin =3D xen_pv_find_xendev("vkbd", xen_domid, 0);
-> > > +    in =3D container_of(xin, struct XenInput, c.xendev);
-> > > +    in->c.con =3D fb->c.con;
-> >
-> > Won't this crash if xen_pv_find_xendev() returned NULL?
-> > Or are we guaranteed that that can't happen here?
->=20
-> As long as there is a vkdb device, it will be already added to the
-> xendevs list at this point. However, if there isn't a device at all,
-> then it would crash. In that case, I think we should print a warning and
-> continue without it.
->=20
-> I'll send an updated patch.
+ Hi Philippe,
 
-There is still the fact the vkbd can't initialise until vfb has done so. Th=
-is interdependency is subtle and IMO bogus. It needs to be cleared up.
+On 29.06.2017 03:02, Philippe Mathieu-Daud=C3=A9 wrote:
+> There have been some comments on the ML about the usefulness of tci.
+>=20
+> https://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg04551.html
+>=20
+>   Peter Maydell> I'd prefer we just got rid of it.
+>=20
+> https://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg04296.html
+>=20
+>   Richard Henderson> Is it time to remove it? I'm pretty sure the only =
+hosts
+>                      for which it will work have proper backends...
+>=20
+> Richard quotes are way clearer than me trying to paraphrase what he tol=
+d me:
+> - it doesn't use libffi, and as such the way it makes calls to helpers =
+doesn't work for many hosts.
+> - we already cover almost everthing that debian does. if debian or gent=
+oo doesn't support it, one can confidently say there's little interest.
+> - if someone *does* want to run qemu on something else, it isn't diffic=
+ult to port tcg.
+>=20
+> I figured out MAINTAINERS was unsync, so added patches 1-4, they are no=
+t really
+> tci-related.
 
-  Paul
+Since they are not related to TCI at all, please submit these as
+separate series.
+
+> Patches 5,6 are trivial fixes to let the codebase quite sane if there i=
+s future
+> need to revert/reimport tci.
+
+I think this should go into 2.10...
+
+> Patches 7,8 are the removal, marked RFC... let's debate!
+
+... but NACK for a direct removal. Common sense is to make obsolete
+features as deprecated first and then wait for 2 public releases before
+the final removal, so that users still have a chance to speak up in case
+they still need the feature and are willing to maintain it.
+
+Please see the following URL for details (and please also add an entry
+for TCI in the Miscellaneous section there):
+
+  http://wiki.qemu.org/Features/LegacyRemoval
+
+ Thomas
