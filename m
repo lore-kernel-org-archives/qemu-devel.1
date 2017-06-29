@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dQXMZ-0007bc-3O
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:11:56 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dQXPI-0000Rp-9u
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:14:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dQXMV-0003Az-2p
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:11:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47983)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dQXMU-0003AY-Pe
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:11:51 -0400
-Date: Thu, 29 Jun 2017 19:11:46 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170629111146.GG28654@lemon.lan>
-References: <20170629080452.26470-1-famz@redhat.com>
-	<20170629080452.26470-5-famz@redhat.com>
-	<20170629124001.55e70490@nial.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170629124001.55e70490@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 4/7] qdev: Introduce DEFINE_PROP_LINK
+	(envelope-from <imammedo@redhat.com>) id 1dQXPG-0004Tl-UU
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:14:44 -0400
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Thu, 29 Jun 2017 13:14:23 +0200
+Message-Id: <1498734863-164338-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH] qom: enforce readonly nature of link's check
+ callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,119 +18,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>
+To: qemu-devel@nongnu.org
+Cc: alistair.francis@xilinx.com, edgar.iglesias@gmail.com, mst@redhat.com, afaerber@suse.de, qemu-arm@nongnu.org, famz@redhat.com, pbonzini@redhat.com
 
-On Thu, 06/29 12:40, Igor Mammedov wrote:
-> On Thu, 29 Jun 2017 16:04:49 +0800
-> Fam Zheng <famz@redhat.com> wrote:
-> 
-> > This property can be used to replace the object_property_add_link in
-> > device code, to add a link to other objects, which is a common pattern.
-> > 
-> > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > ---
-> >  hw/core/qdev-properties.c    | 16 ++++++++++++++++
-> >  include/hw/qdev-core.h       |  5 +++++
-> >  include/hw/qdev-properties.h | 11 +++++++++++
-> >  3 files changed, 32 insertions(+)
-> > 
-> > diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-> > index 68cd653..7c11eb8 100644
-> > --- a/hw/core/qdev-properties.c
-> > +++ b/hw/core/qdev-properties.c
-> > @@ -1192,3 +1192,19 @@ PropertyInfo qdev_prop_size = {
-> >      .set = set_size,
-> >      .set_default_value = set_default_value_uint,
-> >  };
-> > +
-> > +/* --- object link property --- */
-> > +
-> > +static void create_link_property(Object *obj, Property *prop, Error **errp)
-> > +{
-> > +    Object **child = qdev_get_prop_ptr(DEVICE(obj), prop);
-> > +
-> > +    object_property_add_link(obj, prop->name, prop->link_type,
-> > +                             child, prop->link.check,
-> > +                             prop->link.flags, errp);
-> > +}
-> > +
-> > +PropertyInfo qdev_prop_link = {
-> > +    .name = "link",
-> > +    .create = create_link_property,
-> > +};
-> > diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> > index 33518ee..40afb3d 100644
-> > --- a/include/hw/qdev-core.h
-> > +++ b/include/hw/qdev-core.h
-> > @@ -5,6 +5,7 @@
-> >  #include "qemu/option.h"
-> >  #include "qemu/bitmap.h"
-> >  #include "qom/object.h"
-> > +#include "qom/link-property.h"
-> >  #include "hw/irq.h"
-> >  #include "hw/hotplug.h"
-> >  
-> > @@ -233,6 +234,10 @@ struct Property {
-> >      int          arrayoffset;
-> >      PropertyInfo *arrayinfo;
-> >      int          arrayfieldsize;
-> > +    /* Only @check and @flags are used; @child is unuseful because we need a
-> > +     * dynamic pointer in @obj as derived from @offset. */
->  @check, @flags, @child, @obj are not fields of struct Property so it's
-> not clear what doc comments talks about. Maybe adding prefixes would help,
-> for example:
->   @link.child
+link's check callback is supposed to verify/permit setting it,
+however currently nothing restricts it from misusing it
+and modifying target object from within.
+Make sure that readonly semantics are checked by compiler
+to prevent callback's misuse.
 
-Good point, I was being too stingy with words.
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+Fam,
+ it probably conflicts with yours DEFINE_PROP_LINK series,
+ feel free to include this patch if you'll have to respin
 
-> 
-> > +    LinkProperty link;
-> > +    const char   *link_type;
-> >  };
-> >  
-> >  struct PropertyInfo {
-> > diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-> > index 39bf4b2..767c10b 100644
-> > --- a/include/hw/qdev-properties.h
-> > +++ b/include/hw/qdev-properties.h
-> > @@ -30,6 +30,7 @@ extern PropertyInfo qdev_prop_pci_devfn;
-> >  extern PropertyInfo qdev_prop_blocksize;
-> >  extern PropertyInfo qdev_prop_pci_host_devaddr;
-> >  extern PropertyInfo qdev_prop_arraylen;
-> > +extern PropertyInfo qdev_prop_link;
-> >  
-> >  #define DEFINE_PROP(_name, _state, _field, _prop, _type) { \
-> >          .name      = (_name),                                    \
-> > @@ -117,6 +118,16 @@ extern PropertyInfo qdev_prop_arraylen;
-> >          .arrayoffset = offsetof(_state, _arrayfield),                   \
-> >          }
-> >  
-> > +#define DEFINE_PROP_LINK(_name, _state, _field, _type, _check, _flags) {\
-> > +        .name = (_name),                                                \
-> > +        .info = &(qdev_prop_link),                                      \
-> > +        .offset = offsetof(_state, _field)                              \
-> > +            + type_check(Object *, typeof_field(_state, _field)),       \
-> > +        .link.check = _check,                                           \
-> > +        .link.flags = _flags,                                           \
-> maybe we shouldn't have custom _check and _flags fields as majority of devices
-> use qdev_prop_allow_set_link_before_realize + OBJ_PROP_LINK_UNREF_ON_RELEASE
-> policies. That will save us ~2LOC per property of boiler plate code.
-> 
-> I've looked at current device link usage and there is only few that actually
-> use or need custom check/flags and several are misusing object_property_allow_set_link()
-> where they should use qdev_prop_allow_set_link_before_realize().
-> 
-> We could leave alone exceptions that require custom check/flags as is
-> or provide DEFINE_PROP_LINK_CUSTOM() for a few that actually need it and fix
-> ones that misuse it.
-> 
-> There is a bunch of board code that uses links but that's not for Device
-> so it's not related to this macro anyways.
+---
+ include/hw/qdev-properties.h | 3 ++-
+ include/qom/object.h         | 6 +++---
+ hw/core/qdev-properties.c    | 3 ++-
+ hw/display/xlnx_dp.c         | 2 +-
+ hw/ipmi/ipmi.c               | 2 +-
+ hw/mem/pc-dimm.c             | 2 +-
+ hw/misc/ivshmem.c            | 2 +-
+ qom/object.c                 | 8 ++++----
+ 8 files changed, 15 insertions(+), 13 deletions(-)
 
-OK, I wasn't sure about this when Paolo pointed out in v1, but since you've now
-taken a look, I will simplify it.
-
-I will also try to cover more devices in v3. Thanks!
-
-Fam
+diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+index 306bbab..6dfe16e 100644
+--- a/include/hw/qdev-properties.h
++++ b/include/hw/qdev-properties.h
+@@ -234,7 +234,8 @@ void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
+  * This function should be used as the check() argument to
+  * object_property_add_link().
+  */
+-void qdev_prop_allow_set_link_before_realize(Object *obj, const char *name,
++void qdev_prop_allow_set_link_before_realize(const Object *obj,
++                                             const char *name,
+                                              Object *val, Error **errp);
+ 
+ #endif
+diff --git a/include/qom/object.h b/include/qom/object.h
+index 5ecc2d1..5223692 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -788,7 +788,7 @@ ObjectClass *object_get_class(Object *obj);
+  *
+  * Returns: The QOM typename of @obj.
+  */
+-const char *object_get_typename(Object *obj);
++const char *object_get_typename(const Object *obj);
+ 
+ /**
+  * type_register_static:
+@@ -1320,7 +1320,7 @@ typedef enum {
+  * callback function.  It allows the link property to be set and never returns
+  * an error.
+  */
+-void object_property_allow_set_link(Object *, const char *,
++void object_property_allow_set_link(const Object *, const char *,
+                                     Object *, Error **);
+ 
+ /**
+@@ -1353,7 +1353,7 @@ void object_property_allow_set_link(Object *, const char *,
+  */
+ void object_property_add_link(Object *obj, const char *name,
+                               const char *type, Object **child,
+-                              void (*check)(Object *obj, const char *name,
++                              void (*check)(const Object *obj, const char *name,
+                                             Object *val, Error **errp),
+                               ObjectPropertyLinkFlags flags,
+                               Error **errp);
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index 2a82768..95e5fdb 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -25,7 +25,8 @@ void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
+     }
+ }
+ 
+-void qdev_prop_allow_set_link_before_realize(Object *obj, const char *name,
++void qdev_prop_allow_set_link_before_realize(const Object *obj,
++                                             const char *name,
+                                              Object *val, Error **errp)
+ {
+     DeviceState *dev = DEVICE(obj);
+diff --git a/hw/display/xlnx_dp.c b/hw/display/xlnx_dp.c
+index f43eb09..3ed81ff 100644
+--- a/hw/display/xlnx_dp.c
++++ b/hw/display/xlnx_dp.c
+@@ -515,7 +515,7 @@ static void xlnx_dp_aux_set_command(XlnxDPState *s, uint32_t value)
+     s->core_registers[DP_INTERRUPT_SIGNAL_STATE] |= 0x04;
+ }
+ 
+-static void xlnx_dp_set_dpdma(Object *obj, const char *name, Object *val,
++static void xlnx_dp_set_dpdma(const Object *obj, const char *name, Object *val,
+                               Error **errp)
+ {
+     XlnxDPState *s = XLNX_DP(obj);
+diff --git a/hw/ipmi/ipmi.c b/hw/ipmi/ipmi.c
+index 5cf1caa..a2fd1eb 100644
+--- a/hw/ipmi/ipmi.c
++++ b/hw/ipmi/ipmi.c
+@@ -90,7 +90,7 @@ static TypeInfo ipmi_interface_type_info = {
+     .class_init = ipmi_interface_class_init,
+ };
+ 
+-static void isa_ipmi_bmc_check(Object *obj, const char *name,
++static void isa_ipmi_bmc_check(const Object *obj, const char *name,
+                                Object *val, Error **errp)
+ {
+     IPMIBmc *bmc = IPMI_BMC(val);
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index 9e8dab0..380cb30 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -366,7 +366,7 @@ static void pc_dimm_get_size(Object *obj, Visitor *v, const char *name,
+     visit_type_int(v, name, &value, errp);
+ }
+ 
+-static void pc_dimm_check_memdev_is_busy(Object *obj, const char *name,
++static void pc_dimm_check_memdev_is_busy(const Object *obj, const char *name,
+                                       Object *val, Error **errp)
+ {
+     Error *local_err = NULL;
+diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
+index abeaf3d..e25016c 100644
+--- a/hw/misc/ivshmem.c
++++ b/hw/misc/ivshmem.c
+@@ -1005,7 +1005,7 @@ static const TypeInfo ivshmem_common_info = {
+     .class_init    = ivshmem_common_class_init,
+ };
+ 
+-static void ivshmem_check_memdev_is_busy(Object *obj, const char *name,
++static void ivshmem_check_memdev_is_busy(const Object *obj, const char *name,
+                                          Object *val, Error **errp)
+ {
+     if (host_memory_backend_is_mapped(MEMORY_BACKEND(val))) {
+diff --git a/qom/object.c b/qom/object.c
+index 7a05e35..a429e64 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -735,7 +735,7 @@ out:
+     return ret;
+ }
+ 
+-const char *object_get_typename(Object *obj)
++const char *object_get_typename(const Object *obj)
+ {
+     return obj->class->type->name;
+ }
+@@ -1395,7 +1395,7 @@ out:
+     g_free(type);
+ }
+ 
+-void object_property_allow_set_link(Object *obj, const char *name,
++void object_property_allow_set_link(const Object *obj, const char *name,
+                                     Object *val, Error **errp)
+ {
+     /* Allow the link to be set, always */
+@@ -1403,7 +1403,7 @@ void object_property_allow_set_link(Object *obj, const char *name,
+ 
+ typedef struct {
+     Object **child;
+-    void (*check)(Object *, const char *, Object *, Error **);
++    void (*check)(const Object *, const char *, Object *, Error **);
+     ObjectPropertyLinkFlags flags;
+ } LinkProperty;
+ 
+@@ -1519,7 +1519,7 @@ static void object_release_link_property(Object *obj, const char *name,
+ 
+ void object_property_add_link(Object *obj, const char *name,
+                               const char *type, Object **child,
+-                              void (*check)(Object *, const char *,
++                              void (*check)(const Object *, const char *,
+                                             Object *, Error **),
+                               ObjectPropertyLinkFlags flags,
+                               Error **errp)
+-- 
+2.7.4
