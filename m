@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tianyu.lan@intel.com>) id 1dQY43-0006n4-JO
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:56:52 -0400
+	(envelope-from <tianyu.lan@intel.com>) id 1dQY45-0006o1-5z
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:56:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tianyu.lan@intel.com>) id 1dQY3z-00075H-E3
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:56:51 -0400
-Received: from mga09.intel.com ([134.134.136.24]:32955)
+	(envelope-from <tianyu.lan@intel.com>) id 1dQY41-00076M-5N
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:56:53 -0400
+Received: from mga05.intel.com ([192.55.52.43]:1646)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <tianyu.lan@intel.com>)
-	id 1dQY3z-00074e-28
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:56:47 -0400
+	id 1dQY40-00075b-QK
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:56:49 -0400
 From: Lan Tianyu <tianyu.lan@intel.com>
-Date: Thu, 29 Jun 2017 01:49:53 -0400
-Message-Id: <1498715394-16402-3-git-send-email-tianyu.lan@intel.com>
+Date: Thu, 29 Jun 2017 01:49:54 -0400
+Message-Id: <1498715394-16402-4-git-send-email-tianyu.lan@intel.com>
 In-Reply-To: <1498715394-16402-1-git-send-email-tianyu.lan@intel.com>
 References: <1498715394-16402-1-git-send-email-tianyu.lan@intel.com>
-Subject: [Qemu-devel] [PATCH 2/3] xen-pt: bind/unbind interrupt remapping
- format MSI
+Subject: [Qemu-devel] [PATCH 3/3] msi: Handle remappable format interrupt
+ request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,201 +30,121 @@ Cc: Chao Gao <chao.gao@intel.com>, mst@redhat.com, marcel@redhat.com, sstabellin
 
 From: Chao Gao <chao.gao@intel.com>
 
-If a vIOMMU is exposed to guest, guest will configure the msi to remapping
-format. The original code isn't suitable to the new format. A new pair
-bind/unbind interfaces are added for this usage. This patch recognizes
-this case and uses new interfaces to bind/unbind msi.
+According to VT-d spec Interrupt Remapping and Interrupt Posting ->
+Interrupt Remapping -> Interrupt Request Formats On Intel 64
+Platforms, fields of MSI data register have changed. This patch
+avoids wrongly regarding a remappable format interrupt request as
+an interrupt binded with an event channel.
 
 Signed-off-by: Chao Gao <chao.gao@intel.com>
 Signed-off-by: Lan Tianyu <tianyu.lan@intel.com>
 ---
- configure                     | 54 +++++++++++++++++++++++++++++++++++++++++++
- hw/xen/xen_pt_msi.c           | 50 ++++++++++++++++++++++++++++-----------
- include/hw/i386/apic-msidef.h |  1 +
- include/hw/xen/xen_common.h   | 25 ++++++++++++++++++++
- 4 files changed, 117 insertions(+), 13 deletions(-)
+ hw/pci/msi.c         | 5 +++--
+ hw/pci/msix.c        | 4 +++-
+ hw/xen/xen_pt_msi.c  | 2 +-
+ include/hw/xen/xen.h | 2 +-
+ xen-hvm-stub.c       | 2 +-
+ xen-hvm.c            | 8 +++++++-
+ 6 files changed, 16 insertions(+), 7 deletions(-)
 
-diff --git a/configure b/configure
-index 476210b..b3ac49f 100755
---- a/configure
-+++ b/configure
-@@ -1982,6 +1982,60 @@ EOF
- /*
-  * If we have stable libs the we don't want the libxc compat
-  * layers, regardless of what CFLAGS we may have been given.
-+ */
-+#undef XC_WANT_COMPAT_EVTCHN_API
-+#undef XC_WANT_COMPAT_GNTTAB_API
-+#undef XC_WANT_COMPAT_MAP_FOREIGN_API
-+#include <xenctrl.h>
-+#include <xenstore.h>
-+#include <xenevtchn.h>
-+#include <xengnttab.h>
-+#include <xenforeignmemory.h>
-+#include <stdint.h>
-+#include <xen/hvm/hvm_info_table.h>
-+#if !defined(HVM_MAX_VCPUS)
-+# error HVM_MAX_VCPUS not defined
-+#endif
-+int main(void) {
-+  xc_interface *xc = NULL;
-+  xenforeignmemory_handle *xfmem;
-+  xenevtchn_handle *xe;
-+  xengnttab_handle *xg;
-+  xen_domain_handle_t handle;
-+  xengnttab_grant_copy_segment_t* seg = NULL;
-+
-+  xs_daemon_open();
-+
-+  xc = xc_interface_open(0, 0, 0);
-+  xc_hvm_set_mem_type(0, 0, HVMMEM_ram_ro, 0, 0);
-+  xc_domain_add_to_physmap(0, 0, XENMAPSPACE_gmfn, 0, 0);
-+  xc_hvm_inject_msi(xc, 0, 0xf0000000, 0x00000000);
-+  xc_hvm_create_ioreq_server(xc, 0, HVM_IOREQSRV_BUFIOREQ_ATOMIC, NULL);
-+  xc_domain_create(xc, 0, handle, 0, NULL, NULL);
-+
-+  xfmem = xenforeignmemory_open(0, 0);
-+  xenforeignmemory_map(xfmem, 0, 0, 0, 0, 0);
-+
-+  xe = xenevtchn_open(0, 0);
-+  xenevtchn_fd(xe);
-+
-+  xg = xengnttab_open(0, 0);
-+  xengnttab_grant_copy(xg, 0, seg);
-+
-+  xc_domain_update_msi_irq_remapping(xc, 0, 0, 0, 0, 0 ,0);
-+
-+  return 0;
-+}
-+EOF
-+      compile_prog "" "$xen_libs $xen_stable_libs"
-+    then
-+    xen_ctrl_version=4100
-+    xen=yes
-+  elif
-+      cat > $TMPC <<EOF &&
-+/*
-+ * If we have stable libs the we don't want the libxc compat
-+ * layers, regardless of what CFLAGS we may have been given.
-  *
-  * Also, check if xengnttab_grant_copy_segment_t is defined and
-  * grant copy operation is implemented.
+diff --git a/hw/pci/msi.c b/hw/pci/msi.c
+index a87b227..3713ea6 100644
+--- a/hw/pci/msi.c
++++ b/hw/pci/msi.c
+@@ -289,7 +289,7 @@ void msi_reset(PCIDevice *dev)
+ static bool msi_is_masked(const PCIDevice *dev, unsigned int vector)
+ {
+     uint16_t flags = pci_get_word(dev->config + msi_flags_off(dev));
+-    uint32_t mask, data;
++    uint32_t mask, data, addr_lo;
+     bool msi64bit = flags & PCI_MSI_FLAGS_64BIT;
+     assert(vector < PCI_MSI_VECTORS_MAX);
+ 
+@@ -298,7 +298,8 @@ static bool msi_is_masked(const PCIDevice *dev, unsigned int vector)
+     }
+ 
+     data = pci_get_word(dev->config + msi_data_off(dev, msi64bit));
+-    if (xen_is_pirq_msi(data)) {
++    addr_lo = pci_get_long(dev->config + msi_address_lo_off(dev));
++    if (xen_is_pirq_msi(addr_lo, data)) {
+         return false;
+     }
+ 
+diff --git a/hw/pci/msix.c b/hw/pci/msix.c
+index 0ec1cb1..6dda83c 100644
+--- a/hw/pci/msix.c
++++ b/hw/pci/msix.c
+@@ -81,9 +81,11 @@ static bool msix_vector_masked(PCIDevice *dev, unsigned int vector, bool fmask)
+ {
+     unsigned offset = vector * PCI_MSIX_ENTRY_SIZE;
+     uint8_t *data = &dev->msix_table[offset + PCI_MSIX_ENTRY_DATA];
++    uint8_t *addr_lo = &dev->msix_table[offset + PCI_MSIX_ENTRY_LOWER_ADDR];
+     /* MSIs on Xen can be remapped into pirqs. In those cases, masking
+      * and unmasking go through the PV evtchn path. */
+-    if (xen_enabled() && xen_is_pirq_msi(pci_get_long(data))) {
++    if (xen_enabled() && xen_is_pirq_msi(pci_get_long(addr_lo),
++                                         pci_get_long(data))) {
+         return false;
+     }
+     return fmask || dev->msix_table[offset + PCI_MSIX_ENTRY_VECTOR_CTRL] &
 diff --git a/hw/xen/xen_pt_msi.c b/hw/xen/xen_pt_msi.c
-index 62add06..26a69d9 100644
+index 26a69d9..68da0e4 100644
 --- a/hw/xen/xen_pt_msi.c
 +++ b/hw/xen/xen_pt_msi.c
-@@ -163,16 +163,23 @@ static int msi_msix_update(XenPCIPassthroughState *s,
-     int rc = 0;
-     uint64_t table_addr = 0;
+@@ -114,7 +114,7 @@ static int msi_msix_setup(XenPCIPassthroughState *s,
  
--    XEN_PT_LOG(d, "Updating MSI%s with pirq %d gvec %#x gflags %#x"
--               " (entry: %#x)\n",
--               is_msix ? "-X" : "", pirq, gvec, gflags, msix_entry);
--
-     if (is_msix) {
-         table_addr = s->msix->mmio_base_addr;
-     }
+     assert((!is_msix && msix_entry == 0) || is_msix);
  
--    rc = xc_domain_update_msi_irq(xen_xc, xen_domid, gvec,
--                                  pirq, gflags, table_addr);
-+    if (addr & MSI_ADDR_IF_MASK) {
-+        XEN_PT_LOG(d, "Updating MSI%s with addr %#" PRIx64 " data %#x\n",
-+                   is_msix ? "-X" : "", addr, data);
-+        rc = xc_domain_update_msi_irq_remapping(xen_xc, xen_domid, pirq,
-+                                             d->devfn, data, addr, table_addr);
-+    } else {
-+        XEN_PT_LOG(d, "Updating MSI%s with pirq %d gvec %#x gflags %#x"
-+                   " (entry: %#x)\n",
-+                   is_msix ? "-X" : "", pirq, gvec, gflags, msix_entry);
-+
-+        rc = xc_domain_update_msi_irq(xen_xc, xen_domid, gvec,
-+                                      pirq, gflags, table_addr);
-+    }
+-    if (xen_is_pirq_msi(data)) {
++    if (xen_is_pirq_msi(addr, data)) {
+         *ppirq = msi_ext_dest_id(addr >> 32) | msi_dest_id(addr);
+         if (!*ppirq) {
+             /* this probably identifies an misconfiguration of the guest,
+diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
+index a8f3afb..b1ef41e 100644
+--- a/include/hw/xen/xen.h
++++ b/include/hw/xen/xen.h
+@@ -33,7 +33,7 @@ int xen_pci_slot_get_pirq(PCIDevice *pci_dev, int irq_num);
+ void xen_piix3_set_irq(void *opaque, int irq_num, int level);
+ void xen_piix_pci_write_config_client(uint32_t address, uint32_t val, int len);
+ void xen_hvm_inject_msi(uint64_t addr, uint32_t data);
+-int xen_is_pirq_msi(uint32_t msi_data);
++int xen_is_pirq_msi(uint32_t msi_addr_lo, uint32_t msi_data);
  
-     if (rc) {
-         XEN_PT_ERR(d, "Updating of MSI%s failed. (err: %d)\n",
-@@ -204,13 +211,30 @@ static int msi_msix_disable(XenPCIPassthroughState *s,
-     }
+ qemu_irq *xen_interrupt_controller_init(void);
  
-     if (is_binded) {
--        XEN_PT_LOG(d, "Unbind MSI%s with pirq %d, gvec %#x\n",
--                   is_msix ? "-X" : "", pirq, gvec);
--        rc = xc_domain_unbind_msi_irq(xen_xc, xen_domid, gvec, pirq, gflags);
--        if (rc) {
--            XEN_PT_ERR(d, "Unbinding of MSI%s failed. (err: %d, pirq: %d, gvec: %#x)\n",
--                       is_msix ? "-X" : "", errno, pirq, gvec);
--            return rc;
-+        if (addr & MSI_ADDR_IF_MASK) {
-+            XEN_PT_LOG(d, "Unbinding of MSI%s . ( pirq: %d, data: %x, "
-+                       "addr: %#" PRIx64 ")\n",
-+                       is_msix ? "-X" : "", pirq, data, addr);
-+            rc = xc_domain_unbind_msi_irq_remapping(xen_xc, xen_domid, pirq,
-+                                                    d->devfn, data, addr);
-+            if (rc) {
-+                XEN_PT_ERR(d, "Unbinding of MSI%s . (error: %d, pirq: %d, "
-+                           "data: %x, addr: %#" PRIx64 ")\n",
-+                           is_msix ? "-X" : "", rc, pirq, data, addr);
-+                return rc;
-+            }
-+
-+        } else {
-+            XEN_PT_LOG(d, "Unbind MSI%s with pirq %d, gvec %#x\n",
-+                       is_msix ? "-X" : "", pirq, gvec);
-+            rc = xc_domain_unbind_msi_irq(xen_xc, xen_domid, gvec,
-+                                          pirq, gflags);
-+            if (rc) {
-+                XEN_PT_ERR(d, "Unbinding of MSI%s failed. (err: %d, pirq: %d, "
-+                           "gvec: %#x)\n",
-+                           is_msix ? "-X" : "", errno, pirq, gvec);
-+                return rc;
-+            }
-         }
-     }
- 
-diff --git a/include/hw/i386/apic-msidef.h b/include/hw/i386/apic-msidef.h
-index 420b411..a2b52d9 100644
---- a/include/hw/i386/apic-msidef.h
-+++ b/include/hw/i386/apic-msidef.h
-@@ -27,5 +27,6 @@
- #define MSI_ADDR_DEST_ID_SHIFT          12
- #define MSI_ADDR_DEST_IDX_SHIFT         4
- #define  MSI_ADDR_DEST_ID_MASK          0x000ff000
-+#define  MSI_ADDR_IF_MASK               0x00000010
- 
- #endif /* HW_APIC_MSIDEF_H */
-diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
-index 8e1580d..4ba43a8 100644
---- a/include/hw/xen/xen_common.h
-+++ b/include/hw/xen/xen_common.h
-@@ -438,4 +438,29 @@ static inline int xengnttab_grant_copy(xengnttab_handle *xgt, uint32_t count,
+diff --git a/xen-hvm-stub.c b/xen-hvm-stub.c
+index c500325..a3a3bb3 100644
+--- a/xen-hvm-stub.c
++++ b/xen-hvm-stub.c
+@@ -31,7 +31,7 @@ void xen_hvm_inject_msi(uint64_t addr, uint32_t data)
+ {
  }
- #endif
  
-+/* Xen before 4.10 */
-+#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 4100
-+
-+static inline int xc_domain_update_msi_irq_remapping(xc_interface *xc,
-+                                                     uint32_t domid,
-+                                                     uint32_t pirq,
-+                                                     uint32_t source_id,
-+                                                     uint32_t data,
-+                                                     uint64_t addr,
-+                                                     uint64_t gtable)
-+{
-+    return -ENOSYS;
-+}
-+
-+static inline int xc_domain_unbind_msi_irq_remapping(xc_interface *xc,
-+                                                     uint32_t domid,
-+                                                     uint32_t pirq,
-+                                                     uint32_t source_id,
-+                                                     uint32_t data,
-+                                                     uint64_t addr)
-+{
-+    return -ENOSYS;
-+}
-+#endif
-+
- #endif /* QEMU_HW_XEN_COMMON_H */
+-int xen_is_pirq_msi(uint32_t msi_data)
++int xen_is_pirq_msi(uint32_t msi_addr_lo, uint32_t msi_data)
+ {
+     return 0;
+ }
+diff --git a/xen-hvm.c b/xen-hvm.c
+index 0892361..9f1a7bd 100644
+--- a/xen-hvm.c
++++ b/xen-hvm.c
+@@ -146,8 +146,14 @@ void xen_piix_pci_write_config_client(uint32_t address, uint32_t val, int len)
+     }
+ }
+ 
+-int xen_is_pirq_msi(uint32_t msi_data)
++int xen_is_pirq_msi(uint32_t msi_addr_lo, uint32_t msi_data)
+ {
++    /* If the MSI address is configured in remapping format, the MSI will not
++     * be remapped into a pirq.
++     */
++    if (msi_addr_lo & MSI_ADDR_IF_MASK) {
++        return 0;
++    }
+     /* If vector is 0, the msi is remapped into a pirq, passed as
+      * dest_id.
+      */
 -- 
 1.8.3.1
