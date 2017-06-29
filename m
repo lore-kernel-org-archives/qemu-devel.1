@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34425)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dQhQL-0005kz-JF
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 17:56:30 -0400
+	(envelope-from <zuban32s@gmail.com>) id 1dQhQN-0005mN-6X
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 17:56:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dQhQK-0000Sg-Mr
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 17:56:29 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:34991)
+	(envelope-from <zuban32s@gmail.com>) id 1dQhQM-0000TT-5E
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 17:56:31 -0400
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:34533)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dQhQK-0000Rs-Bk
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 17:56:28 -0400
-Received: by mail-lf0-x242.google.com with SMTP id n136so8680281lfn.2
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 14:56:28 -0700 (PDT)
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dQhQL-0000Sq-R4
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 17:56:30 -0400
+Received: by mail-lf0-x241.google.com with SMTP id g21so8706656lfk.1
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 14:56:29 -0700 (PDT)
 From: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Date: Fri, 30 Jun 2017 00:56:01 +0300
-Message-Id: <1498773362-18675-6-git-send-email-zuban32s@gmail.com>
+Date: Fri, 30 Jun 2017 00:56:02 +0300
+Message-Id: <1498773362-18675-7-git-send-email-zuban32s@gmail.com>
 In-Reply-To: <1498773362-18675-1-git-send-email-zuban32s@gmail.com>
 References: <1498773362-18675-1-git-send-email-zuban32s@gmail.com>
-Subject: [Qemu-devel] [PATCH RFC 5/6] hw/acpi: extend acpi pci hotplug
- support for pci express
+Subject: [Qemu-devel] [PATCH RFC 6/6] hw/ich9: enable acpi pci hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,155 +30,172 @@ Cc: marcel@redhat.com, mst@redhat.com, imammedo@redhat.com, pbonzini@redhat.com,
 
 Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
 ---
- hw/i386/acpi-build.c | 47 +++++++++++++++++++++++++++++++----------------
- 1 file changed, 31 insertions(+), 16 deletions(-)
+ hw/acpi/ich9.c         | 31 +++++++++++++++++++++++++++++++
+ hw/isa/lpc_ich9.c      | 12 ++++++++++++
+ include/hw/acpi/ich9.h |  4 ++++
+ include/hw/i386/pc.h   |  7 ++++++-
+ 4 files changed, 53 insertions(+), 1 deletion(-)
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index e434efe..8bbece5 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -254,6 +254,11 @@ static void acpi_get_pci_holes(Range *hole, Range *hole64)
-                                               NULL));
+diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
+index 5c279bb..25339eb 100644
+--- a/hw/acpi/ich9.c
++++ b/hw/acpi/ich9.c
+@@ -258,6 +258,7 @@ static void pm_reset(void *opaque)
+     }
+     pm->smi_en_wmask = ~0;
+ 
++    acpi_pcihp_reset(&pm->acpi_pci_hotplug);
+     acpi_update_sci(&pm->acpi_regs, pm->irq);
  }
  
-+static void acpi_test_pci_bus(PCIBus *bus, void *opaque)
+@@ -301,6 +302,10 @@ void ich9_pm_init(PCIDevice *lpc_pci, ICH9LPCPMRegs *pm,
+     pm->powerdown_notifier.notify = pm_powerdown_req;
+     qemu_register_powerdown_notifier(&pm->powerdown_notifier);
+ 
++    acpi_pcihp_init(OBJECT(lpc_pci), &pm->acpi_pci_hotplug, lpc_pci->bus,
++                    pci_address_space_io(lpc_pci),
++                    pm->use_acpi_pci_hotplug);
++
+     legacy_acpi_cpu_hotplug_init(pci_address_space_io(lpc_pci),
+         OBJECT(lpc_pci), &pm->gpe_cpu, ICH9_CPU_HOTPLUG_IO_BASE);
+ 
+@@ -335,6 +340,21 @@ static void ich9_pm_set_memory_hotplug_support(Object *obj, bool value,
+     s->pm.acpi_memory_hotplug.is_enabled = value;
+ }
+ 
++static bool ich9_pm_get_acpi_pci_hotplug_support(Object *obj, Error **errp)
 +{
-+    *(bool *)opaque |= !pci_bus_is_express(bus);
++    ICH9LPCState *s = ICH9_LPC_DEVICE(obj);
++
++    return s->pm.use_acpi_pci_hotplug;
 +}
 +
- #define ACPI_PORT_SMI_CMD           0x00b2 /* TODO: this is APM_CNT_IOPORT */
- 
- static void acpi_align_size(GArray *blob, unsigned align)
-@@ -489,7 +494,7 @@ static void *acpi_set_bsel(PCIBus *bus, void *opaque)
-     unsigned *bsel_alloc = opaque;
-     unsigned *bus_bsel;
- 
--    if (qbus_is_hotpluggable(BUS(bus))) {
-+    if (qbus_is_hotpluggable(BUS(bus)) && !pci_bus_is_express(bus)) {
-         bus_bsel = g_malloc(sizeof *bus_bsel);
- 
-         *bus_bsel = (*bsel_alloc)++;
-@@ -500,15 +505,12 @@ static void *acpi_set_bsel(PCIBus *bus, void *opaque)
-     return bsel_alloc;
- }
- 
--static void acpi_set_pci_info(void)
-+static void acpi_set_pci_info(PCIBus *bus)
- {
--    PCIBus *bus = find_i440fx(); /* TODO: Q35 support */
-     unsigned bsel_alloc = ACPI_PCIHP_BSEL_DEFAULT;
- 
--    if (bus) {
--        /* Scan all PCI buses. Set property to enable acpi based hotplug. */
--        pci_for_each_bus_depth_first(bus, acpi_set_bsel, NULL, &bsel_alloc);
--    }
-+    /* Scan all PCI buses. Set property to enable acpi based hotplug. */
-+    pci_for_each_bus_depth_first(bus, acpi_set_bsel, NULL, &bsel_alloc);
- }
- 
- static void build_append_pcihp_notify_entry(Aml *method, int slot)
-@@ -570,7 +572,7 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
-          * In this case they aren't themselves hot-pluggable.
-          * Hotplugged bridges *are* hot-pluggable.
-          */
--        bridge_in_acpi = pc->is_bridge && pcihp_bridge_en &&
-+        bridge_in_acpi = pc->is_bridge && !pc->is_express && pcihp_bridge_en &&
-             !DEVICE(pdev)->hotplugged;
- 
-         hotplug_enabled_dev = bsel && dc->hotpluggable && !bridge_in_acpi;
-@@ -1787,7 +1789,7 @@ static void build_piix4_isa_bridge(Aml *table)
-     aml_append(table, scope);
- }
- 
--static void build_piix4_pci_hotplug(Aml *table)
-+static void build_acpi_pci_hotplug(Aml *table)
- {
-     Aml *scope;
-     Aml *field;
-@@ -1889,6 +1891,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-     uint32_t nr_mem = machine->ram_slots;
-     int root_bus_limit = 0xFF;
-     PCIBus *root_bus = NULL;
-+    bool has_pci_bus = false;
-     int i;
- 
-     dsdt = init_aml_allocator();
-@@ -1910,7 +1913,6 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-         build_piix4_pm(dsdt);
-         build_piix4_isa_bridge(dsdt);
-         build_isa_devices_aml(dsdt);
--        build_piix4_pci_hotplug(dsdt);
-         build_piix4_pci0_int(dsdt);
-     } else {
-         sb_scope = aml_scope("_SB");
-@@ -1932,6 +1934,11 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-     root_bus = PC_MACHINE(machine)->bus;
-     assert(root_bus);
- 
-+    pci_for_each_bus(root_bus, acpi_test_pci_bus, &has_pci_bus);
-+    if (pm->pcihp_bridge_en && has_pci_bus) {
-+        build_acpi_pci_hotplug(dsdt);
-+    }
++static void ich9_pm_set_acpi_pci_hotplug_support(Object *obj, bool value,
++                                                 Error **errp)
++{
++    ICH9LPCState *s = ICH9_LPC_DEVICE(obj);
 +
-     if (pcmc->legacy_cpu_hotplug) {
-         build_legacy_cpu_hotplug_aml(dsdt, machine, pm->cpu_hp_io_base);
-     } else {
-@@ -1947,7 +1954,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-     {
-         aml_append(scope, aml_name_decl("_HID", aml_string("ACPI0006")));
- 
--        if (misc->is_piix4) {
-+        if (pm->pcihp_bridge_en && has_pci_bus) {
-             method = aml_method("_E01", 0, AML_NOTSERIALIZED);
-             aml_append(method,
-                 aml_acquire(aml_name("\\_SB.PCI0.BLCK"), 0xFFFF));
-@@ -2080,7 +2087,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-     crs_range_set_free(&crs_range_set);
- 
-     /* reserve PCIHP resources */
--    if (pm->pcihp_io_len) {
-+    if (pm->pcihp_bridge_en && has_pci_bus && pm->pcihp_io_len) {
-         dev = aml_device("PHPR");
-         aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A06")));
-         aml_append(dev,
-@@ -2212,8 +2219,13 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-     sb_scope = aml_scope("\\_SB");
-     {
-         Aml *scope = aml_scope("PCI0");
--        /* Scan all PCI buses. Generate tables to support hotplug. */
--        build_append_pci_bus_devices(scope, root_bus, pm->pcihp_bridge_en);
-+        bool scope_used = false;
++    s->pm.use_acpi_pci_hotplug = value;
++}
 +
-+        if (pm->pcihp_bridge_en && has_pci_bus) {
-+            /* Scan all PCI buses. Generate tables to support hotplug. */
-+            build_append_pci_bus_devices(scope, root_bus, pm->pcihp_bridge_en);
-+            scope_used = true;
-+        }
- 
-         if (misc->tpm_version != TPM_VERSION_UNSPEC) {
-             dev = aml_device("ISA.TPM");
-@@ -2230,9 +2242,12 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-             /* aml_append(crs, aml_irq_no_flags(TPM_TIS_IRQ)); */
-             aml_append(dev, aml_name_decl("_CRS", crs));
-             aml_append(scope, dev);
-+            scope_used = true;
+ static bool ich9_pm_get_cpu_hotplug_legacy(Object *obj, Error **errp)
+ {
+     ICH9LPCState *s = ICH9_LPC_DEVICE(obj);
+@@ -446,6 +466,7 @@ void ich9_pm_add_properties(Object *obj, ICH9LPCPMRegs *pm, Error **errp)
+ {
+     static const uint32_t gpe0_len = ICH9_PMIO_GPE0_LEN;
+     pm->acpi_memory_hotplug.is_enabled = true;
++    pm->use_acpi_pci_hotplug = true;
+     pm->cpu_hotplug_legacy = true;
+     pm->disable_s3 = 0;
+     pm->disable_s4 = 0;
+@@ -462,6 +483,10 @@ void ich9_pm_add_properties(Object *obj, ICH9LPCPMRegs *pm, Error **errp)
+                              ich9_pm_get_memory_hotplug_support,
+                              ich9_pm_set_memory_hotplug_support,
+                              NULL);
++    object_property_add_bool(obj, "acpi-pci-hotplug-with-bridge-support",
++                             ich9_pm_get_acpi_pci_hotplug_support,
++                             ich9_pm_set_acpi_pci_hotplug_support,
++                             NULL);
+     object_property_add_bool(obj, "cpu-hotplug-legacy",
+                              ich9_pm_get_cpu_hotplug_legacy,
+                              ich9_pm_set_cpu_hotplug_legacy,
+@@ -497,6 +522,9 @@ void ich9_pm_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+             acpi_memory_plug_cb(hotplug_dev, &lpc->pm.acpi_memory_hotplug,
+                                 dev, errp);
          }
++    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
++        acpi_pcihp_device_plug_cb(hotplug_dev, &lpc->pm.acpi_pci_hotplug,
++                                  dev, errp);
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+         if (lpc->pm.cpu_hotplug_legacy) {
+             legacy_acpi_cpu_plug_cb(hotplug_dev, &lpc->pm.gpe_cpu, dev, errp);
+@@ -519,6 +547,9 @@ void ich9_pm_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+         acpi_memory_unplug_request_cb(hotplug_dev,
+                                       &lpc->pm.acpi_memory_hotplug, dev,
+                                       errp);
++    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
++        acpi_pcihp_device_unplug_cb(hotplug_dev, &lpc->pm.acpi_pci_hotplug,
++                                    dev, errp);
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
+                !lpc->pm.cpu_hotplug_legacy) {
+         acpi_cpu_unplug_request_cb(hotplug_dev, &lpc->pm.cpuhp_state,
+diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
+index e2215dc..13574d0 100644
+--- a/hw/isa/lpc_ich9.c
++++ b/hw/isa/lpc_ich9.c
+@@ -33,6 +33,7 @@
+ #include "hw/hw.h"
+ #include "qapi/visitor.h"
+ #include "qemu/range.h"
++#include "qapi/error.h"
+ #include "hw/isa/isa.h"
+ #include "hw/sysbus.h"
+ #include "hw/i386/pc.h"
+@@ -574,6 +575,15 @@ static const MemoryRegionOps rcrb_mmio_ops = {
+     .endianness = DEVICE_LITTLE_ENDIAN,
+ };
  
--        aml_append(sb_scope, scope);
-+        if (scope_used) {
-+            aml_append(sb_scope, scope);
-+        }
++static void ich9_update_bus_hotplug(PCIBus *pci_bus, void *opaque)
++{
++    ICH9LPCState *s = opaque;
++
++    if (!pci_bus_is_express(pci_bus)) {
++        qbus_set_hotplug_handler(BUS(pci_bus), DEVICE(s), &error_abort);
++    }
++}
++
+ static void ich9_lpc_machine_ready(Notifier *n, void *opaque)
+ {
+     ICH9LPCState *s = container_of(n, ICH9LPCState, machine_ready);
+@@ -597,6 +607,8 @@ static void ich9_lpc_machine_ready(Notifier *n, void *opaque)
+         /* floppy */
+         pci_conf[0x82] |= 0x08;
      }
-     aml_append(dsdt, sb_scope);
++
++    pci_for_each_bus(s->d.bus, ich9_update_bus_hotplug, s);
+ }
  
-@@ -2866,7 +2881,7 @@ void acpi_setup(void)
+ /* reset control */
+diff --git a/include/hw/acpi/ich9.h b/include/hw/acpi/ich9.h
+index a352c94..e1df363 100644
+--- a/include/hw/acpi/ich9.h
++++ b/include/hw/acpi/ich9.h
+@@ -22,6 +22,7 @@
+ #define HW_ACPI_ICH9_H
  
-     build_state = g_malloc0(sizeof *build_state);
+ #include "hw/acpi/acpi.h"
++#include "hw/acpi/pcihp.h"
+ #include "hw/acpi/cpu_hotplug.h"
+ #include "hw/acpi/cpu.h"
+ #include "hw/acpi/memory_hotplug.h"
+@@ -55,6 +56,9 @@ typedef struct ICH9LPCPMRegs {
  
--    acpi_set_pci_info();
-+    acpi_set_pci_info(pcms->bus);
+     MemHotplugState acpi_memory_hotplug;
  
-     acpi_build_tables_init(&tables);
-     acpi_build(&tables, MACHINE(pcms));
++    AcpiPciHpState acpi_pci_hotplug;
++    bool use_acpi_pci_hotplug;
++
+     uint8_t disable_s3;
+     uint8_t disable_s4;
+     uint8_t s4_val;
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index e447f5d..0d4e8b2 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -464,7 +464,12 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+     },
+ 
+ #define PC_COMPAT_2_5 \
+-    HW_COMPAT_2_5
++    HW_COMPAT_2_5 \
++    {\
++        .driver   = "ICH9-LPC",\
++        .property = "acpi-pci-hotplug-with-bridge-support",\
++        .value    = "off",\
++    },
+ 
+ /* Helper for setting model-id for CPU models that changed model-id
+  * depending on QEMU versions up to QEMU 2.4.
 -- 
 2.7.4
