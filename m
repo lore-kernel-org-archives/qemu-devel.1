@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dQYls-0005vR-Fa
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 08:42:12 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dQYnD-0006ch-0P
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 08:43:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dQYlm-0008Tf-CJ
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 08:42:08 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Thu, 29 Jun 2017 15:41:44 +0300
-Message-Id: <149874010452.9180.5182724462159161565.stgit@frigg.lan>
-In-Reply-To: <149873841036.9180.16600465902334229930.stgit@frigg.lan>
-References: <149873841036.9180.16600465902334229930.stgit@frigg.lan>
+	(envelope-from <peter.maydell@linaro.org>) id 1dQYnC-0001su-6e
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 08:43:31 -0400
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:34138)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dQYnB-0001rf-VU
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 08:43:30 -0400
+Received: by mail-wr0-x22b.google.com with SMTP id 77so188935374wrb.1
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 05:43:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <44cd89c9-bd70-874d-f2bf-f51a9b4170c3@amsat.org>
+References: <1498728533-23160-1-git-send-email-frederic.konrad@adacore.com>
+	<1498728533-23160-4-git-send-email-frederic.konrad@adacore.com>
+	<44cd89c9-bd70-874d-f2bf-f51a9b4170c3@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 29 Jun 2017 13:43:08 +0100
+Message-ID: <CAFEAcA80LV1pX9D==ednuc3p5-sHv7MMhtnLYtKN7VNTC9Zr8Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v10 7/7] trace: [trivial] Statically enable all
- guest events
+Subject: Re: [Qemu-devel] [PATCH v1 3/3] armv7m_systick: abort instead of
+ locking on a bad rate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,168 +32,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Emilio G. Cota" <cota@braap.org>, Eric Blake <eblake@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>, "open list:Trivial patches" <qemu-trivial@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: KONRAD Frederic <frederic.konrad@adacore.com>, QEMU Developers <qemu-devel@nongnu.org>, alistair@alistair23.me, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-The existing optimizations makes it feasible to have them available on al=
-l
-builds.
+On 29 June 2017 at 13:35, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
+te:
+> This is true it is better to abort here than risking a deadlock.
+>
+> However it seems to me they are 3 issues here:
+> - the deadlock pattern is caused by using a global variable,
+> - stellaris:ssys_calculate_system_clock() no checking RCC.SYSDIV and
+> RCC2.SYSDIV2 values <=3D 2 are reserved (GUEST_ERROR)
+> - stellaris:ssys_write(RCC2) not overrides correctly RCC
 
-Some quick'n'dirty numbers with 400.perlbench (SPECcpu2006) on the train =
-input
-(medium size - suns.pl) and the guest_mem_before event:
+Stellaris works fine. It's other ARMv7M boards (which might forget
+to set system_clock_scale) which don't work.
 
-* vanilla, statically disabled
-real    0m2,259s
-user    0m2,252s
-sys     0m0,004s
+> I'd rather take this opportunity to fix the deadlock pattern using a
+> getter/setter on system_clock_scale, doing the zero check in the setter a=
+nd
+> eventually aborting in the getter, what do you think?
 
-* vanilla, statically enabled (overhead: 2.18x)
-real    0m4,921s
-user    0m4,912s
-sys     0m0,008s
+We should be using a clock property on the CPU instead of system_clock_scal=
+e.
+Unfortunately Konrad's series attempting to add that infrastructure
+is still in the "trying to sort out the right API in code review"
+stage. I don't think it's worth trying to fiddle with the API
+for it before we have the right eventual infrastructure in place.
 
-* multi-tb, statically disabled (overhead: 0.99x) [within noise range]
-real    0m2,228s
-user    0m2,216s
-sys     0m0,008s
+(What system_clock_scale is actually doing is setting the
+emulated frequency of the CPU, since that affects the
+frequency of the timer.)
 
-* multi-tb, statically enabled (overhead: 0.99x) [within noise range]
-real    0m2,229s
-user    0m2,224s
-sys     0m0,004s
-
-
-Now enabling all events when booting an ARM system that immediately shuts=
- down
-(https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg04085.html):
-
-* vanilla, statically disabled
-real	0m32,153s
-user	0m31,276s
-sys	0m0,108s
-
-* vanilla, statically enabled (overhead: 1.35x)
-real	0m43,507s
-user	0m42,680s
-sys	0m0,168s
-
-* multi-tb, statically disabled (overhead: 1.03x)
-real	0m32,993s
-user	0m32,516s
-sys	0m0,104s
-
-* multi-tb, statically enabled (overhead: 1.00x) [within noise range]
-real	0m32,110s
-user	0m31,176s
-sys	0m0,156s
-
-
-And finally enabling all events using Emilio's dbt-bench
-(where orig =3D=3D vanilla, new =3D=3D multi-tb):
-
-                                                        NBench score; hig=
-her is better
-
-  180 +-+--------+----------+----------+---------+----------+----------+-=
----------+----------+----------+---------+----------+--------+-+
-      |                                                                  =
-                                                               |
-      |                                      *** $$$$%%                  =
-                                                  orig         |
-  160 +-+....................................*.*.$..$.%..................=
-..........................................orig-enabled       +-+
-      |                                      * * $  $ %                  =
-                                                   new         |
-  140 +-+....................................*.*.$..$.%..................=
-..........................................new-disabled.......+-+
-      |                                      * * $  $ %                  =
-                                                               |
-      |                                      * * $  $ %                  =
-                                                               |
-  120 +-+....................................*.*.$..$.%..................=
-.............................................................+-+
-      |                                      * * $  $ %                  =
-                                                               |
-      |                                      * * $  $ %                  =
-                                                               |
-  100 +-+....................................*.*.$..$.%.....$$$%%%.......=
-.............................................................+-+
-      |                                      * * $  $ % *** $ $  % *** $$=
-$%%                                                            |
-   80 +-+....................................*.*.$..$.%.*.*.$.$..%.*.*.$.=
-$.%..........................................................+-+
-      |                                      * * $  $ % * * $ $  % * * $ =
-$ %                                                            |
-      |                                      * * $  $ % * * $ $  % * * $ =
-$ %                                                            |
-   60 +-+.........................***..$$$%%.*.*##..$.%.*.*.$.$..%.*.*.$.=
-$.%..***.$$$%%...............................................+-+
-      |                **** $$$%% * *  $ $ % * * #  $ % * *## $  % * * $ =
-$ %  * * $ $ %                                                 |
-      |                *  * $ $ % * *  $ $ % * * #  $ % * * # $  % * *## =
-$ %  * * $ $ %                                                 |
-   40 +-+..............*..*.$.$.%.*.*..$.$.%.*.*.#..$.%.*.*.#.$..%.*.*.#.=
-$.%..*.*.$.$.%...............................................+-+
-      |                *  * $ $ % * *  $ $ % * * #  $ % * * # $  % * * # =
-$ %  * *## $ %                                  *** $$$%%%     |
-   20 +-+....***.$$$%%.*..*##.$.%.*.*###.$.%.*.*.#..$.%.*.*.#.$..%.*.*.#.=
-$.%..*.*.#.$.%..................................*.*.$.$..%...+-+
-      |      * *## $ % *  * # $ % * *  # $ % * * #  $ % * * # $  % * * # =
-$ %  * * # $ %                                  * *## $  %     |
-      |      * * # $ % *  * # $ % * *  # $ % * * #  $ % * * # $  % * * # =
-$ %  * * # $ %            ***###$$%% ***##$$$%% * * # $  %     |
-    0 +-+----***##$$%%-****##$$%%-***###$$%%-***##$$$%%-***##$$%%%-***##$=
-$%%--***##$$%%-****##$$%%-***###$$%%-***##$$$%%-***##$$%%%---+-+
-     NUMERIC SORTSTRING SORT   BITFIEFP EMULATION ASSIGNMENT       IDEA  =
-  HUFFMAN    FOURIER NEURLU DECOMPOSITION      gmean
-png: http://imgur.com/a/8XG5S
-
-
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
- trace-events |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/trace-events b/trace-events
-index bae63fdb1d..f9dbd7f509 100644
---- a/trace-events
-+++ b/trace-events
-@@ -106,7 +106,7 @@ vcpu guest_cpu_reset(void)
- #
- # Mode: user, softmmu
- # Targets: TCG(all)
--disable vcpu tcg guest_mem_before(TCGv vaddr, uint8_t info) "info=3D%d",=
- "vaddr=3D0x%016"PRIx64" info=3D%d"
-+vcpu tcg guest_mem_before(TCGv vaddr, uint8_t info) "info=3D%d", "vaddr=3D=
-0x%016"PRIx64" info=3D%d"
-=20
- # @num: System call number.
- # @arg*: System call argument value.
-@@ -115,7 +115,7 @@ disable vcpu tcg guest_mem_before(TCGv vaddr, uint8_t=
- info) "info=3D%d", "vaddr=3D0x
- #
- # Mode: user
- # Targets: TCG(all)
--disable vcpu guest_user_syscall(uint64_t num, uint64_t arg1, uint64_t ar=
-g2, uint64_t arg3, uint64_t arg4, uint64_t arg5, uint64_t arg6, uint64_t =
-arg7, uint64_t arg8) "num=3D0x%016"PRIx64" arg1=3D0x%016"PRIx64" arg2=3D0=
-x%016"PRIx64" arg3=3D0x%016"PRIx64" arg4=3D0x%016"PRIx64" arg5=3D0x%016"P=
-RIx64" arg6=3D0x%016"PRIx64" arg7=3D0x%016"PRIx64" arg8=3D0x%016"PRIx64
-+vcpu guest_user_syscall(uint64_t num, uint64_t arg1, uint64_t arg2, uint=
-64_t arg3, uint64_t arg4, uint64_t arg5, uint64_t arg6, uint64_t arg7, ui=
-nt64_t arg8) "num=3D0x%016"PRIx64" arg1=3D0x%016"PRIx64" arg2=3D0x%016"PR=
-Ix64" arg3=3D0x%016"PRIx64" arg4=3D0x%016"PRIx64" arg5=3D0x%016"PRIx64" a=
-rg6=3D0x%016"PRIx64" arg7=3D0x%016"PRIx64" arg8=3D0x%016"PRIx64
-=20
- # @num: System call number.
- # @ret: System call result value.
-@@ -124,4 +124,4 @@ disable vcpu guest_user_syscall(uint64_t num, uint64_=
-t arg1, uint64_t arg2, uint
- #
- # Mode: user
- # Targets: TCG(all)
--disable vcpu guest_user_syscall_ret(uint64_t num, uint64_t ret) "num=3D0=
-x%016"PRIx64" ret=3D0x%016"PRIx64
-+vcpu guest_user_syscall_ret(uint64_t num, uint64_t ret) "num=3D0x%016"PR=
-Ix64" ret=3D0x%016"PRIx64
+thanks
+-- PMM
