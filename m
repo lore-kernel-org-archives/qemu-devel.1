@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjhoupu@linux.vnet.ibm.com>) id 1dQY5D-0007jo-S3
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:58:09 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dQZxS-0007ry-Jn
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:58:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjhoupu@linux.vnet.ibm.com>) id 1dQY59-0007wm-Sw
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:58:03 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53755
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjhoupu@linux.vnet.ibm.com>)
-	id 1dQY59-0007wV-Ng
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:57:59 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v5TBrqho091540
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 07:57:58 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bd0ma96ja-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 07:57:58 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjhoupu@linux.vnet.ibm.com>;
-	Thu, 29 Jun 2017 12:57:57 +0100
-From: Pu Hou <bjhoupu@linux.vnet.ibm.com>
-Date: Thu, 29 Jun 2017 13:57:51 +0200
-Message-Id: <20170629115751.72337-1-bjhoupu@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH] cryptodev: fix two typos in error message
+	(envelope-from <kwolf@redhat.com>) id 1dQZxP-0001cu-Iw
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:58:10 -0400
+Date: Thu, 29 Jun 2017 15:57:49 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170629135749.GD4618@noname.redhat.com>
+References: <20170629060300.29869-1-el13635@mail.ntua.gr>
+	<20170629111824.GC4618@noname.redhat.com>
+	<20170629120741.lkjam3jrlse6jxq2@postretch>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="tjCHc7DPkfUGtrlw"
+Content-Disposition: inline
+In-Reply-To: <20170629120741.lkjam3jrlse6jxq2@postretch>
+Subject: Re: [Qemu-devel] [PATCH] block: fix bs->file leak in
+ bdrv_new_open_driver()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,44 +26,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, arei.gonglei@huawei.com
-Cc: pasic@linux.vnet.ibm.com, BAGRAMOV@de.ibm.com, Pu Hou <bjhoupu@linux.vnet.ibm.com>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-Currently we have the name of the backend 'cryptodev-builtin' misspelled
-as 'cryptdov-builtin' in two potentially user facing error messages.
-Let's fix this.
 
-Furthermore The second mention of 'cryptodev-builtin' omits 'backend'.
-Let's make things consistent by adding it.
+--tjCHc7DPkfUGtrlw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Reported-by: Timur Bagramov <BAGRAMOV@de.ibm.com>
-Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-Signed-off-by: Pu Hou <bjhoupu@linux.vnet.ibm.com>
----
- backends/cryptodev-builtin.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Am 29.06.2017 um 14:07 hat Manos Pitsidianakis geschrieben:
+> On Thu, Jun 29, 2017 at 01:18:24PM +0200, Kevin Wolf wrote:
+> >Am 29.06.2017 um 08:03 hat Manos Pitsidianakis geschrieben:
+> >>bdrv_open_driver() is called in two places, bdrv_new_open_driver() and
+> >>bdrv_open_common(). In the latter, failure cleanup in is in its caller,
+> >>bdrv_open_inherit(), which unrefs the bs->file of the failed driver open
+> >>if it exists. Let's check for this in bdrv_new_open_driver() as well.
+> >>
+> >>Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+> >>---
+> >> block.c | 3 +++
+> >> 1 file changed, 3 insertions(+)
+> >>
+> >>diff --git a/block.c b/block.c
+> >>index 694396281b..aeacd520e0 100644
+> >>--- a/block.c
+> >>+++ b/block.c
+> >>@@ -1165,6 +1165,9 @@ BlockDriverState *bdrv_new_open_driver(BlockDrive=
+r *drv, const char *node_name,
+> >>
+> >>     ret =3D bdrv_open_driver(bs, drv, node_name, bs->options, flags, e=
+rrp);
+> >>     if (ret < 0) {
+> >>+        if (bs->file !=3D NULL) {
+> >>+            bdrv_unref_child(bs, bs->file);
+> >>+        }
+> >>         QDECREF(bs->explicit_options);
+> >>         QDECREF(bs->options);
+> >>         bdrv_unref(bs);
+> >
+> >I think we should set bs->file =3D NULL here to remove the dangling
+> >pointer. I think it is never accessed anyway because of the
+> >bs->drv =3D NULL in the error path of bdrv_open_driver(), but better safe
+> >than sorry.
+>=20
+> You can't see it in the diff but after bdrv_unref(bs),
+> bdrv_new_open_driver returns NULL so there won't be any access to bs
+> anyway. And since bs is destroyed by bdrv_unref (its refcount is 1),
+> there's not really a point in setting bs->file =3D NULL.
 
-diff --git a/backends/cryptodev-builtin.c b/backends/cryptodev-builtin.c
-index 657c0ba2f3..4e619dfca8 100644
---- a/backends/cryptodev-builtin.c
-+++ b/backends/cryptodev-builtin.c
-@@ -70,7 +70,7 @@ static void cryptodev_builtin_init(
- 
-     if (queues != 1) {
-         error_setg(errp,
--                  "Only support one queue in cryptdov-builtin backend");
-+                  "Only support one queue in cryptodev-builtin backend");
-         return;
-     }
- 
-@@ -314,7 +314,7 @@ static int cryptodev_builtin_sym_operation(
- 
-     if (op_info->op_type == VIRTIO_CRYPTO_SYM_OP_ALGORITHM_CHAINING) {
-         error_setg(errp,
--               "Algorithm chain is unsupported for cryptdoev-builtin");
-+               "Algorithm chain is unsupported for cryptodev-builtin backend");
-         return -VIRTIO_CRYPTO_NOTSUPP;
-     }
- 
--- 
-2.11.2
+Yes, but bdrv_unref() doesn't have to expect inconsistent BDSes. It
+doesn't access bs->file currently when bs->drv =3D=3D NULL, but that's more
+by luck than by design.
+
+> >But what would you think about avoiding the code duplication and just
+> >moving the bdrv_unref_child() call from bdrv_open_inherit() down to
+> >bdrv_open_driver(), so that bdrv_new_open_driver() is automatically
+> >covered?
+>=20
+> The result would be the same, but this will cover future callers of
+> bdrv_open_driver. Should I submit a v2?
+
+I would prefer this, yes.
+
+> >And later we can maybe move it into the individual .bdrv_open
+> >implementations where it really belongs (whoever creates something is
+> >responsible for cleaning it up in error cases).
+>=20
+> freeing bs->file was recently removed from individual '.bdrv_open's
+> since bdrv_open_inherit takes care of it
+> (de234897b60e034ba94b307fc289e2dc692c9251). I think this is simpler
+> since a driver could neglect to free their bs->file whereas this is
+> a catchall solution.
+
+That commit just changed an inconsistent situation where some drivers
+did free it and other didn't. But we don't have to move it into the
+drivers, it's just an option. As long as bs->file is special cased for
+many other things, too, keeping it centrally might make sense.
+
+Kevin
+
+--tjCHc7DPkfUGtrlw
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJZVQddAAoJEH8JsnLIjy/WEtQQAJRVCaQyoqJOTBTJf7M+9xn7
+ZpmSD5v49TL30wr7Lu6WRuxBu4MKTjq98TjhkyUmG27EPC7JElwwHuImPyxJGp71
+uG21ach503t1uTCk210mZesw03sOBJl3AvDQKwY+0PG+NVtgs+5RERtLa/S85anL
+9B7UzTptRwC0HS/+UgfC+mXLWF6IZvu7yY6iiVS5284BnSLHbqllYPfDGF6JEt2T
+Gt9uJddf9RGYzvvLdCbw0IICIOByJT9iEkX5WsNgfqRssgRqFbnGagnsYJt8F8jN
+JjpeXSdTlA2fa+c71g5bblB9oUEARIjAnf5x3zt5FWpPIqjNBgMF+ZhKGDw0QpqH
+xq3DwIqmhsjmh2SRnsGT1eycgG2dXMAzitpRmgXxQdYSNiml1VnXLSlbus/Walo6
+fk/aab4bY3PkRZC85KBlmLYx9Kizz1Hkl1OIzgt91JPavNiRyGRbhJARWt3hpd4U
+orp80ujdY9+BupsTJ2RW4rQtu9ydr1V5AFRY/wT4KWP8YVClfGMbNwEJjcb0xB1R
+SrrS0Laix/YUHmv1tKO4K7w8QkMuGBCW0/m03C6ijDyK78Te+vVf/JjTc+Ch2Bq9
+Grsw6blyGeI3cFrzXgBfZSbs8CIBWDWELmqGeEC5ZCZynUHSRoBzwJfDA7fCfVLd
+8z72u2xJAWRMylJOIcAN
+=/SJx
+-----END PGP SIGNATURE-----
+
+--tjCHc7DPkfUGtrlw--
