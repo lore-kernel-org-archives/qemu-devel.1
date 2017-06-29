@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46541)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dQcnV-0004NI-SH
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 13:00:10 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dQcpw-0006QB-9V
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 13:02:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dQcnS-0008Ss-Nt
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 13:00:05 -0400
-Received: from 8.mo5.mail-out.ovh.net ([178.32.116.78]:54058)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dQcnS-0008RY-HH
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 13:00:02 -0400
-Received: from player799.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 820F210E9A4
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 18:59:59 +0200 (CEST)
-Date: Thu, 29 Jun 2017 18:59:56 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170629185956.4907c616@bahia.lan>
-In-Reply-To: <CAFEAcA_nEPOV25nimO1w2K51G7ooaRUseSwwy=Vc-gvFv2AkTA@mail.gmail.com>
-References: <1498743831-28676-1-git-send-email-groug@kaod.org>
-	<CAFEAcA_nEPOV25nimO1w2K51G7ooaRUseSwwy=Vc-gvFv2AkTA@mail.gmail.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dQcpv-0001Od-KG
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 13:02:36 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170629010300.2848-1-f4bug@amsat.org>
+	<20170629010300.2848-6-f4bug@amsat.org>
+	<9403a3d0-41f6-add2-04fd-12034fe7699a@redhat.com>
+	<ecb12a15-5b0c-67ef-18ad-e627b591148e@weilnetz.de>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <280da99b-50a7-85fe-8f3e-0432adf8bed6@amsat.org>
+Date: Thu, 29 Jun 2017 14:02:24 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/kWQjCqQLSLqo4o4m1QIxt5w";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PULL 0/8] 9pfs patches for 2.10 20170629
+In-Reply-To: <ecb12a15-5b0c-67ef-18ad-e627b591148e@weilnetz.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH RESEND 5/8] tcg/tci: enable bswap16_i64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,85 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Stefan Weil <sw@weilnetz.de>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, "Emilio G . Cota" <cota@braap.org>, QEMU Trivial <qemu-trivial@nongnu.org>
 
---Sig_/kWQjCqQLSLqo4o4m1QIxt5w
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+On 06/29/2017 01:52 PM, Stefan Weil wrote:
+> Am 29.06.2017 um 18:29 schrieb Eric Blake:
+>> On 06/28/2017 08:02 PM, Philippe Mathieu-Daudé wrote:
+>>> remove some copy/paste leftover, code seems sane.
+>>>
+>>
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>
+>> Double-sob seems odd.
+> 
+> Maybe that double SOB can be cleaned by qemu-trivial (cc'ed).
+> 
+>>
+>>> ---
+>>>   tcg/tci.c | 1 -
+>>>   1 file changed, 1 deletion(-)
+>>>
+>>
+>> Otherwise,
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>>
+> 
+> Note from the author: it's not a copy/paste leftover, but was
+> there on purpose: that code part was simply never executed
+> before, and I only removed the TODO() statements from tested
+> code.
 
-On Thu, 29 Jun 2017 17:00:51 +0100
-Peter Maydell <peter.maydell@linaro.org> wrote:
+I'll reword the commit message in my tci-fixes-for-2.10-v2 series.
 
-> On 29 June 2017 at 14:43, Greg Kurz <groug@kaod.org> wrote:
-> > The following changes since commit 464588675455afda2899e20a0b120e4075de=
-50c7:
-> >
-> >   Merge remote-tracking branch 'remotes/sstabellini/tags/xen-20170627-t=
-ag' into staging (2017-06-29 11:45:01 +0100)
-> >
-> > are available in the git repository at:
-> >
-> >   https://github.com/gkurz/qemu.git tags/for-upstream
-> >
-> > for you to fetch changes up to 06a37db7b12e4d42a6699c2fef820158f470ec4f:
-> >
-> >   9pfs: handle transport errors in pdu_complete() (2017-06-29 15:11:51 =
-+0200)
-> >
-> > ----------------------------------------------------------------
-> > - fixes a minor bug that could possibly prevent old guests to remove
-> >   directories
-> > - makes default permissions for new files configurable from the cmdline
-> >   when using mapped security modes
-> > - handle transport errors
-> > - g_malloc()+memcpy() converted to g_memdup()
-> >
-> > ----------------------------------------------------------------
-> > Bruce Rogers (1):
-> >       9pfs: local: remove: use correct path component
-> >
-> > Greg Kurz (4):
-> >       virtio-9p: record element after sanity checks
-> >       virtio-9p: message header is 7-byte long
-> >       virtio-9p: break device if buffers are misconfigured
-> >       9pfs: handle transport errors in pdu_complete()
-> >
-> > Marc-Andr=C3=A9 Lureau (1):
-> >       9pfs: replace g_malloc()+memcpy() with g_memdup()
-> >
-> > Stefano Stabellini (1):
-> >       xen-9pfs: disconnect if buffers are misconfigured
-> >
-> > Tobias Schramm (1):
-> >       9pfs: local: Add support for custom fmode/dmode in 9ps mapped sec=
-urity modes
-> > =20
->=20
-> Applied, thanks.
->=20
+> So you are the first one who found a test case. Congratulations.
 
-Thanks but I just realize I forgot to add my Signed-off-by to patch 3/8... =
-:-\
+Oh nice :)
 
-Sorry.
+> Reviewed-by: Stefan Weil <sw@weilnetz.de>
 
---
-Greg
-
-> -- PMM
-
-
---Sig_/kWQjCqQLSLqo4o4m1QIxt5w
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAllVMgwACgkQAvw66wEB28JsZQCfSRweAQztmPBxSOCaFmgtWh1g
-mJQAn3eGMqs5G0ebPTgpPLpAIwBxwj1Q
-=RPh8
------END PGP SIGNATURE-----
-
---Sig_/kWQjCqQLSLqo4o4m1QIxt5w--
+Thank.
