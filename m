@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42131)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1dQcZO-0000Cz-FJ
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:45:31 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dQcaE-0000dp-7f
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:46:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1dQcZK-0000QA-FI
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:45:30 -0400
-Received: from mail.weilnetz.de ([37.120.169.71]:36862
-	helo=v2201612906741603.powersrv.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1dQcZK-0000Pq-8a
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:45:26 -0400
-References: <20170629010300.2848-1-f4bug@amsat.org>
-	<0e0d7ae6-5c1e-5c54-9d09-ef03e600b87e@redhat.com>
-	<98d49899-a2d8-8ecc-70ac-becc5252ae32@redhat.com>
-	<dd63346e-e200-c2d1-c109-78dc57fcffc7@redhat.com>
-	<db5c43ba-10b1-9fce-30e6-c40368ecc46c@redhat.com>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <4810736b-7bf7-9494-c1a7-73f246b86cc4@weilnetz.de>
-Date: Thu, 29 Jun 2017 18:45:24 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1dQcaD-0000le-98
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:46:22 -0400
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:33650)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dQcaC-0000lJ-Uh
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:46:21 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id z75so20073219wmc.0
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 09:46:20 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <db5c43ba-10b1-9fce-30e6-c40368ecc46c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 0/8] removal of tci (tcg interpreter)
+In-Reply-To: <7e7d94ce-a33c-6253-8dcf-475e93fe388f@adacore.com>
+References: <1498728533-23160-1-git-send-email-frederic.konrad@adacore.com>
+	<1498728533-23160-3-git-send-email-frederic.konrad@adacore.com>
+	<CAFEAcA-tuehYiJkYo148N0VPJ3hwhcxYDDersmbs4TOqxQCEKw@mail.gmail.com>
+	<7e7d94ce-a33c-6253-8dcf-475e93fe388f@adacore.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 29 Jun 2017 17:45:59 +0100
+Message-ID: <CAFEAcA_EcMOQ6afbmZK1jYUuWGzAUzj8AKRLvoDEsezsQkPYzA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 2/3] arm: fix the armv7m reset state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +31,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, "Emilio G . Cota" <cota@braap.org>, Peter Maydell <peter.maydell@linaro.org>
+To: KONRAD Frederic <frederic.konrad@adacore.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, alistair@alistair23.me
 
-Am 29.06.2017 um 17:47 schrieb Paolo Bonzini:
->=20
->=20
-> On 29/06/2017 17:46, Thomas Huth wrote:
->>> TCI is enabled only with a specific configure argument if your machin=
-e
->>> is not supported by TCG.  This would break _build_ configurations, no=
-t
->>> user configurations.  It's a remote possibility that users are buildi=
-ng
->>> their own QEMU, with TCI enabled, to work around a TCG bug.  So we ca=
-n
->>> be more speedy in removing the code.
->> You never know ... it's unlikely, but there might be people around who
->> run configure with "--enable-tcg-interpreter" on purpose.
->=20
-> And they have never reported a bug? :)  But I agree it's not a big deal=
-.
->  Richard should decide.
->=20
-> Paolo
+On 29 June 2017 at 17:41, KONRAD Frederic <frederic.konrad@adacore.com> wrote:
+> On 06/29/2017 05:14 PM, Peter Maydell wrote:
+>> This is awkward, because in the "we have a ROM but it's not been
+>> copied into memory yet" case, the only thing we have is the
+>> rom->addr, which is the address which the user's ROM blob said
+>> it ought to be loaded in at. If the user didn't actually provide
+>> a ROM blob that loads at 0 that seems a bit like a user error,
+>> and I don't think this patch will catch all the cases of that
+>> sort of mistake.
+>
+>
+> I don't think it's really a user mistake because on the real HW
+> the alias is configurable.. at least in my case.
+>
+> There is a "jumper" setting to mirror either the Flash or the
+> SRAM, etc. So the binaries isn't located at 0 but at the flash
+> address 0x8000000 or some such. That's the case with u-boot and
+> the precompiled examples I found for this stm32fxxxx board.
+>
+>>  For instance if address 0 is real flash and the
+>> high address alias is modelled by having the high address be the
+>> alias, then if the user passes us an ELF file saying "load to
+>> the high address" then this change won't catch that I think
+>> (because doing the memory_region_find/get_offset_within_address_space
+>> will return 0, which has already been tried). You'd need to
+>> somehow have a way to say "find all the addresses within this
+>> AS where this MR is mapped" and try them all...
+>
+>
+> This is more likely to be a user error :). Maybe we can load
+> the ROM before the reset but that seems a lot more invasive..
 
-Was there a bug? I'm not aware of one.
+It's the same thing, though, right? If the user's ELF file
+says "vector table is at 0x8000000" then we should either
+(a) say that's a user error, or
+(b) handle it right, whether we implemented the QEMU model with
+the flash at 0 and the alias at 0x8000000, or with the flash
+at 0x8000000 and the alias at 0.
 
-The TODO assertions were added on purpose when I wrote the code:
+> BTW isn't there a trick with the ELF entry somewhere? Or is that
+> for the Cortex-A?
 
-Initially all TCG codes had it, and I removed them as soon as a
-statement was executed and I had verified the result.
+We don't honour the ELF entry point on M profile (arguably
+a bug) -- armv7m_load_kernel() ignores the entry point
+returned by load_elf() in the 'entry' variable.
 
-So the recently failing assertions are simply code which was
-not triggered before, maybe because earlier versions of QEMU
-did not use those cases or maybe because a new guest scenario
-now needs them while my tests did not.
-
-TCI was never meant to be used for production, so I think
-my approach was acceptable.
-
-Stefan
+thanks
+-- PMM
