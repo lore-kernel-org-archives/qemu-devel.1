@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dQMVV-0006kl-4G
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 19:36:26 -0400
+	(envelope-from <kevin.tian@intel.com>) id 1dQN36-0006LN-H2
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 20:11:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dQMVU-0007Jh-51
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 19:36:25 -0400
-References: <20170613121639.17853-1-pbutsykin@virtuozzo.com>
-	<20170613121639.17853-4-pbutsykin@virtuozzo.com>
-	<aed64e0e-61ed-12c9-8676-ad55795b6e62@redhat.com>
-	<5fb63c73-ddc7-ba42-268f-bda160aebb6e@virtuozzo.com>
-	<d3c0c0c2-da7e-bfff-e3c6-2d419c1126b9@redhat.com>
-	<3b1b1a7e-ab9f-1376-fc3c-0853fb12987b@virtuozzo.com>
-	<67df3935-2ef1-b664-11aa-bb6bdf91013b@redhat.com>
-	<9bbacbbf-e9c2-f3b2-d81f-eba03e6ff7fc@virtuozzo.com>
-	<dbbc524c-97db-2a37-26e3-fd0eea328f7c@redhat.com>
-	<5116fc0f-8249-a075-e86d-6986560a39fd@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <28a54177-5f32-f98a-5642-0ee5fae8e998@redhat.com>
-Date: Thu, 29 Jun 2017 01:36:12 +0200
+	(envelope-from <kevin.tian@intel.com>) id 1dQN33-0004KY-3d
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 20:11:08 -0400
+Received: from mga05.intel.com ([192.55.52.43]:34956)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kevin.tian@intel.com>)
+	id 1dQN32-0004KD-Om
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 20:11:05 -0400
+From: "Tian, Kevin" <kevin.tian@intel.com>
+Date: Thu, 29 Jun 2017 00:10:59 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D190D1CF1C@SHSMSX101.ccr.corp.intel.com>
+References: <1491301684-24367-1-git-send-email-yulei.zhang@intel.com>
+	<20170626141906.6e38b235@w520.home>
+	<01FDBDDE256B79498DC57789713132D469DCC1EE@SHSMSX101.ccr.corp.intel.com>
+	<20170627134431.5947c771@w520.home>
+	<AADFC41AFE54684AB9EE6CBC0274A5D190D1956B@SHSMSX101.ccr.corp.intel.com>
+	<20170628095938.1329c358@w520.home>
+In-Reply-To: <20170628095938.1329c358@w520.home>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <5116fc0f-8249-a075-e86d-6986560a39fd@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="BIsrw8CpWCWcXHRfIlX8KtRFVft0vU3kO"
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] qcow2: add shrink image support
+Subject: Re: [Qemu-devel] [RFC 5/5] vifo: introduce new VFIO ioctl
+ VFIO_DEVICE_PCI_GET_DIRTY_BITMAP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,161 +34,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: "Zhang, Yulei" <yulei.zhang@intel.com>, "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "Zheng, Xiao" <xiao.zheng@intel.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BIsrw8CpWCWcXHRfIlX8KtRFVft0vU3kO
-From: Max Reitz <mreitz@redhat.com>
-To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org
-Message-ID: <28a54177-5f32-f98a-5642-0ee5fae8e998@redhat.com>
-Subject: Re: [PATCH v2 3/4] qcow2: add shrink image support
-References: <20170613121639.17853-1-pbutsykin@virtuozzo.com>
- <20170613121639.17853-4-pbutsykin@virtuozzo.com>
- <aed64e0e-61ed-12c9-8676-ad55795b6e62@redhat.com>
- <5fb63c73-ddc7-ba42-268f-bda160aebb6e@virtuozzo.com>
- <d3c0c0c2-da7e-bfff-e3c6-2d419c1126b9@redhat.com>
- <3b1b1a7e-ab9f-1376-fc3c-0853fb12987b@virtuozzo.com>
- <67df3935-2ef1-b664-11aa-bb6bdf91013b@redhat.com>
- <9bbacbbf-e9c2-f3b2-d81f-eba03e6ff7fc@virtuozzo.com>
- <dbbc524c-97db-2a37-26e3-fd0eea328f7c@redhat.com>
- <5116fc0f-8249-a075-e86d-6986560a39fd@virtuozzo.com>
-In-Reply-To: <5116fc0f-8249-a075-e86d-6986560a39fd@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2017-06-28 17:31, Pavel Butsykin wrote:
-> On 28.06.2017 16:59, Max Reitz wrote:
->> On 2017-06-27 17:06, Pavel Butsykin wrote:
->>> On 26.06.2017 20:47, Max Reitz wrote:
->>>> On 2017-06-26 17:23, Pavel Butsykin wrote:
->>> []
->>>>>
->>>>> Is there any guarantee that in the future this will not change?
->>>>> Because
->>>>> in this case it can be a potential danger.
->>>>
->>>> Since this behavior is not documented anywhere, there is no guarante=
-e.
->>>>
->>>>> I can add a comment... Or add a new variable with the size of
->>>>> reftable_tmp, and every time count min(s->refcount_table_size,
->>>>> reftable_tmp_size)
->>>>> before accessing to s->refcount_table[]/reftable_tmp[]
->>>>
->>>> Or (1) you add an assertion that refcount_table_size doesn't change
->>>> along with a comment why that is the case, which also explains in
->>>> detail
->>>> why the call to qcow2_free_clusters() should be safe: The on-disk
->>>> reftable differs from the one in memory. qcow2_free_clusters()and
->>>> update_refcount() themselves do not access the reftable, so they are=
-
->>>> safe. However, update_refcount() calls alloc_refcount_block(), and t=
-hat
->>>> function does access the reftable: Now, as long as
->>>> s->refcount_table_size does not shrink (which I can't see why it
->>>> would),
->>>> refcount_table_index should always be smaller. Now we're accessing
->>>> s->refcount_table: This will always return an existing refblock beca=
-use
->>>> this will either be the refblock itself (for self-referencing
->>>> refblocks)
->>>> or another one that is not going to be freed by qcow2_shrink_reftabl=
-e()
->>>> because this function will not free refblocks which cover other
->>>> clusters
->>>> than themselves.
->>>> We will then proceed to update the refblock which is either right
->>>> (if it
->>>> is not the refblock to be freed) or won't do anything (if it is the =
-one
->>>> to be freed).
->>>> In any case, we will never write to the reftable and reading from th=
-e
->>>> basically outdated cached version will never do anything bad.
->>>
->>> OK, SGTM.
->>>
->>>> Or (2) you copy reftable_tmp into s->refcount_table[] *before* any c=
-all
->>>> to qcow2_free_clusters(). To make this work, you would need to also
->>>> discard all refblocks from the cache in this function here (and not =
-in
->>>> update_refcount()) and then only call qcow2_free_clusters() on
->>>> refblocks
->>>> which were not self-referencing. An alternative hack would be to sim=
-ply
->>>> mark the image dirty and just not do any qcow2_free_clusters() call.=
-=2E.
->>>
->>> The main purpose of qcow2_reftable_shrink() function is discard all
->>> unnecessary refblocks from the file. If we do only rewrite
->>> refcount_table and discard non-self-referencing refblocks (which are
->>> actually very rare), then the meaning of the function is lost.
->>
->> It would do exactly the same. The idea is that you do not need to call=
-
->> qcow2_free_clusters() on self-referencing refblocks at all, since they=
-
->> are freed automatically when their reftable entry is overwritten with =
-0.
+> From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> Sent: Thursday, June 29, 2017 12:00 AM
 >=20
-> Not sure.. For self-referencing refblocks, we also need to do:
-> 1. check if refcount > 1
-
-Yes, if that wasn't an error flagged by qemu-img check. :-)
-
-(http://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dblock/qcow2-refcount.c;h=3D=
-7c06061aae90eb4f091f51df995a9e099178c0ed;hb=3DHEAD#l1787)
-
-> 2. update s->free_cluster_index
-> 3. call update_refcount_discard() (to in the end the fallocate
-> PUNCH_HOLE was called on refblock offset)
-
-These, yes, you'd have to do here.
-
-> It will be practically a copy-paste from qcow2_free_clusters(), so it i=
-s
-> better to avoid it. I think that if it makes sense to do
-> qcow2_reftable_shrink(), it is only because we can slightly reduce imag=
-e
-> size.
-
-But it would be a small copy-paste (although I may very well be wrong)
-and it would help me sleep better because I could actually understand it.=
-
-
-Max
-
->>>> Or (3) of course it would be possible to not clean up refcount
->>>> structures at all...
->>>
->>> Nice solution :)
->>
->> It is, because as I said refcount structures only have a small overhea=
-d.
+> On Wed, 28 Jun 2017 06:04:10 +0000
+> "Tian, Kevin" <kevin.tian@intel.com> wrote:
 >=20
-> Yes, I agree.
+> > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> > > Sent: Wednesday, June 28, 2017 3:45 AM
+> > >
+> > > On Tue, 27 Jun 2017 08:56:01 +0000
+> > > "Zhang, Yulei" <yulei.zhang@intel.com> wrote:
+> > > > > > diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/v=
+fio.h
+> > > > > > index fa17848..aa73ee1 100644
+> > > > > > --- a/linux-headers/linux/vfio.h
+> > > > > > +++ b/linux-headers/linux/vfio.h
+> > > > > > @@ -502,6 +502,20 @@ struct vfio_pci_status_set{
+> > > > > >
+> > > > > >  #define VFIO_DEVICE_PCI_STATUS_SET	_IO(VFIO_TYPE,
+> VFIO_BASE +
+> > > 14)
+> > > > > >
+> > > > > > +/**
+> > > > > > + * VFIO_DEVICE_PCI_GET_DIRTY_BITMAP - _IOW(VFIO_TYPE,
+> > > VFIO_BASE +
+> > > > > 15,
+> > > > > > + *				    struct vfio_pci_get_dirty_bitmap)
+> > > > > > + *
+> > > > > > + * Return: 0 on success, -errno on failure.
+> > > > > > + */
+> > > > > > +struct vfio_pci_get_dirty_bitmap{
+> > > > > > +	__u64	       start_addr;
+> > > > > > +	__u64	       page_nr;
+> > > > > > +	__u8           dirty_bitmap[];
+> > > > > > +};
+> > > > > > +
+> > > > > > +#define VFIO_DEVICE_PCI_GET_DIRTY_BITMAP _IO(VFIO_TYPE,
+> > > VFIO_BASE
+> > > > > + 15)
+> > > > > > +
+> > > > >
+> > > > > Dirty since when?  Since the last time we asked?  Since the devic=
+e was
+> > > > > stopped?  Why is anything dirtied after the device is stopped?  I=
+s this
+> > > > > any pages the device has ever touched?  Thanks,
+> > > > >
+> > > > > Alex
+> > > > Dirty since the device start operation and before it was stopped. W=
+e
+> track
+> > > > down all the guest pages that device was using before it was stoppe=
+d,
+> and
+> > > > leverage this dirty bitmap for page sync during migration.
+> > >
+> > > I don't understand how this is useful or efficient.  This implies tha=
+t
+> > > the device is always tracking dirtied pages even when we don't care
+> > > about migration.  Don't we want to enable dirty logging at some point
+> > > and track dirty pages since then?  Otherwise we can just assume the
+> > > device dirties all pages and get rid of this ioctl.  Thanks,
+> > >
+> >
+> > Agree. Regarding to interface definition we'd better follow general
+> > dirty logging scheme as Alex pointed out, possibly through another
+> > ioctl cmd to enable/disable logging. However vendor specific
+> > implementation may choose to ignore the cmd while always tracking
+> > dirty pages, as on Intel Processor Graphics. Below is some background.
+> >
+> > CPU dirty logging is done through either CPU page fault or HW dirty
+> > bit logging (e.g. Intel PML). However there is a gap in DMA side today.
+> > DMA page fault requires both IOMMU and device support (through
+> > PCI ATS/PRS), which is not widely available today and mostly for
+> > special types of workloads (e.g. Shared Virtual Memory). Regarding
+> > to dirty bit, at least VTd doesn't support it today.
+> >
+> > So the alternative option is to rely on mediation layer to track the
+> > dirty pages, since workload submissions on vGPU are mediated. It's
+> > feasible for simple devices such as NIC, which has a clear definition
+> > of descriptors so it's easy to scan and capture which pages will be
+> > dirtied. However doing same thing for complex GPU (meaning
+> > to scan all GPU commands, shader instructions, indirect structures,
+> > etc.) is weigh too complex and insufficient. Today we only scan
+> > privileged commands for security purpose which is only a very
+> > small portion of all possible cmd set.
+> >
+> > Then in reality we choose a simplified approach. instead of tracking
+> > incrementally dirtied pages since last query, we treat all pages which
+> > are currently mapped in GPU page tables as dirtied. To avoid overhead
+> > of walking global page table (GGTT) and all active per-process page
+> > tables (PPGTTs) upon query, we choose to always maintain a bitmap
+> > which is updated when mediating guest updates to those GTT entries.
+> > It adds negligible overhead at run-time since those operations are
+> > already mediated.
+> >
+> > Every time when Qemu tries to query dirty map, it likely will get
+> > a similar large dirty bitmap (not exactly same since GPU page tables
+> > are being changed) then will exit iterative memory copy very soon,
+> > which will ends up like below:
+> >
+> > 1st round: Qemu copies all the memory (say 4GB) to another machine
+> > 2nd round: Qemu queries vGPU dirty map (usually in several hundreds
+> > of MBs) and combine with CPU dirty map to copy
+> > 3rd round: Qemu will get similar size of dirty pages then exit the
+> > pre-copy phase since dirty set doesn't converge
+> >
+> > Although it's not that efficient, no need to stop service for whole 4GB
+> > memory copy still saves a lot. In our measurement the service
+> > shutdown time is ~300ms over 10Gb link when running 3D benchmarks
+> > (e.g. 3DMark, Heaven, etc.) and media transcoding workloads, while
+> > copying whole system memory may easily take seconds to trigger TDR.
+> > though service shutdown time is bigger than usual server-based scenario=
+,
+> > it's somehow OK for interactive usages (e.g. VDI) or offline transcodin=
+g
+> > usages. You may take a look at our demo at:
+> >
+> > https://www.youtube.com/watch?v=3Dy2SkU5JODIY
+> >
+> > In a nutshell, our current dirty logging implementation is a bit
+> > awkward due to arch limitation, but it does work well for some
+> > scenarios. Most importantly I agree we should design interface
+> > in a more general way to enable/disable dirty logging as stated
+> > earlier.
+> >
+> > Hope above makes the whole background clearer. :-)
+>=20
+> Thanks Kevin.  So really it's not really a dirty bitmap, it's just a
+> bitmap of pages that the device has access to and may have dirtied.
+> Don't we have this more generally in the vfio type1 IOMMU backend?  For
+> a mediated device, we know all the pages that the vendor driver has
+> asked to be pinned.  Should we perhaps make this interface on the vfio
+> container rather than the device?  Any mediated device can provide this
+> level of detail without specific vendor support.  If we had DMA page
+> faulting, this would be the natural place to put it as well, so maybe
+> we should design the interface there to support everything similarly.
+> Thanks,
+>=20
 
+That's a nice idea. Just two comments:
 
---BIsrw8CpWCWcXHRfIlX8KtRFVft0vU3kO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+1) If some mediated device has its own way to construct true dirty
+bitmap (not thru DMA page faulting), the interface is better designed
+to allow that flexibility. Maybe an optional callback if not registered
+then use common type1 IOMMU logic otherwise prefers to vendor
+specific callback
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+2) If there could be multiple mediated devices from different vendors
+in same container while not all mediated devices support live migration,
+would container-level interface impose some limitation?
 
-iQEvBAEBCAAZBQJZVD1sEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQGeW
-CACgssvuO6icwcgIFnxwJ5vfp4ciBw2KpRxm2VHjBrpYmdgxDcokrAlg4Mw1za+R
-nd4ELclAolF6lfqdlKklyuW9vyXqfKpWiaRYK+ZlqXTOfbyvaQYxZupwCDO2HBTz
-AermiOWsZj92Nh4D502tWKRKJS5yfEfggpd0gXqdzF/bz7+ZPYu3vPLqLFp6QmJN
-V5Qm/PetHmWPkoz+0cs1J3VnaEJj6jq7SKI3V0AX2Jap1geFCjiktPodJM/c2ZUC
-osWAvYM9f/xhvP2zvjpM2GYFXvTp5LExc5OM07oPByOVelGkxRNBg1lGIiPyZ8R4
-BiHfHrdH3qxfRnYg4/8j7Iyv
-=hWKC
------END PGP SIGNATURE-----
-
---BIsrw8CpWCWcXHRfIlX8KtRFVft0vU3kO--
+Thanks
+Kevin
