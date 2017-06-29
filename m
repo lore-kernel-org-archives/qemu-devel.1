@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dQg4q-0007E4-BE
+	(envelope-from <cota@braap.org>) id 1dQg4q-0007E2-AL
 	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 16:30:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dQg4n-0000zP-4Y
+	(envelope-from <cota@braap.org>) id 1dQg4n-0000zr-Cv
 	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 16:30:12 -0400
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:37085)
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:51713)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dQg4m-0000xJ-Qq
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dQg4n-0000zH-9H
 	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 16:30:09 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 29 Jun 2017 16:28:26 -0400
-Message-Id: <1498768109-4092-5-git-send-email-cota@braap.org>
+Date: Thu, 29 Jun 2017 16:28:29 -0400
+Message-Id: <1498768109-4092-8-git-send-email-cota@braap.org>
 In-Reply-To: <1498768109-4092-1-git-send-email-cota@braap.org>
 References: <1498768109-4092-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [RFC 4/7] translate-all: report correct avg host TB
- size
+Subject: [Qemu-devel] [RFC 7/7] [XXX] translate-all: generate TCG code
+ without holding tb_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,113 +27,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>
 
-Since commit 6e3b2bfd6 ("tcg: allocate TB structs before the
-corresponding translated code") we are not fully utilizing
-code_gen_buffer for translated code, and therefore are
-incorrectly reporting the amount of translated code as well as
-the average host TB size. Address this by:
+Generate new TBs without holding tb_lock, which should increase
+scalability when running MTTCG for workloads that generate a lot
+of code (e.g. booting linux).
 
-- Making the conscious choice of misreporting the total translated code;
-  doing otherwise would mislead users into thinking "tb-size" is not
-  honoured.
-
-- Expanding tb_tree_stats to accurately count the bytes of translated code on
-  the host, and using this for reporting the average tb host size,
-  as well as the expansion ratio.
-
-In the future we might want to consider reporting the accurate numbers for
-the total translated code, together with a "bookkeeping/overhead" field to
-account for the TB structs.
+XXX: Doesn't work :-) See the commit log from the previous patch.
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- accel/tcg/translate-all.c | 34 ++++++++++++++++++++++++----------
- 1 file changed, 24 insertions(+), 10 deletions(-)
+ accel/tcg/cpu-exec.c      |  8 +++++++-
+ accel/tcg/translate-all.c | 18 ++++++++++++++++--
+ 2 files changed, 23 insertions(+), 3 deletions(-)
 
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index 54ecae2..47f0882 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -351,6 +351,7 @@ static inline TranslationBlock *tb_find(CPUState *cpu,
+              * single threaded the locks are NOPs.
+              */
+             mmap_lock();
++#ifdef CONFIG_USER_ONLY
+             tb_lock();
+             have_tb_lock = true;
+ 
+@@ -362,7 +363,12 @@ static inline TranslationBlock *tb_find(CPUState *cpu,
+                 /* if no translated code available, then translate it now */
+                 tb = tb_gen_code(cpu, pc, cs_base, flags, 0);
+             }
+-
++#else
++            /* tb_gen_code will acquire tb_lock.
++             * Just for the diff: note that have_tb_lock is local to tb_find! */
++            have_tb_lock = true;
++            tb = tb_gen_code(cpu, pc, cs_base, flags, 0);
++#endif
+             mmap_unlock();
+         }
+ 
 diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index a18fbf7..9714777 100644
+index 125b1a8..da29bcc 100644
 --- a/accel/tcg/translate-all.c
 +++ b/accel/tcg/translate-all.c
-@@ -894,9 +894,20 @@ static void page_flush_tb(void)
-     }
- }
- 
-+static __attribute__((unused))
-+gboolean tb_host_size_iter(gpointer key, gpointer value, gpointer data)
-+{
-+    const TranslationBlock *tb = value;
-+    int *size = data;
-+
-+    *size += tb->out_size;
-+    return false;
-+}
-+
- /* flush all the translation blocks */
- static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
+@@ -878,8 +878,6 @@ static TranslationBlock *tb_alloc(target_ulong pc)
  {
-+    int host_size __attribute__((unused));
-     int nb_tbs __attribute__((unused));
+     TranslationBlock *tb;
  
-     tb_lock();
-@@ -909,12 +920,11 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
-     }
- 
- #if defined(DEBUG_TB_FLUSH)
-+    g_tree_foreach(tcg_ctx.tb_ctx.tb_tree, tb_host_size_iter, &host_size);
-     nb_tbs = g_tree_nnodes(tcg_ctx.tb_ctx.tb_tree);
--    printf("qemu: flush code_size=%ld nb_tbs=%d avg_tb_size=%ld\n",
-+    printf("qemu: flush code_size=%ld nb_tbs=%d avg_tb_size=%d\n",
-            (unsigned long)(tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer),
--           nb_tbs, nb_tbs > 0 ?
--           ((unsigned long)(tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer)) /
--           nb_tbs : 0);
-+           nb_tbs, nb_tbs > 0 ? host_size / nb_tbs : 0);
+-    assert_tb_locked();
+-
+     tb = tcg_tb_alloc(&tcg_ctx);
+     if (unlikely(tb == NULL)) {
+         return NULL;
+@@ -1314,7 +1312,9 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+ #ifdef CONFIG_PROFILER
+     int64_t ti;
  #endif
-     if ((unsigned long)(tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer)
-         > tcg_ctx.code_gen_buffer_size) {
-@@ -1842,6 +1852,7 @@ static void print_qht_statistics(FILE *f, fprintf_function cpu_fprintf,
- }
++#ifdef CONFIG_USER_ONLY
+     assert_memory_lock();
++#endif
  
- struct tb_tree_stats {
-+    int host_size;
-     int target_size;
-     int max_target_size;
-     int direct_jmp_count;
-@@ -1854,6 +1865,7 @@ static gboolean tb_tree_stats_iter(gpointer key, gpointer value, gpointer data)
-     const TranslationBlock *tb = value;
-     struct tb_tree_stats *tst = data;
- 
-+    tst->host_size += tb->out_size;
-     tst->target_size += tb->size;
-     if (tb->size > tst->max_target_size) {
-         tst->max_target_size = tb->size;
-@@ -1882,6 +1894,11 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
-     g_tree_foreach(tcg_ctx.tb_ctx.tb_tree, tb_tree_stats_iter, &tst);
-     /* XXX: avoid using doubles ? */
-     cpu_fprintf(f, "Translation buffer state:\n");
-+    /*
-+     * Report total code size including the padding and TB structs;
-+     * otherwise users might think "-tb-size" is not honoured.
-+     * For avg host size we use the precise numbers from tb_tree_stats though.
-+     */
-     cpu_fprintf(f, "gen code size       %td/%zd\n",
-                 tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer,
-                 tcg_ctx.code_gen_highwater - tcg_ctx.code_gen_buffer);
-@@ -1889,12 +1906,9 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
-     cpu_fprintf(f, "TB avg target size  %d max=%d bytes\n",
-                 nb_tbs ? tst.target_size / nb_tbs : 0,
-                 tst.max_target_size);
--    cpu_fprintf(f, "TB avg host size    %td bytes (expansion ratio: %0.1f)\n",
--                nb_tbs ? (tcg_ctx.code_gen_ptr -
--                          tcg_ctx.code_gen_buffer) / nb_tbs : 0,
--                tst.target_size ? (double) (tcg_ctx.code_gen_ptr -
--                                            tcg_ctx.code_gen_buffer) /
--                                            tst.target_size : 0);
-+    cpu_fprintf(f, "TB avg host size    %d bytes (expansion ratio: %0.1f)\n",
-+                nb_tbs ? tst.host_size / nb_tbs : 0,
-+                tst.target_size ? (double)tst.host_size / tst.target_size : 0);
-     cpu_fprintf(f, "cross page TB count %d (%d%%)\n", tst.cross_page,
-             nb_tbs ? (tst.cross_page * 100) / nb_tbs : 0);
-     cpu_fprintf(f, "direct jump count   %d (%d%%) (2 jumps=%d %d%%)\n",
+     phys_pc = get_page_addr_code(env, pc);
+     if (use_icount && !(cflags & CF_IGNORE_ICOUNT)) {
+@@ -1429,6 +1429,20 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+     if ((pc & TARGET_PAGE_MASK) != virt_page2) {
+         phys_page2 = get_page_addr_code(env, virt_page2);
+     }
++    if (!have_tb_lock) {
++        TranslationBlock *t;
++
++        tb_lock();
++        /*
++         * There's a chance that our desired tb has been translated while
++         * we were translating it.
++         */
++        t = tb_htable_lookup(cpu, pc, cs_base, flags);
++        if (unlikely(t)) {
++            /* this is very unlikely so just waste the TB space we just used */
++            return t;
++        }
++    }
+     /* As long as consistency of the TB stuff is provided by tb_lock in user
+      * mode and is implicit in single-threaded softmmu emulation, no explicit
+      * memory barrier is required before tb_link_page() makes the TB visible
 -- 
 2.7.4
