@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dQa3V-0003k3-MA
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:04:29 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dQa4X-0004WV-5R
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:05:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dQa3M-0004oh-7L
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:04:25 -0400
-Date: Thu, 29 Jun 2017 15:04:11 +0100
+	(envelope-from <stefanha@gmail.com>) id 1dQa4T-0005M9-7Y
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:05:29 -0400
+Date: Thu, 29 Jun 2017 15:05:21 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170629140411.GB18146@stefanha-x1.localdomain>
+Message-ID: <20170629140521.GC18146@stefanha-x1.localdomain>
 References: <20170627224616.18538-1-el13635@mail.ntua.gr>
-	<20170627224616.18538-3-el13635@mail.ntua.gr>
+	<20170627224616.18538-2-el13635@mail.ntua.gr>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="zx4FCpZtqtKETZ7O"
+	protocol="application/pgp-signature"; boundary="rQ2U398070+RC21q"
 Content-Disposition: inline
-In-Reply-To: <20170627224616.18538-3-el13635@mail.ntua.gr>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] block: add default
- implementations for bdrv_co_get_block_status()
+In-Reply-To: <20170627224616.18538-2-el13635@mail.ntua.gr>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/2] block: pass bdrv_*
+ methods to bs->file by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +29,48 @@ To: Manos Pitsidianakis <el13635@mail.ntua.gr>
 Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
 
---zx4FCpZtqtKETZ7O
+--rQ2U398070+RC21q
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 28, 2017 at 01:46:16AM +0300, Manos Pitsidianakis wrote:
-> bdrv_co_get_block_status_from_file() and
-> bdrv_co_get_block_status_from_backing() set *file to bs->file and
-> bs->backing respectively, so that bdrv_co_get_block_status() can recurse
-> to them. Future block drivers won't have to duplicate code to implement
-> this.
+On Wed, Jun 28, 2017 at 01:46:15AM +0300, Manos Pitsidianakis wrote:
+> The following functions fail if bs->drv does not implement them:
+>=20
+> bdrv_probe_blocksizes
+> bdrv_probe_geometry
+> bdrv_truncate
+> bdrv_has_zero_init
+> bdrv_get_info
+> bdrv_media_changed
+> bdrv_eject
+> bdrv_lock_medium
+> bdrv_co_ioctl
+>=20
+> Instead, the call should be passed to bs->file if it exists, to allow
+> filter drivers to support those methods without implementing them.
 >=20
 > Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
 > ---
->  block/blkdebug.c          | 12 +-----------
->  block/commit.c            | 12 +-----------
->  block/io.c                | 24 ++++++++++++++++++++++++
->  block/mirror.c            | 12 +-----------
->  include/block/block_int.h | 16 ++++++++++++++++
->  5 files changed, 43 insertions(+), 33 deletions(-)
+>  block.c    | 45 ++++++++++++++++++++++++++++++++++-----------
+>  block/io.c |  4 ++++
+>  2 files changed, 38 insertions(+), 11 deletions(-)
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Will you send a block/raw-format.c patch that removes the forwarding
+functions that are no longer needed?
 
---zx4FCpZtqtKETZ7O
+--rQ2U398070+RC21q
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJZVQjbAAoJEJykq7OBq3PIMHkIAL1nhk8WRoZfk3MgtayzfMY1
-lCQ3QwGzuH8T3+OFxno1Gsu4nozx26cF/Po30zI1cpFPGrjOaz7wbQHTbQ+fzOX9
-MehhOOMB3aPoC28eJVH0aXtAPVjM0ODaVF1UXKKXi8phocKjhtC+ocdR1G1R/QQE
-4aDawQr+Zw+S2WXSU+fuassKYl6+dajW4/NiWEU0ZuVZ2+vdWRHiuwCkqgU2sk+v
-f1mtxT0OOnPevPdNtQ2wY7sbRQpA/2C8KhlKmA9DjXZxRHPvNzopkJUzRcJRp0wM
-dV0MAlEMU4DcbWXq9i1vmQKDmkCte2lAaricRfKLz2xV3UoYCIXSWNuW53EMIsE=
-=/G7H
+iQEcBAEBAgAGBQJZVQkhAAoJEJykq7OBq3PIA/QIAJWlLse2yKc5ViFS9KfVkH5Z
+aOYHdY4GqIGdPVq8JrykXT+v4p6Wjr1jiZxtQkOrrI4TtxJLz9rT/e445Y8lM2eF
+x4pCohX18uyLcBiiQhuTz8/BJG/mKtUXZzQM87QRYUyy572s66r/okOLEqbn3g16
+pVfKehPEQy3xkOSyi72vQ/9R7M7pjePEJpcWSzwtdAGbD/rZK9qTrhECL0PbQchJ
+/MDb3y46XL/pAQIGKDcvcTfhD+qWFE/ub7H7ChAai4y0XqaG+uBv0Wmk0vaEUPou
+Ypd39Y4pBYg8SCb7siiq+XEFlomkQpHAP0bcDW7gOoxhFew/60NbQ2r0ldN2Sa8=
+=WMn3
 -----END PGP SIGNATURE-----
 
---zx4FCpZtqtKETZ7O--
+--rQ2U398070+RC21q--
