@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dQirP-0002lV-Rz
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 19:28:32 -0400
+	(envelope-from <mst@redhat.com>) id 1dQitQ-0004Fr-Kp
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 19:30:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dQirM-0007iY-41
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 19:28:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58826)
+	(envelope-from <mst@redhat.com>) id 1dQitP-0000LG-Gy
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 19:30:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53414)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dQirL-0007hz-SD
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 19:28:28 -0400
-Date: Fri, 30 Jun 2017 02:28:23 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dQitP-0000Kk-7L
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 19:30:35 -0400
+Date: Fri, 30 Jun 2017 02:30:30 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170630022802-mutt-send-email-mst@kernel.org>
+Message-ID: <20170630022856-mutt-send-email-mst@kernel.org>
 References: <1498773362-18675-1-git-send-email-zuban32s@gmail.com>
-	<1498773362-18675-5-git-send-email-zuban32s@gmail.com>
+	<1498773362-18675-6-git-send-email-zuban32s@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1498773362-18675-5-git-send-email-zuban32s@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH RFC 4/6] hw/acpi: prepare pci hotplug IO
- for ich9
+In-Reply-To: <1498773362-18675-6-git-send-email-zuban32s@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 5/6] hw/acpi: extend acpi pci hotplug
+ support for pci express
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,45 +31,161 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Aleksandr Bezzubikov <zuban32s@gmail.com>
 Cc: qemu-devel@nongnu.org, marcel@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
 
-On Fri, Jun 30, 2017 at 12:56:00AM +0300, Aleksandr Bezzubikov wrote:
+On Fri, Jun 30, 2017 at 12:56:01AM +0300, Aleksandr Bezzubikov wrote:
 > Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
 
-Add more explanation in commit log please.
+Which means what exactly?
 
 > ---
->  hw/i386/acpi-build.c | 13 +++++++------
->  1 file changed, 7 insertions(+), 6 deletions(-)
+>  hw/i386/acpi-build.c | 47 +++++++++++++++++++++++++++++++----------------
+>  1 file changed, 31 insertions(+), 16 deletions(-)
 > 
 > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index c99dbcc..e434efe 100644
+> index e434efe..8bbece5 100644
 > --- a/hw/i386/acpi-build.c
 > +++ b/hw/i386/acpi-build.c
-> @@ -135,12 +135,6 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
->      if (piix) {
->          obj = piix;
->          pm->cpu_hp_io_base = PIIX4_CPU_HOTPLUG_IO_BASE;
-> -        pcihp_io_base =
-> -            object_property_get_int(obj, ACPI_PCIHP_IO_BASE_PROP, NULL);
-> -        pcihp_io_len =
-> -            object_property_get_int(obj, ACPI_PCIHP_IO_LEN_PROP, NULL);
-> -        pm->pcihp_io_base = (pcihp_io_base == -1) ? 0 : pcihp_io_base;
-> -        pm->pcihp_io_len = (pcihp_io_len == -1) ? 0 : pcihp_io_len;
->      }
->      if (lpc) {
->          obj = lpc;
-> @@ -148,6 +142,13 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
->      }
->      assert(obj);
+> @@ -254,6 +254,11 @@ static void acpi_get_pci_holes(Range *hole, Range *hole64)
+>                                                NULL));
+>  }
 >  
-> +    pcihp_io_base =
-> +        object_property_get_int(obj, ACPI_PCIHP_IO_BASE_PROP, NULL);
-> +    pcihp_io_len =
-> +        object_property_get_int(obj, ACPI_PCIHP_IO_LEN_PROP, NULL);
-> +    pm->pcihp_io_base = (pcihp_io_base == -1) ? 0 : pcihp_io_base;
-> +    pm->pcihp_io_len = (pcihp_io_len == -1) ? 0 : pcihp_io_len;
+> +static void acpi_test_pci_bus(PCIBus *bus, void *opaque)
+> +{
+> +    *(bool *)opaque |= !pci_bus_is_express(bus);
+> +}
 > +
->      /* Fill in optional s3/s4 related properties */
->      o = object_property_get_qobject(obj, ACPI_PM_PROP_S3_DISABLED, NULL);
->      if (o) {
+>  #define ACPI_PORT_SMI_CMD           0x00b2 /* TODO: this is APM_CNT_IOPORT */
+>  
+>  static void acpi_align_size(GArray *blob, unsigned align)
+> @@ -489,7 +494,7 @@ static void *acpi_set_bsel(PCIBus *bus, void *opaque)
+>      unsigned *bsel_alloc = opaque;
+>      unsigned *bus_bsel;
+>  
+> -    if (qbus_is_hotpluggable(BUS(bus))) {
+> +    if (qbus_is_hotpluggable(BUS(bus)) && !pci_bus_is_express(bus)) {
+>          bus_bsel = g_malloc(sizeof *bus_bsel);
+>  
+>          *bus_bsel = (*bsel_alloc)++;
+> @@ -500,15 +505,12 @@ static void *acpi_set_bsel(PCIBus *bus, void *opaque)
+>      return bsel_alloc;
+>  }
+>  
+> -static void acpi_set_pci_info(void)
+> +static void acpi_set_pci_info(PCIBus *bus)
+>  {
+> -    PCIBus *bus = find_i440fx(); /* TODO: Q35 support */
+>      unsigned bsel_alloc = ACPI_PCIHP_BSEL_DEFAULT;
+>  
+> -    if (bus) {
+> -        /* Scan all PCI buses. Set property to enable acpi based hotplug. */
+> -        pci_for_each_bus_depth_first(bus, acpi_set_bsel, NULL, &bsel_alloc);
+> -    }
+> +    /* Scan all PCI buses. Set property to enable acpi based hotplug. */
+> +    pci_for_each_bus_depth_first(bus, acpi_set_bsel, NULL, &bsel_alloc);
+>  }
+>  
+>  static void build_append_pcihp_notify_entry(Aml *method, int slot)
+> @@ -570,7 +572,7 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+>           * In this case they aren't themselves hot-pluggable.
+>           * Hotplugged bridges *are* hot-pluggable.
+>           */
+> -        bridge_in_acpi = pc->is_bridge && pcihp_bridge_en &&
+> +        bridge_in_acpi = pc->is_bridge && !pc->is_express && pcihp_bridge_en &&
+>              !DEVICE(pdev)->hotplugged;
+>  
+>          hotplug_enabled_dev = bsel && dc->hotpluggable && !bridge_in_acpi;
+> @@ -1787,7 +1789,7 @@ static void build_piix4_isa_bridge(Aml *table)
+>      aml_append(table, scope);
+>  }
+>  
+> -static void build_piix4_pci_hotplug(Aml *table)
+> +static void build_acpi_pci_hotplug(Aml *table)
+>  {
+>      Aml *scope;
+>      Aml *field;
+> @@ -1889,6 +1891,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>      uint32_t nr_mem = machine->ram_slots;
+>      int root_bus_limit = 0xFF;
+>      PCIBus *root_bus = NULL;
+> +    bool has_pci_bus = false;
+>      int i;
+>  
+>      dsdt = init_aml_allocator();
+> @@ -1910,7 +1913,6 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>          build_piix4_pm(dsdt);
+>          build_piix4_isa_bridge(dsdt);
+>          build_isa_devices_aml(dsdt);
+> -        build_piix4_pci_hotplug(dsdt);
+>          build_piix4_pci0_int(dsdt);
+>      } else {
+>          sb_scope = aml_scope("_SB");
+> @@ -1932,6 +1934,11 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>      root_bus = PC_MACHINE(machine)->bus;
+>      assert(root_bus);
+>  
+> +    pci_for_each_bus(root_bus, acpi_test_pci_bus, &has_pci_bus);
+> +    if (pm->pcihp_bridge_en && has_pci_bus) {
+> +        build_acpi_pci_hotplug(dsdt);
+> +    }
+> +
+>      if (pcmc->legacy_cpu_hotplug) {
+>          build_legacy_cpu_hotplug_aml(dsdt, machine, pm->cpu_hp_io_base);
+>      } else {
+> @@ -1947,7 +1954,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>      {
+>          aml_append(scope, aml_name_decl("_HID", aml_string("ACPI0006")));
+>  
+> -        if (misc->is_piix4) {
+> +        if (pm->pcihp_bridge_en && has_pci_bus) {
+>              method = aml_method("_E01", 0, AML_NOTSERIALIZED);
+>              aml_append(method,
+>                  aml_acquire(aml_name("\\_SB.PCI0.BLCK"), 0xFFFF));
+> @@ -2080,7 +2087,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>      crs_range_set_free(&crs_range_set);
+>  
+>      /* reserve PCIHP resources */
+> -    if (pm->pcihp_io_len) {
+> +    if (pm->pcihp_bridge_en && has_pci_bus && pm->pcihp_io_len) {
+>          dev = aml_device("PHPR");
+>          aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A06")));
+>          aml_append(dev,
+> @@ -2212,8 +2219,13 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>      sb_scope = aml_scope("\\_SB");
+>      {
+>          Aml *scope = aml_scope("PCI0");
+> -        /* Scan all PCI buses. Generate tables to support hotplug. */
+> -        build_append_pci_bus_devices(scope, root_bus, pm->pcihp_bridge_en);
+> +        bool scope_used = false;
+> +
+> +        if (pm->pcihp_bridge_en && has_pci_bus) {
+> +            /* Scan all PCI buses. Generate tables to support hotplug. */
+> +            build_append_pci_bus_devices(scope, root_bus, pm->pcihp_bridge_en);
+> +            scope_used = true;
+> +        }
+>  
+>          if (misc->tpm_version != TPM_VERSION_UNSPEC) {
+>              dev = aml_device("ISA.TPM");
+> @@ -2230,9 +2242,12 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>              /* aml_append(crs, aml_irq_no_flags(TPM_TIS_IRQ)); */
+>              aml_append(dev, aml_name_decl("_CRS", crs));
+>              aml_append(scope, dev);
+> +            scope_used = true;
+>          }
+>  
+> -        aml_append(sb_scope, scope);
+> +        if (scope_used) {
+> +            aml_append(sb_scope, scope);
+> +        }
+>      }
+>      aml_append(dsdt, sb_scope);
+>  
+> @@ -2866,7 +2881,7 @@ void acpi_setup(void)
+>  
+>      build_state = g_malloc0(sizeof *build_state);
+>  
+> -    acpi_set_pci_info();
+> +    acpi_set_pci_info(pcms->bus);
+>  
+>      acpi_build_tables_init(&tables);
+>      acpi_build(&tables, MACHINE(pcms));
 > -- 
 > 2.7.4
