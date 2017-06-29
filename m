@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dQPoi-00015D-4u
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:08:29 -0400
+	(envelope-from <peterx@redhat.com>) id 1dQPol-00015U-73
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:08:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dQPoe-0001ce-S7
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:08:28 -0400
-Received: from [59.151.112.132] (port=64448 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dQPod-0001bl-K2
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:08:24 -0400
-References: <cover.1498654240.git.maozy.fnst@cn.fujitsu.com>
-	<f268a317086c90e4d8e2547a084ec9b477fc6a04.1498654240.git.maozy.fnst@cn.fujitsu.com>
-	<20170628132745.GK29134@redhat.com>
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Message-ID: <7d861d6c-fb0c-7a93-22bc-cc7dc814ddaf@cn.fujitsu.com>
-Date: Thu, 29 Jun 2017 11:08:09 +0800
+	(envelope-from <peterx@redhat.com>) id 1dQPoi-0001du-0C
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:08:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35588)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dQPoh-0001db-Px
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:08:27 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 979C1C05B1E6
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 03:08:26 +0000 (UTC)
+Date: Thu, 29 Jun 2017 11:08:21 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170629030821.GC32268@pxdev.xzpeter.org>
+References: <1498536619-14548-1-git-send-email-peterx@redhat.com>
+	<1498634144-26508-1-git-send-email-peterx@redhat.com>
+	<20170628153704.GF12152@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20170628132745.GK29134@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 4/4] net/socket: Improve -net socket
- error reporting
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170628153704.GF12152@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v6 11/10] migration: add comment for
+ TYPE_MIGRATE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,342 +35,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, jasowang@redhat.com, armbru@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, eblake@redhat.com, armbru@redhat.com, quintela@redhat.com, dgilbert@redhat.com
 
-Hi, Daniel
+On Wed, Jun 28, 2017 at 12:37:04PM -0300, Eduardo Habkost wrote:
+> On Wed, Jun 28, 2017 at 03:15:44PM +0800, Peter Xu wrote:
+> > It'll be strange that the migration object inherits TYPE_DEVICE. Add
+> > some explanations to it.
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  migration/migration.c | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> > 
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index b1b0825..2398a9d 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -2046,6 +2046,14 @@ static void migration_instance_init(Object *obj)
+> >  
+> >  static const TypeInfo migration_type = {
+> >      .name = TYPE_MIGRATION,
+> > +    /*
+> > +     * NOTE: "migration" itself is not really a device. We used
+> 
+> I suggest extending this as:
+> 
+>   TYPE_MIGRATION is not really a device, as the object is not created
+>   using qdev_create(), it is not attached to the qdev device tree, and
+>   it is never realized.
+> 
+> 
+> > +     * TYPE_DEVICE here only to leverage some existing QDev features
+> > +     * like "-global" properties, and HW_COMPAT_* fields (which are
+> > +     * finally applied as global properties as well). If one day the
+> > +     * global property feature can be migrated from QDev to QObject in
+> > +     * general, then we can switch to QObject as well.
+> > +     */
+> 
+> QOM objects (qom/object.h) are not QObject (qapi/qmp/qobject.h).  People
+> often confuse them with each other.  (It probably doesn't help that both
+> are described as "QEMU Object Model" at their headers.)
 
-On 06/28/2017 09:27 PM, Daniel P. Berrange wrote:
-> On Wed, Jun 28, 2017 at 09:08:50PM +0800, Mao Zhongyi wrote:
->> When -net socket fails, it first reports a specific error, then
->> a generic one, like this:
->>
->>     $ qemu-system-x86_64 -net socket,
->>     qemu-system-x86_64: -net socket: exactly one of fd=, listen=, connect=, mcast= or udp= is required
->>     qemu-system-x86_64: -net socket: Device 'socket' could not be initialized
->
-> This second line of error message comes from net/net.c in the
-> net_client_init1 method:
->
->         /* FIXME drop when all init functions store an Error */
->         if (errp && !*errp) {
->             error_setg(errp, QERR_DEVICE_INIT_FAILED,
->                        NetClientDriver_lookup[netdev->type]);
->         }
->
->
-> hopefully your patch could drop this code too ?
->
-> In fact this is the only use of QERR_DEVICE_INIT_FAILED in the
-> whole tree, so the QERR constant could possibly be killed too.
->
+Indeed. Sorry I got confused.
 
-OK, I will. :)
+> 
+> I suggest rewriting it as:
+> 
+>   If one day we allow non-device QOM objects to use the global property
+>   system, we can switch this from TYPE_DEVICE to TYPE_OBJECT."
 
-Thanks,
-Mao
+For the comment for this patch (and patch 10 on "properties" and
+"globals"), I both agree. Again, I'll see what's the best way to fix
+them.  Thanks,
 
->
->>
->> Convert net_socket_*_init() to Error to get rid of the superfluous second
->> error message. After the patch, the effect like this:
->>
->>     $ qemu-system-x86_64 -net socket,
->>     qemu-system-x86_64: -net socket: exactly one of fd=, listen=, connect=, mcast= or udp= is required
->>
->> At the same time, add many explicit error handling message when it fails.
->>
->> Cc: jasowang@redhat.com
->> Cc: armbru@redhat.com
->> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
->> ---
->>  net/socket.c | 92 +++++++++++++++++++++++++++++-------------------------------
->>  1 file changed, 44 insertions(+), 48 deletions(-)
->>
->> diff --git a/net/socket.c b/net/socket.c
->> index 90dd4c0..47e6706 100644
->> --- a/net/socket.c
->> +++ b/net/socket.c
->> @@ -494,22 +494,21 @@ static void net_socket_accept(void *opaque)
->>  static int net_socket_listen_init(NetClientState *peer,
->>                                    const char *model,
->>                                    const char *name,
->> -                                  const char *host_str)
->> +                                  const char *host_str,
->> +                                  Error **errp)
->>  {
->>      NetClientState *nc;
->>      NetSocketState *s;
->>      struct sockaddr_in saddr;
->>      int fd, ret;
->> -    Error *err = NULL;
->>
->> -    if (parse_host_port(&saddr, host_str, &err) < 0) {
->> -        error_report_err(err);
->> +    if (parse_host_port(&saddr, host_str, errp) < 0) {
->>          return -1;
->>      }
->>
->>      fd = qemu_socket(PF_INET, SOCK_STREAM, 0);
->>      if (fd < 0) {
->> -        perror("socket");
->> +        error_setg_errno(errp, errno, "failed to create stream socket");
->>          return -1;
->>      }
->>      qemu_set_nonblock(fd);
->> @@ -518,13 +517,14 @@ static int net_socket_listen_init(NetClientState *peer,
->>
->>      ret = bind(fd, (struct sockaddr *)&saddr, sizeof(saddr));
->>      if (ret < 0) {
->> -        perror("bind");
->> +        error_setg_errno(errp, errno, "bind ip=%s to socket failed",
->> +                         inet_ntoa(saddr.sin_addr));
->>          closesocket(fd);
->>          return -1;
->>      }
->>      ret = listen(fd, 0);
->>      if (ret < 0) {
->> -        perror("listen");
->> +        error_setg_errno(errp, errno, "listen socket failed");
->>          closesocket(fd);
->>          return -1;
->>      }
->> @@ -543,21 +543,20 @@ static int net_socket_listen_init(NetClientState *peer,
->>  static int net_socket_connect_init(NetClientState *peer,
->>                                     const char *model,
->>                                     const char *name,
->> -                                   const char *host_str)
->> +                                   const char *host_str,
->> +                                   Error **errp)
->>  {
->>      NetSocketState *s;
->>      int fd, connected, ret;
->>      struct sockaddr_in saddr;
->> -    Error *err = NULL;
->>
->> -    if (parse_host_port(&saddr, host_str, &err) < 0) {
->> -        error_report_err(err);
->> +    if (parse_host_port(&saddr, host_str, errp) < 0) {
->>          return -1;
->>      }
->>
->>      fd = qemu_socket(PF_INET, SOCK_STREAM, 0);
->>      if (fd < 0) {
->> -        perror("socket");
->> +        error_setg_errno(errp, errno, "failed to create stream socket");
->>          return -1;
->>      }
->>      qemu_set_nonblock(fd);
->> @@ -573,7 +572,7 @@ static int net_socket_connect_init(NetClientState *peer,
->>                         errno == EINVAL) {
->>                  break;
->>              } else {
->> -                perror("connect");
->> +                error_setg_errno(errp, errno, "connection failed");
->>                  closesocket(fd);
->>                  return -1;
->>              }
->> @@ -582,9 +581,8 @@ static int net_socket_connect_init(NetClientState *peer,
->>              break;
->>          }
->>      }
->> -    s = net_socket_fd_init(peer, model, name, fd, connected, &err);
->> +    s = net_socket_fd_init(peer, model, name, fd, connected, errp);
->>      if (!s) {
->> -        error_report_err(err);
->>          return -1;
->>      }
->>      snprintf(s->nc.info_str, sizeof(s->nc.info_str),
->> @@ -597,36 +595,36 @@ static int net_socket_mcast_init(NetClientState *peer,
->>                                   const char *model,
->>                                   const char *name,
->>                                   const char *host_str,
->> -                                 const char *localaddr_str)
->> +                                 const char *localaddr_str,
->> +                                 Error **errp)
->>  {
->>      NetSocketState *s;
->>      int fd;
->>      struct sockaddr_in saddr;
->>      struct in_addr localaddr, *param_localaddr;
->> -    Error *err = NULL;
->>
->> -    if (parse_host_port(&saddr, host_str, &err) < 0) {
->> -        error_report_err(err);
->> +    if (parse_host_port(&saddr, host_str, errp) < 0) {
->>          return -1;
->>      }
->>
->>      if (localaddr_str != NULL) {
->> -        if (inet_aton(localaddr_str, &localaddr) == 0)
->> +        if (inet_aton(localaddr_str, &localaddr) == 0) {
->> +            error_setg(errp, "localaddr '%s' is not a valid IPv4 address",
->> +                       localaddr_str);
->>              return -1;
->> +        }
->>          param_localaddr = &localaddr;
->>      } else {
->>          param_localaddr = NULL;
->>      }
->>
->> -    fd = net_socket_mcast_create(&saddr, param_localaddr, &err);
->> +    fd = net_socket_mcast_create(&saddr, param_localaddr, errp);
->>      if (fd < 0) {
->> -        error_report_err(err);
->>          return -1;
->>      }
->>
->> -    s = net_socket_fd_init(peer, model, name, fd, 0, &err);
->> +    s = net_socket_fd_init(peer, model, name, fd, 0, errp);
->>      if (!s) {
->> -        error_report_err(err);
->>          return -1;
->>      }
->>
->> @@ -643,45 +641,45 @@ static int net_socket_udp_init(NetClientState *peer,
->>                                   const char *model,
->>                                   const char *name,
->>                                   const char *rhost,
->> -                                 const char *lhost)
->> +                                 const char *lhost,
->> +                                 Error **errp)
->>  {
->>      NetSocketState *s;
->>      int fd, ret;
->>      struct sockaddr_in laddr, raddr;
->> -    Error *err = NULL;
->>
->> -    if (parse_host_port(&laddr, lhost, &err) < 0) {
->> -        error_report_err(err);
->> +    if (parse_host_port(&laddr, lhost, errp) < 0) {
->>          return -1;
->>      }
->>
->> -    if (parse_host_port(&raddr, rhost, &err) < 0) {
->> -        error_report_err(err);
->> +    if (parse_host_port(&raddr, rhost, errp) < 0) {
->>          return -1;
->>      }
->>
->>      fd = qemu_socket(PF_INET, SOCK_DGRAM, 0);
->>      if (fd < 0) {
->> -        perror("socket(PF_INET, SOCK_DGRAM)");
->> +        error_setg_errno(errp, errno, "failed to create datagram socket");
->>          return -1;
->>      }
->>
->>      ret = socket_set_fast_reuse(fd);
->>      if (ret < 0) {
->> +        error_setg_errno(errp, errno, "set the socket 'SO_REUSEADDR'"
->> +                         " attribute failed");
->>          closesocket(fd);
->>          return -1;
->>      }
->>      ret = bind(fd, (struct sockaddr *)&laddr, sizeof(laddr));
->>      if (ret < 0) {
->> -        perror("bind");
->> +        error_setg_errno(errp, errno, "bind ip=%s to socket failed",
->> +                         inet_ntoa(laddr.sin_addr));
->>          closesocket(fd);
->>          return -1;
->>      }
->>      qemu_set_nonblock(fd);
->>
->> -    s = net_socket_fd_init(peer, model, name, fd, 0, &err);
->> +    s = net_socket_fd_init(peer, model, name, fd, 0, errp);
->>      if (!s) {
->> -        error_report_err(err);
->>          return -1;
->>      }
->>
->> @@ -696,8 +694,6 @@ static int net_socket_udp_init(NetClientState *peer,
->>  int net_init_socket(const Netdev *netdev, const char *name,
->>                      NetClientState *peer, Error **errp)
->>  {
->> -    /* FIXME error_setg(errp, ...) on failure */
->> -    Error *err = NULL;
->>      const NetdevSocketOptions *sock;
->>
->>      assert(netdev->type == NET_CLIENT_DRIVER_SOCKET);
->> @@ -705,22 +701,21 @@ int net_init_socket(const Netdev *netdev, const char *name,
->>
->>      if (sock->has_fd + sock->has_listen + sock->has_connect + sock->has_mcast +
->>          sock->has_udp != 1) {
->> -        error_report("exactly one of fd=, listen=, connect=, mcast= or udp="
->> +        error_setg(errp, "exactly one of fd=, listen=, connect=, mcast= or udp="
->>                       " is required");
->>          return -1;
->>      }
->>
->>      if (sock->has_localaddr && !sock->has_mcast && !sock->has_udp) {
->> -        error_report("localaddr= is only valid with mcast= or udp=");
->> +        error_setg(errp, "localaddr= is only valid with mcast= or udp=");
->>          return -1;
->>      }
->>
->>      if (sock->has_fd) {
->>          int fd;
->>
->> -        fd = monitor_fd_param(cur_mon, sock->fd, &err);
->> +        fd = monitor_fd_param(cur_mon, sock->fd, errp);
->>          if (fd == -1) {
->> -            error_report_err(err);
->>              return -1;
->>          }
->>          qemu_set_nonblock(fd);
->> @@ -731,15 +726,16 @@ int net_init_socket(const Netdev *netdev, const char *name,
->>      }
->>
->>      if (sock->has_listen) {
->> -        if (net_socket_listen_init(peer, "socket", name, sock->listen) == -1) {
->> +        if (net_socket_listen_init(peer, "socket", name,
->> +            sock->listen, errp) == -1) {
->>              return -1;
->>          }
->>          return 0;
->>      }
->>
->>      if (sock->has_connect) {
->> -        if (net_socket_connect_init(peer, "socket", name, sock->connect) ==
->> -            -1) {
->> +        if (net_socket_connect_init(peer, "socket", name,
->> +            sock->connect, errp) == -1) {
->>              return -1;
->>          }
->>          return 0;
->> @@ -748,8 +744,8 @@ int net_init_socket(const Netdev *netdev, const char *name,
->>      if (sock->has_mcast) {
->>          /* if sock->localaddr is missing, it has been initialized to "all bits
->>           * zero" */
->> -        if (net_socket_mcast_init(peer, "socket", name, sock->mcast,
->> -            sock->localaddr) == -1) {
->> +        if (net_socket_mcast_init(peer, "socket", name,
->> +            sock->mcast, sock->localaddr, errp) == -1) {
->>              return -1;
->>          }
->>          return 0;
->> @@ -757,11 +753,11 @@ int net_init_socket(const Netdev *netdev, const char *name,
->>
->>      assert(sock->has_udp);
->>      if (!sock->has_localaddr) {
->> -        error_report("localaddr= is mandatory with udp=");
->> +        error_setg(errp, "localaddr= is mandatory with udp=");
->>          return -1;
->>      }
->> -    if (net_socket_udp_init(peer, "socket", name, sock->udp, sock->localaddr) ==
->> -        -1) {
->> +    if (net_socket_udp_init(peer, "socket", name,
->> +        sock->udp, sock->localaddr, errp) == -1) {
->>          return -1;
->>      }
->>      return 0;
->> --
->> 2.9.4
->>
->>
->>
->>
->
-> Regards,
-> Daniel
->
+-- 
+Peter Xu
