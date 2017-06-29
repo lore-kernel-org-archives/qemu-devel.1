@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dQQ7o-0005qq-7z
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:28:13 -0400
+	(envelope-from <peterx@redhat.com>) id 1dQR2v-00082M-71
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 00:27:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dQQ7l-0007gz-3J
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:28:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48326)
+	(envelope-from <peterx@redhat.com>) id 1dQR2q-0007fK-AV
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 00:27:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49762)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dQQ7k-0007gQ-TX
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:28:09 -0400
-Date: Thu, 29 Jun 2017 11:28:02 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dQR2q-0007d9-3p
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 00:27:08 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F07B080C08
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 04:27:05 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170629032802.GD32268@pxdev.xzpeter.org>
-References: <1498654172-26570-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170628125232eucas1p1af5a7b0d734c7af25a20981e25812ee2@eucas1p1.samsung.com>
-	<1498654172-26570-4-git-send-email-a.perevalov@samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1498654172-26570-4-git-send-email-a.perevalov@samsung.com>
-Subject: Re: [Qemu-devel] [PATCH v6 3/3] migration: add bitmap for received
- page
+Date: Thu, 29 Jun 2017 12:26:57 +0800
+Message-Id: <1498710417-7807-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH] intel_iommu: fix migration breakage on mr
+ switch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>
-Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, quintela@redhat.com, dgilbert@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Juan Quintela <quintela@redhat.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Wed, Jun 28, 2017 at 08:49:32AM -0400, Alexey Perevalov wrote:
+Migration is broken after the vfio integration work:
 
-[...]
+qemu-kvm: AHCI: Failed to start FIS receive engine: bad FIS receive buffer address
+qemu-kvm: Failed to load ich9_ahci:ahci
+qemu-kvm: error while loading state for instance 0x0 of device '0000:00:1f.2/ich9_ahci'
+qemu-kvm: load of migration failed: Operation not permitted
 
-> @@ -2324,8 +2352,14 @@ static int ram_load_setup(QEMUFile *f, void *opaque)
+The problem is that vfio work introduced dynamic memory region
+switching (actually it is also used for future PT mode), and this memory
+region layout is not properly delivered to destination when migration
+happens. Solution is to rebuild the layout in post_load.
 
-[1]
+Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1459906
+Fixes: 558e0024 ("intel_iommu: allow dynamic switch of IOMMU region")
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ hw/i386/intel_iommu.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
->  
->  static int ram_load_cleanup(void *opaque)
->  {
-> +    RAMBlock *rb;
->      xbzrle_load_cleanup();
->      compress_threads_load_cleanup();
-> +
-> +    RAMBLOCK_FOREACH(rb) {
-> +        g_free(rb->receivedmap);
-> +        rb->receivedmap = NULL;
-> +    }
->      return 0;
->  }
-
-Can we put init into ram_load_setup()? (I don't have the codes, but I
-see this function above at [1], I suppose it'll be called on dest side
-before migration really starts?)
-
-Sorry for my harshness, but this just looks weird. I am not asking
-that we _must_ put it somewhere outside RAM codes, but at least I
-think they should be paired. If you cleanup the bitmap in RAM code,
-why not you init it in RAM code as well? Did I miss anything again?
-
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index a9b59bd..36b231d 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -2332,11 +2332,28 @@ static void vtd_iommu_notify_flag_changed(MemoryRegion *iommu,
+     }
+ }
+ 
++static int vtd_post_load(void *opaque, int version_id)
++{
++    IntelIOMMUState *iommu = opaque;
++
++    /*
++     * Since commit 558e00 ("intel_iommu: allow dynamic switch of
++     * IOMMU region"), memory regions are dynamically turned on/off
++     * depending on context entry configurations from the guest. After
++     * migration, we need to make sure the memory regions are still
++     * correct.
++     */
++    vtd_switch_address_space_all(iommu);
++
++    return 0;
++}
++
+ static const VMStateDescription vtd_vmstate = {
+     .name = "iommu-intel",
+     .version_id = 1,
+     .minimum_version_id = 1,
+     .priority = MIG_PRI_IOMMU,
++    .post_load = vtd_post_load,
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT64(root, IntelIOMMUState),
+         VMSTATE_UINT64(intr_root, IntelIOMMUState),
 -- 
-Peter Xu
+2.7.4
