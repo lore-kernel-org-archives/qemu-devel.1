@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44148)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tianyu.lan@intel.com>) id 1dQY45-0006o1-5z
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:56:54 -0400
+	(envelope-from <famz@redhat.com>) id 1dQY5Z-00082M-AG
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:58:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tianyu.lan@intel.com>) id 1dQY41-00076M-5N
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:56:53 -0400
-Received: from mga05.intel.com ([192.55.52.43]:1646)
+	(envelope-from <famz@redhat.com>) id 1dQY5V-00084O-Bh
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:58:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53796)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tianyu.lan@intel.com>)
-	id 1dQY40-00075b-QK
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:56:49 -0400
-From: Lan Tianyu <tianyu.lan@intel.com>
-Date: Thu, 29 Jun 2017 01:49:54 -0400
-Message-Id: <1498715394-16402-4-git-send-email-tianyu.lan@intel.com>
-In-Reply-To: <1498715394-16402-1-git-send-email-tianyu.lan@intel.com>
-References: <1498715394-16402-1-git-send-email-tianyu.lan@intel.com>
-Subject: [Qemu-devel] [PATCH 3/3] msi: Handle remappable format interrupt
- request
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dQY5V-00083y-5v
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:58:21 -0400
+Date: Thu, 29 Jun 2017 19:58:16 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170629115816.GI28654@lemon.lan>
+References: <20170629080452.26470-1-famz@redhat.com>
+	<20170629080452.26470-5-famz@redhat.com>
+	<3a67102f-7be4-a4cb-9dad-ce6cdcb3b0a3@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3a67102f-7be4-a4cb-9dad-ce6cdcb3b0a3@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 4/7] qdev: Introduce DEFINE_PROP_LINK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,126 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, xen-devel@lists.xensource.com
-Cc: Chao Gao <chao.gao@intel.com>, mst@redhat.com, marcel@redhat.com, sstabellini@kernel.org, anthony.perard@citrix.com, kevin.tian@intel.com, Lan Tianyu <tianyu.lan@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Markus Armbruster <armbru@redhat.com>
 
-From: Chao Gao <chao.gao@intel.com>
+On Thu, 06/29 13:51, Paolo Bonzini wrote:
+> 
+> 
+> On 29/06/2017 10:04, Fam Zheng wrote:
+> > +#define DEFINE_PROP_LINK(_name, _state, _field, _type, _check, _flags) {\
+> > +        .name = (_name),                                                \
+> > +        .info = &(qdev_prop_link),                                      \
+> > +        .offset = offsetof(_state, _field)                              \
+> > +            + type_check(Object *, typeof_field(_state, _field)),       \
+> > +        .link.check = _check,                                           \
+> > +        .link.flags = _flags,                                           \
+> > +        .link_type  = _type,                                            \
+> > +        }
+> > +
+> 
+> Still unsure about _check; qdev_prop_allow_set_link_before_realize is
+> mimicking the same behavior of any other qdev property, so it should be
+> always okay for DEFINE_PROP_LINK.
 
-According to VT-d spec Interrupt Remapping and Interrupt Posting ->
-Interrupt Remapping -> Interrupt Request Formats On Intel 64
-Platforms, fields of MSI data register have changed. This patch
-avoids wrongly regarding a remappable format interrupt request as
-an interrupt binded with an event channel.
+OK, let's drop Property.link and use constant check and flags. A
+DEFINE_PROP_LINK_FULL can always be added later.
 
-Signed-off-by: Chao Gao <chao.gao@intel.com>
-Signed-off-by: Lan Tianyu <tianyu.lan@intel.com>
----
- hw/pci/msi.c         | 5 +++--
- hw/pci/msix.c        | 4 +++-
- hw/xen/xen_pt_msi.c  | 2 +-
- include/hw/xen/xen.h | 2 +-
- xen-hvm-stub.c       | 2 +-
- xen-hvm.c            | 8 +++++++-
- 6 files changed, 16 insertions(+), 7 deletions(-)
-
-diff --git a/hw/pci/msi.c b/hw/pci/msi.c
-index a87b227..3713ea6 100644
---- a/hw/pci/msi.c
-+++ b/hw/pci/msi.c
-@@ -289,7 +289,7 @@ void msi_reset(PCIDevice *dev)
- static bool msi_is_masked(const PCIDevice *dev, unsigned int vector)
- {
-     uint16_t flags = pci_get_word(dev->config + msi_flags_off(dev));
--    uint32_t mask, data;
-+    uint32_t mask, data, addr_lo;
-     bool msi64bit = flags & PCI_MSI_FLAGS_64BIT;
-     assert(vector < PCI_MSI_VECTORS_MAX);
- 
-@@ -298,7 +298,8 @@ static bool msi_is_masked(const PCIDevice *dev, unsigned int vector)
-     }
- 
-     data = pci_get_word(dev->config + msi_data_off(dev, msi64bit));
--    if (xen_is_pirq_msi(data)) {
-+    addr_lo = pci_get_long(dev->config + msi_address_lo_off(dev));
-+    if (xen_is_pirq_msi(addr_lo, data)) {
-         return false;
-     }
- 
-diff --git a/hw/pci/msix.c b/hw/pci/msix.c
-index 0ec1cb1..6dda83c 100644
---- a/hw/pci/msix.c
-+++ b/hw/pci/msix.c
-@@ -81,9 +81,11 @@ static bool msix_vector_masked(PCIDevice *dev, unsigned int vector, bool fmask)
- {
-     unsigned offset = vector * PCI_MSIX_ENTRY_SIZE;
-     uint8_t *data = &dev->msix_table[offset + PCI_MSIX_ENTRY_DATA];
-+    uint8_t *addr_lo = &dev->msix_table[offset + PCI_MSIX_ENTRY_LOWER_ADDR];
-     /* MSIs on Xen can be remapped into pirqs. In those cases, masking
-      * and unmasking go through the PV evtchn path. */
--    if (xen_enabled() && xen_is_pirq_msi(pci_get_long(data))) {
-+    if (xen_enabled() && xen_is_pirq_msi(pci_get_long(addr_lo),
-+                                         pci_get_long(data))) {
-         return false;
-     }
-     return fmask || dev->msix_table[offset + PCI_MSIX_ENTRY_VECTOR_CTRL] &
-diff --git a/hw/xen/xen_pt_msi.c b/hw/xen/xen_pt_msi.c
-index 26a69d9..68da0e4 100644
---- a/hw/xen/xen_pt_msi.c
-+++ b/hw/xen/xen_pt_msi.c
-@@ -114,7 +114,7 @@ static int msi_msix_setup(XenPCIPassthroughState *s,
- 
-     assert((!is_msix && msix_entry == 0) || is_msix);
- 
--    if (xen_is_pirq_msi(data)) {
-+    if (xen_is_pirq_msi(addr, data)) {
-         *ppirq = msi_ext_dest_id(addr >> 32) | msi_dest_id(addr);
-         if (!*ppirq) {
-             /* this probably identifies an misconfiguration of the guest,
-diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
-index a8f3afb..b1ef41e 100644
---- a/include/hw/xen/xen.h
-+++ b/include/hw/xen/xen.h
-@@ -33,7 +33,7 @@ int xen_pci_slot_get_pirq(PCIDevice *pci_dev, int irq_num);
- void xen_piix3_set_irq(void *opaque, int irq_num, int level);
- void xen_piix_pci_write_config_client(uint32_t address, uint32_t val, int len);
- void xen_hvm_inject_msi(uint64_t addr, uint32_t data);
--int xen_is_pirq_msi(uint32_t msi_data);
-+int xen_is_pirq_msi(uint32_t msi_addr_lo, uint32_t msi_data);
- 
- qemu_irq *xen_interrupt_controller_init(void);
- 
-diff --git a/xen-hvm-stub.c b/xen-hvm-stub.c
-index c500325..a3a3bb3 100644
---- a/xen-hvm-stub.c
-+++ b/xen-hvm-stub.c
-@@ -31,7 +31,7 @@ void xen_hvm_inject_msi(uint64_t addr, uint32_t data)
- {
- }
- 
--int xen_is_pirq_msi(uint32_t msi_data)
-+int xen_is_pirq_msi(uint32_t msi_addr_lo, uint32_t msi_data)
- {
-     return 0;
- }
-diff --git a/xen-hvm.c b/xen-hvm.c
-index 0892361..9f1a7bd 100644
---- a/xen-hvm.c
-+++ b/xen-hvm.c
-@@ -146,8 +146,14 @@ void xen_piix_pci_write_config_client(uint32_t address, uint32_t val, int len)
-     }
- }
- 
--int xen_is_pirq_msi(uint32_t msi_data)
-+int xen_is_pirq_msi(uint32_t msi_addr_lo, uint32_t msi_data)
- {
-+    /* If the MSI address is configured in remapping format, the MSI will not
-+     * be remapped into a pirq.
-+     */
-+    if (msi_addr_lo & MSI_ADDR_IF_MASK) {
-+        return 0;
-+    }
-     /* If vector is 0, the msi is remapped into a pirq, passed as
-      * dest_id.
-      */
--- 
-1.8.3.1
+Fam
