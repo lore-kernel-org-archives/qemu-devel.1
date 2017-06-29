@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dQfiR-0006kv-EB
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 16:07:04 -0400
+	(envelope-from <eblake@redhat.com>) id 1dQfoH-000105-AU
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 16:13:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dQfiQ-0000GE-Ak
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 16:07:03 -0400
-Date: Thu, 29 Jun 2017 23:06:13 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170629200613.u7cu3gr4uakqtgc4@postretch>
-References: <20170629060300.29869-1-el13635@mail.ntua.gr>
-	<20170629111824.GC4618@noname.redhat.com>
-	<20170629120741.lkjam3jrlse6jxq2@postretch>
-	<20170629135749.GD4618@noname.redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dQfoD-0002gb-55
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 16:13:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35232)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dQfoC-0002gE-RY
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 16:13:01 -0400
+References: <20170621153424.16690-1-vsementsov@virtuozzo.com>
+	<20170621153424.16690-7-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ac4e0a9b-1846-86b2-1e78-f8ae6a61c3ec@redhat.com>
+Date: Thu, 29 Jun 2017 15:12:54 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="2bppj665x3rrjvdz"
-Content-Disposition: inline
-In-Reply-To: <20170629135749.GD4618@noname.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] block: fix bs->file leak in
- bdrv_new_open_driver()
+In-Reply-To: <20170621153424.16690-7-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="DqVaLrph7xmqWR15Xjc1Gf8iKodQw6O6s"
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] nbd: use generic trace subsystem
+ instead of TRACE macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,97 +29,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-
---2bppj665x3rrjvdz
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--DqVaLrph7xmqWR15Xjc1Gf8iKodQw6O6s
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
+Message-ID: <ac4e0a9b-1846-86b2-1e78-f8ae6a61c3ec@redhat.com>
+Subject: Re: [PATCH v2 6/6] nbd: use generic trace subsystem instead of TRACE
+ macro
+References: <20170621153424.16690-1-vsementsov@virtuozzo.com>
+ <20170621153424.16690-7-vsementsov@virtuozzo.com>
+In-Reply-To: <20170621153424.16690-7-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 29, 2017 at 03:57:49PM +0200, Kevin Wolf wrote:
->Am 29.06.2017 um 14:07 hat Manos Pitsidianakis geschrieben:
->> On Thu, Jun 29, 2017 at 01:18:24PM +0200, Kevin Wolf wrote:
->> >Am 29.06.2017 um 08:03 hat Manos Pitsidianakis geschrieben:
->> >>bdrv_open_driver() is called in two places, bdrv_new_open_driver() and
->> >>bdrv_open_common(). In the latter, failure cleanup in is in its caller,
->> >>bdrv_open_inherit(), which unrefs the bs->file of the failed driver op=
-en
->> >>if it exists. Let's check for this in bdrv_new_open_driver() as well.
->> >>
->> >>Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
->> >>---
->> >> block.c | 3 +++
->> >> 1 file changed, 3 insertions(+)
->> >>
->> >>diff --git a/block.c b/block.c
->> >>index 694396281b..aeacd520e0 100644
->> >>--- a/block.c
->> >>+++ b/block.c
->> >>@@ -1165,6 +1165,9 @@ BlockDriverState *bdrv_new_open_driver(BlockDriv=
-er *drv, const char *node_name,
->> >>
->> >>     ret =3D bdrv_open_driver(bs, drv, node_name, bs->options, flags, =
-errp);
->> >>     if (ret < 0) {
->> >>+        if (bs->file !=3D NULL) {
->> >>+            bdrv_unref_child(bs, bs->file);
->> >>+        }
->> >>         QDECREF(bs->explicit_options);
->> >>         QDECREF(bs->options);
->> >>         bdrv_unref(bs);
->> >
->> >I think we should set bs->file =3D NULL here to remove the dangling
->> >pointer. I think it is never accessed anyway because of the
->> >bs->drv =3D NULL in the error path of bdrv_open_driver(), but better sa=
-fe
->> >than sorry.
->>
->> You can't see it in the diff but after bdrv_unref(bs),
->> bdrv_new_open_driver returns NULL so there won't be any access to bs
->> anyway. And since bs is destroyed by bdrv_unref (its refcount is 1),
->> there's not really a point in setting bs->file =3D NULL.
->
->Yes, but bdrv_unref() doesn't have to expect inconsistent BDSes. It
->doesn't access bs->file currently when bs->drv =3D=3D NULL, but that's more
->by luck than by design.
->
->> >But what would you think about avoiding the code duplication and just
->> >moving the bdrv_unref_child() call from bdrv_open_inherit() down to
->> >bdrv_open_driver(), so that bdrv_new_open_driver() is automatically
->> >covered?
->>
->> The result would be the same, but this will cover future callers of
->> bdrv_open_driver. Should I submit a v2?
->
->I would prefer this, yes.
+On 06/21/2017 10:34 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Starting from this patch to enable traces use -trace option of qemu or
+> -T, --trace option of qemu-img, qemu-io and qemu-nbd. For qemu traces
+> also can be managed by qmp commands trace-event-{get,set}-state.
 
-Perhaps it would be better to destroy bs at failure in bdrv_open_driver=20
-and not leave it to the caller which takes care of bdrv_close and=20
-unrefing bs->file anyway (Also bs->children). Setting bs->drv to NULL at=20
-failure in bdrv_open_driver means some things won't be executed in=20
-bdrv_close when the bs is destroyed eventually as well, so that fixes=20
-another mistake.
+Maybe:
 
---2bppj665x3rrjvdz
+Let NBD use the trace mechanisms already present in qemu. Now you can
+use the -trace optino of qemu, or the -T/--trace option of qemu-img,
+qemu-io, and qemu-nbd, to select nbd traces.  For qemu, the QMP commands
+trace-event-{get,set}-state can also toggle tracing on the fly.
+
+I also mentioned in v1 that an actual command line example might be
+helpful (for example, is it qemu-nbd --trace "nbd_*" to get ALL nbd
+traces enabled?)
+
+>=20
+> Recompilation with CFLAGS=3D-DDEBUG_NBD is no more needed, furthermore,=
+
+> DEBUG_NBD macro is removed from the code.
+
+Yay!
+
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+
+> @@ -462,7 +460,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const ch=
+ar *name, uint16_t *flags,
+> =20
+>      memcpy(&nbd_magic, buf, 8);
+>      nbd_magic =3D be64_to_cpu(nbd_magic);
+> -    TRACE("Magic is 0x%" PRIx64, nbd_magic);
+> +    trace_nbd_receive_negotiate_magic(nbd_magic);
+
+Might be some churn based on the resolution to 5/6.
+
+> =20
+>      if (memcmp(buf, "NBDMAGIC", 8) !=3D 0) {
+>          error_setg(errp, "Invalid magic received");
+> @@ -474,7 +472,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const ch=
+ar *name, uint16_t *flags,
+>          goto fail;
+>      }
+>      magic =3D be64_to_cpu(magic);
+> -    TRACE("Magic is 0x%" PRIx64, magic);
+> +    trace_nbd_receive_negotiate_magic2(magic);
+
+I'm not sure you need two different trace functions, since the message
+is identical.  I'd just have trace_nbd_receive_magic(magic) and use that
+at both call sites.
+
+But overall worth having, even if we fine-tune it later.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--DqVaLrph7xmqWR15Xjc1Gf8iKodQw6O6s
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAllVXbUACgkQc2J8L2kN
-9xC09A//WpytOvqo6C4plFi1Qh4WMwY2d3EB6TuQB9GPOcQP4Z5sag6ecTdZCm8C
-ZhYQpFwjmtHMKmaF6nIL+8gse2YDu8awTjvh2//qfa7GcUQn1u2v9fqQhSmh9V5r
-YSHqAz7Wd3SVQSjdnh6Ik/CmfehAx1q+1duUynsl89PiuOZbDZLveCvUdnbdBHoC
-OIjghUGSGsMTqqHxyKGLeQvlPg00q77aIJAh4rGgbz5C476Y0CvsmRMIhWFCc92x
-kUS66b7bH2AJCm3bHzwl74ti0IGzAvLHI+ZO8vlSA3p+tlV5+4i6CaNSGYBtwTTS
-oPOwdzUq16AcIo4dPKjmQR51xGT9fjYnRZ6Mj1xlKI3ZdP1XuYTFsKwdDpZl7/6H
-v/ybq045e5U1cSOJ18OZWDC9FVpYf0gHOhp56CVBWvfVF5IA3ifUyzCrhP+V9v+v
-PXl9ytcSrCPQo3sL1PMV3wXjllacV7+hY5nzp+EGPyjvnwG6qjE2E6BoSSZciFPt
-xkN6WhU+tAQ5LoqpBYJT8w+pBlkw/M/BlIi4m2iko4ab1suwzeUirnr1gpj8cD5e
-f1v2zBfh4EhE3ogP1bFJP9UsiphdXrH8xbnzhyF+fYn0T/XqKFf+14BFJnk26WPv
-eJsQz0N0rwuGMpQPEb7WyZKQVr+JSfBXKeY6Nepk890nUtP2Qdo=
-=UwVQ
+iQEcBAEBCAAGBQJZVV9GAAoJEKeha0olJ0NqnYQH/29th8T2TV2JNJbBdn5DOp2V
+TOWvqLJIqdZCGfzn9MQqAzboGM3EWAa2Jx+i1z/ihazHYA5SUAQbbcMhDBmjShDc
+GDQqMpBZ+pOf6hvRu+z59/r2tjKHSBahQHPXQ2YedbdEFBNV6XYDfIkTGXrTonsq
+HtalvT/raH5gCFjbzSHTqbOrwdfzg9rBS3EZiLO7P65i163CGcwmx6hUHf4McnBO
+HctxJQW1C7dfAdmrCXAQfroAWMkZOgb4NoyavpSQqoPiOv0+fmHcjJkJgEnjmbhr
+jBJqYTRhd10SOZkbsClCIkIeLLsF+2nryQfqzBJd/K3igftJaM3Zzkcvq1N2090=
+=itIb
 -----END PGP SIGNATURE-----
 
---2bppj665x3rrjvdz--
+--DqVaLrph7xmqWR15Xjc1Gf8iKodQw6O6s--
