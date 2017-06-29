@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dQULe-0000rn-Ia
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 03:58:48 -0400
+	(envelope-from <laurent@vivier.eu>) id 1dQUPw-0002ju-Vz
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 04:03:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dQULb-0008Ge-Fq
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 03:58:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40132)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dQULb-0008G3-7k
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 03:58:43 -0400
-References: <1498564100-10045-1-git-send-email-thuth@redhat.com>
-	<23ec1642-053c-a15a-c03f-d9e48d1447e7@linux.vnet.ibm.com>
-	<c664ff99-e98d-459d-2b07-306e0d00c5b7@redhat.com>
-	<29018087-c00b-abb2-47e6-4ebfc954ff1f@linux.vnet.ibm.com>
-	<b1bf85e6-20b8-a77c-d20b-ffc6fe570e9b@redhat.com>
-	<0ead8e59-be76-f80a-3266-2df20ebb5581@redhat.com>
-	<0279acfe-61e7-3861-da31-ddd2ffd43212@linux.vnet.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <e4e2eebf-db08-298a-f20d-4b742beb977c@redhat.com>
-Date: Thu, 29 Jun 2017 09:58:33 +0200
+	(envelope-from <laurent@vivier.eu>) id 1dQUPt-0002Y9-Og
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 04:03:13 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:56259)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dQUPt-0002V7-DD
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 04:03:09 -0400
+References: <20170628204452.41230-1-raj.khem@gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <927f7df8-7956-45b9-eb5e-0ea5f71779ea@vivier.eu>
+Date: Thu, 29 Jun 2017 10:02:50 +0200
 MIME-Version: 1.0
-In-Reply-To: <0279acfe-61e7-3861-da31-ddd2ffd43212@linux.vnet.ibm.com>
+In-Reply-To: <20170628204452.41230-1-raj.khem@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 00/14] Implement network booting
- directly into the s390-ccw BIOS
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] replace struct ucontext with ucontext_t
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,100 +28,269 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Eric Farman <farman@linux.vnet.ibm.com>, Farhan Ali <alifm@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Jens Freimann <jfreiman@redhat.com>, David Hildenbrand <david@redhat.com>
+To: Khem Raj <raj.khem@gmail.com>, qemu-devel@nongnu.org
+Cc: Kamil Rytarowski <kamil@netbsd.org>, Riku Voipio <riku.voipio@iki.fi>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 28.06.2017 17:02, Viktor Mihajlovski wrote:
-> On 28.06.2017 12:56, Thomas Huth wrote:
->> On 28.06.2017 10:02, Thomas Huth wrote:
->>> On 28.06.2017 09:28, Viktor Mihajlovski wrote:
->>>> On 27.06.2017 23:40, Thomas Huth wrote:
->>>> [...]
->>>>>>> - Is it OK to require loading an .INS file first? Or does anybody
->>>>>>>   have a better idea how to load multiple files (kernel, initrd,
->>>>>>>   etc. ...)?
->>>>>> It would be nice to support PXE-style boot, because the majority o=
-f boot
->>>>>> servers is set up that way. A straightforward way would be to do a=
- PXE
->>>>>> emulation by attempting to download a pxelinux.cfg from the well-k=
-nown
->>>>>> locations, parsing the content (menu) and finally load the kernel,
->>>>>> initrd and set the kernel command line as specified there. (I know=
-, but
->>>>>> you're already parsing the INS-File).
->>>>>
->>>>> Please, don't mix up PXE and pxelinux (since you've used both terms=
- in
->>>>> above paragraph). Assuming that you're only talking about pxlinux c=
-onfig
->>>>> files... are they that common on s390x already? Using the pxelinux
->>>>> config file syntax sounds like we would be completely bound to only
->>>>> loading Linux guests to me, since the boot loader has to know where=
- to
->>>>> load the initrd and how to patch the kernel so that it can find the=
- initrd.
->>>>> Using .INS files sounds more flexible to me instead, since you can =
-also
->>>>> specify the addresses here - so you can theoretically also load oth=
-er
->>>>> guest kernels, and that's IMHO the better approach since a firmware
->>>>> should stay as generic as possible.
->>>>>
->>>> In order to be consumable, the network boot should support the most
->>>> common configurations. I would think that most network boot servers =
-are
->>>> setup as PXE boot servers using pxelinux configs.
->>>
->>> Are you really sure about the popularity of pxelinux? It's just one
->>> flavor of secondary stage network boot loaders - which also only exis=
-t
->>> on x86 so far, as far as I know.
->>
->> And it seems like it also only works with legacy BIOSes, i.e. you can
->> not use it on EFI-only systems, if I've got that right:
->>
->> https://github.com/openSUSE/kiwi/wiki/Setup-PXE-boot-with-EFI-Using-GR=
-UB2
->>
->> So I guess the significance of pxelinux will very likely decrease in
->> the next years...
->>
-> Maybe, but supposed goners tend to linger more often than not. I.e., th=
-e
-> syslinux project offers a EFI bootloader called syslinux.efi equivalent
-> to the pexelinux.0 BIOS loader.
-> Further, the OPAL firmware of newer POWER systems embeds petitboot and
-> thus offers PXELINUX-compatible network boot as well.
+Le 28/06/2017 à 22:44, Khem Raj a écrit :
+> The ucontext_t type had a tag struct ucontext until now
+> but newer glibc will drop it so we need to adjust and use
+> the exposed type instead
 
-OK, true, ... you're slowly get me convinced that this pxelinux.cfg
-stuff is maybe not such a bad idea after all ... So I guess supporting
-at least the basic commands from the pxelinux config file would be
-appropriate... (the full set of commands is huge, see
-http://www.syslinux.org/wiki/index.php?title=3DConfig )
+I didn't find in glib git tree the commit dropping the struct tags for
+ucontext. Could you point it out?
 
-> I appreciate the idea of a proper BOOTP implementation though, so maybe
-> a compromise could be to start off with your proposal with the slight
-> modification that the final boot action is controlled by the bootfile
-> content (file magic), similar to what you suggested in order to support
-> both insfile and binary kernel. PXELINUX emulation could be triggered b=
-y
-> a specially crafted bootfile then. What do you think?
+Thanks,
+Laurent
 
-Yes, something like this could work:
-
-1) Do DHCP to get TFTP server address and boot file name
-2) Load the boot file from the TFTP server to address 0
-3) If the boot file name ended with ".ins" or ".INS" (and the content
-   starts with the "* " magic), treat it as an .INS file and load the
-   files that are listed in there accordingly
-4) If the boot file looks like a kernel, start it directly
-5) If not successful in 3 or 4, start looking for a pxelinux config
-   file by trying to download the config files as specified in
-   http://www.syslinux.org/wiki/index.php?title=3DPXELINUX#Configuration
-   and then parse the file and load the kernel + initrd accordingly.
-
-Quite a bit of work, so I'll continue to ignore 5 for the first
-versions, but I agree now that it can certainly be added later.
-
- Thomas
+> Signed-off-by: Khem Raj <raj.khem@gmail.com>
+> Cc: Kamil Rytarowski <kamil@netbsd.org>
+> Cc: Riku Voipio <riku.voipio@iki.fi>
+> Cc: Laurent Vivier <laurent@vivier.eu>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  linux-user/host/aarch64/hostdep.h |  2 +-
+>  linux-user/host/arm/hostdep.h     |  2 +-
+>  linux-user/host/i386/hostdep.h    |  2 +-
+>  linux-user/host/ppc64/hostdep.h   |  2 +-
+>  linux-user/host/s390x/hostdep.h   |  2 +-
+>  linux-user/host/x86_64/hostdep.h  |  2 +-
+>  linux-user/signal.c               | 10 +++++-----
+>  tests/tcg/test-i386.c             |  4 ++--
+>  user-exec.c                       | 18 +++++++++---------
+>  9 files changed, 22 insertions(+), 22 deletions(-)
+> 
+> diff --git a/linux-user/host/aarch64/hostdep.h b/linux-user/host/aarch64/hostdep.h
+> index 64f75cef49..a8d41a21ad 100644
+> --- a/linux-user/host/aarch64/hostdep.h
+> +++ b/linux-user/host/aarch64/hostdep.h
+> @@ -24,7 +24,7 @@ extern char safe_syscall_end[];
+>  /* Adjust the signal context to rewind out of safe-syscall if we're in it */
+>  static inline void rewind_if_in_safe_syscall(void *puc)
+>  {
+> -    struct ucontext *uc = puc;
+> +    ucontext_t *uc = puc;
+>      __u64 *pcreg = &uc->uc_mcontext.pc;
+>  
+>      if (*pcreg > (uintptr_t)safe_syscall_start
+> diff --git a/linux-user/host/arm/hostdep.h b/linux-user/host/arm/hostdep.h
+> index 5c1ae60120..9276fe6ceb 100644
+> --- a/linux-user/host/arm/hostdep.h
+> +++ b/linux-user/host/arm/hostdep.h
+> @@ -24,7 +24,7 @@ extern char safe_syscall_end[];
+>  /* Adjust the signal context to rewind out of safe-syscall if we're in it */
+>  static inline void rewind_if_in_safe_syscall(void *puc)
+>  {
+> -    struct ucontext *uc = puc;
+> +    ucontext_t *uc = puc;
+>      unsigned long *pcreg = &uc->uc_mcontext.arm_pc;
+>  
+>      if (*pcreg > (uintptr_t)safe_syscall_start
+> diff --git a/linux-user/host/i386/hostdep.h b/linux-user/host/i386/hostdep.h
+> index d834bd80ea..073be74d87 100644
+> --- a/linux-user/host/i386/hostdep.h
+> +++ b/linux-user/host/i386/hostdep.h
+> @@ -24,7 +24,7 @@ extern char safe_syscall_end[];
+>  /* Adjust the signal context to rewind out of safe-syscall if we're in it */
+>  static inline void rewind_if_in_safe_syscall(void *puc)
+>  {
+> -    struct ucontext *uc = puc;
+> +    ucontext_t *uc = puc;
+>      greg_t *pcreg = &uc->uc_mcontext.gregs[REG_EIP];
+>  
+>      if (*pcreg > (uintptr_t)safe_syscall_start
+> diff --git a/linux-user/host/ppc64/hostdep.h b/linux-user/host/ppc64/hostdep.h
+> index 0b0f5f7821..98979ad917 100644
+> --- a/linux-user/host/ppc64/hostdep.h
+> +++ b/linux-user/host/ppc64/hostdep.h
+> @@ -24,7 +24,7 @@ extern char safe_syscall_end[];
+>  /* Adjust the signal context to rewind out of safe-syscall if we're in it */
+>  static inline void rewind_if_in_safe_syscall(void *puc)
+>  {
+> -    struct ucontext *uc = puc;
+> +    ucontext_t *uc = puc;
+>      unsigned long *pcreg = &uc->uc_mcontext.gp_regs[PT_NIP];
+>  
+>      if (*pcreg > (uintptr_t)safe_syscall_start
+> diff --git a/linux-user/host/s390x/hostdep.h b/linux-user/host/s390x/hostdep.h
+> index 6f9da9c608..4f0171f36f 100644
+> --- a/linux-user/host/s390x/hostdep.h
+> +++ b/linux-user/host/s390x/hostdep.h
+> @@ -24,7 +24,7 @@ extern char safe_syscall_end[];
+>  /* Adjust the signal context to rewind out of safe-syscall if we're in it */
+>  static inline void rewind_if_in_safe_syscall(void *puc)
+>  {
+> -    struct ucontext *uc = puc;
+> +    ucontext_t *uc = puc;
+>      unsigned long *pcreg = &uc->uc_mcontext.psw.addr;
+>  
+>      if (*pcreg > (uintptr_t)safe_syscall_start
+> diff --git a/linux-user/host/x86_64/hostdep.h b/linux-user/host/x86_64/hostdep.h
+> index 3b4259633e..a4fefb5114 100644
+> --- a/linux-user/host/x86_64/hostdep.h
+> +++ b/linux-user/host/x86_64/hostdep.h
+> @@ -24,7 +24,7 @@ extern char safe_syscall_end[];
+>  /* Adjust the signal context to rewind out of safe-syscall if we're in it */
+>  static inline void rewind_if_in_safe_syscall(void *puc)
+>  {
+> -    struct ucontext *uc = puc;
+> +    ucontext_t *uc = puc;
+>      greg_t *pcreg = &uc->uc_mcontext.gregs[REG_RIP];
+>  
+>      if (*pcreg > (uintptr_t)safe_syscall_start
+> diff --git a/linux-user/signal.c b/linux-user/signal.c
+> index 3d18d1b3ee..2c55a4f600 100644
+> --- a/linux-user/signal.c
+> +++ b/linux-user/signal.c
+> @@ -3346,7 +3346,7 @@ static void setup_rt_frame(int sig, struct target_sigaction *ka,
+>      *
+>      *   a0 = signal number
+>      *   a1 = pointer to siginfo_t
+> -    *   a2 = pointer to struct ucontext
+> +    *   a2 = pointer to ucontext_t
+>      *
+>      * $25 and PC point to the signal handler, $29 points to the
+>      * struct sigframe.
+> @@ -3733,7 +3733,7 @@ struct target_signal_frame {
+>  
+>  struct rt_signal_frame {
+>      siginfo_t info;
+> -    struct ucontext uc;
+> +    ucontext_t uc;
+>      uint32_t tramp[2];
+>  };
+>  
+> @@ -3949,7 +3949,7 @@ struct rt_signal_frame {
+>      siginfo_t *pinfo;
+>      void *puc;
+>      siginfo_t info;
+> -    struct ucontext uc;
+> +    ucontext_t uc;
+>      uint16_t retcode[4];      /* Trampoline code. */
+>  };
+>  
+> @@ -4484,7 +4484,7 @@ static void setup_rt_frame(int sig, struct target_sigaction *ka,
+>          tswap_siginfo(&frame->info, info);
+>      }
+>  
+> -    /*err |= __clear_user(&frame->uc, offsetof(struct ucontext, uc_mcontext));*/
+> +    /*err |= __clear_user(&frame->uc, offsetof(ucontext_t, uc_mcontext));*/
+>      __put_user(0, &frame->uc.tuc_flags);
+>      __put_user(0, &frame->uc.tuc_link);
+>      __put_user(target_sigaltstack_used.ss_sp,
+> @@ -4976,7 +4976,7 @@ enum {
+>  
+>  struct target_ucontext {
+>      target_ulong tuc_flags;
+> -    target_ulong tuc_link;    /* struct ucontext __user * */
+> +    target_ulong tuc_link;    /* ucontext_t __user * */
+>      struct target_sigaltstack tuc_stack;
+>  #if !defined(TARGET_PPC64)
+>      int32_t tuc_pad[7];
+> diff --git a/tests/tcg/test-i386.c b/tests/tcg/test-i386.c
+> index 0f7b943b0c..9599204895 100644
+> --- a/tests/tcg/test-i386.c
+> +++ b/tests/tcg/test-i386.c
+> @@ -1720,7 +1720,7 @@ int tab[2];
+>  
+>  void sig_handler(int sig, siginfo_t *info, void *puc)
+>  {
+> -    struct ucontext *uc = puc;
+> +    ucontext_t *uc = puc;
+>  
+>      printf("si_signo=%d si_errno=%d si_code=%d",
+>             info->si_signo, info->si_errno, info->si_code);
+> @@ -1912,7 +1912,7 @@ void test_exceptions(void)
+>  /* specific precise single step test */
+>  void sig_trap_handler(int sig, siginfo_t *info, void *puc)
+>  {
+> -    struct ucontext *uc = puc;
+> +    ucontext_t *uc = puc;
+>      printf("EIP=" FMTLX "\n", (long)uc->uc_mcontext.gregs[REG_EIP]);
+>  }
+>  
+> diff --git a/user-exec.c b/user-exec.c
+> index a8f95fa1e1..2a975eaf69 100644
+> --- a/user-exec.c
+> +++ b/user-exec.c
+> @@ -167,7 +167,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+>  #elif defined(__OpenBSD__)
+>      struct sigcontext *uc = puc;
+>  #else
+> -    struct ucontext *uc = puc;
+> +    ucontext_t *uc = puc;
+>  #endif
+>      unsigned long pc;
+>      int trapno;
+> @@ -222,7 +222,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+>  #elif defined(__OpenBSD__)
+>      struct sigcontext *uc = puc;
+>  #else
+> -    struct ucontext *uc = puc;
+> +    ucontext_t *uc = puc;
+>  #endif
+>  
+>      pc = PC_sig(uc);
+> @@ -289,7 +289,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+>  #if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+>      ucontext_t *uc = puc;
+>  #else
+> -    struct ucontext *uc = puc;
+> +    ucontext_t *uc = puc;
+>  #endif
+>      unsigned long pc;
+>      int is_write;
+> @@ -316,7 +316,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+>                             void *puc)
+>  {
+>      siginfo_t *info = pinfo;
+> -    struct ucontext *uc = puc;
+> +    ucontext_t *uc = puc;
+>      uint32_t *pc = uc->uc_mcontext.sc_pc;
+>      uint32_t insn = *pc;
+>      int is_write = 0;
+> @@ -414,7 +414,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+>  #if defined(__NetBSD__)
+>      ucontext_t *uc = puc;
+>  #else
+> -    struct ucontext *uc = puc;
+> +    ucontext_t *uc = puc;
+>  #endif
+>      unsigned long pc;
+>      int is_write;
+> @@ -441,7 +441,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+>  int cpu_signal_handler(int host_signum, void *pinfo, void *puc)
+>  {
+>      siginfo_t *info = pinfo;
+> -    struct ucontext *uc = puc;
+> +    ucontext_t *uc = puc;
+>      uintptr_t pc = uc->uc_mcontext.pc;
+>      uint32_t insn = *(uint32_t *)pc;
+>      bool is_write;
+> @@ -474,7 +474,7 @@ int cpu_signal_handler(int host_signum, void *pinfo, void *puc)
+>  int cpu_signal_handler(int host_signum, void *pinfo, void *puc)
+>  {
+>      siginfo_t *info = pinfo;
+> -    struct ucontext *uc = puc;
+> +    ucontext_t *uc = puc;
+>      unsigned long ip;
+>      int is_write = 0;
+>  
+> @@ -505,7 +505,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+>                         void *puc)
+>  {
+>      siginfo_t *info = pinfo;
+> -    struct ucontext *uc = puc;
+> +    ucontext_t *uc = puc;
+>      unsigned long pc;
+>      uint16_t *pinsn;
+>      int is_write = 0;
+> @@ -558,7 +558,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+>                         void *puc)
+>  {
+>      siginfo_t *info = pinfo;
+> -    struct ucontext *uc = puc;
+> +    ucontext_t *uc = puc;
+>      greg_t pc = uc->uc_mcontext.pc;
+>      int is_write;
+>  
+> 
