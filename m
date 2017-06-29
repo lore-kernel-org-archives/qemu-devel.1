@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dQfNr-0005HE-W0
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 15:45:49 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dQfPz-0006vK-2f
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 15:48:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dQfNo-0007SB-LM
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 15:45:48 -0400
-Received: from mail-sn1nam02on0052.outbound.protection.outlook.com
-	([104.47.36.52]:4077
-	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dQfNo-0007Rt-BF
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 15:45:44 -0400
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Thu, 29 Jun 2017 12:42:38 -0700
-Message-ID: <0b14290d85eceaa145e0333c26826b14304e23e4.1498761179.git.alistair.francis@xilinx.com>
-In-Reply-To: <cover.1498761179.git.alistair.francis@xilinx.com>
-References: <cover.1498761179.git.alistair.francis@xilinx.com>
+	(envelope-from <pbonzini@redhat.com>) id 1dQfPy-0008Ua-A4
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 15:47:59 -0400
+Date: Thu, 29 Jun 2017 15:47:39 -0400 (EDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <991581394.12897770.1498765659699.JavaMail.zimbra@redhat.com>
+In-Reply-To: <CAKmqyKNS5D0pV-zspRX8fHE9fhxXmR-v4znAX3_-rdP9su+RJg@mail.gmail.com>
+References: <cover.1498607452.git.alistair.francis@xilinx.com>
+	<4b48ca3f3c45bee1103bcb50d87e6d5cadc88d6f.1498607452.git.alistair.francis@xilinx.com>
+	<b959c21f-1c3e-e3ed-3012-24ef53cb8ff4@redhat.com>
+	<CAKmqyKNS5D0pV-zspRX8fHE9fhxXmR-v4znAX3_-rdP9su+RJg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [RFC v2 2/3] qemu-error: Implement a more generic
- error reporting
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v1 4/4] util/oslib-win32: Recursivly pass the
+ timeout
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,153 +26,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, philippe@mathieu-daude.net, berrange@redhat.com
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Edgar Iglesias <edgar.iglesias@xilinx.com>, qemu-block@nongnu.org
 
-This patch removes the exisinting error_vreport() function and replaces it
-with a more generic vreport() function that takes an enum describing the
-information to be reported.
+> On Thu, Jun 29, 2017 at 5:34 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > On 28/06/2017 01:57, Alistair Francis wrote:
+> > I'm not sure I agree with this change, which is effectively delaying the
+> > processing of events.  The question to me is which handles are
+> > triggering so fast that QEMU effectively busy waits.
+> 
+> Yeah, that is what I was trying to figure out, but didn't make much headway.
+> 
+> I kept seeing zero timeouts, which means that the thread never blocks
+> and this patch helps a lot.
 
-As part of this change a report() function is added as well with the
-same capability.
+Perhaps you can use tracepoints?  There shouldn't be many handles registered,
+since on Windows even the GUI actions all go through messages.
 
-To maintain full compatibility the original error_report() function is
-maintained and no changes to the way errors are printed have been made.
+> > Maybe your QEMUs can get some breath with commit 12f8def0e0 ("win32:
+> > replace custom mutex and condition variable with native primitives",
+> > 2017-03-27), since the native primitives are more efficient and TCG 2.8
+> > used condvars a lot for qemu_io_proceeded_cond.
+> 
+> Ok, I will try that.
+> 
+> Does this mean you don't see the same slowness on QEMU 2.9?
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
----
+I have not tried, but the patch is only working around the real issue,
+as Fam pointed out.
 
- hw/virtio/virtio.c          |  2 +-
- include/qemu/error-report.h | 10 +++++++++-
- scripts/checkpatch.pl       |  3 ++-
- util/qemu-error.c           | 33 ++++++++++++++++++++++++++++++---
- 4 files changed, 42 insertions(+), 6 deletions(-)
-
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 464947f76d..bd3d26abb7 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -2448,7 +2448,7 @@ void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
-     va_list ap;
- 
-     va_start(ap, fmt);
--    error_vreport(fmt, ap);
-+    vreport(ERROR, fmt, ap);
-     va_end(ap);
- 
-     if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
-diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
-index 3001865896..39b554c3b9 100644
---- a/include/qemu/error-report.h
-+++ b/include/qemu/error-report.h
-@@ -21,6 +21,12 @@ typedef struct Location {
-     struct Location *prev;
- } Location;
- 
-+typedef enum {
-+    ERROR,
-+    WARN,
-+    INFO,
-+} report_types;
-+
- Location *loc_push_restore(Location *loc);
- Location *loc_push_none(Location *loc);
- Location *loc_pop(Location *loc);
-@@ -30,12 +36,14 @@ void loc_set_none(void);
- void loc_set_cmdline(char **argv, int idx, int cnt);
- void loc_set_file(const char *fname, int lno);
- 
-+void vreport(report_types type, const char *fmt, va_list ap) GCC_FMT_ATTR(2, 0);
-+void report(report_types type, const char *fmt, ...)  GCC_FMT_ATTR(2, 3);
-+
- void error_vprintf(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
- void error_printf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
- void error_vprintf_unless_qmp(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
- void error_printf_unless_qmp(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
- void error_set_progname(const char *argv0);
--void error_vreport(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
- void error_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
- const char *error_get_progname(void);
- extern bool enable_timestamp_msg;
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index 45027b9281..4a3074e758 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -2530,7 +2530,8 @@ sub process {
- 				error_set|
- 				error_prepend|
- 				error_reportf_err|
--				error_vreport|
-+				vreport|
-+				report|
- 				error_report}x;
- 
- 	if ($rawline =~ /\b(?:$qemu_error_funcs)\s*\(.*\".*\\n/) {
-diff --git a/util/qemu-error.c b/util/qemu-error.c
-index 1c5e35ecdb..83206532dd 100644
---- a/util/qemu-error.c
-+++ b/util/qemu-error.c
-@@ -179,17 +179,28 @@ static void print_loc(void)
- 
- bool enable_timestamp_msg;
- /*
-- * Print an error message to current monitor if we have one, else to stderr.
-+ * Print a message to current monitor if we have one, else to stderr.
-  * Format arguments like vsprintf().  The resulting message should be
-  * a single phrase, with no newline or trailing punctuation.
-  * Prepend the current location and append a newline.
-  * It's wrong to call this in a QMP monitor.  Use error_setg() there.
-  */
--void error_vreport(const char *fmt, va_list ap)
-+void vreport(report_types type, const char *fmt, va_list ap)
- {
-     GTimeVal tv;
-     gchar *timestr;
- 
-+    switch (type) {
-+    case ERROR:
-+        /* To maintin compatibility we don't add anything here */
-+        break;
-+    case WARN:
-+        error_printf("warning: ");
-+        break;
-+    case INFO:
-+        error_printf("info: ");
-+        break;
-+    }
-     if (enable_timestamp_msg && !cur_mon) {
-         g_get_current_time(&tv);
-         timestr = g_time_val_to_iso8601(&tv);
-@@ -203,6 +214,22 @@ void error_vreport(const char *fmt, va_list ap)
- }
- 
- /*
-+ * Print a message to current monitor if we have one, else to stderr.
-+ * Format arguments like sprintf().  The resulting message should be a
-+ * single phrase, with no newline or trailing punctuation.
-+ * Prepend the current location and append a newline.
-+ * It's wrong to call this in a QMP monitor.  Use error_setg() there.
-+ */
-+void report(report_types type, const char *fmt, ...)
-+{
-+    va_list ap;
-+
-+    va_start(ap, fmt);
-+    vreport(type, fmt, ap);
-+    va_end(ap);
-+}
-+
-+/*
-  * Print an error message to current monitor if we have one, else to stderr.
-  * Format arguments like sprintf().  The resulting message should be a
-  * single phrase, with no newline or trailing punctuation.
-@@ -214,6 +241,6 @@ void error_report(const char *fmt, ...)
-     va_list ap;
- 
-     va_start(ap, fmt);
--    error_vreport(fmt, ap);
-+    vreport(ERROR, fmt, ap);
-     va_end(ap);
- }
--- 
-2.11.0
+Paolo
