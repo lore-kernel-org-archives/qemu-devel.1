@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39777)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dQaGs-0007eE-9u
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:18:16 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dQaQV-0002xB-Ui
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:28:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dQaGp-0005t4-4I
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:18:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38298)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dQaGo-0005sI-VQ
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:18:11 -0400
-Date: Thu, 29 Jun 2017 15:18:05 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170629141805.GG32167@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170613165313.20954-1-ehabkost@redhat.com>
-	<87o9t8qy7d.fsf@dusky.pond.sub.org>
-	<6fac3c3d-9cf8-cb79-0141-908fe8160a5b@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dQaQP-0003LP-W8
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:28:11 -0400
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:32854)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dQaQP-0003Ku-Iv
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:28:05 -0400
+Received: by mail-lf0-x242.google.com with SMTP id t72so7866649lff.0
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 07:28:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <6fac3c3d-9cf8-cb79-0141-908fe8160a5b@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 00/15] Error API: Flag errors in *errp even
- if errors are being ignored
+References: <20170611074817.13621-1-sf@sfritsch.de>
+	<d95a3198-3ad0-4a75-dda2-a3b7502ede28@redhat.com>
+In-Reply-To: <d95a3198-3ad0-4a75-dda2-a3b7502ede28@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 29 Jun 2017 14:27:52 +0000
+Message-ID: <CAJ+F1CKs+Q7Z2mkbGK3GFaM9xJ=rTp9A-Gz+9um5pgpA2ef=Hg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] Add chardev-send-break monitor command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +30,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Eric Blake <eblake@redhat.com>, Stefan Fritsch <sf@sfritsch.de>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Thu, Jun 29, 2017 at 03:39:58PM +0200, Paolo Bonzini wrote:
-> On 28/06/2017 11:05, Markus Armbruster wrote:
-> > If foo() additionally returned an indication of success, you could write
-> > 
-> >       if (!foo(arg, errp)) {    // assuming foo() returns a bool
-> >           handle the error...
-> >       }
-> > 
-> > Nicely concise.
-> > 
-> > For what it's worth, this is how GLib wants GError to be used.  We
-> > deviated from it, and it has turned out to be a self-inflicted wound.
-> > 
-> 
-> I find Eduardo's proposal better.  With GLib's way it's easy to confuse
-> functions that return 0/-1, 0/-errno, TRUE/FALSE, FALSE/TRUE or
-> NULL/non-NULL.
+On Tue, Jun 27, 2017 at 9:46 PM Eric Blake <eblake@redhat.com> wrote:
 
-NB, glib basically standardizes on just FALSE/TRUE and NULL/non-NULL,
-avoiding anything returning -1, or errno values, so in their usage
-there isn't really any confusion.
+> On 06/11/2017 02:48 AM, Stefan Fritsch wrote:
+> > Sending a break on a serial console can be useful for debugging the
+> > guest. But not all chardev backends support sending breaks (only telnet
+> > and mux do). The chardev-send-break command allows to send a break even
+> > if using other backends.
+> >
+> > Signed-off-by: Stefan Fritsch <sf@sfritsch.de>
+> > Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>
 
-QEMU of course has lots of pre-existing code, but we could at least
-declare a preferred approach, and work towards it.
+Looks good to me,
+ Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Having the return value indicate error is slightly shorter, and it
-avoids all the blackmagic with special Error values in Eduardo's
-series. Most usefully, it lets you use __attribute__(return_check)
-to get compile time checking of callers who forget to check for
-failure.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> ---
+> > v2: added tests and Acked-by line
+> >
+>
+> > +++ b/hmp-commands.hx
+> > @@ -1745,6 +1745,22 @@ Removes the chardev @var{id}.
+> >  ETEXI
+> >
+> >      {
+> > +        .name       =3D "chardev-send-break",
+> > +        .args_type  =3D "id:s",
+> > +        .params     =3D "id",
+> > +        .help       =3D "send break on chardev",
+>
+> Compare this wording,...
+>
+> > +STEXI
+> > +@item chardev-send-break id
+> > +@findex chardev-send-break
+> > +Sends break on the chardev @var{id}.
+>
+> repeated here,
+>
+> > +++ b/qapi-schema.json
+> > @@ -5114,6 +5114,26 @@
+> >  { 'command': 'chardev-remove', 'data': {'id': 'str'} }
+> >
+> >  ##
+> > +# @chardev-send-break:
+> > +#
+> > +# Send a break to a character device
+>
+> ...with this wording.  I like 'send a break' better than 'send break',
+> but even better might be 'send a break sequence' or even 'emulate a
+> break sequence' (by definition, a break is NOT a character, but on bare
+> metal character devices it IS a defined electrical sequence distinct
+> from characters to make the recipient aware that the sender is trying to
+> get attention).
+>
+> Otherwise, the patch looks fine to me.  If all that changes is some
+> word-smithing (and the maintainer may be willing to do that), you can add=
+:
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>
+
+Paolo would you take it (perhaps on the next iteration)?
+
+thanks
+--=20
+Marc-Andr=C3=A9 Lureau
