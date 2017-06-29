@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1dQW8r-0000YV-Jk
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:53:42 -0400
+	(envelope-from <atar4qemu@gmail.com>) id 1dQWCN-0001Zd-77
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:57:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1dQW8o-0002iE-FH
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:53:41 -0400
-Received: from mail-eopbgr10105.outbound.protection.outlook.com
-	([40.107.1.105]:63168
-	helo=EUR02-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1dQW8n-0002hQ-AU
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:53:38 -0400
-Date: Thu, 29 Jun 2017 12:53:27 +0300
-From: Roman Kagan <rkagan@virtuozzo.com>
-Message-ID: <20170629095326.GA2973@rkaganb.sw.ru>
-References: <20170621162424.10462-1-rkagan@virtuozzo.com>
-	<20170621162424.10462-8-rkagan@virtuozzo.com>
-	<20170628164743.0df730a0@nial.brq.redhat.com>
+	(envelope-from <atar4qemu@gmail.com>) id 1dQWCM-0005R9-26
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:57:19 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:34689)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1dQWCL-0005Qd-S1
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:57:17 -0400
+Received: by mail-oi0-x243.google.com with SMTP id d77so8209016oig.1
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 02:57:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170628164743.0df730a0@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 07/23] hyperv: ensure VP index equal to
- QEMU cpu_index
+In-Reply-To: <98c8f099-fd1b-4f50-97f9-00c8a5f88503@ilande.co.uk>
+References: <4e41c60b-53b8-b917-108a-7cea8cb9e591@oracle.com>
+	<98c8f099-fd1b-4f50-97f9-00c8a5f88503@ilande.co.uk>
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Thu, 29 Jun 2017 11:56:56 +0200
+Message-ID: <CACXAS8AYCVWV+OeHziWf1EWpTNj-wVDu==V931tMZ01SWUBfFQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] SPARC64 supported processors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,179 +28,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Pasha Tatashin <pasha.tatashin@oracle.com>, qemu-devel <qemu-devel@nongnu.org>
 
-On Wed, Jun 28, 2017 at 04:47:43PM +0200, Igor Mammedov wrote:
-> On Wed, 21 Jun 2017 19:24:08 +0300
-> Roman Kagan <rkagan@virtuozzo.com> wrote:
-> 
-> > Hyper-V identifies vCPUs by Virtual Processor (VP) index which can be
-> > queried by the guest via HV_X64_MSR_VP_INDEX msr.  It is defined by the
-> > spec as a sequential number which can't exceed the maximum number of
-> > vCPUs per VM.
-> > 
-> > It has to be owned by QEMU in order to preserve it across migration.
-> > 
-> > However, the initial implementation in KVM didn't allow to set this
-> > msr, and KVM used its own notion of VP index.  Fortunately, the way
-> > vCPUs are created in QEMU/KVM makes it likely that the KVM value is
-> > equal to QEMU cpu_index.
-> > 
-> > So choose cpu_index as the value for vp_index, and push that to KVM on
-> > kernels that support setting the msr.  On older ones that don't, query
-> > the kernel value and assert that it's in sync with QEMU.
-> > 
-> > Besides, since handling errors from vCPU init at hotplug time is
-> > impossible, disable vCPU hotplug.
-> proper place to check if cpu might be created is at 
-> pc_cpu_pre_plug() where you can gracefully abort cpu creation process. 
+ Hi Mark,
 
-Thanks for the suggestion, I'll rework it this way.
+On Thu, Jun 29, 2017 at 8:57 AM, Mark Cave-Ayland
+<mark.cave-ayland@ilande.co.uk> wrote:
+> On 27/06/17 18:59, Pasha Tatashin wrote:
+>
+> Hi Pasha,
+>
+>> Hi,
+>>
+>> I am trying to evaluate the current qemu support for sparc64 processors.
+>> First, it seems -smp is not supported for any processor, is this
+>> correct? When I set -smp greater than 1, I am getting:
+>>
+>> qemu-system-sparc64: Number of SMP CPUs requested (2) exceeds max CPUs
+>> supported by machine 'sun4u' (1)
+>
+> Yes, that is correct for the moment. Before the MTTCG patches were
+> merged, TCG only ran one thread so -smp 2 would effectively split your
+> single host CPU into 2 virtual CPUs which doesn't give much benefit.
+>
+> Now MTTCG has been included multi CPUs become much more useful and
+> really for SPARC64 there are 2 main tasks (for sun4u): reviewing the
+> atomic instructions and marking them with the appropriate barriers in
+> TCG, and then updating OpenBIOS (and possibly fw_cfg) to handle multiple
+> CPUs on startup.
+>
+> The other point to note here is that since the default sun4u CPU doesn't
+> have the equivalent of a "sleep until interrupt" instruction then the
+> guest processes will run at 100% CPU on the host since there is no way
+> for the guest to indicate that it should yield.
 
-> Also it's possible to create cold-plugged CPUs in out of order
-> sequence using
->  -device cpu-foo on CLI
-> will be hyperv kvm/guest side ok with it?
+Well, it should be possible to recognize the scheduler loops for the
+popular OSes at the translation time and halt or throttle down if
+nothing happens. But I'm not sure the hack is worth the effort.
 
-On kernels that support setting HV_X64_MSR_VP_INDEX QEMU will
-synchronize all sides.  On kernels that don't, if out-of-order creation
-results in vp_index mismatch between the kernel and QEMU, vcpu creation
-will fail.
+> I would expect that this
+> would be possible with other CPUs though.
 
-> > This patch also introduces accessor functions to wrap the mapping
-> > between a vCPU and its vp_index.  Besides, a few variables are renamed
-> > to avoid confusion of vp_index with vcpu_id (== apic_id).
-> > 
-> > Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
-> > ---
-> > v1 -> v2:
-> >  - were patches 5, 6 in v1
-> >  - move vp_index initialization to hyperv_init_vcpu
-> >  - check capability before trying to set the msr
-> >  - set the msr on the usual kvm_put_msrs path
-> >  - disable cpu hotplug if msr is not settable
-> > 
-> >  target/i386/hyperv.h |  5 ++++-
-> >  target/i386/hyperv.c | 16 +++++++++++++---
-> >  target/i386/kvm.c    | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  3 files changed, 68 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/target/i386/hyperv.h b/target/i386/hyperv.h
-> > index 0c3b562..82f4757 100644
-> > --- a/target/i386/hyperv.h
-> > +++ b/target/i386/hyperv.h
-> > @@ -32,11 +32,14 @@ struct HvSintRoute {
-> >  
-> >  int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit);
-> >  
-> > -HvSintRoute *kvm_hv_sint_route_create(uint32_t vcpu_id, uint32_t sint,
-> > +HvSintRoute *kvm_hv_sint_route_create(uint32_t vp_index, uint32_t sint,
-> >                                        HvSintAckClb sint_ack_clb);
-> >  
-> >  void kvm_hv_sint_route_destroy(HvSintRoute *sint_route);
-> >  
-> >  int kvm_hv_sint_route_set_sint(HvSintRoute *sint_route);
-> >  
-> > +uint32_t hyperv_vp_index(X86CPU *cpu);
-> > +X86CPU *hyperv_find_vcpu(uint32_t vp_index);
-> > +
-> >  #endif
-> > diff --git a/target/i386/hyperv.c b/target/i386/hyperv.c
-> > index 227185c..4f57447 100644
-> > --- a/target/i386/hyperv.c
-> > +++ b/target/i386/hyperv.c
-> > @@ -16,6 +16,16 @@
-> >  #include "hyperv.h"
-> >  #include "hyperv_proto.h"
-> >  
-> > +uint32_t hyperv_vp_index(X86CPU *cpu)
-> > +{
-> > +    return CPU(cpu)->cpu_index;
-> > +}
-> 
-> 
-> > +X86CPU *hyperv_find_vcpu(uint32_t vp_index)
-> > +{
-> > +    return X86_CPU(qemu_get_cpu(vp_index));
-> > +}
-> this helper isn't used in this patch, add it in the patch that would actually use it
+The IIIi has ways to reduce the frequency, but not halt completely.
+Not sure about IV(+).
 
-I thought I would put the only two functions that encapsulate the
-knowledge of how vp_index is realted to cpu_index, in a single patch.
+>> I've done some testing for all available sparc64 cpus + latest linux
+>> kernel:
+>>
+>> Fujitsu Sparc64        Working
+>> Fujitsu Sparc64 III Exception 0x30 (DAE_side_effect_page) in OpenBios
+>> Fujitsu Sparc64 IV  Working
+>> Fujitsu Sparc64 V   Working
+>> TI UltraSparc I     Working
+>> TI UltraSparc II    Working
+>> TI UltraSparc IIi   Working
+>> TI UltraSparc IIe   Exception 0x28 (division_by_zero) in init_tick_ops
+>>   Can make it to work if is_hummingbird() is changed
+>>   to return 0. The IO stick, and OpenBios stick properties
+>>   are absent, so we have to default to %tick for now.
+>>
+>> Sun UltraSparc III  Illegal instruction in cheetah_boot():
+>>   wr  %g0, %g1, %dcr
+>>   It appears dispatch control register is not implemented.
+>>
+>> Sun UltraSparc IIIi
+>> Sun UltraSparc IV
+>> Sun UltraSparc IV+
+>> Sun UltraSparc IIIi+
+>>  In these four CPUs, I am getting exception 0x32 in
+>>  cheetah_generic_boot: stxa  %g0, [ %g3 ] #ASI_DMMU
+>>
+>> Sun UltraSparc T1
+>> Sun UltraSparc T2
+>>
+>> Both of the above boot pretty far but fail in this function when tmpfs
+>> is mounted:
+>>     direct_pcr_write(unsigned long reg_num, u64 val)
+>>     __asm__ __volatile__("wr %0, 0x0, %%pcr" : : "r" (val));
+>>
+>>     Seems like performance counter registers are not supported.
+>>
+>>     needed to add these to kernel parameters:
+>>     keep_bootcon -> to see where we are panicking
+>>     lpj=1000 -> jiffers could not calculate for some reason.
+>>
+>> NEC UltraSparc I    Working
+>>
+>> Does this look right or may be I have missed something, and we can get
+>> some of the Sun UltraSparc to work for example?
+>
+> That's certainly a very comprehensive set of tests :) I'd say that it's
+> a fairly accurate reflection of where we are at the moment in that the
+> basic SPARC64 core is working well and it's the CPU-specific parts which
+> need more work.
+>
+> Currently myself and Artyom (CCd) are the SPARC maintainers and we tend
+> to focus on different areas: my interest is with the sun4u machine as I
+> have some legacy Solaris images I'm trying to run whilst Artyom has
+> recently contributed niagara support to the 2.9 release. Note that I do
+> try and keep the wiki page at
+> http://wiki.qemu.org/Documentation/Platforms/SPARC up to date so that
+> people can track current progress.
+>
+> Yes we can certainly look at trying to support more of the UltraSPARC
+> CPUs if that is of interest. In reality the main reason that things
+> haven't progressed further is due to lack of available time: whilst both
+> myself and Artyom have done bits of work for particular clients, the
+> majority of the work takes place in our own time outside of work and
+> home which is, of course, limited.
+>
+> If there are particular features you would like added to QEMU's SPARC
+> emulation then offers of help in terms of
+> people/documentation/sponsorship are always welcome. Feel free to
+> follow-up with both myself and Artyom off-list if this is something of
+> interest to you.
+>
+>
 
-I'm now thinking of open-coding the iteration over cpus here and
-directly look for cpu whose hyperv_vp_index() matches.  Then that
-knowledge will become encapsulated in a single place, and indeed, this
-helper can go into another patch where it's used.
+-- 
+Regards,
+Artyom Tarasenko
 
-> also if  qemu_get_cpu() were called from each CPU init,
-> it would incur O(N^2) complexity, could you do without it?
-
-It isn't called on hot paths (ATM it's called only when SINT routes are
-created, which is at most one per cpu).  I don't see a problem here.
-
-> > @@ -105,7 +115,7 @@ HvSintRoute *kvm_hv_sint_route_create(uint32_t vcpu_id, uint32_t sint,
-> >      }
-> >      sint_route->gsi = gsi;
-> >      sint_route->sint_ack_clb = sint_ack_clb;
-> > -    sint_route->vcpu_id = vcpu_id;
-> > +    sint_route->vcpu_id = vp_index;
->                    ^^^ - shouldn't it also be re-named?
-
-Right, but vcpu_id on sint_route is replaced with X86CPU pointer in a
-followup patch, so I wasn't sure if it was worth while to add more
-churn...
-
-> 
-> maybe split all renaming into separate patch ...
-
-Part of the renaming will disappear eventually in the followup patches,
-so I'm sure it's a good idea...  Opinions?
-
-> > +static int hyperv_init_vcpu(X86CPU *cpu)
-> > +{
-> > +    if (cpu->hyperv_vpindex && !is_hv_vpindex_settable) {
-> > +        /*
-> > +         * the kernel doesn't support setting vp_index; assert that its value
-> > +         * is in sync
-> > +         */
-> > +        int ret;
-> > +        struct {
-> > +            struct kvm_msrs info;
-> > +            struct kvm_msr_entry entries[1];
-> > +        } msr_data = {
-> > +            .info.nmsrs = 1,
-> > +            .entries[0].index = HV_X64_MSR_VP_INDEX,
-> > +        };
-> > +
-> > +        /*
-> > +         * handling errors from vcpu init at hotplug time is impossible, so
-> > +         * disallow cpu hotplug
-> > +         */
-> > +        MACHINE_GET_CLASS(current_machine)->hot_add_cpu = NULL;
-> one shouldn't alter machine this way nor
-> it would disable cpu hotplug, it would disable only cpu-add interface
-> but device_add() would still work.
-
-Understood, will rework as you suggest above.
-
-> > +        ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, &msr_data);
-> > +        if (ret < 0) {
-> when this can fail?
-
-Dunno, but not checking for errors doesn't look good.
-
-> > +            return ret;
-> > +        }
-> > +        assert(ret == 1);
-> > +
-> > +        if (msr_data.entries[0].data != hyperv_vp_index(cpu)) {
-> > +            fprintf(stderr, "kernel's vp_index != QEMU's vp_index\n");
-> error_report()
-
-OK (target/i386/kvm.c is already a mix of all possible styles of error
-reporting, I must've followed a wrong one).
-
-Thanks,
-Roman.
+SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
