@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dQZkw-0004Af-Df
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:45:15 -0400
+	(envelope-from <voipio@kos.to>) id 1dQZls-00057m-JN
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:46:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dQZkq-0003Kt-7m
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:45:14 -0400
-Received: from mail-wr0-f180.google.com ([209.85.128.180]:33204)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dQZkp-0003Iv-Ul
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:45:08 -0400
-Received: by mail-wr0-f180.google.com with SMTP id r103so189927097wrb.0
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 06:45:07 -0700 (PDT)
-References: <1498734863-164338-1-git-send-email-imammedo@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b6193c2f-a358-b871-34f7-7f8d6784f4b8@redhat.com>
-Date: Thu, 29 Jun 2017 15:45:04 +0200
+	(envelope-from <voipio@kos.to>) id 1dQZln-00048Z-Nt
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:46:12 -0400
+Received: from jessie.kos.to ([212.47.231.226]:57596 helo=pilvi.kos.to)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <voipio@kos.to>) id 1dQZln-00047V-Cn
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:46:07 -0400
+Date: Thu, 29 Jun 2017 13:46:01 +0000
+From: Riku Voipio <riku.voipio@iki.fi>
+Message-ID: <20170629134601.GA9921@kos.to>
+References: <20170620205121.26515-1-laurent@vivier.eu>
+	<20170620205121.26515-7-laurent@vivier.eu>
+	<e94af6f2-8869-b9e7-b2b8-b3f16713b345@vivier.eu>
 MIME-Version: 1.0
-In-Reply-To: <1498734863-164338-1-git-send-email-imammedo@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qom: enforce readonly nature of link's
- check callback
+Content-Disposition: inline
+In-Reply-To: <e94af6f2-8869-b9e7-b2b8-b3f16713b345@vivier.eu>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 6/6] target-m68k,
+ linux-user: manage FP registers in ucontext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,187 +30,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: famz@redhat.com, mst@redhat.com, alistair.francis@xilinx.com, qemu-arm@nongnu.org, edgar.iglesias@gmail.com, afaerber@suse.de
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, Thomas Huth <huth@tuxfamily.org>, Aurelien Jarno <aurelien@aurel32.net>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <rth@twiddle.net>
 
-On 29/06/2017 13:14, Igor Mammedov wrote:
-> link's check callback is supposed to verify/permit setting it,
-> however currently nothing restricts it from misusing it
-> and modifying target object from within.
-> Make sure that readonly semantics are checked by compiler
-> to prevent callback's misuse.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
-> Fam,
->  it probably conflicts with yours DEFINE_PROP_LINK series,
->  feel free to include this patch if you'll have to respin
-> 
-> ---
->  include/hw/qdev-properties.h | 3 ++-
->  include/qom/object.h         | 6 +++---
->  hw/core/qdev-properties.c    | 3 ++-
->  hw/display/xlnx_dp.c         | 2 +-
->  hw/ipmi/ipmi.c               | 2 +-
->  hw/mem/pc-dimm.c             | 2 +-
->  hw/misc/ivshmem.c            | 2 +-
->  qom/object.c                 | 8 ++++----
->  8 files changed, 15 insertions(+), 13 deletions(-)
-> 
-> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-> index 306bbab..6dfe16e 100644
-> --- a/include/hw/qdev-properties.h
-> +++ b/include/hw/qdev-properties.h
-> @@ -234,7 +234,8 @@ void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
->   * This function should be used as the check() argument to
->   * object_property_add_link().
->   */
-> -void qdev_prop_allow_set_link_before_realize(Object *obj, const char *name,
-> +void qdev_prop_allow_set_link_before_realize(const Object *obj,
-> +                                             const char *name,
->                                               Object *val, Error **errp);
->  
->  #endif
-> diff --git a/include/qom/object.h b/include/qom/object.h
-> index 5ecc2d1..5223692 100644
-> --- a/include/qom/object.h
-> +++ b/include/qom/object.h
-> @@ -788,7 +788,7 @@ ObjectClass *object_get_class(Object *obj);
->   *
->   * Returns: The QOM typename of @obj.
->   */
-> -const char *object_get_typename(Object *obj);
-> +const char *object_get_typename(const Object *obj);
->  
->  /**
->   * type_register_static:
-> @@ -1320,7 +1320,7 @@ typedef enum {
->   * callback function.  It allows the link property to be set and never returns
->   * an error.
->   */
-> -void object_property_allow_set_link(Object *, const char *,
-> +void object_property_allow_set_link(const Object *, const char *,
->                                      Object *, Error **);
->  
->  /**
-> @@ -1353,7 +1353,7 @@ void object_property_allow_set_link(Object *, const char *,
->   */
->  void object_property_add_link(Object *obj, const char *name,
->                                const char *type, Object **child,
-> -                              void (*check)(Object *obj, const char *name,
-> +                              void (*check)(const Object *obj, const char *name,
->                                              Object *val, Error **errp),
->                                ObjectPropertyLinkFlags flags,
->                                Error **errp);
-> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-> index 2a82768..95e5fdb 100644
-> --- a/hw/core/qdev-properties.c
-> +++ b/hw/core/qdev-properties.c
-> @@ -25,7 +25,8 @@ void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
->      }
->  }
->  
-> -void qdev_prop_allow_set_link_before_realize(Object *obj, const char *name,
-> +void qdev_prop_allow_set_link_before_realize(const Object *obj,
-> +                                             const char *name,
->                                               Object *val, Error **errp)
->  {
->      DeviceState *dev = DEVICE(obj);
-> diff --git a/hw/display/xlnx_dp.c b/hw/display/xlnx_dp.c
-> index f43eb09..3ed81ff 100644
-> --- a/hw/display/xlnx_dp.c
-> +++ b/hw/display/xlnx_dp.c
-> @@ -515,7 +515,7 @@ static void xlnx_dp_aux_set_command(XlnxDPState *s, uint32_t value)
->      s->core_registers[DP_INTERRUPT_SIGNAL_STATE] |= 0x04;
->  }
->  
-> -static void xlnx_dp_set_dpdma(Object *obj, const char *name, Object *val,
-> +static void xlnx_dp_set_dpdma(const Object *obj, const char *name, Object *val,
->                                Error **errp)
->  {
->      XlnxDPState *s = XLNX_DP(obj);
-> diff --git a/hw/ipmi/ipmi.c b/hw/ipmi/ipmi.c
-> index 5cf1caa..a2fd1eb 100644
-> --- a/hw/ipmi/ipmi.c
-> +++ b/hw/ipmi/ipmi.c
-> @@ -90,7 +90,7 @@ static TypeInfo ipmi_interface_type_info = {
->      .class_init = ipmi_interface_class_init,
->  };
->  
-> -static void isa_ipmi_bmc_check(Object *obj, const char *name,
-> +static void isa_ipmi_bmc_check(const Object *obj, const char *name,
->                                 Object *val, Error **errp)
->  {
->      IPMIBmc *bmc = IPMI_BMC(val);
-> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> index 9e8dab0..380cb30 100644
-> --- a/hw/mem/pc-dimm.c
-> +++ b/hw/mem/pc-dimm.c
-> @@ -366,7 +366,7 @@ static void pc_dimm_get_size(Object *obj, Visitor *v, const char *name,
->      visit_type_int(v, name, &value, errp);
->  }
->  
-> -static void pc_dimm_check_memdev_is_busy(Object *obj, const char *name,
-> +static void pc_dimm_check_memdev_is_busy(const Object *obj, const char *name,
->                                        Object *val, Error **errp)
->  {
->      Error *local_err = NULL;
-> diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-> index abeaf3d..e25016c 100644
-> --- a/hw/misc/ivshmem.c
-> +++ b/hw/misc/ivshmem.c
-> @@ -1005,7 +1005,7 @@ static const TypeInfo ivshmem_common_info = {
->      .class_init    = ivshmem_common_class_init,
->  };
->  
-> -static void ivshmem_check_memdev_is_busy(Object *obj, const char *name,
-> +static void ivshmem_check_memdev_is_busy(const Object *obj, const char *name,
->                                           Object *val, Error **errp)
->  {
->      if (host_memory_backend_is_mapped(MEMORY_BACKEND(val))) {
-> diff --git a/qom/object.c b/qom/object.c
-> index 7a05e35..a429e64 100644
-> --- a/qom/object.c
-> +++ b/qom/object.c
-> @@ -735,7 +735,7 @@ out:
->      return ret;
->  }
->  
-> -const char *object_get_typename(Object *obj)
-> +const char *object_get_typename(const Object *obj)
->  {
->      return obj->class->type->name;
->  }
-> @@ -1395,7 +1395,7 @@ out:
->      g_free(type);
->  }
->  
-> -void object_property_allow_set_link(Object *obj, const char *name,
-> +void object_property_allow_set_link(const Object *obj, const char *name,
->                                      Object *val, Error **errp)
->  {
->      /* Allow the link to be set, always */
-> @@ -1403,7 +1403,7 @@ void object_property_allow_set_link(Object *obj, const char *name,
->  
->  typedef struct {
->      Object **child;
-> -    void (*check)(Object *, const char *, Object *, Error **);
-> +    void (*check)(const Object *, const char *, Object *, Error **);
->      ObjectPropertyLinkFlags flags;
->  } LinkProperty;
->  
-> @@ -1519,7 +1519,7 @@ static void object_release_link_property(Object *obj, const char *name,
->  
->  void object_property_add_link(Object *obj, const char *name,
->                                const char *type, Object **child,
-> -                              void (*check)(Object *, const char *,
-> +                              void (*check)(const Object *, const char *,
->                                              Object *, Error **),
->                                ObjectPropertyLinkFlags flags,
->                                Error **errp)
-> 
+On Wed, Jun 28, 2017 at 10:44:57PM +0200, Laurent Vivier wrote:
+> Riku,
+>=20
+> could you ACK this patch, so I will add it in my next pull request for =
+m68k?
 
+Whatabout Richard's comment about using cpu_m68k_set_fpcr ?
 
-Good idea.  I think it's okay to wait for Fam's series.
-
-Paolo
+Riku
+=20
+> Thanks,
+> Laurent
+>=20
+> Le 20/06/2017 =C3=A0 22:51, Laurent Vivier a =C3=A9crit :
+> > Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> > ---
+> >  linux-user/signal.c | 41 +++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 41 insertions(+)
+> >=20
+> > diff --git a/linux-user/signal.c b/linux-user/signal.c
+> > index 3d18d1b..d3753e4 100644
+> > --- a/linux-user/signal.c
+> > +++ b/linux-user/signal.c
+> > @@ -5673,6 +5673,24 @@ give_sigsegv:
+> >      force_sigsegv(sig);
+> >  }
+> > =20
+> > +static inline void target_rt_save_fpu_state(struct target_ucontext *=
+uc,
+> > +                                           CPUM68KState *env)
+> > +{
+> > +    int i;
+> > +    target_fpregset_t *fpregs =3D &uc->tuc_mcontext.fpregs;
+> > +
+> > +    __put_user(env->fpcr, &fpregs->f_fpcntl[0]);
+> > +    __put_user(env->fpsr, &fpregs->f_fpcntl[1]);
+> > +    /* fpiar is not emulated */
+> > +
+> > +    for (i =3D 0; i < 8; i++) {
+> > +        uint32_t high =3D env->fregs[i].d.high << 16;
+> > +        __put_user(high, &fpregs->f_fpregs[i * 3]);
+> > +        __put_user(env->fregs[i].d.low,
+> > +                   (uint64_t *)&fpregs->f_fpregs[i * 3 + 1]);
+> > +    }
+> > +}
+> > +
+> >  static inline int target_rt_setup_ucontext(struct target_ucontext *u=
+c,
+> >                                             CPUM68KState *env)
+> >  {
+> > @@ -5699,9 +5717,30 @@ static inline int target_rt_setup_ucontext(str=
+uct target_ucontext *uc,
+> >      __put_user(env->pc, &gregs[16]);
+> >      __put_user(sr, &gregs[17]);
+> > =20
+> > +    target_rt_save_fpu_state(uc, env);
+> > +
+> >      return 0;
+> >  }
+> > =20
+> > +static inline void target_rt_restore_fpu_state(CPUM68KState *env,
+> > +                                               struct target_ucontex=
+t *uc)
+> > +{
+> > +    int i;
+> > +    target_fpregset_t *fpregs =3D &uc->tuc_mcontext.fpregs;
+> > +
+> > +    __get_user(env->fpcr, &fpregs->f_fpcntl[0]);
+> > +    __get_user(env->fpsr, &fpregs->f_fpcntl[1]);
+> > +    /* fpiar is not emulated */
+> > +
+> > +    for (i =3D 0; i < 8; i++) {
+> > +        uint32_t high;
+> > +        __get_user(high, &fpregs->f_fpregs[i * 3]);
+> > +        env->fregs[i].d.high =3D high >> 16;
+> > +        __get_user(env->fregs[i].d.low,
+> > +                   (uint64_t *)&fpregs->f_fpregs[i * 3 + 1]);
+> > +    }
+> > +}
+> > +
+> >  static inline int target_rt_restore_ucontext(CPUM68KState *env,
+> >                                               struct target_ucontext =
+*uc)
+> >  {
+> > @@ -5733,6 +5772,8 @@ static inline int target_rt_restore_ucontext(CP=
+UM68KState *env,
+> >      __get_user(temp, &gregs[17]);
+> >      cpu_m68k_set_ccr(env, temp);
+> > =20
+> > +    target_rt_restore_fpu_state(env, uc);
+> > +
+> >      return 0;
+> > =20
+> >  badframe:
+> >=20
+>=20
