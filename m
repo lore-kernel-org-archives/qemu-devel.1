@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35094)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dQa6m-0006LC-4R
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:07:53 -0400
+	(envelope-from <laurent@vivier.eu>) id 1dQa8K-0008NU-4e
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:09:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dQa6g-000726-9E
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:07:48 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:60716
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1dQa6g-00071d-1R
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:07:42 -0400
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Thu, 29 Jun 2017 15:07:20 +0100
-Message-Id: <1498745240-30658-7-git-send-email-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <1498745240-30658-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-References: <1498745240-30658-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCHv7 6/6] fw_cfg: move QOM type defines and fw_cfg
- types into fw_cfg.h
+	(envelope-from <laurent@vivier.eu>) id 1dQa8G-0007et-5u
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:09:24 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:58479)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dQa8F-0007e2-RI
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:09:20 -0400
+References: <20170628204452.41230-1-raj.khem@gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <d8913f99-d989-c79a-b0a0-78179e16ef72@vivier.eu>
+Date: Thu, 29 Jun 2017 16:09:01 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170628204452.41230-1-raj.khem@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] replace struct ucontext with ucontext_t
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,173 +28,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, lersek@redhat.com, somlo@cmu.edu, ehabkost@redhat.com, mst@redhat.com, pbonzini@redhat.com, rjones@redhat.com, imammedo@redhat.com, peter.maydell@linaro.org
+To: Khem Raj <raj.khem@gmail.com>, qemu-devel@nongnu.org
+Cc: Kamil Rytarowski <kamil@netbsd.org>, Riku Voipio <riku.voipio@iki.fi>, Paolo Bonzini <pbonzini@redhat.com>
 
-By exposing FWCfgIoState and FWCfgMemState internals we allow the possibility
-for the internal MemoryRegion fields to be mapped by name for boards that wish
-to wire up the fw_cfg device themselves.
+Le 28/06/2017 à 22:44, Khem Raj a écrit :
+> The ucontext_t type had a tag struct ucontext until now
+> but newer glibc will drop it so we need to adjust and use
+> the exposed type instead
+> 
+> Signed-off-by: Khem Raj <raj.khem@gmail.com>
+> Cc: Kamil Rytarowski <kamil@netbsd.org>
+> Cc: Riku Voipio <riku.voipio@iki.fi>
+> Cc: Laurent Vivier <laurent@vivier.eu>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  linux-user/host/aarch64/hostdep.h |  2 +-
+>  linux-user/host/arm/hostdep.h     |  2 +-
+>  linux-user/host/i386/hostdep.h    |  2 +-
+>  linux-user/host/ppc64/hostdep.h   |  2 +-
+>  linux-user/host/s390x/hostdep.h   |  2 +-
+>  linux-user/host/x86_64/hostdep.h  |  2 +-
+>  linux-user/signal.c               | 10 +++++-----
+>  tests/tcg/test-i386.c             |  4 ++--
+>  user-exec.c                       | 18 +++++++++---------
+>  9 files changed, 22 insertions(+), 22 deletions(-)
+> 
+...
+> diff --git a/linux-user/signal.c b/linux-user/signal.c
+> index 3d18d1b3ee..2c55a4f600 100644
+> --- a/linux-user/signal.c
+> +++ b/linux-user/signal.c
+> @@ -3346,7 +3346,7 @@ static void setup_rt_frame(int sig, struct target_sigaction *ka,
+>      *
+>      *   a0 = signal number
+>      *   a1 = pointer to siginfo_t
+> -    *   a2 = pointer to struct ucontext
+> +    *   a2 = pointer to ucontext_t
+>      *
+>      * $25 and PC point to the signal handler, $29 points to the
+>      * struct sigframe.
+> @@ -3733,7 +3733,7 @@ struct target_signal_frame {
+>  
+>  struct rt_signal_frame {
+>      siginfo_t info;
+> -    struct ucontext uc;
+> +    ucontext_t uc;
+>      uint32_t tramp[2];
+>  };
+>  
+> @@ -3949,7 +3949,7 @@ struct rt_signal_frame {
+>      siginfo_t *pinfo;
+>      void *puc;
+>      siginfo_t info;
+> -    struct ucontext uc;
+> +    ucontext_t uc;
+>      uint16_t retcode[4];      /* Trampoline code. */
+>  };
+>  
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
----
- hw/nvram/fw_cfg.c         |   49 +-------------------------------------------
- include/hw/nvram/fw_cfg.h |   50 +++++++++++++++++++++++++++++++++++++++++++++
- include/qemu/typedefs.h   |    1 +
- 3 files changed, 52 insertions(+), 48 deletions(-)
+I think these two rt_signal_frame are unused and can be removed.
 
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index 31029ac..35bdb7a 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -37,14 +37,6 @@
- 
- #define FW_CFG_FILE_SLOTS_DFLT 0x20
- 
--#define TYPE_FW_CFG     "fw_cfg"
--#define TYPE_FW_CFG_IO  "fw_cfg_io"
--#define TYPE_FW_CFG_MEM "fw_cfg_mem"
--
--#define FW_CFG(obj)     OBJECT_CHECK(FWCfgState,    (obj), TYPE_FW_CFG)
--#define FW_CFG_IO(obj)  OBJECT_CHECK(FWCfgIoState,  (obj), TYPE_FW_CFG_IO)
--#define FW_CFG_MEM(obj) OBJECT_CHECK(FWCfgMemState, (obj), TYPE_FW_CFG_MEM)
--
- /* FW_CFG_VERSION bits */
- #define FW_CFG_VERSION      0x01
- #define FW_CFG_VERSION_DMA  0x02
-@@ -58,51 +50,12 @@
- 
- #define FW_CFG_DMA_SIGNATURE 0x51454d5520434647ULL /* "QEMU CFG" */
- 
--typedef struct FWCfgEntry {
-+struct FWCfgEntry {
-     uint32_t len;
-     bool allow_write;
-     uint8_t *data;
-     void *callback_opaque;
-     FWCfgReadCallback read_callback;
--} FWCfgEntry;
--
--struct FWCfgState {
--    /*< private >*/
--    SysBusDevice parent_obj;
--    /*< public >*/
--
--    uint16_t file_slots;
--    FWCfgEntry *entries[2];
--    int *entry_order;
--    FWCfgFiles *files;
--    uint16_t cur_entry;
--    uint32_t cur_offset;
--    Notifier machine_ready;
--
--    int fw_cfg_order_override;
--
--    bool dma_enabled;
--    dma_addr_t dma_addr;
--    AddressSpace *dma_as;
--    MemoryRegion dma_iomem;
--};
--
--struct FWCfgIoState {
--    /*< private >*/
--    FWCfgState parent_obj;
--    /*< public >*/
--
--    MemoryRegion comb_iomem;
--};
--
--struct FWCfgMemState {
--    /*< private >*/
--    FWCfgState parent_obj;
--    /*< public >*/
--
--    MemoryRegion ctl_iomem, data_iomem;
--    uint32_t data_width;
--    MemoryRegionOps wide_data_ops;
- };
- 
- #define JPG_FILE 0
-diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
-index b980cba..b77ea48 100644
---- a/include/hw/nvram/fw_cfg.h
-+++ b/include/hw/nvram/fw_cfg.h
-@@ -1,8 +1,19 @@
- #ifndef FW_CFG_H
- #define FW_CFG_H
- 
-+#include "qemu/typedefs.h"
- #include "exec/hwaddr.h"
- #include "hw/nvram/fw_cfg_keys.h"
-+#include "hw/sysbus.h"
-+#include "sysemu/dma.h"
-+
-+#define TYPE_FW_CFG     "fw_cfg"
-+#define TYPE_FW_CFG_IO  "fw_cfg_io"
-+#define TYPE_FW_CFG_MEM "fw_cfg_mem"
-+
-+#define FW_CFG(obj)     OBJECT_CHECK(FWCfgState,    (obj), TYPE_FW_CFG)
-+#define FW_CFG_IO(obj)  OBJECT_CHECK(FWCfgIoState,  (obj), TYPE_FW_CFG_IO)
-+#define FW_CFG_MEM(obj) OBJECT_CHECK(FWCfgMemState, (obj), TYPE_FW_CFG_MEM)
- 
- typedef struct FWCfgFile {
-     uint32_t  size;        /* file size */
-@@ -35,6 +46,45 @@ typedef struct FWCfgDmaAccess {
- 
- typedef void (*FWCfgReadCallback)(void *opaque);
- 
-+struct FWCfgState {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+    /*< public >*/
-+
-+    uint16_t file_slots;
-+    FWCfgEntry *entries[2];
-+    int *entry_order;
-+    FWCfgFiles *files;
-+    uint16_t cur_entry;
-+    uint32_t cur_offset;
-+    Notifier machine_ready;
-+
-+    int fw_cfg_order_override;
-+
-+    bool dma_enabled;
-+    dma_addr_t dma_addr;
-+    AddressSpace *dma_as;
-+    MemoryRegion dma_iomem;
-+};
-+
-+struct FWCfgIoState {
-+    /*< private >*/
-+    FWCfgState parent_obj;
-+    /*< public >*/
-+
-+    MemoryRegion comb_iomem;
-+};
-+
-+struct FWCfgMemState {
-+    /*< private >*/
-+    FWCfgState parent_obj;
-+    /*< public >*/
-+
-+    MemoryRegion ctl_iomem, data_iomem;
-+    uint32_t data_width;
-+    MemoryRegionOps wide_data_ops;
-+};
-+
- /**
-  * fw_cfg_add_bytes:
-  * @s: fw_cfg device being modified
-diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index 2706aab..0a23020 100644
---- a/include/qemu/typedefs.h
-+++ b/include/qemu/typedefs.h
-@@ -30,6 +30,7 @@ typedef struct DisplaySurface DisplaySurface;
- typedef struct DriveInfo DriveInfo;
- typedef struct Error Error;
- typedef struct EventNotifier EventNotifier;
-+typedef struct FWCfgEntry FWCfgEntry;
- typedef struct FWCfgIoState FWCfgIoState;
- typedef struct FWCfgMemState FWCfgMemState;
- typedef struct FWCfgState FWCfgState;
--- 
-1.7.10.4
+Thanks,
+Laurent
