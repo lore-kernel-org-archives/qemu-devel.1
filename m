@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37067)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=346f73eb6=Paul.Durrant@citrix.com>)
-	id 1dQUkw-0004xY-Dx
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 04:24:56 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dQUoM-0005fn-Tj
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 04:28:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=346f73eb6=Paul.Durrant@citrix.com>)
-	id 1dQUkq-0007Nr-4C
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 04:24:54 -0400
-Received: from smtp.eu.citrix.com ([185.25.65.24]:45989)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=346f73eb6=Paul.Durrant@citrix.com>)
-	id 1dQUkp-0007L7-MD
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 04:24:48 -0400
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Thu, 29 Jun 2017 08:24:41 +0000
-Message-ID: <7ecfe394c646482faddf97a40bda944d@AMSPEX02CL03.citrite.net>
-References: <alpine.DEB.2.10.1706281125330.2919@sstabellini-ThinkPad-X260>
-In-Reply-To: <alpine.DEB.2.10.1706281125330.2919@sstabellini-ThinkPad-X260>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dQUoI-0001i9-TW
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 04:28:26 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:35907 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dQUoI-0001h7-Hz
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 04:28:22 -0400
+References: <20170628175534.14295-1-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <4e6a11e8-d2f9-faa0-8203-9421c79224f3@virtuozzo.com>
+Date: Thu, 29 Jun 2017 11:28:11 +0300
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2] xenfb: remove xen_init_display
- "temporary" hack
+In-Reply-To: <20170628175534.14295-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v3 00/11] make dirty-bitmap byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,170 +28,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Stefano Stabellini' <sstabellini@kernel.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, Anthony Perard <anthony.perard@citrix.com>, "kraxel@redhat.com" <kraxel@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-> -----Original Message-----
-> From: Stefano Stabellini [mailto:sstabellini@kernel.org]
-> Sent: 28 June 2017 19:37
-> To: xen-devel@lists.xenproject.org; qemu-devel@nongnu.org
-> Cc: sstabellini@kernel.org; peter.maydell@linaro.org; Anthony Perard
-> <anthony.perard@citrix.com>; kraxel@redhat.com; Paul Durrant
-> <Paul.Durrant@citrix.com>
-> Subject: [PATCH v2] xenfb: remove xen_init_display "temporary" hack
->=20
-> Initialize xenfb properly, as all other backends, from its own
-> "initialise" function.
->=20
-> Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
->=20
-> ---
-> Changes in v2:
-> - remove xen_init_display from xen_backend.h
-> - handle cases where vkbd is missing
->=20
-> diff --git a/hw/display/xenfb.c b/hw/display/xenfb.c
-> index e76c0d8..3b0168b 100644
-> --- a/hw/display/xenfb.c
-> +++ b/hw/display/xenfb.c
-> @@ -71,7 +71,6 @@ struct XenFB {
->      int               fbpages;
->      int               feature_update;
->      int               bug_trigger;
-> -    int               have_console;
->      int               do_resize;
->=20
->      struct {
-> @@ -80,6 +79,7 @@ struct XenFB {
->      int               up_count;
->      int               up_fullscreen;
->  };
-> +static const GraphicHwOps xenfb_ops;
->=20
->  /* -------------------------------------------------------------------- =
-*/
->=20
-> @@ -855,6 +855,8 @@ static int fb_init(struct XenDevice *xendev)
->  static int fb_initialise(struct XenDevice *xendev)
->  {
->      struct XenFB *fb =3D container_of(xendev, struct XenFB, c.xendev);
-> +    struct XenDevice *xin;
-> +    struct XenInput *in;
+Hi!
 
-I think the scope of 'in' can be limited to the 'else' clause where it is u=
-sed below.
+Can we apply my "[PATCH v22 00/30] qcow2: persistent dirty bitmaps" 
+first? It was already near to the victory a week ago, but I had to 
+rebase it on new Paolo's patches.
 
->      struct xenfb_page *fb_page;
->      int videoram;
->      int rc;
-> @@ -877,16 +879,16 @@ static int fb_initialise(struct XenDevice *xendev)
->      if (rc !=3D 0)
->  	return rc;
->=20
-> -#if 0  /* handled in xen_init_display() for now */
-> -    if (!fb->have_console) {
-> -        fb->c.ds =3D graphic_console_init(xenfb_update,
-> -                                        xenfb_invalidate,
-> -                                        NULL,
-> -                                        NULL,
-> -                                        fb);
-> -        fb->have_console =3D 1;
-> +    fb->c.con =3D graphic_console_init(NULL, 0, &xenfb_ops, fb);
-> +
-> +    xin =3D xen_pv_find_xendev("vkbd", xen_domid, 0);
-> +    if (xin =3D=3D NULL) {
-> +        xen_pv_printf(xendev, 1, "xenfb is up, but vkbd is not present\n=
-");
-> +    } else {
-> +        in =3D container_of(xin, struct XenInput, c.xendev);
-> +        in->c.con =3D fb->c.con;
+28.06.2017 20:55, Eric Blake wrote:
+> There are patches floating around to add NBD_CMD_BLOCK_STATUS,
+> but NBD wants to report status on byte granularity (even if the
+> reporting will probably be naturally aligned to sectors or even
+> much higher levels).  I've therefore started the task of
+> converting our block status code to report at a byte granularity
+> rather than sectors.
+>
+> This is part two of that conversion: dirty-bitmap. Other parts
+> include bdrv_is_allocated (at v3 [1]) and replacing
+> bdrv_get_block_status with a byte based callback in all the
+> drivers (at v1, needs a rebase [3]).
+>
+> Available as a tag at:
+> git fetch git://repo.or.cz/qemu/ericb.git nbd-byte-dirty-v3
+>
+> Depends on Kevin's block branch and my v3 bdrv_is_allocated [1]
+>
+> Since v2 [2], I had to rebase on top of Paolo's locking fixes;
+> patch v2 2/12 is gone, and many of the others had a lot of
+> context conflicts. But I felt the resolution was simple enough
+> that I kept R-b on all but patch 8.
+>
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg06077.html
+> [2] https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg03859.html
+> [3] https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg02642.html
+>
+> (git backport-diff doesn't like the rename in 7/11)
+>
+> 001/11:[----] [--] 'dirty-bitmap: Report BlockDirtyInfo.count in bytes, as documented'
+> 002/11:[0024] [FC] 'dirty-bitmap: Drop unused functions'
+> 003/11:[----] [-C] 'dirty-bitmap: Track size in bytes'
+> 004/11:[----] [-C] 'dirty-bitmap: Set iterator start by offset, not sector'
+> 005/11:[----] [-C] 'dirty-bitmap: Change bdrv_dirty_iter_next() to report byte offset'
+> 006/11:[----] [-C] 'dirty-bitmap: Change bdrv_get_dirty_count() to report bytes'
+> 007/11:[down] 'dirty-bitmap: Change bdrv_get_dirty_locked() to take bytes'
+> 008/11:[0036] [FC] 'dirty-bitmap: Change bdrv_[re]set_dirty_bitmap() to use bytes'
+> 009/11:[----] [--] 'mirror: Switch mirror_dirty_init() to byte-based iteration'
+> 010/11:[0001] [FC] 'dirty-bitmap: Switch bdrv_set_dirty() to bytes'
+> 011/11:[----] [-C] 'dirty-bitmap: Convert internal hbitmap size/granularity'
+>
+> Eric Blake (11):
+>    dirty-bitmap: Report BlockDirtyInfo.count in bytes, as documented
+>    dirty-bitmap: Drop unused functions
+>    dirty-bitmap: Track size in bytes
+>    dirty-bitmap: Set iterator start by offset, not sector
+>    dirty-bitmap: Change bdrv_dirty_iter_next() to report byte offset
+>    dirty-bitmap: Change bdrv_get_dirty_count() to report bytes
+>    dirty-bitmap: Change bdrv_get_dirty_locked() to take bytes
+>    dirty-bitmap: Change bdrv_[re]set_dirty_bitmap() to use bytes
+>    mirror: Switch mirror_dirty_init() to byte-based iteration
+>    dirty-bitmap: Switch bdrv_set_dirty() to bytes
+>    dirty-bitmap: Convert internal hbitmap size/granularity
+>
+>   include/block/block_int.h    |   2 +-
+>   include/block/dirty-bitmap.h |  28 ++++--------
+>   block/backup.c               |   7 ++-
+>   block/dirty-bitmap.c         | 105 +++++++++++--------------------------------
+>   block/io.c                   |   6 +--
+>   block/mirror.c               |  73 +++++++++++++-----------------
+>   migration/block.c            |  12 +++--
+>   7 files changed, 79 insertions(+), 154 deletions(-)
+>
 
-I notice that in->c.con is tested in input_initialise() and it will fail if=
- NULL, so there is an inherent race between the frontends and also processi=
-ng of xenstore watches. That seems a little fragile at best, but the depend=
-ency of input_initialise() on in->c.con is also somewhat bogus as the vkbd =
-backend is created for xenfv machine types whereas xenfb is only there for =
-xenpv machine types. I think this needs to be fixed before xenfb can be rel=
-ied on to initialize correctly in all circumstances.
-
-  Paul
-
-> +        xen_be_check_state(xin);
->      }
-> -#endif
->=20
->      if (xenstore_read_fe_int(xendev, "feature-update", &fb-
-> >feature_update) =3D=3D -1)
->  	fb->feature_update =3D 0;
-> @@ -972,42 +974,3 @@ static const GraphicHwOps xenfb_ops =3D {
->      .gfx_update  =3D xenfb_update,
->      .update_interval =3D xenfb_update_interval,
->  };
-> -
-> -/*
-> - * FIXME/TODO: Kill this.
-> - * Temporary needed while DisplayState reorganization is in flight.
-> - */
-> -void xen_init_display(int domid)
-> -{
-> -    struct XenDevice *xfb, *xin;
-> -    struct XenFB *fb;
-> -    struct XenInput *in;
-> -    int i =3D 0;
-> -
-> -wait_more:
-> -    i++;
-> -    main_loop_wait(true);
-> -    xfb =3D xen_pv_find_xendev("vfb", domid, 0);
-> -    xin =3D xen_pv_find_xendev("vkbd", domid, 0);
-> -    if (!xfb || !xin) {
-> -        if (i < 256) {
-> -            usleep(10000);
-> -            goto wait_more;
-> -        }
-> -        xen_pv_printf(NULL, 1, "displaystate setup failed\n");
-> -        return;
-> -    }
-> -
-> -    /* vfb */
-> -    fb =3D container_of(xfb, struct XenFB, c.xendev);
-> -    fb->c.con =3D graphic_console_init(NULL, 0, &xenfb_ops, fb);
-> -    fb->have_console =3D 1;
-> -
-> -    /* vkbd */
-> -    in =3D container_of(xin, struct XenInput, c.xendev);
-> -    in->c.con =3D fb->c.con;
-> -
-> -    /* retry ->init() */
-> -    xen_be_check_state(xin);
-> -    xen_be_check_state(xfb);
-> -}
-> diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
-> index 79aef4e..31d2f25 100644
-> --- a/hw/xenpv/xen_machine_pv.c
-> +++ b/hw/xenpv/xen_machine_pv.c
-> @@ -94,9 +94,6 @@ static void xen_init_pv(MachineState *machine)
->=20
->      /* config cleanup hook */
->      atexit(xen_config_cleanup);
-> -
-> -    /* setup framebuffer */
-> -    xen_init_display(xen_domid);
->  }
->=20
->  static void xenpv_machine_init(MachineClass *mc)
-> diff --git a/include/hw/xen/xen_backend.h
-> b/include/hw/xen/xen_backend.h
-> index 852c2ea..8a6fbcb 100644
-> --- a/include/hw/xen/xen_backend.h
-> +++ b/include/hw/xen/xen_backend.h
-> @@ -55,8 +55,6 @@ extern struct XenDevOps xen_netdev_ops;       /*
-> xen_nic.c         */
->  extern struct XenDevOps xen_usb_ops;          /* xen-usb.c         */
->  #endif
->=20
-> -void xen_init_display(int domid);
-> -
->  /* configuration (aka xenbus setup) */
->  void xen_config_cleanup(void);
->  int xen_config_dev_blk(DriveInfo *disk);
+-- 
+Best regards,
+Vladimir
