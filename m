@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44990)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dQcaE-0000dp-7f
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:46:23 -0400
+	(envelope-from <sw@weilnetz.de>) id 1dQchD-0002xR-1D
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:53:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dQcaD-0000le-98
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:46:22 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:33650)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dQcaC-0000lJ-Uh
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:46:21 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id z75so20073219wmc.0
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 09:46:20 -0700 (PDT)
+	(envelope-from <sw@weilnetz.de>) id 1dQch9-0006GP-3X
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:53:35 -0400
+References: <20170629010300.2848-1-f4bug@amsat.org>
+	<20170629010300.2848-6-f4bug@amsat.org>
+	<9403a3d0-41f6-add2-04fd-12034fe7699a@redhat.com>
+From: Stefan Weil <sw@weilnetz.de>
+Message-ID: <ecb12a15-5b0c-67ef-18ad-e627b591148e@weilnetz.de>
+Date: Thu, 29 Jun 2017 18:52:57 +0200
 MIME-Version: 1.0
-In-Reply-To: <7e7d94ce-a33c-6253-8dcf-475e93fe388f@adacore.com>
-References: <1498728533-23160-1-git-send-email-frederic.konrad@adacore.com>
-	<1498728533-23160-3-git-send-email-frederic.konrad@adacore.com>
-	<CAFEAcA-tuehYiJkYo148N0VPJ3hwhcxYDDersmbs4TOqxQCEKw@mail.gmail.com>
-	<7e7d94ce-a33c-6253-8dcf-475e93fe388f@adacore.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 29 Jun 2017 17:45:59 +0100
-Message-ID: <CAFEAcA_EcMOQ6afbmZK1jYUuWGzAUzj8AKRLvoDEsezsQkPYzA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 2/3] arm: fix the armv7m reset state
+In-Reply-To: <9403a3d0-41f6-add2-04fd-12034fe7699a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH RESEND 5/8] tcg/tci: enable bswap16_i64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +24,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: KONRAD Frederic <frederic.konrad@adacore.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, alistair@alistair23.me
+To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, "Emilio G . Cota" <cota@braap.org>, QEMU Trivial <qemu-trivial@nongnu.org>
 
-On 29 June 2017 at 17:41, KONRAD Frederic <frederic.konrad@adacore.com> wrote:
-> On 06/29/2017 05:14 PM, Peter Maydell wrote:
->> This is awkward, because in the "we have a ROM but it's not been
->> copied into memory yet" case, the only thing we have is the
->> rom->addr, which is the address which the user's ROM blob said
->> it ought to be loaded in at. If the user didn't actually provide
->> a ROM blob that loads at 0 that seems a bit like a user error,
->> and I don't think this patch will catch all the cases of that
->> sort of mistake.
->
->
-> I don't think it's really a user mistake because on the real HW
-> the alias is configurable.. at least in my case.
->
-> There is a "jumper" setting to mirror either the Flash or the
-> SRAM, etc. So the binaries isn't located at 0 but at the flash
-> address 0x8000000 or some such. That's the case with u-boot and
-> the precompiled examples I found for this stm32fxxxx board.
->
->>  For instance if address 0 is real flash and the
->> high address alias is modelled by having the high address be the
->> alias, then if the user passes us an ELF file saying "load to
->> the high address" then this change won't catch that I think
->> (because doing the memory_region_find/get_offset_within_address_space
->> will return 0, which has already been tried). You'd need to
->> somehow have a way to say "find all the addresses within this
->> AS where this MR is mapped" and try them all...
->
->
-> This is more likely to be a user error :). Maybe we can load
-> the ROM before the reset but that seems a lot more invasive..
+Am 29.06.2017 um 18:29 schrieb Eric Blake:
+> On 06/28/2017 08:02 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> remove some copy/paste leftover, code seems sane.
+>>
+>=20
+>>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>=20
+> Double-sob seems odd.
 
-It's the same thing, though, right? If the user's ELF file
-says "vector table is at 0x8000000" then we should either
-(a) say that's a user error, or
-(b) handle it right, whether we implemented the QEMU model with
-the flash at 0 and the alias at 0x8000000, or with the flash
-at 0x8000000 and the alias at 0.
+Maybe that double SOB can be cleaned by qemu-trivial (cc'ed).
 
-> BTW isn't there a trick with the ELF entry somewhere? Or is that
-> for the Cortex-A?
+>=20
+>> ---
+>>  tcg/tci.c | 1 -
+>>  1 file changed, 1 deletion(-)
+>>
+>=20
+> Otherwise,
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
 
-We don't honour the ELF entry point on M profile (arguably
-a bug) -- armv7m_load_kernel() ignores the entry point
-returned by load_elf() in the 'entry' variable.
+Note from the author: it's not a copy/paste leftover, but was
+there on purpose: that code part was simply never executed
+before, and I only removed the TODO() statements from tested
+code.
 
-thanks
--- PMM
+So you are the first one who found a test case. Congratulations.
+
+Reviewed-by: Stefan Weil <sw@weilnetz.de>
