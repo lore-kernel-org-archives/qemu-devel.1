@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34013)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dQcKf-00072w-O7
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:30:18 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dQcKv-0007H3-S9
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:30:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dQcKe-0000i7-NO
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:30:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43624)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dQcKe-0000hV-I7
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:30:16 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 966671393C0
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 16:30:15 +0000 (UTC)
-Received: from dgilbert-t530.redhat.com (ovpn-116-88.ams2.redhat.com
-	[10.36.116.88])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 14306900B9
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 16:30:14 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Thu, 29 Jun 2017 17:30:10 +0100
-Message-Id: <20170629163011.13388-2-dgilbert@redhat.com>
-In-Reply-To: <20170629163011.13388-1-dgilbert@redhat.com>
-References: <20170629163011.13388-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 1/2] monitor: Add -a (all) option to info
- registers
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dQcKu-0000py-V0
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:30:33 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170629162046.4135-1-berrange@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <56329b7b-c81d-791a-1605-6ba1017a61a4@amsat.org>
+Date: Thu, 29 Jun 2017 13:30:21 -0300
+MIME-Version: 1.0
+In-Reply-To: <20170629162046.4135-1-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] backends: remove empty
+ trace-events file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,82 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+On 06/29/2017 01:20 PM, Daniel P. Berrange wrote:
+> The content of the backends/trace-events file was entirely
+> removed in
+> 
+>    commit 6b10e573d15ef82dbc5c5b3726028e6642e134f6
+>    Author: Marc-André Lureau <marcandre.lureau@redhat.com>
+>    Date:   Mon May 29 12:39:42 2017 +0400
+> 
+>      char: move char devices to chardev/
+> 
+> Leaving the empty file around, causes tracetool to generate
+> an empty .dtrace file which makes the dtrace compiler throw
+> a syntax error.
+> 
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 
-The info registers command in the qemu monitor is used to dump register
-values.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Currently this command uses the monitor cpu (which can be set by the
-user) as the cpu for whose registers will be dumped. Sometimes it is
-useful to see the registers for all cpus and currently this requires
-setting the monitor cpu and the re-running the command for each cpu
-in the system. I would be nice if there was an easier way to do this.
-
-Add the "-a" option to the info registers command to dump the register
-values for all cpus.
-
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-
-Message-Id: <20170608054116.17203-1-sjitindarsingh@gmail.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- hmp-commands-info.hx |  6 +++---
- monitor.c            | 21 ++++++++++++++++-----
- 2 files changed, 19 insertions(+), 8 deletions(-)
-
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index ae169011b1..ba98e581ab 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -100,9 +100,9 @@ ETEXI
- 
-     {
-         .name       = "registers",
--        .args_type  = "",
--        .params     = "",
--        .help       = "show the cpu registers",
-+        .args_type  = "cpustate_all:-a",
-+        .params     = "[-a]",
-+        .help       = "show the cpu registers (-a: all - show register info for all cpus)",
-         .cmd        = hmp_info_registers,
-     },
- 
-diff --git a/monitor.c b/monitor.c
-index 3c369f4dd5..4031876411 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -1078,13 +1078,24 @@ int monitor_get_cpu_index(void)
- 
- static void hmp_info_registers(Monitor *mon, const QDict *qdict)
- {
--    CPUState *cs = mon_get_cpu();
-+    bool all_cpus = qdict_get_try_bool(qdict, "cpustate_all", false);
-+    CPUState *cs;
- 
--    if (!cs) {
--        monitor_printf(mon, "No CPU available\n");
--        return;
-+    if (all_cpus) {
-+        CPU_FOREACH(cs) {
-+            monitor_printf(mon, "\nCPU#%d\n", cs->cpu_index);
-+            cpu_dump_state(cs, (FILE *)mon, monitor_fprintf, CPU_DUMP_FPU);
-+        }
-+    } else {
-+        cs = mon_get_cpu();
-+
-+        if (!cs) {
-+            monitor_printf(mon, "No CPU available\n");
-+            return;
-+        }
-+
-+        cpu_dump_state(cs, (FILE *)mon, monitor_fprintf, CPU_DUMP_FPU);
-     }
--    cpu_dump_state(cs, (FILE *)mon, monitor_fprintf, CPU_DUMP_FPU);
- }
- 
- static void hmp_info_jit(Monitor *mon, const QDict *qdict)
--- 
-2.13.0
+> ---
+>   Makefile.objs         | 1 -
+>   backends/trace-events | 0
+>   2 files changed, 1 deletion(-)
+>   delete mode 100644 backends/trace-events
+> 
+> diff --git a/Makefile.objs b/Makefile.objs
+> index b2e6322..8004d6d 100644
+> --- a/Makefile.objs
+> +++ b/Makefile.objs
+> @@ -122,7 +122,6 @@ trace-events-subdirs += crypto
+>   trace-events-subdirs += io
+>   trace-events-subdirs += migration
+>   trace-events-subdirs += block
+> -trace-events-subdirs += backends
+>   trace-events-subdirs += chardev
+>   trace-events-subdirs += hw/block
+>   trace-events-subdirs += hw/block/dataplane
+> diff --git a/backends/trace-events b/backends/trace-events
+> deleted file mode 100644
+> index e69de29..0000000
+> 
