@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dQZZ4-00029i-MM
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:32:59 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dQZaf-0003xn-5y
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:34:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dQZZ1-0004AD-Jv
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:32:58 -0400
-Received: from mail-wm0-f50.google.com ([74.125.82.50]:33621)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dQZad-00053P-LC
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:34:37 -0400
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:35617)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dQZZ1-00049Y-Do
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:32:55 -0400
-Received: by mail-wm0-f50.google.com with SMTP id z75so18927562wmc.0
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 06:32:54 -0700 (PDT)
-References: <cover.1498607452.git.alistair.francis@xilinx.com>
-	<6955f1684346baf57b619ca407cd71363027307a.1498607452.git.alistair.francis@xilinx.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <eb27d632-fae4-23da-48cc-e0c94b9bc584@redhat.com>
-Date: Thu, 29 Jun 2017 15:32:51 +0200
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dQZad-00051c-9m
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:34:35 -0400
+Received: by mail-lf0-x241.google.com with SMTP id n136so7701714lfn.2
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 06:34:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <6955f1684346baf57b619ca407cd71363027307a.1498607452.git.alistair.francis@xilinx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v1 2/4] util/oslib-win32: Remove invalid check
+References: <20170621140219.4568-1-marcandre.lureau@redhat.com>
+	<20170621140219.4568-3-marcandre.lureau@redhat.com>
+	<20170623210845.GA10776@localhost.localdomain>
+	<CAJ+F1CLUHM2+hMQqCmN04nwWEMDDDK8104=vK9rnoTsetw9JVg@mail.gmail.com>
+	<20170628182943.GJ12152@localhost.localdomain>
+In-Reply-To: <20170628182943.GJ12152@localhost.localdomain>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 29 Jun 2017 13:34:22 +0000
+Message-ID: <CAJ+F1C+79Hfd+7J2nS7=+4awjW6nqGSaVrWDx9P8O-8FCuBsdQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 2/3] Add memfd based hostmem
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +33,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, stefanha@redhat.com, famz@redhat.com
-Cc: edgar.iglesias@xilinx.com, alistair23@gmail.com, qemu-block@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: imammedo@redhat.com, qemu-devel@nongnu.org
 
-On 28/06/2017 01:57, Alistair Francis wrote:
-> There is no way nhandles can be zero in this section so that part of the
-> if statement will always be false. Let's just remove it to make the code
-> easier to read.
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Acked-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> ---
-> 
->  util/oslib-win32.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-> index 80e4668935..7ec0f8e083 100644
-> --- a/util/oslib-win32.c
-> +++ b/util/oslib-win32.c
-> @@ -414,7 +414,7 @@ static int poll_rest(gboolean poll_msgs, HANDLE *handles, gint nhandles,
->          /* If we have a timeout, or no handles to poll, be satisfied
->           * with just noticing we have messages waiting.
->           */
-> -        if (timeout != 0 || nhandles == 0) {
-> +        if (timeout != 0) {
->              return 1;
->          }
->  
-> 
+Hi
 
-Hmm, I think it's possible, poll_msgs is true here.
+On Wed, Jun 28, 2017 at 8:29 PM Eduardo Habkost <ehabkost@redhat.com> wrote=
+:
 
-Paolo
+> On Tue, Jun 27, 2017 at 08:23:03AM +0000, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi Eduardo
+> >
+> > On Fri, Jun 23, 2017 at 11:09 PM Eduardo Habkost <ehabkost@redhat.com>
+> > wrote:
+> >
+> > > On Wed, Jun 21, 2017 at 04:02:18PM +0200, Marc-Andr=C3=A9 Lureau wrot=
+e:
+> > > > Add a new memory backend, similar to hostmem-file, except that it
+> > > > doesn't need to create files. It also enforces memory sealing.
+> > > >
+> > > > This backend is mainly useful for sharing the memory with other
+> > > > processes.
+> > >
+> > > How exactly can the memfd be used to share memory?  Is there an
+> existing
+> > > mechanism for sharing the memfd file descriptor with another process
+> >
+> >
+> >
+> > Since there is no backing file, the traditional mechanism is by passing
+> fd,
+> > via socket ancillary data or forking etc.. Both ivshmem and vhost-user
+> have
+> > such messages, with eventually details for the memory map usage.
+>
+> The documentation is very similar to memory-backend-file, so it sounded
+> like there was a generic mechanism to ask QEMU to share the backend FD.
+> Maybe it would be interesting to mention on which cases the FD can
+> actually be shared.  Are ivshmem and vhost-user the only existing cases?
+>
+>
+Actually, vhost-user may be the only way today to get the fd outside of
+qemu process.
+
+(ivshmem needs the server to provide the fd)
+
+We could quite easily add or extend QMP messages for that in the future.
+
+Do you want this detail to be written in the commit message or elsewhere?
+
+
+> >
+> >
+> > > >
+> > > > Note that Linux supports transparent huge-pages of shmem/memfd memo=
+ry
+> > > > since 4.8. It is relatively easier to set up THP than a dedicate
+> > > > hugepage mount point by using "madvise" in
+> > > > /sys/kernel/mm/transparent_hugepage/shmem_enabled.
+> > > >
+> > > > Usage:
+> > > > -object memory-backend-memfd,id=3Dmem1,size=3D1G
+> > > >
+> > > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > > > ---
+> > > >  backends/hostmem-memfd.c | 67
+> > > ++++++++++++++++++++++++++++++++++++++++++++++++
+> > > >  backends/Makefile.objs   |  2 ++
+> > > >  qemu-options.hx          | 11 ++++++++
+> > > >  3 files changed, 80 insertions(+)
+> > > >  create mode 100644 backends/hostmem-memfd.c
+> > > >
+> > > [...]
+> > >
+> > > --
+> > > Eduardo
+> > >
+> > > --
+> > Marc-Andr=C3=A9 Lureau
+>
+> --
+> Eduardo
+>
+--=20
+Marc-Andr=C3=A9 Lureau
