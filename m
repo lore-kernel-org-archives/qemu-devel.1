@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51824)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1dQX8k-0007A0-St
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 06:57:39 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57088)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <a175818323@gmail.com>) id 1dQXIJ-000621-6m
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:07:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1dQX8h-00089X-8m
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 06:57:38 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:60888 helo=mx01.kamp.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dQX8g-00087Z-V4
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 06:57:35 -0400
-From: Peter Lieven <pl@kamp.de>
-Date: Thu, 29 Jun 2017 12:57:07 +0200
-Message-Id: <1498733831-15254-5-git-send-email-pl@kamp.de>
-In-Reply-To: <1498733831-15254-1-git-send-email-pl@kamp.de>
-References: <1498733831-15254-1-git-send-email-pl@kamp.de>
-Subject: [Qemu-devel] [PATCH V2 4/8] qemu-img: add documentation for
- compress settings
+	(envelope-from <a175818323@gmail.com>) id 1dQXII-0000cB-FS
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:07:31 -0400
+Received: from mail-it0-x22b.google.com ([2607:f8b0:4001:c0b::22b]:38286)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a175818323@gmail.com>)
+	id 1dQXII-0000bA-9P
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:07:30 -0400
+Received: by mail-it0-x22b.google.com with SMTP id k192so4921220ith.1
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 04:07:28 -0700 (PDT)
+MIME-Version: 1.0
+From: Bob Chen <a175818323@gmail.com>
+Date: Thu, 29 Jun 2017 19:07:27 +0800
+Message-ID: <CAMxP3BQvfPpAp2GZP+A995t1oozZucv1wqYdgHAreC_-Ne3A9g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] Questions about GPU passthrough + multiple PCIE
+ switches on host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +27,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com, berrange@redhat.com, Peter Lieven <pl@kamp.de>
+To: qemu-devel@nongnu.org
 
-Signed-off-by: Peter Lieven <pl@kamp.de>
----
- qemu-img.texi | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+Hi folks,
 
-diff --git a/qemu-img.texi b/qemu-img.texi
-index 5b925ec..430f0b9 100644
---- a/qemu-img.texi
-+++ b/qemu-img.texi
-@@ -621,6 +621,27 @@ file which is COW and has data blocks already, it couldn't be changed to NOCOW
- by setting @code{nocow=on}. One can issue @code{lsattr filename} to check if
- the NOCOW flag is set or not (Capital 'C' is NOCOW flag).
- 
-+@item compress.format
-+Defines which compression algorithm is should be used for compressed clusters.
-+The following options are available if support for the respective libraries
-+has been enabled at compile time:
-+
-+   zlib            Uses standard zlib compression
-+
-+The compression algorithm can only be defined at image create time and cannot
-+be changed later.
-+
-+Note: defining a compression format will result in the compression format
-+      extension being written to the Qcow2 image. Older versions of QEMU will
-+      not be able to open images with this extension.
-+
-+@item compress.level
-+Defines which compression level is used for the selected compression format.
-+The default of @code{compress.level=0} will use the default compression level
-+for the format. Alternate values range from 1 for fastest compression to
-+x for the best compression (x max vary between compression formats). This is
-+always a trade in of compression speed against compressed size.
-+
- @end table
- 
- @item Other
--- 
-1.9.1
+I have 8 GPU cards needed to passthrough to 1 vm.
+
+These cards are placed at 2 PCIE switches on host server, in case there
+might be bandwidth limit within a single bus.
+
+So what is the correct QEMU bus parameter if I want to achieve the best
+performance. The QEMU's pcie.0/1 parameter could really reflect to the
+actual physical device?
+
+
+
+Thanks,
+Bob
