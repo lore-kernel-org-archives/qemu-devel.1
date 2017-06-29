@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xormaetxea@ikerlan.es>) id 1dQWDl-0002IX-Kd
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:58:47 -0400
+	(envelope-from <bjhoupu@linux.vnet.ibm.com>) id 1dQY1I-0005eU-P8
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:54:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xormaetxea@ikerlan.es>) id 1dQWDg-0006Hy-MW
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:58:45 -0400
-Received: from ikerlan-12.ikerlan.es ([193.145.247.1]:30821)
-	by eggs.gnu.org with smtp (Exim 4.71)
-	(envelope-from <xormaetxea@ikerlan.es>) id 1dQWDg-000634-AP
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:58:40 -0400
-From: Ormaetxea Xabier <xormaetxea@ikerlan.es>
-Date: Thu, 29 Jun 2017 09:37:42 +0000
-Message-ID: <B1DA44315104F94D9F3F23C74275EA9D5C2D34@Ikerlan-12.ikerlan.es>
-Content-Language: es-ES
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] Debugging source code with Eclipse
+	(envelope-from <bjhoupu@linux.vnet.ibm.com>) id 1dQY1D-0005Xo-Pa
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:54:00 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48660)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjhoupu@linux.vnet.ibm.com>)
+	id 1dQY1D-0005XF-Fx
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:53:55 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v5TBrf3s080893
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 07:53:52 -0400
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bd0g8sc8x-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 07:53:51 -0400
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjhoupu@linux.vnet.ibm.com>;
+	Thu, 29 Jun 2017 12:53:49 +0100
+From: Pu Hou <bjhoupu@linux.vnet.ibm.com>
+Date: Thu, 29 Jun 2017 13:53:36 +0200
+Message-Id: <20170629115336.69632-1-bjhoupu@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH] cryptodev: fix two typos in error message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,19 +35,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, arei.gonglei@huawei.com
+Cc: asic@linux.vnet.ibm.com, BAGRAMOV@de.ibm.com, Pu Hou <bjhoupu@linux.vnet.ibm.com>
 
-Hello!
+Currently we have the name of the backend 'cryptodev-builtin' misspelled
+as 'cryptdov-builtin' in two potentially user facing error messages.
+Let's fix this.
 
-Im trying to debug the source code of Qemu with Eclipse to try to understan=
-d how it works. Im not totally sure how should I do this process, but I've =
-create a Eclipse C project using all the Qemu source code. Unfortunately I =
-get a lot of errors for each code piece, and I can't run it.
+Furthermore The second mention of 'cryptodev-builtin' omits 'backend'.
+Let's make things consistent by adding it.
 
-Those errors are: "type/symbol... '<name>' could not be resolved"
+Reported-by: Timur Bagramov <BAGRAMOV@de.ibm.com>
+Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+Signed-off-by: Pu Hou <bjhoupu@linux.vnet.ibm.com>
+---
+ backends/cryptodev-builtin.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Am I doing in it right? How can I debug the source code of Qemu?
-
-Thank you in advance!
-
-Xabi
+diff --git a/backends/cryptodev-builtin.c b/backends/cryptodev-builtin.c
+index 657c0ba2f3..4e619dfca8 100644
+--- a/backends/cryptodev-builtin.c
++++ b/backends/cryptodev-builtin.c
+@@ -70,7 +70,7 @@ static void cryptodev_builtin_init(
+ 
+     if (queues != 1) {
+         error_setg(errp,
+-                  "Only support one queue in cryptdov-builtin backend");
++                  "Only support one queue in cryptodev-builtin backend");
+         return;
+     }
+ 
+@@ -314,7 +314,7 @@ static int cryptodev_builtin_sym_operation(
+ 
+     if (op_info->op_type == VIRTIO_CRYPTO_SYM_OP_ALGORITHM_CHAINING) {
+         error_setg(errp,
+-               "Algorithm chain is unsupported for cryptdoev-builtin");
++               "Algorithm chain is unsupported for cryptodev-builtin backend");
+         return -VIRTIO_CRYPTO_NOTSUPP;
+     }
+ 
+-- 
+2.11.2
