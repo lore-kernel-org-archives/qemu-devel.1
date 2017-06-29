@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeepkiruvale@gmail.com>) id 1dQb6X-000051-QE
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:11:39 -0400
+	(envelope-from <eblake@redhat.com>) id 1dQb6v-0000Ol-HN
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:12:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeepkiruvale@gmail.com>) id 1dQb6V-00033w-Vh
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:11:37 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:36104)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pradeepkiruvale@gmail.com>)
-	id 1dQb6V-00032T-Ls
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:11:35 -0400
-Received: by mail-wr0-x244.google.com with SMTP id 77so37006060wrb.3
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 08:11:35 -0700 (PDT)
-From: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
-Date: Thu, 29 Jun 2017 11:10:56 -0400
-Message-Id: <1498749056-38565-7-git-send-email-pradeep.jagadeesh@huawei.com>
-In-Reply-To: <1498749056-38565-1-git-send-email-pradeep.jagadeesh@huawei.com>
-References: <1498749056-38565-1-git-send-email-pradeep.jagadeesh@huawei.com>
-Subject: [Qemu-devel] [PATCH v6 6/6] fsdev: QMP interface for throttling
+	(envelope-from <eblake@redhat.com>) id 1dQb6u-0003If-IC
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:12:01 -0400
+References: <20170628175534.14295-1-eblake@redhat.com>
+	<4e6a11e8-d2f9-faa0-8203-9421c79224f3@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <aa0a6484-f676-bf9f-393c-be6e9e5ed8b8@redhat.com>
+Date: Thu, 29 Jun 2017 10:11:47 -0500
+MIME-Version: 1.0
+In-Reply-To: <4e6a11e8-d2f9-faa0-8203-9421c79224f3@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="7EoXI80R7R2XpE0k1PQrclrMPl1ASv0ts"
+Subject: Re: [Qemu-devel] [PATCH v3 00/11] make dirty-bitmap byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,380 +24,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>
-Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-This patch introduces qmp interfaces for the fsdev
-devices. This provides two interfaces one 
-for querying info of all the fsdev devices. The second one
-to set the IO limits for the required fsdev device.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--7EoXI80R7R2XpE0k1PQrclrMPl1ASv0ts
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <aa0a6484-f676-bf9f-393c-be6e9e5ed8b8@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 00/11] make dirty-bitmap byte-based
+References: <20170628175534.14295-1-eblake@redhat.com>
+ <4e6a11e8-d2f9-faa0-8203-9421c79224f3@virtuozzo.com>
+In-Reply-To: <4e6a11e8-d2f9-faa0-8203-9421c79224f3@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
----
- Makefile                    |  4 +++
- fsdev/qemu-fsdev-dummy.c    | 10 ++++++
- fsdev/qemu-fsdev-throttle.c | 76 +++++++++++++++++++++++++++++++++++++++-
- fsdev/qemu-fsdev-throttle.h | 13 +++++++
- fsdev/qemu-fsdev.c          | 37 ++++++++++++++++++++
- monitor.c                   |  5 +++
- qapi-schema.json            |  3 ++
- qapi/fsdev.json             | 84 +++++++++++++++++++++++++++++++++++++++++++++
- qmp.c                       | 14 ++++++++
- 9 files changed, 245 insertions(+), 1 deletion(-)
- create mode 100644 qapi/fsdev.json
+On 06/29/2017 03:28 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Hi!
+>=20
+> Can we apply my "[PATCH v22 00/30] qcow2: persistent dirty bitmaps"
+> first? It was already near to the victory a week ago, but I had to
+> rebase it on new Paolo's patches.
 
-diff --git a/Makefile b/Makefile
-index 16a0430..4fd7625 100644
---- a/Makefile
-+++ b/Makefile
-@@ -416,6 +416,10 @@ qapi-modules = $(SRC_PATH)/qapi-schema.json $(SRC_PATH)/qapi/common.json \
-                $(SRC_PATH)/qapi/crypto.json $(SRC_PATH)/qapi/rocker.json \
-                $(SRC_PATH)/qapi/trace.json
- 
-+ifdef CONFIG_VIRTFS
-+qapi-modules += $(SRC_PATH)/qapi/fsdev.json
-+endif
-+
- qapi-types.c qapi-types.h :\
- $(qapi-modules) $(SRC_PATH)/scripts/qapi-types.py $(qapi-py)
- 	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-types.py \
-diff --git a/fsdev/qemu-fsdev-dummy.c b/fsdev/qemu-fsdev-dummy.c
-index 6dc0fbc..f33305d 100644
---- a/fsdev/qemu-fsdev-dummy.c
-+++ b/fsdev/qemu-fsdev-dummy.c
-@@ -19,3 +19,13 @@ int qemu_fsdev_add(QemuOpts *opts)
- {
-     return 0;
- }
-+
-+void qmp_fsdev_set_io_throttle(IOThrottle *arg, Error **errp)
-+{
-+  return;
-+}
-+
-+IOThrottleList *qmp_query_fsdev_io_throttle(Error **errp)
-+{
-+    abort();
-+}
-diff --git a/fsdev/qemu-fsdev-throttle.c b/fsdev/qemu-fsdev-throttle.c
-index c5e2499..4483533 100644
---- a/fsdev/qemu-fsdev-throttle.c
-+++ b/fsdev/qemu-fsdev-throttle.c
-@@ -16,7 +16,6 @@
- #include "qemu/error-report.h"
- #include "qemu-fsdev-throttle.h"
- #include "qemu/iov.h"
--#include "qemu/throttle-options.h"
- 
- static void fsdev_throttle_read_timer_cb(void *opaque)
- {
-@@ -30,6 +29,81 @@ static void fsdev_throttle_write_timer_cb(void *opaque)
-     qemu_co_enter_next(&fst->throttled_reqs[true]);
- }
- 
-+void fsdev_set_io_throttle(IOThrottle *arg, FsThrottle *fst, Error **errp)
-+{
-+    ThrottleConfig cfg;
-+
-+    throttle_set_io_limits(&cfg, arg);
-+
-+    if (throttle_is_valid(&cfg, errp)) {
-+        fst->cfg = cfg;
-+        fsdev_throttle_init(fst);
-+    }
-+}
-+
-+void fsdev_get_io_throttle(FsThrottle *fst, IOThrottle **fs9pcfg,
-+                           char *fsdevice, Error **errp)
-+{
-+
-+    ThrottleConfig cfg = fst->cfg;
-+    IOThrottle *fscfg = g_malloc0(sizeof(*fscfg));
-+
-+    fscfg->has_id = true;
-+    fscfg->id = g_strdup(fsdevice);
-+    fscfg->bps = cfg.buckets[THROTTLE_BPS_TOTAL].avg;
-+    fscfg->bps_rd = cfg.buckets[THROTTLE_BPS_READ].avg;
-+    fscfg->bps_wr = cfg.buckets[THROTTLE_BPS_WRITE].avg;
-+
-+    fscfg->iops = cfg.buckets[THROTTLE_OPS_TOTAL].avg;
-+    fscfg->iops_rd = cfg.buckets[THROTTLE_OPS_READ].avg;
-+    fscfg->iops_wr = cfg.buckets[THROTTLE_OPS_WRITE].avg;
-+
-+    fscfg->has_bps_max     = cfg.buckets[THROTTLE_BPS_TOTAL].max;
-+    fscfg->bps_max         = cfg.buckets[THROTTLE_BPS_TOTAL].max;
-+    fscfg->has_bps_rd_max  = cfg.buckets[THROTTLE_BPS_READ].max;
-+    fscfg->bps_rd_max      = cfg.buckets[THROTTLE_BPS_READ].max;
-+    fscfg->has_bps_wr_max  = cfg.buckets[THROTTLE_BPS_WRITE].max;
-+    fscfg->bps_wr_max      = cfg.buckets[THROTTLE_BPS_WRITE].max;
-+
-+    fscfg->has_iops_max    = cfg.buckets[THROTTLE_OPS_TOTAL].max;
-+    fscfg->iops_max        = cfg.buckets[THROTTLE_OPS_TOTAL].max;
-+    fscfg->has_iops_rd_max = cfg.buckets[THROTTLE_OPS_READ].max;
-+    fscfg->iops_rd_max     = cfg.buckets[THROTTLE_OPS_READ].max;
-+    fscfg->has_iops_wr_max = cfg.buckets[THROTTLE_OPS_WRITE].max;
-+    fscfg->iops_wr_max     = cfg.buckets[THROTTLE_OPS_WRITE].max;
-+
-+    fscfg->has_bps_max_length     = fscfg->has_bps_max;
-+    fscfg->bps_max_length         =
-+         cfg.buckets[THROTTLE_BPS_TOTAL].burst_length;
-+    fscfg->has_bps_rd_max_length  = fscfg->has_bps_rd_max;
-+    fscfg->bps_rd_max_length      =
-+         cfg.buckets[THROTTLE_BPS_READ].burst_length;
-+    fscfg->has_bps_wr_max_length  = fscfg->has_bps_wr_max;
-+    fscfg->bps_wr_max_length      =
-+         cfg.buckets[THROTTLE_BPS_WRITE].burst_length;
-+
-+    fscfg->has_iops_max_length    = fscfg->has_iops_max;
-+    fscfg->iops_max_length        =
-+         cfg.buckets[THROTTLE_OPS_TOTAL].burst_length;
-+    fscfg->has_iops_rd_max_length = fscfg->has_iops_rd_max;
-+    fscfg->iops_rd_max_length     =
-+         cfg.buckets[THROTTLE_OPS_READ].burst_length;
-+    fscfg->has_iops_wr_max_length = fscfg->has_iops_wr_max;
-+    fscfg->iops_wr_max_length     =
-+         cfg.buckets[THROTTLE_OPS_WRITE].burst_length;
-+
-+    fscfg->bps_max_length = cfg.buckets[THROTTLE_BPS_TOTAL].burst_length;
-+    fscfg->bps_rd_max_length = cfg.buckets[THROTTLE_BPS_READ].burst_length;
-+    fscfg->bps_wr_max_length = cfg.buckets[THROTTLE_BPS_WRITE].burst_length;
-+    fscfg->iops_max_length = cfg.buckets[THROTTLE_OPS_TOTAL].burst_length;
-+    fscfg->iops_rd_max_length = cfg.buckets[THROTTLE_OPS_READ].burst_length;
-+    fscfg->iops_wr_max_length = cfg.buckets[THROTTLE_OPS_WRITE].burst_length;
-+
-+    fscfg->iops_size = cfg.op_size;
-+
-+    *fs9pcfg = fscfg;
-+}
-+
- void fsdev_throttle_parse_opts(QemuOpts *opts, FsThrottle *fst, Error **errp)
- {
-     throttle_parse_options(&fst->cfg, opts);
-diff --git a/fsdev/qemu-fsdev-throttle.h b/fsdev/qemu-fsdev-throttle.h
-index e418643..a49b2e5 100644
---- a/fsdev/qemu-fsdev-throttle.h
-+++ b/fsdev/qemu-fsdev-throttle.h
-@@ -20,6 +20,13 @@
- #include "qemu/coroutine.h"
- #include "qapi/error.h"
- #include "qemu/throttle.h"
-+#include "qemu/throttle-options.h"
-+#include "qapi/qmp/qerror.h"
-+#include "qapi/qmp/types.h"
-+#include "qapi-visit.h"
-+#include "qapi/qobject-output-visitor.h"
-+#include "qapi/util.h"
-+#include "qmp-commands.h"
- 
- typedef struct FsThrottle {
-     ThrottleState ts;
-@@ -36,4 +43,10 @@ void coroutine_fn fsdev_co_throttle_request(FsThrottle *, bool ,
-                                             struct iovec *, int);
- 
- void fsdev_throttle_cleanup(FsThrottle *);
-+
-+void fsdev_set_io_throttle(IOThrottle *, FsThrottle *, Error **errp);
-+
-+void fsdev_get_io_throttle(FsThrottle *, IOThrottle **iothp,
-+                           char *, Error **errp);
-+
- #endif /* _FSDEV_THROTTLE_H */
-diff --git a/fsdev/qemu-fsdev.c b/fsdev/qemu-fsdev.c
-index 266e442..a99e299 100644
---- a/fsdev/qemu-fsdev.c
-+++ b/fsdev/qemu-fsdev.c
-@@ -16,6 +16,7 @@
- #include "qemu-common.h"
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
-+#include "qmp-commands.h"
- 
- static QTAILQ_HEAD(FsDriverEntry_head, FsDriverListEntry) fsdriver_entries =
-     QTAILQ_HEAD_INITIALIZER(fsdriver_entries);
-@@ -98,3 +99,39 @@ FsDriverEntry *get_fsdev_fsentry(char *id)
-     }
-     return NULL;
- }
-+
-+void qmp_fsdev_set_io_throttle(IOThrottle *arg, Error **errp)
-+{
-+
-+    FsDriverEntry *fse;
-+
-+    fse = get_fsdev_fsentry(arg->has_id ? arg->id : NULL);
-+    if (!fse) {
-+        return;
-+    }
-+
-+    fsdev_set_io_throttle(arg, &fse->fst, errp);
-+}
-+
-+IOThrottleList *qmp_query_fsdev_io_throttle(Error **errp)
-+{
-+    IOThrottleList *head = NULL, **p_next = &head;
-+    struct FsDriverListEntry *fsle;
-+    Error *local_err = NULL;
-+
-+    QTAILQ_FOREACH(fsle, &fsdriver_entries, next) {
-+        IOThrottleList *fscfg = g_malloc0(sizeof(*fscfg));
-+        fsdev_get_io_throttle(&fsle->fse.fst, &fscfg->value,
-+                            fsle->fse.fsdev_id, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            g_free(fscfg);
-+            qapi_free_IOThrottleList(head);
-+            return NULL;
-+        }
-+
-+        *p_next = fscfg;
-+        p_next = &fscfg->next;
-+    }
-+    return head;
-+}
-diff --git a/monitor.c b/monitor.c
-index 3c369f4..592a39e 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -997,6 +997,11 @@ static void qmp_unregister_commands_hack(void)
-     && !defined(TARGET_S390X)
-     qmp_unregister_command(&qmp_commands, "query-cpu-definitions");
- #endif
-+#ifndef CONFIG_VIRTFS
-+    qmp_unregister_command(&qmp_commands, "fsdev-set-io-throttle");
-+    qmp_unregister_command(&qmp_commands, "query-fsdev-io-throttle");
-+#endif
-+
- }
- 
- void monitor_init_qmp_commands(void)
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 4b50b65..dc676be 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -81,6 +81,9 @@
- # QAPI block definitions
- { 'include': 'qapi/block.json' }
- 
-+# QAPI fsdev definitions
-+{ 'include': 'qapi/fsdev.json' }
-+
- # QAPI event definitions
- { 'include': 'qapi/event.json' }
- 
-diff --git a/qapi/fsdev.json b/qapi/fsdev.json
-new file mode 100644
-index 0000000..eff1efe
---- /dev/null
-+++ b/qapi/fsdev.json
-@@ -0,0 +1,84 @@
-+# -*- Mode: Python -*-
-+
-+##
-+# == QAPI fsdev definitions
-+##
-+
-+# QAPI common definitions
-+{ 'include': 'iothrottle.json' }
-+
-+##
-+# @fsdev-set-io-throttle:
-+#
-+# Change I/O limits for a 9p/fsdev device.
-+#
-+# I/O limits can be enabled by setting throttle value to non-zero number.
-+#
-+# I/O limits can be disabled by setting all throttle values to 0.
-+#
-+# Returns: Nothing on success
-+#          If @device is not a valid fsdev device, DeviceNotFound
-+#
-+# Since: 2.10
-+#
-+# Example:
-+#
-+# -> { "execute": "fsdev-set-io-throttle",
-+#      "arguments": { "id": "id0-1-0",
-+#                     "bps": 1000000,
-+#                     "bps_rd": 0,
-+#                     "bps_wr": 0,
-+#                     "iops": 0,
-+#                     "iops_rd": 0,
-+#                     "iops_wr": 0,
-+#                     "bps_max": 8000000,
-+#                     "bps_rd_max": 0,
-+#                     "bps_wr_max": 0,
-+#                     "iops_max": 0,
-+#                     "iops_rd_max": 0,
-+#                     "iops_wr_max": 0,
-+#                     "bps_max_length": 60,
-+#                     "iops_size": 0 } }
-+# <- { "returns": {} }
-+##
-+{ 'command': 'fsdev-set-io-throttle', 'boxed': true,
-+  'data': 'IOThrottle' }
-+##
-+# @query-fsdev-io-throttle:
-+#
-+# Returns: a list of @IOThrottle describing io throttle values of each fsdev device
-+#
-+# Since: 2.10
-+#
-+# Example:
-+#
-+# -> { "Execute": "query-fsdev-io-throttle" }
-+# <- { "returns" : [
-+#          {
-+#             "id": "id0-hd0",
-+#              "bps":1000000,
-+#              "bps_rd":0,
-+#              "bps_wr":0,
-+#              "iops":1000000,
-+#              "iops_rd":0,
-+#              "iops_wr":0,
-+#              "bps_max": 8000000,
-+#              "bps_rd_max": 0,
-+#              "bps_wr_max": 0,
-+#              "iops_max": 0,
-+#              "iops_rd_max": 0,
-+#              "iops_wr_max": 0,
-+#              "bps_max_length": 0,
-+#              "bps_rd_max_length": 0,
-+#              "bps_wr_max_length": 0,
-+#              "iops_max_length": 0,
-+#              "iops_rd_max_length": 0,
-+#              "iops_wr_max_length": 0,
-+#              "iops_size": 0
-+#            }
-+#          ]
-+#      }
-+#
-+##
-+{ 'command': 'query-fsdev-io-throttle', 'returns': [ 'IOThrottle' ] }
-+
-diff --git a/qmp.c b/qmp.c
-index 7ee9bcf..8a60f2c 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -130,6 +130,20 @@ void qmp_cpu_add(int64_t id, Error **errp)
-     }
- }
- 
-+#if defined(_WIN64) || defined(_WIN32) || defined(__FreeBSD__)
-+
-+void qmp_fsdev_set_io_throttle(IOThrottle *arg, Error **errp)
-+{
-+  return;
-+}
-+
-+IOThrottleList *qmp_query_fsdev_io_throttle(Error **errp)
-+{
-+    abort();
-+}
-+
-+#endif
-+
- #ifndef CONFIG_VNC
- /* If VNC support is enabled, the "true" query-vnc command is
-    defined in the VNC subsystem */
--- 
-1.8.3.1
+Sure, I can rebase on top of yours (I've already rebased multiple times,
+as have you, but yours has been on the list longer).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--7EoXI80R7R2XpE0k1PQrclrMPl1ASv0ts
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZVRizAAoJEKeha0olJ0NqdkcH/AkpMNxHspFTU6rnkmVQQ0H6
+7wkRlBXkoxqiVoz36iU33Siccan3IM5eOHUxwu53gJUPypcxPG636754+kY4WuNV
+WTsHv4TIraWZaW1yD9AXxBtxV0m6opUOqrxk5gyVzh0x83+MKhZoav1aceA++Ynw
+RCYEtC+wgRjNmy6KJtI1L4L8Km+mJWD2rRo/HYAIO+7SAhkUb7tF9YqVsiAeScC/
+9awHEzpgMxHMFph1L3chlxE9/xjwmaQhzmPfFJLg9aSyGFsJDuHjAciG0RwOZS73
+jkSlaTm2kAErfBKrWDZVfhP1onaf8a/yJI/wy0Gjw1a5Ocit1tAZ/D6vkuYnzSg=
+=TkRi
+-----END PGP SIGNATURE-----
+
+--7EoXI80R7R2XpE0k1PQrclrMPl1ASv0ts--
