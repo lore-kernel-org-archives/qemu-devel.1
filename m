@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dQTBc-0004Gw-CW
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 02:44:21 -0400
+	(envelope-from <armbru@redhat.com>) id 1dQTLZ-0006lh-1e
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 02:54:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dQTBZ-0006or-7b
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 02:44:20 -0400
-References: <20170622112648.24815-1-lvivier@redhat.com>
-	<caa25331-5005-78e8-fba2-19bf67116d92@redhat.com>
-	<20170623092124.GG12089@umbus>
-	<c0a0667e-8c60-a8e7-a041-caddac8c8b88@redhat.com>
-	<20170628014231.GA791@pacoca>
-	<a34435df-8944-ddac-e881-0a2338e4aad4@redhat.com>
-	<20170628081850.GJ12089@umbus>
-	<668938c1-f93e-86d1-4e4e-5715d5074587@kaod.org>
-	<e0f76eb1-2388-e512-3763-26e7232b1129@redhat.com>
-	<baf1e0b1-178b-28ae-f2a2-caadaaf9d213@kaod.org>
-	<20170628135908.4501f0a0@bahia.lab.toulouse-stg.fr.ibm.com>
-	<78fa4c41-92db-8676-b6ef-db9de9717844@redhat.com>
-	<20170628184137.699a4f9f@bahia.lab.toulouse-stg.fr.ibm.com>
-	<1498714660.30519.1.camel@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <7e60dbcd-61b9-23fe-330d-37c96e1fb9b2@redhat.com>
-Date: Thu, 29 Jun 2017 08:44:06 +0200
+	(envelope-from <armbru@redhat.com>) id 1dQTLV-00026R-RV
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 02:54:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33296)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dQTLV-000263-IE
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 02:54:33 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170613165313.20954-1-ehabkost@redhat.com>
+	<87o9t8qy7d.fsf@dusky.pond.sub.org>
+	<20170628174158.GG12152@localhost.localdomain>
+Date: Thu, 29 Jun 2017 08:54:29 +0200
+In-Reply-To: <20170628174158.GG12152@localhost.localdomain> (Eduardo Habkost's
+	message of "Wed, 28 Jun 2017 14:41:58 -0300")
+Message-ID: <87mv8r2sii.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1498714660.30519.1.camel@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc/cpu-models: set
- POWER9_v1.0 as POWER9 DD1
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC 00/15] Error API: Flag errors in *errp even
+ if errors are being ignored
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,198 +29,337 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>, Greg Kurz <groug@kaod.org>, Laurent Vivier <lvivier@redhat.com>
-Cc: sursingh@redhat.com, joserz@linux.vnet.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, sbobroff@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 29.06.2017 07:37, Suraj Jitindar Singh wrote:
-> On Wed, 2017-06-28 at 18:41 +0200, Greg Kurz wrote:
->> On Wed, 28 Jun 2017 18:18:06 +0200
->> Laurent Vivier <lvivier@redhat.com> wrote:
->>
->>> On 28/06/2017 13:59, Greg Kurz wrote:
->>>> On Wed, 28 Jun 2017 12:23:06 +0200
->>>> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->>>>  =20
->>>>> On 06/28/2017 11:18 AM, Laurent Vivier wrote: =20
->>>>>> On 28/06/2017 11:11, C=C3=A9dric Le Goater wrote:   =20
->>>>>>> On 06/28/2017 10:18 AM, David Gibson wrote:   =20
->>>>>>>> On Wed, Jun 28, 2017 at 09:09:24AM +0200, Thomas Huth
->>>>>>>> wrote:   =20
->>>>>>>>> On 28.06.2017 03:42, joserz@linux.vnet.ibm.com
->>>>>>>>> wrote:   =20
->>>>>>>>>> On Fri, Jun 23, 2017 at 04:10:55PM +0200, Laurent
->>>>>>>>>> Vivier wrote:   =20
->>>>>>>>>>> On 23/06/2017 11:21, David Gibson wrote:   =20
->>>>>>>>>>>> On Thu, Jun 22, 2017 at 01:31:24PM +0200, Thomas
->>>>>>>>>>>> Huth wrote:   =20
->>>>>>>>>>>>> On 22.06.2017 13:26, Laurent Vivier wrote:   =20
->>>>>>>>>>>>>> CPU_POWERPC_POWER9_DD1 is 0x004E0100, so this
->>>>>>>>>>>>>> is the POWER9 v1.0.
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> When we run qemu on a POWER9 DD1 host, we
->>>>>>>>>>>>>> must use either
->>>>>>>>>>>>>> "-cpu host" or "-cpu POWER9", but in the
->>>>>>>>>>>>>> latter case it fails with
->>>>>>>>>>>>>>
->>>>>>>>>>>>>>     Unable to find sPAPR CPU Core definition
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> because POWER9 DD1 doesn't appear in the list
->>>>>>>>>>>>>> of known CPUs.
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> This patch fixes this by defining POWER9_v1.0
->>>>>>>>>>>>>> with POWER9 DD1
->>>>>>>>>>>>>> PVR instead of CPU_POWERPC_POWER9_BASE.
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> Signed-off-by: Laurent Vivier <lvivier@redhat
->>>>>>>>>>>>>> .com>
->>>>>>>>>>>>>> ---
->>>>>>>>>>>>>>  target/ppc/cpu-models.c | 2 +-
->>>>>>>>>>>>>>  1 file changed, 1 insertion(+), 1 deletion(-
->>>>>>>>>>>>>> )
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> diff --git a/target/ppc/cpu-models.c
->>>>>>>>>>>>>> b/target/ppc/cpu-models.c
->>>>>>>>>>>>>> index 4d3e635..a22363c 100644
->>>>>>>>>>>>>> --- a/target/ppc/cpu-models.c
->>>>>>>>>>>>>> +++ b/target/ppc/cpu-models.c
->>>>>>>>>>>>>> @@ -1144,7 +1144,7 @@
->>>>>>>>>>>>>>      POWERPC_DEF("970_v2.2",      CPU_POWERPC
->>>>>>>>>>>>>> _970_v22,                970,
->>>>>>>>>>>>>>                  "PowerPC 970 v2.2")
->>>>>>>>>>>>>> =20
->>>>>>>>>>>>>> -    POWERPC_DEF("POWER9_v1.0",   CPU_POWERPC
->>>>>>>>>>>>>> _POWER9_BASE,            POWER9,
->>>>>>>>>>>>>> +    POWERPC_DEF("POWER9_v1.0",   CPU_POWERPC
->>>>>>>>>>>>>> _POWER9_DD1,             POWER9,
->>>>>>>>>>>>>>                  "POWER9 v1.0")
->>>>>>>>>>>>>> =20
->>>>>>>>>>>>>>      POWERPC_DEF("970fx_v1.0",    CPU_POWERPC
->>>>>>>>>>>>>> _970FX_v10,              970,
->>>>>>>>>>>>>>   =20
->>>>>>>>>>>>>
->>>>>>>>>>>>> I think this also makes sense for running in
->>>>>>>>>>>>> TCG mode to get a valid
->>>>>>>>>>>>> real PVR there.   =20
->>>>>>>>>>>>
->>>>>>>>>>>> I'm not so convinced.
->>>>>>>>>>>>
->>>>>>>>>>>> IIUC, this will make TCG default (for now) to a
->>>>>>>>>>>> DD1 POWER9.  That's a)
->>>>>>>>>>>> probably not what anyone wants - who'd select a
->>>>>>>>>>>> buggy prototype and b)
->>>>>>>>>>>> not accurate - TCG does not implement DD1's
->>>>>>>>>>>> bugs.   =20
->>>>>>>>>>>
->>>>>>>>>>> According to the POWER8 user manual (I didn't fine
->>>>>>>>>>> the POWER9 one):
->>>>>>>>>>>
->>>>>>>>>>> "3.6.3.1 Processor Version Register (PVR)
->>>>>>>>>>>
->>>>>>>>>>> The processor revision level (PVR[16:31]) starts at
->>>>>>>>>>> x=E2=80=980100=E2=80=99, indicating
->>>>>>>>>>> revision =E2=80=981.0=E2=80=99. As revisions are made, bits [=
-29:31]
->>>>>>>>>>> will indicate minor
->>>>>>>>>>> revisions. Similarly, bits [20:23] indicate major
->>>>>>>>>>> changes."
->>>>>>>>>>>
->>>>>>>>>>> POWER9 DD1 PVR is 0x004E0100, so this is really
->>>>>>>>>>> version 1.0 of the POWER9.
->>>>>>>>>>>
->>>>>>>>>>> Perhaps we can define POWER9_v1.0 as
->>>>>>>>>>> CPU_POWERPC_POWER9_DD1, and
->>>>>>>>>>> introduce a POWER9_v0.0 set to
->>>>>>>>>>> CPU_POWERPC_POWER9_BASE and define it as
->>>>>>>>>>> the default one?   =20
->>>>>>>>>>
->>>>>>>>>> I like the suggestion to set a v0.0 to
->>>>>>>>>> CPU_POWERPC_POWER9_BASE. But, I
->>>>>>>>>> think we could have only that option, removing the
->>>>>>>>>> CPU_POWERPC_POWER9_DD1 entry.   =20
->>>>>>>>>
->>>>>>>>> I really dislike the idea of having a CPU called "v0.0"
->>>>>>>>> ... we do not
->>>>>>>>> have this for any other CPU generation, and it sounds
->>>>>>>>> like it could be
->>>>>>>>> very confusing for the users (you'd need to document
->>>>>>>>> somewhere what the
->>>>>>>>> v0.0 exactly means). If we really want to go this way,
->>>>>>>>> I think we should
->>>>>>>>> name it "POWER9-generic" or "PowerISA-3.0" or something
->>>>>>>>> similar instead.
->>>>>>>>>
->>>>>>>>> Or does somebody already know the exact PVR for DD2? If
->>>>>>>>> so, we could
->>>>>>>>> simply add a POWER9_v2.0 CPU already and let the POWER9
->>>>>>>>> alias point to
->>>>>>>>> that version instead.   =20
->>>>>>>>
->>>>>>>> Yes, I think that's a better idea.  I don't know the DD2
->>>>>>>> PVR, but I'm
->>>>>>>> pretty sure we should be able to find out from someone at
->>>>>>>> IBM.
->>>>>>>>
->>>>>>>> I've CCed Sam & Suraj - can you ask Mikey or someone what
->>>>>>>> the PVR
->>>>>>>> value for DD2.0 will be?   =20
->>>>>>>
->>>>>>> I would expect something like :
->>>>>>>
->>>>>>>  0x200D104980000000UL; /* P9 Nimbus DD2.0 */   =20
->>>>>>
->>>>>>
->>>>>> I would expect something like 0x004Exxxx.   =20
->>>>>
->>>>> ah yes, I am mistaking the PVR and the CFAM ID.=20
->>>>>
->>>>> C.=20
->>>>>   =20
->>>>
->>>> According to https://patchwork.ozlabs.org/patch/776052/
->>>>
->>>> POWER9 DD2's PVR is expected to be 0x004e1200
->>>> =20
->>>
->>> So, perhaps I can send a v2 of the patch with POWER9_v1.0 set to
->>> DD1
->>> PVR, and POWER9_v2.0 set to DD2 PVR?
->>>
->>
->> FWIW Thomas suggested to do just that and David agreed it was "a
->> better idea".
->=20
-> I assume we would have just -cpu POWER9 alias to DD2?
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-Yes.
+> On Wed, Jun 28, 2017 at 11:05:26AM +0200, Markus Armbruster wrote:
+>> Eduardo Habkost <ehabkost@redhat.com> writes:
+>> 
+>> > Rationale
+>> > ---------
+>> >
+>> > I'm often bothered by the fact that we can't write the following:
+>> >
+>> >     foo(arg, errp);
+>> >     if (*errp) {
+>> >         handle the error...
+>> >         error_propagate(errp, err);
+>> >     }
+>> >
+>> > because errp can be NULL.
+>> 
+>> If foo() additionally returned an indication of success, you could write
+>> 
+>>       if (!foo(arg, errp)) {    // assuming foo() returns a bool
+>>           handle the error...
+>>       }
+>> 
+>> Nicely concise.
+>> 
+>> For what it's worth, this is how GLib wants GError to be used.  We
+>> deviated from it, and it has turned out to be a self-inflicted wound.
+>
+> Interesting, I didn't know about that.
 
-> We probably need to have a nice abort if someone tries to run TCG with
-> DD1, I'm not sure where it will break but I'm fairly sure it won't
-> boot.
+See section "Description", in particular subsection "Rules for use of
+GError" at
+https://developer.gnome.org/glib/unstable/glib-Error-Reporting.html
 
-I assume that we will remove DD1 again once DD2 is widely available
-(just like we did on POWER8), so I would not bother adding special
-logic here.
+>> > I understand the reason we need to support errp==NULL, as it
+>> > makes life simpler for callers that don't want any extra error
+>> > information.  However, this has the cost of making the functions
+>> > that report errors more complex and error-prone.
+>> >
+>> > (Evidence of that: the 34 ERR_IS_* cases handled by the "use
+>> > ERR_IS_* macros" patches in the series.  Where existing code will
+>> > crash or behave differently if errp is NULL.)
+>> 
+>> Which of them could *not* use a suitable return value instead of *errp?
+>
+> I don't know.  But I'm not trying to improve those 34 ERR_IS_* cases.  I
+> am trying to improve the 700+ functions that need the
+> local_err/error_propagate() boilerplate code today.  This series already
+> handles 346 of them automatically (see patch 14/15).
 
-> I think the absence of -cpu on the CLI should give -cpu host for KVM-
-> HV.
+I agree the goal is reducing error_propagate() boilerplate.  I latched
+onto the 34 ERR_IS_* cases only because you presented them as examples.
 
-Yes, we've got this in spapr.c:
+>> > I considered suggesting forbidding NULL errp, and just changing
+>> > all callers that use NULL to have an err variable and call
+>> > error_free(), but this would mean changing 690 function callers
+>> > that pass NULL errp as argument.
+>> 
+>> Would also add lots of pointless malloc churn.  The ability to ignore
+>> errors is a feature.
+>
+> Exactly.  My proposal keeps that ability.
+>
+>
+>> 
+>> > Here I'm proposing a mechanism to have the best of both worlds:
+>> > allow callers to ignore errors easily while allowing functions to
+>> > propagate errors without an intermediate local_err variable.
+>> >
+>> > The Proposal
+>> > ------------
+>> >
+>> > I'm proposing replacing NULL errp with a special macro:
+>> > IGNORE_ERRORS.  The macro will trigger special behavior in the
+>> > error API that will make it not save any error information in the
+>> > error pointer, but still keep track of boolean error state in
+>> > *errp.
+>> >
+>> > This will allow us to simplify the documented method to propagate errors
+>> > from:
+>> >
+>> >     Error *err = NULL;
+>> >     foo(arg, &err);
+>> >     if (err) {
+>> >         handle the error...
+>> >         error_propagate(errp, err);
+>> >     }
+>> >
+>> > to:
+>> >
+>> >     foo(arg, errp);
+>> >     if (ERR_IS_SET(errp)) {
+>> >         handle the error...
+>> >     }
+>> >
+>> > This will allow us to stop using local_err variables and
+>> > error_propagate() on hundreds of cases.
+>> 
+>> Getting rid of unnecessary local_err boilerplate is good.  The question
+>> is how.  A possible alternative to your proposal is to follow GLib and
+>> make functions return success/failure.
+>> 
+>> How do the two compare?
+>
+> This proposal proposal already gets rid of 346 error_propagate() calls
+> automatically, and we probably can get rid of many others with
+> additional Coccinelle scripts.
+>
+> Making functions return success/failure, on the other hand, would
+> require rewriting them manually.
 
-    /* init CPUs */
-    if (machine->cpu_model =3D=3D NULL) {
-        machine->cpu_model =3D kvm_enabled() ? "host" : smc->tcg_default_=
-cpu;
-    }
+Yes, but how would the *result* compare?  I feel we should at least
+explore this.  I'll try to find some time to play with it.
 
-> FWIW currently TCG defaults to POWER8, so I guess we have to decide
-> if/when we want to bump that to POWER9.
+Coccinelle might let us automate some, but determining success
+vs. failure will commonly require human smarts.
 
-The main reason for bumping to POWER8 was the fact that some (little
-endian) Linux distros started to compile with -mcpu=3Dpower8 and thus sud=
-denly
-did not work by default anymore with QEMU. As long as we do notsee someth=
-ing
-similar with POWER9 (which I do not expect), I think there is no
-urgent need right now to increase the default CPU to POWER9.
+How many such functions we have?  Hmm...
 
- Thomas
+    @r@
+    identifier fun, errp;
+    typedef Error;
+    position p;
+    @@
+     void fun(..., Error **errp)@p
+     {
+         ...
+     }
+    @script:python@
+        p << r.p;
+        fun << r.fun;
+    @@
+    print("%s:%s:%s: %s()" % (p[0].file, p[0].line, p[0].column, fun))
+
+Finds 1525.  Correcting the void mistake will be a huge pain, but
+procrastinating can only make it grow.
+
+>                                   This proposal doesn't even prevent
+> that from happening.  I'd say it helps on that, because we can now find
+> cases that still need to be converted by grepping for ERR_IS_SET.
+
+I honestly doubt finding the cases is a problem.  We just grep for
+error_propagate().
+
+>> > Implementation
+>> > --------------
+>> >
+>> > This replaces NULL errp arguments on function calls with a
+>> > IGNORE_ERRORS macro.  Checks for (!errp) are replaced by
+>> > ERR_IS_IGNORED(errp).  Checks for (*errp) are replaced by
+>> > ERR_IS_SET(errp).  No extra changes are required on function
+>> > callers.
+>> 
+>> That's a lot of churn.  One time pain, of course.
+>
+> Yes, and it was automated using Coccinelle.
+>
+>> 
+>> > Then IGNORE_ERRORS is implemend as:
+>> >
+>> >   (& { &ignored_error_unset })
+>> >
+>> > When error_set() is called and IGNORE_ERRORS was used, we set
+>> > error state using:
+>> >
+>> >   *errp = &ignored_error_set;
+>> >
+>> > This way, we can make ERR_IS_SET work even if errp was
+>> > IGNORE_ERRORS.  The ERR_IS_* macros are reimplemented as:
+>> >
+>> >   #define ERR_IS_SET(e) (*(e) && *(e) != &ignored_error_unset)
+>> >   #define ERR_IS_IGNORED(e) (!(e) || *(e) == &ignored_error_unset || *(e) == &ignored_error_set)
+>> >
+>> > Ensuring errp is never NULL
+>> > ---------------------------
+>> >
+>> > The last patch on this series changes the (Error **errp)
+>> > parameters in functions to (Error *errp[static 1]), just to help
+>> > validate the existing code, as clang warns about NULL arguments
+>> > on that case.  I don't think we should apply that patch, though,
+>> > because the "[static 1]" syntax confuses Coccinelle.
+>> >
+>> > I have a branch where I experimented with the idea of replacing
+>> > (Error **errp) parameters with an opaque type (void*, or a struct
+>> > type).  I gave up when I noticed it would require touching all
+>> > callers to replace &err with a wrapper macro to convert to the
+>> > right type.  Suggestions to make NULL errp easier to detect at
+>> > build time are welcome.
+>> >
+>> > (Probably the easiest solution for that is to add assert(errp)
+>> > lines to the ERR_IS_*() macros.)
+>> 
+>> We'll obviously struggle with null arguments until all the developers
+>> adjusted to the new interface.  Possibly with occasional mistakes
+>> forever.  Compile-time checking would really, really help.
+>
+> True.  I'm investigating the possibility of using
+> __attribute__((nonull(...))) with Coccinelle's help.
+>
+>
+>> 
+>> > Desirable side-effects
+>> > ----------------------
+>> >
+>> > Some of additional benefits from parts of this series:
+>> >
+>> > * Making code that ignore error information more visible and
+>> >   greppable (using IGNORE_ERRORS).
+>> 
+>> True.
+>> 
+>> Drawback: Passing an address takes more code than passing null.  Not
+>> sure it matters.
+>
+> I don't know what you mean by "more code".  It requires just replacing
+> NULL with IGNORE_ERRORS.  The magic is hidden behind the macro.
+
+Creating the IGNORE_ERRORS value and passing it requires more machine
+instructions than passing NULL.  When ignored_error_unset is in another
+DSO, it also requires a relocation.
+
+>> >                                     I believe many of those cases
+>> >   are actually bugs and should use &error_abort or &error_fatal
+>> >   instead.
+>> 
+>> I've seen such bugs.
+>> 
+>> Of course, making possible offenders more greppable doesn't necessarily
+>> mean existing ones will get fixed and new ones will be avoided.
+>> 
+>> > * Making code that depends on errp more visible and
+>> >   greppable (using ERR_IS_* macros).  Some of those cases are
+>> >   also likely to be bugs, and need to be investigated.
+>> 
+>> Grepping for (local_)?errp? works well enough, doesn't it?
+>
+> I don't see how.
+
+Full list of possible Error ** variables not named errp:
+
+    $ git-grep -E '\bError \*\*' | grep -vE '\bError \*\*(errp\b|\))'
+    HACKING:the eyes than propagating an Error object through an Error ** parameter.
+    HACKING:only the function really knows, use Error **, and set suitable errors.
+    block/quorum.c:    /* XXX - would be nice if we could pass in the Error **
+    block/snapshot.c:                             Error **err)
+    blockjob.c:/* A wrapper around block_job_cancel() taking an Error ** parameter so it may be
+    docs/devel/writing-qmp-commands.txt:3. It takes an "Error **" argument. This is required. Later we will see how to
+    hw/core/qdev.c:static bool check_only_migratable(Object *obj, Error **err)
+    hw/core/qdev.c:        Error **local_errp = NULL;
+    hw/core/qdev.c:static bool device_get_hotplugged(Object *obj, Error **err)
+    hw/i386/amd_iommu.c:static void amdvi_realize(DeviceState *dev, Error **err)
+    hw/sd/sdhci.c:static void sdhci_sysbus_realize(DeviceState *dev, Error ** errp)
+    hw/usb/dev-network.c:static void usb_net_realize(USBDevice *dev, Error **errrp)
+    include/block/snapshot.h:                             Error **err);
+    include/qapi/error.h:void error_propagate(Error **dst_errp, Error *local_err);
+    include/qom/object.h:                                    const uint64_t *v, Error **Errp);
+    include/qom/object.h:                                          const uint64_t *v, Error **Errp);
+    qga/commands-posix.c:GuestUserList *qmp_guest_get_users(Error **err)
+    qga/commands-win32.c:GuestUserList *qmp_guest_get_users(Error **err)
+    qga/commands.c:GuestExecStatus *qmp_guest_exec_status(int64_t pid, Error **err)
+    qga/commands.c:                       Error **err)
+    qga/commands.c:GuestHostName *qmp_guest_get_host_name(Error **err)
+    qmp.c:void qmp_system_powerdown(Error **erp)
+    util/error.c:void error_propagate(Error **dst_errp, Error *local_err)
+
+I'll post a patch to rename the offenders.
+
+>                   I'm talking about two cases:
+>
+> 1) Code like this:
+>
+>   int func1(..., Error **errp)
+>   {
+>       do_something(errp);
+>       if (errp && *errp) {
+>           /* handle error */
+>           return;
+>       }
+>       /* do something else */
+>   }
+>
+> func1() is buggy because it behaves differently if errp is NULL.
+
+Does your series fix any such bugs?  We hunted them all down long ago...
+Perhaps a few new ones have crept in since.  Hmm... I can see two:
+
+    $ git-grep -F 'errp && *errp'
+    exec.c:        if (errp && *errp) {
+    hw/mem/pc-dimm.c:        if (errp && *errp) {
+    util/error.c:    assert(errp && *errp);
+
+> 2) Code like this:
+>
+>   int func2(..., Error **errp)
+>   {
+>       do_something(errp);
+>       if (*errp) {
+>           /* handle error */
+>       }
+>   }
+>
+> func2() is buggy because if crashes if errp is NULL.
+
+Does your series fix any such bugs?  grep coughs up quite a few
+candidates...
+
+> I don't see an easy way to grep for them with the current code.  With
+> this series, (1) can be detected by grepping for ERR_IS_IGNORED,
+
+How would example (1) look like then?
+
+>                                                                  and (2)
+> is fixed because ERR_IS_SET(errp) will work even if errp is NULL.
+>
+>> > TODO
+>> > ----
+>> >
+>> > * Simplify more cases of local_error/error_propagate() to use
+>> >   errp directly.
+>> > * Update API documentation and code examples.
+>> > * Add a mechanism to ensure errp is never NULL.
+>> >
+>> > Git branch
+>> > ----------
+>> >
+>> > This series depend on a few extra cleanups that I didn't submit
+>> > to qemu-devel yet.  A git branch including this series is
+>> > available at:
+>> >
+>> >   git://github.com/ehabkost/qemu-hacks.git work/err-api-rework-ignore-ptr-v1
