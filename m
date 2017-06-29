@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeepkiruvale@gmail.com>) id 1dQb6T-0008UF-9v
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:11:34 -0400
+	(envelope-from <pradeepkiruvale@gmail.com>) id 1dQb6V-0008Um-Ry
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:11:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeepkiruvale@gmail.com>) id 1dQb6Q-00030d-Ku
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:11:33 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:34446)
+	(envelope-from <pradeepkiruvale@gmail.com>) id 1dQb6U-00032L-Np
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:11:35 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:35222)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pradeepkiruvale@gmail.com>)
-	id 1dQb6Q-0002zk-ES
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:11:30 -0400
-Received: by mail-wr0-x242.google.com with SMTP id k67so36931705wrc.1
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 08:11:28 -0700 (PDT)
+	id 1dQb6U-00031x-Dw
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:11:34 -0400
+Received: by mail-wr0-x243.google.com with SMTP id z45so37152726wrb.2
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 08:11:34 -0700 (PDT)
 From: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
-Date: Thu, 29 Jun 2017 11:10:50 -0400
-Message-Id: <1498749056-38565-1-git-send-email-pradeep.jagadeesh@huawei.com>
-Subject: [Qemu-devel] [PATCH v6 0/6] fsdev: qmp interface for io throttling
+Date: Thu, 29 Jun 2017 11:10:55 -0400
+Message-Id: <1498749056-38565-6-git-send-email-pradeep.jagadeesh@huawei.com>
+In-Reply-To: <1498749056-38565-1-git-send-email-pradeep.jagadeesh@huawei.com>
+References: <1498749056-38565-1-git-send-email-pradeep.jagadeesh@huawei.com>
+Subject: [Qemu-devel] [PATCH v6 5/6] fsdev: hmp interface for throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,77 +27,169 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>
-Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-These patches provide the qmp interface, to query the io throttle 
-status of the all fsdev devices that are present in a vm.
-also, it provides an interface to set the io throttle parameters of a
-fsdev to a required value. some of the patches also remove the duplicate
-code that was present in block and fsdev files. 
+This patch introduces hmp interfaces for the fsdev
+devices.
 
-Pradeep Jagadeesh (6):
-  throttle: factor out duplicate code
-  qmp: Create IOThrottle structure
-  throttle: move out function to reuse the code
-  hmp: create a throttle initialization function for code reusability
-  fsdev: hmp interface for throttling
-  fsdev: QMP interface for throttling
+Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+---
+ hmp-commands-info.hx | 18 ++++++++++++++
+ hmp-commands.hx      | 19 +++++++++++++++
+ hmp.c                | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ hmp.h                |  4 ++++
+ 4 files changed, 107 insertions(+)
 
- Makefile                        |   4 ++
- blockdev.c                      |  97 ++-------------------------------
- fsdev/qemu-fsdev-dummy.c        |  10 ++++
- fsdev/qemu-fsdev-throttle.c     | 118 ++++++++++++++++++++++++++--------------
- fsdev/qemu-fsdev-throttle.h     |  13 +++++
- fsdev/qemu-fsdev.c              |  37 +++++++++++++
- hmp-commands-info.hx            |  18 ++++++
- hmp-commands.hx                 |  19 +++++++
- hmp.c                           |  87 +++++++++++++++++++++++++++--
- hmp.h                           |   4 ++
- include/qemu/throttle-options.h |   6 ++
- include/qemu/throttle.h         |   4 +-
- include/qemu/typedefs.h         |   1 +
- monitor.c                       |   5 ++
- qapi-schema.json                |   3 +
- qapi/block-core.json            |  76 +-------------------------
- qapi/fsdev.json                 |  84 ++++++++++++++++++++++++++++
- qapi/iothrottle.json            |  88 ++++++++++++++++++++++++++++++
- qmp.c                           |  14 +++++
- util/throttle.c                 | 110 +++++++++++++++++++++++++++++++++++++
- 20 files changed, 582 insertions(+), 216 deletions(-)
- create mode 100644 qapi/fsdev.json
- create mode 100644 qapi/iothrottle.json
-
-v0 -> v1:
- Addressed comments from Eric Blake, Greg Kurz and Daniel P.Berrange
- Mainly renaming the functions and removing the redundant code.
-
-v1 -> v2:
- Addressed comments from Eric Blake and Greg Kurz.
- As per the suggestion I split the patches into smaller patches.
- Removed some more duplicate code.
-
-v2 -> v3:
- Addresssed comments from Alberto Garcia.
- Changed the comment from block to iothrottle in the iothrottle.json 
- Added the dummy functions in qemu-fsdev-dummy.c to address the compilation
- issues that were observed.
-
-v3 -> v4:
- Addressed comments from Eric Blake and Greg Kurz
- Re-ordered the patches
- Added the dummy functions in qmp.c to address the cross compilation issues
-
-v4 -> v5:
-  Addressed comments from Eric Blake and Greg Kurz
-  Split the fsdev qmp patch into hmp and qmp related patches
-  Moved the common functionalities to throttle.c instead of creating
-  a new file
-
-v5 -> v6:
-  Addressed comments from Greg Kurz and Markus Armbruster
-  Split the commits to specific to hmp and throttle as suggested by Greg
-  Moved ThrottleConfig typedef to qemu/typedefs.h
-  Addressed compilation issue on FreeBSD by adding flags in qmp.c
-
+diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+index ae16901..f23b627 100644
+--- a/hmp-commands-info.hx
++++ b/hmp-commands-info.hx
+@@ -84,6 +84,24 @@ STEXI
+ Show block device statistics.
+ ETEXI
+ 
++#if defined(CONFIG_VIRTFS)
++
++    {
++        .name       = "query-fsdev-iothrottle",
++        .args_type  = "",
++        .params     = "",
++        .help       = "show fsdev device throttle information",
++        .cmd        = hmp_fsdev_get_io_throttle,
++    },
++
++#endif
++
++STEXI
++@item info fsdev throttle
++@findex fsdevthrottleinfo
++Show fsdev device throttleinfo.
++ETEXI
++
+     {
+         .name       = "block-jobs",
+         .args_type  = "",
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index e763606..c60fd7e 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1662,6 +1662,25 @@ STEXI
+ Change I/O throttle limits for a block drive to @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
+ ETEXI
+ 
++#if defined(CONFIG_VIRTFS)
++
++    {
++        .name       = "fsdev-set-io-throttle",
++        .args_type  = "device:B,bps:l,bps_rd:l,bps_wr:l,iops:l,iops_rd:l,iops_wr:l",
++        .params     = "device bps bps_rd bps_wr iops iops_rd iops_wr",
++        .help       = "change I/O throttle limits for a fs devices",
++        .cmd        = hmp_fsdev_set_io_throttle,
++    },
++
++#endif
++
++STEXI
++@item fsdev_set_io_throttle @var{device} @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
++@findex fsdev_set_io_throttle
++Change I/O throttle limits for a fs devices to @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
++ETEXI
++
++
+     {
+         .name       = "set_password",
+         .args_type  = "protocol:s,password:s,connected:s?",
+diff --git a/hmp.c b/hmp.c
+index 220d301..b1c698b 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1776,6 +1776,72 @@ void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict)
+     hmp_handle_error(mon, &err);
+ }
+ 
++#ifdef CONFIG_VIRTFS
++
++void hmp_fsdev_set_io_throttle(Monitor *mon, const QDict *qdict)
++{
++    Error *err = NULL;
++    IOThrottle throttle;
++
++    hmp_initialize_io_throttle(&throttle, qdict);
++    qmp_fsdev_set_io_throttle(&throttle, &err);
++    hmp_handle_error(mon, &err);
++}
++
++static void print_fsdev_throttle_config(Monitor *mon, IOThrottle *fscfg,
++                                       Error *err)
++{
++    if (fscfg->bps  || fscfg->bps_rd  || fscfg->bps_wr  ||
++        fscfg->iops || fscfg->iops_rd || fscfg->iops_wr)
++    {
++        monitor_printf(mon, "%s", fscfg->id);
++        monitor_printf(mon, "    I/O throttling:"
++                        " bps=%" PRId64
++                        " bps_rd=%" PRId64  " bps_wr=%" PRId64
++                        " bps_max=%" PRId64
++                        " bps_rd_max=%" PRId64
++                        " bps_wr_max=%" PRId64
++                        " iops=%" PRId64 " iops_rd=%" PRId64
++                        " iops_wr=%" PRId64
++                        " iops_max=%" PRId64
++                        " iops_rd_max=%" PRId64
++                        " iops_wr_max=%" PRId64
++                        " iops_size=%" PRId64,
++                        fscfg->bps,
++                        fscfg->bps_rd,
++                        fscfg->bps_wr,
++                        fscfg->bps_max,
++                        fscfg->bps_rd_max,
++                        fscfg->bps_wr_max,
++                        fscfg->iops,
++                        fscfg->iops_rd,
++                        fscfg->iops_wr,
++                        fscfg->iops_max,
++                        fscfg->iops_rd_max,
++                        fscfg->iops_wr_max,
++                        fscfg->iops_size);
++   }
++   hmp_handle_error(mon, &err);
++}
++
++void hmp_fsdev_get_io_throttle(Monitor *mon, const QDict *qdict)
++{
++    Error *err = NULL;
++    IOThrottleList *fs9p_list, *info;
++    fs9p_list = qmp_query_fsdev_io_throttle(&err);
++
++    for (info = fs9p_list; info; info = info->next) {
++        if (info != fs9p_list) {
++            monitor_printf(mon, "\n");
++        }
++        print_fsdev_throttle_config(mon, info->value, err);
++        qapi_free_IOThrottle(info->value);
++    }
++    qapi_free_IOThrottleList(fs9p_list);
++}
++
++#endif
++
+ void hmp_block_stream(Monitor *mon, const QDict *qdict)
+ {
+     Error *error = NULL;
+diff --git a/hmp.h b/hmp.h
+index d8b94ce..05e72f2 100644
+--- a/hmp.h
++++ b/hmp.h
+@@ -81,6 +81,10 @@ void hmp_set_password(Monitor *mon, const QDict *qdict);
+ void hmp_expire_password(Monitor *mon, const QDict *qdict);
+ void hmp_eject(Monitor *mon, const QDict *qdict);
+ void hmp_change(Monitor *mon, const QDict *qdict);
++#ifdef CONFIG_VIRTFS
++void hmp_fsdev_set_io_throttle(Monitor *mon, const QDict *qdict);
++void hmp_fsdev_get_io_throttle(Monitor *mon, const QDict *qdict);
++#endif
+ void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict);
+ void hmp_block_stream(Monitor *mon, const QDict *qdict);
+ void hmp_block_job_set_speed(Monitor *mon, const QDict *qdict);
 -- 
 1.8.3.1
