@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dQYOH-0000VV-LC
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 08:17:46 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dQYSC-00029L-GQ
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 08:21:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dQYOE-00050y-Bh
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 08:17:45 -0400
-Received: from roura.ac.upc.edu ([147.83.33.10]:34088 helo=roura.ac.upc.es)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dQYS9-00005J-6Z
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 08:21:48 -0400
+Received: from roura.ac.upc.edu ([147.83.33.10]:52867 helo=roura.ac.upc.es)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dQYOD-00050u-VS
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 08:17:42 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dQYS8-0008VH-Qb
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 08:21:45 -0400
 From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Thu, 29 Jun 2017 15:17:32 +0300
-Message-Id: <149873865231.9180.13927490238451232263.stgit@frigg.lan>
+Date: Thu, 29 Jun 2017 15:21:34 +0300
+Message-Id: <149873889434.9180.13581837716303860414.stgit@frigg.lan>
 In-Reply-To: <149873841036.9180.16600465902334229930.stgit@frigg.lan>
 References: <149873841036.9180.16600465902334229930.stgit@frigg.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v10 1/7] exec: [tcg] Refactor flush of per-CPU
- virtual TB cache
+Subject: [Qemu-devel] [PATCH v10 2/7] trace: Allocate cpu->trace_dstate in
+ place
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,79 +28,108 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Emilio G. Cota" <cota@braap.org>, Eric Blake <eblake@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: "Emilio G. Cota" <cota@braap.org>, Eric Blake <eblake@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-The function is reused in later patches.
+There's little point in dynamically allocating the bitmap if we
+know at compile-time the max number of events we want to support.
+Thus, make room in the struct for the bitmap, which will make things
+easier later: this paves the way for upcoming changes, in which
+we'll use a u32 to fully capture cpu->trace_dstate.
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+This change also increases performance by saving a dereference and
+improving locality--note that this is important since upcoming work
+makes reading this bitmap fairly common.
+
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+Reviewed-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 ---
- accel/tcg/cputlb.c        |    2 +-
- accel/tcg/translate-all.c |   15 ++++++++++-----
- include/exec/exec-all.h   |    6 ++++++
- 3 files changed, 17 insertions(+), 6 deletions(-)
+ include/qom/cpu.h |    9 +++------
+ qom/cpu.c         |    8 --------
+ trace/control.c   |    9 ++++++++-
+ 3 files changed, 11 insertions(+), 15 deletions(-)
 
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index 743776ae19..6a2b762325 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -118,7 +118,7 @@ static void tlb_flush_nocheck(CPUState *cpu)
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 89ddb686fb..bc6e20f056 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -259,6 +259,7 @@ typedef void (*run_on_cpu_func)(CPUState *cpu, run_on=
+_cpu_data data);
+ struct qemu_work_item;
 =20
-     memset(env->tlb_table, -1, sizeof(env->tlb_table));
-     memset(env->tlb_v_table, -1, sizeof(env->tlb_v_table));
--    memset(cpu->tb_jmp_cache, 0, sizeof(cpu->tb_jmp_cache));
-+    tb_flush_jmp_cache_all(cpu);
+ #define CPU_UNSET_NUMA_NODE_ID -1
++#define CPU_TRACE_DSTATE_MAX_EVENTS 32
 =20
-     env->vtlb_index =3D 0;
-     env->tlb_flush_addr =3D -1;
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index f6ad46b613..03820e3aeb 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -928,11 +928,7 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_da=
-ta tb_flush_count)
-     }
+ /**
+  * CPUState:
+@@ -373,12 +374,8 @@ struct CPUState {
+     struct KVMState *kvm_state;
+     struct kvm_run *kvm_run;
 =20
-     CPU_FOREACH(cpu) {
--        int i;
+-    /*
+-     * Used for events with 'vcpu' and *without* the 'disabled' properti=
+es.
+-     * Dynamically allocated based on bitmap requried to hold up to
+-     * trace_get_vcpu_event_count() entries.
+-     */
+-    unsigned long *trace_dstate;
++    /* Used for events with 'vcpu' and *without* the 'disabled' properti=
+es */
++    DECLARE_BITMAP(trace_dstate, CPU_TRACE_DSTATE_MAX_EVENTS);
+=20
+     /* TODO Move common fields from CPUArchState here. */
+     int cpu_index; /* used by alpha TCG */
+diff --git a/qom/cpu.c b/qom/cpu.c
+index 50698767dd..69fbb9cc95 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -382,7 +382,6 @@ static void cpu_common_unrealizefn(DeviceState *dev, =
+Error **errp)
+=20
+ static void cpu_common_initfn(Object *obj)
+ {
+-    uint32_t count;
+     CPUState *cpu =3D CPU(obj);
+     CPUClass *cc =3D CPU_GET_CLASS(obj);
+=20
+@@ -397,18 +396,11 @@ static void cpu_common_initfn(Object *obj)
+     QTAILQ_INIT(&cpu->breakpoints);
+     QTAILQ_INIT(&cpu->watchpoints);
+=20
+-    count =3D trace_get_vcpu_event_count();
+-    if (count) {
+-        cpu->trace_dstate =3D bitmap_new(count);
+-    }
 -
--        for (i =3D 0; i < TB_JMP_CACHE_SIZE; ++i) {
--            atomic_set(&cpu->tb_jmp_cache[i], NULL);
--        }
-+        tb_flush_jmp_cache_all(cpu);
-     }
-=20
-     tcg_ctx.tb_ctx.nb_tbs =3D 0;
-@@ -949,6 +945,15 @@ done:
-     tb_unlock();
+     cpu_exec_initfn(cpu);
  }
 =20
-+void tb_flush_jmp_cache_all(CPUState *cpu)
-+{
-+    int i;
-+
-+    for (i =3D 0; i < TB_JMP_CACHE_SIZE; ++i) {
-+        atomic_set(&cpu->tb_jmp_cache[i], NULL);
-+    }
-+}
-+
- void tb_flush(CPUState *cpu)
+ static void cpu_common_finalize(Object *obj)
  {
-     if (tcg_enabled()) {
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 724ec73dce..b0281b000f 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -366,6 +366,12 @@ struct TranslationBlock {
- };
+-    CPUState *cpu =3D CPU(obj);
+-    g_free(cpu->trace_dstate);
+ }
 =20
- void tb_free(TranslationBlock *tb);
-+/**
-+ * tb_flush_jmp_cache_all:
-+ *
-+ * Flush the virtual translation block cache.
-+ */
-+void tb_flush_jmp_cache_all(CPUState *env);
- void tb_flush(CPUState *cpu);
- void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr);
- TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
+ static int64_t cpu_common_get_arch_id(CPUState *cpu)
+diff --git a/trace/control.c b/trace/control.c
+index 9b157b0ca7..83740aa7ee 100644
+--- a/trace/control.c
++++ b/trace/control.c
+@@ -65,8 +65,15 @@ void trace_event_register_group(TraceEvent **events)
+     size_t i;
+     for (i =3D 0; events[i] !=3D NULL; i++) {
+         events[i]->id =3D next_id++;
+-        if (events[i]->vcpu_id !=3D TRACE_VCPU_EVENT_NONE) {
++        if (events[i]->vcpu_id =3D=3D TRACE_VCPU_EVENT_NONE) {
++            continue;
++        }
++
++        if (likely(next_vcpu_id < CPU_TRACE_DSTATE_MAX_EVENTS)) {
+             events[i]->vcpu_id =3D next_vcpu_id++;
++        } else {
++            error_report("WARNING: too many vcpu trace events; dropping =
+'%s'",
++                         events[i]->name);
+         }
+     }
+     event_groups =3D g_renew(TraceEventGroup, event_groups, nevent_group=
+s + 1);
