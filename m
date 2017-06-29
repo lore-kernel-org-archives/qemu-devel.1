@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34396)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dQhQJ-0005kc-LB
+	(envelope-from <zuban32s@gmail.com>) id 1dQhQJ-0005ka-JV
 	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 17:56:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dQhQI-0000Rc-Un
+	(envelope-from <zuban32s@gmail.com>) id 1dQhQE-0000Pr-Nj
 	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 17:56:27 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:34990)
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:36213)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dQhQI-0000R7-NI
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 17:56:26 -0400
-Received: by mail-lf0-x241.google.com with SMTP id n136so8680247lfn.2
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 14:56:26 -0700 (PDT)
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dQhQE-0000Of-Fg
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 17:56:22 -0400
+Received: by mail-lf0-x242.google.com with SMTP id f28so8682491lfi.3
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 14:56:20 -0700 (PDT)
 From: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Date: Fri, 30 Jun 2017 00:56:00 +0300
-Message-Id: <1498773362-18675-5-git-send-email-zuban32s@gmail.com>
-In-Reply-To: <1498773362-18675-1-git-send-email-zuban32s@gmail.com>
-References: <1498773362-18675-1-git-send-email-zuban32s@gmail.com>
-Subject: [Qemu-devel] [PATCH RFC 4/6] hw/acpi: prepare pci hotplug IO for
- ich9
+Date: Fri, 30 Jun 2017 00:55:56 +0300
+Message-Id: <1498773362-18675-1-git-send-email-zuban32s@gmail.com>
+Subject: [Qemu-devel] [PATCH RFC 0/6] q35: add acpi pci hotplug support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +26,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcel@redhat.com, mst@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, Aleksandr Bezzubikov <zuban32s@gmail.com>
 
-Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
----
- hw/i386/acpi-build.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+The series adds hotplug support to legacy PCI buses for Q35 machines.
+The ACPI hotplug code is emitted if at least one legacy pci-bridge is present.
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index c99dbcc..e434efe 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -135,12 +135,6 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
-     if (piix) {
-         obj = piix;
-         pm->cpu_hp_io_base = PIIX4_CPU_HOTPLUG_IO_BASE;
--        pcihp_io_base =
--            object_property_get_int(obj, ACPI_PCIHP_IO_BASE_PROP, NULL);
--        pcihp_io_len =
--            object_property_get_int(obj, ACPI_PCIHP_IO_LEN_PROP, NULL);
--        pm->pcihp_io_base = (pcihp_io_base == -1) ? 0 : pcihp_io_base;
--        pm->pcihp_io_len = (pcihp_io_len == -1) ? 0 : pcihp_io_len;
-     }
-     if (lpc) {
-         obj = lpc;
-@@ -148,6 +142,13 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
-     }
-     assert(obj);
- 
-+    pcihp_io_base =
-+        object_property_get_int(obj, ACPI_PCIHP_IO_BASE_PROP, NULL);
-+    pcihp_io_len =
-+        object_property_get_int(obj, ACPI_PCIHP_IO_LEN_PROP, NULL);
-+    pm->pcihp_io_base = (pcihp_io_base == -1) ? 0 : pcihp_io_base;
-+    pm->pcihp_io_len = (pcihp_io_len == -1) ? 0 : pcihp_io_len;
-+
-     /* Fill in optional s3/s4 related properties */
-     o = object_property_get_qobject(obj, ACPI_PM_PROP_S3_DISABLED, NULL);
-     if (o) {
+This series is mostly based on past Marcel's series 
+https://lists.gnu.org/archive/html/qemu-devel/2016-05/msg05681.html,
+but rebased on current master with some minor changes according to current codebase.
+
+ACPI code emission approach used in this series can be called "static", 
+because it checkswhether a bridge exists only at initial DSDT generation moment. 
+The main goal is to enable AML PCI hotplug-related code to be generated dynamically. 
+In other words, the bridge plugged in - a new acpi definition block is
+loaded (using LoadTable method). 
+This is necessary for PCIE-PCI bridge hotplugging feature. 
+
+Aleksandr Bezzubikov (6):
+  hw/acpi: remove dead acpi code
+  hw/acpi: simplify dsdt building code
+  hw/acpi: fix pcihp io initialization
+  hw/acpi: prepare pci hotplug IO for ich9
+  hw/acpi: extend acpi pci hotplug support for pci express
+  hw/ich9: enable acpi pci hotplug
+
+ hw/acpi/ich9.c         |  31 +++++++++++++
+ hw/i386/acpi-build.c   | 116 ++++++++++++++++++++++++-------------------------
+ hw/isa/lpc_ich9.c      |  12 +++++
+ include/hw/acpi/ich9.h |   4 ++
+ include/hw/i386/pc.h   |   7 ++-
+ 5 files changed, 111 insertions(+), 59 deletions(-)
+
 -- 
 2.7.4
