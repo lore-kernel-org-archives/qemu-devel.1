@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dQeY9-0007t0-29
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 14:52:22 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dQebO-0000um-Ve
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 14:55:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dQeY8-0001Pt-40
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 14:52:21 -0400
-References: <20170621133023.27627-1-mreitz@redhat.com>
-	<20170621133023.27627-2-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <748b90f3-8f89-59ea-4a65-69e938747c0b@redhat.com>
-Date: Thu, 29 Jun 2017 13:52:11 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1dQebK-0003E1-KI
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 14:55:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50524)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dQebK-0003DS-AF
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 14:55:38 -0400
+Date: Thu, 29 Jun 2017 19:55:25 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170629185525.GC2399@work-vm>
+References: <20170628190047.26159-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170621133023.27627-2-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="RuMm9RxKn3LDtIAuMJiIUDdWsppmmcsd4"
-Subject: Re: [Qemu-devel] [PATCH v4 1/2] iotests: Use absolute paths for
- executables
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20170628190047.26159-1-dgilbert@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC 00/29] postcopy+vhost-user/shared ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,86 +27,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com, aarcange@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RuMm9RxKn3LDtIAuMJiIUDdWsppmmcsd4
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <748b90f3-8f89-59ea-4a65-69e938747c0b@redhat.com>
-Subject: Re: [PATCH v4 1/2] iotests: Use absolute paths for executables
-References: <20170621133023.27627-1-mreitz@redhat.com>
- <20170621133023.27627-2-mreitz@redhat.com>
-In-Reply-To: <20170621133023.27627-2-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 06/21/2017 08:30 AM, Max Reitz wrote:
-> A user may specify a relative path for accessing qemu, qemu-img, etc.
-> through environment variables ($QEMU_PROG and friends) or a symlink.
+* Dr. David Alan Gilbert (git) (dgilbert@redhat.com) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 >=20
-> If a test decides to change its working directory, relative paths will
-> cease to work, however. Work around this by making all of the paths to
-> programs that should undergo testing absolute. Besides "realpath", we
-> also have to use "which" to support programs in $PATH.
+> Hi,
+>   This is a RFC/WIP series that enables postcopy migration
+> with shared memory to a vhost-user process.
+> It's based off current-head + Juan's load_cleanup series, and
+> Alexey's bitmap series (v4).  It's very lightly tested and seems
+> to work, but it's quite rough.
 
-Is this sentence stale...
+Marc-Andr=E9 asked if I had a git with it all applied; so here we are:
+https://github.com/dagrh/qemu/commits/vhost
+git@github.com:dagrh/qemu.git on the vhost branch
 
+Dave
+
+> I've modified the vhost-user-bridge (aka vhub) in qemu's tests/ to
+> use the new feature, since this is about the simplest
+> client around.
 >=20
-> As a side effect, this fixes specifying these programs as symlinks for
-> out-of-tree builds: Before, you would have to create two symlinks, one
-> in the build and one in the source tree (the first one for common.confi=
-g
-> to find, the second one for the iotest to use). Now it is sufficient to=
-
-> create one in the build tree because common.config will resolve it.
+> Structure:
 >=20
-> Reported-by: Kevin Wolf <kwolf@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/common.config | 6 ++++++
->  1 file changed, 6 insertions(+)
+> The basic idea is that near the start of postcopy, the client
+> opens its own userfaultfd fd and sends that back to QEMU over
+> the socket it's already using for VHUST_USER_* commands.
+> Then when VHOST_USER_SET_MEM_TABLE arrives it registers the
+> areas with userfaultfd and sends the mapped addresses back to QEMU.
 >=20
-> diff --git a/tests/qemu-iotests/common.config b/tests/qemu-iotests/comm=
-on.config
-> index d1b45f5..c1dc425 100644
-> --- a/tests/qemu-iotests/common.config
-> +++ b/tests/qemu-iotests/common.config
-> @@ -103,6 +103,12 @@ if [ -z "$QEMU_VXHS_PROG" ]; then
->      export QEMU_VXHS_PROG=3D"`set_prog_path qnio_server`"
->  fi
-> =20
-> +export QEMU_PROG=3D$(realpath -- "$(type -p "$QEMU_PROG")")
-
-=2E..now that you updated per my review to favor 'type' over 'which'?
-Otherwise, the R-b stands.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---RuMm9RxKn3LDtIAuMJiIUDdWsppmmcsd4
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZVUxbAAoJEKeha0olJ0NqV20H/3JCk3zxPrqHj/nx5z6t8f2v
-t8jypZBRoS05ZIHwAaqA8s1vnnEOl/kngtTtS+Me42Q0E86FGsS1u4rvwzV+s/ck
-xAvEv8226UI/lTCl8KQzdBRPW86ATZ5WTTSBlCyf6jvu4IwmyhFCd7OEdKc4pfQ8
-Z0nCo7D0Ww15eGgS500xInY+ry/KkUPFADWGKJ7jI7lX/LmZ8TTn5gIC9pm2ALzp
-0+CFRdM9rYqp9juYvLOOSqkI5+w57QrKufKETMzHObrOmU81ye6o5/t6eoLUlEm1
-jdmrfUtiml5n+P6kCerp16bVMnWu/Qr3Z9592Uub7WWZLBr8HLyJV3Vocx3u3wY=
-=Mqps
------END PGP SIGNATURE-----
-
---RuMm9RxKn3LDtIAuMJiIUDdWsppmmcsd4--
+> QEMU then reads the clients UFD in it's fault thread and issues
+> requests back to the source as needed.
+> QEMU also issues 'WAKE' ioctls on the UFD to let the client know
+> that the page has arrived and can carry on.
+>=20
+> A new feature (VHOST_USER_PROTOCOL_F_POSTCOPY) is added so that
+> the QEMU knows the client can talk postcopy.
+> Three new messages (VHOST_USER_POSTCOPY_{ADVISE/LISTEN/END}) are
+> added to guide the process along.
+>=20
+> Current known issues:
+>    I've not tested it with hugepages yet; and I suspect the madvises
+>    will need tweaking for it.
+>=20
+>    The qemu gets to see the base addresses that the client has its
+>    regions mapped at; that's not great for security
+>=20
+>    Take care of deadlocking; any thread in the client that
+>    accesses a userfault protected page can stall.
+>=20
+>    There's a nasty hack of a lock around the set_mem_table message.
+>=20
+>    I've not looked at the recent IOMMU code.
+>=20
+>    Some cleanup and a lot of corner cases need thinking about.
+>=20
+>    There are probably plenty of unknown issues as well.
+>=20
+> Test setup:
+>   I'm running on one host at the moment, with the guest
+>   scping a large file from the host as it migrates.
+>   The setup is based on one I found in the vhost-user setups.
+>   You'll need a recent kernel for the shared memory support
+>   in userfaultfd, and userfault isn't that happy if a process
+>   using shared memory core's - so make sure you have the
+>   latest fixes.
+>=20
+> SESS=3Dvhost
+> ulimit -c unlimited
+> tmux -L $SESS new-session -d
+> tmux -L $SESS set-option -g history-limit 30000
+> # Start a router using the system qemu
+> tmux -L $SESS new-window -n router ./x86_64-softmmu/qemu-system-x86_64 =
+-M none -nographic -net socket,vlan=3D0,udp=3Dloca
+> lhost:4444,localaddr=3Dlocalhost:5555 -net socket,vlan=3D0,udp=3Dlocalh=
+ost:4445,localaddr=3Dlocalhost:5556 -net user,vlan=3D0
+> tmux -L $SESS set-option -g set-remain-on-exit on
+> # Start source vhost bridge
+> tmux -L $SESS new-window -n srcvhostbr "./tests/vhost-user-bridge -u /t=
+mp/vubrsrc.sock 2>src-vub-log"
+> sleep 0.5
+> tmux -L $SESS new-window -n source "./x86_64-softmmu/qemu-system-x86_64=
+ -enable-kvm -m 8G -smp 2 -object memory-backe
+> nd-file,id=3Dmem,size=3D8G,mem-path=3D/dev/shm,share=3Don -numa node,me=
+mdev=3Dmem -mem-prealloc -chardev socket,id=3Dchar0,path=3D/
+> tmp/vubrsrc.sock -netdev type=3Dvhost-user,id=3Dmynet1,chardev=3Dchar0,=
+vhostforce -device virtio-net-pci,netdev=3Dmynet1 my.qcow2 -net none -vnc=
+ :0 -monitor stdio -trace events=3D/root/trace-file 2>src-qemu-log "
+> # Start dest vhost bridge
+> tmux -L $SESS new-window -n destvhostbr "./tests/vhost-user-bridge -u /=
+tmp/vubrdst.sock -l 127.0.0.1:4445 -r 127.0.0.
+> 1:5556 2>dst-vub-log"
+> sleep 0.5
+> tmux -L $SESS new-window -n dest "./x86_64-softmmu/qemu-system-x86_64 -=
+enable-kvm -m 8G -smp 2 -object memory-backend
+> -file,id=3Dmem,size=3D8G,mem-path=3D/dev/shm,share=3Don -numa node,memd=
+ev=3Dmem -mem-prealloc -chardev socket,id=3Dchar0,path=3D/tm
+> p/vubrdst.sock -netdev type=3Dvhost-user,id=3Dmynet1,chardev=3Dchar0,vh=
+ostforce -device virtio-net-pci,netdev=3Dmynet1 my.qcow2 -net none -vnc :=
+1 -monitor stdio -incoming tcp::8888 -trace events=3D/root/trace-file 2>d=
+st-qemu-log"
+> tmux -L $SESS send-keys -t source "migrate_set_capability postcopy-ram =
+on
+> tmux -L $SESS send-keys -t source "migrate_set_speed 20M
+> tmux -L $SESS send-keys -t dest "migrate_set_capability postcopy-ram on
+>=20
+> then once booted:
+> tmux -L vhost send-keys -t source 'migrate -d tcp:0:8888^M'
+> tmux -L vhost send-keys -t source 'migrate_start_postcopy^M'
+> (Note those ^M's are actual ctrl-M's i.e. ctrl-v ctrl-M)
+>=20
+>=20
+> Dave
+>=20
+> Dr. David Alan Gilbert (29):
+>   RAMBlock/migration: Add migration flags
+>   migrate: Update ram_block_discard_range for shared
+>   qemu_ram_block_host_offset
+>   migration/ram: ramblock_recv_bitmap_test_byte_offset
+>   postcopy: use UFFDIO_ZEROPAGE only when available
+>   postcopy: Add notifier chain
+>   postcopy: Add vhost-user flag for postcopy and check it
+>   vhost-user: Add 'VHOST_USER_POSTCOPY_ADVISE' message
+>   vhub: Support sending fds back to qemu
+>   vhub: Open userfaultfd
+>   postcopy: Allow registering of fd handler
+>   vhost+postcopy: Register shared ufd with postcopy
+>   vhost+postcopy: Transmit 'listen' to client
+>   vhost+postcopy: Register new regions with the ufd
+>   vhost+postcopy: Send address back to qemu
+>   vhost+postcopy: Stash RAMBlock and offset
+>   vhost+postcopy: Send requests to source for shared pages
+>   vhost+postcopy: Resolve client address
+>   postcopy: wake shared
+>   postcopy: postcopy_notify_shared_wake
+>   vhost+postcopy: Add vhost waker
+>   vhost+postcopy: Call wakeups
+>   vub+postcopy: madvises
+>   vhost+postcopy: Lock around set_mem_table
+>   vhu: enable =3D false on get_vring_base
+>   vhost: Add VHOST_USER_POSTCOPY_END message
+>   vhost+postcopy: Wire up POSTCOPY_END notify
+>   postcopy: Allow shared memory
+>   vhost-user: Claim support for postcopy
+>=20
+>  contrib/libvhost-user/libvhost-user.c | 178 ++++++++++++++++-
+>  contrib/libvhost-user/libvhost-user.h |   8 +
+>  exec.c                                |  44 +++--
+>  hw/virtio/trace-events                |  13 ++
+>  hw/virtio/vhost-user.c                | 293 ++++++++++++++++++++++++++=
++-
+>  include/exec/cpu-common.h             |   3 +
+>  include/exec/ram_addr.h               |   2 +
+>  migration/migration.c                 |   3 +
+>  migration/migration.h                 |   8 +
+>  migration/postcopy-ram.c              | 357 ++++++++++++++++++++++++++=
++-------
+>  migration/postcopy-ram.h              |  69 +++++++
+>  migration/ram.c                       |   5 +
+>  migration/ram.h                       |   1 +
+>  migration/savevm.c                    |  13 ++
+>  migration/trace-events                |   6 +
+>  trace-events                          |   3 +
+>  vl.c                                  |   4 +-
+>  17 files changed, 926 insertions(+), 84 deletions(-)
+>=20
+> --=20
+> 2.13.0
+>=20
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
