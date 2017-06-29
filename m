@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dQW6V-0007gm-0Z
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:51:16 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1dQW8r-0000YV-Jk
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:53:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dQW6R-0000wf-ST
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:51:15 -0400
-Received: from lhrrgout.huawei.com ([194.213.3.17]:16145)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dQW6R-0000u7-Ax
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:51:11 -0400
-References: <1497877896-35700-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1497877896-35700-2-git-send-email-pradeep.jagadeesh@huawei.com>
-	<87shisgk96.fsf@dusky.pond.sub.org>
-From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-Message-ID: <a636b34e-3e06-8db3-7ffe-834fcce6805f@huawei.com>
-Date: Thu, 29 Jun 2017 11:50:05 +0200
+	(envelope-from <rkagan@virtuozzo.com>) id 1dQW8o-0002iE-FH
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:53:41 -0400
+Received: from mail-eopbgr10105.outbound.protection.outlook.com
+	([40.107.1.105]:63168
+	helo=EUR02-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1dQW8n-0002hQ-AU
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:53:38 -0400
+Date: Thu, 29 Jun 2017 12:53:27 +0300
+From: Roman Kagan <rkagan@virtuozzo.com>
+Message-ID: <20170629095326.GA2973@rkaganb.sw.ru>
+References: <20170621162424.10462-1-rkagan@virtuozzo.com>
+	<20170621162424.10462-8-rkagan@virtuozzo.com>
+	<20170628164743.0df730a0@nial.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87shisgk96.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 1/5] throttle: factor out duplicate code
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170628164743.0df730a0@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 07/23] hyperv: ensure VP index equal to
+ QEMU cpu_index
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,232 +32,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
-Cc: eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>, jani kokkonen <jani.kokkonen@huawei.com>, alberto garcia <berto@igalia.com>, qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-On 6/22/2017 4:38 PM, Markus Armbruster wrote:
-> Pradeep Jagadeesh <pradeepkiruvale@gmail.com> writes:
->
->> This patch factor out the duplicate throttle code that was present in
->> block and fsdev devices.
->>
->> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
->> ---
->>  blockdev.c                      | 44 +-----------------------------------
->>  fsdev/qemu-fsdev-throttle.c     | 43 +----------------------------------
->>  fsdev/qemu-fsdev-throttle.h     |  1 +
->>  include/qemu/throttle-options.h |  4 ++++
->>  util/throttle.c                 | 50 +++++++++++++++++++++++++++++++++++++++++
->>  5 files changed, 57 insertions(+), 85 deletions(-)
->>
->> diff --git a/blockdev.c b/blockdev.c
->> index 6472548..5db9e5c 100644
->> --- a/blockdev.c
->> +++ b/blockdev.c
->> @@ -386,49 +386,7 @@ static void extract_common_blockdev_options(QemuOpts *opts, int *bdrv_flags,
->>      }
->>
->>      if (throttle_cfg) {
->> -        throttle_config_init(throttle_cfg);
->> -        throttle_cfg->buckets[THROTTLE_BPS_TOTAL].avg =
->> -            qemu_opt_get_number(opts, "throttling.bps-total", 0);
->> -        throttle_cfg->buckets[THROTTLE_BPS_READ].avg  =
->> -            qemu_opt_get_number(opts, "throttling.bps-read", 0);
->> -        throttle_cfg->buckets[THROTTLE_BPS_WRITE].avg =
->> -            qemu_opt_get_number(opts, "throttling.bps-write", 0);
->> -        throttle_cfg->buckets[THROTTLE_OPS_TOTAL].avg =
->> -            qemu_opt_get_number(opts, "throttling.iops-total", 0);
->> -        throttle_cfg->buckets[THROTTLE_OPS_READ].avg =
->> -            qemu_opt_get_number(opts, "throttling.iops-read", 0);
->> -        throttle_cfg->buckets[THROTTLE_OPS_WRITE].avg =
->> -            qemu_opt_get_number(opts, "throttling.iops-write", 0);
->> -
->> -        throttle_cfg->buckets[THROTTLE_BPS_TOTAL].max =
->> -            qemu_opt_get_number(opts, "throttling.bps-total-max", 0);
->> -        throttle_cfg->buckets[THROTTLE_BPS_READ].max  =
->> -            qemu_opt_get_number(opts, "throttling.bps-read-max", 0);
->> -        throttle_cfg->buckets[THROTTLE_BPS_WRITE].max =
->> -            qemu_opt_get_number(opts, "throttling.bps-write-max", 0);
->> -        throttle_cfg->buckets[THROTTLE_OPS_TOTAL].max =
->> -            qemu_opt_get_number(opts, "throttling.iops-total-max", 0);
->> -        throttle_cfg->buckets[THROTTLE_OPS_READ].max =
->> -            qemu_opt_get_number(opts, "throttling.iops-read-max", 0);
->> -        throttle_cfg->buckets[THROTTLE_OPS_WRITE].max =
->> -            qemu_opt_get_number(opts, "throttling.iops-write-max", 0);
->> -
->> -        throttle_cfg->buckets[THROTTLE_BPS_TOTAL].burst_length =
->> -            qemu_opt_get_number(opts, "throttling.bps-total-max-length", 1);
->> -        throttle_cfg->buckets[THROTTLE_BPS_READ].burst_length  =
->> -            qemu_opt_get_number(opts, "throttling.bps-read-max-length", 1);
->> -        throttle_cfg->buckets[THROTTLE_BPS_WRITE].burst_length =
->> -            qemu_opt_get_number(opts, "throttling.bps-write-max-length", 1);
->> -        throttle_cfg->buckets[THROTTLE_OPS_TOTAL].burst_length =
->> -            qemu_opt_get_number(opts, "throttling.iops-total-max-length", 1);
->> -        throttle_cfg->buckets[THROTTLE_OPS_READ].burst_length =
->> -            qemu_opt_get_number(opts, "throttling.iops-read-max-length", 1);
->> -        throttle_cfg->buckets[THROTTLE_OPS_WRITE].burst_length =
->> -            qemu_opt_get_number(opts, "throttling.iops-write-max-length", 1);
->> -
->> -        throttle_cfg->op_size =
->> -            qemu_opt_get_number(opts, "throttling.iops-size", 0);
->> -
->> +        throttle_parse_options(throttle_cfg, opts);
->>          if (!throttle_is_valid(throttle_cfg, errp)) {
->>              return;
->>          }
->> diff --git a/fsdev/qemu-fsdev-throttle.c b/fsdev/qemu-fsdev-throttle.c
->> index 7ae4e86..da9c225 100644
->> --- a/fsdev/qemu-fsdev-throttle.c
->> +++ b/fsdev/qemu-fsdev-throttle.c
->> @@ -31,48 +31,7 @@ static void fsdev_throttle_write_timer_cb(void *opaque)
->>
->>  void fsdev_throttle_parse_opts(QemuOpts *opts, FsThrottle *fst, Error **errp)
->>  {
->> -    throttle_config_init(&fst->cfg);
->> -    fst->cfg.buckets[THROTTLE_BPS_TOTAL].avg =
->> -        qemu_opt_get_number(opts, "throttling.bps-total", 0);
->> -    fst->cfg.buckets[THROTTLE_BPS_READ].avg  =
->> -        qemu_opt_get_number(opts, "throttling.bps-read", 0);
->> -    fst->cfg.buckets[THROTTLE_BPS_WRITE].avg =
->> -        qemu_opt_get_number(opts, "throttling.bps-write", 0);
->> -    fst->cfg.buckets[THROTTLE_OPS_TOTAL].avg =
->> -        qemu_opt_get_number(opts, "throttling.iops-total", 0);
->> -    fst->cfg.buckets[THROTTLE_OPS_READ].avg =
->> -        qemu_opt_get_number(opts, "throttling.iops-read", 0);
->> -    fst->cfg.buckets[THROTTLE_OPS_WRITE].avg =
->> -        qemu_opt_get_number(opts, "throttling.iops-write", 0);
->> -
->> -    fst->cfg.buckets[THROTTLE_BPS_TOTAL].max =
->> -        qemu_opt_get_number(opts, "throttling.bps-total-max", 0);
->> -    fst->cfg.buckets[THROTTLE_BPS_READ].max  =
->> -        qemu_opt_get_number(opts, "throttling.bps-read-max", 0);
->> -    fst->cfg.buckets[THROTTLE_BPS_WRITE].max =
->> -        qemu_opt_get_number(opts, "throttling.bps-write-max", 0);
->> -    fst->cfg.buckets[THROTTLE_OPS_TOTAL].max =
->> -        qemu_opt_get_number(opts, "throttling.iops-total-max", 0);
->> -    fst->cfg.buckets[THROTTLE_OPS_READ].max =
->> -        qemu_opt_get_number(opts, "throttling.iops-read-max", 0);
->> -    fst->cfg.buckets[THROTTLE_OPS_WRITE].max =
->> -        qemu_opt_get_number(opts, "throttling.iops-write-max", 0);
->> -
->> -    fst->cfg.buckets[THROTTLE_BPS_TOTAL].burst_length =
->> -        qemu_opt_get_number(opts, "throttling.bps-total-max-length", 1);
->> -    fst->cfg.buckets[THROTTLE_BPS_READ].burst_length  =
->> -        qemu_opt_get_number(opts, "throttling.bps-read-max-length", 1);
->> -    fst->cfg.buckets[THROTTLE_BPS_WRITE].burst_length =
->> -        qemu_opt_get_number(opts, "throttling.bps-write-max-length", 1);
->> -    fst->cfg.buckets[THROTTLE_OPS_TOTAL].burst_length =
->> -        qemu_opt_get_number(opts, "throttling.iops-total-max-length", 1);
->> -    fst->cfg.buckets[THROTTLE_OPS_READ].burst_length =
->> -        qemu_opt_get_number(opts, "throttling.iops-read-max-length", 1);
->> -    fst->cfg.buckets[THROTTLE_OPS_WRITE].burst_length =
->> -        qemu_opt_get_number(opts, "throttling.iops-write-max-length", 1);
->> -    fst->cfg.op_size =
->> -        qemu_opt_get_number(opts, "throttling.iops-size", 0);
->> -
->> +    throttle_parse_options(&fst->cfg, opts);
->>      throttle_is_valid(&fst->cfg, errp);
->>  }
->>
->> diff --git a/fsdev/qemu-fsdev-throttle.h b/fsdev/qemu-fsdev-throttle.h
->> index e418643..c493e83 100644
->> --- a/fsdev/qemu-fsdev-throttle.h
->> +++ b/fsdev/qemu-fsdev-throttle.h
->> @@ -20,6 +20,7 @@
->>  #include "qemu/coroutine.h"
->>  #include "qapi/error.h"
->>  #include "qemu/throttle.h"
->> +#include "qemu/throttle-options.h"
->
-> Why?
->
-Moved to qemu-fsdev-throttle.c
->>
->>  typedef struct FsThrottle {
->>      ThrottleState ts;
->> diff --git a/include/qemu/throttle-options.h b/include/qemu/throttle-options.h
->> index 3133d1c..565553a 100644
->> --- a/include/qemu/throttle-options.h
->> +++ b/include/qemu/throttle-options.h
->> @@ -10,6 +10,8 @@
->>  #ifndef THROTTLE_OPTIONS_H
->>  #define THROTTLE_OPTIONS_H
->>
->> +#include "qemu/throttle.h"
->> +
->
-> Let's avoid this include: move the ThrottleConfig typedef to
-> qemu/typedefs.h.
-OK
->
->>  #define THROTTLE_OPTS \
->>            { \
->>              .name = "throttling.iops-total",\
->> @@ -89,4 +91,6 @@
->>              .help = "when limiting by iops max size of an I/O in bytes",\
->>          }
->>
->> +void throttle_parse_options(ThrottleConfig *, QemuOpts *);
->> +
->>  #endif
->> diff --git a/util/throttle.c b/util/throttle.c
->> index 3570ed2..ebe9dd0 100644
->> --- a/util/throttle.c
->> +++ b/util/throttle.c
->> @@ -514,3 +514,53 @@ void throttle_account(ThrottleState *ts, bool is_write, uint64_t size)
->>      }
->>  }
->>
->> +/* parse the throttle options
->> + *
->> + * @opts: qemu options
->> + * @throttle_cfg: throttle configuration
->> + */
->> +void throttle_parse_options(ThrottleConfig *throttle_cfg, QemuOpts *opts)
->> +{
->> +    throttle_config_init(throttle_cfg);
->> +    throttle_cfg->buckets[THROTTLE_BPS_TOTAL].avg =
->> +        qemu_opt_get_number(opts, "throttling.bps-total", 0);
->> +    throttle_cfg->buckets[THROTTLE_BPS_READ].avg  =
->> +        qemu_opt_get_number(opts, "throttling.bps-read", 0);
->> +    throttle_cfg->buckets[THROTTLE_BPS_WRITE].avg =
->> +        qemu_opt_get_number(opts, "throttling.bps-write", 0);
->> +    throttle_cfg->buckets[THROTTLE_OPS_TOTAL].avg =
->> +        qemu_opt_get_number(opts, "throttling.iops-total", 0);
->> +    throttle_cfg->buckets[THROTTLE_OPS_READ].avg =
->> +        qemu_opt_get_number(opts, "throttling.iops-read", 0);
->> +    throttle_cfg->buckets[THROTTLE_OPS_WRITE].avg =
->> +        qemu_opt_get_number(opts, "throttling.iops-write", 0);
->> +
->> +    throttle_cfg->buckets[THROTTLE_BPS_TOTAL].max =
->> +        qemu_opt_get_number(opts, "throttling.bps-total-max", 0);
->> +    throttle_cfg->buckets[THROTTLE_BPS_READ].max  =
->> +        qemu_opt_get_number(opts, "throttling.bps-read-max", 0);
->> +    throttle_cfg->buckets[THROTTLE_BPS_WRITE].max =
->> +        qemu_opt_get_number(opts, "throttling.bps-write-max", 0);
->> +    throttle_cfg->buckets[THROTTLE_OPS_TOTAL].max =
->> +        qemu_opt_get_number(opts, "throttling.iops-total-max", 0);
->> +    throttle_cfg->buckets[THROTTLE_OPS_READ].max =
->> +        qemu_opt_get_number(opts, "throttling.iops-read-max", 0);
->> +    throttle_cfg->buckets[THROTTLE_OPS_WRITE].max =
->> +        qemu_opt_get_number(opts, "throttling.iops-write-max", 0);
->> +
->> +    throttle_cfg->buckets[THROTTLE_BPS_TOTAL].burst_length =
->> +        qemu_opt_get_number(opts, "throttling.bps-total-max-length", 1);
->> +    throttle_cfg->buckets[THROTTLE_BPS_READ].burst_length  =
->> +        qemu_opt_get_number(opts, "throttling.bps-read-max-length", 1);
->> +    throttle_cfg->buckets[THROTTLE_BPS_WRITE].burst_length =
->> +        qemu_opt_get_number(opts, "throttling.bps-write-max-length", 1);
->> +    throttle_cfg->buckets[THROTTLE_OPS_TOTAL].burst_length =
->> +        qemu_opt_get_number(opts, "throttling.iops-total-max-length", 1);
->> +    throttle_cfg->buckets[THROTTLE_OPS_READ].burst_length =
->> +        qemu_opt_get_number(opts, "throttling.iops-read-max-length", 1);
->> +    throttle_cfg->buckets[THROTTLE_OPS_WRITE].burst_length =
->> +        qemu_opt_get_number(opts, "throttling.iops-write-max-length", 1);
->> +
->> +    throttle_cfg->op_size =
->> +        qemu_opt_get_number(opts, "throttling.iops-size", 0);
->> +}
->
-> Looks good otherwise.
->
+On Wed, Jun 28, 2017 at 04:47:43PM +0200, Igor Mammedov wrote:
+> On Wed, 21 Jun 2017 19:24:08 +0300
+> Roman Kagan <rkagan@virtuozzo.com> wrote:
+> 
+> > Hyper-V identifies vCPUs by Virtual Processor (VP) index which can be
+> > queried by the guest via HV_X64_MSR_VP_INDEX msr.  It is defined by the
+> > spec as a sequential number which can't exceed the maximum number of
+> > vCPUs per VM.
+> > 
+> > It has to be owned by QEMU in order to preserve it across migration.
+> > 
+> > However, the initial implementation in KVM didn't allow to set this
+> > msr, and KVM used its own notion of VP index.  Fortunately, the way
+> > vCPUs are created in QEMU/KVM makes it likely that the KVM value is
+> > equal to QEMU cpu_index.
+> > 
+> > So choose cpu_index as the value for vp_index, and push that to KVM on
+> > kernels that support setting the msr.  On older ones that don't, query
+> > the kernel value and assert that it's in sync with QEMU.
+> > 
+> > Besides, since handling errors from vCPU init at hotplug time is
+> > impossible, disable vCPU hotplug.
+> proper place to check if cpu might be created is at 
+> pc_cpu_pre_plug() where you can gracefully abort cpu creation process. 
+
+Thanks for the suggestion, I'll rework it this way.
+
+> Also it's possible to create cold-plugged CPUs in out of order
+> sequence using
+>  -device cpu-foo on CLI
+> will be hyperv kvm/guest side ok with it?
+
+On kernels that support setting HV_X64_MSR_VP_INDEX QEMU will
+synchronize all sides.  On kernels that don't, if out-of-order creation
+results in vp_index mismatch between the kernel and QEMU, vcpu creation
+will fail.
+
+> > This patch also introduces accessor functions to wrap the mapping
+> > between a vCPU and its vp_index.  Besides, a few variables are renamed
+> > to avoid confusion of vp_index with vcpu_id (== apic_id).
+> > 
+> > Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+> > ---
+> > v1 -> v2:
+> >  - were patches 5, 6 in v1
+> >  - move vp_index initialization to hyperv_init_vcpu
+> >  - check capability before trying to set the msr
+> >  - set the msr on the usual kvm_put_msrs path
+> >  - disable cpu hotplug if msr is not settable
+> > 
+> >  target/i386/hyperv.h |  5 ++++-
+> >  target/i386/hyperv.c | 16 +++++++++++++---
+> >  target/i386/kvm.c    | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  3 files changed, 68 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/target/i386/hyperv.h b/target/i386/hyperv.h
+> > index 0c3b562..82f4757 100644
+> > --- a/target/i386/hyperv.h
+> > +++ b/target/i386/hyperv.h
+> > @@ -32,11 +32,14 @@ struct HvSintRoute {
+> >  
+> >  int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit);
+> >  
+> > -HvSintRoute *kvm_hv_sint_route_create(uint32_t vcpu_id, uint32_t sint,
+> > +HvSintRoute *kvm_hv_sint_route_create(uint32_t vp_index, uint32_t sint,
+> >                                        HvSintAckClb sint_ack_clb);
+> >  
+> >  void kvm_hv_sint_route_destroy(HvSintRoute *sint_route);
+> >  
+> >  int kvm_hv_sint_route_set_sint(HvSintRoute *sint_route);
+> >  
+> > +uint32_t hyperv_vp_index(X86CPU *cpu);
+> > +X86CPU *hyperv_find_vcpu(uint32_t vp_index);
+> > +
+> >  #endif
+> > diff --git a/target/i386/hyperv.c b/target/i386/hyperv.c
+> > index 227185c..4f57447 100644
+> > --- a/target/i386/hyperv.c
+> > +++ b/target/i386/hyperv.c
+> > @@ -16,6 +16,16 @@
+> >  #include "hyperv.h"
+> >  #include "hyperv_proto.h"
+> >  
+> > +uint32_t hyperv_vp_index(X86CPU *cpu)
+> > +{
+> > +    return CPU(cpu)->cpu_index;
+> > +}
+> 
+> 
+> > +X86CPU *hyperv_find_vcpu(uint32_t vp_index)
+> > +{
+> > +    return X86_CPU(qemu_get_cpu(vp_index));
+> > +}
+> this helper isn't used in this patch, add it in the patch that would actually use it
+
+I thought I would put the only two functions that encapsulate the
+knowledge of how vp_index is realted to cpu_index, in a single patch.
+
+I'm now thinking of open-coding the iteration over cpus here and
+directly look for cpu whose hyperv_vp_index() matches.  Then that
+knowledge will become encapsulated in a single place, and indeed, this
+helper can go into another patch where it's used.
+
+> also if  qemu_get_cpu() were called from each CPU init,
+> it would incur O(N^2) complexity, could you do without it?
+
+It isn't called on hot paths (ATM it's called only when SINT routes are
+created, which is at most one per cpu).  I don't see a problem here.
+
+> > @@ -105,7 +115,7 @@ HvSintRoute *kvm_hv_sint_route_create(uint32_t vcpu_id, uint32_t sint,
+> >      }
+> >      sint_route->gsi = gsi;
+> >      sint_route->sint_ack_clb = sint_ack_clb;
+> > -    sint_route->vcpu_id = vcpu_id;
+> > +    sint_route->vcpu_id = vp_index;
+>                    ^^^ - shouldn't it also be re-named?
+
+Right, but vcpu_id on sint_route is replaced with X86CPU pointer in a
+followup patch, so I wasn't sure if it was worth while to add more
+churn...
+
+> 
+> maybe split all renaming into separate patch ...
+
+Part of the renaming will disappear eventually in the followup patches,
+so I'm sure it's a good idea...  Opinions?
+
+> > +static int hyperv_init_vcpu(X86CPU *cpu)
+> > +{
+> > +    if (cpu->hyperv_vpindex && !is_hv_vpindex_settable) {
+> > +        /*
+> > +         * the kernel doesn't support setting vp_index; assert that its value
+> > +         * is in sync
+> > +         */
+> > +        int ret;
+> > +        struct {
+> > +            struct kvm_msrs info;
+> > +            struct kvm_msr_entry entries[1];
+> > +        } msr_data = {
+> > +            .info.nmsrs = 1,
+> > +            .entries[0].index = HV_X64_MSR_VP_INDEX,
+> > +        };
+> > +
+> > +        /*
+> > +         * handling errors from vcpu init at hotplug time is impossible, so
+> > +         * disallow cpu hotplug
+> > +         */
+> > +        MACHINE_GET_CLASS(current_machine)->hot_add_cpu = NULL;
+> one shouldn't alter machine this way nor
+> it would disable cpu hotplug, it would disable only cpu-add interface
+> but device_add() would still work.
+
+Understood, will rework as you suggest above.
+
+> > +        ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, &msr_data);
+> > +        if (ret < 0) {
+> when this can fail?
+
+Dunno, but not checking for errors doesn't look good.
+
+> > +            return ret;
+> > +        }
+> > +        assert(ret == 1);
+> > +
+> > +        if (msr_data.entries[0].data != hyperv_vp_index(cpu)) {
+> > +            fprintf(stderr, "kernel's vp_index != QEMU's vp_index\n");
+> error_report()
+
+OK (target/i386/kvm.c is already a mix of all possible styles of error
+reporting, I must've followed a wrong one).
+
+Thanks,
+Roman.
