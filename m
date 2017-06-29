@@ -1,31 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50842)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dQgVF-0002fW-AF
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 16:57:30 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dQgXk-0003qi-Un
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 17:00:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dQgVB-00055Z-DV
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 16:57:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34594)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1dQgVB-00055Q-5D
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 16:57:25 -0400
-Date: Thu, 29 Jun 2017 14:57:22 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170629145722.4af0a0fa@w520.home>
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D190D1CF1C@SHSMSX101.ccr.corp.intel.com>
-References: <1491301684-24367-1-git-send-email-yulei.zhang@intel.com>
-	<20170626141906.6e38b235@w520.home>
-	<01FDBDDE256B79498DC57789713132D469DCC1EE@SHSMSX101.ccr.corp.intel.com>
-	<20170627134431.5947c771@w520.home>
-	<AADFC41AFE54684AB9EE6CBC0274A5D190D1956B@SHSMSX101.ccr.corp.intel.com>
-	<20170628095938.1329c358@w520.home>
-	<AADFC41AFE54684AB9EE6CBC0274A5D190D1CF1C@SHSMSX101.ccr.corp.intel.com>
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dQgXh-0005m7-1D
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 17:00:05 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47053
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1dQgXg-0005lq-Q9
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 17:00:00 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v5TKx1WE115403
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 16:59:59 -0400
+Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bd6td535b-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 16:59:59 -0400
+Received: from localhost
+	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Thu, 29 Jun 2017 16:59:58 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 5/5] vifo: introduce new VFIO ioctl
- VFIO_DEVICE_PCI_GET_DIRTY_BITMAP
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <804c9b1a-6803-e920-9d3d-60fc33dd2fea@redhat.com>
+References: <1498695900-1648-1-git-send-email-mdroth@linux.vnet.ibm.com>
+	<804c9b1a-6803-e920-9d3d-60fc33dd2fea@redhat.com>
+Date: Thu, 29 Jun 2017 15:59:50 -0500
+Message-Id: <149876999083.10485.13933378544182209124@loki>
+Subject: Re: [Qemu-devel] [RFC PATCH 0/5] hotplug: fix premature rebinding
+ of VFIO devices to host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,47 +43,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: "Zhang, Yulei" <yulei.zhang@intel.com>, "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "Zheng, Xiao" <xiao.zheng@intel.com>, "Wang, Zhi
-	A" <zhi.a.wang@intel.com>
+To: Laine Stump <laine@redhat.com>, libvir-list@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, aik@ozlabs.ru, alex.williamson@redhat.com, abologna@redhat.com, pkrempa@redhat.com, berrange@redhat.com, mprivozn@redhat.com, sbhat@linux.vnet.ibm.com
 
-On Thu, 29 Jun 2017 00:10:59 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
+Quoting Laine Stump (2017-06-29 13:50:15)
+> On 06/28/2017 08:24 PM, Michael Roth wrote:
+> > Hi everyone. Hoping to get some feedback on this approach, or some
+> > alternatives proposed below, to the following issue:
+> > =
 
-> > From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> > Sent: Thursday, June 29, 2017 12:00 AM 
-> > Thanks Kevin.  So really it's not really a dirty bitmap, it's just a
-> > bitmap of pages that the device has access to and may have dirtied.
-> > Don't we have this more generally in the vfio type1 IOMMU backend?  For
-> > a mediated device, we know all the pages that the vendor driver has
-> > asked to be pinned.  Should we perhaps make this interface on the vfio
-> > container rather than the device?  Any mediated device can provide this
-> > level of detail without specific vendor support.  If we had DMA page
-> > faulting, this would be the natural place to put it as well, so maybe
-> > we should design the interface there to support everything similarly.
-> > Thanks,
-> >   
-> 
-> That's a nice idea. Just two comments:
-> 
-> 1) If some mediated device has its own way to construct true dirty
-> bitmap (not thru DMA page faulting), the interface is better designed
-> to allow that flexibility. Maybe an optional callback if not registered
-> then use common type1 IOMMU logic otherwise prefers to vendor
-> specific callback
+> > Currently libvirt immediately attempts to rebind a managed device back =
+to the
+> > host driver when it receives a DEVICE_DELETED event from QEMU. This is
+> > problematic for 2 reasons:
+> > =
 
-I'm not sure what that looks like, but I agree with the idea.  Could
-the pages that type1 knows about every be anything other than a
-superset of the dirty pages?  Perhaps a device ioctl to flush unused
-mappings would be sufficient.
+> > 1) If multiple devices from a group are attached to a guest, this can m=
+ove
+> >    the group into a "non-viable" state where some devices are assigned =
+to
+> >    the host and some to the guest.
+> =
 
-> 2) If there could be multiple mediated devices from different vendors
-> in same container while not all mediated devices support live migration,
-> would container-level interface impose some limitation?
+> Since we don't support hotplug with managed=3D'yes' of individual (or
+> multiple) functions of a multifunction host device, I don't know that
+> it's very useful to support hot *un*plug of it - it would only be useful
+> if the multi-function device were present in the guest when it was
+> started, and then was hot-unplugged later. And this is all a lot of
+> extra complexity, though, so it would be useful to know what are the
+> scenarios where it would actually be used (i.e. is this a legitimate
+> need, or just an interesting exercise?)
+> =
 
-Dirty page logging is only one small part of migration, each
-migrate-able device would still need to provide a device-level
-interface to save/restore state.  The migration would fail when we get
-to the device(s) that don't provide that.  Thanks,
+> > =
 
-Alex
+> > 2) When QEMU emits the DEVICE_DELETED event, there's still a "finalize"=
+ phase
+> >    where additional cleanup occurs. In most cases libvirt can ignore th=
+is
+> >    cleanup, but in the case of VFIO devices this is where closing of a =
+VFIO
+> >    group FD occurs, and failing to wait before rebinding the device to =
+the
+> >    host driver can result in unexpected behavior. In the case of powernv
+> >    hosts at least, this can lead to a host driver crashing due to the d=
+efault
+> >    DMA windows not having been fully-restored yet. The window between t=
+his is
+> >    and the initial DEVICE_DELETED seems to be ~6 seconds in practice. W=
+e've
+> >    seen host dumps with Mellanox CX4 VFs being rebound to host driver d=
+uring
+> >    this period (on powernv hosts).
+> =
+
+> I agree with Dan that the situation described here should be considered
+> a qemu bug - according to my understanding (from back at the time
+> DEVICE_DELETED was added to qemu (I think at libvirt's request) qemu
+> should never emit the DEVICE_DELETED event until *everything* related to
+> the device is finished - that was the whole point of adding the event in
+> the first palce. Covering up this bug with a bunch of extra libvirt
+> complexity is just creating the potential for even more bugs in the more
+> complex code.
+> =
+
+> > =
+
+> > Patches 1-4 address 1) by deferring rebinding of a hostdev to the host =
+driver
+> > until all the devices in the group have been detached, at which point a=
+ll
+> > the hostdevs are rebound as a group. Until that point, the devices are =
+traced
+> > by the drvManager's inactiveList in a similar manner to hostdevs that a=
+re
+> > assigned to VFIO via the nodedev-detach interface.
+> =
+
+> What happens if libvirtd is restarted during this period? Is the
+> inactiveList rebuilt with all the info necessary to assure that the
+> nodedev-reattach does/doesn't happen (as appropriate) for all devices?
+
+Hmm, good question.
+
+The Unbindable() check only needs to know that nothing in the activeList
+belongs to the group we're checking, and that list at least seems to get
+rebuilt appropriately on restart.
+
+But the Unbind() relies on inactiveList and the behavior there is what
+nodedev-detach currently does, which is to add it to inactive list while
+libvirtd is running, and then just forget about it when libvirtd restarts.
+For nodedev-detach it's fine since virHostdevPreparePCIDevices() re-adds
+it as needed in the device-attach path. But yah, for this purpose it ends
+up losing track of hostdevs that are still pending rebind to the host, and
+that means some devices may not get rebound at the appropriate time if
+there was a libvirtd restart.
+
+Unlike with device-attach, we can't just re-add it on-demand because we
+actually need to know whether or not it was previously in the list. So
+I think we'd need to add some persistent state to track this. Will look
+into adding handling for that.
+
+> =
+
+> =
+
+> > =
+
+> > Patch 5 addresses 2) by adding an additional check that, when the last =
+device
+> > from a group is detached, polls /proc for open FDs referencing the VFIO=
+ group
+> > path in /dev/vfio/<iommu_group> and waiting for the FD to be closed. If=
+ we
+> > time out, we abandon rebinding the hostdevs back to the host.
+> > =
+
+> > There are a couple alternatives to Patch 5 that might be worth consider=
+ing:
+> > =
+
+> > a) Add a DEVICE_FINALIZED event to QEMU and wait for that instead of
+> >    DEVICE_DELETED.
+> =
+
+> Is the "device is *almost* completely deleted" event (current
+> DEVIE_DELETED) really something that anyone wants/needs to know about?
+> Or is the only useful event just the one that you're calling
+> DEVICE_FINALIZED? If the latter, then I think it would be better to just
+> change when DEVICE_DELETED is emitted.
+> =
+
+>  Paired with patches 1-4 this would let us drop patch 5 in
+> >    favor of minimal changes to libvirt's event handlers.
+> > =
+
+> >    The downsides are:
+> >     - that we'd incur some latency for all device-detach calls, but it'=
+s not
+> >       apparent to me whether this delay is significant for anything out=
+side
+> >       of VFIO.
+> >     - there may be cases where finalization after DEVICE_DELETE/unparen=
+t are
+> >       is not guaranteed, and I'm not sure QOM would encourage such
+> >       expectations even if that's currently the case.
+> > =
+
+> > b) Add a GROUP_DELETED event to VFIO's finalize callback. This is the m=
+ost
+> >    direct solution. With this we could completely separate out the hand=
+ling
+> >    of rebinding to host driver based on receival of this event.
+> > =
+
+> >    The downsides are:
+> >     - this would only work for newer versions of QEMU, though we could =
+use
+> >       the poll-wait in patch 5 as a fallback.
+> =
+
+> I don't think we should add such a complex patch as a fallback to
+> support older versions of qemu that don't have the bug fixed. Instead,
+> just tell people to upgrade qemu (after all, they're going to need to
+> update *something* (either libvirt or qemu); no need to update libvirt
+> just in order to avoid updating qemu).
+
+Ok, makes sense.
+
+Thanks!
+
+> =
+
+> =
+
+> >     - synchronizing sync/async device-detach threads with sync/async
+> >       handlers for this would be a bit hairy, but I have a WIP in progr=
+ess
+> >       that seems *fairly reasonable*
+> > =
+
+> > c) Take the approach in Patch 5, either as a precursor to implementing =
+b) or
+> >    something else, or just sticking with that for now.
+> > =
+
+> > d) ???
+> > =
+
+> > Personally I'm leaning toward c), but I'm wondering if that's "good eno=
+ugh"
+> > for now, or if we should pursue something more robust from the start, or
+> > perhaps something else entirely?
+> > =
+
+> > Any feedback is greatly appreciated!
+> > =
+
+> >  src/libvirt_private.syms |   5 ++
+> >  src/qemu/qemu_hostdev.c  |  16 +++++
+> >  src/qemu/qemu_hostdev.h  |   4 ++
+> >  src/qemu/qemu_hotplug.c  |  56 ++++++++++++++----
+> >  src/util/virfile.c       |  52 +++++++++++++++++
+> >  src/util/virfile.h       |   1 +
+> >  src/util/virhostdev.c    | 173 +++++++++++++++++++++++++++++++++++++++=
++++++++++++-----
+> >  src/util/virhostdev.h    |  16 +++++
+> >  src/util/virpci.c        |  69 ++++++++++++++++++----
+> >  src/util/virpci.h        |   4 ++
+> >  10 files changed, 360 insertions(+), 36 deletions(-)
+> > =
+
+> > =
+
+>=20
