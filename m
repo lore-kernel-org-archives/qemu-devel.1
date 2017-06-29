@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60643)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dQYet-0002GU-Rt
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 08:34:56 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dQYfi-0002nh-5t
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 08:35:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dQYer-00031k-8c
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 08:34:55 -0400
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <cover.1498607452.git.alistair.francis@xilinx.com>
-	<4b48ca3f3c45bee1103bcb50d87e6d5cadc88d6f.1498607452.git.alistair.francis@xilinx.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b959c21f-1c3e-e3ed-3012-24ef53cb8ff4@redhat.com>
-Date: Thu, 29 Jun 2017 14:34:40 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dQYff-0003jH-Ki
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 08:35:46 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:35302)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dQYff-0003j1-GM
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 08:35:43 -0400
+Received: by mail-qt0-x243.google.com with SMTP id w12so11051937qta.2
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 05:35:43 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1498728533-23160-1-git-send-email-frederic.konrad@adacore.com>
+	<1498728533-23160-4-git-send-email-frederic.konrad@adacore.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <44cd89c9-bd70-874d-f2bf-f51a9b4170c3@amsat.org>
+Date: Thu, 29 Jun 2017 09:35:39 -0300
 MIME-Version: 1.0
-In-Reply-To: <4b48ca3f3c45bee1103bcb50d87e6d5cadc88d6f.1498607452.git.alistair.francis@xilinx.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1498728533-23160-4-git-send-email-frederic.konrad@adacore.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC v1 4/4] util/oslib-win32: Recursivly pass the
- timeout
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 3/3] armv7m_systick: abort instead of
+ locking on a bad rate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,48 +36,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, stefanha@redhat.com, famz@redhat.com
-Cc: edgar.iglesias@xilinx.com, alistair23@gmail.com, qemu-block@nongnu.org
+To: KONRAD Frederic <frederic.konrad@adacore.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, alistair@alistair23.me, alex.bennee@linaro.org, pbonzini@redhat.com
 
+Hi Frederic,
 
-
-On 28/06/2017 01:57, Alistair Francis wrote:
-> +        /* We only found one and we are waiting on more then one. Let's try
-> +         * again.
->           */
-> -        if (timeout == 0 && nhandles > 1) {
-> +        if (nhandles > 1) {
->              /* Remove the handle that fired */
->              int i;
->              if ((ready - WAIT_OBJECT_0) < nhandles - 1) {
-> @@ -444,7 +444,20 @@ static int poll_rest(gboolean poll_msgs, HANDLE *handles, gint nhandles,
->                  }
->              }
->              nhandles--;
-> -            recursed_result = poll_rest(FALSE, handles, nhandles, fds, nfds, 0);
+On 06/29/2017 06:28 AM, KONRAD Frederic wrote:
+> This helps the board developer by asserting that system_clock_rate is not
+> null. Using systick with a zero rate will lead to a deadlock so better showing
+> the error.
+> 
+> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
+> ---
+>   hw/timer/armv7m_systick.c | 3 +++
+>   1 file changed, 3 insertions(+)
+> 
+> diff --git a/hw/timer/armv7m_systick.c b/hw/timer/armv7m_systick.c
+> index df8d280..745efb7 100644
+> --- a/hw/timer/armv7m_systick.c
+> +++ b/hw/timer/armv7m_systick.c
+> @@ -54,6 +54,9 @@ static void systick_reload(SysTickState *s, int reset)
+>           s->tick = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+>       }
+>       s->tick += (s->reload + 1) * systick_scale(s);
 > +
-> +            /* If we just had a very small timeout let's increase it when we
-> +             * recurse to ensure we don't just busy wait. This ensures we let
-> +             * the Windows threads block at least a little. If we previously
-> +             * had some wait let's set it to zero to avoid blocking for too
-> +             * long.
-> +             */
-> +            if (timeout < 10) {
-> +                timeout = timeout + 1;
-> +            } else {
-> +                timeout = 0;
-> +            }
-> +            recursed_result = poll_rest(FALSE, handles, nhandles, fds,
-> +                                        nfds, timeout);
->              return (recursed_result == -1) ? -1 : 1 + recursed_result;
+> +    /* system_clock_scale = 0 leads to a nasty deadlock, better aborting */
+> +    assert(systick_scale(s));
+>       timer_mod(s->timer, s->tick);
+>   }
 
-I'm not sure I agree with this change, which is effectively delaying the
-processing of events.  The question to me is which handles are
-triggering so fast that QEMU effectively busy waits.
+This is true it is better to abort here than risking a deadlock.
 
-Maybe your QEMUs can get some breath with commit 12f8def0e0 ("win32:
-replace custom mutex and condition variable with native primitives",
-2017-03-27), since the native primitives are more efficient and TCG 2.8
-used condvars a lot for qemu_io_proceeded_cond.
+However it seems to me they are 3 issues here:
+- the deadlock pattern is caused by using a global variable,
+- stellaris:ssys_calculate_system_clock() no checking RCC.SYSDIV and 
+RCC2.SYSDIV2 values <= 2 are reserved (GUEST_ERROR)
+- stellaris:ssys_write(RCC2) not overrides correctly RCC
 
-Paolo
+I'd rather take this opportunity to fix the deadlock pattern using a 
+getter/setter on system_clock_scale, doing the zero check in the setter 
+and eventually aborting in the getter, what do you think?
+
+Regards,
+
+Phil.
