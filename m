@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dQebO-0000um-Ve
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 14:55:44 -0400
+	(envelope-from <eblake@redhat.com>) id 1dQejq-0004ya-4W
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 15:04:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dQebK-0003E1-KI
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 14:55:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50524)
+	(envelope-from <eblake@redhat.com>) id 1dQejm-0006xf-Tj
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 15:04:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37660)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dQebK-0003DS-AF
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 14:55:38 -0400
-Date: Thu, 29 Jun 2017 19:55:25 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170629185525.GC2399@work-vm>
-References: <20170628190047.26159-1-dgilbert@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dQejm-0006xI-Bt
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 15:04:22 -0400
+References: <20170606165510.33057-1-pasic@linux.vnet.ibm.com>
+	<20170606165510.33057-2-pasic@linux.vnet.ibm.com>
+	<20170607095127.GB2099@work-vm>
+	<8c0f9dac-ceef-fe88-8147-3cf043f7e109@linux.vnet.ibm.com>
+	<f8f8bc90-56df-9885-83cd-2283e38c5462@linux.vnet.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <00b260fd-14f6-d716-daab-7d0172be1c07@redhat.com>
+Date: Thu, 29 Jun 2017 14:04:19 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20170628190047.26159-1-dgilbert@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 00/29] postcopy+vhost-user/shared ram
+In-Reply-To: <f8f8bc90-56df-9885-83cd-2283e38c5462@linux.vnet.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="MTXVoOcUKXFOJrBnRIjpaKTk0SLTPbHbI"
+Subject: Re: [Qemu-devel] [RFC PATCH 1/3] vmstate: error hint for failed
+ equal checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,175 +32,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com, aarcange@redhat.com
+To: Halil Pasic <pasic@linux.vnet.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-* Dr. David Alan Gilbert (git) (dgilbert@redhat.com) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->=20
-> Hi,
->   This is a RFC/WIP series that enables postcopy migration
-> with shared memory to a vhost-user process.
-> It's based off current-head + Juan's load_cleanup series, and
-> Alexey's bitmap series (v4).  It's very lightly tested and seems
-> to work, but it's quite rough.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--MTXVoOcUKXFOJrBnRIjpaKTk0SLTPbHbI
+From: Eric Blake <eblake@redhat.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org,
+ "Jason J . Herne" <jjherne@linux.vnet.ibm.com>,
+ Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Message-ID: <00b260fd-14f6-d716-daab-7d0172be1c07@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 1/3] vmstate: error hint for failed equal
+ checks
+References: <20170606165510.33057-1-pasic@linux.vnet.ibm.com>
+ <20170606165510.33057-2-pasic@linux.vnet.ibm.com>
+ <20170607095127.GB2099@work-vm>
+ <8c0f9dac-ceef-fe88-8147-3cf043f7e109@linux.vnet.ibm.com>
+ <f8f8bc90-56df-9885-83cd-2283e38c5462@linux.vnet.ibm.com>
+In-Reply-To: <f8f8bc90-56df-9885-83cd-2283e38c5462@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Marc-Andr=E9 asked if I had a git with it all applied; so here we are:
-https://github.com/dagrh/qemu/commits/vhost
-git@github.com:dagrh/qemu.git on the vhost branch
+On 06/14/2017 08:51 AM, Halil Pasic wrote:
 
-Dave
+[apologies for the delayed response, and also adding Markus]
 
-> I've modified the vhost-user-bridge (aka vhub) in qemu's tests/ to
-> use the new feature, since this is about the simplest
-> client around.
+
+>>
+>> One reason I choose error_report_err is to be consistent about hint
+>> reporting (the other one is that was what Connie suggested). I do
+>> not understand why do we omit hints if QMP, but I figured that's
+>> our policy. So the hint I'm adding must not be printed in QMP
+>> context -- because that's our policy. I was pretty sure what I
+>> want to do is add a hint (and not make a very long 'core' error
+>> message).
+>>
+>> Can you (or somebody else)  explain why are hints dropped in QMP
+>> context?
+>>
+>> Don't misunderstand I'm open towards your proposal, it's just
+>> that:
+>> 1) I would like to understand.
+>> 2) I would like to get the very same result as produced by
+>> https://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg01472.html=
+=20
+>>
+>> Regards,
+>> Halil
+>>
+>>
 >=20
-> Structure:
+> ping.
 >=20
-> The basic idea is that near the start of postcopy, the client
-> opens its own userfaultfd fd and sends that back to QEMU over
-> the socket it's already using for VHUST_USER_* commands.
-> Then when VHOST_USER_SET_MEM_TABLE arrives it registers the
-> areas with userfaultfd and sends the mapped addresses back to QEMU.
+> I would like to do a v2, but I want this sorted out first.
 >=20
-> QEMU then reads the clients UFD in it's fault thread and issues
-> requests back to the source as needed.
-> QEMU also issues 'WAKE' ioctls on the UFD to let the client know
-> that the page has arrived and can carry on.
+> 'This' basically boils down to the question and
+> 'Why aren't hints reported in QMP context?'
+
+QMP is supposed to be machine-parseable.  Hints are supposed to be
+human-readable. If you have a machine managing the monitor, the hint
+adds nothing but bandwidth consumption, because machine should not be
+parsing the human portion of the error message in the first place (as it
+is, libvirt already just logs the human-readable portion of a message,
+and bases its actions solely on the machine-stable portions of an error
+reply: namely, whether an error was sent at all, and occasionally, what
+error class was used for that error - there's no guarantee a human will
+be reading the log, though).
+
+There's also the question of whether the hints are even useful (telling
+the user to do something differently doesn't help if it wasn't the user,
+but libvirt, that was doing things wrong to cause the error in the first
+place).
+
+So while those points may or may not be the original rationale for why
+hints are not used in QMP, but it is an explanation that works for me
+now.  Markus may also have an opinion on the matter.
+
+> and 'Why is this
+> case special (a hint should be reported
+> even in QMP context?'
+
+If something absolutely must be reported, then it is not a hint, and
+shouldn't be using the hint mechanism.
+
 >=20
-> A new feature (VHOST_USER_PROTOCOL_F_POSTCOPY) is added so that
-> the QEMU knows the client can talk postcopy.
-> Three new messages (VHOST_USER_POSTCOPY_{ADVISE/LISTEN/END}) are
-> added to guide the process along.
+> Regarding the first question hints being reported via
+> error_printf_unless_qmp seems to come from commit
+> 50b7b000c9 ("hmp: Allow for error message hints on HMP")
+> --> Cc-ing Eric maybe he can help.
 >=20
-> Current known issues:
->    I've not tested it with hugepages yet; and I suspect the madvises
->    will need tweaking for it.
->=20
->    The qemu gets to see the base addresses that the client has its
->    regions mapped at; that's not great for security
->=20
->    Take care of deadlocking; any thread in the client that
->    accesses a userfault protected page can stall.
->=20
->    There's a nasty hack of a lock around the set_mem_table message.
->=20
->    I've not looked at the recent IOMMU code.
->=20
->    Some cleanup and a lot of corner cases need thinking about.
->=20
->    There are probably plenty of unknown issues as well.
->=20
-> Test setup:
->   I'm running on one host at the moment, with the guest
->   scping a large file from the host as it migrates.
->   The setup is based on one I found in the vhost-user setups.
->   You'll need a recent kernel for the shared memory support
->   in userfaultfd, and userfault isn't that happy if a process
->   using shared memory core's - so make sure you have the
->   latest fixes.
->=20
-> SESS=3Dvhost
-> ulimit -c unlimited
-> tmux -L $SESS new-session -d
-> tmux -L $SESS set-option -g history-limit 30000
-> # Start a router using the system qemu
-> tmux -L $SESS new-window -n router ./x86_64-softmmu/qemu-system-x86_64 =
--M none -nographic -net socket,vlan=3D0,udp=3Dloca
-> lhost:4444,localaddr=3Dlocalhost:5555 -net socket,vlan=3D0,udp=3Dlocalh=
-ost:4445,localaddr=3Dlocalhost:5556 -net user,vlan=3D0
-> tmux -L $SESS set-option -g set-remain-on-exit on
-> # Start source vhost bridge
-> tmux -L $SESS new-window -n srcvhostbr "./tests/vhost-user-bridge -u /t=
-mp/vubrsrc.sock 2>src-vub-log"
-> sleep 0.5
-> tmux -L $SESS new-window -n source "./x86_64-softmmu/qemu-system-x86_64=
- -enable-kvm -m 8G -smp 2 -object memory-backe
-> nd-file,id=3Dmem,size=3D8G,mem-path=3D/dev/shm,share=3Don -numa node,me=
-mdev=3Dmem -mem-prealloc -chardev socket,id=3Dchar0,path=3D/
-> tmp/vubrsrc.sock -netdev type=3Dvhost-user,id=3Dmynet1,chardev=3Dchar0,=
-vhostforce -device virtio-net-pci,netdev=3Dmynet1 my.qcow2 -net none -vnc=
- :0 -monitor stdio -trace events=3D/root/trace-file 2>src-qemu-log "
-> # Start dest vhost bridge
-> tmux -L $SESS new-window -n destvhostbr "./tests/vhost-user-bridge -u /=
-tmp/vubrdst.sock -l 127.0.0.1:4445 -r 127.0.0.
-> 1:5556 2>dst-vub-log"
-> sleep 0.5
-> tmux -L $SESS new-window -n dest "./x86_64-softmmu/qemu-system-x86_64 -=
-enable-kvm -m 8G -smp 2 -object memory-backend
-> -file,id=3Dmem,size=3D8G,mem-path=3D/dev/shm,share=3Don -numa node,memd=
-ev=3Dmem -mem-prealloc -chardev socket,id=3Dchar0,path=3D/tm
-> p/vubrdst.sock -netdev type=3Dvhost-user,id=3Dmynet1,chardev=3Dchar0,vh=
-ostforce -device virtio-net-pci,netdev=3Dmynet1 my.qcow2 -net none -vnc :=
-1 -monitor stdio -incoming tcp::8888 -trace events=3D/root/trace-file 2>d=
-st-qemu-log"
-> tmux -L $SESS send-keys -t source "migrate_set_capability postcopy-ram =
-on
-> tmux -L $SESS send-keys -t source "migrate_set_speed 20M
-> tmux -L $SESS send-keys -t dest "migrate_set_capability postcopy-ram on
->=20
-> then once booted:
-> tmux -L vhost send-keys -t source 'migrate -d tcp:0:8888^M'
-> tmux -L vhost send-keys -t source 'migrate_start_postcopy^M'
-> (Note those ^M's are actual ctrl-M's i.e. ctrl-v ctrl-M)
+> Regards,
+> Halil
 >=20
 >=20
-> Dave
->=20
-> Dr. David Alan Gilbert (29):
->   RAMBlock/migration: Add migration flags
->   migrate: Update ram_block_discard_range for shared
->   qemu_ram_block_host_offset
->   migration/ram: ramblock_recv_bitmap_test_byte_offset
->   postcopy: use UFFDIO_ZEROPAGE only when available
->   postcopy: Add notifier chain
->   postcopy: Add vhost-user flag for postcopy and check it
->   vhost-user: Add 'VHOST_USER_POSTCOPY_ADVISE' message
->   vhub: Support sending fds back to qemu
->   vhub: Open userfaultfd
->   postcopy: Allow registering of fd handler
->   vhost+postcopy: Register shared ufd with postcopy
->   vhost+postcopy: Transmit 'listen' to client
->   vhost+postcopy: Register new regions with the ufd
->   vhost+postcopy: Send address back to qemu
->   vhost+postcopy: Stash RAMBlock and offset
->   vhost+postcopy: Send requests to source for shared pages
->   vhost+postcopy: Resolve client address
->   postcopy: wake shared
->   postcopy: postcopy_notify_shared_wake
->   vhost+postcopy: Add vhost waker
->   vhost+postcopy: Call wakeups
->   vub+postcopy: madvises
->   vhost+postcopy: Lock around set_mem_table
->   vhu: enable =3D false on get_vring_base
->   vhost: Add VHOST_USER_POSTCOPY_END message
->   vhost+postcopy: Wire up POSTCOPY_END notify
->   postcopy: Allow shared memory
->   vhost-user: Claim support for postcopy
->=20
->  contrib/libvhost-user/libvhost-user.c | 178 ++++++++++++++++-
->  contrib/libvhost-user/libvhost-user.h |   8 +
->  exec.c                                |  44 +++--
->  hw/virtio/trace-events                |  13 ++
->  hw/virtio/vhost-user.c                | 293 ++++++++++++++++++++++++++=
-+-
->  include/exec/cpu-common.h             |   3 +
->  include/exec/ram_addr.h               |   2 +
->  migration/migration.c                 |   3 +
->  migration/migration.h                 |   8 +
->  migration/postcopy-ram.c              | 357 ++++++++++++++++++++++++++=
-+-------
->  migration/postcopy-ram.h              |  69 +++++++
->  migration/ram.c                       |   5 +
->  migration/ram.h                       |   1 +
->  migration/savevm.c                    |  13 ++
->  migration/trace-events                |   6 +
->  trace-events                          |   3 +
->  vl.c                                  |   4 +-
->  17 files changed, 926 insertions(+), 84 deletions(-)
->=20
-> --=20
-> 2.13.0
->=20
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--MTXVoOcUKXFOJrBnRIjpaKTk0SLTPbHbI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZVU8zAAoJEKeha0olJ0NqlD0H/2CpNbEgXpYZuyK2X+AZ+cRO
+/YhoxUIkiIhKGW7SdptrLmKL0x+CFWAicwMIW45SQINUsHn2KK8njGFEH/v9X9F7
+4cl3GzzgoNtRXvqO8XcL34v3Ds9mt8IzLhFC2vepEVrSsxDeAXERij1+XpLbdobh
+7YjUrotzQ1hld/QGmleIR9H7BVer5uwctrwErMY46yhe+hxYg19z/+oPZzEALS4y
+BXv2J2FbPTLdlAdB02vv9ZDV3ag2FvfzwwSd2RQKL+fgpB4uSnh7+Yu6Ge7397ax
+l9x34InvUFZY/4llwLFUvgs8RJhjxVxh27L1qGppf5MRhiptR26gEZwMSrXCj+Q=
+=u641
+-----END PGP SIGNATURE-----
+
+--MTXVoOcUKXFOJrBnRIjpaKTk0SLTPbHbI--
