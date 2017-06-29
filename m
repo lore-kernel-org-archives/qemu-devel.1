@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dQd3g-0002Tg-FI
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 13:16:49 -0400
+	(envelope-from <alistai@xilinx.com>) id 1dQd6W-0003gu-U8
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 13:19:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dQd3d-0007T7-9u
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 13:16:48 -0400
-Received: from mail-qt0-x236.google.com ([2607:f8b0:400d:c0d::236]:34608)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dQd3d-0007St-5O
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 13:16:45 -0400
-Received: by mail-qt0-x236.google.com with SMTP id 32so79954944qtv.1
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 10:16:45 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170628204241.32106-1-laurent@vivier.eu>
-	<20170628204241.32106-2-laurent@vivier.eu>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <0c2bacd3-7337-b394-b8f9-fcd0904bc6cb@twiddle.net>
-Date: Thu, 29 Jun 2017 10:16:40 -0700
+	(envelope-from <alistai@xilinx.com>) id 1dQd6W-00008W-1R
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 13:19:44 -0400
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Thu, 29 Jun 2017 10:16:30 -0700
+Message-ID: <ec037b86d3144d26ebdbb943515d2da02725d465.1498756113.git.alistair.francis@xilinx.com>
+In-Reply-To: <cover.1498756113.git.alistair.francis@xilinx.com>
+References: <cover.1498756113.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-In-Reply-To: <20170628204241.32106-2-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 1/7] target/m68k: add fscc.
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v1 1/3] util/aio-win32: Only select on what we
+ are actually waiting for
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,18 +22,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org, stefanha@redhat.com, famz@redhat.com
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, edgar.iglesias@xilinx.com, qemu-block@nongnu.org, philippe@mathieu-daude.net, pbonzini@redhat.com
 
-On 06/28/2017 01:42 PM, Laurent Vivier wrote:
-> use DisasCompare with FPU conditions in fscc and fbcc.
-> 
-> Signed-off-by: Laurent Vivier<laurent@vivier.eu>
-> ---
->   target/m68k/translate.c | 210 ++++++++++++++++++++++++++++++------------------
->   1 file changed, 131 insertions(+), 79 deletions(-)
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Acked-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+---
+Changes since RFC:
+ - Include more bitmasks for the select call
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+ util/aio-win32.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-
-r~
+diff --git a/util/aio-win32.c b/util/aio-win32.c
+index bca496a47a..d6d5e02f00 100644
+--- a/util/aio-win32.c
++++ b/util/aio-win32.c
+@@ -71,6 +71,7 @@ void aio_set_fd_handler(AioContext *ctx,
+         }
+     } else {
+         HANDLE event;
++        long bitmask = 0;
+ 
+         if (node == NULL) {
+             /* Alloc and insert if it's not already there */
+@@ -95,10 +96,16 @@ void aio_set_fd_handler(AioContext *ctx,
+         node->io_write = io_write;
+         node->is_external = is_external;
+ 
++        if (io_read) {
++            bitmask |= FD_READ | FD_ACCEPT | FD_CLOSE;
++        }
++
++        if (io_write) {
++            bitmask |= FD_WRITE | FD_CONNECT;
++        }
++
+         event = event_notifier_get_handle(&ctx->notifier);
+-        WSAEventSelect(node->pfd.fd, event,
+-                       FD_READ | FD_ACCEPT | FD_CLOSE |
+-                       FD_CONNECT | FD_WRITE | FD_OOB);
++        WSAEventSelect(node->pfd.fd, event, bitmask);
+     }
+ 
+     qemu_lockcnt_unlock(&ctx->list_lock);
+-- 
+2.11.0
