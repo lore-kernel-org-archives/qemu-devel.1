@@ -1,35 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58745)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dQb0R-0003CV-OG
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:05:25 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dQb13-00044n-9y
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:05:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dQb0O-0007h8-D4
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:05:19 -0400
-References: <20170622112648.24815-1-lvivier@redhat.com>
-	<caa25331-5005-78e8-fba2-19bf67116d92@redhat.com>
-	<20170623092124.GG12089@umbus>
-	<c0a0667e-8c60-a8e7-a041-caddac8c8b88@redhat.com>
-	<20170628014231.GA791@pacoca>
-	<a34435df-8944-ddac-e881-0a2338e4aad4@redhat.com>
-	<20170628081850.GJ12089@umbus>
-	<668938c1-f93e-86d1-4e4e-5715d5074587@kaod.org>
-	<e0f76eb1-2388-e512-3763-26e7232b1129@redhat.com>
-	<baf1e0b1-178b-28ae-f2a2-caadaaf9d213@kaod.org>
-	<20170628135908.4501f0a0@bahia.lab.toulouse-stg.fr.ibm.com>
-	<78fa4c41-92db-8676-b6ef-db9de9717844@redhat.com>
-	<20170628184137.699a4f9f@bahia.lab.toulouse-stg.fr.ibm.com>
-	<1498714660.30519.1.camel@gmail.com>
-	<7e60dbcd-61b9-23fe-330d-37c96e1fb9b2@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <4803fa79-68d1-cc5c-1bb2-4e29bdd45062@redhat.com>
-Date: Thu, 29 Jun 2017 10:05:00 -0500
+	(envelope-from <imammedo@redhat.com>) id 1dQb0z-0008Kh-UD
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:05:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:29293)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dQb0z-0008KP-Et
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:05:53 -0400
+Date: Thu, 29 Jun 2017 17:05:46 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170629170546.6450586d@nial.brq.redhat.com>
+In-Reply-To: <20170621162424.10462-15-rkagan@virtuozzo.com>
+References: <20170621162424.10462-1-rkagan@virtuozzo.com>
+	<20170621162424.10462-15-rkagan@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <7e60dbcd-61b9-23fe-330d-37c96e1fb9b2@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="vTbfS2q5XkpPMOVnGnsRuwfEAAT0JEUEw"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc/cpu-models: set
- POWER9_v1.0 as POWER9 DD1
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 14/23] hyperv: qom-ify SynIC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,87 +27,282 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, Greg Kurz <groug@kaod.org>, Laurent Vivier <lvivier@redhat.com>
-Cc: sursingh@redhat.com, joserz@linux.vnet.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, sbobroff@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+To: Roman Kagan <rkagan@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---vTbfS2q5XkpPMOVnGnsRuwfEAAT0JEUEw
-From: Eric Blake <eblake@redhat.com>
-To: Thomas Huth <thuth@redhat.com>,
- Suraj Jitindar Singh <sjitindarsingh@gmail.com>, Greg Kurz <groug@kaod.org>,
- Laurent Vivier <lvivier@redhat.com>
-Cc: sursingh@redhat.com, joserz@linux.vnet.ibm.com, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- sbobroff@redhat.com, David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <4803fa79-68d1-cc5c-1bb2-4e29bdd45062@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc/cpu-models: set
- POWER9_v1.0 as POWER9 DD1
-References: <20170622112648.24815-1-lvivier@redhat.com>
- <caa25331-5005-78e8-fba2-19bf67116d92@redhat.com>
- <20170623092124.GG12089@umbus>
- <c0a0667e-8c60-a8e7-a041-caddac8c8b88@redhat.com>
- <20170628014231.GA791@pacoca>
- <a34435df-8944-ddac-e881-0a2338e4aad4@redhat.com>
- <20170628081850.GJ12089@umbus>
- <668938c1-f93e-86d1-4e4e-5715d5074587@kaod.org>
- <e0f76eb1-2388-e512-3763-26e7232b1129@redhat.com>
- <baf1e0b1-178b-28ae-f2a2-caadaaf9d213@kaod.org>
- <20170628135908.4501f0a0@bahia.lab.toulouse-stg.fr.ibm.com>
- <78fa4c41-92db-8676-b6ef-db9de9717844@redhat.com>
- <20170628184137.699a4f9f@bahia.lab.toulouse-stg.fr.ibm.com>
- <1498714660.30519.1.camel@gmail.com>
- <7e60dbcd-61b9-23fe-330d-37c96e1fb9b2@redhat.com>
-In-Reply-To: <7e60dbcd-61b9-23fe-330d-37c96e1fb9b2@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, 21 Jun 2017 19:24:15 +0300
+Roman Kagan <rkagan@virtuozzo.com> wrote:
 
-[meta-comment]
+> Make Hyper-V SynIC a device which is attached as a child to X86CPU.  For
+> now it only makes SynIC visibile in the qom hierarchy, and maintains its
+> internal fields in sync with the respecitve msrs of the parent cpu (the
+> fields will be used in followup patches).
+> 
+> Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+> ---
+> v1 -> v2:
+>  - was patch 13 in v1
+>  - drop unnecessary QOM properties (but keep the fields)
+>  - move KVM_CAP_HYPERV_SYNIC setting and SynIC creation to
+>    hyperv_init_vcpu
+> 
+>  target/i386/hyperv.h  |   4 ++
+>  target/i386/hyperv.c  | 111 +++++++++++++++++++++++++++++++++++++++++++++++++-
+>  target/i386/kvm.c     |  14 ++++++-
+>  target/i386/machine.c |   9 ++++
+>  4 files changed, 134 insertions(+), 4 deletions(-)
+> 
+> diff --git a/target/i386/hyperv.h b/target/i386/hyperv.h
+> index af5fc05..20bbd7b 100644
+> --- a/target/i386/hyperv.h
+> +++ b/target/i386/hyperv.h
+> @@ -34,4 +34,8 @@ int kvm_hv_sint_route_set_sint(HvSintRoute *sint_route);
+>  uint32_t hyperv_vp_index(X86CPU *cpu);
+>  X86CPU *hyperv_find_vcpu(uint32_t vp_index);
+>  
+> +void hyperv_synic_add(X86CPU *cpu);
+> +void hyperv_synic_reset(X86CPU *cpu);
+> +void hyperv_synic_update(X86CPU *cpu);
+> +
+>  #endif
+> diff --git a/target/i386/hyperv.c b/target/i386/hyperv.c
+> index 012c79d..eff612c 100644
+> --- a/target/i386/hyperv.c
+> +++ b/target/i386/hyperv.c
+> @@ -13,12 +13,27 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "qemu/main-loop.h"
+> +#include "qapi/error.h"
+> +#include "hw/qdev-properties.h"
+>  #include "hyperv.h"
+>  #include "hyperv_proto.h"
+>  
+> +typedef struct SynICState {
+> +    DeviceState parent_obj;
+> +
+> +    X86CPU *cpu;
+> +
+> +    bool enabled;
+> +    hwaddr msg_page_addr;
+> +    hwaddr evt_page_addr;
+> +} SynICState;
+> +
+> +#define TYPE_SYNIC "hyperv-synic"
+> +#define SYNIC(obj) OBJECT_CHECK(SynICState, (obj), TYPE_SYNIC)
+> +
+>  struct HvSintRoute {
+>      uint32_t sint;
+> -    X86CPU *cpu;
+> +    SynICState *synic;
+>      int gsi;
+>      EventNotifier sint_set_notifier;
+>      EventNotifier sint_ack_notifier;
+> @@ -37,6 +52,37 @@ X86CPU *hyperv_find_vcpu(uint32_t vp_index)
+>      return X86_CPU(qemu_get_cpu(vp_index));
+>  }
+>  
+> +static SynICState *get_synic(X86CPU *cpu)
+> +{
+> +    SynICState *synic =
+> +        SYNIC(object_resolve_path_component(OBJECT(cpu), "synic"));
+> +    assert(synic);
+> +    return synic;
+> +}
+> +
+> +static void synic_update_msg_page_addr(SynICState *synic)
+> +{
+> +    uint64_t msr = synic->cpu->env.msr_hv_synic_msg_page;
+> +    hwaddr new_addr = (msr & HV_SIMP_ENABLE) ? (msr & TARGET_PAGE_MASK) : 0;
+> +
+> +    synic->msg_page_addr = new_addr;
+> +}
+> +
+> +static void synic_update_evt_page_addr(SynICState *synic)
+> +{
+> +    uint64_t msr = synic->cpu->env.msr_hv_synic_evt_page;
+> +    hwaddr new_addr = (msr & HV_SIEFP_ENABLE) ? (msr & TARGET_PAGE_MASK) : 0;
+> +
+> +    synic->evt_page_addr = new_addr;
+> +}
+> +
+> +static void synic_update(SynICState *synic)
+> +{
+> +    synic->enabled = synic->cpu->env.msr_hv_synic_control & HV_SYNIC_ENABLE;
+> +    synic_update_msg_page_addr(synic);
+> +    synic_update_evt_page_addr(synic);
+> +}
+> +
+>  int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
+>  {
+>      CPUX86State *env = &cpu->env;
+> @@ -65,6 +111,7 @@ int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
+>          default:
+>              return -1;
+>          }
+> +        synic_update(get_synic(cpu));
+>          return 0;
+>      case KVM_EXIT_HYPERV_HCALL: {
+>          uint16_t code;
+> @@ -95,6 +142,7 @@ HvSintRoute *hyperv_sint_route_new(uint32_t vp_index, uint32_t sint,
+>                                     HvSintAckClb sint_ack_clb,
+>                                     void *sint_ack_clb_data)
+>  {
+> +    SynICState *synic;
+>      HvSintRoute *sint_route;
+>      EventNotifier *ack_notifier;
+>      int r, gsi;
+> @@ -105,6 +153,8 @@ HvSintRoute *hyperv_sint_route_new(uint32_t vp_index, uint32_t sint,
+>          return NULL;
+>      }
+>  
+> +    synic = get_synic(cpu);
+> +
+>      sint_route = g_new0(HvSintRoute, 1);
+>      r = event_notifier_init(&sint_route->sint_set_notifier, false);
+>      if (r) {
+> @@ -135,7 +185,7 @@ HvSintRoute *hyperv_sint_route_new(uint32_t vp_index, uint32_t sint,
+>      sint_route->gsi = gsi;
+>      sint_route->sint_ack_clb = sint_ack_clb;
+>      sint_route->sint_ack_clb_data = sint_ack_clb_data;
+> -    sint_route->cpu = cpu;
+> +    sint_route->synic = synic;
+>      sint_route->sint = sint;
+>      sint_route->refcount = 1;
+>  
+> @@ -189,3 +239,60 @@ int kvm_hv_sint_route_set_sint(HvSintRoute *sint_route)
+>  {
+>      return event_notifier_set(&sint_route->sint_set_notifier);
+>  }
+> +
+> +static void synic_realize(DeviceState *dev, Error **errp)
+> +{
+> +    Object *obj = OBJECT(dev);
+> +    SynICState *synic = SYNIC(dev);
+> +
+> +    synic->cpu = X86_CPU(obj->parent);
+usually devices shouldn't access parent this way
 
-On 06/29/2017 01:44 AM, Thomas Huth wrote:
-=2E..
->>>>>>>>>>>>>> On 22.06.2017 13:26, Laurent Vivier wrote:   =20
->>>>>>>>>>>>>>> CPU_POWERPC_POWER9_DD1 is 0x004E0100, so this
+[...]
+> +void hyperv_synic_add(X86CPU *cpu)
+this helper is called by/from parent so something like below should do
 
-As a reminder, 14 levels of > quoting is a bit much. It's not only
-acceptable, but encouraged, to trim replies to high-volume lists, such
-that you only keep context relative to your reply, rather than the full
-thread.
+> +{
+> +    Object *obj;
+> +
+> +    obj = object_new(TYPE_SYNIC);
+> +    object_property_add_child(OBJECT(cpu), "synic", obj, &error_abort);
+> +    object_unref(obj);
 
->>> FWIW Thomas suggested to do just that and David agreed it was "a
->>> better idea".
->>
->> I assume we would have just -cpu POWER9 alias to DD2?
->=20
-> Yes.
+SynICState *synic = SYNIC(obj)
+synic->cpu = cpu;
+or even make synic->cpu a link (object_property_add_link) and set it
+here, benefit will be when synic is introspected via QOM it will show
+that it refers back/uses the cpu + proper reference counting of CPU object.
 
-That way, existing thread readers can quickly see what you're adding to
-the thread without scrolling past screens of quotations they've already
-seen, and new readers can refer to the archives for the rest of the threa=
-d.
+> +    object_property_set_bool(obj, true, "realized", &error_abort);
+> +}
+> +
+> +void hyperv_synic_reset(X86CPU *cpu)
+> +{
+> +    device_reset(DEVICE(get_synic(cpu)));
+> +}
+> +
+> +void hyperv_synic_update(X86CPU *cpu)
+> +{
+> +    synic_update(get_synic(cpu));
+> +}
+> +
+> +static const TypeInfo synic_type_info = {
+> +    .name = TYPE_SYNIC,
+> +    .parent = TYPE_DEVICE,
+> +    .instance_size = sizeof(SynICState),
+> +    .class_init = synic_class_init,
+> +};
+> +
+> +static void synic_register_types(void)
+> +{
+> +    type_register_static(&synic_type_info);
+> +}
+> +
+> +type_init(synic_register_types)
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 9bf7f08..eaa2df3 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -648,8 +648,7 @@ static int hyperv_handle_properties(CPUState *cs)
+>          env->features[FEAT_HYPERV_EAX] |= HV_VP_RUNTIME_AVAILABLE;
+>      }
+>      if (cpu->hyperv_synic) {
+> -        if (!has_msr_hv_synic ||
+> -            kvm_vcpu_enable_cap(cs, KVM_CAP_HYPERV_SYNIC, 0)) {
+> +        if (!has_msr_hv_synic) {
+>              fprintf(stderr, "Hyper-V SynIC is not supported by kernel\n");
+>              return -ENOSYS;
+>          }
+> @@ -700,6 +699,15 @@ static int hyperv_init_vcpu(X86CPU *cpu)
+>          }
+>      }
+>  
+> +    if (cpu->hyperv_synic) {
+> +        if (kvm_vcpu_enable_cap(CPU(cpu), KVM_CAP_HYPERV_SYNIC, 0)) {
+> +            fprintf(stderr, "failed to enable Hyper-V SynIC\n");
+> +            return -ENOSYS;
+> +        }
+> +
+> +        hyperv_synic_add(cpu);
+is synic KVM specific or may it work with TCG accel?
+in either case, looks like hyperv_synic_add() should be called from
+x86_cpu_realizefn(), the same like we do with APIC creating it
+depending feature being enabled.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> +    }
+> +
+>      return 0;
+>  }
+>  
+> @@ -1084,6 +1092,8 @@ void kvm_arch_reset_vcpu(X86CPU *cpu)
+>          for (i = 0; i < ARRAY_SIZE(env->msr_hv_synic_sint); i++) {
+>              env->msr_hv_synic_sint[i] = HV_SINT_MASKED;
+>          }
+> +
+> +        hyperv_synic_reset(cpu);
+ditto, could go to x86_cpu_machine_reset_cb()
+also calling it unconditionally will crash QEMU if
+get_synic() returns NULL (i.e. when feature is not enabled).
 
-
---vTbfS2q5XkpPMOVnGnsRuwfEAAT0JEUEw
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZVRccAAoJEKeha0olJ0NqufQH/2sC6nvE6/G5hN57Txpsg6X9
-eTQNwfoIOMTaOoVTFmh7ACHZitT0spfxbAqG1IOoe+aFwk0ho1srS84I2akVYeK2
-7/v8kO20WP3iKrigzbOKU8NG7DiMJ67mGpDWP8EuhZArjBTwBKmcQkT/OLDJ+LsZ
-JParuoPXWEJQRJqqdXhq8H0nN7eMZcPnh6hGQLUAZIKgZeYFyS8PVog7Oxan60bZ
-2hjCJaMcTJksBJZkspOZw4MgrqLDpeFXaFZ/Hu/e/CLG0+LzFWQu5a1jWjxzRmaP
-5LBE8z1n7oScGovTyRTOJY0U3E2T2mBIoNLjI7307HP38gOErXKoHxPArVx0Ihs=
-=KDI2
------END PGP SIGNATURE-----
-
---vTbfS2q5XkpPMOVnGnsRuwfEAAT0JEUEw--
+>      }
+>  }
+>  
+> diff --git a/target/i386/machine.c b/target/i386/machine.c
+> index ded5e34..90cc3a9 100644
+> --- a/target/i386/machine.c
+> +++ b/target/i386/machine.c
+> @@ -7,6 +7,7 @@
+>  #include "hw/i386/pc.h"
+>  #include "hw/isa/isa.h"
+>  #include "migration/cpu.h"
+> +#include "hyperv.h"
+>  
+>  #include "sysemu/kvm.h"
+>  
+> @@ -629,11 +630,19 @@ static bool hyperv_synic_enable_needed(void *opaque)
+>      return false;
+>  }
+>  
+> +static int hyperv_synic_post_load(void *opaque, int version_id)
+> +{
+> +    X86CPU *cpu = opaque;
+> +    hyperv_synic_update(cpu);
+> +    return 0;
+> +}
+> +
+>  static const VMStateDescription vmstate_msr_hyperv_synic = {
+>      .name = "cpu/msr_hyperv_synic",
+>      .version_id = 1,
+>      .minimum_version_id = 1,
+>      .needed = hyperv_synic_enable_needed,
+> +    .post_load = hyperv_synic_post_load,
+>      .fields = (VMStateField[]) {
+>          VMSTATE_UINT64(env.msr_hv_synic_control, X86CPU),
+>          VMSTATE_UINT64(env.msr_hv_synic_evt_page, X86CPU),
