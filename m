@@ -1,39 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1dQc11-0005B5-7t
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:10:01 -0400
+	(envelope-from <eblake@redhat.com>) id 1dQc3q-0006Jc-Ph
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:12:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1dQc0x-00063n-7b
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:09:59 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36775)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1dQc0w-00063J-TO
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:09:55 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v5TG9DK8017708
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 12:09:51 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bcpx5avw2-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 12:09:51 -0400
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Thu, 29 Jun 2017 10:09:50 -0600
-References: <7f0b8d00-236d-37e8-5c1f-e7ea8e4b9146@redhat.com>
-	<e24f5884-5c1a-593d-6ae6-c8c4667a07d5@linux.vnet.ibm.com>
-	<8c6ec7dd-aaa5-272f-6f75-9440acb10f61@redhat.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Thu, 29 Jun 2017 12:09:44 -0400
+	(envelope-from <eblake@redhat.com>) id 1dQc3n-0008UV-Ja
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:12:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48416)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dQc3n-0008U9-9v
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:12:51 -0400
+References: <1497369290-20401-1-git-send-email-peter.maydell@linaro.org>
+	<1497369290-20401-3-git-send-email-peter.maydell@linaro.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <024979b1-9a1a-0556-5138-480f8ed1a70e@redhat.com>
+Date: Thu, 29 Jun 2017 11:12:47 -0500
 MIME-Version: 1.0
-In-Reply-To: <8c6ec7dd-aaa5-272f-6f75-9440acb10f61@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-Id: <c94973c9-8f32-66d9-88a7-47d957cadab9@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] TPM status
+In-Reply-To: <1497369290-20401-3-git-send-email-peter.maydell@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="k5CrtHTWCfr5tIJCKiGUtvkprsp60Vbll"
+Subject: Re: [Qemu-devel] [PATCH 2/3] scripts/run-coverity-scan: Script to
+ run Coverity Scan build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,80 +29,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Javier Martinez Canillas <javierm@redhat.com>, Laszlo Ersek <lersek@redhat.com>
-Cc: Amarnath Valluri <amarnath.valluri@intel.com>, qemu devel list <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Jones <pjones@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Markus Armbruster <armbru@redhat.com>, patches@linaro.org
 
-On 06/29/2017 08:39 AM, Javier Martinez Canillas wrote:
-> Hello Stefan,
->
-> Thanks a lot for the summary, it's very informative. I've a question below.
->
-> On 06/27/2017 06:12 PM, Stefan Berger wrote:
->
->> QEMU TPM Device
->> ===============
->>
->> = Guest-side Hardware Interface =
->>
->> The QEMU TPM emulation implements a TPM TIS hardware interface following
->> the Trusted Computing Group's specification "TCG PC Client Specific TPM
->> Interface Specification (TIS)", Specifcation Version 1.3, 21 March 2013.
->> This specification, or a later version of it, can be accessed from the
->> following URL:
->>
->> https://trustedcomputinggroup.org/pc-client-work-group-pc-client-specific-tpm-interface-specification-tis/
->>
->> The TIS interface makes a memory mapped IO region in the area 0xfed40000 -
->> 0xfed44fff available to the guest operating system.
->>
-> Besides the TIS interface, the TPM2.0 spec defines a CRB (Command Response
-> Buffer Interface) as described in the "TCG PC Client Platform TPM Profile
-> (PTP) Specification Family 2.0, Level 00 Revision 00.43, January 26, 2015"
->
-> https://trustedcomputinggroup.org/wp-content/uploads/PC-Client-Specific-Platform-TPM-Profile-for-TPM-2-0-v43-150126.pdf
->
->> = TPM backend devices =
->>
->> The TPM implementation is split into two parts. The one part is the hardware
->> interface, such as the TPM TIS interface described earlier, and the TPM backend
->> interface. The backend interfaces implement the interaction with a TPM device,
->> which may be a physical or an emulated device. The split between the front-
->> and backend devices allows a frontend to be connected with any available
->> backend. This enables the TIS interface to be used with the passthrough backend
->> or the (future) swtpm backend.
-> So we will need another TPM interface that implements the CRB interface? I
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--k5CrtHTWCfr5tIJCKiGUtvkprsp60Vbll
+From: Eric Blake <eblake@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, Markus Armbruster <armbru@redhat.com>,
+ patches@linaro.org
+Message-ID: <024979b1-9a1a-0556-5138-480f8ed1a70e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] scripts/run-coverity-scan: Script to run
+ Coverity Scan build
+References: <1497369290-20401-1-git-send-email-peter.maydell@linaro.org>
+ <1497369290-20401-3-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1497369290-20401-3-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-No. How did you infer that ?
+On 06/13/2017 10:54 AM, Peter Maydell wrote:
+> Add a new script to automate the process of running the Coverity
+> Scan build tools and uploading the resulting tarball to the
+> website. This is primarily intended to be driven from Travis,
+> but it can be run locally (if you are a maintainer of the
+> QEMU project on the Coverity Scan website and have the secret
+> upload token).
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  scripts/run-coverity-scan | 170 ++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  1 file changed, 170 insertions(+)
+>  create mode 100755 scripts/run-coverity-scan
+>=20
+> diff --git a/scripts/run-coverity-scan b/scripts/run-coverity-scan
+> new file mode 100755
+> index 0000000..e6d5fc5
+> --- /dev/null
+> +++ b/scripts/run-coverity-scan
+> @@ -0,0 +1,170 @@
+> +#!/bin/sh -e
 
-> have a machine with the Intel PTT TPM2.0 (firmware-based implemented in ME)
-> that uses this CRB interface instead of TIS1.2 + cancel, so libvirt fails:
->
-> Error starting domain: internal error: No usable sysfs TPM cancel file could be found
->
-> Traceback (most recent call last):
->    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 88, in cb_wrapper
->      callback(asyncjob, *args, **kwargs)
->    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 124, in tmpcb
->      callback(*args, **kwargs)
->    File "/usr/share/virt-manager/virtManager/libvirtobject.py", line 83, in newfn
->      ret = fn(self, *args, **kwargs)
->    File "/usr/share/virt-manager/virtManager/domain.py", line 1479, in startup
->      self._backend.create()
->    File "/usr/lib64/python2.7/site-packages/libvirt.py", line 1039, in create
->      if ret == -1: raise libvirtError ('virDomainCreate() failed', dom=self)
-> libvirtError: internal error: No usable sysfs TPM cancel file could be found
->
-> The Linux kernel exposes either a TIS or CRB interface depending on what is
-> filled in the TPM2 ACPI table "Start Method" field as specified in "TCG ACPI
-> Specification Family 1.2 and 2.0 Version 1.2, Revision 8 February 27, 2017"
->
-> https://trustedcomputinggroup.org/wp-content/uploads/TCG_ACPIGeneralSpecification-Family-1.2-and-2.0-Ver1.2-Rev8_public-revie....pdf
->
-> Best regards,
+I'm not a fan of 'set -e'; it seldom does what you think it should do,
+especially when shell functions are involved.  It's better to be
+explicit about error handling than it is to rely on a crutch that has
+well-defined but non-intuitive behavior.
 
-This will require a patch to libvirt. In case the host has a TPM 2 the 
-cancel sysfs entry does not exist and we need to pass /dev/null instead. 
-I'll have a look at that.
+> +mkdir -p "$COVERITY_TOOL_BASE"
+> +cd "$COVERITY_TOOL_BASE"
+> +
+
+Of course, calls like these are where you have to either be explicit or
+rely on the 'set -e' crutch.
+
+Thankfully, I didn't see any bashisms, so you appeared to have stuck to
+portable /bin/sh code.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-    Stefan
+--k5CrtHTWCfr5tIJCKiGUtvkprsp60Vbll
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZVSb/AAoJEKeha0olJ0NqP4wIAKchw8mDJud9B6tgaSWhmquI
+PmuSJ0Sjykv6xsT+fC44n5C/Fw/Q0I0m2Op7Hbcxgx2ljLJQlKE/SznJ+6s7QIrk
+ZTb/mS9wKcllHMLxv/fgWneQ8HVVIbr7pYFsZJz/106pCOFQ1W8g/n3nqnub21mU
+3pF6xfXUFBdmv9rDy7sC8XB7q7A4R9eEmnh6/GHhoT6AUV4ApKGKE9p+o7Gj48Bt
+etvteaOI0nj+SeeBIlk5EIcnkX/fnmRRp49prsb8hSDZ6cDTN83mzNgAYe+uFjnC
+X4017xWmsZUJYtauDJvZD0tlnZ2xAfEK8G9lpsuYc2dU8pB1wXzl/9L2OMLdguI=
+=WRry
+-----END PGP SIGNATURE-----
+
+--k5CrtHTWCfr5tIJCKiGUtvkprsp60Vbll--
