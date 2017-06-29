@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dQTvY-00018q-Qf
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 03:31:49 -0400
+	(envelope-from <armbru@redhat.com>) id 1dQU2Z-0003Ho-0t
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 03:39:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dQTvU-0006Ly-TP
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 03:31:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59440)
+	(envelope-from <armbru@redhat.com>) id 1dQU2V-0000gu-0D
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 03:39:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47582)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dQTvU-0006Lp-NQ
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 03:31:44 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dQU2U-0000gb-R4
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 03:38:58 -0400
 From: Markus Armbruster <armbru@redhat.com>
-References: <cover.1498654240.git.maozy.fnst@cn.fujitsu.com>
-	<f268a317086c90e4d8e2547a084ec9b477fc6a04.1498654240.git.maozy.fnst@cn.fujitsu.com>
-	<20170628132745.GK29134@redhat.com>
-	<7d861d6c-fb0c-7a93-22bc-cc7dc814ddaf@cn.fujitsu.com>
-Date: Thu, 29 Jun 2017 09:31:41 +0200
-In-Reply-To: <7d861d6c-fb0c-7a93-22bc-cc7dc814ddaf@cn.fujitsu.com> (Mao
-	Zhongyi's message of "Thu, 29 Jun 2017 11:08:09 +0800")
-Message-ID: <878tkb2qsi.fsf@dusky.pond.sub.org>
+References: <cover.1498596157.git.alistair.francis@xilinx.com>
+	<4e1eded5cda7b182a8a4cb133b40b2915817b7d1.1498596157.git.alistair.francis@xilinx.com>
+	<20170628090448.GE29134@redhat.com>
+	<CAKmqyKNEgZPMdS5B4J09XVpDQt0LXw0YFbMdBa_fnBXmnndftA@mail.gmail.com>
+	<20170628161927.GQ29134@redhat.com>
+Date: Thu, 29 Jun 2017 09:38:55 +0200
+In-Reply-To: <20170628161927.GQ29134@redhat.com> (Daniel P. Berrange's message
+	of "Wed, 28 Jun 2017 17:19:27 +0100")
+Message-ID: <87r2y31bw0.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 4/4] net/socket: Improve -net socket
- error reporting
+Subject: Re: [Qemu-devel] [RFC v1 2/3] util/qemu-error: Add a
+ warning_report() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +31,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, jasowang@redhat.com, qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
+"Daniel P. Berrange" <berrange@redhat.com> writes:
 
-> Hi, Daniel
+> On Wed, Jun 28, 2017 at 09:16:45AM -0700, Alistair Francis wrote:
+>> On Wed, Jun 28, 2017 at 2:04 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
+>> > On Tue, Jun 27, 2017 at 01:45:45PM -0700, Alistair Francis wrote:
+>> >> Add a functino which can be used similarly to error_report() execpt to
+>> >> inform the users about warnings instead of errors.
+>> >>
+>> >> The warning print does not include the timestamp and instead will
+>> >> preface the messages with a 'warning: '.
+>> >
+>> > Not including the timestamp is a bug IMHO. If I've turned on timestamps,
+>> > I expect all messages to have the timestamp.
+>> 
+>> That's fine, I'm happy to add it back in. I just wasn't sure.
+>> 
+>> >
+>> > I'm not particularly convinced by adding the 'warning: ' prefix either,
+>> > particularly given the scenario you are using this in, is not actually
+>> > a warning - its just a informative message.
+>> 
+>> Maybe it makes more sense to add an extra argument to error_report()
+>> that can be used to specify error, warning or information. The same
+>> way qemu_log_mask() works. That was Edgar's idea in reply to one of
+>> the other patches.
+>> 
+>> Does that sound more useful?
 >
-> On 06/28/2017 09:27 PM, Daniel P. Berrange wrote:
->> On Wed, Jun 28, 2017 at 09:08:50PM +0800, Mao Zhongyi wrote:
->>> When -net socket fails, it first reports a specific error, then
->>> a generic one, like this:
->>>
->>>     $ qemu-system-x86_64 -net socket,
->>>     qemu-system-x86_64: -net socket: exactly one of fd=, listen=, connect=, mcast= or udp= is required
->>>     qemu-system-x86_64: -net socket: Device 'socket' could not be initialized
->>
->> This second line of error message comes from net/net.c in the
->> net_client_init1 method:
->>
->>         /* FIXME drop when all init functions store an Error */
->>         if (errp && !*errp) {
->>             error_setg(errp, QERR_DEVICE_INIT_FAILED,
->>                        NetClientDriver_lookup[netdev->type]);
->>         }
->>
->>
->> hopefully your patch could drop this code too ?
->>
->> In fact this is the only use of QERR_DEVICE_INIT_FAILED in the
->> whole tree, so the QERR constant could possibly be killed too.
->>
->
-> OK, I will. :)
+> I'd suggest renaming the current 'error_report' to 'message_report' and
+> making it take an extra arg that accepts a enum flag INFO | WARNING | ERROR.
+> Then add macros for  error_report, warning_report, info_report that call
+> message_report with the right enum.  That way you don't have to update any
+> of the existing code that calls error_report.
 
-You can do that only when *all* init functions stor an Error!  We're not
-there, yet:
-
-    $ grep 'FIXME error_setg' net/*
-    net/l2tpv3.c:    /* FIXME error_setg(errp, ...) on failure */
-    net/slirp.c:    /* FIXME error_setg(errp, ...) on failure */
-    net/socket.c:    /* FIXME error_setg(errp, ...) on failure */
-    net/tap-win32.c:    /* FIXME error_setg(errp, ...) on failure */
-    net/vde.c:    /* FIXME error_setg(errp, ...) on failure */
+*Functions*, please, not macros.  Macros would bloat the code for no
+benefit at all.
