@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dQexv-0000fN-9p
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 15:19:00 -0400
+	(envelope-from <eblake@redhat.com>) id 1dQf63-0004FF-Qr
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 15:27:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dQexq-0004fb-8P
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 15:18:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47100)
+	(envelope-from <eblake@redhat.com>) id 1dQf5z-0007W0-PD
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 15:27:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52580)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dQexp-0004fG-W1
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 15:18:54 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E194DBE028
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 19:18:52 +0000 (UTC)
-Date: Thu, 29 Jun 2017 16:18:49 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170629191849.GX12152@localhost.localdomain>
-References: <1498536619-14548-1-git-send-email-peterx@redhat.com>
-	<1498536619-14548-10-git-send-email-peterx@redhat.com>
-	<20170628190616.GN12152@localhost.localdomain>
-	<878tkb68en.fsf@secure.mitica>
-	<20170629030013.GB32268@pxdev.xzpeter.org>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dQf5z-0007Vk-GX
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 15:27:19 -0400
+References: <20170621153424.16690-1-vsementsov@virtuozzo.com>
+	<20170621153424.16690-3-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <695de534-7f65-c6cc-00ac-4d35e3eb6e7d@redhat.com>
+Date: Thu, 29 Jun 2017 14:27:13 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170629030013.GB32268@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH v6 09/10] migration: merge
- enforce_config_section somewhat
+In-Reply-To: <20170621153424.16690-3-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="tAWKPv0t6oP6UkCjPIXcqfKPU2W4ImBrU"
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] nbd/server: use errp instead of LOG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,91 +28,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org, Markus Armbruster <armbru@redhat.com>
 
-On Thu, Jun 29, 2017 at 11:00:13AM +0800, Peter Xu wrote:
-> On Thu, Jun 29, 2017 at 12:42:56AM +0200, Juan Quintela wrote:
-> > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > 
-> > >
-> > > So, this is a case where a user-provided config option (-machine
-> > > enforce-config-section) should trigger a different default in another
-> > > class (migration.send-configuration).
-> > >
-> > > Also, the new default triggered by -machine has a very specific
-> > > priority:
-> > >
-> > > * AccelClass::global_props must not override "-machine enforce-config-section=on"
-> > > * MachineClass::compat_props must not override
-> > >   "-machine enforce-config-section=on"
-> > >
-> > > We must also decide in advance what should be result of:
-> > > * "-machine enforce-config-section=on -global migration.send-configuration=off"
-> > > * "-machine enforce-config-section=off -global migration.send-configuration=on"
-> > > * "-global migration.send-configuration=off -machine enforce-config-section=off"
-> > > * "-global migration.send-configuration=on -machine enforce-config-section=on"
-> 
-> Yes, this is considered before this patch: currently
-> enforce-config-section will have the highest priority in case if
-> someone used both of the old & new parameters for it (considering
-> "enforce-config-section" has the word "enforce" inside, it makes some
-> sense). While...
-> 
-> > 
-> > BOOM!!!!!
-> > 
-> > We use old configuration or new one.
-> 
-> ... I agree more with Juan here, that user should not really specify
-> these two parameters at the same time. If the user knows the new
-> parameter, he/she should know that the new one is obsoleting the old
-> one. And since even for that case this patch can handle it well (will
-> take -M param), I think it's okay.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--tAWKPv0t6oP6UkCjPIXcqfKPU2W4ImBrU
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org,
+ Markus Armbruster <armbru@redhat.com>
+Message-ID: <695de534-7f65-c6cc-00ac-4d35e3eb6e7d@redhat.com>
+Subject: Re: [PATCH v2 2/6] nbd/server: use errp instead of LOG
+References: <20170621153424.16690-1-vsementsov@virtuozzo.com>
+ <20170621153424.16690-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20170621153424.16690-3-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-If that's the intended result, it's OK to me.  But I think the
-relationship between enforce-config-section and
-migration.send-configuration should be documented in qemu-options.hx.
-And considering that this could break silently in future code
-refactoring, an automated test would be interesting (but not critical,
-as setting options contradicting each other is not a common scenario).
+On 06/21/2017 10:34 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Move to modern errp scheme from just LOGging errors.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  nbd/server.c | 268 +++++++++++++++++++++++++++++++++++----------------=
+--------
+>  1 file changed, 161 insertions(+), 107 deletions(-)
+
+Unfortunately longer, but I'm okay with that (and we already did it
+client-side, so this is just a case of a patch series being spread out
+over time).
 
 
-> 
-> > 
-> > >
-> > > I'm not sure what we should decide about these 4 cases above, but I
-> > > believe it would be safer to encode that decision at the same place we
-> > > handle the priority between accel/machine/user globals:
-> > > register_global_properties() at vl.c.
-> > >
-> > >
-> > > Or maybe this extra complexity is a sign that we shouldn't try to add
-> > > extra magic to make -machine affect the "migration" object properties,
-> > > and keep the existing machine->enforce_config_section check in the
-> > > migration code?  I'm not sure.
-> > 
-> > Not sure there either.  I preffer doing it in a single place, but I am
-> > not the expert here.
-> 
-> IMHO it is not necessary to introduce such a thing in
-> register_global_properties(). AFAIU this is the only place where one
-> machine property can collapse with a global property? And it currently
-> only happens in migration codes. Actually it is well ordered, since we
-> init the migration object after register_global_properties(), so
-> everthing should possibly be fine. Introducing framework-level thing
-> for this may only make things more complicated imho.
+> =20
+>  /* Send an error reply.
+>   * Return -errno on error, 0 on success. */
+> -static int GCC_FMT_ATTR(4, 5)
+> +static int GCC_FMT_ATTR(5, 6)
+>  nbd_negotiate_send_rep_err(QIOChannel *ioc, uint32_t type,
+> -                           uint32_t opt, const char *fmt, ...)
+> +                           uint32_t opt, Error **errp, const char *fmt=
+, ...)
+>  {
 
-True.  Considering we need to keep the "overrides everything else"
-semantics of enforce-config-section, your approach is not bad.
+Markus, this violates our usual idiom of errp last in code that is not
+directly operating on an Error (the actual Error implementation in
+error.c being the main obvious exception that lists errp first), but I
+don't see any better approach. Do you have any thoughts on it?
 
-> 
-> After all we can remove all these one day when we can obsolete the
-> "enforce-config-section" parameter (maybe we should add one OBSOLETE
-> warning when the -M parameter is used).  Thanks,
+> -    if (nbd_read(client->ioc, name, length, NULL) < 0) {
+> -        LOG("read failed");
+> +    if (nbd_read(client->ioc, name, length, errp) < 0) {
+> +        error_prepend(errp, "read failed: ");
+>          return -EINVAL;
+>      }
 
-I don't think we need a warning, but a documentation update is
-important, IMO.
+I'm still not convinced we need quite as many error_prepend() calls (it
+may be simpler to just use the underlying error message as-is, without
+trying to prepend) - but deciding where it is fluff is a cleanup while
+this patch is all about a mechanical conversion, so I'm not going to
+hold up this patch while we solve that debate.
 
--- 
-Eduardo
+
+>      tioc =3D qio_channel_tls_new_server(ioc,
+>                                        client->tlscreds,
+>                                        client->tlsaclname,
+> -                                      NULL);
+> +                                      errp);
+
+Yay for wiring things up to no longer ignore original error messages.
+
+> @@ -352,14 +367,16 @@ static QIOChannel *nbd_negotiate_handle_starttls(=
+NBDClient *client,
+>  /* nbd_negotiate_options
+>   * Process all NBD_OPT_* client option commands.
+>   * Return:
+> - * -errno  on error
+> - * 0       on successful negotiation
+> - * 1       if client sent NBD_OPT_ABORT, i.e. on legal disconnect
+> + * -errno  on error, errp is set
+> + * 0       on successful negotiation, errp is not set
+> + * 1       if client sent NBD_OPT_ABORT, i.e. on legal disconnect,
+> + *         errp is not set
+
+You'll have some rebase churn based on my comments on 1/6 (where I
+suggested s/legal/valid/).  I'm not sure the change about documenting
+whether errp is set is even necessary (we have enough common usage of
+errp, that it is kind of easy to just assume that everyone knows errp is
+set only on negative return); but it doesn't hurt to keep it.
+
+> @@ -480,25 +497,33 @@ static int nbd_negotiate_options(NBDClient *clien=
+t)
+>                  /* NBD spec says we must try to reply before
+>                   * disconnecting, but that we must also tolerate
+>                   * guests that don't wait for our reply. */
+> -                nbd_negotiate_send_rep(client->ioc, NBD_REP_ACK, clien=
+tflags);
+> +                nbd_negotiate_send_rep(client->ioc, NBD_REP_ACK, clien=
+tflags,
+> +                                       &local_err);
+> +
+> +                if (local_err !=3D NULL) {
+> +                    TRACE("Reply to NBD_OPT_ABORT request failed: %s",=
+
+> +                          error_get_pretty(local_err));
+> +                    error_free(local_err);
+> +                }
+> +
+
+Not sure this is necessary.  I would have just used:
+
+nbd_negotiate_send_rep(client->ioc, NBD_REP_ACK, clientflags, NULL);
+
+and then you don't even need a local_err variable.
+
+
+> @@ -1089,6 +1121,7 @@ static coroutine_fn void nbd_trip(void *opaque)
+>      int ret;
+>      int flags;
+>      int reply_data_len =3D 0;
+> +    Error *local_err =3D NULL;
+> =20
+>      TRACE("Reading request.");
+>      if (client->closing) {
+> @@ -1097,7 +1130,7 @@ static coroutine_fn void nbd_trip(void *opaque)
+
+> @@ -1128,7 +1161,7 @@ static coroutine_fn void nbd_trip(void *opaque)
+>          if (request.flags & NBD_CMD_FLAG_FUA) {
+>              ret =3D blk_co_flush(exp->blk);
+>              if (ret < 0) {
+> -                LOG("flush failed");
+> +                error_setg_errno(&local_err, -ret, "flush failed");
+>                  reply.error =3D -ret;
+>                  break;
+>              }
+
+>  reply:
+> +    if (local_err) {
+> +        /* If we are here local_err is not fatal error, already stored=
+ in
+> +         * reply.error */
+> +        error_report_err(local_err);
+> +        local_err =3D NULL;
+> +    }
+
+So we still end up printing the error directly to stderr, the way LOG()
+used to do; but in light of the recent CVEs on 'qemu-nbd -t' not being
+robust to misbehaved clients, it does feel like the right thing (the
+server detecting an error does not mean that the server should quit,
+merely that it should log that a client is no longer connected).
+
+Overall the change looks good to me, but I'll wait to see if Markus has
+any design advice before giving my R-b.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--tAWKPv0t6oP6UkCjPIXcqfKPU2W4ImBrU
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZVVSRAAoJEKeha0olJ0NqRBsIALCM66tKkNgSQR+YgIWnvApd
+LXTPoZ3mMAVZ+z9qCGKU4qBltNPDensmGhdhFgupkePpt5Q/9sIMrj7+gH/VczfO
+++mGoFxYYZVrUP8RHLHHGwuKfQvnODPms7aIlWO6nir+Kq+k0cFG1tY70PKudL05
+BTCMyaA8TUNhHyzcPlEZ6EFNvRwY8CgDOAUup5AGkoDTR5CgBDrB6bl3YuEY873b
+Ta0QCn45l+mHpWrMGUtyz9SufquYGt5TUCOVH7UdaKjbFQ7WVQDwY3D06TO+tQ+F
+VcqnyFZNTWIXsY2O/JOItS3n7k6u68OIWJwkRlgKi0mCdgS8Wjkz2anO1EchOqE=
+=TORm
+-----END PGP SIGNATURE-----
+
+--tAWKPv0t6oP6UkCjPIXcqfKPU2W4ImBrU--
