@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1dQVlS-0002C8-Fx
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:29:31 -0400
+	(envelope-from <famz@redhat.com>) id 1dQVq7-00067s-TM
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:34:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1dQVlM-0001Xc-LP
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:29:30 -0400
-Received: from mel.act-europe.fr ([194.98.77.210]:43371
-	helo=smtp.eu.adacore.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
-	id 1dQVlM-0001Ws-Fl
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:29:24 -0400
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Date: Thu, 29 Jun 2017 11:28:53 +0200
-Message-Id: <1498728533-23160-4-git-send-email-frederic.konrad@adacore.com>
-In-Reply-To: <1498728533-23160-1-git-send-email-frederic.konrad@adacore.com>
-References: <1498728533-23160-1-git-send-email-frederic.konrad@adacore.com>
-Subject: [Qemu-devel] [PATCH v1 3/3] armv7m_systick: abort instead of
- locking on a bad rate
+	(envelope-from <famz@redhat.com>) id 1dQVq7-0004Vy-AL
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:34:19 -0400
+Date: Thu, 29 Jun 2017 17:34:09 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170629093409.GE28654@lemon.lan>
+References: <cover.1498607452.git.alistair.francis@xilinx.com>
+	<2c339ec0264c85f9c8a4884ffb8ebe059b3b9e4b.1498607452.git.alistair.francis@xilinx.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2c339ec0264c85f9c8a4884ffb8ebe059b3b9e4b.1498607452.git.alistair.francis@xilinx.com>
+Subject: Re: [Qemu-devel] [RFC v1 3/4] util/oslib-win32: Fix up if
+ conditional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,31 +24,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org, pbonzini@redhat.com, alistair@alistair23.me, frederic.konrad@adacore.com
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, alistair23@gmail.com, edgar.iglesias@xilinx.com, qemu-block@nongnu.org
 
-This helps the board developer by asserting that system_clock_rate is not
-null. Using systick with a zero rate will lead to a deadlock so better showing
-the error.
+On Tue, 06/27 16:57, Alistair Francis wrote:
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Acked-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> ---
+> 
+>  util/oslib-win32.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/util/oslib-win32.c b/util/oslib-win32.c
+> index 7ec0f8e083..a015e1ac96 100644
+> --- a/util/oslib-win32.c
+> +++ b/util/oslib-win32.c
+> @@ -438,7 +438,7 @@ static int poll_rest(gboolean poll_msgs, HANDLE *handles, gint nhandles,
+>          if (timeout == 0 && nhandles > 1) {
+>              /* Remove the handle that fired */
+>              int i;
+> -            if (ready < nhandles - 1) {
+> +            if ((ready - WAIT_OBJECT_0) < nhandles - 1) {
+>                  for (i = ready - WAIT_OBJECT_0 + 1; i < nhandles; i++) {
+>                      handles[i-1] = handles[i];
+>                  }
+> -- 
+> 2.11.0
+> 
 
-Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
----
- hw/timer/armv7m_systick.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/hw/timer/armv7m_systick.c b/hw/timer/armv7m_systick.c
-index df8d280..745efb7 100644
---- a/hw/timer/armv7m_systick.c
-+++ b/hw/timer/armv7m_systick.c
-@@ -54,6 +54,9 @@ static void systick_reload(SysTickState *s, int reset)
-         s->tick = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-     }
-     s->tick += (s->reload + 1) * systick_scale(s);
-+
-+    /* system_clock_scale = 0 leads to a nasty deadlock, better aborting */
-+    assert(systick_scale(s));
-     timer_mod(s->timer, s->tick);
- }
- 
--- 
-1.8.3.1
+Reviewed-by: Fam Zheng <famz@redhat.com>
