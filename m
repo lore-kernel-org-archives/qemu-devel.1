@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dQXiG-0006yd-Co
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:34:21 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dQXm1-0007jL-Tz
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:38:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dQXiD-0004aL-6C
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:34:20 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <f55056ef-6da8-09d3-a11a-0c97c3fc21ca@redhat.com>
-References: <1498661881-9605-1-git-send-email-kchamart@redhat.com>
-	<1498661881-9605-2-git-send-email-kchamart@redhat.com>
-	<w51fuejq36o.fsf@maestria.local.igalia.com>
-	<f55056ef-6da8-09d3-a11a-0c97c3fc21ca@redhat.com>
-Date: Thu, 29 Jun 2017 13:34:11 +0200
-Message-ID: <w51mv8r58p8.fsf@maestria.local.igalia.com>
+	(envelope-from <dgilbert@redhat.com>) id 1dQXly-0006H8-Nl
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:38:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55930)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dQXly-0006G7-ER
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 07:38:10 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5586FF1D99
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 11:38:08 +0000 (UTC)
+Date: Thu, 29 Jun 2017 12:37:59 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170629113759.GE2894@work-vm>
+References: <20170628095228.4661-1-quintela@redhat.com>
+	<20170628095228.4661-4-quintela@redhat.com>
+	<20170628111504.GC2130@work-vm> <87d19o5njl.fsf@secure.mitica>
+	<20170629103857.GD2894@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v4 1/2] live-block-ops.txt:
- Rename, rewrite, and improve it
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170629103857.GD2894@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v4 3/5] migration: Create
+ load_setup()/cleanup() methods
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,98 +36,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, stephen@that.guru, armbru@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, kwolf@redhat.com
 
-On Wed 28 Jun 2017 10:33:49 PM CEST, Eric Blake wrote:
->>> +Disk image backing chain notation
->>> +---------------------------------
->>   [...]
->>> +.. important::
->>> +    The base disk image can be raw format; however, all the overlay
->>> +    files must be of QCOW2 format.
->> 
->> This is not quite like that: overlay files must be in a format that
->> supports backing files. QCOW2 is the most common one, but there are
->> others (qed). Grep for 'supports_backing' in the source code.
->
-> At the same time, other image formats are not as frequently tested, or
-> may be read-only.  Maybe a compromise of "The overlay files can
-> generally be any format that supports a backing file, although qcow2
-> is the preferred format and the one used in this document".
+* Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
+> * Juan Quintela (quintela@redhat.com) wrote:
+> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > > * Juan Quintela (quintela@redhat.com) wrote:
+> > >> We need to do things at load time and at cleanup time.
+> > >> 
+> > >> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> > >> 
+> > >> --
+> > >> 
+> > >> Move the printing of the error message so we can print the device
+> > >> giving the error.
+> > >> Add call to postcopy stuff
+> > >> ---
+> > >>  include/migration/register.h |  2 ++
+> > >>  migration/savevm.c           | 45 +++++++++++++++++++++++++++++++++++++++++++-
+> > >>  migration/savevm.h           |  1 +
+> > >>  migration/trace-events       |  2 ++
+> > >>  4 files changed, 49 insertions(+), 1 deletion(-)
+> > >> 
+> > >> diff --git a/include/migration/register.h b/include/migration/register.h
+> > >> index 938ea2b..a0f1edd 100644
+> > >> --- a/include/migration/register.h
+> > >> +++ b/include/migration/register.h
+> > >> @@ -39,6 +39,8 @@ typedef struct SaveVMHandlers {
+> > >>                                uint64_t *non_postcopiable_pending,
+> > >>                                uint64_t *postcopiable_pending);
+> > >>      LoadStateHandler *load_state;
+> > >> +    int (*load_setup)(QEMUFile *f, void *opaque);
+> > >> +    int (*load_cleanup)(void *opaque);
+> > >>  } SaveVMHandlers;
+> > >>  
+> > >>  int register_savevm_live(DeviceState *dev,
+> > >> diff --git a/migration/savevm.c b/migration/savevm.c
+> > >> index fee11c5..fdd15fa 100644
+> > >> --- a/migration/savevm.c
+> > >> +++ b/migration/savevm.c
+> > >> @@ -1541,7 +1541,7 @@ static void *postcopy_ram_listen_thread(void *opaque)
+> > >>       * got a bad migration state).
+> > >>       */
+> > >>      migration_incoming_state_destroy();
+> > >> -
+> > >> +    qemu_loadvm_state_cleanup();
+> > >
+> > > Is that order right? It seems wrong to call the cleanup
+> > > code after MIS is destroyed.
+> > > (The precopy path seems to call mis_destroy at the end of
+> > > process_incoming_migration_bh which is much later).
+> > 
+> > we can do either way, for now it don't matters.
+> > 
+> > Once there, it got me thinking that we are doing things in a very
+> > "interesting" way on the incoming side:
+> > 
+> > (postcopy)
+> > 
+> > postcopy_ram_incoming_cleanup()
+> > migration_incoming_state_destroy()
+> > qemu_loadvm_state_cleanup()
+> > 
+> > (Ok, probably it is better to exchange the last two).
+> > 
+> > But I *think* that we should move the postcopy_ram_incoming_cleanup()
+> > inside ram_load_cleanup(), no?
+> 
+> postcopy_ram_incoming_cleanup shuts down a thread that's shared across
+> all RAMBlock's, so I don't think it can all be merged into
+> ram_load_cleanup.   You might be able to do the equivalent of the
+> cleanup_range function.
 
-That sounds good.
+Actually that's wrong, we only call ram_load_cleanup once - because
+RAM is special and is only register_savevm_live once, not per device.
 
->>> +(2) ``block-commit``: Live merge of data from overlay files into backing
->>> +    files (with the optional goal of removing the overlay file from the
->>> +    chain).  Since QEMU 2.0, this includes "active ``block-commit``"
->>> +    (i.e.  merge the current active layer into the base image).
->> 
->> Same question about the 'optional' here.
->
-> Here, optional is a bit more correct. With non-active (intermediate)
-> commit, qemu ALWAYS rewrites the backing chain to be shorter; but with
-> live commit, you can chose whether to pivot to the now-shorter chain
-> (job-complete) or whether to keep the active image intact (starting to
-> collect a new delta from the point-in-time of the just-completed
-> commit, by job-cancel).
+So yes you probably can do that.
 
-That's correct, I think in this case we can probably leave it as it is
-now.
+Dave
 
->>> +writing to it.  (The rule of thumb is: live QEMU will always be
->>> pointing +to the right-most image in a disk image chain.)
->> 
->> I think it's 'rightmost', without the hyphen.
->
-> Sadly, I think this is one case where both spellings work to a native
-> reader, and where I don't know of a specific style-guide preference.
-> I probably would have written with the hyphen.
-
-Ah, I didn't know! :-)
-
->>> +(3) Intermediate streaming (available since QEMU 2.8): Starting
->>> afresh + with the original example disk image chain, with a total of
->>> four + images, it is possible to copy contents from image [B] into
->>> image + [C].  Once the copy is finished, image [B] can now be
->>> (optionally) + discarded; and the backing file pointer of image [C]
->>> will be + adjusted to point to [A].
->> 
->> The 'optional' usage again. [B] will be removed from the chain and
->> can be (optionally) removed from the disk, but that you have to do
->> yourself, QEMU won't do that.
->
-> Indeed, we may need to be specifically clear of the cases where qemu
-> shortens the chain, but where disk images that are no longer used by
-> the chain (whether they are still viable [as in stream], or
-> invalidated [as in commit crossing more than one element of the
-> chain]) are still left on the disk for the user to discard separately
-> from qemu.
-
-Yes, I think that should be clarified. The distinction between valid and
-invalid images is also an important one, although it's already mentioned
-in the document.
-
->>> +    (QEMU) block-commit device=node-D base=a.qcow2 top=d.qcow2 job-id=job0
->>> +    {
->>> +        "execute": "block-commit",
->>> +        "arguments": {
->>> +            "device": "node-D",
->>> +            "job-id": "job0",
->>> +            "top": "d.qcow2",
->>> +            "base": "a.qcow2"
->>> +        }
->>> +    }
->> 
->> This is correct, but I don't know if it's worth mentioning that if
->> you omit the 'top' parameter it defaults to the active layer (node-D
->> in this example).
->
-> I think it's better to be explicit in the examples (always provide all
-> parameters, even if what you provide would also be the default when
-> omitted), and then maybe the prose can mention which parameters have
-> defaults.
-
-Sounds good to me.
-
-Berto
+> > And we don't have a postcopy_ram_incoming_setup() We could put there the
+> > mmap of mis->postcopy_tmp_zero_page and mis->largest_page_size, no?
+> 
+> Again that's a single shared zero page, not per RAMBlock.
+> 
+> > I am trying to understand if the postcopy_ram_incoming_init() can be
+> > moved soon, but I think no.
+> 
+> Dave
+> 
+> > 
+> > Later, Juan.
+> > 
+> > 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
