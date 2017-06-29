@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dQZQN-000208-FJ
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:24:00 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dQZTA-0004rI-Hf
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:26:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dQZQM-0007ti-Kl
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:23:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55642)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dQZQM-0007tB-G9
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:23:58 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 95341C058EA5
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 13:23:57 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 29 Jun 2017 15:23:10 +0200
-Message-Id: <20170629132310.18865-8-marcandre.lureau@redhat.com>
-In-Reply-To: <20170629132310.18865-1-marcandre.lureau@redhat.com>
-References: <20170629132310.18865-1-marcandre.lureau@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1dQZT7-0000fq-EE
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:26:52 -0400
+Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:34033)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dQZT7-0000ek-7J
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:26:49 -0400
+Received: by mail-wr0-x229.google.com with SMTP id 77so189569519wrb.1
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 06:26:47 -0700 (PDT)
+References: <20170621154244.28309-1-alex.bennee@linaro.org>
+	<20170621154244.28309-3-alex.bennee@linaro.org>
+	<42ab61f5-47f3-030d-264b-78d3f11d8e20@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <42ab61f5-47f3-030d-264b-78d3f11d8e20@amsat.org>
+Date: Thu, 29 Jun 2017 14:27:39 +0100
+Message-ID: <87lgoax6t0.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 7/7] MAINTAINERS: add Dump maintainers
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RISU PATCH v6 02/10] build-all-archs: support
+ cross building via docker
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,33 +32,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, anderson@redhat.com, berrange@redhat.com, ehabkost@redhat.com, lersek@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-Proposing myself, since I have some familiarity with the code now.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- MAINTAINERS | 7 +++++++
- 1 file changed, 7 insertions(+)
+Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 839f7ca063..45a0eb4cb0 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1272,6 +1272,13 @@ S: Maintained
- F: device_tree.c
- F: include/sysemu/device_tree.h
-=20
-+Dump
-+S: Supported
-+M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-+F: dump.c
-+F: include/sysemu/dump.h
-+F: include/sysemu/dump-arch.h
-+
- Error reporting
- M: Markus Armbruster <armbru@redhat.com>
- S: Supported
---=20
-2.13.1.395.gf7b71de06
+> Hi Alex,
+>
+> On 06/21/2017 12:42 PM, Alex Bennée wrote:> By default we use the QEMU
+> projects qemu:debian-FOO-cross images as
+>> RISU hackers are likely to be QEMU developers too. However any docker
+>> tag can be passed on the command line.
+>
+> Any thought about starting to push images?
+
+I think it comes down to how much we trust Docker Hub and how much we
+trust whoever does the pushing. Would it be an automatic thing? From
+shippable?
+
+--
+Alex Bennée
