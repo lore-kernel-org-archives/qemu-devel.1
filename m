@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dQPol-00015U-73
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:08:32 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dQQ4e-0005AN-Qt
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:24:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dQPoi-0001du-0C
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:08:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35588)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dQPoh-0001db-Px
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:08:27 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 979C1C05B1E6
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 03:08:26 +0000 (UTC)
-Date: Thu, 29 Jun 2017 11:08:21 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170629030821.GC32268@pxdev.xzpeter.org>
-References: <1498536619-14548-1-git-send-email-peterx@redhat.com>
-	<1498634144-26508-1-git-send-email-peterx@redhat.com>
-	<20170628153704.GF12152@localhost.localdomain>
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dQQ4b-0005WH-Lp
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:24:56 -0400
+Received: from [59.151.112.132] (port=10917 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dQQ4b-0005VC-91
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:24:53 -0400
+References: <cover.1498654240.git.maozy.fnst@cn.fujitsu.com>
+	<d9660b46628b52aa8c63c21fe20618b5bc33bb4c.1498654240.git.maozy.fnst@cn.fujitsu.com>
+	<20170628131852.GH29134@redhat.com>
+	<66fab3ea-5033-851c-ec8e-5740c7108ab7@redhat.com>
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Message-ID: <5183dcbe-9320-f03b-0e45-97e1b6799997@cn.fujitsu.com>
+Date: Thu, 29 Jun 2017 11:24:39 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170628153704.GF12152@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v6 11/10] migration: add comment for
- TYPE_MIGRATE
+In-Reply-To: <66fab3ea-5033-851c-ec8e-5740c7108ab7@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 1/4] net/socket: Don't treat odd socket
+ type as SOCK_STREAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,59 +30,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, eblake@redhat.com, armbru@redhat.com, quintela@redhat.com, dgilbert@redhat.com
+To: Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: jasowang@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
 
-On Wed, Jun 28, 2017 at 12:37:04PM -0300, Eduardo Habkost wrote:
-> On Wed, Jun 28, 2017 at 03:15:44PM +0800, Peter Xu wrote:
-> > It'll be strange that the migration object inherits TYPE_DEVICE. Add
-> > some explanations to it.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  migration/migration.c | 8 ++++++++
-> >  1 file changed, 8 insertions(+)
-> > 
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index b1b0825..2398a9d 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -2046,6 +2046,14 @@ static void migration_instance_init(Object *obj)
-> >  
-> >  static const TypeInfo migration_type = {
-> >      .name = TYPE_MIGRATION,
-> > +    /*
-> > +     * NOTE: "migration" itself is not really a device. We used
-> 
-> I suggest extending this as:
-> 
->   TYPE_MIGRATION is not really a device, as the object is not created
->   using qdev_create(), it is not attached to the qdev device tree, and
->   it is never realized.
-> 
-> 
-> > +     * TYPE_DEVICE here only to leverage some existing QDev features
-> > +     * like "-global" properties, and HW_COMPAT_* fields (which are
-> > +     * finally applied as global properties as well). If one day the
-> > +     * global property feature can be migrated from QDev to QObject in
-> > +     * general, then we can switch to QObject as well.
-> > +     */
-> 
-> QOM objects (qom/object.h) are not QObject (qapi/qmp/qobject.h).  People
-> often confuse them with each other.  (It probably doesn't help that both
-> are described as "QEMU Object Model" at their headers.)
+Hi, Eric
 
-Indeed. Sorry I got confused.
+On 06/28/2017 10:23 PM, Eric Blake wrote:
+> On 06/28/2017 08:18 AM, Daniel P. Berrange wrote:
+>> On Wed, Jun 28, 2017 at 09:08:47PM +0800, Mao Zhongyi wrote:
+>>> In net_socket_fd_init(), the 'default' case is odd: it warns,
+>>> then continues as if the socket type was SOCK_STREAM. The
+>>> comment explains "this could be a eg. a pty", but that makes
+>>> no sense. If @fd really was a pty, getsockopt() would fail
+>>> with ENOTSOCK. If @fd was a socket, but neither SOCK_DGRAM nor
+>>> SOCK_STREAM. It should not be treated as if it was SOCK_STREAM.
+>>>
+>>> Turn this case into an Error. If there is a genuine reason to
+>>> support something like SOCK_RAW, it should be explicitly
+>>> handled.
+>>>
+>
+>>>      default:
+>>> -        /* who knows ... this could be a eg. a pty, do warn and continue as stream */
+>>> -        fprintf(stderr, "qemu: warning: socket type=%d for fd=%d is not SOCK_DGRAM or SOCK_STREAM\n", so_type, fd);
+>>> -        return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
+>>> +        error_report("qemu: error: socket type=%d for fd=%d is not"
+>>> +                " SOCK_DGRAM or SOCK_STREAM", so_type, fd);
+>>
+>> Please drop the 'qemu: error: ' prefix on the message
+>>
+>> Also, rather than 'is not' I suggest 'must be either'
+>
+> Indentation is also off; we prefer that the second line starts right
+> after the ( of the first line, as in:
+>
+> error_report("part 1"
+>              "part 2")
 
-> 
-> I suggest rewriting it as:
-> 
->   If one day we allow non-device QOM objects to use the global property
->   system, we can switch this from TYPE_DEVICE to TYPE_OBJECT."
+OK, I will. :)
 
-For the comment for this patch (and patch 10 on "properties" and
-"globals"), I both agree. Again, I'll see what's the best way to fix
-them.  Thanks,
+Thanks,
+Mao
 
--- 
-Peter Xu
+>
+>
