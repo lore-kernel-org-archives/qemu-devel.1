@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dQPgw-0007ab-F1
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:00:27 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dQPhv-00085f-B3
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:01:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dQPgs-0004tb-J3
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:00:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56138)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dQPgs-0004tE-BS
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:00:22 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 24E65C057EC9
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 03:00:21 +0000 (UTC)
-Date: Thu, 29 Jun 2017 11:00:13 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170629030013.GB32268@pxdev.xzpeter.org>
-References: <1498536619-14548-1-git-send-email-peterx@redhat.com>
-	<1498536619-14548-10-git-send-email-peterx@redhat.com>
-	<20170628190616.GN12152@localhost.localdomain>
-	<878tkb68en.fsf@secure.mitica>
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dQPhr-00060n-B0
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:01:27 -0400
+Received: from [59.151.112.132] (port=21828 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dQPhq-0005ut-Vg
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:01:23 -0400
+References: <cover.1498654240.git.maozy.fnst@cn.fujitsu.com>
+	<d7c1b8ff9247a09e54110abe6abe93543d59b8b6.1498654240.git.maozy.fnst@cn.fujitsu.com>
+	<20170628132329.GJ29134@redhat.com>
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Message-ID: <feaa0851-6b5b-8980-7981-c5db74e2f94b@cn.fujitsu.com>
+Date: Thu, 29 Jun 2017 11:01:04 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <878tkb68en.fsf@secure.mitica>
-Subject: Re: [Qemu-devel] [PATCH v6 09/10] migration: merge
- enforce_config_section somewhat
+In-Reply-To: <20170628132329.GJ29134@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 3/4] net/net: Convert parse_host_port()
+ to Error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,74 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, kraxel@redhat.com, pbonzini@redhat.com, jasowang@redhat.com, armbru@redhat.com
 
-On Thu, Jun 29, 2017 at 12:42:56AM +0200, Juan Quintela wrote:
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
-> 
-> >
-> > So, this is a case where a user-provided config option (-machine
-> > enforce-config-section) should trigger a different default in another
-> > class (migration.send-configuration).
-> >
-> > Also, the new default triggered by -machine has a very specific
-> > priority:
-> >
-> > * AccelClass::global_props must not override "-machine enforce-config-section=on"
-> > * MachineClass::compat_props must not override
-> >   "-machine enforce-config-section=on"
-> >
-> > We must also decide in advance what should be result of:
-> > * "-machine enforce-config-section=on -global migration.send-configuration=off"
-> > * "-machine enforce-config-section=off -global migration.send-configuration=on"
-> > * "-global migration.send-configuration=off -machine enforce-config-section=off"
-> > * "-global migration.send-configuration=on -machine enforce-config-section=on"
+Hi, Daniel
 
-Yes, this is considered before this patch: currently
-enforce-config-section will have the highest priority in case if
-someone used both of the old & new parameters for it (considering
-"enforce-config-section" has the word "enforce" inside, it makes some
-sense). While...
+On 06/28/2017 09:23 PM, Daniel P. Berrange wrote:
+> On Wed, Jun 28, 2017 at 09:08:49PM +0800, Mao Zhongyi wrote:
+>> diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
+>> index 5c326db..78e2b30 100644
+>> --- a/include/qemu/sockets.h
+>> +++ b/include/qemu/sockets.h
+>
+>>          if (qemu_isdigit(buf[0])) {
+>> -            if (!inet_aton(buf, &saddr->sin_addr))
+>> +            if (!inet_aton(buf, &saddr->sin_addr)) {
+>> +                error_setg(errp, "host address '%s' is not a valid "
+>> +                           "IPv4 address", buf);
+>>                  return -1;
+>> +            }
+>>          } else {
+>> -            if ((he = gethostbyname(buf)) == NULL)
+>> +            he = gethostbyname(buf);
+>> +            if (he == NULL) {
+>> +                error_setg(errp, "can't resolve host address '%s': "
+>> +                           "unknown host", buf);
+>>                  return - 1;
+>> +            }
+>
+> gethostbyname sets  'h_errno' on failure, so you should pass that
+> into error_setg_errno, instead of hardcoding 'unknown host' as a
+> message
 
-> 
-> BOOM!!!!!
-> 
-> We use old configuration or new one.
+Yes, 'h_errno' will be seted detailed error message when gethostbyname() failed,
+but the value of 'h_errno', as far as I know, can be print by hstrerror(),
+herror() and gai_strerror(). I'm not sure 'h_errno' can be parsed correctly
+by error_setg_errno(), so I test it like this:
 
-... I agree more with Juan here, that user should not really specify
-these two parameters at the same time. If the user knows the new
-parameter, he/she should know that the new one is obsoleting the old
-one. And since even for that case this patch can handle it well (will
-take -M param), I think it's okay.
+herror("----herror----");
+error_report("----hstrerror----%s", hstrerror(h_errno));
+error_report("----gai_strerror----%s", gai_strerror(h_errno));
+error_setg_errno(errp, h_errno, "can't resolve host address '%s'" ,buf);
 
-> 
-> >
-> > I'm not sure what we should decide about these 4 cases above, but I
-> > believe it would be safer to encode that decision at the same place we
-> > handle the priority between accel/machine/user globals:
-> > register_global_properties() at vl.c.
-> >
-> >
-> > Or maybe this extra complexity is a sign that we shouldn't try to add
-> > extra magic to make -machine affect the "migration" object properties,
-> > and keep the existing machine->enforce_config_section check in the
-> > migration code?  I'm not sure.
-> 
-> Not sure there either.  I preffer doing it in a single place, but I am
-> not the expert here.
 
-IMHO it is not necessary to introduce such a thing in
-register_global_properties(). AFAIU this is the only place where one
-machine property can collapse with a global property? And it currently
-only happens in migration codes. Actually it is well ordered, since we
-init the migration object after register_global_properties(), so
-everthing should possibly be fine. Introducing framework-level thing
-for this may only make things more complicated imho.
+result:
 
-After all we can remove all these one day when we can obsolete the
-"enforce-config-section" parameter (maybe we should add one OBSOLETE
-warning when the -M parameter is used).  Thanks,
+----herror----: Unknown host
+qemu-system-x86_64: -net socket,listen=hostname:: ----hstrerror----Unknown host
+qemu-system-x86_64: -net socket,listen=hostname:: ----gai_strerror----Unknown error
+qemu-system-x86_64: -net socket,listen=hostname:: can't resolve host address 'hostname': Operation not permitted
 
--- 
-Peter Xu
+
+ From the results, obviously the error message is different.
+error_setg_errno() prints a uncertain message like "Operation not
+permitted", I think that the value of 'h_errno' is treated as a
+standard error code for errno. Although they have the same value,
+the information contained may not be same.
+
+so is it really appropriate to pass 'h_errno' to error_setg_errno()?
+
+Thanks,
+Mao
+
+
+> Regards,
+> Daniel
+>
