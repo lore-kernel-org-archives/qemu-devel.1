@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dQdng-00048C-8t
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 14:04:21 -0400
+	(envelope-from <eblake@redhat.com>) id 1dQdqV-00064K-6S
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 14:07:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dQdnd-0002iG-4Q
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 14:04:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44284)
+	(envelope-from <eblake@redhat.com>) id 1dQdqS-0004A6-0Z
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 14:07:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44766)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dQdnc-0002hg-R6
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 14:04:17 -0400
-Date: Thu, 29 Jun 2017 19:04:10 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170629180410.GJ32167@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170613165313.20954-1-ehabkost@redhat.com>
-	<87o9t8qy7d.fsf@dusky.pond.sub.org>
-	<6fac3c3d-9cf8-cb79-0141-908fe8160a5b@redhat.com>
-	<20170629141805.GG32167@redhat.com>
-	<20170629170939.GU12152@localhost.localdomain>
-	<20170629173850.GI32167@redhat.com>
-	<20170629174734.GV12152@localhost.localdomain>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dQdqR-00049e-OM
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 14:07:11 -0400
+References: <1498759215-25382-1-git-send-email-stefanb@linux.vnet.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <52874c12-d5ff-518e-a796-3f8de2714fca@redhat.com>
+Date: Thu, 29 Jun 2017 13:07:05 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170629174734.GV12152@localhost.localdomain>
-Subject: Re: [Qemu-devel] [RFC 00/15] Error API: Flag errors in *errp even
- if errors are being ignored
+In-Reply-To: <1498759215-25382-1-git-send-email-stefanb@linux.vnet.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ggnmJflttxgW7E4FUKh3PaxXlXoGA3auQ"
+Subject: Re: [Qemu-devel] [PATCH] specs: Describe the TPM support in QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,62 +27,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: lersek@redhat.com, javierm@redhat.com
 
-On Thu, Jun 29, 2017 at 02:47:34PM -0300, Eduardo Habkost wrote:
-> On Thu, Jun 29, 2017 at 06:38:50PM +0100, Daniel P. Berrange wrote:
-> > On Thu, Jun 29, 2017 at 02:09:39PM -0300, Eduardo Habkost wrote:
-> > > On Thu, Jun 29, 2017 at 03:18:05PM +0100, Daniel P. Berrange wrote:
-> > > > On Thu, Jun 29, 2017 at 03:39:58PM +0200, Paolo Bonzini wrote:
-> > > > > On 28/06/2017 11:05, Markus Armbruster wrote:
-> > > > > > If foo() additionally returned an indication of success, you could write
-> > > > > > 
-> > > > > >       if (!foo(arg, errp)) {    // assuming foo() returns a bool
-> > > > > >           handle the error...
-> > > > > >       }
-> > > > > > 
-> > > > > > Nicely concise.
-> > > > > > 
-> > > > > > For what it's worth, this is how GLib wants GError to be used.  We
-> > > > > > deviated from it, and it has turned out to be a self-inflicted wound.
-> > > > > > 
-> > > > > 
-> > > > > I find Eduardo's proposal better.  With GLib's way it's easy to confuse
-> > > > > functions that return 0/-1, 0/-errno, TRUE/FALSE, FALSE/TRUE or
-> > > > > NULL/non-NULL.
-> > > > 
-> > > > NB, glib basically standardizes on just FALSE/TRUE and NULL/non-NULL,
-> > > > avoiding anything returning -1, or errno values, so in their usage
-> > > > there isn't really any confusion.
-> > > > 
-> > > > QEMU of course has lots of pre-existing code, but we could at least
-> > > > declare a preferred approach, and work towards it.
-> > > > 
-> > > > Having the return value indicate error is slightly shorter, and it
-> > > > avoids all the blackmagic with special Error values in Eduardo's
-> > > > series. Most usefully, it lets you use __attribute__(return_check)
-> > > > to get compile time checking of callers who forget to check for
-> > > > failure.
-> > > 
-> > > I agree it's better when the return value is obvious, but I still think
-> > > the Error value magic in IGNORE_ERRORS/ERR_IS_SET is preferable to the
-> > > existing 700+ error_propagate() calls in the tree.
-> > 
-> > Both approaches would let us kill the error_propagate() calls. I think
-> > we're all agreed those would be better off gone, no matter which
-> > approach is used.
-> 
-> Changing the return value of the 1500+ void functions that return errors
-> will take a very long while.  I would like to get rid of the
-> error_propagate() calls before that, even if the long term plan is to
-> eventually get rid of ERR_IS_SET.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ggnmJflttxgW7E4FUKh3PaxXlXoGA3auQ
+From: Eric Blake <eblake@redhat.com>
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: lersek@redhat.com, javierm@redhat.com
+Message-ID: <52874c12-d5ff-518e-a796-3f8de2714fca@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] specs: Describe the TPM support in QEMU
+References: <1498759215-25382-1-git-send-email-stefanb@linux.vnet.ibm.com>
+In-Reply-To: <1498759215-25382-1-git-send-email-stefanb@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Ah, I see what you mean, that's fine.
+On 06/29/2017 01:00 PM, Stefan Berger wrote:
+> This patch adds a description of the current TPM support in QEMU
+> to the specs.
+>=20
+> Several public specs are referenced via their landing page on the
+> trustedcomputinggroup.org website.
+>=20
+> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> ---
+>  docs/specs/tpm.txt | 98 ++++++++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  1 file changed, 98 insertions(+)
+>  create mode 100644 docs/specs/tpm.txt
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> +
+> +QEMU files related to TPM TIS interfaceL
+
+s/interfaceL/interface:/
+
+
+> +
+> +Since the host's TPM device will already be initialize by the host's f=
+irmware,
+
+s/initialize/initialized/
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--ggnmJflttxgW7E4FUKh3PaxXlXoGA3auQ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZVUHJAAoJEKeha0olJ0NqJoUIAJLLOkt2JTR4rzUDYPKvkNf9
+jN6BZGZ7h5rsUA9HmuNME0wrY4ObZdES9jTDJNFHaOAyGhmpOIZGV7nwF6dvPU9H
+yR8JURnUjp54OYju5OJ2WWkKvBLTeg86NdAdOK6wdfKCmgjWXB5fzzyTbJo95kK+
+Hz05pndUzTOQehcff48+nw42qqdKPYbQQXHUtA4Dtzc31r/r6v7ylmhuqSDzucrG
+F/cmqzzQ8MY9eXqVp8qapII0lQ1Lf+di1zJAheQ+L63H2GVWr8V/qXkNEHbLOxcR
+Ou/x5qGTkYU+HYmuK5p5AzOnAIMrUCaMJRH34pDAU6L769Z6G47QfteuhjWo3FU=
+=Jp0x
+-----END PGP SIGNATURE-----
+
+--ggnmJflttxgW7E4FUKh3PaxXlXoGA3auQ--
