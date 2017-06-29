@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dQZjM-0002hz-5Y
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:43:37 -0400
+	(envelope-from <groug@kaod.org>) id 1dQZjv-00034B-S2
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:44:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dQZjL-0002ZQ-9J
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:43:36 -0400
-Received: from mail-io0-x230.google.com ([2607:f8b0:4001:c06::230]:35482)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dQZjL-0002Yx-5I
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:43:35 -0400
-Received: by mail-io0-x230.google.com with SMTP id h134so7119364iof.2
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 06:43:35 -0700 (PDT)
+	(envelope-from <groug@kaod.org>) id 1dQZjq-0002pa-W9
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:44:11 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44827)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dQZjq-0002pI-MX
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:44:06 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v5TDcoME027739
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 09:44:05 -0400
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bcy9qs6t3-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 09:44:04 -0400
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Thu, 29 Jun 2017 14:44:01 +0100
+From: Greg Kurz <groug@kaod.org>
+Date: Thu, 29 Jun 2017 15:43:43 +0200
 MIME-Version: 1.0
-Sender: philippe.mathieu.daude@gmail.com
-In-Reply-To: <87lgoax6t0.fsf@linaro.org>
-References: <20170621154244.28309-1-alex.bennee@linaro.org>
-	<20170621154244.28309-3-alex.bennee@linaro.org>
-	<42ab61f5-47f3-030d-264b-78d3f11d8e20@amsat.org>
-	<87lgoax6t0.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 29 Jun 2017 10:43:32 -0300
-Message-ID: <CAAdtpL4CTYBOvrxp4SD+oTn_cE=z=ickg0NJ_qNu5fy2Xey3tg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <1498743831-28676-1-git-send-email-groug@kaod.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RISU PATCH v6 02/10] build-all-archs: support
- cross building via docker
+Subject: [Qemu-devel] [PULL 0/8] 9pfs patches for 2.10 20170629
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,28 +37,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
 
-On Thu, Jun 29, 2017 at 10:27 AM, Alex Benn=C3=A9e <alex.bennee@linaro.org>=
- wrote:
-> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
->> On 06/21/2017 12:42 PM, Alex Benn=C3=A9e wrote:> By default we use the Q=
-EMU
->> projects qemu:debian-FOO-cross images as
->>> RISU hackers are likely to be QEMU developers too. However any docker
->>> tag can be passed on the command line.
->>
->> Any thought about starting to push images?
->
-> I think it comes down to how much we trust Docker Hub and how much we
-> trust whoever does the pushing. Would it be an automatic thing? From
-> shippable?
+The following changes since commit 464588675455afda2899e20a0b120e4075de50=
+c7:
 
-Surely automatic.
+  Merge remote-tracking branch 'remotes/sstabellini/tags/xen-20170627-tag=
+' into staging (2017-06-29 11:45:01 +0100)
 
-Docker Hub offer free builds but you have to provide a full Dockerfile
-(which is generated in QEMU).
-We might keep those files in the repo... I'll give this a try.
-The other possibilities are Travis and Shippable with a bit more
-complicated setup.
+are available in the git repository at:
+
+  https://github.com/gkurz/qemu.git tags/for-upstream
+
+for you to fetch changes up to 06a37db7b12e4d42a6699c2fef820158f470ec4f:
+
+  9pfs: handle transport errors in pdu_complete() (2017-06-29 15:11:51 +0=
+200)
+
+----------------------------------------------------------------
+- fixes a minor bug that could possibly prevent old guests to remove
+  directories
+- makes default permissions for new files configurable from the cmdline
+  when using mapped security modes
+- handle transport errors
+- g_malloc()+memcpy() converted to g_memdup()
+
+----------------------------------------------------------------
+Bruce Rogers (1):
+      9pfs: local: remove: use correct path component
+
+Greg Kurz (4):
+      virtio-9p: record element after sanity checks
+      virtio-9p: message header is 7-byte long
+      virtio-9p: break device if buffers are misconfigured
+      9pfs: handle transport errors in pdu_complete()
+
+Marc-Andr=C3=A9 Lureau (1):
+      9pfs: replace g_malloc()+memcpy() with g_memdup()
+
+Stefano Stabellini (1):
+      xen-9pfs: disconnect if buffers are misconfigured
+
+Tobias Schramm (1):
+      9pfs: local: Add support for custom fmode/dmode in 9ps mapped secur=
+ity modes
+
+ fsdev/file-op-9p.h         |  4 +++
+ fsdev/qemu-fsdev-opts.c    | 12 +++++++
+ hw/9pfs/9p-local.c         | 27 +++++++++++---
+ hw/9pfs/9p-synth.c         |  3 +-
+ hw/9pfs/9p.c               | 28 ++++++++++-----
+ hw/9pfs/9p.h               |  7 +++-
+ hw/9pfs/virtio-9p-device.c | 51 +++++++++++++++++++++------
+ hw/9pfs/xen-9p-backend.c   | 88 ++++++++++++++++++++++++++++++++++------=
+------
+ qemu-options.hx            | 20 ++++++++---
+ 9 files changed, 187 insertions(+), 53 deletions(-)
+--=20
+2.7.5
