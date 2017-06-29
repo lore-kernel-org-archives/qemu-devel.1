@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeepkiruvale@gmail.com>) id 1dQb6U-0008UJ-61
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:11:35 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeepkiruvale@gmail.com>) id 1dQb6T-00031m-Bs
+	(envelope-from <pradeepkiruvale@gmail.com>) id 1dQb6T-0008UF-9v
 	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:11:34 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:35217)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <pradeepkiruvale@gmail.com>) id 1dQb6Q-00030d-Ku
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:11:33 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:34446)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pradeepkiruvale@gmail.com>)
-	id 1dQb6T-00031J-5H
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:11:33 -0400
-Received: by mail-wr0-x243.google.com with SMTP id z45so37152609wrb.2
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 08:11:33 -0700 (PDT)
+	id 1dQb6Q-0002zk-ES
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:11:30 -0400
+Received: by mail-wr0-x242.google.com with SMTP id k67so36931705wrc.1
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 08:11:28 -0700 (PDT)
 From: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
-Date: Thu, 29 Jun 2017 11:10:54 -0400
-Message-Id: <1498749056-38565-5-git-send-email-pradeep.jagadeesh@huawei.com>
-In-Reply-To: <1498749056-38565-1-git-send-email-pradeep.jagadeesh@huawei.com>
-References: <1498749056-38565-1-git-send-email-pradeep.jagadeesh@huawei.com>
-Subject: [Qemu-devel] [PATCH v6 4/6] hmp: create a throttle initialization
- function
+Date: Thu, 29 Jun 2017 11:10:50 -0400
+Message-Id: <1498749056-38565-1-git-send-email-pradeep.jagadeesh@huawei.com>
+Subject: [Qemu-devel] [PATCH v6 0/6] fsdev: qmp interface for io throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +25,77 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>
-Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-This patch creates a throttle initialization function to maximize the
-code reusability. The same code is also used by fsdev.
+These patches provide the qmp interface, to query the io throttle 
+status of the all fsdev devices that are present in a vm.
+also, it provides an interface to set the io throttle parameters of a
+fsdev to a required value. some of the patches also remove the duplicate
+code that was present in block and fsdev files. 
 
-Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
----
- hmp.c | 21 +++++++++++++++------
- 1 file changed, 15 insertions(+), 6 deletions(-)
+Pradeep Jagadeesh (6):
+  throttle: factor out duplicate code
+  qmp: Create IOThrottle structure
+  throttle: move out function to reuse the code
+  hmp: create a throttle initialization function for code reusability
+  fsdev: hmp interface for throttling
+  fsdev: QMP interface for throttling
 
-diff --git a/hmp.c b/hmp.c
-index 8c72c58..220d301 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1749,20 +1749,29 @@ void hmp_change(Monitor *mon, const QDict *qdict)
-     hmp_handle_error(mon, &err);
- }
- 
-+static void hmp_initialize_io_throttle(IOThrottle *iot, const QDict *qdict)
-+{
-+    iot->has_id = true;
-+    iot->id = (char *) qdict_get_str(qdict, "id");
-+    iot->bps = qdict_get_int(qdict, "bps");
-+    iot->bps_rd = qdict_get_int(qdict, "bps_rd");
-+    iot->bps_wr = qdict_get_int(qdict, "bps_wr");
-+    iot->iops = qdict_get_int(qdict, "iops");
-+    iot->iops_rd = qdict_get_int(qdict, "iops_rd");
-+    iot->iops_wr = qdict_get_int(qdict, "iops_wr");
-+}
-+
- void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict)
- {
-     Error *err = NULL;
-+    IOThrottle *iothrottle;
-     BlockIOThrottle throttle = {
-         .has_device = true,
-         .device = (char *) qdict_get_str(qdict, "device"),
--        .bps = qdict_get_int(qdict, "bps"),
--        .bps_rd = qdict_get_int(qdict, "bps_rd"),
--        .bps_wr = qdict_get_int(qdict, "bps_wr"),
--        .iops = qdict_get_int(qdict, "iops"),
--        .iops_rd = qdict_get_int(qdict, "iops_rd"),
--        .iops_wr = qdict_get_int(qdict, "iops_wr"),
-     };
- 
-+    iothrottle = qapi_BlockIOThrottle_base(&throttle);
-+    hmp_initialize_io_throttle(iothrottle, qdict);
-     qmp_block_set_io_throttle(&throttle, &err);
-     hmp_handle_error(mon, &err);
- }
+ Makefile                        |   4 ++
+ blockdev.c                      |  97 ++-------------------------------
+ fsdev/qemu-fsdev-dummy.c        |  10 ++++
+ fsdev/qemu-fsdev-throttle.c     | 118 ++++++++++++++++++++++++++--------------
+ fsdev/qemu-fsdev-throttle.h     |  13 +++++
+ fsdev/qemu-fsdev.c              |  37 +++++++++++++
+ hmp-commands-info.hx            |  18 ++++++
+ hmp-commands.hx                 |  19 +++++++
+ hmp.c                           |  87 +++++++++++++++++++++++++++--
+ hmp.h                           |   4 ++
+ include/qemu/throttle-options.h |   6 ++
+ include/qemu/throttle.h         |   4 +-
+ include/qemu/typedefs.h         |   1 +
+ monitor.c                       |   5 ++
+ qapi-schema.json                |   3 +
+ qapi/block-core.json            |  76 +-------------------------
+ qapi/fsdev.json                 |  84 ++++++++++++++++++++++++++++
+ qapi/iothrottle.json            |  88 ++++++++++++++++++++++++++++++
+ qmp.c                           |  14 +++++
+ util/throttle.c                 | 110 +++++++++++++++++++++++++++++++++++++
+ 20 files changed, 582 insertions(+), 216 deletions(-)
+ create mode 100644 qapi/fsdev.json
+ create mode 100644 qapi/iothrottle.json
+
+v0 -> v1:
+ Addressed comments from Eric Blake, Greg Kurz and Daniel P.Berrange
+ Mainly renaming the functions and removing the redundant code.
+
+v1 -> v2:
+ Addressed comments from Eric Blake and Greg Kurz.
+ As per the suggestion I split the patches into smaller patches.
+ Removed some more duplicate code.
+
+v2 -> v3:
+ Addresssed comments from Alberto Garcia.
+ Changed the comment from block to iothrottle in the iothrottle.json 
+ Added the dummy functions in qemu-fsdev-dummy.c to address the compilation
+ issues that were observed.
+
+v3 -> v4:
+ Addressed comments from Eric Blake and Greg Kurz
+ Re-ordered the patches
+ Added the dummy functions in qmp.c to address the cross compilation issues
+
+v4 -> v5:
+  Addressed comments from Eric Blake and Greg Kurz
+  Split the fsdev qmp patch into hmp and qmp related patches
+  Moved the common functionalities to throttle.c instead of creating
+  a new file
+
+v5 -> v6:
+  Addressed comments from Greg Kurz and Markus Armbruster
+  Split the commits to specific to hmp and throttle as suggested by Greg
+  Moved ThrottleConfig typedef to qemu/typedefs.h
+  Addressed compilation issue on FreeBSD by adding flags in qmp.c
+
 -- 
 1.8.3.1
