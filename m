@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dQVEy-00018X-B8
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 04:55:57 -0400
+	(envelope-from <famz@redhat.com>) id 1dQVFc-0001Ub-G5
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 04:56:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dQVEx-0002ca-Hv
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 04:55:56 -0400
-Date: Thu, 29 Jun 2017 16:55:36 +0800
+	(envelope-from <famz@redhat.com>) id 1dQVFb-0002vZ-QA
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 04:56:36 -0400
+Date: Thu, 29 Jun 2017 16:56:21 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170629085536.GD19976@lemon.lan>
+Message-ID: <20170629085621.GA28654@lemon.lan>
 References: <20170628184724.21378-1-stefanha@redhat.com>
-	<20170628184724.21378-5-stefanha@redhat.com>
+	<20170628184724.21378-6-stefanha@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170628184724.21378-5-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/6] tests: fix virtio-blk-test ISR
+In-Reply-To: <20170628184724.21378-6-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 5/6] tests: fix virtio-net-test ISR
  dependence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
