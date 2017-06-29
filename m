@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dQPGv-0001V6-5E
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 22:33:34 -0400
+	(envelope-from <peterx@redhat.com>) id 1dQPgw-0007ab-F1
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:00:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dQPGs-0006Ht-3A
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 22:33:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47496)
+	(envelope-from <peterx@redhat.com>) id 1dQPgs-0004tb-J3
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:00:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56138)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dQPGr-0006H4-Tq
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 22:33:30 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dQPgs-0004tE-BS
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 23:00:22 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4A8B03DEE4
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 02:33:28 +0000 (UTC)
-Date: Thu, 29 Jun 2017 10:33:23 +0800
+	by mx1.redhat.com (Postfix) with ESMTPS id 24E65C057EC9
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 03:00:21 +0000 (UTC)
+Date: Thu, 29 Jun 2017 11:00:13 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170629023323.GA32268@pxdev.xzpeter.org>
+Message-ID: <20170629030013.GB32268@pxdev.xzpeter.org>
 References: <1498536619-14548-1-git-send-email-peterx@redhat.com>
-	<1498536619-14548-7-git-send-email-peterx@redhat.com>
-	<20170628191357.GO12152@localhost.localdomain>
+	<1498536619-14548-10-git-send-email-peterx@redhat.com>
+	<20170628190616.GN12152@localhost.localdomain>
+	<878tkb68en.fsf@secure.mitica>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170628191357.GO12152@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v6 06/10] migration: move only_migratable
- to MigrationState
+In-Reply-To: <878tkb68en.fsf@secure.mitica>
+Subject: Re: [Qemu-devel] [PATCH v6 09/10] migration: merge
+ enforce_config_section somewhat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,56 +36,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Wed, Jun 28, 2017 at 04:13:57PM -0300, Eduardo Habkost wrote:
-> On Tue, Jun 27, 2017 at 12:10:15PM +0800, Peter Xu wrote:
-> > One less global variable, and it does only matter with migration.
-> > 
-> > We keep the old "--only-migratable" option, but also now we support:
-> > 
-> >   -global migration.only-migratable=true
-> > 
-> > Currently still keep the old interface.
-> > 
-> > Hmm, now vl.c has no way to access migrate_get_current(). Export a
-> > function for it to setup only_migratable.
-> > 
-> > Reviewed-by: Juan Quintela <quintela@redhat.com>
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> [...]
-> > +void migration_only_migratable_set(void)
-> > +{
-> > +    migrate_get_current()->only_migratable = true;
-> > +}
-> > +
-> [...]
-> > @@ -3953,7 +3952,13 @@ int main(int argc, char **argv, char **envp)
-> >                  incoming = optarg;
-> >                  break;
-> >              case QEMU_OPTION_only_migratable:
-> > -                only_migratable = 1;
-> > +                /*
-> > +                 * TODO: we can remove this option one day, and we
-> > +                 * should all use:
-> > +                 *
-> > +                 * "-global migration.only-migratable=true"
-> > +                 */
-> > +                migration_only_migratable_set();
+On Thu, Jun 29, 2017 at 12:42:56AM +0200, Juan Quintela wrote:
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
 > 
-> This triggers a premature call to migrate_get_current():
-> 
->   $ qemu-system-x86_64 -only-migratable
->   qemu-system-x86_64: /home/ehabkost/rh/proj/virt/qemu/migration/migration.c:127: migrate_get_current: Assertion `current_migration' failed.
->   Aborted (core dumped)
-> 
-> What about just doing:
-> 
->     qemu_global_option("migration.only-migratable=true");
+> >
+> > So, this is a case where a user-provided config option (-machine
+> > enforce-config-section) should trigger a different default in another
+> > class (migration.send-configuration).
+> >
+> > Also, the new default triggered by -machine has a very specific
+> > priority:
+> >
+> > * AccelClass::global_props must not override "-machine enforce-config-section=on"
+> > * MachineClass::compat_props must not override
+> >   "-machine enforce-config-section=on"
+> >
+> > We must also decide in advance what should be result of:
+> > * "-machine enforce-config-section=on -global migration.send-configuration=off"
+> > * "-machine enforce-config-section=off -global migration.send-configuration=on"
+> > * "-global migration.send-configuration=off -machine enforce-config-section=off"
+> > * "-global migration.send-configuration=on -machine enforce-config-section=on"
 
-Oops... Definitely. Thanks for pointing this out! I'll see whether I
-should respin or fix on top.
+Yes, this is considered before this patch: currently
+enforce-config-section will have the highest priority in case if
+someone used both of the old & new parameters for it (considering
+"enforce-config-section" has the word "enforce" inside, it makes some
+sense). While...
+
+> 
+> BOOM!!!!!
+> 
+> We use old configuration or new one.
+
+... I agree more with Juan here, that user should not really specify
+these two parameters at the same time. If the user knows the new
+parameter, he/she should know that the new one is obsoleting the old
+one. And since even for that case this patch can handle it well (will
+take -M param), I think it's okay.
+
+> 
+> >
+> > I'm not sure what we should decide about these 4 cases above, but I
+> > believe it would be safer to encode that decision at the same place we
+> > handle the priority between accel/machine/user globals:
+> > register_global_properties() at vl.c.
+> >
+> >
+> > Or maybe this extra complexity is a sign that we shouldn't try to add
+> > extra magic to make -machine affect the "migration" object properties,
+> > and keep the existing machine->enforce_config_section check in the
+> > migration code?  I'm not sure.
+> 
+> Not sure there either.  I preffer doing it in a single place, but I am
+> not the expert here.
+
+IMHO it is not necessary to introduce such a thing in
+register_global_properties(). AFAIU this is the only place where one
+machine property can collapse with a global property? And it currently
+only happens in migration codes. Actually it is well ordered, since we
+init the migration object after register_global_properties(), so
+everthing should possibly be fine. Introducing framework-level thing
+for this may only make things more complicated imho.
+
+After all we can remove all these one day when we can obsolete the
+"enforce-config-section" parameter (maybe we should add one OBSOLETE
+warning when the -M parameter is used).  Thanks,
 
 -- 
 Peter Xu
