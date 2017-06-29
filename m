@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dQWHE-0003ob-0w
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 06:02:21 -0400
+	(envelope-from <mlureau@redhat.com>) id 1dQWJ1-00056g-Ba
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 06:04:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dQWH8-0000LX-0C
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 06:02:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45184)
+	(envelope-from <mlureau@redhat.com>) id 1dQWIw-0001U7-4p
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 06:04:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50152)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dQWH7-0000JS-Lt
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 06:02:13 -0400
-Date: Thu, 29 Jun 2017 06:02:08 -0400 (EDT)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dQWIv-0001TV-QE
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 06:04:06 -0400
+Date: Thu, 29 Jun 2017 06:04:04 -0400 (EDT)
 From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <416200823.44425042.1498730528050.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1498495550-72357-12-git-send-email-anton.nefedov@virtuozzo.com>
+Message-ID: <1236758047.44425255.1498730644610.JavaMail.zimbra@redhat.com>
+In-Reply-To: <1498495550-72357-1-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1498495550-72357-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1498495550-72357-12-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 11/13] virtio-console: chardev hotswap
- support
+Subject: Re: [Qemu-devel] [PATCH v4 00/13] chardevice hotswap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,100 +27,121 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, den@virtuozzo.com, pbonzini@redhat.com, Amit Shah <amit@kernel.org>
+Cc: qemu-devel@nongnu.org, den@virtuozzo.com, pbonzini@redhat.com
 
-Hi
+Hi,
 
-Looks good, but please write something in the commit message about what needs to be done for be-change (what this patch does).
+The series looks good to me. You could try to ping the subsystem maintainers to get their reviews (serial/virtio/hmp).
 
-thanks
+Paolo, would you like to take the series then?
+
+thanks 
 
 ----- Original Message -----
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> CC: Amit Shah <amit@kernel.org>
-> ---
->  hw/char/virtio-console.c | 35 ++++++++++++++++++++++++++++++-----
->  1 file changed, 30 insertions(+), 5 deletions(-)
+> Changed in v4:
+>   - rebased on top of the latest chardev changes
+>   - remarks applied
+>   - patch 1 fixed so it works with alias names
 > 
-> diff --git a/hw/char/virtio-console.c b/hw/char/virtio-console.c
-> index afb4949..198b2a8 100644
-> --- a/hw/char/virtio-console.c
-> +++ b/hw/char/virtio-console.c
-> @@ -49,7 +49,7 @@ static ssize_t flush_buf(VirtIOSerialPort *port,
->      VirtConsole *vcon = VIRTIO_CONSOLE(port);
->      ssize_t ret;
->  
-> -    if (!qemu_chr_fe_get_driver(&vcon->chr)) {
-> +    if (!qemu_chr_fe_backend_connected(&vcon->chr)) {
->          /* If there's no backend, we can just say we consumed all data. */
->          return len;
->      }
-> @@ -163,12 +163,35 @@ static void chr_event(void *opaque, int event)
->      }
->  }
->  
-> +static int chr_be_change(void *opaque)
-> +{
-> +    VirtConsole *vcon = opaque;
-> +    VirtIOSerialPort *port = VIRTIO_SERIAL_PORT(vcon);
-> +    VirtIOSerialPortClass *k = VIRTIO_SERIAL_PORT_GET_CLASS(port);
-> +
-> +    if (k->is_console) {
-> +        qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
-> +                                 NULL, chr_be_change, vcon, NULL, true);
-> +    } else {
-> +        qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
-> +                                 chr_event, chr_be_change, vcon, NULL,
-> false);
-> +    }
-> +
-> +    if (vcon->watch) {
-> +        g_source_remove(vcon->watch);
-> +        vcon->watch = qemu_chr_fe_add_watch(&vcon->chr,
-> +                                            G_IO_OUT | G_IO_HUP,
-> +                                            chr_write_unblocked, vcon);
-> +    }
-> +
-> +    return 0;
-> +}
-> +
->  static void virtconsole_realize(DeviceState *dev, Error **errp)
->  {
->      VirtIOSerialPort *port = VIRTIO_SERIAL_PORT(dev);
->      VirtConsole *vcon = VIRTIO_CONSOLE(dev);
->      VirtIOSerialPortClass *k = VIRTIO_SERIAL_PORT_GET_CLASS(dev);
-> -    Chardev *chr = qemu_chr_fe_get_driver(&vcon->chr);
->  
->      if (port->id == 0 && !k->is_console) {
->          error_setg(errp, "Port number 0 on virtio-serial devices reserved "
-> @@ -176,7 +199,7 @@ static void virtconsole_realize(DeviceState *dev, Error
-> **errp)
->          return;
->      }
->  
-> -    if (chr) {
-> +    if (qemu_chr_fe_backend_connected(&vcon->chr)) {
->          /*
->           * For consoles we don't block guest data transfer just
->           * because nothing is connected - we'll just let it go
-> @@ -188,11 +211,13 @@ static void virtconsole_realize(DeviceState *dev, Error
-> **errp)
->           */
->          if (k->is_console) {
->              qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
-> -                                     NULL, NULL, vcon, NULL, true);
-> +                                     NULL, chr_be_change,
-> +                                     vcon, NULL, true);
->              virtio_serial_open(port);
->          } else {
->              qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
-> -                                     chr_event, NULL, vcon, NULL, false);
-> +                                     chr_event, chr_be_change,
-> +                                     vcon, NULL, false);
->          }
->      }
->  }
+> ========
+> 
+> Changed in v3:
+>   - minor remarks to patch 1 applied
+>   - patch 3: avoid using bottom-half, handle syncronously
+>     As mentioned, it gets thing complicated and is only a problem for
+>     a monitor-connected chardev hotswap and that is not supported for now
+>   - tests added (patches 6-9)
+> 
+> ========
+> 
+> This serie is a v2 of the February submit
+> http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg01989.html
+> 
+> The interface is changed as requested and the changes are slightly reworked
+> and split into separate patches.
+> 
+> ========
+> 
+> The patchset adds support of the character device change without
+> a frontend device removal.
+> Yet isa-serial and virtio-serial frontends are supported.
+> 
+> The feature can be helpful for e.g. Windows debug allowing to
+> establish connection to a live VM from VM with WinDbg.
+> 
+> Anton Nefedov (13):
+>   char: move QemuOpts->ChardevBackend translation to a separate func
+>   char: add backend hotswap handler
+>   char: chardevice hotswap
+>   char: forbid direct chardevice access for hotswap devices
+>   char: avoid chardevice direct access
+>   test-char: unref chardev-udp after test
+>   test-char: split char_udp_test
+>   test-char: split char_file_test
+>   test-char: add hotswap test
+>   hmp: add hmp analogue for qmp-chardev-change
+>   virtio-console: chardev hotswap support
+>   serial: move TIOCM update to a separate function
+>   serial: chardev hotswap support
+> 
+>  include/chardev/char-fe.h   |  39 +++++++
+>  include/chardev/char.h      |  19 ++++
+>  hmp.h                       |   1 +
+>  backends/rng-egd.c          |   2 +-
+>  chardev/char-fe.c           |  49 +++++++--
+>  chardev/char-mux.c          |   1 +
+>  chardev/char.c              | 167 +++++++++++++++++++++++-----
+>  gdbstub.c                   |   2 +-
+>  hmp-commands.hx             |  18 ++-
+>  hmp.c                       |  34 ++++++
+>  hw/arm/pxa2xx.c             |   3 +-
+>  hw/arm/strongarm.c          |   4 +-
+>  hw/char/bcm2835_aux.c       |   2 +-
+>  hw/char/cadence_uart.c      |   4 +-
+>  hw/char/debugcon.c          |   4 +-
+>  hw/char/digic-uart.c        |   2 +-
+>  hw/char/escc.c              |   8 +-
+>  hw/char/etraxfs_ser.c       |   2 +-
+>  hw/char/exynos4210_uart.c   |   4 +-
+>  hw/char/grlib_apbuart.c     |   4 +-
+>  hw/char/imx_serial.c        |   2 +-
+>  hw/char/ipoctal232.c        |   4 +-
+>  hw/char/lm32_juart.c        |   2 +-
+>  hw/char/lm32_uart.c         |   2 +-
+>  hw/char/mcf_uart.c          |   2 +-
+>  hw/char/milkymist-uart.c    |   2 +-
+>  hw/char/parallel.c          |   2 +-
+>  hw/char/pl011.c             |   2 +-
+>  hw/char/sclpconsole-lm.c    |   4 +-
+>  hw/char/sclpconsole.c       |   4 +-
+>  hw/char/serial.c            |  63 ++++++++---
+>  hw/char/sh_serial.c         |   4 +-
+>  hw/char/spapr_vty.c         |   4 +-
+>  hw/char/stm32f2xx_usart.c   |   3 +-
+>  hw/char/terminal3270.c      |   4 +-
+>  hw/char/virtio-console.c    |  35 +++++-
+>  hw/char/xen_console.c       |   4 +-
+>  hw/char/xilinx_uartlite.c   |   2 +-
+>  hw/ipmi/ipmi_bmc_extern.c   |   4 +-
+>  hw/mips/boston.c            |   2 +-
+>  hw/mips/mips_malta.c        |   2 +-
+>  hw/misc/ivshmem.c           |   6 +-
+>  hw/usb/ccid-card-passthru.c |   6 +-
+>  hw/usb/dev-serial.c         |   7 +-
+>  hw/usb/redirect.c           |   7 +-
+>  monitor.c                   |   4 +-
+>  net/colo-compare.c          |  10 +-
+>  net/filter-mirror.c         |   8 +-
+>  net/slirp.c                 |   2 +-
+>  net/vhost-user.c            |   7 +-
+>  qapi-schema.json            |  40 +++++++
+>  qtest.c                     |   2 +-
+>  tests/test-char.c           | 263
+>  +++++++++++++++++++++++++++++++++-----------
+>  tests/test-hmp.c            |   1 +
+>  tests/vhost-user-test.c     |   2 +-
+>  55 files changed, 685 insertions(+), 202 deletions(-)
+> 
 > --
 > 2.7.4
 > 
