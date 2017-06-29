@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dQN7G-0007ez-WD
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 20:15:29 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dQNHc-0001ri-52
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 20:26:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dQN7D-0005cJ-Mh
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 20:15:26 -0400
-References: <20170606162652.112122-1-vsementsov@virtuozzo.com>
-	<20170606162652.112122-2-vsementsov@virtuozzo.com>
-	<33cfc00b-1f19-6938-44a2-e2e08ea150e1@redhat.com>
-	<5aa5283a-0a2a-7069-ec2a-3bb7f213c106@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <bee4ba0e-444a-3c88-5d2c-f978f2ef9ad9@redhat.com>
-Date: Wed, 28 Jun 2017 20:15:09 -0400
-MIME-Version: 1.0
-In-Reply-To: <5aa5283a-0a2a-7069-ec2a-3bb7f213c106@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 1/3] block: add
- bdrv_get_format_alloc_stat format interface
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dQNHX-00032o-0A
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 20:26:08 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39713
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1dQNHW-00031j-Mw
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 20:26:02 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v5T0OJg7116041
+	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 20:26:01 -0400
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2bcnmqajju-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 20:26:00 -0400
+Received: from localhost
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Wed, 28 Jun 2017 20:26:00 -0400
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+Date: Wed, 28 Jun 2017 19:24:55 -0500
+Message-Id: <1498695900-1648-1-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [RFC PATCH 0/5] hotplug: fix premature rebinding of
+ VFIO devices to host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,439 +37,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com, den@openvz.org, Eric Blake <eblake@redhat.com>
+To: libvir-list@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, aik@ozlabs.ru, alex.williamson@redhat.com, abologna@redhat.com, laine@laine.org, pkrempa@redhat.com, berrange@redhat.com, mprivozn@redhat.com, sbhat@linux.vnet.ibm.com
 
+Hi everyone. Hoping to get some feedback on this approach, or some
+alternatives proposed below, to the following issue:
 
+Currently libvirt immediately attempts to rebind a managed device back to the
+host driver when it receives a DEVICE_DELETED event from QEMU. This is
+problematic for 2 reasons:
 
-On 06/28/2017 11:59 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 27.06.2017 02:19, John Snow wrote:
->>
->> On 06/06/2017 12:26 PM, Vladimir Sementsov-Ogievskiy wrote:
->>> The function should collect statistics, about used/unused by top-level
->>> format driver space (in its .file) and allocation status
->>> (data/zero/discarded/after-eof) of corresponding areas in this .file.
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>> ---
->>>   block.c                   | 16 ++++++++++++++
->>>   include/block/block.h     |  3 +++
->>>   include/block/block_int.h |  2 ++
->>>   qapi/block-core.json      | 55
->>> +++++++++++++++++++++++++++++++++++++++++++++++
->>>   4 files changed, 76 insertions(+)
->>>
->>> diff --git a/block.c b/block.c
->>> index 50ba264143..7d720ae0c2 100644
->>> --- a/block.c
->>> +++ b/block.c
->>> @@ -3407,6 +3407,22 @@ int64_t
->>> bdrv_get_allocated_file_size(BlockDriverState *bs)
->>>   }
->>>     /**
->>> + * Collect format allocation info. See BlockFormatAllocInfo
->>> definition in
->>> + * qapi/block-core.json.
->>> + */
->>> +int bdrv_get_format_alloc_stat(BlockDriverState *bs,
->>> BlockFormatAllocInfo *bfai)
->>> +{
->>> +    BlockDriver *drv = bs->drv;
->>> +    if (!drv) {
->>> +        return -ENOMEDIUM;
->>> +    }
->>> +    if (drv->bdrv_get_format_alloc_stat) {
->>> +        return drv->bdrv_get_format_alloc_stat(bs, bfai);
->>> +    }
->>> +    return -ENOTSUP;
->>> +}
->>> +
->>> +/**
->>>    * Return number of sectors on success, -errno on error.
->>>    */
->>>   int64_t bdrv_nb_sectors(BlockDriverState *bs)
->>> diff --git a/include/block/block.h b/include/block/block.h
->>> index 9b355e92d8..646376a772 100644
->>> --- a/include/block/block.h
->>> +++ b/include/block/block.h
->>> @@ -335,6 +335,9 @@ typedef enum {
->>>     int bdrv_check(BlockDriverState *bs, BdrvCheckResult *res,
->>> BdrvCheckMode fix);
->>>   +int bdrv_get_format_alloc_stat(BlockDriverState *bs,
->>> +                               BlockFormatAllocInfo *bfai);
->>> +
->>>   /* The units of offset and total_work_size may be chosen
->>> arbitrarily by the
->>>    * block driver; total_work_size may change during the course of
->>> the amendment
->>>    * operation */
->>> diff --git a/include/block/block_int.h b/include/block/block_int.h
->>> index 8d3724cce6..458c715e99 100644
->>> --- a/include/block/block_int.h
->>> +++ b/include/block/block_int.h
->>> @@ -208,6 +208,8 @@ struct BlockDriver {
->>>       int64_t (*bdrv_getlength)(BlockDriverState *bs);
->>>       bool has_variable_length;
->>>       int64_t (*bdrv_get_allocated_file_size)(BlockDriverState *bs);
->>> +    int (*bdrv_get_format_alloc_stat)(BlockDriverState *bs,
->>> +                                      BlockFormatAllocInfo *bfai);
->>>         int coroutine_fn
->>> (*bdrv_co_pwritev_compressed)(BlockDriverState *bs,
->>>           uint64_t offset, uint64_t bytes, QEMUIOVector *qiov);
->>> diff --git a/qapi/block-core.json b/qapi/block-core.json
->>> index ea0b3e8b13..fd7b52bd69 100644
->>> --- a/qapi/block-core.json
->>> +++ b/qapi/block-core.json
->>> @@ -139,6 +139,61 @@
->>>              '*format-specific': 'ImageInfoSpecific' } }
->>>     ##
->>> +# @BlockFormatAllocInfo:
->>> +#
->> I apologize in advance, but I don't understand this patch very well. Let
->> me ask some questions to get patch review rolling again, since you've
->> been waiting a bit.
->>
->>> +#
->>> +# Allocation relations between format file and underlying protocol
->>> file.
->>> +# All fields are in bytes.
->>> +#
->> The format file in this case would be ... what, the virtual file
->> represented by the qcow2? and the underlying protocol file is the raw
->> file that is the qcow2 itself?
-> 
-> yes
-> 
->>
->>> +# There are two types of the format file portions: 'used' and
->>> 'unused'. It's up
->>> +# to the format how to interpret these types. For now the only
->>> format supporting
->>> +# the feature is Qcow2 and for this case 'used' are clusters with
->>> positive
->>> +# refcount and unused a clusters with zero refcount. Described
->>> portions include
->>> +# all format file allocations, not only virtual disk data (metadata,
->>> internal
->>> +# snapshots, etc. are included).
->> I guess the semantic differentiation between "used" and "unused" is left
->> to the individual fields, below.
-> 
-> hmm, I don't understand. differentiation is up to the format, and for
-> qcow2 it is described above
-> 
->>
->>> +#
->>> +# For the underlying file there are native block-status types of the
->>> portions:
->>> +#  - data: allocated data
->>> +#  - zero: read-as-zero holes
->>> +#  - discarded: not allocated
->>> +# 4th additional type is 'overrun', which is for the format file
->>> portions beyond
->>> +# the end of the underlying file.
->>> +#
->>> +# So, the fields are:
->>> +#
->>> +# @used-data: used by the format file and backed by data in the
->>> underlying file
->>> +#
->> I assume this is "defined and addressable data".
->>
->>> +# @used-zero: used by the format file and backed by a hole in the
->>> underlying
->>> +#             file
->>> +#
->> By a hole? Can you give me an example? Do you mean like a filesystem
->> hole ala falloc()?
-> 
-> -zero, -data and -discarded are the block status of corresponding area
-> in underlying file.
-> 
-> so, if underlying file is raw, yes, it should be a filesystem hole.
-> 
-> example:
-> -------------------------
-> # ./qemu-img create -f qcow2 x 1G
-> Formatting 'x', fmt=qcow2 size=1073741824 encryption=off
-> cluster_size=65536 lazy_refcounts=off refcount_bits=16
-> # ./qemu-img check x
-> No errors were found on the image.
-> Image end offset: 262144
-> Format allocation info (including metadata):
->                data        zero   discarded   after-eof
-> used        192 KiB         0 B         0 B    63.5 KiB
-> unused          0 B         0 B         0 B
+1) If multiple devices from a group are attached to a guest, this can move
+   the group into a "non-viable" state where some devices are assigned to
+   the host and some to the guest.
 
-OK, we create a 196624 byte file -- 3 clusters and a little bit of extra.
+2) When QEMU emits the DEVICE_DELETED event, there's still a "finalize" phase
+   where additional cleanup occurs. In most cases libvirt can ignore this
+   cleanup, but in the case of VFIO devices this is where closing of a VFIO
+   group FD occurs, and failing to wait before rebinding the device to the
+   host driver can result in unexpected behavior. In the case of powernv
+   hosts at least, this can lead to a host driver crashing due to the default
+   DMA windows not having been fully-restored yet. The window between this is
+   and the initial DEVICE_DELETED seems to be ~6 seconds in practice. We've
+   seen host dumps with Mellanox CX4 VFs being rebound to host driver during
+   this period (on powernv hosts).
 
-0: header
-1: reftable
-2: refcount block #0, accounting for clusters 0x0 - 0x7fff
-3: l1_table, only partially allocated, and all zeroes
+Patches 1-4 address 1) by deferring rebinding of a hostdev to the host driver
+until all the devices in the group have been detached, at which point all
+the hostdevs are rebound as a group. Until that point, the devices are traced
+by the drvManager's inactiveList in a similar manner to hostdevs that are
+assigned to VFIO via the nodedev-detach interface.
 
-So we've got 16 bytes defined for this l1 table, leaving most of a
-cluster defined but after EOF. I suppose your after-EOF counter there is
-probably rounding a bit to the nearest 512.
+Patch 5 addresses 2) by adding an additional check that, when the last device
+from a group is detached, polls /proc for open FDs referencing the VFIO group
+path in /dev/vfio/<iommu_group> and waiting for the FD to be closed. If we
+time out, we abandon rebinding the hostdevs back to the host.
 
-So we've got three used clusters, and 99% of one cluster that's after
-EOF. Shouldn't data here be 192.5 in this case?
+There are a couple alternatives to Patch 5 that might be worth considering:
 
-Or Data: 192KiB; Zero 512 b?
+a) Add a DEVICE_FINALIZED event to QEMU and wait for that instead of
+   DEVICE_DELETED. Paired with patches 1-4 this would let us drop patch 5 in
+   favor of minimal changes to libvirt's event handlers.
 
-I guess the ".5" is just truncated or rounded.
+   The downsides are:
+    - that we'd incur some latency for all device-detach calls, but it's not
+      apparent to me whether this delay is significant for anything outside
+      of VFIO.
+    - there may be cases where finalization after DEVICE_DELETE/unparent are
+      is not guaranteed, and I'm not sure QOM would encourage such
+      expectations even if that's currently the case.
 
-> # ./qemu-io -c 'write 0 100M' x
-> wrote 104857600/104857600 bytes at offset 0
-> 100 MiB, 1 ops; 0.7448 sec (134.263 MiB/sec and 1.3426 ops/sec)
-> # ./qemu-img check x
-> No errors were found on the image.
-> 1600/16384 = 9.77% allocated, 0.00% fragmented, 0.00% compressed clusters
-> Image end offset: 105185280
-> Format allocation info (including metadata):
->                data        zero   discarded   after-eof
-> used        100 MiB      60 KiB         0 B         0 B
-> unused          0 B         0 B         0 B
+b) Add a GROUP_DELETED event to VFIO's finalize callback. This is the most
+   direct solution. With this we could completely separate out the handling
+   of rebinding to host driver based on receival of this event.
 
-Hmm, okay;
+   The downsides are:
+    - this would only work for newer versions of QEMU, though we could use
+      the poll-wait in patch 5 as a fallback.
+    - synchronizing sync/async device-detach threads with sync/async
+      handlers for this would be a bit hairy, but I have a WIP in progress
+      that seems *fairly reasonable*
 
-now the image is 105185280 bytes; 102720 KiB; 1,605 clusters.
-100MiB + 320KiB. Again, it doesn't entirely look like your summaries
-line up. Did we lose 256KiB to a rounding error under "100MiB" ?
+c) Take the approach in Patch 5, either as a precursor to implementing b) or
+   something else, or just sticking with that for now.
 
->From what I can now tell, the map looks like:
+d) ???
 
-== File Map ==
+Personally I'm leaning toward c), but I'm wondering if that's "good enough"
+for now, or if we should pursue something more robust from the start, or
+perhaps something else entirely?
 
-0x000000000 - 0x00004ffff [Metadata] (5 clusters)
-0x000050000 - 0x00644ffff [Data] (1600 clusters)
+Any feedback is greatly appreciated!
 
-1600 clusters at 64KiB each gives us 102400KiB / 100MiB of data.
-Then we've got five clusters of metadata (320KiB).
-
-Cluster 0: Header data. Data only occupies the first 512 bytes or so.
-Data: 512b
-Zeroes: 63.5KiB
-
-Cluster 1: Reftable. Data only occupies the first 8 bytes.
-Data: 512b
-Zeroes: 63.5KiB
-
-Cluster 2: Refcount Block #0. There are 0xC8A bytes, 3210/2 1605
-refcounts. Makes sense. That's 7 sectors of data.
-Data: 3.5KiB
-Zeroes: 60.5KiB
-
-Cluster 3: L1 table. One entry for L2 table. Takes 8 bytes.
-Data: 512B
-Zeroes: 63.5KiB
-
-Cluster 4: L2 table. 1,600 entries. Takes 5120 bytes, about 10 sectors.
-Data: 5KiB
-Zeroes: 59KiB
-
-Then clusters 5-1604 contain our data contiguously, the ascii byte 0xcd.
-
-> # ./qemu-io -c 'discard 0 1M' x
-> discard 1048576/1048576 bytes at offset 0
-> 1 MiB, 1 ops; 0.0002 sec (3.970 GiB/sec and 4065.0407 ops/sec)
-> # ./qemu-img check x
-> No errors were found on the image.
-> 1584/16384 = 9.67% allocated, 0.00% fragmented, 0.00% compressed clusters
-> Image end offset: 105185280
-> Format allocation info (including metadata):
->                data        zero   discarded   after-eof
-> used       99.3 MiB      60 KiB         0 B         0 B
-> unused          0 B       1 MiB         0 B
-> -------------------------
-> 
-> - hmm, 60 KiB, don't know what is it. some preallocation may be..
-> 
-
-x doesn't lose any filesize, but we have 1584 allocated clusters. We
-lost 16, corresponding to the discarded 1M.
-
-Map is now:
-
-0x000000000 - 0x00004ffff [Metadata] (5 clusters)
-0x000050000 - 0x00014ffff [Vacant] (16 clusters)
-0x000150000 - 0x00644ffff [Data] (1584 clusters)
-
-OK.
-
-0: Header. no change.
-Data: 512b
-Zeroes: 63.5KiB
-
-1: Reftable. No change.
-Data: 512b
-Zeroes: 63.5KiB
-
-Cluster 2: Almost the same.... ref[5] (i.e. the sixth) through ref[20]
-have been decremented, but everything else remains at refcount of 01.
-Still takes up the same amount of space at the sector granularity level.
-Data: 3.5KiB
-Zeroes: 60.5KiB
-
-Cluster 3: L1 table. No change.
-Data: 512B
-Zeroes: 63.5KiB
-
-Cluster 4: L2 table
-Here, the first 16 data clusters have been modified to zero cluster
-pointers: 0x0000000000000001, everything else remains defined as it was.
-Data: 5KiB
-Zeroes: 59KiB
-
-Clusters 5-20 inclusive: non-zero data now discarded and considered
-unused. 1MiB. makes sense.
-
-Clusters 21-end: non-zero, used data. 1584 clusters; 101376KiB; 99MiB
-
-My Tallies:
-
-Metadata: 10KiB
-Metadata Zeroes: 310KiB
-Undefined Data: 1MiB
-Data: 99MiB
-
-Your Tallies:
-'used-data': 99.3MiB (101683.2KiB)
-'used-zeroes': 60KiB
-'unused-data': 1MiB
-
-Subtracting out the 99MiB of data surely accounted for correctly here;
-you are counting about 0.3MiB + 60KiB of used data for presumably the
-metadata regions; ~367.2KiB.
-
-Looks like your counts are something like:
-metadata: 260KiB (0.25MiB ... ~0.3 with rounding, OK)
-metadata-zeroes: 60KiB
-
-So it's probably just counting what is and isn't zeroes a little less
-aggressively than I am doing. To what extent or how, I don't know. Maybe
-it depends on the underlying filesystem:
-
-jhuston@probe ~> qemu-img map -f raw X
-Offset          Length          Mapped to       File
-0               0x31000         0               X
-0x40000         0x10000         0x40000         X
-0x150000        0x6300000       0x150000        X
-
-Looks like a hole from 0x31000 to 0x40000, 60KiB in the metadata region,
-so that's probably it.
-
-Then there's a hole from 0x50000 to 0x150000, 1MiB, so that's unused data.
-
-Hey, interesting, the discarded data that would be read as zeroes is
-still defined by the QCOW2 schema so that's "unused-zeroes" whereas the
-zero space in the metadata is only counted as such because of the sparse
-gap, so that's used-zero. OK, I think I'm starting to get what these
-numbers mean.
-
-> 
->>
->>> +# @used-discarded: used by the format file but actually unallocated
->>> in the
->>> +#                  underlying file
->>> +#
->> In what case do we have used data that is discarded/undefined, but not
->> zero? Shouldn't discarded data be zero...?
-> 
-> may be discarded is bad name.. this if for unallocated block status of
-> underlying file.
-> 
-
-Unallocated in what sense, exactly? Do you have an example for qcow2?
-I'm sorry that i still don't quite follow :\
-
->>
->>> +# @used-overrun: used by the format file beyond the end of the
->>> underlying file
->>> +#
->> When does this occur?
-> 
-> I think it shoud be some kind of corruption.
-> 
-
-Alright, let me see if I have this straight...
-
-used-data: Normal data. We are standing on terra-firma.
-used-zero: Data that is defined to be zeroes in some way.
-
-(Does not necessarily include data clusters if they were not actually
-zeroed out, I think. May not include regions that ARE zero, even if they
-are literally zero, because the driver may not especially recognize them
-as such. Anything marked as zero will DEFINITELY be zero, though. Yes?)
-
-used-discarded: I'm not actually sure in this case.
-
-used-overrun: Data that is defined to exist, but appears to fall outside
-of or beyond EOF. Appears to happen with qcow2 metadata before any
-writes occur.
-
-unused-data: Normal data, but not in-use by the schema anywhere. Leaked
-clusters and the like, effectively.
-
-unused-zero: Similar to the above, but definitely zeroes.
-
-unused-discarded: Not really sure.
-
->>
->>> +# @unused-data: allocated data in the underlying file not used by
->>> the format
->>> +#
->> I assume this is an allocation gap in qcow2. Unused, but non-zero. Right?
-> 
-> or it may be some kind of error or due to underlying fs doesn't maintain
-> holes.
-> 
->>
->>> +# @unused-zero: holes in the underlying file not used by the format
->>> file
->>> +#
->> I assume this is similar to the above -- Unused, but zero.
-> 
-> Unused and underlying block status is ZERO. It is a "good" case for
-> unused areas.
-> 
->>
->>> +# @unused-discarded: unallocated areas in the underlying file not
->>> used by the
->>> +#                    format file
->>> +#
->> Again I am unsure of what discarded but non-zero might mean.
-> 
-> looks like for raw format discarded is impossible, but to make a generic
-> tool, let's consider block status = unallocated too.
-> 
->>
->>> +# Note: sum of 6 fields {used,unused}-{data,zero,discarded} is equal
->>> to the
->>> +#       length of the underlying file.
->>> +#
->>> +# Since: 2.10
->>> +#
->>> +##
->>> +{ 'struct': 'BlockFormatAllocInfo',
->>> +  'data': {'used-data':        'uint64',
->>> +           'used-zero':        'uint64',
->>> +           'used-discarded':   'uint64',
->>> +           'used-overrun':     'uint64',
->>> +           'unused-data':      'uint64',
->>> +           'unused-zero':      'uint64',
->>> +           'unused-discarded': 'uint64' } }
->>> +
->>> +##
->>>   # @ImageCheck:
->>>   #
->>>   # Information about a QEMU image file check
->>>
->> Sorry for the dumb questions.
-> 
-> Don't worry)
-> 
->>
->> --John
-> 
-> 
+ src/libvirt_private.syms |   5 ++
+ src/qemu/qemu_hostdev.c  |  16 +++++
+ src/qemu/qemu_hostdev.h  |   4 ++
+ src/qemu/qemu_hotplug.c  |  56 ++++++++++++++----
+ src/util/virfile.c       |  52 +++++++++++++++++
+ src/util/virfile.h       |   1 +
+ src/util/virhostdev.c    | 173 ++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ src/util/virhostdev.h    |  16 +++++
+ src/util/virpci.c        |  69 ++++++++++++++++++----
+ src/util/virpci.h        |   4 ++
+ 10 files changed, 360 insertions(+), 36 deletions(-)
