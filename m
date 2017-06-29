@@ -1,36 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42629)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dQNHg-0001s1-LM
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 20:26:14 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dQNrX-0003yv-6x
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 21:03:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dQNHa-00036k-8t
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 20:26:12 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39873
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1dQNHa-00035O-2A
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 20:26:06 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v5T0OJgA116041
-	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 20:26:05 -0400
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bcnmqajn3-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 20:26:05 -0400
-Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 28 Jun 2017 18:26:04 -0600
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Wed, 28 Jun 2017 19:25:00 -0500
-In-Reply-To: <1498695900-1648-1-git-send-email-mdroth@linux.vnet.ibm.com>
-References: <1498695900-1648-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1498695900-1648-6-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [RFC PATCH 5/5] qemu: hotplug: wait for VFIO group FD
- close before unbind
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dQNrU-0006ty-3X
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 21:03:15 -0400
+Received: from mail-qt0-x230.google.com ([2607:f8b0:400d:c0d::230]:33724)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dQNrT-0006tm-UD
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 21:03:12 -0400
+Received: by mail-qt0-x230.google.com with SMTP id r30so63401922qtc.0
+	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 18:03:11 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Wed, 28 Jun 2017 22:02:52 -0300
+Message-Id: <20170629010300.2848-1-f4bug@amsat.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RFC PATCH 0/8] removal of tci (tcg interpreter)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,184 +31,238 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: libvir-list@redhat.com
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, aik@ozlabs.ru, alex.williamson@redhat.com, abologna@redhat.com, laine@laine.org, pkrempa@redhat.com, berrange@redhat.com, mprivozn@redhat.com, sbhat@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, "Emilio G . Cota" <cota@braap.org>, Stefan Weil <sw@weilnetz.de>, Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-QEMU emits DEVICE_DELETED events during a device's "unparent"
-callback, but some additional cleanup occurs afterward via
-"finalize". In most cases libvirt can ignore the latter, but in the
-case of VFIO the closing of a device's group FD happens here, which
-is something libvirt needs to wait for before attempting to bind a
-hostdev back to a host driver. In the case of powernv, and possibly
-other host archs as well, failing to do this can lead to the host
-device driver crashing due to necessary setup (like restoring default
-DMA windows for the IOMMU group) not being completed yet.
+There have been some comments on the ML about the usefulness of tci.
 
-We attempt to avoid this here by polling the QEMU process for open
-FDs referencing /dev/vfio/<group num> and waiting for a certain period
-of time. In practice the delay between the DEVICE_DELETED
-event and closing of the group FD seems to be around 6 seconds, so we
-set the max wait time at 15 seconds. If we time out we leave the
-device in the inactiveList and bound to VFIO. We only attempt the
-wait if the last hostdev from an IOMMU group is being detached and
-there's reasonable expectation that the group FD will be closed soon.
+https://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg04551.html
 
-There are alternatives to this approach, like adding a specific
-group delete event to QEMU and handling this cleanup via and
-asynchronous event handler, nut since we do a similar poll-wait for
-things like KVM device passthrough this simple approach is hopefully
-a reasonable starting point at least.
+  Peter Maydell> I'd prefer we just got rid of it.
 
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
----
- src/libvirt_private.syms |  1 +
- src/qemu/qemu_hotplug.c  | 34 +++++++++++++++++++++++++++++--
- src/util/virfile.c       | 52 ++++++++++++++++++++++++++++++++++++++++++++++++
- src/util/virfile.h       |  1 +
- 4 files changed, 86 insertions(+), 2 deletions(-)
+https://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg04296.html
 
-diff --git a/src/libvirt_private.syms b/src/libvirt_private.syms
-index ba7fa39..787267c 100644
---- a/src/libvirt_private.syms
-+++ b/src/libvirt_private.syms
-@@ -1657,6 +1657,7 @@ virFileIsDir;
- virFileIsExecutable;
- virFileIsLink;
- virFileIsMountPoint;
-+virFileIsOpenByPid;
- virFileIsSharedFS;
- virFileIsSharedFSType;
- virFileLength;
-diff --git a/src/qemu/qemu_hotplug.c b/src/qemu/qemu_hotplug.c
-index af5ee6f..d200bab 100644
---- a/src/qemu/qemu_hotplug.c
-+++ b/src/qemu/qemu_hotplug.c
-@@ -68,6 +68,8 @@ VIR_LOG_INIT("qemu.qemu_hotplug");
- /* Wait up to 5 seconds for device removal to finish. */
- unsigned long long qemuDomainRemoveDeviceWaitTime = 1000ull * 5;
- 
-+/* Wait up to 15 seconds for iommu group close */
-+unsigned long long qemuDomainRemoveDeviceGroupWaitTime = 1000ull * 15;
- 
- /**
-  * qemuDomainPrepareDisk:
-@@ -3830,6 +3832,32 @@ qemuDomainRemoveSCSIVHostDevice(virQEMUDriverPtr driver,
- }
- 
- static int
-+qemuDomainWaitForDeviceGroupClose(virDomainObjPtr vm, int iommu_group)
-+{
-+    char *group_path;
-+    unsigned long long remaining_ms = qemuDomainRemoveDeviceGroupWaitTime;
-+    int rc = -1;
-+
-+    if (virAsprintf(&group_path, "/dev/vfio/%d", iommu_group) < 0)
-+        return -1;
-+
-+    while ((rc = virFileIsOpenByPid(group_path, vm->pid)) == 1) {
-+        if (remaining_ms <= 0)
-+            break;
-+        usleep(100*1000);
-+        remaining_ms -= 100;
-+    }
-+
-+    VIR_DEBUG("IOMMU group %d FD status: %d, wait time: %llu ms",
-+              iommu_group, rc,
-+              qemuDomainRemoveDeviceGroupWaitTime - remaining_ms);
-+
-+    VIR_FREE(group_path);
-+    return rc;
-+}
-+
-+
-+static int
- qemuDomainRemoveHostDevice(virQEMUDriverPtr driver,
-                            virDomainObjPtr vm,
-                            virDomainHostdevDefPtr hostdev)
-@@ -3933,8 +3961,10 @@ qemuDomainRemoveHostDevice(virQEMUDriverPtr driver,
-             virPCIDeviceAddressGetIOMMUGroupNum(&hostdev->source.subsys.u.pci.addr);
-         if (virHostdevPCIDeviceGroupUnbindable(driver->hostdevMgr,
-                                                iommu_group)) {
--            virHostdevPCIDeviceGroupUnbind(driver->hostdevMgr,
--                                           iommu_group);
-+            if (qemuDomainWaitForDeviceGroupClose(vm, iommu_group) == 0) {
-+                virHostdevPCIDeviceGroupUnbind(driver->hostdevMgr,
-+                                               iommu_group);
-+            }
-         }
-     }
- 
-diff --git a/src/util/virfile.c b/src/util/virfile.c
-index d444b32..29b762f 100644
---- a/src/util/virfile.c
-+++ b/src/util/virfile.c
-@@ -4162,3 +4162,55 @@ virFileReadValueString(char **value, const char *format, ...)
-     VIR_FREE(str);
-     return ret;
- }
-+
-+int
-+virFileIsOpenByPid(const char *path, pid_t pid)
-+{
-+    struct dirent *ent;
-+    DIR *filelist_dir;
-+    char *filelist_path;
-+    bool found = false;
-+    int rc = -1;
-+
-+    if (!path || !IS_ABSOLUTE_FILE_NAME(path)) {
-+        virReportError(VIR_ERR_INTERNAL_ERROR,
-+                       _("invalid path: %s"), path ? path : "null");
-+        goto error;
-+    }
-+
-+    if (virAsprintf(&filelist_path, "/proc/%d/fd", pid) < 0)
-+        goto error;
-+
-+    if (virDirOpen(&filelist_dir, filelist_path) < 0) {
-+        virReportError(VIR_ERR_INTERNAL_ERROR,
-+                       _("unable to open directory: %s"), filelist_path);
-+        goto error;
-+    }
-+
-+    while (!found &&
-+           (rc = virDirRead(filelist_dir, &ent, filelist_path)) == 1) {
-+        char *resolved_path = NULL;
-+        char *link_path;
-+        if ((rc = virAsprintf(&link_path, "%s/%s", filelist_path, ent->d_name)) < 0)
-+            break;
-+        if (virFileResolveLink(link_path, &resolved_path) == 0) {
-+            if (resolved_path) {
-+                VIR_DEBUG("checking absolute path for match (need: %s, got: %s)",
-+                          path, resolved_path);
-+                if (STREQ(resolved_path, path))
-+                    found = true;
-+                VIR_FREE(resolved_path);
-+            }
-+        }
-+    }
-+
-+    VIR_DIR_CLOSE(filelist_dir);
-+ error:
-+    VIR_FREE(filelist_path);
-+
-+    VIR_DEBUG("returning, rc: %d, found: %d", rc, found);
-+    if (rc < 0)
-+        return rc;
-+
-+    return found ? 1 : 0;
-+}
-diff --git a/src/util/virfile.h b/src/util/virfile.h
-index 57ceb80..fb86786 100644
---- a/src/util/virfile.h
-+++ b/src/util/virfile.h
-@@ -347,6 +347,7 @@ int virFileReadValueScaledInt(unsigned long long *value, const char *format, ...
- int virFileReadValueString(char **value, const char *format, ...)
-  ATTRIBUTE_FMT_PRINTF(2, 3);
- 
-+int virFileIsOpenByPid(const char *path, pid_t pid);
- 
- int virFileInData(int fd,
-                   int *inData,
+  Richard Henderson> Is it time to remove it? I'm pretty sure the only hosts
+                     for which it will work have proper backends...
+
+Richard quotes are way clearer than me trying to paraphrase what he told me:
+- it doesn't use libffi, and as such the way it makes calls to helpers doesn't work for many hosts.
+- we already cover almost everthing that debian does. if debian or gentoo doesn't support it, one can confidently say there's little interest.
+- if someone *does* want to run qemu on something else, it isn't difficult to port tcg.
+
+I figured out MAINTAINERS was unsync, so added patches 1-4, they are not really
+tci-related.
+
+Patches 5,6 are trivial fixes to let the codebase quite sane if there is future
+need to revert/reimport tci.
+
+Patches 7,8 are the removal, marked RFC... let's debate!
+
+Regards,
+
+Phil.
+
+PS: How to have fun with TCI and MTTCG:
+
+$ wget -q https://github.com/raspberrypi/firmware/raw/master/boot/kernel7.img
+$ ./configure --enable-tcg-interpreter && make subdir-arm-softmmu
+
+$ arm-softmmu/qemu-system-arm -machine raspi2 -cpu cortex-a7 -smp 4 -accel tcg,thread=multi -kernel kernel7.img
+qemu-system-arm: Guest expects a stronger memory ordering than the host provides
+This may cause strange/hard to debug errors
+Segmentation fault (core dumped)
+
+-
+
+$ arm-softmmu/qemu-system-arm -machine raspi2 -cpu cortex-a7 -smp 4 -accel tcg,thread=multi -kernel kernel7.img
+qemu-system-arm: Guest expects a stronger memory ordering than the host provides
+This may cause strange/hard to debug errors
+qemu-system-arm: Trying to execute code outside RAM or ROM at 0xef661ad0
+This usually means one of the following happened:
+
+(1) You told QEMU to execute a kernel for the wrong machine type, and it crashed on startup (eg trying to run a raspberry pi kernel on a versatilepb QEMU machine)
+(2) You didn't give QEMU a kernel or BIOS filename at all, and QEMU executed a ROM full of no-op instructions until it fell off the end
+(3) Your guest kernel has a bug and crashed by jumping off into nowhere
+
+This is almost always one of the first two, so check your command line and that you are using the right type of kernel for this machine.
+If you think option (3) is likely then you can try debugging your guest with the -d debug options; in particular -d guest_errors will cause the log to include a dump of the guest register state at this point.
+
+Execution cannot continue; stopping here.
+
+Segmentation fault (core dumped)
+
+-
+
+$ arm-softmmu/qemu-system-arm -machine raspi2 -cpu cortex-a7 -smp 4 -accel tcg,thread=multi -kernel kernel7.img
+qemu-system-arm: Guest expects a stronger memory ordering than the host provides
+This may cause strange/hard to debug errors
+qemu-system-arm: Trying to execute code outside RAM or ROM at 0xe28fe004
+This usually means one of the following happened:
+
+(1) You told QEMU to execute a kernel for the wrong machine type, and it crashed on startup (eg trying to run a raspberry pi kernel on a versatilepb QEMU machine)
+(2) You didn't give QEMU a kernel or BIOS filename at all, and QEMU executed a ROM full of no-op instructions until it fell off the end
+(3) Your guest kernel has a bug and crashed by jumping off into nowhere
+
+This is almost always one of the first two, so check your command line and that you are using the right type of kernel for this machine.
+If you think option (3) is likely then you can try debugging your guest with the -d debug options; in particular -d guest_errors will cause the log to include a dump of the guest register state at this point.
+
+Execution cannot continue; stopping here.
+
+qemu-system-arm: qemu/accel/tcg/cpu-exec.c:599: cpu_loop_exec_tb: Assertion `use_icount' failed.
+Aborted (core dumped)
+
+-
+
+$ arm-softmmu/qemu-system-arm -machine raspi2 -cpu cortex-a7 -smp 4 -accel tcg,thread=multi -kernel kernel7.img
+qemu-system-arm: Guest expects a stronger memory ordering than the host provides
+This may cause strange/hard to debug errors
+qemu/tcg/tcg.c:480: temp_idx: Assertion `n >= 0 && n < s->nb_temps' failed.
+Aborted (core dumped)
+
+-
+$ arm-softmmu/qemu-system-arm -machine raspi2 -cpu cortex-a7 -smp 4 -accel tcg,thread=multi -kernel kernel7.img
+qemu-system-arm: Guest expects a stronger memory ordering than the host provides
+This may cause strange/hard to debug errors
+write access to unsupported AArch32 system register cp:15 opc1:4 crn:12 crm:0 opc2:0 (non-secure)
+Segmentation fault (core dumped)
+
+-
+
+$ arm-softmmu/qemu-system-arm -machine raspi2 -cpu cortex-a7 -smp 4 -accel tcg,thread=multi -kernel kernel7.img
+qemu-system-arm: Guest expects a stronger memory ordering than the host provides
+This may cause strange/hard to debug errors
+qemu-system-arm: Trying to execute code outside RAM or ROM at 0xe59f5014
+This usually means one of the following happened:
+
+(1) You told QEMU to execute a kernel for the wrong machine type, and it crashed on startup (eg trying to run a raspberry pi kernel on a versatilepb QEMU machine)
+(2) You didn't give QEMU a kernel or BIOS filename at all, and QEMU executed a ROM full of no-op instructions until it fell off the end
+(3) Your guest kernel has a bug and crashed by jumping off into nowhere
+
+This is almost always one of the first two, so check your command line and that you are using the right type of kernel for this machine.
+If you think option (3) is likely then you can try debugging your guest with the -d debug options; in particular -d guest_errors will cause the log to include a dump of the guest register state at this point.
+
+Execution cannot continue; stopping here.
+
+qemu: fatal: Trying to execute code outside RAM or ROM at 0xe59f5014
+R00=00000031 R01=00000308 R02=00000000 R03=e59f5014
+R04=00000000 R05=00000000 R06=00000000 R07=00000000
+R08=00000000 R09=00000000 R10=00000000 R11=00000000
+R12=00000000 R13=00000000 R14=00000308 R15=e59f5014
+PSR=a00001d3 N-C- A NS svc32
+s00=00000000 s01=00000000 d00=0000000000000000
+s02=00000000 s03=00000000 d01=0000000000000000
+s04=00000000 s05=00000000 d02=0000000000000000
+s06=00000000 s07=00000000 d03=0000000000000000
+s08=00000000 s09=00000000 d04=0000000000000000
+s10=00000000 s11=00000000 d05=0000000000000000
+s12=00000000 s13=00000000 d06=0000000000000000
+s14=00000000 s15=00000000 d07=0000000000000000
+s16=00000000 s17=00000000 d08=0000000000000000
+s18=00000000 s19=00000000 d09=0000000000000000
+s20=00000000 s21=00000000 d10=0000000000000000
+s22=00000000 s23=00000000 d11=0000000000000000
+s24=00000000 s25=00000000 d12=0000000000000000
+s26=00000000 s27=00000000 d13=0000000000000000
+s28=00000000 s29=00000000 d14=0000000000000000
+s30=00000000 s31=00000000 d15=0000000000000000
+s32=00000000 s33=00000000 d16=0000000000000000
+s34=00000000 s35=00000000 d17=0000000000000000
+s36=00000000 s37=00000000 d18=0000000000000000
+s38=00000000 s39=00000000 d19=0000000000000000
+s40=00000000 s41=00000000 d20=0000000000000000
+s42=00000000 s43=00000000 d21=0000000000000000
+s44=00000000 s45=00000000 d22=0000000000000000
+s46=00000000 s47=00000000 d23=0000000000000000
+s48=00000000 s49=00000000 d24=0000000000000000
+s50=00000000 s51=00000000 d25=0000000000000000
+s52=00000000 s53=00000000 d26=0000000000000000
+s54=00000000 s55=00000000 d27=0000000000000000
+s56=00000000 s57=00000000 d28=0000000000000000
+s58=00000000 s59=00000000 d29=0000000000000000
+s60=00000000 s61=00000000 d30=0000000000000000
+s62=00000000 s63=00000000 d31=0000000000000000
+FPSCR: 00000000
+
+-
+
+$ arm-softmmu/qemu-system-arm -machine raspi2 -cpu cortex-a7 -smp 4 -accel tcg,thread=multi -kernel kernel7.img
+qemu-system-arm: Guest expects a stronger memory ordering than the host provides
+This may cause strange/hard to debug errors
+read access to unsupported AArch32 64 bit system register cp:13 opc1: 13 crm:0 (non-secure)
+qemu: fatal: Unhandled exception 0x0
+
+R00=00000002 R01=00000308 R02=00000000 R03=08000000
+R04=00000000 R05=00000000 R06=00000000 R07=00000000
+R08=00000000 R09=00000000 R10=00000000 R11=00000000
+R12=00000000 R13=00000000 R14=00000308 R15=08000000
+PSR=200001d3 --C- A NS svc32
+s00=00000000 s01=00000000 d00=0000000000000000
+s02=00000000 s03=00000000 d01=0000000000000000
+s04=00000000 s05=00000000 d02=0000000000000000
+s06=00000000 s07=00000000 d03=0000000000000000
+s08=00000000 s09=00000000 d04=0000000000000000
+s10=00000000 s11=00000000 d05=0000000000000000
+s12=00000000 s13=00000000 d06=0000000000000000
+s14=00000000 s15=00000000 d07=0000000000000000
+s16=00000000 s17=00000000 d08=0000000000000000
+s18=00000000 s19=00000000 d09=0000000000000000
+s20=00000000 s21=00000000 d10=0000000000000000
+s22=00000000 s23=00000000 d11=0000000000000000
+s24=00000000 s25=00000000 d12=0000000000000000
+s26=00000000 s27=00000000 d13=0000000000000000
+s28=00000000 s29=00000000 d14=0000000000000000
+s30=00000000 s31=00000000 d15=0000000000000000
+s32=00000000 s33=00000000 d16=0000000000000000
+s34=00000000 s35=00000000 d17=0000000000000000
+s36=00000000 s37=00000000 d18=0000000000000000
+s38=00000000 s39=00000000 d19=0000000000000000
+s40=00000000 s41=00000000 d20=0000000000000000
+s42=00000000 s43=00000000 d21=0000000000000000
+s44=00000000 s45=00000000 d22=0000000000000000
+s46=00000000 s47=00000000 d23=0000000000000000
+s48=00000000 s49=00000000 d24=0000000000000000
+s50=00000000 s51=00000000 d25=0000000000000000
+s52=00000000 s53=00000000 d26=0000000000000000
+s54=00000000 s55=00000000 d27=0000000000000000
+s56=00000000 s57=00000000 d28=0000000000000000
+s58=00000000 s59=00000000 d29=0000000000000000
+s60=00000000 s61=00000000 d30=0000000000000000
+s62=00000000 s63=00000000 d31=0000000000000000
+FPSCR: 00000000
+
+:)
+
+Philippe Mathieu-Daudé (8):
+  MAINTAINERS: update tcg entries
+  MAINTAINERS: update kvm entries
+  MAINTAINERS: update xen entries
+  MAINTAINERS: update tci entry
+  tcg/tci: enable bswap16_i64
+  tcg/tci: disable MTTCG if TCI is enabled
+  tcg/tci: time to remove it :(
+  travis: remove tcg/tci job
+
+ .travis.yml              |    3 -
+ MAINTAINERS              |   16 +-
+ Makefile.target          |    2 -
+ configure                |   31 +-
+ disas.c                  |    5 +-
+ disas/Makefile.objs      |    4 -
+ disas/tci.c              |   61 ---
+ include/disas/bfd.h      |    1 -
+ include/exec/exec-all.h  |   16 +-
+ tcg/tcg-common.c         |    4 -
+ tcg/tcg.c                |    6 +-
+ tcg/tci.c                | 1251 ----------------------------------------------
+ tcg/tci/README           |  130 -----
+ tcg/tci/tcg-target.h     |  195 --------
+ tcg/tci/tcg-target.inc.c |  897 ---------------------------------
+ 15 files changed, 14 insertions(+), 2608 deletions(-)
+ delete mode 100644 disas/tci.c
+ delete mode 100644 tcg/tci.c
+ delete mode 100644 tcg/tci/README
+ delete mode 100644 tcg/tci/tcg-target.h
+ delete mode 100644 tcg/tci/tcg-target.inc.c
+
 -- 
-2.7.4
+2.13.1
