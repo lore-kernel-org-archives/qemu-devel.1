@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46013)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dQaWK-0005vn-0K
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:34:17 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dQaZX-0007WO-QI
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:37:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dQaWE-0006jx-IA
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:34:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42344)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dQaWE-0006iS-8a
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:34:06 -0400
-Date: Thu, 29 Jun 2017 15:34:01 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170629143401.GA22733@work-vm>
-References: <20170608054116.17203-1-sjitindarsingh@gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dQaZX-0000b4-0n
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:37:31 -0400
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:37658)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dQaZW-0000an-PN
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:37:30 -0400
+Received: by mail-wm0-x22b.google.com with SMTP id i127so17052253wma.0
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 07:37:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170608054116.17203-1-sjitindarsingh@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH V2] monitor: Add -a (all) option to info
- registers
+In-Reply-To: <7de47a0f-baad-d849-eebd-87c86dae16c1@redhat.com>
+References: <1497369290-20401-1-git-send-email-peter.maydell@linaro.org>
+	<1497369290-20401-2-git-send-email-peter.maydell@linaro.org>
+	<f279fd6d-d32f-79e8-66e3-62edc0e425a8@amsat.org>
+	<937b2871-7380-4bfc-9a3b-997e496633ff@redhat.com>
+	<7b7e4b38-923d-b928-ab09-716b2140273b@amsat.org>
+	<7de47a0f-baad-d849-eebd-87c86dae16c1@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 29 Jun 2017 15:37:08 +0100
+Message-ID: <CAFEAcA_h+PM25Fxb3KZPLnRoFkiJw=e4dAeWJ7b6FU3c-rmKaA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 1/3] travis: install more library
+ dependencies
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,90 +34,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Markus Armbruster <armbru@redhat.com>, "patches@linaro.org" <patches@linaro.org>, Fam Zheng <famz@redhat.com>
 
-* Suraj Jitindar Singh (sjitindarsingh@gmail.com) wrote:
-> The info registers command in the qemu monitor is used to dump register
-> values.
-> 
-> Currently this command uses the monitor cpu (which can be set by the
-> user) as the cpu for whose registers will be dumped. Sometimes it is
-> useful to see the registers for all cpus and currently this requires
-> setting the monitor cpu and the re-running the command for each cpu
-> in the system. I would be nice if there was an easier way to do this.
-> 
-> Add the "-a" option to the info registers command to dump the register
-> values for all cpus.
-> 
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+On 14 June 2017 at 17:49, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> This patch and patch 2 are
+> useful, but I think I'd rather get full coverage, either with Shippable
+> or by keeping on doing manual builds, than to rush things and switch to
+> CI when it's not ready.
 
-Queued.
+I agree with this, so is there a path forwards where we
+get patch 2 into a shape where we can commit it and you
+switch to using it for the manual uploads, (and maybe
+eventually we have Shippable do it, but at least we have
+a reproducible way for somebody other than you to do it
+if needed) ?
 
-> ---
-> 
-> Change Log:
-> 
-> V1 -> V2:
->  - Add CPU number to beginning of register dump
-> ---
->  hmp-commands-info.hx |  6 +++---
->  monitor.c            | 21 ++++++++++++++++-----
->  2 files changed, 19 insertions(+), 8 deletions(-)
-> 
-> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-> index ae16901..ba98e58 100644
-> --- a/hmp-commands-info.hx
-> +++ b/hmp-commands-info.hx
-> @@ -100,9 +100,9 @@ ETEXI
->  
->      {
->          .name       = "registers",
-> -        .args_type  = "",
-> -        .params     = "",
-> -        .help       = "show the cpu registers",
-> +        .args_type  = "cpustate_all:-a",
-> +        .params     = "[-a]",
-> +        .help       = "show the cpu registers (-a: all - show register info for all cpus)",
->          .cmd        = hmp_info_registers,
->      },
->  
-> diff --git a/monitor.c b/monitor.c
-> index baa73c9..1629ad1 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -1078,13 +1078,24 @@ int monitor_get_cpu_index(void)
->  
->  static void hmp_info_registers(Monitor *mon, const QDict *qdict)
->  {
-> -    CPUState *cs = mon_get_cpu();
-> +    bool all_cpus = qdict_get_try_bool(qdict, "cpustate_all", false);
-> +    CPUState *cs;
->  
-> -    if (!cs) {
-> -        monitor_printf(mon, "No CPU available\n");
-> -        return;
-> +    if (all_cpus) {
-> +        CPU_FOREACH(cs) {
-> +            monitor_printf(mon, "\nCPU#%d\n", cs->cpu_index);
-> +            cpu_dump_state(cs, (FILE *)mon, monitor_fprintf, CPU_DUMP_FPU);
-> +        }
-> +    } else {
-> +        cs = mon_get_cpu();
-> +
-> +        if (!cs) {
-> +            monitor_printf(mon, "No CPU available\n");
-> +            return;
-> +        }
-> +
-> +        cpu_dump_state(cs, (FILE *)mon, monitor_fprintf, CPU_DUMP_FPU);
->      }
-> -    cpu_dump_state(cs, (FILE *)mon, monitor_fprintf, CPU_DUMP_FPU);
->  }
->  
->  static void hmp_info_jit(Monitor *mon, const QDict *qdict)
-> -- 
-> 2.9.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+I think for that we should update the comments at the top
+to delete the bit that says "primary purpose is for travis".
+I think we should also make the configure line include
+--enable-foo for all the features we currently test, so that
+if somebody tries to run it on a machine with missing
+dependencies they get a configure error rather than silently
+uploading with reduced coverage.
+
+Can you suggest a set of --enable-foo flags which give us
+the coverage we're getting currently with the machine you
+do the manual runs on?
+
+thanks
+-- PMM
