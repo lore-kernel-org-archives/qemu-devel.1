@@ -1,34 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dQNHc-0001ri-52
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 20:26:09 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dQNHd-0001rp-DK
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 20:26:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dQNHX-00032o-0A
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 20:26:08 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39713
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dQNHY-000345-74
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 20:26:09 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39775
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1dQNHW-00031j-Mw
-	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 20:26:02 -0400
+	id 1dQNHX-00033L-U0
+	for qemu-devel@nongnu.org; Wed, 28 Jun 2017 20:26:04 -0400
 Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v5T0OJg7116041
-	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 20:26:01 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bcnmqajju-1
+	v5T0OJRp115992
+	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 20:26:03 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2bcnmqajm4-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 20:26:00 -0400
+	for <qemu-devel@nongnu.org>; Wed, 28 Jun 2017 20:26:03 -0400
 Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 28 Jun 2017 20:26:00 -0400
+	Wed, 28 Jun 2017 18:26:02 -0600
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Wed, 28 Jun 2017 19:24:55 -0500
-Message-Id: <1498695900-1648-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [RFC PATCH 0/5] hotplug: fix premature rebinding of
- VFIO devices to host
+Date: Wed, 28 Jun 2017 19:24:58 -0500
+In-Reply-To: <1498695900-1648-1-git-send-email-mdroth@linux.vnet.ibm.com>
+References: <1498695900-1648-1-git-send-email-mdroth@linux.vnet.ibm.com>
+Message-Id: <1498695900-1648-4-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [RFC PATCH 3/5] virpci: introduce
+ virPCIIOMMUGroupIterate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,83 +42,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: libvir-list@redhat.com
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, aik@ozlabs.ru, alex.williamson@redhat.com, abologna@redhat.com, laine@laine.org, pkrempa@redhat.com, berrange@redhat.com, mprivozn@redhat.com, sbhat@linux.vnet.ibm.com
 
-Hi everyone. Hoping to get some feedback on this approach, or some
-alternatives proposed below, to the following issue:
+This serves a similar purpose to virPCIDeviceAddressIOMMUGroupIterate,
+but uses the iommu group number to find matches instead of a device
+within the group. We refactor the code to use this new function and
+also export it for use in subsequent patches.
 
-Currently libvirt immediately attempts to rebind a managed device back to the
-host driver when it receives a DEVICE_DELETED event from QEMU. This is
-problematic for 2 reasons:
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+---
+ src/util/virpci.c | 42 ++++++++++++++++++++++++++++++------------
+ src/util/virpci.h |  3 +++
+ 2 files changed, 33 insertions(+), 12 deletions(-)
 
-1) If multiple devices from a group are attached to a guest, this can move
-   the group into a "non-viable" state where some devices are assigned to
-   the host and some to the guest.
-
-2) When QEMU emits the DEVICE_DELETED event, there's still a "finalize" phase
-   where additional cleanup occurs. In most cases libvirt can ignore this
-   cleanup, but in the case of VFIO devices this is where closing of a VFIO
-   group FD occurs, and failing to wait before rebinding the device to the
-   host driver can result in unexpected behavior. In the case of powernv
-   hosts at least, this can lead to a host driver crashing due to the default
-   DMA windows not having been fully-restored yet. The window between this is
-   and the initial DEVICE_DELETED seems to be ~6 seconds in practice. We've
-   seen host dumps with Mellanox CX4 VFs being rebound to host driver during
-   this period (on powernv hosts).
-
-Patches 1-4 address 1) by deferring rebinding of a hostdev to the host driver
-until all the devices in the group have been detached, at which point all
-the hostdevs are rebound as a group. Until that point, the devices are traced
-by the drvManager's inactiveList in a similar manner to hostdevs that are
-assigned to VFIO via the nodedev-detach interface.
-
-Patch 5 addresses 2) by adding an additional check that, when the last device
-from a group is detached, polls /proc for open FDs referencing the VFIO group
-path in /dev/vfio/<iommu_group> and waiting for the FD to be closed. If we
-time out, we abandon rebinding the hostdevs back to the host.
-
-There are a couple alternatives to Patch 5 that might be worth considering:
-
-a) Add a DEVICE_FINALIZED event to QEMU and wait for that instead of
-   DEVICE_DELETED. Paired with patches 1-4 this would let us drop patch 5 in
-   favor of minimal changes to libvirt's event handlers.
-
-   The downsides are:
-    - that we'd incur some latency for all device-detach calls, but it's not
-      apparent to me whether this delay is significant for anything outside
-      of VFIO.
-    - there may be cases where finalization after DEVICE_DELETE/unparent are
-      is not guaranteed, and I'm not sure QOM would encourage such
-      expectations even if that's currently the case.
-
-b) Add a GROUP_DELETED event to VFIO's finalize callback. This is the most
-   direct solution. With this we could completely separate out the handling
-   of rebinding to host driver based on receival of this event.
-
-   The downsides are:
-    - this would only work for newer versions of QEMU, though we could use
-      the poll-wait in patch 5 as a fallback.
-    - synchronizing sync/async device-detach threads with sync/async
-      handlers for this would be a bit hairy, but I have a WIP in progress
-      that seems *fairly reasonable*
-
-c) Take the approach in Patch 5, either as a precursor to implementing b) or
-   something else, or just sticking with that for now.
-
-d) ???
-
-Personally I'm leaning toward c), but I'm wondering if that's "good enough"
-for now, or if we should pursue something more robust from the start, or
-perhaps something else entirely?
-
-Any feedback is greatly appreciated!
-
- src/libvirt_private.syms |   5 ++
- src/qemu/qemu_hostdev.c  |  16 +++++
- src/qemu/qemu_hostdev.h  |   4 ++
- src/qemu/qemu_hotplug.c  |  56 ++++++++++++++----
- src/util/virfile.c       |  52 +++++++++++++++++
- src/util/virfile.h       |   1 +
- src/util/virhostdev.c    | 173 ++++++++++++++++++++++++++++++++++++++++++++++++++-----
- src/util/virhostdev.h    |  16 +++++
- src/util/virpci.c        |  69 ++++++++++++++++++----
- src/util/virpci.h        |   4 ++
- 10 files changed, 360 insertions(+), 36 deletions(-)
+diff --git a/src/util/virpci.c b/src/util/virpci.c
+index 2c1b758..b842f44 100644
+--- a/src/util/virpci.c
++++ b/src/util/virpci.c
+@@ -49,6 +49,7 @@
+ VIR_LOG_INIT("util.pci");
+ 
+ #define PCI_SYSFS "/sys/bus/pci/"
++#define IOMMU_GROUP_SYSFS "/sys/kernel/iommu_groups/"
+ #define PCI_ID_LEN 10   /* "XXXX XXXX" */
+ #define PCI_ADDR_LEN 13 /* "XXXX:XX:XX.X" */
+ 
+@@ -2178,16 +2179,13 @@ int virPCIDeviceFileIterate(virPCIDevicePtr dev,
+     return ret;
+ }
+ 
+-
+-/* virPCIDeviceAddressIOMMUGroupIterate:
+- *   Call @actor for all devices in the same iommu_group as orig
+- *   (including orig itself) Even if there is no iommu_group for the
+- *   device, call @actor once for orig.
++/* virPCIIOMMUGroupIterate:
++ *   Call @actor for all devices in a particular iommu_group.
+  */
+ int
+-virPCIDeviceAddressIOMMUGroupIterate(virPCIDeviceAddressPtr orig,
+-                                     virPCIDeviceAddressActor actor,
+-                                     void *opaque)
++virPCIIOMMUGroupIterate(int iommu_group,
++                        virPCIDeviceAddressActor actor,
++                        void *opaque)
+ {
+     char *groupPath = NULL;
+     DIR *groupDir = NULL;
+@@ -2196,13 +2194,11 @@ virPCIDeviceAddressIOMMUGroupIterate(virPCIDeviceAddressPtr orig,
+     int direrr;
+ 
+     if (virAsprintf(&groupPath,
+-                    PCI_SYSFS "devices/%04x:%02x:%02x.%x/iommu_group/devices",
+-                    orig->domain, orig->bus, orig->slot, orig->function) < 0)
++                    IOMMU_GROUP_SYSFS "%d/devices",
++                    iommu_group) < 0)
+         goto cleanup;
+ 
+     if (virDirOpenQuiet(&groupDir, groupPath) < 0) {
+-        /* just process the original device, nothing more */
+-        ret = (actor)(orig, opaque);
+         goto cleanup;
+     }
+ 
+@@ -2230,6 +2226,28 @@ virPCIDeviceAddressIOMMUGroupIterate(virPCIDeviceAddressPtr orig,
+     return ret;
+ }
+ 
++/* virPCIDeviceAddressIOMMUGroupIterate:
++ *   Call @actor for all devices in the same iommu_group as orig
++ *   (including orig itself) Even if there is no iommu_group for the
++ *   device, call @actor once for orig.
++ */
++int
++virPCIDeviceAddressIOMMUGroupIterate(virPCIDeviceAddressPtr orig,
++                                     virPCIDeviceAddressActor actor,
++                                     void *opaque)
++{
++    int ret = -1;
++
++    ret = virPCIIOMMUGroupIterate(virPCIDeviceAddressGetIOMMUGroupNum(orig),
++                                  actor, opaque);
++    if (ret < 0) {
++        /* just process the original device, nothing more */
++        ret = (actor)(orig, opaque);
++    }
++
++    return ret;
++}
++
+ 
+ static int
+ virPCIDeviceGetIOMMUGroupAddOne(virPCIDeviceAddressPtr newDevAddr, void *opaque)
+diff --git a/src/util/virpci.h b/src/util/virpci.h
+index 570684e..5ec1306 100644
+--- a/src/util/virpci.h
++++ b/src/util/virpci.h
+@@ -176,6 +176,9 @@ typedef int (*virPCIDeviceAddressActor)(virPCIDeviceAddressPtr addr,
+ int virPCIDeviceAddressIOMMUGroupIterate(virPCIDeviceAddressPtr orig,
+                                          virPCIDeviceAddressActor actor,
+                                          void *opaque);
++int virPCIIOMMUGroupIterate(int iommu_group,
++                            virPCIDeviceAddressActor actor,
++                            void *opaque);
+ virPCIDeviceListPtr virPCIDeviceGetIOMMUGroupList(virPCIDevicePtr dev);
+ int virPCIDeviceAddressGetIOMMUGroupAddresses(virPCIDeviceAddressPtr devAddr,
+                                               virPCIDeviceAddressPtr **iommuGroupDevices,
+-- 
+2.7.4
