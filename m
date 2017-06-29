@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45203)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dQZKX-0005Lk-0u
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:17:57 -0400
+	(envelope-from <berrange@redhat.com>) id 1dQZKr-0005cF-Eh
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:18:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dQZKW-00058W-9O
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:17:56 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20170621125047.30294-2-mreitz@redhat.com>
-References: <20170621125047.30294-1-mreitz@redhat.com>
-	<20170621125047.30294-2-mreitz@redhat.com>
-Date: Thu, 29 Jun 2017 15:17:44 +0200
-Message-ID: <w51h8yz53wn.fsf@maestria.local.igalia.com>
+	(envelope-from <berrange@redhat.com>) id 1dQZKo-0005DA-Nh
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:18:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51126)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dQZKo-0005Cq-HN
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 09:18:14 -0400
+Date: Thu, 29 Jun 2017 14:18:07 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170629131807.GD32167@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170628204452.41230-1-raj.khem@gmail.com>
+	<CAFEAcA-N3Ve8GmX6Yq+Kbng8vExe3CzDT_2_07JML8QC2xVwDA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v5 01/25] block/mirror: Small
- absolute-paths simplification
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-N3Ve8GmX6Yq+Kbng8vExe3CzDT_2_07JML8QC2xVwDA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] replace struct ucontext with ucontext_t
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,19 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Khem Raj <raj.khem@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>, Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 
-On Wed 21 Jun 2017 02:50:23 PM CEST, Max Reitz wrote:
-> When invoking drive-mirror in absolute-paths mode, the target's backing
-> BDS is assigned to it in mirror_exit(). The current logic only does so
-> if the target does not have that backing BDS already; but it actually
-> cannot have a backing BDS at all (the BDS is opened with O_NO_BACKING in
-> qmp_drive_mirror()), so just assert that and assign the new backing BDS
-> unconditionally.
->
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+On Thu, Jun 29, 2017 at 10:05:13AM +0100, Peter Maydell wrote:
+> On 28 June 2017 at 21:44, Khem Raj <raj.khem@gmail.com> wrote:
+> > The ucontext_t type had a tag struct ucontext until now
+> > but newer glibc will drop it so we need to adjust and use
+> > the exposed type instead
+> 
+> If true this seems like a bug in glibc to break
+> existing working programs, and it should be fixed there...
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+The glib commit message indicates it is intentional change, in order
+to get POSIX compliance:
 
-Berto
+  https://sourceware.org/git/?p=glibc.git;a=commit;h=251287734e89a52da3db682a8241eb6bccc050c9
+
+NB, other parts of QEMU like the coroutine code are already
+using the 'ucontext_t' typedef, so attaining consistency across
+files is good regardless of the glibc change.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
