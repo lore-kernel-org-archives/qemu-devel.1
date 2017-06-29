@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dQa14-0002kh-Hl
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:01:55 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dQa3V-0003k3-MA
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:04:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dQa10-0003Um-Lq
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:01:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37140)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dQa10-0003U3-Du
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:01:50 -0400
-Date: Thu, 29 Jun 2017 15:01:42 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170629140142.GE32167@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170613165313.20954-1-ehabkost@redhat.com>
-	<87o9t8qy7d.fsf@dusky.pond.sub.org>
-	<20170628174158.GG12152@localhost.localdomain>
+	(envelope-from <stefanha@gmail.com>) id 1dQa3M-0004oh-7L
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:04:25 -0400
+Date: Thu, 29 Jun 2017 15:04:11 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170629140411.GB18146@stefanha-x1.localdomain>
+References: <20170627224616.18538-1-el13635@mail.ntua.gr>
+	<20170627224616.18538-3-el13635@mail.ntua.gr>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="zx4FCpZtqtKETZ7O"
 Content-Disposition: inline
-In-Reply-To: <20170628174158.GG12152@localhost.localdomain>
-Subject: Re: [Qemu-devel] [RFC 00/15] Error API: Flag errors in *errp even
- if errors are being ignored
+In-Reply-To: <20170627224616.18538-3-el13635@mail.ntua.gr>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] block: add default
+ implementations for bdrv_co_get_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +25,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-On Wed, Jun 28, 2017 at 02:41:58PM -0300, Eduardo Habkost wrote:
-> On Wed, Jun 28, 2017 at 11:05:26AM +0200, Markus Armbruster wrote:
 
-> > > Ensuring errp is never NULL
-> > > ---------------------------
-> > >
-> > > The last patch on this series changes the (Error **errp)
-> > > parameters in functions to (Error *errp[static 1]), just to help
-> > > validate the existing code, as clang warns about NULL arguments
-> > > on that case.  I don't think we should apply that patch, though,
-> > > because the "[static 1]" syntax confuses Coccinelle.
-> > >
-> > > I have a branch where I experimented with the idea of replacing
-> > > (Error **errp) parameters with an opaque type (void*, or a struct
-> > > type).  I gave up when I noticed it would require touching all
-> > > callers to replace &err with a wrapper macro to convert to the
-> > > right type.  Suggestions to make NULL errp easier to detect at
-> > > build time are welcome.
-> > >
-> > > (Probably the easiest solution for that is to add assert(errp)
-> > > lines to the ERR_IS_*() macros.)
-> > 
-> > We'll obviously struggle with null arguments until all the developers
-> > adjusted to the new interface.  Possibly with occasional mistakes
-> > forever.  Compile-time checking would really, really help.
-> 
-> True.  I'm investigating the possibility of using
-> __attribute__((nonull(...))) with Coccinelle's help.
+--zx4FCpZtqtKETZ7O
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Beware that '__attribute__((nonnull))' has two distinct effects,
-one of which is a potentially nasty trap which leads to crashes....
+On Wed, Jun 28, 2017 at 01:46:16AM +0300, Manos Pitsidianakis wrote:
+> bdrv_co_get_block_status_from_file() and
+> bdrv_co_get_block_status_from_backing() set *file to bs->file and
+> bs->backing respectively, so that bdrv_co_get_block_status() can recurse
+> to them. Future block drivers won't have to duplicate code to implement
+> this.
+>=20
+> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+> ---
+>  block/blkdebug.c          | 12 +-----------
+>  block/commit.c            | 12 +-----------
+>  block/io.c                | 24 ++++++++++++++++++++++++
+>  block/mirror.c            | 12 +-----------
+>  include/block/block_int.h | 16 ++++++++++++++++
+>  5 files changed, 43 insertions(+), 33 deletions(-)
 
-The useful part is that it allows compilers & analysis tools
-like coverity to warn if you accidentally pass NULL into
-a method. These warnings, particularly from gcc, only catch
-a fraction of scenarios where you pass NULL in though.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-The less useful part is that if GCC sees a nonnull annotation
-on a parameter, then in the body of the method, it will silently
-remove any code which does  "if (!paramname)". So if you added
-a check for the parameter being NULL to avoid a crash, gcc will
-remove that protection, so you'll once again get a crash at
-runtime if passing NULL.
+--zx4FCpZtqtKETZ7O
+Content-Type: application/pgp-signature; name="signature.asc"
 
-So if you use the nonnull annotation, they you probably want
-to make sure to pass  -fno-delete-null-pointer-checks to
-GCC to stop it removing your protection code, or you need to
-be very confident that nothing will mistakenly pass NULL into
-the methods annotated nonnull.
+-----BEGIN PGP SIGNATURE-----
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+iQEcBAEBAgAGBQJZVQjbAAoJEJykq7OBq3PIMHkIAL1nhk8WRoZfk3MgtayzfMY1
+lCQ3QwGzuH8T3+OFxno1Gsu4nozx26cF/Po30zI1cpFPGrjOaz7wbQHTbQ+fzOX9
+MehhOOMB3aPoC28eJVH0aXtAPVjM0ODaVF1UXKKXi8phocKjhtC+ocdR1G1R/QQE
+4aDawQr+Zw+S2WXSU+fuassKYl6+dajW4/NiWEU0ZuVZ2+vdWRHiuwCkqgU2sk+v
+f1mtxT0OOnPevPdNtQ2wY7sbRQpA/2C8KhlKmA9DjXZxRHPvNzopkJUzRcJRp0wM
+dV0MAlEMU4DcbWXq9i1vmQKDmkCte2lAaricRfKLz2xV3UoYCIXSWNuW53EMIsE=
+=/G7H
+-----END PGP SIGNATURE-----
+
+--zx4FCpZtqtKETZ7O--
