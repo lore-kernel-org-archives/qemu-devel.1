@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51640)
 	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1dQX8f-00072N-3C
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 06:57:34 -0400
+	id 1dQX8d-00071m-Kg
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 06:57:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1dQX8d-00083u-N9
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 06:57:33 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:39176 helo=mx01.kamp.de)
+	(envelope-from <pl@kamp.de>) id 1dQX8W-0007vR-Hq
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 06:57:28 -0400
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:42868 helo=mx01.kamp.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dQX8d-00081A-EO
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 06:57:31 -0400
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dQX8W-0007r3-8N
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 06:57:24 -0400
 From: Peter Lieven <pl@kamp.de>
-Date: Thu, 29 Jun 2017 12:57:10 +0200
-Message-Id: <1498733831-15254-8-git-send-email-pl@kamp.de>
+Date: Thu, 29 Jun 2017 12:57:04 +0200
+Message-Id: <1498733831-15254-2-git-send-email-pl@kamp.de>
 In-Reply-To: <1498733831-15254-1-git-send-email-pl@kamp.de>
 References: <1498733831-15254-1-git-send-email-pl@kamp.de>
-Subject: [Qemu-devel] [PATCH V2 7/8] block/qcow2: start using the compress
- format extension
+Subject: [Qemu-devel] [PATCH V2 1/8] docs: add compress format extension to
+ qcow2 spec
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,172 +27,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, kwolf@redhat.com, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com, berrange@redhat.com, Peter Lieven <pl@kamp.de>
 
-we now pass the parameters to the zlib compressor if the
-extension is present and use the old default values if
-the extension is absent.
-
 Signed-off-by: Peter Lieven <pl@kamp.de>
 ---
- block/qcow2-cluster.c | 58 ++++++++++++++++++++++++++++++---------------------
- block/qcow2.c         | 57 +++++++++++++++++++++++++++-----------------------
- 2 files changed, 65 insertions(+), 50 deletions(-)
+ docs/interop/qcow2.txt | 43 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 42 insertions(+), 1 deletion(-)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 3d341fd..353ac87 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -1521,30 +1521,39 @@ again:
- }
+diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
+index 80cdfd0..c01daf3 100644
+--- a/docs/interop/qcow2.txt
++++ b/docs/interop/qcow2.txt
+@@ -85,7 +85,12 @@ in the description of a field.
+                                 be written to (unless for regaining
+                                 consistency).
  
- static int decompress_buffer(uint8_t *out_buf, int out_buf_size,
--                             const uint8_t *buf, int buf_size)
-+                             const uint8_t *buf, int buf_size,
-+                             uint32_t compress_format_id)
- {
--    z_stream strm1, *strm = &strm1;
--    int ret, out_len;
--
--    memset(strm, 0, sizeof(*strm));
--
--    strm->next_in = (uint8_t *)buf;
--    strm->avail_in = buf_size;
--    strm->next_out = out_buf;
--    strm->avail_out = out_buf_size;
--
--    ret = inflateInit2(strm, -12);
--    if (ret != Z_OK)
--        return -1;
--    ret = inflate(strm, Z_FINISH);
--    out_len = strm->next_out - out_buf;
--    if ((ret != Z_STREAM_END && ret != Z_BUF_ERROR) ||
--        out_len != out_buf_size) {
--        inflateEnd(strm);
--        return -1;
--    }
--    inflateEnd(strm);
--    return 0;
-+    int ret = 0, out_len;
+-                    Bits 2-63:  Reserved (set to 0)
++                    Bit 2:      Compress format bit.  If and only if this bit
++                                is set then the compress format extension
++                                MUST be present and MUST be parsed and checked
++                                for compatibility.
 +
-+    switch (compress_format_id) {
-+    case QCOW2_COMPRESS_ZLIB:
-+    case QCOW2_COMPRESS_ZLIB_COMPAT: {
-+        z_stream z_strm = {};
++                    Bits 3-63:  Reserved (set to 0)
+ 
+          80 -  87:  compatible_features
+                     Bitmask of compatible features. An implementation can
+@@ -135,6 +140,7 @@ be stored. Each extension has a structure like the following:
+                         0xE2792ACA - Backing file format name
+                         0x6803f857 - Feature name table
+                         0x23852875 - Bitmaps extension
++                        0xC03183A3 - Compress format extension
+                         other      - Unknown header extension, can be safely
+                                      ignored
+ 
+@@ -208,6 +214,41 @@ The fields of the bitmaps extension are:
+                    starts. Must be aligned to a cluster boundary.
+ 
+ 
++== Compress format extension ==
 +
-+        z_strm.next_in = (uint8_t *)buf;
-+        z_strm.avail_in = buf_size;
-+        z_strm.next_out = out_buf;
-+        z_strm.avail_out = out_buf_size;
++The compress format extension is an optional header extension. It provides
++the ability to specify the compress algorithm and compress parameters
++that are used for compressed clusters. This new header MUST be present if
++the incompatible-feature bit "compress format bit" is set and MUST be absent
++otherwise.
 +
-+        ret = inflateInit2(&z_strm, -15);
-+        if (ret != Z_OK) {
-+            return -1;
-+        }
-+        ret = inflate(&z_strm, Z_FINISH);
-+        out_len = z_strm.next_out - out_buf;
-+        ret = -(ret != Z_STREAM_END);
-+        inflateEnd(&z_strm);
-+        break;
-+    }
-+    default:
-+        abort(); /* should never reach this point */
-+    }
++The fields of the compress format extension are:
 +
-+    if (out_len != out_buf_size) {
-+        ret = -1;
-+    }
-+    return ret;
- }
++    Byte  0 - 15:  compress_format_name (padded with zeros, but not
++                   necessarily null terminated if it has full length)
++
++              16:  compress_level (uint8_t)
++                   0 = default compress level
++                   1 = lowest compress level
++                   x = highest compress level (the highest compress
++                       level may vary for different compress formats)
++
++         17 - 19:  Reserved for future use, must be zero.
++
++         20 - 23:  extra_data_size
++                   Size of compress format specific extra data.
++                   For now, as no format specifies extra data,
++                   extra_data_size is reserved and should be zero.
++
++        variable:  extra_data
++                   Extra data with additional parameters for the compress
++                   format, occupying extra_data_size bytes.
++
++        variable:  Padding to round up the size of compress format extension
++                   to the next multiple of 8. All bytes of the padding must be
++                   zero.
++
++
+ == Host cluster management ==
  
- int qcow2_decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset)
-@@ -1565,7 +1574,8 @@ int qcow2_decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset)
-             return ret;
-         }
-         if (decompress_buffer(s->cluster_cache, s->cluster_size,
--                              s->cluster_data + sector_offset, csize) < 0) {
-+                              s->cluster_data + sector_offset, csize,
-+                              s->compress_format_id) < 0) {
-             return -EIO;
-         }
-         s->cluster_cache_offset = coffset;
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 0a7202a..b41e58d 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2748,9 +2748,10 @@ qcow2_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
-     BDRVQcow2State *s = bs->opaque;
-     QEMUIOVector hd_qiov;
-     struct iovec iov;
--    z_stream strm;
--    int ret, out_len;
--    uint8_t *buf, *out_buf, *local_buf = NULL;
-+    z_stream z_strm = {};
-+    int z_windowBits = -15, z_level = Z_DEFAULT_COMPRESSION;
-+    int ret, out_len = 0;
-+    uint8_t *buf, *out_buf = NULL, *local_buf = NULL;
-     uint64_t cluster_offset;
- 
-     if (bytes == 0) {
-@@ -2775,34 +2776,38 @@ qcow2_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
-         buf = qiov->iov[0].iov_base;
-     }
- 
--    out_buf = g_malloc(s->cluster_size);
-+    switch (s->compress_format_id) {
-+    case QCOW2_COMPRESS_ZLIB_COMPAT:
-+        z_windowBits = -12;
-+    case QCOW2_COMPRESS_ZLIB:
-+        out_buf = g_malloc(s->cluster_size);
-+        if (s->compress_format.level > 0) {
-+            z_level = s->compress_format.level;
-+        }
- 
--    /* best compression, small window, no zlib header */
--    memset(&strm, 0, sizeof(strm));
--    ret = deflateInit2(&strm, Z_DEFAULT_COMPRESSION,
--                       Z_DEFLATED, -12,
--                       9, Z_DEFAULT_STRATEGY);
--    if (ret != 0) {
--        ret = -EINVAL;
--        goto fail;
--    }
-+        ret = deflateInit2(&z_strm, z_level, Z_DEFLATED, z_windowBits, 9,
-+                           Z_DEFAULT_STRATEGY);
-+        if (ret != Z_OK) {
-+            ret = -EINVAL;
-+            goto fail;
-+        }
- 
--    strm.avail_in = s->cluster_size;
--    strm.next_in = (uint8_t *)buf;
--    strm.avail_out = s->cluster_size;
--    strm.next_out = out_buf;
-+        z_strm.avail_in = s->cluster_size;
-+        z_strm.next_in = (uint8_t *)buf;
-+        z_strm.avail_out = s->cluster_size;
-+        z_strm.next_out = out_buf;
- 
--    ret = deflate(&strm, Z_FINISH);
--    if (ret != Z_STREAM_END && ret != Z_OK) {
--        deflateEnd(&strm);
--        ret = -EINVAL;
--        goto fail;
--    }
--    out_len = strm.next_out - out_buf;
-+        ret = deflate(&z_strm, Z_FINISH);
-+        out_len = z_strm.next_out - out_buf;
-+        deflateEnd(&z_strm);
- 
--    deflateEnd(&strm);
-+        ret = ret != Z_STREAM_END;
-+        break;
-+    default:
-+        abort(); /* should never reach this point */
-+    }
- 
--    if (ret != Z_STREAM_END || out_len >= s->cluster_size) {
-+    if (ret || out_len >= s->cluster_size) {
-         /* could not compress: write normal cluster */
-         ret = qcow2_co_pwritev(bs, offset, bytes, qiov, 0);
-         if (ret < 0) {
+ qcow2 manages the allocation of host clusters by maintaining a reference count
 -- 
 1.9.1
