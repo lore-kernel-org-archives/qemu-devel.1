@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dQU2Z-0003Ho-0t
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 03:39:03 -0400
+	(envelope-from <ashijeetacharya@gmail.com>) id 1dQU67-00041d-Mk
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 03:42:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dQU2V-0000gu-0D
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 03:39:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47582)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dQU2U-0000gb-R4
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 03:38:58 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <cover.1498596157.git.alistair.francis@xilinx.com>
-	<4e1eded5cda7b182a8a4cb133b40b2915817b7d1.1498596157.git.alistair.francis@xilinx.com>
-	<20170628090448.GE29134@redhat.com>
-	<CAKmqyKNEgZPMdS5B4J09XVpDQt0LXw0YFbMdBa_fnBXmnndftA@mail.gmail.com>
-	<20170628161927.GQ29134@redhat.com>
-Date: Thu, 29 Jun 2017 09:38:55 +0200
-In-Reply-To: <20170628161927.GQ29134@redhat.com> (Daniel P. Berrange's message
-	of "Wed, 28 Jun 2017 17:19:27 +0100")
-Message-ID: <87r2y31bw0.fsf@dusky.pond.sub.org>
+	(envelope-from <ashijeetacharya@gmail.com>) id 1dQU66-0002QQ-K6
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 03:42:43 -0400
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC v1 2/3] util/qemu-error: Add a
- warning_report() function
+In-Reply-To: <20170627080210.GB14166@lemon.lan>
+References: <1496649172-26982-1-git-send-email-ashijeetacharya@gmail.com>
+	<1496649172-26982-7-git-send-email-ashijeetacharya@gmail.com>
+	<20170627080210.GB14166@lemon.lan>
+From: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Date: Thu, 29 Jun 2017 13:12:39 +0530
+Message-ID: <CAC2QTZbRR_z4QtVNck_R9=tB_DKyQgbdO7sdLBRwROmz6hBERQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v6 6/8] vmdk: New functions to assist
+ allocating multiple clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +24,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Fam Zheng <famz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
 
-"Daniel P. Berrange" <berrange@redhat.com> writes:
-
-> On Wed, Jun 28, 2017 at 09:16:45AM -0700, Alistair Francis wrote:
->> On Wed, Jun 28, 2017 at 2:04 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
->> > On Tue, Jun 27, 2017 at 01:45:45PM -0700, Alistair Francis wrote:
->> >> Add a functino which can be used similarly to error_report() execpt to
->> >> inform the users about warnings instead of errors.
->> >>
->> >> The warning print does not include the timestamp and instead will
->> >> preface the messages with a 'warning: '.
->> >
->> > Not including the timestamp is a bug IMHO. If I've turned on timestamps,
->> > I expect all messages to have the timestamp.
->> 
->> That's fine, I'm happy to add it back in. I just wasn't sure.
->> 
->> >
->> > I'm not particularly convinced by adding the 'warning: ' prefix either,
->> > particularly given the scenario you are using this in, is not actually
->> > a warning - its just a informative message.
->> 
->> Maybe it makes more sense to add an extra argument to error_report()
->> that can be used to specify error, warning or information. The same
->> way qemu_log_mask() works. That was Edgar's idea in reply to one of
->> the other patches.
->> 
->> Does that sound more useful?
+On Tue, Jun 27, 2017 at 1:32 PM, Fam Zheng <famz@redhat.com> wrote:
+> On Mon, 06/05 13:22, Ashijeet Acharya wrote:
+>> +/*
+>> + * vmdk_handle_alloc
+>> + *
+>> + * Allocate new clusters for an area that either is yet unallocated or needs a
+>> + * copy on write. If *cluster_offset is non_zero, clusters are only allocated if
+>> + * the new allocation can match the specified host offset.
 >
-> I'd suggest renaming the current 'error_report' to 'message_report' and
-> making it take an extra arg that accepts a enum flag INFO | WARNING | ERROR.
-> Then add macros for  error_report, warning_report, info_report that call
-> message_report with the right enum.  That way you don't have to update any
-> of the existing code that calls error_report.
+> I don't think this matches the function body, the passed in *cluster_offset
+> value is ignored.
+>
+>> + *
+>> + * Returns:
+>> + *   VMDK_OK:       if new clusters were allocated, *bytes may be decreased if
+>> + *                  the new allocation doesn't cover all of the requested area.
+>> + *                  *cluster_offset is updated to contain the offset of the
+>> + *                  first newly allocated cluster.
+>> + *
+>> + *   VMDK_UNALLOC:  if no clusters could be allocated. *cluster_offset is left
+>> + *                  unchanged.
+>> + *
+>> + *   VMDK_ERROR:    in error cases
+>> + */
+>> +static int vmdk_handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
+>> +                             uint64_t offset, uint64_t *cluster_offset,
+>> +                             int64_t *bytes, VmdkMetaData *m_data,
+>> +                             bool allocate, uint32_t *alloc_clusters_counter)
+>> +{
+>> +    int l1_index, l2_offset, l2_index;
+>> +    uint32_t *l2_table;
+>> +    uint32_t cluster_sector;
+>> +    uint32_t nb_clusters;
+>> +    bool zeroed = false;
+>> +    uint64_t skip_start_bytes, skip_end_bytes;
+>> +    int ret;
+>> +
+>> +    ret = get_cluster_table(extent, offset, &l1_index, &l2_offset,
+>> +                            &l2_index, &l2_table);
+>> +    if (ret < 0) {
+>> +        return ret;
+>> +    }
+>> +
+>> +    cluster_sector = le32_to_cpu(l2_table[l2_index]);
+>> +
+>> +    skip_start_bytes = vmdk_find_offset_in_cluster(extent, offset);
+>> +    /* Calculate the number of clusters to look for. Here we truncate the last
+>> +     * cluster, i.e. 1 less than the actual value calculated as we may need to
+>> +     * perform COW for the last one. */
+>> +    nb_clusters = DIV_ROUND_UP(skip_start_bytes + *bytes,
+>> +                               extent->cluster_sectors << BDRV_SECTOR_BITS) - 1;
+>> +
+>> +    nb_clusters = MIN(nb_clusters, extent->l2_size - l2_index);
+>> +    assert(nb_clusters <= INT_MAX);
+>> +
+>> +    /* update bytes according to final nb_clusters value */
+>> +    if (nb_clusters != 0) {
+>> +        *bytes = ((nb_clusters * extent->cluster_sectors) << BDRV_SECTOR_BITS)
+>> +                 - skip_start_bytes;
+>> +    } else {
+>> +        nb_clusters = 1;
+>> +    }
+>> +    *alloc_clusters_counter += nb_clusters;
+>> +    skip_end_bytes = skip_start_bytes + MIN(*bytes,
+>> +                     extent->cluster_sectors * BDRV_SECTOR_SIZE
+>> +                                    - skip_start_bytes);
+>
+> I don't understand the MIN part, shouldn't skip_end_bytes simply be
+> skip_start_bytes + *bytes?
+>
+>> +
+>> +    if (extent->has_zero_grain && cluster_sector == VMDK_GTE_ZEROED) {
+>> +        zeroed = true;
+>> +    }
+>> +
+>> +    if (!cluster_sector || zeroed) {
+>> +        if (!allocate) {
+>> +            return zeroed ? VMDK_ZEROED : VMDK_UNALLOC;
+>> +        }
+>> +
+>> +        cluster_sector = extent->next_cluster_sector;
+>> +        extent->next_cluster_sector += extent->cluster_sectors
+>> +                                                * nb_clusters;
+>> +
+>> +        ret = vmdk_perform_cow(bs, extent, cluster_sector * BDRV_SECTOR_SIZE,
+>> +                               offset, skip_start_bytes,
+>> +                               skip_end_bytes);
+>> +        if (ret < 0) {
+>> +            return ret;
+>> +        }
+>> +        if (m_data) {
+>> +            m_data->valid = 1;
+>> +            m_data->l1_index = l1_index;
+>> +            m_data->l2_index = l2_index;
+>> +            m_data->l2_offset = l2_offset;
+>> +            m_data->l2_cache_entry = &l2_table[l2_index];
+>> +            m_data->nb_clusters = nb_clusters;
+>> +        }
+>> +    }
+>> +    *cluster_offset = cluster_sector << BDRV_SECTOR_BITS;
+>> +    return VMDK_OK;
+>> +}
+>> +
+>> +/*
+>> + * vmdk_alloc_clusters
+>> + *
+>> + * For a given offset on the virtual disk, find the cluster offset in vmdk
+>> + * file. If the offset is not found, allocate a new cluster.
+>> + *
+>> + * If the cluster is newly allocated, m_data->nb_clusters is set to the number
+>> + * of contiguous clusters that have been allocated. In this case, the other
+>> + * fields of m_data are valid and contain information about the first allocated
+>> + * cluster.
+>> + *
+>> + * Returns:
+>> + *
+>> + *   VMDK_OK:           on success and @cluster_offset was set
+>> + *
+>> + *   VMDK_UNALLOC:      if no clusters were allocated and @cluster_offset is
+>> + *                      set to zero
+>> + *
+>> + *   VMDK_ERROR:        in error cases
+>> + */
+>> +static int vmdk_alloc_clusters(BlockDriverState *bs,
+>> +                               VmdkExtent *extent,
+>> +                               VmdkMetaData *m_data, uint64_t offset,
+>> +                               bool allocate, uint64_t *cluster_offset,
+>> +                               int64_t bytes,
+>> +                               uint32_t *total_alloc_clusters)
+>> +{
+>> +    uint64_t start, remaining;
+>> +    uint64_t new_cluster_offset;
+>> +    int64_t n_bytes;
+>> +    int ret;
+>> +
+>> +    if (extent->flat) {
+>> +        *cluster_offset = extent->flat_start_offset;
+>> +        return VMDK_OK;
+>> +    }
+>> +
+>> +    start = offset;
+>> +    remaining = bytes;
+>> +    new_cluster_offset = 0;
+>> +    *cluster_offset = 0;
+>> +    n_bytes = 0;
+>> +    if (m_data) {
+>> +        m_data->valid = 0;
+>> +    }
+>> +
+>> +    /* due to L2 table margins all bytes may not get allocated at once */
+>> +    while (true) {
+>> +
+>> +        if (!*cluster_offset) {
+>> +            *cluster_offset = new_cluster_offset;
+>> +        }
+>> +
+>> +        start              += n_bytes;
+>> +        remaining          -= n_bytes;
+>> +        new_cluster_offset += n_bytes;
+>
+> Like said above, even though you increment new_cluster_offset by n_bytes, it has
+> no effect inside vmdk_handle_alloc. Is this intended?
 
-*Functions*, please, not macros.  Macros would bloat the code for no
-benefit at all.
+I think that comment may have caused a confusion as it was valid only
+till v2/v3 and not now. I will remove it.
+
+Ashijeet
