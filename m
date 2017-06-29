@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54170)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dQdGY-0000f3-Ax
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 13:30:07 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1dQdIo-0001Lr-UM
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 13:32:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dQdGX-0004wt-Gy
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 13:30:06 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <cover.1498756113.git.alistair.francis@xilinx.com>
-	<ec037b86d3144d26ebdbb943515d2da02725d465.1498756113.git.alistair.francis@xilinx.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <cbdfef36-9f44-dcb9-a2e6-cf2fd65b0365@amsat.org>
-Date: Thu, 29 Jun 2017 14:29:54 -0300
+	(envelope-from <rkagan@virtuozzo.com>) id 1dQdIj-0006XI-O3
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 13:32:26 -0400
+Received: from mail-eopbgr30102.outbound.protection.outlook.com
+	([40.107.3.102]:58448
+	helo=EUR03-AM5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1dQdIj-0006VF-08
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 13:32:21 -0400
+Date: Thu, 29 Jun 2017 20:31:54 +0300
+From: Roman Kagan <rkagan@virtuozzo.com>
+Message-ID: <20170629173153.GA13435@rkaganb.sw.ru>
+References: <20170621162424.10462-1-rkagan@virtuozzo.com>
+	<20170621162424.10462-8-rkagan@virtuozzo.com>
+	<20170628164743.0df730a0@nial.brq.redhat.com>
+	<20170629095326.GA2973@rkaganb.sw.ru>
+	<20170629135329.0c2dcd70@nial.brq.redhat.com>
+	<20170629131019.GC2973@rkaganb.sw.ru>
+	<20170629163900.16efe4d6@nial.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <ec037b86d3144d26ebdbb943515d2da02725d465.1498756113.git.alistair.francis@xilinx.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 1/3] util/aio-win32: Only select on what
- we are actually waiting for
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170629163900.16efe4d6@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 07/23] hyperv: ensure VP index equal to
+ QEMU cpu_index
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +36,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, stefanha@redhat.com, famz@redhat.com
-Cc: alistair23@gmail.com, edgar.iglesias@xilinx.com, qemu-block@nongnu.org, philippe@mathieu-daude.net, pbonzini@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-On 06/29/2017 02:16 PM, Alistair Francis wrote:
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Acked-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+On Thu, Jun 29, 2017 at 04:39:00PM +0200, Igor Mammedov wrote:
+> On Thu, 29 Jun 2017 16:10:20 +0300
+> Roman Kagan <rkagan@virtuozzo.com> wrote:
+> 
+> > On Thu, Jun 29, 2017 at 01:53:29PM +0200, Igor Mammedov wrote:
+> > > On Thu, 29 Jun 2017 12:53:27 +0300
+> > > Roman Kagan <rkagan@virtuozzo.com> wrote:
+> > >   
+> > > > On Wed, Jun 28, 2017 at 04:47:43PM +0200, Igor Mammedov wrote:  
+> > > > > On Wed, 21 Jun 2017 19:24:08 +0300
+> > > > > Roman Kagan <rkagan@virtuozzo.com> wrote:
+> > > > >     
+> > > > > > Hyper-V identifies vCPUs by Virtual Processor (VP) index which can be
+> > > > > > queried by the guest via HV_X64_MSR_VP_INDEX msr.  It is defined by the
+> > > > > > spec as a sequential number which can't exceed the maximum number of
+> > > > > > vCPUs per VM.
+> > > > > > 
+> > > > > > It has to be owned by QEMU in order to preserve it across migration.
+> > > > > > 
+> > > > > > However, the initial implementation in KVM didn't allow to set this
+> > > > > > msr, and KVM used its own notion of VP index.  Fortunately, the way
+> > > > > > vCPUs are created in QEMU/KVM makes it likely that the KVM value is
+> > > > > > equal to QEMU cpu_index.
+> > > > > > 
+> > > > > > So choose cpu_index as the value for vp_index, and push that to KVM on
+> > > > > > kernels that support setting the msr.  On older ones that don't, query
+> > > > > > the kernel value and assert that it's in sync with QEMU.
+> > > > > > 
+> > > > > > Besides, since handling errors from vCPU init at hotplug time is
+> > > > > > impossible, disable vCPU hotplug.    
+> > > > > proper place to check if cpu might be created is at 
+> > > > > pc_cpu_pre_plug() where you can gracefully abort cpu creation process.     
+> > > > 
+> > > > Thanks for the suggestion, I'll rework it this way.
+> > > >   
+> > > > > Also it's possible to create cold-plugged CPUs in out of order
+> > > > > sequence using
+> > > > >  -device cpu-foo on CLI
+> > > > > will be hyperv kvm/guest side ok with it?    
+> > > > 
+> > > > On kernels that support setting HV_X64_MSR_VP_INDEX QEMU will
+> > > > synchronize all sides.  On kernels that don't, if out-of-order creation
+> > > > results in vp_index mismatch between the kernel and QEMU, vcpu creation
+> > > > will fail.  
+> > > 
+> > > And additional question,
+> > > what would happen if VM is started on host supporting VP index setting
+> > > and then migrated to a host without it?  
+> > 
+> > The destination QEMU will attempt to initialize vCPUs, and if that
+> > fails (e.g. due to vp_index mismatch), the migration will be aborted and
+> > the source VM will continue running.
+> > 
+> > If the destination QEMU is old, too, there's a chance that vp_index will
+> > change.  Then we just keep the fingers crossed that the guest doesn't
+> > notice (this is the behavior we have now).
+> on source, putting in migration stream a flag that setting HV_X64_MSR_VP_INDEX
+> is in use, should prevent migration to the old destination or new destination but
+> without kernel support.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+These are different cases.  New destination QEMU can verify that all
+vcpus have the desired vp_index even if it can't set it, so in this case
+vp_index migration is even reliable.
 
-> ---
-> Changes since RFC:
->   - Include more bitmasks for the select call
-> 
->   util/aio-win32.c | 13 ++++++++++---
->   1 file changed, 10 insertions(+), 3 deletions(-)
-> 
-> diff --git a/util/aio-win32.c b/util/aio-win32.c
-> index bca496a47a..d6d5e02f00 100644
-> --- a/util/aio-win32.c
-> +++ b/util/aio-win32.c
-> @@ -71,6 +71,7 @@ void aio_set_fd_handler(AioContext *ctx,
->           }
->       } else {
->           HANDLE event;
-> +        long bitmask = 0;
->   
->           if (node == NULL) {
->               /* Alloc and insert if it's not already there */
-> @@ -95,10 +96,16 @@ void aio_set_fd_handler(AioContext *ctx,
->           node->io_write = io_write;
->           node->is_external = is_external;
->   
-> +        if (io_read) {
-> +            bitmask |= FD_READ | FD_ACCEPT | FD_CLOSE;
-> +        }
-> +
-> +        if (io_write) {
-> +            bitmask |= FD_WRITE | FD_CONNECT;
-> +        }
-> +
->           event = event_notifier_get_handle(&ctx->notifier);
-> -        WSAEventSelect(node->pfd.fd, event,
-> -                       FD_READ | FD_ACCEPT | FD_CLOSE |
-> -                       FD_CONNECT | FD_WRITE | FD_OOB);
-> +        WSAEventSelect(node->pfd.fd, event, bitmask);
->       }
->   
->       qemu_lockcnt_unlock(&ctx->list_lock);
-> 
+Old QEMU didn't bother so it potentially can confuse the guest.  But
+we're unaware of this ever happening in the past, probably because the
+existing users of synic are only in-kvm synic timers which don't depend
+on vp_index.
+
+> It also might make sense to disable feature for old machine types
+> so new->old migration would work as it used to be even if
+> destination kernel supports feature.
+
+I'm not sure it's worth the effort, especially since other patches in
+the series introduce "in-kvm-only" flag in SynIC, which is "on" for old
+machine types.  So eventually the migration to/from an old QEMU will
+only be possible for configurations with only in-kvm synic users, where
+we hope vp_index not to matter.
+
+
+> > > > > > +X86CPU *hyperv_find_vcpu(uint32_t vp_index)
+> > > > > > +{
+> > > > > > +    return X86_CPU(qemu_get_cpu(vp_index));
+> > > > > > +}    
+> > > > > this helper isn't used in this patch, add it in the patch that would actually use it    
+> > > > 
+> > > > I thought I would put the only two functions that encapsulate the
+> > > > knowledge of how vp_index is realted to cpu_index, in a single patch.
+> > > > 
+> > > > I'm now thinking of open-coding the iteration over cpus here and
+> > > > directly look for cpu whose hyperv_vp_index() matches.  Then that
+> > > > knowledge will become encapsulated in a single place, and indeed, this
+> > > > helper can go into another patch where it's used.
+> > > >   
+> > > > > also if  qemu_get_cpu() were called from each CPU init,
+> > > > > it would incur O(N^2) complexity, could you do without it?    
+> > > > 
+> > > > It isn't called on hot paths (ATM it's called only when SINT routes are
+> > > > created, which is at most one per cpu).  I don't see a problem here.  
+> > > For what/where do you need this lookup?  
+> > 
+> > The guest configures devices to signal their events with synthetic
+> > interrupts on specific cpus, identified by vp_index.  When we receive
+> > such a request we look up the cpu and set up a SINT route to be able to
+> > deliver interrupts to its synic.
+> > 
+> > Or did I misunderstand the question perhaps?
+> since there is 1:1 mapping between synic:vp_index and
+> vp_index is dense interval of [0..maxcpus),
+> I'd suggest to maintain internal synic map where vp_index
+> could be used as index in array to fetch addressed synic.
+
+Ah, I see.  I wonder why qemu_get_cpu() itself isn't implemented this
+way?
+
+Roman.
