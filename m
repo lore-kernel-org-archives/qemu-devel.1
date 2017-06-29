@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dQb6v-0000Ol-HN
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:12:02 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dQb9K-000339-P1
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:14:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dQb6u-0003If-IC
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:12:01 -0400
-References: <20170628175534.14295-1-eblake@redhat.com>
-	<4e6a11e8-d2f9-faa0-8203-9421c79224f3@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <aa0a6484-f676-bf9f-393c-be6e9e5ed8b8@redhat.com>
-Date: Thu, 29 Jun 2017 10:11:47 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1dQb9J-0003vi-JO
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:14:30 -0400
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:36423)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dQb9J-0003vU-Bu
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:14:29 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id 62so85586684wmw.1
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 08:14:29 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <4e6a11e8-d2f9-faa0-8203-9421c79224f3@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="7EoXI80R7R2XpE0k1PQrclrMPl1ASv0ts"
-Subject: Re: [Qemu-devel] [PATCH v3 00/11] make dirty-bitmap byte-based
+In-Reply-To: <1498728533-23160-3-git-send-email-frederic.konrad@adacore.com>
+References: <1498728533-23160-1-git-send-email-frederic.konrad@adacore.com>
+	<1498728533-23160-3-git-send-email-frederic.konrad@adacore.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 29 Jun 2017 16:14:07 +0100
+Message-ID: <CAFEAcA-tuehYiJkYo148N0VPJ3hwhcxYDDersmbs4TOqxQCEKw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 2/3] arm: fix the armv7m reset state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: KONRAD Frederic <frederic.konrad@adacore.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, alistair@alistair23.me
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7EoXI80R7R2XpE0k1PQrclrMPl1ASv0ts
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <aa0a6484-f676-bf9f-393c-be6e9e5ed8b8@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 00/11] make dirty-bitmap byte-based
-References: <20170628175534.14295-1-eblake@redhat.com>
- <4e6a11e8-d2f9-faa0-8203-9421c79224f3@virtuozzo.com>
-In-Reply-To: <4e6a11e8-d2f9-faa0-8203-9421c79224f3@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 29 June 2017 at 10:28, KONRAD Frederic <frederic.konrad@adacore.com> wrote:
+> This fixes an odd bug when a ROM is present somewhere and an alias @0x00000000
+> is pointing to the ROM. The "if (rom)" test fails and we don't get a valid reset
+> state. QEMU later crashes with an exception because the ARMv7-M starts with the
+> ARM instruction set. (eg: PC & 0x01 is 0).
+>
+> This patch uses memory_region_get_offset_within_address_space introduced before
+> to check if an alias doesn't point to a flash somewhere.
+>
+> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
 
-On 06/29/2017 03:28 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Hi!
->=20
-> Can we apply my "[PATCH v22 00/30] qcow2: persistent dirty bitmaps"
-> first? It was already near to the victory a week ago, but I had to
-> rebase it on new Paolo's patches.
+This is awkward, because in the "we have a ROM but it's not been
+copied into memory yet" case, the only thing we have is the
+rom->addr, which is the address which the user's ROM blob said
+it ought to be loaded in at. If the user didn't actually provide
+a ROM blob that loads at 0 that seems a bit like a user error,
+and I don't think this patch will catch all the cases of that
+sort of mistake. For instance if address 0 is real flash and the
+high address alias is modelled by having the high address be the
+alias, then if the user passes us an ELF file saying "load to
+the high address" then this change won't catch that I think
+(because doing the memory_region_find/get_offset_within_address_space
+will return 0, which has already been tried). You'd need to
+somehow have a way to say "find all the addresses within this
+AS where this MR is mapped" and try them all...
 
-Sure, I can rebase on top of yours (I've already rebased multiple times,
-as have you, but yours has been on the list longer).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---7EoXI80R7R2XpE0k1PQrclrMPl1ASv0ts
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZVRizAAoJEKeha0olJ0NqdkcH/AkpMNxHspFTU6rnkmVQQ0H6
-7wkRlBXkoxqiVoz36iU33Siccan3IM5eOHUxwu53gJUPypcxPG636754+kY4WuNV
-WTsHv4TIraWZaW1yD9AXxBtxV0m6opUOqrxk5gyVzh0x83+MKhZoav1aceA++Ynw
-RCYEtC+wgRjNmy6KJtI1L4L8Km+mJWD2rRo/HYAIO+7SAhkUb7tF9YqVsiAeScC/
-9awHEzpgMxHMFph1L3chlxE9/xjwmaQhzmPfFJLg9aSyGFsJDuHjAciG0RwOZS73
-jkSlaTm2kAErfBKrWDZVfhP1onaf8a/yJI/wy0Gjw1a5Ocit1tAZ/D6vkuYnzSg=
-=TkRi
------END PGP SIGNATURE-----
-
---7EoXI80R7R2XpE0k1PQrclrMPl1ASv0ts--
+thanks
+-- PMM
