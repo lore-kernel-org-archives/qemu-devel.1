@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dQi3N-00052H-DE
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 18:36:50 -0400
+	(envelope-from <cota@braap.org>) id 1dQiId-0000Qx-TX
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 18:52:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dQi3M-0001CH-Kj
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 18:36:49 -0400
-Date: Thu, 29 Jun 2017 18:36:47 -0400
+	(envelope-from <cota@braap.org>) id 1dQiIZ-0003Lx-7k
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 18:52:35 -0400
+Date: Thu, 29 Jun 2017 18:52:25 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170629223647.GE9797@flamenco>
-References: <149873841036.9180.16600465902334229930.stgit@frigg.lan>
-	<149874010452.9180.5182724462159161565.stgit@frigg.lan>
+Message-ID: <20170629225225.GA13979@flamenco>
+References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
+	<149865244195.17063.11938084353514091141.stgit@frigg.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <149874010452.9180.5182724462159161565.stgit@frigg.lan>
-Subject: Re: [Qemu-devel] [PATCH v10 7/7] trace: [trivial] Statically enable
- all guest events
+In-Reply-To: <149865244195.17063.11938084353514091141.stgit@frigg.lan>
+Subject: Re: [Qemu-devel] [PATCH v11 01/29] Pass generic CPUState to
+ gen_intermediate_code()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,17 +26,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>, "open list:Trivial patches" <qemu-trivial@nongnu.org>
+Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Michael Walle <michael@walle.cc>, Laurent Vivier <laurent@vivier.eu>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Anthony Green <green@moxielogic.com>, Chris Wulff <crwulff@gmail.com>, Marek Vasut <marex@denx.de>, Stafford Horne <shorne@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Max Filippov <jcmvbkbc@gmail.com>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:PowerPC" <qemu-ppc@nongnu.org>
 
-On Thu, Jun 29, 2017 at 15:41:44 +0300, Lluís Vilanova wrote:
-> The existing optimizations makes it feasible to have them available on all
-> builds.
-(snip)
+On Wed, Jun 28, 2017 at 15:20:42 +0300, Lluís Vilanova wrote:
+> Needed to implement a target-agnostic gen_intermediate_code() in the
+> future.
+> 
 > Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> Reviewed-by: Richard Henderson <rth@twiddle.net>
 > ---
->  trace-events |    6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+(snip)
+> -void gen_intermediate_code(CPUAlphaState *env, struct TranslationBlock *tb)
+> +void gen_intermediate_code(CPUState *cpu, struct TranslationBlock *tb)
+>  {
+> -    AlphaCPU *cpu = alpha_env_get_cpu(env);
+> -    CPUState *cs = CPU(cpu);
+> +    CPUAlphaState *env = cpu->env_ptr;
 
-Reviewed-by: Emilio G. Cota <cota@braap.org>
+I'd keep the original variable names, i.e. cs for CPUState in this case,
+just like you did for a64:
+
+> -void gen_intermediate_code_a64(ARMCPU *cpu, TranslationBlock *tb)
+> +void gen_intermediate_code_a64(CPUState *cs, TranslationBlock *tb)
+>  {
+> -    CPUState *cs = CPU(cpu);
+> -    CPUARMState *env = &cpu->env;
+> +    CPUARMState *env = cs->env_ptr;
+> +    ARMCPU *cpu = arm_env_get_cpu(env);
+
+This will keep the diff size to a minimum.
 
 		E.
