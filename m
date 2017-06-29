@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39875)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dQbLl-0003aJ-HV
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:27:22 -0400
+	(envelope-from <somlo@cmu.edu>) id 1dQbQq-0005Ak-OK
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:32:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dQbLi-0001TW-Dn
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:27:21 -0400
-References: <20170629132749.997-1-pbonzini@redhat.com>
-	<20170629132749.997-9-pbonzini@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7077653a-8048-d7e8-f678-1eb8dfaa6c2a@redhat.com>
-Date: Thu, 29 Jun 2017 10:26:54 -0500
+	(envelope-from <somlo@cmu.edu>) id 1dQbQk-0004Bh-L9
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:32:36 -0400
+Received: from smtp.andrew.cmu.edu ([128.2.157.39]:52322)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <somlo@cmu.edu>) id 1dQbQk-0004BO-G7
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:32:30 -0400
+Date: Thu, 29 Jun 2017 11:32:15 -0400
+From: "Gabriel L. Somlo" <somlo@cmu.edu>
+Message-ID: <20170629153215.GB16878@HEDWIG.INI.CMU.EDU>
+References: <1498745240-30658-1-git-send-email-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-In-Reply-To: <20170629132749.997-9-pbonzini@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="jjDGGp0pb0GDsheLtqUeRQxjqifxjCEbN"
-Subject: Re: [Qemu-devel] [PATCH 08/11] qed: introduce bdrv_qed_init_state
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1498745240-30658-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCHv7 0/6] fw_cfg: qdev-related tidy-ups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,59 +26,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel@nongnu.org, lersek@redhat.com, ehabkost@redhat.com, mst@redhat.com, pbonzini@redhat.com, rjones@redhat.com, imammedo@redhat.com, peter.maydell@linaro.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---jjDGGp0pb0GDsheLtqUeRQxjqifxjCEbN
-From: Eric Blake <eblake@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com
-Message-ID: <7077653a-8048-d7e8-f678-1eb8dfaa6c2a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 08/11] qed: introduce bdrv_qed_init_state
-References: <20170629132749.997-1-pbonzini@redhat.com>
- <20170629132749.997-9-pbonzini@redhat.com>
-In-Reply-To: <20170629132749.997-9-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, Jun 29, 2017 at 03:07:14PM +0100, Mark Cave-Ayland wrote:
+> As part of some ongoing sun4u work, I need to be able to wire the fw_cfg
+> IO interface to a separate IO space by instantiating the qdev device instead
+> of calling fw_cfg_init_io(). This patchset brings FW_CFG_IO in line with
+> FW_CFG_MEM and tidies up the realize methods accordingly.
 
-On 06/29/2017 08:27 AM, Paolo Bonzini wrote:
-> This will be used in the next patch, which will call bdrv_qed_do_open
-> with a CoMutex taken.  bdrv_qed_init_state provides a nice place to
-> initialize it.
->=20
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->         RFC->v2: new
->=20
->  block/qed.c | 15 +++++++++++----
->  1 file changed, 11 insertions(+), 4 deletions(-)
+Tested-by: Gabriel Somlo <somlo@cmu.edu>
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Specifically, verified that passing blobs into the guest via
+"-fw-cfg name=opt/foo,file=./bar" still shows up properly in
+'/sys/firmware/qemu_fw_cfg/by_name/opt/foo/raw' on the guest.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---jjDGGp0pb0GDsheLtqUeRQxjqifxjCEbN
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZVRw+AAoJEKeha0olJ0NqGEcH/iIHn08ij2MghbwqqKN6b3X4
-8HHpGBDDy/z/QmF2l22TJdFjax5DUrDtP0W6Lmfmu6ll9vqyGka6+kSTGKRLUvnG
-KMK+Pki9dv+c+oKF9MXCErVNnaXeyTLXIeb6uaW+a/Di2fEd9+qFbSmTnSG11xGS
-L/5d7soa+Qj2yDxQ1VJ/3v2qiJKd9kI4eEv2BST7qQYmJGNrBsVikYvZo7iSxZ5r
-gDnn2QcZX5ah3D/XadXQKP4+cLGTOHmysFLO96v1gPXmzsRfj56ty5oyPzPNaHmz
-fSFBY3ns21fMj9GmD9hHo7YHQQDP0CLX5ce6R4o8DhZEvshJJKT6mWZfDmtjgik=
-=9Liy
------END PGP SIGNATURE-----
-
---jjDGGp0pb0GDsheLtqUeRQxjqifxjCEbN--
+Thanks much,
+--Gabriel
+ 
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> 
+> v7:
+> - Remove instance_init() function with assert()
+> - Switch fw_cfg_find() over to use object_resolve_path_type() which removes the
+>   need for the fw_cfg device to exist at a fixed QOM path
+> - Switch check for existence of another fw_cfg device over to use the new
+>   fw_cfg_find()
+> - Add check for fw_cfg parent at realize time
+> 
+> v6:
+> - Revert move of FWCfgEntry from fw_cfg.c to fw_cfg.h from v5
+> - Add Reviewed-by tag from Laszlo for patch 5
+> - Add Tested-by tags from Laszlo for the series
+> 
+> v5:
+> - Remove unused FWCfgIoState iobase and dma_iobase fields
+> - Add Reviewed-By tags from Laszlo
+> - Update commit message in patch 5 as suggested by Laszlo
+> - Move FWCfgEntry typedef from fw_cfg.h to typedefs.h with the others
+> 
+> v4:
+> - Undo accidental typedef change in patch 5 caught in v3 rework
+> 
+> v3:
+> - Rework patch 1 to use sysbus_add_io() as suggested by Laszlo
+> - Add Reviewed-By from Laszlo for patch 2
+> - Fix assert() when instantiating > 1 fw_cfg device (new patch 3)
+> - Rename fw_cfg_init1() to fw_cfg_common_realize() as part of patch 4
+> 
+> v2:
+> - Fix the QOM bug in patch 1 as indicated by Laszlo
+> - Minimise code churn compared to v1
+> 
+> 
+> Mark Cave-Ayland (6):
+>   fw_cfg: don't map the fw_cfg IO ports in fw_cfg_io_realize()
+>   fw_cfg: move setting of FW_CFG_VERSION_DMA bit to fw_cfg_init1()
+>   fw_cfg: switch fw_cfg_find() to locate the fw_cfg device by type
+>     rather than path
+>   fw_cfg: add assert() to ensure the fw_cfg device has been added as a
+>     child property
+>   fw_cfg: move qdev_init_nofail() from fw_cfg_init1() to callers
+>   fw_cfg: move QOM type defines and fw_cfg types into fw_cfg.h
+> 
+>  hw/nvram/fw_cfg.c         |  133 +++++++++++++++++++--------------------------
+>  include/hw/nvram/fw_cfg.h |   50 +++++++++++++++++
+>  include/qemu/typedefs.h   |    1 +
+>  3 files changed, 108 insertions(+), 76 deletions(-)
+> 
+> -- 
+> 1.7.10.4
+> 
