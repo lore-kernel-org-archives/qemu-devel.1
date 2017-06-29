@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47757)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dQgMc-0007GR-Ez
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 16:48:35 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1dQgVF-0002fW-AF
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 16:57:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dQgMY-0000dk-6S
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 16:48:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52066)
+	(envelope-from <alex.williamson@redhat.com>) id 1dQgVB-00055Z-DV
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 16:57:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34594)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dQgMX-0000dQ-Ta
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 16:48:30 -0400
-References: <cover.1498761179.git.alistair.francis@xilinx.com>
-	<453bac0f21aa525d7c9de38d4c8c509b44c4ecda.1498761179.git.alistair.francis@xilinx.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <df960468-b202-d523-d390-6d246a4091aa@redhat.com>
-Date: Thu, 29 Jun 2017 15:48:26 -0500
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1dQgVB-00055Q-5D
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 16:57:25 -0400
+Date: Thu, 29 Jun 2017 14:57:22 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170629145722.4af0a0fa@w520.home>
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D190D1CF1C@SHSMSX101.ccr.corp.intel.com>
+References: <1491301684-24367-1-git-send-email-yulei.zhang@intel.com>
+	<20170626141906.6e38b235@w520.home>
+	<01FDBDDE256B79498DC57789713132D469DCC1EE@SHSMSX101.ccr.corp.intel.com>
+	<20170627134431.5947c771@w520.home>
+	<AADFC41AFE54684AB9EE6CBC0274A5D190D1956B@SHSMSX101.ccr.corp.intel.com>
+	<20170628095938.1329c358@w520.home>
+	<AADFC41AFE54684AB9EE6CBC0274A5D190D1CF1C@SHSMSX101.ccr.corp.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <453bac0f21aa525d7c9de38d4c8c509b44c4ecda.1498761179.git.alistair.francis@xilinx.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="91XUNNmhbVet5SS7ihS8J3vexojhhXS91"
-Subject: Re: [Qemu-devel] [RFC v2 3/3] char-socket: Report TCP socket
- waiting as information
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 5/5] vifo: introduce new VFIO ioctl
+ VFIO_DEVICE_PCI_GET_DIRTY_BITMAP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +34,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
-Cc: alistair23@gmail.com, philippe@mathieu-daude.net
+To: "Tian, Kevin" <kevin.tian@intel.com>
+Cc: "Zhang, Yulei" <yulei.zhang@intel.com>, "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "Zheng, Xiao" <xiao.zheng@intel.com>, "Wang, Zhi
+	A" <zhi.a.wang@intel.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---91XUNNmhbVet5SS7ihS8J3vexojhhXS91
-From: Eric Blake <eblake@redhat.com>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
-Cc: alistair23@gmail.com, philippe@mathieu-daude.net
-Message-ID: <df960468-b202-d523-d390-6d246a4091aa@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2 3/3] char-socket: Report TCP socket waiting
- as information
-References: <cover.1498761179.git.alistair.francis@xilinx.com>
- <453bac0f21aa525d7c9de38d4c8c509b44c4ecda.1498761179.git.alistair.francis@xilinx.com>
-In-Reply-To: <453bac0f21aa525d7c9de38d4c8c509b44c4ecda.1498761179.git.alistair.francis@xilinx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, 29 Jun 2017 00:10:59 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
 
-On 06/29/2017 02:42 PM, Alistair Francis wrote:
-> When QEMU is waiting for a TCP socket connection it reports that messag=
-e as
-> an error. This isn't an error it is just informaiton so let's change th=
-e
-> report to use report() instead.
->=20
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> ---
->=20
->  chardev/char-socket.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index ccc499cfa1..ad1b3d6e93 100644
-> --- a/chardev/char-socket.c
-> +++ b/chardev/char-socket.c
-> @@ -765,7 +765,7 @@ static int tcp_chr_wait_connected(Chardev *chr, Err=
-or **errp)
->       * in TLS and telnet cases, only wait for an accepted socket */
->      while (!s->ioc) {
->          if (s->is_listen) {
-> -            error_report("QEMU waiting for connection on: %s",
-> +            report(INFO, "QEMU waiting for connection on: %s",
->                           chr->filename);
+> > From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> > Sent: Thursday, June 29, 2017 12:00 AM 
+> > Thanks Kevin.  So really it's not really a dirty bitmap, it's just a
+> > bitmap of pages that the device has access to and may have dirtied.
+> > Don't we have this more generally in the vfio type1 IOMMU backend?  For
+> > a mediated device, we know all the pages that the vendor driver has
+> > asked to be pinned.  Should we perhaps make this interface on the vfio
+> > container rather than the device?  Any mediated device can provide this
+> > level of detail without specific vendor support.  If we had DMA page
+> > faulting, this would be the natural place to put it as well, so maybe
+> > we should design the interface there to support everything similarly.
+> > Thanks,
+> >   
+> 
+> That's a nice idea. Just two comments:
+> 
+> 1) If some mediated device has its own way to construct true dirty
+> bitmap (not thru DMA page faulting), the interface is better designed
+> to allow that flexibility. Maybe an optional callback if not registered
+> then use common type1 IOMMU logic otherwise prefers to vendor
+> specific callback
 
-Indentation looks off now; I'd scoot chr->filename to live right under IN=
-FO.
+I'm not sure what that looks like, but I agree with the idea.  Could
+the pages that type1 knows about every be anything other than a
+superset of the dirty pages?  Perhaps a device ioctl to flush unused
+mappings would be sufficient.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> 2) If there could be multiple mediated devices from different vendors
+> in same container while not all mediated devices support live migration,
+> would container-level interface impose some limitation?
 
+Dirty page logging is only one small part of migration, each
+migrate-able device would still need to provide a device-level
+interface to save/restore state.  The migration would fail when we get
+to the device(s) that don't provide that.  Thanks,
 
---91XUNNmhbVet5SS7ihS8J3vexojhhXS91
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZVWeaAAoJEKeha0olJ0NqixkIAIn9vC0UxUoGOiloBdV7ZXIS
-Ga2pBM9rIBkGjH5jCmsch9DhspHTEc/9ID1kaebTGaUasEDmK18Txxcyfc7AGajE
-HJIPVy5F354XU4LIS9v6amByWol3r4sueCsPFRe4e1tlV6AwaK0QzIq6CtEa/UyM
-EM2/qIzk4SZfHZZ90tGl4QcWjpG3otbKINAd6ISqtkBh5EccvBsBzx4BRZth9Hgo
-TTjJpQ600q+NS4V/fTleMAlG0Qrak3Mtug81brHwCAHEpbifK6ylE8OCrZwEePCx
-ShdzSItTQn+WWENUKU7d5ZULtRdDFIiQDescHiAPOKWe3z1uxsUTg0ow9VynXog=
-=FIKo
------END PGP SIGNATURE-----
-
---91XUNNmhbVet5SS7ihS8J3vexojhhXS91--
+Alex
