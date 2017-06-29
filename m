@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dQVzB-0001zn-JY
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:43:43 -0400
+	(envelope-from <atar4qemu@gmail.com>) id 1dQW1m-00043e-6W
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:46:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dQVzA-0003lC-5k
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:43:41 -0400
-Received: from [59.151.112.132] (port=5742 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dQVz9-0003jy-3G
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:43:40 -0400
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Date: Thu, 29 Jun 2017 17:43:02 +0800
-Message-ID: <943a835da22f8e4edc549d0c1b85da5b12e65ed4.1498727785.git.maozy.fnst@cn.fujitsu.com>
-In-Reply-To: <cover.1498727785.git.maozy.fnst@cn.fujitsu.com>
-References: <cover.1498727785.git.maozy.fnst@cn.fujitsu.com>
+	(envelope-from <atar4qemu@gmail.com>) id 1dQW1k-0005XS-Vs
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:46:22 -0400
+Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:34463)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1dQW1k-0005VJ-Rm
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 05:46:20 -0400
+Received: by mail-oi0-x233.google.com with SMTP id l130so7094617oib.1
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 02:46:19 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v7 4/4] net/socket: Improve -net socket error
- reporting
+In-Reply-To: <4e41c60b-53b8-b917-108a-7cea8cb9e591@oracle.com>
+References: <4e41c60b-53b8-b917-108a-7cea8cb9e591@oracle.com>
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Thu, 29 Jun 2017 11:45:58 +0200
+Message-ID: <CACXAS8AqFRC+6nXBm86Ed9ReLFxHxNm8FSvmSt3c+13mA2f7VQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] SPARC64 supported processors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,309 +27,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: jasowang@redhat.com, armbru@redhat.com, berrange@redhat.com
+To: Pasha Tatashin <pasha.tatashin@oracle.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-When -net socket fails, it first reports a specific error, then
-a generic one, like this:
+Hi Pasha,
 
-    $ qemu-system-x86_64 -net socket,
-    qemu-system-x86_64: -net socket: exactly one of fd=, listen=, connect=, mcast= or udp= is required
-    qemu-system-x86_64: -net socket: Device 'socket' could not be initialized
+On Tue, Jun 27, 2017 at 7:59 PM, Pasha Tatashin
+<pasha.tatashin@oracle.com> wrote:
+> Hi,
+>
+> I am trying to evaluate the current qemu support for sparc64 processors.
+> First, it seems -smp is not supported for any processor, is this correct?
+> When I set -smp greater than 1, I am getting:
+>
+> qemu-system-sparc64: Number of SMP CPUs requested (2) exceeds max CPUs
+> supported by machine 'sun4u' (1)
+>
+> I've done some testing for all available sparc64 cpus + latest linux kernel:
+>
+> Fujitsu Sparc64     Working
+> Fujitsu Sparc64 III Exception 0x30 (DAE_side_effect_page) in OpenBios
+> Fujitsu Sparc64 IV  Working
+> Fujitsu Sparc64 V   Working
+> TI UltraSparc I     Working
+> TI UltraSparc II    Working
+> TI UltraSparc IIi   Working
+> TI UltraSparc IIe   Exception 0x28 (division_by_zero) in init_tick_ops
+>   Can make it to work if is_hummingbird() is changed
+>   to return 0. The IO stick, and OpenBios stick properties
+>   are absent, so we have to default to %tick for now.
+>
+> Sun UltraSparc III  Illegal instruction in cheetah_boot():
+>   wr  %g0, %g1, %dcr
+>   It appears dispatch control register is not implemented.
+>
+> Sun UltraSparc IIIi
+> Sun UltraSparc IV
+> Sun UltraSparc IV+
+> Sun UltraSparc IIIi+
+>  In these four CPUs, I am getting exception 0x32 in
+>  cheetah_generic_boot: stxa  %g0, [ %g3 ] #ASI_DMMU
 
-Convert net_socket_*_init() to Error to get rid of the superfluous second
-error message. After the patch, the effect like this:
+The UltraSPARC III {,i,i+} and IV(+) MMUs are not implemented. IIi is
+the best for the sun4u target, I think.
 
-    $ qemu-system-x86_64 -net socket,
-    qemu-system-x86_64: -net socket: exactly one of fd=, listen=, connect=, mcast= or udp= is required
+> Sun UltraSparc T1
+> Sun UltraSparc T2
 
-At the same time, add many explicit error handling message when it fails.
+Same here. T2 is pretty much a stub currently. The emulation uses the
+same MMU as for T1.
 
-Cc: jasowang@redhat.com
-Cc: armbru@redhat.com
-Cc: berrange@redhat.com
-Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
----
- net/socket.c | 94 +++++++++++++++++++++++++++++-------------------------------
- 1 file changed, 45 insertions(+), 49 deletions(-)
+> Both of the above boot pretty far but fail in this function when tmpfs is
+> mounted:
+>         direct_pcr_write(unsigned long reg_num, u64 val)
+>         __asm__ __volatile__("wr %0, 0x0, %%pcr" : : "r" (val));
+>
+>         Seems like performance counter registers are not supported.
 
-diff --git a/net/socket.c b/net/socket.c
-index bd80b3c..a891c3a 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -494,22 +494,21 @@ static void net_socket_accept(void *opaque)
- static int net_socket_listen_init(NetClientState *peer,
-                                   const char *model,
-                                   const char *name,
--                                  const char *host_str)
-+                                  const char *host_str,
-+                                  Error **errp)
- {
-     NetClientState *nc;
-     NetSocketState *s;
-     struct sockaddr_in saddr;
-     int fd, ret;
--    Error *err = NULL;
- 
--    if (parse_host_port(&saddr, host_str, &err) < 0) {
--        error_report_err(err);
-+    if (parse_host_port(&saddr, host_str, errp) < 0) {
-         return -1;
-     }
- 
-     fd = qemu_socket(PF_INET, SOCK_STREAM, 0);
-     if (fd < 0) {
--        perror("socket");
-+        error_setg_errno(errp, errno, "failed to create stream socket");
-         return -1;
-     }
-     qemu_set_nonblock(fd);
-@@ -518,13 +517,14 @@ static int net_socket_listen_init(NetClientState *peer,
- 
-     ret = bind(fd, (struct sockaddr *)&saddr, sizeof(saddr));
-     if (ret < 0) {
--        perror("bind");
-+        error_setg_errno(errp, errno, "bind ip=%s to socket failed",
-+                         inet_ntoa(saddr.sin_addr));
-         closesocket(fd);
-         return -1;
-     }
-     ret = listen(fd, 0);
-     if (ret < 0) {
--        perror("listen");
-+        error_setg_errno(errp, errno, "listen socket failed");
-         closesocket(fd);
-         return -1;
-     }
-@@ -543,21 +543,20 @@ static int net_socket_listen_init(NetClientState *peer,
- static int net_socket_connect_init(NetClientState *peer,
-                                    const char *model,
-                                    const char *name,
--                                   const char *host_str)
-+                                   const char *host_str,
-+                                   Error **errp)
- {
-     NetSocketState *s;
-     int fd, connected, ret;
-     struct sockaddr_in saddr;
--    Error *err = NULL;
- 
--    if (parse_host_port(&saddr, host_str, &err) < 0) {
--        error_report_err(err);
-+    if (parse_host_port(&saddr, host_str, errp) < 0) {
-         return -1;
-     }
- 
-     fd = qemu_socket(PF_INET, SOCK_STREAM, 0);
-     if (fd < 0) {
--        perror("socket");
-+        error_setg_errno(errp, errno, "failed to create stream socket");
-         return -1;
-     }
-     qemu_set_nonblock(fd);
-@@ -573,7 +572,7 @@ static int net_socket_connect_init(NetClientState *peer,
-                        errno == EINVAL) {
-                 break;
-             } else {
--                perror("connect");
-+                error_setg_errno(errp, errno, "connection failed");
-                 closesocket(fd);
-                 return -1;
-             }
-@@ -582,9 +581,8 @@ static int net_socket_connect_init(NetClientState *peer,
-             break;
-         }
-     }
--    s = net_socket_fd_init(peer, model, name, fd, connected, &err);
-+    s = net_socket_fd_init(peer, model, name, fd, connected, errp);
-     if (!s) {
--        error_report_err(err);
-         return -1;
-     }
-     snprintf(s->nc.info_str, sizeof(s->nc.info_str),
-@@ -597,36 +595,36 @@ static int net_socket_mcast_init(NetClientState *peer,
-                                  const char *model,
-                                  const char *name,
-                                  const char *host_str,
--                                 const char *localaddr_str)
-+                                 const char *localaddr_str,
-+                                 Error **errp)
- {
-     NetSocketState *s;
-     int fd;
-     struct sockaddr_in saddr;
-     struct in_addr localaddr, *param_localaddr;
--    Error *err = NULL;
- 
--    if (parse_host_port(&saddr, host_str, &err) < 0) {
--        error_report_err(err);
-+    if (parse_host_port(&saddr, host_str, errp) < 0) {
-         return -1;
-     }
- 
-     if (localaddr_str != NULL) {
--        if (inet_aton(localaddr_str, &localaddr) == 0)
-+        if (inet_aton(localaddr_str, &localaddr) == 0) {
-+            error_setg(errp, "localaddr '%s' is not a valid IPv4 address",
-+                       localaddr_str);
-             return -1;
-+        }
-         param_localaddr = &localaddr;
-     } else {
-         param_localaddr = NULL;
-     }
- 
--    fd = net_socket_mcast_create(&saddr, param_localaddr, &err);
-+    fd = net_socket_mcast_create(&saddr, param_localaddr, errp);
-     if (fd < 0) {
--        error_report_err(err);
-         return -1;
-     }
- 
--    s = net_socket_fd_init(peer, model, name, fd, 0, &err);
-+    s = net_socket_fd_init(peer, model, name, fd, 0, errp);
-     if (!s) {
--        error_report_err(err);
-         return -1;
-     }
- 
-@@ -643,45 +641,45 @@ static int net_socket_udp_init(NetClientState *peer,
-                                  const char *model,
-                                  const char *name,
-                                  const char *rhost,
--                                 const char *lhost)
-+                                 const char *lhost,
-+                                 Error **errp)
- {
-     NetSocketState *s;
-     int fd, ret;
-     struct sockaddr_in laddr, raddr;
--    Error *err = NULL;
- 
--    if (parse_host_port(&laddr, lhost, &err) < 0) {
--        error_report_err(err);
-+    if (parse_host_port(&laddr, lhost, errp) < 0) {
-         return -1;
-     }
- 
--    if (parse_host_port(&raddr, rhost, &err) < 0) {
--        error_report_err(err);
-+    if (parse_host_port(&raddr, rhost, errp) < 0) {
-         return -1;
-     }
- 
-     fd = qemu_socket(PF_INET, SOCK_DGRAM, 0);
-     if (fd < 0) {
--        perror("socket(PF_INET, SOCK_DGRAM)");
-+        error_setg_errno(errp, errno, "failed to create datagram socket");
-         return -1;
-     }
- 
-     ret = socket_set_fast_reuse(fd);
-     if (ret < 0) {
-+        error_setg_errno(errp, errno, "set the socket 'SO_REUSEADDR'"
-+                         " attribute failed");
-         closesocket(fd);
-         return -1;
-     }
-     ret = bind(fd, (struct sockaddr *)&laddr, sizeof(laddr));
-     if (ret < 0) {
--        perror("bind");
-+        error_setg_errno(errp, errno, "bind ip=%s to socket failed",
-+                         inet_ntoa(laddr.sin_addr));
-         closesocket(fd);
-         return -1;
-     }
-     qemu_set_nonblock(fd);
- 
--    s = net_socket_fd_init(peer, model, name, fd, 0, &err);
-+    s = net_socket_fd_init(peer, model, name, fd, 0, errp);
-     if (!s) {
--        error_report_err(err);
-         return -1;
-     }
- 
-@@ -696,8 +694,6 @@ static int net_socket_udp_init(NetClientState *peer,
- int net_init_socket(const Netdev *netdev, const char *name,
-                     NetClientState *peer, Error **errp)
- {
--    /* FIXME error_setg(errp, ...) on failure */
--    Error *err = NULL;
-     const NetdevSocketOptions *sock;
- 
-     assert(netdev->type == NET_CLIENT_DRIVER_SOCKET);
-@@ -705,22 +701,21 @@ int net_init_socket(const Netdev *netdev, const char *name,
- 
-     if (sock->has_fd + sock->has_listen + sock->has_connect + sock->has_mcast +
-         sock->has_udp != 1) {
--        error_report("exactly one of fd=, listen=, connect=, mcast= or udp="
--                     " is required");
-+        error_setg(errp, "exactly one of fd=, listen=, connect=, mcast= or udp="
-+                   " is required");
-         return -1;
-     }
- 
-     if (sock->has_localaddr && !sock->has_mcast && !sock->has_udp) {
--        error_report("localaddr= is only valid with mcast= or udp=");
-+        error_setg(errp, "localaddr= is only valid with mcast= or udp=");
-         return -1;
-     }
- 
-     if (sock->has_fd) {
-         int fd;
- 
--        fd = monitor_fd_param(cur_mon, sock->fd, &err);
-+        fd = monitor_fd_param(cur_mon, sock->fd, errp);
-         if (fd == -1) {
--            error_report_err(err);
-             return -1;
-         }
-         qemu_set_nonblock(fd);
-@@ -731,15 +726,16 @@ int net_init_socket(const Netdev *netdev, const char *name,
-     }
- 
-     if (sock->has_listen) {
--        if (net_socket_listen_init(peer, "socket", name, sock->listen) == -1) {
-+        if (net_socket_listen_init(peer, "socket", name,
-+            sock->listen, errp) == -1) {
-             return -1;
-         }
-         return 0;
-     }
- 
-     if (sock->has_connect) {
--        if (net_socket_connect_init(peer, "socket", name, sock->connect) ==
--            -1) {
-+        if (net_socket_connect_init(peer, "socket", name,
-+            sock->connect, errp) == -1) {
-             return -1;
-         }
-         return 0;
-@@ -748,8 +744,8 @@ int net_init_socket(const Netdev *netdev, const char *name,
-     if (sock->has_mcast) {
-         /* if sock->localaddr is missing, it has been initialized to "all bits
-          * zero" */
--        if (net_socket_mcast_init(peer, "socket", name, sock->mcast,
--            sock->localaddr) == -1) {
-+        if (net_socket_mcast_init(peer, "socket", name,
-+            sock->mcast, sock->localaddr, errp) == -1) {
-             return -1;
-         }
-         return 0;
-@@ -757,11 +753,11 @@ int net_init_socket(const Netdev *netdev, const char *name,
- 
-     assert(sock->has_udp);
-     if (!sock->has_localaddr) {
--        error_report("localaddr= is mandatory with udp=");
-+        error_setg(errp, "localaddr= is mandatory with udp=");
-         return -1;
-     }
--    if (net_socket_udp_init(peer, "socket", name, sock->udp, sock->localaddr) ==
--        -1) {
-+    if (net_socket_udp_init(peer, "socket", name,
-+        sock->udp, sock->localaddr, errp) == -1) {
-         return -1;
-     }
-     return 0;
+Correct. As discussed off-list they are not.
+Btw, you can try to get through even without modifying qemu.
+Start qemu-system-sparc64 with -s -S options, connect to it with gdb,
+set a breakpoint before the instruction and skip it by modifying the
+%pc and %npc registers.
+
+
+>         needed to add these to kernel parameters:
+>         keep_bootcon -> to see where we are panicking
+>         lpj=1000 -> jiffers could not calculate for some reason.
+>
+> NEC UltraSparc I    Working
+>
+> Does this look right or may be I have missed something, and we can get some
+> of the Sun UltraSparc to work for example?
+>
+> Thank you,
+> Pasha
+>
+
+
 -- 
-2.9.4
+Regards,
+Artyom Tarasenko
+
+SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
