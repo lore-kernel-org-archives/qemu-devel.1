@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54626)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1dQdIo-0001Lr-UM
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 13:32:28 -0400
+	(envelope-from <berrange@redhat.com>) id 1dQdPA-0003S7-QV
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 13:39:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1dQdIj-0006XI-O3
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 13:32:26 -0400
-Received: from mail-eopbgr30102.outbound.protection.outlook.com
-	([40.107.3.102]:58448
-	helo=EUR03-AM5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1dQdIj-0006VF-08
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 13:32:21 -0400
-Date: Thu, 29 Jun 2017 20:31:54 +0300
-From: Roman Kagan <rkagan@virtuozzo.com>
-Message-ID: <20170629173153.GA13435@rkaganb.sw.ru>
-References: <20170621162424.10462-1-rkagan@virtuozzo.com>
-	<20170621162424.10462-8-rkagan@virtuozzo.com>
-	<20170628164743.0df730a0@nial.brq.redhat.com>
-	<20170629095326.GA2973@rkaganb.sw.ru>
-	<20170629135329.0c2dcd70@nial.brq.redhat.com>
-	<20170629131019.GC2973@rkaganb.sw.ru>
-	<20170629163900.16efe4d6@nial.brq.redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1dQdP6-0001Po-Ru
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 13:39:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40982)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dQdP6-0001PT-MU
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 13:38:56 -0400
+Date: Thu, 29 Jun 2017 18:38:50 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170629173850.GI32167@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170613165313.20954-1-ehabkost@redhat.com>
+	<87o9t8qy7d.fsf@dusky.pond.sub.org>
+	<6fac3c3d-9cf8-cb79-0141-908fe8160a5b@redhat.com>
+	<20170629141805.GG32167@redhat.com>
+	<20170629170939.GU12152@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170629163900.16efe4d6@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 07/23] hyperv: ensure VP index equal to
- QEMU cpu_index
+In-Reply-To: <20170629170939.GU12152@localhost.localdomain>
+Subject: Re: [Qemu-devel] [RFC 00/15] Error API: Flag errors in *errp even
+ if errors are being ignored
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,122 +32,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Thu, Jun 29, 2017 at 04:39:00PM +0200, Igor Mammedov wrote:
-> On Thu, 29 Jun 2017 16:10:20 +0300
-> Roman Kagan <rkagan@virtuozzo.com> wrote:
-> 
-> > On Thu, Jun 29, 2017 at 01:53:29PM +0200, Igor Mammedov wrote:
-> > > On Thu, 29 Jun 2017 12:53:27 +0300
-> > > Roman Kagan <rkagan@virtuozzo.com> wrote:
-> > >   
-> > > > On Wed, Jun 28, 2017 at 04:47:43PM +0200, Igor Mammedov wrote:  
-> > > > > On Wed, 21 Jun 2017 19:24:08 +0300
-> > > > > Roman Kagan <rkagan@virtuozzo.com> wrote:
-> > > > >     
-> > > > > > Hyper-V identifies vCPUs by Virtual Processor (VP) index which can be
-> > > > > > queried by the guest via HV_X64_MSR_VP_INDEX msr.  It is defined by the
-> > > > > > spec as a sequential number which can't exceed the maximum number of
-> > > > > > vCPUs per VM.
-> > > > > > 
-> > > > > > It has to be owned by QEMU in order to preserve it across migration.
-> > > > > > 
-> > > > > > However, the initial implementation in KVM didn't allow to set this
-> > > > > > msr, and KVM used its own notion of VP index.  Fortunately, the way
-> > > > > > vCPUs are created in QEMU/KVM makes it likely that the KVM value is
-> > > > > > equal to QEMU cpu_index.
-> > > > > > 
-> > > > > > So choose cpu_index as the value for vp_index, and push that to KVM on
-> > > > > > kernels that support setting the msr.  On older ones that don't, query
-> > > > > > the kernel value and assert that it's in sync with QEMU.
-> > > > > > 
-> > > > > > Besides, since handling errors from vCPU init at hotplug time is
-> > > > > > impossible, disable vCPU hotplug.    
-> > > > > proper place to check if cpu might be created is at 
-> > > > > pc_cpu_pre_plug() where you can gracefully abort cpu creation process.     
+On Thu, Jun 29, 2017 at 02:09:39PM -0300, Eduardo Habkost wrote:
+> On Thu, Jun 29, 2017 at 03:18:05PM +0100, Daniel P. Berrange wrote:
+> > On Thu, Jun 29, 2017 at 03:39:58PM +0200, Paolo Bonzini wrote:
+> > > On 28/06/2017 11:05, Markus Armbruster wrote:
+> > > > If foo() additionally returned an indication of success, you could write
 > > > > 
-> > > > Thanks for the suggestion, I'll rework it this way.
-> > > >   
-> > > > > Also it's possible to create cold-plugged CPUs in out of order
-> > > > > sequence using
-> > > > >  -device cpu-foo on CLI
-> > > > > will be hyperv kvm/guest side ok with it?    
+> > > >       if (!foo(arg, errp)) {    // assuming foo() returns a bool
+> > > >           handle the error...
+> > > >       }
 > > > > 
-> > > > On kernels that support setting HV_X64_MSR_VP_INDEX QEMU will
-> > > > synchronize all sides.  On kernels that don't, if out-of-order creation
-> > > > results in vp_index mismatch between the kernel and QEMU, vcpu creation
-> > > > will fail.  
+> > > > Nicely concise.
+> > > > 
+> > > > For what it's worth, this is how GLib wants GError to be used.  We
+> > > > deviated from it, and it has turned out to be a self-inflicted wound.
+> > > > 
 > > > 
-> > > And additional question,
-> > > what would happen if VM is started on host supporting VP index setting
-> > > and then migrated to a host without it?  
+> > > I find Eduardo's proposal better.  With GLib's way it's easy to confuse
+> > > functions that return 0/-1, 0/-errno, TRUE/FALSE, FALSE/TRUE or
+> > > NULL/non-NULL.
 > > 
-> > The destination QEMU will attempt to initialize vCPUs, and if that
-> > fails (e.g. due to vp_index mismatch), the migration will be aborted and
-> > the source VM will continue running.
+> > NB, glib basically standardizes on just FALSE/TRUE and NULL/non-NULL,
+> > avoiding anything returning -1, or errno values, so in their usage
+> > there isn't really any confusion.
 > > 
-> > If the destination QEMU is old, too, there's a chance that vp_index will
-> > change.  Then we just keep the fingers crossed that the guest doesn't
-> > notice (this is the behavior we have now).
-> on source, putting in migration stream a flag that setting HV_X64_MSR_VP_INDEX
-> is in use, should prevent migration to the old destination or new destination but
-> without kernel support.
-
-These are different cases.  New destination QEMU can verify that all
-vcpus have the desired vp_index even if it can't set it, so in this case
-vp_index migration is even reliable.
-
-Old QEMU didn't bother so it potentially can confuse the guest.  But
-we're unaware of this ever happening in the past, probably because the
-existing users of synic are only in-kvm synic timers which don't depend
-on vp_index.
-
-> It also might make sense to disable feature for old machine types
-> so new->old migration would work as it used to be even if
-> destination kernel supports feature.
-
-I'm not sure it's worth the effort, especially since other patches in
-the series introduce "in-kvm-only" flag in SynIC, which is "on" for old
-machine types.  So eventually the migration to/from an old QEMU will
-only be possible for configurations with only in-kvm synic users, where
-we hope vp_index not to matter.
-
-
-> > > > > > +X86CPU *hyperv_find_vcpu(uint32_t vp_index)
-> > > > > > +{
-> > > > > > +    return X86_CPU(qemu_get_cpu(vp_index));
-> > > > > > +}    
-> > > > > this helper isn't used in this patch, add it in the patch that would actually use it    
-> > > > 
-> > > > I thought I would put the only two functions that encapsulate the
-> > > > knowledge of how vp_index is realted to cpu_index, in a single patch.
-> > > > 
-> > > > I'm now thinking of open-coding the iteration over cpus here and
-> > > > directly look for cpu whose hyperv_vp_index() matches.  Then that
-> > > > knowledge will become encapsulated in a single place, and indeed, this
-> > > > helper can go into another patch where it's used.
-> > > >   
-> > > > > also if  qemu_get_cpu() were called from each CPU init,
-> > > > > it would incur O(N^2) complexity, could you do without it?    
-> > > > 
-> > > > It isn't called on hot paths (ATM it's called only when SINT routes are
-> > > > created, which is at most one per cpu).  I don't see a problem here.  
-> > > For what/where do you need this lookup?  
+> > QEMU of course has lots of pre-existing code, but we could at least
+> > declare a preferred approach, and work towards it.
 > > 
-> > The guest configures devices to signal their events with synthetic
-> > interrupts on specific cpus, identified by vp_index.  When we receive
-> > such a request we look up the cpu and set up a SINT route to be able to
-> > deliver interrupts to its synic.
-> > 
-> > Or did I misunderstand the question perhaps?
-> since there is 1:1 mapping between synic:vp_index and
-> vp_index is dense interval of [0..maxcpus),
-> I'd suggest to maintain internal synic map where vp_index
-> could be used as index in array to fetch addressed synic.
+> > Having the return value indicate error is slightly shorter, and it
+> > avoids all the blackmagic with special Error values in Eduardo's
+> > series. Most usefully, it lets you use __attribute__(return_check)
+> > to get compile time checking of callers who forget to check for
+> > failure.
+> 
+> I agree it's better when the return value is obvious, but I still think
+> the Error value magic in IGNORE_ERRORS/ERR_IS_SET is preferable to the
+> existing 700+ error_propagate() calls in the tree.
 
-Ah, I see.  I wonder why qemu_get_cpu() itself isn't implemented this
-way?
+Both approaches would let us kill the error_propagate() calls. I think
+we're all agreed those would be better off gone, no matter which
+approach is used.
 
-Roman.
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
