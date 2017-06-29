@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48231)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dQadU-0001kv-NI
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:41:38 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dQat2-0006Jl-Q8
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:57:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dQadQ-0002Hy-M3
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:41:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35658)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dQadQ-0002He-E4
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:41:32 -0400
-Date: Thu, 29 Jun 2017 15:41:26 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170629144125.GH2894@work-vm>
-References: <20170611074817.13621-1-sf@sfritsch.de>
-	<d95a3198-3ad0-4a75-dda2-a3b7502ede28@redhat.com>
-	<CAJ+F1CKs+Q7Z2mkbGK3GFaM9xJ=rTp9A-Gz+9um5pgpA2ef=Hg@mail.gmail.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dQasz-000479-Ld
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:57:40 -0400
+Received: from mail-qt0-x236.google.com ([2607:f8b0:400d:c0d::236]:34570)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dQasz-00046u-HD
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 10:57:37 -0400
+Received: by mail-qt0-x236.google.com with SMTP id 32so76531075qtv.1
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 07:57:37 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170629010300.2848-1-f4bug@amsat.org>
+	<0e0d7ae6-5c1e-5c54-9d09-ef03e600b87e@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <a935039a-1aaa-3e5a-0e52-303f1675aa71@amsat.org>
+Date: Thu, 29 Jun 2017 11:57:32 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CKs+Q7Z2mkbGK3GFaM9xJ=rTp9A-Gz+9um5pgpA2ef=Hg@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] Add chardev-send-break monitor command
+In-Reply-To: <0e0d7ae6-5c1e-5c54-9d09-ef03e600b87e@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 0/8] removal of tci (tcg interpreter)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,84 +35,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Eric Blake <eblake@redhat.com>, Stefan Fritsch <sf@sfritsch.de>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, "Emilio G . Cota" <cota@braap.org>, Stefan Weil <sw@weilnetz.de>, Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
-* Marc-Andr=E9 Lureau (marcandre.lureau@gmail.com) wrote:
-> On Tue, Jun 27, 2017 at 9:46 PM Eric Blake <eblake@redhat.com> wrote:
->=20
-> > On 06/11/2017 02:48 AM, Stefan Fritsch wrote:
-> > > Sending a break on a serial console can be useful for debugging the
-> > > guest. But not all chardev backends support sending breaks (only te=
-lnet
-> > > and mux do). The chardev-send-break command allows to send a break =
-even
-> > > if using other backends.
-> > >
-> > > Signed-off-by: Stefan Fritsch <sf@sfritsch.de>
-> > > Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >
->=20
-> Looks good to me,
->  Reviewed-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
->=20
->=20
-> > ---
-> > > v2: added tests and Acked-by line
-> > >
-> >
-> > > +++ b/hmp-commands.hx
-> > > @@ -1745,6 +1745,22 @@ Removes the chardev @var{id}.
-> > >  ETEXI
-> > >
-> > >      {
-> > > +        .name       =3D "chardev-send-break",
-> > > +        .args_type  =3D "id:s",
-> > > +        .params     =3D "id",
-> > > +        .help       =3D "send break on chardev",
-> >
-> > Compare this wording,...
-> >
-> > > +STEXI
-> > > +@item chardev-send-break id
-> > > +@findex chardev-send-break
-> > > +Sends break on the chardev @var{id}.
-> >
-> > repeated here,
-> >
-> > > +++ b/qapi-schema.json
-> > > @@ -5114,6 +5114,26 @@
-> > >  { 'command': 'chardev-remove', 'data': {'id': 'str'} }
-> > >
-> > >  ##
-> > > +# @chardev-send-break:
-> > > +#
-> > > +# Send a break to a character device
-> >
-> > ...with this wording.  I like 'send a break' better than 'send break'=
-,
-> > but even better might be 'send a break sequence' or even 'emulate a
-> > break sequence' (by definition, a break is NOT a character, but on ba=
-re
-> > metal character devices it IS a defined electrical sequence distinct
-> > from characters to make the recipient aware that the sender is trying=
- to
-> > get attention).
-> >
-> > Otherwise, the patch looks fine to me.  If all that changes is some
-> > word-smithing (and the maintainer may be willing to do that), you can=
- add:
-> > Reviewed-by: Eric Blake <eblake@redhat.com>
-> >
->=20
-> Paolo would you take it (perhaps on the next iteration)?
+On 06/29/2017 05:46 AM, Thomas Huth wrote:>> I figured out MAINTAINERS 
+was unsync, so added patches 1-4, they are not really
+>> tci-related.
+> 
+> Since they are not related to TCI at all, please submit these as
+> separate series.
 
-I can take it through HMP; I'm just doing a pull now.
+Ok.
 
-Dave
+>> Patches 5,6 are trivial fixes to let the codebase quite sane if there is future
+>> need to revert/reimport tci.
+> 
+> I think this should go into 2.10...
 
-> thanks
-> --=20
-> Marc-Andr=E9 Lureau
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Ok I will resend separately.
+
+>> Patches 7,8 are the removal, marked RFC... let's debate!
+> 
+> ... but NACK for a direct removal. Common sense is to make obsolete
+> features as deprecated first and then wait for 2 public releases before
+> the final removal, so that users still have a chance to speak up in case
+> they still need the feature and are willing to maintain it.
+> 
+> Please see the following URL for details (and please also add an entry
+> for TCI in the Miscellaneous section there):
+> 
+>    http://wiki.qemu.org/Features/LegacyRemoval
+
+Ok I'll follow the procedure and see how to modify the ./configure (with 
+Daniel comment), also update the wiki accordingly.
+
+Regards,
+
+Phil.
