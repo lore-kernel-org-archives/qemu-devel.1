@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dQcM3-0008J6-1M
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:31:43 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dQcOE-0001it-1X
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:33:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dQcM1-0001Tg-Sq
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:31:43 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dQcOD-0003kX-4A
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:33:58 -0400
 MIME-Version: 1.0
 Sender: alistair23@gmail.com
-In-Reply-To: <188253dd-dc0f-17b8-8c0d-4a3d14a6a94f@redhat.com>
+In-Reply-To: <b959c21f-1c3e-e3ed-3012-24ef53cb8ff4@redhat.com>
 References: <cover.1498607452.git.alistair.francis@xilinx.com>
-	<2c339ec0264c85f9c8a4884ffb8ebe059b3b9e4b.1498607452.git.alistair.francis@xilinx.com>
-	<188253dd-dc0f-17b8-8c0d-4a3d14a6a94f@redhat.com>
+	<4b48ca3f3c45bee1103bcb50d87e6d5cadc88d6f.1498607452.git.alistair.francis@xilinx.com>
+	<b959c21f-1c3e-e3ed-3012-24ef53cb8ff4@redhat.com>
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Thu, 29 Jun 2017 09:31:08 -0700
-Message-ID: <CAKmqyKN0+JEAS5PVvHWmLPLxMsK0=RFiktuqsqGaeV8TT=p-KQ@mail.gmail.com>
+Date: Thu, 29 Jun 2017 09:33:25 -0700
+Message-ID: <CAKmqyKNS5D0pV-zspRX8fHE9fhxXmR-v4znAX3_-rdP9su+RJg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC v1 3/4] util/oslib-win32: Fix up if
- conditional
+Subject: Re: [Qemu-devel] [RFC v1 4/4] util/oslib-win32: Recursivly pass the
+ timeout
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +28,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Edgar Iglesias <edgar.iglesias@xilinx.com>, qemu-block@nongnu.org
 
-On Thu, Jun 29, 2017 at 5:25 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Thu, Jun 29, 2017 at 5:34 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
 >
 > On 28/06/2017 01:57, Alistair Francis wrote:
->> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
->> Acked-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
->> ---
->>
->>  util/oslib-win32.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/util/oslib-win32.c b/util/oslib-win32.c
->> index 7ec0f8e083..a015e1ac96 100644
->> --- a/util/oslib-win32.c
->> +++ b/util/oslib-win32.c
->> @@ -438,7 +438,7 @@ static int poll_rest(gboolean poll_msgs, HANDLE *handles, gint nhandles,
->>          if (timeout == 0 && nhandles > 1) {
+>> +        /* We only found one and we are waiting on more then one. Let's try
+>> +         * again.
+>>           */
+>> -        if (timeout == 0 && nhandles > 1) {
+>> +        if (nhandles > 1) {
 >>              /* Remove the handle that fired */
 >>              int i;
->> -            if (ready < nhandles - 1) {
->> +            if ((ready - WAIT_OBJECT_0) < nhandles - 1) {
->>                  for (i = ready - WAIT_OBJECT_0 + 1; i < nhandles; i++) {
->>                      handles[i-1] = handles[i];
+>>              if ((ready - WAIT_OBJECT_0) < nhandles - 1) {
+>> @@ -444,7 +444,20 @@ static int poll_rest(gboolean poll_msgs, HANDLE *handles, gint nhandles,
 >>                  }
->>
+>>              }
+>>              nhandles--;
+>> -            recursed_result = poll_rest(FALSE, handles, nhandles, fds, nfds, 0);
+>> +
+>> +            /* If we just had a very small timeout let's increase it when we
+>> +             * recurse to ensure we don't just busy wait. This ensures we let
+>> +             * the Windows threads block at least a little. If we previously
+>> +             * had some wait let's set it to zero to avoid blocking for too
+>> +             * long.
+>> +             */
+>> +            if (timeout < 10) {
+>> +                timeout = timeout + 1;
+>> +            } else {
+>> +                timeout = 0;
+>> +            }
+>> +            recursed_result = poll_rest(FALSE, handles, nhandles, fds,
+>> +                                        nfds, timeout);
+>>              return (recursed_result == -1) ? -1 : 1 + recursed_result;
 >
-> WAIT_OBJECT_0 is zero, but I agree it's better to add it.
->
-> However, the condition can be rewritten as ready - WAIT_OBJECT_0 + 1 <
-> nhandles, which is the same as the first iteration's "i < nhandles".  So
-> I'd just remove the "if" and "unindent" the for loop.
+> I'm not sure I agree with this change, which is effectively delaying the
+> processing of events.  The question to me is which handles are
+> triggering so fast that QEMU effectively busy waits.
 
-Ah, good spot. I'll remove it.
+Yeah, that is what I was trying to figure out, but didn't make much headway.
+
+I kept seeing zero timeouts, which means that the thread never blocks
+and this patch helps a lot.
+
+>
+> Maybe your QEMUs can get some breath with commit 12f8def0e0 ("win32:
+> replace custom mutex and condition variable with native primitives",
+> 2017-03-27), since the native primitives are more efficient and TCG 2.8
+> used condvars a lot for qemu_io_proceeded_cond.
+
+Ok, I will try that.
+
+Does this mean you don't see the same slowness on QEMU 2.9?
 
 Thanks,
 Alistair
