@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dQbHF-0008Me-Dw
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:22:42 -0400
+	(envelope-from <sw@weilnetz.de>) id 1dQbIz-0001sO-Ow
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:24:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dQbHE-0007wb-HT
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:22:41 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:34151)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dQbHE-0007wB-Ay
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:22:40 -0400
-Received: by mail-wm0-x234.google.com with SMTP id 70so543199wmo.1
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 08:22:40 -0700 (PDT)
+	(envelope-from <sw@weilnetz.de>) id 1dQbIx-0000Iz-5e
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 11:24:29 -0400
+References: <20170629150308.22766-1-f4bug@amsat.org>
+	<20170629150308.22766-5-f4bug@amsat.org>
+From: Stefan Weil <sw@weilnetz.de>
+Message-ID: <8e5fee51-a858-61d5-a10d-8f7e803d6a97@weilnetz.de>
+Date: Thu, 29 Jun 2017 17:24:21 +0200
 MIME-Version: 1.0
-In-Reply-To: <1498577737-130264-1-git-send-email-agraf@suse.de>
-References: <1498577737-130264-1-git-send-email-agraf@suse.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 29 Jun 2017 16:22:18 +0100
-Message-ID: <CAFEAcA_fFgcZb0Zrhn3gN0bYd6JjAzyzRdn1fbqDzp_1=G_ebg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3] ARM: KVM: Enable in-kernel timers with
- user space gic
+In-Reply-To: <20170629150308.22766-5-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 4/5] MAINTAINERS: update TCI entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,25 +24,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Graf <agraf@suse.de>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, Christoffer Dall <cdall@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Andrew Jones <drjones@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, "Emilio G . Cota" <cota@braap.org>, Yang Zhong <yang.zhong@intel.com>
+Cc: qemu-trivial@nongnu.org
 
-On 27 June 2017 at 16:35, Alexander Graf <agraf@suse.de> wrote:
-> When running with KVM enabled, you can choose between emulating the
-> gic in kernel or user space. If the kernel supports in-kernel virtualization
-> of the interrupt controller, it will default to that. If not, if will
-> default to user space emulation.
+Am 29.06.2017 um 17:03 schrieb Philippe Mathieu-Daud=C3=A9:
+> moved in 244f1441 to tcg/
 >
-> Unfortunately when running in user mode gic emulation, we miss out on
-> interrupt events which are only available from kernel space, such as the timer.
-> This patch leverages the new kernel/user space pending line synchronization for
-> timer events. It does not handle PMU events yet.
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  MAINTAINERS | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> Signed-off-by: Alexander Graf <agraf@suse.de>
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 530293044b..9bad523060 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1654,7 +1654,7 @@ TCI target
+>  M: Stefan Weil <sw@weilnetz.de>
+>  S: Maintained
+>  F: tcg/tci/
+> -F: tci.c
+> +F: tcg/tci.c
+>  F: disas/tci.c
+> =20
+>  Block drivers
 
 
+Thank you for this fix.
 
-Applied to target-arm.next, thanks.
-
--- PMM
+Reviewed-by: Stefan Weil <sw@weilnetz.de>
