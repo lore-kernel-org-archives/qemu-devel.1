@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dQcHA-0005Bg-1t
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:26:41 -0400
+	(envelope-from <eblake@redhat.com>) id 1dQcJZ-0006FM-J8
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:29:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dQcH5-0008DE-E6
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:26:40 -0400
-References: <20170629162046.4135-1-berrange@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dQcJV-0000M3-8g
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:29:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46266)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dQcJU-0000Ls-VZ
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 12:29:05 -0400
+References: <20170629010300.2848-1-f4bug@amsat.org>
+	<20170629010300.2848-6-f4bug@amsat.org>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <875e1a54-863c-a632-9cad-9880416d8693@redhat.com>
-Date: Thu, 29 Jun 2017 11:26:22 -0500
+Message-ID: <9403a3d0-41f6-add2-04fd-12034fe7699a@redhat.com>
+Date: Thu, 29 Jun 2017 11:29:01 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170629162046.4135-1-berrange@redhat.com>
+In-Reply-To: <20170629010300.2848-6-f4bug@amsat.org>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="2DRE7LqvELXkQNGNLFGwqbCsNDB2rnjkr"
-Subject: Re: [Qemu-devel] [PATCH] backends: remove empty trace-events file
+	boundary="v2GRowvqSjmALPFTfJIQoT0MsXEv3qotG"
+Subject: Re: [Qemu-devel] [PATCH RESEND 5/8] tcg/tci: enable bswap16_i64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,43 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, "Emilio G . Cota" <cota@braap.org>, Stefan Weil <sw@weilnetz.de>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2DRE7LqvELXkQNGNLFGwqbCsNDB2rnjkr
+--v2GRowvqSjmALPFTfJIQoT0MsXEv3qotG
 From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?=
- <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <875e1a54-863c-a632-9cad-9880416d8693@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] backends: remove empty trace-events file
-References: <20170629162046.4135-1-berrange@redhat.com>
-In-Reply-To: <20170629162046.4135-1-berrange@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, "Emilio G . Cota" <cota@braap.org>,
+ Stefan Weil <sw@weilnetz.de>
+Message-ID: <9403a3d0-41f6-add2-04fd-12034fe7699a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RESEND 5/8] tcg/tci: enable bswap16_i64
+References: <20170629010300.2848-1-f4bug@amsat.org>
+ <20170629010300.2848-6-f4bug@amsat.org>
+In-Reply-To: <20170629010300.2848-6-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 06/29/2017 11:20 AM, Daniel P. Berrange wrote:
-> The content of the backends/trace-events file was entirely
-> removed in
+On 06/28/2017 08:02 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> remove some copy/paste leftover, code seems sane.
 >=20
->   commit 6b10e573d15ef82dbc5c5b3726028e6642e134f6
->   Author: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->   Date:   Mon May 29 12:39:42 2017 +0400
->=20
->     char: move char devices to chardev/
->=20
-> Leaving the empty file around, causes tracetool to generate
-> an empty .dtrace file which makes the dtrace compiler throw
-> a syntax error.
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  Makefile.objs         | 1 -
->  backends/trace-events | 0
->  2 files changed, 1 deletion(-)
->  delete mode 100644 backends/trace-events
 
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
+Double-sob seems odd.
+
+> ---
+>  tcg/tci.c | 1 -
+>  1 file changed, 1 deletion(-)
+>=20
+
+Otherwise,
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
@@ -68,7 +71,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---2DRE7LqvELXkQNGNLFGwqbCsNDB2rnjkr
+--v2GRowvqSjmALPFTfJIQoT0MsXEv3qotG
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -78,13 +81,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZVSouAAoJEKeha0olJ0NqEWQIAIKw6ZO28mq+lpH03u2U+iox
-3z6tqq9y1ud78oHXwPZIK5qp85RKTMSXpHn6MX8zlmCS7ghKL8QqqSu9uvodQB0x
-1frUeh81ySx7QNxxzNfUXlcKI3Eq+g8jQkdj/tqd+uxNTrIxApXO1cf6J+cuy2VR
-xLC9Blqqgm6KGUGJr4cyu8dRcw4sLisGSYxBdz+qOJNTOSuN3KRDpA3JvHiHDwC1
-g8KdJCAcIjypIYU9mJUn5HSJ//jPdG9PUmq8GS7bCPiAzeqQ73NHGD65bSBas1uA
-NSDfRA9vrMYvufD2R8m/yGT3FDSodH3QxY51oONiYhaZ2VPkV8hRI4j6OIQG5H4=
-=UYio
+iQEcBAEBCAAGBQJZVSrOAAoJEKeha0olJ0NqYgwH/0YkS7iPOCugd0qqbHbzSEit
+z4mmyvC5ZoNCf4IFT8LPwCjDZ/7ChN+18/MoSXrLUcl4jW7hCA62/9k70Dw3yBBh
+MxcTwDMz2yVktUQ6KhwG0BW621LslihpVIOoc+OJLTzEvo8O4pdAsjq9kXFz+JpC
+eontoEOaf6MtfUCfBzIoIOpzdfY9uBSwgfsdC/jTUO3LlLil/UEfjNorezPq7fG5
+hcYWiGcBOOg1Y4+rWls2eSnBlyc2MuHBvGlwNFbP7ohAhpSXgn8LL7JqeL9sIvKQ
+nz5oMLqnGfkRqxaMNEfCUwxy77mSUI+9X4g7a+xn9nMV0Ck1yYPpHUfnI8FLcd8=
+=C+s/
 -----END PGP SIGNATURE-----
 
---2DRE7LqvELXkQNGNLFGwqbCsNDB2rnjkr--
+--v2GRowvqSjmALPFTfJIQoT0MsXEv3qotG--
