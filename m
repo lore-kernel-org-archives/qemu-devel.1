@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dQwLi-0004g6-AV
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 09:52:43 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dQwMs-00067d-Nv
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 09:53:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dQwLh-0002U2-JM
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 09:52:42 -0400
-Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:35216)
+	(envelope-from <stefanha@gmail.com>) id 1dQwMs-0003Ur-0V
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 09:53:54 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:38632)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1dQwLh-0002S6-F8
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 09:52:41 -0400
-Received: by mail-io0-x243.google.com with SMTP id 84so3485702iop.2
-	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 06:52:39 -0700 (PDT)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dQwMr-0003To-Qa
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 09:53:53 -0400
+Received: by mail-wm0-x236.google.com with SMTP id b184so46790454wme.1
+	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 06:53:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <fa409172-2651-d685-6de0-b1559745cba9@twiddle.net>
-References: <20170630004059.25619-1-bobby.prani@gmail.com>
-	<20170630004059.25619-3-bobby.prani@gmail.com>
-	<fa409172-2651-d685-6de0-b1559745cba9@twiddle.net>
-From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Fri, 30 Jun 2017 09:52:08 -0400
-Message-ID: <CAJhHMCCe_FxsDUemUs-iSBsLfke2yYvip7oN2ve5nwYcEykE7Q@mail.gmail.com>
+In-Reply-To: <CAGKXQyct2Y0DTbSRxCjyDJpR0eSZg3L245mce6QvmtPNJexcrw@mail.gmail.com>
+References: <CAGKXQyct2Y0DTbSRxCjyDJpR0eSZg3L245mce6QvmtPNJexcrw@mail.gmail.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Fri, 30 Jun 2017 14:53:52 +0100
+Message-ID: <CAJSP0QUKJdeTcupGBkdj_kLS-J-LW24ym9Z-dcWf1rxWZyk6cw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] tcg/aarch64: Use ADRP+ADD to
- compute target address
+Subject: Re: [Qemu-devel] BIT_WORD(start >> TARGET_PAGE_BITS)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,51 +27,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, qemu-devel <qemu-devel@nongnu.org>
+To: ali saeedi <ali.saeedi56@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-On Fri, Jun 30, 2017 at 12:47 AM, Richard Henderson <rth@twiddle.net> wrote:
-> On 06/29/2017 05:40 PM, Pranith Kumar wrote:
->>
->>   void aarch64_tb_set_jmp_target(uintptr_t jmp_addr, uintptr_t addr)
->>   {
->>       tcg_insn_unit *code_ptr = (tcg_insn_unit *)jmp_addr;
->> -    tcg_insn_unit *target = (tcg_insn_unit *)addr;
->> +    tcg_insn_unit i1, i2;
->> +    uint64_t pair;
->>   +    ptrdiff_t offset = addr - jmp_addr;
->> +
->> +    if (offset == sextract64(offset, 0, 26)) {
->> +        i1 = NOP;
->> +        i2 = I3206_B | ((offset >> 2) & 0x3ffffff);
->
->
-> Branch first, since that's the offset you calculated.
-> Also, the nop need not be executed.
+On Fri, Jun 30, 2017 at 2:02 PM, ali saeedi <ali.saeedi56@gmail.com> wrote:
+> Hello
+> what does the following code do?
+> 'unsigned long page = BIT_WORD(start >> TARGET_PAGE_BITS)' ?
+> thanks a lot
 
-This is exactly how I form the instruction pair below (B+NOP, not
-NOP+B). But I get your point. It is confusing to use i1 for the second
-instruction. I'll change it.
+Aside from Eric's response, I want to mention that I've noticed your
+frequent questions too.
 
->
->> +    } else {
->> +        offset = (addr >> 12) - (jmp_addr >> 12);
->> +
->> +        /* patch ADRP */
->> +        i2 = deposit32(*code_ptr++, 29, 2, offset & 0x3);
->> +        i2 = deposit32(i2, 5, 19, offset >> 2);
->> +        /* patch ADDI */
->> +        i1 = deposit32(*code_ptr, 10, 12, addr & 0xfff);
->
->
-> You can't just patch these insns, because they aren't necessarily ADRP+ADD.
-> Indeed, they will very likely be B and NOP.  The first address we patch in
-> is tb_jmp_reset_offset, which is the following opcode, which is definitely
-> in range of the branch above.
+A volunteer project like QEMU can only make progress if people "give"
+more than they "take".
 
-Whoops, I totally missed that we patch these out the first time out. I
-will explicitly generate the ADRP+ADD pair from here.
+Each question you ask takes someone's time.  Often the person
+responding searches the code base for you and then replies with the
+answer.
 
-Thanks,
--- 
-Pranith
+If you keep demanding time and attention without giving back to QEMU
+then people notice this and they will stop responding.
+
+I'm not trying to attack you, just letting you know what I've often
+seen happen when someone wants more support than the volunteers are
+willing to give.
+
+This is an opportunity to do two things:
+
+1. Learn to answer your own questions by reading the code, adding
+printfs, using a debugger, and other techniques.  This will make you
+more independent and you'll be more productive.
+
+2. Start contributing to QEMU by reviewing patches on the mailing
+list, helping users on #qemu IRC, etc.
+
+I'd be happy to discuss how to do these things in more detail.
+
+Stefan
