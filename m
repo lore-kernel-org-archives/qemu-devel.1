@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dQlxd-0004iZ-GW
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 22:47:10 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dQm2v-00071B-HA
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 22:52:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dQlxc-00058u-FG
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 22:47:09 -0400
-References: <20170621133023.27627-1-mreitz@redhat.com>
-	<20170621133023.27627-2-mreitz@redhat.com>
-	<748b90f3-8f89-59ea-4a65-69e938747c0b@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <6179c9e2-5486-0ff6-927d-da144c178e93@redhat.com>
-Date: Fri, 30 Jun 2017 04:46:59 +0200
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dQm2s-0001QE-F6
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 22:52:37 -0400
+Received: from [59.151.112.132] (port=35725 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dQm2r-0001Iv-4i
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 22:52:34 -0400
+References: <1496736776-19852-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<20170629103604.GB2399@work-vm>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <071f38fc-2b94-0197-c143-5e8164679f08@cn.fujitsu.com>
+Date: Fri, 30 Jun 2017 10:54:12 +0800
 MIME-Version: 1.0
-In-Reply-To: <748b90f3-8f89-59ea-4a65-69e938747c0b@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="O0djKLAI9fUFrIK11WfnxbWUGLXCQ48Is"
-Subject: Re: [Qemu-devel] [PATCH v4 1/2] iotests: Use absolute paths for
- executables
+In-Reply-To: <20170629103604.GB2399@work-vm>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH V3 0/3] COLO-compare: Make COLO-compare
+ support remote COLO-frame
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,95 +29,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: zhangchen.fnst@cn.fujitsu.com, qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---O0djKLAI9fUFrIK11WfnxbWUGLXCQ48Is
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <6179c9e2-5486-0ff6-927d-da144c178e93@redhat.com>
-Subject: Re: [PATCH v4 1/2] iotests: Use absolute paths for executables
-References: <20170621133023.27627-1-mreitz@redhat.com>
- <20170621133023.27627-2-mreitz@redhat.com>
- <748b90f3-8f89-59ea-4a65-69e938747c0b@redhat.com>
-In-Reply-To: <748b90f3-8f89-59ea-4a65-69e938747c0b@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 2017-06-29 20:52, Eric Blake wrote:
-> On 06/21/2017 08:30 AM, Max Reitz wrote:
->> A user may specify a relative path for accessing qemu, qemu-img, etc.
->> through environment variables ($QEMU_PROG and friends) or a symlink.
+
+On 06/29/2017 06:36 PM, Dr. David Alan Gilbert wrote:
+> * Zhang Chen (zhangchen.fnst@cn.fujitsu.com) wrote:
+>> This series focus on COLO-proxy remote colo-frame support.
+>> Xen COLO-frame is the first user. We add a new chardev socket
+>> in colo-compare as the way of communicate with remote COLO-frame.
+>> And remote COLO-frame notify colo-proxy part depend on this serise:
+>> https://lists.nongnu.org/archive/html/qemu-devel/2017-04/msg03904.html
+> Can you explain a bit more about how the 'remote colo-frame' works?
+> Is this the comparison that's separate or what?
+
+COLO consists of three modules, colo-frame, colo-proxy, block-replication.
+If we use qemu/kvm COLO, the three parts all in qemu side.
+If we use Xen COLO, the colo-frame in Xen side(the remote COLO-frame),
+and colo-proxy,block-replication in qemu side. So, in this case,
+remote colo-frame need use qmp command and socket connect to 
+block-replication
+and colo-proxy finish COLO job.
+KVM COLO and Xen COLO use the same colo-proxy to compare net packet.
+
+Thanks
+Zhang Chen
+
+>
+> Dave
+>
+>> I will send another part of this series after depend patchset have
+>> been merged.
 >>
->> If a test decides to change its working directory, relative paths will=
-
->> cease to work, however. Work around this by making all of the paths to=
-
->> programs that should undergo testing absolute. Besides "realpath", we
->> also have to use "which" to support programs in $PATH.
->=20
-> Is this sentence stale...
-
-Gnarf. Sure is, yes. Thanks for spotting!
-
->> As a side effect, this fixes specifying these programs as symlinks for=
-
->> out-of-tree builds: Before, you would have to create two symlinks, one=
-
->> in the build and one in the source tree (the first one for common.conf=
-ig
->> to find, the second one for the iotest to use). Now it is sufficient t=
-o
->> create one in the build tree because common.config will resolve it.
+>> V3:
+>>   - Fix codestyle.
 >>
->> Reported-by: Kevin Wolf <kwolf@redhat.com>
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  tests/qemu-iotests/common.config | 6 ++++++
->>  1 file changed, 6 insertions(+)
+>> V2:
+>>   - Rename this series.
+>>   - Change communication way to remote colo-frame.
+>>   - Some bugfix.
+>>   - Split the main function, anther part wait depend patchset.
 >>
->> diff --git a/tests/qemu-iotests/common.config b/tests/qemu-iotests/com=
-mon.config
->> index d1b45f5..c1dc425 100644
->> --- a/tests/qemu-iotests/common.config
->> +++ b/tests/qemu-iotests/common.config
->> @@ -103,6 +103,12 @@ if [ -z "$QEMU_VXHS_PROG" ]; then
->>      export QEMU_VXHS_PROG=3D"`set_prog_path qnio_server`"
->>  fi
->> =20
->> +export QEMU_PROG=3D$(realpath -- "$(type -p "$QEMU_PROG")")
->=20
-> ...now that you updated per my review to favor 'type' over 'which'?
-> Otherwise, the R-b stands.
+>>
+>> Zhang Chen (3):
+>>    COLO-compare: Add new parameter for communicate with remote colo-frame
+>>    COLO-compare: Add remote checkpoint notify chardev socket handler
+>>      frame
+>>    COLO-compare: Add remote initialization and checkpoint notification
+>>
+>>   net/colo-compare.c | 91 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>>   qemu-options.hx    | 41 ++++++++++++++++++++----
+>>   2 files changed, 124 insertions(+), 8 deletions(-)
+>>
+>> -- 
+>> 2.7.4
+>>
+>>
+>>
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+>
+>
 
-Thanks, will fix and apply then...
-
-=2E..and done, applied to my block branch:
-
-https://github.com/XanClic/qemu/commits/block
-
-Max
-
-
---O0djKLAI9fUFrIK11WfnxbWUGLXCQ48Is
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEvBAEBCAAZBQJZVbujEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQCKD
-CACDbZn2m1+EFxq8lrhZU9wCzlxK7kFUIPDHcrvHz526SxoKb0aKq3ues06aeEOw
-bFL+c/m55tbNb4J5WVqsBuZZYaSisrRWSEzXTC2EvedaYbJ6vc5vsyc98gJNjP5Y
-g2RkBJJCblbGqXDUKVNfYQ4mgOtGoPmHUaEUxvscn1PMOyq0FewN/ydSMKGU2P5D
-DbZWTIQrweRf2UOVj2yYdpnMGmYWRUn3agv+LdTlAOaLYKeJN473O7GvbKMnmPev
-ZzjCbKEtl0QZGKBNCf7g9mTE/RJSN6WIoxME4O2slQo5AkwuPilLQH4j7XwPdg4X
-w5iYZG6sw0/m6Ojy2N1K3JSS
-=Acbp
------END PGP SIGNATURE-----
-
---O0djKLAI9fUFrIK11WfnxbWUGLXCQ48Is--
+-- 
+Thanks
+Zhang Chen
