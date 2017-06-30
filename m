@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dQtdU-000333-HZ
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:58:53 -0400
+	(envelope-from <jsli@synology.com>) id 1dQthG-0006Fh-Cj
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 07:02:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dQtdT-00065k-QO
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:58:52 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:34707)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dQtdT-00063a-IT
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:58:51 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id 77so202468449wrb.1
-	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 03:58:49 -0700 (PDT)
+	(envelope-from <jsli@synology.com>) id 1dQthB-0000Mx-Gv
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 07:02:46 -0400
+Received: from synology.com ([59.124.61.242]:34408)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsli@synology.com>) id 1dQthA-0000Dj-Nr
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 07:02:41 -0400
+Date: Fri, 30 Jun 2017 19:02:18 +0800
+From: jsli <jsli@synology.com>
+Message-ID: <ad81f904-0aa1-4504-bc62-d5e48b759f41@Mail>
+In-Reply-To: <CAJ+F1CJ0qP_0XiuUG8cA8PRsARzrWpxJWasPeKZv7M6J7MyNew@mail.gmail.com>
+References: <1498187397-127781-1-git-send-email-jsli@synology.com>
+	<CAJ+F1CJ0qP_0XiuUG8cA8PRsARzrWpxJWasPeKZv7M6J7MyNew@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170629163011.13388-1-dgilbert@redhat.com>
-References: <20170629163011.13388-1-dgilbert@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 30 Jun 2017 11:58:28 +0100
-Message-ID: <CAFEAcA9aB0cdfk-JmXePd4MKGtH973axhgOK7ctQmGL8wNcqjg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/2] hmp queue
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Subject: Re: [Qemu-devel] [PATCH] vhost: Fix use-after-free in
+ vhost_log_put()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@gmail.com>
+Cc: mst@redhat.com, qemu-devel@nongnu.org
 
-On 29 June 2017 at 17:30, Dr. David Alan Gilbert (git)
-<dgilbert@redhat.com> wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> The following changes since commit 454d7dc9bc13e46084e0612076e6952c40f4afeb:
->
->   Merge remote-tracking branch 'remotes/gkurz/tags/for-upstream' into staging (2017-06-29 16:21:45 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/dagrh/qemu.git tags/pull-hmp-20170629
->
-> for you to fetch changes up to bd1d5ad9f9a1347d6f4338f294253617c565c89a:
->
->   Add chardev-send-break monitor command (2017-06-29 17:14:11 +0100)
->
-> ----------------------------------------------------------------
-> HMP pull 2017-06-29
->
-> ----------------------------------------------------------------
-> Stefan Fritsch (1):
->       Add chardev-send-break monitor command
->
-> Suraj Jitindar Singh (1):
->       monitor: Add -a (all) option to info registers
->
->  chardev/char.c       | 12 ++++++++++++
->  hmp-commands-info.hx |  6 +++---
->  hmp-commands.hx      | 16 ++++++++++++++++
->  hmp.c                |  8 ++++++++
->  hmp.h                |  1 +
->  monitor.c            | 21 ++++++++++++++++-----
->  qapi-schema.json     | 20 ++++++++++++++++++++
->  tests/test-char.c    | 12 ++++++++++--
->  tests/test-hmp.c     |  1 +
->  9 files changed, 87 insertions(+), 10 deletions(-)
->
-Applied, thanks.
 
--- PMM
+
+On 2017-06-29 05:12, Marc-Andr=C3=A9 Lureau<marcandre.lureau=40gmail.com>=
+wrote:
+> Hi
+>  =20
+> On =46ri, Jun 23, 2017 at 6:28 AM Jia-Shiun Li<jsli=40synology.com(mail=
+to:jsli=40synology.com)>wrote:
+> > In commit 9e0bc24f dev->log=5Fsize was reset to zero too early before=
+
+> > syncing vhost log. It causes syncing to be skipped.
+>  =20
+> ooch, I guess I didn't realize it was also accessing dev->log=5Fsize wh=
+en taking dev->log in local variable.
+> I wonder why the code is written this way, it looks like the function m=
+ay be reentered. =46or consistency, and perhaps for the reentering case, =
+I would use a local log=5Fsize variable too.
+> Btw, how did you find this regression=3F
+>  =20
+>  =20
+>  =20
+
+Ok, it makes sense to prevent reentering. Willregenerate patch.
+We are trying to do vhost-scsi migration, and found it to cause dataincon=
+sistency migrating an i/o stressed guest.
+
+-Jia-Shiun
