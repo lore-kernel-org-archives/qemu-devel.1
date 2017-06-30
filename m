@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dQtRp-00006L-2a
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:46:52 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dQtRs-0000Aq-Hi
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:46:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dQtRl-0007y5-VY
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:46:49 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dQtRp-00082q-6k
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:46:52 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 30 Jun 2017 20:46:26 +1000
-Message-Id: <20170630104632.27942-16-david@gibson.dropbear.id.au>
+Date: Fri, 30 Jun 2017 20:46:32 +1000
+Message-Id: <20170630104632.27942-22-david@gibson.dropbear.id.au>
 In-Reply-To: <20170630104632.27942-1-david@gibson.dropbear.id.au>
 References: <20170630104632.27942-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 15/21] target-ppc: Enable open-pic timers to
- count and generate interrupts
+Subject: [Qemu-devel] [PULL 21/21] spapr: Clean up DRC set_isolation_state()
+ path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,216 +21,250 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, thuth@redhat.com, lvivier@redhat.com, sursingh@redhat.com, sbobroff@redhat.com, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Aaron Larson <alarson@ddci.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, thuth@redhat.com, lvivier@redhat.com, sursingh@redhat.com, sbobroff@redhat.com, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Aaron Larson <alarson@ddci.com>
+There are substantial differences in the various paths through
+set_isolation_state(), both for setting to ISOLATED versus UNISOLATED
+state and for logical versus physical DRCs.
 
-Previously QEMU open-pic implemented the 4 open-pic timers including
-all timer registers, but the timers did not "count" or generate any
-interrupts.  The patch makes the timers both count and generate
-interrupts.  The timer clock frequency is fixed at 25MHZ.
+So, split the set_isolation_state() method into isolate() and unisolate()
+methods, and give it different implementations for the two DRC types.
 
---
+Factor some minimal common checks, including for valid indicator values
+(which we weren't previously checking) into rtas_set_isolation_state().
 
-Responding to V2 patch comments.
-- Simplify clock frequency logic and commentary.
-- Remove camelCase variables.
-- Timer objects now created at init rather than lazily.
-
-Signed-off-by: Aaron Larson <alarson@ddci.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/intc/openpic.c | 117 +++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 111 insertions(+), 6 deletions(-)
+ hw/ppc/spapr_drc.c         | 145 ++++++++++++++++++++++++++++++++-------------
+ include/hw/ppc/spapr_drc.h |   6 +-
+ 2 files changed, 105 insertions(+), 46 deletions(-)
 
-diff --git a/hw/intc/openpic.c b/hw/intc/openpic.c
-index 5595bb2..9dd285b 100644
---- a/hw/intc/openpic.c
-+++ b/hw/intc/openpic.c
-@@ -45,6 +45,7 @@
- #include "qemu/bitops.h"
- #include "qapi/qmp/qerror.h"
- #include "qemu/log.h"
-+#include "qemu/timer.h"
- 
- //#define DEBUG_OPENPIC
- 
-@@ -54,8 +55,10 @@ static const int debug_openpic = 1;
- static const int debug_openpic = 0;
- #endif
- 
-+static int get_current_cpu(void);
- #define DPRINTF(fmt, ...) do { \
-         if (debug_openpic) { \
-+            printf("Core%d: ", get_current_cpu()); \
-             printf(fmt , ## __VA_ARGS__); \
-         } \
-     } while (0)
-@@ -246,9 +249,31 @@ typedef struct IRQSource {
- #define IDR_EP      0x80000000  /* external pin */
- #define IDR_CI      0x40000000  /* critical interrupt */
- 
-+/* Convert between openpic clock ticks and nanosecs.  In the hardware the clock
-+   frequency is driven by board inputs to the PIC which the PIC would then
-+   divide by 4 or 8.  For now hard code to 25MZ.
-+*/
-+#define OPENPIC_TIMER_FREQ_MHZ 25
-+#define OPENPIC_TIMER_NS_PER_TICK (1000 / OPENPIC_TIMER_FREQ_MHZ)
-+static inline uint64_t ns_to_ticks(uint64_t ns)
-+{
-+    return ns    / OPENPIC_TIMER_NS_PER_TICK;
-+}
-+static inline uint64_t ticks_to_ns(uint64_t ticks)
-+{
-+    return ticks * OPENPIC_TIMER_NS_PER_TICK;
-+}
-+
- typedef struct OpenPICTimer {
-     uint32_t tccr;  /* Global timer current count register */
-     uint32_t tbcr;  /* Global timer base count register */
-+    int                   n_IRQ;
-+    bool                  qemu_timer_active; /* Is the qemu_timer is running? */
-+    struct QEMUTimer     *qemu_timer;
-+    struct OpenPICState  *opp;          /* Device timer is part of. */
-+    /* The QEMU_CLOCK_VIRTUAL time (in ns) corresponding to the last
-+       current_count written or read, only defined if qemu_timer_active. */
-+    uint64_t              origin_time;
- } OpenPICTimer;
- 
- typedef struct OpenPICMSI {
-@@ -795,6 +820,65 @@ static uint64_t openpic_gbl_read(void *opaque, hwaddr addr, unsigned len)
-     return retval;
+diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+index dbcd670..bd40b84 100644
+--- a/hw/ppc/spapr_drc.c
++++ b/hw/ppc/spapr_drc.c
+@@ -46,30 +46,64 @@ uint32_t spapr_drc_index(sPAPRDRConnector *drc)
+         | (drc->id & DRC_INDEX_ID_MASK);
  }
  
-+static void openpic_tmr_set_tmr(OpenPICTimer *tmr, uint32_t val, bool enabled);
-+
-+static void qemu_timer_cb(void *opaque)
-+{
-+    OpenPICTimer *tmr = opaque;
-+    OpenPICState *opp = tmr->opp;
-+    uint32_t    n_IRQ = tmr->n_IRQ;
-+    uint32_t val =   tmr->tbcr & ~TBCR_CI;
-+    uint32_t tog = ((tmr->tccr & TCCR_TOG) ^ TCCR_TOG);  /* invert toggle. */
-+
-+    DPRINTF("%s n_IRQ=%d\n", __func__, n_IRQ);
-+    /* Reload current count from base count and setup timer. */
-+    tmr->tccr = val | tog;
-+    openpic_tmr_set_tmr(tmr, val, /*enabled=*/true);
-+    /* Raise the interrupt. */
-+    opp->src[n_IRQ].destmask = read_IRQreg_idr(opp, n_IRQ);
-+    openpic_set_irq(opp, n_IRQ, 1);
-+    openpic_set_irq(opp, n_IRQ, 0);
-+}
-+
-+/* If enabled is true, arranges for an interrupt to be raised val clocks into
-+   the future, if enabled is false cancels the timer. */
-+static void openpic_tmr_set_tmr(OpenPICTimer *tmr, uint32_t val, bool enabled)
-+{
-+    uint64_t ns = ticks_to_ns(val & ~TCCR_TOG);
-+    /* A count of zero causes a timer to be set to expire immediately.  This
-+       effectively stops the simulation since the timer is constantly expiring
-+       which prevents guest code execution, so we don't honor that
-+       configuration.  On real hardware, this situation would generate an
-+       interrupt on every clock cycle if the interrupt was unmasked. */
-+    if ((ns == 0) || !enabled) {
-+        tmr->qemu_timer_active = false;
-+        tmr->tccr = tmr->tccr & TCCR_TOG;
-+        timer_del(tmr->qemu_timer); /* set timer to never expire. */
-+    } else {
-+        tmr->qemu_timer_active = true;
-+        uint64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+        tmr->origin_time = now;
-+        timer_mod(tmr->qemu_timer, now + ns);     /* set timer expiration. */
-+    }
-+}
-+
-+/* Returns the currrent tccr value, i.e., timer value (in clocks) with
-+   appropriate TOG. */
-+static uint64_t openpic_tmr_get_timer(OpenPICTimer *tmr)
-+{
-+    uint64_t retval;
-+    if (!tmr->qemu_timer_active) {
-+        retval = tmr->tccr;
-+    } else {
-+        uint64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+        uint64_t used = now - tmr->origin_time;  /* nsecs */
-+        uint32_t used_ticks = (uint32_t)ns_to_ticks(used);
-+        uint32_t count = (tmr->tccr & ~TCCR_TOG) - used_ticks;
-+        retval = (uint32_t)((tmr->tccr & TCCR_TOG) | (count & ~TCCR_TOG));
-+    }
-+    return retval;
-+}
-+
- static void openpic_tmr_write(void *opaque, hwaddr addr, uint64_t val,
-                               unsigned len)
+-static uint32_t set_isolation_state(sPAPRDRConnector *drc,
+-                                    sPAPRDRIsolationState state)
++static uint32_t drc_isolate_physical(sPAPRDRConnector *drc)
  {
-@@ -819,10 +903,15 @@ static void openpic_tmr_write(void *opaque, hwaddr addr, uint64_t val,
-     case 0x00: /* TCCR */
-         break;
-     case 0x10: /* TBCR */
--        if ((opp->timers[idx].tccr & TCCR_TOG) != 0 &&
--            (val & TBCR_CI) == 0 &&
--            (opp->timers[idx].tbcr & TBCR_CI) != 0) {
--            opp->timers[idx].tccr &= ~TCCR_TOG;
-+        /* Did the enable status change? */
-+        if ((opp->timers[idx].tbcr & TBCR_CI) != (val & TBCR_CI)) {
-+            /* Did "Count Inhibit" transition from 1 to 0? */
-+            if ((val & TBCR_CI) == 0) {
-+                opp->timers[idx].tccr = val & ~TCCR_TOG;
-+            }
-+            openpic_tmr_set_tmr(&opp->timers[idx],
-+                                (val & ~TBCR_CI),
-+                                /*enabled=*/((val & TBCR_CI) == 0));
+-    trace_spapr_drc_set_isolation_state(spapr_drc_index(drc), state);
+-
+     /* if the guest is configuring a device attached to this DRC, we
+      * should reset the configuration state at this point since it may
+      * no longer be reliable (guest released device and needs to start
+      * over, or unplug occurred so the FDT is no longer valid)
+      */
+-    if (state == SPAPR_DR_ISOLATION_STATE_ISOLATED) {
+-        g_free(drc->ccs);
+-        drc->ccs = NULL;
+-    }
++    g_free(drc->ccs);
++    drc->ccs = NULL;
+ 
+-    if (state == SPAPR_DR_ISOLATION_STATE_UNISOLATED) {
+-        /* cannot unisolate a non-existent resource, and, or resources
+-         * which are in an 'UNUSABLE' allocation state. (PAPR 2.7, 13.5.3.5)
+-         */
+-        if (!drc->dev ||
+-            drc->allocation_state == SPAPR_DR_ALLOCATION_STATE_UNUSABLE) {
+-            return RTAS_OUT_NO_SUCH_INDICATOR;
++    drc->isolation_state = SPAPR_DR_ISOLATION_STATE_ISOLATED;
++
++    /* if we're awaiting release, but still in an unconfigured state,
++     * it's likely the guest is still in the process of configuring
++     * the device and is transitioning the devices to an ISOLATED
++     * state as a part of that process. so we only complete the
++     * removal when this transition happens for a device in a
++     * configured state, as suggested by the state diagram from PAPR+
++     * 2.7, 13.4
++     */
++    if (drc->awaiting_release) {
++        uint32_t drc_index = spapr_drc_index(drc);
++        if (drc->configured) {
++            trace_spapr_drc_set_isolation_state_finalizing(drc_index);
++            spapr_drc_detach(drc, DEVICE(drc->dev), NULL);
++        } else {
++            trace_spapr_drc_set_isolation_state_deferring(drc_index);
          }
-         opp->timers[idx].tbcr = val;
-         break;
-@@ -854,7 +943,7 @@ static uint64_t openpic_tmr_read(void *opaque, hwaddr addr, unsigned len)
-     idx = (addr >> 6) & 0x3;
-     switch (addr & 0x30) {
-     case 0x00: /* TCCR */
--        retval = opp->timers[idx].tccr;
-+        retval = openpic_tmr_get_timer(&opp->timers[idx]);
-         break;
-     case 0x10: /* TBCR */
-         retval = opp->timers[idx].tbcr;
-@@ -1136,7 +1225,10 @@ static uint32_t openpic_iack(OpenPICState *opp, IRQDest *dst, int cpu)
-         IRQ_resetbit(&dst->raised, irq);
+     }
++    drc->configured = false;
++
++    return RTAS_OUT_SUCCESS;
++}
++
++static uint32_t drc_unisolate_physical(sPAPRDRConnector *drc)
++{
++    /* cannot unisolate a non-existent resource, and, or resources
++     * which are in an 'UNUSABLE' allocation state. (PAPR 2.7,
++     * 13.5.3.5)
++     */
++    if (!drc->dev) {
++        return RTAS_OUT_NO_SUCH_INDICATOR;
++    }
++
++    drc->isolation_state = SPAPR_DR_ISOLATION_STATE_UNISOLATED;
++
++    return RTAS_OUT_SUCCESS;
++}
++
++static uint32_t drc_isolate_logical(sPAPRDRConnector *drc)
++{
++    /* if the guest is configuring a device attached to this DRC, we
++     * should reset the configuration state at this point since it may
++     * no longer be reliable (guest released device and needs to start
++     * over, or unplug occurred so the FDT is no longer valid)
++     */
++    g_free(drc->ccs);
++    drc->ccs = NULL;
+ 
+     /*
+      * Fail any requests to ISOLATE the LMB DRC if this LMB doesn't
+@@ -81,35 +115,47 @@ static uint32_t set_isolation_state(sPAPRDRConnector *drc,
+      * If the LMB being removed doesn't belong to a DIMM device that is
+      * actually being unplugged, fail the isolation request here.
+      */
+-    if (spapr_drc_type(drc) == SPAPR_DR_CONNECTOR_TYPE_LMB) {
+-        if ((state == SPAPR_DR_ISOLATION_STATE_ISOLATED) &&
+-             !drc->awaiting_release) {
+-            return RTAS_OUT_HW_ERROR;
+-        }
++    if (spapr_drc_type(drc) == SPAPR_DR_CONNECTOR_TYPE_LMB
++        && !drc->awaiting_release) {
++        return RTAS_OUT_HW_ERROR;
      }
  
--    if ((irq >= opp->irq_ipi0) &&  (irq < (opp->irq_ipi0 + OPENPIC_MAX_IPI))) {
-+    /* Timers and IPIs support multicast. */
-+    if (((irq >= opp->irq_ipi0) && (irq < (opp->irq_ipi0 + OPENPIC_MAX_IPI))) ||
-+        ((irq >= opp->irq_tim0) && (irq < (opp->irq_tim0 + OPENPIC_MAX_TMR)))) {
-+        DPRINTF("irq is IPI or TMR\n");
-         src->destmask &= ~(1 << cpu);
-         if (src->destmask && !src->level) {
-             /* trigger on CPUs that didn't know about it yet */
-@@ -1341,6 +1433,10 @@ static void openpic_reset(DeviceState *d)
-     for (i = 0; i < OPENPIC_MAX_TMR; i++) {
-         opp->timers[i].tccr = 0;
-         opp->timers[i].tbcr = TBCR_CI;
-+        if (opp->timers[i].qemu_timer_active) {
-+            timer_del(opp->timers[i].qemu_timer);  /* Inhibit timer */
-+            opp->timers[i].qemu_timer_active = false;
-+        }
+-    drc->isolation_state = state;
++    drc->isolation_state = SPAPR_DR_ISOLATION_STATE_ISOLATED;
+ 
+-    if (drc->isolation_state == SPAPR_DR_ISOLATION_STATE_ISOLATED) {
+-        /* if we're awaiting release, but still in an unconfigured state,
+-         * it's likely the guest is still in the process of configuring
+-         * the device and is transitioning the devices to an ISOLATED
+-         * state as a part of that process. so we only complete the
+-         * removal when this transition happens for a device in a
+-         * configured state, as suggested by the state diagram from
+-         * PAPR+ 2.7, 13.4
+-         */
+-        if (drc->awaiting_release) {
+-            uint32_t drc_index = spapr_drc_index(drc);
+-            if (drc->configured) {
+-                trace_spapr_drc_set_isolation_state_finalizing(drc_index);
+-                spapr_drc_detach(drc, DEVICE(drc->dev), NULL);
+-            } else {
+-                trace_spapr_drc_set_isolation_state_deferring(drc_index);
+-            }
++    /* if we're awaiting release, but still in an unconfigured state,
++     * it's likely the guest is still in the process of configuring
++     * the device and is transitioning the devices to an ISOLATED
++     * state as a part of that process. so we only complete the
++     * removal when this transition happens for a device in a
++     * configured state, as suggested by the state diagram from PAPR+
++     * 2.7, 13.4
++     */
++    if (drc->awaiting_release) {
++        uint32_t drc_index = spapr_drc_index(drc);
++        if (drc->configured) {
++            trace_spapr_drc_set_isolation_state_finalizing(drc_index);
++            spapr_drc_detach(drc, DEVICE(drc->dev), NULL);
++        } else {
++            trace_spapr_drc_set_isolation_state_deferring(drc_index);
+         }
+-        drc->configured = false;
      }
-     /* Go out of RESET state */
-     opp->gcr = 0;
-@@ -1391,6 +1487,15 @@ static void fsl_common_init(OpenPICState *opp)
-         opp->src[i].type = IRQ_TYPE_FSLSPECIAL;
-         opp->src[i].level = false;
-     }
++    drc->configured = false;
 +
-+    for (i = 0; i < OPENPIC_MAX_TMR; i++) {
-+        opp->timers[i].n_IRQ = opp->irq_tim0 + i;
-+        opp->timers[i].qemu_timer_active = false;
-+        opp->timers[i].qemu_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
-+                                                 &qemu_timer_cb,
-+                                                 &opp->timers[i]);
-+        opp->timers[i].opp = opp;
++    return RTAS_OUT_SUCCESS;
++}
++
++static uint32_t drc_unisolate_logical(sPAPRDRConnector *drc)
++{
++    /* cannot unisolate a non-existent resource, and, or resources
++     * which are in an 'UNUSABLE' allocation state. (PAPR 2.7,
++     * 13.5.3.5)
++     */
++    if (!drc->dev ||
++        drc->allocation_state == SPAPR_DR_ALLOCATION_STATE_UNUSABLE) {
++        return RTAS_OUT_NO_SUCH_INDICATOR;
++    }
++
++    drc->isolation_state = SPAPR_DR_ISOLATION_STATE_UNISOLATED;
+ 
+     return RTAS_OUT_SUCCESS;
+ }
+@@ -555,7 +601,6 @@ static void spapr_dr_connector_class_init(ObjectClass *k, void *data)
+     dk->reset = reset;
+     dk->realize = realize;
+     dk->unrealize = unrealize;
+-    drck->set_isolation_state = set_isolation_state;
+     drck->release_pending = release_pending;
+     /*
+      * Reason: it crashes FIXME find and document the real reason
+@@ -568,6 +613,8 @@ static void spapr_drc_physical_class_init(ObjectClass *k, void *data)
+     sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_CLASS(k);
+ 
+     drck->dr_entity_sense = physical_entity_sense;
++    drck->isolate = drc_isolate_physical;
++    drck->unisolate = drc_unisolate_physical;
+ }
+ 
+ static void spapr_drc_logical_class_init(ObjectClass *k, void *data)
+@@ -575,6 +622,8 @@ static void spapr_drc_logical_class_init(ObjectClass *k, void *data)
+     sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_CLASS(k);
+ 
+     drck->dr_entity_sense = logical_entity_sense;
++    drck->isolate = drc_isolate_logical;
++    drck->unisolate = drc_unisolate_logical;
+ }
+ 
+ static void spapr_drc_cpu_class_init(ObjectClass *k, void *data)
+@@ -815,11 +864,23 @@ static uint32_t rtas_set_isolation_state(uint32_t idx, uint32_t state)
+     sPAPRDRConnectorClass *drck;
+ 
+     if (!drc) {
+-        return RTAS_OUT_PARAM_ERROR;
++        return RTAS_OUT_NO_SUCH_INDICATOR;
+     }
+ 
++    trace_spapr_drc_set_isolation_state(spapr_drc_index(drc), state);
++
+     drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+-    return drck->set_isolation_state(drc, state);
++
++    switch (state) {
++    case SPAPR_DR_ISOLATION_STATE_ISOLATED:
++        return drck->isolate(drc);
++
++    case SPAPR_DR_ISOLATION_STATE_UNISOLATED:
++        return drck->unisolate(drc);
++
++    default:
++        return RTAS_OUT_PARAM_ERROR;
 +    }
  }
  
- static void map_list(OpenPICState *opp, const MemReg *list, int *count)
+ static uint32_t rtas_set_allocation_state(uint32_t idx, uint32_t state)
+diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+index 1674b66..d9cacb3 100644
+--- a/include/hw/ppc/spapr_drc.h
++++ b/include/hw/ppc/spapr_drc.h
+@@ -215,10 +215,8 @@ typedef struct sPAPRDRConnectorClass {
+     const char *drc_name_prefix; /* used other places in device tree */
+ 
+     sPAPRDREntitySense (*dr_entity_sense)(sPAPRDRConnector *drc);
+-
+-    /* accessors for guest-visible (generally via RTAS) DR state */
+-    uint32_t (*set_isolation_state)(sPAPRDRConnector *drc,
+-                                    sPAPRDRIsolationState state);
++    uint32_t (*isolate)(sPAPRDRConnector *drc);
++    uint32_t (*unisolate)(sPAPRDRConnector *drc);
+ 
+     /* QEMU interfaces for managing hotplug operations */
+     bool (*release_pending)(sPAPRDRConnector *drc);
 -- 
 2.9.4
