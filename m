@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59822)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dQtIj-0004NZ-C4
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:37:26 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dQtMV-0005xF-0e
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:41:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dQtIi-0002he-GO
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:37:25 -0400
-References: <cover.1498607452.git.alistair.francis@xilinx.com>
-	<6955f1684346baf57b619ca407cd71363027307a.1498607452.git.alistair.francis@xilinx.com>
-	<eb27d632-fae4-23da-48cc-e0c94b9bc584@redhat.com>
-	<CAKmqyKMvOukarSU_KG0CF8pY04Yp7RB1RxBV8pZPhWUm2b-Jcg@mail.gmail.com>
+	(envelope-from <pbonzini@redhat.com>) id 1dQtMT-0004Xa-Gg
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:41:19 -0400
+References: <1498734863-164338-1-git-send-email-imammedo@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b208d3d3-c71a-2604-d473-ff33d51c91ba@redhat.com>
-Date: Fri, 30 Jun 2017 12:37:07 +0200
+Message-ID: <41be440c-e158-fb83-15dd-e9853460d5a3@redhat.com>
+Date: Fri, 30 Jun 2017 12:41:00 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKMvOukarSU_KG0CF8pY04Yp7RB1RxBV8pZPhWUm2b-Jcg@mail.gmail.com>
+In-Reply-To: <1498734863-164338-1-git-send-email-imammedo@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v1 2/4] util/oslib-win32: Remove invalid check
+Subject: Re: [Qemu-devel] [PATCH] qom: enforce readonly nature of link's
+ check callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,47 +24,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Edgar Iglesias <edgar.iglesias@xilinx.com>, qemu-block@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: alistair.francis@xilinx.com, edgar.iglesias@gmail.com, mst@redhat.com, afaerber@suse.de, qemu-arm@nongnu.org, famz@redhat.com
 
 
 
-On 29/06/2017 18:37, Alistair Francis wrote:
->> Hmm, I think it's possible, poll_msgs is true here.
-> poll_msgs?
+On 29/06/2017 13:14, Igor Mammedov wrote:
+> link's check callback is supposed to verify/permit setting it,
+> however currently nothing restricts it from misusing it
+> and modifying target object from within.
+> Make sure that readonly semantics are checked by compiler
+> to prevent callback's misuse.
 > 
-> If nhandles is 0 then we have already entered an earlier if statement
-> and set ready to either WAIT_FAILED or WAIT_TIMEOUT in which case we
-> can't enter this part of the if statement.
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> Fam,
+>  it probably conflicts with yours DEFINE_PROP_LINK series,
+>  feel free to include this patch if you'll have to respin
 
-No, that's not correct.  The code is:
-
-    if (poll_msgs) {
-        /* Wait for either messages or handles
-         * -> Use MsgWaitForMultipleObjectsEx
-         */
-        ready = MsgWaitForMultipleObjectsEx(nhandles, handles, timeout,
-                                            QS_ALLINPUT, MWMO_ALERTABLE);
-
-        if (ready == WAIT_FAILED) {
-            gchar *emsg = g_win32_error_message(GetLastError());
-            g_warning("MsgWaitForMultipleObjectsEx failed: %s", emsg);
-            g_free(emsg);
-        }
-    } else if (nhandles == 0) {
-        /* No handles to wait for, just the timeout */
-        if (timeout == INFINITE) {
-            ready = WAIT_FAILED;
-        } else {
-            SleepEx(timeout, TRUE);
-            ready = WAIT_TIMEOUT;
-        }
-
-You can have poll_msgs == TRUE && nhandles == 0.  This happens for
-
-   GPollFD fds[1] = { .fd = G_WIN32_MSG_HANDLE, .events = G_IO_IN };
-   g_poll(fds, 1, timeout);
-
-Thanks,
+Since there will be a respin, I'm _not_ queuing this patch.
 
 Paolo
+
+> ---
+>  include/hw/qdev-properties.h | 3 ++-
+>  include/qom/object.h         | 6 +++---
+>  hw/core/qdev-properties.c    | 3 ++-
+>  hw/display/xlnx_dp.c         | 2 +-
+>  hw/ipmi/ipmi.c               | 2 +-
+>  hw/mem/pc-dimm.c             | 2 +-
+>  hw/misc/ivshmem.c            | 2 +-
+>  qom/object.c                 | 8 ++++----
+>  8 files changed, 15 insertions(+), 13 deletions(-)
+> 
+> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+> index 306bbab..6dfe16e 100644
+> --- a/include/hw/qdev-properties.h
+> +++ b/include/hw/qdev-properties.h
+> @@ -234,7 +234,8 @@ void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
+>   * This function should be used as the check() argument to
+>   * object_property_add_link().
+>   */
+> -void qdev_prop_allow_set_link_before_realize(Object *obj, const char *name,
+> +void qdev_prop_allow_set_link_before_realize(const Object *obj,
+> +                                             const char *name,
+>                                               Object *val, Error **errp);
+>  
+>  #endif
+> diff --git a/include/qom/object.h b/include/qom/object.h
+> index 5ecc2d1..5223692 100644
+> --- a/include/qom/object.h
+> +++ b/include/qom/object.h
+> @@ -788,7 +788,7 @@ ObjectClass *object_get_class(Object *obj);
+>   *
+>   * Returns: The QOM typename of @obj.
+>   */
+> -const char *object_get_typename(Object *obj);
+> +const char *object_get_typename(const Object *obj);
+>  
+>  /**
+>   * type_register_static:
+> @@ -1320,7 +1320,7 @@ typedef enum {
+>   * callback function.  It allows the link property to be set and never returns
+>   * an error.
+>   */
+> -void object_property_allow_set_link(Object *, const char *,
+> +void object_property_allow_set_link(const Object *, const char *,
+>                                      Object *, Error **);
+>  
+>  /**
+> @@ -1353,7 +1353,7 @@ void object_property_allow_set_link(Object *, const char *,
+>   */
+>  void object_property_add_link(Object *obj, const char *name,
+>                                const char *type, Object **child,
+> -                              void (*check)(Object *obj, const char *name,
+> +                              void (*check)(const Object *obj, const char *name,
+>                                              Object *val, Error **errp),
+>                                ObjectPropertyLinkFlags flags,
+>                                Error **errp);
+> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> index 2a82768..95e5fdb 100644
+> --- a/hw/core/qdev-properties.c
+> +++ b/hw/core/qdev-properties.c
+> @@ -25,7 +25,8 @@ void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
+>      }
+>  }
+>  
+> -void qdev_prop_allow_set_link_before_realize(Object *obj, const char *name,
+> +void qdev_prop_allow_set_link_before_realize(const Object *obj,
+> +                                             const char *name,
+>                                               Object *val, Error **errp)
+>  {
+>      DeviceState *dev = DEVICE(obj);
+> diff --git a/hw/display/xlnx_dp.c b/hw/display/xlnx_dp.c
+> index f43eb09..3ed81ff 100644
+> --- a/hw/display/xlnx_dp.c
+> +++ b/hw/display/xlnx_dp.c
+> @@ -515,7 +515,7 @@ static void xlnx_dp_aux_set_command(XlnxDPState *s, uint32_t value)
+>      s->core_registers[DP_INTERRUPT_SIGNAL_STATE] |= 0x04;
+>  }
+>  
+> -static void xlnx_dp_set_dpdma(Object *obj, const char *name, Object *val,
+> +static void xlnx_dp_set_dpdma(const Object *obj, const char *name, Object *val,
+>                                Error **errp)
+>  {
+>      XlnxDPState *s = XLNX_DP(obj);
+> diff --git a/hw/ipmi/ipmi.c b/hw/ipmi/ipmi.c
+> index 5cf1caa..a2fd1eb 100644
+> --- a/hw/ipmi/ipmi.c
+> +++ b/hw/ipmi/ipmi.c
+> @@ -90,7 +90,7 @@ static TypeInfo ipmi_interface_type_info = {
+>      .class_init = ipmi_interface_class_init,
+>  };
+>  
+> -static void isa_ipmi_bmc_check(Object *obj, const char *name,
+> +static void isa_ipmi_bmc_check(const Object *obj, const char *name,
+>                                 Object *val, Error **errp)
+>  {
+>      IPMIBmc *bmc = IPMI_BMC(val);
+> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> index 9e8dab0..380cb30 100644
+> --- a/hw/mem/pc-dimm.c
+> +++ b/hw/mem/pc-dimm.c
+> @@ -366,7 +366,7 @@ static void pc_dimm_get_size(Object *obj, Visitor *v, const char *name,
+>      visit_type_int(v, name, &value, errp);
+>  }
+>  
+> -static void pc_dimm_check_memdev_is_busy(Object *obj, const char *name,
+> +static void pc_dimm_check_memdev_is_busy(const Object *obj, const char *name,
+>                                        Object *val, Error **errp)
+>  {
+>      Error *local_err = NULL;
+> diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
+> index abeaf3d..e25016c 100644
+> --- a/hw/misc/ivshmem.c
+> +++ b/hw/misc/ivshmem.c
+> @@ -1005,7 +1005,7 @@ static const TypeInfo ivshmem_common_info = {
+>      .class_init    = ivshmem_common_class_init,
+>  };
+>  
+> -static void ivshmem_check_memdev_is_busy(Object *obj, const char *name,
+> +static void ivshmem_check_memdev_is_busy(const Object *obj, const char *name,
+>                                           Object *val, Error **errp)
+>  {
+>      if (host_memory_backend_is_mapped(MEMORY_BACKEND(val))) {
+> diff --git a/qom/object.c b/qom/object.c
+> index 7a05e35..a429e64 100644
+> --- a/qom/object.c
+> +++ b/qom/object.c
+> @@ -735,7 +735,7 @@ out:
+>      return ret;
+>  }
+>  
+> -const char *object_get_typename(Object *obj)
+> +const char *object_get_typename(const Object *obj)
+>  {
+>      return obj->class->type->name;
+>  }
+> @@ -1395,7 +1395,7 @@ out:
+>      g_free(type);
+>  }
+>  
+> -void object_property_allow_set_link(Object *obj, const char *name,
+> +void object_property_allow_set_link(const Object *obj, const char *name,
+>                                      Object *val, Error **errp)
+>  {
+>      /* Allow the link to be set, always */
+> @@ -1403,7 +1403,7 @@ void object_property_allow_set_link(Object *obj, const char *name,
+>  
+>  typedef struct {
+>      Object **child;
+> -    void (*check)(Object *, const char *, Object *, Error **);
+> +    void (*check)(const Object *, const char *, Object *, Error **);
+>      ObjectPropertyLinkFlags flags;
+>  } LinkProperty;
+>  
+> @@ -1519,7 +1519,7 @@ static void object_release_link_property(Object *obj, const char *name,
+>  
+>  void object_property_add_link(Object *obj, const char *name,
+>                                const char *type, Object **child,
+> -                              void (*check)(Object *, const char *,
+> +                              void (*check)(const Object *, const char *,
+>                                              Object *, Error **),
+>                                ObjectPropertyLinkFlags flags,
+>                                Error **errp)
+> 
