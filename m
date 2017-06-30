@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dQsmK-0008O3-39
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:03:56 -0400
+	(envelope-from <groug@kaod.org>) id 1dQso4-0000pD-6n
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:05:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dQsmJ-0001wQ-9T
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:03:56 -0400
-References: <cover.1498756113.git.alistair.francis@xilinx.com>
-	<199bd37fe51c4b240da9834673c065ea042b9897.1498756113.git.alistair.francis@xilinx.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7af9fffb-c5e4-adac-c0a3-21d739b6a22a@redhat.com>
-Date: Fri, 30 Jun 2017 12:03:39 +0200
+	(envelope-from <groug@kaod.org>) id 1dQso0-0003CU-8t
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:05:44 -0400
+Received: from 10.mo5.mail-out.ovh.net ([46.105.52.148]:52267)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dQso0-0003BU-2z
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:05:40 -0400
+Received: from player799.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 8BFFE10EA3F
+	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 12:05:38 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Fri, 30 Jun 2017 12:05:32 +0200
+Message-ID: <149881713243.18888.18140083803237379387.stgit@bahia>
 MIME-Version: 1.0
-In-Reply-To: <199bd37fe51c4b240da9834673c065ea042b9897.1498756113.git.alistair.francis@xilinx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 2/3] util/oslib-win32: Remove invalid
- check
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] spapr: refresh "platform-specific" hcalls
+ comment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, stefanha@redhat.com, famz@redhat.com
-Cc: alistair23@gmail.com, edgar.iglesias@xilinx.com, qemu-block@nongnu.org, philippe@mathieu-daude.net
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
+We have more of these since the addition of KVMPPC_H_LOGICAL_MEMOP in 2012.
 
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ include/hw/ppc/spapr.h |    5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-On 29/06/2017 19:16, Alistair Francis wrote:
-> There is no way nhandles can be zero in this section so that part of th=
-e
-> if statement will always be false. Let's just remove it to make the cod=
-e
-> easier to read.
->=20
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Acked-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Reviewed-by: Fam Zheng <famz@redhat.com>
-> ---
->=20
->  util/oslib-win32.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-> index 80e4668935..7ec0f8e083 100644
-> --- a/util/oslib-win32.c
-> +++ b/util/oslib-win32.c
-> @@ -414,7 +414,7 @@ static int poll_rest(gboolean poll_msgs, HANDLE *ha=
-ndles, gint nhandles,
->          /* If we have a timeout, or no handles to poll, be satisfied
->           * with just noticing we have messages waiting.
->           */
-> -        if (timeout !=3D 0 || nhandles =3D=3D 0) {
-> +        if (timeout !=3D 0) {
->              return 1;
->          }
-> =20
-
-Can you explain this better?
-
-Paolo
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index a66bbac35242..1826cc4fd696 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -377,9 +377,8 @@ struct sPAPRMachineState {
+  * as well.
+  *
+  * We also need some hcalls which are specific to qemu / KVM-on-POWER.
+- * So far we just need one for H_RTAS, but in future we'll need more
+- * for extensions like virtio.  We put those into the 0xf000-0xfffc
+- * range which is reserved by PAPR for "platform-specific" hcalls.
++ * We put those into the 0xf000-0xfffc range which is reserved by PAPR
++ * for "platform-specific" hcalls.
+  */
+ #define KVMPPC_HCALL_BASE       0xf000
+ #define KVMPPC_H_RTAS           (KVMPPC_HCALL_BASE + 0x0)
