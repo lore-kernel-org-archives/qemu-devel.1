@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dQpIU-00033A-69
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 02:20:55 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dQwI3-0001pe-Ag
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 09:48:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dQpIQ-0000hi-QY
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 02:20:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55504)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dQpIQ-0000h8-Jo
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 02:20:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dQpIN-0000tQ-Ew
-	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 06:20:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 643402E8194
-	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 06:20:47 +0000 (UTC)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dQwI2-0000zA-0Y
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 09:48:55 -0400
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:34608)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dQwI1-0000yk-K8
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 09:48:53 -0400
+Received: by mail-lf0-x242.google.com with SMTP id g21so10129929lfk.1
+	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 06:48:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <cover.1498771584.git.tgolembi@redhat.com>
+	<a01ca468294eba398bbaa1dfdec7fb07903df586.1498771584.git.tgolembi@redhat.com>
+In-Reply-To: <a01ca468294eba398bbaa1dfdec7fb07903df586.1498771584.git.tgolembi@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 30 Jun 2017 13:48:41 +0000
+Message-ID: <CAJ+F1CJdDYtPNZXNjs6cesKg1iL7mCEPgx01WSc3RPwL5CcZ6A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 30 Jun 2017 06:09:33 -0000
-From: Nick <nick@nine.ch>
-Reply-To: Bug 1701449 <1701449@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <149880297386.6544.11962739093038956076.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1701449] [NEW] high memory usage when using rbd
- with client caching
+Subject: Re: [Qemu-devel] [PATCH v6 3/3] test-qga: add test for
+ guest-get-osinfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,169 +31,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-Public bug reported:
+To: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>, Eric Blake <eblake@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>
+Cc: qemu-devel@nongnu.org
 
 Hi,
-we are experiencing a quite high memory usage of a single qemu (used with K=
-VM) process when using RBD with client caching as a disk backend. We are te=
-sting with 3GB memory qemu virtual machines and 128MB RBD client cache. Whe=
-n running 'fio' in the virtual machine you can see that after some time the=
- machine uses a lot more memory (RSS) on the hypervisor than she should. We=
- have seen values (in real production machines, no artificially fio tests) =
-of 250% memory overhead. I reproduced this with qemu version 2.9 as well.
 
-Here the contents of our ceph.conf on the hypervisor:
-"""
-[client]
-rbd cache writethrough until flush =3D False
-rbd cache max dirty =3D 100663296
-rbd cache size =3D 134217728
-rbd cache target dirty =3D 50331648
-"""
+It's missing test-qga-os-release :)
 
-How to reproduce:
-* create a virtual machine with a RBD backed disk (100GB or so)
-* install a linux distribution on it (we are using Ubuntu)
-* install fio (apt-get install fio)
-* run fio multiple times with (e.g.) the following test file:
-"""
-# This job file tries to mimic the Intel IOMeter File Server Access Pattern
-[global]
-description=3DEmulation of Intel IOmeter File Server Access Pattern
-randrepeat=3D0
-filename=3D/root/test.dat
-# IOMeter defines the server loads as the following:
-# iodepth=3D1     Linear
-# iodepth=3D4     Very Light
-# iodepth=3D8     Light
-# iodepth=3D64    Moderate
-# iodepth=3D256   Heavy
-iodepth=3D8
-size=3D80g
-direct=3D0
-ioengine=3Dlibaio
+On Thu, Jun 29, 2017 at 11:27 PM Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolemb=
+i@redhat.com>
+wrote:
 
-[iometer]
-stonewall
-bs=3D4M
-rw=3Drandrw
-
-[iometer_just_write]
-stonewall
-bs=3D4M
-rw=3Dwrite
-
-[iometer_just_read]
-stonewall
-bs=3D4M
-rw=3Dread
-"""
-
-You can measure the virtual machine RSS usage on the hypervisor with:
-  virsh dommemstat <machine name> | grep rss
-or if you are not using libvirt:
-  grep RSS /proc/<PID of qemu process>/status
-
-When switching off the RBD client cache, all is ok again, as the process
-does not use so much memory anymore.
-
-There is already a ticket on the ceph bug tracker for this ([1]).
-However I can reproduce that memory behaviour only when using qemu
-(maybe it is using librbd in a special way?). Running directly 'fio'
-with the rbd engine does not result in that high memory usage.
-
-[1] http://tracker.ceph.com/issues/20054
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1701449
-
-Title:
-  high memory usage when using rbd with client caching
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hi,
-  we are experiencing a quite high memory usage of a single qemu (used with=
- KVM) process when using RBD with client caching as a disk backend. We are =
-testing with 3GB memory qemu virtual machines and 128MB RBD client cache. W=
-hen running 'fio' in the virtual machine you can see that after some time t=
-he machine uses a lot more memory (RSS) on the hypervisor than she should. =
-We have seen values (in real production machines, no artificially fio tests=
-) of 250% memory overhead. I reproduced this with qemu version 2.9 as well.
-
-  Here the contents of our ceph.conf on the hypervisor:
-  """
-  [client]
-  rbd cache writethrough until flush =3D False
-  rbd cache max dirty =3D 100663296
-  rbd cache size =3D 134217728
-  rbd cache target dirty =3D 50331648
-  """
-
-  How to reproduce:
-  * create a virtual machine with a RBD backed disk (100GB or so)
-  * install a linux distribution on it (we are using Ubuntu)
-  * install fio (apt-get install fio)
-  * run fio multiple times with (e.g.) the following test file:
-  """
-  # This job file tries to mimic the Intel IOMeter File Server Access Patte=
-rn
-  [global]
-  description=3DEmulation of Intel IOmeter File Server Access Pattern
-  randrepeat=3D0
-  filename=3D/root/test.dat
-  # IOMeter defines the server loads as the following:
-  # iodepth=3D1     Linear
-  # iodepth=3D4     Very Light
-  # iodepth=3D8     Light
-  # iodepth=3D64    Moderate
-  # iodepth=3D256   Heavy
-  iodepth=3D8
-  size=3D80g
-  direct=3D0
-  ioengine=3Dlibaio
-
-  [iometer]
-  stonewall
-  bs=3D4M
-  rw=3Drandrw
-
-  [iometer_just_write]
-  stonewall
-  bs=3D4M
-  rw=3Dwrite
-
-  [iometer_just_read]
-  stonewall
-  bs=3D4M
-  rw=3Dread
-  """
-
-  You can measure the virtual machine RSS usage on the hypervisor with:
-    virsh dommemstat <machine name> | grep rss
-  or if you are not using libvirt:
-    grep RSS /proc/<PID of qemu process>/status
-
-  When switching off the RBD client cache, all is ok again, as the
-  process does not use so much memory anymore.
-
-  There is already a ticket on the ceph bug tracker for this ([1]).
-  However I can reproduce that memory behaviour only when using qemu
-  (maybe it is using librbd in a special way?). Running directly 'fio'
-  with the rbd engine does not result in that high memory usage.
-
-  [1] http://tracker.ceph.com/issues/20054
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1701449/+subscriptions
+> Add test for guest-get-osinfo command.
+>
+> Qemu-ga was modified to accept QGA_OS_RELEASE environment variable. If
+> the variable is defined it is interpreted as path to the os-release file
+> and it is parsed instead of the default paths.
+>
+> Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+> ---
+>  qga/commands-posix.c | 13 ++++++++++---
+>  tests/test-qga.c     | 53
+> ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 63 insertions(+), 3 deletions(-)
+>
+> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+> index 2406518d47..f6ce8dd583 100644
+> --- a/qga/commands-posix.c
+> +++ b/qga/commands-posix.c
+> @@ -2683,9 +2683,16 @@ GuestOSInfo *qmp_guest_get_osinfo(Error **errp)
+>      info->kernel_release =3D g_strdup(kinfo.release);
+>      info->machine_hardware =3D g_strdup(kinfo.machine);
+>
+> -    GKeyFile *osrelease =3D ga_parse_osrelease("/etc/os-release");
+> -    if (osrelease =3D=3D NULL) {
+> -        osrelease =3D ga_parse_osrelease("/usr/lib/os-release");
+> +    GKeyFile *osrelease =3D NULL;
+> +
+> +    const char *qga_os_release =3D g_getenv("QGA_OS_RELEASE");
+> +    if (qga_os_release !=3D NULL) {
+> +        osrelease =3D ga_parse_osrelease(qga_os_release);
+> +    } else {
+> +        osrelease =3D ga_parse_osrelease("/etc/os-release");
+> +        if (osrelease =3D=3D NULL) {
+> +            osrelease =3D ga_parse_osrelease("/usr/lib/os-release");
+> +        }
+>      }
+>
+>      if (osrelease !=3D NULL) {
+> diff --git a/tests/test-qga.c b/tests/test-qga.c
+> index 631b98639a..b9160708a0 100644
+> --- a/tests/test-qga.c
+> +++ b/tests/test-qga.c
+> @@ -936,6 +936,58 @@ static void test_qga_guest_exec_invalid(gconstpointe=
+r
+> fix)
+>      QDECREF(ret);
+>  }
+>
+> +static void test_qga_guest_get_osinfo(gconstpointer data)
+> +{
+> +    TestFixture fixture;
+> +    const gchar *str;
+> +    gchar *cwd, *env[2];
+> +    QDict *ret, *val;
+> +
+> +    cwd =3D g_get_current_dir();
+> +    env[0] =3D
+> g_strdup_printf("QGA_OS_RELEASE=3D%s%ctests%cdata%ctest-qga-os-release",
+> +                             cwd, G_DIR_SEPARATOR, G_DIR_SEPARATOR,
+> G_DIR_SEPARATOR);
+> +    env[1] =3D NULL;
+> +    g_free(cwd);
+> +    fixture_setup(&fixture, NULL, env);
+> +
+> +    ret =3D qmp_fd(fixture.fd, "{'execute': 'guest-get-osinfo'}");
+> +    g_assert_nonnull(ret);
+> +    qmp_assert_no_error(ret);
+> +
+> +    val =3D qdict_get_qdict(ret, "return");
+> +
+> +    str =3D qdict_get_try_str(val, "id");
+> +    g_assert_nonnull(str);
+> +    g_assert_cmpstr(str, =3D=3D, "qemu-ga-test");
+> +
+> +    str =3D qdict_get_try_str(val, "name");
+> +    g_assert_nonnull(str);
+> +    g_assert_cmpstr(str, =3D=3D, "QEMU-GA");
+> +
+> +    str =3D qdict_get_try_str(val, "pretty-name");
+> +    g_assert_nonnull(str);
+> +    g_assert_cmpstr(str, =3D=3D, "QEMU Guest Agent test");
+> +
+> +    str =3D qdict_get_try_str(val, "version");
+> +    g_assert_nonnull(str);
+> +    g_assert_cmpstr(str, =3D=3D, "Test 1");
+> +
+> +    str =3D qdict_get_try_str(val, "version-id");
+> +    g_assert_nonnull(str);
+> +    g_assert_cmpstr(str, =3D=3D, "1");
+> +
+> +    str =3D qdict_get_try_str(val, "variant");
+> +    g_assert_nonnull(str);
+> +    g_assert_cmpstr(str, =3D=3D, "Unit test \"'$`\\ and \\\\ etc.");
+> +
+> +    str =3D qdict_get_try_str(val, "variant-id");
+> +    g_assert_nonnull(str);
+> +    g_assert_cmpstr(str, =3D=3D, "unit-test");
+> +
+> +    QDECREF(ret);
+> +    g_free(env[0]);
+> +}
+> +
+>  int main(int argc, char **argv)
+>  {
+>      TestFixture fix;
+> @@ -972,6 +1024,7 @@ int main(int argc, char **argv)
+>      g_test_add_data_func("/qga/guest-exec", &fix, test_qga_guest_exec);
+>      g_test_add_data_func("/qga/guest-exec-invalid", &fix,
+>                           test_qga_guest_exec_invalid);
+> +    g_test_add_data_func("/qga/guest-get-osinfo", &fix,
+> test_qga_guest_get_osinfo);
+>
+>      if (g_getenv("QGA_TEST_SIDE_EFFECTING")) {
+>          g_test_add_data_func("/qga/fsfreeze-and-thaw", &fix,
+> --
+> 2.13.1
+>
+> --
+Marc-Andr=C3=A9 Lureau
