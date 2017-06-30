@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dQsoL-00010s-Da
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:06:02 -0400
+	(envelope-from <xormaetxea@ikerlan.es>) id 1dQsty-0003Iv-WA
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:11:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dQsoK-0003P8-CW
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:06:01 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:33304)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dQsoK-0003OP-4l
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:06:00 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id z75so24003629wmc.0
-	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 03:06:00 -0700 (PDT)
+	(envelope-from <xormaetxea@ikerlan.es>) id 1dQstu-0008Js-TI
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:11:50 -0400
+Received: from ikerlan-12.ikerlan.es ([193.145.247.1]:43951)
+	by eggs.gnu.org with smtp (Exim 4.71)
+	(envelope-from <xormaetxea@ikerlan.es>) id 1dQsts-0007pc-Oj
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:11:46 -0400
+From: Ormaetxea Xabier <xormaetxea@ikerlan.es>
+Date: Fri, 30 Jun 2017 10:09:44 +0000
+Message-ID: <B1DA44315104F94D9F3F23C74275EA9D71DAF7@Ikerlan-12.ikerlan.es>
+Content-Language: es-ES
 MIME-Version: 1.0
-In-Reply-To: <199bd37fe51c4b240da9834673c065ea042b9897.1498756113.git.alistair.francis@xilinx.com>
-References: <cover.1498756113.git.alistair.francis@xilinx.com>
-	<199bd37fe51c4b240da9834673c065ea042b9897.1498756113.git.alistair.francis@xilinx.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 30 Jun 2017 11:05:38 +0100
-Message-ID: <CAFEAcA9oucBm84kep7NHBM1UP6LRdRCfOAS7_buKo_8DTKjeSA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 2/3] util/oslib-win32: Remove invalid
- check
+Subject: [Qemu-devel] Running QEMU for Microblaze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +25,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Edgar Iglesias <edgar.iglesias@xilinx.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philippe@mathieu-daude.net>, Qemu-block <qemu-block@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair23@gmail.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 29 June 2017 at 18:16, Alistair Francis <alistair.francis@xilinx.com> wr=
-ote:
-> There is no way nhandles can be zero in this section so that part of the
-> if statement will always be false. Let's just remove it to make the code
-> easier to read.
->
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Acked-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Reviewed-by: Fam Zheng <famz@redhat.com>
-> ---
->
->  util/oslib-win32.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-> index 80e4668935..7ec0f8e083 100644
-> --- a/util/oslib-win32.c
-> +++ b/util/oslib-win32.c
-> @@ -414,7 +414,7 @@ static int poll_rest(gboolean poll_msgs, HANDLE *hand=
-les, gint nhandles,
->          /* If we have a timeout, or no handles to poll, be satisfied
->           * with just noticing we have messages waiting.
->           */
-> -        if (timeout !=3D 0 || nhandles =3D=3D 0) {
-> +        if (timeout !=3D 0) {
->              return 1;
->          }
+Hello!
 
-The comment and the code now don't match -- does the comment
-need updating too?
+I'm trying to run QEMU-Microblaze (Little-endian) with a standalone app in =
+some different ways, but none of them works for me:
 
-thanks
--- PMM
+
+1)      I have created my own .DTB from my system design (.HDF), just a mic=
+roblaze connected to the Uartlite AXI, leds, interrupt controller, and a gp=
+io. Using the board support package I've made a simple c-based program (at =
+the end of the message):
+
+Run it with ./qemu-system-microblazeel -M microblaze-fdt-plnx -dtb system-t=
+op.dtb -kernel fibonacci.elf (-s -S)         #(-s -S just to debug it)
+
+Invalid MicroBlaze version number: (null)           #Don't think it's a pro=
+blem
+Bar ram offset 9000528f
+Aborted (core dumped)
+
+
+2)      I use a mb.dtb that I found on the internet. Same c-based program. =
+Run it with the debugger:
+
+./qemu-system-microblazeel -M microblaze-fdt-plnx -dtb mb.dtb -kernel fibon=
+acci.elf (-s -S)
+
+Lets my debug it (doesn't fail booting), but in the first step:
+Bad ram pointer
+
+I suppose this isn't my option cause the .dtb is created for another microb=
+laze-based design.
+
+
+3)      I use the same design (.HDF), but run it for the Spartan 3a dsp 180=
+0 option:
+
+./qemu-system-microblazeel -kernel fibonacci.elf (-s -S)
+
+Runs "properly" -> I mean properly because I can follow on the debugger tha=
+t the steps are correctly made:
+_start -> _start1 -> main -> fibonacci -> xil_printf -> xil_printf ... -> x=
+il_printf -> _exit
+
+But doesn't print nothing. And doesn't write in memory as asked (*addrPtr =
+=3D 0x150) :
+In the qemu shell:
+(qemu) x 0xC0000000
+C0000000: 0x00000000        #When it should be 0x00000150
+
+
+4)      Modifying my system design to be similar to the Spartan board desig=
+n:
+MEMORY_BASEADDR 0x90000000
+FLASH_BASEADDR 0xa0000000
+INTC_BASEADDR 0x81800000
+TIMER_BASEADDR 0x83c00000
+UARTLITE_BASEADDR 0x84000000
+ETHLITE_BASEADDR 0x81000000
+                I get exactly the same result as in the (3) case.
+
+So here they go my questions:
+
+-          Am I doing it right? Is this the method of running a standalone =
+program over a microblaze?
+
+-          How can I make the program print something?
+
+-          Im not sure if the problem is that it doesn't write on memory, o=
+r I am the one who fails reading it from the shell, because if I change the=
+ writing position to (0x84000008, uart status position) I get the error (qe=
+mu: hardware error: write to UART STATUS?) -> that means im writing (or try=
+ing, at least). How can I write on memory (and read after it, so I know it =
+works)?
+
+Thank you in advance! Really appreciate your Job! (I'm sorry if my problem =
+it's a simple one, I'm new at it)
+
+#include <stdio.h>
+#include "platform.h"
+#include "xil_printf.h"
+
+void fibonacci(int d){
+       u32 a=3D1;
+       u32 b=3D0;
+       u32 em=3D0;
+       u32 *addrPtr =3D 0xC0000000;
+
+for(int num=3D0; num<d; num++){
+       for(int i=3D0; i<a; i++){
+       }
+       for(int c=3D0; c<b; c++){
+       }
+       em =3D a+b;
+       xil_printf(em);
+       *addrPtr =3D 0x150;
+       addrPtr+=3D1;
+       b=3Da;
+       a=3Dem;
+       }
+}
+
+
+int main()
+{
+    init_platform();
+    int i=3D35;
+    fibonacci(i);
+    cleanup_platform();
+    return 0;
+}
