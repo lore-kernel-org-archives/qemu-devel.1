@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dR3Ir-0005Wt-Ul
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 17:18:15 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dR3JF-0005tQ-G4
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 17:18:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dR3Iq-0000e6-PH
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 17:18:13 -0400
-Date: Fri, 30 Jun 2017 17:18:01 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170630211801.GM4997@localhost.localdomain>
-References: <20170627192458.15519-1-eblake@redhat.com>
-	<20170627192458.15519-15-eblake@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dR3JA-0000qV-CA
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 17:18:37 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:34293)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dR3JA-0000p1-6m
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 17:18:32 -0400
+Received: by mail-qk0-x243.google.com with SMTP id 91so16956183qkq.1
+	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 14:18:30 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170628113106.5248-1-quintela@redhat.com>
+	<20170628113106.5248-5-quintela@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <1c10b8db-1d3a-863b-cf06-ccfce5d71498@amsat.org>
+Date: Fri, 30 Jun 2017 18:18:26 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170627192458.15519-15-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 14/20] backup: Switch BackupBlockJob to
- byte-based
+In-Reply-To: <20170628113106.5248-5-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 04/14] migration: let MigrationState be a
+ qdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,127 +36,224 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, jsnow@redhat.com, Max Reitz <mreitz@redhat.com>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On Tue, Jun 27, 2017 at 02:24:52PM -0500, Eric Blake wrote:
-> We are gradually converting to byte-based interfaces, as they are
-> easier to reason about than sector-based.  Continue by converting an
-> internal structure (no semantic change), and all references to
-> tracking progress.  Drop a redundant local variable bytes_per_cluster.
+Hi Peter, Juan,
+
+On 06/28/2017 08:30 AM, Juan Quintela wrote:
+> From: Peter Xu <peterx@redhat.com>
 > 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: John Snow <jsnow@redhat.com>
+> Let the old man "MigrationState" join the object family. Direct benefit
+> is that we can start to use all the property features derived from
+> current QDev, like: HW_COMPAT_* bits, command line setup for migration
+> parameters (so will never need to set them up each time using HMP/QMP,
+> this is really, really attractive for test writters), etc.
 > 
-
-Reviewed-by: Jeff Cody <jcody@redhat.com>
-
+> I see no reason to disallow this happen yet. So let's start from this
+> one, to see whether it would be anything good.
+> 
+> Now we init the MigrationState struct statically in main() to make sure
+> it's initialized after global properties are applied, since we'll use
+> them during creation of the object.
+> 
+> No functional change at all.
+> 
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> Message-Id: <1498536619-14548-5-git-send-email-peterx@redhat.com>
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 > ---
-> v2: no change
-> ---
->  block/backup.c | 33 +++++++++++++++------------------
->  1 file changed, 15 insertions(+), 18 deletions(-)
+>   include/migration/misc.h |  1 +
+>   migration/migration.c    | 78 ++++++++++++++++++++++++++++++++++--------------
+>   migration/migration.h    | 19 ++++++++++++
+>   vl.c                     |  6 ++++
+>   4 files changed, 81 insertions(+), 23 deletions(-)
 > 
-> diff --git a/block/backup.c b/block/backup.c
-> index 06431ac..4e64710 100644
-> --- a/block/backup.c
-> +++ b/block/backup.c
-> @@ -39,7 +39,7 @@ typedef struct BackupBlockJob {
->      BlockdevOnError on_source_error;
->      BlockdevOnError on_target_error;
->      CoRwlock flush_rwlock;
-> -    uint64_t sectors_read;
-> +    uint64_t bytes_read;
->      unsigned long *done_bitmap;
->      int64_t cluster_size;
->      bool compress;
-> @@ -102,16 +102,15 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
->      void *bounce_buffer = NULL;
->      int ret = 0;
->      int64_t sectors_per_cluster = cluster_size_sectors(job);
-> -    int64_t bytes_per_cluster = sectors_per_cluster * BDRV_SECTOR_SIZE;
-> -    int64_t start, end;
-> -    int n;
-> +    int64_t start, end; /* clusters */
-> +    int n; /* bytes */
-> 
->      qemu_co_rwlock_rdlock(&job->flush_rwlock);
-> 
->      start = sector_num / sectors_per_cluster;
->      end = DIV_ROUND_UP(sector_num + nb_sectors, sectors_per_cluster);
-> 
-> -    trace_backup_do_cow_enter(job, start * bytes_per_cluster,
-> +    trace_backup_do_cow_enter(job, start * job->cluster_size,
->                                sector_num * BDRV_SECTOR_SIZE,
->                                nb_sectors * BDRV_SECTOR_SIZE);
-> 
-> @@ -120,28 +119,27 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-> 
->      for (; start < end; start++) {
->          if (test_bit(start, job->done_bitmap)) {
-> -            trace_backup_do_cow_skip(job, start * bytes_per_cluster);
-> +            trace_backup_do_cow_skip(job, start * job->cluster_size);
->              continue; /* already copied */
->          }
-> 
-> -        trace_backup_do_cow_process(job, start * bytes_per_cluster);
-> +        trace_backup_do_cow_process(job, start * job->cluster_size);
-> 
-> -        n = MIN(sectors_per_cluster,
-> -                job->common.len / BDRV_SECTOR_SIZE -
-> -                start * sectors_per_cluster);
-> +        n = MIN(job->cluster_size,
-> +                job->common.len - start * job->cluster_size);
-> 
->          if (!bounce_buffer) {
->              bounce_buffer = blk_blockalign(blk, job->cluster_size);
->          }
->          iov.iov_base = bounce_buffer;
-> -        iov.iov_len = n * BDRV_SECTOR_SIZE;
-> +        iov.iov_len = n;
->          qemu_iovec_init_external(&bounce_qiov, &iov, 1);
-> 
->          ret = blk_co_preadv(blk, start * job->cluster_size,
->                              bounce_qiov.size, &bounce_qiov,
->                              is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0);
->          if (ret < 0) {
-> -            trace_backup_do_cow_read_fail(job, start * bytes_per_cluster, ret);
-> +            trace_backup_do_cow_read_fail(job, start * job->cluster_size, ret);
->              if (error_is_read) {
->                  *error_is_read = true;
->              }
-> @@ -157,7 +155,7 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
->                                   job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
->          }
->          if (ret < 0) {
-> -            trace_backup_do_cow_write_fail(job, start * bytes_per_cluster, ret);
-> +            trace_backup_do_cow_write_fail(job, start * job->cluster_size, ret);
->              if (error_is_read) {
->                  *error_is_read = false;
->              }
-> @@ -169,8 +167,8 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
->          /* Publish progress, guest I/O counts as progress too.  Note that the
->           * offset field is an opaque progress value, it is not a disk offset.
->           */
-> -        job->sectors_read += n;
-> -        job->common.offset += n * BDRV_SECTOR_SIZE;
-> +        job->bytes_read += n;
-> +        job->common.offset += n;
->      }
-> 
->  out:
-> @@ -363,9 +361,8 @@ static bool coroutine_fn yield_and_check(BackupBlockJob *job)
->       */
->      if (job->common.speed) {
->          uint64_t delay_ns = ratelimit_calculate_delay(&job->limit,
-> -                                                      job->sectors_read *
-> -                                                      BDRV_SECTOR_SIZE);
-> -        job->sectors_read = 0;
-> +                                                      job->bytes_read);
-> +        job->bytes_read = 0;
->          block_job_sleep_ns(&job->common, QEMU_CLOCK_REALTIME, delay_ns);
->      } else {
->          block_job_sleep_ns(&job->common, QEMU_CLOCK_REALTIME, 0);
-> -- 
-> 2.9.4
+> diff --git a/include/migration/misc.h b/include/migration/misc.h
+> index 65c7070..2d36cf5 100644
+> --- a/include/migration/misc.h
+> +++ b/include/migration/misc.h
+> @@ -45,6 +45,7 @@ void savevm_skip_section_footers(void);
+>   void savevm_skip_configuration(void);
+>   
+>   /* migration/migration.c */
+> +void migration_object_init(void);
+>   void qemu_start_incoming_migration(const char *uri, Error **errp);
+>   bool migration_is_idle(void);
+>   void add_migration_state_change_notifier(Notifier *notify);
+> diff --git a/migration/migration.c b/migration/migration.c
+> index f588329..2c25927 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -98,32 +98,21 @@ enum mig_rp_message_type {
+>      migrations at once.  For now we don't need to add
+>      dynamic creation of migration */
+>   
+> +static MigrationState *current_migration;
+> +
+> +void migration_object_init(void)
+> +{
+> +    /* This can only be called once. */
+> +    assert(!current_migration);
+> +    current_migration = MIGRATION_OBJ(object_new(TYPE_MIGRATION));
+> +}
+> +
+>   /* For outgoing */
+>   MigrationState *migrate_get_current(void)
+>   {
+> -    static bool once;
+> -    static MigrationState current_migration = {
+> -        .state = MIGRATION_STATUS_NONE,
+> -        .xbzrle_cache_size = DEFAULT_MIGRATE_CACHE_SIZE,
+> -        .mbps = -1,
+> -        .parameters = {
+> -            .compress_level = DEFAULT_MIGRATE_COMPRESS_LEVEL,
+> -            .compress_threads = DEFAULT_MIGRATE_COMPRESS_THREAD_COUNT,
+> -            .decompress_threads = DEFAULT_MIGRATE_DECOMPRESS_THREAD_COUNT,
+> -            .cpu_throttle_initial = DEFAULT_MIGRATE_CPU_THROTTLE_INITIAL,
+> -            .cpu_throttle_increment = DEFAULT_MIGRATE_CPU_THROTTLE_INCREMENT,
+> -            .max_bandwidth = MAX_THROTTLE,
+> -            .downtime_limit = DEFAULT_MIGRATE_SET_DOWNTIME,
+> -            .x_checkpoint_delay = DEFAULT_MIGRATE_X_CHECKPOINT_DELAY,
+> -        },
+> -    };
+> -
+> -    if (!once) {
+> -        current_migration.parameters.tls_creds = g_strdup("");
+> -        current_migration.parameters.tls_hostname = g_strdup("");
+> -        once = true;
+> -    }
+> -    return &current_migration;
+> +    /* This can only be called after the object created. */
+> +    assert(current_migration);
+
+This this pull I'v been unable to run qemu:
+
+qemu-system-arm: migration/migration.c:127: migrate_get_current: 
+Assertion `current_migration' failed.
+
+I'v bisected to this commit using the following script:
+
+#! /usr/bin/env bash
+test -f test.qcow2 || qemu-img create -f qcow test.qcow2 1G
+make -C build/system-arm subdir-arm-softmmu -j4 || exit 125
+echo q | build/system-arm/arm-softmmu/qemu-system-arm -M virt \
+   -drive if=none,file=test.qcow2,format=qcow,id=hd \
+   -device virtio-blk-device,drive=hd \
+   -nographic -serial null -monitor stdio
+test $? -eq 0 || exit 1
+
+Regards,
+
+Phil.
+
+> +    return current_migration;
+>   }
+>   
+>   MigrationIncomingState *migration_incoming_get_current(void)
+> @@ -1987,3 +1976,46 @@ void migrate_fd_connect(MigrationState *s)
+>       s->migration_thread_running = true;
+>   }
+>   
+> +static void migration_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->user_creatable = false;
+> +}
+> +
+> +static void migration_instance_init(Object *obj)
+> +{
+> +    MigrationState *ms = MIGRATION_OBJ(obj);
+> +
+> +    ms->state = MIGRATION_STATUS_NONE;
+> +    ms->xbzrle_cache_size = DEFAULT_MIGRATE_CACHE_SIZE;
+> +    ms->mbps = -1;
+> +    ms->parameters = (MigrationParameters) {
+> +        .compress_level = DEFAULT_MIGRATE_COMPRESS_LEVEL,
+> +        .compress_threads = DEFAULT_MIGRATE_COMPRESS_THREAD_COUNT,
+> +        .decompress_threads = DEFAULT_MIGRATE_DECOMPRESS_THREAD_COUNT,
+> +        .cpu_throttle_initial = DEFAULT_MIGRATE_CPU_THROTTLE_INITIAL,
+> +        .cpu_throttle_increment = DEFAULT_MIGRATE_CPU_THROTTLE_INCREMENT,
+> +        .max_bandwidth = MAX_THROTTLE,
+> +        .downtime_limit = DEFAULT_MIGRATE_SET_DOWNTIME,
+> +        .x_checkpoint_delay = DEFAULT_MIGRATE_X_CHECKPOINT_DELAY,
+> +    };
+> +    ms->parameters.tls_creds = g_strdup("");
+> +    ms->parameters.tls_hostname = g_strdup("");
+> +}
+> +
+> +static const TypeInfo migration_type = {
+> +    .name = TYPE_MIGRATION,
+> +    .parent = TYPE_DEVICE,
+> +    .class_init = migration_class_init,
+> +    .class_size = sizeof(MigrationClass),
+> +    .instance_size = sizeof(MigrationState),
+> +    .instance_init = migration_instance_init,
+> +};
+> +
+> +static void register_migration_types(void)
+> +{
+> +    type_register_static(&migration_type);
+> +}
+> +
+> +type_init(register_migration_types);
+> diff --git a/migration/migration.h b/migration/migration.h
+> index d9a268a..3fca364 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -19,6 +19,7 @@
+>   #include "qapi-types.h"
+>   #include "exec/cpu-common.h"
+>   #include "qemu/coroutine_int.h"
+> +#include "hw/qdev.h"
+>   
+>   /* State for the incoming migration */
+>   struct MigrationIncomingState {
+> @@ -62,8 +63,26 @@ struct MigrationIncomingState {
+>   MigrationIncomingState *migration_incoming_get_current(void);
+>   void migration_incoming_state_destroy(void);
+>   
+> +#define TYPE_MIGRATION "migration"
+> +
+> +#define MIGRATION_CLASS(klass) \
+> +    OBJECT_CLASS_CHECK(MigrationClass, (klass), TYPE_MIGRATION)
+> +#define MIGRATION_OBJ(obj) \
+> +    OBJECT_CHECK(MigrationState, (obj), TYPE_MIGRATION)
+> +#define MIGRATION_GET_CLASS(obj) \
+> +    OBJECT_GET_CLASS(MigrationClass, (obj), TYPE_MIGRATION)
+> +
+> +typedef struct MigrationClass {
+> +    /*< private >*/
+> +    DeviceClass parent_class;
+> +} MigrationClass;
+> +
+>   struct MigrationState
+>   {
+> +    /*< private >*/
+> +    DeviceState parent_obj;
+> +
+> +    /*< public >*/
+>       size_t bytes_xfer;
+>       size_t xfer_limit;
+>       QemuThread thread;
+> diff --git a/vl.c b/vl.c
+> index c0cdb17..f0a0515 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4596,6 +4596,12 @@ int main(int argc, char **argv, char **envp)
+>        */
+>       register_global_properties(current_machine);
+>   
+> +    /*
+> +     * Migration object can only be created after global properties
+> +     * are applied correctly.
+> +     */
+> +    migration_object_init();
+> +
+>       /* This checkpoint is required by replay to separate prior clock
+>          reading from the other reads, because timer polling functions query
+>          clock values from the log. */
 > 
