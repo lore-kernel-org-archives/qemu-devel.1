@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dQjzf-0001fc-Rg
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 20:41:09 -0400
+	(envelope-from <cota@braap.org>) id 1dQk0G-00026j-O5
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 20:41:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dQjze-0006JU-SJ
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 20:41:07 -0400
-Received: from mail-yw0-x241.google.com ([2607:f8b0:4002:c05::241]:34149)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1dQjze-0006JA-Nj
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 20:41:06 -0400
-Received: by mail-yw0-x241.google.com with SMTP id a12so19204ywh.1
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 17:41:06 -0700 (PDT)
-From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Thu, 29 Jun 2017 20:40:59 -0400
-Message-Id: <20170630004059.25619-4-bobby.prani@gmail.com>
-In-Reply-To: <20170630004059.25619-1-bobby.prani@gmail.com>
-References: <20170630004059.25619-1-bobby.prani@gmail.com>
+	(envelope-from <cota@braap.org>) id 1dQk0C-0006dd-1u
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 20:41:44 -0400
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:44119)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dQk0B-0006d3-Mm
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 20:41:39 -0400
+Date: Thu, 29 Jun 2017 20:41:34 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170630004134.GJ13979@flamenco>
+References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
+	<149865462073.17063.17488435214703164893.stgit@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 3/3] tcg/aarch64: Enable indirect jump path
- using LDR (literal)
+In-Reply-To: <149865462073.17063.17488435214703164893.stgit@frigg.lan>
+Subject: Re: [Qemu-devel] [PATCH v11 10/29] target/i386: [tcg] Refactor
+ translate_insn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,101 +29,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alex.bennee@linaro.org
-Cc: qemu-devel@nongnu.org, rth@twiddle.net
+To: =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
+Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-This patch enables the indirect jump path using an LDR (literal)
-instruction. It will be interesting to test and see which performs
-better among the two paths.
+On Wed, Jun 28, 2017 at 15:57:00 +0300, Lluís Vilanova wrote:
+> Incrementally paves the way towards using the generic instruction translation
+> loop.
+> 
+> Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
+> ---
+>  target/i386/translate.c |   72 +++++++++++++++++++++++++++++++----------------
+>  1 file changed, 48 insertions(+), 24 deletions(-)
+> 
+> diff --git a/target/i386/translate.c b/target/i386/translate.c
+> index 3eee348de7..da4b409d97 100644
+> --- a/target/i386/translate.c
+> +++ b/target/i386/translate.c
+> @@ -4420,15 +4420,17 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
+>  
+>  /* convert one instruction. s->base.is_jmp is set if the translation must
+>     be stopped. Return the next pc value */
+> -static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+> -                               target_ulong pc_start)
+> +static target_ulong disas_insn(DisasContextBase *dcbase, CPUState *cpu)
+>  {
+> +    DisasContext *s = container_of(dcbase, DisasContext, base);
+> +    CPUX86State *env = cpu->env_ptr;
 
-CC: Alex BennÃ©e <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
----
- tcg/aarch64/tcg-target.inc.c | 42 ++++++++++++++++++++++++++++--------------
- 1 file changed, 28 insertions(+), 14 deletions(-)
+Minor nit: you can pass dc (*s) here directly, no need for container_of
 
-diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
-index f059d9d781..b0801d0259 100644
---- a/tcg/aarch64/tcg-target.inc.c
-+++ b/tcg/aarch64/tcg-target.inc.c
-@@ -269,6 +269,8 @@ typedef enum {
-     I3207_BLR       = 0xd63f0000,
-     I3207_RET       = 0xd65f0000,
- 
-+    /* Load literal for loading the address at pc-relative offset */
-+    I3305_LDR       = 0x58000000,
-     /* Load/store register.  Described here as 3.3.12, but the helper
-        that emits them can transform to 3.3.10 or 3.3.13.  */
-     I3312_STRB      = 0x38000000 | LDST_ST << 22 | MO_8 << 30,
-@@ -389,6 +391,11 @@ static inline uint32_t tcg_in32(TCGContext *s)
- #define tcg_out_insn(S, FMT, OP, ...) \
-     glue(tcg_out_insn_,FMT)(S, glue(glue(glue(I,FMT),_),OP), ## __VA_ARGS__)
- 
-+static void tcg_out_insn_3305(TCGContext *s, AArch64Insn insn, int imm19, TCGReg rt)
-+{
-+    tcg_out32(s, insn | (imm19 & 0x7ffff) << 5 | rt);
-+}
-+
- static void tcg_out_insn_3201(TCGContext *s, AArch64Insn insn, TCGType ext,
-                               TCGReg rt, int imm19)
- {
-@@ -864,6 +871,8 @@ static inline void tcg_out_call(TCGContext *s, tcg_insn_unit *target)
-     }
- }
- 
-+#ifdef USE_DIRECT_JUMP
-+
- void aarch64_tb_set_jmp_target(uintptr_t jmp_addr, uintptr_t addr)
- {
-     tcg_insn_unit *code_ptr = (tcg_insn_unit *)jmp_addr;
-@@ -889,6 +898,8 @@ void aarch64_tb_set_jmp_target(uintptr_t jmp_addr, uintptr_t addr)
-     flush_icache_range(jmp_addr, jmp_addr + 8);
- }
- 
-+#endif
-+
- static inline void tcg_out_goto_label(TCGContext *s, TCGLabel *l)
- {
-     if (!l->has_value) {
-@@ -1400,21 +1411,24 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,
-         break;
- 
-     case INDEX_op_goto_tb:
--#ifndef USE_DIRECT_JUMP
--#error "USE_DIRECT_JUMP required for aarch64"
--#endif
--        /* consistency for USE_DIRECT_JUMP */
--        tcg_debug_assert(s->tb_jmp_insn_offset != NULL);
--        /* Ensure that ADRP+ADD are 8-byte aligned so that an atomic
--           write can be used to patch the target address. */
--        if ((uintptr_t)s->code_ptr & 7) {
--            tcg_out32(s, NOP);
-+        if (s->tb_jmp_insn_offset != NULL) {
-+            /* USE_DIRECT_JUMP */
-+            /* Ensure that ADRP+ADD are 8-byte aligned so that an atomic
-+               write can be used to patch the target address. */
-+            if ((uintptr_t)s->code_ptr & 7) {
-+                tcg_out32(s, NOP);
-+            }
-+            s->tb_jmp_insn_offset[a0] = tcg_current_code_size(s);
-+            /* actual branch destination will be patched by
-+               aarch64_tb_set_jmp_target later. */
-+            tcg_out_insn(s, 3406, ADRP, TCG_REG_TMP, 0);
-+            tcg_out_insn(s, 3401, ADDI, TCG_TYPE_I64, TCG_REG_TMP, TCG_REG_TMP, 0);
-+        } else {
-+            /* !USE_DIRECT_JUMP */
-+            tcg_debug_assert(s->tb_jmp_target_addr != NULL);
-+            intptr_t offset = tcg_pcrel_diff(s, (s->tb_jmp_target_addr + a0)) >> 2;
-+            tcg_out_insn(s, 3305, LDR, offset, TCG_REG_TMP);
-         }
--        s->tb_jmp_insn_offset[a0] = tcg_current_code_size(s);
--        /* actual branch destination will be patched by
--           aarch64_tb_set_jmp_target later. */
--        tcg_out_insn(s, 3406, ADRP, TCG_REG_TMP, 0);
--        tcg_out_insn(s, 3401, ADDI, TCG_TYPE_I64, TCG_REG_TMP, TCG_REG_TMP, 0);
-         tcg_out_insn(s, 3207, BR, TCG_REG_TMP);
-         s->tb_jmp_reset_offset[a0] = tcg_current_code_size(s);
-         break;
--- 
-2.13.0
+(snip)
+> +static target_ulong i386_trblock_translate_insn(DisasContextBase *dcbase,
+> +                                                CPUState *cpu)
+> +{
+> +    DisasContext *dc = container_of(dcbase, DisasContext, base);
+> +    target_ulong pc_next = disas_insn(&dc->base, cpu);
+> +
+> +    if (dc->base.is_jmp) {
+> +        return pc_next;
+> +    }
+> +
+> +    if (dc->tf || (dc->base.tb->flags & HF_INHIBIT_IRQ_MASK)) {
+> +        /* if single step mode, we generate only one instruction and
+> +           generate an exception */
+> +        /* if irq were inhibited with HF_INHIBIT_IRQ_MASK, we clear
+> +           the flag and abort the translation to give the irqs a
+> +           change to be happen */
+
+I know you just moved lines around, but while at it, s/change to be/chance to/
+
+Other than that,
+
+Reviewed-by: Emilio G. Cota <cota@braap.org>
+
+		E.
