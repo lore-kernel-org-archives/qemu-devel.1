@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dQvq8-0004Id-KW
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 09:20:05 -0400
+	(envelope-from <mihajlov@de.ibm.com>) id 1dQvvc-0006oa-HD
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 09:25:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dQvq4-0001P9-0e
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 09:20:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38424)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dQvq3-0001Oa-N8
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 09:19:59 -0400
-References: <CAGKXQyct2Y0DTbSRxCjyDJpR0eSZg3L245mce6QvmtPNJexcrw@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <715c7cf5-0311-425a-9ea0-9a9986b3655b@redhat.com>
-Date: Fri, 30 Jun 2017 08:19:56 -0500
-MIME-Version: 1.0
-In-Reply-To: <CAGKXQyct2Y0DTbSRxCjyDJpR0eSZg3L245mce6QvmtPNJexcrw@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="xdah3nC3l6c2bCsFJmjhRhuRFjpHuv7in"
-Subject: Re: [Qemu-devel] BIT_WORD(start >> TARGET_PAGE_BITS)
+	(envelope-from <mihajlov@de.ibm.com>) id 1dQvvX-0003Kn-JC
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 09:25:44 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46772
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mihajlov@de.ibm.com>) id 1dQvvX-0003K5-CF
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 09:25:39 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v5UDOBUh020555
+	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 09:25:37 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2bdk8bjvth-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 09:25:37 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mihajlov@de.ibm.com>;
+	Fri, 30 Jun 2017 14:25:35 +0100
+From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Date: Fri, 30 Jun 2017 15:25:33 +0200
+Message-Id: <1498829133-20598-1-git-send-email-mihajlov@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH] s390: return unavailable features via
+ query-cpu-definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,77 +36,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ali saeedi <ali.saeedi56@gmail.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, jjherne@linux.vnet.ibm.com, david@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---xdah3nC3l6c2bCsFJmjhRhuRFjpHuv7in
-From: Eric Blake <eblake@redhat.com>
-To: ali saeedi <ali.saeedi56@gmail.com>, qemu-devel@nongnu.org
-Message-ID: <715c7cf5-0311-425a-9ea0-9a9986b3655b@redhat.com>
-Subject: Re: [Qemu-devel] BIT_WORD(start >> TARGET_PAGE_BITS)
-References: <CAGKXQyct2Y0DTbSRxCjyDJpR0eSZg3L245mce6QvmtPNJexcrw@mail.gmail.com>
-In-Reply-To: <CAGKXQyct2Y0DTbSRxCjyDJpR0eSZg3L245mce6QvmtPNJexcrw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The response for query-cpu-definitions didn't include the
+unavailable-features field, which is used by libvirt to figure
+out whether a certain cpu model is usable on the host.
 
-On 06/30/2017 08:02 AM, ali saeedi wrote:
-> Hello
-> what does the following code do?
-> 'unsigned long page =3D BIT_WORD(start >> TARGET_PAGE_BITS)' ?
+The unavailable features are now computed by obtaining the host CPU
+model and comparing its feature bitmap with the feature bitmaps of
+the known CPU models.
 
-I've noticed you've been asking a lot of questions (each as a new
-thread, rather than replying to previous answers), that seem like you
-are not trying very hard to read the code and find an answer for
-yourself.  Rather than just answer you, I'm going to try to teach you
-how to read the source and answer the question yourself.  You may also
-get better answers to your future questions if you ask in the form of
-"this code is confusing me, I think it means this, based on what I read
-at xyz, but would like confirmation or correction" (showing WHAT you
-have already researched) rather than just "what does this code do" (and
-making it feel like you are off-loading the research work onto others).
+I.e. the output of virsh domcapabilities would change from
+ ...
+     <mode name='custom' supported='yes'>
+      <model usable='unknown'>z10EC-base</model>
+      <model usable='unknown'>z9EC-base</model>
+      <model usable='unknown'>z196.2-base</model>
+      <model usable='unknown'>z900-base</model>
+      <model usable='unknown'>z990</model>
+ ...
+to
+ ...
+     <mode name='custom' supported='yes'>
+      <model usable='yes'>z10EC-base</model>
+      <model usable='yes'>z9EC-base</model>
+      <model usable='no'>z196.2-base</model>
+      <model usable='yes'>z900-base</model>
+      <model usable='yes'>z990</model>
+ ...
 
-First, figure out what BIT_WORD does:
+Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+---
+ target/s390x/cpu_models.c | 51 ++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 46 insertions(+), 5 deletions(-)
 
-$ git grep 'define BIT_WORD'
-
-That should have only one hit, in include/qemu/bitops.h.  Reading it in
-context doesn't have any more comments, but it looks like it is
-computing the number of bits that are available in a word, and looks
-like it is defining a word to be the type most efficiently operated on
-for the current ABI (a long is 32 bits on a 32-bit OS, and 64 bits on a
-64-bit OS).
-
-It also looks like you are scaling a start address by the number of bits
-in a target page.
-
-So it probably means you are computing the index for which page 'start'
-occurs on (depending on values, it might mean that 'start =3D=3D 0x0' is
-page 0, 'start =3D=3D 0x10000' is page 1, and so on), where start is
-initially in the form of the number of bits per page.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---xdah3nC3l6c2bCsFJmjhRhuRFjpHuv7in
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZVk/8AAoJEKeha0olJ0Nq/VkH/iBSGsEe9mcTu4A/zhe5Cayp
-Wqvsk74E4XXDmwk3le2l8B8vrb5PPvUwa8ui0ZEmG91tj1VxIV/edSu6ZWeCcaHR
-ZT0Vif8i1QQ/l+tRo6/84Hww35y/9vQlHRgR2dLGyy4ySSFMzJH5pqe3KMPKZ2ZM
-C+eAaL2estfN6ARASyQ8ij5Qn4k+7ZnzvYZlQfmolbY1BlB5K3wnMNm9VJXu3Fcd
-C1t+1niMWHLK7s6RL5dzzS1Jq9Gn2hWaxDwlvsN7Olh/YEgDWBOOYLoMGuUi0waM
-kY2r4L+xqLY9gFrxQJCABHYDiDWVnNP6k4rVS5iez9Y1MTpIhEXhA1/hhxnTuY4=
-=HLNb
------END PGP SIGNATURE-----
-
---xdah3nC3l6c2bCsFJmjhRhuRFjpHuv7in--
+diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+index 63903c2..dc3371f 100644
+--- a/target/s390x/cpu_models.c
++++ b/target/s390x/cpu_models.c
+@@ -283,14 +283,43 @@ void s390_cpu_list(FILE *f, fprintf_function print)
+     }
+ }
+ 
++static S390CPUModel *get_max_cpu_model(Error **errp);
++
+ #ifndef CONFIG_USER_ONLY
++static void list_add_feat(const char *name, void *opaque);
++
++static void check_unavailable_features(const S390CPUModel *max_model,
++                                       const S390CPUModel *model,
++                                       strList **unavailable)
++{
++    S390FeatBitmap missing;
++
++    /* detect missing features if any to properly report them */
++    bitmap_andnot(missing, model->features, max_model->features,
++                  S390_FEAT_MAX);
++    if (!bitmap_empty(missing, S390_FEAT_MAX)) {
++        s390_feat_bitmap_to_ascii(missing,
++                                  unavailable,
++                                  list_add_feat);
++    }
++}
++
++struct CpuDefinitionInfoListData {
++    CpuDefinitionInfoList *list;
++    Error **errp;
++};
++
+ static void create_cpu_model_list(ObjectClass *klass, void *opaque)
+ {
+-    CpuDefinitionInfoList **cpu_list = opaque;
++    struct CpuDefinitionInfoListData *cpu_list_data = opaque;
++    CpuDefinitionInfoList **cpu_list = &cpu_list_data->list;
+     CpuDefinitionInfoList *entry;
+     CpuDefinitionInfo *info;
+     char *name = g_strdup(object_class_get_name(klass));
+     S390CPUClass *scc = S390_CPU_CLASS(klass);
++    Object *obj;
++    S390CPU *sc;
++    S390CPUModel *scm;
+ 
+     /* strip off the -s390-cpu */
+     g_strrstr(name, "-" TYPE_S390_CPU)[0] = 0;
+@@ -300,21 +329,33 @@ static void create_cpu_model_list(ObjectClass *klass, void *opaque)
+     info->migration_safe = scc->is_migration_safe;
+     info->q_static = scc->is_static;
+     info->q_typename = g_strdup(object_class_get_name(klass));
+-
++    /* check for unavailable features */
++    obj = object_new(object_class_get_name(klass));
++    sc = S390_CPU(obj);
++    scm = get_max_cpu_model(cpu_list_data->errp);
++    if (scm && sc->model) {
++        info->has_unavailable_features = true;
++        check_unavailable_features(scm, sc->model, &info->unavailable_features);
++    }
+ 
+     entry = g_malloc0(sizeof(*entry));
+     entry->value = info;
+     entry->next = *cpu_list;
+     *cpu_list = entry;
++    object_unref(obj);
+ }
+ 
+ CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
+ {
+-    CpuDefinitionInfoList *list = NULL;
++    struct CpuDefinitionInfoListData list_data = {
++        .list = NULL,
++        .errp = errp,
++    };
+ 
+-    object_class_foreach(create_cpu_model_list, TYPE_S390_CPU, false, &list);
++    object_class_foreach(create_cpu_model_list, TYPE_S390_CPU, false,
++                         &list_data);
+ 
+-    return list;
++    return list_data.list;
+ }
+ 
+ static void cpu_model_from_info(S390CPUModel *model, const CpuModelInfo *info,
+-- 
+1.9.1
