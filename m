@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dQso4-0000pD-6n
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:05:45 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dQsoL-00010s-Da
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:06:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dQso0-0003CU-8t
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:05:44 -0400
-Received: from 10.mo5.mail-out.ovh.net ([46.105.52.148]:52267)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dQso0-0003BU-2z
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:05:40 -0400
-Received: from player799.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 8BFFE10EA3F
-	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 12:05:38 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Fri, 30 Jun 2017 12:05:32 +0200
-Message-ID: <149881713243.18888.18140083803237379387.stgit@bahia>
+	(envelope-from <peter.maydell@linaro.org>) id 1dQsoK-0003P8-CW
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:06:01 -0400
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:33304)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dQsoK-0003OP-4l
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:06:00 -0400
+Received: by mail-wm0-x22a.google.com with SMTP id z75so24003629wmc.0
+	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 03:06:00 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] spapr: refresh "platform-specific" hcalls
- comment
+In-Reply-To: <199bd37fe51c4b240da9834673c065ea042b9897.1498756113.git.alistair.francis@xilinx.com>
+References: <cover.1498756113.git.alistair.francis@xilinx.com>
+	<199bd37fe51c4b240da9834673c065ea042b9897.1498756113.git.alistair.francis@xilinx.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 30 Jun 2017 11:05:38 +0100
+Message-ID: <CAFEAcA9oucBm84kep7NHBM1UP6LRdRCfOAS7_buKo_8DTKjeSA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 2/3] util/oslib-win32: Remove invalid
+ check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,29 +31,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Edgar Iglesias <edgar.iglesias@xilinx.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philippe@mathieu-daude.net>, Qemu-block <qemu-block@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair23@gmail.com>
 
-We have more of these since the addition of KVMPPC_H_LOGICAL_MEMOP in 2012.
+On 29 June 2017 at 18:16, Alistair Francis <alistair.francis@xilinx.com> wr=
+ote:
+> There is no way nhandles can be zero in this section so that part of the
+> if statement will always be false. Let's just remove it to make the code
+> easier to read.
+>
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Acked-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Reviewed-by: Fam Zheng <famz@redhat.com>
+> ---
+>
+>  util/oslib-win32.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/util/oslib-win32.c b/util/oslib-win32.c
+> index 80e4668935..7ec0f8e083 100644
+> --- a/util/oslib-win32.c
+> +++ b/util/oslib-win32.c
+> @@ -414,7 +414,7 @@ static int poll_rest(gboolean poll_msgs, HANDLE *hand=
+les, gint nhandles,
+>          /* If we have a timeout, or no handles to poll, be satisfied
+>           * with just noticing we have messages waiting.
+>           */
+> -        if (timeout !=3D 0 || nhandles =3D=3D 0) {
+> +        if (timeout !=3D 0) {
+>              return 1;
+>          }
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- include/hw/ppc/spapr.h |    5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+The comment and the code now don't match -- does the comment
+need updating too?
 
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index a66bbac35242..1826cc4fd696 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -377,9 +377,8 @@ struct sPAPRMachineState {
-  * as well.
-  *
-  * We also need some hcalls which are specific to qemu / KVM-on-POWER.
-- * So far we just need one for H_RTAS, but in future we'll need more
-- * for extensions like virtio.  We put those into the 0xf000-0xfffc
-- * range which is reserved by PAPR for "platform-specific" hcalls.
-+ * We put those into the 0xf000-0xfffc range which is reserved by PAPR
-+ * for "platform-specific" hcalls.
-  */
- #define KVMPPC_HCALL_BASE       0xf000
- #define KVMPPC_H_RTAS           (KVMPPC_HCALL_BASE + 0x0)
+thanks
+-- PMM
