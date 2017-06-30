@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dQwKW-0003qA-EK
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 09:51:29 -0400
+	(envelope-from <bobby.prani@gmail.com>) id 1dQwLi-0004g6-AV
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 09:52:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dQwKT-0001wf-C0
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 09:51:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54322)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1dQwKT-0001wL-2X
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 09:51:25 -0400
-References: <20170614153557.3319-1-stefanha@redhat.com>
-	<20170614153557.3319-2-stefanha@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <b3a700eb-19fa-1e5f-48c0-dafba5bda07b@redhat.com>
-Date: Fri, 30 Jun 2017 15:51:09 +0200
+	(envelope-from <bobby.prani@gmail.com>) id 1dQwLh-0002U2-JM
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 09:52:42 -0400
+Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:35216)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1dQwLh-0002S6-F8
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 09:52:41 -0400
+Received: by mail-io0-x243.google.com with SMTP id 84so3485702iop.2
+	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 06:52:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170614153557.3319-2-stefanha@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="BJ4h6S7435pGpfSxvgiKVd5Rp7CJBwde7"
-Subject: Re: [Qemu-devel] [PATCH v8 1/9] block: add bdrv_measure() API
+In-Reply-To: <fa409172-2651-d685-6de0-b1559745cba9@twiddle.net>
+References: <20170630004059.25619-1-bobby.prani@gmail.com>
+	<20170630004059.25619-3-bobby.prani@gmail.com>
+	<fa409172-2651-d685-6de0-b1559745cba9@twiddle.net>
+From: Pranith Kumar <bobby.prani@gmail.com>
+Date: Fri, 30 Jun 2017 09:52:08 -0400
+Message-ID: <CAJhHMCCe_FxsDUemUs-iSBsLfke2yYvip7oN2ve5nwYcEykE7Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] tcg/aarch64: Use ADRP+ADD to
+ compute target address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,129 +31,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Nir Soffer <nsoffer@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, qemu-devel <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BJ4h6S7435pGpfSxvgiKVd5Rp7CJBwde7
-From: Max Reitz <mreitz@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
- Nir Soffer <nsoffer@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>,
- Alberto Garcia <berto@igalia.com>
-Message-ID: <b3a700eb-19fa-1e5f-48c0-dafba5bda07b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v8 1/9] block: add bdrv_measure() API
-References: <20170614153557.3319-1-stefanha@redhat.com>
- <20170614153557.3319-2-stefanha@redhat.com>
-In-Reply-To: <20170614153557.3319-2-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Jun 30, 2017 at 12:47 AM, Richard Henderson <rth@twiddle.net> wrote:
+> On 06/29/2017 05:40 PM, Pranith Kumar wrote:
+>>
+>>   void aarch64_tb_set_jmp_target(uintptr_t jmp_addr, uintptr_t addr)
+>>   {
+>>       tcg_insn_unit *code_ptr = (tcg_insn_unit *)jmp_addr;
+>> -    tcg_insn_unit *target = (tcg_insn_unit *)addr;
+>> +    tcg_insn_unit i1, i2;
+>> +    uint64_t pair;
+>>   +    ptrdiff_t offset = addr - jmp_addr;
+>> +
+>> +    if (offset == sextract64(offset, 0, 26)) {
+>> +        i1 = NOP;
+>> +        i2 = I3206_B | ((offset >> 2) & 0x3ffffff);
+>
+>
+> Branch first, since that's the offset you calculated.
+> Also, the nop need not be executed.
 
-On 2017-06-14 17:35, Stefan Hajnoczi wrote:
-> bdrv_measure() provides a conservative maximum for the size of a new
-> image.  This information is handy if storage needs to be allocated (e.g=
-=2E
-> a SAN or an LVM volume) ahead of time.
->=20
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Reviewed-by: Alberto Garcia <berto@igalia.com>
-> ---
-> v6:
->  * Change bdrv_measure() return type to BlockMeasureInfo * [Eric]
->  * Clarify that holes in sparse POSIX files are still counted [Eric]
-> ---
->  qapi/block-core.json      | 25 +++++++++++++++++++++++++
->  include/block/block.h     |  2 ++
->  include/block/block_int.h |  2 ++
->  block.c                   | 35 +++++++++++++++++++++++++++++++++++
->  4 files changed, 64 insertions(+)
+This is exactly how I form the instruction pair below (B+NOP, not
+NOP+B). But I get your point. It is confusing to use i1 for the second
+instruction. I'll change it.
 
-[...]
+>
+>> +    } else {
+>> +        offset = (addr >> 12) - (jmp_addr >> 12);
+>> +
+>> +        /* patch ADRP */
+>> +        i2 = deposit32(*code_ptr++, 29, 2, offset & 0x3);
+>> +        i2 = deposit32(i2, 5, 19, offset >> 2);
+>> +        /* patch ADDI */
+>> +        i1 = deposit32(*code_ptr, 10, 12, addr & 0xfff);
+>
+>
+> You can't just patch these insns, because they aren't necessarily ADRP+ADD.
+> Indeed, they will very likely be B and NOP.  The first address we patch in
+> is tb_jmp_reset_offset, which is the following opcode, which is definitely
+> in range of the branch above.
 
-> diff --git a/block.c b/block.c
-> index fa1d06d..056400a 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -3446,6 +3446,41 @@ int64_t bdrv_get_allocated_file_size(BlockDriver=
-State *bs)
->      return -ENOTSUP;
->  }
-> =20
-> +/*
-> + * bdrv_measure:
-> + * @drv: Format driver
-> + * @opts: Creation options for new image
-> + * @in_bs: Existing image containing data for new image (may be NULL)
-> + * @errp: Error object
-> + * Returns: A #BlockMeasureInfo (free using qapi_free_BlockMeasureInfo=
-())
-> + *          or NULL on error
-> + *
-> + * Calculate file size required to create a new image.
-> + *
-> + * If @in_bs is given then space for allocated clusters and zero clust=
-ers
-> + * from that image are included in the calculation.  If @opts contains=
- a
-> + * backing file that is shared by @in_bs then backing clusters are omi=
-tted
-> + * from the calculation.
+Whoops, I totally missed that we patch these out the first time out. I
+will explicitly generate the ADRP+ADD pair from here.
 
-Well, it's a bit weird that qcow2 just doesn't do this, then. :-)
-
-I'm not really complaining (I think it's the best for qcow2 to ignore
-this, at least for now), but maybe an s/are/may be/ would be more
-appropriate...
-
-(I wouldn't have complained if I hadn't replied to patch 7 anyway.)
-
-Max
-
-> + *
-> + * If @in_bs is NULL then the calculation includes no allocated cluste=
-rs
-> + * unless a preallocation option is given in @opts.
-> + *
-> + * Note that @in_bs may use a different BlockDriver from @drv.
-> + *
-> + * If an error occurs the @errp pointer is set.
-> + */
-> +BlockMeasureInfo *bdrv_measure(BlockDriver *drv, QemuOpts *opts,
-> +                               BlockDriverState *in_bs, Error **errp)
-> +{
-> +    if (!drv->bdrv_measure) {
-> +        error_setg(errp, "Block driver '%s' does not support size meas=
-urement",
-> +                   drv->format_name);
-> +        return NULL;
-> +    }
-> +
-> +    return drv->bdrv_measure(opts, in_bs, errp);
-> +}
-> +
->  /**
->   * Return number of sectors on success, -errno on error.
->   */
->=20
-
-
-
---BJ4h6S7435pGpfSxvgiKVd5Rp7CJBwde7
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEvBAEBCAAZBQJZVldOEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQPn9
-B/4lnEzrbIiuZtDfiPfwb5Uro+xRIPcNULis5ntgOAk0jGAdmb6U0Iov1srtjpCk
-oefJKLy4PZNSkDzOO2lU3jPERXM8YqA+5hc4k9JKJfspX7+gGbN0oSI6NQiw04cu
-ZsyQ30r5doO22QsDXSP/HbcreUa6mKecaTwjvjlxKhECwp1MeJViTkaBUv84geH4
-YMEQ7hnhGw9rBiK/p1Suv/qgRPKjw1G94+qvMlWQeq6vnug6sayIR4eCzj7wvbus
-L0yuZqgEZ91s95as/OCj3mWnLuYJCri04tduraj+ouoKFRevUR9Ac5rdHYCtkFPF
-dFL/zXyPdKsrZholcL/xiOD8
-=faNb
------END PGP SIGNATURE-----
-
---BJ4h6S7435pGpfSxvgiKVd5Rp7CJBwde7--
+Thanks,
+-- 
+Pranith
