@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53810)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dQlWU-00029q-Gp
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 22:19:07 -0400
+	(envelope-from <eblake@redhat.com>) id 1dQlWW-0002Bk-Vt
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 22:19:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dQlWR-0007Wk-D2
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 22:19:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52820)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1dQlWR-0007WH-4K
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 22:19:03 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 378D178EB1
-	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 02:19:02 +0000 (UTC)
-References: <1498536619-14548-1-git-send-email-peterx@redhat.com>
-	<1498536619-14548-5-git-send-email-peterx@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <139475df-a7d8-80c6-ce21-a9a896e642ff@redhat.com>
-Date: Fri, 30 Jun 2017 04:18:56 +0200
+	(envelope-from <eblake@redhat.com>) id 1dQlWV-0007Zg-RI
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 22:19:08 -0400
+References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
+	<20170628120530.31251-20-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f92fea0e-fe66-6888-dcd2-10782aec4fd2@redhat.com>
+Date: Thu, 29 Jun 2017 21:18:52 -0500
 MIME-Version: 1.0
-In-Reply-To: <1498536619-14548-5-git-send-email-peterx@redhat.com>
+In-Reply-To: <20170628120530.31251-20-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="SupiKOqQQlxGjIOBSPMq4J3IwlJ33CiEU"
-Subject: Re: [Qemu-devel] [PATCH v6 04/10] migration: let MigrationState be
- a qdev
+	boundary="rIdO8XeRDNFdmA9Ta1mMaHtETrqxos8A6"
+Subject: Re: [Qemu-devel] [PATCH v22 19/30] qcow2: add persistent dirty
+ bitmaps support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,88 +25,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Laurent Vivier <lvivier@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SupiKOqQQlxGjIOBSPMq4J3IwlJ33CiEU
-From: Max Reitz <mreitz@redhat.com>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Laurent Vivier <lvivier@redhat.com>, Eduardo Habkost
- <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-Message-ID: <139475df-a7d8-80c6-ce21-a9a896e642ff@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 04/10] migration: let MigrationState be a
- qdev
-References: <1498536619-14548-1-git-send-email-peterx@redhat.com>
- <1498536619-14548-5-git-send-email-peterx@redhat.com>
-In-Reply-To: <1498536619-14548-5-git-send-email-peterx@redhat.com>
+--rIdO8XeRDNFdmA9Ta1mMaHtETrqxos8A6
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com,
+ famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+Message-ID: <f92fea0e-fe66-6888-dcd2-10782aec4fd2@redhat.com>
+Subject: Re: [PATCH v22 19/30] qcow2: add persistent dirty bitmaps support
+References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
+ <20170628120530.31251-20-vsementsov@virtuozzo.com>
+In-Reply-To: <20170628120530.31251-20-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-06-27 06:10, Peter Xu wrote:
-> Let the old man "MigrationState" join the object family. Direct benefit=
-
-> is that we can start to use all the property features derived from
-> current QDev, like: HW_COMPAT_* bits, command line setup for migration
-> parameters (so will never need to set them up each time using HMP/QMP,
-> this is really, really attractive for test writters), etc.
+On 06/28/2017 07:05 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Store persistent dirty bitmaps in qcow2 image.
 >=20
-> I see no reason to disallow this happen yet. So let's start from this
-> one, to see whether it would be anything good.
->=20
-> Now we init the MigrationState struct statically in main() to make sure=
-
-> it's initialized after global properties are applied, since we'll use
-> them during creation of the object.
->=20
-> No functional change at all.
-
-Evidently not quite right because this breaks iotest 055.
-
-Condensed test case:
-
-$ ./qemu-img create -f vmdk -o subformat=3DstreamOptimized foo.vmdk 64M
-Formatting 'foo.vmdk', fmt=3Dvmdk size=3D67108864 compat6=3Doff
-hwversion=3Dundefined subformat=3DstreamOptimized
-$ x86_64-softmmu/qemu-system-x86_64 -drive if=3Dnone,file=3Dfoo.vmdk
-qemu-system-x86_64: ./migration/migration.c:114: migrate_get_current:
-Assertion `current_migration' failed.
-[1]    15453 abort (core dumped)  x86_64-softmmu/qemu-system-x86_64
--drive if=3Dnone,file=3Dfoo.vmdk
-
-(It just worked before this patch.)
-
-Max
-
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
 > ---
->  include/migration/misc.h |  1 +
->  migration/migration.c    | 78 ++++++++++++++++++++++++++++++++++------=
---------
->  migration/migration.h    | 19 ++++++++++++
->  vl.c                     |  6 ++++
->  4 files changed, 81 insertions(+), 23 deletions(-)
+>  block/qcow2-bitmap.c | 475 +++++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  block/qcow2.c        |   9 +
+>  block/qcow2.h        |   1 +
+>  3 files changed, 485 insertions(+)
+>=20
+
+> +
+> +/* store_bitmap_data()
+> + * Store bitmap to image, filling bitmap table accordingly.
+> + */
+> +static uint64_t *store_bitmap_data(BlockDriverState *bs,
+> +                                   BdrvDirtyBitmap *bitmap,
+> +                                   uint32_t *bitmap_table_size, Error =
+**errp)
+> +{
+> +    int ret;
+> +    BDRVQcow2State *s =3D bs->opaque;
+> +    int64_t sector;
+> +    uint64_t sbc;
+> +    uint64_t bm_size =3D bdrv_dirty_bitmap_size(bitmap);
+
+This grabs the size (currently in sectors, although I plan to fix it to
+be in bytes)...
+
+> +    const char *bm_name =3D bdrv_dirty_bitmap_name(bitmap);
+> +    uint8_t *buf =3D NULL;
+> +    BdrvDirtyBitmapIter *dbi;
+> +    uint64_t *tb;
+> +    uint64_t tb_size =3D
+> +            size_to_clusters(s,
+> +                bdrv_dirty_bitmap_serialization_size(bitmap, 0, bm_siz=
+e));
+
+=2E..then finds out how many bytes are required to serialize the entire
+image, where bm_size should be the same as before...
+
+> +    while ((sector =3D bdrv_dirty_iter_next(dbi)) !=3D -1) {
+> +        uint64_t cluster =3D sector / sbc;
+> +        uint64_t end, write_size;
+> +        int64_t off;
+> +
+> +        sector =3D cluster * sbc;
+> +        end =3D MIN(bm_size, sector + sbc);
+> +        write_size =3D
+> +            bdrv_dirty_bitmap_serialization_size(bitmap, sector, end -=
+ sector);
+
+But here, rather than tackling the entire image at once, you are
+subdividing your queries along arbitrary lines. But nowhere do I see a
+call to bdrv_dirty_bitmap_serialization_align() to make sure your
+end-sector value is properly aligned; if it is not aligned, you will
+trigger an assertion failure here...
+
+> +        assert(write_size <=3D s->cluster_size);
+> +
+> +        off =3D qcow2_alloc_clusters(bs, s->cluster_size);
+> +        if (off < 0) {
+> +            error_setg_errno(errp, -off,
+> +                             "Failed to allocate clusters for bitmap '=
+%s'",
+> +                             bm_name);
+> +            goto fail;
+> +        }
+> +        tb[cluster] =3D off;
+> +
+> +        bdrv_dirty_bitmap_serialize_part(bitmap, buf, sector, end - se=
+ctor);
+
+=2E..and again here, during serialization_chunk().
+
+I don't know if that means you need a v23 series, or if we can just
+patch it in as a followup (perhaps by having me add the usage during my
+byte-based dirty-bitmap series).  I guess it depends on whether we can
+come up with any bitmap granularity (between 512 bytes and 2M is all the
+more we are currently supporting, right?) that differs from the qcow2
+cluster granularity in a manner that iteration by qcow2 clusters is no
+longer guaranteed to be bitmap-granularity aligned, and thus trigger an
+assertion failure on your code as-is.
+
+I also think it's pretty gross to be calculating the iteration bounds by
+sectors rather than bytes, when we are really worried about clusters
+(it's easier to track just bytes/clusters than it is to track
+bytes/sectors/clusters) - but that one is more along the lines of the
+sector-to-byte conversions I've been tackling, so I won't insist on you
+changing it if there is no other reason for a v23.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
---SupiKOqQQlxGjIOBSPMq4J3IwlJ33CiEU
+--rIdO8XeRDNFdmA9Ta1mMaHtETrqxos8A6
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEvBAEBCAAZBQJZVbUQEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQLn7
-B/9lwWyiYj19JOXupXHhDb0l9Ys5J16e0HxFM/yakbieD0oGz+EjmjEE76n1SbsK
-fh2ccpQzzctySmQKS2oHCgyBfNO8ysmqr2UnPR77L7ff1jPfDW4GWY+9QQhEhkpZ
-ggeIt/KjGicopgpmrZxMAQcr+T9PMvQSxrfFeY6oXnLgb+75kbFNCLKB0yfyUvu6
-N13GDyoQ7m7UOuB6deqwd309KXSHcnAWxSpDQya6gCB3gt6ibRmRJLZ519WqLR4J
-eaWoUI/IbfbHx7QiPC+b34qIBqkvrC5o7kqiorIRbgNLhCtXVrSOmSS2Wzim7Z8g
-v+3KTpm3i+5nfkT1RgBz9oAl
-=namo
+iQEcBAEBCAAGBQJZVbUMAAoJEKeha0olJ0NqRKsH/RbZsTS1Rb+GSj9It02jXWWE
+iiNG267gj+H0elZhOpvQQHJV2heRUjrou/JpOs6b3nniRDCwJuxP1bCelaUOm3Qr
++lZed/mIzSahCuhOpnlHkOUx5/lahRE9Vvbyli4KV3SmLnGivSmszmjtbdhd32Cj
+PpwCkwxmHNFk1bbkruwKyKaRE96c/TiaMz/MhOTzsZ9UR9AIst5EnB3AhzgaHH3L
+g8XrbD9xjx9yNjTHa9+ZwGJa17pYBHxRdDPGmzeQ06GARjZUkI0SPpk32xx0NcrZ
+1CD+VIQbfZGealk1Ufn+pbCsh1TXV4vBdb/l2rstTrXuzQ7YYqjzLZvpSoOx7PM=
+=AFLJ
 -----END PGP SIGNATURE-----
 
---SupiKOqQQlxGjIOBSPMq4J3IwlJ33CiEU--
+--rIdO8XeRDNFdmA9Ta1mMaHtETrqxos8A6--
