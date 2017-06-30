@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dQtRj-0008SK-UN
+	(envelope-from <dgibson@ozlabs.org>) id 1dQtRk-0008Ss-HV
 	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:46:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dQtRi-0007u8-RB
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:46:43 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dQtRj-0007vP-DD
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:46:44 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 30 Jun 2017 20:46:17 +1000
-Message-Id: <20170630104632.27942-7-david@gibson.dropbear.id.au>
+Date: Fri, 30 Jun 2017 20:46:20 +1000
+Message-Id: <20170630104632.27942-10-david@gibson.dropbear.id.au>
 In-Reply-To: <20170630104632.27942-1-david@gibson.dropbear.id.au>
 References: <20170630104632.27942-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 06/21] spapr: Add a "no HPT" encoding to HTAB
- migration stream
+Subject: [Qemu-devel] [PULL 09/21] target/ppc: Fix return value in tcg radix
+ mmu fault handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,87 +21,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, thuth@redhat.com, lvivier@redhat.com, sursingh@redhat.com, sbobroff@redhat.com, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, thuth@redhat.com, lvivier@redhat.com, sursingh@redhat.com, sbobroff@redhat.com, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-Add a "no HPT" encoding (using value -1) to the HTAB migration
-stream (in the place of HPT size) when the guest doesn't allocate HPT.
-This will help the target side to match target HPT with the source HPT
-and thus enable successful migration.
+The mmu fault handler should return 0 if it was able to successfully
+handle the fault and a positive value otherwise.
 
-Suggested-by: David Gibson <david@gibson.dropbear.id.au>
-Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Currently the tcg radix mmu fault handler will return 1 after
+successfully handling a fault in virtual mode. This is incorrect
+so fix it so that it returns 0 in this case.
+
+The handler already correctly returns 0 when a fault was handled
+in real mode and 1 if an interrupt was generated.
+
+Fixes: d5fee0bbe68d ("target/ppc: Implement ISA V3.00 radix page fault handler")
+
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c | 29 +++++++++++++++++++++++++----
- 1 file changed, 25 insertions(+), 4 deletions(-)
+ target/ppc/mmu-radix64.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 52f4e72..f3e0b9b 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1560,13 +1560,19 @@ static int htab_save_setup(QEMUFile *f, void *opaque)
-     sPAPRMachineState *spapr = opaque;
+diff --git a/target/ppc/mmu-radix64.c b/target/ppc/mmu-radix64.c
+index de18c0b..69fde65 100644
+--- a/target/ppc/mmu-radix64.c
++++ b/target/ppc/mmu-radix64.c
+@@ -255,5 +255,5 @@ int ppc_radix64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
  
-     /* "Iteration" header */
--    qemu_put_be32(f, spapr->htab_shift);
-+    if (!spapr->htab_shift) {
-+        qemu_put_be32(f, -1);
-+    } else {
-+        qemu_put_be32(f, spapr->htab_shift);
-+    }
- 
-     if (spapr->htab) {
-         spapr->htab_save_index = 0;
-         spapr->htab_first_pass = true;
-     } else {
--        assert(kvm_enabled());
-+        if (spapr->htab_shift) {
-+            assert(kvm_enabled());
-+        }
-     }
- 
- 
-@@ -1712,7 +1718,12 @@ static int htab_save_iterate(QEMUFile *f, void *opaque)
-     int rc = 0;
- 
-     /* Iteration header */
--    qemu_put_be32(f, 0);
-+    if (!spapr->htab_shift) {
-+        qemu_put_be32(f, -1);
-+        return 0;
-+    } else {
-+        qemu_put_be32(f, 0);
-+    }
- 
-     if (!spapr->htab) {
-         assert(kvm_enabled());
-@@ -1746,7 +1757,12 @@ static int htab_save_complete(QEMUFile *f, void *opaque)
-     int fd;
- 
-     /* Iteration header */
--    qemu_put_be32(f, 0);
-+    if (!spapr->htab_shift) {
-+        qemu_put_be32(f, -1);
-+        return 0;
-+    } else {
-+        qemu_put_be32(f, 0);
-+    }
- 
-     if (!spapr->htab) {
-         int rc;
-@@ -1790,6 +1806,11 @@ static int htab_load(QEMUFile *f, void *opaque, int version_id)
- 
-     section_hdr = qemu_get_be32(f);
- 
-+    if (section_hdr == -1) {
-+        spapr_free_hpt(spapr);
-+        return 0;
-+    }
-+
-     if (section_hdr) {
-         Error *local_err = NULL;
- 
+     tlb_set_page(cs, eaddr & TARGET_PAGE_MASK, raddr & TARGET_PAGE_MASK,
+                  prot, mmu_idx, 1UL << page_size);
+-    return 1;
++    return 0;
+ }
 -- 
 2.9.4
