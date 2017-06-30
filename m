@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dQpSc-0007ru-Az
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 02:31:23 -0400
+	(envelope-from <abologna@redhat.com>) id 1dQpuL-0006rz-Sq
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 03:00:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dQpSZ-0000TZ-7s
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 02:31:22 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:33893)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dQpSZ-0000Sy-2Y
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 02:31:19 -0400
-Received: by mail-qk0-x243.google.com with SMTP id 91so14370484qkq.1
-	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 23:31:18 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1498768109-4092-1-git-send-email-cota@braap.org>
-	<1498768109-4092-3-git-send-email-cota@braap.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <ad8b61e4-ecdd-9bb9-1d86-6ca628040225@twiddle.net>
-Date: Thu, 29 Jun 2017 23:31:15 -0700
-MIME-Version: 1.0
-In-Reply-To: <1498768109-4092-3-git-send-email-cota@braap.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 2/7] translate-all: add out_size field to
- TranslationBlock
+	(envelope-from <abologna@redhat.com>) id 1dQpuI-0007Ku-Qk
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 03:00:01 -0400
+Message-ID: <1498805986.4282.5.camel@redhat.com>
+From: Andrea Bolognani <abologna@redhat.com>
+Date: Fri, 30 Jun 2017 08:59:46 +0200
+In-Reply-To: <149876999083.10485.13933378544182209124@loki>
+References: <1498695900-1648-1-git-send-email-mdroth@linux.vnet.ibm.com>
+	<804c9b1a-6803-e920-9d3d-60fc33dd2fea@redhat.com>
+	<149876999083.10485.13933378544182209124@loki>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 0/5] hotplug: fix premature rebinding
+ of VFIO devices to host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,40 +25,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, Laine Stump <laine@redhat.com>, libvir-list@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, aik@ozlabs.ru, alex.williamson@redhat.com, pkrempa@redhat.com, berrange@redhat.com, mprivozn@redhat.com, sbhat@linux.vnet.ibm.com
 
-On 06/29/2017 01:28 PM, Emilio G. Cota wrote:
-> Note that due to the cacheline padding we are using, for
-> hosts with 64-byte cache lines this will not waste any
-> additional memory. Using a s16 would be ideal, since that
-> would plug an existing hole in the struct, but I see no
-> guarantee that a TB won't overflow it.
-> 
-> Signed-off-by: Emilio G. Cota<cota@braap.org>
-> ---
->   include/exec/exec-all.h   |  1 +
->   accel/tcg/translate-all.c | 16 ++++++++--------
->   2 files changed, 9 insertions(+), 8 deletions(-)
-> 
-> diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-> index 35a75f1..df12338 100644
-> --- a/include/exec/exec-all.h
-> +++ b/include/exec/exec-all.h
-> @@ -363,6 +363,7 @@ struct TranslationBlock {
->        */
->       uintptr_t jmp_list_next[2];
->       uintptr_t jmp_list_first;
-> +    int32_t out_size; /* size of host code for this block */
+On Thu, 2017-06-29 at 15:59 -0500, Michael Roth wrote:
+> > > Patches 1-4 address 1) by deferring rebinding of a hostdev to the h=
+ost driver
+> > > until all the devices in the group have been detached, at which poi=
+nt all
+> > > the hostdevs are rebound as a group. Until that point, the devices =
+are traced
+> > > by the drvManager's inactiveList in a similar manner to hostdevs th=
+at are
+> > > assigned to VFIO via the nodedev-detach interface.
+> >=C2=A0
+> > What happens if libvirtd is restarted during this period? Is the
+> > inactiveList rebuilt with all the info necessary to assure that the
+> > nodedev-reattach does/doesn't happen (as appropriate) for all devices=
+?
+>=C2=A0
+> Hmm, good question.
+>=C2=A0
+> The Unbindable() check only needs to know that nothing in the activeLis=
+t
+> belongs to the group we're checking, and that list at least seems to ge=
+t
+> rebuilt appropriately on restart.
+>=C2=A0
+> But the Unbind() relies on inactiveList and the behavior there is what
+> nodedev-detach currently does, which is to add it to inactive list whil=
+e
+> libvirtd is running, and then just forget about it when libvirtd restar=
+ts.
+> For nodedev-detach it's fine since virHostdevPreparePCIDevices() re-add=
+s
+> it as needed in the device-attach path. But yah, for this purpose it en=
+ds
+> up losing track of hostdevs that are still pending rebind to the host, =
+and
+> that means some devices may not get rebound at the appropriate time if
+> there was a libvirtd restart.
+>=C2=A0
+> Unlike with device-attach, we can't just re-add it on-demand because we
+> actually need to know whether or not it was previously in the list. So
+> I think we'd need to add some persistent state to track this. Will look
+> into adding handling for that.
 
-unsigned probably better.
+FWIW last time a tried to attack this issue[1] I got pretty
+much as far as this, eg. the code worked as intended but
+restarting libvirtd would result in an inconsistent state
+which prevented you from performing some operations.
 
-I do wonder about putting it in the hole after invalid.
-Which itself could be shrunk to bool.
-
-I don't believe there's much chance of an overflow of uint16_t.  The limit of 
-OPC_BUF_SIZE = 640 fairly well limits the practical size.  And, honestly, it 
-doesn't matter if we saturate to 0xffff, so long as you retain the full-size 
-gen_code_size local variable.
+Unfortunately I got sidetracked by other work and stopped
+just short of implementing a way to persist the relevant
+information on disk :(
 
 
-r~
+[1] ~1.5 years ago, according to git log
+--=C2=A0
+Andrea Bolognani / Red Hat / Virtualization
