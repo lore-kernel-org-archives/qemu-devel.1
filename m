@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dQmME-0007Yu-OY
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 23:12:35 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dQnYP-0000pP-Em
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 00:29:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dQmMA-0004pN-Pu
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 23:12:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50882)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dQmMA-0004oP-Ja
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 23:12:30 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CFF5683F40
-	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 03:12:28 +0000 (UTC)
-References: <1498710417-7807-1-git-send-email-peterx@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <8a708ab5-8869-2077-aa96-fdf521a94ef9@redhat.com>
-Date: Fri, 30 Jun 2017 11:12:20 +0800
+	(envelope-from <dgibson@ozlabs.org>) id 1dQnYM-00060e-9o
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 00:29:13 -0400
+Date: Fri, 30 Jun 2017 14:03:17 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170630040317.GA13989@umbus.fritz.box>
+References: <20170629045940.11242-1-sjitindarsingh@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1498710417-7807-1-git-send-email-peterx@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] intel_iommu: fix migration breakage on mr
- switch
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="qDbXVdCdHGoSgWSk"
+Content-Disposition: inline
+In-Reply-To: <20170629045940.11242-1-sjitindarsingh@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] target/ppc: Only set PCR in kvm if
+ actually in a compat mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,67 +24,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Laurent Vivier <lvivier@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: qemu-ppc@nongnu.org, agraf@suse.de, qemu-devel@nongnu.org
 
 
+--qDbXVdCdHGoSgWSk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 2017=E5=B9=B406=E6=9C=8829=E6=97=A5 12:26, Peter Xu wrote:
-> Migration is broken after the vfio integration work:
->
-> qemu-kvm: AHCI: Failed to start FIS receive engine: bad FIS receive buf=
-fer address
-> qemu-kvm: Failed to load ich9_ahci:ahci
-> qemu-kvm: error while loading state for instance 0x0 of device '0000:00=
-:1f.2/ich9_ahci'
-> qemu-kvm: load of migration failed: Operation not permitted
->
-> The problem is that vfio work introduced dynamic memory region
-> switching (actually it is also used for future PT mode), and this memor=
-y
-> region layout is not properly delivered to destination when migration
-> happens. Solution is to rebuild the layout in post_load.
->
-> Bug: https://bugzilla.redhat.com/show_bug.cgi?id=3D1459906
-> Fixes: 558e0024 ("intel_iommu: allow dynamic switch of IOMMU region")
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+On Thu, Jun 29, 2017 at 02:59:39PM +1000, Suraj Jitindar Singh wrote:
+> The Processor Compatibility Register (PCR) I used to set the
+> compatibility mode of the processor using the SET_ONE_REG ioctl on
+> KVM_REG_PPC_ARCH_COMPAT. Previously this was only called when a compat
+> mode was actually in use, however a recent patch made it unconditional.
+> Calling this in KVM_PR fails as there is no handler for that call and it
+> is thus impossible to start a machine with KVM_PR.
+>=20
+> Change ppc_set_compat() so that the ioctl is only actually called if a
+> compat mode is in use. This means that a KVM_PR guest can boot.
+> Additionally the current behaviour for KVM_HV is preserved where a compat
+> mode of 0 set pcr and arch_compat in the vcore struct to zero, both of
+> which are initialised to zero anyway.
+>=20
+> Fixes: 37f516defa2e ("pseries: Reset CPU compatibility mode")
+>=20
+> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+
+This doesn't seem quite right.  With this change, how would we ever
+turn compatibility mode _off_ (which could happen on reset if nothing
+else).  Really we should add this pseudo-register to KVM PR, although
+I'm fine with also having a qemu workaround to let it work with older
+PR versions.
+
+>=20
 > ---
->   hw/i386/intel_iommu.c | 17 +++++++++++++++++
->   1 file changed, 17 insertions(+)
->
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index a9b59bd..36b231d 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -2332,11 +2332,28 @@ static void vtd_iommu_notify_flag_changed(Memor=
-yRegion *iommu,
->       }
->   }
->  =20
-> +static int vtd_post_load(void *opaque, int version_id)
-> +{
-> +    IntelIOMMUState *iommu =3D opaque;
-> +
-> +    /*
-> +     * Since commit 558e00 ("intel_iommu: allow dynamic switch of
-> +     * IOMMU region"), memory regions are dynamically turned on/off
-> +     * depending on context entry configurations from the guest. After
-> +     * migration, we need to make sure the memory regions are still
-> +     * correct.
-> +     */
-> +    vtd_switch_address_space_all(iommu);
-> +
-> +    return 0;
-> +}
-> +
->   static const VMStateDescription vtd_vmstate =3D {
->       .name =3D "iommu-intel",
->       .version_id =3D 1,
->       .minimum_version_id =3D 1,
->       .priority =3D MIG_PRI_IOMMU,
-> +    .post_load =3D vtd_post_load,
->       .fields =3D (VMStateField[]) {
->           VMSTATE_UINT64(root, IntelIOMMUState),
->           VMSTATE_UINT64(intr_root, IntelIOMMUState),
+>=20
+> Based on: dwg/ppc-for-2.10
+>=20
+>  target/ppc/compat.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/target/ppc/compat.c b/target/ppc/compat.c
+> index f1b67fa..4482206 100644
+> --- a/target/ppc/compat.c
+> +++ b/target/ppc/compat.c
+> @@ -143,7 +143,7 @@ void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_=
+pvr, Error **errp)
+>      cpu->compat_pvr =3D compat_pvr;
+>      env->spr[SPR_PCR] =3D pcr & pcc->pcr_mask;
+> =20
+> -    if (kvm_enabled()) {
+> +    if (kvm_enabled() && compat_pvr) {
+>          int ret =3D kvmppc_set_compat(cpu, cpu->compat_pvr);
+>          if (ret < 0) {
+>              error_setg_errno(errp, -ret,
 
-Reviewed-by: Jason Wang <jasowang@redhat.com>
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--qDbXVdCdHGoSgWSk
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZVc2FAAoJEGw4ysog2bOSMhIQAK50AK1XoORaZ49P+vmYVVTQ
+Y9wm8zsVLqVUU6o8lR5KdeHyVZ5FpJLA+nDRrYxYiqXejhAQGPe8espH00QVfkKc
+prT8VmOm9H3Q2w/Di831atlmsASNZqBpiMbrO+MhEe8diL5bbFQ9AAkifjFXLYQ7
+J2QMTH//bYV3pek9ISkKrc3o06zq++hBIpJDuyTVRj77V0bFA53qML0SPdqee3YN
+gp5AWx/JTkskvwITSnNhvUnTo2LzZ2Cr/zaqHcfNj+ADgCzg601CJapyNDDFpotA
+6IXZaok3F4cPxtz8uNOEExxAiy/2TGtmM1Qo/CHLu1tLfrYX53MAfVBRd6557yB+
+L+tyV4Gm44WYzOfygJjIUEZGWtT5ghZjWI/6RsIpJztSbzPTgyfscP+679kW2bfF
+rrWaBRHto341J2lressMJx410RsPUphhWtf0yZeZykZtcZ8IGoRduZTO8fWFjFp7
+DAQN8jr4s0YBo5aFoilo7ZrkLhYAiJp2BUwIISOohPMs1t5jCkCU2hyd1wG0O177
+icatHH93KEMGuf0CZyqjgBBGerJcV7RfhKynC3ybhts8muwJOcHAYuXjYA1m3y0U
+YgKsZnJHrvS20O5P1rdHsDberwHJMQvtOupF7Q1d+aQHjjDZdMY1mId/73ZL6fwY
+HfzlBbnNVMTn6eGBvC7N
+=yymP
+-----END PGP SIGNATURE-----
+
+--qDbXVdCdHGoSgWSk--
