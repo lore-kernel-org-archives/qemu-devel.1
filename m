@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58821)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=3478c7289=igor.druzhinin@citrix.com>)
-	id 1dQySS-0007Mm-0I
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 12:07:52 -0400
+	id 1dQySW-0007Oy-NH
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 12:07:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=3478c7289=igor.druzhinin@citrix.com>)
-	id 1dQySQ-0006xj-7l
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 12:07:47 -0400
+	id 1dQySR-0006zO-UJ
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 12:07:52 -0400
 Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:62995
 	helo=SMTP.EU.CITRIX.COM)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
 	(envelope-from <prvs=3478c7289=igor.druzhinin@citrix.com>)
-	id 1dQySP-0006vm-TH
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 12:07:46 -0400
+	id 1dQySR-0006vm-K5
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 12:07:47 -0400
 From: Igor Druzhinin <igor.druzhinin@citrix.com>
-Date: Fri, 30 Jun 2017 17:07:02 +0100
-Message-ID: <1498838825-23701-2-git-send-email-igor.druzhinin@citrix.com>
+Date: Fri, 30 Jun 2017 17:07:03 +0100
+Message-ID: <1498838825-23701-3-git-send-email-igor.druzhinin@citrix.com>
 In-Reply-To: <1498838825-23701-1-git-send-email-igor.druzhinin@citrix.com>
 References: <1498838825-23701-1-git-send-email-igor.druzhinin@citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 1/4] xen: move physmap saving into a separate
- function
+Subject: [Qemu-devel] [PATCH 2/4] xen/mapcache: add an ability to create
+ dummy mappings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,94 +33,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
 Cc: Igor Druzhinin <igor.druzhinin@citrix.com>, sstabellini@kernel.org, anthony.perard@citrix.com, paul.durrant@citrix.com, pbonzini@redhat.com
 
-Non-functional change.
+Dummys are simple anonymous mappings that are placed instead
+of regular foreign mappings in certain situations when we need
+to postpone the actual mapping but still have to give a
+memory region to QEMU to play with.
+
+This is planned to be used for restore on Xen.
 
 Signed-off-by: Igor Druzhinin <igor.druzhinin@citrix.com>
 ---
- hw/i386/xen/xen-hvm.c | 57 ++++++++++++++++++++++++++++-----------------------
- 1 file changed, 31 insertions(+), 26 deletions(-)
+ hw/i386/xen/xen-mapcache.c | 36 ++++++++++++++++++++++++++++--------
+ 1 file changed, 28 insertions(+), 8 deletions(-)
 
-diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-index cffa7e2..d259cf7 100644
---- a/hw/i386/xen/xen-hvm.c
-+++ b/hw/i386/xen/xen-hvm.c
-@@ -305,6 +305,36 @@ static hwaddr xen_phys_offset_to_gaddr(hwaddr start_addr,
-     return start_addr;
- }
+diff --git a/hw/i386/xen/xen-mapcache.c b/hw/i386/xen/xen-mapcache.c
+index e60156c..05050de 100644
+--- a/hw/i386/xen/xen-mapcache.c
++++ b/hw/i386/xen/xen-mapcache.c
+@@ -150,7 +150,8 @@ void xen_map_cache_init(phys_offset_to_gaddr_t f, void *opaque)
  
-+static int xen_save_physmap(XenIOState *state, XenPhysmap *physmap)
-+{
-+    char path[80], value[17];
-+
-+    snprintf(path, sizeof(path),
-+            "/local/domain/0/device-model/%d/physmap/%"PRIx64"/start_addr",
-+            xen_domid, (uint64_t)physmap->phys_offset);
-+    snprintf(value, sizeof(value), "%"PRIx64, (uint64_t)physmap->start_addr);
-+    if (!xs_write(state->xenstore, 0, path, value, strlen(value))) {
-+        return -1;
-+    }
-+    snprintf(path, sizeof(path),
-+            "/local/domain/0/device-model/%d/physmap/%"PRIx64"/size",
-+            xen_domid, (uint64_t)physmap->phys_offset);
-+    snprintf(value, sizeof(value), "%"PRIx64, (uint64_t)physmap->size);
-+    if (!xs_write(state->xenstore, 0, path, value, strlen(value))) {
-+        return -1;
-+    }
-+    if (physmap->name) {
-+        snprintf(path, sizeof(path),
-+                "/local/domain/0/device-model/%d/physmap/%"PRIx64"/name",
-+                xen_domid, (uint64_t)physmap->phys_offset);
-+        if (!xs_write(state->xenstore, 0, path,
-+                      physmap->name, strlen(physmap->name))) {
-+            return -1;
+ static void xen_remap_bucket(MapCacheEntry *entry,
+                              hwaddr size,
+-                             hwaddr address_index)
++                             hwaddr address_index,
++                             bool dummy)
+ {
+     uint8_t *vaddr_base;
+     xen_pfn_t *pfns;
+@@ -177,11 +178,25 @@ static void xen_remap_bucket(MapCacheEntry *entry,
+         pfns[i] = (address_index << (MCACHE_BUCKET_SHIFT-XC_PAGE_SHIFT)) + i;
+     }
+ 
+-    vaddr_base = xenforeignmemory_map(xen_fmem, xen_domid, PROT_READ|PROT_WRITE,
+-                                      nb_pfn, pfns, err);
+-    if (vaddr_base == NULL) {
+-        perror("xenforeignmemory_map");
+-        exit(-1);
++    if (!dummy) {
++        vaddr_base = xenforeignmemory_map(xen_fmem, xen_domid,
++                                           PROT_READ|PROT_WRITE,
++                                           nb_pfn, pfns, err);
++        if (vaddr_base == NULL) {
++            perror("xenforeignmemory_map");
++            exit(-1);
 +        }
-+    }
-+    return 0;
-+}
-+
- static int xen_add_to_physmap(XenIOState *state,
-                               hwaddr start_addr,
-                               ram_addr_t size,
-@@ -316,7 +346,6 @@ static int xen_add_to_physmap(XenIOState *state,
-     XenPhysmap *physmap = NULL;
-     hwaddr pfn, start_gpfn;
-     hwaddr phys_offset = memory_region_get_ram_addr(mr);
--    char path[80], value[17];
-     const char *mr_name;
++    } else {
++        /*
++         * We create dummy mappings where we are unable to create a foreign
++         * mapping immediately due to certain circumstances (i.e. on resume now)
++         */
++        vaddr_base = mmap(NULL, size, PROT_READ|PROT_WRITE,
++                          MAP_ANON|MAP_SHARED, -1, 0);
++        if (vaddr_base == NULL) {
++            perror("mmap");
++            exit(-1);
++        }
+     }
  
-     if (get_physmapping(state, start_addr, size)) {
-@@ -368,31 +397,7 @@ go_physmap:
-                                    start_addr >> TARGET_PAGE_BITS,
-                                    (start_addr + size - 1) >> TARGET_PAGE_BITS,
-                                    XEN_DOMCTL_MEM_CACHEATTR_WB);
--
--    snprintf(path, sizeof(path),
--            "/local/domain/0/device-model/%d/physmap/%"PRIx64"/start_addr",
--            xen_domid, (uint64_t)phys_offset);
--    snprintf(value, sizeof(value), "%"PRIx64, (uint64_t)start_addr);
--    if (!xs_write(state->xenstore, 0, path, value, strlen(value))) {
--        return -1;
--    }
--    snprintf(path, sizeof(path),
--            "/local/domain/0/device-model/%d/physmap/%"PRIx64"/size",
--            xen_domid, (uint64_t)phys_offset);
--    snprintf(value, sizeof(value), "%"PRIx64, (uint64_t)size);
--    if (!xs_write(state->xenstore, 0, path, value, strlen(value))) {
--        return -1;
--    }
--    if (mr_name) {
--        snprintf(path, sizeof(path),
--                "/local/domain/0/device-model/%d/physmap/%"PRIx64"/name",
--                xen_domid, (uint64_t)phys_offset);
--        if (!xs_write(state->xenstore, 0, path, mr_name, strlen(mr_name))) {
--            return -1;
--        }
--    }
--
--    return 0;
-+    return xen_save_physmap(state, physmap);
- }
+     entry->vaddr_base = vaddr_base;
+@@ -211,6 +226,7 @@ static uint8_t *xen_map_cache_unlocked(hwaddr phys_addr, hwaddr size,
+     hwaddr cache_size = size;
+     hwaddr test_bit_size;
+     bool translated = false;
++    bool dummy = false;
  
- static int xen_remove_from_physmap(XenIOState *state,
+ tryagain:
+     address_index  = phys_addr >> MCACHE_BUCKET_SHIFT;
+@@ -262,14 +278,14 @@ tryagain:
+     if (!entry) {
+         entry = g_malloc0(sizeof (MapCacheEntry));
+         pentry->next = entry;
+-        xen_remap_bucket(entry, cache_size, address_index);
++        xen_remap_bucket(entry, cache_size, address_index, dummy);
+     } else if (!entry->lock) {
+         if (!entry->vaddr_base || entry->paddr_index != address_index ||
+                 entry->size != cache_size ||
+                 !test_bits(address_offset >> XC_PAGE_SHIFT,
+                     test_bit_size >> XC_PAGE_SHIFT,
+                     entry->valid_mapping)) {
+-            xen_remap_bucket(entry, cache_size, address_index);
++            xen_remap_bucket(entry, cache_size, address_index, dummy);
+         }
+     }
+ 
+@@ -282,6 +298,10 @@ tryagain:
+             translated = true;
+             goto tryagain;
+         }
++        if (!dummy && runstate_check(RUN_STATE_INMIGRATE)) {
++            dummy = true;
++            goto tryagain;
++        }
+         trace_xen_map_cache_return(NULL);
+         return NULL;
+     }
 -- 
 2.7.4
