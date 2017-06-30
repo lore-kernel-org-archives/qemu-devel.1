@@ -1,15 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39013)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dR0na-0005Ix-Nt
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 14:37:47 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dR0vp-0008Hc-1n
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 14:46:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dR0nX-0005Xp-JB
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 14:37:46 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dR0vo-0002mO-8i
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 14:46:17 -0400
 Sender: Richard Henderson <rth7680@gmail.com>
+References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
+	<149865244195.17063.11938084353514091141.stgit@frigg.lan>
+	<20170629225225.GA13979@flamenco>
 From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 30 Jun 2017 11:37:36 -0700
-Message-Id: <20170630183736.13222-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH] target/ppc: Use tcg_gen_lookup_and_goto_ptr
+Message-ID: <69def2b9-13d1-1600-2f4a-4001958ffa97@twiddle.net>
+Date: Fri, 30 Jun 2017 11:46:00 -0700
+MIME-Version: 1.0
+In-Reply-To: <20170629225225.GA13979@flamenco>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v11 01/29] Pass generic CPUState to
+ gen_intermediate_code()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,77 +27,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org
+To: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?Q?Llu=c3=ads_Vilanova?= <vilanova@ac.upc.edu>
+Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Michael Walle <michael@walle.cc>, Laurent Vivier <laurent@vivier.eu>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Anthony Green <green@moxielogic.com>, Chris Wulff <crwulff@gmail.com>, Marek Vasut <marex@denx.de>, Stafford Horne <shorne@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Max Filippov <jcmvbkbc@gmail.com>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:PowerPC" <qemu-ppc@nongnu.org>
 
-Cc: qemu-ppc@nongnu.org
-Signed-off-by: Richard Henderson <rth@twiddle.net>
----
- target/ppc/translate.c | 23 ++++++++---------------
- 1 file changed, 8 insertions(+), 15 deletions(-)
+On 06/29/2017 03:52 PM, Emilio G. Cota wrote:
+> On Wed, Jun 28, 2017 at 15:20:42 +0300, Lluís Vilanova wrote:
+>> Needed to implement a target-agnostic gen_intermediate_code() in the
+>> future.
+>>
+>> Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
+>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+>> Reviewed-by: Richard Henderson <rth@twiddle.net>
+>> ---
+> (snip)
+>> -void gen_intermediate_code(CPUAlphaState *env, struct TranslationBlock *tb)
+>> +void gen_intermediate_code(CPUState *cpu, struct TranslationBlock *tb)
+>>   {
+>> -    AlphaCPU *cpu = alpha_env_get_cpu(env);
+>> -    CPUState *cs = CPU(cpu);
+>> +    CPUAlphaState *env = cpu->env_ptr;
+> 
+> I'd keep the original variable names, i.e. cs for CPUState in this case,
+> just like you did for a64:
+> 
+>> -void gen_intermediate_code_a64(ARMCPU *cpu, TranslationBlock *tb)
+>> +void gen_intermediate_code_a64(CPUState *cs, TranslationBlock *tb)
+>>   {
+>> -    CPUState *cs = CPU(cpu);
+>> -    CPUARMState *env = &cpu->env;
+>> +    CPUARMState *env = cs->env_ptr;
+>> +    ARMCPU *cpu = arm_env_get_cpu(env);
+> 
+> This will keep the diff size to a minimum.
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index c0cd64d..9aa66f5 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -3419,7 +3419,7 @@ static inline bool use_goto_tb(DisasContext *ctx, target_ulong dest)
- }
- 
- /***                                Branch                                 ***/
--static inline void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
-+static void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
- {
-     if (NARROW_MODE(ctx)) {
-         dest = (uint32_t) dest;
-@@ -3441,7 +3441,7 @@ static inline void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
-                 gen_debug_exception(ctx);
-             }
-         }
--        tcg_gen_exit_tb(0);
-+        tcg_gen_lookup_and_goto_ptr(cpu_nip);
-     }
- }
- 
-@@ -3479,7 +3479,7 @@ static void gen_b(DisasContext *ctx)
- #define BCOND_CTR 2
- #define BCOND_TAR 3
- 
--static inline void gen_bcond(DisasContext *ctx, int type)
-+static void gen_bcond(DisasContext *ctx, int type)
- {
-     uint32_t bo = BO(ctx->opcode);
-     TCGLabel *l1;
-@@ -3543,26 +3543,19 @@ static inline void gen_bcond(DisasContext *ctx, int type)
-         } else {
-             gen_goto_tb(ctx, 0, li);
-         }
--        if ((bo & 0x14) != 0x14) {
--            gen_set_label(l1);
--            gen_goto_tb(ctx, 1, ctx->nip);
--        }
-     } else {
-         if (NARROW_MODE(ctx)) {
-             tcg_gen_andi_tl(cpu_nip, target, (uint32_t)~3);
-         } else {
-             tcg_gen_andi_tl(cpu_nip, target, ~3);
-         }
--        tcg_gen_exit_tb(0);
--        if ((bo & 0x14) != 0x14) {
--            gen_set_label(l1);
--            gen_update_nip(ctx, ctx->nip);
--            tcg_gen_exit_tb(0);
--        }
--    }
--    if (type == BCOND_LR || type == BCOND_CTR || type == BCOND_TAR) {
-+        tcg_gen_lookup_and_goto_ptr(cpu_nip);
-         tcg_temp_free(target);
-     }
-+    if ((bo & 0x14) != 0x14) {
-+        gen_set_label(l1);
-+        gen_goto_tb(ctx, 1, ctx->nip);
-+    }
- }
- 
- static void gen_bc(DisasContext *ctx)
--- 
-2.9.4
+I asked for the same thing many revisions ago.
+
+
+r~
