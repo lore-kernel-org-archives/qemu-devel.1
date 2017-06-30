@@ -1,18 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dQyex-0006x6-5c
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 12:20:44 -0400
+	(envelope-from <mlureau@redhat.com>) id 1dQyhb-0007iL-Cz
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 12:23:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dQyeu-0005RV-1V
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 12:20:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40514)
+	(envelope-from <mlureau@redhat.com>) id 1dQyhY-00072H-4J
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 12:23:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58272)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dQyet-0005QF-Rf
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 12:20:39 -0400
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Fri, 30 Jun 2017 17:20:33 +0100
-Message-Id: <20170630162033.12893-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH] migration/rdma: Fix race on source
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dQyhX-00071H-U2
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 12:23:24 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5BE827D0DD
+	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 16:23:22 +0000 (UTC)
+Date: Fri, 30 Jun 2017 12:23:17 -0400 (EDT)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <1186247051.45558056.1498839797752.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20170630160422.14842-3-maxime.coquelin@redhat.com>
+References: <20170630160422.14842-1-maxime.coquelin@redhat.com>
+	<20170630160422.14842-3-maxime.coquelin@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/2] vhost-user: unregister slave req
+ handler at cleanup time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,58 +34,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, michael@hinespot.com, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com
+To: Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc: jasowang@redhat.com, qemu-devel@nongnu.org, mst@redhat.com
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Fix a race where the destination might try and send the source a
-WRID_READY before the source has done a post-recv for it.
 
-rdma_post_recv has to happen after the qp exists, and we're
-OK since we've already called qemu_rdma_source_init that calls
-qemu_alloc_qp.
+----- Original Message -----
+> If the backend sends a request just before closing the socket,
+> the aio dispatcher might schedule its reading after the vhost
+> device has been cleaned, leading to a NULL pointer dereference
+> in slave_read();
+>=20
+> vhost_user_cleanup() already closes the socket but it is not
+> enough, the handler has to be unregistered.
+>=20
+> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
 
-This corresponds to:
-https://bugzilla.redhat.com/show_bug.cgi?id=1285044
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-The race can be triggered by adding a few ms wait before this
-post_recv_control (which was originally due to me turning on loads of
-debug).
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/rdma.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/migration/rdma.c b/migration/rdma.c
-index c6bc607a03..6111e10c70 100644
---- a/migration/rdma.c
-+++ b/migration/rdma.c
-@@ -2365,6 +2365,12 @@ static int qemu_rdma_connect(RDMAContext *rdma, Error **errp)
- 
-     caps_to_network(&cap);
- 
-+    ret = qemu_rdma_post_recv_control(rdma, RDMA_WRID_READY);
-+    if (ret) {
-+        ERROR(errp, "posting second control recv");
-+        goto err_rdma_source_connect;
-+    }
-+
-     ret = rdma_connect(rdma->cm_id, &conn_param);
-     if (ret) {
-         perror("rdma_connect");
-@@ -2405,12 +2411,6 @@ static int qemu_rdma_connect(RDMAContext *rdma, Error **errp)
- 
-     rdma_ack_cm_event(cm_event);
- 
--    ret = qemu_rdma_post_recv_control(rdma, RDMA_WRID_READY);
--    if (ret) {
--        ERROR(errp, "posting second control recv!");
--        goto err_rdma_source_connect;
--    }
--
-     rdma->control_ready_expected = 1;
-     rdma->nb_sent = 0;
-     return 0;
--- 
-2.13.0
+> ---
+>  hw/virtio/vhost-user.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> index 958ee09..2203011 100644
+> --- a/hw/virtio/vhost-user.c
+> +++ b/hw/virtio/vhost-user.c
+> @@ -779,6 +779,7 @@ static int vhost_user_cleanup(struct vhost_dev *dev)
+> =20
+>      u =3D dev->opaque;
+>      if (u->slave_fd >=3D 0) {
+> +        qemu_set_fd_handler(u->slave_fd, NULL, NULL, NULL);
+>          close(u->slave_fd);
+>          u->slave_fd =3D -1;
+>      }
+> --
+> 2.9.4
+>=20
+>=20
