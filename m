@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dR3PV-0000aR-TN
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 17:25:07 -0400
+	(envelope-from <jcody@redhat.com>) id 1dR3QA-0001JB-Ki
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 17:25:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dR3PU-0006E4-OQ
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 17:25:05 -0400
-Date: Fri, 30 Jun 2017 17:24:53 -0400
+	(envelope-from <jcody@redhat.com>) id 1dR3Q9-0006tL-EN
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 17:25:46 -0400
+Date: Fri, 30 Jun 2017 17:25:35 -0400
 From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170630212453.GO4997@localhost.localdomain>
+Message-ID: <20170630212535.GP4997@localhost.localdomain>
 References: <20170627192458.15519-1-eblake@redhat.com>
-	<20170627192458.15519-17-eblake@redhat.com>
+	<20170627192458.15519-18-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170627192458.15519-17-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 16/20] backup: Switch backup_do_cow() to
+In-Reply-To: <20170627192458.15519-18-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 17/20] backup: Switch backup_run() to
  byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -27,10 +27,12 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Eric Blake <eblake@redhat.com>
 Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, jsnow@redhat.com, Max Reitz <mreitz@redhat.com>
 
-On Tue, Jun 27, 2017 at 02:24:54PM -0500, Eric Blake wrote:
+On Tue, Jun 27, 2017 at 02:24:55PM -0500, Eric Blake wrote:
 > We are gradually converting to byte-based interfaces, as they are
-> easier to reason about than sector-based.  Convert another internal
-> function (no semantic change).
+> easier to reason about than sector-based.  Change the internal
+> loop iteration of backups to track by bytes instead of sectors
+> (although we are still guaranteed that we iterate by steps that
+> are cluster-aligned).
 > 
 > Signed-off-by: Eric Blake <eblake@redhat.com>
 > Reviewed-by: John Snow <jsnow@redhat.com>
@@ -41,159 +43,110 @@ Reviewed-by: Jeff Cody <jcody@redhat.com>
 > ---
 > v2: no change
 > ---
->  block/backup.c | 62 ++++++++++++++++++++++++----------------------------------
->  1 file changed, 26 insertions(+), 36 deletions(-)
+>  block/backup.c | 32 +++++++++++++++-----------------
+>  1 file changed, 15 insertions(+), 17 deletions(-)
 > 
 > diff --git a/block/backup.c b/block/backup.c
-> index cfbd921..c029d44 100644
+> index c029d44..04def91 100644
 > --- a/block/backup.c
 > +++ b/block/backup.c
-> @@ -91,7 +91,7 @@ static void cow_request_end(CowRequest *req)
->  }
-> 
->  static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-> -                                      int64_t sector_num, int nb_sectors,
-> +                                      int64_t offset, uint64_t bytes,
->                                        bool *error_is_read,
->                                        bool is_write_notifier)
->  {
-> @@ -101,34 +101,28 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
->      QEMUIOVector bounce_qiov;
->      void *bounce_buffer = NULL;
+> @@ -370,11 +370,10 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
 >      int ret = 0;
+>      int clusters_per_iter;
+>      uint32_t granularity;
+> -    int64_t sector;
+> +    int64_t offset;
+>      int64_t cluster;
+>      int64_t end;
+>      int64_t last_cluster = -1;
 > -    int64_t sectors_per_cluster = cluster_size_sectors(job);
-> -    int64_t start, end; /* clusters */
-> +    int64_t start, end; /* bytes */
->      int n; /* bytes */
+>      BdrvDirtyBitmapIter *dbi;
 > 
->      qemu_co_rwlock_rdlock(&job->flush_rwlock);
+>      granularity = bdrv_dirty_bitmap_granularity(job->sync_bitmap);
+> @@ -382,8 +381,8 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
+>      dbi = bdrv_dirty_iter_new(job->sync_bitmap, 0);
 > 
-> -    start = sector_num / sectors_per_cluster;
-> -    end = DIV_ROUND_UP(sector_num + nb_sectors, sectors_per_cluster);
-> +    start = QEMU_ALIGN_DOWN(offset, job->cluster_size);
-> +    end = QEMU_ALIGN_UP(bytes + offset, job->cluster_size);
+>      /* Find the next dirty sector(s) */
+> -    while ((sector = bdrv_dirty_iter_next(dbi)) != -1) {
+> -        cluster = sector / sectors_per_cluster;
+> +    while ((offset = bdrv_dirty_iter_next(dbi) * BDRV_SECTOR_SIZE) >= 0) {
+> +        cluster = offset / job->cluster_size;
 > 
-> -    trace_backup_do_cow_enter(job, start * job->cluster_size,
-> -                              sector_num * BDRV_SECTOR_SIZE,
-> -                              nb_sectors * BDRV_SECTOR_SIZE);
-> +    trace_backup_do_cow_enter(job, start, offset, bytes);
-> 
-> -    wait_for_overlapping_requests(job, start * job->cluster_size,
-> -                                  end * job->cluster_size);
-> -    cow_request_begin(&cow_request, job, start * job->cluster_size,
-> -                      end * job->cluster_size);
-> +    wait_for_overlapping_requests(job, start, end);
-> +    cow_request_begin(&cow_request, job, start, end);
-> 
-> -    for (; start < end; start++) {
-> -        if (test_bit(start, job->done_bitmap)) {
-> -            trace_backup_do_cow_skip(job, start * job->cluster_size);
-> +    for (; start < end; start += job->cluster_size) {
-> +        if (test_bit(start / job->cluster_size, job->done_bitmap)) {
-> +            trace_backup_do_cow_skip(job, start);
->              continue; /* already copied */
+>          /* Fake progress updates for any clusters we skipped */
+>          if (cluster != last_cluster + 1) {
+> @@ -410,7 +409,8 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
+>          /* If the bitmap granularity is smaller than the backup granularity,
+>           * we need to advance the iterator pointer to the next cluster. */
+>          if (granularity < job->cluster_size) {
+> -            bdrv_set_dirty_iter(dbi, cluster * sectors_per_cluster);
+> +            bdrv_set_dirty_iter(dbi,
+> +                                cluster * job->cluster_size / BDRV_SECTOR_SIZE);
 >          }
 > 
-> -        trace_backup_do_cow_process(job, start * job->cluster_size);
-> +        trace_backup_do_cow_process(job, start);
+>          last_cluster = cluster - 1;
+> @@ -432,17 +432,15 @@ static void coroutine_fn backup_run(void *opaque)
+>      BackupBlockJob *job = opaque;
+>      BackupCompleteData *data;
+>      BlockDriverState *bs = blk_bs(job->common.blk);
+> -    int64_t start, end;
+> +    int64_t offset;
+>      int64_t sectors_per_cluster = cluster_size_sectors(job);
+>      int ret = 0;
 > 
-> -        n = MIN(job->cluster_size,
-> -                job->common.len - start * job->cluster_size);
-> +        n = MIN(job->cluster_size, job->common.len - start);
+>      QLIST_INIT(&job->inflight_reqs);
+>      qemu_co_rwlock_init(&job->flush_rwlock);
 > 
->          if (!bounce_buffer) {
->              bounce_buffer = blk_blockalign(blk, job->cluster_size);
-> @@ -137,11 +131,10 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
->          iov.iov_len = n;
->          qemu_iovec_init_external(&bounce_qiov, &iov, 1);
+> -    start = 0;
+> -    end = DIV_ROUND_UP(job->common.len, job->cluster_size);
+> -
+> -    job->done_bitmap = bitmap_new(end);
+> +    job->done_bitmap = bitmap_new(DIV_ROUND_UP(job->common.len,
+> +                                               job->cluster_size));
 > 
-> -        ret = blk_co_preadv(blk, start * job->cluster_size,
-> -                            bounce_qiov.size, &bounce_qiov,
-> +        ret = blk_co_preadv(blk, start, bounce_qiov.size, &bounce_qiov,
->                              is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0);
->          if (ret < 0) {
-> -            trace_backup_do_cow_read_fail(job, start * job->cluster_size, ret);
-> +            trace_backup_do_cow_read_fail(job, start, ret);
->              if (error_is_read) {
->                  *error_is_read = true;
->              }
-> @@ -149,22 +142,22 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
->          }
+>      job->before_write.notify = backup_before_write_notify;
+>      bdrv_add_before_write_notifier(bs, &job->before_write);
+> @@ -457,7 +455,8 @@ static void coroutine_fn backup_run(void *opaque)
+>          ret = backup_run_incremental(job);
+>      } else {
+>          /* Both FULL and TOP SYNC_MODE's require copying.. */
+> -        for (; start < end; start++) {
+> +        for (offset = 0; offset < job->common.len;
+> +             offset += job->cluster_size) {
+>              bool error_is_read;
+>              int alloced = 0;
 > 
->          if (buffer_is_zero(iov.iov_base, iov.iov_len)) {
-> -            ret = blk_co_pwrite_zeroes(job->target, start * job->cluster_size,
-> +            ret = blk_co_pwrite_zeroes(job->target, start,
->                                         bounce_qiov.size, BDRV_REQ_MAY_UNMAP);
->          } else {
-> -            ret = blk_co_pwritev(job->target, start * job->cluster_size,
-> +            ret = blk_co_pwritev(job->target, start,
->                                   bounce_qiov.size, &bounce_qiov,
->                                   job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
->          }
->          if (ret < 0) {
-> -            trace_backup_do_cow_write_fail(job, start * job->cluster_size, ret);
-> +            trace_backup_do_cow_write_fail(job, start, ret);
->              if (error_is_read) {
->                  *error_is_read = false;
->              }
->              goto out;
->          }
+> @@ -480,8 +479,8 @@ static void coroutine_fn backup_run(void *opaque)
+>                       * needed but at some point that is always the case. */
+>                      alloced =
+>                          bdrv_is_allocated(bs,
+> -                                start * sectors_per_cluster + i,
+> -                                sectors_per_cluster - i, &n);
+> +                                          (offset >> BDRV_SECTOR_BITS) + i,
+> +                                          sectors_per_cluster - i, &n);
+>                      i += n;
 > 
-> -        set_bit(start, job->done_bitmap);
-> +        set_bit(start / job->cluster_size, job->done_bitmap);
-> 
->          /* Publish progress, guest I/O counts as progress too.  Note that the
->           * offset field is an opaque progress value, it is not a disk offset.
-> @@ -180,8 +173,7 @@ out:
-> 
->      cow_request_end(&cow_request);
-> 
-> -    trace_backup_do_cow_return(job, sector_num * BDRV_SECTOR_SIZE,
-> -                               nb_sectors * BDRV_SECTOR_SIZE, ret);
-> +    trace_backup_do_cow_return(job, offset, bytes, ret);
-> 
->      qemu_co_rwlock_unlock(&job->flush_rwlock);
-> 
-> @@ -194,14 +186,12 @@ static int coroutine_fn backup_before_write_notify(
->  {
->      BackupBlockJob *job = container_of(notifier, BackupBlockJob, before_write);
->      BdrvTrackedRequest *req = opaque;
-> -    int64_t sector_num = req->offset >> BDRV_SECTOR_BITS;
-> -    int nb_sectors = req->bytes >> BDRV_SECTOR_BITS;
-> 
->      assert(req->bs == blk_bs(job->common.blk));
-> -    assert((req->offset & (BDRV_SECTOR_SIZE - 1)) == 0);
-> -    assert((req->bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
-> +    assert(QEMU_IS_ALIGNED(req->offset, BDRV_SECTOR_SIZE));
-> +    assert(QEMU_IS_ALIGNED(req->bytes, BDRV_SECTOR_SIZE));
-> 
-> -    return backup_do_cow(job, sector_num, nb_sectors, NULL, true);
-> +    return backup_do_cow(job, req->offset, req->bytes, NULL, true);
->  }
-> 
->  static void backup_set_speed(BlockJob *job, int64_t speed, Error **errp)
-> @@ -406,8 +396,8 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
->                  if (yield_and_check(job)) {
->                      goto out;
->                  }
-> -                ret = backup_do_cow(job, cluster * sectors_per_cluster,
-> -                                    sectors_per_cluster, &error_is_read,
-> +                ret = backup_do_cow(job, cluster * job->cluster_size,
-> +                                    job->cluster_size, &error_is_read,
->                                      false);
->                  if ((ret < 0) &&
->                      backup_error_action(job, error_is_read, -ret) ==
-> @@ -509,8 +499,8 @@ static void coroutine_fn backup_run(void *opaque)
+>                      if (alloced || n == 0) {
+> @@ -499,9 +498,8 @@ static void coroutine_fn backup_run(void *opaque)
 >              if (alloced < 0) {
 >                  ret = alloced;
 >              } else {
-> -                ret = backup_do_cow(job, start * sectors_per_cluster,
-> -                                    sectors_per_cluster, &error_is_read,
-> +                ret = backup_do_cow(job, start * job->cluster_size,
-> +                                    job->cluster_size, &error_is_read,
->                                      false);
+> -                ret = backup_do_cow(job, start * job->cluster_size,
+> -                                    job->cluster_size, &error_is_read,
+> -                                    false);
+> +                ret = backup_do_cow(job, offset, job->cluster_size,
+> +                                    &error_is_read, false);
 >              }
 >              if (ret < 0) {
+>                  /* Depending on error action, fail now or retry cluster */
+> @@ -510,7 +508,7 @@ static void coroutine_fn backup_run(void *opaque)
+>                  if (action == BLOCK_ERROR_ACTION_REPORT) {
+>                      break;
+>                  } else {
+> -                    start--;
+> +                    offset -= job->cluster_size;
+>                      continue;
+>                  }
+>              }
 > -- 
 > 2.9.4
 > 
