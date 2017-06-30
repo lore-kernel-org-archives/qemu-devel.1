@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dQwwv-0005i5-Vb
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 10:31:13 -0400
+	(envelope-from <bobby.prani@gmail.com>) id 1dQx1w-0007hx-UU
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 10:36:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dQwwv-0003un-2E
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 10:31:09 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20170630142211.GB4776@noname.redhat.com>
-References: <20170627163145.GC4792@noname.redhat.com>
-	<w51shihd3y2.fsf@maestria.local.igalia.com>
-	<20170630142211.GB4776@noname.redhat.com>
-Date: Fri, 30 Jun 2017 16:30:58 +0200
-Message-ID: <w51k23tcztp.fsf@maestria.local.igalia.com>
+	(envelope-from <bobby.prani@gmail.com>) id 1dQx1t-0006qf-Rg
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 10:36:20 -0400
+Received: from mail-yb0-x241.google.com ([2607:f8b0:4002:c09::241]:35876)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1dQx1t-0006qP-Ny
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 10:36:17 -0400
+Received: by mail-yb0-x241.google.com with SMTP id i80so5186990yba.3
+	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 07:36:17 -0700 (PDT)
+From: Pranith Kumar <bobby.prani@gmail.com>
+Date: Fri, 30 Jun 2017 10:36:12 -0400
+Message-Id: <20170630143614.31059-1-bobby.prani@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC] QMP design: Fixing query-block
- and friends
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v4 1/3] tcg/aarch64: Introduce and use long
+ branch to register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, armbru@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
+To: alex.bennee@linaro.org
+Cc: qemu-devel@nongnu.org, rth@twiddle.net
 
-On Fri 30 Jun 2017 04:22:11 PM CEST, Kevin Wolf wrote:
-> Am 30.06.2017 um 15:01 hat Alberto Garcia geschrieben:
->> On Tue 27 Jun 2017 06:31:45 PM CEST, Kevin Wolf wrote:
->> > * Speaking of recursion: ImageInfo recursively includes information
->> >   about all images in the backing chain. This is what makes the output
->> >   of query-named-block-nodes so redundant. It is also inconsistent
->> >   because the runtime information (BlockInfo/BlockDeviceInfo) isn't
->> >   recursive.
->> 
->> I've also been told of cases where a query-block command on a VM with a
->> very large amount of images in all backing chains would slow down the
->> guest because of this recursion.
->> 
->> I haven't been able to reproduce this problem myself, but being able to
->> see only the devices seen by the guest (as opposed to the complete
->> graph) seems like a good idea.
->
-> I think the information only really becomes redundant if you use
-> query-named-block-nodes because then you list every backing file node
-> and each of them contains the recursive information.
->
-> With query-block, you start at the top and include the information for
-> each image in the backing file chain only once. If we did indeed have
-> a problem there, that might mean that we do in fact need filtering to
-> reduce the overhead. But I don't think any of the information involves
-> any I/O to get, so it seems unlikely to me that this would make a big
-> difference.
+We can use a branch to register instruction for exit_tb for offsets
+greater than 128MB.
 
-Yes, that was also what I thought, but I haven't been able to reproduce
-the problem so I don't know yet. In my own tests with thousands of
-backing files I haven't noticed any slowdown caused by query-block.
+CC: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+---
+ tcg/aarch64/tcg-target.inc.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-Berto
+diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+index 1fa3bccc89..8fce11ace7 100644
+--- a/tcg/aarch64/tcg-target.inc.c
++++ b/tcg/aarch64/tcg-target.inc.c
+@@ -819,6 +819,17 @@ static inline void tcg_out_goto(TCGContext *s, tcg_insn_unit *target)
+     tcg_out_insn(s, 3206, B, offset);
+ }
+ 
++static inline void tcg_out_goto_long(TCGContext *s, tcg_insn_unit *target)
++{
++    ptrdiff_t offset = target - s->code_ptr;
++    if (offset == sextract64(offset, 0, 26)) {
++        tcg_out_insn(s, 3206, BL, offset);
++    } else {
++        tcg_out_movi(s, TCG_TYPE_I64, TCG_REG_TMP, (intptr_t)target);
++        tcg_out_insn(s, 3207, BR, TCG_REG_TMP);
++    }
++}
++
+ static inline void tcg_out_goto_noaddr(TCGContext *s)
+ {
+     /* We pay attention here to not modify the branch target by reading from
+@@ -1364,10 +1375,10 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,
+     case INDEX_op_exit_tb:
+         /* Reuse the zeroing that exists for goto_ptr.  */
+         if (a0 == 0) {
+-            tcg_out_goto(s, s->code_gen_epilogue);
++            tcg_out_goto_long(s, s->code_gen_epilogue);
+         } else {
+             tcg_out_movi(s, TCG_TYPE_I64, TCG_REG_X0, a0);
+-            tcg_out_goto(s, tb_ret_addr);
++            tcg_out_goto_long(s, tb_ret_addr);
+         }
+         break;
+ 
+-- 
+2.13.0
