@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54835)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dQwS1-0001kL-GE
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 09:59:14 -0400
+	(envelope-from <vadim.galitsyn@profitbricks.com>) id 1dQwTZ-0002Oa-1u
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 10:00:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dQwS0-0002QO-O9
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 09:59:13 -0400
-Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:36451)
+	(envelope-from <vadim.galitsyn@profitbricks.com>) id 1dQwTU-000580-Oz
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 10:00:49 -0400
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:35280)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dQwS0-0002PF-H7
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 09:59:12 -0400
-Received: by mail-wr0-x22f.google.com with SMTP id c11so204907332wrc.3
-	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 06:59:12 -0700 (PDT)
+	(Exim 4.71) (envelope-from <vadim.galitsyn@profitbricks.com>)
+	id 1dQwTU-00056n-C4
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 10:00:44 -0400
+Received: by mail-wm0-x22d.google.com with SMTP id w126so110879697wme.0
+	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 07:00:44 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170630114635.9286-1-stefanha@redhat.com>
-References: <20170630114635.9286-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 30 Jun 2017 14:58:50 +0100
-Message-ID: <CAFEAcA8TmmM9P1h-op4MksWY1aJz6fd5Khr+G9eEqyNf-HB2Dw@mail.gmail.com>
+In-Reply-To: <4a4aa9ac-39d2-c549-4955-0d18fa30fd14@redhat.com>
+References: <20170614152106.25533-1-vadim.galitsyn@profitbricks.com>
+	<20170627160512.705f6d8e@nial.brq.redhat.com>
+	<4a4aa9ac-39d2-c549-4955-0d18fa30fd14@redhat.com>
+From: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
+Date: Fri, 30 Jun 2017 16:00:22 +0200
+Message-ID: <CAPHE7Nr5zjDSY3fzwV=YFoifPzXwWOAap4N=y5VSipkzkNhWCg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/7] Block patches
+Subject: Re: [Qemu-devel] [PATCH v3] hmp,
+ qmp: introduce "info memory" and "query-memory" commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +31,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Mohammed Gamal <mohammed.gamal@profitbricks.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Vasilis Liaskovitis <vasilis.liaskovitis@profitbricks.com>, Eduardo Otubo <eduardo.otubo@profitbricks.com>
 
-On 30 June 2017 at 12:46, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> The following changes since commit 464588675455afda2899e20a0b120e4075de50c7:
->
->   Merge remote-tracking branch 'remotes/sstabellini/tags/xen-20170627-tag' into staging (2017-06-29 11:45:01 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/stefanha/qemu.git tags/block-pull-request
->
-> for you to fetch changes up to c324fd0a39cee43c13f6d1fb34f74fc5e2fb007b:
->
->   virtio-pci: use ioeventfd even when KVM is disabled (2017-06-30 11:03:45 +0100)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
->
-> Stefan Hajnoczi (7):
->   virtio-blk: trace vdev so devices can be distinguished
->   libqos: fix typo in virtio.h QVirtQueue->used comment
->   libqos: add virtio used ring support
->   tests: fix virtio-scsi-test ISR dependence
->   tests: fix virtio-blk-test ISR dependence
->   tests: fix virtio-net-test ISR dependence
->   virtio-pci: use ioeventfd even when KVM is disabled
+Hi Guys,
 
-Applied, thanks.
+Thank you for the input. Please find updated patch v4 at
+http://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg07065.html.
 
--- PMM
+Vadim
+
+On Tue, Jun 27, 2017 at 4:14 PM, Eric Blake <eblake@redhat.com> wrote:
+
+> On 06/27/2017 09:05 AM, Igor Mammedov wrote:
+> > On Wed, 14 Jun 2017 17:21:06 +0200
+> > Vadim Galitsyn <vadim.galitsyn@profitbricks.com> wrote:
+> >
+>
+> >> +void hmp_info_memory(Monitor *mon, const QDict *qdict)
+> >> +{
+> >> +    Error *err = NULL;
+> >> +    MemoryInfo *info = qmp_query_memory(&err);
+> >> +    if (info) {
+> >> +        monitor_printf(mon, "base-memory: %" PRIu64 "\n",
+> >> +                       info->base_memory);
+> >> +        monitor_printf(mon, "hot-plug-memory: %" PRIu64 "\n",
+> >> +                       info->hot_plug_memory);
+> > it shouldn't be printed if hotplug is not enabled
+>
+> In which case, the QAPI change in the .json file should mark it as
+> '*hot-plug-memory', to make it an optional field, and you'll need to
+> check/set info->has_hot_plug_memory as appropriate.
+>
+> >
+> >> +        monitor_printf(mon, "ballooned-actual-memory: %" PRIu64 "\n",
+> >> +                       info->ballooned_actual_memory);
+> >> +        g_free(info);
+> >
+> > probably there is autogenerated qapi_free_FOO() for MemInfo type
+>
+> Yes, there is.
+>
+> > since it's QAPI type, it should be used here instead of g_free() if it
+> exists.
+>
+> Yes, that is correct.
+>
+>
+> >> +#
+> >> +# @ballooned-actual-memory: amount of guest memory available after
+> ballooning.
+> >> +#
+> >> +# Since: 2.10.0
+> >> +##
+> >> +{ 'struct': 'MemoryInfo',
+> >> +  'data'  : { 'base-memory': 'int',
+> >> 'hot-plug-memory': 'int',
+> > should be optional and shown only if hotplug is actually enabled
+> >
+> >> +              'ballooned-actual-memory': 'int' } }
+> > maybe the same for ballooning
+>
+> Yes, that makes sense to have both of those stats be optional, since
+> they are opt-in configurations.
+>
+> --
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+>
+>
