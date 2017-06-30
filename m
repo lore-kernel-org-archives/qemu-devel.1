@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34333)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dQtRj-0008S7-5H
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:46:44 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dQtRj-0008SK-UN
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:46:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dQtRg-0007s8-1Y
+	(envelope-from <dgibson@ozlabs.org>) id 1dQtRi-0007u8-RB
 	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 06:46:43 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 30 Jun 2017 20:46:11 +1000
-Message-Id: <20170630104632.27942-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/21] ppc-for-2.10 queue 20170730
+Date: Fri, 30 Jun 2017 20:46:17 +1000
+Message-Id: <20170630104632.27942-7-david@gibson.dropbear.id.au>
+In-Reply-To: <20170630104632.27942-1-david@gibson.dropbear.id.au>
+References: <20170630104632.27942-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PULL 06/21] spapr: Add a "no HPT" encoding to HTAB
+ migration stream
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,86 +21,87 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, thuth@redhat.com, lvivier@redhat.com, sursingh@redhat.com, sbobroff@redhat.com, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, thuth@redhat.com, lvivier@redhat.com, sursingh@redhat.com, sbobroff@redhat.com, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-The following changes since commit c5eb5846d2d207bbde7f4b665d9ff90b92c8ad=
-ff:
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-  Merge remote-tracking branch 'remotes/dgilbert/tags/pull-hmp-20170629' =
-into staging (2017-06-29 17:37:11 +0100)
+Add a "no HPT" encoding (using value -1) to the HTAB migration
+stream (in the place of HPT size) when the guest doesn't allocate HPT.
+This will help the target side to match target HPT with the source HPT
+and thus enable successful migration.
 
-are available in the git repository at:
+Suggested-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/spapr.c | 29 +++++++++++++++++++++++++----
+ 1 file changed, 25 insertions(+), 4 deletions(-)
 
-  git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170630
-
-for you to fetch changes up to 0dfabd39d523fc3f6f0f8c441f41c013cc429b52:
-
-  spapr: Clean up DRC set_isolation_state() path (2017-06-30 14:03:32 +10=
-00)
-
-----------------------------------------------------------------
-ppc patch queue 2017-06-30
-
-  * More DRC cleanups, these now actually fix a few bugs
-  * Properly implements the openpic timers (they now count and
-    generate interrupts)
-  * Fixes for XICS migration
-  * Fixes for migration of POWER9 RPT guests
-  * The last of the compatibility mode rework
-
-----------------------------------------------------------------
-Aaron Larson (1):
-      target-ppc: Enable open-pic timers to count and generate interrupts
-
-Bharata B Rao (4):
-      spapr: Add a "no HPT" encoding to HTAB migration stream
-      spapr: Fix migration of Radix guests
-      target/ppc: Proper cleanup when ppc_cpu_realizefn fails
-      spapr: prevent QEMU crash when CPU realization fails
-
-Daniel Henrique Barboza (1):
-      hw/ppc/spapr.c: consecutive 'spapr->patb_entry =3D 0' statements
-
-David Gibson (9):
-      pseries: Move CPU compatibility property to machine
-      pseries: Reset CPU compatibility mode
-      ppc: Rework CPU compatibility testing across migration
-      spapr: Start hotplugged PCI devices in ISOLATED state
-      spapr: Eliminate DRC 'signalled' state variable
-      spapr: Split DRC release from DRC detach
-      spapr: Make DRC reset force DRC into known state
-      spapr: Clean up DRC set_allocation_state path
-      spapr: Clean up DRC set_isolation_state() path
-
-Greg Kurz (3):
-      qapi: add explicit null to string input and output visitors
-      xics: directly register ICPState objects to vmstate
-      spapr: fix migration of ICPState objects from/to older QEMU
-
-Suraj Jitindar Singh (1):
-      target/ppc: Fix return value in tcg radix mmu fault handler
-
-Thomas Huth (2):
-      hw/ppc/prep: Remove superfluous call to soundhw_init()
-      target/ppc/excp_helper: Take BQL before calling cpu_interrupt()
-
- hw/intc/openpic.c            | 117 +++++++++++++-
- hw/intc/xics.c               |   5 +-
- hw/ppc/prep.c                |   4 -
- hw/ppc/spapr.c               | 160 ++++++++++++++++---
- hw/ppc/spapr_cpu_core.c      |  68 +++++++--
- hw/ppc/spapr_drc.c           | 355 +++++++++++++++++++++++--------------=
-------
- hw/ppc/spapr_events.c        |  10 --
- hw/ppc/spapr_hcall.c         |   8 +-
- include/hw/ppc/spapr.h       |  13 +-
- include/hw/ppc/spapr_drc.h   |  10 +-
- qapi/string-input-visitor.c  |  11 ++
- qapi/string-output-visitor.c |  14 ++
- target/ppc/compat.c          | 102 +++++++++++++
- target/ppc/cpu.h             |   6 +-
- target/ppc/excp_helper.c     |   3 +
- target/ppc/machine.c         |  69 ++++++++-
- target/ppc/mmu-radix64.c     |   2 +-
- target/ppc/translate_init.c  | 100 +++++-------
- 18 files changed, 749 insertions(+), 308 deletions(-)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 52f4e72..f3e0b9b 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1560,13 +1560,19 @@ static int htab_save_setup(QEMUFile *f, void *opaque)
+     sPAPRMachineState *spapr = opaque;
+ 
+     /* "Iteration" header */
+-    qemu_put_be32(f, spapr->htab_shift);
++    if (!spapr->htab_shift) {
++        qemu_put_be32(f, -1);
++    } else {
++        qemu_put_be32(f, spapr->htab_shift);
++    }
+ 
+     if (spapr->htab) {
+         spapr->htab_save_index = 0;
+         spapr->htab_first_pass = true;
+     } else {
+-        assert(kvm_enabled());
++        if (spapr->htab_shift) {
++            assert(kvm_enabled());
++        }
+     }
+ 
+ 
+@@ -1712,7 +1718,12 @@ static int htab_save_iterate(QEMUFile *f, void *opaque)
+     int rc = 0;
+ 
+     /* Iteration header */
+-    qemu_put_be32(f, 0);
++    if (!spapr->htab_shift) {
++        qemu_put_be32(f, -1);
++        return 0;
++    } else {
++        qemu_put_be32(f, 0);
++    }
+ 
+     if (!spapr->htab) {
+         assert(kvm_enabled());
+@@ -1746,7 +1757,12 @@ static int htab_save_complete(QEMUFile *f, void *opaque)
+     int fd;
+ 
+     /* Iteration header */
+-    qemu_put_be32(f, 0);
++    if (!spapr->htab_shift) {
++        qemu_put_be32(f, -1);
++        return 0;
++    } else {
++        qemu_put_be32(f, 0);
++    }
+ 
+     if (!spapr->htab) {
+         int rc;
+@@ -1790,6 +1806,11 @@ static int htab_load(QEMUFile *f, void *opaque, int version_id)
+ 
+     section_hdr = qemu_get_be32(f);
+ 
++    if (section_hdr == -1) {
++        spapr_free_hpt(spapr);
++        return 0;
++    }
++
+     if (section_hdr) {
+         Error *local_err = NULL;
+ 
+-- 
+2.9.4
