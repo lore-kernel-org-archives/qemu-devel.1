@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dQrhD-00064F-6n
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 04:54:36 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dQrsf-0002DM-6x
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 05:06:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dQrhA-0000yE-3m
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 04:54:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38286)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dQrh9-0000xR-Q6
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 04:54:32 -0400
-Date: Fri, 30 Jun 2017 09:54:26 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170630085426.GA23259@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <cover.1498761179.git.alistair.francis@xilinx.com>
-	<0b14290d85eceaa145e0333c26826b14304e23e4.1498761179.git.alistair.francis@xilinx.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dQrse-0002tw-5l
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 05:06:25 -0400
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:36152)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dQrsd-0002t4-U4
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 05:06:24 -0400
+Received: by mail-wm0-x22d.google.com with SMTP id 62so104185247wmw.1
+	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 02:06:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <0b14290d85eceaa145e0333c26826b14304e23e4.1498761179.git.alistair.francis@xilinx.com>
-Subject: Re: [Qemu-devel] [RFC v2 2/3] qemu-error: Implement a more generic
- error reporting
+In-Reply-To: <f7ff9307-f341-f7df-3c80-374626f7631a@adacore.com>
+References: <1498728533-23160-1-git-send-email-frederic.konrad@adacore.com>
+	<1498728533-23160-3-git-send-email-frederic.konrad@adacore.com>
+	<CAFEAcA-tuehYiJkYo148N0VPJ3hwhcxYDDersmbs4TOqxQCEKw@mail.gmail.com>
+	<7e7d94ce-a33c-6253-8dcf-475e93fe388f@adacore.com>
+	<CAFEAcA_EcMOQ6afbmZK1jYUuWGzAUzj8AKRLvoDEsezsQkPYzA@mail.gmail.com>
+	<f7ff9307-f341-f7df-3c80-374626f7631a@adacore.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 30 Jun 2017 10:06:02 +0100
+Message-ID: <CAFEAcA89iy-r0OQ1T_znZ7EHZxGMZS0p=F_O5nygOVYzC_Dwgw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 2/3] arm: fix the armv7m reset state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +33,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel@nongnu.org, alistair23@gmail.com, philippe@mathieu-daude.net
+To: KONRAD Frederic <frederic.konrad@adacore.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, alistair@alistair23.me
 
-On Thu, Jun 29, 2017 at 12:42:38PM -0700, Alistair Francis wrote:
-> This patch removes the exisinting error_vreport() function and replaces it
-> with a more generic vreport() function that takes an enum describing the
-> information to be reported.
-> 
-> As part of this change a report() function is added as well with the
-> same capability.
-> 
-> To maintain full compatibility the original error_report() function is
-> maintained and no changes to the way errors are printed have been made.
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> ---
-> 
->  hw/virtio/virtio.c          |  2 +-
->  include/qemu/error-report.h | 10 +++++++++-
->  scripts/checkpatch.pl       |  3 ++-
->  util/qemu-error.c           | 33 ++++++++++++++++++++++++++++++---
->  4 files changed, 42 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 464947f76d..bd3d26abb7 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -2448,7 +2448,7 @@ void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
->      va_list ap;
->  
->      va_start(ap, fmt);
-> -    error_vreport(fmt, ap);
-> +    vreport(ERROR, fmt, ap);
->      va_end(ap);
->  
->      if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
-> diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
-> index 3001865896..39b554c3b9 100644
-> --- a/include/qemu/error-report.h
-> +++ b/include/qemu/error-report.h
-> @@ -21,6 +21,12 @@ typedef struct Location {
->      struct Location *prev;
->  } Location;
->  
-> +typedef enum {
-> +    ERROR,
-> +    WARN,
-> +    INFO,
-> +} report_types;
+On 30 June 2017 at 09:24, KONRAD Frederic <frederic.konrad@adacore.com> wrote:
+> On 06/29/2017 06:45 PM, Peter Maydell wrote:
+>> It's the same thing, though, right? If the user's ELF file
+>> says "vector table is at 0x8000000" then we should either
+>> (a) say that's a user error, or
+>> (b) handle it right, whether we implemented the QEMU model with
+>> the flash at 0 and the alias at 0x8000000, or with the flash
+>> at 0x8000000 and the alias at 0.
 
-Woah, those are faaar to generic names to be used. There is way too much
-chance of those clashing with definitions from headers we pull in - particularly
-windows which pollutes its system headers with loads of generic names.
+> Fondamentaly yes, it is the same.. but it seems really strange to
+> me to load the elf in the alias.
 
-I'd suggest  QMSG_ERROR, QMSG_WARN, QMSG_INFO
+The user creating the ELF file has no idea whether we
+modelled the flash at 0 and the alias at highmem or
+the other way around -- that is an implementation detail
+that should be completely invisible to the user.
+My two suggestions are based on that point -- either we
+should treat "ELF loaded at highmem" as always wrong, or
+we should always support it.
 
-> +
->  Location *loc_push_restore(Location *loc);
->  Location *loc_push_none(Location *loc);
->  Location *loc_pop(Location *loc);
-> @@ -30,12 +36,14 @@ void loc_set_none(void);
->  void loc_set_cmdline(char **argv, int idx, int cnt);
->  void loc_set_file(const char *fname, int lno);
->  
-> +void vreport(report_types type, const char *fmt, va_list ap) GCC_FMT_ATTR(2, 0);
-> +void report(report_types type, const char *fmt, ...)  GCC_FMT_ATTR(2, 3);
+> If I choose (a) I'll need to objcpy all the elf to 0 or modify
+> the build script which should work on the real board.. This seems
+> not really a good option to me.
 
-Those names are too generic too IMHO.  I'd suggest  qmsg_report, qmsg_vreport
+I agree that I don't like this.
 
-As mentioned in the previous review, there should be wrappers which
-call these with suitable enum to make usage less verbose. eg
+> If I choose (b) I won't be able to load it to SRAM and it is
+> basically the same result I'll need to move or modify the config.
 
-  qmsg_info(fmt, ....)  should call qmsg_report(QMSG_INFO, fmt, ...)
-  qmsg_vinfo(fmt, ....)  should call qmsg_vreport(QMSG_INFO, fmt, ...)
+I don't understand this, though. Option (b) is probably painful
+to implement (I don't have a good idea of how to do it) but
+it ought to mean that the ELF files that work on the board
+also work for QEMU (regardless of how the board model
+implemented the aliased flash).
 
-likewise, for other message levels
-
->  void error_vprintf(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
->  void error_printf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
->  void error_vprintf_unless_qmp(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
->  void error_printf_unless_qmp(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
->  void error_set_progname(const char *argv0);
-> -void error_vreport(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
->  void error_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
->  const char *error_get_progname(void);
->  extern bool enable_timestamp_msg;
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+thanks
+-- PMM
