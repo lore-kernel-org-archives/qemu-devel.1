@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dQpRc-0007OZ-Da
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 02:30:24 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dQpSc-0007ru-Az
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 02:31:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dQpRW-00088s-Gy
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 02:30:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50724)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dQpRW-00088X-Ap
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 02:30:14 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1C8C7333C0
-	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 06:30:13 +0000 (UTC)
-Date: Fri, 30 Jun 2017 14:30:02 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170630063002.GD24859@pxdev.xzpeter.org>
-References: <1498710417-7807-1-git-send-email-peterx@redhat.com>
-	<20170629163418-mutt-send-email-mst@kernel.org>
+	(envelope-from <rth7680@gmail.com>) id 1dQpSZ-0000TZ-7s
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 02:31:22 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:33893)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dQpSZ-0000Sy-2Y
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 02:31:19 -0400
+Received: by mail-qk0-x243.google.com with SMTP id 91so14370484qkq.1
+	for <qemu-devel@nongnu.org>; Thu, 29 Jun 2017 23:31:18 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1498768109-4092-1-git-send-email-cota@braap.org>
+	<1498768109-4092-3-git-send-email-cota@braap.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <ad8b61e4-ecdd-9bb9-1d86-6ca628040225@twiddle.net>
+Date: Thu, 29 Jun 2017 23:31:15 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170629163418-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH] intel_iommu: fix migration breakage on mr
- switch
+In-Reply-To: <1498768109-4092-3-git-send-email-cota@braap.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 2/7] translate-all: add out_size field to
+ TranslationBlock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,51 +32,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>, Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
 
-On Thu, Jun 29, 2017 at 04:35:04PM +0300, Michael S. Tsirkin wrote:
-> On Thu, Jun 29, 2017 at 12:26:57PM +0800, Peter Xu wrote:
-> > Migration is broken after the vfio integration work:
-> > 
-> > qemu-kvm: AHCI: Failed to start FIS receive engine: bad FIS receive buffer address
-> > qemu-kvm: Failed to load ich9_ahci:ahci
-> > qemu-kvm: error while loading state for instance 0x0 of device '0000:00:1f.2/ich9_ahci'
-> > qemu-kvm: load of migration failed: Operation not permitted
-> > 
-> > The problem is that vfio work introduced dynamic memory region
-> > switching (actually it is also used for future PT mode), and this memory
-> > region layout is not properly delivered to destination when migration
-> > happens. Solution is to rebuild the layout in post_load.
-> > 
-> > Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1459906
-> > Fixes: 558e0024 ("intel_iommu: allow dynamic switch of IOMMU region")
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  hw/i386/intel_iommu.c | 17 +++++++++++++++++
-> >  1 file changed, 17 insertions(+)
-> > 
-> > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > index a9b59bd..36b231d 100644
-> > --- a/hw/i386/intel_iommu.c
-> > +++ b/hw/i386/intel_iommu.c
-> > @@ -2332,11 +2332,28 @@ static void vtd_iommu_notify_flag_changed(MemoryRegion *iommu,
-> >      }
-> >  }
-> >  
-> > +static int vtd_post_load(void *opaque, int version_id)
-> > +{
-> > +    IntelIOMMUState *iommu = opaque;
-> > +
-> > +    /*
-> > +     * Since commit 558e00 ("intel_iommu: allow dynamic switch of
-> > +     * IOMMU region"),
+On 06/29/2017 01:28 PM, Emilio G. Cota wrote:
+> Note that due to the cacheline padding we are using, for
+> hosts with 64-byte cache lines this will not waste any
+> additional memory. Using a s16 would be ideal, since that
+> would plug an existing hole in the struct, but I see no
+> guarantee that a TB won't overflow it.
 > 
-> I would drop this part of the comment. It isn't of interest
-> to people reading code directly, while people reading git
-> history see the commit log.
+> Signed-off-by: Emilio G. Cota<cota@braap.org>
+> ---
+>   include/exec/exec-all.h   |  1 +
+>   accel/tcg/translate-all.c | 16 ++++++++--------
+>   2 files changed, 9 insertions(+), 8 deletions(-)
+> 
+> diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+> index 35a75f1..df12338 100644
+> --- a/include/exec/exec-all.h
+> +++ b/include/exec/exec-all.h
+> @@ -363,6 +363,7 @@ struct TranslationBlock {
+>        */
+>       uintptr_t jmp_list_next[2];
+>       uintptr_t jmp_list_first;
+> +    int32_t out_size; /* size of host code for this block */
 
-Ok. Will resend. Thanks.
+unsigned probably better.
 
--- 
-Peter Xu
+I do wonder about putting it in the hole after invalid.
+Which itself could be shrunk to bool.
+
+I don't believe there's much chance of an overflow of uint16_t.  The limit of 
+OPC_BUF_SIZE = 640 fairly well limits the practical size.  And, honestly, it 
+doesn't matter if we saturate to 0xffff, so long as you retain the full-size 
+gen_code_size local variable.
+
+
+r~
