@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dQx1z-0007i7-02
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 10:36:24 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dQx4V-0001EW-1H
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 10:39:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dQx1x-0006uS-PK
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 10:36:23 -0400
-Received: from mail-yw0-x244.google.com ([2607:f8b0:4002:c05::244]:32989)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1dQx1x-0006tS-KU
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 10:36:21 -0400
-Received: by mail-yw0-x244.google.com with SMTP id f200so6697472ywb.0
-	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 07:36:21 -0700 (PDT)
-From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Fri, 30 Jun 2017 10:36:14 -0400
-Message-Id: <20170630143614.31059-3-bobby.prani@gmail.com>
-In-Reply-To: <20170630143614.31059-1-bobby.prani@gmail.com>
-References: <20170630143614.31059-1-bobby.prani@gmail.com>
+	(envelope-from <mreitz@redhat.com>) id 1dQx4U-0000He-2t
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 10:38:59 -0400
+References: <20170628142137.7440-1-eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <a83183bc-464c-dd5b-aff9-fff07bde833c@redhat.com>
+Date: Fri, 30 Jun 2017 16:38:46 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 3/3] tcg/aarch64: Enable indirect jump path
- using LDR (literal)
+In-Reply-To: <20170628142137.7440-1-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="OCJRkETdqxA0m7msUFl7s5OjO6mfJR59D"
+Subject: Re: [Qemu-devel] [PATCH] tests: Avoid non-portable 'echo -ARG'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,101 +23,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alex.bennee@linaro.org
-Cc: qemu-devel@nongnu.org, rth@twiddle.net
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, stefanha@redhat.com, Jiri Pirko <jiri@resnulli.us>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-This patch enables the indirect jump path using an LDR (literal)
-instruction. It will be interesting to test and see which performs
-better among the two paths.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--OCJRkETdqxA0m7msUFl7s5OjO6mfJR59D
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, stefanha@redhat.com, Jiri Pirko <jiri@resnulli.us>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>
+Message-ID: <a83183bc-464c-dd5b-aff9-fff07bde833c@redhat.com>
+Subject: Re: [PATCH] tests: Avoid non-portable 'echo -ARG'
+References: <20170628142137.7440-1-eblake@redhat.com>
+In-Reply-To: <20170628142137.7440-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-CC: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
----
- tcg/aarch64/tcg-target.inc.c | 42 ++++++++++++++++++++++++++++--------------
- 1 file changed, 28 insertions(+), 14 deletions(-)
+On 2017-06-28 16:21, Eric Blake wrote:
+> POSIX says that backslashes in the arguments to 'echo', as well as
+> any use of 'echo -n' and 'echo -e', are non-portable; it recommends
+> people should favor 'printf' instead.  This is definitely true where
+> we do not control which shell is running (such as in makefile snippets
+> or in documentation examples).  But even for scripts where we
+> require bash (and therefore, where echo does what we want by default),
+> it is still possible to use 'shopt -s xpg_echo' to change bash's
+> behavior of echo.  And setting a good example never hurts when we are
+> not sure if a snippet will be copied from a bash-only script to a
+> general shell script (although I don't change the use of non-portable
+> \e for ESC when we know the running shell is bash).
+>=20
+> Replace 'echo -n "..."' with 'printf "..."', and 'echo -e "..."'
+> with 'printf "...\n"'.
+>=20
+> In the qemu-iotests check script, also fix unusual shell quoting
+> that would result in word-splitting if 'date' outputs a space.
+>=20
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>=20
+> Of course, Stefan's pending patch:
+> [PATCH 3/5] qemu-iotests: 068: extract _qemu() function
+> also touches 068, so there may be some (obvious) merge conflicts
+> to resolve there depending on what goes in first.
+>=20
+>  qemu-options.hx             |  4 ++--
+>  tests/multiboot/run_test.sh | 10 +++++-----
+>  tests/qemu-iotests/051      |  7 ++++---
+>  tests/qemu-iotests/068      |  2 +-
+>  tests/qemu-iotests/142      | 48 ++++++++++++++++++++++---------------=
+--------
+>  tests/qemu-iotests/171      | 14 ++++++-------
+>  tests/qemu-iotests/check    | 18 ++++++++---------
+>  tests/rocker/all            | 10 +++++-----
+>  tests/tcg/cris/Makefile     |  8 ++++----
+>  9 files changed, 61 insertions(+), 60 deletions(-)
 
-diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
-index a84422d633..04bc369a92 100644
---- a/tcg/aarch64/tcg-target.inc.c
-+++ b/tcg/aarch64/tcg-target.inc.c
-@@ -269,6 +269,8 @@ typedef enum {
-     I3207_BLR       = 0xd63f0000,
-     I3207_RET       = 0xd65f0000,
- 
-+    /* Load literal for loading the address at pc-relative offset */
-+    I3305_LDR       = 0x58000000,
-     /* Load/store register.  Described here as 3.3.12, but the helper
-        that emits them can transform to 3.3.10 or 3.3.13.  */
-     I3312_STRB      = 0x38000000 | LDST_ST << 22 | MO_8 << 30,
-@@ -389,6 +391,11 @@ static inline uint32_t tcg_in32(TCGContext *s)
- #define tcg_out_insn(S, FMT, OP, ...) \
-     glue(tcg_out_insn_,FMT)(S, glue(glue(glue(I,FMT),_),OP), ## __VA_ARGS__)
- 
-+static void tcg_out_insn_3305(TCGContext *s, AArch64Insn insn, int imm19, TCGReg rt)
-+{
-+    tcg_out32(s, insn | (imm19 & 0x7ffff) << 5 | rt);
-+}
-+
- static void tcg_out_insn_3201(TCGContext *s, AArch64Insn insn, TCGType ext,
-                               TCGReg rt, int imm19)
- {
-@@ -864,6 +871,8 @@ static inline void tcg_out_call(TCGContext *s, tcg_insn_unit *target)
-     }
- }
- 
-+#ifdef USE_DIRECT_JUMP
-+
- void aarch64_tb_set_jmp_target(uintptr_t jmp_addr, uintptr_t addr)
- {
-     tcg_insn_unit i1, i2;
-@@ -889,6 +898,8 @@ void aarch64_tb_set_jmp_target(uintptr_t jmp_addr, uintptr_t addr)
-     flush_icache_range(jmp_addr, jmp_addr + 8);
- }
- 
-+#endif
-+
- static inline void tcg_out_goto_label(TCGContext *s, TCGLabel *l)
- {
-     if (!l->has_value) {
-@@ -1400,21 +1411,24 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,
-         break;
- 
-     case INDEX_op_goto_tb:
--#ifndef USE_DIRECT_JUMP
--#error "USE_DIRECT_JUMP required for aarch64"
--#endif
--        /* consistency for USE_DIRECT_JUMP */
--        tcg_debug_assert(s->tb_jmp_insn_offset != NULL);
--        /* Ensure that ADRP+ADD are 8-byte aligned so that an atomic
--           write can be used to patch the target address. */
--        if ((uintptr_t)s->code_ptr & 7) {
--            tcg_out32(s, NOP);
-+        if (s->tb_jmp_insn_offset != NULL) {
-+            /* USE_DIRECT_JUMP */
-+            /* Ensure that ADRP+ADD are 8-byte aligned so that an atomic
-+               write can be used to patch the target address. */
-+            if ((uintptr_t)s->code_ptr & 7) {
-+                tcg_out32(s, NOP);
-+            }
-+            s->tb_jmp_insn_offset[a0] = tcg_current_code_size(s);
-+            /* actual branch destination will be patched by
-+               aarch64_tb_set_jmp_target later. */
-+            tcg_out_insn(s, 3406, ADRP, TCG_REG_TMP, 0);
-+            tcg_out_insn(s, 3401, ADDI, TCG_TYPE_I64, TCG_REG_TMP, TCG_REG_TMP, 0);
-+        } else {
-+            /* !USE_DIRECT_JUMP */
-+            tcg_debug_assert(s->tb_jmp_target_addr != NULL);
-+            intptr_t offset = tcg_pcrel_diff(s, (s->tb_jmp_target_addr + a0)) >> 2;
-+            tcg_out_insn(s, 3305, LDR, offset, TCG_REG_TMP);
-         }
--        s->tb_jmp_insn_offset[a0] = tcg_current_code_size(s);
--        /* actual branch destination will be patched by
--           aarch64_tb_set_jmp_target later. */
--        tcg_out_insn(s, 3406, ADRP, TCG_REG_TMP, 0);
--        tcg_out_insn(s, 3401, ADDI, TCG_TYPE_I64, TCG_REG_TMP, TCG_REG_TMP, 0);
-         tcg_out_insn(s, 3207, BR, TCG_REG_TMP);
-         s->tb_jmp_reset_offset[a0] = tcg_current_code_size(s);
-         break;
--- 
-2.13.0
+Question 1: Who's going to take this? :-)
+
+Question 2: This breaks 171 if TEST_DIR contains a % (e.g.
+"TEST_DIR=3D/tmp/foo%% ./check -raw 171"). Is that OK?
+
+Max
+
+
+--OCJRkETdqxA0m7msUFl7s5OjO6mfJR59D
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEvBAEBCAAZBQJZVmJ2EhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQI0M
+B/490C9crNK4TdUu03pQr1iIdbANWFfqfHnw90s844E6YwGIH4OW8ka6LuNlL5Gp
+hp+AzK6RSlHuzJtkLibvn860UIDc+uCA2X8Ch74IJF/KXbL+2Da86nXTh9wpJIiD
+MYr0M8IRuhC68oHWCC4pM06WS/K7c4pbKwUDVU8QXFXBz210xEmlkxve6rHldAt7
+2uuh3T/p1S5WktIR5sG+Xb5XXHk5KZigaViDz1lD++swXVtVpue1TiEeZTQpqZhu
+YFv+jC1g5mM93ctDr1Z7ReKc/D92x57zkQnwYU5eYFA0z5VMC8ubN4PZN/J8rDfP
+ZZ5Y/wOc4wtx3Qi4Y0ADjLwe
+=G6vv
+-----END PGP SIGNATURE-----
+
+--OCJRkETdqxA0m7msUFl7s5OjO6mfJR59D--
