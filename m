@@ -1,14 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46929)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dQm6l-0000gd-4N
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 22:56:36 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dQmAD-00028M-IE
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 23:00:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dQm6j-0004C4-Qm
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 22:56:35 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dQmAC-0006cD-IW
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 23:00:09 -0400
+References: <20170616135847.17726-1-mreitz@redhat.com>
+	<0bed1851-9298-0ba5-0604-9686ca5cf569@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Date: Fri, 30 Jun 2017 04:56:24 +0200
-Message-Id: <20170630025624.29870-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] iotests: Add test for dataplane mirroring
+Message-ID: <ac1c3cbf-e238-aa84-fffd-0acf68c1f51e@redhat.com>
+Date: Fri, 30 Jun 2017 04:59:56 +0200
+MIME-Version: 1.0
+In-Reply-To: <0bed1851-9298-0ba5-0604-9686ca5cf569@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="oJecBx5ueCiv7Q3s2qFLvSlnhN5LarMSf"
+Subject: Re: [Qemu-devel] [PATCH] iotests: Add test for failing qemu-img
+ commit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,175 +25,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
-v2:
-- Use test number which (I hope) no currently pending patch is trying to
-  use [Kevin]
-- Write 42 bytes instead of 64 so it looks less like a mistake
-- Mark the test as quick (because it is)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--oJecBx5ueCiv7Q3s2qFLvSlnhN5LarMSf
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <ac1c3cbf-e238-aa84-fffd-0acf68c1f51e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] iotests: Add test for failing qemu-img
+ commit
+References: <20170616135847.17726-1-mreitz@redhat.com>
+ <0bed1851-9298-0ba5-0604-9686ca5cf569@redhat.com>
+In-Reply-To: <0bed1851-9298-0ba5-0604-9686ca5cf569@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2017-06-27 21:52, Eric Blake wrote:
+> On 06/16/2017 08:58 AM, Max Reitz wrote:
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>> In order to pass, this depends on "fix: avoid an infinite loop or a
+>> dangling pointer problem in img_commit"
+>> (http://lists.nongnu.org/archive/html/qemu-block/2017-06/msg00443.html=
+)
+>=20
+> Looks like that is now 4172a003
+>=20
+>> and on the "block: Don't compare strings in bdrv_reopen_prepare()"
+>> series
+>> (http://lists.nongnu.org/archive/html/qemu-block/2017-06/msg00424.html=
+).
+>=20
+> Still pending.
+
+By the way, yes, it's still pending because I got stopped in the middle
+of writing the QObject test case and now a bit of other stuff came up
+this week... I haven't forgotten, but let's see whether I get to finish
+it later today.
+
+>> ---
+>>  tests/qemu-iotests/020     | 27 +++++++++++++++++++++++++++
+>>  tests/qemu-iotests/020.out | 17 +++++++++++++++++
+>>  2 files changed, 44 insertions(+)
+>>
+>> diff --git a/tests/qemu-iotests/020 b/tests/qemu-iotests/020
+>> index 7a11110..83d5ef0 100755
+>> --- a/tests/qemu-iotests/020
+>> +++ b/tests/qemu-iotests/020
+>> @@ -110,6 +110,33 @@ for offset in $TEST_OFFSETS; do
+>>      io_zero readv $(( offset + 64 * 1024 + 65536 * 4 )) 65536 65536 1=
+
+>>  done
+>>  _check_test_img
+>> +_cleanup
+>> +TEST_IMG=3D$TEST_IMG_SAVE
+>> +
+>> +echo
+>> +echo 'Testing failing commit'
+>> +echo
+>> +
+>> +# Create an image with a null backing file to which committing will f=
+ail (with
+>> +# ENOSPC so we can distinguish the result from some generic EIO which=
+ may be
+>> +# generated anywhere in the block layer)
+>> +_make_test_img -b "json:{'driver': 'raw',
+>> +                         'file': {
+>> +                             'driver': 'blkdebug',
+>> +                             'inject-error': [{
+>> +                                 'event': 'write_aio',
+>> +                                 'errno': 28,
+>=20
+> Still nasty that we encoded an errno value rather than using a
+> stringified enum, but that's not your problem.
+>=20
+>> +                                 'once': true
+>> +                             }],
+>> +                             'image': {
+>> +                                 'driver': 'null-co'
+>> +                             }}}"
+>=20
+> The comment does wonders for explaining how it all works!
+>=20
+>> +
+>> +# Just write anything so comitting will not be a no-op
+>=20
+> s/comitting/committing/
+>=20
+> With the typo fix,
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks, as always!
+
+Max
 
 
-git-backport-diff output against v1:
+--oJecBx5ueCiv7Q3s2qFLvSlnhN5LarMSf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream patch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-001/1:[0004] [FC] 'iotests: Add test for dataplane mirroring'
+iQEvBAEBCAAZBQJZVb6tEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQDWp
+CACqv1PehCcHHHa7/418oOu7vD28P/3gjv4MMytSNI4vBZAbGrDoq0lX0l220o7V
+tCrsE21q1ZUeitNJLfA4nxfdR1Ca/kKAHaq3rPLuAWs0pTF4kyMf/ErLH9f+9ocT
+ud3dfsigP/pw9zMDGoT5bllElxQVOVAMNMWFcg+mitTXu453eUZJLpPyaeT9xAiI
+UOI3jFLQTOp8k3ZTyziQ3dY8FcyUcvLPCdwpK1tOvm/9L4188pR1DEl9cTjXDPKn
+X84hxRYgJI77OngGKk7rroVrqMcDacepBxmzDoJPoz2rAtaqum4Gag9quoKdp0BJ
+THy6pOnP9FfIVUFJaMJNjmMt
+=c8pI
+-----END PGP SIGNATURE-----
 
-
-Not applied to my block branch because (1) maybe we still want to find
-out why virtio-blk doesn't assign the BB to its particular AioContext,
-and (2) because it still doesn't even work without Stefan's ioeventfd
-series.
----
- tests/qemu-iotests/127     | 97 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/127.out | 14 +++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 112 insertions(+)
- create mode 100755 tests/qemu-iotests/127
- create mode 100644 tests/qemu-iotests/127.out
-
-diff --git a/tests/qemu-iotests/127 b/tests/qemu-iotests/127
-new file mode 100755
-index 0000000..9e0d7d3
---- /dev/null
-+++ b/tests/qemu-iotests/127
-@@ -0,0 +1,97 @@
-+#!/bin/bash
-+#
-+# Test case for mirroring with dataplane
-+#
-+# Copyright (C) 2017 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=mreitz@redhat.com
-+
-+seq=$(basename $0)
-+echo "QA output created by $seq"
-+
-+here=$PWD
-+status=1    # failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_qemu
-+    _cleanup_test_img
-+    _rm_test_img "$TEST_IMG.overlay0"
-+    _rm_test_img "$TEST_IMG.overlay1"
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and qemu instance handling
-+. ./common.rc
-+. ./common.filter
-+. ./common.qemu
-+
-+_supported_fmt qcow2
-+_supported_proto file
-+_supported_os Linux
-+
-+IMG_SIZE=64K
-+
-+_make_test_img $IMG_SIZE
-+TEST_IMG="$TEST_IMG.overlay0" _make_test_img -b "$TEST_IMG" $IMG_SIZE
-+TEST_IMG="$TEST_IMG.overlay1" _make_test_img -b "$TEST_IMG" $IMG_SIZE
-+
-+# So that we actually have something to mirror and the job does not return
-+# immediately (which may be bad because then we cannot know whether the
-+# 'return' or the 'BLOCK_JOB_READY' comes first).
-+$QEMU_IO -c 'write 0 42' "$TEST_IMG.overlay0" | _filter_qemu_io
-+
-+# We cannot use virtio-blk here because that does not actually set the attached
-+# BB's AioContext in qtest mode
-+_launch_qemu \
-+    -object iothread,id=iothr \
-+    -blockdev node-name=source,driver=$IMGFMT,file.driver=file,file.filename="$TEST_IMG.overlay0" \
-+    -device virtio-scsi,id=scsi-bus,iothread=iothr \
-+    -device scsi-hd,bus=scsi-bus.0,drive=source
-+
-+_send_qemu_cmd $QEMU_HANDLE \
-+    "{ 'execute': 'qmp_capabilities' }" \
-+    'return'
-+
-+_send_qemu_cmd $QEMU_HANDLE \
-+    "{ 'execute': 'drive-mirror',
-+       'arguments': {
-+           'job-id': 'mirror',
-+           'device': 'source',
-+           'target': '$TEST_IMG.overlay1',
-+           'mode':   'existing',
-+           'sync':   'top'
-+       } }" \
-+    'BLOCK_JOB_READY'
-+
-+# The backing BDS should be assigned the overlay's AioContext
-+_send_qemu_cmd $QEMU_HANDLE \
-+    "{ 'execute': 'block-job-complete',
-+       'arguments': { 'device': 'mirror' } }" \
-+    'BLOCK_JOB_COMPLETED'
-+
-+_send_qemu_cmd $QEMU_HANDLE \
-+    "{ 'execute': 'quit' }" \
-+    'return'
-+
-+wait=yes _cleanup_qemu
-+
-+# success, all done
-+echo '*** done'
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/127.out b/tests/qemu-iotests/127.out
-new file mode 100644
-index 0000000..d1b83f1
---- /dev/null
-+++ b/tests/qemu-iotests/127.out
-@@ -0,0 +1,14 @@
-+QA output created by 106
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=65536
-+Formatting 'TEST_DIR/t.IMGFMT.overlay0', fmt=IMGFMT size=65536 backing_file=TEST_DIR/t.IMGFMT
-+Formatting 'TEST_DIR/t.IMGFMT.overlay1', fmt=IMGFMT size=65536 backing_file=TEST_DIR/t.IMGFMT
-+wrote 64/64 bytes at offset 0
-+64 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "mirror", "len": 65536, "offset": 65536, "speed": 0, "type": "mirror"}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "mirror", "len": 65536, "offset": 65536, "speed": 0, "type": "mirror"}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 40bef99..4373054 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -131,6 +131,7 @@
- 123 rw auto quick
- 124 rw auto backing
- 126 rw auto backing
-+127 rw auto backing quick
- 128 rw auto quick
- 129 rw auto quick
- 130 rw auto quick
--- 
-2.9.4
+--oJecBx5ueCiv7Q3s2qFLvSlnhN5LarMSf--
