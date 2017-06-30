@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39013)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dR0vp-0008Hc-1n
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 14:46:18 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dR1Hz-0006Ur-MC
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 15:09:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dR0vo-0002mO-8i
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 14:46:17 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dR1Hx-00035F-Fl
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 15:09:11 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:36121)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dR1Hx-00034w-Al
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 15:09:09 -0400
+Received: by mail-qk0-x241.google.com with SMTP id v143so3780372qkb.3
+	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 12:09:09 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
-References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
-	<149865244195.17063.11938084353514091141.stgit@frigg.lan>
-	<20170629225225.GA13979@flamenco>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <69def2b9-13d1-1600-2f4a-4001958ffa97@twiddle.net>
-Date: Fri, 30 Jun 2017 11:46:00 -0700
-MIME-Version: 1.0
-In-Reply-To: <20170629225225.GA13979@flamenco>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v11 01/29] Pass generic CPUState to
- gen_intermediate_code()
+Date: Fri, 30 Jun 2017 12:09:01 -0700
+Message-Id: <20170630190903.9886-2-rth@twiddle.net>
+In-Reply-To: <20170630190903.9886-1-rth@twiddle.net>
+References: <20170630190903.9886-1-rth@twiddle.net>
+Subject: [Qemu-devel] [PULL 1/3] gen-icount: add missing inline to gen_tb_end
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +26,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?Q?Llu=c3=ads_Vilanova?= <vilanova@ac.upc.edu>
-Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Michael Walle <michael@walle.cc>, Laurent Vivier <laurent@vivier.eu>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Anthony Green <green@moxielogic.com>, Chris Wulff <crwulff@gmail.com>, Marek Vasut <marex@denx.de>, Stafford Horne <shorne@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Max Filippov <jcmvbkbc@gmail.com>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:PowerPC" <qemu-ppc@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
 
-On 06/29/2017 03:52 PM, Emilio G. Cota wrote:
-> On Wed, Jun 28, 2017 at 15:20:42 +0300, Lluís Vilanova wrote:
->> Needed to implement a target-agnostic gen_intermediate_code() in the
->> future.
->>
->> Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
->> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
->> Reviewed-by: Richard Henderson <rth@twiddle.net>
->> ---
-> (snip)
->> -void gen_intermediate_code(CPUAlphaState *env, struct TranslationBlock *tb)
->> +void gen_intermediate_code(CPUState *cpu, struct TranslationBlock *tb)
->>   {
->> -    AlphaCPU *cpu = alpha_env_get_cpu(env);
->> -    CPUState *cs = CPU(cpu);
->> +    CPUAlphaState *env = cpu->env_ptr;
-> 
-> I'd keep the original variable names, i.e. cs for CPUState in this case,
-> just like you did for a64:
-> 
->> -void gen_intermediate_code_a64(ARMCPU *cpu, TranslationBlock *tb)
->> +void gen_intermediate_code_a64(CPUState *cs, TranslationBlock *tb)
->>   {
->> -    CPUState *cs = CPU(cpu);
->> -    CPUARMState *env = &cpu->env;
->> +    CPUARMState *env = cs->env_ptr;
->> +    ARMCPU *cpu = arm_env_get_cpu(env);
-> 
-> This will keep the diff size to a minimum.
+From: "Emilio G. Cota" <cota@braap.org>
 
-I asked for the same thing many revisions ago.
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+Message-Id: <1497639397-19453-2-git-send-email-cota@braap.org>
+Signed-off-by: Richard Henderson <rth@twiddle.net>
+---
+ include/exec/gen-icount.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-r~
+diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
+index 62d462e..547c979 100644
+--- a/include/exec/gen-icount.h
++++ b/include/exec/gen-icount.h
+@@ -44,7 +44,7 @@ static inline void gen_tb_start(TranslationBlock *tb)
+     tcg_temp_free_i32(count);
+ }
+ 
+-static void gen_tb_end(TranslationBlock *tb, int num_insns)
++static inline void gen_tb_end(TranslationBlock *tb, int num_insns)
+ {
+     if (tb->cflags & CF_USE_ICOUNT) {
+         /* Update the num_insn immediate parameter now that we know
+-- 
+2.9.4
