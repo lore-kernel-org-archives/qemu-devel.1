@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37758)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dQyrX-0002kC-Ty
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 12:33:44 -0400
+	(envelope-from <david@redhat.com>) id 1dQz4r-0006rT-Jl
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 12:47:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dQyrT-0007Zj-0l
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 12:33:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60412)
+	(envelope-from <david@redhat.com>) id 1dQz4n-0007ad-Lx
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 12:47:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60712)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dQyrS-0007Yw-Qo
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 12:33:38 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C0AE77F41A
-	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 16:33:37 +0000 (UTC)
-Date: Fri, 30 Jun 2017 12:33:33 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <374372131.45583910.1498840413273.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20170630160422.14842-2-maxime.coquelin@redhat.com>
-References: <20170630160422.14842-1-maxime.coquelin@redhat.com>
-	<20170630160422.14842-2-maxime.coquelin@redhat.com>
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dQz4n-0007YM-BU
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 12:47:25 -0400
+References: <1498829133-20598-1-git-send-email-mihajlov@linux.vnet.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <5566d3c2-f791-eab2-cafa-795c96739d8c@redhat.com>
+Date: Fri, 30 Jun 2017 18:47:15 +0200
 MIME-Version: 1.0
+In-Reply-To: <1498829133-20598-1-git-send-email-mihajlov@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] vhost: ensure vhost_ops are set before
- calling iotlb callback
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] s390: return unavailable features via
+ query-cpu-definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,60 +28,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: jasowang@redhat.com, qemu-devel@nongnu.org, mst@redhat.com
+To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, jjherne@linux.vnet.ibm.com, Eduardo Habkost <ehabkost@redhat.com>
 
-
-
------ Original Message -----
-> This patch fixes a crash that happens when vhost-user iommu
-> support is enabled and vhost-user socket is closed.
->=20
-> When it happens, if an IOTLB invalidation notification is sent
-> by the IOMMU, vhost_ops's NULL pointer is dereferenced.
->=20
-> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
-
-looks fine to me,
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
+On 30.06.2017 15:25, Viktor Mihajlovski wrote:
+> The response for query-cpu-definitions didn't include the
+> unavailable-features field, which is used by libvirt to figure
+> out whether a certain cpu model is usable on the host.
+> 
+> The unavailable features are now computed by obtaining the host CPU
+> model and comparing its feature bitmap with the feature bitmaps of
+> the known CPU models.
+> 
+> I.e. the output of virsh domcapabilities would change from
+>  ...
+>      <mode name='custom' supported='yes'>
+>       <model usable='unknown'>z10EC-base</model>
+>       <model usable='unknown'>z9EC-base</model>
+>       <model usable='unknown'>z196.2-base</model>
+>       <model usable='unknown'>z900-base</model>
+>       <model usable='unknown'>z990</model>
+>  ...
+> to
+>  ...
+>      <mode name='custom' supported='yes'>
+>       <model usable='yes'>z10EC-base</model>
+>       <model usable='yes'>z9EC-base</model>
+>       <model usable='no'>z196.2-base</model>
+>       <model usable='yes'>z900-base</model>
+>       <model usable='yes'>z990</model>
+>  ...
+> 
+> Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 > ---
->  hw/virtio/vhost-backend.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
-> index 4e31de1..cb055e8 100644
-> --- a/hw/virtio/vhost-backend.c
-> +++ b/hw/virtio/vhost-backend.c
-> @@ -309,7 +309,10 @@ int vhost_backend_update_device_iotlb(struct vhost_d=
-ev
-> *dev,
->          return -EINVAL;
+>  target/s390x/cpu_models.c | 51 ++++++++++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 46 insertions(+), 5 deletions(-)
+> 
+> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+> index 63903c2..dc3371f 100644
+> --- a/target/s390x/cpu_models.c
+> +++ b/target/s390x/cpu_models.c
+> @@ -283,14 +283,43 @@ void s390_cpu_list(FILE *f, fprintf_function print)
 >      }
-> =20
-> -    return dev->vhost_ops->vhost_send_device_iotlb_msg(dev, &imsg);
-> +    if (dev->vhost_ops && dev->vhost_ops->vhost_send_device_iotlb_msg)
-> +        return dev->vhost_ops->vhost_send_device_iotlb_msg(dev, &imsg);
-> +
-> +    return -ENODEV;
 >  }
-> =20
->  int vhost_backend_invalidate_device_iotlb(struct vhost_dev *dev,
-> @@ -321,7 +324,10 @@ int vhost_backend_invalidate_device_iotlb(struct
-> vhost_dev *dev,
->      imsg.size =3D len;
->      imsg.type =3D VHOST_IOTLB_INVALIDATE;
-> =20
-> -    return dev->vhost_ops->vhost_send_device_iotlb_msg(dev, &imsg);
-> +    if (dev->vhost_ops && dev->vhost_ops->vhost_send_device_iotlb_msg)
-> +        return dev->vhost_ops->vhost_send_device_iotlb_msg(dev, &imsg);
+>  
+> +static S390CPUModel *get_max_cpu_model(Error **errp);
 > +
-> +    return -ENODEV;
->  }
-> =20
->  int vhost_backend_handle_iotlb_msg(struct vhost_dev *dev,
-> --
-> 2.9.4
->=20
->=20
+>  #ifndef CONFIG_USER_ONLY
+> +static void list_add_feat(const char *name, void *opaque);
+> +
+> +static void check_unavailable_features(const S390CPUModel *max_model,
+> +                                       const S390CPUModel *model,
+> +                                       strList **unavailable)
+> +{
+> +    S390FeatBitmap missing;
+> +
+> +    /* detect missing features if any to properly report them */
+> +    bitmap_andnot(missing, model->features, max_model->features,
+> +                  S390_FEAT_MAX);
+> +    if (!bitmap_empty(missing, S390_FEAT_MAX)) {
+> +        s390_feat_bitmap_to_ascii(missing,
+> +                                  unavailable,
+> +                                  list_add_feat);
+
+I remember discussing this with Eduardo when he introduced this.
+
+There is one additional case to handle here that might turn a CPU model
+not runnable. This can happen when trying to run a new CPU model on an
+old host, where the features are not the problem, but the model itself.
+E.g. running a GA2 version on a GA1 is not allowed. But this can happen
+more generally also between hardware generations.
+
+Therefore, whenever the model is never than the host model, we have to
+add here the special property "type" as missing feature. The
+documentation partly coveres what we had in mind.
+
+qapi-schema.json:
+# @unavailable-features is a list of QOM property names that
+
+# represent CPU model attributes that prevent the CPU from running.
+
+# If the QOM property is read-only, that means there's no known
+
+# way to make the CPU model run in the current host. Implementations
+
+# that choose not to provide specific information return the
+
+# property name "type".
+
+We discussed that "type" should always be added if there is no way to
+make the model runnable (by simply removing features).
+
+See check_compatibility() for details. For these cases, add "type" to
+the list. (you might be able to extend check_compatibility(), making
+e.g. the *errp and *unavailable parameters optional).
+
+-- 
+
+Thanks,
+
+David
