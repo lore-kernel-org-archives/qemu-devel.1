@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dQuO6-0008Mf-Dt
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 07:47:03 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dQuOC-0008R4-8X
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 07:47:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dQuO5-0004yp-HV
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 07:47:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52074)
+	(envelope-from <stefanha@redhat.com>) id 1dQuOB-00052J-Gy
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 07:47:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45448)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dQuO5-0004yV-Bm
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 07:47:01 -0400
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dQuOB-00051u-Aq
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 07:47:07 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri, 30 Jun 2017 12:46:34 +0100
-Message-Id: <20170630114635.9286-7-stefanha@redhat.com>
+Date: Fri, 30 Jun 2017 12:46:35 +0100
+Message-Id: <20170630114635.9286-8-stefanha@redhat.com>
 In-Reply-To: <20170630114635.9286-1-stefanha@redhat.com>
 References: <20170630114635.9286-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 6/7] tests: fix virtio-net-test ISR dependence
+Subject: [Qemu-devel] [PULL 7/7] virtio-pci: use ioeventfd even when KVM is
+ disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,52 +25,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
-Use the new used ring APIs instead of assuming ISR being set means the
-request has completed.
+Old kvm.ko versions only supported a tiny number of ioeventfds so
+virtio-pci avoids ioeventfds when kvm_has_many_ioeventfds() returns 0.
 
+Do not check kvm_has_many_ioeventfds() when KVM is disabled since it
+always returns 0.  Since commit 8c56c1a592b5092d91da8d8943c17777d6462a6f
+("memory: emulate ioeventfd") it has been possible to use ioeventfds in
+qtest or TCG mode.
+
+This patch makes -device virtio-blk-pci,iothread=iothread0 work even
+when KVM is disabled.
+
+I have tested that virtio-blk-pci works under TCG both with and without
+iothread.
+
+This patch fixes qemu-iotests 068, which was accidentally merged early
+despite the dependency on ioeventfd.
+
+Cc: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
 Tested-by: Eric Blake <eblake@redhat.com>
 Tested-by: Kevin Wolf <kwolf@redhat.com>
-Message-id: 20170628184724.21378-6-stefanha@redhat.com
+Message-id: 20170628184724.21378-7-stefanha@redhat.com
+Message-id: 20170615163813.7255-2-stefanha@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- tests/virtio-net-test.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ hw/virtio/virtio-pci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/virtio-net-test.c b/tests/virtio-net-test.c
-index 8f94360..635b942 100644
---- a/tests/virtio-net-test.c
-+++ b/tests/virtio-net-test.c
-@@ -108,7 +108,7 @@ static void rx_test(QVirtioDevice *dev,
-     ret = iov_send(socket, iov, 2, 0, sizeof(len) + sizeof(test));
-     g_assert_cmpint(ret, ==, sizeof(test) + sizeof(len));
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 20d6a08..301920e 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -1740,7 +1740,7 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
+     bool pcie_port = pci_bus_is_express(pci_dev->bus) &&
+                      !pci_bus_is_root(pci_dev->bus);
  
--    qvirtio_wait_queue_isr(dev, vq, QVIRTIO_NET_TIMEOUT_US);
-+    qvirtio_wait_used_elem(dev, vq, free_head, QVIRTIO_NET_TIMEOUT_US);
-     memread(req_addr + VNET_HDR_SIZE, buffer, sizeof(test));
-     g_assert_cmpstr(buffer, ==, "TEST");
- 
-@@ -131,7 +131,7 @@ static void tx_test(QVirtioDevice *dev,
-     free_head = qvirtqueue_add(vq, req_addr, 64, false, false);
-     qvirtqueue_kick(dev, vq, free_head);
- 
--    qvirtio_wait_queue_isr(dev, vq, QVIRTIO_NET_TIMEOUT_US);
-+    qvirtio_wait_used_elem(dev, vq, free_head, QVIRTIO_NET_TIMEOUT_US);
-     guest_free(alloc, req_addr);
- 
-     ret = qemu_recv(socket, &len, sizeof(len), 0);
-@@ -182,7 +182,7 @@ static void rx_stop_cont_test(QVirtioDevice *dev,
-     rsp = qmp("{ 'execute' : 'cont'}");
-     QDECREF(rsp);
- 
--    qvirtio_wait_queue_isr(dev, vq, QVIRTIO_NET_TIMEOUT_US);
-+    qvirtio_wait_used_elem(dev, vq, free_head, QVIRTIO_NET_TIMEOUT_US);
-     memread(req_addr + VNET_HDR_SIZE, buffer, sizeof(test));
-     g_assert_cmpstr(buffer, ==, "TEST");
+-    if (!kvm_has_many_ioeventfds()) {
++    if (kvm_enabled() && !kvm_has_many_ioeventfds()) {
+         proxy->flags &= ~VIRTIO_PCI_FLAG_USE_IOEVENTFD;
+     }
  
 -- 
 2.9.4
