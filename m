@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dQlab-00042g-2w
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 22:23:22 -0400
+	(envelope-from <laine@redhat.com>) id 1dQleS-0005ln-Om
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 22:27:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dQlaZ-0002Pj-TS
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 22:23:21 -0400
-References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
-	<20170628120530.31251-20-vsementsov@virtuozzo.com>
-	<f92fea0e-fe66-6888-dcd2-10782aec4fd2@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <b084acc4-a9d6-ecf5-e8f1-beb7c3a80072@redhat.com>
-Date: Fri, 30 Jun 2017 04:23:02 +0200
+	(envelope-from <laine@redhat.com>) id 1dQleN-0005V8-PJ
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 22:27:20 -0400
+References: <1498695900-1648-1-git-send-email-mdroth@linux.vnet.ibm.com>
+	<804c9b1a-6803-e920-9d3d-60fc33dd2fea@redhat.com>
+	<20170629134418.7b1faea4@w520.home>
+From: Laine Stump <laine@redhat.com>
+Message-ID: <735cb80b-4bdb-ba0c-3322-e3c1d2e3feb8@redhat.com>
+Date: Thu, 29 Jun 2017 22:27:08 -0400
 MIME-Version: 1.0
-In-Reply-To: <f92fea0e-fe66-6888-dcd2-10782aec4fd2@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="uTtwWwahwVbbr1i9OVuSdLs6p57CdggEp"
-Subject: Re: [Qemu-devel] [PATCH v22 19/30] qcow2: add persistent dirty
- bitmaps support
+In-Reply-To: <20170629134418.7b1faea4@w520.home>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 0/5] hotplug: fix premature rebinding
+ of VFIO devices to host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,154 +26,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: libvir-list@redhat.com
+Cc: Alex Williamson <alex.williamson@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, aik@ozlabs.ru, abologna@redhat.com, pkrempa@redhat.com, berrange@redhat.com, mprivozn@redhat.com, sbhat@linux.vnet.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---uTtwWwahwVbbr1i9OVuSdLs6p57CdggEp
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, jsnow@redhat.com, famz@redhat.com,
- den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
-Message-ID: <b084acc4-a9d6-ecf5-e8f1-beb7c3a80072@redhat.com>
-Subject: Re: [PATCH v22 19/30] qcow2: add persistent dirty bitmaps support
-References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
- <20170628120530.31251-20-vsementsov@virtuozzo.com>
- <f92fea0e-fe66-6888-dcd2-10782aec4fd2@redhat.com>
-In-Reply-To: <f92fea0e-fe66-6888-dcd2-10782aec4fd2@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2017-06-30 04:18, Eric Blake wrote:
-> On 06/28/2017 07:05 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Store persistent dirty bitmaps in qcow2 image.
+On 06/29/2017 03:44 PM, Alex Williamson wrote:
+> On Thu, 29 Jun 2017 14:50:15 -0400
+> Laine Stump <laine@redhat.com> wrote:
+> 
+>> On 06/28/2017 08:24 PM, Michael Roth wrote:
+>>> Hi everyone. Hoping to get some feedback on this approach, or some
+>>> alternatives proposed below, to the following issue:
+>>>
+>>> Currently libvirt immediately attempts to rebind a managed device back to the
+>>> host driver when it receives a DEVICE_DELETED event from QEMU. This is
+>>> problematic for 2 reasons:
+>>>
+>>> 1) If multiple devices from a group are attached to a guest, this can move
+>>>    the group into a "non-viable" state where some devices are assigned to
+>>>    the host and some to the guest.  
 >>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>=
+>> Since we don't support hotplug with managed='yes' of individual (or
+>> multiple) functions of a multifunction host device, I don't know that
+>> it's very useful to support hot *un*plug of it - it would only be useful
+>> if the multi-function device were present in the guest when it was
+>> started, and then was hot-unplugged later. And this is all a lot of
+>> extra complexity, though, so it would be useful to know what are the
+>> scenarios where it would actually be used (i.e. is this a legitimate
+>> need, or just an interesting exercise?)
+> 
+> This doesn't make sense to me, since when do we not support hotplug
+> with managed='yes' and how is it prevented?
 
->> Reviewed-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  block/qcow2-bitmap.c | 475 ++++++++++++++++++++++++++++++++++++++++++=
-+++++++++
->>  block/qcow2.c        |   9 +
->>  block/qcow2.h        |   1 +
->>  3 files changed, 485 insertions(+)
+Wait a minute. I wasn't thinking straight, got sidetracked into a
+different problem, and completely screwed up what I was trying to say.
+
+So basically forget everything in that paragraph :-/
+
+What I started out to say was simply that we didn't support
+managed='yes' hotplugging of a single device that's in an iommu group
+containing multiple devices (and that led me to wander into the topic of
+multifunction devices, which as you say is really unrelated). We don't
+do anything specifically to prevent it, but as you say, it will fail
+when it gets to qemu.
+
+At one time someone talked about having libvirt automatically detach the
+other devices in the same group at times like this, but that was
+rightfully detected as ridiculous (it may have been me talking to
+myself, and I realized the stupidity of the idea before I managed to
+repeat it to anyone else).
+
+>  Also, let's just not talk
+> about multifunction, a multifunction device does not imply a shared
+> group, nor does a shared group imply multifunction. 
+
+Yeah, that was me being distracted while thinking about the situation
+and mistakenly conflating two different problems.
+
+> So is it hotplug
+> of a device which is in a shared group that is not supported, and if so
+> how?
+
+"not supported" != "actively prevented", it just means "there's no way
+to successfully do that"
+
+>  I think libvirt tries to do the hot-add, but it hits the
+> non-viable group when it gives it to QEMU.
+
+Correct.
+
+
+> On hot-remove, I'm pretty
+> sure libvirt just lets the host crash into the ground by re-binding the
+> device to the host driver.
+
+I haven't tried, but you're likely right.
+
+>  If we don't want to support it, that's one
+> thing, but the current model is more just neglectful than unsupported.
+
+Semantics. Potato, Potahto. The end result is "it doesn't work". If
+we're going to try to fix one, we should try to fix the other too.
+
+> 
+> 
+>>> 2) When QEMU emits the DEVICE_DELETED event, there's still a "finalize" phase
+>>>    where additional cleanup occurs. In most cases libvirt can ignore this
+>>>    cleanup, but in the case of VFIO devices this is where closing of a VFIO
+>>>    group FD occurs, and failing to wait before rebinding the device to the
+>>>    host driver can result in unexpected behavior. In the case of powernv
+>>>    hosts at least, this can lead to a host driver crashing due to the default
+>>>    DMA windows not having been fully-restored yet. The window between this is
+>>>    and the initial DEVICE_DELETED seems to be ~6 seconds in practice. We've
+>>>    seen host dumps with Mellanox CX4 VFs being rebound to host driver during
+>>>    this period (on powernv hosts).  
 >>
->=20
->> +
->> +/* store_bitmap_data()
->> + * Store bitmap to image, filling bitmap table accordingly.
->> + */
->> +static uint64_t *store_bitmap_data(BlockDriverState *bs,
->> +                                   BdrvDirtyBitmap *bitmap,
->> +                                   uint32_t *bitmap_table_size, Error=
- **errp)
->> +{
->> +    int ret;
->> +    BDRVQcow2State *s =3D bs->opaque;
->> +    int64_t sector;
->> +    uint64_t sbc;
->> +    uint64_t bm_size =3D bdrv_dirty_bitmap_size(bitmap);
->=20
-> This grabs the size (currently in sectors, although I plan to fix it to=
+>> I agree with Dan that the situation described here should be considered
+>> a qemu bug - according to my understanding (from back at the time
+>> DEVICE_DELETED was added to qemu (I think at libvirt's request) qemu
+>> should never emit the DEVICE_DELETED event until *everything* related to
+>> the device is finished - that was the whole point of adding the event in
+>> the first palce. Covering up this bug with a bunch of extra libvirt
+>> complexity is just creating the potential for even more bugs in the more
+>> complex code.
+> 
+> Agree, but ISTR not everyone thinks that way.  I don't remember the
+> opposing viewpoint though.
 
-> be in bytes)...
->=20
->> +    const char *bm_name =3D bdrv_dirty_bitmap_name(bitmap);
->> +    uint8_t *buf =3D NULL;
->> +    BdrvDirtyBitmapIter *dbi;
->> +    uint64_t *tb;
->> +    uint64_t tb_size =3D
->> +            size_to_clusters(s,
->> +                bdrv_dirty_bitmap_serialization_size(bitmap, 0, bm_si=
-ze));
->=20
-> ...then finds out how many bytes are required to serialize the entire
-> image, where bm_size should be the same as before...
->=20
->> +    while ((sector =3D bdrv_dirty_iter_next(dbi)) !=3D -1) {
->> +        uint64_t cluster =3D sector / sbc;
->> +        uint64_t end, write_size;
->> +        int64_t off;
->> +
->> +        sector =3D cluster * sbc;
->> +        end =3D MIN(bm_size, sector + sbc);
->> +        write_size =3D
->> +            bdrv_dirty_bitmap_serialization_size(bitmap, sector, end =
-- sector);
->=20
-> But here, rather than tackling the entire image at once, you are
-> subdividing your queries along arbitrary lines. But nowhere do I see a
-> call to bdrv_dirty_bitmap_serialization_align() to make sure your
-> end-sector value is properly aligned; if it is not aligned, you will
-> trigger an assertion failure here...
-
-It's 4:21 am here, so I cannot claim to be right, but if I remember
-correctly, it will automatically aligned because sbc is the number of
-bits (and thus sectors) a bitmap cluster covers.
-
->=20
->> +        assert(write_size <=3D s->cluster_size);
->> +
->> +        off =3D qcow2_alloc_clusters(bs, s->cluster_size);
->> +        if (off < 0) {
->> +            error_setg_errno(errp, -off,
->> +                             "Failed to allocate clusters for bitmap =
-'%s'",
->> +                             bm_name);
->> +            goto fail;
->> +        }
->> +        tb[cluster] =3D off;
->> +
->> +        bdrv_dirty_bitmap_serialize_part(bitmap, buf, sector, end - s=
-ector);
->=20
-> ...and again here, during serialization_chunk().
->=20
-> I don't know if that means you need a v23 series, or if we can just
-> patch it in as a followup (perhaps by having me add the usage during my=
-
-> byte-based dirty-bitmap series).  I guess it depends on whether we can
-> come up with any bitmap granularity (between 512 bytes and 2M is all th=
-e
-> more we are currently supporting, right?) that differs from the qcow2
-> cluster granularity in a manner that iteration by qcow2 clusters is no
-> longer guaranteed to be bitmap-granularity aligned, and thus trigger an=
-
-> assertion failure on your code as-is.
->=20
-> I also think it's pretty gross to be calculating the iteration bounds b=
-y
-> sectors rather than bytes, when we are really worried about clusters
-> (it's easier to track just bytes/clusters than it is to track
-> bytes/sectors/clusters) - but that one is more along the lines of the
-> sector-to-byte conversions I've been tackling, so I won't insist on you=
-
-> changing it if there is no other reason for a v23.
-
-I'm for fixing it later. I would have announced the series "applied" an
-hour ago if I hadn't had to bisect iotest 055 breakage...
-
-Max
-
-
---uTtwWwahwVbbr1i9OVuSdLs6p57CdggEp
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEvBAEBCAAZBQJZVbYGEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQK4m
-B/4mK1g7PvjhL0dlkfzZK6OrWYgh4DIyuxkHNqxPqvHV2DjV+7paivAZY9aI4uG9
-uhGBTerxQJeOJESPMJOVWZbksALkegN8AbPe/U5jkZSxalmUxUdpGFaefWL5Baf5
-JGBNqUY1xNoVkKTZY1GLKFnqx0RRbOqTqsMqFNVLPrfiiT6+0DeP1HSIpNlY2h3V
-yR/30q+7v26pxYdC+jJi3f6y4qdmMhG6T4xzyTyBdgL7saxDKyy9J9DrI0xkl9XW
-lWWZqtg9XnDlbbAyali9qrWnGqlZXkficFKofLYk2QEYQRJbdNLftsq+YVUtghxP
-CSuL2S5p6j9mVFQJ4We131K2
-=dGDn
------END PGP SIGNATURE-----
-
---uTtwWwahwVbbr1i9OVuSdLs6p57CdggEp--
+Possible. I only retain about 1% of what goes by the screen, and even
+most of that is gone within 6 months. I thought I recalled that there
+was no DEVICE_DELETED event before libvirt requested it, so it would
+make sense for it to behave according to what libvirt needs (assuming
+nobody else is using it). That may be a narcissistic and incorrect view
+though.
