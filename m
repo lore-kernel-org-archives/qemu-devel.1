@@ -1,15 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49327)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew@aj.id.au>) id 1dQmBO-0002ok-36
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 23:01:23 -0400
+	(envelope-from <peterx@redhat.com>) id 1dQmDQ-0003pC-GP
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 23:03:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew@aj.id.au>) id 1dQmBM-0007Zy-MC
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 23:01:22 -0400
-From: Andrew Jeffery <andrew@aj.id.au>
-Date: Fri, 30 Jun 2017 12:30:58 +0930
-Message-Id: <20170630030058.28943-1-andrew@aj.id.au>
-Subject: [Qemu-devel] [RFC PATCH 1/1] memory: Support unaligned accesses on
- aligned-only models
+	(envelope-from <peterx@redhat.com>) id 1dQmDP-0000VS-80
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 23:03:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44308)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dQmDP-0000U6-1o
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 23:03:27 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5AA9581222
+	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 03:03:25 +0000 (UTC)
+Date: Fri, 30 Jun 2017 11:03:21 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170630030321.GA24859@pxdev.xzpeter.org>
+References: <1498536619-14548-1-git-send-email-peterx@redhat.com>
+	<1498536619-14548-5-git-send-email-peterx@redhat.com>
+	<139475df-a7d8-80c6-ce21-a9a896e642ff@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <139475df-a7d8-80c6-ce21-a9a896e642ff@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 04/10] migration: let MigrationState be
+ a qdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,268 +35,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org, joel@jms.id.au, clg@kaod.org, f4bug@amsat.org, pbonzini@redhat.com
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
----
-Hello,
+On Fri, Jun 30, 2017 at 04:18:56AM +0200, Max Reitz wrote:
+> On 2017-06-27 06:10, Peter Xu wrote:
+> > Let the old man "MigrationState" join the object family. Direct benefit
+> > is that we can start to use all the property features derived from
+> > current QDev, like: HW_COMPAT_* bits, command line setup for migration
+> > parameters (so will never need to set them up each time using HMP/QMP,
+> > this is really, really attractive for test writters), etc.
+> > 
+> > I see no reason to disallow this happen yet. So let's start from this
+> > one, to see whether it would be anything good.
+> > 
+> > Now we init the MigrationState struct statically in main() to make sure
+> > it's initialized after global properties are applied, since we'll use
+> > them during creation of the object.
+> > 
+> > No functional change at all.
+> 
+> Evidently not quite right because this breaks iotest 055.
+> 
+> Condensed test case:
+> 
+> $ ./qemu-img create -f vmdk -o subformat=streamOptimized foo.vmdk 64M
+> Formatting 'foo.vmdk', fmt=vmdk size=67108864 compat6=off
+> hwversion=undefined subformat=streamOptimized
+> $ x86_64-softmmu/qemu-system-x86_64 -drive if=none,file=foo.vmdk
+> qemu-system-x86_64: ./migration/migration.c:114: migrate_get_current:
+> Assertion `current_migration' failed.
+> [1]    15453 abort (core dumped)  x86_64-softmmu/qemu-system-x86_64
+> -drive if=none,file=foo.vmdk
+> 
+> (It just worked before this patch.)
 
-This RFC patch stems from a discussion on a patch for an ADC model[1] where it
-was pointed out that I should be able to use the .impl member of
-MemoryRegionOps to constrain how my read() and write() callbacks where invoked.
+Sorry. Will have a look.
 
-I tried Phil's suggested approach and found I got reads of size 4, but with an
-address that was not 4-byte aligned.
-
-Looking at the source for access_with_adjusted_size() lead to the comment
-
-     /* FIXME: support unaligned access? */
-
-which at least suggests that the implementation isn't complete.
-
-So, this patch is a quick and incomplete attempt at resolving the issue to see
-whether I'm on the right track or way off in the weeds.
-
-I've lightly tested it with the ADC model mentioned above, and it appears to do
-the right thing (I changed the values generated by the ADC to distinguish
-between the lower and upper 16 bits).
-
-Things the patch is not:
-
-1. Capable of handling unaligned writes
-2. Tested on big-endian models
-
-If the general idea of the patch is reasonable I'll look to resolve the above
-to points.
-
-Cheers,
-
-Andrew
-
-[1] http://lists.nongnu.org/archive/html/qemu-arm/2017-05/msg00400.html
- memory.c | 144 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 137 insertions(+), 7 deletions(-)
-
-diff --git a/memory.c b/memory.c
-index 0ddc4cc28deb..b9fae8d382bc 100644
---- a/memory.c
-+++ b/memory.c
-@@ -432,6 +432,7 @@ static MemTxResult  memory_region_read_accessor(MemoryRegion *mr,
- {
-     uint64_t tmp;
- 
-+
-     tmp = mr->ops->read(mr->opaque, addr, size);
-     if (mr->subpage) {
-         trace_memory_region_subpage_read(get_cpu_index(), mr, addr, tmp, size);
-@@ -552,7 +553,7 @@ static MemTxResult memory_region_write_with_attrs_accessor(MemoryRegion *mr,
-     return mr->ops->write_with_attrs(mr->opaque, addr, tmp, size, attrs);
- }
- 
--static MemTxResult access_with_adjusted_size(hwaddr addr,
-+static MemTxResult access_with_adjusted_size_aligned(hwaddr addr,
-                                       uint64_t *value,
-                                       unsigned size,
-                                       unsigned access_size_min,
-@@ -567,10 +568,11 @@ static MemTxResult access_with_adjusted_size(hwaddr addr,
-                                       MemoryRegion *mr,
-                                       MemTxAttrs attrs)
- {
-+
-+    MemTxResult r = MEMTX_OK;
-     uint64_t access_mask;
-     unsigned access_size;
-     unsigned i;
--    MemTxResult r = MEMTX_OK;
- 
-     if (!access_size_min) {
-         access_size_min = 1;
-@@ -579,7 +581,6 @@ static MemTxResult access_with_adjusted_size(hwaddr addr,
-         access_size_max = 4;
-     }
- 
--    /* FIXME: support unaligned access? */
-     access_size = MAX(MIN(size, access_size_max), access_size_min);
-     access_mask = -1ULL >> (64 - access_size * 8);
-     if (memory_region_big_endian(mr)) {
-@@ -596,6 +597,133 @@ static MemTxResult access_with_adjusted_size(hwaddr addr,
-     return r;
- }
- 
-+/* Assume power-of-two size */
-+#define align_down(addr, size) ((addr) & ~((size) - 1))
-+#define align_up(addr, size) \
-+    ({ typeof(size) __size = size; align_down((addr) + (__size) - 1, (__size)); })
-+
-+static MemTxResult access_with_adjusted_size_unaligned(hwaddr addr,
-+                                      uint64_t *value,
-+                                      unsigned size,
-+                                      unsigned access_size_min,
-+                                      unsigned access_size_max,
-+                                      bool unaligned,
-+                                      MemTxResult (*access)(MemoryRegion *mr,
-+                                                            hwaddr addr,
-+                                                            uint64_t *value,
-+                                                            unsigned size,
-+                                                            unsigned shift,
-+                                                            uint64_t mask,
-+                                                            MemTxAttrs attrs),
-+                                      MemoryRegion *mr,
-+                                      MemTxAttrs attrs)
-+{
-+    uint64_t access_value = 0;
-+    MemTxResult r = MEMTX_OK;
-+    hwaddr access_addr[2];
-+    uint64_t access_mask;
-+    unsigned access_size;
-+
-+    if (unlikely(!access_size_min)) {
-+        access_size_min = 1;
-+    }
-+    if (unlikely(!access_size_max)) {
-+        access_size_max = 4;
-+    }
-+
-+    access_size = MAX(MIN(size, access_size_max), access_size_min);
-+    access_addr[0] = align_down(addr, access_size);
-+    access_addr[1] = align_up(addr + size, access_size);
-+
-+    if (memory_region_big_endian(mr)) {
-+        hwaddr cur;
-+
-+        /* XXX: Big-endian path is untested...  */
-+
-+        for (cur = access_addr[0]; cur < access_addr[1]; cur += access_size) {
-+            uint64_t mask_bounds[2];
-+
-+            mask_bounds[0] = MAX(addr, cur) - cur;
-+            mask_bounds[1] =
-+                MIN(addr + size, align_up(cur + 1, access_size)) - cur;
-+
-+            access_mask = (-1ULL << mask_bounds[0] * 8) &
-+                (-1ULL >> (64 - mask_bounds[1] * 8));
-+
-+            r |= access(mr, cur, &access_value, access_size,
-+                  (size - access_size - (MAX(addr, cur) - addr)),
-+                  access_mask, attrs);
-+
-+            /* XXX: Can't do this hack for writes */
-+            access_value >>= mask_bounds[0] * 8;
-+        }
-+    } else {
-+        hwaddr cur;
-+
-+        for (cur = access_addr[0]; cur < access_addr[1]; cur += access_size) {
-+            uint64_t mask_bounds[2];
-+
-+            mask_bounds[0] = MAX(addr, cur) - cur;
-+            mask_bounds[1] =
-+                MIN(addr + size, align_up(cur + 1, access_size)) - cur;
-+
-+            access_mask = (-1ULL << mask_bounds[0] * 8) &
-+                (-1ULL >> (64 - mask_bounds[1] * 8));
-+
-+            r |= access(mr, cur, &access_value, access_size,
-+                  (MAX(addr, cur) - addr), access_mask, attrs);
-+
-+            /* XXX: Can't do this hack for writes */
-+            access_value >>= mask_bounds[0] * 8;
-+        }
-+    }
-+
-+    *value = access_value;
-+
-+    return r;
-+}
-+
-+static inline MemTxResult access_with_adjusted_size(hwaddr addr,
-+                                      uint64_t *value,
-+                                      unsigned size,
-+                                      unsigned access_size_min,
-+                                      unsigned access_size_max,
-+                                      bool unaligned,
-+                                      MemTxResult (*access)(MemoryRegion *mr,
-+                                                            hwaddr addr,
-+                                                            uint64_t *value,
-+                                                            unsigned size,
-+                                                            unsigned shift,
-+                                                            uint64_t mask,
-+                                                            MemTxAttrs attrs),
-+                                      MemoryRegion *mr,
-+                                      MemTxAttrs attrs)
-+{
-+    unsigned access_size;
-+
-+    if (!access_size_min) {
-+        access_size_min = 1;
-+    }
-+    if (!access_size_max) {
-+        access_size_max = 4;
-+    }
-+
-+    access_size = MAX(MIN(size, access_size_max), access_size_min);
-+
-+    /* Handle unaligned accesses if the model only supports natural alignment */
-+    if (unlikely((addr & (access_size - 1)) && !unaligned)) {
-+        return access_with_adjusted_size_unaligned(addr, value, size,
-+                access_size_min, access_size_max, unaligned, access, mr, attrs);
-+    }
-+
-+    /*
-+     * Otherwise, if the access is aligned or the model specifies it can handle
-+     * unaligned accesses, use the 'aligned' handler
-+     */
-+    return access_with_adjusted_size_aligned(addr, value, size,
-+            access_size_min, access_size_max, access, mr, attrs);
-+}
-+
- static AddressSpace *memory_region_to_address_space(MemoryRegion *mr)
- {
-     AddressSpace *as;
-@@ -1238,16 +1366,18 @@ static MemTxResult memory_region_dispatch_read1(MemoryRegion *mr,
-         return access_with_adjusted_size(addr, pval, size,
-                                          mr->ops->impl.min_access_size,
-                                          mr->ops->impl.max_access_size,
-+                                         mr->ops->impl.unaligned,
-                                          memory_region_read_accessor,
-                                          mr, attrs);
-     } else if (mr->ops->read_with_attrs) {
-         return access_with_adjusted_size(addr, pval, size,
-                                          mr->ops->impl.min_access_size,
-                                          mr->ops->impl.max_access_size,
-+                                         mr->ops->impl.unaligned,
-                                          memory_region_read_with_attrs_accessor,
-                                          mr, attrs);
-     } else {
--        return access_with_adjusted_size(addr, pval, size, 1, 4,
-+        return access_with_adjusted_size(addr, pval, size, 1, 4, true,
-                                          memory_region_oldmmio_read_accessor,
-                                          mr, attrs);
-     }
-@@ -1316,20 +1446,20 @@ MemTxResult memory_region_dispatch_write(MemoryRegion *mr,
-     }
- 
-     if (mr->ops->write) {
--        return access_with_adjusted_size(addr, &data, size,
-+        return access_with_adjusted_size_aligned(addr, &data, size,
-                                          mr->ops->impl.min_access_size,
-                                          mr->ops->impl.max_access_size,
-                                          memory_region_write_accessor, mr,
-                                          attrs);
-     } else if (mr->ops->write_with_attrs) {
-         return
--            access_with_adjusted_size(addr, &data, size,
-+            access_with_adjusted_size_aligned(addr, &data, size,
-                                       mr->ops->impl.min_access_size,
-                                       mr->ops->impl.max_access_size,
-                                       memory_region_write_with_attrs_accessor,
-                                       mr, attrs);
-     } else {
--        return access_with_adjusted_size(addr, &data, size, 1, 4,
-+        return access_with_adjusted_size_aligned(addr, &data, size, 1, 4,
-                                          memory_region_oldmmio_write_accessor,
-                                          mr, attrs);
-     }
 -- 
-2.11.0
+Peter Xu
