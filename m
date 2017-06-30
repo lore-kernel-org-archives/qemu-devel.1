@@ -1,22 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dQmAD-00028M-IE
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 23:00:10 -0400
+	(envelope-from <andrew@aj.id.au>) id 1dQmBO-0002ok-36
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 23:01:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dQmAC-0006cD-IW
-	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 23:00:09 -0400
-References: <20170616135847.17726-1-mreitz@redhat.com>
-	<0bed1851-9298-0ba5-0604-9686ca5cf569@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <ac1c3cbf-e238-aa84-fffd-0acf68c1f51e@redhat.com>
-Date: Fri, 30 Jun 2017 04:59:56 +0200
-MIME-Version: 1.0
-In-Reply-To: <0bed1851-9298-0ba5-0604-9686ca5cf569@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="oJecBx5ueCiv7Q3s2qFLvSlnhN5LarMSf"
-Subject: Re: [Qemu-devel] [PATCH] iotests: Add test for failing qemu-img
- commit
+	(envelope-from <andrew@aj.id.au>) id 1dQmBM-0007Zy-MC
+	for qemu-devel@nongnu.org; Thu, 29 Jun 2017 23:01:22 -0400
+From: Andrew Jeffery <andrew@aj.id.au>
+Date: Fri, 30 Jun 2017 12:30:58 +0930
+Message-Id: <20170630030058.28943-1-andrew@aj.id.au>
+Subject: [Qemu-devel] [RFC PATCH 1/1] memory: Support unaligned accesses on
+ aligned-only models
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,119 +18,268 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org, joel@jms.id.au, clg@kaod.org, f4bug@amsat.org, pbonzini@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---oJecBx5ueCiv7Q3s2qFLvSlnhN5LarMSf
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <ac1c3cbf-e238-aa84-fffd-0acf68c1f51e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] iotests: Add test for failing qemu-img
- commit
-References: <20170616135847.17726-1-mreitz@redhat.com>
- <0bed1851-9298-0ba5-0604-9686ca5cf569@redhat.com>
-In-Reply-To: <0bed1851-9298-0ba5-0604-9686ca5cf569@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
+---
+Hello,
 
-On 2017-06-27 21:52, Eric Blake wrote:
-> On 06/16/2017 08:58 AM, Max Reitz wrote:
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->> In order to pass, this depends on "fix: avoid an infinite loop or a
->> dangling pointer problem in img_commit"
->> (http://lists.nongnu.org/archive/html/qemu-block/2017-06/msg00443.html=
-)
->=20
-> Looks like that is now 4172a003
->=20
->> and on the "block: Don't compare strings in bdrv_reopen_prepare()"
->> series
->> (http://lists.nongnu.org/archive/html/qemu-block/2017-06/msg00424.html=
-).
->=20
-> Still pending.
+This RFC patch stems from a discussion on a patch for an ADC model[1] where it
+was pointed out that I should be able to use the .impl member of
+MemoryRegionOps to constrain how my read() and write() callbacks where invoked.
 
-By the way, yes, it's still pending because I got stopped in the middle
-of writing the QObject test case and now a bit of other stuff came up
-this week... I haven't forgotten, but let's see whether I get to finish
-it later today.
+I tried Phil's suggested approach and found I got reads of size 4, but with an
+address that was not 4-byte aligned.
 
->> ---
->>  tests/qemu-iotests/020     | 27 +++++++++++++++++++++++++++
->>  tests/qemu-iotests/020.out | 17 +++++++++++++++++
->>  2 files changed, 44 insertions(+)
->>
->> diff --git a/tests/qemu-iotests/020 b/tests/qemu-iotests/020
->> index 7a11110..83d5ef0 100755
->> --- a/tests/qemu-iotests/020
->> +++ b/tests/qemu-iotests/020
->> @@ -110,6 +110,33 @@ for offset in $TEST_OFFSETS; do
->>      io_zero readv $(( offset + 64 * 1024 + 65536 * 4 )) 65536 65536 1=
+Looking at the source for access_with_adjusted_size() lead to the comment
 
->>  done
->>  _check_test_img
->> +_cleanup
->> +TEST_IMG=3D$TEST_IMG_SAVE
->> +
->> +echo
->> +echo 'Testing failing commit'
->> +echo
->> +
->> +# Create an image with a null backing file to which committing will f=
-ail (with
->> +# ENOSPC so we can distinguish the result from some generic EIO which=
- may be
->> +# generated anywhere in the block layer)
->> +_make_test_img -b "json:{'driver': 'raw',
->> +                         'file': {
->> +                             'driver': 'blkdebug',
->> +                             'inject-error': [{
->> +                                 'event': 'write_aio',
->> +                                 'errno': 28,
->=20
-> Still nasty that we encoded an errno value rather than using a
-> stringified enum, but that's not your problem.
->=20
->> +                                 'once': true
->> +                             }],
->> +                             'image': {
->> +                                 'driver': 'null-co'
->> +                             }}}"
->=20
-> The comment does wonders for explaining how it all works!
->=20
->> +
->> +# Just write anything so comitting will not be a no-op
->=20
-> s/comitting/committing/
->=20
-> With the typo fix,
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+     /* FIXME: support unaligned access? */
 
-Thanks, as always!
+which at least suggests that the implementation isn't complete.
 
-Max
+So, this patch is a quick and incomplete attempt at resolving the issue to see
+whether I'm on the right track or way off in the weeds.
 
+I've lightly tested it with the ADC model mentioned above, and it appears to do
+the right thing (I changed the values generated by the ADC to distinguish
+between the lower and upper 16 bits).
 
---oJecBx5ueCiv7Q3s2qFLvSlnhN5LarMSf
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Things the patch is not:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+1. Capable of handling unaligned writes
+2. Tested on big-endian models
 
-iQEvBAEBCAAZBQJZVb6tEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQDWp
-CACqv1PehCcHHHa7/418oOu7vD28P/3gjv4MMytSNI4vBZAbGrDoq0lX0l220o7V
-tCrsE21q1ZUeitNJLfA4nxfdR1Ca/kKAHaq3rPLuAWs0pTF4kyMf/ErLH9f+9ocT
-ud3dfsigP/pw9zMDGoT5bllElxQVOVAMNMWFcg+mitTXu453eUZJLpPyaeT9xAiI
-UOI3jFLQTOp8k3ZTyziQ3dY8FcyUcvLPCdwpK1tOvm/9L4188pR1DEl9cTjXDPKn
-X84hxRYgJI77OngGKk7rroVrqMcDacepBxmzDoJPoz2rAtaqum4Gag9quoKdp0BJ
-THy6pOnP9FfIVUFJaMJNjmMt
-=c8pI
------END PGP SIGNATURE-----
+If the general idea of the patch is reasonable I'll look to resolve the above
+to points.
 
---oJecBx5ueCiv7Q3s2qFLvSlnhN5LarMSf--
+Cheers,
+
+Andrew
+
+[1] http://lists.nongnu.org/archive/html/qemu-arm/2017-05/msg00400.html
+ memory.c | 144 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 137 insertions(+), 7 deletions(-)
+
+diff --git a/memory.c b/memory.c
+index 0ddc4cc28deb..b9fae8d382bc 100644
+--- a/memory.c
++++ b/memory.c
+@@ -432,6 +432,7 @@ static MemTxResult  memory_region_read_accessor(MemoryRegion *mr,
+ {
+     uint64_t tmp;
+ 
++
+     tmp = mr->ops->read(mr->opaque, addr, size);
+     if (mr->subpage) {
+         trace_memory_region_subpage_read(get_cpu_index(), mr, addr, tmp, size);
+@@ -552,7 +553,7 @@ static MemTxResult memory_region_write_with_attrs_accessor(MemoryRegion *mr,
+     return mr->ops->write_with_attrs(mr->opaque, addr, tmp, size, attrs);
+ }
+ 
+-static MemTxResult access_with_adjusted_size(hwaddr addr,
++static MemTxResult access_with_adjusted_size_aligned(hwaddr addr,
+                                       uint64_t *value,
+                                       unsigned size,
+                                       unsigned access_size_min,
+@@ -567,10 +568,11 @@ static MemTxResult access_with_adjusted_size(hwaddr addr,
+                                       MemoryRegion *mr,
+                                       MemTxAttrs attrs)
+ {
++
++    MemTxResult r = MEMTX_OK;
+     uint64_t access_mask;
+     unsigned access_size;
+     unsigned i;
+-    MemTxResult r = MEMTX_OK;
+ 
+     if (!access_size_min) {
+         access_size_min = 1;
+@@ -579,7 +581,6 @@ static MemTxResult access_with_adjusted_size(hwaddr addr,
+         access_size_max = 4;
+     }
+ 
+-    /* FIXME: support unaligned access? */
+     access_size = MAX(MIN(size, access_size_max), access_size_min);
+     access_mask = -1ULL >> (64 - access_size * 8);
+     if (memory_region_big_endian(mr)) {
+@@ -596,6 +597,133 @@ static MemTxResult access_with_adjusted_size(hwaddr addr,
+     return r;
+ }
+ 
++/* Assume power-of-two size */
++#define align_down(addr, size) ((addr) & ~((size) - 1))
++#define align_up(addr, size) \
++    ({ typeof(size) __size = size; align_down((addr) + (__size) - 1, (__size)); })
++
++static MemTxResult access_with_adjusted_size_unaligned(hwaddr addr,
++                                      uint64_t *value,
++                                      unsigned size,
++                                      unsigned access_size_min,
++                                      unsigned access_size_max,
++                                      bool unaligned,
++                                      MemTxResult (*access)(MemoryRegion *mr,
++                                                            hwaddr addr,
++                                                            uint64_t *value,
++                                                            unsigned size,
++                                                            unsigned shift,
++                                                            uint64_t mask,
++                                                            MemTxAttrs attrs),
++                                      MemoryRegion *mr,
++                                      MemTxAttrs attrs)
++{
++    uint64_t access_value = 0;
++    MemTxResult r = MEMTX_OK;
++    hwaddr access_addr[2];
++    uint64_t access_mask;
++    unsigned access_size;
++
++    if (unlikely(!access_size_min)) {
++        access_size_min = 1;
++    }
++    if (unlikely(!access_size_max)) {
++        access_size_max = 4;
++    }
++
++    access_size = MAX(MIN(size, access_size_max), access_size_min);
++    access_addr[0] = align_down(addr, access_size);
++    access_addr[1] = align_up(addr + size, access_size);
++
++    if (memory_region_big_endian(mr)) {
++        hwaddr cur;
++
++        /* XXX: Big-endian path is untested...  */
++
++        for (cur = access_addr[0]; cur < access_addr[1]; cur += access_size) {
++            uint64_t mask_bounds[2];
++
++            mask_bounds[0] = MAX(addr, cur) - cur;
++            mask_bounds[1] =
++                MIN(addr + size, align_up(cur + 1, access_size)) - cur;
++
++            access_mask = (-1ULL << mask_bounds[0] * 8) &
++                (-1ULL >> (64 - mask_bounds[1] * 8));
++
++            r |= access(mr, cur, &access_value, access_size,
++                  (size - access_size - (MAX(addr, cur) - addr)),
++                  access_mask, attrs);
++
++            /* XXX: Can't do this hack for writes */
++            access_value >>= mask_bounds[0] * 8;
++        }
++    } else {
++        hwaddr cur;
++
++        for (cur = access_addr[0]; cur < access_addr[1]; cur += access_size) {
++            uint64_t mask_bounds[2];
++
++            mask_bounds[0] = MAX(addr, cur) - cur;
++            mask_bounds[1] =
++                MIN(addr + size, align_up(cur + 1, access_size)) - cur;
++
++            access_mask = (-1ULL << mask_bounds[0] * 8) &
++                (-1ULL >> (64 - mask_bounds[1] * 8));
++
++            r |= access(mr, cur, &access_value, access_size,
++                  (MAX(addr, cur) - addr), access_mask, attrs);
++
++            /* XXX: Can't do this hack for writes */
++            access_value >>= mask_bounds[0] * 8;
++        }
++    }
++
++    *value = access_value;
++
++    return r;
++}
++
++static inline MemTxResult access_with_adjusted_size(hwaddr addr,
++                                      uint64_t *value,
++                                      unsigned size,
++                                      unsigned access_size_min,
++                                      unsigned access_size_max,
++                                      bool unaligned,
++                                      MemTxResult (*access)(MemoryRegion *mr,
++                                                            hwaddr addr,
++                                                            uint64_t *value,
++                                                            unsigned size,
++                                                            unsigned shift,
++                                                            uint64_t mask,
++                                                            MemTxAttrs attrs),
++                                      MemoryRegion *mr,
++                                      MemTxAttrs attrs)
++{
++    unsigned access_size;
++
++    if (!access_size_min) {
++        access_size_min = 1;
++    }
++    if (!access_size_max) {
++        access_size_max = 4;
++    }
++
++    access_size = MAX(MIN(size, access_size_max), access_size_min);
++
++    /* Handle unaligned accesses if the model only supports natural alignment */
++    if (unlikely((addr & (access_size - 1)) && !unaligned)) {
++        return access_with_adjusted_size_unaligned(addr, value, size,
++                access_size_min, access_size_max, unaligned, access, mr, attrs);
++    }
++
++    /*
++     * Otherwise, if the access is aligned or the model specifies it can handle
++     * unaligned accesses, use the 'aligned' handler
++     */
++    return access_with_adjusted_size_aligned(addr, value, size,
++            access_size_min, access_size_max, access, mr, attrs);
++}
++
+ static AddressSpace *memory_region_to_address_space(MemoryRegion *mr)
+ {
+     AddressSpace *as;
+@@ -1238,16 +1366,18 @@ static MemTxResult memory_region_dispatch_read1(MemoryRegion *mr,
+         return access_with_adjusted_size(addr, pval, size,
+                                          mr->ops->impl.min_access_size,
+                                          mr->ops->impl.max_access_size,
++                                         mr->ops->impl.unaligned,
+                                          memory_region_read_accessor,
+                                          mr, attrs);
+     } else if (mr->ops->read_with_attrs) {
+         return access_with_adjusted_size(addr, pval, size,
+                                          mr->ops->impl.min_access_size,
+                                          mr->ops->impl.max_access_size,
++                                         mr->ops->impl.unaligned,
+                                          memory_region_read_with_attrs_accessor,
+                                          mr, attrs);
+     } else {
+-        return access_with_adjusted_size(addr, pval, size, 1, 4,
++        return access_with_adjusted_size(addr, pval, size, 1, 4, true,
+                                          memory_region_oldmmio_read_accessor,
+                                          mr, attrs);
+     }
+@@ -1316,20 +1446,20 @@ MemTxResult memory_region_dispatch_write(MemoryRegion *mr,
+     }
+ 
+     if (mr->ops->write) {
+-        return access_with_adjusted_size(addr, &data, size,
++        return access_with_adjusted_size_aligned(addr, &data, size,
+                                          mr->ops->impl.min_access_size,
+                                          mr->ops->impl.max_access_size,
+                                          memory_region_write_accessor, mr,
+                                          attrs);
+     } else if (mr->ops->write_with_attrs) {
+         return
+-            access_with_adjusted_size(addr, &data, size,
++            access_with_adjusted_size_aligned(addr, &data, size,
+                                       mr->ops->impl.min_access_size,
+                                       mr->ops->impl.max_access_size,
+                                       memory_region_write_with_attrs_accessor,
+                                       mr, attrs);
+     } else {
+-        return access_with_adjusted_size(addr, &data, size, 1, 4,
++        return access_with_adjusted_size_aligned(addr, &data, size, 1, 4,
+                                          memory_region_oldmmio_write_accessor,
+                                          mr, attrs);
+     }
+-- 
+2.11.0
