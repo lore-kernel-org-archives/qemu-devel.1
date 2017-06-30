@@ -1,20 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dQv4h-0008Bu-7z
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 08:31:04 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dQv7d-0002YS-IT
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 08:34:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dQv4b-0005wJ-F1
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 08:31:03 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:54506)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dQv4b-0005sr-2j
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 08:30:57 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Fri, 30 Jun 2017 14:30:50 +0200
-Message-Id: <20170630123050.19834-8-laurent@vivier.eu>
-In-Reply-To: <20170630123050.19834-1-laurent@vivier.eu>
-References: <20170630123050.19834-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 7/7] target/m68k: add fmovem
+	(envelope-from <mreitz@redhat.com>) id 1dQv7a-0000Pb-EC
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 08:34:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36024)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1dQv7a-0000OF-5l
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 08:34:02 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1426AA4FB4
+	for <qemu-devel@nongnu.org>; Fri, 30 Jun 2017 12:34:01 +0000 (UTC)
+References: <1498536619-14548-1-git-send-email-peterx@redhat.com>
+	<1498536619-14548-5-git-send-email-peterx@redhat.com>
+	<139475df-a7d8-80c6-ce21-a9a896e642ff@redhat.com>
+	<20170630030321.GA24859@pxdev.xzpeter.org>
+	<20170630071123.GE24859@pxdev.xzpeter.org>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <c616d603-a744-dd6b-1f8b-91f0a7614436@redhat.com>
+Date: Fri, 30 Jun 2017 14:33:50 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170630071123.GE24859@pxdev.xzpeter.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="FXWamiapQmELaGiv9EvrdK43wiP4WPwDR"
+Subject: Re: [Qemu-devel] [PATCH v6 04/10] migration: let MigrationState be
+ a qdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,287 +38,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Message-Id: <20170628204241.32106-8-laurent@vivier.eu>
----
- target/m68k/fpu_helper.c | 120 +++++++++++++++++++++++++++++++++++++++++++++++
- target/m68k/helper.h     |   6 +++
- target/m68k/translate.c  |  93 ++++++++++++++++++++++++------------
- 3 files changed, 189 insertions(+), 30 deletions(-)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--FXWamiapQmELaGiv9EvrdK43wiP4WPwDR
+From: Max Reitz <mreitz@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
+Message-ID: <c616d603-a744-dd6b-1f8b-91f0a7614436@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 04/10] migration: let MigrationState be a
+ qdev
+References: <1498536619-14548-1-git-send-email-peterx@redhat.com>
+ <1498536619-14548-5-git-send-email-peterx@redhat.com>
+ <139475df-a7d8-80c6-ce21-a9a896e642ff@redhat.com>
+ <20170630030321.GA24859@pxdev.xzpeter.org>
+ <20170630071123.GE24859@pxdev.xzpeter.org>
+In-Reply-To: <20170630071123.GE24859@pxdev.xzpeter.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
-index 382fbc1..bdfc537 100644
---- a/target/m68k/fpu_helper.c
-+++ b/target/m68k/fpu_helper.c
-@@ -22,6 +22,7 @@
- #include "cpu.h"
- #include "exec/helper-proto.h"
- #include "exec/exec-all.h"
-+#include "exec/cpu_ldst.h"
- 
- /* Undefined offsets may be different on various FPU.
-  * On 68040 they return 0.0 (floatx80_zero)
-@@ -388,3 +389,122 @@ void HELPER(fconst)(CPUM68KState *env, FPReg *val, uint32_t offset)
- {
-     val->d = fpu_rom[offset];
- }
-+
-+typedef int (*float_access)(CPUM68KState *env, uint32_t addr, FPReg *fp,
-+                            uintptr_t ra);
-+
-+static uint32_t fmovem_predec(CPUM68KState *env, uint32_t addr, uint32_t mask,
-+                               float_access access)
-+{
-+    uintptr_t ra = GETPC();
-+    int i, size;
-+
-+    for (i = 7; i >= 0; i--, mask <<= 1) {
-+        if (mask & 0x80) {
-+            size = access(env, addr, &env->fregs[i], ra);
-+            if ((mask & 0xff) != 0x80) {
-+                addr -= size;
-+            }
-+        }
-+    }
-+
-+    return addr;
-+}
-+
-+static uint32_t fmovem_postinc(CPUM68KState *env, uint32_t addr, uint32_t mask,
-+                               float_access access)
-+{
-+    uintptr_t ra = GETPC();
-+    int i, size;
-+
-+    for (i = 0; i < 8; i++, mask <<= 1) {
-+        if (mask & 0x80) {
-+            size = access(env, addr, &env->fregs[i], ra);
-+            addr += size;
-+        }
-+    }
-+
-+    return addr;
-+}
-+
-+static int cpu_ld_floatx80_ra(CPUM68KState *env, uint32_t addr, FPReg *fp,
-+                              uintptr_t ra)
-+{
-+    uint32_t high;
-+    uint64_t low;
-+
-+    high = cpu_ldl_data_ra(env, addr, ra);
-+    low = cpu_ldq_data_ra(env, addr + 4, ra);
-+
-+    fp->l.upper = high >> 16;
-+    fp->l.lower = low;
-+
-+    return 12;
-+}
-+
-+static int cpu_st_floatx80_ra(CPUM68KState *env, uint32_t addr, FPReg *fp,
-+                               uintptr_t ra)
-+{
-+    cpu_stl_data_ra(env, addr, fp->l.upper << 16, ra);
-+    cpu_stq_data_ra(env, addr + 4, fp->l.lower, ra);
-+
-+    return 12;
-+}
-+
-+static int cpu_ld_float64_ra(CPUM68KState *env, uint32_t addr, FPReg *fp,
-+                             uintptr_t ra)
-+{
-+    uint64_t val;
-+
-+    val = cpu_ldq_data_ra(env, addr, ra);
-+    fp->d = float64_to_floatx80(*(float64 *)&val, &env->fp_status);
-+
-+    return 8;
-+}
-+
-+static int cpu_st_float64_ra(CPUM68KState *env, uint32_t addr, FPReg *fp,
-+                             uintptr_t ra)
-+{
-+    float64 val;
-+
-+    val = floatx80_to_float64(fp->d, &env->fp_status);
-+    cpu_stq_data_ra(env, addr, *(uint64_t *)&val, ra);
-+
-+    return 8;
-+}
-+
-+uint32_t HELPER(fmovemx_st_predec)(CPUM68KState *env, uint32_t addr,
-+                                   uint32_t mask)
-+{
-+    return fmovem_predec(env, addr, mask, cpu_st_floatx80_ra);
-+}
-+
-+uint32_t HELPER(fmovemx_st_postinc)(CPUM68KState *env, uint32_t addr,
-+                                    uint32_t mask)
-+{
-+    return fmovem_postinc(env, addr, mask, cpu_st_floatx80_ra);
-+}
-+
-+uint32_t HELPER(fmovemx_ld_postinc)(CPUM68KState *env, uint32_t addr,
-+                                    uint32_t mask)
-+{
-+    return fmovem_postinc(env, addr, mask, cpu_ld_floatx80_ra);
-+}
-+
-+uint32_t HELPER(fmovemd_st_predec)(CPUM68KState *env, uint32_t addr,
-+                                   uint32_t mask)
-+{
-+    return fmovem_predec(env, addr, mask, cpu_st_float64_ra);
-+}
-+
-+uint32_t HELPER(fmovemd_st_postinc)(CPUM68KState *env, uint32_t addr,
-+                                    uint32_t mask)
-+{
-+    return fmovem_postinc(env, addr, mask, cpu_st_float64_ra);
-+}
-+
-+uint32_t HELPER(fmovemd_ld_postinc)(CPUM68KState *env, uint32_t addr,
-+                                    uint32_t mask)
-+{
-+    return fmovem_postinc(env, addr, mask, cpu_ld_float64_ra);
-+}
-diff --git a/target/m68k/helper.h b/target/m68k/helper.h
-index b396899..475a1f2 100644
---- a/target/m68k/helper.h
-+++ b/target/m68k/helper.h
-@@ -54,6 +54,12 @@ DEF_HELPER_FLAGS_3(fcmp, TCG_CALL_NO_RWG, void, env, fp, fp)
- DEF_HELPER_FLAGS_2(set_fpcr, TCG_CALL_NO_RWG, void, env, i32)
- DEF_HELPER_FLAGS_2(ftst, TCG_CALL_NO_RWG, void, env, fp)
- DEF_HELPER_3(fconst, void, env, fp, i32)
-+DEF_HELPER_3(fmovemx_st_predec, i32, env, i32, i32)
-+DEF_HELPER_3(fmovemx_st_postinc, i32, env, i32, i32)
-+DEF_HELPER_3(fmovemx_ld_postinc, i32, env, i32, i32)
-+DEF_HELPER_3(fmovemd_st_predec, i32, env, i32, i32)
-+DEF_HELPER_3(fmovemd_st_postinc, i32, env, i32, i32)
-+DEF_HELPER_3(fmovemd_ld_postinc, i32, env, i32, i32)
- 
- DEF_HELPER_3(mac_move, void, env, i32, i32)
- DEF_HELPER_3(macmulf, i64, env, i32, i32)
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 89ac2c7..3a519b7 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -4505,13 +4505,72 @@ static void gen_op_fmove_fcr(CPUM68KState *env, DisasContext *s,
-     tcg_temp_free_i32(addr);
- }
- 
-+static void gen_op_fmovem(CPUM68KState *env, DisasContext *s,
-+                          uint32_t insn, uint32_t ext)
-+{
-+    int opsize;
-+    TCGv addr, tmp;
-+    int mode = (ext >> 11) & 0x3;
-+    int is_load = ((ext & 0x2000) == 0);
-+
-+    if (m68k_feature(s->env, M68K_FEATURE_FPU)) {
-+        opsize = OS_EXTENDED;
-+    } else {
-+        opsize = OS_DOUBLE;  /* FIXME */
-+    }
-+
-+    addr = gen_lea(env, s, insn, opsize);
-+    if (IS_NULL_QREG(addr)) {
-+        gen_addr_fault(s);
-+        return;
-+    }
-+
-+    tmp = tcg_temp_new();
-+    if (mode & 0x1) {
-+        /* Dynamic register list */
-+        tcg_gen_ext8u_i32(tmp, DREG(ext, 4));
-+    } else {
-+        /* Static register list */
-+        tcg_gen_movi_i32(tmp, ext & 0xff);
-+    }
-+
-+    if (!is_load && (mode & 2) == 0) {
-+        /* predecrement addressing mode
-+         * only available to store register to memory
-+         */
-+        if (opsize == OS_EXTENDED) {
-+            gen_helper_fmovemx_st_predec(tmp, cpu_env, addr, tmp);
-+        } else {
-+            gen_helper_fmovemd_st_predec(tmp, cpu_env, addr, tmp);
-+        }
-+    } else {
-+        /* postincrement addressing mode */
-+        if (opsize == OS_EXTENDED) {
-+            if (is_load) {
-+                gen_helper_fmovemx_ld_postinc(tmp, cpu_env, addr, tmp);
-+            } else {
-+                gen_helper_fmovemx_st_postinc(tmp, cpu_env, addr, tmp);
-+            }
-+        } else {
-+            if (is_load) {
-+                gen_helper_fmovemd_ld_postinc(tmp, cpu_env, addr, tmp);
-+            } else {
-+                gen_helper_fmovemd_st_postinc(tmp, cpu_env, addr, tmp);
-+            }
-+        }
-+    }
-+    if ((insn & 070) == 030 || (insn & 070) == 040) {
-+        tcg_gen_mov_i32(AREG(insn, 0), tmp);
-+    }
-+    tcg_temp_free(tmp);
-+}
-+
- /* ??? FP exceptions are not implemented.  Most exceptions are deferred until
-    immediately before the next FP instruction is executed.  */
- DISAS_INSN(fpu)
- {
-     uint16_t ext;
-     int opmode;
--    TCGv tmp32;
-     int opsize;
-     TCGv_ptr cpu_src, cpu_dest;
- 
-@@ -4548,36 +4607,10 @@ DISAS_INSN(fpu)
-         return;
-     case 6: /* fmovem */
-     case 7:
--        {
--            TCGv addr;
--            TCGv_ptr fp;
--            uint16_t mask;
--            int i;
--            if ((ext & 0x1f00) != 0x1000 || (ext & 0xff) == 0)
--                goto undef;
--            tmp32 = gen_lea(env, s, insn, OS_LONG);
--            if (IS_NULL_QREG(tmp32)) {
--                gen_addr_fault(s);
--                return;
--            }
--            addr = tcg_temp_new_i32();
--            tcg_gen_mov_i32(addr, tmp32);
--            mask = 0x80;
--            fp = tcg_temp_new_ptr();
--            for (i = 0; i < 8; i++) {
--                if (ext & mask) {
--                    tcg_gen_addi_ptr(fp, cpu_env,
--                                     offsetof(CPUM68KState, fregs[i]));
--                    gen_ldst_fp(s, OS_DOUBLE, addr, fp,
--                                (ext & (1 << 13)) ?  EA_STORE : EA_LOADS);
--                    if (ext & (mask - 1))
--                        tcg_gen_addi_i32(addr, addr, 8);
--                }
--                mask >>= 1;
--            }
--            tcg_temp_free_i32(addr);
--            tcg_temp_free_ptr(fp);
-+        if ((ext & 0x1000) == 0 && !m68k_feature(s->env, M68K_FEATURE_FPU)) {
-+            goto undef;
-         }
-+        gen_op_fmovem(env, s, insn, ext);
-         return;
-     }
-     if (ext & (1 << 14)) {
--- 
-2.9.4
+On 2017-06-30 09:11, Peter Xu wrote:
+> On Fri, Jun 30, 2017 at 11:03:21AM +0800, Peter Xu wrote:
+>> On Fri, Jun 30, 2017 at 04:18:56AM +0200, Max Reitz wrote:
+>>> On 2017-06-27 06:10, Peter Xu wrote:
+>>>> Let the old man "MigrationState" join the object family. Direct bene=
+fit
+>>>> is that we can start to use all the property features derived from
+>>>> current QDev, like: HW_COMPAT_* bits, command line setup for migrati=
+on
+>>>> parameters (so will never need to set them up each time using HMP/QM=
+P,
+>>>> this is really, really attractive for test writters), etc.
+>>>>
+>>>> I see no reason to disallow this happen yet. So let's start from thi=
+s
+>>>> one, to see whether it would be anything good.
+>>>>
+>>>> Now we init the MigrationState struct statically in main() to make s=
+ure
+>>>> it's initialized after global properties are applied, since we'll us=
+e
+>>>> them during creation of the object.
+>>>>
+>>>> No functional change at all.
+>>>
+>>> Evidently not quite right because this breaks iotest 055.
+>>>
+>>> Condensed test case:
+>>>
+>>> $ ./qemu-img create -f vmdk -o subformat=3DstreamOptimized foo.vmdk 6=
+4M
+>>> Formatting 'foo.vmdk', fmt=3Dvmdk size=3D67108864 compat6=3Doff
+>>> hwversion=3Dundefined subformat=3DstreamOptimized
+>>> $ x86_64-softmmu/qemu-system-x86_64 -drive if=3Dnone,file=3Dfoo.vmdk
+>>> qemu-system-x86_64: ./migration/migration.c:114: migrate_get_current:=
+
+>>> Assertion `current_migration' failed.
+>>> [1]    15453 abort (core dumped)  x86_64-softmmu/qemu-system-x86_64
+>>> -drive if=3Dnone,file=3Dfoo.vmdk
+>>>
+>>> (It just worked before this patch.)
+>>
+>> Sorry. Will have a look.
+>=20
+> Hello, Max,
+>=20
+> The assertion is caused by migrate_add_blocker() called before
+> initialization of migration object. I'll fix it.
+
+Thanks!
+
+> But even with a fix (so I can pass 055 now), I still cannot pass some
+> of the other tests. Errors I got:
+>=20
+>   https://pastebin.com/ACqbXAYd
+>=20
+> I am not familiar with iotests. Is above usual? Looks like it still
+> includes 3 failures, and some output mismatch.
+
+Well, not usual. But 068 just is broken on master currently (Stefan has
+sent "virtio: use ioeventfd in TCG and qtest mode" to fix it, and it's
+part of his latest pull request). The failure in test 087 is because you
+don't have aio=3Dnative enabled in your build, as the message says. :-)
+
+I'm not sure about 118. Maybe the os.chmod() doesn't work as intended on
+your machine...? Because it tries to open a read-only image as
+read/write and wants to see it fail (which it doesn't in your case).
+
+Max
+
+
+--FXWamiapQmELaGiv9EvrdK43wiP4WPwDR
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEvBAEBCAAZBQJZVkUuEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQOS7
+CACFE+ELxekVftDbKcqiFW8SqUJAbu5ubJKAphUSAlVl8XfeAWemtEyqPWHqhEl4
+RwnXL8ZakmthFc3T0XFLBfhkop+LqbRGCakSQNF7Iz3HgOJMZbRv7RzF/g6G1kjg
+7W0B3WTyZU+qmiYzeWOBvfICbh8r1Gv9ZllkSSpDe+uTuyPrcMJqw7JmlaR2oo2c
+R2IJ8xOuHf2y001G/hGM4wXjdNMaYDdlZQJ6CWmO4C3vObVgpOVU+IkfZszyZwde
+pzNGZpLvfcnlX+LDQAN4N/2SiOFOLSSh7XoK102qs+i1r10eQUP6N2NrrOV3C7Cc
+tVeEURypE0R6mmJK/wxesj0X
+=kiTJ
+-----END PGP SIGNATURE-----
+
+--FXWamiapQmELaGiv9EvrdK43wiP4WPwDR--
