@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dR1nr-0007Uv-F1
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 15:42:08 -0400
+	(envelope-from <jcody@redhat.com>) id 1dR1oQ-0007mL-6X
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 15:42:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dR1nq-0002OT-G7
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 15:42:07 -0400
-References: <20170621133023.27627-1-mreitz@redhat.com>
-	<20170621133023.27627-2-mreitz@redhat.com>
-	<748b90f3-8f89-59ea-4a65-69e938747c0b@redhat.com>
-	<6179c9e2-5486-0ff6-927d-da144c178e93@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7fa30bfe-d1b4-0aeb-b90e-ae91f9467749@redhat.com>
-Date: Fri, 30 Jun 2017 14:41:48 -0500
+	(envelope-from <jcody@redhat.com>) id 1dR1oO-0002r0-U3
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 15:42:42 -0400
+Date: Fri, 30 Jun 2017 15:42:30 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170630194230.GA4997@localhost.localdomain>
+References: <20170627192458.15519-1-eblake@redhat.com>
+	<20170627192458.15519-2-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <6179c9e2-5486-0ff6-927d-da144c178e93@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="HmLir0bd64KrquUuG51sggdsTCQBpDTkR"
-Subject: Re: [Qemu-devel] [PATCH v4 1/2] iotests: Use absolute paths for
- executables
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170627192458.15519-2-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 01/20] blockjob: Track job ratelimits
+ via bytes, not sectors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,82 +24,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, jsnow@redhat.com, Max Reitz <mreitz@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HmLir0bd64KrquUuG51sggdsTCQBpDTkR
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <7fa30bfe-d1b4-0aeb-b90e-ae91f9467749@redhat.com>
-Subject: Re: [PATCH v4 1/2] iotests: Use absolute paths for executables
-References: <20170621133023.27627-1-mreitz@redhat.com>
- <20170621133023.27627-2-mreitz@redhat.com>
- <748b90f3-8f89-59ea-4a65-69e938747c0b@redhat.com>
- <6179c9e2-5486-0ff6-927d-da144c178e93@redhat.com>
-In-Reply-To: <6179c9e2-5486-0ff6-927d-da144c178e93@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Jun 27, 2017 at 02:24:39PM -0500, Eric Blake wrote:
+> The user interface specifies job rate limits in bytes/second.
+> It's pointless to have our internal representation track things
+> in sectors/second, particularly since we want to move away from
+> sector-based interfaces.
+> 
+> Fix up a doc typo found while verifying that the ratelimit
+> code handles the scaling difference.
+> 
+> Repetition of expressions like 'n * BDRV_SECTOR_SIZE' will be
+> cleaned up later when functions are converted to iterate over
+> images by bytes rather than by sectors.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: John Snow <jsnow@redhat.com>
+> 
 
-On 06/29/2017 09:46 PM, Max Reitz wrote:
+Reviewed-by: Jeff Cody <jcody@redhat.com>
 
->>> +++ b/tests/qemu-iotests/common.config
->>> @@ -103,6 +103,12 @@ if [ -z "$QEMU_VXHS_PROG" ]; then
->>>      export QEMU_VXHS_PROG=3D"`set_prog_path qnio_server`"
->>>  fi
->>> =20
->>> +export QEMU_PROG=3D$(realpath -- "$(type -p "$QEMU_PROG")")
->>
->> ...now that you updated per my review to favor 'type' over 'which'?
->> Otherwise, the R-b stands.
->=20
-> Thanks, will fix and apply then...
->=20
-> ...and done, applied to my block branch:
->=20
-> https://github.com/XanClic/qemu/commits/block
-
-Sorry for not noticing sooner, but you'll need to replace v4 (commit
-0f0fec82 on your branch) with a fix, because now your branch does the
-following on all iotests for me:
-
-068 3s ... - output mismatch (see 068.out.bad)
---- /home/eblake/qemu/tests/qemu-iotests/068.out	2017-06-26
-22:02:56.057734882 -0500
-+++ 068.out.bad	2017-06-30 14:35:28.720241398 -0500
-@@ -1,4 +1,5 @@
- QA output created by 068
-+realpath: '': No such file or directory
-
-The culprit? $QEMU_VXHS_PROG is empty for me, which means `set_prog_path
-qnio_server` found nothing to use.  You'll have to add in a safety valve
-that only calls 'type' if operating on a non-empty path in the first plac=
-e.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---HmLir0bd64KrquUuG51sggdsTCQBpDTkR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZVql8AAoJEKeha0olJ0Nqfq0H/0Ey9AYQgezbzCPG7e3PKoW/
-9No2oQA1j2u594M8lNc9TN5q3FXrjVKsvZgDm05V4mgXTYve9aocHK/A1L2w+9EQ
-fae//vkRg61j7HuSe0Ct/CvEWPUEggQsLdwzIzVnlQfuO9eupNqlR12g0YitaKF0
-IT7oZ6xZiMCerU3mN1n3K3KmfaDMD+IBJnUK25Jg6ek4QoyELoUzisa8zkNb6eOs
-bxaLokP2EzfTM2dc87qBfCR3f/ybl7oAqRWu9UVsCI7/9ZcJZ/RIpgs9gkv7sxtD
-x/GsBvuiAkZQonoPAHzQ5Gg97/jHsna7QnLgl2PguKG65JEMLw6JEL9sLntyOcE=
-=UtWb
------END PGP SIGNATURE-----
-
---HmLir0bd64KrquUuG51sggdsTCQBpDTkR--
+> ---
+> v2: adjust commit message based on review; no code change
+> ---
+>  include/qemu/ratelimit.h |  3 ++-
+>  block/backup.c           |  5 +++--
+>  block/commit.c           |  5 +++--
+>  block/mirror.c           | 13 +++++++------
+>  block/stream.c           |  5 +++--
+>  5 files changed, 18 insertions(+), 13 deletions(-)
+> 
+> diff --git a/include/qemu/ratelimit.h b/include/qemu/ratelimit.h
+> index 8da1232..8dece48 100644
+> --- a/include/qemu/ratelimit.h
+> +++ b/include/qemu/ratelimit.h
+> @@ -24,7 +24,8 @@ typedef struct {
+> 
+>  /** Calculate and return delay for next request in ns
+>   *
+> - * Record that we sent @p n data units. If we may send more data units
+> + * Record that we sent @n data units (where @n matches the scale chosen
+> + * during ratelimit_set_speed). If we may send more data units
+>   * in the current time slice, return 0 (i.e. no delay). Otherwise
+>   * return the amount of time (in ns) until the start of the next time
+>   * slice that will permit sending the next chunk of data.
+> diff --git a/block/backup.c b/block/backup.c
+> index 5387fbd..9ca1d8e 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -208,7 +208,7 @@ static void backup_set_speed(BlockJob *job, int64_t speed, Error **errp)
+>          error_setg(errp, QERR_INVALID_PARAMETER, "speed");
+>          return;
+>      }
+> -    ratelimit_set_speed(&s->limit, speed / BDRV_SECTOR_SIZE, SLICE_TIME);
+> +    ratelimit_set_speed(&s->limit, speed, SLICE_TIME);
+>  }
+> 
+>  static void backup_cleanup_sync_bitmap(BackupBlockJob *job, int ret)
+> @@ -359,7 +359,8 @@ static bool coroutine_fn yield_and_check(BackupBlockJob *job)
+>       */
+>      if (job->common.speed) {
+>          uint64_t delay_ns = ratelimit_calculate_delay(&job->limit,
+> -                                                      job->sectors_read);
+> +                                                      job->sectors_read *
+> +                                                      BDRV_SECTOR_SIZE);
+>          job->sectors_read = 0;
+>          block_job_sleep_ns(&job->common, QEMU_CLOCK_REALTIME, delay_ns);
+>      } else {
+> diff --git a/block/commit.c b/block/commit.c
+> index 524bd54..6993994 100644
+> --- a/block/commit.c
+> +++ b/block/commit.c
+> @@ -209,7 +209,8 @@ static void coroutine_fn commit_run(void *opaque)
+>          s->common.offset += n * BDRV_SECTOR_SIZE;
+> 
+>          if (copy && s->common.speed) {
+> -            delay_ns = ratelimit_calculate_delay(&s->limit, n);
+> +            delay_ns = ratelimit_calculate_delay(&s->limit,
+> +                                                 n * BDRV_SECTOR_SIZE);
+>          }
+>      }
+> 
+> @@ -231,7 +232,7 @@ static void commit_set_speed(BlockJob *job, int64_t speed, Error **errp)
+>          error_setg(errp, QERR_INVALID_PARAMETER, "speed");
+>          return;
+>      }
+> -    ratelimit_set_speed(&s->limit, speed / BDRV_SECTOR_SIZE, SLICE_TIME);
+> +    ratelimit_set_speed(&s->limit, speed, SLICE_TIME);
+>  }
+> 
+>  static const BlockJobDriver commit_job_driver = {
+> diff --git a/block/mirror.c b/block/mirror.c
+> index 61a862d..eb27efc 100644
+> --- a/block/mirror.c
+> +++ b/block/mirror.c
+> @@ -396,7 +396,8 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+>      bitmap_set(s->in_flight_bitmap, sector_num / sectors_per_chunk, nb_chunks);
+>      while (nb_chunks > 0 && sector_num < end) {
+>          int64_t ret;
+> -        int io_sectors, io_sectors_acct;
+> +        int io_sectors;
+> +        int64_t io_bytes_acct;
+>          BlockDriverState *file;
+>          enum MirrorMethod {
+>              MIRROR_METHOD_COPY,
+> @@ -444,16 +445,16 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+>          switch (mirror_method) {
+>          case MIRROR_METHOD_COPY:
+>              io_sectors = mirror_do_read(s, sector_num, io_sectors);
+> -            io_sectors_acct = io_sectors;
+> +            io_bytes_acct = io_sectors * BDRV_SECTOR_SIZE;
+>              break;
+>          case MIRROR_METHOD_ZERO:
+>          case MIRROR_METHOD_DISCARD:
+>              mirror_do_zero_or_discard(s, sector_num, io_sectors,
+>                                        mirror_method == MIRROR_METHOD_DISCARD);
+>              if (write_zeroes_ok) {
+> -                io_sectors_acct = 0;
+> +                io_bytes_acct = 0;
+>              } else {
+> -                io_sectors_acct = io_sectors;
+> +                io_bytes_acct = io_sectors * BDRV_SECTOR_SIZE;
+>              }
+>              break;
+>          default:
+> @@ -463,7 +464,7 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+>          sector_num += io_sectors;
+>          nb_chunks -= DIV_ROUND_UP(io_sectors, sectors_per_chunk);
+>          if (s->common.speed) {
+> -            delay_ns = ratelimit_calculate_delay(&s->limit, io_sectors_acct);
+> +            delay_ns = ratelimit_calculate_delay(&s->limit, io_bytes_acct);
+>          }
+>      }
+>      return delay_ns;
+> @@ -929,7 +930,7 @@ static void mirror_set_speed(BlockJob *job, int64_t speed, Error **errp)
+>          error_setg(errp, QERR_INVALID_PARAMETER, "speed");
+>          return;
+>      }
+> -    ratelimit_set_speed(&s->limit, speed / BDRV_SECTOR_SIZE, SLICE_TIME);
+> +    ratelimit_set_speed(&s->limit, speed, SLICE_TIME);
+>  }
+> 
+>  static void mirror_complete(BlockJob *job, Error **errp)
+> diff --git a/block/stream.c b/block/stream.c
+> index 52d329f..29273a5 100644
+> --- a/block/stream.c
+> +++ b/block/stream.c
+> @@ -191,7 +191,8 @@ static void coroutine_fn stream_run(void *opaque)
+>          /* Publish progress */
+>          s->common.offset += n * BDRV_SECTOR_SIZE;
+>          if (copy && s->common.speed) {
+> -            delay_ns = ratelimit_calculate_delay(&s->limit, n);
+> +            delay_ns = ratelimit_calculate_delay(&s->limit,
+> +                                                 n * BDRV_SECTOR_SIZE);
+>          }
+>      }
+> 
+> @@ -220,7 +221,7 @@ static void stream_set_speed(BlockJob *job, int64_t speed, Error **errp)
+>          error_setg(errp, QERR_INVALID_PARAMETER, "speed");
+>          return;
+>      }
+> -    ratelimit_set_speed(&s->limit, speed / BDRV_SECTOR_SIZE, SLICE_TIME);
+> +    ratelimit_set_speed(&s->limit, speed, SLICE_TIME);
+>  }
+> 
+>  static const BlockJobDriver stream_job_driver = {
+> -- 
+> 2.9.4
+> 
