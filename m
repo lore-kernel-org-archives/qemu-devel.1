@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dRHYA-0002Fy-Gw
+	(envelope-from <bounces@canonical.com>) id 1dRHYA-0002Fz-HW
 	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 08:30:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dRHY7-0003yH-Cf
+	(envelope-from <bounces@canonical.com>) id 1dRHY7-0003yL-Cd
 	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 08:30:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54873)
+Received: from indium.canonical.com ([91.189.90.7]:54871)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dRHY7-0003xT-5T
+	id 1dRHY7-0003xS-5M
 	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 08:30:55 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dRHY5-0007Bn-GZ
+	id 1dRHY5-0007Bt-1K
 	for <qemu-devel@nongnu.org>; Sat, 01 Jul 2017 12:30:53 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 766EB2E8194
+	by loganberry.canonical.com (Postfix) with ESMTP id 08BD22E8030
 	for <qemu-devel@nongnu.org>; Sat,  1 Jul 2017 12:30:53 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 01 Jul 2017 12:15:50 -0000
+Date: Sat, 01 Jul 2017 12:15:06 -0000
 From: Bruno Haible <bruno@clisp.org>
 Reply-To: Bug 1701808 <1701808@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <149891130681.24932.1838110700653893581.malonedeb@soybean.canonical.com>
-Message-Id: <149891135083.15177.10662196418162782551.malone@wampee.canonical.com>
+Message-Id: <149891130681.24932.1838110700653893581.malonedeb@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1701808] Re: stack smashing in or after recvmsg
+Subject: [Qemu-devel] [Bug 1701808] [NEW] stack smashing in or after recvmsg
  system call in aarch64 user mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -39,9 +38,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Attachment added: "Statically compiled test program"
-   https://bugs.launchpad.net/qemu/+bug/1701808/+attachment/4907340/+files/=
-a.out
+Public bug reported:
+
+A program that invokes recvmsg aborts with "*** stack smashing detected
+***" when run in qemu-aarch64 (user mode), but works fine when running
+on native aarch64 hardware.
+
+How to reproduce:
+$ aarch64-linux-gnu-gcc-5 -O -Wall /media/develdata/devel/qemu-bug/testpass=
+fd.c -static -DEXTRA_SPACE=3D0
+$ QEMU_LD_PREFIX=3D/usr/aarch64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-aarch6=
+4 ./a.out
+*** stack smashing detected ***: ./a.out terminated
+qemu: uncaught target signal 6 (Aborted) - core dumped
+
+On native aarch64 hardware:
+$ ./a.out =
+
+$ echo $?
+0
+
+The parameter EXTRA_SPACE can be used to add additional space to the
+array that receives the recvmsg data. With -DEXTRA_SPACE=3D9 (or larger),
+the program runs fine. Which suggests that recvmsg is storing up to 9
+bytes more than allowed in memory.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Attachment added: "Test program"
+   https://bugs.launchpad.net/bugs/1701808/+attachment/4907339/+files/testp=
+assfd.c
 
 -- =
 
