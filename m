@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dRDbi-0004CR-HX
-	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 04:18:23 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dRDbk-0004Cf-G9
+	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 04:18:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dRDbh-00027c-Ab
-	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 04:18:22 -0400
-Date: Sat, 1 Jul 2017 17:51:38 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1dRDbh-00027l-BJ
+	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 04:18:24 -0400
+Date: Sat, 1 Jul 2017 17:53:10 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170701075138.GK13989@umbus.fritz.box>
-References: <149881542765.17418.16611868807694688341.stgit@bahia>
+Message-ID: <20170701075310.GL13989@umbus.fritz.box>
+References: <20170628140919.27167-1-lvivier@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="AYsPlKobQGgtCvjI"
+	protocol="application/pgp-signature"; boundary="t5C3/nrmPumNj5sH"
 Content-Disposition: inline
-In-Reply-To: <149881542765.17418.16611868807694688341.stgit@bahia>
-Subject: Re: [Qemu-devel] [PATCH] spapr: fix bogus function name in comment
+In-Reply-To: <20170628140919.27167-1-lvivier@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] spapr: fix migration to pseries machine <
+ 2.8
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,48 +24,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-ppc@nongnu.org
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---AYsPlKobQGgtCvjI
+--t5C3/nrmPumNj5sH
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 30, 2017 at 11:37:07AM +0200, Greg Kurz wrote:
-> $ git grep spapr_ppc_reset
-> hw/ppc/spapr.c: * as part of spapr_ppc_reset().
+On Wed, Jun 28, 2017 at 04:09:19PM +0200, Laurent Vivier wrote:
+1;4602;0c> since commit 5c4537bd ("spapr: Fix 2.7<->2.8 migration of PCI ho=
+st bridge"),
+> some migration fields are forged from the new ones in spapr_pci_pre_save(=
+).
 >=20
-> $ git grep ppc_spapr_reset
-> hw/ppc/spapr.c:static void ppc_spapr_reset(void)
-> hw/ppc/spapr.c:    mc->reset =3D ppc_spapr_reset;
-> hw/ppc/spapr_hcall.c:        /* If ppc_spapr_reset() did not set up a HPT
->  but one is necessary
+> It works well, except when the number of MSI devices is 0,
+> because in this case the function exits immediately.
 >=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> This fix moves the migration code before the exit code.
+>=20
+> The problem can be reproduced with these commands:
+>=20
+> source qemu-2.9:
+>=20
+>     qemu-system-ppc64 -monitor stdio -M pseries-2.6 -nodefaults -S
+>=20
+> destination qemu-2.6:
+>=20
+>     qemu-system-ppc64 -monitor stdio -M pseries-2.6 -nodefaults \
+>                       -incoming tcp:0:4444
+>=20
+> on the source:
+>=20
+>     migrate tcp:localhost:4444
+>=20
+> Destination fails with the following error:
+>=20
+>     qemu-system-ppc64: error while loading state for
+>                        instance 0x0 of device 'spapr_pci'
+>     qemu-system-ppc64: load of migration failed: Invalid argument
+>=20
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 
 Applied to ppc-for-2.10.
 
 > ---
->  hw/ppc/spapr.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  hw/ppc/spapr_pci.c | 28 ++++++++++++++--------------
+>  1 file changed, 14 insertions(+), 14 deletions(-)
 >=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 0ee9fac50bd4..43a1cb5725d6 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1973,7 +1973,7 @@ static void spapr_boot_set(void *opaque, const char=
- *boot_device,
->   * Unlike PCI DR devices, LMB DR devices explicitly register this reset
->   * routine. Reset for PCI DR devices will be handled by PHB reset routine
->   * when it walks all its children devices. LMB devices reset occurs
-> - * as part of spapr_ppc_reset().
-> + * as part of ppc_spapr_reset().
->   */
->  static void spapr_drc_reset(void *opaque)
->  {
->=20
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index 0b447f2..bd30b4f 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -1873,20 +1873,6 @@ static void spapr_pci_pre_save(void *opaque)
+>      gpointer key, value;
+>      int i;
+> =20
+> -    g_free(sphb->msi_devs);
+> -    sphb->msi_devs =3D NULL;
+> -    sphb->msi_devs_num =3D g_hash_table_size(sphb->msi);
+> -    if (!sphb->msi_devs_num) {
+> -        return;
+> -    }
+> -    sphb->msi_devs =3D g_malloc(sphb->msi_devs_num * sizeof(spapr_pci_ms=
+i_mig));
+> -
+> -    g_hash_table_iter_init(&iter, sphb->msi);
+> -    for (i =3D 0; g_hash_table_iter_next(&iter, &key, &value); ++i) {
+> -        sphb->msi_devs[i].key =3D *(uint32_t *) key;
+> -        sphb->msi_devs[i].value =3D *(spapr_pci_msi *) value;
+> -    }
+> -
+>      if (sphb->pre_2_8_migration) {
+>          sphb->mig_liobn =3D sphb->dma_liobn[0];
+>          sphb->mig_mem_win_addr =3D sphb->mem_win_addr;
+> @@ -1900,6 +1886,20 @@ static void spapr_pci_pre_save(void *opaque)
+>              sphb->mig_mem_win_size +=3D sphb->mem64_win_size;
+>          }
+>      }
+> +
+> +    g_free(sphb->msi_devs);
+> +    sphb->msi_devs =3D NULL;
+> +    sphb->msi_devs_num =3D g_hash_table_size(sphb->msi);
+> +    if (!sphb->msi_devs_num) {
+> +        return;
+> +    }
+> +    sphb->msi_devs =3D g_malloc(sphb->msi_devs_num * sizeof(spapr_pci_ms=
+i_mig));
+> +
+> +    g_hash_table_iter_init(&iter, sphb->msi);
+> +    for (i =3D 0; g_hash_table_iter_next(&iter, &key, &value); ++i) {
+> +        sphb->msi_devs[i].key =3D *(uint32_t *) key;
+> +        sphb->msi_devs[i].value =3D *(spapr_pci_msi *) value;
+> +    }
+>  }
+> =20
+>  static int spapr_pci_post_load(void *opaque, int version_id)
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -72,25 +128,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---AYsPlKobQGgtCvjI
+--t5C3/nrmPumNj5sH
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZV1SKAAoJEGw4ysog2bOSL/kQAI7hmWUqhIcESIRW1ghXUWie
-nstSVbetb2w05c7k4GPFrFlVTiPzGKTj04rJAyFw4C87ERmELMhungAj/XaM6pHI
-Y/zBduLW4q9wJsSVLrQPmPuZ0a1HMpd0zHlslaHwGcNzQNPUzlO14zoyIxLW7w2i
-u7MJ5GyWFL1OVQ2ZoG3Dch6sx/HA3ZxuKPiAgbosCsX5fvXvz+RXRPvVnt4PzIgW
-dxwA4niv8/RQoY1L6H0L8REy3G8qXZdWxXgg+rooqGvasU0fhtd8WU2dqg3Qfuwf
-C3W0cjV5EZ0N8/quljGs000Ni9PeTxiLb0tPojTwnCg20UfjEVM6R3jXQCv7gBeX
-tb2hTydKChFSQgRo1CgxN9qUZXxTwHpOljSZilZRMHrikjO+/KVEKbYY7RBp7d/E
-OK3XbGkM/kTFLkJNKAnWLANZjDwDqOi0KQ4YqCQ5/KoW10ESmg7kQLeystXkS0Av
-25PM+gg9VrbVBe27Bxz3o1ee9fnH3ZhR/8N7KYJeSiYWnVIWxGkh/9PaLszu7jNf
-iVetg6EC2P1UvJOjHu6Ecsgekx+Y0yj9AACQkmhOxW9K0n+T52e8nz4DtSAfkXy6
-O4fOCTFMGVHJ8XZaR6wc61+6NMENoG4+iN9rmODKZkDktNoHFCCyYmR87uCTc5lP
-b4nfV7rl2MBN2dkNKhlq
-=Nkzg
+iQIcBAEBCAAGBQJZV1TmAAoJEGw4ysog2bOShnUQAOGWs/tJYrF6btU7cynT5Q65
+2JgnzsXEXMA1gmiHDwNQen4l9tdiavLPFodpTHocF+L6GHvFAE+OAi9BASIxZsdG
+xm+FwflVPe//8R3qkjE9NiC0MOyxzuXJHb++KLZhbrN15ZML07Y407Qh3lssSz4s
+eryfoh2XSsGG0Ja91YG4E3PT0FbKlpFfRALUB26dzW3cOcXVFfbNbCwj579IeX7I
+wfMojKEaGrZH2OoNdYS/8EOr4m3N9PA4/T8kmrNyRfb8FnJY19eP+ut/XJdj8Daa
+vULmUYJuI/iIELbKWNqumbhChaNuKQdq/w1lVqYSAqFlFP+1jYCMt25mWyvCmfPK
+FoAETojG/Ul/wy0JqAaaEF/j3d981bwpHF6k2bwnO1W6B5bK398ll/NjYcADYXsf
+YeJYJMkKlfUx6lx2dOQXSua+fl5ljz+dO4dD5YUQ8GAf1ME14S1warTpAHShAm8G
+upvLnizqQxI/GU1z+JeO1vRGNsgblMM4YVMkukqqPThrIjqjxeOLeQfoT3RxDO75
+VZdvqBOLxfQ7qBoJ4XD4Qkt7a2Tl4iwZYTY8VblXN4W9QnFMlgvXwK3kLIXXmQbi
+YzxKypfF/PvV1cEGHiKJHJ8vMkSOr8rrfWoU0bIJsobKjD92LqJzjciAHdVV/Su8
+D0+vGfrH8Fyq4ZAeXjr7
+=WZyL
 -----END PGP SIGNATURE-----
 
---AYsPlKobQGgtCvjI--
+--t5C3/nrmPumNj5sH--
