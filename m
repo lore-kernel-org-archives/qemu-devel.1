@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dR5tX-0004v4-IS
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 20:04:16 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1dR5vM-0005co-Nk
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 20:06:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dR5tT-00047g-AH
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 20:04:15 -0400
-Date: Fri, 30 Jun 2017 20:04:08 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170701000408.GA16320@flamenco>
-References: <20170630183736.13222-1-rth@twiddle.net>
+	(envelope-from <sstabellini@kernel.org>) id 1dR5vH-0005wX-PZ
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 20:06:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58638)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1dR5vH-0005uq-H4
+	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 20:06:03 -0400
+Date: Fri, 30 Jun 2017 17:06:00 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <1498838825-23701-2-git-send-email-igor.druzhinin@citrix.com>
+Message-ID: <alpine.DEB.2.10.1706301629170.2919@sstabellini-ThinkPad-X260>
+References: <1498838825-23701-1-git-send-email-igor.druzhinin@citrix.com>
+	<1498838825-23701-2-git-send-email-igor.druzhinin@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170630183736.13222-1-rth@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH] target/ppc: Use tcg_gen_lookup_and_goto_ptr
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH 1/4] xen: move physmap saving into a
+ separate function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,53 +28,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Igor Druzhinin <igor.druzhinin@citrix.com>
+Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, sstabellini@kernel.org, anthony.perard@citrix.com, paul.durrant@citrix.com, pbonzini@redhat.com
 
-On Fri, Jun 30, 2017 at 11:37:36 -0700, Richard Henderson wrote:
-> Cc: qemu-ppc@nongnu.org
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
+On Fri, 30 Jun 2017, Igor Druzhinin wrote:
+> Non-functional change.
+> 
+> Signed-off-by: Igor Druzhinin <igor.druzhinin@citrix.com>
+
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+
+
 > ---
->  target/ppc/translate.c | 23 ++++++++---------------
->  1 file changed, 8 insertions(+), 15 deletions(-)
-
-Tested-by: Emilio G. Cota <cota@braap.org>
-
-Just measured the speedup for linux-user:
-
-                                     SPECint06 (test set), ppc64le-linux-user. Host: IBM POWER8 @ 3.42 GHz                                  
-                                                                                                                                            
-  1.6 +-+------+---------+--------+--------+--------+---------+--------+--------+---------+--------+--------+--------+---------+------+-+   
-      |                                                                                   |                                             |   
-      |                                                                                   |                               after         |   
-  1.5 +-+.................................................................................|...........................................+-+   
-      |                                                                                   |                                             |   
-      |                                                                                ******                                           |   
-  1.4 +-+.....+++.....................................................+++..............*..|.*.....+++.................................+-+   
-      |        |                                   +++                 |               *  | *      |                                    |   
-      |        |                                    |                  |               *  | *    *****                                  |   
-  1.3 +-+......|....................................|..................|...............*..|.*....*.|.*................................+-+   
-      |        |                 +++              ******             *****             * +++*    * | *             ******               |   
-      |      ******               |               * |  *             * | *             *    *    *+++*             *+++ *               |   
-  1.2 +-+....*.|..*...............|...............*.|..*.....+++.....*.|.*.............*....*....*...*.............*....*.............+-+   
-      |      * |  *               |               * |  *      |      *+++*             *    *    *   *             *    *   ******      |   
-      |      * |  *             *****             *+++ *   ******    *   *             *    *    *   *             *    *   * +++*      |   
-  1.1 +-+....*+++.*.............*.|.*.............*....*...*.+++*....*...*.............*....*....*...*.....+++.....*....*...*....*....+-+   
-      |      *    *             * | *             *    *   *    *    *   *             *    *    *   *      |      *    *   *    *      |   
-      |      *    *             * | *             *    *   *    *    *   *    ******   *    *    *   *      |      *    *   *    *      |   
-    1 +-+....*....*.....+++.....*+++*.....+++.....*....*...*....*....*...*....*....*...*....*....*...*....*****....*....*...*....*....+-+   
-      |      *    *      |      *   *      |      *    *   *    *    *   *    *    *   *    *    *   *    * | *    *    *   *    *      |   
-      |      *    *      |      *   *    *****    *    *   *    *    *   *    *    *   *    *    *   *    * | *    *    *   *    *      |   
-  0.9 +-+....*....*...******....*...*....*.|.*....*....*...*....*....*...*....*....*...*....*....*...*....*.|.*....*....*...*....*....+-+   
-      |      *    *   *  | *    *   *    * | *    *    *   *    *    *   *    *    *   *    *    *   *    *+++*    *    *   *    *      |   
-      |      *    *   * +++*    *   *    *+++*    *    *   *    *    *   *    *    *   *    *    *   *    *   *    *    *   *    *      |   
-  0.8 +-+----******---******----*****----*****----******---******----*****----******---******----*****----*****----******---******----+-+   
-  400.perlbench 401.bzip2  403.gcc  429.mcf445.gobmk 456.hmmer458.462.libquantu464.h264r471.omnetpp473.a483.xalancbmk     gmean             
-png: http://imgur.com/a/twj6V
-
-Thanks,
-
-		Emilio
-
-PS. If you have spec06, you can very easily generate these plots. See
-  https://github.com/cota/runspec-simple/commit/14211b927
+>  hw/i386/xen/xen-hvm.c | 57 ++++++++++++++++++++++++++++-----------------------
+>  1 file changed, 31 insertions(+), 26 deletions(-)
+> 
+> diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+> index cffa7e2..d259cf7 100644
+> --- a/hw/i386/xen/xen-hvm.c
+> +++ b/hw/i386/xen/xen-hvm.c
+> @@ -305,6 +305,36 @@ static hwaddr xen_phys_offset_to_gaddr(hwaddr start_addr,
+>      return start_addr;
+>  }
+>  
+> +static int xen_save_physmap(XenIOState *state, XenPhysmap *physmap)
+> +{
+> +    char path[80], value[17];
+> +
+> +    snprintf(path, sizeof(path),
+> +            "/local/domain/0/device-model/%d/physmap/%"PRIx64"/start_addr",
+> +            xen_domid, (uint64_t)physmap->phys_offset);
+> +    snprintf(value, sizeof(value), "%"PRIx64, (uint64_t)physmap->start_addr);
+> +    if (!xs_write(state->xenstore, 0, path, value, strlen(value))) {
+> +        return -1;
+> +    }
+> +    snprintf(path, sizeof(path),
+> +            "/local/domain/0/device-model/%d/physmap/%"PRIx64"/size",
+> +            xen_domid, (uint64_t)physmap->phys_offset);
+> +    snprintf(value, sizeof(value), "%"PRIx64, (uint64_t)physmap->size);
+> +    if (!xs_write(state->xenstore, 0, path, value, strlen(value))) {
+> +        return -1;
+> +    }
+> +    if (physmap->name) {
+> +        snprintf(path, sizeof(path),
+> +                "/local/domain/0/device-model/%d/physmap/%"PRIx64"/name",
+> +                xen_domid, (uint64_t)physmap->phys_offset);
+> +        if (!xs_write(state->xenstore, 0, path,
+> +                      physmap->name, strlen(physmap->name))) {
+> +            return -1;
+> +        }
+> +    }
+> +    return 0;
+> +}
+> +
+>  static int xen_add_to_physmap(XenIOState *state,
+>                                hwaddr start_addr,
+>                                ram_addr_t size,
+> @@ -316,7 +346,6 @@ static int xen_add_to_physmap(XenIOState *state,
+>      XenPhysmap *physmap = NULL;
+>      hwaddr pfn, start_gpfn;
+>      hwaddr phys_offset = memory_region_get_ram_addr(mr);
+> -    char path[80], value[17];
+>      const char *mr_name;
+>  
+>      if (get_physmapping(state, start_addr, size)) {
+> @@ -368,31 +397,7 @@ go_physmap:
+>                                     start_addr >> TARGET_PAGE_BITS,
+>                                     (start_addr + size - 1) >> TARGET_PAGE_BITS,
+>                                     XEN_DOMCTL_MEM_CACHEATTR_WB);
+> -
+> -    snprintf(path, sizeof(path),
+> -            "/local/domain/0/device-model/%d/physmap/%"PRIx64"/start_addr",
+> -            xen_domid, (uint64_t)phys_offset);
+> -    snprintf(value, sizeof(value), "%"PRIx64, (uint64_t)start_addr);
+> -    if (!xs_write(state->xenstore, 0, path, value, strlen(value))) {
+> -        return -1;
+> -    }
+> -    snprintf(path, sizeof(path),
+> -            "/local/domain/0/device-model/%d/physmap/%"PRIx64"/size",
+> -            xen_domid, (uint64_t)phys_offset);
+> -    snprintf(value, sizeof(value), "%"PRIx64, (uint64_t)size);
+> -    if (!xs_write(state->xenstore, 0, path, value, strlen(value))) {
+> -        return -1;
+> -    }
+> -    if (mr_name) {
+> -        snprintf(path, sizeof(path),
+> -                "/local/domain/0/device-model/%d/physmap/%"PRIx64"/name",
+> -                xen_domid, (uint64_t)phys_offset);
+> -        if (!xs_write(state->xenstore, 0, path, mr_name, strlen(mr_name))) {
+> -            return -1;
+> -        }
+> -    }
+> -
+> -    return 0;
+> +    return xen_save_physmap(state, physmap);
+>  }
+>  
+>  static int xen_remove_from_physmap(XenIOState *state,
+> -- 
+> 2.7.4
+> 
