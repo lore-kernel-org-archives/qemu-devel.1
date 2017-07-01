@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57798)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dRDbk-0004Ce-Fy
-	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 04:18:25 -0400
+	(envelope-from <bounces@canonical.com>) id 1dRGc7-0007SM-FA
+	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 07:31:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dRDbh-00027r-BP
-	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 04:18:24 -0400
-Date: Sat, 1 Jul 2017 17:51:13 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170701075113.GJ13989@umbus.fritz.box>
-References: <149881713243.18888.18140083803237379387.stgit@bahia>
+	(envelope-from <bounces@canonical.com>) id 1dRGc2-00064S-Lm
+	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 07:30:59 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52183)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dRGc2-00063a-AA
+	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 07:30:54 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dRGby-0006GH-Ni
+	for <qemu-devel@nongnu.org>; Sat, 01 Jul 2017 11:30:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B08E42E8055
+	for <qemu-devel@nongnu.org>; Sat,  1 Jul 2017 11:30:50 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="x+WOirvrtTKur1pg"
-Content-Disposition: inline
-In-Reply-To: <149881713243.18888.18140083803237379387.stgit@bahia>
-Subject: Re: [Qemu-devel] [PATCH] spapr: refresh "platform-specific" hcalls
- comment
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 01 Jul 2017 11:23:51 -0000
+From: Bruno Haible <bruno@clisp.org>
+Reply-To: Bug 1701798 <1701798@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <149890819992.24827.8096984642709091835.malonedeb@soybean.canonical.com>
+Message-Id: <149890823167.15456.9655332109102254548.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1701798] Re: dynamically linked binaries crash
+ for big-endian targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,70 +37,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
 
+I would guess that the problem comes from a missing (or an extra) BSWAP cal=
+l in one of the files
+  include/elf.h
+  include/hw/elf_ops.h
+  linux-user/elfload.c
 
---x+WOirvrtTKur1pg
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+-- =
 
-On Fri, Jun 30, 2017 at 12:05:32PM +0200, Greg Kurz wrote:
-> We have more of these since the addition of KVMPPC_H_LOGICAL_MEMOP in 201=
-2.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1701798
 
-Applied to ppc-for-2.10.
+Title:
+  dynamically linked binaries crash for big-endian targets
 
-> ---
->  include/hw/ppc/spapr.h |    5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
->=20
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index a66bbac35242..1826cc4fd696 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -377,9 +377,8 @@ struct sPAPRMachineState {
->   * as well.
->   *
->   * We also need some hcalls which are specific to qemu / KVM-on-POWER.
-> - * So far we just need one for H_RTAS, but in future we'll need more
-> - * for extensions like virtio.  We put those into the 0xf000-0xfffc
-> - * range which is reserved by PAPR for "platform-specific" hcalls.
-> + * We put those into the 0xf000-0xfffc range which is reserved by PAPR
-> + * for "platform-specific" hcalls.
->   */
->  #define KVMPPC_HCALL_BASE       0xf000
->  #define KVMPPC_H_RTAS           (KVMPPC_HCALL_BASE + 0x0)
->=20
+Status in QEMU:
+  New
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Bug description:
+  On the targets
+    hppa
+    m68k
+    mips
+    mips64
+    powerpc
+    powerpc64
+    s390x
+    sparc64
+  dynamically linked binaries crash, but statically linked binaries work.
+  On the targets
+    aarch64
+    alpha
+    armhf
+    powerpc64le
+    sh4
+  both dynamically linked and statically linked binaries work.
 
---x+WOirvrtTKur1pg
-Content-Type: application/pgp-signature; name="signature.asc"
+  How to reproduce:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+  1) On Ubuntu 16.04, install the packages
+  g++-5-aarch64-linux-gnu
+  g++-5-alpha-linux-gnu
+  g++-5-arm-linux-gnueabihf
+  g++-5-hppa-linux-gnu
+  g++-5-m68k-linux-gnu
+  g++-5-mips-linux-gnu
+  g++-5-mips64-linux-gnuabi64
+  g++-5-powerpc-linux-gnu
+  g++-5-powerpc64-linux-gnu
+  g++-5-powerpc64le-linux-gnu
+  g++-5-s390x-linux-gnu
+  g++-5-sh4-linux-gnu
+  g++-5-sparc64-linux-gnu
 
-iQIcBAEBCAAGBQJZV1RxAAoJEGw4ysog2bOSn6cQANScSdoTxBePzT1CwZYweePZ
-6NRZxjHNh1XQr0uZtq4aBUO+pvqSS3neapd01ZEG9egGJV4NWmcjwCcKp2jfZkn6
-cUuHkUBQBRkNxBu2dH0/urzviIeXPBCaeekeqpz93/K2/Wzjc342ebOTGYaTxQ3B
-Hd3BJf9JxvfYAAad67eNTJChuoxeBAwqnp5NjYgkdQk5o67NFTuGKnLLaz7uQJua
-wZWdnZ36w3U4OtHJi3GxwCIbmQqvuntE8jndNiw/BLS1KyjDj4b9E5C+MJrJjUVo
-yeQpEZwcP78xEwzXeKPKKHYEsLho8mREYBC+doROo1dfs4dwBNN4iHnI5DesIXTk
-Nxq9CfHCiiFaltFcTGbP5ea9ouhUc5XWYcop/GQtd55G3KqRqXHZyiSz8uQZX8FJ
-YX0IDjgYcJPZNtpBCjdlK+pGRRR0OW/6fECCImniuXYfFF6NwpKU4eqWGjv+vGMS
-VpR6HPe53HZ6uICQ/y0hcmhU76zXAr/jFL5+w+DNDGvV/odhwVvglEolktX/I7l+
-uyy93hN5bjJPUl3ateR5KOBINRL3X0JzlRwlNP4DQP1gyWTAxPqqExx12H1ccFml
-nkCJKfTVT6tLPVlh6qxP7G9MQRcTwJMujoHeH2MsYCliJhiGESpgPUDTEEXW4Yv6
-D9Zm0Q9avQIMBlsxfo4s
-=untr
------END PGP SIGNATURE-----
+  2) Install qemu 2.9.0 from source (for m68k, use the 2.7.0-m68k
+  code from https://github.com/vivier/qemu-m68k.git):
+  $ ../configure --prefix=3D/home/bruno/inst-qemu/2.9.0 --target-list=3Daar=
+ch64-softmmu,alpha-softmmu,arm-softmmu,i386-softmmu,m68k-softmmu,mips-softm=
+mu,mipsel-softmmu,mips64-softmmu,mips64el-softmmu,ppc-softmmu,ppc64-softmmu=
+,s390x-softmmu,sh4-softmmu,sparc-softmmu,sparc64-softmmu,x86_64-softmmu,aar=
+ch64-linux-user,alpha-linux-user,arm-linux-user,hppa-linux-user,m68k-linux-=
+user,mips-linux-user,mipsel-linux-user,mips64-linux-user,mips64el-linux-use=
+r,ppc-linux-user,ppc64-linux-user,ppc64le-linux-user,s390x-linux-user,sh4-l=
+inux-user,sparc-linux-user,sparc64-linux-user --disable-strip --disable-wer=
+ror --enable-gtk --enable-vnc
+  $ make
+  $ make install
 
---x+WOirvrtTKur1pg--
+  3) Cross-compile the programs:
+
+  $ aarch64-linux-gnu-gcc-5 -O hello.c -o hello.aarch64
+  $ alpha-linux-gnu-gcc-5 -O hello.c -o hello.alpha
+  $ arm-linux-gnueabihf-gcc-5 -O hello.c -o hello.armhf
+  $ hppa-linux-gnu-gcc-5 -O hello.c -o hello.hppa
+  $ m68k-linux-gnu-gcc-5 -O hello.c -o hello.m68k
+  $ mips-linux-gnu-gcc-5 -O hello.c -o hello.mips
+  $ mips64-linux-gnuabi64-gcc-5 -O hello.c -o hello.mips64
+  $ powerpc-linux-gnu-gcc-5 -O hello.c -o hello.powerpc
+  $ powerpc64-linux-gnu-gcc-5 -O hello.c -o hello.powerpc64
+  $ powerpc64le-linux-gnu-gcc-5 -O hello.c -o hello.powerpc64le
+  $ s390x-linux-gnu-gcc-5 -O hello.c -o hello.s390x
+  $ sh4-linux-gnu-gcc-5 -O hello.c -o hello.sh4
+  $ sparc64-linux-gnu-gcc-5 -O hello.c -o hello.sparc64
+
+  4) Run the programs:
+
+  * aarch64 works:
+  $ QEMU_LD_PREFIX=3D/usr/aarch64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-aarc=
+h64 hello.aarch64
+  Hello world
+
+  * alpha works:
+  $ QEMU_LD_PREFIX=3D/usr/alpha-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-alpha =
+hello.alpha =
+
+  Hello world
+
+  * armhf works:
+  $ QEMU_LD_PREFIX=3D/usr/arm-linux-gnueabihf ~/inst-qemu/2.9.0/bin/qemu-ar=
+m hello.armhf
+  Hello world
+
+  * powerpc64le works:
+  $ QEMU_LD_PREFIX=3D/usr/powerpc64le-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-=
+ppc64le hello.powerpc64le
+  Hello world
+
+  * sh4 works:
+  $ QEMU_LD_PREFIX=3D/usr/sh4-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-sh4 hell=
+o.sh4
+  Hello world
+
+  * =3D=3D=3D=3D=3D sparc64 does not work:
+  $ QEMU_LD_PREFIX=3D/usr/sparc64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-spar=
+c64 hello.sparc64
+  Segmentation fault (core dumped)
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 4.5.0-2-sp=
+arc64 sparc64",
+  it works:
+  $ ./hello.sparc64
+  Hello world
+
+  When I copy the file and its execution environment /usr/sparc64-linux-gnu=
+ to the
+  same machine and run the binary in a chroot environment:
+  # /bin/hello.sparc64 =
+
+  Hello world
+
+  * =3D=3D=3D=3D=3D mips does not work:
+  $ QEMU_LD_PREFIX=3D/usr/mips-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-mips he=
+llo.mips
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-4=
+kc-malta mips",
+  it works:
+  $ ./hello.mips
+  Hello world
+
+  When I copy the file and its execution environment /usr/mips-linux-gnu to=
+ the
+  same machine and run the binary in a chroot environment:
+  # /bin/hello.mips =
+
+  Hello world
+
+  * =3D=3D=3D=3D=3D mips64 does not work:
+  $ QEMU_LD_PREFIX=3D/usr/mips64-linux-gnuabi64 ~/inst-qemu/2.9.0/bin/qemu-=
+mips64 hello.mips64
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-5=
+kc-malta mips64",
+  it works:
+  $ ./hello.mips64
+  Hello world
+
+  * =3D=3D=3D=3D=3D powerpc does not work:
+  $ QEMU_LD_PREFIX=3D/usr/powerpc-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-ppc =
+hello.powerpc
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 3.17.2-200=
+.fc20.ppc64p7 ppc64",
+  it works:
+  $ ./hello.powerpc
+  Hello world
+
+  * =3D=3D=3D=3D=3D powerpc64 does not work:
+  $ QEMU_LD_PREFIX=3D/usr/powerpc64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-pp=
+c64 hello.powerpc64
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 3.17.2-200=
+.fc20.ppc64p7 ppc64",
+  it works:
+  $ ./hello.powerpc64
+  Hello world
+
+  * =3D=3D=3D=3D=3D s390x does not work:
+  $ QEMU_LD_PREFIX=3D/usr/s390x-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-s390x =
+hello.s390x
+  <hangs>
+  $ QEMU_LD_PREFIX=3D/usr/s390x-linux-gnu ~/inst-qemu/2.8.1/bin/qemu-s390x =
+hello.s390x
+  qemu-s390x: /media/develdata/devel/build/qemu-2.8.1/translate-all.c:175: =
+tb_lock: Assertion `!have_tb_lock' failed.
+  Segmentation fault (core dumped)
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-s=
+390x s390x",
+  it works:
+  $ ./hello.s390x
+  Hello world
+
+  * =3D=3D=3D=3D=3D hppa does not work:
+  $ QEMU_LD_PREFIX=3D/usr/hppa-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-hppa he=
+llo.hppa
+  Segmentation fault (core dumped)
+
+  * =3D=3D=3D=3D=3D m68k does not work:
+  $ QEMU_LD_PREFIX=3D/usr/m68k-linux-gnu QEMU_CPU=3Dm68020 ~/inst-qemu/2.9.=
+0/bin/qemu-m68k hello.m68k
+  qemu: uncaught target signal 4 (Illegal instruction) - core dumped
+  $ QEMU_LD_PREFIX=3D/usr/m68k-linux-gnu QEMU_CPU=3Dm68020 ~/inst-qemu/2.7.=
+0-m68k/bin/qemu-m68k hello.m68k
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  =
+
+  The set of targets where it does not work is exactly the big-endian targe=
+ts.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1701798/+subscriptions
