@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <benyux.xu@intel.com>) id 1dRJtT-0003s1-Bw
-	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 11:01:08 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dRKUy-0004tD-HQ
+	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 11:39:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <benyux.xu@intel.com>) id 1dRJtO-0003oi-HV
-	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 11:01:07 -0400
-Received: from mga05.intel.com ([192.55.52.43]:57356)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <benyux.xu@intel.com>) id 1dRJtO-0003hL-6u
-	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 11:01:02 -0400
-From: Benyu Xu <benyux.xu@intel.com>
-Date: Sat,  1 Jul 2017 22:57:07 +0800
-Message-Id: <1498921030-23255-1-git-send-email-benyux.xu@intel.com>
-Subject: [Qemu-devel] [PATCH 0/3] pin vcpus to pcpus(set CPU affinity).
+	(envelope-from <el13635@mail.ntua.gr>) id 1dRKUv-0003Zr-Fv
+	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 11:39:52 -0400
+Received: from smtp1.ntua.gr ([2001:648:2000:de::183]:61670)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <el13635@mail.ntua.gr>) id 1dRKUv-00039L-3e
+	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 11:39:49 -0400
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Date: Sat,  1 Jul 2017 18:39:06 +0300
+Message-Id: <20170701153906.16588-1-el13635@mail.ntua.gr>
+Subject: [Qemu-devel] [PATCH v2] block: fix leaks in bdrv_open_driver()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,45 +21,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, gordon.jin@intel.com, eddie.dong@intel.com, kevin.tian@intel.com, haozhong.zhang@intel.com, hongbo.wang@intel.com, hao.l.li@intel.com, xudong.hao@intel.com, tianyu.lan@intel.com, binx.wu@intel.com, benyux.xu@intel.com, benjamin_xby@163.com
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>, Max Reitz <mreitz@redhat.com>
 
-Pin vcpus to pcpus(set CPU affinity).
-When run a Qemu in terminal, if we want to set the cpu affinity, for example,
-using the tool taskset, we should find the cpus' thread ID first and then 
-pin it manually. It's a tedious process, now a new feature "vcpupin" can help
-this. This feature will be helpful to do performance tuning, it's more 
-flexible and easily to use than external tools.
+bdrv_open_driver() is called in two places, bdrv_new_open_driver() and
+bdrv_open_common(). In the latter, failure cleanup in is in its caller,
+bdrv_open_inherit(), which unrefs the bs->file of the failed driver open if it
+exists.
 
-Add option "-vcpupin [pcpu_id_list]" to implement this feature. use the host's
-physical or logical processor(pcpu) id to made a list to set cpu affinity, the
-vcpus will sequentially pin to the pcpus of this list.
-This means we should use the option -smp to allocate vcpus.
-Here use ',' to seperate the single id or id sequence,
-     use '-' as the id sequence's connector. eg:
-a)
-    qemu ... -smp 8 -vcpupin 0,2,4,6-10 ...
-    It means qemu will pin 8 vcpus one by one and 1:1 to pcpu 0,2,4,6,7,8,9,10.
-b)
-    qemu ... -smp 8 -vcpupin 6-10,0,4,2 ...
-    It means qemu will pin 8 vcpus one by one and 1:1 to pcpu 6,7,8,9,10,0,4,2.
-c)
-    qemu ... -smp 8 -vcpupin auto ...
-    It means qemu will pin 8 vcpus one by one and 1:1 to pcpu 0,1,2,3,4,5,6,7.
+Let's move the bs->file cleanup to bdrv_open_driver() to take care of all
+callers and do not set bs->drv to NULL unless the driver's open function
+failed. When bs is destroyed by removing its last reference, bdrv_close()
+checks bs->drv to perform the needed cleanups and also call the driver's close
+function.
 
+Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+---
 
+v2:
+ move bdrv_unref_child(bs, bs->file) to bdrv_open_driver
+ do not set bs->drv to NULL if open succeeds 
 
-Benyu Xu (3):
-  add some vcpu-pin related functions.
-  vcpu pin:  parameters parse and execution.
-  add option -vcpupin into qemu-options.
+ block.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
- cpus.c                | 126 ++++++++++++++++++++++++++++++++++++++++++++++++++
- include/qom/cpu.h     |   9 ++++
- include/sysemu/cpus.h |   2 +
- qemu-options.hx       |  19 ++++++++
- vl.c                  | 115 +++++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 271 insertions(+)
-
+diff --git a/block.c b/block.c
+index 694396281b..df2a46990c 100644
+--- a/block.c
++++ b/block.c
+@@ -1091,6 +1091,7 @@ static int bdrv_open_driver(BlockDriverState *bs, BlockDriver *drv,
+ {
+     Error *local_err = NULL;
+     int ret;
++    bool open_failed;
+ 
+     bdrv_assign_node_name(bs, node_name, &local_err);
+     if (local_err) {
+@@ -1111,7 +1112,9 @@ static int bdrv_open_driver(BlockDriverState *bs, BlockDriver *drv,
+         ret = 0;
+     }
+ 
+-    if (ret < 0) {
++    open_failed = ret < 0;
++
++    if (open_failed) {
+         if (local_err) {
+             error_propagate(errp, local_err);
+         } else if (bs->filename[0]) {
+@@ -1142,10 +1145,15 @@ static int bdrv_open_driver(BlockDriverState *bs, BlockDriver *drv,
+     return 0;
+ 
+ free_and_fail:
+-    /* FIXME Close bs first if already opened*/
+-    g_free(bs->opaque);
+-    bs->opaque = NULL;
+-    bs->drv = NULL;
++    if (open_failed) {
++        g_free(bs->opaque);
++        bs->opaque = NULL;
++        bs->drv = NULL;
++    }
++    if (bs->file != NULL) {
++        bdrv_unref_child(bs, bs->file);
++        bs->file = NULL;
++    }
+     return ret;
+ }
+ 
+@@ -2607,9 +2615,6 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+ 
+ fail:
+     blk_unref(file);
+-    if (bs->file != NULL) {
+-        bdrv_unref_child(bs, bs->file);
+-    }
+     QDECREF(snapshot_options);
+     QDECREF(bs->explicit_options);
+     QDECREF(bs->options);
 -- 
-1.8.3.1
+2.11.0
