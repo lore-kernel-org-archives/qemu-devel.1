@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dRDbi-0004CS-HW
+	(envelope-from <dgibson@ozlabs.org>) id 1dRDbi-0004CR-HX
 	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 04:18:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dRDbh-00027d-B5
+	(envelope-from <dgibson@ozlabs.org>) id 1dRDbh-00027c-Ab
 	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 04:18:22 -0400
-Date: Sat, 1 Jul 2017 17:50:24 +1000
+Date: Sat, 1 Jul 2017 17:51:38 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170701075024.GI13989@umbus.fritz.box>
-References: <149882869053.24031.15086612121177689276.stgit@bahia.lan>
+Message-ID: <20170701075138.GK13989@umbus.fritz.box>
+References: <149881542765.17418.16611868807694688341.stgit@bahia>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="2nTeH+t2PBomgucg"
+	protocol="application/pgp-signature"; boundary="AYsPlKobQGgtCvjI"
 Content-Disposition: inline
-In-Reply-To: <149882869053.24031.15086612121177689276.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH] spapr: make
- spapr_populate_hotplug_cpu_dt() static
+In-Reply-To: <149881542765.17418.16611868807694688341.stgit@bahia>
+Subject: Re: [Qemu-devel] [PATCH] spapr: fix bogus function name in comment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +27,43 @@ To: Greg Kurz <groug@kaod.org>
 Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-ppc@nongnu.org
 
 
---2nTeH+t2PBomgucg
+--AYsPlKobQGgtCvjI
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 30, 2017 at 03:18:10PM +0200, Greg Kurz wrote:
-> Since commit ff9006ddbfd1 ("spapr: move spapr_core_[foo]plug() callbacks
-> close to machine code in spapr.c"), this function doesn't need to be exte=
-rn
-> anymore.
+On Fri, Jun 30, 2017 at 11:37:07AM +0200, Greg Kurz wrote:
+> $ git grep spapr_ppc_reset
+> hw/ppc/spapr.c: * as part of spapr_ppc_reset().
+>=20
+> $ git grep ppc_spapr_reset
+> hw/ppc/spapr.c:static void ppc_spapr_reset(void)
+> hw/ppc/spapr.c:    mc->reset =3D ppc_spapr_reset;
+> hw/ppc/spapr_hcall.c:        /* If ppc_spapr_reset() did not set up a HPT
+>  but one is necessary
 >=20
 > Signed-off-by: Greg Kurz <groug@kaod.org>
 
 Applied to ppc-for-2.10.
 
 > ---
->  hw/ppc/spapr.c         |    4 ++--
->  include/hw/ppc/spapr.h |    2 --
->  2 files changed, 2 insertions(+), 4 deletions(-)
+>  hw/ppc/spapr.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 0ee9fac50bd4..65d8ad2f4966 100644
+> index 0ee9fac50bd4..43a1cb5725d6 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -2863,8 +2863,8 @@ out:
->      error_propagate(errp, local_err);
->  }
-> =20
-> -void *spapr_populate_hotplug_cpu_dt(CPUState *cs, int *fdt_offset,
-> -                                    sPAPRMachineState *spapr)
-> +static void *spapr_populate_hotplug_cpu_dt(CPUState *cs, int *fdt_offset,
-> +                                           sPAPRMachineState *spapr)
+> @@ -1973,7 +1973,7 @@ static void spapr_boot_set(void *opaque, const char=
+ *boot_device,
+>   * Unlike PCI DR devices, LMB DR devices explicitly register this reset
+>   * routine. Reset for PCI DR devices will be handled by PHB reset routine
+>   * when it walks all its children devices. LMB devices reset occurs
+> - * as part of spapr_ppc_reset().
+> + * as part of ppc_spapr_reset().
+>   */
+>  static void spapr_drc_reset(void *opaque)
 >  {
->      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
->      DeviceClass *dc =3D DEVICE_GET_CLASS(cs);
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index a66bbac35242..12bf9697990e 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -640,8 +640,6 @@ void spapr_hotplug_req_add_by_count_indexed(sPAPRDRCo=
-nnectorType drc_type,
->  void spapr_hotplug_req_remove_by_count_indexed(sPAPRDRConnectorType drc_=
-type,
->                                                 uint32_t count, uint32_t =
-index);
->  void spapr_cpu_parse_features(sPAPRMachineState *spapr);
-> -void *spapr_populate_hotplug_cpu_dt(CPUState *cs, int *fdt_offset,
-> -                                    sPAPRMachineState *spapr);
-> =20
->  /* CPU and LMB DRC release callbacks. */
->  void spapr_core_release(DeviceState *dev);
 >=20
 
 --=20
@@ -87,25 +72,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---2nTeH+t2PBomgucg
+--AYsPlKobQGgtCvjI
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZV1Q8AAoJEGw4ysog2bOS4P0QAObR28rEfoIlcJeW5W5U4vlo
-GESFD1iSkyQd3KW1N5pSql25DXTbpah8LSvClOMJIWf5I13nUqyo/Vt6bQepA9p9
-fw1vuO5MhiGwvR/bqDccXOuI4WdFct6NS4RAc/dhZG0c0ErJ3mhCjG+Yy+FSjm/T
-MvBf0VjeRSkqmsftBrpHHE7iPl68cKpRlCeDzhPrOmy9OSpMiF9nyutSuy2rv2S1
-LIxoYQylkeX7UGQR0xxUCSxomVYpSBhk56TGhycDZJIq0kNr+P8TLq+zyOfdUoGB
-eymbtPwL3EPUhRhYbwhSQLRdD/yvvYJi7ekf54tIggXt9igl3QoQBvTBvjdDdCpp
-BuAxmbPutXTlVRXPMmfU5yztYCx7Gcl0Z6eIu9cwIEcpvexKuHUbaa5DmDQttAM3
-pc4nj/Ks23lJLfW+xLbUScwu6Y9tqZQ+XwzDB1caWkj1IIrBbbbs1JyDjbE5LmKp
-DxkXASQKthZtBbAbwC0582dRi7AmLmK3QJinXOQI03HdCy15sQRDS8IarJ+LF7oA
-/t53Ob5YGIs++Ma4pWbkEFQTVS3xXOm5myK55pIunlEEwBWl1pT5ob5Y9kt4aJkg
-Mzv2JcOcQR57czmx1hlPVlhPxvlefvCwjxxNgZSQdDDTmBCsg1hFlAWOVBuYdQ9A
-CHgXceVCiKln6qJHAQYg
-=Aa4p
+iQIcBAEBCAAGBQJZV1SKAAoJEGw4ysog2bOSL/kQAI7hmWUqhIcESIRW1ghXUWie
+nstSVbetb2w05c7k4GPFrFlVTiPzGKTj04rJAyFw4C87ERmELMhungAj/XaM6pHI
+Y/zBduLW4q9wJsSVLrQPmPuZ0a1HMpd0zHlslaHwGcNzQNPUzlO14zoyIxLW7w2i
+u7MJ5GyWFL1OVQ2ZoG3Dch6sx/HA3ZxuKPiAgbosCsX5fvXvz+RXRPvVnt4PzIgW
+dxwA4niv8/RQoY1L6H0L8REy3G8qXZdWxXgg+rooqGvasU0fhtd8WU2dqg3Qfuwf
+C3W0cjV5EZ0N8/quljGs000Ni9PeTxiLb0tPojTwnCg20UfjEVM6R3jXQCv7gBeX
+tb2hTydKChFSQgRo1CgxN9qUZXxTwHpOljSZilZRMHrikjO+/KVEKbYY7RBp7d/E
+OK3XbGkM/kTFLkJNKAnWLANZjDwDqOi0KQ4YqCQ5/KoW10ESmg7kQLeystXkS0Av
+25PM+gg9VrbVBe27Bxz3o1ee9fnH3ZhR/8N7KYJeSiYWnVIWxGkh/9PaLszu7jNf
+iVetg6EC2P1UvJOjHu6Ecsgekx+Y0yj9AACQkmhOxW9K0n+T52e8nz4DtSAfkXy6
+O4fOCTFMGVHJ8XZaR6wc61+6NMENoG4+iN9rmODKZkDktNoHFCCyYmR87uCTc5lP
+b4nfV7rl2MBN2dkNKhlq
+=Nkzg
 -----END PGP SIGNATURE-----
 
---2nTeH+t2PBomgucg--
+--AYsPlKobQGgtCvjI--
