@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dROyH-0001f6-7Z
+	(envelope-from <rth7680@gmail.com>) id 1dROyG-0001f1-JR
 	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 16:26:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dROyF-0006mS-T3
-	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 16:26:25 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:36261)
+	(envelope-from <rth7680@gmail.com>) id 1dROyE-0006mC-KX
+	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 16:26:24 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:36792)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dROyF-0006mI-Or
-	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 16:26:23 -0400
-Received: by mail-qk0-x242.google.com with SMTP id v143so6825677qkb.3
-	for <qemu-devel@nongnu.org>; Sat, 01 Jul 2017 13:26:23 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dROyE-0006m5-F3
+	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 16:26:22 -0400
+Received: by mail-qt0-x243.google.com with SMTP id v31so19209234qtb.3
+	for <qemu-devel@nongnu.org>; Sat, 01 Jul 2017 13:26:22 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Sat,  1 Jul 2017 13:25:55 -0700
-Message-Id: <20170701202600.14057-4-rth@twiddle.net>
+Date: Sat,  1 Jul 2017 13:25:54 -0700
+Message-Id: <20170701202600.14057-3-rth@twiddle.net>
 In-Reply-To: <20170701202600.14057-1-rth@twiddle.net>
 References: <20170701202600.14057-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v2 3/8] target/s390x: Tidy SRST
+Subject: [Qemu-devel] [PATCH v2 2/8] target/s390x: Implement CONVERT UNICODE
+ insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,123 +30,434 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: david@redhat.com, aurelien@aurel32.net
 
-Since we require all registers saved on input, read R0 from ENV instead
-of passing it manually.  Recognize the specification exception when R0
-contains incorrect data.  Keep high bits of result registers unmodified
-when in 31 or 24-bit mode.
-
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/s390x/helper.h      |  2 +-
- target/s390x/mem_helper.c  | 25 ++++++++++++++-----------
- target/s390x/translate.c   |  9 +++++++--
- target/s390x/insn-data.def |  2 +-
- 4 files changed, 23 insertions(+), 15 deletions(-)
+ target/s390x/helper.h      |   6 +
+ target/s390x/mem_helper.c  | 310 +++++++++++++++++++++++++++++++++++++++++++++
+ target/s390x/translate.c   |  44 +++++++
+ target/s390x/insn-data.def |  13 ++
+ 4 files changed, 373 insertions(+)
 
 diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 2793cf3..a2e5b9b 100644
+index 23e8d1d..2793cf3 100644
 --- a/target/s390x/helper.h
 +++ b/target/s390x/helper.h
-@@ -12,7 +12,7 @@ DEF_HELPER_FLAGS_3(divs32, TCG_CALL_NO_WG, s64, env, s64, s64)
- DEF_HELPER_FLAGS_3(divu32, TCG_CALL_NO_WG, i64, env, i64, i64)
- DEF_HELPER_FLAGS_3(divs64, TCG_CALL_NO_WG, s64, env, s64, s64)
- DEF_HELPER_FLAGS_4(divu64, TCG_CALL_NO_WG, i64, env, i64, i64, i64)
--DEF_HELPER_4(srst, i64, env, i64, i64, i64)
-+DEF_HELPER_3(srst, void, env, i32, i32)
- DEF_HELPER_4(clst, i64, env, i64, i64, i64)
- DEF_HELPER_FLAGS_4(mvn, TCG_CALL_NO_WG, void, env, i32, i64, i64)
- DEF_HELPER_FLAGS_4(mvo, TCG_CALL_NO_WG, void, env, i32, i64, i64)
+@@ -107,6 +107,12 @@ DEF_HELPER_2(stfle, i32, env, i64)
+ DEF_HELPER_FLAGS_2(lpq, TCG_CALL_NO_WG, i64, env, i64)
+ DEF_HELPER_FLAGS_4(stpq, TCG_CALL_NO_WG, void, env, i64, i64, i64)
+ DEF_HELPER_4(mvcos, i32, env, i64, i64, i64)
++DEF_HELPER_4(cu12, i32, env, i32, i32, i32)
++DEF_HELPER_4(cu14, i32, env, i32, i32, i32)
++DEF_HELPER_4(cu21, i32, env, i32, i32, i32)
++DEF_HELPER_4(cu24, i32, env, i32, i32, i32)
++DEF_HELPER_4(cu41, i32, env, i32, i32, i32)
++DEF_HELPER_4(cu42, i32, env, i32, i32, i32)
+ 
+ #ifndef CONFIG_USER_ONLY
+ DEF_HELPER_3(servc, i32, env, i64, i64)
 diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 0b18560..74b48aa 100644
+index 513b402..0b18560 100644
 --- a/target/s390x/mem_helper.c
 +++ b/target/s390x/mem_helper.c
-@@ -538,18 +538,21 @@ static inline void set_length(CPUS390XState *env, int reg, uint64_t length)
+@@ -2196,3 +2196,313 @@ uint32_t HELPER(mvcos)(CPUS390XState *env, uint64_t dest, uint64_t src,
+ 
+     return cc;
  }
- 
- /* search string (c is byte to search, r2 is string, r1 end of string) */
--uint64_t HELPER(srst)(CPUS390XState *env, uint64_t r0, uint64_t end,
--                      uint64_t str)
-+void HELPER(srst)(CPUS390XState *env, uint32_t r1, uint32_t r2)
- {
-     uintptr_t ra = GETPC();
-+    uint64_t end, str;
-     uint32_t len;
--    uint8_t v, c = r0;
-+    uint8_t v, c = env->regs[0];
- 
--    str = wrap_address(env, str);
--    end = wrap_address(env, end);
-+    /* Bits 32-55 must contain all 0.  */
-+    if (env->regs[0] & 0xffffff00u) {
-+        cpu_restore_state(ENV_GET_CPU(env), ra);
-+        program_interrupt(env, PGM_SPECIFICATION, 6);
++
++/* Decode a Unicode character.  A return value < 0 indicates success, storing
++   the UTF-32 result into OCHAR and the input length into OLEN.  A return
++   value >= 0 indicates failure, and the CC value to be returned.  */
++typedef int (*decode_unicode_fn)(CPUS390XState *env, uint64_t addr,
++                                 uint64_t ilen, bool enh_check, uintptr_t ra,
++                                 uint32_t *ochar, uint32_t *olen);
++
++/* Encode a Unicode character.  A return value < 0 indicates success, storing
++   the bytes into ADDR and the output length into OLEN.  A return value >= 0
++   indicates failure, and the CC value to be returned.  */
++typedef int (*encode_unicode_fn)(CPUS390XState *env, uint64_t addr,
++                                 uint64_t ilen, uintptr_t ra, uint32_t c,
++                                 uint32_t *olen);
++
++static int decode_utf8(CPUS390XState *env, uint64_t addr, uint64_t ilen,
++                       bool enh_check, uintptr_t ra,
++                       uint32_t *ochar, uint32_t *olen)
++{
++    uint8_t s0, s1, s2, s3;
++    uint32_t c, l;
++
++    if (ilen < 1) {
++        return 0;
 +    }
- 
--    /* Assume for now that R2 is unmodified.  */
--    env->retxl = str;
-+    str = get_address(env, r2);
-+    end = get_address(env, r1);
- 
-     /* Lest we fail to service interrupts in a timely manner, limit the
-        amount of work we're willing to do.  For now, let's cap at 8k.  */
-@@ -557,20 +560,20 @@ uint64_t HELPER(srst)(CPUS390XState *env, uint64_t r0, uint64_t end,
-         if (str + len == end) {
-             /* Character not found.  R1 & R2 are unmodified.  */
-             env->cc_op = 2;
--            return end;
-+            return;
-         }
-         v = cpu_ldub_data_ra(env, str + len, ra);
-         if (v == c) {
-             /* Character found.  Set R1 to the location; R2 is unmodified.  */
-             env->cc_op = 1;
--            return str + len;
-+            set_address(env, r1, str + len);
-+            return;
-         }
-     }
- 
-     /* CPU-determined bytes processed.  Advance R2 to next byte to process.  */
--    env->retxl = str + len;
-     env->cc_op = 3;
--    return end;
-+    set_address(env, r2, str + len);
- }
- 
- /* unsigned string compare (c is string terminator) */
++    s0 = cpu_ldub_data_ra(env, addr, ra);
++    if (s0 <= 0x7f) {
++        /* one byte character */
++        l = 1;
++        c = s0;
++    } else if (s0 <= (enh_check ? 0xc1 : 0xbf)) {
++        /* invalid character */
++        return 2;
++    } else if (s0 <= 0xdf) {
++        /* two byte character */
++        l = 2;
++        if (ilen < 2) {
++            return 0;
++        }
++        s1 = cpu_ldub_data_ra(env, addr + 1, ra);
++        c = s0 & 0x1f;
++        c = (c << 6) | (s1 & 0x3f);
++        if (enh_check && (s1 & 0xc0) != 0x80) {
++            return 2;
++        }
++    } else if (s0 <= 0xef) {
++        /* three byte character */
++        l = 3;
++        if (ilen < 3) {
++            return 0;
++        }
++        s1 = cpu_ldub_data_ra(env, addr + 1, ra);
++        s2 = cpu_ldub_data_ra(env, addr + 2, ra);
++        c = s0 & 0x0f;
++        c = (c << 6) | (s1 & 0x3f);
++        c = (c << 6) | (s2 & 0x3f);
++        /* Fold the byte-by-byte range descriptions in the PoO into
++           tests against the complete value.  It disallows encodings
++           that could be smaller, and the UTF-16 surrogates.  */
++        if (enh_check
++            && ((s1 & 0xc0) != 0x80
++                || (s2 & 0xc0) != 0x80
++                || c < 0x1000
++                || (c >= 0xd800 && c <= 0xdfff))) {
++            return 2;
++        }
++    } else if (s0 <= (enh_check ? 0xf4 : 0xf7)) {
++        /* four byte character */
++        l = 4;
++        if (ilen < 4) {
++            return 0;
++        }
++        s1 = cpu_ldub_data_ra(env, addr + 1, ra);
++        s2 = cpu_ldub_data_ra(env, addr + 2, ra);
++        s3 = cpu_ldub_data_ra(env, addr + 3, ra);
++        c = s0 & 0x0f;
++        c = (c << 6) | (s1 & 0x3f);
++        c = (c << 6) | (s2 & 0x3f);
++        c = (c << 6) | (s3 & 0x3f);
++        /* See above.  */
++        if (enh_check
++            && ((s1 & 0xc0) != 0x80
++                || (s2 & 0xc0) != 0x80
++                || (s3 & 0xc0) != 0x80
++                || c < 0x010000
++                || c > 0x10ffff)) {
++            return 2;
++        }
++    } else {
++        /* invalid character */
++        return 2;
++    }
++
++    *ochar = c;
++    *olen = l;
++    return -1;
++}
++
++static int decode_utf16(CPUS390XState *env, uint64_t addr, uint64_t ilen,
++                        bool enh_check, uintptr_t ra,
++                        uint32_t *ochar, uint32_t *olen)
++{
++    uint16_t s0, s1;
++    uint32_t c, l;
++
++    if (ilen < 2) {
++        return 0;
++    }
++    s0 = cpu_lduw_data_ra(env, addr, ra);
++    if ((s0 & 0xfc00) != 0xd800) {
++        /* one word character */
++        l = 2;
++        c = s0;
++    } else {
++        /* two word character */
++        l = 4;
++        if (ilen < 4) {
++            return 0;
++        }
++        s1 = cpu_lduw_data_ra(env, addr + 2, ra);
++        c = extract32(s0, 6, 4) + 1;
++        c = (c << 6) | (s0 & 0x3f);
++        c = (c << 10) | (s1 & 0x3ff);
++        if (enh_check && (s1 & 0xfc00) != 0xdc00) {
++            /* invalid surrogate character */
++            return 2;
++        }
++    }
++
++    *ochar = c;
++    *olen = l;
++    return -1;
++}
++
++static int decode_utf32(CPUS390XState *env, uint64_t addr, uint64_t ilen,
++                        bool enh_check, uintptr_t ra,
++                        uint32_t *ochar, uint32_t *olen)
++{
++    uint32_t c;
++
++    if (ilen < 4) {
++        return 0;
++    }
++    c = cpu_ldl_data_ra(env, addr, ra);
++    if ((c >= 0xd800 && c <= 0xdbff) || c > 0x10ffff) {
++        /* invalid unicode character */
++        return 2;
++    }
++
++    *ochar = c;
++    *olen = 4;
++    return -1;
++}
++
++static int encode_utf8(CPUS390XState *env, uint64_t addr, uint64_t ilen,
++                       uintptr_t ra, uint32_t c, uint32_t *olen)
++{
++    uint8_t d[4];
++    uint32_t l, i;
++
++    if (c <= 0x7f) {
++        /* one byte character */
++        l = 1;
++        d[0] = c;
++    } else if (c <= 0x7ff) {
++        /* two byte character */
++        l = 2;
++        d[1] = 0x80 | extract32(c, 0, 6);
++        d[0] = 0xc0 | extract32(c, 6, 5);
++    } else if (c <= 0xffff) {
++        /* three byte character */
++        l = 3;
++        d[2] = 0x80 | extract32(c, 0, 6);
++        d[1] = 0x80 | extract32(c, 6, 6);
++        d[0] = 0xe0 | extract32(c, 12, 4);
++    } else {
++        /* four byte character */
++        l = 4;
++        d[3] = 0x80 | extract32(c, 0, 6);
++        d[2] = 0x80 | extract32(c, 6, 6);
++        d[1] = 0x80 | extract32(c, 12, 6);
++        d[0] = 0xf0 | extract32(c, 18, 3);
++    }
++
++    if (ilen < l) {
++        return 1;
++    }
++    for (i = 0; i < l; ++i) {
++        cpu_stb_data_ra(env, addr + i, d[i], ra);
++    }
++
++    *olen = l;
++    return -1;
++}
++
++static int encode_utf16(CPUS390XState *env, uint64_t addr, uint64_t ilen,
++                        uintptr_t ra, uint32_t c, uint32_t *olen)
++{
++    uint16_t d0, d1;
++
++    if (c <= 0xffff) {
++        /* one word character */
++        if (ilen < 2) {
++            return 1;
++        }
++        cpu_stw_data_ra(env, addr, c, ra);
++        *olen = 2;
++    } else {
++        /* two word character */
++        if (ilen < 4) {
++            return 1;
++        }
++        d1 = 0xdc00 | extract32(c, 0, 10);
++        d0 = 0xd800 | extract32(c, 10, 6);
++        d0 = deposit32(d0, 6, 4, extract32(c, 16, 5) - 1);
++        cpu_stw_data_ra(env, addr + 0, d0, ra);
++        cpu_stw_data_ra(env, addr + 2, d1, ra);
++        *olen = 4;
++    }
++
++    return -1;
++}
++
++static int encode_utf32(CPUS390XState *env, uint64_t addr, uint64_t ilen,
++                        uintptr_t ra, uint32_t c, uint32_t *olen)
++{
++    if (ilen < 4) {
++        return 1;
++    }
++    cpu_stl_data_ra(env, addr, c, ra);
++    *olen = 4;
++    return -1;
++}
++
++static inline uint32_t convert_unicode(CPUS390XState *env, uint32_t r1,
++                                       uint32_t r2, uint32_t m3, uintptr_t ra,
++                                       decode_unicode_fn decode,
++                                       encode_unicode_fn encode)
++{
++    uint64_t dst = get_address(env, r1);
++    uint64_t dlen = get_length(env, r1 + 1);
++    uint64_t src = get_address(env, r2);
++    uint64_t slen = get_length(env, r2 + 1);
++    bool enh_check = m3 & 1;
++    int cc, i;
++
++    /* Lest we fail to service interrupts in a timely manner, limit the
++       amount of work we're willing to do.  For now, let's cap at 256.  */
++    for (i = 0; i < 256; ++i) {
++        uint32_t c, ilen, olen;
++
++        cc = decode(env, src, slen, enh_check, ra, &c, &ilen);
++        if (unlikely(cc >= 0)) {
++            break;
++        }
++        cc = encode(env, dst, dlen, ra, c, &olen);
++        if (unlikely(cc >= 0)) {
++            break;
++        }
++
++        src += ilen;
++        slen -= ilen;
++        dst += olen;
++        dlen -= olen;
++        cc = 3;
++    }
++
++    set_address(env, r1, dst);
++    set_length(env, r1 + 1, dlen);
++    set_address(env, r2, src);
++    set_length(env, r2 + 1, slen);
++
++    return cc;
++}
++
++uint32_t HELPER(cu12)(CPUS390XState *env, uint32_t r1, uint32_t r2, uint32_t m3)
++{
++    return convert_unicode(env, r1, r2, m3, GETPC(),
++                           decode_utf8, encode_utf16);
++}
++
++uint32_t HELPER(cu14)(CPUS390XState *env, uint32_t r1, uint32_t r2, uint32_t m3)
++{
++    return convert_unicode(env, r1, r2, m3, GETPC(),
++                           decode_utf8, encode_utf32);
++}
++
++uint32_t HELPER(cu21)(CPUS390XState *env, uint32_t r1, uint32_t r2, uint32_t m3)
++{
++    return convert_unicode(env, r1, r2, m3, GETPC(),
++                           decode_utf16, encode_utf8);
++}
++
++uint32_t HELPER(cu24)(CPUS390XState *env, uint32_t r1, uint32_t r2, uint32_t m3)
++{
++    return convert_unicode(env, r1, r2, m3, GETPC(),
++                           decode_utf16, encode_utf32);
++}
++
++uint32_t HELPER(cu41)(CPUS390XState *env, uint32_t r1, uint32_t r2, uint32_t m3)
++{
++    return convert_unicode(env, r1, r2, m3, GETPC(),
++                           decode_utf32, encode_utf8);
++}
++
++uint32_t HELPER(cu42)(CPUS390XState *env, uint32_t r1, uint32_t r2, uint32_t m3)
++{
++    return convert_unicode(env, r1, r2, m3, GETPC(),
++                           decode_utf32, encode_utf16);
++}
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 9301daa..b887843 100644
+index e739525..9301daa 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -4280,9 +4280,14 @@ static ExitStatus op_stpq(DisasContext *s, DisasOps *o)
- 
- static ExitStatus op_srst(DisasContext *s, DisasOps *o)
- {
--    gen_helper_srst(o->in1, cpu_env, regs[0], o->in1, o->in2);
-+    TCGv_i32 r1 = tcg_const_i32(get_field(s->fields, r1));
-+    TCGv_i32 r2 = tcg_const_i32(get_field(s->fields, r2));
-+
-+    gen_helper_srst(cpu_env, r1, r2);
-+
-+    tcg_temp_free_i32(r1);
-+    tcg_temp_free_i32(r2);
-     set_cc_static(s);
--    return_low128(o->in2);
+@@ -2122,6 +2122,49 @@ static ExitStatus op_ct(DisasContext *s, DisasOps *o)
      return NO_EXIT;
  }
  
++static ExitStatus op_cuXX(DisasContext *s, DisasOps *o)
++{
++    int m3 = get_field(s->fields, m3);
++    TCGv_i32 r1 = tcg_const_i32(get_field(s->fields, r1));
++    TCGv_i32 r2 = tcg_const_i32(get_field(s->fields, r2));
++    TCGv_i32 chk;
++
++    if (!s390_has_feat(s->insn->fac == S390_FEAT_EXTENDED_TRANSLATION_3
++                       ? S390_FEAT_ETF3_ENH : S390_FEAT_ETF2_ENH)) {
++        m3 = 0;
++    }
++    chk = tcg_const_i32(m3);
++
++    switch (s->insn->data) {
++    case 12:
++        gen_helper_cu12(cc_op, cpu_env, r1, r2, chk);
++        break;
++    case 14:
++        gen_helper_cu14(cc_op, cpu_env, r1, r2, chk);
++        break;
++    case 21:
++        gen_helper_cu21(cc_op, cpu_env, r1, r2, chk);
++        break;
++    case 24:
++        gen_helper_cu24(cc_op, cpu_env, r1, r2, chk);
++        break;
++    case 41:
++        gen_helper_cu41(cc_op, cpu_env, r1, r2, chk);
++        break;
++    case 42:
++        gen_helper_cu42(cc_op, cpu_env, r1, r2, chk);
++        break;
++    default:
++        g_assert_not_reached();
++    }
++
++    tcg_temp_free_i32(r1);
++    tcg_temp_free_i32(r2);
++    tcg_temp_free_i32(chk);
++    set_cc_static(s);
++    return NO_EXIT;
++}
++
+ #ifndef CONFIG_USER_ONLY
+ static ExitStatus op_diag(DisasContext *s, DisasOps *o)
+ {
+@@ -5477,6 +5520,7 @@ enum DisasInsnEnum {
+ #define FAC_EH          S390_FEAT_STFLE_49 /* execution-hint */
+ #define FAC_PPA         S390_FEAT_STFLE_49 /* processor-assist */
+ #define FAC_LZRB        S390_FEAT_STFLE_53 /* load-and-zero-rightmost-byte */
++#define FAC_ETF3        S390_FEAT_EXTENDED_TRANSLATION_3
+ 
+ static const DisasInsn insn_info[] = {
+ #include "insn-data.def"
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 323a301..bc6ff01 100644
+index 6ac12b8..323a301 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -736,7 +736,7 @@
-     C(0xec57, RXSBG,   RIE_f, GIE, 0, r2, r1, 0, rosbg, 0)
+@@ -313,6 +313,19 @@
+     C(0xb3a1, CDLGBR,  RRF_e, FPE, 0, r2_o, f1, 0, cdlgb, 0)
+     C(0xb3a2, CXLGBR,  RRF_e, FPE, 0, r2_o, x1, 0, cxlgb, 0)
  
- /* SEARCH STRING */
--    C(0xb25e, SRST,    RRE,   Z,   r1_o, r2_o, 0, 0, srst, 0)
-+    C(0xb25e, SRST,    RRE,   Z,   0, 0, 0, 0, srst, 0)
- 
- /* SET ACCESS */
-     C(0xb24e, SAR,     RRE,   Z,   0, r2_o, 0, 0, sar, 0)
++/* CONVERT UTF-8 TO UTF-16 */
++    D(0xb2a7, CU12,    RRF_c, Z,   0, 0, 0, 0, cuXX, 0, 12)
++/* CONVERT UTF-8 TO UTF-32 */
++    D(0xb9b0, CU14,    RRF_c, ETF3, 0, 0, 0, 0, cuXX, 0, 14)
++/* CONVERT UTF-16 to UTF-8 */
++    D(0xb2a6, CU21,    RRF_c, Z,   0, 0, 0, 0, cuXX, 0, 21)
++/* CONVERT UTF-16 to UTF-32 */
++    D(0xb9b1, CU24,    RRF_c, ETF3, 0, 0, 0, 0, cuXX, 0, 24)
++/* CONVERT UTF-32 to UTF-8 */
++    D(0xb9b2, CU41,    RRF_c, ETF3, 0, 0, 0, 0, cuXX, 0, 41)
++/* CONVERT UTF-32 to UTF-16 */
++    D(0xb9b3, CU42,    RRF_c, ETF3, 0, 0, 0, 0, cuXX, 0, 42)
++
+ /* DIVIDE */
+     C(0x1d00, DR,      RR_a,  Z,   r1_D32, r2_32s, new_P, r1_P32, divs32, 0)
+     C(0x5d00, D,       RX_a,  Z,   r1_D32, m2_32s, new_P, r1_P32, divs32, 0)
 -- 
 2.9.4
