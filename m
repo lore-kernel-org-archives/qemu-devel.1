@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dR7i1-0006kH-5Q
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 22:00:29 -0400
+	(envelope-from <bounces@canonical.com>) id 1dRA8R-0003at-Dy
+	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 00:35:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dR7hy-0003Zg-3d
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 22:00:29 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:47177)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dR7hx-0003Yl-QW
-	for qemu-devel@nongnu.org; Fri, 30 Jun 2017 22:00:26 -0400
-Date: Fri, 30 Jun 2017 22:00:24 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170701020024.GB1320@flamenco>
-References: <1498768109-4092-1-git-send-email-cota@braap.org>
-	<4e66d79b-6455-58f6-83ce-0ada25d1cec4@twiddle.net>
+	(envelope-from <bounces@canonical.com>) id 1dRA8M-0005Ka-Hr
+	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 00:35:55 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53058)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dRA8M-0005Jt-BF
+	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 00:35:50 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dRA8L-0006Fy-5j
+	for <qemu-devel@nongnu.org>; Sat, 01 Jul 2017 04:35:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id DB28F2E819D
+	for <qemu-devel@nongnu.org>; Sat,  1 Jul 2017 04:35:48 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4e66d79b-6455-58f6-83ce-0ada25d1cec4@twiddle.net>
-Subject: Re: [Qemu-devel] [RFC 0/7] tcg: parallel code generation (Work in
- Progress)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 01 Jul 2017 04:17:19 -0000
+From: Launchpad Bug Tracker <965133@bugs.launchpad.net>
+Reply-To: Bug 965133 <965133@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20120326102736.18275.22299.malonedeb@wampee.canonical.com>
+Message-Id: <149888264109.11072.139612811028444457.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 965133] Re: Sparc64 crash on start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +36,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Fri, Jun 30, 2017 at 01:25:54 -0700, Richard Henderson wrote:
-> On 06/29/2017 01:28 PM, Emilio G. Cota wrote:
-> >- Patches 2-3 remove *tbs[] to use a binary search tree instead.
-> >   This removes the assumption in tb_find_pc that *tbs[] are ordered
-> >   by tc_ptr, thereby allowing us to generate code regardless of
-> >   its location on the host (as we do after patch 6).
-> 
-> Have you considered a scheme by which the front end translation and tcg
-> optimization are done outside the lock, but final code generation is done
-> inside the lock?
-> 
-> It would put at least half of the translation time in the parallel space
-> without requiring changes to code_buffer allocation.
+[Expired for QEMU because there has been no activity for 60 days.]
 
-I don't think that would save much, because the performance issue comes
-from the fact that we have to grab the lock, regardless of how long we hold
-it. So even if we did nothing inside the lock, scalability when
-translating a lot of code (e.g. booting) would still be quite bad.
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-So we either get rid of the lock altogether, or use a more scalable lock.
+-- =
 
-		E.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/965133
+
+Title:
+  Sparc64 crash on start
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  qemu version 1.0.1 compiled on a Ubuntu live on a HP laptop win a x64
+  architecture.
+
+  With more than 4G of memory sparc64 machine crash on start.
+
+  command line: qemu-system-sparc64 -m 4G
+
+  output:
+  VNC server running on `127.0.0.1:5900'
+  qemu: fatal: Trap 0x0064 while trap level (5) >=3D MAXTL (5), Error state
+  pc: 00000000ffd04c80  npc: 00000000ffd04c84
+  General Registers:
+  %g0-3: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %g4-7: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+
+  Current Register Window:
+  %o0-3: 00000000ffd00000 0000000000080000 0000000000080000 000000000000000=
+0 =
+
+  %o4-7: 0000000000000000 0000000000000000 00000000fff754e1 00000000ffd144d=
+4 =
+
+  %l0-3: 0000000100000000 00000000fff75c4d 0000000000000000 000000000000000=
+0 =
+
+  %l4-7: 0000000000000000 0000000000000000 0000000000000000 000000000000000=
+0 =
+
+  %i0-3: 0000000000000000 0000000000000000 0000000100000000 000000000000003=
+6 =
+
+  %i4-7: 00000000ffe87418 00000000ffe87648 00000000fff75591 00000000ffd0bf5=
+4 =
+
+
+  Floating Point Registers:
+  %f00: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f08: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f16: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f24: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f32: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f40: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f48: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f56: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  pstate: 00000414 ccr: 99 (icc: N--C xcc: N--C) asi: 00 tl: 5 pil: 0
+  cansave: 5 canrestore: 1 otherwin: 0 wstate: 0 cleanwin: 6 cwp: 3
+  fsr: 0000000000000000 y: 0000000000000000 fprs: 0000000000000000
+  Aborted (core dumped)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/965133/+subscriptions
