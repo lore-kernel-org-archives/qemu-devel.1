@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dRRBu-0001UR-G2
-	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 18:48:39 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dRRKT-0003Jl-JF
+	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 18:57:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dRRBt-0002lp-O9
-	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 18:48:38 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dRRKQ-0000mj-JH
+	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 18:57:29 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:36633)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dRRKQ-0000mN-Cr
+	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 18:57:26 -0400
+Received: by mail-qk0-x244.google.com with SMTP id v143so7085459qkb.3
+	for <qemu-devel@nongnu.org>; Sat, 01 Jul 2017 15:57:26 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
-	<149865292643.17063.14495945233139782748.stgit@frigg.lan>
+	<149865316837.17063.1608754834009945976.stgit@frigg.lan>
+	<20170630000240.GF13979@flamenco>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <8738c294-8c73-492e-f574-5d1d88d8cb38@twiddle.net>
-Date: Sat, 1 Jul 2017 15:48:28 -0700
+Message-ID: <bd970a00-5442-d1e0-c455-d4230179ae23@twiddle.net>
+Date: Sat, 1 Jul 2017 15:57:21 -0700
 MIME-Version: 1.0
-In-Reply-To: <149865292643.17063.14495945233139782748.stgit@frigg.lan>
+In-Reply-To: <20170630000240.GF13979@flamenco>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v11 03/29] target: [tcg] Use a generic enum
- for DISAS_ values
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v11 04/29] target: [tcg] Add generic
+ translation framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,32 +33,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Llu=c3=ads_Vilanova?= <vilanova@ac.upc.edu>, qemu-devel@nongnu.org
-Cc: Marek Vasut <marex@denx.de>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Chris Wulff <crwulff@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Alexander Graf <agraf@suse.de>, Max Filippov <jcmvbkbc@gmail.com>, Michael Walle <michael@walle.cc>, "Emilio G. Cota" <cota@braap.org>, "open list:ARM" <qemu-arm@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Stafford Horne <shorne@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?Q?Llu=c3=ads_Vilanova?= <vilanova@ac.upc.edu>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 
-On 06/28/2017 05:28 AM, Lluís Vilanova wrote:
-> Used later. An enum makes expected values explicit and bounds the value space of
-> switches.
+On 06/29/2017 05:02 PM, Emilio G. Cota wrote:
+>> +void translate_block(const TranslatorOps *ops, DisasContextBase *db,
+>> +                     CPUState *cpu, TranslationBlock *tb);
+> I'd rather avoid "block" here. Some alternatives:
 > 
-> Signed-off-by: Lluís Vilanova<vilanova@ac.upc.edu>
-> ---
->   include/exec/exec-all.h       |    6 ------
->   include/exec/translator.h     |   38 ++++++++++++++++++++++++++++++++++++++
->   target/arm/translate.h        |   26 ++++++++++++++++----------
->   target/cris/translate.c       |    7 ++++++-
->   target/i386/translate.c       |    4 ++++
->   target/lm32/translate.c       |    6 ++++++
->   target/m68k/translate.c       |    7 ++++++-
->   target/microblaze/translate.c |    6 ++++++
->   target/nios2/translate.c      |    6 ++++++
->   target/openrisc/translate.c   |    6 ++++++
->   target/s390x/translate.c      |    3 ++-
->   target/unicore32/translate.c  |    7 ++++++-
->   target/xtensa/translate.c     |    4 ++++
->   13 files changed, 106 insertions(+), 20 deletions(-)
->   create mode 100644 include/exec/translator.h
+> - tb_translate()
+> - translate_tb()
+> - translate()
+> - translator_gen()
+> - translator_loop()
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+I like translator_loop.
 
 
 r~
