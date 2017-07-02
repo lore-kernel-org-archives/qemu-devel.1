@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dRodc-0001Cg-N1
+	(envelope-from <bounces@canonical.com>) id 1dRodc-0001Cf-Mp
 	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 19:50:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dRodZ-0006A4-NZ
+	(envelope-from <bounces@canonical.com>) id 1dRoda-0006AS-1z
 	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 19:50:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:32999)
+Received: from indium.canonical.com ([91.189.90.7]:33014)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dRodZ-00069K-DY
+	id 1dRodZ-00069W-Lx
 	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 19:50:45 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dRodY-00032a-6Y
+	id 1dRodY-00030s-Jk
 	for <qemu-devel@nongnu.org>; Sun, 02 Jul 2017 23:50:44 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 303B92E8195
+	by loganberry.canonical.com (Postfix) with ESMTP id 944332E8195
 	for <qemu-devel@nongnu.org>; Sun,  2 Jul 2017 23:50:44 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 02 Jul 2017 23:32:57 -0000
+Date: Sun, 02 Jul 2017 23:36:34 -0000
 From: Bruno Haible <bruno@clisp.org>
 Reply-To: Bug 1701974 <1701974@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <149903834521.26763.979428508609659400.malonedeb@chaenomeles.canonical.com>
-Message-Id: <149903837771.26263.5034936477536096018.malone@chaenomeles.canonical.com>
+Message-Id: <149903859499.15852.15890824812561835515.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1701974] Re: pwrite does not work right under
  qemu-sh4
@@ -39,9 +39,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Attachment added: "Statically linked compiled test program"
-   https://bugs.launchpad.net/qemu/+bug/1701974/+attachment/4908132/+files/=
-test-pwrite
+In case it matters: My host platform is Linux/x86_64.
 
 -- =
 
