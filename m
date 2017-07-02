@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dRf2h-0003SA-Ez
-	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 09:36:04 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dRfRD-0000KY-8B
+	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 10:01:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dRf2g-00045V-Dc
-	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 09:36:03 -0400
-References: <20170621133023.27627-1-mreitz@redhat.com>
-	<20170621133023.27627-2-mreitz@redhat.com>
-	<748b90f3-8f89-59ea-4a65-69e938747c0b@redhat.com>
-	<6179c9e2-5486-0ff6-927d-da144c178e93@redhat.com>
-	<7fa30bfe-d1b4-0aeb-b90e-ae91f9467749@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1dRfRC-0003NM-3S
+	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 10:01:23 -0400
+References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
+	<20170628120530.31251-20-vsementsov@virtuozzo.com>
+	<f92fea0e-fe66-6888-dcd2-10782aec4fd2@redhat.com>
+	<b084acc4-a9d6-ecf5-e8f1-beb7c3a80072@redhat.com>
+	<bddd14a1-5d18-58b2-8e4b-8579ad0e7f49@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <355f4801-b8a6-cf7c-6de0-8bd3a7eb9a19@redhat.com>
-Date: Sun, 2 Jul 2017 15:35:51 +0200
+Message-ID: <368951d8-f683-4aeb-c702-8edd78c2fac7@redhat.com>
+Date: Sun, 2 Jul 2017 16:01:04 +0200
 MIME-Version: 1.0
-In-Reply-To: <7fa30bfe-d1b4-0aeb-b90e-ae91f9467749@redhat.com>
+In-Reply-To: <bddd14a1-5d18-58b2-8e4b-8579ad0e7f49@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="HQwesgHTiHDJVp8TAFvhjWT4sr471fljg"
-Subject: Re: [Qemu-devel] [PATCH v4 1/2] iotests: Use absolute paths for
- executables
+	boundary="WNFbeUKf8HixPQ9JJ5OftbqQJNeoOrh0l"
+Subject: Re: [Qemu-devel] [PATCH v22 19/30] qcow2: add persistent dirty
+ bitmaps support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,73 +28,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HQwesgHTiHDJVp8TAFvhjWT4sr471fljg
+--WNFbeUKf8HixPQ9JJ5OftbqQJNeoOrh0l
 From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <355f4801-b8a6-cf7c-6de0-8bd3a7eb9a19@redhat.com>
-Subject: Re: [PATCH v4 1/2] iotests: Use absolute paths for executables
-References: <20170621133023.27627-1-mreitz@redhat.com>
- <20170621133023.27627-2-mreitz@redhat.com>
- <748b90f3-8f89-59ea-4a65-69e938747c0b@redhat.com>
- <6179c9e2-5486-0ff6-927d-da144c178e93@redhat.com>
- <7fa30bfe-d1b4-0aeb-b90e-ae91f9467749@redhat.com>
-In-Reply-To: <7fa30bfe-d1b4-0aeb-b90e-ae91f9467749@redhat.com>
+To: Eric Blake <eblake@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, jsnow@redhat.com, famz@redhat.com,
+ den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+Message-ID: <368951d8-f683-4aeb-c702-8edd78c2fac7@redhat.com>
+Subject: Re: [PATCH v22 19/30] qcow2: add persistent dirty bitmaps support
+References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
+ <20170628120530.31251-20-vsementsov@virtuozzo.com>
+ <f92fea0e-fe66-6888-dcd2-10782aec4fd2@redhat.com>
+ <b084acc4-a9d6-ecf5-e8f1-beb7c3a80072@redhat.com>
+ <bddd14a1-5d18-58b2-8e4b-8579ad0e7f49@redhat.com>
+In-Reply-To: <bddd14a1-5d18-58b2-8e4b-8579ad0e7f49@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-06-30 21:41, Eric Blake wrote:
-> On 06/29/2017 09:46 PM, Max Reitz wrote:
+On 2017-06-30 19:47, Eric Blake wrote:
+> On 06/29/2017 09:23 PM, Max Reitz wrote:
+>> On 2017-06-30 04:18, Eric Blake wrote:
+>>> On 06/28/2017 07:05 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>>> Store persistent dirty bitmaps in qcow2 image.
+>>>>
+>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.co=
+m>
+>>>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>>>> ---
 >=20
->>>> +++ b/tests/qemu-iotests/common.config
->>>> @@ -103,6 +103,12 @@ if [ -z "$QEMU_VXHS_PROG" ]; then
->>>>      export QEMU_VXHS_PROG=3D"`set_prog_path qnio_server`"
->>>>  fi
->>>> =20
->>>> +export QEMU_PROG=3D$(realpath -- "$(type -p "$QEMU_PROG")")
 >>>
->>> ...now that you updated per my review to favor 'type' over 'which'?
->>> Otherwise, the R-b stands.
+>>> This grabs the size (currently in sectors, although I plan to fix it =
+to
+>>> be in bytes)...
+>>>
+>>>> +    const char *bm_name =3D bdrv_dirty_bitmap_name(bitmap);
+>>>> +    uint8_t *buf =3D NULL;
+>>>> +    BdrvDirtyBitmapIter *dbi;
+>>>> +    uint64_t *tb;
+>>>> +    uint64_t tb_size =3D
+>>>> +            size_to_clusters(s,
+>>>> +                bdrv_dirty_bitmap_serialization_size(bitmap, 0, bm_=
+size));
+>>>
+>>> ...then finds out how many bytes are required to serialize the entire=
+
+>>> image, where bm_size should be the same as before...
+>>>
+>>>> +    while ((sector =3D bdrv_dirty_iter_next(dbi)) !=3D -1) {
+>>>> +        uint64_t cluster =3D sector / sbc;
+>>>> +        uint64_t end, write_size;
+>>>> +        int64_t off;
+>>>> +
+>>>> +        sector =3D cluster * sbc;
+>>>> +        end =3D MIN(bm_size, sector + sbc);
+>>>> +        write_size =3D
+>>>> +            bdrv_dirty_bitmap_serialization_size(bitmap, sector, en=
+d - sector);
+>>>
+>>> But here, rather than tackling the entire image at once, you are
+>>> subdividing your queries along arbitrary lines. But nowhere do I see =
+a
+>>> call to bdrv_dirty_bitmap_serialization_align() to make sure your
+>>> end-sector value is properly aligned; if it is not aligned, you will
+>>> trigger an assertion failure here...
 >>
->> Thanks, will fix and apply then...
->>
->> ...and done, applied to my block branch:
->>
->> https://github.com/XanClic/qemu/commits/block
+>> It's 4:21 am here, so I cannot claim to be right, but if I remember
+>> correctly, it will automatically aligned because sbc is the number of
+>> bits (and thus sectors) a bitmap cluster covers.
 >=20
-> Sorry for not noticing sooner, but you'll need to replace v4 (commit
-> 0f0fec82 on your branch) with a fix, because now your branch does the
-> following on all iotests for me:
+> Okay, I re-read the spec.  First thing I noticed: we have a potential
+> conflict if an image is allowed to be resized:
+
+It isn't, though. (At least currently qemu won't allow it.)
+
+> "All stored bitmaps are related to the virtual disk stored in the same
+> image, so each bitmap size is equal to the virtual disk size."
 >=20
-> 068 3s ... - output mismatch (see 068.out.bad)
-> --- /home/eblake/qemu/tests/qemu-iotests/068.out	2017-06-26
-> 22:02:56.057734882 -0500
-> +++ 068.out.bad	2017-06-30 14:35:28.720241398 -0500
-> @@ -1,4 +1,5 @@
->  QA output created by 068
-> +realpath: '': No such file or directory
+> If you resize an image, does the bitmap size have to be adjusted as
+> well?
 
-Oops.
+Sure.
 
-> The culprit? $QEMU_VXHS_PROG is empty for me, which means `set_prog_pat=
-h
-> qnio_server` found nothing to use.  You'll have to add in a safety valv=
-e
-> that only calls 'type' if operating on a non-empty path in the first pl=
-ace.
+>        What if you create one bitmap, then take an internal snapshot,
+> then resize?
 
-Sure, will drop the patches and send a v5.
+v3 images store the virtual disk size for each snapshot. So resizing an
+image leaves snapshots unaffected.
 
-Thanks!
+Now bitmaps are not (yet) tied to snapshots. The spec thus says that the
+bitmaps always correspond to the active state (it lists "snapshot
+switching" as something that should dirty dirty bitmaps).
+
+Therefore, if you then resize (which currently is doubly forbidden,
+because qemu won't allow you to resize images with bitmaps or
+snapshots), you would have to resize the bitmap, too.
+
+In the future, we might want to allow binding bitmaps to snapshots. Then
+the bitmap would not be resized but you couldn't see it anymore unless
+you go back to the snapshot (which would bring the image to its original
+size).
+
+>               Or do we declare that (at least for now) the presence of =
+a
+> bitmap is incompatible with the use of an internal snapshot?
+
+Well, that's not what the spec says. It clearly lists "snapshot
+switching" as something that dirty bitmaps track.
+
+> Conversely, we state that:
+>=20
+>=20
+> "Structure of a bitmap directory entry:
+> ...
+>          8 - 11:    bitmap_table_size
+>                     Number of entries in the bitmap table of the bitmap=
+=2E"
+>=20
+> Since a bitmap therefore tracks its own size, I think the earlier
+> statement that all bitmap sizes are equal to the virtual disk size is
+> too strict (there seems to be no technical reason why a bitmap can't
+> have a different size that the image).
+
+But a logical. qcow2 is not a container format, it's an image format. I
+for one am very opposed to storing bitmaps in a qcow2 file which have no
+immediate connection to that virtual disk.
+
+A reason I can see myself supporting would be that you could tie bitmaps
+to snapshots and then they can have a size that differs from the one of
+the active layer.
 
 Max
 
+> But, having read that, you are correct that we are subdividing our
+> bitmaps according to what fits in a qcow2 cluster, and the smallest
+> qcow2 cluster we can come up with is 512-bytes (or 4k bits of the
+> bitmap).  Checking hbitmap.c, we are merely asserting that our alignmen=
+t
+> is always a multiple of 64 << hb->granularity.  But since we are
+> partitioning a cluster at a time, our minimum alignment will be 512 <<
+> hb->granularity, which is always aligned.
+>=20
+> So all the more I need to do is add an assertion.
+>=20
+>> I'm for fixing it later. I would have announced the series "applied" a=
+n
+>> hour ago if I hadn't had to bisect iotest 055 breakage...
+>=20
+> I'm working it into my v4 posting of dirty-bitmap cleanups.
+>=20
 
---HQwesgHTiHDJVp8TAFvhjWT4sr471fljg
+
+
+--WNFbeUKf8HixPQ9JJ5OftbqQJNeoOrh0l
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -102,14 +192,14 @@ Content-Disposition: attachment; filename="signature.asc"
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQEvBAEBCAAZBQJZWPa3EhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQPza
-B/9IQPu5v+SaTUIDJ1X5eHJn/2qJLOmnYdmPgy8yESQChz6kOVcc4Y/33FNEbCJv
-/HdSjtnrnSDNIanl5NGTnEVKKMx1jAcxwmYtOUhZvnNg+KS8yAKgcfEB6D+kY0qU
-FD4bOSl0yUYmRclyFR4bquQzUulQMZ5oA9Fs/+VzwbZRTSkT0zuQ238WQpEYAsXu
-EMwvUfPtSCwE+j6LsMpLZPw6vvAKLJj0ersZP8hb2oav8RUR9b5vs+8CP+zuHJ08
-TRdBYOHvm6gBoQ2q6//gbv82Pxo38EfSl7zjKcUVMJZsAwqccZ7sdmYt9MiOkrHq
-5BbrqWCi/JFPUky+5zXIPYh4
-=N2pk
+iQEvBAEBCAAZBQJZWPygEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQPSx
+CACIsX+fwzqY7HnvPnwOSA5TEVFVC4keZwIbdhcdQBpXqeo5iJXK/WjAXWyziY84
+a6kFMBUFNVJq861zjmcNhJvVyqZAzGL8IKUF14xMgmKK7/DmdsG0LjRcVTtAzqF0
+g8uxjpmnvYoN7vD1A04eUos2ZiziBB0HP/E1YCLp3F2RwwySpFvIqrMCxDtZLZpz
+HRegzKWWAWK+8chvJP5ttNWax/ScOz5/elwQkwofZKsvHF66fyOo6ItCH1Z6awr8
+CfeKDneaa0RX/KXVFd0+az/URK+mxuY5pCi4l6PZPTehWkE5lCiAKk2s+IEzmYXQ
+RAfbQxsq10frMkzT+9cnz0EG
+=vop/
 -----END PGP SIGNATURE-----
 
---HQwesgHTiHDJVp8TAFvhjWT4sr471fljg--
+--WNFbeUKf8HixPQ9JJ5OftbqQJNeoOrh0l--
