@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dRW0v-0003up-Ip
-	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 23:57:38 -0400
+	(envelope-from <knut.omang@oracle.com>) id 1dRYKx-0005G4-2r
+	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 02:26:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dRW0u-0002ZD-GQ
-	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 23:57:37 -0400
-Date: Sun, 2 Jul 2017 13:04:40 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170702030440.GN13989@umbus.fritz.box>
-References: <20170622124204.19407-1-marcandre.lureau@redhat.com>
-	<20170622124204.19407-24-marcandre.lureau@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="UExESr5xZTMxdOWv"
-Content-Disposition: inline
-In-Reply-To: <20170622124204.19407-24-marcandre.lureau@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 23/31] ppc: use DIV_ROUND_UP
+	(envelope-from <knut.omang@oracle.com>) id 1dRYKt-0001eZ-UB
+	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 02:26:27 -0400
+Received: from aserp1040.oracle.com ([141.146.126.69]:23955)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
+	id 1dRYKt-0001aP-JZ
+	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 02:26:23 -0400
+Message-ID: <1498976774.2946.79.camel@oracle.com>
+From: Knut Omang <knut.omang@oracle.com>
+Date: Sun, 02 Jul 2017 08:26:14 +0200
+In-Reply-To: <20170626102852.GH495@redhat.com>
+References: <cover.050aaed1de4cecd4ba9a4dc6576d1d148a8a9004.1498213152.git-series.knut.omang@oracle.com>
+	<b107bc13f30e0b4a8ca8de1db178aef3fade9164.1498213152.git-series.knut.omang@oracle.com>
+	<20170626102852.GH495@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 2/4] sockets: factor out
+ create_fast_reuse_socket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,82 +30,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, "open list:PowerPC" <qemu-ppc@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-
---UExESr5xZTMxdOWv
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Jun 22, 2017 at 02:41:56PM +0200, Marc-Andr=E9 Lureau wrote:
-> I used the clang-tidy qemu-round check to generate the fix:
-> https://github.com/elmarco/clang-tools-extra
+On Mon, 2017-06-26 at 11:28 +0100, Daniel P. Berrange wrote:
+> On Fri, Jun 23, 2017 at 12:31:06PM +0200, Knut Omang wrote:
+> >=20
+> > First refactoring step to prepare for fixing the problem
+> > exposed with the test-listen test in the previous commit
+> >=20
+> > Signed-off-by: Knut Omang <knut.omang@oracle.com>
+> > ---
+> > =C2=A0util/qemu-sockets.c | 24 +++++++++++++++++-------
+> > =C2=A01 file changed, 17 insertions(+), 7 deletions(-)
+> >=20
+> > diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+> > index 852773d..699e36c 100644
+> > --- a/util/qemu-sockets.c
+> > +++ b/util/qemu-sockets.c
+> > @@ -149,6 +149,20 @@ int inet_ai_family_from_address(InetSocketAddress
+> > *addr,
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return PF_UNSPEC;
+> > =C2=A0}
+> > =C2=A0
+> > +static int create_fast_reuse_socket(struct addrinfo *e, Error **errp)
+> > +{
+> > +=C2=A0=C2=A0=C2=A0=C2=A0int slisten =3D qemu_socket(e->ai_family, e->a=
+i_socktype, e-
+> > >ai_protocol);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0if (slisten < 0) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!e->ai_next) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0error_setg_errno(errp, errno, "Failed to create socket");
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
 >=20
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-
-> ---
->  target/ppc/mem_helper.c | 2 +-
->  target/ppc/translate.c  | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+> I think that having this method sometimes report an error message, and
+> sometimes not report an error message, depending on state of a variable
+> used by the caller is rather unpleasant. I'd much rather see this
+> error message reporting remain in the caller.
+>
+> >=20
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return -1;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0}
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0socket_set_fast_reuse(slisten);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0return slisten;
+> > +}
+> > +
+> > =C2=A0static int inet_listen_saddr(InetSocketAddress *saddr,
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int port_offset,
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bool update_addr,
+> > @@ -210,21 +224,17 @@ static int inet_listen_saddr(InetSocketAddress *s=
+addr,
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return -1;
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> > =C2=A0
+> > -=C2=A0=C2=A0=C2=A0=C2=A0/* create socket + bind */
+> > +=C2=A0=C2=A0=C2=A0=C2=A0/* create socket + bind/listen */
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0for (e =3D res; e !=3D NULL; e =3D e->ai_=
+next) {
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0getnameinfo((stru=
+ct sockaddr*)e->ai_addr,e->ai_addrlen,
+> > =C2=A0		=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0uaddr,INET6_ADD=
+RSTRLEN,uport,32,
+> > =C2=A0		=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0NI_NUMERICHOST =
+| NI_NUMERICSERV);
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0slisten =3D qemu_socke=
+t(e->ai_family, e->ai_socktype, e-
+> > >ai_protocol);
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0slisten =3D create_fas=
+t_reuse_socket(e, &err);
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (slisten < 0) =
+{
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0if (!e->ai_next) {
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0error_setg_errno(errp, errno, "Failed to create =
+socket");
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0}
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0continue;
 >=20
-> diff --git a/target/ppc/mem_helper.c b/target/ppc/mem_helper.c
-> index e6383c6bfa..a34e604db3 100644
-> --- a/target/ppc/mem_helper.c
-> +++ b/target/ppc/mem_helper.c
-> @@ -111,7 +111,7 @@ void helper_lswx(CPUPPCState *env, target_ulong addr,=
- uint32_t reg,
->                   uint32_t ra, uint32_t rb)
->  {
->      if (likely(xer_bc !=3D 0)) {
-> -        int num_used_regs =3D (xer_bc + 3) / 4;
-> +        int num_used_regs =3D DIV_ROUND_UP(xer_bc, 4);
->          if (unlikely((ra !=3D 0 && lsw_reg_in_range(reg, num_used_regs, =
-ra)) ||
->                       lsw_reg_in_range(reg, num_used_regs, rb))) {
->              raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index c0cd64d927..76f9ccde25 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -2882,7 +2882,7 @@ static void gen_lswi(DisasContext *ctx)
->      }
->      if (nb =3D=3D 0)
->          nb =3D 32;
-> -    nr =3D (nb + 3) / 4;
-> +    nr =3D DIV_ROUND_UP(nb, 4);
->      if (unlikely(lsw_reg_in_range(start, nr, ra))) {
->          gen_inval_exception(ctx, POWERPC_EXCP_INVAL_LSWX);
->          return;
+> It isn't shown in this diff context, but at the end of the outer
+> loop we have
+>=20
+> =C2=A0=C2=A0=C2=A0error_setg_errno(errp, errno, "Failed to find available=
+ port");
+>=20
+> so IIUC, even this pre-existing code is wrong. If 'e->ai_next' is
+> NULL, we report an error message here. Then, we continue to the
+> next loop iteration, which causes use to terminate the loop
+> entirely. At which point we'll report another error message
+> over the top of the one we already have. So I think the error
+> reporting does still need refactoring, but not in the way it
+> is done here.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Yes, I did scratch my head about this but I tried to keep the original sema=
+ntics
+to avoid mixing unrelated changes.
 
---UExESr5xZTMxdOWv
-Content-Type: application/pgp-signature; name="signature.asc"
+With the split into separate refactoring commits we are beyond that anyway.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+I'll have a second look at it..
 
-iQIcBAEBCAAGBQJZWGLFAAoJEGw4ysog2bOSApwQAIAlw5hi1BCMl42KHO4o0BPN
-G09pkj7yY1IcgGLo8EedBoinp43WG8+dkKERlihxIf72H0FQuKxf4y6xbdZELm15
-r0LWvetFTOJKQ72Ai3HFTJMH2kjAujPROk+cdwpDNHk4z8pPj0gtYCUV385FMc4V
-DGEEeCNjS/Z/QzwVZw3CDugWvnoScmIU7KGGsHTylMY69rWEHgdhukbUrykZ2WLq
-5TLraBx8FlHlSKatZW/bIYCtuOIo5e99hknFbMmvocqgXhdSH/o+yNO9RCDhtGFE
-aUQlixqxR25Ur2eU3r8lgDIbmpjw1lBZxHL7cPyB6MjwUT8hm+zS/t4S3tfF2Ufz
-/+3IVQpTcpy6vU67fX2RILzx6iO016ekoX+JIZLUqQm4sZWBtX4xDovez0T6Nllt
-IbQPlgmQAqGLw0PfMSufBahAPSaCuR5E4WHJQHwPMLA9hiMPbPTVTvS2AZs9L26n
-jf/6z9DewNOGtp4sHQzhT/X6CAXwRU3l2/X1ROqJqy/fJL+oSN0qoKOUvd11derw
-Jh5BunQArbXJaEtzXNkwyaOfBUGMNc1teloA19G6FWFR2nMT7inUhHhQbNqyCNUg
-0B2UlRL7q71tJ4Q1B3haj2hR2Rd5P1dcwYn3kb+lA6q+tOVCRsO5uH0M+H7kHa8I
-zO5Kyu3QVAxjs9VgA33m
-=RaDc
------END PGP SIGNATURE-----
+Thanks,
+Knut
 
---UExESr5xZTMxdOWv--
+>=20
+> >=20
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> > =C2=A0
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0socket_set_fast_reuse(=
+slisten);
+> > -
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0port_min =3D inet=
+_getport(e);
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0port_max =3D sadd=
+r->has_to ? saddr->to + port_offset : port_min;
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0for (p =3D port_m=
+in; p <=3D port_max; p++) {
+>=20
+> Regards,
+> Daniel
