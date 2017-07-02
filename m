@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1dRVGi-0003cO-2A
-	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 23:09:53 -0400
+	(envelope-from <ben@skyportsystems.com>) id 1dRVxu-0002iC-3a
+	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 23:54:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1dRVGe-0000z4-PU
-	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 23:09:52 -0400
-Received: from mail-it0-x22f.google.com ([2607:f8b0:4001:c0b::22f]:35630)
+	(envelope-from <ben@skyportsystems.com>) id 1dRVxr-0008Ke-0n
+	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 23:54:30 -0400
+Received: from mail-it0-x230.google.com ([2607:f8b0:4001:c0b::230]:35626)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
-	id 1dRVGe-0000yP-J4
-	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 23:09:48 -0400
-Received: by mail-it0-x22f.google.com with SMTP id v202so75547929itb.0
-	for <qemu-devel@nongnu.org>; Sat, 01 Jul 2017 20:09:47 -0700 (PDT)
-From: Ben Warren <ben@skyportsystems.com>
-Message-Id: <319FA821-7EF0-4670-BA23-74C6E44D4477@skyportsystems.com>
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Date: Sat, 1 Jul 2017 23:09:45 -0400
-In-Reply-To: <20170629132310.18865-2-marcandre.lureau@redhat.com>
-References: <20170629132310.18865-1-marcandre.lureau@redhat.com>
-	<20170629132310.18865-2-marcandre.lureau@redhat.com>
-Content-Type: text/plain;
-	charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/7] vmgenid: replace
- x-write-pointer-available hack
+	id 1dRVxq-0008K5-Qs
+	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 23:54:26 -0400
+Received: by mail-it0-x230.google.com with SMTP id v202so75670256itb.0
+	for <qemu-devel@nongnu.org>; Sat, 01 Jul 2017 20:54:26 -0700 (PDT)
+From: ben@skyportsystems.com
+Date: Sat,  1 Jul 2017 23:54:03 -0400
+Message-Id: <d85f9aef28b70034bc698ef53543cd0f5ac064e4.1498967158.git.ben@skyportsystems.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2] tests: Add unit tests for the VM Generation
+ ID feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,122 +28,261 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, anderson@redhat.com, berrange@redhat.com, ehabkost@redhat.com, lersek@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org, mst@redhat.com
+Cc: imammedo@redhat.com, lersek@redhat.com, marcandre.lureau@gmail.com, Ben Warren <ben@skyportsystems.com>
 
-Nice improvement!
-> On Jun 29, 2017, at 9:23 AM, Marc-Andr=C3=A9 Lureau =
-<marcandre.lureau@redhat.com> wrote:
->=20
-> This compat property sole function is to prevent the device from being
-> instantiated. Instead of requiring an extra compat property, check if
-> fw_cfg has DMA enabled.
->=20
-> This has the additional benefit of handling other cases properly, =
-like:
->=20
->  $ qemu-system-x86_64 -device vmgenid -machine none
->  qemu-system-x86_64: -device vmgenid: vmgenid requires DMA write =
-support in fw_cfg, which this machine type does not provide
->  $ qemu-system-x86_64 -device vmgenid -machine pc-i440fx-2.9 -global =
-fw_cfg.dma_enabled=3Doff
->  qemu-system-x86_64: -device vmgenid: vmgenid requires DMA write =
-support in fw_cfg, which this machine type does not provide
->  $ qemu-system-x86_64 -device vmgenid -machine pc-i440fx-2.6 -global =
-fw_cfg.dma_enabled=3Don
->  [boots normally]
->=20
-> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Ben Warren <ben@skyportsystems.com <mailto:mst@redhat.com>>
-> ---
-> include/hw/acpi/bios-linker-loader.h | 2 ++
-> include/hw/compat.h                  | 4 ----
-> hw/acpi/bios-linker-loader.c         | 6 ++++++
-> hw/acpi/vmgenid.c                    | 9 +--------
-> 4 files changed, 9 insertions(+), 12 deletions(-)
->=20
-> diff --git a/include/hw/acpi/bios-linker-loader.h =
-b/include/hw/acpi/bios-linker-loader.h
-> index efe17b0b9c..a711dbced8 100644
-> --- a/include/hw/acpi/bios-linker-loader.h
-> +++ b/include/hw/acpi/bios-linker-loader.h
-> @@ -7,6 +7,8 @@ typedef struct BIOSLinker {
->     GArray *file_list;
-> } BIOSLinker;
->=20
-> +bool bios_linker_loader_can_write_pointer(void);
-> +
-> BIOSLinker *bios_linker_loader_init(void);
->=20
-> void bios_linker_loader_alloc(BIOSLinker *linker,
-> diff --git a/include/hw/compat.h b/include/hw/compat.h
-> index 26cd5851a5..36f02179ac 100644
-> --- a/include/hw/compat.h
-> +++ b/include/hw/compat.h
-> @@ -150,10 +150,6 @@
->         .driver   =3D "fw_cfg_io",\
->         .property =3D "dma_enabled",\
->         .value    =3D "off",\
-> -    },{\
-> -        .driver   =3D "vmgenid",\
-> -        .property =3D "x-write-pointer-available",\
-> -        .value    =3D "off",\
->     },
->=20
-> #define HW_COMPAT_2_3 \
-> diff --git a/hw/acpi/bios-linker-loader.c =
-b/hw/acpi/bios-linker-loader.c
-> index 046183a0f1..587d62cb93 100644
-> --- a/hw/acpi/bios-linker-loader.c
-> +++ b/hw/acpi/bios-linker-loader.c
-> @@ -168,6 +168,12 @@ bios_linker_find_file(const BIOSLinker *linker, =
-const char *name)
->     return NULL;
-> }
->=20
-> +bool bios_linker_loader_can_write_pointer(void)
-> +{
-> +    FWCfgState *fw_cfg =3D fw_cfg_find();
-> +    return fw_cfg && fw_cfg_dma_enabled(fw_cfg);
-> +}
-> +
-> /*
->  * bios_linker_loader_alloc: ask guest to load file into guest memory.
->  *
-> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
-> index a32b847fe0..ab5da293fd 100644
-> --- a/hw/acpi/vmgenid.c
-> +++ b/hw/acpi/vmgenid.c
-> @@ -205,17 +205,11 @@ static void vmgenid_handle_reset(void *opaque)
->     memset(vms->vmgenid_addr_le, 0, ARRAY_SIZE(vms->vmgenid_addr_le));
-> }
->=20
-> -static Property vmgenid_properties[] =3D {
-> -    DEFINE_PROP_BOOL("x-write-pointer-available", VmGenIdState,
-> -                     write_pointer_available, true),
-> -    DEFINE_PROP_END_OF_LIST(),
-> -};
-> -
-> static void vmgenid_realize(DeviceState *dev, Error **errp)
-> {
->     VmGenIdState *vms =3D VMGENID(dev);
->=20
-> -    if (!vms->write_pointer_available) {
-> +    if (!bios_linker_loader_can_write_pointer()) {
->         error_setg(errp, "%s requires DMA write support in fw_cfg, "
->                    "which this machine type does not provide", =
-VMGENID_DEVICE);
->         return;
-> @@ -239,7 +233,6 @@ static void vmgenid_device_class_init(ObjectClass =
-*klass, void *data)
->     dc->vmsd =3D &vmstate_vmgenid;
->     dc->realize =3D vmgenid_realize;
->     dc->hotpluggable =3D false;
-> -    dc->props =3D vmgenid_properties;
->=20
->     object_class_property_add_str(klass, VMGENID_GUID, NULL,
->                                   vmgenid_set_guid, NULL);
-> --=20
-> 2.13.1.395.gf7b71de06
->=20
+From: Ben Warren <ben@skyportsystems.com>
+
+The following tests are implemented:
+* test that a GUID passed in by command line is propagated to the guest.
+  Read the GUID from guest memory
+* test that the "auto" argument to the GUID generates a valid GUID, as
+  seen by the guest.
+* test that a GUID passed in can be queried from the monitor
+
+  This patch is loosely based on a previous patch from:
+  Gal Hammer <ghammer@redhat.com>  and Igor Mammedov <imammedo@redhat.com>
+
+Signed-off-by: Ben Warren <ben@skyportsystems.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+---
+
+v1->v2: free g_alloc'd tables
+
+ tests/Makefile.include |   2 +
+ tests/vmgenid-test.c   | 203 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 205 insertions(+)
+ create mode 100644 tests/vmgenid-test.c
+
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index ae889ca..18cd06a 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -250,6 +250,7 @@ check-qtest-i386-y += tests/usb-hcd-xhci-test$(EXESUF)
+ gcov-files-i386-y += hw/usb/hcd-xhci.c
+ check-qtest-i386-y += tests/pc-cpu-test$(EXESUF)
+ check-qtest-i386-y += tests/q35-test$(EXESUF)
++check-qtest-i386-y += tests/vmgenid-test$(EXESUF)
+ gcov-files-i386-y += hw/pci-host/q35.c
+ check-qtest-i386-$(CONFIG_VHOST_NET_TEST_i386) += tests/vhost-user-test$(EXESUF)
+ ifeq ($(CONFIG_VHOST_NET_TEST_i386),)
+@@ -760,6 +761,7 @@ tests/test-uuid$(EXESUF): tests/test-uuid.o $(test-util-obj-y)
+ tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptimer.o
+ tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o $(test-util-obj-y)
+ tests/numa-test$(EXESUF): tests/numa-test.o
++tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/acpi-utils.o
+ 
+ tests/migration/stress$(EXESUF): tests/migration/stress.o
+ 	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,"LINK","$(TARGET_DIR)$@")
+diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
+new file mode 100644
+index 0000000..e7ba38c
+--- /dev/null
++++ b/tests/vmgenid-test.c
+@@ -0,0 +1,203 @@
++/*
++ * QTest testcase for VM Generation ID
++ *
++ * Copyright (c) 2016 Red Hat, Inc.
++ * Copyright (c) 2017 Skyport Systems
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include <glib.h>
++#include <string.h>
++#include <unistd.h>
++#include "qemu/osdep.h"
++#include "qemu/bitmap.h"
++#include "qemu/uuid.h"
++#include "hw/acpi/acpi-defs.h"
++#include "acpi-utils.h"
++#include "libqtest.h"
++
++#define VGID_GUID "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
++#define VMGENID_GUID_OFFSET 40   /* allow space for
++                                  * OVMF SDT Header Probe Supressor
++                                  */
++#define RSDP_ADDR_INVALID 0x100000 /* RSDP must be below this address */
++#define RSDP_SLEEP_US     100000   /* Sleep for 100ms between tries */
++#define RSDP_TRIES_MAX    100      /* Max total time is 10 seconds */
++
++typedef struct {
++    AcpiTableHeader header;
++    gchar name_op;
++    gchar vgia[4];
++    gchar val_op;
++    uint32_t vgia_val;
++} QEMU_PACKED VgidTable;
++
++static uint32_t acpi_find_vgia(void)
++{
++    uint32_t rsdp_offset;
++    uint32_t guid_offset = 0;
++    AcpiRsdpDescriptor rsdp_table;
++    uint32_t rsdt;
++    AcpiRsdtDescriptorRev1 rsdt_table;
++    int tables_nr;
++    uint32_t *tables;
++    AcpiTableHeader ssdt_table;
++    VgidTable vgid_table;
++    int i;
++
++    /* Tables may take a short time to be set up by the guest */
++    for (i = 0; i < RSDP_TRIES_MAX; i++) {
++        rsdp_offset = acpi_find_rsdp_address();
++        if (rsdp_offset < RSDP_ADDR_INVALID) {
++            break;
++        }
++        g_usleep(RSDP_SLEEP_US);
++    }
++    g_assert_cmphex(rsdp_offset, <, RSDP_ADDR_INVALID);
++
++    acpi_parse_rsdp_table(rsdp_offset, &rsdp_table);
++
++    rsdt = rsdp_table.rsdt_physical_address;
++    /* read the header */
++    ACPI_READ_TABLE_HEADER(&rsdt_table, rsdt);
++    ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
++
++    /* compute the table entries in rsdt */
++    tables_nr = (rsdt_table.length - sizeof(AcpiRsdtDescriptorRev1)) /
++                sizeof(uint32_t);
++    g_assert_cmpint(tables_nr, >, 0);
++
++    /* get the addresses of the tables pointed by rsdt */
++    tables = g_new0(uint32_t, tables_nr);
++    ACPI_READ_ARRAY_PTR(tables, tables_nr, rsdt);
++
++    for (i = 0; i < tables_nr; i++) {
++        ACPI_READ_TABLE_HEADER(&ssdt_table, tables[i]);
++        if (!strncmp((char *)ssdt_table.oem_table_id, "VMGENID", 7)) {
++            /* the first entry in the table should be VGIA
++             * That's all we need
++             */
++            ACPI_READ_FIELD(vgid_table.name_op, tables[i]);
++            g_assert(vgid_table.name_op == 0x08);  /* name */
++            ACPI_READ_ARRAY(vgid_table.vgia, tables[i]);
++            g_assert(memcmp(vgid_table.vgia, "VGIA", 4) == 0);
++            ACPI_READ_FIELD(vgid_table.val_op, tables[i]);
++            g_assert(vgid_table.val_op == 0x0C);  /* dword */
++            ACPI_READ_FIELD(vgid_table.vgia_val, tables[i]);
++            /* The GUID is written at a fixed offset into the fw_cfg file
++             * in order to implement the "OVMF SDT Header probe suppressor"
++             * see docs/specs/vmgenid.txt for more details
++             */
++            guid_offset = vgid_table.vgia_val + VMGENID_GUID_OFFSET;
++            break;
++        }
++    }
++    g_free(tables);
++    return guid_offset;
++}
++
++static void read_guid_from_memory(QemuUUID *guid)
++{
++    uint32_t vmgenid_addr;
++    int i;
++
++    vmgenid_addr = acpi_find_vgia();
++    g_assert(vmgenid_addr);
++
++    /* Read the GUID directly from guest memory */
++    for (i = 0; i < 16; i++) {
++        guid->data[i] = readb(vmgenid_addr + i);
++    }
++    /* The GUID is in little-endian format in the guest, while QEMU
++     * uses big-endian.  Swap after reading.
++     */
++    qemu_uuid_bswap(guid);
++}
++
++static void read_guid_from_monitor(QemuUUID *guid)
++{
++    QDict *rsp, *rsp_ret;
++    const char *guid_str;
++
++    rsp = qmp("{ 'execute': 'query-vm-generation-id' }");
++    if (qdict_haskey(rsp, "return")) {
++        rsp_ret = qdict_get_qdict(rsp, "return");
++        g_assert(qdict_haskey(rsp_ret, "guid"));
++        guid_str = qdict_get_str(rsp_ret, "guid");
++        g_assert(qemu_uuid_parse(guid_str, guid) == 0);
++    }
++    QDECREF(rsp);
++}
++
++static void vmgenid_set_guid_test(void)
++{
++    QemuUUID expected, measured;
++    gchar *cmd;
++
++    g_assert(qemu_uuid_parse(VGID_GUID, &expected) == 0);
++
++    cmd = g_strdup_printf("-machine accel=tcg -device vmgenid,id=testvgid,"
++                          "guid=%s", VGID_GUID);
++    qtest_start(cmd);
++
++    /* Read the GUID from accessing guest memory */
++    read_guid_from_memory(&measured);
++    g_assert(memcmp(measured.data, expected.data, sizeof(measured.data)) == 0);
++
++    qtest_quit(global_qtest);
++    g_free(cmd);
++}
++
++static void vmgenid_set_guid_auto_test(void)
++{
++    const char *cmd;
++    QemuUUID measured;
++
++    cmd = "-machine accel=tcg -device vmgenid,id=testvgid," "guid=auto";
++    qtest_start(cmd);
++
++    read_guid_from_memory(&measured);
++
++    /* Just check that the GUID is non-null */
++    g_assert(!qemu_uuid_is_null(&measured));
++
++    qtest_quit(global_qtest);
++}
++
++static void vmgenid_query_monitor_test(void)
++{
++    QemuUUID expected, measured;
++    gchar *cmd;
++
++    g_assert(qemu_uuid_parse(VGID_GUID, &expected) == 0);
++
++    cmd = g_strdup_printf("-machine accel=tcg -device vmgenid,id=testvgid,"
++                          "guid=%s", VGID_GUID);
++    qtest_start(cmd);
++
++    /* Read the GUID via the monitor */
++    read_guid_from_monitor(&measured);
++    g_assert(memcmp(measured.data, expected.data, sizeof(measured.data)) == 0);
++
++    qtest_quit(global_qtest);
++    g_free(cmd);
++}
++
++int main(int argc, char **argv)
++{
++    int ret;
++
++    g_test_init(&argc, &argv, NULL);
++
++    qtest_add_func("/vmgenid/vmgenid/set-guid",
++                   vmgenid_set_guid_test);
++    qtest_add_func("/vmgenid/vmgenid/set-guid-auto",
++                   vmgenid_set_guid_auto_test);
++    qtest_add_func("/vmgenid/vmgenid/query-monitor",
++                   vmgenid_query_monitor_test);
++    ret = g_test_run();
++
++    return ret;
++}
+-- 
+2.7.4
