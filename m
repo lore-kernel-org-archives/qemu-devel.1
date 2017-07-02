@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dRgR8-00030u-5O
-	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 11:05:23 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dRgR7-0001o9-61
+	(envelope-from <mreitz@redhat.com>) id 1dRgR7-00030e-SD
 	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 11:05:22 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <mreitz@redhat.com>) id 1dRgR6-0001nz-SA
+	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 11:05:21 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Sun,  2 Jul 2017 17:05:09 +0200
-Message-Id: <20170702150510.23276-2-mreitz@redhat.com>
-In-Reply-To: <20170702150510.23276-1-mreitz@redhat.com>
-References: <20170702150510.23276-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 1/2] iotests: Use absolute paths for
- executables
+Date: Sun,  2 Jul 2017 17:05:08 +0200
+Message-Id: <20170702150510.23276-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 0/2] iotests: Add test for colon handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,47 +20,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-A user may specify a relative path for accessing qemu, qemu-img, etc.
-through environment variables ($QEMU_PROG and friends) or a symlink.
+v3 of v3 of "iotests: Add test for colon handling"; thus, basically, v5.
 
-If a test decides to change its working directory, relative paths will
-cease to work, however. Work around this by making all of the paths to
-programs that should undergo testing absolute. Besides "realpath", we
-also have to use "type -p" to support programs in $PATH.
+This adds an iotest for the original series "block: Fix backing paths
+for filenames with colons" and fixes common.config so it works if you
+have specified the qemu binaries through relative paths. As a bonus, it
+makes symlinked binaries work for out-of-tree builds.
 
-As a side effect, this fixes specifying these programs as symlinks for
-out-of-tree builds: Before, you would have to create two symlinks, one
-in the build and one in the source tree (the first one for common.config
-to find, the second one for the iotest to use). Now it is sufficient to
-create one in the build tree because common.config will resolve it.
 
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/common.config | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+v5: Don't try to resolve QEMU_VXHS_PROG if it is empty (which it may be)
+    [Eric]
 
-diff --git a/tests/qemu-iotests/common.config b/tests/qemu-iotests/common.config
-index d1b45f5..e0883a0 100644
---- a/tests/qemu-iotests/common.config
-+++ b/tests/qemu-iotests/common.config
-@@ -103,6 +103,17 @@ if [ -z "$QEMU_VXHS_PROG" ]; then
-     export QEMU_VXHS_PROG="`set_prog_path qnio_server`"
- fi
- 
-+export QEMU_PROG=$(realpath -- "$(type -p "$QEMU_PROG")")
-+export QEMU_IMG_PROG=$(realpath -- "$(type -p "$QEMU_IMG_PROG")")
-+export QEMU_IO_PROG=$(realpath -- "$(type -p "$QEMU_IO_PROG")")
-+export QEMU_NBD_PROG=$(realpath -- "$(type -p "$QEMU_NBD_PROG")")
-+
-+# This program is not built as part of qemu but (possibly) provided by the
-+# system, so it may not be present at all
-+if [ -n "$QEMU_VXHS_PROG" ]; then
-+    export QEMU_VXHS_PROG=$(realpath -- "$(type -p "$QEMU_VXHS_PROG")")
-+fi
-+
- _qemu_wrapper()
- {
-     (
+
+git-backport-diff against v4:
+
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+
+001/2:[0007] [FC] 'iotests: Use absolute paths for executables'
+002/2:[----] [--] 'iotests: Add test for colon handling'
+
+
+Max Reitz (2):
+  iotests: Use absolute paths for executables
+  iotests: Add test for colon handling
+
+ tests/qemu-iotests/126           | 105 +++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/126.out       |  23 +++++++++
+ tests/qemu-iotests/common.config |  11 ++++
+ tests/qemu-iotests/group         |   1 +
+ 4 files changed, 140 insertions(+)
+ create mode 100755 tests/qemu-iotests/126
+ create mode 100644 tests/qemu-iotests/126.out
+
 -- 
 2.9.4
