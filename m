@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51984)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dRnrR-0003pk-Pm
-	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 19:01:03 -0400
+	(envelope-from <bounces@canonical.com>) id 1dRo5j-0007fS-OA
+	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 19:15:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dRnrO-0004FQ-Oa
-	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 19:01:01 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58643)
+	(envelope-from <bounces@canonical.com>) id 1dRo5g-000206-Cq
+	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 19:15:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58966)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dRnrO-0004DS-I2
-	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 19:00:58 -0400
+	id 1dRo5g-0001yg-4O
+	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 19:15:44 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dRnrL-00069j-He
-	for <qemu-devel@nongnu.org>; Sun, 02 Jul 2017 23:00:55 +0000
+	id 1dRo5f-0006po-6r
+	for <qemu-devel@nongnu.org>; Sun, 02 Jul 2017 23:15:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8269A2E8194
-	for <qemu-devel@nongnu.org>; Sun,  2 Jul 2017 23:00:55 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 2EE762E8195
+	for <qemu-devel@nongnu.org>; Sun,  2 Jul 2017 23:15:43 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 02 Jul 2017 22:54:12 -0000
+Date: Sun, 02 Jul 2017 23:01:34 -0000
 From: Bruno Haible <bruno@clisp.org>
 Reply-To: Bug 1701971 <1701971@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <149903601307.6257.7341525830619997074.malonedeb@gac.canonical.com>
-Message-Id: <149903605292.15314.14134338642856039589.malone@wampee.canonical.com>
+Message-Id: <149903649493.26131.16321245824228384877.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1701971] Re: multithreading not working right
  under qemu user mode for sh4
@@ -39,9 +39,14 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Attachment added: "Compiled test program"
-   https://bugs.launchpad.net/qemu/+bug/1701971/+attachment/4908118/+files/=
-test-tls
+Another gnulib test (test-lock) fails with an assertion inside glibc:
+test-lock: pthread_mutex_lock.c:81: __pthread_mutex_lock: Assertion `mutex-=
+>__data.__owner =3D=3D 0' failed.
+qemu: uncaught target signal 6 (Aborted) - core dumped
+
+Based on this, I would speculate that the problem is in the qemu
+emulation of the Linux system calls that glibc uses for multithreading
+or in the implementation of the primitives used by qemu_event_wait().
 
 -- =
 
