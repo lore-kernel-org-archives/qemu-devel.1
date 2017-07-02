@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60489)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dRTty-0000jp-G8
-	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 21:42:19 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dRTxG-0002GC-R8
+	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 21:45:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dRTtx-0003Pv-NS
-	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 21:42:18 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dRTxF-0005Uu-RL
+	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 21:45:42 -0400
 Sender: Richard Henderson <rth7680@gmail.com>
 References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
-	<149865801156.17063.15618379976159104550.stgit@frigg.lan>
+	<149865825357.17063.13113603039704787150.stgit@frigg.lan>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <244b5aab-8863-3139-f252-09cc02333eda@twiddle.net>
-Date: Sat, 1 Jul 2017 18:42:09 -0700
+Message-ID: <ae9e2ddd-8a58-cc7b-fcbf-bcab107a98fd@twiddle.net>
+Date: Sat, 1 Jul 2017 18:45:33 -0700
 MIME-Version: 1.0
-In-Reply-To: <149865801156.17063.15618379976159104550.stgit@frigg.lan>
+In-Reply-To: <149865825357.17063.13113603039704787150.stgit@frigg.lan>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v11 24/29] target/arm: [tcg,
- a64] Port to translate_insn
+Subject: Re: [Qemu-devel] [PATCH v11 25/29] target/arm: [tcg] Port to tb_stop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +28,20 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?UTF-8?Q?Llu=c3=ads_Vilanova?= <vilanova@ac.upc.edu>, qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Emilio G. Cota" <cota@braap.org>, "open list:ARM" <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On 06/28/2017 06:53 AM, Lluís Vilanova wrote:
-> Incrementally paves the way towards using the generic instruction translation
-> loop.
-> 
-> Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
-> ---
->   target/arm/translate-a64.c |   74 +++++++++++++++++++++++++++-----------------
->   1 file changed, 46 insertions(+), 28 deletions(-)
-> 
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 9c870f6d07..586a01a2de 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -11244,6 +11244,9 @@ static void aarch64_trblock_init_disas_context(DisasContextBase *dcbase,
->       dc->is_ldex = false;
->       dc->ss_same_el = (arm_debug_target_el(env) == dc->current_el);
->   
-> +    dc->next_page_start =
-> +        (dc->base.pc_first & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
+On 06/28/2017 06:57 AM, Lluís Vilanova wrote:
+> -    if (max_insns > TCG_MAX_INSNS) {
+> -        max_insns = TCG_MAX_INSNS;
+> +    if ((dc->base.tb->cflags & CF_LAST_IO) && dc->condjmp) {
+> +        /* FIXME: This can theoretically happen with self-modifying code. */
+> +        cpu_abort(cpu, "IO on conditional branch instruction");
+>       }
+...
+> -        gen_io_end();
+> +    if (dc->base.tb->cflags & CF_LAST_IO && dc->condjmp) {
+> +        /* FIXME: This can theoretically happen with self-modifying code. */
+> +        cpu_abort(cpu, "IO on conditional branch instruction");
 
-I think a better solution for a fixed-length ISA is to adjust max_insns. 
-Perhaps the init_disas_context hook should be able to modify it?
-
-And, while I'm thinking of it -- why is the init_globals hook separate? 
-There's nothing in between the two hook calls, and the more modern target front 
-ends won't need it.
+Two copies of this code... sequentially, apparently?
 
 
 r~
