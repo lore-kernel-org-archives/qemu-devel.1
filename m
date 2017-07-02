@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dRfRD-0000KY-8B
-	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 10:01:24 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dRgBw-00075p-Ml
+	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 10:49:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dRfRC-0003NM-3S
-	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 10:01:23 -0400
-References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
-	<20170628120530.31251-20-vsementsov@virtuozzo.com>
-	<f92fea0e-fe66-6888-dcd2-10782aec4fd2@redhat.com>
-	<b084acc4-a9d6-ecf5-e8f1-beb7c3a80072@redhat.com>
-	<bddd14a1-5d18-58b2-8e4b-8579ad0e7f49@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1dRgBv-0000al-KK
+	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 10:49:40 -0400
+References: <20170630195831.26087-1-eblake@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <368951d8-f683-4aeb-c702-8edd78c2fac7@redhat.com>
-Date: Sun, 2 Jul 2017 16:01:04 +0200
+Message-ID: <6ff70225-77c3-84ce-ada9-ce44192de608@redhat.com>
+Date: Sun, 2 Jul 2017 16:49:27 +0200
 MIME-Version: 1.0
-In-Reply-To: <bddd14a1-5d18-58b2-8e4b-8579ad0e7f49@redhat.com>
+In-Reply-To: <20170630195831.26087-1-eblake@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="WNFbeUKf8HixPQ9JJ5OftbqQJNeoOrh0l"
-Subject: Re: [Qemu-devel] [PATCH v22 19/30] qcow2: add persistent dirty
- bitmaps support
+	boundary="4O2ldoQ47rNLlK3hT7JlXXFK16hNLKKnp"
+Subject: Re: [Qemu-devel] [PATCH v2] tests: Avoid non-portable 'echo -ARG'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,163 +23,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: edgar.iglesias@xilinx.com, stefanha@redhat.com, qemu-block@nongnu.org, qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Jiri Pirko <jiri@resnulli.us>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WNFbeUKf8HixPQ9JJ5OftbqQJNeoOrh0l
+--4O2ldoQ47rNLlK3hT7JlXXFK16hNLKKnp
 From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, jsnow@redhat.com, famz@redhat.com,
- den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
-Message-ID: <368951d8-f683-4aeb-c702-8edd78c2fac7@redhat.com>
-Subject: Re: [PATCH v22 19/30] qcow2: add persistent dirty bitmaps support
-References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
- <20170628120530.31251-20-vsementsov@virtuozzo.com>
- <f92fea0e-fe66-6888-dcd2-10782aec4fd2@redhat.com>
- <b084acc4-a9d6-ecf5-e8f1-beb7c3a80072@redhat.com>
- <bddd14a1-5d18-58b2-8e4b-8579ad0e7f49@redhat.com>
-In-Reply-To: <bddd14a1-5d18-58b2-8e4b-8579ad0e7f49@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: edgar.iglesias@xilinx.com, stefanha@redhat.com, qemu-block@nongnu.org,
+ qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Jiri Pirko <jiri@resnulli.us>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Message-ID: <6ff70225-77c3-84ce-ada9-ce44192de608@redhat.com>
+Subject: Re: [PATCH v2] tests: Avoid non-portable 'echo -ARG'
+References: <20170630195831.26087-1-eblake@redhat.com>
+In-Reply-To: <20170630195831.26087-1-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-06-30 19:47, Eric Blake wrote:
-> On 06/29/2017 09:23 PM, Max Reitz wrote:
->> On 2017-06-30 04:18, Eric Blake wrote:
->>> On 06/28/2017 07:05 AM, Vladimir Sementsov-Ogievskiy wrote:
->>>> Store persistent dirty bitmaps in qcow2 image.
->>>>
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.co=
-m>
->>>> Reviewed-by: Max Reitz <mreitz@redhat.com>
->>>> ---
+On 2017-06-30 21:58, Eric Blake wrote:
+> POSIX says that backslashes in the arguments to 'echo', as well as
+> any use of 'echo -n' and 'echo -e', are non-portable; it recommends
+> people should favor 'printf' instead.  This is definitely true where
+> we do not control which shell is running (such as in makefile snippets
+> or in documentation examples).  But even for scripts where we
+> require bash (and therefore, where echo does what we want by default),
+> it is still possible to use 'shopt -s xpg_echo' to change bash's
+> behavior of echo.  And setting a good example never hurts when we are
+> not sure if a snippet will be copied from a bash-only script to a
+> general shell script (although I don't change the use of non-portable
+> \e for ESC when we know the running shell is bash).
 >=20
->>>
->>> This grabs the size (currently in sectors, although I plan to fix it =
-to
->>> be in bytes)...
->>>
->>>> +    const char *bm_name =3D bdrv_dirty_bitmap_name(bitmap);
->>>> +    uint8_t *buf =3D NULL;
->>>> +    BdrvDirtyBitmapIter *dbi;
->>>> +    uint64_t *tb;
->>>> +    uint64_t tb_size =3D
->>>> +            size_to_clusters(s,
->>>> +                bdrv_dirty_bitmap_serialization_size(bitmap, 0, bm_=
-size));
->>>
->>> ...then finds out how many bytes are required to serialize the entire=
+> Replace 'echo -n "..."' with 'printf %s "..."', and 'echo -e "..."'
+> with 'printf %b "...\n"', with the optimization that the %s/%b
+> argument can be omitted if the string being printed contains no
+> substitutions that could result in '%' (trivial if there is no
+> $ or `, but also possible when using things like $ret that are
+> known to be numeric given the assignment to ret just above).
 
->>> image, where bm_size should be the same as before...
->>>
->>>> +    while ((sector =3D bdrv_dirty_iter_next(dbi)) !=3D -1) {
->>>> +        uint64_t cluster =3D sector / sbc;
->>>> +        uint64_t end, write_size;
->>>> +        int64_t off;
->>>> +
->>>> +        sector =3D cluster * sbc;
->>>> +        end =3D MIN(bm_size, sector + sbc);
->>>> +        write_size =3D
->>>> +            bdrv_dirty_bitmap_serialization_size(bitmap, sector, en=
-d - sector);
->>>
->>> But here, rather than tackling the entire image at once, you are
->>> subdividing your queries along arbitrary lines. But nowhere do I see =
-a
->>> call to bdrv_dirty_bitmap_serialization_align() to make sure your
->>> end-sector value is properly aligned; if it is not aligned, you will
->>> trigger an assertion failure here...
->>
->> It's 4:21 am here, so I cannot claim to be right, but if I remember
->> correctly, it will automatically aligned because sbc is the number of
->> bits (and thus sectors) a bitmap cluster covers.
+Well, yes, possible, but it's no longer trivial... And just using '%s'
+or '%b' in these cases would make reading the code simpler, in my opinion=
+=2E
+
+Sure, omitting it makes sense for constant format strings, but for
+variable the cost outweighs the benefit, in my opinion.
+
+(And since this is a bit supposed to go through qemu-trivial, it should
+be trivial, right? :-))
+
+> In the qemu-iotests check script, fix unusual shell quoting
+> that would result in word-splitting if 'date' outputs a space.
 >=20
-> Okay, I re-read the spec.  First thing I noticed: we have a potential
-> conflict if an image is allowed to be resized:
-
-It isn't, though. (At least currently qemu won't allow it.)
-
-> "All stored bitmaps are related to the virtual disk stored in the same
-> image, so each bitmap size is equal to the virtual disk size."
+> In test 051, take an opportunity to shorten the line.
 >=20
-> If you resize an image, does the bitmap size have to be adjusted as
-> well?
-
-Sure.
-
->        What if you create one bitmap, then take an internal snapshot,
-> then resize?
-
-v3 images store the virtual disk size for each snapshot. So resizing an
-image leaves snapshots unaffected.
-
-Now bitmaps are not (yet) tied to snapshots. The spec thus says that the
-bitmaps always correspond to the active state (it lists "snapshot
-switching" as something that should dirty dirty bitmaps).
-
-Therefore, if you then resize (which currently is doubly forbidden,
-because qemu won't allow you to resize images with bitmaps or
-snapshots), you would have to resize the bitmap, too.
-
-In the future, we might want to allow binding bitmaps to snapshots. Then
-the bitmap would not be resized but you couldn't see it anymore unless
-you go back to the snapshot (which would bring the image to its original
-size).
-
->               Or do we declare that (at least for now) the presence of =
-a
-> bitmap is incompatible with the use of an internal snapshot?
-
-Well, that's not what the spec says. It clearly lists "snapshot
-switching" as something that dirty bitmaps track.
-
-> Conversely, we state that:
+> In test 068, get rid of a pointless second invocation of bash.
 >=20
+> CC: qemu-trivial@nongnu.org
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 >=20
-> "Structure of a bitmap directory entry:
-> ...
->          8 - 11:    bitmap_table_size
->                     Number of entries in the bitmap table of the bitmap=
-=2E"
+> ---
+> v2: be robust to potential % in substitutions [Max], rebase to master,
+> shorten some long lines and an odd bash -c use
 >=20
-> Since a bitmap therefore tracks its own size, I think the earlier
-> statement that all bitmap sizes are equal to the virtual disk size is
-> too strict (there seems to be no technical reason why a bitmap can't
-> have a different size that the image).
+> Add qemu-trivial in cc, although we may decide this is better through
+> Max's block tree since it is mostly iotests related
+>=20
+> ---
+>  qemu-options.hx             |  4 ++--
+>  tests/multiboot/run_test.sh | 10 +++++-----
+>  tests/qemu-iotests/051      |  7 ++++---
+>  tests/qemu-iotests/068      |  2 +-
+>  tests/qemu-iotests/142      | 48 ++++++++++++++++++++++---------------=
+--------
+>  tests/qemu-iotests/171      | 14 ++++++-------
+>  tests/qemu-iotests/check    | 18 ++++++++---------
+>  tests/rocker/all            | 10 +++++-----
+>  tests/tcg/cris/Makefile     |  8 ++++----
+>  9 files changed, 61 insertions(+), 60 deletions(-)
 
-But a logical. qcow2 is not a container format, it's an image format. I
-for one am very opposed to storing bitmaps in a qcow2 file which have no
-immediate connection to that virtual disk.
+[...]
 
-A reason I can see myself supporting would be that you could tie bitmaps
-to snapshots and then they can have a size that differs from the one of
-the active layer.
+> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+> index 4b1c674..0a13df9 100755
+> --- a/tests/qemu-iotests/check
+> +++ b/tests/qemu-iotests/check
+
+[...]
+
+> @@ -281,9 +281,9 @@ do
+>          rm -f $seq.out.bad
+>          lasttime=3D`sed -n -e "/^$seq /s/.* //p" <$TIMESTAMP_FILE`
+>          if [ "X$lasttime" !=3D X ]; then
+> -                echo -n " ${lasttime}s ..."
+> +                printf " ${lasttime}s ..."
+
+You cannot prove this doesn't contain a %. In fact, I can very easily
+put a % into the timestamp file and let printf print it here.
+
+Sure, there shouldn't be one there, but on one hand it's still possible
+and on the other, finding out that there shouldn't be a % there is very
+much non-trivial.
+
+>          else
+> -                echo -n "        "        # prettier output with times=
+tamps.
+> +                printf "        "        # prettier output with timest=
+amps.
+>          fi
+>          rm -f core $seq.notrun
+>=20
+
+[...]
+
+> diff --git a/tests/tcg/cris/Makefile b/tests/tcg/cris/Makefile
+> index 6b3dba4..6888263 100644
+> --- a/tests/tcg/cris/Makefile
+> +++ b/tests/tcg/cris/Makefile
+> @@ -150,17 +150,17 @@ check_addcv17.tst: crtv10.o sysv10.o
+>  build: $(CRT) $(SYS) $(TESTCASES)
+>=20
+>  check: $(CRT) $(SYS) $(TESTCASES)
+> -	@echo -e "\nQEMU simulator."
+> +	@printf "\nQEMU simulator.\n"
+>  	for case in $(TESTCASES); do \
+> -		echo -n "$$case "; \
+> +		printf "$$case "; \
+
+This is another rather non-trivial case: Checking that this doesn't
+contain a % means reading through the whole list defining TESTCASES.
+
+All in all, I'd really prefer just using %s and %b everywhere there is a
+variable format string.
 
 Max
 
-> But, having read that, you are correct that we are subdividing our
-> bitmaps according to what fits in a qcow2 cluster, and the smallest
-> qcow2 cluster we can come up with is 512-bytes (or 4k bits of the
-> bitmap).  Checking hbitmap.c, we are merely asserting that our alignmen=
-t
-> is always a multiple of 64 << hb->granularity.  But since we are
-> partitioning a cluster at a time, our minimum alignment will be 512 <<
-> hb->granularity, which is always aligned.
->=20
-> So all the more I need to do is add an assertion.
->=20
->> I'm for fixing it later. I would have announced the series "applied" a=
-n
->> hour ago if I hadn't had to bisect iotest 055 breakage...
->=20
-> I'm working it into my v4 posting of dirty-bitmap cleanups.
+>  		SIMARGS=3D; \
+>  		case $$case in *v17*) SIMARGS=3D"-cpu crisv17";; esac; \
+>  		$(SIM) $$SIMARGS ./$$case; \
+>  	done
+>  check-g: $(CRT) $(SYS) $(TESTCASES)
+> -	@echo -e "\nGDB simulator."
+> +	@printf "\nGDB simulator.\n"
+>  	@for case in $(TESTCASES); do \
+> -		echo -n "$$case "; \
+> +		printf "$$case "; \
+>  		$(SIMG) $$case; \
+>  	done
 >=20
 
 
 
---WNFbeUKf8HixPQ9JJ5OftbqQJNeoOrh0l
+--4O2ldoQ47rNLlK3hT7JlXXFK16hNLKKnp
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -192,14 +180,14 @@ Content-Disposition: attachment; filename="signature.asc"
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQEvBAEBCAAZBQJZWPygEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQPSx
-CACIsX+fwzqY7HnvPnwOSA5TEVFVC4keZwIbdhcdQBpXqeo5iJXK/WjAXWyziY84
-a6kFMBUFNVJq861zjmcNhJvVyqZAzGL8IKUF14xMgmKK7/DmdsG0LjRcVTtAzqF0
-g8uxjpmnvYoN7vD1A04eUos2ZiziBB0HP/E1YCLp3F2RwwySpFvIqrMCxDtZLZpz
-HRegzKWWAWK+8chvJP5ttNWax/ScOz5/elwQkwofZKsvHF66fyOo6ItCH1Z6awr8
-CfeKDneaa0RX/KXVFd0+az/URK+mxuY5pCi4l6PZPTehWkE5lCiAKk2s+IEzmYXQ
-RAfbQxsq10frMkzT+9cnz0EG
-=vop/
+iQEvBAEBCAAZBQJZWQf3EhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQDYN
+B/4zoYKYUO+M+Kyk6dlCTPLoCrtJ6njWOLl9G/g84QQAoUv7EfLeU0Bw6H4UoUPb
+ofpASN7/W7WG3lkCaPVnuFs+YPh3FitsupAiLGwq6F3Yw1rhKiE+/Xkd7wj5NpAj
+DdR1kwxmWaxF8pQBTj5aQMuOskptuaaGoIYwG7p/jfLjWzHwc22ebdrquAbUkyMj
+dN1Mrdc9VajXjLmeMkXAayMGINhgeoGltx2FMXtXgk9nZ8f+MbrEeHY51UwlrpHP
+wm92lyUegx50sIlybyItky0wreJ/sulVt6VlDoL1x/oQSLyekO0J81D4AP3F4/vG
+MZUidIVo1i9ueZN33gSFCzJZ
+=hIt/
 -----END PGP SIGNATURE-----
 
---WNFbeUKf8HixPQ9JJ5OftbqQJNeoOrh0l--
+--4O2ldoQ47rNLlK3hT7JlXXFK16hNLKKnp--
