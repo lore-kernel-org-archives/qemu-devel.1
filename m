@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1dRVxu-0002iC-3a
-	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 23:54:31 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dRW0v-0003up-Ip
+	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 23:57:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1dRVxr-0008Ke-0n
-	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 23:54:30 -0400
-Received: from mail-it0-x230.google.com ([2607:f8b0:4001:c0b::230]:35626)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
-	id 1dRVxq-0008K5-Qs
-	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 23:54:26 -0400
-Received: by mail-it0-x230.google.com with SMTP id v202so75670256itb.0
-	for <qemu-devel@nongnu.org>; Sat, 01 Jul 2017 20:54:26 -0700 (PDT)
-From: ben@skyportsystems.com
-Date: Sat,  1 Jul 2017 23:54:03 -0400
-Message-Id: <d85f9aef28b70034bc698ef53543cd0f5ac064e4.1498967158.git.ben@skyportsystems.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1dRW0u-0002ZD-GQ
+	for qemu-devel@nongnu.org; Sat, 01 Jul 2017 23:57:37 -0400
+Date: Sun, 2 Jul 2017 13:04:40 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170702030440.GN13989@umbus.fritz.box>
+References: <20170622124204.19407-1-marcandre.lureau@redhat.com>
+	<20170622124204.19407-24-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2] tests: Add unit tests for the VM Generation
- ID feature
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="UExESr5xZTMxdOWv"
+Content-Disposition: inline
+In-Reply-To: <20170622124204.19407-24-marcandre.lureau@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 23/31] ppc: use DIV_ROUND_UP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,261 +24,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, mst@redhat.com
-Cc: imammedo@redhat.com, lersek@redhat.com, marcandre.lureau@gmail.com, Ben Warren <ben@skyportsystems.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, "open list:PowerPC" <qemu-ppc@nongnu.org>
 
-From: Ben Warren <ben@skyportsystems.com>
 
-The following tests are implemented:
-* test that a GUID passed in by command line is propagated to the guest.
-  Read the GUID from guest memory
-* test that the "auto" argument to the GUID generates a valid GUID, as
-  seen by the guest.
-* test that a GUID passed in can be queried from the monitor
+--UExESr5xZTMxdOWv
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-  This patch is loosely based on a previous patch from:
-  Gal Hammer <ghammer@redhat.com>  and Igor Mammedov <imammedo@redhat.com>
+On Thu, Jun 22, 2017 at 02:41:56PM +0200, Marc-Andr=E9 Lureau wrote:
+> I used the clang-tidy qemu-round check to generate the fix:
+> https://github.com/elmarco/clang-tools-extra
+>=20
+> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
 
-Signed-off-by: Ben Warren <ben@skyportsystems.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
----
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
-v1->v2: free g_alloc'd tables
+> ---
+>  target/ppc/mem_helper.c | 2 +-
+>  target/ppc/translate.c  | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/target/ppc/mem_helper.c b/target/ppc/mem_helper.c
+> index e6383c6bfa..a34e604db3 100644
+> --- a/target/ppc/mem_helper.c
+> +++ b/target/ppc/mem_helper.c
+> @@ -111,7 +111,7 @@ void helper_lswx(CPUPPCState *env, target_ulong addr,=
+ uint32_t reg,
+>                   uint32_t ra, uint32_t rb)
+>  {
+>      if (likely(xer_bc !=3D 0)) {
+> -        int num_used_regs =3D (xer_bc + 3) / 4;
+> +        int num_used_regs =3D DIV_ROUND_UP(xer_bc, 4);
+>          if (unlikely((ra !=3D 0 && lsw_reg_in_range(reg, num_used_regs, =
+ra)) ||
+>                       lsw_reg_in_range(reg, num_used_regs, rb))) {
+>              raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index c0cd64d927..76f9ccde25 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -2882,7 +2882,7 @@ static void gen_lswi(DisasContext *ctx)
+>      }
+>      if (nb =3D=3D 0)
+>          nb =3D 32;
+> -    nr =3D (nb + 3) / 4;
+> +    nr =3D DIV_ROUND_UP(nb, 4);
+>      if (unlikely(lsw_reg_in_range(start, nr, ra))) {
+>          gen_inval_exception(ctx, POWERPC_EXCP_INVAL_LSWX);
+>          return;
 
- tests/Makefile.include |   2 +
- tests/vmgenid-test.c   | 203 +++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 205 insertions(+)
- create mode 100644 tests/vmgenid-test.c
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index ae889ca..18cd06a 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -250,6 +250,7 @@ check-qtest-i386-y += tests/usb-hcd-xhci-test$(EXESUF)
- gcov-files-i386-y += hw/usb/hcd-xhci.c
- check-qtest-i386-y += tests/pc-cpu-test$(EXESUF)
- check-qtest-i386-y += tests/q35-test$(EXESUF)
-+check-qtest-i386-y += tests/vmgenid-test$(EXESUF)
- gcov-files-i386-y += hw/pci-host/q35.c
- check-qtest-i386-$(CONFIG_VHOST_NET_TEST_i386) += tests/vhost-user-test$(EXESUF)
- ifeq ($(CONFIG_VHOST_NET_TEST_i386),)
-@@ -760,6 +761,7 @@ tests/test-uuid$(EXESUF): tests/test-uuid.o $(test-util-obj-y)
- tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptimer.o
- tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o $(test-util-obj-y)
- tests/numa-test$(EXESUF): tests/numa-test.o
-+tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/acpi-utils.o
- 
- tests/migration/stress$(EXESUF): tests/migration/stress.o
- 	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,"LINK","$(TARGET_DIR)$@")
-diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
-new file mode 100644
-index 0000000..e7ba38c
---- /dev/null
-+++ b/tests/vmgenid-test.c
-@@ -0,0 +1,203 @@
-+/*
-+ * QTest testcase for VM Generation ID
-+ *
-+ * Copyright (c) 2016 Red Hat, Inc.
-+ * Copyright (c) 2017 Skyport Systems
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include <glib.h>
-+#include <string.h>
-+#include <unistd.h>
-+#include "qemu/osdep.h"
-+#include "qemu/bitmap.h"
-+#include "qemu/uuid.h"
-+#include "hw/acpi/acpi-defs.h"
-+#include "acpi-utils.h"
-+#include "libqtest.h"
-+
-+#define VGID_GUID "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
-+#define VMGENID_GUID_OFFSET 40   /* allow space for
-+                                  * OVMF SDT Header Probe Supressor
-+                                  */
-+#define RSDP_ADDR_INVALID 0x100000 /* RSDP must be below this address */
-+#define RSDP_SLEEP_US     100000   /* Sleep for 100ms between tries */
-+#define RSDP_TRIES_MAX    100      /* Max total time is 10 seconds */
-+
-+typedef struct {
-+    AcpiTableHeader header;
-+    gchar name_op;
-+    gchar vgia[4];
-+    gchar val_op;
-+    uint32_t vgia_val;
-+} QEMU_PACKED VgidTable;
-+
-+static uint32_t acpi_find_vgia(void)
-+{
-+    uint32_t rsdp_offset;
-+    uint32_t guid_offset = 0;
-+    AcpiRsdpDescriptor rsdp_table;
-+    uint32_t rsdt;
-+    AcpiRsdtDescriptorRev1 rsdt_table;
-+    int tables_nr;
-+    uint32_t *tables;
-+    AcpiTableHeader ssdt_table;
-+    VgidTable vgid_table;
-+    int i;
-+
-+    /* Tables may take a short time to be set up by the guest */
-+    for (i = 0; i < RSDP_TRIES_MAX; i++) {
-+        rsdp_offset = acpi_find_rsdp_address();
-+        if (rsdp_offset < RSDP_ADDR_INVALID) {
-+            break;
-+        }
-+        g_usleep(RSDP_SLEEP_US);
-+    }
-+    g_assert_cmphex(rsdp_offset, <, RSDP_ADDR_INVALID);
-+
-+    acpi_parse_rsdp_table(rsdp_offset, &rsdp_table);
-+
-+    rsdt = rsdp_table.rsdt_physical_address;
-+    /* read the header */
-+    ACPI_READ_TABLE_HEADER(&rsdt_table, rsdt);
-+    ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
-+
-+    /* compute the table entries in rsdt */
-+    tables_nr = (rsdt_table.length - sizeof(AcpiRsdtDescriptorRev1)) /
-+                sizeof(uint32_t);
-+    g_assert_cmpint(tables_nr, >, 0);
-+
-+    /* get the addresses of the tables pointed by rsdt */
-+    tables = g_new0(uint32_t, tables_nr);
-+    ACPI_READ_ARRAY_PTR(tables, tables_nr, rsdt);
-+
-+    for (i = 0; i < tables_nr; i++) {
-+        ACPI_READ_TABLE_HEADER(&ssdt_table, tables[i]);
-+        if (!strncmp((char *)ssdt_table.oem_table_id, "VMGENID", 7)) {
-+            /* the first entry in the table should be VGIA
-+             * That's all we need
-+             */
-+            ACPI_READ_FIELD(vgid_table.name_op, tables[i]);
-+            g_assert(vgid_table.name_op == 0x08);  /* name */
-+            ACPI_READ_ARRAY(vgid_table.vgia, tables[i]);
-+            g_assert(memcmp(vgid_table.vgia, "VGIA", 4) == 0);
-+            ACPI_READ_FIELD(vgid_table.val_op, tables[i]);
-+            g_assert(vgid_table.val_op == 0x0C);  /* dword */
-+            ACPI_READ_FIELD(vgid_table.vgia_val, tables[i]);
-+            /* The GUID is written at a fixed offset into the fw_cfg file
-+             * in order to implement the "OVMF SDT Header probe suppressor"
-+             * see docs/specs/vmgenid.txt for more details
-+             */
-+            guid_offset = vgid_table.vgia_val + VMGENID_GUID_OFFSET;
-+            break;
-+        }
-+    }
-+    g_free(tables);
-+    return guid_offset;
-+}
-+
-+static void read_guid_from_memory(QemuUUID *guid)
-+{
-+    uint32_t vmgenid_addr;
-+    int i;
-+
-+    vmgenid_addr = acpi_find_vgia();
-+    g_assert(vmgenid_addr);
-+
-+    /* Read the GUID directly from guest memory */
-+    for (i = 0; i < 16; i++) {
-+        guid->data[i] = readb(vmgenid_addr + i);
-+    }
-+    /* The GUID is in little-endian format in the guest, while QEMU
-+     * uses big-endian.  Swap after reading.
-+     */
-+    qemu_uuid_bswap(guid);
-+}
-+
-+static void read_guid_from_monitor(QemuUUID *guid)
-+{
-+    QDict *rsp, *rsp_ret;
-+    const char *guid_str;
-+
-+    rsp = qmp("{ 'execute': 'query-vm-generation-id' }");
-+    if (qdict_haskey(rsp, "return")) {
-+        rsp_ret = qdict_get_qdict(rsp, "return");
-+        g_assert(qdict_haskey(rsp_ret, "guid"));
-+        guid_str = qdict_get_str(rsp_ret, "guid");
-+        g_assert(qemu_uuid_parse(guid_str, guid) == 0);
-+    }
-+    QDECREF(rsp);
-+}
-+
-+static void vmgenid_set_guid_test(void)
-+{
-+    QemuUUID expected, measured;
-+    gchar *cmd;
-+
-+    g_assert(qemu_uuid_parse(VGID_GUID, &expected) == 0);
-+
-+    cmd = g_strdup_printf("-machine accel=tcg -device vmgenid,id=testvgid,"
-+                          "guid=%s", VGID_GUID);
-+    qtest_start(cmd);
-+
-+    /* Read the GUID from accessing guest memory */
-+    read_guid_from_memory(&measured);
-+    g_assert(memcmp(measured.data, expected.data, sizeof(measured.data)) == 0);
-+
-+    qtest_quit(global_qtest);
-+    g_free(cmd);
-+}
-+
-+static void vmgenid_set_guid_auto_test(void)
-+{
-+    const char *cmd;
-+    QemuUUID measured;
-+
-+    cmd = "-machine accel=tcg -device vmgenid,id=testvgid," "guid=auto";
-+    qtest_start(cmd);
-+
-+    read_guid_from_memory(&measured);
-+
-+    /* Just check that the GUID is non-null */
-+    g_assert(!qemu_uuid_is_null(&measured));
-+
-+    qtest_quit(global_qtest);
-+}
-+
-+static void vmgenid_query_monitor_test(void)
-+{
-+    QemuUUID expected, measured;
-+    gchar *cmd;
-+
-+    g_assert(qemu_uuid_parse(VGID_GUID, &expected) == 0);
-+
-+    cmd = g_strdup_printf("-machine accel=tcg -device vmgenid,id=testvgid,"
-+                          "guid=%s", VGID_GUID);
-+    qtest_start(cmd);
-+
-+    /* Read the GUID via the monitor */
-+    read_guid_from_monitor(&measured);
-+    g_assert(memcmp(measured.data, expected.data, sizeof(measured.data)) == 0);
-+
-+    qtest_quit(global_qtest);
-+    g_free(cmd);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    int ret;
-+
-+    g_test_init(&argc, &argv, NULL);
-+
-+    qtest_add_func("/vmgenid/vmgenid/set-guid",
-+                   vmgenid_set_guid_test);
-+    qtest_add_func("/vmgenid/vmgenid/set-guid-auto",
-+                   vmgenid_set_guid_auto_test);
-+    qtest_add_func("/vmgenid/vmgenid/query-monitor",
-+                   vmgenid_query_monitor_test);
-+    ret = g_test_run();
-+
-+    return ret;
-+}
--- 
-2.7.4
+--UExESr5xZTMxdOWv
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZWGLFAAoJEGw4ysog2bOSApwQAIAlw5hi1BCMl42KHO4o0BPN
+G09pkj7yY1IcgGLo8EedBoinp43WG8+dkKERlihxIf72H0FQuKxf4y6xbdZELm15
+r0LWvetFTOJKQ72Ai3HFTJMH2kjAujPROk+cdwpDNHk4z8pPj0gtYCUV385FMc4V
+DGEEeCNjS/Z/QzwVZw3CDugWvnoScmIU7KGGsHTylMY69rWEHgdhukbUrykZ2WLq
+5TLraBx8FlHlSKatZW/bIYCtuOIo5e99hknFbMmvocqgXhdSH/o+yNO9RCDhtGFE
+aUQlixqxR25Ur2eU3r8lgDIbmpjw1lBZxHL7cPyB6MjwUT8hm+zS/t4S3tfF2Ufz
+/+3IVQpTcpy6vU67fX2RILzx6iO016ekoX+JIZLUqQm4sZWBtX4xDovez0T6Nllt
+IbQPlgmQAqGLw0PfMSufBahAPSaCuR5E4WHJQHwPMLA9hiMPbPTVTvS2AZs9L26n
+jf/6z9DewNOGtp4sHQzhT/X6CAXwRU3l2/X1ROqJqy/fJL+oSN0qoKOUvd11derw
+Jh5BunQArbXJaEtzXNkwyaOfBUGMNc1teloA19G6FWFR2nMT7inUhHhQbNqyCNUg
+0B2UlRL7q71tJ4Q1B3haj2hR2Rd5P1dcwYn3kb+lA6q+tOVCRsO5uH0M+H7kHa8I
+zO5Kyu3QVAxjs9VgA33m
+=RaDc
+-----END PGP SIGNATURE-----
+
+--UExESr5xZTMxdOWv--
