@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dS4JU-0008Oa-41
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dS4JU-0008OZ-3p
 	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:35:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dS4JQ-0007HW-Us
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dS4JS-0007JG-40
 	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:35:04 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34381)
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36530)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dS4JQ-0007H3-Nv
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:35:00 -0400
-Received: by mail-wm0-x243.google.com with SMTP id p204so21563519wmg.1
-	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 09:34:59 -0700 (PDT)
+	id 1dS4JR-0007Hh-TY
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:35:02 -0400
+Received: by mail-wm0-x244.google.com with SMTP id y5so21469462wmh.3
+	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 09:35:01 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  3 Jul 2017 18:34:31 +0200
-Message-Id: <1499099693-22903-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 00/22] add disable-tcg option for x86 build
+Date: Mon,  3 Jul 2017 18:34:33 +0200
+Message-Id: <1499099693-22903-3-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1499099693-22903-1-git-send-email-pbonzini@redhat.com>
+References: <1499099693-22903-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 02/22] configure: early test for supported
+ targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,80 +31,123 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: rth@twiddle.net, thuth@redhat.com, anthony.xu@intel.com, berrange@redhat.com, a.rigo@virtualopensystems.com, yang.zhong@intel.com
 
-Most of this series is the same as Yang Zhong's, except for:
+Check for unsupported targets in target_list, and print an
+error early in the configuration process.
 
-1) less stubs usage
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ configure | 65 ++++++++++++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 43 insertions(+), 22 deletions(-)
 
-2) splitting patch 2 ("vl: add tcg_enabled() for tcg related code") [Thomas]
-
-3) reworked configure [Thomas, Daniel]
-
-Please review!
-
-Paolo
-
-Paolo Bonzini (10):
-  configure: factor out list of supported Xen/KVM/HAX targets
-  configure: early test for supported targets
-  configure: add --disable-tcg configure option
-  vl: convert -tb-size to qemu_strtoul
-  monitor: disable "info jit" and "info opcount" if !TCG
-  vapic: use tcg_enabled
-  tcg: move tb_lock out of translate-all.h
-  exec: elide calls to tb_lock and tb_unlock
-  target/i386: move TLB refill function out of helper.c
-  configure: warn on untested --disable-tcg
-
-Yang Zhong (12):
-  vl: add tcg_enabled() for tcg related code
-  tcg: move page_size_init() function
-  tcg: tcg_handle_interrupt() function
-  tcg: make tcg_allowed global
-  tcg: add the tcg-stub.c file into accel/stubs/
-  tcg: add CONFIG_TCG guards in headers
-  tcg: add the CONFIG_TCG into Makefiles
-  target/i386: move cpu_sync_bndcs_hflags() function
-  target/i386: make cpu_get_fp80()/cpu_set_fp80() static
-  target/i386: split cpu_set_mxcsr() and make cpu_set_fpuc() inline
-  target/i386: add the tcg_enabled() in target/i386/
-  target/i386: add the CONFIG_TCG into Makefiles
-
- Makefile.target              |   4 +-
- accel/Makefile.objs          |   2 +-
- accel/stubs/Makefile.objs    |   1 +
- accel/stubs/tcg-stub.c       |  22 +++
- accel/tcg/Makefile.objs      |   2 +-
- accel/tcg/cpu-exec-common.c  |   2 +
- accel/tcg/tcg-all.c          |  35 +++-
- accel/tcg/translate-all.c    |  29 +---
- accel/tcg/translate-common.c |  56 -------
- bsd-user/main.c              |   1 -
- configure                    | 186 ++++++++++++++-------
- exec.c                       |  23 +++
- hmp-commands-info.hx         |   4 +
- hw/i386/kvmvapic.c           |   5 +-
- include/exec/cpu-defs.h      |   4 +-
- include/exec/cputlb.h        |   2 +-
- include/exec/exec-all.h      |  57 ++++---
- include/exec/helper-proto.h  |   2 +
- include/qemu-common.h        |   7 +-
- include/sysemu/accel.h       |   2 +-
- monitor.c                    |   2 +
- qom/cpu.c                    |   2 +
- target/i386/Makefile.objs    |   7 +-
- target/i386/bpt_helper.c     |  32 ++--
- target/i386/cpu.c            |   4 +-
- target/i386/cpu.h            |  28 +++-
- target/i386/excp_helper.c    | 343 +++++++++++++++++++++++++++++++++++++++
- target/i386/fpu_helper.c     |  29 +---
- target/i386/helper.c         | 378 ++++---------------------------------------
- target/i386/machine.c        |  23 ++-
- target/i386/mpx_helper.c     |  30 ----
- tcg/tcg.h                    |   4 -
- vl.c                         |  14 +-
- 33 files changed, 735 insertions(+), 607 deletions(-)
- create mode 100644 accel/stubs/tcg-stub.c
- delete mode 100644 accel/tcg/translate-common.c
-
+diff --git a/configure b/configure
+index 0f14e79..6d1a6a9 100755
+--- a/configure
++++ b/configure
+@@ -40,14 +40,18 @@ printf " '%s'" "$0" "$@" >> config.log
+ echo >> config.log
+ echo "#" >> config.log
+ 
+-error_exit() {
+-    echo
++print_error() {
++    (echo
+     echo "ERROR: $1"
+     while test -n "$2"; do
+         echo "       $2"
+         shift
+     done
+-    echo
++    echo) >&2
++}
++
++error_exit() {
++    print_error "$@"
+     exit 1
+ }
+ 
+@@ -207,6 +211,25 @@ supported_xen_target() {
+     return 1
+ }
+ 
++supported_target() {
++    case "$1" in
++        ${target_name}-softmmu) ;;
++        ${target_name}-linux-user)
++            if test "$linux" != "yes"; then
++                print_error "Target '$target' is only available on a Linux host"
++                return 1
++            fi
++            ;;
++        ${target_name}-bsd-user)
++            if test "$bsd" != "yes"; then
++                print_error "Target '$target' is only available on a BSD host"
++                return 1
++            fi
++            ;;
++    esac
++    return 0
++}
++
+ # default parameters
+ source_path=$(dirname "$0")
+ cpu=""
+@@ -1734,23 +1757,27 @@ if test "$solaris" = "yes" ; then
+ fi
+ 
+ if test -z "${target_list+xxx}" ; then
+-    target_list="$default_target_list"
++    for target in $default_target_list; do
++        supported_target $target 2>/dev/null && \
++            target_list="$target_list $target"
++    done
++    target_list="${target_list# }"
+ else
+     target_list=$(echo "$target_list" | sed -e 's/,/ /g')
++    for target in $target_list; do
++        # Check that we recognised the target name; this allows a more
++        # friendly error message than if we let it fall through.
++        case " $default_target_list " in
++            *" $target "*)
++                ;;
++            *)
++                error_exit "Unknown target name '$target'"
++                ;;
++        esac
++        supported_target $target || exit 1
++    done
+ fi
+ 
+-# Check that we recognised the target name; this allows a more
+-# friendly error message than if we let it fall through.
+-for target in $target_list; do
+-    case " $default_target_list " in
+-        *" $target "*)
+-            ;;
+-        *)
+-            error_exit "Unknown target name '$target'"
+-            ;;
+-    esac
+-done
+-
+ # see if system emulation was really requested
+ case " $target_list " in
+   *"-softmmu "*) softmmu=yes
+@@ -6050,16 +6077,10 @@ case "$target" in
+     target_softmmu="yes"
+     ;;
+   ${target_name}-linux-user)
+-    if test "$linux" != "yes" ; then
+-      error_exit "Target '$target' is only available on a Linux host"
+-    fi
+     target_user_only="yes"
+     target_linux_user="yes"
+     ;;
+   ${target_name}-bsd-user)
+-    if test "$bsd" != "yes" ; then
+-      error_exit "Target '$target' is only available on a BSD host"
+-    fi
+     target_user_only="yes"
+     target_bsd_user="yes"
+     ;;
 -- 
 1.8.3.1
