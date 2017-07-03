@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mihajlov@de.ibm.com>) id 1dRzqg-0000pV-6y
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:49:03 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dRzqh-0000pX-1t
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:49:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mihajlov@de.ibm.com>) id 1dRzqb-0000R5-AJ
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:49:02 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43054)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mihajlov@de.ibm.com>) id 1dRzqb-0000QH-08
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:48:57 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v63BmpN6144723
-	for <qemu-devel@nongnu.org>; Mon, 3 Jul 2017 07:48:55 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bfc034nnp-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 07:48:54 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mihajlov@de.ibm.com>;
-	Mon, 3 Jul 2017 12:48:52 +0100
-From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Date: Mon,  3 Jul 2017 13:48:49 +0200
-Message-Id: <1499082529-16970-1-git-send-email-mihajlov@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v3] s390: return unavailable features via
- query-cpu-definitions
+	(envelope-from <dgilbert@redhat.com>) id 1dRzqc-0000Sk-K9
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:49:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60286)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dRzqc-0000Qr-B6
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:48:58 -0400
+Date: Mon, 3 Jul 2017 12:48:46 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170703114845.GB2206@work-vm>
+References: <20170628190047.26159-1-dgilbert@redhat.com>
+	<20170629185525.GC2399@work-vm>
+	<CAJ+F1CKEEaRTfNiGU3cDYedqRYD9a+teG7t-F1YhGte3J-EbfA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CKEEaRTfNiGU3cDYedqRYD9a+teG7t-F1YhGte3J-EbfA@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC 00/29] postcopy+vhost-user/shared ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,142 +29,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, jjherne@linux.vnet.ibm.com, david@redhat.com
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
+Cc: qemu-devel@nongnu.org, a.perevalov@samsung.com, maxime.coquelin@redhat.com, mst@redhat.com, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com, aarcange@redhat.com
 
-The response for query-cpu-definitions didn't include the
-unavailable-features field, which is used by libvirt to figure
-out whether a certain cpu model is usable on the host.
+* Marc-Andr=E9 Lureau (marcandre.lureau@gmail.com) wrote:
+> Hi
+>=20
+> On Thu, Jun 29, 2017 at 8:56 PM Dr. David Alan Gilbert <dgilbert@redhat=
+.com>
+> wrote:
+>=20
+> > * Dr. David Alan Gilbert (git) (dgilbert@redhat.com) wrote:
+> > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > >
+> > > Hi,
+> > >   This is a RFC/WIP series that enables postcopy migration
+> > > with shared memory to a vhost-user process.
+> > > It's based off current-head + Juan's load_cleanup series, and
+> > > Alexey's bitmap series (v4).  It's very lightly tested and seems
+> > > to work, but it's quite rough.
+> >
+> > Marc-Andr=E9 asked if I had a git with it all applied; so here we are=
+:
+> > https://github.com/dagrh/qemu/commits/vhost
+> > git@github.com:dagrh/qemu.git on the vhost branch
+> >
+> >
+> I started looking at the series, but I am not familiar with ufd/postcop=
+y.
 
-The unavailable features are now computed by obtaining the host CPU
-model and comparing it against the known CPU models. The comparison
-takes into account the generation, the GA level and the feature
-bitmaps. In the case of a CPU generation/GA level mismatch
-a feature called "type" is reported to be missing.
+I'm similarly unfamiliar with the vhost code when I started this (which
+probably shows!).
+The main thing about ufd is that a process registers with the ufd system
+and registers an area of memory with it;  accesses to the memory block
+until the page is available, a message is sent down the ufd, and whoever
+receives that message may then respond by atomically copying a page into
+memory, or wakeing the process when it knows the page is there.
+This is the first time we've tried to use userfaultfd with shared memory
+and it does need a very recent kernel for it (4.11.0 or rhel 7.4 beta)
 
-As a result, the output of virsh domcapabilities would change
-from something like
- ...
-     <mode name='custom' supported='yes'>
-      <model usable='unknown'>z10EC-base</model>
-      <model usable='unknown'>z9EC-base</model>
-      <model usable='unknown'>z196.2-base</model>
-      <model usable='unknown'>z900-base</model>
-      <model usable='unknown'>z990</model>
- ...
-to
- ...
-     <mode name='custom' supported='yes'>
-      <model usable='yes'>z10EC-base</model>
-      <model usable='yes'>z9EC-base</model>
-      <model usable='no'>z196.2-base</model>
-      <model usable='yes'>z900-base</model>
-      <model usable='yes'>z990</model>
- ...
+> Could you update vhost-user.txt to describe the new messages?
 
-Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
----
-v1 -> v2:
- Account for model generation and GA level, not only on features.
-v2 -> v3:
- Prevent repetitive failures by calling get_max_cpu_model only once.
- Ignore get_max_cpu_model failures in query_cpu_definitions in order
- return CPU models even if the host CPU model is not available.
+See below; I'll add that in.
 
- target/s390x/cpu_models.c | 62 +++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 57 insertions(+), 5 deletions(-)
+> Otherwise,
+> make check hangs in /x86_64/vhost-user/connect-fail (might be an unrela=
+ted
+> regression?) Thanks
 
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 63903c2..7cb55dc 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -283,10 +283,41 @@ void s390_cpu_list(FILE *f, fprintf_function print)
-     }
- }
- 
-+static S390CPUModel *get_max_cpu_model(Error **errp);
+Entirely possible I broke it; I'll have a look - at the moment I'm more
+interested in comments on the structure of this set.
+
+Dave
+
+diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+index 481ab56e35..fec4cd0ffe 100644
+--- a/docs/interop/vhost-user.txt
++++ b/docs/interop/vhost-user.txt
+@@ -273,6 +273,14 @@ Once the source has finished migration, rings will b=
+e stopped by
+ the source. No further update must be done before rings are
+ restarted.
+
++In postcopy migration the slave is started before all the memory has bee=
+n
++received from the source host, and care must be taken to avoid accessing=
+ pages
++that have yet to be received.  The slave opens a 'userfault'-fd and regi=
+sters
++the memory with it; this fd is then passed back over to the master.
++The master services requests on the userfaultfd for pages that are acces=
+sed
++and when the page is available it performs WAKE ioctl's on the userfault=
+fd
++to wake the stalled slave.
 +
- #ifndef CONFIG_USER_ONLY
-+static void list_add_feat(const char *name, void *opaque);
+ IOMMU support
+ -------------
+
+@@ -326,6 +334,7 @@ Protocol features
+ #define VHOST_USER_PROTOCOL_F_REPLY_ACK      3
+ #define VHOST_USER_PROTOCOL_F_MTU            4
+ #define VHOST_USER_PROTOCOL_F_SLAVE_REQ      5
++#define VHOST_USER_PROTOCOL_F_POSTCOPY       6
+
+ Master message types
+ --------------------
+@@ -402,12 +411,17 @@ Master message types
+       Id: 5
+       Equivalent ioctl: VHOST_SET_MEM_TABLE
+       Master payload: memory regions description
++      Slave payload: (postcopy only) memory regions description
+
+       Sets the memory map regions on the slave so it can translate the v=
+ring
+       addresses. In the ancillary data there is an array of file descrip=
+tors
+       for each memory mapped region. The size and ordering of the fds ma=
+tches
+       the number and ordering of memory regions.
+
++      When postcopy-listening has been received, SET_MEM_TABLE replies w=
+ith
++      the bases of the memory mapped regions to the master.  It must hav=
+e mmap'd
++      the regions and enabled userfaultfd on them.
 +
-+static void check_unavailable_features(const S390CPUModel *max_model,
-+                                       const S390CPUModel *model,
-+                                       strList **unavailable)
-+{
-+    S390FeatBitmap missing;
+  * VHOST_USER_SET_LOG_BASE
+
+       Id: 6
+@@ -580,6 +594,29 @@ Master message types
+       This request should be send only when VIRTIO_F_IOMMU_PLATFORM feat=
+ure
+       has been successfully negotiated.
+
++ * VHOST_USER_POSTCOPY_ADVISE
++      Id: 23
++      Master payload: N/A
++      Slave payload: userfault fd + u64
 +
-+    /* check general model compatibility */
-+    if (max_model->def->gen < model->def->gen ||
-+        (max_model->def->gen == model->def->gen &&
-+         max_model->def->ec_ga < model->def->ec_ga)) {
-+        list_add_feat("type", unavailable);
-+    }
++      Master advises slave that a migration with postcopy enabled is und=
+erway,
++      the slave must open a userfaultfd for later use.
++      Note that at this stage the migration is still in precopy mode.
 +
-+    /* detect missing features if any to properly report them */
-+    bitmap_andnot(missing, model->features, max_model->features,
-+                  S390_FEAT_MAX);
-+    if (!bitmap_empty(missing, S390_FEAT_MAX)) {
-+        s390_feat_bitmap_to_ascii(missing, unavailable, list_add_feat);
-+    }
-+}
++ * VHOST_USER_POSTCOPY_LISTEN
++      Id: 24
++      Master payload: N/A
 +
-+struct CpuDefinitionInfoListData {
-+    CpuDefinitionInfoList *list;
-+    S390CPUModel *model;
-+};
++      Master advises slave that a transition to postcopy mode has happen=
+ed.
 +
- static void create_cpu_model_list(ObjectClass *klass, void *opaque)
- {
--    CpuDefinitionInfoList **cpu_list = opaque;
-+    struct CpuDefinitionInfoListData *cpu_list_data = opaque;
-+    CpuDefinitionInfoList **cpu_list = &cpu_list_data->list;
-     CpuDefinitionInfoList *entry;
-     CpuDefinitionInfo *info;
-     char *name = g_strdup(object_class_get_name(klass));
-@@ -300,7 +331,19 @@ static void create_cpu_model_list(ObjectClass *klass, void *opaque)
-     info->migration_safe = scc->is_migration_safe;
-     info->q_static = scc->is_static;
-     info->q_typename = g_strdup(object_class_get_name(klass));
--
-+    /* check for unavailable features */
-+    if (cpu_list_data->model) {
-+        Object *obj;
-+        S390CPU *sc;
-+        obj = object_new(object_class_get_name(klass));
-+        sc = S390_CPU(obj);
-+        if (sc->model) {
-+            info->has_unavailable_features = true;
-+            check_unavailable_features(cpu_list_data->model, sc->model,
-+                                       &info->unavailable_features);
-+        }
-+        object_unref(obj);
-+    }
- 
-     entry = g_malloc0(sizeof(*entry));
-     entry->value = info;
-@@ -310,11 +353,20 @@ static void create_cpu_model_list(ObjectClass *klass, void *opaque)
- 
- CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
- {
--    CpuDefinitionInfoList *list = NULL;
-+    struct CpuDefinitionInfoListData list_data = {
-+        .list = NULL,
-+    };
++ * VHOST_USER_POSTCOPY_END
++      Id: 25
++      Slave payload: u64
 +
-+    list_data.model = get_max_cpu_model(errp);
-+    if (*errp) {
-+        error_free(*errp);
-+        *errp = NULL;
-+    }
- 
--    object_class_foreach(create_cpu_model_list, TYPE_S390_CPU, false, &list);
-+    object_class_foreach(create_cpu_model_list, TYPE_S390_CPU, false,
-+                         &list_data);
- 
--    return list;
-+    return list_data.list;
- }
- 
- static void cpu_model_from_info(S390CPUModel *model, const CpuModelInfo *info,
--- 
-1.9.1
++      Master advises that postcopy migration has now completed.  The
++      slave must disable the userfaultfd. The response is an acknowledge=
+ment
++      only.
++
+ Slave message types
+ -------------------
+
+
+> --=20
+> Marc-Andr=E9 Lureau
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
