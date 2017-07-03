@@ -1,43 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1dRwrn-0001Qk-35
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 04:38:00 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dRx3a-00053G-Sx
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 04:50:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1dRwrk-0004uJ-74
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 04:37:59 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54044
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haoqf@linux.vnet.ibm.com>)
-	id 1dRwrk-0004sh-0s
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 04:37:56 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v638Soew066122
-	for <qemu-devel@nongnu.org>; Mon, 3 Jul 2017 04:37:52 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bem6g770t-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 04:37:52 -0400
-Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <haoqf@linux.vnet.ibm.com>;
-	Mon, 3 Jul 2017 04:37:51 -0400
-References: <20170703073836.72092-1-haoqf@linux.vnet.ibm.com>
-	<20170703073836.72092-2-haoqf@linux.vnet.ibm.com>
-	<cb96f282-2482-e085-1e94-62ba290fefe6@de.ibm.com>
-	<f37b8414-165e-080b-276c-407ddebbce2b@linux.vnet.ibm.com>
-	<7dbedc9d-7079-a766-36c9-addb49e8bece@de.ibm.com>
-From: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Date: Mon, 3 Jul 2017 16:37:42 +0800
+	(envelope-from <stefanha@redhat.com>) id 1dRx3X-0002Vn-RZ
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 04:50:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32902)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dRx3X-0002R2-JZ
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 04:50:07 -0400
+Date: Mon, 3 Jul 2017 09:50:00 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170703085000.GA22607@stefanha-x1.localdomain>
+References: <1498849781-12776-1-git-send-email-chugh.ishani@research.iiit.ac.in>
 MIME-Version: 1.0
-In-Reply-To: <7dbedc9d-7079-a766-36c9-addb49e8bece@de.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <73c8d807-deed-0f8d-3787-ca9421243f20@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/1] virtio-scsi-ccw: use ioeventfd even
- when KVM is disabled
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Q68bSM7Ycu6FN28Q"
+Content-Disposition: inline
+In-Reply-To: <1498849781-12776-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+Subject: Re: [Qemu-devel] [PATCH] Python3 Support for qmp.py
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,99 +27,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: zyimin@linux.vnet.ibm.com, stefanha@redhat.com, kwolf@redhat.com, famz@redhat.com, peterx@redhat.com
+To: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com
 
 
+--Q68bSM7Ycu6FN28Q
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-=E5=9C=A8 2017/7/3 16:21, Christian Borntraeger =E5=86=99=E9=81=93:
-> On 07/03/2017 10:08 AM, QingFeng Hao wrote:
->>
->> =E5=9C=A8 2017/7/3 15:41, Christian Borntraeger =E5=86=99=E9=81=93:
->>> On 07/03/2017 09:38 AM, QingFeng Hao wrote:
->>>> Do not check kvm_eventfds_enabled() when KVM is disabled since it
->>>> always returns 0.  Since commit 8c56c1a592b5092d91da8d8943c17777d646=
-2a6f
->>>> ("memory: emulate ioeventfd") it has been possible to use ioeventfds=
- in
->>>> qtest or TCG mode.
->>>>
->>>> This patch makes -device virtio-scsi-ccw,iothread=3Diothread0 work e=
-ven
->>>> when KVM is disabled.
->>>>
->>>> I have tested that virtio-scsi-ccw works under tcg both with and wit=
-hout
->>>> iothread.
->>>>
->>>> This patch fixes qemu-iotests 068, which was accidentally merged ear=
-ly
->>>> despite the dependency on ioeventfd.
->>>>
->>>> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
->>>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->>> cut'n'paste mistake of adding Stefans signoff?
->>>
->>> Otherwise it looks good.
->> I just want to mark that this patch is related with the former one fro=
-m Stefan.
->> Is that ok to add this sign-off? thanks!
-> No, sign-off indicates who passes the patch along for integration, so o=
-nly Stefan
-> is allowed to add that - if he actually takes the patch. It is very imp=
-ortant to
-> not mangle the sign-off-chain as it is actually used to track how a pat=
-ch moved from
-> the developer into the tree.
->
-> You can give credit to Stefan in the patch description - e.g. by saying=
- in the patch
-> description something like
->
-> based on a similar patch from Stefan Hajnoczi - commit c324fd0a39c (" v=
-irtio-pci: use
-> ioeventfd even when KVM is disabled)
-Thanks for your good explanation and I'll change the commit message.
->
->
->
->>>> ---
->>>>    hw/s390x/virtio-ccw.c | 2 +-
->>>>    target/s390x/kvm.c    | 3 +++
->>>>    2 files changed, 4 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
->>>> index 90d37cb9ff..35896eb007 100644
->>>> --- a/hw/s390x/virtio-ccw.c
->>>> +++ b/hw/s390x/virtio-ccw.c
->>>> @@ -711,7 +711,7 @@ static void virtio_ccw_device_realize(VirtioCcwD=
-evice *dev, Error **errp)
->>>>            sch->cssid, sch->ssid, sch->schid, sch->devno,
->>>>            ccw_dev->devno.valid ? "user-configured" : "auto-configur=
-ed");
->>>>
->>>> -    if (!kvm_eventfds_enabled()) {
->>>> +    if (kvm_enabled() && !kvm_eventfds_enabled()) {
->>>>            dev->flags &=3D ~VIRTIO_CCW_FLAG_USE_IOEVENTFD;
->>>>        }
->>>>
->>>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
->>>> index a3d00196f4..c37f9c3b9e 100644
->>>> --- a/target/s390x/kvm.c
->>>> +++ b/target/s390x/kvm.c
->>>> @@ -2220,6 +2220,9 @@ int kvm_s390_assign_subch_ioeventfd(EventNotif=
-ier *notifier, uint32_t sch,
->>>>            .addr =3D sch,
->>>>            .len =3D 8,
->>>>        };
->>>> +    if (!kvm_enabled()) {
->>>> +        return 0;
->>>> +    }
->>>>        if (!kvm_check_extension(kvm_state, KVM_CAP_IOEVENTFD)) {
->>>>            return -ENOSYS;
->>>>        }
->>>>
+On Sat, Jul 01, 2017 at 12:39:41AM +0530, Ishani Chugh wrote:
+> This patch intends to make qmp.py compatible with both python2 and python=
+3.
 
---=20
-Regards
-QingFeng Hao
+Please identify the Python 2/3 compatibility issues addressed in the
+patch like:
+
+ * Python 3 does not have dict.has_key(key), use key in dict instead
+ * Avoid line-based I/O since Python 2/3 have different character
+   encoding behavior.  Explicitly encode/decode JSON UTF-8.
+
+This explains why code changes are being made.
+
+>=20
+> Signed-off-by: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+> ---
+>  scripts/qmp/qmp.py | 66 +++++++++++++++++++++++++++++++++++-------------=
+------
+>  1 file changed, 43 insertions(+), 23 deletions(-)
+>=20
+> diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
+> index 62d3651..9926c36 100644
+> --- a/scripts/qmp/qmp.py
+> +++ b/scripts/qmp/qmp.py
+> @@ -13,18 +13,23 @@ import errno
+>  import socket
+>  import sys
+> =20
+> +
+>  class QMPError(Exception):
+>      pass
+
+Whitespace changes are generally discouraged because they perturb the
+code (creating merge conflicts, adding noise to diffs, and obscuring
+line change history).
+
+I think you're making them for a good reason here - probably to conform
+to Python PEP8 coding style?  But I'm not sure because there is
+explanation in the commit description.
+
+If you want to reformat this file to meet the PEP8 standard, please do
+it as a separate patch.
+
+> @@ -42,6 +47,7 @@ class QEMUMonitorProtocol:
+>          self.__address =3D address
+>          self._debug =3D debug
+>          self.__sock =3D self.__get_sock()
+> +        self.data =3D b""
+
+Please follow the variable naming convention: two underscores for
+private member fields (i.e. self.__data).
+
+>          if server:
+>              self.__sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADD=
+R, 1)
+>              self.__sock.bind(self.__address)
+> @@ -56,23 +62,35 @@ class QEMUMonitorProtocol:
+> =20
+>      def __negotiate_capabilities(self):
+>          greeting =3D self.__json_read()
+> -        if greeting is None or not greeting.has_key('QMP'):
+> +        if greeting is None or 'QMP' not in greeting:
+>              raise QMPConnectError
+> -        # Greeting seems ok, negotiate capabilities
+
+Why remove this comment?
+
+> @@ -87,18 +105,18 @@ class QEMUMonitorProtocol:
+>          @param wait (bool): block until an event is available.
+>          @param wait (float): If wait is a float, treat it as a timeout v=
+alue.
+> =20
+> -        @raise QMPTimeoutError: If a timeout float is provided and the t=
+imeout
+> -                                period elapses.
+> -        @raise QMPConnectError: If wait is True but no events could be r=
+etrieved
+> -                                or if some other error occurred.
+> +        @raise QMPTimeoutError: If a timeout float is provided and the
+> +                                timeout period elapses.
+> +        @raise QMPConnectError: If wait is True but no events could be
+> +                                retrieved or if some other error occurre=
+d.
+>          """
+> =20
+>          # Check for new events regardless and pull them into the cache:
+>          self.__sock.setblocking(0)
+>          try:
+> -            self.__json_read()
+> +            test =3D self.__json_read()
+
+Is 'test' a debug variable that should be removed from the final patch?
+
+>          except socket.error as err:
+> -            if err[0] =3D=3D errno.EAGAIN:
+> +            if err.errno =3D=3D errno.EAGAIN:
+>                  # No data available
+>                  pass
+
+Pre-existing bug: if the exceptin is not EAGAIN we need to raise the
+exception again.
+
+>          self.__sock.setblocking(1)
+> @@ -128,7 +146,7 @@ class QEMUMonitorProtocol:
+>          @raise QMPCapabilitiesError if fails to negotiate capabilities
+>          """
+>          self.__sock.connect(self.__address)
+> -        self.__sockfile =3D self.__sock.makefile()
+> +        self.__sockfile =3D self.__sock.makefile('rb')
+
+self.__sockfile is no longer used, please delete it.
+
+>          if negotiate:
+>              return self.__negotiate_capabilities()
+> =20
+> @@ -143,7 +161,7 @@ class QEMUMonitorProtocol:
+>          """
+>          self.__sock.settimeout(15)
+>          self.__sock, _ =3D self.__sock.accept()
+> -        self.__sockfile =3D self.__sock.makefile()
+> +        self.__sockfile =3D self.__sock.makefile('rb')
+
+Same here.
+
+> @@ -245,3 +264,4 @@ class QEMUMonitorProtocol:
+> =20
+>      def is_scm_available(self):
+>          return self.__sock.family =3D=3D socket.AF_UNIX
+> +
+
+--Q68bSM7Ycu6FN28Q
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZWgU4AAoJEJykq7OBq3PIZoYIALz/17Lp81kgpKxup7lyL4tq
+s6ljxGxAMlwaensda+ZLivGbR+GIt96DZ2wdg7CRUNVuw09zMVhTvpvZM9+OIjts
+xN1agexkaH3ZRvaWqExwWK/1nQFWG/Xcm0Rkn9ktP8WC3CWSVG2IyMNjZRSWBe0P
+hwoPvWnKgNYeHWGscZ5jqu8QEBYI2YBKhKCQSd8nrIaXwjDtEHljXapoXoaMPM8V
+sG+jbaOrvFsFjdy41pRxMeYqxujB1O3NIYudFzJNX5hCP+l5INiZAP27tG9FKZ5Q
+sL9CJfGxlMwzdMl9au04skRFoVetpMkLq9ETPdOe9Z/e1DFCiMawiLCnW/KUSOQ=
+=8Xew
+-----END PGP SIGNATURE-----
+
+--Q68bSM7Ycu6FN28Q--
