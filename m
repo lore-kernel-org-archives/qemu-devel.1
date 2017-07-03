@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@kernel.org>) id 1dRzqY-0000ow-GZ
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:48:55 -0400
+	(envelope-from <cohuck@kernel.org>) id 1dRzxg-00053s-C3
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:56:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@kernel.org>) id 1dRzqX-0000Mt-Ii
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:48:54 -0400
-Date: Mon, 3 Jul 2017 13:48:40 +0200
+	(envelope-from <cohuck@kernel.org>) id 1dRzxf-0005lY-HU
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:56:16 -0400
+Date: Mon, 3 Jul 2017 13:56:04 +0200
 From: Cornelia Huck <cohuck@kernel.org>
-Message-ID: <20170703134840.5b0a57d5@dhcp-192-215.str.redhat.com>
-In-Reply-To: <20170703073836.72092-2-haoqf@linux.vnet.ibm.com>
-References: <20170703073836.72092-1-haoqf@linux.vnet.ibm.com>
-	<20170703073836.72092-2-haoqf@linux.vnet.ibm.com>
+Message-ID: <20170703135604.311ad10d@dhcp-192-215.str.redhat.com>
+In-Reply-To: <fee6eaa0-8132-b3ce-bb3e-0a716eb72064@de.ibm.com>
+References: <20170703085107.16547-1-haoqf@linux.vnet.ibm.com>
+	<20170703085107.16547-2-haoqf@linux.vnet.ibm.com>
+	<fee6eaa0-8132-b3ce-bb3e-0a716eb72064@de.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] virtio-scsi-ccw: use ioeventfd even
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] virtio-scsi-ccw: use ioeventfd even
  when KVM is disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -24,62 +25,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, zyimin@linux.vnet.ibm.com, famz@redhat.com, peterx@redhat.com, borntraeger@de.ibm.com, stefanha@redhat.com
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: QingFeng Hao <haoqf@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, Halil Pasic <pasic@linux.vnet.ibm.com>, zyimin@linux.vnet.ibm.com, famz@redhat.com, peterx@redhat.com, stefanha@redhat.com
 
-On Mon,  3 Jul 2017 09:38:36 +0200
-QingFeng Hao <haoqf@linux.vnet.ibm.com> wrote:
+On Mon, 3 Jul 2017 12:20:03 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-> Do not check kvm_eventfds_enabled() when KVM is disabled since it
-> always returns 0.  Since commit
-> 8c56c1a592b5092d91da8d8943c17777d6462a6f ("memory: emulate
-> ioeventfd") it has been possible to use ioeventfds in qtest or TCG
-> mode.
+> On 07/03/2017 10:51 AM, QingFeng Hao wrote:
+>
+> > diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> > index a3d00196f4..c37f9c3b9e 100644
+> > --- a/target/s390x/kvm.c
+> > +++ b/target/s390x/kvm.c
+> > @@ -2220,6 +2220,9 @@ int kvm_s390_assign_subch_ioeventfd(EventNotifier *notifier, uint32_t sch,
+> >          .addr = sch,
+> >          .len = 8,
+> >      };
+> > +    if (!kvm_enabled()) {
+> > +        return 0;
+> > +    }  
 > 
-> This patch makes -device virtio-scsi-ccw,iothread=iothread0 work even
-> when KVM is disabled.
+> thinking more about it. wouldnt it be better to do something like this instead
 > 
-> I have tested that virtio-scsi-ccw works under tcg both with and
-> without iothread.
-> 
-> This patch fixes qemu-iotests 068, which was accidentally merged early
-> despite the dependency on ioeventfd.
-> 
-> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  hw/s390x/virtio-ccw.c | 2 +-
->  target/s390x/kvm.c    | 3 +++
->  2 files changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-> index 90d37cb9ff..35896eb007 100644
-> --- a/hw/s390x/virtio-ccw.c
-> +++ b/hw/s390x/virtio-ccw.c
-> @@ -711,7 +711,7 @@ static void
-> virtio_ccw_device_realize(VirtioCcwDevice *dev, Error **errp)
-> sch->cssid, sch->ssid, sch->schid, sch->devno, ccw_dev->devno.valid ?
-> "user-configured" : "auto-configured"); 
-> -    if (!kvm_eventfds_enabled()) {
-> +    if (kvm_enabled() && !kvm_eventfds_enabled()) {
->          dev->flags &= ~VIRTIO_CCW_FLAG_USE_IOEVENTFD;
->      }
->  
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index a3d00196f4..c37f9c3b9e 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -2220,6 +2220,9 @@ int
-> kvm_s390_assign_subch_ioeventfd(EventNotifier *notifier, uint32_t
-> sch, .addr = sch, .len = 8,
->      };
-> +    if (!kvm_enabled()) {
+> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> index 058ddad..cc47831 100644
+> --- a/target/s390x/cpu.h
+> +++ b/target/s390x/cpu.h
+> @@ -1240,7 +1240,11 @@ static inline int s390_assign_subch_ioeventfd(EventNotifier *notifier,
+>                                                uint32_t sch_id, int vq,
+>                                                bool assign)
+>  {
+> -    return kvm_s390_assign_subch_ioeventfd(notifier, sch_id, vq, assign);
+> +    if (kvm_enabled()) {
+> +        return kvm_s390_assign_subch_ioeventfd(notifier, sch_id, vq, assign);
+> +    } else {
 > +        return 0;
 > +    }
+>  }
+>  
+>  static inline void s390_crypto_reset(void)
 
-I'd prefer if you moved the kvm_enabled() check into
-s390_assign_subch_ioeventfd().
+Agreed.
 
->      if (!kvm_check_extension(kvm_state, KVM_CAP_IOEVENTFD)) {
->          return -ENOSYS;
->      }
+> 
+> 
+> FWIW, it seems that we (s390) do not have a functional equivalent function as commit
+> 8c56c1a592b5092d91da8d8943c17777d6462a6f ("memory: emulate ioeventfd") , so we will
+> not use the iothreads. 
+
+Should not be a problem, I think. We may want to cook up an equivalent,
+though.
+
+> 
+> 
+> >      if (!kvm_check_extension(kvm_state, KVM_CAP_IOEVENTFD)) {
+> >          return -ENOSYS;
+> >      }
+> >   
+> 
+> 
