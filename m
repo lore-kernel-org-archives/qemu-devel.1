@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dS1Ik-0001Aa-3N
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 09:22:07 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dS1P8-0002pS-Td
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 09:28:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dS1Ie-0006fr-Vu
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 09:22:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54218)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dS1Ie-0006fg-Ms
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 09:22:00 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170613165313.20954-1-ehabkost@redhat.com>
-	<87o9t8qy7d.fsf@dusky.pond.sub.org>
-	<20170628174158.GG12152@localhost.localdomain>
-	<87mv8r2sii.fsf@dusky.pond.sub.org>
-	<20170629125706.GT12152@localhost.localdomain>
-	<871sq1r9dh.fsf@dusky.pond.sub.org>
-	<20170701142909.GE12152@localhost.localdomain>
-Date: Mon, 03 Jul 2017 15:21:56 +0200
-In-Reply-To: <20170701142909.GE12152@localhost.localdomain> (Eduardo Habkost's
-	message of "Sat, 1 Jul 2017 11:29:09 -0300")
-Message-ID: <87shidk64r.fsf@dusky.pond.sub.org>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dS1P7-0000Th-Op
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 09:28:42 -0400
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:36167)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dS1P7-0000TR-CZ
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 09:28:41 -0400
+Received: by mail-lf0-x244.google.com with SMTP id f28so15185651lfi.3
+	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 06:28:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC 00/15] Error API: Flag errors in *errp even
- if errors are being ignored
+References: <cover.1499082038.git.tgolembi@redhat.com>
+	<217e64d171636218b61c41f1f70e72cdb40f9144.1499082038.git.tgolembi@redhat.com>
+In-Reply-To: <217e64d171636218b61c41f1f70e72cdb40f9144.1499082038.git.tgolembi@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 03 Jul 2017 13:28:29 +0000
+Message-ID: <CAJ+F1CJ90ua2hirb8LC1346mxVJUO96eaa5nAEGLUz8ve6K14Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 2/3] test-qga: pass environemnt to
+ qemu-ga
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,61 +31,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>, Eric Blake <eblake@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+On Mon, Jul 3, 2017 at 1:40 PM Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@=
+redhat.com>
+wrote:
 
-> On Fri, Jun 30, 2017 at 01:40:58PM +0200, Markus Armbruster wrote:
-> [...]
->> 
->> I doubt the macros make the bug fixing materially easier, and I doubt
->> they can reduce future bugs of this kind.  What they can do is letting
->> us get rid of error_propagate() boilerplate with relative ease.
->> 
->> If we switch to returning success/failure (which also gets rid of the
->> boilerplate), then the macros may still let us get rid of boilerplate
->> more quickly, for some additional churn.  Worthwhile?  Depends on how
->> long the return value change takes us.
->> 
->> I think the first order of business is to figure out whether we want to
->> pursue returning success/failure.
+> Modify fixture_setup() to pass environemnt variables to spawned qemu-ga
+> instance.
 >
-> About this, I'm unsure.  Returning error information in two separate
-> locations (the return value and *errp) makes it easier to introduce bugs
-> that are hard to detect.
+> Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+>
 
-I sympathize with this argument.  It's exactly what that made us avoid
-returning a success/failure indication.
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Except when we don't actually avoid it:
 
-* Functions returning a pointer typically return non-null on success,
-  null on failure.  Has inconsistency between return value and Error
-  setting been a problem in practice?  Nope.
-
-* Quite a few functions return 0 on success, -errno on failure, to let
-  callers handle different errors differently.  Has inconsistency been a
-  problem in practice?  Nope again.
-
-  Aside: the original Error plan was to have callers check ErrorClass,
-  but that didn't work out.
-
-* Functions with a side effect typically either do their side effect and
-  succeed, or do nothing and fail.  Inconsistency between side effect
-  and claimed success is theoretically possible no matter how success is
-  claimed: it's possible if the function returns success/failure, it's
-  possible if it sets an Error on failure and doesn't on success, and
-  it's possible if it does both.
-
-My point is: returning void instead of success/failure gets rid only of
-a part of a theoretical problem, which turns out not much of a problem
-in practice.
-
->                           Especially when the tree is an inconsistent
-> state where we mix -1/0, -errno/0, FALSE/TRUE, NULL/non-NULL and void
-> functions.
-
-This is basically ret<0/ret>=0, !ret/ret, void.
-
-Getting rid of void would improve matters, wouldn't it?
+---
+>  tests/test-qga.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/tests/test-qga.c b/tests/test-qga.c
+> index c77f241036..631b98639a 100644
+> --- a/tests/test-qga.c
+> +++ b/tests/test-qga.c
+> @@ -46,7 +46,7 @@ static void qga_watch(GPid pid, gint status, gpointer
+> user_data)
+>  }
+>
+>  static void
+> -fixture_setup(TestFixture *fixture, gconstpointer data)
+> +fixture_setup(TestFixture *fixture, gconstpointer data, gchar **envp)
+>  {
+>      const gchar *extra_arg =3D data;
+>      GError *error =3D NULL;
+> @@ -67,7 +67,7 @@ fixture_setup(TestFixture *fixture, gconstpointer data)
+>      g_shell_parse_argv(cmd, NULL, &argv, &error);
+>      g_assert_no_error(error);
+>
+> -    g_spawn_async(fixture->test_dir, argv, NULL,
+> +    g_spawn_async(fixture->test_dir, argv, envp,
+>                    G_SPAWN_SEARCH_PATH|G_SPAWN_DO_NOT_REAP_CHILD,
+>                    NULL, NULL, &fixture->pid, &error);
+>      g_assert_no_error(error);
+> @@ -707,7 +707,7 @@ static void test_qga_blacklist(gconstpointer data)
+>      QDict *ret, *error;
+>      const gchar *class, *desc;
+>
+> -    fixture_setup(&fix, "-b guest-ping,guest-get-time");
+> +    fixture_setup(&fix, "-b guest-ping,guest-get-time", NULL);
+>
+>      /* check blacklist */
+>      ret =3D qmp_fd(fix.fd, "{'execute': 'guest-ping'}");
+> @@ -943,7 +943,7 @@ int main(int argc, char **argv)
+>
+>      setlocale (LC_ALL, "");
+>      g_test_init(&argc, &argv, NULL);
+> -    fixture_setup(&fix, NULL);
+> +    fixture_setup(&fix, NULL, NULL);
+>
+>      g_test_add_data_func("/qga/sync-delimited", &fix,
+> test_qga_sync_delimited);
+>      g_test_add_data_func("/qga/sync", &fix, test_qga_sync);
+> --
+> 2.13.1
+>
+> --
+Marc-Andr=C3=A9 Lureau
