@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dS2Nv-0001X7-Os
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 10:31:33 -0400
+	(envelope-from <eblake@redhat.com>) id 1dS2P8-0002DH-4Z
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 10:32:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dS2Nu-0006iQ-CQ
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 10:31:31 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:33633)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dS2Nt-0006hZ-VZ
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 10:31:30 -0400
-Received: by mail-lf0-x241.google.com with SMTP id t72so15399663lff.0
-	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 07:31:29 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1dS2P6-0007KV-Uv
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 10:32:46 -0400
+References: <20170703123114.17103-1-eblake@redhat.com>
+	<73fa75d7-3aa7-e125-af55-c9f383007a28@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8cc9c517-0ee5-a492-c596-6713db0e7d0f@redhat.com>
+Date: Mon, 3 Jul 2017 09:32:33 -0500
 MIME-Version: 1.0
-References: <cover.1499082038.git.tgolembi@redhat.com>
-	<d1ee0939a084ec0f120dbf7831cb7985123f7774.1499082038.git.tgolembi@redhat.com>
-In-Reply-To: <d1ee0939a084ec0f120dbf7831cb7985123f7774.1499082038.git.tgolembi@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 03 Jul 2017 14:31:18 +0000
-Message-ID: <CAJ+F1CJQA-S+4z0tHm6HR2R4AUp31ajfC8+YMXhTXCjzKNuHAA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 3/3] test-qga: add test for
- guest-get-osinfo
+In-Reply-To: <73fa75d7-3aa7-e125-af55-c9f383007a28@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ArqorfWQN7RfUUJVQ9AckbTN68h8i150A"
+Subject: Re: [Qemu-devel] [PATCH v3] tests: Avoid non-portable 'echo -ARG'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,154 +24,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>, Eric Blake <eblake@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: edgar.iglesias@xilinx.com, stefanha@redhat.com, qemu-block@nongnu.org, qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Jiri Pirko <jiri@resnulli.us>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 
-Hi
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ArqorfWQN7RfUUJVQ9AckbTN68h8i150A
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: edgar.iglesias@xilinx.com, stefanha@redhat.com, qemu-block@nongnu.org,
+ qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Jiri Pirko <jiri@resnulli.us>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Message-ID: <8cc9c517-0ee5-a492-c596-6713db0e7d0f@redhat.com>
+Subject: Re: [PATCH v3] tests: Avoid non-portable 'echo -ARG'
+References: <20170703123114.17103-1-eblake@redhat.com>
+ <73fa75d7-3aa7-e125-af55-c9f383007a28@redhat.com>
+In-Reply-To: <73fa75d7-3aa7-e125-af55-c9f383007a28@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 3, 2017 at 1:40 PM Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@=
-redhat.com>
-wrote:
+On 07/03/2017 07:57 AM, Max Reitz wrote:
+> On 2017-07-03 14:31, Eric Blake wrote:
+>> POSIX says that backslashes in the arguments to 'echo', as well as
+>> any use of 'echo -n' and 'echo -e', are non-portable; it recommends
+>> people should favor 'printf' instead.  This is definitely true where
+>> we do not control which shell is running (such as in makefile snippets=
 
-> Add test for guest-get-osinfo command.
->
-> Qemu-ga was modified to accept QGA_OS_RELEASE environment variable. If
-> the variable is defined it is interpreted as path to the os-release file
-> and it is parsed instead of the default paths.
->
-> Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
-> ---
->  qga/commands-posix.c           | 13 +++++++---
->  tests/data/test-qga-os-release |  7 ++++++
->  tests/test-qga.c               | 55
-> ++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 72 insertions(+), 3 deletions(-)
->  create mode 100644 tests/data/test-qga-os-release
->
-> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-> index 7a933a5f12..16b18c96ef 100644
-> --- a/qga/commands-posix.c
-> +++ b/qga/commands-posix.c
-> @@ -2683,9 +2683,16 @@ GuestOSInfo *qmp_guest_get_osinfo(Error **errp)
->      info->kernel_release =3D g_strdup(kinfo.release);
->      info->machine_hardware =3D g_strdup(kinfo.machine);
->
-> -    GKeyFile *osrelease =3D ga_parse_osrelease("/etc/os-release");
-> -    if (osrelease =3D=3D NULL) {
-> -        osrelease =3D ga_parse_osrelease("/usr/lib/os-release");
-> +    GKeyFile *osrelease =3D NULL;
-> +
-> +    const char *qga_os_release =3D g_getenv("QGA_OS_RELEASE");
-> +    if (qga_os_release !=3D NULL) {
-> +        osrelease =3D ga_parse_osrelease(qga_os_release);
-> +    } else {
-> +        osrelease =3D ga_parse_osrelease("/etc/os-release");
-> +        if (osrelease =3D=3D NULL) {
-> +            osrelease =3D ga_parse_osrelease("/usr/lib/os-release");
-> +        }
->      }
->
->      if (osrelease !=3D NULL) {
-> diff --git a/tests/data/test-qga-os-release
-> b/tests/data/test-qga-os-release
-> new file mode 100644
-> index 0000000000..70664eb6ec
-> --- /dev/null
-> +++ b/tests/data/test-qga-os-release
-> @@ -0,0 +1,7 @@
-> +ID=3Dqemu-ga-test
-> +NAME=3DQEMU-GA
-> +PRETTY_NAME=3D"QEMU Guest Agent test"
-> +VERSION=3D"Test 1"
-> +VERSION_ID=3D1
-> +VARIANT=3D"Unit test \"\'\$\`\\ and \\\\ etc."
-> +VARIANT_ID=3Dunit-test
-> diff --git a/tests/test-qga.c b/tests/test-qga.c
-> index 631b98639a..c151dfdc34 100644
-> --- a/tests/test-qga.c
-> +++ b/tests/test-qga.c
-> @@ -936,6 +936,59 @@ static void test_qga_guest_exec_invalid(gconstpointe=
-r
-> fix)
->      QDECREF(ret);
->  }
->
-> +static void test_qga_guest_get_osinfo(gconstpointer data)
-> +{
-> +    TestFixture fixture;
-> +    const gchar *str;
-> +    gchar *cwd, *env[2];
-> +    QDict *ret, *val;
-> +
-> +    cwd =3D g_get_current_dir();
-> +    env[0] =3D g_strdup_printf(
-> +        "QGA_OS_RELEASE=3D%s%ctests%cdata%ctest-qga-os-release",
-> +        cwd, G_DIR_SEPARATOR, G_DIR_SEPARATOR, G_DIR_SEPARATOR);
-> +    env[1] =3D NULL;
-> +    g_free(cwd);
-> +    fixture_setup(&fixture, NULL, env);
-> +
-> +    ret =3D qmp_fd(fixture.fd, "{'execute': 'guest-get-osinfo'}");
-> +    g_assert_nonnull(ret);
-> +    qmp_assert_no_error(ret);
-> +
-> +    val =3D qdict_get_qdict(ret, "return");
-> +
-> +    str =3D qdict_get_try_str(val, "id");
-> +    g_assert_nonnull(str);
-> +    g_assert_cmpstr(str, =3D=3D, "qemu-ga-test");
-> +
-> +    str =3D qdict_get_try_str(val, "name");
-> +    g_assert_nonnull(str);
-> +    g_assert_cmpstr(str, =3D=3D, "QEMU-GA");
-> +
-> +    str =3D qdict_get_try_str(val, "pretty-name");
-> +    g_assert_nonnull(str);
-> +    g_assert_cmpstr(str, =3D=3D, "QEMU Guest Agent test");
-> +
-> +    str =3D qdict_get_try_str(val, "version");
-> +    g_assert_nonnull(str);
-> +    g_assert_cmpstr(str, =3D=3D, "Test 1");
-> +
-> +    str =3D qdict_get_try_str(val, "version-id");
-> +    g_assert_nonnull(str);
-> +    g_assert_cmpstr(str, =3D=3D, "1");
-> +
-> +    str =3D qdict_get_try_str(val, "variant");
-> +    g_assert_nonnull(str);
-> +    g_assert_cmpstr(str, =3D=3D, "Unit test \"'$`\\ and \\\\ etc.");
-> +
-> +    str =3D qdict_get_try_str(val, "variant-id");
-> +    g_assert_nonnull(str);
-> +    g_assert_cmpstr(str, =3D=3D, "unit-test");
-> +
-> +    QDECREF(ret);
-> +    g_free(env[0]);
->
+>> or in documentation examples).  But even for scripts where we
+>> require bash (and therefore, where echo does what we want by default),=
 
- +    fixture_tear_down(&fixture, NULL);
+>> it is still possible to use 'shopt -s xpg_echo' to change bash's
+>> behavior of echo.  And setting a good example never hurts when we are
+>> not sure if a snippet will be copied from a bash-only script to a
+>> general shell script (although I don't change the use of non-portable
+>> \e for ESC when we know the running shell is bash).
+>>
 
-+}
-> +
->  int main(int argc, char **argv)
->  {
->      TestFixture fix;
-> @@ -972,6 +1025,8 @@ int main(int argc, char **argv)
->      g_test_add_data_func("/qga/guest-exec", &fix, test_qga_guest_exec);
->      g_test_add_data_func("/qga/guest-exec-invalid", &fix,
->                           test_qga_guest_exec_invalid);
-> +    g_test_add_data_func("/qga/guest-get-osinfo", &fix,
-> +                         test_qga_guest_get_osinfo);
->
->      if (g_getenv("QGA_TEST_SIDE_EFFECTING")) {
->          g_test_add_data_func("/qga/fsfreeze-and-thaw", &fix,
-> --
-> 2.13.1
->
->
-With that
+>>
+>>          if [ -f $seq.notrun ]
+>>          then
+>> -            $timestamp || echo -n " [not run] "
+>> -            $timestamp && echo " [not run]" && echo -n "        $seq =
+-- "
+>> +            $timestamp || printf " [not run] "
+>> +            $timestamp && echo " [not run]" && printf "        $seq -=
+- "
+>=20
+> Everywhere else, $seq got its own %s, but not here. That's at least
+> inconsistent.
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+True, and it's because $ is a bit easy to miss when I'm trying to
+special case which $ are important.
+
+>=20
+> I don't quite know why you're not simply using %s and %b everywhere
+> there is a non-constant format string. Yes, if it is an exit code, it i=
+s
+> pretty clear that it won't contain a %. If it's a return value from
+> "date +%T", it is kind of, too (but then you have to know what that doe=
+s
+> in order to review the change -- and I myself had to consult the man
+> page, to be honest). If they are variables named "img_offset" and
+> "img_size", then you'd hope they are numbers, but in order to check you=
+
+> still have to look at the rest of the code (especially since they are
+> embedded as strings into the JSON object).
+> If you simply used %s and %b everywhere there is a $, reviewing would b=
+e
+> absolutely trivial. Yes, it seems a bit unnecessary, but it does make
+> reviewing much easier and I think since this is also about setting a
+> good example, that would be a good example, IMHO.
+> (Sure, reviewing this already is easy enough, but there still is a
+> difference between "very easy" and "trivial".)
+
+It's not every day a "trivial" patch gets to v4, but your arguments are
+persuasive enough that I'll respin.
+
+>=20
+> Although at this point I have to admit that reviewing a really trivial
+> v4 would take me more time than to just write the following:
+>=20
+> With a %s added to the printf above:
+>=20
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>=20
+>>              cat $seq.notrun
+>>              notrun=3D"$notrun $seq"
+>>          else
+>>              if [ $sts -ne 0 ]
+>>              then
+>> -                echo -n " [failed, exit status $sts]"
+>> +                printf " [failed, exit status $sts]"
+
+So, before I respin, let me double-check:
+
+Here's a case where the context makes it obvious that $sts is numeric
+(if not, the '[ $sts -ne 0 ]' would have failed); do you want the %s
+here or not?
 
 --=20
-Marc-Andr=C3=A9 Lureau
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--ArqorfWQN7RfUUJVQ9AckbTN68h8i150A
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZWlWBAAoJEKeha0olJ0NqQBMIAK9Bmv9srCbVeZVz1K+w2jOj
+ucv/ZRi9IhdGVyq2cqHeWgXosoAZErgtWp4uEYBaJZ1HZM5Td4ebSowePOOoEaUU
+yVB8B0tRNwMwsgfctfqLVvV3CvhWODxQXeKNHKY0Iq6X3mdEhsDqfyYt48dBiekc
+t3YJjC2LeHox3LOzltolMhLc8xPBXJqw0A/q/Q9rjCsd+K8rYo7qHTuwb8sS1iOR
+RRvLLOZzQ+xeH4OR93xgJ0Lf1h+bHyjT2HGgQOkS1uatSmDupA74OTlrP/M+aQqx
+NJD9fHXJxpWh7Iyfdk5pRjINCP1LQf63YQy0306l+pAmCc6V5AyYslSAu/yo3oY=
+=7vcM
+-----END PGP SIGNATURE-----
+
+--ArqorfWQN7RfUUJVQ9AckbTN68h8i150A--
