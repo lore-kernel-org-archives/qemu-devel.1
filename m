@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dS6h9-0006He-4z
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:07:39 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dS6ky-000800-1F
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:11:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dS6h6-0002wH-30
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:07:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34314)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dS6h5-0002vQ-SO
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:07:36 -0400
-Date: Mon, 3 Jul 2017 20:07:28 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170703190728.GE2206@work-vm>
-References: <75a4c5ff-385e-31ac-5f86-883b082cd94e@de.ibm.com>
-	<20170424143516.GD2075@work-vm>
-	<5c0608dd-ba22-dc09-71a1-bb95c977f77d@de.ibm.com>
-	<20170424191202.GQ2362@work-vm>
-	<097a5085-1128-cf2d-abc4-54660a608f36@de.ibm.com>
-	<20170426110144.GF2098@work-vm>
-	<cbf8c55d-9473-9f6f-eb89-779afe7c1fd2@de.ibm.com>
-	<cec279c5-9900-ca28-103b-b95c36d9d989@de.ibm.com>
-	<20170630163139.GC2437@work-vm>
-	<20170703192353-mutt-send-email-mst@kernel.org>
+	(envelope-from <rth7680@gmail.com>) id 1dS6ku-0004UF-TI
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:11:36 -0400
+Received: from mail-qk0-x232.google.com ([2607:f8b0:400d:c09::232]:32886)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dS6ku-0004U0-NI
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:11:32 -0400
+Received: by mail-qk0-x232.google.com with SMTP id v143so68957671qkb.0
+	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 12:11:32 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170703162328.24474-1-laurent@vivier.eu>
+	<20170703162328.24474-3-laurent@vivier.eu>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <255de989-982c-273e-55d1-0940a60169c2@twiddle.net>
+Date: Mon, 3 Jul 2017 12:11:25 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170703192353-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] postcopy migration hangs while loading virtio state
+In-Reply-To: <20170703162328.24474-3-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/4] target/m68k: add FPU trigonometric
+ instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,37 +32,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, thuth@redhat.com
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>
 
-* Michael S. Tsirkin (mst@redhat.com) wrote:
-> On Fri, Jun 30, 2017 at 05:31:39PM +0100, Dr. David Alan Gilbert wrote:
-> > * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
-> > > On 04/26/2017 01:45 PM, Christian Borntraeger wrote:
-> > > 
-> > > >> Hmm, I have a theory, if the flags field has bit 1 set, i.e. RAM_SAVE_FLAG_COMPRESS
-> > > >> then try changing ram_handle_compressed to always do the memset.
-> > > > 
-> > > > FWIW, changing ram_handle_compressed to always memset makes the problem go away.
-> > > 
-> > > It is still running fine now with the "always memset change"
-> > 
-> > Did we ever nail down a fix for this; as I remember Andrea said
-> > we shouldn't need to do that memset, but we came to the conclusion
-> > it was something specific to how s390 protection keys worked.
-> > 
-> > Dave
-> 
-> No we didn't. Let's merge that for now, with a comment that
-> we don't really understand what's going on?
+On 07/03/2017 09:23 AM, Laurent Vivier wrote:
+> +long double floatx80_to_ldouble(floatx80 val)
+> +{
+> +    long double mantissa;
+> +    int32_t exp;
+> +    uint8_t sign;
+> +
+> +    if (floatx80_is_infinity(val)) {
+> +        if (floatx80_is_neg(val)) {
+> +            return -__builtin_infl();
+> +        }
+> +        return __builtin_infl();
 
-Hmm no, I don't really want to change the !s390 behaviour, especially
-since it causes allocation that we otherwise avoid and Andrea's
-reply tothe original post pointed out it's not necessary.
+Better is the C99 INFINITY macro.
 
-Dave
+> +    }
+> +    if (floatx80_is_any_nan(val)) {
+> +        char low[20];
+> +        sprintf(low, "0x%016"PRIx64, val.low);
+> +        return nanl(low);
 
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+I think it would be better to avoid playing with nan payloads.
+
+If you want to handle nans properly, I think you should provide a completely 
+separate path through each user of floatx80_to_ldouble that avoids calling the 
+libm function entirely.  And, more importantly, avoids the ldouble_to_floatx80 
+call as well.
+
+One possibly arrangement would be
+
+	bool floatx80_to_ldouble(long double *out, floatx80 val)
+	{
+	  if (floatx80_is_any_nan(val)) {
+	    *out = NAN;
+	    return false;
+	  }
+           if (floatx80_is_infinity(val)) {
+	    ...
+	  } else {
+	    ...
+	  }
+	  return true;
+	}
+
+   long double d;
+   if (floatx80_to_ldouble(&d, val))) {
+     d = sinl(d);
+     val = ldouble_to_floatx80(d, status);
+   } else {
+     status->float_exception_flags |= float_flag_invalid;
+     val = floatx80_default_nan(status);
+   }
+
+Failing that, just use the C99 NAN macro.
+
+> +static floatx80 ldouble_to_floatx80(long double val, float_status *status)
+> +{
+> +    floatx80 res;
+> +    long double mantissa;
+> +    int exp;
+> +
+> +    if (isinf(val)) {
+> +        res = floatx80_infinity;
+> +        if (isinf(val) < 0) {
+
+C99 isinf is merely boolean.  You want signbit for the second test.
+
+> +    if (isnan(val)) {
+> +        res.high = floatx80_default_nan(NULL).high;
+> +        res.low = *(uint64_t *)&val; /* FIXME */
+> +        return res;
+> +    }
+
+Likewise I'm uncomfortable with nan payloads.
+
+You're not handling -0.0.  Perhaps
+
+	switch (fpclassifyl(val)) {
+	case FP_NAN:
+	    res = floatx80_default_nan(status);
+             break;
+	case FP_INF:
+	    res = floatx80_infinity;
+	    break;
+	case FP_ZERO:
+	    res = floatx80_zero;
+	    break;
+	default:
+	    // frexpl et al.
+	}
+	if (signbit(val)) {
+	    res = floatx80_chs(res);
+	}
+
+is a better arrangement.
+
+> +    mantissa = frexpl(val, &exp);
+> +    res.high = exp + 0x3ffe;
+
+Must be careful here: when long double = float128, this can either underflow or 
+overflow.  Perhaps check for this and maybe even set the appropriate float_flag 
+in status when it happens?
+
+If you have gcc compile farm access, try gcc112 (power8 ppc64le host).
+
+> +    res.low = (uint64_t)ldexpl(mantissa, 64);
+> +
+> +    return floatx80_round(res, status);
+
+There may also be bits left over with float128, which means that rounding may 
+be off.  But I think perhaps we don't really care *that* much about last-bit 
+accuracy when it comes to these non-arithmetic insns.
+
+> +    d = logl(floatx80_to_ldouble(val->d) + 1.0);
+
+log1pl, which is important for actually computing values near 1.
+
+
+r~
