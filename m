@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59703)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1dRuiM-00088l-5W
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 02:20:06 -0400
+	(envelope-from <sjitindarsingh@gmail.com>) id 1dRuiM-00088v-MB
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 02:20:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1dRuiL-0001Jv-Fu
+	(envelope-from <sjitindarsingh@gmail.com>) id 1dRuiL-0001K6-NF
 	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 02:20:06 -0400
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Mon,  3 Jul 2017 16:19:45 +1000
-Message-Id: <20170703061948.18220-1-sjitindarsingh@gmail.com>
-Subject: [Qemu-devel] [Qemu-PPC] [PATCH 0/3] target/ppc: Implement radix mmu
- debug functions
+Date: Mon,  3 Jul 2017 16:19:46 +1000
+Message-Id: <20170703061948.18220-2-sjitindarsingh@gmail.com>
+In-Reply-To: <20170703061948.18220-1-sjitindarsingh@gmail.com>
+References: <20170703061948.18220-1-sjitindarsingh@gmail.com>
+Subject: [Qemu-devel] [Qemu-PPC] [PATCH 1/3] target/ppc: Refactor tcg radix
+ mmu code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,27 +23,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org
 Cc: david@gibson.dropbear.id.au, agraf@suse.de, qemu-devel@nongnu.org, bsingharora@gmail.com, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-When the radix mmu emulation code was implemented the translation
-debug functions were left as a todo.
+The mmu-radix64.c file implements functions to enable the radix mmu
+emulation in tcg mode. There is a function ppc_radix64_walk_tree() which
+performs the radix tree walk and also implicitly checks the pte
+protection.
 
-Implement the functions ppc_radix64_get_phys_page_debug() and 
-ppc_radix64_dump_level() to translate a single address and dump all the 
-address translations respectively.
+Move the protection checking of the pte from the ppc_radix64_walk_tree()
+function into the caller. This means the ppc_radix64_walk_tree() function
+can be used without protection checking which is useful for debugging.
 
-This functionality is already implemented for the hash mmu.
+ppc_radix64_walk_tree() no longer needs to take the rwx and prot variables.
 
-A slight refactor of the radix mmu emulation code was necessary to enable
-the debug code to call existing functions.
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+---
+ target/ppc/mmu-radix64.c | 22 ++++++++--------------
+ 1 file changed, 8 insertions(+), 14 deletions(-)
 
-Suraj Jitindar Singh (3):
-  target/ppc: Refactor tcg radix mmu code
-  target/ppc: Add debug function for radix mmu translation
-  target/ppc: Add debug function to dump radix mmu translations
-
- target/ppc/mmu-radix64.c | 116 +++++++++++++++++++++++++++++++++++++++++------
- target/ppc/mmu-radix64.h |   2 +
- target/ppc/mmu_helper.c  |   5 +-
- 3 files changed, 107 insertions(+), 16 deletions(-)
-
+diff --git a/target/ppc/mmu-radix64.c b/target/ppc/mmu-radix64.c
+index 69fde65..1a650fd 100644
+--- a/target/ppc/mmu-radix64.c
++++ b/target/ppc/mmu-radix64.c
+@@ -147,11 +147,10 @@ static void ppc_radix64_set_rc(PowerPCCPU *cpu, int rwx, uint64_t pte,
+     }
+ }
+ 
+-static uint64_t ppc_radix64_walk_tree(PowerPCCPU *cpu, int rwx, vaddr eaddr,
++static uint64_t ppc_radix64_walk_tree(PowerPCCPU *cpu, vaddr eaddr,
+                                       uint64_t base_addr, uint64_t nls,
+                                       hwaddr *raddr, int *psize,
+-                                      int *fault_cause, int *prot,
+-                                      hwaddr *pte_addr)
++                                      int *fault_cause, hwaddr *pte_addr)
+ {
+     CPUState *cs = CPU(cpu);
+     uint64_t index, pde;
+@@ -177,10 +176,6 @@ static uint64_t ppc_radix64_walk_tree(PowerPCCPU *cpu, int rwx, vaddr eaddr,
+         uint64_t rpn = pde & R_PTE_RPN;
+         uint64_t mask = (1UL << *psize) - 1;
+ 
+-        if (ppc_radix64_check_prot(cpu, rwx, pde, fault_cause, prot)) {
+-            return 0; /* Protection Denied Access */
+-        }
+-
+         /* Or high bits of rpn and low bits to ea to form whole real addr */
+         *raddr = (rpn & ~mask) | (eaddr & mask);
+         *pte_addr = base_addr + (index * sizeof(pde));
+@@ -188,9 +183,8 @@ static uint64_t ppc_radix64_walk_tree(PowerPCCPU *cpu, int rwx, vaddr eaddr,
+     }
+ 
+     /* Next Level of Radix Tree */
+-    return ppc_radix64_walk_tree(cpu, rwx, eaddr, pde & R_PDE_NLB,
+-                                 pde & R_PDE_NLS, raddr, psize,
+-                                 fault_cause, prot, pte_addr);
++    return ppc_radix64_walk_tree(cpu, eaddr, pde & R_PDE_NLB, pde & R_PDE_NLS,
++                                 raddr, psize, fault_cause, pte_addr);
+ }
+ 
+ int ppc_radix64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
+@@ -241,11 +235,11 @@ int ppc_radix64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
+ 
+     /* Walk Radix Tree from Process Table Entry to Convert EA to RA */
+     page_size = PRTBE_R_GET_RTS(prtbe0);
+-    pte = ppc_radix64_walk_tree(cpu, rwx, eaddr & R_EADDR_MASK,
++    pte = ppc_radix64_walk_tree(cpu, eaddr & R_EADDR_MASK,
+                                 prtbe0 & PRTBE_R_RPDB, prtbe0 & PRTBE_R_RPDS,
+-                                &raddr, &page_size, &fault_cause, &prot,
+-                                &pte_addr);
+-    if (!pte) {
++                                &raddr, &page_size, &fault_cause, &pte_addr);
++    if (!pte || ppc_radix64_check_prot(cpu, rwx, pte, &fault_cause, &prot)) {
++        /* Couldn't get pte or access denied due to protection */
+         ppc_radix64_raise_si(cpu, rwx, eaddr, fault_cause);
+         return 1;
+     }
 -- 
 2.9.4
