@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dRxlK-0006O4-Tf
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 05:35:25 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dRxph-0008Gk-8y
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 05:39:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dRxlH-0003pI-RF
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 05:35:22 -0400
-References: <20170703074548.5780-1-lvivier@redhat.com>
-	<20170703074548.5780-2-lvivier@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <8d627cf8-5edb-56dc-a145-3bad87a34dcd@redhat.com>
-Date: Mon, 3 Jul 2017 11:35:12 +0200
+	(envelope-from <imammedo@redhat.com>) id 1dRxpc-00071v-AT
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 05:39:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46262)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dRxpc-000719-16
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 05:39:48 -0400
+Date: Mon, 3 Jul 2017 11:39:40 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170703113940.0e0415a2@nial.brq.redhat.com>
+In-Reply-To: <1498745240-30658-6-git-send-email-mark.cave-ayland@ilande.co.uk>
+References: <1498745240-30658-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1498745240-30658-6-git-send-email-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-In-Reply-To: <20170703074548.5780-2-lvivier@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 1/1] target/ppc/cpu-models: set
- POWER9_v1.0 as POWER9 DD1
+Subject: Re: [Qemu-devel] [PATCHv7 5/6] fw_cfg: move qdev_init_nofail() from
+ fw_cfg_init1() to callers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,51 +28,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
-Cc: joserz@linux.vnet.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Suraj Singh <sursingh@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Sam Bobroff <sbobroff@redhat.com>, Greg Kurz <groug@kaod.org>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel@nongnu.org, lersek@redhat.com, somlo@cmu.edu, ehabkost@redhat.com, mst@redhat.com, pbonzini@redhat.com, rjones@redhat.com, peter.maydell@linaro.org
 
-On 03.07.2017 09:45, Laurent Vivier wrote:
-> CPU_POWERPC_POWER9_DD1 is 0x004E0100, so this is the POWER9 v1.0.
+On Thu, 29 Jun 2017 15:07:19 +0100
+Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> wrote:
+
+> When looking to instantiate a TYPE_FW_CFG_MEM or TYPE_FW_CFG_IO device to be
+> able to wire it up differently, it is much more convenient for the caller to
+> instantiate the device and have the fw_cfg default files already preloaded
+> during realize.
 > 
-> When we run qemu on a POWER9 DD1 host, we must use either
-> "-cpu host" or "-cpu POWER9", but in the latter case it fails with
+> Move fw_cfg_init1() to the end of both the fw_cfg_mem_realize() and
+> fw_cfg_io_realize() functions so it no longer needs to be called manually
+> when instantiating the device, and also rename it to fw_cfg_common_realize()
+> which better describes its new purpose.
 > 
->     Unable to find sPAPR CPU Core definition
+> Since it is now the responsibility of the machine to wire up the fw_cfg device
+> it is necessary to introduce a object_property_add_child() call into
+> fw_cfg_init_io() and fw_cfg_init_mem() to link the fw_cfg device to the root
+> machine object as before.
 > 
-> because POWER9 DD1 doesn't appear in the list of known CPUs.
+> Finally we can now convert the asserts() preventing multiple fw_cfg devices
+> and unparented fw_cfg devices being instantiated and replace them with proper
+> error reporting at realize time. This allows us to remove FW_CFG_NAME and
+> FW_CFG_PATH since they are no longer required.
 > 
-> This patch fixes this by defining POWER9_v1.0 with POWER9 DD1
-> PVR instead of CPU_POWERPC_POWER9_BASE. It also adds POWER_v2.0
-> with POWER9 DD2 PVR to avoid to trigger kernel POWER9 DD1 workaround
-> in TCG mode.
-> 
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 > ---
->  hw/ppc/spapr_cpu_core.c | 5 ++++-
->  target/ppc/cpu-models.c | 6 ++++--
->  target/ppc/cpu-models.h | 1 +
->  3 files changed, 9 insertions(+), 3 deletions(-)
+>  hw/nvram/fw_cfg.c |   41 +++++++++++++++++++++++++++++------------
+>  1 file changed, 29 insertions(+), 12 deletions(-)
 > 
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 9fb896b..00918a5 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -249,8 +249,11 @@ static const char *spapr_core_models[] = {
->      /* POWER8NVL */
->      "POWER8NVL_v1.0",
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index 2291121..31029ac 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -37,9 +37,6 @@
 >  
-> -    /* POWER9 */
-> +    /* POWER9 DD1 */
->      "POWER9_v1.0",
+>  #define FW_CFG_FILE_SLOTS_DFLT 0x20
+>  
+> -#define FW_CFG_NAME "fw_cfg"
+> -#define FW_CFG_PATH "/machine/" FW_CFG_NAME
+> -
+>  #define TYPE_FW_CFG     "fw_cfg"
+>  #define TYPE_FW_CFG_IO  "fw_cfg_io"
+>  #define TYPE_FW_CFG_MEM "fw_cfg_mem"
+> @@ -920,19 +917,22 @@ static int fw_cfg_unattached_at_realize(void)
+>  }
+>  
+>  
+> -static void fw_cfg_init1(DeviceState *dev)
+> +static void fw_cfg_common_realize(DeviceState *dev, Error **errp)
+>  {
+>      FWCfgState *s = FW_CFG(dev);
+>      MachineState *machine = MACHINE(qdev_get_machine());
+>      uint32_t version = FW_CFG_VERSION;
+>  
+> -    assert(!object_resolve_path(FW_CFG_PATH, NULL));
+> -
+> -    object_property_add_child(OBJECT(machine), FW_CFG_NAME, OBJECT(s), NULL);
+> -
+> -    qdev_init_nofail(dev);
+> +    if (!fw_cfg_find()) {
+maybe add comment that here, that fw_cfg_find() will return NULL if more than
+1 device is found.
+
+
+> +        error_setg(errp, "at most one %s device is permitted", TYPE_FW_CFG);
+s/TYPE_FW_CFG/object_get_typename()/
+so it would print leaf type name 
+
+> +        return;
+> +    }
+>  
+> -    assert(!fw_cfg_unattached_at_realize());
+> +    if (fw_cfg_unattached_at_realize()) {
+as I pointed out in v6, this condition will always be false,
+I suggest to drop 4/6 patch and this hunk here so it won't to confuse
+readers with assumption that condition might succeed.
+
+
+> +        error_setg(errp, "%s device must be added as a child device before "
+> +                   "realize", TYPE_FW_CFG);
+> +        return;
+> +    }
+>  
+>      fw_cfg_add_bytes(s, FW_CFG_SIGNATURE, (char *)"QEMU", 4);
+>      fw_cfg_add_bytes(s, FW_CFG_UUID, &qemu_uuid, 16);
+> @@ -965,7 +965,9 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
+>          qdev_prop_set_bit(dev, "dma_enabled", false);
+>      }
+>  
+> -    fw_cfg_init1(dev);
+> +    object_property_add_child(OBJECT(qdev_get_machine()), TYPE_FW_CFG,
+> +                              OBJECT(dev), NULL);
+> +    qdev_init_nofail(dev);
+>  
+>      sbd = SYS_BUS_DEVICE(dev);
+>      ios = FW_CFG_IO(dev);
+> @@ -1003,7 +1005,9 @@ FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
+>          qdev_prop_set_bit(dev, "dma_enabled", false);
+>      }
+>  
+> -    fw_cfg_init1(dev);
+> +    object_property_add_child(OBJECT(qdev_get_machine()), TYPE_FW_CFG,
+> +                              OBJECT(dev), NULL);
+> +    qdev_init_nofail(dev);
+>  
+>      sbd = SYS_BUS_DEVICE(dev);
+>      sysbus_mmio_map(sbd, 0, ctl_addr);
+> @@ -1033,6 +1037,7 @@ FWCfgState *fw_cfg_find(void)
+>      return FW_CFG(object_resolve_path_type("", TYPE_FW_CFG, NULL));
+>  }
+>  
 > +
-> +    /* POWER9 DD2 */
-> +    "POWER9_v2.0",
->  };
+>  static void fw_cfg_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+> @@ -1104,6 +1109,12 @@ static void fw_cfg_io_realize(DeviceState *dev, Error **errp)
+>                                &fw_cfg_dma_mem_ops, FW_CFG(s), "fwcfg.dma",
+>                                sizeof(dma_addr_t));
+>      }
+> +
+> +    fw_cfg_common_realize(dev, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+>  }
+>  
+>  static void fw_cfg_io_class_init(ObjectClass *klass, void *data)
+> @@ -1170,6 +1181,12 @@ static void fw_cfg_mem_realize(DeviceState *dev, Error **errp)
+>                                sizeof(dma_addr_t));
+>          sysbus_init_mmio(sbd, &FW_CFG(s)->dma_iomem);
+>      }
+> +
+> +    fw_cfg_common_realize(dev, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+>  }
+>  
+>  static void fw_cfg_mem_class_init(ObjectClass *klass, void *data)
+patch looks good, with above comments fixed:
 
-Cosmetical nit: Do we really need two comments for this? I'd maybe list
-both entries below a "/* POWER9 */" comment instead (similar to the "/*
-970MP variants */" section in that file).
-
-Apart from that, the patch looks good to me.
-
- Thomas
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
