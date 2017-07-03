@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dS49x-0003rm-Ef
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:25:14 -0400
+	(envelope-from <mst@redhat.com>) id 1dS4Ii-0007za-4g
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:34:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dS49u-0001KL-9F
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:25:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60358)
+	(envelope-from <mst@redhat.com>) id 1dS4If-0006zj-07
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:34:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40368)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dS49u-0001JM-3E
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:25:10 -0400
-Date: Mon, 3 Jul 2017 19:25:07 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dS4Ie-0006yb-Pu
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:34:12 -0400
+Date: Mon, 3 Jul 2017 19:34:07 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170703192353-mutt-send-email-mst@kernel.org>
-References: <20170424105344.GF2362@work-vm>
-	<75a4c5ff-385e-31ac-5f86-883b082cd94e@de.ibm.com>
-	<20170424143516.GD2075@work-vm>
-	<5c0608dd-ba22-dc09-71a1-bb95c977f77d@de.ibm.com>
-	<20170424191202.GQ2362@work-vm>
-	<097a5085-1128-cf2d-abc4-54660a608f36@de.ibm.com>
-	<20170426110144.GF2098@work-vm>
-	<cbf8c55d-9473-9f6f-eb89-779afe7c1fd2@de.ibm.com>
-	<cec279c5-9900-ca28-103b-b95c36d9d989@de.ibm.com>
-	<20170630163139.GC2437@work-vm>
+Message-ID: <20170703193026-mutt-send-email-mst@kernel.org>
+References: <1498773362-18675-1-git-send-email-zuban32s@gmail.com>
+	<20170630020622-mutt-send-email-mst@kernel.org>
+	<ec616cb6-f693-76c5-5732-ec6ee7840d9c@redhat.com>
+	<20170703142711.0a1db036@nial.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170630163139.GC2437@work-vm>
-Subject: Re: [Qemu-devel] postcopy migration hangs while loading virtio state
+In-Reply-To: <20170703142711.0a1db036@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 0/6] q35: add acpi pci hotplug support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,28 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, thuth@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Aleksandr Bezzubikov <zuban32s@gmail.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
 
-On Fri, Jun 30, 2017 at 05:31:39PM +0100, Dr. David Alan Gilbert wrote:
-> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
-> > On 04/26/2017 01:45 PM, Christian Borntraeger wrote:
-> > 
-> > >> Hmm, I have a theory, if the flags field has bit 1 set, i.e. RAM_SAVE_FLAG_COMPRESS
-> > >> then try changing ram_handle_compressed to always do the memset.
-> > > 
-> > > FWIW, changing ram_handle_compressed to always memset makes the problem go away.
-> > 
-> > It is still running fine now with the "always memset change"
+On Mon, Jul 03, 2017 at 02:27:11PM +0200, Igor Mammedov wrote:
+> On Fri, 30 Jun 2017 10:25:05 +0300
+> Marcel Apfelbaum <marcel@redhat.com> wrote:
 > 
-> Did we ever nail down a fix for this; as I remember Andrea said
-> we shouldn't need to do that memset, but we came to the conclusion
-> it was something specific to how s390 protection keys worked.
+> [...]
+> > 
+> > So for the modern systems not supporting PCI ACPI hotplug
+> > we don't need pci-bridges anyway, but for the older ones
+> > the ACPI code of the pci-bridge will be loaded into the
+> > ACPI namespace only if a pci-bridge is actually hot-plugged.
 > 
-> Dave
+> just note that the set of 'older' guest OSes is limited to
+> one that do not support SHPC (i.e. to EOLed WinXP & co)
+> as for linux and more modern Windows SHPC hotplug should
+> just work without our ACPI hack (which taxes low memory
+> to keep acpi tables for bridges).
+> 
+> So I'm in favor of Michael's suggestion to leave ACPI PCI
+> only in PC machine for old WinXP guests and to keep Q35
+> clean, where linux or newer Windows guests could just
+> use standard SHPC.
+> 
+> [...]
 
-No we didn't. Let's merge that for now, with a comment that
-we don't really understand what's going on?
+I didn't realize windows actually supports SHPC for PCI.
 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Do they correctly set _OSC Arg3, bit offset 1?
+	SHPC Native Hot Plug control
+	The OS sets this bit to 1 to request control over PCI/PCI-X Standard Hot-Plug Controller
+	(SHPC) hot plug. If the OS successfully receives control of this feature, it must track and
+	update the status of hot plug slots and handle hot plug events as described in the SHPC
+	Specification.
+I was under impression they only set bit 0.
+
+-- 
+MST
