@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dS6RU-0004vj-Au
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 14:51:29 -0400
+	(envelope-from <bounces@canonical.com>) id 1dS6ft-0005AK-V3
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:06:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dS6RR-0002Dj-P3
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 14:51:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60466)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dS6RR-0002Ch-If
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 14:51:25 -0400
-Date: Mon, 3 Jul 2017 15:50:52 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170703185052.GT12152@localhost.localdomain>
-References: <20170629132310.18865-1-marcandre.lureau@redhat.com>
-	<20170629132310.18865-2-marcandre.lureau@redhat.com>
-	<20170703213528-mutt-send-email-mst@kernel.org>
+	(envelope-from <bounces@canonical.com>) id 1dS6fo-0002Qg-45
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:06:21 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48029)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dS6fn-0002QV-Tn
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:06:16 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dS6fm-0006UT-Uk
+	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 19:06:14 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id DA8382E8195
+	for <qemu-devel@nongnu.org>; Mon,  3 Jul 2017 19:06:14 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20170703213528-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/7] vmgenid: replace
- x-write-pointer-available hack
+Date: Mon, 03 Jul 2017 18:47:04 -0000
+From: 123p <1377095@bugs.launchpad.net>
+Reply-To: Bug 1377095 <1377095@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20141003105035.5331.35277.malonedeb@wampee.canonical.com>
+Message-Id: <149910762442.26937.2866302761545979712.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1377095] Re: KVM guest VM does not reattach a
+ throughpassed USB printer from Host after switching printer off and on
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +37,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, imammedo@redhat.com, anderson@redhat.com, berrange@redhat.com, lersek@redhat.com, Ben Warren <ben@skyportsystems.com>
+To: qemu-devel@nongnu.org
 
-On Mon, Jul 03, 2017 at 09:38:52PM +0300, Michael S. Tsirkin wrote:
-> On Thu, Jun 29, 2017 at 03:23:04PM +0200, Marc-Andr=E9 Lureau wrote:
-> > This compat property sole function is to prevent the device from bein=
-g
-> > instantiated. Instead of requiring an extra compat property, check if
-> > fw_cfg has DMA enabled.
-> >=20
-> > This has the additional benefit of handling other cases properly, lik=
-e:
-> >=20
-> >   $ qemu-system-x86_64 -device vmgenid -machine none
-> >   qemu-system-x86_64: -device vmgenid: vmgenid requires DMA write sup=
-port in fw_cfg, which this machine type does not provide
-> >   $ qemu-system-x86_64 -device vmgenid -machine pc-i440fx-2.9 -global=
- fw_cfg.dma_enabled=3Doff
-> >   qemu-system-x86_64: -device vmgenid: vmgenid requires DMA write sup=
-port in fw_cfg, which this machine type does not provide
-> >   $ qemu-system-x86_64 -device vmgenid -machine pc-i440fx-2.6 -global=
- fw_cfg.dma_enabled=3Don
-> >   [boots normally]
-> >=20
-> > Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
->=20
-> It's a nice cleanup, but I suspect we need to first implement
-> a framework for initialization ordering. I don't much like it
-> that we are adding more dependencies to the current bag of hacks.
+This is a very annoying bug, and it is still not solved after 2.7 years.
+Last versions tested and affected by this bug:
 
-I agree we should address this, but in this case there's no need to
-introduce new mechanisms for initialization ordering if we just check
-the dependencies on machine_done notifier or acpi_setup() (which is
-called by machine_done).
+KVM host qemu version 2.9.0
 
---=20
-Eduardo
+KVM host Linux version 4.9.6 x86_64
+
+Please fix this.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1377095
+
+Title:
+  KVM guest VM does not reattach a throughpassed USB printer from Host
+  after switching printer off and on
+
+Status in QEMU:
+  New
+
+Bug description:
+  =
+
+  Host OS: Gentoo, all packages built 2014-10-01
+
+  qemu version 2.1.0-r1
+
+  Linux kernel 3.14.14   x86_64 Intel(R) Core(TM) i3-3220T CPU @ 2.80GHz
+  GenuineIntel GNU/Linux
+
+  =
+
+  Guest VM: Debian 7 (Wheezy) Linux 3.2.0 686
+
+  =
+
+  Start command:
+  /usr/bin/qemu-system-i386 -enable-kvm -name wheezy -k de -serial null -pa=
+rallel null -hda /var/kvm/wheezy.kvm-img -daemonize -net nic,macaddr=3D02:0=
+0:00:00:01:31 -net tap,ifname=3Dtap3,script=3Dno,downscript=3Dno -m 512 -pi=
+dfile /var/run/kvm/wheezy.pid -usb -usbdevice tablet -runas myuser -vnc 127=
+.0.0.1:3 -usbdevice host:04e8:3242
+
+  Problem:
+  USB printer pass-through from KVM host to guest vm only works if I start =
+the qemu kvm when the USB printer (vendor/product ID 04e8:3242) is switched=
+ on and therefore shown in lsusb on the host. Then it is available in the s=
+tarted VM.
+
+  But when I switch the usb printer attached to the host off, it
+  disappears in lsusb both on the host and the VM (as expected) but when
+  I switch the USB printer on again, it is shown on the host and also on
+  the QEMU Monitor (Crtl Alt Shift 2 -> info usbhost), but in the VM
+  lsusb does not show it again- so USB pass-through / hot plugging does
+  not work. It worked with a previous Version of qemu (1.0 or
+  something).
+
+  That is very annoying, because every time I want to print something, I ne=
+ed to shutdown the VM, start the printer, and then start the VM (which runs=
+ cups as printer server).
+  But after printing, I do not want the printer to keep running, so I switc=
+h it off.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1377095/+subscriptions
