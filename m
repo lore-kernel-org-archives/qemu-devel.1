@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dRxru-00016c-IM
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 05:42:11 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dRyEG-0006VI-CI
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:05:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dRxrq-0008Tq-7S
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 05:42:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38876)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dRxrq-0008Tb-0g
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 05:42:06 -0400
-Date: Mon, 3 Jul 2017 11:42:00 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170703114200.67a39ecb@nial.brq.redhat.com>
-In-Reply-To: <1498745240-30658-4-git-send-email-mark.cave-ayland@ilande.co.uk>
-References: <1498745240-30658-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1498745240-30658-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+	(envelope-from <peter.maydell@linaro.org>) id 1dRyEF-0006Ff-DY
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:05:16 -0400
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:35593)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dRyEF-0006Fa-6S
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:05:15 -0400
+Received: by mail-wr0-x236.google.com with SMTP id k67so231056066wrc.2
+	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 03:05:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCHv7 3/6] fw_cfg: switch fw_cfg_find() to
- locate the fw_cfg device by type rather than path
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 3 Jul 2017 11:04:53 +0100
+Message-ID: <CAFEAcA_OcQY1V16Vi8Ld1iZprPUsq+OCML0udYzLhVToCUXt_g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] handling emulation fine-grained memory protection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +26,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, lersek@redhat.com, somlo@cmu.edu, ehabkost@redhat.com, mst@redhat.com, pbonzini@redhat.com, rjones@redhat.com, peter.maydell@linaro.org
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-On Thu, 29 Jun 2017 15:07:17 +0100
-Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> wrote:
+For the ARM v7M microcontrollers we currently treat their memory
+protection unit like a funny kind of MMU that only has a 1:1
+address mapping. This basically works but it means that we can
+only support protection regions which are a multiple of 1K in
+size and on a 1K address boundary (because that's what we define
+as the "page size" for it). The real hardware lets you define
+protection regions on a granularity down to 64 bytes (both size
+and address).
 
-> This will enable the fw_cfg device to be placed anywhere within the QOM tree
-> regardless of its machine location.
-> 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->  hw/nvram/fw_cfg.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> index 99bdbc2..0fe7404 100644
-> --- a/hw/nvram/fw_cfg.c
-> +++ b/hw/nvram/fw_cfg.c
-> @@ -1017,7 +1017,7 @@ FWCfgState *fw_cfg_init_mem(hwaddr ctl_addr, hwaddr data_addr)
->  
->  FWCfgState *fw_cfg_find(void)
->  {
-> -    return FW_CFG(object_resolve_path(FW_CFG_PATH, NULL));
-> +    return FW_CFG(object_resolve_path_type("", TYPE_FW_CFG, NULL));
-I insist on using ambiguous argument
+So far we've got away with this, but I think only because the
+payloads we've tested haven't really used the MPU much or at all.
+With v8M I expect the MPU (and its secure/non-secure cousin the
+Security Attribution Unit) to be much more heavily used, so it
+would be nice if we could lift this limitation somehow.
 
-see why it's needed
- https://www.mail-archive.com/qemu-devel@nongnu.org/msg460692.html
+Does anybody have any good ideas for how this ought to be done?
+We could wind down the "page size" for these CPUs (since we
+now have runtime-configurable-page-size for ARM CPUs this
+shouldn't compromise the A profile cores which can stick to
+1K or 4K pages) but I don't think we can get down as low as
+64 bytes due to all the things we keep in the low bits of
+TLB entries.
 
->  }
->  
->  static void fw_cfg_class_init(ObjectClass *klass, void *data)
+I'm guessing we'd need to have "this page has fine grained
+protection regions" imply "take the slow path" and then do
+the protection check in the slow path. Alex Graf pointed out
+to me a while back that we already have a data structure for
+handling sub-page-sized things in the slow path (the subpage
+handling in the memory system), but can we easily (or otherwise)
+use it, or would it be simpler just to have a separate thing?
+
+There are probably some awkward corner cases too, for instance
+translate.c code would have to cope with the fact that it would
+now be possible for the first address in a page to be executable
+but later addresses in the same page not be executable...
+
+Any thoughts/ideas/suggestions?
+
+thanks
+-- PMM
