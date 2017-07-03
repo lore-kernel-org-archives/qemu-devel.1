@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dS7Hs-0008Cs-JJ
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:45:37 -0400
+	(envelope-from <mst@redhat.com>) id 1dS7Hu-0008EQ-3t
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:45:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dS7Hr-0003CZ-DQ
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:45:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44906)
+	(envelope-from <mst@redhat.com>) id 1dS7Ht-0003EJ-6M
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:45:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42310)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dS7Hr-0003BN-2j
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:45:35 -0400
-Date: Mon, 3 Jul 2017 22:45:28 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dS7Hs-0003DN-QV
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:45:37 -0400
+Date: Mon, 3 Jul 2017 22:45:34 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1499111049-13721-12-git-send-email-mst@redhat.com>
+Message-ID: <1499111049-13721-13-git-send-email-mst@redhat.com>
 References: <1499111049-13721-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1499111049-13721-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 11/21] i386/kvm/pci-assign: Fix return type of
- verify_irqchip_kernel()
+Subject: [Qemu-devel] [PULL 12/21] i386/kvm/pci-assign: Use errp directly
+ rather than local_err
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,12 +32,11 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Mao Zhongyi <maozy.fnst@cn.fujitsu
 
 From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
 
-When the function no success value to transmit, it usually make the
-function return void. It has turned out not to be a success, because
-it means that the extra local_err variable and error_propagate() will
-be needed. It leads to cumbersome code, therefore, transmit success/
-failure in the return value is worth. So fix the return type to avoid
-it.
+In assigned_device_pci_cap_init(), first, error messages are filled
+to a local_err variable, then through error_propagate() pass to
+the parameter of errp. It leads to cumbersome code. In order to
+avoid the extra local_err and error_propagate(), drop it and use
+errp instead.
 
 Cc: pbonzini@redhat.com
 Cc: rth@twiddle.net
@@ -50,69 +49,97 @@ Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/i386/kvm/pci-assign.c | 18 ++++++------------
- 1 file changed, 6 insertions(+), 12 deletions(-)
+ hw/i386/kvm/pci-assign.c | 22 +++++++---------------
+ 1 file changed, 7 insertions(+), 15 deletions(-)
 
 diff --git a/hw/i386/kvm/pci-assign.c b/hw/i386/kvm/pci-assign.c
-index 3d60455..b7fdb47 100644
+index b7fdb47..9f2615c 100644
 --- a/hw/i386/kvm/pci-assign.c
 +++ b/hw/i386/kvm/pci-assign.c
-@@ -824,12 +824,13 @@ static void assign_device(AssignedDevice *dev, Error **errp)
-     }
- }
- 
--static void verify_irqchip_in_kernel(Error **errp)
-+static int verify_irqchip_in_kernel(Error **errp)
- {
-     if (kvm_irqchip_in_kernel()) {
--        return;
-+        return -1;
-     }
-     error_setg(errp, "pci-assign requires KVM with in-kernel irqchip enabled");
-+    return 0;
- }
- 
- static int assign_intx(AssignedDevice *dev, Error **errp)
-@@ -838,7 +839,6 @@ static int assign_intx(AssignedDevice *dev, Error **errp)
-     PCIINTxRoute intx_route;
-     bool intx_host_msi;
-     int r;
+@@ -1232,7 +1232,6 @@ static int assigned_device_pci_cap_init(PCIDevice *pci_dev, Error **errp)
+     AssignedDevice *dev = PCI_ASSIGN(pci_dev);
+     PCIRegion *pci_region = dev->real_device.regions;
+     int ret, pos;
 -    Error *local_err = NULL;
  
-     /* Interrupt PIN 0 means don't use INTx */
-     if (assigned_dev_pci_read_byte(&dev->dev, PCI_INTERRUPT_PIN) == 0) {
-@@ -846,9 +846,7 @@ static int assign_intx(AssignedDevice *dev, Error **errp)
-         return 0;
-     }
- 
--    verify_irqchip_in_kernel(&local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (verify_irqchip_in_kernel(errp) < 0) {
-         return -ENOTSUP;
-     }
- 
-@@ -1246,9 +1244,7 @@ static int assigned_device_pci_cap_init(PCIDevice *pci_dev, Error **errp)
-      * MSI capability is the 1st capability in capability config */
-     pos = pci_find_cap_offset(pci_dev, PCI_CAP_ID_MSI, 0);
-     if (pos != 0 && kvm_check_extension(kvm_state, KVM_CAP_ASSIGN_DEV_IRQ)) {
--        verify_irqchip_in_kernel(&local_err);
--        if (local_err) {
+     /* Clear initial capabilities pointer and status copied from hw */
+     pci_set_byte(pci_dev->config + PCI_CAPABILITY_LIST, 0);
+@@ -1251,9 +1250,8 @@ static int assigned_device_pci_cap_init(PCIDevice *pci_dev, Error **errp)
+         dev->cap.available |= ASSIGNED_DEVICE_CAP_MSI;
+         /* Only 32-bit/no-mask currently supported */
+         ret = pci_add_capability(pci_dev, PCI_CAP_ID_MSI, pos, 10,
+-                                  &local_err);
++                                  errp);
+         if (ret < 0) {
 -            error_propagate(errp, local_err);
-+        if (verify_irqchip_in_kernel(errp) < 0) {
-             return -ENOTSUP;
+             return ret;
          }
-         dev->dev.cap_present |= QEMU_PCI_CAP_MSI;
-@@ -1281,9 +1277,7 @@ static int assigned_device_pci_cap_init(PCIDevice *pci_dev, Error **errp)
-         uint32_t msix_table_entry;
-         uint16_t msix_max;
- 
--        verify_irqchip_in_kernel(&local_err);
--        if (local_err) {
--            error_propagate(errp, local_err);
-+        if (verify_irqchip_in_kernel(errp) < 0) {
-             return -ENOTSUP;
-         }
+         pci_dev->msi_cap = pos;
+@@ -1283,9 +1281,8 @@ static int assigned_device_pci_cap_init(PCIDevice *pci_dev, Error **errp)
          dev->dev.cap_present |= QEMU_PCI_CAP_MSIX;
+         dev->cap.available |= ASSIGNED_DEVICE_CAP_MSIX;
+         ret = pci_add_capability(pci_dev, PCI_CAP_ID_MSIX, pos, 12,
+-                                  &local_err);
++                                  errp);
+         if (ret < 0) {
+-            error_propagate(errp, local_err);
+             return ret;
+         }
+         pci_dev->msix_cap = pos;
+@@ -1313,9 +1310,8 @@ static int assigned_device_pci_cap_init(PCIDevice *pci_dev, Error **errp)
+         uint16_t pmc;
+ 
+         ret = pci_add_capability(pci_dev, PCI_CAP_ID_PM, pos, PCI_PM_SIZEOF,
+-                                  &local_err);
++                                  errp);
+         if (ret < 0) {
+-            error_propagate(errp, local_err);
+             return ret;
+         }
+ 
+@@ -1381,9 +1377,8 @@ static int assigned_device_pci_cap_init(PCIDevice *pci_dev, Error **errp)
+         }
+ 
+         ret = pci_add_capability(pci_dev, PCI_CAP_ID_EXP, pos, size,
+-                                  &local_err);
++                                  errp);
+         if (ret < 0) {
+-            error_propagate(errp, local_err);
+             return ret;
+         }
+ 
+@@ -1457,9 +1452,8 @@ static int assigned_device_pci_cap_init(PCIDevice *pci_dev, Error **errp)
+ 
+         /* Only expose the minimum, 8 byte capability */
+         ret = pci_add_capability(pci_dev, PCI_CAP_ID_PCIX, pos, 8,
+-                                  &local_err);
++                                  errp);
+         if (ret < 0) {
+-            error_propagate(errp, local_err);
+             return ret;
+         }
+ 
+@@ -1485,9 +1479,8 @@ static int assigned_device_pci_cap_init(PCIDevice *pci_dev, Error **errp)
+     if (pos) {
+         /* Direct R/W passthrough */
+         ret = pci_add_capability(pci_dev, PCI_CAP_ID_VPD, pos, 8,
+-                                  &local_err);
++                                  errp);
+         if (ret < 0) {
+-            error_propagate(errp, local_err);
+             return ret;
+         }
+ 
+@@ -1503,9 +1496,8 @@ static int assigned_device_pci_cap_init(PCIDevice *pci_dev, Error **errp)
+         uint8_t len = pci_get_byte(pci_dev->config + pos + PCI_CAP_FLAGS);
+         /* Direct R/W passthrough */
+         ret = pci_add_capability(pci_dev, PCI_CAP_ID_VNDR, pos, len,
+-                                  &local_err);
++                                  errp);
+         if (ret < 0) {
+-            error_propagate(errp, local_err);
+             return ret;
+         }
+ 
 -- 
 MST
