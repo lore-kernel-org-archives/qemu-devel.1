@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dS0Rn-0008DE-Mc
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:27:24 -0400
+	(envelope-from <thuth@redhat.com>) id 1dS0V1-0002t6-3W
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:30:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dS0Rk-0001JF-Kx
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:27:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43952)
+	(envelope-from <thuth@redhat.com>) id 1dS0Ux-0005YR-OJ
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:30:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43648)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dS0Rk-0001Ib-Er
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:27:20 -0400
-Date: Mon, 3 Jul 2017 14:27:11 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170703142711.0a1db036@nial.brq.redhat.com>
-In-Reply-To: <ec616cb6-f693-76c5-5732-ec6ee7840d9c@redhat.com>
-References: <1498773362-18675-1-git-send-email-zuban32s@gmail.com>
-	<20170630020622-mutt-send-email-mst@kernel.org>
-	<ec616cb6-f693-76c5-5732-ec6ee7840d9c@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dS0Uo-000554-Ox
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:30:39 -0400
+References: <1499076743-15477-1-git-send-email-yang.zhong@intel.com>
+	<1499076743-15477-3-git-send-email-yang.zhong@intel.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <e7eee323-ac28-cc26-e430-143df4e92426@redhat.com>
+Date: Mon, 3 Jul 2017 14:30:26 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1499076743-15477-3-git-send-email-yang.zhong@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 0/6] q35: add acpi pci hotplug support
+Subject: Re: [Qemu-devel] [PATCH v2 02/15] vl: add tcg_enabled() for tcg
+ related code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +29,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Aleksandr Bezzubikov <zuban32s@gmail.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
+To: Yang Zhong <yang.zhong@intel.com>, pbonzini@redhat.com, rth@twiddle.net
+Cc: anthony.xu@intel.com, qemu-devel@nongnu.org, a.rigo@virtualopensystems.com
 
-On Fri, 30 Jun 2017 10:25:05 +0300
-Marcel Apfelbaum <marcel@redhat.com> wrote:
-
-[...]
+On 03.07.2017 12:12, Yang Zhong wrote:
+> Need to disable the tcg related code in the vl.c if the
+> disable-tcg option is added into ./configure command.
 > 
-> So for the modern systems not supporting PCI ACPI hotplug
-> we don't need pci-bridges anyway, but for the older ones
-> the ACPI code of the pci-bridge will be loaded into the
-> ACPI namespace only if a pci-bridge is actually hot-plugged.
+> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> ---
+>  accel/tcg/tcg-all.c    |  2 +-
+>  include/sysemu/accel.h |  2 +-
+>  vl.c                   | 15 +++++++++++----
+>  3 files changed, 13 insertions(+), 6 deletions(-)
+> 
+> diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
+> index dba9931..b86c896 100644
+> --- a/accel/tcg/tcg-all.c
+> +++ b/accel/tcg/tcg-all.c
+> @@ -28,7 +28,7 @@
+>  #include "sysemu/sysemu.h"
+>  #include "qom/object.h"
+>  
+> -int tcg_tb_size;
+> +long tcg_tb_size;
 
-just note that the set of 'older' guest OSes is limited to
-one that do not support SHPC (i.e. to EOLed WinXP & co)
-as for linux and more modern Windows SHPC hotplug should
-just work without our ACPI hack (which taxes low memory
-to keep acpi tables for bridges).
+This looks like a non-related change. I think you should either put it
+into a separate patch, or drop it.
 
-So I'm in favor of Michael's suggestion to leave ACPI PCI
-only in PC machine for old WinXP guests and to keep Q35
-clean, where linux or newer Windows guests could just
-use standard SHPC.
+>  static bool tcg_allowed = true;
+>  
+>  static int tcg_init(MachineState *ms)
+> diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
+> index ecc5c84..7b905b7 100644
+> --- a/include/sysemu/accel.h
+> +++ b/include/sysemu/accel.h
+> @@ -63,7 +63,7 @@ typedef struct AccelClass {
+>  #define ACCEL_GET_CLASS(obj) \
+>      OBJECT_GET_CLASS(AccelClass, (obj), TYPE_ACCEL)
+>  
+> -extern int tcg_tb_size;
+> +extern long tcg_tb_size;
+>  
+>  void configure_accelerator(MachineState *ms);
+>  /* Register accelerator specific global properties */
+> diff --git a/vl.c b/vl.c
+> index 36ff3f4..f28c1ac 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -3933,9 +3933,14 @@ int main(int argc, char **argv, char **envp)
+>                  configure_rtc(opts);
+>                  break;
+>              case QEMU_OPTION_tb_size:
+> -                tcg_tb_size = strtol(optarg, NULL, 0);
+> -                if (tcg_tb_size < 0) {
+> -                    tcg_tb_size = 0;
+> +                if (tcg_enabled()) {
+> +                    qemu_strtol(optarg, NULL, 0, &tcg_tb_size);
+> +                    if (tcg_tb_size < 0) {
+> +                        tcg_tb_size = 0;
+> +                    }
+> +                } else {
+> +                    error_report("TCG is disabled");
+> +                    exit(1);
+>                  }
 
-[...]
+
+You could do this without an else-part, leaving the tcg_tb_size code
+unmodified:
+
++                  if (!tcg_enabled()) {
++                      error_report("TCG is disabled");
++                      exit(1);
++                  }
+                   tcg_tb_size = strtol(optarg, NULL, 0);
+                   if (tcg_tb_size < 0) {
+                       tcg_tb_size = 0;
+
+>                  break;
+>              case QEMU_OPTION_icount:
+> @@ -4481,7 +4486,9 @@ int main(int argc, char **argv, char **envp)
+>          qemu_opts_del(icount_opts);
+>      }
+>  
+> -    qemu_tcg_configure(accel_opts, &error_fatal);
+> +    if (tcg_enabled()) {
+> +        qemu_tcg_configure(accel_opts, &error_fatal);
+> +    }
+>  
+>      if (default_net) {
+>          QemuOptsList *net = qemu_find_opts("net");
+> 
+
+ Thomas
