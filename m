@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dS7AC-0003cT-II
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:37:41 -0400
+	(envelope-from <mst@redhat.com>) id 1dS7Gx-0007Km-Rg
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:44:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dS7A7-0005uz-NP
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:37:40 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:36135)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dS7A7-0005uF-IG
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:37:35 -0400
-Received: by mail-qt0-x243.google.com with SMTP id v31so24666141qtb.3
-	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 12:37:35 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1499099693-22903-1-git-send-email-pbonzini@redhat.com>
-	<1499099693-22903-4-git-send-email-pbonzini@redhat.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <e5f16b6d-843f-6c8c-cc7d-68fa9ca33069@twiddle.net>
-Date: Mon, 3 Jul 2017 12:37:29 -0700
+	(envelope-from <mst@redhat.com>) id 1dS7Gt-0002M6-4J
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:44:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51328)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dS7Gs-0002LE-RF
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:44:35 -0400
+Date: Mon, 3 Jul 2017 22:44:32 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <1499111049-13721-2-git-send-email-mst@redhat.com>
+References: <1499111049-13721-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1499099693-22903-4-git-send-email-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 03/22] configure: add --disable-tcg
- configure option
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1499111049-13721-1-git-send-email-mst@redhat.com>
+Subject: [Qemu-devel] [PULL 01/21] virtio-net: enable configurable tx queue
+ size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,21 +27,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com, anthony.xu@intel.com, berrange@redhat.com, a.rigo@virtualopensystems.com, yang.zhong@intel.com, Anthony Liguori <aliguori@us.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Wei Wang <wei.w.wang@intel.com>, Jason Wang <jasowang@redhat.com>
 
-On 07/03/2017 09:34 AM, Paolo Bonzini wrote:
-> This lets you build without TCG (hardware accelerationor qtest only).  When
-> this flag is passed to configure, it will automatically filter out the target
-> list to only those that support KVM or Xen or HAX.
-> 
-> Signed-off-by: Anthony Liguori<aliguori@us.ibm.com>
-> Signed-off-by: Paolo Bonzini<pbonzini@redhat.com>
-> ---
->   configure | 26 +++++++++++++++++++++-----
->   1 file changed, 21 insertions(+), 5 deletions(-)
+From: Wei Wang <wei.w.wang@intel.com>
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+This patch enables the virtio-net tx queue size to be configurable
+between 256 (the default queue size) and 1024 by the user when the
+vhost-user backend is used.
 
+Currently, the maximum tx queue size for other backends is 512 due
+to the following limitations:
+- QEMU backend: the QEMU backend implementation in some cases may
+send 1024+1 iovs to writev.
+- Vhost_net backend: there are possibilities that the guest sends
+a vring_desc of memory which crosses a MemoryRegion thereby
+generating more than 1024 iovs after translation from guest-physical
+address in the backend.
 
-r~
+Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ include/hw/virtio/virtio-net.h |  1 +
+ hw/net/virtio-net.c            | 32 ++++++++++++++++++++++++++++++--
+ 2 files changed, 31 insertions(+), 2 deletions(-)
+
+diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
+index 602b486..b81b6a4 100644
+--- a/include/hw/virtio/virtio-net.h
++++ b/include/hw/virtio/virtio-net.h
+@@ -36,6 +36,7 @@ typedef struct virtio_net_conf
+     int32_t txburst;
+     char *tx;
+     uint16_t rx_queue_size;
++    uint16_t tx_queue_size;
+     uint16_t mtu;
+ } virtio_net_conf;
+ 
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 91eddaf..a1fc0db 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -34,8 +34,11 @@
+ 
+ /* previously fixed value */
+ #define VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE 256
++#define VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE 256
++
+ /* for now, only allow larger queues; with virtio-1, guest can downsize */
+ #define VIRTIO_NET_RX_QUEUE_MIN_SIZE VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE
++#define VIRTIO_NET_TX_QUEUE_MIN_SIZE VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE
+ 
+ /*
+  * Calculate the number of bytes up to and including the given 'field' of
+@@ -1508,15 +1511,18 @@ static void virtio_net_add_queue(VirtIONet *n, int index)
+ 
+     n->vqs[index].rx_vq = virtio_add_queue(vdev, n->net_conf.rx_queue_size,
+                                            virtio_net_handle_rx);
++
+     if (n->net_conf.tx && !strcmp(n->net_conf.tx, "timer")) {
+         n->vqs[index].tx_vq =
+-            virtio_add_queue(vdev, 256, virtio_net_handle_tx_timer);
++            virtio_add_queue(vdev, n->net_conf.tx_queue_size,
++                             virtio_net_handle_tx_timer);
+         n->vqs[index].tx_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
+                                               virtio_net_tx_timer,
+                                               &n->vqs[index]);
+     } else {
+         n->vqs[index].tx_vq =
+-            virtio_add_queue(vdev, 256, virtio_net_handle_tx_bh);
++            virtio_add_queue(vdev, n->net_conf.tx_queue_size,
++                             virtio_net_handle_tx_bh);
+         n->vqs[index].tx_bh = qemu_bh_new(virtio_net_tx_bh, &n->vqs[index]);
+     }
+ 
+@@ -1927,6 +1933,17 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
++    if (n->net_conf.tx_queue_size < VIRTIO_NET_TX_QUEUE_MIN_SIZE ||
++        n->net_conf.tx_queue_size > VIRTQUEUE_MAX_SIZE ||
++        !is_power_of_2(n->net_conf.tx_queue_size)) {
++        error_setg(errp, "Invalid tx_queue_size (= %" PRIu16 "), "
++                   "must be a power of 2 between %d and %d",
++                   n->net_conf.tx_queue_size, VIRTIO_NET_TX_QUEUE_MIN_SIZE,
++                   VIRTQUEUE_MAX_SIZE);
++        virtio_cleanup(vdev);
++        return;
++    }
++
+     n->max_queues = MAX(n->nic_conf.peers.queues, 1);
+     if (n->max_queues * 2 + 1 > VIRTIO_QUEUE_MAX) {
+         error_setg(errp, "Invalid number of queues (= %" PRIu32 "), "
+@@ -1947,6 +1964,15 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
+         error_report("Defaulting to \"bh\"");
+     }
+ 
++    /*
++     * Currently, backends other than vhost-user don't support 1024 queue
++     * size.
++     */
++    if (n->net_conf.tx_queue_size == VIRTQUEUE_MAX_SIZE &&
++        n->nic_conf.peers.ncs[0]->info->type != NET_CLIENT_DRIVER_VHOST_USER) {
++        n->net_conf.tx_queue_size = VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE;
++    }
++
+     for (i = 0; i < n->max_queues; i++) {
+         virtio_net_add_queue(n, i);
+     }
+@@ -2106,6 +2132,8 @@ static Property virtio_net_properties[] = {
+     DEFINE_PROP_STRING("tx", VirtIONet, net_conf.tx),
+     DEFINE_PROP_UINT16("rx_queue_size", VirtIONet, net_conf.rx_queue_size,
+                        VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE),
++    DEFINE_PROP_UINT16("tx_queue_size", VirtIONet, net_conf.tx_queue_size,
++                       VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE),
+     DEFINE_PROP_UINT16("host_mtu", VirtIONet, net_conf.mtu, 0),
+     DEFINE_PROP_BOOL("x-mtu-bypass-backend", VirtIONet, mtu_bypass_backend,
+                      true),
+-- 
+MST
