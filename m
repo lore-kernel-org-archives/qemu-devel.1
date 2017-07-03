@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1dRxHa-0002ZZ-KW
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 05:04:39 -0400
+	(envelope-from <david@redhat.com>) id 1dRxLm-00051q-Fa
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 05:08:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1dRxHZ-00089j-PQ
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 05:04:38 -0400
-Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:59284
-	helo=smtp.eu.adacore.com)
+	(envelope-from <david@redhat.com>) id 1dRxLj-0003Us-49
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 05:08:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44492)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
-	id 1dRxHZ-00088v-Ie
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 05:04:37 -0400
-References: <1498728533-23160-1-git-send-email-frederic.konrad@adacore.com>
-	<1498728533-23160-3-git-send-email-frederic.konrad@adacore.com>
-	<CAFEAcA-tuehYiJkYo148N0VPJ3hwhcxYDDersmbs4TOqxQCEKw@mail.gmail.com>
-	<7e7d94ce-a33c-6253-8dcf-475e93fe388f@adacore.com>
-	<CAFEAcA_EcMOQ6afbmZK1jYUuWGzAUzj8AKRLvoDEsezsQkPYzA@mail.gmail.com>
-	<f7ff9307-f341-f7df-3c80-374626f7631a@adacore.com>
-	<CAFEAcA89iy-r0OQ1T_znZ7EHZxGMZS0p=F_O5nygOVYzC_Dwgw@mail.gmail.com>
-	<d5287ef7-748a-7d77-041e-03fcea607bf9@adacore.com>
-	<CAFEAcA-C3zJ6yqsbMm8a0XM-i9Ew_OtukjGgCR5aRKzF5-0bFw@mail.gmail.com>
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <bd674de7-5bcb-8767-9ce4-0832485e6ca0@adacore.com>
-Date: Mon, 3 Jul 2017 11:04:28 +0200
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dRxLi-0003T5-Tg
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 05:08:55 -0400
+References: <20170622231228.1050-1-david@redhat.com>
+	<20170625221956.rda2cls2ex7icapa@aurel32.net>
+	<98e6dd78-d30d-fdb3-0572-5983154e2669@twiddle.net>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <22333f7b-5e04-7a71-db9b-7f142e21dcd6@redhat.com>
+Date: Mon, 3 Jul 2017 11:08:49 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-C3zJ6yqsbMm8a0XM-i9Ew_OtukjGgCR5aRKzF5-0bFw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <98e6dd78-d30d-fdb3-0572-5983154e2669@twiddle.net>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 2/3] arm: fix the armv7m reset state
+Subject: Re: [Qemu-devel] [PATCH v1] target-s390x: fix risbg handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,47 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, alistair@alistair23.me
+To: Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: agraf@suse.de, thuth@redhat.com, qemu-devel@nongnu.org
 
-
-
-On 07/03/2017 10:51 AM, Peter Maydell wrote:
-> On 3 July 2017 at 08:31, KONRAD Frederic <frederic.konrad@adacore.com> wrote:
->> On 06/30/2017 11:06 AM, Peter Maydell wrote:
->>> On 30 June 2017 at 09:24, KONRAD Frederic <frederic.konrad@adacore.com>
->>> wrote:
->>>> If I choose (b) I won't be able to load it to SRAM and it is
->>>> basically the same result I'll need to move or modify the config.
+On 01.07.2017 22:27, Richard Henderson wrote:
+> On 06/25/2017 03:19 PM, Aurelien Jarno wrote:
+>> On 2017-06-23 01:12, David Hildenbrand wrote:
+>>> If we have for example: r3 contains 0x00000000ffffffff
+>>>      ec 33 3f bf 61 55       risbg   %r3,%r3,63,191,97
 >>>
+>>> We want to rotate 33 to the left and only keep MSB bit 63 of that. So the
+>>> result is then exactly 1 (we're reading the sign of the 32 bit value).
 >>>
->>> I don't understand this, though. Option (b) is probably painful
->>> to implement (I don't have a good idea of how to do it) but
->>> it ought to mean that the ELF files that work on the board
->>> also work for QEMU (regardless of how the board model
->>> implemented the aliased flash).
->>>
+>>> Current code assumes that we can do that via an extract, which is not
+>>> true (at least not that easy) and produces a 0.
 >>
->> Yes that's exactly what I want.
+>> I think the mistake there is that the rotation is done to the left,
+>> while in extract the "shift" is done to the right. The following patch
+>> should be enough:
 >>
->> Basically the 0x00000000 alias can point to the SRAM or the ROM
->> during the reset depending on some boot config. The ELF is
->> directly loaded in the ROM or in the SRAM and my patch allows to
->> fetch the two first words in the reset handler to make it work
->> for any boot config.
+>> --- a/target/s390x/translate.c
+>> +++ b/target/s390x/translate.c
+>> @@ -3441,8 +3441,8 @@ static ExitStatus op_risbg(DisasContext *s, DisasOps *o)
+>>       }
+>>   
+>>       /* In some cases we can implement this with extract.  */
+>> -    if (imask == 0 && pos == 0 && len > 0 && rot + len <= 64) {
+>> -        tcg_gen_extract_i64(o->out, o->in2, rot, len);
+>> +    if (imask == 0 && pos == 0 && len > 0 && rot - len >= 0) {
+>> +        tcg_gen_extract_i64(o->out, o->in2, 64 - rot, len);
+>>           return NO_EXIT;
 > 
-> Yes, but it only works if you implemented it that way
-> round, and not for board implementations which put the
-> real device at 0 and the alias at high memory. I'd like a fix
-> which deals with all of this, not just with the particular
-> arrangement your board implementation has.
-
-Ok got it, I'll check if I can do something clean which can
-handle both ways.
-
-Fred
-
+> Agreed.  Included.
 > 
-> thanks
-> -- PMM
 > 
+> r~
+> 
+
+Was able to test it with your version and it works just fine!
+
+Thanks!
+
+-- 
+
+Thanks,
+
+David
