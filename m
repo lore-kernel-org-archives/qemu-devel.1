@@ -1,36 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39040)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1dRx4k-0005cS-Cy
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 04:51:23 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dRx5d-0006FL-QY
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 04:52:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1dRx4h-0004Od-Bk
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 04:51:22 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49176
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haoqf@linux.vnet.ibm.com>)
-	id 1dRx4h-0004Ng-5e
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 04:51:19 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v638n1W1031418
-	for <qemu-devel@nongnu.org>; Mon, 3 Jul 2017 04:51:18 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bexvwkxm2-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 04:51:18 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <haoqf@linux.vnet.ibm.com>;
-	Mon, 3 Jul 2017 09:51:16 +0100
-From: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Date: Mon,  3 Jul 2017 10:51:07 +0200
-In-Reply-To: <20170703085107.16547-1-haoqf@linux.vnet.ibm.com>
-References: <20170703085107.16547-1-haoqf@linux.vnet.ibm.com>
-Message-Id: <20170703085107.16547-2-haoqf@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 1/1] virtio-scsi-ccw: use ioeventfd even
- when KVM is disabled
+	(envelope-from <peter.maydell@linaro.org>) id 1dRx5d-0005wu-2S
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 04:52:17 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:38349)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dRx5c-0005u5-Rb
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 04:52:16 -0400
+Received: by mail-wm0-x232.google.com with SMTP id f67so47078940wmh.1
+	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 01:52:15 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <d5287ef7-748a-7d77-041e-03fcea607bf9@adacore.com>
+References: <1498728533-23160-1-git-send-email-frederic.konrad@adacore.com>
+	<1498728533-23160-3-git-send-email-frederic.konrad@adacore.com>
+	<CAFEAcA-tuehYiJkYo148N0VPJ3hwhcxYDDersmbs4TOqxQCEKw@mail.gmail.com>
+	<7e7d94ce-a33c-6253-8dcf-475e93fe388f@adacore.com>
+	<CAFEAcA_EcMOQ6afbmZK1jYUuWGzAUzj8AKRLvoDEsezsQkPYzA@mail.gmail.com>
+	<f7ff9307-f341-f7df-3c80-374626f7631a@adacore.com>
+	<CAFEAcA89iy-r0OQ1T_znZ7EHZxGMZS0p=F_O5nygOVYzC_Dwgw@mail.gmail.com>
+	<d5287ef7-748a-7d77-041e-03fcea607bf9@adacore.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 3 Jul 2017 09:51:53 +0100
+Message-ID: <CAFEAcA-C3zJ6yqsbMm8a0XM-i9Ew_OtukjGgCR5aRKzF5-0bFw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 2/3] arm: fix the armv7m reset state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,58 +35,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, stefanha@redhat.com, kwolf@redhat.com, famz@redhat.com, peterx@redhat.com, QingFeng Hao <haoqf@linux.vnet.ibm.com>
+To: KONRAD Frederic <frederic.konrad@adacore.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, alistair@alistair23.me
 
-This patch is based on a similar patch from Stefan Hajnoczi -
-commit c324fd0a39c (" virtio-pci: use ioeventfd even when KVM is disabled)
+On 3 July 2017 at 08:31, KONRAD Frederic <frederic.konrad@adacore.com> wrote:
+> On 06/30/2017 11:06 AM, Peter Maydell wrote:
+>> On 30 June 2017 at 09:24, KONRAD Frederic <frederic.konrad@adacore.com>
+>> wrote:
+>>> If I choose (b) I won't be able to load it to SRAM and it is
+>>> basically the same result I'll need to move or modify the config.
+>>
+>>
+>> I don't understand this, though. Option (b) is probably painful
+>> to implement (I don't have a good idea of how to do it) but
+>> it ought to mean that the ELF files that work on the board
+>> also work for QEMU (regardless of how the board model
+>> implemented the aliased flash).
+>>
+>
+> Yes that's exactly what I want.
+>
+> Basically the 0x00000000 alias can point to the SRAM or the ROM
+> during the reset depending on some boot config. The ELF is
+> directly loaded in the ROM or in the SRAM and my patch allows to
+> fetch the two first words in the reset handler to make it work
+> for any boot config.
 
-Do not check kvm_eventfds_enabled() when KVM is disabled since it
-always returns 0.  Since commit 8c56c1a592b5092d91da8d8943c17777d6462a6f
-("memory: emulate ioeventfd") it has been possible to use ioeventfds in
-qtest or TCG mode.
+Yes, but it only works if you implemented it that way
+round, and not for board implementations which put the
+real device at 0 and the alias at high memory. I'd like a fix
+which deals with all of this, not just with the particular
+arrangement your board implementation has.
 
-This patch makes -device virtio-scsi-ccw,iothread=iothread0 work even
-when KVM is disabled.
-
-I have tested that virtio-scsi-ccw works under tcg both with and without
-iothread.
-
-This patch fixes qemu-iotests 068, which was accidentally merged early
-despite the dependency on ioeventfd.
-
-Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
----
- hw/s390x/virtio-ccw.c | 2 +-
- target/s390x/kvm.c    | 3 +++
- 2 files changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index 90d37cb9ff..35896eb007 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -711,7 +711,7 @@ static void virtio_ccw_device_realize(VirtioCcwDevice *dev, Error **errp)
-         sch->cssid, sch->ssid, sch->schid, sch->devno,
-         ccw_dev->devno.valid ? "user-configured" : "auto-configured");
- 
--    if (!kvm_eventfds_enabled()) {
-+    if (kvm_enabled() && !kvm_eventfds_enabled()) {
-         dev->flags &= ~VIRTIO_CCW_FLAG_USE_IOEVENTFD;
-     }
- 
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index a3d00196f4..c37f9c3b9e 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -2220,6 +2220,9 @@ int kvm_s390_assign_subch_ioeventfd(EventNotifier *notifier, uint32_t sch,
-         .addr = sch,
-         .len = 8,
-     };
-+    if (!kvm_enabled()) {
-+        return 0;
-+    }
-     if (!kvm_check_extension(kvm_state, KVM_CAP_IOEVENTFD)) {
-         return -ENOSYS;
-     }
--- 
-2.11.2
+thanks
+-- PMM
