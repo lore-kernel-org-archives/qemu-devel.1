@@ -1,42 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1dRuQq-0003jW-0x
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 02:02:01 -0400
+	(envelope-from <peterx@redhat.com>) id 1dRuSX-0004vX-LC
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 02:03:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1dRuQl-0006EK-3t
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 02:02:00 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43254
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haoqf@linux.vnet.ibm.com>)
-	id 1dRuQk-0006Dj-UB
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 02:01:55 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v635wf79114635
-	for <qemu-devel@nongnu.org>; Mon, 3 Jul 2017 02:01:53 -0400
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bf13v1jau-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 02:01:53 -0400
-Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <haoqf@linux.vnet.ibm.com>;
-	Mon, 3 Jul 2017 02:01:52 -0400
-References: <1498234919-27316-1-git-send-email-kwolf@redhat.com>
-	<1498234919-27316-12-git-send-email-kwolf@redhat.com>
-	<4c7f09a2-04b4-25b0-b9c7-cbdb5dc3c795@linux.vnet.ibm.com>
-	<20170628102213.GB5378@noname.redhat.com>
-From: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Date: Mon, 3 Jul 2017 14:01:45 +0800
+	(envelope-from <peterx@redhat.com>) id 1dRuSS-0007PH-SG
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 02:03:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46876)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dRuSS-0007OY-K2
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 02:03:40 -0400
+Date: Mon, 3 Jul 2017 14:03:38 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170703060338.GA32568@pxdev.xzpeter.org>
+References: <1498817910-20454-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170630102107eucas1p28e19080c358dd88dfaf8a46e3a6a5ae7@eucas1p2.samsung.com>
+	<1498817910-20454-4-git-send-email-a.perevalov@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <20170628102213.GB5378@noname.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <799c3d2f-237c-9833-e8fe-0af6d461e252@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] [PULL 11/61] virtio-pci: use
- ioeventfd even when KVM is disabled
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1498817910-20454-4-git-send-email-a.perevalov@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH v7 3/3] migration: add bitmap for received
+ page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,101 +29,242 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, stefanha@redhat.com
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, quintela@redhat.com, dgilbert@redhat.com, heetae82.ahn@samsung.com
 
+On Fri, Jun 30, 2017 at 06:18:30AM -0400, Alexey Perevalov wrote:
+> This patch adds ability to track down already received
+> pages, it's necessary for calculation vCPU block time in
+> postcopy migration feature, maybe for restore after
+> postcopy migration failure.
+> Also it's necessary to solve shared memory issue in
+> postcopy livemigration. Information about received pages
+> will be transferred to the software virtual bridge
+> (e.g. OVS-VSWITCHD), to avoid fallocate (unmap) for
+> already received pages. fallocate syscall is required for
+> remmaped shared memory, due to remmaping itself blocks
+> ioctl(UFFDIO_COPY, ioctl in this case will end with EEXIT
+> error (struct page is exists after remmap).
+> 
+> Bitmap is placed into RAMBlock as another postcopy/precopy
+> related bitmaps.
+> 
+> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> ---
+>  include/exec/ram_addr.h  | 10 ++++++++++
+>  migration/postcopy-ram.c | 16 +++++++++++-----
+>  migration/ram.c          | 43 ++++++++++++++++++++++++++++++++++++++++---
+>  migration/ram.h          |  6 ++++++
+>  4 files changed, 67 insertions(+), 8 deletions(-)
+> 
+> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+> index 73d1bea..af5bf26 100644
+> --- a/include/exec/ram_addr.h
+> +++ b/include/exec/ram_addr.h
+> @@ -47,6 +47,8 @@ struct RAMBlock {
+>       * of the postcopy phase
+>       */
+>      unsigned long *unsentmap;
+> +    /* bitmap of already received pages in postcopy */
+> +    unsigned long *receivedmap;
+>  };
+>  
+>  static inline bool offset_in_ramblock(RAMBlock *b, ram_addr_t offset)
+> @@ -60,6 +62,14 @@ static inline void *ramblock_ptr(RAMBlock *block, ram_addr_t offset)
+>      return (char *)block->host + offset;
+>  }
+>  
+> +static inline unsigned long int ramblock_recv_bitmap_offset(void *host_addr,
+> +                                                            RAMBlock *rb)
+> +{
+> +    uint64_t host_addr_offset =
+> +            (uint64_t)(uintptr_t)(host_addr - (void *)rb->host);
+> +    return host_addr_offset >> TARGET_PAGE_BITS;
+> +}
+> +
+>  long qemu_getrampagesize(void);
+>  unsigned long last_ram_page(void);
+>  RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index be497bb..276ce12 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -560,22 +560,27 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+>  }
+>  
+>  static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
+> -        void *from_addr, uint64_t pagesize)
+> +                               void *from_addr, uint64_t pagesize, RAMBlock *rb)
+>  {
+> +    int ret;
+>      if (from_addr) {
+>          struct uffdio_copy copy_struct;
+>          copy_struct.dst = (uint64_t)(uintptr_t)host_addr;
+>          copy_struct.src = (uint64_t)(uintptr_t)from_addr;
+>          copy_struct.len = pagesize;
+>          copy_struct.mode = 0;
+> -        return ioctl(userfault_fd, UFFDIO_COPY, &copy_struct);
+> +        ret = ioctl(userfault_fd, UFFDIO_COPY, &copy_struct);
+>      } else {
+>          struct uffdio_zeropage zero_struct;
+>          zero_struct.range.start = (uint64_t)(uintptr_t)host_addr;
+>          zero_struct.range.len = pagesize;
+>          zero_struct.mode = 0;
+> -        return ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
+> +        ret = ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
+> +    }
+> +    if (!ret) {
+> +        ramblock_recv_bitmap_set(host_addr, rb);
+>      }
+> +    return ret;
+>  }
+>  
+>  /*
+> @@ -592,7 +597,7 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
+>       * which would be slightly cheaper, but we'd have to be careful
+>       * of the order of updating our page state.
+>       */
+> -    if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, from, pagesize)) {
+> +    if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, from, pagesize, rb)) {
+>          int e = errno;
+>          error_report("%s: %s copy host: %p from: %p (size: %zd)",
+>                       __func__, strerror(e), host, from, pagesize);
+> @@ -614,7 +619,8 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
+>      trace_postcopy_place_page_zero(host);
+>  
+>      if (qemu_ram_pagesize(rb) == getpagesize()) {
+> -        if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, NULL, getpagesize())) {
+> +        if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, NULL, getpagesize(),
+> +                                rb)) {
+>              int e = errno;
+>              error_report("%s: %s zero host: %p",
+>                           __func__, strerror(e), host);
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 9cc1b17..dfbb36b 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -147,6 +147,32 @@ out:
+>      return ret;
+>  }
+>  
+> +void ramblock_recv_map_init(void)
+> +{
+> +    RAMBlock *rb;
+> +
+> +    RAMBLOCK_FOREACH(rb) {
+> +        assert(!rb->receivedmap);
+> +        rb->receivedmap = bitmap_new(rb->max_length >> TARGET_PAGE_BITS);
+> +    }
+> +}
+> +
+> +int ramblock_recv_bitmap_test(void *host_addr, RAMBlock *rb)
+> +{
+> +    return test_bit(ramblock_recv_bitmap_offset(host_addr, rb),
+> +                    rb->receivedmap);
+> +}
+> +
+> +void ramblock_recv_bitmap_set(void *host_addr, RAMBlock *rb)
+> +{
+> +    set_bit_atomic(ramblock_recv_bitmap_offset(host_addr, rb), rb->receivedmap);
+> +}
+> +
+> +void ramblock_recv_bitmap_clear(void *host_addr, RAMBlock *rb)
+> +{
+> +    clear_bit(ramblock_recv_bitmap_offset(host_addr, rb), rb->receivedmap);
+> +}
+> +
+>  /*
+>   * An outstanding page request, on the source, having been received
+>   * and queued
+> @@ -1793,6 +1819,8 @@ int ram_discard_range(const char *rbname, uint64_t start, size_t length)
+>          goto err;
+>      }
+>  
+> +    bitmap_clear(rb->receivedmap, start >> TARGET_PAGE_BITS,
+> +                 length >> TARGET_PAGE_BITS);
+>      ret = ram_block_discard_range(rb, start, length);
+>  
+>  err:
+> @@ -2324,13 +2352,20 @@ static int ram_load_setup(QEMUFile *f, void *opaque)
+>  {
+>      xbzrle_load_setup();
+>      compress_threads_load_setup();
+> +    ramblock_recv_map_init();
+>      return 0;
+>  }
+>  
+>  static int ram_load_cleanup(void *opaque)
+>  {
+> +    RAMBlock *rb;
+>      xbzrle_load_cleanup();
+>      compress_threads_load_cleanup();
+> +
+> +    RAMBLOCK_FOREACH(rb) {
+> +        g_free(rb->receivedmap);
+> +        rb->receivedmap = NULL;
+> +    }
+>      return 0;
+>  }
 
+Yeah, this looks much better. Thanks. Though I may not bother export
+ramblock_recv_map_init(), but it's ok.
 
-=E5=9C=A8 2017/6/28 18:22, Kevin Wolf =E5=86=99=E9=81=93:
-> Am 28.06.2017 um 12:11 hat QingFeng Hao geschrieben:
->> =E5=9C=A8 2017/6/24 0:21, Kevin Wolf =E5=86=99=E9=81=93:
->>> From: Stefan Hajnoczi <stefanha@redhat.com>
->>>
->>> Old kvm.ko versions only supported a tiny number of ioeventfds so
->>> virtio-pci avoids ioeventfds when kvm_has_many_ioeventfds() returns 0.
->>>
->>> Do not check kvm_has_many_ioeventfds() when KVM is disabled since it
->>> always returns 0.  Since commit 8c56c1a592b5092d91da8d8943c17777d6462=
-a6f
->>> ("memory: emulate ioeventfd") it has been possible to use ioeventfds =
-in
->>> qtest or TCG mode.
->>>
->>> This patch makes -device virtio-blk-pci,iothread=3Diothread0 work eve=
-n
->>> when KVM is disabled.
->>>
->>> I have tested that virtio-blk-pci works under TCG both with and witho=
-ut
->>> iothread.
->>>
->>> Cc: Michael S. Tsirkin <mst@redhat.com>
->>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->>> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
->>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->>> ---
->>>   hw/virtio/virtio-pci.c | 2 +-
->>>   1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
->>> index 20d6a08..301920e 100644
->>> --- a/hw/virtio/virtio-pci.c
->>> +++ b/hw/virtio/virtio-pci.c
->>> @@ -1740,7 +1740,7 @@ static void virtio_pci_realize(PCIDevice *pci_d=
-ev, Error **errp)
->>>       bool pcie_port =3D pci_bus_is_express(pci_dev->bus) &&
->>>                        !pci_bus_is_root(pci_dev->bus);
->>>
->>> -    if (!kvm_has_many_ioeventfds()) {
->>> +    if (kvm_enabled() && !kvm_has_many_ioeventfds()) {
->>>           proxy->flags &=3D ~VIRTIO_PCI_FLAG_USE_IOEVENTFD;
->>>       }
->> This response is actually for mail thread "Re: [Qemu-devel] [PATCH
->> 1/5] virtio-pci: use ioeventfd even when KVM is disabled"
->> which I didn't receive, sorry.
->> I also saw the failed case of 068 as Fam due to the same cause on
->> s390x and x86.
->> With this patch applied, no failure found. Further investigation
->> shows that the error is in
->> virtio_scsi_dataplane_setup:
->>   if (!virtio_device_ioeventfd_enabled(vdev)) {
->>              error_setg(errp, "ioeventfd is required for iothread");
->>              return;
->>   }
->> call flow is:
->> virtio_device_ioeventfd_enabled-->virtio_bus_ioeventfd_enabled
->> -->k->ioeventfd_enabled-->virtio_pci_ioeventfd_enabled
->> virtio_pci_ioeventfd_enabled checks flag
->> VIRTIO_PCI_FLAG_USE_IOEVENTFD which was
->> cleared in virtio_pci_realize if this patch isn't applied.
-> Yes, we know all of this. However, this patch is not correct and causes
-> 'make check' failures on some platforms. The open question is where tha=
-t
-> failure comes from. Before this is solved, the patch can't be applied.
-Sorry that I found case 068 of the latest master still fails on s390x=20
-(but passed
-on x86) and the cause is that s390x uses "-device virtio-scsi-ccw"=20
-instead of
-"-device virtio-scsi-pci", so the change in virtio_ccw_device_realize is=20
-also needed:
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index 90d37cb..35896eb 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -711,7 +711,7 @@ static void=20
-virtio_ccw_device_realize(VirtioCcwDevice *dev, Error
-          sch->cssid, sch->ssid, sch->schid, sch->devno,
-          ccw_dev->devno.valid ? "user-configured" : "auto-configured");
+>  
+> @@ -2521,6 +2556,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>          ram_addr_t addr, total_ram_bytes;
+>          void *host = NULL;
+>          uint8_t ch;
+> +        RAMBlock *rb = NULL;
+>  
+>          addr = qemu_get_be64(f);
+>          flags = addr & ~TARGET_PAGE_MASK;
+> @@ -2537,15 +2573,16 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>  
+>          if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
+>                       RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE)) {
+> -            RAMBlock *block = ram_block_from_stream(f, flags);
+> +            rb = ram_block_from_stream(f, flags);
+>  
+> -            host = host_from_ram_block_offset(block, addr);
+> +            host = host_from_ram_block_offset(rb, addr);
+>              if (!host) {
+>                  error_report("Illegal RAM offset " RAM_ADDR_FMT, addr);
+>                  ret = -EINVAL;
+>                  break;
+>              }
+> -            trace_ram_load_loop(block->idstr, (uint64_t)addr, flags, host);
+> +            ramblock_recv_bitmap_set(host, rb);
 
--    if (!kvm_eventfds_enabled()) {
-+    if (kvm_enabled() && !kvm_eventfds_enabled()) {
-          dev->flags &=3D ~VIRTIO_CCW_FLAG_USE_IOEVENTFD;
-      }
+If we move this line here, then we can keep the above *block
+definition, then no need to touch other lines as well, so only one new
+line addition is needed in ram_load.
 
-I'll send out a patch for that. Thanks!
-> Kevin
->
+> +            trace_ram_load_loop(rb->idstr, (uint64_t)addr, flags, host);
+>          }
+>  
+>          switch (flags & ~RAM_SAVE_FLAG_CONTINUE) {
+> diff --git a/migration/ram.h b/migration/ram.h
+> index c081fde..98d68df 100644
+> --- a/migration/ram.h
+> +++ b/migration/ram.h
+> @@ -52,4 +52,10 @@ int ram_discard_range(const char *block_name, uint64_t start, size_t length);
+>  int ram_postcopy_incoming_init(MigrationIncomingState *mis);
+>  
+>  void ram_handle_compressed(void *host, uint8_t ch, uint64_t size);
+> +
+> +void ramblock_recv_map_init(void);
+> +int ramblock_recv_bitmap_test(void *host_addr, RAMBlock *rb);
+> +void ramblock_recv_bitmap_set(void *host_addr, RAMBlock *rb);
+> +void ramblock_recv_bitmap_clear(void *host_addr, RAMBlock *rb);
+> +
+>  #endif
+> -- 
+> 1.8.3.1
+> 
 
---=20
-Regards
-QingFeng Hao
+Only trivial nitpicks, maybe no need to repost? Anyway:
+
+Reviewed-by: Peter Xu <peterx@redhat.com>
+
+-- 
+Peter Xu
