@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51743)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dS4KS-0000u5-RE
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:36:05 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dS4KU-0000v5-CQ
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:36:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dS4KR-0008A7-U9
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:36:04 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:35804)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dS4KT-0008BT-B5
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:36:06 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36646)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dS4KR-00089X-ND
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:36:03 -0400
-Received: by mail-wm0-x242.google.com with SMTP id u23so21542973wma.2
-	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 09:36:03 -0700 (PDT)
+	id 1dS4KT-0008Aw-41
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:36:05 -0400
+Received: by mail-wm0-x242.google.com with SMTP id y5so21474819wmh.3
+	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 09:36:04 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  3 Jul 2017 18:34:46 +0200
-Message-Id: <1499099693-22903-16-git-send-email-pbonzini@redhat.com>
+Date: Mon,  3 Jul 2017 18:34:47 +0200
+Message-Id: <1499099693-22903-17-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1499099693-22903-1-git-send-email-pbonzini@redhat.com>
 References: <1499099693-22903-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 15/22] tcg: add the CONFIG_TCG into Makefiles
+Subject: [Qemu-devel] [PATCH 16/22] target/i386: move
+ cpu_sync_bndcs_hflags() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,40 +33,112 @@ Cc: rth@twiddle.net, thuth@redhat.com, anthony.xu@intel.com, berrange@redhat.com
 
 From: Yang Zhong <yang.zhong@intel.com>
 
-Add the CONFIG_TCG for frontend and backend's files in the related
-Makefiles.
+Move cpu_sync_bndcs_hflags() function from mpx_helper.c
+to helper.c because mpx_helper.c need be disabled when
+tcg is disabled.
 
 Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile.target     | 4 ++--
- accel/Makefile.objs | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ target/i386/helper.c     | 34 +++++++++++++++++++++++++++++++++-
+ target/i386/mpx_helper.c | 30 ------------------------------
+ 2 files changed, 33 insertions(+), 31 deletions(-)
 
-diff --git a/Makefile.target b/Makefile.target
-index 0066579..8e185d4 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -90,8 +90,8 @@ all: $(PROGS) stap
- # cpu emulator library
- obj-y += exec.o
- obj-y += accel/
--obj-y += tcg/tcg.o tcg/tcg-op.o tcg/optimize.o
--obj-y += tcg/tcg-common.o tcg/tcg-runtime.o
-+obj-$(CONFIG_TCG) += tcg/tcg.o tcg/tcg-op.o tcg/optimize.o
-+obj-$(CONFIG_TCG) += tcg/tcg-common.o tcg/tcg-runtime.o
- obj-$(CONFIG_TCG_INTERPRETER) += tcg/tci.o
- obj-$(CONFIG_TCG_INTERPRETER) += disas/tci.o
- obj-y += fpu/softfloat.o
-diff --git a/accel/Makefile.objs b/accel/Makefile.objs
-index cd5702f..10666ed 100644
---- a/accel/Makefile.objs
-+++ b/accel/Makefile.objs
-@@ -1,4 +1,4 @@
- obj-$(CONFIG_SOFTMMU) += accel.o
- obj-y += kvm/
--obj-y += tcg/
-+obj-$(CONFIG_TCG) += tcg/
- obj-y += stubs/
+diff --git a/target/i386/helper.c b/target/i386/helper.c
+index ef05059..87fd705 100644
+--- a/target/i386/helper.c
++++ b/target/i386/helper.c
+@@ -29,6 +29,36 @@
+ #include "hw/i386/apic_internal.h"
+ #endif
+ 
++void cpu_sync_bndcs_hflags(CPUX86State *env)
++{
++    uint32_t hflags = env->hflags;
++    uint32_t hflags2 = env->hflags2;
++    uint32_t bndcsr;
++
++    if ((hflags & HF_CPL_MASK) == 3) {
++        bndcsr = env->bndcs_regs.cfgu;
++    } else {
++        bndcsr = env->msr_bndcfgs;
++    }
++
++    if ((env->cr[4] & CR4_OSXSAVE_MASK)
++        && (env->xcr0 & XSTATE_BNDCSR_MASK)
++        && (bndcsr & BNDCFG_ENABLE)) {
++        hflags |= HF_MPX_EN_MASK;
++    } else {
++        hflags &= ~HF_MPX_EN_MASK;
++    }
++
++    if (bndcsr & BNDCFG_BNDPRESERVE) {
++        hflags2 |= HF2_MPX_PR_MASK;
++    } else {
++        hflags2 &= ~HF2_MPX_PR_MASK;
++    }
++
++    env->hflags = hflags;
++    env->hflags2 = hflags2;
++}
++
+ static void cpu_x86_version(CPUX86State *env, int *family, int *model)
+ {
+     int cpuver = env->cpuid_version;
+@@ -1302,10 +1332,12 @@ void cpu_report_tpr_access(CPUX86State *env, TPRAccess access)
+         env->tpr_access_type = access;
+ 
+         cpu_interrupt(cs, CPU_INTERRUPT_TPR);
+-    } else {
++    } else if (tcg_enabled()) {
+         cpu_restore_state(cs, cs->mem_io_pc);
+ 
+         apic_handle_tpr_access_report(cpu->apic_state, env->eip, access);
++    } else {
++        abort();
+     }
+ }
+ #endif /* !CONFIG_USER_ONLY */
+diff --git a/target/i386/mpx_helper.c b/target/i386/mpx_helper.c
+index 7e44820..ade5d24 100644
+--- a/target/i386/mpx_helper.c
++++ b/target/i386/mpx_helper.c
+@@ -24,36 +24,6 @@
+ #include "exec/exec-all.h"
+ 
+ 
+-void cpu_sync_bndcs_hflags(CPUX86State *env)
+-{
+-    uint32_t hflags = env->hflags;
+-    uint32_t hflags2 = env->hflags2;
+-    uint32_t bndcsr;
+-
+-    if ((hflags & HF_CPL_MASK) == 3) {
+-        bndcsr = env->bndcs_regs.cfgu;
+-    } else {
+-        bndcsr = env->msr_bndcfgs;
+-    }
+-
+-    if ((env->cr[4] & CR4_OSXSAVE_MASK)
+-        && (env->xcr0 & XSTATE_BNDCSR_MASK)
+-        && (bndcsr & BNDCFG_ENABLE)) {
+-        hflags |= HF_MPX_EN_MASK;
+-    } else {
+-        hflags &= ~HF_MPX_EN_MASK;
+-    }
+-
+-    if (bndcsr & BNDCFG_BNDPRESERVE) {
+-        hflags2 |= HF2_MPX_PR_MASK;
+-    } else {
+-        hflags2 &= ~HF2_MPX_PR_MASK;
+-    }
+-
+-    env->hflags = hflags;
+-    env->hflags2 = hflags2;
+-}
+-
+ void helper_bndck(CPUX86State *env, uint32_t fail)
+ {
+     if (unlikely(fail)) {
 -- 
 1.8.3.1
