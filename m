@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40197)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dS72M-0008KL-66
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:29:35 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dS73O-0000h1-B5
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:30:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dS72J-0000zB-30
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:29:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55190)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dS72I-0000ym-TO
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:29:31 -0400
-Date: Mon, 3 Jul 2017 22:29:28 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1499110159-15894-1-git-send-email-mst@redhat.com>
+	(envelope-from <rth7680@gmail.com>) id 1dS73L-0001qn-8c
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:30:38 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:35781)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dS73L-0001qA-3m
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:30:35 -0400
+Received: by mail-qk0-x241.google.com with SMTP id 16so25163524qkg.2
+	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 12:30:35 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1499099693-22903-1-git-send-email-pbonzini@redhat.com>
+	<1499099693-22903-2-git-send-email-pbonzini@redhat.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <a62894ea-d6a4-0fce-ce75-37a2181ae371@twiddle.net>
+Date: Mon, 3 Jul 2017 12:30:29 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] [PATCH] virtio-net: fix tx queue size for !vhost-user
+In-Reply-To: <1499099693-22903-2-git-send-email-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 01/22] configure: factor out list of
+ supported Xen/KVM/HAX targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +32,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Wei Wang <wei.w.wang@intel.com>, Jason Wang <jasowang@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, anthony.xu@intel.com, berrange@redhat.com, a.rigo@virtualopensystems.com, yang.zhong@intel.com
 
-Current code segfaults when no nic peer is specified.
-Fix it up - fall back to default queue size.
+On 07/03/2017 09:34 AM, Paolo Bonzini wrote:
+> This will be useful when the functions are called, early in the configure
+> process, to filter out targets that do not support hardware acceleration.
+> 
+> Signed-off-by: Paolo Bonzini<pbonzini@redhat.com>
+> ---
+>   configure | 90 ++++++++++++++++++++++++++++++++++++++-------------------------
+>   1 file changed, 55 insertions(+), 35 deletions(-)
 
-Fixes: 526e8fa8b872 ("virtio-net: enable configurable tx queue size")
-Cc: Wei Wang <wei.w.wang@intel.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- hw/net/virtio-net.c | 28 ++++++++++++++++++++--------
- 1 file changed, 20 insertions(+), 8 deletions(-)
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index a1fc0db..5630a9e 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -498,6 +498,24 @@ static void virtio_net_set_mrg_rx_bufs(VirtIONet *n, int mergeable_rx_bufs,
-     }
- }
- 
-+static int virtio_net_max_tx_queue_size(VirtIONet *n)
-+{
-+    NetClientState *peer = n->nic_conf.peers.ncs[0];
-+
-+    /*
-+     * Backends other than vhost-user don't support max queue size.
-+     */
-+    if (!peer) {
-+        return VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE;
-+    }
-+
-+    if (peer->info->type != NET_CLIENT_DRIVER_VHOST_USER) {
-+        return VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE;
-+    }
-+
-+    return VIRTQUEUE_MAX_SIZE;
-+}
-+
- static int peer_attach(VirtIONet *n, int index)
- {
-     NetClientState *nc = qemu_get_subqueue(n->nic, index);
-@@ -1964,14 +1982,8 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
-         error_report("Defaulting to \"bh\"");
-     }
- 
--    /*
--     * Currently, backends other than vhost-user don't support 1024 queue
--     * size.
--     */
--    if (n->net_conf.tx_queue_size == VIRTQUEUE_MAX_SIZE &&
--        n->nic_conf.peers.ncs[0]->info->type != NET_CLIENT_DRIVER_VHOST_USER) {
--        n->net_conf.tx_queue_size = VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE;
--    }
-+    n->net_conf.tx_queue_size = MIN(virtio_net_max_tx_queue_size(n),
-+                                    n->net_conf.tx_queue_size);
- 
-     for (i = 0; i < n->max_queues; i++) {
-         virtio_net_add_queue(n, i);
--- 
-MST
+
+r~
