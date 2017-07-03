@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS0Hx-0002fm-IP
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:17:16 -0400
+	(envelope-from <groug@kaod.org>) id 1dS0MW-00049G-Sc
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:21:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS0Hw-0004is-Ca
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:17:13 -0400
-References: <20170702150510.23276-1-mreitz@redhat.com>
-	<20170702150510.23276-2-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <573379d4-3102-43b6-8348-72dbd5999702@redhat.com>
-Date: Mon, 3 Jul 2017 07:17:00 -0500
+	(envelope-from <groug@kaod.org>) id 1dS0MT-0006Nq-Qi
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:21:56 -0400
+Received: from 14.mo4.mail-out.ovh.net ([46.105.40.29]:37724)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dS0MT-0006M2-K6
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:21:53 -0400
+Received: from player159.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id B83BF8146F
+	for <qemu-devel@nongnu.org>; Mon,  3 Jul 2017 14:21:44 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Mon, 03 Jul 2017 14:21:31 +0200
+Message-ID: <149908449117.14256.2821600309813941055.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170702150510.23276-2-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="OrU2bm2cgRIlcgwrNbo5F6Vbv6wJvSBnI"
-Subject: Re: [Qemu-devel] [PATCH v5 1/2] iotests: Use absolute paths for
- executables
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] spapr: fix memory hotplug error path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,72 +27,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---OrU2bm2cgRIlcgwrNbo5F6Vbv6wJvSBnI
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <573379d4-3102-43b6-8348-72dbd5999702@redhat.com>
-Subject: Re: [PATCH v5 1/2] iotests: Use absolute paths for executables
-References: <20170702150510.23276-1-mreitz@redhat.com>
- <20170702150510.23276-2-mreitz@redhat.com>
-In-Reply-To: <20170702150510.23276-2-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+QEMU shouldn't abort if spapr_add_lmbs()->spapr_drc_attach() fails.
+Let's propagate the error instead, like it is done everywhere else
+where spapr_drc_attach() is called.
 
-On 07/02/2017 10:05 AM, Max Reitz wrote:
-> A user may specify a relative path for accessing qemu, qemu-img, etc.
-> through environment variables ($QEMU_PROG and friends) or a symlink.
->=20
-> If a test decides to change its working directory, relative paths will
-> cease to work, however. Work around this by making all of the paths to
-> programs that should undergo testing absolute. Besides "realpath", we
-> also have to use "type -p" to support programs in $PATH.
->=20
-> As a side effect, this fixes specifying these programs as symlinks for
-> out-of-tree builds: Before, you would have to create two symlinks, one
-> in the build and one in the source tree (the first one for common.confi=
-g
-> to find, the second one for the iotest to use). Now it is sufficient to=
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/ppc/spapr.c |   10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-> create one in the build tree because common.config will resolve it.
->=20
-> Reported-by: Kevin Wolf <kwolf@redhat.com>
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/common.config | 11 +++++++++++
->  1 file changed, 11 insertions(+)
->=20
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Tested-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---OrU2bm2cgRIlcgwrNbo5F6Vbv6wJvSBnI
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZWjW8AAoJEKeha0olJ0Nqq7cH/07JQaLLUlm7NTPGMewbZ1iY
-TpCHgCg+dYeqzmMU6m/PbNBuFEaCMiEQFnYUXOyqJ1/m0mf6rdjxqhMaq2RV3iCc
-vk9rB9nA0PYRrXKzH7SuKyan3GQow17Z0vkJzTCmSsFfNjZjsffmtjoCCDRZ23My
-g8DnkAC759YO0/AbBf9/r2iUme0klKcxqlj5V3HFMeol07g6ajZcyN76r1XPaLi3
-tJ0Fkm/BNzlLM+JsCojTIBFQgo9sMFlmBKBZmH7nFyGhlb1G7ka8SGPUHtaQ4Q/K
-hpU0BaGt0Ru3k1FCduY/PhJoxx6dc/A0TWs+JzSCVSuieM9w1SlDvhtcVon9x9k=
-=tnG+
------END PGP SIGNATURE-----
-
---OrU2bm2cgRIlcgwrNbo5F6Vbv6wJvSBnI--
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 70b3fd374e2b..e103be500189 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2601,6 +2601,7 @@ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
+     int i, fdt_offset, fdt_size;
+     void *fdt;
+     uint64_t addr = addr_start;
++    Error *local_err = NULL;
+ 
+     for (i = 0; i < nr_lmbs; i++) {
+         drc = spapr_drc_by_id(TYPE_SPAPR_DRC_LMB,
+@@ -2611,7 +2612,12 @@ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
+         fdt_offset = spapr_populate_memory_node(fdt, node, addr,
+                                                 SPAPR_MEMORY_BLOCK_SIZE);
+ 
+-        spapr_drc_attach(drc, dev, fdt, fdt_offset, errp);
++        spapr_drc_attach(drc, dev, fdt, fdt_offset, &local_err);
++        if (local_err) {
++            g_free(fdt);
++            error_propagate(errp, local_err);
++            return;
++        }
+         addr += SPAPR_MEMORY_BLOCK_SIZE;
+     }
+     /* send hotplug notification to the
+@@ -2657,7 +2663,7 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+ 
+     spapr_add_lmbs(dev, addr, size, node,
+                    spapr_ovec_test(ms->ov5_cas, OV5_HP_EVT),
+-                   &error_abort);
++                   &local_err);
+ 
+ out:
+     error_propagate(errp, local_err);
