@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS0ot-0003nj-EB
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:51:16 -0400
+	(envelope-from <armbru@redhat.com>) id 1dS0pP-000463-GV
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:51:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS0os-0003qe-Dp
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:51:15 -0400
-References: <20170703122505.32017-1-mreitz@redhat.com>
-	<20170703122505.32017-4-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a36ef7da-de27-6cc7-5194-d343d05497c1@redhat.com>
-Date: Mon, 3 Jul 2017 07:51:05 -0500
+	(envelope-from <armbru@redhat.com>) id 1dS0pL-00046r-KF
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:51:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58674)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dS0pL-00045G-AI
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:51:43 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170613165313.20954-1-ehabkost@redhat.com>
+	<87o9t8qy7d.fsf@dusky.pond.sub.org>
+	<20170628174158.GG12152@localhost.localdomain>
+	<87mv8r2sii.fsf@dusky.pond.sub.org>
+	<20170629125706.GT12152@localhost.localdomain>
+	<871sq1r9dh.fsf@dusky.pond.sub.org>
+	<20170701142020.GD12152@localhost.localdomain>
+Date: Mon, 03 Jul 2017 14:51:38 +0200
+In-Reply-To: <20170701142020.GD12152@localhost.localdomain> (Eduardo Habkost's
+	message of "Sat, 1 Jul 2017 11:20:20 -0300")
+Message-ID: <871spxlm3p.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170703122505.32017-4-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="2UKniQ0KHN5K4v29pCR5VTEiaGjw6oU1G"
-Subject: Re: [Qemu-devel] [PATCH v3 3/5] block: qobject_is_equal() in
- bdrv_reopen_prepare()
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC 00/15] Error API: Flag errors in *errp even
+ if errors are being ignored
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,105 +33,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2UKniQ0KHN5K4v29pCR5VTEiaGjw6oU1G
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org
-Message-ID: <a36ef7da-de27-6cc7-5194-d343d05497c1@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 3/5] block: qobject_is_equal() in
- bdrv_reopen_prepare()
-References: <20170703122505.32017-1-mreitz@redhat.com>
- <20170703122505.32017-4-mreitz@redhat.com>
-In-Reply-To: <20170703122505.32017-4-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-On 07/03/2017 07:25 AM, Max Reitz wrote:
-> Currently, bdrv_reopen_prepare() assumes that all BDS options are
-> strings. However, this is not the case if the BDS has been created
-> through the json: pseudo-protocol or blockdev-add.
->=20
-> Note that the user-invokable reopen command is an HMP command, so you
+> On Fri, Jun 30, 2017 at 01:40:58PM +0200, Markus Armbruster wrote:
+>> Eduardo Habkost <ehabkost@redhat.com> writes:
+>> 
+>> > On Thu, Jun 29, 2017 at 08:54:29AM +0200, Markus Armbruster wrote:
+>> >> Eduardo Habkost <ehabkost@redhat.com> writes:
+>> >> 
+>> >> > On Wed, Jun 28, 2017 at 11:05:26AM +0200, Markus Armbruster wrote:
+>> >> >> Eduardo Habkost <ehabkost@redhat.com> writes:
+>> > [...]
+>> >> >> > I understand the reason we need to support errp==NULL, as it
+>> >> >> > makes life simpler for callers that don't want any extra error
+>> >> >> > information.  However, this has the cost of making the functions
+>> >> >> > that report errors more complex and error-prone.
+>> >> >> >
+>> >> >> > (Evidence of that: the 34 ERR_IS_* cases handled by the "use
+>> >> >> > ERR_IS_* macros" patches in the series.  Where existing code will
+>> >> >> > crash or behave differently if errp is NULL.)
+>> >> >> 
+>> >> >> Which of them could *not* use a suitable return value instead of *errp?
+>> >> >
+>> >> > I don't know.  But I'm not trying to improve those 34 ERR_IS_* cases.  I
+>> >> > am trying to improve the 700+ functions that need the
+>> >> > local_err/error_propagate() boilerplate code today.  This series already
+>> >> > handles 346 of them automatically (see patch 14/15).
+>> >> 
+>> >> I agree the goal is reducing error_propagate() boilerplate.  I latched
+>> >> onto the 34 ERR_IS_* cases only because you presented them as examples.
+>> >
+>> > The 34 ERR_IS_* cases were evidence of how easy it is to introduce
+>> > mistakes with the current API.  Probably most of them are instances of
+>> > (1) and (2) below.
+>> 
+>> The current interface can be abused, but how much abuse actually creeps
+>> in?  I think we've been doing reasonably well there since we got rid of
+>> the bad examples and improved documentation.
+>
+> See the 30+ cases touched by patch 09/15.  Except for the ones in
+> error.c, all of them look like bugs to me.
+>
+> I didn't investigate when each of them were introduced, though.
+>
+>> 
+>> Moreover, the revised interface could also be abused.  Nothing stops you
+>> from dereferencing errp before or after, the only thing that changes are
+>> the examples people see in code.  I'm afraid the people who reinvent bad
+>> examples from scratch despite the documentation telling them not to will
+>> also bypass any macros the documentation tells them to use.
+>> 
+>> *Especially* if we use macros only sometimes.  ERR_IS_SET(&err) makes no
+>> sense, so we'd still test err directly there, wouldn't we?
+>
+> Any interface can be abused.  But I still believe a simpler and easier
+> interface for propagating errors is less likely to be abused.
 
-s/invokable/invocable/
+Can you substantiate this claim with examples?  I'm looking for
+arguments like "if existing code looks like $this, people could
+plausibly write $mistake, which is wrong.  If it looks like $that, they
+could still write $related_mistake, but it seems far less likely."
 
-> can only specify strings there. Therefore, specifying a non-string
-> option with the "same" value as it was when originally created will now=
+> But in either case, tools to detect abuse would be welcome.  We can
+> write Coccinelle scripts to detect most abuse of the existing error API.
 
-> return an error because the values are supposedly similar (and there is=
+checkpatch.pl would be nice, too.  It's too stupid for rigorous checks.
+However, the ones you fix in PATCH 09 all involve *errp.  Many of the
+*errp your patch doesn't touch look fishy to me.  Should checkpatch.pl
+warn when it sees *errp in new code?
 
-> no way for the user to circumvent this but to just not specify the
-> option again -- however, this is still strictly better than just
-> crashing).
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  block.c | 31 ++++++++++++++++++-------------
->  1 file changed, 18 insertions(+), 13 deletions(-)
->=20
+> [...]
+>> >> > is fixed because ERR_IS_SET(errp) will work even if errp is NULL.
+>> >> >
+>> >> >> > TODO
+>> >> >> > ----
+>> >> >> >
+>> >> >> > * Simplify more cases of local_error/error_propagate() to use
+>> >> >> >   errp directly.
+>> >> >> > * Update API documentation and code examples.
+>> >> >> > * Add a mechanism to ensure errp is never NULL.
+>> >> >> >
+>> >> >> > Git branch
+>> >> >> > ----------
+>> >> >> >
+>> >> >> > This series depend on a few extra cleanups that I didn't submit
+>> >> >> > to qemu-devel yet.  A git branch including this series is
+>> >> >> > available at:
+>> >> >> >
+>> >> >> >   git://github.com/ehabkost/qemu-hacks.git work/err-api-rework-ignore-ptr-v1
+>> 
+>> I doubt the macros make the bug fixing materially easier, and I doubt
+>> they can reduce future bugs of this kind.  What they can do is letting
+>> us get rid of error_propagate() boilerplate with relative ease.
+>> 
+>> If we switch to returning success/failure (which also gets rid of the
+>> boilerplate), then the macros may still let us get rid of boilerplate
+>> more quickly, for some additional churn.  Worthwhile?  Depends on how
+>> long the return value change takes us.
+>
+> My assumption is that it will take a very long time.
 
-> +            /* TODO: When using -drive to specify blockdev options, al=
-l values
-> +             * will be strings; however, when using -blockdev, blockde=
-v-add or
-> +             * filenames using the json:{} pseudo-protocol, they will =
-be
-> +             * correctly typed.
-> +             * In contrast, reopening options are (currently) always s=
-trings
-> +             * (because you can only specify them through qemu-io; all=
- other
-> +             * callers do not specify any options).
-> +             * Therefore, when using anything other than -drive to cre=
-ate a BDS,
-> +             * this cannot detect non-string options as unchanged, bec=
-ause
-> +             * qobject_is_equal() always returns false for objects of =
-different
-> +             * type.  In the future, this should be remedied by correc=
-tly typing
-> +             * all options.  For now, this is not too big of an issue =
-because
-> +             * the user simply can not specify options which cannot be=
- changed
+"Very long time" would be bad, because unconverted code breeds more
+unconverted code by serving as bad example.
 
-Seeing "can not" usually looks wrong for "cannot"; but here, it is
-grammatically correct.  But better would be "the user can simply not
-specify" or "the user can simply avoid specifying options".
+Big "convert from old way to do things to new way" tasks should only be
+started with a reasonable idea on how to end them.  We've started too
+many such tasks sanguinely, and have had the darndest time ending any
+of them.
 
-> +             * anyway, so they will stay unchanged. */
+I'm investigating ways to automate parts of the job.
 
-The grammar tweak is minor, so:
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---2UKniQ0KHN5K4v29pCR5VTEiaGjw6oU1G
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZWj25AAoJEKeha0olJ0NqUjUH/0B1TY+6Jtgjdf1T1wXAB+Re
-4E3X7F0kxERvL0Uz5rcjNszmnksdymVqaeypq3cZO16/N99VDqD/YO7rOSkUrOmY
-7oNJCTgn1aK8YQ4/f0zvfgDK+AUfARzoq3iir43LrzHoGpNVec3bAcBSmJxq+2ro
-uv+68SlsrQ/iZ9691iyEolrP8eQHJ4U0O6IJ0kroIkN0J4YQ/H+eTdjdctewNj24
-oXz5Pppz9Si7wWVfmwaPrfLz7Up+u64Y000a3Bg1rTBjPelKBgwcWAuHFSaoqy9K
-0H05GFPwi38HLlFpnsj2KDcvIdsGM19kgwhFT2v2uk7EKnBLxuRub2GnmrBbXoE=
-=m1A6
------END PGP SIGNATURE-----
-
---2UKniQ0KHN5K4v29pCR5VTEiaGjw6oU1G--
+>> I think the first order of business is to figure out whether we want to
+>> pursue returning success/failure.
+>
+> OK.  I will reply about that in a separate message.
