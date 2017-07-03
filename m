@@ -1,40 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1dRvPK-0004qA-In
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 03:04:31 -0400
+	(envelope-from <xormaetxea@ikerlan.es>) id 1dRviC-0001Fz-3a
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 03:24:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1dRvPH-0003hm-By
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 03:04:30 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60312)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
-	id 1dRvPH-0003gP-2p
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 03:04:27 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v6373wpN059828
-	for <qemu-devel@nongnu.org>; Mon, 3 Jul 2017 03:04:25 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bf63028pm-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 03:04:24 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
-	Mon, 3 Jul 2017 08:04:22 +0100
-References: <1498829133-20598-1-git-send-email-mihajlov@linux.vnet.ibm.com>
-	<5566d3c2-f791-eab2-cafa-795c96739d8c@redhat.com>
-From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Date: Mon, 3 Jul 2017 09:04:19 +0200
+	(envelope-from <xormaetxea@ikerlan.es>) id 1dRvi7-0006u9-MG
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 03:24:00 -0400
+Received: from ikerlan-12.ikerlan.es ([193.145.247.1]:49679)
+	by eggs.gnu.org with smtp (Exim 4.71)
+	(envelope-from <xormaetxea@ikerlan.es>) id 1dRvi7-0006i0-0m
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 03:23:55 -0400
+From: Ormaetxea Xabier <xormaetxea@ikerlan.es>
+Date: Mon, 3 Jul 2017 07:23:23 +0000
+Message-ID: <B1DA44315104F94D9F3F23C74275EA9D71DB63@Ikerlan-12.ikerlan.es>
+Content-Language: es-ES
 MIME-Version: 1.0
-In-Reply-To: <5566d3c2-f791-eab2-cafa-795c96739d8c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Message-Id: <e2c34fc2-97e0-0a16-c04d-9a039e2d402d@linux.vnet.ibm.com>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] s390: return unavailable features via
- query-cpu-definitions
+Subject: [Qemu-devel] Launching Standalone in QEMU-Microblaze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,115 +25,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, Eduardo Habkost <ehabkost@redhat.com>, jjherne@linux.vnet.ibm.com
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 30.06.2017 18:47, David Hildenbrand wrote:
-> On 30.06.2017 15:25, Viktor Mihajlovski wrote:
->> The response for query-cpu-definitions didn't include the
->> unavailable-features field, which is used by libvirt to figure
->> out whether a certain cpu model is usable on the host.
->>
->> The unavailable features are now computed by obtaining the host CPU
->> model and comparing its feature bitmap with the feature bitmaps of
->> the known CPU models.
->>
->> I.e. the output of virsh domcapabilities would change from
->>  ...
->>      <mode name=3D'custom' supported=3D'yes'>
->>       <model usable=3D'unknown'>z10EC-base</model>
->>       <model usable=3D'unknown'>z9EC-base</model>
->>       <model usable=3D'unknown'>z196.2-base</model>
->>       <model usable=3D'unknown'>z900-base</model>
->>       <model usable=3D'unknown'>z990</model>
->>  ...
->> to
->>  ...
->>      <mode name=3D'custom' supported=3D'yes'>
->>       <model usable=3D'yes'>z10EC-base</model>
->>       <model usable=3D'yes'>z9EC-base</model>
->>       <model usable=3D'no'>z196.2-base</model>
->>       <model usable=3D'yes'>z900-base</model>
->>       <model usable=3D'yes'>z990</model>
->>  ...
->>
->> Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
->> ---
->>  target/s390x/cpu_models.c | 51 ++++++++++++++++++++++++++++++++++++++=
-++++-----
->>  1 file changed, 46 insertions(+), 5 deletions(-)
->>
->> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
->> index 63903c2..dc3371f 100644
->> --- a/target/s390x/cpu_models.c
->> +++ b/target/s390x/cpu_models.c
->> @@ -283,14 +283,43 @@ void s390_cpu_list(FILE *f, fprintf_function pri=
-nt)
->>      }
->>  }
->> =20
->> +static S390CPUModel *get_max_cpu_model(Error **errp);
->> +
->>  #ifndef CONFIG_USER_ONLY
->> +static void list_add_feat(const char *name, void *opaque);
->> +
->> +static void check_unavailable_features(const S390CPUModel *max_model,
->> +                                       const S390CPUModel *model,
->> +                                       strList **unavailable)
->> +{
->> +    S390FeatBitmap missing;
->> +
->> +    /* detect missing features if any to properly report them */
->> +    bitmap_andnot(missing, model->features, max_model->features,
->> +                  S390_FEAT_MAX);
->> +    if (!bitmap_empty(missing, S390_FEAT_MAX)) {
->> +        s390_feat_bitmap_to_ascii(missing,
->> +                                  unavailable,
->> +                                  list_add_feat);
->=20
-> I remember discussing this with Eduardo when he introduced this.
->=20
-> There is one additional case to handle here that might turn a CPU model
-> not runnable. This can happen when trying to run a new CPU model on an
-> old host, where the features are not the problem, but the model itself.
-> E.g. running a GA2 version on a GA1 is not allowed. But this can happen
-> more generally also between hardware generations.
->=20
-> Therefore, whenever the model is never than the host model, we have to
-> add here the special property "type" as missing feature. The
-> documentation partly coveres what we had in mind.>
-> qapi-schema.json:
-> # @unavailable-features is a list of QOM property names that
->=20
-> # represent CPU model attributes that prevent the CPU from running.
->=20
-> # If the QOM property is read-only, that means there's no known
->=20
-> # way to make the CPU model run in the current host. Implementations
->=20
-> # that choose not to provide specific information return the
->=20
-> # property name "type".
->=20
-> We discussed that "type" should always be added if there is no way to
-> make the model runnable (by simply removing features).
-Thanks for the clarification.
-I guess I was reading that too narrow-minded (no specific information vs
-type), although I had the suspicion that features alone wouldn't
-suffice. I will follow the query_cpu_model_comparison pattern and return
-both "type" and the real features.
-> > See check_compatibility() for details. For these cases, add "type" to
-> the list. (you might be able to extend check_compatibility(), making
-> e.g. the *errp and *unavailable parameters optional).
->=20
+Hello!
 
---=20
+I'm trying to run QEMU-Microblaze (Little-endian) with a standalone app in =
+some different ways, but none of them works for me:
 
-Mit freundlichen Gr=C3=BC=C3=9Fen/Kind Regards
-   Viktor Mihajlovski
 
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Martina K=C3=B6deritz
-Gesch=C3=A4ftsf=C3=BChrung: Dirk Wittkopp
-Sitz der Gesellschaft: B=C3=B6blingen
-Registergericht: Amtsgericht Stuttgart, HRB 243294
+1)      I have created my own .DTB from my system design (.HDF), just a mic=
+roblaze connected to the Uartlite AXI, leds, interrupt controller, and a gp=
+io. Using the board support package I've made a simple c-based program (at =
+the end of the message):
+
+Run it with ./qemu-system-microblazeel -M microblaze-fdt-plnx -dtb system-t=
+op.dtb -kernel fibonacci.elf (-s -S)         #(-s -S just to debug it)
+
+Invalid MicroBlaze version number: (null)           #Don't think it's a pro=
+blem
+Bar ram offset 9000528f
+Aborted (core dumped)
+
+
+2)      I use a mb.dtb that I found on the internet. Same c-based program. =
+Run it with the debugger:
+
+./qemu-system-microblazeel -M microblaze-fdt-plnx -dtb mb.dtb -kernel fibon=
+acci.elf (-s -S)
+
+Lets my debug it (doesn't fail booting), but in the first step:
+Bad ram pointer
+
+I suppose this isn't my option cause the .dtb is created for another microb=
+laze-based design.
+
+
+3)      I use the same design (.HDF), but run it for the Spartan 3a dsp 180=
+0 option:
+
+./qemu-system-microblazeel -kernel fibonacci.elf (-s -S)
+
+Runs "properly" -> I mean properly because I can follow on the debugger tha=
+t the steps are correctly made:
+_start -> _start1 -> main -> fibonacci -> xil_printf -> xil_printf ... -> x=
+il_printf -> _exit
+
+But doesn't print nothing. And doesn't write in memory as asked (*addrPtr =
+=3D 0x150) :
+In the qemu shell:
+(qemu) x 0xC0000000
+C0000000: 0x00000000        #When it should be 0x00000150
+
+
+4)      Modifying my system design to be similar to the Spartan board desig=
+n:
+MEMORY_BASEADDR 0x90000000
+FLASH_BASEADDR 0xa0000000
+INTC_BASEADDR 0x81800000
+TIMER_BASEADDR 0x83c00000
+UARTLITE_BASEADDR 0x84000000
+ETHLITE_BASEADDR 0x81000000
+                I get exactly the same result as in the (3) case.
+
+So here they go my questions:
+
+-          Am I doing it right? Is this the method of running a standalone =
+program over a microblaze?
+
+-          How can I make the program print something?
+
+-          Im not sure if the problem is that it doesn't write on memory, o=
+r I am the one who fails reading it from the shell, because if I change the=
+ writing position to (0x84000008, uart status position) I get the error (qe=
+mu: hardware error: write to UART STATUS?) -> that means im writing (or try=
+ing, at least). How can I write on memory (and read after it, so I know it =
+works)?
+
+Thank you in advance! Really appreciate your Job! (I'm sorry if my problem =
+it's a simple one, I'm new at it)
+
+#include <stdio.h>
+#include "platform.h"
+#include "xil_printf.h"
+
+void fibonacci(int d){
+       u32 a=3D1;
+       u32 b=3D0;
+       u32 em=3D0;
+       u32 *addrPtr =3D 0xC0000000;
+
+for(int num=3D0; num<d; num++){
+       for(int i=3D0; i<a; i++){
+       }
+       for(int c=3D0; c<b; c++){
+       }
+       em =3D a+b;
+       xil_printf(em);
+       *addrPtr =3D 0x150;
+       addrPtr+=3D1;
+       b=3Da;
+       a=3Dem;
+       }
+}
+
+
+int main()
+{
+    init_platform();
+    int i=3D35;
+    fibonacci(i);
+    cleanup_platform();
+    return 0;
+}
