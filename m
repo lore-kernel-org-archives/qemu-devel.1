@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dS4Yq-0005mr-TJ
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:50:57 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dS4aL-00071U-8S
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:52:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dS4Yp-00013o-K1
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:50:56 -0400
-Date: Mon, 3 Jul 2017 18:50:47 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170703165047.GB4936@noname.redhat.com>
-References: <20170522211205.14265-1-hpoussin@reactos.org>
+	(envelope-from <ehabkost@redhat.com>) id 1dS4aI-000254-7T
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:52:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60542)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dS4aI-00023o-0q
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:52:26 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E97207CE05
+	for <qemu-devel@nongnu.org>; Mon,  3 Jul 2017 16:52:24 +0000 (UTC)
+Date: Mon, 3 Jul 2017 13:52:18 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170703165218.GM12152@localhost.localdomain>
+References: <1499049848-18012-1-git-send-email-peterx@redhat.com>
+	<1499049848-18012-2-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170522211205.14265-1-hpoussin@reactos.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 00/13] vvfat: misc fixes for read-only
- mode
+In-Reply-To: <1499049848-18012-2-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/4] migration: fix handling for
+ --only-migratable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,36 +34,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Am 22.05.2017 um 23:11 hat Herv=E9 Poussineau geschrieben:
-> Hi,
->=20
-> This patchset fixes some of issues I encountered when trying to use vvf=
-at, and fixes
-> bug #1599539: https://bugs.launchpad.net/qemu/+bug/1599539
->=20
-> Patch 1 fixes a crash when using 'qemu-img convert'.
-> Patches 2 to 6 are code cleanup. No functionnal changes.
-> Patches 7 to 13 fix problems detected by disk checking utilities in rea=
-d-only mode.
->=20
-> With these patches, vvfat creates valid FAT volumes and can be used wit=
-h QEMU disk utilities.
->=20
-> Read-write mode is still buggy after this patchset, but at least, I was=
- not
-> able to crash QEMU anymore.
->=20
-> Note that patch 2 doesn't pass checkpatch.pl, as it changes indentation=
- only.
+On Mon, Jul 03, 2017 at 10:44:05AM +0800, Peter Xu wrote:
+> MigrateState object is not ready at that time, so we'll get an
+> assertion. Use qemu_global_option() instead.
+> 
+> Reported-by: Eduardo Habkost <ehabkost@redhat.com>
+> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+> Fixes: 3df663e ("migration: move only_migratable to MigrationState")
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Thanks, fixed the build error in patch 9 (yet unused variables) and
-applied to the block branch.
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
-There were a few more minor comments for this series, but it has been on
-the list for long enough and I figured that they can be addressed on
-top.
-
-Kevin
+-- 
+Eduardo
