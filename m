@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dS4Ii-0007za-4g
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:34:17 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dS4JU-0008Oa-41
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:35:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dS4If-0006zj-07
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:34:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40368)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dS4Ie-0006yb-Pu
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:34:12 -0400
-Date: Mon, 3 Jul 2017 19:34:07 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170703193026-mutt-send-email-mst@kernel.org>
-References: <1498773362-18675-1-git-send-email-zuban32s@gmail.com>
-	<20170630020622-mutt-send-email-mst@kernel.org>
-	<ec616cb6-f693-76c5-5732-ec6ee7840d9c@redhat.com>
-	<20170703142711.0a1db036@nial.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170703142711.0a1db036@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC 0/6] q35: add acpi pci hotplug support
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dS4JQ-0007HW-Us
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:35:04 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34381)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1dS4JQ-0007H3-Nv
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:35:00 -0400
+Received: by mail-wm0-x243.google.com with SMTP id p204so21563519wmg.1
+	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 09:34:59 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon,  3 Jul 2017 18:34:31 +0200
+Message-Id: <1499099693-22903-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 00/22] add disable-tcg option for x86 build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +25,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Aleksandr Bezzubikov <zuban32s@gmail.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
+To: qemu-devel@nongnu.org
+Cc: rth@twiddle.net, thuth@redhat.com, anthony.xu@intel.com, berrange@redhat.com, a.rigo@virtualopensystems.com, yang.zhong@intel.com
 
-On Mon, Jul 03, 2017 at 02:27:11PM +0200, Igor Mammedov wrote:
-> On Fri, 30 Jun 2017 10:25:05 +0300
-> Marcel Apfelbaum <marcel@redhat.com> wrote:
-> 
-> [...]
-> > 
-> > So for the modern systems not supporting PCI ACPI hotplug
-> > we don't need pci-bridges anyway, but for the older ones
-> > the ACPI code of the pci-bridge will be loaded into the
-> > ACPI namespace only if a pci-bridge is actually hot-plugged.
-> 
-> just note that the set of 'older' guest OSes is limited to
-> one that do not support SHPC (i.e. to EOLed WinXP & co)
-> as for linux and more modern Windows SHPC hotplug should
-> just work without our ACPI hack (which taxes low memory
-> to keep acpi tables for bridges).
-> 
-> So I'm in favor of Michael's suggestion to leave ACPI PCI
-> only in PC machine for old WinXP guests and to keep Q35
-> clean, where linux or newer Windows guests could just
-> use standard SHPC.
-> 
-> [...]
+Most of this series is the same as Yang Zhong's, except for:
 
-I didn't realize windows actually supports SHPC for PCI.
+1) less stubs usage
 
-Do they correctly set _OSC Arg3, bit offset 1?
-	SHPC Native Hot Plug control
-	The OS sets this bit to 1 to request control over PCI/PCI-X Standard Hot-Plug Controller
-	(SHPC) hot plug. If the OS successfully receives control of this feature, it must track and
-	update the status of hot plug slots and handle hot plug events as described in the SHPC
-	Specification.
-I was under impression they only set bit 0.
+2) splitting patch 2 ("vl: add tcg_enabled() for tcg related code") [Thomas]
+
+3) reworked configure [Thomas, Daniel]
+
+Please review!
+
+Paolo
+
+Paolo Bonzini (10):
+  configure: factor out list of supported Xen/KVM/HAX targets
+  configure: early test for supported targets
+  configure: add --disable-tcg configure option
+  vl: convert -tb-size to qemu_strtoul
+  monitor: disable "info jit" and "info opcount" if !TCG
+  vapic: use tcg_enabled
+  tcg: move tb_lock out of translate-all.h
+  exec: elide calls to tb_lock and tb_unlock
+  target/i386: move TLB refill function out of helper.c
+  configure: warn on untested --disable-tcg
+
+Yang Zhong (12):
+  vl: add tcg_enabled() for tcg related code
+  tcg: move page_size_init() function
+  tcg: tcg_handle_interrupt() function
+  tcg: make tcg_allowed global
+  tcg: add the tcg-stub.c file into accel/stubs/
+  tcg: add CONFIG_TCG guards in headers
+  tcg: add the CONFIG_TCG into Makefiles
+  target/i386: move cpu_sync_bndcs_hflags() function
+  target/i386: make cpu_get_fp80()/cpu_set_fp80() static
+  target/i386: split cpu_set_mxcsr() and make cpu_set_fpuc() inline
+  target/i386: add the tcg_enabled() in target/i386/
+  target/i386: add the CONFIG_TCG into Makefiles
+
+ Makefile.target              |   4 +-
+ accel/Makefile.objs          |   2 +-
+ accel/stubs/Makefile.objs    |   1 +
+ accel/stubs/tcg-stub.c       |  22 +++
+ accel/tcg/Makefile.objs      |   2 +-
+ accel/tcg/cpu-exec-common.c  |   2 +
+ accel/tcg/tcg-all.c          |  35 +++-
+ accel/tcg/translate-all.c    |  29 +---
+ accel/tcg/translate-common.c |  56 -------
+ bsd-user/main.c              |   1 -
+ configure                    | 186 ++++++++++++++-------
+ exec.c                       |  23 +++
+ hmp-commands-info.hx         |   4 +
+ hw/i386/kvmvapic.c           |   5 +-
+ include/exec/cpu-defs.h      |   4 +-
+ include/exec/cputlb.h        |   2 +-
+ include/exec/exec-all.h      |  57 ++++---
+ include/exec/helper-proto.h  |   2 +
+ include/qemu-common.h        |   7 +-
+ include/sysemu/accel.h       |   2 +-
+ monitor.c                    |   2 +
+ qom/cpu.c                    |   2 +
+ target/i386/Makefile.objs    |   7 +-
+ target/i386/bpt_helper.c     |  32 ++--
+ target/i386/cpu.c            |   4 +-
+ target/i386/cpu.h            |  28 +++-
+ target/i386/excp_helper.c    | 343 +++++++++++++++++++++++++++++++++++++++
+ target/i386/fpu_helper.c     |  29 +---
+ target/i386/helper.c         | 378 ++++---------------------------------------
+ target/i386/machine.c        |  23 ++-
+ target/i386/mpx_helper.c     |  30 ----
+ tcg/tcg.h                    |   4 -
+ vl.c                         |  14 +-
+ 33 files changed, 735 insertions(+), 607 deletions(-)
+ create mode 100644 accel/stubs/tcg-stub.c
+ delete mode 100644 accel/tcg/translate-common.c
 
 -- 
-MST
+1.8.3.1
