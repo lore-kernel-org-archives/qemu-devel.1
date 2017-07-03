@@ -1,41 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dRySl-0006sA-Es
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:20:16 -0400
+	(envelope-from <berrange@redhat.com>) id 1dRyTT-0007dQ-Sl
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:21:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dRySi-0005EI-90
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:20:15 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60577
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dRySh-0005CQ-TM
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:20:12 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v63AJ3dp054435
-	for <qemu-devel@nongnu.org>; Mon, 3 Jul 2017 06:20:10 -0400
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2beytt50rf-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 06:20:10 -0400
-Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 3 Jul 2017 06:20:10 -0400
-References: <20170703085107.16547-1-haoqf@linux.vnet.ibm.com>
-	<20170703085107.16547-2-haoqf@linux.vnet.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 3 Jul 2017 12:20:03 +0200
+	(envelope-from <berrange@redhat.com>) id 1dRyTQ-000655-2L
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:20:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43218)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dRyTP-00062x-Pv
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:20:55 -0400
+Date: Mon, 3 Jul 2017 11:20:43 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170703102043.GE5663@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1499076743-15477-1-git-send-email-yang.zhong@intel.com>
+	<1499076743-15477-2-git-send-email-yang.zhong@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20170703085107.16547-2-haoqf@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-IE
-Content-Transfer-Encoding: 8bit
-Message-Id: <fee6eaa0-8132-b3ce-bb3e-0a716eb72064@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] virtio-scsi-ccw: use ioeventfd even
- when KVM is disabled
+Content-Disposition: inline
+In-Reply-To: <1499076743-15477-2-git-send-email-yang.zhong@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v2 01/15] configure: add the disable-tcg
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,85 +29,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QingFeng Hao <haoqf@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, zyimin@linux.vnet.ibm.com, famz@redhat.com, peterx@redhat.com, stefanha@redhat.com, Halil Pasic <pasic@linux.vnet.ibm.com>
+To: Yang Zhong <yang.zhong@intel.com>
+Cc: pbonzini@redhat.com, rth@twiddle.net, thuth@redhat.com, anthony.xu@intel.com, qemu-devel@nongnu.org, a.rigo@virtualopensystems.com
 
-On 07/03/2017 10:51 AM, QingFeng Hao wrote:
-> This patch is based on a similar patch from Stefan Hajnoczi -
-> commit c324fd0a39c (" virtio-pci: use ioeventfd even when KVM is disabled)
+On Mon, Jul 03, 2017 at 06:12:09PM +0800, Yang Zhong wrote:
+> Add the disable-tcg option into configure and echo CONFIG_TCG=y into
+> $config_target_mak. The default tcg is enabled for all build, only i386
+> and x86_64 softmmu option can be disabled. This operation do not make
+> big change with the older build command.
 > 
-> Do not check kvm_eventfds_enabled() when KVM is disabled since it
-> always returns 0.  Since commit 8c56c1a592b5092d91da8d8943c17777d6462a6f
-> ("memory: emulate ioeventfd") it has been possible to use ioeventfds in
-> qtest or TCG mode.
+> The new configure build command like below
+> (1)./configure
+>    tcg is defaultly enabled
 > 
-> This patch makes -device virtio-scsi-ccw,iothread=iothread0 work even
-> when KVM is disabled.
+> (2)./configure --disable-tcg --target-list=x86_64-softmmu
+>    tcg is disabled in x86_64-softmmu
 > 
-> I have tested that virtio-scsi-ccw works under tcg both with and without
-> iothread.
+> (3)./configure --disable-tcg --target-list=i386-softmmu
+>    tcg is disabled in i386-softmmu
 > 
-> This patch fixes qemu-iotests 068, which was accidentally merged early
-> despite the dependency on ioeventfd.
+> If the --target-list include other softmmus or user options, the configure
+> command will report error and configure is aborted.
+> The error as:
+> ERROR: The current aarch64-softmmu can't support disable-tcg,
+>     only i386-softmmu|x86_64-softmmu support disable-tcg
+> or
+> ERROR: The user build can't support disable-tcg,
+>     only i386-softmmu|x86_64-softmmu support disable-tcg
 > 
-> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 > ---
->  hw/s390x/virtio-ccw.c | 2 +-
->  target/s390x/kvm.c    | 3 +++
->  2 files changed, 4 insertions(+), 1 deletion(-)
+>  configure | 43 ++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 42 insertions(+), 1 deletion(-)
 > 
-> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-> index 90d37cb9ff..35896eb007 100644
-> --- a/hw/s390x/virtio-ccw.c
-> +++ b/hw/s390x/virtio-ccw.c
-> @@ -711,7 +711,7 @@ static void virtio_ccw_device_realize(VirtioCcwDevice *dev, Error **errp)
->          sch->cssid, sch->ssid, sch->schid, sch->devno,
->          ccw_dev->devno.valid ? "user-configured" : "auto-configured");
-> 
-> -    if (!kvm_eventfds_enabled()) {
-> +    if (kvm_enabled() && !kvm_eventfds_enabled()) {
->          dev->flags &= ~VIRTIO_CCW_FLAG_USE_IOEVENTFD;
->      }
-> 
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index a3d00196f4..c37f9c3b9e 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -2220,6 +2220,9 @@ int kvm_s390_assign_subch_ioeventfd(EventNotifier *notifier, uint32_t sch,
->          .addr = sch,
->          .len = 8,
->      };
-> +    if (!kvm_enabled()) {
-> +        return 0;
-> +    }
+> diff --git a/configure b/configure
+> index c571ad1..61ce514 100755
+> --- a/configure
+> +++ b/configure
+> @@ -224,6 +224,7 @@ cap_ng=""
+>  attr=""
+>  libattr=""
+>  xfs=""
+> +tcg="yes"
+>  
+>  vhost_net="no"
+>  vhost_scsi="no"
+> @@ -953,6 +954,10 @@ for opt do
+>    ;;
+>    --enable-hax) hax="yes"
+>    ;;
+> +  --disable-tcg) tcg="no"
+> +  ;;
+> +  --enable-tcg) tcg="yes"
+> +  ;;
+>    --disable-tcg-interpreter) tcg_interpreter="no"
+>    ;;
+>    --enable-tcg-interpreter) tcg_interpreter="yes"
+> @@ -1715,6 +1720,24 @@ case " $target_list " in
+>    ;;
+>  esac
+>  
+> +if test "$tcg" = "no"; then
+> +   for target in $target_list; do
+> +      if test "$softmmu" = "yes"; then
+> +        case $target in
+> +           i386-softmmu|x86_64-softmmu)
+> +           ;;
+> +        *)
+> +           error_exit "The current $target can't support disable-tcg,"\
+> +              "only i386-softmmu|x86_64-softmmu support disable-tcg"
+> +           ;;
 
-thinking more about it. wouldnt it be better to do something like this instead
+This looks too simplistic in its logic.
 
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 058ddad..cc47831 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -1240,7 +1240,11 @@ static inline int s390_assign_subch_ioeventfd(EventNotifier *notifier,
-                                               uint32_t sch_id, int vq,
-                                               bool assign)
- {
--    return kvm_s390_assign_subch_ioeventfd(notifier, sch_id, vq, assign);
-+    if (kvm_enabled()) {
-+        return kvm_s390_assign_subch_ioeventfd(notifier, sch_id, vq, assign);
-+    } else {
-+        return 0;
-+    }
- }
- 
- static inline void s390_crypto_reset(void)
+You can disable TCG, if-and-only-if the system emulator supports KVM.
 
+KVM is supported on many architectures, not only x86-64 & i386.
 
-FWIW, it seems that we (s390) do not have a functional equivalent function as commit
-8c56c1a592b5092d91da8d8943c17777d6462a6f ("memory: emulate ioeventfd") , so we will
-not use the iothreads. 
+KVM is only supported if the guest emulator architecture matches the
+host build target architecture.
 
+ie if you are building an x86_64 system emulator on a PPC64 host,
+then you can't disable TCG.
 
->      if (!kvm_check_extension(kvm_state, KVM_CAP_IOEVENTFD)) {
->          return -ENOSYS;
->      }
-> 
+So this needs rewriting to *not* special case x86_64 / i386. Instead
+you need to compare & match build target / system emulator architectures,
+across all architectures supporting KVM.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
