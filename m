@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dS4Jl-0000JM-UC
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dS4Jl-0000JP-Uw
 	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:35:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dS4Jk-0007ca-1J
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dS4Ji-0007c7-Pn
 	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:35:21 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:36327)
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:33891)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dS4Jj-0007cJ-Qj
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:35:19 -0400
-Received: by mail-wr0-x243.google.com with SMTP id 77so45152867wrb.3
-	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 09:35:19 -0700 (PDT)
+	id 1dS4Ji-0007ba-Js
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:35:18 -0400
+Received: by mail-wr0-x241.google.com with SMTP id k67so45051580wrc.1
+	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 09:35:18 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  3 Jul 2017 18:34:36 +0200
-Message-Id: <1499099693-22903-6-git-send-email-pbonzini@redhat.com>
+Date: Mon,  3 Jul 2017 18:34:35 +0200
+Message-Id: <1499099693-22903-5-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1499099693-22903-1-git-send-email-pbonzini@redhat.com>
 References: <1499099693-22903-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 05/22] vl: add tcg_enabled() for tcg related
- code
+Subject: [Qemu-devel] [PATCH 04/22] vl: convert -tb-size to qemu_strtoul
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +30,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: rth@twiddle.net, thuth@redhat.com, anthony.xu@intel.com, berrange@redhat.com, a.rigo@virtualopensystems.com, yang.zhong@intel.com
 
-From: Yang Zhong <yang.zhong@intel.com>
-
-Need to disable the tcg related code in the vl.c if the
-disable-tcg option is added into ./configure command.
-
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- vl.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ accel/tcg/tcg-all.c    | 2 +-
+ include/sysemu/accel.h | 2 +-
+ vl.c                   | 6 +++---
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
+diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
+index dba9931..e327d90 100644
+--- a/accel/tcg/tcg-all.c
++++ b/accel/tcg/tcg-all.c
+@@ -28,7 +28,7 @@
+ #include "sysemu/sysemu.h"
+ #include "qom/object.h"
+ 
+-int tcg_tb_size;
++unsigned long tcg_tb_size;
+ static bool tcg_allowed = true;
+ 
+ static int tcg_init(MachineState *ms)
+diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
+index ecc5c84..5a632ce 100644
+--- a/include/sysemu/accel.h
++++ b/include/sysemu/accel.h
+@@ -63,7 +63,7 @@ typedef struct AccelClass {
+ #define ACCEL_GET_CLASS(obj) \
+     OBJECT_GET_CLASS(AccelClass, (obj), TYPE_ACCEL)
+ 
+-extern int tcg_tb_size;
++extern unsigned long tcg_tb_size;
+ 
+ void configure_accelerator(MachineState *ms);
+ /* Register accelerator specific global properties */
 diff --git a/vl.c b/vl.c
-index 611ddfe..1ca6e8f 100644
+index 36ff3f4..611ddfe 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -3933,6 +3933,10 @@ int main(int argc, char **argv, char **envp)
+@@ -3933,9 +3933,9 @@ int main(int argc, char **argv, char **envp)
                  configure_rtc(opts);
                  break;
              case QEMU_OPTION_tb_size:
-+                if (!tcg_enabled()) {
-+                    error_report("TCG is disabled");
+-                tcg_tb_size = strtol(optarg, NULL, 0);
+-                if (tcg_tb_size < 0) {
+-                    tcg_tb_size = 0;
++                if (qemu_strtoul(optarg, NULL, 0, &tcg_tb_size) < 0) {
++                    error_report("Invalid argument to -tb-size");
 +                    exit(1);
-+                }
-                 if (qemu_strtoul(optarg, NULL, 0, &tcg_tb_size) < 0) {
-                     error_report("Invalid argument to -tb-size");
-                     exit(1);
-@@ -4481,7 +4485,9 @@ int main(int argc, char **argv, char **envp)
-         qemu_opts_del(icount_opts);
-     }
- 
--    qemu_tcg_configure(accel_opts, &error_fatal);
-+    if (tcg_enabled()) {
-+        qemu_tcg_configure(accel_opts, &error_fatal);
-+    }
- 
-     if (default_net) {
-         QemuOptsList *net = qemu_find_opts("net");
+                 }
+                 break;
+             case QEMU_OPTION_icount:
 -- 
 1.8.3.1
