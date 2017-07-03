@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dS49k-0003cP-6s
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:25:01 -0400
+	(envelope-from <mst@redhat.com>) id 1dS49x-0003rm-Ef
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:25:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dS49e-0001D7-3H
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:25:00 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:61000)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dS49d-0001Ca-O0
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:24:54 -0400
-References: <20170629190405.1748-1-laurent@vivier.eu>
-	<CAAdtpL5Zm6OX=FLAku_gcVyukQCrw5qhFDX9rcchOkEPr6yFCQ@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <311526ac-92dc-f460-fd2b-b1cba1c1df2e@vivier.eu>
-Date: Mon, 3 Jul 2017 18:24:38 +0200
+	(envelope-from <mst@redhat.com>) id 1dS49u-0001KL-9F
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:25:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60358)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dS49u-0001JM-3E
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:25:10 -0400
+Date: Mon, 3 Jul 2017 19:25:07 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170703192353-mutt-send-email-mst@kernel.org>
+References: <20170424105344.GF2362@work-vm>
+	<75a4c5ff-385e-31ac-5f86-883b082cd94e@de.ibm.com>
+	<20170424143516.GD2075@work-vm>
+	<5c0608dd-ba22-dc09-71a1-bb95c977f77d@de.ibm.com>
+	<20170424191202.GQ2362@work-vm>
+	<097a5085-1128-cf2d-abc4-54660a608f36@de.ibm.com>
+	<20170426110144.GF2098@work-vm>
+	<cbf8c55d-9473-9f6f-eb89-779afe7c1fd2@de.ibm.com>
+	<cec279c5-9900-ca28-103b-b95c36d9d989@de.ibm.com>
+	<20170630163139.GC2437@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <CAAdtpL5Zm6OX=FLAku_gcVyukQCrw5qhFDX9rcchOkEPr6yFCQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] softfloat: define floatx80_default_inf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170630163139.GC2437@work-vm>
+Subject: Re: [Qemu-devel] postcopy migration hangs while loading virtio state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,18 +35,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philippe@mathieu-daude.net>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, thuth@redhat.com
 
-Le 29/06/2017 à 21:15, Philippe Mathieu-Daudé a écrit :
-> On Thu, Jun 29, 2017 at 4:04 PM, Laurent Vivier <laurent@vivier.eu> wrote:
->> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+On Fri, Jun 30, 2017 at 05:31:39PM +0100, Dr. David Alan Gilbert wrote:
+> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
+> > On 04/26/2017 01:45 PM, Christian Borntraeger wrote:
+> > 
+> > >> Hmm, I have a theory, if the flags field has bit 1 set, i.e. RAM_SAVE_FLAG_COMPRESS
+> > >> then try changing ram_handle_compressed to always do the memset.
+> > > 
+> > > FWIW, changing ram_handle_compressed to always memset makes the problem go away.
+> > 
+> > It is still running fine now with the "always memset change"
 > 
-> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Did we ever nail down a fix for this; as I remember Andrea said
+> we shouldn't need to do that memset, but we came to the conclusion
+> it was something specific to how s390 protection keys worked.
 > 
+> Dave
 
-I've sent an updated version of this patch in my series "target/m68k:
-implement 680x0 FPU (part 3)".
+No we didn't. Let's merge that for now, with a comment that
+we don't really understand what's going on?
 
-Thanks,
-Laurent
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
