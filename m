@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dRzfj-0001Va-8f
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:37:44 -0400
+	(envelope-from <tgolembi@redhat.com>) id 1dRzfn-0001ZO-Sb
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:37:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dRzfi-0002vs-Bt
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:37:43 -0400
-References: <1497360677-4780-1-git-send-email-eric.auger@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <8d9934e2-efab-c7c6-da3a-31749a031f31@redhat.com>
-Date: Mon, 3 Jul 2017 13:37:26 +0200
+	(envelope-from <tgolembi@redhat.com>) id 1dRzfi-0002wK-V4
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:37:47 -0400
+Received: from mail-wm0-f53.google.com ([74.125.82.53]:35314)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1dRzfi-0002vN-Ly
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:37:42 -0400
+Received: by mail-wm0-f53.google.com with SMTP id w126so165560670wme.0
+	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 04:37:42 -0700 (PDT)
+Date: Mon, 3 Jul 2017 13:37:38 +0200
+From: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
+Message-ID: <20170703133738.6e6bd346@fiorina>
+In-Reply-To: <CAJ+F1CJdDYtPNZXNjs6cesKg1iL7mCEPgx01WSc3RPwL5CcZ6A@mail.gmail.com>
+References: <cover.1498771584.git.tgolembi@redhat.com>
+	<a01ca468294eba398bbaa1dfdec7fb07903df586.1498771584.git.tgolembi@redhat.com>
+	<CAJ+F1CJdDYtPNZXNjs6cesKg1iL7mCEPgx01WSc3RPwL5CcZ6A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1497360677-4780-1-git-send-email-eric.auger@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] Generic PCIe host bridge INTx
- determination for INTx routing
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 3/3] test-qga: add test for
+ guest-get-osinfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,51 +31,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, peter.maydell@linaro.org, alex.williamson@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: christoffer.dall@linaro.org, agraf@suse.de, pranavkumar@linaro.org, drjones@redhat.com, wei@redhat.com
+To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@gmail.com>
+Cc: Eric Blake <eblake@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>, qemu-devel@nongnu.org
 
-Hi,
+Uh, sorry. I will resend in a minute.
 
-On 13/06/2017 15:31, Eric Auger wrote:
-> This series implements INTx to gsi routing for ARM VIRT/GPEX. This is
-> a respin of [1] which was lost in limbo.
-> 
-> ARM virt uses GPEX PCIe bridge. This latter does not implement INTx
-> to GSI routing. PCIe/INTx assignment works but the consequence is
-> irqfd is not used along with INTx interrupts and VFIO INTx handlers
-> are executed on userspace leading to an important performance degradation.
-> 
-> This issue is witnessed by the following messages;
-> 
-> qemu-system-aarch64: -device vfio-pci,host=0006:90:00.0: PCI: Bug -
-> unimplemented PCI INTx routing (gpex-pcihost)
-> qemu-system-aarch64: PCI: Bug - unimplemented PCI INTx routing (gpex-pcihost)
-> qemu-system-aarch64: PCI: Bug - unimplemented PCI INTx routing (gpex-pcihost)
-> 
-> So with this series, irqfd is set up for PCIe/INTx passthrough and we get
-> the optimal performance. Also we get rid of the above messages.
+    Tomas
 
-Ping? any feedback on this series that fixes irqfd setup for PCIe
-passthrough/ARM with legacy interrupts?
+On Fri, 30 Jun 2017 13:48:41 +0000
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
 
-Thanks
+> Hi,
+>=20
+> It's missing test-qga-os-release :)
+>=20
+> On Thu, Jun 29, 2017 at 11:27 PM Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgole=
+mbi@redhat.com>
+> wrote:
+>=20
+> > Add test for guest-get-osinfo command.
+> >
+> > Qemu-ga was modified to accept QGA_OS_RELEASE environment variable. If
+> > the variable is defined it is interpreted as path to the os-release file
+> > and it is parsed instead of the default paths.
+> >
+> > Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+> > ---
+> >  qga/commands-posix.c | 13 ++++++++++---
+> >  tests/test-qga.c     | 53
+> > ++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  2 files changed, 63 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+> > index 2406518d47..f6ce8dd583 100644
+> > --- a/qga/commands-posix.c
+> > +++ b/qga/commands-posix.c
+> > @@ -2683,9 +2683,16 @@ GuestOSInfo *qmp_guest_get_osinfo(Error **errp)
+> >      info->kernel_release =3D g_strdup(kinfo.release);
+> >      info->machine_hardware =3D g_strdup(kinfo.machine);
+> >
+> > -    GKeyFile *osrelease =3D ga_parse_osrelease("/etc/os-release");
+> > -    if (osrelease =3D=3D NULL) {
+> > -        osrelease =3D ga_parse_osrelease("/usr/lib/os-release");
+> > +    GKeyFile *osrelease =3D NULL;
+> > +
+> > +    const char *qga_os_release =3D g_getenv("QGA_OS_RELEASE");
+> > +    if (qga_os_release !=3D NULL) {
+> > +        osrelease =3D ga_parse_osrelease(qga_os_release);
+> > +    } else {
+> > +        osrelease =3D ga_parse_osrelease("/etc/os-release");
+> > +        if (osrelease =3D=3D NULL) {
+> > +            osrelease =3D ga_parse_osrelease("/usr/lib/os-release");
+> > +        }
+> >      }
+> >
+> >      if (osrelease !=3D NULL) {
+> > diff --git a/tests/test-qga.c b/tests/test-qga.c
+> > index 631b98639a..b9160708a0 100644
+> > --- a/tests/test-qga.c
+> > +++ b/tests/test-qga.c
+> > @@ -936,6 +936,58 @@ static void test_qga_guest_exec_invalid(gconstpoin=
+ter
+> > fix)
+> >      QDECREF(ret);
+> >  }
+> >
+> > +static void test_qga_guest_get_osinfo(gconstpointer data)
+> > +{
+> > +    TestFixture fixture;
+> > +    const gchar *str;
+> > +    gchar *cwd, *env[2];
+> > +    QDict *ret, *val;
+> > +
+> > +    cwd =3D g_get_current_dir();
+> > +    env[0] =3D
+> > g_strdup_printf("QGA_OS_RELEASE=3D%s%ctests%cdata%ctest-qga-os-release",
+> > +                             cwd, G_DIR_SEPARATOR, G_DIR_SEPARATOR,
+> > G_DIR_SEPARATOR);
+> > +    env[1] =3D NULL;
+> > +    g_free(cwd);
+> > +    fixture_setup(&fixture, NULL, env);
+> > +
+> > +    ret =3D qmp_fd(fixture.fd, "{'execute': 'guest-get-osinfo'}");
+> > +    g_assert_nonnull(ret);
+> > +    qmp_assert_no_error(ret);
+> > +
+> > +    val =3D qdict_get_qdict(ret, "return");
+> > +
+> > +    str =3D qdict_get_try_str(val, "id");
+> > +    g_assert_nonnull(str);
+> > +    g_assert_cmpstr(str, =3D=3D, "qemu-ga-test");
+> > +
+> > +    str =3D qdict_get_try_str(val, "name");
+> > +    g_assert_nonnull(str);
+> > +    g_assert_cmpstr(str, =3D=3D, "QEMU-GA");
+> > +
+> > +    str =3D qdict_get_try_str(val, "pretty-name");
+> > +    g_assert_nonnull(str);
+> > +    g_assert_cmpstr(str, =3D=3D, "QEMU Guest Agent test");
+> > +
+> > +    str =3D qdict_get_try_str(val, "version");
+> > +    g_assert_nonnull(str);
+> > +    g_assert_cmpstr(str, =3D=3D, "Test 1");
+> > +
+> > +    str =3D qdict_get_try_str(val, "version-id");
+> > +    g_assert_nonnull(str);
+> > +    g_assert_cmpstr(str, =3D=3D, "1");
+> > +
+> > +    str =3D qdict_get_try_str(val, "variant");
+> > +    g_assert_nonnull(str);
+> > +    g_assert_cmpstr(str, =3D=3D, "Unit test \"'$`\\ and \\\\ etc.");
+> > +
+> > +    str =3D qdict_get_try_str(val, "variant-id");
+> > +    g_assert_nonnull(str);
+> > +    g_assert_cmpstr(str, =3D=3D, "unit-test");
+> > +
+> > +    QDECREF(ret);
+> > +    g_free(env[0]);
+> > +}
+> > +
+> >  int main(int argc, char **argv)
+> >  {
+> >      TestFixture fix;
+> > @@ -972,6 +1024,7 @@ int main(int argc, char **argv)
+> >      g_test_add_data_func("/qga/guest-exec", &fix, test_qga_guest_exec);
+> >      g_test_add_data_func("/qga/guest-exec-invalid", &fix,
+> >                           test_qga_guest_exec_invalid);
+> > +    g_test_add_data_func("/qga/guest-get-osinfo", &fix,
+> > test_qga_guest_get_osinfo);
+> >
+> >      if (g_getenv("QGA_TEST_SIDE_EFFECTING")) {
+> >          g_test_add_data_func("/qga/fsfreeze-and-thaw", &fix,
+> > --
+> > 2.13.1
+> >
+> > -- =20
+> Marc-Andr=C3=A9 Lureau
 
-Eric
-> 
-> This series can be found at:
-> https://github.com/eauger/qemu/tree/v2.9-gpex-intx-v3
-> 
-> References:
-> [1] Generic PCIe host bridge INTx determination for INTx routing
->    https://lists.gnu.org/archive/html/qemu-devel/2015-09/msg04975.html
-> 
-> Pranavkumar Sawargaonkar (3):
->   hw/pci-host/gpex: Set INTx index/gsi mapping
->   hw/arm/virt: Set INTx/gsi mapping
->   hw/pci-host/gpex: Implement PCI INTx routing
-> 
->  hw/arm/virt.c              |  4 ++++
->  hw/pci-host/gpex.c         | 22 ++++++++++++++++++++++
->  include/hw/pci-host/gpex.h |  3 +++
->  3 files changed, 29 insertions(+)
-> 
+
+--=20
+Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
