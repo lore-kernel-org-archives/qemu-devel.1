@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dRzk5-0005T4-15
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:42:13 -0400
+	(envelope-from <mihajlov@de.ibm.com>) id 1dRzqg-0000pV-6y
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:49:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dRzk0-0005Ie-40
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:42:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59184)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dRzjz-0005IG-PG
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:42:08 -0400
-References: <1499068251-6164-1-git-send-email-mihajlov@linux.vnet.ibm.com>
-	<83e957bb-6064-e769-6ada-3846cbd77059@redhat.com>
-	<0e91b7e7-5301-8b55-261c-bc4b822f82f7@linux.vnet.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <14f79ebc-09bc-cbb2-537c-f2c8f1c55763@redhat.com>
-Date: Mon, 3 Jul 2017 13:42:04 +0200
-MIME-Version: 1.0
-In-Reply-To: <0e91b7e7-5301-8b55-261c-bc4b822f82f7@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] s390: return unavailable features via
+	(envelope-from <mihajlov@de.ibm.com>) id 1dRzqb-0000R5-AJ
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:49:02 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43054)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mihajlov@de.ibm.com>) id 1dRzqb-0000QH-08
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:48:57 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v63BmpN6144723
+	for <qemu-devel@nongnu.org>; Mon, 3 Jul 2017 07:48:55 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bfc034nnp-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 07:48:54 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mihajlov@de.ibm.com>;
+	Mon, 3 Jul 2017 12:48:52 +0100
+From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Date: Mon,  3 Jul 2017 13:48:49 +0200
+Message-Id: <1499082529-16970-1-git-send-email-mihajlov@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v3] s390: return unavailable features via
  query-cpu-definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,48 +35,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, jjherne@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, jjherne@linux.vnet.ibm.com, david@redhat.com
 
+The response for query-cpu-definitions didn't include the
+unavailable-features field, which is used by libvirt to figure
+out whether a certain cpu model is usable on the host.
 
->> Wonder if we should declare all these prototypes at the beginning of the
->> file.
->>
-> Don't know either. Looking around in QEMU, forward declarations for
-> static functions seem to be used sparsely (only when needed). I could
-> have reordered the functions to get around without forward decls but
-> this would have obscured the change. Maybe defer and clean up in a
-> general cleanup/refactoring?
+The unavailable features are now computed by obtaining the host CPU
+model and comparing it against the known CPU models. The comparison
+takes into account the generation, the GA level and the feature
+bitmaps. In the case of a CPU generation/GA level mismatch
+a feature called "type" is reported to be missing.
 
-Yes, fine with me!
-[...]
+As a result, the output of virsh domcapabilities would change
+from something like
+ ...
+     <mode name='custom' supported='yes'>
+      <model usable='unknown'>z10EC-base</model>
+      <model usable='unknown'>z9EC-base</model>
+      <model usable='unknown'>z196.2-base</model>
+      <model usable='unknown'>z900-base</model>
+      <model usable='unknown'>z990</model>
+ ...
+to
+ ...
+     <mode name='custom' supported='yes'>
+      <model usable='yes'>z10EC-base</model>
+      <model usable='yes'>z9EC-base</model>
+      <model usable='no'>z196.2-base</model>
+      <model usable='yes'>z900-base</model>
+      <model usable='yes'>z990</model>
+ ...
 
->>
->> Hmmmm, if this function fails, we will create the same error multiple
->> times (as there is no way to stop this function from iterating). And we
->> will fail to create a cpu model list in case there is no host cpu model,
->> which is a change in behavior (as we will report an error).
->>
->> Would it be better to simply get the max model in
->> arch_query_cpu_definitions() and pass it via CpuDefinitionInfoListData,
->> instead of the errp variable?Simplifies things, I like it.
->>
->> Then you could simply skip the checks and set
->> info->has_unavailable_features = false in case there is no max model
->> (get_max_cpu_model() returned NULL / an error). (same behavior as for now)
->>
->> Errors from get_max_cpu_model() then should be ignored and not reported.
->>
-> Just to be sure: you suggest that I should call error_free() after
-> calling get_max_cpu_model, in order to prevent that the QMP command
-> query-cpu-definitions fails, right?
+Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+---
+v1 -> v2:
+ Account for model generation and GA level, not only on features.
+v2 -> v3:
+ Prevent repetitive failures by calling get_max_cpu_model only once.
+ Ignore get_max_cpu_model failures in query_cpu_definitions in order
+ return CPU models even if the host CPU model is not available.
 
-That would be my suggestion simply don't provide runability information,
-if we can't tell (because the max model is not available - e.g. with old
-KVM versions without complete CPU model support), hiding the error.
+ target/s390x/cpu_models.c | 62 +++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 57 insertions(+), 5 deletions(-)
 
+diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+index 63903c2..7cb55dc 100644
+--- a/target/s390x/cpu_models.c
++++ b/target/s390x/cpu_models.c
+@@ -283,10 +283,41 @@ void s390_cpu_list(FILE *f, fprintf_function print)
+     }
+ }
+ 
++static S390CPUModel *get_max_cpu_model(Error **errp);
++
+ #ifndef CONFIG_USER_ONLY
++static void list_add_feat(const char *name, void *opaque);
++
++static void check_unavailable_features(const S390CPUModel *max_model,
++                                       const S390CPUModel *model,
++                                       strList **unavailable)
++{
++    S390FeatBitmap missing;
++
++    /* check general model compatibility */
++    if (max_model->def->gen < model->def->gen ||
++        (max_model->def->gen == model->def->gen &&
++         max_model->def->ec_ga < model->def->ec_ga)) {
++        list_add_feat("type", unavailable);
++    }
++
++    /* detect missing features if any to properly report them */
++    bitmap_andnot(missing, model->features, max_model->features,
++                  S390_FEAT_MAX);
++    if (!bitmap_empty(missing, S390_FEAT_MAX)) {
++        s390_feat_bitmap_to_ascii(missing, unavailable, list_add_feat);
++    }
++}
++
++struct CpuDefinitionInfoListData {
++    CpuDefinitionInfoList *list;
++    S390CPUModel *model;
++};
++
+ static void create_cpu_model_list(ObjectClass *klass, void *opaque)
+ {
+-    CpuDefinitionInfoList **cpu_list = opaque;
++    struct CpuDefinitionInfoListData *cpu_list_data = opaque;
++    CpuDefinitionInfoList **cpu_list = &cpu_list_data->list;
+     CpuDefinitionInfoList *entry;
+     CpuDefinitionInfo *info;
+     char *name = g_strdup(object_class_get_name(klass));
+@@ -300,7 +331,19 @@ static void create_cpu_model_list(ObjectClass *klass, void *opaque)
+     info->migration_safe = scc->is_migration_safe;
+     info->q_static = scc->is_static;
+     info->q_typename = g_strdup(object_class_get_name(klass));
+-
++    /* check for unavailable features */
++    if (cpu_list_data->model) {
++        Object *obj;
++        S390CPU *sc;
++        obj = object_new(object_class_get_name(klass));
++        sc = S390_CPU(obj);
++        if (sc->model) {
++            info->has_unavailable_features = true;
++            check_unavailable_features(cpu_list_data->model, sc->model,
++                                       &info->unavailable_features);
++        }
++        object_unref(obj);
++    }
+ 
+     entry = g_malloc0(sizeof(*entry));
+     entry->value = info;
+@@ -310,11 +353,20 @@ static void create_cpu_model_list(ObjectClass *klass, void *opaque)
+ 
+ CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
+ {
+-    CpuDefinitionInfoList *list = NULL;
++    struct CpuDefinitionInfoListData list_data = {
++        .list = NULL,
++    };
++
++    list_data.model = get_max_cpu_model(errp);
++    if (*errp) {
++        error_free(*errp);
++        *errp = NULL;
++    }
+ 
+-    object_class_foreach(create_cpu_model_list, TYPE_S390_CPU, false, &list);
++    object_class_foreach(create_cpu_model_list, TYPE_S390_CPU, false,
++                         &list_data);
+ 
+-    return list;
++    return list_data.list;
+ }
+ 
+ static void cpu_model_from_info(S390CPUModel *model, const CpuModelInfo *info,
 -- 
-
-Thanks,
-
-David
+1.9.1
