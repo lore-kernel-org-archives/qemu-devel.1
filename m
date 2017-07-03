@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56249)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dS32o-0000ik-2c
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 11:13:47 -0400
+	(envelope-from <haozhong.zhang@intel.com>) id 1dS3D0-0000sE-Iu
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 11:24:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dS32m-0001Zd-TM
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 11:13:46 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37402)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dS32m-0001Wz-Hs
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 11:13:44 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  3 Jul 2017 16:13:32 +0100
-Message-Id: <1499094812-13239-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] include/hw/ptimer.h: Add documentation comments
+	(envelope-from <haozhong.zhang@intel.com>) id 1dS3Cy-0007ZP-0K
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 11:24:18 -0400
+Received: from mga04.intel.com ([192.55.52.120]:26935)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1dS3Cx-0007YR-OH
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 11:24:15 -0400
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Date: Mon,  3 Jul 2017 23:23:38 +0800
+Message-Id: <20170703152338.20024-1-haozhong.zhang@intel.com>
+Subject: [Qemu-devel] [PATCH] i386/kvm: mask MSR_IA32_BNDCFGS if MPX is not
+ enabled in guest cpuid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,166 +23,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: patches@linaro.org
+To: qemu-devel@nongnu.org
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>
 
-Add documentation comments describing the public API of the
-ptimer countdown timer.
+Otherwise, QEMU on a host with MPX support will try to set guest
+MSR_IA32_BNDCFGS although guest MPX is not enabled, and result in
+abort.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+For example,
+   qemu-system-x86_64 -enable-kvm -cpu qemu64,-mpx ...
+aborts with messages:
+   qemu-system-x86_64: error: failed to set MSR 0xd90 to 0x0
+   qemu-system-x86_64: /root/qemu.git/target/i386/kvm.c:1832: kvm_put_msrs: Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed
+
+Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
 ---
-I was trying to write a timer device and discovered that the ptimer
-API wasn't actually documented, so I wrote some basic notes for it...
+ target/i386/kvm.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
- include/hw/ptimer.h | 120 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 120 insertions(+)
-
-diff --git a/include/hw/ptimer.h b/include/hw/ptimer.h
-index eafc3f0..fc4ef5c 100644
---- a/include/hw/ptimer.h
-+++ b/include/hw/ptimer.h
-@@ -12,6 +12,20 @@
- #include "qemu/timer.h"
- #include "migration/vmstate.h"
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index ee36502789..7b3a310a31 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -943,6 +943,11 @@ int kvm_arch_init_vcpu(CPUState *cs)
+         has_msr_mcg_ext_ctl = has_msr_feature_control = true;
+     }
  
-+/* The ptimer API implements a simple periodic countdown timer.
-+ * The countdown timer has a value (which can be read and written via
-+ * ptimer_get_count() and ptimer_set_count()). When it is enabled
-+ * using ptimer_run(), the value will count downwards at the frequency
-+ * which has been configured using ptimer_set_period() or ptimer_set_freq().
-+ * When it reaches zero it will trigger a QEMU bottom half handler, and
-+ * can be set to either reload itself from a specified limit value
-+ * and keep counting down, or to stop (as a one-shot timer).
-+ *
-+ * Forgetting to set the period/frequency (or setting it to zero) is a
-+ * bug in the QEMU device and will cause warning messages to be printed
-+ * to stderr when the guest attempts to enable the timer.
-+ */
++    if (has_msr_bndcfgs) {
++        c = cpuid_find_entry(&cpuid_data.cpuid, 7, 0);
++        has_msr_bndcfgs = c && (c->ebx & CPUID_7_0_EBX_MPX);
++    }
 +
- /* The default ptimer policy retains backward compatibility with the legacy
-  * timers. Custom policies are adjusting the default one. Consider providing
-  * a correct policy for your timer.
-@@ -59,15 +73,121 @@
- typedef struct ptimer_state ptimer_state;
- typedef void (*ptimer_cb)(void *opaque);
- 
-+/**
-+ * ptimer_init - Allocate and return a new ptimer
-+ * @bh: QEMU bottom half which is run on timer expiry
-+ * @policy: PTIMER_POLICY_* bits specifying behaviour
-+ *
-+ * The ptimer returned must be freed using ptimer_free().
-+ * The ptimer takes ownership of @bh and will delete it
-+ * when the ptimer is eventually freed.
-+ */
- ptimer_state *ptimer_init(QEMUBH *bh, uint8_t policy_mask);
-+
-+/**
-+ * ptimer_free - Free a ptimer
-+ * @s: timer to free
-+ *
-+ * Free a ptimer created using ptimer_init() (including
-+ * deleting the bottom half which it is using).
-+ */
- void ptimer_free(ptimer_state *s);
-+
-+/**
-+ * ptimer_set_period - Set counter increment interval in nanoseconds
-+ * @s: ptimer to configure
-+ * @period: period of the counter in nanoseconds
-+ *
-+ * Note that if your counter behaviour is specified as having a
-+ * particular frequency rather than a period then ptimer_set_freq()
-+ * may be more appropriate.
-+ */
- void ptimer_set_period(ptimer_state *s, int64_t period);
-+
-+/**
-+ * ptimer_set_freq - Set counter frequency in Hz
-+ * @s: ptimer to configure
-+ * @freq: counter frequency in Hz
-+ *
-+ * This does the same thing as ptimer_set_period(), so you only
-+ * need to call one of them. If the counter behaviour is specified
-+ * as setting the frequency then this function is more appropriate,
-+ * because it allows specifying an effective period which is
-+ * precise to fractions of a nanosecond, avoiding rounding errors.
-+ */
- void ptimer_set_freq(ptimer_state *s, uint32_t freq);
-+
-+/**
-+ * ptimer_get_limit - Get the configured limit of the ptimer
-+ * @s: ptimer to query
-+ *
-+ * This function returns the current limit (reload) value
-+ * of the down-counter; that is, the value which it will be
-+ * reset to when it hits zero.
-+ *
-+ * Generally timer devices using ptimers should be able to keep
-+ * their reload register state inside the ptimer using the get
-+ * and set limit functions rather than needing to also track it
-+ * in their own state structure.
-+ */
- uint64_t ptimer_get_limit(ptimer_state *s);
-+
-+/**
-+ * ptimer_set_limit - Set the limit of the ptimer
-+ * @s: ptimer
-+ * @limit: initial countdown value
-+ * @reload: if nonzero, then reset the counter to the new limit
-+ *
-+ * Set the limit value of the down-counter. The @reload flag can
-+ * be used to emulate the behaviour of timers which immediately
-+ * reload the counter when their reload register is written to.
-+ */
- void ptimer_set_limit(ptimer_state *s, uint64_t limit, int reload);
-+
-+/**
-+ * ptimer_get_count - Get the current value of the ptimer
-+ * @s: ptimer
-+ *
-+ * Return the current value of the down-counter. This will
-+ * return the correct value whether the counter is enabled or
-+ * disabled.
-+ */
- uint64_t ptimer_get_count(ptimer_state *s);
-+
-+/**
-+ * ptimer_set_count - Set the current value of the ptimer
-+ * @s: ptimer
-+ * @count: count value to set
-+ *
-+ * Set the value of the down-counter. If the counter is currently
-+ * enabled this will arrange for a timer callback at the appropriate
-+ * point in the future.
-+ */
- void ptimer_set_count(ptimer_state *s, uint64_t count);
-+
-+/**
-+ * ptimer_run - Start a ptimer counting
-+ * @s: ptimer
-+ * @oneshot: non-zero if this timer should only count down once
-+ *
-+ * Start a ptimer counting down; when it reaches zero the bottom half
-+ * passed to ptimer_init() will be invoked. If the @oneshot argument is zero,
-+ * the counter value will then be reloaded from the limit and it will
-+ * start counting down again. If @oneshot is non-zero, then the counter
-+ * will disable itself when it reaches zero.
-+ */
- void ptimer_run(ptimer_state *s, int oneshot);
-+
-+/**
-+ * ptimer_stop - Stop a ptimer counting
-+ * @s: ptimer
-+ *
-+ * Pause a timer (the count stays at its current value until ptimer_run()
-+ * is called to start it counting again).
-+ *
-+ * Note that this can cause it to "lose" time, even if it is immediately
-+ * restarted.
-+ */
- void ptimer_stop(ptimer_state *s);
- 
- extern const VMStateDescription vmstate_ptimer;
+     if (!env->user_tsc_khz) {
+         if ((env->features[FEAT_8000_0007_EDX] & CPUID_APM_INVTSC) &&
+             invtsc_mig_blocker == NULL) {
 -- 
-2.7.4
+2.11.0
