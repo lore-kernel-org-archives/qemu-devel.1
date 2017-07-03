@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dS2Qw-0003AS-Hr
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 10:34:41 -0400
+	(envelope-from <groug@kaod.org>) id 1dS2RA-0003Gc-4X
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 10:34:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dS2Qv-0008Gy-Pf
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 10:34:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50000)
+	(envelope-from <groug@kaod.org>) id 1dS2R7-0008OZ-0k
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 10:34:52 -0400
+Received: from 6.mo4.mail-out.ovh.net ([188.165.36.253]:49884)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dS2Qv-0008Go-Gl
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 10:34:37 -0400
-Date: Mon, 3 Jul 2017 11:34:34 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170703143434.GH12152@localhost.localdomain>
-References: <20170621140219.4568-1-marcandre.lureau@redhat.com>
-	<20170621140219.4568-3-marcandre.lureau@redhat.com>
-	<20170623210845.GA10776@localhost.localdomain>
-	<CAJ+F1CLUHM2+hMQqCmN04nwWEMDDDK8104=vK9rnoTsetw9JVg@mail.gmail.com>
-	<20170628182943.GJ12152@localhost.localdomain>
-	<CAJ+F1C+79Hfd+7J2nS7=+4awjW6nqGSaVrWDx9P8O-8FCuBsdQ@mail.gmail.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dS2R6-0008Nf-Pe
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 10:34:48 -0400
+Received: from player159.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 4B09B817D9
+	for <qemu-devel@nongnu.org>; Mon,  3 Jul 2017 16:34:46 +0200 (CEST)
+Date: Mon, 3 Jul 2017 16:34:37 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170703163437.48721aee@bahia.lan>
+In-Reply-To: <20170703154326.030e08bc@nial.brq.redhat.com>
+References: <149908449117.14256.2821600309813941055.stgit@bahia.lan>
+	<20170703154326.030e08bc@nial.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1C+79Hfd+7J2nS7=+4awjW6nqGSaVrWDx9P8O-8FCuBsdQ@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 2/3] Add memfd based hostmem
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/ELhdQ7_vUwGgCPqVqDnJoxO";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH] spapr: fix memory hotplug error path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,75 +31,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
-Cc: imammedo@redhat.com, qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-On Thu, Jun 29, 2017 at 01:34:22PM +0000, Marc-Andr=E9 Lureau wrote:
-> Hi
->=20
-> On Wed, Jun 28, 2017 at 8:29 PM Eduardo Habkost <ehabkost@redhat.com> w=
-rote:
->=20
-> > On Tue, Jun 27, 2017 at 08:23:03AM +0000, Marc-Andr=E9 Lureau wrote:
-> > > Hi Eduardo
-> > >
-> > > On Fri, Jun 23, 2017 at 11:09 PM Eduardo Habkost <ehabkost@redhat.c=
-om>
-> > > wrote:
-> > >
-> > > > On Wed, Jun 21, 2017 at 04:02:18PM +0200, Marc-Andr=E9 Lureau wro=
-te:
-> > > > > Add a new memory backend, similar to hostmem-file, except that =
-it
-> > > > > doesn't need to create files. It also enforces memory sealing.
-> > > > >
-> > > > > This backend is mainly useful for sharing the memory with other
-> > > > > processes.
-> > > >
-> > > > How exactly can the memfd be used to share memory?  Is there an
-> > existing
-> > > > mechanism for sharing the memfd file descriptor with another proc=
-ess
-> > >
-> > >
-> > >
-> > > Since there is no backing file, the traditional mechanism is by pas=
-sing
-> > fd,
-> > > via socket ancillary data or forking etc.. Both ivshmem and vhost-u=
-ser
-> > have
-> > > such messages, with eventually details for the memory map usage.
-> >
-> > The documentation is very similar to memory-backend-file, so it sound=
-ed
-> > like there was a generic mechanism to ask QEMU to share the backend F=
-D.
-> > Maybe it would be interesting to mention on which cases the FD can
-> > actually be shared.  Are ivshmem and vhost-user the only existing cas=
-es?
-> >
-> >
-> Actually, vhost-user may be the only way today to get the fd outside of
-> qemu process.
->=20
-> (ivshmem needs the server to provide the fd)
->=20
-> We could quite easily add or extend QMP messages for that in the future=
-.
->=20
-> Do you want this detail to be written in the commit message or elsewher=
-e?
+--Sig_/ELhdQ7_vUwGgCPqVqDnJoxO
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-(Sorry for taking so long to reply.)
+On Mon, 3 Jul 2017 15:43:26 +0200
+Igor Mammedov <imammedo@redhat.com> wrote:
 
-I think this should be in the documentation of the new option (in
-qemu-options.hx).
+> On Mon, 03 Jul 2017 14:21:31 +0200
+> Greg Kurz <groug@kaod.org> wrote:
+>=20
+> > QEMU shouldn't abort if spapr_add_lmbs()->spapr_drc_attach() fails.
+> > Let's propagate the error instead, like it is done everywhere else
+> > where spapr_drc_attach() is called.
+> >=20
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  hw/ppc/spapr.c |   10 ++++++++--
+> >  1 file changed, 8 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index 70b3fd374e2b..e103be500189 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -2601,6 +2601,7 @@ static void spapr_add_lmbs(DeviceState *dev, uint=
+64_t addr_start, uint64_t size,
+> >      int i, fdt_offset, fdt_size;
+> >      void *fdt;
+> >      uint64_t addr =3D addr_start;
+> > +    Error *local_err =3D NULL;
+> > =20
+> >      for (i =3D 0; i < nr_lmbs; i++) {
+> >          drc =3D spapr_drc_by_id(TYPE_SPAPR_DRC_LMB,
+> > @@ -2611,7 +2612,12 @@ static void spapr_add_lmbs(DeviceState *dev, uin=
+t64_t addr_start, uint64_t size,
+> >          fdt_offset =3D spapr_populate_memory_node(fdt, node, addr,
+> >                                                  SPAPR_MEMORY_BLOCK_SIZ=
+E);
+> > =20
+> > -        spapr_drc_attach(drc, dev, fdt, fdt_offset, errp);
+> > +        spapr_drc_attach(drc, dev, fdt, fdt_offset, &local_err);
+> > +        if (local_err) {
+> > +            g_free(fdt);
+> > +            error_propagate(errp, local_err);
+> > +            return;
+> > +        }
+> >          addr +=3D SPAPR_MEMORY_BLOCK_SIZE;
+> >      }
+> >      /* send hotplug notification to the
+> > @@ -2657,7 +2663,7 @@ static void spapr_memory_plug(HotplugHandler *hot=
+plug_dev, DeviceState *dev,
+> > =20
+> >      spapr_add_lmbs(dev, addr, size, node,
+> >                     spapr_ovec_test(ms->ov5_cas, OV5_HP_EVT),
+> > -                   &error_abort);
+> > +                   &local_err); =20
+> where is code that handles error condition?
+>  i.e. undo what pc_dimm_memory_plug() has done
+>=20
 
-I don't think it needs lots of extra detail, maybe just change "which
-can be used to share the memory with a co-operating external process" to
-"which allows QEMU to share the memory with an external process in some
-cases (e.g. when using vhost-user)".
+Oops, you're right and I also need to add some rollback in
+spapr_add_lmbs() as well... :-\
 
---=20
-Eduardo
+> > =20
+> >  out:
+> >      error_propagate(errp, local_err);
+> >=20
+> >  =20
+>=20
+
+
+--Sig_/ELhdQ7_vUwGgCPqVqDnJoxO
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAllaVf0ACgkQAvw66wEB28K5ugCfYKuwUmi6dIrP61Vvlx0f3Yb1
+OmcAn3pLU53o4vZOpxBUE5uFtf2I4/rA
+=N7ih
+-----END PGP SIGNATURE-----
+
+--Sig_/ELhdQ7_vUwGgCPqVqDnJoxO--
