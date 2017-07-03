@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48636)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dS2eg-000836-5G
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 10:48:51 -0400
+	(envelope-from <groug@kaod.org>) id 1dS2kS-0001DK-HW
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 10:54:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dS2eb-0001n5-7m
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 10:48:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41718)
+	(envelope-from <groug@kaod.org>) id 1dS2kO-000502-Jj
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 10:54:48 -0400
+Received: from 17.mo4.mail-out.ovh.net ([46.105.41.16]:42099)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dS2eb-0001mP-0o
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 10:48:45 -0400
-Date: Mon, 3 Jul 2017 11:48:38 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170703144838.GK12152@localhost.localdomain>
-References: <20170629132310.18865-1-marcandre.lureau@redhat.com>
-	<20170629132310.18865-2-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dS2kO-0004z7-Ci
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 10:54:44 -0400
+Received: from player159.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 81FD9813F8
+	for <qemu-devel@nongnu.org>; Mon,  3 Jul 2017 16:54:42 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Mon, 03 Jul 2017 16:54:36 +0200
+Message-ID: <149909367669.21100.17690903693542179077.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20170629132310.18865-2-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/7] vmgenid: replace
- x-write-pointer-available hack
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH v2] spapr: fix memory hotplug error path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +27,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, anderson@redhat.com, berrange@redhat.com, lersek@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Ben Warren <ben@skyportsystems.com>
+To: qemu-devel@nongnu.org
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-ppc@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On Thu, Jun 29, 2017 at 03:23:04PM +0200, Marc-Andr=E9 Lureau wrote:
-> This compat property sole function is to prevent the device from being
-> instantiated. Instead of requiring an extra compat property, check if
-> fw_cfg has DMA enabled.
->=20
-> This has the additional benefit of handling other cases properly, like:
->=20
->   $ qemu-system-x86_64 -device vmgenid -machine none
->   qemu-system-x86_64: -device vmgenid: vmgenid requires DMA write suppo=
-rt in fw_cfg, which this machine type does not provide
->   $ qemu-system-x86_64 -device vmgenid -machine pc-i440fx-2.9 -global f=
-w_cfg.dma_enabled=3Doff
->   qemu-system-x86_64: -device vmgenid: vmgenid requires DMA write suppo=
-rt in fw_cfg, which this machine type does not provide
->   $ qemu-system-x86_64 -device vmgenid -machine pc-i440fx-2.6 -global f=
-w_cfg.dma_enabled=3Don
->   [boots normally]
->=20
-> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+QEMU shouldn't abort if spapr_add_lmbs()->spapr_drc_attach() fails.
+Let's propagate the error instead, like it is done everywhere else
+where spapr_drc_attach() is called.
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+Changes in v2: - added rollback code
+---
+ hw/ppc/spapr.c |   26 ++++++++++++++++++++++----
+ 1 file changed, 22 insertions(+), 4 deletions(-)
 
---=20
-Eduardo
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 70b3fd374e2b..ba8f57a5a054 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2601,6 +2601,7 @@ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
+     int i, fdt_offset, fdt_size;
+     void *fdt;
+     uint64_t addr = addr_start;
++    Error *local_err = NULL;
+ 
+     for (i = 0; i < nr_lmbs; i++) {
+         drc = spapr_drc_by_id(TYPE_SPAPR_DRC_LMB,
+@@ -2611,7 +2612,18 @@ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
+         fdt_offset = spapr_populate_memory_node(fdt, node, addr,
+                                                 SPAPR_MEMORY_BLOCK_SIZE);
+ 
+-        spapr_drc_attach(drc, dev, fdt, fdt_offset, errp);
++        spapr_drc_attach(drc, dev, fdt, fdt_offset, &local_err);
++        if (local_err) {
++            while (addr > addr_start) {
++                addr -= SPAPR_MEMORY_BLOCK_SIZE;
++                drc = spapr_drc_by_id(TYPE_SPAPR_DRC_LMB,
++                                      addr / SPAPR_MEMORY_BLOCK_SIZE);
++                spapr_drc_detach(drc, dev, NULL);
++            }
++            g_free(fdt);
++            error_propagate(errp, local_err);
++            return;
++        }
+         addr += SPAPR_MEMORY_BLOCK_SIZE;
+     }
+     /* send hotplug notification to the
+@@ -2651,14 +2663,20 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     addr = object_property_get_uint(OBJECT(dimm),
+                                     PC_DIMM_ADDR_PROP, &local_err);
+     if (local_err) {
+-        pc_dimm_memory_unplug(dev, &ms->hotplug_memory, mr);
+-        goto out;
++        goto out_unplug;
+     }
+ 
+     spapr_add_lmbs(dev, addr, size, node,
+                    spapr_ovec_test(ms->ov5_cas, OV5_HP_EVT),
+-                   &error_abort);
++                   &local_err);
++    if (local_err) {
++        goto out_unplug;
++    }
++
++    return;
+ 
++out_unplug:
++    pc_dimm_memory_unplug(dev, &ms->hotplug_memory, mr);
+ out:
+     error_propagate(errp, local_err);
+ }
