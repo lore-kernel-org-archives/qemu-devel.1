@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dS4Kd-00015R-Dv
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:36:17 -0400
+	(envelope-from <mst@redhat.com>) id 1dS4LW-0001sD-Nl
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:37:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dS4KZ-0008G1-Do
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:36:15 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:32835)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dS4KZ-0008FF-3T
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:36:11 -0400
-Received: by mail-wm0-x242.google.com with SMTP id j85so21516214wmj.0
-	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 09:36:10 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  3 Jul 2017 18:34:51 +0200
-Message-Id: <1499099693-22903-21-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1499099693-22903-1-git-send-email-pbonzini@redhat.com>
-References: <1499099693-22903-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 20/22] target/i386: add the tcg_enabled() in
- target/i386/
+	(envelope-from <mst@redhat.com>) id 1dS4LT-0000QZ-LM
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:37:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51290)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dS4LT-0000QH-E8
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:37:07 -0400
+Date: Mon, 3 Jul 2017 19:37:03 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170703193427-mutt-send-email-mst@kernel.org>
+References: <1498773362-18675-1-git-send-email-zuban32s@gmail.com>
+	<20170630020622-mutt-send-email-mst@kernel.org>
+	<ec616cb6-f693-76c5-5732-ec6ee7840d9c@redhat.com>
+	<20170703142711.0a1db036@nial.brq.redhat.com>
+	<CAKSfGUCWRMEZLazPibjMeJo9pV5SxdWK9p+4_prr9hAeWpU7nw@mail.gmail.com>
+	<CAKSfGUCDaPFi=1MBxFkfz1ZtZfkfYneSVtxh=ydOAS0jtPsSJw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKSfGUCDaPFi=1MBxFkfz1ZtZfkfYneSVtxh=ydOAS0jtPsSJw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 0/6] q35: add acpi pci hotplug support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,167 +31,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: rth@twiddle.net, thuth@redhat.com, anthony.xu@intel.com, berrange@redhat.com, a.rigo@virtualopensystems.com, yang.zhong@intel.com
+To: Alexander Bezzubikov <zuban32s@gmail.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
 
-From: Yang Zhong <yang.zhong@intel.com>
+SHPC did work for linux. As ACPI is enabled by default, you need
+to expose it in _OSC and maybe jump through more hoops
+to avoid ACPI from trying to take over.
 
-Add the tcg_enabled() where the x86 target needs to disable
-TCG-specific code.
+Source is available so if it doesn't work you should be able
+to find out why.
 
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- target/i386/bpt_helper.c | 32 +++++++++++++++++++++++---------
- target/i386/cpu.c        |  4 +++-
- target/i386/cpu.h        |  8 +++++++-
- target/i386/machine.c    |  5 +++--
- 4 files changed, 36 insertions(+), 13 deletions(-)
 
-diff --git a/target/i386/bpt_helper.c b/target/i386/bpt_helper.c
-index b3efdc7..e0fa54c 100644
---- a/target/i386/bpt_helper.c
-+++ b/target/i386/bpt_helper.c
-@@ -215,10 +215,12 @@ void breakpoint_handler(CPUState *cs)
-     if (cs->watchpoint_hit) {
-         if (cs->watchpoint_hit->flags & BP_CPU) {
-             cs->watchpoint_hit = NULL;
--            if (check_hw_breakpoints(env, false)) {
--                raise_exception(env, EXCP01_DB);
--            } else {
--                cpu_loop_exit_noexc(cs);
-+            if (tcg_enabled()) {
-+                if (check_hw_breakpoints(env, false)) {
-+                    raise_exception(env, EXCP01_DB);
-+                } else {
-+                    cpu_loop_exit_noexc(cs);
-+                }
-             }
-         }
-     } else {
-@@ -226,7 +228,9 @@ void breakpoint_handler(CPUState *cs)
-             if (bp->pc == env->eip) {
-                 if (bp->flags & BP_CPU) {
-                     check_hw_breakpoints(env, true);
--                    raise_exception(env, EXCP01_DB);
-+                    if (tcg_enabled()) {
-+                        raise_exception(env, EXCP01_DB);
-+                    }
-                 }
-                 break;
-             }
-@@ -241,7 +245,9 @@ void helper_single_step(CPUX86State *env)
-     check_hw_breakpoints(env, true);
-     env->dr[6] |= DR6_BS;
- #endif
--    raise_exception(env, EXCP01_DB);
-+    if (tcg_enabled()) {
-+        raise_exception(env, EXCP01_DB);
-+    }
- }
- 
- void helper_rechecking_single_step(CPUX86State *env)
-@@ -282,7 +288,9 @@ void helper_set_dr(CPUX86State *env, int reg, target_ulong t0)
-         cpu_x86_update_dr7(env, t0);
-         return;
-     }
--    raise_exception_err_ra(env, EXCP06_ILLOP, 0, GETPC());
-+    if (tcg_enabled()) {
-+        raise_exception_err_ra(env, EXCP06_ILLOP, 0, GETPC());
-+    }
- #endif
- }
- 
-@@ -304,7 +312,11 @@ target_ulong helper_get_dr(CPUX86State *env, int reg)
-             return env->dr[7];
-         }
-     }
--    raise_exception_err_ra(env, EXCP06_ILLOP, 0, GETPC());
-+    if (tcg_enabled()) {
-+        raise_exception_err_ra(env, EXCP06_ILLOP, 0, GETPC());
-+    } else {
-+        return 0;
-+    }
- }
- 
- /* Check if Port I/O is trapped by a breakpoint.  */
-@@ -329,7 +341,9 @@ void helper_bpt_io(CPUX86State *env, uint32_t port,
-     if (hit) {
-         env->dr[6] = (env->dr[6] & ~0xf) | hit;
-         env->eip = next_eip;
--        raise_exception(env, EXCP01_DB);
-+        if (tcg_enabled()) {
-+            raise_exception(env, EXCP01_DB);
-+        }
-     }
- #endif
- }
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 642519a..c571772 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -4040,8 +4040,10 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
-     cc->class_by_name = x86_cpu_class_by_name;
-     cc->parse_features = x86_cpu_parse_featurestr;
-     cc->has_work = x86_cpu_has_work;
-+#ifdef CONFIG_TCG
-     cc->do_interrupt = x86_cpu_do_interrupt;
-     cc->cpu_exec_interrupt = x86_cpu_exec_interrupt;
-+#endif
-     cc->dump_state = x86_cpu_dump_state;
-     cc->get_crash_info = x86_cpu_get_crash_info;
-     cc->set_pc = x86_cpu_set_pc;
-@@ -4070,7 +4072,7 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
-     cc->gdb_core_xml_file = "i386-32bit.xml";
-     cc->gdb_num_core_regs = 41;
- #endif
--#ifndef CONFIG_USER_ONLY
-+#if defined(CONFIG_TCG) && !defined(CONFIG_USER_ONLY)
-     cc->debug_excp_handler = breakpoint_handler;
- #endif
-     cc->cpu_exec_enter = x86_cpu_exec_enter;
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 67a6091..27732ad 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -52,7 +52,9 @@
- 
- #include "exec/cpu-defs.h"
- 
-+#ifdef CONFIG_TCG
- #include "fpu/softfloat.h"
-+#endif
- 
- #define R_EAX 0
- #define R_ECX 1
-@@ -1598,7 +1600,11 @@ void update_fp_status(CPUX86State *env);
- 
- static inline uint32_t cpu_compute_eflags(CPUX86State *env)
- {
--    return env->eflags | cpu_cc_compute_all(env, CC_OP) | (env->df & DF_MASK);
-+    uint32_t eflags = env->eflags;
-+    if (tcg_enabled()) {
-+        eflags |= cpu_cc_compute_all(env, CC_OP) | (env->df & DF_MASK);
-+    }
-+    return eflags;
- }
- 
- /* NOTE: the translator must set DisasContext.cc_op to CC_OP_EFLAGS
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 53587ae..b78b36c 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -280,8 +280,9 @@ static int cpu_post_load(void *opaque, int version_id)
-     for(i = 0; i < 8; i++) {
-         env->fptags[i] = (env->fptag_vmstate >> i) & 1;
-     }
--    update_fp_status(env);
--
-+    if (tcg_enabled()) {
-+        update_fp_status(env);
-+    }
-     cpu_breakpoint_remove_all(cs, BP_CPU);
-     cpu_watchpoint_remove_all(cs, BP_CPU);
-     {
--- 
-1.8.3.1
+
+On Mon, Jul 03, 2017 at 05:41:12PM +0300, Alexander Bezzubikov wrote:
+> Do we have any surely working scenario of pci-bridge's SHPC usage? Because
+> first of all I've tried to use SHPC to avoi involving any ACPI code, but it
+> didn't look functioning even for ordinary pci-bridge, that's why after talking
+> to Marcel I left SHPC idea.
+> 
+> 2017-07-03 16:58 GMT+03:00 Alexander Bezzubikov <zuban32s@gmail.com>:
+> 
+>     Hmm, I've failed to make SHPC (from current master) work on any modern
+>     Linux guests.
+> 
+>     2017-07-03 15:27 GMT+03:00 Igor Mammedov <imammedo@redhat.com>:
+> 
+>         On Fri, 30 Jun 2017 10:25:05 +0300
+>         Marcel Apfelbaum <marcel@redhat.com> wrote:
+> 
+>         [...]
+>         >
+>         > So for the modern systems not supporting PCI ACPI hotplug
+>         > we don't need pci-bridges anyway, but for the older ones
+>         > the ACPI code of the pci-bridge will be loaded into the
+>         > ACPI namespace only if a pci-bridge is actually hot-plugged.
+> 
+>         just note that the set of 'older' guest OSes is limited to
+>         one that do not support SHPC (i.e. to EOLed WinXP & co)
+>         as for linux and more modern Windows SHPC hotplug should
+>         just work without our ACPI hack (which taxes low memory
+>         to keep acpi tables for bridges).
+> 
+>         So I'm in favor of Michael's suggestion to leave ACPI PCI
+>         only in PC machine for old WinXP guests and to keep Q35
+>         clean, where linux or newer Windows guests could just
+>         use standard SHPC.
+> 
+>         [...]
+> 
+> 
+> 
+> 
+>     --
+>     Alexander Bezzubikov
+> 
+> 
+> 
+> 
+> --
+> Alexander Bezzubikov
