@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1dRyMA-0000M2-CI
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:13:27 -0400
+	(envelope-from <yang.zhong@intel.com>) id 1dRyMC-0000Mc-7T
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:13:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1dRyM8-0001n0-O6
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:13:26 -0400
+	(envelope-from <yang.zhong@intel.com>) id 1dRyMB-0001oR-2v
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:13:28 -0400
 Received: from mga01.intel.com ([192.55.52.88]:14583)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1dRyM8-0001cL-DA
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:13:24 -0400
+	id 1dRyMA-0001cL-OJ
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:13:26 -0400
 From: Yang Zhong <yang.zhong@intel.com>
-Date: Mon,  3 Jul 2017 18:12:21 +0800
-Message-Id: <1499076743-15477-14-git-send-email-yang.zhong@intel.com>
+Date: Mon,  3 Jul 2017 18:12:22 +0800
+Message-Id: <1499076743-15477-15-git-send-email-yang.zhong@intel.com>
 In-Reply-To: <1499076743-15477-1-git-send-email-yang.zhong@intel.com>
 References: <1499076743-15477-1-git-send-email-yang.zhong@intel.com>
-Subject: [Qemu-devel] [PATCH v2 13/15] tcg: add the CONFIG_TCG for header
+Subject: [Qemu-devel] [PATCH v2 14/15] tcg: add the tcg_enabled() in
+ target/i386/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,132 +28,126 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: pbonzini@redhat.com, rth@twiddle.net, thuth@redhat.com
 Cc: qemu-devel@nongnu.org, anthony.xu@intel.com, a.rigo@virtualopensystems.com, yang.zhong@intel.com
 
-Add the CONFIG_TCG for exec-all.h. Since function tlb_set_page_with_attrs()
-is defined in ./accel/tcg/cputlb.c, which will be disabled if tcg is disabled.
-This function need be implemented in accel/stubs/tcg-stub.c for disable-tcg.
+Add the tcg_enabled() to disable tcg code in x86 target.
 
 Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 ---
- accel/stubs/tcg-stub.c      |  6 +++++
- include/exec/cputlb.h       |  2 +-
- include/exec/exec-all.h     | 53 ++++++++++++++++++++++++---------------------
- include/exec/helper-proto.h |  2 ++
- 4 files changed, 37 insertions(+), 26 deletions(-)
+ target/i386/bpt_helper.c | 26 ++++++++++++++++++++------
+ target/i386/cpu.c        |  4 +++-
+ target/i386/machine.c    |  5 +++--
+ 3 files changed, 26 insertions(+), 9 deletions(-)
 
-diff --git a/accel/stubs/tcg-stub.c b/accel/stubs/tcg-stub.c
-index a84a6e6..4e9f7fa 100644
---- a/accel/stubs/tcg-stub.c
-+++ b/accel/stubs/tcg-stub.c
-@@ -64,6 +64,12 @@ bool cpu_restore_state(CPUState *cpu, uintptr_t searched_pc)
-     return false;
+diff --git a/target/i386/bpt_helper.c b/target/i386/bpt_helper.c
+index b3efdc7..083c712 100644
+--- a/target/i386/bpt_helper.c
++++ b/target/i386/bpt_helper.c
+@@ -216,7 +216,9 @@ void breakpoint_handler(CPUState *cs)
+         if (cs->watchpoint_hit->flags & BP_CPU) {
+             cs->watchpoint_hit = NULL;
+             if (check_hw_breakpoints(env, false)) {
+-                raise_exception(env, EXCP01_DB);
++                if (tcg_enabled()) {
++                    raise_exception(env, EXCP01_DB);
++                }
+             } else {
+                 cpu_loop_exit_noexc(cs);
+             }
+@@ -226,7 +228,9 @@ void breakpoint_handler(CPUState *cs)
+             if (bp->pc == env->eip) {
+                 if (bp->flags & BP_CPU) {
+                     check_hw_breakpoints(env, true);
+-                    raise_exception(env, EXCP01_DB);
++                    if (tcg_enabled()) {
++                        raise_exception(env, EXCP01_DB);
++                    }
+                 }
+                 break;
+             }
+@@ -241,7 +245,9 @@ void helper_single_step(CPUX86State *env)
+     check_hw_breakpoints(env, true);
+     env->dr[6] |= DR6_BS;
+ #endif
+-    raise_exception(env, EXCP01_DB);
++    if (tcg_enabled()) {
++        raise_exception(env, EXCP01_DB);
++    }
  }
  
-+void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
-+                             hwaddr paddr, MemTxAttrs attrs,
-+                             int prot, int mmu_idx, target_ulong size)
-+{
-+}
-+
- void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
- {
+ void helper_rechecking_single_step(CPUX86State *env)
+@@ -282,7 +288,9 @@ void helper_set_dr(CPUX86State *env, int reg, target_ulong t0)
+         cpu_x86_update_dr7(env, t0);
+         return;
+     }
+-    raise_exception_err_ra(env, EXCP06_ILLOP, 0, GETPC());
++    if (tcg_enabled()) {
++        raise_exception_err_ra(env, EXCP06_ILLOP, 0, GETPC());
++    }
+ #endif
  }
-diff --git a/include/exec/cputlb.h b/include/exec/cputlb.h
-index 3f94178..cf296d9 100644
---- a/include/exec/cputlb.h
-+++ b/include/exec/cputlb.h
-@@ -19,7 +19,7 @@
- #ifndef CPUTLB_H
- #define CPUTLB_H
  
--#if !defined(CONFIG_USER_ONLY)
-+#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
- /* cputlb.c */
- void tlb_protect_code(ram_addr_t ram_addr);
- void tlb_unprotect_code(ram_addr_t ram_addr);
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 724ec73..446c924 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -82,6 +82,34 @@ void cpu_reloading_memory_map(void);
-  * Note that with KVM only one address space is supported.
-  */
- void cpu_address_space_init(CPUState *cpu, AddressSpace *as, int asidx);
-+/**
-+ * tlb_set_page_with_attrs:
-+ * @cpu: CPU to add this TLB entry for
-+ * @vaddr: virtual address of page to add entry for
-+ * @paddr: physical address of the page
-+ * @attrs: memory transaction attributes
-+ * @prot: access permissions (PAGE_READ/PAGE_WRITE/PAGE_EXEC bits)
-+ * @mmu_idx: MMU index to insert TLB entry for
-+ * @size: size of the page in bytes
-+ *
-+ * Add an entry to this CPU's TLB (a mapping from virtual address
-+ * @vaddr to physical address @paddr) with the specified memory
-+ * transaction attributes. This is generally called by the target CPU
-+ * specific code after it has been called through the tlb_fill()
-+ * entry point and performed a successful page table walk to find
-+ * the physical address and attributes for the virtual address
-+ * which provoked the TLB miss.
-+ *
-+ * At most one entry for a given virtual address is permitted. Only a
-+ * single TARGET_PAGE_SIZE region is mapped; the supplied @size is only
-+ * used by tlb_flush_page.
-+ */
-+void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
-+                             hwaddr paddr, MemTxAttrs attrs,
-+                             int prot, int mmu_idx, target_ulong size);
-+#endif
-+
-+#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
- /* cputlb.c */
- /**
-  * tlb_flush_page:
-@@ -205,31 +233,6 @@ void tlb_flush_by_mmuidx_all_cpus(CPUState *cpu, uint16_t idxmap);
-  * depend on when the guests translation ends the TB.
-  */
- void tlb_flush_by_mmuidx_all_cpus_synced(CPUState *cpu, uint16_t idxmap);
--/**
-- * tlb_set_page_with_attrs:
-- * @cpu: CPU to add this TLB entry for
-- * @vaddr: virtual address of page to add entry for
-- * @paddr: physical address of the page
-- * @attrs: memory transaction attributes
-- * @prot: access permissions (PAGE_READ/PAGE_WRITE/PAGE_EXEC bits)
-- * @mmu_idx: MMU index to insert TLB entry for
-- * @size: size of the page in bytes
-- *
-- * Add an entry to this CPU's TLB (a mapping from virtual address
-- * @vaddr to physical address @paddr) with the specified memory
-- * transaction attributes. This is generally called by the target CPU
-- * specific code after it has been called through the tlb_fill()
-- * entry point and performed a successful page table walk to find
-- * the physical address and attributes for the virtual address
-- * which provoked the TLB miss.
-- *
-- * At most one entry for a given virtual address is permitted. Only a
-- * single TARGET_PAGE_SIZE region is mapped; the supplied @size is only
-- * used by tlb_flush_page.
-- */
--void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
--                             hwaddr paddr, MemTxAttrs attrs,
--                             int prot, int mmu_idx, target_ulong size);
- /* tlb_set_page:
-  *
-  * This function is equivalent to calling tlb_set_page_with_attrs()
-diff --git a/include/exec/helper-proto.h b/include/exec/helper-proto.h
-index 954bef8..417c7b0 100644
---- a/include/exec/helper-proto.h
-+++ b/include/exec/helper-proto.h
-@@ -28,7 +28,9 @@ dh_ctype(ret) HELPER(name) (dh_ctype(t1), dh_ctype(t2), dh_ctype(t3), \
+@@ -304,7 +312,11 @@ target_ulong helper_get_dr(CPUX86State *env, int reg)
+             return env->dr[7];
+         }
+     }
+-    raise_exception_err_ra(env, EXCP06_ILLOP, 0, GETPC());
++    if (tcg_enabled()) {
++        raise_exception_err_ra(env, EXCP06_ILLOP, 0, GETPC());
++    } else {
++        return 0;
++    }
+ }
  
- #include "helper.h"
- #include "trace/generated-helpers.h"
+ /* Check if Port I/O is trapped by a breakpoint.  */
+@@ -329,7 +341,9 @@ void helper_bpt_io(CPUX86State *env, uint32_t port,
+     if (hit) {
+         env->dr[6] = (env->dr[6] & ~0xf) | hit;
+         env->eip = next_eip;
+-        raise_exception(env, EXCP01_DB);
++        if (tcg_enabled()) {
++            raise_exception(env, EXCP01_DB);
++        }
+     }
+ #endif
+ }
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 642519a..c571772 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -4040,8 +4040,10 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
+     cc->class_by_name = x86_cpu_class_by_name;
+     cc->parse_features = x86_cpu_parse_featurestr;
+     cc->has_work = x86_cpu_has_work;
 +#ifdef CONFIG_TCG
- #include "tcg-runtime.h"
+     cc->do_interrupt = x86_cpu_do_interrupt;
+     cc->cpu_exec_interrupt = x86_cpu_exec_interrupt;
 +#endif
- 
- #undef DEF_HELPER_FLAGS_0
- #undef DEF_HELPER_FLAGS_1
+     cc->dump_state = x86_cpu_dump_state;
+     cc->get_crash_info = x86_cpu_get_crash_info;
+     cc->set_pc = x86_cpu_set_pc;
+@@ -4070,7 +4072,7 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
+     cc->gdb_core_xml_file = "i386-32bit.xml";
+     cc->gdb_num_core_regs = 41;
+ #endif
+-#ifndef CONFIG_USER_ONLY
++#if defined(CONFIG_TCG) && !defined(CONFIG_USER_ONLY)
+     cc->debug_excp_handler = breakpoint_handler;
+ #endif
+     cc->cpu_exec_enter = x86_cpu_exec_enter;
+diff --git a/target/i386/machine.c b/target/i386/machine.c
+index 53587ae..b78b36c 100644
+--- a/target/i386/machine.c
++++ b/target/i386/machine.c
+@@ -280,8 +280,9 @@ static int cpu_post_load(void *opaque, int version_id)
+     for(i = 0; i < 8; i++) {
+         env->fptags[i] = (env->fptag_vmstate >> i) & 1;
+     }
+-    update_fp_status(env);
+-
++    if (tcg_enabled()) {
++        update_fp_status(env);
++    }
+     cpu_breakpoint_remove_all(cs, BP_CPU);
+     cpu_watchpoint_remove_all(cs, BP_CPU);
+     {
 -- 
 1.9.1
