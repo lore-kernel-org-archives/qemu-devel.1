@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1dRrsy-0007NI-7t
-	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 23:18:53 -0400
+	(envelope-from <sundeep.lkml@gmail.com>) id 1dRtFB-00080G-Tc
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 00:45:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1dRrsx-0006XQ-8H
-	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 23:18:52 -0400
-Message-ID: <1499051918.2398.1.camel@gmail.com>
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Mon, 03 Jul 2017 13:18:38 +1000
-In-Reply-To: <20170630040317.GA13989@umbus.fritz.box>
-References: <20170629045940.11242-1-sjitindarsingh@gmail.com>
-	<20170630040317.GA13989@umbus.fritz.box>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] target/ppc: Only set PCR in kvm if
- actually in a compat mode
+	(envelope-from <sundeep.lkml@gmail.com>) id 1dRtF7-0007m9-5N
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 00:45:53 -0400
+From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+Date: Mon,  3 Jul 2017 10:15:10 +0530
+Message-Id: <1499057115-6773-1-git-send-email-sundeep.lkml@gmail.com>
+Subject: [Qemu-devel] [Qemu devel v6 PATCH 0/5] Add support for Smartfusion2
+ SoC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,68 +18,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, agraf@suse.de, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, crosthwaite.peter@gmail.com, alistair23@gmail.com, f4bug@amsat.org, Subbaraya Sundeep <sundeep.lkml@gmail.com>
 
-On Fri, 2017-06-30 at 14:03 +1000, David Gibson wrote:
-> On Thu, Jun 29, 2017 at 02:59:39PM +1000, Suraj Jitindar Singh wrote:
-> > The Processor Compatibility Register (PCR) I used to set the
-> > compatibility mode of the processor using the SET_ONE_REG ioctl on
-> > KVM_REG_PPC_ARCH_COMPAT. Previously this was only called when a
-> > compat
-> > mode was actually in use, however a recent patch made it
-> > unconditional.
-> > Calling this in KVM_PR fails as there is no handler for that call
-> > and it
-> > is thus impossible to start a machine with KVM_PR.
-> > 
-> > Change ppc_set_compat() so that the ioctl is only actually called
-> > if a
-> > compat mode is in use. This means that a KVM_PR guest can boot.
-> > Additionally the current behaviour for KVM_HV is preserved where a
-> > compat
-> > mode of 0 set pcr and arch_compat in the vcore struct to zero, both
-> > of
-> > which are initialised to zero anyway.
-> > 
-> > Fixes: 37f516defa2e ("pseries: Reset CPU compatibility mode")
-> > 
-> > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> 
-> This doesn't seem quite right.  With this change, how would we ever
-> turn compatibility mode _off_ (which could happen on reset if nothing
+Hi Qemu-devel,
 
-Oh yeah, didn't really think about that.
+I am trying to add Smartfusion2 SoC.
+SoC is from Microsemi and System on Module(SOM)
+board is from Emcraft systems. Smartfusion2 has hardened
+Microcontroller(Cortex-M3)based Sub System and FPGA fabric.
+At the moment only system timer, sysreg and SPI
+controller are modelled.
 
-> else).  Really we should add this pseudo-register to KVM PR, although
-> I'm fine with also having a qemu workaround to let it work with older
-> PR versions.
+Testing:
+./arm-softmmu/qemu-system-arm -M smartfusion2-som -serial mon:stdio \
+-kernel u-boot.bin -display none -drive file=spi.bin,if=mtd,format=raw
 
-How do you feel about having a check and only calling the ioctl if the
-KVM in use is HV?
+Binaries u-boot.bin and spi.bin are at:
+https://github.com/Subbaraya-Sundeep/qemu-test-binaries.git
 
-> 
-> > 
-> > ---
-> > 
-> > Based on: dwg/ppc-for-2.10
-> > 
-> >  target/ppc/compat.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/target/ppc/compat.c b/target/ppc/compat.c
-> > index f1b67fa..4482206 100644
-> > --- a/target/ppc/compat.c
-> > +++ b/target/ppc/compat.c
-> > @@ -143,7 +143,7 @@ void ppc_set_compat(PowerPCCPU *cpu, uint32_t
-> > compat_pvr, Error **errp)
-> >      cpu->compat_pvr = compat_pvr;
-> >      env->spr[SPR_PCR] = pcr & pcc->pcr_mask;
-> >  
-> > -    if (kvm_enabled()) {
-> > +    if (kvm_enabled() && compat_pvr) {
-> >          int ret = kvmppc_set_compat(cpu, cpu->compat_pvr);
-> >          if (ret < 0) {
-> >              error_setg_errno(errp, -ret,
-> 
-> 
+U-boot is from Emcraft with modified
+    - SPI driver not to use PDMA.
+    - ugly hack to pass dtb to kernel in r1.
+@
+https://github.com/Subbaraya-Sundeep/emcraft-uboot-sf2.git
+
+Linux is 4.5 linux with Smartfusion2 SoC dts and clocksource
+driver added by myself @
+https://github.com/Subbaraya-Sundeep/linux.git
+
+v6:
+    Moved some defines from header files to source files
+    Added properties m3clk, apb0div, apb0div1 properties
+    to soc.
+    Added properties apb0divisor, apb1divisor to sysreg
+    Update system_clock_source in msf2-soc.c
+    Changed machine name smartfusion2-som->emcraft-sf2
+
+v5
+    As per Philippe comments:
+        Added abort in Sysreg if guest tries to remap memory
+        other than default mapping.
+        Use of CONFIG_MSF2 in Makefile for soc.c
+        Fixed incorrect logic in timer model.
+        Renamed msf2-timer.c -> mss-timer.c
+                msf2-spi.c -> mss-spi.c also type names
+        Renamed function msf2_init->emcraft_sf2_init in msf2-som.c
+        Added part-name,eNVM-size,eSRAM-size,pclk0 and pclk1
+            properties to soc.
+        Pass soc part-name,memory size and clock rate properties from som.
+v4:
+    Fixed build failure by using PRIx macros.
+v3:
+    Added SoC file and board file as per Alistair comments.
+v2:
+    Added SPI controller so that u-boot loads kernel from spi flash.
+v1:
+    Initial patch set with timer and sysreg
+
+Thanks,
+Sundeep
+
+Subbaraya Sundeep (5):
+  msf2: Add Smartfusion2 System timer
+  msf2: Microsemi Smartfusion2 System Register block.
+  msf2: Add Smartfusion2 SPI controller
+  msf2: Add Smartfusion2 SoC.
+  msf2: Add Emcraft's Smartfusion2 SOM kit.
+
+ default-configs/arm-softmmu.mak |   1 +
+ hw/arm/Makefile.objs            |   2 +
+ hw/arm/msf2-soc.c               | 216 +++++++++++++++++++++
+ hw/arm/msf2-som.c               |  94 +++++++++
+ hw/misc/Makefile.objs           |   1 +
+ hw/misc/msf2-sysreg.c           | 200 +++++++++++++++++++
+ hw/ssi/Makefile.objs            |   1 +
+ hw/ssi/mss-spi.c                | 415 ++++++++++++++++++++++++++++++++++++++++
+ hw/timer/Makefile.objs          |   1 +
+ hw/timer/mss-timer.c            | 261 +++++++++++++++++++++++++
+ include/hw/arm/msf2-soc.h       |  67 +++++++
+ include/hw/misc/msf2-sysreg.h   |  82 ++++++++
+ include/hw/ssi/mss-spi.h        |  62 ++++++
+ include/hw/timer/mss-timer.h    |  67 +++++++
+ 14 files changed, 1470 insertions(+)
+ create mode 100644 hw/arm/msf2-soc.c
+ create mode 100644 hw/arm/msf2-som.c
+ create mode 100644 hw/misc/msf2-sysreg.c
+ create mode 100644 hw/ssi/mss-spi.c
+ create mode 100644 hw/timer/mss-timer.c
+ create mode 100644 include/hw/arm/msf2-soc.h
+ create mode 100644 include/hw/misc/msf2-sysreg.h
+ create mode 100644 include/hw/ssi/mss-spi.h
+ create mode 100644 include/hw/timer/mss-timer.h
+
+-- 
+2.5.0
