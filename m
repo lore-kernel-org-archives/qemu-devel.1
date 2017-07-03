@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dS3tg-0004si-Dh
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:08:25 -0400
+	(envelope-from <eblake@redhat.com>) id 1dS3xn-0007AI-1s
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:12:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dS3tZ-00007e-D4
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:08:21 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:33540)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dS3tZ-00006S-7w
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:08:17 -0400
-Received: by mail-qt0-x244.google.com with SMTP id c20so23934109qte.0
-	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 09:08:14 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170627161032.5014-1-david@redhat.com>
-	<251b8047-7df4-50a5-cce7-b66858c781a1@redhat.com>
-	<4c7a78bc-ec7f-9873-0bda-f3c8e76c844b@redhat.com>
-	<3373125e-171a-0516-90f0-757d60eba32a@redhat.com>
-	<449afc6c-1fbc-9ae9-8450-9c9a9e67f2c8@twiddle.net>
-	<266c6260-cc9a-b765-6988-62c7e5777ce1@redhat.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <6541ac01-526b-aa94-1297-380ca78a7f2d@twiddle.net>
-Date: Mon, 3 Jul 2017 09:08:08 -0700
+	(envelope-from <eblake@redhat.com>) id 1dS3xl-00030Z-Qh
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:12:39 -0400
+References: <20170629184320.7151-1-el13635@mail.ntua.gr>
+	<20170629184320.7151-4-el13635@mail.ntua.gr>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <69eaa5de-6e3c-d520-cdc6-35a6298aee94@redhat.com>
+Date: Mon, 3 Jul 2017 11:12:28 -0500
 MIME-Version: 1.0
-In-Reply-To: <266c6260-cc9a-b765-6988-62c7e5777ce1@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/cpumodel: allow to enable "idtes"
- feature for TCG
+In-Reply-To: <20170629184320.7151-4-el13635@mail.ntua.gr>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="XXsgUw1WsPbtGb22xOTgx9g3UBJKVghCD"
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] block: add default implementations
+ for bdrv_co_get_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,28 +25,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: agraf@suse.de, Aurelien Jarno <aurelien@aurel32.net>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-On 07/03/2017 04:07 AM, Thomas Huth wrote:
-> On 30.06.2017 21:22, Richard Henderson wrote:
->> On 06/29/2017 12:05 AM, Thomas Huth wrote:
->>> However, I'm not sure whether you can simply ignore the clearing-by-ASCE
->>> stuff in this case. For example, according to the PoP:
->>>
->>> "When the clearing-by-ASCE-option bit (bit 52 of gen-
->>>    eral register R2 is one), the M4 field is ignored."
->>>
->>> And the idte helper function currently always takes the M4 field into
->>> account...
->>
->> I don't see that quote.
-> 
-> Which version of the Principles of Operation are you using? I just
-> checked, and that sentence seems to be available in version SA22-7832-10
-> (but it is not in SA22-7832-09 yet).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--XXsgUw1WsPbtGb22xOTgx9g3UBJKVghCD
+From: Eric Blake <eblake@redhat.com>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>,
+ qemu-devel <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <69eaa5de-6e3c-d520-cdc6-35a6298aee94@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] block: add default implementations
+ for bdrv_co_get_block_status()
+References: <20170629184320.7151-1-el13635@mail.ntua.gr>
+ <20170629184320.7151-4-el13635@mail.ntua.gr>
+In-Reply-To: <20170629184320.7151-4-el13635@mail.ntua.gr>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I'm using -10.
+On 06/29/2017 01:43 PM, Manos Pitsidianakis wrote:
+> bdrv_co_get_block_status_from_file() and
+> bdrv_co_get_block_status_from_backing() set *file to bs->file and
+> bs->backing respectively, so that bdrv_co_get_block_status() can recurs=
+e
+> to them. Future block drivers won't have to duplicate code to implement=
+
+> this.
+>=20
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+> ---
+>  block/blkdebug.c          | 12 +-----------
+>  block/commit.c            | 12 +-----------
+>  block/io.c                | 24 ++++++++++++++++++++++++
+>  block/mirror.c            | 12 +-----------
+>  include/block/block_int.h | 16 ++++++++++++++++
+>  5 files changed, 43 insertions(+), 33 deletions(-)
+
+My [still-needs-rebasing] part 3 series converting
+bdrv_co_get_block_status to byte-based will be impacted by this, but I'd
+rather yours go in first and I can deal with the rebase fallout.
 
 
-r~
+> +++ b/include/block/block_int.h
+> @@ -945,6 +945,22 @@ void bdrv_format_default_perms(BlockDriverState *b=
+s, BdrvChild *c,
+>                                 uint64_t perm, uint64_t shared,
+>                                 uint64_t *nperm, uint64_t *nshared);
+> =20
+> +/*
+> + * Default implementation for drivers to pass bdrv_co_get_block_status=
+() to
+> + * their file
+
+I would have ended with '.'
+
+> + * */
+
+Looks odd.  Just use ' */', not ' * */'
+
+> +int64_t coroutine_fn bdrv_co_get_block_status_from_file(BlockDriverSta=
+te *bs,
+> +                                                     int64_t sector_nu=
+m,
+> +                                                     int nb_sectors, i=
+nt *pnum,
+> +                                                     BlockDriverState =
+**file);
+
+Indentation is unusual (not necessarily bad, since you are up against
+80-column limits).
+
+> +/*
+> + * Default implementation for drivers to pass bdrv_co_get_block_status=
+() to
+> + * their backing file
+> + * */
+> +int64_t coroutine_fn bdrv_co_get_block_status_from_backing(BlockDriver=
+State *bs,
+> +                                                     int64_t sector_nu=
+m,
+> +                                                     int nb_sectors, i=
+nt *pnum,
+> +                                                     BlockDriverState =
+**file);
+
+Ditto.
+
+Making changes according to what I mentioned is minor, so you can add:
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--XXsgUw1WsPbtGb22xOTgx9g3UBJKVghCD
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZWmztAAoJEKeha0olJ0NqETEH/0jb/zI5aHQBusFbkD00J5eF
+TJPoiDrrExvL1h8XOM/aXk1CgauigxOM1qwrq6iNRdlmU0hQjWUtVRSFy0zOZrAy
+pv/DU3C4/n4SD44+ce23dJqrBgP+tr+My9M+ForsA0CRff8OedNptyJE0FRtxw6e
+JGr6lZQG3PsXpHpvYIH6MlZQ1rrtnIGip11Lt5eR10LqIqm7WoVHMI7g2rAlvy3O
+6sBR4ZxfxseFKxliALgiTXIh5yZNL5w7ymxrql4EvGBzd7wNf9fm26qBcX7xtWtF
+yhjSGdgDDX10J7TPNarJXzxQjDUPFCYDSu8RAb/IMlOBgG4JjvkYm9sDSzTQPM0=
+=IeLl
+-----END PGP SIGNATURE-----
+
+--XXsgUw1WsPbtGb22xOTgx9g3UBJKVghCD--
