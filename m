@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dS0vS-0007ZZ-9m
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:58:03 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dS0zB-0000yg-Nt
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 09:01:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dS0vR-0007C2-8I
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:58:02 -0400
-References: <20170703123114.17103-1-eblake@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1dS0zA-00011T-LR
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 09:01:53 -0400
+References: <20170703122505.32017-1-mreitz@redhat.com>
+	<20170703122505.32017-4-mreitz@redhat.com>
+	<a36ef7da-de27-6cc7-5194-d343d05497c1@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <73fa75d7-3aa7-e125-af55-c9f383007a28@redhat.com>
-Date: Mon, 3 Jul 2017 14:57:46 +0200
+Message-ID: <414fd97a-a243-8ab2-1cea-03ca9add6fab@redhat.com>
+Date: Mon, 3 Jul 2017 15:01:17 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170703123114.17103-1-eblake@redhat.com>
+In-Reply-To: <a36ef7da-de27-6cc7-5194-d343d05497c1@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="63lkvp5ss26ehh031WmCPFtLQlKeaabMe"
-Subject: Re: [Qemu-devel] [PATCH v3] tests: Avoid non-portable 'echo -ARG'
+	boundary="GRG7tFi6MJp52nhaQJGw69xV8P1rMiXAA"
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] block: qobject_is_equal() in
+ bdrv_reopen_prepare()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,136 +26,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: edgar.iglesias@xilinx.com, stefanha@redhat.com, qemu-block@nongnu.org, qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Jiri Pirko <jiri@resnulli.us>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---63lkvp5ss26ehh031WmCPFtLQlKeaabMe
+--GRG7tFi6MJp52nhaQJGw69xV8P1rMiXAA
 From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: edgar.iglesias@xilinx.com, stefanha@redhat.com, qemu-block@nongnu.org,
- qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Jiri Pirko <jiri@resnulli.us>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <73fa75d7-3aa7-e125-af55-c9f383007a28@redhat.com>
-Subject: Re: [PATCH v3] tests: Avoid non-portable 'echo -ARG'
-References: <20170703123114.17103-1-eblake@redhat.com>
-In-Reply-To: <20170703123114.17103-1-eblake@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org
+Message-ID: <414fd97a-a243-8ab2-1cea-03ca9add6fab@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] block: qobject_is_equal() in
+ bdrv_reopen_prepare()
+References: <20170703122505.32017-1-mreitz@redhat.com>
+ <20170703122505.32017-4-mreitz@redhat.com>
+ <a36ef7da-de27-6cc7-5194-d343d05497c1@redhat.com>
+In-Reply-To: <a36ef7da-de27-6cc7-5194-d343d05497c1@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-07-03 14:31, Eric Blake wrote:
-> POSIX says that backslashes in the arguments to 'echo', as well as
-> any use of 'echo -n' and 'echo -e', are non-portable; it recommends
-> people should favor 'printf' instead.  This is definitely true where
-> we do not control which shell is running (such as in makefile snippets
-> or in documentation examples).  But even for scripts where we
-> require bash (and therefore, where echo does what we want by default),
-> it is still possible to use 'shopt -s xpg_echo' to change bash's
-> behavior of echo.  And setting a good example never hurts when we are
-> not sure if a snippet will be copied from a bash-only script to a
-> general shell script (although I don't change the use of non-portable
-> \e for ESC when we know the running shell is bash).
+On 2017-07-03 14:51, Eric Blake wrote:
+> On 07/03/2017 07:25 AM, Max Reitz wrote:
+>> Currently, bdrv_reopen_prepare() assumes that all BDS options are
+>> strings. However, this is not the case if the BDS has been created
+>> through the json: pseudo-protocol or blockdev-add.
+>>
+>> Note that the user-invokable reopen command is an HMP command, so you
 >=20
-> Replace 'echo -n "..."' with 'printf %s "..."', and 'echo -e "..."'
-> with 'printf %b "...\n"', with the optimization that the %s/%b
-> argument can be omitted if the string being printed contains no
-> substitutions that could result in '%' (trivial if there are no
-> $ or `, but also possible when using things like $ret that are
-> known to be numeric given the assignment to ret just above).
+> s/invokable/invocable/
+
+I was asking this myself when writing this commit message and actually
+consulted Wiktionary: https://en.wiktionary.org/wiki/invokable
+
+>> can only specify strings there. Therefore, specifying a non-string
+>> option with the "same" value as it was when originally created will no=
+w
+>> return an error because the values are supposedly similar (and there i=
+s
+>> no way for the user to circumvent this but to just not specify the
+>> option again -- however, this is still strictly better than just
+>> crashing).
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>  block.c | 31 ++++++++++++++++++-------------
+>>  1 file changed, 18 insertions(+), 13 deletions(-)
+>>
 >=20
-> In the qemu-iotests check script, fix unusual shell quoting
-> that would result in word-splitting if 'date' outputs a space.
+>> +            /* TODO: When using -drive to specify blockdev options, a=
+ll values
+>> +             * will be strings; however, when using -blockdev, blockd=
+ev-add or
+>> +             * filenames using the json:{} pseudo-protocol, they will=
+ be
+>> +             * correctly typed.
+>> +             * In contrast, reopening options are (currently) always =
+strings
+>> +             * (because you can only specify them through qemu-io; al=
+l other
+>> +             * callers do not specify any options).
+>> +             * Therefore, when using anything other than -drive to cr=
+eate a BDS,
+>> +             * this cannot detect non-string options as unchanged, be=
+cause
+>> +             * qobject_is_equal() always returns false for objects of=
+ different
+>> +             * type.  In the future, this should be remedied by corre=
+ctly typing
+>> +             * all options.  For now, this is not too big of an issue=
+ because
+>> +             * the user simply can not specify options which cannot b=
+e changed
 >=20
-> In test 051, take an opportunity to shorten the line.
+> Seeing "can not" usually looks wrong for "cannot"; but here, it is
+> grammatically correct.  But better would be "the user can simply not
+> specify" or "the user can simply avoid specifying options".
+
+Awww, I deliberately designed the sentence so I could use "can not". :-)
+
+(and even contrast it with the following "cannot"!)
+
+>> +             * anyway, so they will stay unchanged. */
 >=20
-> In test 068, get rid of a pointless second invocation of bash.
->=20
-> CC: qemu-trivial@nongnu.org
-> Signed-off-by: Eric Blake <eblake@redhat.com>
->=20
-> ---
-> v3: use 'printf %s' in a few more places that substitute [Max]
-> v2: be robust to potential % in substitutions
-> ---
->  qemu-options.hx             |  4 ++--
->  tests/multiboot/run_test.sh | 10 +++++-----
->  tests/qemu-iotests/051      |  7 ++++---
->  tests/qemu-iotests/068      |  2 +-
->  tests/qemu-iotests/142      | 48 ++++++++++++++++++++++---------------=
---------
->  tests/qemu-iotests/171      | 14 ++++++-------
->  tests/qemu-iotests/check    | 18 ++++++++---------
->  tests/rocker/all            | 10 +++++-----
->  tests/tcg/cris/Makefile     |  8 ++++----
->  9 files changed, 61 insertions(+), 60 deletions(-)
+> The grammar tweak is minor, so:
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+Please let me keep it :-)
 
-[...]
-
-> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-> index 4b1c674..30af0eb 100755
-> --- a/tests/qemu-iotests/check
-> +++ b/tests/qemu-iotests/check
-
-[...]
-
-> @@ -314,21 +314,21 @@ do
->=20
->          if [ -f core ]
->          then
-> -            echo -n " [dumped core]"
-> +            printf " [dumped core]"
->              mv core $seq.core
->              err=3Dtrue
->          fi
->=20
->          if [ -f $seq.notrun ]
->          then
-> -            $timestamp || echo -n " [not run] "
-> -            $timestamp && echo " [not run]" && echo -n "        $seq -=
-- "
-> +            $timestamp || printf " [not run] "
-> +            $timestamp && echo " [not run]" && printf "        $seq --=
- "
-
-Everywhere else, $seq got its own %s, but not here. That's at least
-inconsistent.
-
-I don't quite know why you're not simply using %s and %b everywhere
-there is a non-constant format string. Yes, if it is an exit code, it is
-pretty clear that it won't contain a %. If it's a return value from
-"date +%T", it is kind of, too (but then you have to know what that does
-in order to review the change -- and I myself had to consult the man
-page, to be honest). If they are variables named "img_offset" and
-"img_size", then you'd hope they are numbers, but in order to check you
-still have to look at the rest of the code (especially since they are
-embedded as strings into the JSON object).
-If you simply used %s and %b everywhere there is a $, reviewing would be
-absolutely trivial. Yes, it seems a bit unnecessary, but it does make
-reviewing much easier and I think since this is also about setting a
-good example, that would be a good example, IMHO.
-(Sure, reviewing this already is easy enough, but there still is a
-difference between "very easy" and "trivial".)
-
-Although at this point I have to admit that reviewing a really trivial
-v4 would take me more time than to just write the following:
-
-With a %s added to the printf above:
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
->              cat $seq.notrun
->              notrun=3D"$notrun $seq"
->          else
->              if [ $sts -ne 0 ]
->              then
-> -                echo -n " [failed, exit status $sts]"
-> +                printf " [failed, exit status $sts]"
->                  err=3Dtrue
->              fi
->=20
+Max
 
 
---63lkvp5ss26ehh031WmCPFtLQlKeaabMe
+--GRG7tFi6MJp52nhaQJGw69xV8P1rMiXAA
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -160,14 +123,14 @@ Content-Disposition: attachment; filename="signature.asc"
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQEvBAEBCAAZBQJZWj9KEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQCRP
-CACXWg78I0pQD5DjGAtAF6PKtkCX1ghYCN/s0ylfQybjh2CYCCkAvsx7WFOihv3U
-eAlqGUSGBHktNWg64jVwMEf2KCppekgDtgiaie0hYqDscZ4p2hfmZycahv8EOT6G
-fDkGRHj90+8zvcgxQtXzNgyD3L9fWZHdEIx+hXKXw0IDdytaiiGyEbmTF1F8cxMH
-GETUVYzpgIq5zJbxQ/t6NOxtj2+NxpcQR8A2TK0sPH4cukTldyjbx4v8yij3jhSb
-VFKXYBZo+WtxQhHQvur9SOxLFZGLRqv3ArlH+UlpzXaH303YxJhb/pu2vCZfPLjK
-1V1UYHmlba4D8uh16/SdPkWi
-=MwgD
+iQEvBAEBCAAZBQJZWkAdEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQATx
+B/9orRbQE34nD92d2tuzusBzy3BJH28z7WUHImtDjjUjn7HAv4/ZW5c/S0sCBq50
+8UnhFVOnJxxOKJzw5Bmnw6WnldKPftsCDFdwfpDG+rkQxHSy4Vb1lh7oFlluBlfw
+27H9RkTpWT3v8Llet1ngaDygBLo77sKz1CgMPegT5elj6EUF6Aant7W4tRXcgOvr
+mgjvFWOLttqwBwKyz8OErHMtLNCx6NKHYLulbfsEvoQY2LHRtSh20EEPyF16sGED
+DKc+DTSlNkPDEneIzkNuqadXyJmTDtRsMoqCEC05M33+7ihDnT2uEpvCgrV/8tvx
+YzUP5srohKrbhyE0Mv07CQLE
+=bIln
 -----END PGP SIGNATURE-----
 
---63lkvp5ss26ehh031WmCPFtLQlKeaabMe--
+--GRG7tFi6MJp52nhaQJGw69xV8P1rMiXAA--
