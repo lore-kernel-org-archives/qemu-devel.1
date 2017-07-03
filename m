@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1dRyMD-0000O0-Dz
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:13:30 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dRySO-0006Dm-At
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:19:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1dRyMC-0001pP-EE
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:13:29 -0400
-Received: from mga01.intel.com ([192.55.52.88]:14583)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1dRyMC-0001cL-3Q
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:13:28 -0400
-From: Yang Zhong <yang.zhong@intel.com>
-Date: Mon,  3 Jul 2017 18:12:23 +0800
-Message-Id: <1499076743-15477-16-git-send-email-yang.zhong@intel.com>
-In-Reply-To: <1499076743-15477-1-git-send-email-yang.zhong@intel.com>
-References: <1499076743-15477-1-git-send-email-yang.zhong@intel.com>
-Subject: [Qemu-devel] [PATCH v2 15/15] tcg: add the CONFIG_TCG into Makefiles
+	(envelope-from <peter.maydell@linaro.org>) id 1dRySN-0004pQ-Ij
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:19:52 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:33373)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dRySN-0004ou-Az
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:19:51 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id r103so231987592wrb.0
+	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 03:19:51 -0700 (PDT)
+MIME-Version: 1.0
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 3 Jul 2017 11:19:29 +0100
+Message-ID: <CAFEAcA9CBus3ibcqB7W3vhifoAxthu0bstixtAKQ4TkAW-XODg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] what is the USB 'maxframes' parameter for and what is
+ its maximum value?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,58 +27,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, rth@twiddle.net, thuth@redhat.com
-Cc: qemu-devel@nongnu.org, anthony.xu@intel.com, a.rigo@virtualopensystems.com, yang.zhong@intel.com
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Add the CONFIG_TCG for frontend and backend's files in the related
-Makefiles.
+Hi; I've been idly looking through our fairly small number of
+remaining Coverity issues, and one of them is in hw/usb/hcd-ehci.c:
+in ehci_work_bh() we do:
+        if (uframes > (ehci->maxframes * 8)) {
 
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
----
- Makefile.target           | 4 ++--
- accel/Makefile.objs       | 2 +-
- target/i386/Makefile.objs | 7 ++++---
- 3 files changed, 7 insertions(+), 6 deletions(-)
+but if maxframes is very large then the multiply will overflow
+a 32-bit integer. (CID 1375885)
 
-diff --git a/Makefile.target b/Makefile.target
-index 0066579..8e185d4 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -90,8 +90,8 @@ all: $(PROGS) stap
- # cpu emulator library
- obj-y += exec.o
- obj-y += accel/
--obj-y += tcg/tcg.o tcg/tcg-op.o tcg/optimize.o
--obj-y += tcg/tcg-common.o tcg/tcg-runtime.o
-+obj-$(CONFIG_TCG) += tcg/tcg.o tcg/tcg-op.o tcg/optimize.o
-+obj-$(CONFIG_TCG) += tcg/tcg-common.o tcg/tcg-runtime.o
- obj-$(CONFIG_TCG_INTERPRETER) += tcg/tci.o
- obj-$(CONFIG_TCG_INTERPRETER) += disas/tci.o
- obj-y += fpu/softfloat.o
-diff --git a/accel/Makefile.objs b/accel/Makefile.objs
-index cd5702f..10666ed 100644
---- a/accel/Makefile.objs
-+++ b/accel/Makefile.objs
-@@ -1,4 +1,4 @@
- obj-$(CONFIG_SOFTMMU) += accel.o
- obj-y += kvm/
--obj-y += tcg/
-+obj-$(CONFIG_TCG) += tcg/
- obj-y += stubs/
-diff --git a/target/i386/Makefile.objs b/target/i386/Makefile.objs
-index 4fcb7f3..fee6c7e 100644
---- a/target/i386/Makefile.objs
-+++ b/target/i386/Makefile.objs
-@@ -1,6 +1,7 @@
--obj-y += translate.o helper.o cpu.o bpt_helper.o
--obj-y += excp_helper.o fpu_helper.o cc_helper.o int_helper.o svm_helper.o
--obj-y += smm_helper.o misc_helper.o mem_helper.o seg_helper.o mpx_helper.o
-+obj-y += helper.o cpu.o cc_helper.o bpt_helper.o
-+obj-$(CONFIG_TCG) += translate.o
-+obj-$(CONFIG_TCG) += excp_helper.o fpu_helper.o int_helper.o svm_helper.o
-+obj-$(CONFIG_TCG) += smm_helper.o misc_helper.o mem_helper.o seg_helper.o mpx_helper.o
- obj-y += gdbstub.o
- obj-$(CONFIG_SOFTMMU) += machine.o arch_memory_mapping.o arch_dump.o monitor.o
- obj-$(CONFIG_KVM) += kvm.o hyperv.o
--- 
-1.9.1
+We could shut up Coverity by forcing a 64-bit multiply, but that
+doesn't really seem like the right approach -- maxframes is a
+user-settable parameter whose default is 128 and values as big
+as 2^30 seem like they probably aren't valid. So perhaps we should
+handle this by having the device sanity-check the user-provided
+value at startup.
+
+Unfortunately there doesn't seem to be any documentation on what
+the 'maxframes' property is for or what its valid values are.
+Digging through git history this was added in commit 16a2dee6b98
+whose commit message briefly says it's the upper limit for how many
+frames we process at once, but I'm not familiar enough with
+USB to be able to translate that into what the valid range
+might be.
+
+thanks
+-- PMM
