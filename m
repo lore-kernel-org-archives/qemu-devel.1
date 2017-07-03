@@ -1,34 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39998)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dRvMG-0003F0-Gh
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 03:01:21 -0400
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1dRvPK-0004qA-In
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 03:04:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dRvMD-0001hz-Em
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 03:01:20 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36618)
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1dRvPH-0003hm-By
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 03:04:30 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60312)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dRvMD-0001hW-8s
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 03:01:17 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dRvMB-0000fA-3z
-	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 07:01:15 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1D36F2E80E6
-	for <qemu-devel@nongnu.org>; Mon,  3 Jul 2017 07:01:15 +0000 (UTC)
+	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
+	id 1dRvPH-0003gP-2p
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 03:04:27 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v6373wpN059828
+	for <qemu-devel@nongnu.org>; Mon, 3 Jul 2017 03:04:25 -0400
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bf63028pm-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 03:04:24 -0400
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
+	Mon, 3 Jul 2017 08:04:22 +0100
+References: <1498829133-20598-1-git-send-email-mihajlov@linux.vnet.ibm.com>
+	<5566d3c2-f791-eab2-cafa-795c96739d8c@redhat.com>
+From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Date: Mon, 3 Jul 2017 09:04:19 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <5566d3c2-f791-eab2-cafa-795c96739d8c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Message-Id: <e2c34fc2-97e0-0a16-c04d-9a039e2d402d@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 03 Jul 2017 06:52:05 -0000
-From: Thomas Huth <1694998@bugs.launchpad.net>
-Reply-To: Bug 1694998 <1694998@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149632651904.23369.12296046707149421968.malonedeb@wampee.canonical.com>
-Message-Id: <149906472560.6077.5309854100870258628.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1694998] Re: PPC: msgsnd instruction leads to
- assertion
+Subject: Re: [Qemu-devel] [PATCH] s390: return unavailable features via
+ query-cpu-definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,44 +43,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, Eduardo Habkost <ehabkost@redhat.com>, jjherne@linux.vnet.ibm.com
 
-Fix has now been included:
-http://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Df1c29ebc51be77bd64178c=
-8d
+On 30.06.2017 18:47, David Hildenbrand wrote:
+> On 30.06.2017 15:25, Viktor Mihajlovski wrote:
+>> The response for query-cpu-definitions didn't include the
+>> unavailable-features field, which is used by libvirt to figure
+>> out whether a certain cpu model is usable on the host.
+>>
+>> The unavailable features are now computed by obtaining the host CPU
+>> model and comparing its feature bitmap with the feature bitmaps of
+>> the known CPU models.
+>>
+>> I.e. the output of virsh domcapabilities would change from
+>>  ...
+>>      <mode name=3D'custom' supported=3D'yes'>
+>>       <model usable=3D'unknown'>z10EC-base</model>
+>>       <model usable=3D'unknown'>z9EC-base</model>
+>>       <model usable=3D'unknown'>z196.2-base</model>
+>>       <model usable=3D'unknown'>z900-base</model>
+>>       <model usable=3D'unknown'>z990</model>
+>>  ...
+>> to
+>>  ...
+>>      <mode name=3D'custom' supported=3D'yes'>
+>>       <model usable=3D'yes'>z10EC-base</model>
+>>       <model usable=3D'yes'>z9EC-base</model>
+>>       <model usable=3D'no'>z196.2-base</model>
+>>       <model usable=3D'yes'>z900-base</model>
+>>       <model usable=3D'yes'>z990</model>
+>>  ...
+>>
+>> Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+>> ---
+>>  target/s390x/cpu_models.c | 51 ++++++++++++++++++++++++++++++++++++++=
+++++-----
+>>  1 file changed, 46 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+>> index 63903c2..dc3371f 100644
+>> --- a/target/s390x/cpu_models.c
+>> +++ b/target/s390x/cpu_models.c
+>> @@ -283,14 +283,43 @@ void s390_cpu_list(FILE *f, fprintf_function pri=
+nt)
+>>      }
+>>  }
+>> =20
+>> +static S390CPUModel *get_max_cpu_model(Error **errp);
+>> +
+>>  #ifndef CONFIG_USER_ONLY
+>> +static void list_add_feat(const char *name, void *opaque);
+>> +
+>> +static void check_unavailable_features(const S390CPUModel *max_model,
+>> +                                       const S390CPUModel *model,
+>> +                                       strList **unavailable)
+>> +{
+>> +    S390FeatBitmap missing;
+>> +
+>> +    /* detect missing features if any to properly report them */
+>> +    bitmap_andnot(missing, model->features, max_model->features,
+>> +                  S390_FEAT_MAX);
+>> +    if (!bitmap_empty(missing, S390_FEAT_MAX)) {
+>> +        s390_feat_bitmap_to_ascii(missing,
+>> +                                  unavailable,
+>> +                                  list_add_feat);
+>=20
+> I remember discussing this with Eduardo when he introduced this.
+>=20
+> There is one additional case to handle here that might turn a CPU model
+> not runnable. This can happen when trying to run a new CPU model on an
+> old host, where the features are not the problem, but the model itself.
+> E.g. running a GA2 version on a GA1 is not allowed. But this can happen
+> more generally also between hardware generations.
+>=20
+> Therefore, whenever the model is never than the host model, we have to
+> add here the special property "type" as missing feature. The
+> documentation partly coveres what we had in mind.>
+> qapi-schema.json:
+> # @unavailable-features is a list of QOM property names that
+>=20
+> # represent CPU model attributes that prevent the CPU from running.
+>=20
+> # If the QOM property is read-only, that means there's no known
+>=20
+> # way to make the CPU model run in the current host. Implementations
+>=20
+> # that choose not to provide specific information return the
+>=20
+> # property name "type".
+>=20
+> We discussed that "type" should always be added if there is no way to
+> make the model runnable (by simply removing features).
+Thanks for the clarification.
+I guess I was reading that too narrow-minded (no specific information vs
+type), although I had the suspicion that features alone wouldn't
+suffice. I will follow the query_cpu_model_comparison pattern and return
+both "type" and the real features.
+> > See check_compatibility() for details. For these cases, add "type" to
+> the list. (you might be able to extend check_compatibility(), making
+> e.g. the *errp and *unavailable parameters optional).
+>=20
 
-** Changed in: qemu
-       Status: New =3D> Fix Committed
+--=20
 
-** Changed in: qemu
-     Assignee: (unassigned) =3D> Thomas Huth (th-huth)
+Mit freundlichen Gr=C3=BC=C3=9Fen/Kind Regards
+   Viktor Mihajlovski
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1694998
-
-Title:
-  PPC: msgsnd instruction leads to assertion
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  I tried to send doorbells (using msgsnd) between cores in guest OS. On QE=
-MU v2.9.0 usage of msgsnd instruction leads to error:
-  ERROR: <...>/qemu-new/translate-common.c:34:tcg_handle_interrupt: asserti=
-on failed: (qemu_mutex_iothread_locked())
-
-  =
-
-  QEMU v2.8.0 works fine.
-
-  QEMU run options: qemu-system-ppc -serial stdio -M ppce500 -cpu e500mc
-  -smp 2 -m 512M -kernel pok.elf
-
-  pok.elf attached
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1694998/+subscriptions
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Martina K=C3=B6deritz
+Gesch=C3=A4ftsf=C3=BChrung: Dirk Wittkopp
+Sitz der Gesellschaft: B=C3=B6blingen
+Registergericht: Amtsgericht Stuttgart, HRB 243294
