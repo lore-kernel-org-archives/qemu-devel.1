@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS30K-0006zO-0n
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 11:11:13 -0400
+	(envelope-from <eblake@redhat.com>) id 1dS30L-00070g-9q
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 11:11:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS30I-000874-HH
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 11:11:11 -0400
+	(envelope-from <eblake@redhat.com>) id 1dS30K-000885-3G
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 11:11:13 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon,  3 Jul 2017 10:10:36 -0500
-Message-Id: <20170703151051.31327-3-eblake@redhat.com>
+Date: Mon,  3 Jul 2017 10:10:38 -0500
+Message-Id: <20170703151051.31327-5-eblake@redhat.com>
 In-Reply-To: <20170703151051.31327-1-eblake@redhat.com>
 References: <20170703151051.31327-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 02/17] hbitmap: Rename
- serialization_granularity to serialization_align
+Subject: [Qemu-devel] [PATCH v4 04/17] dirty-bitmap: Drop unused functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,134 +22,117 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-The only client of hbitmap_serialization_granularity() is dirty-bitmap's
-bdrv_dirty_bitmap_serialization_align().  Keeping the two names consistent
-is worthwhile, and the shorter name is more representative of what the
-function returns (the required alignment to be used for start/count of
-other serialization functions, where violating the alignment causes
-assertion failures).
+We had several functions that no one is currently using, and which
+use sector-based interfaces.  I'm trying to convert towards byte-based
+interfaces, so it's easier to just drop the unused functions:
+
+bdrv_dirty_bitmap_get_meta
+bdrv_dirty_bitmap_get_meta_locked
+bdrv_dirty_bitmap_reset_meta
+bdrv_dirty_bitmap_meta_granularity
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
-v4: new patch
+v4: rebase to Vladimir's persistent bitmaps (bdrv_dirty_bitmap_size now
+in use), dropped R-b
+v3: rebase to upstream changes (bdrv_dirty_bitmap_get_meta_locked was
+added in b64bd51e with no clients), kept R-b
+v2: tweak commit message based on review, no code change
 ---
- include/qemu/hbitmap.h |  8 ++++----
- block/dirty-bitmap.c   |  2 +-
- tests/test-hbitmap.c   | 10 +++++-----
- util/hbitmap.c         |  8 ++++----
- 4 files changed, 14 insertions(+), 14 deletions(-)
+ include/block/dirty-bitmap.h | 10 ----------
+ block/dirty-bitmap.c         | 44 --------------------------------------------
+ 2 files changed, 54 deletions(-)
 
-diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
-index d3a74a2..81e7804 100644
---- a/include/qemu/hbitmap.h
-+++ b/include/qemu/hbitmap.h
-@@ -159,16 +159,16 @@ bool hbitmap_get(const HBitmap *hb, uint64_t item);
- bool hbitmap_is_serializable(const HBitmap *hb);
-
- /**
-- * hbitmap_serialization_granularity:
-+ * hbitmap_serialization_align:
-  * @hb: HBitmap to operate on.
-  *
-- * Granularity of serialization chunks, used by other serialization functions.
-- * For every chunk:
-+ * Required alignment of serialization chunks, used by other serialization
-+ * functions. For every chunk:
-  * 1. Chunk start should be aligned to this granularity.
-  * 2. Chunk size should be aligned too, except for last chunk (for which
-  *      start + count == hb->size)
-  */
--uint64_t hbitmap_serialization_granularity(const HBitmap *hb);
-+uint64_t hbitmap_serialization_align(const HBitmap *hb);
-
- /**
-  * hbitmap_serialization_size:
+diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+index a79a58d..8fd842e 100644
+--- a/include/block/dirty-bitmap.h
++++ b/include/block/dirty-bitmap.h
+@@ -34,7 +34,6 @@ void bdrv_enable_dirty_bitmap(BdrvDirtyBitmap *bitmap);
+ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs);
+ uint32_t bdrv_get_default_bitmap_granularity(BlockDriverState *bs);
+ uint32_t bdrv_dirty_bitmap_granularity(const BdrvDirtyBitmap *bitmap);
+-uint32_t bdrv_dirty_bitmap_meta_granularity(BdrvDirtyBitmap *bitmap);
+ bool bdrv_dirty_bitmap_enabled(BdrvDirtyBitmap *bitmap);
+ bool bdrv_dirty_bitmap_frozen(BdrvDirtyBitmap *bitmap);
+ const char *bdrv_dirty_bitmap_name(const BdrvDirtyBitmap *bitmap);
+@@ -44,15 +43,6 @@ void bdrv_set_dirty_bitmap(BdrvDirtyBitmap *bitmap,
+                            int64_t cur_sector, int64_t nr_sectors);
+ void bdrv_reset_dirty_bitmap(BdrvDirtyBitmap *bitmap,
+                              int64_t cur_sector, int64_t nr_sectors);
+-int bdrv_dirty_bitmap_get_meta(BlockDriverState *bs,
+-                               BdrvDirtyBitmap *bitmap, int64_t sector,
+-                               int nb_sectors);
+-int bdrv_dirty_bitmap_get_meta_locked(BlockDriverState *bs,
+-                                      BdrvDirtyBitmap *bitmap, int64_t sector,
+-                                      int nb_sectors);
+-void bdrv_dirty_bitmap_reset_meta(BlockDriverState *bs,
+-                                  BdrvDirtyBitmap *bitmap, int64_t sector,
+-                                  int nb_sectors);
+ BdrvDirtyBitmapIter *bdrv_dirty_meta_iter_new(BdrvDirtyBitmap *bitmap);
+ BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap,
+                                          uint64_t first_sector);
 diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 30462d4..0490ca3 100644
+index 0490ca3..42a55e4 100644
 --- a/block/dirty-bitmap.c
 +++ b/block/dirty-bitmap.c
-@@ -617,7 +617,7 @@ uint64_t bdrv_dirty_bitmap_serialization_size(const BdrvDirtyBitmap *bitmap,
-
- uint64_t bdrv_dirty_bitmap_serialization_align(const BdrvDirtyBitmap *bitmap)
- {
--    return hbitmap_serialization_granularity(bitmap->bitmap);
-+    return hbitmap_serialization_align(bitmap->bitmap);
+@@ -173,45 +173,6 @@ void bdrv_release_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+     qemu_mutex_unlock(bitmap->mutex);
  }
 
- void bdrv_dirty_bitmap_serialize_part(const BdrvDirtyBitmap *bitmap,
-diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
-index 1acb353..af41642 100644
---- a/tests/test-hbitmap.c
-+++ b/tests/test-hbitmap.c
-@@ -738,15 +738,15 @@ static void test_hbitmap_meta_one(TestHBitmapData *data, const void *unused)
-     }
+-int bdrv_dirty_bitmap_get_meta_locked(BlockDriverState *bs,
+-                                      BdrvDirtyBitmap *bitmap, int64_t sector,
+-                                      int nb_sectors)
+-{
+-    uint64_t i;
+-    int sectors_per_bit = 1 << hbitmap_granularity(bitmap->meta);
+-
+-    /* To optimize: we can make hbitmap to internally check the range in a
+-     * coarse level, or at least do it word by word. */
+-    for (i = sector; i < sector + nb_sectors; i += sectors_per_bit) {
+-        if (hbitmap_get(bitmap->meta, i)) {
+-            return true;
+-        }
+-    }
+-    return false;
+-}
+-
+-int bdrv_dirty_bitmap_get_meta(BlockDriverState *bs,
+-                               BdrvDirtyBitmap *bitmap, int64_t sector,
+-                               int nb_sectors)
+-{
+-    bool dirty;
+-
+-    qemu_mutex_lock(bitmap->mutex);
+-    dirty = bdrv_dirty_bitmap_get_meta_locked(bs, bitmap, sector, nb_sectors);
+-    qemu_mutex_unlock(bitmap->mutex);
+-
+-    return dirty;
+-}
+-
+-void bdrv_dirty_bitmap_reset_meta(BlockDriverState *bs,
+-                                  BdrvDirtyBitmap *bitmap, int64_t sector,
+-                                  int nb_sectors)
+-{
+-    qemu_mutex_lock(bitmap->mutex);
+-    hbitmap_reset(bitmap->meta, sector, nb_sectors);
+-    qemu_mutex_unlock(bitmap->mutex);
+-}
+-
+ int64_t bdrv_dirty_bitmap_size(const BdrvDirtyBitmap *bitmap)
+ {
+     return bitmap->size;
+@@ -511,11 +472,6 @@ uint32_t bdrv_dirty_bitmap_granularity(const BdrvDirtyBitmap *bitmap)
+     return BDRV_SECTOR_SIZE << hbitmap_granularity(bitmap->bitmap);
  }
 
--static void test_hbitmap_serialize_granularity(TestHBitmapData *data,
--                                               const void *unused)
-+static void test_hbitmap_serialize_align(TestHBitmapData *data,
-+                                         const void *unused)
+-uint32_t bdrv_dirty_bitmap_meta_granularity(BdrvDirtyBitmap *bitmap)
+-{
+-    return BDRV_SECTOR_SIZE << hbitmap_granularity(bitmap->meta);
+-}
+-
+ BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap,
+                                          uint64_t first_sector)
  {
-     int r;
-
-     hbitmap_test_init(data, L3 * 2, 3);
-     g_assert(hbitmap_is_serializable(data->hb));
-
--    r = hbitmap_serialization_granularity(data->hb);
-+    r = hbitmap_serialization_align(data->hb);
-     g_assert_cmpint(r, ==, 64 << 3);
- }
-
-@@ -974,8 +974,8 @@ int main(int argc, char **argv)
-     hbitmap_test_add("/hbitmap/meta/word", test_hbitmap_meta_word);
-     hbitmap_test_add("/hbitmap/meta/sector", test_hbitmap_meta_sector);
-
--    hbitmap_test_add("/hbitmap/serialize/granularity",
--                     test_hbitmap_serialize_granularity);
-+    hbitmap_test_add("/hbitmap/serialize/align",
-+                     test_hbitmap_serialize_align);
-     hbitmap_test_add("/hbitmap/serialize/basic",
-                      test_hbitmap_serialize_basic);
-     hbitmap_test_add("/hbitmap/serialize/part",
-diff --git a/util/hbitmap.c b/util/hbitmap.c
-index 21535cc..2f9d0fd 100644
---- a/util/hbitmap.c
-+++ b/util/hbitmap.c
-@@ -413,14 +413,14 @@ bool hbitmap_is_serializable(const HBitmap *hb)
- {
-     /* Every serialized chunk must be aligned to 64 bits so that endianness
-      * requirements can be fulfilled on both 64 bit and 32 bit hosts.
--     * We have hbitmap_serialization_granularity() which converts this
-+     * We have hbitmap_serialization_align() which converts this
-      * alignment requirement from bitmap bits to items covered (e.g. sectors).
-      * That value is:
-      *    64 << hb->granularity
-      * Since this value must not exceed UINT64_MAX, hb->granularity must be
-      * less than 58 (== 64 - 6, where 6 is ld(64), i.e. 1 << 6 == 64).
-      *
--     * In order for hbitmap_serialization_granularity() to always return a
-+     * In order for hbitmap_serialization_align() to always return a
-      * meaningful value, bitmaps that are to be serialized must have a
-      * granularity of less than 58. */
-
-@@ -437,7 +437,7 @@ bool hbitmap_get(const HBitmap *hb, uint64_t item)
-     return (hb->levels[HBITMAP_LEVELS - 1][pos >> BITS_PER_LEVEL] & bit) != 0;
- }
-
--uint64_t hbitmap_serialization_granularity(const HBitmap *hb)
-+uint64_t hbitmap_serialization_align(const HBitmap *hb)
- {
-     assert(hbitmap_is_serializable(hb));
-
-@@ -454,7 +454,7 @@ static void serialization_chunk(const HBitmap *hb,
-                                 unsigned long **first_el, uint64_t *el_count)
- {
-     uint64_t last = start + count - 1;
--    uint64_t gran = hbitmap_serialization_granularity(hb);
-+    uint64_t gran = hbitmap_serialization_align(hb);
-
-     assert((start & (gran - 1)) == 0);
-     assert((last >> hb->granularity) < hb->size);
 -- 
 2.9.4
