@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44268)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dS8c8-0002DQ-PV
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 17:10:38 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dS8gH-00040M-Pb
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 17:14:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dS8c3-0006Pf-HJ
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 17:10:36 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44842)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1dS8c3-0006Md-8K
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 17:10:31 -0400
-Date: Mon, 3 Jul 2017 14:10:27 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <62d87e1c-8a07-2c30-a105-77114a6dc2ef@citrix.com>
-Message-ID: <alpine.DEB.2.10.1707031409380.2919@sstabellini-ThinkPad-X260>
-References: <1498838825-23701-1-git-send-email-igor.druzhinin@citrix.com>
-	<1498838825-23701-3-git-send-email-igor.druzhinin@citrix.com>
-	<alpine.DEB.2.10.1706301631020.2919@sstabellini-ThinkPad-X260>
-	<62d87e1c-8a07-2c30-a105-77114a6dc2ef@citrix.com>
+	(envelope-from <rth7680@gmail.com>) id 1dS8gC-0001Zx-00
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 17:14:52 -0400
+Received: from mail-qk0-x22c.google.com ([2607:f8b0:400d:c09::22c]:36016)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dS8gB-0001YZ-RN
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 17:14:47 -0400
+Received: by mail-qk0-x22c.google.com with SMTP id p21so155311405qke.3
+	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 14:14:45 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170630143614.31059-1-bobby.prani@gmail.com>
+	<20170630143614.31059-3-bobby.prani@gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <a1aecc41-88ea-71c7-0243-b200aebbb6f7@twiddle.net>
+Date: Mon, 3 Jul 2017 14:14:39 -0700
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH 2/4] xen/mapcache: add an ability to create
- dummy mappings
+In-Reply-To: <20170630143614.31059-3-bobby.prani@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 3/3] tcg/aarch64: Enable indirect jump
+ path using LDR (literal)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,123 +32,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Druzhinin <igor.druzhinin@citrix.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, anthony.perard@citrix.com, paul.durrant@citrix.com, pbonzini@redhat.com
+To: Pranith Kumar <bobby.prani@gmail.com>, alex.bennee@linaro.org
+Cc: qemu-devel@nongnu.org
 
-On Mon, 3 Jul 2017, Igor Druzhinin wrote:
-> On 01/07/17 01:06, Stefano Stabellini wrote:
-> > On Fri, 30 Jun 2017, Igor Druzhinin wrote:
-> >> Dummys are simple anonymous mappings that are placed instead
-> >> of regular foreign mappings in certain situations when we need
-> >> to postpone the actual mapping but still have to give a
-> >> memory region to QEMU to play with.
-> >>
-> >> This is planned to be used for restore on Xen.
-> >>
-> >> Signed-off-by: Igor Druzhinin <igor.druzhinin@citrix.com>
-> >>
-> >> ---
-> >>  hw/i386/xen/xen-mapcache.c | 36 ++++++++++++++++++++++++++++--------
-> >>  1 file changed, 28 insertions(+), 8 deletions(-)
-> >>
-> >> diff --git a/hw/i386/xen/xen-mapcache.c b/hw/i386/xen/xen-mapcache.c
-> >> index e60156c..05050de 100644
-> >> --- a/hw/i386/xen/xen-mapcache.c
-> >> +++ b/hw/i386/xen/xen-mapcache.c
-> >> @@ -150,7 +150,8 @@ void xen_map_cache_init(phys_offset_to_gaddr_t f, void *opaque)
-> >>  
-> >>  static void xen_remap_bucket(MapCacheEntry *entry,
-> >>                               hwaddr size,
-> >> -                             hwaddr address_index)
-> >> +                             hwaddr address_index,
-> >> +                             bool dummy)
-> >>  {
-> >>      uint8_t *vaddr_base;
-> >>      xen_pfn_t *pfns;
-> >> @@ -177,11 +178,25 @@ static void xen_remap_bucket(MapCacheEntry *entry,
-> >>          pfns[i] = (address_index << (MCACHE_BUCKET_SHIFT-XC_PAGE_SHIFT)) + i;
-> >>      }
-> >>  
-> >> -    vaddr_base = xenforeignmemory_map(xen_fmem, xen_domid, PROT_READ|PROT_WRITE,
-> >> -                                      nb_pfn, pfns, err);
-> >> -    if (vaddr_base == NULL) {
-> >> -        perror("xenforeignmemory_map");
-> >> -        exit(-1);
-> >> +    if (!dummy) {
-> >> +        vaddr_base = xenforeignmemory_map(xen_fmem, xen_domid,
-> >> +                                           PROT_READ|PROT_WRITE,
-> >> +                                           nb_pfn, pfns, err);
-> >> +        if (vaddr_base == NULL) {
-> >> +            perror("xenforeignmemory_map");
-> >> +            exit(-1);
-> >> +        }
-> >> +    } else {
-> >> +        /*
-> >> +         * We create dummy mappings where we are unable to create a foreign
-> >> +         * mapping immediately due to certain circumstances (i.e. on resume now)
-> >> +         */
-> >> +        vaddr_base = mmap(NULL, size, PROT_READ|PROT_WRITE,
-> >> +                          MAP_ANON|MAP_SHARED, -1, 0);
-> >> +        if (vaddr_base == NULL) {
-> >> +            perror("mmap");
-> >> +            exit(-1);
-> >> +        }
-> > 
-> > For our sanity in debugging this in the future, I think it's best if we
-> > mark this mapcache entry as "dummy". Since we are at it, we could turn
-> > the lock field of MapCacheEntry into a flag field and #define LOCK as
-> > (1<<0) and DUMMY as (1<<1). Please do that as a separate patch.
-> >
+On 06/30/2017 07:36 AM, Pranith Kumar wrote:
+> This patch enables the indirect jump path using an LDR (literal)
+> instruction. It will be interesting to test and see which performs
+> better among the two paths.
 > 
-> Unfortunately, lock field is a reference counter (or at least it looks
-> like according to the source code). It seems to me that it's technically
-> possible to have one region locked from several places in QEMU code. For
-> that reason, I'd like to introduce a separate field - something like
-> uint8_t flags.
+> CC: Alex Bennée <alex.bennee@linaro.org>
+> Reviewed-by: Richard Henderson <rth@twiddle.net>
+> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
 
-Yes, you are right.
+Applied all to tcg-next.
+
+Bonus points for converting USE_DIRECT_JUMP to a run-time flag, perhaps 
+controllable by a -d bit.  That would further enable easy benchmarking of the 
+two paths.
 
 
-> >>>      }
-> >>  
-> >>      entry->vaddr_base = vaddr_base;
-> >> @@ -211,6 +226,7 @@ static uint8_t *xen_map_cache_unlocked(hwaddr phys_addr, hwaddr size,
-> >>      hwaddr cache_size = size;
-> >>      hwaddr test_bit_size;
-> >>      bool translated = false;
-> >> +    bool dummy = false;
-> >>  
-> >>  tryagain:
-> >>      address_index  = phys_addr >> MCACHE_BUCKET_SHIFT;
-> >> @@ -262,14 +278,14 @@ tryagain:
-> >>      if (!entry) {
-> >>          entry = g_malloc0(sizeof (MapCacheEntry));
-> >>          pentry->next = entry;
-> >> -        xen_remap_bucket(entry, cache_size, address_index);
-> >> +        xen_remap_bucket(entry, cache_size, address_index, dummy);
-> >>      } else if (!entry->lock) {
-> >>          if (!entry->vaddr_base || entry->paddr_index != address_index ||
-> >>                  entry->size != cache_size ||
-> >>                  !test_bits(address_offset >> XC_PAGE_SHIFT,
-> >>                      test_bit_size >> XC_PAGE_SHIFT,
-> >>                      entry->valid_mapping)) {
-> >> -            xen_remap_bucket(entry, cache_size, address_index);
-> >> +            xen_remap_bucket(entry, cache_size, address_index, dummy);
-> >>          }
-> >>      }
-> >>  
-> >> @@ -282,6 +298,10 @@ tryagain:
-> >>              translated = true;
-> >>              goto tryagain;
-> >>          }
-> >> +        if (!dummy && runstate_check(RUN_STATE_INMIGRATE)) {
-> >> +            dummy = true;
-> >> +            goto tryagain;
-> >> +        }
-> >>          trace_xen_map_cache_return(NULL);
-> >>          return NULL;
-> >>      }
-> >> -- 
-> >> 2.7.4
-> >>
-> 
+r~
