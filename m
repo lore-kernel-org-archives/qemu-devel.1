@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48588)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS601-00020u-Eo
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 14:23:06 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dS61f-0002qf-TV
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 14:24:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS600-0006qp-GQ
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 14:23:05 -0400
-References: <20170627192458.15519-1-eblake@redhat.com>
-	<20170627192458.15519-19-eblake@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1a2f0667-9060-6412-26ea-22aa484844c2@redhat.com>
-Date: Mon, 3 Jul 2017 13:22:48 -0500
+	(envelope-from <el13635@mail.ntua.gr>) id 1dS61f-0007wA-1E
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 14:24:47 -0400
+Date: Mon, 3 Jul 2017 21:24:27 +0300
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20170703182427.ltj6bbezc3udfiq3@postretch>
+References: <20170629184320.7151-1-el13635@mail.ntua.gr>
+	<20170629184320.7151-4-el13635@mail.ntua.gr>
+	<69eaa5de-6e3c-d520-cdc6-35a6298aee94@redhat.com>
+	<a3c3ad15-ae75-4eae-f74e-72da4e96d980@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170627192458.15519-19-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="DFVE73D5fBE833aatEx9T73lK5rsrS3Pd"
-Subject: Re: [Qemu-devel] [PATCH v3 18/20] block: Make bdrv_is_allocated()
- byte-based
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="glewsaigyx5xcxyx"
+Content-Disposition: inline
+In-Reply-To: <a3c3ad15-ae75-4eae-f74e-72da4e96d980@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] block: add default implementations
+ for bdrv_co_get_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +27,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>, Jeff Cody <jcody@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, jsnow@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---DFVE73D5fBE833aatEx9T73lK5rsrS3Pd
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, Jeff Cody <jcody@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz
- <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, jsnow@redhat.com
-Message-ID: <1a2f0667-9060-6412-26ea-22aa484844c2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 18/20] block: Make bdrv_is_allocated()
- byte-based
-References: <20170627192458.15519-1-eblake@redhat.com>
- <20170627192458.15519-19-eblake@redhat.com>
-In-Reply-To: <20170627192458.15519-19-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
+
+--glewsaigyx5xcxyx
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 06/27/2017 02:24 PM, Eric Blake wrote:
-> We are gradually moving away from sector-based interfaces, towards
-> byte-based.  In the common case, allocation is unlikely to ever use
-> values that are not naturally sector-aligned, but it is possible
-> that byte-based values will let us be more precise about allocation
-> at the end of an unaligned file that can do byte-based access.
->=20
+On Mon, Jul 03, 2017 at 12:51:45PM -0500, Eric Blake wrote:
+>On 07/03/2017 11:12 AM, Eric Blake wrote:
+>> On 06/29/2017 01:43 PM, Manos Pitsidianakis wrote:
+>>> bdrv_co_get_block_status_from_file() and
+>>> bdrv_co_get_block_status_from_backing() set *file to bs->file and
+>>> bs->backing respectively, so that bdrv_co_get_block_status() can recurse
+>>> to them. Future block drivers won't have to duplicate code to implement
+>>> this.
+>>>
+>>> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+>>> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+>>> ---
+>>>  block/blkdebug.c          | 12 +-----------
+>>>  block/commit.c            | 12 +-----------
+>>>  block/io.c                | 24 ++++++++++++++++++++++++
+>>>  block/mirror.c            | 12 +-----------
+>>>  include/block/block_int.h | 16 ++++++++++++++++
+>>>  5 files changed, 43 insertions(+), 33 deletions(-)
+>>
+>> My [still-needs-rebasing] part 3 series converting
+>> bdrv_co_get_block_status to byte-based will be impacted by this, but I'd
+>> rather yours go in first and I can deal with the rebase fallout.
+>
+>In fact, my rebase fallout is to completely delete
+>bdrv_co_get_block_status_from_file().  Why? Because blkdebug is the only
+>client, but I want to enhance blkdebug to add in-place assert()ions that
+>the values passed by the block layer are properly aligned to
+>bs->bl.request_alignment (matching what blkdebug does for read and write
+>- after all, if a device cannot access smaller than a given alignment
+>for a read, it should not be able to report different statuses half-way
+>through that granularity).  However, in-place assertions are no longer
+>generic, so we no longer have a client of a generic helper function
+>referring to bs->file.
+>
+>Which means you are REALLY left only with commit and mirror as the two
+>functions that have a common implementation of pointing back to=20
+>backing.
 
-> ---
-> v2: rebase to earlier changes, tweak commit message
-> ---
->  include/block/block.h |  4 +--
->  block/backup.c        | 17 ++++---------
->  block/commit.c        | 21 +++++++---------
->  block/io.c            | 49 +++++++++++++++++++++++++-----------
->  block/stream.c        |  5 ++--
->  block/vvfat.c         | 34 ++++++++++++++-----------
 
-Now that Kevin's branch is sitting on a bunch of vvfat changes
-(including reformatting to get rid of TABs), applying this will
-conflict.  Do you need me to send a v4 to tackle the resolution?
+Hello Eric, thanks for taking the time to review my patches.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+The throttle driver I'm working on passes bdrv_co_get_block_status() to=20
+bs->file. If there is a problem with an unused default function (it's=20
+not static so will compile, but it might not be up to standard), you can=20
+just remove it and I will reintroduce it when it's needed. CC me on=20
+those patches when you send them if you can.
 
-
---DFVE73D5fBE833aatEx9T73lK5rsrS3Pd
+--glewsaigyx5xcxyx
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZWot4AAoJEKeha0olJ0NqStcH/1UK56kgXpBhlmyDuYBsQd5z
-iyYLpg1u9sGlV9XlrDRIQwIWlG5f/CutsWs6i1WQGGZCQ5U4H+oEdcgHWVR9dUxp
-F8JfSPYGETpkjiZNsw58MyH5ES4mKPUqb3mC2ZwqRuEO6JGf7jdSy7+SbDIeTIYn
-mliI0YKnxt60p0K61CG1tmIhkv8o1dUVdvp7cARJatZ2QagmMXkXS9RtnnqkBBc2
-TCEjG7vmvgvJYhF4hFp5rYT3YD7XkaurIreqjCxF6dmCImOZpur+Ocz8iMZcii7i
-pe5onOvENs36Ty1t46Rjk3CWQlrQsbEpYlDSONXR2AtcXMsXkeMgTjN5dfkTf3E=
-=BDEx
+iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAllai9sACgkQc2J8L2kN
+9xDiag/8DsiP43myPZHnNM00+St2/6igvSOSkhovtSDiiJLayQgAep1bDCEeSLQY
++YGX6zXiEXbkLor66vW9j3MuSIRraNfPU4TkYTIrjdjiEME1ALlwmbuDrxwS1iOb
+eK9tOBdyd/YIlHE5wL5zAkYsjjPB622hzoq3PQG+EI5gy+eS4bWuaKG6ZsXb9wG0
++HShJO/XcfkRy3hl6vmte8fmqeHUdnU0li2klwiUT54NwKeGibCD9FtHrY6YW4K4
++T7rhdqzo9ba7Zp/iNLLxkJtikbC1e9BmCgbe8ygf6YjEuFd25YYyGMTaiKfw/Oc
++wTSuXvdY/+sJWZY+9cCsIA1usijujcGv99uRxPwFIadet3oymYQuZLpa1z9UWUQ
+hWIEXKwz3y7rJRjNb2bGtHyYDhPstR5+Vvc2oeHnDKsnF0SZVuy4uUCjVj/IK6Cg
+1gCEBuDP561gPjkzRBoBD/YT+iveo4REUUSN2afXvDh2irQgHMGYmkpVZP0hlaRu
+gN/07MQNdlHsan+VEVJPVEDXFr10DH3/+yZdUkum4v8SmbVIoL2A0v9LaatOjTMk
+c3gy04qJWkwjSh17aEBKEhfeTVirX3DvmefoiOyIs1a+d/jRi9c5nrsvMYvsLzAX
+xwMHZoQ9Nk2u5q8mDrf5vMVTzDozQp6VK0aLv12YLtzsStEBOW0=
+=jeLi
 -----END PGP SIGNATURE-----
 
---DFVE73D5fBE833aatEx9T73lK5rsrS3Pd--
+--glewsaigyx5xcxyx--
