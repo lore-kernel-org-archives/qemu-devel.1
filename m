@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40197)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dS6zG-00070C-Ns
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:26:23 -0400
+	(envelope-from <mst@redhat.com>) id 1dS72M-0008KL-66
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:29:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dS6zD-0006N8-LS
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:26:22 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:34644)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dS6zD-0006Mb-G5
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:26:19 -0400
-Received: by mail-qk0-x241.google.com with SMTP id 91so25133988qkq.1
-	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 12:26:19 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170703162328.24474-1-laurent@vivier.eu>
-	<20170703162328.24474-5-laurent@vivier.eu>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <39af8700-3e03-828d-144a-5e86703e90cd@twiddle.net>
-Date: Mon, 3 Jul 2017 12:26:13 -0700
+	(envelope-from <mst@redhat.com>) id 1dS72J-0000zB-30
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:29:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55190)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dS72I-0000ym-TO
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:29:31 -0400
+Date: Mon, 3 Jul 2017 22:29:28 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <1499110159-15894-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170703162328.24474-5-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/4] target-m68k: add fscale,
- fgetman and fgetexp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH] virtio-net: fix tx queue size for !vhost-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,30 +24,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>
+To: qemu-devel@nongnu.org
+Cc: Wei Wang <wei.w.wang@intel.com>, Jason Wang <jasowang@redhat.com>
 
-On 07/03/2017 09:23 AM, Laurent Vivier wrote:
-> +void HELPER(fgetman)(CPUM68KState *env, FPReg *res, FPReg *val)
-> +{
-> +    if (floatx80_is_infinity(val->d)) {
-> +        res->d = floatx80_default_nan(NULL);
-> +        /* FIXME: set the OPERR bit int he FPSR */
-> +        return;
-> +    }
-> +    if (floatx80_is_zero(val->d) ||
-> +        floatx80_is_any_nan(val->d)) {
-> +        *res = *val;
-> +        return;
-> +    }
-> +
-> +    res->l.upper = (val->l.upper & 0x8000) | 0x3fff;
-> +    if (floatx80_is_zero_or_denormal(val->d)) {
-> +        res->l.lower = val->l.lower << 1;
+Current code segfaults when no nic peer is specified.
+Fix it up - fall back to default queue size.
 
-Surely you have to do more than this for denormals?  There may be more than one 
-leading zero bit in the mant.  Do you actually need to re-normalize?  Or does 
-real hardware produce a so-called "unnormal" in this situation?
+Fixes: 526e8fa8b872 ("virtio-net: enable configurable tx queue size")
+Cc: Wei Wang <wei.w.wang@intel.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/net/virtio-net.c | 28 ++++++++++++++++++++--------
+ 1 file changed, 20 insertions(+), 8 deletions(-)
 
-
-r~
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index a1fc0db..5630a9e 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -498,6 +498,24 @@ static void virtio_net_set_mrg_rx_bufs(VirtIONet *n, int mergeable_rx_bufs,
+     }
+ }
+ 
++static int virtio_net_max_tx_queue_size(VirtIONet *n)
++{
++    NetClientState *peer = n->nic_conf.peers.ncs[0];
++
++    /*
++     * Backends other than vhost-user don't support max queue size.
++     */
++    if (!peer) {
++        return VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE;
++    }
++
++    if (peer->info->type != NET_CLIENT_DRIVER_VHOST_USER) {
++        return VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE;
++    }
++
++    return VIRTQUEUE_MAX_SIZE;
++}
++
+ static int peer_attach(VirtIONet *n, int index)
+ {
+     NetClientState *nc = qemu_get_subqueue(n->nic, index);
+@@ -1964,14 +1982,8 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
+         error_report("Defaulting to \"bh\"");
+     }
+ 
+-    /*
+-     * Currently, backends other than vhost-user don't support 1024 queue
+-     * size.
+-     */
+-    if (n->net_conf.tx_queue_size == VIRTQUEUE_MAX_SIZE &&
+-        n->nic_conf.peers.ncs[0]->info->type != NET_CLIENT_DRIVER_VHOST_USER) {
+-        n->net_conf.tx_queue_size = VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE;
+-    }
++    n->net_conf.tx_queue_size = MIN(virtio_net_max_tx_queue_size(n),
++                                    n->net_conf.tx_queue_size);
+ 
+     for (i = 0; i < n->max_queues; i++) {
+         virtio_net_add_queue(n, i);
+-- 
+MST
