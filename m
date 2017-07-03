@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41496)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS5Vw-0005Ek-2f
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 13:52:01 -0400
+	(envelope-from <mst@redhat.com>) id 1dS5ZM-0006qb-JY
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 13:55:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS5Vv-0005rK-0C
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 13:52:00 -0400
-References: <20170629184320.7151-1-el13635@mail.ntua.gr>
-	<20170629184320.7151-4-el13635@mail.ntua.gr>
-	<69eaa5de-6e3c-d520-cdc6-35a6298aee94@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a3c3ad15-ae75-4eae-f74e-72da4e96d980@redhat.com>
-Date: Mon, 3 Jul 2017 12:51:45 -0500
+	(envelope-from <mst@redhat.com>) id 1dS5ZJ-00087Z-Fu
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 13:55:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43366)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dS5ZJ-000875-5x
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 13:55:29 -0400
+Date: Mon, 3 Jul 2017 20:55:20 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170703205127-mutt-send-email-mst@kernel.org>
+References: <20170628190047.26159-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <69eaa5de-6e3c-d520-cdc6-35a6298aee94@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="gWq6ec5mLV3KCwBcmAMdcqLquJgwVAB5D"
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] block: add default implementations
- for bdrv_co_get_block_status()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170628190047.26159-1-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 00/29] postcopy+vhost-user/shared ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,89 +26,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com, aarcange@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---gWq6ec5mLV3KCwBcmAMdcqLquJgwVAB5D
-From: Eric Blake <eblake@redhat.com>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>,
- qemu-devel <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
- qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <a3c3ad15-ae75-4eae-f74e-72da4e96d980@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] block: add default implementations
- for bdrv_co_get_block_status()
-References: <20170629184320.7151-1-el13635@mail.ntua.gr>
- <20170629184320.7151-4-el13635@mail.ntua.gr>
- <69eaa5de-6e3c-d520-cdc6-35a6298aee94@redhat.com>
-In-Reply-To: <69eaa5de-6e3c-d520-cdc6-35a6298aee94@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, Jun 28, 2017 at 08:00:18PM +0100, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> Hi,
+>   This is a RFC/WIP series that enables postcopy migration
+> with shared memory to a vhost-user process.
+> It's based off current-head + Juan's load_cleanup series, and
+> Alexey's bitmap series (v4).  It's very lightly tested and seems
+> to work, but it's quite rough.
+> 
+> I've modified the vhost-user-bridge (aka vhub) in qemu's tests/ to
+> use the new feature, since this is about the simplest
+> client around.
+> 
+> Structure:
+> 
+> The basic idea is that near the start of postcopy, the client
+> opens its own userfaultfd fd and sends that back to QEMU over
+> the socket it's already using for VHUST_USER_* commands.
+> Then when VHOST_USER_SET_MEM_TABLE arrives it registers the
+> areas with userfaultfd and sends the mapped addresses back to QEMU.
+> 
+> QEMU then reads the clients UFD in it's fault thread and issues
+> requests back to the source as needed.
+> QEMU also issues 'WAKE' ioctls on the UFD to let the client know
+> that the page has arrived and can carry on.
+> 
+> A new feature (VHOST_USER_PROTOCOL_F_POSTCOPY) is added so that
+> the QEMU knows the client can talk postcopy.
+> Three new messages (VHOST_USER_POSTCOPY_{ADVISE/LISTEN/END}) are
+> added to guide the process along.
+> 
+> Current known issues:
+>    I've not tested it with hugepages yet; and I suspect the madvises
+>    will need tweaking for it.
+> 
+>    The qemu gets to see the base addresses that the client has its
+>    regions mapped at; that's not great for security
 
-On 07/03/2017 11:12 AM, Eric Blake wrote:
-> On 06/29/2017 01:43 PM, Manos Pitsidianakis wrote:
->> bdrv_co_get_block_status_from_file() and
->> bdrv_co_get_block_status_from_backing() set *file to bs->file and
->> bs->backing respectively, so that bdrv_co_get_block_status() can recur=
-se
->> to them. Future block drivers won't have to duplicate code to implemen=
-t
->> this.
->>
->> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
->> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
->> ---
->>  block/blkdebug.c          | 12 +-----------
->>  block/commit.c            | 12 +-----------
->>  block/io.c                | 24 ++++++++++++++++++++++++
->>  block/mirror.c            | 12 +-----------
->>  include/block/block_int.h | 16 ++++++++++++++++
->>  5 files changed, 43 insertions(+), 33 deletions(-)
->=20
-> My [still-needs-rebasing] part 3 series converting
-> bdrv_co_get_block_status to byte-based will be impacted by this, but I'=
-d
-> rather yours go in first and I can deal with the rebase fallout.
+Not urgent to fix.
 
-In fact, my rebase fallout is to completely delete
-bdrv_co_get_block_status_from_file().  Why? Because blkdebug is the only
-client, but I want to enhance blkdebug to add in-place assert()ions that
-the values passed by the block layer are properly aligned to
-bs->bl.request_alignment (matching what blkdebug does for read and write
-- after all, if a device cannot access smaller than a given alignment
-for a read, it should not be able to report different statuses half-way
-through that granularity).  However, in-place assertions are no longer
-generic, so we no longer have a client of a generic helper function
-referring to bs->file.
+>    Take care of deadlocking; any thread in the client that
+>    accesses a userfault protected page can stall.
 
-Which means you are REALLY left only with commit and mirror as the two
-functions that have a common implementation of pointing back to backing.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+And it can happen under a lock quite easily.
+What exactly is proposed here?
+Maybe we want to reuse the new channel that the IOMMU uses.
 
 
---gWq6ec5mLV3KCwBcmAMdcqLquJgwVAB5D
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+>    There's a nasty hack of a lock around the set_mem_table message.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Yes.
 
-iQEcBAEBCAAGBQJZWoQxAAoJEKeha0olJ0NqOzYH/jc05Gp8/Fes59qe8aUzfQo+
-GtHN8m10F6YDhbgwtD2iQqe8Ae5BmuAm6lxf9FM8JZ3ivrAgfD9mzaF4k0qdDkqE
-oNx+otiGQpn+Nhq70PecSV5PntObiTL3T8paWf1lZOS+FLhWCViyzqDDJzxc5uZZ
-Gu4cMy65zo1cebzz6Fid+t7gQwuXN04xN/i7N6I7DOs7Sx15IcZmkwhWzbZLKben
-zr9fkynqeTPu6yfURcQNgjSlSVlBS4LskWycDJu9tMaEpH4NmCSuLdAu/sDrK1/o
-R5KzJJrLwFICd+ciFUgh1BjjZmX49UmsxShR8nrTVjAM8h2VSFYRgjld7U/xjUY=
-=oKRX
------END PGP SIGNATURE-----
+>    I've not looked at the recent IOMMU code.
+> 
+>    Some cleanup and a lot of corner cases need thinking about.
+> 
+>    There are probably plenty of unknown issues as well.
 
---gWq6ec5mLV3KCwBcmAMdcqLquJgwVAB5D--
+At the protocol level, I'd like to rename the feature to
+USER_PAGEFAULT. Client does not really know anything about
+copies, it's all internal to qemu.
+Spec can document that it's used by qemu for postcopy.
+
+
+> Test setup:
+>   I'm running on one host at the moment, with the guest
+>   scping a large file from the host as it migrates.
+>   The setup is based on one I found in the vhost-user setups.
+>   You'll need a recent kernel for the shared memory support
+>   in userfaultfd, and userfault isn't that happy if a process
+>   using shared memory core's - so make sure you have the
+>   latest fixes.
+> 
+> SESS=vhost
+> ulimit -c unlimited
+> tmux -L $SESS new-session -d
+> tmux -L $SESS set-option -g history-limit 30000
+> # Start a router using the system qemu
+> tmux -L $SESS new-window -n router ./x86_64-softmmu/qemu-system-x86_64 -M none -nographic -net socket,vlan=0,udp=loca
+> lhost:4444,localaddr=localhost:5555 -net socket,vlan=0,udp=localhost:4445,localaddr=localhost:5556 -net user,vlan=0
+> tmux -L $SESS set-option -g set-remain-on-exit on
+> # Start source vhost bridge
+> tmux -L $SESS new-window -n srcvhostbr "./tests/vhost-user-bridge -u /tmp/vubrsrc.sock 2>src-vub-log"
+> sleep 0.5
+> tmux -L $SESS new-window -n source "./x86_64-softmmu/qemu-system-x86_64 -enable-kvm -m 8G -smp 2 -object memory-backe
+> nd-file,id=mem,size=8G,mem-path=/dev/shm,share=on -numa node,memdev=mem -mem-prealloc -chardev socket,id=char0,path=/
+> tmp/vubrsrc.sock -netdev type=vhost-user,id=mynet1,chardev=char0,vhostforce -device virtio-net-pci,netdev=mynet1 my.qcow2 -net none -vnc :0 -monitor stdio -trace events=/root/trace-file 2>src-qemu-log "
+> # Start dest vhost bridge
+> tmux -L $SESS new-window -n destvhostbr "./tests/vhost-user-bridge -u /tmp/vubrdst.sock -l 127.0.0.1:4445 -r 127.0.0.
+> 1:5556 2>dst-vub-log"
+> sleep 0.5
+> tmux -L $SESS new-window -n dest "./x86_64-softmmu/qemu-system-x86_64 -enable-kvm -m 8G -smp 2 -object memory-backend
+> -file,id=mem,size=8G,mem-path=/dev/shm,share=on -numa node,memdev=mem -mem-prealloc -chardev socket,id=char0,path=/tm
+> p/vubrdst.sock -netdev type=vhost-user,id=mynet1,chardev=char0,vhostforce -device virtio-net-pci,netdev=mynet1 my.qcow2 -net none -vnc :1 -monitor stdio -incoming tcp::8888 -trace events=/root/trace-file 2>dst-qemu-log"
+> tmux -L $SESS send-keys -t source "migrate_set_capability postcopy-ram on
+> tmux -L $SESS send-keys -t source "migrate_set_speed 20M
+> tmux -L $SESS send-keys -t dest "migrate_set_capability postcopy-ram on
+> 
+> then once booted:
+> tmux -L vhost send-keys -t source 'migrate -d tcp:0:8888^M'
+> tmux -L vhost send-keys -t source 'migrate_start_postcopy^M'
+> (Note those ^M's are actual ctrl-M's i.e. ctrl-v ctrl-M)
+> 
+> 
+> Dave
+> 
+> Dr. David Alan Gilbert (29):
+>   RAMBlock/migration: Add migration flags
+>   migrate: Update ram_block_discard_range for shared
+>   qemu_ram_block_host_offset
+>   migration/ram: ramblock_recv_bitmap_test_byte_offset
+>   postcopy: use UFFDIO_ZEROPAGE only when available
+>   postcopy: Add notifier chain
+>   postcopy: Add vhost-user flag for postcopy and check it
+>   vhost-user: Add 'VHOST_USER_POSTCOPY_ADVISE' message
+>   vhub: Support sending fds back to qemu
+>   vhub: Open userfaultfd
+>   postcopy: Allow registering of fd handler
+>   vhost+postcopy: Register shared ufd with postcopy
+>   vhost+postcopy: Transmit 'listen' to client
+>   vhost+postcopy: Register new regions with the ufd
+>   vhost+postcopy: Send address back to qemu
+>   vhost+postcopy: Stash RAMBlock and offset
+>   vhost+postcopy: Send requests to source for shared pages
+>   vhost+postcopy: Resolve client address
+>   postcopy: wake shared
+>   postcopy: postcopy_notify_shared_wake
+>   vhost+postcopy: Add vhost waker
+>   vhost+postcopy: Call wakeups
+>   vub+postcopy: madvises
+>   vhost+postcopy: Lock around set_mem_table
+>   vhu: enable = false on get_vring_base
+>   vhost: Add VHOST_USER_POSTCOPY_END message
+>   vhost+postcopy: Wire up POSTCOPY_END notify
+>   postcopy: Allow shared memory
+>   vhost-user: Claim support for postcopy
+> 
+>  contrib/libvhost-user/libvhost-user.c | 178 ++++++++++++++++-
+>  contrib/libvhost-user/libvhost-user.h |   8 +
+>  exec.c                                |  44 +++--
+>  hw/virtio/trace-events                |  13 ++
+>  hw/virtio/vhost-user.c                | 293 +++++++++++++++++++++++++++-
+>  include/exec/cpu-common.h             |   3 +
+>  include/exec/ram_addr.h               |   2 +
+>  migration/migration.c                 |   3 +
+>  migration/migration.h                 |   8 +
+>  migration/postcopy-ram.c              | 357 +++++++++++++++++++++++++++-------
+>  migration/postcopy-ram.h              |  69 +++++++
+>  migration/ram.c                       |   5 +
+>  migration/ram.h                       |   1 +
+>  migration/savevm.c                    |  13 ++
+>  migration/trace-events                |   6 +
+>  trace-events                          |   3 +
+>  vl.c                                  |   4 +-
+>  17 files changed, 926 insertions(+), 84 deletions(-)
+> 
+> -- 
+> 2.13.0
