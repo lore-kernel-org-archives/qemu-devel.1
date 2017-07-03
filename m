@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS30q-0007Un-Ul
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 11:11:46 -0400
+	(envelope-from <eblake@redhat.com>) id 1dS30t-0007Wv-SM
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 11:11:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS30p-0000AT-WA
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 11:11:44 -0400
+	(envelope-from <eblake@redhat.com>) id 1dS30s-0000CA-UT
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 11:11:47 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon,  3 Jul 2017 10:10:48 -0500
-Message-Id: <20170703151051.31327-15-eblake@redhat.com>
+Date: Mon,  3 Jul 2017 10:10:50 -0500
+Message-Id: <20170703151051.31327-17-eblake@redhat.com>
 In-Reply-To: <20170703151051.31327-1-eblake@redhat.com>
 References: <20170703151051.31327-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 14/17] qcow2: Switch load_bitmap_data() to
- byte-based iteration
+Subject: [Qemu-devel] [PATCH v4 16/17] dirty-bitmap: Switch bdrv_set_dirty()
+ to bytes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,74 +21,98 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Now that we have adjusted the majority of the calls this function
-makes to be byte-based, it is easier to read the code if it makes
-passes over the image using bytes rather than sectors.
+Both callers already had bytes available, but were scaling to
+sectors.  Move the scaling to internal code.  In the case of
+bdrv_aligned_pwritev(), we are now passing the exact offset
+rather than a rounded sector-aligned value, but that's okay
+as long as dirty bitmap widens start/bytes to granularity
+boundaries.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 
 ---
-v4: new patch
+v4: only context changes
+v3: rebase to lock context changes, R-b kept
+v2: no change
 ---
- block/qcow2-bitmap.c | 22 ++++++++--------------
- 1 file changed, 8 insertions(+), 14 deletions(-)
+ include/block/block_int.h | 2 +-
+ block/dirty-bitmap.c      | 7 ++++---
+ block/io.c                | 6 ++----
+ 3 files changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index 280960a..1de2ab5 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -291,9 +291,8 @@ static int load_bitmap_data(BlockDriverState *bs,
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 58d4ffd..226232d 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -966,7 +966,7 @@ void blk_dev_eject_request(BlockBackend *blk, bool force);
+ bool blk_dev_is_tray_open(BlockBackend *blk);
+ bool blk_dev_is_medium_locked(BlockBackend *blk);
+
+-void bdrv_set_dirty(BlockDriverState *bs, int64_t cur_sector, int64_t nr_sect);
++void bdrv_set_dirty(BlockDriverState *bs, int64_t offset, int64_t bytes);
+ bool bdrv_requests_pending(BlockDriverState *bs);
+
+ void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out);
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 7c79da4..5bfc7bc 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -630,10 +630,10 @@ void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap)
+     hbitmap_deserialize_finish(bitmap->bitmap);
+ }
+
+-void bdrv_set_dirty(BlockDriverState *bs, int64_t cur_sector,
+-                    int64_t nr_sectors)
++void bdrv_set_dirty(BlockDriverState *bs, int64_t offset, int64_t bytes)
  {
-     int ret = 0;
-     BDRVQcow2State *s = bs->opaque;
--    uint64_t sector, limit, sbc;
-+    uint64_t offset, limit;
-     uint64_t bm_size = bdrv_dirty_bitmap_size(bitmap);
--    uint64_t bm_sectors = DIV_ROUND_UP(bm_size, BDRV_SECTOR_SIZE);
-     uint8_t *buf = NULL;
-     uint64_t i, tab_size =
-             size_to_clusters(s,
-@@ -305,32 +304,27 @@ static int load_bitmap_data(BlockDriverState *bs,
+     BdrvDirtyBitmap *bitmap;
++    int64_t end_sector = DIV_ROUND_UP(offset + bytes, BDRV_SECTOR_SIZE);
 
-     buf = g_malloc(s->cluster_size);
-     limit = bytes_covered_by_bitmap_cluster(s, bitmap);
--    sbc = limit >> BDRV_SECTOR_BITS;
--    for (i = 0, sector = 0; i < tab_size; ++i, sector += sbc) {
--        uint64_t count = MIN(bm_sectors - sector, sbc);
-+    for (i = 0, offset = 0; i < tab_size; ++i, offset += limit) {
-+        uint64_t count = MIN(bm_size - offset, limit);
-         uint64_t entry = bitmap_table[i];
--        uint64_t offset = entry & BME_TABLE_ENTRY_OFFSET_MASK;
-+        uint64_t data_offset = entry & BME_TABLE_ENTRY_OFFSET_MASK;
-
-         assert(check_table_entry(entry, s->cluster_size) == 0);
-
--        if (offset == 0) {
-+        if (data_offset == 0) {
-             if (entry & BME_TABLE_ENTRY_FLAG_ALL_ONES) {
--                bdrv_dirty_bitmap_deserialize_ones(bitmap,
--                                                   sector * BDRV_SECTOR_SIZE,
--                                                   count * BDRV_SECTOR_SIZE,
-+                bdrv_dirty_bitmap_deserialize_ones(bitmap, offset, count,
-                                                    false);
-             } else {
-                 /* No need to deserialize zeros because the dirty bitmap is
-                  * already cleared */
-             }
-         } else {
--            ret = bdrv_pread(bs->file, offset, buf, s->cluster_size);
-+            ret = bdrv_pread(bs->file, data_offset, buf, s->cluster_size);
-             if (ret < 0) {
-                 goto finish;
-             }
--            bdrv_dirty_bitmap_deserialize_part(bitmap, buf,
--                                               sector * BDRV_SECTOR_SIZE,
--                                               count * BDRV_SECTOR_SIZE,
-+            bdrv_dirty_bitmap_deserialize_part(bitmap, buf, offset, count,
-                                                false);
+     if (QLIST_EMPTY(&bs->dirty_bitmaps)) {
+         return;
+@@ -645,7 +645,8 @@ void bdrv_set_dirty(BlockDriverState *bs, int64_t cur_sector,
+             continue;
          }
+         assert(!bdrv_dirty_bitmap_readonly(bitmap));
+-        hbitmap_set(bitmap->bitmap, cur_sector, nr_sectors);
++        hbitmap_set(bitmap->bitmap, offset >> BDRV_SECTOR_BITS,
++                    end_sector - (offset >> BDRV_SECTOR_BITS));
      }
+     bdrv_dirty_bitmaps_unlock(bs);
+ }
+diff --git a/block/io.c b/block/io.c
+index 569c503..53c01cf 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -1310,7 +1310,6 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
+     bool waited;
+     int ret;
+
+-    int64_t start_sector = offset >> BDRV_SECTOR_BITS;
+     int64_t end_sector = DIV_ROUND_UP(offset + bytes, BDRV_SECTOR_SIZE);
+     uint64_t bytes_remaining = bytes;
+     int max_transfer;
+@@ -1385,7 +1384,7 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
+     bdrv_debug_event(bs, BLKDBG_PWRITEV_DONE);
+
+     atomic_inc(&bs->write_gen);
+-    bdrv_set_dirty(bs, start_sector, end_sector - start_sector);
++    bdrv_set_dirty(bs, offset, bytes);
+
+     stat64_max(&bs->wr_highest_offset, offset + bytes);
+
+@@ -2394,8 +2393,7 @@ int coroutine_fn bdrv_co_pdiscard(BlockDriverState *bs, int64_t offset,
+     ret = 0;
+ out:
+     atomic_inc(&bs->write_gen);
+-    bdrv_set_dirty(bs, req.offset >> BDRV_SECTOR_BITS,
+-                   req.bytes >> BDRV_SECTOR_BITS);
++    bdrv_set_dirty(bs, req.offset, req.bytes);
+     tracked_request_end(&req);
+     bdrv_dec_in_flight(bs);
+     return ret;
 -- 
 2.9.4
