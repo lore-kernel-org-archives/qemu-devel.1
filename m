@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49670)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dS61f-0002qf-TV
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 14:24:49 -0400
+	(envelope-from <marcel@redhat.com>) id 1dS63a-0003ji-HJ
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 14:26:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dS61f-0007wA-1E
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 14:24:47 -0400
-Date: Mon, 3 Jul 2017 21:24:27 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170703182427.ltj6bbezc3udfiq3@postretch>
-References: <20170629184320.7151-1-el13635@mail.ntua.gr>
-	<20170629184320.7151-4-el13635@mail.ntua.gr>
-	<69eaa5de-6e3c-d520-cdc6-35a6298aee94@redhat.com>
-	<a3c3ad15-ae75-4eae-f74e-72da4e96d980@redhat.com>
+	(envelope-from <marcel@redhat.com>) id 1dS63W-0000m6-Dk
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 14:26:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:5373)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dS63W-0000lA-73
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 14:26:42 -0400
+References: <1498773362-18675-1-git-send-email-zuban32s@gmail.com>
+	<20170630020622-mutt-send-email-mst@kernel.org>
+	<ec616cb6-f693-76c5-5732-ec6ee7840d9c@redhat.com>
+	<20170703142711.0a1db036@nial.brq.redhat.com>
+	<20170703193026-mutt-send-email-mst@kernel.org>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <8c2c1c27-0b92-3877-3f19-640c82682cc4@redhat.com>
+Date: Mon, 3 Jul 2017 21:26:33 +0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="glewsaigyx5xcxyx"
-Content-Disposition: inline
-In-Reply-To: <a3c3ad15-ae75-4eae-f74e-72da4e96d980@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] block: add default implementations
- for bdrv_co_get_block_status()
+In-Reply-To: <20170703193026-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC 0/6] q35: add acpi pci hotplug support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,80 +31,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: Aleksandr Bezzubikov <zuban32s@gmail.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
 
-
---glewsaigyx5xcxyx
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Jul 03, 2017 at 12:51:45PM -0500, Eric Blake wrote:
->On 07/03/2017 11:12 AM, Eric Blake wrote:
->> On 06/29/2017 01:43 PM, Manos Pitsidianakis wrote:
->>> bdrv_co_get_block_status_from_file() and
->>> bdrv_co_get_block_status_from_backing() set *file to bs->file and
->>> bs->backing respectively, so that bdrv_co_get_block_status() can recurse
->>> to them. Future block drivers won't have to duplicate code to implement
->>> this.
->>>
->>> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
->>> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
->>> ---
->>>  block/blkdebug.c          | 12 +-----------
->>>  block/commit.c            | 12 +-----------
->>>  block/io.c                | 24 ++++++++++++++++++++++++
->>>  block/mirror.c            | 12 +-----------
->>>  include/block/block_int.h | 16 ++++++++++++++++
->>>  5 files changed, 43 insertions(+), 33 deletions(-)
+On 03/07/2017 19:34, Michael S. Tsirkin wrote:
+> On Mon, Jul 03, 2017 at 02:27:11PM +0200, Igor Mammedov wrote:
+>> On Fri, 30 Jun 2017 10:25:05 +0300
+>> Marcel Apfelbaum <marcel@redhat.com> wrote:
 >>
->> My [still-needs-rebasing] part 3 series converting
->> bdrv_co_get_block_status to byte-based will be impacted by this, but I'd
->> rather yours go in first and I can deal with the rebase fallout.
->
->In fact, my rebase fallout is to completely delete
->bdrv_co_get_block_status_from_file().  Why? Because blkdebug is the only
->client, but I want to enhance blkdebug to add in-place assert()ions that
->the values passed by the block layer are properly aligned to
->bs->bl.request_alignment (matching what blkdebug does for read and write
->- after all, if a device cannot access smaller than a given alignment
->for a read, it should not be able to report different statuses half-way
->through that granularity).  However, in-place assertions are no longer
->generic, so we no longer have a client of a generic helper function
->referring to bs->file.
->
->Which means you are REALLY left only with commit and mirror as the two
->functions that have a common implementation of pointing back to=20
->backing.
+>> [...]
+>>>
+>>> So for the modern systems not supporting PCI ACPI hotplug
+>>> we don't need pci-bridges anyway, but for the older ones
+>>> the ACPI code of the pci-bridge will be loaded into the
+>>> ACPI namespace only if a pci-bridge is actually hot-plugged.
+>>
+>> just note that the set of 'older' guest OSes is limited to
+>> one that do not support SHPC (i.e. to EOLed WinXP & co)
+>> as for linux and more modern Windows SHPC hotplug should
+>> just work without our ACPI hack (which taxes low memory
+>> to keep acpi tables for bridges).
+>>
+>> So I'm in favor of Michael's suggestion to leave ACPI PCI
+>> only in PC machine for old WinXP guests and to keep Q35
+>> clean, where linux or newer Windows guests could just
+>> use standard SHPC.
+>>
+>> [...]
+> 
+> I didn't realize windows actually supports SHPC for PCI.
 
+Me neither, if Igor is right I am all for shpc hotplug
+since Q35 is not supposed to support older guests.
 
-Hello Eric, thanks for taking the time to review my patches.
+I remember I succeeded to enable shpc hotplug some time
+ago, but only for Linux guests.
 
-The throttle driver I'm working on passes bdrv_co_get_block_status() to=20
-bs->file. If there is a problem with an unused default function (it's=20
-not static so will compile, but it might not be up to standard), you can=20
-just remove it and I will reintroduce it when it's needed. CC me on=20
-those patches when you send them if you can.
+Igor, do you have some spec/doc on newer Windows OSes that confirm
+PCI shpc hotplug support?
 
---glewsaigyx5xcxyx
-Content-Type: application/pgp-signature; name="signature.asc"
+> 
+> Do they correctly set _OSC Arg3, bit offset 1?
+> 	SHPC Native Hot Plug control
+> 	The OS sets this bit to 1 to request control over PCI/PCI-X Standard Hot-Plug Controller
+> 	(SHPC) hot plug. If the OS successfully receives control of this feature, it must track and
+> 	update the status of hot plug slots and handle hot plug events as described in the SHPC
+> 	Specification.
+> I was under impression they only set bit 0.
+> 
 
------BEGIN PGP SIGNATURE-----
+Alexandr, if modern Windows OSes do support shpc, it makes our
+job easier, can you please try to enable shpc hotplug?
 
-iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAllai9sACgkQc2J8L2kN
-9xDiag/8DsiP43myPZHnNM00+St2/6igvSOSkhovtSDiiJLayQgAep1bDCEeSLQY
-+YGX6zXiEXbkLor66vW9j3MuSIRraNfPU4TkYTIrjdjiEME1ALlwmbuDrxwS1iOb
-eK9tOBdyd/YIlHE5wL5zAkYsjjPB622hzoq3PQG+EI5gy+eS4bWuaKG6ZsXb9wG0
-+HShJO/XcfkRy3hl6vmte8fmqeHUdnU0li2klwiUT54NwKeGibCD9FtHrY6YW4K4
-+T7rhdqzo9ba7Zp/iNLLxkJtikbC1e9BmCgbe8ygf6YjEuFd25YYyGMTaiKfw/Oc
-+wTSuXvdY/+sJWZY+9cCsIA1usijujcGv99uRxPwFIadet3oymYQuZLpa1z9UWUQ
-hWIEXKwz3y7rJRjNb2bGtHyYDhPstR5+Vvc2oeHnDKsnF0SZVuy4uUCjVj/IK6Cg
-1gCEBuDP561gPjkzRBoBD/YT+iveo4REUUSN2afXvDh2irQgHMGYmkpVZP0hlaRu
-gN/07MQNdlHsan+VEVJPVEDXFr10DH3/+yZdUkum4v8SmbVIoL2A0v9LaatOjTMk
-c3gy04qJWkwjSh17aEBKEhfeTVirX3DvmefoiOyIs1a+d/jRi9c5nrsvMYvsLzAX
-xwMHZoQ9Nk2u5q8mDrf5vMVTzDozQp6VK0aLv12YLtzsStEBOW0=
-=jeLi
------END PGP SIGNATURE-----
-
---glewsaigyx5xcxyx--
+Thanks,
+Marcel
