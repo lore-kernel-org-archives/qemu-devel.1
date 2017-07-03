@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS30D-0006tc-Nj
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 11:11:07 -0400
+	(envelope-from <eblake@redhat.com>) id 1dS30E-0006uL-MS
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 11:11:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS30C-00082e-Ec
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 11:11:05 -0400
+	(envelope-from <eblake@redhat.com>) id 1dS30D-00083L-N9
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 11:11:06 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon,  3 Jul 2017 10:10:34 -0500
-Message-Id: <20170703151051.31327-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 00/17] make dirty-bitmap byte-based
+Date: Mon,  3 Jul 2017 10:10:35 -0500
+Message-Id: <20170703151051.31327-2-eblake@redhat.com>
+In-Reply-To: <20170703151051.31327-1-eblake@redhat.com>
+References: <20170703151051.31327-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 01/17] dirty-bitmap: Report
+ BlockDirtyInfo.count in bytes, as documented
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,88 +21,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, jsnow@redhat.com
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, qemu-stable@nongnu.org, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-There are patches floating around to add NBD_CMD_BLOCK_STATUS,
-but NBD wants to report status on byte granularity (even if the
-reporting will probably be naturally aligned to sectors or even
-much higher levels).  I've therefore started the task of
-converting our block status code to report at a byte granularity
-rather than sectors.
+We've been documenting the value in bytes since its introduction
+in commit b9a9b3a4 (v1.3), where it was actually reported in bytes.
 
-This is part two of that conversion: dirty-bitmap. Other parts
-include bdrv_is_allocated (at v3 [1]) and replacing
-bdrv_get_block_status with a byte based callback in all the
-drivers (at v1, needs a rebase [3]).
+Commit e4654d2 (v2.0) then removed things from block/qapi.c, in
+preparation for a rewrite to a list of dirty sectors in the next
+commit 21b5683 in block.c, but the new code mistakenly started
+reporting in sectors.
 
-Available as a tag at:
-git fetch git://repo.or.cz/qemu/ericb.git nbd-byte-dirty-v4
+Fixes: https://bugzilla.redhat.com/1441460
 
-Depends on Max's block branch and my v3 bdrv_is_allocated [1]
+CC: qemu-stable@nongnu.org
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 
-v4 is a major rebase: now that persistent dirty bitmaps have
-landed, I had more client code to convert. As part of the
-rebase, I also discovered that v3 did not correctly convert
-the functions used for serializing a dirty bitmap (which
-really didn't matter until qcow2-bitmap.c landed, anyways).
-So the intra-version diffstat is huge, and a lot of patches
-need re-review.
+---
+Too late for 2.9, since the regression has been unnoticed for
+nine releases. But worth putting in 2.9.1.
 
-[1] https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg06077.html
-[2] https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg03859.html
-[3] https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg02642.html
+v2-v4: no change
+---
+ block/dirty-bitmap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-(git backport-diff doesn't like the rename in 5/17)
-
-001/17:[----] [--] 'dirty-bitmap: Report BlockDirtyInfo.count in bytes, as documented'
-002/17:[down] 'hbitmap: Rename serialization_granularity to serialization_align'
-003/17:[down] 'qcow2: Ensure bitmap serialization is aligned'
-004/17:[0006] [FC] 'dirty-bitmap: Drop unused functions'
-005/17:[down] 'dirty-bitmap: Change bdrv_dirty_bitmap_size() to report bytes'
-006/17:[down] 'dirty-bitmap: Change bdrv_dirty_bitmap_*serialize*() to take bytes'
-007/17:[down] 'qcow2: Switch sectors_covered_by_bitmap_cluster() to byte-based'
-008/17:[0004] [FC] 'dirty-bitmap: Set iterator start by offset, not sector'
-009/17:[0002] [FC] 'dirty-bitmap: Change bdrv_dirty_iter_next() to report byte offset'
-010/17:[----] [--] 'dirty-bitmap: Change bdrv_get_dirty_count() to report bytes'
-011/17:[----] [-C] 'dirty-bitmap: Change bdrv_get_dirty_locked() to take bytes'
-012/17:[----] [-C] 'dirty-bitmap: Change bdrv_[re]set_dirty_bitmap() to use bytes'
-013/17:[----] [--] 'mirror: Switch mirror_dirty_init() to byte-based iteration'
-014/17:[down] 'qcow2: Switch load_bitmap_data() to byte-based iteration'
-015/17:[down] 'qcow2: Switch store_bitmap_data() to byte-based iteration'
-016/17:[----] [-C] 'dirty-bitmap: Switch bdrv_set_dirty() to bytes'
-017/17:[0031] [FC] 'dirty-bitmap: Convert internal hbitmap size/granularity'
-
-Eric Blake (17):
-  dirty-bitmap: Report BlockDirtyInfo.count in bytes, as documented
-  hbitmap: Rename serialization_granularity to serialization_align
-  qcow2: Ensure bitmap serialization is aligned
-  dirty-bitmap: Drop unused functions
-  dirty-bitmap: Change bdrv_dirty_bitmap_size() to report bytes
-  dirty-bitmap: Change bdrv_dirty_bitmap_*serialize*() to take bytes
-  qcow2: Switch sectors_covered_by_bitmap_cluster() to byte-based
-  dirty-bitmap: Set iterator start by offset, not sector
-  dirty-bitmap: Change bdrv_dirty_iter_next() to report byte offset
-  dirty-bitmap: Change bdrv_get_dirty_count() to report bytes
-  dirty-bitmap: Change bdrv_get_dirty_locked() to take bytes
-  dirty-bitmap: Change bdrv_[re]set_dirty_bitmap() to use bytes
-  mirror: Switch mirror_dirty_init() to byte-based iteration
-  qcow2: Switch load_bitmap_data() to byte-based iteration
-  qcow2: Switch store_bitmap_data() to byte-based iteration
-  dirty-bitmap: Switch bdrv_set_dirty() to bytes
-  dirty-bitmap: Convert internal hbitmap size/granularity
-
- include/block/block_int.h    |   2 +-
- include/block/dirty-bitmap.h |  41 +++++---------
- include/qemu/hbitmap.h       |   8 +--
- block/backup.c               |   7 +--
- block/dirty-bitmap.c         | 128 ++++++++++++++-----------------------------
- block/io.c                   |   6 +-
- block/mirror.c               |  73 +++++++++++-------------
- block/qcow2-bitmap.c         |  57 +++++++++----------
- migration/block.c            |  12 ++--
- tests/test-hbitmap.c         |  10 ++--
- util/hbitmap.c               |   8 +--
- 11 files changed, 142 insertions(+), 210 deletions(-)
-
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 543bddb..30462d4 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -461,7 +461,7 @@ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs)
+     QLIST_FOREACH(bm, &bs->dirty_bitmaps, list) {
+         BlockDirtyInfo *info = g_new0(BlockDirtyInfo, 1);
+         BlockDirtyInfoList *entry = g_new0(BlockDirtyInfoList, 1);
+-        info->count = bdrv_get_dirty_count(bm);
++        info->count = bdrv_get_dirty_count(bm) << BDRV_SECTOR_BITS;
+         info->granularity = bdrv_dirty_bitmap_granularity(bm);
+         info->has_name = !!bm->name;
+         info->name = g_strdup(bm->name);
 -- 
 2.9.4
