@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1dRyM2-0000EU-Ex
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:13:19 -0400
+	(envelope-from <yang.zhong@intel.com>) id 1dRyM4-0000GJ-3J
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:13:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1dRyM1-0001iA-3C
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:13:17 -0400
+	(envelope-from <yang.zhong@intel.com>) id 1dRyM2-0001jB-Sh
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:13:20 -0400
 Received: from mga01.intel.com ([192.55.52.88]:14583)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1dRyM0-0001cL-Qx
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:13:17 -0400
+	id 1dRyM2-0001cL-JS
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 06:13:18 -0400
 From: Yang Zhong <yang.zhong@intel.com>
-Date: Mon,  3 Jul 2017 18:12:17 +0800
-Message-Id: <1499076743-15477-10-git-send-email-yang.zhong@intel.com>
+Date: Mon,  3 Jul 2017 18:12:18 +0800
+Message-Id: <1499076743-15477-11-git-send-email-yang.zhong@intel.com>
 In-Reply-To: <1499076743-15477-1-git-send-email-yang.zhong@intel.com>
 References: <1499076743-15477-1-git-send-email-yang.zhong@intel.com>
-Subject: [Qemu-devel] [PATCH v2 09/15] tcg: add the tcg-stub.c file into
- accel/stubs/
+Subject: [Qemu-devel] [PATCH v2 10/15] tcg: move tb related lock functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,109 +27,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: pbonzini@redhat.com, rth@twiddle.net, thuth@redhat.com
 Cc: qemu-devel@nongnu.org, anthony.xu@intel.com, a.rigo@virtualopensystems.com, yang.zhong@intel.com
 
-If tcg is disabled, the functions in tcg-stub.c file will be called.
-This file is target-independent file, do not include any platform
-related stub functions into this file.
+Move tb_lock()/tb_unlock()/tb_lock_reset() from tcg.h to
+translate-all.h. tb_lock()/tb_unlock() need be impelemnted
+in accel/stubs/tcg-stub.c.
 
 Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 ---
- accel/stubs/Makefile.objs |  1 +
- accel/stubs/tcg-stub.c    | 80 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 81 insertions(+)
- create mode 100644 accel/stubs/tcg-stub.c
+ accel/stubs/tcg-stub.c    | 8 ++++++++
+ accel/tcg/cpu-exec.c      | 1 +
+ accel/tcg/cputlb.c        | 1 +
+ accel/tcg/translate-all.h | 3 +++
+ tcg/tcg.h                 | 4 ----
+ trace/control-target.c    | 1 -
+ 6 files changed, 13 insertions(+), 5 deletions(-)
 
-diff --git a/accel/stubs/Makefile.objs b/accel/stubs/Makefile.objs
-index bd5794f..fdfbf73 100644
---- a/accel/stubs/Makefile.objs
-+++ b/accel/stubs/Makefile.objs
-@@ -1 +1,2 @@
- obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
-+obj-$(call lnot,$(CONFIG_TCG)) += tcg-stub.o
 diff --git a/accel/stubs/tcg-stub.c b/accel/stubs/tcg-stub.c
-new file mode 100644
-index 0000000..a9fe40a
---- /dev/null
+index a9fe40a..a84a6e6 100644
+--- a/accel/stubs/tcg-stub.c
 +++ b/accel/stubs/tcg-stub.c
-@@ -0,0 +1,80 @@
-+/*
-+ * QEMU TCG accelerator stub
-+ *
-+ * Copyright Red Hat, Inc. 2013
-+ *
-+ * Author: Paolo Bonzini     <pbonzini@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
+@@ -20,6 +20,14 @@
+ #include "exec/cpu-all.h"
+ 
+ 
++void tb_lock(void)
++{
++}
 +
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "cpu.h"
-+#include "tcg/tcg.h"
-+#include "exec/cpu-common.h"
-+#include "exec/exec-all.h"
++void tb_unlock(void)
++{
++}
++
+ void tb_flush(CPUState *cpu)
+ {
+ }
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index 3581618..03b4ea2 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -21,6 +21,7 @@
+ #include "trace.h"
+ #include "disas/disas.h"
+ #include "exec/exec-all.h"
 +#include "translate-all.h"
-+#include "exec/cpu-all.h"
-+
-+
-+void tb_flush(CPUState *cpu)
-+{
-+}
-+
-+void tb_invalidate_phys_page_fast(tb_page_addr_t start, int len)
-+{
-+}
-+
-+void tb_invalidate_phys_range(tb_page_addr_t start, tb_page_addr_t end)
-+{
-+}
-+
-+void tb_check_watchpoint(CPUState *cpu)
-+{
-+}
-+
-+TranslationBlock *tb_gen_code(CPUState *cpu,
-+                              target_ulong pc, target_ulong cs_base,
-+                              uint32_t flags, int cflags)
-+{
-+    return NULL;
-+}
-+
-+void tlb_reset_dirty(CPUState *cpu, ram_addr_t start1, ram_addr_t length)
-+{
-+}
-+
-+void tlb_set_dirty(CPUState *cpu, target_ulong vaddr)
-+{
-+}
-+
-+bool cpu_restore_state(CPUState *cpu, uintptr_t searched_pc)
-+{
-+    return false;
-+}
-+
-+void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
-+{
-+}
-+
-+void dump_opcount_info(FILE *f, fprintf_function cpu_fprintf)
-+{
-+}
-+
-+void cpu_loop_exit(CPUState *cpu)
-+{
-+    abort();
-+}
-+
-+void cpu_loop_exit_noexc(CPUState *cpu)
-+{
-+    abort();
-+}
-+
-+int cpu_exec(CPUState *cpu)
-+{
-+    abort();
-+}
+ #include "tcg.h"
+ #include "qemu/atomic.h"
+ #include "sysemu/qtest.h"
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index 1900936..c0efd74 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -21,6 +21,7 @@
+ #include "qemu/main-loop.h"
+ #include "cpu.h"
+ #include "exec/exec-all.h"
++#include "translate-all.h"
+ #include "exec/memory.h"
+ #include "exec/address-spaces.h"
+ #include "exec/cpu_ldst.h"
+diff --git a/accel/tcg/translate-all.h b/accel/tcg/translate-all.h
+index ba8e4d6..4774f78 100644
+--- a/accel/tcg/translate-all.h
++++ b/accel/tcg/translate-all.h
+@@ -23,6 +23,9 @@
+ 
+ 
+ /* translate-all.c */
++void tb_lock(void);
++void tb_unlock(void);
++void tb_lock_reset(void);
+ void tb_invalidate_phys_page_fast(tb_page_addr_t start, int len);
+ void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end,
+                                    int is_cpu_write_access);
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 9e37722..da78721 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -757,10 +757,6 @@ void *tcg_malloc_internal(TCGContext *s, int size);
+ void tcg_pool_reset(TCGContext *s);
+ TranslationBlock *tcg_tb_alloc(TCGContext *s);
+ 
+-void tb_lock(void);
+-void tb_unlock(void);
+-void tb_lock_reset(void);
+-
+ /* Called with tb_lock held.  */
+ static inline void *tcg_malloc(int size)
+ {
+diff --git a/trace/control-target.c b/trace/control-target.c
+index 6266e63..2a5efc7 100644
+--- a/trace/control-target.c
++++ b/trace/control-target.c
+@@ -11,7 +11,6 @@
+ #include "cpu.h"
+ #include "trace-root.h"
+ #include "trace/control.h"
+-#include "translate-all.h"
+ 
+ 
+ void trace_event_set_state_dynamic_init(TraceEvent *ev, bool state)
 -- 
 1.9.1
