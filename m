@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS9cf-0007PY-Es
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 18:15:14 -0400
+	(envelope-from <eblake@redhat.com>) id 1dS9cn-0007UU-4g
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 18:15:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS9ce-0004JQ-6d
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 18:15:13 -0400
+	(envelope-from <eblake@redhat.com>) id 1dS9cl-0004S8-PP
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 18:15:21 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon,  3 Jul 2017 17:14:41 -0500
-Message-Id: <20170703221456.30817-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 00/15] make bdrv_get_block_status byte-based
+Date: Mon,  3 Jul 2017 17:14:42 -0500
+Message-Id: <20170703221456.30817-2-eblake@redhat.com>
+In-Reply-To: <20170703221456.30817-1-eblake@redhat.com>
+References: <20170703221456.30817-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 01/15] block: add default implementations
+ for bdrv_co_get_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,100 +21,183 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, el13635@mail.ntua.gr
+Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, el13635@mail.ntua.gr, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
 
-There are patches floating around to add NBD_CMD_BLOCK_STATUS,
-but NBD wants to report status on byte granularity (even if the
-reporting will probably be naturally aligned to sectors or even
-much higher levels).  I've therefore started the task of
-converting our block status code to report at a byte granularity
-rather than sectors.
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
 
-The overall conversion currently looks like:
-part 1: bdrv_is_allocated (v3 is reviewed [1], modulo vvfat whitespace changes)
-part 2: dirty-bitmap (v4 is posted [2]; v2 was reviewed but rebase changes
-mean more review is needed)
-part 3: this series, for bdrv_get_block_status (first half of v1, at [3],
-did not get much review)
-part 4: upcoming series, for .bdrv_co_block_status (second half of v1 [3])
+bdrv_co_get_block_status_from_file() and
+bdrv_co_get_block_status_from_backing() set *file to bs->file and
+bs->backing respectively, so that bdrv_co_get_block_status() can recurse
+to them. Future block drivers won't have to duplicate code to implement
+this.
 
-Available as a tag at:
-git fetch git://repo.or.cz/qemu/ericb.git nbd-byte-status-v2
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-Id: <20170629184320.7151-4-el13635@mail.ntua.gr>
 
-It is based on the union of Max's and Kevin's block branches,
-plus posted fixes that make iotest 55 pass.
+---
+v2: Including this patch from Manos, since it affects my later patches;
+however, I anticipate that we will get a full v3 series from Manos
+merged first
+---
+ include/block/block_int.h | 16 ++++++++++++++++
+ block/blkdebug.c          | 12 +-----------
+ block/commit.c            | 12 +-----------
+ block/io.c                | 24 ++++++++++++++++++++++++
+ block/mirror.c            | 12 +-----------
+ 5 files changed, 43 insertions(+), 33 deletions(-)
 
-The diffstat shows a net growth in line count, but some of that is due
-to better comments, and some because the code is a bit longer in order
-to handle differing alignments between caller and driver.
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 226232d..724799c 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -958,6 +958,22 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
+                                uint64_t perm, uint64_t shared,
+                                uint64_t *nperm, uint64_t *nshared);
 
-I still haven't felt like tackling the task of rewriting migration/block.c
-and qemu-img.c to use bytes (instead of sectors) everywhere - that might
-give another net win in lines of code and legibility.
++/*
++ * Default implementation for drivers to pass bdrv_co_get_block_status() to
++ * their file
++ * */
++int64_t coroutine_fn bdrv_co_get_block_status_from_file(BlockDriverState *bs,
++                                                     int64_t sector_num,
++                                                     int nb_sectors, int *pnum,
++                                                     BlockDriverState **file);
++/*
++ * Default implementation for drivers to pass bdrv_co_get_block_status() to
++ * their backing file
++ * */
++int64_t coroutine_fn bdrv_co_get_block_status_from_backing(BlockDriverState *bs,
++                                                     int64_t sector_num,
++                                                     int nb_sectors, int *pnum,
++                                                     BlockDriverState **file);
+ const char *bdrv_get_parent_name(const BlockDriverState *bs);
+ void blk_dev_change_media_cb(BlockBackend *blk, bool load, Error **errp);
+ bool blk_dev_has_removable_media(BlockBackend *blk);
+diff --git a/block/blkdebug.c b/block/blkdebug.c
+index b25856c..f1539db 100644
+--- a/block/blkdebug.c
++++ b/block/blkdebug.c
+@@ -641,16 +641,6 @@ static int coroutine_fn blkdebug_co_pdiscard(BlockDriverState *bs,
+     return bdrv_co_pdiscard(bs->file->bs, offset, bytes);
+ }
 
-Patch 1/15 isn't really mine; Manos will probably be posting a v3
-of his series, which should be committed before mine [4].
+-static int64_t coroutine_fn blkdebug_co_get_block_status(
+-    BlockDriverState *bs, int64_t sector_num, int nb_sectors, int *pnum,
+-    BlockDriverState **file)
+-{
+-    *pnum = nb_sectors;
+-    *file = bs->file->bs;
+-    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
+-        (sector_num << BDRV_SECTOR_BITS);
+-}
+-
+ static void blkdebug_close(BlockDriverState *bs)
+ {
+     BDRVBlkdebugState *s = bs->opaque;
+@@ -925,7 +915,7 @@ static BlockDriver bdrv_blkdebug = {
+     .bdrv_co_flush_to_disk  = blkdebug_co_flush,
+     .bdrv_co_pwrite_zeroes  = blkdebug_co_pwrite_zeroes,
+     .bdrv_co_pdiscard       = blkdebug_co_pdiscard,
+-    .bdrv_co_get_block_status = blkdebug_co_get_block_status,
++    .bdrv_co_get_block_status = bdrv_co_get_block_status_from_file,
 
-[1] https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg06077.html
-[2] https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg00269.html
-[3] https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg02642.html
-[4] https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg06846.html
+     .bdrv_debug_event           = blkdebug_debug_event,
+     .bdrv_debug_breakpoint      = blkdebug_debug_breakpoint,
+diff --git a/block/commit.c b/block/commit.c
+index 774a8a5..9e875a6 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -242,16 +242,6 @@ static int coroutine_fn bdrv_commit_top_preadv(BlockDriverState *bs,
+     return bdrv_co_preadv(bs->backing, offset, bytes, qiov, flags);
+ }
 
-Since v1: rebase against lots of upstream churn; add patches to support
-arbitrary alignments and test them. I also split the original v1 series
-(31 patches) into two halves, where teaching the individual drivers
-about byte-level granularity is now going to be a fourth series (I'll
-post a 16/15 RFC patch to show the interface that will use)
+-static int64_t coroutine_fn bdrv_commit_top_get_block_status(
+-    BlockDriverState *bs, int64_t sector_num, int nb_sectors, int *pnum,
+-    BlockDriverState **file)
+-{
+-    *pnum = nb_sectors;
+-    *file = bs->backing->bs;
+-    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
+-           (sector_num << BDRV_SECTOR_BITS);
+-}
+-
+ static void bdrv_commit_top_refresh_filename(BlockDriverState *bs, QDict *opts)
+ {
+     bdrv_refresh_filename(bs->backing->bs);
+@@ -277,7 +267,7 @@ static void bdrv_commit_top_child_perm(BlockDriverState *bs, BdrvChild *c,
+ static BlockDriver bdrv_commit_top = {
+     .format_name                = "commit_top",
+     .bdrv_co_preadv             = bdrv_commit_top_preadv,
+-    .bdrv_co_get_block_status   = bdrv_commit_top_get_block_status,
++    .bdrv_co_get_block_status   = bdrv_co_get_block_status_from_backing,
+     .bdrv_refresh_filename      = bdrv_commit_top_refresh_filename,
+     .bdrv_close                 = bdrv_commit_top_close,
+     .bdrv_child_perm            = bdrv_commit_top_child_perm,
+diff --git a/block/io.c b/block/io.c
+index 53c01cf..8c67ba8 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -1689,6 +1689,30 @@ typedef struct BdrvCoGetBlockStatusData {
+     bool done;
+ } BdrvCoGetBlockStatusData;
 
-001/15:[down] 'block: add default implementations for bdrv_co_get_block_status()'
-002/15:[down] 'block: Allow NULL file for bdrv_get_block_status()'
-003/15:[down] 'block: Add flag to avoid wasted work in bdrv_is_allocated()'
-004/15:[0002] [FC] 'block: Make bdrv_round_to_clusters() signature more useful'
-005/15:[0018] [FC] 'qcow2: Switch is_zero_sectors() to byte-based'
-006/15:[0004] [FC] 'block: Switch bdrv_make_zero() to byte-based'
-007/15:[----] [--] 'qemu-img: Switch get_block_status() to byte-based'
-008/15:[0058] [FC] 'block: Convert bdrv_get_block_status() to bytes'
-009/15:[0064] [FC] 'block: Switch bdrv_co_get_block_status() to byte-based'
-010/15:[0001] [FC] 'block: Switch BdrvCoGetBlockStatusData to byte-based'
-011/15:[down] 'block: Switch bdrv_common_block_status_above() to byte-based'
-012/15:[0010] [FC] 'block: Switch bdrv_co_get_block_status_above() to byte-based'
-013/15:[0063] [FC] 'block: Convert bdrv_get_block_status_above() to bytes'
-014/15:[down] 'block: Align block status requests'
-015/15:[down] 'qemu-io: Relax 'alloc' now that block-status doesn't assert'
++int64_t coroutine_fn bdrv_co_get_block_status_from_file(BlockDriverState *bs,
++                                                     int64_t sector_num,
++                                                     int nb_sectors, int *pnum,
++                                                     BlockDriverState **file)
++{
++    assert(bs->file && bs->file->bs);
++    *pnum = nb_sectors;
++    *file = bs->file->bs;
++    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
++           (sector_num << BDRV_SECTOR_BITS);
++}
++
++int64_t coroutine_fn bdrv_co_get_block_status_from_backing(BlockDriverState *bs,
++                                                     int64_t sector_num,
++                                                     int nb_sectors, int *pnum,
++                                                     BlockDriverState **file)
++{
++    assert(bs->backing && bs->backing->bs);
++    *pnum = nb_sectors;
++    *file = bs->backing->bs;
++    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
++           (sector_num << BDRV_SECTOR_BITS);
++}
++
+ /*
+  * Returns the allocation status of the specified sectors.
+  * Drivers not implementing the functionality are assumed to not support
+diff --git a/block/mirror.c b/block/mirror.c
+index 6f54dcc..4e883bc 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1043,16 +1043,6 @@ static int coroutine_fn bdrv_mirror_top_flush(BlockDriverState *bs)
+     return bdrv_co_flush(bs->backing->bs);
+ }
 
-Eric Blake (14):
-  block: Allow NULL file for bdrv_get_block_status()
-  block: Add flag to avoid wasted work in bdrv_is_allocated()
-  block: Make bdrv_round_to_clusters() signature more useful
-  qcow2: Switch is_zero_sectors() to byte-based
-  block: Switch bdrv_make_zero() to byte-based
-  qemu-img: Switch get_block_status() to byte-based
-  block: Convert bdrv_get_block_status() to bytes
-  block: Switch bdrv_co_get_block_status() to byte-based
-  block: Switch BdrvCoGetBlockStatusData to byte-based
-  block: Switch bdrv_common_block_status_above() to byte-based
-  block: Switch bdrv_co_get_block_status_above() to byte-based
-  block: Convert bdrv_get_block_status_above() to bytes
-  block: Align block status requests
-  qemu-io: Relax 'alloc' now that block-status doesn't assert
-
-Manos Pitsidianakis (1):
-  block: add default implementations for bdrv_co_get_block_status()
-
- include/block/block.h      |  26 ++--
- include/block/block_int.h  |  27 +++-
- block/blkdebug.c           |   9 +-
- block/commit.c             |  12 +-
- block/io.c                 | 302 ++++++++++++++++++++++++++++-----------------
- block/mirror.c             |  32 ++---
- block/qcow2-cluster.c      |   2 +-
- block/qcow2.c              |  34 ++---
- qemu-img.c                 |  71 ++++++-----
- qemu-io-cmds.c             |  13 --
- block/trace-events         |   2 +-
- tests/qemu-iotests/177     |  11 +-
- tests/qemu-iotests/177.out |  18 ++-
- 13 files changed, 317 insertions(+), 242 deletions(-)
-
+-static int64_t coroutine_fn bdrv_mirror_top_get_block_status(
+-    BlockDriverState *bs, int64_t sector_num, int nb_sectors, int *pnum,
+-    BlockDriverState **file)
+-{
+-    *pnum = nb_sectors;
+-    *file = bs->backing->bs;
+-    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
+-           (sector_num << BDRV_SECTOR_BITS);
+-}
+-
+ static int coroutine_fn bdrv_mirror_top_pwrite_zeroes(BlockDriverState *bs,
+     int64_t offset, int bytes, BdrvRequestFlags flags)
+ {
+@@ -1099,7 +1089,7 @@ static BlockDriver bdrv_mirror_top = {
+     .bdrv_co_pwrite_zeroes      = bdrv_mirror_top_pwrite_zeroes,
+     .bdrv_co_pdiscard           = bdrv_mirror_top_pdiscard,
+     .bdrv_co_flush              = bdrv_mirror_top_flush,
+-    .bdrv_co_get_block_status   = bdrv_mirror_top_get_block_status,
++    .bdrv_co_get_block_status   = bdrv_co_get_block_status_from_backing,
+     .bdrv_refresh_filename      = bdrv_mirror_top_refresh_filename,
+     .bdrv_close                 = bdrv_mirror_top_close,
+     .bdrv_child_perm            = bdrv_mirror_top_child_perm,
 -- 
 2.9.4
