@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dS0At-0007qu-T9
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:09:57 -0400
+	(envelope-from <eblake@redhat.com>) id 1dS0Hx-0002fm-IP
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:17:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dS0Aq-0000rX-LT
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:09:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54698)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dS0Aq-0000r4-F7
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:09:52 -0400
-Date: Mon, 3 Jul 2017 13:09:45 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170703120945.GG5663@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1499076743-15477-1-git-send-email-yang.zhong@intel.com>
-	<1499076743-15477-2-git-send-email-yang.zhong@intel.com>
-	<20170703102043.GE5663@redhat.com>
-	<68cbc479-3707-cdab-4dcd-d055b02ede7d@redhat.com>
-	<20170703103340.GF5663@redhat.com>
-	<650bf1e9-ba8c-c7a5-9e48-94dc970523d6@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dS0Hw-0004is-Ca
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:17:13 -0400
+References: <20170702150510.23276-1-mreitz@redhat.com>
+	<20170702150510.23276-2-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <573379d4-3102-43b6-8348-72dbd5999702@redhat.com>
+Date: Mon, 3 Jul 2017 07:17:00 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <650bf1e9-ba8c-c7a5-9e48-94dc970523d6@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 01/15] configure: add the disable-tcg
- option
+In-Reply-To: <20170702150510.23276-2-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="OrU2bm2cgRIlcgwrNbo5F6Vbv6wJvSBnI"
+Subject: Re: [Qemu-devel] [PATCH v5 1/2] iotests: Use absolute paths for
+ executables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,34 +25,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Yang Zhong <yang.zhong@intel.com>, rth@twiddle.net, thuth@redhat.com, anthony.xu@intel.com, qemu-devel@nongnu.org, a.rigo@virtualopensystems.com
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-On Mon, Jul 03, 2017 at 12:55:04PM +0200, Paolo Bonzini wrote:
-> 
-> 
-> On 03/07/2017 12:33, Daniel P. Berrange wrote:
-> >> i386-softmmu and x86_64-softmmu are singled out here, because they're
-> >> the only targets where --disable-tcg compiles.  For the others, more
-> >> work is needed (see patches 6-15 in Yang Zhong's series).
-> >
-> > Even with that, you still can't disable TCG if building on a non-x86
-> > host, since that'd leave you with no available CPU at all. So the
-> > code still needs refactoring to check architectures properly.
-> 
-> It would leave you with a tools-only build; whether that's a good idea,
-> it's another story.  I think it's acceptable, but others may disagree.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--OrU2bm2cgRIlcgwrNbo5F6Vbv6wJvSBnI
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <573379d4-3102-43b6-8348-72dbd5999702@redhat.com>
+Subject: Re: [PATCH v5 1/2] iotests: Use absolute paths for executables
+References: <20170702150510.23276-1-mreitz@redhat.com>
+ <20170702150510.23276-2-mreitz@redhat.com>
+In-Reply-To: <20170702150510.23276-2-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-If you do 'configure --target-list=x86_64-softmmu --disable-tcg' on a
-non-x86 host I would be surprised to find  x86_64-softmmu not built.
-IMHO if you explicitly request system emulators and its not posisble
-to build then, an error should be report, rather than silently ignoring
-the request.
+On 07/02/2017 10:05 AM, Max Reitz wrote:
+> A user may specify a relative path for accessing qemu, qemu-img, etc.
+> through environment variables ($QEMU_PROG and friends) or a symlink.
+>=20
+> If a test decides to change its working directory, relative paths will
+> cease to work, however. Work around this by making all of the paths to
+> programs that should undergo testing absolute. Besides "realpath", we
+> also have to use "type -p" to support programs in $PATH.
+>=20
+> As a side effect, this fixes specifying these programs as symlinks for
+> out-of-tree builds: Before, you would have to create two symlinks, one
+> in the build and one in the source tree (the first one for common.confi=
+g
+> to find, the second one for the iotest to use). Now it is sufficient to=
+
+> create one in the build tree because common.config will resolve it.
+>=20
+> Reported-by: Kevin Wolf <kwolf@redhat.com>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qemu-iotests/common.config | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+>=20
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Tested-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--OrU2bm2cgRIlcgwrNbo5F6Vbv6wJvSBnI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZWjW8AAoJEKeha0olJ0Nqq7cH/07JQaLLUlm7NTPGMewbZ1iY
+TpCHgCg+dYeqzmMU6m/PbNBuFEaCMiEQFnYUXOyqJ1/m0mf6rdjxqhMaq2RV3iCc
+vk9rB9nA0PYRrXKzH7SuKyan3GQow17Z0vkJzTCmSsFfNjZjsffmtjoCCDRZ23My
+g8DnkAC759YO0/AbBf9/r2iUme0klKcxqlj5V3HFMeol07g6ajZcyN76r1XPaLi3
+tJ0Fkm/BNzlLM+JsCojTIBFQgo9sMFlmBKBZmH7nFyGhlb1G7ka8SGPUHtaQ4Q/K
+hpU0BaGt0Ru3k1FCduY/PhJoxx6dc/A0TWs+JzSCVSuieM9w1SlDvhtcVon9x9k=
+=tnG+
+-----END PGP SIGNATURE-----
+
+--OrU2bm2cgRIlcgwrNbo5F6Vbv6wJvSBnI--
