@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dRzqh-0000pX-1t
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:49:04 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dRzrx-0001W5-0a
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:50:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dRzqc-0000Sk-K9
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:49:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60286)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dRzqc-0000Qr-B6
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:48:58 -0400
-Date: Mon, 3 Jul 2017 12:48:46 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170703114845.GB2206@work-vm>
-References: <20170628190047.26159-1-dgilbert@redhat.com>
-	<20170629185525.GC2399@work-vm>
-	<CAJ+F1CKEEaRTfNiGU3cDYedqRYD9a+teG7t-F1YhGte3J-EbfA@mail.gmail.com>
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dRzrr-0001YO-UD
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:50:21 -0400
+Received: from mail-ve1eur01on0119.outbound.protection.outlook.com
+	([104.47.1.119]:43402
+	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
+	id 1dRzrr-0001WA-0r
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:50:15 -0400
+References: <1498495550-72357-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1498495550-72357-12-git-send-email-anton.nefedov@virtuozzo.com>
+	<416200823.44425042.1498730528050.JavaMail.zimbra@redhat.com>
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Message-ID: <2e0cd377-3320-3e93-55a7-ca7de66a36a6@virtuozzo.com>
+Date: Mon, 3 Jul 2017 14:50:07 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CKEEaRTfNiGU3cDYedqRYD9a+teG7t-F1YhGte3J-EbfA@mail.gmail.com>
+In-Reply-To: <416200823.44425042.1498730528050.JavaMail.zimbra@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 00/29] postcopy+vhost-user/shared ram
+Subject: Re: [Qemu-devel] [PATCH v4 11/13] virtio-console: chardev hotswap
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,151 +33,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
-Cc: qemu-devel@nongnu.org, a.perevalov@samsung.com, maxime.coquelin@redhat.com, mst@redhat.com, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com, aarcange@redhat.com
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Amit Shah <amit@kernel.org>
+Cc: qemu-devel@nongnu.org, den@virtuozzo.com, pbonzini@redhat.com
 
-* Marc-Andr=E9 Lureau (marcandre.lureau@gmail.com) wrote:
+On 06/29/2017 01:02 PM, Marc-Andr=C3=A9 Lureau wrote:
 > Hi
 >=20
-> On Thu, Jun 29, 2017 at 8:56 PM Dr. David Alan Gilbert <dgilbert@redhat=
-.com>
-> wrote:
+> Looks good, but please write something in the commit message about what n=
+eeds to be done for be-change (what this patch does).
 >=20
-> > * Dr. David Alan Gilbert (git) (dgilbert@redhat.com) wrote:
-> > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > >
-> > > Hi,
-> > >   This is a RFC/WIP series that enables postcopy migration
-> > > with shared memory to a vhost-user process.
-> > > It's based off current-head + Juan's load_cleanup series, and
-> > > Alexey's bitmap series (v4).  It's very lightly tested and seems
-> > > to work, but it's quite rough.
-> >
-> > Marc-Andr=E9 asked if I had a git with it all applied; so here we are=
-:
-> > https://github.com/dagrh/qemu/commits/vhost
-> > git@github.com:dagrh/qemu.git on the vhost branch
-> >
-> >
-> I started looking at the series, but I am not familiar with ufd/postcop=
-y.
+> thanks
+>=20
 
-I'm similarly unfamiliar with the vhost code when I started this (which
-probably shows!).
-The main thing about ufd is that a process registers with the ufd system
-and registers an area of memory with it;  accesses to the memory block
-until the page is available, a message is sent down the ufd, and whoever
-receives that message may then respond by atomically copying a page into
-memory, or wakeing the process when it knows the page is there.
-This is the first time we've tried to use userfaultfd with shared memory
-and it does need a very recent kernel for it (4.11.0 or rhel 7.4 beta)
+Hi,
 
-> Could you update vhost-user.txt to describe the new messages?
+thank you! I guess the description should look like
 
-See below; I'll add that in.
+   virtio-console: chardev hotswap support
 
-> Otherwise,
-> make check hangs in /x86_64/vhost-user/connect-fail (might be an unrela=
-ted
-> regression?) Thanks
-
-Entirely possible I broke it; I'll have a look - at the moment I'm more
-interested in comments on the structure of this set.
-
-Dave
-
-diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-index 481ab56e35..fec4cd0ffe 100644
---- a/docs/interop/vhost-user.txt
-+++ b/docs/interop/vhost-user.txt
-@@ -273,6 +273,14 @@ Once the source has finished migration, rings will b=
-e stopped by
- the source. No further update must be done before rings are
- restarted.
-
-+In postcopy migration the slave is started before all the memory has bee=
-n
-+received from the source host, and care must be taken to avoid accessing=
- pages
-+that have yet to be received.  The slave opens a 'userfault'-fd and regi=
-sters
-+the memory with it; this fd is then passed back over to the master.
-+The master services requests on the userfaultfd for pages that are acces=
-sed
-+and when the page is available it performs WAKE ioctl's on the userfault=
-fd
-+to wake the stalled slave.
-+
- IOMMU support
- -------------
-
-@@ -326,6 +334,7 @@ Protocol features
- #define VHOST_USER_PROTOCOL_F_REPLY_ACK      3
- #define VHOST_USER_PROTOCOL_F_MTU            4
- #define VHOST_USER_PROTOCOL_F_SLAVE_REQ      5
-+#define VHOST_USER_PROTOCOL_F_POSTCOPY       6
-
- Master message types
- --------------------
-@@ -402,12 +411,17 @@ Master message types
-       Id: 5
-       Equivalent ioctl: VHOST_SET_MEM_TABLE
-       Master payload: memory regions description
-+      Slave payload: (postcopy only) memory regions description
-
-       Sets the memory map regions on the slave so it can translate the v=
-ring
-       addresses. In the ancillary data there is an array of file descrip=
-tors
-       for each memory mapped region. The size and ordering of the fds ma=
-tches
-       the number and ordering of memory regions.
-
-+      When postcopy-listening has been received, SET_MEM_TABLE replies w=
-ith
-+      the bases of the memory mapped regions to the master.  It must hav=
-e mmap'd
-+      the regions and enabled userfaultfd on them.
-+
-  * VHOST_USER_SET_LOG_BASE
-
-       Id: 6
-@@ -580,6 +594,29 @@ Master message types
-       This request should be send only when VIRTIO_F_IOMMU_PLATFORM feat=
-ure
-       has been successfully negotiated.
-
-+ * VHOST_USER_POSTCOPY_ADVISE
-+      Id: 23
-+      Master payload: N/A
-+      Slave payload: userfault fd + u64
-+
-+      Master advises slave that a migration with postcopy enabled is und=
-erway,
-+      the slave must open a userfaultfd for later use.
-+      Note that at this stage the migration is still in precopy mode.
-+
-+ * VHOST_USER_POSTCOPY_LISTEN
-+      Id: 24
-+      Master payload: N/A
-+
-+      Master advises slave that a transition to postcopy mode has happen=
-ed.
-+
-+ * VHOST_USER_POSTCOPY_END
-+      Id: 25
-+      Slave payload: u64
-+
-+      Master advises that postcopy migration has now completed.  The
-+      slave must disable the userfaultfd. The response is an acknowledge=
-ment
-+      only.
-+
- Slave message types
- -------------------
+   In case of a backend change, the handler functions and the watch have
+   to be reset.
+   Also, avoid unsafe qemu_chr_fe_get_driver() usage even though the pointe=
+r
+   is not really stored.
 
 
-> --=20
-> Marc-Andr=E9 Lureau
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+Amit, have you had a chance to kindly look at this?
+
+
+/Anton
+
+> ----- Original Message -----
+>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+>> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> CC: Amit Shah <amit@kernel.org>
+>> ---
+>>   hw/char/virtio-console.c | 35 ++++++++++++++++++++++++++++++-----
+>>   1 file changed, 30 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/hw/char/virtio-console.c b/hw/char/virtio-console.c
+>> index afb4949..198b2a8 100644
+>> --- a/hw/char/virtio-console.c
+>> +++ b/hw/char/virtio-console.c
+>> @@ -49,7 +49,7 @@ static ssize_t flush_buf(VirtIOSerialPort *port,
+>>       VirtConsole *vcon =3D VIRTIO_CONSOLE(port);
+>>       ssize_t ret;
+>>  =20
+>> -    if (!qemu_chr_fe_get_driver(&vcon->chr)) {
+>> +    if (!qemu_chr_fe_backend_connected(&vcon->chr)) {
+>>           /* If there's no backend, we can just say we consumed all data=
+. */
+>>           return len;
+>>       }
+>> @@ -163,12 +163,35 @@ static void chr_event(void *opaque, int event)
+>>       }
+>>   }
+>>  =20
+>> +static int chr_be_change(void *opaque)
+>> +{
+>> +    VirtConsole *vcon =3D opaque;
+>> +    VirtIOSerialPort *port =3D VIRTIO_SERIAL_PORT(vcon);
+>> +    VirtIOSerialPortClass *k =3D VIRTIO_SERIAL_PORT_GET_CLASS(port);
+>> +
+>> +    if (k->is_console) {
+>> +        qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
+>> +                                 NULL, chr_be_change, vcon, NULL, true)=
+;
+>> +    } else {
+>> +        qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
+>> +                                 chr_event, chr_be_change, vcon, NULL,
+>> false);
+>> +    }
+>> +
+>> +    if (vcon->watch) {
+>> +        g_source_remove(vcon->watch);
+>> +        vcon->watch =3D qemu_chr_fe_add_watch(&vcon->chr,
+>> +                                            G_IO_OUT | G_IO_HUP,
+>> +                                            chr_write_unblocked, vcon);
+>> +    }
+>> +
+>> +    return 0;
+>> +}
+>> +
+>>   static void virtconsole_realize(DeviceState *dev, Error **errp)
+>>   {
+>>       VirtIOSerialPort *port =3D VIRTIO_SERIAL_PORT(dev);
+>>       VirtConsole *vcon =3D VIRTIO_CONSOLE(dev);
+>>       VirtIOSerialPortClass *k =3D VIRTIO_SERIAL_PORT_GET_CLASS(dev);
+>> -    Chardev *chr =3D qemu_chr_fe_get_driver(&vcon->chr);
+>>  =20
+>>       if (port->id =3D=3D 0 && !k->is_console) {
+>>           error_setg(errp, "Port number 0 on virtio-serial devices reser=
+ved "
+>> @@ -176,7 +199,7 @@ static void virtconsole_realize(DeviceState *dev, Er=
+ror
+>> **errp)
+>>           return;
+>>       }
+>>  =20
+>> -    if (chr) {
+>> +    if (qemu_chr_fe_backend_connected(&vcon->chr)) {
+>>           /*
+>>            * For consoles we don't block guest data transfer just
+>>            * because nothing is connected - we'll just let it go
+>> @@ -188,11 +211,13 @@ static void virtconsole_realize(DeviceState *dev, =
+Error
+>> **errp)
+>>            */
+>>           if (k->is_console) {
+>>               qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_rea=
+d,
+>> -                                     NULL, NULL, vcon, NULL, true);
+>> +                                     NULL, chr_be_change,
+>> +                                     vcon, NULL, true);
+>>               virtio_serial_open(port);
+>>           } else {
+>>               qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_rea=
+d,
+>> -                                     chr_event, NULL, vcon, NULL, false=
+);
+>> +                                     chr_event, chr_be_change,
+>> +                                     vcon, NULL, false);
+>>           }
+>>       }
+>>   }
+>> --
+>> 2.7.4
+>>
+>>
+
+--=20
+/Anton
