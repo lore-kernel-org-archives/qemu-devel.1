@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dRzgh-0002XK-Nr
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:38:44 -0400
+	(envelope-from <david@redhat.com>) id 1dRzh2-0002xq-UE
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:39:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dRzgg-0003Mt-MD
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:38:43 -0400
-References: <20170622124204.19407-1-marcandre.lureau@redhat.com>
-	<20170622124204.19407-11-marcandre.lureau@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f246d4de-997b-2523-b2d1-ba89d950b072@redhat.com>
-Date: Mon, 3 Jul 2017 06:38:31 -0500
+	(envelope-from <david@redhat.com>) id 1dRzgy-0003Sh-1J
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:39:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57306)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dRzgx-0003S5-OP
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 07:38:59 -0400
+References: <20170627161032.5014-1-david@redhat.com>
+	<251b8047-7df4-50a5-cce7-b66858c781a1@redhat.com>
+	<4c7a78bc-ec7f-9873-0bda-f3c8e76c844b@redhat.com>
+	<3373125e-171a-0516-90f0-757d60eba32a@redhat.com>
+	<449afc6c-1fbc-9ae9-8450-9c9a9e67f2c8@twiddle.net>
+	<266c6260-cc9a-b765-6988-62c7e5777ce1@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <7dbfb58e-0c68-5b69-3d35-5ad79b874530@redhat.com>
+Date: Mon, 3 Jul 2017 13:38:56 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170622124204.19407-11-marcandre.lureau@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="LCQwRBd1wEs3puLAFBauJIxg36LrM2MbQ"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 10/31] vvfat: use DIV_ROUND_UP
+In-Reply-To: <266c6260-cc9a-b765-6988-62c7e5777ce1@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1] s390x/cpumodel: allow to enable "idtes"
+ feature for TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,81 +33,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, "open list:vvfat" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+Cc: agraf@suse.de, Aurelien Jarno <aurelien@aurel32.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---LCQwRBd1wEs3puLAFBauJIxg36LrM2MbQ
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, "open list:vvfat" <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <f246d4de-997b-2523-b2d1-ba89d950b072@redhat.com>
-Subject: Re: [Qemu-block] [PATCH 10/31] vvfat: use DIV_ROUND_UP
-References: <20170622124204.19407-1-marcandre.lureau@redhat.com>
- <20170622124204.19407-11-marcandre.lureau@redhat.com>
-In-Reply-To: <20170622124204.19407-11-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 06/22/2017 07:41 AM, Marc-Andr=C3=A9 Lureau wrote:
-> I used the clang-tidy qemu-round check to generate the fix:
-> https://github.com/elmarco/clang-tools-extra
+On 03.07.2017 13:07, Thomas Huth wrote:
+> On 30.06.2017 21:22, Richard Henderson wrote:
+>> On 06/29/2017 12:05 AM, Thomas Huth wrote:
+>>> However, I'm not sure whether you can simply ignore the clearing-by-A=
+SCE
+>>> stuff in this case. For example, according to the PoP:
+>>>
+>>> "When the clearing-by-ASCE-option bit (bit 52 of gen-
+>>>   eral register R2 is one), the M4 field is ignored."
+>>>
+>>> And the idte helper function currently always takes the M4 field into
+>>> account...
+>>
+>> I don't see that quote.
 >=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  block/vvfat.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> Which version of the Principles of Operation are you using? I just
+> checked, and that sentence seems to be available in version SA22-7832-1=
+0
+> (but it is not in SA22-7832-09 yet).
 >=20
-> diff --git a/block/vvfat.c b/block/vvfat.c
-> index 426ca70e35..877f71dcdc 100644
-> --- a/block/vvfat.c
-> +++ b/block/vvfat.c
-> @@ -433,7 +433,7 @@ static inline direntry_t* create_long_filename(BDRV=
-VVFATState* s,const char* fil
->  {
->      char buffer[258];
->      int length=3Dshort2long_name(buffer,filename),
-> -        number_of_entries=3D(length+25)/26,i;
-> +        number_of_entries=3DDIV_ROUND_UP(length, 26),i;
+>  Thomas
+>=20
+>=20
 
-This formatting made me do a double take (at first, I thought it was a
-comma expression, before realizing it was a declaration).  While you are
-touching it, can you please rewrite it into something more legible, such =
-as:
+I think that part of the PoP is quite confusing.
 
-int length =3D short2long_name(buffer, filename);
-int number_of_entries =3D DIV_ROUND_UP(length, 26);
-int i;
 
-I don't mind declaring multiple variables in one declaration - provided
-that we aren't also initializing them.  But mixing in the un-initialized
-declaration of 'i' with other initialized variables is just awkward.
+"When the local-TLB-clearing facility is not installed [...]
+the term =E2=80=9C__specified__ CPU or CPUs=E2=80=9D means all of the CPU=
+s in the
+configuration."
+
+"When the local-TLB-clearing facility is installed [...]
+the term =E2=80=9C__specified__ CPU or CPUs=E2=80=9D means only the CPU
+executing the IDTE instruction (the local CPU)."
+
+"When the clearing-by-ASCE-option bit, bit 52 of gen-
+eral register R2, is zero [...] in the
+__specified__ CPU or CPUs in the configuration are
+cleared of (1) all TLB table entries of the designated [...]"
+
+"When the clearing-by-ASCE-option bit is one [...]
+but it does clear, from the TLBs in __all__ CPUs in the [...]"
+
+
+So one could assume, that local-tlb-clearing does not apply to
+clearing-by-ASCE-option. However:
+
+"When bit 52 of general register R2, the clearing-by-
+ASCE-option bit, is one, the clearing-by-ASCE oper-
+ation is specified. [...] The TLBs of the __specified__ CPU or CPUs in
+the configuration [...]"
+
+
+But:
+
+"When the clearing-by-ASCE-option bit (bit 52 of gen-
+eral register R2 is one), the M4 field is ignored."
+
+However also "Common Operation" section rather reads like
+local-TLB-clearing applies to any mode.
+
+Also the description of local-TLB-clearing is quite general:
+
+"Local-TLB-Clearing Facility
+The local-TLB-clearing facility may be available on a
+model implementing z/Architecture. The facility may
+provide performance improvements for the INVALI-
+DATE DAT TABLE ENTRY and INVALIDATE PAGE
+TABLE ENTRY instructions by allowing the program
+to specify whether TLB clearing should be done in all
+CPUs of the configuration or only in the CPU execut-
+ing the instruction."
+
+
+My interpretation:
+
+local-TLB-clearing was introduced after IDTES but before EDAT2 (M4 bit
+2). I think "m4 is ignored" should rather mean "M4 bit 2 is ignored".
+Especially as this sentence was added later, I assume it is connected to
+EDAT2, not local-TLB-clearing.
+
+
+For now (!SMP) it should really matter. Opinions?
+
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
 
+Thanks,
 
---LCQwRBd1wEs3puLAFBauJIxg36LrM2MbQ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZWiy3AAoJEKeha0olJ0NqJNwH/0H6GwdKD5EBbfhUtLMytVaJ
-jNaJJWAKWZds5/2IUBmEpXpHZUofoEciMC0gnzcUKP5r6iSmh8v4bRyKnJtD/JKF
-X6tDVF8TFesSm9nFq+Fu74rmmMwEX9cmfNyI0i4vZcC98ZNKGlfKUpcXGslbdaRT
-wmXSh9cpxGrp+53RbcU1/ylwlP6Lus23flBZVQlHLmlDqAMmQaA5sEJEyPwn/x9P
-4ARJ/dNGZEFfe+NnkwMhPPuYkZqfa9LvtTkuwlb771xSFfG0iKDxLQEt3Tv7NqaQ
-XIM53vkA+Rp0fdZmQ139AMxTlbniqrpQ0k9mfWKzdT9N42jSnMCZZwmFLICuTPc=
-=0Wgd
------END PGP SIGNATURE-----
-
---LCQwRBd1wEs3puLAFBauJIxg36LrM2MbQ--
+David
