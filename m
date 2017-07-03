@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56097)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS9d9-0007qu-Fp
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 18:15:46 -0400
+	(envelope-from <eblake@redhat.com>) id 1dS9dC-0007tt-Lb
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 18:15:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS9d7-0004oj-Lp
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 18:15:43 -0400
+	(envelope-from <eblake@redhat.com>) id 1dS9d9-0004qi-FZ
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 18:15:46 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon,  3 Jul 2017 17:14:54 -0500
-Message-Id: <20170703221456.30817-14-eblake@redhat.com>
+Date: Mon,  3 Jul 2017 17:14:55 -0500
+Message-Id: <20170703221456.30817-15-eblake@redhat.com>
 In-Reply-To: <20170703221456.30817-1-eblake@redhat.com>
 References: <20170703221456.30817-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 13/15] block: Convert
- bdrv_get_block_status_above() to bytes
+Subject: [Qemu-devel] [PATCH v2 14/15] block: Align block status requests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,291 +20,164 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, el13635@mail.ntua.gr, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>
+Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, el13635@mail.ntua.gr, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
 
-We are gradually moving away from sector-based interfaces, towards
-byte-based.  In the common case, allocation is unlikely to ever use
-values that are not naturally sector-aligned, but it is possible
-that byte-based values will let us be more precise about allocation
-at the end of an unaligned file that can do byte-based access.
+Any device that has request_alignment greater than 512 should be
+unable to report status at a finer granularity; it may also be
+simpler for such devices to be guaranteed that the block layer
+has rounded things out to the granularity boundary (the way the
+block layer already rounds all other I/O out).  Besides, getting
+the code correct for super-sector alignment also benefits us
+for the fact that our public interface now has byte granularity,
+even though none of our drivers have byte-level callbacks.
 
-Changing the name of the function from bdrv_get_block_status_above()
-to bdrv_block_status_above() ensures that the compiler enforces that
-all callers are updated.  For now, the io.c layer still assert()s
-that all callers are sector-aligned, but that can be relaxed when a
-later patch implements byte-based block status in the drivers.
-
-For the most part this patch is just the addition of scaling at the
-callers followed by inverse scaling at bdrv_block_status().  But some
-code, particularly bdrv_block_status(), gets a lot simpler because
-it no longer has to mess with sectors.
-
-For ease of review, bdrv_get_block_status() was tackled separately.
+Add an assertion in blkdebug that proves that the block layer
+never requests status of unaligned sections, similar to what it
+does on other requests (while still keeping the generic helper
+in place for when future patches add a throttle driver).  Note
+note that iotest 177 already covers this (it would fail if you
+use just the blkdebug.c hunk without the io.c changes).
+Meanwhile, we can drop assertions in callers that no longer have
+to pass in sector-aligned addresses.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
-v2: rebase to earlier changes
+v2: new patch
 ---
- include/block/block.h | 10 +++++-----
- block/io.c            | 39 ++++++++-------------------------------
- block/mirror.c        | 12 ++++--------
- block/qcow2.c         |  8 +++-----
- qemu-img.c            | 39 +++++++++++++++++++++++----------------
- 5 files changed, 43 insertions(+), 65 deletions(-)
+ include/block/block_int.h |  3 ++-
+ block/blkdebug.c          | 13 +++++++++++-
+ block/io.c                | 53 ++++++++++++++++++++++++++++++++---------------
+ 3 files changed, 50 insertions(+), 19 deletions(-)
 
-diff --git a/include/block/block.h b/include/block/block.h
-index e3e6582..ed2ea69 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -424,11 +424,11 @@ bool bdrv_can_write_zeroes_with_unmap(BlockDriverState *bs);
- int64_t bdrv_block_status(BlockDriverState *bs, int64_t offset,
-                           int64_t bytes, int64_t *pnum,
-                           BlockDriverState **file);
--int64_t bdrv_get_block_status_above(BlockDriverState *bs,
--                                    BlockDriverState *base,
--                                    int64_t sector_num,
--                                    int nb_sectors, int *pnum,
--                                    BlockDriverState **file);
-+int64_t bdrv_block_status_above(BlockDriverState *bs,
-+                                BlockDriverState *base,
-+                                int64_t offset,
-+                                int64_t bytes, int64_t *pnum,
-+                                BlockDriverState **file);
- int bdrv_is_allocated(BlockDriverState *bs, int64_t offset, int64_t bytes,
-                       int64_t *pnum);
- int bdrv_is_allocated_above(BlockDriverState *top, BlockDriverState *base,
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index ffa22c7..5f6ba5d 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -173,7 +173,8 @@ struct BlockDriver {
+      * according to the current layer, and should not set
+      * BDRV_BLOCK_ALLOCATED, but may set BDRV_BLOCK_RAW.  See block.h
+      * for the meaning of _DATA, _ZERO, and _OFFSET_VALID.  The block
+-     * layer guarantees non-NULL pnum and file.
++     * layer guarantees input aligned to request_alignment, as well as
++     * non-NULL pnum and file.
+      */
+     int64_t coroutine_fn (*bdrv_co_get_block_status)(BlockDriverState *bs,
+         int64_t sector_num, int nb_sectors, int *pnum,
+diff --git a/block/blkdebug.c b/block/blkdebug.c
+index f1539db..67736b4 100644
+--- a/block/blkdebug.c
++++ b/block/blkdebug.c
+@@ -641,6 +641,17 @@ static int coroutine_fn blkdebug_co_pdiscard(BlockDriverState *bs,
+     return bdrv_co_pdiscard(bs->file->bs, offset, bytes);
+ }
+
++static int64_t coroutine_fn blkdebug_co_get_block_status(
++    BlockDriverState *bs, int64_t sector_num, int nb_sectors, int *pnum,
++    BlockDriverState **file)
++{
++    assert(QEMU_IS_ALIGNED(sector_num | nb_sectors,
++                           DIV_ROUND_UP(bs->bl.request_alignment,
++                                        BDRV_SECTOR_SIZE)));
++    return bdrv_co_get_block_status_from_file(bs, sector_num, nb_sectors,
++                                              pnum, file);
++}
++
+ static void blkdebug_close(BlockDriverState *bs)
+ {
+     BDRVBlkdebugState *s = bs->opaque;
+@@ -915,7 +926,7 @@ static BlockDriver bdrv_blkdebug = {
+     .bdrv_co_flush_to_disk  = blkdebug_co_flush,
+     .bdrv_co_pwrite_zeroes  = blkdebug_co_pwrite_zeroes,
+     .bdrv_co_pdiscard       = blkdebug_co_pdiscard,
+-    .bdrv_co_get_block_status = bdrv_co_get_block_status_from_file,
++    .bdrv_co_get_block_status = blkdebug_co_get_block_status,
+
+     .bdrv_debug_event           = blkdebug_debug_event,
+     .bdrv_debug_breakpoint      = blkdebug_debug_breakpoint,
 diff --git a/block/io.c b/block/io.c
-index 85353fa..91d3e99 100644
+index 91d3e99..5ed1ac7 100644
 --- a/block/io.c
 +++ b/block/io.c
-@@ -1903,7 +1903,7 @@ static int64_t coroutine_fn bdrv_co_block_status_above(BlockDriverState *bs,
-     return ret;
- }
+@@ -1746,7 +1746,8 @@ static int64_t coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+     int64_t n; /* bytes */
+     int64_t ret, ret2;
+     BlockDriverState *local_file = NULL;
+-    int count; /* sectors */
++    int64_t aligned_offset, aligned_bytes;
++    uint32_t align;
 
--/* Coroutine wrapper for bdrv_get_block_status_above() */
-+/* Coroutine wrapper for bdrv_block_status_above() */
- static void coroutine_fn bdrv_block_status_above_co_entry(void *opaque)
- {
-     BdrvCoBlockStatusData *data = opaque;
-@@ -1950,43 +1950,20 @@ static int64_t bdrv_common_block_status_above(BlockDriverState *bs,
-     return data.ret;
- }
+     assert(pnum);
+     total_size = bdrv_getlength(bs);
+@@ -1788,27 +1789,44 @@ static int64_t coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+     }
 
--int64_t bdrv_get_block_status_above(BlockDriverState *bs,
--                                    BlockDriverState *base,
--                                    int64_t sector_num,
--                                    int nb_sectors, int *pnum,
--                                    BlockDriverState **file)
-+int64_t bdrv_block_status_above(BlockDriverState *bs, BlockDriverState *base,
-+                                int64_t offset, int64_t bytes, int64_t *pnum,
-+                                BlockDriverState **file)
- {
--    int64_t ret;
--    int64_t n;
--
--    ret = bdrv_common_block_status_above(bs, base, false,
--                                         sector_num * BDRV_SECTOR_SIZE,
--                                         nb_sectors * BDRV_SECTOR_SIZE,
--                                         &n, file);
--    if (ret < 0) {
--        return ret;
--    }
--    assert(QEMU_IS_ALIGNED(n, BDRV_SECTOR_SIZE));
--    *pnum = n >> BDRV_SECTOR_BITS;
--    return ret;
-+    return bdrv_common_block_status_above(bs, base, false, offset, bytes,
-+                                          pnum, file);
- }
-
- int64_t bdrv_block_status(BlockDriverState *bs,
-                           int64_t offset, int64_t bytes, int64_t *pnum,
-                           BlockDriverState **file)
- {
--    int64_t ret;
--    int n;
--
+     bdrv_inc_in_flight(bs);
+-    /*
+-     * TODO: Rather than require aligned offsets, we could instead
+-     * round to the driver's request_alignment here, then touch up
+-     * count afterwards back to the caller's expectations.
+-     */
 -    assert(QEMU_IS_ALIGNED(offset | bytes, BDRV_SECTOR_SIZE));
--    assert(bytes <= BDRV_REQUEST_MAX_BYTES);
--    ret = bdrv_get_block_status_above(bs, backing_bs(bs),
--                                      offset >> BDRV_SECTOR_BITS,
--                                      bytes >> BDRV_SECTOR_BITS, &n, file);
--    if (pnum) {
--        *pnum = n * BDRV_SECTOR_SIZE;
--    }
--    return ret;
-+    return bdrv_block_status_above(bs, backing_bs(bs),
-+                                   offset, bytes, pnum, file);
- }
-
- int coroutine_fn bdrv_is_allocated(BlockDriverState *bs, int64_t offset,
-diff --git a/block/mirror.c b/block/mirror.c
-index 08c0c27..1d555bb 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -328,7 +328,6 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
-     uint64_t delay_ns = 0;
-     /* At least the first dirty chunk is mirrored in one iteration. */
-     int nb_chunks = 1;
--    int sectors_per_chunk = s->granularity >> BDRV_SECTOR_BITS;
-     bool write_zeroes_ok = bdrv_can_write_zeroes_with_unmap(blk_bs(s->target));
-     int max_io_bytes = MAX(s->buf_size / MAX_IN_FLIGHT, MAX_IO_BYTES);
-
-@@ -377,7 +376,7 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
-     }
-
-     /* Clear dirty bits before querying the block status, because
--     * calling bdrv_get_block_status_above could yield - if some blocks are
-+     * calling bdrv_block_status_above could yield - if some blocks are
-      * marked dirty in this window, we need to know.
-      */
-     bdrv_reset_dirty_bitmap_locked(s->dirty_bitmap, offset,
-@@ -387,7 +386,6 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
-     bitmap_set(s->in_flight_bitmap, offset / s->granularity, nb_chunks);
-     while (nb_chunks > 0 && offset < s->bdev_length) {
-         int64_t ret;
--        int io_sectors;
-         int64_t io_bytes;
-         int64_t io_bytes_acct;
-         enum MirrorMethod {
-@@ -397,11 +395,9 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
-         } mirror_method = MIRROR_METHOD_COPY;
-
-         assert(!(offset % s->granularity));
--        ret = bdrv_get_block_status_above(source, NULL,
--                                          offset >> BDRV_SECTOR_BITS,
--                                          nb_chunks * sectors_per_chunk,
--                                          &io_sectors, NULL);
--        io_bytes = io_sectors * BDRV_SECTOR_SIZE;
-+        ret = bdrv_block_status_above(source, NULL, offset,
-+                                      nb_chunks * s->granularity,
-+                                      &io_bytes, NULL);
-         if (ret < 0) {
-             io_bytes = MIN(nb_chunks * s->granularity, max_io_bytes);
-         } else if (ret & BDRV_BLOCK_DATA) {
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 9754193..d251bf7 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2907,7 +2907,7 @@ finish:
-
- static bool is_zero(BlockDriverState *bs, int64_t offset, int64_t bytes)
- {
--    int nr;
-+    int64_t nr;
-     int64_t res;
-     int64_t start;
-
-@@ -2923,10 +2923,8 @@ static bool is_zero(BlockDriverState *bs, int64_t offset, int64_t bytes)
-     if (!bytes) {
-         return true;
-     }
--    res = bdrv_get_block_status_above(bs, NULL, start >> BDRV_SECTOR_BITS,
--                                      bytes >> BDRV_SECTOR_BITS, &nr, NULL);
--    return res >= 0 && (res & BDRV_BLOCK_ZERO) &&
--        nr * BDRV_SECTOR_SIZE == bytes;
-+    res = bdrv_block_status_above(bs, NULL, start, bytes, &nr, NULL);
-+    return res >= 0 && (res & BDRV_BLOCK_ZERO) && nr == bytes;
- }
-
- static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
-diff --git a/qemu-img.c b/qemu-img.c
-index 2b1422a..39aff13 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -1224,7 +1224,7 @@ static int img_compare(int argc, char **argv)
-     BlockDriverState *bs1, *bs2;
-     int64_t total_sectors1, total_sectors2;
-     uint8_t *buf1 = NULL, *buf2 = NULL;
--    int pnum1, pnum2;
-+    int64_t pnum1, pnum2;
-     int allocated1, allocated2;
-     int ret = 0; /* return value - 0 Ident, 1 Different, >1 Error */
-     bool progress = false, quiet = false, strict = false;
-@@ -1378,9 +1378,11 @@ static int img_compare(int argc, char **argv)
-         if (nb_sectors <= 0) {
-             break;
-         }
--        status1 = bdrv_get_block_status_above(bs1, NULL, sector_num,
--                                              total_sectors1 - sector_num,
--                                              &pnum1, NULL);
-+        status1 = bdrv_block_status_above(bs1, NULL,
-+                                          sector_num * BDRV_SECTOR_SIZE,
-+                                          (total_sectors1 - sector_num) *
-+                                          BDRV_SECTOR_SIZE,
-+                                          &pnum1, NULL);
-         if (status1 < 0) {
-             ret = 3;
-             error_report("Sector allocation test failed for %s", filename1);
-@@ -1388,9 +1390,11 @@ static int img_compare(int argc, char **argv)
-         }
-         allocated1 = status1 & BDRV_BLOCK_ALLOCATED;
-
--        status2 = bdrv_get_block_status_above(bs2, NULL, sector_num,
--                                              total_sectors2 - sector_num,
--                                              &pnum2, NULL);
-+        status2 = bdrv_block_status_above(bs2, NULL,
-+                                          sector_num * BDRV_SECTOR_SIZE,
-+                                          (total_sectors2 - sector_num) *
-+                                          BDRV_SECTOR_SIZE,
-+                                          &pnum2, NULL);
-         if (status2 < 0) {
-             ret = 3;
-             error_report("Sector allocation test failed for %s", filename2);
-@@ -1398,10 +1402,12 @@ static int img_compare(int argc, char **argv)
-         }
-         allocated2 = status2 & BDRV_BLOCK_ALLOCATED;
-         if (pnum1) {
--            nb_sectors = MIN(nb_sectors, pnum1);
-+            nb_sectors = MIN(nb_sectors,
-+                             DIV_ROUND_UP(pnum1, BDRV_SECTOR_SIZE));
-         }
-         if (pnum2) {
--            nb_sectors = MIN(nb_sectors, pnum2);
-+            nb_sectors = MIN(nb_sectors,
-+                             DIV_ROUND_UP(pnum2, BDRV_SECTOR_SIZE));
-         }
-
-         if (strict) {
-@@ -1415,7 +1421,7 @@ static int img_compare(int argc, char **argv)
-             }
-         }
-         if ((status1 & BDRV_BLOCK_ZERO) && (status2 & BDRV_BLOCK_ZERO)) {
--            nb_sectors = MIN(pnum1, pnum2);
-+            nb_sectors = DIV_ROUND_UP(MIN(pnum1, pnum2), BDRV_SECTOR_SIZE);
-         } else if (allocated1 == allocated2) {
-             if (allocated1) {
-                 ret = blk_pread(blk1, sector_num << BDRV_SECTOR_BITS, buf1,
-@@ -1593,23 +1599,24 @@ static int convert_iteration_sectors(ImgConvertState *s, int64_t sector_num)
-     n = MIN(s->total_sectors - sector_num, BDRV_REQUEST_MAX_SECTORS);
-
-     if (s->sector_next_status <= sector_num) {
-+        int64_t count = n * BDRV_SECTOR_SIZE;
+-    ret = bs->drv->bdrv_co_get_block_status(bs, offset >> BDRV_SECTOR_BITS,
+-                                            bytes >> BDRV_SECTOR_BITS, &count,
+-                                            &local_file);
+-    if (ret < 0) {
+-        *pnum = 0;
+-        goto out;
 +
-         if (s->target_has_backing) {
--            int64_t count = n * BDRV_SECTOR_SIZE;
++    /* Round out to request_alignment boundaries */
++    align = MAX(bs->bl.request_alignment, BDRV_SECTOR_SIZE);
++    aligned_offset = QEMU_ALIGN_DOWN(offset, align);
++    aligned_bytes = ROUND_UP(offset + bytes, align) - aligned_offset;
++
++    {
++        int count; /* sectors */
++
++        assert(QEMU_IS_ALIGNED(aligned_offset | aligned_bytes,
++                               BDRV_SECTOR_SIZE));
++        ret = bs->drv->bdrv_co_get_block_status(
++            bs, aligned_offset >> BDRV_SECTOR_BITS,
++            aligned_bytes >> BDRV_SECTOR_BITS, &count, &local_file);
++        if (ret < 0) {
++            *pnum = 0;
++            goto out;
++        }
++        *pnum = count * BDRV_SECTOR_SIZE;
++    }
++
++    /* Clamp pnum and ret to original request */
++    assert(QEMU_IS_ALIGNED(*pnum, align));
++    *pnum -= offset - aligned_offset;
++    if (aligned_offset >> BDRV_SECTOR_BITS != offset >> BDRV_SECTOR_BITS &&
++        ret & BDRV_BLOCK_OFFSET_VALID) {
++        ret += QEMU_ALIGN_DOWN(offset - aligned_offset, BDRV_SECTOR_SIZE);
++    }
++    if (*pnum > bytes) {
++        *pnum = bytes;
+     }
+-    *pnum = count * BDRV_SECTOR_SIZE;
 
-             ret = bdrv_block_status(blk_bs(s->src[src_cur]),
-                                     (sector_num - src_cur_offset) *
-                                     BDRV_SECTOR_SIZE,
-                                     count, &count, NULL);
--            assert(ret < 0 || QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE));
--            n = count >> BDRV_SECTOR_BITS;
-         } else {
--            ret = bdrv_get_block_status_above(blk_bs(s->src[src_cur]), NULL,
--                                              sector_num - src_cur_offset,
--                                              n, &n, NULL);
-+            ret = bdrv_block_status_above(blk_bs(s->src[src_cur]), NULL,
-+                                          (sector_num - src_cur_offset) *
-+                                          BDRV_SECTOR_SIZE,
-+                                          count, &count, NULL);
-         }
-         if (ret < 0) {
-             return ret;
-         }
-+        n = DIV_ROUND_UP(count, BDRV_SECTOR_SIZE);
+     if (ret & BDRV_BLOCK_RAW) {
+         assert(ret & BDRV_BLOCK_OFFSET_VALID && local_file);
+         ret = bdrv_co_block_status(local_file, allocation,
+-                                   ret & BDRV_BLOCK_OFFSET_MASK,
++                                   (ret & BDRV_BLOCK_OFFSET_MASK) |
++                                   (offset & ~BDRV_BLOCK_OFFSET_MASK),
+                                    *pnum, pnum, &local_file);
+-        assert(QEMU_IS_ALIGNED(*pnum, BDRV_SECTOR_SIZE));
+         goto out;
+     }
 
-         if (ret & BDRV_BLOCK_ZERO) {
-             s->status = BLK_ZERO;
+@@ -1832,7 +1850,8 @@ static int64_t coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+         int64_t file_pnum;
+
+         ret2 = bdrv_co_block_status(local_file, true,
+-                                    ret & BDRV_BLOCK_OFFSET_MASK,
++                                    (ret & BDRV_BLOCK_OFFSET_MASK) |
++                                    (offset & ~BDRV_BLOCK_OFFSET_MASK),
+                                     *pnum, &file_pnum, NULL);
+         if (ret2 >= 0) {
+             /* Ignore errors.  This is just providing extra information, it
 -- 
 2.9.4
