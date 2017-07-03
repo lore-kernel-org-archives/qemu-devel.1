@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS0PN-0006DD-UE
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:24:57 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dS0Pk-0006V0-SC
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:25:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS0PM-0007pL-M3
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:24:53 -0400
-References: <20170630195831.26087-1-eblake@redhat.com>
-	<6ff70225-77c3-84ce-ada9-ce44192de608@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e14abe31-3133-1e86-d5ea-fb0161058d88@redhat.com>
-Date: Mon, 3 Jul 2017 07:24:31 -0500
-MIME-Version: 1.0
-In-Reply-To: <6ff70225-77c3-84ce-ada9-ce44192de608@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="QNUROahhEfOtO7a78cEORuUU4m6t66wGc"
-Subject: Re: [Qemu-devel] [PATCH v2] tests: Avoid non-portable 'echo -ARG'
+	(envelope-from <mreitz@redhat.com>) id 1dS0Pk-00085o-25
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 08:25:16 -0400
+From: Max Reitz <mreitz@redhat.com>
+Date: Mon,  3 Jul 2017 14:25:00 +0200
+Message-Id: <20170703122505.32017-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/5] block: Don't compare strings in
+ bdrv_reopen_prepare()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,130 +18,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: edgar.iglesias@xilinx.com, stefanha@redhat.com, qemu-block@nongnu.org, qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Jiri Pirko <jiri@resnulli.us>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---QNUROahhEfOtO7a78cEORuUU4m6t66wGc
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: edgar.iglesias@xilinx.com, stefanha@redhat.com, qemu-block@nongnu.org,
- qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Jiri Pirko <jiri@resnulli.us>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <e14abe31-3133-1e86-d5ea-fb0161058d88@redhat.com>
-Subject: Re: [PATCH v2] tests: Avoid non-portable 'echo -ARG'
-References: <20170630195831.26087-1-eblake@redhat.com>
- <6ff70225-77c3-84ce-ada9-ce44192de608@redhat.com>
-In-Reply-To: <6ff70225-77c3-84ce-ada9-ce44192de608@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 07/02/2017 09:49 AM, Max Reitz wrote:
-> On 2017-06-30 21:58, Eric Blake wrote:
->> POSIX says that backslashes in the arguments to 'echo', as well as
->> any use of 'echo -n' and 'echo -e', are non-portable; it recommends
->> people should favor 'printf' instead.  This is definitely true where
->> we do not control which shell is running (such as in makefile snippets=
-
->> or in documentation examples).  But even for scripts where we
->> require bash (and therefore, where echo does what we want by default),=
-
->> it is still possible to use 'shopt -s xpg_echo' to change bash's
->> behavior of echo.  And setting a good example never hurts when we are
->> not sure if a snippet will be copied from a bash-only script to a
->> general shell script (although I don't change the use of non-portable
->> \e for ESC when we know the running shell is bash).
->>
->> Replace 'echo -n "..."' with 'printf %s "..."', and 'echo -e "..."'
->> with 'printf %b "...\n"', with the optimization that the %s/%b
->> argument can be omitted if the string being printed contains no
->> substitutions that could result in '%' (trivial if there is no
->> $ or `, but also possible when using things like $ret that are
->> known to be numeric given the assignment to ret just above).
->=20
-> Well, yes, possible, but it's no longer trivial... And just using '%s'
-> or '%b' in these cases would make reading the code simpler, in my opini=
-on.
->=20
-> Sure, omitting it makes sense for constant format strings, but for
-> variable the cost outweighs the benefit, in my opinion.
->=20
-> (And since this is a bit supposed to go through qemu-trivial, it should=
-
-> be trivial, right? :-))
-
-I can spin up a v3 that adds more %s/%b anywhere a $ appears where the
-variable being printed is not obviously assigned in the immediately
-preceding context.
+bdrv_reopen_prepare() assumes that all BDS options are strings, which is
+not necessarily correct. This series introduces a new qobject_is_equal()
+function which can be used to test whether any options have changed,
+independently of their type.
 
 
->> +++ b/tests/qemu-iotests/check
->=20
-> [...]
->=20
->> @@ -281,9 +281,9 @@ do
->>          rm -f $seq.out.bad
->>          lasttime=3D`sed -n -e "/^$seq /s/.* //p" <$TIMESTAMP_FILE`
->>          if [ "X$lasttime" !=3D X ]; then
->> -                echo -n " ${lasttime}s ..."
->> +                printf " ${lasttime}s ..."
->=20
-> You cannot prove this doesn't contain a %. In fact, I can very easily
-> put a % into the timestamp file and let printf print it here.
->=20
-> Sure, there shouldn't be one there, but on one hand it's still possible=
-
-> and on the other, finding out that there shouldn't be a % there is very=
-
-> much non-trivial.
-
-Indeed, any variable whose contents are provided from the filesystem
-rather than directly by the script are suspects for abuse. In a
-testsuite, it's often feasible to assume that abuse is not happening,
-but being robust doesn't hurt.
-
->> +++ b/tests/tcg/cris/Makefile
->> @@ -150,17 +150,17 @@ check_addcv17.tst: crtv10.o sysv10.o
->>  build: $(CRT) $(SYS) $(TESTCASES)
->>
->>  check: $(CRT) $(SYS) $(TESTCASES)
->> -	@echo -e "\nQEMU simulator."
->> +	@printf "\nQEMU simulator.\n"
->>  	for case in $(TESTCASES); do \
->> -		echo -n "$$case "; \
->> +		printf "$$case "; \
->=20
-> This is another rather non-trivial case: Checking that this doesn't
-> contain a % means reading through the whole list defining TESTCASES.
-
-We'd be crazy to define TESTCASES with %, but I agree that the context
-is not close, so being robust doesn't hurt.
-
-Sounds like a v3 is coming up.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+v3:
+- Patch 1:
+  - Fix copyright header [Markus]
+  - Drop qobject.h include from qnull.c [Markus]
+  - Replacing all QObject includes by qmp/types.h in target/i386/cpu.c
+    became unnecessary due to 01b2ffcedd94ad7b42bc870e4c6936c87ad03429
+    (kept R-b anyway, because v2 contained exactly the same change as
+     that commit)
+- Patch 2:
+  - Move the code for QInt and QFloat to QNum
+  - Write function descriptions in imperative mood [Markus]
+  - Break comment lines after 70 characters [Markus]
+  - Style changes [Markus]
+- Patch 3: Add a comment on what will go wrong when using e.g. -blockdev
+           and the qemu-io reopen command together [Markus]
+- Patch 5: Added some test cases for qobject_is_equal() [Markus]
 
 
---QNUROahhEfOtO7a78cEORuUU4m6t66wGc
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+git-backport-diff against v2:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
 
-iQEcBAEBCAAGBQJZWjd/AAoJEKeha0olJ0NqOPsH/04hyB8VLr1fBbxgdXyPYlUF
-lTwEZmnnGpG9apLqbDXwb+BSY3481s84vrCTn+5oFIGvWEBxcw6IVVA1vhLTFKTF
-CyD4D5EyLaQYDFRTIEV9YDQrW0MS3CEvEB7SnM9aBbTwcw8DAwNWBXN7pcG1PjHf
-xJuuSE6Uwt1JyCc+JLURyFjaPp6bc+Hn5y0kIVeebzcElQZ3vBaxx3qvhlXDiUKm
-0crW4nNeEV7rVKSK0YgFYOPOuACqKUjo9JJYs/+vhdEb2l0ve58dt8mRhFCt0ChS
-tdR2L6LC3v3iuU1WGqJ0kPdwBgV7gpl3qyI3WTUZmn5kSJ3ssaAUrseGPqQyabY=
-=vmBJ
------END PGP SIGNATURE-----
+001/5:[0017] [FC] 'qapi/qnull: Add own header'
+002/5:[0120] [FC] 'qapi: Add qobject_is_equal()'
+003/5:[0018] [FC] 'block: qobject_is_equal() in bdrv_reopen_prepare()'
+004/5:[----] [--] 'iotests: Add test for non-string option reopening'
+005/5:[down] 'tests: Add check-qobject for equality tests'
 
---QNUROahhEfOtO7a78cEORuUU4m6t66wGc--
+
+Max Reitz (5):
+  qapi/qnull: Add own header
+  qapi: Add qobject_is_equal()
+  block: qobject_is_equal() in bdrv_reopen_prepare()
+  iotests: Add test for non-string option reopening
+  tests: Add check-qobject for equality tests
+
+ tests/Makefile.include     |   4 +-
+ include/qapi/qmp/qbool.h   |   1 +
+ include/qapi/qmp/qdict.h   |   1 +
+ include/qapi/qmp/qlist.h   |   1 +
+ include/qapi/qmp/qnull.h   |  28 ++++
+ include/qapi/qmp/qnum.h    |   1 +
+ include/qapi/qmp/qobject.h |  17 +--
+ include/qapi/qmp/qstring.h |   1 +
+ include/qapi/qmp/types.h   |   1 +
+ block.c                    |  31 +++--
+ qobject/qbool.c            |   8 ++
+ qobject/qdict.c            |  29 +++++
+ qobject/qlist.c            |  32 +++++
+ qobject/qnull.c            |  11 +-
+ qobject/qnum.c             |  53 ++++++++
+ qobject/qobject.c          |  29 +++++
+ qobject/qstring.c          |   9 ++
+ tests/check-qnull.c        |   2 +-
+ tests/check-qobject.c      | 312 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/133     |   9 ++
+ tests/qemu-iotests/133.out |   5 +
+ 21 files changed, 561 insertions(+), 24 deletions(-)
+ create mode 100644 include/qapi/qmp/qnull.h
+ create mode 100644 tests/check-qobject.c
+
+-- 
+2.9.4
