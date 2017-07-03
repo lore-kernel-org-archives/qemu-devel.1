@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dRrLZ-00073T-U5
-	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 22:44:22 -0400
+	(envelope-from <peterx@redhat.com>) id 1dRrLc-000757-7G
+	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 22:44:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dRrLZ-0006p9-23
-	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 22:44:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41566)
+	(envelope-from <peterx@redhat.com>) id 1dRrLb-0006qL-FB
+	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 22:44:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42120)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dRrLY-0006oc-Ry
-	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 22:44:20 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dRrLa-0006pk-U1
+	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 22:44:23 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B396883F3D
-	for <qemu-devel@nongnu.org>; Mon,  3 Jul 2017 02:44:19 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 01DE880E72
+	for <qemu-devel@nongnu.org>; Mon,  3 Jul 2017 02:44:22 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Mon,  3 Jul 2017 10:44:07 +0800
-Message-Id: <1499049848-18012-4-git-send-email-peterx@redhat.com>
+Date: Mon,  3 Jul 2017 10:44:08 +0800
+Message-Id: <1499049848-18012-5-git-send-email-peterx@redhat.com>
 In-Reply-To: <1499049848-18012-1-git-send-email-peterx@redhat.com>
 References: <1499049848-18012-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/4] doc: add item for "-M
- enforce-config-section"
+Subject: [Qemu-devel] [PATCH 4/4] doc: update TYPE_MIGRATION documents
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,37 +32,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-It's never documented, and now we have one more parameter for it (which
-means this one can be obsolete in the future). Document it properly.
-
-Although now when enforce-config-section is set, it'll override the
-other "-global" parameter, that is not necessarily a rule. Forbid that
-usage in the document.
+[Peter collected Eduardo's patch comment and formatted into patch]
 
 Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- qemu-options.hx | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ migration/migration.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 297bd8a..927c51f 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -85,6 +85,14 @@ Enables or disables NVDIMM support. The default is off.
- @item s390-squash-mcss=on|off
- Enables or disables squashing subchannels into the default css.
- The default is off.
-+@item enforce-config-section=on|off
-+Decides whether we will send the configuration section when doing
-+migration. By default, it is turned on. We can set this to off to
-+explicitly disable it. Note: this parameter will be obsolete soon,
-+please use "-global migration.send-configuration=on|off" instead.
-+"enforce-config-section" cannot be used together with "-global
-+migration.send-configuration". If it happens, the behavior is
-+undefined.
- @end table
- ETEXI
- 
+diff --git a/migration/migration.c b/migration/migration.c
+index dbdc121..6c64b99 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -2052,12 +2052,15 @@ static void migration_instance_init(Object *obj)
+ static const TypeInfo migration_type = {
+     .name = TYPE_MIGRATION,
+     /*
+-     * NOTE: "migration" itself is not really a device. We used
+-     * TYPE_DEVICE here only to leverage some existing QDev features
+-     * like "-global" properties, and HW_COMPAT_* fields (which are
+-     * finally applied as global properties as well). If one day the
+-     * global property feature can be migrated from QDev to QObject in
+-     * general, then we can switch to QObject as well.
++     * NOTE:
++     *
++     * TYPE_MIGRATION is not really a device, as the object is not
++     * created using qdev_create(), it is not attached to the qdev
++     * device tree, and it is never realized.
++     *
++     * If one day we allow non-device QOM objects to use the global
++     * property system, we can switch this from TYPE_DEVICE to
++     * TYPE_OBJECT.
+      */
+     .parent = TYPE_DEVICE,
+     .class_init = migration_class_init,
 -- 
 2.7.4
