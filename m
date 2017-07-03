@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dS4Ow-00050q-Tc
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:40:43 -0400
+	(envelope-from <groug@kaod.org>) id 1dS4Wb-0003UZ-Ht
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:48:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dS4Ov-0003rn-JU
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:40:42 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:34870)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dS4Ov-0003r9-9B
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:40:41 -0400
-Received: by mail-wm0-x232.google.com with SMTP id w126so173648055wme.0
-	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 09:40:41 -0700 (PDT)
+	(envelope-from <groug@kaod.org>) id 1dS4WY-0008NG-9D
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:48:37 -0400
+Received: from 1.mo4.mail-out.ovh.net ([178.33.248.196]:42071)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dS4WX-0008Mg-Uu
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:48:34 -0400
+Received: from player159.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 53CBE81349
+	for <qemu-devel@nongnu.org>; Mon,  3 Jul 2017 18:48:32 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Mon, 03 Jul 2017 18:48:25 +0200
+Message-ID: <149910050540.26371.12575732020425703531.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <24d9856c-dd4e-70d1-5eaf-3f36e70fad72@twiddle.net>
-References: <CAFEAcA_OcQY1V16Vi8Ld1iZprPUsq+OCML0udYzLhVToCUXt_g@mail.gmail.com>
-	<24d9856c-dd4e-70d1-5eaf-3f36e70fad72@twiddle.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 3 Jul 2017 17:40:19 +0100
-Message-ID: <CAFEAcA_QfLHR1dFQphS5DzjnekUACq=DOGKaqaeQgM_XpouLjw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] handling emulation fine-grained memory protection
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] spapr: make default PHB optionnal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +27,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Andrea Bolognani <abologna@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On 3 July 2017 at 17:07, Richard Henderson <rth@twiddle.net> wrote:
-> On 07/03/2017 03:04 AM, Peter Maydell wrote:
->> Does anybody have any good ideas for how this ought to be done?
->> We could wind down the "page size" for these CPUs (since we
->> now have runtime-configurable-page-size for ARM CPUs this
->> shouldn't compromise the A profile cores which can stick to
->> 1K or 4K pages) but I don't think we can get down as low as
->> 64 bytes due to all the things we keep in the low bits of
->> TLB entries.
->
->
-> It's close..  We need 3 bits that do not overlap any requested alignment.
->
-> Does the v7m profile have 8-byte aligned operations?  I see that STREXD is
-> out, and I can't think of anything else.  So bits 8, 16, 32 are up for
-> grabs, which does fit a 64-byte page minimum.
+The sPAPR machine always create a default PHB during initialization, even
+if -nodefaults was passed on the command line. This forces the user to
+rely on -global if she wants to set properties of the default PHB, such
+as numa_node.
 
-Looking at section B5.4 in the v8M ARM ARM, it lists only
-alignment faults for non-halfword-aligned halfword accesses
-and for non-word-aligned various, so we don't need 8-byte
-alignment checks.
+This patch introduces a new machine create-default-phb property to control
+whether the default PHB must be created or not. It defaults to on in order
+to preserve old setups (which is also the motivation to not alter the
+current behavior of -nodefaults).
 
-> That said...
->
->> I'm guessing we'd need to have "this page has fine grained
->> protection regions" imply "take the slow path" and then do
->> the protection check in the slow path. Alex Graf pointed out
->> to me a while back that we already have a data structure for
->> handling sub-page-sized things in the slow path (the subpage
->> handling in the memory system), but can we easily (or otherwise)
->> use it, or would it be simpler just to have a separate thing?
->
->
-> I think it would be simpler to have a separate thing, since the regular
-> subpage handling requires memory allocation.
->
-> I would just think about a bit, TLB_PROT_RECHECK or so, that not only takes
-> the slow path through the helper, but also the slow path back through
-> tlb_fill.
->
-> Since these are defined by system registers, I can imagine there can only be
-> a few pages for which this fine grained handling might apply any any one
-> time. This would certainly be preferable to reducing the effectiveness of
-> the entire TLB by a factor of 16.
+If create-default-phb is set to off, the default PHB isn't created, nor
+any other device usually created with it. It is mandatory to provide
+a PHB on the command line to be able to use PCI devices (otherwise QEMU
+won't start). For example, the following creates a PHB with the same
+mappings as the default PHB and also sets the NUMA affinity:
 
-Yes, that was somewhat my feeling too -- really tiny TLB pages
-are not very nice, and most pages probably won't be finegrained.
+    -machine type=pseries,create-default-phb=off \
+    -numa node,nodeid=0 -device spapr-pci-host-bridge,index=0,numa_node=0
 
-thanks
--- PMM
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/ppc/spapr.c         |   63 ++++++++++++++++++++++++++++++++++--------------
+ include/hw/ppc/spapr.h |    2 ++
+ 2 files changed, 47 insertions(+), 18 deletions(-)
+
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index ba8f57a5a054..3395bb3774b9 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2103,7 +2103,7 @@ static void ppc_spapr_init(MachineState *machine)
+     sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(machine);
+     const char *kernel_filename = machine->kernel_filename;
+     const char *initrd_filename = machine->initrd_filename;
+-    PCIHostState *phb;
++    PCIHostState *phb = NULL;
+     int i;
+     MemoryRegion *sysmem = get_system_memory();
+     MemoryRegion *ram = g_new(MemoryRegion, 1);
+@@ -2294,7 +2294,9 @@ static void ppc_spapr_init(MachineState *machine)
+     /* Set up PCI */
+     spapr_pci_rtas_init();
+ 
+-    phb = spapr_create_phb(spapr, 0);
++    if (spapr->create_default_phb) {
++        phb = spapr_create_phb(spapr, 0);
++    }
+ 
+     for (i = 0; i < nb_nics; i++) {
+         NICInfo *nd = &nd_table[i];
+@@ -2305,7 +2307,7 @@ static void ppc_spapr_init(MachineState *machine)
+ 
+         if (strcmp(nd->model, "ibmveth") == 0) {
+             spapr_vlan_create(spapr->vio_bus, nd);
+-        } else {
++        } else if (phb) {
+             pci_nic_init_nofail(&nd_table[i], phb->bus, nd->model, NULL);
+         }
+     }
+@@ -2314,24 +2316,26 @@ static void ppc_spapr_init(MachineState *machine)
+         spapr_vscsi_create(spapr->vio_bus);
+     }
+ 
+-    /* Graphics */
+-    if (spapr_vga_init(phb->bus, &error_fatal)) {
+-        spapr->has_graphics = true;
+-        machine->usb |= defaults_enabled() && !machine->usb_disabled;
+-    }
+-
+-    if (machine->usb) {
+-        if (smc->use_ohci_by_default) {
+-            pci_create_simple(phb->bus, -1, "pci-ohci");
+-        } else {
+-            pci_create_simple(phb->bus, -1, "nec-usb-xhci");
++    if (phb) {
++        /* Graphics */
++        if (spapr_vga_init(phb->bus, &error_fatal)) {
++            spapr->has_graphics = true;
++            machine->usb |= defaults_enabled() && !machine->usb_disabled;
+         }
+ 
+-        if (spapr->has_graphics) {
+-            USBBus *usb_bus = usb_bus_find(-1);
++        if (machine->usb) {
++            if (smc->use_ohci_by_default) {
++                pci_create_simple(phb->bus, -1, "pci-ohci");
++            } else {
++                pci_create_simple(phb->bus, -1, "nec-usb-xhci");
++            }
++
++            if (spapr->has_graphics) {
++                USBBus *usb_bus = usb_bus_find(-1);
+ 
+-            usb_create_simple(usb_bus, "usb-kbd");
+-            usb_create_simple(usb_bus, "usb-mouse");
++                usb_create_simple(usb_bus, "usb-kbd");
++                usb_create_simple(usb_bus, "usb-mouse");
++            }
+         }
+     }
+ 
+@@ -2544,12 +2548,27 @@ static void spapr_set_modern_hotplug_events(Object *obj, bool value,
+     spapr->use_hotplug_event_source = value;
+ }
+ 
++static bool spapr_get_create_default_phb(Object *obj, Error **errp)
++{
++    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
++
++    return spapr->create_default_phb;
++}
++
++static void spapr_set_create_default_phb(Object *obj, bool value, Error **errp)
++{
++    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
++
++    spapr->create_default_phb = value;
++}
++
+ static void spapr_machine_initfn(Object *obj)
+ {
+     sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
+ 
+     spapr->htab_fd = -1;
+     spapr->use_hotplug_event_source = true;
++    spapr->create_default_phb = true;
+     object_property_add_str(obj, "kvm-type",
+                             spapr_get_kvm_type, spapr_set_kvm_type, NULL);
+     object_property_set_description(obj, "kvm-type",
+@@ -2568,6 +2587,14 @@ static void spapr_machine_initfn(Object *obj)
+     ppc_compat_add_property(obj, "max-cpu-compat", &spapr->max_compat_pvr,
+                             "Maximum permitted CPU compatibility mode",
+                             &error_fatal);
++
++    object_property_add_bool(obj, "create-default-phb",
++                            spapr_get_create_default_phb,
++                            spapr_set_create_default_phb,
++                            NULL);
++    object_property_set_description(obj, "create-default-phb",
++                                    "Create a default PCI Host Bridge",
++                                    NULL);
+ }
+ 
+ static void spapr_machine_finalizefn(Object *obj)
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index a184ffab0ebc..6ee914764807 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -93,6 +93,8 @@ struct sPAPRMachineState {
+     bool use_hotplug_event_source;
+     sPAPREventSource *event_sources;
+ 
++    bool create_default_phb;
++
+     /* ibm,client-architecture-support option negotiation */
+     bool cas_reboot;
+     bool cas_legacy_guest_workaround;
