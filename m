@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS3xn-0007AI-1s
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:12:40 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dS3z8-00081l-Nd
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:14:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS3xl-00030Z-Qh
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:12:39 -0400
-References: <20170629184320.7151-1-el13635@mail.ntua.gr>
-	<20170629184320.7151-4-el13635@mail.ntua.gr>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <69eaa5de-6e3c-d520-cdc6-35a6298aee94@redhat.com>
-Date: Mon, 3 Jul 2017 11:12:28 -0500
+	(envelope-from <mreitz@redhat.com>) id 1dS3z7-00048V-Lh
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:14:02 -0400
+References: <20170703122505.32017-1-mreitz@redhat.com>
+	<20170703122505.32017-6-mreitz@redhat.com>
+	<78e9f722-b6b8-ed94-cf1e-4760059b077f@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <2994bfb3-b442-c6e2-a600-a2644ad2331f@redhat.com>
+Date: Mon, 3 Jul 2017 18:13:50 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170629184320.7151-4-el13635@mail.ntua.gr>
+In-Reply-To: <78e9f722-b6b8-ed94-cf1e-4760059b077f@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="XXsgUw1WsPbtGb22xOTgx9g3UBJKVghCD"
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] block: add default implementations
- for bdrv_co_get_block_status()
+	boundary="sVDc8VR4WFek1i0v3G3IqI326dJLSsJNJ"
+Subject: Re: [Qemu-devel] [PATCH v3 5/5] tests: Add check-qobject for
+ equality tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,121 +26,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XXsgUw1WsPbtGb22xOTgx9g3UBJKVghCD
-From: Eric Blake <eblake@redhat.com>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>,
- qemu-devel <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <69eaa5de-6e3c-d520-cdc6-35a6298aee94@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] block: add default implementations
- for bdrv_co_get_block_status()
-References: <20170629184320.7151-1-el13635@mail.ntua.gr>
- <20170629184320.7151-4-el13635@mail.ntua.gr>
-In-Reply-To: <20170629184320.7151-4-el13635@mail.ntua.gr>
+--sVDc8VR4WFek1i0v3G3IqI326dJLSsJNJ
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org
+Message-ID: <2994bfb3-b442-c6e2-a600-a2644ad2331f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 5/5] tests: Add check-qobject for equality
+ tests
+References: <20170703122505.32017-1-mreitz@redhat.com>
+ <20170703122505.32017-6-mreitz@redhat.com>
+ <78e9f722-b6b8-ed94-cf1e-4760059b077f@redhat.com>
+In-Reply-To: <78e9f722-b6b8-ed94-cf1e-4760059b077f@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 06/29/2017 01:43 PM, Manos Pitsidianakis wrote:
-> bdrv_co_get_block_status_from_file() and
-> bdrv_co_get_block_status_from_backing() set *file to bs->file and
-> bs->backing respectively, so that bdrv_co_get_block_status() can recurs=
-e
-> to them. Future block drivers won't have to duplicate code to implement=
-
-> this.
+On 2017-07-03 16:15, Eric Blake wrote:
+> On 07/03/2017 07:25 AM, Max Reitz wrote:
+>> Add a new test file (check-qobject.c) for unit tests that concern
+>> QObjects as a whole.
+>>
+>> Its only purpose for now is to test the qobject_is_equal() function.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>  tests/Makefile.include |   4 +-
+>>  tests/check-qobject.c  | 312 ++++++++++++++++++++++++++++++++++++++++=
++++++++++
+>>  2 files changed, 315 insertions(+), 1 deletion(-)
+>>  create mode 100644 tests/check-qobject.c
+>>
 >=20
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
-> ---
->  block/blkdebug.c          | 12 +-----------
->  block/commit.c            | 12 +-----------
->  block/io.c                | 24 ++++++++++++++++++++++++
->  block/mirror.c            | 12 +-----------
->  include/block/block_int.h | 16 ++++++++++++++++
->  5 files changed, 43 insertions(+), 33 deletions(-)
+>> + * Note that qobject_is_equal() is not really an equivalence relation=
+,
+>> + * so this function may not be used for all objects (reflexivity is
+>> + * not guaranteed).
+>=20
+> May be worth expanding the comment to mention NaN in QNum as the culpri=
+t
+> for this fact.
 
-My [still-needs-rebasing] part 3 series converting
-bdrv_co_get_block_status to byte-based will be impacted by this, but I'd
-rather yours go in first and I can deal with the rebase fallout.
+True.
+
+>> +static void do_test_equality(bool expected, ...)
+>> +{
+>> +    va_list ap_count, ap_extract;
+>> +    QObject **args;
+>> +    int arg_count =3D 0;
+>> +    int i, j;
+>> +
+>> +    va_start(ap_count, expected);
+>> +    va_copy(ap_extract, ap_count);
+>> +    while (va_arg(ap_count, QObject *) !=3D &_test_equality_end_of_ar=
+guments) {
+>=20
+> Here, you're careful to allow a NULL argument,
+>=20
+>=20
+>> +static void do_free_all(int _, ...)
+>> +{
+>> +    va_list ap;
+>> +    QObject *obj;
+>> +
+>> +    va_start(ap, _);
+>> +    while ((obj =3D va_arg(ap, QObject *)) !=3D NULL) {
+>> +        qobject_decref(obj);
+>> +    }
+>=20
+> Here, you stop on the first NULL, and aren't checking for the special
+> sentinel that can't be freed.
+>=20
+>> +    va_end(ap);
+>> +}
+>> +
+>> +#define free_all(...) \
+>> +    do_free_all(0, __VA_ARGS__, NULL)
+>=20
+> Then again, you don't pass the special sentinel. So as long as NULL is
+> the last argument(s) on any test that passes NULL (rather than an
+> intermediate argument), you don't need to use the sentinel, and stoppin=
+g
+> iteration on the first NULL is okay.  A bit magic, but I can live with =
+it.
+
+I don't mind using the sentinel here, too, but passing NULL doesn't make
+much sense here. It does for test_equality(), though.
+
+>> +
+>> +static void qobject_is_equal_null_test(void)
+>> +{
+>> +    test_equality(false, qnull(), NULL);
+>> +}
+>=20
+> Where do you test_equality(true, NULL, NULL) ?
+
+Automatically in do_test_equality().
+
+(It automatically tests whether all arguments are equal to itself --
+which is why I can't use it to test NaN.)
+
+>> +
+>> +static void qobject_is_equal_num_test(void)
+>> +{
+>> +    QNum *u0, *i0, *d0, *d0p25, *dnan, *um42, *im42, *dm42;
+>> +    QString *s0, *s_empty;
+>> +    QBool *bfalse;
+>> +
+>> +    u0 =3D qnum_from_uint(0u);
+>> +    i0 =3D qnum_from_int(0);
+>> +    d0 =3D qnum_from_double(0.0);
+>> +    d0p25 =3D qnum_from_double(0.25);
+>> +    dnan =3D qnum_from_double(0.0 / 0.0);
+>=20
+> Ah, so you ARE testing NaN as a QNum, even though it can't occur in
+> JSON.  Might be worth a comment.
+
+Sure, why not.
+
+>> +
+>> +    /* Containing an NaN value will make this dict compare unequal to=
+
+>=20
+> s/an/a/ (if you pronounce it "nan" or "not-a-number") (but I guess no
+> change if you pronounce it "en-a-en")
+
+I pronounce it en-a-en, but I don't know whether that's the usual way. ;-=
+)
+
+> There might be some improvements to add, but as written the test is
+> reasonable, and some testing is better than none, so:
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks!
+
+Max
 
 
-> +++ b/include/block/block_int.h
-> @@ -945,6 +945,22 @@ void bdrv_format_default_perms(BlockDriverState *b=
-s, BdrvChild *c,
->                                 uint64_t perm, uint64_t shared,
->                                 uint64_t *nperm, uint64_t *nshared);
-> =20
-> +/*
-> + * Default implementation for drivers to pass bdrv_co_get_block_status=
-() to
-> + * their file
-
-I would have ended with '.'
-
-> + * */
-
-Looks odd.  Just use ' */', not ' * */'
-
-> +int64_t coroutine_fn bdrv_co_get_block_status_from_file(BlockDriverSta=
-te *bs,
-> +                                                     int64_t sector_nu=
-m,
-> +                                                     int nb_sectors, i=
-nt *pnum,
-> +                                                     BlockDriverState =
-**file);
-
-Indentation is unusual (not necessarily bad, since you are up against
-80-column limits).
-
-> +/*
-> + * Default implementation for drivers to pass bdrv_co_get_block_status=
-() to
-> + * their backing file
-> + * */
-> +int64_t coroutine_fn bdrv_co_get_block_status_from_backing(BlockDriver=
-State *bs,
-> +                                                     int64_t sector_nu=
-m,
-> +                                                     int nb_sectors, i=
-nt *pnum,
-> +                                                     BlockDriverState =
-**file);
-
-Ditto.
-
-Making changes according to what I mentioned is minor, so you can add:
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---XXsgUw1WsPbtGb22xOTgx9g3UBJKVghCD
+--sVDc8VR4WFek1i0v3G3IqI326dJLSsJNJ
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZWmztAAoJEKeha0olJ0NqETEH/0jb/zI5aHQBusFbkD00J5eF
-TJPoiDrrExvL1h8XOM/aXk1CgauigxOM1qwrq6iNRdlmU0hQjWUtVRSFy0zOZrAy
-pv/DU3C4/n4SD44+ce23dJqrBgP+tr+My9M+ForsA0CRff8OedNptyJE0FRtxw6e
-JGr6lZQG3PsXpHpvYIH6MlZQ1rrtnIGip11Lt5eR10LqIqm7WoVHMI7g2rAlvy3O
-6sBR4ZxfxseFKxliALgiTXIh5yZNL5w7ymxrql4EvGBzd7wNf9fm26qBcX7xtWtF
-yhjSGdgDDX10J7TPNarJXzxQjDUPFCYDSu8RAb/IMlOBgG4JjvkYm9sDSzTQPM0=
-=IeLl
+iQEvBAEBCAAZBQJZWm0+EhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQAG6
+CACVaXSJigtHsHs7NasiZSl+Ny40EpcqWjiDtcKYeLBqqPEpXWrrlM209Y9RSkds
+1ADjvHJIATSkQLrMPISEsDdM8s3FdZXDzm8rBic4Ff1rSJpYeVL599DA+eRZby+Z
+LWq1fVd/uqA2YxxXaYqzpWYVmiG0BgzZXbGntawtDx1GZa4mzR4hggcVDoa0Xmgu
+K0ESEPjFYqgKmjlkVEmbIQxC2FeiKOFasIFnjRYYBV3xu3aUMfoatazxKBxnVuUN
+pEYglJBzJdBtgIxFM4tDV10BRF8NwWdedUgRWhW3MzaVyN7WOG4MhsPakBk31CYP
+tBYGOrLZlFsXjo++6Mj++EBz
+=aZJG
 -----END PGP SIGNATURE-----
 
---XXsgUw1WsPbtGb22xOTgx9g3UBJKVghCD--
+--sVDc8VR4WFek1i0v3G3IqI326dJLSsJNJ--
