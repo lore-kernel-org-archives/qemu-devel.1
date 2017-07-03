@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS30v-0007Zz-P3
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 11:11:53 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dS32o-0000ik-2c
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 11:13:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS30u-0000DB-Gh
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 11:11:49 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Mon,  3 Jul 2017 10:10:51 -0500
-Message-Id: <20170703151051.31327-18-eblake@redhat.com>
-In-Reply-To: <20170703151051.31327-1-eblake@redhat.com>
-References: <20170703151051.31327-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 17/17] dirty-bitmap: Convert internal
- hbitmap size/granularity
+	(envelope-from <pm215@archaic.org.uk>) id 1dS32m-0001Zd-TM
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 11:13:46 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37402)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1dS32m-0001Wz-Hs
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 11:13:44 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon,  3 Jul 2017 16:13:32 +0100
+Message-Id: <1499094812-13239-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] include/hw/ptimer.h: Add documentation comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,214 +22,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: patches@linaro.org
 
-Now that all callers are using byte-based interfaces, there's no
-reason for our internal hbitmap to remain with sector-based
-granularity.  It also simplifies our internal scaling, since we
-already know that hbitmap widens requests out to granularity
-boundaries.
+Add documentation comments describing the public API of the
+ptimer countdown timer.
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
-v4: rebase to earlier changes, include serialization, R-b dropped
-v3: no change
-v2: no change
----
- block/dirty-bitmap.c | 60 +++++++++++++++-------------------------------------
- 1 file changed, 17 insertions(+), 43 deletions(-)
+I was trying to write a timer device and discovered that the ptimer
+API wasn't actually documented, so I wrote some basic notes for it...
 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 5bfc7bc..0b349f0 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -38,7 +38,7 @@
-  */
- struct BdrvDirtyBitmap {
-     QemuMutex *mutex;
--    HBitmap *bitmap;            /* Dirty sector bitmap implementation */
-+    HBitmap *bitmap;            /* Dirty bitmap implementation */
-     HBitmap *meta;              /* Meta dirty bitmap */
-     BdrvDirtyBitmap *successor; /* Anonymous child; implies frozen status */
-     char *name;                 /* Optional non-empty unique ID */
-@@ -130,12 +130,7 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriverState *bs,
-     }
-     bitmap = g_new0(BdrvDirtyBitmap, 1);
-     bitmap->mutex = &bs->dirty_bitmap_mutex;
--    /*
--     * TODO - let hbitmap track full granularity. For now, it is tracking
--     * only sector granularity, as a shortcut for our iterators.
--     */
--    bitmap->bitmap = hbitmap_alloc(DIV_ROUND_UP(bitmap_size, BDRV_SECTOR_SIZE),
--                                   ctz32(granularity) - BDRV_SECTOR_BITS);
-+    bitmap->bitmap = hbitmap_alloc(bitmap_size, ctz32(granularity));
-     bitmap->size = bitmap_size;
-     bitmap->name = g_strdup(name);
-     bitmap->disabled = false;
-@@ -310,7 +305,6 @@ void bdrv_dirty_bitmap_truncate(BlockDriverState *bs)
-     int64_t size = bdrv_getlength(bs);
+ include/hw/ptimer.h | 120 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 120 insertions(+)
 
-     assert(size >= 0);
--    size = DIV_ROUND_UP(size, BDRV_SECTOR_SIZE);
-     bdrv_dirty_bitmaps_lock(bs);
-     QLIST_FOREACH(bitmap, &bs->dirty_bitmaps, list) {
-         assert(!bdrv_dirty_bitmap_frozen(bitmap));
-@@ -445,7 +439,7 @@ bool bdrv_get_dirty_locked(BlockDriverState *bs, BdrvDirtyBitmap *bitmap,
-                            int64_t offset)
- {
-     if (bitmap) {
--        return hbitmap_get(bitmap->bitmap, offset >> BDRV_SECTOR_BITS);
-+        return hbitmap_get(bitmap->bitmap, offset);
-     } else {
-         return false;
-     }
-@@ -473,7 +467,7 @@ uint32_t bdrv_get_default_bitmap_granularity(BlockDriverState *bs)
-
- uint32_t bdrv_dirty_bitmap_granularity(const BdrvDirtyBitmap *bitmap)
- {
--    return BDRV_SECTOR_SIZE << hbitmap_granularity(bitmap->bitmap);
-+    return 1U << hbitmap_granularity(bitmap->bitmap);
- }
-
- BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap)
-@@ -506,19 +500,16 @@ void bdrv_dirty_iter_free(BdrvDirtyBitmapIter *iter)
-
- int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter)
- {
--    return hbitmap_iter_next(&iter->hbi) * BDRV_SECTOR_SIZE;
-+    return hbitmap_iter_next(&iter->hbi);
- }
-
- /* Called within bdrv_dirty_bitmap_lock..unlock */
- void bdrv_set_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
-                                   int64_t offset, int64_t bytes)
- {
--    int64_t end_sector = DIV_ROUND_UP(offset + bytes, BDRV_SECTOR_SIZE);
--
-     assert(bdrv_dirty_bitmap_enabled(bitmap));
-     assert(!bdrv_dirty_bitmap_readonly(bitmap));
--    hbitmap_set(bitmap->bitmap, offset >> BDRV_SECTOR_BITS,
--                end_sector - (offset >> BDRV_SECTOR_BITS));
-+    hbitmap_set(bitmap->bitmap, offset, bytes);
- }
-
- void bdrv_set_dirty_bitmap(BdrvDirtyBitmap *bitmap,
-@@ -533,12 +524,9 @@ void bdrv_set_dirty_bitmap(BdrvDirtyBitmap *bitmap,
- void bdrv_reset_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
-                                     int64_t offset, int64_t bytes)
- {
--    int64_t end_sector = DIV_ROUND_UP(offset + bytes, BDRV_SECTOR_SIZE);
--
-     assert(bdrv_dirty_bitmap_enabled(bitmap));
-     assert(!bdrv_dirty_bitmap_readonly(bitmap));
--    hbitmap_reset(bitmap->bitmap, offset >> BDRV_SECTOR_BITS,
--                  end_sector - (offset >> BDRV_SECTOR_BITS));
-+    hbitmap_reset(bitmap->bitmap, offset, bytes);
- }
-
- void bdrv_reset_dirty_bitmap(BdrvDirtyBitmap *bitmap,
-@@ -558,8 +546,7 @@ void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out)
-         hbitmap_reset_all(bitmap->bitmap);
-     } else {
-         HBitmap *backup = bitmap->bitmap;
--        bitmap->bitmap = hbitmap_alloc(DIV_ROUND_UP(bitmap->size,
--                                                    BDRV_SECTOR_SIZE),
-+        bitmap->bitmap = hbitmap_alloc(bitmap->size,
-                                        hbitmap_granularity(backup));
-         *out = backup;
-     }
-@@ -578,51 +565,40 @@ void bdrv_undo_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap *in)
- uint64_t bdrv_dirty_bitmap_serialization_size(const BdrvDirtyBitmap *bitmap,
-                                               uint64_t offset, uint64_t bytes)
- {
--    assert(QEMU_IS_ALIGNED(offset | bytes, BDRV_SECTOR_SIZE));
--    return hbitmap_serialization_size(bitmap->bitmap,
--                                      offset >> BDRV_SECTOR_BITS,
--                                      bytes >> BDRV_SECTOR_BITS);
-+    return hbitmap_serialization_size(bitmap->bitmap, offset, bytes);
- }
-
- uint64_t bdrv_dirty_bitmap_serialization_align(const BdrvDirtyBitmap *bitmap)
- {
--    return hbitmap_serialization_align(bitmap->bitmap) * BDRV_SECTOR_SIZE;
-+    return hbitmap_serialization_align(bitmap->bitmap);
- }
-
- void bdrv_dirty_bitmap_serialize_part(const BdrvDirtyBitmap *bitmap,
-                                       uint8_t *buf, uint64_t offset,
-                                       uint64_t bytes)
- {
--    assert(QEMU_IS_ALIGNED(offset | bytes, BDRV_SECTOR_SIZE));
--    hbitmap_serialize_part(bitmap->bitmap, buf, offset >> BDRV_SECTOR_BITS,
--                           bytes >> BDRV_SECTOR_BITS);
-+    hbitmap_serialize_part(bitmap->bitmap, buf, offset, bytes);
- }
-
- void bdrv_dirty_bitmap_deserialize_part(BdrvDirtyBitmap *bitmap,
-                                         uint8_t *buf, uint64_t offset,
-                                         uint64_t bytes, bool finish)
- {
--    assert(QEMU_IS_ALIGNED(offset | bytes, BDRV_SECTOR_SIZE));
--    hbitmap_deserialize_part(bitmap->bitmap, buf, offset >> BDRV_SECTOR_BITS,
--                             bytes >> BDRV_SECTOR_BITS, finish);
-+    hbitmap_deserialize_part(bitmap->bitmap, buf, offset, bytes, finish);
- }
-
- void bdrv_dirty_bitmap_deserialize_zeroes(BdrvDirtyBitmap *bitmap,
-                                           uint64_t offset, uint64_t bytes,
-                                           bool finish)
- {
--    assert(QEMU_IS_ALIGNED(offset | bytes, BDRV_SECTOR_SIZE));
--    hbitmap_deserialize_zeroes(bitmap->bitmap, offset >> BDRV_SECTOR_BITS,
--                               bytes >> BDRV_SECTOR_BITS, finish);
-+    hbitmap_deserialize_zeroes(bitmap->bitmap, offset, bytes, finish);
- }
-
- void bdrv_dirty_bitmap_deserialize_ones(BdrvDirtyBitmap *bitmap,
-                                         uint64_t offset, uint64_t bytes,
-                                         bool finish)
- {
--    assert(QEMU_IS_ALIGNED(offset | bytes, BDRV_SECTOR_SIZE));
--    hbitmap_deserialize_ones(bitmap->bitmap, offset >> BDRV_SECTOR_BITS,
--                             bytes >> BDRV_SECTOR_BITS, finish);
-+    hbitmap_deserialize_ones(bitmap->bitmap, offset, bytes, finish);
- }
-
- void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap)
-@@ -633,7 +609,6 @@ void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap)
- void bdrv_set_dirty(BlockDriverState *bs, int64_t offset, int64_t bytes)
- {
-     BdrvDirtyBitmap *bitmap;
--    int64_t end_sector = DIV_ROUND_UP(offset + bytes, BDRV_SECTOR_SIZE);
-
-     if (QLIST_EMPTY(&bs->dirty_bitmaps)) {
-         return;
-@@ -645,8 +620,7 @@ void bdrv_set_dirty(BlockDriverState *bs, int64_t offset, int64_t bytes)
-             continue;
-         }
-         assert(!bdrv_dirty_bitmap_readonly(bitmap));
--        hbitmap_set(bitmap->bitmap, offset >> BDRV_SECTOR_BITS,
--                    end_sector - (offset >> BDRV_SECTOR_BITS));
-+        hbitmap_set(bitmap->bitmap, offset, bytes);
-     }
-     bdrv_dirty_bitmaps_unlock(bs);
- }
-@@ -656,12 +630,12 @@ void bdrv_set_dirty(BlockDriverState *bs, int64_t offset, int64_t bytes)
-  */
- void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *iter, int64_t offset)
- {
--    hbitmap_iter_init(&iter->hbi, iter->hbi.hb, offset >> BDRV_SECTOR_BITS);
-+    hbitmap_iter_init(&iter->hbi, iter->hbi.hb, offset);
- }
-
- int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap)
- {
--    return hbitmap_count(bitmap->bitmap) << BDRV_SECTOR_BITS;
-+    return hbitmap_count(bitmap->bitmap);
- }
-
- int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap)
+diff --git a/include/hw/ptimer.h b/include/hw/ptimer.h
+index eafc3f0..fc4ef5c 100644
+--- a/include/hw/ptimer.h
++++ b/include/hw/ptimer.h
+@@ -12,6 +12,20 @@
+ #include "qemu/timer.h"
+ #include "migration/vmstate.h"
+ 
++/* The ptimer API implements a simple periodic countdown timer.
++ * The countdown timer has a value (which can be read and written via
++ * ptimer_get_count() and ptimer_set_count()). When it is enabled
++ * using ptimer_run(), the value will count downwards at the frequency
++ * which has been configured using ptimer_set_period() or ptimer_set_freq().
++ * When it reaches zero it will trigger a QEMU bottom half handler, and
++ * can be set to either reload itself from a specified limit value
++ * and keep counting down, or to stop (as a one-shot timer).
++ *
++ * Forgetting to set the period/frequency (or setting it to zero) is a
++ * bug in the QEMU device and will cause warning messages to be printed
++ * to stderr when the guest attempts to enable the timer.
++ */
++
+ /* The default ptimer policy retains backward compatibility with the legacy
+  * timers. Custom policies are adjusting the default one. Consider providing
+  * a correct policy for your timer.
+@@ -59,15 +73,121 @@
+ typedef struct ptimer_state ptimer_state;
+ typedef void (*ptimer_cb)(void *opaque);
+ 
++/**
++ * ptimer_init - Allocate and return a new ptimer
++ * @bh: QEMU bottom half which is run on timer expiry
++ * @policy: PTIMER_POLICY_* bits specifying behaviour
++ *
++ * The ptimer returned must be freed using ptimer_free().
++ * The ptimer takes ownership of @bh and will delete it
++ * when the ptimer is eventually freed.
++ */
+ ptimer_state *ptimer_init(QEMUBH *bh, uint8_t policy_mask);
++
++/**
++ * ptimer_free - Free a ptimer
++ * @s: timer to free
++ *
++ * Free a ptimer created using ptimer_init() (including
++ * deleting the bottom half which it is using).
++ */
+ void ptimer_free(ptimer_state *s);
++
++/**
++ * ptimer_set_period - Set counter increment interval in nanoseconds
++ * @s: ptimer to configure
++ * @period: period of the counter in nanoseconds
++ *
++ * Note that if your counter behaviour is specified as having a
++ * particular frequency rather than a period then ptimer_set_freq()
++ * may be more appropriate.
++ */
+ void ptimer_set_period(ptimer_state *s, int64_t period);
++
++/**
++ * ptimer_set_freq - Set counter frequency in Hz
++ * @s: ptimer to configure
++ * @freq: counter frequency in Hz
++ *
++ * This does the same thing as ptimer_set_period(), so you only
++ * need to call one of them. If the counter behaviour is specified
++ * as setting the frequency then this function is more appropriate,
++ * because it allows specifying an effective period which is
++ * precise to fractions of a nanosecond, avoiding rounding errors.
++ */
+ void ptimer_set_freq(ptimer_state *s, uint32_t freq);
++
++/**
++ * ptimer_get_limit - Get the configured limit of the ptimer
++ * @s: ptimer to query
++ *
++ * This function returns the current limit (reload) value
++ * of the down-counter; that is, the value which it will be
++ * reset to when it hits zero.
++ *
++ * Generally timer devices using ptimers should be able to keep
++ * their reload register state inside the ptimer using the get
++ * and set limit functions rather than needing to also track it
++ * in their own state structure.
++ */
+ uint64_t ptimer_get_limit(ptimer_state *s);
++
++/**
++ * ptimer_set_limit - Set the limit of the ptimer
++ * @s: ptimer
++ * @limit: initial countdown value
++ * @reload: if nonzero, then reset the counter to the new limit
++ *
++ * Set the limit value of the down-counter. The @reload flag can
++ * be used to emulate the behaviour of timers which immediately
++ * reload the counter when their reload register is written to.
++ */
+ void ptimer_set_limit(ptimer_state *s, uint64_t limit, int reload);
++
++/**
++ * ptimer_get_count - Get the current value of the ptimer
++ * @s: ptimer
++ *
++ * Return the current value of the down-counter. This will
++ * return the correct value whether the counter is enabled or
++ * disabled.
++ */
+ uint64_t ptimer_get_count(ptimer_state *s);
++
++/**
++ * ptimer_set_count - Set the current value of the ptimer
++ * @s: ptimer
++ * @count: count value to set
++ *
++ * Set the value of the down-counter. If the counter is currently
++ * enabled this will arrange for a timer callback at the appropriate
++ * point in the future.
++ */
+ void ptimer_set_count(ptimer_state *s, uint64_t count);
++
++/**
++ * ptimer_run - Start a ptimer counting
++ * @s: ptimer
++ * @oneshot: non-zero if this timer should only count down once
++ *
++ * Start a ptimer counting down; when it reaches zero the bottom half
++ * passed to ptimer_init() will be invoked. If the @oneshot argument is zero,
++ * the counter value will then be reloaded from the limit and it will
++ * start counting down again. If @oneshot is non-zero, then the counter
++ * will disable itself when it reaches zero.
++ */
+ void ptimer_run(ptimer_state *s, int oneshot);
++
++/**
++ * ptimer_stop - Stop a ptimer counting
++ * @s: ptimer
++ *
++ * Pause a timer (the count stays at its current value until ptimer_run()
++ * is called to start it counting again).
++ *
++ * Note that this can cause it to "lose" time, even if it is immediately
++ * restarted.
++ */
+ void ptimer_stop(ptimer_state *s);
+ 
+ extern const VMStateDescription vmstate_ptimer;
 -- 
-2.9.4
+2.7.4
