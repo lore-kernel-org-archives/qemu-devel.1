@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dS3z8-00081l-Nd
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:14:03 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dS41n-0000dx-Tq
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:16:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dS3z7-00048V-Lh
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:14:02 -0400
-References: <20170703122505.32017-1-mreitz@redhat.com>
-	<20170703122505.32017-6-mreitz@redhat.com>
-	<78e9f722-b6b8-ed94-cf1e-4760059b077f@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1dS41m-00069S-TD
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 12:16:47 -0400
+References: <20170703123114.17103-1-eblake@redhat.com>
+	<73fa75d7-3aa7-e125-af55-c9f383007a28@redhat.com>
+	<8cc9c517-0ee5-a492-c596-6713db0e7d0f@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <2994bfb3-b442-c6e2-a600-a2644ad2331f@redhat.com>
-Date: Mon, 3 Jul 2017 18:13:50 +0200
+Message-ID: <8777cb27-5245-697d-4b88-fc0216c2e5ea@redhat.com>
+Date: Mon, 3 Jul 2017 18:16:34 +0200
 MIME-Version: 1.0
-In-Reply-To: <78e9f722-b6b8-ed94-cf1e-4760059b077f@redhat.com>
+In-Reply-To: <8cc9c517-0ee5-a492-c596-6713db0e7d0f@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="sVDc8VR4WFek1i0v3G3IqI326dJLSsJNJ"
-Subject: Re: [Qemu-devel] [PATCH v3 5/5] tests: Add check-qobject for
- equality tests
+	boundary="ITco9le1USVFBoXf4qQGhVNgmf3qn4dAk"
+Subject: Re: [Qemu-devel] [PATCH v3] tests: Avoid non-portable 'echo -ARG'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,147 +25,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: edgar.iglesias@xilinx.com, stefanha@redhat.com, qemu-block@nongnu.org, qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Jiri Pirko <jiri@resnulli.us>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---sVDc8VR4WFek1i0v3G3IqI326dJLSsJNJ
+--ITco9le1USVFBoXf4qQGhVNgmf3qn4dAk
 From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org
-Message-ID: <2994bfb3-b442-c6e2-a600-a2644ad2331f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 5/5] tests: Add check-qobject for equality
- tests
-References: <20170703122505.32017-1-mreitz@redhat.com>
- <20170703122505.32017-6-mreitz@redhat.com>
- <78e9f722-b6b8-ed94-cf1e-4760059b077f@redhat.com>
-In-Reply-To: <78e9f722-b6b8-ed94-cf1e-4760059b077f@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: edgar.iglesias@xilinx.com, stefanha@redhat.com, qemu-block@nongnu.org,
+ qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Jiri Pirko <jiri@resnulli.us>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Message-ID: <8777cb27-5245-697d-4b88-fc0216c2e5ea@redhat.com>
+Subject: Re: [PATCH v3] tests: Avoid non-portable 'echo -ARG'
+References: <20170703123114.17103-1-eblake@redhat.com>
+ <73fa75d7-3aa7-e125-af55-c9f383007a28@redhat.com>
+ <8cc9c517-0ee5-a492-c596-6713db0e7d0f@redhat.com>
+In-Reply-To: <8cc9c517-0ee5-a492-c596-6713db0e7d0f@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-07-03 16:15, Eric Blake wrote:
-> On 07/03/2017 07:25 AM, Max Reitz wrote:
->> Add a new test file (check-qobject.c) for unit tests that concern
->> QObjects as a whole.
->>
->> Its only purpose for now is to test the qobject_is_equal() function.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  tests/Makefile.include |   4 +-
->>  tests/check-qobject.c  | 312 ++++++++++++++++++++++++++++++++++++++++=
-+++++++++
->>  2 files changed, 315 insertions(+), 1 deletion(-)
->>  create mode 100644 tests/check-qobject.c
->>
->=20
->> + * Note that qobject_is_equal() is not really an equivalence relation=
+On 2017-07-03 16:32, Eric Blake wrote:
+> On 07/03/2017 07:57 AM, Max Reitz wrote:
+>> On 2017-07-03 14:31, Eric Blake wrote:
+>>> POSIX says that backslashes in the arguments to 'echo', as well as
+>>> any use of 'echo -n' and 'echo -e', are non-portable; it recommends
+>>> people should favor 'printf' instead.  This is definitely true where
+>>> we do not control which shell is running (such as in makefile snippet=
+s
+>>> or in documentation examples).  But even for scripts where we
+>>> require bash (and therefore, where echo does what we want by default)=
 ,
->> + * so this function may not be used for all objects (reflexivity is
->> + * not guaranteed).
+>>> it is still possible to use 'shopt -s xpg_echo' to change bash's
+>>> behavior of echo.  And setting a good example never hurts when we are=
+
+>>> not sure if a snippet will be copied from a bash-only script to a
+>>> general shell script (although I don't change the use of non-portable=
+
+>>> \e for ESC when we know the running shell is bash).
+>>>
 >=20
-> May be worth expanding the comment to mention NaN in QNum as the culpri=
-t
-> for this fact.
-
-True.
-
->> +static void do_test_equality(bool expected, ...)
->> +{
->> +    va_list ap_count, ap_extract;
->> +    QObject **args;
->> +    int arg_count =3D 0;
->> +    int i, j;
->> +
->> +    va_start(ap_count, expected);
->> +    va_copy(ap_extract, ap_count);
->> +    while (va_arg(ap_count, QObject *) !=3D &_test_equality_end_of_ar=
-guments) {
+>>>
+>>>          if [ -f $seq.notrun ]
+>>>          then
+>>> -            $timestamp || echo -n " [not run] "
+>>> -            $timestamp && echo " [not run]" && echo -n "        $seq=
+ -- "
+>>> +            $timestamp || printf " [not run] "
+>>> +            $timestamp && echo " [not run]" && printf "        $seq =
+-- "
+>>
+>> Everywhere else, $seq got its own %s, but not here. That's at least
+>> inconsistent.
 >=20
-> Here, you're careful to allow a NULL argument,
+> True, and it's because $ is a bit easy to miss when I'm trying to
+> special case which $ are important.
 >=20
+>>
+>> I don't quite know why you're not simply using %s and %b everywhere
+>> there is a non-constant format string. Yes, if it is an exit code, it =
+is
+>> pretty clear that it won't contain a %. If it's a return value from
+>> "date +%T", it is kind of, too (but then you have to know what that do=
+es
+>> in order to review the change -- and I myself had to consult the man
+>> page, to be honest). If they are variables named "img_offset" and
+>> "img_size", then you'd hope they are numbers, but in order to check yo=
+u
+>> still have to look at the rest of the code (especially since they are
+>> embedded as strings into the JSON object).
+>> If you simply used %s and %b everywhere there is a $, reviewing would =
+be
+>> absolutely trivial. Yes, it seems a bit unnecessary, but it does make
+>> reviewing much easier and I think since this is also about setting a
+>> good example, that would be a good example, IMHO.
+>> (Sure, reviewing this already is easy enough, but there still is a
+>> difference between "very easy" and "trivial".)
 >=20
->> +static void do_free_all(int _, ...)
->> +{
->> +    va_list ap;
->> +    QObject *obj;
->> +
->> +    va_start(ap, _);
->> +    while ((obj =3D va_arg(ap, QObject *)) !=3D NULL) {
->> +        qobject_decref(obj);
->> +    }
+> It's not every day a "trivial" patch gets to v4, but your arguments are=
+
+> persuasive enough that I'll respin.
 >=20
-> Here, you stop on the first NULL, and aren't checking for the special
-> sentinel that can't be freed.
+>>
+>> Although at this point I have to admit that reviewing a really trivial=
+
+>> v4 would take me more time than to just write the following:
+>>
+>> With a %s added to the printf above:
+>>
+>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>>
+>>>              cat $seq.notrun
+>>>              notrun=3D"$notrun $seq"
+>>>          else
+>>>              if [ $sts -ne 0 ]
+>>>              then
+>>> -                echo -n " [failed, exit status $sts]"
+>>> +                printf " [failed, exit status $sts]"
 >=20
->> +    va_end(ap);
->> +}
->> +
->> +#define free_all(...) \
->> +    do_free_all(0, __VA_ARGS__, NULL)
+> So, before I respin, let me double-check:
 >=20
-> Then again, you don't pass the special sentinel. So as long as NULL is
-> the last argument(s) on any test that passes NULL (rather than an
-> intermediate argument), you don't need to use the sentinel, and stoppin=
-g
-> iteration on the first NULL is okay.  A bit magic, but I can live with =
-it.
+> Here's a case where the context makes it obvious that $sts is numeric
+> (if not, the '[ $sts -ne 0 ]' would have failed); do you want the %s
+> here or not?
 
-I don't mind using the sentinel here, too, but passing NULL doesn't make
-much sense here. It does for test_equality(), though.
-
->> +
->> +static void qobject_is_equal_null_test(void)
->> +{
->> +    test_equality(false, qnull(), NULL);
->> +}
->=20
-> Where do you test_equality(true, NULL, NULL) ?
-
-Automatically in do_test_equality().
-
-(It automatically tests whether all arguments are equal to itself --
-which is why I can't use it to test NaN.)
-
->> +
->> +static void qobject_is_equal_num_test(void)
->> +{
->> +    QNum *u0, *i0, *d0, *d0p25, *dnan, *um42, *im42, *dm42;
->> +    QString *s0, *s_empty;
->> +    QBool *bfalse;
->> +
->> +    u0 =3D qnum_from_uint(0u);
->> +    i0 =3D qnum_from_int(0);
->> +    d0 =3D qnum_from_double(0.0);
->> +    d0p25 =3D qnum_from_double(0.25);
->> +    dnan =3D qnum_from_double(0.0 / 0.0);
->=20
-> Ah, so you ARE testing NaN as a QNum, even though it can't occur in
-> JSON.  Might be worth a comment.
-
-Sure, why not.
-
->> +
->> +    /* Containing an NaN value will make this dict compare unequal to=
-
->=20
-> s/an/a/ (if you pronounce it "nan" or "not-a-number") (but I guess no
-> change if you pronounce it "en-a-en")
-
-I pronounce it en-a-en, but I don't know whether that's the usual way. ;-=
-)
-
-> There might be some improvements to add, but as written the test is
-> reasonable, and some testing is better than none, so:
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Thanks!
+Well, I'd put a %s there anyway, just because that would mean exactly
+zero dependency on any context (even if the context is very small here).
 
 Max
 
 
---sVDc8VR4WFek1i0v3G3IqI326dJLSsJNJ
+--ITco9le1USVFBoXf4qQGhVNgmf3qn4dAk
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -174,14 +142,14 @@ Content-Disposition: attachment; filename="signature.asc"
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQEvBAEBCAAZBQJZWm0+EhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQAG6
-CACVaXSJigtHsHs7NasiZSl+Ny40EpcqWjiDtcKYeLBqqPEpXWrrlM209Y9RSkds
-1ADjvHJIATSkQLrMPISEsDdM8s3FdZXDzm8rBic4Ff1rSJpYeVL599DA+eRZby+Z
-LWq1fVd/uqA2YxxXaYqzpWYVmiG0BgzZXbGntawtDx1GZa4mzR4hggcVDoa0Xmgu
-K0ESEPjFYqgKmjlkVEmbIQxC2FeiKOFasIFnjRYYBV3xu3aUMfoatazxKBxnVuUN
-pEYglJBzJdBtgIxFM4tDV10BRF8NwWdedUgRWhW3MzaVyN7WOG4MhsPakBk31CYP
-tBYGOrLZlFsXjo++6Mj++EBz
-=aZJG
+iQEvBAEBCAAZBQJZWm3iEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQLzv
+B/48rEBMoG6AiYtrX27TOTz95q3HqiuNG69jsLycWzGIoCIqvWasQRrcxdDIwy4H
+j5p3zooWZIIIJrnmziwoi/ppBxH4de+76E0qD7ww+nJVz7FKmS94orOF5kn/K62V
+uiUjxhLy60BygmbehZvJ1sl0f8qF4R2L7uHJ7Emv7PXo4qumbBbTF2mvDsEjuKLj
+MlEHJhVenGDZ19AAWX9WWlVcB+ZHnbXqGBNcZkpEFDwBgcNjTUZzRAtkE3Ti6QJR
+SD0VvKUx9+eMrGI+pTP9hpT8H9umm9k7GQVI1zgBCqurw81tPFta3WEg7xgRh79L
+8Ejiam3xFdV/vGS9QHvpxATh
+=Fovd
 -----END PGP SIGNATURE-----
 
---sVDc8VR4WFek1i0v3G3IqI326dJLSsJNJ--
+--ITco9le1USVFBoXf4qQGhVNgmf3qn4dAk--
