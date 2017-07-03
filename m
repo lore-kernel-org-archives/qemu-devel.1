@@ -1,32 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dS2oj-0003JA-Dw
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 10:59:14 -0400
+	(envelope-from <eblake@redhat.com>) id 1dS30D-0006tc-Nj
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 11:11:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dS2of-0007Hg-Fd
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 10:59:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59838)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dS2of-0007Gt-6O
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 10:59:09 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CB2463F1E7
-	for <qemu-devel@nongnu.org>; Mon,  3 Jul 2017 14:59:07 +0000 (UTC)
-Date: Mon, 3 Jul 2017 11:59:03 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170703145903.GL12152@localhost.localdomain>
-References: <1499049848-18012-1-git-send-email-peterx@redhat.com>
-	<1499049848-18012-3-git-send-email-peterx@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <1499049848-18012-3-git-send-email-peterx@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/4] vl: move global property,
- migrate init earlier
+	(envelope-from <eblake@redhat.com>) id 1dS30C-00082e-Ec
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 11:11:05 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Mon,  3 Jul 2017 10:10:34 -0500
+Message-Id: <20170703151051.31327-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 00/17] make dirty-bitmap byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,147 +17,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, jsnow@redhat.com
 
-On Mon, Jul 03, 2017 at 10:44:06AM +0800, Peter Xu wrote:
-> Currently drive_init_func() may call migrate_get_current() while the
-> migrate object is still not ready yet at that time. Move the migration
-> object init earlier, along with the global properties, right after
-> acceleration init.
->=20
-> This fixes a breakage for iotest 055, which caused an assertion failure=
-.
->=20
-> Reported-by: Max Reitz <mreitz@redhat.com>
-> Reported-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> Fixes: 3df663 ("migration: move only_migratable to MigrationState")
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  vl.c | 24 ++++++++++++------------
->  1 file changed, 12 insertions(+), 12 deletions(-)
->=20
-> diff --git a/vl.c b/vl.c
-> index 0c497a3..2ae4313 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -4414,6 +4414,18 @@ int main(int argc, char **argv, char **envp)
-> =20
->      configure_accelerator(current_machine);
-> =20
-> +    /*
-> +     * Register all the global properties, including accel properties,
-> +     * machine properties, and user-specified ones.
-> +     */
-> +    register_global_properties(current_machine);
-> +
-> +    /*
-> +     * Migration object can only be created after global properties
-> +     * are applied correctly.
-> +     */
-> +    migration_object_init();
-> +
+There are patches floating around to add NBD_CMD_BLOCK_STATUS,
+but NBD wants to report status on byte granularity (even if the
+reporting will probably be naturally aligned to sectors or even
+much higher levels).  I've therefore started the task of
+converting our block status code to report at a byte granularity
+rather than sectors.
 
-So, things that might introduce bugs here are:
-1) Unexpected qdev_prop_register_global() calls between this place and
-   the original register_global_properties() call (that would now happen
-   in a different order).
-2) register_global_properties() seeing a different global property list
-   because it is being called earlier.
-   2.1) AccelClass::global_props is statically defined and will be the
-        same here. Not a problem.
-   2.2) MachineClass::compat_props: same as above.
-   2.3) user-provided global properties: we need to ensure all
-        properties in the "global" QemuOpts section are already
-        available at this point.
+This is part two of that conversion: dirty-bitmap. Other parts
+include bdrv_is_allocated (at v3 [1]) and replacing
+bdrv_get_block_status with a byte based callback in all the
+drivers (at v1, needs a rebase [3]).
 
+Available as a tag at:
+git fetch git://repo.or.cz/qemu/ericb.git nbd-byte-dirty-v4
 
-To ensure (1) is not a problem, we need to check all calls for
-qdev_prop_register_global().  The callers are:
+Depends on Max's block branch and my v3 bdrv_is_allocated [1]
 
-* configure_rtc()
-  - Called very early, when parsing command-line options.  Not a problem.=
-[1]
-* global_init_func()
-  * Called by user_register_global_props()
-    * Called by register_global_properties().
-      - That's the code we're moving.  Not a problem.
-* QEMU_OPTION_rtc_td_hack case in main()
-  - Called very early, when parsing command-line options.  Not a problem.=
-[1]
-* QEMU_OPTION_no_kvm_pit_reinjection case in main()
-  - Called very early, when parsing command-line options.  Not a problem.=
-[1]
-* register_compat_prop()
-  * Called by machine_register_compat_props()
-    * Called by register_global_properties().
-      - That's the code we're moving.  Not a problem.
-  * Called by machine_register_compat_for_subclass()
-    * Called by machine_register_compat_props() (see above)
-  * Called by register_compat_props_array()
-    * Called by accel_register_compat_props()
-      * Called by register_global_properties().
-        - That's the code we're moving.  Not a problem.
-* qdev_prop_register_global_list()
-  - Used only by unit test code.
-* cpu_common_parse_features()
-  - Used when initializing CPUs, which is done much later, when
-    machine_run_board_init() is called (or when -device is handled by
-    device_init_func()).  Not a problem.[2]
-* x86_cpu_parse_featurestr()
-  - Same as above.
+v4 is a major rebase: now that persistent dirty bitmaps have
+landed, I had more client code to convert. As part of the
+rebase, I also discovered that v3 did not correctly convert
+the functions used for serializing a dirty bitmap (which
+really didn't matter until qcow2-bitmap.c landed, anyways).
+So the intra-version diffstat is huge, and a lot of patches
+need re-review.
 
+[1] https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg06077.html
+[2] https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg03859.html
+[3] https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg02642.html
 
-To ensure (2.3) is not a problem, we need to look for references to
-qemu_find_opts("global") or qemu_global_opts.  They are:
+(git backport-diff doesn't like the rename in 5/17)
 
-* user_register_global_props()
-  - This is the code we're moving.  Not a problem.
-* default_driver_check() call at main()
-  - This happens earlier, before the code we're moving.  Not a problem.
-* qemu_global_option()
-  - Called very early, when parsing command-line options.  Not a problem.
+001/17:[----] [--] 'dirty-bitmap: Report BlockDirtyInfo.count in bytes, as documented'
+002/17:[down] 'hbitmap: Rename serialization_granularity to serialization_align'
+003/17:[down] 'qcow2: Ensure bitmap serialization is aligned'
+004/17:[0006] [FC] 'dirty-bitmap: Drop unused functions'
+005/17:[down] 'dirty-bitmap: Change bdrv_dirty_bitmap_size() to report bytes'
+006/17:[down] 'dirty-bitmap: Change bdrv_dirty_bitmap_*serialize*() to take bytes'
+007/17:[down] 'qcow2: Switch sectors_covered_by_bitmap_cluster() to byte-based'
+008/17:[0004] [FC] 'dirty-bitmap: Set iterator start by offset, not sector'
+009/17:[0002] [FC] 'dirty-bitmap: Change bdrv_dirty_iter_next() to report byte offset'
+010/17:[----] [--] 'dirty-bitmap: Change bdrv_get_dirty_count() to report bytes'
+011/17:[----] [-C] 'dirty-bitmap: Change bdrv_get_dirty_locked() to take bytes'
+012/17:[----] [-C] 'dirty-bitmap: Change bdrv_[re]set_dirty_bitmap() to use bytes'
+013/17:[----] [--] 'mirror: Switch mirror_dirty_init() to byte-based iteration'
+014/17:[down] 'qcow2: Switch load_bitmap_data() to byte-based iteration'
+015/17:[down] 'qcow2: Switch store_bitmap_data() to byte-based iteration'
+016/17:[----] [-C] 'dirty-bitmap: Switch bdrv_set_dirty() to bytes'
+017/17:[0031] [FC] 'dirty-bitmap: Convert internal hbitmap size/granularity'
 
+Eric Blake (17):
+  dirty-bitmap: Report BlockDirtyInfo.count in bytes, as documented
+  hbitmap: Rename serialization_granularity to serialization_align
+  qcow2: Ensure bitmap serialization is aligned
+  dirty-bitmap: Drop unused functions
+  dirty-bitmap: Change bdrv_dirty_bitmap_size() to report bytes
+  dirty-bitmap: Change bdrv_dirty_bitmap_*serialize*() to take bytes
+  qcow2: Switch sectors_covered_by_bitmap_cluster() to byte-based
+  dirty-bitmap: Set iterator start by offset, not sector
+  dirty-bitmap: Change bdrv_dirty_iter_next() to report byte offset
+  dirty-bitmap: Change bdrv_get_dirty_count() to report bytes
+  dirty-bitmap: Change bdrv_get_dirty_locked() to take bytes
+  dirty-bitmap: Change bdrv_[re]set_dirty_bitmap() to use bytes
+  mirror: Switch mirror_dirty_init() to byte-based iteration
+  qcow2: Switch load_bitmap_data() to byte-based iteration
+  qcow2: Switch store_bitmap_data() to byte-based iteration
+  dirty-bitmap: Switch bdrv_set_dirty() to bytes
+  dirty-bitmap: Convert internal hbitmap size/granularity
 
-So the code reordering looks OK.
+ include/block/block_int.h    |   2 +-
+ include/block/dirty-bitmap.h |  41 +++++---------
+ include/qemu/hbitmap.h       |   8 +--
+ block/backup.c               |   7 +--
+ block/dirty-bitmap.c         | 128 ++++++++++++++-----------------------------
+ block/io.c                   |   6 +-
+ block/mirror.c               |  73 +++++++++++-------------
+ block/qcow2-bitmap.c         |  57 +++++++++----------
+ migration/block.c            |  12 ++--
+ tests/test-hbitmap.c         |  10 ++--
+ util/hbitmap.c               |   8 +--
+ 11 files changed, 142 insertions(+), 210 deletions(-)
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-
-
-Notes about things we need to fix in the future:
-
-[1] I think they should be replaced by qemu_global_option() calls, though=
-.
-[2] This is a fragile portion of the global property code and should be
-    eventually moved to the command-line parsing section of main().
-
-
->      if (qtest_chrdev) {
->          qtest_init(qtest_chrdev, qtest_log, &error_fatal);
->      }
-> @@ -4595,18 +4607,6 @@ int main(int argc, char **argv, char **envp)
->              exit (i =3D=3D 1 ? 1 : 0);
->      }
-> =20
-> -    /*
-> -     * Register all the global properties, including accel properties,
-> -     * machine properties, and user-specified ones.
-> -     */
-> -    register_global_properties(current_machine);
-> -
-> -    /*
-> -     * Migration object can only be created after global properties
-> -     * are applied correctly.
-> -     */
-> -    migration_object_init();
-> -
->      /* This checkpoint is required by replay to separate prior clock
->         reading from the other reads, because timer polling functions q=
-uery
->         clock values from the log. */
-> --=20
-> 2.7.4
->=20
-
---=20
-Eduardo
+-- 
+2.9.4
