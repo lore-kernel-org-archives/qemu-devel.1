@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47136)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dS7I0-0008Ke-U7
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:45:46 -0400
+	(envelope-from <mst@redhat.com>) id 1dS7I3-0008Mw-Fu
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:45:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dS7Hw-0003HX-3j
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:45:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34542)
+	(envelope-from <mst@redhat.com>) id 1dS7I2-0003Pc-Ci
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:45:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42554)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dS7Hv-0003GT-PQ
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:45:40 -0400
-Date: Mon, 3 Jul 2017 22:45:35 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dS7I2-0003O8-3o
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 15:45:46 -0400
+Date: Mon, 3 Jul 2017 22:45:41 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1499111049-13721-14-git-send-email-mst@redhat.com>
+Message-ID: <1499111049-13721-17-git-send-email-mst@redhat.com>
 References: <1499111049-13721-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1499111049-13721-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 13/21] fw_cfg: don't map the fw_cfg IO ports in
- fw_cfg_io_realize()
+Subject: [Qemu-devel] [PULL 16/21] intel_iommu: fix migration breakage on mr
+ switch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,103 +28,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Laszlo Ersek <lersek@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Gabriel Somlo <somlo@cmu.edu>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Xu <peterx@redhat.com>, Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+From: Peter Xu <peterx@redhat.com>
 
-As indicated by Laszlo it is a QOM bug for the realize() method to actually
-map the device. Set up the IO regions within fw_cfg_io_realize() and defer
-the mapping with sysbus_add_io() to the caller, as already done in
-fw_cfg_init_mem_wide().
+Migration is broken after the vfio integration work:
 
-This makes the iobase and dma_iobase properties now obsolete so they can be
-removed.
+qemu-kvm: AHCI: Failed to start FIS receive engine: bad FIS receive buffer address
+qemu-kvm: Failed to load ich9_ahci:ahci
+qemu-kvm: error while loading state for instance 0x0 of device '0000:00:1f.2/ich9_ahci'
+qemu-kvm: load of migration failed: Operation not permitted
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+The problem is that vfio work introduced dynamic memory region
+switching (actually it is also used for future PT mode), and this memory
+region layout is not properly delivered to destination when migration
+happens. Solution is to rebuild the layout in post_load.
+
+Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1459906
+Fixes: 558e0024 ("intel_iommu: allow dynamic switch of IOMMU region")
+Reviewed-by: Jason Wang <jasowang@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Tested-by: Gabriel Somlo <somlo@cmu.edu>
 ---
- hw/nvram/fw_cfg.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ hw/i386/intel_iommu.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index 316fca9..4e4f71a 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -96,7 +96,6 @@ struct FWCfgIoState {
-     /*< public >*/
- 
-     MemoryRegion comb_iomem;
--    uint32_t iobase, dma_iobase;
- };
- 
- struct FWCfgMemState {
-@@ -936,24 +935,30 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
-                                 AddressSpace *dma_as)
- {
-     DeviceState *dev;
-+    SysBusDevice *sbd;
-+    FWCfgIoState *ios;
-     FWCfgState *s;
-     uint32_t version = FW_CFG_VERSION;
-     bool dma_requested = dma_iobase && dma_as;
- 
-     dev = qdev_create(NULL, TYPE_FW_CFG_IO);
--    qdev_prop_set_uint32(dev, "iobase", iobase);
--    qdev_prop_set_uint32(dev, "dma_iobase", dma_iobase);
-     if (!dma_requested) {
-         qdev_prop_set_bit(dev, "dma_enabled", false);
-     }
- 
-     fw_cfg_init1(dev);
-+
-+    sbd = SYS_BUS_DEVICE(dev);
-+    ios = FW_CFG_IO(dev);
-+    sysbus_add_io(sbd, iobase, &ios->comb_iomem);
-+
-     s = FW_CFG(dev);
- 
-     if (s->dma_enabled) {
-         /* 64 bits for the address field */
-         s->dma_as = dma_as;
-         s->dma_addr = 0;
-+        sysbus_add_io(sbd, dma_iobase, &s->dma_iomem);
- 
-         version |= FW_CFG_VERSION_DMA;
-     }
-@@ -1059,8 +1064,6 @@ static void fw_cfg_file_slots_allocate(FWCfgState *s, Error **errp)
- }
- 
- static Property fw_cfg_io_properties[] = {
--    DEFINE_PROP_UINT32("iobase", FWCfgIoState, iobase, -1),
--    DEFINE_PROP_UINT32("dma_iobase", FWCfgIoState, dma_iobase, -1),
-     DEFINE_PROP_BOOL("dma_enabled", FWCfgIoState, parent_obj.dma_enabled,
-                      true),
-     DEFINE_PROP_UINT16("x-file-slots", FWCfgIoState, parent_obj.file_slots,
-@@ -1071,7 +1074,6 @@ static Property fw_cfg_io_properties[] = {
- static void fw_cfg_io_realize(DeviceState *dev, Error **errp)
- {
-     FWCfgIoState *s = FW_CFG_IO(dev);
--    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-     Error *local_err = NULL;
- 
-     fw_cfg_file_slots_allocate(FW_CFG(s), &local_err);
-@@ -1085,13 +1087,11 @@ static void fw_cfg_io_realize(DeviceState *dev, Error **errp)
-      * of the i/o region used is FW_CFG_CTL_SIZE */
-     memory_region_init_io(&s->comb_iomem, OBJECT(s), &fw_cfg_comb_mem_ops,
-                           FW_CFG(s), "fwcfg", FW_CFG_CTL_SIZE);
--    sysbus_add_io(sbd, s->iobase, &s->comb_iomem);
- 
-     if (FW_CFG(s)->dma_enabled) {
-         memory_region_init_io(&FW_CFG(s)->dma_iomem, OBJECT(s),
-                               &fw_cfg_dma_mem_ops, FW_CFG(s), "fwcfg.dma",
-                               sizeof(dma_addr_t));
--        sysbus_add_io(sbd, s->dma_iobase, &FW_CFG(s)->dma_iomem);
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 2ddf3bd..88dc042 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -2337,11 +2337,26 @@ static void vtd_iommu_notify_flag_changed(MemoryRegion *iommu,
      }
  }
  
++static int vtd_post_load(void *opaque, int version_id)
++{
++    IntelIOMMUState *iommu = opaque;
++
++    /*
++     * Memory regions are dynamically turned on/off depending on
++     * context entry configurations from the guest. After migration,
++     * we need to make sure the memory regions are still correct.
++     */
++    vtd_switch_address_space_all(iommu);
++
++    return 0;
++}
++
+ static const VMStateDescription vtd_vmstate = {
+     .name = "iommu-intel",
+     .version_id = 1,
+     .minimum_version_id = 1,
+     .priority = MIG_PRI_IOMMU,
++    .post_load = vtd_post_load,
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT64(root, IntelIOMMUState),
+         VMSTATE_UINT64(intr_root, IntelIOMMUState),
 -- 
 MST
