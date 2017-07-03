@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52615)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dRrLc-000757-7G
-	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 22:44:29 -0400
+	(envelope-from <sjitindarsingh@gmail.com>) id 1dRrsy-0007NI-7t
+	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 23:18:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dRrLb-0006qL-FB
-	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 22:44:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42120)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dRrLa-0006pk-U1
-	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 22:44:23 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 01DE880E72
-	for <qemu-devel@nongnu.org>; Mon,  3 Jul 2017 02:44:22 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Mon,  3 Jul 2017 10:44:08 +0800
-Message-Id: <1499049848-18012-5-git-send-email-peterx@redhat.com>
-In-Reply-To: <1499049848-18012-1-git-send-email-peterx@redhat.com>
-References: <1499049848-18012-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/4] doc: update TYPE_MIGRATION documents
+	(envelope-from <sjitindarsingh@gmail.com>) id 1dRrsx-0006XQ-8H
+	for qemu-devel@nongnu.org; Sun, 02 Jul 2017 23:18:52 -0400
+Message-ID: <1499051918.2398.1.camel@gmail.com>
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Date: Mon, 03 Jul 2017 13:18:38 +1000
+In-Reply-To: <20170630040317.GA13989@umbus.fritz.box>
+References: <20170629045940.11242-1-sjitindarsingh@gmail.com>
+	<20170630040317.GA13989@umbus.fritz.box>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] target/ppc: Only set PCR in kvm if
+ actually in a compat mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, agraf@suse.de, qemu-devel@nongnu.org
 
-[Peter collected Eduardo's patch comment and formatted into patch]
+On Fri, 2017-06-30 at 14:03 +1000, David Gibson wrote:
+> On Thu, Jun 29, 2017 at 02:59:39PM +1000, Suraj Jitindar Singh wrote:
+> > The Processor Compatibility Register (PCR) I used to set the
+> > compatibility mode of the processor using the SET_ONE_REG ioctl on
+> > KVM_REG_PPC_ARCH_COMPAT. Previously this was only called when a
+> > compat
+> > mode was actually in use, however a recent patch made it
+> > unconditional.
+> > Calling this in KVM_PR fails as there is no handler for that call
+> > and it
+> > is thus impossible to start a machine with KVM_PR.
+> > 
+> > Change ppc_set_compat() so that the ioctl is only actually called
+> > if a
+> > compat mode is in use. This means that a KVM_PR guest can boot.
+> > Additionally the current behaviour for KVM_HV is preserved where a
+> > compat
+> > mode of 0 set pcr and arch_compat in the vcore struct to zero, both
+> > of
+> > which are initialised to zero anyway.
+> > 
+> > Fixes: 37f516defa2e ("pseries: Reset CPU compatibility mode")
+> > 
+> > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> 
+> This doesn't seem quite right.  With this change, how would we ever
+> turn compatibility mode _off_ (which could happen on reset if nothing
 
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- migration/migration.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+Oh yeah, didn't really think about that.
 
-diff --git a/migration/migration.c b/migration/migration.c
-index dbdc121..6c64b99 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -2052,12 +2052,15 @@ static void migration_instance_init(Object *obj)
- static const TypeInfo migration_type = {
-     .name = TYPE_MIGRATION,
-     /*
--     * NOTE: "migration" itself is not really a device. We used
--     * TYPE_DEVICE here only to leverage some existing QDev features
--     * like "-global" properties, and HW_COMPAT_* fields (which are
--     * finally applied as global properties as well). If one day the
--     * global property feature can be migrated from QDev to QObject in
--     * general, then we can switch to QObject as well.
-+     * NOTE:
-+     *
-+     * TYPE_MIGRATION is not really a device, as the object is not
-+     * created using qdev_create(), it is not attached to the qdev
-+     * device tree, and it is never realized.
-+     *
-+     * If one day we allow non-device QOM objects to use the global
-+     * property system, we can switch this from TYPE_DEVICE to
-+     * TYPE_OBJECT.
-      */
-     .parent = TYPE_DEVICE,
-     .class_init = migration_class_init,
--- 
-2.7.4
+> else).  Really we should add this pseudo-register to KVM PR, although
+> I'm fine with also having a qemu workaround to let it work with older
+> PR versions.
+
+How do you feel about having a check and only calling the ioctl if the
+KVM in use is HV?
+
+> 
+> > 
+> > ---
+> > 
+> > Based on: dwg/ppc-for-2.10
+> > 
+> >  target/ppc/compat.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/target/ppc/compat.c b/target/ppc/compat.c
+> > index f1b67fa..4482206 100644
+> > --- a/target/ppc/compat.c
+> > +++ b/target/ppc/compat.c
+> > @@ -143,7 +143,7 @@ void ppc_set_compat(PowerPCCPU *cpu, uint32_t
+> > compat_pvr, Error **errp)
+> >      cpu->compat_pvr = compat_pvr;
+> >      env->spr[SPR_PCR] = pcr & pcc->pcr_mask;
+> >  
+> > -    if (kvm_enabled()) {
+> > +    if (kvm_enabled() && compat_pvr) {
+> >          int ret = kvmppc_set_compat(cpu, cpu->compat_pvr);
+> >          if (ret < 0) {
+> >              error_setg_errno(errp, -ret,
+> 
+> 
